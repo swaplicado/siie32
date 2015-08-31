@@ -1,0 +1,1095 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package erp.mtrn.data;
+
+import cfd.DCfdUtils;
+import cfd.DElement;
+import cfd.ver3.DElementComprobante;
+import cfd.ver3.DElementNomina;
+import cfd.ver3.DElementTimbreFiscalDigital;
+import erp.cfd.SCfdConsts;
+import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
+import erp.data.SDataReadDescriptions;
+import erp.data.SDataUtilities;
+import erp.lib.SLibConstants;
+import erp.lib.SLibTimeUtilities;
+import erp.lib.SLibUtilities;
+import erp.mbps.data.SDataBizPartner;
+import erp.mbps.data.SDataBizPartnerBranch;
+import erp.mbps.data.SDataBizPartnerBranchAddress;
+import erp.mbps.data.SDataBizPartnerBranchContact;
+import erp.mcfg.data.SDataCurrency;
+import erp.mhrs.data.SDataFormerPayroll;
+import erp.mhrs.data.SDataFormerPayrollEmp;
+import erp.mod.SModConsts;
+import erp.mod.hrs.db.SDbEmployeeType;
+import erp.mod.hrs.db.SDbPayroll;
+import erp.mod.hrs.db.SDbPayrollReceipt;
+import erp.print.SDataConstantsPrint;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperPrintManager;
+import net.sf.jasperreports.view.JasperViewer;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
+import sa.lib.db.SDbRegistry;
+import sa.lib.gui.SGuiClient;
+import sa.lib.xml.SXmlUtils;
+
+/**
+ *
+ * @author Sergio Flores
+ */
+public class SCfdPrint {
+
+    erp.client.SClientInterface miClient;
+
+    public SCfdPrint(erp.client.SClientInterface client) {
+        miClient = client;
+    }
+
+    public void printCfd(erp.mtrn.data.SDataCfd cfd, SDataDps dps) throws java.lang.Exception {
+        printCfd(cfd, SDataConstantsPrint.PRINT_MODE_VIEWER, dps);
+    }
+
+    public void printCfd(erp.mtrn.data.SDataCfd cfd, int pnPrintMode, SDataDps dps) throws java.lang.Exception {
+        int nFkEmiAddressFormatTypeId_n = 0;
+        int nFkRecAddressFormatTypeId_n = 0;
+        double dSubtotalProvisionalCy = 0;
+        double dDiscountDocCy = 0;
+        double dSubtotalCy = 0;
+        double dTotalCy = 0;
+        double dTotalPesoBruto = 0;
+        double dTotalPesoNeto = 0;
+        float fVersion = 0;
+        Map<String, Object> map = null;
+        JasperPrint jasperPrint = null;
+        JasperViewer jasperViewer = null;
+        DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        Document doc = docBuilder.parse(new ByteArrayInputStream(cfd.getDocXml().getBytes("UTF-8")));
+        SDataCurrency cur = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { dps.getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
+        SDataBizPartnerBranchAddress address = null;
+        SDataBizPartnerBranchContact contact = null;
+        SDataBizPartnerBranch emisor = null;
+        SDataBizPartnerBranch receptor = null;
+        SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP,
+                    new int[] { dps.getFkBizPartnerId_r() }, SLibConstants.EXEC_MODE_SILENT);
+        Node node = null;
+        Node nodeChild = null;
+        NamedNodeMap namedNodeMap = null;
+        NamedNodeMap namedNodeMapChild = null;
+        String sDocType = "";
+        String sDocValueText = "";
+        String sTelsEmiDom = "";
+        String sTelsEmiExp = "";
+        String sPdfFileName = "";
+
+        if (dps.getFkBizPartnerBranchAddressId() != 1) {
+            address = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB_ADD,
+                    new int[] { dps.getFkBizPartnerBranchId(), dps.getFkBizPartnerBranchAddressId() }, SLibConstants.EXEC_MODE_SILENT);
+        }
+
+        for (SDataDpsEntry entry : dps.getDbmsDpsEntries()) {
+            if (entry.isAccountable()) {
+                dSubtotalProvisionalCy += entry.getSubtotalProvisionalCy_r();
+                dDiscountDocCy += entry.getDiscountDocCy();
+                dSubtotalCy += entry.getSubtotalCy_r();
+                dTotalCy += entry.getTotalCy_r();
+            }
+        }
+
+        sDocType = SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNU_TP_DPS, new int[] { dps.getFkDpsCategoryId(), dps.getFkDpsClassId(), dps.getFkDpsTypeId() });
+        sDocValueText = SLibUtilities.translateValueToText(dTotalCy, miClient.getSessionXXX().getParamsErp().getDecimalsValue(), dps.getFkLanguajeId(), cur.getTextSingular(), cur.getTextPlural(), cur.getTextPrefix(), cur.getTextSuffix());
+
+        if (sDocType.indexOf("CTE.") != -1) {
+            sDocType = SLibUtilities.textTrim(sDocType.substring(0, sDocType.indexOf("CTE.")));
+        }
+
+        map = miClient.createReportParams();
+
+        map.put("sXmlBaseDir", miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory());
+        map.put("nPkYearId", cfd.getFkDpsYearId_n());
+        map.put("nPkDocId", cfd.getFkDpsDocId_n());
+        map.put("sDocTipo", sDocType);
+        map.put("bDocEsMonedaLocal", miClient.getSessionXXX().getParamsErp().getFkCurrencyId() == dps.getFkCurrencyId());
+        map.put("dDocSubtotalProvisional", dSubtotalProvisionalCy);
+        map.put("dDocDescuento", dDiscountDocCy);
+        map.put("dDocSubtotal", dSubtotalCy);
+        map.put("dDocTotal", dTotalCy);
+        map.put("sDocTotalConLetra", sDocValueText);
+        map.put("sDocCadenaOriginal", cfd.getStringSigned());
+        map.put("bIsAnnulled", dps.getFkDpsStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED);
+        map.put("bIsDeleted", dps.getIsDeleted());
+
+        if (miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().size() > 0) {
+            contact = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0);
+            sTelsEmiDom += (sTelsEmiDom.length() == 0 || contact.getAuxTelephone01().length() == 0 ? "" : ", ") + contact.getAuxTelephone01();
+            sTelsEmiDom += (sTelsEmiDom.length() == 0 || contact.getAuxTelephone02().length() == 0 ? "" : ", ") + contact.getAuxTelephone02();
+            sTelsEmiDom += (sTelsEmiDom.length() == 0 || contact.getAuxTelephone03().length() == 0 ? "" : ", ") + contact.getAuxTelephone03();
+            sTelsEmiDom += (sTelsEmiDom.length() == 0 || contact.getEmail01().length() == 0 ? "" : ", ") + contact.getEmail01();
+        }
+
+        map.put("sTelEmiDom", sTelsEmiDom);
+
+        if(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranch(new int[]{dps.getFkCompanyBranchId()}).getDbmsBizPartnerBranchContacts().size() > 0) {
+            contact = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranch(new int[]{dps.getFkCompanyBranchId()}).getDbmsBizPartnerBranchContacts().get(0);
+            sTelsEmiExp += (sTelsEmiExp.length() == 0 || contact.getAuxTelephone01().length() == 0 ? "" : ", ") + contact.getAuxTelephone01();
+            sTelsEmiExp += (sTelsEmiExp.length() == 0 || contact.getAuxTelephone02().length() == 0 ? "" : ", ") + contact.getAuxTelephone02();
+            sTelsEmiExp += (sTelsEmiExp.length() == 0 || contact.getAuxTelephone03().length() == 0 ? "" : ", ") + contact.getAuxTelephone03();
+            sTelsEmiExp += (sTelsEmiExp.length() == 0 || contact.getEmail01().length() == 0 ? "" : ", ") + contact.getEmail01();
+        }
+
+        map.put("sTelEmiExp", sTelsEmiExp);
+
+        contact = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().size() <= 1 ? null :
+                miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(1);
+
+        map.put("sManagerFinance", contact == null ? "" : SLibUtilities.textTrim(contact.getContactPrefix() + " " + contact.getFirstname() + " " + contact.getLastname()));
+
+        // Comprobante:
+
+        node = SXmlUtils.extractElements(doc, "Comprobante").item(0);
+        namedNodeMap = node.getAttributes();
+
+        map.put("sCfdVersion", SXmlUtils.extractAttributeValue(namedNodeMap, "version", true));
+        map.put("sCfdSerieOpc", SXmlUtils.extractAttributeValue(namedNodeMap, "serie", false));
+        map.put("sCfdFolio", SXmlUtils.extractAttributeValue(namedNodeMap, "folio", true));
+        map.put("sCfdFecha", SXmlUtils.extractAttributeValue(namedNodeMap, "fecha", true));
+        map.put("sCfdSello", SXmlUtils.extractAttributeValue(namedNodeMap, "sello", true));
+        map.put("nCfdNoAprobacion", SLibUtilities.parseInt(SXmlUtils.extractAttributeValue(namedNodeMap, "noAprobacion", true)));
+        map.put("nCfdAnoAprobacion", SLibUtilities.parseInt(SXmlUtils.extractAttributeValue(namedNodeMap, "anoAprobacion", true)));
+        map.put("sCfdFormaDePago", SXmlUtils.extractAttributeValue(namedNodeMap, "formaDePago", true));
+        map.put("sCfdNoCertificado", SXmlUtils.extractAttributeValue(namedNodeMap, "noCertificado", true));
+        map.put("sCfdCondicionesDePagoOpc", SXmlUtils.extractAttributeValue(namedNodeMap, "condicionesDePago", false));
+        map.put("dCfdSubTotal", SLibUtilities.parseDouble(SXmlUtils.extractAttributeValue(namedNodeMap, "subTotal", true)));
+        map.put("dCfdDescuentoOpc", SLibUtilities.parseDouble(SXmlUtils.extractAttributeValue(namedNodeMap, "descuento", false)));
+        map.put("sCfdMotivoDescuentoOpc", SXmlUtils.extractAttributeValue(namedNodeMap, "motivoDescuento", false));
+        map.put("dCfdTotal", SLibUtilities.parseDouble(SXmlUtils.extractAttributeValue(namedNodeMap, "total", true)));
+        map.put("sCfdMetodoDePagoOpc", SXmlUtils.extractAttributeValue(namedNodeMap, "metodoDePago", false));
+        map.put("sCfdTipoDeComprobante", SXmlUtils.extractAttributeValue(namedNodeMap, "tipoDeComprobante", true));
+
+        fVersion = Float.parseFloat(SXmlUtils.extractAttributeValue(namedNodeMap, "version", true));
+
+        if (fVersion == 2.2f) {
+            map.put("sCfdNoCuentaPago", SXmlUtils.extractAttributeValue(namedNodeMap, "NumCtaPago", false));
+        }
+
+        // Emisor:
+
+        node = SXmlUtils.extractElements(doc, "Emisor").item(0);
+        namedNodeMap = node.getAttributes();
+
+        map.put("sEmiRfc", SXmlUtils.extractAttributeValue(namedNodeMap, "rfc", true));
+        map.put("sEmiNombre", SXmlUtils.extractAttributeValue(namedNodeMap, "nombre", true));
+
+        nodeChild = SXmlUtils.extractChildElements(node, "DomicilioFiscal").get(0);
+        namedNodeMapChild = nodeChild.getAttributes();
+
+        emisor = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB,new int[] { dps.getFkCompanyBranchId(), dps.getFkCompanyBranchId() } , SLibConstants.EXEC_MODE_SILENT);
+
+        if(emisor.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
+            nFkEmiAddressFormatTypeId_n = emisor.getFkAddressFormatTypeId_n();
+        }
+        else {
+            nFkEmiAddressFormatTypeId_n = miClient.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n();
+        }
+
+        map.put("sEmiDomCalle", SXmlUtils.extractAttributeValue(namedNodeMapChild, "calle", true));
+        map.put("sEmiDomNoExteriorOpc", SXmlUtils.extractAttributeValue(namedNodeMapChild, "noExterior", false));
+        map.put("sEmiDomNoInteriorOpc", SXmlUtils.extractAttributeValue(namedNodeMapChild, "noInterior", false));
+        map.put("sEmiDomColoniaOpc", SXmlUtils.extractAttributeValue(namedNodeMapChild, "colonia", false));
+        map.put("sEmiDomLocalidadOpc", SXmlUtils.extractAttributeValue(namedNodeMapChild, "localidad", false));
+        map.put("sEmiDomReferenciaOpc", SXmlUtils.extractAttributeValue(namedNodeMapChild, "referencia", false));
+        map.put("sEmiDomMunicipio", SXmlUtils.extractAttributeValue(namedNodeMapChild, "municipio", true));
+        map.put("sEmiDomEstado", SXmlUtils.extractAttributeValue(namedNodeMapChild, "estado", true));
+        map.put("sEmiDomPais", SXmlUtils.extractAttributeValue(namedNodeMapChild, "pais", true));
+        map.put("sEmiDomCodigoPostal", SXmlUtils.extractAttributeValue(namedNodeMapChild, "codigoPostal", true));
+        map.put("nFkEmiAddressFormatTypeId_n", nFkEmiAddressFormatTypeId_n);
+
+        if (SXmlUtils.hasChildElement(node, "ExpedidoEn")) {
+            nodeChild = SXmlUtils.extractChildElements(node, "ExpedidoEn").get(0);
+            namedNodeMapChild = nodeChild.getAttributes();
+
+            map.put("sEmiExpCalleOpc", SXmlUtils.extractAttributeValue(namedNodeMapChild, "calle", false));
+            map.put("sEmiExpNoExteriorOpc", SXmlUtils.extractAttributeValue(namedNodeMapChild, "noExterior", false));
+            map.put("sEmiExpNoInteriorOpc", SXmlUtils.extractAttributeValue(namedNodeMapChild, "noInterior", false));
+            map.put("sEmiExpColoniaOpc", SXmlUtils.extractAttributeValue(namedNodeMapChild, "colonia", false));
+            map.put("sEmiExpLocalidadOpc", SXmlUtils.extractAttributeValue(namedNodeMapChild, "localidad", false));
+            map.put("sEmiExpReferenciaOpc", SXmlUtils.extractAttributeValue(namedNodeMapChild, "referencia", false));
+            map.put("sEmiExpMunicipioOpc", SXmlUtils.extractAttributeValue(namedNodeMapChild, "municipio", false));
+            map.put("sEmiExpEstadoOpc", SXmlUtils.extractAttributeValue(namedNodeMapChild, "estado", false));
+            map.put("sEmiExpPais", SXmlUtils.extractAttributeValue(namedNodeMapChild, "pais", true));
+            map.put("sEmiExpCodigoPostalOpc", SXmlUtils.extractAttributeValue(namedNodeMapChild, "codigoPostal", false));
+        }
+
+        if (fVersion == 2.2f) {
+            nodeChild = SXmlUtils.extractChildElements(node, "RegimenFiscal").get(0);
+            namedNodeMapChild = nodeChild.getAttributes();
+
+            if (SXmlUtils.extractAttributeValue(namedNodeMapChild, "Regimen", false).length() > 0) {
+                map.put("sEmiRegimenFiscal", SXmlUtils.extractAttributeValue(namedNodeMapChild, "Regimen", true));
+            }
+        }
+
+        // Receptor:
+
+        node = SXmlUtils.extractElements(doc, "Receptor").item(0);
+        namedNodeMap = node.getAttributes();
+
+        map.put("sRecRfc", SXmlUtils.extractAttributeValue(namedNodeMap, "rfc", true));
+        map.put("sRecNombreOpc", SXmlUtils.extractAttributeValue(namedNodeMap, "nombre", false));
+
+        nodeChild = SXmlUtils.extractChildElements(node, "Domicilio").get(0);
+        namedNodeMapChild = nodeChild.getAttributes();
+
+        receptor = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB,new int[] { dps.getFkBizPartnerBranchId(), dps.getFkBizPartnerBranchAddressId() } , SLibConstants.EXEC_MODE_SILENT);
+
+        if(receptor.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
+            nFkRecAddressFormatTypeId_n = receptor.getFkAddressFormatTypeId_n();
+        }
+        else {
+            nFkRecAddressFormatTypeId_n = miClient.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n();
+        }
+
+        map.put("sRecDomCalleOpc", SXmlUtils.extractAttributeValue(namedNodeMapChild, "calle", false));
+        map.put("sRecDomNoExteriorOpc", SXmlUtils.extractAttributeValue(namedNodeMapChild, "noExterior", false));
+        map.put("sRecDomNoInteriorOpc", SXmlUtils.extractAttributeValue(namedNodeMapChild, "noInterior", false));
+        map.put("sRecDomColoniaOpc", SXmlUtils.extractAttributeValue(namedNodeMapChild, "colonia", false));
+        map.put("sRecDomLocalidadOpc", SXmlUtils.extractAttributeValue(namedNodeMapChild, "localidad", false));
+        map.put("sRecDomReferenciaOpc", SXmlUtils.extractAttributeValue(namedNodeMapChild, "referencia", false));
+        map.put("sRecDomMunicipioOpc", SXmlUtils.extractAttributeValue(namedNodeMapChild, "municipio", false));
+        map.put("sRecDomEstadoOpc", SXmlUtils.extractAttributeValue(namedNodeMapChild, "estado", false));
+        map.put("sRecDomPais", SXmlUtils.extractAttributeValue(namedNodeMapChild, "pais", true));
+        map.put("sRecDomCodigoPostalOpc", SXmlUtils.extractAttributeValue(namedNodeMapChild, "codigoPostal", false));
+        map.put("nFkRecAddressFormatTypeId_n", nFkRecAddressFormatTypeId_n);
+
+        map.put("sFiscalId", bizPartner.getFiscalFrgId());
+
+        if (address != null) {
+            map.put("sRecEnt", address.getAddress());
+            map.put("sRecEntCalleOpc", address.getStreet());
+            map.put("sRecEntNoExteriorOpc", address.getStreetNumberExt());
+            map.put("sRecEntNoInteriorOpc", address.getStreetNumberInt());
+            map.put("sRecEntColoniaOpc", address.getNeighborhood());
+            map.put("sRecEntLocalidadOpc", address.getLocality());
+            map.put("sRecEntReferenciaOpc", address.getReference());
+            map.put("sRecEntMunicipioOpc", address.getCounty());
+            map.put("sRecEntEstadoOpc", address.getState());
+            map.put("sRecEntPais", address.getDbmsDataCountry().getCountry());
+            map.put("sRecEntCodigoPostalOpc", address.getZipCode());
+        }
+
+        // Addenda:
+
+        for (SDataDpsEntry entry : dps.getDbmsDpsEntries()) {
+            if (entry.isAccountable()) {
+                dTotalPesoBruto += entry.getWeightGross();
+                dTotalPesoNeto += entry.getMass();
+            }
+        }
+
+        map.put("sAddClaveMoneda", dps.getDbmsCurrencyKey());
+        map.put("dAddTipoDeCambio", dps.getExchangeRate());
+        map.put("nAddDiasDeCredito", dps.getDaysOfCredit());
+        map.put("sAddEmbarque", "");
+        map.put("sAddOrdenDeEmbarque", "");
+        map.put("sAddOrdenDeCompra", dps.getNumberReference());
+        map.put("sAddContrato", dps.getAuxCfdParams().getContrato());
+        map.put("sAddPedido", dps.getAuxCfdParams().getPedido());
+        map.put("sAddFactura", dps.getAuxCfdParams().getFactura());
+        map.put("sAddCliente", dps.getAuxCfdParams().getReceptor().getDbmsCategorySettingsCus().getKey());
+        map.put("sAddSucursal", dps.getFkCompanyBranchId());
+        map.put("sAddAgente",  dps.getFkSalesAgentId_n());
+        map.put("sAddRuta", dps.getAuxCfdParams().getRuta());
+        map.put("sAddChofer", dps.getDriver());
+        map.put("sAddPlacas", dps.getPlate());
+        map.put("sAddBoleto", dps.getTicket());
+        map.put("dAddPesoBruto", dTotalPesoBruto);
+        map.put("dAddPesoNeto", dTotalPesoNeto);
+        map.put("sAddUnidadPesoBruto", dps.getAuxCfdParams().getUnidadPesoBruto());
+        map.put("sAddUnidadPesoNeto", dps.getAuxCfdParams().getUnidadPesoBruto());
+
+        map.put("sAddPagFecha", miClient.getSessionXXX().getFormatters().getDateTextFormat().format(dps.getDate()).toUpperCase());
+        map.put("sAddPagFechaDeVencimiento", miClient.getSessionXXX().getFormatters().getDateTextFormat().format(SLibTimeUtilities.addDate(dps.getDateStartCredit(), 0, 0, dps.getDaysOfCredit())).toUpperCase());
+        map.put("dAddPagImporte", dps.getTotalCy_r());
+        map.put("sAddPagClaveMoneda", dps.getDbmsCurrencyKey());
+        map.put("dAddPagInteresMoratorio", dps.getAuxCfdParams().getInterestDelayRate());
+
+        /*
+        * XXX Remove addenda of Tron (navalos, 2014-05-07)
+        *
+
+        // Addenda:
+
+        node = SXmlUtils.extractElements(doc, "Addenda").item(0);
+        node = SXmlUtils.extractChildElements(node, "myadd:Addenda1").get(0);
+
+        nodeChild = SXmlUtils.extractChildElements(node, "myadd:Moneda").get(0);
+        namedNodeMapChild = nodeChild.getAttributes();
+
+        map.put("sAddClaveMoneda", SXmlUtils.extractAttributeValue(namedNodeMapChild, "claveMoneda", true));
+        map.put("dAddTipoDeCambio", SLibUtilities.parseDouble(SXmlUtils.extractAttributeValue(namedNodeMapChild, "tipoDeCambio", true)));
+
+        nodeChild = SXmlUtils.extractChildElements(node, "myadd:Adicional").get(0);
+        namedNodeMapChild = nodeChild.getAttributes();
+
+        map.put("nAddDiasDeCredito", SLibUtilities.parseInt(SXmlUtils.extractAttributeValue(namedNodeMapChild, "diasDeCredito", false)));
+        map.put("sAddEmbarque", SXmlUtils.extractAttributeValue(namedNodeMapChild, "embarque", false));
+        map.put("sAddOrdenDeEmbarque", SXmlUtils.extractAttributeValue(namedNodeMapChild, "ordenDeEmbarque", false));
+        map.put("sAddOrdenDeCompra", SXmlUtils.extractAttributeValue(namedNodeMapChild, "ordenDeCompra", false));
+        map.put("sAddContrato", SXmlUtils.extractAttributeValue(namedNodeMapChild, "contrato", false));
+        map.put("sAddPedido", SXmlUtils.extractAttributeValue(namedNodeMapChild, "pedido", false));
+        map.put("sAddFactura", SXmlUtils.extractAttributeValue(namedNodeMapChild, "factura", false));
+        map.put("sAddCliente", SXmlUtils.extractAttributeValue(namedNodeMapChild, "cliente", false));
+        map.put("sAddSucursal", SXmlUtils.extractAttributeValue(namedNodeMapChild, "sucursal", false));
+        map.put("sAddAgente", SXmlUtils.extractAttributeValue(namedNodeMapChild, "agente", false));
+        map.put("sAddRuta", SXmlUtils.extractAttributeValue(namedNodeMapChild, "ruta", false));
+        map.put("sAddChofer", SXmlUtils.extractAttributeValue(namedNodeMapChild, "chofer", false));
+        map.put("sAddPlacas", SXmlUtils.extractAttributeValue(namedNodeMapChild, "placas", false));
+        map.put("sAddBoleto", SXmlUtils.extractAttributeValue(namedNodeMapChild, "boleto", false));
+        map.put("dAddPesoBruto", SLibUtilities.parseDouble(SXmlUtils.extractAttributeValue(namedNodeMapChild, "pesoBruto", false)));
+        map.put("dAddPesoNeto", SLibUtilities.parseDouble(SXmlUtils.extractAttributeValue(namedNodeMapChild, "pesoNeto", false)));
+        map.put("sAddUnidadPesoBruto", SXmlUtils.extractAttributeValue(namedNodeMapChild, "unidadPesoBruto", true));
+        map.put("sAddUnidadPesoNeto", SXmlUtils.extractAttributeValue(namedNodeMapChild, "unidadPesoNeto", true));
+
+        if (SXmlUtils.hasChildElement(node, "myadd:Pagare")) {
+            nodeChild = SXmlUtils.extractChildElements(node, "myadd:Pagare").get(0);
+            namedNodeMapChild = nodeChild.getAttributes();
+
+            map.put("sAddPagFecha", miClient.getSessionXXX().getFormatters().getDateTextFormat().format(dps.getDate()).toUpperCase());
+            map.put("sAddPagFechaDeVencimiento", miClient.getSessionXXX().getFormatters().getDateTextFormat().format(SLibTimeUtilities.addDate(dps.getDateStartCredit(), 0, 0, dps.getDaysOfCredit())).toUpperCase());
+            map.put("dAddPagImporte", SLibUtilities.parseDouble(SXmlUtils.extractAttributeValue(namedNodeMapChild, "importe", false)));
+            map.put("sAddPagClaveMoneda", SXmlUtils.extractAttributeValue(namedNodeMapChild, "claveMoneda", false));
+            map.put("dAddPagInteresMoratorio", SLibUtilities.parseDouble(SXmlUtils.extractAttributeValue(namedNodeMapChild, "interesMoratorio", false)));
+        }
+        */
+
+        jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_CFD, map);
+        sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
+        sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
+
+        switch (pnPrintMode) {
+            case SDataConstantsPrint.PRINT_MODE_VIEWER:
+                jasperViewer = new JasperViewer(jasperPrint, false);
+                jasperViewer.setTitle("Comprobante Fiscal Digital");
+                jasperViewer.setVisible(true);
+                break;
+            case SDataConstantsPrint.PRINT_MODE_PDF:
+                JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
+                break;
+            default:
+                throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
+        }
+    }
+
+    public void printCfdi(erp.mtrn.data.SDataCfd cfd, int pnPrintMode, SDataDps dps) throws java.lang.Exception {
+        int nFkEmiAddressFormatTypeId_n = 0;
+        int nFkRecAddressFormatTypeId_n = 0;
+        double dSubtotalProvisionalCy = 0;
+        double dDiscountDocCy = 0;
+        double dSubtotalCy = 0;
+        double dTotalCy = 0;
+        double dTotalPesoBruto = 0;
+        double dTotalPesoNeto = 0;
+        Map<String, Object> map = null;
+        JasperPrint jasperPrint = null;
+        JasperViewer jasperViewer = null;
+        SDataCurrency cur = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { dps.getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
+        SDataBizPartnerBranchAddress address = null;
+        SDataBizPartnerBranchContact contact = null;
+        SDataBizPartnerBranch emisor = null;
+        SDataBizPartnerBranch receptor = null;
+        SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { dps.getFkBizPartnerId_r() }, SLibConstants.EXEC_MODE_SILENT);
+        String sDocType = "";
+        String sDocValueText = "";
+        String sTelsEmiDom = "";
+        String sTelsEmiExp = "";
+        String sPdfFileName = "";
+        BufferedImage biQrCode = null;  // cannot be really used, because is not serializable
+        cfd.ver3.DElementComprobante comprobante = null;
+
+        if (dps.getFkBizPartnerBranchAddressId() != 1) {
+            address = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB_ADD,
+                    new int[] { dps.getFkBizPartnerBranchId(), dps.getFkBizPartnerBranchAddressId() }, SLibConstants.EXEC_MODE_SILENT);
+        }
+
+        for (SDataDpsEntry entry : dps.getDbmsDpsEntries()) {
+            if (entry.isAccountable()) {
+                dSubtotalProvisionalCy += entry.getSubtotalProvisionalCy_r();
+                dDiscountDocCy += entry.getDiscountDocCy();
+                dSubtotalCy += entry.getSubtotalCy_r();
+                dTotalCy += entry.getTotalCy_r();
+            }
+        }
+
+        sDocType = SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNU_TP_DPS, new int[] { dps.getFkDpsCategoryId(), dps.getFkDpsClassId(), dps.getFkDpsTypeId() });
+        sDocValueText = SLibUtilities.translateValueToText(dTotalCy, miClient.getSessionXXX().getParamsErp().getDecimalsValue(), dps.getFkLanguajeId(), cur.getTextSingular(), cur.getTextPlural(), cur.getTextPrefix(), cur.getTextSuffix());
+
+        if (sDocType.indexOf("CTE.") != -1) {
+            sDocType = SLibUtilities.textTrim(sDocType.substring(0, sDocType.indexOf("CTE.")));
+        }
+
+        map = miClient.createReportParams();
+
+        map.put("sXmlBaseDir", miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory());
+        map.put("nPkYearId", cfd.getFkDpsYearId_n());
+        map.put("nPkDocId", cfd.getFkDpsDocId_n());
+        map.put("sDocTipo", sDocType);
+        map.put("bDocEsMonedaLocal", miClient.getSessionXXX().getParamsErp().getFkCurrencyId() == dps.getFkCurrencyId());
+        map.put("dDocSubtotalProvisional", dSubtotalProvisionalCy);
+        map.put("dDocDescuento", dDiscountDocCy);
+        map.put("dDocSubtotal", dSubtotalCy);
+        map.put("dDocTotal", dTotalCy);
+        map.put("sDocTotalConLetra", sDocValueText);
+        map.put("sDocCadenaOriginal", cfd.getStringSigned());
+        map.put("bIsAnnulled", dps.getFkDpsStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED);
+        map.put("bIsDeleted", dps.getIsDeleted());
+
+        if (miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().size() > 0) {
+            contact = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0);
+            sTelsEmiDom += (sTelsEmiDom.length() == 0 || contact.getAuxTelephone01().length() == 0 ? "" : ", ") + contact.getAuxTelephone01();
+            sTelsEmiDom += (sTelsEmiDom.length() == 0 || contact.getAuxTelephone02().length() == 0 ? "" : ", ") + contact.getAuxTelephone02();
+            sTelsEmiDom += (sTelsEmiDom.length() == 0 || contact.getAuxTelephone03().length() == 0 ? "" : ", ") + contact.getAuxTelephone03();
+            sTelsEmiDom += (sTelsEmiDom.length() == 0 || contact.getEmail01().length() == 0 ? "" : ", ") + contact.getEmail01();
+        }
+
+        map.put("sTelEmiDom", sTelsEmiDom);
+
+        if (miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranch(new int[]{dps.getFkCompanyBranchId()}).getDbmsBizPartnerBranchContacts().size() > 0) {
+            contact = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranch(new int[]{dps.getFkCompanyBranchId()}).getDbmsBizPartnerBranchContacts().get(0);
+            sTelsEmiExp += (sTelsEmiExp.length() == 0 || contact.getAuxTelephone01().length() == 0 ? "" : ", ") + contact.getAuxTelephone01();
+            sTelsEmiExp += (sTelsEmiExp.length() == 0 || contact.getAuxTelephone02().length() == 0 ? "" : ", ") + contact.getAuxTelephone02();
+            sTelsEmiExp += (sTelsEmiExp.length() == 0 || contact.getAuxTelephone03().length() == 0 ? "" : ", ") + contact.getAuxTelephone03();
+            sTelsEmiExp += (sTelsEmiExp.length() == 0 || contact.getEmail01().length() == 0 ? "" : ", ") + contact.getEmail01();
+        }
+
+        map.put("sTelEmiExp", sTelsEmiExp);
+
+        contact = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().size() <= 1 ? null :
+                miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(1);
+
+        map.put("sManagerFinance", contact == null ? "" : SLibUtilities.textTrim(contact.getContactPrefix() + " " + contact.getFirstname() + " " + contact.getLastname()));
+
+        // Comprobante:
+
+        comprobante = DCfdUtils.getCfdi(cfd.getDocXml());
+
+        map.put("sCfdVersion", comprobante.getAttVersion().getString());
+        map.put("sCfdSerieOpc", comprobante.getAttSerie().getString());
+        map.put("sCfdFolio", comprobante.getAttFolio().getString());
+        map.put("sCfdFecha", SLibUtils.DbmsDateFormatDatetime.format(comprobante.getAttFecha().getDatetime()));
+        map.put("sCfdSello", comprobante.getAttSello().getString());
+        map.put("sCfdFormaDePago", comprobante.getAttFormaDePago().getOption());
+        map.put("sCfdNoCertificado", comprobante.getAttNoCertificado().getString());
+        map.put("sCfdCondicionesDePagoOpc", comprobante.getAttCondicionesDePago().getOption());
+        map.put("dCfdSubTotal", comprobante.getAttSubTotal().getDouble());
+        map.put("dCfdTotal", comprobante.getAttTotal().getDouble());
+        map.put("sCfdMetodoDePagoOpc", comprobante.getAttMetodoDePago().getString());
+        map.put("sExpedidoEn", comprobante.getAttLugarExpedicion().getString());
+        map.put("sCfdTipoDeComprobante", comprobante.getAttTipoDeComprobante().getOption());
+        map.put("sCfdNoCuentaPago", comprobante.getAttNumCtaPago().getString());
+
+        // Emisor:
+
+        map.put("sEmiRfc", comprobante.getEltEmisor().getAttRfc().getString());
+        map.put("sEmiNombre", comprobante.getEltEmisor().getAttNombre().getString());
+
+        emisor = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { dps.getFkCompanyBranchId(), dps.getFkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
+
+        if (emisor.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
+            nFkEmiAddressFormatTypeId_n = emisor.getFkAddressFormatTypeId_n();
+        }
+        else {
+            nFkEmiAddressFormatTypeId_n = miClient.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n();
+        }
+
+        map.put("sEmiDomCalle", comprobante.getEltEmisor().getEltDomicilioFiscal().getAttCalle().getString());
+        map.put("sEmiDomNoExteriorOpc", comprobante.getEltEmisor().getEltDomicilioFiscal().getAttNoExterior().getString());
+        map.put("sEmiDomNoInteriorOpc", comprobante.getEltEmisor().getEltDomicilioFiscal().getAttNoInterior().getString());
+        map.put("sEmiDomColoniaOpc", comprobante.getEltEmisor().getEltDomicilioFiscal().getAttColonia().getString());
+        map.put("sEmiDomLocalidadOpc", comprobante.getEltEmisor().getEltDomicilioFiscal().getAttLocalidad().getString());
+        map.put("sEmiDomReferenciaOpc", comprobante.getEltEmisor().getEltDomicilioFiscal().getAttReferencia().getString());
+        map.put("sEmiDomMunicipio", comprobante.getEltEmisor().getEltDomicilioFiscal().getAttMunicipio().getString());
+        map.put("sEmiDomEstado", comprobante.getEltEmisor().getEltDomicilioFiscal().getAttEstado().getString());
+        map.put("sEmiDomPais", comprobante.getEltEmisor().getEltDomicilioFiscal().getAttPais().getString());
+        map.put("sEmiDomCodigoPostal", comprobante.getEltEmisor().getEltDomicilioFiscal().getAttCodigoPostal().getString());
+        map.put("nFkEmiAddressFormatTypeId_n", nFkEmiAddressFormatTypeId_n);
+
+        if (comprobante.getEltEmisor().getEltHijosRegimenFiscal().size() > 0) { // XXX Fix code: it is possible to have many "RegimenFiscal" nodes!!!
+            map.put("sEmiRegimenFiscal", comprobante.getEltEmisor().getEltHijosRegimenFiscal().get(0).getAttRegimen().getString());
+        }
+
+        if (comprobante.getEltEmisor().getEltOpcExpedidoEn() != null) {
+            map.put("sEmiExpCalleOpc", comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttCalle().getString());
+            map.put("sEmiExpNoExteriorOpc", comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttNoExterior().getString());
+            map.put("sEmiExpNoInteriorOpc", comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttNoInterior().getString());
+            map.put("sEmiExpColoniaOpc", comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttColonia().getString());
+            map.put("sEmiExpLocalidadOpc", comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttLocalidad().getString());
+            map.put("sEmiExpReferenciaOpc", comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttReferencia().getString());
+            map.put("sEmiExpMunicipioOpc", comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttMunicipio().getString());
+            map.put("sEmiExpEstadoOpc", comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttEstado().getString());
+            map.put("sEmiExpPais", comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttPais().getString());
+            map.put("sEmiExpCodigoPostalOpc", comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttCodigoPostal().getString());
+        }
+
+        // Receptor:
+
+        map.put("sRecRfc", comprobante.getEltReceptor().getAttRfc().getString());
+        map.put("sRecNombreOpc", comprobante.getEltReceptor().getAttNombre().getString());
+
+        receptor = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB,new int[] { dps.getFkBizPartnerBranchId(), dps.getFkBizPartnerBranchAddressId() } , SLibConstants.EXEC_MODE_SILENT);
+
+        if (receptor.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
+            nFkRecAddressFormatTypeId_n = receptor.getFkAddressFormatTypeId_n();
+        }
+        else {
+            nFkRecAddressFormatTypeId_n = miClient.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n();
+        }
+
+        map.put("sRecDomCalleOpc", comprobante.getEltReceptor().getEltDomicilio().getAttCalle().getString());
+        map.put("sRecDomNoExteriorOpc", comprobante.getEltReceptor().getEltDomicilio().getAttNoExterior().getString());
+        map.put("sRecDomNoInteriorOpc", comprobante.getEltReceptor().getEltDomicilio().getAttNoInterior().getString());
+        map.put("sRecDomColoniaOpc", comprobante.getEltReceptor().getEltDomicilio().getAttColonia().getString());
+        map.put("sRecDomLocalidadOpc", comprobante.getEltReceptor().getEltDomicilio().getAttLocalidad().getString());
+        map.put("sRecDomReferenciaOpc", comprobante.getEltReceptor().getEltDomicilio().getAttReferencia().getString());
+        map.put("sRecDomMunicipioOpc", comprobante.getEltReceptor().getEltDomicilio().getAttMunicipio().getString());
+        map.put("sRecDomEstadoOpc", comprobante.getEltReceptor().getEltDomicilio().getAttEstado().getString());
+        map.put("sRecDomPais", comprobante.getEltReceptor().getEltDomicilio().getAttPais().getString());
+        map.put("sRecDomCodigoPostalOpc", comprobante.getEltReceptor().getEltDomicilio().getAttCodigoPostal().getString());
+        map.put("nFkRecAddressFormatTypeId_n", nFkRecAddressFormatTypeId_n);
+        map.put("sFiscalId", bizPartner.getFiscalFrgId());
+
+        if (address != null) {
+            map.put("sRecEnt", address.getAddress());
+            map.put("sRecEntCalleOpc", address.getStreet());
+            map.put("sRecEntNoExteriorOpc", address.getStreetNumberExt());
+            map.put("sRecEntNoInteriorOpc", address.getStreetNumberInt());
+            map.put("sRecEntColoniaOpc", address.getNeighborhood());
+            map.put("sRecEntLocalidadOpc", address.getLocality());
+            map.put("sRecEntReferenciaOpc", address.getReference());
+            map.put("sRecEntMunicipioOpc", address.getCounty());
+            map.put("sRecEntEstadoOpc", address.getState());
+            map.put("sRecEntPais", address.getDbmsDataCountry().getCountry());
+            map.put("sRecEntCodigoPostalOpc", address.getZipCode());
+        }
+
+        // Stamp:
+
+        if (comprobante.getEltOpcComplemento() != null) {
+            for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
+                if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
+                    map.put("sCfdiVersion", ((DElementTimbreFiscalDigital) element).getAttVersion().getString());
+                    map.put("sCfdiUuid", ((DElementTimbreFiscalDigital) element).getAttUuid().getString());
+                    map.put("sCfdiSelloCFD", ((DElementTimbreFiscalDigital) element).getAttSelloCfd().getString());
+                    map.put("sCfdiSelloSAT", ((DElementTimbreFiscalDigital) element).getAttSelloSAT().getString());
+                    map.put("sCfdiNoCertificadoSAT", ((DElementTimbreFiscalDigital) element).getAttNoCertificadoSAT().getString());
+                    map.put("sCfdiFechaTimbre", ((DElementTimbreFiscalDigital) element).getAttFechaTimbrado().getString());
+                }
+            }
+        }
+
+        // QR Code:
+
+        /* IMPORTANT (sflores, 2014-01-15):
+         * BufferedImage is not serializable, therefore it cannot be send to Server through RMI. QR Code is generated and put into in SSessionServer.requestFillReport().
+         *
+         * biQrCode = DCfd.createQrCodeBufferedImage((String) map.get("sEmiRfc"), (String) map.get("sRecRfc"), Double.parseDouble("" + map.get("dCfdTotal")), (String) map.get("sCfdiUuid"));
+         * map.put("oCfdiQrCode", biQrCode.getScaledInstance(biQrCode.getWidth(), biQrCode.getHeight(), Image.SCALE_DEFAULT));
+         */
+
+        // Addenda:
+
+        for (SDataDpsEntry entry : dps.getDbmsDpsEntries()) {
+            if (entry.isAccountable()) {
+                dTotalPesoBruto += entry.getWeightGross();
+                dTotalPesoNeto += entry.getMass();
+            }
+        }
+
+        map.put("sAddClaveMoneda", dps.getDbmsCurrencyKey());
+        map.put("dAddTipoDeCambio", dps.getExchangeRate());
+        map.put("nAddDiasDeCredito", dps.getDaysOfCredit());
+        map.put("sAddEmbarque", "");
+        map.put("sAddOrdenDeEmbarque", "");
+        map.put("sAddOrdenDeCompra", dps.getNumberReference());
+        map.put("sAddContrato", dps.getAuxCfdParams().getContrato());
+        map.put("sAddPedido", dps.getAuxCfdParams().getPedido());
+        map.put("sAddFactura", dps.getAuxCfdParams().getFactura());
+        map.put("sAddCliente", dps.getAuxCfdParams().getReceptor().getDbmsCategorySettingsCus().getKey());
+        map.put("sAddSucursal", dps.getFkCompanyBranchId());
+        map.put("sAddAgente",  dps.getFkSalesAgentId_n());
+        map.put("sAddRuta", dps.getAuxCfdParams().getRuta());
+        map.put("sAddChofer", dps.getDriver());
+        map.put("sAddPlacas", dps.getPlate());
+        map.put("sAddBoleto", dps.getTicket());
+        map.put("dAddPesoBruto", dTotalPesoBruto);
+        map.put("dAddPesoNeto", dTotalPesoNeto);
+        map.put("sAddUnidadPesoBruto", dps.getAuxCfdParams().getUnidadPesoBruto());
+        map.put("sAddUnidadPesoNeto", dps.getAuxCfdParams().getUnidadPesoBruto());
+
+        map.put("sAddPagFecha", miClient.getSessionXXX().getFormatters().getDateTextFormat().format(dps.getDate()).toUpperCase());
+        map.put("sAddPagFechaDeVencimiento", miClient.getSessionXXX().getFormatters().getDateTextFormat().format(SLibTimeUtilities.addDate(dps.getDateStartCredit(), 0, 0, dps.getDaysOfCredit())).toUpperCase());
+        map.put("dAddPagImporte", dps.getTotalCy_r());
+        map.put("sAddPagClaveMoneda", dps.getDbmsCurrencyKey());
+        map.put("dAddPagInteresMoratorio", dps.getAuxCfdParams().getInterestDelayRate());
+
+        /*
+        * XXX Remove addenda of Tron (navalos, 2014-05-07)
+        *
+
+        map.put("sAddClaveMoneda", ((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltMoneda().getAttClaveMoneda().getOption()); // dps.getDbmsCurrencyKey();
+        map.put("dAddTipoDeCambio", ((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltMoneda().getAttTipoDeCambio().getDouble()); // dps.getExchangeRate();
+        map.put("nAddDiasDeCredito", ((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltAdicional().getAttDiasDeCredito().getInteger()); //dps.getDaysOfCredit();
+        map.put("sAddEmbarque", ((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltAdicional().getAttEmbarque().getString()); //
+        map.put("sAddOrdenDeEmbarque", ((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltAdicional().getAttOrdenDeEmbarque().getString());
+        map.put("sAddOrdenDeCompra", ((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltAdicional().getAttOrdenDeCompra().getString());
+        map.put("sAddContrato", ((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltAdicional().getAttContrato().getString());
+        map.put("sAddPedido", ((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltAdicional().getAttPedido().getString());
+        map.put("sAddFactura", ((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltAdicional().getAttFactura().getString());
+        map.put("sAddCliente", ((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltAdicional().getAttCliente().getString());
+        map.put("sAddSucursal", ((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltAdicional().getAttSucursal().getString());
+        map.put("sAddAgente", ((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltAdicional().getAttAgente().getString());
+        map.put("sAddRuta", ((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltAdicional().getAttRuta().getString());
+        map.put("sAddChofer", ((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltAdicional().getAttChofer().getString());
+        map.put("sAddPlacas", ((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltAdicional().getAttPlacas().getString());
+        map.put("sAddBoleto", ((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltAdicional().getAttBoleto().getString());
+        map.put("dAddPesoBruto", ((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltAdicional().getAttPesoBruto().getDouble());
+        map.put("dAddPesoNeto", ((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltAdicional().getAttPesoNeto().getDouble());
+        map.put("sAddUnidadPesoBruto", ((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltAdicional().getAttUnidadPesoBruto().getString());
+        map.put("sAddUnidadPesoNeto", ((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltAdicional().getAttUnidadPesoNeto().getString());
+
+        if (((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltOpcPagare() != null) {
+            map.put("sAddPagFecha", miClient.getSessionXXX().getFormatters().getDateTextFormat().format(dps.getDate()).toUpperCase());
+            map.put("sAddPagFechaDeVencimiento", miClient.getSessionXXX().getFormatters().getDateTextFormat().format(SLibTimeUtilities.addDate(dps.getDateStartCredit(), 0, 0, dps.getDaysOfCredit())).toUpperCase());
+            map.put("dAddPagImporte", ((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltOpcPagare().getAttImporte().getDouble());
+            map.put("sAddPagClaveMoneda", ((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltOpcPagare().getAttClaveMoneda().getString());
+            map.put("dAddPagInteresMoratorio", ((DElementAddenda1) comprobante.getEltOpcAddenda().getElements().get(0)).getEltOpcPagare().getAttInteresMoratorio().getDouble());
+        }
+        */
+
+        jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_CFDI, map);
+        sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
+        sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
+
+        switch (pnPrintMode) {
+            case SDataConstantsPrint.PRINT_MODE_VIEWER:
+                jasperViewer = new JasperViewer(jasperPrint, false);
+                jasperViewer.setTitle("Comprobante Fiscal Digital por Internet");
+                jasperViewer.setVisible(true);
+                break;
+            case SDataConstantsPrint.PRINT_MODE_PDF:
+                JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
+                break;
+            default:
+                throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
+        }
+    }
+
+    public void printAcknowledgment(erp.mtrn.data.SDataCfd cfd, int pnPrintMode, final int subtypeCfd) throws java.lang.Exception {
+        Map<String, Object> map = null;
+        JasperPrint jasperPrint = null;
+        JasperViewer jasperViewer = null;
+        DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        Document doc = docBuilder.parse(new ByteArrayInputStream(cfd.getAcknowledgmentCancellation().getBytes("UTF-8")));
+        SDataDps dps = null;
+        SDataFormerPayrollEmp payrollEmp = null;
+        SDbPayrollReceipt payrollReceipt = null;
+        Node node = null;
+        Node nodeChild = null;
+        NamedNodeMap namedNodeMap = null;
+        String sPdfFileName = "";
+
+        switch (cfd.getFkCfdTypeId()) {
+            case SCfdConsts.CFD_TYPE_DPS:
+                dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
+                break;
+            case SCfdConsts.CFD_TYPE_PAYROLL:
+                switch (subtypeCfd) {
+                    case SCfdConsts.CFDI_PAYROLL_VER_OLD:
+                        payrollEmp = (SDataFormerPayrollEmp) SDataUtilities.readRegistry(miClient, SDataConstants.HRS_FORMER_PAYR_EMP, new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, SLibConstants.EXEC_MODE_SILENT);
+                        break;
+                    case SCfdConsts.CFDI_PAYROLL_VER_CUR:
+                        payrollReceipt = new SDbPayrollReceipt();
+                        payrollReceipt.read(miClient.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
+                        break;
+                    default:
+                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                }
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+
+        map = miClient.createReportParams();
+
+        map.put("sCfdiDate", dps == null ? cfd.getTimestamp() : dps.getDate());
+        map.put("sCfdiFolio", dps == null ? subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? (payrollEmp.getNumberSeries() + "-" + payrollEmp.getNumber()) : (payrollReceipt.getNumberSeries() + "-" + payrollReceipt.getNumber()) : (dps.getNumberSeries() + "-" + dps.getNumber()));
+
+        // Acknowledgment Cancellation:
+
+        node = SXmlUtils.extractElements(doc, "CancelaCFDResult").item(0);
+        if (node == null) {
+            node = SXmlUtils.extractElements(doc, "ns2:CancelaCFDResult").item(0);  // try again
+        }
+        namedNodeMap = node.getAttributes();
+
+        map.put("sEmiRfc", SXmlUtils.extractAttributeValue(namedNodeMap, "RfcEmisor", true));
+        map.put("sDateRequest", SXmlUtils.extractAttributeValue(namedNodeMap, "Fecha", true));
+        map.put("sDateCancel", SXmlUtils.extractAttributeValue(namedNodeMap, "Fecha", true));
+
+        if (SXmlUtils.hasChildElement(node, "Folios")) {
+            node = SXmlUtils.extractChildElements(node, "Folios").get(0);
+        }
+        else {
+            node = SXmlUtils.extractChildElements(node, "ns2:Folios").get(0);      // try again
+        }
+
+        if (SXmlUtils.hasChildElement(node, "UUID")) {
+            nodeChild = SXmlUtils.extractChildElements(node, "UUID").get(0);
+        }
+        else {
+            nodeChild = SXmlUtils.extractChildElements(node, "ns2:UUID").get(0);   // try again
+        }
+        map.put("sUuid", nodeChild.getTextContent());
+
+        if (SXmlUtils.hasChildElement(node, "EstatusUUID")) {
+            nodeChild = SXmlUtils.extractChildElements(node, "EstatusUUID").get(0);    // try again
+        }
+        else {
+            nodeChild = SXmlUtils.extractChildElements(node, "ns2:EstatusUUID").get(0);    // try again
+        }
+        map.put("sStatusCfdi", nodeChild.getTextContent().compareTo(SCfdConsts.UUID_ANNUL) == 0 ? "Cancelado" : "Desconocido");
+
+        node = SXmlUtils.extractElements(doc, "CancelaCFDResult").item(0);
+        if (node == null) {
+            node = SXmlUtils.extractElements(doc, "ns2:CancelaCFDResult").item(0);  // try again
+        }
+
+        node = SXmlUtils.extractChildElements(node, "Signature").get(0);
+        nodeChild = SXmlUtils.extractChildElements(node, "SignatureValue").get(0);
+
+        map.put("sCfdiSelloSAT", nodeChild.getTextContent());
+        map.put("nPkCfdId", cfd.getPkCfdId());
+
+        jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_CFDI_ACK_CAN, map);
+        sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
+        sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
+
+        switch (pnPrintMode) {
+            case SDataConstantsPrint.PRINT_MODE_VIEWER:
+                jasperViewer = new JasperViewer(jasperPrint, false);
+                jasperViewer.setTitle("Acuse de cancelación de CFDI");
+                jasperViewer.setVisible(true);
+                break;
+            case SDataConstantsPrint.PRINT_MODE_PDF:
+                JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
+                break;
+            case SDataConstantsPrint.PRINT_MODE_STREAM:
+                JasperPrintManager.printReport(jasperPrint, false);
+                break;
+            default:
+                throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
+        }
+    }
+
+    public void printPayrollReceipt(final SDataCfd cfd, final int pnPrintMode, final int subtypeCfd) throws java.lang.Exception {
+        int i = 0;
+        int nTotalTiempoExtra = 0;
+
+        double dTotalPercepciones = 0;
+        double dTotalDeducciones = 0;
+        double dTotalTiempoExtraPagado = 0;
+        double dTotalIncapacidades = 0;
+        double dTotalIsr = 0;
+
+        String sPdfFileName = "";
+
+        SDataFormerPayroll oFormerPayroll = null;
+        SDataFormerPayrollEmp oFormerPayrollEmployee = null;
+        SDbPayroll payroll = null;
+        SDbPayrollReceipt payrollReceipt = null;
+        SDataCurrency cur = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { miClient.getSessionXXX().getParamsErp().getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
+
+        DElementComprobante comprobante = null;
+        HashMap<String, Object> map = null;
+        JasperPrint jasperPrint = null;
+        JasperViewer jasperViewer = null;
+
+        ArrayList aPercepciones = null;
+        ArrayList aDeducciones = null;
+        ArrayList aTiempoExtra = null;
+        ArrayList aIncapacidades = null;
+
+        DecimalFormat oFixedFormat = new DecimalFormat(SLibUtils.textRepeat("0", 3));
+        DecimalFormat oFixedFormatAux = new DecimalFormat(SLibUtils.textRepeat("0", 2));
+
+        map = miClient.createReportParams();
+
+        SimpleDateFormat oSimpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+        switch (subtypeCfd) {
+            case SCfdConsts.CFDI_PAYROLL_VER_OLD:
+                oFormerPayroll = new SDataFormerPayroll();
+                oFormerPayroll.read(new int[] { cfd.getFkPayrollPayrollId_n() }, miClient.getSession().getStatement());
+                
+                oFormerPayrollEmployee = new SDataFormerPayrollEmp();
+                oFormerPayrollEmployee.read(new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, miClient.getSession().getStatement());
+                break;
+            case SCfdConsts.CFDI_PAYROLL_VER_CUR:
+                payroll = new SDbPayroll();
+                payroll.read(miClient.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n() });
+                
+                payrollReceipt = new SDbPayrollReceipt();
+                payrollReceipt.read(miClient.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+
+        comprobante = DCfdUtils.getCfdi(cfd.getDocXml());
+        map.put("sCfdFecha", SLibUtils.DbmsDateFormatDatetime.format(comprobante.getAttFecha().getDatetime()));
+        map.put("sCfdFormaDePago", comprobante.getAttFormaDePago().getOption());
+        map.put("sCfdNoCuentaPago", comprobante.getAttNumCtaPago().getString());
+        map.put("sCfdCondicionesDePagoOpc", comprobante.getAttCondicionesDePago().getOption());
+        map.put("dCfdSubtotal", comprobante.getAttSubTotal().getDouble());
+        map.put("dCfdDescuento", comprobante.getAttDescuento().getDouble());
+        map.put("dCfdTotal", comprobante.getAttTotal().getDouble());
+        map.put("sCfdMetodoDePagoOpc", comprobante.getAttMetodoDePago().getString());
+        map.put("sExpedidoEn", comprobante.getAttLugarExpedicion().getString());
+        map.put("sCfdTipoComprobante", comprobante.getAttTipoDeComprobante().getOption());
+        map.put("sCfdNoCuentaPago", comprobante.getAttNumCtaPago().getString());
+        map.put("sCfdNoCertificado", comprobante.getAttNoCertificado().getString());
+        map.put("sEmiRegimenFiscal", comprobante.getEltEmisor().getEltHijosRegimenFiscal().get(0).getAttRegimen().getString());
+        map.put("sEmiRfc", comprobante.getEltEmisor().getAttRfc().getString());
+        map.put("sRecRfc", comprobante.getEltReceptor().getAttRfc().getString());
+        map.put("dCfdTotal", comprobante.getAttTotal().getDouble());
+        map.put("sDocTotalConLetra", SLibUtilities.translateValueToText(comprobante.getAttTotal().getDouble(), miClient.getSessionXXX().getParamsErp().getDecimalsValue(), miClient.getSessionXXX().getParamsErp().getFkCurrencyId(),
+                cur.getTextSingular(), cur.getTextPlural(), cur.getTextPrefix(), cur.getTextSuffix()));
+        map.put("sCfdMoneda", comprobante.getAttMoneda().getString());
+        map.put("dCfdTipoCambio", comprobante.getAttTipoCambio().getDouble());
+        map.put("ReceptorNombre", comprobante.getEltReceptor().getAttNombre().getString());
+        map.put("bIsAnnulled", cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED);
+        map.put("nPkPayrollId", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayroll.getPkPayrollId() : payroll.getPkPayrollId());
+        map.put("NominaNumTipo", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? (oFormerPayroll.getNumber() + " " + oFormerPayroll.getType()) : (payroll.getNumber() + " " + payroll.getAuxPaymentType()));
+        map.put("NominaFolio", comprobante.getAttSerie().getString() + "-" + comprobante.getAttFolio().getString());
+        map.put("sXmlBaseDir", miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory());
+
+        map.put("dCfdConceptoCantidad", comprobante.getEltConceptos().getEltHijosConcepto().get(0).getAttCantidad().getDouble());
+        map.put("sCfdConceptoUnidad", comprobante.getEltConceptos().getEltHijosConcepto().get(0).getAttUnidad().getString());
+        map.put("sCfdConceptoNoIdentifiacion", comprobante.getEltConceptos().getEltHijosConcepto().get(0).getAttNoIdentificacion().getString());
+        map.put("sCfdConceptoDescripcion", comprobante.getEltConceptos().getEltHijosConcepto().get(0).getAttDescripcion().getString());
+        map.put("dCfdConceptoValorUnitario", comprobante.getEltConceptos().getEltHijosConcepto().get(0).getAttValorUnitario().getDouble());
+        map.put("dCfdConceptoImporte", comprobante.getEltConceptos().getEltHijosConcepto().get(0).getAttImporte().getDouble());
+
+        for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
+
+            if (element.getName().compareTo("nomina:Nomina") == 0) {
+
+                map.put("RegistroPatronal", ((DElementNomina) element).getAttRegistroPatronal().getString());
+                map.put("NumEmpleado", ((DElementNomina) element).getAttNumEmpleado().getString());
+                map.put("CURP", ((DElementNomina) element).getAttCurp().getString());
+                map.put("TipoRegimen", SCfdConsts.RegimenMap.get(((DElementNomina) element).getAttTipoRegimen().getInteger()));
+                map.put("NumSeguridadSocial", ((DElementNomina) element).getAttNumSeguridadSocial().getString());
+                map.put("FechaPago", oSimpleDateFormat.format(((DElementNomina) element).getAttFechaPago().getDate()));
+                map.put("FechaInicialPago", oSimpleDateFormat.format(((DElementNomina) element).getAttFechaInicialPago().getDate()));
+                map.put("FechaFinalPago", oSimpleDateFormat.format(((DElementNomina) element).getAttFechaFinalPago().getDate()));
+                map.put("NumDiasNoLaborados", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getDaysNotWorked() : payrollReceipt.getDaysNotWorked_r());
+                map.put("NumDiasLaborados", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getDaysWorked() : payrollReceipt.getDaysWorked()); // XXX Optional
+                map.put("NumDiasPagar", 0d); // Calculate?, navalos (2014-03-13)
+                map.put("NumDiasPagados", ((DElementNomina) element).getAttNumDiasPagados().getDouble());
+                map.put("Departamento", ((DElementNomina) element).getAttDepartamento().getString());
+                map.put("CLABE", ((DElementNomina) element).getAttClabe().getString());
+                map.put("Banco", SCfdConsts.BancoMap.get(((DElementNomina) element).getAttBanco().getInteger()));
+                map.put("FechaInicioRelLaboral", oSimpleDateFormat.format(((DElementNomina) element).getAttFechaInicioRelLaboral().getDate()));
+                map.put("Antiguedad", ((DElementNomina) element).getAttAntiguedad().getInteger());
+                map.put("Puesto", ((DElementNomina) element).getAttPuesto().getString());
+                map.put("TipoContrato", ((DElementNomina) element).getAttTipoContrato().getString());
+                map.put("TipoJornada", ((DElementNomina) element).getAttTipoJornada().getString());
+                map.put("PeriodicidadPago", ((DElementNomina) element).getAttPeriodicidadPago().getString());
+                map.put("RiesgoPuesto", SCfdConsts.RiesgoMap.get(((DElementNomina) element).getAttRiesgoPuesto().getInteger()));
+                map.put("Sueldo", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getSalary() : payrollReceipt.getSalary());
+                map.put("SalarioBaseCotApor", ((DElementNomina) element).getAttSalarioBaseCotApor().getDouble());
+                map.put("SalarioDiarioIntegrado", ((DElementNomina) element).getAttSalarioDiarioIntegrado().getDouble());
+
+                map.put("TipoEmpleado", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getEmployeeType() : miClient.getSession().readField(SModConsts.HRSU_TP_EMP, new int[] { payrollReceipt.getFkEmployeeTypeId() }, SDbRegistry.FIELD_CODE));
+                map.put("Categoria", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getEmployeeCategory() : miClient.getSession().readField(SModConsts.HRSU_TP_WRK, new int[] { payrollReceipt.getFkWorkerTypeId() }, SDbRegistry.FIELD_CODE));
+                map.put("TipoSalario", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getSalaryType() : miClient.getSession().readField(SModConsts.HRSS_TP_SAL, new int[] { payrollReceipt.getFkSalaryTypeId() }, SDbRegistry.FIELD_NAME));
+                map.put("Ejercicio", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? (oFormerPayroll.getYear() + "-" + oFixedFormatAux.format(oFormerPayroll.getPeriod())) : (payroll.getPeriodYear() + "-" + oFixedFormatAux.format(payroll.getPeriod())));
+
+                aPercepciones = new ArrayList();
+                aDeducciones = new ArrayList();
+                aTiempoExtra = new ArrayList();
+                aIncapacidades = new ArrayList();
+
+                dTotalPercepciones = 0;
+                dTotalDeducciones = 0;
+                nTotalTiempoExtra = 0;
+                dTotalTiempoExtraPagado = 0;
+                dTotalIncapacidades = 0;
+                dTotalIsr = 0;
+
+                // Perceptions:
+
+                i = 0;
+                if (((cfd.ver3.DElementNomina) element).getEltPercepciones() != null) {
+                    for (i = 0; i < ((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().size(); i++) {
+                        aPercepciones.add(oFixedFormat.format(((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttTipoPercepcion().getInteger()));
+                        aPercepciones.add(((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttClave().getString());
+                        aPercepciones.add(((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttConcepto().getString());
+                        aPercepciones.add(((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteGravado().getDouble() +
+                                ((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteExento().getDouble());
+                        aPercepciones.add(null); // pending to be used, navalos (2014-03-13)
+
+                        dTotalPercepciones += ((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteGravado().getDouble() +
+                                ((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteExento().getDouble();
+                    }
+                }
+
+                for (int j = i; j < 10; j++) {
+                    aPercepciones.add(null);
+                    aPercepciones.add(null);
+                    aPercepciones.add(null);
+                    aPercepciones.add(null);
+                    aPercepciones.add(null);
+                }
+
+                // ExtraTimes:
+
+                i = 0;
+                if (((cfd.ver3.DElementNomina) element).getEltHorasExtras() != null) {
+                    for (i = 0; i < ((cfd.ver3.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().size(); i++) {
+
+                        aTiempoExtra.add(((cfd.ver3.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(i).getAttTipoHoras().getString().compareTo(SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE) == 0 ?
+                            SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE : SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_TRIPLE);
+                        aTiempoExtra.add(((cfd.ver3.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(i).getAttDias().getInteger());
+                        aTiempoExtra.add(((cfd.ver3.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(i).getAttHorasExtra().getInteger());
+                        aTiempoExtra.add(((cfd.ver3.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(i).getAttImportePagado().getDouble());
+
+                        nTotalTiempoExtra += ((cfd.ver3.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(i).getAttHorasExtra().getInteger();
+                        dTotalTiempoExtraPagado += ((cfd.ver3.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(i).getAttImportePagado().getDouble();
+                    }
+                }
+
+                for (int j = i; j < 5; j++) {
+                    aTiempoExtra.add(null);
+                    aTiempoExtra.add(null);
+                    aTiempoExtra.add(null);
+                    aTiempoExtra.add(null);
+                }
+
+                // Deductions:
+
+                i = 0;
+                if (((cfd.ver3.DElementNomina) element).getEltDeducciones() != null) {
+                    for (i = 0; i < ((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().size(); i++) {
+
+                        aDeducciones.add(oFixedFormat.format(((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttTipoDeduccion().getInteger()));
+                        aDeducciones.add(((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttClave().getString());
+                        aDeducciones.add(((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttConcepto().getString());
+                        aDeducciones.add(((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteGravado().getDouble() +
+                                ((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteExento().getDouble());
+                        aDeducciones.add(null); // pending to be used, navalos (2014-03-13)
+
+                        // Obtain isr tax
+
+                        if (((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttClave().getString().compareTo(SCfdConsts.PAYROLL_PER_ISR) == 0 &&
+                            ((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttTipoDeduccion().getInteger() == SCfdConsts.DED_ISR) {
+                            dTotalIsr += ((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteGravado().getDouble();
+                        }
+
+                        dTotalDeducciones += ((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteGravado().getDouble() +
+                                ((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteExento().getDouble();
+                    }
+                }
+
+                for (int j = i; j < 10; j++) {
+                    aDeducciones.add(null);
+                    aDeducciones.add(null);
+                    aDeducciones.add(null);
+                    aDeducciones.add(null);
+                    aDeducciones.add(null);
+                }
+
+                // Incapacities:
+
+                i = 0;
+                if (((cfd.ver3.DElementNomina) element).getEltIncapacidades() != null) {
+                    for (i = 0; i < ((cfd.ver3.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().size(); i++) {
+
+                        aIncapacidades.add(oFixedFormat.format(((cfd.ver3.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttTipoIncapacidad().getInteger()));
+                        aIncapacidades.add(((cfd.ver3.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttDiasIncapacidad().getDouble());
+                        aIncapacidades.add(((cfd.ver3.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttDescuento().getDouble());
+
+                        dTotalIncapacidades += ((cfd.ver3.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttDescuento().getDouble();
+                    }
+                }
+
+                for (int j = i; j < 5; j++) {
+                    aIncapacidades.add(null);
+                    aIncapacidades.add(null);
+                    aIncapacidades.add(null);
+                }
+
+                map.put("oPerceptions", aPercepciones);
+                map.put("oDeductions", aDeducciones);
+                map.put("oExtratimes", aTiempoExtra);
+                map.put("oIncapacities", aIncapacidades);
+                map.put("TotalPercepcionesGravado", dTotalPercepciones);
+                map.put("TotalPercepcionesExento", null);
+                map.put("TotalDeduccionesGravado", dTotalDeducciones);
+                map.put("TotalDeduccionesExento", null);
+                map.put("TotalTiempoExtra", nTotalTiempoExtra);
+                map.put("TotalTiempoExtraPagado", dTotalTiempoExtraPagado);
+                map.put("TotalIncapacidades", dTotalIncapacidades);
+                map.put("dCfdTotalIsr", dTotalIsr);
+            }
+            else if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
+
+                map.put("sCfdiVersion", ((DElementTimbreFiscalDigital) element).getAttVersion().getString());
+                map.put("sCfdiUuid", ((DElementTimbreFiscalDigital) element).getAttUuid().getString());
+                map.put("sCfdiSelloCFD", ((DElementTimbreFiscalDigital) element).getAttSelloCfd().getString());
+                map.put("sCfdiSelloSAT", ((DElementTimbreFiscalDigital) element).getAttSelloSAT().getString());
+                map.put("sCfdiNoCertificadoSAT", ((DElementTimbreFiscalDigital) element).getAttNoCertificadoSAT().getString());
+                map.put("sCfdiFechaTimbre", ((DElementTimbreFiscalDigital) element).getAttFechaTimbrado().getString());
+            }
+        }
+
+        jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_CFDI_PAYROLL, map);
+        sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
+        sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
+
+        switch (pnPrintMode) {
+            case SDataConstantsPrint.PRINT_MODE_VIEWER:
+                jasperViewer = new JasperViewer(jasperPrint, false);
+                jasperViewer.setTitle("Comprobante Fiscal Digital por Internet");
+                jasperViewer.setVisible(true);
+                break;
+            case SDataConstantsPrint.PRINT_MODE_PDF:
+                JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
+                break;
+            case SDataConstantsPrint.PRINT_MODE_STREAM:
+                JasperPrintManager.printReport(jasperPrint, false);
+                break;
+            default:
+                throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
+        }
+
+
+    }
+}

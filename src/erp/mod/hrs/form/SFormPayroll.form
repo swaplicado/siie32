@@ -1,0 +1,1054 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.8" maxVersion="1.8" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
+  <NonVisualComponents>
+    <Container class="javax.swing.JPanel" name="jPanel3">
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
+    </Container>
+  </NonVisualComponents>
+  <SyntheticProperties>
+    <SyntheticProperty name="formSizePolicy" type="int" value="2"/>
+  </SyntheticProperties>
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+    <AuxValue name="designerSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,2,78,0,0,4,0"/>
+  </AuxValues>
+
+  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+  <SubComponents>
+    <Container class="javax.swing.JPanel" name="jPanel1">
+      <Properties>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+            <TitledBorder title="Datos del registro:"/>
+          </Border>
+        </Property>
+      </Properties>
+      <Constraints>
+        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+          <BorderConstraints direction="Center"/>
+        </Constraint>
+      </Constraints>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+      <SubComponents>
+        <Container class="javax.swing.JTabbedPane" name="jtpPayroll">
+          <Properties>
+            <Property name="tabPlacement" type="int" value="2"/>
+            <Property name="toolTipText" type="java.lang.String" value=""/>
+            <Property name="autoscrolls" type="boolean" value="true"/>
+            <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+              <Color id="Cursor Por defecto"/>
+            </Property>
+          </Properties>
+          <AccessibilityProperties>
+            <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="Configuraci&#xf3;n"/>
+          </AccessibilityProperties>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+              <BorderConstraints direction="Center"/>
+            </Constraint>
+          </Constraints>
+
+          <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
+          <SubComponents>
+            <Container class="javax.swing.JPanel" name="jpPayroll">
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                  <JTabbedPaneConstraints tabName="N&#xf3;mina">
+                    <Property name="tabTitle" type="java.lang.String" value="N&#xf3;mina"/>
+                  </JTabbedPaneConstraints>
+                </Constraint>
+              </Constraints>
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+              <SubComponents>
+                <Container class="javax.swing.JPanel" name="jPanel41">
+                  <Properties>
+                    <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                      <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                        <TitledBorder title="Datos del registro:"/>
+                      </Border>
+                    </Property>
+                  </Properties>
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                      <BorderConstraints direction="Center"/>
+                    </Constraint>
+                  </Constraints>
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+                  <SubComponents>
+                    <Container class="javax.swing.JPanel" name="jPanel7">
+                      <Constraints>
+                        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                          <BorderConstraints direction="North"/>
+                        </Constraint>
+                      </Constraints>
+
+                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+                        <Property name="columns" type="int" value="2"/>
+                        <Property name="horizontalGap" type="int" value="5"/>
+                        <Property name="rows" type="int" value="1"/>
+                      </Layout>
+                      <SubComponents>
+                        <Container class="javax.swing.JPanel" name="jPanel6">
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+                            <Property name="columns" type="int" value="1"/>
+                            <Property name="rows" type="int" value="12"/>
+                            <Property name="verticalGap" type="int" value="5"/>
+                          </Layout>
+                          <SubComponents>
+                            <Container class="javax.swing.JPanel" name="jPanel8">
+                              <Properties>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[100, 23]"/>
+                                </Property>
+                              </Properties>
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                                <Property name="alignment" type="int" value="0"/>
+                                <Property name="verticalGap" type="int" value="0"/>
+                              </Layout>
+                              <SubComponents>
+                                <Component class="javax.swing.JLabel" name="jlPaymentType">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="Per&#xed;odo de pago:"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[100, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="javax.swing.JTextField" name="jtfPaymentType">
+                                  <Properties>
+                                    <Property name="editable" type="boolean" value="false"/>
+                                    <Property name="text" type="java.lang.String" value="jTextField1"/>
+                                    <Property name="focusable" type="boolean" value="false"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[200, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel35">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                                <Property name="alignment" type="int" value="0"/>
+                                <Property name="verticalGap" type="int" value="0"/>
+                              </Layout>
+                              <SubComponents>
+                                <Component class="javax.swing.JLabel" name="jlYear">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="A&#xf1;o n&#xf3;mina:*"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[100, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="sa.lib.gui.bean.SBeanFieldInteger" name="moIntPeriodYear">
+                                  <Properties>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[103, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="javax.swing.JButton" name="jbEditPeriodYear">
+                                  <Properties>
+                                    <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                                      <Image iconType="3" name="/erp/img/icon_std_edit.gif"/>
+                                    </Property>
+                                    <Property name="toolTipText" type="java.lang.String" value="Modificar"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[23, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel42">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                                <Property name="alignment" type="int" value="0"/>
+                                <Property name="verticalGap" type="int" value="0"/>
+                              </Layout>
+                              <SubComponents>
+                                <Component class="javax.swing.JLabel" name="jlFiscalYear">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="A&#xf1;o fiscal:*"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[100, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="sa.lib.gui.bean.SBeanFieldInteger" name="moIntFiscalYear">
+                                  <Properties>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[103, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="javax.swing.JButton" name="jbEditFiscalYear">
+                                  <Properties>
+                                    <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                                      <Image iconType="3" name="/erp/img/icon_std_edit.gif"/>
+                                    </Property>
+                                    <Property name="toolTipText" type="java.lang.String" value="Modificar"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[23, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel9">
+                              <Properties>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[125, 23]"/>
+                                </Property>
+                              </Properties>
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                                <Property name="alignment" type="int" value="0"/>
+                                <Property name="verticalGap" type="int" value="0"/>
+                              </Layout>
+                              <SubComponents>
+                                <Component class="javax.swing.JLabel" name="jlNumber">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="N&#xfa;mero n&#xf3;mina:*"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[100, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="sa.lib.gui.bean.SBeanFieldInteger" name="moIntNumber">
+                                  <Properties>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[103, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="javax.swing.JButton" name="jbGetNextNumber">
+                                  <Properties>
+                                    <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                                      <Image iconType="3" name="/erp/img/icon_std_action.gif"/>
+                                    </Property>
+                                    <Property name="toolTipText" type="java.lang.String" value="Obtener n&#xfa;mero n&#xf3;mina"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[23, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel10">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                                <Property name="alignment" type="int" value="0"/>
+                                <Property name="verticalGap" type="int" value="0"/>
+                              </Layout>
+                              <SubComponents>
+                                <Component class="javax.swing.JLabel" name="jlDateStart">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="Fecha inicial:*"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[100, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="sa.lib.gui.bean.SBeanFieldDate" name="moDateDateStart">
+                                </Component>
+                                <Component class="javax.swing.JButton" name="jbEditDates">
+                                  <Properties>
+                                    <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                                      <Image iconType="3" name="/erp/img/icon_std_edit.gif"/>
+                                    </Property>
+                                    <Property name="toolTipText" type="java.lang.String" value="Modificar"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[23, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="javax.swing.JTextField" name="jtfDefaultDateStart">
+                                  <Properties>
+                                    <Property name="editable" type="boolean" value="false"/>
+                                    <Property name="text" type="java.lang.String" value="jTextField1"/>
+                                    <Property name="toolTipText" type="java.lang.String" value="Fecha inicial por default"/>
+                                    <Property name="focusable" type="boolean" value="false"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[75, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel11">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                                <Property name="alignment" type="int" value="0"/>
+                                <Property name="verticalGap" type="int" value="0"/>
+                              </Layout>
+                              <SubComponents>
+                                <Component class="javax.swing.JLabel" name="jlDateEnd">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="Fecha final:*"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[100, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="sa.lib.gui.bean.SBeanFieldDate" name="moDateDateEnd">
+                                </Component>
+                                <Component class="javax.swing.JLabel" name="jLabel1">
+                                  <Properties>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[23, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="javax.swing.JTextField" name="jtfDefaultDateEnd">
+                                  <Properties>
+                                    <Property name="editable" type="boolean" value="false"/>
+                                    <Property name="text" type="java.lang.String" value="jTextField2"/>
+                                    <Property name="toolTipText" type="java.lang.String" value="Fecha final por default"/>
+                                    <Property name="focusable" type="boolean" value="false"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[75, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel36">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                                <Property name="alignment" type="int" value="0"/>
+                                <Property name="verticalGap" type="int" value="0"/>
+                              </Layout>
+                              <SubComponents>
+                                <Component class="javax.swing.JLabel" name="jlPeriod">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="Per&#xed;odo n&#xf3;mina:*"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[100, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="sa.lib.gui.bean.SBeanFieldInteger" name="moIntPeriod">
+                                  <Properties>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[103, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="javax.swing.JButton" name="jbEditPeriod">
+                                  <Properties>
+                                    <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                                      <Image iconType="3" name="/erp/img/icon_std_edit.gif"/>
+                                    </Property>
+                                    <Property name="toolTipText" type="java.lang.String" value="Modificar"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[23, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel12">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                                <Property name="alignment" type="int" value="0"/>
+                                <Property name="verticalGap" type="int" value="0"/>
+                              </Layout>
+                              <SubComponents>
+                                <Component class="javax.swing.JLabel" name="jlPayrollDays">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="D&#xed;as n&#xf3;mina:*"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[100, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="sa.lib.gui.bean.SBeanFieldInteger" name="moIntPayrollDays">
+                                  <Properties>
+                                    <Property name="editable" type="boolean" value="false"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[103, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel13">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                                <Property name="alignment" type="int" value="0"/>
+                                <Property name="verticalGap" type="int" value="0"/>
+                              </Layout>
+                              <SubComponents>
+                                <Component class="javax.swing.JLabel" name="jlWorkingDays">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="D&#xed;as laborables:*"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[100, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="sa.lib.gui.bean.SBeanFieldInteger" name="moIntWorkingDays">
+                                  <Properties>
+                                    <Property name="editable" type="boolean" value="false"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[103, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel16">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                                <Property name="alignment" type="int" value="0"/>
+                                <Property name="verticalGap" type="int" value="0"/>
+                              </Layout>
+                              <SubComponents>
+                                <Component class="javax.swing.JLabel" name="jlNotes">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="Notas:"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[100, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextNotes">
+                                  <Properties>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[200, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel17">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                                <Property name="alignment" type="int" value="0"/>
+                                <Property name="verticalGap" type="int" value="0"/>
+                              </Layout>
+                              <SubComponents>
+                                <Component class="sa.lib.gui.bean.SBeanFieldBoolean" name="moBoolNormal">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="Es n&#xf3;mina normal"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[300, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel34">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                                <Property name="alignment" type="int" value="0"/>
+                                <Property name="verticalGap" type="int" value="0"/>
+                              </Layout>
+                              <SubComponents>
+                                <Component class="sa.lib.gui.bean.SBeanFieldBoolean" name="moBoolClosed">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="Es n&#xf3;mina cerrada"/>
+                                    <Property name="enabled" type="boolean" value="false"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[300, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                          </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel21">
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+                            <Property name="columns" type="int" value="1"/>
+                            <Property name="rows" type="int" value="12"/>
+                          </Layout>
+                          <SubComponents>
+                            <Container class="javax.swing.JPanel" name="jPanel24">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                                <Property name="alignment" type="int" value="0"/>
+                                <Property name="verticalGap" type="int" value="0"/>
+                              </Layout>
+                              <SubComponents>
+                                <Component class="javax.swing.JLabel" name="jlTaxComputationType">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="Tipo c&#xe1;lculo impuesto:*"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[150, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyTaxComputationType">
+                                  <Properties>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[200, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel25">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                                <Property name="alignment" type="int" value="0"/>
+                                <Property name="verticalGap" type="int" value="0"/>
+                              </Layout>
+                              <SubComponents>
+                                <Component class="javax.swing.JLabel" name="jlTax">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="Tabla impuesto:*"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[150, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyTax">
+                                  <Properties>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[200, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel26">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                                <Property name="alignment" type="int" value="0"/>
+                                <Property name="verticalGap" type="int" value="0"/>
+                              </Layout>
+                              <SubComponents>
+                                <Component class="javax.swing.JLabel" name="jlTaxSubsidy">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="Tabla subsidio impuesto:*"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[150, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyTaxSubsidy">
+                                  <Properties>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[200, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel27">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                                <Property name="alignment" type="int" value="0"/>
+                                <Property name="verticalGap" type="int" value="0"/>
+                              </Layout>
+                              <SubComponents>
+                                <Component class="javax.swing.JLabel" name="jlSsContribution">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="Tabla SS:*"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[150, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeySsContribution">
+                                  <Properties>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[200, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel19">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                                <Property name="alignment" type="int" value="0"/>
+                                <Property name="verticalGap" type="int" value="0"/>
+                              </Layout>
+                              <SubComponents>
+                                <Component class="sa.lib.gui.bean.SBeanFieldBoolean" name="moBoolSsContribution">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="Es n&#xf3;mina con c&#xe1;lculo de retenci&#xf3;n del SS"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[300, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel18">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                                <Property name="alignment" type="int" value="0"/>
+                                <Property name="verticalGap" type="int" value="0"/>
+                              </Layout>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel22">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                                <Property name="alignment" type="int" value="0"/>
+                                <Property name="verticalGap" type="int" value="0"/>
+                              </Layout>
+                              <SubComponents>
+                                <Component class="javax.swing.JLabel" name="jlMwzType">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="&#xc1;rea geogr&#xe1;fica:*"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[150, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyMwzType">
+                                  <Properties>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[200, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel14">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                                <Property name="alignment" type="int" value="0"/>
+                                <Property name="verticalGap" type="int" value="0"/>
+                              </Layout>
+                              <SubComponents>
+                                <Component class="javax.swing.JLabel" name="jlMwzWage">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="Salario m&#xed;n. &#xe1;rea geo.:"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[150, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moDecMwzWage">
+                                  <Properties>
+                                    <Property name="editable" type="boolean" value="false"/>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel23">
+                              <Properties>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[125, 23]"/>
+                                </Property>
+                              </Properties>
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                                <Property name="alignment" type="int" value="0"/>
+                                <Property name="verticalGap" type="int" value="0"/>
+                              </Layout>
+                              <SubComponents>
+                                <Component class="javax.swing.JLabel" name="jlMwzReferenceType">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="&#xc1;rea geogr&#xe1;fica ref.:*"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[150, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyMwzReferenceType">
+                                  <Properties>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[200, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel15">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                                <Property name="alignment" type="int" value="0"/>
+                                <Property name="verticalGap" type="int" value="0"/>
+                              </Layout>
+                              <SubComponents>
+                                <Component class="javax.swing.JLabel" name="jlMwzReferenceWage">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="Salario m&#xed;n. &#xe1;rea geo. ref.:"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[150, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moDecMwzReferenceWage">
+                                  <Properties>
+                                    <Property name="editable" type="boolean" value="false"/>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                          </SubComponents>
+                        </Container>
+                      </SubComponents>
+                    </Container>
+                  </SubComponents>
+                </Container>
+                <Container class="javax.swing.JPanel" name="jPanel20">
+                  <Properties>
+                    <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                      <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                        <TitledBorder title="Totales:"/>
+                      </Border>
+                    </Property>
+                  </Properties>
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                      <BorderConstraints direction="South"/>
+                    </Constraint>
+                  </Constraints>
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout">
+                    <Property name="verticalGap" type="int" value="5"/>
+                  </Layout>
+                  <SubComponents>
+                    <Container class="javax.swing.JPanel" name="jPanel38">
+                      <Constraints>
+                        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                          <BorderConstraints direction="North"/>
+                        </Constraint>
+                      </Constraints>
+
+                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+                        <Property name="columns" type="int" value="1"/>
+                        <Property name="horizontalGap" type="int" value="5"/>
+                        <Property name="rows" type="int" value="4"/>
+                        <Property name="verticalGap" type="int" value="5"/>
+                      </Layout>
+                      <SubComponents>
+                        <Container class="javax.swing.JPanel" name="jPanel28">
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="2"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlTotalEarnings">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Total percepciones:"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[175, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moDecTotalEarnings">
+                              <Properties>
+                                <Property name="editable" type="boolean" value="false"/>
+                              </Properties>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel29">
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="2"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlTotalDeductions">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Total deducciones:"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[175, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moDecTotalDeductions">
+                              <Properties>
+                                <Property name="editable" type="boolean" value="false"/>
+                              </Properties>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel30">
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="2"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlTotalNet">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Total neto:"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[175, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moDecTotalNet">
+                              <Properties>
+                                <Property name="editable" type="boolean" value="false"/>
+                              </Properties>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel37">
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="2"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JButton" name="jbGoTabReceipts">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Ir a recibos"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[100, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                      </SubComponents>
+                    </Container>
+                  </SubComponents>
+                </Container>
+              </SubComponents>
+            </Container>
+            <Container class="javax.swing.JPanel" name="jpReceipts">
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                  <JTabbedPaneConstraints tabName="Recibos">
+                    <Property name="tabTitle" type="java.lang.String" value="Recibos"/>
+                  </JTabbedPaneConstraints>
+                </Constraint>
+              </Constraints>
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+              <SubComponents>
+                <Container class="javax.swing.JPanel" name="jPanel33">
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                      <BorderConstraints direction="North"/>
+                    </Constraint>
+                  </Constraints>
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+                </Container>
+                <Container class="javax.swing.JPanel" name="jPanel5">
+                  <Properties>
+                    <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                      <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                        <TitledBorder title="Recibos de n&#xf3;mina:"/>
+                      </Border>
+                    </Property>
+                  </Properties>
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                      <BorderConstraints direction="Center"/>
+                    </Constraint>
+                  </Constraints>
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout">
+                    <Property name="horizontalGap" type="int" value="5"/>
+                    <Property name="verticalGap" type="int" value="5"/>
+                  </Layout>
+                  <SubComponents>
+                    <Container class="javax.swing.JPanel" name="jPanel31">
+                      <Constraints>
+                        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                          <BorderConstraints direction="North"/>
+                        </Constraint>
+                      </Constraints>
+
+                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+                        <Property name="columns" type="int" value="2"/>
+                        <Property name="rows" type="int" value="1"/>
+                        <Property name="verticalGap" type="int" value="5"/>
+                      </Layout>
+                      <SubComponents>
+                        <Container class="javax.swing.JPanel" name="jPanel39">
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JButton" name="jbEmployeeViewActive">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Ver empleados activos"/>
+                                <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+                                  <Insets value="[2, 0, 2, 0]"/>
+                                </Property>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[150, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JButton" name="jbEmployeeViewAll">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Ver todos los empleados"/>
+                                <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+                                  <Insets value="[2, 0, 2, 0]"/>
+                                </Property>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[150, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel40">
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JButton" name="jbReceiptCaptureEarnings">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Capturar percepciones"/>
+                                <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+                                  <Insets value="[2, 0, 2, 0]"/>
+                                </Property>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[150, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JButton" name="jbReceiptCaptureDeductions">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Capturar deducciones"/>
+                                <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+                                  <Insets value="[2, 0, 2, 0]"/>
+                                </Property>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[150, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                      </SubComponents>
+                    </Container>
+                    <Container class="javax.swing.JPanel" name="jpAvailableEmployees">
+                      <Properties>
+                        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                          <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                            <TitledBorder title="Empleados disponibles:"/>
+                          </Border>
+                        </Property>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[350, 100]"/>
+                        </Property>
+                      </Properties>
+                      <Constraints>
+                        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                          <BorderConstraints direction="Before"/>
+                        </Constraint>
+                      </Constraints>
+
+                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+                    </Container>
+                    <Container class="javax.swing.JPanel" name="jpPayrollReceipts">
+                      <Properties>
+                        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                          <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                            <TitledBorder title="Recibos de n&#xf3;mina:"/>
+                          </Border>
+                        </Property>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[475, 100]"/>
+                        </Property>
+                      </Properties>
+                      <Constraints>
+                        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                          <BorderConstraints direction="After"/>
+                        </Constraint>
+                      </Constraints>
+
+                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+                    </Container>
+                    <Container class="javax.swing.JPanel" name="jpControls">
+                      <Constraints>
+                        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                          <BorderConstraints direction="Center"/>
+                        </Constraint>
+                      </Constraints>
+
+                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+                      <SubComponents>
+                        <Container class="javax.swing.JPanel" name="jPanel32">
+                          <Constraints>
+                            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                              <BorderConstraints direction="First"/>
+                            </Constraint>
+                          </Constraints>
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+                            <Property name="columns" type="int" value="1"/>
+                            <Property name="rows" type="int" value="5"/>
+                            <Property name="verticalGap" type="int" value="5"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlDummy01">
+                            </Component>
+                            <Component class="javax.swing.JButton" name="jbReceiptAdd">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="&gt;"/>
+                                <Property name="toolTipText" type="java.lang.String" value="Agregar"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[75, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JButton" name="jbReceiptAddAll">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="&gt;&gt;"/>
+                                <Property name="toolTipText" type="java.lang.String" value="Agregar todos"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[75, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JButton" name="jbReceiptRemove">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="&lt;"/>
+                                <Property name="toolTipText" type="java.lang.String" value="Remover"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[75, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JButton" name="jbReceiptRemoveAll">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="&lt;&lt;"/>
+                                <Property name="toolTipText" type="java.lang.String" value="Remover todos"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[75, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                      </SubComponents>
+                    </Container>
+                  </SubComponents>
+                </Container>
+              </SubComponents>
+            </Container>
+          </SubComponents>
+        </Container>
+      </SubComponents>
+    </Container>
+  </SubComponents>
+</Form>

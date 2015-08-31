@@ -1,0 +1,1075 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package erp.mfin.data;
+
+import erp.client.SClientInterface;
+import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
+import erp.lib.table.STableUtilities;
+import erp.mod.fin.db.SDbAccount;
+import erp.mod.fin.db.SLayoutBankPaymentTxt;
+import erp.mod.fin.db.SLayoutBankRow;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.sql.ResultSet;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Vector;
+import javax.swing.JFileChooser;
+
+/**
+ *
+ * @author Juan Barajas
+ */
+public abstract class SFinUtilities {
+    
+    public static final java.lang.String TXT_TYPE_LAY_BANBAJIO_LOCAL = "bco";
+    public static final java.lang.String TXT_TYPE_LAY_BANBAJIO_TEF = "tef";
+    public static final java.lang.String TXT_TYPE_LAY_BANBAJIO_SPEI = "spi";
+    
+    public static final java.lang.String TXT_TYPE_ACCOUNT_CHECK = "01";
+    public static final java.lang.String TXT_TYPE_ACCOUNT_CLABE = "40";
+    
+    private static double mdBalanceTot;
+    private static double mdTaxChargedTot;
+    private static boolean mbIsRepeated;
+
+    /**
+     * Calculate balance total by business partner.
+     * @param vRows Vector rows of layout.
+     * @param index Index of vector.
+     * @param nBizPartnerId Id business partner
+     * @return Index new.
+     */
+    private static int calculateBalanceTotal(Vector<SLayoutBankRow> vRows, int index, int nBizPartnerId, String accountCredit) {
+        mbIsRepeated = false;
+        SLayoutBankRow values = null;
+
+        for (int j = index + 1; j < vRows.size(); j++) {
+            values = vRows.get(j);
+            if (values.getBizPartnerId() == nBizPartnerId && values.getAccountCredit().compareTo(accountCredit) == 0) {
+                mdBalanceTot += values.getBalanceTotByBizPartner();
+                if (values.getTaxCharged() != 0) {
+                    mdTaxChargedTot += (values.getTotalVat() * (values.getBalanceTotByBizPartner() / values.getTotal()));
+                }
+                else {
+                    mdTaxChargedTot += 0;
+                }
+                index = j + 1;
+                mbIsRepeated = true;
+            }
+            else {
+                break;
+            }
+        }
+
+        if (!mbIsRepeated) {
+            index++;
+        }
+
+        return index;
+    }
+    
+    public static void writeLayout(SClientInterface client, String layout, java.lang.String title) {
+        String fileName = "";
+        BufferedWriter bw = null;
+        
+        client.getFileChooser().setSelectedFile(new File("Archivo Layout.txt"));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            fileName = client.getFileChooser().getSelectedFile().getAbsolutePath();
+            client.getFileChooser().setSelectedFile(new File(client.getSessionXXX().getFormatters().getFileNameDatetimeFormat().format(new java.util.Date()) + " " + title + ".txt"));
+            
+            File file = new File(fileName.endsWith(".txt") ? fileName : fileName + ".txt");
+
+            try {
+                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "ASCII"));
+                
+                bw.write(layout);
+                bw.close();
+            }
+            catch (java.lang.Exception e) {
+                SLibUtilities.renderException(STableUtilities.class.getName(), e);
+            }
+        }
+    }
+
+    public static java.lang.String createLayoutHsbcThirdOld(erp.client.SClientInterface client, Vector<SLayoutBankRow> vRows, java.lang.String title) {
+        int nMoveNum = 1;
+        int n = 0;
+        int nBizPartnerId = 0;
+        java.lang.String sBizPartner = "";
+        java.lang.String sReference = "";
+        java.lang.String sAccountDebit = "";
+        java.lang.String sAccountCredit = "";
+        java.lang.String sConcept = "";
+        java.lang.String layout = "";
+        SLayoutBankRow values = null;
+        DecimalFormat formatDesc = new DecimalFormat("00000000000.00");
+        mdBalanceTot = 0;
+        mdTaxChargedTot = 0;
+        mbIsRepeated = false;
+
+        /*
+        client.getFileChooser().setSelectedFile(new File(client.getSessionXXX().getFormatters().getFileNameDatetimeFormat().format(new java.util.Date()) + " " + title + ".txt"));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+        */
+
+        try {
+            for (int i = 0; i < vRows.size();) {
+                values = vRows.get(i);
+
+                n = (int) (Math.floor(Math.log10(nMoveNum)) + 1);
+
+                nBizPartnerId = values.getBizPartnerId();
+                sBizPartner = SLibUtilities.textToAlphanumeric(values.getBizPartner());
+                sReference = SLibUtilities.textToAlphanumeric(values.getReference());
+                sAccountDebit = SLibUtilities.textTrim(values.getAccountDebit());
+                sAccountCredit = SLibUtilities.textTrim(values.getAccountCredit());
+                sConcept = SLibUtilities.textToAlphanumeric(values.getConcept());
+                mdBalanceTot = values.getBalanceTotByBizPartner();
+                /*
+                 * XXX No required is optional (jbarajas)
+                 * 
+                if (values.getTaxCharged() != 0) {
+                    mdTaxChargedTot = (values.getTotalVat() * (mdBalanceTot / values.getTotal()));
+                }
+                else {
+                    mdTaxChargedTot = 0;
+                }
+                */ 
+
+                i = calculateBalanceTotal(vRows, i, nBizPartnerId, sAccountCredit);
+
+                layout += SLibUtilities.textRepeat("0", 6 - n).concat(nMoveNum++ + "");
+                layout += SLibUtilities.textRepeat("0", (sAccountDebit.length() >= 10 ? 0 : 10 - sAccountDebit.length())).concat(SLibUtilities.textLeft(sAccountDebit, 10));
+                layout += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 10 ? 0 : 10 - sAccountCredit.length())).concat(SLibUtilities.textLeft(sAccountCredit, 10));
+                layout += formatDesc.format(mdBalanceTot).replace(".", "");
+                layout += values.getCurrencyId();
+                layout += sReference.concat(SLibUtilities.textRepeat(" ", (30 - sReference.length())));
+                layout += (sBizPartner.length() > 40 ? SLibUtilities.textLeft(sBizPartner, 40) : sBizPartner).concat(SLibUtilities.textRepeat(" ", (40 - sBizPartner.length())));
+                layout += values.getCf();
+                layout += SLibUtilities.textRepeat(" ", 18);
+                layout += formatDesc.format(0d).replace(".", "");
+                layout += SLibUtilities.textRepeat(" ", 60);
+
+                layout += "\r\n";
+            }
+
+            if (vRows.size() > 0) {
+                // Summary
+                nMoveNum = nMoveNum - 1;
+                n = (int) (Math.floor(Math.log10(nMoveNum)) + 1);
+
+                layout += SLibUtilities.textRepeat("0", 5).concat("1");
+                layout += SLibUtilities.textRepeat("0", 6 - n).concat(nMoveNum + "");
+                layout += sConcept.concat(SLibUtilities.textRepeat(" ", (40 - sConcept.length())));
+            }
+
+            /*
+            if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                SLibUtilities.launchFile(file.getPath());
+            }
+            */
+        }
+        catch (java.lang.Exception e) {
+            SLibUtilities.renderException(STableUtilities.class.getName(), e);
+        }
+        return layout;
+    }
+    
+    public static java.lang.String createLayoutHsbcThird(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
+        int nMoveNum = 1;
+        int n = 0;
+        java.lang.String sBizPartner = "";
+        java.lang.String sReference = "";
+        java.lang.String sAccountDebit = "";
+        java.lang.String sAccountCredit = "";
+        java.lang.String sConcept = "";
+        java.lang.String layout = "";
+        DecimalFormat formatDesc = new DecimalFormat("00000000000.00");
+        mdBalanceTot = 0;
+        mdTaxChargedTot = 0;
+        mbIsRepeated = false;
+
+        try {
+            for (SLayoutBankPaymentTxt payment : payments) {
+
+                n = (int) (Math.floor(Math.log10(nMoveNum)) + 1);
+
+                sBizPartner = SLibUtilities.textToAlphanumeric(payment.getBizPartner());
+                sReference = SLibUtilities.textToAlphanumeric(payment.getReference());
+                sAccountDebit = SLibUtilities.textTrim(payment.getAccountDebit());
+                sAccountCredit = SLibUtilities.textTrim(payment.getAccountCredit());
+                sConcept = SLibUtilities.textToAlphanumeric(payment.getConcept());
+                mdBalanceTot = payment.getTotalAmount();
+
+                layout += SLibUtilities.textRepeat("0", 6 - n).concat(nMoveNum++ + "");
+                layout += SLibUtilities.textRepeat("0", (sAccountDebit.length() >= 10 ? 0 : 10 - sAccountDebit.length())).concat(SLibUtilities.textLeft(sAccountDebit, 10));
+                layout += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 10 ? 0 : 10 - sAccountCredit.length())).concat(SLibUtilities.textLeft(sAccountCredit, 10));
+                layout += formatDesc.format(mdBalanceTot).replace(".", "");
+                layout += payment.getCurrencyId();
+                layout += sReference.concat(SLibUtilities.textRepeat(" ", (30 - sReference.length())));
+                layout += (sBizPartner.length() > 40 ? SLibUtilities.textLeft(sBizPartner, 40) : sBizPartner).concat(SLibUtilities.textRepeat(" ", (40 - sBizPartner.length())));
+                layout += payment.getHsbcFiscalVoucher();
+                layout += SLibUtilities.textRepeat(" ", 18);
+                layout += formatDesc.format(0d).replace(".", "");
+                layout += SLibUtilities.textRepeat(" ", 60);
+
+                layout += "\r\n";
+            }
+
+            if (payments.size() > 0) {
+                // Summary
+                nMoveNum = nMoveNum - 1;
+                n = (int) (Math.floor(Math.log10(nMoveNum)) + 1);
+
+                layout += SLibUtilities.textRepeat("0", 5).concat("1");
+                layout += SLibUtilities.textRepeat("0", 6 - n).concat(nMoveNum + "");
+                layout += sConcept.concat(SLibUtilities.textRepeat(" ", (40 - sConcept.length())));
+            }
+        }
+        catch (java.lang.Exception e) {
+            SLibUtilities.renderException(STableUtilities.class.getName(), e);
+        }
+        return layout;
+    }
+
+    public static java.lang.String createLayoutHsbcTefOld(erp.client.SClientInterface client, Vector<SLayoutBankRow> vRows, java.lang.String title) {
+        int n = 0;
+        int nBizPartnerId = 0;
+        java.lang.String sBizPartner = "";
+        java.lang.String sReference = "";
+        java.lang.String sAccountDebit = "";
+        java.lang.String sAccountCredit = "";
+        java.lang.String layout = "";
+        SLayoutBankRow values = null;
+        DecimalFormat formatDesc = new DecimalFormat("000000000000.00");
+        mdBalanceTot = 0;
+        mdTaxChargedTot = 0;
+        mbIsRepeated = false;
+
+        /*
+        client.getFileChooser().setSelectedFile(new File(client.getSessionXXX().getFormatters().getFileNameDatetimeFormat().format(new java.util.Date()) + " " + title + ".txt"));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+        */
+
+        try {
+            for (int i = 0; i < vRows.size();) {
+                values = vRows.get(i);
+
+                n = (int) (Math.floor(Math.log10(values.getBankKey())) + 1);
+
+                nBizPartnerId = values.getBizPartnerId();
+                sBizPartner = SLibUtilities.textToAlphanumeric(values.getBizPartner());
+                sReference = SLibUtilities.textToAlphanumeric(values.getReference());
+                sAccountDebit = SLibUtilities.textTrim(values.getAccountDebit());
+                sAccountCredit = SLibUtilities.textTrim(values.getAccountCredit());
+                mdBalanceTot = values.getBalanceTotByBizPartner();
+                if (values.getTaxCharged() != 0) {
+                    mdTaxChargedTot = (values.getTotalVat() * (mdBalanceTot / values.getTotal()));
+                }
+                else {
+                    mdTaxChargedTot = 0;
+                }
+
+                i = calculateBalanceTotal(vRows, i, nBizPartnerId, sAccountCredit);
+
+                layout += values.getAccType();
+                layout += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 20 ? 0 : 20 - sAccountCredit.length())).concat(SLibUtilities.textLeft(sAccountCredit, 20));
+                layout += SLibUtilities.textRepeat("0", 3 - n).concat(values.getBankKey() + "");
+                layout += (sBizPartner.length() > 40 ? SLibUtilities.textLeft(sBizPartner, 40) : sBizPartner).concat(SLibUtilities.textRepeat(" ", (40 - sBizPartner.length())));
+                layout += SLibUtilities.textRepeat("0", 3).concat(SLibUtilities.textRight(sAccountDebit, 4)); // Numerical Reference
+                layout += sReference.concat(SLibUtilities.textRepeat(" ", (40 - sReference.length())));
+                layout += formatDesc.format(mdBalanceTot).replace(".", "");
+                //layout += values.getBizPartnerCreditFiscalId().concat(SLibUtilities.textRepeat(" ", (18 - values.getBizPartnerCreditFiscalId().length()))); XXX No required is optional (jbarajas)
+                //layout += formatDescs.format(mdTaxChargedTot); XXX No required is optional (jbarajas)
+                //layout += sEmail.concat(SLibUtilities.textRepeat(" ", (100 - sEmail.length()))); XXX No required is optional (jbarajas)
+
+                layout += "\r\n";
+            }
+
+            /*
+            if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                SLibUtilities.launchFile(file.getPath());
+            }
+            */
+        }
+        catch (java.lang.Exception e) {
+            SLibUtilities.renderException(STableUtilities.class.getName(), e);
+        }
+        return layout;
+    }
+    
+    public static java.lang.String createLayoutHsbcTef(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
+        int n = 0;
+        java.lang.String sBizPartner = "";
+        java.lang.String sReference = "";
+        java.lang.String sAccountDebit = "";
+        java.lang.String sAccountCredit = "";
+        java.lang.String layout = "";
+        DecimalFormat formatDesc = new DecimalFormat("000000000000.00");
+        mdBalanceTot = 0;
+        mdTaxChargedTot = 0;
+        mbIsRepeated = false;
+
+        try {
+            for (SLayoutBankPaymentTxt payment : payments) {
+
+                n = (int) (Math.floor(Math.log10(payment.getHsbcBankCode())) + 1);
+
+                sBizPartner = SLibUtilities.textToAlphanumeric(payment.getBizPartner());
+                sReference = SLibUtilities.textToAlphanumeric(payment.getReference());
+                sAccountDebit = SLibUtilities.textTrim(payment.getAccountDebit());
+                sAccountCredit = SLibUtilities.textTrim(payment.getAccountCredit());
+                mdBalanceTot = payment.getTotalAmount();
+
+                layout += payment.getHsbcAccountType();
+                layout += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 20 ? 0 : 20 - sAccountCredit.length())).concat(SLibUtilities.textLeft(sAccountCredit, 20));
+                layout += SLibUtilities.textRepeat("0", 3 - n).concat(payment.getHsbcBankCode() + "");
+                layout += (sBizPartner.length() > 40 ? SLibUtilities.textLeft(sBizPartner, 40) : sBizPartner).concat(SLibUtilities.textRepeat(" ", (40 - sBizPartner.length())));
+                layout += SLibUtilities.textRepeat("0", 3).concat(SLibUtilities.textRight(sAccountDebit, 4)); // Numerical Reference
+                layout += sReference.concat(SLibUtilities.textRepeat(" ", (40 - sReference.length())));
+                layout += formatDesc.format(mdBalanceTot).replace(".", "");
+                //layout += values.getBizPartnerCreditFiscalId().concat(SLibUtilities.textRepeat(" ", (18 - values.getBizPartnerCreditFiscalId().length()))); XXX No required is optional (jbarajas)
+                //layout += formatDescs.format(mdTaxChargedTot); XXX No required is optional (jbarajas)
+                //layout += sEmail.concat(SLibUtilities.textRepeat(" ", (100 - sEmail.length()))); XXX No required is optional (jbarajas)
+
+                layout += "\r\n";
+            }
+        }
+        catch (java.lang.Exception e) {
+            SLibUtilities.renderException(STableUtilities.class.getName(), e);
+        }
+        return layout;
+    }
+
+    public static java.lang.String createLayoutHsbcSpeiFdNOld(erp.client.SClientInterface client, Vector<SLayoutBankRow> vRows, java.lang.String title) {
+        int nBizPartnerId = 0;
+        java.lang.String sAccountDebit = "";
+        java.lang.String sAccountCredit = "";
+        java.lang.String sConcept = "";
+        java.lang.String sDescription = "";
+        java.lang.String layout = "";
+        SLayoutBankRow values = null;
+        DecimalFormat formatDesc = new DecimalFormat("0000000000000000.00");
+        mdBalanceTot = 0;
+
+        /*
+        client.getFileChooser().setSelectedFile(new File(client.getSessionXXX().getFormatters().getFileNameDatetimeFormat().format(new java.util.Date()) + " " + title + ".txt"));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+        */
+
+        try {
+            for (int i = 0; i < vRows.size();) {
+                values = vRows.get(i);
+
+                nBizPartnerId = values.getBizPartnerId();
+                sAccountDebit = SLibUtilities.textTrim(values.getAccountDebit());
+                sAccountCredit = SLibUtilities.textTrim(values.getAccountCredit());
+                sConcept = SLibUtilities.textToAlphanumeric(values.getConcept());
+                sDescription = SLibUtilities.textToAlphanumeric(values.getDescription());
+                mdBalanceTot = values.getBalanceTotByBizPartner();
+
+                i = calculateBalanceTotal(vRows, i, nBizPartnerId, sAccountCredit);
+
+                layout += SLibUtilities.textRepeat("0", (sAccountDebit.length() >= 10 ? 0 : 10 - sAccountDebit.length())).concat(SLibUtilities.textLeft(sAccountDebit, 10));
+                layout += values.getBizPartnerDebitFiscalId().concat(SLibUtilities.textRepeat(" ", (18 - values.getBizPartnerDebitFiscalId().length())));
+                layout += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 20 ? 0 : 20 - sAccountCredit.length())).concat(SLibUtilities.textLeft(sAccountCredit, 20));
+                layout += formatDesc.format(mdBalanceTot).replace(".", "");
+                layout += SLibUtilities.textRepeat("0", 3).concat(SLibUtilities.textRight(sAccountDebit, 4)); // Numerical Reference
+                layout += sConcept.concat(SLibUtilities.textRepeat(" ", (30 - sConcept.length())));
+                layout += sDescription.concat(SLibUtilities.textRepeat(" ", (40 - sDescription.length())));
+
+                layout += "\r\n";
+            }
+
+            /*
+            if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                SLibUtilities.launchFile(file.getPath());
+            }
+            */
+        }
+        catch (java.lang.Exception e) {
+            SLibUtilities.renderException(STableUtilities.class.getName(), e);
+        }
+        return layout;
+    }
+    
+    public static java.lang.String createLayoutHsbcSpeiFdN(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
+        java.lang.String sAccountDebit = "";
+        java.lang.String sAccountCredit = "";
+        java.lang.String sConcept = "";
+        java.lang.String sDescription = "";
+        java.lang.String layout = "";
+        DecimalFormat formatDesc = new DecimalFormat("0000000000000000.00");
+        mdBalanceTot = 0;
+
+        try {
+            for (SLayoutBankPaymentTxt payment : payments) {
+
+                sAccountDebit = SLibUtilities.textTrim(payment.getAccountDebit());
+                sAccountCredit = SLibUtilities.textTrim(payment.getAccountCredit());
+                sConcept = SLibUtilities.textToAlphanumeric(payment.getConcept());
+                sDescription = SLibUtilities.textToAlphanumeric(payment.getDescription());
+                mdBalanceTot = payment.getTotalAmount();
+
+                layout += SLibUtilities.textRepeat("0", (sAccountDebit.length() >= 10 ? 0 : 10 - sAccountDebit.length())).concat(SLibUtilities.textLeft(sAccountDebit, 10));
+                layout += payment.getHsbcFiscalIdDebit().concat(SLibUtilities.textRepeat(" ", (18 - payment.getHsbcFiscalIdDebit().length())));
+                layout += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 20 ? 0 : 20 - sAccountCredit.length())).concat(SLibUtilities.textLeft(sAccountCredit, 20));
+                layout += formatDesc.format(mdBalanceTot).replace(".", "");
+                layout += SLibUtilities.textRepeat("0", 3).concat(SLibUtilities.textRight(sAccountDebit, 4)); // Numerical Reference
+                layout += sConcept.concat(SLibUtilities.textRepeat(" ", (30 - sConcept.length())));
+                layout += sDescription.concat(SLibUtilities.textRepeat(" ", (40 - sDescription.length())));
+
+                layout += "\r\n";
+            }
+        }
+        catch (java.lang.Exception e) {
+            SLibUtilities.renderException(STableUtilities.class.getName(), e);
+        }
+        return layout;
+    }
+
+    public static java.lang.String createLayoutHsbcSpeiFdYOld(erp.client.SClientInterface client, Vector<SLayoutBankRow> vRows, java.lang.String title) {
+        int nBizPartnerId = 0;
+        java.lang.String sAccountDebit = "";
+        java.lang.String sAccountCredit = "";
+        java.lang.String sConcept = "";
+        java.lang.String layout = "";
+        SLayoutBankRow values = null;
+        DecimalFormat formatDesc = new DecimalFormat("0000000000000000.00");
+        mdBalanceTot = 0;
+        mdTaxChargedTot = 0;
+        mbIsRepeated = false;
+
+        /*
+        client.getFileChooser().setSelectedFile(new File(client.getSessionXXX().getFormatters().getFileNameDatetimeFormat().format(new java.util.Date()) + " " + title + ".txt"));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+        */
+
+        try {
+            for (int i = 0; i < vRows.size();) {
+                values = vRows.get(i);
+
+                nBizPartnerId = values.getBizPartnerId();
+                sAccountDebit = SLibUtilities.textTrim(values.getAccountDebit());
+                sAccountCredit = SLibUtilities.textTrim(values.getAccountCredit());
+                sConcept = SLibUtilities.textToAlphanumeric(values.getConcept());
+                mdBalanceTot = values.getBalanceTotByBizPartner();
+                if (values.getTaxCharged() != 0) {
+                    mdTaxChargedTot = (values.getTotalVat() * (mdBalanceTot / values.getTotal()));
+                }
+                else {
+                    mdTaxChargedTot = 0;
+                }
+
+                i = calculateBalanceTotal(vRows, i, nBizPartnerId, sAccountCredit);
+
+                layout += SLibUtilities.textRepeat("0", (sAccountDebit.length() >= 10 ? 0 : 10 - sAccountDebit.length())).concat(SLibUtilities.textLeft(sAccountDebit, 10));
+                layout += values.getBizPartnerDebitFiscalId().concat(SLibUtilities.textRepeat(" ", (18 - values.getBizPartnerDebitFiscalId().length())));
+                layout += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 20 ? 0 : 20 - sAccountCredit.length())).concat(SLibUtilities.textLeft(sAccountCredit, 20));
+                layout += formatDesc.format(mdBalanceTot).replace(".", "");
+                layout += "S"; // CF
+                layout += values.getBizPartnerCreditFiscalId().concat(SLibUtilities.textRepeat(" ", (18 - values.getBizPartnerCreditFiscalId().length())));
+                layout += values.getTaxCharged() != 0 ? formatDesc.format(mdTaxChargedTot).replace(".", "") : formatDesc.format(0d).replace(".", "");
+                layout += SLibUtilities.textRepeat("0", 3).concat(SLibUtilities.textRight(sAccountDebit, 4)); // Numerical Reference
+                layout += sConcept.concat(SLibUtilities.textRepeat(" ", (40 - sConcept.length())));
+
+                layout += "\r\n";
+            }
+
+            /*
+            if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                SLibUtilities.launchFile(file.getPath());
+            }
+            */
+        }
+        catch (java.lang.Exception e) {
+            SLibUtilities.renderException(STableUtilities.class.getName(), e);
+        }
+        return layout;
+    }
+    
+    public static java.lang.String createLayoutHsbcSpeiFdY(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
+        java.lang.String sAccountDebit = "";
+        java.lang.String sAccountCredit = "";
+        java.lang.String sConcept = "";
+        java.lang.String layout = "";
+        DecimalFormat formatDesc = new DecimalFormat("0000000000000000.00");
+        mdBalanceTot = 0;
+
+        try {
+            for (SLayoutBankPaymentTxt payment : payments) {
+
+                sAccountDebit = SLibUtilities.textTrim(payment.getAccountDebit());
+                sAccountCredit = SLibUtilities.textTrim(payment.getAccountCredit());
+                sConcept = SLibUtilities.textToAlphanumeric(payment.getConcept());
+                mdBalanceTot = payment.getTotalAmount();
+
+                layout += SLibUtilities.textRepeat("0", (sAccountDebit.length() >= 10 ? 0 : 10 - sAccountDebit.length())).concat(SLibUtilities.textLeft(sAccountDebit, 10));
+                layout += payment.getHsbcFiscalIdDebit().concat(SLibUtilities.textRepeat(" ", (18 - payment.getHsbcFiscalIdDebit().length())));
+                layout += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 20 ? 0 : 20 - sAccountCredit.length())).concat(SLibUtilities.textLeft(sAccountCredit, 20));
+                layout += formatDesc.format(mdBalanceTot).replace(".", "");
+                layout += "S"; // CF
+                layout += payment.getHsbcFiscalIdCredit().concat(SLibUtilities.textRepeat(" ", (18 - payment.getHsbcFiscalIdCredit().length())));
+                layout +=  formatDesc.format(0d).replace(".", "");
+                layout += SLibUtilities.textRepeat("0", 3).concat(SLibUtilities.textRight(sAccountDebit, 4)); // Numerical Reference
+                layout += sConcept.concat(SLibUtilities.textRepeat(" ", (40 - sConcept.length())));
+
+                layout += "\r\n";
+            }
+        }
+        catch (java.lang.Exception e) {
+            SLibUtilities.renderException(STableUtilities.class.getName(), e);
+        }
+        return layout;
+    }
+
+    public static java.lang.String createLayoutSantanderThirdOld(erp.client.SClientInterface client, Vector<SLayoutBankRow> vRows, java.lang.String title) {
+        int nBizPartnerId = 0;
+        java.lang.String sAccountDebit = "";
+        java.lang.String sAccountCredit = "";
+        java.lang.String sConcept = "";
+        java.lang.String layout = "";
+        SLayoutBankRow values = null;
+        DecimalFormat formatDesc = new DecimalFormat("0000000000.00");
+        SimpleDateFormat formatDate = new SimpleDateFormat("ddMMyyyy");
+        mdBalanceTot = 0;
+        mdTaxChargedTot = 0;
+        mbIsRepeated = false;
+
+        /*
+        client.getFileChooser().setSelectedFile(new File(client.getSessionXXX().getFormatters().getFileNameDatetimeFormat().format(new java.util.Date()) + " " + title + ".txt"));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+        */
+
+        try {
+            for (int i = 0; i < vRows.size();) {
+                values = vRows.get(i);
+
+                nBizPartnerId = values.getBizPartnerId();
+                sAccountDebit = SLibUtilities.textTrim(values.getAccountDebit());
+                sAccountCredit = SLibUtilities.textTrim(values.getAccountCredit());
+                sConcept = SLibUtilities.textToAlphanumeric(values.getConcept());
+                mdBalanceTot = values.getBalanceTotByBizPartner();
+                if (values.getTaxCharged() != 0) {
+                    mdTaxChargedTot = (values.getTotalVat() * (mdBalanceTot / values.getTotal()));
+                }
+                else {
+                    mdTaxChargedTot = 0;
+                }
+
+                i = calculateBalanceTotal(vRows, i, nBizPartnerId, sAccountCredit);
+
+                layout += SLibUtilities.textRepeat("0", (sAccountDebit.length() >= 11 ? 0 : 11 - sAccountDebit.length())).concat(SLibUtilities.textLeft(sAccountDebit, 11)); // Debit acccount
+                layout += SLibUtilities.textRepeat(" ", 5); // Blank
+                layout += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 11 ? 0 : 11 - sAccountCredit.length())).concat(SLibUtilities.textLeft(sAccountCredit, 11)); // Credit account
+                layout += SLibUtilities.textRepeat(" ", 5); // Blank
+                layout += formatDesc.format(mdBalanceTot);
+                layout += sConcept.concat(SLibUtilities.textRepeat(" ", (40 - sConcept.length())));
+                layout += formatDate.format(values.getDate());
+
+                layout += "\r\n";
+            }
+
+            /*
+            if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                SLibUtilities.launchFile(file.getPath());
+            }
+            */
+        }
+        catch (java.lang.Exception e) {
+            SLibUtilities.renderException(STableUtilities.class.getName(), e);
+        }
+        return layout;
+    }
+    
+    public static java.lang.String createLayoutSantanderThird(ArrayList<SLayoutBankPaymentTxt> payments, Date date, java.lang.String title) {
+        java.lang.String sAccountDebit = "";
+        java.lang.String sAccountCredit = "";
+        java.lang.String sConcept = "";
+        java.lang.String layout = "";
+        DecimalFormat formatDesc = new DecimalFormat("0000000000.00");
+        SimpleDateFormat formatDate = new SimpleDateFormat("ddMMyyyy");
+        mdBalanceTot = 0;
+
+        try {
+            for (SLayoutBankPaymentTxt payment : payments) {
+
+                sAccountDebit = SLibUtilities.textTrim(payment.getAccountDebit());
+                sAccountCredit = SLibUtilities.textTrim(payment.getAccountCredit());
+                sConcept = SLibUtilities.textToAlphanumeric(payment.getConcept());
+                mdBalanceTot = payment.getTotalAmount();
+
+                layout += SLibUtilities.textRepeat("0", (sAccountDebit.length() >= 11 ? 0 : 11 - sAccountDebit.length())).concat(SLibUtilities.textLeft(sAccountDebit, 11)); // Debit acccount
+                layout += SLibUtilities.textRepeat(" ", 5); // Blank
+                layout += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 11 ? 0 : 11 - sAccountCredit.length())).concat(SLibUtilities.textLeft(sAccountCredit, 11)); // Credit account
+                layout += SLibUtilities.textRepeat(" ", 5); // Blank
+                layout += formatDesc.format(mdBalanceTot);
+                layout += sConcept.concat(SLibUtilities.textRepeat(" ", (40 - sConcept.length())));
+                layout += formatDate.format(date);
+
+                layout += "\r\n";
+            }
+        }
+        catch (java.lang.Exception e) {
+            SLibUtilities.renderException(STableUtilities.class.getName(), e);
+        }
+        return layout;
+    }
+    
+    public static java.lang.String createLayoutSantanderTefOld(erp.client.SClientInterface client, Vector<SLayoutBankRow> vRows, java.lang.String title) {
+        int nBizPartnerId = 0;
+        java.lang.String sBizPartner = "";
+        java.lang.String sBizPartnerSantanderCode = "";
+        java.lang.String sAccountDebit = "";
+        java.lang.String sAccountCredit = "";
+        java.lang.String sConcept = "";
+        java.lang.String sReference = "";
+        java.lang.String layout = "";
+        SLayoutBankRow values = null;
+        DecimalFormat formatDesc = new DecimalFormat("0000000000000.00");
+        mdBalanceTot = 0;
+        mdTaxChargedTot = 0;
+        mbIsRepeated = false;
+
+        /*
+        client.getFileChooser().setSelectedFile(new File(client.getSessionXXX().getFormatters().getFileNameDatetimeFormat().format(new java.util.Date()) + " " + title + ".txt"));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+        */
+
+        try {
+            for (int i = 0; i < vRows.size();) {
+                values = vRows.get(i);
+
+                nBizPartnerId = values.getBizPartnerId();
+                sBizPartner = SLibUtilities.textToAlphanumeric(values.getBizPartner());
+                sBizPartnerSantanderCode = SLibUtilities.textToAlphanumeric(values.getSantanderBankCode());
+                sAccountDebit = SLibUtilities.textTrim(values.getAccountDebit());
+                sAccountCredit = SLibUtilities.textTrim(values.getAccountCredit());
+                sConcept = SLibUtilities.textToAlphanumeric(values.getConcept());
+                sReference = SLibUtilities.textToAlphanumeric(values.getReference());
+                mdBalanceTot = values.getBalanceTotByBizPartner();
+                if (values.getTaxCharged() != 0) {
+                    mdTaxChargedTot = (values.getTotalVat() * (mdBalanceTot / values.getTotal()));
+                }
+                else {
+                    mdTaxChargedTot = 0;
+                }
+
+                i = calculateBalanceTotal(vRows, i, nBizPartnerId, sAccountCredit);
+
+                layout += (sAccountDebit.length() > 16 ? SLibUtilities.textLeft(sAccountDebit, 16) : sAccountDebit).concat(SLibUtilities.textRepeat(" ", (16 - sAccountDebit.length()))); // Debit acccount
+                layout += (sAccountCredit.length() > 20 ? SLibUtilities.textLeft(sAccountCredit, 20) : sAccountCredit).concat(SLibUtilities.textRepeat(" ", (20 - sAccountCredit.length()))); // Credit account
+                layout += (sBizPartnerSantanderCode.length() > 0 ? sBizPartnerSantanderCode.concat(SLibUtilities.textRepeat(" ", (5 - sBizPartnerSantanderCode.length()))) : SLibUtilities.textRepeat(" ", 5)); // Bank
+                layout += (sBizPartner.length() > 40 ? SLibUtilities.textLeft(sBizPartner, 40) : sBizPartner).concat(SLibUtilities.textRepeat(" ", (40 - sBizPartner.length()))); // Beneficiary
+                layout += "0000"; // Branch credit
+                layout += formatDesc.format(mdBalanceTot).replace(".", "");
+                layout += "00000"; // Plaza Banxico
+                layout += sConcept.concat(SLibUtilities.textRepeat(" ", (40 - sConcept.length())));
+                layout += SLibUtilities.textRepeat(" ", 90); // Blank
+                layout += sReference.concat(SLibUtilities.textRepeat(" ", (7 - sReference.length())));
+                layout += 1;
+
+                layout += "\r\n";
+            }
+
+            /*
+            if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                SLibUtilities.launchFile(file.getPath());
+            }
+            */
+        }
+        catch (java.lang.Exception e) {
+            SLibUtilities.renderException(STableUtilities.class.getName(), e);
+        }
+        return layout;
+    }
+    
+    public static java.lang.String createLayoutSantanderTef(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
+        java.lang.String sBizPartner = "";
+        java.lang.String sBizPartnerSantanderCode = "";
+        java.lang.String sAccountDebit = "";
+        java.lang.String sAccountCredit = "";
+        java.lang.String sConcept = "";
+        java.lang.String sReference = "";
+        java.lang.String layout = "";
+        DecimalFormat formatDesc = new DecimalFormat("0000000000000.00");
+        mdBalanceTot = 0;
+
+        try {
+            for (SLayoutBankPaymentTxt payment : payments) {
+
+                sBizPartner = SLibUtilities.textToAlphanumeric(payment.getBizPartner());
+                sBizPartnerSantanderCode = SLibUtilities.textToAlphanumeric(payment.getSantanderBankCode());
+                sAccountDebit = SLibUtilities.textTrim(payment.getAccountDebit());
+                sAccountCredit = SLibUtilities.textTrim(payment.getAccountCredit());
+                sConcept = SLibUtilities.textToAlphanumeric(payment.getConcept());
+                sReference = SLibUtilities.textToAlphanumeric(payment.getReference());
+                mdBalanceTot = payment.getTotalAmount();
+
+                layout += (sAccountDebit.length() > 16 ? SLibUtilities.textLeft(sAccountDebit, 16) : sAccountDebit).concat(SLibUtilities.textRepeat(" ", (16 - sAccountDebit.length()))); // Debit acccount
+                layout += (sAccountCredit.length() > 20 ? SLibUtilities.textLeft(sAccountCredit, 20) : sAccountCredit).concat(SLibUtilities.textRepeat(" ", (20 - sAccountCredit.length()))); // Credit account
+                layout += (sBizPartnerSantanderCode.length() > 0 ? sBizPartnerSantanderCode.concat(SLibUtilities.textRepeat(" ", (5 - sBizPartnerSantanderCode.length()))) : SLibUtilities.textRepeat(" ", 5)); // Bank
+                layout += (sBizPartner.length() > 40 ? SLibUtilities.textLeft(sBizPartner, 40) : sBizPartner).concat(SLibUtilities.textRepeat(" ", (40 - sBizPartner.length()))); // Beneficiary
+                layout += "0000"; // Branch credit
+                layout += formatDesc.format(mdBalanceTot).replace(".", "");
+                layout += "00000"; // Plaza Banxico
+                layout += sConcept.concat(SLibUtilities.textRepeat(" ", (40 - sConcept.length())));
+                layout += SLibUtilities.textRepeat(" ", 90); // Blank
+                layout += sReference.concat(SLibUtilities.textRepeat(" ", (7 - sReference.length())));
+                layout += 1;
+
+                layout += "\r\n";
+            }
+        }
+        catch (java.lang.Exception e) {
+            SLibUtilities.renderException(STableUtilities.class.getName(), e);
+        }
+        return layout;
+    }
+    
+    public static java.lang.String createLayoutSantanderSpeiFdNOld(erp.client.SClientInterface client, Vector<SLayoutBankRow> vRows, java.lang.String title) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    public static java.lang.String createLayoutSantanderSpeiFdN(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    public static java.lang.String createLayoutSantanderSpeiFdYOld(erp.client.SClientInterface client, Vector<SLayoutBankRow> vRows, java.lang.String title) {
+        return createLayoutSantanderTefOld(client, vRows, title);
+    }
+    
+    public static java.lang.String createLayoutSantanderSpeiFdY(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
+        return createLayoutSantanderTef(payments, title);
+    }
+    
+    public static java.lang.String createLayoutBanBajioOld(erp.client.SClientInterface client, Vector<SLayoutBankRow> vRows, java.lang.String title, Date date, Date dateApplication, int consecutiveDay, String typeLay, String typeAccountCredit) {
+        int nMoveNum = 2;
+        int nMoveNumTotal = 0;
+        int n = 0;
+        int m = 0;
+        int nBizPartnerId = 0;
+        java.lang.String sBizPartnerBanBajioCode = "";
+        java.lang.String sBizPartnerAliasBanBajio = "";
+        java.lang.String sReference = "";
+        java.lang.String sAccountDebit = "";
+        java.lang.String sAccountCredit = "";
+        java.lang.String layout = "";
+        SLayoutBankRow values = null;
+        DecimalFormat formatDesc = new DecimalFormat("0000000000000.00");
+        DecimalFormat formatDescTotal = new DecimalFormat("0000000000000000.00");
+        SimpleDateFormat formatDate = new SimpleDateFormat("yyyyMMdd");
+        double mdBalanceTotal = 0;
+        mdBalanceTot = 0;
+        mdTaxChargedTot = 0;
+        mbIsRepeated = false;
+
+        /*
+        client.getFileChooser().setSelectedFile(new File(client.getSessionXXX().getFormatters().getFileNameDatetimeFormat().format(new java.util.Date()) + " " + title + ".txt"));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+        */
+
+        try {
+            n = (int) (Math.floor(Math.log10(consecutiveDay)) + 1);
+
+            layout += "01";
+            layout += "0000001";
+            layout += formatDate.format(date);
+            layout += SLibUtilities.textRepeat("0", 3 - n).concat(consecutiveDay + ""); // Consecutive Day
+
+            layout += "\r\n";
+
+            for (int i = 0; i < vRows.size();) {
+                values = vRows.get(i);
+
+                n = (int) (Math.floor(Math.log10(nMoveNum)) + 1);
+
+                nBizPartnerId = values.getBizPartnerId();
+                sBizPartnerBanBajioCode = SLibUtilities.textToAlphanumeric(values.getBajioBankCode());
+                sBizPartnerAliasBanBajio = SLibUtilities.textToAlphanumeric(values.getBajioBankAlias());
+                sReference = SLibUtilities.textToAlphanumeric(values.getReference());
+                sAccountDebit = SLibUtilities.textTrim(values.getAccountDebit());
+                sAccountCredit = SLibUtilities.textTrim(values.getAccountCredit());
+                mdBalanceTot = values.getBalanceTotByBizPartner();
+                mdBalanceTotal += mdBalanceTot;
+                if (values.getTaxCharged() != 0) {
+                    mdTaxChargedTot = (values.getTotalVat() * (mdBalanceTot / values.getTotal()));
+                }
+                else {
+                    mdTaxChargedTot = 0;
+                }
+
+                i = calculateBalanceTotal(vRows, i, nBizPartnerId, sAccountCredit);
+
+                layout += "02";
+                layout += SLibUtilities.textRepeat("0", 7 - n).concat(nMoveNum++ + "");
+                layout += TXT_TYPE_ACCOUNT_CHECK;
+                layout += SLibUtilities.textRepeat("0", (sAccountDebit.length() >= 20 ? 0 : 20 - sAccountDebit.length())).concat(SLibUtilities.textLeft(sAccountDebit, 20)); // Debit acccount
+                layout += "01"; // Currency
+                layout += (sBizPartnerBanBajioCode.length() > 0 ? sBizPartnerBanBajioCode.concat(SLibUtilities.textRepeat(" ", (5 - sBizPartnerBanBajioCode.length()))) : SLibUtilities.textRepeat(" ", 5)); // Code Bank
+                layout += formatDesc.format(mdBalanceTot).replace(".", "");
+                layout += formatDate.format(dateApplication);
+                layout += typeLay;
+                layout += typeAccountCredit;
+                layout += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 20 ? 0 : 20 - sAccountCredit.length())).concat(SLibUtilities.textLeft(sAccountCredit, 20)); // Credit account
+                layout += "000000000"; // FILLER
+                layout += (sBizPartnerAliasBanBajio.length() > 15 ? SLibUtilities.textLeft(sBizPartnerAliasBanBajio, 15) : sBizPartnerAliasBanBajio).concat(SLibUtilities.textRepeat(" ", (15 - sBizPartnerAliasBanBajio.length()))); // ALIAS
+                layout += formatDesc.format(0d).replace(".", "");
+                layout += sReference.concat(SLibUtilities.textRepeat(" ", (40 - sReference.length())));
+
+                layout += "\r\n";
+
+                nMoveNumTotal++;
+            }
+
+            if (vRows.size() > 0) {
+                // Summary
+                n = (int) (Math.floor(Math.log10(nMoveNum)) + 1);
+                m = (int) (Math.floor(Math.log10(nMoveNumTotal)) + 1);
+
+                layout += "09";
+                layout += SLibUtilities.textRepeat("0", 7 - n).concat(nMoveNum + "");
+                layout += SLibUtilities.textRepeat("0", 7 - m).concat(nMoveNumTotal + "");
+                layout += formatDescTotal.format(mdBalanceTotal).replace(".", "");;
+            }
+            layout += "\r\n";
+
+            /*
+            if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                SLibUtilities.launchFile(file.getPath());
+            }
+            */
+        }
+        catch (java.lang.Exception e) {
+            SLibUtilities.renderException(STableUtilities.class.getName(), e);
+        }
+        return layout;
+    }
+    
+    public static java.lang.String createLayoutBanBajio(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title, Date date, Date dateApplication, int consecutiveDay, String typeLay, String typeAccountCredit) {
+        int nMoveNum = 2;
+        int nMoveNumTotal = 0;
+        int n = 0;
+        int m = 0;
+        java.lang.String sBizPartnerBanBajioCode = "";
+        java.lang.String sBizPartnerAliasBanBajio = "";
+        java.lang.String sReference = "";
+        java.lang.String sAccountDebit = "";
+        java.lang.String sAccountCredit = "";
+        java.lang.String layout = "";
+        DecimalFormat formatDesc = new DecimalFormat("0000000000000.00");
+        DecimalFormat formatDescTotal = new DecimalFormat("0000000000000000.00");
+        SimpleDateFormat formatDate = new SimpleDateFormat("yyyyMMdd");
+        double mdBalanceTotal = 0;
+        mdBalanceTot = 0;
+
+        try {
+            n = (int) (Math.floor(Math.log10(consecutiveDay)) + 1);
+
+            layout += "01";
+            layout += "0000001";
+            layout += formatDate.format(date);
+            layout += SLibUtilities.textRepeat("0", 3 - n).concat(consecutiveDay + ""); // Consecutive Day
+
+            layout += "\r\n";
+
+            for (SLayoutBankPaymentTxt payment : payments) {
+
+                n = (int) (Math.floor(Math.log10(nMoveNum)) + 1);
+                
+                sBizPartnerBanBajioCode = SLibUtilities.textToAlphanumeric(payment.getBajioBankCode());
+                sBizPartnerAliasBanBajio = SLibUtilities.textToAlphanumeric(payment.getBajioBankNick());
+                sReference = SLibUtilities.textToAlphanumeric(payment.getReference());
+                sAccountDebit = SLibUtilities.textTrim(payment.getAccountDebit());
+                sAccountCredit = SLibUtilities.textTrim(payment.getAccountCredit());
+                mdBalanceTot = payment.getTotalAmount();
+                mdBalanceTotal += mdBalanceTot;
+
+                layout += "02";
+                layout += SLibUtilities.textRepeat("0", 7 - n).concat(nMoveNum++ + "");
+                layout += TXT_TYPE_ACCOUNT_CHECK;
+                layout += SLibUtilities.textRepeat("0", (sAccountDebit.length() >= 20 ? 0 : 20 - sAccountDebit.length())).concat(SLibUtilities.textLeft(sAccountDebit, 20)); // Debit acccount
+                layout += "01"; // Currency
+                layout += (sBizPartnerBanBajioCode.length() > 0 ? sBizPartnerBanBajioCode.concat(SLibUtilities.textRepeat(" ", (5 - sBizPartnerBanBajioCode.length()))) : SLibUtilities.textRepeat(" ", 5)); // Code Bank
+                layout += formatDesc.format(mdBalanceTot).replace(".", "");
+                layout += formatDate.format(dateApplication);
+                layout += typeLay;
+                layout += typeAccountCredit;
+                layout += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 20 ? 0 : 20 - sAccountCredit.length())).concat(SLibUtilities.textLeft(sAccountCredit, 20)); // Credit account
+                layout += "000000000"; // FILLER
+                layout += (sBizPartnerAliasBanBajio.length() > 15 ? SLibUtilities.textLeft(sBizPartnerAliasBanBajio, 15) : sBizPartnerAliasBanBajio).concat(SLibUtilities.textRepeat(" ", (15 - sBizPartnerAliasBanBajio.length()))); // ALIAS
+                layout += formatDesc.format(0d).replace(".", "");
+                layout += sReference.concat(SLibUtilities.textRepeat(" ", (40 - sReference.length())));
+
+                layout += "\r\n";
+
+                nMoveNumTotal++;
+            }
+
+            if (payments.size() > 0) {
+                // Summary
+                n = (int) (Math.floor(Math.log10(nMoveNum)) + 1);
+                m = (int) (Math.floor(Math.log10(nMoveNumTotal)) + 1);
+
+                layout += "09";
+                layout += SLibUtilities.textRepeat("0", 7 - n).concat(nMoveNum + "");
+                layout += SLibUtilities.textRepeat("0", 7 - m).concat(nMoveNumTotal + "");
+                layout += formatDescTotal.format(mdBalanceTotal).replace(".", "");;
+            }
+            layout += "\r\n";
+        }
+        catch (java.lang.Exception e) {
+            SLibUtilities.renderException(STableUtilities.class.getName(), e);
+        }
+        return layout;
+    }
+    
+    public static java.lang.String createLayoutBanBajioThirdOld(erp.client.SClientInterface client, Vector<SLayoutBankRow> vRows, java.lang.String title, Date date, int consecutiveDay) {
+        return createLayoutBanBajioOld(client, vRows, title, date, date, consecutiveDay, TXT_TYPE_LAY_BANBAJIO_LOCAL, TXT_TYPE_ACCOUNT_CHECK);
+    }
+    
+    public static java.lang.String createLayoutBanBajioThird(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title, Date date, int consecutiveDay) {
+        return createLayoutBanBajio(payments, title, date, date, consecutiveDay, TXT_TYPE_LAY_BANBAJIO_LOCAL, TXT_TYPE_ACCOUNT_CHECK);
+    }
+    
+    public static java.lang.String createLayoutBanBajioTefOld(erp.client.SClientInterface client, Vector<SLayoutBankRow> vRows, java.lang.String title, Date date, int consecutiveDay) {
+        return createLayoutBanBajioOld(client, vRows, title, date, date, consecutiveDay, TXT_TYPE_LAY_BANBAJIO_TEF, TXT_TYPE_ACCOUNT_CLABE);
+    }
+    
+    public static java.lang.String createLayoutBanBajioTef(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title, Date date, int consecutiveDay) {
+        return createLayoutBanBajio(payments, title, date, date, consecutiveDay, TXT_TYPE_LAY_BANBAJIO_TEF, TXT_TYPE_ACCOUNT_CLABE);
+    }
+    
+    public static java.lang.String createLayoutBanBajioSpeiFdNOld(erp.client.SClientInterface client, Vector<SLayoutBankRow> vRows, java.lang.String title, Date date, int consecutiveDay) {
+        return createLayoutBanBajioOld(client, vRows, title, date, date, consecutiveDay, TXT_TYPE_LAY_BANBAJIO_SPEI, TXT_TYPE_ACCOUNT_CLABE);
+    }
+    
+    public static java.lang.String createLayoutBanBajioSpeiFdN(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title, Date date, int consecutiveDay) {
+        return createLayoutBanBajio(payments, title, date, date, consecutiveDay, TXT_TYPE_LAY_BANBAJIO_SPEI, TXT_TYPE_ACCOUNT_CLABE);
+    }
+    
+    /**
+     * Checks if accounting transactions have a business partner.
+     * @param client
+     * @param year
+     * @param bizPartnerId
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    public static boolean hasBizPartnerMovesFinance(final SClientInterface client, final int year, final int bizPartnerId) throws Exception {
+        boolean bHas = false;
+        String sql = "";
+        ResultSet resulSet = null;
+        Vector<String> bd = null;
+
+        sql = "SELECT bd " +
+              "FROM erp.cfgu_co " +
+                "WHERE b_del = 0 ";
+
+        resulSet = client.getSession().getStatement().executeQuery(sql);
+        while (resulSet.next()) {
+            bd = new Vector<>();
+            bd.add(resulSet.getString("bd"));
+        }
+        
+        for (String row : bd) {
+            sql = "SELECT * " +
+                    "FROM " + row + ".fin_rec_ety " +
+                    "WHERE b_del = 0 AND id_year = " + year + " AND fid_bp_nr = " + bizPartnerId + " ";
+
+            resulSet = client.getSession().getStatement().executeQuery(sql);
+            if (resulSet.next()) {
+                bHas = true;
+                break;
+            }
+        }
+        return bHas;
+    }
+    
+    public static boolean changeDeepAccount(final SClientInterface client, final int [] keyOldAccount, final int deep, boolean isValidate) throws Exception {
+        SDbAccount account = null;
+        
+        account = new SDbAccount();
+        account.read(client.getSession(), keyOldAccount);
+        
+        if (isValidate) {
+            if (account.getIsDeleted()) {
+                throw new Exception("La cuenta contable está eliminada.");
+            }
+            else if (!account.getIsActive()) {
+                throw new Exception("La cuenta contable no está activa.");
+            }
+            else if (account.getDeep() == 0) {
+                throw new Exception("La cuenta contable debe ser cuenta de mayor.");
+            } 
+            else if (account.getDeep() != 1) {
+                throw new Exception("La profundidad de la cuenta contable debe ser 1.");
+            } 
+        }            
+        account.saveField(client.getSession().getStatement(), account.getPrimaryKey(), SDbAccount.FIELD_DEEP, deep);
+        return true;
+    }
+    
+    
+    public static boolean changeRecortEntriesAccount(final SClientInterface client, final int [] keyOldAccount, final int[] keyNewAccount) throws Exception {
+        SDataRecordEntry recordEntry = null;
+        SDbAccount oldAccount = null;
+        SDbAccount newAccount = null;
+        ResultSet resultSet = null;
+        String sql = "";
+        Object[] key = null;
+        ArrayList<Object[]> keys = null;
+        
+        oldAccount = new SDbAccount();
+        newAccount = new SDbAccount();
+        
+        oldAccount.read(client.getSession(), keyOldAccount);
+        newAccount.read(client.getSession(), keyNewAccount);
+        
+        sql = "SELECT id_year, id_per, id_bkc, id_tp_rec, id_num, id_ety FROM fin_rec_ety WHERE fid_acc = '" + oldAccount.getPkAccountIdXXX() + "' AND fk_acc = " + oldAccount.getPkAccountId();
+        resultSet = client.getSession().getStatement().executeQuery(sql);
+        keys = new ArrayList<>();
+        
+        while (resultSet.next()){
+            key = new Object[6];
+            key[0] = resultSet.getInt("id_year");
+            key[1] = resultSet.getInt("id_per"); 
+            key[2] = resultSet.getInt("id_bkc"); 
+            key[3] = resultSet.getString("id_tp_rec"); 
+            key[4] = resultSet.getInt("id_num"); 
+            key[5] = resultSet.getInt("id_ety");
+            
+            keys.add(key);
+        }
+        
+        for (Object[] pk : keys) {
+            recordEntry = new SDataRecordEntry();
+            recordEntry.read(pk, client.getSession().getStatement());
+            recordEntry.setFkAccountIdXXX(newAccount.getPkAccountIdXXX());
+            recordEntry.setFkAccountId(newAccount.getPkAccountId());
+            recordEntry.setFkUserEditId(client.getSession().getUser().getPkUserId());
+            
+            if (recordEntry.save(client.getSession().getStatement().getConnection()) != SLibConstants.DB_ACTION_SAVE_OK) {
+                throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE);
+            }
+        }
+        
+        return true;
+    }
+}
