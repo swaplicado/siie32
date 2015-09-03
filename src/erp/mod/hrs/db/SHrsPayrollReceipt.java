@@ -200,7 +200,7 @@ public class SHrsPayrollReceipt {
 
     private void computeReceiptTax() throws Exception {
         int i = 0;
-        float fTableFactor = 0;
+        double fTableFactor = 0;
         double dTableFactorPayroll = 0;
         double dTableFactorAnnull = 0;
         double dTaxSetByUser = 0;
@@ -351,21 +351,21 @@ public class SHrsPayrollReceipt {
             // Define factor for table adjusting:
 
             if (moHrsPayroll.getPayroll().getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_FOR && moHrsPayroll.getConfig().isFornightStandard()) {
-                dTableFactorPayroll = ((float) SHrsConsts.YEAR_MONTHS / (float) SHrsConsts.YEAR_DAYS_FORNIGHTS_FIXED) * oEmployeeDays.getPayrollTaxableDays_r();
-                dTableFactorAnnull = ((float) SHrsConsts.YEAR_MONTHS / (float) SHrsConsts.YEAR_DAYS_FORNIGHTS_FIXED) * oEmployeeDays.getAnnualTaxableDays_r();
+                dTableFactorPayroll = ((double) SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS_FORNIGHTS_FIXED) * oEmployeeDays.getPayrollTaxableDays_r();
+                dTableFactorAnnull = ((double) SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS_FORNIGHTS_FIXED) * oEmployeeDays.getAnnualTaxableDays_r();
             }
             else {
-                dTableFactorPayroll = ((float) SHrsConsts.YEAR_MONTHS / (float) SHrsConsts.YEAR_DAYS) * oEmployeeDays.getPayrollTaxableDays_r();
-                dTableFactorAnnull = ((float) SHrsConsts.YEAR_MONTHS / (float) SHrsConsts.YEAR_DAYS) * oEmployeeDays.getAnnualTaxableDays_r();
+                dTableFactorPayroll = ((double) SHrsConsts.YEAR_MONTHS / (SHrsConsts.YEAR_DAYS + (SLibTimeUtils.isLeapYear(moHrsPayroll.getPayroll().getFiscalYear()) ? 1d : 0d))) * oEmployeeDays.getPayrollTaxableDays_r();
+                dTableFactorAnnull = ((double) SHrsConsts.YEAR_MONTHS / (SHrsConsts.YEAR_DAYS + (SLibTimeUtils.isLeapYear(moHrsPayroll.getPayroll().getFiscalYear()) ? 1d : 0d))) * oEmployeeDays.getAnnualTaxableDays_r();
             }
             moReceipt.setPayrollFactorTax(dTableFactorPayroll);
             moReceipt.setAnnualFactorTax(dTableFactorAnnull);
             
             if (moHrsPayroll.getPayroll().getFkTaxComputationTypeId() == SModSysConsts.HRSS_TP_TAX_COMP_ANN) {
-                fTableFactor = (float) dTableFactorAnnull;
+                fTableFactor = dTableFactorAnnull;
             }
             else {
-                fTableFactor = (float) dTableFactorPayroll;
+                fTableFactor = dTableFactorPayroll;
             }
 
             // Compute tax:
@@ -394,9 +394,9 @@ public class SHrsPayrollReceipt {
 
             for (i = 0; i < dbTaxTable.getChildRows().size(); i++) {
                 dbTaxTableRow = dbTaxTable.getChildRows().get(i);
-                if (dTaxableEarnings >= dbTaxTableRow.getLowerLimit() * fTableFactor &&
-                        (i + 1 == dbTaxTable.getChildRows().size() || dTaxableEarnings < dbTaxTable.getChildRows().get(i + 1).getLowerLimit() * fTableFactor)) {
-                    dTaxComputed = SLibUtils.round((dTaxableEarnings - dbTaxTableRow.getLowerLimit() * fTableFactor) * dbTaxTableRow.getTaxRate() + dbTaxTableRow.getFixedFee() * fTableFactor, SUtilConsts.DECS_AMT);
+                if (dTaxableEarnings >= SLibUtils.round(dbTaxTableRow.getLowerLimit() * fTableFactor, SUtilConsts.DECS_AMT) &&
+                        (i + 1 == dbTaxTable.getChildRows().size() || dTaxableEarnings < SLibUtils.round(dbTaxTable.getChildRows().get(i + 1).getLowerLimit() * fTableFactor, SUtilConsts.DECS_AMT))) {
+                    dTaxComputed = SLibUtils.round((dTaxableEarnings - SLibUtils.round(dbTaxTableRow.getLowerLimit() * fTableFactor, SUtilConsts.DECS_AMT)) * dbTaxTableRow.getTaxRate() + dbTaxTableRow.getFixedFee() * fTableFactor, SUtilConsts.DECS_AMT);
                 }
             }
 

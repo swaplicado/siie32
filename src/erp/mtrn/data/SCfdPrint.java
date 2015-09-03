@@ -26,7 +26,7 @@ import erp.mcfg.data.SDataCurrency;
 import erp.mhrs.data.SDataFormerPayroll;
 import erp.mhrs.data.SDataFormerPayrollEmp;
 import erp.mod.SModConsts;
-import erp.mod.hrs.db.SDbEmployeeType;
+import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.print.SDataConstantsPrint;
@@ -49,7 +49,6 @@ import org.w3c.dom.Node;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
-import sa.lib.gui.SGuiClient;
 import sa.lib.xml.SXmlUtils;
 
 /**
@@ -923,7 +922,8 @@ public class SCfdPrint {
                 map.put("TipoJornada", ((DElementNomina) element).getAttTipoJornada().getString());
                 map.put("PeriodicidadPago", ((DElementNomina) element).getAttPeriodicidadPago().getString());
                 map.put("RiesgoPuesto", SCfdConsts.RiesgoMap.get(((DElementNomina) element).getAttRiesgoPuesto().getInteger()));
-                map.put("Sueldo", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getSalary() : payrollReceipt.getSalary());
+                map.put("TipoPago", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? SModSysConsts.HRSS_TP_PAY_FOR : payrollReceipt.getFkPaymentTypeId());
+                map.put("Sueldo", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getSalary() : payrollReceipt.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? payrollReceipt.getSalary() : payrollReceipt.getWage());
                 map.put("SalarioBaseCotApor", ((DElementNomina) element).getAttSalarioBaseCotApor().getDouble());
                 map.put("SalarioDiarioIntegrado", ((DElementNomina) element).getAttSalarioDiarioIntegrado().getDouble());
 

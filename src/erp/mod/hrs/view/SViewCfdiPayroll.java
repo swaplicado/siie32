@@ -212,10 +212,10 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                 else {
                     try {
                         if (mnGridSubtype == SModConsts.VIEW_SC_SUM) {
-                            needUpdate = SCfdUtils.signCfdi((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_OLD, gridRow.getRowPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_OLD);
+                            needUpdate = SCfdUtils.signCfdi((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), gridRow.getRowPrimaryKey()), (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
                         }
                         else {
-                            needUpdate = SCfdUtils.signCfdi((SClientInterface) miClient, (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT), SCfdConsts.CFDI_PAYROLL_VER_OLD);
+                            needUpdate = SCfdUtils.signCfdi((SClientInterface) miClient, (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT), (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
                         }
 
                         if (needUpdate) {
@@ -253,7 +253,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                 else {
                     try {
                         if (mnGridSubtype == SModConsts.VIEW_SC_SUM) {
-                            cfds = SCfdUtils.getPayrollCfds((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_OLD, gridRow.getRowPrimaryKey());
+                            cfds = SCfdUtils.getPayrollCfds((SClientInterface) miClient, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), gridRow.getRowPrimaryKey());
                         }
                         else {
                             cfds = new ArrayList<SDataCfd>();
@@ -271,10 +271,10 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
 
                             if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                                 if (mnGridSubtype == SModConsts.VIEW_SC_SUM) {
-                                    needUpdate = SCfdUtils.cancelCfdi((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_OLD, gridRow.getRowPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_OLD, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat());
+                                    needUpdate = SCfdUtils.cancelCfdi((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), gridRow.getRowPrimaryKey()), (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat());
                                 }
                                 else {
-                                    needUpdate = SCfdUtils.cancelCfdi((SClientInterface) miClient, (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT), SCfdConsts.CFDI_PAYROLL_VER_OLD, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat());
+                                    needUpdate = SCfdUtils.cancelCfdi((SClientInterface) miClient, (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT), (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat());
                                 }
                             }
 
@@ -379,7 +379,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                             cfdAux = new ArrayList<SDataCfd>();
                             cfds = new ArrayList<SDataCfd>();
 
-                            cfdAux = SCfdUtils.getPayrollCfds((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_OLD, gridRow.getRowPrimaryKey());
+                            cfdAux = SCfdUtils.getPayrollCfds((SClientInterface) miClient, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), gridRow.getRowPrimaryKey());
 
                             for(SDataCfd cfd : cfdAux) {
                                 if (cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
@@ -387,10 +387,10 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                                 }
                             }
 
-                            SCfdUtils.printCfd((SClientInterface) miClient, cfds, SCfdConsts.CFDI_PAYROLL_VER_OLD);
+                            SCfdUtils.printCfd((SClientInterface) miClient, cfds, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
                         }
                         else {
-                            SCfdUtils.printCfd((SClientInterface) miClient, SCfdConsts.CFD_TYPE_PAYROLL, (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT), SCfdConsts.CFDI_PAYROLL_VER_OLD);
+                            SCfdUtils.printCfd((SClientInterface) miClient, SCfdConsts.CFD_TYPE_PAYROLL, (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT), (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
                          }
                     }
                     catch (Exception e) {
@@ -427,7 +427,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                             cfdAux = new ArrayList<SDataCfd>();
                             cfds = new ArrayList<SDataCfd>();
 
-                            cfdAux = SCfdUtils.getPayrollCfds((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_OLD, gridRow.getRowPrimaryKey());
+                            cfdAux = SCfdUtils.getPayrollCfds((SClientInterface) miClient, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), gridRow.getRowPrimaryKey());
 
                             for(SDataCfd cfd : cfdAux) {
                                 if (cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
@@ -435,10 +435,10 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                                 }
                             }
 
-                            SCfdUtils.printAcknowledgmentCancellationCfd((SClientInterface) miClient, cfds, SCfdConsts.CFDI_PAYROLL_VER_OLD);
+                            SCfdUtils.printAcknowledgmentCancellationCfd((SClientInterface) miClient, cfds, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
                         }
                         else {
-                            SCfdUtils.printAcknowledgmentCancellationCfd((SClientInterface) miClient, (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT), SCfdConsts.CFDI_PAYROLL_VER_OLD);
+                            SCfdUtils.printAcknowledgmentCancellationCfd((SClientInterface) miClient, (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT), (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
                         }
                     }
                     catch (Exception e) {
@@ -469,10 +469,10 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                 else {
                     try {
                         if (mnGridSubtype == SModConsts.VIEW_SC_SUM) {
-                            SCfdUtils.sendCfd((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_OLD, gridRow.getRowPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_OLD);
+                            SCfdUtils.sendCfd((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), gridRow.getRowPrimaryKey()), (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
                         }
                         else {
-                            SCfdUtils.sendCfd((SClientInterface) miClient, SCfdConsts.CFD_TYPE_PAYROLL, (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT), SCfdConsts.CFDI_PAYROLL_VER_OLD);
+                            SCfdUtils.sendCfd((SClientInterface) miClient, SCfdConsts.CFD_TYPE_PAYROLL, (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT), (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
                          }
                     }
                     catch (Exception e) {
@@ -504,7 +504,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
-                        needUpdate = SCfdUtils.verifyCfdi((SClientInterface) miClient, (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT), SCfdConsts.CFDI_PAYROLL_VER_OLD);
+                        needUpdate = SCfdUtils.verifyCfdi((SClientInterface) miClient, (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT), (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
 
                         if (needUpdate) {
                             miClient.getSession().notifySuscriptors(mnGridType);
