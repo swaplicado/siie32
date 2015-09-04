@@ -997,8 +997,8 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                 receiptEarning.setAmountUnitary(moReceipt.getReceipt().getPaymentHourly());
             }
 
-            amount = SLibUtils.round((receiptEarning.getUnits() * receiptEarning.getAmountUnitary()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-
+            amount = SLibUtils.round((receiptEarning.getUnits() * receiptEarning.getAmountUnitary() * moEarning.getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+            
             receiptEarning.setAmountSystem_r(amount);
             receiptEarning.setAmount_r(amount);
             receiptEarning.setAutomatic(false);
