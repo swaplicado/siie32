@@ -453,6 +453,11 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
             }
         }
     }
+    
+    private void actionPickDeduction() {
+        miClient.getSession().showOptionPicker(SModConsts.HRS_DED, SLibConsts.UNDEFINED, null, moTextCodeFind);
+        actionLoadDeduction();
+    }
 
     private void actionLoadDeduction() {
         boolean load = true;
@@ -532,7 +537,6 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
 
         setFormEditable(true);
 
-        jbCodeFind.setEnabled(false);
         moKeyLoan_n.setEnabled(false);
         moKeyEmployee.setEnabled(false);
 
@@ -601,6 +605,9 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
 
             if (button == jbAdd) {
                 actionAdd();
+            }
+            else if (button == jbCodeFind) {
+                actionPickDeduction();
             }
         }
         else if (e.getSource() instanceof JTextField) {

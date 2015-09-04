@@ -453,6 +453,11 @@ public class SFormAutomaticEarnings extends SBeanForm implements SGridPaneFormOw
             }
         }
     }
+    
+    private void actionPickEarning() {
+        miClient.getSession().showOptionPicker(SModConsts.HRS_EAR, SLibConsts.UNDEFINED, null, moTextCodeFind);
+        actionLoadEarning();
+    }
 
     private void actionLoadEarning() {
         boolean load = true;
@@ -532,7 +537,6 @@ public class SFormAutomaticEarnings extends SBeanForm implements SGridPaneFormOw
 
         setFormEditable(true);
 
-        jbCodeFind.setEnabled(false);
         moKeyLoan_n.setEnabled(false);
         moKeyEmployee.setEnabled(false);
 
@@ -601,6 +605,9 @@ public class SFormAutomaticEarnings extends SBeanForm implements SGridPaneFormOw
 
             if (button == jbAdd) {
                 actionAdd();
+            }
+            else if (button == jbCodeFind) {
+                actionPickEarning();
             }
         }
         else if (e.getSource() instanceof JTextField) {
