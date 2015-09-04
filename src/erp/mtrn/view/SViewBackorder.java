@@ -30,6 +30,8 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
 
     private boolean mbIsByDoc;
     private boolean mbIsByItem;
+    private boolean mbIsByItemBp;
+    private boolean mbIsByItemBpBra;
     private javax.swing.JButton mjbViewNotes;
     private javax.swing.JButton mjbViewLinks;
     private erp.lib.table.STabFilterDate moTabFilterDate;
@@ -41,8 +43,28 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
         super(client, tabTitle, SDataConstants.TRNX_DPS_BACKORDER, auxType01, auxType02);
         mnTabTypeAux01 = auxType01;
         mnTabTypeAux02 = auxType02;
-        mbIsByDoc = SLibUtils.belongsTo(mnTabTypeAux01, new int[] { SDataConstantsSys.TRNX_PUR_BACKORDER_CON, SDataConstantsSys.TRNX_PUR_BACKORDER_ORD, SDataConstantsSys.TRNX_SAL_BACKORDER_CON, SDataConstantsSys.TRNX_SAL_BACKORDER_ORD });
-        mbIsByItem = SLibUtils.belongsTo(mnTabTypeAux01, new int[] { SDataConstantsSys.TRNX_PUR_BACKORDER_CON_ITEM, SDataConstantsSys.TRNX_PUR_BACKORDER_ORD_ITEM, SDataConstantsSys.TRNX_SAL_BACKORDER_CON_ITEM, SDataConstantsSys.TRNX_SAL_BACKORDER_ORD_ITEM });
+        
+        mbIsByDoc = SLibUtils.belongsTo(mnTabTypeAux01, new int[] { 
+            SDataConstantsSys.TRNX_PUR_BACKORDER_CON, 
+            SDataConstantsSys.TRNX_PUR_BACKORDER_ORD, 
+            SDataConstantsSys.TRNX_SAL_BACKORDER_CON, 
+            SDataConstantsSys.TRNX_SAL_BACKORDER_ORD });
+        mbIsByItem = SLibUtils.belongsTo(mnTabTypeAux01, new int[] { 
+            SDataConstantsSys.TRNX_PUR_BACKORDER_CON_ITEM, 
+            SDataConstantsSys.TRNX_PUR_BACKORDER_ORD_ITEM, 
+            SDataConstantsSys.TRNX_SAL_BACKORDER_CON_ITEM, 
+            SDataConstantsSys.TRNX_SAL_BACKORDER_ORD_ITEM });
+        mbIsByItemBp = SLibUtils.belongsTo(mnTabTypeAux01, new int[] { 
+            SDataConstantsSys.TRNX_PUR_BACKORDER_CON_ITEM_BP, 
+            SDataConstantsSys.TRNX_PUR_BACKORDER_ORD_ITEM_BP, 
+            SDataConstantsSys.TRNX_SAL_BACKORDER_CON_ITEM_BP, 
+            SDataConstantsSys.TRNX_SAL_BACKORDER_ORD_ITEM_BP });
+        mbIsByItemBpBra = SLibUtils.belongsTo(mnTabTypeAux01, new int[] { 
+            SDataConstantsSys.TRNX_PUR_BACKORDER_CON_ITEM_BP_BRA, 
+            SDataConstantsSys.TRNX_PUR_BACKORDER_ORD_ITEM_BP_BRA, 
+            SDataConstantsSys.TRNX_SAL_BACKORDER_CON_ITEM_BP_BRA, 
+            SDataConstantsSys.TRNX_SAL_BACKORDER_ORD_ITEM_BP_BRA });
+        
         initComponents();
     }
 
@@ -90,8 +112,11 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
         else if (mbIsByItem) {
             aoTableColumns = new STableColumn[5];
         }
-        else {
+        else if (mbIsByItemBp) {
             aoTableColumns = new STableColumn[7];
+        }
+        else if (mbIsByItemBpBra) {
+            aoTableColumns = new STableColumn[8];
         }
 
         i = 0;
@@ -103,6 +128,7 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
             aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "id_year");
             aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "id_doc");
         }
+        
         for (i = 0; i < aoKeyFields.length; i++) {
             moTablePane.getPrimaryKeyFields().add(aoKeyFields[i]);
         }
@@ -141,7 +167,7 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_pend", "Cant. pend.", STableConstants.WIDTH_QUANTITY);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_pend", "Importe pendiente $", STableConstants.WIDTH_QUANTITY);
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_pend", "Importe pendiente $", STableConstants.WIDTH_VALUE);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "dn.code", "Naturaleza doc.", STableConstants.WIDTH_CODE_DOC);
         }
@@ -151,7 +177,7 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "symbol", "Un.", STableConstants.WIDTH_UNIT_SYMBOL);
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_pend", "Cant. pend.", STableConstants.WIDTH_QUANTITY);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_pend", "Importe pendiente $", STableConstants.WIDTH_QUANTITY);
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_pend", "Importe pendiente $", STableConstants.WIDTH_VALUE);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         }
         else {
@@ -160,9 +186,12 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "symbol", "Un.", STableConstants.WIDTH_UNIT_SYMBOL);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_key", "Clave", 50);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp", "Asociado negocios", 200);
+            if (mbIsByItemBpBra) {
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb", "Sucursal", 75);
+            }
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_pend", "Cant. pend.", STableConstants.WIDTH_QUANTITY);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_pend", "Importe pendiente $", STableConstants.WIDTH_QUANTITY);
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_pend", "Importe pendiente $", STableConstants.WIDTH_VALUE);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         }
 
@@ -179,8 +208,8 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
         boolean bIsPurchase = false;
 
         if (SLibUtils.belongsTo(mnTabTypeAux01, new int[] {
-            SDataConstantsSys.TRNX_PUR_BACKORDER_CON, SDataConstantsSys.TRNX_PUR_BACKORDER_CON_ITEM, SDataConstantsSys.TRNX_PUR_BACKORDER_CON_ITEM_BP, 
-            SDataConstantsSys.TRNX_PUR_BACKORDER_ORD, SDataConstantsSys.TRNX_PUR_BACKORDER_ORD_ITEM, SDataConstantsSys.TRNX_PUR_BACKORDER_ORD_ITEM_BP })) {
+            SDataConstantsSys.TRNX_PUR_BACKORDER_CON, SDataConstantsSys.TRNX_PUR_BACKORDER_CON_ITEM, SDataConstantsSys.TRNX_PUR_BACKORDER_CON_ITEM_BP, SDataConstantsSys.TRNX_PUR_BACKORDER_CON_ITEM_BP_BRA, 
+            SDataConstantsSys.TRNX_PUR_BACKORDER_ORD, SDataConstantsSys.TRNX_PUR_BACKORDER_ORD_ITEM, SDataConstantsSys.TRNX_PUR_BACKORDER_ORD_ITEM_BP, SDataConstantsSys.TRNX_PUR_BACKORDER_ORD_ITEM_BP_BRA })) {
             bIsPurchase = true;
         }
 
@@ -348,10 +377,10 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
                 "ORDER BY item_key; ";
         }
         else {
-            msSql = "SELECT id_year, id_doc, id_ety, item_key, item, symbol, bp_key, bp, " +
+            msSql = "SELECT id_year, id_doc, id_ety, item_key, item, symbol, bp_key, bp, " + (!mbIsByItemBpBra ? "" : "bpb, ") +
                 "SUM(f_qty_pend) AS f_qty_pend, SUM(f_stot_pend) AS f_stot_pend " +
                 "FROM(" +
-                "SELECT de.id_year, de.id_doc, de.id_ety, i.item_key, i.item, u.symbol, ct.bp_key, bp.bp, " +
+                "SELECT de.id_year, de.id_doc, de.id_ety, i.item_key, i.item, u.symbol, ct.bp_key, bp.bp, " + (!mbIsByItemBpBra ? "" : "bpb.bpb, ") +
                 "(de.qty - " +
                 "(SELECT COALESCE(SUM(s.qty), 0) FROM trn_dps_dps_supply AS s INNER JOIN trn_dps AS t ON s.id_des_year = t.id_year AND " +
                 "s.id_des_doc = t.id_doc INNER JOIN trn_dps_ety AS te ON s.id_des_year = te.id_year AND s.id_des_doc = te.id_doc AND " +
@@ -365,8 +394,7 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
                 "t.b_del = 0 AND te.b_del = 0 " + sqlWhereDateSubquery +
                 ")) * de.price_u)) AS f_stot_pend "+
                 "FROM trn_dps AS d " +
-                "INNER JOIN trn_dps_ety AS de ON " +
-                "d.id_year = de.id_year AND d.id_doc = de.id_doc " +
+                "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc " +
                 "INNER JOIN erp.trnu_tp_dps AS dt ON " +
                 "d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps AND d.fid_ct_dps = " +
                 (isPurchases() ?
@@ -380,12 +408,10 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
                 (isPurchases() ?
                     mnTabTypeAux02 == SDataConstantsSys.TRNS_CL_DPS_PUR_EST[1] ? SDataConstantsSys.TRNU_TP_DPS_PUR_CON[2] : SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] :
                         mnTabTypeAux02 == SDataConstantsSys.TRNS_CL_DPS_SAL_EST[1] ? SDataConstantsSys.TRNU_TP_DPS_SAL_CON[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_ORD[2]) + " " +
-                "INNER JOIN erp.itmu_item AS i ON " +
-                "de.fid_item = i.id_item " +
-                "INNER JOIN erp.itmu_unit AS u ON " +
-                "de.fid_unit = u.id_unit " +
-                "INNER JOIN erp.bpsu_bp AS bp ON " +
-                "d.fid_bp_r = bp.id_bp " +
+                "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " +
+                "INNER JOIN erp.itmu_unit AS u ON de.fid_unit = u.id_unit " +
+                "INNER JOIN erp.bpsu_bp AS bp ON d.fid_bp_r = bp.id_bp " +
+                (!mbIsByItemBpBra ? "" : "INNER JOIN erp.bpsu_bpb AS bpb ON d.fid_bpb = bpb.id_bpb ") +
                 "INNER JOIN erp.bpsu_bp_ct AS ct ON " +
                 "ct.id_bp = bp.id_bp AND ct.id_ct_bp = " + (isPurchases() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS) + " " +
                 "WHERE d.b_del = 0 AND de.b_del = 0 AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND d.fid_st_dps_val = " +
@@ -394,8 +420,8 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
                 (sqlWhere.length() == 0 ? "" : sqlWhere) +
                 "HAVING f_qty_pend > 0 " +
                 "ORDER BY i.item_key, ct.bp_key ) AS t " +
-                "GROUP BY item_key, bp_key " +
-                "ORDER BY item_key, bp_key; ";
+                "GROUP BY item_key, bp_key" + (!mbIsByItemBpBra ? "" : ", bpb ") + " " +
+                "ORDER BY item_key, bp_key" + (!mbIsByItemBpBra ? "" : ", bpb ") + "; ";
         }
     }
 

@@ -1242,19 +1242,23 @@ public abstract class SDataConstantsSys {
     public static final int TRNX_SAL_DPS_BY_ITEM_BP_ALL = 314;
     public static final int TRNX_SAL_DPS_BY_ITEM_BP_FIL = 315;
 
-    public static final int TRNX_PUR_BACKORDER_CON = 1;
-    public static final int TRNX_PUR_BACKORDER_CON_ITEM = 2;
-    public static final int TRNX_PUR_BACKORDER_CON_ITEM_BP = 3;
-    public static final int TRNX_PUR_BACKORDER_ORD = 4;
-    public static final int TRNX_PUR_BACKORDER_ORD_ITEM = 5;
-    public static final int TRNX_PUR_BACKORDER_ORD_ITEM_BP = 6;
+    public static final int TRNX_PUR_BACKORDER_CON = 11;
+    public static final int TRNX_PUR_BACKORDER_CON_ITEM = 12;
+    public static final int TRNX_PUR_BACKORDER_CON_ITEM_BP = 13;
+    public static final int TRNX_PUR_BACKORDER_CON_ITEM_BP_BRA = 14;
+    public static final int TRNX_PUR_BACKORDER_ORD = 16;
+    public static final int TRNX_PUR_BACKORDER_ORD_ITEM = 17;
+    public static final int TRNX_PUR_BACKORDER_ORD_ITEM_BP = 18;
+    public static final int TRNX_PUR_BACKORDER_ORD_ITEM_BP_BRA = 19;
 
-    public static final int TRNX_SAL_BACKORDER_CON = 7;
-    public static final int TRNX_SAL_BACKORDER_CON_ITEM = 8;
-    public static final int TRNX_SAL_BACKORDER_CON_ITEM_BP = 9;
-    public static final int TRNX_SAL_BACKORDER_ORD = 10;
-    public static final int TRNX_SAL_BACKORDER_ORD_ITEM = 11;
-    public static final int TRNX_SAL_BACKORDER_ORD_ITEM_BP = 12;
+    public static final int TRNX_SAL_BACKORDER_CON = 21;
+    public static final int TRNX_SAL_BACKORDER_CON_ITEM = 22;
+    public static final int TRNX_SAL_BACKORDER_CON_ITEM_BP = 23;
+    public static final int TRNX_SAL_BACKORDER_CON_ITEM_BP_BRA = 24;
+    public static final int TRNX_SAL_BACKORDER_ORD = 26;
+    public static final int TRNX_SAL_BACKORDER_ORD_ITEM = 27;
+    public static final int TRNX_SAL_BACKORDER_ORD_ITEM_BP = 28;
+    public static final int TRNX_SAL_BACKORDER_ORD_ITEM_BP_BRA = 29;
 
     public static final int TRNX_STK_LOT_DEF_ID = 1;
 

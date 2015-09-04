@@ -138,9 +138,11 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiReportsBackorderContract;
     private javax.swing.JMenuItem jmiReportsBackorderContractByItem;
     private javax.swing.JMenuItem jmiReportsBackorderContractByItemBizPartner;
+    private javax.swing.JMenuItem jmiReportsBackorderContractByItemBizPartnerBra;
     private javax.swing.JMenuItem jmiReportsBackorderOrder;
     private javax.swing.JMenuItem jmiReportsBackorderOrderByItem;
     private javax.swing.JMenuItem jmiReportsBackorderOrderByItemBizPartner;
+    private javax.swing.JMenuItem jmiReportsBackorderOrderByItemBizPartnerBra;
     private javax.swing.JMenuItem jmiReportsBizPartnerBalanceAgingView;
     private javax.swing.JMenuItem jmiReportsBizPartnerBalance;
     private javax.swing.JMenuItem jmiReportsBizPartnerBalanceDps;
@@ -387,9 +389,11 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiReportsBackorderContract = new JMenuItem("Backorder de contratos");
         jmiReportsBackorderContractByItem = new JMenuItem("Backorder de contratos por ítem");
         jmiReportsBackorderContractByItemBizPartner = new JMenuItem("Backorder de contratos por ítem-cliente");
+        jmiReportsBackorderContractByItemBizPartnerBra = new JMenuItem("Backorder de contratos por ítem-cliente sucursal");
         jmiReportsBackorderOrder = new JMenuItem("Backorder de pedidos");
         jmiReportsBackorderOrderByItem = new JMenuItem("Backorder de pedidos por ítem");
         jmiReportsBackorderOrderByItemBizPartner = new JMenuItem("Backorder de pedidos por ítem-cliente");
+        jmiReportsBackorderOrderByItemBizPartnerBra = new JMenuItem("Backorder de pedidos por ítem-cliente sucursal");
         jmiReportsBizPartnerBalanceAgingView = new JMenuItem("Antigüedad de saldos de proveedores");
         jmiReportsBizPartnerBalance = new JMenuItem("Reporte de saldos proveedores...");
         jmiReportsBizPartnerBalanceDps = new JMenuItem("Reporte de saldos proveedores por documento...");
@@ -431,10 +435,12 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmReportsBackorder.add(jmiReportsBackorderContract);
         jmReportsBackorder.add(jmiReportsBackorderContractByItem);
         jmReportsBackorder.add(jmiReportsBackorderContractByItemBizPartner);
+        jmReportsBackorder.add(jmiReportsBackorderContractByItemBizPartnerBra);
         jmReportsBackorder.addSeparator();
         jmReportsBackorder.add(jmiReportsBackorderOrder);
         jmReportsBackorder.add(jmiReportsBackorderOrderByItem);
         jmReportsBackorder.add(jmiReportsBackorderOrderByItemBizPartner);
+        jmReportsBackorder.add(jmiReportsBackorderOrderByItemBizPartnerBra);
 
         jmReports.add(jmReportsStatistics);
         jmReports.add(jmReportsBackorder);
@@ -567,9 +573,11 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiReportsBackorderContract.addActionListener(this);
         jmiReportsBackorderContractByItem.addActionListener(this);
         jmiReportsBackorderContractByItemBizPartner.addActionListener(this);
+        jmiReportsBackorderContractByItemBizPartnerBra.addActionListener(this);
         jmiReportsBackorderOrder.addActionListener(this);
         jmiReportsBackorderOrderByItem.addActionListener(this);
         jmiReportsBackorderOrderByItemBizPartner.addActionListener(this);
+        jmiReportsBackorderOrderByItemBizPartnerBra.addActionListener(this);
         jmiReportsBizPartnerBalanceAgingView.addActionListener(this);
         jmiReportsBizPartnerBalance.addActionListener(this);
         jmiReportsBizPartnerBalanceDps.addActionListener(this);
@@ -1013,10 +1021,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                         case SDataConstantsSys.TRNX_PUR_BACKORDER_ORD:
                             oViewClass = erp.mtrn.view.SViewBackorder.class;
                             if (auxType02 == SDataConstantsSys.TRNS_CL_DPS_PUR_EST[1]) {
-                                sViewTitle = "CPA - Backorder contratos";
+                                sViewTitle = "CPA - BO contratos";
                             }
                             else {
-                                sViewTitle = "CPA - Backorder pedidos";
+                                sViewTitle = "CPA - BO pedidos";
                             }
                             break;
 
@@ -1024,10 +1032,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                         case SDataConstantsSys.TRNX_PUR_BACKORDER_ORD_ITEM:
                             oViewClass = erp.mtrn.view.SViewBackorder.class;
                             if (auxType02 == SDataConstantsSys.TRNS_CL_DPS_PUR_EST[1]) {
-                                sViewTitle = "CPA - Backorder contratos x ítem";
+                                sViewTitle = "CPA - BO contratos x ítem";
                             }
                             else {
-                                sViewTitle = "CPA - Backorder pedidos x ítem";
+                                sViewTitle = "CPA - BO pedidos x ítem";
                             }
                             break;
 
@@ -1035,12 +1043,25 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                         case SDataConstantsSys.TRNX_PUR_BACKORDER_ORD_ITEM_BP:
                             oViewClass = erp.mtrn.view.SViewBackorder.class;
                             if (auxType02 == SDataConstantsSys.TRNS_CL_DPS_PUR_EST[1]) {
-                                sViewTitle = "CPA - Backorder contratos x ítem-cliente";
+                                sViewTitle = "CPA - BO contratos x ítem-cliente";
                             }
                             else {
-                                sViewTitle = "CPA - Backorder pedidos x ítem-cliente";
+                                sViewTitle = "CPA - BO pedidos x ítem-cliente";
                             }
                             break;
+                            
+                        case SDataConstantsSys.TRNX_PUR_BACKORDER_CON_ITEM_BP_BRA:
+                        case SDataConstantsSys.TRNX_PUR_BACKORDER_ORD_ITEM_BP_BRA:
+                            oViewClass = erp.mtrn.view.SViewBackorder.class;
+                            if (auxType02 == SDataConstantsSys.TRNS_CL_DPS_PUR_EST[1]) {
+                                sViewTitle = "CPA - BO contratos x ítem-cliente suc.";
+                            }
+                            else {
+                                sViewTitle = "CPA - BO pedidos x ítem-cliente suc.";
+                            }
+                            break;
+                            
+                        default:
                     }
                     break;
 
@@ -1407,6 +1428,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiReportsBackorderContractByItemBizPartner) {
                 showView(SDataConstants.TRNX_DPS_BACKORDER, SDataConstantsSys.TRNX_PUR_BACKORDER_CON_ITEM_BP, SDataConstantsSys.TRNS_CL_DPS_PUR_EST[1]);
             }
+            else if (item == jmiReportsBackorderContractByItemBizPartnerBra) {
+                showView(SDataConstants.TRNX_DPS_BACKORDER, SDataConstantsSys.TRNX_PUR_BACKORDER_CON_ITEM_BP_BRA, SDataConstantsSys.TRNS_CL_DPS_PUR_EST[1]);
+            }
             else if (item == jmiReportsBackorderOrder) {
                 showView(SDataConstants.TRNX_DPS_BACKORDER, SDataConstantsSys.TRNX_PUR_BACKORDER_ORD, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]);
             }
@@ -1415,6 +1439,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiReportsBackorderOrderByItemBizPartner) {
                 showView(SDataConstants.TRNX_DPS_BACKORDER, SDataConstantsSys.TRNX_PUR_BACKORDER_ORD_ITEM_BP, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]);
+            }
+            else if (item == jmiReportsBackorderOrderByItemBizPartnerBra) {
+                showView(SDataConstants.TRNX_DPS_BACKORDER, SDataConstantsSys.TRNX_PUR_BACKORDER_ORD_ITEM_BP_BRA, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]);
             }
             else if (item == jmiReportsBizPartnerBalanceAgingView) {
                 showView(SDataConstants.TRNX_DPS_BAL_AGING, SDataConstantsSys.TRNS_CT_DPS_PUR);
