@@ -346,7 +346,7 @@ public class SDbPayroll extends SDbRegistryUser {
                     "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON " +
                     "p.id_pay = pr.id_pay " +
-                    "WHERE pr.b_del = 0 AND pr.id_pay = " + mnPkPayrollId + "; ";
+                    "WHERE pr.id_pay = " + mnPkPayrollId + "; ";
             resultSet = statement.executeQuery(msSql);
             while (resultSet.next()) {
 

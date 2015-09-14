@@ -289,6 +289,16 @@ public class SHrsPayrollReceiptEarning implements SGridRow {
                                 moEarning.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_NON) {
                             moPayrollReceiptEarning.setUserEdited((double) value != moPayrollReceiptEarning.getAmountUnitary());
                             moPayrollReceiptEarning.setAmountUnitary((double) value);
+                            
+                            if ((double) value > 0) {
+                                moPayrollReceiptEarning.setUnitsAlleged(1d);
+                                moPayrollReceiptEarning.setUnits(1d);
+                            }
+                            else {
+                                moPayrollReceiptEarning.setUnitsAlleged(0d);
+                                moPayrollReceiptEarning.setUnits(0d);
+                            }
+                            
                             computeAmount();
                         }
                         else {
@@ -388,6 +398,16 @@ public class SHrsPayrollReceiptEarning implements SGridRow {
                                 moEarning.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_NON) {
                             moPayrollReceiptEarning.setUserEdited((double) value != moPayrollReceiptEarning.getAmountUnitary());
                             moPayrollReceiptEarning.setAmountUnitary((double) value);
+                            
+                            if ((double) value > 0) {
+                                moPayrollReceiptEarning.setUnitsAlleged(1d);
+                                moPayrollReceiptEarning.setUnits(1d);
+                            }
+                            else {
+                                moPayrollReceiptEarning.setUnitsAlleged(0d);
+                                moPayrollReceiptEarning.setUnits(0d);
+                            }
+                            
                             computeAmount();
                         }
                         else {

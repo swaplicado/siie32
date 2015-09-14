@@ -208,7 +208,7 @@
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="jlExemptionSalaryEqualsMwzPercentage">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Porcentaje exento si SB = SMA:"/>
+                    <Property name="text" type="java.lang.String" value="Porcentaje exenci&#xf3;n si SB = SMA:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[175, 23]"/>
                     </Property>
@@ -222,7 +222,7 @@
                       <Color blue="6d" green="6d" red="6d" type="rgb"/>
                     </Property>
                     <Property name="horizontalAlignment" type="int" value="2"/>
-                    <Property name="text" type="java.lang.String" value="(Porcentaje exento cuando el empleado gana el salario m&#xed;nimo)"/>
+                    <Property name="text" type="java.lang.String" value="(Porcentaje exenci&#xf3;n cuando el empleado gana el salario m&#xed;nimo)"/>
                     <Property name="toolTipText" type="java.lang.String" value=""/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[650, 23]"/>
@@ -240,7 +240,7 @@
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="jlExemptionSalaryEqualsMwzLimit">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="L&#xed;mite exento si SB = SMA:"/>
+                    <Property name="text" type="java.lang.String" value="Tope exenci&#xf3;n si SB = SMA:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[175, 23]"/>
                     </Property>
@@ -254,7 +254,7 @@
                       <Color blue="6d" green="6d" red="6d" type="rgb"/>
                     </Property>
                     <Property name="horizontalAlignment" type="int" value="2"/>
-                    <Property name="text" type="java.lang.String" value="(Exenci&#xf3;n l&#xed;mite expresado en n&#xfa;mero de salarios m&#xed;nimos del &#xe1;rea geogr&#xe1;fica, cuando el empleado gana el salario m&#xed;nimo)"/>
+                    <Property name="text" type="java.lang.String" value="(Tope exenci&#xf3;n expresado en n&#xfa;mero de salarios m&#xed;nimos del &#xe1;rea geogr&#xe1;fica, cuando el empleado gana el salario m&#xed;nimo)"/>
                     <Property name="toolTipText" type="java.lang.String" value=""/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[650, 23]"/>
@@ -272,7 +272,7 @@
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="jlExemptionSalaryGreaterMwzPercentage">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Porcentaje exento si SB &gt; SMA:"/>
+                    <Property name="text" type="java.lang.String" value="Porcentaje exenci&#xf3;n si SB &gt; SMA:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[175, 23]"/>
                     </Property>
@@ -286,7 +286,7 @@
                       <Color blue="6d" green="6d" red="6d" type="rgb"/>
                     </Property>
                     <Property name="horizontalAlignment" type="int" value="2"/>
-                    <Property name="text" type="java.lang.String" value="(Porcentaje exento cuando el empleado gana m&#xe1;s del salario m&#xed;nimo)"/>
+                    <Property name="text" type="java.lang.String" value="(Porcentaje exenci&#xf3;n cuando el empleado gana m&#xe1;s del salario m&#xed;nimo)"/>
                     <Property name="toolTipText" type="java.lang.String" value=""/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[650, 23]"/>
@@ -304,7 +304,7 @@
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="jlExemptionSalaryGreaterMwzLimit">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="L&#xed;mite exento si SB &gt; SMA:"/>
+                    <Property name="text" type="java.lang.String" value="Tope exenci&#xf3;n si SB &gt; SMA:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[175, 23]"/>
                     </Property>
@@ -318,7 +318,7 @@
                       <Color blue="6d" green="6d" red="6d" type="rgb"/>
                     </Property>
                     <Property name="horizontalAlignment" type="int" value="2"/>
-                    <Property name="text" type="java.lang.String" value="(Exenci&#xf3;n l&#xed;mite expresado en n&#xfa;mero de salarios m&#xed;nimos del &#xe1;rea geogr&#xe1;fica, cuando el empleado gana m&#xe1;s del salario m&#xed;nimo)"/>
+                    <Property name="text" type="java.lang.String" value="(Tope exenci&#xf3;n expresado en n&#xfa;mero de salarios m&#xed;nimos del &#xe1;rea geogr&#xe1;fica, cuando el empleado gana m&#xe1;s del salario m&#xed;nimo)"/>
                     <Property name="toolTipText" type="java.lang.String" value="Exenci&#xf3;n l&#xed;mite expresado en n&#xfa;mero de salarios m&#xed;nimos del &#xe1;rea geogr&#xe1;fica, cuando el empleado gana m&#xe1;s del salario m&#xed;nimo"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[650, 23]"/>

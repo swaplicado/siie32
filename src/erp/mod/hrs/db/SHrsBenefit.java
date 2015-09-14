@@ -5,12 +5,22 @@
 package erp.mod.hrs.db;
 
 import sa.lib.SLibConsts;
+import sa.lib.gui.SGuiConsts;
 
 /**
  *
  * @author Juan Barajas
  */
 public class SHrsBenefit {
+    
+    public static final int VALIDATION_BENEFIT_TYPE = 1;
+    public static final int VALIDATION_ABSENCE_TYPE = 2;
+    
+    public static final int VALID_DAYS_TO_PAID = 10;
+    public static final int VALID_DAYS_TO_PAID_TOTAL = 20;
+    public static final int VALID_DAYS_TABLE = 30;
+    public static final int VALID_AMOUNT_TO_PAID = 40;
+    public static final int VALID_AMOUNT_TO_PAID_AMOUNT_SYS = 50;
 
     protected int mnBenefitTypeId;
     protected int mnBenefitAnn;
@@ -75,6 +85,42 @@ public class SHrsBenefit {
     
     public double getValuePending() { return mdValue - mdValuePayed - mdValuePayedReceipt; }
     public double getAmountPending() { return mdAmount - mdAmountPayed - mdAmountPayedReceipt; }
+    
+    public String validate(int valid, int validationType) throws Exception {
+        String msg = "";
+        
+        switch (valid) {
+            case VALID_DAYS_TO_PAID:
+                if (mdValuePayedReceipt == 0) {
+                    msg = SGuiConsts.ERR_MSG_FIELD_REQ + "'" + (validationType == VALIDATION_BENEFIT_TYPE ? "días a pagar" : "días efectivos") + "'.";
+                }
+                break;
+            case VALID_DAYS_TO_PAID_TOTAL:
+                if (getValuePending() < 0) {
+                    msg = "La suma de 'días pagados' + '" + (validationType == VALIDATION_BENEFIT_TYPE ? "días a pagar" : "días efectivos") + "' es mayor al valor del campo 'días'.";
+                }
+                break;
+            case VALID_DAYS_TABLE:
+                if (mdValuePayedReceipt > mdValue) {
+                    msg = SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + (validationType == VALIDATION_BENEFIT_TYPE ? "días a pagar" : "días efectivos") + "' es mayor al valor del campo 'días'.";
+                }
+                break;
+            case VALID_AMOUNT_TO_PAID:
+                if (mdAmountPayedReceipt == 0) {
+                    msg = SGuiConsts.ERR_MSG_FIELD_REQ + "'monto a pagar'.";
+                }
+                break;
+            case VALID_AMOUNT_TO_PAID_AMOUNT_SYS:
+                if (mdAmountPayedReceipt != mdAmountPayedReceiptSys) {
+                    msg = SGuiConsts.ERR_MSG_FIELD_VAL_ + "'monto a pagar' es diferente al monto calculado por sistema.";
+                }
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+        
+        return msg;
+    }
     
     public SHrsBenefit clone() throws CloneNotSupportedException {
         SHrsBenefit hrsBenefit = new SHrsBenefit(SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, SLibConsts.UNDEFINED);

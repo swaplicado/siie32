@@ -648,7 +648,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                                 + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " WHERE b_del = 0 AND id_pay = v.id_pay GROUP BY id_pay ) AS f_tot "
                                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS v "
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pe ON "
-                                + "v.id_pay = pe.id_pay "
+                                + "v.id_pay = pe.id_pay AND pe.b_del = 0 "
                                 + "WHERE " + (sql.isEmpty() ? "" : sql)
                                 + "GROUP BY v.id_pay, v.per_year, v.per, v.num, pay_type, v.dt_sta, v.dt_end " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? ", pe.id_emp " : "")
                                 + "ORDER BY v.per_year, v.per, pay_type ,v.num, v.id_pay " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? ", pe.id_emp " : "")

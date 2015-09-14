@@ -42,6 +42,7 @@ import javax.swing.event.ChangeEvent;
 import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
+import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridColumnForm;
 import sa.lib.grid.SGridConsts;
@@ -757,7 +758,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         moGridEarningRow = new SGridPaneForm(miClient, SModConsts.HRSX_PAY_REC_EAR, SLibConsts.UNDEFINED, "Percepciones") {
             @Override
             public void initGrid() {
-                setRowButtonsEnabled(false, false, false);
+                setRowButtonsEnabled(false, false, true);
             }
 
             @Override
@@ -783,6 +784,39 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
 
                 return gridColumnsForm;
             }
+            
+            @Override
+            public void actionRowDelete() {
+                int moveId = 0;
+                boolean delete = false;
+                SHrsPayrollReceiptEarning hrsReceiptEarningRow = null;
+
+                if (jtTable.getSelectedRowCount() != 1) {
+                    miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+                }
+                else {
+                    hrsReceiptEarningRow = (SHrsPayrollReceiptEarning) moGridEarningRow.getSelectedGridRow();
+                    
+                    if (hrsReceiptEarningRow.getReceiptEarning().isSystem()) {
+                        miClient.showMsgBoxInformation(SDbConsts.MSG_REG_ + hrsReceiptEarningRow.getEarning().getName() + SDbConsts.MSG_REG_IS_SYSTEM);
+                    }
+                    else {
+                        for (SHrsPayrollReceiptEarning earning : moReceipt.getHrsEarnings()) {
+                            if (SLibUtils.compareKeys(earning.getRowPrimaryKey(), hrsReceiptEarningRow.getRowPrimaryKey())) {
+                                delete = true;
+                                moveId = earning.getPkMoveId();
+                                break;
+                            }
+                        }
+
+                        if (delete) {
+                            moReceipt.removeEarning(moveId);
+                            populateEarnings();
+                            populateDeductions();
+                        }
+                    }
+                }
+            }
         };
 
         moGridEarningRow.setForm(null);
@@ -794,7 +828,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         moGridDeductionRow = new SGridPaneForm(miClient, SModConsts.HRSX_PAY_REC_DED, SLibConsts.UNDEFINED, "Deducciones") {
             @Override
             public void initGrid() {
-                setRowButtonsEnabled(false, false, false);
+                setRowButtonsEnabled(false, false, true);
             }
 
             @Override
@@ -814,6 +848,34 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                 moGridDeductionRow.getTable().getDefaultEditor(Double.class).addCellEditorListener(SDialogPayrollEmployee.this);
 
                 return gridColumnsForm;
+            }
+            
+            @Override
+            public void actionRowDelete() {
+                int moveId = 0;
+                boolean delete = false;
+                SHrsPayrollReceiptDeduction hrsReceiptDeductionRow = null;
+
+                if (jtTable.getSelectedRowCount() != 1) {
+                    miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+                }
+                else {
+                    hrsReceiptDeductionRow = (SHrsPayrollReceiptDeduction) moGridDeductionRow.getSelectedGridRow();
+                    
+                    for (SHrsPayrollReceiptDeduction deduction : moReceipt.getHrsDeductions()) {
+                        if (SLibUtils.compareKeys(deduction.getRowPrimaryKey(), hrsReceiptDeductionRow.getRowPrimaryKey())) {
+                            delete = true;
+                            moveId = deduction.getPkMoveId();
+                            break;
+                        }
+                    }
+                    
+                    if (delete) {
+                        moReceipt.removeDeduction(moveId);
+                        populateEarnings();
+                        populateDeductions();
+                    }
+                }
             }
         };
 
@@ -898,7 +960,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                                 moReceipt.getHrsEmployee().getHrsPayrollReceipt().removeEarning(earning.getPkMoveId());
                             }
 
-                            for (SHrsPayrollReceiptEarning hrsPayrollReceiptEarningRow : moReceipt.getHrsPayroll().getHrsPayrollReceiptEarningAbsence(moReceipt.getHrsEmployee().getHrsPayrollReceipt().getAbsenceConsumptionDays(), moReceipt.getHrsEmployee().getHrsPayrollReceipt())) {
+                            for (SHrsPayrollReceiptEarning hrsPayrollReceiptEarningRow : moReceipt.getHrsPayroll().getHrsPayrollReceiptEarningAbsence(moReceipt.getHrsEmployee().getHrsPayrollReceipt().getAbsenceConsumptions(), moReceipt.getHrsEmployee().getHrsPayrollReceipt())) {
                                 hrsPayrollReceiptEarningRow.setAbsenceConsumption(true);
                                 moReceipt.getHrsEmployee().getHrsPayrollReceipt().addEarning(hrsPayrollReceiptEarningRow);
                             }
@@ -976,8 +1038,8 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
             // Unit:
 
             if (moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
-                receiptEarning.setUnitsAlleged(1d);
-                receiptEarning.setUnits(1d);
+                receiptEarning.setUnitsAlleged(row.getXtaValueAlleged() == 0 ? 0d : 1d);
+                receiptEarning.setUnits(row.getXtaValueAlleged() == 0 ? 0d : 1d);
             }
             else {
                 receiptEarning.setUnitsAlleged(row.getXtaValueAlleged());
@@ -1261,6 +1323,15 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                 add = false;
                 moTextEarningCodeFind.requestFocus();
             }
+                
+            if (add) {
+                for (SHrsPayrollReceiptEarning earning : moReceipt.getHrsEarnings()) {
+                    if (SLibUtils.compareKeys(new int[] { earning.getEarning().getPkEarningId()}, new int[] { moEarning.getPkEarningId() })) {
+                        miClient.showMsgBoxWarning("La percepción '" + moEarning.getName() + "' no se puede agregar, ya existe en el recibo.");
+                        add = false;
+                    }
+                }
+            }
 
             if (add) {
                 itemStateEarning();
@@ -1300,6 +1371,15 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                         }
                     }
                 }
+                
+                if (add) {
+                    for (SHrsPayrollReceiptDeduction deduction : moReceipt.getHrsDeductions()) {
+                        if (SLibUtils.compareKeys(new int[] { deduction.getDeduction().getPkDeductionId() }, new int[] { moDeduction.getPkDeductionId() })) {
+                            miClient.showMsgBoxWarning("La deducción '" + moDeduction.getName() + "' no se puede agregar, ya existe en el recibo.");
+                            add = false;
+                        }
+                    }
+                }
 
                 if (add) {
                     itemStateDeduction();
@@ -1331,7 +1411,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                 moTextEarningCodeFind.requestFocus();
             }
             else {
-                if (moEarning.getFkAbsenceClassId_n() != SLibConsts.UNDEFINED && moEarning.getFkAbsenceTypeId_n() != SLibConsts.UNDEFINED && moEarning.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_NON) {
+                if (moEarning.getFkAbsenceClassId_n() != SLibConsts.UNDEFINED && moEarning.getFkAbsenceTypeId_n() != SLibConsts.UNDEFINED) {
                     add = false;
                 }
 
@@ -1503,6 +1583,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         Vector<SGridRow> rows = new Vector<SGridRow>();
         SHrsPayrollReceiptDeduction hrsReceiptDeductionRow = null;
 
+        //moGridDeductionRow.setRowButtonsEnabled(mbEditable, false, mbEditable);
         for (SHrsPayrollReceiptDeduction hrsDeductionRow : moReceipt.getHrsDeductions()) {
             hrsReceiptDeductionRow = new SHrsPayrollReceiptDeduction();
 
@@ -1531,8 +1612,9 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
     private void populateAbsenceConsumption() {
         Vector<SGridRow> rows = new Vector<SGridRow>();
         SDbAbsence absence = null;
-        
-        for (SDbAbsenceConsumption absenceConsumption : moReceipt.getAbsenceConsumptionDays()) {
+
+        moGridAbsenceConsumptionRow.setRowButtonsEnabled(mbEditable, false, mbEditable);
+        for (SDbAbsenceConsumption absenceConsumption : moReceipt.getAbsenceConsumptions()) {
             absence = (SDbAbsence) miClient.getSession().readRegistry(SModConsts.HRS_ABS, new int[] { absenceConsumption.getPkEmployeeId(), absenceConsumption.getPkAbsenceId() });
             
             absenceConsumption.setAuxNumber(absence.getNumber());
@@ -1645,7 +1727,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                     daysToBePaid += hrsEarningRow.getReceiptEarning().getUnitsAlleged();
                 }
             }
-            for (SDbAbsenceConsumption absenceConsumption : moReceipt.getAbsenceConsumptionDays()) {
+            for (SDbAbsenceConsumption absenceConsumption : moReceipt.getAbsenceConsumptions()) {
                 if (absenceConsumption.getAbsence().getFkAbsenceClassId() != SModSysConsts.HRSU_CL_ABS_VAC) {
                     daysAbsence += absenceConsumption.getEffectiveDays();
                 }

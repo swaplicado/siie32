@@ -52,7 +52,7 @@ public class SHrsPayrollReceipt {
 
         return taxableEarnings;
     }
-
+    
     private void computeEarnings() {
         for (SHrsPayrollReceiptEarning receiptEarning : maHrsEarnings) {
             // receiptEarning.computeEarning(); XXX jbarajas 15/04/2015
@@ -134,8 +134,7 @@ public class SHrsPayrollReceipt {
                             amountExemp = SLibUtils.round(earning.getExemptionSalaryGreaterMwzPercentage() * hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r(), SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits());
                         }
 
-                        if (amountExemp > limitExemption) {
-
+                        if (limitExemption != 0 && amountExemp > limitExemption) {
                             amountExemp = limitExemption;
                         }
 
@@ -211,6 +210,8 @@ public class SHrsPayrollReceipt {
         double dSubsidyAccumulated = 0;
         double dTaxableEarnings = 0;
         boolean bComputeTax = false;
+        boolean foundTax = false;
+        boolean foundSubsidy = false;
         SHrsEmployeeDays oEmployeeDays = null;
         SDbTaxTable dbTaxTable = null;
         SDbTaxTableRow dbTaxTableRow = null;
@@ -259,6 +260,7 @@ public class SHrsPayrollReceipt {
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
 
+        /* XXX jbarajas 2015-09-10 update deduction when is user
         // Remove previous tax:
 
         aDeductionsToRemove = new ArrayList<SHrsPayrollReceiptDeduction>();
@@ -285,11 +287,13 @@ public class SHrsPayrollReceipt {
         for (SHrsPayrollReceiptDeduction deduction : maHrsDeductions) {
             deduction.setPkMoveId(++i);
         }
+        */
 
         if (oAccumulatedTax != null) {
             dTaxAccumulated = SLibUtils.round(oAccumulatedTax.getAcummulated(), SUtilConsts.DECS_AMT);
         }
 
+        /* XXX jbarajas 2015-09-10 update deduction when is user
         // Preserve tax set by user:
 
         for (SHrsPayrollReceiptDeduction deduction : aDeductionsByUser) {
@@ -324,11 +328,13 @@ public class SHrsPayrollReceipt {
         for (SHrsPayrollReceiptEarning earning : maHrsEarnings) {
             earning.setPkMoveId(++i);
         }
+        */
 
         if (oAccumulatedSubsidy != null) {
             dSubsidyAccumulated = SLibUtils.round(oAccumulatedSubsidy.getAcummulated(), SUtilConsts.DECS_AMT);
         }
 
+        /* XXX jbarajas 2015-09-10 update deduction when is user
         // Preserve tax subsidy set by user:
 
         for (SHrsPayrollReceiptEarning earning : aEarningsByUser) {
@@ -336,6 +342,7 @@ public class SHrsPayrollReceipt {
             dSubsidySetByUser += SLibUtils.round(earning.getReceiptEarning().getAmount_r(), SUtilConsts.DECS_AMT);
         }
         dSubsidySetByUser = SLibUtils.round(dSubsidySetByUser, SUtilConsts.DECS_AMT);
+        */
 
         if (bComputeTax) {
             for (SHrsPayrollReceiptEarning earning : maHrsEarnings) {
@@ -400,7 +407,10 @@ public class SHrsPayrollReceipt {
                 }
             }
 
+            /* XXX jbarajas 2015-09-10 update deduction when is user
             if (aDeductionsByUser.isEmpty() && dTaxComputed != 0 && dTaxComputed > dTaxAccumulated) {
+            */
+            if (dTaxComputed != 0 && dTaxComputed > dTaxAccumulated) {
                 dbReceiptDeductionTax = new SDbPayrollReceiptDeduction();
                 dbReceiptDeductionTax.setPkPayrollId(moReceipt.getPkPayrollId());
                 dbReceiptDeductionTax.setPkEmployeeId(moReceipt.getPkEmployeeId());
@@ -421,7 +431,7 @@ public class SHrsPayrollReceipt {
                 oReceiptDeductionTax.setDeduction(dbDeductionTax);
                 oReceiptDeductionTax.setReceiptDeduction(dbReceiptDeductionTax);
 
-                maHrsDeductions.add(oReceiptDeductionTax);
+                //maHrsDeductions.add(oReceiptDeductionTax); XXX jbarajas 2015-09-10 update deduction when is user
             }
 
             // Compute tax subsidy:
@@ -456,7 +466,10 @@ public class SHrsPayrollReceipt {
                 }
             }
 
+            /* XXX jbarajas 2015-09-10 update deduction when is user
             if (aEarningsByUser.isEmpty() && dSubsidyComputed != 0 && dSubsidyComputed > dSubsidyAccumulated) {
+            */
+            if (dSubsidyComputed != 0 && dSubsidyComputed > dSubsidyAccumulated) {
                 dbReceiptEarningSubsidy = new SDbPayrollReceiptEarning();
                 dbReceiptEarningSubsidy.setPkPayrollId(moReceipt.getPkPayrollId());
                 dbReceiptEarningSubsidy.setPkEmployeeId(moReceipt.getPkEmployeeId());
@@ -481,15 +494,103 @@ public class SHrsPayrollReceipt {
                 oReceiptEarningSubsidy.setXtaValueAlleged(dbReceiptEarningSubsidy.getUnitsAlleged());
                 oReceiptEarningSubsidy.setXtaValue(dbReceiptEarningSubsidy.getUnits());
 
-                maHrsEarnings.add(oReceiptEarningSubsidy);
+                //maHrsEarnings.add(oReceiptEarningSubsidy); XXX jbarajas 2015-09-10 update deduction when is user
             }
         }
 
+         // Remove previous tax:
+
+        aDeductionsToRemove = new ArrayList<SHrsPayrollReceiptDeduction>();
+
+        for (SHrsPayrollReceiptDeduction deduction : maHrsDeductions) {
+            if (deduction.getReceiptDeduction().getFkDeductionTypeId() == SModSysConsts.HRSS_TP_DED_TAX) {
+                if (deduction.getReceiptDeduction().isUserEdited() || !deduction.getReceiptDeduction().isAutomatic()) {
+                    deduction.getReceiptDeduction().setAmountSystem_r(SLibUtils.round(dTaxComputed - dTaxAccumulated, SUtilConsts.DECS_AMT));    // preserve user input
+                    dTaxSetByUser += SLibUtils.round(deduction.getReceiptDeduction().getAmount_r(), SUtilConsts.DECS_AMT);
+                    foundTax = true;
+                }
+                else {
+                    aDeductionsToRemove.add(deduction);  // delete previous system computations
+                }
+            }
+        }
+
+        if (!aDeductionsToRemove.isEmpty()) {
+            if ((dTaxComputed - dTaxAccumulated) == 0) {
+                for (SHrsPayrollReceiptDeduction deduction : aDeductionsToRemove) {
+                    maHrsDeductions.remove(deduction);
+                }
+
+                aDeductionsToRemove.clear();
+
+                renumberDeductions();
+            }
+            else {
+                for (SHrsPayrollReceiptDeduction deductionRemove : aDeductionsToRemove) {
+                    for (SHrsPayrollReceiptDeduction deduction : maHrsDeductions) {
+                        if (SLibUtils.compareKeys(new int[] { deduction.getPkMoveId() }, new int[] { deductionRemove.getPkMoveId() })) {
+                            deduction.getReceiptDeduction().setAmountUnitary(SLibUtils.round(dTaxComputed - dTaxAccumulated, SUtilConsts.DECS_AMT));
+                            deduction.getReceiptDeduction().setAmountSystem_r(deduction.getReceiptDeduction().getAmountUnitary());
+                            deduction.getReceiptDeduction().setAmount_r(deduction.getReceiptDeduction().getAmountUnitary());
+                        }
+                    }
+                }
+            }
+        }
+        else if (!foundTax && oReceiptDeductionTax != null) {
+            maHrsDeductions.add(oReceiptDeductionTax);
+        }
+        
+        // Remove previous tax subsidy:
+
+        aEarningsToRemove = new ArrayList<SHrsPayrollReceiptEarning>();
+
+        for (SHrsPayrollReceiptEarning earning : maHrsEarnings) {
+            if (earning.getReceiptEarning().getFkEarningTypeId() == SModSysConsts.HRSS_TP_EAR_TAX_SUB) {
+                if (earning.getReceiptEarning().isUserEdited() || !earning.getReceiptEarning().isAutomatic()) {
+                    earning.getReceiptEarning().setAmountSystem_r(SLibUtils.round(dSubsidyComputed - dSubsidyAccumulated, SUtilConsts.DECS_AMT));    // preserve user input
+                    dSubsidySetByUser += SLibUtils.round( earning.getReceiptEarning().getAmount_r(), SUtilConsts.DECS_AMT);
+                    foundSubsidy = true;
+                }
+                else {
+                    aEarningsToRemove.add(earning);  // delete previous system computations
+                }
+            }
+        }
+
+        if (!aEarningsToRemove.isEmpty()) {
+            if ((dSubsidyComputed - dSubsidyAccumulated) == 0) {
+                for (SHrsPayrollReceiptEarning earning : aEarningsToRemove) {
+                    maHrsEarnings.remove(earning);
+                }
+
+                aEarningsToRemove.clear();
+
+                renumberEarnings();
+            }
+            else {
+                for (SHrsPayrollReceiptEarning earningRemove : aEarningsToRemove) {
+                    for (SHrsPayrollReceiptEarning earning : maHrsEarnings) {
+                        if (SLibUtils.compareKeys(new int[] { earning.getPkMoveId() }, new int[] { earningRemove.getPkMoveId() })) {
+                            earning.getReceiptEarning().setAmountUnitary(SLibUtils.round(dSubsidyComputed - dSubsidyAccumulated, SUtilConsts.DECS_AMT));
+                            earning.getReceiptEarning().setAmountSystem_r(earning.getReceiptEarning().getAmountUnitary());
+                            earning.getReceiptEarning().setAmount_r(earning.getReceiptEarning().getAmountUnitary());
+                        }
+                    }
+                }
+            }
+        }
+        else if (!foundSubsidy && oReceiptEarningSubsidy != null) {
+            maHrsEarnings.add(oReceiptEarningSubsidy);
+        }
+        
         if (!bComputeTax) {
             moReceipt.setTaxPayrollTheorical(0);
-            moReceipt.setTaxPayrollActual(!aDeductionsByUser.isEmpty() ? dTaxSetByUser : 0);
+            //moReceipt.setTaxPayrollActual(!aDeductionsByUser.isEmpty() ? dTaxSetByUser : 0); XXX jbarajas 2015-09-10 update deduction when is user
+            moReceipt.setTaxPayrollActual(dTaxSetByUser != 0 ? dTaxSetByUser : 0);
             moReceipt.setTaxSubsidyPayrollTheorical(0);
-            moReceipt.setTaxSubsidyPayrollActual(!aEarningsByUser.isEmpty() ? dSubsidySetByUser : 0);
+            //moReceipt.setTaxSubsidyPayrollActual(!aEarningsByUser.isEmpty() ? dSubsidySetByUser : 0); XXX jbarajas 2015-09-10 update deduction when is user
+            moReceipt.setTaxSubsidyPayrollActual(dSubsidySetByUser != 0 ? dSubsidySetByUser : 0);
             moReceipt.setTaxAnnualTheorical(0);
             moReceipt.setTaxAnnualActual(0);
             moReceipt.setTaxSubsidyAnnualTheorical(0);
@@ -499,9 +600,11 @@ public class SHrsPayrollReceipt {
             switch (moHrsPayroll.getPayroll().getFkTaxComputationTypeId()) {
                 case SModSysConsts.HRSS_TP_TAX_COMP_WOT:
                     moReceipt.setTaxPayrollTheorical(0);
-                    moReceipt.setTaxPayrollActual(!aDeductionsByUser.isEmpty() ? dTaxSetByUser : 0);
+                    //moReceipt.setTaxPayrollActual(!aDeductionsByUser.isEmpty() ? dTaxSetByUser : 0); XXX jbarajas 2015-09-10 update deduction when is user
+                    moReceipt.setTaxPayrollActual(dTaxSetByUser != 0 ? dTaxSetByUser : 0);
                     moReceipt.setTaxSubsidyPayrollTheorical(0);
-                    moReceipt.setTaxSubsidyPayrollActual(!aEarningsByUser.isEmpty() ? dSubsidySetByUser : 0);
+                    //moReceipt.setTaxSubsidyPayrollActual(!aEarningsByUser.isEmpty() ? dSubsidySetByUser : 0); XXX jbarajas 2015-09-10 update deduction when is user
+                    moReceipt.setTaxSubsidyPayrollActual(dSubsidySetByUser != 0 ? dSubsidySetByUser : 0);
                     moReceipt.setTaxAnnualTheorical(0);
                     moReceipt.setTaxAnnualActual(0);
                     moReceipt.setTaxSubsidyAnnualTheorical(0);
@@ -509,9 +612,11 @@ public class SHrsPayrollReceipt {
                     break;
                 case SModSysConsts.HRSS_TP_TAX_COMP_PAY:
                     moReceipt.setTaxPayrollTheorical(dTaxComputed);
-                    moReceipt.setTaxPayrollActual(!aDeductionsByUser.isEmpty() ? dTaxSetByUser : moReceipt.getTaxPayrollTheorical());
+                    //moReceipt.setTaxPayrollActual(!aDeductionsByUser.isEmpty() ? dTaxSetByUser : moReceipt.getTaxPayrollTheorical()); XXX jbarajas 2015-09-10 update deduction when is user
+                    moReceipt.setTaxPayrollActual(dTaxSetByUser != 0 ? dTaxSetByUser : moReceipt.getTaxPayrollTheorical());
                     moReceipt.setTaxSubsidyPayrollTheorical(dSubsidyComputed);
-                    moReceipt.setTaxSubsidyPayrollActual(!aEarningsByUser.isEmpty() ? dSubsidySetByUser : moReceipt.getTaxSubsidyPayrollTheorical());
+                    //moReceipt.setTaxSubsidyPayrollActual(!aEarningsByUser.isEmpty() ? dSubsidySetByUser : moReceipt.getTaxSubsidyPayrollTheorical()); XXX jbarajas 2015-09-10 update deduction when is user
+                    moReceipt.setTaxSubsidyPayrollActual(dSubsidySetByUser != 0 ? dSubsidySetByUser : moReceipt.getTaxSubsidyPayrollTheorical());
                     moReceipt.setTaxAnnualTheorical(0);
                     moReceipt.setTaxAnnualActual(0);
                     moReceipt.setTaxSubsidyAnnualTheorical(0);
@@ -519,9 +624,11 @@ public class SHrsPayrollReceipt {
                     break;
                 case SModSysConsts.HRSS_TP_TAX_COMP_ANN:
                     moReceipt.setTaxPayrollTheorical(dTaxComputed <= dTaxAccumulated ? 0 : SLibUtils.round(dTaxComputed - dTaxAccumulated, SUtilConsts.DECS_AMT));
-                    moReceipt.setTaxPayrollActual(!aDeductionsByUser.isEmpty() ? dTaxSetByUser : moReceipt.getTaxPayrollTheorical());
+                    //moReceipt.setTaxPayrollActual(!aDeductionsByUser.isEmpty() ? dTaxSetByUser : moReceipt.getTaxPayrollTheorical()); XXX jbarajas 2015-09-10 update deduction when is user
+                    moReceipt.setTaxPayrollActual(dTaxSetByUser != 0 ? dTaxSetByUser : moReceipt.getTaxPayrollTheorical());
                     moReceipt.setTaxSubsidyPayrollTheorical(dSubsidyComputed <= dSubsidyAccumulated ? 0 : SLibUtils.round(dSubsidyComputed - dSubsidyAccumulated, SUtilConsts.DECS_AMT));
-                    moReceipt.setTaxSubsidyPayrollActual(!aEarningsByUser.isEmpty() ? dSubsidySetByUser : moReceipt.getTaxSubsidyPayrollTheorical());
+                    //moReceipt.setTaxSubsidyPayrollActual(!aEarningsByUser.isEmpty() ? dSubsidySetByUser : moReceipt.getTaxSubsidyPayrollTheorical()); XXX jbarajas 2015-09-10 update deduction when is user
+                    moReceipt.setTaxSubsidyPayrollActual(dSubsidySetByUser != 0 ? dSubsidySetByUser : moReceipt.getTaxSubsidyPayrollTheorical());
                     moReceipt.setTaxAnnualTheorical(dTaxComputed);
                     moReceipt.setTaxAnnualActual(dTaxAccumulated);
                     moReceipt.setTaxSubsidyAnnualTheorical(dSubsidyComputed);
@@ -539,6 +646,7 @@ public class SHrsPayrollReceipt {
         double dEarningSsc = 0;
         double dSscSetByUser = 0;
         double dSscComputed = 0;
+        boolean foundSsc = false;
         SDbSsContributionTable dbSscTable = null;
         SDbSsContributionTableRow dbSscTableRow = null;
         SDbDeduction dbDeductionSsc = null;
@@ -550,6 +658,7 @@ public class SHrsPayrollReceipt {
         SHrsDaysByPeriod hrsDaysCurr = moHrsEmployee.getHrsDaysCurr();
         SHrsDaysByPeriod hrsDaysNext = moHrsEmployee.getHrsDaysNext();
         
+        /* XXX jbarajas 2015-09-09 update deduction when is user
         // Remove previous SS contribution:
 
         aDeductionsToRemove = new ArrayList<SHrsPayrollReceiptDeduction>();
@@ -584,8 +693,11 @@ public class SHrsPayrollReceipt {
             dSscSetByUser += SLibUtils.round(deduction.getReceiptDeduction().getAmount_r(), SUtilConsts.DECS_AMT);
         }
         dSscSetByUser = SLibUtils.round(dSscSetByUser, SUtilConsts.DECS_AMT);
-
+        
         if (moHrsPayroll.getPayroll().isSsContribution() && aDeductionsByUser.isEmpty()) {
+            
+        */
+        if (moHrsPayroll.getPayroll().isSsContribution()) {
             // Compute SS contribution:
 
             if (moHrsPayroll.getConfig().getFkDeductionSsContributionId_n() == SLibConsts.UNDEFINED) {
@@ -653,10 +765,12 @@ public class SHrsPayrollReceipt {
              }
              */
 
+            /* XXX jbarajas 2015-09-09 update deduction when is user
             if (!aDeductionsByUser.isEmpty()) {
                 aDeductionsByUser.get(0).getReceiptDeduction().setAmountSystem_r(dSscComputed);
             }
-            else if (dSscComputed != 0) {
+            */
+            if (dSscComputed != 0) {
                 dbReceiptDeductionSsc = new SDbPayrollReceiptDeduction();
                 dbReceiptDeductionSsc.setPkPayrollId(moReceipt.getPkPayrollId());
                 dbReceiptDeductionSsc.setPkEmployeeId(moReceipt.getPkEmployeeId());
@@ -677,8 +791,50 @@ public class SHrsPayrollReceipt {
                 oReceiptDeductionSsc.setDeduction(dbDeductionSsc);
                 oReceiptDeductionSsc.setReceiptDeduction(dbReceiptDeductionSsc);
 
-                maHrsDeductions.add(oReceiptDeductionSsc);
+                //maHrsDeductions.add(oReceiptDeductionSsc);
             }
+        }
+            
+        // Remove previous SS contribution:
+
+        aDeductionsToRemove = new ArrayList<SHrsPayrollReceiptDeduction>();
+
+        for (SHrsPayrollReceiptDeduction deduction : maHrsDeductions) {
+            if (deduction.getReceiptDeduction().getFkDeductionTypeId() == SModSysConsts.HRSS_TP_DED_SSC) {
+                if (deduction.getReceiptDeduction().isUserEdited() || !deduction.getReceiptDeduction().isAutomatic()) {
+                    deduction.getReceiptDeduction().setAmountSystem_r(SLibUtils.round(dSscComputed, SUtilConsts.DECS_AMT));    // preserve user input
+                    foundSsc = true;
+                }
+                else {
+                    aDeductionsToRemove.add(deduction);  // delete previous system computations
+                }
+            }
+        }
+
+        if (!aDeductionsToRemove.isEmpty()) {
+            if (dSscComputed == 0) {
+                for (SHrsPayrollReceiptDeduction deduction : aDeductionsToRemove) {
+                    maHrsDeductions.remove(deduction);
+                }
+
+                aDeductionsToRemove.clear();
+
+                renumberDeductions();
+            }
+            else {
+                for (SHrsPayrollReceiptDeduction deductionRemove : aDeductionsToRemove) {
+                    for (SHrsPayrollReceiptDeduction deduction : maHrsDeductions) {
+                        if (SLibUtils.compareKeys(new int[] { deduction.getPkMoveId() }, new int[] { deductionRemove.getPkMoveId() })) {
+                            deduction.getReceiptDeduction().setAmountUnitary(dSscComputed);
+                            deduction.getReceiptDeduction().setAmountSystem_r(deduction.getReceiptDeduction().getAmountUnitary());
+                            deduction.getReceiptDeduction().setAmount_r(deduction.getReceiptDeduction().getAmountUnitary());
+                        }
+                    }
+                }
+            }
+        }
+        else if (!foundSsc && oReceiptDeductionSsc != null) {
+            maHrsDeductions.add(oReceiptDeductionSsc);
         }
     }
 
@@ -741,7 +897,7 @@ public class SHrsPayrollReceipt {
     public SDbPayrollReceipt getReceipt()  { return moReceipt; }
     public SHrsPayroll getHrsPayroll() { return moHrsPayroll; }
     public SHrsEmployee getHrsEmployee() { return moHrsEmployee; }
-    public ArrayList<SDbAbsenceConsumption> getAbsenceConsumptionDays() { return maAbsenceConsumptionDays; }
+    public ArrayList<SDbAbsenceConsumption> getAbsenceConsumptions() { return maAbsenceConsumptionDays; }
     public ArrayList<SHrsPayrollReceiptEarning> getHrsEarnings() { return maHrsEarnings; }
     public ArrayList<SHrsPayrollReceiptDeduction> getHrsDeductions() { return maHrsDeductions; }
     public ArrayList<SHrsBenefit> getHrsBenefits() { return maHrsBenefits; }
@@ -759,9 +915,17 @@ public class SHrsPayrollReceipt {
         return oPayrollReceiptEarning;
     }
 
+    public void renumberEarnings() {
+        int i = 0;
+        for (SHrsPayrollReceiptEarning earning : maHrsEarnings) {
+            earning.setPkMoveId(++i);
+        }
+    }
+
     public SHrsPayrollReceiptEarning addEarning(final SHrsPayrollReceiptEarning hrsPayrollReceiptEarning) {
         try {
             maHrsEarnings.add(hrsPayrollReceiptEarning);
+            renumberEarnings();
             computeReceipt();
         }
         catch (Exception e) {
@@ -794,10 +958,18 @@ public class SHrsPayrollReceipt {
                     break;
                 }
             }
+            renumberEarnings();
             computeReceipt();
         }
         catch (Exception e) {
             SLibUtils.printException(this, e);
+        }
+    }
+
+    public void renumberDeductions() {
+        int i = 0;
+        for (SHrsPayrollReceiptDeduction deduction : maHrsDeductions) {
+            deduction.setPkMoveId(++i);
         }
     }
 
@@ -817,6 +989,7 @@ public class SHrsPayrollReceipt {
     public SHrsPayrollReceiptDeduction addDeduction(final SHrsPayrollReceiptDeduction hrsPayrollReceiptDeduction) {
         try {
             maHrsDeductions.add(hrsPayrollReceiptDeduction);
+            renumberDeductions();
             computeReceipt();
         }
         catch (Exception e) {
@@ -834,6 +1007,7 @@ public class SHrsPayrollReceipt {
                     break;
                 }
             }
+            computeReceipt();
         }
         catch (Exception e) {
             SLibUtils.printException(this, e);
@@ -848,6 +1022,8 @@ public class SHrsPayrollReceipt {
                     break;
                 }
             }
+            renumberDeductions();
+            computeReceipt();
         }
         catch (Exception e) {
             SLibUtils.printException(this, e);
@@ -1144,7 +1320,7 @@ public class SHrsPayrollReceipt {
             }
         }
 
-        for (SHrsPayrollReceiptEarning hrsPayrollReceiptEarningRow : moHrsPayroll.getHrsPayrollReceiptEarningAbsence(getAbsenceConsumptionDays(), moHrsEmployee.getHrsPayrollReceipt())) {
+        for (SHrsPayrollReceiptEarning hrsPayrollReceiptEarningRow : moHrsPayroll.getHrsPayrollReceiptEarningAbsence(getAbsenceConsumptions(), moHrsEmployee.getHrsPayrollReceipt())) {
             moHrsEmployee.getHrsPayrollReceipt().addEarning(hrsPayrollReceiptEarningRow);
         }
     }
@@ -1153,7 +1329,7 @@ public class SHrsPayrollReceipt {
         ArrayList<SDbAbsenceConsumption> aAbsenceConsumptionsDelete = null;
         SDbAbsenceType absenceType = null;
         
-        for (SDbAbsenceConsumption absenceConsumption : moHrsEmployee.getHrsPayrollReceipt().getAbsenceConsumptionDays()) {
+        for (SDbAbsenceConsumption absenceConsumption : moHrsEmployee.getHrsPayrollReceipt().getAbsenceConsumptions()) {
             if (SLibUtilities.compareKeys(absenceType.getPrimaryKey(), new int[] { absenceConsumption.getAbsence().getFkAbsenceClassId(), absenceConsumption.getAbsence().getFkAbsenceTypeId() })) {
                 aAbsenceConsumptionsDelete.add(absenceConsumption);
                 break;
@@ -1161,7 +1337,7 @@ public class SHrsPayrollReceipt {
         }
         
         for (SDbAbsenceConsumption absenceConsumptionDelete : aAbsenceConsumptionsDelete) {
-            for (SDbAbsenceConsumption absenceConsumption : moHrsEmployee.getHrsPayrollReceipt().getAbsenceConsumptionDays()) {
+            for (SDbAbsenceConsumption absenceConsumption : moHrsEmployee.getHrsPayrollReceipt().getAbsenceConsumptions()) {
                 if (SLibUtilities.compareKeys(absenceConsumption.getPrimaryKey(), absenceConsumptionDelete.getPrimaryKey())) {
                     moHrsEmployee.getHrsPayrollReceipt().removeAbsenceConsumption(absenceConsumption);
                     break;
@@ -1333,7 +1509,7 @@ public class SHrsPayrollReceipt {
                 throw new Exception("Los días efectivos de consumo deben ser menor o igual a " + workingDaysAvailable + ".");
             }
             
-            for (SDbAbsenceConsumption absenceConsumptionAux : moHrsEmployee.getHrsPayrollReceipt().getAbsenceConsumptionDays()) {
+            for (SDbAbsenceConsumption absenceConsumptionAux : moHrsEmployee.getHrsPayrollReceipt().getAbsenceConsumptions()) {
                 diferenceDaysPeriod += (int) SLibTimeUtils.getDaysDiff(absenceConsumptionAux.getDateEnd(), absenceConsumptionAux.getDateStart()) + 1;
             }
             
@@ -1388,8 +1564,8 @@ public class SHrsPayrollReceipt {
         registry.setHrsPayroll(this.getHrsPayroll());
         registry.setHrsEmployee(this.getHrsEmployee());
         
-        for (SDbAbsenceConsumption absenceConsumption : this.getAbsenceConsumptionDays()) {
-            registry.getAbsenceConsumptionDays().add(absenceConsumption.clone());
+        for (SDbAbsenceConsumption absenceConsumption : this.getAbsenceConsumptions()) {
+            registry.getAbsenceConsumptions().add(absenceConsumption.clone());
         }
         
         for (SHrsPayrollReceiptEarning hrsEarning : this.getHrsEarnings()) {
@@ -1412,7 +1588,7 @@ public class SHrsPayrollReceipt {
             hrsDeduction.setHrsReceipt(registry);
         }
         
-        registry.getHrsPayroll().replaceReceipt(registry.getHrsEmployee().getEmployee().getPkEmployeeId(), registry);
+        registry.getHrsPayroll().replaceReceipt(registry.getHrsEmployee().getEmployee().getPkEmployeeId(), registry, false);
         registry.getHrsEmployee().setHrsPayrollReceipt(registry);
         
         return registry;

@@ -204,14 +204,14 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlExemptionSalaryEqualsMwzPercentage.setText("Porcentaje exento si SB = SMA:");
+        jlExemptionSalaryEqualsMwzPercentage.setText("Porcentaje exención si SB = SMA:");
         jlExemptionSalaryEqualsMwzPercentage.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel9.add(jlExemptionSalaryEqualsMwzPercentage);
         jPanel9.add(moDecExemptionSalaryEqualsMwzPercentage);
 
         jlExemptionSalaryEqualsMwzPercentageHelp.setForeground(new java.awt.Color(109, 109, 109));
         jlExemptionSalaryEqualsMwzPercentageHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jlExemptionSalaryEqualsMwzPercentageHelp.setText("(Porcentaje exento cuando el empleado gana el salario mínimo)");
+        jlExemptionSalaryEqualsMwzPercentageHelp.setText("(Porcentaje exención cuando el empleado gana el salario mínimo)");
         jlExemptionSalaryEqualsMwzPercentageHelp.setToolTipText("");
         jlExemptionSalaryEqualsMwzPercentageHelp.setPreferredSize(new java.awt.Dimension(650, 23));
         jPanel9.add(jlExemptionSalaryEqualsMwzPercentageHelp);
@@ -220,14 +220,14 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlExemptionSalaryEqualsMwzLimit.setText("Límite exento si SB = SMA:");
+        jlExemptionSalaryEqualsMwzLimit.setText("Tope exención si SB = SMA:");
         jlExemptionSalaryEqualsMwzLimit.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel10.add(jlExemptionSalaryEqualsMwzLimit);
         jPanel10.add(moIntExemptionSalaryEqualsMwzLimit);
 
         jlExemptionSalaryEqualsMwzLimitHelp.setForeground(new java.awt.Color(109, 109, 109));
         jlExemptionSalaryEqualsMwzLimitHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jlExemptionSalaryEqualsMwzLimitHelp.setText("(Exención límite expresado en número de salarios mínimos del área geográfica, cuando el empleado gana el salario mínimo)");
+        jlExemptionSalaryEqualsMwzLimitHelp.setText("(Tope exención expresado en número de salarios mínimos del área geográfica, cuando el empleado gana el salario mínimo)");
         jlExemptionSalaryEqualsMwzLimitHelp.setToolTipText("");
         jlExemptionSalaryEqualsMwzLimitHelp.setPreferredSize(new java.awt.Dimension(650, 23));
         jPanel10.add(jlExemptionSalaryEqualsMwzLimitHelp);
@@ -236,14 +236,14 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlExemptionSalaryGreaterMwzPercentage.setText("Porcentaje exento si SB > SMA:");
+        jlExemptionSalaryGreaterMwzPercentage.setText("Porcentaje exención si SB > SMA:");
         jlExemptionSalaryGreaterMwzPercentage.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel11.add(jlExemptionSalaryGreaterMwzPercentage);
         jPanel11.add(moDecExemptionSalaryGreaterMwzPercentage);
 
         jlExemptionSalaryGreaterMwzPercentageHelp.setForeground(new java.awt.Color(109, 109, 109));
         jlExemptionSalaryGreaterMwzPercentageHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jlExemptionSalaryGreaterMwzPercentageHelp.setText("(Porcentaje exento cuando el empleado gana más del salario mínimo)");
+        jlExemptionSalaryGreaterMwzPercentageHelp.setText("(Porcentaje exención cuando el empleado gana más del salario mínimo)");
         jlExemptionSalaryGreaterMwzPercentageHelp.setToolTipText("");
         jlExemptionSalaryGreaterMwzPercentageHelp.setPreferredSize(new java.awt.Dimension(650, 23));
         jPanel11.add(jlExemptionSalaryGreaterMwzPercentageHelp);
@@ -252,14 +252,14 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlExemptionSalaryGreaterMwzLimit.setText("Límite exento si SB > SMA:");
+        jlExemptionSalaryGreaterMwzLimit.setText("Tope exención si SB > SMA:");
         jlExemptionSalaryGreaterMwzLimit.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel12.add(jlExemptionSalaryGreaterMwzLimit);
         jPanel12.add(moIntExemptionSalaryGreaterMwzLimit);
 
         jlExemptionSalaryGreaterMwzLimitHelp.setForeground(new java.awt.Color(109, 109, 109));
         jlExemptionSalaryGreaterMwzLimitHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jlExemptionSalaryGreaterMwzLimitHelp.setText("(Exención límite expresado en número de salarios mínimos del área geográfica, cuando el empleado gana más del salario mínimo)");
+        jlExemptionSalaryGreaterMwzLimitHelp.setText("(Tope exención expresado en número de salarios mínimos del área geográfica, cuando el empleado gana más del salario mínimo)");
         jlExemptionSalaryGreaterMwzLimitHelp.setToolTipText("Exención límite expresado en número de salarios mínimos del área geográfica, cuando el empleado gana más del salario mínimo");
         jlExemptionSalaryGreaterMwzLimitHelp.setPreferredSize(new java.awt.Dimension(650, 23));
         jPanel12.add(jlExemptionSalaryGreaterMwzLimitHelp);

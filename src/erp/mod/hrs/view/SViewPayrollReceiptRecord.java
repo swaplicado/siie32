@@ -69,7 +69,7 @@ public class SViewPayrollReceiptRecord extends SGridPaneView {
                 + "p.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
                 + "p.fk_usr_upd = uu.id_usr "
-                + "WHERE re.b_del = 0 " + (sql.isEmpty() ? "" : " AND " + sql)
+                + "WHERE p.b_del = 0 AND re.b_del = 0 " + (sql.isEmpty() ? "" : " AND " + sql)
                 + "GROUP BY pe.id_pay, pe.id_emp, p.per_year, p.per, f_pay_name, p.num, "
                 + "p.dt_sta, p.dt_end, p.b_nor, p.b_clo, p.b_del, r.dt, bkc.code, cob.code, r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num "
                 + "ORDER BY p.per_year, p.per, f_pay_name, p.num, p.dt_sta, p.dt_end, " + SDbConsts.FIELD_NAME + ", pe.id_pay, pe.id_emp, "

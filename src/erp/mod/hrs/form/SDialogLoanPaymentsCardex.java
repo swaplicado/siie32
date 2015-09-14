@@ -327,7 +327,7 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON bp.id_bp = emp.id_emp " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON rcp_ear.fk_usr_ins = ui.id_usr " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON rcp_ear.fk_usr_upd = uu.id_usr " +
-                    "WHERE p.b_del = 0 AND rcp_ear.fk_loan_emp_n = " + moLoan.getPkEmployeeId() + " AND rcp_ear.fk_loan_loan_n = " + moLoan.getPkLoanId() + " " +
+                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND rcp_ear.fk_loan_emp_n = " + moLoan.getPkEmployeeId() + " AND rcp_ear.fk_loan_loan_n = " + moLoan.getPkLoanId() + " " +
 
                     "UNION " +
 
@@ -341,7 +341,7 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON bp.id_bp = emp.id_emp " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON rcp_ded.fk_usr_ins = ui.id_usr " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON rcp_ded.fk_usr_upd = uu.id_usr " +
-                    "WHERE p.b_del = 0 AND rcp_ded.fk_loan_emp_n = " + moLoan.getPkEmployeeId() + " AND rcp_ded.fk_loan_loan_n = " + moLoan.getPkLoanId() + " " +
+                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.fk_loan_emp_n = " + moLoan.getPkEmployeeId() + " AND rcp_ded.fk_loan_loan_n = " + moLoan.getPkLoanId() + " " +
                     "ORDER BY per_year, f_period, f_tp_pay, f_num, dt_sta, dt_end, id_bp, bp ";
 
             resultSet = miClient.getSession().getStatement().executeQuery(sql);

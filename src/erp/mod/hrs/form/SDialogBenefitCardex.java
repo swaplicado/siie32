@@ -391,8 +391,8 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
                         "SELECT br.id_row " +
                         "FROM hrs_ben_row AS br " +
                         "WHERE br.id_ben = " + mnBenefitTableId + " AND mon >= " + (i == 0 ? 1 : i) + " * " + SHrsConsts.YEAR_MONTHS + " LIMIT 1)) AS t " +
-                        "LEFT OUTER JOIN hrs_pay_rcp AS rcp ON rcp.id_emp = " + moEmployee.getPkEmployeeId() + " " +
-                        "LEFT OUTER JOIN hrs_pay_rcp_ear AS ear ON ear.id_pay = rcp.id_pay AND ear.id_emp = rcp.id_emp AND ear.fk_tp_ben = " + mnFormSubtype + " AND ear.ben_ann = " + (i == 0 ? 1 : i) + " " +
+                        "LEFT OUTER JOIN hrs_pay_rcp AS rcp ON rcp.id_emp = " + moEmployee.getPkEmployeeId() + " AND rcp.b_del = 0 " +
+                        "LEFT OUTER JOIN hrs_pay_rcp_ear AS ear ON ear.id_pay = rcp.id_pay AND ear.id_emp = rcp.id_emp AND ear.b_del = 0 AND ear.fk_tp_ben = " + mnFormSubtype + " AND ear.ben_ann = " + (i == 0 ? 1 : i) + " " +
                         "GROUP BY f_ann, f_ann_ano ";
 
                 resultSet = miClient.getSession().getStatement().executeQuery(sql);
@@ -447,11 +447,11 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
                     "rcp_ear.ts_usr_ins AS ts_usr_ins, rcp_ear.ts_usr_upd AS ts_usr_upd, ui.usr AS f_usr_ins, uu.usr AS f_usr_upd " +
                     "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS rcp ON rcp.id_pay = p.id_pay " +
-                    "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
+                    "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp AND rcp_ear.b_del = 0 " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS tp_pay ON tp_pay.id_tp_pay = p.fk_tp_pay " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON rcp_ear.fk_usr_ins = ui.id_usr " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON rcp_ear.fk_usr_upd = uu.id_usr " +
-                    "WHERE p.b_del = 0 AND rcp_ear.id_emp = " + moEmployee.getPkEmployeeId() + " AND rcp_ear.fk_tp_ben = " + mnFormSubtype + " AND rcp_ear.ben_ann = " + rowBenefit.getAnn() + " AND " +
+                    "WHERE p.b_del = 0 AND rcp_ear.id_emp = " + moEmployee.getPkEmployeeId() + " AND rcp.b_del = 0 AND rcp_ear.fk_tp_ben = " + mnFormSubtype + " AND rcp_ear.ben_ann = " + rowBenefit.getAnn() + " AND " +
                     "rcp_ear.ben_year = " + rowBenefit.getAnnYear() + " " +
                     "ORDER BY per_year, f_period, f_tp_pay, f_num, dt_sta, dt_end ";
 

@@ -344,7 +344,7 @@ public class SHrsEmployee {
              * Obtain employee absence days (ndi)
              */
 
-            for (SDbAbsenceConsumption absenceConsumption : moHrsPayrollReceipt.getAbsenceConsumptionDays()) {
+            for (SDbAbsenceConsumption absenceConsumption : moHrsPayrollReceipt.getAbsenceConsumptions()) {
                 if (absenceConsumption.getAbsence().IsAuxAbsencePayable()) {
                     daysNotWorkedPaid += absenceConsumption.getEffectiveDays();
                 }

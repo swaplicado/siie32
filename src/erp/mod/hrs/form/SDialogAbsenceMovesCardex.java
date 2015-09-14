@@ -326,7 +326,7 @@ public class SDialogAbsenceMovesCardex extends SBeanFormDialog {
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON bp.id_bp = emp.id_emp " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON rcp_abs.fk_usr_ins = ui.id_usr " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON rcp_abs.fk_usr_upd = uu.id_usr " +
-                    "WHERE p.b_del = 0 AND abs.id_abs = " + moAbsence.getPkAbsenceId() + " AND abs.id_emp = " + moAbsence.getPkEmployeeId() + " " +
+                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND abs.id_abs = " + moAbsence.getPkAbsenceId() + " AND abs.id_emp = " + moAbsence.getPkEmployeeId() + " " +
                     "ORDER BY per_year, f_period, f_tp_pay, f_num, dt_sta, dt_end, id_bp, bp ";
 
             resultSet = miClient.getSession().getStatement().executeQuery(sql);

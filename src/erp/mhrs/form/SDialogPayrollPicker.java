@@ -187,8 +187,8 @@ public class SDialogPayrollPicker extends JDialog {
 
             sql = "SELECT p.id_pay, p.per_year, p.per, p.num, p.dt_sta, p.dt_end, " +
                     "p.b_clo, p.nts, tp.id_tp_pay, tp.code, " +
-                    "(SELECT SUM(rcp.ear_r) FROM hrs_pay_rcp AS rcp WHERE rcp.id_pay = p.id_pay) AS f_ear, " +
-                    "(SELECT SUM(rcp.ded_r) FROM hrs_pay_rcp AS rcp WHERE rcp.id_pay = p.id_pay) AS f_ded " +
+                    "(SELECT SUM(rcp.ear_r) FROM hrs_pay_rcp AS rcp WHERE rcp.b_del = 0 AND rcp.id_pay = p.id_pay) AS f_ear, " +
+                    "(SELECT SUM(rcp.ded_r) FROM hrs_pay_rcp AS rcp WHERE rcp.b_del = 0 AND rcp.id_pay = p.id_pay) AS f_ded " +
                     "FROM hrs_pay AS p " +
                     "INNER JOIN erp.hrss_tp_pay AS tp ON p.fk_tp_pay = tp.id_tp_pay " +
                     "WHERE p.b_del = 0 " +

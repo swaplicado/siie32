@@ -598,6 +598,23 @@ public abstract class SHrsUtils {
 
         return benefitTable;
     }
+    
+    public static ArrayList<SHrsBenefitTableByAnniversary> getBenefitTablesAnniversarys(ArrayList<SDbBenefitTable> benefitTables) throws Exception {
+        int i = 0;
+        ArrayList<SHrsBenefitTableByAnniversary> aBenefitTableByAnniversary = new ArrayList<SHrsBenefitTableByAnniversary>();
+        
+        for (SDbBenefitTable table : benefitTables) {
+            i = 1;
+            for (SDbBenefitTableRow tableRow : table.getChildRows()) {
+                while ( i * 12 <= tableRow.getMonths()) {
+                    aBenefitTableByAnniversary.add(new SHrsBenefitTableByAnniversary(table.getPkBenefitId(), i, table.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON ? tableRow.getBenefitBonusPercentage() : tableRow.getBenefitDays()));
+                    i++;
+                }
+            }
+        }
+
+        return aBenefitTableByAnniversary;
+    }
 
     /**
      * Get recent tax table
@@ -896,7 +913,7 @@ public abstract class SHrsUtils {
             }
         }
         
-        for (SDbAbsenceConsumption absenceConsumptionAux : hrsEmployee.getHrsPayrollReceipt().getAbsenceConsumptionDays()) {
+        for (SDbAbsenceConsumption absenceConsumptionAux : hrsEmployee.getHrsPayrollReceipt().getAbsenceConsumptions()) {
             if (absence.getPkAbsenceId() == absenceConsumptionAux.getPkAbsenceId() &&
                     absence.getPkEmployeeId() == absenceConsumptionAux.getPkEmployeeId()) {
                 consumptionPreviousDays += absenceConsumptionAux.getEffectiveDays();
@@ -915,7 +932,7 @@ public abstract class SHrsUtils {
     public static Date getConsumptionDateLast(final SDbAbsence absence, final SHrsEmployee hrsEmployee) {
         Date dateConsumptionLast = null;
         
-        for (SDbAbsenceConsumption absenceConsumptionAux : hrsEmployee.getHrsPayrollReceipt().getAbsenceConsumptionDays()) {
+        for (SDbAbsenceConsumption absenceConsumptionAux : hrsEmployee.getHrsPayrollReceipt().getAbsenceConsumptions()) {
             if (absence.getPkAbsenceId() == absenceConsumptionAux.getPkAbsenceId() &&
                     absence.getPkEmployeeId() == absenceConsumptionAux.getPkEmployeeId()) {
                 dateConsumptionLast = absenceConsumptionAux.getDateEnd();
@@ -943,7 +960,7 @@ public abstract class SHrsUtils {
     public static int getConsumptionNextId(final SDbAbsence absence, final SHrsEmployee hrsEmployee) {
         int consumptionLast = 0;
         
-        for (SDbAbsenceConsumption absenceConsumptionAux : hrsEmployee.getHrsPayrollReceipt().getAbsenceConsumptionDays()) {
+        for (SDbAbsenceConsumption absenceConsumptionAux : hrsEmployee.getHrsPayrollReceipt().getAbsenceConsumptions()) {
             if (absence.getPkAbsenceId() == absenceConsumptionAux.getPkAbsenceId() &&
                     absence.getPkEmployeeId() == absenceConsumptionAux.getPkEmployeeId()) {
                 consumptionLast = absenceConsumptionAux.getPkConsumptionId();
@@ -1037,10 +1054,12 @@ public abstract class SHrsUtils {
         return employeeHireLog;
     }
     
-    public static ArrayList<SHrsBenefit> readHrsBenefits(final SGuiSession session, final SDbEmployee employee, final int benefitType, final int aniversaryLimit, final int benefitYearAux, final int payrrollId) throws Exception {
+    public static ArrayList<SHrsBenefit> readHrsBenefits(final SGuiSession session, final SDbEmployee employee, final int benefitType, final int aniversaryLimit, final int benefitYearAux, final int payrrollId, final ArrayList<SHrsBenefitTableByAnniversary> benefitTableByAnniversary, final ArrayList<SHrsBenefitTableByAnniversary> benefitTableByAnniversaryAux, final double paymentDaily) throws Exception {
         boolean foundAnniversary = false;
         ArrayList<SHrsBenefit> aHrsBenefits = new ArrayList<SHrsBenefit>();
         SHrsBenefit hrsBenefit = null;
+        SHrsBenefitTableByAnniversary benefitTableRow = null;
+        SHrsBenefitTableByAnniversary benefitTableRowAux = null;
         String sql = "";
         ResultSet resultSet = null;
         
@@ -1070,7 +1089,53 @@ public abstract class SHrsUtils {
             aHrsBenefits.add(hrsBenefit);
         }
         
+        // To complete benefits registries accumulated by benefit type:
+        
+        for (SHrsBenefit benefit : aHrsBenefits) {
+            for (SHrsBenefitTableByAnniversary row : benefitTableByAnniversary) {
+                if (row.getBenefitAnn() <= benefit.getBenefitAnn()) {
+                    benefitTableRow = row;
+                }
+            }
+
+            if (benefitType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
+                for (SHrsBenefitTableByAnniversary row : benefitTableByAnniversaryAux) {
+                    if (row.getBenefitAnn() <= benefit.getBenefitAnn()) {
+                        benefitTableRowAux = row;
+                    }
+                }
+            }
+
+            if (benefitType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
+                benefit.setValue(benefitTableRow == null || benefitTableRowAux == null ? 0d : benefitTableRowAux.getValue());
+                benefit.setAmount(benefitTableRow == null || benefitTableRowAux == null ? 0d : benefitTableRowAux.getValue() * paymentDaily * benefitTableRow.getValue());
+            }
+            else {
+                benefit.setValue(benefitTableRow == null ? 0d : benefitTableRow.getValue());
+                benefit.setAmount(benefitTableRow == null ? 0d : benefitTableRow.getValue() * paymentDaily);
+            }
+        }
+        
         return aHrsBenefits;
+    }
+    
+    public static int readScheduledDays(final SGuiSession session, final SDbEmployee employee, final int benefitType, final int benefitAnn, final int benefitYear, final int absenceId) throws Exception {
+        int scheduledDays = 0;
+        String sql = "";
+        ResultSet resultSet = null;
+
+         sql = "SELECT SUM(ac.eff_day) AS f_days " +
+                 "FROM hrs_abs AS a " +
+                 "INNER JOIN hrs_abs_cns AS ac ON a.id_emp = ac.id_emp AND a.id_abs = ac.id_abs " +
+                 "WHERE a.b_del = 0 AND ac.b_del = 0 AND a.id_emp = " + employee.getPkEmployeeId() + " AND a.id_abs <> " + absenceId + " AND a.ben_year = " + benefitYear + " AND a.ben_ann = " + benefitAnn + " " +
+                 "GROUP BY a.id_emp, a.id_abs ";
+         
+         resultSet = session.getStatement().executeQuery(sql);
+         if (resultSet.next()) {
+             scheduledDays = resultSet.getInt("f_days");
+         }
+         
+        return scheduledDays;
     }
     
     public static SHrsFormerPayroll readPayroll(final SClientInterface client, final int payrollId, final int payrollEmployeeId) throws SQLException, Exception {
@@ -1113,12 +1178,12 @@ public abstract class SHrsUtils {
                 "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) " +
                 "FROM hrs_pay_rcp AS r " +
                 "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = r.id_pay AND rcp_ded.id_emp = r.id_emp " +
-                "WHERE r.id_pay = p.id_pay AND rcp_ded.fk_ded IN (" + deductionsTaxRetained + ")) AS f_rent_ret, " +
+                "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.fk_ded IN (" + deductionsTaxRetained + ")) AS f_rent_ret, " +
                 "'SUELDOS Y SALARIOS ' AS f_descrip, p.fk_tp_pay " +
                 "FROM hrs_pay AS p " +
                 "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
                 "INNER JOIN erp.hrss_tp_pay AS tp ON p.fk_tp_pay = tp.id_tp_pay " +
-                "WHERE rcp.id_pay = " + payrollId + " AND rcp.id_emp = " + payrollEmployeeId + " " +
+                "WHERE rcp.id_pay = " + payrollId + " AND rcp.b_del = 0 AND rcp.id_emp = " + payrollEmployeeId + " " +
                 "GROUP BY p.per_year, p.per, tp.code, p.num, p.id_pay, f_date, p.dt_sta, p.dt_end " +
                 "ORDER BY p.per_year DESC, p.per DESC, tp.code, p.num, p.id_pay, f_date, p.dt_sta, p.dt_end; ";
         
@@ -1177,7 +1242,7 @@ public abstract class SHrsUtils {
                 "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) " +
                 "FROM hrs_pay_rcp AS r " +
                 "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = r.id_pay AND rcp_ded.id_emp = r.id_emp " +
-                "WHERE r.id_pay = p.id_pay AND rcp_ded.id_emp = rcp.id_emp AND rcp_ded.fk_ded IN (" + deductionsTaxRetained + ")) AS f_emp_tot_rent_ret, " +
+                "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.id_emp = rcp.id_emp AND rcp_ded.fk_ded IN (" + deductionsTaxRetained + ")) AS f_emp_tot_rent_ret, " +
                 "SUM(rcp.pay_r) AS f_emp_tot_net, NOW() AS f_emp_date_edit " +
                 "FROM hrs_pay AS p " +
                 "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
@@ -1189,7 +1254,7 @@ public abstract class SHrsUtils {
                 "INNER JOIN erp.hrsu_tp_emp AS et ON et.id_tp_emp = rcp.fk_tp_emp " +
                 "INNER JOIN erp.hrss_tp_pos_risk AS ris ON ris.id_tp_pos_risk = rcp.fk_tp_pos_risk " +
                 "INNER JOIN erp.hrss_tp_pay AS tp ON p.fk_tp_pay = tp.id_tp_pay " +
-                "WHERE rcp.id_pay = " + payrollId + " AND rcp.id_emp = " + payrollEmployeeId + " " +
+                "WHERE rcp.id_pay = " + payrollId + " AND rcp.b_del = 0 AND rcp.id_emp = " + payrollEmployeeId + " " +
                 "GROUP BY bp.bp, f_emp_map_bp, f_emp_num, f_emp_curp, f_emp_nss, f_emp_reg_tp, f_emp_dias_pag, f_emp_dep, f_emp_dep_cve, d.id_dep, f_emp_bank, f_emp_alta, f_nom_date_start, f_nom_date_end, " +
                 "f_emp_sen, f_emp_pos, f_emp_pay, f_emp_sal_bc, f_emp_risk " +
                 "ORDER BY bp.bp, f_emp_map_bp, f_emp_num, f_emp_curp, f_emp_nss, f_emp_reg_tp, f_emp_dias_pag, f_emp_dep, f_emp_dep_cve, d.id_dep, f_emp_bank, f_emp_alta, f_nom_date_start, f_nom_date_end, " +
@@ -1299,8 +1364,8 @@ public abstract class SHrsUtils {
                         "CASE WHEN ear.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_OVR_TME + " AND ear.unt_fac = " + SHrsConsts.OVER_TIME_3X + " THEN " + SCfdConsts.CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_TRIPLE[1] + " ELSE " + 
                         "" + SCfdConsts.CFDI_PAYROLL_PERCEPTION_PERCEPTION[1] + " END END AS f_conc_stp " +
                         "FROM hrs_pay AS p " +
-                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                        "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
+                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay AND rcp.b_del = 0 " +
+                        "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp AND rcp_ear.b_del = 0 " +
                         "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
                         "INNER JOIN erp.hrss_tp_ear_comp AS comp ON comp.id_tp_ear_comp = ear.fk_tp_ear_comp " +
                         "WHERE p.id_pay = " + payrollId + " AND rcp.id_emp = " + f_emp_id + "; ";
@@ -1349,7 +1414,7 @@ public abstract class SHrsUtils {
                         "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
                         "LEFT OUTER JOIN hrs_loan AS l ON l.id_emp = rcp_ded.fk_loan_emp_n AND l.id_loan = rcp_ded.fk_loan_loan_n " +
                         "LEFT OUTER JOIN erp.hrss_tp_loan AS ltp ON ltp.id_tp_loan = rcp_ded.fk_tp_loan_n " +
-                        "WHERE p.id_pay = " + payrollId + " AND rcp.id_emp = " + f_emp_id + "; ";
+                        "WHERE p.id_pay = " + payrollId + " AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND rcp.id_emp = " + f_emp_id + "; ";
 
                 resultSetAux = statementAux.executeQuery(sql);
                 while (resultSetAux.next()) {

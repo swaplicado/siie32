@@ -5,10 +5,13 @@
 package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbAbsence;
 import erp.mod.hrs.db.SDbAbsenceConsumption;
+import erp.mod.hrs.db.SDbBenefitTable;
+import erp.mod.hrs.db.SHrsBenefit;
+import erp.mod.hrs.db.SHrsBenefitTableByAnniversary;
 import erp.mod.hrs.db.SHrsPayrollReceipt;
-import erp.mod.hrs.db.SHrsPayrollReceiptEarning;
 import erp.mod.hrs.db.SHrsUtils;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -19,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
 import javax.swing.JFormattedTextField;
+import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import sa.lib.SLibConsts;
@@ -48,6 +52,11 @@ public class SDialogPayrollEmployeeAbsence extends SBeanFormDialog implements Ac
     
     protected int mnAbsenceConsumptionPendingDays;
     protected int mnDiferenceDays;
+    protected SDbBenefitTable moBenefit;
+    protected SHrsBenefit moHrsBenefit;
+    protected ArrayList<SHrsBenefit> maHrsBenefits;
+    protected ArrayList<SHrsBenefitTableByAnniversary> maBenefitTableByAnniversary;
+    protected boolean mbIsEditAmount;
 
     /**
      * Creates new form SDialogPayrollEmployeeAbsence
@@ -68,6 +77,19 @@ public class SDialogPayrollEmployeeAbsence extends SBeanFormDialog implements Ac
 
         jPanel1 = new javax.swing.JPanel();
         jpAbsence = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
+        jpBenefit = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        jlAnniversary = new javax.swing.JLabel();
+        moIntBenefitAnn = new sa.lib.gui.bean.SBeanFieldInteger();
+        moIntBenefitYear = new sa.lib.gui.bean.SBeanFieldInteger();
+        jPanel5 = new javax.swing.JPanel();
+        jlDaysToPaidTable = new javax.swing.JLabel();
+        moIntDaysToPaidTable = new sa.lib.gui.bean.SBeanFieldInteger();
+        jPanel11 = new javax.swing.JPanel();
+        jlDaysPayed = new javax.swing.JLabel();
+        moDecDaysPayed = new sa.lib.gui.bean.SBeanFieldDecimal();
         jpAbsenceConsumption = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
@@ -89,12 +111,61 @@ public class SDialogPayrollEmployeeAbsence extends SBeanFormDialog implements Ac
         jpAbsence.setLayout(new java.awt.BorderLayout());
         jPanel1.add(jpAbsence, java.awt.BorderLayout.CENTER);
 
+        jPanel3.setLayout(new java.awt.BorderLayout());
+
+        jpBenefit.setBorder(javax.swing.BorderFactory.createTitledBorder("Consumo prestación:"));
+        jpBenefit.setLayout(new java.awt.BorderLayout());
+
+        jPanel6.setLayout(new java.awt.GridLayout(3, 0));
+
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlAnniversary.setText("Aniversario:");
+        jlAnniversary.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel4.add(jlAnniversary);
+
+        moIntBenefitAnn.setToolTipText("Año aniversario");
+        moIntBenefitAnn.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel4.add(moIntBenefitAnn);
+
+        moIntBenefitYear.setToolTipText("Año aniversario");
+        moIntBenefitYear.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel4.add(moIntBenefitYear);
+
+        jPanel6.add(jPanel4);
+
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDaysToPaidTable.setText("Días:");
+        jlDaysToPaidTable.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel5.add(jlDaysToPaidTable);
+
+        moIntDaysToPaidTable.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel5.add(moIntDaysToPaidTable);
+
+        jPanel6.add(jPanel5);
+
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDaysPayed.setText("Días pagados:");
+        jlDaysPayed.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel11.add(jlDaysPayed);
+
+        moDecDaysPayed.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel11.add(moDecDaysPayed);
+
+        jPanel6.add(jPanel11);
+
+        jpBenefit.add(jPanel6, java.awt.BorderLayout.CENTER);
+
+        jPanel3.add(jpBenefit, java.awt.BorderLayout.WEST);
+
         jpAbsenceConsumption.setBorder(javax.swing.BorderFactory.createTitledBorder("Consumo incidencia:"));
         jpAbsenceConsumption.setLayout(new java.awt.BorderLayout());
 
         jPanel2.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
-        jPanel8.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateStart.setText("Fecha inicial:*");
         jlDateStart.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -105,7 +176,7 @@ public class SDialogPayrollEmployeeAbsence extends SBeanFormDialog implements Ac
 
         jPanel2.add(jPanel8);
 
-        jPanel9.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateEnd.setText("Fecha final:*");
         jlDateEnd.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -114,18 +185,22 @@ public class SDialogPayrollEmployeeAbsence extends SBeanFormDialog implements Ac
 
         jPanel2.add(jPanel9);
 
-        jPanel10.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlEffectiveDays.setText("Días efectivos:*");
         jlEffectiveDays.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel10.add(jlEffectiveDays);
+
+        moIntEffectiveDays.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel10.add(moIntEffectiveDays);
 
         jPanel2.add(jPanel10);
 
         jpAbsenceConsumption.add(jPanel2, java.awt.BorderLayout.NORTH);
 
-        jPanel1.add(jpAbsenceConsumption, java.awt.BorderLayout.SOUTH);
+        jPanel3.add(jpAbsenceConsumption, java.awt.BorderLayout.CENTER);
+
+        jPanel1.add(jPanel3, java.awt.BorderLayout.SOUTH);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
@@ -135,21 +210,34 @@ public class SDialogPayrollEmployeeAbsence extends SBeanFormDialog implements Ac
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JLabel jlAnniversary;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
+    private javax.swing.JLabel jlDaysPayed;
+    private javax.swing.JLabel jlDaysToPaidTable;
     private javax.swing.JLabel jlEffectiveDays;
     private javax.swing.JPanel jpAbsence;
     private javax.swing.JPanel jpAbsenceConsumption;
+    private javax.swing.JPanel jpBenefit;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecDaysPayed;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntBenefitAnn;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntBenefitYear;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntDaysToPaidTable;
     private sa.lib.gui.bean.SBeanFieldInteger moIntEffectiveDays;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 560, 350);
+        SGuiUtils.setWindowBounds(this, 720, 450);
         
         moAbsence = null;
         mnAbsenceConsumptionPendingDays = 0;
@@ -157,10 +245,20 @@ public class SDialogPayrollEmployeeAbsence extends SBeanFormDialog implements Ac
         moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart.getText()), true);
         moDateDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd.getText()), true);
         moIntEffectiveDays.setIntegerSettings(SGuiUtils.getLabelName(jlEffectiveDays.getText()), SGuiConsts.GUI_TYPE_INT, true);
+        moIntBenefitAnn.setIntegerSettings(SGuiUtils.getLabelName(jlAnniversary.getText()), SGuiConsts.GUI_TYPE_INT, false);
+        moIntBenefitYear.setIntegerSettings(SGuiUtils.getLabelName(jlAnniversary.getText()), SGuiConsts.GUI_TYPE_INT_CAL_YEAR, false);
+        moIntDaysToPaidTable.setIntegerSettings(SGuiUtils.getLabelName(jlDaysToPaidTable.getText()), SGuiConsts.GUI_TYPE_INT, false);
+        moDecDaysPayed.setDecimalSettings(SGuiUtils.getLabelName(jlDaysPayed.getText()), SGuiConsts.GUI_TYPE_DEC_QTY, false);
         
         moFields.addField(moDateDateStart);
         moFields.addField(moDateDateEnd);
         moFields.addField(moIntEffectiveDays);
+        /*
+        moFields.addField(moIntBenefitAnn);
+        moFields.addField(moIntBenefitYear);
+        moFields.addField(moIntDaysToPaidTable);
+        moFields.addField(moDecDaysPayed);
+        */
         
         moFields.setFormButton(jbSave);
         
@@ -195,6 +293,71 @@ public class SDialogPayrollEmployeeAbsence extends SBeanFormDialog implements Ac
         addAllListeners();
         
         moDateDateStart.setEditable(false);
+        moIntBenefitAnn.setEditable(false);
+        moIntBenefitYear.setEditable(false);
+        moIntDaysToPaidTable.setEditable(false);
+        moDecDaysPayed.setEditable(false);
+    }
+    
+    private void loadBenefitTables() throws Exception {
+        ArrayList<SDbBenefitTable> aBenefitTables = new ArrayList<SDbBenefitTable>();
+        
+        if (moReceipt.getHrsPayroll().getConfig().getFkEarningVacationsId_n() == SLibConsts.UNDEFINED) {
+            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración vacaciones)");
+        }
+        
+        moBenefit = SHrsUtils.getBenefitTableByEarning(miClient.getSession(), moReceipt.getHrsPayroll().getConfig().getFkEarningVacationsId_n(), moReceipt.getHrsEmployee().getEmployee().getFkPaymentTypeId(), moReceipt.getHrsPayroll().getPayroll().getDateEnd());
+        
+        if (moBenefit == null) {
+            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Tabla de prestaciones adecuada para la fecha de corte)");
+        }
+        aBenefitTables.add(moBenefit);
+        
+        maBenefitTableByAnniversary = SHrsUtils.getBenefitTablesAnniversarys(aBenefitTables);
+    }
+    
+    private void readHrsBenefitAcummulate(int seniority, int benefitYear) {
+        try {
+            loadBenefitTables();
+            
+            maHrsBenefits = SHrsUtils.readHrsBenefits(miClient.getSession(), moReceipt.getHrsEmployee().getEmployee(), SModSysConsts.HRSS_TP_BEN_VAC, seniority, benefitYear, moReceipt.getHrsPayroll().getPayroll().getPkPayrollId(), maBenefitTableByAnniversary, null, moReceipt.getReceipt().getPaymentDaily());
+            
+            moIntBenefitAnn.setValue(seniority);
+            moIntBenefitYear.setValue(benefitYear);
+            
+            for (SHrsBenefit hrsBenefit : maHrsBenefits) {
+                if (SLibUtils.compareKeys(hrsBenefit.getPrimaryBenefitType(), new int[] { SModSysConsts.HRSS_TP_BEN_VAC, seniority, benefitYear })) {
+                    hrsBenefit.setValuePayedReceipt(moReceipt.getBenefitValue(SModSysConsts.HRSS_TP_BEN_VAC, hrsBenefit.getBenefitAnn(), hrsBenefit.getBenefitYear()));
+                    hrsBenefit.setAmountPayedReceipt(moReceipt.getBenefitAmount(SModSysConsts.HRSS_TP_BEN_VAC, hrsBenefit.getBenefitAnn(), hrsBenefit.getBenefitYear()));
+                    moIntDaysToPaidTable.setValue((int) hrsBenefit.getValue());
+                    moDecDaysPayed.setValue(hrsBenefit.getValuePayed() + hrsBenefit.getValuePayedReceipt());
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
+    
+    private void createHrsBenefit() {
+        double amountSys = 0;
+        moHrsBenefit = new SHrsBenefit(mnFormType,  moIntBenefitAnn.getValue(), moIntBenefitYear.getValue());
+        
+        for (SHrsBenefit hrsBenefit : maHrsBenefits) {
+            if (SLibUtils.compareKeys(hrsBenefit.getPrimaryBenefitType(), new int[] { SModSysConsts.HRSS_TP_BEN_VAC, moIntBenefitAnn.getValue(), moIntBenefitYear.getValue() })) {
+                moHrsBenefit.setValue(hrsBenefit.getValue());
+                moHrsBenefit.setValuePayed(hrsBenefit.getValuePayed());
+                moHrsBenefit.setAmount(hrsBenefit.getAmount());
+                moHrsBenefit.setAmountPayed(hrsBenefit.getAmountPayed());
+            }
+        }
+        amountSys = SLibUtils.round(moIntEffectiveDays.getValue() * moReceipt.getReceipt().getPaymentDaily(), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+        
+        moHrsBenefit.setFactorAmount(0d);
+        moHrsBenefit.setEditAmount(false);
+        moHrsBenefit.setValuePayedReceipt(moIntEffectiveDays.getValue());
+        moHrsBenefit.setAmountPayedReceipt(amountSys);
+        moHrsBenefit.setAmountPayedReceiptSys(amountSys);
     }
     
     private void populateAbsence() {
@@ -230,6 +393,16 @@ public class SDialogPayrollEmployeeAbsence extends SBeanFormDialog implements Ac
             mnAbsenceConsumptionPendingDays = moAbsence.getEffectiveDays() - SHrsUtils.getConsumptionPreviousDays(moAbsence, moReceipt.getHrsEmployee());
 
             moDateDateStart.setValue(dateConsumptionLast == null ? moAbsence.getDateStart() : SLibTimeUtils.addDate(dateConsumptionLast, 0, 0, 1));
+            
+            if (moAbsence.getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_VAC) {
+                readHrsBenefitAcummulate(moAbsence.getBenefitsAniversary(), moAbsence.getBenefitsYear());
+            }
+            else {
+                moIntBenefitAnn.setValue(0);
+                moIntBenefitYear.setValue(0);
+                moIntDaysToPaidTable.setValue(0);
+                moDecDaysPayed.setValue(0d);
+            }
         }
     }
     
@@ -268,7 +441,36 @@ public class SDialogPayrollEmployeeAbsence extends SBeanFormDialog implements Ac
 
     @Override
     public SGuiValidation validateForm() {
+        String msg = "";
         SGuiValidation validation = moFields.validateFields();
+        
+        try {
+            if (validation.isValid()) {
+                if (moAbsence.getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_VAC) {
+                    createHrsBenefit();
+
+                    msg = moHrsBenefit.validate(SHrsBenefit.VALID_DAYS_TO_PAID, SHrsBenefit.VALIDATION_ABSENCE_TYPE);
+                    if (!msg.isEmpty()) {
+                        validation.setMessage(msg);
+                        validation.setComponent(moIntEffectiveDays);
+                    }
+                    
+                    if (validation.isValid()) {
+                        msg = moHrsBenefit.validate(SHrsBenefit.VALID_DAYS_TO_PAID_TOTAL, SHrsBenefit.VALIDATION_ABSENCE_TYPE);
+                        
+                        if (!msg.isEmpty()) {
+                            if (miClient.showMsgBoxConfirm(msg + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.NO_OPTION) {
+                                validation.setMessage(msg);
+                                validation.setComponent(moIntEffectiveDays);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
         
         return validation;
     }
@@ -292,7 +494,6 @@ public class SDialogPayrollEmployeeAbsence extends SBeanFormDialog implements Ac
     
     @Override
     public void actionSave() {
-        ArrayList<SHrsPayrollReceiptEarning> aEarningDelete = null;
         SDbAbsenceConsumption absenceConsumption = null;
         
         if (SGuiUtils.computeValidation(miClient, validateForm())) {
@@ -301,7 +502,6 @@ public class SDialogPayrollEmployeeAbsence extends SBeanFormDialog implements Ac
                     miClient.showMsgBoxWarning("No se ha especificado un valor para la fecha inicial.");
                 }
                 else {
-                    aEarningDelete = new ArrayList<SHrsPayrollReceiptEarning>();
                     absenceConsumption = moReceipt.getHrsEmployee().getHrsPayrollReceipt().createAbsenceConsumption(moAbsence, moDateDateStart.getValue(), moDateDateEnd.getValue(), moIntEffectiveDays.getValue());
 
                     moReceipt.getHrsEmployee().getHrsPayrollReceipt().addAbsenceConsumption(moAbsence, absenceConsumption);

@@ -82,6 +82,7 @@ public class SHrsPayroll {
         // Get earnings of withholding:
 
         move = 1;
+        /* XXX jbarajas (07-09-2015) this field is for correction purposes of deductions, not for add automatic earning.
         for (SDbEarning earning : maEarnigs) {
 
             if (earning.isWithholding()) {
@@ -99,6 +100,7 @@ public class SHrsPayroll {
                 move++;
             }
         }
+        */
 
         // Get automatic earnings:
 
@@ -125,89 +127,91 @@ public class SHrsPayroll {
             move++;
         }
 
-        // Add earning and vacations:
-        
-        unitAlleged = hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getDaysWorked();
+        if (moPayroll.isNormal()) {
+            // Add earning and vacations:
 
-        for (SDbAbsenceConsumption receiptAbsenceConsumption: hrsPayrollReceipt.getAbsenceConsumptionDays()) {
-            if (receiptAbsenceConsumption.getAbsence().getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_VAC) {
-                vacationDays += receiptAbsenceConsumption.getEffectiveDays();
-            }
-        }
-        
-        /*
-        for (SDbPayrollReceiptDay receiptDay: hrsPayrollReceipt.getEffectiveDays()) {
-            if (receiptDay.getFkDayTypeId() == SModSysConsts.HRSS_TP_DAY_WRK || receiptDay.getFkDayTypeId() == SModSysConsts.HRSS_TP_DAY_HOL) {
-                earningDays++;
-            }
-            else if (receiptDay.getFkDayTypeId() == SModSysConsts.HRSS_TP_DAY_ABS && receiptDay.getFkAbsenceClassId_n() == SModSysConsts.HRSU_CL_ABS_VAC) {
-                vacationDays++;
-            }
-        }
-        */
+            unitAlleged = hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getDaysWorked();
 
-        if (unitAlleged > 0 && moConfig.getFkEarningEarningId_n() == SLibConsts.UNDEFINED) {
-            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración percepción normal)");
-        }
-
-        if (moConfig.getFkEarningEarningId_n() != SLibConsts.UNDEFINED && unitAlleged > 0) {
-            for (SDbEarning earning : maEarnigs) {
-                if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
-                    amount_unt = unitAlleged;
-                }
-                else if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_DAY) {
-                    amount_unt = hrsPayrollReceipt.getReceipt().getPaymentDaily();
-                }
-                else if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_HRS) {
-                    amount_unt = hrsPayrollReceipt.getReceipt().getPaymentHourly();
-                }
-                unit = !earning.isDaysAdjustment() ? unitAlleged * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : (unitAlleged * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid());
-                amount = SLibUtils.round((unit * amount_unt), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-                
-                if (SLibUtils.compareKeys(earning.getPrimaryKey(), new int[] { moConfig.getFkEarningEarningId_n() })) {
-                    hrsPayrollReceiptEarning = new SHrsPayrollReceiptEarning();
-                    hrsPayrollReceiptEarning.setEarning(earning);
-
-                    payrollReceiptEarning = createHrsPayrollReceiptEarning(employeeId, unitAlleged, amount_unt, amount, true, earning,
-                        SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, earning.getFkLoanTypeId(), hrsPayrollReceipt);
-
-                    hrsPayrollReceiptEarning.setReceiptEarning(payrollReceiptEarning);
-                    hrsPayrollReceiptEarning.setPkMoveId(move);
-                    hrsPayrollReceiptEarning.setHrsReceipt(hrsPayrollReceipt);
-                    aHrsPayrollReceiptEarnings.add(hrsPayrollReceiptEarning);
-
-                    move++;
+            for (SDbAbsenceConsumption receiptAbsenceConsumption: hrsPayrollReceipt.getAbsenceConsumptions()) {
+                if (receiptAbsenceConsumption.getAbsence().getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_VAC) {
+                    vacationDays += receiptAbsenceConsumption.getEffectiveDays();
                 }
             }
-        }
 
-        /*
-        if (vacationDays > 0 && moConfig.getFkEarningVacationsId_n() == SLibConsts.UNDEFINED) {
-            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración vacaciones)");
-        }
-
-        if (moConfig.getFkEarningVacationsId_n() != SLibConsts.UNDEFINED && vacationDays > 0) {
-            for (SDbEarning earning : maEarnigs) {
-                if (SLibUtils.compareKeys(earning.getPrimaryKey(), new int[] { moConfig.getFkEarningVacationsId_n() })) {
-                    hrsPayrollReceiptEarning = new SHrsPayrollReceiptEarning();
-                    hrsPayrollReceiptEarning.setEarning(earning);
-
-                    payrollReceiptEarning = createHrsPayrollReceiptEarning(employeeId, vacationDays, 0, 0, true, earning,
-                        SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, earning.getFkLoanTypeId(), hrsPayrollReceipt);
-
-                    hrsPayrollReceiptEarning.setReceiptEarning(payrollReceiptEarning);
-                    hrsPayrollReceiptEarning.setPkMoveId(move);
-                    hrsPayrollReceiptEarning.setHrsReceipt(hrsPayrollReceipt);
-                    aHrsPayrollReceiptEarnings.add(hrsPayrollReceiptEarning);
-
-                    move++;
+            /*
+            for (SDbPayrollReceiptDay receiptDay: hrsPayrollReceipt.getEffectiveDays()) {
+                if (receiptDay.getFkDayTypeId() == SModSysConsts.HRSS_TP_DAY_WRK || receiptDay.getFkDayTypeId() == SModSysConsts.HRSS_TP_DAY_HOL) {
+                    earningDays++;
+                }
+                else if (receiptDay.getFkDayTypeId() == SModSysConsts.HRSS_TP_DAY_ABS && receiptDay.getFkAbsenceClassId_n() == SModSysConsts.HRSU_CL_ABS_VAC) {
+                    vacationDays++;
                 }
             }
-        }
-        */
-        
-        for (SHrsPayrollReceiptEarning hrsPayrollReceiptEarningRow : getHrsPayrollReceiptEarningAbsence(hrsPayrollReceipt.getAbsenceConsumptionDays(), hrsPayrollReceipt)) {
-            aHrsPayrollReceiptEarnings.add(hrsPayrollReceiptEarningRow);
+            */
+
+            if (unitAlleged > 0 && moConfig.getFkEarningEarningId_n() == SLibConsts.UNDEFINED) {
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración percepción normal)");
+            }
+
+            if (moConfig.getFkEarningEarningId_n() != SLibConsts.UNDEFINED && unitAlleged > 0) {
+                for (SDbEarning earning : maEarnigs) {
+                    if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
+                        amount_unt = unitAlleged;
+                    }
+                    else if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_DAY) {
+                        amount_unt = hrsPayrollReceipt.getReceipt().getPaymentDaily();
+                    }
+                    else if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_HRS) {
+                        amount_unt = hrsPayrollReceipt.getReceipt().getPaymentHourly();
+                    }
+                    unit = !earning.isDaysAdjustment() ? unitAlleged * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : (unitAlleged * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid());
+                    amount = SLibUtils.round((unit * amount_unt), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+
+                    if (SLibUtils.compareKeys(earning.getPrimaryKey(), new int[] { moConfig.getFkEarningEarningId_n() })) {
+                        hrsPayrollReceiptEarning = new SHrsPayrollReceiptEarning();
+                        hrsPayrollReceiptEarning.setEarning(earning);
+
+                        payrollReceiptEarning = createHrsPayrollReceiptEarning(employeeId, unitAlleged, amount_unt, amount, true, earning,
+                            SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, earning.getFkLoanTypeId(), hrsPayrollReceipt);
+
+                        hrsPayrollReceiptEarning.setReceiptEarning(payrollReceiptEarning);
+                        hrsPayrollReceiptEarning.setPkMoveId(move);
+                        hrsPayrollReceiptEarning.setHrsReceipt(hrsPayrollReceipt);
+                        aHrsPayrollReceiptEarnings.add(hrsPayrollReceiptEarning);
+
+                        move++;
+                    }
+                }
+            }
+
+            /*
+            if (vacationDays > 0 && moConfig.getFkEarningVacationsId_n() == SLibConsts.UNDEFINED) {
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración vacaciones)");
+            }
+
+            if (moConfig.getFkEarningVacationsId_n() != SLibConsts.UNDEFINED && vacationDays > 0) {
+                for (SDbEarning earning : maEarnigs) {
+                    if (SLibUtils.compareKeys(earning.getPrimaryKey(), new int[] { moConfig.getFkEarningVacationsId_n() })) {
+                        hrsPayrollReceiptEarning = new SHrsPayrollReceiptEarning();
+                        hrsPayrollReceiptEarning.setEarning(earning);
+
+                        payrollReceiptEarning = createHrsPayrollReceiptEarning(employeeId, vacationDays, 0, 0, true, earning,
+                            SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, earning.getFkLoanTypeId(), hrsPayrollReceipt);
+
+                        hrsPayrollReceiptEarning.setReceiptEarning(payrollReceiptEarning);
+                        hrsPayrollReceiptEarning.setPkMoveId(move);
+                        hrsPayrollReceiptEarning.setHrsReceipt(hrsPayrollReceipt);
+                        aHrsPayrollReceiptEarnings.add(hrsPayrollReceiptEarning);
+
+                        move++;
+                    }
+                }
+            }
+            */
+
+            for (SHrsPayrollReceiptEarning hrsPayrollReceiptEarningRow : getHrsPayrollReceiptEarningAbsence(hrsPayrollReceipt.getAbsenceConsumptions(), hrsPayrollReceipt)) {
+                aHrsPayrollReceiptEarnings.add(hrsPayrollReceiptEarningRow);
+            }
         }
 
         return aHrsPayrollReceiptEarnings;
@@ -298,25 +302,27 @@ public class SHrsPayroll {
         ArrayList<SDbAutomaticDeduction> aAutomaticDeductions = new ArrayList<SDbAutomaticDeduction>();
 
         try {
-            // Get earnings of withholding:
+            if (moPayroll.isNormal()) {
+                // Get earnings of withholding:
 
-            move = 1;
-            for (SDbDeduction deduction : maDeductions) {
+                move = 1;
+                for (SDbDeduction deduction : maDeductions) {
 
-                if (deduction.isWithholding()) {
-                    hrsPayrollReceiptDeduction = new SHrsPayrollReceiptDeduction();
-                    hrsPayrollReceiptDeduction.setDeduction(deduction);
+                    if (deduction.isWithholding()) {
+                        hrsPayrollReceiptDeduction = new SHrsPayrollReceiptDeduction();
+                        hrsPayrollReceiptDeduction.setDeduction(deduction);
 
-                    payrollReceiptDeduction = createHrsPayrollReceiptDeduction(employeeId, 0, 0, 0, deduction,
-                        SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, deduction.getFkLoanTypeId());
+                        payrollReceiptDeduction = createHrsPayrollReceiptDeduction(employeeId, 0, 0, 0, deduction,
+                            SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, deduction.getFkLoanTypeId());
 
-                    payrollReceiptDeduction.setAutomatic(true);
-                    hrsPayrollReceiptDeduction.setReceiptDeduction(payrollReceiptDeduction);
-                    hrsPayrollReceiptDeduction.setPkMoveId(move);
-                    hrsPayrollReceiptDeduction.setHrsReceipt(hrsPayrollReceipt);
-                    aHrsPayrollReceiptDeductions.add(hrsPayrollReceiptDeduction);
+                        payrollReceiptDeduction.setAutomatic(true);
+                        hrsPayrollReceiptDeduction.setReceiptDeduction(payrollReceiptDeduction);
+                        hrsPayrollReceiptDeduction.setPkMoveId(move);
+                        hrsPayrollReceiptDeduction.setHrsReceipt(hrsPayrollReceipt);
+                        aHrsPayrollReceiptDeductions.add(hrsPayrollReceiptDeduction);
 
-                    move++;
+                        move++;
+                    }
                 }
             }
 
@@ -345,40 +351,42 @@ public class SHrsPayroll {
                 move++;
             }
 
-            // Get loans employee:
+            if (moPayroll.isNormal()) {
+                // Get loans employee:
 
-            for (SDbLoan loan : hrsPayrollReceipt.getHrsEmployee().getLoans()) {
-                hrsPayrollReceiptDeduction = new SHrsPayrollReceiptDeduction();
+                for (SDbLoan loan : hrsPayrollReceipt.getHrsEmployee().getLoans()) {
+                    hrsPayrollReceiptDeduction = new SHrsPayrollReceiptDeduction();
 
-                if ((SLibTimeUtils.isBelongingToPeriod(dateStart, loan.getDateStart(), loan.getDateEnd_n() == null ? dateEnd : loan.getDateEnd_n()) ||
-                        SLibTimeUtils.isBelongingToPeriod(dateEnd, loan.getDateStart(), loan.getDateEnd_n() == null ? dateEnd : loan.getDateEnd_n()))) {
-                    for (SDbDeduction deduction : maDeductions) {
-                        if (deduction.getFkLoanTypeId() == loan.getFkLoanTypeId()) {
-                            hrsPayrollReceiptDeduction.setDeduction(deduction);
-                            break;
+                    if ((SLibTimeUtils.isBelongingToPeriod(dateStart, loan.getDateStart(), loan.getDateEnd_n() == null ? dateEnd : loan.getDateEnd_n()) ||
+                            SLibTimeUtils.isBelongingToPeriod(dateEnd, loan.getDateStart(), loan.getDateEnd_n() == null ? dateEnd : loan.getDateEnd_n()))) {
+                        for (SDbDeduction deduction : maDeductions) {
+                            if (deduction.getFkLoanTypeId() == loan.getFkLoanTypeId()) {
+                                hrsPayrollReceiptDeduction.setDeduction(deduction);
+                                break;
+                            }
                         }
-                    }
 
-                    amountLoan = SHrsUtils.computeAmoutLoan(hrsPayrollReceipt, loan);
-                    
-                    if (loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA) {
-                        balanceLoan = SHrsUtils.getBalanceLoan(loan, hrsPayrollReceipt.getHrsEmployee());
+                        amountLoan = SHrsUtils.computeAmoutLoan(hrsPayrollReceipt, loan);
 
-                        amountLoan = (amountLoan > balanceLoan ? balanceLoan : amountLoan);
-                    }
+                        if (loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA) {
+                            balanceLoan = SHrsUtils.getBalanceLoan(loan, hrsPayrollReceipt.getHrsEmployee());
 
-                    if (amountLoan >= 0) {
-                        payrollReceiptDeduction = createHrsPayrollReceiptDeduction(employeeId, 1, amountLoan, amountLoan,
-                                hrsPayrollReceiptDeduction.getDeduction(), loan.getPkEmployeeId(), loan.getPkLoanId(),
-                                loan.getFkLoanTypeId());
+                            amountLoan = (amountLoan > balanceLoan ? balanceLoan : amountLoan);
+                        }
 
-                        payrollReceiptDeduction.setUserEdited(false);
-                        hrsPayrollReceiptDeduction.setReceiptDeduction(payrollReceiptDeduction);
-                        hrsPayrollReceiptDeduction.setPkMoveId(move);
-                        hrsPayrollReceiptDeduction.setHrsReceipt(hrsPayrollReceipt);
-                        aHrsPayrollReceiptDeductions.add(hrsPayrollReceiptDeduction);
+                        if (amountLoan >= 0) {
+                            payrollReceiptDeduction = createHrsPayrollReceiptDeduction(employeeId, 1, amountLoan, amountLoan,
+                                    hrsPayrollReceiptDeduction.getDeduction(), loan.getPkEmployeeId(), loan.getPkLoanId(),
+                                    loan.getFkLoanTypeId());
 
-                        move++;
+                            payrollReceiptDeduction.setUserEdited(false);
+                            hrsPayrollReceiptDeduction.setReceiptDeduction(payrollReceiptDeduction);
+                            hrsPayrollReceiptDeduction.setPkMoveId(move);
+                            hrsPayrollReceiptDeduction.setHrsReceipt(hrsPayrollReceipt);
+                            aHrsPayrollReceiptDeductions.add(hrsPayrollReceiptDeduction);
+
+                            move++;
+                        }
                     }
                 }
             }
@@ -740,21 +748,23 @@ public class SHrsPayroll {
         payrollReceipt.setFkPaymentSystemTypeId(SDataConstantsSys.TRNU_TP_PAY_SYS_NA);
         
         oHrsPayrollReceipt.setReceipt(payrollReceipt);
-        
-        // Get absence consumption:
-        
-        oHrsPayrollReceipt.getAbsenceConsumptionDays().addAll(getAbsenceConsumptionDays(oHrsPayrollReceipt, oHrsEmployee));
 
+        if (moPayroll.isNormal()) {
+            // Get absence consumption:
+
+            oHrsPayrollReceipt.getAbsenceConsumptions().addAll(getAbsenceConsumptionDays(oHrsPayrollReceipt, oHrsEmployee));
+        }
+        
         // Get earnings:
 
         oHrsPayrollReceipt.getHrsEarnings().addAll(getPayrollReceiptEarnings(oHrsPayrollReceipt, employeeId, dateStart, dateEnd));
-
-        // Compute payrollReceiptDays:
         
+        // Compute payrollReceiptDays:
+
         oHrsPayrollReceipt.computeDbPayrollReceiptDays();
 
         // Get deductions:
-
+            
         oHrsPayrollReceipt.getHrsDeductions().addAll(getPayrollReceiptDeductions(oHrsPayrollReceipt, employeeId, dateStart, dateEnd));
 
         // Compute payrollReceipt:
@@ -764,11 +774,14 @@ public class SHrsPayroll {
         // Add hrsReceipt:
 
         maReceipts.add(oHrsPayrollReceipt);
+        
+        oHrsPayrollReceipt.renumberEarnings();
+        oHrsPayrollReceipt.renumberDeductions();
 
         return oHrsPayrollReceipt;
     }
 
-    public void replaceReceipt(final int employeeId, final SHrsPayrollReceipt receipt) {
+    public void replaceReceipt(final int employeeId, final SHrsPayrollReceipt receipt, final boolean compute) {
         SHrsPayrollReceipt hrsPayrollReceipt = null;
 
         for (int i = 0; i < maReceipts.size(); i++) {
@@ -779,7 +792,15 @@ public class SHrsPayroll {
                 break;
             }
         }
-        computeReceipts();
+        //computeReceipts(); XXX jbarajas; only calculate receipt value 08-09-2015
+        if (compute) {
+            try {
+                receipt.computeReceipt();
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
+        }
     }
 
     public void removeReceipt(final int employeeId) {
@@ -793,7 +814,7 @@ public class SHrsPayroll {
                 break;
             }
         }
-        computeReceipts();
+        //computeReceipts(); XXX jbarajas; only calculate receipt value 08-09-2015
     }
 
     public void computeEmployees(final boolean isCopy) {

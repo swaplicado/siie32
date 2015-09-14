@@ -7,12 +7,18 @@ package erp.mod.hrs.form;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbAbsence;
+import erp.mod.hrs.db.SDbBenefitTable;
+import erp.mod.hrs.db.SDbConfig;
 import erp.mod.hrs.db.SDbEmployee;
+import erp.mod.hrs.db.SHrsBenefitTableByAnniversary;
+import erp.mod.hrs.db.SHrsUtils;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
 import javax.swing.JFormattedTextField;
+import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
@@ -36,11 +42,14 @@ import sa.lib.gui.bean.SBeanForm;
  */
 public class SFormAbsence extends SBeanForm implements ItemListener, FocusListener, ChangeListener {
 
-    private SDbAbsence moRegistry;
-    private SDbEmployee moEmployee;
-    private SGuiFieldKeyGroup moFieldKeyGroup;
+    protected SDbAbsence moRegistry;
+    protected SDbEmployee moEmployee;
+    protected SGuiFieldKeyGroup moFieldKeyGroup;
     
-    private int mnWorkingDays;
+    protected int mnWorkingDays;
+    protected SDbConfig moConfig;
+    protected SDbBenefitTable moBenefit;
+    protected ArrayList<SHrsBenefitTableByAnniversary> maBenefitTableByAnniversary;
 
     /**
      * Creates new form SFormAbsence
@@ -84,13 +93,19 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
         jPanel9 = new javax.swing.JPanel();
         jlDateEnd = new javax.swing.JLabel();
         moDateDateEnd = new sa.lib.gui.bean.SBeanFieldDate();
-        jPanel10 = new javax.swing.JPanel();
-        jlEffectiveDays = new javax.swing.JLabel();
-        moIntEffectiveDays = new sa.lib.gui.bean.SBeanFieldInteger();
         jPanel11 = new javax.swing.JPanel();
         jlBenefitAnniversary = new javax.swing.JLabel();
         jsAnniversary = new javax.swing.JSpinner();
         moIntBenefitYear = new sa.lib.gui.bean.SBeanFieldInteger();
+        jPanel15 = new javax.swing.JPanel();
+        jlDaysToPaidTable = new javax.swing.JLabel();
+        moIntDaysToPaidTable = new sa.lib.gui.bean.SBeanFieldInteger();
+        jPanel16 = new javax.swing.JPanel();
+        jlScheduledDays = new javax.swing.JLabel();
+        moIntScheduledDays = new sa.lib.gui.bean.SBeanFieldInteger();
+        jPanel10 = new javax.swing.JPanel();
+        jlEffectiveDays = new javax.swing.JLabel();
+        moIntEffectiveDays = new sa.lib.gui.bean.SBeanFieldInteger();
         jPanel12 = new javax.swing.JPanel();
         jlNotes = new javax.swing.JLabel();
         moTextNotes = new sa.lib.gui.bean.SBeanFieldText();
@@ -100,9 +115,9 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(11, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(13, 1, 0, 5));
 
-        jPanel14.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlEmployee.setForeground(new java.awt.Color(0, 0, 255));
         jlEmployee.setText("Empleado:*");
@@ -114,7 +129,7 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
 
         jPanel2.add(jPanel14);
 
-        jPanel5.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDate.setText("Fecha registro:*");
         jlDate.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -123,7 +138,7 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
 
         jPanel2.add(jPanel5);
 
-        jPanel6.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlAbsenceClass.setText("Clase incidencia:*");
         jlAbsenceClass.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -134,7 +149,7 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
 
         jPanel2.add(jPanel6);
 
-        jPanel7.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlAbsenceType.setText("Tipo incidencia:*");
         jlAbsenceType.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -145,7 +160,7 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
 
         jPanel2.add(jPanel7);
 
-        jPanel4.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlNumber.setText("Número o folio:*");
         jlNumber.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -157,7 +172,7 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
 
         jPanel2.add(jPanel4);
 
-        jPanel8.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateStart.setText("Fecha inicial:*");
         jlDateStart.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -166,7 +181,7 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
 
         jPanel2.add(jPanel8);
 
-        jPanel9.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateEnd.setText("Fecha final:*");
         jlDateEnd.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -175,22 +190,13 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
 
         jPanel2.add(jPanel9);
 
-        jPanel10.setLayout(new java.awt.FlowLayout(0, 5, 0));
-
-        jlEffectiveDays.setText("Días efectivos:*");
-        jlEffectiveDays.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel10.add(jlEffectiveDays);
-        jPanel10.add(moIntEffectiveDays);
-
-        jPanel2.add(jPanel10);
-
-        jPanel11.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBenefitAnniversary.setText("Aniversario:*");
         jlBenefitAnniversary.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel11.add(jlBenefitAnniversary);
 
-        jsAnniversary.setPreferredSize(new java.awt.Dimension(75, 23));
+        jsAnniversary.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel11.add(jsAnniversary);
 
         moIntBenefitYear.setToolTipText("Año aniversario");
@@ -199,7 +205,34 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
 
         jPanel2.add(jPanel11);
 
-        jPanel12.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDaysToPaidTable.setText("Días:");
+        jlDaysToPaidTable.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel15.add(jlDaysToPaidTable);
+        jPanel15.add(moIntDaysToPaidTable);
+
+        jPanel2.add(jPanel15);
+
+        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlScheduledDays.setText("Días programados:");
+        jlScheduledDays.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel16.add(jlScheduledDays);
+        jPanel16.add(moIntScheduledDays);
+
+        jPanel2.add(jPanel16);
+
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlEffectiveDays.setText("Días efectivos:*");
+        jlEffectiveDays.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel10.add(jlEffectiveDays);
+        jPanel10.add(moIntEffectiveDays);
+
+        jPanel2.add(jPanel10);
+
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlNotes.setText("Notas:");
         jlNotes.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -211,7 +244,7 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
 
         jPanel2.add(jPanel12);
 
-        jPanel13.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         moBoolClosed.setText("Registro cerrado");
         moBoolClosed.setEnabled(false);
@@ -232,6 +265,8 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -246,17 +281,21 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
     private javax.swing.JLabel jlDate;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
+    private javax.swing.JLabel jlDaysToPaidTable;
     private javax.swing.JLabel jlEffectiveDays;
     private javax.swing.JLabel jlEmployee;
     private javax.swing.JLabel jlNotes;
     private javax.swing.JLabel jlNumber;
+    private javax.swing.JLabel jlScheduledDays;
     private javax.swing.JSpinner jsAnniversary;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolClosed;
     private sa.lib.gui.bean.SBeanFieldDate moDateDate;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
     private sa.lib.gui.bean.SBeanFieldInteger moIntBenefitYear;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntDaysToPaidTable;
     private sa.lib.gui.bean.SBeanFieldInteger moIntEffectiveDays;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntScheduledDays;
     private sa.lib.gui.bean.SBeanFieldKey moKeyAbsenceClass;
     private sa.lib.gui.bean.SBeanFieldKey moKeyAbsenceType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEmployee;
@@ -269,7 +308,7 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
      */
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 640, 400);
+        SGuiUtils.setWindowBounds(this, 720, 450);
 
         moFieldKeyGroup = new SGuiFieldKeyGroup(miClient);
         moFieldKeyGroup.addFieldKey(moKeyAbsenceClass, SModConsts.HRSU_CL_ABS, SLibConsts.UNDEFINED, null);
@@ -282,9 +321,11 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
         moTextNumber.setTextSettings(SGuiUtils.getLabelName(jlNumber.getText()), 10);
         moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart.getText()), true);
         moDateDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd.getText()), true);
-        moIntEffectiveDays.setIntegerSettings(SGuiUtils.getLabelName(jlEffectiveDays.getText()), SGuiConsts.GUI_TYPE_INT, true);
         jsAnniversary.setModel(new SpinnerNumberModel(1, 1, 100, 1));
         moIntBenefitYear.setIntegerSettings(SGuiUtils.getLabelName(jlBenefitAnniversary.getText()), SGuiConsts.GUI_TYPE_INT_CAL_YEAR, true);
+        moIntDaysToPaidTable.setIntegerSettings(SGuiUtils.getLabelName(jlDaysToPaidTable.getText()), SGuiConsts.GUI_TYPE_INT, false);
+        moIntScheduledDays.setIntegerSettings(SGuiUtils.getLabelName(jlScheduledDays.getText()), SGuiConsts.GUI_TYPE_INT, false);
+        moIntEffectiveDays.setIntegerSettings(SGuiUtils.getLabelName(jlEffectiveDays.getText()), SGuiConsts.GUI_TYPE_INT, true);
         moTextNotes.setTextSettings(SGuiUtils.getLabelName(jlNotes.getText()), 255, 0);
 
         moFields.addField(moKeyEmployee);
@@ -294,11 +335,54 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
         moFields.addField(moTextNumber);
         moFields.addField(moDateDateStart);
         moFields.addField(moDateDateEnd);
-        moFields.addField(moIntEffectiveDays);
         moFields.addField(moIntBenefitYear);
+        moFields.addField(moIntDaysToPaidTable);
+        moFields.addField(moIntScheduledDays);
+        moFields.addField(moIntEffectiveDays);
         moFields.addField(moTextNotes);
 
         moFields.setFormButton(jbSave);
+    }
+    
+    private void loadBenefitTables() throws Exception {
+        ArrayList<SDbBenefitTable> aBenefitTables = new ArrayList<SDbBenefitTable>();
+        
+        if (moConfig.getFkEarningVacationsId_n() == SLibConsts.UNDEFINED) {
+            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración vacaciones)");
+        }
+        
+        moBenefit = SHrsUtils.getBenefitTableByEarning(miClient.getSession(), moConfig.getFkEarningVacationsId_n(), moEmployee.getFkPaymentTypeId(), SLibTimeUtils.createDate(moIntBenefitYear.getValue(), 1, 1));
+        
+        if (moBenefit == null) {
+            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Tabla de prestaciones adecuada para la fecha de corte)");
+        }
+        aBenefitTables.add(moBenefit);
+        
+        maBenefitTableByAnniversary = SHrsUtils.getBenefitTablesAnniversarys(aBenefitTables);
+    }
+    
+    private void readHrsBenefitAcummulate(int seniority, int benefitYear) {
+        int scheduledDays = 0;
+        int daysTable = 0;
+        SHrsBenefitTableByAnniversary benefitTableRow = null;
+        
+        try {
+            loadBenefitTables();
+            
+            for (SHrsBenefitTableByAnniversary row : maBenefitTableByAnniversary) {
+                if (row.getBenefitAnn() <= seniority) {
+                    benefitTableRow = row;
+                }
+            }
+            daysTable = benefitTableRow == null ? 0 : (int) benefitTableRow.getValue();
+            scheduledDays = SHrsUtils.readScheduledDays(miClient.getSession(), moEmployee, mnFormType, seniority, benefitYear, moRegistry.getPkAbsenceId());
+            
+            moIntDaysToPaidTable.setValue(daysTable);
+            moIntScheduledDays.setValue(scheduledDays);
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
     }
 
     private void itemStateEmployee() {
@@ -337,9 +421,12 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
     private void actionStateChangeAnniversary() {
         if (jsAnniversary.isEnabled()) {
             moIntBenefitYear.setValue(SLibTimeUtils.digestYear(SLibTimeUtils.addDate(moEmployee.getDateBenefits(), (Integer) jsAnniversary.getValue() - 1, 0, 0))[0]);
+            readHrsBenefitAcummulate((Integer) jsAnniversary.getValue(), moIntBenefitYear.getValue());
         }
         else {
             moIntBenefitYear.setValue(0);
+            moIntDaysToPaidTable.setValue(0);
+            moIntScheduledDays.setValue(0);
         }
     }
 
@@ -381,6 +468,8 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
 
         mnFormResult = SLibConsts.UNDEFINED;
         mbFirstActivation = true;
+        
+        moConfig = (SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
 
         removeAllListeners();
         reloadCatalogues();
@@ -424,6 +513,8 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
         itemStateEmployee();
         
         moIntBenefitYear.setEditable(false);
+        moIntDaysToPaidTable.setEditable(false);
+        moIntScheduledDays.setEditable(false);
 
         addAllListeners();
     }
@@ -454,6 +545,7 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
 
     @Override
     public SGuiValidation validateForm() {
+        String msg = "";
         SGuiValidation validation = moFields.validateFields();
 
         if (validation.isValid()) {
@@ -464,6 +556,17 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
                     validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + SGuiUtils.getLabelName(jlEffectiveDays) + "'" +
                             SGuiConsts.ERR_MSG_FIELD_VAL_LESS_EQUAL + mnWorkingDays + ".");
                     validation.setComponent(moIntEffectiveDays);
+                }
+                
+                if (validation.isValid() && moKeyAbsenceClass.getValue()[0] == SModSysConsts.HRSU_CL_ABS_VAC) {
+                    if ((moIntEffectiveDays.getValue() + moIntScheduledDays.getValue()) > moIntDaysToPaidTable.getValue()) {
+                        msg = "La suma de '" + SGuiUtils.getLabelName(jlScheduledDays) + "' + '" + SGuiUtils.getLabelName(jlEffectiveDays) + "' es mayor a '" + SGuiUtils.getLabelName(jlDaysToPaidTable) + "'.";
+
+                        if (miClient.showMsgBoxConfirm(msg + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.NO_OPTION) {
+                            validation.setMessage(msg);
+                            validation.setComponent(moIntEffectiveDays);
+                        }
+                    }
                 }
             }
         }

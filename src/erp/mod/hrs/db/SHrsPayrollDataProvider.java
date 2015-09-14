@@ -142,20 +142,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     }
     
     private ArrayList<SHrsBenefitTableByAnniversary> getBenefitTablesAnniversarys(ArrayList<SDbBenefitTable> benefitTables) throws Exception {
-        int i = 0;
-        ArrayList<SHrsBenefitTableByAnniversary> aBenefitTableByAnniversary = new ArrayList<SHrsBenefitTableByAnniversary>();
-        
-        for (SDbBenefitTable table : benefitTables) {
-            i = 1;
-            for (SDbBenefitTableRow tableRow : table.getChildRows()) {
-                while ( i * 12 <= tableRow.getMonths()) {
-                    aBenefitTableByAnniversary.add(new SHrsBenefitTableByAnniversary(table.getPkBenefitId(), i, tableRow.getBenefitDays()));
-                    i++;
-                }
-            }
-        }
-
-        return aBenefitTableByAnniversary;
+        return SHrsUtils.getBenefitTablesAnniversarys(benefitTables);
     }
 
     private ArrayList<SDbMwzTypeWage> getMwzTypeWages() throws Exception {
@@ -391,7 +378,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
             // Obtain absenceConsumption:
 
             if (!payrollReceipt.getChildAbsenceConsumption().isEmpty()) {
-                hrsPayrollReceipt.getAbsenceConsumptionDays().addAll(payrollReceipt.getChildAbsenceConsumption());
+                hrsPayrollReceipt.getAbsenceConsumptions().addAll(payrollReceipt.getChildAbsenceConsumption());
             }
 
             hrsEmployee = createEmployee(isCopy ? SLibConsts.UNDEFINED : hrsPayroll.getPayroll().getPkPayrollId(), payrollReceipt.getPkEmployeeId(), hrsPayroll.getPayroll().getPeriodYear(), hrsPayroll.getPayroll().getPeriod(), hrsPayroll.getPayroll().getFiscalYear(),
@@ -490,7 +477,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 "FROM hrs_pay AS p " +
                 "INNER JOIN hrs_pay_rcp AS r ON r.id_pay = p.id_pay " +
                 "INNER JOIN hrs_pay_rcp_ded AS rd ON rd.id_pay = r.id_pay AND rd.id_emp = r.id_emp " +
-                "WHERE p.b_del = 0 AND r.b_del = 0 AND p.id_pay <> " + payrollId + " AND p.per_year = " + payrollYear + " AND p.per = " + payrollPeriod + " AND r.id_emp = " + loan.getPkEmployeeId() + " AND " +
+                "WHERE p.b_del = 0 AND r.b_del = 0 AND rd.b_del = 0 AND p.id_pay <> " + payrollId + " AND p.per_year = " + payrollYear + " AND p.per = " + payrollPeriod + " AND r.id_emp = " + loan.getPkEmployeeId() + " AND " +
                 "rd.fk_loan_emp_n = " + loan.getPkEmployeeId() + " AND rd.fk_loan_loan_n = " + loan.getPkLoanId() + " AND rd.fk_tp_loan_n = " + loan.getFkLoanTypeId() + " ";
         
             resultSet = statement.executeQuery(sql);
@@ -611,7 +598,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
             "p.id_pay = pr.id_pay " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON " +
             "pr.id_pay = pre.id_pay AND pr.id_emp = pre.id_emp " +
-            "WHERE p.b_del = 0 AND pr.b_del = 0 AND pr.b_del = 0 AND p.id_pay <> " + payrollId + " AND pr.id_emp = " + employeeId + " AND  " +
+            "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND p.id_pay <> " + payrollId + " AND pr.id_emp = " + employeeId + " AND  " +
             "p.fis_year = " + periodYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateEnd) + "'" +
             "GROUP BY pr.id_emp " +
             "ORDER BY pr.id_emp ";
@@ -639,7 +626,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
             "p.id_pay = pr.id_pay " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON " +
             "pr.id_pay = pre.id_pay AND pr.id_emp = pre.id_emp " +
-            "WHERE p.b_del = 0 AND pr.b_del = 0 AND pr.b_del = 0 AND p.id_pay <> " + payrollId + " AND pr.id_emp = " + employeeId + " AND  " +
+            "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND p.id_pay <> " + payrollId + " AND pr.id_emp = " + employeeId + " AND  " +
             "p.per_year = " + periodYear + " AND " + ((taxComputationType == SModSysConsts.HRSS_TP_TAX_COMP_ANN ||
                 taxComputationType == SLibConsts.UNDEFINED) ?
                 "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateEnd) + "'" :
@@ -671,7 +658,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
             "p.id_pay = pr.id_pay " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON " +
             "pr.id_pay = prd.id_pay AND pr.id_emp = prd.id_emp " +
-            "WHERE p.b_del = 0 AND pr.b_del = 0 AND pr.b_del = 0 AND p.id_pay <> " + payrollId + " AND pr.id_emp = " + employeeId + " AND " +
+            "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 AND p.id_pay <> " + payrollId + " AND pr.id_emp = " + employeeId + " AND " +
             "p.per_year = " + periodYear + " AND " + ((taxComputationType == SModSysConsts.HRSS_TP_TAX_COMP_ANN ||
                 taxComputationType == SLibConsts.UNDEFINED) ?
                 "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateEnd) + "'" :

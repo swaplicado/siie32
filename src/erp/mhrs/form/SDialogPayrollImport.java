@@ -910,7 +910,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                                 "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
                                 "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
                                 "INNER JOIN hrs_acc_ear AS v ON v.id_ear = ear.id_ear " +
-                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                 "GROUP BY v.id_tp_acc, ear.id_ear, rtrim(ear.name_abbr), v.id_ref, v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
 
                                 "UNION " +
@@ -923,7 +923,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                                 "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
                                 "INNER JOIN hrs_acc_ear AS v ON v.id_ear = ear.id_ear " +
                                 "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep AND v.id_ref = d.id_dep " +
-                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                 "GROUP BY v.id_tp_acc, ear.id_ear, rtrim(ear.name_abbr), v.id_ref, rtrim(d.name), rtrim(d.code), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
 
                                 "UNION " +
@@ -937,7 +937,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                                 "INNER JOIN hrs_acc_ear AS v ON v.id_ear = ear.id_ear " +
                                 "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp AND v.id_ref = emp.id_emp " +
                                 "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
-                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                 "GROUP BY v.id_tp_acc, ear.id_ear, rtrim(ear.name_abbr), v.id_ref, rtrim(bp.bp), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
                                 "ORDER BY f_id_tipo, f_id_aux, f_ref; ";
                     sType = "percepción";
@@ -957,7 +957,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                                 "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
                                 "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
                                 "INNER JOIN hrs_acc_ded AS v ON v.id_ded = ded.id_ded " +
-                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                 "GROUP BY v.id_tp_acc, ded.id_ded, rtrim(ded.name_abbr), v.id_ref, v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
 
                                 "UNION " +
@@ -970,7 +970,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                                 "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
                                 "INNER JOIN hrs_acc_ded AS v ON v.id_ded = ded.id_ded " +
                                 "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep AND v.id_ref = d.id_dep " +
-                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                 "GROUP BY v.id_tp_acc, ded.id_ded, rtrim(ded.name_abbr), v.id_ref, rtrim(d.name), rtrim(d.code), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
 
                                 "UNION " +
@@ -984,7 +984,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                                 "INNER JOIN hrs_acc_ded AS v ON v.id_ded = ded.id_ded " +
                                 "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp AND v.id_ref = emp.id_emp " +
                                 "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
-                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                 "GROUP BY v.id_tp_acc, ded.id_ded, rtrim(ded.name_abbr), v.id_ref, rtrim(bp.bp), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
                                 "ORDER BY f_id_tipo, f_id_aux, f_ref ";
                     sType = "deducción";
@@ -1113,7 +1113,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                                     "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
                                     "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
                                     "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
-                                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + mnPayrollId + " " +
+                                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + mnPayrollId + " " +
                                     "AND ear.id_ear = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                     "GROUP BY ear.id_ear, ear.name_abbr " +
 
@@ -1125,7 +1125,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                                     "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
                                     "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
                                     "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
-                                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + mnPayrollId + " " +
+                                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + mnPayrollId + " " +
                                     "AND ear.id_ear = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") AND d.id_dep = " + nF_id_ref + " " + 
                                     "GROUP BY ear.id_ear, ear.name_abbr, d.id_dep, d.name, d.code " +
 
@@ -1138,7 +1138,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                                     "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
                                     "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
                                     "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
-                                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " " +
+                                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " " +
                                     "AND ear.id_ear = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") AND emp.id_emp = " + nF_id_ref + " " +
                                     "GROUP BY ear.id_ear, ear.name_abbr, bp.id_bp, bp.bp " +
                                     "ORDER BY f_id_tipo_rec, id_ear, f_ref; ";
@@ -1157,7 +1157,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                                     "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
                                     "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
                                     "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
-                                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + mnPayrollId + " " +
+                                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + mnPayrollId + " " +
                                     "AND ded.id_ded = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                     "GROUP BY ded.id_ded, ded.name_abbr " +
 
@@ -1169,7 +1169,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                                     "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
                                     "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
                                     "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
-                                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + mnPayrollId + " " +
+                                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + mnPayrollId + " " +
                                     "AND ded.id_ded = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") AND d.id_dep = " + nF_id_ref + " " +
                                     "GROUP BY ded.id_ded, ded.name_abbr, d.id_dep, d.name, d.code " +
 
@@ -1182,7 +1182,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                                     "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
                                     "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
                                     "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
-                                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " " +
+                                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " " +
                                     "AND ded.id_ded = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") AND emp.id_emp = " + nF_id_ref + " " +
                                     "GROUP BY ded.id_ded, ded.name_abbr, bp.id_bp, bp.bp " +
                                     "ORDER BY f_id_tipo_rec, id_ded, f_ref; ";
