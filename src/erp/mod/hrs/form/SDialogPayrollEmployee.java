@@ -83,6 +83,8 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
 
     /**
      * Creates new form SDialogPayrollEmployee
+     * @param client
+     * @param title
      */
     public SDialogPayrollEmployee(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_PAY_RCP, SLibConsts.UNDEFINED, title);
@@ -928,7 +930,6 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
             
             @Override
             public void actionRowDelete() {
-                ArrayList<SHrsPayrollReceiptEarning> aEarningDelete = null;
                 SDbAbsenceConsumption absenceConsumption = null;
                 
                 try {
@@ -944,7 +945,6 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                             gridRow = gridRows[i];
                             
                             absenceConsumption = (SDbAbsenceConsumption) gridRow;
-                            aEarningDelete = new ArrayList<SHrsPayrollReceiptEarning>();
                             
                             moReceipt.getHrsEmployee().getHrsPayrollReceipt().removeAbsenceConsumption(absenceConsumption);
                             moReceipt.getHrsEmployee().getHrsPayrollReceipt().updateHrsPayrollReceiptEarningAbsence(absenceConsumption, false);

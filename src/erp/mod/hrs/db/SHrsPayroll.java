@@ -919,7 +919,7 @@ public class SHrsPayroll {
         aHrsPayrollReceiptEarnings = new ArrayList<SHrsPayrollReceiptEarning>();
         
         move = 1;
-        for (SDbAbsenceConsumption receiptAbsenceConsumption: aAbsenceConsumption) {
+        for (SDbAbsenceConsumption receiptAbsenceConsumption : aAbsenceConsumption) {
             earning = null;
             
             for (SDbEarning earningAux : maEarnigs) {

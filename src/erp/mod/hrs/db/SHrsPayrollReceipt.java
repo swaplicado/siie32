@@ -173,6 +173,20 @@ public class SHrsPayrollReceipt {
                         amountAccumulateExemp += amountExemp;
 
                         break;
+                    case SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_SEN:
+                        // Compute exempt:
+
+                        if (earning.getExemptionMwz() > 0) {
+
+                            minimumExemptionWage = SLibUtils.round(earning.getExemptionMwz() * moHrsPayroll.getPayroll().getMwzWage(), SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits());
+                            if (minimumExemptionWage <= hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r()) {
+                                amountExemp = SLibUtils.round(minimumExemptionWage, SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits());
+                            }
+                            else {
+                                amountExemp = hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r();
+                            }
+                        }
+                        break;
 
                     default:
                         throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración percepción)");

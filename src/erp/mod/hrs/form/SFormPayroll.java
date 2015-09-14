@@ -89,6 +89,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private boolean mbIsReadOnly;
     /**
      * Creates new form SFormPayroll
+     * @param client
+     * @param title
+     * @param subtype
      */
     public SFormPayroll(SGuiClient client, String title, int subtype) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_PAY, subtype, title);

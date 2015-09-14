@@ -56,10 +56,11 @@ public class SDialogPayrollEmployeeAbsence extends SBeanFormDialog implements Ac
     protected SHrsBenefit moHrsBenefit;
     protected ArrayList<SHrsBenefit> maHrsBenefits;
     protected ArrayList<SHrsBenefitTableByAnniversary> maBenefitTableByAnniversary;
-    protected boolean mbIsEditAmount;
-
+    
     /**
      * Creates new form SDialogPayrollEmployeeAbsence
+     * @param client
+     * @param title
      */
     public SDialogPayrollEmployeeAbsence(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSX_PAY_REC_EAR, SLibConsts.UNDEFINED, title);
