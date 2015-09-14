@@ -99,7 +99,7 @@ import sa.lib.srv.SSrvCompany;
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 025.05";
+    public static final String APP_RELEASE = "3.2 025.06";
     public static final String APP_COPYRIGHT = "2008-2015";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
