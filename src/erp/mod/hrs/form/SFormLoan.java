@@ -385,7 +385,7 @@ public class SFormLoan extends SBeanForm implements ItemListener {
     @Override
     public void reloadCatalogues() {
         miClient.getSession().populateCatalogue(moKeyEmployee, SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, null);
-        miClient.getSession().populateCatalogue(moKeyLoanType, SModConsts.HRSS_TP_LOAN, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyLoanType, SModConsts.HRSS_TP_LOAN, SModConsts.HRS_LOAN, null);
         miClient.getSession().populateCatalogue(moKeyLoanPaymentType, SModConsts.HRSS_TP_LOAN_PAY, SLibConsts.UNDEFINED, null);
     }
 

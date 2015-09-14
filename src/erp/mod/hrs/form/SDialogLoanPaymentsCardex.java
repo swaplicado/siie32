@@ -311,7 +311,7 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
         double in = 0;
         double out = 0;
         double totalAmount = 0;
-        double balance = 0;
+        double totalPayment = 0;
         Vector<SGridRow> rows = new Vector<>();
         String sql = "";
         ResultSet resultSet = null;
@@ -356,7 +356,7 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
                 row.setDateEnd(resultSet.getDate("dt_end"));
 
                 totalAmount += in = resultSet.getDouble("f_in");
-                balance += out = resultSet.getDouble("f_out");
+                totalPayment += out = resultSet.getDouble("f_out");
 
                 row.setAmount(in);
                 row.setPayment(out);
@@ -368,9 +368,9 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
                 rows.add(row);
             }
             
-            moCurTotalAmount.getField().setValue(totalAmount);
-            moCurTotalPayments.getField().setValue(balance);
-            moCurTotalBalance.getField().setValue(totalAmount - balance);
+            moCurTotalAmount.getField().setValue(moLoan.getTotalAmount() + totalAmount);
+            moCurTotalPayments.getField().setValue(totalPayment);
+            moCurTotalBalance.getField().setValue((moLoan.getTotalAmount() + totalAmount) - totalPayment);
 
             moGridPaymentMoves.populateGrid(rows);
             moGridPaymentMoves.clearSortKeys();

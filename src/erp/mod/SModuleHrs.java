@@ -484,7 +484,10 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRSS_TP_LOAN:
                 settings = new SGuiCatalogueSettings("Tipo crédito/préstamo", 1);
                 sql = "SELECT id_tp_loan AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE b_del = 0 "
+                        + (subtype == SModConsts.HRS_LOAN ? " AND id_tp_loan > " + SModSysConsts.HRSS_TP_LOAN_NON : "") + " "
+                        + "ORDER BY sort ";
                 break;
             case SModConsts.HRSS_TP_LOAN_PAY:
                 settings = new SGuiCatalogueSettings("Tipo pago", 1);
