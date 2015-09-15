@@ -313,7 +313,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         return aEmployees;
     }
 
-    private ArrayList<SHrsPayrollReceipt> getHrsPayrollReceipts(final SHrsPayroll hrsPayroll, final int payrollId, final boolean isCopy) throws Exception {
+    private ArrayList<SHrsPayrollReceipt> getHrsPayrollReceipts(final SHrsPayroll hrsPayroll, final int payrollId, final boolean isCopy, final boolean isNew) throws Exception {
         String sql = "";
         SDbPayrollReceipt payrollReceipt = null;
         SDbEarning earning = null;
@@ -329,74 +329,76 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         ResultSet resultSet = null;
         Statement statement = moSession.getDatabase().getConnection().createStatement();
 
-        sql = "SELECT pr.id_pay, pr.id_emp " +
-                "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
-                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON " +
-                "p.id_pay = pr.id_pay " +
-                "WHERE pr.b_del = 0 AND p.id_pay = " + payrollId + " ";
+        if (!isNew) {
+            sql = "SELECT pr.id_pay, pr.id_emp " +
+                    "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
+                    "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON " +
+                    "p.id_pay = pr.id_pay " +
+                    "WHERE pr.b_del = 0 AND p.id_pay = " + payrollId + " ";
 
-        resultSet = statement.executeQuery(sql);
-        while (resultSet.next()) {
-            payrollReceipt = new SDbPayrollReceipt();
-            payrollReceipt.read(moSession, new int[] { resultSet.getInt("pr.id_pay"), resultSet.getInt("pr.id_emp") });
+            resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                payrollReceipt = new SDbPayrollReceipt();
+                payrollReceipt.read(moSession, new int[] { resultSet.getInt("pr.id_pay"), resultSet.getInt("pr.id_emp") });
 
-            hrsPayrollReceipt = new SHrsPayrollReceipt();
-            hrsPayrollReceipt.setHrsPayroll(hrsPayroll);
+                hrsPayrollReceipt = new SHrsPayrollReceipt();
+                hrsPayrollReceipt.setHrsPayroll(hrsPayroll);
 
-            // Obtain payrollReceiptEarning:
+                // Obtain payrollReceiptEarning:
 
-            for (SDbPayrollReceiptEarning payrollReceiptEarning : payrollReceipt.getChildPayrollReceiptEarnings()) {
-                hrsPayrollReceiptEarning = new SHrsPayrollReceiptEarning();
+                for (SDbPayrollReceiptEarning payrollReceiptEarning : payrollReceipt.getChildPayrollReceiptEarnings()) {
+                    hrsPayrollReceiptEarning = new SHrsPayrollReceiptEarning();
 
-                earning = new SDbEarning();
-                earning.read(moSession, new int[] { payrollReceiptEarning.getFkEarningId() });
+                    earning = new SDbEarning();
+                    earning.read(moSession, new int[] { payrollReceiptEarning.getFkEarningId() });
 
-                hrsPayrollReceiptEarning.setPkMoveId(payrollReceiptEarning.getPkMoveId());
-                hrsPayrollReceiptEarning.setEarning(earning);
-                hrsPayrollReceiptEarning.setReceiptEarning(payrollReceiptEarning);
-                hrsPayrollReceiptEarning.setHrsReceipt(hrsPayrollReceipt);
+                    hrsPayrollReceiptEarning.setPkMoveId(payrollReceiptEarning.getPkMoveId());
+                    hrsPayrollReceiptEarning.setEarning(earning);
+                    hrsPayrollReceiptEarning.setReceiptEarning(payrollReceiptEarning);
+                    hrsPayrollReceiptEarning.setHrsReceipt(hrsPayrollReceipt);
 
-                hrsPayrollReceipt.getHrsEarnings().add(hrsPayrollReceiptEarning);
+                    hrsPayrollReceipt.getHrsEarnings().add(hrsPayrollReceiptEarning);
+                }
+
+                // Obtain payrollReceiptDeduction:
+
+                for (SDbPayrollReceiptDeduction payrollReceiptDeduction : payrollReceipt.getChildPayrollReceiptDeductions()) {
+                    hrsPayrollReceiptDeduction = new SHrsPayrollReceiptDeduction();
+
+                    deduction = new SDbDeduction();
+                    deduction.read(moSession, new int[] { payrollReceiptDeduction.getFkDeductionId() });
+
+                    hrsPayrollReceiptDeduction.setPkMoveId(payrollReceiptDeduction.getPkMoveId());
+                    hrsPayrollReceiptDeduction.setDeduction(deduction);
+                    hrsPayrollReceiptDeduction.setReceiptDeduction(payrollReceiptDeduction);
+                    hrsPayrollReceiptDeduction.setHrsReceipt(hrsPayrollReceipt);
+
+                    hrsPayrollReceipt.getHrsDeductions().add(hrsPayrollReceiptDeduction);
+                }
+
+                // Obtain absenceConsumption:
+
+                if (!payrollReceipt.getChildAbsenceConsumption().isEmpty()) {
+                    hrsPayrollReceipt.getAbsenceConsumptions().addAll(payrollReceipt.getChildAbsenceConsumption());
+                }
+
+                hrsEmployee = createEmployee(isCopy ? SLibConsts.UNDEFINED : hrsPayroll.getPayroll().getPkPayrollId(), payrollReceipt.getPkEmployeeId(), hrsPayroll.getPayroll().getPeriodYear(), hrsPayroll.getPayroll().getPeriod(), hrsPayroll.getPayroll().getFiscalYear(),
+                        hrsPayroll.getPayroll().getDateStart(), hrsPayroll.getPayroll().getDateEnd(), hrsPayroll.getPayroll().getFkTaxComputationTypeId());
+                hrsEmployee.setHrsPayrollReceipt(hrsPayrollReceipt);
+                hrsPayrollReceipt.setHrsEmployee(hrsEmployee);
+                hrsPayrollReceipt.setReceipt(hrsPayroll.createPayrollReceipt(hrsEmployee));
+                hrsPayrollReceipt.getReceipt().setRegistryNew(payrollReceipt.isRegistryNew());
+                hrsPayrollReceipt.getReceipt().setDbmsDataCfd(payrollReceipt.getDbmsDataCfd());
+                hrsPayrollReceipt.getReceipt().setNumberSeries(payrollReceipt.getNumberSeries());
+                hrsPayrollReceipt.getReceipt().setNumber(payrollReceipt.getNumber());
+                hrsPayrollReceipt.getReceipt().setDateIssue(payrollReceipt.getDateIssue());
+                hrsPayrollReceipt.getReceipt().setDatePayment(payrollReceipt.getDatePayment());
+                hrsPayrollReceipt.getReceipt().setFkPaymentSystemTypeId(payrollReceipt.getFkPaymentSystemTypeId());
+                hrsPayrollReceipt.computeDbPayrollReceiptDays();
+                //hrsPayrollReceipt.computeDbPayrollReceipt();  XXX jbarajas 2015-05-11
+
+                aPayrollReceipts.add(hrsPayrollReceipt);
             }
-
-            // Obtain payrollReceiptDeduction:
-
-            for (SDbPayrollReceiptDeduction payrollReceiptDeduction : payrollReceipt.getChildPayrollReceiptDeductions()) {
-                hrsPayrollReceiptDeduction = new SHrsPayrollReceiptDeduction();
-
-                deduction = new SDbDeduction();
-                deduction.read(moSession, new int[] { payrollReceiptDeduction.getFkDeductionId() });
-
-                hrsPayrollReceiptDeduction.setPkMoveId(payrollReceiptDeduction.getPkMoveId());
-                hrsPayrollReceiptDeduction.setDeduction(deduction);
-                hrsPayrollReceiptDeduction.setReceiptDeduction(payrollReceiptDeduction);
-                hrsPayrollReceiptDeduction.setHrsReceipt(hrsPayrollReceipt);
-
-                hrsPayrollReceipt.getHrsDeductions().add(hrsPayrollReceiptDeduction);
-            }
-            
-            // Obtain absenceConsumption:
-
-            if (!payrollReceipt.getChildAbsenceConsumption().isEmpty()) {
-                hrsPayrollReceipt.getAbsenceConsumptions().addAll(payrollReceipt.getChildAbsenceConsumption());
-            }
-
-            hrsEmployee = createEmployee(isCopy ? SLibConsts.UNDEFINED : hrsPayroll.getPayroll().getPkPayrollId(), payrollReceipt.getPkEmployeeId(), hrsPayroll.getPayroll().getPeriodYear(), hrsPayroll.getPayroll().getPeriod(), hrsPayroll.getPayroll().getFiscalYear(),
-                    hrsPayroll.getPayroll().getDateStart(), hrsPayroll.getPayroll().getDateEnd(), hrsPayroll.getPayroll().getFkTaxComputationTypeId());
-            hrsEmployee.setHrsPayrollReceipt(hrsPayrollReceipt);
-            hrsPayrollReceipt.setHrsEmployee(hrsEmployee);
-            hrsPayrollReceipt.setReceipt(hrsPayroll.createPayrollReceipt(hrsEmployee));
-            hrsPayrollReceipt.getReceipt().setRegistryNew(payrollReceipt.isRegistryNew());
-            hrsPayrollReceipt.getReceipt().setDbmsDataCfd(payrollReceipt.getDbmsDataCfd());
-            hrsPayrollReceipt.getReceipt().setNumberSeries(payrollReceipt.getNumberSeries());
-            hrsPayrollReceipt.getReceipt().setNumber(payrollReceipt.getNumber());
-            hrsPayrollReceipt.getReceipt().setDateIssue(payrollReceipt.getDateIssue());
-            hrsPayrollReceipt.getReceipt().setDatePayment(payrollReceipt.getDatePayment());
-            hrsPayrollReceipt.getReceipt().setFkPaymentSystemTypeId(payrollReceipt.getFkPaymentSystemTypeId());
-            hrsPayrollReceipt.computeDbPayrollReceiptDays();
-            //hrsPayrollReceipt.computeDbPayrollReceipt();  XXX jbarajas 2015-05-11
-
-            aPayrollReceipts.add(hrsPayrollReceipt);
         }
 
         return aPayrollReceipts;
@@ -447,6 +449,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     private ArrayList<SHrsLoanPayments> getEmployeeLoanPayments(final ArrayList<SDbLoan> loans, final int payrollId, final int payrollYear, final int payrollPeriod) throws Exception {
         ArrayList<SHrsLoanPayments> aLoanPayments = new ArrayList<SHrsLoanPayments>();
         SHrsLoanPayments loanPayments = null;
+        SDbPayrollReceiptEarning receiptEarning = null;
         SDbPayrollReceiptDeduction receiptDeduction = null;
         String sql = "";
         ResultSet resultSet = null;
@@ -458,6 +461,20 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
 
         for (SDbLoan loan : loans) {
             loanPayments = new SHrsLoanPayments();
+            
+            sql = "SELECT rcp_ear.id_pay, rcp_ear.id_emp, rcp_ear.id_mov "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS rcp ON rcp.id_pay = p.id_pay "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp "
+                + "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND p.id_pay <> " + payrollId + " AND rcp_ear.fk_loan_emp_n = " + loan.getPkEmployeeId() + " AND rcp_ear.fk_loan_loan_n = " + loan.getPkLoanId() + " ";
+
+            resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                receiptEarning = new SDbPayrollReceiptEarning();
+                receiptEarning.read(moSession, new int[] { resultSet.getInt("rcp_ear.id_pay"), resultSet.getInt("rcp_ear.id_emp"), resultSet.getInt("rcp_ear.id_mov") });
+                
+                loanPayments.getReceiptEarnings().add(receiptEarning);
+            }
             
             sql = "SELECT rcp_ded.id_pay, rcp_ded.id_emp, rcp_ded.id_mov "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
@@ -742,7 +759,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
 
         // Receipts:
 
-        hrsPayroll.getReceipts().addAll(getHrsPayrollReceipts(hrsPayroll, payroll.getPkPayrollId(), isCopy));
+        hrsPayroll.getReceipts().addAll(getHrsPayrollReceipts(hrsPayroll, payroll.getPkPayrollId(), isCopy, payroll.isRegistryNew()));
 
         // Preserve data provider:
 

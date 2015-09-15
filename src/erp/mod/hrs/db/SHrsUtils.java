@@ -983,6 +983,10 @@ public abstract class SHrsUtils {
         balance = loan.getTotalAmount();
         
         if (hrsEmployee.getLoanPayment(loan.getPkLoanId()) != null) {
+            balance += hrsEmployee.getLoanPayment(loan.getPkLoanId()).getTotalEarnings();
+        }
+        
+        if (hrsEmployee.getLoanPayment(loan.getPkLoanId()) != null) {
             balance -= hrsEmployee.getLoanPayment(loan.getPkLoanId()).getTotalPayment();
         }
         

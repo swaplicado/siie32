@@ -1199,6 +1199,21 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         moCurNetTotal.getField().setValue(earningTotal - deductionTotal);
     }
 
+    private void itemStateEarningLoan_n() {
+        if (moKeyEarningLoan_n.getSelectedIndex() > 0) {
+            try {
+                moEarningLoan = new SDbLoan();
+                moEarningLoan.read(miClient.getSession(), new int[] { moKeyEarningLoan_n.getValue()[0] , moKeyEarningLoan_n.getValue()[1] });
+            }
+            catch (Exception e) {
+                SLibUtils.printException(this, e);
+            }
+        }
+        else {
+            moComEarningValue.getField().setValue(0d);
+        }
+    }
+
     private void itemStateDeductionLoan_n() {
         if (moKeyDeductionLoan_n.getSelectedIndex() > 0) {
             try {
@@ -1835,7 +1850,10 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         if (e.getSource() instanceof JComboBox && e.getStateChange() == ItemEvent.SELECTED) {
             JComboBox comboBox = (JComboBox)  e.getSource();
 
-            if (comboBox == moKeyDeductionLoan_n) {
+            if (comboBox == moKeyEarningLoan_n) {
+                itemStateEarningLoan_n();
+            }
+            else if (comboBox == moKeyDeductionLoan_n) {
                 itemStateDeductionLoan_n();
             }
         }

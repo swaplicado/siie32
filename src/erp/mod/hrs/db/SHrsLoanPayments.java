@@ -13,12 +13,14 @@ import java.util.ArrayList;
 public class SHrsLoanPayments {
 
     protected SDbLoan moLoan;
+    protected ArrayList<SDbPayrollReceiptEarning> maReceiptEarnings;
     protected ArrayList<SDbPayrollReceiptDeduction> maReceiptDeductions;
     protected double mdDaysPeriod = 0;
     protected double mdAmountPeriod = 0;
 
     public SHrsLoanPayments() {
         moLoan = new SDbLoan();
+        maReceiptEarnings = new ArrayList<SDbPayrollReceiptEarning>();
         maReceiptDeductions = new ArrayList<SDbPayrollReceiptDeduction>();
     }
 
@@ -30,7 +32,18 @@ public class SHrsLoanPayments {
     public double getAmountPeriod() { return mdAmountPeriod; }
     public double getDaysPeriod() { return mdDaysPeriod; }
     
+    public ArrayList<SDbPayrollReceiptEarning> getReceiptEarnings() { return maReceiptEarnings; }
     public ArrayList<SDbPayrollReceiptDeduction> getReceiptDeductions() { return maReceiptDeductions; }
+    
+    public double getTotalEarnings() {
+        double amount = 0;
+        
+        for (SDbPayrollReceiptEarning earning : maReceiptEarnings) {
+            amount += earning.getAmount_r();
+        }
+        
+        return amount;
+    }
     
     public double getTotalPayment() {
         double payment = 0;
