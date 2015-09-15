@@ -7157,9 +7157,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         validation.setMessage("La fecha del campo '" + jlDateDocLapsing_n.getText() + "' no puede ser anterior a la del campo '" + jlDateDocDelivery_n.getText() + "'.");
                         validation.setComponent(jftDateDocLapsing_n);
                     }
-                    else if (mbIsCon && (moFieldDateDocDelivery_n.getDate() == null || moFieldDateDocLapsing_n.getDate() == null)) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + (moFieldDateDocDelivery_n.getDate() == null ? jlDateDocDelivery_n.getText() : jlDateDocLapsing_n.getText()) + "'.");
-                        validation.setComponent(moFieldDateDocDelivery_n.getDate() == null ? jftDateDocDelivery_n : jftDateDocLapsing_n/*jftDateDocLapsing_n*/);
+                    else if (mbIsCon && moFieldDateDocDelivery_n.getDate() == null) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDateDocDelivery_n.getText() + "'.");
+                        validation.setComponent(jftDateDocDelivery_n);
+                    }
+                    else if (mbIsCon && moFieldDateDocLapsing_n.getDate() == null) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDateDocLapsing_n.getText() + "'.");
+                        validation.setComponent(jftDateDocLapsing_n);
                     }
                     else if (moFieldDateShipment_n.getDate() != null && moFieldDateShipment_n.getDate().before(moFieldDate.getDate())) {
                         validation.setMessage("La fecha del campo '" + jlDateShipment_n.getText() + "' no puede ser anterior a la del campo '" + jlDate.getText() + "'.");
