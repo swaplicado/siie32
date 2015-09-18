@@ -563,8 +563,8 @@ public abstract class SHrsUtils {
     /**
      * Get earning by provided type ID.
      * @param client SGuiClient
-     * @param type
-     * @param typeId
+     * @param type type filter options: SModConsts.HRSS_TP_BEN or SModConsts.HRSS_TP_LOAN
+     * @param typeId ID the type indicated.
      * @return Object Earning
      * @throws Exception
      */
@@ -600,8 +600,8 @@ public abstract class SHrsUtils {
     /**
      * Get deduction by provided type ID.
      * @param client SGuiClient
-     * @param type
-     * @param typeId
+     * @param type type filter options: SModConsts.HRSS_TP_BEN or SModConsts.HRSS_TP_LOAN
+     * @param typeId ID the type indicated.
      * @return Object Deduction
      * @throws Exception
      */
