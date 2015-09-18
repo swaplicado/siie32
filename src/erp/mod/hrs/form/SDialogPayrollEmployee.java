@@ -1262,7 +1262,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
             moTextDateLastDismiss_n.setValue(SLibUtils.DateFormatDate.format(moReceipt.getHrsEmployee().getEmployee().getDateLastDismiss_n()));
         }
         else {
-            moTextDateLastDismiss_n.setValue(" / / /");
+            moTextDateLastDismiss_n.setValue("");
         }
         moTextSalaryType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_SAL, new int[] { moReceipt.getHrsEmployee().getEmployee().getFkSalaryTypeId() }, SDbRegistry.FIELD_NAME));
         moTextEmployeeType.setValue(miClient.getSession().readField(SModConsts.HRSU_TP_EMP, new int[] { moReceipt.getHrsEmployee().getEmployee().getFkEmployeeTypeId() }, SDbRegistry.FIELD_NAME));
