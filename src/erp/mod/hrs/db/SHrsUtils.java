@@ -561,7 +561,7 @@ public abstract class SHrsUtils {
     }
     
     /**
-     * Get earning by provided code
+     * Get earning by provided type ID.
      * @param client SGuiClient
      * @param type
      * @param typeId
@@ -598,7 +598,7 @@ public abstract class SHrsUtils {
     }
 
     /**
-     * Get deduction by provided code
+     * Get deduction by provided type ID.
      * @param client SGuiClient
      * @param type
      * @param typeId
