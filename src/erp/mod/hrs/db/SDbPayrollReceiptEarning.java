@@ -5,9 +5,9 @@
 package erp.mod.hrs.db;
 
 import erp.mod.SModConsts;
-import erp.mod.SModSysConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
@@ -50,6 +50,8 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     protected Date mtTsUserInsert;
     protected Date mtTsUserUpdate;
     */
+    
+    protected SDbPayrollReceiptEarningComplement moChildEarningComplement;
 
     public SDbPayrollReceiptEarning() {
         super(SModConsts.HRS_PAY_RCP_EAR);
@@ -90,6 +92,8 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
+    
+    public void setChildEarningComplement(SDbPayrollReceiptEarningComplement o) { moChildEarningComplement = o; }
 
     public int getPkPayrollId() { return mnPkPayrollId; }
     public int getPkEmployeeId() { return mnPkEmployeeId; }
@@ -118,6 +122,8 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
+    
+    public SDbPayrollReceiptEarningComplement getChildEarningComplement() { return moChildEarningComplement; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -167,6 +173,8 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
+        
+        moChildEarningComplement = null;
     }
 
     @Override
@@ -199,6 +207,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
 
     @Override
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
+        Statement statement = null;
         ResultSet resultSet = null;
 
         initRegistry();
@@ -244,6 +253,17 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
 
+            // Read payrollReceiptDeductionComplement:
+            
+            msSql = "SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR_CMP) + " WHERE id_pay = " + mnPkPayrollId + " AND id_emp = " + mnPkEmployeeId + " AND id_mov = " + mnPkMoveId + " ";
+            
+            statement = session.getDatabase().getConnection().createStatement();
+            resultSet = statement.executeQuery(msSql);
+            if (resultSet.next() && resultSet.getInt(1) > 0) {
+                moChildEarningComplement = new SDbPayrollReceiptEarningComplement();
+                moChildEarningComplement.read(session, new int[] { mnPkPayrollId, mnPkEmployeeId, mnPkMoveId });
+            }
+
             mbRegistryNew = false;
         }
 
@@ -254,6 +274,8 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     public void save(SGuiSession session) throws SQLException, Exception {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
+        
+        SDbPayrollReceipt.checkDummyRegistry(session, mnPkEmployeeId);
         
         calculateAmountSystem(session);
 
@@ -335,6 +357,17 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         }
 
         session.getStatement().execute(msSql);
+        
+        // Save payrollEarningComplement:
+
+        if (moChildEarningComplement != null) {
+            moChildEarningComplement.setDeleted(mbDeleted);
+            moChildEarningComplement.setPkPayrollId(mnPkPayrollId);
+            moChildEarningComplement.setPkEmployeeId(mnPkEmployeeId);
+            moChildEarningComplement.setPkMoveId(mnPkMoveId);
+            moChildEarningComplement.save(session);
+        }
+        
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
     }
@@ -370,6 +403,8 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
+        
+        registry.setChildEarningComplement(this.getChildEarningComplement());
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;

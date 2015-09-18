@@ -105,7 +105,7 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Prestación:"));
         jPanel4.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
-        jPanel7.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlEmployeeName.setText("Empleado:");
         jlEmployeeName.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -117,7 +117,7 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
 
         jPanel4.add(jPanel7);
 
-        jPanel2.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBenefitType.setText("Tipo prestación:");
         jlBenefitType.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -129,7 +129,7 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
 
         jPanel4.add(jPanel2);
 
-        jPanel10.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateBenefit.setText("Fecha beneficios:");
         jlDateBenefit.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -225,7 +225,7 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 800, 500);
+        SGuiUtils.setWindowBounds(this, 960, 600);
         
         jbSave.setText("Cerrar");
         jbCancel.setEnabled(false);
@@ -289,6 +289,7 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<SGridColumnForm>();
 
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_CAL_YEAR, "Ejercicio", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_CAL_MONTH, "Período", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Tipo nómina", 75));
@@ -443,7 +444,7 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
         ResultSet resultSet = null;
 
         try {
-            sql = "SELECT p.per_year, p.per AS f_period, tp_pay.name AS f_tp_pay, p.num AS f_num, p.dt_sta, p.dt_end, rcp_ear.unt_all AS f_unt, rcp_ear.amt_r AS f_amt, " +
+            sql = "SELECT IF(p.id_pay = 0,rcp_ear_cmp.dt, p.dt_end) f_dt, p.per_year, p.per AS f_period, IF(p.id_pay = 0,'', tp_pay.name) AS f_tp_pay, p.num AS f_num, IF(p.id_pay = 0,NULL, p.dt_sta) AS f_dt_sta, IF(p.id_pay = 0,NULL, p.dt_end) AS f_dt_end, rcp_ear.id_pay, rcp_ear.id_emp, rcp_ear.id_mov, rcp_ear.unt_all AS f_unt, rcp_ear.amt_r AS f_amt, " +
                     "rcp_ear.ts_usr_ins AS ts_usr_ins, rcp_ear.ts_usr_upd AS ts_usr_upd, ui.usr AS f_usr_ins, uu.usr AS f_usr_upd " +
                     "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS rcp ON rcp.id_pay = p.id_pay " +
@@ -451,20 +452,22 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS tp_pay ON tp_pay.id_tp_pay = p.fk_tp_pay " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON rcp_ear.fk_usr_ins = ui.id_usr " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON rcp_ear.fk_usr_upd = uu.id_usr " +
-                    "WHERE p.b_del = 0 AND rcp_ear.id_emp = " + moEmployee.getPkEmployeeId() + " AND rcp.b_del = 0 AND rcp_ear.fk_tp_ben = " + mnFormSubtype + " AND rcp_ear.ben_ann = " + rowBenefit.getAnn() + " AND " +
+                    "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR_CMP) + " AS rcp_ear_cmp ON rcp_ear_cmp.id_pay = rcp_ear.id_pay AND rcp_ear_cmp.id_emp = rcp_ear.id_emp AND rcp_ear_cmp.id_mov = rcp_ear.id_mov " +
+                    "WHERE (p.id_pay = 0 OR p.b_del = 0) AND rcp_ear.id_emp = " + moEmployee.getPkEmployeeId() + " AND rcp.b_del = 0 AND rcp_ear.fk_tp_ben = " + mnFormSubtype + " AND rcp_ear.ben_ann = " + rowBenefit.getAnn() + " AND " +
                     "rcp_ear.ben_year = " + rowBenefit.getAnnYear() + " " +
-                    "ORDER BY per_year, f_period, f_tp_pay, f_num, dt_sta, dt_end ";
+                    "ORDER BY f_dt, per_year, f_period, f_tp_pay, f_num, f_dt_sta, f_dt_end, rcp_ear.id_pay, rcp_ear.id_emp, rcp_ear.id_mov ";
 
             resultSet = miClient.getSession().getStatement().executeQuery(sql);
 
             while (resultSet.next()) {
                 SRowBenefitDetailCardex row = new SRowBenefitDetailCardex(mnFormSubtype);
+                row.setDate(resultSet.getDate("f_dt"));
                 row.setYear(resultSet.getInt("per_year"));
                 row.setPeriod(resultSet.getInt("f_period"));
                 row.setPayrollType(resultSet.getString("f_tp_pay"));
                 row.setNumber(resultSet.getString("f_num"));
-                row.setDateStart(resultSet.getDate("dt_sta"));
-                row.setDateEnd(resultSet.getDate("dt_end"));
+                row.setDateStart(resultSet.getDate("f_dt_sta"));
+                row.setDateEnd(resultSet.getDate("f_dt_end"));
 
                 row.setDays(resultSet.getDouble("f_unt"));
                 row.setAmount(resultSet.getDouble("f_amt"));

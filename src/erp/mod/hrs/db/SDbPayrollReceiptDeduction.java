@@ -7,6 +7,7 @@ package erp.mod.hrs.db;
 import erp.mod.SModConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.db.SDbConsts;
@@ -46,6 +47,8 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
     protected Date mtTsUserInsert;
     protected Date mtTsUserUpdate;
     */
+    
+    protected SDbPayrollReceiptDeductionComplement moChildDeductionComplement;
 
     public SDbPayrollReceiptDeduction() {
         super(SModConsts.HRS_PAY_RCP_DED);
@@ -76,6 +79,8 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
+    
+    public void setChildDeductionComplement(SDbPayrollReceiptDeductionComplement o) { moChildDeductionComplement = o; }
 
     public int getPkPayrollId() { return mnPkPayrollId; }
     public int getPkEmployeeId() { return mnPkEmployeeId; }
@@ -102,6 +107,8 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
+    
+    public SDbPayrollReceiptDeductionComplement getChildDeductionComplement() { return moChildDeductionComplement; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -144,6 +151,8 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
+        
+        moChildDeductionComplement = null;
     }
 
     @Override
@@ -175,6 +184,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
 
     @Override
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
+        Statement statement = null;
         ResultSet resultSet = null;
 
         initRegistry();
@@ -213,6 +223,17 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
 
+            // Read payrollReceiptDeductionComplement:
+            
+            msSql = "SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED_CMP) + " WHERE id_pay = " + mnPkPayrollId + " AND id_emp = " + mnPkEmployeeId + " AND id_mov = " + mnPkMoveId + " ";
+            
+            statement = session.getDatabase().getConnection().createStatement();
+            resultSet = statement.executeQuery(msSql);
+            if (resultSet.next() && resultSet.getInt(1) > 0) {
+                moChildDeductionComplement = new SDbPayrollReceiptDeductionComplement();
+                moChildDeductionComplement.read(session, new int[] { mnPkPayrollId, mnPkEmployeeId, mnPkMoveId });
+            }
+            
             mbRegistryNew = false;
         }
 
@@ -223,6 +244,8 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
     public void save(SGuiSession session) throws SQLException, Exception {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
+        
+        SDbPayrollReceipt.checkDummyRegistry(session, mnPkEmployeeId);
 
         if (mbRegistryNew) {
             computePrimaryKey(session);
@@ -296,8 +319,17 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
                     "ts_usr_upd = " + "NOW()" + " " +
                     getSqlWhere();
         }
-
+        
         session.getStatement().execute(msSql);
+        // Save payrollDeductionComplement:
+
+        if (moChildDeductionComplement != null) {
+            moChildDeductionComplement.setDeleted(mbDeleted);
+            moChildDeductionComplement.setPkPayrollId(mnPkPayrollId);
+            moChildDeductionComplement.setPkEmployeeId(mnPkEmployeeId);
+            moChildDeductionComplement.setPkMoveId(mnPkMoveId);
+            moChildDeductionComplement.save(session);
+        }
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
     }
@@ -331,6 +363,8 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
+        
+        registry.setChildDeductionComplement(this.getChildDeductionComplement());
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;

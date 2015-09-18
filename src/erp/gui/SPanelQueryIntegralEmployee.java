@@ -556,7 +556,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
 
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlAnnualBonus.setText("Aguinaldo:");
+        jlAnnualBonus.setText("Gratif. anual:");
         jlAnnualBonus.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel27.add(jlAnnualBonus);
 

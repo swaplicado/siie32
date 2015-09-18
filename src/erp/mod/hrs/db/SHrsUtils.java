@@ -560,6 +560,80 @@ public abstract class SHrsUtils {
         return deduction;
     }
     
+    /**
+     * Get earning by provided code
+     * @param client SGuiClient
+     * @param type
+     * @param typeId
+     * @return Object Earning
+     * @throws Exception
+     */
+    public static SDbEarning getEarningByType(final SGuiClient client, final int type, final int typeId) throws Exception {
+        SDbEarning earning = null;
+        String sql = "";
+        String sqlType = "";
+        ResultSet resultSet = null;
+        
+        switch (type) {
+            case SModConsts.HRSS_TP_BEN:
+                sqlType = "fk_tp_ben = " + typeId;
+                break;
+            case SModConsts.HRSS_TP_LOAN:
+                sqlType = "fk_tp_loan = " + typeId;
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+
+        sql = "SELECT id_ear " +
+                "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " " +
+                "WHERE " + sqlType + " ORDER BY code, name, id_ear LIMIT 1 ";
+        resultSet = client.getSession().getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            earning = new SDbEarning();
+            earning.read(client.getSession(), new int[] { resultSet.getInt("id_ear") });
+        }
+
+        return earning;
+    }
+
+    /**
+     * Get deduction by provided code
+     * @param client SGuiClient
+     * @param type
+     * @param typeId
+     * @return Object Deduction
+     * @throws Exception
+     */
+    public static SDbDeduction getDeductionByType(final SGuiClient client, final int type, final int typeId) throws Exception {
+        SDbDeduction deduction = null;
+        String sql = "";
+        String sqlType = "";
+        ResultSet resultSet = null;
+        
+        switch (type) {
+            case SModConsts.HRSS_TP_BEN:
+                sqlType = "fk_tp_ben = " + typeId;
+                break;
+            case SModConsts.HRSS_TP_LOAN:
+                sqlType = "fk_tp_loan = " + typeId;
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+
+        sql = "SELECT id_ded " +
+                "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_DED) + " " +
+                "WHERE " + sqlType + " ORDER BY code, name, id_ded LIMIT 1 ";
+        resultSet = client.getSession().getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            deduction = new SDbDeduction();
+            deduction.read(client.getSession(), new int[] { resultSet.getInt("id_ded") });
+        }
+
+        return deduction;
+    }
+    
     public static SDbBenefitTable getBenefitTableByEarning(final SGuiSession session, final int earningId, final int paymentType, final Date dateCut) throws Exception {
         SDbBenefitTable benefitTable = null;
         String sql = "";
@@ -988,6 +1062,13 @@ public abstract class SHrsUtils {
         
         if (hrsEmployee.getLoanPayment(loan.getPkLoanId()) != null) {
             balance -= hrsEmployee.getLoanPayment(loan.getPkLoanId()).getTotalPayment();
+        }
+        
+        for (SHrsPayrollReceiptEarning deduction : hrsEmployee.getHrsPayrollReceipt().getHrsEarnings()) {
+            if (SLibUtils.compareKeys(new int[] { deduction.getReceiptEarning().getFkLoanEmployeeId_n(), deduction.getReceiptEarning().getFkLoanLoanId_n()}, 
+                    loan.getPrimaryKey())) {
+                balance += deduction.getReceiptEarning().getAmount_r();
+            }
         }
         
         for (SHrsPayrollReceiptDeduction deduction : hrsEmployee.getHrsPayrollReceipt().getHrsDeductions()) {

@@ -5,6 +5,7 @@
 
 package erp.mod;
 
+import erp.cfd.SCfdConsts;
 import erp.mod.hrs.db.SDbAbsence;
 import erp.mod.hrs.db.SDbAbsenceClass;
 import erp.mod.hrs.db.SDbAbsenceConsumption;
@@ -33,6 +34,8 @@ import erp.mod.hrs.db.SDbLoan;
 import erp.mod.hrs.db.SDbMwzType;
 import erp.mod.hrs.db.SDbMwzTypeWage;
 import erp.mod.hrs.db.SDbPayroll;
+import erp.mod.hrs.db.SDbPayrollReceiptDeduction;
+import erp.mod.hrs.db.SDbPayrollReceiptEarning;
 import erp.mod.hrs.db.SDbPosition;
 import erp.mod.hrs.db.SDbShift;
 import erp.mod.hrs.db.SDbSsContributionTable;
@@ -52,6 +55,7 @@ import erp.mod.hrs.form.SFormAccountingEarning;
 import erp.mod.hrs.form.SFormAdvanceSettlement;
 import erp.mod.hrs.form.SFormAutomaticDeductions;
 import erp.mod.hrs.form.SFormAutomaticEarnings;
+import erp.mod.hrs.form.SFormBenefitAdjustmentEarning;
 import erp.mod.hrs.form.SFormBenefitTable;
 import erp.mod.hrs.form.SFormConfig;
 import erp.mod.hrs.form.SFormDeduction;
@@ -62,6 +66,8 @@ import erp.mod.hrs.form.SFormEmployeeType;
 import erp.mod.hrs.form.SFormFirstDayYear;
 import erp.mod.hrs.form.SFormHoliday;
 import erp.mod.hrs.form.SFormLoan;
+import erp.mod.hrs.form.SFormLoanAdjustmentDeduction;
+import erp.mod.hrs.form.SFormLoanAdjustmentEarning;
 import erp.mod.hrs.form.SFormMwzType;
 import erp.mod.hrs.form.SFormMwzTypeWage;
 import erp.mod.hrs.form.SFormPayroll;
@@ -100,6 +106,9 @@ import erp.mod.hrs.view.SViewLoan;
 import erp.mod.hrs.view.SViewMwzType;
 import erp.mod.hrs.view.SViewMwzTypeWage;
 import erp.mod.hrs.view.SViewPayroll;
+import erp.mod.hrs.view.SViewPayrollBenefitEarningComplement;
+import erp.mod.hrs.view.SViewPayrollLoanDeductionComplement;
+import erp.mod.hrs.view.SViewPayrollLoanEarningComplement;
 import erp.mod.hrs.view.SViewPayrollReceiptRecord;
 import erp.mod.hrs.view.SViewPayrollRow;
 import erp.mod.hrs.view.SViewPosition;
@@ -175,6 +184,9 @@ public class SModuleHrs extends SGuiModule {
     private SFormPayroll moFormPayrollWeekly;
     private SFormPayroll moFormPayrollFortnightly;
     private SFormAdvanceSettlement moAdvanceSettlement;
+    private SFormBenefitAdjustmentEarning moFormBenefitAdjustmentEarning;
+    private SFormLoanAdjustmentDeduction moFormLoanAdjustmentDeduction;
+    private SFormLoanAdjustmentEarning moFormLoanAdjustmentEarning;
 
     private SBeanOptionPicker moPickerEarnings;
     private SBeanOptionPicker moPickerDeductions;
@@ -402,6 +414,12 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_PAY:
                 registry = new SDbPayroll();
                 break;
+            case SModConsts.HRS_PAY_RCP_EAR:
+                registry = new SDbPayrollReceiptEarning();
+                break;
+            case SModConsts.HRS_PAY_RCP_DED:
+                registry = new SDbPayrollReceiptDeduction();
+                break;
             case SModConsts.HRS_ADV_SET:
                 registry = new SDbAdvanceSettlement();
                 break;
@@ -478,7 +496,7 @@ public class SModuleHrs extends SGuiModule {
                 sql = "SELECT id_tp_ben AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
                         + "WHERE b_del = 0 "
-                        + (subtype != SLibConsts.UNDEFINED ? " AND id_tp_ben > " + SModSysConsts.HRSS_TP_BEN_NON : "") + " "
+                        + (subtype == SModConsts.HRS_BEN ? " AND id_tp_ben > " + SModSysConsts.HRSS_TP_BEN_NON : "") + " "
                         + "ORDER BY sort ";
                 break;
             case SModConsts.HRSS_TP_LOAN:
@@ -712,7 +730,7 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewAbsence(miClient, "Incidencias");
                 break;
             case SModConsts.HRS_LOAN:
-                view = new SViewLoan(miClient, "Créditos/Préstamos");
+                view = new SViewLoan(miClient, "Control créditos/Préstamos");
                 break;
             case SModConsts.HRS_EAR:
                 view = new SViewEarnings(miClient, "Percepciones");
@@ -747,13 +765,13 @@ public class SModuleHrs extends SGuiModule {
                 case SModConsts.HRSX_BEN:
                     switch (subtype) {
                         case SModSysConsts.HRSS_TP_BEN_VAC:
-                            view = new SViewBenefit(miClient, subtype, "Vacaciones");
+                            view = new SViewBenefit(miClient, subtype, "Control vacaciones");
                             break;
                         case SModSysConsts.HRSS_TP_BEN_VAC_BON:
-                            view = new SViewBenefit(miClient, subtype, "Prima vacacional");
+                            view = new SViewBenefit(miClient, subtype, "Control prima vacacional");
                             break;
                         case SModSysConsts.HRSS_TP_BEN_ANN_BON:
-                            view = new SViewBenefit(miClient, subtype, "Aguinaldo");
+                            view = new SViewBenefit(miClient, subtype, "Control gratificación anual");
                             break;
                     default:
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -793,20 +811,41 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewPayroll(miClient, "Nóminas " + (subtype == SModSysConsts.HRSS_TP_PAY_WEE ? "semanales" : "quincenales"), subtype);
                 break;
             case SModConsts.HRS_PAY_RCP:
-                view = new SViewPayrollRow(miClient, "Nóminas " + (subtype == SModSysConsts.HRSS_TP_PAY_WEE ? "semanales detalle" : "quincenales detalle"), subtype);
+                view = new SViewPayrollRow(miClient, "Recibos nóminas " + (subtype == SModSysConsts.HRSS_TP_PAY_WEE ? "semanales" : "quincenales"), subtype);
+                break;
+            case SModConsts.HRS_PAY_RCP_EAR:
+                    switch (subtype) {
+                        case SModConsts.HRS_BEN:
+                            view = new SViewPayrollBenefitEarningComplement(miClient, "Incremento prestaciones");
+                            break;
+                        case SModConsts.HRS_LOAN:
+                            view = new SViewPayrollLoanEarningComplement(miClient, "Incremento créditos/préstamos");
+                            break;
+                    default:
+                        miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                }
+                break;
+            case SModConsts.HRS_PAY_RCP_DED:
+                    switch (subtype) {
+                        case SModConsts.HRS_LOAN:
+                            view = new SViewPayrollLoanDeductionComplement(miClient, "Decremento créditos/préstamos");
+                            break;
+                    default:
+                        miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                }
                 break;
             case SModConsts.HRS_ADV_SET:
-                view = new SViewAdvanceSettlement(miClient, "Adelantos liquidación");
+                view = new SViewAdvanceSettlement(miClient, "Control adelantos liquidación");
                 break;
             case SModConsts.HRSX_PAY_REC:
-                view = new SViewPayrollReceiptRecord(miClient, "Nóminas detalle vs. pólizas contables");
+                view = new SViewPayrollReceiptRecord(miClient, "Recibos nóminas vs. pólizas contables");
                 break;
             case SModConsts.HRS_SIE_PAY:
                 if (subtype == SModConsts.VIEW_SC_SUM) {
-                    title = "CFDI nóminas";
+                    title = "CFDI nóminas" + (params != null && params.getType() == SCfdConsts.CFDI_PAYROLL_VER_OLD ? " importadas" : "");
                 }
                 else {
-                    title = "CFDI nóminas (recibos)";
+                    title = "CFDI recibos nóminas" + (params != null && params.getType() == SCfdConsts.CFDI_PAYROLL_VER_OLD ? " importadas" : "");
                 }
                 view = new SViewCfdiPayroll(miClient, subtype, title, params);
                 break;
@@ -1043,8 +1082,32 @@ public class SModuleHrs extends SGuiModule {
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
                 break;
+            case SModConsts.HRS_PAY_RCP_EAR:
+                switch (subtype) {
+                    case SModConsts.HRS_BEN:
+                        if (moFormBenefitAdjustmentEarning == null) moFormBenefitAdjustmentEarning = new SFormBenefitAdjustmentEarning(miClient, "Incremento de prestación");
+                        form = moFormBenefitAdjustmentEarning;
+                        break;
+                    case SModConsts.HRS_LOAN:
+                        if (moFormLoanAdjustmentEarning == null) moFormLoanAdjustmentEarning = new SFormLoanAdjustmentEarning(miClient, "Incremento de crédito/préstamo");
+                        form = moFormLoanAdjustmentEarning;
+                        break;
+                    default:
+                        miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                }
+                break;
+            case SModConsts.HRS_PAY_RCP_DED:
+                switch (subtype) {
+                    case SModConsts.HRS_LOAN:
+                        if (moFormLoanAdjustmentDeduction == null) moFormLoanAdjustmentDeduction = new SFormLoanAdjustmentDeduction(miClient, "Decremento de crédito/préstamo");
+                        form = moFormLoanAdjustmentDeduction;
+                        break;
+                    default:
+                        miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                }
+                break;
             case SModConsts.HRS_ADV_SET:
-                if (moAdvanceSettlement == null) moAdvanceSettlement = new SFormAdvanceSettlement(miClient, "Adelanto de liquidación");
+                if (moAdvanceSettlement == null) moAdvanceSettlement = new SFormAdvanceSettlement(miClient, "Control de adelanto de liquidación");
                 form = moAdvanceSettlement;
                 break;
             default:

@@ -7,6 +7,7 @@ package erp.mod.hrs.db;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mtrn.data.SDataCfd;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
@@ -994,5 +996,43 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         statement.execute(msSql);
 
         mnQueryResultId = SDbConsts.SAVE_OK;
+    }
+
+    public static void checkDummyRegistry(final SGuiSession session, final int employeeId) throws Exception {
+        String sql = "";
+        ResultSet resultSet = null;
+        SDbPayrollReceipt registryDummy = null;
+
+        SDbPayroll.checkDummyRegistry(session);
+        
+        sql = "SELECT COUNT(*) "
+            + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " "
+            + "WHERE id_pay = " + SLibConsts.UNDEFINED + " AND id_emp = " + employeeId;
+        
+        resultSet = session.getStatement().executeQuery(sql);
+        if (resultSet.next() && resultSet.getInt(1) == 0) {
+            // Create dbReceipt:
+
+            registryDummy = new SDbPayrollReceipt();
+            registryDummy.setPkPayrollId(SLibConsts.UNDEFINED);
+            registryDummy.setPkEmployeeId(employeeId);
+            registryDummy.setDateIssue(SLibTimeUtils.createDate(2000, 1, 1));
+            registryDummy.setDatePayment(SLibTimeUtils.createDate(2000, 1, 1));
+            registryDummy.setDateBenefits(SLibTimeUtils.createDate(2000, 1, 1));
+            registryDummy.setDateLastHire(SLibTimeUtils.createDate(2000, 1, 1));
+            registryDummy.setFkPaymentTypeId(1);
+            registryDummy.setFkSalaryTypeId(SModSysConsts.HRSS_TP_SAL_FIX);
+            registryDummy.setFkEmployeeTypeId(SModSysConsts.HRSU_TP_EMP_NON);
+            registryDummy.setFkWorkerTypeId(SModSysConsts.HRSU_TP_WRK_NON);
+            registryDummy.setFkMwzTypeId(SModSysConsts.HRSU_TP_MWZ_DEF);
+            registryDummy.setFkDepartmentId(SModSysConsts.HRSU_DEP_NON);
+            registryDummy.setFkPositionId(SModSysConsts.HRSU_POS_NON);
+            registryDummy.setFkShiftId(SModSysConsts.HRSU_SHT_NON);
+            registryDummy.setFkRecruitmentSchemeTypeId(SModSysConsts.HRSS_TP_REC_SCHE_X);
+            registryDummy.setFkPositionRiskTypeId(SModSysConsts.HRSS_TP_POS_RISK_CL1);
+            registryDummy.setFkPaymentSystemTypeId(1);
+
+            registryDummy.save(session);
+        }
     }
 }

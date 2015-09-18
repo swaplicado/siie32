@@ -69,12 +69,15 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
         jlDateEnd_n = new javax.swing.JLabel();
         moTextDateEnd_n = new sa.lib.gui.bean.SBeanFieldText();
         jPanel6 = new javax.swing.JPanel();
-        jPanel11 = new javax.swing.JPanel();
+        jPanel15 = new javax.swing.JPanel();
         jlTotalAmount = new javax.swing.JLabel();
         moCurTotalAmount = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jPanel11 = new javax.swing.JPanel();
+        jlTotalEarning = new javax.swing.JLabel();
+        moCurTotalEarning = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
         jPanel13 = new javax.swing.JPanel();
-        jlTotalPayments = new javax.swing.JLabel();
-        moCurTotalPayments = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jlTotalDeductions = new javax.swing.JLabel();
+        moCurTotalDeductions = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
         jPanel14 = new javax.swing.JPanel();
         jlTotalBalance = new javax.swing.JLabel();
         moCurTotalBalance = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
@@ -92,21 +95,21 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
         jPanel12.setLayout(new java.awt.BorderLayout());
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Préstamo:"));
-        jPanel4.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
+        jPanel4.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
-        jPanel7.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlEmployeeName.setText("Empleado:");
         jlEmployeeName.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel7.add(jlEmployeeName);
 
         moTextEmployeeName.setText("sBeanFieldText2");
-        moTextEmployeeName.setPreferredSize(new java.awt.Dimension(385, 23));
+        moTextEmployeeName.setPreferredSize(new java.awt.Dimension(375, 23));
         jPanel7.add(moTextEmployeeName);
 
         jPanel4.add(jPanel7);
 
-        jPanel2.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlLoanType.setText("Tipo crédito/préstamo:");
         jlLoanType.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -121,12 +124,12 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
         jPanel2.add(jlLoanPaymentType);
 
         moTextLoanPaymentType.setText("sBeanFieldText1");
-        moTextLoanPaymentType.setPreferredSize(new java.awt.Dimension(150, 23));
+        moTextLoanPaymentType.setPreferredSize(new java.awt.Dimension(140, 23));
         jPanel2.add(moTextLoanPaymentType);
 
         jPanel4.add(jPanel2);
 
-        jPanel10.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateStart.setText("Fecha inicial:");
         jlDateStart.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -152,32 +155,42 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
         jPanel12.add(jPanel4, java.awt.BorderLayout.CENTER);
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Saldo:"));
-        jPanel6.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
+        jPanel6.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
-        jPanel11.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTotalAmount.setText("Cargos:");
-        jlTotalAmount.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlTotalAmount.setText("Total a pagar:");
+        jlTotalAmount.setPreferredSize(new java.awt.Dimension(100, 23));
         jlTotalAmount.setRequestFocusEnabled(false);
-        jPanel11.add(jlTotalAmount);
-        jPanel11.add(moCurTotalAmount);
+        jPanel15.add(jlTotalAmount);
+        jPanel15.add(moCurTotalAmount);
+
+        jPanel6.add(jPanel15);
+
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlTotalEarning.setText("Percepciones:");
+        jlTotalEarning.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlTotalEarning.setRequestFocusEnabled(false);
+        jPanel11.add(jlTotalEarning);
+        jPanel11.add(moCurTotalEarning);
 
         jPanel6.add(jPanel11);
 
-        jPanel13.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTotalPayments.setText("Abonos:");
-        jlTotalPayments.setPreferredSize(new java.awt.Dimension(75, 23));
-        jlTotalPayments.setRequestFocusEnabled(false);
-        jPanel13.add(jlTotalPayments);
-        jPanel13.add(moCurTotalPayments);
+        jlTotalDeductions.setText("Deducciones:");
+        jlTotalDeductions.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlTotalDeductions.setRequestFocusEnabled(false);
+        jPanel13.add(jlTotalDeductions);
+        jPanel13.add(moCurTotalDeductions);
 
         jPanel6.add(jPanel13);
 
-        jPanel14.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlTotalBalance.setText("Saldo:");
-        jlTotalBalance.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlTotalBalance.setPreferredSize(new java.awt.Dimension(100, 23));
         jlTotalBalance.setRequestFocusEnabled(false);
         jPanel14.add(jlTotalBalance);
         jPanel14.add(moCurTotalBalance);
@@ -188,7 +201,7 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
 
         jPanel1.add(jPanel12, java.awt.BorderLayout.NORTH);
 
-        jpPayments.setBorder(javax.swing.BorderFactory.createTitledBorder("Pagos:"));
+        jpPayments.setBorder(javax.swing.BorderFactory.createTitledBorder("Movimientos:"));
         jpPayments.setLayout(new java.awt.BorderLayout());
         jPanel1.add(jpPayments, java.awt.BorderLayout.CENTER);
 
@@ -210,6 +223,7 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel6;
@@ -222,11 +236,13 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
     private javax.swing.JLabel jlLoanType;
     private javax.swing.JLabel jlTotalAmount;
     private javax.swing.JLabel jlTotalBalance;
-    private javax.swing.JLabel jlTotalPayments;
+    private javax.swing.JLabel jlTotalDeductions;
+    private javax.swing.JLabel jlTotalEarning;
     private javax.swing.JPanel jpPayments;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurTotalAmount;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurTotalBalance;
-    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurTotalPayments;
+    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurTotalDeductions;
+    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurTotalEarning;
     private sa.lib.gui.bean.SBeanFieldText moTextDateEnd_n;
     private sa.lib.gui.bean.SBeanFieldText moTextDateStart;
     private sa.lib.gui.bean.SBeanFieldText moTextEmployeeName;
@@ -247,8 +263,10 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
         moTextDateEnd_n.setTextSettings(SGuiUtils.getLabelName(jlDateEnd_n.getText()), 25);
         moCurTotalAmount.setCompoundFieldSettings(miClient);
         moCurTotalAmount.getField().setDecimalSettings(SGuiUtils.getLabelName(jlTotalAmount), SGuiConsts.GUI_TYPE_DEC_AMT, false);
-        moCurTotalPayments.setCompoundFieldSettings(miClient);
-        moCurTotalPayments.getField().setDecimalSettings(SGuiUtils.getLabelName(jlTotalPayments), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moCurTotalEarning.setCompoundFieldSettings(miClient);
+        moCurTotalEarning.getField().setDecimalSettings(SGuiUtils.getLabelName(jlTotalEarning), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moCurTotalDeductions.setCompoundFieldSettings(miClient);
+        moCurTotalDeductions.getField().setDecimalSettings(SGuiUtils.getLabelName(jlTotalDeductions), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         moCurTotalBalance.setCompoundFieldSettings(miClient);
         moCurTotalBalance.getField().setDecimalSettings(SGuiUtils.getLabelName(jlTotalBalance), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         
@@ -274,14 +292,15 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<SGridColumnForm>();
 
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_CAL_YEAR, "Ejercicio", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_CAL_MONTH, "Período", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Tipo nómina", 75));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "No. nómina", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha inicial"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha final"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Cargos $"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Abonos $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Percepciones $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Deducciones $"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_USR, "Usr nvo"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE_DATETIME, "Usr TS nvo"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_USR, "Usr mod"));
@@ -299,7 +318,8 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
         moTextDateStart.setEditable(false);
         moTextDateEnd_n.setEditable(false);
         moCurTotalAmount.getField().setEditable(false);
-        moCurTotalPayments.getField().setEditable(false);
+        moCurTotalEarning.getField().setEditable(false);
+        moCurTotalDeductions.getField().setEditable(false);
         moCurTotalBalance.getField().setEditable(false);
         
         reloadCatalogues();
@@ -310,14 +330,14 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
     private void showPaymentsMoves() {
         double in = 0;
         double out = 0;
-        double totalAmount = 0;
-        double totalPayment = 0;
+        double totalEarnings = 0;
+        double totalDeductions = 0;
         Vector<SGridRow> rows = new Vector<>();
         String sql = "";
         ResultSet resultSet = null;
 
         try {
-            sql = "SELECT p.per_year, p.per AS f_period, tp_pay.name AS f_tp_pay, p.num AS f_num, p.dt_sta, p.dt_end, bp.id_bp, bp.bp, rcp_ear.amt_r AS f_in, 0 AS f_out, " +
+            sql = "SELECT IF(p.id_pay = 0,rcp_ear_cmp.dt, p.dt_end) AS f_dt, p.per_year, p.per AS f_period, IF(p.id_pay = 0,'', tp_pay.name) AS f_tp_pay, p.num AS f_num, IF(p.id_pay = 0,NULL, p.dt_sta) AS f_dt_sta, IF(p.id_pay = 0,NULL, p.dt_end) AS f_dt_end, 1 AS f_ord, rcp_ear.id_pay, rcp_ear.id_emp, rcp_ear.id_mov, bp.id_bp, bp.bp, rcp_ear.amt_r AS f_in, 0 AS f_out, " +
                     "rcp_ear.ts_usr_ins AS ts_usr_ins, rcp_ear.ts_usr_upd AS ts_usr_upd, ui.usr AS f_usr_ins, uu.usr AS f_usr_upd " +
                     "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS rcp ON rcp.id_pay = p.id_pay " +
@@ -327,11 +347,12 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON bp.id_bp = emp.id_emp " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON rcp_ear.fk_usr_ins = ui.id_usr " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON rcp_ear.fk_usr_upd = uu.id_usr " +
-                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND rcp_ear.fk_loan_emp_n = " + moLoan.getPkEmployeeId() + " AND rcp_ear.fk_loan_loan_n = " + moLoan.getPkLoanId() + " " +
+                    "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR_CMP) + " AS rcp_ear_cmp ON rcp_ear_cmp.id_pay = rcp_ear.id_pay AND rcp_ear_cmp.id_emp = rcp_ear.id_emp AND rcp_ear_cmp.id_mov = rcp_ear.id_mov " +
+                    "WHERE (p.id_pay = 0 OR p.b_del = 0) AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND rcp_ear.fk_loan_emp_n = " + moLoan.getPkEmployeeId() + " AND rcp_ear.fk_loan_loan_n = " + moLoan.getPkLoanId() + " " +
 
                     "UNION " +
 
-                    "SELECT p.per_year, p.per AS f_period, tp_pay.name AS f_tp_pay, p.num AS f_num, p.dt_sta, p.dt_end, bp.id_bp, bp.bp, 0 AS f_in, rcp_ded.amt_r AS f_out, " +
+                    "SELECT IF(p.id_pay = 0,rcp_ded_cmp.dt, p.dt_end) AS f_dt, p.per_year, p.per AS f_period, IF(p.id_pay = 0,'', tp_pay.name) AS f_tp_pay, p.num AS f_num, IF(p.id_pay = 0,NULL, p.dt_sta) AS f_dt_sta, IF(p.id_pay = 0,NULL, p.dt_end) AS f_dt_end, 2 AS f_ord, rcp_ded.id_pay, rcp_ded.id_emp, rcp_ded.id_mov, bp.id_bp, bp.bp, 0 AS f_in, rcp_ded.amt_r AS f_out, " +
                     "rcp_ded.ts_usr_ins AS ts_usr_ins, rcp_ded.ts_usr_upd AS ts_usr_upd, ui.usr AS f_usr_ins, uu.usr AS f_usr_upd " +
                     "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS rcp ON rcp.id_pay = p.id_pay " +
@@ -341,22 +362,24 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON bp.id_bp = emp.id_emp " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON rcp_ded.fk_usr_ins = ui.id_usr " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON rcp_ded.fk_usr_upd = uu.id_usr " +
-                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.fk_loan_emp_n = " + moLoan.getPkEmployeeId() + " AND rcp_ded.fk_loan_loan_n = " + moLoan.getPkLoanId() + " " +
-                    "ORDER BY per_year, f_period, f_tp_pay, f_num, dt_sta, dt_end, id_bp, bp ";
+                    "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED_CMP) + " AS rcp_ded_cmp ON rcp_ded_cmp.id_pay = rcp_ded.id_pay AND rcp_ded_cmp.id_emp = rcp_ded.id_emp AND rcp_ded_cmp.id_mov = rcp_ded.id_mov " +
+                    "WHERE (p.id_pay = 0 OR p.b_del = 0) AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.fk_loan_emp_n = " + moLoan.getPkEmployeeId() + " AND rcp_ded.fk_loan_loan_n = " + moLoan.getPkLoanId() + " " +
+                    "ORDER BY f_dt, per_year, f_period, f_tp_pay, f_num, f_dt_sta, f_dt_end, f_ord, id_pay, id_emp, id_mov ";
 
             resultSet = miClient.getSession().getStatement().executeQuery(sql);
 
             while (resultSet.next()) {
                 SRowLoanPaymentCardex row = new SRowLoanPaymentCardex();
+                row.setDate(resultSet.getDate("f_dt"));
                 row.setYear(resultSet.getInt("per_year"));
                 row.setPeriod(resultSet.getInt("f_period"));
                 row.setPayrollType(resultSet.getString("f_tp_pay"));
                 row.setNumber(resultSet.getString("f_num"));
-                row.setDateStart(resultSet.getDate("dt_sta"));
-                row.setDateEnd(resultSet.getDate("dt_end"));
+                row.setDateStart(resultSet.getDate("f_dt_sta"));
+                row.setDateEnd(resultSet.getDate("f_dt_end"));
 
-                totalAmount += in = resultSet.getDouble("f_in");
-                totalPayment += out = resultSet.getDouble("f_out");
+                totalEarnings += in = resultSet.getDouble("f_in");
+                totalDeductions += out = resultSet.getDouble("f_out");
 
                 row.setAmount(in);
                 row.setPayment(out);
@@ -368,9 +391,10 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
                 rows.add(row);
             }
             
-            moCurTotalAmount.getField().setValue(moLoan.getTotalAmount() + totalAmount);
-            moCurTotalPayments.getField().setValue(totalPayment);
-            moCurTotalBalance.getField().setValue((moLoan.getTotalAmount() + totalAmount) - totalPayment);
+            moCurTotalAmount.getField().setValue(moLoan.getTotalAmount());
+            moCurTotalEarning.getField().setValue(totalEarnings);
+            moCurTotalDeductions.getField().setValue(totalDeductions);
+            moCurTotalBalance.getField().setValue((moLoan.getTotalAmount() + totalEarnings) - totalDeductions);
 
             moGridPaymentMoves.populateGrid(rows);
             moGridPaymentMoves.clearSortKeys();
@@ -390,7 +414,7 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
         moTextLoanType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_LOAN, new int[] { moLoan.getFkLoanTypeId() }, SDbRegistryUser.FIELD_NAME));
         moTextLoanPaymentType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_LOAN_PAY, new int[] { moLoan.getFkLoanPaymentTypeId() }, SDbRegistryUser.FIELD_NAME));
         moTextDateStart.setValue(SLibUtils.DateFormatDate.format(moLoan.getDateStart()));
-        moTextDateEnd_n.setValue(moLoan.getDateEnd_n() == null ? " / / / " : SLibUtils.DateFormatDate.format(moLoan.getDateEnd_n()));
+        moTextDateEnd_n.setValue(moLoan.getDateEnd_n() == null ? "" : SLibUtils.DateFormatDate.format(moLoan.getDateEnd_n()));
         
         showPaymentsMoves();
     }

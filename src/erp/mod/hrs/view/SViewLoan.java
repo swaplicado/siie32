@@ -41,9 +41,9 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_LOAN, SLibConsts.UNDEFINED, title);
 
         jbCloseLoan = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_ok.gif")), "Cerrar crédito/préstamo", this);
-        jbCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver pagos", this);
+        jbCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver movimientos", this);
         
-        moDialogLoanPaymentsCardex = new SDialogLoanPaymentsCardex(client, "Pagos del préstamo");
+        moDialogLoanPaymentsCardex = new SDialogLoanPaymentsCardex(client, "Control de crédito/préstamo");
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCloseLoan);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCardex);

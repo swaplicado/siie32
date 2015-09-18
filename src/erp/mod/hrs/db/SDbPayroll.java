@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
@@ -65,6 +66,7 @@ public class SDbPayroll extends SDbRegistryUser {
     protected String msAuxPaymentType;
     protected double mdAuxTotalEarnings;
     protected double mdAuxTotalDeductions;
+    protected boolean mbAuxIsDummy;
 
     protected ArrayList<SDbPayrollReceipt> maChildPayrollReceipts;
     protected ArrayList<SDbPayrollReceipt> maChildPayrollReceiptsDelete;
@@ -76,7 +78,7 @@ public class SDbPayroll extends SDbRegistryUser {
     /*
      * Private methods
      */
-
+    
     /*
      * Public methods
      */
@@ -190,11 +192,14 @@ public class SDbPayroll extends SDbRegistryUser {
     public void setAuxPaymentType(String s) { msAuxPaymentType = s; }
     public void setAuxTotalEarnings(double d) { mdAuxTotalEarnings = d; }
     public void setAuxTotalDeductions(double d) { mdAuxTotalDeductions = d; }
+    public void setAuxIsDummy(boolean b) { mbAuxIsDummy = b; }
 
     public String getAuxPaymentType() { return msAuxPaymentType; }
     public double getAuxTotalEarnings() { return mdAuxTotalEarnings; }
     public double getAuxTotalDeductions() { return mdAuxTotalDeductions; }
     public double getAuxTotalNet() { return mdAuxTotalEarnings - mdAuxTotalDeductions; }
+    
+    public boolean isDummy() { return mbAuxIsDummy; }
 
     public ArrayList<SDbPayrollReceipt> getChildPayrollReceipts() { return maChildPayrollReceipts; }
     public ArrayList<SDbPayrollReceipt> getChildPayrollReceiptsDelete() { return maChildPayrollReceiptsDelete; }
@@ -249,6 +254,7 @@ public class SDbPayroll extends SDbRegistryUser {
         msAuxPaymentType = "";
         mdAuxTotalEarnings = 0;
         mdAuxTotalDeductions = 0;
+        mbAuxIsDummy = false;
 
         maChildPayrollReceipts = new ArrayList<SDbPayrollReceipt>();
         maChildPayrollReceiptsDelete = new ArrayList<SDbPayrollReceipt>();
@@ -368,7 +374,9 @@ public class SDbPayroll extends SDbRegistryUser {
         mnQueryResultId = SDbConsts.SAVE_ERROR;
 
         if (mbRegistryNew) {
-            computePrimaryKey(session);
+            if (!mbAuxIsDummy)  {
+                computePrimaryKey(session);
+            }
             mbUpdatable = true;
             mbDisableable = true;
             mbDeletable = true;
@@ -595,5 +603,35 @@ public class SDbPayroll extends SDbRegistryUser {
         statement.execute(msSql);
         
         mnQueryResultId = SDbConsts.SAVE_OK;
+    }
+
+    public static void checkDummyRegistry(final SGuiSession session) throws Exception {
+        String sql = "";
+        ResultSet resultSet = null;
+        SDbPayroll registryDummy = null;
+
+        sql = "SELECT COUNT(*) "
+            + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " "
+            + "WHERE id_pay = " + SLibConsts.UNDEFINED;
+        
+        resultSet = session.getStatement().executeQuery(sql);
+        if (resultSet.next() && resultSet.getInt(1) == 0) {
+            // Create dbReceipt:
+
+            registryDummy = new SDbPayroll();
+            registryDummy.setAuxIsDummy(true);
+            registryDummy.setDateStart(SLibTimeUtils.createDate(2000, 1, 1));
+            registryDummy.setDateEnd(SLibTimeUtils.createDate(2000, 1, 1));
+            registryDummy.setDeleted(true);
+            registryDummy.setFkPaymentTypeId(1);
+            registryDummy.setFkMwzTypeId(1);
+            registryDummy.setFkMwzReferenceTypeId(1);
+            registryDummy.setFkTaxComputationTypeId(1);
+            registryDummy.setFkTaxId(1);
+            registryDummy.setFkTaxSubsidyId(1);
+            registryDummy.setFkSsContributionId(1);
+
+            registryDummy.save(session);
+        }
     }
 }

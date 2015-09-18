@@ -14,6 +14,7 @@ import sa.lib.grid.SGridRow;
  */
 public class SRowLoanPaymentCardex implements SGridRow {
 
+    protected Date mtDate;
     protected int mnYear;
     protected int mnPeriod;
     protected String msPayrollType;
@@ -28,6 +29,7 @@ public class SRowLoanPaymentCardex implements SGridRow {
     protected Date mtDateUserUpdate;
 
     public SRowLoanPaymentCardex() {
+        mtDate = null;
         mnYear = 0;
         mnPeriod = 0;
         msPayrollType = "";
@@ -42,6 +44,7 @@ public class SRowLoanPaymentCardex implements SGridRow {
         mtDateUserUpdate = null;
     }
 
+    public void setDate(Date t) { mtDate = t; }
     public void setYear(int n) { mnYear = n; }
     public void setPeriod(int n) { mnPeriod = n; }
     public void setPayrollType(String s) { msPayrollType = s; }
@@ -55,6 +58,7 @@ public class SRowLoanPaymentCardex implements SGridRow {
     public void setUserUpdate(String s) { msUserUpdate = s; }
     public void setDateUserUpdate(Date t) { mtDateUserUpdate = t; }
 
+    public Date getDate() { return mtDate; }
     public int getYear() { return mnYear; }
     public int getPeriod() { return mnPeriod; }
     public String getPayrollType() { return msPayrollType; }
@@ -109,39 +113,42 @@ public class SRowLoanPaymentCardex implements SGridRow {
 
         switch(row) {
             case 0:
-                value = mnYear;
+                value = mtDate;
                 break;
             case 1:
-                value = mnPeriod;
+                value = mnYear;
                 break;
             case 2:
-                value = msPayrollType;
+                value = mnPeriod;
                 break;
             case 3:
-                value = msNumber;
+                value = msPayrollType;
                 break;
             case 4:
-                value = mtDateStart;
+                value = msNumber;
                 break;
             case 5:
-                value = mtDateEnd;
+                value = mtDateStart;
                 break;
             case 6:
-                value = mdAmount;
+                value = mtDateEnd;
                 break;
             case 7:
-                value = mdPayment;
+                value = mdAmount;
                 break;
             case 8:
-                value = msUserInsert;
+                value = mdPayment;
                 break;
             case 9:
-                value = mtDateUserInsert;
+                value = msUserInsert;
                 break;
             case 10:
-                value = msUserUpdate;
+                value = mtDateUserInsert;
                 break;
             case 11:
+                value = msUserUpdate;
+                break;
+            case 12:
                 value = mtDateUserUpdate;
                 break;
             default:

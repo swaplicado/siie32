@@ -15,6 +15,7 @@ import sa.lib.grid.SGridRow;
  */
 public class SRowBenefitDetailCardex implements SGridRow {
 
+    protected Date mtDate;
     protected int mnRowType;
     protected int mnYear;
     protected int mnPeriod;
@@ -30,6 +31,7 @@ public class SRowBenefitDetailCardex implements SGridRow {
     protected Date mtDateUserUpdate;
 
     public SRowBenefitDetailCardex(int rowType) {
+        mtDate = null;
         mnRowType = rowType;
         mnYear = 0;
         mnPeriod = 0;
@@ -45,6 +47,7 @@ public class SRowBenefitDetailCardex implements SGridRow {
         mtDateUserUpdate = null;
     }
 
+    public void setDate(Date t) { mtDate = t; }
     public void setRowType(int n) { mnRowType = n; }
     public void setYear(int n) { mnYear = n; }
     public void setPeriod(int n) { mnPeriod = n; }
@@ -59,6 +62,7 @@ public class SRowBenefitDetailCardex implements SGridRow {
     public void setUserUpdate(String s) { msUserUpdate = s; }
     public void setDateUserUpdate(Date t) { mtDateUserUpdate = t; }
 
+    public Date getDate() { return mtDate; }
     public int getRowType() { return mnRowType; }
     public int getYear() { return mnYear; }
     public int getPeriod() { return mnPeriod; }
@@ -112,66 +116,28 @@ public class SRowBenefitDetailCardex implements SGridRow {
     public Object getRowValueAt(int row) {
         Object value = null;
 
-        if (mnRowType == SModSysConsts.HRSS_TP_BEN_VAC_BON) { 
+        if (mnRowType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
             switch(row) {
                 case 0:
-                    value = mnYear;
+                    value = mtDate;
                     break;
                 case 1:
-                    value = mnPeriod;
-                    break;
-                case 2:
-                    value = msPayrollType;
-                    break;
-                case 3:
-                    value = msNumber;
-                    break;
-                case 4:
-                    value = mtDateStart;
-                    break;
-                case 5:
-                    value = mtDateEnd;
-                    break;
-                case 6:
-                    value = mdAmount;
-                    break;
-                case 7:
-                    value = msUserInsert;
-                    break;
-                case 8:
-                    value = mtDateUserInsert;
-                    break;
-                case 9:
-                    value = msUserUpdate;
-                    break;
-                case 10:
-                    value = mtDateUserUpdate;
-                    break;
-                default:
-            }
-        }
-        else { 
-            switch(row) {
-                case 0:
                     value = mnYear;
                     break;
-                case 1:
+                case 2:
                     value = mnPeriod;
                     break;
-                case 2:
+                case 3:
                     value = msPayrollType;
                     break;
-                case 3:
+                case 4:
                     value = msNumber;
                     break;
-                case 4:
+                case 5:
                     value = mtDateStart;
                     break;
-                case 5:
-                    value = mtDateEnd;
-                    break;
                 case 6:
-                    value = mdDays;
+                    value = mtDateEnd;
                     break;
                 case 7:
                     value = mdAmount;
@@ -186,6 +152,50 @@ public class SRowBenefitDetailCardex implements SGridRow {
                     value = msUserUpdate;
                     break;
                 case 11:
+                    value = mtDateUserUpdate;
+                    break;
+                default:
+            }
+        }
+        else { 
+            switch(row) {
+                case 0:
+                    value = mtDate;
+                    break;
+                case 1:
+                    value = mnYear;
+                    break;
+                case 2:
+                    value = mnPeriod;
+                    break;
+                case 3:
+                    value = msPayrollType;
+                    break;
+                case 4:
+                    value = msNumber;
+                    break;
+                case 5:
+                    value = mtDateStart;
+                    break;
+                case 6:
+                    value = mtDateEnd;
+                    break;
+                case 7:
+                    value = mdDays;
+                    break;
+                case 8:
+                    value = mdAmount;
+                    break;
+                case 9:
+                    value = msUserInsert;
+                    break;
+                case 10:
+                    value = mtDateUserInsert;
+                    break;
+                case 11:
+                    value = msUserUpdate;
+                    break;
+                case 12:
                     value = mtDateUserUpdate;
                     break;
                 default:

@@ -63,9 +63,9 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
         else {
             moFilterDate.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_YEAR, miClient.getSession().getCurrentDate().getTime()));
         }
-        jbCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver pagos", this);
+        jbCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver movimientos", this);
         
-        moDialogBenefitCardex = new SDialogBenefitCardex(miClient, mnGridSubtype, "Detalle de la prestación");
+        moDialogBenefitCardex = new SDialogBenefitCardex(miClient, mnGridSubtype, "Control de la prestación");
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDate);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCardex);

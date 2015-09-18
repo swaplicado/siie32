@@ -512,7 +512,7 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
 
     @Override
     public void reloadCatalogues() {
-        miClient.getSession().populateCatalogue(moKeyBenefitType, SModConsts.HRSS_TP_BEN, SModSysConsts.HRSS_TP_BEN_NON, null);
+        miClient.getSession().populateCatalogue(moKeyBenefitType, SModConsts.HRSS_TP_BEN, SModConsts.HRS_BEN, null);
         miClient.getSession().populateCatalogue(moKeyEarning, SModConsts.HRS_EAR, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyDeduction, SModConsts.HRS_DED, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyPaymentType, SModConsts.HRSS_TP_PAY, SLibConsts.UNDEFINED, null);
