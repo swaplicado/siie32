@@ -762,7 +762,7 @@ public class SModuleHrs extends SGuiModule {
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
                 break;
-                case SModConsts.HRSX_BEN:
+                case SModConsts.HRSX_BEN_MOV:
                     switch (subtype) {
                         case SModSysConsts.HRSS_TP_BEN_VAC:
                             view = new SViewBenefit(miClient, subtype, "Control vacaciones");

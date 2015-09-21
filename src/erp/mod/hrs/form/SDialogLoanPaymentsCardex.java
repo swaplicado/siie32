@@ -38,7 +38,7 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
      * Creates new form SDialogLoanPaymentsCardex
      */
     public SDialogLoanPaymentsCardex(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSX_PAY_LOAN, SLibConsts.UNDEFINED, title);
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSX_LOAN_PAY, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
     }
@@ -282,7 +282,7 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
         moFields.addField(moCurTotalBalance.getField());
         */
 
-        moGridPaymentMoves = new SGridPaneForm(miClient, SModConsts.HRSX_PAY_LOAN, SLibConsts.UNDEFINED, "Pagos del préstamo") {
+        moGridPaymentMoves = new SGridPaneForm(miClient, SModConsts.HRSX_LOAN_PAY, SLibConsts.UNDEFINED, "Pagos del préstamo") {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);

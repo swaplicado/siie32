@@ -805,13 +805,13 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                 miClient.getSession().showView(SModConsts.HRSX_AUT_DED, SModSysConsts.HRS_AUT_EMP, null);
             }
             else if (item == jmiBenefitBenefitVac) {
-                miClient.getSession().showView(SModConsts.HRSX_BEN, SModSysConsts.HRSS_TP_BEN_VAC, null);
+                miClient.getSession().showView(SModConsts.HRSX_BEN_MOV, SModSysConsts.HRSS_TP_BEN_VAC, null);
             }
             else if (item == jmiBenefitBenefitBonVac) {
-                miClient.getSession().showView(SModConsts.HRSX_BEN, SModSysConsts.HRSS_TP_BEN_VAC_BON, null);
+                miClient.getSession().showView(SModConsts.HRSX_BEN_MOV, SModSysConsts.HRSS_TP_BEN_VAC_BON, null);
             }
             else if (item == jmiBenefitBenefitBonAnn) {
-                miClient.getSession().showView(SModConsts.HRSX_BEN, SModSysConsts.HRSS_TP_BEN_ANN_BON, null);
+                miClient.getSession().showView(SModConsts.HRSX_BEN_MOV, SModSysConsts.HRSS_TP_BEN_ANN_BON, null);
             }
             else if (item == jmiBenefitBenefitAdjustmentEarning) {
                 miClient.getSession().showView(SModConsts.HRS_PAY_RCP_EAR, SModConsts.HRS_BEN, null);

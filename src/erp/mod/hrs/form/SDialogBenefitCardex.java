@@ -54,7 +54,7 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
      * Creates new form SDialogBenefitCardex
      */
     public SDialogBenefitCardex(SGuiClient client, int formSubtype, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSX_BEN, formSubtype, title);
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSX_BEN_MOV, formSubtype, title);
         initComponents();
         initComponentsCustom();
     }

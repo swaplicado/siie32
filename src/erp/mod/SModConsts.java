@@ -617,12 +617,13 @@ public abstract class SModConsts {
     public static final int HRSX_PAY_REC_DED = 2064037;
     public static final int HRSX_PAY_REC_EMP = 2064038;
     public static final int HRSX_PAY_REC_REC = 2064039;
-    public static final int HRSX_PAY_LOAN = 2064040;
     public static final int HRSX_PAY_LAY = 2064041;
-    public static final int HRSX_ABS = 2064042;
-    public static final int HRSX_BEN = 2064043;
-    public static final int HRSX_BEN_SUM = 2064044;
-    public static final int HRSX_BEN_DET = 2064045;
+    public static final int HRSX_BEN_MOV = 2064051;
+    public static final int HRSX_BEN_SUM = 2064052;
+    public static final int HRSX_BEN_DET = 2064053;
+    public static final int HRSX_EMP_INT = 2064061;
+    public static final int HRSX_LOAN_PAY = 2064091;
+    public static final int HRSX_ABS_MOV = 2064101;
 
     public static final int HRSU_TP_PAY_SYS = 2064050;
 
@@ -631,7 +632,7 @@ public abstract class SModConsts {
     public static final int HRSR_AUX_EAR_EMP = 2065012;
     public static final int HRSR_AUX_DED = 2065021;
     public static final int HRSR_AUX_DED_EMP = 2065022;
-    public static final int HRSR_PAY_TAX = 2065023;
+    public static final int HRSR_PAY_TAX = 2065031;
 
     public static final HashMap<Integer, String> TablesMap = new HashMap<Integer, String>();
 

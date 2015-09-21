@@ -39,7 +39,7 @@ public class SDialogAbsenceMovesCardex extends SBeanFormDialog {
      * Creates new form SDialogAbsenceMovesCardex
      */
     public SDialogAbsenceMovesCardex(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSX_ABS, SLibConsts.UNDEFINED, title);
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSX_ABS_MOV, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
     }
@@ -262,7 +262,7 @@ public class SDialogAbsenceMovesCardex extends SBeanFormDialog {
         moFields.addField(moIntApplyDays);
         */
 
-        moGridAbsenceMoves = new SGridPaneForm(miClient, SModConsts.HRSX_ABS, SLibConsts.UNDEFINED, "Movimientos de la incidencia") {
+        moGridAbsenceMoves = new SGridPaneForm(miClient, SModConsts.HRSX_ABS_MOV, SLibConsts.UNDEFINED, "Movimientos de la incidencia") {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);

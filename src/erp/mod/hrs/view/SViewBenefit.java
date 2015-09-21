@@ -49,7 +49,7 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
     private SDialogBenefitCardex moDialogBenefitCardex;
     
     public SViewBenefit(SGuiClient client, int gridSubtype, String title) {
-        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRSX_BEN, gridSubtype, title);
+        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRSX_BEN_MOV, gridSubtype, title);
         initComponentsCustom();
     }
 
