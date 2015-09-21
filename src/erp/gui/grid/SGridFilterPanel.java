@@ -105,11 +105,8 @@ public class SGridFilterPanel extends JPanel implements SGridFilter, ActionListe
     
     public void updateOptions() {
         jcbFilter.removeItemListener(this);
-        
         miClient.getSession().populateCatalogue(jcbFilter, mnFilterType, mnFilterSubype, new SGuiParams(SDbRegistry.FIELD_CODE));
-        
         actionClearFilter();
-        
         jcbFilter.addItemListener(this);
     }
     

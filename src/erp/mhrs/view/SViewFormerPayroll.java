@@ -14,13 +14,12 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
-import javax.swing.JButton;
 
 /**
  *
  * @author Sergio Flores
  */
-public class SViewFormerPayroll extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
+public class SViewFormerPayroll extends erp.lib.table.STableTab {
 
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
@@ -134,14 +133,5 @@ public class SViewFormerPayroll extends erp.lib.table.STableTab implements java.
                 "INNER JOIN erp.usru_usr AS ud ON p.fid_usr_del = ud.id_usr " +
                 (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) +
                 "ORDER BY p.pay_year, p.pay_per, p.pay_type, p.pay_num, p.id_pay ";
-    }
-
-    @Override
-    public void actionPerformed(java.awt.event.ActionEvent e) {
-        super.actionPerformed(e);
-
-        if (e.getSource() instanceof javax.swing.JButton) {
-            JButton button = (JButton) e.getSource();
-        }
     }
 }

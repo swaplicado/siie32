@@ -66,10 +66,12 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     
     private int mnPaymentTypeId;
     
-    /** Creates new form SPanelQueryIntegralEmployee */
+    /** Creates new form SPanelQueryIntegralEmployee
+     * @param client 
+     */
     public SPanelQueryIntegralEmployee(erp.client.SClientInterface client) {
         try {
-            mnPanelType = SDataConstants.TRNX_MFG_ORD;
+            mnPanelType = SModConsts.HRSX_EMP_INT;
             miClient = client;
 
             initComponents();
@@ -975,7 +977,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     
     private void itemStateChangedFilter() {
         try {
-            mnPaymentTypeId = ((SGuiItem) jcbFilter.getSelectedItem()).getPrimaryKey()[0];
+            mnPaymentTypeId = (((SGuiItem) jcbFilter.getSelectedItem()).getPrimaryKey().length == 0 ? SLibConsts.UNDEFINED : ((SGuiItem) jcbFilter.getSelectedItem()).getPrimaryKey()[0]);
             jbClearFilter.setEnabled(jcbFilter.getSelectedIndex() > 0);
             populateEmployee();
         }

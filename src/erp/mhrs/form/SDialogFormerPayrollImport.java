@@ -78,7 +78,9 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
     private SHrsFormerPayroll moPayroll;
     private java.util.Vector<java.lang.Object[]> mvRecords; // idx 0: record registry (SDataRecord); idx 1: selected employees (Vector<Integer>)
 
-    /** Creates new form SDialogFormerPayrollPicker */
+    /** Creates new form SDialogFormerPayrollPicker
+     * @param client 
+     */
     public SDialogFormerPayrollImport(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;

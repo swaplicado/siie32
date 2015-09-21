@@ -1229,7 +1229,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         SHrsPayrollRowEmployeeReceipt row = null;
         String employeesReceiptIds = "";
 
-        for (int i=0; i<moGridPaneEmployeesReceipt.getModel().getRowCount(); i++) {
+        for (int i = 0; i < moGridPaneEmployeesReceipt.getModel().getRowCount(); i++) {
             row = (SHrsPayrollRowEmployeeReceipt) moGridPaneEmployeesReceipt.getGridRow(i);
             employeesReceiptIds = employeesReceiptIds + row.getPkEmployeeId() + ", ";
         }
@@ -1239,17 +1239,13 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
     private void actionEditPeriodYear() {
         jbEditPeriodYear.setEnabled(false);
-
         moIntPeriodYear.setEditable(true);
-
         moIntPeriodYear.requestFocus();
     }
     
     private void actionEditFiscalYear() {
         jbEditFiscalYear.setEnabled(false);
-
         moIntFiscalYear.setEditable(true);
-
         moIntFiscalYear.requestFocus();
     }
 
@@ -1268,10 +1264,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
     private void actionEditDates() {
         jbEditDates.setEnabled(false);
-
         moDateDateStart.setEditable(true);
         moDateDateEnd.setEditable(true);
-
         moDateDateStart.requestFocus();
     }
 
@@ -1284,9 +1278,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
     private void actionEditPeriod() {
         jbEditPeriod.setEnabled(false);
-
         moIntPeriod.setEditable(true);
-
         moIntPeriod.requestFocus();
     }
 

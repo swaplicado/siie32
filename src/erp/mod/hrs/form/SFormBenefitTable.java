@@ -44,6 +44,8 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
 
     /**
      * Creates new form SFormBenefitTable
+     * @param client
+     * @param title
      */
     public SFormBenefitTable(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_BEN, SLibConsts.UNDEFINED, title);

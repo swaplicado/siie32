@@ -507,7 +507,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         }
         else {
             switch (panelType) {
-                case SDataConstants.HRS_FORMER_PAYR_EMP:
+                case SModConsts.HRSX_EMP_INT:
                     title = "Consulta integral empleados";
                     tableTab = new SPanelQueryIntegralEmployee(miClient);
                     break;
@@ -709,7 +709,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                 miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).showView(SDataConstants.BPSX_BP_EMP);
             }
             else if (item == jmiCatEmployeeIntegral) {
-                showPanelQueryIntegralEmployee(SDataConstants.HRS_FORMER_PAYR_EMP);
+                showPanelQueryIntegralEmployee(SModConsts.HRSX_EMP_INT);
             }
             else if (item == jmiCatEmployeeHireLog) {
                 miClient.getSession().showView(SModConsts.HRS_EMP_LOG_HIRE, SLibConsts.UNDEFINED, null);
