@@ -4,6 +4,7 @@
  */
 package erp.mod.hrs.view;
 
+import erp.gui.grid.SGridFilterPanel;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SHrsConsts;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import sa.lib.SLibConsts;
 import sa.lib.SLibRpnArgument;
 import sa.lib.SLibRpnArgumentType;
 import sa.lib.SLibRpnOperator;
@@ -23,6 +25,7 @@ import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridFilterDate;
+import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.grid.SGridRowView;
@@ -37,6 +40,8 @@ import sa.lib.gui.SGuiDate;
  */
 public class SViewBenefit extends SGridPaneView implements ActionListener {
 
+    private SGridFilterPanel moFilterProject;
+
     private SGridFilterDate moFilterDate;
     private JButton jbCardex;
     private Date mtDateCut;
@@ -46,7 +51,6 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
     public SViewBenefit(SGuiClient client, int gridSubtype, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRSX_BEN, gridSubtype, title);
         initComponentsCustom();
-        setRowButtonsEnabled(false);
     }
 
     /*
@@ -54,8 +58,13 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
      */
 
     private void initComponentsCustom() {
+        setRowButtonsEnabled(false);
+        
         moFilterDate = new SGridFilterDate(miClient, this);
         mtDateCut = null;
+        
+        moFilterProject = new SGridFilterPanel(miClient, this, SModConsts.HRSS_TP_PAY, SLibConsts.UNDEFINED);
+        moFilterProject.initFilter(null);
         
         if (mnGridSubtype == SModSysConsts.HRSS_TP_BEN_ANN_BON) {
             moFilterDate.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_YEAR, SLibTimeUtils.getEndOfYear(miClient.getSession().getCurrentDate()).getTime()));
@@ -68,6 +77,7 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
         moDialogBenefitCardex = new SDialogBenefitCardex(miClient, mnGridSubtype, "Control de la prestación");
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDate);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterProject);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCardex);
     }
 
@@ -118,6 +128,11 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
         if ((Boolean) filter) {
             sql += (sql.isEmpty() ? " AND " : "") + "emp.b_act = 1 ";
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSS_TP_PAY)).getValue();
+        if (filter != null && ((int[]) filter).length == 1) {
+            sql += (sql.isEmpty() ? "" : "AND ") + "emp.fk_tp_pay = " + ((int[]) filter)[0] + " ";
         }
 
         msSql = "SELECT "

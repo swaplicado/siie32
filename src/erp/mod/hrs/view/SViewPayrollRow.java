@@ -27,18 +27,22 @@ import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
+import sa.lib.grid.SGridFilterDatePeriod;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.grid.SGridRowView;
 import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiDate;
 
 /**
  *
  * @author Néstor Ávalos, Juan Barajas
  */
 public class SViewPayrollRow extends SGridPaneView implements ActionListener {
+
+    private SGridFilterDatePeriod moFilterDatePeriod;
 
     private JButton jbPrintReceipt;
     private JButton jbSignXml;
@@ -65,6 +69,9 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
     private void initComponentCustom() {
         setRowButtonsEnabled(false);
         
+        moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
+        moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
+        
         jbSignXml = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_SIGN), "Timbrar XML", this);
         jbAnnul = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_ANNUL), "Anular nómina", this);
         jbGetXml = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML), "Obtener XML", this);
@@ -87,6 +94,8 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
         jbSend.setEnabled(true);
         jbVerifyCfdi.setEnabled(true);
         jbDiactivatePac.setEnabled(true);
+        
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrintReceipt);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSignXml);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAnnul);
@@ -439,6 +448,9 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
         if ((Boolean) filter) {
             sql += (sql.isEmpty() ? "" : "AND ") + "r.b_del = 0 ";
         }
+        
+        filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
+        sql += (sql.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt_end", (SGuiDate) filter);
 
         msSql = "SELECT "
             + "r.id_pay AS " + SDbConsts.FIELD_ID + "1, "

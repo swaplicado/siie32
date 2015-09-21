@@ -7,12 +7,15 @@ package erp.mod.hrs.view;
 import erp.mod.SModConsts;
 import java.util.ArrayList;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
+import sa.lib.grid.SGridFilterYear;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
 
 /**
  *
@@ -20,9 +23,19 @@ import sa.lib.gui.SGuiClient;
  */
 public class SViewHoliday extends SGridPaneView {
 
+    private SGridFilterYear moFilterYear;
+    
     public SViewHoliday(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_HOL, SLibConsts.UNDEFINED, title);
         setRowButtonsEnabled(true, true, true, false, true);
+        initComponetsCustom();
+    }
+
+    private void initComponetsCustom() {
+        moFilterYear = new SGridFilterYear(miClient, this);
+        moFilterYear.initFilter(new int[] { SLibTimeUtils.digestYear(miClient.getSession().getCurrentDate())[0] });
+        
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterYear);
     }
 
     @Override
@@ -38,6 +51,9 @@ public class SViewHoliday extends SGridPaneView {
         if ((Boolean) filter) {
             sql += (sql.isEmpty() ? "" : "AND ") + "v.b_del = 0 ";
         }
+    
+        filter = (int[]) moFiltersMap.get(SGridConsts.FILTER_YEAR).getValue();
+        sql += (sql.isEmpty() ? "" : " AND ") + ("v.id_hdy = " + ((int[]) filter)[0]) + " ";
 
         msSql = "SELECT "
                 + "v.id_hdy AS " + SDbConsts.FIELD_ID + "1, "

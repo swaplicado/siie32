@@ -10,9 +10,13 @@ import java.util.ArrayList;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
+import sa.lib.grid.SGridFilterDatePeriod;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
+import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiDate;
 
 /**
  *
@@ -20,9 +24,24 @@ import sa.lib.gui.SGuiClient;
  */
 public class SViewPayrollBenefitEarningComplement extends SGridPaneView {
 
+    private SGridFilterDatePeriod moFilterDatePeriod;
+
     public SViewPayrollBenefitEarningComplement(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_PAY_RCP_EAR, SModConsts.HRS_BEN, title);
+        initComponentCustom();
+    }
+
+    /*
+     * Private methods
+     */
+
+    private void initComponentCustom() {
         setRowButtonsEnabled(true, true, true, false, true);
+        
+        moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
+        moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
+        
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
     }
 
     @Override
@@ -39,6 +58,9 @@ public class SViewPayrollBenefitEarningComplement extends SGridPaneView {
         if ((Boolean) filter) {
             sql += (sql.isEmpty() ? "" : "AND ") + "ve.b_del = 0 ";
         }
+        
+        filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
+        sql += (sql.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt", (SGuiDate) filter);
 
         msSql = "SELECT "
                 + "ve.id_pay AS " + SDbConsts.FIELD_ID + "1, "

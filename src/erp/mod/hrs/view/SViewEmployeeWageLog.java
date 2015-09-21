@@ -4,15 +4,18 @@
  */
 package erp.mod.hrs.view;
 
+import erp.gui.grid.SGridFilterPanel;
 import erp.mod.SModConsts;
 import java.util.ArrayList;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
+import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
 
 /**
  *
@@ -20,9 +23,20 @@ import sa.lib.gui.SGuiClient;
  */
 public class SViewEmployeeWageLog extends SGridPaneView {
 
+    private SGridFilterPanel moFilterProject;
+
     public SViewEmployeeWageLog(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_EMP_LOG_WAGE, SLibConsts.UNDEFINED, title);
-        setRowButtonsEnabled(false, false, false, false, false);
+        initComponentsCustom();
+    }
+    
+    private void initComponentsCustom() {
+        setRowButtonsEnabled(false);
+        
+        moFilterProject = new SGridFilterPanel(miClient, this, SModConsts.HRSS_TP_PAY, SLibConsts.UNDEFINED);
+        moFilterProject.initFilter(null);
+        
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterProject);
     }
 
     @Override
@@ -38,6 +52,11 @@ public class SViewEmployeeWageLog extends SGridPaneView {
         if ((Boolean) filter) {
             sql += (sql.isEmpty() ? "" : "AND ") + "v.b_del = 0 ";
         }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSS_TP_PAY)).getValue();
+        if (filter != null && ((int[]) filter).length == 1) {
+            sql += (sql.isEmpty() ? "" : "AND ") + "emp.fk_tp_pay = " + ((int[]) filter)[0] + " ";
+        }
 
         msSql = "SELECT "
                 + "v.id_emp AS " + SDbConsts.FIELD_ID + "1, "
@@ -51,7 +70,7 @@ public class SViewEmployeeWageLog extends SGridPaneView {
                 + "bp.bp, "
                 + "pay.name, "
                 + "sal.name, "
-                + "emp.name, "
+                + "temp.name, "
                 + "wrk.name, "
                 + "mwz.name, "
                 + "dep.name, "
@@ -69,7 +88,7 @@ public class SViewEmployeeWageLog extends SGridPaneView {
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_WAGE) + " AS v "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS pay ON v.fk_tp_pay = pay.id_tp_pay "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_SAL) + " AS sal ON v.fk_tp_sal = sal.id_tp_sal "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_EMP) + " AS emp ON v.fk_tp_emp = emp.id_tp_emp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_EMP) + " AS temp ON v.fk_tp_emp = temp.id_tp_emp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_WRK) + " AS wrk ON v.fk_tp_wrk = wrk.id_tp_wrk "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_MWZ) + " AS mwz ON v.fk_tp_mwz = mwz.id_tp_mwz "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON v.fk_dep = dep.id_dep "
@@ -77,6 +96,8 @@ public class SViewEmployeeWageLog extends SGridPaneView {
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_SHT) + " AS sht ON v.fk_sht = sht.id_sht "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + "  AS rshe ON v.fk_tp_rec_sche = rshe.id_tp_rec_sche "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_POS_RISK) + "  AS risk ON v.fk_tp_pos_risk = risk.id_tp_pos_risk "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON "
+                + "v.id_emp = emp.id_emp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON "
                 + "v.id_emp = bp.id_bp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
@@ -98,7 +119,7 @@ public class SViewEmployeeWageLog extends SGridPaneView {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "v.wage", "Sueldo $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "pay.name", "Periodo pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "sal.name", "Tipo salario"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "emp.name", "Tipo empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "temp.name", "Tipo empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "wrk.name", "Tipo obrero"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "dep.name", "Departamento"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "pos.name", "Puesto"));

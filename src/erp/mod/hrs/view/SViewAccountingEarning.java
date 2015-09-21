@@ -4,18 +4,22 @@
  */
 package erp.mod.hrs.view;
 
+import erp.gui.grid.SGridFilterPanel;
 import erp.mcfg.data.SDataParamsCompany;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
+import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
 
 /**
  *
@@ -23,9 +27,26 @@ import sa.lib.gui.SGuiClient;
  */
 public class SViewAccountingEarning extends SGridPaneView implements ActionListener {
 
+    private SGridFilterPanel moFilterProject;
+
     public SViewAccountingEarning(SGuiClient client, int gridSubtype, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_ACC_EAR, gridSubtype, title);
+        initComponentsCustom();
+    }
+    
+    private void initComponentsCustom() {
         setRowButtonsEnabled(false, false, true, false, false);
+        
+        moFilterProject = new SGridFilterPanel(miClient, this, (mnGridSubtype == SModSysConsts.HRSS_TP_ACC_DEP ? SModConsts.HRSU_DEP : SModConsts.HRSU_EMP), SLibConsts.UNDEFINED);
+        moFilterProject.initFilter(null);
+        
+        switch (mnGridSubtype) {
+            case SModSysConsts.HRSS_TP_ACC_DEP:
+            case SModSysConsts.HRSS_TP_ACC_EMP:
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterProject);
+                break;
+            default:
+        }
     }
 
     @Override
@@ -40,6 +61,17 @@ public class SViewAccountingEarning extends SGridPaneView implements ActionListe
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
         if ((Boolean) filter) {
             sql += (sql.isEmpty() ? "" : "") + "v.b_del = 0 ";
+        }
+
+        switch (mnGridSubtype) {
+            case SModSysConsts.HRSS_TP_ACC_DEP:
+            case SModSysConsts.HRSS_TP_ACC_EMP:
+                filter = ((SGridFilterValue) moFiltersMap.get((mnGridSubtype == SModSysConsts.HRSS_TP_ACC_DEP ? SModConsts.HRSU_DEP : SModConsts.HRSU_EMP))).getValue();
+                if (filter != null && ((int[]) filter).length == 1) {
+                    sql += (sql.isEmpty() ? "" : "AND ") + "v.id_ref = " + ((int[]) filter)[0] + " ";
+                }
+                break;
+            default:
         }
 
         msSql = "SELECT "

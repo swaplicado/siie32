@@ -18,22 +18,29 @@ import erp.mbps.form.SDialogBizPartnerExport;
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.form.SDialogEmployeeHireLog;
+import erp.table.SFilterConstants;
 import java.awt.Dimension;
+import java.awt.event.ItemEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiItem;
 
 /**
  *
  * @author Alfonso Flores
  */
-public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
+public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt.event.ActionListener, java.awt.event.ItemListener {
 
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private javax.swing.JButton jbBizPartnerExport;
     private javax.swing.JButton jbStatusEmployee;
+    private javax.swing.JComboBox jcbFilter;
+    private javax.swing.JButton jbClearFilter;
 
     private int mnBizPartnerCategory;
     private java.lang.String msOrderKey;
@@ -41,6 +48,8 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     private erp.mbps.form.SDialogBizPartnerExport moDialogBizPartnerExport;
     private erp.mod.hrs.form.SDialogEmployeeHireLog moDialogEmployeeHireLog;
     private boolean mbHasRightEmpWage;
+    
+    private int mnPaymentTypeId;
 
     public SViewBizPartner(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType) {
         super(client, tabTitle, auxType);
@@ -67,10 +76,24 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         jbStatusEmployee.setEnabled(false);
 
         moTabFilterDeleted = new STabFilterDeleted(this);
-
+        jcbFilter = new javax.swing.JComboBox();
+        jcbFilter.setToolTipText("Filtrar");
+        jcbFilter.setPreferredSize(new java.awt.Dimension(150, 23));
+        
+        jbClearFilter = new javax.swing.JButton();
+        jbClearFilter.setIcon(new javax.swing.ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_clear.gif")));
+        jbClearFilter.setToolTipText("Quitar filtro");
+        jbClearFilter.setPreferredSize(new java.awt.Dimension(23, 23));
+        jbClearFilter.addActionListener(this);
+        
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
         addTaskBarUpperComponent(jbBizPartnerExport);
+        
+        if (mnTabTypeAux01 == SDataConstants.BPSX_BP_EMP) {
+            addTaskBarUpperComponent(jcbFilter);
+            addTaskBarUpperComponent(jbClearFilter);
+        }
         addTaskBarUpperComponent(jbStatusEmployee);
 
         STableField[] aoKeyFields = new STableField[1];
@@ -346,6 +369,42 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         mvSuscriptors.add(SModConsts.HRSU_SHT);
 
         populateTable();
+        updateOptions();
+    }
+    
+    private void actionClearFilter() {
+        jbClearFilter.setEnabled(false);
+        jcbFilter.setSelectedIndex(0);
+        jcbFilter.requestFocus();
+        mnPaymentTypeId = SLibConsts.UNDEFINED;
+        
+        try {
+            populateTable();
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+    }
+    
+    private void itemStateChangedFilter() {
+        try {
+            mnPaymentTypeId = ((SGuiItem) jcbFilter.getSelectedItem()).getPrimaryKey()[0];
+            jbClearFilter.setEnabled(jcbFilter.getSelectedIndex() > 0);
+            populateTable();
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+    }
+    
+    private void updateOptions() {
+        jcbFilter.removeItemListener(this);
+        
+        miClient.getSession().populateCatalogue(jcbFilter, SModConsts.HRSS_TP_PAY, SLibConsts.UNDEFINED, null);
+        
+        actionClearFilter();
+        
+        jcbFilter.addItemListener(this);
     }
 
     @Override
@@ -425,6 +484,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     public void createSqlQuery() {
         String sqlWhere = "";
         String sqlCategoryWhere = "";
+        String sqlBizPartner = "";
         STableSetting setting = null;
 
         for (int i = 0; i < mvTableSettings.size(); i++) {
@@ -432,6 +492,11 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             if (setting.getType() == STableConstants.SETTING_FILTER_DELETED && setting.getStatus() == STableConstants.STATUS_ON) {
                 sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_del = 0 ";
                 sqlCategoryWhere = " AND bp_ct.b_del = 0 ";
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_BP) {
+                if ((Integer) setting.getSetting() != SLibConstants.UNDEFINED) {
+                    sqlBizPartner += " AND e.id_emp = " + (Integer) setting.getSetting() + " ";
+                }
             }
         }
 
@@ -493,7 +558,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 "LEFT OUTER JOIN erp.hrss_tp_rec_sche AS rshe ON e.fk_tp_rec_sche = rshe.id_tp_rec_sche " +
                 "LEFT OUTER JOIN erp.hrss_tp_pos_risk AS risk ON e.fk_tp_pos_risk = risk.id_tp_pos_risk " +
                 "LEFT OUTER JOIN erp.hrss_bank AS bank ON e.fk_bank_n = bank.id_bank ") +
-                (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) +
+                (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) + (sqlBizPartner.length() == 0 ? "" : sqlBizPartner) + (mnPaymentTypeId != SLibConsts.UNDEFINED ? " AND e.fk_tp_pay = " + mnPaymentTypeId : "") + " " +
                 "ORDER BY " + msOrderKey;
     }
 
@@ -509,6 +574,22 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             }
             else if (button == jbStatusEmployee) {
                 actionStatusChange();
+            }
+            else if (button == jbClearFilter) {
+                    actionClearFilter();
+                }
+            }
+        }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof JComboBox) {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                JComboBox comboBox = (JComboBox) e.getSource();
+
+                if (comboBox == jcbFilter) {
+                    itemStateChangedFilter();
+                }
             }
         }
     }

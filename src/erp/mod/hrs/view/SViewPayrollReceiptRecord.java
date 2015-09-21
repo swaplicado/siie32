@@ -11,9 +11,13 @@ import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
+import sa.lib.grid.SGridFilterDatePeriod;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
+import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiDate;
 
 /**
  *
@@ -21,9 +25,24 @@ import sa.lib.gui.SGuiClient;
  */
 public class SViewPayrollReceiptRecord extends SGridPaneView {
 
+    private SGridFilterDatePeriod moFilterDatePeriod;
+
     public SViewPayrollReceiptRecord(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRSX_PAY_REC, SLibConsts.UNDEFINED, title);
+        initComponentCustom();
+    }
+
+    /*
+     * Private methods
+     */
+
+    private void initComponentCustom() {
         setRowButtonsEnabled(false);
+        
+        moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
+        moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
+        
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
     }
 
     @Override
@@ -39,6 +58,9 @@ public class SViewPayrollReceiptRecord extends SGridPaneView {
         if ((Boolean) filter) {
             sql += "pe.b_del = 0 ";
         }
+        
+        filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
+        sql += (sql.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("p.dt_end", (SGuiDate) filter);
 
         msSql = "SELECT pe.id_pay, pe.id_emp, p.id_pay, r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num, "
                 + "p.per_year, p.per, p.num, p.fk_tp_pay, p.dt_sta, p.dt_end, " 

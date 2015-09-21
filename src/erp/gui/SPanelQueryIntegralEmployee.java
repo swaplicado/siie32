@@ -31,23 +31,28 @@ import erp.mod.hrs.db.SHrsBenefitTableByAnniversary;
 import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsUtils;
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Vector;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.event.ListSelectionEvent;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
+import sa.lib.gui.SGuiItem;
 
 /**
  *
  * @author Juan Barajas
  */
-public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements STableTabInterface, javax.swing.event.ListSelectionListener {
+public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements STableTabInterface, javax.swing.event.ListSelectionListener, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
     int mnPanelType;
     private erp.client.SClientInterface miClient;
@@ -59,7 +64,8 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private ArrayList<SHrsBenefitTableByAnniversary> maBenefitTableVacationBonByAnniversary = null;
     private ArrayList<SHrsBenefitTableByAnniversary> maBenefitTableAnnByAnniversarys = null;
     
-
+    private int mnPaymentTypeId;
+    
     /** Creates new form SPanelQueryIntegralEmployee */
     public SPanelQueryIntegralEmployee(erp.client.SClientInterface client) {
         try {
@@ -84,8 +90,12 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jpEmployeesAvailable = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
+        jpEmployeesAvailable = new javax.swing.JPanel();
+        jpFilter = new javax.swing.JPanel();
+        jcbFilter = new javax.swing.JComboBox();
+        jbClearFilter = new javax.swing.JButton();
+        jpInformation = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
@@ -199,11 +209,28 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
 
         jPanel1.setLayout(new java.awt.BorderLayout());
 
+        jPanel3.setLayout(new java.awt.BorderLayout());
+        jPanel1.add(jPanel3, java.awt.BorderLayout.NORTH);
+
         jpEmployeesAvailable.setBorder(javax.swing.BorderFactory.createTitledBorder("Empleados:"));
         jpEmployeesAvailable.setLayout(new java.awt.BorderLayout());
+
+        jpFilter.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jcbFilter.setToolTipText("Filtrar");
+        jcbFilter.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpFilter.add(jcbFilter);
+
+        jbClearFilter.setIcon(new javax.swing.ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_clear.gif"))); // NOI18N
+        jbClearFilter.setToolTipText("Quitar filtro");
+        jbClearFilter.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpFilter.add(jbClearFilter);
+
+        jpEmployeesAvailable.add(jpFilter, java.awt.BorderLayout.NORTH);
+
         jPanel1.add(jpEmployeesAvailable, java.awt.BorderLayout.CENTER);
 
-        jPanel3.setLayout(new java.awt.BorderLayout());
+        jpInformation.setLayout(new java.awt.BorderLayout());
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos personales:"));
         jPanel4.setLayout(new java.awt.BorderLayout());
@@ -479,7 +506,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
 
         jPanel4.add(jPanel7, java.awt.BorderLayout.NORTH);
 
-        jPanel3.add(jPanel4, java.awt.BorderLayout.NORTH);
+        jpInformation.add(jPanel4, java.awt.BorderLayout.NORTH);
 
         jPanel5.setLayout(new java.awt.BorderLayout());
 
@@ -762,9 +789,9 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
 
         jPanel5.add(jPanel6, java.awt.BorderLayout.SOUTH);
 
-        jPanel3.add(jPanel5, java.awt.BorderLayout.CENTER);
+        jpInformation.add(jPanel5, java.awt.BorderLayout.CENTER);
 
-        jPanel1.add(jPanel3, java.awt.BorderLayout.EAST);
+        jPanel1.add(jpInformation, java.awt.BorderLayout.EAST);
 
         add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
@@ -798,6 +825,8 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JButton jbClearFilter;
+    private javax.swing.JComboBox jcbFilter;
     private javax.swing.JFormattedTextField jftDateBenefits;
     private javax.swing.JFormattedTextField jftDateBirth;
     private javax.swing.JFormattedTextField jftDateChangeSalary;
@@ -852,6 +881,8 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private javax.swing.JLabel jlWage;
     private javax.swing.JLabel jlWorkingHoursDay;
     private javax.swing.JPanel jpEmployeesAvailable;
+    private javax.swing.JPanel jpFilter;
+    private javax.swing.JPanel jpInformation;
     private javax.swing.JTextField jtfAlternativeId;
     private javax.swing.JTextField jtfAnnualBonusBenefit;
     private javax.swing.JTextField jtfAnnualBonusPayProp;
@@ -924,6 +955,43 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         }
         populateBenefits();
         populateEmployee();
+        updateOptions();
+        jbClearFilter.addActionListener(this);
+    }
+    
+    private void actionClearFilter() {
+        jbClearFilter.setEnabled(false);
+        jcbFilter.setSelectedIndex(0);
+        jcbFilter.requestFocus();
+        mnPaymentTypeId = SLibConsts.UNDEFINED;
+        
+        try {
+            populateEmployee();
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+    }
+    
+    private void itemStateChangedFilter() {
+        try {
+            mnPaymentTypeId = ((SGuiItem) jcbFilter.getSelectedItem()).getPrimaryKey()[0];
+            jbClearFilter.setEnabled(jcbFilter.getSelectedIndex() > 0);
+            populateEmployee();
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+    }
+    
+    private void updateOptions() {
+        jcbFilter.removeItemListener(this);
+        
+        miClient.getSession().populateCatalogue(jcbFilter, SModConsts.HRSS_TP_PAY, SLibConsts.UNDEFINED, null);
+        
+        actionClearFilter();
+        
+        jcbFilter.addItemListener(this);
     }
     
     private ArrayList<SDbBenefitTable> getBenefitTable(int benefitTableType) throws Exception {
@@ -1001,7 +1069,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
                 "INNER JOIN erp.bpsu_bpb AS bpb ON bpb.fid_bp = bp.id_bp " +
                 "INNER JOIN erp.bpsu_bpb_add AS a ON a.id_bpb = bpb.id_bpb " +
                 "LEFT OUTER JOIN erp.locu_cty AS cty ON cty.id_cty = a.fid_cty_n " + 
-                "WHERE emp.b_del = 0 AND bp.b_del = 0 " + 
+                "WHERE emp.b_del = 0 AND bp.b_del = 0" + (mnPaymentTypeId != SLibConsts.UNDEFINED ? " AND emp.fk_tp_pay = " + mnPaymentTypeId : "") + " " +
                 "GROUP BY emp.id_emp " +
                 "ORDER BY bp.bp, emp.id_emp, pay.name ";
 
@@ -1317,6 +1385,30 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
 
             if (row != null) {
                 renderEmployee(row.getPkEmployeeId());
+            }
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
+            JButton button = (JButton) e.getSource();
+            
+            if (button == jbClearFilter) {
+                actionClearFilter();
+            }
+        }
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof JComboBox) {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                JComboBox comboBox = (JComboBox) e.getSource();
+
+                if (comboBox == jcbFilter) {
+                    itemStateChangedFilter();
+                }
             }
         }
     }

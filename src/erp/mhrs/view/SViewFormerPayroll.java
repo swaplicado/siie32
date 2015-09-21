@@ -7,6 +7,8 @@ package erp.mhrs.view;
 
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
+import erp.lib.data.SDataSqlUtilities;
+import erp.lib.table.STabFilterDatePeriod;
 import erp.lib.table.STabFilterDeleted;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
@@ -21,6 +23,7 @@ import javax.swing.JButton;
 public class SViewFormerPayroll extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
+    private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
 
     public SViewFormerPayroll(erp.client.SClientInterface client, java.lang.String tabTitle) {
         super(client, tabTitle, SDataConstants.HRS_FORMER_PAYR);
@@ -31,9 +34,12 @@ public class SViewFormerPayroll extends erp.lib.table.STableTab implements java.
         int i;
 
         moTabFilterDeleted = new STabFilterDeleted(this);
+        moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
 
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterDatePeriod);
 
         jbNew.setEnabled(false);
         jbEdit.setEnabled(false);
@@ -113,6 +119,9 @@ public class SViewFormerPayroll extends erp.lib.table.STableTab implements java.
             setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
             if (setting.getType() == STableConstants.SETTING_FILTER_DELETED && setting.getStatus() == STableConstants.STATUS_ON) {
                 sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "p.b_del = FALSE ";
+            }
+            else if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "p.dt_end");
             }
         }
 

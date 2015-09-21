@@ -4,15 +4,18 @@
  */
 package erp.mod.hrs.view;
 
+import erp.gui.grid.SGridFilterPanel;
 import erp.mod.SModConsts;
 import java.util.ArrayList;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
+import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
 
 /**
  *
@@ -20,9 +23,20 @@ import sa.lib.gui.SGuiClient;
  */
 public class SViewEmployeeWageSscBaseLog extends SGridPaneView {
 
+    private SGridFilterPanel moFilterProject;
+
     public SViewEmployeeWageSscBaseLog(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_EMP_LOG_SAL_SSC, SLibConsts.UNDEFINED, title);
-        setRowButtonsEnabled(false, false, false, false, false);
+        initComponentsCustom();
+    }
+    
+    private void initComponentsCustom() {
+        setRowButtonsEnabled(false);
+        
+        moFilterProject = new SGridFilterPanel(miClient, this, SModConsts.HRSS_TP_PAY, SLibConsts.UNDEFINED);
+        moFilterProject.initFilter(null);
+        
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterProject);
     }
 
     @Override
@@ -37,6 +51,11 @@ public class SViewEmployeeWageSscBaseLog extends SGridPaneView {
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
         if ((Boolean) filter) {
             sql += (sql.isEmpty() ? "" : "AND ") + "v.b_del = 0 ";
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSS_TP_PAY)).getValue();
+        if (filter != null && ((int[]) filter).length == 1) {
+            sql += (sql.isEmpty() ? "" : "AND ") + "emp.fk_tp_pay = " + ((int[]) filter)[0] + " ";
         }
 
         msSql = "SELECT "
@@ -55,6 +74,8 @@ public class SViewEmployeeWageSscBaseLog extends SGridPaneView {
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
                 + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_SAL_SSC) + " AS v "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON "
+                + "v.id_emp = emp.id_emp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON "
                 + "v.id_emp = bp.id_bp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "

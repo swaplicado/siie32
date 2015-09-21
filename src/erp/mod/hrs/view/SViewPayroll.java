@@ -33,12 +33,14 @@ import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
+import sa.lib.grid.SGridFilterDatePeriod;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.grid.SGridRowView;
 import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiDate;
 
 /**
  *
@@ -46,6 +48,8 @@ import sa.lib.gui.SGuiConsts;
  */
 public class SViewPayroll extends SGridPaneView implements ActionListener {
 
+    private SGridFilterDatePeriod moFilterDatePeriod;
+    
     private JButton jbImport;
     private JButton jbAnnul;
     private JButton jbGetXml;
@@ -62,7 +66,6 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
 
     public SViewPayroll(SGuiClient client, String title, int subtype) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_PAY, subtype, title);
-        setRowButtonsEnabled(true, false, true, false, true);
         initComponentCustom();
     }
     
@@ -71,6 +74,10 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
      */
 
     private void initComponentCustom() {
+        setRowButtonsEnabled(true, false, true, false, true);
+        
+        moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
+        moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
         jbImport = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_IMPORT), "Generar y timbrar CFDI", this);
         jbAnnul = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_ANNUL), "Anular nómina", this);
         jbGetXml = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML), "Obtener XML", this);
@@ -90,6 +97,8 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         jbPrint.setEnabled(true);
         jbPrintAcknowledgmentCancellation.setEnabled(true);
         jbSend.setEnabled(true);
+        
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbImport);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAnnul);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGetXml);
@@ -440,6 +449,9 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         if ((Boolean) filter) {
             sql += (sql.isEmpty() ? "" : "AND ") + "v.b_del = 0 ";
         }
+        
+        filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
+        sql += (sql.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt_end", (SGuiDate) filter);
 
         msSql = "SELECT "
             + "v.id_pay AS " + SDbConsts.FIELD_ID + "1, "

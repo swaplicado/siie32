@@ -5,16 +5,17 @@
 
 package erp.mhrs.view;
 
-import javax.swing.JButton;
-
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
+import erp.lib.data.SDataSqlUtilities;
+import erp.lib.table.STabFilterDatePeriod;
 import erp.lib.table.STabFilterDeleted;
-import erp.lib.table.STableField;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
+import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import javax.swing.JButton;
 
 /**
  *
@@ -23,6 +24,7 @@ import erp.lib.table.STableSetting;
 public class SViewFormerPayrollEmp extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
+    private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
 
     public SViewFormerPayrollEmp(erp.client.SClientInterface client, java.lang.String tabTitle) {
         super(client, tabTitle, SDataConstants.HRS_FORMER_PAYR_EMP);
@@ -33,9 +35,12 @@ public class SViewFormerPayrollEmp extends erp.lib.table.STableTab implements ja
         int i;
 
         moTabFilterDeleted = new STabFilterDeleted(this);
+        moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
 
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterDatePeriod);
 
         jbNew.setEnabled(false);
         jbEdit.setEnabled(false);
@@ -114,6 +119,9 @@ public class SViewFormerPayrollEmp extends erp.lib.table.STableTab implements ja
             setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
             if (setting.getType() == STableConstants.SETTING_FILTER_DELETED && setting.getStatus() == STableConstants.STATUS_ON) {
                 sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "p.b_del = FALSE ";
+            }
+            else if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "p.dt_end");
             }
         }
 

@@ -358,22 +358,26 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
         }
         
         if (items != null) {
-            for(SFormComponentItem componentItem : items) {
+            for (SFormComponentItem componentItem : items) {
                 jcbDpsEntryPrices.addItem(componentItem);
                 
                 if (selectedRow.getAuxSGuiDpsEntryPrice() != null) {
                     if (SLibUtilities.compareKeys(selectedRow.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getPrimaryKey(), ((SGuiDpsEntryPrice) componentItem.getComplement()).getDataDpsEntryPrice().getPrimaryKey())) {
                         jcbDpsEntryPrices.setSelectedItem(componentItem);
+                        renderEntryPriceSatus((SFormComponentItem) jcbDpsEntryPrices.getSelectedItem());
+                        actionEntryPriceSelected((SFormComponentItem) jcbDpsEntryPrices.getSelectedItem());
                     }
                 }
                 else {
                     if (jcbDpsEntryPrices.getSelectedIndex() == SLibConstants.UNDEFINED) {
                         if (jcbDpsEntryPrices.getModel().getSize() > 1) {
                             jcbDpsEntryPrices.setSelectedIndex(1);
+                            renderEntryPriceSatus((SFormComponentItem) jcbDpsEntryPrices.getSelectedItem());
+                            actionEntryPriceSelected((SFormComponentItem) jcbDpsEntryPrices.getSelectedItem());
                         }
                     }
                 }
-                renderEntryPriceSatus((SFormComponentItem) jcbDpsEntryPrices.getSelectedItem());
+                //renderEntryPriceSatus((SFormComponentItem) jcbDpsEntryPrices.getSelectedItem());
             }                
         }
         else {
@@ -433,6 +437,7 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
 
         return !error;
     }
+    
     private void actionEntryPriceSelected(SFormComponentItem item) {
         SDataEntryDpsDpsLink selectedRow = (SDataEntryDpsDpsLink) moTablePane.getSelectedTableRow();
         if (selectedRow != null) {
