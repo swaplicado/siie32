@@ -548,15 +548,15 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmReports.add(jmiReportsTrnShipmentItem);
         jmReports.addSeparator();
         jmReports.add(jmiReportsTrnContractStock);
-//        jmReports.add(jmiReportsTrnContractByBizPartner); // XXX (sflores, 2013-12-17)
+        //jmReports.add(jmiReportsTrnContractByBizPartner); // XXX (sflores, 2013-12-17)
         jmReports.addSeparator();
         jmReports.add(jmiReportsTrnContractStatus);
 
         jmCatCfdi = new JMenu("Comprobantes fiscales digitales");
         jmiStampAvailable = new JMenuItem("Timbres disponibles");
-        jmiStampSign = new JMenuItem("Comprobantes timbrados");
-        jmiStampSignPending = new JMenuItem("Comprobantes por timbrar");
-        jmiSendingLog = new JMenuItem("Bitácora de envíos");
+        jmiStampSign = new JMenuItem("CFDI timbrados");
+        jmiStampSignPending = new JMenuItem("CFDI por timbrar");
+        jmiSendingLog = new JMenuItem("Bitácora de envíos de CFDI");
         jmCatCfdi.add(jmiStampAvailable);
         jmCatCfdi.add(jmiStampSign);
         jmCatCfdi.add(jmiStampSignPending);
@@ -1278,12 +1278,14 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
 
                 case SDataConstants.TRN_CFD:
                     oViewClass = erp.mtrn.view.SViewCfdXml.class;
+                    sViewTitle = "VTA - CFDI";
+                    
                     switch (auxType01) {
                         case SDataConstants.TRNX_STAMP_SIGN:
-                            sViewTitle = "VTA - comprobantes timbrados";
+                            sViewTitle += " timbrados";
                             break;
                         case SDataConstants.TRNX_STAMP_SIGN_PEND:
-                            sViewTitle = "VTA - comprobantes x timbrar";
+                            sViewTitle += " x timbrar";
                             break;
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
@@ -1292,7 +1294,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     
                 case SDataConstants.TRN_CFD_SND_LOG:
                     oViewClass = erp.mtrn.view.SViewDpsSendingLog.class;
-                    sViewTitle = "VTA - bitácora envíos";
+                    sViewTitle = "VTA - bitácora envíos CFDI";
                     break;
 
                 case SDataConstants.MKT_PLIST_ITEM:

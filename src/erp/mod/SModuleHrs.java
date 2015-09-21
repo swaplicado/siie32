@@ -655,7 +655,7 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewAbsenceType(miClient, "Tipos incidencia");
                 break;
             case SModConsts.HRSU_TP_EMP_DIS:
-                view = new SViewEmployeeDismissType(miClient, "Tipos baja empleado");
+                view = new SViewEmployeeDismissType(miClient, "Tipos baja");
                 break;
             case SModConsts.HRSU_TP_EMP:
                 view = new SViewEmployeeType(miClient, "Tipos empleado");
@@ -676,7 +676,7 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewShift(miClient, "Turnos");
                 break;
             case SModConsts.HRS_CFG:
-                view = new SViewConfig(miClient, "Configuración");
+                view = new SViewConfig(miClient, "Configuración módulo");
                 break;
             case SModConsts.HRS_FDY:
                 view = new SViewFirstDayYear(miClient, "Primer día año");
@@ -691,46 +691,46 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewTaxTable(miClient, "Tablas impuesto");
                 break;
             case SModConsts.HRS_TAX_ROW:
-                view = new SViewTaxTableRow(miClient, "Tablas impuesto detalle");
+                view = new SViewTaxTableRow(miClient, "Tablas impuesto (detalle)");
                 break;
             case SModConsts.HRS_TAX_SUB:
                 view = new SViewTaxSubsidyTable(miClient, "Tablas subsidio impuesto");
                 break;
             case SModConsts.HRS_TAX_SUB_ROW:
-                view = new SViewTaxSubsidyTableRow(miClient, "Tablas subsidio impuesto detalle");
+                view = new SViewTaxSubsidyTableRow(miClient, "Tablas subsidio impuesto (detalle)");
                 break;
             case SModConsts.HRS_SSC:
                 view = new SViewSsContributionTable(miClient, "Tablas SS");
                 break;
             case SModConsts.HRS_SSC_ROW:
-                view = new SViewSsContributionTableRow(miClient, "Tablas SS detalle");
+                view = new SViewSsContributionTableRow(miClient, "Tablas SS (detalle)");
                 break;
             case SModConsts.HRS_BEN:
                 view = new SViewBenefitTable(miClient, "Tablas prestaciones");
                 break;
             case SModConsts.HRS_BEN_ROW:
-                view = new SViewBenefitTableRow(miClient, "Tablas prestaciones detalle");
+                view = new SViewBenefitTableRow(miClient, "Tablas prestaciones (detalle)");
                 break;
             case SModConsts.HRS_WRK_SAL:
-                view = new SViewWorkerTypeSalary(miClient, "Salarios por tipo de obrero");
+                view = new SViewWorkerTypeSalary(miClient, "Salarios tipo obrero");
                 break;
             case SModConsts.HRS_MWZ_WAGE:
-                view = new SViewMwzTypeWage(miClient, "Salarios mínimos por área geográfica");
+                view = new SViewMwzTypeWage(miClient, "Salarios mínimos área geográfica");
                 break;
             case SModConsts.HRS_EMP_LOG_HIRE:
-                view = new SViewEmployeeHireLog(miClient, "Historial altas y bajas empleados");
+                view = new SViewEmployeeHireLog(miClient, "Bitácora altas y bajas");
                 break;
             case SModConsts.HRS_EMP_LOG_WAGE:
-                view = new SViewEmployeeWageLog(miClient, "Historial sueldos y salarios empleados");
+                view = new SViewEmployeeWageLog(miClient, "Bitácora sueldos y salarios");
                 break;
             case SModConsts.HRS_EMP_LOG_SAL_SSC:
-                view = new SViewEmployeeWageSscBaseLog(miClient, "Historial salarios base cotización empleados");
+                view = new SViewEmployeeWageSscBaseLog(miClient, "Bitácora salarios base cotización");
                 break;
             case SModConsts.HRS_ABS:
                 view = new SViewAbsence(miClient, "Incidencias");
                 break;
             case SModConsts.HRS_LOAN:
-                view = new SViewLoan(miClient, "Control créditos/Préstamos");
+                view = new SViewLoan(miClient, "Control créditos/préstamos");
                 break;
             case SModConsts.HRS_EAR:
                 view = new SViewEarnings(miClient, "Percepciones");
@@ -744,7 +744,7 @@ public class SModuleHrs extends SGuiModule {
                         view = new SViewAutomaticEarnings(miClient, subtype, "Percepciones automáticas globales");
                         break;
                     case SModSysConsts.HRS_AUT_EMP:
-                        view = new SViewAutomaticEarnings(miClient, subtype, "Percepciones automáticas x empleado");
+                        view = new SViewAutomaticEarnings(miClient, subtype, "Percepciones automáticas empleado");
                         break;
                     default:
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -756,7 +756,7 @@ public class SModuleHrs extends SGuiModule {
                         view = new SViewAutomaticDeductions(miClient, subtype, "Deducciones automáticas globales");
                         break;
                     case SModSysConsts.HRS_AUT_EMP:
-                        view = new SViewAutomaticDeductions(miClient, subtype, "Deducciones automáticas x empleado");
+                        view = new SViewAutomaticDeductions(miClient, subtype, "Deducciones automáticas empleado");
                         break;
                     default:
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -780,13 +780,13 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_ACC_EAR:
                     switch (subtype) {
                         case SModSysConsts.HRSS_TP_ACC_GBL:
-                            view = new SViewAccountingEarning(miClient, subtype, "Contabilización percepciones globales");
+                            view = new SViewAccountingEarning(miClient, subtype, "Config. contab. percepciones globales");
                             break;
                         case SModSysConsts.HRSS_TP_ACC_DEP:
-                            view = new SViewAccountingEarning(miClient, subtype, "Contabilización percepciones x departamento");
+                            view = new SViewAccountingEarning(miClient, subtype, "Config. contab. percepciones departamento");
                             break;
                         case SModSysConsts.HRSS_TP_ACC_EMP:
-                            view = new SViewAccountingEarning(miClient, subtype, "Contabilización percepciones x empleado");
+                            view = new SViewAccountingEarning(miClient, subtype, "Config. contab. percepciones empleado");
                             break;
                     default:
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -795,13 +795,13 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_ACC_DED:
                     switch (subtype) {
                         case SModSysConsts.HRSS_TP_ACC_GBL:
-                            view = new SViewAccountingDeduction(miClient, subtype, "Contabilización deducciones globales");
+                            view = new SViewAccountingDeduction(miClient, subtype, "Config. contab. deducciones globales");
                             break;
                         case SModSysConsts.HRSS_TP_ACC_DEP:
-                            view = new SViewAccountingDeduction(miClient, subtype, "Contabilización deducciones x departamento");
+                            view = new SViewAccountingDeduction(miClient, subtype, "Config. contab. deducciones departamento");
                             break;
                         case SModSysConsts.HRSS_TP_ACC_EMP:
-                            view = new SViewAccountingDeduction(miClient, subtype, "Contabilización deducciones x empleado");
+                            view = new SViewAccountingDeduction(miClient, subtype, "Config. contab. deducciones empleado");
                             break;
                     default:
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -842,10 +842,10 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRS_SIE_PAY:
                 if (subtype == SModConsts.VIEW_SC_SUM) {
-                    title = "CFDI nóminas" + (params != null && params.getType() == SCfdConsts.CFDI_PAYROLL_VER_OLD ? " importadas" : "");
+                    title = "CFDI nóminas" + (params != null && params.getType() == SCfdConsts.CFDI_PAYROLL_VER_OLD ? " imp." : "");
                 }
                 else {
-                    title = "CFDI recibos nóminas" + (params != null && params.getType() == SCfdConsts.CFDI_PAYROLL_VER_OLD ? " importadas" : "");
+                    title = "CFDI recibos nóminas" + (params != null && params.getType() == SCfdConsts.CFDI_PAYROLL_VER_OLD ? " imp." : "");
                 }
                 view = new SViewCfdiPayroll(miClient, subtype, title, params);
                 break;
@@ -1035,15 +1035,15 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_ACC_EAR:
                 switch (subtype) {
                     case SModSysConsts.HRSS_TP_ACC_GBL:
-                        if (moAccountingEarningGlobal == null) moAccountingEarningGlobal = new SFormAccountingEarning(miClient, "Contabilización de percepción global");
+                        if (moAccountingEarningGlobal == null) moAccountingEarningGlobal = new SFormAccountingEarning(miClient, "Config. contab. de percepción global");
                         form = moAccountingEarningGlobal;
                         break;
                     case SModSysConsts.HRSS_TP_ACC_DEP:
-                        if (moAccountingEarningDepartament == null) moAccountingEarningDepartament = new SFormAccountingEarning(miClient, "Contabilización de percepción por departamento");
+                        if (moAccountingEarningDepartament == null) moAccountingEarningDepartament = new SFormAccountingEarning(miClient, "Config. contab. de percepción por departamento");
                         form = moAccountingEarningDepartament;
                         break;
                     case SModSysConsts.HRSS_TP_ACC_EMP:
-                        if (moAccountingEarningEmployee == null) moAccountingEarningEmployee = new SFormAccountingEarning(miClient, "Contabilización de percepción por empleado");
+                        if (moAccountingEarningEmployee == null) moAccountingEarningEmployee = new SFormAccountingEarning(miClient, "Config. contab. de percepción por empleado");
                         form = moAccountingEarningEmployee;
                         break;
                     default:
@@ -1053,15 +1053,15 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_ACC_DED:
                 switch (subtype) {
                     case SModSysConsts.HRSS_TP_ACC_GBL:
-                        if (moAccountingDeductionGlobal == null) moAccountingDeductionGlobal = new SFormAccountingDeduction(miClient, "Contabilización de deducción global");
+                        if (moAccountingDeductionGlobal == null) moAccountingDeductionGlobal = new SFormAccountingDeduction(miClient, "Config. contab. de deducción global");
                         form = moAccountingDeductionGlobal;
                         break;
                     case SModSysConsts.HRSS_TP_ACC_DEP:
-                        if (moAccountingDeductionDepartament == null) moAccountingDeductionDepartament = new SFormAccountingDeduction(miClient, "Contabilización de deducción por departamento");
+                        if (moAccountingDeductionDepartament == null) moAccountingDeductionDepartament = new SFormAccountingDeduction(miClient, "Config. contab. de deducción por departamento");
                         form = moAccountingDeductionDepartament;
                         break;
                     case SModSysConsts.HRSS_TP_ACC_EMP:
-                        if (moAccountingDeductionEmployee == null) moAccountingDeductionEmployee = new SFormAccountingDeduction(miClient, "Contabilización de deducción por empleado");
+                        if (moAccountingDeductionEmployee == null) moAccountingDeductionEmployee = new SFormAccountingDeduction(miClient, "Config. contab. de deducción por empleado");
                         form = moAccountingDeductionEmployee;
                         break;
                     default:
