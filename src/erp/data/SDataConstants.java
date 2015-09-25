@@ -345,7 +345,7 @@ public abstract class SDataConstants {
     public static final int TRN_SUP_LT_COB = 207039;
     public static final int TRN_SYS_NTS = 207040;
     public static final int TRN_DPS = 207041;
-    public static final int TRN_DPS_XML = 207042;       // XXX eliminate! (sflores, 2014-01-28)
+    public static final int TRN_DPS_SND_LOG = 207042;
     public static final int TRN_DPS_ADD = 207043;
     public static final int TRN_DPS_ADD_ETY = 207044;
     public static final int TRN_DPS_EVT = 207046;
