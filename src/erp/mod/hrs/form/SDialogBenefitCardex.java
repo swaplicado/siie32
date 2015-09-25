@@ -37,7 +37,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  *
  * @author Juan Barajas
  */
-public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelectionListener{
+public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelectionListener {
     
     protected SDbEmployee moEmployee;
     protected SDbConfig moConfig;
@@ -47,11 +47,14 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
     protected int mnAnniversaryYear;
     protected int mnBenefitTableId;
     protected double mdPaymentDaily;
-    private SGridPaneForm moGridBenefitSummary;
-    private SGridPaneForm moGridBenefitDetail;
+    protected SGridPaneForm moGridBenefitSummary;
+    protected SGridPaneForm moGridBenefitDetail;
 
     /**
      * Creates new form SDialogBenefitCardex
+     * @param client
+     * @param formSubtype
+     * @param title
      */
     public SDialogBenefitCardex(SGuiClient client, int formSubtype, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSX_BEN_MOV, formSubtype, title);

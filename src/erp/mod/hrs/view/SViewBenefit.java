@@ -41,7 +41,6 @@ import sa.lib.gui.SGuiDate;
 public class SViewBenefit extends SGridPaneView implements ActionListener {
 
     private SGridFilterPanel moFilterProject;
-
     private SGridFilterDate moFilterDate;
     private JButton jbCardex;
     private Date mtDateCut;

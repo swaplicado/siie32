@@ -62,8 +62,10 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ChangeListener
 
     /**
      * Creates new form SDialogHrsBenefit
+     * @param client
+     * @param formType
+     * @param title
      */
-
     public SDialogHrsBenefit(SGuiClient client, int formType, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, formType, SLibConsts.UNDEFINED, title);
         initComponents();

@@ -105,6 +105,7 @@ public class SViewEmployeeWageSscBaseLog extends SGridPaneView {
     @Override
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
+        moSuscriptionsSet.add(SModConsts.HRSU_EMP);
         moSuscriptionsSet.add(SModConsts.BPSU_BP);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
     }

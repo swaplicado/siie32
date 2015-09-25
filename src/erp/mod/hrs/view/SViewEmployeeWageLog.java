@@ -68,16 +68,16 @@ public class SViewEmployeeWageLog extends SGridPaneView {
                 + "v.wage, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "bp.bp, "
-                + "pay.name, "
-                + "sal.name, "
-                + "temp.name, "
-                + "wrk.name, "
-                + "mwz.name, "
-                + "dep.name, "
-                + "pos.name, "
-                + "sht.name, "
-                + "rshe.name, "
-                + "risk.name, "
+                + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " WHERE id_tp_pay = v.fk_tp_pay) AS f_pay_name, "
+                + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_SAL) + " WHERE id_tp_sal = v.fk_tp_sal) AS f_sal_name, "
+                + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_EMP) + " WHERE id_tp_emp = v.fk_tp_emp) AS f_tp_emp_name, "
+                + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_WRK) + " WHERE id_tp_wrk = v.fk_tp_wrk) AS f_tp_wrk_name, "
+                + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_MWZ) + " WHERE id_tp_mwz = v.fk_tp_mwz) AS f_tp_mwz_name, "
+                + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " WHERE id_dep = v.fk_dep) AS f_dep_name, "
+                + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_POS) + " WHERE id_pos = v.fk_pos) AS f_pos_name, "
+                + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_SHT) + " WHERE id_sht = v.fk_sht) AS f_sht_name, "
+                + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " WHERE id_tp_rec_sche = v.fk_tp_rec_sche) AS f_rec_sche_name, "
+                + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_POS_RISK) + " WHERE id_tp_pos_risk = v.fk_tp_pos_risk) AS f_pos_risk_name, "
                 + "bank.name, "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
@@ -86,16 +86,6 @@ public class SViewEmployeeWageLog extends SGridPaneView {
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
                 + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_WAGE) + " AS v "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS pay ON v.fk_tp_pay = pay.id_tp_pay "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_SAL) + " AS sal ON v.fk_tp_sal = sal.id_tp_sal "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_EMP) + " AS temp ON v.fk_tp_emp = temp.id_tp_emp "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_WRK) + " AS wrk ON v.fk_tp_wrk = wrk.id_tp_wrk "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_MWZ) + " AS mwz ON v.fk_tp_mwz = mwz.id_tp_mwz "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON v.fk_dep = dep.id_dep "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_POS) + " AS pos ON v.fk_pos = pos.id_pos "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_SHT) + " AS sht ON v.fk_sht = sht.id_sht "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + "  AS rshe ON v.fk_tp_rec_sche = rshe.id_tp_rec_sche "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_POS_RISK) + "  AS risk ON v.fk_tp_pos_risk = risk.id_tp_pos_risk "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON "
                 + "v.id_emp = emp.id_emp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON "
@@ -117,16 +107,16 @@ public class SViewEmployeeWageLog extends SGridPaneView {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, SGridConsts.COL_TITLE_DATE));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "v.sal", "Salario $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "v.wage", "Sueldo $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "pay.name", "Periodo pago"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "sal.name", "Tipo salario"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "temp.name", "Tipo empleado"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "wrk.name", "Tipo obrero"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "dep.name", "Departamento"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "pos.name", "Puesto"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "sht.name", "Turno"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "rshe.name", "Régimen contratación"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "risk.name", "Riesgo trabajo"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "mwz.name", "Área geográfica"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_pay_name", "Periodo pago"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_sal_name", "Tipo salario"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_tp_emp_name", "Tipo empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_tp_wrk_name", "Tipo obrero"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_dep_name", "Departamento"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_pos_name", "Puesto"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_sht_name", "Turno"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_rec_sche_name", "Régimen contratación"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_pos_risk_name", "Riesgo trabajo"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_tp_mwz_name", "Área geográfica"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "bank.name", "Banco"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));

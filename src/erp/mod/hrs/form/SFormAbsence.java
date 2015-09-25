@@ -53,6 +53,8 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
 
     /**
      * Creates new form SFormAbsence
+     * @param client
+     * @param title
      */
     public SFormAbsence(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_ABS, SLibConsts.UNDEFINED, title);
@@ -350,7 +352,6 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
         if (moConfig.getFkEarningVacationsId_n() == SLibConsts.UNDEFINED) {
             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración vacaciones)");
         }
-        
         moBenefit = SHrsUtils.getBenefitTableByEarning(miClient.getSession(), moConfig.getFkEarningVacationsId_n(), moEmployee.getFkPaymentTypeId(), SLibTimeUtils.createDate(moIntBenefitYear.getValue(), 1, 1));
         
         if (moBenefit == null) {

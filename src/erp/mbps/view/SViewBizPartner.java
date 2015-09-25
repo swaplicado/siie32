@@ -388,7 +388,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     
     private void itemStateChangedFilter() {
         try {
-            mnPaymentTypeId = ((SGuiItem) jcbFilter.getSelectedItem()).getPrimaryKey()[0];
+            mnPaymentTypeId = (((SGuiItem) jcbFilter.getSelectedItem()).getPrimaryKey().length == 0 ? SLibConsts.UNDEFINED : ((SGuiItem) jcbFilter.getSelectedItem()).getPrimaryKey()[0]);
             jbClearFilter.setEnabled(jcbFilter.getSelectedIndex() > 0);
             populateTable();
         }

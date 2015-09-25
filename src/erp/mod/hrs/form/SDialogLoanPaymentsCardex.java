@@ -36,6 +36,8 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
 
     /**
      * Creates new form SDialogLoanPaymentsCardex
+     * @param client
+     * @param title
      */
     public SDialogLoanPaymentsCardex(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSX_LOAN_PAY, SLibConsts.UNDEFINED, title);
