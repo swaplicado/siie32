@@ -2,58 +2,58 @@
 <!DOCTYPE jasperTemplate PUBLIC "-//JasperReports//DTD Template//EN" "http://jasperreports.sourceforge.net/dtds/jaspertemplate.dtd">
 
 <jasperTemplate>
-	<style name="Company name" isDefault="false" hAlign="Center" vAlign="Middle" fontName="Arial" fontSize="13" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Report title" isDefault="false" hAlign="Center" vAlign="Middle" fontName="Arial" fontSize="11" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Report subtitle" isDefault="false" hAlign="Center" vAlign="Middle" fontName="Arial" fontSize="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Header settings label left" isDefault="false" hAlign="Left" vAlign="Middle" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Header settings label center" isDefault="false" hAlign="Center" vAlign="Middle" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Header settings label right" isDefault="false" hAlign="Right" vAlign="Middle" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Header settings left" isDefault="false" hAlign="Left" vAlign="Middle" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Header settings center" isDefault="false" hAlign="Center" vAlign="Middle" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Header settings right" isDefault="false" hAlign="Right" vAlign="Middle" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Column header left" isDefault="false" hAlign="Left" vAlign="Middle" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Column header center" isDefault="false" hAlign="Center" vAlign="Middle" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Column header right" isDefault="false" hAlign="Right" vAlign="Middle" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Column footer left" isDefault="false" hAlign="Left" vAlign="Middle" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Column footer center" isDefault="false" hAlign="Center" vAlign="Middle" markup="none" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Column footer right" isDefault="false" hAlign="Right" vAlign="Middle" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Super group left" isDefault="false" hAlign="Left" vAlign="Middle" fontName="Arial" fontSize="9" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Super group center" isDefault="false" hAlign="Center" vAlign="Middle" fontName="Arial" fontSize="9" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Super group right" isDefault="false" hAlign="Right" vAlign="Middle" fontName="Arial" fontSize="9" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Super group value" isDefault="false" hAlign="Right" vAlign="Middle" pattern="#,##0.00" fontName="Arial" fontSize="9" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Super group percentage" isDefault="false" hAlign="Right" vAlign="Middle" pattern="#,##0.00%" fontName="Arial" fontSize="9" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Group header left" isDefault="false" hAlign="Left" vAlign="Middle" fontName="Arial" fontSize="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Group header center" isDefault="false" hAlign="Center" vAlign="Middle" fontName="Arial" fontSize="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Group header right" isDefault="false" hAlign="Right" vAlign="Middle" fontName="Arial" fontSize="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Group value" isDefault="false" hAlign="Right" vAlign="Middle" pattern="#,##0.00" fontName="Arial" fontSize="9" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Group value 8 decimal" isDefault="false" hAlign="Right" vAlign="Middle" pattern="#,##0.00000000" fontName="Arial" fontSize="9" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Group percentage" isDefault="false" hAlign="Right" vAlign="Middle" pattern="#,##0.00%" fontName="Arial" fontSize="9" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Detail left" isDefault="false" hAlign="Left" vAlign="Middle" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Detail center" isDefault="false" hAlign="Center" vAlign="Middle" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Detail right" isDefault="false" hAlign="Right" vAlign="Middle" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Detail dps print left" isDefault="false" hAlign="Left" vAlign="Middle" fontName="Arial" fontSize="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Detail dps print center" isDefault="false" hAlign="Center" vAlign="Middle" fontName="Arial" fontSize="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Detail dps print rigth" isDefault="false" hAlign="Right" vAlign="Middle" fontName="Arial" fontSize="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Footer vendor label" isDefault="false" forecolor="#808080" hAlign="Left" vAlign="Middle" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Footer printing label" isDefault="false" hAlign="Right" vAlign="Middle" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Footer page label left" isDefault="false" hAlign="Left" vAlign="Middle" fontName="Arial" fontSize="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Footer page label right" isDefault="false" hAlign="Right" vAlign="Middle" fontName="Arial" fontSize="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Value" isDefault="false" hAlign="Right" vAlign="Middle" pattern="#,##0.00" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Value dps print" isDefault="false" hAlign="Right" vAlign="Middle" pattern="#,##0.00" fontName="Arial" fontSize="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Value unitary" isDefault="false" hAlign="Right" vAlign="Middle" pattern="#,##0.0000" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Value unitary 8 decimal" isDefault="false" hAlign="Right" vAlign="Middle" pattern="#,##0.00000000" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Exchange rate" isDefault="false" hAlign="Right" vAlign="Middle" pattern="#,##0.0000" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Quantity" isDefault="false" hAlign="Right" vAlign="Middle" pattern="#,##0.000" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Unit measurement" isDefault="false" hAlign="Right" vAlign="Middle" pattern="#,##0.000" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Percentage" isDefault="false" hAlign="Right" vAlign="Middle" pattern="#,##0.0000%" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Percentage 2 decimal" isDefault="false" hAlign="Right" vAlign="Middle" pattern="#,##0.00%" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Total value" isDefault="false" hAlign="Right" vAlign="Middle" pattern="#,##0.00" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Total value unitary" isDefault="false" hAlign="Right" vAlign="Middle" pattern="#,##0.0000" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Total value unitary 8 decimal" isDefault="false" hAlign="Right" vAlign="Middle" pattern="#,##0.00000000" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Total exchange rate" isDefault="false" hAlign="Right" vAlign="Middle" pattern="#,##0.0000" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Total quantity" isDefault="false" hAlign="Right" vAlign="Middle" pattern="#,##0.000" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Total unit measurement" isDefault="false" hAlign="Right" vAlign="Middle" pattern="#,##0.000" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Total percentage" isDefault="false" hAlign="Right" vAlign="Middle" pattern="#,##0.0000%" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Total percentage 2 decimal" isDefault="false" hAlign="Right" vAlign="Middle" pattern="#,##0.00%" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<style name="Value account cost center mayor" isDefault="false" mode="Opaque" hAlign="Right" vAlign="Middle" pattern="#,##0.00" fontName="Arial" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Company name" hAlign="Center" vAlign="Middle" fontName="Arial" fontSize="13" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Report title" hAlign="Center" vAlign="Middle" fontName="Arial" fontSize="11" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Report subtitle" hAlign="Center" vAlign="Middle" fontName="Arial" fontSize="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Header settings label left" hAlign="Left" vAlign="Middle" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Header settings label center" hAlign="Center" vAlign="Middle" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Header settings label right" hAlign="Right" vAlign="Middle" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Header settings left" hAlign="Left" vAlign="Middle" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Header settings center" hAlign="Center" vAlign="Middle" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Header settings right" hAlign="Right" vAlign="Middle" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Column header left" hAlign="Left" vAlign="Middle" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Column header center" hAlign="Center" vAlign="Middle" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Column header right" hAlign="Right" vAlign="Middle" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Column footer left" hAlign="Left" vAlign="Middle" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Column footer center" hAlign="Center" vAlign="Middle" markup="none" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Column footer right" hAlign="Right" vAlign="Middle" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Super group left" hAlign="Left" vAlign="Middle" fontName="Arial" fontSize="9" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Super group center" hAlign="Center" vAlign="Middle" fontName="Arial" fontSize="9" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Super group right" hAlign="Right" vAlign="Middle" fontName="Arial" fontSize="9" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Super group value" hAlign="Right" vAlign="Middle" pattern="#,##0.00" fontName="Arial" fontSize="9" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Super group percentage" hAlign="Right" vAlign="Middle" pattern="#,##0.00%" fontName="Arial" fontSize="9" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Group header left" hAlign="Left" vAlign="Middle" fontName="Arial" fontSize="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Group header center" hAlign="Center" vAlign="Middle" fontName="Arial" fontSize="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Group header right" hAlign="Right" vAlign="Middle" fontName="Arial" fontSize="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Group value" hAlign="Right" vAlign="Middle" pattern="#,##0.00" fontName="Arial" fontSize="9" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Group value 8 decimal" hAlign="Right" vAlign="Middle" pattern="#,##0.00000000" fontName="Arial" fontSize="9" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Group percentage" hAlign="Right" vAlign="Middle" pattern="#,##0.00%" fontName="Arial" fontSize="9" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Detail left" hAlign="Left" vAlign="Middle" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Detail center" hAlign="Center" vAlign="Middle" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Detail right" hAlign="Right" vAlign="Middle" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Detail dps print left" hAlign="Left" vAlign="Middle" fontName="Arial" fontSize="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Detail dps print center" hAlign="Center" vAlign="Middle" fontName="Arial" fontSize="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Detail dps print rigth" hAlign="Right" vAlign="Middle" fontName="Arial" fontSize="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Footer vendor label" hAlign="Left" vAlign="Middle" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Footer printing label" hAlign="Right" vAlign="Middle" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Footer page label left" hAlign="Left" vAlign="Middle" fontName="Arial" fontSize="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Footer page label right" hAlign="Right" vAlign="Middle" fontName="Arial" fontSize="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Value" hAlign="Right" vAlign="Middle" pattern="#,##0.00" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Value dps print" hAlign="Right" vAlign="Middle" pattern="#,##0.00" fontName="Arial" fontSize="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Value unitary" hAlign="Right" vAlign="Middle" pattern="#,##0.0000" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Value unitary 8 decimal" hAlign="Right" vAlign="Middle" pattern="#,##0.00000000" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Exchange rate" hAlign="Right" vAlign="Middle" pattern="#,##0.0000" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Quantity" hAlign="Right" vAlign="Middle" pattern="#,##0.000" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Unit measurement" hAlign="Right" vAlign="Middle" pattern="#,##0.000" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Percentage" hAlign="Right" vAlign="Middle" pattern="#,##0.0000%" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Percentage 2 decimal" hAlign="Right" vAlign="Middle" pattern="#,##0.00%" fontName="Arial" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Total value" hAlign="Right" vAlign="Middle" pattern="#,##0.00" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Total value unitary" hAlign="Right" vAlign="Middle" pattern="#,##0.0000" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Total value unitary 8 decimal" hAlign="Right" vAlign="Middle" pattern="#,##0.00000000" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Total exchange rate" hAlign="Right" vAlign="Middle" pattern="#,##0.0000" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Total quantity" hAlign="Right" vAlign="Middle" pattern="#,##0.000" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Total unit measurement" hAlign="Right" vAlign="Middle" pattern="#,##0.000" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Total percentage" hAlign="Right" vAlign="Middle" pattern="#,##0.0000%" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Total percentage 2 decimal" hAlign="Right" vAlign="Middle" pattern="#,##0.00%" fontName="Arial" fontSize="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="Value account cost center mayor" mode="Opaque" hAlign="Right" vAlign="Middle" pattern="#,##0.00" fontName="Arial" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
 </jasperTemplate>
