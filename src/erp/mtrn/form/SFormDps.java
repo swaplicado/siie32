@@ -8124,7 +8124,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             mmsType = SModSysConsts.CFGS_TP_MMS_CON;
         }
         else if (SLibUtilities.compareKeys(SDataConstantsSys.TRNU_TP_DPS_SAL_ORD, dps.getDpsTypeKey())) {
-            mmsType = SModSysConsts.CFGS_TP_MMS_ORD;
+            mmsType = SModSysConsts.CFGS_TP_MMS_ORD_SAL;
         }
         
         if (sendMail) {

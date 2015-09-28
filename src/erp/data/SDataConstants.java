@@ -24,6 +24,9 @@ public abstract class SDataConstants {
     public static final int MOD_HRS = 109000;
     public static final int MOD_XXX = 109999;
 
+    public static final int MOD_CFG_CAT = 101001;
+    public static final int MOD_CFG_CFG = 101002;
+    
     public static final int GLOBAL_CAT_CFG = 201000;
     public static final int GLOBAL_CAT_USR = 202000;
     public static final int GLOBAL_CAT_LOC = 203000;
