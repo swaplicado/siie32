@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<!--
+Software Aplicado SA de CV
+-->
+
+<xs:schema version="1.0"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://www.swaplicado.com.mx"
+           xmlns="http://www.swaplicado.com.mx"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+    
+    <!--
+    Definition of root element:
+    -->
+    
+    <xs:element name="config">
+        <xs:annotation>
+            <xs:documentation>GUI configuration root element.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="scope" minOccurs="0" maxOccurs="unbounded">
+                    <xs:annotation>
+                        <xs:documentation>Configuration scope.</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="module" minOccurs="0" maxOccurs="unbounded">
+                                <xs:annotation>
+                                    <xs:documentation>Configuration module.</xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="menu" minOccurs="0" maxOccurs="unbounded">
+                                            <xs:annotation>
+                                                <xs:documentation>Configuration module menu.</xs:documentation>
+                                            </xs:annotation>
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="section" minOccurs="0" maxOccurs="unbounded">
+                                                        <xs:annotation>
+                                                            <xs:documentation>Configuration module menu section.</xs:documentation>
+                                                        </xs:annotation>
+                                                        <xs:complexType>
+                                                            <xs:sequence>
+                                                                <xs:element name="item" minOccurs="0" maxOccurs="unbounded">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>Configuration module menu section's item.</xs:documentation>
+                                                                    </xs:annotation>
+                                                                    <xs:complexType>
+                                                                        <xs:attribute name="id" type="idType" use="required"/>
+                                                                    </xs:complexType>
+                                                                </xs:element>
+                                                            </xs:sequence>
+                                                            <xs:attribute name="id" type="idType" use="required"/>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                                <xs:attribute name="id" type="idType" use="required"/>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute name="id" type="idType" use="required"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                        <xs:attribute  name="ambit" type="ambitType" use="required"/>
+                        <xs:attribute  name="reference" type="xs:integer" use="required"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="version" type="xs:string" fixed="1.0" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <!--
+    Definition of simple types:
+    -->
+    
+    <xs:simpleType name="ambitType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="system"/>
+            <xs:enumeration value="company"/>
+            <xs:enumeration value="user"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:simpleType name="idType">
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <!--
+    Example of use:
+    <?xml version="1.0" encoding="UTF-8"?>
+
+    <config xmlns="http://www.swaplicado.com.mx"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+            xsi:schemaLocation="http://www.swaplicado.com.mx http://www.swaplicado.com.mx/xml/config_gui1.xsd"
+            version="1.0">
+        <scope ambit="system" reference="0">
+            <module id="1">
+                <menu id="11">
+                    <section id="111">
+                        <item id="1111"/>
+                        <item id="1112"/>
+                        <item id="1113"/>
+                    </section>
+                </menu>
+            </module>
+        </scope>
+    </config>
+    -->
+</xs:schema>

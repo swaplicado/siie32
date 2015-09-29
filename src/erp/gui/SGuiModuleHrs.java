@@ -8,6 +8,8 @@ package erp.gui;
 import erp.cfd.SCfdConsts;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.gui.mod.cfg.SCfgMenu;
+import erp.gui.mod.cfg.SCfgModule;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.table.STableTabComponent;
@@ -482,6 +484,18 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepPayrollEarningsByEmployeeAux.setEnabled(true);
         jmiRepPayrollDeductionsByEmployeeAux.setEnabled(true);
         jmiRepPayrollTax.setEnabled(true);
+        
+        // GUI configuration:
+        
+        if (((erp.SClient) miClient).getCfgProcesor() != null) {
+            SCfgModule module = new SCfgModule("" + mnModuleType);
+            SCfgMenu menu = null;
+            
+            menu = new SCfgMenu(jmImp, "" + SDataConstants.MOD_HRS_IMP);
+            module.getChildMenus().add(menu);
+            
+            ((erp.SClient) miClient).getCfgProcesor().processModule(module);
+        }
     }
 
     private void showPanelQueryIntegralEmployee(int panelType) {

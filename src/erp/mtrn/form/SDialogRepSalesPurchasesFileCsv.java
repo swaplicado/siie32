@@ -35,7 +35,7 @@ import javax.swing.JOptionPane;
  *
  * @author Sergio Flores
  */
-public class SDialogRepSalesPurchasesFile extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
+public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
     private int mnFormType;
     private int mnFormResult;
@@ -59,7 +59,7 @@ public class SDialogRepSalesPurchasesFile extends javax.swing.JDialog implements
      * @param client ERP Client interface.
      * @param formType Constants defined in SDataConstantsSys (TRNS_CT_DPS_PUR or TRNS_CT_DPS_SAL).
      */
-    public SDialogRepSalesPurchasesFile(erp.client.SClientInterface client, int formType) {
+    public SDialogRepSalesPurchasesFileCsv(erp.client.SClientInterface client, int formType) {
         super(client.getFrame(), true);
         miClient =  client;
         mnFormType = formType;
@@ -105,7 +105,7 @@ public class SDialogRepSalesPurchasesFile extends javax.swing.JDialog implements
         jbBizPartner = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Archivo de exportación de compras/ventas netas por período");
+        setTitle("Archivo CSV de compras/ventas netas por período");
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -226,8 +226,8 @@ public class SDialogRepSalesPurchasesFile extends javax.swing.JDialog implements
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-524)/2, (screenSize.height-328)/2, 524, 328);
+        setSize(new java.awt.Dimension(524, 328));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated

@@ -8,6 +8,11 @@ package erp.gui;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.form.SFormOptionPicker;
+import erp.gui.mod.cfg.SCfgMenu;
+import erp.gui.mod.cfg.SCfgMenuSection;
+import erp.gui.mod.cfg.SCfgMenuSectionItem;
+import erp.gui.mod.cfg.SCfgMenuSectionSeparator;
+import erp.gui.mod.cfg.SCfgModule;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormOptionPickerInterface;
@@ -41,11 +46,10 @@ import erp.mfin.form.SDialogRepAccountingAux;
 import erp.mfin.form.SDialogRepAuxAccounting;
 import erp.mfin.form.SDialogRepBalanceSheet;
 import erp.mfin.form.SDialogRepBizPartnerAccountingMoves;
-import erp.mfin.form.SDialogRepBizPartnerAuxMoves;
 import erp.mfin.form.SDialogRepBizPartnerBalance;
 import erp.mfin.form.SDialogRepBizPartnerBalanceDps;
+import erp.mfin.form.SDialogRepBizPartnerJournal;
 import erp.mfin.form.SDialogRepBizPartnerMove;
-import erp.mfin.form.SDialogRepBizPartnerStatements;
 import erp.mfin.form.SDialogRepDpsMonthlyReport;
 import erp.mfin.form.SDialogRepDpsPayment;
 import erp.mfin.form.SDialogRepFinMov;
@@ -100,6 +104,7 @@ import erp.mtrn.form.SFormCtr;
 import erp.mtrn.form.SFormDsm;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
 
@@ -141,6 +146,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCatTaxGroup;
     private javax.swing.JMenuItem jmiCatConceptAdministrativeType;
     private javax.swing.JMenuItem jmiCatConceptTaxableType;
+    private javax.swing.JSeparator jsCatConcept;
 
     private javax.swing.JMenu jmCatSysAcc;
     private javax.swing.JMenuItem jmiCatSysAccTaxGroupForItem;
@@ -180,8 +186,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
 
     private javax.swing.JMenu jmFin;
     private javax.swing.JMenuItem jmiFinExchangeRate;
-    private javax.swing.JMenuItem jmiFinCheck;
-    private javax.swing.JMenuItem jmiFinCounterReceipt;
+    private javax.swing.JMenuItem jmiFinCashCheck;
+    private javax.swing.JMenuItem jmiFinCashCounterReceipt;
+    private javax.swing.JSeparator jsFinCash;
     private javax.swing.JMenuItem jmiFinLayoutBank;
     private javax.swing.JMenuItem jmiFinLayoutBankPending;
     private javax.swing.JMenuItem jmiFinLayoutBankDone;
@@ -209,13 +216,6 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenu jmRepBizPartnerBalanceAging;
     private javax.swing.JMenuItem jmiRepBizPartnerBalanceCusAging;
     private javax.swing.JMenuItem jmiRepBizPartnerBalanceSupAging;
-    private javax.swing.JMenu jmRepFinBpsStt;
-    private javax.swing.JMenuItem jmiRepsFinBpsSttCus;
-    private javax.swing.JMenuItem jmiRepsFinBpsSttSup;
-    private javax.swing.JMenuItem jmiRepsFinBpsSttDbr;
-    private javax.swing.JMenuItem jmiRepsFinBpsSttCdr;
-    private javax.swing.JMenuItem jmiRepsFinBpsSttCusDps;
-    private javax.swing.JMenuItem jmiRepsFinBpsSttSupDps;
     private javax.swing.JMenu jmRepBizPartnerAccountingMoves;
     private javax.swing.JMenuItem jmiRepBizPartnerAccountingMovesCus;
     private javax.swing.JMenuItem jmiRepBizPartnerAccountingMovesSup;
@@ -237,11 +237,12 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiDpsPaymentSup;
     private javax.swing.JMenuItem jmiDpsPaymentCus;
     private javax.swing.JMenuItem jmiRepIncomeExpenseDue;
-    private javax.swing.JMenuItem jmiRepFinanceRecords;
-    private javax.swing.JMenuItem jmiRepAccountingAux;
-    private javax.swing.JMenuItem jmiRepAccountCostCenter;
+    private javax.swing.JMenuItem jmiRepLedgerAccount;
+    private javax.swing.JMenuItem jmiRepLedgerCostCenter;
     private javax.swing.JMenuItem jmiRepConceptAdminstrative;
     private javax.swing.JMenuItem jmiRepConceptTaxable;
+    private javax.swing.JSeparator jsRepAuxiliar;
+    private javax.swing.JMenuItem jmiRepFinanceRecords;
     private javax.swing.JMenuItem jmiRepTaxesByConcept;
     private javax.swing.JMenu jmRepFis;
     private javax.swing.JMenuItem jmiRepFisTaxPendingPur;
@@ -408,6 +409,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatTaxGroup = new JMenuItem("Grupos de impuestos");
         jmiCatConceptAdministrativeType = new JMenuItem("Conceptos administrativos");
         jmiCatConceptTaxableType = new JMenuItem("Conceptos de impuestos");
+        jsCatConcept = new JPopupMenu.Separator();
 
         jmCat.add(jmiCatAccount);
         jmCat.add(jmiCatFiscalAccount);
@@ -426,6 +428,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCat.addSeparator();
         jmCat.add(jmiCatConceptAdministrativeType);
         jmCat.add(jmiCatConceptTaxableType);
+        jmCat.add(jsCatConcept);    // separator
 
         jmCatSysAcc = new JMenu("Contabilización automática");
         jmiCatSysAccTaxGroupForItem = new JMenuItem("Grupos de impuestos vs. ítems");
@@ -449,7 +452,6 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCatSysAcc.addSeparator();
         jmCatSysAcc.add(jmiCatSysAccCostCenterForItem);
 
-        jmCat.addSeparator();
         jmCat.add(jmCatSysAcc);
 
         jmBkk = new JMenu("Contabilidad");
@@ -516,17 +518,18 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFin = new JMenu("Finanzas");
 
         jmiFinExchangeRate = new JMenuItem("Tipos de cambio");
-        jmiFinCheck = new JMenuItem("Cheques");
-        jmiFinCounterReceipt = new JMenuItem("Contrarrecibos");
+        jmiFinCashCheck = new JMenuItem("Cheques");
+        jmiFinCashCounterReceipt = new JMenuItem("Contrarrecibos");
+        jsFinCash = new JPopupMenu.Separator();
         jmiFinLayoutBank = new JMenuItem("Layouts de transferencias");
         jmiFinLayoutBankPending = new JMenuItem("Layouts de transferencias por pagar");
         jmiFinLayoutBankDone = new JMenuItem("Layouts de transferencias pagados");
 
         jmFin.add(jmiFinExchangeRate);
         jmFin.addSeparator();
-        jmFin.add(jmiFinCheck);
-        jmFin.add(jmiFinCounterReceipt);
-        jmFin.addSeparator();
+        jmFin.add(jmiFinCashCheck);
+        jmFin.add(jmiFinCashCounterReceipt);
+        jmFin.add(jsFinCash);   // separator
         jmFin.add(jmiFinLayoutBank);
         jmFin.add(jmiFinLayoutBankPending);
         jmFin.add(jmiFinLayoutBankDone);
@@ -555,13 +558,6 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRepBizPartnerBalanceAging = new JMenu("Antigüedad de saldos de asociados de negocios");
         jmiRepBizPartnerBalanceCusAging = new JMenuItem("Reporte de antigüedad de saldos de clientes...");
         jmiRepBizPartnerBalanceSupAging = new JMenuItem("Reporte de antigüedad de saldos de proveedores...");
-        jmRepFinBpsStt = new JMenu("Estados de cuenta de asociados de negocios");
-        jmiRepsFinBpsSttCus = new JMenuItem("Estados de cuenta de clientes...");
-        jmiRepsFinBpsSttSup = new JMenuItem("Estados de cuenta de proveedores...");
-        jmiRepsFinBpsSttDbr = new JMenuItem("Estados de cuenta de deudores diversos...");
-        jmiRepsFinBpsSttCdr = new JMenuItem("Estados de cuenta de acreedores diversos...");
-        jmiRepsFinBpsSttCusDps = new JMenuItem("Estados de cuenta de clientes por documento...");
-        jmiRepsFinBpsSttSupDps = new JMenuItem("Estados de cuenta de proveedores por documento...");
         jmRepBizPartnerAccountingMoves = new JMenu("Movimientos contables de asociados de negocios");
         jmiRepBizPartnerAccountingMovesCus = new JMenuItem("Movimientos contables de clientes...");
         jmiRepBizPartnerAccountingMovesSup = new JMenuItem("Movimientos contables de proveedores...");
@@ -588,10 +584,11 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         
         jmiRepIncomeExpenseDue = new JMenuItem("Reporte de ingresos y egresos esperados por periodo...");
 
-        jmiRepAccountingAux = new JMenuItem("Reporte de auxiliares de contabilidad...");
-        jmiRepAccountCostCenter = new JMenuItem("Reporte de auxiliares de centros de costo...");
+        jmiRepLedgerAccount = new JMenuItem("Reporte de auxiliares de contabilidad...");
+        jmiRepLedgerCostCenter = new JMenuItem("Reporte de auxiliares de centros de costo...");
         jmiRepConceptAdminstrative = new JMenuItem("Reporte de conceptos administrativos...");
         jmiRepConceptTaxable = new JMenuItem("Reporte de conceptos de impuestos...");
+        jsRepAuxiliar = new JPopupMenu.Separator();
         jmiRepFinanceRecords = new JMenuItem("Impresión de pólizas contables...");
         jmiRepTaxesByConcept = new JMenuItem("Reporte de impuestos por concepto...");
 
@@ -635,15 +632,6 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRepBizPartnerBalanceAging.add(jmiRepBizPartnerBalanceSupAging);
         jmRep.add(jmRepBizPartnerBalanceAging);
 
-        jmRepFinBpsStt.add(jmiRepsFinBpsSttCus);
-        jmRepFinBpsStt.add(jmiRepsFinBpsSttSup);
-        jmRepFinBpsStt.add(jmiRepsFinBpsSttDbr);
-        jmRepFinBpsStt.add(jmiRepsFinBpsSttCdr);
-        jmRepFinBpsStt.addSeparator();
-        jmRepFinBpsStt.add(jmiRepsFinBpsSttCusDps);
-        jmRepFinBpsStt.add(jmiRepsFinBpsSttSupDps);
-        //jmRep.add(jmRepFinBpsStt);  // XXX temporal code
-
         jmRepBizPartnerAccountingMoves.add(jmiRepBizPartnerAccountingMovesCus);
         jmRepBizPartnerAccountingMoves.add(jmiRepBizPartnerAccountingMovesSup);
         jmRep.add(jmRepBizPartnerAccountingMoves);
@@ -674,10 +662,11 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRep.add(jmiRepIncomeExpenseDue);
 
         jmRep.addSeparator();
-        jmRep.add(jmiRepAccountingAux);
-        jmRep.add(jmiRepAccountCostCenter);
+        jmRep.add(jmiRepLedgerAccount);
+        jmRep.add(jmiRepLedgerCostCenter);
         jmRep.add(jmiRepConceptAdminstrative);
         jmRep.add(jmiRepConceptTaxable);
+        jmRep.add(jsRepAuxiliar);   // separator
         jmRep.add(jmiRepFinanceRecords);
         jmRep.addSeparator();
         jmRep.add(jmiRepTaxesByConcept);
@@ -741,8 +730,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRecDpsBizPartnerSup.addActionListener(this);
 
         jmiFinExchangeRate.addActionListener(this);
-        jmiFinCheck.addActionListener(this);
-        jmiFinCounterReceipt.addActionListener(this);
+        jmiFinCashCheck.addActionListener(this);
+        jmiFinCashCounterReceipt.addActionListener(this);
         jmiFinLayoutBank.addActionListener(this);
         jmiFinLayoutBankPending.addActionListener(this);
         jmiFinLayoutBankDone.addActionListener(this);
@@ -779,12 +768,6 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepBizPartnerBalanceSupDps.addActionListener(this);
         jmiRepBizPartnerBalanceCusAging.addActionListener(this);
         jmiRepBizPartnerBalanceSupAging.addActionListener(this);
-        jmiRepsFinBpsSttCus.addActionListener(this);
-        jmiRepsFinBpsSttSup.addActionListener(this);
-        jmiRepsFinBpsSttDbr.addActionListener(this);
-        jmiRepsFinBpsSttCdr.addActionListener(this);
-        jmiRepsFinBpsSttCusDps.addActionListener(this);
-        jmiRepsFinBpsSttSupDps.addActionListener(this);
         jmiRepBizPartnerAccountingMovesCus.addActionListener(this);
         jmiRepBizPartnerAccountingMovesSup.addActionListener(this);
         jmiRepsBizPartnerAuxMovesCus.addActionListener(this);
@@ -802,79 +785,17 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiDpsPaymentSup.addActionListener(this);
         jmiDpsPaymentCus.addActionListener(this);
         jmiRepIncomeExpenseDue.addActionListener(this);
-        jmiRepFinanceRecords.addActionListener(this);
-        jmiRepAccountingAux.addActionListener(this);
-        jmiRepAccountCostCenter.addActionListener(this);
+        jmiRepLedgerAccount.addActionListener(this);
+        jmiRepLedgerCostCenter.addActionListener(this);
         jmiRepConceptAdminstrative.addActionListener(this);
         jmiRepConceptTaxable.addActionListener(this);
+        jmiRepFinanceRecords.addActionListener(this);
         jmiRepTaxesByConcept.addActionListener(this);
         jmiRepFisTaxPendingPur.addActionListener(this);
         jmiRepFisTaxPendingSal.addActionListener(this);
         jmiRepFisXmlFile.addActionListener(this);
         jmiRepFisMonthlyReportCfd.addActionListener(this);
         jmiRepFisMonthlyReportCf.addActionListener(this);
-
-        moFormRecord = null;
-        moFormRecordRo = null;
-        moFormRecordHeader = null;
-        moFormAccount = null;
-        moFormAccountChangeDeep = null;
-        moFormAccountMajor = null;
-        moFormCostCenter = null;
-        moFormCostCenterMajor = null;
-        moFormExchangeRate = null;
-        moFormYear = null;
-        moFormCardIssuer = null;
-        moFormTaxRegion = null;
-        moFormTaxIdentity = null;
-        moFormAdministrativeConceptType = null;
-        moFormTaxableConceptType = null;
-        moFormTaxBas = null;
-        moFormTaxGroup = null;
-        moFormTaxGroupItem = null;
-        moFormTaxGroupItemGeneric = null;
-        moFormAccountBizPartner = null;
-        moFormAccountItem = null;
-        moFormAccountTax = null;
-        moFormAccountCash = null;
-        moFormAccountCashBank = null;
-        moFormItemConfig = null;
-        moFormCheckWallet = null;
-        moFormCheckFormat = null;
-        moFormCheckAnnuled = null;
-        moFormDsm = null;
-        moFormCtr = null;
-
-        moPickerAccountSpecializedType = null;
-        moPickerFiscalAccount = null;
-        moPickerFiscalBank = null;
-        moPickerAccountUserType = null;
-        moPickerAccountUserClass = null;
-        moPickerAccountUserSubclass = null;
-        moPickerAccountLedgerType = null;
-        moPickerAccountEbitdaType = null;
-        moPickerExchangeRate = null;
-        moPickerAccount = null;
-        moPickerCostCenter = null;
-        moPickerBookkeepingCenter = null;
-        moPickerTaxIdentity = null;
-        moPickerTaxRegion = null;
-        moPickerCardIssuer = null;
-        moPickerTaxBas = null;
-        moPickerTax = null;
-        moPickerTaxGroup = null;
-        moPickerCheckFormat = null;
-        moPickerCheckFormatGp = null;
-        moPickerAccountCash = null;
-        moPickerAccountCashCash = null;
-        moPickerAccountCashBank = null;
-        moPickerAccountCashBankCheck = null;
-        moPickerRecordType = null;
-        moPickerRecordTypeAll = null;
-        moPickerRecordTypeUser = null;
-        moPickerAdministrativeConceptType = null;
-        moPickerTaxableConceptType = null;
-        moPickerYear = null;
 
         moDialogRepRecords = new SDialogRepRecords(miClient);
         moDialogRepAccountingAux = new SDialogRepAccountingAux(miClient);
@@ -987,11 +908,50 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
 
         jmFin.setEnabled(hasExcRateRight || hasMoveAccCash || hasCounterReceiptRight);
         jmiFinExchangeRate.setEnabled(hasExcRateRight);
-        jmiFinCheck.setEnabled(hasMoveAccCash);
-        jmiFinCounterReceipt.setEnabled(hasCounterReceiptRight);
+        jmiFinCashCheck.setEnabled(hasMoveAccCash);
+        jmiFinCashCounterReceipt.setEnabled(hasCounterReceiptRight);
 
         jmRep.setEnabled(hasRepRight || hasRepFinRateRight || hasRepStatementRight);
         jmRepSheet.setEnabled(hasRepStatementRight);
+        
+        // GUI configuration:
+        
+        if (((erp.SClient) miClient).getCfgProcesor() != null) {
+            SCfgModule module = new SCfgModule("" + mnModuleType);
+            SCfgMenu menu = null;
+            SCfgMenuSection section = null;
+            
+            menu = new SCfgMenu(jmCfg, "" + SDataConstants.MOD_FIN_CFG);
+            module.getChildMenus().add(menu);
+            
+            menu = new SCfgMenu(jmCat, "" + SDataConstants.MOD_FIN_CAT);
+            section = new SCfgMenuSection("" + SDataConstants.MOD_FIN_CAT_CPT);
+            section.getChildItems().add(new SCfgMenuSectionItem(jmiCatConceptAdministrativeType, "" + SDataConstants.FINU_TP_ADM_CPT));
+            section.getChildItems().add(new SCfgMenuSectionItem(jmiCatConceptTaxableType, "" + SDataConstants.FINU_TP_TAX_CPT));
+            section.setChildSeparator(new SCfgMenuSectionSeparator(jsCatConcept));
+            menu.getChildSections().add(section);
+            module.getChildMenus().add(menu);
+            
+            menu = new SCfgMenu(jmCat, "" + SDataConstants.MOD_FIN_FIN);
+            section = new SCfgMenuSection("" + SDataConstants.MOD_FIN_FIN_CSH);
+            section.getChildItems().add(new SCfgMenuSectionItem(jmiFinCashCheck, "" + SDataConstants.FIN_CHECK));
+            section.getChildItems().add(new SCfgMenuSectionItem(jmiFinCashCounterReceipt, "" + SDataConstants.TRN_CTR));
+            section.setChildSeparator(new SCfgMenuSectionSeparator(jsFinCash));
+            menu.getChildSections().add(section);
+            module.getChildMenus().add(menu);
+            
+            menu = new SCfgMenu(jmCat, "" + SDataConstants.MOD_FIN_REP);
+            section = new SCfgMenuSection("" + SDataConstants.MOD_FIN_REP_AUX);
+            section.getChildItems().add(new SCfgMenuSectionItem(jmiRepLedgerAccount, "" + SDataConstants.FIN_ACC));
+            section.getChildItems().add(new SCfgMenuSectionItem(jmiRepLedgerCostCenter, "" + SDataConstants.FIN_CC));
+            section.getChildItems().add(new SCfgMenuSectionItem(jmiRepConceptAdminstrative, "" + SDataConstants.FINU_TP_ADM_CPT));
+            section.getChildItems().add(new SCfgMenuSectionItem(jmiRepConceptTaxable, "" + SDataConstants.FINU_TP_TAX_CPT));
+            section.setChildSeparator(new SCfgMenuSectionSeparator(jsRepAuxiliar));
+            menu.getChildSections().add(section);
+            module.getChildMenus().add(menu);
+            
+            ((erp.SClient) miClient).getCfgProcesor().processModule(module);
+        }
     }
 
     private void actionFinFiscalYearClosing() {
@@ -1851,10 +1811,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiFinExchangeRate) {
                 showView(SDataConstants.FIN_EXC_RATE);
             }
-            else if (item == jmiFinCheck) {
+            else if (item == jmiFinCashCheck) {
                 showView(SDataConstants.FIN_CHECK);
             }
-            else if (item == jmiFinCounterReceipt) {
+            else if (item == jmiFinCashCounterReceipt) {
                 showView(SDataConstants.TRN_CTR);
             }
             else if (item == jmiFinLayoutBank) {
@@ -1920,24 +1880,6 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiRepBizPartnerBalanceSupAging) {
                 new SDialogRepBizPartnerBalanceAging(miClient, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP).setVisible(true);
             }
-            else if (item == jmiRepsFinBpsSttCus) {
-                new SDialogRepBizPartnerStatements(miClient, SDataConstantsSys.BPSS_CT_BP_CUS, false).setVisible(true);
-            }
-            else if (item == jmiRepsFinBpsSttSup) {
-                new SDialogRepBizPartnerStatements(miClient, SDataConstantsSys.BPSS_CT_BP_SUP, false).setVisible(true);
-            }
-            else if (item == jmiRepsFinBpsSttDbr) {
-                new SDialogRepBizPartnerStatements(miClient, SDataConstantsSys.BPSS_CT_BP_DBR, false).setVisible(true);
-            }
-            else if (item == jmiRepsFinBpsSttCdr) {
-                new SDialogRepBizPartnerStatements(miClient, SDataConstantsSys.BPSS_CT_BP_CDR, false).setVisible(true);
-            }
-            else if (item == jmiRepsFinBpsSttCusDps) {
-                new SDialogRepBizPartnerStatements(miClient, SDataConstantsSys.BPSS_CT_BP_CUS, true).setVisible(true);
-            }
-            else if (item == jmiRepsFinBpsSttSupDps) {
-                new SDialogRepBizPartnerStatements(miClient, SDataConstantsSys.BPSS_CT_BP_SUP, true).setVisible(true);
-            }
             else if (item == jmiRepBizPartnerAccountingMovesCus) {
                 new SDialogRepBizPartnerAccountingMoves(miClient, SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
             }
@@ -1945,16 +1887,16 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                 new SDialogRepBizPartnerAccountingMoves(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
             }
             else if (item == jmiRepsBizPartnerAuxMovesCus) {
-                new SDialogRepBizPartnerAuxMoves(miClient, SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
+                new SDialogRepBizPartnerJournal(miClient, SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
             }
             else if (item == jmiRepsBizPartnerAuxMovesSup) {
-                new SDialogRepBizPartnerAuxMoves(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
+                new SDialogRepBizPartnerJournal(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
             }
             else if (item == jmiRepsBizPartnerAuxMovesDbr) {
-                new SDialogRepBizPartnerAuxMoves(miClient, SDataConstantsSys.BPSS_CT_BP_DBR).setVisible(true);
+                new SDialogRepBizPartnerJournal(miClient, SDataConstantsSys.BPSS_CT_BP_DBR).setVisible(true);
             }
             else if (item == jmiRepsBizPartnerAuxMovesCdr) {
-                new SDialogRepBizPartnerAuxMoves(miClient, SDataConstantsSys.BPSS_CT_BP_CDR).setVisible(true);
+                new SDialogRepBizPartnerJournal(miClient, SDataConstantsSys.BPSS_CT_BP_CDR).setVisible(true);
             }
             else if (item == jmiRepFinMovCash) {
                 new SDialogRepFinMov(miClient, new Object[] { SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH, SDataConstants.UNDEFINED }).setVisible(true);
@@ -1996,7 +1938,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                 moDialogRepRecords.formReset();
                 moDialogRepRecords.setFormVisible(true);
             }
-            else if (item == jmiRepAccountingAux) {
+            else if (item == jmiRepLedgerAccount) {
                 /*
                 moDialogRepAccountingAux.formRefreshCatalogues();
                 moDialogRepAccountingAux.formReset();
@@ -2004,7 +1946,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                 */
                 new SDialogRepAuxAccounting(miClient).setVisible(true);
             }
-            else if (item == jmiRepAccountCostCenter) {
+            else if (item == jmiRepLedgerCostCenter) {
                 /*
                 moDialogRepAccountCostCenter.formRefreshCatalogues();
                 moDialogRepAccountCostCenter.formReset();

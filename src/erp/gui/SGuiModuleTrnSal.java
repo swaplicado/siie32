@@ -8,14 +8,19 @@ import erp.cfd.SCfdConsts;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
+import erp.gui.mod.cfg.SCfgMenu;
+import erp.gui.mod.cfg.SCfgMenuSection;
+import erp.gui.mod.cfg.SCfgMenuSectionItem;
+import erp.gui.mod.cfg.SCfgMenuSectionSeparator;
+import erp.gui.mod.cfg.SCfgModule;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mfin.data.SDataCostCenterItem;
 import erp.mfin.form.SDialogRepBizPartnerAccountingMoves;
-import erp.mfin.form.SDialogRepBizPartnerAuxMoves;
 import erp.mfin.form.SDialogRepBizPartnerBalance;
 import erp.mfin.form.SDialogRepBizPartnerBalanceDps;
 import erp.mfin.form.SDialogRepBizPartnerBalanceDpsCollection;
+import erp.mfin.form.SDialogRepBizPartnerJournal;
 import erp.mfin.form.SDialogRepBizPartnerStatements;
 import erp.mfin.form.SFormCostCenterItem;
 import erp.mod.SModConsts;
@@ -42,8 +47,8 @@ import erp.mtrn.form.SDialogRepSalesPurchasesByConcept;
 import erp.mtrn.form.SDialogRepSalesPurchasesByLocality;
 import erp.mtrn.form.SDialogRepSalesPurchasesComparative;
 import erp.mtrn.form.SDialogRepSalesPurchasesDetailByBizPartner;
-import erp.mtrn.form.SDialogRepSalesPurchasesDiary;
-import erp.mtrn.form.SDialogRepSalesPurchasesFile;
+import erp.mtrn.form.SDialogRepSalesPurchasesFileCsv;
+import erp.mtrn.form.SDialogRepSalesPurchasesJournal;
 import erp.mtrn.form.SDialogRepSalesPurchasesNet;
 import erp.mtrn.form.SDialogRepSalesPurchasesPriceUnitary;
 import erp.mtrn.form.SFormBizPartnerBlocking;
@@ -57,6 +62,7 @@ import erp.server.SServerResponse;
 import java.util.Date;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import sa.gui.util.SUtilConsts;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
@@ -74,6 +80,11 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiCatBizPartnerBlocking;
     private javax.swing.JMenu jmCatCfg;
     private javax.swing.JMenuItem jmiCatCfgCostCenterItem;
+    private javax.swing.JMenu jmCatCfdi;
+    private javax.swing.JMenuItem jmiCatCfdiStampAvailable;
+    private javax.swing.JMenuItem jmiCatCfdiStampSign;
+    private javax.swing.JMenuItem jmiCatCfdiStampSignPending;
+    private javax.swing.JMenuItem jmiCatCfdiSendingLog;
     private javax.swing.JMenu jmEst;
     private javax.swing.JMenuItem jmiEstimates;
     private javax.swing.JMenuItem jmiEstimatesLinkPend;
@@ -105,7 +116,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiOrdersPrice;
     private javax.swing.JMenuItem jmiOrdersPriceHistory;
     private javax.swing.JMenu jmDps;
-    private javax.swing.JMenuItem jmiDps;
+    private javax.swing.JMenuItem jmiDpsDoc;
     private javax.swing.JMenuItem jmiDpsEntry;
     private javax.swing.JMenuItem jmiDpsAnnuled;
     private javax.swing.JMenuItem jmiDpsReissued;
@@ -125,84 +136,82 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiDpsPrice;
     private javax.swing.JMenuItem jmiDpsPriceHistory;
     private javax.swing.JMenu jmDpsAdj;
-    private javax.swing.JMenuItem jmiDpsAdjustments;
-    private javax.swing.JMenuItem jmiDpsAdjustmentsAnnuled;
-    private javax.swing.JMenuItem jmiDpsAdjustmentsReissued;
-    private javax.swing.JMenuItem jmiDpsAdjustmentsReplaced;
-    private javax.swing.JMenuItem jmiDpsAdjustmentsSendPendingEmail;
-    private javax.swing.JMenuItem jmiDpsAdjustmentsSentEmail;
-    private javax.swing.JMenuItem jmiDpsAdjustmentsSendPendingWs;
-    private javax.swing.JMenuItem jmiDpsAdjustmentsApprovedWs;
-    private javax.swing.JMenuItem jmiDpsAdjustmentsRejectWs;
-    private javax.swing.JMenu jmStkSup;
-    private javax.swing.JMenuItem jmiStockSupplyPend;
-    private javax.swing.JMenuItem jmiStockSupplyPendEntry;
-    private javax.swing.JMenuItem jmiStockSupplied;
-    private javax.swing.JMenuItem jmiStockSuppliedEntry;
-    private javax.swing.JMenuItem jmiStockSupplyDiog;
-    private javax.swing.JMenuItem jmiStatisticsConsume;
+    private javax.swing.JMenuItem jmiDpsAdjDoc;
+    private javax.swing.JMenuItem jmiDpsAdjAnnuled;
+    private javax.swing.JMenuItem jmiDpsAdjReissued;
+    private javax.swing.JMenuItem jmiDpsAdjReplaced;
+    private javax.swing.JMenuItem jmiDpsAdjSendPendingEmail;
+    private javax.swing.JMenuItem jmiDpsAdjSentEmail;
+    private javax.swing.JMenuItem jmiDpsAdjSendPendingWs;
+    private javax.swing.JMenuItem jmiDpsAdjApprovedWs;
+    private javax.swing.JMenuItem jmiDpsAdjRejectWs;
+    private javax.swing.JMenu jmStkDvy;
+    private javax.swing.JMenuItem jmiStkDvyPend;
+    private javax.swing.JMenuItem jmiStkDvyPendEntry;
+    private javax.swing.JMenuItem jmiStkDvySupplied;
+    private javax.swing.JMenuItem jmiStkDvySuppliedEntry;
+    private javax.swing.JMenuItem jmiStkDvyDiog;
+    private javax.swing.JMenuItem jmiStkDvyStatsConsumption;
     private javax.swing.JMenu jmStkRet;
-    private javax.swing.JMenuItem jmiStockReturnPend;
-    private javax.swing.JMenuItem jmiStockReturnPendEntry;
-    private javax.swing.JMenuItem jmiStockReturned;
-    private javax.swing.JMenuItem jmiStockReturnedEntry;
-    private javax.swing.JMenuItem jmiStockReturnDiog;
-    private javax.swing.JMenu jmReports;
-    private javax.swing.JMenu jmReportsStatistics;
-    private javax.swing.JMenu jmReportsBackorder;
-    private javax.swing.JMenuItem jmiReportsTrnGlobal;
-    private javax.swing.JMenuItem jmiReportsTrnByMonth;
-    private javax.swing.JMenuItem jmiReportsTrnByItemGeneric;
-    private javax.swing.JMenuItem jmiReportsTrnByItemGenericBizPartner;
-    private javax.swing.JMenuItem jmiReportsTrnByItem;
-    private javax.swing.JMenuItem jmiReportsTrnByItemBizPartner;
-    private javax.swing.JMenuItem jmiReportsTrnByBizPartner;
-    private javax.swing.JMenuItem jmiReportsTrnByBizPartnerItem;
-    private javax.swing.JMenuItem jmiReportsTrnByBizPartnerType;
-    private javax.swing.JMenuItem jmiReportsTrnByBizPartnerTypeBizPartner;
-    private javax.swing.JMenuItem jmiReportsTrnDpsByItemBizPartner;
-    private javax.swing.JMenuItem jmiReportsBackorderContract;
-    private javax.swing.JMenuItem jmiReportsBackorderContractByItem;
-    private javax.swing.JMenuItem jmiReportsBackorderContractByItemBizPartner;
-    private javax.swing.JMenuItem jmiReportsBackorderContractByItemBizPartnerBra;
-    private javax.swing.JMenuItem jmiReportsBackorderOrder;
-    private javax.swing.JMenuItem jmiReportsBackorderOrderByItem;
-    private javax.swing.JMenuItem jmiReportsBackorderOrderByItemBizPartner;
-    private javax.swing.JMenuItem jmiReportsBackorderOrderByItemBizPartnerBra;
-    private javax.swing.JMenuItem jmiReportsBizPartnerBalanceAgingView;
-    private javax.swing.JMenuItem jmiReportsBizPartnerBalance;
-    private javax.swing.JMenuItem jmiReportsBizPartnerBalanceDps;
-    private javax.swing.JMenuItem jmiReportsBizPartnerBalanceCollection;
-    private javax.swing.JMenuItem jmiReportsBizPartnerBalanceDpsCollection;
-    private javax.swing.JMenuItem jmiReportsBizPartnerBalanceAging;
-    private javax.swing.JMenuItem jmiReportsAccountStatements;
-    private javax.swing.JMenuItem jmiReportsAccountStatementsDps;
-    private javax.swing.JMenuItem jmiReportsBizPartnerAccountingMoves;
-    private javax.swing.JMenuItem jmiReportsBizPartnerAccountingMovesDays;
-    private javax.swing.JMenuItem jmiReportsBizPartnerAuxMoves;
-    private javax.swing.JMenuItem jmiReportsDpsList;
-    private javax.swing.JMenuItem jmiReportsDpsBizPartner;
-    private javax.swing.JMenuItem jmiReportsDpsWithBalance;
-    private javax.swing.JMenuItem jmiReportsTrn;
-    private javax.swing.JMenuItem jmiReportsTrnConcept;
-    private javax.swing.JMenuItem jmiReportsTrnLocality;
-    private javax.swing.JMenuItem jmiReportsTrnComparative;
-    private javax.swing.JMenuItem jmiReportsTrnDpsDetailBizPartner;
-    private javax.swing.JMenuItem jmiReportsTrnNetTotals;
-    private javax.swing.JMenuItem jmiReportsTrnNet;
-    private javax.swing.JMenuItem jmiReportsTrnFile;
-    private javax.swing.JMenuItem jmiReportsTrnDiary;
-    private javax.swing.JMenuItem jmiReportsTrnItemUnitaryPrice;
-    private javax.swing.JMenuItem jmiReportsTrnShipmentItem;
-    private javax.swing.JMenuItem jmiReportsTrnContractStock;
-    private javax.swing.JMenuItem jmiReportsTrnContractByBizPartner;
-    private javax.swing.JMenuItem jmiReportsTrnContractStatus;
-    private javax.swing.JMenuItem jmiReportsMoneyIn;
-    private javax.swing.JMenu jmCatCfdi;
-    private javax.swing.JMenuItem jmiStampAvailable;
-    private javax.swing.JMenuItem jmiStampSign;
-    private javax.swing.JMenuItem jmiStampSignPending;
-    private javax.swing.JMenuItem jmiSendingLog;
+    private javax.swing.JMenuItem jmiStkRetPending;
+    private javax.swing.JMenuItem jmiStkRetPendingEntry;
+    private javax.swing.JMenuItem jmiStkRetReturned;
+    private javax.swing.JMenuItem jmiStkRetReturnedEntry;
+    private javax.swing.JMenuItem jmiStkRetDiog;
+    private javax.swing.JMenu jmRep;
+    private javax.swing.JMenu jmRepStats;
+    private javax.swing.JMenu jmRepBackorder;
+    private javax.swing.JMenuItem jmiRepTrnGlobal;
+    private javax.swing.JMenuItem jmiRepTrnByMonth;
+    private javax.swing.JMenuItem jmiRepTrnByItemGeneric;
+    private javax.swing.JMenuItem jmiRepTrnByItemGenericBizPartner;
+    private javax.swing.JMenuItem jmiRepTrnByItem;
+    private javax.swing.JMenuItem jmiRepTrnByItemBizPartner;
+    private javax.swing.JMenuItem jmiRepTrnByBizPartner;
+    private javax.swing.JMenuItem jmiRepTrnByBizPartnerItem;
+    private javax.swing.JMenuItem jmiRepTrnByBizPartnerType;
+    private javax.swing.JMenuItem jmiRepTrnByBizPartnerTypeBizPartner;
+    private javax.swing.JMenuItem jmiRepTrnDpsByItemBizPartner;
+    private javax.swing.JMenuItem jmiRepBackorderContract;
+    private javax.swing.JMenuItem jmiRepBackorderContractByItem;
+    private javax.swing.JMenuItem jmiRepBackorderContractByItemBizPartner;
+    private javax.swing.JMenuItem jmiRepBackorderContractByItemBizPartnerBra;
+    private javax.swing.JMenuItem jmiRepBackorderOrder;
+    private javax.swing.JMenuItem jmiRepBackorderOrderByItem;
+    private javax.swing.JMenuItem jmiRepBackorderOrderByItemBizPartner;
+    private javax.swing.JMenuItem jmiRepBackorderOrderByItemBizPartnerBra;
+    private javax.swing.JMenuItem jmiRepBizPartnerBalanceAgingView;
+    private javax.swing.JMenuItem jmiRepBizPartnerBalance;
+    private javax.swing.JMenuItem jmiRepBizPartnerBalanceDps;
+    private javax.swing.JMenuItem jmiRepBizPartnerBalanceAging;
+    private javax.swing.JMenuItem jmiRepBizPartnerBalanceCollection;
+    private javax.swing.JMenuItem jmiRepBizPartnerBalanceCollectionDps;
+    private javax.swing.JMenuItem jmiRepAccountStatements;
+    private javax.swing.JMenuItem jmiRepAccountStatementsDps;
+    private javax.swing.JMenuItem jmiRepBizPartnerJournal;
+    private javax.swing.JMenuItem jmiRepBizPartnerAccountingMoves;
+    private javax.swing.JMenuItem jmiRepBizPartnerAccountingMovesDays;
+    private javax.swing.JMenuItem jmiRepDpsList;
+    private javax.swing.JMenuItem jmiRepDpsBizPartner;
+    private javax.swing.JMenuItem jmiRepDpsWithBalance;
+    private javax.swing.JMenuItem jmiRepTrn;
+    private javax.swing.JMenuItem jmiRepTrnConcept;
+    private javax.swing.JMenuItem jmiRepTrnLocality;
+    private javax.swing.JMenuItem jmiRepTrnComparative;
+    private javax.swing.JMenuItem jmiRepTrnDpsDetailBizPartner;
+    private javax.swing.JMenuItem jmiRepTrnNetTotal;
+    private javax.swing.JMenuItem jmiRepTrnNetAnalytic;
+    private javax.swing.JMenuItem jmiRepTrnFileCsv;
+    private javax.swing.JMenuItem jmiRepTrnJournal;
+    private javax.swing.JMenuItem jmiRepTrnItemUnitaryPrice;
+    private javax.swing.JSeparator jsRepTrn;
+    private javax.swing.JMenuItem jmiRepTrnContractStatus;
+    private javax.swing.JMenuItem jmiRepTrnContractBackorderStock;
+    private javax.swing.JMenuItem jmiRepTrnContractByBizPartner;
+    private javax.swing.JSeparator jsRepContract;
+    private javax.swing.JMenuItem jmiRepTrnShipmentItem;
+    private javax.swing.JSeparator jsRepTrnShipment;
+    private javax.swing.JMenuItem jmiRepMoneyIn;
 
     private erp.mtrn.form.SFormDps moFormDps;
     private erp.mtrn.form.SFormDps moFormDpsRo;
@@ -220,12 +229,12 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private erp.mtrn.form.SDialogRepSalesPurchasesComparative moDialogRepSalesPurchasesComparative;
     private erp.mtrn.form.SDialogRepSalesPurchasesDetailByBizPartner moDialogRepSalesPurchasesDetailByBizPartner;
     private erp.mtrn.form.SDialogRepSalesPurchasesNet moDialogRepSalesPurchasesNet;
-    private erp.mtrn.form.SDialogRepSalesPurchasesFile moDialogRepSalesPurchasesFile;
-    private erp.mtrn.form.SDialogRepSalesPurchasesDiary moDialogRepSalesPurchasesDiary;
+    private erp.mtrn.form.SDialogRepSalesPurchasesFileCsv moDialogRepSalesPurchasesFileCsv;
+    private erp.mtrn.form.SDialogRepSalesPurchasesJournal moDialogRepSalesPurchasesJournal;
     private erp.mtrn.form.SDialogRepSalesPurchasesPriceUnitary moDialogRepSalesPurchasesItemUnitaryPrice;
-    private erp.mtrn.form.SDialogRepDpsMoves moDialogRepDpsMoves;
-    private erp.mtrn.form.SDialogRepDpsShipmentItem moDialogRepDpsShipmentItem;
     private erp.mtrn.form.SDialogRepContractStock moDialogRepContractStock;
+    private erp.mtrn.form.SDialogRepDpsShipmentItem moDialogRepDpsShipmentItem;
+    private erp.mtrn.form.SDialogRepDpsMoves moDialogRepDpsMoves;
     private erp.mtrn.form.SFormStamp moFormStamp;
 
     public SGuiModuleTrnSal(erp.client.SClientInterface client) {
@@ -262,6 +271,17 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmCat.add(jmiCatBizPartnerBlocking);
         jmCat.addSeparator();
         jmCat.add(jmCatCfg);
+        jmCatCfdi = new JMenu("Comprobantes fiscales digitales");
+        jmiCatCfdiStampAvailable = new JMenuItem("Timbres disponibles");
+        jmiCatCfdiStampSign = new JMenuItem("CFDI timbrados");
+        jmiCatCfdiStampSignPending = new JMenuItem("CFDI por timbrar");
+        jmiCatCfdiSendingLog = new JMenuItem("Bitácora de envíos de CFDI");
+        jmCatCfdi.add(jmiCatCfdiStampAvailable);
+        jmCatCfdi.add(jmiCatCfdiStampSign);
+        jmCatCfdi.add(jmiCatCfdiStampSignPending);
+        jmCatCfdi.addSeparator();
+        jmCatCfdi.add(jmiCatCfdiSendingLog);
+        jmCat.add(jmCatCfdi);
 
         jmEst = new JMenu("Cotizaciones");
         jmiEstimates = new JMenuItem("Cotizaciones de ventas");
@@ -336,8 +356,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmOrd.add(jmiOrdersPriceHistory);
         jmOrd.add(jmiOrdersPrice);
 
-        jmDps = new JMenu("Ventas");
-        jmiDps = new JMenuItem("Facturas de ventas");
+        jmDps = new JMenu("Facturas");
+        jmiDpsDoc = new JMenuItem("Facturas de ventas");
         jmiDpsEntry = new JMenuItem("Facturas de ventas a detalle");
         jmiDpsAnnuled = new JMenuItem("Anulación de facturas");
         jmiDpsReissued = new JMenuItem("Reimpresión de facturas");
@@ -356,7 +376,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsRejectWs = new JMenuItem("Facturas rechazadas por web-service");
         jmiDpsPriceHistory = new JMenuItem("Historial de precios de ventas");
         jmiDpsPrice = new JMenuItem("Precios de ventas");
-        jmDps.add(jmiDps);
+        jmDps.add(jmiDpsDoc);
         jmDps.add(jmiDpsEntry);
         jmDps.addSeparator();
         jmDps.add(jmiDpsAnnuled);
@@ -382,194 +402,181 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmDps.addSeparator();
         jmDps.add(jmiDpsPriceHistory);
 
-        jmDpsAdj = new JMenu("Ajustes ventas");
-        jmiDpsAdjustments = new JMenuItem("Notas de crédito de ventas");
-        jmiDpsAdjustmentsAnnuled = new JMenuItem("Anulación de notas de crédito");
-        jmiDpsAdjustmentsReissued = new JMenuItem("Reimpresión de notas de crédito");
-        jmiDpsAdjustmentsReplaced = new JMenuItem("Sustitución de notas de crédito");
-        jmiDpsAdjustmentsSendPendingEmail = new JMenuItem("Notas de crédito por enviar por correo-e");
-        jmiDpsAdjustmentsSentEmail = new JMenuItem("Notas de crédito enviadas por correo-e");
-        jmiDpsAdjustmentsSendPendingWs = new JMenuItem("Notas de crédito por enviar por web-service");
-        jmiDpsAdjustmentsApprovedWs = new JMenuItem("Notas de crédito aceptadas por web-service");
-        jmiDpsAdjustmentsRejectWs = new JMenuItem("Notas de crédito rechazadas por web-service");
-        jmDpsAdj.add(jmiDpsAdjustments);
+        jmDpsAdj = new JMenu("Notas crédito");
+        jmiDpsAdjDoc = new JMenuItem("Notas de crédito de ventas");
+        jmiDpsAdjAnnuled = new JMenuItem("Anulación de notas de crédito");
+        jmiDpsAdjReissued = new JMenuItem("Reimpresión de notas de crédito");
+        jmiDpsAdjReplaced = new JMenuItem("Sustitución de notas de crédito");
+        jmiDpsAdjSendPendingEmail = new JMenuItem("Notas de crédito por enviar por correo-e");
+        jmiDpsAdjSentEmail = new JMenuItem("Notas de crédito enviadas por correo-e");
+        jmiDpsAdjSendPendingWs = new JMenuItem("Notas de crédito por enviar por web-service");
+        jmiDpsAdjApprovedWs = new JMenuItem("Notas de crédito aceptadas por web-service");
+        jmiDpsAdjRejectWs = new JMenuItem("Notas de crédito rechazadas por web-service");
+        jmDpsAdj.add(jmiDpsAdjDoc);
         jmDpsAdj.addSeparator();
-        jmDpsAdj.add(jmiDpsAdjustmentsAnnuled);
-        jmDpsAdj.add(jmiDpsAdjustmentsReissued);
-        jmDpsAdj.add(jmiDpsAdjustmentsReplaced);
+        jmDpsAdj.add(jmiDpsAdjAnnuled);
+        jmDpsAdj.add(jmiDpsAdjReissued);
+        jmDpsAdj.add(jmiDpsAdjReplaced);
         jmDpsAdj.addSeparator();
-        jmDpsAdj.add(jmiDpsAdjustmentsSendPendingEmail);
-        jmDpsAdj.add(jmiDpsAdjustmentsSentEmail);
+        jmDpsAdj.add(jmiDpsAdjSendPendingEmail);
+        jmDpsAdj.add(jmiDpsAdjSentEmail);
         jmDpsAdj.addSeparator();
-        jmDpsAdj.add(jmiDpsAdjustmentsSendPendingWs);
-        jmDpsAdj.add(jmiDpsAdjustmentsApprovedWs);
-        jmDpsAdj.add(jmiDpsAdjustmentsRejectWs);
+        jmDpsAdj.add(jmiDpsAdjSendPendingWs);
+        jmDpsAdj.add(jmiDpsAdjApprovedWs);
+        jmDpsAdj.add(jmiDpsAdjRejectWs);
 
-        jmStkSup = new JMenu("Surtidos");
-        jmiStockSupplyPend = new JMenuItem("Ventas por surtir");
-        jmiStockSupplyPendEntry = new JMenuItem("Ventas por surtir a detalle");
-        jmiStockSupplied = new JMenuItem("Ventas surtidas");
-        jmiStockSuppliedEntry = new JMenuItem("Ventas surtidas a detalle");
-        jmiStockSupplyDiog = new JMenuItem("Documentos de surtidos de ventas");
-        jmiStatisticsConsume = new JMenuItem("Estadísticas de consumo de ventas");
-        jmStkSup.add(jmiStockSupplyPend);
-        jmStkSup.add(jmiStockSupplyPendEntry);
-        jmStkSup.addSeparator();
-        jmStkSup.add(jmiStockSupplied);
-        jmStkSup.add(jmiStockSuppliedEntry);
-        jmStkSup.addSeparator();
-        jmStkSup.add(jmiStockSupplyDiog);
-        jmStkSup.addSeparator();
-        jmStkSup.add(jmiStatisticsConsume);
+        jmStkDvy = new JMenu("Surtidos");
+        jmiStkDvyPend = new JMenuItem("Ventas por surtir");
+        jmiStkDvyPendEntry = new JMenuItem("Ventas por surtir a detalle");
+        jmiStkDvySupplied = new JMenuItem("Ventas surtidas");
+        jmiStkDvySuppliedEntry = new JMenuItem("Ventas surtidas a detalle");
+        jmiStkDvyDiog = new JMenuItem("Documentos de surtidos de ventas");
+        jmiStkDvyStatsConsumption = new JMenuItem("Estadísticas de consumo de ventas");
+        jmStkDvy.add(jmiStkDvyPend);
+        jmStkDvy.add(jmiStkDvyPendEntry);
+        jmStkDvy.addSeparator();
+        jmStkDvy.add(jmiStkDvySupplied);
+        jmStkDvy.add(jmiStkDvySuppliedEntry);
+        jmStkDvy.addSeparator();
+        jmStkDvy.add(jmiStkDvyDiog);
+        jmStkDvy.addSeparator();
+        jmStkDvy.add(jmiStkDvyStatsConsumption);
 
         jmStkRet = new JMenu("Devoluciones");
-        jmiStockReturnPend = new JMenuItem("Ventas por devolver");
-        jmiStockReturnPendEntry = new JMenuItem("Ventas por devolver a detalle");
-        jmiStockReturned = new JMenuItem("Ventas devueltas");
-        jmiStockReturnedEntry = new JMenuItem("Ventas devueltas a detalle");
-        jmiStockReturnDiog = new JMenuItem("Documentos de devoluciones de ventas");
-        jmStkRet.add(jmiStockReturnPend);
-        jmStkRet.add(jmiStockReturnPendEntry);
+        jmiStkRetPending = new JMenuItem("Ventas por devolver");
+        jmiStkRetPendingEntry = new JMenuItem("Ventas por devolver a detalle");
+        jmiStkRetReturned = new JMenuItem("Ventas devueltas");
+        jmiStkRetReturnedEntry = new JMenuItem("Ventas devueltas a detalle");
+        jmiStkRetDiog = new JMenuItem("Documentos de devoluciones de ventas");
+        jmStkRet.add(jmiStkRetPending);
+        jmStkRet.add(jmiStkRetPendingEntry);
         jmStkRet.addSeparator();
-        jmStkRet.add(jmiStockReturned);
-        jmStkRet.add(jmiStockReturnedEntry);
+        jmStkRet.add(jmiStkRetReturned);
+        jmStkRet.add(jmiStkRetReturnedEntry);
         jmStkRet.addSeparator();
-        jmStkRet.add(jmiStockReturnDiog);
+        jmStkRet.add(jmiStkRetDiog);
 
-        jmReports = new JMenu("Reportes");
-        jmReportsStatistics = new JMenu("Estadísticas de ventas");
-        jmReportsBackorder = new JMenu("Backorder");
-        jmiReportsTrnGlobal = new JMenuItem("Ventas globales");
-        jmiReportsTrnByMonth = new JMenuItem("Ventas globales por mes");
-        jmiReportsTrnByItemGeneric = new JMenuItem("Ventas por ítem genérico");
-        jmiReportsTrnByItemGenericBizPartner = new JMenuItem("Ventas por ítem genérico-cliente");
-        jmiReportsTrnByItem = new JMenuItem("Ventas por ítem");
-        jmiReportsTrnByItemBizPartner = new JMenuItem("Ventas por ítem-cliente");
-        jmiReportsTrnByBizPartner = new JMenuItem("Ventas por cliente");
-        jmiReportsTrnByBizPartnerItem = new JMenuItem("Ventas por cliente-ítem");
-        jmiReportsTrnByBizPartnerType = new JMenuItem("Ventas por tipo de cliente");
-        jmiReportsTrnByBizPartnerTypeBizPartner = new JMenuItem("Ventas por tipo de cliente-cliente");
-        jmiReportsTrnDpsByItemBizPartner = new JMenuItem("Documentos de ventas por ítem-cliente");
-        jmiReportsBackorderContract = new JMenuItem("Backorder de contratos");
-        jmiReportsBackorderContractByItem = new JMenuItem("Backorder de contratos por ítem");
-        jmiReportsBackorderContractByItemBizPartner = new JMenuItem("Backorder de contratos por ítem-cliente");
-        jmiReportsBackorderContractByItemBizPartnerBra = new JMenuItem("Backorder de contratos por ítem-cliente sucursal");
-        jmiReportsBackorderOrder = new JMenuItem("Backorder de pedidos");
-        jmiReportsBackorderOrderByItem = new JMenuItem("Backorder de pedidos por ítem");
-        jmiReportsBackorderOrderByItemBizPartner = new JMenuItem("Backorder de pedidos por ítem-cliente");
-        jmiReportsBackorderOrderByItemBizPartnerBra = new JMenuItem("Backorder de pedidos por ítem-cliente sucursal");
-        jmiReportsBizPartnerBalanceAgingView = new JMenuItem("Antigüedad de saldos de clientes");
-        jmiReportsBizPartnerBalance = new JMenuItem("Reporte de saldos clientes...");
-        jmiReportsBizPartnerBalanceDps = new JMenuItem("Reporte de saldos clientes por documento...");
-        jmiReportsBizPartnerBalanceCollection = new JMenuItem("Reporte de cobranza esperada...");
-        jmiReportsBizPartnerBalanceDpsCollection = new JMenuItem("Reporte de cobranza esperada por documento...");
-        jmiReportsBizPartnerBalanceAging = new JMenuItem("Reporte de antigüedad de saldos de clientes...");
-        jmiReportsAccountStatements = new JMenuItem("Estados de cuenta de clientes...");
-        jmiReportsAccountStatementsDps = new JMenuItem("Estados de cuenta de clientes por documento...");
-        jmiReportsBizPartnerAccountingMoves = new JMenuItem("Movimientos contables de clientes...");
-        jmiReportsBizPartnerAccountingMovesDays = new JMenuItem("Movimientos contables de clientes con días de pago...");
-        jmiReportsBizPartnerAuxMoves = new JMenuItem("Reporte auxiliar de movimientos contables de clientes...");
-        jmiReportsDpsList = new JMenuItem("Listado de facturas por período...");
-        jmiReportsDpsBizPartner = new JMenuItem("Reporte de facturas de clientes...");
-        jmiReportsDpsWithBalance = new JMenuItem("Reporte de facturas con saldo de clientes...");
-        jmiReportsTrn = new JMenuItem("Reporte de ventas netas...");
-        jmiReportsTrnConcept = new JMenuItem("Reporte de ventas netas por concepto...");
-        jmiReportsTrnLocality = new JMenuItem("Reporte de ventas netas por zona geográfica...");
-        jmiReportsTrnComparative = new JMenuItem("Reporte comparativo de ventas netas...");
-        jmiReportsTrnDpsDetailBizPartner = new JMenuItem("Reporte detallado de ventas por cliente...");
-        jmiReportsTrnNetTotals = new JMenuItem("Relación de ventas netas por período...");
-        jmiReportsTrnNet = new JMenuItem("Relación de ventas, devoluciones y descuentos por período...");
-        jmiReportsTrnFile = new JMenuItem("Archivo de exportación de ventas netas por período...");
-        jmiReportsTrnDiary = new JMenuItem("Reporte de diario de ventas...");
-        jmiReportsTrnItemUnitaryPrice = new JMenuItem("Reporte de precios unitarios de ventas...");
-        jmiReportsMoneyIn = new JMenuItem("Reporte de documentos e ingresos del ejercicio...");
-        jmiReportsTrnShipmentItem = new JMenuItem("Reporte de embarque y surtido de ítems");
-        jmiReportsTrnContractStock = new JMenuItem("Reporte backorder contratos de ventas vs. existencias...");
-        jmiReportsTrnContractByBizPartner = new JMenuItem("Reporte de contratos de ventas por cliente...");
-        jmiReportsTrnContractStatus = new JMenuItem("Reporte de estatus de contratos...");
+        jmRep = new JMenu("Reportes");
+        jmRepStats = new JMenu("Consultas de estadísticas de ventas");
+        jmiRepTrnGlobal = new JMenuItem("Ventas globales");
+        jmiRepTrnByMonth = new JMenuItem("Ventas globales por mes");
+        jmiRepTrnByItemGeneric = new JMenuItem("Ventas por ítem genérico");
+        jmiRepTrnByItemGenericBizPartner = new JMenuItem("Ventas por ítem genérico-cliente");
+        jmiRepTrnByItem = new JMenuItem("Ventas por ítem");
+        jmiRepTrnByItemBizPartner = new JMenuItem("Ventas por ítem-cliente");
+        jmiRepTrnByBizPartner = new JMenuItem("Ventas por cliente");
+        jmiRepTrnByBizPartnerItem = new JMenuItem("Ventas por cliente-ítem");
+        jmiRepTrnByBizPartnerType = new JMenuItem("Ventas por tipo de cliente");
+        jmiRepTrnByBizPartnerTypeBizPartner = new JMenuItem("Ventas por tipo de cliente-cliente");
+        jmiRepTrnDpsByItemBizPartner = new JMenuItem("Documentos de ventas por ítem-cliente");
+        jmRepBackorder = new JMenu("Consultas de backorder de ventas");
+        jmiRepBackorderContract = new JMenuItem("Backorder de contratos");
+        jmiRepBackorderContractByItem = new JMenuItem("Backorder de contratos por ítem");
+        jmiRepBackorderContractByItemBizPartner = new JMenuItem("Backorder de contratos por ítem-cliente");
+        jmiRepBackorderContractByItemBizPartnerBra = new JMenuItem("Backorder de contratos por ítem-cliente sucursal");
+        jmiRepBackorderOrder = new JMenuItem("Backorder de pedidos");
+        jmiRepBackorderOrderByItem = new JMenuItem("Backorder de pedidos por ítem");
+        jmiRepBackorderOrderByItemBizPartner = new JMenuItem("Backorder de pedidos por ítem-cliente");
+        jmiRepBackorderOrderByItemBizPartnerBra = new JMenuItem("Backorder de pedidos por ítem-cliente sucursal");
+        jmiRepBizPartnerBalanceAgingView = new JMenuItem("Consulta de antigüedad de saldos de clientes");
+        jmiRepBizPartnerBalance = new JMenuItem("Reporte de saldos clientes...");
+        jmiRepBizPartnerBalanceDps = new JMenuItem("Reporte de saldos clientes por documento...");
+        jmiRepBizPartnerBalanceAging = new JMenuItem("Reporte de antigüedad de saldos de clientes...");
+        jmiRepBizPartnerBalanceCollection = new JMenuItem("Reporte de cobranza esperada...");
+        jmiRepBizPartnerBalanceCollectionDps = new JMenuItem("Reporte de cobranza esperada por documento...");
+        jmiRepAccountStatements = new JMenuItem("Estados de cuenta de clientes...");
+        jmiRepAccountStatementsDps = new JMenuItem("Estados de cuenta de clientes por documento...");
+        jmiRepBizPartnerAccountingMoves = new JMenuItem("Movimientos contables de clientes...");
+        jmiRepBizPartnerAccountingMovesDays = new JMenuItem("Movimientos contables de clientes con días de pago...");
+        jmiRepBizPartnerJournal = new JMenuItem("Reporte auxiliar de movimientos contables de clientes...");
+        jmiRepDpsList = new JMenuItem("Listado de facturas por período...");
+        jmiRepDpsBizPartner = new JMenuItem("Reporte de facturas de clientes...");
+        jmiRepDpsWithBalance = new JMenuItem("Reporte de facturas con saldo de clientes...");
+        jmiRepTrn = new JMenuItem("Reporte de ventas netas...");
+        jmiRepTrnConcept = new JMenuItem("Reporte de ventas netas por concepto...");
+        jmiRepTrnLocality = new JMenuItem("Reporte de ventas netas por zona geográfica...");
+        jmiRepTrnComparative = new JMenuItem("Reporte comparativo de ventas netas...");
+        jmiRepTrnDpsDetailBizPartner = new JMenuItem("Reporte detallado de ventas por cliente...");
+        jmiRepTrnNetTotal = new JMenuItem("Relación de ventas netas por período...");
+        jmiRepTrnNetAnalytic = new JMenuItem("Relación de ventas, devoluciones y descuentos por período...");
+        jmiRepTrnFileCsv = new JMenuItem("Archivo CSV de ventas netas por período...");
+        jmiRepTrnJournal = new JMenuItem("Reporte de diario de ventas...");
+        jmiRepTrnItemUnitaryPrice = new JMenuItem("Reporte de precios unitarios de ventas...");
+        jsRepTrn = new JPopupMenu.Separator();
+        jmiRepTrnContractStatus = new JMenuItem("Reporte de estatus de contratos de ventas...");
+        jmiRepTrnContractBackorderStock = new JMenuItem("Reporte de backorder contratos de ventas vs. existencias...");
+        jmiRepTrnContractByBizPartner = new JMenuItem("Reporte de contratos de ventas por cliente...");
+        jsRepContract = new JPopupMenu.Separator();
+        jmiRepTrnShipmentItem = new JMenuItem("Reporte de embarque y surtido de ítems...");
+        jsRepTrnShipment = new JPopupMenu.Separator();
+        jmiRepMoneyIn = new JMenuItem("Reporte de documentos e ingresos del ejercicio...");
 
-        jmReportsStatistics.add(jmiReportsTrnGlobal);
-        jmReportsStatistics.add(jmiReportsTrnByMonth);
-        jmReportsStatistics.add(jmiReportsTrnByItemGeneric);
-        jmReportsStatistics.add(jmiReportsTrnByItemGenericBizPartner);
-        jmReportsStatistics.add(jmiReportsTrnByItem);
-        jmReportsStatistics.add(jmiReportsTrnByItemBizPartner);
-        jmReportsStatistics.add(jmiReportsTrnByBizPartner);
-        jmReportsStatistics.add(jmiReportsTrnByBizPartnerItem);
-        jmReportsStatistics.add(jmiReportsTrnByBizPartnerType);
-        jmReportsStatistics.add(jmiReportsTrnByBizPartnerTypeBizPartner);
-        jmReportsStatistics.addSeparator();
-        jmReportsStatistics.add(jmiReportsTrnDpsByItemBizPartner);
-        jmReportsBackorder.add(jmiReportsBackorderContract);
-        jmReportsBackorder.add(jmiReportsBackorderContractByItem);
-        jmReportsBackorder.add(jmiReportsBackorderContractByItemBizPartner);
-        jmReportsBackorder.add(jmiReportsBackorderContractByItemBizPartnerBra);
-        jmReportsBackorder.addSeparator();
-        jmReportsBackorder.add(jmiReportsBackorderOrder);
-        jmReportsBackorder.add(jmiReportsBackorderOrderByItem);
-        jmReportsBackorder.add(jmiReportsBackorderOrderByItemBizPartner);
-        jmReportsBackorder.add(jmiReportsBackorderOrderByItemBizPartnerBra);
+        jmRepStats.add(jmiRepTrnGlobal);
+        jmRepStats.add(jmiRepTrnByMonth);
+        jmRepStats.add(jmiRepTrnByItemGeneric);
+        jmRepStats.add(jmiRepTrnByItemGenericBizPartner);
+        jmRepStats.add(jmiRepTrnByItem);
+        jmRepStats.add(jmiRepTrnByItemBizPartner);
+        jmRepStats.add(jmiRepTrnByBizPartner);
+        jmRepStats.add(jmiRepTrnByBizPartnerItem);
+        jmRepStats.add(jmiRepTrnByBizPartnerType);
+        jmRepStats.add(jmiRepTrnByBizPartnerTypeBizPartner);
+        jmRepStats.addSeparator();
+        jmRepStats.add(jmiRepTrnDpsByItemBizPartner);
+        jmRepBackorder.add(jmiRepBackorderContract);
+        jmRepBackorder.add(jmiRepBackorderContractByItem);
+        jmRepBackorder.add(jmiRepBackorderContractByItemBizPartner);
+        jmRepBackorder.add(jmiRepBackorderContractByItemBizPartnerBra);
+        jmRepBackorder.addSeparator();
+        jmRepBackorder.add(jmiRepBackorderOrder);
+        jmRepBackorder.add(jmiRepBackorderOrderByItem);
+        jmRepBackorder.add(jmiRepBackorderOrderByItemBizPartner);
+        jmRepBackorder.add(jmiRepBackorderOrderByItemBizPartnerBra);
 
-        jmReports.add(jmReportsStatistics);
-        jmReports.add(jmReportsBackorder);
-        jmReports.add(jmiReportsBizPartnerBalanceAgingView);
-        jmReports.addSeparator();
-        jmReports.add(jmiReportsBizPartnerBalance);
-        jmReports.add(jmiReportsBizPartnerBalanceDps);
-        jmReports.add(jmiReportsBizPartnerBalanceCollection);
-        jmReports.add(jmiReportsBizPartnerBalanceDpsCollection);
-        jmReports.add(jmiReportsBizPartnerBalanceAging);
-        jmReports.addSeparator();
-        jmReports.add(jmiReportsAccountStatements);
-        jmReports.add(jmiReportsAccountStatementsDps);
-        jmReports.addSeparator();
-        jmReports.add(jmiReportsBizPartnerAccountingMoves);
-        jmReports.add(jmiReportsBizPartnerAccountingMovesDays);
-        jmReports.add(jmiReportsBizPartnerAuxMoves);
-        jmReports.addSeparator();
-        jmReports.add(jmiReportsDpsList);
-        jmReports.add(jmiReportsDpsBizPartner);
-        jmReports.add(jmiReportsDpsWithBalance);
-        jmReports.addSeparator();
-        jmReports.add(jmiReportsTrn);
-        jmReports.add(jmiReportsTrnConcept);
-        jmReports.add(jmiReportsTrnLocality);
-        jmReports.add(jmiReportsTrnComparative);
-        jmReports.add(jmiReportsTrnDpsDetailBizPartner);
-        jmReports.add(jmiReportsTrnNetTotals);
-        jmReports.add(jmiReportsTrnNet);
-        jmReports.add(jmiReportsTrnFile);
-        jmReports.addSeparator();
-        jmReports.add(jmiReportsTrnDiary);
-        jmReports.add(jmiReportsTrnItemUnitaryPrice);
-        jmReports.addSeparator();
-        jmReports.add(jmiReportsMoneyIn);
-        jmReports.addSeparator();
-        jmReports.add(jmiReportsTrnShipmentItem);
-        jmReports.addSeparator();
-        jmReports.add(jmiReportsTrnContractStock);
-        //jmReports.add(jmiReportsTrnContractByBizPartner); // XXX (sflores, 2013-12-17)
-        jmReports.addSeparator();
-        jmReports.add(jmiReportsTrnContractStatus);
+        jmRep.add(jmRepStats);
+        jmRep.add(jmRepBackorder);
+        jmRep.add(jmiRepBizPartnerBalanceAgingView);
+        jmRep.addSeparator();
+        jmRep.add(jmiRepBizPartnerBalance);
+        jmRep.add(jmiRepBizPartnerBalanceDps);
+        jmRep.add(jmiRepBizPartnerBalanceAging);
+        jmRep.addSeparator();
+        jmRep.add(jmiRepBizPartnerBalanceCollection);
+        jmRep.add(jmiRepBizPartnerBalanceCollectionDps);
+        jmRep.addSeparator();
+        jmRep.add(jmiRepAccountStatements);
+        jmRep.add(jmiRepAccountStatementsDps);
+        jmRep.add(jmiRepBizPartnerJournal);
+        jmRep.addSeparator();
+        jmRep.add(jmiRepBizPartnerAccountingMoves);
+        jmRep.add(jmiRepBizPartnerAccountingMovesDays);
+        jmRep.addSeparator();
+        jmRep.add(jmiRepDpsList);
+        jmRep.add(jmiRepDpsBizPartner);
+        jmRep.add(jmiRepDpsWithBalance);
+        jmRep.addSeparator();
+        jmRep.add(jmiRepTrn);
+        jmRep.add(jmiRepTrnConcept);
+        jmRep.add(jmiRepTrnLocality);
+        jmRep.add(jmiRepTrnComparative);
+        jmRep.add(jmiRepTrnDpsDetailBizPartner);
+        jmRep.addSeparator();
+        jmRep.add(jmiRepTrnNetTotal);
+        jmRep.add(jmiRepTrnNetAnalytic);
+        jmRep.addSeparator();
+        jmRep.add(jmiRepTrnFileCsv);
+        jmRep.addSeparator();
+        jmRep.add(jmiRepTrnJournal);
+        jmRep.add(jmiRepTrnItemUnitaryPrice);
+        jmRep.add(jsRepTrn);            // separator
+        jmRep.add(jmiRepTrnContractStatus);
+        jmRep.add(jmiRepTrnContractBackorderStock);
+        //jmReports.add(jmiRepTrnContractByBizPartner); // XXX (sflores, 2013-12-17)
+        jmRep.add(jsRepContract);       // separator
+        jmRep.add(jmiRepTrnShipmentItem);
+        jmRep.add(jsRepTrnShipment);    // separator
+        jmRep.add(jmiRepMoneyIn);
 
-        jmCatCfdi = new JMenu("Comprobantes fiscales digitales");
-        jmiStampAvailable = new JMenuItem("Timbres disponibles");
-        jmiStampSign = new JMenuItem("CFDI timbrados");
-        jmiStampSignPending = new JMenuItem("CFDI por timbrar");
-        jmiSendingLog = new JMenuItem("Bitácora de envíos de CFDI");
-        jmCatCfdi.add(jmiStampAvailable);
-        jmCatCfdi.add(jmiStampSign);
-        jmCatCfdi.add(jmiStampSignPending);
-        jmCatCfdi.addSeparator();
-        jmCatCfdi.add(jmiSendingLog);
-        jmCat.add(jmCatCfdi);
-
-        moFormDps = null;
-        moFormDpsRo = null;
-        moFormDsm = null;
-        moFormBizPartnerBlocking = null;
-        moFormDncDocumentNumberSeriesDps = null;
-        moFormDncDocumentNumberSeriesDiog = null;
         moDialogRepDpsList = new SDialogRepDpsList(miClient);
         moDialogRepDpsBizPartner = new SDialogRepDpsBizPartner(miClient);
         moDialogRepDpsWithBalance = new SDialogRepDpsWithBalance(miClient);
@@ -579,17 +586,21 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         moDialogRepSalesPurchasesComparative = new SDialogRepSalesPurchasesComparative(miClient, SDataConstantsSys.TRNS_CT_DPS_SAL);
         moDialogRepSalesPurchasesDetailByBizPartner = new SDialogRepSalesPurchasesDetailByBizPartner(miClient);
         moDialogRepSalesPurchasesNet = new SDialogRepSalesPurchasesNet(miClient);
-        moDialogRepSalesPurchasesFile = new SDialogRepSalesPurchasesFile(miClient, SDataConstantsSys.TRNS_CT_DPS_SAL);
-        moDialogRepSalesPurchasesDiary = new SDialogRepSalesPurchasesDiary(miClient);
+        moDialogRepSalesPurchasesFileCsv = new SDialogRepSalesPurchasesFileCsv(miClient, SDataConstantsSys.TRNS_CT_DPS_SAL);
+        moDialogRepSalesPurchasesJournal = new SDialogRepSalesPurchasesJournal(miClient);
         moDialogRepSalesPurchasesItemUnitaryPrice = new SDialogRepSalesPurchasesPriceUnitary(miClient);
-        moDialogRepDpsMoves = new SDialogRepDpsMoves(miClient);
-        moDialogRepDpsShipmentItem = new SDialogRepDpsShipmentItem(miClient);
         moDialogRepContractStock = new SDialogRepContractStock(miClient);
+        moDialogRepDpsShipmentItem = new SDialogRepDpsShipmentItem(miClient);
+        moDialogRepDpsMoves = new SDialogRepDpsMoves(miClient);
 
         jmiCatDpsDncDocumentNumberSeries.addActionListener(this);
         jmiCatDiogDncDocumentNumberSeries.addActionListener(this);
         jmiCatBizPartnerBlocking.addActionListener(this);
         jmiCatCfgCostCenterItem.addActionListener(this);
+        jmiCatCfdiStampAvailable.addActionListener(this);
+        jmiCatCfdiStampSign.addActionListener(this);
+        jmiCatCfdiStampSignPending.addActionListener(this);
+        jmiCatCfdiSendingLog.addActionListener(this);
         jmiEstimates.addActionListener(this);
         jmiEstimatesLinkPend.addActionListener(this);
         jmiEstimatesLinked.addActionListener(this);
@@ -617,7 +628,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiOrdersAutorizedRejected.addActionListener(this);
         jmiOrdersPriceHistory.addActionListener(this);
         jmiOrdersPrice.addActionListener(this);
-        jmiDps.addActionListener(this);
+        jmiDpsDoc.addActionListener(this);
         jmiDpsEntry.addActionListener(this);
         jmiDpsAnnuled.addActionListener(this);
         jmiDpsReissued.addActionListener(this);
@@ -636,78 +647,74 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsRejectWs.addActionListener(this);
         jmiDpsPriceHistory.addActionListener(this);
         jmiDpsPrice.addActionListener(this);
-        jmiDpsAdjustments.addActionListener(this);
-        jmiDpsAdjustmentsAnnuled.addActionListener(this);
-        jmiDpsAdjustmentsReissued.addActionListener(this);
-        jmiDpsAdjustmentsReplaced.addActionListener(this);
-        jmiDpsAdjustmentsSendPendingEmail.addActionListener(this);
-        jmiDpsAdjustmentsSentEmail.addActionListener(this);
-        jmiDpsAdjustmentsSendPendingWs.addActionListener(this);
-        jmiDpsAdjustmentsApprovedWs.addActionListener(this);
-        jmiDpsAdjustmentsRejectWs.addActionListener(this);
-        jmiStockSupplyPend.addActionListener(this);
-        jmiStockSupplied.addActionListener(this);
-        jmiStockSupplyPendEntry.addActionListener(this);
-        jmiStockSuppliedEntry.addActionListener(this);
-        jmiStockSupplyDiog.addActionListener(this);
-        jmiStatisticsConsume.addActionListener(this);
-        jmiStockReturnPend.addActionListener(this);
-        jmiStockReturned.addActionListener(this);
-        jmiStockReturnPendEntry.addActionListener(this);
-        jmiStockReturnedEntry.addActionListener(this);
-        jmiStockReturnDiog.addActionListener(this);
-        jmiReportsTrnGlobal.addActionListener(this);
-        jmiReportsTrnByMonth.addActionListener(this);
-        jmiReportsTrnByItemGeneric.addActionListener(this);
-        jmiReportsTrnByItemGenericBizPartner.addActionListener(this);
-        jmiReportsTrnByItem.addActionListener(this);
-        jmiReportsTrnByItemBizPartner.addActionListener(this);
-        jmiReportsTrnByBizPartner.addActionListener(this);
-        jmiReportsTrnByBizPartnerItem.addActionListener(this);
-        jmiReportsTrnByBizPartnerType.addActionListener(this);
-        jmiReportsTrnByBizPartnerTypeBizPartner.addActionListener(this);
-        jmiReportsTrnDpsByItemBizPartner.addActionListener(this);
-        jmiReportsBackorderContract.addActionListener(this);
-        jmiReportsBackorderContractByItem.addActionListener(this);
-        jmiReportsBackorderContractByItemBizPartner.addActionListener(this);
-        jmiReportsBackorderContractByItemBizPartnerBra.addActionListener(this);
-        jmiReportsBackorderOrder.addActionListener(this);
-        jmiReportsBackorderOrderByItem.addActionListener(this);
-        jmiReportsBackorderOrderByItemBizPartner.addActionListener(this);
-        jmiReportsBackorderOrderByItemBizPartnerBra.addActionListener(this);
-        jmiReportsBizPartnerBalanceAgingView.addActionListener(this);
-        jmiReportsBizPartnerBalance.addActionListener(this);
-        jmiReportsBizPartnerBalanceDps.addActionListener(this);
-        jmiReportsBizPartnerBalanceCollection.addActionListener(this);
-        jmiReportsBizPartnerBalanceDpsCollection.addActionListener(this);
-        jmiReportsBizPartnerBalanceAging.addActionListener(this);
-        jmiReportsAccountStatements.addActionListener(this);
-        jmiReportsAccountStatementsDps.addActionListener(this);
-        jmiReportsBizPartnerAccountingMoves.addActionListener(this);
-        jmiReportsBizPartnerAccountingMovesDays.addActionListener(this);
-        jmiReportsBizPartnerAuxMoves.addActionListener(this);
-        jmiReportsDpsList.addActionListener(this);
-        jmiReportsDpsBizPartner.addActionListener(this);
-        jmiReportsDpsWithBalance.addActionListener(this);
-        jmiReportsTrn.addActionListener(this);
-        jmiReportsTrnConcept.addActionListener(this);
-        jmiReportsTrnLocality.addActionListener(this);
-        jmiReportsTrnComparative.addActionListener(this);
-        jmiReportsTrnDpsDetailBizPartner.addActionListener(this);
-        jmiReportsTrnNetTotals.addActionListener(this);
-        jmiReportsTrnNet.addActionListener(this);
-        jmiReportsTrnFile.addActionListener(this);
-        jmiReportsTrnDiary.addActionListener(this);
-        jmiReportsTrnItemUnitaryPrice.addActionListener(this);
-        jmiReportsMoneyIn.addActionListener(this);
-        jmiStampAvailable.addActionListener(this);
-        jmiStampSign.addActionListener(this);
-        jmiStampSignPending.addActionListener(this);
-        jmiSendingLog.addActionListener(this);
-        jmiReportsTrnShipmentItem.addActionListener(this);
-        jmiReportsTrnContractStock.addActionListener(this);
-        jmiReportsTrnContractByBizPartner.addActionListener(this);
-        jmiReportsTrnContractStatus.addActionListener(this);
+        jmiDpsAdjDoc.addActionListener(this);
+        jmiDpsAdjAnnuled.addActionListener(this);
+        jmiDpsAdjReissued.addActionListener(this);
+        jmiDpsAdjReplaced.addActionListener(this);
+        jmiDpsAdjSendPendingEmail.addActionListener(this);
+        jmiDpsAdjSentEmail.addActionListener(this);
+        jmiDpsAdjSendPendingWs.addActionListener(this);
+        jmiDpsAdjApprovedWs.addActionListener(this);
+        jmiDpsAdjRejectWs.addActionListener(this);
+        jmiStkDvyPend.addActionListener(this);
+        jmiStkDvySupplied.addActionListener(this);
+        jmiStkDvyPendEntry.addActionListener(this);
+        jmiStkDvySuppliedEntry.addActionListener(this);
+        jmiStkDvyDiog.addActionListener(this);
+        jmiStkDvyStatsConsumption.addActionListener(this);
+        jmiStkRetPending.addActionListener(this);
+        jmiStkRetPendingEntry.addActionListener(this);
+        jmiStkRetReturned.addActionListener(this);
+        jmiStkRetReturnedEntry.addActionListener(this);
+        jmiStkRetDiog.addActionListener(this);
+        jmiRepTrnGlobal.addActionListener(this);
+        jmiRepTrnByMonth.addActionListener(this);
+        jmiRepTrnByItemGeneric.addActionListener(this);
+        jmiRepTrnByItemGenericBizPartner.addActionListener(this);
+        jmiRepTrnByItem.addActionListener(this);
+        jmiRepTrnByItemBizPartner.addActionListener(this);
+        jmiRepTrnByBizPartner.addActionListener(this);
+        jmiRepTrnByBizPartnerItem.addActionListener(this);
+        jmiRepTrnByBizPartnerType.addActionListener(this);
+        jmiRepTrnByBizPartnerTypeBizPartner.addActionListener(this);
+        jmiRepTrnDpsByItemBizPartner.addActionListener(this);
+        jmiRepBackorderContract.addActionListener(this);
+        jmiRepBackorderContractByItem.addActionListener(this);
+        jmiRepBackorderContractByItemBizPartner.addActionListener(this);
+        jmiRepBackorderContractByItemBizPartnerBra.addActionListener(this);
+        jmiRepBackorderOrder.addActionListener(this);
+        jmiRepBackorderOrderByItem.addActionListener(this);
+        jmiRepBackorderOrderByItemBizPartner.addActionListener(this);
+        jmiRepBackorderOrderByItemBizPartnerBra.addActionListener(this);
+        jmiRepBizPartnerBalanceAgingView.addActionListener(this);
+        jmiRepBizPartnerBalance.addActionListener(this);
+        jmiRepBizPartnerBalanceDps.addActionListener(this);
+        jmiRepBizPartnerBalanceAging.addActionListener(this);
+        jmiRepBizPartnerBalanceCollection.addActionListener(this);
+        jmiRepBizPartnerBalanceCollectionDps.addActionListener(this);
+        jmiRepAccountStatements.addActionListener(this);
+        jmiRepAccountStatementsDps.addActionListener(this);
+        jmiRepBizPartnerJournal.addActionListener(this);
+        jmiRepBizPartnerAccountingMoves.addActionListener(this);
+        jmiRepBizPartnerAccountingMovesDays.addActionListener(this);
+        jmiRepDpsList.addActionListener(this);
+        jmiRepDpsBizPartner.addActionListener(this);
+        jmiRepDpsWithBalance.addActionListener(this);
+        jmiRepTrn.addActionListener(this);
+        jmiRepTrnConcept.addActionListener(this);
+        jmiRepTrnLocality.addActionListener(this);
+        jmiRepTrnComparative.addActionListener(this);
+        jmiRepTrnDpsDetailBizPartner.addActionListener(this);
+        jmiRepTrnNetTotal.addActionListener(this);
+        jmiRepTrnNetAnalytic.addActionListener(this);
+        jmiRepTrnFileCsv.addActionListener(this);
+        jmiRepTrnJournal.addActionListener(this);
+        jmiRepTrnItemUnitaryPrice.addActionListener(this);
+        jmiRepTrnContractStatus.addActionListener(this);
+        jmiRepTrnContractBackorderStock.addActionListener(this);
+        jmiRepTrnContractByBizPartner.addActionListener(this);
+        jmiRepTrnShipmentItem.addActionListener(this);
+        jmiRepMoneyIn.addActionListener(this);
 
         hasRightDnsDps = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DPS_DNS).HasRight;
         hasRightDnsDiog = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_DIOG_CFG).HasRight;
@@ -744,7 +751,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiOrdersPrice.setEnabled(hasRightDocOrder && levelRightDocOrder >= SUtilConsts.LEV_AUTHOR);
 
         jmDps.setEnabled(hasRightDocTransaction);
-        jmiDps.setEnabled(hasRightDocTransaction);
+        jmiDpsDoc.setEnabled(hasRightDocTransaction);
         jmiDpsEntry.setEnabled(hasRightDocTransaction);
         jmiDpsAnnuled.setEnabled(false);
         jmiDpsReissued.setEnabled(false);
@@ -762,32 +769,71 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsPrice.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
 
         jmDpsAdj.setEnabled(hasRightDocTransactionAdjust);
-        jmiDpsAdjustments.setEnabled(hasRightDocTransactionAdjust);
-        jmiDpsAdjustmentsAnnuled.setEnabled(false);
-        jmiDpsAdjustmentsReissued.setEnabled(false);
-        jmiDpsAdjustmentsReplaced.setEnabled(false);
-        jmiDpsAdjustmentsSendPendingEmail.setEnabled(hasRightDocTransactionAdjust);
-        jmiDpsAdjustmentsSentEmail.setEnabled(hasRightDocTransactionAdjust);
-        jmiDpsAdjustmentsSendPendingWs.setEnabled(hasRightDocTransactionAdjust);
-        jmiDpsAdjustmentsApprovedWs.setEnabled(hasRightDocTransactionAdjust);
-        jmiDpsAdjustmentsRejectWs.setEnabled(hasRightDocTransactionAdjust);
+        jmiDpsAdjDoc.setEnabled(hasRightDocTransactionAdjust);
+        jmiDpsAdjAnnuled.setEnabled(false);
+        jmiDpsAdjReissued.setEnabled(false);
+        jmiDpsAdjReplaced.setEnabled(false);
+        jmiDpsAdjSendPendingEmail.setEnabled(hasRightDocTransactionAdjust);
+        jmiDpsAdjSentEmail.setEnabled(hasRightDocTransactionAdjust);
+        jmiDpsAdjSendPendingWs.setEnabled(hasRightDocTransactionAdjust);
+        jmiDpsAdjApprovedWs.setEnabled(hasRightDocTransactionAdjust);
+        jmiDpsAdjRejectWs.setEnabled(hasRightDocTransactionAdjust);
 
-        jmStkSup.setEnabled(hasRightInventoryOut);
-        jmiStockSupplyPend.setEnabled(hasRightInventoryOut);
-        jmiStockSupplied.setEnabled(hasRightInventoryOut);
-        jmiStockSupplyPendEntry.setEnabled(hasRightInventoryOut);
-        jmiStockSuppliedEntry.setEnabled(hasRightInventoryOut);
-        jmiStockSupplyDiog.setEnabled(hasRightInventoryOut);
-        jmiStatisticsConsume.setEnabled(hasRightInventoryOut);
+        jmStkDvy.setEnabled(hasRightInventoryOut);
+        jmiStkDvyPend.setEnabled(hasRightInventoryOut);
+        jmiStkDvySupplied.setEnabled(hasRightInventoryOut);
+        jmiStkDvyPendEntry.setEnabled(hasRightInventoryOut);
+        jmiStkDvySuppliedEntry.setEnabled(hasRightInventoryOut);
+        jmiStkDvyDiog.setEnabled(hasRightInventoryOut);
+        jmiStkDvyStatsConsumption.setEnabled(hasRightInventoryOut);
 
         jmStkRet.setEnabled(hasRightInventoryIn);
-        jmiStockReturnPend.setEnabled(hasRightInventoryIn);
-        jmiStockReturned.setEnabled(hasRightInventoryIn);
-        jmiStockReturnPendEntry.setEnabled(hasRightInventoryIn);
-        jmiStockReturnedEntry.setEnabled(hasRightInventoryIn);
-        jmiStockReturnDiog.setEnabled(hasRightInventoryIn);
+        jmiStkRetPending.setEnabled(hasRightInventoryIn);
+        jmiStkRetReturned.setEnabled(hasRightInventoryIn);
+        jmiStkRetPendingEntry.setEnabled(hasRightInventoryIn);
+        jmiStkRetReturnedEntry.setEnabled(hasRightInventoryIn);
+        jmiStkRetDiog.setEnabled(hasRightInventoryIn);
 
-        jmReports.setEnabled(hasRightReports);
+        jmRep.setEnabled(hasRightReports);
+        
+        // GUI configuration:
+        
+        if (((erp.SClient) miClient).getCfgProcesor() != null) {
+            SCfgModule module = new SCfgModule("" + mnModuleType);
+            SCfgMenu menu = null;
+            SCfgMenuSection section = null;
+            
+            menu = new SCfgMenu(jmEst, "" + SDataConstants.MOD_SAL_EST);
+            module.getChildMenus().add(menu);
+            
+            menu = new SCfgMenu(jmCon, "" + SDataConstants.MOD_SAL_CON);
+            module.getChildMenus().add(menu);
+            
+            menu = new SCfgMenu(jmStkDvy, "" + SDataConstants.MOD_SAL_DVY);
+            module.getChildMenus().add(menu);
+            
+            menu = new SCfgMenu(jmStkRet, "" + SDataConstants.MOD_SAL_RET);
+            module.getChildMenus().add(menu);
+            
+            menu = new SCfgMenu(jmRep, "" + SDataConstants.MOD_SAL_REP);
+            section = new SCfgMenuSection("" + SDataConstants.MOD_SAL_REP_CON);
+            section.getChildItems().add(new SCfgMenuSectionItem(jmiRepTrnContractStatus, "" + SDataConstants.TRNS_ST_DPS));
+            section.getChildItems().add(new SCfgMenuSectionItem(jmiRepTrnContractBackorderStock, "" + SDataConstants.TRN_STK));
+            section.getChildItems().add(new SCfgMenuSectionItem(jmiRepTrnContractByBizPartner, "" + SDataConstants.BPSU_BP));
+            section.setChildSeparator(new SCfgMenuSectionSeparator(jsRepTrn));          // previous separator
+            menu.getChildSections().add(section);
+            section = new SCfgMenuSection("" + SDataConstants.MOD_SAL_REP_SHI);
+            section.getChildItems().add(new SCfgMenuSectionItem(jmiRepTrnShipmentItem, "" + SModConsts.LOG_SHIP));
+            section.setChildSeparator(new SCfgMenuSectionSeparator(jsRepContract));     // previous separator
+            menu.getChildSections().add(section);
+            section = new SCfgMenuSection("" + SDataConstants.MOD_SAL_REP_MIN);
+            section.getChildItems().add(new SCfgMenuSectionItem(jmiRepMoneyIn, "" + SDataConstants.TRN_DPS));
+            section.setChildSeparator(new SCfgMenuSectionSeparator(jsRepTrnShipment));  // previous separator
+            menu.getChildSections().add(section);
+            module.getChildMenus().add(menu);
+            
+            ((erp.SClient) miClient).getCfgProcesor().processModule(module);
+        }
     }
 
     private java.lang.String getViewTitle(int type) {
@@ -1434,7 +1480,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
 
     @Override
     public javax.swing.JMenu[] getMenues() {
-        return new JMenu[] { jmCat, jmEst, jmCon, jmOrd, jmDps, jmDpsAdj, jmStkSup, jmStkRet, jmReports };
+        return new JMenu[] { jmCat, jmEst, jmCon, jmOrd, jmDps, jmDpsAdj, jmStkDvy, jmStkRet, jmRep };
     }
 
     @Override
@@ -1458,6 +1504,18 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiCatCfgCostCenterItem) {
                 showView(SDataConstants.FIN_CC_ITEM);
+            }
+            else if (item == jmiCatCfdiStampAvailable) {
+                miClient.getGuiModule(SDataConstants.MOD_CFG).showView(SDataConstants.TRNX_STAMP_AVL);
+            }
+            else if (item == jmiCatCfdiStampSign) {
+                showView(SDataConstants.TRN_CFD, SDataConstants.TRNX_STAMP_SIGN, SCfdConsts.CFD_TYPE_DPS);
+            }
+            else if (item == jmiCatCfdiStampSignPending) {
+                showView(SDataConstants.TRN_CFD, SDataConstants.TRNX_STAMP_SIGN_PEND, SCfdConsts.CFD_TYPE_DPS);
+            }
+            else if (item == jmiCatCfdiSendingLog) {
+                showView(SDataConstants.TRN_CFD_SND_LOG, SCfdConsts.CFD_TYPE_DPS);
             }
             else if (item == jmiEstimates) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_EST_EST);
@@ -1534,7 +1592,10 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiOrdersAutorizedRejected) {
                 showView(SDataConstants.TRNX_DPS_AUTHORIZE_PEND, SDataConstantsSys.TRNX_DPS_SAL_ORD_AUT_REJ);
             }
-            else if (item == jmiDps) {
+            else if (item == jmiOrdersPrice) {
+                showView(SDataConstants.MKT_PLIST_ITEM, SDataConstantsSys.TRNS_CT_DPS_SAL);
+            }
+            else if (item == jmiDpsDoc) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_DOC);
             }
             else if (item == jmiDpsEntry) {
@@ -1588,269 +1649,254 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiDpsPriceHistory || item == jmiOrdersPriceHistory) {
                 showView(SDataConstants.TRNX_PRICE_HIST, SDataConstantsSys.TRNS_CT_DPS_SAL);
             }
-            else if (item == jmiDpsAdjustments) {
+            else if (item == jmiDpsAdjDoc) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
             }
-            else if (item == jmiDpsAdjustmentsAnnuled) {
+            else if (item == jmiDpsAdjAnnuled) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ + SDataConstantsSys.TRNX_DPS_DOC_ANNUL);
             }
-            else if (item == jmiDpsAdjustmentsReissued) {
+            else if (item == jmiDpsAdjReissued) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ + SDataConstantsSys.TRNX_DPS_DOC_RISS);
             }
-            else if (item == jmiDpsAdjustmentsReplaced) {
+            else if (item == jmiDpsAdjReplaced) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ + SDataConstantsSys.TRNX_DPS_DOC_REPL);
             }
-            else if (item == jmiDpsAdjustmentsSendPendingEmail) {
+            else if (item == jmiDpsAdjSendPendingEmail) {
                 showView(SDataConstants.TRNX_DPS_SEND_PEND, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
             }
-            else if (item == jmiDpsAdjustmentsSentEmail) {
+            else if (item == jmiDpsAdjSentEmail) {
                 showView(SDataConstants.TRNX_DPS_SENT, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
             }
-            else if (item == jmiDpsAdjustmentsSendPendingWs) {
+            else if (item == jmiDpsAdjSendPendingWs) {
                 miClient.getSession().showView(SModConsts.TRN_CFD, SModSysConsts.TRNS_ST_XML_DVY_PENDING, new SGuiParams(SDataConstantsSys.TRNX_TP_DPS_ADJ));
             }
-            else if (item == jmiDpsAdjustmentsApprovedWs) {
+            else if (item == jmiDpsAdjApprovedWs) {
                 miClient.getSession().showView(SModConsts.TRN_CFD, SModSysConsts.TRNS_ST_XML_DVY_APPROVED, new SGuiParams(SDataConstantsSys.TRNX_TP_DPS_ADJ));
             }
-            else if (item == jmiDpsAdjustmentsRejectWs) {
+            else if (item == jmiDpsAdjRejectWs) {
                 miClient.getSession().showView(SModConsts.TRN_CFD, SModSysConsts.TRNS_ST_XML_DVY_REJECT, new SGuiParams(SDataConstantsSys.TRNX_TP_DPS_ADJ));
             }
-            else if (item == jmiStockSupplyPend) {
+            else if (item == jmiStkDvyPend) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_SUPPLY_PEND, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC[0], SDataConstantsSys.TRNS_CL_DPS_SAL_DOC[1]);
             }
-            else if (item == jmiStockSupplyPendEntry) {
+            else if (item == jmiStkDvyPendEntry) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_SUPPLY_PEND_ETY, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC[0], SDataConstantsSys.TRNS_CL_DPS_SAL_DOC[1]);
             }
-            else if (item == jmiStockSupplied) {
+            else if (item == jmiStkDvySupplied) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_SUPPLIED, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC[0], SDataConstantsSys.TRNS_CL_DPS_SAL_DOC[1]);
             }
-            else if (item == jmiStockSuppliedEntry) {
+            else if (item == jmiStkDvySuppliedEntry) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_SUPPLIED_ETY, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC[0], SDataConstantsSys.TRNS_CL_DPS_SAL_DOC[1]);
             }
-            else if (item == jmiStockSupplyDiog) {
+            else if (item == jmiStkDvyDiog) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRN_DIOG, SDataConstantsSys.TRNS_CL_IOG_OUT_SAL[0], SDataConstantsSys.TRNS_CL_IOG_OUT_SAL[1]);
             }
-            else if (item == jmiStatisticsConsume) {
+            else if (item == jmiStkDvyStatsConsumption) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_STK_COMSUME, SDataConstantsSys.TRNS_CT_DPS_SAL);
             }
-            else if (item == jmiStockReturnPend) {
+            else if (item == jmiStkRetPending) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_RETURN_PEND, SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ[0], SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ[1]);
             }
-            else if (item == jmiStockReturnPendEntry) {
+            else if (item == jmiStkRetPendingEntry) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_RETURN_PEND_ETY, SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ[0], SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ[1]);
             }
-            else if (item == jmiStockReturned) {
+            else if (item == jmiStkRetReturned) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_RETURNED, SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ[0], SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ[1]);
             }
-            else if (item == jmiStockReturnedEntry) {
+            else if (item == jmiStkRetReturnedEntry) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_RETURNED_ETY, SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ[0], SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ[1]);
             }
-            else if (item == jmiStockReturnDiog) {
+            else if (item == jmiStkRetDiog) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRN_DIOG, SDataConstantsSys.TRNS_CL_IOG_IN_SAL[0], SDataConstantsSys.TRNS_CL_IOG_IN_SAL[1]);
             }
-            else if (item == jmiReportsTrnGlobal) {
+            else if (item == jmiRepTrnGlobal) {
                 showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_TOT);
             }
-            else if (item == jmiReportsTrnByMonth) {
+            else if (item == jmiRepTrnByMonth) {
                 showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_TOT_MONTH);
             }
-            else if (item == jmiReportsTrnByItemGeneric) {
+            else if (item == jmiRepTrnByItemGeneric) {
                 showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN);
             }
-            else if (item == jmiReportsTrnByItemGenericBizPartner) {
+            else if (item == jmiRepTrnByItemGenericBizPartner) {
                 showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN_BP);
             }
-            else if (item == jmiReportsTrnByItem) {
+            else if (item == jmiRepTrnByItem) {
                 showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_TOT_BY_ITEM);
             }
-            else if (item == jmiReportsTrnByItemBizPartner) {
+            else if (item == jmiRepTrnByItemBizPartner) {
                 showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_TOT_BY_ITEM_BP);
             }
-            else if (item == jmiReportsTrnByBizPartner) {
+            else if (item == jmiRepTrnByBizPartner) {
                 showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_TOT_BY_BP);
             }
-            else if (item == jmiReportsTrnByBizPartnerItem) {
+            else if (item == jmiRepTrnByBizPartnerItem) {
                 showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_TOT_BY_BP_ITEM);
             }
-            else if (item == jmiReportsTrnByBizPartnerType) {
+            else if (item == jmiRepTrnByBizPartnerType) {
                 showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_TOT_BY_TP_BP);
             }
-            else if (item == jmiReportsTrnByBizPartnerTypeBizPartner) {
+            else if (item == jmiRepTrnByBizPartnerTypeBizPartner) {
                 showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_TOT_BY_TP_BP_BP);
             }
-            else if (item == jmiReportsTrnDpsByItemBizPartner) {
+            else if (item == jmiRepTrnDpsByItemBizPartner) {
                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_FIL);
             }
-            else if (item == jmiReportsBackorderContract) {
+            else if (item == jmiRepBackorderContract) {
                 showView(SDataConstants.TRNX_DPS_BACKORDER, SDataConstantsSys.TRNX_SAL_BACKORDER_CON, SDataConstantsSys.TRNS_CL_DPS_SAL_EST[1]);
             }
-            else if (item == jmiReportsBackorderContractByItem) {
+            else if (item == jmiRepBackorderContractByItem) {
                 showView(SDataConstants.TRNX_DPS_BACKORDER, SDataConstantsSys.TRNX_SAL_BACKORDER_CON_ITEM, SDataConstantsSys.TRNS_CL_DPS_SAL_EST[1]);
             }
-            else if (item == jmiReportsBackorderContractByItemBizPartner) {
+            else if (item == jmiRepBackorderContractByItemBizPartner) {
                 showView(SDataConstants.TRNX_DPS_BACKORDER, SDataConstantsSys.TRNX_SAL_BACKORDER_CON_ITEM_BP, SDataConstantsSys.TRNS_CL_DPS_SAL_EST[1]);
             }
-            else if (item == jmiReportsBackorderContractByItemBizPartnerBra) {
+            else if (item == jmiRepBackorderContractByItemBizPartnerBra) {
                 showView(SDataConstants.TRNX_DPS_BACKORDER, SDataConstantsSys.TRNX_SAL_BACKORDER_CON_ITEM_BP_BRA, SDataConstantsSys.TRNS_CL_DPS_SAL_EST[1]);
             }
-            else if (item == jmiReportsBackorderOrder) {
+            else if (item == jmiRepBackorderOrder) {
                 showView(SDataConstants.TRNX_DPS_BACKORDER, SDataConstantsSys.TRNX_SAL_BACKORDER_ORD, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD[1]);
             }
-            else if (item == jmiReportsBackorderOrderByItem) {
+            else if (item == jmiRepBackorderOrderByItem) {
                 showView(SDataConstants.TRNX_DPS_BACKORDER, SDataConstantsSys.TRNX_SAL_BACKORDER_ORD_ITEM, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD[1]);
             }
-            else if (item == jmiReportsBackorderOrderByItemBizPartner) {
+            else if (item == jmiRepBackorderOrderByItemBizPartner) {
                 showView(SDataConstants.TRNX_DPS_BACKORDER, SDataConstantsSys.TRNX_SAL_BACKORDER_ORD_ITEM_BP, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD[1]);
             }
-            else if (item == jmiReportsBackorderOrderByItemBizPartnerBra) {
+            else if (item == jmiRepBackorderOrderByItemBizPartnerBra) {
                 showView(SDataConstants.TRNX_DPS_BACKORDER, SDataConstantsSys.TRNX_SAL_BACKORDER_ORD_ITEM_BP_BRA, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD[1]);
             }
-            else if (item == jmiReportsBizPartnerBalanceAgingView) {
+            else if (item == jmiRepBizPartnerBalanceAgingView) {
                 showView(SDataConstants.TRNX_DPS_BAL_AGING, SDataConstantsSys.TRNS_CT_DPS_SAL);
             }
-            else if (item == jmiReportsBizPartnerBalance) {
+            else if (item == jmiRepBizPartnerBalance) {
                 new SDialogRepBizPartnerBalance(miClient, SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
             }
-            else if (item == jmiReportsBizPartnerBalanceDps) {
+            else if (item == jmiRepBizPartnerBalanceDps) {
                 new SDialogRepBizPartnerBalanceDps(miClient, SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
             }
-            else if (item == jmiReportsBizPartnerBalanceCollection) {
-                new SDialogRepBizPartnerBalanceDpsCollection(miClient, SDataConstantsSys.BPSS_CT_BP_CUS, SDataConstantsSys.REP_FIN_BPS_BAL_COLL).setVisible(true);
-            }
-            else if (item == jmiReportsBizPartnerBalanceDpsCollection) {
-                new SDialogRepBizPartnerBalanceDpsCollection(miClient, SDataConstantsSys.BPSS_CT_BP_CUS, SDataConstantsSys.REP_FIN_BPS_BAL_COLL_DPS).setVisible(true);
-            }
-            else if (item == jmiReportsBizPartnerBalanceAging) {
+            else if (item == jmiRepBizPartnerBalanceAging) {
                 new SDialogRepBizPartnerBalanceAging(miClient, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS).setVisible(true);
             }
-            else if (item == jmiReportsAccountStatements) {
+            else if (item == jmiRepBizPartnerBalanceCollection) {
+                new SDialogRepBizPartnerBalanceDpsCollection(miClient, SDataConstantsSys.BPSS_CT_BP_CUS, SDataConstantsSys.REP_FIN_BPS_BAL_COLL).setVisible(true);
+            }
+            else if (item == jmiRepBizPartnerBalanceCollectionDps) {
+                new SDialogRepBizPartnerBalanceDpsCollection(miClient, SDataConstantsSys.BPSS_CT_BP_CUS, SDataConstantsSys.REP_FIN_BPS_BAL_COLL_DPS).setVisible(true);
+            }
+            else if (item == jmiRepAccountStatements) {
                 new SDialogRepBizPartnerStatements(miClient, SDataConstantsSys.BPSS_CT_BP_CUS, false).setVisible(true);
             }
-            else if (item == jmiReportsAccountStatementsDps) {
+            else if (item == jmiRepAccountStatementsDps) {
                 new SDialogRepBizPartnerStatements(miClient, SDataConstantsSys.BPSS_CT_BP_CUS, true).setVisible(true);
             }
-            else if (item == jmiReportsBizPartnerAccountingMoves) {
+            else if (item == jmiRepBizPartnerJournal) {
+                new SDialogRepBizPartnerJournal(miClient, SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
+            }
+            else if (item == jmiRepBizPartnerAccountingMoves) {
                 new SDialogRepBizPartnerAccountingMoves(miClient, SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
             }
-            else if (item == jmiReportsBizPartnerAccountingMovesDays) {
+            else if (item == jmiRepBizPartnerAccountingMovesDays) {
                 new SDialogRepBizPartnerAccountingMoves(miClient, SDataConstantsSys.BPSS_CT_BP_CUS, true).setVisible(true);
             }
-            else if (item == jmiReportsBizPartnerAuxMoves) {
-                new SDialogRepBizPartnerAuxMoves(miClient, SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
-            }
-            else if (item == jmiReportsDpsList) {
+            else if (item == jmiRepDpsList) {
                 moDialogRepDpsList.setParamIsSupplier(false);
                 moDialogRepDpsList.formRefreshCatalogues();
                 moDialogRepDpsList.formReset();
                 moDialogRepDpsList.setFormVisible(true);
             }
-            else if (item == jmiReportsDpsBizPartner) {
+            else if (item == jmiRepDpsBizPartner) {
                 moDialogRepDpsBizPartner.setParamIsSupplier(false);
                 moDialogRepDpsBizPartner.formRefreshCatalogues();
                 moDialogRepDpsBizPartner.formReset();
                 moDialogRepDpsBizPartner.setFormVisible(true);
             }
-            else if (item == jmiReportsDpsWithBalance) {
+            else if (item == jmiRepDpsWithBalance) {
                 moDialogRepDpsWithBalance.setParamIsSupplier(false);
                 moDialogRepDpsWithBalance.formRefreshCatalogues();
                 moDialogRepDpsWithBalance.formReset();
                 moDialogRepDpsWithBalance.setFormVisible(true);
             }
-            else if (item == jmiReportsTrn) {
+            else if (item == jmiRepTrn) {
                 moDialogRepSalesPurchases.setParamIsSupplier(false);
                 moDialogRepSalesPurchases.formRefreshCatalogues();
                 moDialogRepSalesPurchases.formReset();
                 moDialogRepSalesPurchases.setFormVisible(true);
             }
-            else if (item == jmiReportsTrnConcept) {
+            else if (item == jmiRepTrnConcept) {
                 moDialogRepSalesPurchasesByConcept.formRefreshCatalogues();
                 moDialogRepSalesPurchasesByConcept.formReset();
                 moDialogRepSalesPurchasesByConcept.setParamIsSupplier(false);
                 moDialogRepSalesPurchasesByConcept.setFormVisible(true);
             }
-            else if (item == jmiReportsTrnLocality) {
+            else if (item == jmiRepTrnLocality) {
                 moDialogRepSalesPurchasesByLocality.formRefreshCatalogues();
                 moDialogRepSalesPurchasesByLocality.formReset();
                 moDialogRepSalesPurchasesByLocality.setParamIsSupplier(false);
                 moDialogRepSalesPurchasesByLocality.setFormVisible(true);
             }
-            else if (item == jmiReportsTrnComparative) {
+            else if (item == jmiRepTrnComparative) {
                 moDialogRepSalesPurchasesComparative.formReset();
                 moDialogRepSalesPurchasesComparative.setFormVisible(true);
             }
-            else if (item == jmiReportsTrnDpsDetailBizPartner) {
+            else if (item == jmiRepTrnDpsDetailBizPartner) {
                 moDialogRepSalesPurchasesDetailByBizPartner.formRefreshCatalogues();
                 moDialogRepSalesPurchasesDetailByBizPartner.formReset();
                 moDialogRepSalesPurchasesDetailByBizPartner.setParamIsSupplier(false);
                 moDialogRepSalesPurchasesDetailByBizPartner.setFormVisible(true);
             }
-            else if (item == jmiReportsTrnNetTotals) {
+            else if (item == jmiRepTrnNetTotal) {
                 moDialogRepSalesPurchasesNet.formRefreshCatalogues();
                 moDialogRepSalesPurchasesNet.formReset();
                 moDialogRepSalesPurchasesNet.setParamIsSupplier(false);
                 moDialogRepSalesPurchasesNet.setParamIsNet(true);
                 moDialogRepSalesPurchasesNet.setFormVisible(true);
             }
-            else if (item == jmiReportsTrnNet) {
+            else if (item == jmiRepTrnNetAnalytic) {
                 moDialogRepSalesPurchasesNet.formRefreshCatalogues();
                 moDialogRepSalesPurchasesNet.formReset();
                 moDialogRepSalesPurchasesNet.setParamIsSupplier(false);
                 moDialogRepSalesPurchasesNet.setParamIsNet(false);
                 moDialogRepSalesPurchasesNet.setFormVisible(true);
             }
-            else if (item == jmiReportsTrnFile) {
-                moDialogRepSalesPurchasesFile.formReset();
-                moDialogRepSalesPurchasesFile.setFormVisible(true);
+            else if (item == jmiRepTrnFileCsv) {
+                moDialogRepSalesPurchasesFileCsv.formReset();
+                moDialogRepSalesPurchasesFileCsv.setFormVisible(true);
             }
-            else if (item == jmiReportsTrnDiary) {
-                moDialogRepSalesPurchasesDiary.formRefreshCatalogues();
-                moDialogRepSalesPurchasesDiary.formReset();
-                moDialogRepSalesPurchasesDiary.setParamIsSupplier(false);
-                moDialogRepSalesPurchasesDiary.setFormVisible(true);
+            else if (item == jmiRepTrnJournal) {
+                moDialogRepSalesPurchasesJournal.formRefreshCatalogues();
+                moDialogRepSalesPurchasesJournal.formReset();
+                moDialogRepSalesPurchasesJournal.setParamIsSupplier(false);
+                moDialogRepSalesPurchasesJournal.setFormVisible(true);
             }
-            else if (item == jmiReportsTrnItemUnitaryPrice) {
+            else if (item == jmiRepTrnItemUnitaryPrice) {
                 moDialogRepSalesPurchasesItemUnitaryPrice.formRefreshCatalogues();
                 moDialogRepSalesPurchasesItemUnitaryPrice.formReset();
                 moDialogRepSalesPurchasesItemUnitaryPrice.setParamIsSupplier(false);
                 moDialogRepSalesPurchasesItemUnitaryPrice.setFormVisible(true);
             }
-            else if (item == jmiReportsMoneyIn) {
-                moDialogRepDpsMoves.formRefreshCatalogues();
-                moDialogRepDpsMoves.formReset();
-                moDialogRepDpsMoves.setParamIsSupplier(false);
-                moDialogRepDpsMoves.setFormVisible(true);
+            else if (item == jmiRepTrnContractStatus) {
+                new SDialogRepContractStatus(miClient.getSession().getClient(), SDataConstantsSys.BPSS_CT_BP_CUS, "Reporte de estatus de contratos").setVisible(true);
             }
-            else if (item == jmiReportsTrnShipmentItem) {
-                moDialogRepDpsShipmentItem.formRefreshCatalogues();
-                moDialogRepDpsShipmentItem.formReset();
-                moDialogRepDpsShipmentItem.setFormVisible(true);
-            }
-            else if (item == jmiReportsTrnContractStock) {
+            else if (item == jmiRepTrnContractBackorderStock) {
                 moDialogRepContractStock.formRefreshCatalogues();
                 moDialogRepContractStock.formReset();
                 moDialogRepContractStock.setParamIsSupplier(false);
                 moDialogRepContractStock.setFormVisible(true);
             }
-            else if (item == jmiReportsTrnContractByBizPartner) {
+            else if (item == jmiRepTrnContractByBizPartner) {
                 new SDialogRepContractByBizPartner(miClient.getSession().getClient(), SDataConstantsSys.BPSS_CT_BP_CUS, "Reporte de contratos por cliente").setVisible(true);
             }
-            else if (item == jmiReportsTrnContractStatus) {
-                new SDialogRepContractStatus(miClient.getSession().getClient(), SDataConstantsSys.BPSS_CT_BP_CUS, "Reporte de estatus de contratos").setVisible(true);
+            else if (item == jmiRepTrnShipmentItem) {
+                moDialogRepDpsShipmentItem.formRefreshCatalogues();
+                moDialogRepDpsShipmentItem.formReset();
+                moDialogRepDpsShipmentItem.setFormVisible(true);
             }
-            else if (item == jmiStampSign) {
-                showView(SDataConstants.TRN_CFD, SDataConstants.TRNX_STAMP_SIGN, SCfdConsts.CFD_TYPE_DPS);
-            }
-            else if (item == jmiStampSignPending) {
-                showView(SDataConstants.TRN_CFD, SDataConstants.TRNX_STAMP_SIGN_PEND, SCfdConsts.CFD_TYPE_DPS);
-            }
-            else if (item == jmiSendingLog) {
-                showView(SDataConstants.TRN_CFD_SND_LOG, SCfdConsts.CFD_TYPE_DPS);
-            }
-            else if (item == jmiStampAvailable) {
-                miClient.getGuiModule(SDataConstants.MOD_CFG).showView(SDataConstants.TRNX_STAMP_AVL);
-            }
-            else if (item == jmiOrdersPrice) {
-                showView(SDataConstants.MKT_PLIST_ITEM, SDataConstantsSys.TRNS_CT_DPS_SAL);
+            else if (item == jmiRepMoneyIn) {
+                moDialogRepDpsMoves.formRefreshCatalogues();
+                moDialogRepDpsMoves.formReset();
+                moDialogRepDpsMoves.setParamIsSupplier(false);
+                moDialogRepDpsMoves.setFormVisible(true);
             }
         }
     }

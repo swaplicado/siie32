@@ -10,6 +10,8 @@ import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
 import erp.form.SFormOptionPicker;
+import erp.gui.mod.cfg.SCfgMenu;
+import erp.gui.mod.cfg.SCfgModule;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormOptionPickerInterface;
@@ -282,19 +284,6 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         moDialogRepProductionOrderPerformance = new SDialogRepProductionOrderPerformance(miClient);
         moDialogProductionOrderSaved = new SDialogProductionOrderSaved(miClient);
 
-        moFormManufacturingLine = null;
-        moFormManufacturingLineConfigItem = null;
-        moFormBom = null;
-        moFormBomExp = null;
-        moFormLeadtime = null;
-        moFormProductionOrder = null;
-
-        moPickerBom = null;
-        moPickerBomSubstitute = null;
-        moPickerOrd = null;
-        moPickerOrdPP = null;
-        moPickerManufacturingLine = null;
-
         hasRightBom = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_BOM).HasRight;
         hasRightExplotionMaterials = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_EXP).HasRight;
         hasRightAssignLot = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ASG_LOT).HasRight;
@@ -313,6 +302,18 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiProductionOrderProcess.setVisible(!(Boolean)SDataReadDescriptions.getField(miClient, SDataConstants.MFGS_ST_ORD, new int[] { SDataConstantsSys.MFGS_ST_ORD_PROC }, SLibConstants.FIELD_DEL));
         jmiProductionOrderEnd.setVisible(!(Boolean)SDataReadDescriptions.getField(miClient, SDataConstants.MFGS_ST_ORD, new int[] { SDataConstantsSys.MFGS_ST_ORD_END }, SLibConstants.FIELD_DEL));
         jmiProductionOrderClose.setVisible(!(Boolean)SDataReadDescriptions.getField(miClient, SDataConstants.MFGS_ST_ORD, new int[] { SDataConstantsSys.MFGS_ST_ORD_CLS }, SLibConstants.FIELD_DEL));
+        
+        // GUI configuration:
+        
+        if (((erp.SClient) miClient).getCfgProcesor() != null) {
+            SCfgModule module = new SCfgModule("" + mnModuleType);
+            SCfgMenu menu = null;
+            
+            menu = new SCfgMenu(jmManufacturingCost, "" + SDataConstants.MOD_MFG_HRS);
+            module.getChildMenus().add(menu);
+            
+            ((erp.SClient) miClient).getCfgProcesor().processModule(module);
+        }
     }
 
     private int showForm(int formType, int auxType, java.lang.Object pk, boolean isCopy) {

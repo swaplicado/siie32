@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2011 Sergio Abraham Flores Gutiérrez -->
+<!-- Versión 1.0.001 2010-11-11 -->
+<xs:schema xmlns="http://www.tron.com.mx/addenda" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.tron.com.mx/addenda" elementFormDefault="qualified" attributeFormDefault="unqualified">
+    <!-- Addenda1 -->
+    <xs:element name="Addenda1">
+        <xs:annotation>
+            <xs:documentation>Estándar para addenda versión 1.0.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <!-- Moneda -->
+                <xs:element name="Moneda">
+                    <xs:annotation>
+                        <xs:documentation>Estándar para la moneda del CFD.</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:attribute name="claveMoneda" type="t_TextoClaveMoneda" use="required">
+                            <xs:annotation>
+                                <xs:documentation>Clave de la moneda del CFD.</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="tipoDeCambio" type="t_TipoDeCambio" use="required">
+                            <xs:annotation>
+                                <xs:documentation>Tipo de cambio de la moneda del CFD en base a MXN.</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                    </xs:complexType>
+                </xs:element>
+                <!-- Adicional -->
+                <xs:element name="Adicional">
+                    <xs:annotation>
+                        <xs:documentation>Estándar para información adicional del CFD.</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <!-- AdicionalConceptos -->
+                            <xs:element name="AdicionalConceptos">
+                                <xs:annotation>
+                                    <xs:documentation>Estándar para la información adicional de los conceptos del CFD.</xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <!-- AdicionalConceptos.AdicionalConcepto -->
+                                        <xs:element name="AdicionalConcepto" maxOccurs="unbounded">
+                                            <xs:annotation>
+                                                <xs:documentation>Información adicional del concepto del CFD.</xs:documentation>
+                                            </xs:annotation>
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <!-- AdicionalConceptos.AdicionalConcepto.Notas -->
+                                                    <xs:element name="Notas" minOccurs="0">
+                                                        <xs:annotation>
+                                                            <xs:documentation>Estándar para las notas del CFD.</xs:documentation>
+                                                        </xs:annotation>
+                                                        <xs:complexType>
+                                                            <xs:sequence>
+                                                                <!-- AdicionalConceptos.AdicionalConcepto.Notas.Nota -->
+                                                                <xs:element name="Nota" maxOccurs="unbounded">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>Nota del CFD.</xs:documentation>
+                                                                    </xs:annotation>
+                                                                    <xs:complexType>
+                                                                        <xs:attribute name="texto" type="t_TextoSimple" use="required">
+                                                                            <xs:annotation>
+                                                                                <xs:documentation>Nota.</xs:documentation>
+                                                                            </xs:annotation>
+                                                                        </xs:attribute>
+                                                                    </xs:complexType>
+                                                                </xs:element>
+                                                            </xs:sequence>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                                <xs:attribute name="claveConcepto" type="t_TextoSimple" use="required">
+                                                    <xs:annotation>
+                                                        <xs:documentation>Clave del concepto.</xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:attribute>
+                                                <xs:attribute name="presentacion" type="t_TextoSimple" use="optional">
+                                                    <xs:annotation>
+                                                        <xs:documentation>Presentación del concepto.</xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:attribute>
+                                                <xs:attribute name="descuentoUnitario" type="t_ImporteUnitario" use="optional">
+                                                    <xs:annotation>
+                                                        <xs:documentation>Descuento unitario del concepto. Este es un descuento que aplica de forma unitaria, de forma similar al precio unitario.</xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:attribute>
+                                                <xs:attribute name="descuento" type="t_Importe" use="optional">
+                                                    <xs:annotation>
+                                                        <xs:documentation>Descuento del concepto. Este es un descuento que aplica sobre el importe total del concepto.</xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:attribute>
+                                                <xs:attribute name="pesoBruto" type="t_Peso" use="optional">
+                                                    <xs:annotation>
+                                                        <xs:documentation>Peso bruto del concepto.</xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:attribute>
+                                                <xs:attribute name="pesoNeto" type="t_Peso" use="optional">
+                                                    <xs:annotation>
+                                                        <xs:documentation>Peso neto del concepto.</xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:attribute>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                            <!-- Notas -->
+                            <xs:element name="Notas" minOccurs="0">
+                                <xs:annotation>
+                                    <xs:documentation>Estándar para las notas del CFD.</xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="Nota" maxOccurs="unbounded">
+                                            <xs:annotation>
+                                                <xs:documentation>Nota del CFD.</xs:documentation>
+                                            </xs:annotation>
+                                            <xs:complexType>
+                                                <xs:attribute name="texto" type="t_TextoSimple" use="required">
+                                                    <xs:annotation>
+                                                        <xs:documentation>Nota.</xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:attribute>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                        <xs:attribute name="diasDeCredito" type="t_Entero" use="optional">
+                            <xs:annotation>
+                                <xs:documentation>Días de crédito del documento.</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="embarque" type="t_TextoSimple" use="optional">
+                            <xs:annotation>
+                                <xs:documentation>Datos del embarque.</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="ordenDeEmbarque" type="t_TextoSimple" use="optional">
+                            <xs:annotation>
+                                <xs:documentation>Datos de la orden de embarque (e.g. clave).</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="ordenDeCompra" type="t_TextoSimple" use="optional">
+                            <xs:annotation>
+                                <xs:documentation>Datos de la orden de compra (e.g. clave).</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="contrato" type="t_TextoSimple" use="optional">
+                            <xs:annotation>
+                                <xs:documentation>Datos del contrato (e.g. clave).</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="pedido" type="t_TextoSimple" use="optional">
+                            <xs:annotation>
+                                <xs:documentation>Datos del pedido (e.g. clave).</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="cliente" type="t_TextoSimple" use="optional">
+                            <xs:annotation>
+                                <xs:documentation>Datos del cliente (e.g. clave).</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="sucursal" type="t_TextoSimple" use="optional">
+                            <xs:annotation>
+                                <xs:documentation>Datos de la sucursal de la empresa (e.g. clave).</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="agente" type="t_TextoSimple" use="optional">
+                            <xs:annotation>
+                                <xs:documentation>Datos del agente de ventas (e.g. clave).</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="ruta" type="t_TextoSimple" use="optional">
+                            <xs:annotation>
+                                <xs:documentation>Datos de la ruta (e.g. clave).</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="chofer" type="t_TextoSimple" use="optional">
+                            <xs:annotation>
+                                <xs:documentation>Chofer registrado para el traslado de las mercancías.</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="placas" type="t_TextoSimple" use="optional">
+                            <xs:annotation>
+                                <xs:documentation>Placas del vehículo registrado para el traslado de las mercancías.</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="boleto" type="t_TextoSimple" use="optional">
+                            <xs:annotation>
+                                <xs:documentation>Número de boleto de la báscula.</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="pesoBruto" type="t_Peso" use="optional">
+                            <xs:annotation>
+                                <xs:documentation>Peso bruto total de los conceptos del CFD.</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="pesoNeto" type="t_Peso" use="optional">
+                            <xs:annotation>
+                                <xs:documentation>Peso neto total de los conceptos del CFD.</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="unidadPesoBruto" type="t_TextoSimple" use="required">
+                            <xs:annotation>
+                                <xs:documentation>Unidad del peso bruto de los conceptos del CFD.</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="unidadPesoNeto" type="t_TextoSimple" use="required">
+                            <xs:annotation>
+                                <xs:documentation>Unidad del peso neto de los conceptos del CFD.</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                    </xs:complexType>
+                </xs:element>
+                <!-- Pagare -->
+                <xs:element name="Pagare" minOccurs="0">
+                    <xs:annotation>
+                        <xs:documentation>Estándar para el pagaré del CFD.</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:attribute name="fecha" type="t_Fecha" use="required">
+                            <xs:annotation>
+                                <xs:documentation>Fecha de emisión del pagaré.</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="fechaDeVencimiento" type="t_Fecha" use="required">
+                            <xs:annotation>
+                                <xs:documentation>Fecha de vencimiento del pagaré.</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="importe" type="t_Importe" use="required">
+                            <xs:annotation>
+                                <xs:documentation>Importe del pagaré.</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="claveMoneda" type="t_TextoClaveMoneda" use="optional">
+                            <xs:annotation>
+                                <xs:documentation>Clave de la moneda del pagaré.</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="interesMoratorio" type="t_Porcentaje" use="required">
+                            <xs:annotation>
+                                <xs:documentation>Tasa de interés moratorio.</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:simpleType name="t_Entero">
+        <xs:annotation>
+            <xs:documentation>Tipo definido para expresar valores numéricos enteros.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:integer">
+            <xs:whiteSpace value="collapse"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="t_Importe">
+        <xs:annotation>
+            <xs:documentation>Tipo definido para expresar valores numéricos a 2 decimales.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:decimal">
+            <xs:fractionDigits value="2"/>
+            <xs:whiteSpace value="collapse"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="t_ImporteUnitario">
+        <xs:annotation>
+            <xs:documentation>Tipo definido para expresar valores numéricos a 8 decimales.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:decimal">
+            <xs:fractionDigits value="8"/>
+            <xs:whiteSpace value="collapse"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="t_Porcentaje">
+        <xs:annotation>
+            <xs:documentation>Tipo definido para expresar porcentajes (0 = 0%, 1 = 100%).</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:decimal">
+            <xs:fractionDigits value="8"/>
+            <xs:whiteSpace value="collapse"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="t_TipoDeCambio">
+        <xs:annotation>
+            <xs:documentation>Tipo definido para expresar valores numéricos para tipo de cambio.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:decimal">
+            <xs:fractionDigits value="8"/>
+            <xs:whiteSpace value="collapse"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="t_Peso">
+        <xs:annotation>
+            <xs:documentation>Tipo definido para expresar valores numéricos para peso.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:decimal">
+            <xs:fractionDigits value="8"/>
+            <xs:whiteSpace value="collapse"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="t_TextoSimple">
+        <xs:annotation>
+            <xs:documentation>Tipo definido para expresar cadenas de caracteres con al menos un caracter.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:whiteSpace value="collapse"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="t_TextoClaveMoneda">
+        <xs:restriction base="xs:string">
+            <xs:minLength value="3"/>
+            <xs:maxLength value="3"/>
+            <xs:whiteSpace value="collapse"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="t_Fecha">
+        <xs:annotation>
+            <xs:documentation>Tipo definido para expresar fechas.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:date">
+            <xs:whiteSpace value="collapse"/>
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>
+<!--
+<xs:element name="Element">
+    <xs:annotation>
+        <xs:documentation>Element documentation...</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+        <xs:sequence>
+            <xs:element name...>
+                ...
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="attribute" [type="userDefinedType"] use="required|optional|prohibited">
+            <xs:annotation>
+                <xs:documentation>Attribute documentation...</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:whiteSpace value="collapse"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name...>
+            ...
+        </xs:attribute>
+    </xs:complexType>
+</xs:element>
+-->

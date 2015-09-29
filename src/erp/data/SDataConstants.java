@@ -24,8 +24,51 @@ public abstract class SDataConstants {
     public static final int MOD_HRS = 109000;
     public static final int MOD_XXX = 109999;
 
-    public static final int MOD_CFG_CAT = 101001;
-    public static final int MOD_CFG_CFG = 101002;
+    public static final int MOD_CFG_CFG = 101100;
+    public static final int MOD_CFG_CFG_CFG = 101110;   // configuration
+    public static final int MOD_CFG_CFG_DNS = 101120;   // Document Number Series
+    public static final int MOD_CFG_CFG_DNC = 101130;   // Document Numbering Center
+    public static final int MOD_CFG_CAT = 101200;
+    public static final int MOD_CFG_REP = 101900;
+    
+    public static final int MOD_FIN_CFG = 102100;
+    public static final int MOD_FIN_CAT = 102200;
+    public static final int MOD_FIN_CAT_CPT = 102240;   // concepts
+    public static final int MOD_FIN_ACC = 102300;
+    public static final int MOD_FIN_JOU = 102400;
+    public static final int MOD_FIN_FIN = 102500;
+    public static final int MOD_FIN_FIN_CSH = 102520;   // cash: checks & counter-receipts
+    public static final int MOD_FIN_REP = 102900;
+    public static final int MOD_FIN_REP_AUX = 102940;
+    
+    public static final int MOD_PUR_CAT = 103100;
+    public static final int MOD_PUR_EST = 103200;
+    public static final int MOD_PUR_CON = 103300;
+    public static final int MOD_PUR_ORD = 103400;
+    public static final int MOD_PUR_INV = 103500;       // invoices
+    public static final int MOD_PUR_CNT = 103600;       // credit notes
+    public static final int MOD_PUR_DVY = 103700;       // deliveries
+    public static final int MOD_PUR_RET = 103800;       // returns
+    public static final int MOD_PUR_REP = 103900;
+    public static final int MOD_PUR_REP_CON = 103909;   // contracts
+    public static final int MOD_PUR_REP_CST = 103910;   // costs
+    
+    public static final int MOD_SAL_CAT = 104100;
+    public static final int MOD_SAL_EST = 104200;
+    public static final int MOD_SAL_CON = 104300;
+    public static final int MOD_SAL_ORD = 104400;
+    public static final int MOD_SAL_INV = 104500;       // invoices
+    public static final int MOD_SAL_CNT = 104600;       // credit notes
+    public static final int MOD_SAL_DVY = 104700;       // deliveries
+    public static final int MOD_SAL_RET = 104800;       // returns
+    public static final int MOD_SAL_REP = 104900;
+    public static final int MOD_SAL_REP_CON = 104909;   // contracts
+    public static final int MOD_SAL_REP_SHI = 104910;   // shipments
+    public static final int MOD_SAL_REP_MIN = 104911;   // money in
+    
+    public static final int MOD_MFG_HRS = 108500;       // labor hours
+    
+    public static final int MOD_HRS_IMP = 109500;       // import
     
     public static final int GLOBAL_CAT_CFG = 201000;
     public static final int GLOBAL_CAT_USR = 202000;

@@ -7,7 +7,7 @@
   </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="2"/>
-    <Property name="title" type="java.lang.String" value="Archivo de exportaci&#xf3;n de compras/ventas netas por per&#xed;odo"/>
+    <Property name="title" type="java.lang.String" value="Archivo CSV de compras/ventas netas por per&#xed;odo"/>
     <Property name="resizable" type="boolean" value="false"/>
   </Properties>
   <SyntheticProperties>

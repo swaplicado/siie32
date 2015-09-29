@@ -26,6 +26,9 @@ import erp.gui.SGuiModuleMkt;
 import erp.gui.SGuiModuleTrnInv;
 import erp.gui.SGuiModuleTrnPur;
 import erp.gui.SGuiModuleTrnSal;
+import erp.gui.mod.cfg.SCfgProcessor;
+import erp.gui.mod.xml.SXmlConfig;
+import erp.gui.mod.xml.SXmlModConsts;
 import erp.gui.session.SSessionCustom;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
@@ -90,6 +93,7 @@ import sa.lib.gui.bean.SBeanFormProcess;
 import sa.lib.gui.bean.SBeanOptionPicker;
 import sa.lib.img.DImgConsts;
 import sa.lib.srv.SSrvCompany;
+import sa.lib.xml.SXmlUtils;
 
 /**
  *
@@ -113,6 +117,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     private SLoginSession moLoginSession;
     private SServerRemote moServer;
     private SSessionXXX moSessionXXX;
+    private SXmlConfig moXmlConfig;
+    private SCfgProcessor moCfgProcessor;
     private erp.lib.gui.SGuiDatePicker moGuiDatePicker;
     private erp.lib.gui.SGuiDatePicker moGuiDatePeriodPicker;
     private erp.lib.gui.SGuiDateRangePicker moGuiDateRangePicker;
@@ -691,6 +697,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         moFileChooser = new JFileChooser();
 
         setIconImage(moIcon.getImage());
+        
+        // Prepare SIIE client own DB connection:
 
         moSysDatabase = new SDbDatabase(SDbConsts.DBMS_MYSQL);
         result = moSysDatabase.connect(moParamsApp.getDatabaseHostClt(), moParamsApp.getDatabasePortClt(),
@@ -712,6 +720,19 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 System.exit(-1);    // there is no way of connecting to an ERP Server
             }
         }
+        
+        // Get XML configuration:
+        
+        try {
+            moXmlConfig = new SXmlConfig(SXmlModConsts.CONFIG_VER);
+            moXmlConfig.parseConfig(SXmlUtils.readXml("config_gui1.xml"));
+        }
+        catch (Exception e) {
+            moXmlConfig = null;
+            SLibUtils.printException(this, e);
+        }
+        
+        // Prepare GUI:
 
         logout();
 
@@ -888,47 +909,60 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             jbCurrentDate.setEnabled(true);
             jbSession.setEnabled(true);
 
-            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_CFG, moSessionXXX.getCurrentCompany().getPkCompanyId())) {
+            if (moXmlConfig != null) {
+                moCfgProcessor = new SCfgProcessor(moXmlConfig, moSessionXXX.getCompany().getPkCompanyId(), moSessionXXX.getUser().getPkUserId());
+            }
+
+            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_CFG, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
+                    moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_CFG)) {
                 jmiViewModuleCfg.setEnabled(true);
                 jtbModuleCfg.setEnabled(true);
             }
 
-            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_FIN, moSessionXXX.getCurrentCompany().getPkCompanyId())) {
+            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_FIN, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
+                    moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_FIN)) {
                 jmiViewModuleFin.setEnabled(true);
                 jtbModuleFin.setEnabled(true);
             }
 
-            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_PUR, moSessionXXX.getCurrentCompany().getPkCompanyId())) {
+            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_PUR, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
+                    moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_PUR)) {
                 jmiViewModulePur.setEnabled(true);
                 jtbModulePur.setEnabled(true);
             }
 
-            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_SAL, moSessionXXX.getCurrentCompany().getPkCompanyId())) {
+            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_SAL, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
+                    moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_SAL)) {
                 jmiViewModuleSal.setEnabled(true);
                 jtbModuleSal.setEnabled(true);
             }
 
-            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_INV, moSessionXXX.getCurrentCompany().getPkCompanyId())) {
+            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_INV, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
+                    moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_INV)) {
                 jmiViewModuleInv.setEnabled(true);
                 jtbModuleInv.setEnabled(true);
             }
 
-            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_MKT, moSessionXXX.getCurrentCompany().getPkCompanyId())) {
+            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_MKT, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
+                    moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_MKT)) {
                 jmiViewModuleMkt.setEnabled(true);
                 jtbModuleMkt.setEnabled(true);
             }
 
-            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_LOG, moSessionXXX.getCurrentCompany().getPkCompanyId())) {
+            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_LOG, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
+                    moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_LOG)) {
                 jmiViewModuleLog.setEnabled(true);
                 jtbModuleLog.setEnabled(true);
             }
 
-            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_MFG, moSessionXXX.getCurrentCompany().getPkCompanyId())) {
+            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_MFG, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
+                    moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_MFG)) {
                 jmiViewModuleMfg.setEnabled(true);
                 jtbModuleMfg.setEnabled(true);
             }
 
-            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_HRS, moSessionXXX.getCurrentCompany().getPkCompanyId())) {
+            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_HRS, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
+                    moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_HRS)) {
                 jmiViewModuleHrs.setEnabled(true);
                 jtbModuleHrs.setEnabled(true);
             }
@@ -959,7 +993,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         moSession.setCurrentDate(moSessionXXX.getWorkingDate());
         moSession.setUserTs(moSessionXXX.getSystemDate());
         moSession.setDatabase(database);
-
+    
         moSession.setConfigSystem(moSessionXXX.getParamsErp());         // XXX this must be replaced
         moSession.setConfigCompany(moSessionXXX.getParamsCompany());    // XXX this must be replaced
         moSession.setConfigBranch(null);
@@ -1020,7 +1054,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         }
         if (moSession.getUser().hasModuleAccess(SModConsts.MOD_HRS_N)) {
 
-            /*
+            /* Functionality not yet implemented (sflores, 2015-09-28)
             modulesAccessed++;
             jtbModuleSomRm.setEnabled(true);
             if (defaultToggleButton == null) {
@@ -1029,7 +1063,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             */
         }
 
-        /*
+        /* Functionality not yet implemented (sflores, 2015-09-28)
         if (defaultToggleButton != null) {
             defaultToggleButton.requestFocus();
         }
@@ -1080,6 +1114,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             moServer = null;
             moSessionXXX = null;
             moSession = null;
+            moCfgProcessor = null;
             moGlobalCataloguesUsr = null;
             moGlobalCataloguesLoc = null;
             moGlobalCataloguesBps = null;
@@ -1463,6 +1498,14 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         if (jTabbedPane.getSelectedIndex() != -1) {
             jTabbedPane.remove(jTabbedPane.getSelectedIndex());
         }
+    }
+    
+    public SXmlConfig getXmlConfig() {
+        return moXmlConfig;
+    }
+
+    public SCfgProcessor getCfgProcesor() {
+        return moCfgProcessor;
     }
 
     @Override

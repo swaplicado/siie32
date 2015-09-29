@@ -102,7 +102,7 @@ import stamp.StampSOAP;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public abstract class SCfdUtils implements Serializable {
 
@@ -855,7 +855,7 @@ public abstract class SCfdUtils implements Serializable {
 
             /* Code used in fiscal stamp testing: (DO NOT DELETE! KEEPED JUST FOR REFERENCE!)
             XmlProcess xmlProcess = null;
-            oInputFile = new BufferedInputStream(new FileInputStream(sXmlBaseDir + oDpsXml.getDocXmlName()));
+            oInputFile = new BufferedInputStream(new FileInputStream(sXmlBaseDir + cfd.getDocXmlName()));
             xmlProcess = new XmlProcess(oInputFile);
             sCfdi = xmlProcess.generaTextoXML();
             */

@@ -8,16 +8,40 @@ package erp.gui;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.form.SFormOptionPicker;
+import erp.gui.mod.cfg.SCfgMenu;
+import erp.gui.mod.cfg.SCfgMenuSection;
+import erp.gui.mod.cfg.SCfgMenuSectionItem;
+import erp.gui.mod.cfg.SCfgMenuSectionSeparator;
+import erp.gui.mod.cfg.SCfgModule;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormOptionPickerInterface;
-import erp.mcfg.data.*;
-import erp.mcfg.form.*;
+import erp.mcfg.data.SDataCompanyBranchEntity;
+import erp.mcfg.data.SDataCurrency;
+import erp.mcfg.data.SDataLanguage;
+import erp.mcfg.form.SFormCompanyBranchEntity;
+import erp.mcfg.form.SFormCurrency;
+import erp.mcfg.form.SFormLanguage;
 import erp.mod.SModConsts;
-import erp.mtrn.data.*;
-import erp.mtrn.form.*;
+import erp.mtrn.data.SDataDiogDncCompanyBranch;
+import erp.mtrn.data.SDataDiogDncCompanyBranchEntity;
+import erp.mtrn.data.SDataDiogDocumentNumberSeries;
+import erp.mtrn.data.SDataDiogDocumentNumberingCenter;
+import erp.mtrn.data.SDataDocumentNatureCatalogue;
+import erp.mtrn.data.SDataDpsDncCompanyBranch;
+import erp.mtrn.data.SDataDpsDncCompanyBranchEntity;
+import erp.mtrn.data.SDataDpsDocumentNumberSeries;
+import erp.mtrn.data.SDataDpsDocumentNumberingCenter;
+import erp.mtrn.data.SDataSystemNotes;
+import erp.mtrn.form.SDialogUtilStampsClosing;
+import erp.mtrn.form.SFormDncCompanyBranchEntity;
+import erp.mtrn.form.SFormDocumentNature;
+import erp.mtrn.form.SFormDocumentNumberSeries;
+import erp.mtrn.form.SFormDocumentNumberignCenter;
+import erp.mtrn.form.SFormSystemNotes;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import sa.lib.SLibConsts;
 
 /**
@@ -26,30 +50,33 @@ import sa.lib.SLibConsts;
  */
 public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
+    private javax.swing.JMenu jmCfg;
+    private javax.swing.JMenuItem jmiCfgParamsCompany;
+    private javax.swing.JMenuItem jmiCfgParamsErp;
+    private javax.swing.JSeparator jsCfgParams;
+    private javax.swing.JMenuItem jmiCfgDnsDps;    // Document Number Series
+    private javax.swing.JMenuItem jmiCfgDnsDiog;   // Document Number Series
+    private javax.swing.JSeparator jsCfgDns;
+    private javax.swing.JMenuItem jmiCfgDncDps;    // Document Numbering Center
+    private javax.swing.JMenuItem jmiCfgDncDiog;   // Document Numbering Center
+    private javax.swing.JSeparator jsCfgDnc;
+    private javax.swing.JMenuItem jmiCfgDncDpsCompanyBranch;
+    private javax.swing.JMenuItem jmiCfgDncDiogCompanyBranch;
+    private javax.swing.JMenuItem jmiCfgDncDpsCompanyBranchEntity;
+    private javax.swing.JMenuItem jmiCfgDncDiogCompanyBranchEntity;
+    private javax.swing.JMenu jmCfgCfdi;
+    private javax.swing.JMenuItem jmiCfgCfdiStampAvailable;
+    private javax.swing.JMenuItem jmiCfgCfdiStampAcquisition;
+    private javax.swing.JMenuItem jmiCfgCfdiStampClosing;
+    private javax.swing.JMenuItem jmiCfgDpsNature;
+    private javax.swing.JMenuItem jmiCfgSystemNotes;
+    private javax.swing.JMenuItem jmiCfgMmsItem;
     private javax.swing.JMenu jmCat;
     private javax.swing.JMenuItem jmiCatLanguage;
     private javax.swing.JMenuItem jmiCatCurrency;
     private javax.swing.JMenuItem jmiCatCompanyERP;
     private javax.swing.JMenuItem jmiCatCompany;
     private javax.swing.JMenuItem jmiCatCompanyBranchEntity;
-    private javax.swing.JMenu jmCfg;
-    private javax.swing.JMenuItem jmiCfgParamsCompany;
-    private javax.swing.JMenuItem jmiCfgParamsErp;
-    private javax.swing.JMenuItem jmiCfgDpsDns;    // Document Number Series
-    private javax.swing.JMenuItem jmiCfgDiogDns;   // Document Number Series
-    private javax.swing.JMenuItem jmiCfgDpsDnc;    // Document Numbering Center
-    private javax.swing.JMenuItem jmiCfgDiogDnc;   // Document Numbering Center
-    private javax.swing.JMenuItem jmiCfgDpsDncCompanyBranch;
-    private javax.swing.JMenuItem jmiCfgDiogDncCompanyBranch;
-    private javax.swing.JMenuItem jmiCfgDpsDncCompanyBranchEntity;
-    private javax.swing.JMenuItem jmiCfgDiogDncCompanyBranchEntity;
-    private javax.swing.JMenuItem jmiCfgMMSItem;
-    private javax.swing.JMenu jmCatCfdi;
-    private javax.swing.JMenuItem jmiStampAvailable;
-    private javax.swing.JMenuItem jmiStampAcquisition;
-    private javax.swing.JMenuItem jmiStampClosing;
-    private javax.swing.JMenuItem jmiCfgDpsNature;
-    private javax.swing.JMenuItem jmiCfgSystemNotes;
 
     private erp.mcfg.form.SFormLanguage moFormLanguage;
     private erp.mcfg.form.SFormCurrency moFormCurrency;
@@ -65,7 +92,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
     private erp.form.SFormOptionPicker moPickerCurrency;
     private erp.form.SFormOptionPicker moPickerCompany;
     private erp.form.SFormOptionPicker moPickerCompanyBranchEntity;
-
+    
     public SGuiModuleCfg(erp.client.SClientInterface client) {
         super(client, SDataConstants.MOD_CFG);
         initComponents();
@@ -88,7 +115,56 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         
         moDialogUtilStampsClosing = new SDialogUtilStampsClosing(miClient);
 
+        jmCfg = new JMenu("Configuración");
+        
+        jmiCfgParamsCompany = new JMenuItem("Parámetros de empresas");
+        jmiCfgParamsErp = new JMenuItem("Parámetros de sistema");
+        jsCfgParams = new JPopupMenu.Separator();
+        jmiCfgDnsDps = new JMenuItem("Series de docs. de C/V");
+        jmiCfgDnsDiog = new JMenuItem("Series de docs. de inventarios");
+        jsCfgDns = new JPopupMenu.Separator();
+        jmiCfgDncDps = new JMenuItem("Centros de foliado de docs. de C/V");
+        jmiCfgDncDiog = new JMenuItem("Centros de foliado de docs. de inventarios");
+        jsCfgDnc = new JPopupMenu.Separator();
+        jmiCfgDncDpsCompanyBranch = new JMenuItem("Centros de foliado de docs. de C/V por sucursal");
+        jmiCfgDncDiogCompanyBranch = new JMenuItem("Centros de foliado de docs. de inventarios por sucursal");
+        jmiCfgDncDpsCompanyBranchEntity = new JMenuItem("Centros de foliado de docs. de C/V por entidad");
+        jmiCfgDncDiogCompanyBranchEntity = new JMenuItem("Centros de foliado de docs. de inventarios por entidad");
+        jmCfgCfdi = new JMenu("Comprobantes fiscales digitales");
+        jmiCfgCfdiStampAvailable = new JMenuItem("Timbres disponibles");
+        jmiCfgCfdiStampAcquisition = new JMenuItem("Adquisición de timbres");
+        jmiCfgCfdiStampClosing = new JMenuItem("Generación de inventario inicial de timbres...");
+        jmiCfgDpsNature = new JMenuItem("Naturaleza de docs. de C/V");
+        jmiCfgSystemNotes = new JMenuItem("Notas predefinidas de docs. de C/V");
+        jmiCfgMmsItem = new JMenuItem("Configuración de ítems para envío por email");
+
+        jmCfg.add(jmiCfgParamsCompany);
+        jmCfg.add(jmiCfgParamsErp);
+        jmCfg.add(jsCfgParams); // separator
+        jmCfg.add(jmiCfgDnsDps);
+        jmCfg.add(jmiCfgDnsDiog);
+        jmCfg.add(jsCfgDns);    // separator
+        jmCfg.add(jmiCfgDncDps);
+        jmCfg.add(jmiCfgDncDiog);
+        jmCfg.add(jsCfgDnc);    // separator
+        jmCfg.add(jmiCfgDncDpsCompanyBranch);
+        jmCfg.add(jmiCfgDncDiogCompanyBranch);
+        jmCfg.add(jmiCfgDncDpsCompanyBranchEntity);
+        jmCfg.add(jmiCfgDncDiogCompanyBranchEntity);
+        jmCfg.addSeparator();
+        jmCfgCfdi.add(jmiCfgCfdiStampAvailable);
+        jmCfgCfdi.add(jmiCfgCfdiStampAcquisition);
+        jmCfgCfdi.addSeparator();
+        jmCfgCfdi.add(jmiCfgCfdiStampClosing);
+        jmCfg.add(jmCfgCfdi);
+        jmCfg.addSeparator();
+        jmCfg.add(jmiCfgDpsNature);
+        jmCfg.add(jmiCfgSystemNotes);
+        jmCfg.addSeparator();
+        jmCfg.add(jmiCfgMmsItem);
+
         jmCat = new JMenu("Catálogos");
+        
         jmiCatLanguage = new JMenuItem("Idiomas");
         jmiCatCurrency = new JMenuItem("Monedas");
         jmiCatCompanyERP = new JMenuItem("Empresas ERP");
@@ -102,89 +178,28 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCat.add(jmiCatCompany);
         jmCat.add(jmiCatCompanyBranchEntity);
 
-        jmCfg = new JMenu("Configuración");
-        jmiCfgParamsCompany = new JMenuItem("Parámetros de empresas");
-        jmiCfgParamsErp = new JMenuItem("Parámetros de sistema");
-        jmiCfgDpsDns = new JMenuItem("Series de docs. de C/V");
-        jmiCfgDiogDns = new JMenuItem("Series de docs. de inventarios");
-        jmiCfgDpsDnc = new JMenuItem("Centros de foliado de docs. de C/V");
-        jmiCfgDiogDnc = new JMenuItem("Centros de foliado de docs. de inventarios");
-        jmiCfgDpsDncCompanyBranch = new JMenuItem("Centros de foliado de docs. de C/V por sucursal");
-        jmiCfgDiogDncCompanyBranch = new JMenuItem("Centros de foliado de docs. de inventarios por sucursal");
-        jmiCfgDpsDncCompanyBranchEntity = new JMenuItem("Centros de foliado de docs. de C/V por entidad");
-        jmiCfgDiogDncCompanyBranchEntity = new JMenuItem("Centros de foliado de docs. de inventarios por entidad");
-        jmiCfgMMSItem = new JMenuItem("Configuración de ítems para envío por email");
-        jmCatCfdi = new JMenu("Comprobantes fiscales digitales");
-        jmiStampAvailable = new JMenuItem("Timbres disponibles");
-        jmiStampAcquisition = new JMenuItem("Adquisición de timbres");
-        jmiStampClosing = new JMenuItem("Generación de inventario inicial de timbres...");
-        jmiCfgDpsNature = new JMenuItem("Naturaleza de docs. de C/V");
-        jmiCfgSystemNotes = new JMenuItem("Notas predefinidas de docs. de C/V");
-
-        jmCfg.add(jmiCfgParamsCompany);
-        jmCfg.add(jmiCfgParamsErp);
-        jmCfg.addSeparator();
-        jmCfg.add(jmiCfgDpsDns);
-        jmCfg.add(jmiCfgDiogDns);
-        jmCfg.addSeparator();
-        jmCfg.add(jmiCfgDpsDnc);
-        jmCfg.add(jmiCfgDiogDnc);
-        jmCfg.addSeparator();
-        jmCfg.add(jmiCfgDpsDncCompanyBranch);
-        jmCfg.add(jmiCfgDiogDncCompanyBranch);
-        jmCfg.addSeparator();
-        jmCfg.add(jmiCfgDpsDncCompanyBranchEntity);
-        jmCfg.add(jmiCfgDiogDncCompanyBranchEntity);
-        jmCatCfdi.add(jmiStampAvailable);
-        jmCatCfdi.add(jmiStampAcquisition);
-        jmCatCfdi.addSeparator();
-        jmCatCfdi.add(jmiStampClosing);
-        jmCfg.add(jmCatCfdi);
-        jmCfg.addSeparator();
-        jmCfg.add(jmiCfgDpsNature);
-        jmCfg.add(jmiCfgSystemNotes);
-        jmCfg.addSeparator();
-        jmCfg.add(jmiCfgMMSItem);
-
-        // XXX
-        jmiCfgParamsCompany.setEnabled(false);
-        jmiCfgParamsErp.setEnabled(false);
-        // XXX
-
+        jmiCfgParamsCompany.addActionListener(this);
+        jmiCfgParamsErp.addActionListener(this);
+        jmiCfgDncDps.addActionListener(this);
+        jmiCfgDncDiog.addActionListener(this);
+        jmiCfgDnsDps.addActionListener(this);
+        jmiCfgDnsDiog.addActionListener(this);
+        jmiCfgDncDpsCompanyBranch.addActionListener(this);
+        jmiCfgDncDiogCompanyBranch.addActionListener(this);
+        jmiCfgDncDpsCompanyBranchEntity.addActionListener(this);
+        jmiCfgDncDiogCompanyBranchEntity.addActionListener(this);
+        jmiCfgCfdiStampAvailable.addActionListener(this);
+        jmiCfgCfdiStampAcquisition.addActionListener(this);
+        jmiCfgCfdiStampClosing.addActionListener(this);
+        jmiCfgDpsNature.addActionListener(this);
+        jmiCfgSystemNotes.addActionListener(this);
+        jmiCfgMmsItem.addActionListener(this);
+        
         jmiCatLanguage.addActionListener(this);
         jmiCatCurrency.addActionListener(this);
         jmiCatCompanyERP.addActionListener(this);
         jmiCatCompany.addActionListener(this);
         jmiCatCompanyBranchEntity.addActionListener(this);
-        jmiCfgParamsCompany.addActionListener(this);
-        jmiCfgParamsErp.addActionListener(this);
-        jmiCfgDpsDnc.addActionListener(this);
-        jmiCfgDiogDnc.addActionListener(this);
-        jmiCfgDpsDns.addActionListener(this);
-        jmiCfgDiogDns.addActionListener(this);
-        jmiCfgDpsDncCompanyBranch.addActionListener(this);
-        jmiCfgDiogDncCompanyBranch.addActionListener(this);
-        jmiCfgDpsDncCompanyBranchEntity.addActionListener(this);
-        jmiCfgDiogDncCompanyBranchEntity.addActionListener(this);
-        jmiCfgMMSItem.addActionListener(this);
-        jmiStampAvailable.addActionListener(this);
-        jmiStampAcquisition.addActionListener(this);
-        jmiStampClosing.addActionListener(this);
-        jmiCfgDpsNature.addActionListener(this);
-        jmiCfgSystemNotes.addActionListener(this);
-
-        moFormLanguage = null;
-        moFormCurrency = null;
-        moFormDocumentNumberignCenter = null;
-        moFormDocumentNumberSerie = null;
-        moFormDncCompanyBranchEntity = null;
-        moFormDocumentNature = null;
-        moFormSystemNotes = null;
-
-        moPickerLanguage = null;
-        moPickerCurrency = null;
-        moPickerCompany = null;
-        moPickerCompanyBranchEntity = null;
 
         hasRightLanguage = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_CFG_LAN).HasRight;
         hasRightCurrency = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_CFG_CUR).HasRight;
@@ -205,27 +220,59 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         hasRightDiogDns = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_DIOG_CFG).HasRight;
         hasRightDiogDnc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_DNC_DIOG).HasRight;
 
+        jmCfg.setEnabled(hasRightParamsCompany || hasRightParamsErp || hasRightFinanceDpsDnc || hasRightPurchasesDpsDnc || hasRightSalesDpsDnc ||
+                            hasRightDiogDnc || hasRightFinanceDpsDns || hasRightPurchasesDpsDns || hasRightSalesDpsDns || hasRightDiogDns);
+        jmiCfgParamsCompany.setEnabled(false);
+        jmiCfgParamsErp.setEnabled(false);
+        jmiCfgDnsDps.setEnabled(hasRightFinanceDpsDns || hasRightPurchasesDpsDns || hasRightSalesDpsDns);
+        jmiCfgDnsDiog.setEnabled(hasRightDiogDns);
+        jmiCfgDncDps.setEnabled(hasRightFinanceDpsDnc || hasRightPurchasesDpsDnc || hasRightSalesDpsDnc);
+        jmiCfgDncDiog.setEnabled(hasRightDiogDnc);
+        jmiCfgDncDpsCompanyBranch.setEnabled(hasRightFinanceDpsDnc || hasRightPurchasesDpsDnc || hasRightSalesDpsDnc);
+        jmiCfgDncDiogCompanyBranch.setEnabled(hasRightDiogDnc);
+        jmiCfgDncDpsCompanyBranchEntity.setEnabled(hasRightFinanceDpsDnc || hasRightPurchasesDpsDnc || hasRightSalesDpsDnc);
+        jmiCfgDncDiogCompanyBranchEntity.setEnabled(hasRightDiogDnc);
+        jmiCfgDpsNature.setEnabled(hasRightParamsCompany || hasRightParamsErp);
+        jmiCfgSystemNotes.setEnabled(hasRightParamsCompany || hasRightParamsErp);
+        jmiCfgMmsItem.setEnabled(hasRightParamsCompany || hasRightParamsErp);
+
         jmCat.setEnabled(hasRightLanguage || hasRightCurrency || hasRightCompany);
         jmiCatLanguage.setEnabled(hasRightLanguage);
         jmiCatCurrency.setEnabled(hasRightCurrency);
         jmiCatCompanyERP.setEnabled(hasRightCompany);
         jmiCatCompany.setEnabled(hasRightCompany);
         jmiCatCompanyBranchEntity.setEnabled(hasRightCompany);
-
-        jmCfg.setEnabled(hasRightParamsCompany || hasRightParamsErp || hasRightFinanceDpsDnc || hasRightPurchasesDpsDnc || hasRightSalesDpsDnc ||
-                            hasRightDiogDnc || hasRightFinanceDpsDns || hasRightPurchasesDpsDns || hasRightSalesDpsDns || hasRightDiogDns);
-        //jmiParamsCompany.setEnabled(hasRightParamsCompany);   XXX implement view!
-        //jmiParamsErp.setEnabled(hasRightParamsErp);   XXX implement view!
-        jmiCfgDpsDns.setEnabled(hasRightFinanceDpsDns || hasRightPurchasesDpsDns || hasRightSalesDpsDns);
-        jmiCfgDiogDns.setEnabled(hasRightDiogDns);
-        jmiCfgDpsDnc.setEnabled(hasRightFinanceDpsDnc || hasRightPurchasesDpsDnc || hasRightSalesDpsDnc);
-        jmiCfgDiogDnc.setEnabled(hasRightDiogDnc);
-        jmiCfgDpsDncCompanyBranch.setEnabled(hasRightFinanceDpsDnc || hasRightPurchasesDpsDnc || hasRightSalesDpsDnc);
-        jmiCfgDiogDncCompanyBranch.setEnabled(hasRightDiogDnc);
-        jmiCfgDpsDncCompanyBranchEntity.setEnabled(hasRightFinanceDpsDnc || hasRightPurchasesDpsDnc || hasRightSalesDpsDnc);
-        jmiCfgDiogDncCompanyBranchEntity.setEnabled(hasRightDiogDnc);
-        jmiCfgMMSItem.setEnabled(hasRightParamsCompany || hasRightParamsErp); // XXX pending to define if has right access
-        jmiCfgDpsNature.setEnabled(hasRightDiogDnc);
+        
+        // GUI configuration:
+        
+        if (((erp.SClient) miClient).getCfgProcesor() != null) {
+            SCfgModule module = new SCfgModule("" + mnModuleType);
+            SCfgMenu menu = null;
+            SCfgMenuSection section = null;
+            
+            menu = new SCfgMenu(jmCfg, "" + SDataConstants.MOD_CFG_CFG);
+            section = new SCfgMenuSection("" + SDataConstants.MOD_CFG_CFG_CFG);
+            section.getChildItems().add(new SCfgMenuSectionItem(jmiCfgParamsCompany, "" + SDataConstants.CFGU_PARAM_CO));
+            section.getChildItems().add(new SCfgMenuSectionItem(jmiCfgParamsErp, "" + SDataConstants.CFGU_PARAM_ERP));
+            section.setChildSeparator(new SCfgMenuSectionSeparator(jsCfgParams));
+            menu.getChildSections().add(section);
+            section = new SCfgMenuSection("" + SDataConstants.MOD_CFG_CFG_DNS);
+            section.getChildItems().add(new SCfgMenuSectionItem(jmiCfgDnsDps, "" + SDataConstants.TRN_DNS_DPS));
+            section.getChildItems().add(new SCfgMenuSectionItem(jmiCfgDnsDiog, "" + SDataConstants.TRN_DNS_DIOG));
+            section.setChildSeparator(new SCfgMenuSectionSeparator(jsCfgDns));
+            menu.getChildSections().add(section);
+            section = new SCfgMenuSection("" + SDataConstants.MOD_CFG_CFG_DNC);
+            section.getChildItems().add(new SCfgMenuSectionItem(jmiCfgDncDps, "" + SDataConstants.TRN_DNC_DPS));
+            section.getChildItems().add(new SCfgMenuSectionItem(jmiCfgDncDiog, "" + SDataConstants.TRN_DNC_DIOG));
+            section.setChildSeparator(new SCfgMenuSectionSeparator(jsCfgDnc));
+            menu.getChildSections().add(section);
+            module.getChildMenus().add(menu);
+            
+            menu = new SCfgMenu(jmCat, "" + SDataConstants.MOD_CFG_CAT);
+            module.getChildMenus().add(menu);
+            
+            ((erp.SClient) miClient).getCfgProcesor().processModule(module);
+        }
     }
 
     private int showForm(int formType, int auxType, java.lang.Object pk, boolean isCopy) {
@@ -543,8 +590,9 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         JMenu[] menuesBps = miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).getMenuesForModule(SDataConstants.MOD_CFG);
         JMenu[] menuesItm = miClient.getGuiModule(SDataConstants.GLOBAL_CAT_ITM).getMenuesForModule(SDataConstants.MOD_CFG);
 
-        menues = new JMenu[menuesUsr.length + menuesLoc.length + menuesBps.length + menuesItm.length + 2];
+        menues = new JMenu[2 + menuesUsr.length + menuesLoc.length + menuesBps.length + menuesItm.length];
 
+        menues [i++] = jmCfg;
         menues [i++] = jmCat;
 
         for (JMenu menu : menuesUsr) {
@@ -562,8 +610,6 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         for (JMenu menu : menuesItm) {
             menues[i++] = menu;
         }
-
-        menues [i++] = jmCfg;
 
         /*
         int i = 0;
@@ -607,7 +653,56 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         if (e.getSource() instanceof javax.swing.JMenuItem) {
             javax.swing.JMenuItem item = (javax.swing.JMenuItem) e.getSource();
 
-            if (item == jmiCatLanguage){
+            if (item == jmiCfgParamsCompany) {
+                showView(SDataConstants.CFGU_PARAM_CO);
+            }
+            else if (item == jmiCfgParamsErp) {
+                showView(SDataConstants.CFGU_PARAM_ERP);
+            }
+            else if (item == jmiCfgDnsDps) {
+                showView(SDataConstants.TRN_DNS_DPS);
+            }
+            else if (item == jmiCfgDnsDiog) {
+                showView(SDataConstants.TRN_DNS_DIOG);
+            }
+            else if (item == jmiCfgDncDps) {
+                showView(SDataConstants.TRN_DNC_DPS);
+            }
+            else if (item == jmiCfgDncDiog) {
+                showView(SDataConstants.TRN_DNC_DIOG);
+            }
+            else if (item == jmiCfgDncDpsCompanyBranch) {
+                showView(SDataConstants.TRN_DNC_DPS_COB);
+            }
+            else if (item == jmiCfgDncDiogCompanyBranch) {
+                showView(SDataConstants.TRN_DNC_DIOG_COB);
+            }
+            else if (item == jmiCfgDncDpsCompanyBranchEntity) {
+                showView(SDataConstants.TRN_DNC_DPS_COB_ENT);
+            }
+            else if (item == jmiCfgDncDiogCompanyBranchEntity) {
+                showView(SDataConstants.TRN_DNC_DIOG_COB_ENT);
+            }
+            else if (item == jmiCfgMmsItem) {
+                 miClient.getSession().showView(SModConsts.TRN_MMS_CFG, SLibConsts.UNDEFINED, null);
+            }
+            else if (item == jmiCfgCfdiStampAcquisition) {
+                showView(SDataConstants.TRN_SIGN);
+            }
+            else if (item == jmiCfgCfdiStampClosing) {
+                moDialogUtilStampsClosing.resetForm();
+                moDialogUtilStampsClosing.setVisible(true);
+            }
+            else if (item == jmiCfgCfdiStampAvailable) {
+                showView(SDataConstants.TRNX_STAMP_AVL);
+            }
+            else if (item == jmiCfgDpsNature) {
+                showView(SDataConstants.TRNU_DPS_NAT);
+            }
+            else if (item == jmiCfgSystemNotes) {
+                showView(SDataConstants.TRN_SYS_NTS);
+            }
+            else if (item == jmiCatLanguage){
                 showView(SDataConstants.CFGU_LAN);
             }
             else if (item == jmiCatCurrency) {
@@ -621,55 +716,6 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiCatCompanyBranchEntity) {
                 showView(SDataConstants.CFGU_COB_ENT);
-            }
-            else if (item == jmiCfgParamsCompany) {
-                showView(SDataConstants.CFGU_PARAM_CO);
-            }
-            else if (item == jmiCfgParamsErp) {
-                showView(SDataConstants.CFGU_PARAM_ERP);
-            }
-            else if (item == jmiCfgDpsDns) {
-                showView(SDataConstants.TRN_DNS_DPS);
-            }
-            else if (item == jmiCfgDiogDns) {
-                showView(SDataConstants.TRN_DNS_DIOG);
-            }
-            else if (item == jmiCfgDpsDnc) {
-                showView(SDataConstants.TRN_DNC_DPS);
-            }
-            else if (item == jmiCfgDiogDnc) {
-                showView(SDataConstants.TRN_DNC_DIOG);
-            }
-            else if (item == jmiCfgDpsDncCompanyBranch) {
-                showView(SDataConstants.TRN_DNC_DPS_COB);
-            }
-            else if (item == jmiCfgDiogDncCompanyBranch) {
-                showView(SDataConstants.TRN_DNC_DIOG_COB);
-            }
-            else if (item == jmiCfgDpsDncCompanyBranchEntity) {
-                showView(SDataConstants.TRN_DNC_DPS_COB_ENT);
-            }
-            else if (item == jmiCfgDiogDncCompanyBranchEntity) {
-                showView(SDataConstants.TRN_DNC_DIOG_COB_ENT);
-            }
-            else if (item == jmiCfgMMSItem) {
-                 miClient.getSession().showView(SModConsts.TRN_MMS_CFG, SLibConsts.UNDEFINED, null);
-            }
-            else if (item == jmiStampAcquisition) {
-                showView(SDataConstants.TRN_SIGN);
-            }
-            else if (item == jmiStampClosing) {
-                moDialogUtilStampsClosing.resetForm();
-                moDialogUtilStampsClosing.setVisible(true);
-            }
-            else if (item == jmiStampAvailable) {
-                showView(SDataConstants.TRNX_STAMP_AVL);
-            }
-            else if (item == jmiCfgDpsNature) {
-                showView(SDataConstants.TRNU_DPS_NAT);
-            }
-            else if (item == jmiCfgSystemNotes) {
-                showView(SDataConstants.TRN_SYS_NTS);
             }
         }
     }

@@ -514,6 +514,8 @@ public abstract class SGuiModule {
 
         return registry;
     }
+    
+    public int getModuleType() { return mnModuleType; }
 
     public void setLastSavedPrimaryKey(java.lang.Object o) { moLastSavedPrimaryKey = o; }
     public void setRegistry(erp.lib.data.SDataRegistry o) { moRegistry = o; }

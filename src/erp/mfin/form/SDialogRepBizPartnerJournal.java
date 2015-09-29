@@ -41,7 +41,7 @@ import net.sf.jasperreports.view.*;
  *
  * @author Juan Barajas
  */
-public class SDialogRepBizPartnerAuxMoves extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener  {
+public class SDialogRepBizPartnerJournal extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener  {
 
     private int mnFormResult;
     private int mnFormStatus;
@@ -66,7 +66,7 @@ public class SDialogRepBizPartnerAuxMoves extends javax.swing.JDialog implements
     private erp.mfin.form.SPanelAccount moPanelFkAccountId;
 
     /** Creates new form SDialogRepBizPartnerAuxMoves */
-    public SDialogRepBizPartnerAuxMoves(erp.client.SClientInterface client, int idBizPartnerCategory) {
+    public SDialogRepBizPartnerJournal(erp.client.SClientInterface client, int idBizPartnerCategory) {
         super(client.getFrame(), true);
         miClient =  client;
         mnBizPartnerCategory = idBizPartnerCategory;
@@ -219,8 +219,8 @@ public class SDialogRepBizPartnerAuxMoves extends javax.swing.JDialog implements
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.NORTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-484)/2, (screenSize.height-333)/2, 484, 333);
+        setSize(new java.awt.Dimension(484, 333));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated

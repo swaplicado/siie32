@@ -1708,7 +1708,7 @@ public abstract class STrnUtilities {
     
     public static void sendDocumentSoriana(final SClientInterface client, final int[] dpsKey) throws Exception {
         Cursor cursor = null;
-        SDataCfd dpsXml = null;
+        SDataCfd cfd = null;
         SDataDps dps = null;
         SSorianaUtils sorianaUtils;
         int statusId = 0;
@@ -1716,7 +1716,7 @@ public abstract class STrnUtilities {
 
         cursor = client.getFrame().getCursor();
         dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, dpsKey, SLibConstants.EXEC_MODE_SILENT);
-        dpsXml = dps.getDbmsDataCfd();
+        cfd = dps.getDbmsDataCfd();
 
         sorianaUtils = new SSorianaUtils();
         sorianaUtils.sendDocumentWs(SCfdUtils.removeNode(dps.getDbmsDataCfd().getDocXml(), "myadd:Addenda1"));
@@ -1734,11 +1734,11 @@ public abstract class STrnUtilities {
             status = "PENDIENTE.";
         }
 
-        dpsXml.saveField(client.getSession().getStatement().getConnection(), new int[] { dpsXml.getPkCfdId() }, SDataCfd.FIELD_ACK_DVY, sorianaUtils.getAcknowledgment().replaceAll("'", "\""));
-        dpsXml.saveField(client.getSession().getStatement().getConnection(), new int[] { dpsXml.getPkCfdId() }, SDataCfd.FIELD_MSJ_DVY, sorianaUtils.getAcknowledgmentMsg().replaceAll("'", "\""));
-        dpsXml.saveField(client.getSession().getStatement().getConnection(), new int[] { dpsXml.getPkCfdId() }, SDataCfd.FIELD_TP_XML_DVY, SModSysConsts.TRNS_TP_XML_DVY_WS_SOR);
-        dpsXml.saveField(client.getSession().getStatement().getConnection(), new int[] { dpsXml.getPkCfdId() }, SDataCfd.FIELD_ST_XML_DVY, statusId);
-        dpsXml.saveField(client.getSession().getStatement().getConnection(), new int[] { dpsXml.getPkCfdId() }, SDataCfd.FIELD_USR_DVY, client.getSession().getUser().getPkUserId());
+        cfd.saveField(client.getSession().getStatement().getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_ACK_DVY, sorianaUtils.getAcknowledgment().replaceAll("'", "\""));
+        cfd.saveField(client.getSession().getStatement().getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_MSJ_DVY, sorianaUtils.getAcknowledgmentMsg().replaceAll("'", "\""));
+        cfd.saveField(client.getSession().getStatement().getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_TP_XML_DVY, SModSysConsts.TRNS_TP_XML_DVY_WS_SOR);
+        cfd.saveField(client.getSession().getStatement().getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_ST_XML_DVY, statusId);
+        cfd.saveField(client.getSession().getStatement().getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_USR_DVY, client.getSession().getUser().getPkUserId());
 
         client.getFrame().setCursor(cursor);
         client.showMsgBoxInformation("El documento '" + dps.getNumberSeries() + (dps.getNumberSeries().length() > 0 ? "-" : "") + dps.getNumber() + (statusId == SModSysConsts.TRNS_ST_XML_DVY_PENDING ? "' sigue " : "' fue ") + status);
