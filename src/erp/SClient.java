@@ -914,55 +914,55 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             }
 
             if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_CFG, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
-                    moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_CFG)) {
+                    (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_CFG))) {
                 jmiViewModuleCfg.setEnabled(true);
                 jtbModuleCfg.setEnabled(true);
             }
 
             if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_FIN, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
-                    moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_FIN)) {
+                    (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_FIN))) {
                 jmiViewModuleFin.setEnabled(true);
                 jtbModuleFin.setEnabled(true);
             }
 
             if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_PUR, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
-                    moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_PUR)) {
+                    (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_PUR))) {
                 jmiViewModulePur.setEnabled(true);
                 jtbModulePur.setEnabled(true);
             }
 
             if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_SAL, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
-                    moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_SAL)) {
+                    (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_SAL))) {
                 jmiViewModuleSal.setEnabled(true);
                 jtbModuleSal.setEnabled(true);
             }
 
             if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_INV, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
-                    moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_INV)) {
+                    (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_INV))) {
                 jmiViewModuleInv.setEnabled(true);
                 jtbModuleInv.setEnabled(true);
             }
 
             if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_MKT, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
-                    moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_MKT)) {
+                    (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_MKT))) {
                 jmiViewModuleMkt.setEnabled(true);
                 jtbModuleMkt.setEnabled(true);
             }
 
             if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_LOG, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
-                    moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_LOG)) {
+                    (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_LOG))) {
                 jmiViewModuleLog.setEnabled(true);
                 jtbModuleLog.setEnabled(true);
             }
 
             if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_MFG, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
-                    moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_MFG)) {
+                    (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_MFG))) {
                 jmiViewModuleMfg.setEnabled(true);
                 jtbModuleMfg.setEnabled(true);
             }
 
             if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_HRS, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
-                    moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_HRS)) {
+                    (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_HRS))) {
                 jmiViewModuleHrs.setEnabled(true);
                 jtbModuleHrs.setEnabled(true);
             }
