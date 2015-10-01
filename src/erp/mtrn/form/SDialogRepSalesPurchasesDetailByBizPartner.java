@@ -11,29 +11,25 @@
 
 package erp.mtrn.form;
 
+import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
+import erp.lib.SLibConstants;
+import erp.lib.SLibTimeUtilities;
+import erp.lib.SLibUtilities;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
+import erp.mbps.data.SDataBizPartner;
+import erp.mitm.data.SDataUnitType;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.AbstractAction;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.view.*;
-import net.sf.jasperreports.view.save.JRPdfSaveContributor.*;
-import net.sf.jasperreports.view.JRViewer.*;
-import net.sf.jasperreports.view.save.JRMultipleSheetsXlsSaveContributor.*;
-
-import erp.data.SDataConstants;
-import erp.data.SDataConstantsSys;
-import erp.data.SDataUtilities;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormUtilities;
-import erp.lib.form.SFormValidation;
-import erp.lib.SLibConstants;
-import erp.lib.SLibTimeUtilities;
-import erp.lib.SLibUtilities;
-import erp.mbps.data.SDataBizPartner;
-import erp.mitm.data.SDataUnitType;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -301,28 +297,28 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
                 switch (jcbUnitType.getSelectedIndex()) {
                     case 1:
                         field = "de.len";
+                        sUnit = "LNG.";
                         unitType = (SDataUnitType) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_TP_UNIT, new int[] { SDataConstantsSys.ITMU_TP_UNIT_LEN }, SLibConstants.EXEC_MODE_VERBOSE);
-                        sUnit = "Longitud";
                         break;
                     case 2:
                         field = "de.surf";
+                        sUnit = "SUP.";
                         unitType = (SDataUnitType) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_TP_UNIT, new int[] { SDataConstantsSys.ITMU_TP_UNIT_SURF }, SLibConstants.EXEC_MODE_VERBOSE);
-                        sUnit = "Superficie";
                         break;
                     case 3:
                         field = "de.vol";
+                        sUnit = "VOL.";
                         unitType = (SDataUnitType) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_TP_UNIT, new int[] { SDataConstantsSys.ITMU_TP_UNIT_VOL }, SLibConstants.EXEC_MODE_VERBOSE);
-                        sUnit = "Volúmen";
                         break;
                     case 4:
                         field = "de.mass";
+                        sUnit = "MAS.";
                         unitType = (SDataUnitType) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_TP_UNIT, new int[] { SDataConstantsSys.ITMU_TP_UNIT_MASS }, SLibConstants.EXEC_MODE_VERBOSE);
-                        sUnit = "Masa";
                         break;
                     default:
-                        field = "de.len";
-                        unitType = (SDataUnitType) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_TP_UNIT, new int[] { SDataConstantsSys.ITMU_TP_UNIT_LEN }, SLibConstants.EXEC_MODE_VERBOSE);
-                        sUnit = "Longitud";
+                        field = "0";
+                        sUnit = "N/A";
+                        unitType = null;
                 }
 
                 bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, moFieldBizPartner.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
@@ -342,7 +338,7 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
                 map.put("sBizPartnerCat", mbParamIsSupplier ? "PROVEEDOR" : "CLIENTE");
                 map.put("sFieldUnit", field);
                 map.put("sUnit", sUnit);
-                map.put("sUnitBase", unitType.getUnitBase());
+                map.put("sUnitBase", unitType == null ? "" : unitType.getUnitBase());
                 map.put("sTitle", mbParamIsSupplier ? "DETALLADO DE COMPRAS POR " : "DETALLADO DE VENTAS POR ");
 
                 jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_DPS_BPS_DETAIL, map);
