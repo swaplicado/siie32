@@ -760,7 +760,7 @@ public class SDbAbpItem extends SDbRegistryUser implements SAbp {
                 (String) session.readField(SModConsts.FIN_CC, new int[] { mnFkCostCenterPurchasesDecReturnId }, SDbRegistry.FIELD_CODE),
                 (String) session.readField(SModConsts.FIN_CC, new int[] { mnFkCostCenterPurchasesDecReturnId }, SDbRegistry.FIELD_NAME)));
 
-        rowsMap.put(ACC_SAL, new SAbpRegistry(ACC_SAL, TXT_ACC_PUR, new int[] { },
+        rowsMap.put(ACC_SAL, new SAbpRegistry(ACC_SAL, TXT_ACC_SAL, new int[] { },
                 mnFkAccountSalesId,
                 (String) session.readField(SModConsts.FIN_ACC, new int[] { mnFkAccountSalesId }, SDbRegistry.FIELD_CODE),
                 (String) session.readField(SModConsts.FIN_ACC, new int[] { mnFkAccountSalesId }, SDbRegistry.FIELD_NAME),
