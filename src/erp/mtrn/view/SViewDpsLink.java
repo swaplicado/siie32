@@ -185,7 +185,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
         mjbPrintContractMoves.setEnabled(isViewForEstimateCon());
 
         aoKeyFields = new STableField[2];
-        aoTableColumns = new STableColumn[!isViewForDocEntries() ? 17 : 26];
+        aoTableColumns = new STableColumn[!isViewForDocEntries() ? 17 : 27];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "id_year");
@@ -262,6 +262,11 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_orig_price_u", "Precio u. moneda $", STableConstants.WIDTH_VALUE_2X);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cur_key", "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "", "Monto procesado $", STableConstants.WIDTH_VALUE_2X);
+            aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
+            aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_link_orig_qty", SLibRpnArgumentType.OPERAND));
+            aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_orig_price_u", SLibRpnArgumentType.OPERAND));
+            aoTableColumns[i++].getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.MULTIPLICATION, SLibRpnArgumentType.OPERATOR));
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "", "Monto pendiente $", STableConstants.WIDTH_VALUE_2X);
             aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
             aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_orig_qty", SLibRpnArgumentType.OPERAND));

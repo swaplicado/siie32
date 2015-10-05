@@ -1339,7 +1339,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     break;
                     
                 case SDataConstants.TRN_CFD_SND_LOG:
-                    oViewClass = erp.mtrn.view.SViewDpsSendingLog.class;
+                    oViewClass = erp.mtrn.view.SViewCfdSendingLog.class;
                     sViewTitle = "VTA - bitácora envíos CFDI";
                     break;
 

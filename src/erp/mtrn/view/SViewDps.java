@@ -1004,6 +1004,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         }
                         else {
                             try {
+                                
+                                STrnUtilities.createReportOrder(miClient, oDps, SDataConstantsPrint.PRINT_MODE_VIEWER);
+                                /* XXX New way of printing the report (jbarajas, 25-09-2015)
                                 setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
                                 map = miClient.createReportParams();
@@ -1031,6 +1034,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                 jasperViewer = new JasperViewer(jasperPrint, false);
                                 jasperViewer.setTitle("Impresión de pedido");
                                 jasperViewer.setVisible(true);
+                                */
                             }
                             catch (Exception e) {
                                 SLibUtilities.renderException(this, e);

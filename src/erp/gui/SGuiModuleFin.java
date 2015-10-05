@@ -105,6 +105,7 @@ import erp.mtrn.form.SFormDsm;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
 
@@ -235,7 +236,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiRepDpsPaymentSup;
     private javax.swing.JMenuItem jmiRepDpsPaymentCus;
     private javax.swing.JMenuItem jmiDpsPaymentSup;
+    private javax.swing.JMenuItem jmiDpsPaymentSupDetail;
     private javax.swing.JMenuItem jmiDpsPaymentCus;
+    private javax.swing.JMenuItem jmiDpsPaymentCusDetail;
     private javax.swing.JMenuItem jmiRepIncomeExpenseDue;
     private javax.swing.JMenuItem jmiRepLedgerAccount;
     private javax.swing.JMenuItem jmiRepLedgerCostCenter;
@@ -580,7 +583,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepDpsPaymentSup = new JMenuItem("Reporte de pagos por período...");
         jmiRepDpsPaymentCus = new JMenuItem("Reporte de cobros por período...");
         jmiDpsPaymentSup = new JMenuItem("Pagos por período");
+        jmiDpsPaymentSupDetail = new JMenuItem("Pagos por período a detalle");
         jmiDpsPaymentCus = new JMenuItem("Cobros por período");
+        jmiDpsPaymentCusDetail = new JMenuItem("Cobros por período a detalle");
         
         jmiRepIncomeExpenseDue = new JMenuItem("Reporte de ingresos y egresos esperados por periodo...");
 
@@ -656,7 +661,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRepDpsPayment.add(jmiRepDpsPaymentCus);
         jmRepDpsPayment.addSeparator();
         jmRepDpsPayment.add(jmiDpsPaymentSup);
+        jmRepDpsPayment.add(jmiDpsPaymentSupDetail);
         jmRepDpsPayment.add(jmiDpsPaymentCus);
+        jmRepDpsPayment.add(jmiDpsPaymentCusDetail);
         jmRep.add(jmRepDpsPayment);
         
         jmRep.add(jmiRepIncomeExpenseDue);
@@ -783,7 +790,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepDpsPaymentSup.addActionListener(this);
         jmiRepDpsPaymentCus.addActionListener(this);
         jmiDpsPaymentSup.addActionListener(this);
+        jmiDpsPaymentSupDetail.addActionListener(this);
         jmiDpsPaymentCus.addActionListener(this);
+        jmiDpsPaymentCusDetail.addActionListener(this);
         jmiRepIncomeExpenseDue.addActionListener(this);
         jmiRepLedgerAccount.addActionListener(this);
         jmiRepLedgerCostCenter.addActionListener(this);
@@ -1927,8 +1936,14 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiDpsPaymentSup) {
                 showView(SDataConstants.TRNX_DPS_PAYS, SDataConstantsSys.TRNS_CT_DPS_PUR);
             }
+            else if (item == jmiDpsPaymentSupDetail) {
+                showView(SDataConstants.TRNX_DPS_PAYS, SDataConstantsSys.TRNS_CT_DPS_PUR, SUtilConsts.QRY_DET);
+            }
             else if (item == jmiDpsPaymentCus) {
-                showView(SDataConstants.TRNX_DPS_PAYS, SDataConstantsSys.TRNS_CT_DPS_SAL);
+                showView(SDataConstants.TRNX_DPS_PAYS, SDataConstantsSys.TRNS_CT_DPS_SAL, SUtilConsts.QRY_SUM);
+            }
+            else if (item == jmiDpsPaymentCusDetail) {
+                showView(SDataConstants.TRNX_DPS_PAYS, SDataConstantsSys.TRNS_CT_DPS_SAL, SUtilConsts.QRY_DET);
             }
             else if (item == jmiRepIncomeExpenseDue){
                 new SDialogRepIncomeExpenseDue(miClient.getSession().getClient(), SModConsts.FINR_INC_EXP_DUE, "Reporte de ingresos y egresos esperados por periodo").setVisible(true);

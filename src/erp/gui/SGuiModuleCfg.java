@@ -71,6 +71,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCfgDpsNature;
     private javax.swing.JMenuItem jmiCfgSystemNotes;
     private javax.swing.JMenuItem jmiCfgMmsItem;
+    private javax.swing.JMenuItem jmiCfgItemRequiredDps;
     private javax.swing.JMenu jmCat;
     private javax.swing.JMenuItem jmiCatLanguage;
     private javax.swing.JMenuItem jmiCatCurrency;
@@ -137,6 +138,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgDpsNature = new JMenuItem("Naturaleza de docs. de C/V");
         jmiCfgSystemNotes = new JMenuItem("Notas predefinidas de docs. de C/V");
         jmiCfgMmsItem = new JMenuItem("Configuración de ítems para envío por email");
+        jmiCfgItemRequiredDps = new JMenuItem("Configuración de ítems obligatorios con documentos origen");
 
         jmCfg.add(jmiCfgParamsCompany);
         jmCfg.add(jmiCfgParamsErp);
@@ -162,6 +164,8 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCfg.add(jmiCfgSystemNotes);
         jmCfg.addSeparator();
         jmCfg.add(jmiCfgMmsItem);
+        jmCfg.addSeparator();
+        jmCfg.add(jmiCfgItemRequiredDps);
 
         jmCat = new JMenu("Catálogos");
         
@@ -194,6 +198,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgDpsNature.addActionListener(this);
         jmiCfgSystemNotes.addActionListener(this);
         jmiCfgMmsItem.addActionListener(this);
+        jmiCfgItemRequiredDps.addActionListener(this);
         
         jmiCatLanguage.addActionListener(this);
         jmiCatCurrency.addActionListener(this);
@@ -235,6 +240,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgDpsNature.setEnabled(hasRightParamsCompany || hasRightParamsErp);
         jmiCfgSystemNotes.setEnabled(hasRightParamsCompany || hasRightParamsErp);
         jmiCfgMmsItem.setEnabled(hasRightParamsCompany || hasRightParamsErp);
+        jmiCfgItemRequiredDps.setEnabled(hasRightParamsCompany || hasRightParamsErp);
 
         jmCat.setEnabled(hasRightLanguage || hasRightCurrency || hasRightCompany);
         jmiCatLanguage.setEnabled(hasRightLanguage);
@@ -685,6 +691,9 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiCfgMmsItem) {
                  miClient.getSession().showView(SModConsts.TRN_MMS_CFG, SLibConsts.UNDEFINED, null);
+            }
+            else if (item == jmiCfgItemRequiredDps) {
+                 miClient.getSession().showView(SModConsts.TRNU_TP_DPS_SRC_ITEM, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiCfgCfdiStampAcquisition) {
                 showView(SDataConstants.TRN_SIGN);

@@ -33,6 +33,7 @@ import erp.mitm.data.SDataItemForeignLanguage;
 import erp.mitm.data.SDataUnitType;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsDpsAdjustment;
 import erp.mtrn.data.SDataDpsDpsLink;
@@ -4438,6 +4439,17 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     validation.setMessage(message);
                     validation.setComponent(jckIsDpsReqMonthDelivery);
                     jTabbedPane.setSelectedIndex(3);
+                }
+            }
+            
+            if (!validation.getIsError()) {
+                try {
+                    STrnUtils.canBeUsedItemDps(miClient.getSession(), moParamDps.getDpsTypeKey(), moItem.getPkItemId(), moDpsEntry.hasDpsLinksAsDestiny());
+                }
+                catch (Exception e) {
+                    validation.setMessage(e.getMessage());
+                    validation.setComponent(jcbFkItemId);
+                    SLibUtilities.printOutException(this, e);
                 }
             }
         }

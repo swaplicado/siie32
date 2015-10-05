@@ -81,6 +81,8 @@ public class SDialogRepContractStatus extends SBeanDialogReport implements Chang
         moKeyItem = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel12 = new javax.swing.JPanel();
         moBooleanShowPrices = new sa.lib.gui.bean.SBeanFieldBoolean();
+        moBooleanAmountPending = new sa.lib.gui.bean.SBeanFieldBoolean();
+        moBooleanShowDetailsContract = new sa.lib.gui.bean.SBeanFieldBoolean();
 
         jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
 
@@ -199,6 +201,16 @@ public class SDialogRepContractStatus extends SBeanDialogReport implements Chang
         moBooleanShowPrices.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel12.add(moBooleanShowPrices);
 
+        moBooleanAmountPending.setSelected(true);
+        moBooleanAmountPending.setText("Total pendiente");
+        moBooleanAmountPending.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel12.add(moBooleanAmountPending);
+
+        moBooleanShowDetailsContract.setSelected(true);
+        moBooleanShowDetailsContract.setText("Con detalle de contratos");
+        moBooleanShowDetailsContract.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel12.add(moBooleanShowDetailsContract);
+
         jPanel10.add(jPanel12);
 
         jPanel2.add(jPanel10, java.awt.BorderLayout.NORTH);
@@ -234,6 +246,8 @@ public class SDialogRepContractStatus extends SBeanDialogReport implements Chang
     private javax.swing.JLabel jlDateStart;
     private javax.swing.JLabel jlIGen;
     private javax.swing.JLabel jlItem;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBooleanAmountPending;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBooleanShowDetailsContract;
     private sa.lib.gui.bean.SBeanFieldBoolean moBooleanShowPrices;
     private sa.lib.gui.bean.SBeanFieldDate moDateEnd;
     private sa.lib.gui.bean.SBeanFieldDate moDateStart;
@@ -261,6 +275,8 @@ public class SDialogRepContractStatus extends SBeanDialogReport implements Chang
         moKeyIGen.setKeySettings(miClient, SGuiUtils.getLabelName(jlIGen.getText()), false);
         moKeyItem.setKeySettings(miClient, SGuiUtils.getLabelName(jlItem.getText()), false);
         moBooleanShowPrices.setBooleanSettings(SGuiUtils.getLabelName(moBooleanShowPrices.getText()), true);
+        moBooleanAmountPending.setBooleanSettings(SGuiUtils.getLabelName(moBooleanAmountPending.getText()), true);
+        moBooleanShowDetailsContract.setBooleanSettings(SGuiUtils.getLabelName(moBooleanShowDetailsContract.getText()), true);
         
         moFields.addField(moRadioContractStatus);
         moFields.addField(moRadioContractStatusByBp);
@@ -274,6 +290,8 @@ public class SDialogRepContractStatus extends SBeanDialogReport implements Chang
         moFields.addField(moKeyIGen);
         moFields.addField(moKeyItem);
         moFields.addField(moBooleanShowPrices);
+        moFields.addField(moBooleanAmountPending);
+        moFields.addField(moBooleanShowDetailsContract);
         moFields.setFormButton(jbPrint);
         
         moRadioContractStatus.addChangeListener(this);
@@ -294,6 +312,8 @@ public class SDialogRepContractStatus extends SBeanDialogReport implements Chang
             moKeyIGen.setEnabled(true);    
             moKeyItem.setEnabled(false);    
             moBooleanShowPrices.setEnabled(true);
+            moBooleanAmountPending.setEnabled(true);
+            moBooleanShowDetailsContract.setEnabled(false);
             
             moDateStart.setEnabled(false);
             moDateEnd.setEnabled(true);
@@ -305,8 +325,10 @@ public class SDialogRepContractStatus extends SBeanDialogReport implements Chang
         }
         if (moRadioContractStatusByBp.isSelected()) {
             moKeyBizPartner.setEnabled(true);
-            moKeyIGen.setEnabled(false);
+            moKeyIGen.setEnabled(true);
             moBooleanShowPrices.setEnabled(false);
+            moBooleanAmountPending.setEnabled(false);
+            moBooleanShowDetailsContract.setEnabled(false);
             
             moDateStart.setEnabled(false);
             moDateEnd.setEnabled(true);
@@ -317,9 +339,11 @@ public class SDialogRepContractStatus extends SBeanDialogReport implements Chang
             moDateStart.setValue(null);
         }
         if (moRadioMonthlyDeliveryProgram.isSelected()) {
-            moKeyBizPartner.setEnabled(false);
+            moKeyBizPartner.setEnabled(true);
             moKeyIGen.setEnabled(false);
             moBooleanShowPrices.setEnabled(false);
+            moBooleanAmountPending.setEnabled(false);
+            moBooleanShowDetailsContract.setEnabled(true);
             
             moDateStart.setEnabled(true);
             moDateEnd.setEnabled(false);
@@ -334,6 +358,8 @@ public class SDialogRepContractStatus extends SBeanDialogReport implements Chang
             moKeyBizPartner.setEnabled(true);
             moKeyIGen.setEnabled(true);
             moBooleanShowPrices.setEnabled(false);
+            moBooleanAmountPending.setEnabled(false);
+            moBooleanShowDetailsContract.setEnabled(false);
             
             if (moDateStart.isEnabled()) {
                 moDateEnd.setValue(SLibTimeUtils.getEndOfMonth(moDateStart.getValue()));
@@ -398,8 +424,6 @@ public class SDialogRepContractStatus extends SBeanDialogReport implements Chang
         int nIdTypDps = 0;
         int nIdStDps = 0;
         int nIdCatBp = 0;
-        //int nIdCob = 0;
-        boolean bShowPrices = false;
         String sTitle = "";
         String sTitleSingular = "";
         String sBpName = "(TODOS)";
@@ -414,7 +438,7 @@ public class SDialogRepContractStatus extends SBeanDialogReport implements Chang
                 moParamsMap = miClient.createReportParams();
 
                 if (mnFormSubtype == SDataConstantsSys.BPSS_CT_BP_CUS) {
-                        sTitle = "CLIENTES";
+                        sTitle = "CLIENTE" + (moRadioContractStatus.isSelected() ? "S" : "");
                         sTitleSingular = "CLIENTE";
                         nIdCatDps = SModSysConsts.TRNU_TP_DPS_SAL_CON[0];
                         nIdClaDps = SModSysConsts.TRNU_TP_DPS_SAL_CON[1];
@@ -422,7 +446,7 @@ public class SDialogRepContractStatus extends SBeanDialogReport implements Chang
                         nIdCatBp = SDataConstantsSys.BPSS_CT_BP_CUS;
                     }
                     else {
-                        sTitle = "PROVEEDORES";
+                        sTitle = "PROVEEDOR";
                         sTitleSingular = "PROVEEDOR";
                         nIdCatDps = SModSysConsts.TRNU_TP_DPS_PUR_CON[0];
                         nIdClaDps = SModSysConsts.TRNU_TP_DPS_PUR_CON[1];
@@ -436,19 +460,16 @@ public class SDialogRepContractStatus extends SBeanDialogReport implements Chang
                 tDateEnd = moDateEnd.getValue();
                 
                 if (moRadioContractStatus.isSelected()) {
-                    //nIdCob = miClient.getSession().getConfigBranch().getBranchId();
 
-                    bShowPrices = moBooleanShowPrices.isSelected();
-
-                    if(moKeyBizPartner.getSelectedIndex() > 0) {
+                    if (moKeyBizPartner.getSelectedIndex() > 0) {
                         sSqlWhere += " AND d.fid_bp_r = " + moKeyBizPartner.getValue()[0];
                         sBpName = moKeyBizPartner.getSelectedItem().getItem();
                     }
-                    if(moKeyIGen.getSelectedIndex() > 0) {
+                    if (moKeyIGen.getSelectedIndex() > 0) {
                         sSqlWhere += " AND i.fid_igen = " + moKeyIGen.getValue()[0];
                         sIGen = moKeyIGen.getSelectedItem().getItem();
                     }
-                    if(moKeyItem.getSelectedIndex() > 0) {
+                    if (moKeyItem.getSelectedIndex() > 0) {
                         sSqlWhere += " AND i.id_item = " + moKeyItem.getValue()[0];
                         sItem = moKeyItem.getSelectedItem().getItem();
                     }
@@ -460,17 +481,27 @@ public class SDialogRepContractStatus extends SBeanDialogReport implements Chang
                     //moParamsMap.put("nIdCob", nIdCob);
                     moParamsMap.put("nIdStDps", nIdStDps);
                     moParamsMap.put("sSqlWhere", sSqlWhere);
-                    moParamsMap.put("bShowPrices", bShowPrices);
+                    moParamsMap.put("bShowPrices", moBooleanShowPrices.isSelected());
                     moParamsMap.put("sTitle", sTitle);
                     moParamsMap.put("sTitleSingular", sTitleSingular);
                     moParamsMap.put("sBpName", sBpName);
                     moParamsMap.put("sIGen", sIGen);
                     moParamsMap.put("sItem", sItem);
                     moParamsMap.put("tDateCut", tDateEnd);
+                    moParamsMap.put("bIsAmountPending", moBooleanAmountPending.isSelected());
                 }
                 else if (moRadioContractStatusByBp.isSelected()) {
                     sSqlWhere += " AND b.id_bp = " + moKeyBizPartner.getValue()[0];
                     sBpName = moKeyBizPartner.getSelectedItem().getItem();
+                    
+                    if (moKeyIGen.getSelectedIndex() > 0) {
+                        sSqlWhere += " AND i.fid_igen = " + moKeyIGen.getValue()[0];
+                        sIGen = moKeyIGen.getSelectedItem().getItem();
+                    }
+                    if (moKeyItem.getSelectedIndex() > 0) {
+                        sSqlWhere += " AND i.id_item = " + moKeyItem.getValue()[0];
+                        sItem = moKeyItem.getSelectedItem().getItem();
+                    }
 
                     moParamsMap.put("nIdCatDps", nIdCatDps);
                     moParamsMap.put("nIdClaDps", nIdClaDps);
@@ -487,6 +518,11 @@ public class SDialogRepContractStatus extends SBeanDialogReport implements Chang
                     moParamsMap.put("tDateCut", tDateEnd);
                 }
                 else if (moRadioMonthlyDeliveryProgram.isSelected()) {
+                    if (moKeyBizPartner.getSelectedIndex() > 0) {
+                        sSqlWhere += " AND d.fid_bp_r = " + moKeyBizPartner.getValue()[0];
+                        sBpName = moKeyBizPartner.getSelectedItem().getItem();
+                    }
+                    
                     moParamsMap.put("nIdCatDps", nIdCatDps);
                     moParamsMap.put("nIdClaDps", nIdClaDps);
                     moParamsMap.put("nIdTypDps", nIdTypDps);
@@ -495,6 +531,7 @@ public class SDialogRepContractStatus extends SBeanDialogReport implements Chang
                     moParamsMap.put("sBpName", sBpName);
                     moParamsMap.put("sIGen", sIGen);
                     moParamsMap.put("sItem", sItem);
+                    moParamsMap.put("bShowDetailsContract", moBooleanShowDetailsContract.isSelected());
                 
                 }
                 else if (moRadioDpsByContractByPeriod.isSelected()) {

@@ -23,12 +23,17 @@ import erp.lib.table.STableField;
 import erp.lib.table.STableRow;
 import erp.lib.table.STableRowCustom;
 import erp.lib.table.STableUtilities;
+import erp.mbps.data.SDataEmployee;
 import erp.mfin.data.SFinanceUtilities;
 import erp.mtrn.data.SCfdPacket;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataCfdSignLog;
 import erp.mtrn.data.SDataSign;
+import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
+import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -181,6 +186,26 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
         if (reportType == SDataConstantsSys.REP_TRN_CFDI || reportType == SDataConstantsSys.REP_TRN_CFDI_PAYROLL) {
             BufferedImage biQrCode = DCfd.createQrCodeBufferedImage((String) map.get("sEmiRfc"), (String) map.get("sRecRfc"), Double.parseDouble("" + map.get("dCfdTotal")), (String) map.get("sCfdiUuid"));
             map.put("oCfdiQrCode", biQrCode.getScaledInstance(biQrCode.getWidth(), biQrCode.getHeight(), Image.SCALE_DEFAULT));
+        }
+        
+        if (reportType == SDataConstantsSys.REP_TRN_DPS_ORDER && (boolean) map.get("bIsSupplier")) {
+            GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+            
+            if (((SDataEmployee) map.get("oUserBuyer")) != null && ((SDataEmployee) map.get("oUserBuyer")).getXtaImageIconSignature_n() != null) {
+                BufferedImage userBuyer = gc.createCompatibleImage(((SDataEmployee) map.get("oUserBuyer")).getXtaImageIconSignature_n().getImage().getWidth(null), ((SDataEmployee) map.get("oUserBuyer")).getXtaImageIconSignature_n().getImage().getHeight(null), Transparency.TRANSLUCENT);                
+                Graphics gUserBuyer = userBuyer.createGraphics();
+                gUserBuyer.drawImage(((SDataEmployee) map.get("oUserBuyer")).getXtaImageIconSignature_n().getImage(), 0, 0, null);
+                map.put("oUserBuyerSign", userBuyer);
+                gUserBuyer.dispose();
+            }
+            
+            if (((SDataEmployee) map.get("oUserAuthorize")) != null && ((SDataEmployee) map.get("oUserAuthorize")).getXtaImageIconSignature_n() != null) {
+                BufferedImage userAuthorize = gc.createCompatibleImage(((SDataEmployee) map.get("oUserAuthorize")).getXtaImageIconSignature_n().getImage().getWidth(null), ((SDataEmployee) map.get("oUserAuthorize")).getXtaImageIconSignature_n().getImage().getHeight(null), Transparency.TRANSLUCENT);
+                Graphics gUserAuthorize = userAuthorize.createGraphics();
+                gUserAuthorize.drawImage(((SDataEmployee) map.get("oUserAuthorize")).getXtaImageIconSignature_n().getImage(), 0, 0, null);
+                map.put("oUserAuthorizeSign", userAuthorize);
+                gUserAuthorize.dispose();
+            }
         }
 
         /* End of special block of code (sflores, 2014-01-15)

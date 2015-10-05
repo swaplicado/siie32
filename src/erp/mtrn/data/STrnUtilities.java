@@ -18,7 +18,9 @@ import erp.lib.SLibUtilities;
 import erp.lib.data.SDataRegistry;
 import erp.lib.form.SFormComponentItem;
 import erp.mbps.data.SDataBizPartner;
+import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mbps.data.SDataBizPartnerBranchAddress;
+import erp.mbps.data.SDataEmployee;
 import erp.mcfg.data.SDataCompanyBranchEntity;
 import erp.mhrs.data.SDataFormerPayroll;
 import erp.mhrs.data.SDataFormerPayrollEmp;
@@ -31,6 +33,8 @@ import erp.mod.cfg.db.SDbMms;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SHrsFormerConsts;
+import erp.musr.data.SDataUser;
+import erp.print.SDataConstantsPrint;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
@@ -1403,6 +1407,88 @@ public abstract class STrnUtilities {
     /**
      * Send mail with information of contracts specificated.
      * @param client ERP Client interface.
+     * @param keyDoc DPS primary Key.
+     * @param typeDoc type the DPS SDataConstantsSys.TRNS_CT_DPS_PUR or SDataConstantsSys.TRNS_CT_DPS_SAL
+     */
+    public static void sendMailOrder(final SClientInterface client, final int[] keyDoc, final int typeDoc) {
+        String addressee = "";
+        String msg = "";
+        String userMail = "";
+        String bizPartnerMail = "";
+        SDataDps oDps = null;
+        boolean canSend = true;
+        SMailSender sender = null;
+        SMail mail = null;
+        ArrayList<String> toRecipients = null;
+        File pdf = null;
+        SDbMms mms = null;
+        SDataBizPartner bizPartner = null;
+        SDataBizPartner bizPartnerUserSend = null;
+
+        try {
+            client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            mms = getMms(client, typeDoc == SDataConstantsSys.TRNS_CT_DPS_PUR ? SModSysConsts.CFGS_TP_MMS_ORD_PUR : SModSysConsts.CFGS_TP_MMS_ORD_SAL);
+            oDps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, keyDoc, SLibConstants.EXEC_MODE_SILENT);
+            bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { oDps.getFkBizPartnerId_r() }, SLibConstants.EXEC_MODE_SILENT); 
+            
+            bizPartnerMail = bizPartner.getBizPartnerBranchContactMail(new int[] { oDps.getFkBizPartnerBranchId() });
+            
+            if (mms.getQueryResultId() != SDbConsts.READ_OK) {
+                client.showMsgBoxWarning("No existe ningún correo configurado para envío de pedidos.");
+            }
+            else if (bizPartnerMail.isEmpty()) {
+                throw new Exception("El receptor de documento no tiene ningún correo configurado para la recepción de documentos.");
+            }
+            else {
+                if (((SDataUser) client.getSession().getUser()).getFkBizPartnerId_n() != SLibConstants.UNDEFINED) {
+                    bizPartnerUserSend = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { ((SDataUser) client.getSession().getUser()).getFkBizPartnerId_n() }, SLibConstants.EXEC_MODE_SILENT); 
+                    userMail = bizPartnerUserSend.getBizPartnerBranchContactMail(SDataConstantsSys.BPSS_TP_CON_ADM);
+                }
+                
+                sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), (userMail.isEmpty() ? mms.getUser() : userMail));
+
+                toRecipients = new ArrayList<String>();
+
+                toRecipients.addAll(Arrays.asList(SLibUtils.textExplode(bizPartnerMail, ";")));
+
+                if (toRecipients.isEmpty()) {
+                    client.showMsgBoxWarning("No existe ningún destinatario configurado.");
+                    canSend = false;
+                }
+                else {
+                    mail = new SMail(sender, mms.getTextSubject(), mms.getTextBody(), toRecipients);
+                }
+
+                if (canSend) {
+                    pdf = new File(oDps.getNumberSeries() +
+                    (oDps.getNumberSeries().isEmpty() ? "" : "_") + oDps.getNumber() + ".pdf");
+
+                    createReportOrder(client, oDps, SDataConstantsPrint.PRINT_MODE_PDF);
+
+                    mail.getAttachments().add(pdf);
+                    mail.send();
+
+                    addressee = String.join(";", toRecipients);
+
+                    if (!STrnUtilities.insertDpsSendLog(client, oDps, addressee, false)) {
+                    }
+
+                    pdf.delete();
+                    client.showMsgBoxInformation("El correo ha sido enviado.\n" + msg);
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(STrnUtilities.class.getName(), e);
+        }
+        finally {
+            client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        }
+    }
+
+    /**
+     * Send mail with information of contracts specificated.
+     * @param client ERP Client interface.
      * @param numberStart Number contract initial.
      * @param numberEnd Number contract final.
      * @param recipientsTo Recipients the information.
@@ -1773,6 +1859,27 @@ public abstract class STrnUtilities {
         return mms;
     }
 
+    public static boolean insertDpsSendLog(final SClientInterface client, final SDataDps dps, final String sendTo, final boolean isSend) throws Exception {
+        String sql = "";
+        int id_snd = 0;
+        ResultSet resultSet = null;
+
+        sql = "SELECT COALESCE(MAX(id_snd), 0) + 1 AS f_snd FROM trn_dps_snd_log WHERE id_year = " + dps.getPkYearId()+ " AND id_doc = " + dps.getPkDocId()+ " ";
+
+        resultSet = client.getSession().getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            id_snd = resultSet.getInt("f_snd");
+        }
+
+        sql = "INSERT INTO trn_dps_snd_log VALUES(" + dps.getPkYearId() + ", " + dps.getPkDocId() + ", " +
+                id_snd + ", '" + SLibUtils.DbmsDateFormatDate.format(client.getSession().getCurrentDate()) + "', '" + sendTo + "', " + isSend + ", " + client.getSession().getUser().getPkUserId() + ", NOW())";
+
+        client.getSession().getStatement().execute(sql);
+
+        return true;
+    }
+
+
     /**
      * Create report with contract moves.
      * @param client ERP Client interface.
@@ -1818,6 +1925,133 @@ public abstract class STrnUtilities {
                 JasperExportManager.exportReportToPdfStream(jasperPrint, outputStreamPdf);
 
                 outputStreamPdf.close();
+            }
+        }
+        catch (Exception e) {
+            SLibUtilities.printOutException(STrnUtilities.class.getName(), e);
+        }
+        finally {
+            client.getFrame().setCursor(cursor);
+        }
+    }
+    
+    public static void createReportOrder(final SClientInterface client, final SDataDps dps, final int pnPrintMode) {
+        Cursor cursor = null;
+        String sUserBuyer = "";
+        String sUserAuthorize = "";
+        int nFkEmiAddressFormatTypeId_n = 0;
+        int nFkRecAddressFormatTypeId_n = 0;
+        boolean bincludeCountry = false;
+        String[] addressOficial = null;
+        String[] addressDelivery = null;
+        String[] addressDeliveryCompany = null;
+        Map<String, Object> map = null;
+        JasperPrint jasperPrint = null;
+        JasperViewer jasperViewer = null;
+        SDataBizPartnerBranch oCompanyBranch = null;
+        SDataBizPartnerBranch oBizPartnerBranch = null;
+        SDataBizPartnerBranchAddress oAddress = null;
+        SDataUser oUserBuyer = null;
+        SDataUser oUserAuthorize = null;
+        SDataBizPartner bizPartnerUserBuyer = null;
+        SDataBizPartner bizPartnerUserAuthorize = null;
+        SDataEmployee employeeUserBuyer = null;
+        SDataEmployee employeeUserAuthorize = null;
+        boolean isPurchase = false;
+        FileOutputStream outputStreamPdf = null;
+        
+        try {
+            cursor = client.getFrame().getCursor();
+            client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            
+            map = client.createReportParams();
+            
+            isPurchase = dps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_PUR;
+            
+            oCompanyBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BPB, new int[] { dps.getFkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
+            oBizPartnerBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BPB, new int[] { dps.getFkBizPartnerBranchId() }, SLibConstants.EXEC_MODE_SILENT);
+            oAddress = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BPB_ADD, new int [] { dps.getFkBizPartnerBranchId(),
+                dps.getFkBizPartnerBranchAddressId() }, SLibConstants.EXEC_MODE_SILENT);
+            
+            if (oBizPartnerBranch.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
+                nFkRecAddressFormatTypeId_n = oBizPartnerBranch.getFkAddressFormatTypeId_n();
+            }
+            else {
+                nFkRecAddressFormatTypeId_n = client.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n();
+            }
+
+            if (oCompanyBranch.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
+                nFkEmiAddressFormatTypeId_n = oAddress.getFkAddressTypeId();
+            }
+            else {
+                nFkEmiAddressFormatTypeId_n = client.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n();
+            }
+            
+            addressOficial = oBizPartnerBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(nFkRecAddressFormatTypeId_n,
+                SDataBizPartnerBranchAddress.ADDRESS_4ROWS, bincludeCountry);
+            addressDelivery = oAddress.obtainAddress(nFkRecAddressFormatTypeId_n,
+                SDataBizPartnerBranchAddress.ADDRESS_4ROWS, bincludeCountry);
+            addressDeliveryCompany = oCompanyBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(nFkEmiAddressFormatTypeId_n,
+                SDataBizPartnerBranchAddress.ADDRESS_4ROWS, bincludeCountry);
+            oUserBuyer = (SDataUser) SDataUtilities.readRegistry(client, SDataConstants.USRU_USR, new int[] { dps.getFkUserNewId() }, SLibConstants.EXEC_MODE_SILENT);
+            oUserAuthorize = (SDataUser) SDataUtilities.readRegistry(client, SDataConstants.USRU_USR, new int[] { dps.getFkUserAuthorizedId() }, SLibConstants.EXEC_MODE_SILENT);
+
+            sUserBuyer = SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.USRU_USR, new int[] { dps.getFkUserNewId() });
+            sUserAuthorize = SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.USRU_USR, new int[] { dps.getFkUserAuthorizedId() });
+            
+            if (oUserBuyer.getFkBizPartnerId_n() != SLibConstants.UNDEFINED) {
+                bizPartnerUserBuyer = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { oUserBuyer.getFkBizPartnerId_n() }, SLibConstants.EXEC_MODE_SILENT); 
+                employeeUserBuyer = bizPartnerUserBuyer.getDbmsDataEmployee();
+            }
+            
+            if (oUserAuthorize.getFkBizPartnerId_n() != SLibConstants.UNDEFINED) {
+                bizPartnerUserAuthorize = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { oUserAuthorize.getFkBizPartnerId_n() }, SLibConstants.EXEC_MODE_SILENT); 
+                employeeUserAuthorize = bizPartnerUserAuthorize.getDbmsDataEmployee();
+            }
+            
+            if (isPurchase) {
+                map.put("oUserBuyer", employeeUserBuyer);
+                map.put("oUserAuthorize", employeeUserAuthorize);
+            }
+            
+            map.put("nIdYear", dps.getPkYearId());
+            map.put("nIdDoc", dps.getPkDocId());
+            map.put("sTitle", SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.TRNU_TP_DPS, new int[] { dps.getFkDpsCategoryId(),
+            dps.getFkDpsClassId(), dps.getFkDpsTypeId() }));
+            map.put("bIsSupplier", isPurchase);
+            map.put("sAddressLine1", addressOficial[0]);
+            map.put("sAddressLine2", addressOficial[1]);
+            map.put("sAddressLine3", addressOficial[2]);
+            map.put("sAddressLine4", addressOficial[3]);
+            map.put("sAddressDelivery1", isPurchase ? addressDeliveryCompany[0] : addressDelivery[0]);
+            map.put("sAddressDelivery2", isPurchase ? addressDeliveryCompany[1] : addressDelivery[1]);
+            map.put("sAddressDelivery3", isPurchase ? addressDeliveryCompany[2] : addressDelivery[2]);
+            map.put("sAddressDelivery4", isPurchase ? addressDeliveryCompany.length > 3 ? addressDeliveryCompany[3] : "" :
+                addressDelivery.length > 3 ? addressDelivery[3] : "");
+            map.put("sUserBuyer", sUserBuyer != null ? sUserBuyer : oUserBuyer.getUser());
+            map.put("sUserAuthorize", sUserAuthorize != null ? sUserAuthorize : oUserAuthorize.getUser());
+            map.put("nBizPartnerCategory", isPurchase ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
+            map.put("nIdTpCarSup", SModSysConsts.LOGS_TP_CAR_CAR);
+            map.put("sNotes", client.getSessionXXX().getParamsCompany().getNotesPurchasesOrder());
+
+            jasperPrint = SDataUtilities.fillReport(client, SDataConstantsSys.REP_TRN_DPS_ORDER, map);
+            
+            switch (pnPrintMode) {
+                case SDataConstantsPrint.PRINT_MODE_VIEWER:
+                    jasperViewer = new JasperViewer(jasperPrint, false);
+                    jasperViewer.setTitle("Impresión de pedido");
+                    jasperViewer.setVisible(true);
+                    break;
+                case SDataConstantsPrint.PRINT_MODE_PDF:
+                    outputStreamPdf = new FileOutputStream(dps.getNumberSeries() +
+                    (dps.getNumberSeries().isEmpty() ? "" : "_") + dps.getNumber() + ".pdf");
+
+                    JasperExportManager.exportReportToPdfStream(jasperPrint, outputStreamPdf);
+
+                    outputStreamPdf.close();
+                    break;
+                default:
+                    throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
             }
         }
         catch (Exception e) {

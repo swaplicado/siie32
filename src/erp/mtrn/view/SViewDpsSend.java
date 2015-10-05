@@ -23,6 +23,7 @@ import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.STrnUtilities;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
 import erp.table.STabFilterCompanyBranch;
@@ -164,6 +165,7 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
         mvSuscriptors.add(SDataConstants.BPSU_BP_CT);
         mvSuscriptors.add(SDataConstants.BPSU_BPB);
         mvSuscriptors.add(SDataConstants.TRN_DPS);
+        mvSuscriptors.add(SDataConstants.TRNX_DPS_AUTHORIZE_PEND);
         mvSuscriptors.add(SDataConstants.TRNX_DPS_SEND_PEND);
         mvSuscriptors.add(SDataConstants.TRNX_DPS_SENT);
         mvSuscriptors.add(SDataConstants.USRU_USR);
@@ -175,6 +177,14 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
 
     private boolean isDpsSendPending() {
         return mnTabType == SDataConstants.TRNX_DPS_SEND_PEND;
+    }
+    
+    private boolean isDpsPurchases() {
+        return mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR;
+    }
+    
+    private boolean isCfd() {
+        return mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_DOC || mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ADJ;
     }
 
     @Override
@@ -212,17 +222,21 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
         msSql += "(SELECT d.id_year, d.id_doc, d.dt, d.dt_doc_delivery_n, d.b_close, d.b_del, d.ts_close, " +
                     "d.num_ser, d.num, d.num_ref, CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
                     "d.ts_audit, d.tot_cur_r, dt.code, c.cur_key, b.id_bp, b.bp, bc.bp_key, bb.id_bpb, bb.bpb, cb.code AS code_bpb, ua.usr, " +
-                    "(SELECT COUNT(*) FROM trn_cfd_snd_log WHERE id_cfd = x.id_cfd " + (isDpsSendPending() ? " " : " AND b_snd = 0 ") + ") AS f_count_snd " +
+                    (isCfd() ? "(SELECT COUNT(*) FROM trn_cfd_snd_log WHERE id_cfd = x.id_cfd " :
+                                "(SELECT COUNT(*) FROM trn_dps_snd_log  WHERE id_year = d.id_year AND id_doc = d.id_doc ") + (isDpsSendPending() ? " " : " AND b_snd = 0 ") + ") AS f_count_snd " +
                     "FROM trn_dps AS d " +
                     "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps AND ";
 
-                 switch (mnTabTypeAux02) {
+                switch (mnTabTypeAux02) {
+                    case SDataConstantsSys.TRNX_TP_DPS_ORD:
+                        msSql += "d.fid_ct_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_ORD[0]) + " AND d.fid_cl_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_ORD[1]) + " AND d.fid_tp_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_ORD[2]) + " ";
+                        break;
                     case SDataConstantsSys.TRNX_TP_DPS_DOC:
-                        msSql += "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1] + " AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2] + " ";
+                        msSql += "d.fid_ct_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[0]) + " AND d.fid_cl_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1]) + " AND d.fid_tp_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2]) + " ";
                         break;
 
                     case SDataConstantsSys.TRNX_TP_DPS_ADJ:
-                        msSql += "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CN[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CN[1] + " AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CN[2] + " ";
+                        msSql += "d.fid_ct_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[0]) + " AND d.fid_cl_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[1]) + " AND d.fid_tp_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[2]) + " ";
                         break;
                     default:
                 }
@@ -231,12 +245,13 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
                     sqlDatePeriod + sqlCompanyBranch + sqlBizPartner +
                     "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
                     "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " +
-                    "INNER JOIN erp.bpsu_bp_ct AS bc ON b.id_bp = bc.id_bp AND bc.id_ct_bp = " + SDataConstantsSys.BPSS_CT_BP_CUS + " " +
+                    "INNER JOIN erp.bpsu_bp_ct AS bc ON b.id_bp = bc.id_bp AND bc.id_ct_bp = " + (isDpsPurchases() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS) + " " +
                     "INNER JOIN erp.bpsu_bpb AS cb ON d.fid_cob = cb.id_bpb " +
                     "INNER JOIN erp.bpsu_bpb AS bb ON d.fid_bpb = bb.id_bpb " +
                     "INNER JOIN erp.usru_usr AS ua ON d.fid_usr_audit = ua.id_usr " +
-                    "INNER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n AND d.id_doc = x.fid_dps_doc_n AND x.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " +
-                    "WHERE d.b_del = 0 AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " +
+                    (isCfd() ? "INNER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n AND d.id_doc = x.fid_dps_doc_n AND x.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_EMITED :
+                               "") + " " +
+                    "WHERE d.b_del = 0 AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + (isDpsPurchases() && mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ORD ? " AND d.b_authorn = 1 " : "") + " " +
                     (isDpsSendPending() ? "HAVING f_count_snd = 0 " : "HAVING f_count_snd > 0 ") +
                     "ORDER BY dt.code, d.num_ser, CAST(d.num AS UNSIGNED INTEGER), d.num, d.dt, b.bp, bc.bp_key, b.id_bp, bb.bpb, bb.id_bpb) ";
 
@@ -251,12 +266,15 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
                     "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps AND ";
 
                  switch (mnTabTypeAux02) {
+                    case SDataConstantsSys.TRNX_TP_DPS_ORD:
+                        msSql += "d.fid_ct_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_ORD[0]) + " AND d.fid_cl_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_ORD[1]) + " AND d.fid_tp_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_ORD[2]) + " ";
+                        break;
                     case SDataConstantsSys.TRNX_TP_DPS_DOC:
-                        msSql += "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1] + " AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2] + " ";
+                        msSql += "d.fid_ct_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[0]) + " AND d.fid_cl_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1]) + " AND d.fid_tp_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2]) + " ";
                         break;
 
                     case SDataConstantsSys.TRNX_TP_DPS_ADJ:
-                        msSql += "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CN[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CN[1] + " AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CN[2] + " ";
+                        msSql += "d.fid_ct_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[0]) + " AND d.fid_cl_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[1]) + " AND d.fid_tp_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[2]) + " ";
                         break;
                     default:
                 }
@@ -269,9 +287,10 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
                     "INNER JOIN erp.bpsu_bpb AS cb ON d.fid_cob = cb.id_bpb " +
                     "INNER JOIN erp.bpsu_bpb AS bb ON d.fid_bpb = bb.id_bpb " +
                     "INNER JOIN erp.usru_usr AS ua ON d.fid_usr_audit = ua.id_usr " +
-                    "INNER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n AND d.id_doc = x.fid_dps_doc_n AND x.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " +
-                    "INNER JOIN trn_cfd_snd_log AS s ON s.id_cfd = x.id_cfd AND s.b_snd = 1 " +
-                    "WHERE d.b_del = 0 AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " +
+                    (isCfd() ? "INNER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n AND d.id_doc = x.fid_dps_doc_n AND x.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " +
+                               "INNER JOIN trn_cfd_snd_log AS s ON s.id_cfd = x.id_cfd AND s.b_snd = 1 " :
+                               "INNER JOIN trn_dps_snd_log AS s ON s.id_year = d.id_year AND s.id_doc = d.id_doc AND s.b_snd = 1 ") + " " +
+                    "WHERE d.b_del = 0 AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + (isDpsPurchases() && mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ORD ? " AND d.b_authorn = 1 " : "") + " " +
                     "ORDER BY dt.code, d.num_ser, CAST(d.num AS UNSIGNED INTEGER), d.num, d.dt, b.bp, bc.bp_key, b.id_bp, bb.bpb, bb.id_bpb) ";
         }
 
@@ -306,22 +325,49 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
     }
 
     private void actionSendClose() {
-        int gui = SDataConstants.MOD_SAL;
+        boolean sendClose = true;
+        int gui = (isDpsPurchases() ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL);
 
         if (mjbSendClose.isEnabled()) {
             if (moTablePane.getSelectedTableRow() != null) {
-               if (miClient.showMsgBoxConfirm("¿Está seguro que desea marcar la factura como enviada?") == JOptionPane.YES_OPTION) {
+               if (miClient.showMsgBoxConfirm("¿Está seguro que desea marcar el documento como enviado?") == JOptionPane.YES_OPTION) {
                     try {
                         SDataDps oDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
                         
-                        if (oDps.getDbmsDataCfd() == null) {
-                            miClient.showMsgBoxInformation("No se encontró el archivo XML del documento.");
+                        switch (mnTabTypeAux02) {
+                            case SDataConstantsSys.TRNX_TP_DPS_DOC:
+                            case SDataConstantsSys.TRNX_TP_DPS_ADJ:
+                                if (oDps.getDbmsDataCfd() == null) {
+                                    miClient.showMsgBoxInformation("No se encontró el archivo XML del documento.");
+                                    sendClose = false;
+                                }
+                                break;
+                            case SDataConstantsSys.TRNX_TP_DPS_ORD:
+                                break;
+                            default:
                         }
-                        else {
-                            if (SCfdUtils.insertCfdSendLog(miClient, oDps.getDbmsDataCfd(), "N/A", true)) {
-                                miClient.getGuiModule(gui).refreshCatalogues(mnTabType);
+                        
+                        if (sendClose) {
+                            switch (mnTabTypeAux02) {
+                                case SDataConstantsSys.TRNX_TP_DPS_DOC:
+                                case SDataConstantsSys.TRNX_TP_DPS_ADJ:
+                                    if (!SCfdUtils.insertCfdSendLog(miClient, oDps.getDbmsDataCfd(), "N/A", true)) {
+                                        sendClose = false;
+                                    }
+                                    break;
+                                case SDataConstantsSys.TRNX_TP_DPS_ORD:
+                                    if (!STrnUtilities.insertDpsSendLog(miClient, oDps, "N/A", true)) {
+                                        sendClose = false;
+                                    }
+                                    break;
+                                default:
                             }
                         }
+                        
+                        if (sendClose) {
+                            miClient.getGuiModule(gui).refreshCatalogues(mnTabType);
+                        }
+                        
                     }
                     catch (Exception e) {
                         SLibUtilities.renderException(this, e);
@@ -332,7 +378,7 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
     }
 
     private void actionViewDps() {
-        int gui = SDataConstants.MOD_SAL;
+        int gui = (isDpsPurchases() ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL);
 
         if (moTablePane.getSelectedTableRow() != null) {
             miClient.getGuiModule(gui).setFormComplement(SDataConstantsSys.TRNU_TP_DPS_SAL_INV);
@@ -353,23 +399,28 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
     }
 
     private void actionSend() {
-        int gui = SDataConstants.MOD_SAL;
+        boolean send = false;
+        int gui = (isDpsPurchases() ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL);
+        
         if (mjbSend.isEnabled()) {
             if (moTablePane.getSelectedTableRow() != null) {
                 try {
-                    SCfdUtils.sendCfd((SClientInterface) miClient, SCfdConsts.CFD_TYPE_DPS, SCfdUtils.getCfd(miClient, SCfdConsts.CFD_TYPE_DPS, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_OLD);
-                    miClient.getGuiModule(gui).refreshCatalogues(mnTabType);
-                    
-                    /*
-                     * XXX Change to new structure of CFDI generation (jbarajas 2014-05-07)
-                     * 
-                    if (miClient.showMsgBoxConfirm("¿Está seguro que desea enviar la factura?") == JOptionPane.YES_OPTION) {
-                        if (STrnUtilities.sendMailSalesCfd(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey())) {
-                            miClient.getGuiModule(gui).refreshCatalogues(mnTabType);
-                            miClient.showMsgBoxInformation("Comprobante enviado.");
-                        }
+                    switch (mnTabTypeAux02) {
+                        case SDataConstantsSys.TRNX_TP_DPS_DOC:
+                        case SDataConstantsSys.TRNX_TP_DPS_ADJ:
+                            SCfdUtils.sendCfd((SClientInterface) miClient, SCfdConsts.CFD_TYPE_DPS, SCfdUtils.getCfd(miClient, SCfdConsts.CFD_TYPE_DPS, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_OLD);
+                            send = true;
+                            break;
+                        case SDataConstantsSys.TRNX_TP_DPS_ORD:
+                            STrnUtilities.sendMailOrder(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey(), mnTabTypeAux01);
+                            send = true;
+                            break;
+                        default:
                     }
-                    */
+                    
+                    if (send) {
+                        miClient.getGuiModule(gui).refreshCatalogues(mnTabType);
+                    }
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
