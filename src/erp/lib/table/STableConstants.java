@@ -92,6 +92,9 @@ public abstract class STableConstants {
     public static final int ICON_XML = 1101;
     public static final int ICON_XML_PEND = 1102;
     public static final int ICON_XML_SIGN = 1103;
+    public static final int ICON_XML_CANC = 1106;
+    public static final int ICON_XML_CANC_PDF = 1107;
+    public static final int ICON_XML_CANC_XML = 1108;
     public static final int ICON_MFG_ST = 1200;
     public static final int ICON_MFG_ST_01 = 1201;
     public static final int ICON_MFG_ST_02 = 1202;
