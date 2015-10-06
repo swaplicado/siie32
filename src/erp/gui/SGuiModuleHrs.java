@@ -593,7 +593,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                     }
                     break;
                 case SDataConstants.TRN_CFD_SND_LOG:
-                    oViewClass = erp.mtrn.view.SViewDpsSendingLog.class;
+                    oViewClass = erp.mtrn.view.SViewCfdSendingLog.class;
                     sViewTitle = "Bitácora envíos CFDI";
                     switch (auxType01) {
                         case SCfdConsts.CFDI_PAYROLL_VER_OLD:

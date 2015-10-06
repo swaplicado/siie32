@@ -38,6 +38,7 @@ import erp.mitm.data.SDataItem;
 import erp.mmkt.data.SDataCustomerBranchConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SCfdParams;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
@@ -7395,6 +7396,21 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 validation.setMessage("Se debe ingresar un valor diferente para el campo '" + jlSalesAgent.getText() + "'.");
                 validation.setComponent(jbSalesAgent);
                 jTabbedPane.setSelectedIndex(1);
+            }
+            
+            if (!validation.getIsError()) {
+                for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
+                    SDataDpsEntry entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
+                    
+                    try {
+                        STrnUtils.canBeUsedItemDps(miClient.getSession(), moDps.getDpsTypeKey(), entry.getFkItemId(), entry.hasDpsLinksAsDestiny());
+                    }
+                    catch (Exception e) {
+                        validation.setMessage(e.getMessage());
+                        validation.setComponent(moPaneGridEntries);
+                        SLibUtilities.printOutException(this, e);
+                    }
+                }
             }
             
             if (!validation.getIsError() && mbIsCon) {

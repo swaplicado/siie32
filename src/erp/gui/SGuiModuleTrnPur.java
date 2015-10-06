@@ -65,6 +65,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiCatBizPartnerBlocking;
     private javax.swing.JMenu jmCatCfg;
     private javax.swing.JMenuItem jmiCatCfgCostCenterItem;
+    private javax.swing.JMenuItem jmiCatSendingDpsLog;
     private javax.swing.JMenu jmEst;
     private javax.swing.JMenuItem jmiEstimates;
     private javax.swing.JMenuItem jmiEstimatesLinkPend;
@@ -92,6 +93,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiOrdersAutorizedPending;
     private javax.swing.JMenuItem jmiOrdersAutorizedAutorized;
     private javax.swing.JMenuItem jmiOrdersAutorizedRejected;
+    private javax.swing.JMenuItem jmiOrdersSendPendingEmail;
+    private javax.swing.JMenuItem jmiOrdersSentEmail;
     private javax.swing.JMenuItem jmiOrdersPriceHistory;
     private javax.swing.JMenuItem jmiOrdersPrice;
     private javax.swing.JMenu jmDps;
@@ -226,6 +229,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatBizPartnerBlocking = new JMenuItem("Bloqueo de proveedores");
         jmCatCfg = new JMenu("Contabilización automática");
         jmiCatCfgCostCenterItem = new JMenuItem("Configuración de centros de costo vs. ítems");
+        jmiCatSendingDpsLog = new JMenuItem("Bitácora de envíos de docs.");
         jmCatCfg.add(jmiCatCfgCostCenterItem);
         jmCat.add(jmiCatDpsDncDocumentNumberSeries);
         jmCat.add(jmiCatDiogDncDocumentNumberSeries);
@@ -233,6 +237,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmCat.add(jmiCatBizPartnerBlocking);
         jmCat.addSeparator();
         jmCat.add(jmCatCfg);
+        jmCat.addSeparator();
+        jmCat.add(jmiCatSendingDpsLog);
         
         jmEst = new JMenu("Cotizaciones");
         jmiEstimates = new JMenuItem("Cotizaciones de compras");
@@ -284,6 +290,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiOrdersAutorizedPending = new JMenuItem("Pedidos por autorizar");
         jmiOrdersAutorizedAutorized = new JMenuItem("Pedidos autorizados");
         jmiOrdersAutorizedRejected = new JMenuItem("Pedidos rechazados");
+        jmiOrdersSendPendingEmail = new JMenuItem("Pedidos por enviar por correo-e");
+        jmiOrdersSentEmail = new JMenuItem("Pedidos enviados por correo-e");
         jmiOrdersPriceHistory = new JMenuItem("Historial de precios de compras");
         jmiOrdersPrice = new JMenuItem("Precios de compras");
         jmOrd.add(jmiOrders);
@@ -300,6 +308,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmOrd.add(jmiOrdersAutorizedPending);
         jmOrd.add(jmiOrdersAutorizedAutorized);
         jmOrd.add(jmiOrdersAutorizedRejected);
+        jmOrd.addSeparator();
+        jmOrd.add(jmiOrdersSendPendingEmail);
+        jmOrd.add(jmiOrdersSentEmail);
         jmOrd.addSeparator();
         jmOrd.add(jmiOrdersPriceHistory);
         jmOrd.add(jmiOrdersPrice);
@@ -509,6 +520,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatDiogDncDocumentNumberSeries.addActionListener(this);
         jmiCatBizPartnerBlocking.addActionListener(this);
         jmiCatCfgCostCenterItem.addActionListener(this);
+        jmiCatSendingDpsLog.addActionListener(this);
         jmiEstimates.addActionListener(this);
         jmiEstimatesLinkPend.addActionListener(this);
         jmiEstimatesLinked.addActionListener(this);
@@ -533,6 +545,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiOrdersAutorizedPending.addActionListener(this);
         jmiOrdersAutorizedAutorized.addActionListener(this);
         jmiOrdersAutorizedRejected.addActionListener(this);
+        jmiOrdersSendPendingEmail.addActionListener(this);
+        jmiOrdersSentEmail.addActionListener(this);
         jmiOrdersPriceHistory.addActionListener(this);
         jmiOrdersPrice.addActionListener(this);
         jmiDpsDoc.addActionListener(this);
@@ -634,11 +648,14 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatDiogDncDocumentNumberSeries.setEnabled(hasRightDnsDiog);
         jmiCatBizPartnerBlocking.setEnabled(hasRightBizPartnerBlocking);
         jmCatCfg.setEnabled(hasRightItemConfig);
+        jmiCatSendingDpsLog.setEnabled(hasRightDocOrder);
         jmEst.setEnabled(hasRightDocEstimate);
 
         jmCon.setEnabled(hasRightDocEstimate);
 
         jmOrd.setEnabled(hasRightDocOrder || hasRightDocOrderAuthorize);
+        jmiOrdersSendPendingEmail.setEnabled(hasRightDocOrder);
+        jmiOrdersSentEmail.setEnabled(hasRightDocOrder);
         jmiOrdersPriceHistory.setEnabled(hasRightDocOrder && levelRightDocOrder >= SUtilConsts.LEV_AUTHOR);
         jmiOrdersPrice.setEnabled(hasRightDocOrder && levelRightDocOrder >= SUtilConsts.LEV_AUTHOR);
 
@@ -966,6 +983,11 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                     oViewClass = erp.mfin.view.SViewCostCenterItem.class;
                     sViewTitle = "Config. centros costo ítems";
                     break;
+                    
+                case SDataConstants.TRN_DPS_SND_LOG:
+                    oViewClass = erp.mtrn.view.SViewDpsSendingLog.class;
+                    sViewTitle = "CPA - bitácora envíos docs.";
+                    break;
 
                 case SDataConstants.TRN_DPS:
                     oViewClass = erp.mtrn.view.SViewDps.class;
@@ -1043,6 +1065,16 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                 case SDataConstants.TRNX_DPS_AUDITED:
                     oViewClass = erp.mtrn.view.SViewDpsAudit.class;
                     sViewTitle = "CPA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02) + " auditad@s";
+                    break;
+
+                case SDataConstants.TRNX_DPS_SEND_PEND:
+                    oViewClass = erp.mtrn.view.SViewDpsSend.class;
+                    sViewTitle = "CPA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02) + " x enviar x correo-e";
+                    break;
+
+                case SDataConstants.TRNX_DPS_SENT:
+                    oViewClass = erp.mtrn.view.SViewDpsSend.class;
+                    sViewTitle = "CPA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02) + " enviad@s x correo-e";
                     break;
 
                 case SDataConstants.TRNX_PRICE_HIST:
@@ -1266,6 +1298,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiCatCfgCostCenterItem) {
                 showView(SDataConstants.FIN_CC_ITEM);
             }
+            else if (item == jmiCatSendingDpsLog) {
+                showView(SDataConstants.TRN_DPS_SND_LOG, SDataConstantsSys.TRNS_CT_DPS_PUR);
+            }
             else if (item == jmiEstimates) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_EST_EST);
             }
@@ -1337,6 +1372,12 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiOrdersAutorizedRejected) {
                 showView(SDataConstants.TRNX_DPS_AUTHORIZE_PEND, SDataConstantsSys.TRNX_DPS_PUR_ORD_AUT_REJ);
+            }
+            else if (item == jmiOrdersSendPendingEmail) {
+                showView(SDataConstants.TRNX_DPS_SEND_PEND, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_ORD);
+            }
+            else if (item == jmiOrdersSentEmail) {
+                showView(SDataConstants.TRNX_DPS_SENT, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_ORD);
             }
             else if (item == jmiOrdersPrice) {
                 showView(SDataConstants.MKT_PLIST_ITEM, SDataConstantsSys.TRNS_CT_DPS_PUR);
