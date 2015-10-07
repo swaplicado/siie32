@@ -603,6 +603,7 @@ public abstract class SModConsts {
     public static final int HRS_ACC_DED = 2063132;
     public static final int HRS_PAY = 2063201;
     public static final int HRS_PAY_RCP = 2063211;
+    public static final int HRS_PAY_RCP_ISS = 2063216;
     public static final int HRS_PAY_RCP_DAY = 2063221;
     public static final int HRS_PAY_RCP_EAR = 2063231;
     public static final int HRS_PAY_RCP_EAR_CMP = 2063236;
@@ -1095,6 +1096,7 @@ public abstract class SModConsts {
         TablesMap.put(HRS_ACC_DED, "hrs_acc_ded");
         TablesMap.put(HRS_PAY, "hrs_pay");
         TablesMap.put(HRS_PAY_RCP, "hrs_pay_rcp");
+        TablesMap.put(HRS_PAY_RCP_ISS, "hrs_pay_rcp_iss");
         TablesMap.put(HRS_PAY_RCP_DAY, "hrs_pay_rcp_day");
         TablesMap.put(HRS_PAY_RCP_EAR, "hrs_pay_rcp_ear");
         TablesMap.put(HRS_PAY_RCP_EAR_CMP, "hrs_pay_rcp_ear_cmp");
