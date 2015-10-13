@@ -280,37 +280,37 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbGetXml = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML));
         jbGetXml.setPreferredSize(new Dimension(23, 23));
         jbGetXml.addActionListener(this);
-        jbGetXml.setToolTipText("Obtener XML");
+        jbGetXml.setToolTipText("Obtener XML del comprobante");
 
         jbGetAcknowledgmentCancellation = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_CANCEL));
         jbGetAcknowledgmentCancellation.setPreferredSize(new Dimension(23, 23));
         jbGetAcknowledgmentCancellation.addActionListener(this);
-        jbGetAcknowledgmentCancellation.setToolTipText("Obtener acuse de cancelación");
+        jbGetAcknowledgmentCancellation.setToolTipText("Obtener XML del acuse de cancelación del CFDI");
 
         jbSignXml = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_SIGN));
         jbSignXml.setPreferredSize(new Dimension(23, 23));
         jbSignXml.addActionListener(this);
-        jbSignXml.setToolTipText("Timbrar XML");
+        jbSignXml.setToolTipText("Timbrar CFDI");
 
         jbVerifyCfdi = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_ok.gif")));
         jbVerifyCfdi.setPreferredSize(new Dimension(23, 23));
         jbVerifyCfdi.addActionListener(this);
-        jbVerifyCfdi.setToolTipText("Verificar CFDI");
+        jbVerifyCfdi.setToolTipText("Verificar timbrado o cancelación del CFDI");
 
         jbRestoreSignXml = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_insert.gif")));
         jbRestoreSignXml.setPreferredSize(new Dimension(23, 23));
         jbRestoreSignXml.addActionListener(this);
-        jbRestoreSignXml.setToolTipText("Restaurar CFDI timbrado");
+        jbRestoreSignXml.setToolTipText("Insertar XML timbrado del CFDI");
 
         jbRestoreAcknowledgmentCancellation = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_insert.gif")));
         jbRestoreAcknowledgmentCancellation.setPreferredSize(new Dimension(23, 23));
         jbRestoreAcknowledgmentCancellation.addActionListener(this);
-        jbRestoreAcknowledgmentCancellation.setToolTipText("Restaurar acuse de cancelación");
+        jbRestoreAcknowledgmentCancellation.setToolTipText("Insertar PDF del acuse de cancelación del CFDI");
 
         jbDiactivateFlags = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif")));
         jbDiactivateFlags.setPreferredSize(new Dimension(23, 23));
         jbDiactivateFlags.addActionListener(this);
-        jbDiactivateFlags.setToolTipText("Desactivar banderas CFDI");
+        jbDiactivateFlags.setToolTipText("Limpiar inconsistencias del timbrado o cancelación del CFDI");
 
         moTabFilterUser = new STabFilterUsers(miClient, this);
         moTabFilterUser.removeButtonUser();
