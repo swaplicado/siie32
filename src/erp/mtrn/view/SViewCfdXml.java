@@ -16,6 +16,7 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableSetting;
 import erp.mod.SModConsts;
+import sa.lib.grid.SGridConsts;
 
 /**
  *
@@ -118,7 +119,15 @@ public class SViewCfdXml extends erp.lib.table.STableTab implements java.awt.eve
          msSql = "SELECT d.dt AS f_dt, dt.code AS f_tp_doc, tp.tp_cfd, " + (!isCfdiSignPending() ? "vt.pac AS f_pac, " : "") +
                  "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, cob.code AS f_cob, dx.uuid, " +
                  "IF(d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + STableConstants.ICON_ST_ANNUL + ", " + STableConstants.ICON_NULL + ") AS f_ico, " +
-                 "IF(dx.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(dx.uuid) = 0, " + STableConstants.ICON_XML_PEND + ", " + STableConstants.ICON_XML_SIGN + ") AS f_ico_xml " +
+                 //"IF(dx.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(dx.uuid) = 0, " + STableConstants.ICON_XML_PEND + ", " + STableConstants.ICON_XML_SIGN + ") AS f_ico_xml " +
+                 "IF(dx.ts IS NULL OR dx.doc_xml = '', " + STableConstants.ICON_NULL  + ", " + /* not is CFD not is CFDI */
+                 "IF(dx.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFD + " OR dx.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_NA + ", " + STableConstants.ICON_XML + ", " + /* is CFD */
+                 "IF(dx.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(dx.uuid) = 0, " + STableConstants.ICON_XML_PEND + ", " + /* CFDI pending sign */
+                 "IF(LENGTH(dx.ack_can_xml) = 0 AND dx.ack_can_pdf_n IS NULL, " + STableConstants.ICON_XML_SIGN  + ", " + /* CFDI signed, canceled only SIIE */
+                 "IF(LENGTH(dx.ack_can_xml) != 0, " + STableConstants.ICON_XML_CANC_XML + ", " + /* CFDI canceled with cancellation acknowledgment in XML format */
+                 "IF(dx.ack_can_pdf_n IS NOT NULL, " + STableConstants.ICON_XML_CANC_PDF + ", " + /* CFDI canceled with cancellation acknowledgment in PDF format */
+                 STableConstants.ICON_XML_SIGN + " " + /* CFDI signed, canceled only SIIE */
+                 ")))))) AS f_ico_xml " +
                  "FROM trn_dps AS d " +
                  "INNER JOIN trn_cfd AS dx ON d.id_year = dx.fid_dps_year_n AND d.id_doc = dx.fid_dps_doc_n ";
          
@@ -138,8 +147,16 @@ public class SViewCfdXml extends erp.lib.table.STableTab implements java.awt.eve
                  
                  "SELECT dx.ts AS f_dt, '' AS f_tp_doc, tp.tp_cfd, " + (!isCfdiSignPending() ? "vt.pac AS f_pac, " : "") +
                  "CONCAT(hr.num_ser, IF(length(hr.num_ser) = 0, '', '-'), hr.num) AS f_num, '' AS f_cob, dx.uuid, " +
-                 "IF(dx.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + STableConstants.ICON_ST_ANNUL + ", " + STableConstants.ICON_NULL + ") AS f_ico, " +
-                 "IF(dx.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + ", " + STableConstants.ICON_XML_PEND + ", " + STableConstants.ICON_XML_SIGN + ") AS f_ico_xml " +
+                 (isCfdiPayrollVersionOld() ? "IF(dx.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + STableConstants.ICON_ST_ANNUL + ", " + STableConstants.ICON_NULL + ") AS f_ico, " +
+                 "IF(dx.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + ", " + STableConstants.ICON_XML_PEND + ", " + STableConstants.ICON_XML_SIGN + ") AS f_ico_xml " :
+                 "IF(hr.fk_st_rcp = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + STableConstants.ICON_ST_ANNUL + ", " + STableConstants.ICON_NULL + ") AS f_ico, " +
+                 "IF(dx.ts IS NULL OR dx.doc_xml = '', " + STableConstants.ICON_NULL  + ", " /* without icon (not have CFDI associated) */ +
+                 "IF(dx.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(dx.uuid) = 0, " + STableConstants.ICON_XML_PEND + ", " /* CFDI pending sign */ +
+                 "IF(LENGTH(dx.ack_can_xml) = 0 AND dx.ack_can_pdf_n IS NULL, " + STableConstants.ICON_XML_SIGN + ", " /* CFDI signed, canceled only SIIE */ +
+                 "IF(LENGTH(dx.ack_can_xml) != 0, " + STableConstants.ICON_XML_CANC_XML + ", " /* CFDI canceled with cancellation acknowledgment in XML format */ +
+                 "IF(dx.ack_can_pdf_n IS NOT NULL, " + STableConstants.ICON_XML_CANC_PDF + ", " /* CFDI canceled with cancellation acknowledgment in PDF format */ +
+                 SGridConsts.ICON_XML_ISSU + "" /* CFDI signed, canceled only SIIE */ +
+                 "))))) AS f_ico_xml ") +
                  "FROM trn_cfd AS dx ";
          
          if (!isCfdiSignPending()) {
@@ -148,7 +165,9 @@ public class SViewCfdXml extends erp.lib.table.STableTab implements java.awt.eve
          }
                          
         msSql += (isCfdiPayrollVersionOld() ? "INNER JOIN hrs_sie_pay_emp AS hr ON dx.fid_pay_pay_n = hr.id_pay AND dx.fid_pay_emp_n = hr.id_emp AND dx.fid_pay_bpr_n = hr.fid_bpr_n AND hr.b_del = FALSE " : 
-                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS hr ON dx.fid_pay_rcp_pay_n = hr.id_pay AND dx.fid_pay_rcp_emp_n = hr.id_emp ") +
+                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS r ON dx.fid_pay_rcp_pay_n = r.id_pay AND dx.fid_pay_rcp_emp_n = r.id_emp " +
+                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS hr ON " +
+                 "r.id_pay = hr.id_pay AND r.id_emp = hr.id_emp AND hr.b_del = 0 AND hr.id_iss = dx.fid_pay_rcp_iss_n ") +
                  "INNER JOIN erp.trns_tp_cfd AS tp ON dx.fid_tp_cfd = tp.id_tp_cfd " +
                  "WHERE dx.fid_tp_cfd = " + (isCfdiPayroll() ? SDataConstantsSys.TRNS_TP_CFD_PAY : SDataConstantsSys.TRNS_TP_CFD_CFD)+ " AND dx.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFDI + " AND hr.b_del = 0 " + 
                  "AND NOT (dx.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND dx.b_con = 0) " + (isCfdiSignPending() ? " AND LENGTH(dx.uuid) = 0 " : " AND LENGTH(dx.uuid) <> 0 ") + sqlDatePeriodPayroll + " " +

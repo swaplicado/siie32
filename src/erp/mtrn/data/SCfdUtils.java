@@ -36,6 +36,7 @@ import erp.lib.SLibUtilities;
 import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mcfg.data.SDataCertificate;
+import erp.mhrs.data.SDataPayrollReceiptIssue;
 import erp.mmkt.data.SDataCustomerBranchConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -345,7 +346,7 @@ public abstract class SCfdUtils implements Serializable {
 
         if (mnLogSignId == 0) {
             cfdSignLog.setDate(client.getSession().getCurrentDate());
-            cfdSignLog.setIsSystem(pacId != 0 ? false : true);
+            cfdSignLog.setIsSystem(pacId == SLibConsts.UNDEFINED);
             cfdSignLog.setIsDeleted(false);
             cfdSignLog.setFkCfdId(cfd.getPkCfdId());
             cfdSignLog.setFkPacId_n(pacId);
@@ -609,6 +610,7 @@ public abstract class SCfdUtils implements Serializable {
         SCfdiSignature cfdiSign = null;
         SCfdPacket packet = null;
         SDataDps dps = null;
+        SDataPayrollReceiptIssue receiptIssue = null;
         SDataCfd cfdAuxPrint = null;
         SDataCfdPacType cfdPacType = null;
         SDataPac pac = null;
@@ -626,6 +628,16 @@ public abstract class SCfdUtils implements Serializable {
                 // Attempt to gain data lock:
 
                 lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, dps.getPrimaryKey(), 1000 * 60);     // 1 minute timeout
+            }
+            else if (cfd.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_PAY) {
+                receiptIssue = new SDataPayrollReceiptIssue();
+                
+                if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, client.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                }
+                // Attempt to gain data lock:
+
+                lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SModConsts.HRS_PAY_RCP_ISS, receiptIssue.getPrimaryKey(), 1000 * 60);     // 1 minute timeout
             }
 
             if (status == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
@@ -681,6 +693,7 @@ public abstract class SCfdUtils implements Serializable {
                         packet.setPacId(pac.getPkPacId());
                         packet.setIsConsistent(true);
                         packet.setDps(cfd.getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_ANNULED ? dps : null);
+                        packet.setPayrollReceiptIssue(cfd.getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_ANNULED ? receiptIssue : null);
                         packet.setLogSignId(mnLogSignId);
 
                         packet.setStringSigned(cfd.getStringSigned());
@@ -702,7 +715,7 @@ public abstract class SCfdUtils implements Serializable {
                         packet.setUuid(cfdiSign.getUuid());
                         packet.setQuantityStamp(status == SDataConstantsSys.TRNS_ST_DPS_EMITED ? 1 : (pac.getIsPrepayment() && pac.getIsChargedAnnulment() ? 1 : 0) );
                         packet.setConsumeStamp(consumeStamp);
-                        packet.setGenerateQrCode(status == SDataConstantsSys.TRNS_ST_DPS_ANNULED ? false : true);
+                        packet.setGenerateQrCode(status != SDataConstantsSys.TRNS_ST_DPS_ANNULED);
                         if (status == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
                             packet.setXml(cfd.getDocXml());
                         }
@@ -756,6 +769,7 @@ public abstract class SCfdUtils implements Serializable {
             if (lock != null) {
                 SSrvUtils.releaseLock(client.getSession(), lock);
             }
+            client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
 
         return next;
@@ -1791,11 +1805,12 @@ public abstract class SCfdUtils implements Serializable {
             }
         }
     }
-
+    
     private static void  processAnnul(final SClientInterface client, final SDataCfd cfd) throws Exception {
         int result = SLibConstants.UNDEFINED;
         String error = "";
         SDataDps dps = null;
+        SDataPayrollReceiptIssue receiptIssue = null;
         SSrvLock lock = null;
         SServerRequest request = null;
         SServerResponse response = null;
@@ -1854,6 +1869,58 @@ public abstract class SCfdUtils implements Serializable {
             else {
                 // Annul Payroll CFDI:
 
+                receiptIssue = new SDataPayrollReceiptIssue();
+                
+                if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, client.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                }
+                
+                // Attempt to gain data lock:
+
+                lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, receiptIssue.getPrimaryKey(), 1000 * 60);     // 1 minute timeout
+
+                if (receiptIssue != null) {
+                    request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL);
+                    request.setPacket(receiptIssue);
+                    response = client.getSessionXXX().request(request);
+
+                    if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+                        error = response.getMessage();
+                    }
+                    else {
+                        result = response.getResultType();
+
+                        if (result != SLibConstants.DB_CAN_ANNUL_YES) {
+                            error = SLibConstants.MSG_ERR_DB_REG_ANNUL_CAN + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage());
+                        }
+                        else {
+                            // Annul registry:
+
+                            receiptIssue.setIsRegistryRequestAnnul(true);
+                            receiptIssue.setFkUserUpdateId(client.getSession().getUser().getPkUserId());
+
+                            request = new SServerRequest(SServerConstants.REQ_DB_ACTION_ANNUL);
+                            request.setPacket(receiptIssue);
+                            response = client.getSessionXXX().request(request);
+
+                            if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+                                error = response.getMessage();
+                            }
+                            else {
+                                result = response.getResultType();
+
+                                if (result != SLibConstants.DB_ACTION_ANNUL_OK) {
+                                    error = SLibConstants.MSG_ERR_DB_REG_ANNUL + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage());
+                                }
+                            }
+                        }
+                    }
+                }
+                else {
+                    error = SLibConstants.MSG_ERR_DB_REG_READ;
+                }
+
+                /*
                 request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL);
                 request.setPacket(cfd);
                 response = client.getSessionXXX().request(request);
@@ -1886,6 +1953,7 @@ public abstract class SCfdUtils implements Serializable {
                         }
                     }
                 }
+                */
             }
 
             if (!error.isEmpty()) {
@@ -1935,7 +2003,7 @@ public abstract class SCfdUtils implements Serializable {
             nodeList = node.getChildNodes();
 
             if (nodeList == null) {
-                throw new Exception("XML element '" + "tfd:TimbreFiscalDigital" + "' does not have child elements!");
+                throw new Exception("XML element '" + "cfdi:Complemento" + "' does not have child elements!");
             }
             else {
                 for (int i = 0; i < nodeList.getLength(); i++) {
@@ -1946,37 +2014,42 @@ public abstract class SCfdUtils implements Serializable {
                 }
             }
 
-            namedNodeMap = nodeChild.getAttributes();
+            if (nodeChild == null) {
+                throw new Exception("XML element '" + "tfd:TimbreFiscalDigital" + "' does not exists!");
+            }
+            else {
+                namedNodeMap = nodeChild.getAttributes();
 
-            node = namedNodeMap.getNamedItem("UUID");
-            cfdiSign.setUuid(node.getNodeValue());
+                node = namedNodeMap.getNamedItem("UUID");
+                cfdiSign.setUuid(node.getNodeValue());
 
-            node = namedNodeMap.getNamedItem("FechaTimbrado");
-            cfdiSign.setFechaTimbrado(node.getNodeValue());
+                node = namedNodeMap.getNamedItem("FechaTimbrado");
+                cfdiSign.setFechaTimbrado(node.getNodeValue());
 
-            node = namedNodeMap.getNamedItem("selloCFD");
-            cfdiSign.setSelloCFD(node.getNodeValue());
+                node = namedNodeMap.getNamedItem("selloCFD");
+                cfdiSign.setSelloCFD(node.getNodeValue());
 
-            node = namedNodeMap.getNamedItem("noCertificadoSAT");
-            cfdiSign.setNoCertificadoSAT(node.getNodeValue());
+                node = namedNodeMap.getNamedItem("noCertificadoSAT");
+                cfdiSign.setNoCertificadoSAT(node.getNodeValue());
 
-            node = namedNodeMap.getNamedItem("selloSAT");
-            cfdiSign.setSelloSAT(node.getNodeValue());
+                node = namedNodeMap.getNamedItem("selloSAT");
+                cfdiSign.setSelloSAT(node.getNodeValue());
 
-            node = SXmlUtils.extractElements(doc, "cfdi:Emisor").item(0);
-            namedNodeMap = node.getAttributes();
-            node = namedNodeMap.getNamedItem("rfc");
-            cfdiSign.setRfcEmisor(node.getNodeValue());
+                node = SXmlUtils.extractElements(doc, "cfdi:Emisor").item(0);
+                namedNodeMap = node.getAttributes();
+                node = namedNodeMap.getNamedItem("rfc");
+                cfdiSign.setRfcEmisor(node.getNodeValue());
 
-            node = SXmlUtils.extractElements(doc, "cfdi:Receptor").item(0);
-            namedNodeMap = node.getAttributes();
-            node = namedNodeMap.getNamedItem("rfc");
-            cfdiSign.setRfcReceptor(node.getNodeValue());
+                node = SXmlUtils.extractElements(doc, "cfdi:Receptor").item(0);
+                namedNodeMap = node.getAttributes();
+                node = namedNodeMap.getNamedItem("rfc");
+                cfdiSign.setRfcReceptor(node.getNodeValue());
 
-            node = SXmlUtils.extractElements(doc, "cfdi:Comprobante").item(0);
-            namedNodeMap = node.getAttributes();
-            node = namedNodeMap.getNamedItem("total");
-            cfdiSign.setTotalCy(Double.parseDouble(node.getNodeValue()));
+                node = SXmlUtils.extractElements(doc, "cfdi:Comprobante").item(0);
+                namedNodeMap = node.getAttributes();
+                node = namedNodeMap.getNamedItem("total");
+                cfdiSign.setTotalCy(Double.parseDouble(node.getNodeValue()));
+            }
         }
         catch (Exception e) {
             SLibUtils.showException(SCfdUtils.class.getName(), e);
@@ -2061,14 +2134,19 @@ public abstract class SCfdUtils implements Serializable {
     }
 
     public static void resetCfdiDiactivateFlags(final SClientInterface client, final SDataCfd cfd) throws Exception {
-        if (client.showMsgBoxConfirm("Si desactiva las banderas del CFDI puede que se timbre o cancele dos veces.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
-            if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
+        if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
+        }
+        else {
+            if (!isSignedByFinkok(client, cfd)) {
+                if (client.showMsgBoxConfirm("Si limpia las inconsistencias del timbrado o cancelación del CFDI puede " + (!cfd.isStamped() ? "timbrarse dos veces" : "ser que ya esté cancelado") + " el CFDI.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                    updateProcessCfd(client, cfd, false);
+                    mnLogSignId = 0;
+                    createSignCancelLog(client, "", SCfdConsts.ACTION_DIACTIVATE, SCfdConsts.STATUS_NA, cfd, SLibConsts.UNDEFINED);
+                }
             }
             else {
-                updateProcessCfd(client, cfd, false);
-                mnLogSignId = 0;
-                createSignCancelLog(client, "", SCfdConsts.ACTION_DIACTIVATE, SCfdConsts.STATUS_NA, cfd, 0);
+                throw new Exception("El PAC permite la verificación del timbrado o cancelación del CFDI.");
             }
         }
     }
@@ -2381,6 +2459,12 @@ public abstract class SCfdUtils implements Serializable {
         }
     }
 
+    public static void  processAnnul(final SClientInterface client, final ArrayList<SDataCfd> cfds) throws Exception {
+        for (SDataCfd cfd : cfds) {
+            processAnnul(client, cfd);
+        }
+    }
+
     public static boolean deletePayroll(final SClientInterface client, int payrollId) throws Exception {
         String sql = "";
         ResultSet resultSet = null;
@@ -2581,7 +2665,8 @@ public abstract class SCfdUtils implements Serializable {
                 managementCfdi(client, cfd, SDataConstantsSys.TRNS_ST_DPS_ANNULED, null, true, true, pac == null ? 0 : pac.getPkPacId(), subtypeCfd, "", true);
                 isRestore = true;
             }
-            else {createSignCancelLog(client, "El archivo proporcionado es erróneo.", !cfd.isStamped() ? SCfdConsts.ACTION_RESTORE_SIGN : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_NA, cfd, pac.getPkPacId());
+            else {
+                createSignCancelLog(client, "El archivo proporcionado es erróneo.", !cfd.isStamped() ? SCfdConsts.ACTION_RESTORE_SIGN : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_NA, cfd, pac.getPkPacId());
                 throw new Exception("El archivo proporcionado es erróneo.");
             }
         }
@@ -3047,14 +3132,12 @@ public abstract class SCfdUtils implements Serializable {
         boolean signed = false;
         ArrayList<SDataCfd> cfdsValidate = null;
 
-        if (cfd.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_PAY) {
-            cfdsValidate = getPayrollCfds(client, subtypeCfd,  new int[] { subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? cfd.getFkPayrollPayrollId_n() : cfd.getFkPayrollReceiptPayrollId_n()});
-        }
-
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
         }
-        else {
+        else if (cfd.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_PAY) {
+            cfdsValidate = getPayrollCfds(client, subtypeCfd,  new int[] { subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? cfd.getFkPayrollPayrollId_n() : cfd.getFkPayrollReceiptPayrollId_n()});
+            
             if (existsCfdiEmitInconsist(client, cfdsValidate)) {
                 signed = signCfdi(client, cfd, subtypeCfd, true);
             }
@@ -3431,6 +3514,7 @@ public abstract class SCfdUtils implements Serializable {
 
     public static ArrayList<SDataCfd> getPayrollCfds(final SClientInterface client, final int typeCfd, final int[] payrollKey) throws Exception {
         String sql = "";
+        String sqlInner = "";
         String sqlWhere = "";
         ResultSet resultSet = null;
         ArrayList<SDataCfd> cfds = null;
@@ -3440,17 +3524,19 @@ public abstract class SCfdUtils implements Serializable {
 
         switch (typeCfd) {
             case SCfdConsts.CFDI_PAYROLL_VER_OLD:
-                sqlWhere = "WHERE NOT (fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND b_con = 0) AND fid_pay_pay_n = " + payrollKey[0] + " ORDER BY id_cfd ";
+                sqlWhere = "WHERE NOT (c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND c.b_con = 0) AND c.fid_pay_pay_n = " + payrollKey[0] + " ORDER BY c.id_cfd ";
                 break;
             case SCfdConsts.CFDI_PAYROLL_VER_CUR:
-                sqlWhere = "WHERE NOT (fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND b_con = 0) AND fid_pay_rcp_pay_n = " + payrollKey[0] + " ORDER BY id_cfd ";
+                sqlInner = "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
+                            + "c.fid_pay_rcp_pay_n = pei.id_pay AND c.fid_pay_rcp_emp_n = pei.id_emp AND c.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 AND pei.fk_st_rcp = "  + SModSysConsts.TRNS_ST_DPS_EMITED + " ";
+                sqlWhere = "WHERE NOT (c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND c.b_con = 0) AND c.fid_pay_rcp_pay_n = " + payrollKey[0] + " ORDER BY c.id_cfd ";
                 break;
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
 
-        sql = "SELECT id_cfd " +
-                "FROM trn_cfd " + sqlWhere;
+        sql = "SELECT c.id_cfd " +
+                "FROM trn_cfd AS c " + sqlInner + sqlWhere;
 
         resultSet = client.getSession().getStatement().executeQuery(sql);
         while (resultSet.next()) {
@@ -3473,7 +3559,7 @@ public abstract class SCfdUtils implements Serializable {
                 sqlWhere = "WHERE  fid_pay_pay_n = " + payrollReceiptKey[0] + " AND fid_pay_emp_n = " + payrollReceiptKey[1] + " AND fid_pay_bpr_n = " + payrollReceiptKey[2] + " ORDER BY id_cfd DESC LIMIT 1 ";
                 break;
             case SCfdConsts.CFDI_PAYROLL_VER_CUR:
-                sqlWhere = "WHERE fid_pay_rcp_pay_n = " + payrollReceiptKey[0] + " AND fid_pay_rcp_emp_n = " + payrollReceiptKey[1] + " ORDER BY id_cfd DESC LIMIT 1 ";
+                sqlWhere = "WHERE fid_pay_rcp_pay_n = " + payrollReceiptKey[0] + " AND fid_pay_rcp_emp_n = " + payrollReceiptKey[1] + " AND fid_pay_rcp_iss_n = " + payrollReceiptKey[2] + " ORDER BY id_cfd DESC LIMIT 1 ";
                 break;
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

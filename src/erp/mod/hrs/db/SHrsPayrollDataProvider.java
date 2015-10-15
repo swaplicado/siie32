@@ -388,12 +388,15 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 hrsPayrollReceipt.setHrsEmployee(hrsEmployee);
                 hrsPayrollReceipt.setReceipt(hrsPayroll.createPayrollReceipt(hrsEmployee));
                 hrsPayrollReceipt.getReceipt().setRegistryNew(payrollReceipt.isRegistryNew());
+                hrsPayrollReceipt.getReceipt().setPayrollReceiptIssue(payrollReceipt.getPayrollReceiptIssues());
+                /* XXX (jbarajas, 2015-10-07) remove by new table
                 hrsPayrollReceipt.getReceipt().setDbmsDataCfd(payrollReceipt.getDbmsDataCfd());
                 hrsPayrollReceipt.getReceipt().setNumberSeries(payrollReceipt.getNumberSeries());
                 hrsPayrollReceipt.getReceipt().setNumber(payrollReceipt.getNumber());
                 hrsPayrollReceipt.getReceipt().setDateIssue(payrollReceipt.getDateIssue());
                 hrsPayrollReceipt.getReceipt().setDatePayment(payrollReceipt.getDatePayment());
                 hrsPayrollReceipt.getReceipt().setFkPaymentSystemTypeId(payrollReceipt.getFkPaymentSystemTypeId());
+                */
                 hrsPayrollReceipt.computeDbPayrollReceiptDays();
                 //hrsPayrollReceipt.computeDbPayrollReceipt();  XXX jbarajas 2015-05-11
 

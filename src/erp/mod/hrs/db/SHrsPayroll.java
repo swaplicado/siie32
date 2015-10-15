@@ -4,7 +4,6 @@
  */
 package erp.mod.hrs.db;
 
-import erp.data.SDataConstantsSys;
 import erp.lib.SLibUtilities;
 import erp.mod.SModSysConsts;
 import java.util.ArrayList;
@@ -741,11 +740,13 @@ public class SHrsPayroll {
         
         payrollReceipt = createPayrollReceipt(oHrsEmployee);
         
+        /* XXX (jbarajas, 2015-10-07) remove by new table
         payrollReceipt.setNumberSeries("");
         payrollReceipt.setNumber(0);
         payrollReceipt.setDateIssue(dateEnd);
         payrollReceipt.setDatePayment(dateEnd);
         payrollReceipt.setFkPaymentSystemTypeId(SDataConstantsSys.TRNU_TP_PAY_SYS_NA);
+        */
         
         oHrsPayrollReceipt.setReceipt(payrollReceipt);
 
@@ -880,7 +881,7 @@ public class SHrsPayroll {
         payrollReceipt.setWage(hrsEmployee.getEmployee().getWage());
         payrollReceipt.setSalarySscBase(hrsEmployee.getEmployee().getSalarySscBase());
         payrollReceipt.setWorkingHoursDay(hrsEmployee.getEmployee().getWorkingHoursDay());
-        payrollReceipt.setBankAccount(hrsEmployee.getEmployee().getBankAccount());
+        //payrollReceipt.setBankAccount(hrsEmployee.getEmployee().getBankAccount()); XXX (jbarajas, 2015-10-07) remove by new table
         // XXX modify when payment for fornight is fijo
         payrollReceipt.setPaymentDaily(hrsEmployee.getEmployee().getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? hrsEmployee.getEmployee().getSalary() :
                 (moConfig.isFornightStandard() ? ((hrsEmployee.getEmployee().getWage() * SHrsConsts.YEAR_MONTHS) / (SHrsConsts.FORNIGHT_FIXED_DAYS * SHrsConsts.YEAR_FORNIGHTS)) :
@@ -896,7 +897,7 @@ public class SHrsPayroll {
         payrollReceipt.setFkShiftId(hrsEmployee.getEmployee().getFkShiftId());
         payrollReceipt.setFkRecruitmentSchemeTypeId(hrsEmployee.getEmployee().getFkRecruitmentSchemeTypeId());
         payrollReceipt.setFkPositionRiskTypeId(hrsEmployee.getEmployee().getFkPositionRiskTypeId());
-        payrollReceipt.setFkBankId_n(hrsEmployee.getEmployee().getFkBankId_n());
+        //payrollReceipt.setFkBankId_n(hrsEmployee.getEmployee().getFkBankId_n()); XXX (jbarajas, 2015-10-07) remove by new table
         payrollReceipt.setActive(hrsEmployee.getEmployee().isActive());
         hrsEmployee.getHrsPayrollReceipt().setReceipt(payrollReceipt);
         hrsEmployee.getHrsPayrollReceipt().setHrsPayroll(this);

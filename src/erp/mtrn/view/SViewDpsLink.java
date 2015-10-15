@@ -77,7 +77,8 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
     private void initComponents() {
         int i;
         int levelDoc = SDataConstantsSys.UNDEFINED;
-        boolean hasRightToLink = false;
+        boolean hasRightToClose = false;
+        boolean hasRightToOpen = false;
         STableField[] aoKeyFields = null;
         STableColumn[] aoTableColumns = null;
 
@@ -85,21 +86,25 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
 
         if (isViewForCategoryPur()) {
             if (isViewForEstimate()) {
-                hasRightToLink = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_EST).Level == SUtilConsts.LEV_MANAGER;
+                hasRightToClose = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_EST).Level >= SUtilConsts.LEV_EDITOR;
+                hasRightToOpen = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_EST).Level == SUtilConsts.LEV_MANAGER;
                 levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_EST).Level;
             }
             else if (isViewForOrder()) {
-                hasRightToLink = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD).Level == SUtilConsts.LEV_MANAGER;
+                hasRightToClose = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD).Level >= SUtilConsts.LEV_EDITOR;
+                hasRightToOpen = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD).Level == SUtilConsts.LEV_MANAGER;
                 levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD).Level;
             }
         }
         else {
             if (isViewForEstimate()) {
-                hasRightToLink = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_EST).Level == SUtilConsts.LEV_MANAGER;
+                hasRightToClose = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_EST).Level >= SUtilConsts.LEV_EDITOR;
+                hasRightToOpen = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_EST).Level == SUtilConsts.LEV_MANAGER;
                 levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_EST).Level;
             }
             else if (isViewForOrder()) {
-                hasRightToLink = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD).Level == SUtilConsts.LEV_MANAGER;
+                hasRightToClose = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD).Level >= SUtilConsts.LEV_EDITOR;
+                hasRightToOpen = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD).Level == SUtilConsts.LEV_MANAGER;
                 levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD).Level;
             }
         }
@@ -176,8 +181,8 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
         addTaskBarLowerSeparator();
         addTaskBarLowerComponent(moTabFilterDocumentNature);
 
-        mjbClose.setEnabled(hasRightToLink && !isViewForDocLinked());
-        mjbOpen.setEnabled(hasRightToLink && isViewForDocLinked());
+        mjbClose.setEnabled(hasRightToClose && !isViewForDocLinked());
+        mjbOpen.setEnabled(hasRightToOpen && isViewForDocLinked());
         mjbViewNotes.setEnabled(true);
         mjbViewDps.setEnabled(true);
         mjbViewLinks.setEnabled(true);

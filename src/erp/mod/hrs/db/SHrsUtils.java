@@ -11,6 +11,7 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.table.STableUtilities;
 import erp.mbps.data.SDataBizPartner;
+import erp.mhrs.data.SDataPayrollReceiptIssue;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.print.SDataConstantsPrint;
@@ -205,7 +206,7 @@ public abstract class SHrsUtils {
         ResultSet resultSet = null;
 
         sql = "SELECT MAX(CONVERT(num, UNSIGNED INTEGER)) + 1 AS f_num "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " "
                 + "WHERE num_ser = '" + series + "' AND b_del = 0 ";
 
         resultSet = session.getStatement().executeQuery(sql);
@@ -219,6 +220,31 @@ public abstract class SHrsUtils {
         }
 
         return number;
+    }
+
+    public static ArrayList<SDataPayrollReceiptIssue> getPayrollReceiptIssues(final SGuiSession session, final int[] payrollKey) throws Exception {
+        String sql = "";
+        ResultSet resultSet = null;
+        ArrayList<SDataPayrollReceiptIssue> receiptIssues = null;
+        SDataPayrollReceiptIssue receiptIssue = null;
+
+        receiptIssues = new ArrayList<SDataPayrollReceiptIssue>();
+
+        sql = "SELECT id_pay, id_emp, id_iss " +
+                "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " " + 
+                "WHERE id_pay = " + payrollKey[0] + " AND b_del = 0 AND fk_st_rcp = "  + SModSysConsts.TRNS_ST_DPS_EMITED + " ORDER BY id_iss ";
+        
+        resultSet = session.getStatement().executeQuery(sql);
+        while (resultSet.next()) {
+            receiptIssue = new SDataPayrollReceiptIssue();
+            
+            if (receiptIssue.read(new int[] { resultSet.getInt("id_pay"), resultSet.getInt("id_emp"), resultSet.getInt("id_iss") }, session.getStatement().getConnection().createStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+            }
+            receiptIssues.add(receiptIssue);
+        }
+
+        return receiptIssues;
     }
 
     /**
@@ -833,7 +859,7 @@ public abstract class SHrsUtils {
         payroll.read(client.getSession(), new int[] { payrollKey[0] });
 
         for (SDbPayrollReceipt receipt : payroll.getChildPayrollReceipts()) {
-            if (SLibUtils.compareKeys(receipt.getPrimaryKey(), payrollKey)) {
+            if (SLibUtils.compareKeys(receipt.getPrimaryKey(), new int[] { payrollKey[0], payrollKey[1] })) {
                 payrollReceipt = receipt;
             }
         }
@@ -1096,7 +1122,7 @@ public abstract class SHrsUtils {
         return seniority;
     }
 
-    public static ArrayList<SDbEmployeeHireLog> getEmployeeHireLogs(final SGuiSession session, final int employeeId, final Date dateStart, final Date dateEnd)  throws Exception {
+    public static ArrayList<SDbEmployeeHireLog> getEmployeeHireLogs(final SGuiSession session, final int employeeId, final Date dateStart, final Date dateEnd) throws Exception {
         ArrayList<SDbEmployeeHireLog> aEmployeeHireLogs = new ArrayList<SDbEmployeeHireLog>();
         SDbEmployeeHireLog employeeHireLog = null;
         String sql = "";
@@ -1209,7 +1235,7 @@ public abstract class SHrsUtils {
         String sql = "";
         ResultSet resultSet = null;
 
-         sql = "SELECT SUM(ac.eff_day) AS f_days " +
+         sql = "SELECT a.id_emp, a.id_abs, SUM(ac.eff_day) AS f_days " +
                  "FROM hrs_abs AS a " +
                  "INNER JOIN hrs_abs_cns AS ac ON a.id_emp = ac.id_emp AND a.id_abs = ac.id_abs " +
                  "WHERE a.b_del = 0 AND ac.b_del = 0 AND a.id_emp = " + employee.getPkEmployeeId() + " AND a.id_abs <> " + absenceId + " AND a.ben_year = " + benefitYear + " AND a.ben_ann = " + benefitAnn + " " +
@@ -1223,7 +1249,7 @@ public abstract class SHrsUtils {
         return scheduledDays;
     }
     
-    public static SHrsFormerPayroll readPayroll(final SClientInterface client, final int payrollId, final int payrollEmployeeId) throws SQLException, Exception {
+    public static SHrsFormerPayroll readPayroll(final SClientInterface client, final int payrollId, final int payrollEmployeeId, final int payrollIssueId) throws SQLException, Exception {
         int f_emp_map_bp = 0;
         int f_emp_id = 0;
         int claveOficial = 0;
@@ -1259,7 +1285,7 @@ public abstract class SHrsUtils {
         sql = "SELECT p.per_year, p.id_pay, tp.code, p.num, p.id_pay, NOW() AS f_date, p.dt_sta, p.dt_end, " +
                 "SUM(rcp.ear_r) AS f_ear, " +
                 "SUM(rcp.ded_r) AS f_ded, " +
-                "rcp.dt_iss, " +
+                "pei.dt_iss, " +
                 "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) " +
                 "FROM hrs_pay_rcp AS r " +
                 "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = r.id_pay AND rcp_ded.id_emp = r.id_emp " +
@@ -1267,8 +1293,10 @@ public abstract class SHrsUtils {
                 "'SUELDOS Y SALARIOS ' AS f_descrip, p.fk_tp_pay " +
                 "FROM hrs_pay AS p " +
                 "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
+                "INNER JOIN hrs_pay_rcp_iss AS pei ON " +
+                "rcp.id_pay = pei.id_pay AND rcp.id_emp = pei.id_emp AND pei.b_del = 0 AND pei.id_iss = " + payrollIssueId + " " +
                 "INNER JOIN erp.hrss_tp_pay AS tp ON p.fk_tp_pay = tp.id_tp_pay " +
-                "WHERE rcp.id_pay = " + payrollId + " AND rcp.b_del = 0 AND rcp.id_emp = " + payrollEmployeeId + " " +
+                "WHERE rcp.id_pay = " + payrollId + " AND rcp.b_del = 0 AND rcp.id_emp = " + payrollEmployeeId + " " + 
                 "GROUP BY p.per_year, p.per, tp.code, p.num, p.id_pay, f_date, p.dt_sta, p.dt_end " +
                 "ORDER BY p.per_year DESC, p.per DESC, tp.code, p.num, p.id_pay, f_date, p.dt_sta, p.dt_end; ";
         
@@ -1296,7 +1324,7 @@ public abstract class SHrsUtils {
             hrsPayroll = new SHrsFormerPayroll(client);
 
             hrsPayroll.setPkNominaId(resultSet.getInt("id_pay"));
-            hrsPayroll.setFecha(resultSet.getDate("rcp.dt_iss"));
+            hrsPayroll.setFecha(resultSet.getDate("pei.dt_iss"));
             hrsPayroll.setFechaInicial(resultSet.getDate("dt_sta"));
             hrsPayroll.setFechaFinal(resultSet.getDate("dt_end"));
             hrsPayroll.setTotalPercepciones(resultSet.getDouble("f_ear"));
@@ -1316,8 +1344,8 @@ public abstract class SHrsUtils {
 
         sql = "SELECT bp.bp, bp.id_bp AS f_emp_map_bp, emp.id_emp AS f_emp_id, emp.num AS f_emp_num, bp.alt_id AS f_emp_curp, emp.ssn AS f_emp_nss, " +
                 "emp.fk_tp_rec_sche AS f_emp_reg_tp, rcp.day_pad AS f_emp_dias_pag, d.name AS f_emp_dep, d.code AS f_emp_dep_cve, " +
-                "'' AS f_emp_bank_clabe, " +
-                "rcp.dt_pay, rcp.num_ser, rcp.num, rcp.fk_tp_pay_sys, " +
+                "emp.bank_acc AS f_emp_bank_clabe, " +
+                "pei.dt_pay, pei.num_ser, pei.num, pei.fk_tp_pay_sys, " +
                 "CASE WHEN emp.fk_bank_n IS NOT NULL THEN emp.fk_bank_n ELSE (SELECT fk_bank FROM hrs_cfg WHERE id_cfg = " + SUtilConsts.BPR_CO_ID + ") END AS f_emp_bank, " +
                 "emp.dt_hire AS f_emp_alta, p.dt_sta AS f_nom_date_start, p.dt_end AS f_nom_date_end, " +
                 "TIMESTAMPDIFF(DAY, emp.dt_ben, p.dt_end) / " + SHrsConsts.WEEK_DAYS + " AS f_emp_sen, pos.name AS f_emp_pos, " +
@@ -1331,6 +1359,8 @@ public abstract class SHrsUtils {
                 "SUM(rcp.pay_r) AS f_emp_tot_net, NOW() AS f_emp_date_edit " +
                 "FROM hrs_pay AS p " +
                 "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
+                "INNER JOIN hrs_pay_rcp_iss AS pei ON " +
+                "rcp.id_pay = pei.id_pay AND rcp.id_emp = pei.id_emp AND pei.b_del = 0 AND pei.id_iss = " + payrollIssueId + " " +
                 "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
                 "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
                 "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
@@ -1375,7 +1405,7 @@ public abstract class SHrsUtils {
             hrsPayrollReceipt.setDepartamento(SLibUtilities.textTrim(resultSet.getString("f_emp_dep")));
             hrsPayrollReceipt.setClabe(SLibUtilities.textTrim(resultSet.getString("f_emp_bank_clabe")));
             hrsPayrollReceipt.setBanco(resultSet.getInt("f_emp_bank"));
-            hrsPayrollReceipt.setFechaPago(resultSet.getDate("rcp.dt_pay"));
+            hrsPayrollReceipt.setFechaPago(resultSet.getDate("pei.dt_pay"));
             hrsPayrollReceipt.setFechaInicioRelLaboral(resultSet.getDate("f_emp_alta"));
             hrsPayrollReceipt.setFechaInicialPago(resultSet.getDate("f_nom_date_start"));
             hrsPayrollReceipt.setFechaFinalPago(resultSet.getDate("f_nom_date_end"));
@@ -1392,9 +1422,9 @@ public abstract class SHrsUtils {
             hrsPayrollReceipt.setTotalRetenciones(resultSet.getDouble("f_emp_tot_rent_ret"));
             hrsPayrollReceipt.setTotalNeto(resultSet.getDouble("f_emp_tot_net"));
             hrsPayrollReceipt.setFechaEdicion(resultSet.getDate("f_emp_date_edit"));
-            hrsPayrollReceipt.setSerie(SLibUtilities.textTrim(resultSet.getString("rcp.num_ser")));
-            hrsPayrollReceipt.setFolio(resultSet.getInt("rcp.num"));
-            hrsPayrollReceipt.setMetodoPago(resultSet.getInt("rcp.fk_tp_pay_sys"));
+            hrsPayrollReceipt.setSerie(SLibUtilities.textTrim(resultSet.getString("pei.num_ser")));
+            hrsPayrollReceipt.setFolio(resultSet.getInt("pei.num"));
+            hrsPayrollReceipt.setMetodoPago(resultSet.getInt("pei.fk_tp_pay_sys"));
 
             /*
             // Obtain 'num_ser', 'num', 'fid_tp_pay_sys' from 'hrs_sie_pay_emp' table:
@@ -1522,6 +1552,19 @@ public abstract class SHrsUtils {
         }
 
         return hrsPayroll;
+    }
+    
+    public static void createPayrollReceiptIssues(final SGuiSession session, final SDbPayroll payroll) throws Exception {
+        for (SDbPayrollReceipt receipt : payroll.getChildPayrollReceipts()) {
+            receipt.setAuxDateIssue(payroll.getDateEnd());
+            receipt.createIssues(session);
+        }
+    }
+    
+    public static void updateToNewStatusPayrollReceiptIssues(final SGuiSession session, final SDbPayroll payroll) throws Exception {
+        for (SDbPayrollReceipt receipt : payroll.getChildPayrollReceipts()) {
+            receipt.updateToNewStatusIssues(session);
+        }
     }
     
     public static double computeAmoutLoan(final SHrsPayrollReceipt hrsReceipt, final SDbLoan loan) throws Exception {

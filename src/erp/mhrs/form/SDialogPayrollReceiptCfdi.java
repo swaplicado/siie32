@@ -19,7 +19,7 @@ import erp.mhrs.data.SHrsPayrollEmployeeReceipt;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbConfig;
-import erp.mod.hrs.db.SDbPayrollReceipt;
+import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
@@ -465,20 +465,22 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
     private void computePayroll() throws java.lang.Exception {
         int payrollId = 0;
         int employeeId = 0;
-        SDbPayrollReceipt receipt = null;
+        int issueId = 0;
+        SDbPayrollReceiptIssue receiptIssue = null;
         SHrsPayrollEmployeeReceipt employeeReceipt = null;
         
-        receipt = new SDbPayrollReceipt();
+        receiptIssue = new SDbPayrollReceiptIssue();
         for (STableRow row : moTablePaneReceiptSelected.getGridRows()) {
             employeeReceipt = (SHrsPayrollEmployeeReceipt) row;
             payrollId = employeeReceipt.getPkPayrollId();
             employeeId = employeeReceipt.getPkEmployeeId();
+            issueId = employeeReceipt.getPkIssueId();
             
-            receipt.saveField(miClient.getSession().getStatement(), new int[] { payrollId, employeeId }, SDbPayrollReceipt.FIELD_NUMBER_SERIES, employeeReceipt.getNumberSeries());
-            receipt.saveField(miClient.getSession().getStatement(), new int[] { payrollId, employeeId }, SDbPayrollReceipt.FIELD_DATE_ISSUE, employeeReceipt.getDateIssue());
-            receipt.saveField(miClient.getSession().getStatement(), new int[] { payrollId, employeeId }, SDbPayrollReceipt.FIELD_DATE_PAYMENT, employeeReceipt.getDatePayment());
-            receipt.saveField(miClient.getSession().getStatement(), new int[] { payrollId, employeeId }, SDbPayrollReceipt.FIELD_TYPE_PAYMENT_SYS, employeeReceipt.getPaymentTypeSysId());
-            manPayrollEmployeeReceipts.add(new int[] { payrollId, employeeId });
+            receiptIssue.saveField(miClient.getSession().getStatement(), new int[] { payrollId, employeeId, issueId }, SDbPayrollReceiptIssue.FIELD_NUMBER_SERIES, employeeReceipt.getNumberSeries());
+            receiptIssue.saveField(miClient.getSession().getStatement(), new int[] { payrollId, employeeId, issueId }, SDbPayrollReceiptIssue.FIELD_DATE_ISSUE, employeeReceipt.getDateIssue());
+            receiptIssue.saveField(miClient.getSession().getStatement(), new int[] { payrollId, employeeId, issueId }, SDbPayrollReceiptIssue.FIELD_DATE_PAYMENT, employeeReceipt.getDatePayment());
+            receiptIssue.saveField(miClient.getSession().getStatement(), new int[] { payrollId, employeeId, issueId }, SDbPayrollReceiptIssue.FIELD_TYPE_PAYMENT_SYS, employeeReceipt.getPaymentTypeSysId());
+            manPayrollEmployeeReceipts.add(new int[] { payrollId, employeeId, issueId });
         }
     }
 

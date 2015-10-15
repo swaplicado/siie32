@@ -1568,6 +1568,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         Vector<SGridRow> rows = new Vector<SGridRow>();
         SHrsPayrollReceiptEarning hrsReceiptEarningRow = null;
 
+        moGridEarningRow.setRowButtonsEnabled(false, false, mbEditable);
         for (SHrsPayrollReceiptEarning hrsEarningRow : moReceipt.getHrsEarnings()) {
             hrsReceiptEarningRow = new SHrsPayrollReceiptEarning();
 
@@ -1598,7 +1599,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         Vector<SGridRow> rows = new Vector<SGridRow>();
         SHrsPayrollReceiptDeduction hrsReceiptDeductionRow = null;
 
-        //moGridDeductionRow.setRowButtonsEnabled(mbEditable, false, mbEditable);
+        moGridDeductionRow.setRowButtonsEnabled(false, false, mbEditable);
         for (SHrsPayrollReceiptDeduction hrsDeductionRow : moReceipt.getHrsDeductions()) {
             hrsReceiptDeductionRow = new SHrsPayrollReceiptDeduction();
 

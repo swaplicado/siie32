@@ -74,6 +74,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected int mnFkPayrollBizPartnerId_n;
     protected int mnFkPayrollReceiptPayrollId_n;
     protected int mnFkPayrollReceiptEmployeeId_n;
+    protected int mnFkPayrollReceiptIssueId_n;
     protected int mnFkUserProcessingId;
     protected int mnFkUserDeliveryId;
     protected java.util.Date mtUserProcessingTs;
@@ -168,6 +169,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setFkPayrollBizPartnerId_n(int n) { mnFkPayrollBizPartnerId_n = n; }
     public void setFkPayrollReceiptPayrollId_n(int n) { mnFkPayrollReceiptPayrollId_n = n; }
     public void setFkPayrollReceiptEmployeeId_n(int n) { mnFkPayrollReceiptEmployeeId_n = n; }
+    public void setFkPayrollReceiptIssueId_n(int n) { mnFkPayrollReceiptIssueId_n = n; }
     public void setFkUserProcessingId(int n) { mnFkUserProcessingId = n; }
     public void setFkUserDeliveryId(int n) { mnFkUserDeliveryId = n; }
     public void setUserProcessingTs(java.util.Date t) { mtUserProcessingTs = t; }
@@ -215,6 +217,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public int getFkPayrollBizPartnerId_n() { return mnFkPayrollBizPartnerId_n; }
     public int getFkPayrollReceiptPayrollId_n() { return mnFkPayrollReceiptPayrollId_n; }
     public int getFkPayrollReceiptEmployeeId_n() { return mnFkPayrollReceiptEmployeeId_n; }
+    public int getFkPayrollReceiptIssueId_n() { return mnFkPayrollReceiptIssueId_n; }
     public int getFkUserProcessingId() { return mnFkUserProcessingId; }
     public int getFkUserDeliveryId() { return mnFkUserDeliveryId; }
     public java.util.Date getUserProcessingTs() { return mtUserProcessingTs; }
@@ -276,6 +279,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnFkPayrollBizPartnerId_n = 0;
         mnFkPayrollReceiptPayrollId_n = 0;
         mnFkPayrollReceiptEmployeeId_n = 0;
+        mnFkPayrollReceiptIssueId_n = 0;
         mnFkUserProcessingId = 0;
         mnFkUserDeliveryId = 0;
         mtUserProcessingTs = null;
@@ -340,6 +344,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnFkPayrollBizPartnerId_n = resultSet.getInt("fid_pay_bpr_n");
                 mnFkPayrollReceiptPayrollId_n = resultSet.getInt("fid_pay_rcp_pay_n");
                 mnFkPayrollReceiptEmployeeId_n = resultSet.getInt("fid_pay_rcp_emp_n");
+                mnFkPayrollReceiptIssueId_n = resultSet.getInt("fid_pay_rcp_iss_n");
                 mnFkUserProcessingId = resultSet.getInt("fid_usr_prc");
                 mnFkUserDeliveryId = resultSet.getInt("fid_usr_dvy");
                 mtUserProcessingTs = resultSet.getTimestamp("ts_prc");
@@ -392,12 +397,12 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                 sql = "INSERT INTO trn_cfd (id_cfd, " +
                         "ts, cert_num, str_signed, signature, doc_xml, doc_xml_name, uuid, qrc_n, ack_can_xml, ack_can_pdf_n, ack_dvy, msg_dvy, b_prc_ws, b_prc_sto_xml, b_prc_sto_pdf, b_con, fid_tp_cfd, fid_tp_xml, fid_st_xml, " +
-                        "fid_tp_xml_dvy, fid_st_xml_dvy, fid_dps_year_n, fid_dps_doc_n, fid_rec_year_n, fid_rec_per_n, fid_rec_bkc_n, fid_rec_tp_rec_n, fid_rec_num_n, fid_rec_ety_n, fid_pay_pay_n, fid_pay_emp_n, fid_pay_bpr_n, fid_pay_rcp_pay_n, fid_pay_rcp_emp_n, fid_usr_prc, fid_usr_dvy, ts_prc, ts_dvy) " +
+                        "fid_tp_xml_dvy, fid_st_xml_dvy, fid_dps_year_n, fid_dps_doc_n, fid_rec_year_n, fid_rec_per_n, fid_rec_bkc_n, fid_rec_tp_rec_n, fid_rec_num_n, fid_rec_ety_n, fid_pay_pay_n, fid_pay_emp_n, fid_pay_bpr_n, fid_pay_rcp_pay_n, fid_pay_rcp_emp_n, fid_pay_rcp_iss_n, fid_usr_prc, fid_usr_dvy, ts_prc, ts_dvy) " +
                         "VALUES (" + mnPkCfdId + ", " +
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                        "?, ?, ?, ?, ?, ?, NOW(), NOW())";
+                        "?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
             }
             else {
                 bIsUpd = true;
@@ -412,7 +417,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 //    mbIsConsistent = true;
                     sql = "UPDATE trn_cfd SET ts = ?, cert_num = ?, str_signed = ?, signature = ?, " +
                             "doc_xml = ?, doc_xml_name = ?, uuid = ?, " + (mnFkXmlStatusId != SDataConstantsSys.TRNS_ST_DPS_ANNULED ? "qrc_n = ?," : "") + " ack_can_xml = ?, ack_dvy = ?, msg_dvy = ?, b_con = ?, fid_tp_cfd = ?, " +
-                            "fid_tp_xml = ?, fid_st_xml = ?, fid_tp_xml_dvy = ?, fid_st_xml_dvy = ?, fid_dps_year_n = ?, fid_dps_doc_n = ?, fid_rec_year_n = ?, fid_rec_per_n = ?, fid_rec_bkc_n = ?, fid_rec_tp_rec_n = ?, fid_rec_num_n = ?, fid_rec_ety_n = ?, fid_pay_pay_n = ?, fid_pay_emp_n = ?, fid_pay_bpr_n = ?, fid_pay_rcp_pay_n = ?, fid_pay_rcp_emp_n = ?, fid_usr_dvy = ?, ts_dvy = NOW() " +
+                            "fid_tp_xml = ?, fid_st_xml = ?, fid_tp_xml_dvy = ?, fid_st_xml_dvy = ?, fid_dps_year_n = ?, fid_dps_doc_n = ?, fid_rec_year_n = ?, fid_rec_per_n = ?, fid_rec_bkc_n = ?, fid_rec_tp_rec_n = ?, fid_rec_num_n = ?, fid_rec_ety_n = ?, fid_pay_pay_n = ?, fid_pay_emp_n = ?, fid_pay_bpr_n = ?, fid_pay_rcp_pay_n = ?, fid_pay_rcp_emp_n = ?, fid_pay_rcp_iss_n = ?, fid_usr_dvy = ?, ts_dvy = NOW() " +
                             "WHERE id_cfd = " + mnPkCfdId + " ";
                 //}
             }
@@ -501,10 +506,12 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 if (mnFkPayrollReceiptPayrollId_n == SLibConsts.UNDEFINED) {
                     preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
                     preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
+                    preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
                 }
                 else {
                     preparedStatement.setInt(index++, mnFkPayrollReceiptPayrollId_n);
                     preparedStatement.setInt(index++, mnFkPayrollReceiptEmployeeId_n);
+                    preparedStatement.setInt(index++, mnFkPayrollReceiptIssueId_n);
                 }
                 if (!bIsUpd) {
                     preparedStatement.setInt(index++, mnFkUserProcessingId);

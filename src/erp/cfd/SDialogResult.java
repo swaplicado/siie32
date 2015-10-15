@@ -8,12 +8,10 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
-import erp.mhrs.data.SDataFormerPayroll;
 import erp.mhrs.data.SDataFormerPayrollEmp;
 import erp.mod.SModConsts;
-import erp.mod.hrs.db.SDbConfig;
-import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceipt;
+import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SHrsCfdUtils;
 import erp.mod.hrs.db.SHrsUtils;
 import erp.mtrn.data.SCfdUtils;
@@ -23,7 +21,6 @@ import erp.print.SDataConstantsPrint;
 import java.awt.Cursor;
 import java.util.ArrayList;
 import java.util.Date;
-import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -316,22 +313,27 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
         int cfdsCorrect = 0;
         int cfdsIncorrect = 0;
         String detailMessage = "";
-        SDbPayrollReceipt receipt = null;
-        SDbConfig config = null;
+        SDbPayrollReceiptIssue receiptIssue = null;
         
          if (manPayrollReceiptsId != null) {
-            receipt = new SDbPayrollReceipt();
-            config = (SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
+            receiptIssue = new SDbPayrollReceiptIssue();
             for (int[] key : manPayrollReceiptsId) {
                 cfdsProcessed ++;
                 try {
                     switch (mnFormSubtype) {
                         case SCfdConsts.PROC_REQ_STAMP:
-                                number = SHrsUtils.getPayrollReceiptNextNumber(miClient.getSession(), config.getNumberSeries());
-                                receipt.saveField(miClient.getSession().getStatement(), new int[] { key[0], key[1] }, SDbPayrollReceipt.FIELD_NUMBER, number);
+                                receiptIssue.read(miClient.getSession(), new int[] { key[0], key[1], key[2] });
                                 
-                                SHrsCfdUtils.compueteSignCfdi(miClient.getSession(), new int[] { key[0], key[1] });
-                                detailMessage += (config.getNumberSeries().length() > 0 ? config.getNumberSeries() + "-" : "") + number + "   Timbrado.\n";
+                                if (receiptIssue.getPkIssueId() != SLibConsts.UNDEFINED) {
+                                    number = SHrsUtils.getPayrollReceiptNextNumber(miClient.getSession(), receiptIssue.getNumberSeries());
+
+                                    if (receiptIssue.getNumber() == SLibConsts.UNDEFINED) {
+                                        receiptIssue.saveField(miClient.getSession().getStatement(), new int[] { key[0], key[1], key[2] }, SDbPayrollReceiptIssue.FIELD_NUMBER, number);
+                                    }
+                                }
+                                
+                                SHrsCfdUtils.computeSignCfdi(miClient.getSession(), new int[] { key[0], key[1], key[2]  });
+                                detailMessage += (receiptIssue.getNumberSeries().length() > 0 ? receiptIssue.getNumberSeries() + "-" : "") + number + "   Timbrado.\n";
                                 cfdsCorrect ++;
                             break;
                     }
@@ -391,8 +393,10 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                             payrollReceipt = new SDbPayrollReceipt();
                             payrollReceipt.read(miClient.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
                             
-                            numberSeries = payrollReceipt.getNumberSeries();
-                            number = "" + payrollReceipt.getNumber();
+                            if (payrollReceipt.getPayrollReceiptIssues() != null) {
+                                numberSeries = payrollReceipt.getPayrollReceiptIssues().getNumberSeries();
+                                number = "" + payrollReceipt.getPayrollReceiptIssues().getNumber();
+                            }
                             break;
                         default:
                             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

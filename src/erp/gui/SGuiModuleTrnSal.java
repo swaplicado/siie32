@@ -25,7 +25,6 @@ import erp.mfin.form.SDialogRepBizPartnerStatements;
 import erp.mfin.form.SFormCostCenterItem;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.trn.form.SDialogRepContractByBizPartner;
 import erp.mod.trn.form.SDialogRepContractStatus;
 import erp.mod.trn.form.SDialogSendMailContract;
 import erp.mtrn.data.SCfdUtils;
@@ -207,7 +206,6 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JSeparator jsRepTrn;
     private javax.swing.JMenuItem jmiRepTrnContractStatus;
     private javax.swing.JMenuItem jmiRepTrnContractBackorderStock;
-    private javax.swing.JMenuItem jmiRepTrnContractByBizPartner;
     private javax.swing.JSeparator jsRepContract;
     private javax.swing.JMenuItem jmiRepTrnShipmentItem;
     private javax.swing.JSeparator jsRepTrnShipment;
@@ -505,7 +503,6 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jsRepTrn = new JPopupMenu.Separator();
         jmiRepTrnContractStatus = new JMenuItem("Reporte de estatus de contratos de ventas...");
         jmiRepTrnContractBackorderStock = new JMenuItem("Reporte de backorder contratos de ventas vs. existencias...");
-        jmiRepTrnContractByBizPartner = new JMenuItem("Reporte de contratos de ventas por cliente...");
         jsRepContract = new JPopupMenu.Separator();
         jmiRepTrnShipmentItem = new JMenuItem("Reporte de embarque y surtido de ítems...");
         jsRepTrnShipment = new JPopupMenu.Separator();
@@ -571,7 +568,6 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmRep.add(jsRepTrn);            // separator
         jmRep.add(jmiRepTrnContractStatus);
         jmRep.add(jmiRepTrnContractBackorderStock);
-        //jmReports.add(jmiRepTrnContractByBizPartner); // XXX (sflores, 2013-12-17)
         jmRep.add(jsRepContract);       // separator
         jmRep.add(jmiRepTrnShipmentItem);
         jmRep.add(jsRepTrnShipment);    // separator
@@ -712,7 +708,6 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepTrnItemUnitaryPrice.addActionListener(this);
         jmiRepTrnContractStatus.addActionListener(this);
         jmiRepTrnContractBackorderStock.addActionListener(this);
-        jmiRepTrnContractByBizPartner.addActionListener(this);
         jmiRepTrnShipmentItem.addActionListener(this);
         jmiRepMoneyIn.addActionListener(this);
 
@@ -819,7 +814,6 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             section = new SCfgMenuSection("" + SDataConstants.MOD_SAL_REP_CON);
             section.getChildItems().add(new SCfgMenuSectionItem(jmiRepTrnContractStatus, "" + SDataConstants.TRNS_ST_DPS));
             section.getChildItems().add(new SCfgMenuSectionItem(jmiRepTrnContractBackorderStock, "" + SDataConstants.TRN_STK));
-            section.getChildItems().add(new SCfgMenuSectionItem(jmiRepTrnContractByBizPartner, "" + SDataConstants.BPSU_BP));
             section.setChildSeparator(new SCfgMenuSectionSeparator(jsRepTrn));          // previous separator
             menu.getChildSections().add(section);
             section = new SCfgMenuSection("" + SDataConstants.MOD_SAL_REP_SHI);
@@ -1883,9 +1877,6 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 moDialogRepContractStock.formReset();
                 moDialogRepContractStock.setParamIsSupplier(false);
                 moDialogRepContractStock.setFormVisible(true);
-            }
-            else if (item == jmiRepTrnContractByBizPartner) {
-                new SDialogRepContractByBizPartner(miClient.getSession().getClient(), SDataConstantsSys.BPSS_CT_BP_CUS, "Reporte de contratos por cliente").setVisible(true);
             }
             else if (item == jmiRepTrnShipmentItem) {
                 moDialogRepDpsShipmentItem.formRefreshCatalogues();

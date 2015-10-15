@@ -931,21 +931,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
                 if (oDps.getDbmsDataCfd() != null) {
                     try {
-                    /*
-                     * XXX Change to new structure of CFDI generation (jbarajas 2014-05-07)
-                     *
-                        switch(oDps.getDbmsDataCfd().getFkXmlTypeId()) {
-                            case SDataConstantsSys.TRNS_TP_XML_CFD:
-                                moCfdPrint.printCfd(oDps.getDbmsDataCfd());
-                                break;
-                            case SDataConstantsSys.TRNS_TP_XML_CFDI:
-                                moCfdPrint.printCfdi(oDps.getDbmsDataCfd(), SDataConstantsPrint.PRINT_MODE_VIEWER);
-                                break;
-                            default:
-                                throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
-                        }
-                    */
-                    SCfdUtils.printCfd(miClient, SCfdConsts.CFD_TYPE_DPS, oDps.getDbmsDataCfd(), SDataConstantsPrint.PRINT_MODE_VIEWER, SLibConstants.UNDEFINED, false);
+                        SCfdUtils.printCfd(miClient, SCfdConsts.CFD_TYPE_DPS, oDps.getDbmsDataCfd(), SDataConstantsPrint.PRINT_MODE_VIEWER, SLibConstants.UNDEFINED, false);
                     }
                     catch (Exception e) {
                         SLibUtilities.renderException(this, e);
@@ -1483,21 +1469,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
                 if (oDps.getDbmsDataCfd() != null) {
                     try {
-                    /*
-                     * XXX Change to new structure of CFDI generation (jbarajas 2014-05-07)
-                     *
-                        switch(oDps.getDbmsDataCfd().getFkXmlTypeId()) {
-                            case SDataConstantsSys.TRNS_TP_XML_CFD:
-                                moCfdPrint.printCfd(oDps.getDbmsDataCfd());
-                                break;
-                            case SDataConstantsSys.TRNS_TP_XML_CFDI:
-                                moCfdPrint.printCfdi(oDps.getDbmsDataCfd(), SDataConstantsPrint.PRINT_MODE_VIEWER);
-                                break;
-                            default:
-                                throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
-                        }
-                    */
-                    SCfdUtils.printCfd(miClient, SCfdConsts.CFD_TYPE_DPS, oDps.getDbmsDataCfd(), SDataConstantsPrint.PRINT_MODE_VIEWER, SLibConstants.UNDEFINED, false);
+                        SCfdUtils.printCfd(miClient, SCfdConsts.CFD_TYPE_DPS, oDps.getDbmsDataCfd(), SDataConstantsPrint.PRINT_MODE_VIEWER, SLibConstants.UNDEFINED, false);
                     }
                     catch (Exception e) {
                         SLibUtilities.renderException(this, e);
@@ -1567,49 +1539,6 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
                 }
-                /*
-                 * XXX Change to new structure of CFDI generation (jbarajas 2014-05-07)
-                 *
-                File file = null;
-                BufferedWriter bw = null;
-                SDataDps oDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-
-                if (oDps.getDbmsDataCfd() == null) {
-                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
-                }
-                else {
-                    if (oDps.getDbmsDataCfd().getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_EMITED) {
-                        switch (oDps.getDbmsDataCfd().getFkXmlTypeId()) {
-                            case SDataConstantsSys.TRNS_TP_XML_CFD:
-                                miClient.showMsgBoxWarning("El documento no ha sido emitido.");
-                                break;
-                            case SDataConstantsSys.TRNS_TP_XML_CFDI:
-                                miClient.showMsgBoxWarning("El documento no ha sido timbrado.");
-                                break;
-                            default:
-                                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_OPT_UNDEF);
-                        }
-                    }
-                    else {
-                        miClient.getFileChooser().setSelectedFile(new File(oDps.getDbmsDataCfd().getDocXmlName()));
-                        if (miClient.getFileChooser().showSaveDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
-                            try {
-                                file = new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath());
-                                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),"UTF8"));
-                                bw.write(oDps.getDbmsDataCfd().getDocXml());
-                                bw.close();
-                                miClient.showMsgBoxInformation(SLibConstants.MSG_INF_FILE_CREATE + file.getAbsolutePath());
-                            }
-                            catch (IOException e) {
-                                SLibUtilities.renderException(this, e);
-                            }
-                            catch (Exception e) {
-                                SLibUtilities.renderException(this, e);
-                            }
-                        }
-                    }
-                }
-                */
             }
         }
     }
@@ -1623,52 +1552,6 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
                 }
-                /*
-                 * XXX Change to new structure of CFDI generation (jbarajas 2014-05-07)
-                 *
-                SDataDps oDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-
-                if (oDps.getDbmsDataCfd() == null) {
-                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
-                }
-                else {
-                    if (oDps.getDbmsDataCfd().getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
-                        switch (oDps.getDbmsDataCfd().getFkXmlTypeId()) {
-                            case SDataConstantsSys.TRNS_TP_XML_CFD:
-                                miClient.showMsgBoxWarning("El documento es un CFD y no tiene acuse de cancelación.");
-                                break;
-                            case SDataConstantsSys.TRNS_TP_XML_CFDI:
-                                miClient.showMsgBoxWarning("El documento no ha sido cancelado.");
-                                break;
-                            default:
-                                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_OPT_UNDEF);
-                        }
-                    }
-                    else if (oDps.getDbmsDataCfd().getAcknowledgmentCancellation().isEmpty()) {
-                        switch (oDps.getDbmsDataCfd().getFkXmlTypeId()) {
-                            case SDataConstantsSys.TRNS_TP_XML_CFD:
-                                miClient.showMsgBoxWarning("El documento es un CFD y no tiene acuse de cancelación.");
-                                break;
-                            case SDataConstantsSys.TRNS_TP_XML_CFDI:
-                                miClient.showMsgBoxWarning("El documento no tiene acuse de cancelación.");
-                                break;
-                            default:
-                                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_OPT_UNDEF);
-                        }
-                    }
-                    else {
-                        try {
-                            moCfdPrint.printAcknowledgment(oDps.getDbmsDataCfd(), SDataConstantsPrint.PRINT_MODE_VIEWER);
-                        }
-                        catch (IOException e) {
-                            SLibUtilities.renderException(this, e);
-                        }
-                        catch (Exception e) {
-                            SLibUtilities.renderException(this, e);
-                        }
-                    }
-                }
-                */
             }
         }
     }
@@ -1682,61 +1565,6 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
                 }
-                /*
-                 * XXX Change to new structure of CFDI generation (jbarajas 2014-05-07)
-                 *
-                File file = null;
-                BufferedWriter bw = null;
-                SDataDps oDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-
-                if (oDps.getDbmsDataCfd() == null) {
-                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
-                }
-                else {
-                    if (oDps.getDbmsDataCfd().getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
-                        switch (oDps.getDbmsDataCfd().getFkXmlTypeId()) {
-                            case SDataConstantsSys.TRNS_TP_XML_CFD:
-                                miClient.showMsgBoxWarning("El documento es un CFD y no tiene acuse de cancelación.");
-                                break;
-                            case SDataConstantsSys.TRNS_TP_XML_CFDI:
-                                miClient.showMsgBoxWarning("El documento no ha sido cancelado.");
-                                break;
-                            default:
-                                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_OPT_UNDEF);
-                        }
-                    }
-                    else if (oDps.getDbmsDataCfd().getAcknowledgmentCancellation().isEmpty()) {
-                        switch (oDps.getDbmsDataCfd().getFkXmlTypeId()) {
-                            case SDataConstantsSys.TRNS_TP_XML_CFD:
-                                miClient.showMsgBoxWarning("El documento es un CFD y no tiene acuse de cancelación.");
-                                break;
-                            case SDataConstantsSys.TRNS_TP_XML_CFDI:
-                                miClient.showMsgBoxWarning("El documento no tiene acuse de cancelación.");
-                                break;
-                            default:
-                                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_OPT_UNDEF);
-                        }
-                    }
-                    else {
-                        miClient.getFileChooser().setSelectedFile(new File(oDps.getDbmsDataCfd().getDocXmlName().replaceAll(".xml", "_CANCELA_RESP") + ".xml"));
-                        if (miClient.getFileChooser().showSaveDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
-                            try {
-                                file = new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath());
-                                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),"UTF8"));
-                                bw.write(oDps.getDbmsDataCfd().getAcknowledgmentCancellation());
-                                bw.close();
-                                miClient.showMsgBoxInformation(SLibConstants.MSG_INF_FILE_CREATE + file.getAbsolutePath());
-                            }
-                            catch (IOException e) {
-                                SLibUtilities.renderException(this, e);
-                            }
-                            catch (Exception e) {
-                                SLibUtilities.renderException(this, e);
-                            }
-                        }
-                    }
-                }
-            */
             }
         }
     }
@@ -1930,7 +1758,15 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
                 "(SELECT CONCAT(ord.id_year, '-', ord.num) FROM mfg_ord AS ord WHERE d.fid_mfg_year_n = ord.id_year AND d.fid_mfg_ord_n = ord.id_ord) AS num_ord, " +
                 "IF(d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + STableConstants.ICON_ST_ANNUL + ", " + STableConstants.ICON_NULL + ") AS f_ico, " +
-                "IF(x.ts IS NULL OR doc_xml = '', " + STableConstants.ICON_NULL  + ", IF(x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFD + " OR x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_NA + ", " + STableConstants.ICON_XML + ", IF(x.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(uuid) = 0, " + STableConstants.ICON_XML_PEND + ", " + STableConstants.ICON_XML_SIGN + "))) AS f_ico_xml, " +
+                //"IF(x.ts IS NULL OR doc_xml = '', " + STableConstants.ICON_NULL  + ", IF(x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFD + " OR x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_NA + ", " + STableConstants.ICON_XML + ", IF(x.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(uuid) = 0, " + STableConstants.ICON_XML_PEND + ", " + STableConstants.ICON_XML_SIGN + "))) AS f_ico_xml, " +
+                "IF(x.ts IS NULL OR doc_xml = '', " + STableConstants.ICON_NULL  + ", " + /* not is CFD not is CFDI */
+                "IF(x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFD + " OR x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_NA + ", " + STableConstants.ICON_XML + ", " + /* is CFD */
+                "IF(x.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(uuid) = 0, " + STableConstants.ICON_XML_PEND + ", " + /* CFDI pending sign */
+                "IF(LENGTH(x.ack_can_xml) = 0 AND x.ack_can_pdf_n IS NULL, " + STableConstants.ICON_XML_SIGN  + ", " + /* CFDI signed, canceled only SIIE */
+                "IF(LENGTH(x.ack_can_xml) != 0, " + STableConstants.ICON_XML_CANC_XML + ", " + /* CFDI canceled with cancellation acknowledgment in XML format */
+                "IF(x.ack_can_pdf_n IS NOT NULL, " + STableConstants.ICON_XML_CANC_PDF + ", " + /* CFDI canceled with cancellation acknowledgment in PDF format */
+                STableConstants.ICON_XML_SIGN + " " + /* CFDI signed, canceled only SIIE */
+                ")))))) AS f_ico_xml, " +
                 "bp.id_bp, bp.bp, bpc.bp_key, bpb.id_bpb, bpb.bpb, " +
                 "(SELECT c.cur_key FROM erp.cfgu_cur AS c WHERE d.fid_cur = c.id_cur) AS f_cur_key, 'MXN' AS f_cur_key_local, '" +
                 miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey() + "' AS f_cur_key, " +

@@ -738,7 +738,8 @@ public class SCfdPrint {
         map = miClient.createReportParams();
 
         map.put("sCfdiDate", dps == null ? cfd.getTimestamp() : dps.getDate());
-        map.put("sCfdiFolio", dps == null ? subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? (payrollEmp.getNumberSeries() + "-" + payrollEmp.getNumber()) : (payrollReceipt.getNumberSeries() + "-" + payrollReceipt.getNumber()) : (dps.getNumberSeries() + "-" + dps.getNumber()));
+        //map.put("sCfdiFolio", dps == null ? subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? (payrollEmp.getNumberSeries() + "-" + payrollEmp.getNumber()) : (payrollReceipt.getNumberSeries() + "-" + payrollReceipt.getNumber()) : (dps.getNumberSeries() + "-" + dps.getNumber())); XXX (jbarajas, 2015-10-07) remove by new table
+        map.put("sCfdiFolio", dps == null ? subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? (payrollEmp.getNumberSeries() + "-" + payrollEmp.getNumber()) : (payrollReceipt.getPayrollReceiptIssues() == null ? "" : payrollReceipt.getPayrollReceiptIssues().getNumberSeries() + "-" + payrollReceipt.getPayrollReceiptIssues().getNumber()) : (dps.getNumberSeries() + "-" + dps.getNumber()));
 
         // Acknowledgment Cancellation:
 

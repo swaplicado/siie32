@@ -5,6 +5,8 @@
 
 package erp.mtrn.data;
 
+import erp.mhrs.data.SDataPayrollReceiptIssue;
+
 /**
  *
  * @author Sergio Flores
@@ -39,11 +41,13 @@ public final class SCfdPacket implements java.io.Serializable {
     private int mnPayrollEmployeeId;
     private int mnPayrollReceiptPayrollId;
     private int mnPayrollReceiptEmployeeId;
+    private int mnPayrollReceiptIssueId;
     private java.lang.String msXml;
     private java.lang.String msXmlName;
     private java.util.Date mtXmlDate;
     private int mnFkUserDeliveryId;
     private SDataDps moDps;
+    private SDataPayrollReceiptIssue moPayrollReceiptIssue;
     private int mnLogSignId;
 
     public SCfdPacket() {
@@ -75,12 +79,14 @@ public final class SCfdPacket implements java.io.Serializable {
         mnPayrollEmployeeId = 0;
         mnPayrollReceiptPayrollId = 0;
         mnPayrollReceiptEmployeeId = 0;
+        mnPayrollReceiptIssueId = 0;
         msXml = "";
         msXmlName = "";
         mtXmlDate = null;
         mnFkUserDeliveryId = 0;
         
         moDps = null;
+        moPayrollReceiptIssue = null;
         mnLogSignId = 0;
     }
 
@@ -112,12 +118,14 @@ public final class SCfdPacket implements java.io.Serializable {
     public void setPayrollEmployeeId(int n) { mnPayrollEmployeeId = n; }
     public void setPayrollReceiptPayrollId(int n) { mnPayrollReceiptPayrollId = n; }
     public void setPayrollReceiptEmployeeId(int n) { mnPayrollReceiptEmployeeId = n; }
+    public void setPayrollReceiptIssueId(int n) { mnPayrollReceiptIssueId = n; }
     public void setXml(java.lang.String s) { msXml = s; }
     public void setXmlName(java.lang.String s) { msXmlName = s; }
     public void setXmlDate(java.util.Date t) { mtXmlDate = t; }
     public void setFkUserDeliveryId(int n) { mnFkUserDeliveryId = n; }
     
     public void setDps(SDataDps o) { moDps = o; }
+    public void setPayrollReceiptIssue(SDataPayrollReceiptIssue o) { moPayrollReceiptIssue = o; }
     public void setLogSignId(int n) { mnLogSignId = n; }
 
     public int getDpsYearId() { return mnDpsYearId; }
@@ -148,11 +156,13 @@ public final class SCfdPacket implements java.io.Serializable {
     public int getPayrollEmployeeId() { return mnPayrollEmployeeId; }
     public int getPayrollReceiptPayrollId() { return mnPayrollReceiptPayrollId; }
     public int getPayrollReceiptEmployeeId() { return mnPayrollReceiptEmployeeId; }
+    public int getPayrollReceiptIssueId() { return mnPayrollReceiptIssueId; }
     public java.lang.String getXml() { return msXml; }
     public java.lang.String getXmlName() { return msXmlName; }
     public java.util.Date getXmlDate() { return mtXmlDate; }
     public int getFkUserDeliveryId() { return mnFkUserDeliveryId; }
     
     public SDataDps getDps() { return moDps; }
+    public SDataPayrollReceiptIssue getPayrollReceiptIssue() { return moPayrollReceiptIssue; }
     public int getLogSignId() { return mnLogSignId; }
 }

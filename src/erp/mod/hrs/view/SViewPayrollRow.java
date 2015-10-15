@@ -7,8 +7,12 @@ package erp.mod.hrs.view;
 import erp.cfd.SCfdConsts;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
+import erp.mhrs.data.SDataPayrollReceiptIssue;
 import erp.mod.SModConsts;
+import erp.mod.hrs.db.SDbPayrollReceiptIssue;
+import erp.mod.hrs.db.SHrsPayrollAnnul;
 import erp.mod.hrs.db.SHrsUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
@@ -20,6 +24,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import sa.lib.SLibConsts;
 import sa.lib.SLibRpnArgument;
 import sa.lib.SLibRpnArgumentType;
 import sa.lib.SLibRpnOperator;
@@ -72,18 +77,18 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
         
-        jbSignXml = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_SIGN), "Timbrar XML", this);
+        jbSignXml = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_SIGN), "Timbrar CFDI", this);
         jbAnnul = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_ANNUL), "Anular nómina", this);
-        jbGetXml = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML), "Obtener XML", this);
-        jbGetAcknowledgmentCancellation = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_CANCEL), "Obtener acuse de cancelación", this);
+        jbGetXml = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML), "Obtener XML del comprobante", this);
+        jbGetAcknowledgmentCancellation = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_CANCEL), "Obtener XML del acuse de cancelación del CFDI", this);
         jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir nómina", this);
         jbPrintAcknowledgmentCancellation = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT_ACK_CAN), "Imprimir acuse de cancelación", this);
         jbSend = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")), "Enviar nómina", this);
-        jbVerifyCfdi = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_ok.gif")), "Verificar CFDI", this);
-        jbDiactivatePac = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif")), "Desactivar banderas CFDI", this);
+        jbVerifyCfdi = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_ok.gif")), "Verificar timbrado o cancelación del CFDI", this);
+        jbDiactivatePac = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif")), "Limpiar inconsistencias del timbrado o cancelación del CFDI", this);
         jbPrintReceipt = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_print.gif")), "Imprimir recibo", this);
         
-        moDialogAnnulCfdi = new SDialogAnnulCfdi((SClientInterface) miClient, false);
+        moDialogAnnulCfdi = new SDialogAnnulCfdi((SClientInterface) miClient, true);
 
         jbSignXml.setEnabled(true);
         jbAnnul.setEnabled(true);
@@ -137,6 +142,8 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
 
     private void actionSignPayroll() {
         boolean needUpdate = false;
+        SDataCfd cfd = null;
+        SDbPayrollReceiptIssue receiptIssue = null;
         
         if (jbSignXml.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
@@ -155,9 +162,31 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
                     miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
                 }
                 else {
+                    receiptIssue = new SDbPayrollReceiptIssue();
                     try {
-                        needUpdate = SCfdUtils.signCfdi((SClientInterface) miClient, SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_CUR);
+                        cfd = SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey());
+                        if (cfd != null) {
+                            receiptIssue.read(miClient.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() });
+                        }
                         
+                        if (receiptIssue.getPkIssueId() == SLibConsts.UNDEFINED) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n El recibo no ha sido emitido.");
+                        }
+                        else {
+                            if (receiptIssue.isDeleted()) {
+                                miClient.showMsgBoxWarning("El recibo '" + receiptIssue.getIssueNumber() + "' está eliminado.");
+                            }
+                            else if (receiptIssue.getFkReceiptStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
+                                miClient.showMsgBoxWarning("El recibo '" + receiptIssue.getIssueNumber() + "' está anulado.");
+                            }
+                            else if (!SDataUtilities.isPeriodOpen((SClientInterface) miClient, receiptIssue.getDateIssue())) {
+                                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
+                            }
+                            else {
+                                needUpdate = SCfdUtils.signCfdi((SClientInterface) miClient, cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR);
+                            }
+                        }
+                                
                         if (needUpdate) {
                             miClient.getSession().notifySuscriptors(mnGridType);
                         }
@@ -173,6 +202,10 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
     private void actionAnnulPayroll() {
         boolean needUpdate = false;
         SDataCfd cfd = null;
+        SDataPayrollReceiptIssue receiptIssue = null;
+        SHrsPayrollAnnul payrollAnnul = null;
+        ArrayList<SDataCfd> cfds = null;
+        ArrayList<SDataPayrollReceiptIssue> receiptIssues = null;
 
         if (jbAnnul.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
@@ -192,8 +225,36 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
-                        cfd = SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey());
+                        cfds = new ArrayList<SDataCfd>();
+                        receiptIssues = new ArrayList<SDataPayrollReceiptIssue>();
                         
+                        cfd = SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey());
+                        if (cfd != null) {
+                            cfds.add(cfd);
+                        }
+                        
+                        receiptIssue = new SDataPayrollReceiptIssue();
+            
+                        if (receiptIssue.read(new int[] { gridRow.getRowPrimaryKey()[0], gridRow.getRowPrimaryKey()[1], gridRow.getRowPrimaryKey()[2] }, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n El recibo no ha sido emitido.");
+                        }
+                        receiptIssues.add(receiptIssue);
+                                
+                        moDialogAnnulCfdi.formReset();
+                        moDialogAnnulCfdi.formRefreshCatalogues();
+                        moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, (cfds.isEmpty() ? miClient.getSession().getCurrentDate() : cfds.get(0).getTimestamp()));
+                        moDialogAnnulCfdi.setVisible(true);
+
+                        if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                            payrollAnnul = new SHrsPayrollAnnul((SClientInterface) miClient, cfds, receiptIssues, SCfdConsts.CFDI_PAYROLL_VER_CUR, false, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat());
+                            needUpdate = payrollAnnul.annulPayroll();
+                        }
+
+                        if (needUpdate) {
+                            miClient.getSession().notifySuscriptors(mnGridType);
+                        }
+                        
+                        /*
                         if (cfd == null) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
                         }
@@ -211,6 +272,7 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
                                 miClient.getSession().notifySuscriptors(mnGridType);
                             }
                         }
+                        */
                     }
                     catch (Exception e) {
                         SLibUtils.showException(this, e);
@@ -440,7 +502,7 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
         String sql = "v.fk_tp_pay = " + mnGridSubtype + " ";
         Object filter = null;
 
-        moPaneSettings = new SGridPaneSettings(2);
+        moPaneSettings = new SGridPaneSettings(3);
         moPaneSettings.setUserInsertApplying(true);
         moPaneSettings.setUserUpdateApplying(true);
 
@@ -455,6 +517,7 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
         msSql = "SELECT "
             + "r.id_pay AS " + SDbConsts.FIELD_ID + "1, "
             + "r.id_emp AS " + SDbConsts.FIELD_ID + "2, "
+            + "COALESCE(pei.id_iss, 0) AS " + SDbConsts.FIELD_ID + "3, "
             + "(SELECT emp.num FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp WHERE emp.id_emp = r.id_emp) AS " + SDbConsts.FIELD_CODE + ", "
             + "(SELECT bp.bp FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp WHERE bp.id_bp = r.id_emp) AS " + SDbConsts.FIELD_NAME + ", "
             + "v.num AS f_num, "
@@ -471,9 +534,15 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
             + "v.b_ssc, "
             + "r.ear_r AS f_debit, "
             + "r.ded_r AS f_credit, "
-            + "CONCAT(r.num_ser, IF(LENGTH(r.num_ser) = 0, '', '-'), erp.lib_fix_int(r.num, " + SDataConstantsSys.NUM_LEN_DPS + ")) AS f_num_cfd, "
-            + "IF(c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + SGridConsts.ICON_ANNUL + ", " + SGridConsts.ICON_NULL + ") AS f_ico, "
-            + "IF(c.ts IS NULL OR doc_xml = '', " + SGridConsts.ICON_NULL  + ", IF(c.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFD + " OR c.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_NA + ", " + SGridConsts.ICON_XML_ISSU + ", IF(c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(uuid) = 0, " + SGridConsts.ICON_XML_PEND + ", " + SGridConsts.ICON_XML_ISSU + "))) AS f_ico_xml, "
+            + "CONCAT(pei.num_ser, IF(LENGTH(pei.num_ser) = 0, '', '-'), erp.lib_fix_int(pei.num, " + SDataConstantsSys.NUM_LEN_DPS + ")) AS f_num_cfd, "
+            + "IF(pei.fk_st_rcp = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + SGridConsts.ICON_ANNUL + ", " + SGridConsts.ICON_NULL + ") AS f_ico, "  
+            + "IF(c.ts IS NULL OR doc_xml = '', " + SGridConsts.ICON_NULL  + ", " /* without icon (not have CFDI associated) */
+            + "IF(c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(uuid) = 0, " + SGridConsts.ICON_XML_PEND + ", " /* CFDI pending sign */
+            + "IF(LENGTH(c.ack_can_xml) = 0 AND c.ack_can_pdf_n IS NULL, " + SGridConsts.ICON_XML_ISSU + ", " /* CFDI signed, canceled only SIIE */
+            + "IF(LENGTH(c.ack_can_xml) != 0, " + SGridConsts.ICON_XML_ANNUL_XML + ", " /* CFDI canceled with cancellation acknowledgment in XML format */
+            + "IF(c.ack_can_pdf_n IS NOT NULL, " + SGridConsts.ICON_XML_ANNUL_PDF + ", " /* CFDI canceled with cancellation acknowledgment in PDF format */
+            + SGridConsts.ICON_XML_ISSU + "" /* CFDI signed, canceled only SIIE */
+            +"))))) AS f_ico_xml, "
             + "(SELECT b_prc_ws FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " WHERE fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n AND fid_pay_rcp_emp_n = c.fid_pay_rcp_emp_n ORDER BY id_cfd DESC LIMIT 1) AS f_prc_ws, "
             + "(SELECT b_prc_sto_xml FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " WHERE fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n AND fid_pay_rcp_emp_n = c.fid_pay_rcp_emp_n ORDER BY id_cfd DESC LIMIT 1) AS f_prc_sto_xml, "
             + "(SELECT b_prc_sto_pdf FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " WHERE fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n AND fid_pay_rcp_emp_n = c.fid_pay_rcp_emp_n ORDER BY id_cfd DESC LIMIT 1) AS f_prc_sto_pdf, "
@@ -524,9 +593,11 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
             + "v.fk_usr_ins = ui.id_usr "
             + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
             + "v.fk_usr_upd = uu.id_usr "
+            + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
+            + "r.id_pay = pei.id_pay AND r.id_emp = pei.id_emp AND pei.b_del = 0 AND pei.id_iss = (SELECT pei1.id_iss FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei1 WHERE pei1.id_pay = pei.id_pay AND pei1.id_emp = pei.id_emp AND pei1.b_del = 0 ORDER BY pei1.id_iss DESC LIMIT 1) "
             + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON "
-            + "r.id_pay = c.fid_pay_rcp_pay_n AND r.id_emp = c.fid_pay_rcp_emp_n AND NOT (c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND c.b_con = 0) " 
-            + "AND c.id_cfd = (SELECT c1.id_cfd FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c1 WHERE c1.fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n AND c1.fid_pay_rcp_emp_n = c.fid_pay_rcp_emp_n ORDER BY c1.id_cfd DESC LIMIT 1)"
+            + "r.id_pay = c.fid_pay_rcp_pay_n AND r.id_emp = c.fid_pay_rcp_emp_n AND c.fid_pay_rcp_iss_n = pei.id_iss AND NOT (c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND c.b_con = 0) " 
+            + "AND c.id_cfd = (SELECT c1.id_cfd FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c1 WHERE c1.fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n AND c1.fid_pay_rcp_emp_n = c.fid_pay_rcp_emp_n AND c1.fid_pay_rcp_iss_n = c.fid_pay_rcp_iss_n ORDER BY c1.id_cfd DESC LIMIT 1)"
             + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNS_ST_DPS) + " AS st ON "
             + "c.fid_st_xml = st.id_st_dps "
             + (sql.isEmpty() ? "" : "WHERE v.b_del = 0 AND " + sql)
@@ -575,6 +646,11 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
     @Override
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
+        moSuscriptionsSet.add(mnGridSubtype);
+        moSuscriptionsSet.add(SModConsts.HRS_PAY);
+        moSuscriptionsSet.add(SModConsts.HRS_PAY_RCP_EAR);
+        moSuscriptionsSet.add(SModConsts.HRS_PAY_RCP_DED);
+        moSuscriptionsSet.add(SModConsts.HRS_SIE_PAY);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
     }
 

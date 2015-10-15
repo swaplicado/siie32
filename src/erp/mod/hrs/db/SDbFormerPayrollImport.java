@@ -128,6 +128,7 @@ public class SDbFormerPayrollImport extends SDataRegistry implements Serializabl
                     cfd.setFkPayrollBizPartnerId_n(packet.getPayrollBizPartnerId());
                     cfd.setFkPayrollReceiptPayrollId_n(packet.getPayrollReceiptPayrollId());
                     cfd.setFkPayrollReceiptEmployeeId_n(packet.getPayrollReceiptEmployeeId());
+                    cfd.setFkPayrollReceiptIssueId_n(packet.getPayrollReceiptIssueId());
 
                     cfd.setAuxRfcEmisor(packet.getRfcEmisor());
                     cfd.setAuxRfcReceptor(packet.getRfcReceptor());

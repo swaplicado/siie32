@@ -11,6 +11,7 @@ import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.mhrs.data.SHrsPayrollEmployeeReceipt;
+import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mtrn.data.SCfdPacket;
 import erp.mtrn.data.SCfdUtils;
@@ -54,21 +55,26 @@ public abstract class SHrsCfdUtils {
         ArrayList<SHrsPayrollEmployeeReceipt> receipts = new ArrayList<SHrsPayrollEmployeeReceipt>();
         ResultSet resultSet = null;
         
-        sql = "SELECT p.id_pay, p.per_year, p.per, p.num, p.dt_sta, p.dt_end, p.nts, p.fk_tp_pay, pr.id_emp, bp.bp, emp.num, pr.ear_r AS f_ear, pr.ded_r AS f_ded, pr.num_ser, pr.pay_r as f_tot, pr.fk_tp_pay_sys, pr.dt_iss, pr.dt_pay " 
-                + "FROM hrs_pay p "
-                + "INNER JOIN hrs_pay_rcp pr ON p.id_pay = pr.id_pay "
-                + "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = pr.id_emp "
-                + "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp "
+        sql = "SELECT p.id_pay, p.per_year, p.per, p.num, p.dt_sta, p.dt_end, p.nts, p.fk_tp_pay, pr.id_emp, bp.bp, emp.num AS f_emp_num, pr.ear_r AS f_ear, pr.ded_r AS f_ded, pei.id_iss, pei.num_ser, pr.pay_r as f_tot, pei.fk_tp_pay_sys, pei.dt_iss, pei.dt_pay " 
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
+                + "pr.id_pay = pei.id_pay AND pr.id_emp = pei.id_emp AND pei.b_del = 0 AND pei.fk_st_rcp = " + SModSysConsts.TRNS_ST_DPS_EMITED + " AND pei.id_iss = (SELECT pei1.id_iss FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei1 WHERE pei1.id_pay = pei.id_pay AND pei1.id_emp = pei.id_emp AND pei1.b_del = 0 ORDER BY pei1.id_iss DESC LIMIT 1) "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON emp.id_emp = pr.id_emp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON bp.id_bp = emp.id_emp "
                 + "WHERE p.id_pay = " + payrollId + " AND p.b_del = 0 AND pr.b_del = 0 AND pr.b_cfd_req = 1 AND "
-                + "NOT EXISTS (SELECT * FROM trn_cfd WHERE fid_pay_rcp_pay_n = pr.id_pay AND fid_pay_rcp_emp_n = pr.id_emp) "
+                + "NOT EXISTS (SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " WHERE fid_pay_rcp_pay_n = pei.id_pay AND fid_pay_rcp_emp_n = pei.id_emp AND fid_pay_rcp_iss_n = pei.id_iss ) "
                 + "UNION "
-                + "SELECT p.id_pay, p.per_year, p.per, p.num, p.dt_sta, p.dt_end, p.nts, p.fk_tp_pay, pr.id_emp, bp.bp, emp.num, pr.ear_r AS f_ear, pr.ded_r AS f_ded, pr.num_ser, pr.pay_r as f_tot, pr.fk_tp_pay_sys, pr.dt_iss, pr.dt_pay "
-                + "FROM hrs_pay p "
-                + "INNER JOIN hrs_pay_rcp pr ON p.id_pay = pr.id_pay "
-                + "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = pr.id_emp "
-                + "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp "
-                + "INNER JOIN trn_cfd c ON pr.id_pay = c.fid_pay_rcp_pay_n AND pr.id_emp = c.fid_pay_rcp_emp_n AND c.fid_st_xml in (" + SDataConstantsSys.TRNS_ST_DPS_NEW + " , " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ") "
-                + "WHERE p.id_pay = " + payrollId + " AND p.b_del = 0 AND pr.b_del = 0;";
+                + "SELECT p.id_pay, p.per_year, p.per, p.num, p.dt_sta, p.dt_end, p.nts, p.fk_tp_pay, pr.id_emp, bp.bp, emp.num AS f_emp_num, pr.ear_r AS f_ear, pr.ded_r AS f_ded, pei.id_iss, pei.num_ser, pr.pay_r as f_tot, pei.fk_tp_pay_sys, pei.dt_iss, pei.dt_pay "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
+                + "pr.id_pay = pei.id_pay AND pr.id_emp = pei.id_emp AND pei.b_del = 0 AND pei.fk_st_rcp <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " AND pei.id_iss = (SELECT pei1.id_iss FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei1 WHERE pei1.id_pay = pei.id_pay AND pei1.id_emp = pei.id_emp AND pei1.b_del = 0 ORDER BY pei1.id_iss DESC LIMIT 1) "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON emp.id_emp = pr.id_emp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON bp.id_bp = emp.id_emp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " c ON pei.id_pay = c.fid_pay_rcp_pay_n AND pei.id_emp = c.fid_pay_rcp_emp_n AND pei.id_iss = c.fid_pay_rcp_iss_n AND c.fid_st_xml IN (" + SDataConstantsSys.TRNS_ST_DPS_NEW + " , " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ") "
+                + "WHERE p.id_pay = " + payrollId + " AND p.b_del = 0 AND pr.b_del = 0 "
+                + "ORDER BY id_pay, per_year, per, num, dt_sta, dt_end, nts, fk_tp_pay, id_emp, bp, f_emp_num, f_ear, f_ded, id_iss, num_ser, f_tot, fk_tp_pay_sys, dt_iss, dt_pay ";
         
         resultSet = session.getStatement().executeQuery(sql);
         
@@ -76,6 +82,8 @@ public abstract class SHrsCfdUtils {
             receipt = new SHrsPayrollEmployeeReceipt();
             
             receipt.setPkPayrollId(resultSet.getInt("id_pay"));
+            receipt.setPkEmployeeId(resultSet.getInt("id_emp"));
+            receipt.setPkIssueId(resultSet.getInt("id_iss"));
             receipt.setPeriodYear(resultSet.getInt("per_year"));
             receipt.setPeriod(resultSet.getInt("per"));
             receipt.setPayrollNumber(resultSet.getInt("num"));
@@ -83,7 +91,6 @@ public abstract class SHrsCfdUtils {
             receipt.setDateEnd(resultSet.getDate("dt_end"));
             receipt.setNotes(resultSet.getString("nts"));
             receipt.setFkPaymentTypeId(resultSet.getInt("fk_tp_pay"));
-            receipt.setPkEmployeeId(resultSet.getInt("id_emp"));
             receipt.setNumberSeries(resultSet.getString("num_ser"));
             receipt.setDateIssue(resultSet.getDate("dt_iss"));
             receipt.setDatePayment(resultSet.getDate("dt_pay"));
@@ -110,21 +117,19 @@ public abstract class SHrsCfdUtils {
         return true;
     }
     
-    public static SDataCfd computeCfdi(final SGuiSession session, final SHrsFormerPayrollReceipt receipt, final boolean cfdiPendingSigned) throws Exception {
+    public static SDataCfd computeCfdi(final SGuiSession session, final SHrsFormerPayrollReceipt receipt, final int receiptIssue, final boolean cfdiPendingSigned) throws Exception {
         boolean add = true;
         String sql;
         SCfdPacket packet = null;
         SDbFormerPayrollImport payrollImport = null;
         cfd.ver3.DElementComprobante comprobanteCfdi = null;
         ArrayList<SCfdPacket> moCfdPackets = new ArrayList<SCfdPacket>();
-        ArrayList<SDataCfd> cfds = null;
-        SDataCfd cfd = null;
         ResultSet resultSet = null;
         
         int cfdId = SLibConsts.UNDEFINED;
         
         sql = "SELECT id_cfd, fid_st_xml " 
-                + "FROM trn_cfd WHERE fid_pay_rcp_pay_n = " + receipt.getPayroll().getPkNominaId() + " AND fid_pay_rcp_emp_n = " + receipt.getPkEmpleadoId() + " "
+                + "FROM trn_cfd WHERE fid_pay_rcp_pay_n = " + receipt.getPayroll().getPkNominaId() + " AND fid_pay_rcp_emp_n = " + receipt.getPkEmpleadoId() + " AND fid_pay_rcp_iss_n = " + receiptIssue + " "
                 + "ORDER BY id_cfd ";
 
         resultSet = session.getStatement().executeQuery(sql);
@@ -159,6 +164,7 @@ public abstract class SHrsCfdUtils {
             packet.setFkUserDeliveryId(session.getUser().getPkUserId());
             packet.setPayrollReceiptPayrollId(receipt.getPayroll().getPkNominaId());
             packet.setPayrollReceiptEmployeeId(receipt.getAuxEmpleadoId());
+            packet.setPayrollReceiptIssueId(receiptIssue);
             packet.setRfcEmisor("");
             packet.setRfcReceptor("");
             packet.setTotalCy(0);
@@ -196,21 +202,21 @@ public abstract class SHrsCfdUtils {
                 }
             }
         }
-        return SCfdUtils.getPayrollReceiptLastCfd((SClientInterface)session.getClient(), SCfdConsts.CFDI_PAYROLL_VER_CUR, new int[] { receipt.getPayroll().getPkNominaId(), receipt.getPkEmpleadoId() });
+        return SCfdUtils.getPayrollReceiptLastCfd((SClientInterface)session.getClient(), SCfdConsts.CFDI_PAYROLL_VER_CUR, new int[] { receipt.getPayroll().getPkNominaId(), receipt.getPkEmpleadoId(), receiptIssue });
     }
         
-    public static void compueteSignCfdi(final SGuiSession session, int[] keyReceipt) throws Exception {
+    public static void computeSignCfdi(final SGuiSession session, int[] keyReceipt) throws Exception {
         SDataCfd cfdi = null;
         SHrsFormerPayroll hrsFormerPayroll = null;
         SHrsFormerPayrollReceipt hrsFormerPayrollReceipt = null;
         
-        hrsFormerPayroll = SHrsUtils.readPayroll((SClientInterface) session.getClient(), keyReceipt[0], keyReceipt[1]);
+        hrsFormerPayroll = SHrsUtils.readPayroll((SClientInterface) session.getClient(), keyReceipt[0], keyReceipt[1], keyReceipt[2]);
         hrsFormerPayrollReceipt = hrsFormerPayroll.getChildPayrollReceipts().get(0);
         hrsFormerPayrollReceipt.setPayroll(hrsFormerPayroll);
         hrsFormerPayrollReceipt.setFechaEdicion(session.getCurrentDate());
         hrsFormerPayrollReceipt.setMoneda(session.getSessionCustom().getLocalCurrencyCode()); 
         
-        cfdi = computeCfdi(session, hrsFormerPayrollReceipt, false);
+        cfdi = computeCfdi(session, hrsFormerPayrollReceipt, keyReceipt[2], false);
         if (cfdi == null) {
             throw new Exception("Error al leer el CFD, no se encontró el registro.");
         }

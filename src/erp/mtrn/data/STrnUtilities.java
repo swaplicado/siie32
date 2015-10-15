@@ -1739,7 +1739,8 @@ public abstract class STrnUtilities {
                                 payrollReceipt.read(client.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
                                 
                                 snd_subject = mms.getTextSubject() + " " + payroll.getPeriodYear() + " " + (payroll.getAuxPaymentType().compareTo(SHrsFormerConsts.PAY_WEE) == 0 ? SHrsFormerConsts.PAY_WEE_ABB : payroll.getAuxPaymentType().compareTo(SHrsFormerConsts.PAY_BIW) == 0 ? SHrsFormerConsts.PAY_BIW_ABB : payroll.getAuxPaymentType().compareTo(SHrsFormerConsts.PAY_MON) == 0 ? SHrsFormerConsts.PAY_MON_ABB : "") + " " +
-                                    numberFormat.format(payroll.getNumber()) + " " + (payrollReceipt.getNumberSeries().length() > 0 ? payrollReceipt.getNumberSeries() + "-" : "") + payrollReceipt.getNumber();
+                                    numberFormat.format(payroll.getNumber()) + " " + (payrollReceipt.getPayrollReceiptIssues() == null ? "" :(payrollReceipt.getPayrollReceiptIssues().getNumberSeries().length() > 0 ? payrollReceipt.getPayrollReceiptIssues().getNumberSeries() + "-" : "") + payrollReceipt.getPayrollReceiptIssues().getNumber());
+                                    //numberFormat.format(payroll.getNumber()) + " " + (payrollReceipt.getNumberSeries().length() > 0 ? payrollReceipt.getNumberSeries() + "-" : "") + payrollReceipt.getNumber(); XXX (jbarajas, 2015-10-07) remove by new table
                                 break;
                             default:
                                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

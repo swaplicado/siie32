@@ -13,6 +13,8 @@ import java.util.Date;
 public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
     
     protected int mnPkPayrollId;
+    protected int mnPkEmployeeId;
+    protected int mnPkIssueId;
     protected int mnPeriodYear;
     protected int mnPeriod;
     protected int mnPayrollNumber;
@@ -21,7 +23,6 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
     protected String msNotes;
     protected int mnFkPaymentTypeId;
     
-    protected int mnPkEmployeeId;
     protected String msEmployeeNumber;
     protected String msEmployeeName;
     protected double mdTotalEarnings;
@@ -36,6 +37,8 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
 
     public SHrsPayrollEmployeeReceipt() {
         mnPkPayrollId = 0;
+        mnPkEmployeeId = 0;
+        mnPkIssueId = 0;
         mnPeriodYear = 0;
         mnPeriod = 0;
         mnPayrollNumber = 0;
@@ -43,7 +46,6 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
         mtDateEnd = null;
         msNotes = "";
         mnFkPaymentTypeId = 0;
-        mnPkEmployeeId = 0;
         msEmployeeNumber = "";
         msEmployeeName = "";
         mdTotalEarnings = 0;
@@ -71,6 +73,8 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
     }
 
     public void setPkPayrollId(int n) { mnPkPayrollId = n; }
+    public void setPkEmployeeId(int n) { mnPkEmployeeId = n; }
+    public void setPkIssueId(int n) { mnPkIssueId = n; }
     public void setPeriodYear(int n) { mnPeriodYear = n; }
     public void setPeriod(int n) { mnPeriod = n; }
     public void setPayrollNumber(int n) { mnPayrollNumber = n; }
@@ -78,7 +82,6 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
     public void setDateEnd(Date t) { mtDateEnd = t; }
     public void setNotes(String s) { msNotes = s; }
     public void setFkPaymentTypeId(int n) { mnFkPaymentTypeId = n; }
-    public void setPkEmployeeId(int n) { mnPkEmployeeId = n; }
     public void setEmployeeNumber(String s) { msEmployeeNumber = s; }
     public void setEmployeeName(String s) { msEmployeeName = s; }
     public void setTotalEarnings(double d) { mdTotalEarnings = d; }
@@ -91,6 +94,8 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
     public void setPaymentTypeSysId(int n) { mnPaymentTypeSysId = n; }
 
     public int getPkPayrollId() { return mnPkPayrollId; }
+    public int getPkEmployeeId() { return mnPkEmployeeId; }
+    public int getPkIssueId() { return mnPkIssueId; }
     public int getPeriodYear() { return mnPeriodYear; }
     public int getPeriod() { return mnPeriod; }
     public int getPayrollNumber() { return mnPayrollNumber; }
@@ -98,7 +103,6 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
     public Date getDateEnd() { return mtDateEnd; }
     public String getNotes() { return msNotes; }
     public int getFkPaymentTypeId() { return mnFkPaymentTypeId; }
-    public int getPkEmployeeId() { return mnPkEmployeeId; }
     public String getEmployeeNumber() { return msEmployeeNumber ; }
     public String getEmployeeName() { return msEmployeeName ; }
     public double getTotalEarnings() { return mdTotalEarnings ; }

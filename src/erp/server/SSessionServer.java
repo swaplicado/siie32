@@ -564,6 +564,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
             cfd.setFkPayrollBizPartnerId_n(packet.getPayrollBizPartnerId());
             cfd.setFkPayrollReceiptPayrollId_n(packet.getPayrollReceiptPayrollId());
             cfd.setFkPayrollReceiptEmployeeId_n(packet.getPayrollReceiptEmployeeId());
+            cfd.setFkPayrollReceiptIssueId_n(packet.getPayrollReceiptIssueId());
             cfd.setGenerateQrCode(packet.getGenerateQrCode());
 
             cfd.setAuxRfcEmisor(packet.getRfcEmisor());
@@ -620,16 +621,29 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                 }
 
                 if (result == SLibConstants.DB_CFD_OK) {
-                    if (packet.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED && packet.getDps() != null) {
-                        // Annul DPS registry:
+                    if (packet.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
+                        if (packet.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_CFD && packet.getDps() != null) {
+                           // Annul DPS registry:
 
-                        result = ((SDataRegistry) packet.getDps()).canAnnul(moCompanyDatabase.getConnection());
+                            result = ((SDataRegistry) packet.getDps()).canAnnul(moCompanyDatabase.getConnection());
 
-                        if (result == SLibConstants.DB_CAN_ANNUL_YES) {
-                            result = ((SDataRegistry) packet.getDps()).annul(moCompanyDatabase.getConnection());
+                            if (result == SLibConstants.DB_CAN_ANNUL_YES) {
+                                result = ((SDataRegistry) packet.getDps()).annul(moCompanyDatabase.getConnection());
 
-                            if (result == SLibConstants.DB_ACTION_ANNUL_OK) {
-                                result = SLibConstants.DB_CFD_OK;
+                                if (result == SLibConstants.DB_ACTION_ANNUL_OK) {
+                                    result = SLibConstants.DB_CFD_OK;
+                                }
+                            } 
+                        }
+                        else if (packet.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_PAY && packet.getPayrollReceiptIssue() != null) {
+                            result = ((SDataRegistry) packet.getPayrollReceiptIssue()).canAnnul(moCompanyDatabase.getConnection());
+
+                            if (result == SLibConstants.DB_CAN_ANNUL_YES) {
+                                result = ((SDataRegistry) packet.getPayrollReceiptIssue()).annul(moCompanyDatabase.getConnection());
+
+                                if (result == SLibConstants.DB_ACTION_ANNUL_OK) {
+                                    result = SLibConstants.DB_CFD_OK;
+                                }
                             }
                         }
                     }

@@ -468,11 +468,13 @@ public class SDbPayroll extends SDbRegistryUser {
         for (SDbPayrollReceipt payrollReceipt : maChildPayrollReceiptsDelete) {
             payrollReceipt.setDeleted(true);
             payrollReceipt.setPkPayrollId(mnPkPayrollId);
+            payrollReceipt.setAuxDateIssue(mtDateEnd);
             payrollReceipt.save(session);
         }
         
         for (SDbPayrollReceipt payrollReceipt : maChildPayrollReceipts) {
-            if (!payrollReceipt.isStamped()) {
+            if (payrollReceipt.getPayrollReceiptIssues() == null || !payrollReceipt.getPayrollReceiptIssues().isStamped()) {
+            //if (!payrollReceipt.isStamped()) {
                 payrollReceipt.setRegistryNew(true);
                 payrollReceipt.setPkPayrollId(mnPkPayrollId);
                 payrollReceipt.save(session);
@@ -536,12 +538,19 @@ public class SDbPayroll extends SDbRegistryUser {
     public boolean canDelete(SGuiSession session) throws SQLException, Exception {
         boolean can = super.canSave(session);
         
-        for (SDbPayrollReceipt payrollReceipt : maChildPayrollReceipts) {
-            can = payrollReceipt.canDelete(session);
+        if (can && mbClosed) {
+            can = false;
+            msQueryResult = "¡No es posible eliminar nóminas cerradas!";
+        }
+        
+        if (can) {
+            for (SDbPayrollReceipt payrollReceipt : maChildPayrollReceipts) {
+                can = payrollReceipt.canDelete(session);
 
-            if (!can) {
-                msQueryResult = payrollReceipt.getQueryResult();
-                break;
+                if (!can) {
+                    msQueryResult = payrollReceipt.getQueryResult();
+                    break;
+                }
             }
         }
         

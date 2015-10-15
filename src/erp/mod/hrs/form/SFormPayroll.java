@@ -4,6 +4,7 @@
  */
 package erp.mod.hrs.form;
 
+import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbAbsenceConsumption;
@@ -916,6 +917,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 SHrsPayrollRowEmployeeReceipt hrsPayrollEmployeeReceipt = null;
                 SDialogPayrollEmployee payrollEmployee = null;
                 SHrsPayrollReceipt payrollReceipt = null;
+                boolean edit = true;
 
                 try {
                     if (jtTable.getSelectedRowCount() != 1) {
@@ -930,8 +932,12 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                         if (!mbIsReadOnly) {
                             payrollReceipt.computeReceipt();
                         }
+                        
+                        edit = (hrsPayrollEmployeeReceipt.getHrsPayrollReceipt().getReceipt().getPayrollReceiptIssues() == null && !mbIsReadOnly) ||
+                                (!(hrsPayrollEmployeeReceipt.getHrsPayrollReceipt().getReceipt().getPayrollReceiptIssues() != null && hrsPayrollEmployeeReceipt.getHrsPayrollReceipt().getReceipt().getPayrollReceiptIssues().getFkReceiptStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) && !mbIsReadOnly);
 
-                        payrollEmployee.setValue(SGuiConsts.PARAM_REQ_PAY, (!hrsPayrollEmployeeReceipt.getHrsPayrollReceipt().getReceipt().isStamped() && !mbIsReadOnly));
+                        //payrollEmployee.setValue(SGuiConsts.PARAM_REQ_PAY, (!hrsPayrollEmployeeReceipt.getHrsPayrollReceipt().getReceipt().isStamped() && !mbIsReadOnly)); XXX (jbarajas, 2015-10-07) remove by new table receipt issue
+                        payrollEmployee.setValue(SGuiConsts.PARAM_REQ_PAY, edit);
                         payrollEmployee.setValue(SModConsts.HRS_PAY_RCP, payrollReceipt);
                         payrollEmployee.setValue(SModConsts.HRS_EAR, moHrsPayroll.getEarnigs());
                         payrollEmployee.setValue(SModConsts.HRS_DED, moHrsPayroll.getDeductions());
@@ -975,11 +981,12 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         boolean enable = true;
         
         try {
-            mbIsReadOnly = moRegistry.isClosed();
+            mbIsReadOnly = moRegistry.isClosed() || moRegistry.isDeleted();
             
             if (!mbIsReadOnly) {
                 for (SHrsPayrollReceipt receipt : moHrsPayroll.getReceipts()) {
-                    if (receipt.getReceipt().isStamped()) {
+                    //if (receipt.getReceipt().isStamped()) { XXX (jbarajas, 2015-10-07) remove by new table receipt issue
+                    if (receipt.getReceipt().getPayrollReceiptIssues() != null && receipt.getReceipt().getPayrollReceiptIssues().getFkReceiptStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
                         enable = false;
                         break;
                     }
@@ -1039,8 +1046,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     }
     
     private void validatePayrollReceiptCfdi(SHrsPayrollRowEmployeeReceipt employeeReceipt) throws Exception {
-        if (employeeReceipt.getHrsPayrollReceipt().getReceipt().isStamped()) {
-            throw new Exception("No se puede remover el recibo de '" + employeeReceipt.getName() + "', está timbrado.");
+        //if (employeeReceipt.getHrsPayrollReceipt().getReceipt().isStamped()) { XXX (jbarajas, 2015-10-07) remove by new table receipt issue
+        if (employeeReceipt.getHrsPayrollReceipt().getReceipt().getPayrollReceiptIssues() != null && employeeReceipt.getHrsPayrollReceipt().getReceipt().getPayrollReceiptIssues().getFkReceiptStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
+            throw new Exception("No se puede remover el recibo de '" + employeeReceipt.getName() + "', está emitido.");
         }
     }
 
@@ -1801,7 +1809,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
             setFormEditable(true);
 
-            populateEmployeesReceipt();         // XXX This method must be invoqued just before populateEmployeesAvailable()! Improve this!
+            populateEmployeesReceipt();         // XXX This method must be invoked just before populateEmployeesAvailable()! Improve this!
             populateEmployeesAvailable(false);
 
             clearCurrentValues();
