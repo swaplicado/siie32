@@ -650,6 +650,7 @@ public class SDbBankLayout extends SDbRegistryUser {
     private String createConceptRecordEntry(final SGuiSession session, final int bizPartnerBank, final int bankBank, final String reference, final String bizPartner) throws Exception {
         String bank = "";
         String layoutTitle = "";
+        String concept = "";
         String sql = "";
         ResultSet resultSet = null;
 
@@ -678,7 +679,9 @@ public class SDbBankLayout extends SDbRegistryUser {
             bank = resultSet.getString(1);
         }
         
-        return layoutTitle + " / " + bank + " / F " + reference + " / " + bizPartner;
+        concept = layoutTitle + " / " + bank + " / F " + reference + " / " + bizPartner;
+        
+        return (concept.length() > 100 ? SLibUtilities.textLeft(concept, 100) : concept).trim();
     }
     
     private void updateLayoutXml(Vector<SDataRecordEntry> recordEntries) {
