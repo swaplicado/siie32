@@ -152,7 +152,7 @@ public abstract class SFinUtilities {
                 layout += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 10 ? 0 : 10 - sAccountCredit.length())).concat(SLibUtilities.textLeft(sAccountCredit, 10));
                 layout += formatDesc.format(mdBalanceTot).replace(".", "");
                 layout += values.getCurrencyId();
-                layout += sReference.concat(SLibUtilities.textRepeat(" ", (30 - sReference.length())));
+                layout += SLibUtilities.textRepeat(" ", (sReference.length() >= 30 ? 0 : 430 - sReference.length())).concat(SLibUtilities.textLeft(sReference, 30));
                 layout += (sBizPartner.length() > 40 ? SLibUtilities.textLeft(sBizPartner, 40) : sBizPartner).concat(SLibUtilities.textRepeat(" ", (40 - sBizPartner.length())));
                 layout += values.getCf();
                 layout += SLibUtilities.textRepeat(" ", 18);
@@ -215,7 +215,7 @@ public abstract class SFinUtilities {
                 layout += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 10 ? 0 : 10 - sAccountCredit.length())).concat(SLibUtilities.textLeft(sAccountCredit, 10));
                 layout += formatDesc.format(mdBalanceTot).replace(".", "");
                 layout += payment.getCurrencyId();
-                layout += sReference.concat(SLibUtilities.textRepeat(" ", (30 - sReference.length())));
+                layout += SLibUtilities.textRepeat(" ", (sReference.length() >= 30 ? 0 : 30 - sReference.length())).concat(SLibUtilities.textLeft(sReference, 30));
                 layout += (sBizPartner.length() > 40 ? SLibUtilities.textLeft(sBizPartner, 40) : sBizPartner).concat(SLibUtilities.textRepeat(" ", (40 - sBizPartner.length())));
                 layout += payment.getHsbcFiscalVoucher();
                 layout += SLibUtilities.textRepeat(" ", 18);
@@ -232,7 +232,7 @@ public abstract class SFinUtilities {
 
                 layout += SLibUtilities.textRepeat("0", 5).concat("1");
                 layout += SLibUtilities.textRepeat("0", 6 - n).concat(nMoveNum + "");
-                layout += sConcept.concat(SLibUtilities.textRepeat(" ", (40 - sConcept.length())));
+                layout += SLibUtilities.textRepeat(" ", (sConcept.length() >= 40 ? 0 : 40 - sConcept.length())).concat(SLibUtilities.textLeft(sConcept, 40));
             }
         }
         catch (java.lang.Exception e) {
@@ -287,7 +287,7 @@ public abstract class SFinUtilities {
                 layout += SLibUtilities.textRepeat("0", 3 - n).concat(values.getBankKey() + "");
                 layout += (sBizPartner.length() > 40 ? SLibUtilities.textLeft(sBizPartner, 40) : sBizPartner).concat(SLibUtilities.textRepeat(" ", (40 - sBizPartner.length())));
                 layout += SLibUtilities.textRepeat("0", 3).concat(SLibUtilities.textRight(sAccountDebit, 4)); // Numerical Reference
-                layout += sReference.concat(SLibUtilities.textRepeat(" ", (40 - sReference.length())));
+                layout += SLibUtilities.textRepeat(" ", (sReference.length() >= 40 ? 0 : 40 - sReference.length())).concat(SLibUtilities.textLeft(sReference, 40));
                 layout += formatDesc.format(mdBalanceTot).replace(".", "");
                 //layout += values.getBizPartnerCreditFiscalId().concat(SLibUtilities.textRepeat(" ", (18 - values.getBizPartnerCreditFiscalId().length()))); XXX No required is optional (jbarajas)
                 //layout += formatDescs.format(mdTaxChargedTot); XXX No required is optional (jbarajas)
@@ -336,7 +336,7 @@ public abstract class SFinUtilities {
                 layout += SLibUtilities.textRepeat("0", 3 - n).concat(payment.getHsbcBankCode() + "");
                 layout += (sBizPartner.length() > 40 ? SLibUtilities.textLeft(sBizPartner, 40) : sBizPartner).concat(SLibUtilities.textRepeat(" ", (40 - sBizPartner.length())));
                 layout += SLibUtilities.textRepeat("0", 3).concat(SLibUtilities.textRight(sAccountDebit, 4)); // Numerical Reference
-                layout += sReference.concat(SLibUtilities.textRepeat(" ", (40 - sReference.length())));
+                layout += SLibUtilities.textRepeat(" ", (sReference.length() >= 40 ? 0 : 40 - sReference.length())).concat(SLibUtilities.textLeft(sReference, 40));
                 layout += formatDesc.format(mdBalanceTot).replace(".", "");
                 //layout += values.getBizPartnerCreditFiscalId().concat(SLibUtilities.textRepeat(" ", (18 - values.getBizPartnerCreditFiscalId().length()))); XXX No required is optional (jbarajas)
                 //layout += formatDescs.format(mdTaxChargedTot); XXX No required is optional (jbarajas)
@@ -386,8 +386,8 @@ public abstract class SFinUtilities {
                 layout += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 20 ? 0 : 20 - sAccountCredit.length())).concat(SLibUtilities.textLeft(sAccountCredit, 20));
                 layout += formatDesc.format(mdBalanceTot).replace(".", "");
                 layout += SLibUtilities.textRepeat("0", 3).concat(SLibUtilities.textRight(sAccountDebit, 4)); // Numerical Reference
-                layout += sConcept.concat(SLibUtilities.textRepeat(" ", (30 - sConcept.length())));
-                layout += sDescription.concat(SLibUtilities.textRepeat(" ", (40 - sDescription.length())));
+                layout += SLibUtilities.textRepeat(" ", (sConcept.length() >= 30 ? 0 : 30 - sConcept.length())).concat(SLibUtilities.textLeft(sConcept, 30));
+                layout += SLibUtilities.textRepeat(" ", (sDescription.length() >= 40 ? 0 : 40 - sDescription.length())).concat(SLibUtilities.textLeft(sDescription, 40));
 
                 layout += "\r\n";
             }
@@ -427,8 +427,8 @@ public abstract class SFinUtilities {
                 layout += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 20 ? 0 : 20 - sAccountCredit.length())).concat(SLibUtilities.textLeft(sAccountCredit, 20));
                 layout += formatDesc.format(mdBalanceTot).replace(".", "");
                 layout += SLibUtilities.textRepeat("0", 3).concat(SLibUtilities.textRight(sAccountDebit, 4)); // Numerical Reference
-                layout += sConcept.concat(SLibUtilities.textRepeat(" ", (30 - sConcept.length())));
-                layout += sDescription.concat(SLibUtilities.textRepeat(" ", (40 - sDescription.length())));
+                layout += SLibUtilities.textRepeat(" ", (sConcept.length() >= 30 ? 0 : 30 - sConcept.length())).concat(SLibUtilities.textLeft(sConcept, 30));
+                layout += SLibUtilities.textRepeat(" ", (sDescription.length() >= 40 ? 0 : 40 - sDescription.length())).concat(SLibUtilities.textLeft(sDescription, 40));
 
                 layout += "\r\n";
             }
@@ -483,7 +483,7 @@ public abstract class SFinUtilities {
                 layout += values.getBizPartnerCreditFiscalId().concat(SLibUtilities.textRepeat(" ", (18 - values.getBizPartnerCreditFiscalId().length())));
                 layout += values.getTaxCharged() != 0 ? formatDesc.format(mdTaxChargedTot).replace(".", "") : formatDesc.format(0d).replace(".", "");
                 layout += SLibUtilities.textRepeat("0", 3).concat(SLibUtilities.textRight(sAccountDebit, 4)); // Numerical Reference
-                layout += sConcept.concat(SLibUtilities.textRepeat(" ", (40 - sConcept.length())));
+                layout += SLibUtilities.textRepeat(" ", (sConcept.length() >= 40 ? 0 : 40 - sConcept.length())).concat(SLibUtilities.textLeft(sConcept, 40));
 
                 layout += "\r\n";
             }
@@ -524,7 +524,7 @@ public abstract class SFinUtilities {
                 layout += payment.getHsbcFiscalIdCredit().concat(SLibUtilities.textRepeat(" ", (18 - payment.getHsbcFiscalIdCredit().length())));
                 layout +=  formatDesc.format(0d).replace(".", "");
                 layout += SLibUtilities.textRepeat("0", 3).concat(SLibUtilities.textRight(sAccountDebit, 4)); // Numerical Reference
-                layout += sConcept.concat(SLibUtilities.textRepeat(" ", (40 - sConcept.length())));
+                layout += SLibUtilities.textRepeat(" ", (sConcept.length() >= 40 ? 0 : 40 - sConcept.length())).concat(SLibUtilities.textLeft(sConcept, 40));
 
                 layout += "\r\n";
             }
@@ -577,7 +577,7 @@ public abstract class SFinUtilities {
                 layout += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 11 ? 0 : 11 - sAccountCredit.length())).concat(SLibUtilities.textLeft(sAccountCredit, 11)); // Credit account
                 layout += SLibUtilities.textRepeat(" ", 5); // Blank
                 layout += formatDesc.format(mdBalanceTot);
-                layout += sConcept.concat(SLibUtilities.textRepeat(" ", (40 - sConcept.length())));
+                layout += SLibUtilities.textRepeat(" ", (sConcept.length() >= 40 ? 0 : 40 - sConcept.length())).concat(SLibUtilities.textLeft(sConcept, 40));
                 layout += formatDate.format(values.getDate());
 
                 layout += "\r\n";
@@ -617,7 +617,7 @@ public abstract class SFinUtilities {
                 layout += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 11 ? 0 : 11 - sAccountCredit.length())).concat(SLibUtilities.textLeft(sAccountCredit, 11)); // Credit account
                 layout += SLibUtilities.textRepeat(" ", 5); // Blank
                 layout += formatDesc.format(mdBalanceTot);
-                layout += sConcept.concat(SLibUtilities.textRepeat(" ", (40 - sConcept.length())));
+                layout += SLibUtilities.textRepeat(" ", (sConcept.length() >= 40 ? 0 : 40 - sConcept.length())).concat(SLibUtilities.textLeft(sConcept, 40));
                 layout += formatDate.format(date);
 
                 layout += "\r\n";
@@ -678,9 +678,9 @@ public abstract class SFinUtilities {
                 layout += "0000"; // Branch credit
                 layout += formatDesc.format(mdBalanceTot).replace(".", "");
                 layout += "00000"; // Plaza Banxico
-                layout += sConcept.concat(SLibUtilities.textRepeat(" ", (40 - sConcept.length())));
+                layout += SLibUtilities.textRepeat(" ", (sConcept.length() >= 40 ? 0 : 40 - sConcept.length())).concat(SLibUtilities.textLeft(sConcept, 40));
                 layout += SLibUtilities.textRepeat(" ", 90); // Blank
-                layout += sReference.concat(SLibUtilities.textRepeat(" ", (7 - sReference.length())));
+                layout += SLibUtilities.textRepeat(" ", (sReference.length() >= 7 ? 0 : 7 - sReference.length())).concat(SLibUtilities.textLeft(sReference, 7));
                 layout += 1;
 
                 layout += "\r\n";
@@ -727,9 +727,9 @@ public abstract class SFinUtilities {
                 layout += "0000"; // Branch credit
                 layout += formatDesc.format(mdBalanceTot).replace(".", "");
                 layout += "00000"; // Plaza Banxico
-                layout += sConcept.concat(SLibUtilities.textRepeat(" ", (40 - sConcept.length())));
+                layout += SLibUtilities.textRepeat(" ", (sConcept.length() >= 40 ? 0 : 40 - sConcept.length())).concat(SLibUtilities.textLeft(sConcept, 40));
                 layout += SLibUtilities.textRepeat(" ", 90); // Blank
-                layout += sReference.concat(SLibUtilities.textRepeat(" ", (7 - sReference.length())));
+                layout += SLibUtilities.textRepeat(" ", (sReference.length() >= 7 ? 0 : 7 - sReference.length())).concat(SLibUtilities.textLeft(sReference, 7));
                 layout += 1;
 
                 layout += "\r\n";
@@ -830,7 +830,7 @@ public abstract class SFinUtilities {
                 layout += "000000000"; // FILLER
                 layout += (sBizPartnerAliasBanBajio.length() > 15 ? SLibUtilities.textLeft(sBizPartnerAliasBanBajio, 15) : sBizPartnerAliasBanBajio).concat(SLibUtilities.textRepeat(" ", (15 - sBizPartnerAliasBanBajio.length()))); // ALIAS
                 layout += formatDesc.format(0d).replace(".", "");
-                layout += sReference.concat(SLibUtilities.textRepeat(" ", (40 - sReference.length())));
+                layout += SLibUtilities.textRepeat(" ", (sReference.length() >= 40 ? 0 : 40 - sReference.length())).concat(SLibUtilities.textLeft(sReference, 40));
 
                 layout += "\r\n";
 
@@ -914,7 +914,7 @@ public abstract class SFinUtilities {
                 layout += "000000000"; // FILLER
                 layout += (sBizPartnerAliasBanBajio.length() > 15 ? SLibUtilities.textLeft(sBizPartnerAliasBanBajio, 15) : sBizPartnerAliasBanBajio).concat(SLibUtilities.textRepeat(" ", (15 - sBizPartnerAliasBanBajio.length()))); // ALIAS
                 layout += formatDesc.format(0d).replace(".", "");
-                layout += sReference.concat(SLibUtilities.textRepeat(" ", (40 - sReference.length())));
+                layout += SLibUtilities.textRepeat(" ", (sReference.length() >= 40 ? 0 : 40 - sReference.length())).concat(SLibUtilities.textLeft(sReference, 40));
 
                 layout += "\r\n";
 
