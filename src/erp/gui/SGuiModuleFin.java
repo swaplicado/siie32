@@ -1934,7 +1934,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                 new SDialogRepDpsPayment(miClient, SDataConstantsSys.TRNS_CT_DPS_SAL).setVisible(true);
             }
             else if (item == jmiDpsPaymentSup) {
-                showView(SDataConstants.TRNX_DPS_PAYS, SDataConstantsSys.TRNS_CT_DPS_PUR);
+                showView(SDataConstants.TRNX_DPS_PAYS, SDataConstantsSys.TRNS_CT_DPS_PUR, SUtilConsts.QRY_SUM);
             }
             else if (item == jmiDpsPaymentSupDetail) {
                 showView(SDataConstants.TRNX_DPS_PAYS, SDataConstantsSys.TRNS_CT_DPS_PUR, SUtilConsts.QRY_DET);

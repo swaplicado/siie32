@@ -3132,12 +3132,14 @@ public abstract class SCfdUtils implements Serializable {
         boolean signed = false;
         ArrayList<SDataCfd> cfdsValidate = null;
 
+        if (cfd.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_PAY) {
+            cfdsValidate = getPayrollCfds(client, subtypeCfd,  new int[] { subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? cfd.getFkPayrollPayrollId_n() : cfd.getFkPayrollReceiptPayrollId_n()});
+        }
+
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
         }
-        else if (cfd.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_PAY) {
-            cfdsValidate = getPayrollCfds(client, subtypeCfd,  new int[] { subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? cfd.getFkPayrollPayrollId_n() : cfd.getFkPayrollReceiptPayrollId_n()});
-            
+        else {
             if (existsCfdiEmitInconsist(client, cfdsValidate)) {
                 signed = signCfdi(client, cfd, subtypeCfd, true);
             }

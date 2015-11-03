@@ -137,10 +137,10 @@ public class SViewDpsPayment extends erp.lib.table.STableTab implements java.awt
                 "INNER JOIN erp.bpsu_bpb AS bpb ON re.fid_bpb_n = bpb.id_bpb " +
                 "INNER JOIN erp.bpsu_bp_ct AS bc ON b.id_bp = bc.id_bp AND bc.id_ct_bp = " + (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS) + " " +
                 "LEFT OUTER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc " +
-                "LEFT OUTER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND de.b_del = 0 " +
+                //"LEFT OUTER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND de.b_del = 0 " +
                 "LEFT OUTER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps " +
                 "LEFT OUTER JOIN erp.bpsu_bpb AS cb ON d.fid_cob = cb.id_bpb " +
-                "LEFT OUTER JOIN trn_dps_ety_tax AS det ON de.id_year = det.id_year AND de.id_doc = det.id_doc AND de.id_ety = det.id_ety " +
+                //"LEFT OUTER JOIN trn_dps_ety_tax AS det ON de.id_year = det.id_year AND de.id_doc = det.id_doc AND de.id_ety = det.id_ety " +
                 "LEFT OUTER JOIN erp.bpsu_bp AS agt ON d.fid_sal_agt_n = agt.id_bp ";
         
                 if (isSummary()) {

@@ -282,7 +282,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         moTextPosition.setText("sBeanFieldText1");
         jPanel29.add(moTextPosition);
 
-        jlEmployeeType.setText("Tipo empelado:");
+        jlEmployeeType.setText("Tipo empleado:");
         jlEmployeeType.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel29.add(jlEmployeeType);
 
