@@ -1613,7 +1613,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
             hrsReceiptDeductionRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { SModSysConsts.HRSS_TP_EAR_COMP_AMT }, SDbRegistry.FIELD_CODE));
 
             if (hrsDeductionRow.getReceiptDeduction() != null && hrsDeductionRow.getReceiptDeduction().getFkLoanEmployeeId_n() != SLibConsts.UNDEFINED) {
-                hrsReceiptDeductionRow.setXtaLoan(hrsDeductionRow.getHrsReceipt().getHrsEmployee().getLoan(hrsDeductionRow.getReceiptDeduction().getFkLoanLoanId_n()).getLoanIdentificator());
+                hrsReceiptDeductionRow.setXtaLoan(hrsDeductionRow.getHrsReceipt().getHrsEmployee().getLoan(hrsDeductionRow.getReceiptDeduction().getFkLoanLoanId_n()) == null ? "" : hrsDeductionRow.getHrsReceipt().getHrsEmployee().getLoan(hrsDeductionRow.getReceiptDeduction().getFkLoanLoanId_n()).getLoanIdentificator());
             }
             rows.add(hrsReceiptDeductionRow);
         }

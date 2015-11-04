@@ -247,6 +247,21 @@ public class ImportPayrolls extends javax.swing.JFrame {
 
         return loanType;
     }
+    
+    private int getLoanIdMap(java.sql.Statement stMySql, int empleado, int credito, int prestamo) throws java.lang.Exception {
+        int loanId = 0;
+        String sql = "";
+        ResultSet rsMySql = null;
+
+        sql = "SELECT id_loan FROM temp_map_loan " +
+                "WHERE empleado = " + empleado + (credito != SLibConstants.UNDEFINED ? " AND credito = " + credito : " AND prestamo = " + prestamo) + "; ";
+        rsMySql = stMySql.executeQuery(sql);
+        if (rsMySql.next()) {
+            loanId = rsMySql.getInt("id_loan");
+        }
+
+        return loanId;
+    }
 
     private void importAccountingRecords() {
         int nIdNomina = 0;
@@ -504,7 +519,7 @@ public class ImportPayrolls extends javax.swing.JFrame {
                             nIdNomina + ", " + nBizPartner + ", " + rsSqlServerReceiptDeductions.getInt("id_mov") + ", 1, 1, 1, " + 
                             dAmount + ", " + dAmount + ", " + dAmount + ", " +
                             "0, 0, 1, 1, 0, 1, " + nDeductionType + ", " + nDeduction + ", " + nDeductionBenefitType + ", " + (nCredito != 0 || nPrestamo != 0 ? nBizPartner : "NULL") + ", " + 
-                            (nCredito != 0 || nPrestamo != 0 ? (nCredito != 0 ? nCredito : nPrestamo) : "NULL") + ", " + (nCredito != 0 || nPrestamo != 0 ? nLoanType : "NULL") + ", " +
+                            (nCredito != 0 || nPrestamo != 0 ? (nCredito != 0 ? getLoanIdMap(stMySql, nIdEmpleado, nCredito, nPrestamo) : getLoanIdMap(stMySql, nIdEmpleado, nCredito, nPrestamo)) : "NULL") + ", " + (nCredito != 0 || nPrestamo != 0 ? nLoanType : "NULL") + ", " +
                             "1, 1, NOW(), NOW()); ";
                     
                         stMySql.execute(sSql);
