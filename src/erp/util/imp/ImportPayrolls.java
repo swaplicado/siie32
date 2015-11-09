@@ -112,7 +112,7 @@ public class ImportPayrolls extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jbImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbImportActionPerformed
-        importAccountingRecords();
+        importPayrolls();
     }//GEN-LAST:event_jbImportActionPerformed
 
     private void initComponentsExtra() {
@@ -263,9 +263,10 @@ public class ImportPayrolls extends javax.swing.JFrame {
         return loanId;
     }
 
-    private void importAccountingRecords() {
+    private void importPayrolls() {
         int nIdNomina = 0;
         int nYear = 0;
+        int nPeriod = 0;
         int nIdEmpleado = 0;
         int nBizPartner = 0;
         int nPayroll = 0;
@@ -354,6 +355,7 @@ public class ImportPayrolls extends javax.swing.JFrame {
             sdfMagic = new SimpleDateFormat("yyyyMMdd");
             tDateImport = sdf.parse(jftDateImport.getText());
             nYear = SLibTimeUtilities.digestYear(tDateImport)[0];
+            nPeriod = SLibTimeUtilities.digestYearMonth(tDateImport)[0];
 
             stMySql = moDbMySql.getConnection().createStatement();
             stMySqlAux = moDbMySql.getConnection().createStatement();
@@ -367,32 +369,32 @@ public class ImportPayrolls extends javax.swing.JFrame {
             sSql = "DELETE hrs_pay_rcp_ded FROM hrs_pay_rcp_ded, hrs_pay_rcp, hrs_pay " +
                     "WHERE hrs_pay_rcp.id_pay = hrs_pay.id_pay AND " +
                     "hrs_pay_rcp_ded.id_pay = hrs_pay_rcp.id_pay AND hrs_pay_rcp_ded.id_emp = hrs_pay_rcp.id_emp AND " +
-                    "hrs_pay.per_year = " + nYear + "; ";
+                    "hrs_pay.per_year = " + nYear + " AND hrs_pay.per <= " + nPeriod + "; ";
             stMySql.execute(sSql);
 
             sSql = "DELETE hrs_pay_rcp_ear FROM hrs_pay_rcp_ear, hrs_pay_rcp, hrs_pay " +
                     "WHERE hrs_pay_rcp.id_pay = hrs_pay.id_pay AND " +
                     "hrs_pay_rcp_ear.id_pay = hrs_pay_rcp.id_pay AND hrs_pay_rcp_ear.id_emp = hrs_pay_rcp.id_emp AND " +
-                    "hrs_pay.per_year = " + nYear + "; ";
+                    "hrs_pay.per_year = " + nYear + " AND hrs_pay.per <= " + nPeriod + "; ";
             stMySql.execute(sSql);
 
             sSql = "DELETE hrs_pay_rcp_iss FROM hrs_pay_rcp_iss, hrs_pay_rcp, hrs_pay " +
                     "WHERE hrs_pay_rcp.id_pay = hrs_pay.id_pay AND " +
                     "hrs_pay_rcp_iss.id_pay = hrs_pay_rcp.id_pay AND hrs_pay_rcp_iss.id_emp = hrs_pay_rcp.id_emp AND " +
-                    "hrs_pay.per_year = " + nYear + "; ";
+                    "hrs_pay.per_year = " + nYear + " AND hrs_pay.per <= " + nPeriod + "; ";
             stMySql.execute(sSql);
 
             sSql = "DELETE hrs_pay_rcp FROM hrs_pay_rcp, hrs_pay " +
                     "WHERE hrs_pay_rcp.id_pay = hrs_pay.id_pay AND " +
-                    "hrs_pay.per_year = " + nYear + "; ";
+                    "hrs_pay.per_year = " + nYear + " AND hrs_pay.per <= " + nPeriod + "; ";
             stMySql.execute(sSql);
             
-            sSql = "DELETE FROM hrs_pay WHERE per_year = " + nYear + "; ";
+            sSql = "DELETE FROM hrs_pay WHERE per_year = " + nYear + " AND hrs_pay.per <= " + nPeriod + "; ";
             stMySql.execute(sSql);
 
             // Import payroll:
 
-            sSql = "SELECT COUNT(*) FROM dbo.nom_nominas WHERE ejercicio=" + nYear + "; ";
+            sSql = "SELECT COUNT(*) FROM dbo.nom_nominas WHERE periodo<=" + nPeriod + " AND ejercicio=" + nYear + "; ";
             rsSqlServerPayroll = stSqlServerPayroll.executeQuery(sSql);
             if (!rsSqlServerPayroll.next()) {
                 throw new Exception("No hay nóminas para importar.");
@@ -403,7 +405,7 @@ public class ImportPayrolls extends javax.swing.JFrame {
 
             sSql = "SELECT * " +
                     "FROM dbo.nom_nominas " +
-                    "WHERE ejercicio=" + nYear + "; ";
+                    "WHERE periodo<=" + nPeriod + " AND ejercicio=" + nYear + "; ";
             rsSqlServerPayroll = stSqlServerPayroll.executeQuery(sSql);
             while (rsSqlServerPayroll.next()) {
                 nIdNomina = rsSqlServerPayroll.getInt("id_nomina");

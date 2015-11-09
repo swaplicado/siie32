@@ -240,7 +240,7 @@ public class SHrsPayroll {
                 consumptionPreviousDays = SHrsUtils.getConsumptionPreviousDays(absence, hrsEmployee);
                 consumptionCurrentDays = (absence.getEffectiveDays() - consumptionPreviousDays);
                 
-                if (consumptionCurrentDays > 0) {
+                if (consumptionCurrentDays > 0 && !absence.isClosed()) {
                     if (absence.getDateStart().compareTo(hrsPayrollReceipt.getHrsPayroll().getPayroll().getDateEnd()) <= 0) {
                         if (consumptionCurrentDays > (workingDaysAbsence - consumptionEffectiveDays)) {
                             consumptionCurrentDays = (int) (workingDaysAbsence - consumptionEffectiveDays);
@@ -891,7 +891,7 @@ public class SHrsPayroll {
         payrollReceipt.setFkSalaryTypeId(hrsEmployee.getEmployee().getFkSalaryTypeId());
         payrollReceipt.setFkEmployeeTypeId(hrsEmployee.getEmployee().getFkEmployeeTypeId());
         payrollReceipt.setFkWorkerTypeId(hrsEmployee.getEmployee().getFkWorkerTypeId());
-        payrollReceipt.setFkMwzTypeId(hrsEmployee.getEmployee().getFkWorkerTypeId());
+        payrollReceipt.setFkMwzTypeId(hrsEmployee.getEmployee().getFkMwzTypeId());
         payrollReceipt.setFkDepartmentId(hrsEmployee.getEmployee().getFkDepartmentId());
         payrollReceipt.setFkPositionId(hrsEmployee.getEmployee().getFkPositionId());
         payrollReceipt.setFkShiftId(hrsEmployee.getEmployee().getFkShiftId());

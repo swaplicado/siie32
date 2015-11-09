@@ -368,7 +368,7 @@ public class SDialogPayrollEmployeeAbsence extends SBeanFormDialog implements Ac
         for (SDbAbsence absence : moReceipt.getHrsEmployee().getAbsences()) {
             pendingDays = absence.getEffectiveDays() - SHrsUtils.getConsumptionPreviousDays(absence, moReceipt.getHrsEmployee());
             
-            if (pendingDays > 0) {
+            if (pendingDays > 0 && !absence.isClosed()) {
                 absence.setAuxPendingDays(pendingDays);
                 rows.add(absence);
             }
