@@ -1568,6 +1568,7 @@ public abstract class SHrsUtils {
     }
     
     public static double computeAmoutLoan(final SHrsPayrollReceipt hrsReceipt, final SDbLoan loan) throws Exception {
+        double amoutAdjustment = 0;
         double amoutAux = 0;
         double amoutMonth = 0;
         double amout = 0;
@@ -1575,9 +1576,10 @@ public abstract class SHrsUtils {
         SHrsDaysByPeriod hrsDaysCurr = hrsReceipt.getHrsEmployee().getHrsDaysCurr();
         SHrsDaysByPeriod hrsDaysNext = hrsReceipt.getHrsEmployee().getHrsDaysNext();
         
+        amoutAdjustment = getAdjustmentLoan(loan.getFkLoanTypeId());
         switch (loan.getFkLoanPaymentTypeId()) {
             case SModSysConsts.HRSS_TP_LOAN_PAY_AMT:
-                amoutMonth = loan.getPaymentAmount();
+                amoutMonth = loan.getPaymentAmount() + amoutAdjustment;
                 
                 if (loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA) {
                     amoutAux = amoutMonth;
@@ -1589,18 +1591,36 @@ public abstract class SHrsUtils {
                 }
                 break;
             case SModSysConsts.HRSS_TP_LOAN_PAY_FIX:
-                amoutMonth = loan.getPaymentFixed() * hrsReceipt.getHrsPayroll().getPayroll().getMwzReferenceWage();
+                amoutMonth = loan.getPaymentFixed() * hrsReceipt.getHrsPayroll().getPayroll().getMwzReferenceWage() + amoutAdjustment;
                 amoutAux += hrsDaysPrev == null ? 0 : (amoutMonth / hrsDaysPrev.getDaysPeriod() * (hrsDaysPrev.getDaysPeriodPayroll() - hrsDaysPrev.getDaysPeriodPayrollNotWorkedNotPaid()));
                 amoutAux += amoutMonth / hrsDaysCurr.getDaysPeriod() * (hrsDaysCurr.getDaysPeriodPayroll() - hrsDaysCurr.getDaysPeriodPayrollNotWorkedNotPaid());
                 amoutAux += hrsDaysNext == null ? 0 : (amoutMonth / hrsDaysNext.getDaysPeriod() * (hrsDaysNext.getDaysPeriodPayroll() - hrsDaysNext.getDaysPeriodPayrollNotWorkedNotPaid()));
                 break;
             case SModSysConsts.HRSS_TP_LOAN_PAY_PER:
-                amoutAux = (hrsReceipt.getReceipt().getDaysHiredPayroll() - hrsReceipt.getReceipt().getDaysNotWorkedNotPaid()) * hrsReceipt.getReceipt().getPaymentDaily() * loan.getPaymentPercentage();
+                amoutAux = (hrsReceipt.getReceipt().getDaysHiredPayroll() - hrsReceipt.getReceipt().getDaysNotWorkedNotPaid()) * hrsReceipt.getReceipt().getPaymentDaily() * loan.getPaymentPercentage() + amoutAdjustment;
                 break;
             default:
                 break;
         }
         amout = (SLibUtils.round(amoutAux, SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits()));
+        
+        return amout;
+    }
+    
+    public static double getAdjustmentLoan(final int typeLoan) {
+        double amout = 0;
+        
+        switch (typeLoan) {
+            case SModSysConsts.HRSS_TP_LOAN_LOA:
+                break;
+            case SModSysConsts.HRSS_TP_LOAN_HOM:
+                amout = 7.5;
+                break;
+            case SModSysConsts.HRSS_TP_LOAN_CON:
+                break;
+            default:
+                break;
+        }
         
         return amout;
     }
