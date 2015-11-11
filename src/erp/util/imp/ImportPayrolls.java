@@ -121,7 +121,7 @@ public class ImportPayrolls extends javax.swing.JFrame {
         moDbMySql = new SDataDatabase(SLibConstants.DBMS_MY_SQL);
 
         //   2015-10-23
-        moDbMySql.connect("localhost", "3306", "erp_otsa", "root", "msroot");
+        moDbMySql.connect("192.168.1.19", "3306", "erp_otsa", "root", "msroot");
         moDbSqlServer = new SDataDatabase(SLibConstants.DBMS_SQL_SERVER_2005);
         moDbSqlServer.connect("localhost\\SQLEXPRESS", "", "OpTron", "jbarajas", "1120");
 
@@ -355,7 +355,7 @@ public class ImportPayrolls extends javax.swing.JFrame {
             sdfMagic = new SimpleDateFormat("yyyyMMdd");
             tDateImport = sdf.parse(jftDateImport.getText());
             nYear = SLibTimeUtilities.digestYear(tDateImport)[0];
-            nPeriod = SLibTimeUtilities.digestYearMonth(tDateImport)[0];
+            nPeriod = SLibTimeUtilities.digestYearMonth(tDateImport)[1];
 
             stMySql = moDbMySql.getConnection().createStatement();
             stMySqlAux = moDbMySql.getConnection().createStatement();
