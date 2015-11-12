@@ -769,7 +769,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<SGridColumnForm>();
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "#"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "Percepción"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Percepción", 135));
                 columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Valor", 75, moGridEarningRow.getTable().getDefaultEditor(Double.class));
                 columnForm.setEditable(mbEditable);
                 gridColumnsForm.add(columnForm);
@@ -839,7 +839,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<SGridColumnForm>();
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "#"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "Deducción"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Deducción", 135));
                 columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Valor", moGridDeductionRow.getTable().getDefaultEditor(Double.class));
                 columnForm.setEditable(mbEditable);
                 gridColumnsForm.add(columnForm);

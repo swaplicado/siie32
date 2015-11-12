@@ -1259,6 +1259,7 @@ public class SHrsPayrollReceipt {
         double unitAlleged = 0;
         double amount_unt = 0;
         double amount = 0;
+        int businessDays = 0;
         SDbEarning earningNormal;
         SDbPayrollReceiptEarning payrollReceiptEarning = null;
         SHrsPayrollReceiptEarning hrsPayrollReceiptEarning = null;
@@ -1275,7 +1276,8 @@ public class SHrsPayrollReceipt {
         for (SHrsPayrollReceiptEarning earning : aEarningDelete) {
             moHrsEmployee.getHrsPayrollReceipt().removeEarning(earning.getPkMoveId());
         }
-        unitAlleged = absenceConsumption.getEffectiveDays();
+        businessDays = SHrsUtils.getEmployeeBusinessDays(absenceConsumption.getDateStart(), absenceConsumption.getDateEnd(), moHrsPayroll.getHolidays(), moHrsPayroll.getWorkingDaySettings());
+        unitAlleged = (absenceConsumption.getAbsence().getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_DIS ? businessDays : absenceConsumption.getEffectiveDays());
         
         // Update normal earning:
         
@@ -1312,12 +1314,15 @@ public class SHrsPayrollReceipt {
             if (!found) {
                 if (earningNormal.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
                     amount_unt = unitAlleged;
+                    unit = 1;
                 }
                 else if (earningNormal.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_DAY) {
                     amount_unt = moHrsEmployee.getHrsPayrollReceipt().getReceipt().getPaymentDaily();
+                    unit = !earningNormal.isDaysAdjustment() ? unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() : (unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() * moHrsEmployee.getEmployeeDays().getFactorDaysPaid());;
                 }
                 else if (earningNormal.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_HRS) {
                     amount_unt = moHrsEmployee.getHrsPayrollReceipt().getReceipt().getPaymentHourly();
+                    unit = !earningNormal.isDaysAdjustment() ? unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() : (unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() * moHrsEmployee.getEmployeeDays().getFactorDaysPaid());;
                 }
                 amount = SLibUtils.round((unit * amount_unt), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
             
@@ -1519,7 +1524,7 @@ public class SHrsPayrollReceipt {
             if (workingDaysAvailable <= 0) {
                 throw new Exception("No existen días laborables que asociar con la incidencia.");
             }
-            else if (absenceConsumption.getEffectiveDays() > workingDaysAvailable) {
+            else if (absenceConsumption.getEffectiveDays() > (absence.getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_DIS ? recepitDays : workingDaysAvailable)) {
                 throw new Exception("Los días efectivos de consumo deben ser menor o igual a " + workingDaysAvailable + ".");
             }
             

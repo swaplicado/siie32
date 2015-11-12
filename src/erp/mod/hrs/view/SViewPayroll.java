@@ -539,6 +539,10 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
             + "(SELECT tm.code FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_MWZ) + " AS tm WHERE v.fk_tp_mwz_ref = tm.id_tp_mwz) AS f_mwz_code, "
             + "(SELECT tr.code FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_MWZ) + " AS tr WHERE v.fk_tp_mwz_ref = tr.id_tp_mwz) AS f_mwz_ref_code, "
             + "(SELECT tc.code FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_TAX_COMP) + " AS tc WHERE v.fk_tp_tax_comp = tc.id_tp_tax_comp) AS f_tax_comp, "
+            + "(SELECT COUNT(DISTINCT r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num) "
+            + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS r "
+            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
+            + "WHERE re.fid_pay_n = v.id_pay AND r.b_del = 0 AND re.b_del = 0) AS f_is_record, "
             + "uc.usr AS f_usr_close, "
             + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
             + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
@@ -620,6 +624,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "v.b_nor", "Normal"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "v.b_clo", "Cerrada"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "f_is_record", "Contabilizada"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.nts", "Notas"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_0D, "f_tot", "Recibos totales", 100));
         
