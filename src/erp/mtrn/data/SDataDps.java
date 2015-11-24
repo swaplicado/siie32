@@ -4615,7 +4615,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 conceptoXml.setUnidad(entry.getDbmsOriginalUnitSymbol());
                 conceptoXml.setCantidad(entry.getOriginalQuantity());
                 conceptoXml.setDescripcion(entry.getConcept());
-                conceptoXml.setValorUnitario(entry.getPriceUnitarySystemCy());
+                conceptoXml.setValorUnitario(entry.getSubtotalCy_r() / entry.getOriginalQuantity());
+                //conceptoXml.setValorUnitario(entry.getPriceUnitarySystemCy()); (24/11/2015) jbarajas bug in the UI whith distinct units.
                 conceptoXml.setImporte(entry.getSubtotalCy_r());
 
                 conceptosXml.add(conceptoXml);
