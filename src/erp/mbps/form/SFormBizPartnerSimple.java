@@ -1248,7 +1248,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
 
         moBizPartner.setFkBizPartnerIdentityTypeId(moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0]);
         moBizPartner.setFkTaxIdentityId(moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0]);
-        moBizPartner.setFkBizAreaId(SDataConstantsSys.BPSS_TP_BP_BA_DEFAULT);
+        moBizPartner.setFkBizAreaId(SDataConstantsSys.BPSU_BA_DEFAULT);
 
         if (moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER) {
             moBizPartner.setFirstname(moFieldFirstName.getString());

@@ -859,7 +859,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
 
             moBizPartner.setFkBizPartnerIdentityTypeId(moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0]);
             moBizPartner.setFkTaxIdentityId(moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0]);
-            moBizPartner.setFkBizAreaId(SDataConstantsSys.BPSS_TP_BP_BA_DEFAULT);
+            moBizPartner.setFkBizAreaId(SDataConstantsSys.BPSU_BA_DEFAULT);
 
             moBizPartner.getDbmsBizPartnerBranches().add(createBizPartnerBranch());
             moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().add(createBizPartnerBranchContact());

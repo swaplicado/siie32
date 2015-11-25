@@ -374,8 +374,6 @@ public abstract class SDataConstantsSys {
     public static final int BPSS_TP_BP_ATT_BANK = 1;
     public static final int BPSS_TP_BP_ATT_CARR = 2;
 
-    public static final int BPSS_TP_BP_BA_DEFAULT = 1;
-
     public static final int BPSS_TP_BPB_HQ = 1;
     public static final int BPSS_TP_BPB_B = 2;
 
@@ -426,6 +424,8 @@ public abstract class SDataConstantsSys {
     
     public static final int BPSS_STP_CFD_ADD_SORIANA_NOR = 1;
     public static final int BPSS_STP_CFD_ADD_SORIANA_EXT = 2;
+
+    public static final int BPSU_BA_DEFAULT = 1;
 
     public static final int BPSX_CT_BP_QTY = 5;
 

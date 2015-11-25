@@ -1963,7 +1963,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
             moBizPartner.setFkBizPartnerIdentityTypeId(SModSysConsts.BPSS_TP_BP_IDY_PER);
             moBizPartner.setFkTaxIdentityId(SModSysConsts.BPSS_TP_BP_IDY_PER);      // XXX (sflores, 2015-02-19: check if propper constants must be created)
-            moBizPartner.setFkBizAreaId(SDataConstantsSys.BPSS_TP_BP_BA_DEFAULT);
+            moBizPartner.setFkBizAreaId(SDataConstantsSys.BPSU_BA_DEFAULT);
             moBizPartner.setFkFiscalBankId(SModSysConsts.FINS_FISCAL_BANK_NA);
 
             //moBizPartner.getDbmsBizPartnerBranches().add(createBizPartnerBranch());
