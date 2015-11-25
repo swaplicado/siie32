@@ -34,6 +34,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
     protected java.lang.String msFiscalId;
     protected java.lang.String msFiscalFrgId;
     protected java.lang.String msAlternativeId;
+    protected java.lang.String msExternalId;
     protected java.lang.String msCodeBankSantander;
     protected java.lang.String msCodeBankBanBajio;
     protected java.lang.String msWeb;
@@ -86,6 +87,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
     public void setFiscalId(java.lang.String s) { msFiscalId = s; }
     public void setFiscalFrgId(java.lang.String s) { msFiscalFrgId = s; }
     public void setAlternativeId(java.lang.String s) { msAlternativeId = s; }
+    public void setExternalId(java.lang.String s) { msExternalId = s; }
     public void setCodeBankSantander(java.lang.String s) { msCodeBankSantander = s; }
     public void setCodeBankBanBajio(java.lang.String s) { msCodeBankBanBajio = s; }
     public void setWeb(java.lang.String s) { msWeb = s; }
@@ -120,6 +122,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
     public java.lang.String getFiscalId() { return msFiscalId; }
     public java.lang.String getFiscalFrgId() { return msFiscalFrgId; }
     public java.lang.String getAlternativeId() { return msAlternativeId; }
+    public java.lang.String getExternalId() { return msExternalId; }
     public java.lang.String getCodeBankSantander() { return msCodeBankSantander; }
     public java.lang.String getCodeBankBanBajio() { return msCodeBankBanBajio; }
     public java.lang.String getWeb() { return msWeb; }
@@ -210,6 +213,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
         msFiscalId = "";
         msFiscalFrgId = "";
         msAlternativeId = "";
+        msExternalId = "";
         msCodeBankSantander = "";
         msCodeBankBanBajio = "";
         msWeb = "";
@@ -273,6 +277,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                 msFiscalId = resultSet.getString("fiscal_id");
                 msFiscalFrgId = resultSet.getString("fiscal_frg_id");
                 msAlternativeId = resultSet.getString("alt_id");
+                msExternalId = resultSet.getString("ext_id");
                 msCodeBankSantander = resultSet.getString("code_bank_san");
                 msCodeBankBanBajio = resultSet.getString("code_bank_baj");
                 msWeb = resultSet.getString("web");
@@ -468,6 +473,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
             callableStatement.setString(nParam++, msFiscalId);
             callableStatement.setString(nParam++, msFiscalFrgId);
             callableStatement.setString(nParam++, msAlternativeId);
+            callableStatement.setString(nParam++, msExternalId);
             callableStatement.setString(nParam++, msCodeBankSantander);
             callableStatement.setString(nParam++, msCodeBankBanBajio);
             callableStatement.setString(nParam++, msWeb);
@@ -525,7 +531,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                     }
                 }
 
-                // Save aswell customer configuration, if apply:
+                // Save aswell customer configuration, if applies:
 
                 if (moDbmsDataCustomerConfig != null) {
                     moDbmsDataCustomerConfig.setPkCustomerId(mnPkBizPartnerId);
@@ -534,7 +540,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                     }
                 }
 
-                // Save aswell sales agent configuration, if apply:
+                // Save aswell sales agent configuration, if applies:
 
                 if (moDbmsDataConfigurationSalesAgent != null) {
                     moDbmsDataConfigurationSalesAgent.setPkSalesAgentId(mnPkBizPartnerId);
@@ -543,7 +549,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                     }
                 }
 
-                // Save information of the employee, of the human resources module, if apply:
+                // Save information of the employee, of the human resources module, if applies:
 
                 if (moDbmsDataEmployee != null) {
                     moDbmsDataEmployee.setPkEmployeeId(mnPkBizPartnerId);

@@ -110,6 +110,8 @@ public abstract class SModSysConsts {
     public static final int BPSS_LINK_BP = 4;
 
     public static final int BPSU_TP_BP_DEF = 1;
+    
+    public static final int BPSU_BA_DEF = 1;
 
     public static final String TXT_HQ = "MATRIZ";
     public static final String TXT_OFFICIAL = "OFICIAL";
