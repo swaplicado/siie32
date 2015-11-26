@@ -33,6 +33,7 @@ public class SDbBizPartner extends SDbRegistryUser {
     protected String msFiscalId;
     protected String msFiscalForeignId;
     protected String msAlternativeId;
+    protected String msExternalId;
     protected String msWeb;
     protected boolean mbIsCompany;
     protected boolean mbIsSupplier;
@@ -70,6 +71,7 @@ public class SDbBizPartner extends SDbRegistryUser {
     public void setFiscalId(String s) { msFiscalId = s; }
     public void setFiscalForeignId(String s) { msFiscalForeignId = s; }
     public void setAlternativeId(String s) { msAlternativeId = s; }
+    public void setExternalId(String s) { msExternalId = s; }
     public void setWeb(String s) { msWeb = s; }
     public void setIsCompany(boolean b) { mbIsCompany = b; }
     public void setIsSupplier(boolean b) { mbIsSupplier = b; }
@@ -99,6 +101,7 @@ public class SDbBizPartner extends SDbRegistryUser {
     public String getFiscalId() { return msFiscalId; }
     public String getFiscalForeignId() { return msFiscalForeignId; }
     public String getAlternativeId() { return msAlternativeId; }
+    public String getExternalId() { return msExternalId; }
     public String getWeb() { return msWeb; }
     public boolean getIsCompany() { return mbIsCompany; }
     public boolean getIsSupplier() { return mbIsSupplier; }
@@ -146,6 +149,7 @@ public class SDbBizPartner extends SDbRegistryUser {
         msFiscalId = "";
         msFiscalForeignId = "";
         msAlternativeId = "";
+        msExternalId = "";
         msWeb = "";
         mbIsCompany = false;
         mbIsSupplier = false;
@@ -210,6 +214,7 @@ public class SDbBizPartner extends SDbRegistryUser {
             msFiscalId = resultSet.getString("fiscal_id");
             msFiscalForeignId = resultSet.getString("fiscal_frg_id");
             msAlternativeId = resultSet.getString("alt_id");
+            msExternalId = resultSet.getString("ext_id");
             msWeb = resultSet.getString("web");
             mbIsCompany = resultSet.getBoolean("b_co");
             mbIsSupplier = resultSet.getBoolean("b_sup");

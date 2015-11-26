@@ -1319,6 +1319,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         contact.setPkTelephoneType02Id(SDataConstantsSys.BPSS_TP_TEL_NA);
         contact.setPkTelephoneType03Id(SDataConstantsSys.BPSS_TP_TEL_NA);
         contact.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
+        contact.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
 
         return contact;
     }

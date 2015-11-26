@@ -155,20 +155,19 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
         jPanel6 = new javax.swing.JPanel();
         jlNextel01 = new javax.swing.JLabel();
         jtfNextel01 = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
         jlNextel02 = new javax.swing.JLabel();
         jtfNextel02 = new javax.swing.JTextField();
         jPanel20 = new javax.swing.JPanel();
-        jPanel14 = new javax.swing.JPanel();
-        jlSkype01 = new javax.swing.JLabel();
-        jtfSkype01 = new javax.swing.JTextField();
-        jlSkype02 = new javax.swing.JLabel();
-        jtfSkype02 = new javax.swing.JTextField();
         jPanel13 = new javax.swing.JPanel();
         jlEmail01 = new javax.swing.JLabel();
         jtfEmail01 = new javax.swing.JTextField();
         jlEmail02 = new javax.swing.JLabel();
         jtfEmail02 = new javax.swing.JTextField();
+        jPanel14 = new javax.swing.JPanel();
+        jlSkype01 = new javax.swing.JLabel();
+        jtfSkype01 = new javax.swing.JTextField();
+        jlSkype02 = new javax.swing.JLabel();
+        jtfSkype02 = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -205,7 +204,7 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
 
         jlDbmsFkBizPartnerId.setForeground(java.awt.Color.blue);
         jlDbmsFkBizPartnerId.setText("Asociado de negocios: *");
-        jlDbmsFkBizPartnerId.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlDbmsFkBizPartnerId.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel12.add(jlDbmsFkBizPartnerId);
 
         jcbDbmsFkBizPartnerId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -224,7 +223,7 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
 
         jlPkBizPartnerBranchId.setForeground(java.awt.Color.blue);
         jlPkBizPartnerBranchId.setText("Sucursal asociado: *");
-        jlPkBizPartnerBranchId.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlPkBizPartnerBranchId.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel7.add(jlPkBizPartnerBranchId);
 
         jcbPkBizPartnerBranchId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -242,10 +241,10 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlPrefix.setText("Prefijo:");
-        jlPrefix.setPreferredSize(new java.awt.Dimension(100, 20));
+        jlPrefix.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel11.add(jlPrefix);
 
-        jtfPrefix.setText("PREF");
+        jtfPrefix.setText("PREFIX");
         jtfPrefix.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel11.add(jtfPrefix);
 
@@ -254,11 +253,11 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlLastName.setText("Apellido(s): *");
-        jlLastName.setPreferredSize(new java.awt.Dimension(200, 20));
+        jlLastName.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel9.add(jlLastName);
 
         jtfLastName.setText("LASTNAME");
-        jtfLastName.setPreferredSize(new java.awt.Dimension(503, 23));
+        jtfLastName.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel9.add(jtfLastName);
 
         jPanel22.add(jPanel9);
@@ -266,11 +265,11 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFirstName.setText("Nombre(s): *");
-        jlFirstName.setPreferredSize(new java.awt.Dimension(200, 20));
+        jlFirstName.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel10.add(jlFirstName);
 
         jtfFirstName.setText("FIRSTNAME");
-        jtfFirstName.setPreferredSize(new java.awt.Dimension(503, 23));
+        jtfFirstName.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel10.add(jtfFirstName);
 
         jPanel22.add(jPanel10);
@@ -278,10 +277,10 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlSuffix.setText("Sufijo:");
-        jlSuffix.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlSuffix.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel19.add(jlSuffix);
 
-        jtfSuffix.setText("SUF");
+        jtfSuffix.setText("SUFFIX");
         jtfSuffix.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel19.add(jtfSuffix);
 
@@ -290,11 +289,11 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlCharge.setText("Puesto: ");
-        jlCharge.setPreferredSize(new java.awt.Dimension(200, 20));
+        jlCharge.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel16.add(jlCharge);
 
-        jtfCharge.setText("JOB");
-        jtfCharge.setPreferredSize(new java.awt.Dimension(503, 23));
+        jtfCharge.setText("JOB TITLE");
+        jtfCharge.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel16.add(jtfCharge);
 
         jPanel22.add(jPanel16);
@@ -302,11 +301,11 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFkContactTypeId.setText("Tipo de contacto: *");
-        jlFkContactTypeId.setPreferredSize(new java.awt.Dimension(200, 20));
+        jlFkContactTypeId.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel8.add(jlFkContactTypeId);
 
         jcbFkContactTypeId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkContactTypeId.setPreferredSize(new java.awt.Dimension(503, 23));
+        jcbFkContactTypeId.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel8.add(jcbFkContactTypeId);
 
         jPanel22.add(jPanel8);
@@ -319,31 +318,31 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
         jPanel21.setBorder(javax.swing.BorderFactory.createTitledBorder("Información telefónica:"));
         jPanel21.setLayout(new java.awt.GridLayout(4, 0, 2, 2));
 
-        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkTelephoneType01Id.setText("Tipo de teléfono 01:");
-        jlFkTelephoneType01Id.setPreferredSize(new java.awt.Dimension(110, 20));
+        jlFkTelephoneType01Id.setText("Tipo teléfono 01:");
+        jlFkTelephoneType01Id.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlFkTelephoneType01Id);
 
         jcbFkTelephoneType01Id.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbFkTelephoneType01Id.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jcbFkTelephoneType01Id);
 
-        jlTelAreaCode01.setText("Código de área:");
-        jlTelAreaCode01.setPreferredSize(new java.awt.Dimension(110, 20));
+        jlTelAreaCode01.setText("Código área:");
+        jlTelAreaCode01.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel5.add(jlTelAreaCode01);
 
         jtfTelAreaCode01.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfTelAreaCode01.setText("COD AR 01");
-        jtfTelAreaCode01.setPreferredSize(new java.awt.Dimension(60, 23));
+        jtfTelAreaCode01.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel5.add(jtfTelAreaCode01);
 
         jlTelNumber01.setText("Teléfono 01:");
-        jlTelNumber01.setPreferredSize(new java.awt.Dimension(90, 20));
+        jlTelNumber01.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel5.add(jlTelNumber01);
 
         jtfTelNumber01.setText("TEL 01");
-        jtfTelNumber01.setPreferredSize(new java.awt.Dimension(130, 23));
+        jtfTelNumber01.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel5.add(jtfTelNumber01);
 
         jlTelExt01.setText("Ext.:");
@@ -352,36 +351,36 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
 
         jtfTelExt01.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfTelExt01.setText("EXT 01");
-        jtfTelExt01.setPreferredSize(new java.awt.Dimension(40, 23));
+        jtfTelExt01.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel5.add(jtfTelExt01);
 
         jPanel21.add(jPanel5);
 
-        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jl$FkTelephoneType03Id.setText("Tipo de teléfono 03:");
-        jl$FkTelephoneType03Id.setPreferredSize(new java.awt.Dimension(110, 20));
+        jl$FkTelephoneType03Id.setText("Tipo teléfono 03:");
+        jl$FkTelephoneType03Id.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jl$FkTelephoneType03Id);
 
         jcbFkTelephoneType03Id.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbFkTelephoneType03Id.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jcbFkTelephoneType03Id);
 
-        jlTelAreaCode03.setText("Código de área:");
-        jlTelAreaCode03.setPreferredSize(new java.awt.Dimension(110, 20));
+        jlTelAreaCode03.setText("Código área:");
+        jlTelAreaCode03.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel4.add(jlTelAreaCode03);
 
         jtfTelAreaCode03.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfTelAreaCode03.setText("COD AR 03");
-        jtfTelAreaCode03.setPreferredSize(new java.awt.Dimension(60, 23));
+        jtfTelAreaCode03.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel4.add(jtfTelAreaCode03);
 
         jlTelNumber03.setText("Teléfono 03:");
-        jlTelNumber03.setPreferredSize(new java.awt.Dimension(90, 20));
+        jlTelNumber03.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel4.add(jlTelNumber03);
 
         jtfTelNumber03.setText("TEL 03");
-        jtfTelNumber03.setPreferredSize(new java.awt.Dimension(130, 23));
+        jtfTelNumber03.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel4.add(jtfTelNumber03);
 
         jlTelExt03.setText("Ext.:");
@@ -390,36 +389,36 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
 
         jtfTelExt03.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfTelExt03.setText("EXT 03");
-        jtfTelExt03.setPreferredSize(new java.awt.Dimension(40, 23));
+        jtfTelExt03.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel4.add(jtfTelExt03);
 
         jPanel21.add(jPanel4);
 
-        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkTelephoneType02Id.setText("Tipo de teléfono 02:");
-        jlFkTelephoneType02Id.setPreferredSize(new java.awt.Dimension(110, 20));
+        jlFkTelephoneType02Id.setText("Tipo teléfono 02:");
+        jlFkTelephoneType02Id.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel15.add(jlFkTelephoneType02Id);
 
         jcbFkTelephoneType02Id.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbFkTelephoneType02Id.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel15.add(jcbFkTelephoneType02Id);
 
-        jlTelAreaCode02.setText("Código de área:");
-        jlTelAreaCode02.setPreferredSize(new java.awt.Dimension(110, 20));
+        jlTelAreaCode02.setText("Código área:");
+        jlTelAreaCode02.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel15.add(jlTelAreaCode02);
 
         jtfTelAreaCode02.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfTelAreaCode02.setText("COD AR 02");
-        jtfTelAreaCode02.setPreferredSize(new java.awt.Dimension(60, 23));
+        jtfTelAreaCode02.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel15.add(jtfTelAreaCode02);
 
         jlTelNumber02.setText("Teléfono 02:");
-        jlTelNumber02.setPreferredSize(new java.awt.Dimension(90, 20));
+        jlTelNumber02.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel15.add(jlTelNumber02);
 
         jtfTelNumber02.setText("TEL 02");
-        jtfTelNumber02.setPreferredSize(new java.awt.Dimension(130, 23));
+        jtfTelNumber02.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel15.add(jtfTelNumber02);
 
         jlTelExt02.setText("Ext.:");
@@ -428,26 +427,23 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
 
         jtfTelExt02.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfTelExt02.setText("EXT 02");
-        jtfTelExt02.setPreferredSize(new java.awt.Dimension(40, 23));
+        jtfTelExt02.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel15.add(jtfTelExt02);
 
         jPanel21.add(jPanel15);
 
-        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlNextel01.setText("Nextel 01:");
-        jlNextel01.setPreferredSize(new java.awt.Dimension(110, 20));
+        jlNextel01.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jlNextel01);
 
         jtfNextel01.setText("NEXT 01");
         jtfNextel01.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jtfNextel01);
 
-        jLabel1.setPreferredSize(new java.awt.Dimension(110, 23));
-        jPanel6.add(jLabel1);
-
         jlNextel02.setText("Nextel 02:");
-        jlNextel02.setPreferredSize(new java.awt.Dimension(60, 20));
+        jlNextel02.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel6.add(jlNextel02);
 
         jtfNextel02.setText("NEXT 02");
@@ -460,9 +456,29 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
 
         jPanel20.setBorder(javax.swing.BorderFactory.createTitledBorder("Cuentas de correo electrónico:"));
         jPanel20.setPreferredSize(new java.awt.Dimension(352, 75));
-        jPanel20.setLayout(new java.awt.BorderLayout(5, 5));
+        jPanel20.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
-        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlEmail01.setText("Mail 01:");
+        jlEmail01.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel13.add(jlEmail01);
+
+        jtfEmail01.setText("EMAIL 01");
+        jtfEmail01.setPreferredSize(new java.awt.Dimension(225, 23));
+        jPanel13.add(jtfEmail01);
+
+        jlEmail02.setText("Mail 02:");
+        jlEmail02.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel13.add(jlEmail02);
+
+        jtfEmail02.setText("EMAIL 02");
+        jtfEmail02.setPreferredSize(new java.awt.Dimension(235, 23));
+        jPanel13.add(jtfEmail02);
+
+        jPanel20.add(jPanel13);
+
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlSkype01.setText("Skype 01:");
         jlSkype01.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -480,27 +496,7 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
         jtfSkype02.setPreferredSize(new java.awt.Dimension(235, 23));
         jPanel14.add(jtfSkype02);
 
-        jPanel20.add(jPanel14, java.awt.BorderLayout.NORTH);
-
-        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
-
-        jlEmail01.setText("E-mail 01:");
-        jlEmail01.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel13.add(jlEmail01);
-
-        jtfEmail01.setText("EMAIL 01");
-        jtfEmail01.setPreferredSize(new java.awt.Dimension(225, 23));
-        jPanel13.add(jtfEmail01);
-
-        jlEmail02.setText("E-mail 02:");
-        jlEmail02.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel13.add(jlEmail02);
-
-        jtfEmail02.setText("EMAIL 02");
-        jtfEmail02.setPreferredSize(new java.awt.Dimension(235, 23));
-        jPanel13.add(jtfEmail02);
-
-        jPanel20.add(jPanel13, java.awt.BorderLayout.CENTER);
+        jPanel20.add(jPanel14);
 
         jPanel3.add(jPanel20, java.awt.BorderLayout.SOUTH);
 
@@ -520,8 +516,8 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-750)/2, (screenSize.height-552)/2, 750, 552);
+        setSize(new java.awt.Dimension(750, 552));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -553,21 +549,21 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
         moFieldTelAreaCode01 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfTelAreaCode01, jlTelAreaCode01);
         moFieldTelAreaCode01.setLengthMax(10);
         moFieldTelNumber01 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfTelNumber01, jlTelNumber01);
-        moFieldTelNumber01.setLengthMax(15);
+        moFieldTelNumber01.setLengthMax(50);
         moFieldTelExt01 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfTelExt01, jlTelExt01);
         moFieldTelExt01.setLengthMax(15);
         moFieldFkTelephoneType02Id = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkTelephoneType02Id, jlFkTelephoneType02Id);
         moFieldTelAreaCode02 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfTelAreaCode02, jlTelAreaCode02);
         moFieldTelAreaCode02.setLengthMax(10);
         moFieldTelNumber02 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfTelNumber02, jlTelNumber02);
-        moFieldTelNumber02.setLengthMax(15);
+        moFieldTelNumber02.setLengthMax(50);
         moFieldTelExt02 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfTelExt02, jlTelExt02);
         moFieldTelExt02.setLengthMax(15);
         moFieldFkTelephoneType03Id = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkTelephoneType03Id, jl$FkTelephoneType03Id);
         moFieldTelAreaCode03 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfTelAreaCode03, jlTelAreaCode03);
         moFieldTelAreaCode03.setLengthMax(10);
         moFieldTelNumber03 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfTelNumber03, jlTelNumber03);
-        moFieldTelNumber03.setLengthMax(15);
+        moFieldTelNumber03.setLengthMax(50);
         moFieldTelExt03 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfTelExt03, jlTelExt03);
         moFieldTelExt03.setLengthMax(15);
         moFieldNextelId01 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfNextel01, jlNextel01);
@@ -729,7 +725,6 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBox5;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;

@@ -786,21 +786,34 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
         moBizPartnerBranch.getDbmsBizPartnerBranchContacts().clear();
 
         contact = new SDataBizPartnerBranchContact();
+        //contact.setPkBizPartnerBranchId();
         contact.setPkContactId(mnPkContactId);
+        contact.setContact("");
+        contact.setContactPrefix("");
+        contact.setContactSuffix("");
+        contact.setLastname("");
+        contact.setFirstname("");
+        contact.setCharge("");
         contact.setTelAreaCode01("");
         contact.setTelNumber01("");
         contact.setTelExt01("");
-        contact.setPkTelephoneType01Id(SDataConstantsSys.BPSS_TP_TEL_NA);
         contact.setTelAreaCode02("");
         contact.setTelNumber02("");
         contact.setTelExt02("");
-        contact.setPkTelephoneType02Id(SDataConstantsSys.BPSS_TP_TEL_NA);
         contact.setTelAreaCode03("");
         contact.setTelNumber03("");
         contact.setTelExt03("");
-        contact.setPkTelephoneType03Id(SDataConstantsSys.BPSS_TP_TEL_NA);
+        contact.setNextelId01("");
+        contact.setNextelId02("");
         contact.setEmail01(moFieldEmail.getString());
+        contact.setEmail02("");
+        contact.setSkype01("");
+        contact.setSkype02("");
+        contact.setIsDeleted(false);
         contact.setPkContactTypeId(SDataConstantsSys.BPSS_TP_CON_ADM);
+        contact.setPkTelephoneType01Id(SDataConstantsSys.BPSS_TP_TEL_NA);
+        contact.setPkTelephoneType02Id(SDataConstantsSys.BPSS_TP_TEL_NA);
+        contact.setPkTelephoneType03Id(SDataConstantsSys.BPSS_TP_TEL_NA);
         contact.setFkUserNewId(moBizPartnerBranch.getFkUserNewId());
         contact.setFkUserEditId(moBizPartnerBranch.getFkUserEditId());
 
