@@ -512,7 +512,8 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
                     }
                 }
 
-                // Save Customer Branch
+                // Save aswell customer branch configuration:
+                
                 for (int i = 0; i < mvDbmsCustomerBranchConfig.size(); i++) {
                     mvDbmsCustomerBranchConfig.get(i).setPkCustomerBranchId(mnPkBizPartnerBranchId);
                     if (mvDbmsCustomerBranchConfig.get(i).save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {

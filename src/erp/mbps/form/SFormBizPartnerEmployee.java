@@ -1277,7 +1277,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         address.setPoBox("");
         address.setIsDefault(true);
         address.setIsDeleted(false);
-        address.setFkAddressTypeId(SDataConstantsSys.BPSS_TP_ADD_OFF);
+        address.setFkAddressTypeId(SModSysConsts.BPSS_TP_ADD_OFF);
         address.setFkCountryId_n(SLibConsts.UNDEFINED);
         address.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
 

@@ -464,7 +464,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?) }");
+                    "?, ?) }");
             callableStatement.setInt(nParam++, mnPkBizPartnerId);
             callableStatement.setString(nParam++, msBizPartner);
             callableStatement.setString(nParam++, msBizPartnerCommercial);
