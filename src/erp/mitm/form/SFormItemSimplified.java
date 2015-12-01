@@ -993,22 +993,23 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
             moItem.setFkItemLineId_n(SLibConstants.UNDEFINED);
             moItem.setIsInventoriable(false);
 
+            moItem.setFkUnitUnitsContainedId(SDataConstantsSys.ITMU_UNIT_NA);
+            moItem.setFkUnitUnitsVirtualId(SDataConstantsSys.ITMU_UNIT_NA);
+            moItem.setFkUnitNetContentId(SDataConstantsSys.ITMU_UNIT_NA);
+            moItem.setFkUnitNetContentUnitaryId(SDataConstantsSys.ITMU_UNIT_NA);
+            moItem.setFkUnitAlternativeTypeId(SDataConstantsSys.ITMU_TP_UNIT_NA);
+            moItem.setFkLevelTypeId(SDataConstantsSys.ITMU_TP_LEV_NA);
             moItem.setFkBrandId(SDataConstantsSys.ITMU_BRD_NA);
             moItem.setFkManufacturerId(SDataConstantsSys.ITMU_MFR_NA);
             moItem.setFkElementId(SDataConstantsSys.ITMU_EMT_NA);
             moItem.setFkVariety01Id(SDataConstantsSys.ITMU_VAR_NA);
             moItem.setFkVariety02Id(SDataConstantsSys.ITMU_VAR_NA);
             moItem.setFkVariety03Id(SDataConstantsSys.ITMU_VAR_NA);
-            moItem.setFkUnitUnitsContainedId(SDataConstantsSys.ITMU_UNIT_NA);
-            moItem.setFkUnitUnitsVirtualId(SDataConstantsSys.ITMU_UNIT_NA);
-            moItem.setFkUnitNetContentId(SDataConstantsSys.ITMU_UNIT_NA);
-            moItem.setFkUnitNetContentUnitaryId(SDataConstantsSys.ITMU_UNIT_NA);
-            moItem.setFkItemPackageId_n(SLibConstants.UNDEFINED);
-            moItem.setFkUnitAlternativeTypeId(SDataConstantsSys.ITMU_TP_UNIT_NA);
-            moItem.setFkLevelTypeId(SDataConstantsSys.ITMU_TP_LEV_NA);
-            moItem.setFkDefaultItemRefId_n(SLibConstants.UNDEFINED);
             moItem.setFkAdministrativeConceptTypeId(SDataConstantsSys.FINU_TP_ADM_CPT_NA);
             moItem.setFkTaxableConceptTypeId(SDataConstantsSys.FINU_TP_TAX_CPT_NA);
+            moItem.setFkItemPackageId_n(SLibConstants.UNDEFINED);
+            moItem.setFkDefaultItemRefId_n(SLibConstants.UNDEFINED);
+            
         }
         else {
             moItem.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
