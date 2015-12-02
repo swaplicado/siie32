@@ -5,8 +5,9 @@
 
 package erp.lib.data;
 
-import erp.lib.*;
+import erp.lib.SLibConstants;
 import java.util.Vector;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -106,10 +107,10 @@ public abstract class SDataRegistry implements java.io.Serializable {
         mbIsRegistryRequestDelete = true;
         mnDbmsErrorId = 0;
         msDbmsError = "";
-        moDateFormat = null;
-        moDbmsDateFormat = null;
-        moDbmsDatetimeFormat = null;
-        moDbmsTimeFormat = null;
+        moDateFormat = SLibUtils.DateFormatDate;
+        moDbmsDateFormat = SLibUtils.DbmsDateFormatDate;
+        moDbmsDatetimeFormat = SLibUtils.DbmsDateFormatDatetime;
+        moDbmsTimeFormat = SLibUtils.DbmsDateFormatTime;
         mvRegistryComplements.clear();
         moPostSaveTarget = null;
         moPostSaveMethod = null;

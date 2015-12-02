@@ -225,7 +225,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.mfin.form.SPanelRecord moPanelRecord;
     private boolean mbIsAddendaNeeded;
     private int mnCountEntries;
-    private String msXmlPath;
+    private String msFileXmlPath;
 
     private double mdOrigExchangeRate;
     private double mdOrigDiscountDocPercentage;
@@ -5921,7 +5921,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
             moFieldFileXml.setFieldValue(miClient.getFileChooser().getSelectedFile().getName());
-            msXmlPath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
+            msFileXmlPath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
         }
         miClient.getFileChooser().resetChoosableFileFilters();
     }
@@ -7002,7 +7002,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jftRemissionDate.setEnabled(false);
         mbIsAddendaNeeded = false;
         mnCountEntries = 0;
-        msXmlPath  = "";
+        msFileXmlPath  = "";
 
         mdOrigExchangeRate = 0;
         mdOrigDiscountDocPercentage = 0;
@@ -7805,20 +7805,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         if (isCfdNeeded() || isCfdiNeeded()) {
             moDps.setAuxCfdParams(createCfdParams());
-            moDps.setAuxIsNeedCfd(isCfdNeeded() || isCfdiNeeded());
+            moDps.setAuxIsNeedCfd(true);
         }
 
-
-        if (msXmlPath.length() > 0) {
+        if (!msFileXmlPath.isEmpty()) {
             try {
-                if (moDps.getDbmsDataCfd() == null) {
-                    cfd = new SDataCfd();
-                }
-                else {
-                    cfd = moDps.getDbmsDataCfd();
-                }
+                cfd = moDps.getDbmsDataCfd() != null ? moDps.getDbmsDataCfd() : new SDataCfd();
 
-                sFileXml = DUtilities.readXml(msXmlPath);
+                sFileXml = DUtilities.readXml(msFileXmlPath);
                 if (cfd != null) {
                     cfd.setCertNumber("");
                     cfd.setStringSigned("");
@@ -7846,7 +7840,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
         else {
             try {
-                if (moFieldFileXml.getString().length() == 0 && moDps.getDbmsDataCfd() != null) {
+                if (moFieldFileXml.getString().isEmpty() && moDps.getDbmsDataCfd() != null) {
                     cfd = moDps.getDbmsDataCfd();
                     
                     cfd.setDocXml("");

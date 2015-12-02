@@ -134,9 +134,13 @@ public abstract class SModSysConsts {
 
     public static final int ITMU_UNIT_NA = 1;
     public static final int ITMU_UNIT_UNIT = 2;
+    public static final int ITMU_UNIT_PCE = 3;
+    public static final int ITMU_UNIT_K = 6;
     public static final int ITMU_UNIT_MT = 12;
     public static final int ITMU_UNIT_MT2 = 24;
+    public static final int ITMU_UNIT_FT2 = 31;
     public static final int ITMU_UNIT_MT3 = 40;
+    public static final int ITMU_UNIT_FT3 = 47;
     public static final int ITMU_UNIT_MT_TON = 58;
     public static final int ITMU_UNIT_KG = 59;
     public static final int ITMU_UNIT_LB = 66;
