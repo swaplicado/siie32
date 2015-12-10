@@ -205,7 +205,7 @@ public class SViewItemSimple extends erp.lib.table.STableTab implements java.awt
                 "INNER JOIN erp.usru_usr AS ue ON i.fid_usr_edit = ue.id_usr " +
                 "INNER JOIN erp.usru_usr AS ud ON i.fid_usr_del = ud.id_usr " +
                 "LEFT OUTER JOIN erp.itmu_line AS il ON i.fid_line_n = il.id_line " +
-                "WHERE i.b_inv = 0 AND ig.fid_ct_item = " + manItemClassKey[0] + " AND ig.fid_cl_item = " + manItemClassKey[1] + " " +
+                "WHERE ig.fid_ct_item = " + manItemClassKey[0] + " AND ig.fid_cl_item = " + manItemClassKey[1] + " " +
                 (sqlWhere.isEmpty() ? "" : " AND " + sqlWhere) + " " +
                 "ORDER BY " + (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ?
                     "i.item_key, i.item, " :
