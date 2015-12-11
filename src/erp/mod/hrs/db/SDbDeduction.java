@@ -53,6 +53,27 @@ public class SDbDeduction extends SDbRegistryUser {
     
     protected ArrayList<SDbAccountingDeduction> maAccountingDeduction;
     
+    private SDbAccountingDeduction createAccountingDeduction() {
+        SDbAccountingDeduction accountingDeduction = null;
+        
+        accountingDeduction = new SDbAccountingDeduction();
+            
+        accountingDeduction.setFkAccountId(SModSysConsts.FIN_ACC_NA);
+        accountingDeduction.setFkCostCenterId_n(SLibConsts.UNDEFINED);
+        accountingDeduction.setFkItemId_n(SLibConsts.UNDEFINED);
+        accountingDeduction.setFkBizPartnerId_n(SLibConsts.UNDEFINED);
+        accountingDeduction.setFkTaxBasicId_n(SLibConsts.UNDEFINED);
+        accountingDeduction.setFkTaxTaxId_n(SLibConsts.UNDEFINED);
+        /*
+        accountingDeduction.setFkUserInsertId();
+        accountingDeduction.setFkUserUpdateId();
+        accountingDeduction.setTsUserInsert();
+        accountingDeduction.setTsUserUpdate();
+        */
+        
+        return accountingDeduction;
+    }
+    
     private SDbAccountingDeduction getAccountingConfigurationDepartament(final int departamentId) throws Exception {
         SDbAccountingDeduction accountingDeduction = null;
         
@@ -61,6 +82,10 @@ public class SDbDeduction extends SDbRegistryUser {
                 accountingDeduction = dbAccountingDeduction.clone();
                 break;
             }
+        }
+        
+        if (accountingDeduction == null) {
+            accountingDeduction = createAccountingDeduction();
         }
         
         return accountingDeduction;
@@ -79,25 +104,13 @@ public class SDbDeduction extends SDbRegistryUser {
         if (mnAuxAccountingConfigurationTypeId != mnFkAccountingConfigurationTypeId) {
             switch (mnFkAccountingConfigurationTypeId) {
                 case SModSysConsts.HRSS_TP_ACC_GBL:
-                    accountingDeduction = new SDbAccountingDeduction();
+                    accountingDeduction = createAccountingDeduction();
             
                     accountingDeduction.setPkDeductionId(mnPkDeductionId);
                     accountingDeduction.setPkAccountingTypeId(SModSysConsts.HRSS_TP_ACC_GBL);
                     accountingDeduction.setPkReferenceId(SLibConsts.UNDEFINED);
                     accountingDeduction.setDeleted(false);
-                    accountingDeduction.setFkAccountId(SModSysConsts.FIN_ACC_NA);
-                    accountingDeduction.setFkCostCenterId_n(SLibConsts.UNDEFINED);
-                    accountingDeduction.setFkItemId_n(SLibConsts.UNDEFINED);
-                    accountingDeduction.setFkBizPartnerId_n(SLibConsts.UNDEFINED);
-                    accountingDeduction.setFkTaxBasicId_n(SLibConsts.UNDEFINED);
-                    accountingDeduction.setFkTaxTaxId_n(SLibConsts.UNDEFINED);
-                    /*
-                    accountingDeduction.setFkUserInsertId();
-                    accountingDeduction.setFkUserUpdateId();
-                    accountingDeduction.setTsUserInsert();
-                    accountingDeduction.setTsUserUpdate();
-                    */
-
+                    
                     aAccountingDeduction.add(accountingDeduction);
                     break;
                 case SModSysConsts.HRSS_TP_ACC_DEP:
@@ -111,23 +124,11 @@ public class SDbDeduction extends SDbRegistryUser {
                     
                     for (SDbDepartment dbDepartment : departments) {
                         if (mnAuxAccountingConfigurationTypeId != SLibConsts.UNDEFINED &&
-                                mnAuxAccountingConfigurationTypeId < mnFkAccountingConfigurationTypeId) {
+                                mnAuxAccountingConfigurationTypeId < mnFkAccountingConfigurationTypeId && !maAccountingDeduction.isEmpty()) {
                             accountingDeduction = maAccountingDeduction.get(0).clone();
                         }
                         else {
-                            
-                            accountingDeduction.setFkAccountId(SModSysConsts.FIN_ACC_NA);
-                            accountingDeduction.setFkCostCenterId_n(SLibConsts.UNDEFINED);
-                            accountingDeduction.setFkItemId_n(SLibConsts.UNDEFINED);
-                            accountingDeduction.setFkBizPartnerId_n(SLibConsts.UNDEFINED);
-                            accountingDeduction.setFkTaxBasicId_n(SLibConsts.UNDEFINED);
-                            accountingDeduction.setFkTaxTaxId_n(SLibConsts.UNDEFINED);
-                            /*
-                            accountingDeduction.setFkUserInsertId();
-                            accountingDeduction.setFkUserUpdateId();
-                            accountingDeduction.setTsUserInsert();
-                            accountingDeduction.setTsUserUpdate();
-                            */
+                            accountingDeduction = createAccountingDeduction();
                         }
                         accountingDeduction.setDeleted(false);
                         accountingDeduction.setPkDeductionId(mnPkDeductionId);
@@ -150,7 +151,7 @@ public class SDbDeduction extends SDbRegistryUser {
                     for (SDbEmployee dbEmployee : employees) {
                         if (mnAuxAccountingConfigurationTypeId != SLibConsts.UNDEFINED &&
                                 mnAuxAccountingConfigurationTypeId < mnFkAccountingConfigurationTypeId) {
-                            if (mnAuxAccountingConfigurationTypeId == SModSysConsts.HRSS_TP_ACC_GBL) {
+                            if (mnAuxAccountingConfigurationTypeId == SModSysConsts.HRSS_TP_ACC_GBL && !maAccountingDeduction.isEmpty()) {
                                 accountingDeduction = maAccountingDeduction.get(0).clone();
                             }
                             else {
@@ -158,20 +159,7 @@ public class SDbDeduction extends SDbRegistryUser {
                             }
                         }
                         else {
-                            accountingDeduction = new SDbAccountingDeduction();
-                            
-                            accountingDeduction.setFkAccountId(SModSysConsts.FIN_ACC_NA);
-                            accountingDeduction.setFkCostCenterId_n(SLibConsts.UNDEFINED);
-                            accountingDeduction.setFkItemId_n(SLibConsts.UNDEFINED);
-                            accountingDeduction.setFkBizPartnerId_n(SLibConsts.UNDEFINED);
-                            accountingDeduction.setFkTaxBasicId_n(SLibConsts.UNDEFINED);
-                            accountingDeduction.setFkTaxTaxId_n(SLibConsts.UNDEFINED);
-                            /*
-                            accountingDeduction.setFkUserInsertId();
-                            accountingDeduction.setFkUserUpdateId();
-                            accountingDeduction.setTsUserInsert();
-                            accountingDeduction.setTsUserUpdate();
-                            */
+                            accountingDeduction = createAccountingDeduction();
                         }
                         accountingDeduction.setDeleted(false);
                         accountingDeduction.setPkDeductionId(mnPkDeductionId);

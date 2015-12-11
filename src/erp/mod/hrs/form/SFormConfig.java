@@ -512,7 +512,7 @@ public class SFormConfig extends SBeanForm {
         moIntLimitMwzReference.setIntegerSettings(SGuiUtils.getLabelName(jlLimitMwzReference.getText()), SGuiConsts.GUI_TYPE_INT, true);
         moIntLimitMwzReference.setMinInteger(1);
         moIntLimitMwzReference.setMaxInteger(100);
-        moTextBajioAffinityGroup.setTextSettings(SGuiUtils.getLabelName(moTextBajioAffinityGroup.getText()), 5);
+        moTextBajioAffinityGroup.setTextSettings(SGuiUtils.getLabelName(jlBajioAffinityGroup.getText()), 5, 0);
         moDecPayrollTaxRate.setDecimalSettings(SGuiUtils.getLabelName(jlPayrollTaxRate.getText()), SGuiConsts.GUI_TYPE_DEC_PER_DISC, false);
         moBoolFornightStandard.setBooleanSettings(SGuiUtils.getLabelName(moBoolFornightStandard.getText()), true);
         moBoolTaxSubsidyEarning.setBooleanSettings(SGuiUtils.getLabelName(moBoolTaxSubsidyEarning.getText()), true);

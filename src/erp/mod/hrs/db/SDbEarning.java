@@ -65,6 +65,27 @@ public class SDbEarning extends SDbRegistryUser {
     
     protected ArrayList<SDbAccountingEarning> maAccountingEarning;
     
+    private SDbAccountingEarning createAccountingEarning() {
+        SDbAccountingEarning accountingEarning = null;
+        
+        accountingEarning = new SDbAccountingEarning();
+            
+        accountingEarning.setFkAccountId(SModSysConsts.FIN_ACC_NA);
+        accountingEarning.setFkCostCenterId_n(SLibConsts.UNDEFINED);
+        accountingEarning.setFkItemId_n(SLibConsts.UNDEFINED);
+        accountingEarning.setFkBizPartnerId_n(SLibConsts.UNDEFINED);
+        accountingEarning.setFkTaxBasicId_n(SLibConsts.UNDEFINED);
+        accountingEarning.setFkTaxTaxId_n(SLibConsts.UNDEFINED);
+        /*
+        accountingEarning.setFkUserInsertId();
+        accountingEarning.setFkUserUpdateId();
+        accountingEarning.setTsUserInsert();
+        accountingEarning.setTsUserUpdate();
+        */
+        
+        return accountingEarning;
+    }
+    
     private SDbAccountingEarning getAccountingConfigurationDepartament(final int departamentId) throws Exception {
         SDbAccountingEarning accountingEarning = null;
         
@@ -73,6 +94,10 @@ public class SDbEarning extends SDbRegistryUser {
                 accountingEarning = dbAccountingEarning.clone();
                 break;
             }
+        }
+        
+        if (accountingEarning == null) {
+            accountingEarning = createAccountingEarning();
         }
         
         return accountingEarning;
@@ -91,24 +116,12 @@ public class SDbEarning extends SDbRegistryUser {
         if (mnAuxAccountingConfigurationTypeId != mnFkAccountingConfigurationTypeId) {
             switch (mnFkAccountingConfigurationTypeId) {
                 case SModSysConsts.HRSS_TP_ACC_GBL:
-                    accountingEarning = new SDbAccountingEarning();
+                    accountingEarning = createAccountingEarning();
             
                     accountingEarning.setPkEarningId(mnPkEarningId);
                     accountingEarning.setPkAccountingTypeId(SModSysConsts.HRSS_TP_ACC_GBL);
                     accountingEarning.setPkReferenceId(SLibConsts.UNDEFINED);
                     accountingEarning.setDeleted(false);
-                    accountingEarning.setFkAccountId(SModSysConsts.FIN_ACC_NA);
-                    accountingEarning.setFkCostCenterId_n(SLibConsts.UNDEFINED);
-                    accountingEarning.setFkItemId_n(SLibConsts.UNDEFINED);
-                    accountingEarning.setFkBizPartnerId_n(SLibConsts.UNDEFINED);
-                    accountingEarning.setFkTaxBasicId_n(SLibConsts.UNDEFINED);
-                    accountingEarning.setFkTaxTaxId_n(SLibConsts.UNDEFINED);
-                    /*
-                    accountingEarning.setFkUserInsertId();
-                    accountingEarning.setFkUserUpdateId();
-                    accountingEarning.setTsUserInsert();
-                    accountingEarning.setTsUserUpdate();
-                    */
 
                     aAccountingEarning.add(accountingEarning);
                     break;
@@ -123,23 +136,11 @@ public class SDbEarning extends SDbRegistryUser {
                     
                     for (SDbDepartment dbDepartment : departments) {
                         if (mnAuxAccountingConfigurationTypeId != SLibConsts.UNDEFINED &&
-                                mnAuxAccountingConfigurationTypeId < mnFkAccountingConfigurationTypeId) {
+                                mnAuxAccountingConfigurationTypeId < mnFkAccountingConfigurationTypeId && !maAccountingEarning.isEmpty()) {
                             accountingEarning = maAccountingEarning.get(0).clone();
                         }
                         else {
-                            
-                            accountingEarning.setFkAccountId(SModSysConsts.FIN_ACC_NA);
-                            accountingEarning.setFkCostCenterId_n(SLibConsts.UNDEFINED);
-                            accountingEarning.setFkItemId_n(SLibConsts.UNDEFINED);
-                            accountingEarning.setFkBizPartnerId_n(SLibConsts.UNDEFINED);
-                            accountingEarning.setFkTaxBasicId_n(SLibConsts.UNDEFINED);
-                            accountingEarning.setFkTaxTaxId_n(SLibConsts.UNDEFINED);
-                            /*
-                            accountingEarning.setFkUserInsertId();
-                            accountingEarning.setFkUserUpdateId();
-                            accountingEarning.setTsUserInsert();
-                            accountingEarning.setTsUserUpdate();
-                            */
+                            accountingEarning = createAccountingEarning();
                         }
                         accountingEarning.setDeleted(false);
                         accountingEarning.setPkEarningId(mnPkEarningId);
@@ -162,7 +163,7 @@ public class SDbEarning extends SDbRegistryUser {
                     for (SDbEmployee dbEmployee : employees) {
                         if (mnAuxAccountingConfigurationTypeId != SLibConsts.UNDEFINED &&
                                 mnAuxAccountingConfigurationTypeId < mnFkAccountingConfigurationTypeId) {
-                            if (mnAuxAccountingConfigurationTypeId == SModSysConsts.HRSS_TP_ACC_GBL) {
+                            if (mnAuxAccountingConfigurationTypeId == SModSysConsts.HRSS_TP_ACC_GBL && !maAccountingEarning.isEmpty()) {
                                 accountingEarning = maAccountingEarning.get(0).clone();
                             }
                             else {
@@ -170,20 +171,7 @@ public class SDbEarning extends SDbRegistryUser {
                             }
                         }
                         else {
-                            accountingEarning = new SDbAccountingEarning();
-                            
-                            accountingEarning.setFkAccountId(SModSysConsts.FIN_ACC_NA);
-                            accountingEarning.setFkCostCenterId_n(SLibConsts.UNDEFINED);
-                            accountingEarning.setFkItemId_n(SLibConsts.UNDEFINED);
-                            accountingEarning.setFkBizPartnerId_n(SLibConsts.UNDEFINED);
-                            accountingEarning.setFkTaxBasicId_n(SLibConsts.UNDEFINED);
-                            accountingEarning.setFkTaxTaxId_n(SLibConsts.UNDEFINED);
-                            /*
-                            accountingEarning.setFkUserInsertId();
-                            accountingEarning.setFkUserUpdateId();
-                            accountingEarning.setTsUserInsert();
-                            accountingEarning.setTsUserUpdate();
-                            */
+                            accountingEarning = createAccountingEarning();
                         }
                         accountingEarning.setDeleted(false);
                         accountingEarning.setPkEarningId(mnPkEarningId);
