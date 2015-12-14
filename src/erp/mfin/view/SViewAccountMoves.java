@@ -105,11 +105,11 @@ public class SViewAccountMoves extends erp.lib.table.STableTab {
         aoTableColumns[i++].setSumApplying(true);
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "re.credit", "Haber $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setSumApplying(true);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "re.exc_rate", "T. cambio", STableConstants.WIDTH_EXCHANGE_RATE);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "re.exc_rate", "T cambio", STableConstants.WIDTH_EXCHANGE_RATE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererExchangeRate());
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "re.debit_cur", "Debe moneda $", STableConstants.WIDTH_VALUE);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "re.debit_cur", "Debe mon $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setSumApplying(true);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "re.credit_cur", "Haber moneda $", STableConstants.WIDTH_VALUE);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "re.credit_cur", "Haber mon $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setSumApplying(true);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.cur_key", "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "re.b_sys", "Sistema", STableConstants.WIDTH_BOOLEAN);

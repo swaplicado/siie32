@@ -554,7 +554,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
 
         jpRegistry217.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jckIsItemKeyAutomatic.setText("Las claves de ítems son automáticas");
+        jckIsItemKeyAutomatic.setText("Claves de ítems automáticas");
         jckIsItemKeyAutomatic.setPreferredSize(new java.awt.Dimension(250, 23));
         jpRegistry217.add(jckIsItemKeyAutomatic);
 
@@ -728,14 +728,14 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         jcbFkUnitNetContentTypeId.setPreferredSize(new java.awt.Dimension(100, 23));
         jpRegistry32.add(jcbFkUnitNetContentTypeId);
 
-        jckIsNetContentUnitaryApplying.setText("Tipo de unidad contenido neto unitario:");
+        jckIsNetContentUnitaryApplying.setText("Tipo de unidad contenido neto unit.:");
         jckIsNetContentUnitaryApplying.setPreferredSize(new java.awt.Dimension(100, 23));
         jpRegistry32.add(jckIsNetContentUnitaryApplying);
 
         jcbFkUnitNetContentUnitaryTypeId.setPreferredSize(new java.awt.Dimension(100, 23));
         jpRegistry32.add(jcbFkUnitNetContentUnitaryTypeId);
 
-        jckIsNetContentVariable.setText("El contenido neto es variable");
+        jckIsNetContentVariable.setText("Contenido neto variable");
         jckIsNetContentVariable.setPreferredSize(new java.awt.Dimension(100, 23));
         jpRegistry32.add(jckIsNetContentVariable);
 
@@ -1233,8 +1233,8 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
 
         getContentPane().add(jpCommand, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-960)/2, (screenSize.height-600)/2, 960, 600);
+        setSize(new java.awt.Dimension(960, 600));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated

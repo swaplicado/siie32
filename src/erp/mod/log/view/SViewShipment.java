@@ -265,7 +265,7 @@ public class SViewShipment extends SGridPaneView implements ActionListener {
             columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "v.carr_imp_oth", "Trans destino otros $");
             columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "v.cust_imp", "Imp despacho aduana $");
             columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "v.tari", "Aranceles $");
-            columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "v.cost_cur_r", "Total moneda $");
+            columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "v.cost_cur_r", "Total mon $");
             columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "f_cur_key", "Moneda");
             columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "v.exc_rate", "T cambio");
             columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "v.cost_r", "Total embarque $");

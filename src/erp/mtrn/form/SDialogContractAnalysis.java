@@ -829,8 +829,8 @@ public class SDialogContractAnalysis extends javax.swing.JDialog implements erp.
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Folio fac.", STableConstants.WIDTH_DOC_NUM);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Referencia coms.", STableConstants.WIDTH_DOC_NUM_REF);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Sucursal fac.", STableConstants.WIDTH_CODE_COB);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total fac.$", STableConstants.WIDTH_VALUE_2X);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Saldo fac.$", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total fac. $", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Saldo fac. $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Partida fac.", STableConstants.WIDTH_NUM_TINYINT);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cantidad fac.", STableConstants.WIDTH_QUANTITY);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha NC", STableConstants.WIDTH_DATE);

@@ -11,15 +11,6 @@
 
 package erp.mfin.form;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.util.Vector;
-import javax.swing.AbstractAction;
-import javax.swing.JButton;
-import javax.swing.JTextField;
-
 import erp.data.SDataReadTableRows;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
@@ -29,7 +20,15 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STablePane;
 import erp.lib.table.STableRow;
 import erp.lib.table.STableUtilities;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.HashMap;
+import java.util.Vector;
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JTextField;
 
 /**
  *
@@ -188,8 +187,8 @@ public class SDialogRecordPicker extends javax.swing.JDialog implements erp.lib.
         tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num", "Folio póliza", STableConstants.WIDTH_RECORD_NUM);
         tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "r.dt", "Fecha póliza", STableConstants.WIDTH_DATE);
         tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "r.concept", "Concepto", 175);
-        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_debit", "Debe $", STableConstants.WIDTH_VALUE_2X);
-        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_credit", "Haber $", STableConstants.WIDTH_VALUE_2X);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_debit", "Cargos $", STableConstants.WIDTH_VALUE_2X);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_credit", "Abonos $", STableConstants.WIDTH_VALUE_2X);
         tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_balance", "Saldo $", STableConstants.WIDTH_VALUE_2X);
         tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "r.b_sys", "Sistema", STableConstants.WIDTH_BOOLEAN);
         tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "e.ent", "Cuenta efectivo", 100);

@@ -6,37 +6,34 @@
 
 package erp.mmfg.form;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.text.DecimalFormat;
-import java.util.Vector;
-import javax.swing.AbstractAction;
-
 import erp.data.SDataConstants;
-import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.data.SProcConstants;
+import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
 import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.lib.table.STableCellRendererNumber;
-import erp.lib.table.STableConstants;
 import erp.lib.table.STableColumnForm;
+import erp.lib.table.STableConstants;
 import erp.lib.table.STablePane;
-import erp.lib.SLibConstants;
-import erp.lib.SLibUtilities;
 import erp.lib.table.STablePaneGrid;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
 import erp.mmfg.data.SDataBom;
 import erp.mmfg.data.SDataBomLevelRow;
 import erp.mmfg.data.SDataBomNotes;
+import erp.mmfg.data.SDataBomNotesRow;
 import erp.mmfg.data.SDataBomSubgoods;
 import erp.mmfg.data.SDataBomSubgoodsRow;
-import erp.mmfg.data.SDataBomNotesRow;
-import erp.mmfg.data.SDataBomSubstitute;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.text.DecimalFormat;
+import java.util.Vector;
+import javax.swing.AbstractAction;
 import javax.swing.JToggleButton;
 
 /**
@@ -548,7 +545,7 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         oColumnsLevel[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Porcentaje", 85);
         oColumnsLevel[i].setCellRenderer(new STableCellRendererNumber(new DecimalFormat("#,##0" + "." + SLibUtilities.textRepeat("0", 6) + "%")));
         oColumnsLevel[i++].setSumApplying(true);
-        oColumnsLevel[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Costo", STableConstants.WIDTH_VALUE_2X);
+        oColumnsLevel[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Costo $", STableConstants.WIDTH_VALUE_2X);
         oColumnsLevel[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         oColumnsLevel[i++].setSumApplying(true);
         oColumnsLevel[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Ini. vigencia", STableConstants.WIDTH_DATE);

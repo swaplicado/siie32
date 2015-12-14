@@ -5,26 +5,21 @@
 
 package erp.mmfg.view;
 
-import erp.SClient;
+import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
+import erp.lib.SLibConstants;
+import erp.lib.table.STabFilterDeleted;
+import erp.lib.table.STableColumn;
+import erp.lib.table.STableConstants;
+import erp.lib.table.STableField;
+import erp.mmfg.data.SDataBom;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.text.DecimalFormat;
 import java.util.Map;
 import javax.swing.JButton;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
-
-import erp.data.SDataConstants;
-import erp.data.SDataConstantsSys;
-import erp.data.SDataUtilities;
-import erp.lib.table.STabFilterDeleted;
-import erp.lib.table.STableCellRendererNumber;
-import erp.lib.table.STableColumn;
-import erp.lib.table.STableConstants;
-import erp.lib.table.STableField;
-import erp.lib.SLibConstants;
-import erp.lib.SLibUtilities;
-import erp.mmfg.data.SDataBom;
 
 /**
  *
@@ -77,7 +72,7 @@ public class SViewBom extends erp.lib.table.STableTab implements java.awt.event.
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "b.qty", "Lote sugerido", STableConstants.WIDTH_QUANTITY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "b.cost_per", "Cto. asig.", STableConstants.WIDTH_PERCENTAGE);
-        aoTableColumns[i++].setCellRenderer(new STableCellRendererNumber(new DecimalFormat("#,##0" + "." + SLibUtilities.textRepeat("0", 4) + "%")));
+        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererPercentage());
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "b.ts_start", "Ini. vigencia", STableConstants.WIDTH_DATE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "b.ts_end_n", "Fin. vigencia", STableConstants.WIDTH_DATE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "b.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);

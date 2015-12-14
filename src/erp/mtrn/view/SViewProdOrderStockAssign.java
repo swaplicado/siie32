@@ -177,7 +177,7 @@ public class SViewProdOrderStockAssign extends erp.lib.table.STableTab implement
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp", "Tipo orden", 75);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_ord_item_key", "Clave ítem", STableConstants.WIDTH_ITEM_KEY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_ord_item", "Ítem", STableConstants.WIDTH_ITEM_2X);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "qty", "Cant. orden", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "qty", "Cant. orden", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_ord_unit_sym", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
 
@@ -187,21 +187,21 @@ public class SViewProdOrderStockAssign extends erp.lib.table.STableTab implement
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_chg_item", "Ingrediente", STableConstants.WIDTH_ITEM_2X);
         }
 
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_req", "Cant. x asignar", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_req", "Cant. x asignar", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_asd", "Cant. asignada", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_asd", "Cant. asignada", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
 
         if (isViewForEntries()) {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_chg_unit_sym", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
         }
 
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "", "Avance %", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "", "Avance %", STableConstants.WIDTH_PERCENTAGE);
         aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererPercentage());
         aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_qty_asd", SLibRpnArgumentType.OPERAND));
         aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_qty_req", SLibRpnArgumentType.OPERAND));
         aoTableColumns[i++].getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.DIVISION, SLibRpnArgumentType.OPERATOR));
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "", "Cant. pendiente", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "", "Cant. pendiente", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_qty_req", SLibRpnArgumentType.OPERAND));
         aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_qty_asd", SLibRpnArgumentType.OPERAND));

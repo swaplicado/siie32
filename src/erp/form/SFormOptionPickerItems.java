@@ -449,7 +449,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
             aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
             aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
             if (showStock()) {
-                aoTableColumns[col] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Existencias", STableConstants.WIDTH_QUANTITY);
+                aoTableColumns[col] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Existencias", STableConstants.WIDTH_QUANTITY_2X);
                 aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
             }
             aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
@@ -465,7 +465,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
             aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
             aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
             if (showStock()) {
-                aoTableColumns[col] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Existencias", STableConstants.WIDTH_QUANTITY);
+                aoTableColumns[col] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Existencias", STableConstants.WIDTH_QUANTITY_2X);
                 aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
             }
             aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
@@ -488,7 +488,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
                 aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
             }
             if (showStock()) {
-                aoTableColumns[col] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Existencias", STableConstants.WIDTH_QUANTITY);
+                aoTableColumns[col] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Existencias", STableConstants.WIDTH_QUANTITY_2X);
                 aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
             }
             aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
@@ -510,7 +510,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
                 aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
             }
             if (showStock()) {
-                aoTableColumns[col] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Existencias", STableConstants.WIDTH_QUANTITY);
+                aoTableColumns[col] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Existencias", STableConstants.WIDTH_QUANTITY_2X);
                 aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
             }
             aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);

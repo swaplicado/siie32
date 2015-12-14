@@ -1080,7 +1080,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFkCurrencyId.setForeground(java.awt.Color.blue);
-        jlFkCurrencyId.setText("Moneda del documento: *");
+        jlFkCurrencyId.setText("Moneda documento: *");
         jlFkCurrencyId.setPreferredSize(new java.awt.Dimension(135, 23));
         jPanel20.add(jlFkCurrencyId);
 
@@ -1159,7 +1159,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jckIsCopy.setText("Copia");
+        jckIsCopy.setText("Es copia");
         jckIsCopy.setMargin(new java.awt.Insets(2, 0, 2, 2));
         jckIsCopy.setPreferredSize(new java.awt.Dimension(85, 23));
         jPanel37.add(jckIsCopy);
@@ -2312,21 +2312,21 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cantidad", STableConstants.WIDTH_QUANTITY);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
-        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Precio u. $", STableConstants.WIDTH_VALUE);   // due to space restrictions, value width is used
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Precio u. $", STableConstants.WIDTH_VALUE); // due to space restrictions
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitaryFixed4());
-        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Descto. u. $", STableConstants.WIDTH_VALUE);  // due to space restrictions, value width is used
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Descto. u. $", STableConstants.WIDTH_VALUE); // due to space restrictions
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitaryFixed4());
-        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Descto. $", STableConstants.WIDTH_DISCOUNT);
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Descto. $", STableConstants.WIDTH_DISCOUNT - 15); // due to space restrictions
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Subtotal prov. $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Descto. doc. $", STableConstants.WIDTH_DISCOUNT);
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Descto. doc. $", STableConstants.WIDTH_DISCOUNT - 15); // due to space restrictions
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Subtotal $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Impto. tras. $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Impto. ret. $", STableConstants.WIDTH_VALUE);
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Impto. ret. $", STableConstants.WIDTH_VALUE - 15); // due to space restrictions
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
@@ -2341,7 +2341,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem referencia", STableConstants.WIDTH_ITEM);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. centro costo", STableConstants.WIDTH_ACCOUNT_ID);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Centro costo", STableConstants.WIDTH_ACCOUNT);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Id interno", STableConstants.WIDTH_NUM_TINYINT);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "ID interno", STableConstants.WIDTH_NUM_TINYINT);
 
         for (i = 0; i < aoTableColumns.length; i++) {
             moPaneGridEntries.addTableColumn(aoTableColumns[i]);
@@ -2854,7 +2854,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jtfQuantityTotal.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(quantity));
 
-        moDps.calculateTotal(miClient);
+        try {
+            moDps.calculateTotal(miClient);
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+        
         renderDpsValue();
     }
 

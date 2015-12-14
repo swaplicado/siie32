@@ -227,8 +227,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel63 = new javax.swing.JPanel();
         jlFkLevelTypeId = new javax.swing.JLabel();
         jcbFkLevelTypeId = new javax.swing.JComboBox();
-        jPanel7 = new javax.swing.JPanel();
-        jPanel26 = new javax.swing.JPanel();
+        jPanel9 = new javax.swing.JPanel();
+        jPanel14 = new javax.swing.JPanel();
+        jPanel10 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jlFkUnitId = new javax.swing.JLabel();
         jcbFkUnitId = new javax.swing.JComboBox();
@@ -258,8 +259,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel8 = new javax.swing.JPanel();
         jlProductionTime = new javax.swing.JLabel();
         jtfProductionTime = new javax.swing.JTextField();
-        jlProductionTimeUnit = new javax.swing.JLabel();
-        jPanel25 = new javax.swing.JPanel();
+        jtfProductionTimeUnitRo = new javax.swing.JTextField();
+        jPanel11 = new javax.swing.JPanel();
         jPanel31 = new javax.swing.JPanel();
         jlWeightGross = new javax.swing.JLabel();
         jtfWeightGross = new javax.swing.JTextField();
@@ -292,6 +293,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel32 = new javax.swing.JPanel();
         jlFkUnitAlternativeTypeId = new javax.swing.JLabel();
         jcbFkUnitAlternativeTypeId = new javax.swing.JComboBox();
+        jPanel3 = new javax.swing.JPanel();
         jlUnitBaseEquivalence = new javax.swing.JLabel();
         jtfUnitAlternativeBaseEquivalence = new javax.swing.JTextField();
         jtfUnitAlternativeBaseRo = new javax.swing.JTextField();
@@ -360,7 +362,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel50.setLayout(new java.awt.GridLayout(10, 1, 0, 5));
 
-        jPanel52.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel52.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkItemGenericId.setText("Ítem genérico: *");
         jlFkItemGenericId.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -385,7 +387,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel50.add(jPanel52);
 
-        jPanel53.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel53.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkItemLineId_n.setText("Línea de ítems: *");
         jlFkItemLineId_n.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -403,7 +405,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel50.add(jPanel53);
 
-        jPanel54.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel54.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlName.setText("Nombre: *");
         jlName.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -415,7 +417,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel50.add(jPanel54);
 
-        jPanel60.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel60.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlNameShort.setText("Nombre corto: *");
         jlNameShort.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -433,7 +435,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel50.add(jPanel60);
 
-        jPanel55.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel55.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPresent.setText("Presentación:");
         jlPresent.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -445,7 +447,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel50.add(jPanel55);
 
-        jPanel61.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel61.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPresentShort.setText("Presentación corta:");
         jlPresentShort.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -463,7 +465,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel50.add(jPanel61);
 
-        jPanel56.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel56.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCode.setText("Código del ítem: *");
         jlCode.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -481,7 +483,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel50.add(jPanel56);
 
-        jPanel57.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel57.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlItemKey.setText("Clave del ítem: *");
         jlItemKey.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -493,7 +495,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel50.add(jPanel57);
 
-        jPanel58.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel58.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlItem.setText("Ítem:");
         jlItem.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -508,7 +510,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel50.add(jPanel58);
 
-        jPanel59.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel59.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlItemShort.setText("Ítem corto:");
         jlItemShort.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -526,7 +528,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel51.setLayout(new java.awt.GridLayout(10, 1, 0, 5));
 
-        jPanel62.setLayout(new java.awt.FlowLayout(2, 5, 0));
+        jPanel62.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
         jckIsDeleted.setForeground(java.awt.Color.red);
         jckIsDeleted.setText("Registro eliminado");
@@ -537,7 +539,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel51.add(jPanel62);
 
-        jPanel65.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel65.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckIsBulk.setText("Es a granel");
         jckIsBulk.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -545,7 +547,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel51.add(jPanel65);
 
-        jPanel64.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel64.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckIsInventoriable.setText("Es inventariable");
         jckIsInventoriable.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -557,7 +559,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel51.add(jPanel64);
 
-        jPanel66.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel66.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkBrandId.setText("Marca: *");
         jlFkBrandId.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -569,7 +571,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel51.add(jPanel66);
 
-        jPanel67.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel67.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkManufacturerId.setText("Fabricante: *");
         jlFkManufacturerId.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -581,7 +583,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel51.add(jPanel67);
 
-        jPanel68.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel68.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkElementId.setText("Elemento: *");
         jlFkElementId.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -593,7 +595,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel51.add(jPanel68);
 
-        jPanel69.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel69.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkVariety01Id.setText("Variedad 1: *");
         jlFkVariety01Id.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -605,7 +607,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel51.add(jPanel69);
 
-        jPanel70.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel70.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkVariety02Id.setText("Variedad 2: *");
         jlFkVariety02Id.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -617,7 +619,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel51.add(jPanel70);
 
-        jPanel71.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel71.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkVariety03Id.setText("Variedad 3: *");
         jlFkVariety03Id.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -629,7 +631,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel51.add(jPanel71);
 
-        jPanel63.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel63.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkLevelTypeId.setText("Tipo de nivel: *");
         jlFkLevelTypeId.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -646,21 +648,21 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jpRegistry.add(jPanel1, java.awt.BorderLayout.NORTH);
 
-        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Unidades de medida del ítem:"));
-        jPanel7.setPreferredSize(new java.awt.Dimension(775, 180));
-        jPanel7.setLayout(new java.awt.GridLayout(1, 2, 5, 5));
+        jPanel9.setBorder(javax.swing.BorderFactory.createTitledBorder("Unidades de medida del ítem:"));
+        jPanel9.setLayout(new java.awt.BorderLayout());
 
-        jPanel26.setPreferredSize(new java.awt.Dimension(430, 100));
-        jPanel26.setLayout(new java.awt.GridLayout(7, 1));
+        jPanel14.setLayout(new java.awt.GridLayout(1, 2));
 
-        jPanel4.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel10.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
+
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkUnitId.setText("Unidad física: *");
         jlFkUnitId.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jlFkUnitId);
 
         jcbFkUnitId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkUnitId.setPreferredSize(new java.awt.Dimension(125, 23));
+        jcbFkUnitId.setPreferredSize(new java.awt.Dimension(270, 23));
         jPanel4.add(jcbFkUnitId);
 
         jbEditUnit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
@@ -669,9 +671,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jbEditUnit.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel4.add(jbEditUnit);
 
-        jPanel26.add(jPanel4);
+        jPanel10.add(jPanel4);
 
-        jPanel5.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkUnitUnitsContainedId.setText("Unids. contenidas: *");
         jlFkUnitUnitsContainedId.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -679,15 +681,15 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jtfUnitsContained.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfUnitsContained.setText("0.0000");
-        jtfUnitsContained.setPreferredSize(new java.awt.Dimension(125, 23));
+        jtfUnitsContained.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel5.add(jtfUnitsContained);
 
-        jcbFkUnitUnitsContainedId.setPreferredSize(new java.awt.Dimension(125, 23));
+        jcbFkUnitUnitsContainedId.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel5.add(jcbFkUnitUnitsContainedId);
 
-        jPanel26.add(jPanel5);
+        jPanel10.add(jPanel5);
 
-        jPanel6.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkUnitUnitsVirtualId.setText("Unids. virtuales: *");
         jlFkUnitUnitsVirtualId.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -695,15 +697,15 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jtfUnitsVirtual.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfUnitsVirtual.setText("0.0000");
-        jtfUnitsVirtual.setPreferredSize(new java.awt.Dimension(125, 23));
+        jtfUnitsVirtual.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel6.add(jtfUnitsVirtual);
 
-        jcbFkUnitUnitsVirtualId.setPreferredSize(new java.awt.Dimension(125, 23));
+        jcbFkUnitUnitsVirtualId.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel6.add(jcbFkUnitUnitsVirtualId);
 
-        jPanel26.add(jPanel6);
+        jPanel10.add(jPanel6);
 
-        jPanel27.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkUnitNetContentId.setText("Cont. neto: *");
         jlFkUnitNetContentId.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -711,19 +713,19 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jtfNetContent.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfNetContent.setText("0.0000");
-        jtfNetContent.setPreferredSize(new java.awt.Dimension(125, 23));
+        jtfNetContent.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel27.add(jtfNetContent);
 
-        jcbFkUnitNetContentId.setPreferredSize(new java.awt.Dimension(125, 23));
+        jcbFkUnitNetContentId.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel27.add(jcbFkUnitNetContentId);
 
-        jckIsNetContentVariable.setText("Es variable");
-        jckIsNetContentVariable.setPreferredSize(new java.awt.Dimension(80, 23));
+        jckIsNetContentVariable.setText("Variable");
+        jckIsNetContentVariable.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel27.add(jckIsNetContentVariable);
 
-        jPanel26.add(jPanel27);
+        jPanel10.add(jPanel27);
 
-        jPanel28.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkUnitNetContentUnitaryId.setText("Cont. neto unit.: *");
         jlFkUnitNetContentUnitaryId.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -731,15 +733,15 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jtfNetContentUnitary.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfNetContentUnitary.setText("0.0000");
-        jtfNetContentUnitary.setPreferredSize(new java.awt.Dimension(125, 23));
+        jtfNetContentUnitary.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel28.add(jtfNetContentUnitary);
 
-        jcbFkUnitNetContentUnitaryId.setPreferredSize(new java.awt.Dimension(125, 23));
+        jcbFkUnitNetContentUnitaryId.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel28.add(jcbFkUnitNetContentUnitaryId);
 
-        jPanel26.add(jPanel28);
+        jPanel10.add(jPanel28);
 
-        jPanel30.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkItemPackageId_n.setText("Unids. conversión:");
         jlFkItemPackageId_n.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -747,10 +749,10 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jtfUnitsPackage.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfUnitsPackage.setText("0.0000");
-        jtfUnitsPackage.setPreferredSize(new java.awt.Dimension(125, 23));
+        jtfUnitsPackage.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel30.add(jtfUnitsPackage);
 
-        jcbFkItemPackageId_n.setPreferredSize(new java.awt.Dimension(190, 23));
+        jcbFkItemPackageId_n.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel30.add(jcbFkItemPackageId_n);
 
         jbFkItemPackageId_n.setText("jButton1");
@@ -759,9 +761,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jbFkItemPackageId_n.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel30.add(jbFkItemPackageId_n);
 
-        jPanel26.add(jPanel30);
+        jPanel10.add(jPanel30);
 
-        jPanel8.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlProductionTime.setText("Tiempo producción:");
         jlProductionTime.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -769,21 +771,22 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jtfProductionTime.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfProductionTime.setText("0.0000");
-        jtfProductionTime.setPreferredSize(new java.awt.Dimension(125, 23));
+        jtfProductionTime.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel8.add(jtfProductionTime);
 
-        jlProductionTimeUnit.setText("(horas)");
-        jlProductionTimeUnit.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel8.add(jlProductionTimeUnit);
+        jtfProductionTimeUnitRo.setEditable(false);
+        jtfProductionTimeUnitRo.setText("hr");
+        jtfProductionTimeUnitRo.setFocusable(false);
+        jtfProductionTimeUnitRo.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel8.add(jtfProductionTimeUnitRo);
 
-        jPanel26.add(jPanel8);
+        jPanel10.add(jPanel8);
 
-        jPanel7.add(jPanel26);
+        jPanel14.add(jPanel10);
 
-        jPanel25.setPreferredSize(new java.awt.Dimension(435, 100));
-        jPanel25.setLayout(new java.awt.GridLayout(7, 1));
+        jPanel11.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
 
-        jPanel31.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlWeightGross.setText("Peso bruto: *");
         jlWeightGross.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -791,7 +794,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jtfWeightGross.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfWeightGross.setText("0.0000");
-        jtfWeightGross.setPreferredSize(new java.awt.Dimension(100, 23));
+        jtfWeightGross.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel31.add(jtfWeightGross);
 
         jlWeightDelivery.setText("Peso flete: *");
@@ -803,9 +806,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfWeightDelivery.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel31.add(jtfWeightDelivery);
 
-        jPanel25.add(jPanel31);
+        jPanel11.add(jPanel31);
 
-        jPanel33.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlLength.setText("Longitud: *");
         jlLength.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -813,7 +816,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jtfLength.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfLength.setText("0.0000");
-        jtfLength.setPreferredSize(new java.awt.Dimension(100, 23));
+        jtfLength.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel33.add(jtfLength);
 
         jlLengthUnitary.setText("Longitud unit.:");
@@ -825,13 +828,13 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfLengthUnitary.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel33.add(jtfLengthUnitary);
 
-        jckIsLengthVariable.setText("Es variable");
-        jckIsLengthVariable.setPreferredSize(new java.awt.Dimension(80, 23));
+        jckIsLengthVariable.setText("Variable");
+        jckIsLengthVariable.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel33.add(jckIsLengthVariable);
 
-        jPanel25.add(jPanel33);
+        jPanel11.add(jPanel33);
 
-        jPanel34.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel34.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlSurface.setText("Superficie: *");
         jlSurface.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -839,7 +842,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jtfSurface.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfSurface.setText("0.0000");
-        jtfSurface.setPreferredSize(new java.awt.Dimension(100, 23));
+        jtfSurface.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel34.add(jtfSurface);
 
         jlSurfaceUnitary.setText("Superficie unit.:");
@@ -851,13 +854,13 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfSurfaceUnitary.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel34.add(jtfSurfaceUnitary);
 
-        jckIsSurfaceVariable.setText("Es variable");
-        jckIsSurfaceVariable.setPreferredSize(new java.awt.Dimension(80, 23));
+        jckIsSurfaceVariable.setText("Variable");
+        jckIsSurfaceVariable.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel34.add(jckIsSurfaceVariable);
 
-        jPanel25.add(jPanel34);
+        jPanel11.add(jPanel34);
 
-        jPanel35.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel35.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlVolume.setText("Volumen: *");
         jlVolume.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -865,7 +868,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jtfVolume.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfVolume.setText("0.0000");
-        jtfVolume.setPreferredSize(new java.awt.Dimension(100, 23));
+        jtfVolume.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel35.add(jtfVolume);
 
         jlVolumeUnitary.setText("Volumen unit.:");
@@ -877,13 +880,13 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfVolumeUnitary.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel35.add(jtfVolumeUnitary);
 
-        jckIsVolumeVariable.setText("Es variable");
-        jckIsVolumeVariable.setPreferredSize(new java.awt.Dimension(80, 23));
+        jckIsVolumeVariable.setText("Variable");
+        jckIsVolumeVariable.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel35.add(jckIsVolumeVariable);
 
-        jPanel25.add(jPanel35);
+        jPanel11.add(jPanel35);
 
-        jPanel38.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel38.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlMass.setText("Masa: *");
         jlMass.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -891,7 +894,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jtfMass.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfMass.setText("0.0000");
-        jtfMass.setPreferredSize(new java.awt.Dimension(100, 23));
+        jtfMass.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel38.add(jtfMass);
 
         jlMassUnitary.setText("Masa unit.:");
@@ -903,44 +906,50 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfMassUnitary.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel38.add(jtfMassUnitary);
 
-        jckIsMassVariable.setText("Es variable");
-        jckIsMassVariable.setPreferredSize(new java.awt.Dimension(80, 23));
+        jckIsMassVariable.setText("Variable");
+        jckIsMassVariable.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel38.add(jckIsMassVariable);
 
-        jPanel25.add(jPanel38);
+        jPanel11.add(jPanel38);
 
-        jPanel32.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkUnitAlternativeTypeId.setText("Tipo unid. alt.:");
-        jlFkUnitAlternativeTypeId.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlFkUnitAlternativeTypeId.setText("Tipo de unidad alternativa:*");
+        jlFkUnitAlternativeTypeId.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel32.add(jlFkUnitAlternativeTypeId);
 
         jcbFkUnitAlternativeTypeId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbFkUnitAlternativeTypeId.setToolTipText("Tipo unidad alterna");
-        jcbFkUnitAlternativeTypeId.setPreferredSize(new java.awt.Dimension(100, 23));
+        jcbFkUnitAlternativeTypeId.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel32.add(jcbFkUnitAlternativeTypeId);
 
-        jlUnitBaseEquivalence.setText("Equival.:");
-        jlUnitBaseEquivalence.setPreferredSize(new java.awt.Dimension(55, 23));
-        jPanel32.add(jlUnitBaseEquivalence);
+        jPanel11.add(jPanel32);
+
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlUnitBaseEquivalence.setText("Equivalencia unidad alternativa:");
+        jlUnitBaseEquivalence.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel3.add(jlUnitBaseEquivalence);
 
         jtfUnitAlternativeBaseEquivalence.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfUnitAlternativeBaseEquivalence.setText("0.0000");
         jtfUnitAlternativeBaseEquivalence.setToolTipText("Equivalencia unidad base");
-        jtfUnitAlternativeBaseEquivalence.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel32.add(jtfUnitAlternativeBaseEquivalence);
+        jtfUnitAlternativeBaseEquivalence.setPreferredSize(new java.awt.Dimension(115, 23));
+        jPanel3.add(jtfUnitAlternativeBaseEquivalence);
 
         jtfUnitAlternativeBaseRo.setEditable(false);
         jtfUnitAlternativeBaseRo.setText("UNIT");
         jtfUnitAlternativeBaseRo.setFocusable(false);
         jtfUnitAlternativeBaseRo.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel32.add(jtfUnitAlternativeBaseRo);
+        jPanel3.add(jtfUnitAlternativeBaseRo);
 
-        jPanel25.add(jPanel32);
+        jPanel11.add(jPanel3);
 
-        jPanel7.add(jPanel25);
+        jPanel14.add(jPanel11);
 
-        jpRegistry.add(jPanel7, java.awt.BorderLayout.CENTER);
+        jPanel9.add(jPanel14, java.awt.BorderLayout.NORTH);
+
+        jpRegistry.add(jPanel9, java.awt.BorderLayout.CENTER);
 
         jTabbedPane.addTab("Clasificación", jpRegistry);
 
@@ -983,9 +992,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración para contabilización:"));
         jPanel2.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
-        jPanel49.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel49.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkDefaultItemRefId_n.setText("Ítem referencia predeterminado:");
+        jlFkDefaultItemRefId_n.setText("Ítem de referencia predeterminado:");
         jlFkDefaultItemRefId_n.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel49.add(jlFkDefaultItemRefId_n);
 
@@ -1002,9 +1011,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel2.add(jPanel49);
 
         jPanel44.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel44.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel44.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkAdministrativeConceptTypeId.setText("Tipo concepto administrativo: *");
+        jlFkAdministrativeConceptTypeId.setText("Tipo de concepto administrativo: *");
         jlFkAdministrativeConceptTypeId.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel44.add(jlFkAdministrativeConceptTypeId);
 
@@ -1021,9 +1030,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel2.add(jPanel44);
 
         jPanel43.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel43.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel43.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkTaxableConceptTypeId.setText("Tipo concepto impuestos: *");
+        jlFkTaxableConceptTypeId.setText("Tipo de concepto impuestos: *");
         jlFkTaxableConceptTypeId.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel43.add(jlFkTaxableConceptTypeId);
 
@@ -1040,7 +1049,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel2.add(jPanel43);
 
         jPanel45.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel45.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel45.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkFiscalAccountIncId.setText("Código agrupador SAT (ingresos): *");
         jlFkFiscalAccountIncId.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -1059,7 +1068,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel2.add(jPanel45);
 
         jPanel46.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel46.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel46.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkFiscalAccountExpId.setText("Código agrupador SAT (egresos): *");
         jlFkFiscalAccountExpId.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -1088,7 +1097,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jpConfig2Language.setLayout(new java.awt.BorderLayout());
 
         jPanel41.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel41.setLayout(new java.awt.FlowLayout(0, 1, 0));
+        jPanel41.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 1, 0));
 
         jbAddItemForeignLanguage.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_new.gif"))); // NOI18N
         jbAddItemForeignLanguage.setToolTipText("Crear [Alt+N]");
@@ -1110,7 +1119,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jpItemBarcode.setLayout(new java.awt.BorderLayout());
 
-        jPanel29.setLayout(new java.awt.FlowLayout(0, 1, 0));
+        jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 1, 0));
 
         jbAddItemBarcode.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_new.gif"))); // NOI18N
         jbAddItemBarcode.setToolTipText("Crear [Ctrl+N]");
@@ -1137,7 +1146,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jpCommand.setPreferredSize(new java.awt.Dimension(792, 33));
         jpCommand.setLayout(new java.awt.GridLayout(1, 0));
 
-        jPanel13.setLayout(new java.awt.FlowLayout(3));
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
 
         jtfPkItemId_Ro.setEditable(false);
         jtfPkItemId_Ro.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -1148,7 +1157,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jpCommand.add(jPanel13);
 
-        jPanel12.setLayout(new java.awt.FlowLayout(2));
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar");
         jbOk.setToolTipText("[Ctrl + Enter]");
@@ -1163,8 +1172,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         getContentPane().add(jpCommand, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-960)/2, (screenSize.height-600)/2, 960, 600);
+        setSize(new java.awt.Dimension(976, 639));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -1306,7 +1315,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldFkUnitAlternativeTypeId.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkLevelTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkLevelTypeId, jlFkLevelTypeId);
         moFieldFkLevelTypeId.setTabbedPaneIndex(0, jTabbedPane);
-        moFieldUnitAlternativeBaseEquivalence = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfUnitAlternativeBaseEquivalence, jlUnitBaseEquivalence);
+        moFieldUnitAlternativeBaseEquivalence = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfUnitAlternativeBaseEquivalence, jlUnitBaseEquivalence);
         moFieldUnitAlternativeBaseEquivalence.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsBaseEquivalenceFormat());
         moFieldUnitAlternativeBaseEquivalence.setTabbedPaneIndex(0, jTabbedPane);
         moFieldSurplusPercentage = new SFormField(miClient, SLibConstants.DATA_TYPE_FLOAT, false, jtfSurplusPercentage, jlSurplusPercentage);
@@ -2530,14 +2539,16 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel25;
-    private javax.swing.JPanel jPanel26;
     private javax.swing.JPanel jPanel27;
     private javax.swing.JPanel jPanel28;
     private javax.swing.JPanel jPanel29;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel30;
     private javax.swing.JPanel jPanel31;
     private javax.swing.JPanel jPanel32;
@@ -2575,10 +2586,10 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JPanel jPanel67;
     private javax.swing.JPanel jPanel68;
     private javax.swing.JPanel jPanel69;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel70;
     private javax.swing.JPanel jPanel71;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JTabbedPane jTabbedPane;
     private javax.swing.JButton jbAddItemBarcode;
     private javax.swing.JButton jbAddItemForeignLanguage;
@@ -2669,7 +2680,6 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JLabel jlPresent;
     private javax.swing.JLabel jlPresentShort;
     private javax.swing.JLabel jlProductionTime;
-    private javax.swing.JLabel jlProductionTimeUnit;
     private javax.swing.JLabel jlSurface;
     private javax.swing.JLabel jlSurfaceUnitary;
     private javax.swing.JLabel jlSurplusPercentage;
@@ -2702,6 +2712,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JTextField jtfPresentation;
     private javax.swing.JTextField jtfPresentationShort;
     private javax.swing.JTextField jtfProductionTime;
+    private javax.swing.JTextField jtfProductionTimeUnitRo;
     private javax.swing.JTextField jtfSurface;
     private javax.swing.JTextField jtfSurfaceUnitary;
     private javax.swing.JTextField jtfSurplusPercentage;

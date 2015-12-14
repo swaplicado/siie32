@@ -5,16 +5,15 @@
 
 package erp.mmfg.view;
 
-import javax.swing.JButton;
-
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.lib.SLibConstants;
 import erp.lib.table.STabFilterDatePeriod;
 import erp.lib.table.STabFilterDeleted;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
-import erp.lib.SLibConstants;
+import javax.swing.JButton;
 
 /**
  *
@@ -63,8 +62,8 @@ public class SViewProductionOrderFatherSon extends erp.lib.table.STableTab imple
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tpf.tp", "Tipo padre", 60);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "f_dt_fat", "F. doc. padre", STableConstants.WIDTH_DATE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_ref_fat", "Ref. padre", 60);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "of.qty", "Cantidad padre", STableConstants.WIDTH_QUANTITY);
-        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererMass());
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "of.qty", "Cantidad padre", STableConstants.WIDTH_QUANTITY_2X);
+        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uf.symbol", "Unidad padre", STableConstants.WIDTH_UNIT_SYMBOL);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_lot_fat", "Lote padre", 75);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "f_cad_fat", "F. cad. padre", STableConstants.WIDTH_DATE);
@@ -74,8 +73,8 @@ public class SViewProductionOrderFatherSon extends erp.lib.table.STableTab imple
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp.tp", "Tipo hijo", 60);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "f_dt_son", "F. doc. hijo", STableConstants.WIDTH_DATE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_ref_son", "Ref. hijo", 60);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "o.qty", "Cantidad hijo", STableConstants.WIDTH_QUANTITY);
-        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererMass());
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "o.qty", "Cantidad hijo", STableConstants.WIDTH_QUANTITY_2X);
+        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad hijo", STableConstants.WIDTH_UNIT_SYMBOL);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_lot_son", "Lote hijo", 75);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "f_cad_son", "F. cad. hijo", STableConstants.WIDTH_DATE);

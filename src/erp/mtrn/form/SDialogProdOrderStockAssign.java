@@ -622,13 +622,13 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
         columns = new STableColumnForm[6];
         columns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
         columns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Concepto", STableConstants.WIDTH_ITEM_3X);
-        columns[col] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cant. requerida", STableConstants.WIDTH_QUANTITY_3X);
-        columns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
-        columns[col] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cant. pendiente", STableConstants.WIDTH_QUANTITY_3X);
-        columns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
-        columns[col] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cant. a entregar", STableConstants.WIDTH_QUANTITY_3X);
+        columns[col] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cant. requerida", STableConstants.WIDTH_QUANTITY_2X);
+        columns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        columns[col] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cant. pendiente", STableConstants.WIDTH_QUANTITY_2X);
+        columns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        columns[col] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cant. a entregar", STableConstants.WIDTH_QUANTITY_2X);
         columns[col].setEditable(true);
-        columns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
+        columns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         columns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
 
         switch (mnFormMode) {

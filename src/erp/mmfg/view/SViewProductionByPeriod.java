@@ -5,28 +5,14 @@
 
 package erp.mmfg.view;
 
-import erp.SClient;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.text.DecimalFormat;
-import java.util.Map;
-import javax.swing.JButton;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.view.JasperViewer;
-
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
-import erp.data.SDataUtilities;
-import erp.lib.table.STabFilterDeleted;
-import erp.lib.table.STableCellRendererNumber;
+import erp.lib.SLibConstants;
+import erp.lib.table.STabFilterDatePeriodRange;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
-import erp.lib.SLibConstants;
-import erp.lib.SLibUtilities;
-import erp.lib.table.STabFilterDatePeriodRange;
-import erp.table.STabFilterBizPartner;
-import erp.mmfg.data.SDataBom;
+import javax.swing.JButton;
 
 /**
  *
@@ -127,16 +113,16 @@ public class SViewProductionByPeriod extends erp.lib.table.STableTab implements 
                 }
                 break;
         }
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty", "Cantidad", STableConstants.WIDTH_QUANTITY);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty", "Cantidad", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_mass", "Masa (kg)", STableConstants.WIDTH_QUANTITY);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_mass", "Masa (kg)", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererMass());
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_len", "Longitud (m)", STableConstants.WIDTH_QUANTITY);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_len", "Longitud (m)", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererLength());
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_surf", "Supercie (m²)", STableConstants.WIDTH_QUANTITY);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_surf", "Supercie (m²)", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererLength());
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_vol", "Volumen (m³)", STableConstants.WIDTH_QUANTITY);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_vol", "Volumen (m³)", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererLength());
 
         for (i = 0; i < aoTableColumns.length; i++) {

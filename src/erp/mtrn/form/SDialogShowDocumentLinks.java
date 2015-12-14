@@ -143,7 +143,7 @@ public class SDialogShowDocumentLinks extends javax.swing.JDialog implements erp
         maoTableColumnsDps[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo doc.", STableConstants.WIDTH_CODE_DOC);
         maoTableColumnsDps[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Folio doc.", STableConstants.WIDTH_DOC_NUM);
         maoTableColumnsDps[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total $", STableConstants.WIDTH_VALUE_2X);
-        maoTableColumnsDps[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total moneda $", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumnsDps[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total mon $", STableConstants.WIDTH_VALUE_2X);
         maoTableColumnsDps[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
         maoTableColumnsDps[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
 
@@ -160,7 +160,7 @@ public class SDialogShowDocumentLinks extends javax.swing.JDialog implements erp
         maoTableColumnsDpsEntry[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         maoTableColumnsDpsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
         maoTableColumnsDpsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Valor $", STableConstants.WIDTH_VALUE);
-        maoTableColumnsDpsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Valor moneda $", STableConstants.WIDTH_VALUE);
+        maoTableColumnsDpsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Valor mon $", STableConstants.WIDTH_VALUE);
         maoTableColumnsDpsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
 
         moPaneGrid = new STablePaneGrid(miClient);

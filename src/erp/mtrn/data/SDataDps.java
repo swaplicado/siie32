@@ -33,6 +33,8 @@ import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
+import erp.gui.session.SSessionCustom;
+import erp.gui.session.SSessionItem;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
@@ -837,7 +839,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     }
 
-    private void calculateDpsTotal(erp.client.SClientInterface piClient_n, int pnDecs) {
+    private void calculateDpsTotal(erp.client.SClientInterface piClient_n, int pnDecs) throws SQLException, Exception {
         double dSubtotalProvisional = 0;
         double dDiscountDoc = 0;
         double dSubtotal = 0;
@@ -846,6 +848,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         double dTotal = 0;
         double dCommissions = 0;
         double dDifference = 0;
+        SSessionItem oSessionItem = null;
 
         mdSubtotalProvisionalCy_r = 0;
         mdDiscountDocCy_r = 0;
@@ -865,6 +868,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         for (SDataDpsEntry entry : mvDbmsDpsEntries) {
             if (!entry.getIsDeleted()) {
                 if (piClient_n != null) {
+                    oSessionItem = ((SSessionCustom) piClient_n.getSession().getSessionCustom()).getSessionItem(entry.getFkItemId());
+                    
+                    if (oSessionItem.getFkUnitAlternativeTypeId() != SDataConstantsSys.ITMU_TP_UNIT_NA && oSessionItem.getUnitAlternativeBaseEquivalence() == 0) {
+                        entry.setAuxPreserveQuantity(true);
+                    }
+                    
                     entry.calculateTotal(piClient_n, mtDate,
                             mnFkTaxIdentityEmisorTypeId, mnFkTaxIdentityReceptorTypeId,
                             mbIsDiscountDocPercentage, mdDiscountDocPercentage, mdExchangeRate);
@@ -2998,7 +3007,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
      * Calculates DPS value.
      * @param client ERP Client. Can be null, and each DPS entry is not calculated, original values remains as the original ones.
      */
-    public void calculateTotal(erp.client.SClientInterface client) {
+    public void calculateTotal(erp.client.SClientInterface client) throws SQLException, Exception {
         calculateDpsTotal(client, 0);
     }
 

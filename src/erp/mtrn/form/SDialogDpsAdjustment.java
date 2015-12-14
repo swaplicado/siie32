@@ -195,15 +195,15 @@ public class SDialogDpsAdjustment extends javax.swing.JDialog implements erp.lib
         columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "A devolver", STableConstants.WIDTH_QUANTITY);
         columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total moneda $", STableConstants.WIDTH_VALUE);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total mon $", STableConstants.WIDTH_VALUE);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Dev. moneda $", STableConstants.WIDTH_VALUE);
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Dev. actual moneda $", STableConstants.WIDTH_VALUE);
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Desc. moneda $", STableConstants.WIDTH_VALUE);
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Desc. actual moneda $", STableConstants.WIDTH_VALUE);
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total neto moneda $", STableConstants.WIDTH_VALUE);
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "A devolver moneda $", STableConstants.WIDTH_VALUE);
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "A descontar moneda $", STableConstants.WIDTH_VALUE);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Dev. mon $", STableConstants.WIDTH_VALUE);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Dev. actual mon $", STableConstants.WIDTH_VALUE);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Desc. mon $", STableConstants.WIDTH_VALUE);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Desc. actual mon $", STableConstants.WIDTH_VALUE);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total neto mon $", STableConstants.WIDTH_VALUE);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "A devolver mon $", STableConstants.WIDTH_VALUE);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "A descontar mon $", STableConstants.WIDTH_VALUE);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
 
         for (i = 0; i < columns.length; i++) {

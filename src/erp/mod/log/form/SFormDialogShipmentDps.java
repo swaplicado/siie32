@@ -117,7 +117,7 @@ public class SFormDialogShipmentDps extends sa.lib.gui.bean.SBeanFormDialog {
                     aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
                 }
 
-                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total moneda $", STableConstants.WIDTH_VALUE);
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total mon $", STableConstants.WIDTH_VALUE);
                 aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
                 aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Embarques act.", 80);
                 */
@@ -128,7 +128,7 @@ public class SFormDialogShipmentDps extends sa.lib.gui.bean.SBeanFormDialog {
                 columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha doc");
                 columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Asociado negocios");
                 columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Clave");
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Total moneda $");
+                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Total mon $");
                 columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Moneda");
 
                 gridColumnsForm.addAll(Arrays.asList((SGridColumnForm[]) columns));

@@ -1076,7 +1076,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         sessionCustom = new SSessionCustom(moSession);
         sessionCustom.setCurrentCompanyKey((int[]) moSessionXXX.getCompany().getPrimaryKey());
         sessionCustom.updateSessionSettings();
-        moSession.setSessionCustom(sessionCustom);                      // client database must be set already
+        moSession.setSessionCustom(sessionCustom); // client database must be set already
     }
 
     private void logout() {

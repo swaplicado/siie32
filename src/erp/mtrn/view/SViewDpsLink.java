@@ -264,7 +264,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_orig_unit", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "surplus_per", "Excedente %", STableConstants.WIDTH_PERCENTAGE);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererPercentage());
-            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_orig_price_u", "Precio u. moneda $", STableConstants.WIDTH_VALUE_2X);
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_orig_price_u", "Precio u. mon $", STableConstants.WIDTH_VALUE_2X);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cur_key", "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "", "Monto procesado $", STableConstants.WIDTH_VALUE_2X);

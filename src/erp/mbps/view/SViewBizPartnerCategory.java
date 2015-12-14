@@ -56,7 +56,7 @@ public class SViewBizPartnerCategory extends erp.lib.table.STableTab implements 
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "b.b_del", "Eliminado (asociado negocios)", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bct.b_cred_usr", "Config. manual crédito", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_tp_cred", "Tipo crédito", 150);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_cred_lim", "Límite crédito", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_cred_lim", "Límite crédito $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererNumberDouble());
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_days_cred", "Días créd.", STableConstants.WIDTH_NUM_INTEGER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_days_grace", "Días gracia", STableConstants.WIDTH_NUM_INTEGER);

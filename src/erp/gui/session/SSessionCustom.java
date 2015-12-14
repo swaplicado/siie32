@@ -101,33 +101,43 @@ public class SSessionCustom implements SGuiSessionCustom {
      * Private methods
      */
 
+    /**
+     * @param idItem Item ID.
+     * @param idUnitSource Source unit ID.
+     * @param idUnitDestiny  Destiny unit ID.
+     * @param isForQuantity Quantity (when <code>true</code>) of unit price (when <code>false</code>) request.
+     */
     private double computeUnitsFactor(final int idItem, final int idUnitSource, final int idUnitDestiny, final boolean isForQuantity) throws SQLException, Exception {
         double factor = 1;
-        SSessionItem item = null;
-        SSessionUnit unitSource = moUnitsMap.get(idUnitSource);
-        SSessionUnit unitDestiny = moUnitsMap.get(idUnitDestiny);
+        SSessionItem sessionItem = null;
+        SSessionUnit sessionUnitSource = moUnitsMap.get(idUnitSource);
+        SSessionUnit sessionUnitDestiny = moUnitsMap.get(idUnitDestiny);
 
-        if (unitSource != null && unitDestiny != null) {
-            if (unitSource.getFkUnitTypeId() == unitDestiny.getFkUnitTypeId()) {
-                if (unitSource.getUnitBaseEquivalence() != 0d && unitDestiny.getUnitBaseEquivalence() != 0d) {
+        if (sessionUnitSource != null && sessionUnitDestiny != null) {
+            if (sessionUnitSource.getFkUnitTypeId() == sessionUnitDestiny.getFkUnitTypeId()) {
+                // Source and destiny units are same type:
+                
+                if (sessionUnitSource.getUnitBaseEquivalence() != 0d && sessionUnitDestiny.getUnitBaseEquivalence() != 0d) {
                     if (isForQuantity) {
-                        factor = unitSource.getUnitBaseEquivalence() / unitDestiny.getUnitBaseEquivalence();
+                        factor = sessionUnitSource.getUnitBaseEquivalence() / sessionUnitDestiny.getUnitBaseEquivalence();
                     }
                     else {
-                        factor = 1d / unitSource.getUnitBaseEquivalence() * unitDestiny.getUnitBaseEquivalence();
+                        factor = 1d / sessionUnitSource.getUnitBaseEquivalence() * sessionUnitDestiny.getUnitBaseEquivalence();
                     }
                 }
             }
             else {
-                item = getSessionItem(idItem);
-                if (item != null) {
-                    if (unitSource.getFkUnitTypeId() == item.getFkAltUnitTypeId()) {
-                        if (unitSource.getUnitBaseEquivalence() != 0d && item.getAltUnitBaseEquivalence() != 0d) {
+                // Source and destiny units are different type, use alternative unit if possible:
+                
+                sessionItem = getSessionItem(idItem);
+                if (sessionItem != null) {
+                    if (sessionUnitSource.getFkUnitTypeId() == sessionItem.getFkUnitAlternativeTypeId()) {
+                        if (sessionUnitSource.getUnitBaseEquivalence() != 0d && sessionItem.getUnitAlternativeBaseEquivalence() != 0d) {
                             if (isForQuantity) {
-                                factor = unitSource.getUnitBaseEquivalence() / item.getAltUnitBaseEquivalence();
+                                factor = sessionUnitSource.getUnitBaseEquivalence() / sessionItem.getUnitAlternativeBaseEquivalence();
                             }
                             else {
-                                factor = 1d / unitSource.getUnitBaseEquivalence() * item.getAltUnitBaseEquivalence();
+                                factor = 1d / sessionUnitSource.getUnitBaseEquivalence() * sessionItem.getUnitAlternativeBaseEquivalence();
                             }
                         }
                     }
@@ -379,8 +389,8 @@ public class SSessionCustom implements SGuiSessionCustom {
                 item.setFkTypeTypeId(resultSet.getInt("itp.tp_idx"));
                 item.setFkTypeClassId(resultSet.getInt("icl.cl_idx"));
                 item.setFkTypeCategoryId(resultSet.getInt("ict.ct_idx"));
-                item.setFkAltUnitTypeId(resultSet.getInt("i.fid_tp_unit_alt"));
-                item.setAltUnitBaseEquivalence(resultSet.getDouble("i.unit_alt_base_equiv"));
+                item.setFkUnitAlternativeTypeId(resultSet.getInt("i.fid_tp_unit_alt"));
+                item.setUnitAlternativeBaseEquivalence(resultSet.getDouble("i.unit_alt_base_equiv"));
                 moItemsMap.put(item.getPkItemId(), item);
             }
 
@@ -650,8 +660,8 @@ public class SSessionCustom implements SGuiSessionCustom {
             item.setFkTypeTypeId(resultSet.getInt("itp.tp_idx"));
             item.setFkTypeClassId(resultSet.getInt("icl.cl_idx"));
             item.setFkTypeCategoryId(resultSet.getInt("ict.ct_idx"));
-            item.setFkAltUnitTypeId(resultSet.getInt("i.fid_tp_unit_alt"));
-            item.setAltUnitBaseEquivalence(resultSet.getDouble("i.unit_alt_base_equiv"));
+            item.setFkUnitAlternativeTypeId(resultSet.getInt("i.fid_tp_unit_alt"));
+            item.setUnitAlternativeBaseEquivalence(resultSet.getDouble("i.unit_alt_base_equiv"));
         }
 
         return item;

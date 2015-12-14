@@ -5,6 +5,27 @@
 
 package erp.mmfg.view;
 
+import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
+import erp.data.SDataReadDescriptions;
+import erp.data.SDataUtilities;
+import erp.lib.SLibConstants;
+import erp.lib.SLibTimeUtilities;
+import erp.lib.form.SFormUtilities;
+import erp.lib.table.STabFilterDatePeriod;
+import erp.lib.table.STabFilterDeleted;
+import erp.lib.table.STableColumn;
+import erp.lib.table.STableConstants;
+import erp.lib.table.STableField;
+import erp.mmfg.data.SDataProductionOrder;
+import erp.mmfg.form.SDialogMfgAssignDate;
+import erp.mmfg.form.SDialogMfgAssignRework;
+import erp.mmfg.form.SDialogMfgChangeState;
+import erp.mmfg.form.SDialogMfgCreateLot;
+import erp.mtrn.form.SDialogStockCardexProdOrder;
+import erp.table.SFilterConstants;
+import erp.table.STabFilterBizPartner;
+import erp.table.STabFilterProductionOrderType;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
@@ -12,32 +33,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.JButton;
-
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.view.*;
-
-import erp.data.SDataConstants;
-import erp.data.SDataConstantsSys;
-import erp.data.SDataUtilities;
-import erp.lib.table.STabFilterDatePeriod;
-import erp.lib.table.STabFilterDeleted;
-import erp.lib.table.STableColumn;
-import erp.lib.table.STableConstants;
-import erp.lib.table.STableField;
-import erp.lib.SLibConstants;
-import erp.lib.SLibTimeUtilities;
-import erp.mmfg.data.SDataProductionOrder;
-import erp.mmfg.form.SDialogMfgAssignDate;
-import erp.mmfg.form.SDialogMfgAssignRework;
-import erp.mmfg.form.SDialogMfgChangeState;
-import erp.mmfg.form.SDialogMfgCreateLot;
-import erp.mtrn.form.SDialogStockCardexProdOrder;
-import erp.lib.form.SFormUtilities;
-import erp.table.SFilterConstants;
-import erp.table.STabFilterBizPartner;
-import erp.table.STabFilterProductionOrderType;
-import erp.SClient;
-import erp.data.SDataReadDescriptions;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -251,12 +248,12 @@ public class SViewProductionOrder extends erp.lib.table.STableTab implements jav
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", 65);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Producto", 150);
 
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "o.qty_ori", "Cantidad original", STableConstants.WIDTH_QUANTITY);
-        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererMass());
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "o.qty_rew", "Cantidad reproceso", STableConstants.WIDTH_QUANTITY);
-        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererMass());
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "o.qty", "Cantidad total", STableConstants.WIDTH_QUANTITY);
-        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererMass());
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "o.qty_ori", "Cantidad original", STableConstants.WIDTH_QUANTITY_2X);
+        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "o.qty_rew", "Cantidad reproceso", STableConstants.WIDTH_QUANTITY_2X);
+        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "o.qty", "Cantidad total", STableConstants.WIDTH_QUANTITY_2X);
+        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "o.chgs", "Cargas prod.", 40);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererSimpleInteger());

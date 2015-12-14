@@ -5,17 +5,16 @@
 
 package erp.mmfg.view;
 
-import javax.swing.JButton;
-
 import erp.data.SDataConstants;
+import erp.lib.SLibConstants;
+import erp.lib.data.SDataSqlUtilities;
 import erp.lib.table.STabFilterDatePeriod;
 import erp.lib.table.STabFilterDeleted;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
-import erp.lib.SLibConstants;
-import erp.lib.data.SDataSqlUtilities;
+import javax.swing.JButton;
 
 /**
  *
@@ -85,10 +84,8 @@ public class SViewExplotionMaterialsProductionOrder extends erp.lib.table.STable
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", 65);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Producto", 150);
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "o.qty", "Cantidad", STableConstants.WIDTH_QUANTITY);
-        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererMass());
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "o.chgs", "Cargas prod.", 40);
-        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererSimpleInteger());
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "o.chgs", "Cargas prod.", STableConstants.WIDTH_QUANTITY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.bom", "Fórmula", 200);
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);

@@ -208,7 +208,7 @@ public class SViewDpsSendWebService extends SGridPaneView implements ActionListe
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "bc.bp_key", "Clave cliente"));
         }
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "bb.bpb", "Sucursal cliente"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "d.tot_cur_r", "Total moneda $"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "d.tot_cur_r", "Total mon $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "c.cur_key", "Moneda"));
         
         if (mnGridSubtype != SModSysConsts.TRNS_ST_XML_DVY_PENDING) {

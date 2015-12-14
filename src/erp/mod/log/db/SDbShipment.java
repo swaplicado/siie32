@@ -366,7 +366,7 @@ public class SDbShipment extends SDbRegistryUser {
         }
     }
 
-    private void calculateTotalDps(SGuiSession session) {
+    private void calculateTotalDps(SGuiSession session) throws SQLException, Exception {
 
         moDpsOrder.setFkLanguajeId(((SDataParamsErp) session.getConfigSystem()).getFkLanguageId());
         moDpsOrder.setFkCurrencyId(((SDataParamsErp) session.getConfigSystem()).getFkCurrencyId());
@@ -382,7 +382,7 @@ public class SDbShipment extends SDbRegistryUser {
         moDpsOrder.calculateTotal(null);
     }
 
-    private boolean getRegistryPurchaseOrder(SGuiSession session) {
+    private boolean getRegistryPurchaseOrder(SGuiSession session) throws SQLException, Exception {
         boolean b = true;
         String item = "";
         ArrayList<Object[]> vDpsEntries = null;

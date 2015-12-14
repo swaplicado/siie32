@@ -138,11 +138,12 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected java.util.Vector<erp.mtrn.data.SDataDpsDpsAdjustment> mvDbmsDpsAdjustmentsAsDps;
     protected java.util.Vector<erp.mtrn.data.SDataDpsDpsAdjustment> mvDbmsDpsAdjustmentsAsAdjustment;
 
-    protected int mnAuxPkDpsYearId;     // DPS for adjustment DPS in record entries
-    protected int mnAuxPkDpsDocId;      // DPS for adjustment DPS in record entries
-    protected int[] mnAuxPkDpsEntryPrice;      // DPS for adjustment DPS in record entries
+    protected int mnAuxPkDpsYearId; // DPS for adjustment DPS in record entries
+    protected int mnAuxPkDpsDocId; // DPS for adjustment DPS in record entries
+    protected int[] mnAuxPkDpsEntryPrice; // DPS for adjustment DPS in record entries
+    protected boolean mbAuxPreserveQuantity; // preserve customized quantity
 
-    protected boolean mbFlagReadLinksAswell;   // Read aswell links and adjustments
+    protected boolean mbFlagReadLinksAswell; // Read aswell links and adjustments
 
     /**
      * Overrides java.lang.Object.clone() function.
@@ -388,10 +389,12 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setAuxPkDpsYearId(int n) { mnAuxPkDpsYearId = n; }
     public void setAuxPkDpsDocId(int n) { mnAuxPkDpsDocId = n; }
     public void setAuxPkDpsEntryPrice(int[] n) { mnAuxPkDpsEntryPrice = n; }
+    public void setAuxPreserveQuantity(boolean b) { mbAuxPreserveQuantity = b; }
 
     public int getAuxPkDpsYearId() { return mnAuxPkDpsYearId; }
     public int getAuxPkDpsDocId() { return mnAuxPkDpsDocId; }
     public int[] getAuxPkDpsEntryPriceId() { return mnAuxPkDpsEntryPrice; }
+    public boolean isAuxPreserveQuantity() { return mbAuxPreserveQuantity; }
 
     public void setFlagReadLinksAswell(boolean b) { mbFlagReadLinksAswell = b; }
     public boolean getFlagReadLinksAswell() { return mbFlagReadLinksAswell; }
@@ -534,6 +537,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mnAuxPkDpsYearId = 0;
         mnAuxPkDpsDocId = 0;
         mnAuxPkDpsEntryPrice = null;
+        mbAuxPreserveQuantity = false;
     }
 
     @Override
@@ -1154,8 +1158,18 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         nDecsVal = piClient.getSessionXXX().getParamsErp().getDecimalsValue();
         nDecsValUnit = piClient.getSessionXXX().getParamsErp().getDecimalsValueUnitary();
 
-        dFactQty = ((SSessionCustom) piClient.getSession().getSessionCustom()).getUnitsFactorForQuantity(mnFkItemId, mnFkOriginalUnitId, mnFkUnitId);
-        dFactValUnit = ((SSessionCustom) piClient.getSession().getSessionCustom()).getUnitsFactorForUnitaryValue(mnFkItemId, mnFkOriginalUnitId, mnFkUnitId);
+        if (mbAuxPreserveQuantity) {
+            // Seldom case: quantity must be preserved
+            
+            dFactQty = mdQuantity / mdOriginalQuantity;
+            dFactValUnit = 1d / dFactQty;
+        }
+        else {
+            // Common case: quantity must be calculated
+            
+            dFactQty = ((SSessionCustom) piClient.getSession().getSessionCustom()).getUnitsFactorForQuantity(mnFkItemId, mnFkOriginalUnitId, mnFkUnitId);
+            dFactValUnit = ((SSessionCustom) piClient.getSession().getSessionCustom()).getUnitsFactorForUnitaryValue(mnFkItemId, mnFkOriginalUnitId, mnFkUnitId);
+        }
 
         /*
          * 2. Calculate DPS entry's value in original currency:
@@ -1513,6 +1527,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setAuxPkDpsYearId(mnAuxPkDpsYearId);
         clone.setAuxPkDpsDocId(mnAuxPkDpsDocId);
         clone.setAuxPkDpsEntryPrice(mnAuxPkDpsEntryPrice);
+        clone.setAuxPreserveQuantity(mbAuxPreserveQuantity);
 
         return clone;
     }

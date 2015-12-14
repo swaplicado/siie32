@@ -6,19 +6,18 @@
 package erp.mmfg.view;
 
 
-import java.util.Date;
-import javax.swing.JButton;
-
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.lib.SLibConstants;
 import erp.lib.table.STabFilterDatePeriodRange;
 import erp.lib.table.STabFilterDeleted;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
-import erp.lib.table.STableSetting;
 import erp.lib.table.STableField;
-import erp.lib.SLibConstants;
+import erp.lib.table.STableSetting;
 import erp.mod.SModSysConsts;
+import java.util.Date;
+import javax.swing.JButton;
 
 /**
  *
@@ -76,9 +75,9 @@ public class SViewProductionOrderProgramMonitoring extends erp.lib.table.STableT
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_turn_start", "T. inicio", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_hr_start", "Hrs. iniciada", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "o.qty", "C. programada", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "o.qty", "Cant. programada", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_balance", "C. recibida", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_balance", "Cant. recibida", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "us.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "f_dt_end", "F. termino", STableConstants.WIDTH_DATE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_turn_end", "T. termino", 100);

@@ -67,7 +67,7 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.aw
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_adj_r", "Devs. $", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_adj_d", "Desc. $", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_adj_d", "Descs. $", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_net", "Total neto $", STableConstants.WIDTH_VALUE_2X);
@@ -85,7 +85,7 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.aw
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_avg_price", "Precio promedio $", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_avg_price", "Precio promedio $", STableConstants.WIDTH_VALUE_UNITARY);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
 
         for (i = 0; i < maoTableColumns.length; i++) {

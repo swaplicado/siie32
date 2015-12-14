@@ -24,25 +24,12 @@ public class SSessionItem implements Serializable {
     private int mnFkTypeTypeId;
     private int mnFkTypeClassId;
     private int mnFkTypeCategoryId;
-    private int mnFkAltUnitTypeId;
-    private double mdAltUnitBaseEquivalence;
+    private int mnFkUnitAlternativeTypeId;
+    private double mdUnitAlternativeBaseEquivalence;
 
     public SSessionItem(int idItem) {
         mnPkItemId = idItem;
     }
-
-    public int getPkItemId() { return mnPkItemId; }
-    public int getFkPropManufacturerId() { return mnFkPropManufacturerId; }
-    public int getFkPropBrandId() { return mnFkPropBrandId; }
-    public int getFkItemLineId() { return mnFkItemLineId; }
-    public int getFkItemGenericId() { return mnFkItemGenericId; }
-    public int getFkItemGroupId() { return mnFkItemGroupId; }
-    public int getFkItemFamilyId() { return mnFkItemFamilyId; }
-    public int getFkTypeTypeId() { return mnFkTypeTypeId; }
-    public int getFkTypeClassId() { return mnFkTypeClassId; }
-    public int getFkTypeCategoryId() { return mnFkTypeCategoryId; }
-    public int getFkAltUnitTypeId() { return mnFkAltUnitTypeId; }
-    public double getAltUnitBaseEquivalence() { return mdAltUnitBaseEquivalence; }
 
     public void setPkItemId(int n) { mnPkItemId = n; }
     public void setFkPropManufacturerId(int n) { mnFkPropManufacturerId = n; }
@@ -54,8 +41,21 @@ public class SSessionItem implements Serializable {
     public void setFkTypeTypeId(int n) { mnFkTypeTypeId = n; }
     public void setFkTypeClassId(int n) { mnFkTypeClassId = n; }
     public void setFkTypeCategoryId(int n) { mnFkTypeCategoryId = n; }
-    public void setFkAltUnitTypeId(int n) { mnFkAltUnitTypeId = n; }
-    public void setAltUnitBaseEquivalence(double d) { mdAltUnitBaseEquivalence = d; }
+    public void setFkUnitAlternativeTypeId(int n) { mnFkUnitAlternativeTypeId = n; }
+    public void setUnitAlternativeBaseEquivalence(double d) { mdUnitAlternativeBaseEquivalence = d; }
+
+    public int getPkItemId() { return mnPkItemId; }
+    public int getFkPropManufacturerId() { return mnFkPropManufacturerId; }
+    public int getFkPropBrandId() { return mnFkPropBrandId; }
+    public int getFkItemLineId() { return mnFkItemLineId; }
+    public int getFkItemGenericId() { return mnFkItemGenericId; }
+    public int getFkItemGroupId() { return mnFkItemGroupId; }
+    public int getFkItemFamilyId() { return mnFkItemFamilyId; }
+    public int getFkTypeTypeId() { return mnFkTypeTypeId; }
+    public int getFkTypeClassId() { return mnFkTypeClassId; }
+    public int getFkTypeCategoryId() { return mnFkTypeCategoryId; }
+    public int getFkUnitAlternativeTypeId() { return mnFkUnitAlternativeTypeId; }
+    public double getUnitAlternativeBaseEquivalence() { return mdUnitAlternativeBaseEquivalence; }
 
     public int getReferenceId(int idLink) {
         int referenceId = SLibConsts.UNDEFINED;

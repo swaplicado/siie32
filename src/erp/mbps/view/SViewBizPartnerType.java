@@ -5,16 +5,15 @@
 
 package erp.mbps.view;
 
-import javax.swing.JButton;
-
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.table.STabFilterDeleted;
-import erp.lib.table.STableField;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
+import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import javax.swing.JButton;
 import sa.gui.util.SUtilConsts;
 
 /**
@@ -54,7 +53,7 @@ public class SViewBizPartnerType extends erp.lib.table.STableTab implements java
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpss_ct_bp.ct_bp", "Categoría asociado negocios", 125);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpsu_tp_bp.tp_bp", "Tipo asociado negocios", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tc.tp_cred", "Tipo crédito", 150);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "bpsu_tp_bp.cred_lim", "Límite crédito", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "bpsu_tp_bp.cred_lim", "Límite crédito $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererNumberDouble());
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "bpsu_tp_bp.days_cred", "Días créd.", STableConstants.WIDTH_NUM_INTEGER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "bpsu_tp_bp.days_grace", "Días gracia", STableConstants.WIDTH_NUM_INTEGER);

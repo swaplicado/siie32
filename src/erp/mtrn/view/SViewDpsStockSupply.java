@@ -237,7 +237,7 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
         }
 
         if (levelRightAllDocs == SUtilConsts.LEV_MANAGER) {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "tot_cur_r", "Total moneda $", STableConstants.WIDTH_VALUE_2X);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "tot_cur_r", "Total mon $", STableConstants.WIDTH_VALUE_2X);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cur_key", "Moneda doc.", STableConstants.WIDTH_CURRENCY_KEY);
         }
 
@@ -252,11 +252,11 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
             }
         }
 
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_orig_qty", "Cant. original", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_orig_qty", "Cant. original", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_adj_orig_qty", "Cant. ajustada", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_adj_orig_qty", "Cant. ajustada", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "", "Cant. neta", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "", "Cant. neta", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_orig_qty", SLibRpnArgumentType.OPERAND));
         aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_adj_orig_qty", SLibRpnArgumentType.OPERAND));
@@ -265,9 +265,9 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_orig_unit", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
         }
 
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_sup_orig_qty", "Cant. surtida", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_sup_orig_qty", "Cant. surtida", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "", "Cant. pendiente", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "", "Cant. pendiente", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_orig_qty", SLibRpnArgumentType.OPERAND));
         aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_adj_orig_qty", SLibRpnArgumentType.OPERAND));

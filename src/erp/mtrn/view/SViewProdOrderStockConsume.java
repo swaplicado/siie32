@@ -197,13 +197,13 @@ public class SViewProdOrderStockConsume extends erp.lib.table.STableTab implemen
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_item", "Ítem", STableConstants.WIDTH_ITEM_2X);
 
         if (mnTabTypeAux02 != SDataConstantsSys.TRNX_TP_UNIT_TOT_MASS) {
-            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "qty", "Cant. orden", STableConstants.WIDTH_VALUE_2X);
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "qty", "Cant. orden", STableConstants.WIDTH_QUANTITY_2X);
             aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
             aoTableColumns[i++].setSumApplying(true);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
         }
         else {
-            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "qty", "Cant. orden" + (mnTabTypeAux02 != SDataConstantsSys.TRNX_TP_UNIT_TOT_MASS ? "" : " (masa)"), STableConstants.WIDTH_VALUE_2X);
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "qty", "Cant. orden" + (mnTabTypeAux02 != SDataConstantsSys.TRNX_TP_UNIT_TOT_MASS ? "" : " (masa)"), STableConstants.WIDTH_QUANTITY_2X);
             aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
             aoTableColumns[i++].setSumApplying(true);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_symbol_mass", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
@@ -217,32 +217,13 @@ public class SViewProdOrderStockConsume extends erp.lib.table.STableTab implemen
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "dt_exp_n", "Caducidad insumo/producto", STableConstants.WIDTH_DATE);
         }
 
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_asd", "Cant. asig. entregada", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_asd", "Cant. asig. entregada", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         aoTableColumns[i++].setSumApplying(true);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_asd_ret", "Cant. asig. devuelta", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_asd_ret", "Cant. asig. devuelta", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         aoTableColumns[i++].setSumApplying(true);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_asd_net", "Cant. asig. neta", STableConstants.WIDTH_VALUE_2X);
-        aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-        aoTableColumns[i++].setSumApplying(true);
-
-        if (isViewForEntries()) {
-            if (mnTabTypeAux02 != SDataConstantsSys.TRNX_TP_UNIT_TOT_MASS) {
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "symbol", "Unidad insumo/producto", STableConstants.WIDTH_UNIT_SYMBOL);
-            }
-            else {
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_symbol_mass", "Unidad insumo/producto", STableConstants.WIDTH_UNIT_SYMBOL);
-            }
-        }
-
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_fin", "Cant. term. entregada", STableConstants.WIDTH_VALUE_2X);
-        aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-        aoTableColumns[i++].setSumApplying(true);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_fin_ret", "Cant. term. devuelta", STableConstants.WIDTH_VALUE_2X);
-        aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-        aoTableColumns[i++].setSumApplying(true);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_fin_net", "Cant. term. neta", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_asd_net", "Cant. asig. neta", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         aoTableColumns[i++].setSumApplying(true);
 
@@ -255,7 +236,26 @@ public class SViewProdOrderStockConsume extends erp.lib.table.STableTab implemen
             }
         }
 
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_dif", "Cant. x consumir", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_fin", "Cant. term. entregada", STableConstants.WIDTH_QUANTITY_2X);
+        aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        aoTableColumns[i++].setSumApplying(true);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_fin_ret", "Cant. term. devuelta", STableConstants.WIDTH_QUANTITY_2X);
+        aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        aoTableColumns[i++].setSumApplying(true);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_fin_net", "Cant. term. neta", STableConstants.WIDTH_QUANTITY_2X);
+        aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        aoTableColumns[i++].setSumApplying(true);
+
+        if (isViewForEntries()) {
+            if (mnTabTypeAux02 != SDataConstantsSys.TRNX_TP_UNIT_TOT_MASS) {
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "symbol", "Unidad insumo/producto", STableConstants.WIDTH_UNIT_SYMBOL);
+            }
+            else {
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_symbol_mass", "Unidad insumo/producto", STableConstants.WIDTH_UNIT_SYMBOL);
+            }
+        }
+
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_dif", "Cant. x consumir", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         aoTableColumns[i++].setSumApplying(true);
 

@@ -76,9 +76,9 @@ public class SViewDpsPayment extends erp.lib.table.STableTab implements java.awt
         }
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot", "Subtotal $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++].setSumApplying(true);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_tax_charged", "Imp. tras. $", STableConstants.WIDTH_VALUE);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_tax_charged", "Imp tras $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setSumApplying(true);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_tax_retained", "Imp. ret. $", STableConstants.WIDTH_VALUE);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_tax_retained", "Imp ret $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setSumApplying(true);
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_tot", "Total $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++].setSumApplying(true);
@@ -91,9 +91,9 @@ public class SViewDpsPayment extends erp.lib.table.STableTab implements java.awt
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "r.dt", "Fecha póliza", STableConstants.WIDTH_DATE);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "re.concept", "Concepto", 200);
         }
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_debit", "Debe $", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_debit", "Cargos $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++].setSumApplying(true);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_credit", "Haber $", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_credit", "Abonos $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++].setSumApplying(true);
 
         for (i = 0; i < aoTableColumns.length; i++) {
