@@ -24,6 +24,7 @@ import erp.mtrn.data.SDataDps;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
 import erp.table.STabFilterCompanyBranch;
+import erp.table.STabFilterDocumentNature;
 import erp.table.STabFilterUsers;
 import java.awt.Dimension;
 import java.util.Vector;
@@ -47,6 +48,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
     private erp.lib.table.STabFilterDateCutOff moTabFilterDateCutOff;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     private erp.table.STabFilterUsers moTabFilterUser;
+    private erp.table.STabFilterDocumentNature moTabFilterDocumentNature;
 
     private boolean mbHasRightAuthor = false;
     private boolean mbHasRightRejectOwn = false;
@@ -115,6 +117,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
         moTabFilterUser = new STabFilterUsers(miClient, this);
         moTabFilterUser.removeButtonUser();
         moTabFilterUser.setUserId(mbHasRightAuthor ? miClient.getSession().getUser().getPkUserId() : SDataConstantsSys.UNDEFINED);
+        moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
 
         if (isViewDocsPending()) {
             moTabFilterDateCutOff = new STabFilterDateCutOff(miClient, this, SLibTimeUtilities.getEndOfYear(miClient.getSessionXXX().getWorkingDate()));
@@ -143,6 +146,8 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
         addTaskBarUpperComponent(mjbViewLinks);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterUser);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterDocumentNature);
 
         mjbAuthorize.setEnabled(hasRightAuthorize && (isViewDocsPending() || isViewDocsRejected()));
         mjbReject.setEnabled((hasRightAuthorize || mbHasRightRejectOwn) && (isViewDocsPending() || isViewDocsAuthorized()));
@@ -387,6 +392,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
         String sqlTypeDocument = "";
         String sqlCompanyBranch = "";
         String sqlBizPartner = "";
+        String sqlDocNature = "";
         String sqlOrderBy = "";
         STableSetting setting = null;
 
@@ -406,6 +412,11 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_BP) {
                 sqlBizPartner += ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "d.fid_bp_r = " + (Integer) setting.getSetting() + " ");
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_DOC_NAT) {
+                if (((Integer) setting.getSetting()) != SLibConstants.UNDEFINED) {
+                    sqlDocNature += (sqlDocNature.length() == 0 ? "" : "AND ") + "d.fid_dps_nat = " + ((Integer) setting.getSetting()) + " ";
+                }
             }
         }
 
@@ -477,6 +488,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
                 (sqlCompanyBranch.length() == 0 ? "" : "AND " + sqlCompanyBranch) + " " +
                 (sqlTypeDocument.length() == 0 ? "" : "AND " + sqlTypeDocument) + " " +
                 (sqlBizPartner.length() == 0 ? "" : "AND " + sqlBizPartner) + " " +
+                (sqlDocNature.length() == 0 ? "" : "AND " + sqlDocNature) + " " +
                 sqlOrderBy;
     }
 
