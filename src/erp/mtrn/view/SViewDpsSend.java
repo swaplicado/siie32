@@ -27,6 +27,7 @@ import erp.mtrn.data.STrnUtilities;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
 import erp.table.STabFilterCompanyBranch;
+import erp.table.STabFilterDocumentNature;
 import java.awt.Dimension;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -46,6 +47,7 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     private erp.table.STabFilterCompanyBranch moTabFilterCompanyBranch;
     private erp.table.STabFilterBizPartner moTabFilterBizPartner;
+    private erp.table.STabFilterDocumentNature moTabFilterDocumentNature;
 
     /**
      * View to send documents.
@@ -99,6 +101,7 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
         }
         moTabFilterCompanyBranch = new STabFilterCompanyBranch(miClient, this);
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, SDataConstantsSys.BPSS_CT_BP_CUS);
+        moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
@@ -111,6 +114,8 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
         addTaskBarUpperComponent(moTabFilterCompanyBranch);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterBizPartner);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterDocumentNature);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(mjbViewDps);
         addTaskBarUpperComponent(mjbViewNotes);
@@ -193,6 +198,7 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
         String sqlDatePeriod = "";
         String sqlCompanyBranch = "";
         String sqlBizPartner = "";
+        String sqlDocNature = "";
         STableSetting setting = null;
 
         for (int i = 0; i < mvTableSettings.size(); i++) {
@@ -211,6 +217,11 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_BP) {
                 sqlBizPartner = ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND d.fid_bp_r = " + (Integer) setting.getSetting() + " ");
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_DOC_NAT) {
+                if (((Integer) setting.getSetting()) != SLibConstants.UNDEFINED) {
+                    sqlDocNature += ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND d.fid_dps_nat = " + (Integer) setting.getSetting() + " ");
+                }
             }
         }
 
@@ -242,7 +253,7 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
                 }
 
                 msSql +=
-                    sqlDatePeriod + sqlCompanyBranch + sqlBizPartner +
+                    sqlDatePeriod + sqlCompanyBranch + sqlBizPartner + sqlDocNature +
                     "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
                     "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " +
                     "INNER JOIN erp.bpsu_bp_ct AS bc ON b.id_bp = bc.id_bp AND bc.id_ct_bp = " + (isDpsPurchases() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS) + " " +
