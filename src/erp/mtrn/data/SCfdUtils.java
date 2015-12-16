@@ -708,6 +708,7 @@ public abstract class SCfdUtils implements Serializable {
                         packet.setPayrollBizPartnerId(cfd.getFkPayrollBizPartnerId_n());
                         packet.setPayrollReceiptPayrollId(cfd.getFkPayrollReceiptPayrollId_n());
                         packet.setPayrollReceiptEmployeeId(cfd.getFkPayrollReceiptEmployeeId_n());
+                        packet.setPayrollReceiptIssueId(cfd.getFkPayrollReceiptIssueId_n());
                         packet.setRfcEmisor(cfdiSign.getRfcEmisor());
                         packet.setRfcReceptor(cfdiSign.getRfcReceptor());
                         packet.setTotalCy(cfdiSign.getTotalCy());
