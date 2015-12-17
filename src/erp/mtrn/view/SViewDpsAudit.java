@@ -23,6 +23,7 @@ import erp.lib.table.STableSetting;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
 import erp.table.STabFilterCompanyBranch;
+import erp.table.STabFilterDocumentNature;
 import erp.table.STabFilterUsers;
 import java.awt.Dimension;
 import java.util.Vector;
@@ -46,6 +47,7 @@ public class SViewDpsAudit extends erp.lib.table.STableTab implements java.awt.e
     private erp.table.STabFilterCompanyBranch moTabFilterCompanyBranch;
     private erp.table.STabFilterBizPartner moTabFilterBizPartner;
     private erp.table.STabFilterUsers moTabFilterUser;
+    private erp.table.STabFilterDocumentNature moTabFilterDocumentNature;
 
     private boolean mbHasRightAuthor = false;
 
@@ -117,7 +119,7 @@ public class SViewDpsAudit extends erp.lib.table.STableTab implements java.awt.e
         moTabFilterUser = new STabFilterUsers(miClient, this);
         moTabFilterUser.removeButtonUser();
         moTabFilterUser.setUserId(mbHasRightAuthor ? miClient.getSession().getUser().getPkUserId() : SDataConstantsSys.UNDEFINED);
-
+        moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
@@ -137,6 +139,8 @@ public class SViewDpsAudit extends erp.lib.table.STableTab implements java.awt.e
         addTaskBarUpperComponent(mjbViewLinks);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterUser);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterDocumentNature);
 
         mjbAuditYes.setEnabled(isDpsAuditPending());
         mjbAuditNo.setEnabled(!isDpsAuditPending());
@@ -298,6 +302,7 @@ public class SViewDpsAudit extends erp.lib.table.STableTab implements java.awt.e
         String sqlDatePeriod = "";
         String sqlCompanyBranch = "";
         String sqlBizPartner = "";
+        String sqlDocNature = "";
         STableSetting setting = null;
 
         for (int i = 0; i < mvTableSettings.size(); i++) {
@@ -317,6 +322,11 @@ public class SViewDpsAudit extends erp.lib.table.STableTab implements java.awt.e
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_BP) {
                 sqlBizPartner = ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND d.fid_bp_r = " + (Integer) setting.getSetting() + " ");
             }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_DOC_NAT) {
+                if (((Integer) setting.getSetting()) != SLibConstants.UNDEFINED) {
+                    sqlDocNature += ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND d.fid_dps_nat = " + (Integer) setting.getSetting() + " ");
+                }
+            }
         }
 
         msSql = "SELECT d.id_year, d.id_doc, d.dt, d.dt_doc_delivery_n, d.b_close, d.b_del, d.ts_close, " +
@@ -325,7 +335,7 @@ public class SViewDpsAudit extends erp.lib.table.STableTab implements java.awt.e
                 "FROM trn_dps AS d " +
                 "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps AND " +
                 "d.fid_ct_dps = " + dpsTypeKey[0] + " AND d.fid_cl_dps = " + dpsTypeKey[1] + " AND d.fid_tp_dps = " + dpsTypeKey[2] + " " +
-                sqlDatePeriod + sqlCompanyBranch + sqlBizPartner + " AND d.b_audit = " + (isDpsAuditPending() ? 0 : 1) + " " +
+                sqlDatePeriod + sqlCompanyBranch + sqlBizPartner + sqlDocNature + " AND d.b_audit = " + (isDpsAuditPending() ? 0 : 1) + " " +
                 "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
                 "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " +
                 "INNER JOIN erp.bpsu_bp_ct AS bc ON b.id_bp = bc.id_bp AND bc.id_ct_bp = " +
