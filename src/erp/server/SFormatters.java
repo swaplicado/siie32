@@ -18,7 +18,6 @@ import erp.lib.table.STableCellRendererStyle;
 import java.awt.Color;
 import java.text.DecimalFormat;
 import java.util.Locale;
-import sa.lib.SLibConsts;
 
 /**
  *
@@ -222,7 +221,7 @@ public class SFormatters implements java.io.Serializable {
         moDecimalsBaseEquivalenceFormat = new DecimalFormat("#,##0." + SLibUtilities.textRepeat("0", 12));
 
         moDateFormat = new java.text.SimpleDateFormat("dd/MM/yyyy");
-        moDateTextFormat = new java.text.SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag(SLibConsts.LAN_ISO639_ES)); // XXX improve this, it should not be a fixed setting! (sflores, 2015-12-02)
+        moDateTextFormat = new java.text.SimpleDateFormat("dd MMMM yyyy", new Locale("es_MX")); // XXX improve this, it should not be a fixed setting! (sflores, 2015-12-17)
 
         moDateYearFormat = new java.text.SimpleDateFormat("yyyy");
 
