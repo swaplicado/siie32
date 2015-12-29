@@ -31,6 +31,7 @@ import erp.mod.hrs.db.SDbEmployeeWageLog;
 import erp.mod.hrs.db.SDbFirstDayYear;
 import erp.mod.hrs.db.SDbHoliday;
 import erp.mod.hrs.db.SDbLoan;
+import erp.mod.hrs.db.SDbLoanTypeAdjustment;
 import erp.mod.hrs.db.SDbMwzType;
 import erp.mod.hrs.db.SDbMwzTypeWage;
 import erp.mod.hrs.db.SDbPayroll;
@@ -368,6 +369,9 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRS_MWZ_WAGE:
                 registry = new SDbMwzTypeWage();
+                break;
+            case SModConsts.HRS_TP_LOAN_ADJ:
+                registry = new SDbLoanTypeAdjustment();
                 break;
             case SModConsts.HRS_EMP_LOG_HIRE:
                 registry = new SDbEmployeeHireLog();

@@ -221,7 +221,7 @@ public class SFormatters implements java.io.Serializable {
         moDecimalsBaseEquivalenceFormat = new DecimalFormat("#,##0." + SLibUtilities.textRepeat("0", 12));
 
         moDateFormat = new java.text.SimpleDateFormat("dd/MM/yyyy");
-        moDateTextFormat = new java.text.SimpleDateFormat("dd MMMM yyyy", new Locale("es_MX")); // XXX improve this, it should not be a fixed setting! (sflores, 2015-12-17)
+        moDateTextFormat = new java.text.SimpleDateFormat("dd MMMM yyyy");
 
         moDateYearFormat = new java.text.SimpleDateFormat("yyyy");
 
@@ -279,15 +279,15 @@ public class SFormatters implements java.io.Serializable {
         switch (params.getFkFormatDateTypeId()) {
             case SDataConstantsSys.CFGS_TP_FMT_D_YYYY_MM_DD:
                 moDateFormat = new java.text.SimpleDateFormat("yyyy/MM/dd");
-                moDateTextFormat = new java.text.SimpleDateFormat("yyyy MMMM dd");
+                moDateTextFormat = new java.text.SimpleDateFormat("yyyy MMMM dd", new Locale(params.getLocaleId()));
                 break;
             case SDataConstantsSys.CFGS_TP_FMT_D_DD_MM_YYYY:
                 moDateFormat = new java.text.SimpleDateFormat("dd/MM/yyyy");
-                moDateTextFormat = new java.text.SimpleDateFormat("dd MMMM yyyy");
+                moDateTextFormat = new java.text.SimpleDateFormat("dd MMMM yyyy", new Locale(params.getLocaleId()));
                 break;
             case SDataConstantsSys.CFGS_TP_FMT_D_MM_DD_YYYY:
                 moDateFormat = new java.text.SimpleDateFormat("MM/dd/yyyy");
-                moDateTextFormat = new java.text.SimpleDateFormat("MMMM dd yyyy");
+                moDateTextFormat = new java.text.SimpleDateFormat("MMMM dd yyyy", new Locale(params.getLocaleId()));
                 break;
             default:
                 break;

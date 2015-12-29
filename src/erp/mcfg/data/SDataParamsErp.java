@@ -38,6 +38,7 @@ public class SDataParamsErp extends erp.lib.data.SDataRegistry implements java.i
     protected java.lang.String msFormatKeyCreditor;
     protected java.lang.String msFormatKeyDebtor;
     protected java.lang.String msFormatKeyEmployee;
+    protected java.lang.String msLocaleId;
     protected int mnDeepAccounts;
     protected int mnDeepCostCenters;
     protected java.lang.String msFormatAccountId;
@@ -187,6 +188,7 @@ public class SDataParamsErp extends erp.lib.data.SDataRegistry implements java.i
     public void setFormatKeyCreditor(java.lang.String s) { msFormatKeyCreditor = s; }
     public void setFormatKeyDebtor(java.lang.String s) { msFormatKeyDebtor = s; }
     public void setFormatKeyEmployee(java.lang.String s) { msFormatKeyEmployee = s; }
+    public void setLocaleId(java.lang.String s) { msLocaleId = s; }
     public void setDeepAccounts(int n) { mnDeepAccounts = n; }
     public void setDeepCostCenters(int n) { mnDeepCostCenters = n; }
     public void setFormatAccountId(java.lang.String s) { msFormatAccountId = s; }
@@ -329,6 +331,7 @@ public class SDataParamsErp extends erp.lib.data.SDataRegistry implements java.i
     public java.lang.String getFormatKeyCreditor() { return msFormatKeyCreditor; }
     public java.lang.String getFormatKeyDebtor() { return msFormatKeyDebtor; }
     public java.lang.String getFormatKeyEmployee() { return msFormatKeyEmployee; }
+    public java.lang.String getLocaleId() { return msLocaleId; }
     public int getDeepAccounts() { return mnDeepAccounts; }
     public int getDeepCostCenters() { return mnDeepCostCenters; }
     public java.lang.String getFormatAccountId() { return msFormatAccountId; }
@@ -487,6 +490,7 @@ public class SDataParamsErp extends erp.lib.data.SDataRegistry implements java.i
         msFormatKeyCreditor = "";
         msFormatKeyDebtor = "";
         msFormatKeyEmployee = "";
+        msLocaleId = "";
         mnDeepAccounts = 0;
         mnDeepCostCenters = 0;
         msFormatAccountId = "";
@@ -648,6 +652,7 @@ public class SDataParamsErp extends erp.lib.data.SDataRegistry implements java.i
                 msFormatKeyCreditor = resultSet.getString("fmt_key_cdr");
                 msFormatKeyDebtor = resultSet.getString("fmt_key_dbr");
                 msFormatKeyEmployee = resultSet.getString("fmt_key_emp");
+                msLocaleId = resultSet.getString("loc_id");
                 mnDeepAccounts = resultSet.getInt("deep_acc");
                 mnDeepCostCenters = resultSet.getInt("deep_cc");
                 msFormatAccountId = resultSet.getString("fmt_id_acc");
@@ -818,7 +823,7 @@ public class SDataParamsErp extends erp.lib.data.SDataRegistry implements java.i
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkErpId);
             callableStatement.setString(nParam++, msErp);
             callableStatement.setInt(nParam++, mnDecimalsValue);
@@ -841,6 +846,7 @@ public class SDataParamsErp extends erp.lib.data.SDataRegistry implements java.i
             callableStatement.setString(nParam++, msFormatKeyCreditor);
             callableStatement.setString(nParam++, msFormatKeyDebtor);
             callableStatement.setString(nParam++, msFormatKeyEmployee);
+            callableStatement.setString(nParam++, msLocaleId);
             callableStatement.setInt(nParam++, mnDeepAccounts);
             callableStatement.setInt(nParam++, mnDeepCostCenters);
             callableStatement.setString(nParam++, msFormatAccountId);
