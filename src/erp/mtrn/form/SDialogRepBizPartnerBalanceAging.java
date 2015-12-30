@@ -1,36 +1,27 @@
 /*
- * DFormCompany.java
+ * SDialogRepBizPartnerBalanceAging.java
  *
  * Created on 19 de agosto de 2008, 11:10 AM
  */
 
 package erp.mtrn.form;
 
-import java.awt.Cursor;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Vector;
-import javax.swing.AbstractAction;
-
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
-import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormValidation;
-import erp.lib.form.SFormUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
-import erp.mfin.data.SDataAccountCash;
-import erp.SClient;
-
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
+import java.awt.Cursor;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.util.Map;
+import java.util.Vector;
+import javax.swing.AbstractAction;
 import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.view.save.JRPdfSaveContributor.*;
-import net.sf.jasperreports.view.JRViewer.*;
-import net.sf.jasperreports.view.save.JRMultipleSheetsXlsSaveContributor.*;
 import net.sf.jasperreports.view.JasperViewer;
 
 /**
@@ -53,7 +44,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
 
     private int[] mnParamTpSysMovId;
 
-    /** Creates new form DFormCompany */
+    /** Creates new form SDialogRepBizPartnerBalanceAging */
     public SDialogRepBizPartnerBalanceAging(erp.client.SClientInterface client, java.lang.Object oType) {
         super(client.getFrame(), true);
         miClient = client;
@@ -76,6 +67,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         buttonGroup2 = new javax.swing.ButtonGroup();
+        summary = new javax.swing.ButtonGroup();
         jpData = new javax.swing.JPanel();
         jpReg = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
@@ -102,6 +94,10 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jlSort = new javax.swing.JLabel();
         jrbSortDate = new javax.swing.JRadioButton();
         jrbSortDoc = new javax.swing.JRadioButton();
+        jPanel101 = new javax.swing.JPanel();
+        jrbIsDetail = new javax.swing.JRadioButton();
+        jPanel102 = new javax.swing.JPanel();
+        jrbIsSummary = new javax.swing.JRadioButton();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jbPrint = new javax.swing.JButton();
@@ -154,7 +150,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jpReg.add(jPanel8, java.awt.BorderLayout.PAGE_START);
 
         jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtro:"));
-        jPanel7.setLayout(new java.awt.GridLayout(5, 1, 0, 2));
+        jPanel7.setLayout(new java.awt.GridLayout(6, 1, 0, 2));
 
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
@@ -215,15 +211,31 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jPanel100.add(jlSort);
 
         buttonGroup2.add(jrbSortDate);
-        jrbSortDate.setSelected(true);
         jrbSortDate.setText("Fecha venc./base crédito");
         jPanel100.add(jrbSortDate);
 
         buttonGroup2.add(jrbSortDoc);
-        jrbSortDoc.setText("Folio doc.");
+        jrbSortDoc.setText("Folio docto.");
         jPanel100.add(jrbSortDoc);
 
         jPanel7.add(jPanel100);
+
+        jPanel101.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        summary.add(jrbIsDetail);
+        jrbIsDetail.setSelected(true);
+        jrbIsDetail.setText("Detalle");
+        jPanel101.add(jrbIsDetail);
+
+        jPanel7.add(jPanel101);
+
+        jPanel102.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        summary.add(jrbIsSummary);
+        jrbIsSummary.setText("Resumen");
+        jPanel102.add(jrbIsSummary);
+
+        jPanel7.add(jPanel102);
 
         jpReg.add(jPanel7, java.awt.BorderLayout.CENTER);
 
@@ -248,8 +260,8 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-508)/2, (screenSize.height-308)/2, 508, 308);
+        setSize(new java.awt.Dimension(508, 308));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -429,6 +441,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
             oMap.put("nRange5", 90);
             oMap.put("nRange6", 180);
             oMap.put("nRange7", 360);
+            oMap.put("bIsDetail", jrbIsDetail.isSelected());
 
             oPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_BAL_AGI, oMap);
             oViewer = new JasperViewer(oPrint, false);
@@ -453,6 +466,8 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel100;
+    private javax.swing.JPanel jPanel101;
+    private javax.swing.JPanel jPanel102;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel38;
@@ -478,9 +493,12 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
     private javax.swing.JPanel jpStartDate;
     private javax.swing.JRadioButton jrbDateCred;
     private javax.swing.JRadioButton jrbDateDoc;
+    private javax.swing.JRadioButton jrbIsDetail;
+    private javax.swing.JRadioButton jrbIsSummary;
     private javax.swing.JRadioButton jrbSortDate;
     private javax.swing.JRadioButton jrbSortDoc;
     private javax.swing.JFormattedTextField jtfDateCut;
+    private javax.swing.ButtonGroup summary;
     // End of variables declaration//GEN-END:variables
 
     @Override

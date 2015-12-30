@@ -98,6 +98,8 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                     "1, " +
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateLastHire) + "', " +
                     "'', " +
+                    "NULL, " +
+                    "'', " +
                     (mbActive ? 1 : 0) + ", " +
                     (mbDeleted ? 1 : 0) + ", " +
                     SModSysConsts.HRSU_TP_EMP_DIS_NON + ", " +
