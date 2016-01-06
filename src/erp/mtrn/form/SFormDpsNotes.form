@@ -125,17 +125,17 @@
           <SubComponents>
             <Component class="javax.swing.JCheckBox" name="jckIsAllDocs">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Notas para todos los documentos"/>
+                <Property name="text" type="java.lang.String" value="Para todos los documentos"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[200, 23]"/>
+                  <Dimension value="[175, 23]"/>
                 </Property>
               </Properties>
             </Component>
             <Component class="javax.swing.JCheckBox" name="jckIsPrintable">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Notas para impresi&#xf3;n"/>
+                <Property name="text" type="java.lang.String" value="Para impresi&#xf3;n"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[150, 23]"/>
+                  <Dimension value="[100, 23]"/>
                 </Property>
               </Properties>
             </Component>

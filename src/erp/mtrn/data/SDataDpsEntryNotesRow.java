@@ -24,6 +24,7 @@ public class SDataDpsEntryNotesRow extends erp.lib.table.STableRow {
         mvValues.add(notes.getNotes());
         mvValues.add(notes.getIsAllDocs());
         mvValues.add(notes.getIsPrintable());
+        mvValues.add(notes.getIsCfd());
         mvValues.add(notes.getIsDeleted());
         mvValues.add(notes.getDbmsUserNew());
         mvValues.add(notes.getUserNewTs());

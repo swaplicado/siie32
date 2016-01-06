@@ -11,17 +11,16 @@
 
 package erp.mtrn.form;
 
+import erp.data.SDataConstants;
+import erp.lib.SLibConstants;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
+import erp.mtrn.data.SDataDpsEntryNotes;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
-
-import erp.data.SDataConstants;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormValidation;
-import erp.lib.SLibConstants;
-import erp.lib.form.SFormUtilities;
-import erp.mtrn.data.SDataDpsEntryNotes;
 
 /**
  *
@@ -41,6 +40,7 @@ public class SFormDpsEntryNotes extends javax.swing.JDialog implements erp.lib.f
     private erp.lib.form.SFormField moFieldNotes;
     private erp.lib.form.SFormField moFieldIsAllDocs;
     private erp.lib.form.SFormField moFieldIsPrintable;
+    private erp.lib.form.SFormField moFieldIsCfd;
     private erp.lib.form.SFormField moFieldIsDeleted;
 
     /** Creates new form SFormDpsEntryNotes */
@@ -72,6 +72,7 @@ public class SFormDpsEntryNotes extends javax.swing.JDialog implements erp.lib.f
         jPanel3 = new javax.swing.JPanel();
         jckIsAllDocs = new javax.swing.JCheckBox();
         jckIsPrintable = new javax.swing.JCheckBox();
+        jckIsCfd = new javax.swing.JCheckBox();
         jckIsDeleted = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -112,13 +113,17 @@ public class SFormDpsEntryNotes extends javax.swing.JDialog implements erp.lib.f
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jckIsAllDocs.setText("Notas para todos los documentos");
-        jckIsAllDocs.setPreferredSize(new java.awt.Dimension(200, 23));
+        jckIsAllDocs.setText("Para todos los documentos");
+        jckIsAllDocs.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel3.add(jckIsAllDocs);
 
-        jckIsPrintable.setText("Notas para impresión");
-        jckIsPrintable.setPreferredSize(new java.awt.Dimension(150, 23));
+        jckIsPrintable.setText("Para impresión");
+        jckIsPrintable.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel3.add(jckIsPrintable);
+
+        jckIsCfd.setText("Para XML CFD");
+        jckIsCfd.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel3.add(jckIsCfd);
 
         jckIsDeleted.setText("Registro eliminado");
         jckIsDeleted.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -128,8 +133,8 @@ public class SFormDpsEntryNotes extends javax.swing.JDialog implements erp.lib.f
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-600)/2, (screenSize.height-300)/2, 600, 300);
+        setSize(new java.awt.Dimension(600, 300));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -143,11 +148,13 @@ public class SFormDpsEntryNotes extends javax.swing.JDialog implements erp.lib.f
         moFieldNotes.setLengthMax(1023);
         moFieldIsAllDocs = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsAllDocs);
         moFieldIsPrintable = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsPrintable);
+        moFieldIsCfd = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsCfd);
         moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsDeleted);
 
         mvFields.add(moFieldNotes);
         mvFields.add(moFieldIsAllDocs);
         mvFields.add(moFieldIsPrintable);
+        mvFields.add(moFieldIsCfd);
         mvFields.add(moFieldIsDeleted);
 
         jbOk.addActionListener(this);
@@ -205,6 +212,7 @@ public class SFormDpsEntryNotes extends javax.swing.JDialog implements erp.lib.f
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
     private javax.swing.JCheckBox jckIsAllDocs;
+    private javax.swing.JCheckBox jckIsCfd;
     private javax.swing.JCheckBox jckIsDeleted;
     private javax.swing.JCheckBox jckIsPrintable;
     private javax.swing.JLabel jlNotes;
@@ -230,6 +238,7 @@ public class SFormDpsEntryNotes extends javax.swing.JDialog implements erp.lib.f
 
         moFieldIsAllDocs.setFieldValue(true);
         moFieldIsPrintable.setFieldValue(true);
+        moFieldIsCfd.setFieldValue(false);
 
         jckIsDeleted.setEnabled(false);
     }
@@ -281,6 +290,7 @@ public class SFormDpsEntryNotes extends javax.swing.JDialog implements erp.lib.f
         moFieldNotes.setFieldValue(moDpsEntryNotes.getNotes());
         moFieldIsAllDocs.setFieldValue(moDpsEntryNotes.getIsAllDocs());
         moFieldIsPrintable.setFieldValue(moDpsEntryNotes.getIsPrintable());
+        moFieldIsCfd.setFieldValue(moDpsEntryNotes.getIsCfd());
         moFieldIsDeleted.setFieldValue(moDpsEntryNotes.getIsDeleted());
 
         jckIsDeleted.setEnabled(true);
@@ -300,6 +310,7 @@ public class SFormDpsEntryNotes extends javax.swing.JDialog implements erp.lib.f
         moDpsEntryNotes.setNotes(moFieldNotes.getString());
         moDpsEntryNotes.setIsAllDocs(moFieldIsAllDocs.getBoolean());
         moDpsEntryNotes.setIsPrintable(moFieldIsPrintable.getBoolean());
+        moDpsEntryNotes.setIsCfd(moFieldIsCfd.getBoolean());
         moDpsEntryNotes.setIsDeleted(moFieldIsDeleted.getBoolean());
 
         return moDpsEntryNotes;

@@ -24,6 +24,7 @@ public class SDataDpsEntryNotes extends erp.lib.data.SDataRegistry implements ja
     protected java.lang.String msNotes;
     protected boolean mbIsAllDocs;
     protected boolean mbIsPrintable;
+    protected boolean mbIsCfd;
     protected boolean mbIsDeleted;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
@@ -51,6 +52,7 @@ public class SDataDpsEntryNotes extends erp.lib.data.SDataRegistry implements ja
     public void setNotes(java.lang.String s) { msNotes = s; }
     public void setIsAllDocs(boolean b) { mbIsAllDocs = b; }
     public void setIsPrintable(boolean b) { mbIsPrintable = b; }
+    public void setIsCfd(boolean b) { mbIsCfd = b; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
@@ -66,6 +68,7 @@ public class SDataDpsEntryNotes extends erp.lib.data.SDataRegistry implements ja
     public java.lang.String getNotes() { return msNotes; }
     public boolean getIsAllDocs() { return mbIsAllDocs; }
     public boolean getIsPrintable() { return mbIsPrintable; }
+    public boolean getIsCfd() { return mbIsCfd; }
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
@@ -106,6 +109,7 @@ public class SDataDpsEntryNotes extends erp.lib.data.SDataRegistry implements ja
         msNotes = "";
         mbIsAllDocs = false;
         mbIsPrintable = false;
+        mbIsCfd = false;
         mbIsDeleted = false;
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
@@ -151,6 +155,7 @@ public class SDataDpsEntryNotes extends erp.lib.data.SDataRegistry implements ja
                 msNotes = resultSet.getString("n.nts");
                 mbIsAllDocs = resultSet.getBoolean("n.b_all");
                 mbIsPrintable = resultSet.getBoolean("n.b_prt");
+                mbIsCfd = resultSet.getBoolean("n.b_cfd");
                 mbIsDeleted = resultSet.getBoolean("n.b_del");
                 mnFkUserNewId = resultSet.getInt("n.fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("n.fid_usr_edit");
@@ -190,7 +195,7 @@ public class SDataDpsEntryNotes extends erp.lib.data.SDataRegistry implements ja
             callableStatement = connection.prepareCall(
                     "{ CALL trn_dps_ety_nts_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?) }");
+                    "?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkDocId);
             callableStatement.setInt(nParam++, mnPkEntryId);
@@ -198,6 +203,7 @@ public class SDataDpsEntryNotes extends erp.lib.data.SDataRegistry implements ja
             callableStatement.setString(nParam++, msNotes);
             callableStatement.setBoolean(nParam++, mbIsAllDocs);
             callableStatement.setBoolean(nParam++, mbIsPrintable);
+            callableStatement.setBoolean(nParam++, mbIsCfd);
             callableStatement.setBoolean(nParam++, mbIsDeleted);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
@@ -243,6 +249,7 @@ public class SDataDpsEntryNotes extends erp.lib.data.SDataRegistry implements ja
         clone.setNotes(msNotes);
         clone.setIsAllDocs(mbIsAllDocs);
         clone.setIsPrintable(mbIsPrintable);
+        clone.setIsCfd(mbIsCfd);
         clone.setIsDeleted(mbIsDeleted);
         clone.setFkUserNewId(mnFkUserNewId);
         clone.setFkUserEditId(mnFkUserEditId);
