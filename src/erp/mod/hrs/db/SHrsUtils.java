@@ -1344,7 +1344,7 @@ public abstract class SHrsUtils {
 
         sql = "SELECT bp.bp, bp.id_bp AS f_emp_map_bp, emp.id_emp AS f_emp_id, emp.num AS f_emp_num, bp.alt_id AS f_emp_curp, emp.ssn AS f_emp_nss, " +
                 "emp.fk_tp_rec_sche AS f_emp_reg_tp, rcp.day_pad AS f_emp_dias_pag, d.name AS f_emp_dep, d.code AS f_emp_dep_cve, " +
-                "emp.bank_acc AS f_emp_bank_clabe, " +
+                "'' AS f_emp_bank_clabe, " +
                 "pei.dt_pay, pei.num_ser, pei.num, pei.fk_tp_pay_sys, " +
                 "CASE WHEN emp.fk_bank_n IS NOT NULL THEN emp.fk_bank_n ELSE (SELECT fk_bank FROM hrs_cfg WHERE id_cfg = " + SUtilConsts.BPR_CO_ID + ") END AS f_emp_bank, " +
                 "emp.dt_hire AS f_emp_alta, p.dt_sta AS f_nom_date_start, p.dt_end AS f_nom_date_end, " +
@@ -1576,7 +1576,7 @@ public abstract class SHrsUtils {
         SHrsDaysByPeriod hrsDaysCurr = hrsReceipt.getHrsEmployee().getHrsDaysCurr();
         SHrsDaysByPeriod hrsDaysNext = hrsReceipt.getHrsEmployee().getHrsDaysNext();
         
-        amoutAdjustment = getAdjustmentLoan(loan.getFkLoanTypeId());
+        amoutAdjustment = getAdjustmentLoan(null, loan.getFkLoanTypeId());
         switch (loan.getFkLoanPaymentTypeId()) {
             case SModSysConsts.HRSS_TP_LOAN_PAY_AMT:
                 amoutMonth = loan.getPaymentAmount() + amoutAdjustment;
@@ -1607,8 +1607,19 @@ public abstract class SHrsUtils {
         return amout;
     }
     
-    public static double getAdjustmentLoan(final int typeLoan) {
+    public static double getAdjustmentLoan(final SGuiSession session, final int typeLoan) throws Exception {
+        String sql = "";
+        ResultSet resultSet = null;
         double amout = 0;
+        
+        /*
+        sql = "SELECT amt_adj FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_LOAN) + " WHERE id_tp_loan = " + typeLoan + "";
+        
+        resultSet = session.getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            amout = resultSet.getDouble("amt_adj");
+        }
+        */
         
         switch (typeLoan) {
             case SModSysConsts.HRSS_TP_LOAN_LOA:
