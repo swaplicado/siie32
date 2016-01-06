@@ -102,7 +102,7 @@ public class SHrsPayrollReceipt {
 
             earning = hrsPayrollReceiptEarning.getEarning();
             payrollReceiptEarning = hrsPayrollReceiptEarning.getReceiptEarning();
-            if (earning.getFkEarningTypeId() != SModSysConsts.HRSS_TP_EAR_TAX_SUB) {
+            //if (earning.getFkEarningTypeId() != SModSysConsts.HRSS_TP_EAR_TAX_SUB) { XXX jbarajas 2016-01-16 calculate exemption for all earnings
 
                 // Verify type of exemption:
 
@@ -201,7 +201,7 @@ public class SHrsPayrollReceipt {
                 payrollReceiptEarning.setAmountExempt(amountExemp);
                 payrollReceiptEarning.setAmountTaxable(SLibUtils.round(hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r() - amountExemp, SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits()));
                 hrsPayrollReceiptEarning.setReceiptEarning(payrollReceiptEarning);
-            }
+            //} XXX jbarajas 2016-01-16 calculate exemption for all earnings
         }
     }
 

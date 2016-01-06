@@ -1139,7 +1139,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                                     "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
                                     "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
                                     "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " " +
-                                    "AND ear.id_ear = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") AND emp.id_emp = " + nF_id_ref + " " +
+                                    "AND ear.id_ear = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") AND emp.id_emp IN (" + sEmployees + ") " +
                                     "GROUP BY ear.id_ear, ear.name_abbr, bp.id_bp, bp.bp " +
                                     "ORDER BY f_id_tipo_rec, id_ear, f_ref; ";
                         sType = "percepción";
@@ -1183,7 +1183,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                                     "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
                                     "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
                                     "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " " +
-                                    "AND ded.id_ded = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") AND emp.id_emp = " + nF_id_ref + " " +
+                                    "AND ded.id_ded = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") AND emp.id_emp IN (" + sEmployees + ") " +
                                     "GROUP BY ded.id_ded, ded.name_abbr, bp.id_bp, bp.bp " +
                                     "ORDER BY f_id_tipo_rec, id_ded, f_ref; ";
                         sType = "deducción";
@@ -1299,6 +1299,12 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
         moFormerPayroll.setDebit_r(dDebit_r);
         moFormerPayroll.setCredit_r(dCredit_r);
 
+        // Validate that fully accounted payroll
+        
+        if (SLibUtilities.round((dDebit_r - dCredit_r), miClient.getSessionXXX().getParamsErp().getDecimalsValue()) != SLibUtilities.round(moPayroll.getAuxTotalNet(), miClient.getSessionXXX().getParamsErp().getDecimalsValue())) {
+            throw new Exception("¡Hay una diferencia entre el alcance neto de la nómina (" + miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(moPayroll.getAuxTotalNet()) +") y el monto neto de la afectación contable (" + miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(dDebit_r - dCredit_r) +")!");
+        }
+        
         oRequest = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
         oRequest.setPacket(moFormerPayroll);
         oResponse = miClient.getSessionXXX().request(oRequest);
