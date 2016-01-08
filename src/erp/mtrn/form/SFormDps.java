@@ -2355,7 +2355,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         i = 0;
         aoTableColumns = new STableColumnForm[10];
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Notas", 300);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Notas", 500);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Todos los docs.", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Impresión", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Eliminado", STableConstants.WIDTH_BOOLEAN);

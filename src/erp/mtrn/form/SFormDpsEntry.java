@@ -1976,10 +1976,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jpNotes.add(moPaneGridNotes, BorderLayout.CENTER);
         
         i = 0;
-        aoTableColumns = new STableColumnForm[10];
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Notas", 300);
+        aoTableColumns = new STableColumnForm[11];
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Notas", 500);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Todos los docs.", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Impresión", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "XML CFD", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Usr. creación", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE_TIME, "Creación", STableConstants.WIDTH_DATE_TIME);

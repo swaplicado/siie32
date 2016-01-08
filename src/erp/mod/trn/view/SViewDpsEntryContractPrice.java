@@ -171,7 +171,7 @@ public class SViewDpsEntryContractPrice extends SGridPaneView implements ActionL
                 + "'' AS " + SDbConsts.FIELD_CODE + ", "
                 + "'' AS " + SDbConsts.FIELD_NAME + ", "
                 + "(SELECT cob.code FROM erp.bpsu_bpb AS cob WHERE d.fid_cob = cob.id_bpb) AS f_cob_code, "
-                + "d.b_close, d.dt, d.num_ref, CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, dt.code, "
+                + "d.b_link, d.dt, d.num_ref, CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, dt.code, "
                 + "COALESCE(SUM(dps_sup.orig_qty), 0) AS f_orig_qty_supply, de.orig_qty AS f_orig_qty_prc, "
                 + "it.item, de.concept_key, u.symbol, bp.bp, bpc.bp_key "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
@@ -187,7 +187,7 @@ public class SViewDpsEntryContractPrice extends SGridPaneView implements ActionL
                 + (isViewForCategoryPur() ? "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CON[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CON[1] + " AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CON[2] : 
                 "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CON[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CON[1] + " AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CON[2]) + " " + sql
                 + "GROUP BY de.id_year, de.id_doc, de.id_ety "
-                + (mnGridMode == SModConsts.VIEW_ST_PEND ? "HAVING f_orig_qty_prc <> f_orig_qty_supply AND d.b_close = 0 " : "HAVING f_orig_qty_prc = f_orig_qty_supply OR d.b_close = 1 ")
+                + (mnGridMode == SModConsts.VIEW_ST_PEND ? "HAVING f_orig_qty_prc < f_orig_qty_supply AND d.b_link = 0 " : "HAVING f_orig_qty_prc >= f_orig_qty_supply OR d.b_link = 1 ")
                 + "ORDER BY de.id_year, de.id_doc, de.id_ety; ";
     }
 

@@ -1630,21 +1630,16 @@ public abstract class SCfdUtils implements Serializable {
      * Create CFD parameters.
      * @param client ERP Client interface.
      * @param dps DPS regitry.
-     * @param date Date of cancelation.
-     * @param typeCfd CFD type. Constants defined in SDataConstantsSys (i.e. TRNS_TP_XML_CFD, TRNS_TP_XML_CFDI).
-     * @param statusCfd CFD status. Constants defined in SDataConstantsSys (i.e. TRNS_ST_DPS_EMITED, TRNS_ST_DPS_NEW).
      * @return CFD parameters.
      */
-    private static SCfdParams createCfdParams(final SClientInterface client, final SDataDps dps /*, final Date date, final int typeCfd, final int statusCfd*/) {
+    private static SCfdParams createCfdParams(final SClientInterface client, final SDataDps dps) {
         String factura = "";
         String pedido = "";
         String contrato = "";
         String ruta = "";
-        //String acknowledgmentCancel = "";
         SDataDps dpsFactura = null;
         SDataDps dpsPedido = null;
         SDataDps dpsContrato = null;
-        //SCfdiSignature cfdiSign = null;
         SDataCustomerBranchConfig cusBranchConfig = null;
         SCfdParams params = new SCfdParams();
         SDataBizPartner moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[]{ dps.getFkBizPartnerId_r()}, SLibConstants.EXEC_MODE_SILENT);
@@ -2327,33 +2322,32 @@ public abstract class SCfdUtils implements Serializable {
      */
     public static void computeCfd(final SClientInterface client, final SDataDps dps, final int typeCfd) throws Exception {
         SCfdPacket packet = null;
-        SDataDps dpsAux = dps;
         SCfdParams params = null;
         cfd.ver2.DElementComprobante comprobanteCfd = null;
         cfd.ver3.DElementComprobante comprobanteCfdi = null;
 
         packet = new SCfdPacket();
-        packet.setDpsYearId(dpsAux.getPkYearId());
-        packet.setDpsDocId(dpsAux.getPkDocId());
+        packet.setDpsYearId(dps.getPkYearId());
+        packet.setDpsDocId(dps.getPkDocId());
         packet.setIsConsistent(true);
-        packet.setDps(dpsAux);
-        packet.setCfdId(dpsAux.getDbmsDataCfd() == null ? 0 : dpsAux.getDbmsDataCfd().getPkCfdId());
+        packet.setDps(dps);
+        packet.setCfdId(dps.getDbmsDataCfd() == null ? 0 : dps.getDbmsDataCfd().getPkCfdId());
 
-        params = createCfdParams(client, dpsAux);
+        params = createCfdParams(client, dps);
 
         if (params != null) {
-            dpsAux.setAuxCfdParams(params);
+            dps.setAuxCfdParams(params);
 
             switch (typeCfd) {
                 case SDataConstantsSys.TRNS_TP_XML_CFD:
-                    comprobanteCfd = (cfd.ver2.DElementComprobante) createCfdRootElement(client, dpsAux);
+                    comprobanteCfd = (cfd.ver2.DElementComprobante) createCfdRootElement(client, dps);
 
                     packet.setStringSigned(DUtilities.generateOriginalString(comprobanteCfd));
                     packet.setFkXmlTypeId(SDataConstantsSys.TRNS_TP_XML_CFD);
                     packet.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);
                     break;
                 case SDataConstantsSys.TRNS_TP_XML_CFDI:
-                    comprobanteCfdi = (cfd.ver3.DElementComprobante) createCfdiRootElement(client, dpsAux);
+                    comprobanteCfdi = (cfd.ver3.DElementComprobante) createCfdiRootElement(client, dps);
 
                     packet.setStringSigned(DUtilities.generateOriginalString(comprobanteCfdi));
                     packet.setFkXmlTypeId(SDataConstantsSys.TRNS_TP_XML_CFDI);
@@ -2362,12 +2356,13 @@ public abstract class SCfdUtils implements Serializable {
                 default:
                     throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
             }
+            
             packet.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_CFD);
             packet.setFkXmlDeliveryTypeId(params.getTipoAddenda() != SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA ? SModSysConsts.TRNS_TP_XML_DVY_NA : SModSysConsts.TRNS_TP_XML_DVY_WS_SOR);
             packet.setFkXmlDeliveryStatusId(SModSysConsts.TRNS_ST_XML_DVY_PENDING);
             packet.setFkUserDeliveryId(client.getSession().getUser().getPkUserId());
 
-            packet.setSignature(client.getCfdSignature().sign(packet.getStringSigned(), SLibTimeUtilities.digestYear(dpsAux.getDate())[0]));
+            packet.setSignature(client.getCfdSignature().sign(packet.getStringSigned(), SLibTimeUtilities.digestYear(dps.getDate())[0]));
             packet.setCertNumber(client.getCfdSignature().getCertNumber());
             packet.setCertBase64(client.getCfdSignature().getCertBase64());
 

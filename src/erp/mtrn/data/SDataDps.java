@@ -4612,22 +4612,27 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     @Override
     public ArrayList<SCfdDataConcepto> getCfdConceptos() {
-        ArrayList<SCfdDataConcepto> conceptosXml = null;
+        String descripcion = "";
         SCfdDataConcepto conceptoXml = null;
-
-        conceptosXml = new ArrayList<SCfdDataConcepto>();
-        for (SDataDpsEntry entry : mvDbmsDpsEntries) {
-            if (entry.isAccountable()) {
+        ArrayList<SCfdDataConcepto> conceptosXml = new ArrayList<SCfdDataConcepto>();
+        
+        for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
+            if (dpsEntry.isAccountable()) {
+                descripcion = dpsEntry.getConcept();
+                
+                for (SDataDpsEntryNotes dpsEntryNotes : dpsEntry.getDbmsEntryNotes()) {
+                    if (dpsEntryNotes.getIsCfd()) {
+                        descripcion += "\n- " + dpsEntryNotes.getNotes();
+                    }
+                }
+                
                 conceptoXml = new SCfdDataConcepto();
-
-                conceptoXml.setNoIdentificacion(entry.getConceptKey());
-                conceptoXml.setUnidad(entry.getDbmsOriginalUnitSymbol());
-                conceptoXml.setCantidad(entry.getOriginalQuantity());
-                conceptoXml.setDescripcion(entry.getConcept());
-                conceptoXml.setValorUnitario(entry.getSubtotalCy_r() / entry.getOriginalQuantity());
-                //conceptoXml.setValorUnitario(entry.getPriceUnitarySystemCy()); (24/11/2015) jbarajas bug in the UI whith distinct units.
-                conceptoXml.setImporte(entry.getSubtotalCy_r());
-
+                conceptoXml.setNoIdentificacion(dpsEntry.getConceptKey());
+                conceptoXml.setUnidad(dpsEntry.getDbmsOriginalUnitSymbol());
+                conceptoXml.setCantidad(dpsEntry.getOriginalQuantity());
+                conceptoXml.setDescripcion(descripcion);
+                conceptoXml.setValorUnitario(dpsEntry.getSubtotalCy_r() / dpsEntry.getOriginalQuantity());
+                conceptoXml.setImporte(dpsEntry.getSubtotalCy_r());
                 conceptosXml.add(conceptoXml);
             }
         }

@@ -1027,8 +1027,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     break;
 
                 case SDataConstants.TRNX_DPS_RO:
-                    miForm.setValue(SLibConstants.VALUE_TYPE, moFormComplement);    // int[] document type
-                    miForm.setValue(SLibConstants.VALUE_STATUS, true);              // editable status
+                    miForm.setValue(SLibConstants.VALUE_TYPE, moFormComplement); // int[] document type
+                    miForm.setValue(SLibConstants.VALUE_STATUS, true); // editable status
                     break;
 
                 default:
@@ -1041,12 +1041,10 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 switch (formType) {
                     case SDataConstants.TRN_DPS:
                         SDataDps dps = null;
-                        //SCfdParams params = ((SDataDps) moRegistry).getAuxCfdParams();
 
                         if (((SDataDps) moRegistry).getAuxIsNeedCfd()) {
                             try {
-                                dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moRegistry.getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);   // get brand new information stored in DBMS (e.g. edition timestamp)
-                                //dps.setAuxCfdParams(params);
+                                dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moRegistry.getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE); // get brand new information stored in DBMS (e.g. edition timestamp)
 
                                 SCfdUtils.computeCfd(miClient, dps, miClient.getSessionXXX().getParamsCompany().getFkXmlTypeId());
                             }

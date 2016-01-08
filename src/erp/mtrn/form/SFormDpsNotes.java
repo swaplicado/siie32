@@ -111,12 +111,12 @@ public class SFormDpsNotes extends javax.swing.JDialog implements erp.lib.form.S
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jckIsAllDocs.setText("Notas para todos los documentos");
-        jckIsAllDocs.setPreferredSize(new java.awt.Dimension(200, 23));
+        jckIsAllDocs.setText("Para todos los documentos");
+        jckIsAllDocs.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel3.add(jckIsAllDocs);
 
-        jckIsPrintable.setText("Notas para impresión");
-        jckIsPrintable.setPreferredSize(new java.awt.Dimension(150, 23));
+        jckIsPrintable.setText("Para impresión");
+        jckIsPrintable.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel3.add(jckIsPrintable);
 
         jckIsDeleted.setText("Registro eliminado");
@@ -127,8 +127,8 @@ public class SFormDpsNotes extends javax.swing.JDialog implements erp.lib.form.S
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-600)/2, (screenSize.height-300)/2, 600, 300);
+        setSize(new java.awt.Dimension(600, 300));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
