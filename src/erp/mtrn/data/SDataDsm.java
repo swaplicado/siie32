@@ -1499,15 +1499,16 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                         */
 
                         sSql = "SELECT " + (oDsmEntry.getDbmsTpSysMovId() == SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] ?
-                                ((nPkTaxType == SModSysConsts.FINS_TP_TAX_CHARGED ? "SUM(debit - credit) AS balance, " : "SUM(credit - debit) AS balance, ") +
-                                (nPkTaxType == SModSysConsts.FINS_TP_TAX_CHARGED ? "SUM(debit_cur - credit_cur) AS balance_cur " : "SUM(credit_cur - debit_cur) AS balance_cur ")) :
-                                ((nPkTaxType == SModSysConsts.FINS_TP_TAX_CHARGED ? "SUM(credit - debit) AS balance, " : "SUM(debit - credit) AS balance, ") +
-                                (nPkTaxType == SModSysConsts.FINS_TP_TAX_CHARGED ? "SUM(credit_cur - debit_cur) AS balance_cur " : "SUM(debit_cur - credit_cur) AS balance_cur "))) +
-                                "FROM fin_rec_ety " +
-                                "WHERE b_del = FALSE AND " +
-                                "fid_bp_nr = " + oDsmEntry.getFkBizPartnerId() + " AND fid_tax_bas_n = " + nPkTaxBasicId + " AND " +
-                                "fid_tax_n = " + nPkTaxId + " AND fid_dps_year_n = " + nDpsYearId +  " AND fid_dps_doc_n = " + nDpsDocId +  " AND " +
-                                "fid_ct_sys_mov_xxx = " + anTypeSystemMove[0] + " AND fid_tp_sys_mov_xxx = " + anTypeSystemMove[1] + " ";
+                                ((nPkTaxType == SModSysConsts.FINS_TP_TAX_CHARGED ? "SUM(fe.debit - fe.credit) AS balance, " : "SUM(fe.credit - fe.debit) AS balance, ") +
+                                (nPkTaxType == SModSysConsts.FINS_TP_TAX_CHARGED ? "SUM(fe.debit_cur - fe.credit_cur) AS balance_cur " : "SUM(fe.credit_cur - fe.debit_cur) AS balance_cur ")) :
+                                ((nPkTaxType == SModSysConsts.FINS_TP_TAX_CHARGED ? "SUM(fe.credit - fe.debit) AS balance, " : "SUM(fe.debit - fe.credit) AS balance, ") +
+                                (nPkTaxType == SModSysConsts.FINS_TP_TAX_CHARGED ? "SUM(fe.credit_cur - fe.debit_cur) AS balance_cur " : "SUM(fe.debit_cur - fe.credit_cur) AS balance_cur "))) +
+                                "FROM fin_rec AS f " +
+                                "INNER JOIN fin_rec_ety AS fe ON fe.id_year = f.id_year AND fe.id_per = f.id_per AND fe.id_bkc = f.id_bkc AND fe.id_tp_rec = f.id_tp_rec AND fe.id_num = f.id_num " +
+                                "WHERE f.b_del = FALSE AND fe.b_del = FALSE AND " +
+                                "fe.fid_bp_nr = " + oDsmEntry.getFkBizPartnerId() + " AND fe.fid_tax_bas_n = " + nPkTaxBasicId + " AND " +
+                                "fe.fid_tax_n = " + nPkTaxId + " AND fe.fid_dps_year_n = " + nDpsYearId +  " AND fe.fid_dps_doc_n = " + nDpsDocId +  " AND " +
+                                "fe.fid_ct_sys_mov_xxx = " + anTypeSystemMove[0] + " AND fe.fid_tp_sys_mov_xxx = " + anTypeSystemMove[1] + " ";
                         resultSet1 = statementAux1.executeQuery(sSql);
                         if (resultSet1.next()) {
                             dValueTax = resultSet1.getDouble("balance");
