@@ -991,7 +991,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         else {
                             try {
                                 
-                                STrnUtilities.createReportOrder(miClient, oDps, SDataConstantsPrint.PRINT_MODE_VIEWER);
+                                STrnUtilities.createReportOrder(miClient, null, oDps, SDataConstantsPrint.PRINT_MODE_VIEWER);
                                 /* XXX New way of printing the report (jbarajas, 25-09-2015)
                                 setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
