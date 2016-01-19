@@ -69,6 +69,7 @@ import erp.mod.hrs.form.SFormHoliday;
 import erp.mod.hrs.form.SFormLoan;
 import erp.mod.hrs.form.SFormLoanAdjustmentDeduction;
 import erp.mod.hrs.form.SFormLoanAdjustmentEarning;
+import erp.mod.hrs.form.SFormLoanTypeAdjustment;
 import erp.mod.hrs.form.SFormMwzType;
 import erp.mod.hrs.form.SFormMwzTypeWage;
 import erp.mod.hrs.form.SFormPayroll;
@@ -104,6 +105,7 @@ import erp.mod.hrs.view.SViewEmployeeWageSscBaseLog;
 import erp.mod.hrs.view.SViewFirstDayYear;
 import erp.mod.hrs.view.SViewHoliday;
 import erp.mod.hrs.view.SViewLoan;
+import erp.mod.hrs.view.SViewLoanTypeAdjustment;
 import erp.mod.hrs.view.SViewMwzType;
 import erp.mod.hrs.view.SViewMwzTypeWage;
 import erp.mod.hrs.view.SViewPayroll;
@@ -168,6 +170,7 @@ public class SModuleHrs extends SGuiModule {
     private SFormBenefitTable moFormBenefitTable;
     private SFormWorkerTypeSalary moFormWorkerTypeSalary;
     private SFormMwzTypeWage moFormMwzTypeWage;
+    private SFormLoanTypeAdjustment moFormLoanTypeAdjustment;
     private SFormLoan moFormLoan;
     private SFormAbsence moFormAbsence;
     private SFormEarning moFormEarning;
@@ -721,6 +724,9 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_MWZ_WAGE:
                 view = new SViewMwzTypeWage(miClient, "Salarios mínimos área geográfica");
                 break;
+            case SModConsts.HRS_TP_LOAN_ADJ:
+                view = new SViewLoanTypeAdjustment(miClient, "Ajuste tipo crédito/préstamo");
+                break;
             case SModConsts.HRS_EMP_LOG_HIRE:
                 view = new SViewEmployeeHireLog(miClient, "Bitácora altas y bajas");
                 break;
@@ -987,6 +993,10 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_MWZ_WAGE:
                 if (moFormMwzTypeWage == null) moFormMwzTypeWage = new SFormMwzTypeWage(miClient, "Salario mínimo por área geográfica");
                 form = moFormMwzTypeWage;
+                break;
+            case SModConsts.HRS_TP_LOAN_ADJ:
+                if (moFormLoanTypeAdjustment == null) moFormLoanTypeAdjustment = new SFormLoanTypeAdjustment(miClient, "Ajuste por tipo de crédito/préstamo");
+                form = moFormLoanTypeAdjustment;
                 break;
             case SModConsts.HRS_LOAN:
                 if (moFormLoan == null) moFormLoan = new SFormLoan(miClient, "Crédito/Préstamo");
