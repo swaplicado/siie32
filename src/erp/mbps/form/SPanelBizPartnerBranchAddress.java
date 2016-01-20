@@ -102,13 +102,12 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         setPreferredSize(new java.awt.Dimension(515, 151));
         setLayout(new java.awt.GridLayout(6, 1, 5, 1));
 
-        jPanel1.setLayout(new java.awt.FlowLayout(0, 2, 0));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlAddress.setText("Nombre.: *");
         jlAddress.setPreferredSize(new java.awt.Dimension(85, 23));
         jPanel1.add(jlAddress);
 
-        jtfAddress.setText("NOM DIR");
         jtfAddress.setToolTipText("Nombre");
         jtfAddress.setPreferredSize(new java.awt.Dimension(265, 23));
         jPanel1.add(jtfAddress);
@@ -120,91 +119,81 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
 
         add(jPanel1);
 
-        jPanel2.setLayout(new java.awt.FlowLayout(0, 2, 0));
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlStreet.setText("Calle:");
         jlStreet.setPreferredSize(new java.awt.Dimension(85, 23));
         jPanel2.add(jlStreet);
 
-        jtfStreet.setText("CALLE");
         jtfStreet.setToolTipText("Calle");
         jtfStreet.setPreferredSize(new java.awt.Dimension(265, 23));
         jPanel2.add(jtfStreet);
 
-        jtfStreetNumberExt.setText("NUM EXT");
         jtfStreetNumberExt.setToolTipText("Número exterior");
         jtfStreetNumberExt.setPreferredSize(new java.awt.Dimension(65, 23));
         jPanel2.add(jtfStreetNumberExt);
 
-        jtfStreetNumberInt.setText("NUM INT");
         jtfStreetNumberInt.setToolTipText("Número interior");
         jtfStreetNumberInt.setPreferredSize(new java.awt.Dimension(65, 23));
         jPanel2.add(jtfStreetNumberInt);
 
         add(jPanel2);
 
-        jPanel3.setLayout(new java.awt.FlowLayout(0, 2, 0));
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlNeighbordhood.setText("Colonia:");
         jlNeighbordhood.setPreferredSize(new java.awt.Dimension(85, 23));
         jPanel3.add(jlNeighbordhood);
 
-        jtfNeighborhood.setText("COLONIA");
         jtfNeighborhood.setToolTipText("Colonia");
         jtfNeighborhood.setPreferredSize(new java.awt.Dimension(265, 23));
         jPanel3.add(jtfNeighborhood);
 
-        jtfReference.setText("REFERENCIA");
         jtfReference.setToolTipText("Referencia");
         jtfReference.setPreferredSize(new java.awt.Dimension(133, 23));
         jPanel3.add(jtfReference);
 
         add(jPanel3);
 
-        jPanel4.setLayout(new java.awt.FlowLayout(0, 2, 0));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlLocality.setText("Localidad:");
         jlLocality.setPreferredSize(new java.awt.Dimension(85, 23));
         jPanel4.add(jlLocality);
 
-        jtfLocality.setText("LOCALIDAD");
         jtfLocality.setToolTipText("Localidad");
         jtfLocality.setPreferredSize(new java.awt.Dimension(265, 23));
         jPanel4.add(jtfLocality);
 
-        jtfCounty.setText("MUNICIPIO");
         jtfCounty.setToolTipText("Municipio");
         jtfCounty.setPreferredSize(new java.awt.Dimension(133, 23));
         jPanel4.add(jtfCounty);
 
         add(jPanel4);
 
-        jPanel5.setLayout(new java.awt.FlowLayout(0, 2, 0));
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlState.setText("Estado:");
         jlState.setPreferredSize(new java.awt.Dimension(85, 23));
         jPanel5.add(jlState);
 
-        jtfState.setText("ESTADO");
         jtfState.setToolTipText("Estado");
         jtfState.setPreferredSize(new java.awt.Dimension(265, 23));
         jPanel5.add(jtfState);
 
         add(jPanel5);
 
-        jPanel6.setLayout(new java.awt.FlowLayout(0, 2, 0));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlZipCode.setText("Código postal:");
         jlZipCode.setPreferredSize(new java.awt.Dimension(85, 23));
         jPanel6.add(jlZipCode);
 
-        jtfZipCode.setText("CP");
-        jtfZipCode.setToolTipText("Código Postal");
+        jtfZipCode.setToolTipText("Código postal");
         jtfZipCode.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel6.add(jtfZipCode);
 
-        jtfPoBox.setText("AP");
-        jtfPoBox.setToolTipText("Apartado Postal");
+        jtfPoBox.setToolTipText("Apartado postal");
         jtfPoBox.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel6.add(jtfPoBox);
 
@@ -221,7 +210,7 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         jPanel6.add(jbFkCountryId_n);
 
         jbEditCountry.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
-        jbEditCountry.setToolTipText("Modificar idioma");
+        jbEditCountry.setToolTipText("Modificar país");
         jbEditCountry.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jbEditCountry.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel6.add(jbEditCountry);

@@ -69,8 +69,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
     private erp.mbps.data.SDataBizPartner moBizPartner;
     private erp.lib.form.SFormField moFieldFkBizPartnerIdentityTypeId;
-    private erp.lib.form.SFormField moFieldFirstName;
     private erp.lib.form.SFormField moFieldLastName;
+    private erp.lib.form.SFormField moFieldFirstName;
     private erp.lib.form.SFormField moFieldBizPartner;
     private erp.lib.form.SFormField moFieldBizPartnerCommercial;
     private erp.lib.form.SFormField moFieldFiscalId;
@@ -170,12 +170,12 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jPanel18 = new javax.swing.JPanel();
         jlFkTaxIdentityTypeId = new javax.swing.JLabel();
         jcbFkTaxIdentityTypeId = new javax.swing.JComboBox<SFormComponentItem>();
-        jPanel2 = new javax.swing.JPanel();
-        jlFirstName = new javax.swing.JLabel();
-        jtfFirstName = new javax.swing.JTextField();
         jPanel28 = new javax.swing.JPanel();
         jlLastName = new javax.swing.JLabel();
         jtfLastName = new javax.swing.JTextField();
+        jPanel2 = new javax.swing.JPanel();
+        jlFirstName = new javax.swing.JLabel();
+        jtfFirstName = new javax.swing.JTextField();
         jPanel32 = new javax.swing.JPanel();
         jlBizPartner = new javax.swing.JLabel();
         jtfBizPartner = new javax.swing.JTextField();
@@ -378,37 +378,34 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         jPanel13.add(jPanel18);
 
-        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlFirstName.setText("Nombre(s): *");
-        jlFirstName.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel2.add(jlFirstName);
-
-        jtfFirstName.setText("NOMBRES");
-        jtfFirstName.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel2.add(jtfFirstName);
-
-        jPanel13.add(jPanel2);
-
         jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlLastName.setText("Apellido(s): *");
         jlLastName.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel28.add(jlLastName);
 
-        jtfLastName.setText("APELLIDOS");
         jtfLastName.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel28.add(jtfLastName);
 
         jPanel13.add(jPanel28);
 
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFirstName.setText("Nombre(s): *");
+        jlFirstName.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel2.add(jlFirstName);
+
+        jtfFirstName.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel2.add(jtfFirstName);
+
+        jPanel13.add(jPanel2);
+
         jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBizPartner.setText("Nombre: *");
+        jlBizPartner.setText("Razón social: *");
         jlBizPartner.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel32.add(jlBizPartner);
 
-        jtfBizPartner.setText("ASOCIADO DE NEGOCIOS");
         jtfBizPartner.setPreferredSize(new java.awt.Dimension(354, 23));
         jPanel32.add(jtfBizPartner);
 
@@ -420,7 +417,6 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jlBizPartnerCommercial.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel34.add(jlBizPartnerCommercial);
 
-        jtfBizPartnerCommercial.setText("NOMBRE COMERCIAL");
         jtfBizPartnerCommercial.setPreferredSize(new java.awt.Dimension(354, 23));
         jPanel34.add(jtfBizPartnerCommercial);
 
@@ -438,7 +434,6 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jlFiscalId.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel33.add(jlFiscalId);
 
-        jtfFiscalId.setText("RFC");
         jtfFiscalId.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel33.add(jtfFiscalId);
 
@@ -447,7 +442,6 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jlAlternativeId.setPreferredSize(new java.awt.Dimension(54, 23));
         jPanel33.add(jlAlternativeId);
 
-        jftAlternativeId.setText("CURP");
         jftAlternativeId.setFocusLostBehavior(javax.swing.JFormattedTextField.PERSIST);
         jftAlternativeId.setPreferredSize(new java.awt.Dimension(125, 23));
         jftAlternativeId.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -462,7 +456,6 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jlFiscalFrgId.setPreferredSize(new java.awt.Dimension(60, 23));
         jPanel33.add(jlFiscalFrgId);
 
-        jtfFiscalFrgId.setText("ID FISCAL");
         jtfFiscalFrgId.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel33.add(jtfFiscalFrgId);
 
@@ -817,7 +810,6 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jlWeb.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel5.add(jlWeb);
 
-        jtfWeb.setText("WEB SITE");
         jtfWeb.setPreferredSize(new java.awt.Dimension(340, 23));
         jPanel5.add(jtfWeb);
 
@@ -829,7 +821,6 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jlNotes.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel22.add(jlNotes);
 
-        jtfNotes.setText("NOTES");
         jtfNotes.setPreferredSize(new java.awt.Dimension(340, 23));
         jPanel22.add(jtfNotes);
 
@@ -1168,12 +1159,12 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         moFieldFkBizPartnerIdentityTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkBizPartnerIdentityTypeId, jlFkBizPartnerIdentityTypeId);
         moFieldFkBizPartnerIdentityTypeId.setTabbedPaneIndex(0, jTabbedPane1);
-        moFieldFirstName = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfFirstName, jlFirstName);
-        moFieldFirstName.setTabbedPaneIndex(0, jTabbedPane1);
-        moFieldFirstName.setLengthMax(100);
         moFieldLastName = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfLastName, jlLastName);
         moFieldLastName.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldLastName.setLengthMax(100);
+        moFieldFirstName = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfFirstName, jlFirstName);
+        moFieldFirstName.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldFirstName.setLengthMax(100);
         moFieldBizPartner = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfBizPartner, jlBizPartner);
         moFieldBizPartner.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldBizPartner.setLengthMax(202);
@@ -2546,8 +2537,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moFieldFkBizPartnerIdentityTypeId.setFieldValue(new int[] { moBizPartner.getFkBizPartnerIdentityTypeId() });
         renderBizPartnerSettings();
         renderTaxIdentity();
-        moFieldFirstName.setFieldValue(moBizPartner.getFirstname());
         moFieldLastName.setFieldValue(moBizPartner.getLastname());
+        moFieldFirstName.setFieldValue(moBizPartner.getFirstname());
         if (moBizPartner.getFkBizPartnerIdentityTypeId() == SDataConstantsSys.BPSS_TP_BP_IDY_PER) {
             moFieldBizPartner.setFieldValue("");
         }
@@ -2719,13 +2710,13 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moBizPartner.setFkBizPartnerIdentityTypeId(moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0]);
 
         if (moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER) {
-            moBizPartner.setFirstname(moFieldFirstName.getString());
             moBizPartner.setLastname(moFieldLastName.getString());
+            moBizPartner.setFirstname(moFieldFirstName.getString());
             moBizPartner.setBizPartner(moFieldLastName.getString().trim() + ", " + moFieldFirstName.getString().trim());
         }
         else {
-            moBizPartner.setFirstname("");
             moBizPartner.setLastname("");
+            moBizPartner.setFirstname("");
             moBizPartner.setBizPartner(moFieldBizPartner.getString());
         }
 

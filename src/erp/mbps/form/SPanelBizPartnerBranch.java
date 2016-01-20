@@ -180,7 +180,6 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         jlBizPartnerBranch.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel5.add(jlBizPartnerBranch);
 
-        jtfBizPartnerBranch.setText("NOM SUC");
         jtfBizPartnerBranch.setPreferredSize(new java.awt.Dimension(239, 23));
         jPanel5.add(jtfBizPartnerBranch);
 
@@ -205,7 +204,7 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         jPanel10.add(jlFkAddressFormatTypeId_n);
 
         jcbFkAddressFormatTypeId_n.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkAddressFormatTypeId_n.setPreferredSize(new java.awt.Dimension(240, 23));
+        jcbFkAddressFormatTypeId_n.setPreferredSize(new java.awt.Dimension(239, 23));
         jPanel10.add(jcbFkAddressFormatTypeId_n);
 
         jpBranch.add(jPanel10);
@@ -216,15 +215,12 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         jlTelephone01.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel3.add(jlTelephone01);
 
-        jtfTelAreaCode01.setText("CODE");
         jtfTelAreaCode01.setPreferredSize(new java.awt.Dimension(40, 23));
         jPanel3.add(jtfTelAreaCode01);
 
-        jtfTelNumber01.setText("NUMBER");
         jtfTelNumber01.setPreferredSize(new java.awt.Dimension(80, 23));
         jPanel3.add(jtfTelNumber01);
 
-        jtfTelExt01.setText("EXT");
         jtfTelExt01.setPreferredSize(new java.awt.Dimension(40, 23));
         jPanel3.add(jtfTelExt01);
 
@@ -240,15 +236,12 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         jlTelephone02.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel7.add(jlTelephone02);
 
-        jtfTelAreaCode02.setText("CODE");
         jtfTelAreaCode02.setPreferredSize(new java.awt.Dimension(40, 23));
         jPanel7.add(jtfTelAreaCode02);
 
-        jtfTelNumber02.setText("NUMBER");
         jtfTelNumber02.setPreferredSize(new java.awt.Dimension(80, 23));
         jPanel7.add(jtfTelNumber02);
 
-        jtfTelExt02.setText("EXT");
         jtfTelExt02.setPreferredSize(new java.awt.Dimension(40, 23));
         jPanel7.add(jtfTelExt02);
 
@@ -264,15 +257,12 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         jlTelephone03.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel8.add(jlTelephone03);
 
-        jtfTelAreaCode03.setText("CODE");
         jtfTelAreaCode03.setPreferredSize(new java.awt.Dimension(40, 23));
         jPanel8.add(jtfTelAreaCode03);
 
-        jtfTelNumber03.setText("NUMBER");
         jtfTelNumber03.setPreferredSize(new java.awt.Dimension(80, 23));
         jPanel8.add(jtfTelNumber03);
 
-        jtfTelExt03.setText("EXT");
         jtfTelExt03.setPreferredSize(new java.awt.Dimension(40, 23));
         jPanel8.add(jtfTelExt03);
 
@@ -288,7 +278,6 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         jlEmail.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel9.add(jlEmail);
 
-        jtfEmail.setText("E-MAIL");
         jtfEmail.setPreferredSize(new java.awt.Dimension(240, 23));
         jPanel9.add(jtfEmail);
 
