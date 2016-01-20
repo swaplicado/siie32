@@ -24,6 +24,8 @@ build/
 dist/
 nbproject/
 test/
+cfd/
+reps/img/
 build.xml
 manifest.mf
 Thumbs.db
@@ -31,5 +33,3 @@ Thumbs.db
 sa*.xml
 config*.xml
 *.jrxml
-cfd/
-reps/*.jpg
