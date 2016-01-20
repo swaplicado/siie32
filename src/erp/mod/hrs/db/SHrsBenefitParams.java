@@ -20,8 +20,9 @@ public class SHrsBenefitParams {
     protected int mnPayrollId;
     protected int mnEarningId;
     protected int mnEarningComputationTypeId;
+    protected boolean mbIsDaysAdjustment;
 
-    public SHrsBenefitParams(SDbBenefitTable benefit, SDbBenefitTable benefitAux, SDbEmployee employee, SHrsPayrollReceipt hrsPayrollReceipt, Date dateCut, int earningId, int earningComputationType) {
+    public SHrsBenefitParams(SDbBenefitTable benefit, SDbBenefitTable benefitAux, SDbEmployee employee, SHrsPayrollReceipt hrsPayrollReceipt, Date dateCut, int earningId, int earningComputationType, boolean isDaysAdjustment) {
         moBenefit = benefit;
         moBenefitAux = benefitAux;
         moEmployee = employee;
@@ -31,6 +32,7 @@ public class SHrsBenefitParams {
         mnPayrollId = 0;
         mnEarningId = earningId;
         mnEarningComputationTypeId = earningComputationType;
+        mbIsDaysAdjustment = isDaysAdjustment;
     }
 
     public void setBenefit(SDbBenefitTable o) { moBenefit = o; }
@@ -41,6 +43,7 @@ public class SHrsBenefitParams {
     public void setPayrollId(int n) { mnPayrollId = n; }
     public void setEarningId(int n) { mnEarningId = n; }
     public void setEarningComputationTypeId(int n) { mnEarningComputationTypeId = n; }
+    public void setIsDaysAdjustment(boolean b) { mbIsDaysAdjustment = b; }
 
     public SDbBenefitTable getBenefit() { return moBenefit; }
     public SDbBenefitTable getBenefitAux() { return moBenefitAux; }
@@ -50,4 +53,5 @@ public class SHrsBenefitParams {
     public int getPayrollId() { return mnPayrollId; }
     public int getEarningId() { return mnEarningId; }
     public int getEarningComputationTypeId() { return mnEarningComputationTypeId; }
+    public boolean isDaysAdjustment() { return mbIsDaysAdjustment; }
 }

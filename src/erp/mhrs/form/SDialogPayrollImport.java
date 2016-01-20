@@ -1138,8 +1138,9 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                                     "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
                                     "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
                                     "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
+                                    "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
                                     "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " " +
-                                    "AND ear.id_ear = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") " + ((nF_id_tipo == SModSysConsts.HRSS_TP_ACC_EMP) ? ("AND emp.id_emp = " + nF_id_ref + " ") : "") + //AND emp.id_emp IN (" + sEmployees + ") " +
+                                    "AND ear.id_ear = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") " + ((nF_id_tipo == SModSysConsts.HRSS_TP_ACC_EMP) ? ("AND emp.id_emp = " + nF_id_ref + " ") : (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_DEP) ? ("AND d.id_dep = " + nF_id_ref + " ") : "") + //AND emp.id_emp IN (" + sEmployees + ") " +
                                     "GROUP BY ear.id_ear, ear.name_abbr, bp.id_bp, bp.bp " +
                                     "ORDER BY f_id_tipo_rec, id_ear, f_ref; ";
                         sType = "percepción";
@@ -1182,8 +1183,9 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                                     "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
                                     "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
                                     "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
+                                    "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
                                     "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " " +
-                                    "AND ded.id_ded = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") " + ((nF_id_tipo == SModSysConsts.HRSS_TP_ACC_EMP) ? ("AND emp.id_emp = " + nF_id_ref + " ") : "") + //AND emp.id_emp IN (" + sEmployees + ") " +
+                                    "AND ded.id_ded = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") " + ((nF_id_tipo == SModSysConsts.HRSS_TP_ACC_EMP) ? ("AND emp.id_emp = " + nF_id_ref + " ") : (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_DEP) ? ("AND d.id_dep = " + nF_id_ref + " ") : "") + //AND emp.id_emp IN (" + sEmployees + ") " +
                                     "GROUP BY ded.id_ded, ded.name_abbr, bp.id_bp, bp.bp " +
                                     "ORDER BY f_id_tipo_rec, id_ded, f_ref; ";
                         sType = "deducción";

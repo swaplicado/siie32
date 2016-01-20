@@ -495,9 +495,12 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
         moDateDate.setValue(moRegistry.getDate());
         moDateDateStart.setValue(moRegistry.getDateStart());
         moDateDateEnd.setValue(moRegistry.getDateEnd());
-        moIntEffectiveDays.setValue(moRegistry.getEffectiveDays());
         jsAnniversary.setValue((Integer) moRegistry.getBenefitsAniversary() == 0 ? (Integer) 1 : (Integer) moRegistry.getBenefitsAniversary());
         moIntBenefitYear.setValue(moRegistry.getBenefitsYear());
+        moIntDaysToPaidTable.setValue(0);
+        moIntScheduledDays.setValue(0);
+        moIntEffectiveDays.setValue(moRegistry.getEffectiveDays());
+        
         moTextNotes.setValue(moRegistry.getNotes());
         moBoolClosed.setValue(moRegistry.isClosed());
 

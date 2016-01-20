@@ -1019,6 +1019,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
             populateDeductions();
         }
         else {
+            computeTotal();
             moGridDeductionRow.renderGridRows();
             moGridDeductionRow.setSelectedGridRow(0);
         }
@@ -1148,7 +1149,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         }
         
         // Create benefit params:
-        benefitParams = new SHrsBenefitParams(benefitTable, benefitTableAux, moReceipt.getHrsEmployee().getEmployee(), moReceipt, datecut, earning.getPkEarningId(), earning.getFkEarningComputationTypeId());
+        benefitParams = new SHrsBenefitParams(benefitTable, benefitTableAux, moReceipt.getHrsEmployee().getEmployee(), moReceipt, datecut, earning.getPkEarningId(), earning.getFkEarningComputationTypeId(), earning.isDaysAdjustment());
         
         dialogHrsBenefit = new SDialogHrsBenefit(miClient, benefitType, "Agregar prestación");
         dialogHrsBenefit.setValue(SGuiConsts.PARAM_ROWS, benefitParams);

@@ -558,7 +558,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
 
         sql = "SELECT id_emp, id_abs, eff_day " +
             "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " " +
-            "WHERE b_del = 0 AND id_emp = " + employeeId + " " +
+            "WHERE b_del = 0 AND b_clo = 0 AND id_emp = " + employeeId + " " +
             "ORDER BY dt_sta, id_emp, id_abs ";
 
         resultSet = statement.executeQuery(sql);

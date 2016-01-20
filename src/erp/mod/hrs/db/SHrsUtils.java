@@ -1174,7 +1174,7 @@ public abstract class SHrsUtils {
         String sql = "";
         ResultSet resultSet = null;
         
-        sql = "SELECT fk_tp_ben, ben_ann, ben_year, SUM(unt) AS f_val_payed, " +
+        sql = "SELECT fk_tp_ben, ben_ann, ben_year, SUM(unt_all) AS f_val_payed, " +
                 "SUM(amt_r) AS f_amt_payed " +
                 "FROM hrs_pay_rcp_ear " +
                 "WHERE b_del = 0 AND id_emp = " + employee.getPkEmployeeId() + " AND id_pay <> " + payrrollId + " AND fk_tp_ben = " + benefitType + " AND ben_ann <= " + aniversaryLimit + " " +

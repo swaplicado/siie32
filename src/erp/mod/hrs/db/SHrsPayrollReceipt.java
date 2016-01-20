@@ -1207,7 +1207,7 @@ public class SHrsPayrollReceipt {
         for (SHrsPayrollReceiptEarning hrsPayrollReceiptEarning : maHrsEarnings) {
             if (SLibUtils.compareKeys(new int[] { benefitType, benefitAnn, benefitYear }, new int[] { hrsPayrollReceiptEarning.getReceiptEarning().getFkBenefitTypeId(), 
                 hrsPayrollReceiptEarning.getReceiptEarning().getBenefitAniversary(), hrsPayrollReceiptEarning.getReceiptEarning().getBenefitYear() })) {
-                value += hrsPayrollReceiptEarning.getReceiptEarning().getUnits();
+                value += hrsPayrollReceiptEarning.getReceiptEarning().getUnitsAlleged();
             }
         }
 

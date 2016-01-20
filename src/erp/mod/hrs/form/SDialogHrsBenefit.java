@@ -59,6 +59,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ChangeListener
     protected Date mtDateCut;
     protected int mnEarningComputationTypeId;
     protected boolean mbIsEditAmount;
+    protected boolean mbIsDaysAdjustment;
 
     /**
      * Creates new form SDialogHrsBenefit
@@ -507,7 +508,10 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ChangeListener
     }
     
     private void actionCalculateAmount() {
-        moCurAmount.getField().setValue(moDecDaysToPaid.getValue() * moHrsPayrollReceipt.getReceipt().getPaymentDaily() * (mnFormType == SModSysConsts.HRSS_TP_BEN_VAC_BON ? moDecBonusPercentageTable.getValue() : 1));
+        double units = 0;
+        
+        units = (!mbIsDaysAdjustment ? moDecDaysToPaid.getValue() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : moDecDaysToPaid.getValue() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid());
+        moCurAmount.getField().setValue(units * moHrsPayrollReceipt.getReceipt().getPaymentDaily() * (mnFormType == SModSysConsts.HRSS_TP_BEN_VAC_BON ? moDecBonusPercentageTable.getValue() : 1));
     }
     
     private void actionStateChangeAnniversary() {
@@ -551,6 +555,9 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ChangeListener
             if (benefitAnn == 0) {
                 actionStateChangeAnniversary();
                 actionProportinalDays();
+            }
+            else {
+                actionStateChangeAnniversary();
             }
         }
         catch (Exception e) {
@@ -668,6 +675,9 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ChangeListener
     }
     
     private void createHrsBenefit() {
+        double units = 0;
+        
+        units = (!mbIsDaysAdjustment ? moDecDaysToPaid.getValue() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : moDecDaysToPaid.getValue() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid());
         moHrsBenefit = new SHrsBenefit(mnFormType, (Integer) jsAnniversary.getValue(), mnBenefitYear);
         
         for (SHrsBenefit hrsBenefit : maHrsBenefits) {
@@ -682,7 +692,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ChangeListener
         moHrsBenefit.setEditAmount(mbIsEditAmount);
         moHrsBenefit.setValuePayedReceipt(moDecDaysToPaid.getValue());
         moHrsBenefit.setAmountPayedReceipt(moCurAmount.getField().getValue());
-        moHrsBenefit.setAmountPayedReceiptSys(SLibUtils.round(moDecDaysToPaid.getValue() * moHrsPayrollReceipt.getReceipt().getPaymentDaily() * (mnFormType == SModSysConsts.HRSS_TP_BEN_VAC_BON ? moDecBonusPercentageTable.getValue() : 1), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
+        moHrsBenefit.setAmountPayedReceiptSys(SLibUtils.round(units * moHrsPayrollReceipt.getReceipt().getPaymentDaily() * (mnFormType == SModSysConsts.HRSS_TP_BEN_VAC_BON ? moDecBonusPercentageTable.getValue() : 1), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
     }
 
     @Override
@@ -693,14 +703,16 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ChangeListener
     public SGuiValidation validateForm() {
         double amountSys = 0;
         double daysDiff = 0;
+        double units = 0;
         mbIsEditAmount = false;
         String msg = "";
         SGuiValidation validation = moFields.validateFields();
 
+        units = (!mbIsDaysAdjustment ? moDecDaysToPaid.getValue() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : moDecDaysToPaid.getValue() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid());
         try {
             if (validation.isValid()) {
                 daysDiff = moIntDaysToPaidTable.getValue() - (moDecDaysPayed.getValue() + moDecDaysToPaid.getValue());
-                amountSys = SLibUtils.round(moDecDaysToPaid.getValue() * moHrsPayrollReceipt.getReceipt().getPaymentDaily() * (mnFormType == SModSysConsts.HRSS_TP_BEN_VAC_BON ? moDecBonusPercentageTable.getValue() : 1), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                amountSys = SLibUtils.round(units * moHrsPayrollReceipt.getReceipt().getPaymentDaily() * (mnFormType == SModSysConsts.HRSS_TP_BEN_VAC_BON ? moDecBonusPercentageTable.getValue() : 1), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
         
                 createHrsBenefit();
                 
@@ -823,6 +835,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ChangeListener
                 mtDateCut = moHrsBenefitParams.getDateCut();
                 moHrsPayrollReceipt = moHrsBenefitParams.getHrsPayrollReceipt();
                 mnEarningComputationTypeId = moHrsBenefitParams.getEarningComputationTypeId();
+                mbIsDaysAdjustment = moHrsBenefitParams.isDaysAdjustment();
                 
                 try {
                     loadBenefitTables(moHrsBenefitParams.getBenefit(), moHrsBenefitParams.getBenefitAux());

@@ -193,7 +193,7 @@ public class SViewAccountMoves extends erp.lib.table.STableTab {
                 "INNER JOIN erp.fins_cls_acc_mov AS cl ON re.fid_tp_acc_mov = cl.id_tp_acc_mov AND re.fid_cl_acc_mov = cl.id_cl_acc_mov AND re.fid_cls_acc_mov = cl.id_cls_acc_mov " +
                 "LEFT OUTER JOIN fin_cc AS cc ON re.fid_cc_n = cc.id_cc " +
                 "LEFT OUTER JOIN erp.itmu_item AS i ON re.fid_item_n = i.id_item " +
-                "WHERE " + sqlDatePeriod + sqlWhere + " AND re.b_del = 0 " +
+                "WHERE " + sqlDatePeriod + sqlWhere + " AND r.b_del = 0 AND re.b_del = 0 " +
                 "ORDER by r.id_year, r.id_per, bkc.code, r.id_bkc, r.id_tp_rec, r.id_num, r.dt, f.id_acc, cc.id_cc, i.item_key ";
     }
 

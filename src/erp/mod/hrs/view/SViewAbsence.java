@@ -9,10 +9,13 @@ import erp.mod.hrs.db.SDbAbsence;
 import erp.mod.hrs.form.SDialogAbsenceMovesCardex;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
@@ -32,6 +35,7 @@ import sa.lib.gui.SGuiDate;
 public class SViewAbsence extends SGridPaneView implements ActionListener {
 
     private SGridFilterDatePeriod moFilterDatePeriod;
+    private JButton jbCloseAbsence;
     private JButton jbCardex;
     
     private SDialogAbsenceMovesCardex moDialogAbsenceMovesCardex;
@@ -49,11 +53,13 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
     private void initComponentsCustom() {
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_YEAR, miClient.getSession().getCurrentDate().getTime()));
+        jbCloseAbsence = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_ok.gif")), "Cerrar incidencia", this);
         jbCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver movimientos", this);
         
         moDialogAbsenceMovesCardex = new SDialogAbsenceMovesCardex(miClient, "Movimientos de la incidencia");
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCloseAbsence);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCardex);
     }
 
@@ -64,6 +70,46 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
     /*
      * Overriden methods
      */
+
+    /*
+     * Private methods
+     */
+
+    private void actionCloseAbsence() {
+        SDbAbsence absence = null;
+
+        if (jbCloseAbsence.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                try {
+                    SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                    absence = (SDbAbsence) miClient.getSession().readRegistry(SModConsts.HRS_ABS, gridRow.getRowPrimaryKey());
+
+                    if (miClient.showMsgBoxConfirm("Está por cerrar la incidencia '" + absence.getNumber() + "'.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                        absence.setClosed(!absence.isClosed());
+                        absence.setFkUserClosedId(miClient.getSession().getUser().getPkUserId());
+                        if (absence.canSave(miClient.getSession())) {
+                            absence.save(miClient.getSession());
+                        }
+                        else {
+                            miClient.showMsgBoxWarning(absence.getQueryResult());
+                        }
+
+                        miClient.getSession().notifySuscriptors(mnGridType);
+                    }
+                }
+                catch (SQLException e) {
+                    SLibUtils.showException(this, e);
+                }
+                catch (Exception e) {
+                    SLibUtils.showException(this, e);
+                }
+            }
+        }
+    }
 
     private void actionShowCardex() {
         SDbAbsence absence = null;
@@ -188,7 +234,10 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
 
-            if (button == jbCardex) {
+            if (button == jbCloseAbsence) {
+                actionCloseAbsence();
+            }
+            else if (button == jbCardex) {
                 actionShowCardex();
             }
         }

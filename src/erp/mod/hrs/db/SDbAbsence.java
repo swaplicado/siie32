@@ -240,6 +240,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
         if (mbRegistryNew) {
             computePrimaryKey(session);
             mbDeleted = false;
+            mbClosed = false;
             mnFkUserInsertId = session.getUser().getPkUserId();
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
 

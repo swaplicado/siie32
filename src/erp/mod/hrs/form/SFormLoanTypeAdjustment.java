@@ -82,7 +82,7 @@ public class SFormLoanTypeAdjustment extends SBeanForm {
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlAdjustment.setText("Ajuste:*");
+        jlAdjustment.setText("Ajuste mensual:*");
         jlAdjustment.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel6.add(jlAdjustment);
         jPanel6.add(moCurAdjustment);

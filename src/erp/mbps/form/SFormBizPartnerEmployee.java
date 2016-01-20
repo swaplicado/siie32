@@ -546,13 +546,13 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         jPanel3.add(jPanel10);
 
-        jckChangeWage.setText("Cambiar sueldo");
+        jckChangeWage.setText("Cambiar sueldo mensual");
         jckChangeWage.setFocusable(false);
         jPanel3.add(jckChangeWage);
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlWage.setText("Sueldo:*");
+        jlWage.setText("Sueldo mensual:*");
         jlWage.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel16.add(jlWage);
 

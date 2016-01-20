@@ -150,10 +150,10 @@ public class SViewCfdSendingLog extends erp.lib.table.STableTab implements java.
         }
         
         if (isCfdiPayroll()) {
-            msSql = "SELECT dx.id_cfd, p.id_pay, p.dt_end AS f_dt, pe.id_emp, pe.num_ser, pe.num, " +
+            msSql = "SELECT dx.id_cfd, p.id_pay, p.dt_end AS f_dt, pe.id_emp, pes.num_ser, pes.num, " +
                     (isCfdiPayrollVersionOld() ? "p.pay_num, p.pay_year, p.pay_per, p.pay_type, p.dt_beg, pe.fid_bpr_n, " : 
                     "p.num, p.per_year, p.per, p.dt_sta, ") +
-                    "b.bp, '' AS f_cob_code, snd.dt, snd.snd_to, snd.ts, us.usr, CONCAT(pe.num_ser, IF(length(pe.num_ser) = 0, '', '-'), pe.num) AS f_num, tp.tp_cfd, " +
+                    "b.bp, '' AS f_cob_code, snd.dt, snd.snd_to, snd.ts, us.usr, CONCAT(pes.num_ser, IF(length(pes.num_ser) = 0, '', '-'), pes.num) AS f_num, tp.tp_cfd, " +
                     "SUM(" + (isCfdiPayrollVersionOld() ? "pe.debit " : "pe.ear_r ") + ") AS f_debit, " +
                     "SUM(" + (isCfdiPayrollVersionOld() ? "pe.credit " : "pe.ded_r ") + ") AS f_credit, " +
                     "SUM(" + (isCfdiPayrollVersionOld() ? "pe.debit - pe.credit " : "pe.pay_r ") + ") AS f_balance " +
@@ -163,14 +163,15 @@ public class SViewCfdSendingLog extends erp.lib.table.STableTab implements java.
                     "INNER JOIN hrs_sie_pay_emp AS pe ON pe.id_pay = dx.fid_pay_pay_n AND pe.id_emp = dx.fid_pay_emp_n AND pe.fid_bpr_n = dx.fid_pay_bpr_n AND pe.b_del = FALSE " +
                     "INNER JOIN hrs_sie_pay AS p ON p.id_pay = pe.id_pay " :
                     "INNER JOIN hrs_pay_rcp AS pe ON pe.id_pay = dx.fid_pay_rcp_pay_n AND pe.id_emp = dx.fid_pay_rcp_emp_n " +
-                    "INNER JOIN hrs_pay AS p ON p.id_pay = pe.id_pay ") +
+                    "INNER JOIN hrs_pay AS p ON p.id_pay = pe.id_pay " +
+                    "INNER JOIN hrs_pay_rcp_iss AS pes ON pes.id_pay = dx.fid_pay_rcp_pay_n AND pes.id_emp = dx.fid_pay_rcp_emp_n AND pes.id_iss = dx.fid_pay_rcp_iss_n ") +
                     "INNER JOIN erp.bpsu_bp AS b ON " + (isCfdiPayrollVersionOld() ? "pe.fid_bpr_n = b.id_bp " : "pe.id_emp = b.id_bp ") +
                     "INNER JOIN erp.trns_tp_cfd AS tp ON dx.fid_tp_cfd = tp.id_tp_cfd " +
                     "INNER JOIN erp.usru_usr AS us ON snd.fid_usr = us.id_usr " +
                     "WHERE pe.b_del = 0 AND dx.fid_tp_cfd = " + (isCfdiPayroll() ? SDataConstantsSys.TRNS_TP_CFD_PAY : SDataConstantsSys.TRNS_TP_CFD_CFD) + " " + sqlDatePeriod + sqlBizPartner +
-                    "GROUP BY id_cfd, tp.tp_cfd, pe.num_ser, pe.num, p.dt_end, b.bp, " + (isCfdiPayrollVersionOld() ? "pe.fid_bpr_n, " : "pe.id_emp, ") + " snd.id_snd " +
+                    "GROUP BY id_cfd, tp.tp_cfd, pes.num_ser, pes.num, p.dt_end, b.bp, " + (isCfdiPayrollVersionOld() ? "pe.fid_bpr_n, " : "pe.id_emp, ") + " snd.id_snd " +
                     "HAVING id_cfd <> 0 " +
-                    "ORDER BY id_cfd, tp.tp_cfd, pe.num_ser, pe.num, p.dt_end, b.bp, " + (isCfdiPayrollVersionOld() ? "pe.fid_bpr_n, " : "pe.id_emp, ") + " snd.id_snd ";
+                    "ORDER BY id_cfd, tp.tp_cfd, pes.num_ser, pes.num, p.dt_end, b.bp, " + (isCfdiPayrollVersionOld() ? "pe.fid_bpr_n, " : "pe.id_emp, ") + " snd.id_snd ";
         }
         else {
             msSql = "SELECT dx.id_cfd, d.id_year, d.id_doc, d.dt AS f_dt, d.dt_doc_delivery_n, d.b_close, d.b_del, d.ts_close, " +
