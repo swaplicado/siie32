@@ -1460,10 +1460,10 @@ public abstract class STrnUtilities {
                 }
 
                 if (canSend) {
-                    pdf = new File(oDps.getNumberSeries() +
+                    pdf = new File("temp", oDps.getNumberSeries() +
                     (oDps.getNumberSeries().isEmpty() ? "" : "_") + oDps.getNumber() + ".pdf");
 
-                    createReportOrder(client, oDps, SDataConstantsPrint.PRINT_MODE_PDF);
+                    createReportOrder(client, pdf, oDps, SDataConstantsPrint.PRINT_MODE_PDF);
 
                     mail.getAttachments().add(pdf);
                     mail.send();
@@ -1936,7 +1936,7 @@ public abstract class STrnUtilities {
         }
     }
     
-    public static void createReportOrder(final SClientInterface client, final SDataDps dps, final int pnPrintMode) {
+    public static void createReportOrder(final SClientInterface client, final File file, final SDataDps dps, final int pnPrintMode) {
         Cursor cursor = null;
         String sUserBuyer = "";
         String sUserAuthorize = "";
@@ -2044,8 +2044,7 @@ public abstract class STrnUtilities {
                     jasperViewer.setVisible(true);
                     break;
                 case SDataConstantsPrint.PRINT_MODE_PDF:
-                    outputStreamPdf = new FileOutputStream(dps.getNumberSeries() +
-                    (dps.getNumberSeries().isEmpty() ? "" : "_") + dps.getNumber() + ".pdf");
+                    outputStreamPdf = new FileOutputStream(file);
 
                     JasperExportManager.exportReportToPdfStream(jasperPrint, outputStreamPdf);
 

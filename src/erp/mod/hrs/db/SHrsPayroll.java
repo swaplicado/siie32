@@ -23,6 +23,7 @@ public class SHrsPayroll {
     protected SDbPayroll moPayroll;
     protected SHrsPayrollDataProvider moPayrollDataProvider;
 
+    protected ArrayList<SDbLoanTypeAdjustment> maLoanTypeAdjustment;
     protected ArrayList<SDbHoliday> maHolidays;
     protected ArrayList<SDbTaxTable> maTaxTables;
     protected ArrayList<SDbTaxSubsidyTable> maTaxSubsidyTables;
@@ -45,6 +46,7 @@ public class SHrsPayroll {
         moPayroll = null;
         moPayrollDataProvider = null;
 
+        maLoanTypeAdjustment = new ArrayList<SDbLoanTypeAdjustment>();
         maHolidays = new ArrayList<SDbHoliday>();
         maTaxTables = new ArrayList<SDbTaxTable>();
         maTaxSubsidyTables = new ArrayList<SDbTaxSubsidyTable>();
@@ -453,6 +455,7 @@ public class SHrsPayroll {
     public SDbWorkingDaySettings getWorkingDaySettings() { return moWorkingDaySettings; }
     public SDbPayroll getPayroll() { return moPayroll; }
 
+    public ArrayList<SDbLoanTypeAdjustment> getLoanTypeAdjustment() { return maLoanTypeAdjustment; }
     public ArrayList<SDbHoliday> getHolidays() { return maHolidays; }
     public ArrayList<SDbTaxTable> getTaxTables() { return maTaxTables; }
     public ArrayList<SDbTaxSubsidyTable> getTaxSubsidyTables() { return maTaxSubsidyTables; }
@@ -468,7 +471,20 @@ public class SHrsPayroll {
     public ArrayList<SHrsPayrollReceipt> getReceipts() { return maReceipts; }
     
     public boolean isLastPayrollPeriod() { return mbIsLastPayrollPeriod; }
+    
+    public double getLoanTypeAdjustment(final Date date, final int loanType) {
+        double amount = 0;
 
+        for (SDbLoanTypeAdjustment adjustment : maLoanTypeAdjustment) {
+            if (!date.before(adjustment.getDateStart()) && adjustment.getPkLoanTypeId() == loanType) {
+                amount = adjustment.getAdjustment();
+                break;
+            }
+        }
+
+        return amount;
+    }
+    
     public ArrayList<SDbHoliday> getHolidays(final Date dateStart, final Date dateEnd) {
         ArrayList<SDbHoliday> aHolidays = new ArrayList<SDbHoliday>();
 

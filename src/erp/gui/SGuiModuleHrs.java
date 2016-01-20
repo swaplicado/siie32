@@ -71,6 +71,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCatMwzType;
     private javax.swing.JMenuItem jmiCatMwzTypeWage;
     private javax.swing.JMenuItem jmiCatWorkerTypeSalary;
+    private javax.swing.JMenuItem jmiCatLoanTypeAdjustment;
     private javax.swing.JMenuItem jmiCatAbsenceType;
     private javax.swing.JMenuItem jmiCatAbsenceClass;
     
@@ -192,6 +193,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatEmployeeDismissType = new JMenuItem("Tipos de baja");
         jmiCatMwzType = new JMenuItem("Áreas geográficas");
         jmiCatWorkerTypeSalary = new JMenuItem("Salarios por tipo de obrero");
+        jmiCatLoanTypeAdjustment = new JMenuItem("Ajuste por tipo de crédito/préstamo");
         jmiCatMwzTypeWage = new JMenuItem("Salarios mínimos de áreas geográficas");
         jmiCatAbsenceType = new JMenuItem("Tipos de incidencia");
         jmiCatAbsenceClass = new JMenuItem("Clases de incidencia");
@@ -216,6 +218,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCat.add(jmiCatMwzType);
         jmCat.add(jmiCatMwzTypeWage);
         jmCat.add(jmiCatWorkerTypeSalary);
+        jmCat.add(jmiCatLoanTypeAdjustment);
         jmCat.addSeparator();
         jmCat.add(jmiCatAbsenceType);
         jmCat.add(jmiCatAbsenceClass);
@@ -356,6 +359,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatMwzType.addActionListener(this);
         jmiCatMwzTypeWage.addActionListener(this);
         jmiCatWorkerTypeSalary.addActionListener(this);
+        jmiCatLoanTypeAdjustment.addActionListener(this);
         jmiCatAbsenceType.addActionListener(this);
         jmiCatAbsenceClass.addActionListener(this);
         
@@ -440,6 +444,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatMwzType.setEnabled(true);
         jmiCatMwzTypeWage.setEnabled(true);
         jmiCatWorkerTypeSalary.setEnabled(true);
+        jmiCatLoanTypeAdjustment.setEnabled(true);
         jmiCatAbsenceType.setEnabled(true);
         jmiCatAbsenceClass.setEnabled(true);
         jmiPayAbsence.setEnabled(true);
@@ -766,6 +771,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiCatWorkerTypeSalary) {
                 miClient.getSession().showView(SModConsts.HRS_WRK_SAL, SLibConsts.UNDEFINED, null);
+            }
+            else if (item == jmiCatLoanTypeAdjustment) {
+                miClient.getSession().showView(SModConsts.HRS_TP_LOAN_ADJ, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiCatAbsenceType) {
                 miClient.getSession().showView(SModConsts.HRSU_TP_ABS, SLibConsts.UNDEFINED, null);

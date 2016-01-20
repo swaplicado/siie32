@@ -350,7 +350,7 @@ public class SHrsEmployee {
                 }
                 else {
                     daysNotWorkedNotPaid += absenceConsumption.getEffectiveDays();
-
+                    
                     if (absenceConsumption.getAbsence().getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_DIS) {
                         daysIncapacityNotPaidPayroll += absenceConsumption.getEffectiveDays();
                     }

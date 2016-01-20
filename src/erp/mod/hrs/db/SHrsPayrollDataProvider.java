@@ -31,6 +31,28 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
      * Private methods
      */
 
+    private ArrayList<SDbLoanTypeAdjustment> getLoanTypeAdjustment() throws Exception {
+        String sql = "";
+        SDbLoanTypeAdjustment adjustment = null;
+        ArrayList<SDbLoanTypeAdjustment> aAdjustments = new ArrayList<SDbLoanTypeAdjustment>();
+        ResultSet resultSet = null;
+        Statement statement = moSession.getDatabase().getConnection().createStatement();
+
+        sql = "SELECT * "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_TP_LOAN_ADJ) + " "
+                + "WHERE b_del = 0 "
+                + "ORDER BY dt_sta DESC, id_adj DESC ";
+
+        resultSet = statement.executeQuery(sql);
+        while (resultSet.next()) {
+            adjustment = new SDbLoanTypeAdjustment();
+            adjustment.read(moSession, new int[] { resultSet.getInt("id_tp_loan"), resultSet.getInt("id_adj") });
+            aAdjustments.add(adjustment);
+        }
+
+        return aAdjustments;
+    }
+    
     private ArrayList<SDbHoliday> getHolidays() throws Exception {
         String sql = "";
         SDbHoliday holiday = null;
@@ -712,6 +734,10 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         hrsPayroll.setPayroll(payroll);
         hrsPayroll.setLastPayrollPeriod(isLastPayrollForCredits(payroll.getPkPayrollId(), payroll.getPeriodYear(), payroll.getPeriod(), payroll.getFkPaymentTypeId()));
 
+        // LoanTypeAdjustment:
+
+        hrsPayroll.getLoanTypeAdjustment().addAll(getLoanTypeAdjustment());
+        
         // Holidays:
 
         hrsPayroll.getHolidays().addAll(getHolidays());

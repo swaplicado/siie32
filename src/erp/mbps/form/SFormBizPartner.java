@@ -1499,7 +1499,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     
     private void setFieldEnableEmployee(boolean enable) {
         jckIsAttEmployee.setEnabled(enable);
-        jckIsCategoryDeleted.setEnabled(enable);
+        jckIsCategoryDeleted.setEnabled(enable || (mnParamBizPartnerCategoryFilter == SDataConstantsSys.BPSS_CT_BP_SUP || mnParamBizPartnerCategoryFilter == SDataConstantsSys.BPSS_CT_BP_CUS));
         jckIsDeleted.setEnabled(enable);
     }
 
@@ -1516,10 +1516,10 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             moFieldFkBizPartnerCategoryId.setFieldValue(new int[] {SDataConstants.BPSX_BPB_CON_SUP});
         }
         else if (mnParamBizPartnerType == SDataConstants.BPSX_BP_SUP) {
-             moFieldFkBizPartnerCategoryId.setKey(new int [] {SDataConstantsSys.BPSS_CT_BP_SUP});
+            moFieldFkBizPartnerCategoryId.setKey(new int [] {SDataConstantsSys.BPSS_CT_BP_SUP});
          }
         else if (mnParamBizPartnerType == SDataConstants.BPSX_BP_CUS) {
-             moFieldFkBizPartnerCategoryId.setKey(new int [] {SDataConstantsSys.BPSS_CT_BP_CUS});
+            moFieldFkBizPartnerCategoryId.setKey(new int [] {SDataConstantsSys.BPSS_CT_BP_CUS});
         }
     }
 

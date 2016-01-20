@@ -1470,9 +1470,14 @@ public class SHrsPayrollReceipt {
             for (SDbAbsenceConsumption absenceConsumption : moHrsEmployee.getAbsencesConsumptions()) {
                 difDays = absenceConsumption.getEffectiveDays();
                 
+                /*
+                EXCLUIR LAS VACIONES COMO DIA NO TRABAJADOS PARA CALCULAR DIAS DEL PERIODO EN CREDITOS
+                */
+                
                 for (int i = 0; i < difDays; i++) {
                     if (SLibTimeUtils.isBelongingToPeriod(SLibTimeUtils.addDate(absenceConsumption.getDateStart(), 0, 0, i), year, periodYear) &&
-                        !absenceConsumption.getAbsence().IsAuxAbsencePayable()) {
+                        !absenceConsumption.getAbsence().IsAuxAbsencePayable() &&
+                        absenceConsumption.getAbsence().getFkAbsenceClassId() != SModSysConsts.HRSU_CL_ABS_VAC) {
                         daysPeriodPayrollNotWorkedNotPaid++;
                         
                         if (absenceConsumption.getAbsence().getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_DIS) {
@@ -1487,7 +1492,8 @@ public class SHrsPayrollReceipt {
                 
                 for (int i = 0; i < difDays; i++) {
                     if (SLibTimeUtils.isBelongingToPeriod(SLibTimeUtils.addDate(absenceConsumption.getDateStart(), 0, 0, i), year, periodYear) &&
-                        !absenceConsumption.getAbsence().IsAuxAbsencePayable()) {
+                        !absenceConsumption.getAbsence().IsAuxAbsencePayable() &&
+                        absenceConsumption.getAbsence().getFkAbsenceClassId() != SModSysConsts.HRSU_CL_ABS_VAC) {
                         daysPeriodPayrollNotWorkedNotPaid++;
                         
                         if (absenceConsumption.getAbsence().getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_DIS) {
