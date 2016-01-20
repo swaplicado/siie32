@@ -31,3 +31,4 @@ Thumbs.db
 sa*.xml
 config*.xml
 *.jrxml
+/cfd/
