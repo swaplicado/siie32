@@ -61,9 +61,9 @@ public abstract class SCfdConsts {
     public static final String PAYROLL_EXTRA_TIME_TYPE_DOUBLE = "003";
     public static final String PAYROLL_EXTRA_TIME_TYPE_TRIPLE = "004";
 
-    public static final String ERR_MSG_PROCESSING_WEB_SERVICE = "No se obtuvo respuesta del Proveedor Autorizado de Certificación.";
-    public static final String ERR_MSG_PROCESSING_XML_STORAGE = "No se pudo almacenar archivo XML en el disco.";
-    public static final String ERR_MSG_PROCESSING_PDF_STORAGE = "No se pudo almacenar archivo PDF en el disco.";
+    public static final String ERR_MSG_PROCESSING_WEB_SERVICE = "No se obtuvo respuesta del Proveedor Autorizado de Certificación (PAC).";
+    public static final String ERR_MSG_PROCESSING_XML_STORAGE = "No se pudo almacenar el archivo XML en el disco.";
+    public static final String ERR_MSG_PROCESSING_PDF_STORAGE = "No se pudo almacenar el archivo PDF en el disco.";
 
     public static final int CFDI_FILE_XML = 1;
     public static final int CFDI_FILE_PDF = 2;

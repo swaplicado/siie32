@@ -24,8 +24,8 @@ build/
 dist/
 nbproject/
 test/
-cfd/
-reps/img/
+/cfd/
+/reps/img/
 build.xml
 manifest.mf
 Thumbs.db
