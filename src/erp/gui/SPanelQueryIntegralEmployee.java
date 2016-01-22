@@ -246,6 +246,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jPanel13.add(jlFirstName);
 
         jtfFirstName.setEditable(false);
+        jtfFirstName.setText("X");
         jtfFirstName.setToolTipText("");
         jtfFirstName.setFocusable(false);
         jtfFirstName.setPreferredSize(new java.awt.Dimension(250, 23));
@@ -260,6 +261,8 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jPanel21.add(jlFiscalId);
 
         jtfFiscalId.setEditable(false);
+        jtfFiscalId.setText("X");
+        jtfFiscalId.setToolTipText("");
         jtfFiscalId.setFocusable(false);
         jtfFiscalId.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel21.add(jtfFiscalId);
@@ -269,6 +272,8 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jPanel21.add(jlAlternativeId);
 
         jtfAlternativeId.setEditable(false);
+        jtfAlternativeId.setText("X");
+        jtfAlternativeId.setToolTipText("");
         jtfAlternativeId.setFocusable(false);
         jtfAlternativeId.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel21.add(jtfAlternativeId);
@@ -279,6 +284,8 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jPanel21.add(jlSocialSecurityNumber);
 
         jtfSocialSecurityNumber.setEditable(false);
+        jtfSocialSecurityNumber.setText("X");
+        jtfSocialSecurityNumber.setToolTipText("");
         jtfSocialSecurityNumber.setFocusable(false);
         jtfSocialSecurityNumber.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel21.add(jtfSocialSecurityNumber);
@@ -300,7 +307,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jLabel4.setPreferredSize(new java.awt.Dimension(20, 23));
         jPanel22.add(jLabel4);
 
-        jlDateBenefits.setText("Fecha beneficios:");
+        jlDateBenefits.setText("Beneficios:");
         jlDateBenefits.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel22.add(jlDateBenefits);
 
@@ -327,7 +334,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jLabel7.setPreferredSize(new java.awt.Dimension(20, 23));
         jPanel15.add(jLabel7);
 
-        jlDateLastDismiss_n.setText("Fecha última baja:");
+        jlDateLastDismiss_n.setText("Última baja:");
         jlDateLastDismiss_n.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel15.add(jlDateLastDismiss_n);
 
@@ -408,8 +415,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jPanel19.add(jlBank);
 
         jtfBank.setEditable(false);
-        jtfBank.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfBank.setText("BANCO");
+        jtfBank.setText("X");
         jtfBank.setToolTipText("");
         jtfBank.setFocusable(false);
         jtfBank.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -420,6 +426,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jPanel19.add(jlBankAccount);
 
         jtfBankAccount.setEditable(false);
+        jtfBankAccount.setText("X");
         jtfBankAccount.setFocusable(false);
         jtfBankAccount.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel19.add(jtfBankAccount);
@@ -433,8 +440,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jPanel16.add(jlSex);
 
         jtfSex.setEditable(false);
-        jtfSex.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfSex.setText("M");
+        jtfSex.setText("X");
         jtfSex.setToolTipText("");
         jtfSex.setFocusable(false);
         jtfSex.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -445,8 +451,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jPanel16.add(jlMarital);
 
         jtfMarital.setEditable(false);
-        jtfMarital.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfMarital.setText("A +");
+        jtfMarital.setText("X");
         jtfMarital.setToolTipText("");
         jtfMarital.setFocusable(false);
         jtfMarital.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -457,8 +462,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jPanel16.add(jlFkBloodType);
 
         jtfBloodType.setEditable(false);
-        jtfBloodType.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfBloodType.setText("A +");
+        jtfBloodType.setText("X");
         jtfBloodType.setToolTipText("");
         jtfBloodType.setFocusable(false);
         jtfBloodType.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -473,20 +477,18 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jPanel9.add(jlEducationType);
 
         jtfEducationType.setEditable(false);
-        jtfEducationType.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfEducationType.setText("No aplica");
+        jtfEducationType.setText("X");
         jtfEducationType.setToolTipText("");
         jtfEducationType.setFocusable(false);
         jtfEducationType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel9.add(jtfEducationType);
 
-        jlMwzType.setText("Área geo.:");
+        jlMwzType.setText("Área geográfica:");
         jlMwzType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel9.add(jlMwzType);
 
         jtfMwzType.setEditable(false);
-        jtfMwzType.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfMwzType.setText("M");
+        jtfMwzType.setText("X");
         jtfMwzType.setToolTipText("");
         jtfMwzType.setFocusable(false);
         jtfMwzType.setPreferredSize(new java.awt.Dimension(100, 23));

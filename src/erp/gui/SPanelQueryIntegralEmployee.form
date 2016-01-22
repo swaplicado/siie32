@@ -140,6 +140,7 @@
                         <Component class="javax.swing.JTextField" name="jtfFirstName">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
+                            <Property name="text" type="java.lang.String" value="X"/>
                             <Property name="toolTipText" type="java.lang.String" value=""/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -167,6 +168,8 @@
                         <Component class="javax.swing.JTextField" name="jtfFiscalId">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
+                            <Property name="text" type="java.lang.String" value="X"/>
+                            <Property name="toolTipText" type="java.lang.String" value=""/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[100, 23]"/>
@@ -184,6 +187,8 @@
                         <Component class="javax.swing.JTextField" name="jtfAlternativeId">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
+                            <Property name="text" type="java.lang.String" value="X"/>
+                            <Property name="toolTipText" type="java.lang.String" value=""/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[125, 23]"/>
@@ -202,6 +207,8 @@
                         <Component class="javax.swing.JTextField" name="jtfSocialSecurityNumber">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
+                            <Property name="text" type="java.lang.String" value="X"/>
+                            <Property name="toolTipText" type="java.lang.String" value=""/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[150, 23]"/>
@@ -244,7 +251,7 @@
                         </Component>
                         <Component class="javax.swing.JLabel" name="jlDateBenefits">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Fecha beneficios:"/>
+                            <Property name="text" type="java.lang.String" value="Beneficios:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[100, 23]"/>
                             </Property>
@@ -296,7 +303,7 @@
                         </Component>
                         <Component class="javax.swing.JLabel" name="jlDateLastDismiss_n">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Fecha &#xfa;ltima baja:"/>
+                            <Property name="text" type="java.lang.String" value="&#xda;ltima baja:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[100, 23]"/>
                             </Property>
@@ -440,8 +447,7 @@
                         <Component class="javax.swing.JTextField" name="jtfBank">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
-                            <Property name="horizontalAlignment" type="int" value="11"/>
-                            <Property name="text" type="java.lang.String" value="BANCO"/>
+                            <Property name="text" type="java.lang.String" value="X"/>
                             <Property name="toolTipText" type="java.lang.String" value=""/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -460,6 +466,7 @@
                         <Component class="javax.swing.JTextField" name="jtfBankAccount">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
+                            <Property name="text" type="java.lang.String" value="X"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[200, 23]"/>
@@ -486,8 +493,7 @@
                         <Component class="javax.swing.JTextField" name="jtfSex">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
-                            <Property name="horizontalAlignment" type="int" value="11"/>
-                            <Property name="text" type="java.lang.String" value="M"/>
+                            <Property name="text" type="java.lang.String" value="X"/>
                             <Property name="toolTipText" type="java.lang.String" value=""/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -506,8 +512,7 @@
                         <Component class="javax.swing.JTextField" name="jtfMarital">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
-                            <Property name="horizontalAlignment" type="int" value="11"/>
-                            <Property name="text" type="java.lang.String" value="A +"/>
+                            <Property name="text" type="java.lang.String" value="X"/>
                             <Property name="toolTipText" type="java.lang.String" value=""/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -526,8 +531,7 @@
                         <Component class="javax.swing.JTextField" name="jtfBloodType">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
-                            <Property name="horizontalAlignment" type="int" value="11"/>
-                            <Property name="text" type="java.lang.String" value="A +"/>
+                            <Property name="text" type="java.lang.String" value="X"/>
                             <Property name="toolTipText" type="java.lang.String" value=""/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -555,8 +559,7 @@
                         <Component class="javax.swing.JTextField" name="jtfEducationType">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
-                            <Property name="horizontalAlignment" type="int" value="11"/>
-                            <Property name="text" type="java.lang.String" value="No aplica"/>
+                            <Property name="text" type="java.lang.String" value="X"/>
                             <Property name="toolTipText" type="java.lang.String" value=""/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -566,7 +569,7 @@
                         </Component>
                         <Component class="javax.swing.JLabel" name="jlMwzType">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="&#xc1;rea geo.:"/>
+                            <Property name="text" type="java.lang.String" value="&#xc1;rea geogr&#xe1;fica:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[100, 23]"/>
                             </Property>
@@ -575,8 +578,7 @@
                         <Component class="javax.swing.JTextField" name="jtfMwzType">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
-                            <Property name="horizontalAlignment" type="int" value="11"/>
-                            <Property name="text" type="java.lang.String" value="M"/>
+                            <Property name="text" type="java.lang.String" value="X"/>
                             <Property name="toolTipText" type="java.lang.String" value=""/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
