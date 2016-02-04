@@ -785,6 +785,8 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_EAR_COMP_AMT = 1;
     public static final int HRSS_TP_EAR_COMP_DAY = 2;
     public static final int HRSS_TP_EAR_COMP_HRS = 3;
+    public static final int HRSS_TP_EAR_COMP_PER_DAY = 12;
+    public static final int HRSS_TP_EAR_COMP_PER_HRS = 13;
 
     public static final int HRSS_TP_EAR_EXEM_NON = 1;
     public static final int HRSS_TP_EAR_EXEM_PER = 11;
