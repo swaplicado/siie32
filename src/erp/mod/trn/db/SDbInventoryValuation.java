@@ -27,6 +27,7 @@ import sa.lib.SLibTimeConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
+import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
@@ -51,15 +52,15 @@ public class SDbInventoryValuation extends SDbRegistryUser {
     protected boolean mbAuxExistInventoryMoves;
     protected boolean mbAuxExistInventoryPurchasingExpenses;
     protected boolean mbAuxExistPurchasingExpenses;
-    protected boolean mbAuxExistInventoryManufacturingExpenses;
-    protected boolean mbAuxExistManufacturingExpenses;
+    protected boolean mbAuxExistInventoryMfgExpenses;
+    protected boolean mbAuxExistMfgExpenses;
     protected String msAuxAccountMask;
-    protected String msAuxTypeUnitValuation;
+    protected String msAuxMfgCostUnitType;
+    protected String msAuxMfgCostUnitTypeSql;
     protected String msAuxPeriodQuery;
     protected Date mtAuxDateStart;
     protected Date mtAuxDateEnd;
-
-    protected int[] manAuxPkRawMaterialWarehouseId;
+    protected int[] manAuxRawMaterialWarehouseKey;
 
     public SDbInventoryValuation() {
         super(SModConsts.TRN_INV_VAL);
@@ -126,10 +127,10 @@ public class SDbInventoryValuation extends SDbRegistryUser {
         ArrayList<int[]> aLinkType = new ArrayList<int[]>();
 
         Statement statement = session.getDatabase().getConnection().createStatement();
-        Statement statementCC = session.getDatabase().getConnection().createStatement();
+        Statement statementCc = session.getDatabase().getConnection().createStatement();
         ResultSet resultSet = null;
-        ResultSet resultSetCC = null;
-        HashMap<Integer, Integer> mapCC = new HashMap<Integer, Integer>();
+        ResultSet resultSetCc = null;
+        HashMap<Integer, Integer> mapCc = new HashMap<Integer, Integer>();
 
         // Read configuration for item:
 
@@ -145,10 +146,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
         // Read item by link type:
 
         for (int[] linkType : aLinkType) {
-
-            msSql = "";
             switch(linkType[0]) {
-
                 case SDataConstantsSys.TRNS_TP_LINK_ITEM:
                     msSql = "SELECT l.fid_cc, c.id_tp_link, c.id_ref, c.id_line " +
                         "FROM mfgu_line_cfg_item AS c " +
@@ -170,7 +168,6 @@ public class SDbInventoryValuation extends SDbRegistryUser {
                     break;
 
                 case SDataConstantsSys.TRNS_TP_LINK_BRD:
-
                     msSql = "SELECT l.fid_cc, c.id_tp_link, c.id_ref, c.id_line " +
                     "FROM mfgu_line_cfg_item AS c, mfgu_line AS l, erp.itmu_brd AS brd " +
                     "INNER JOIN erp.itmu_item AS i ON " +
@@ -179,8 +176,8 @@ public class SDbInventoryValuation extends SDbRegistryUser {
                     "c.id_line = l.id_line " +
                     "WHERE c.id_tp_link = " + linkType[0] + " AND c.id_ref = " + linkType[1] + " AND  i.id_item = " + id_item + " AND i.fid_brd = " + linkType[1] + " ";
                     break;
+                    
                 case SDataConstantsSys.TRNS_TP_LINK_LINE:
-
                     msSql = "SELECT l.fid_cc, c.id_tp_link, c.id_ref, c.id_line " +
                     "FROM mfgu_line_cfg_item AS c, mfgu_line AS l, erp.itmu_line AS line " +
                     "INNER JOIN erp.itmu_item AS i ON " +
@@ -189,16 +186,16 @@ public class SDbInventoryValuation extends SDbRegistryUser {
                     "c.id_line = l.id_line " +
                     "WHERE c.id_tp_link = " + linkType[0] + " AND c.id_ref = " + linkType[1] + " AND  i.id_item = " + id_item + " AND i.fid_line_n = " + linkType[1] + " ";
                     break;
+                    
                 case SDataConstantsSys.TRNS_TP_LINK_IGEN:
-
                     msSql = "SELECT l.fid_cc, c.id_tp_link, c.id_ref, c.id_line " +
                     "FROM mfgu_line_cfg_item AS c, mfgu_line AS l, erp.itmu_igen AS gen " +
                     "INNER JOIN erp.itmu_item AS i ON " +
                     "gen.id_igen = i.fid_igen " +
                     "WHERE c.id_line = l.id_line AND c.id_tp_link = " + linkType[0] + " AND c.id_ref = " + linkType[1] + " AND  i.id_item = " + id_item + " AND i.fid_igen = " + linkType[1] + " ";
                     break;
+                    
                 case SDataConstantsSys.TRNS_TP_LINK_IGRP:
-
                     msSql = "SELECT l.fid_cc, c.id_tp_link, c.id_ref, c.id_line " +
                     "FROM mfgu_line_cfg_item AS c, mfgu_line AS l, erp.itmu_igrp AS grp " +
                     "INNER JOIN erp.itmu_igen AS gen ON " +
@@ -209,8 +206,8 @@ public class SDbInventoryValuation extends SDbRegistryUser {
                     "c.id_line = l.id_line " +
                     "WHERE c.id_tp_link = " + linkType[0] + " AND c.id_ref = " + linkType[1] + " AND  i.id_item = " + id_item + " AND gen.fid_igrp = " + linkType[1] + " ";
                     break;
+                    
                 case SDataConstantsSys.TRNS_TP_LINK_IFAM:
-
                     msSql = "SELECT l.fid_cc, c.id_tp_link, c.id_ref, c.id_line " +
                     "FROM mfgu_line_cfg_item AS c, mfgu_line AS l, erp.itmu_ifam AS fam " +
                     "INNER JOIN erp.itmu_igrp AS grp ON " +
@@ -223,8 +220,8 @@ public class SDbInventoryValuation extends SDbRegistryUser {
                     "c.id_line = l.id_line " +
                     "WHERE c.id_tp_link = " + linkType[0] + " AND c.id_ref = " + linkType[1] + " AND  i.id_item = " + id_item + " AND grp.fid_ifam = " + linkType[1] + " ";
                     break;
+                    
                 case SDataConstantsSys.TRNS_TP_LINK_TP_ITEM:
-
                     msSql = "SELECT l.fid_cc, c.id_tp_link, c.id_ref, c.id_line " +
                     "FROM mfgu_line_cfg_item AS c, erp.itms_tp_item AS tp " +
                     "INNER JOIN erp.itmu_igen AS gen ON " +
@@ -235,8 +232,8 @@ public class SDbInventoryValuation extends SDbRegistryUser {
                     "c.id_line = l.id_line " +
                     "WHERE c.id_tp_link = " + linkType[0] + " AND c.id_ref = " + linkType[1] + " AND  i.id_item = " + id_item + " AND gen.fid_tp_item = " + linkType[1] + " ";
                     break;
+                    
                 case SDataConstantsSys.TRNS_TP_LINK_CL_ITEM:
-
                     msSql = "SELECT l.fid_cc, c.id_tp_link, c.id_ref, c.id_line " +
                     "FROM mfgu_line_cfg_item AS c, erp.itms_cl_item AS cl " +
                     "INNER JOIN erp.itmu_igen AS gen ON " +
@@ -247,8 +244,8 @@ public class SDbInventoryValuation extends SDbRegistryUser {
                     "c.id_line = l.id_line " +
                     "WHERE c.id_tp_link = " + linkType[0] + " AND c.id_ref = " + linkType[1] + " AND  i.id_item = " + id_item + " AND gen.fid_cl_item = " + linkType[1] + " ";
                     break;
+                    
                 case SDataConstantsSys.TRNS_TP_LINK_CT_ITEM:
-
                     msSql = "SELECT l.fid_cc, c.id_tp_link, c.id_ref, c.id_line " +
                     "FROM mfgu_line_cfg_item AS c, erp.itms_ct_item AS ct " +
                     "INNER JOIN erp.itmu_igen AS gen ON " +
@@ -267,17 +264,20 @@ public class SDbInventoryValuation extends SDbRegistryUser {
                     "c.id_line = l.id_line " +
                     "WHERE c.b_del = 0 AND c.id_ref = 0; ";
                     break;
+                    
+                default:
+                    msSql = "";
             }
 
-            resultSetCC = statementCC.executeQuery(msSql);
-            while (resultSetCC.next()) {
-                mapCC.put(resultSetCC.getInt("c.id_tp_link"), resultSetCC.getInt("l.fid_cc"));
+            resultSetCc = statementCc.executeQuery(msSql);
+            while (resultSetCc.next()) {
+                mapCc.put(resultSetCc.getInt("c.id_tp_link"), resultSetCc.getInt("l.fid_cc"));
             }
         }
 
         for (int i = SDataConstantsSys.TRNS_TP_LINK_ITEM; i >= SDataConstantsSys.TRNS_TP_LINK_ALL; i--) {
-            if (mapCC.get(i) != null) {
-                idCc.add(mapCC.get(i));
+            if (mapCc.get(i) != null) {
+                idCc.add(mapCc.get(i));
                 break;
             }
         }
@@ -285,14 +285,14 @@ public class SDbInventoryValuation extends SDbRegistryUser {
         return idCc.size() > SLibConsts.UNDEFINED ? idCc.get(idCc.size()-1) : SLibConsts.UNDEFINED;
     }
 
-    private void allocateExpensesManufacturing(final SGuiSession session) throws Exception {
+    private void allocateMfgExpenses(final SGuiSession session) throws Exception {
         boolean ban = false;
         double dTotalAssigned = 0;
         double dTotalProductionExpense = 0;
         double dTotalItemUnitOrder = 0;
         double dTotalItemUnit = 0;
         String sProductionOrders = "";
-        int numberOfOP = 0;
+        int numberOfPo = 0;
 
         SDataDiog diog = null;
 
@@ -319,14 +319,14 @@ public class SDbInventoryValuation extends SDbRegistryUser {
         aProductionOrders = obtainProductionOrders(session, mtAuxDateStart, false, true);
         sProductionOrders = aProductionOrders.size() > 0 ? "(" : "";
         for (SDataProductionOrder order : aProductionOrders) {
-            ++numberOfOP;
+            ++numberOfPo;
             sProductionOrders += "(o.id_year = " + order.getPkYearId() + " AND o.id_ord = " + order.getPkOrdId() + ")";
-            sProductionOrders += numberOfOP < aProductionOrders.size() ? " OR " : ")";
+            sProductionOrders += numberOfPo < aProductionOrders.size() ? " OR " : ")";
         }
 
         // Validate if there is manufacturing units per item-unit-warehouse-order for the msAuxPeriodQuery:
 
-        msSql = obtainQueryForAmountManufacturing(SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, false, SLibConsts.UNDEFINED, true, sProductionOrders);
+        msSql = composeSqlQueryMfgAmount(SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, false, SLibConsts.UNDEFINED, true, sProductionOrders);
         resultSetItemUnit = statementCenterCostProduction.executeQuery(msSql);
         if (resultSetItemUnit.next()) {
 
@@ -389,13 +389,13 @@ public class SDbInventoryValuation extends SDbRegistryUser {
 
                         // 2. Determine the available inventory manufactured (PP and PT) in equivalent units per item-warehouse-OP in the current PC (ie, initial inventory + net PP and PT and PT PP deliveries).
 
-                        msSql = obtainQueryForAmountManufacturing(SLibConstants.UNDEFINED, SLibConstants.UNDEFINED, true, cc, true, sProductionOrders);
+                        msSql = composeSqlQueryMfgAmount(SLibConstants.UNDEFINED, SLibConstants.UNDEFINED, true, cc, true, sProductionOrders);
                         resultSetItemUnit = statementCenterCostProduction.executeQuery(msSql);
                         while (resultSetItemUnit.next()) {
 
                             // 4. GF apportion and allocate inventories (ie, create inputs System type INPUT PRODUCTION COST) for each item-unit-warehouse-OP, in warehouses of origin of manufacture (eg, PP).
 
-                            msSql = obtainQueryForAmountManufacturing(SLibConstants.UNDEFINED, SLibConstants.UNDEFINED, false, cc, true, sProductionOrders);
+                            msSql = composeSqlQueryMfgAmount(SLibConstants.UNDEFINED, SLibConstants.UNDEFINED, false, cc, true, sProductionOrders);
                             resultSetItemUnitOrder = statementItemUnitOrder.executeQuery(msSql);
                             while (resultSetItemUnitOrder.next()) {
 
@@ -436,7 +436,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
         }
     }
 
-    private String obtainQueryForAmountManufacturing(final int idItem, final int idUnit, final boolean bItemUnit, final int idCc, final boolean bCostAssigned, final String sProductionOrders) {
+    private String composeSqlQueryMfgAmount(final int idItem, final int idUnit, final boolean bItemUnit, final int idCc, final boolean bCostAssigned, final String sProductionOrders) {
         /*
         return "SELECT s.dt, s.id_item, s.id_unit, s.id_lot, s.id_cob, s.id_wh, d.fid_mfg_year_n, d.fid_mfg_ord_n, COALESCE((" +
             obtainQueryInitialInventoryManufacturing(mnFkYearYearId, SLibTimeUtils.createDate(mnFkYearYearId, mnFkYearPeriodId, 1), idItem, idUnit, bItemUnit) + "),0) + " +
@@ -447,7 +447,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
             "d.fid_ct_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_FG_RET[0] + " AND " +
             "d.fid_cl_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_FG_RET[1] + " AND " +
             "d.fid_tp_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_FG_RET[2] + "), -1, 1)))" +
-            (msAuxTypeUnitValuation.isEmpty() ? "" : "* ") +  msAuxTypeUnitValuation + ")) AS f_total " +
+            (msAuxMfgCostUnitTypeSql.isEmpty() ? "" : "* ") +  msAuxMfgCostUnitTypeSql + ")) AS f_total " +
             "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS d " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " AS de ON " +
             "d.id_year = de.id_year AND d.id_doc = de.id_doc " +
@@ -486,9 +486,8 @@ public class SDbInventoryValuation extends SDbRegistryUser {
                 "s.id_item, s.id_unit, o.id_year, o.id_ord ");
         */
         return "SELECT s.dt, s.id_item, s.id_unit, s.id_lot, s.id_cob, s.id_wh, d.fid_mfg_year_n, d.fid_mfg_ord_n, COALESCE((" +
-            obtainQueryInitialInventoryManufacturing(mnFkYearYearId, SLibTimeUtils.createDate(mnFkYearYearId, mnFkYearPeriodId, 1), idItem, idUnit, bItemUnit) + "),0) + " +
-            "(SUM(((s.mov_in - s.mov_out) * -1) " +
-            (msAuxTypeUnitValuation.isEmpty() ? "" : "* ") +  msAuxTypeUnitValuation + ")) AS f_total " +
+            composeSqlQueryMfgStartingInventory(mnFkYearYearId, SLibTimeUtils.createDate(mnFkYearYearId, mnFkYearPeriodId, 1), idItem, idUnit, bItemUnit) + "),0) + " +
+            "SUM(((s.mov_in - s.mov_out) * -1) * " +  msAuxMfgCostUnitTypeSql + ") AS f_total " +
             "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS d " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " AS de ON " +
             "d.id_year = de.id_year AND d.id_doc = de.id_doc " +
@@ -526,8 +525,8 @@ public class SDbInventoryValuation extends SDbRegistryUser {
                 "s.id_item, s.id_unit, o.id_year, o.id_ord ");
     }
 
-    private String obtainQueryInitialInventoryManufacturing(final int year, final Date dateStart, final int idItem, final int idUnit, final boolean bItemUnit) {
-        return "SELECT SUM((ss.mov_in - ss.mov_out) " + (msAuxTypeUnitValuation.isEmpty() ? "" : "* ") + msAuxTypeUnitValuation + ") AS f_total " +
+    private String composeSqlQueryMfgStartingInventory(final int year, final Date dateStart, final int idItem, final int idUnit, final boolean bItemUnit) {
+        return "SELECT SUM((ss.mov_in - ss.mov_out) * " + msAuxMfgCostUnitTypeSql + ") AS f_total " +
             "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS sd " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " AS sde ON " +
             "sd.id_year = sde.id_year AND sd.id_doc = sde.id_doc " +
@@ -639,7 +638,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
 
         // 6. Allocate manufacturing costs:
 
-        allocateExpensesManufacturing(session);
+        allocateMfgExpenses(session);
 
         // 7. Obtain information for CIV:
         // 7.1. Obtain all current WM of CP ordened as follows: date, warehouse type, simple input, composed input, compused output, simple output, diog type, number serie
@@ -800,7 +799,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
 
                         if (anProductionOrderId != null) {
 
-                            verifyManufacturingCostsProductionOrder(
+                            verifyMfgCostsProductionOrder(
                                     session,
                                     anProductionOrderId,
                                     new int[] { diogInput.getPkYearId(), diogInput.getPkDocId() },
@@ -855,7 +854,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
 
                         if (anProductionOrderId != null) {
 
-                            verifyManufacturingCostsProductionOrder(session,
+                            verifyMfgCostsProductionOrder(session,
                                     anProductionOrderId,
                                     new int[] { diogInput.getPkYearId(), diogInput.getPkDocId() },
                                     new int[] { diogOutput.getPkYearId(), diogOutput.getPkDocId() },
@@ -917,7 +916,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
 
                         if (anProductionOrderId != null) {
 
-                            verifyManufacturingCostsProductionOrder(session,
+                            verifyMfgCostsProductionOrder(session,
                                     anProductionOrderId,
                                     new int[] { diogInput.getPkYearId(), diogInput.getPkDocId() },
                                     new int[] { diogOutput.getPkYearId(), diogOutput.getPkDocId() },
@@ -971,7 +970,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
 
                         if (anProductionOrderId != null) {
 
-                            verifyManufacturingCostsProductionOrder(session,
+                            verifyMfgCostsProductionOrder(session,
                                     anProductionOrderId,
                                     new int[] { diogInput.getPkYearId(), diogInput.getPkDocId() },
                                     new int[] { diogOutput.getPkYearId(), diogOutput.getPkDocId() },
@@ -1007,7 +1006,6 @@ public class SDbInventoryValuation extends SDbRegistryUser {
                         }
                     }
                     else {
-
                         // Composite outputs (transfers, conversion...):
 
                         if (diogOutput.getCostAsigned() == SModSysConsts.TRNX_DIOG_CST_ASIG_NO) {
@@ -1063,7 +1061,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
 
         if (bInventoryMovesPending) {
 
-            msQueryResult = "Error, no se pudieron valuar todos los movimientos de inventarios.";
+            msQueryResult = "Error: no se pudieron procesar todos los movimientos de inventarios.";
             throw new Exception(msQueryResult);
         }
 
@@ -1233,7 +1231,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
 
                     if (SLibUtils.compareKeys(productionOrder.getPrimaryKey(), orderRelation.getPrimaryKey())) {
 
-                        msQueryResult = "Error existe una relación circular con la orden de producción '" + productionOrder.getNumber() + "'.";
+                        msQueryResult = "Error: existe una relación circular con la orden de producción #'" + productionOrder.getNumber() + "'.";
                         throw new Exception(msQueryResult);
                     }
                 }
@@ -1262,8 +1260,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
         return SLibUtils.round(dValue_r, SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
     }
 
-    private void verifyManufacturingCostsProductionOrder(final SGuiSession session, final int[] pkProductionOrderId, final int[] pkParamDiogInputId, final int[] pkParamDiogOutputId, final String period,
-            final int year, final Date dateStart) throws Exception {
+    private void verifyMfgCostsProductionOrder(final SGuiSession session, final int[] pkProductionOrderId, final int[] pkParamDiogInputId, final int[] pkParamDiogOutputId, final String period, final int year, final Date dateStart) throws Exception {
         SDataDiog diogInput = new SDataDiog();
         SDataDiog diogOutput = new SDataDiog();
         SDataProductionOrder productionOrder = new SDataProductionOrder();
@@ -1279,14 +1276,14 @@ public class SDbInventoryValuation extends SDbRegistryUser {
                 if (productionOrderVerifyCostsInventoryInputMoves(session, pkProductionOrderId)) { /* Exit */ }
                 else {
 
-                    realizeMCCProductionOrder(session, year, dateStart, pkProductionOrderId);
+                    realizeMccProductionOrder(session, year, dateStart, pkProductionOrderId);
                     diogOutput.read(new int[] { pkParamDiogOutputId[0], pkParamDiogOutputId[1] }, session.getStatement());
                     if (diogOutput.getCostAsigned() == SModSysConsts.TRNX_DIOG_CST_ASIG_YES) {
 
                         for (int i=0; i<productionOrder.getAuxProductionOrdersRelations().size(); i++) {
 
                              productionOrderAux = productionOrder.getAuxProductionOrdersRelations().get(i);
-                             verifyManufacturingCostsProductionOrder(session, new int[] { productionOrderAux.getPkYearId(), productionOrderAux.getPkOrdId() }, pkParamDiogInputId, pkParamDiogOutputId, period, year, dateStart);
+                             verifyMfgCostsProductionOrder(session, new int[] { productionOrderAux.getPkYearId(), productionOrderAux.getPkOrdId() }, pkParamDiogInputId, pkParamDiogOutputId, period, year, dateStart);
                         }
                     }
                 }
@@ -1323,7 +1320,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
         return can;
     }
 
-    private void realizeMCCProductionOrder(final SGuiSession session, final int year, final Date dateStart, final int[] pkProductionOrderId) throws Exception {
+    private void realizeMccProductionOrder(final SGuiSession session, final int year, final Date dateStart, final int[] pkProductionOrderId) throws Exception {
         double dDiogTotal = 0;
         double dTotalAssigned = 0;
         double dValueUnitaryEquivalent = 0;
@@ -1332,11 +1329,11 @@ public class SDbInventoryValuation extends SDbRegistryUser {
         SDataDiog diogOutput = null;
         SDataDiogEntry diogOutputEntry = null;
 
-        Statement statementManufacturingTotal = session.getDatabase().getConnection().createStatement();
+        Statement statementMfgTotal = session.getDatabase().getConnection().createStatement();
         Statement statementCostNet = session.getDatabase().getConnection().createStatement();
         Statement statementOutputProducts = session.getDatabase().getConnection().createStatement();
 
-        ResultSet resultSetManufacturingTotal = null;
+        ResultSet resultSetMfgTotal = null;
         ResultSet resultSetCostNet = null;
         ResultSet resultSetOutputProducts = null;
 
@@ -1345,9 +1342,9 @@ public class SDbInventoryValuation extends SDbRegistryUser {
         // Determine the total net quantity manufactured MASS equivalent units (Kg) (i.e. E/D Products):
 
         msSql = "SELECT s.dt, s.id_item, s.id_unit, s.id_lot, s.id_cob, s.id_wh, COALESCE((" +
-            obtainQueryInitialInventoryProductionOrderQuantity(year, pkProductionOrderId, dateStart) + "), 0) + " +
+            composeSqlQueryStartingInventoryProductionOrderQuantity(year, pkProductionOrderId, dateStart) + "), 0) + " +
             "ABS((SUM((s.mov_in - s.mov_out) * i.mass))) AS f_total, COALESCE((" +
-            obtainQueryInitialInventoryProductionOrderQuantity(year, pkProductionOrderId, dateStart) + "), 0) + " +
+            composeSqlQueryStartingInventoryProductionOrderQuantity(year, pkProductionOrderId, dateStart) + "), 0) + " +
             "ABS((SUM((s.mov_in - s.mov_out)))) AS f_total_item " +
             "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS d " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " AS de ON " +
@@ -1366,8 +1363,8 @@ public class SDbInventoryValuation extends SDbRegistryUser {
             "(d.fid_ct_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_FG_ASD[0] + " AND d.fid_cl_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_FG_ASD[1] + " AND d.fid_tp_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_FG_ASD[2] + ")) " +
             "GROUP BY d.fid_mfg_year_n, d.fid_mfg_ord_n " +
             "ORDER BY d.fid_mfg_year_n, d.fid_mfg_ord_n ";
-        resultSetManufacturingTotal = statementManufacturingTotal.executeQuery(msSql);
-        if (resultSetManufacturingTotal.next()) {
+        resultSetMfgTotal = statementMfgTotal.executeQuery(msSql);
+        if (resultSetMfgTotal.next()) {
 
             // Determine the cost of MPD (CMPD) Total net (ie, $E E/D Inputs):
 
@@ -1443,14 +1440,14 @@ public class SDbInventoryValuation extends SDbRegistryUser {
                                 new int[][] { SModSysConsts.TRNS_TP_IOG_OUT_MFG_WP_RET, SModSysConsts.TRNS_TP_IOG_OUT_MFG_FG_RET })) {
 
                             dValueUnitaryEquivalent = SLibUtils.round(
-                                    (resultSetManufacturingTotal.getDouble("f_total") > SLibConsts.UNDEFINED ?
-                                        (resultSetCostNet.getDouble("f_balance") / resultSetManufacturingTotal.getDouble("f_total")) : SLibConsts.UNDEFINED),
+                                    (resultSetMfgTotal.getDouble("f_total") > SLibConsts.UNDEFINED ?
+                                        (resultSetCostNet.getDouble("f_balance") / resultSetMfgTotal.getDouble("f_total")) : SLibConsts.UNDEFINED),
                                     SLibUtils.DecimalFormatValue8D.getMaximumFractionDigits());
 
                             diogOutputEntry.setValueUnitary(SLibUtils.round(
                                     dValueUnitaryEquivalent *
-                                    (resultSetManufacturingTotal.getDouble("f_total_item") > SLibConsts.UNDEFINED ?
-                                    resultSetManufacturingTotal.getDouble("f_total") / resultSetManufacturingTotal.getDouble("f_total_item") : SLibConsts.UNDEFINED),
+                                    (resultSetMfgTotal.getDouble("f_total_item") > SLibConsts.UNDEFINED ?
+                                    resultSetMfgTotal.getDouble("f_total") / resultSetMfgTotal.getDouble("f_total_item") : SLibConsts.UNDEFINED),
                                     SLibUtils.DecimalFormatValue8D.getMaximumFractionDigits()));
 
                             diogOutputEntry.setOriginalValueUnitary(diogOutputEntry.getValueUnitary());
@@ -1598,21 +1595,21 @@ public class SDbInventoryValuation extends SDbRegistryUser {
 
                 diogOut = productionOrderObtainInventoryMoves(session, SModSysConsts.TRNS_TP_IOG_IN_MFG_RM_ASD, order.getPkYearId(), order.getPkOrdId());
                 if (diogOut == null) {
-                    msg = "La orden de producción '" + order.getNumber() + "' no es consistente en sus movimientos de entrada devolución de MP.\n" +
-                            "Existe el movimiento de entrada devolución de MP, pero no existe el movimiento de entrada entrega MP.";
+                    msg = "La orden de producción #'" + order.getNumber() + "' no es consistente en sus movimientos de entrada devolución de MP.\n" +
+                            "Existe el movimiento de entrada devolución de MP, pero no existe el movimiento de entrada entrega de MP.";
                 }
                 else {
                     if (diogOut.getDate().compareTo(diogIn.getDate()) > SLibConsts.UNDEFINED) {
-                        msg = "La orden de producción '" + order.getNumber() + "' no es consistente en sus movimientos de entrada devolución de MP.\n" +
+                        msg = "La orden de producción #'" + order.getNumber() + "' no es consistente en sus movimientos de entrada devolución de MP.\n" +
                             "La fecha '" + SLibUtils.DateFormatDate.format(diogIn.getDate()) + "' de entrada devolución de MP es posterior a la fecha '" +
-                                SLibUtils.DateFormatDate.format(diogOut.getDate()) + "' de entrada entrega MP.";
+                                SLibUtils.DateFormatDate.format(diogOut.getDate()) + "' de entrada entrega de MP.";
                     }
                 }
             }
         }
         else {
 
-            msg += "\n Orden de producción: " + order.getNumber() + ".";
+            msg += "\n Orden de producción #'" + order.getNumber() + "'.";
         }
 
         // Validate with delivery production process:
@@ -1624,14 +1621,14 @@ public class SDbInventoryValuation extends SDbRegistryUser {
 
                 diogOut = productionOrderObtainInventoryMoves(session, SModSysConsts.TRNS_TP_IOG_IN_MFG_RM_ASD, order.getPkYearId(), order.getPkOrdId());
                 if (diogOut == null) {
-                    msg = "La orden de producción '" + order.getNumber() + "' no es consistente en sus movimientos de entrada entrega de PP.\n" +
-                            "Existe el movimiento de entrada entrega PP, pero no existe el movimiento de entrada entrega MP.";
+                    msg = "La orden de producción #'" + order.getNumber() + "' no es consistente en sus movimientos de entrada entrega de PP.\n" +
+                            "Existe el movimiento de entrada entrega PP, pero no existe el movimiento de entrada entrega de MP.";
                 }
                 else {
                     if (diogOut.getDate().compareTo(diogIn.getDate()) > SLibConsts.UNDEFINED) {
-                        msg = "La orden de producción '" + order.getNumber() + "' no es consistente en sus movimientos de entrada entrega de PP.\n" +
-                            "La fecha '" + SLibUtils.DateFormatDate.format(diogIn.getDate()) + "' de entrada entrega PP es posterior a la fecha '" +
-                                SLibUtils.DateFormatDate.format(diogOut.getDate()) + "' de entrada entrega MP.";
+                        msg = "La orden de producción #'" + order.getNumber() + "' no es consistente en sus movimientos de entrada entrega de PP.\n" +
+                            "La fecha '" + SLibUtils.DateFormatDate.format(diogIn.getDate()) + "' de entrada entrega de PP es posterior a la fecha '" +
+                                SLibUtils.DateFormatDate.format(diogOut.getDate()) + "' de entrada entrega de MP.";
                     }
                 }
             }
@@ -1645,14 +1642,14 @@ public class SDbInventoryValuation extends SDbRegistryUser {
 
                 diogOut = productionOrderObtainInventoryMoves(session, SModSysConsts.TRNS_TP_IOG_OUT_MFG_WP_ASD, order.getPkYearId(), order.getPkOrdId());
                 if (diogOut == null) {
-                    msg = "La orden de producción '" + order.getNumber() + "' no es consistente en sus movimientos de entrada devolución de PP.\n" +
-                            "Existe el movimiento de entrada devolución de PP, pero no existe el movimiento de entrada entrega PP.";
+                    msg = "La orden de producción #'" + order.getNumber() + "' no es consistente en sus movimientos de entrada devolución de PP.\n" +
+                            "Existe el movimiento de entrada devolución de PP, pero no existe el movimiento de entrada entrega de PP.";
                 }
                 else {
                     if (diogOut.getDate().compareTo(diogIn.getDate()) > SLibConsts.UNDEFINED) {
-                        msg = "La orden de producción '" + order.getNumber() + "' no es consistente en sus movimientos de entrada devolución de PP.\n" +
+                        msg = "La orden de producción #'" + order.getNumber() + "' no es consistente en sus movimientos de entrada devolución de PP.\n" +
                             "La fecha '" + SLibUtils.DateFormatDate.format(diogIn.getDate()) + "' de entrada devolución de PP es posterior a la fecha '" +
-                                SLibUtils.DateFormatDate.format(diogOut.getDate()) + "' de entrada entrega PP.";
+                                SLibUtils.DateFormatDate.format(diogOut.getDate()) + "' de entrada entrega de PP.";
                     }
                 }
             }
@@ -1670,14 +1667,14 @@ public class SDbInventoryValuation extends SDbRegistryUser {
 
                     diogOut = productionOrderObtainInventoryMoves(session, SModSysConsts.TRNS_TP_IOG_IN_MFG_WP_ASD, order.getPkYearId(), order.getPkOrdId());
                     if (diogOut == null) {
-                        msg = "La orden de producción '" + order.getNumber() + "' no es consistente en sus movimientos de entrada entrega de PT.\n" +
-                                "Existe el movimiento de entrada entrega PT, pero no existe el movimiento de entrada entrega PP.";
+                        msg = "La orden de producción #'" + order.getNumber() + "' no es consistente en sus movimientos de entrada entrega de PT.\n" +
+                                "Existe el movimiento de entrada entrega PT, pero no existe el movimiento de entrada entrega de PP.";
                     }
                     else {
                         if (diogOut.getDate().compareTo(diogIn.getDate()) > SLibConsts.UNDEFINED) {
-                            msg = "La orden de producción '" + order.getNumber() + "' no es consistente en sus movimientos de entrada entrega de PT.\n" +
-                                "La fecha '" + SLibUtils.DateFormatDate.format(diogIn.getDate()) + "' de entrada entrega PT es posterior a la fecha '" +
-                                    SLibUtils.DateFormatDate.format(diogOut.getDate()) + "' de entrada entrega PP.";
+                            msg = "La orden de producción #'" + order.getNumber() + "' no es consistente en sus movimientos de entrada entrega de PT.\n" +
+                                "La fecha '" + SLibUtils.DateFormatDate.format(diogIn.getDate()) + "' de entrada entrega de PT es posterior a la fecha '" +
+                                    SLibUtils.DateFormatDate.format(diogOut.getDate()) + "' de entrada entrega de PP.";
                         }
                     }
                 }
@@ -1693,14 +1690,14 @@ public class SDbInventoryValuation extends SDbRegistryUser {
 
                 diogOut = productionOrderObtainInventoryMoves(session, SModSysConsts.TRNS_TP_IOG_IN_MFG_FG_ASD, order.getPkYearId(), order.getPkOrdId());
                 if (diogOut == null) {
-                    msg = "La orden de producción '" + order.getNumber() + "' no es consistente en sus movimientos de entrada entrega de PT.\n" +
-                            "Existe el movimiento de entrada devolución de PT, pero no existe el movimiento de entrada entrega PT.";
+                    msg = "La orden de producción #'" + order.getNumber() + "' no es consistente en sus movimientos de entrada entrega de PT.\n" +
+                            "Existe el movimiento de entrada devolución de PT, pero no existe el movimiento de entrada entrega de PT.";
                 }
                 else {
                     if (diogOut.getDate().compareTo(diogIn.getDate()) > SLibConsts.UNDEFINED) {
-                        msg = "La orden de producción '" + order.getNumber() + "' no es consistente en sus movimientos de entrada devolución de PT.\n" +
+                        msg = "La orden de producción #'" + order.getNumber() + "' no es consistente en sus movimientos de entrada devolución de PT.\n" +
                             "La fecha '" + SLibUtils.DateFormatDate.format(diogIn.getDate()) + "' de entrada devolución de PT es posterior a la fecha '" +
-                                SLibUtils.DateFormatDate.format(diogOut.getDate()) + "' de entrada entrega PT.";
+                                SLibUtils.DateFormatDate.format(diogOut.getDate()) + "' de entrada entrega de PT.";
                     }
                 }
             }
@@ -1758,8 +1755,8 @@ public class SDbInventoryValuation extends SDbRegistryUser {
             resultSet = statement.executeQuery(msSql);
             if (resultSet.next()) {
 
-                msg = "La valuación de inventarios no puede continuar, existen movimientos de la orden de producción '" + productionOrderNumber + "' de Entrega/Devolución de Insumos fuera de su período de valuación (" +
-                        SLibTimeUtils.digestMonth(dateStart)[0] + "-" + SLibTimeUtils.digestMonth(dateStart)[1] + ").";
+                msg = "La valuación de inventarios no puede continuar:\nexisten movimientos de la orden de producción #'" + productionOrderNumber + "' de Entrega/Devolución de Insumos fuera de su periodo de valuación (" +
+                        SLibTimeUtils.digestMonth(dateStart)[0] + "-" + SLibUtils.DecimalFormatCalendarMonth.format(SLibTimeUtils.digestMonth(dateStart)[1]) + ").";
             }
         }
 
@@ -1792,7 +1789,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
         resultSet = statement.executeQuery(msSql);
         if (resultSet.next()) {
 
-            msg = "La valuación de inventarios no puede continuar, existen movimientos de inventario de la orden de producción '" + productionOrderNumber + "' modificados después de su valuación de inventarios.";
+            msg = "La valuación de inventarios no puede continuar:\nexisten movimientos de inventario de la orden de producción #'" + productionOrderNumber + "' modificados después de su valuación de inventarios.";
         }
 
         return msg;
@@ -1833,7 +1830,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
         if (resultSet.next() &&
                 resultSet.getInt(1) == 0) {
 
-            msg = "Todos los movimientos de entrada de insumos (MP, PP) deben estar registrados primero que las salidas de productos (PP, PT).";
+            msg = "Todos los movimientos de entrada de insumos (MP, PP) deben estar registrados antes que las salidas de productos (PP, PT).";
         }
 
         return msg;
@@ -1957,8 +1954,8 @@ public class SDbInventoryValuation extends SDbRegistryUser {
         rows = obtainInventoryMovesForProductionOrderInputs(session, SModSysConsts.TRNS_TP_IOG_IN_MFG_RM_ASD, order.getPkYearId(), order.getPkOrdId());
         if (rows > SLibConsts.UNDEFINED) {
 
-            msg = "La orden de producción '" + order.getNumber() + "' no es consistente en sus movimientos de entrada entrega de MP.\n" +
-                    "Existen insumos que se entregaron fuera del período actual " + periodSystem + ".";
+            msg = "La orden de producción #'" + order.getNumber() + "' no es consistente en sus movimientos de entrada entrega de MP.\n" +
+                    "Existen insumos que se entregaron fuera del periodo actual " + periodSystem + ".";
         }
 
         // Validate with return raw material:
@@ -1967,8 +1964,8 @@ public class SDbInventoryValuation extends SDbRegistryUser {
             rows = obtainInventoryMovesForProductionOrderInputs(session, SModSysConsts.TRNS_TP_IOG_IN_MFG_RM_RET, order.getPkYearId(), order.getPkOrdId());
             if (rows > SLibConsts.UNDEFINED) {
 
-                msg = "La orden de producción '" + order.getNumber() + "' no es consistente en sus movimientos de entrada devolución de MP.\n" +
-                        "Existen insumos que se devolvieron fuera del período actual " + periodSystem + ".";
+                msg = "La orden de producción #'" + order.getNumber() + "' no es consistente en sus movimientos de entrada devolución de MP.\n" +
+                        "Existen insumos que se devolvieron fuera del periodo actual " + periodSystem + ".";
             }
         }
 
@@ -1978,8 +1975,8 @@ public class SDbInventoryValuation extends SDbRegistryUser {
             rows = obtainInventoryMovesForProductionOrderInputs(session, SModSysConsts.TRNS_TP_IOG_IN_MFG_WP_ASD, order.getPkYearId(), order.getPkOrdId());
             if (rows > SLibConsts.UNDEFINED) {
 
-                msg = "La orden de producción '" + order.getNumber() + "' no es consistente en sus movimientos de entrada entrega de PP.\n" +
-                        "Existen insumos que se entregaron fuera del período actual " + periodSystem + ".";
+                msg = "La orden de producción #'" + order.getNumber() + "' no es consistente en sus movimientos de entrada entrega de PP.\n" +
+                        "Existen insumos que se entregaron fuera del periodo actual " + periodSystem + ".";
             }
         }
 
@@ -1989,8 +1986,8 @@ public class SDbInventoryValuation extends SDbRegistryUser {
             rows = obtainInventoryMovesForProductionOrderInputs(session, SModSysConsts.TRNS_TP_IOG_IN_MFG_WP_RET, order.getPkYearId(), order.getPkOrdId());
             if (rows > SLibConsts.UNDEFINED) {
 
-                msg = "La orden de producción '" + order.getNumber() + "' no es consistente en sus movimientos de entrada devolución de PP.\n" +
-                        "Existen insumos que se devolvieron fuera del período actual " + periodSystem + ".";
+                msg = "La orden de producción #'" + order.getNumber() + "' no es consistente en sus movimientos de entrada devolución de PP.\n" +
+                        "Existen insumos que se devolvieron fuera del periodo actual " + periodSystem + ".";
             }
         }
 
@@ -2141,8 +2138,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
                 "ORDER BY d.dt, d.ts_edit, d.fid_ct_iog, d.fid_cl_iog, d.fid_tp_iog, d.id_year, d.id_doc ";
         resultSet = statement.executeQuery(msSql);
         if (resultSet.next()) {
-
-            msg = "La unidad de medida en base al tipo de unidad configurada en la empresa del ítem '" + resultSet.getString("i.item") + " (" + resultSet.getString("i.item_key") + ")" + "' debe ser mayor a cero.";
+            msg = "La unidad 'MASA' del ítem '" + resultSet.getString("i.item") + " (" + resultSet.getString("i.item_key") + ")" + "' debe ser mayor a cero.";
         }
 
         return msg;
@@ -2178,15 +2174,13 @@ public class SDbInventoryValuation extends SDbRegistryUser {
                 "ig.fid_cl_item = " + SDataConstantsSys.ITMS_TP_ITEM_SAL_PRO_FG[1] + " AND " +
                 "ig.fid_tp_item = " + SDataConstantsSys.ITMS_TP_ITEM_SAL_PRO_FG[2] + ")) AND " +
                 "d.fid_mfg_year_n = " + order.getPkYearId() + " AND d.fid_mfg_ord_n = " + order.getPkOrdId() + " AND " +
-                (msAuxTypeUnitValuation.isEmpty() ? "" : msAuxTypeUnitValuation + " <= 0 AND ") +
+                msAuxMfgCostUnitTypeSql + " <= 0 AND " +
                 "d.dt " + msAuxPeriodQuery + " " +
                 "GROUP BY de.id_year, de.id_doc, de.id_ety " +
                 "ORDER BY d.dt, d.ts_edit, d.fid_ct_iog, d.fid_cl_iog, d.fid_tp_iog, d.id_year, d.id_doc ";
         resultSet = statement.executeQuery(msSql);
         if (resultSet.next()) {
-
-            msg = "La unidad de medida en base al tipo de unidad configurada en la empresa del ítem '" + resultSet.getString("i.item") + " (" + resultSet.getString("i.item_key") + ")" + "'\n "
-                    + "de la orden de producción ' " + resultSet.getString("o.num") + "' debe ser mayor a cero.";
+            msg = "La unidad '" + msAuxMfgCostUnitType + "' del ítem '" + resultSet.getString("i.item") + " (" + resultSet.getString("i.item_key") + ")" + "' de la orden de producción #' " + resultSet.getString("o.num") + "' debe ser mayor a cero.";
         }
 
         return msg;
@@ -2201,10 +2195,10 @@ public class SDbInventoryValuation extends SDbRegistryUser {
         SDataItem item = null;
 
         Statement statementItemUnitWarehouse = session.getDatabase().getConnection().createStatement(); // XXX jbarajas statementItemMass
-        Statement statementPurchaseExpenses = session.getDatabase().getConnection().createStatement();
+        Statement statementPurchasingExpenses = session.getDatabase().getConnection().createStatement();
         Statement statementItem = session.getDatabase().getConnection().createStatement(); // XXX jbarajas statementItemUnitWarehouse
         ResultSet resultSetItemUnitWarehouse = null; // XXX jbarajas resultSetItemMass
-        ResultSet resultSetPurchaseExpenses = null;
+        ResultSet resultSetPurchasingExpenses = null;
         ResultSet resultSetItem = null; // XXX jbarajas resultSetItemUnitWarehouse
 
         // 1. Delete Purchases Expense for the msAuxPeriodQuery:
@@ -2213,14 +2207,14 @@ public class SDbInventoryValuation extends SDbRegistryUser {
 
         // 2. Determine the total of purchasing expenses by item-unit for the msAuxPeriodQuery:
 
-        msSql = obtainQueryForPurchasingExpenses(SLibConsts.UNDEFINED);
-        resultSetPurchaseExpenses = statementPurchaseExpenses.executeQuery(msSql);
-        while (resultSetPurchaseExpenses.next()) {
+        msSql = composeSqlQueryForPurchasingExpenses(SLibConsts.UNDEFINED);
+        resultSetPurchasingExpenses = statementPurchasingExpenses.executeQuery(msSql);
+        while (resultSetPurchasingExpenses.next()) {
 
             // 2.1 Determine the available inventory MP, mass (kg), for item-unit-store the current PC (ie, initial inventory purchases MP + net income):
 
             // XXX jbarajas warehouseType
-            msSql = obtainQueryInitialInventoryAvailableForExpensesPurchasing(resultSetPurchaseExpenses.getInt("re.fid_item_n"), false);
+            msSql = composeSqlQueryStartingInventoryAvailableForPurchasingExpenses(resultSetPurchasingExpenses.getInt("re.fid_item_n"), false);
             resultSetItemUnitWarehouse = statementItemUnitWarehouse.executeQuery(msSql);
 
             // Validate if there is purchased by units per item-unit-lot-warehouse for the msAuxPeriodQuery:
@@ -2233,7 +2227,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
 
                     // 3. GC apportion and allocate inventories (ie, create inputs System type ENTRY COST PURCHASE) for each item-unit-warehouse, stores shopping destination (eg, MP).
 
-                    msSql = obtainQueryInitialInventoryAvailableForExpensesPurchasing(resultSetItemUnitWarehouse.getInt("s.id_item"), true); // XXX jbarajas mnFkYearYearId, mtAuxDateEnd
+                    msSql = composeSqlQueryStartingInventoryAvailableForPurchasingExpenses(resultSetItemUnitWarehouse.getInt("s.id_item"), true); // XXX jbarajas mnFkYearYearId, mtAuxDateEnd
                     //msSql = obtainQueryForApportionPurchasingExpensesByWareHouseType(resultSetItemUnitWarehouse.getInt("s.id_item"), mnFkYearYearId, mtAuxDateEnd, true, SDataConstantsSys.CFGS_TP_ENT_WH_MFG_RM); // XXX jbarajas mnFkYearYearId, mtAuxDateEnd
                     resultSetItem = statementItem.executeQuery(msSql);
                     while (resultSetItem.next()) {
@@ -2242,23 +2236,23 @@ public class SDbInventoryValuation extends SDbRegistryUser {
                             resultSetItem.getInt("s.id_item"), resultSetItem.getInt("s.id_unit"),
                             SLibTimeUtils.createDate(mnFkYearYearId, mnFkYearPeriodId, 1),
                             SLibConsts.UNDEFINED, SLibConsts.UNDEFINED,
-                            SLibUtils.round(resultSetPurchaseExpenses.getDouble("f_bal") * (resultSetItemUnitWarehouse.getDouble("f_total") / resultSetItem.getDouble("f_total")), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
-                        dTotalAssigned += SLibUtils.round(resultSetPurchaseExpenses.getDouble("f_bal") * (resultSetItemUnitWarehouse.getDouble("f_total") / resultSetItem.getDouble("f_total")), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                            SLibUtils.round(resultSetPurchasingExpenses.getDouble("f_bal") * (resultSetItemUnitWarehouse.getDouble("f_total") / resultSetItem.getDouble("f_total")), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
+                        dTotalAssigned += SLibUtils.round(resultSetPurchasingExpenses.getDouble("f_bal") * (resultSetItemUnitWarehouse.getDouble("f_total") / resultSetItem.getDouble("f_total")), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
                         apportionDiogs.add(diog);
                     }
                 }
 
                 // Validate apportion the purchasing expenses and assign to inventory for each item-unit-lot-warehouse in the warehouses destiny:
 
-                if ((resultSetPurchaseExpenses.getDouble("f_bal") - dTotalAssigned) != 0) {
+                if ((resultSetPurchasingExpenses.getDouble("f_bal") - dTotalAssigned) != 0) {
 
-                    apportionDiogs(session, apportionDiogs, (resultSetPurchaseExpenses.getDouble("f_bal") - dTotalAssigned));
+                    apportionDiogs(session, apportionDiogs, (resultSetPurchasingExpenses.getDouble("f_bal") - dTotalAssigned));
                 }
             }
             else {
                 // XXX jbarajas
 
-                msSql = obtainQueryForApportionPurchasingExpensesByWareHouseType(resultSetPurchaseExpenses.getInt("re.fid_item_n"), mnFkYearYearId, mtAuxDateEnd, false, SDataConstantsSys.CFGS_TP_ENT_WH_MFG_RM);
+                msSql = composeSqlQueryForPurchasingExpensesApportionByWarehouseType(resultSetPurchasingExpenses.getInt("re.fid_item_n"), mnFkYearYearId, mtAuxDateEnd, false, SDataConstantsSys.CFGS_TP_ENT_WH_MFG_RM);
                 resultSetItemUnitWarehouse = statementItemUnitWarehouse.executeQuery(msSql);
 
                 if (resultSetItemUnitWarehouse.next() && resultSetItemUnitWarehouse.getDouble("f_total") > 0) {
@@ -2267,7 +2261,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
                     resultSetItemUnitWarehouse.beforeFirst();
                     while (resultSetItemUnitWarehouse.next()) {
 
-                        msSql = obtainQueryForApportionPurchasingExpensesByWareHouseType(resultSetItemUnitWarehouse.getInt("s.id_item"), mnFkYearYearId, mtAuxDateEnd, true, SDataConstantsSys.CFGS_TP_ENT_WH_MFG_RM);
+                        msSql = composeSqlQueryForPurchasingExpensesApportionByWarehouseType(resultSetItemUnitWarehouse.getInt("s.id_item"), mnFkYearYearId, mtAuxDateEnd, true, SDataConstantsSys.CFGS_TP_ENT_WH_MFG_RM);
                         resultSetItem = statementItem.executeQuery(msSql);
                         while (resultSetItem.next()) {
 
@@ -2275,35 +2269,35 @@ public class SDbInventoryValuation extends SDbRegistryUser {
                                 resultSetItem.getInt("s.id_item"), resultSetItem.getInt("s.id_unit"),
                                 SLibTimeUtils.createDate(mnFkYearYearId, mnFkYearPeriodId, 1),
                                 SLibConsts.UNDEFINED, SLibConsts.UNDEFINED,
-                                SLibUtils.round(resultSetPurchaseExpenses.getDouble("f_bal") * (resultSetItemUnitWarehouse.getDouble("f_total") / resultSetItem.getDouble("f_total")), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
-                            dTotalAssigned += SLibUtils.round(resultSetPurchaseExpenses.getDouble("f_bal") * (resultSetItemUnitWarehouse.getDouble("f_total") / resultSetItem.getDouble("f_total")), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                                SLibUtils.round(resultSetPurchasingExpenses.getDouble("f_bal") * (resultSetItemUnitWarehouse.getDouble("f_total") / resultSetItem.getDouble("f_total")), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
+                            dTotalAssigned += SLibUtils.round(resultSetPurchasingExpenses.getDouble("f_bal") * (resultSetItemUnitWarehouse.getDouble("f_total") / resultSetItem.getDouble("f_total")), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
                             apportionDiogs.add(diog);
                         }
                     }
 
                     // Validate apportion the purchasing expenses and assign to inventory for each item-unit-lot-warehouse in the warehouses destiny:
 
-                    if ((resultSetPurchaseExpenses.getDouble("f_bal") - dTotalAssigned) != 0) {
+                    if ((resultSetPurchasingExpenses.getDouble("f_bal") - dTotalAssigned) != 0) {
 
-                        apportionDiogs(session, apportionDiogs, (resultSetPurchaseExpenses.getDouble("f_bal") - dTotalAssigned));
+                        apportionDiogs(session, apportionDiogs, (resultSetPurchasingExpenses.getDouble("f_bal") - dTotalAssigned));
                     }
                 }
                 else { // XXX jbarajas
                     // Read item:
 
                     item = new SDataItem();
-                    item.read(new int[] { resultSetPurchaseExpenses.getInt("re.fid_item_n") }, statementItemUnitWarehouse);
-                    createDiog(session, SModSysConsts.TRNS_TP_IOG_IN_EXP_PUR, manAuxPkRawMaterialWarehouseId[0], manAuxPkRawMaterialWarehouseId[1], 1,
-                            item.getPkItemId(), item.getFkUnitId(), resultSetPurchaseExpenses.getDate("r.dt"), SLibConsts.UNDEFINED, SLibConsts.UNDEFINED,
-                            SLibUtils.round(resultSetPurchaseExpenses.getDouble("f_bal"), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()) );
+                    item.read(new int[] { resultSetPurchasingExpenses.getInt("re.fid_item_n") }, statementItemUnitWarehouse);
+                    createDiog(session, SModSysConsts.TRNS_TP_IOG_IN_EXP_PUR, manAuxRawMaterialWarehouseKey[0], manAuxRawMaterialWarehouseKey[1], 1,
+                            item.getPkItemId(), item.getFkUnitId(), resultSetPurchasingExpenses.getDate("r.dt"), SLibConsts.UNDEFINED, SLibConsts.UNDEFINED,
+                            SLibUtils.round(resultSetPurchasingExpenses.getDouble("f_bal"), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()) );
                 }
             }
         }
     }
 
-    private String obtainQueryInitialInventoryAvailableForExpensesPurchasing(final int idItem, final boolean isByItem) {
+    private String composeSqlQueryStartingInventoryAvailableForPurchasingExpenses(final int idItem, final boolean isByItem) {
         return msSql = "SELECT s.dt, s.id_item, s.id_unit, s.id_cob, s.id_wh, (COALESCE((" +
-                obtainQueryInitialInventoryPurchasing(mnFkYearYearId, SLibTimeUtils.createDate(mnFkYearYearId, mnFkYearPeriodId, 1)) + "), 0) + " +
+                composeSqlQueryStartingInventoryPurchasing(mnFkYearYearId, SLibTimeUtils.createDate(mnFkYearYearId, mnFkYearPeriodId, 1)) + "), 0) + " +
                 "(SUM((s.mov_in - s.mov_out) * i.mass))) AS f_total " +
                 "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS d " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " AS de ON " +
@@ -2333,7 +2327,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
                 "ORDER BY s.id_item " + (isByItem ? "" : ", s.id_unit, s.id_cob, s.id_wh ");
     }
 
-    private String obtainQueryInitialInventoryPurchasing(final int year, final Date dateStart) {
+    private String composeSqlQueryStartingInventoryPurchasing(final int year, final Date dateStart) {
         return "SELECT (SUM((ss.mov_in - ss.mov_out) * i.mass)) AS f_total " + // XXX jbarajas  * i.mass))
             "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS sd " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " AS sde ON " +
@@ -2355,7 +2349,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
             "ORDER BY s.id_item, s.id_unit ";
     }
 
-    private String obtainQueryInitialInventoryProductionOrderQuantity(final int year, final int[] pkProductionOrderId, final Date dateStart) {
+    private String composeSqlQueryStartingInventoryProductionOrderQuantity(final int year, final int[] pkProductionOrderId, final Date dateStart) {
         return "SELECT (SUM((s.mov_in - s.mov_out) * i.mass)) AS f_total " +
             "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS d " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " AS de ON " +
@@ -2381,7 +2375,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
             "ORDER BY d.fid_mfg_year_n, d.fid_mfg_ord_n ";
     }
 
-    private String obtainQueryInitialInventoryProductionOrderRMCosts(final int year, final int[] pkProductionOrderId, final Date dateStart) {
+    private String composeSqlQueryStartingInventoryProductionOrderRmCosts(final int year, final int[] pkProductionOrderId, final Date dateStart) {
         return "SELECT SUM(s.debit - s.credit) AS f_balance " +
             "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS d " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " AS de ON " +
@@ -2471,7 +2465,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
         }
     }
 
-    private String obtainQueryForPurchasingExpenses(final int idItem) {
+    private String composeSqlQueryForPurchasingExpenses(final int idItem) {
         return "SELECT r.dt, re.fid_item_n, SUM(re.debit - re.credit) AS f_bal " +
                 "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS r " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re ON " +
@@ -2501,7 +2495,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
                 "ORDER BY re.fid_item_n ";
     }
 
-    private String obtainQueryForApportionPurchasingExpenses(final int idItem, final int year, final Date date, final boolean isByItem) { // XXX jbarajas final int year, final Date date, final boolean isByItem
+    private String composeSqlQueryForPurchasingExpensesApportion(final int idItem, final int year, final Date date, final boolean isByItem) { // XXX jbarajas final int year, final Date date, final boolean isByItem
         return "SELECT s.id_cob, s.id_wh, s.id_item, s.id_unit, s.dt, (SUM(s.mov_in - s.mov_out) * i.mass) AS f_total " +
             "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS d " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " AS de ON " +
@@ -2528,8 +2522,8 @@ public class SDbInventoryValuation extends SDbRegistryUser {
             "ORDER BY s.id_item " + (isByItem ? "" : ", s.id_unit, s.id_cob, s.id_wh ");
     }
 
-    // XXX jbarajas new method
-    private String obtainQueryForApportionPurchasingExpensesByWareHouseType(final int idItem, final int year, final Date date, final boolean isByItem, final int[] warehouseType) {
+    private String composeSqlQueryForPurchasingExpensesApportionByWarehouseType(final int idItem, final int year, final Date date, final boolean isByItem, final int[] warehouseType) {
+        // XXX jbarajas new method
         return "SELECT s.id_cob, s.id_wh, s.id_item, s.id_unit, s.dt, (SUM(s.mov_in - s.mov_out) * i.mass) AS f_total " +
             "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS d " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " AS de ON " +
@@ -2620,7 +2614,6 @@ public class SDbInventoryValuation extends SDbRegistryUser {
                 "GROUP BY s.id_year, s.id_item, s.id_unit, s.id_cob, s.id_wh; ";
         resultSet = statement.executeQuery(msSql);
         if (resultSet.next()) {
-
             stock = resultSet.getDouble("f_stock");
             balance = resultSet.getDouble("f_balance");
         }
@@ -2654,7 +2647,6 @@ public class SDbInventoryValuation extends SDbRegistryUser {
                 "GROUP BY s.id_year, s.id_item, s.id_unit, s.id_cob, s.id_wh; ";
         resultSet = statement.executeQuery(msSql);
         if (resultSet.next()) {
-
             stock = resultSet.getDouble("f_stock");
             balance = resultSet.getDouble("f_balance");
         }
@@ -2662,59 +2654,42 @@ public class SDbInventoryValuation extends SDbRegistryUser {
         return new double[] { stock, balance };
     }
 
-    private void validateYearPeriodAll(final SGuiSession session, final int yearFirts, final int monthFirts) throws Exception {
-        Statement statement = session.getStatement();
+    private void validateAllPeriods(final SGuiSession session, final int maxYear, final int maxPeriod) throws Exception {
+        int minYear = 0;
+        int minPeriod = 0;
         ResultSet resultSet = null;
-        int yearLast = 0;
-        int monthLast = 0;
-        int yearAux = 0;
-        int monthAux = 0;
 
-        // Obtain year and month of first valuation:
+        // Get first inventory valuation period:
 
-        msSql = "SELECT * " +
-                "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_INV_VAL) + " " +
-                "WHERE b_del = 0 AND " +
-                "(fk_year_year <= " + yearFirts + " OR (fk_year_year <= " + yearFirts + " AND fk_year_per <= " + monthFirts + ")) " +
-                "GROUP BY fk_year_year, fk_year_per " +
-                "ORDER BY fk_year_year, fk_year_per LIMIT 1 ";
-        resultSet = statement.executeQuery(msSql);
-        if (resultSet.next()) {
-            yearAux = resultSet.getInt("fk_year_year");
-            monthAux = resultSet.getInt("fk_year_per");
+        msSql = "SELECT fk_year_year, fk_year_per "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_INV_VAL) + " "
+                + "WHERE id_inv_val = (SELECT COALESCE(MIN(id_inv_val), 0) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_INV_VAL) + " WHERE b_del=0) ";
+        resultSet = session.getStatement().executeQuery(msSql);
+        if (!resultSet.next()) {
+            throw new Exception("No existen aún valuaciones de inventarios en esta empresa.");
         }
-
-        // Obtain year and month of last valuation:
-
-        msSql = "SELECT * " +
-                "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_INV_VAL) + " " +
-                "WHERE b_del = 0 AND " +
-                "(fk_year_year <= " + yearFirts + " OR (fk_year_year <= " + yearFirts + " AND fk_year_per <= " + monthFirts + ")) " +
-                "GROUP BY fk_year_year, fk_year_per " +
-                "ORDER BY fk_year_year DESC, fk_year_per DESC LIMIT 1 ";
-        resultSet = statement.executeQuery(msSql);
-        if (resultSet.next()) {
-            yearLast = resultSet.getInt("fk_year_year");
-            monthLast = resultSet.getInt("fk_year_per");
-        }
-
-        while (yearAux < yearLast || (yearAux == yearLast && monthAux < monthLast)) {
-            msSql = "SELECT * " +
-                    "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_INV_VAL) + " " +
-                    "WHERE b_del = 0 AND " +
-                    "fk_year_year = " + yearAux + " AND fk_year_per = " + monthAux + " ";
-
-            resultSet = statement.executeQuery(msSql);
-            if (!resultSet.next() && !(yearAux == mnFkYearYearId && monthAux == mnFkYearPeriodId)) {
-                throw new Exception("No existe la valuación de inventarios del período: " + yearAux + "-" + monthAux + ".");
-            }
-
-            if (monthAux == SLibTimeConsts.MONTH_MAX) {
-                yearAux++;
-                monthAux = 1;
-            }
-            else {
-                monthAux++;
+        else {
+            minYear = resultSet.getInt("fk_year_year");
+            minPeriod = resultSet.getInt("fk_year_per");
+            
+            msSql = "SELECT fk_year_year, fk_year_per "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_INV_VAL) + " "
+                    + "WHERE (fk_year_year<" + maxYear + " OR (fk_year_year=" + maxYear + " AND fk_year_per<=" + maxPeriod + ")) AND "
+                    + "b_del=0 "
+                    + "ORDER BY fk_year_year, fk_year_per ";
+            resultSet = session.getStatement().executeQuery(msSql);
+            while (resultSet.next()) {
+                if (resultSet.getInt(1) != minYear || resultSet.getInt(2) != minPeriod) {
+                    throw new Exception("No existe la valuación de inventarios del periodo: " + minYear + "-" + SLibUtils.DecimalFormatCalendarMonth.format(minPeriod) + ".");
+                }
+                
+                if (minPeriod < SLibTimeConsts.MONTH_MAX) {
+                    minPeriod++;
+                }
+                else {
+                    minYear++;
+                    minPeriod = 1;
+                }
             }
         }
     }
@@ -2741,33 +2716,33 @@ public class SDbInventoryValuation extends SDbRegistryUser {
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
 
-    public void getAuxPkRawMaterialWarehouseId(int[] n) { manAuxPkRawMaterialWarehouseId = n; };
-
-    public int[] setAuxPkRawMaterialWarehouseId() { return manAuxPkRawMaterialWarehouseId; };
-
-    public void setAuxAccountMask(String s) { msAuxAccountMask = s; }
-    public void setAuxTypeUnitValuation(String s) { msAuxTypeUnitValuation = s; }
-    public void setAuxPeriodQuery(String s) { msAuxPeriodQuery = s; }
     public void setAuxIsConsistent(boolean b) { mbAuxIsConsistent = b; }
     public void setAuxExistInventoryMoves(boolean b) { mbAuxExistInventoryMoves = b; }
     public void setAuxExistInventoryPurchasingExpenses(boolean b) { mbAuxExistInventoryPurchasingExpenses = b; }
     public void setAuxExistPurchasingExpenses(boolean b) { mbAuxExistPurchasingExpenses = b; }
-    public void setAuxExistInventoryManufacturingExpenses(boolean b) { mbAuxExistInventoryManufacturingExpenses = b; }
-    public void setAuxExistManufacturingExpenses(boolean b) { mbAuxExistManufacturingExpenses = b; }
+    public void setAuxExistInventoryMfgExpenses(boolean b) { mbAuxExistInventoryMfgExpenses = b; }
+    public void setAuxExistMfgExpenses(boolean b) { mbAuxExistMfgExpenses = b; }
+    public void setAuxAccountMask(String s) { msAuxAccountMask = s; }
+    public void setAuxMfgCostUnitType(String s) { msAuxMfgCostUnitType = s; }
+    public void setAuxMfgCostUnitTypeSql(String s) { msAuxMfgCostUnitTypeSql = s; }
+    public void setAuxPeriodQuery(String s) { msAuxPeriodQuery = s; }
     public void setAuxDateStart(Date t) { mtAuxDateStart = t; }
     public void setAuxDateEnd(Date t) { mtAuxDateEnd = t; }
+    public void setAuxRawMaterialWarehouseKey(int[] n) { manAuxRawMaterialWarehouseKey = n; };
 
-    public String getAuxAccountMask() { return msAuxAccountMask; }
-    public String getAuxTypeUnitValuation() { return msAuxTypeUnitValuation; }
-    public String getAuxPeriodQuery() { return msAuxPeriodQuery; }
     public boolean getAuxIsConsistent() { return mbAuxIsConsistent; }
     public boolean getAuxExistInventoryMoves() { return mbAuxExistInventoryMoves; }
     public boolean getAuxExistInventoryPurchasingExpenses() { return mbAuxExistInventoryPurchasingExpenses; }
     public boolean getAuxExistPurchasingExpenses() { return mbAuxExistPurchasingExpenses; }
-    public boolean getAuxExistInventoryManufacturingExpenses() { return mbAuxExistInventoryManufacturingExpenses; }
-    public boolean getAuxExistManufacturingExpenses() { return mbAuxExistManufacturingExpenses; }
+    public boolean getAuxExistInventoryMfgExpenses() { return mbAuxExistInventoryMfgExpenses; }
+    public boolean getAuxExistMfgExpenses() { return mbAuxExistMfgExpenses; }
+    public String getAuxAccountMask() { return msAuxAccountMask; }
+    public String getAuxMfgCostUnitType() { return msAuxMfgCostUnitType; }
+    public String getAuxMfgCostUnitTypeSql() { return msAuxMfgCostUnitTypeSql; }
+    public String getAuxPeriodQuery() { return msAuxPeriodQuery; }
     public Date getAuxDateStart() { return mtAuxDateStart; }
     public Date getAuxDateEnd() { return mtAuxDateEnd; }
+    public int[] getAuxRawMaterialWarehouseKey() { return manAuxRawMaterialWarehouseKey; };
 
     public void validatePurchasingExpensesInventory(SGuiSession session) throws Exception {
         mbAuxExistInventoryMoves = false;
@@ -2789,7 +2764,6 @@ public class SDbInventoryValuation extends SDbRegistryUser {
                 "GROUP BY d.id_year ";
         resultSet = statement.executeQuery(msSql);
         if (resultSet.next()) {
-
             if (resultSet.getDouble(1) > 0d ||
                     resultSet.getDouble(2) > 0d) {
 
@@ -2801,7 +2775,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
 
             // Obtain inventory for purchasing expenses:
 
-            msSql = obtainQueryForApportionPurchasingExpenses(SLibConsts.UNDEFINED, mnFkYearYearId, mtAuxDateEnd, false); // XXX jbarajas mnFkYearYearId, mtAuxDateEnd
+            msSql = composeSqlQueryForPurchasingExpensesApportion(SLibConsts.UNDEFINED, mnFkYearYearId, mtAuxDateEnd, false); // XXX jbarajas mnFkYearYearId, mtAuxDateEnd
             resultSet = statement.executeQuery(msSql);
             if (resultSet.next()) {
 
@@ -2810,18 +2784,17 @@ public class SDbInventoryValuation extends SDbRegistryUser {
 
             // Obtain purshasing expenses:
 
-            msSql = obtainQueryForPurchasingExpenses(SLibConsts.UNDEFINED);
+            msSql = composeSqlQueryForPurchasingExpenses(SLibConsts.UNDEFINED);
             resultSet = statement.executeQuery(msSql);
             if (resultSet.next()) {
-
                 mbAuxExistPurchasingExpenses = true;
             }
         }
     }
 
-    public void validateManufacturingExpensesInventory(SGuiSession session) throws Exception {
-        mbAuxExistInventoryManufacturingExpenses = false;
-        mbAuxExistManufacturingExpenses = false;
+    public void validateMfgExpensesInventory(SGuiSession session) throws Exception {
+        mbAuxExistInventoryMfgExpenses = false;
+        mbAuxExistMfgExpenses = false;
 
         String sProductionOrders = "";
         ArrayList<SDataProductionOrder> aProductionOrders = new ArrayList<SDataProductionOrder>();
@@ -2844,11 +2817,10 @@ public class SDbInventoryValuation extends SDbRegistryUser {
 
         if (!sProductionOrders.isEmpty()) {
 
-            msSql = obtainQueryForAmountManufacturing(SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, false, SLibConsts.UNDEFINED, false, sProductionOrders);
+            msSql = composeSqlQueryMfgAmount(SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, false, SLibConsts.UNDEFINED, false, sProductionOrders);
             resultSet = statement.executeQuery(msSql);
             if (resultSet.next()) {
-
-                mbAuxExistInventoryManufacturingExpenses = true;
+                mbAuxExistInventoryMfgExpenses = true;
             }
         }
 
@@ -2877,8 +2849,7 @@ public class SDbInventoryValuation extends SDbRegistryUser {
 
         resultSet = statement.executeQuery(msSql);
         if (resultSet.next()) {
-
-            mbAuxExistManufacturingExpenses = true;
+            mbAuxExistMfgExpenses = true;
         }
     }
 
@@ -2906,17 +2877,19 @@ public class SDbInventoryValuation extends SDbRegistryUser {
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
 
-        manAuxPkRawMaterialWarehouseId = null;
-
-        msAuxAccountMask = "";
-        msAuxTypeUnitValuation = "";
-        msAuxPeriodQuery = "";
         mbAuxIsConsistent = false;
         mbAuxExistInventoryMoves = false;
         mbAuxExistInventoryPurchasingExpenses = false;
         mbAuxExistPurchasingExpenses = false;
-        mbAuxExistInventoryManufacturingExpenses = false;
-        mbAuxExistManufacturingExpenses = false;
+        mbAuxExistInventoryMfgExpenses = false;
+        mbAuxExistMfgExpenses = false;
+        msAuxAccountMask = "";
+        msAuxMfgCostUnitType = "";
+        msAuxMfgCostUnitTypeSql = "";
+        msAuxPeriodQuery = "";
+        msAuxPeriodQuery = null;
+        mtAuxDateStart = null;
+        manAuxRawMaterialWarehouseKey = null;
     }
 
     @Override
@@ -3056,7 +3029,6 @@ public class SDbInventoryValuation extends SDbRegistryUser {
 
         if (can) {
 
-
         }
 
         return can;
@@ -3065,404 +3037,355 @@ public class SDbInventoryValuation extends SDbRegistryUser {
     @Override
     public boolean canSave(SGuiSession session) throws SQLException, Exception {
         boolean can = super.canSave(session);
-
-        int[] anPreviousYearPeriod = null;
-        int nInventoryValId = 0;
-
-        ArrayList<SDataProductionOrder> aProductionOrders = new ArrayList<SDataProductionOrder>();
-        ArrayList<SDataDiog> aDiogs = new ArrayList<SDataDiog>();
-
-        SDataParamsCompany paramsCompany = null;
-        SDbInventoryValuation inventoryValuationPrevious = null;
-
-        Statement statement = session.getStatement();
+        int[] prevPeriodKey = null;
         ResultSet resultSet = null;
+        ArrayList<SDataDiog> diogs = null;
+        ArrayList<SDataProductionOrder> productionOrders = null;
+        SDbInventoryValuation prevInventoryValuation = null;
 
         if (can) {
+            msAuxMfgCostUnitType = "";
+            msAuxMfgCostUnitTypeSql = "";
+            manAuxRawMaterialWarehouseKey = null;
+            
+            diogs = new ArrayList<SDataDiog>();
+            productionOrders = new ArrayList<SDataProductionOrder>();
+
+            // 3. Validate whether it is possible to compute inventory valuation:
+
+            // 3.1. Validate company configuration for Inventory Valuation Calculation Method (MCVI):
+
+            if (((SDataParamsCompany) session.getConfigCompany()).getInventoryValuationMethod() != SModSysConsts.CFGX_IVM_AVG) {
+                can = false;
+                msQueryResult = "No se ha configurado en esta empresa un Método de Cálculo de Valuación de Inventarios (MCVI) soportado por el sistema.\n1 MCVI soportados: costo promedio.";
+            }
+
+            // 3.2. Validate company configuration for Unit Type for Manufacturing Cost Calculation (CCF):
+
             if (can) {
-
-                // 3. Validate whether you can make the calculation of inventory valuation:
-                // 3.1. Validate that the Method Calculation Valuation (MCIV) this implemented in the company:
-
-                paramsCompany = (SDataParamsCompany) session.getConfigCompany();
-                if (paramsCompany.getInventoryValuationMethod() != SModSysConsts.CFGX_IVM_AVG) {
-
-                    can = false;
-                    msQueryResult = "No existe la configuración para el Método de Cálculo de Valuación de Inventarios (MCVI) soportado por el sistema.\n (MCVI Soportado: Promedios).";
+                msAuxMfgCostUnitType = (String) session.readField(SModConsts.ITMU_TP_UNIT, new int[] { ((SDataParamsCompany) session.getConfigCompany()).getFkMfgCostUnitTypeId() }, SDbRegistry.FIELD_NAME);
+                
+                switch (((SDataParamsCompany) session.getConfigCompany()).getFkMfgCostUnitTypeId()) {
+                    case SModSysConsts.ITMU_TP_UNIT_LEN:
+                        msAuxMfgCostUnitTypeSql = "i.len";
+                        break;
+                    case SModSysConsts.ITMU_TP_UNIT_SURF:
+                        msAuxMfgCostUnitTypeSql = "i.surf";
+                        break;
+                    case SModSysConsts.ITMU_TP_UNIT_VOL:
+                        msAuxMfgCostUnitTypeSql = "i.vol";
+                        break;
+                    case SModSysConsts.ITMU_TP_UNIT_MASS:
+                        msAuxMfgCostUnitTypeSql = "i.mass";
+                        break;
+                    case SModSysConsts.ITMU_TP_UNIT_TIME:
+                        msAuxMfgCostUnitTypeSql = "i.prod_time";
+                        break;
+                    default:
+                        can = false;
+                        msQueryResult = "No se ha configurado en esta empresa el Tipo de Unidad base para el Cálculo de Costos de Fabricación (CCF).";
                 }
+            }
 
-                // 3.2. Validate that the Manufacturing Cost Calculation (MCC) Unit Type set for the company is supported by the system:
+            // 3.3. Validate that there is one and only one default warehouse for Raw Materials:
 
-                if (paramsCompany.getFkMfgCostUnitTypeId() == SLibConsts.UNDEFINED) {
-
-                    can = false;
-                    msQueryResult = "No se ha definido la configuración del tipo de unidad para el Cálculo de Costo de Producción.";
-                }
-                else {
-                    msAuxTypeUnitValuation =
-                        paramsCompany.getFkMfgCostUnitTypeId() == SModSysConsts.ITMU_TP_UNIT_NA ? "" :
-                        paramsCompany.getFkMfgCostUnitTypeId() == SModSysConsts.ITMU_TP_UNIT_QTY ? "" :
-                        paramsCompany.getFkMfgCostUnitTypeId() == SModSysConsts.ITMU_TP_UNIT_MASS ? "i.mass" :
-                        paramsCompany.getFkMfgCostUnitTypeId() == SModSysConsts.ITMU_TP_UNIT_TIME ? "i.prod_time" :
-                        paramsCompany.getFkMfgCostUnitTypeId() == SModSysConsts.ITMU_TP_UNIT_LEN ? "i.len" :
-                        paramsCompany.getFkMfgCostUnitTypeId() == SModSysConsts.ITMU_TP_UNIT_SURF ? "i.surf" :
-                        paramsCompany.getFkMfgCostUnitTypeId() == SModSysConsts.ITMU_TP_UNIT_VOL ? "i.vol" : "";
-                }
-
-                // 3.3. Validate that has one and only one default warehouse for storage type RM:
-
-                if (can) {
-                    manAuxPkRawMaterialWarehouseId = null;
-                    msSql = "SELECT COUNT(*), id_cob, id_ent, fid_ct_ent, fid_tp_ent, b_def " +
-                            "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_COB_ENT) + " " +
-                            "WHERE b_del = 0 AND b_def = 1 AND fid_ct_ent = " + SModSysConsts.CFGS_TP_ENT_WH_MFG_RM[0] + " AND fid_tp_ent = " + SModSysConsts.CFGS_TP_ENT_WH_MFG_RM[1] + " " +
-                            "GROUP BY fid_ct_ent, fid_tp_ent ";
-                    resultSet = statement.executeQuery(msSql);
-                    if (resultSet.next()) {
-
-                        if (resultSet.getInt(1) > 1) {
-
-                            can = false;
-                            msQueryResult = "Existe más de un almacén 'Predeterminado' de tipo Materia Prima.";
-                        }
-                        else {
-
-                            manAuxPkRawMaterialWarehouseId = new int[] { resultSet.getInt("id_cob"), resultSet.getInt("id_ent") };
-                        }
+            if (can) {
+                msSql = "SELECT COUNT(*) "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_COB_ENT) + " "
+                        + "WHERE fid_ct_ent = " + SModSysConsts.CFGS_TP_ENT_WH_MFG_RM[0] + " AND fid_tp_ent = " + SModSysConsts.CFGS_TP_ENT_WH_MFG_RM[1] + " AND "
+                        + "b_del = 0 AND b_def = 1 ";
+                resultSet = session.getStatement().executeQuery(msSql);
+                if (resultSet.next()) {
+                    if (resultSet.getInt(1) == 0) {
+                        can = false;
+                        msQueryResult = "No existen en esta empresa un almacenes predeterminados de tipo Materia Prima,\nes necesario solamente uno para la asignación por defecto de gastos de compra.";
+                    }
+                    else if (resultSet.getInt(1) > 1) {
+                        can = false;
+                        msQueryResult = "Existen en esta empresa " + resultSet.getInt(1) + " almacenes 'predeterminados' de tipo Materia Prima,\nes necesario solamente uno para la asignación por defecto de gastos de compra.";
                     }
                     else {
+                        msSql = "SELECT id_cob, id_ent "
+                                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_COB_ENT) + " "
+                                + "WHERE fid_ct_ent = " + SModSysConsts.CFGS_TP_ENT_WH_MFG_RM[0] + " AND fid_tp_ent = " + SModSysConsts.CFGS_TP_ENT_WH_MFG_RM[1] + " AND "
+                                + "b_del = 0 AND b_def = 1 ";
+                        resultSet = session.getStatement().executeQuery(msSql);
+                        if (resultSet.next()) {
+                            manAuxRawMaterialWarehouseKey = new int[] { resultSet.getInt(1), resultSet.getInt(2) };
+                        }
+                    }
+                }
+            }
 
+            // 3.4. Validate that all accounting periods preceding the current one inclusive are closed:
+
+            if (can) {
+                msSql = "SELECT "
+                        + "(SELECT COUNT(*) FROM fin_year_per WHERE id_year<" + mnFkYearYearId + " AND b_closed=0) "
+                        + "(SELECT COUNT(*) FROM fin_year_per WHERE id_year=" + mnFkYearYearId + " AND id_per<=" + mnFkYearPeriodId + " AND b_closed=0) ";
+                if (resultSet.next()) {
+                    if (resultSet.getInt(1) > 0) {
                         can = false;
-                            msQueryResult = "No existe un almacén 'Predeterminado' de tipo Materia Prima.\n" +
-                                "Es necesario para la asignación de gastos de compra.";
+                        msQueryResult = (resultSet.getInt(1) == 1 ? "Existe 1 periodo contable abierto " : "Existen " + resultSet.getInt(1) + " periodos contables abiertos ")
+                                + "antes del periodo " + mnFkYearYearId + "-" + SLibUtils.DecimalFormatCalendarMonth.format(mnFkYearPeriodId) + " inclusive.";
                     }
                 }
+            }
 
-                // 3.4. Validate that the current accounting period is closed in the PC system.
+            // 3.5. Validate that the Calculation Period (PC) inmediately preceding current Inventory Valuation Calculation (CVI) is consistent:
 
-                if (can) {
+            // (a) 3.5.1. There must exist all preceding PC up to current CVI:
 
-                    msSql = "SELECT p.id_year, p.id_per, p.b_closed " +
-                            "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_YEAR) + " AS y " +
-                            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_YEAR_PER) + " AS p ON " +
-                            "y.id_year = p.id_year " +
-                            "WHERE (p.id_year < " + mnFkYearYearId + " AND p.b_closed = 0) OR " +
-                            "(p.id_year <= " + mnFkYearYearId + " AND p.id_per <= " + mnFkYearPeriodId + " AND p.b_closed = 0) " +
-                            "ORDER BY p.id_year, p.id_per, p.b_closed; ";
-                    resultSet = statement.executeQuery(msSql);
-                    if (resultSet.next()) {
+            if (can) {
+                prevPeriodKey = SLibTimeUtils.digestMonth(SLibTimeUtils.addDate(SLibTimeUtils.createDate(mnFkYearYearId, mnFkYearPeriodId), 0, -1, 0));
+                validateAllPeriods(session, prevPeriodKey[0], prevPeriodKey[1]);
+                
+                // Get previous period's CVI, if any:
 
+                msSql = "SELECT id_inv_val " +
+                        "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_INV_VAL) + " " +
+                        "WHERE fk_year_year = " + prevPeriodKey[0] + " AND fk_year_per = " + prevPeriodKey[1] + " AND b_del = 0 ";
+                resultSet = session.getStatement().executeQuery(msSql);
+                if (resultSet.next()) {
+                    prevInventoryValuation = (SDbInventoryValuation) session.readRegistry(SModConsts.TRN_INV_VAL, new int[] { resultSet.getInt(1) });
+                }
+            }
+
+            // (b) 3.5.2. All previous purchases costs (GC) must have been inputted before the immediately previous PC:
+
+            if (can && prevInventoryValuation != null) {
+                msSql = "SELECT COUNT(*) " +
+                    "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS r " +
+                    "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re ON " +
+                    "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num " +
+                    "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " AS acc ON " +
+                    "re.fid_acc = acc.id_acc " +
+                    "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON " +
+                    "re.fid_item_n = i.id_item " +
+                    "WHERE r.b_del = 0 AND re.b_del = 0 AND " +
+                    "(SELECT COUNT(*) " +
+                    "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " " +
+                    "WHERE id_acc = CONCAT( " +
+                    "LEFT(acc.id_acc, INSTR(acc.id_acc, '-') -1), " +
+                    "RIGHT('" + msAuxAccountMask + "', LENGTH(acc.id_acc) - (INSTR(acc.id_acc, '-') -1))) AND " +
+                    "(fid_tp_acc_r = " + SDataConstantsSys.FINS_CLS_ACC_EXPEN_PUR[0] + " AND " +
+                    "fid_cl_acc_r = " + SDataConstantsSys.FINS_CLS_ACC_EXPEN_PUR[1] + " AND " +
+                    "fid_cls_acc_r = " + SDataConstantsSys.FINS_CLS_ACC_EXPEN_PUR[2] + ")) > 0 AND " +
+                    "re.fid_item_aux_n IS NOT NULL AND " +
+                    "YEAR(r.dt) = " + prevPeriodKey[0] + " AND " +
+                    "MONTH(r.dt) = " + prevPeriodKey[1] + " AND " +
+                    "(re.ts_edit > '" + SLibUtils.DbmsDateFormatDatetime.format(prevInventoryValuation.getTsUserUpdate()) + "' OR " +
+                    "re.ts_del > '" + SLibUtils.DbmsDateFormatDatetime.format(prevInventoryValuation.getTsUserUpdate()) + "') " +
+                    "GROUP BY re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety " +
+                    "ORDER BY re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety ";
+                resultSet = session.getStatement().executeQuery(msSql);
+                if (resultSet.next()) {
+                    if (resultSet.getInt(1) > SLibConsts.UNDEFINED) {
                         can = false;
-                        msQueryResult = "El período contable: '" + resultSet.getInt("p.id_year") + "-" + resultSet.getInt("p.id_per") + "' y anteriores deben estar cerrados.";
+                        msQueryResult = "Existen gastos de compra capturados o modificados después de la valuación de inventarios "
+                                + "del periodo: " + prevPeriodKey[0] + "-" + SLibUtils.DecimalFormatCalendarMonth.format(prevPeriodKey[1]) + ".";
                     }
                 }
+            }
 
-                // 3.5. Validate that the Calculation Period (CP) inmediately preceding Method Calculation Inventory Valuation (CIV) is consistent:
-                // (a) 3.5.1. There must be the immediately preceding CIV:
+            // (c) 3.5.3. All previous manufacturing costs (GF) must have been inputted before the immediately previous PC:
 
-                if (can) {
-
-                    // Verify if exist valuations inventory:
-
-                    inventoryValuationPrevious = null;
-                    anPreviousYearPeriod = SLibTimeUtils.digestMonth(SLibTimeUtils.addDate(SLibTimeUtils.createDate(mnFkYearYearId, mnFkYearPeriodId), 0, -1, 0));
-
-                    msSql = "SELECT * " +
-                            "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_INV_VAL) + " " +
-                            "WHERE b_del = 0 AND " +
-                            "fk_year_year <= " + anPreviousYearPeriod[0] + " OR (fk_year_year <= " + anPreviousYearPeriod[0] + " AND fk_year_per <= " + anPreviousYearPeriod[1] + ") " +
-                            "GROUP BY fk_year_year, fk_year_per " +
-                            "ORDER BY fk_year_year, fk_year_per LIMIT 1 ";
-                    resultSet = statement.executeQuery(msSql);
-                    if (resultSet.next()) {
-
-                        msSql = "SELECT COALESCE(MAX(id_inv_val), 0) " +
-                                "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_INV_VAL) + " " +
-                                "WHERE b_del = 0 AND fk_year_year = " + anPreviousYearPeriod[0] + " AND fk_year_per = " + anPreviousYearPeriod[1] + " " +
-                                "GROUP BY fk_year_year, fk_year_per ";
-                        resultSet = statement.executeQuery(msSql);
-                        if (!resultSet.next()) {
-
-                            can = false;
-                            msQueryResult = "No existe la valuación de inventarios previa (período: " + anPreviousYearPeriod[0] + "-" + anPreviousYearPeriod[1] + ").";
-                        }
-                        else {
-                            nInventoryValId = resultSet.getInt(1);
-
-                            validateYearPeriodAll(session, anPreviousYearPeriod[0], anPreviousYearPeriod[1]);
-
-                            inventoryValuationPrevious = (SDbInventoryValuation) session.readRegistry(SModConsts.TRN_INV_VAL, new int[] { nInventoryValId });
-                        }
-                    }
-                }
-
-                // (b) 3.5.2. All previous purchases cost (PURC) should have been caught before the CP immediately preceding CIV:
-
-                if (can &&
-                    inventoryValuationPrevious != null) {
-
-                    msSql = "SELECT COUNT(*) " +
-                        "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS r " +
-                        "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re ON " +
-                        "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num " +
-                        "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " AS acc ON " +
-                        "re.fid_acc = acc.id_acc " +
-                        "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON " +
-                        "re.fid_item_n = i.id_item " +
-                        "WHERE r.b_del = 0 AND re.b_del = 0 AND " +
-                        "(SELECT COUNT(*) " +
-                        "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " " +
-                        "WHERE id_acc = CONCAT( " +
-                        "LEFT(acc.id_acc, INSTR(acc.id_acc, '-') -1), " +
-                        "RIGHT('" + msAuxAccountMask + "', LENGTH(acc.id_acc) - (INSTR(acc.id_acc, '-') -1))) AND " +
-                        "(fid_tp_acc_r = " + SDataConstantsSys.FINS_CLS_ACC_EXPEN_PUR[0] + " AND " +
-                        "fid_cl_acc_r = " + SDataConstantsSys.FINS_CLS_ACC_EXPEN_PUR[1] + " AND " +
-                        "fid_cls_acc_r = " + SDataConstantsSys.FINS_CLS_ACC_EXPEN_PUR[2] + ")) > 0 AND " +
-                        "re.fid_item_aux_n IS NOT NULL AND " +
-                        "YEAR(r.dt) = " + anPreviousYearPeriod[0] + " AND " +
-                        "MONTH(r.dt) = " + anPreviousYearPeriod[1] + " AND " +
-                        "(re.ts_edit > '" + SLibUtils.DbmsDateFormatDatetime.format(inventoryValuationPrevious.getTsUserUpdate()) + "' OR " +
-                        "re.ts_del > '" + SLibUtils.DbmsDateFormatDatetime.format(inventoryValuationPrevious.getTsUserUpdate()) + "') " +
-                        "GROUP BY re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety " +
-                        "ORDER BY re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety ";
-                    resultSet = statement.executeQuery(msSql);
-                    if (resultSet.next()) {
-                        if (resultSet.getInt(1) > SLibConsts.UNDEFINED) {
-
-                            can = false;
-                            msQueryResult = "Existen gastos de compra modificados después de la valuación de inventarios del período: " +
-                                    anPreviousYearPeriod[0] + "-" + anPreviousYearPeriod[1] + ".";
-                        }
-                    }
-                }
-
-                // (c) 3.5.3. All previous manufacturing cost (MANC) should have been caught before the CP immediately preceding CIV:
-
-                if (can &&
-                    inventoryValuationPrevious != null) {
-
-                    msSql = "SELECT COUNT(*) " +
-                        "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS r " +
-                        "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re ON " +
-                        "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num " +
-                        "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " AS acc ON " +
-                        "re.fid_acc = acc.id_acc " +
-                        "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON " +
-                        "re.fid_item_n = i.id_item " +
-                        "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_IGEN) + " AS ig ON " +
-                        "i.fid_igen = ig.id_igen " +
-                        "WHERE r.b_del = 0 AND re.b_del = 0 AND " +
-                        "(SELECT COUNT(*) " +
-                        "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " " +
-                        "WHERE id_acc = CONCAT( " +
-                        "LEFT(acc.id_acc, INSTR(acc.id_acc, '-') -1), " +
-                        "RIGHT('" + msAuxAccountMask + "', LENGTH(acc.id_acc) - (INSTR(acc.id_acc, '-') -1))) AND " +
-                        "((fid_tp_acc_r = " + SDataConstantsSys.FINS_CLS_ACC_EXPEN_MFG[0] + " AND " +
-                        "fid_cl_acc_r = " + SDataConstantsSys.FINS_CLS_ACC_EXPEN_MFG[1] + " AND " +
-                        "fid_cls_acc_r = " + SDataConstantsSys.FINS_CLS_ACC_EXPEN_MFG[2] + "))) > 0 AND " +
-                        "YEAR(r.dt) = " + anPreviousYearPeriod[0] + " AND " +
-                        "MONTH(r.dt) = " + anPreviousYearPeriod[1] + " AND " +
-                        "(re.ts_edit > '" + SLibUtils.DbmsDateFormatDatetime.format(inventoryValuationPrevious.getTsUserUpdate()) + "' OR " +
-                        "re.ts_del > '" + SLibUtils.DbmsDateFormatDatetime.format(inventoryValuationPrevious.getTsUserUpdate()) + "') " +
-                        "GROUP BY re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety " +
-                        "ORDER BY re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety ";
-                    resultSet = statement.executeQuery(msSql);
-                    if (resultSet.next()) {
-                        if (resultSet.getInt(1) > SLibConsts.UNDEFINED) {
-
-                            can = false;
-                            msQueryResult = "Existen gastos de producción modificados después de la valuación de inventarios del período: " +
-                                    anPreviousYearPeriod[0] + "-" + anPreviousYearPeriod[1] + ".";
-                        }
-                    }
-                }
-
-                // (d) 3.5.4. All inventory moves cost (MANC) should have been caught before the CP immediately preceding CIV:
-
-                if (can &&
-                    inventoryValuationPrevious != null) {
-
-                    msSql = "SELECT COUNT(*) " +
-                            "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS d " +
-                            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " AS de ON " +
-                            "d.id_year = de.id_year AND d.id_doc = de.id_doc " +
-                            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s ON " +
-                            "de.id_year = s.fid_diog_year AND de.id_doc = s.fid_diog_doc AND de.id_ety = s.fid_diog_ety " +
-                            "WHERE d.b_del = 0 AND de.b_del = 0 AND  s.b_del = 0 AND " +
-                            "YEAR(d.dt) = " + anPreviousYearPeriod[0] + " AND " +
-                            "MONTH(d.dt) = " + anPreviousYearPeriod[1] + " AND " +
-                            "(de.ts_edit > '" + SLibUtils.DbmsDateFormatDatetime.format(inventoryValuationPrevious.getTsUserUpdate()) + "' OR " +
-                            "de.ts_del > '" + SLibUtils.DbmsDateFormatDatetime.format(inventoryValuationPrevious.getTsUserUpdate()) + "') " +
-                            "GROUP BY d.id_year, d.id_doc " +
-                            "ORDER BY d.id_year, d.id_doc ";
-                    resultSet = statement.executeQuery(msSql);
-                    if (resultSet.next()) {
-                        if (resultSet.getInt(1) > SLibConsts.UNDEFINED) {
-
-                            can = false;
-                            msQueryResult = "Existen movimientos de inventario modificados después de la valuación de inventarios del período: " +
-                                    anPreviousYearPeriod[0] + "-" + anPreviousYearPeriod[1] + ".";
-                        }
-                    }
-                }
-
-                // (e) 3.5.5. The CVI PC immediately preceding the current must have been generated after any modification (eg, opening/closing) and the corresponding previous accounting msAuxPeriodQuery, which must also be closed:
-
-                if (can) {
-
-                    msSql = "SELECT COUNT(*) " +
-                        "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_YEAR) + " AS y " +
-                        "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_YEAR_PER) + " AS p ON " +
-                        "y.id_year = p.id_year " +
-                        "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_INV_VAL) + " AS v ON " +
-                        "p.id_year = v.fk_year_year AND p.id_per = v.fk_year_per " +
-                        "WHERE y.b_del = 0 AND p.b_del = 0 AND v.b_del = 0 AND " +
-                        "v.fk_year_year <= " + anPreviousYearPeriod[0] + " AND v.fk_year_per <= " + anPreviousYearPeriod[1] + " AND p.ts_edit > v.ts_usr_upd AND " +
-                        "p.b_closed = 1 ";
-                    resultSet = statement.executeQuery(msSql);
-                    if (resultSet.next()) {
-                        if (resultSet.getInt(1) > SLibConsts.UNDEFINED) {
-
-                            can = false;
-                            msQueryResult = "Existen periodos contables abiertos o modificados después de la última valuación de inventarios: " +
-                                    anPreviousYearPeriod[0] + "-" + anPreviousYearPeriod[1] + ".";
-                        }
-                    }
-                }
-
-                // 3.6 Validate that all items purchased in the RM CP have defined corresponding to MASA (kg) (required Assignment GC) physical measurement (ie,> 0):
-
-                if (can) {
-
-                    msQueryResult = validatePurchasesForPhysicalMeasurementItems(session);
-                    if (!msQueryResult.isEmpty()) {
-
+            if (can && prevInventoryValuation != null) {
+                msSql = "SELECT COUNT(*) " +
+                    "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS r " +
+                    "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re ON " +
+                    "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num " +
+                    "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " AS acc ON " +
+                    "re.fid_acc = acc.id_acc " +
+                    "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON " +
+                    "re.fid_item_n = i.id_item " +
+                    "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_IGEN) + " AS ig ON " +
+                    "i.fid_igen = ig.id_igen " +
+                    "WHERE r.b_del = 0 AND re.b_del = 0 AND " +
+                    "(SELECT COUNT(*) " +
+                    "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " " +
+                    "WHERE id_acc = CONCAT( " +
+                    "LEFT(acc.id_acc, INSTR(acc.id_acc, '-') -1), " +
+                    "RIGHT('" + msAuxAccountMask + "', LENGTH(acc.id_acc) - (INSTR(acc.id_acc, '-') -1))) AND " +
+                    "((fid_tp_acc_r = " + SDataConstantsSys.FINS_CLS_ACC_EXPEN_MFG[0] + " AND " +
+                    "fid_cl_acc_r = " + SDataConstantsSys.FINS_CLS_ACC_EXPEN_MFG[1] + " AND " +
+                    "fid_cls_acc_r = " + SDataConstantsSys.FINS_CLS_ACC_EXPEN_MFG[2] + "))) > 0 AND " +
+                    "YEAR(r.dt) = " + prevPeriodKey[0] + " AND " +
+                    "MONTH(r.dt) = " + prevPeriodKey[1] + " AND " +
+                    "(re.ts_edit > '" + SLibUtils.DbmsDateFormatDatetime.format(prevInventoryValuation.getTsUserUpdate()) + "' OR " +
+                    "re.ts_del > '" + SLibUtils.DbmsDateFormatDatetime.format(prevInventoryValuation.getTsUserUpdate()) + "') " +
+                    "GROUP BY re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety " +
+                    "ORDER BY re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety ";
+                resultSet = session.getStatement().executeQuery(msSql);
+                if (resultSet.next()) {
+                    if (resultSet.getInt(1) > SLibConsts.UNDEFINED) {
                         can = false;
+                        msQueryResult = "Existen gastos de producción capturados o modificados después de la valuación de inventarios "
+                                + "del periodo: " + prevPeriodKey[0] + "-" + SLibUtils.DecimalFormatCalendarMonth.format(prevPeriodKey[1]) + ".";
                     }
                 }
+            }
 
-                // 3.7. Validate that the Manufacturing Order (MO) with Warehouse Moves (WM) in the CP are consistens:
+            // (d) 3.5.4. All inventory moves (MA) must have been inputted before the immediately previous PC:
 
-                if (can) {
+            if (can && prevInventoryValuation != null) {
+                msSql = "SELECT COUNT(*) " +
+                        "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS d " +
+                        "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " AS de ON " +
+                        "d.id_year = de.id_year AND d.id_doc = de.id_doc " +
+                        "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s ON " +
+                        "de.id_year = s.fid_diog_year AND de.id_doc = s.fid_diog_doc AND de.id_ety = s.fid_diog_ety " +
+                        "WHERE d.b_del = 0 AND de.b_del = 0 AND  s.b_del = 0 AND " +
+                        "YEAR(d.dt) = " + prevPeriodKey[0] + " AND " +
+                        "MONTH(d.dt) = " + prevPeriodKey[1] + " AND " +
+                        "(de.ts_edit > '" + SLibUtils.DbmsDateFormatDatetime.format(prevInventoryValuation.getTsUserUpdate()) + "' OR " +
+                        "de.ts_del > '" + SLibUtils.DbmsDateFormatDatetime.format(prevInventoryValuation.getTsUserUpdate()) + "') " +
+                        "GROUP BY d.id_year, d.id_doc " +
+                        "ORDER BY d.id_year, d.id_doc ";
+                resultSet = session.getStatement().executeQuery(msSql);
+                if (resultSet.next()) {
+                    if (resultSet.getInt(1) > SLibConsts.UNDEFINED) {
+                        can = false;
+                        msQueryResult = "Existen movimientos de inventario capturados o modificados después de la valuación de inventarios "
+                                + "del periodo: " + prevPeriodKey[0] + "-" + SLibUtils.DecimalFormatCalendarMonth.format(prevPeriodKey[1]) + ".";
+                    }
+                }
+            }
 
-                    // 3.7.1. Obtain list with production orders
+            // (e) 3.5.5. The CVI PC immediately preceding the current must have been generated after any modification (eg, opening/closing) and the corresponding previous accounting msAuxPeriodQuery, which must also be closed:
 
-                    aProductionOrders.clear();
-                    aProductionOrders.addAll(obtainProductionOrders(session, mtAuxDateStart, false, false));
-                    for (SDataProductionOrder productionOrder : aProductionOrders) {
+            if (can) {
+                msSql = "SELECT COUNT(*) " +
+                    "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_YEAR) + " AS y " +
+                    "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_YEAR_PER) + " AS p ON " +
+                    "y.id_year = p.id_year " +
+                    "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_INV_VAL) + " AS v ON " +
+                    "p.id_year = v.fk_year_year AND p.id_per = v.fk_year_per " +
+                    "WHERE y.b_del = 0 AND p.b_del = 0 AND v.b_del = 0 AND " +
+                    "v.fk_year_year <= " + prevPeriodKey[0] + " AND v.fk_year_per <= " + prevPeriodKey[1] + " AND p.ts_edit > v.ts_usr_upd AND " +
+                    "p.b_closed = 1 ";
+                resultSet = session.getStatement().executeQuery(msSql);
+                if (resultSet.next()) {
+                    if (resultSet.getInt(1) > SLibConsts.UNDEFINED) {
+                        can = false;
+                        msQueryResult = "Existen periodos contables abiertos o modificados después de la valuación de inventarios "
+                                + "del periodo: " + prevPeriodKey[0] + "-" + SLibUtils.DecimalFormatCalendarMonth.format(prevPeriodKey[1]) + ".";
+                    }
+                }
+            }
 
-                        // 3.7.4. Validate with unit type of manufacturing costs calculation (MCC):
+            // 3.6 Validate that all items purchased in the RM CP have defined corresponding to MASA (kg) (required Assignment GC) physical measurement (ie,> 0):
+
+            if (can) {
+                msQueryResult = validatePurchasesForPhysicalMeasurementItems(session);
+                if (!msQueryResult.isEmpty()) {
+                    can = false;
+                }
+            }
+
+            // 3.7. Validate that the Manufacturing Order (MO) with Warehouse Moves (WM) in the CP are consistens:
+
+            if (can) {
+
+                // 3.7.1. Obtain list with production orders
+
+                productionOrders.clear();
+                productionOrders.addAll(obtainProductionOrders(session, mtAuxDateStart, false, false));
+                for (SDataProductionOrder productionOrder : productionOrders) {
+
+                    // 3.7.4. Validate with unit type of manufacturing costs calculation (MCC):
+
+                    if (can) {
+                        if (!validateProductionOrderInputsPreviousOuputMoves(session, (int[]) productionOrder.getPrimaryKey())) {
+                            can = false;
+                            msQueryResult = "La valuación de inventarios no puede continuar, existen movimientos de la orden de producción '" + productionOrder.getNumber() + "' de Entrega/Devolución de Insumos posteriores a la primer entrega de PP/PT.";
+                            break;
+                        }
+                    }
+
+                    // 3.7.2. Validated for each OP with CCF Status = "CCF No-Made" that:
+                    // Validate that all MA Inputs have been made in the current PC, ie, the date of each MA must belong to the current PC.
+
+                    if (productionOrder.getIsCostDone() == SModSysConsts.MFGX_ORD_CST_DONE_NO) {
+                        msQueryResult = productionOrderObtainInventoryInputsMoves(session, (int[]) productionOrder.getPrimaryKey(), productionOrder.getNumber());
+                        if (!msQueryResult.isEmpty()) {
+                            can = false;
+                            break;
+                        }
+
+                        // Validate that moves of production order are consistent (first inputs the output):
 
                         if (can) {
-
-                            if (!validateProductionOrderInputsPreviousOuputMoves(session, (int[]) productionOrder.getPrimaryKey())) {
-                                msQueryResult = "La valuación de inventarios no puede continuar, existen movimientos de la orden de producción '" + productionOrder.getNumber() + "' de Entrega/Devolución de Insumos posteriores a la primer entrega de PP/PT.";
-
+                            msQueryResult = validateMovesForProductionOrderInputs(session, productionOrder);
+                            if (!msQueryResult.isEmpty()) {
                                 can = false;
                                 break;
                             }
                         }
 
-                        // 3.7.2. Validated for each OP with CCF Status = "CCF No-Made" that:
-                        // Validate that all MA Inputs have been made in the current PC, ie, the date of each MA must belong to the current PC.
+                        if (can) {
+                            msQueryResult = productionOrderValidateOrderMoves(session, productionOrder);
+                            if (!msQueryResult.isEmpty()) {
+                                can = false;
+                                break;
+                            }
+                        }
+                    }
 
-                        if (productionOrder.getIsCostDone() == SModSysConsts.MFGX_ORD_CST_DONE_NO) {
+                    // 3.7.3. Validated for each OP with CCF Status = "CCF Made" that:
+                    // Validate that all MA Products Inputs, regardless of PC to which they belong, placed before the corresponding CVI, ie, the TS of each MA must be earlier than the corresponding TS CVI.
 
+                    if (can) {
+                        if (productionOrder.getIsCostDone() == SModSysConsts.MFGX_ORD_CST_DONE_YES) {
                             msQueryResult = productionOrderObtainInventoryInputsMoves(session, (int[]) productionOrder.getPrimaryKey(), productionOrder.getNumber());
                             if (!msQueryResult.isEmpty()) {
-
                                 can = false;
                                 break;
                             }
 
-                            // Validate that moves of production order are consistent (first inputs the output):
-
-                            if (can) {
-
-                                msQueryResult = validateMovesForProductionOrderInputs(session, productionOrder);
-                                if (!msQueryResult.isEmpty()) {
-
-                                    can = false;
-                                    break;
-                                }
-                            }
-
-                            if (can) {
-
-                                msQueryResult = productionOrderValidateOrderMoves(session, productionOrder);
-                                if (!msQueryResult.isEmpty()) {
-
-                                    can = false;
-                                    break;
-                                }
-                            }
-                        }
-
-                        // 3.7.3. Validated for each OP with CCF Status = "CCF Made" that:
-                        // Validate that all MA Products Inputs, regardless of PC to which they belong, placed before the corresponding CVI, ie, the TS of each MA must be earlier than the corresponding TS CVI.
-
-                        if (can) {
-
-                            if (productionOrder.getIsCostDone() == SModSysConsts.MFGX_ORD_CST_DONE_YES) {
-
-                                msQueryResult = productionOrderObtainInventoryInputsMoves(session, (int[]) productionOrder.getPrimaryKey(), productionOrder.getNumber());
-                                if (!msQueryResult.isEmpty()) {
-
-                                    can = false;
-                                    break;
-                                }
-
-                                msQueryResult = productionOrderObtainInventoryProductsMoves(session, (int[]) productionOrder.getPrimaryKey(), productionOrder.getNumber());
-                                if (!msQueryResult.isEmpty()) {
-
-                                    can = false;
-                                    break;
-                                }
-                            }
-                        }
-
-                        // 3.7.4. Validate with unit type of manufacturing costs calculation (MCC):
-
-                        if (can) {
-
-                            msQueryResult = validateMovesForProductionOrderPhysicalMeasurement(session, productionOrder);
+                            msQueryResult = productionOrderObtainInventoryProductsMoves(session, (int[]) productionOrder.getPrimaryKey(), productionOrder.getNumber());
                             if (!msQueryResult.isEmpty()) {
-
                                 can = false;
                                 break;
                             }
                         }
                     }
-                }
 
-                // Validate that all output that corresponds to a compound MA has its corresponding entry 'mirror':
+                    // 3.7.4. Validate with unit type of manufacturing costs calculation (MCC):
 
-                if (can) {
-                    aDiogs.addAll(obtainDiogs(session));
-                    for (SDataDiog diog : aDiogs) {
-
-                        if (diog.getFkDiogCategoryId() == SModSysConsts.TRNS_CT_IOG_OUT &&
-                                !isSimpleDiog(new int[] { diog.getFkDiogCategoryId(), diog.getFkDiogClassId(), diog.getFkDiogTypeId() })&&
-                                diog.getDbmsDataCounterpartDiog() == null) {
-
-                                    msQueryResult = "El movimiento de inventario '" + (diog.getNumberSeries().isEmpty() ? "" : "-") + diog.getNumber() + "' no tiene su contraparte de entrada.";
-                                    can = false;
-                                    break;
+                    if (can) {
+                        msQueryResult = validateMovesForProductionOrderPhysicalMeasurement(session, productionOrder);
+                        if (!msQueryResult.isEmpty()) {
+                            can = false;
+                            break;
                         }
                     }
                 }
+            }
 
-                if (can) {
+            // Validate that all output that corresponds to a compound MA has its corresponding entry 'mirror':
 
-                    validatePurchasingExpensesInventory(session); // Update class members: mbAuxExistInventoryMoves, mbAuxExistInventoryPurchasingExpenses, mbAuxExistPurchasingExpenses
-                    validateManufacturingExpensesInventory(session); // Update class members: mbAuxExistInventoryManufacturingExpenses, mbAuxExistManufacturingExpenses
-
-                    if (!mbAuxExistInventoryManufacturingExpenses &&
-                            mbAuxExistManufacturingExpenses) {
-
-                            can = false;
-                            msQueryResult = "No hay inventario disponible de producción para asignar los gastos de fabricación.";
+            if (can) {
+                diogs.addAll(obtainDiogs(session));
+                for (SDataDiog diog : diogs) {
+                    if (diog.getFkDiogCategoryId() == SModSysConsts.TRNS_CT_IOG_OUT &&
+                            !isSimpleDiog(new int[] { diog.getFkDiogCategoryId(), diog.getFkDiogClassId(), diog.getFkDiogTypeId() })&&
+                            diog.getDbmsDataCounterpartDiog() == null) {
+                                can = false;
+                                msQueryResult = "El movimiento de inventario '" + (diog.getNumberSeries().isEmpty() ? "" : "-") + diog.getNumber() + "' no tiene su contraparte de entrada.";
+                                break;
                     }
+                }
+            }
+
+            if (can) {
+                validatePurchasingExpensesInventory(session); // Update class members: mbAuxExistInventoryMoves, mbAuxExistInventoryPurchasingExpenses, mbAuxExistPurchasingExpenses
+                validateMfgExpensesInventory(session); // Update class members: mbAuxExistInventoryMfgExpenses, mbAuxExistMfgExpenses
+
+                if (!mbAuxExistInventoryMfgExpenses &&
+                        mbAuxExistMfgExpenses) {
+                        can = false;
+                        msQueryResult = "No hay inventario disponible de producción para asignar los gastos de fabricación.";
                 }
             }
         }
@@ -3487,19 +3410,22 @@ public class SDbInventoryValuation extends SDbRegistryUser {
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
 
-        registry.setRegistryNew(mbRegistryNew);
-        registry.setAuxAccountMask(this.getAuxAccountMask());
-        registry.setAuxTypeUnitValuation(this.getAuxTypeUnitValuation());
-        registry.setAuxPeriodQuery(this.getAuxPeriodQuery());
         registry.setAuxIsConsistent(this.getAuxIsConsistent());
         registry.setAuxExistInventoryMoves(this.getAuxExistInventoryMoves());
         registry.setAuxExistInventoryPurchasingExpenses(this.getAuxExistInventoryPurchasingExpenses());
         registry.setAuxExistPurchasingExpenses(this.getAuxExistPurchasingExpenses());
-        registry.setAuxExistInventoryManufacturingExpenses(this.getAuxExistInventoryManufacturingExpenses());
-        registry.setAuxExistManufacturingExpenses(this.getAuxExistManufacturingExpenses());
+        registry.setAuxExistInventoryMfgExpenses(this.getAuxExistInventoryMfgExpenses());
+        registry.setAuxExistMfgExpenses(this.getAuxExistMfgExpenses());
+        registry.setAuxAccountMask(this.getAuxAccountMask());
+        registry.setAuxMfgCostUnitType(this.getAuxMfgCostUnitType());
+        registry.setAuxMfgCostUnitTypeSql(this.getAuxMfgCostUnitTypeSql());
+        registry.setAuxPeriodQuery(this.getAuxPeriodQuery());
         registry.setAuxDateStart(this.getAuxDateStart());
         registry.setAuxDateEnd(this.getAuxDateEnd());
-
+        registry.setAuxRawMaterialWarehouseKey(SLibUtils.cloneKey(this.getAuxRawMaterialWarehouseKey()));
+                
+        registry.setRegistryNew(mbRegistryNew);
+        
         return registry;
     }
 }
