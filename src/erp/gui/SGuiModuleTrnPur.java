@@ -156,6 +156,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiRepBizPartnerBalance;
     private javax.swing.JMenuItem jmiRepBizPartnerBalanceDps;
     private javax.swing.JMenuItem jmiRepBizPartnerBalanceAging;
+    private javax.swing.JMenuItem jmiRepBizPartnerBalanceCollection;
+    private javax.swing.JMenuItem jmiRepBizPartnerBalanceCollectionDps;
     private javax.swing.JMenuItem jmiRepAccountStatements;
     private javax.swing.JMenuItem jmiRepAccountStatementsDps;
     private javax.swing.JMenuItem jmiRepBizPartnerJournal;
@@ -417,6 +419,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepBizPartnerBalance = new JMenuItem("Reporte de saldos proveedores...");
         jmiRepBizPartnerBalanceDps = new JMenuItem("Reporte de saldos proveedores por documento...");
         jmiRepBizPartnerBalanceAging = new JMenuItem("Reporte de antigüedad de saldos de proveedores...");
+        jmiRepBizPartnerBalanceCollection = new JMenuItem("Reporte de cobranza esperada...");
+        jmiRepBizPartnerBalanceCollectionDps = new JMenuItem("Reporte de cobranza esperada por documento...");
         jmiRepAccountStatements = new JMenuItem("Estados de cuenta de proveedores...");
         jmiRepAccountStatementsDps = new JMenuItem("Estados de cuenta de proveedores por documento...");
         jmiRepBizPartnerAccountingMoves = new JMenuItem("Movimientos contables de proveedores...");
@@ -471,10 +475,15 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmRep.add(jmiRepBizPartnerBalanceDps);
         jmRep.add(jmiRepBizPartnerBalanceAging);
         jmRep.addSeparator();
+        //jmRep.add(jmiRepBizPartnerBalanceCollection);
+        //jmRep.add(jmiRepBizPartnerBalanceCollectionDps);
+        //jmRep.addSeparator();
+        /*
         jmRep.add(jmiRepAccountStatements);
         jmRep.add(jmiRepAccountStatementsDps);
         jmRep.add(jmiRepBizPartnerJournal);
         jmRep.addSeparator();
+        */
         jmRep.add(jmiRepBizPartnerAccountingMoves);
         jmRep.add(jmiRepBizPartnerAccountingMovesDays);
         jmRep.addSeparator();
@@ -495,10 +504,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmRep.addSeparator();
         jmRep.add(jmiRepTrnJournal);
         jmRep.add(jmiRepTrnItemUnitaryPrice);
-        jmRep.add(jsRepTrn);        // separator
+        jmRep.add(jsRepTrn); // separator
         jmRep.add(jmiRepTrnContractStatus);
         jmRep.add(jmiRepTrnContractBackorderStock);
-        jmRep.add(jsRepContract);   // separator
+        jmRep.add(jsRepContract); // separator
         jmRep.add(jmiRepTrnUnitaryCosts);
         
         moDialogRepDpsList = new SDialogRepDpsList(miClient);
@@ -601,6 +610,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepBizPartnerBalance.addActionListener(this);
         jmiRepBizPartnerBalanceDps.addActionListener(this);
         jmiRepBizPartnerBalanceAging.addActionListener(this);
+        jmiRepBizPartnerBalanceCollection.addActionListener(this);
+        jmiRepBizPartnerBalanceCollectionDps.addActionListener(this);
         jmiRepAccountStatements.addActionListener(this);
         jmiRepAccountStatementsDps.addActionListener(this);
         jmiRepBizPartnerJournal.addActionListener(this);
@@ -718,7 +729,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             section = new SCfgMenuSection("" + SDataConstants.MOD_PUR_REP_CON);
             section.getChildItems().add(new SCfgMenuSectionItem(jmiRepTrnContractStatus, "" + SDataConstants.TRNS_ST_DPS));
             section.getChildItems().add(new SCfgMenuSectionItem(jmiRepTrnContractBackorderStock, "" + SDataConstants.TRN_STK));
-            section.setChildSeparator(new SCfgMenuSectionSeparator(jsRepTrn));      // previous separator
+            section.setChildSeparator(new SCfgMenuSectionSeparator(jsRepTrn)); // previous separator
             menu.getChildSections().add(section);
             section = new SCfgMenuSection("" + SDataConstants.MOD_PUR_REP_CST);
             section.getChildItems().add(new SCfgMenuSectionItem(jmiRepTrnUnitaryCosts, "" + SModConsts.LOG_SHIP));

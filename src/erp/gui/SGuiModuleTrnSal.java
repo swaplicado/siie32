@@ -480,13 +480,13 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepBizPartnerBalance = new JMenuItem("Reporte de saldos clientes...");
         jmiRepBizPartnerBalanceDps = new JMenuItem("Reporte de saldos clientes por documento...");
         jmiRepBizPartnerBalanceAging = new JMenuItem("Reporte de antigüedad de saldos de clientes...");
-        jmiRepBizPartnerBalanceCollection = new JMenuItem("Reporte de cobranza esperada...");
-        jmiRepBizPartnerBalanceCollectionDps = new JMenuItem("Reporte de cobranza esperada por documento...");
+        jmiRepBizPartnerBalanceCollection = new JMenuItem("Reporte de pagos esperados...");
+        jmiRepBizPartnerBalanceCollectionDps = new JMenuItem("Reporte de pagos esperados por documento...");
         jmiRepAccountStatements = new JMenuItem("Estados de cuenta de clientes...");
         jmiRepAccountStatementsDps = new JMenuItem("Estados de cuenta de clientes por documento...");
+        jmiRepBizPartnerJournal = new JMenuItem("Reporte auxiliar de movimientos contables de clientes...");
         jmiRepBizPartnerAccountingMoves = new JMenuItem("Movimientos contables de clientes...");
         jmiRepBizPartnerAccountingMovesDays = new JMenuItem("Movimientos contables de clientes con días de pago...");
-        jmiRepBizPartnerJournal = new JMenuItem("Reporte auxiliar de movimientos contables de clientes...");
         jmiRepDpsList = new JMenuItem("Listado de facturas por período...");
         jmiRepDpsBizPartner = new JMenuItem("Reporte de facturas de clientes...");
         jmiRepDpsWithBalance = new JMenuItem("Reporte de facturas con saldo de clientes...");
@@ -541,10 +541,12 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmRep.add(jmiRepBizPartnerBalanceCollection);
         jmRep.add(jmiRepBizPartnerBalanceCollectionDps);
         jmRep.addSeparator();
+        /*
         jmRep.add(jmiRepAccountStatements);
         jmRep.add(jmiRepAccountStatementsDps);
         jmRep.add(jmiRepBizPartnerJournal);
         jmRep.addSeparator();
+        */
         jmRep.add(jmiRepBizPartnerAccountingMoves);
         jmRep.add(jmiRepBizPartnerAccountingMovesDays);
         jmRep.addSeparator();
@@ -565,12 +567,12 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmRep.addSeparator();
         jmRep.add(jmiRepTrnJournal);
         jmRep.add(jmiRepTrnItemUnitaryPrice);
-        jmRep.add(jsRepTrn);            // separator
+        jmRep.add(jsRepTrn); // separator
         jmRep.add(jmiRepTrnContractStatus);
         jmRep.add(jmiRepTrnContractBackorderStock);
-        jmRep.add(jsRepContract);       // separator
+        jmRep.add(jsRepContract); // separator
         jmRep.add(jmiRepTrnShipmentItem);
-        jmRep.add(jsRepTrnShipment);    // separator
+        jmRep.add(jsRepTrnShipment); // separator
         jmRep.add(jmiRepMoneyIn);
 
         moDialogRepDpsList = new SDialogRepDpsList(miClient);
@@ -814,15 +816,15 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             section = new SCfgMenuSection("" + SDataConstants.MOD_SAL_REP_CON);
             section.getChildItems().add(new SCfgMenuSectionItem(jmiRepTrnContractStatus, "" + SDataConstants.TRNS_ST_DPS));
             section.getChildItems().add(new SCfgMenuSectionItem(jmiRepTrnContractBackorderStock, "" + SDataConstants.TRN_STK));
-            section.setChildSeparator(new SCfgMenuSectionSeparator(jsRepTrn));          // previous separator
+            section.setChildSeparator(new SCfgMenuSectionSeparator(jsRepTrn)); // previous separator
             menu.getChildSections().add(section);
             section = new SCfgMenuSection("" + SDataConstants.MOD_SAL_REP_SHI);
             section.getChildItems().add(new SCfgMenuSectionItem(jmiRepTrnShipmentItem, "" + SModConsts.LOG_SHIP));
-            section.setChildSeparator(new SCfgMenuSectionSeparator(jsRepContract));     // previous separator
+            section.setChildSeparator(new SCfgMenuSectionSeparator(jsRepContract)); // previous separator
             menu.getChildSections().add(section);
             section = new SCfgMenuSection("" + SDataConstants.MOD_SAL_REP_MIN);
             section.getChildItems().add(new SCfgMenuSectionItem(jmiRepMoneyIn, "" + SDataConstants.TRN_DPS));
-            section.setChildSeparator(new SCfgMenuSectionSeparator(jsRepTrnShipment));  // previous separator
+            section.setChildSeparator(new SCfgMenuSectionSeparator(jsRepTrnShipment)); // previous separator
             menu.getChildSections().add(section);
             module.getChildMenus().add(menu);
             

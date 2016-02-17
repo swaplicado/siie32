@@ -97,14 +97,11 @@ public class SFormCompanyBranchEntity extends javax.swing.JDialog implements erp
         jlCode = new javax.swing.JLabel();
         jtfCode = new javax.swing.JTextField();
         jckIsDefault = new javax.swing.JCheckBox();
-        Dummy04 = new javax.swing.JLabel();
         jckIsActive = new javax.swing.JCheckBox();
-        Dummy01 = new javax.swing.JLabel();
-        jckIsActiveIn = new javax.swing.JCheckBox();
-        Dummy02 = new javax.swing.JLabel();
-        jckIsActiveOut = new javax.swing.JCheckBox();
-        Dummy03 = new javax.swing.JLabel();
         jckIsDeleted = new javax.swing.JCheckBox();
+        jckIsActiveIn = new javax.swing.JCheckBox();
+        Dummy04 = new javax.swing.JLabel();
+        jckIsActiveOut = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Entidad de sucursal");
@@ -116,7 +113,7 @@ public class SFormCompanyBranchEntity extends javax.swing.JDialog implements erp
         });
 
         jPanel1.setPreferredSize(new java.awt.Dimension(392, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(2));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar");
         jbOk.setToolTipText("[Ctrl + Enter]");
@@ -132,7 +129,7 @@ public class SFormCompanyBranchEntity extends javax.swing.JDialog implements erp
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel3.setLayout(new java.awt.GridLayout(11, 2, 0, 1));
+        jPanel3.setLayout(new java.awt.GridLayout(9, 2, 0, 2));
 
         jlFkCompanyId.setForeground(java.awt.Color.blue);
         jlFkCompanyId.setText("Empresa: *");
@@ -198,31 +195,28 @@ public class SFormCompanyBranchEntity extends javax.swing.JDialog implements erp
         jtfCode.setText("CODE");
         jPanel3.add(jtfCode);
 
-        jckIsDefault.setText("Es predeterminada");
+        jckIsDefault.setText("Es la entidad predeterminada");
         jPanel3.add(jckIsDefault);
-        jPanel3.add(Dummy04);
 
-        jckIsActive.setText("Es activo");
+        jckIsActive.setText("Está activo");
         jPanel3.add(jckIsActive);
-        jPanel3.add(Dummy01);
-
-        jckIsActiveIn.setText("Es activo para movs. entrada");
-        jPanel3.add(jckIsActiveIn);
-        jPanel3.add(Dummy02);
-
-        jckIsActiveOut.setText("Es activo para movs. salida");
-        jPanel3.add(jckIsActiveOut);
-        jPanel3.add(Dummy03);
 
         jckIsDeleted.setText("Registro eliminado");
         jPanel3.add(jckIsDeleted);
+
+        jckIsActiveIn.setText("Está activo para movimientos de entrada");
+        jPanel3.add(jckIsActiveIn);
+        jPanel3.add(Dummy04);
+
+        jckIsActiveOut.setText("Está activo para movimientos de salida");
+        jPanel3.add(jckIsActiveOut);
 
         jPanel2.add(jPanel3, java.awt.BorderLayout.NORTH);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-410)/2, (screenSize.height-345)/2, 410, 345);
+        setSize(new java.awt.Dimension(576, 389));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -374,9 +368,6 @@ public class SFormCompanyBranchEntity extends javax.swing.JDialog implements erp
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel Dummy01;
-    private javax.swing.JLabel Dummy02;
-    private javax.swing.JLabel Dummy03;
     private javax.swing.JLabel Dummy04;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;

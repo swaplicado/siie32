@@ -1336,13 +1336,16 @@ public abstract class SFiscalUtils {
                                             break;
                                         case "2":
                                         case "DLL":
+                                        case "DLS":
                                         case "DOL":
+                                        case "USA":
                                             moneda = SModSysConsts.FINS_FISCAL_CUR_USD_NAME;
                                             break;
                                         case "3":
-                                        case "EUR":
+                                        //case "EUR":
                                             moneda = SModSysConsts.FINS_FISCAL_CUR_EUR_NAME;
                                             break;
+                                        case "JAP":
                                         case "YEN":
                                             moneda = SModSysConsts.FINS_FISCAL_CUR_JPY_NAME;
                                             break;

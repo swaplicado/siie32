@@ -1522,6 +1522,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                     else if (auxType01 == SDataConstantsSys.TRNS_CT_DPS_SAL) {
                         sViewTitle = "Cobros período";
                     }
+                    if (auxType02 == SUtilConsts.QRY_DET) {
+                        sViewTitle += " (detalle)";
+                    }
                     oViewClass = erp.mfin.view.SViewDpsPayment.class;
                     break;
                 default:

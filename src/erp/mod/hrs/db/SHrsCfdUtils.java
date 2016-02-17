@@ -69,12 +69,12 @@ public abstract class SHrsCfdUtils {
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
-                + "pr.id_pay = pei.id_pay AND pr.id_emp = pei.id_emp AND pei.b_del = 0 AND pei.fk_st_rcp <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " AND pei.id_iss = (SELECT pei1.id_iss FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei1 WHERE pei1.id_pay = pei.id_pay AND pei1.id_emp = pei.id_emp AND pei1.b_del = 0 ORDER BY pei1.id_iss DESC LIMIT 1) "
+                + "pr.id_pay = pei.id_pay AND pr.id_emp = pei.id_emp AND pei.b_del = 0 AND pei.fk_st_rcp = " + SModSysConsts.TRNS_ST_DPS_ANNULED + " AND pei.id_iss = (SELECT pei1.id_iss FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei1 WHERE pei1.id_pay = pei.id_pay AND pei1.id_emp = pei.id_emp AND pei1.b_del = 0 ORDER BY pei1.id_iss DESC LIMIT 1) "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON emp.id_emp = pr.id_emp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON bp.id_bp = emp.id_emp "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " c ON pei.id_pay = c.fid_pay_rcp_pay_n AND pei.id_emp = c.fid_pay_rcp_emp_n AND pei.id_iss = c.fid_pay_rcp_iss_n AND c.fid_st_xml IN (" + SDataConstantsSys.TRNS_ST_DPS_NEW + " , " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ") "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON pei.id_pay = c.fid_pay_rcp_pay_n AND pei.id_emp = c.fid_pay_rcp_emp_n AND pei.id_iss = c.fid_pay_rcp_iss_n AND c.fid_st_xml IN (" + SDataConstantsSys.TRNS_ST_DPS_NEW + " , " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ") "
                 + "WHERE p.id_pay = " + payrollId + " AND p.b_del = 0 AND pr.b_del = 0 "
-                + "ORDER BY id_pay, per_year, per, num, dt_sta, dt_end, nts, fk_tp_pay, id_emp, bp, f_emp_num, f_ear, f_ded, id_iss, num_ser, f_tot, fk_tp_pay_sys, dt_iss, dt_pay ";
+                + "ORDER BY id_pay, per_year, per, num, dt_sta, dt_end, nts, fk_tp_pay, bp, id_emp, f_emp_num, f_ear, f_ded, id_iss, num_ser, f_tot, fk_tp_pay_sys, dt_iss, dt_pay ";
         
         resultSet = session.getStatement().executeQuery(sql);
         

@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import sa.lib.SLibConsts;
 
 /* IMPORTANT:
- * Class erp.mfin.data.SDataFiscalYearClosing also inserts record entry registries.
- * So, every record entry table definition change must be updated also in that class.
+ * Classes erp.mfin.data.SDataFiscalYearClosing & erp.mfin.data.SDataFiscalYearClosing also make raw SQL insertions of Record Entry registries.
+ * So, every single change made to Record Entry table definition must be updated also on those classes.
  */
 
 /**

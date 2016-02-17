@@ -659,6 +659,8 @@ public abstract class SModSysConsts {
     public static final int TRNS_TP_LINK_BRD = 9;
     public static final int TRNS_TP_LINK_MFR = 10;
     public static final int TRNS_TP_LINK_ITEM = 11;
+    
+    public static final int TRNU_TP_IOG_ADJ_NA = 1;
 
     public static final int TRN_PAC_FCG = 1;    // Formas Contínuas de Guadalajara SA de CV
     public static final int TRN_PAC_FNK = 2;    // Finkok SA de CV
