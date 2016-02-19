@@ -34,6 +34,7 @@ public class SDbEarning extends SDbRegistryUser {
     protected int mnExemptionSalaryEqualsMwzLimit;
     protected double mdExemptionSalaryGreaterMwzPercentage;
     protected int mnExemptionSalaryGreaterMwzLimit;
+    protected double mdPayPercentage;
     protected double mdUnitsMaximumWeek;
     protected double mdUnitsFactor;
     protected boolean mbWelfare;
@@ -205,6 +206,7 @@ public class SDbEarning extends SDbRegistryUser {
     public void setExemptionSalaryEqualsMwzLimit(int n) { mnExemptionSalaryEqualsMwzLimit = n; }
     public void setExemptionSalaryGreaterMwzPercentage(double d) { mdExemptionSalaryGreaterMwzPercentage = d; }
     public void setExemptionSalaryGreaterMwzLimit(int n) { mnExemptionSalaryGreaterMwzLimit = n; }
+    public void setPayPercentage(double d) { mdPayPercentage = d; }
     public void setUnitsMaximumWeek(double d) { mdUnitsMaximumWeek = d; }
     public void setUnitsFactor(double d) { mdUnitsFactor = d; }
     public void setWelfare(boolean b) { mbWelfare = b; }
@@ -240,6 +242,7 @@ public class SDbEarning extends SDbRegistryUser {
     public int getExemptionSalaryEqualsMwzLimit() { return mnExemptionSalaryEqualsMwzLimit; }
     public double getExemptionSalaryGreaterMwzPercentage() { return mdExemptionSalaryGreaterMwzPercentage; }
     public int getExemptionSalaryGreaterMwzLimit() { return mnExemptionSalaryGreaterMwzLimit; }
+    public double getPayPercentage() { return mdPayPercentage; }
     public double getUnitsMaximumWeek() { return mdUnitsMaximumWeek; }
     public double getUnitsFactor() { return mdUnitsFactor; }
     public boolean isWelfare() { return mbWelfare; }
@@ -290,6 +293,7 @@ public class SDbEarning extends SDbRegistryUser {
         mnExemptionSalaryEqualsMwzLimit = 0;
         mdExemptionSalaryGreaterMwzPercentage = 0;
         mnExemptionSalaryGreaterMwzLimit = 0;
+        mdPayPercentage = 0;
         mdUnitsMaximumWeek = 0;
         mdUnitsFactor = 0;
         mbWelfare = false;
@@ -371,6 +375,7 @@ public class SDbEarning extends SDbRegistryUser {
             mnExemptionSalaryEqualsMwzLimit = resultSet.getInt("exem_sal_equ_mwz_lim");
             mdExemptionSalaryGreaterMwzPercentage = resultSet.getDouble("exem_sal_grt_mwz_per");
             mnExemptionSalaryGreaterMwzLimit = resultSet.getInt("exem_sal_grt_mwz_lim");
+            mdPayPercentage = resultSet.getDouble("pay_per");
             mdUnitsMaximumWeek = resultSet.getDouble("unt_max_wee");
             mdUnitsFactor = resultSet.getDouble("unt_fac");
             mbWelfare = resultSet.getBoolean("b_wel");
@@ -441,6 +446,7 @@ public class SDbEarning extends SDbRegistryUser {
                     mnExemptionSalaryEqualsMwzLimit + ", " +
                     mdExemptionSalaryGreaterMwzPercentage + ", " +
                     mnExemptionSalaryGreaterMwzLimit + ", " +
+                    mdPayPercentage + ", " + 
                     mdUnitsMaximumWeek + ", " +
                     mdUnitsFactor + ", " +
                     (mbWelfare ? 1 : 0) + ", " +
@@ -481,6 +487,7 @@ public class SDbEarning extends SDbRegistryUser {
                     "exem_sal_equ_mwz_lim = " + mnExemptionSalaryEqualsMwzLimit + ", " +
                     "exem_sal_grt_mwz_per = " + mdExemptionSalaryGreaterMwzPercentage + ", " +
                     "exem_sal_grt_mwz_lim = " + mnExemptionSalaryGreaterMwzLimit + ", " +
+                    "pay_per = " + mdPayPercentage + ", " +
                     "unt_max_wee = " + mdUnitsMaximumWeek + ", " +
                     "unt_fac = " + mdUnitsFactor + ", " +
                     "b_wel = " + (mbWelfare ? 1 : 0) + ", " +
@@ -539,6 +546,7 @@ public class SDbEarning extends SDbRegistryUser {
         registry.setExemptionSalaryEqualsMwzLimit(this.getExemptionSalaryEqualsMwzLimit());
         registry.setExemptionSalaryGreaterMwzPercentage(this.getExemptionSalaryGreaterMwzPercentage());
         registry.setExemptionSalaryGreaterMwzLimit(this.getExemptionSalaryGreaterMwzLimit());
+        registry.setPayPercentage(this.getPayPercentage());
         registry.setUnitsMaximumWeek(this.getUnitsMaximumWeek());
         registry.setUnitsFactor(this.getUnitsFactor());
         registry.setWelfare(this.isWelfare());

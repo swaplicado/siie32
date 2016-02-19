@@ -51,6 +51,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        jPanel25 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jlCode = new javax.swing.JLabel();
@@ -61,6 +62,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jPanel22 = new javax.swing.JPanel();
         jlNameAbbreviated = new javax.swing.JLabel();
         moTextNameAbbreviated = new sa.lib.gui.bean.SBeanFieldText();
+        jlNameAbbreviatedHelp = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
         jlEarningComputationType = new javax.swing.JLabel();
         moKeyEarningComputationType = new sa.lib.gui.bean.SBeanFieldKey();
@@ -87,6 +89,10 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jlExemptionSalaryGreaterMwzLimit = new javax.swing.JLabel();
         moIntExemptionSalaryGreaterMwzLimit = new sa.lib.gui.bean.SBeanFieldInteger();
         jlExemptionSalaryGreaterMwzLimitHelp = new javax.swing.JLabel();
+        jPanel23 = new javax.swing.JPanel();
+        jlPayPercentage = new javax.swing.JLabel();
+        moDecPayPercentage = new sa.lib.gui.bean.SBeanFieldDecimal();
+        jlPayPercentageHelp = new javax.swing.JLabel();
         jPanel13 = new javax.swing.JPanel();
         jlUnitsMaximumWeek = new javax.swing.JLabel();
         moDecUnitsMaximumWeek = new sa.lib.gui.bean.SBeanFieldDecimal();
@@ -102,6 +108,9 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moBoolWithholding = new sa.lib.gui.bean.SBeanFieldBoolean();
         moBoolPayrollTax = new sa.lib.gui.bean.SBeanFieldBoolean();
         moBoolLoan = new sa.lib.gui.bean.SBeanFieldBoolean();
+        jPanel24 = new javax.swing.JPanel();
+        jPanel26 = new javax.swing.JPanel();
+        jPanel27 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jlEarningType = new javax.swing.JLabel();
         moKeyEarningType = new sa.lib.gui.bean.SBeanFieldKey();
@@ -117,6 +126,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jPanel18 = new javax.swing.JPanel();
         jlAccountingRecordType = new javax.swing.JLabel();
         moKeyAccountingRecordType = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel28 = new javax.swing.JPanel();
         jPanel21 = new javax.swing.JPanel();
         jlAbsenceClass = new javax.swing.JLabel();
         moKeyAbsenceClass = new sa.lib.gui.bean.SBeanFieldKey();
@@ -125,9 +135,11 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moKeyAbsenceType = new sa.lib.gui.bean.SBeanFieldKey();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
-        jPanel1.setLayout(new java.awt.BorderLayout());
+        jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jPanel2.setLayout(new java.awt.GridLayout(20, 1, 0, 5));
+        jPanel25.setLayout(new java.awt.BorderLayout());
+
+        jPanel2.setLayout(new java.awt.GridLayout(14, 1, 0, 5));
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -161,6 +173,13 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moTextNameAbbreviated.setText("sBeanFieldText1");
         moTextNameAbbreviated.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel22.add(moTextNameAbbreviated);
+
+        jlNameAbbreviatedHelp.setForeground(new java.awt.Color(109, 109, 109));
+        jlNameAbbreviatedHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jlNameAbbreviatedHelp.setText("(Nombre utilizado para la contabilización y concepto en XML)");
+        jlNameAbbreviatedHelp.setToolTipText("");
+        jlNameAbbreviatedHelp.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel22.add(jlNameAbbreviatedHelp);
 
         jPanel2.add(jPanel22);
 
@@ -266,6 +285,22 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
 
         jPanel2.add(jPanel12);
 
+        jPanel23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlPayPercentage.setText("Porcentaje pago:");
+        jlPayPercentage.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel23.add(jlPayPercentage);
+        jPanel23.add(moDecPayPercentage);
+
+        jlPayPercentageHelp.setForeground(new java.awt.Color(109, 109, 109));
+        jlPayPercentageHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jlPayPercentageHelp.setText("(Porcentaje del pago por unidad)");
+        jlPayPercentageHelp.setToolTipText("");
+        jlPayPercentageHelp.setPreferredSize(new java.awt.Dimension(650, 23));
+        jPanel23.add(jlPayPercentageHelp);
+
+        jPanel2.add(jPanel23);
+
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlUnitsMaximumWeek.setText("Unidades máximas:");
@@ -323,6 +358,16 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
 
         jPanel2.add(jPanel3);
 
+        jPanel25.add(jPanel2, java.awt.BorderLayout.NORTH);
+
+        jPanel1.add(jPanel25, java.awt.BorderLayout.NORTH);
+
+        jPanel24.setLayout(new java.awt.BorderLayout());
+
+        jPanel26.setLayout(new java.awt.BorderLayout(0, 5));
+
+        jPanel27.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlEarningType.setText("Tipo percepción:*");
@@ -332,7 +377,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moKeyEarningType.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel5.add(moKeyEarningType);
 
-        jPanel2.add(jPanel5);
+        jPanel27.add(jPanel5);
 
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -343,7 +388,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moKeyLoanType.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel15.add(moKeyLoanType);
 
-        jPanel2.add(jPanel15);
+        jPanel27.add(jPanel15);
 
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -354,7 +399,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moKeyBenefitType.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel19.add(moKeyBenefitType);
 
-        jPanel2.add(jPanel19);
+        jPanel27.add(jPanel19);
 
         jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -365,7 +410,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moKeyAccountingConfigurationType.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel17.add(moKeyAccountingConfigurationType);
 
-        jPanel2.add(jPanel17);
+        jPanel27.add(jPanel17);
 
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -376,7 +421,11 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moKeyAccountingRecordType.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel18.add(moKeyAccountingRecordType);
 
-        jPanel2.add(jPanel18);
+        jPanel27.add(jPanel18);
+
+        jPanel26.add(jPanel27, java.awt.BorderLayout.WEST);
+
+        jPanel28.setLayout(new java.awt.GridLayout(5, 1));
 
         jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -387,7 +436,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moKeyAbsenceClass.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel21.add(moKeyAbsenceClass);
 
-        jPanel2.add(jPanel21);
+        jPanel28.add(jPanel21);
 
         jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -398,9 +447,13 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moKeyAbsenceType.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel20.add(moKeyAbsenceType);
 
-        jPanel2.add(jPanel20);
+        jPanel28.add(jPanel20);
 
-        jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
+        jPanel26.add(jPanel28, java.awt.BorderLayout.CENTER);
+
+        jPanel24.add(jPanel26, java.awt.BorderLayout.NORTH);
+
+        jPanel1.add(jPanel24, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
@@ -421,6 +474,12 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JPanel jPanel20;
     private javax.swing.JPanel jPanel21;
     private javax.swing.JPanel jPanel22;
+    private javax.swing.JPanel jPanel23;
+    private javax.swing.JPanel jPanel24;
+    private javax.swing.JPanel jPanel25;
+    private javax.swing.JPanel jPanel26;
+    private javax.swing.JPanel jPanel27;
+    private javax.swing.JPanel jPanel28;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
@@ -450,6 +509,9 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JLabel jlLoanType;
     private javax.swing.JLabel jlName;
     private javax.swing.JLabel jlNameAbbreviated;
+    private javax.swing.JLabel jlNameAbbreviatedHelp;
+    private javax.swing.JLabel jlPayPercentage;
+    private javax.swing.JLabel jlPayPercentageHelp;
     private javax.swing.JLabel jlUnitsFactor;
     private javax.swing.JLabel jlUnitsMaximumWeek;
     private javax.swing.JLabel jlUnitsMaximumWeekHelp;
@@ -462,6 +524,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolWithholding;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecExemptionSalaryEqualsMwzPercentage;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecExemptionSalaryGreaterMwzPercentage;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecPayPercentage;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecUnitsFactor;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecUnitsMaximumWeek;
     private sa.lib.gui.bean.SBeanFieldInteger moIntExemptionMwz;
@@ -496,6 +559,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moIntExemptionSalaryEqualsMwzLimit.setIntegerSettings(SGuiUtils.getLabelName(jlExemptionSalaryEqualsMwzLimit.getText()), SGuiConsts.GUI_TYPE_INT, false);
         moDecExemptionSalaryGreaterMwzPercentage.setDecimalSettings(SGuiUtils.getLabelName(jlExemptionSalaryGreaterMwzPercentage.getText()), SGuiConsts.GUI_TYPE_DEC_PER_DISC, false);
         moIntExemptionSalaryGreaterMwzLimit.setIntegerSettings(SGuiUtils.getLabelName(jlExemptionSalaryGreaterMwzLimit.getText()), SGuiConsts.GUI_TYPE_INT, false);
+        moDecPayPercentage.setDecimalSettings(SGuiUtils.getLabelName(jlPayPercentage.getText()), SGuiConsts.GUI_TYPE_DEC_PER_DISC, true);
         moDecUnitsMaximumWeek.setDecimalSettings(SGuiUtils.getLabelName(jlUnitsMaximumWeek.getText()), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, false);
         moDecUnitsFactor.setDecimalSettings(SGuiUtils.getLabelName(jlUnitsFactor.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, true);
         moBoolWelfare.setBooleanSettings(SGuiUtils.getLabelName(moBoolWelfare.getText()), false);
@@ -525,6 +589,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moFields.addField(moIntExemptionSalaryEqualsMwzLimit);
         moFields.addField(moDecExemptionSalaryGreaterMwzPercentage);
         moFields.addField(moIntExemptionSalaryGreaterMwzLimit);
+        moFields.addField(moDecPayPercentage);
         moFields.addField(moDecUnitsMaximumWeek);
         moFields.addField(moDecUnitsFactor);
         moFields.addField(moBoolWelfare);
@@ -552,6 +617,8 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
     private void itemStateKeyEarningComputationType() {
         if (moKeyEarningComputationType.getValue().length > 0) {
             if (moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
+                moDecPayPercentage.setEnabled(false);
+                moDecPayPercentage.setValue(0d);
                 moDecUnitsMaximumWeek.setEnabled(false);
                 moDecUnitsMaximumWeek.setValue(0d);
                 moBoolDaysWorked.setSelected(false);
@@ -566,6 +633,15 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
                 else {
                     moBoolDaysWorked.setSelected(false);
                     moBoolDaysWorked.setEnabled(false);
+                }
+                
+                if (moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_PER_DAY ||
+                        moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_PER_HRS) {
+                    moDecPayPercentage.setEnabled(true);
+                }
+                else {
+                    moDecPayPercentage.setEnabled(false);
+                    moDecPayPercentage.setValue(0d);
                 }
             }
         }
@@ -650,6 +726,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moIntExemptionSalaryEqualsMwzLimit.setValue(moRegistry.getExemptionSalaryEqualsMwzLimit());
         moDecExemptionSalaryGreaterMwzPercentage.setValue(moRegistry.getExemptionSalaryGreaterMwzPercentage());
         moIntExemptionSalaryGreaterMwzLimit.setValue(moRegistry.getExemptionSalaryGreaterMwzLimit());
+        moDecPayPercentage.setValue(moRegistry.getPayPercentage());
         moDecUnitsMaximumWeek.setValue(moRegistry.getUnitsMaximumWeek());
         moDecUnitsFactor.setValue(moRegistry.getUnitsFactor());
         moBoolWelfare.setValue(moRegistry.isWelfare());
@@ -692,6 +769,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         registry.setExemptionSalaryEqualsMwzLimit(moIntExemptionSalaryEqualsMwzLimit.getValue());
         registry.setExemptionSalaryGreaterMwzPercentage(moDecExemptionSalaryGreaterMwzPercentage.getValue());
         registry.setExemptionSalaryGreaterMwzLimit(moIntExemptionSalaryGreaterMwzLimit.getValue());
+        registry.setPayPercentage(moDecPayPercentage.getValue());
         registry.setUnitsMaximumWeek(moDecUnitsMaximumWeek.getValue());
         registry.setUnitsFactor(moDecUnitsFactor.getValue());
         registry.setWelfare(moBoolWelfare.getValue());

@@ -23,6 +23,15 @@ public class SDataCompany extends erp.lib.data.SDataRegistry implements java.io.
     protected java.lang.String msKey;
     protected java.lang.String msCompany;
     protected java.lang.String msDatabase;
+    protected boolean mbIsModuleCfg;
+    protected boolean mbIsModuleFin;
+    protected boolean mbIsModulePur;
+    protected boolean mbIsModuleSal;
+    protected boolean mbIsModuleInv;
+    protected boolean mbIsModuleMkt;
+    protected boolean mbIsModuleLog;
+    protected boolean mbIsModuleMfg;
+    protected boolean mbIsModuleHrs;
     protected boolean mbIsDeleted;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
@@ -44,6 +53,15 @@ public class SDataCompany extends erp.lib.data.SDataRegistry implements java.io.
     public void setKey(java.lang.String s) { msKey = s; }
     public void setCompany(java.lang.String s) { msCompany = s; }
     public void setDatabase(java.lang.String s) { msDatabase = s; }
+    public void setIsModuleCfg(boolean b) { mbIsModuleCfg = b; }
+    public void setIsModuleFin(boolean b) { mbIsModuleFin = b; }
+    public void setIsModulePur(boolean b) { mbIsModulePur = b; }
+    public void setIsModuleSal(boolean b) { mbIsModuleSal = b; }
+    public void setIsModuleInv(boolean b) { mbIsModuleInv = b; }
+    public void setIsModuleMkt(boolean b) { mbIsModuleMkt = b; }
+    public void setIsModuleLog(boolean b) { mbIsModuleLog = b; }
+    public void setIsModuleMfg(boolean b) { mbIsModuleMfg = b; }
+    public void setIsModuleHrs(boolean b) { mbIsModuleHrs = b; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
@@ -56,6 +74,15 @@ public class SDataCompany extends erp.lib.data.SDataRegistry implements java.io.
     public java.lang.String getKey() { return msKey; }
     public java.lang.String getCompany() { return msCompany; }
     public java.lang.String getDatabase() { return msDatabase; }
+    public boolean getIsModuleCfg() { return mbIsModuleCfg; }
+    public boolean getIsModuleFin() { return mbIsModuleFin; }
+    public boolean getIsModulePur() { return mbIsModulePur; }
+    public boolean getIsModuleSal() { return mbIsModuleSal; }
+    public boolean getIsModuleInv() { return mbIsModuleInv; }
+    public boolean getIsModuleMkt() { return mbIsModuleMkt; }
+    public boolean getIsModuleLog() { return mbIsModuleLog; }
+    public boolean getIsModuleMfg() { return mbIsModuleMfg; }
+    public boolean getIsModuleHrs() { return mbIsModuleHrs; }
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
@@ -87,6 +114,15 @@ public class SDataCompany extends erp.lib.data.SDataRegistry implements java.io.
         msKey = "";
         msCompany = "";
         msDatabase = "";
+        mbIsModuleCfg = false;
+        mbIsModuleFin = false;
+        mbIsModulePur = false;
+        mbIsModuleSal = false;
+        mbIsModuleInv = false;
+        mbIsModuleMkt = false;
+        mbIsModuleLog = false;
+        mbIsModuleMfg = false;
+        mbIsModuleHrs = false;
         mbIsDeleted = false;
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
@@ -120,6 +156,15 @@ public class SDataCompany extends erp.lib.data.SDataRegistry implements java.io.
                 msKey = resultSet.getString("co_key");
                 msCompany = resultSet.getString("co");
                 msDatabase = resultSet.getString("bd");
+                mbIsModuleCfg = resultSet.getBoolean("b_mod_cfg");
+                mbIsModuleFin = resultSet.getBoolean("b_mod_fin");
+                mbIsModulePur = resultSet.getBoolean("b_mod_pur");
+                mbIsModuleSal = resultSet.getBoolean("b_mod_sal");
+                mbIsModuleInv = resultSet.getBoolean("b_mod_inv");
+                mbIsModuleMkt = resultSet.getBoolean("b_mod_mkt");
+                mbIsModuleLog = resultSet.getBoolean("b_mod_log");
+                mbIsModuleMfg = resultSet.getBoolean("b_mod_mfg");
+                mbIsModuleHrs = resultSet.getBoolean("b_mod_hrs");
                 mbIsDeleted = resultSet.getBoolean("b_del");
                 mnFkUserNewId = resultSet.getInt("fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("fid_usr_edit");
@@ -183,11 +228,20 @@ public class SDataCompany extends erp.lib.data.SDataRegistry implements java.io.
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
         try {
-            callableStatement = connection.prepareCall("{ CALL erp.cfgu_co_save(?, ?, ?, ?, ?, ?) }");
+            callableStatement = connection.prepareCall("{ CALL erp.cfgu_co_save(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkCompanyId);
             callableStatement.setString(nParam++, msKey);
             callableStatement.setString(nParam++, msCompany);
             callableStatement.setString(nParam++, msDatabase);
+            callableStatement.setBoolean(nParam++, mbIsModuleCfg);
+            callableStatement.setBoolean(nParam++, mbIsModuleFin);
+            callableStatement.setBoolean(nParam++, mbIsModulePur);
+            callableStatement.setBoolean(nParam++, mbIsModuleSal);
+            callableStatement.setBoolean(nParam++, mbIsModuleInv);
+            callableStatement.setBoolean(nParam++, mbIsModuleMkt);
+            callableStatement.setBoolean(nParam++, mbIsModuleLog);
+            callableStatement.setBoolean(nParam++, mbIsModuleMfg);
+            callableStatement.setBoolean(nParam++, mbIsModuleHrs);
             callableStatement.setBoolean(nParam++, mbIsDeleted);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
