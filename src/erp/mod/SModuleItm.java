@@ -45,7 +45,7 @@ public class SModuleItm extends SGuiModule {
     }
 
     @Override
-    public SDbRegistry getRegistry(int type) {
+    public SDbRegistry getRegistry(final int type, final SGuiParams params) {
         SDbRegistry registry = null;
 
         switch (type) {
@@ -66,7 +66,7 @@ public class SModuleItm extends SGuiModule {
     }
 
     @Override
-    public SGuiCatalogueSettings getCatalogueSettings(int type, int subtype, SGuiParams params) {
+    public SGuiCatalogueSettings getCatalogueSettings(final int type, final int subtype, final SGuiParams params) {
         String sql = "";
         String aux = "";
         Object value = null;
@@ -161,14 +161,14 @@ public class SModuleItm extends SGuiModule {
     }
 
     @Override
-    public SGridPaneView getView(int type, int subtype, SGuiParams params) {
+    public SGridPaneView getView(final int type, final int subtype, final SGuiParams params) {
         SGridPaneView view = null;
 
         return view;
     }
 
     @Override
-    public SGuiOptionPicker getOptionPicker(int type, int subtype, SGuiParams params) {
+    public SGuiOptionPicker getOptionPicker(final int type, final int subtype, final SGuiParams params) {
         String sql = "";
         ArrayList<SGridColumnForm> gridColumns = new ArrayList<SGridColumnForm>();
         SGuiOptionPickerSettings settings = null;
@@ -200,14 +200,14 @@ public class SModuleItm extends SGuiModule {
     }
 
     @Override
-    public SGuiForm getForm(int type, int subtype, SGuiParams params) {
+    public SGuiForm getForm(final int type, final int subtype, final SGuiParams params) {
         SGuiForm form = null;
 
         return form;
     }
 
     @Override
-    public SGuiReport getReport(int type, int subtype, SGuiParams params) {
+    public SGuiReport getReport(final int type, final int subtype, final SGuiParams params) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }

@@ -206,7 +206,7 @@ public class SModuleHrs extends SGuiModule {
     }
 
     @Override
-    public SDbRegistry getRegistry(int type) {
+    public SDbRegistry getRegistry(final int type, final SGuiParams params) {
         SDbRegistry registry = null;
 
         switch (type) {
@@ -438,7 +438,7 @@ public class SModuleHrs extends SGuiModule {
     }
 
     @Override
-    public SGuiCatalogueSettings getCatalogueSettings(int type, int subtype, SGuiParams params) {
+    public SGuiCatalogueSettings getCatalogueSettings(final int type, final int subtype, final SGuiParams params) {
         String sql = "";
         String aux = "";
         SGuiCatalogueSettings settings = null;
@@ -650,7 +650,7 @@ public class SModuleHrs extends SGuiModule {
     }
 
     @Override
-    public SGridPaneView getView(int type, int subtype, SGuiParams params) {
+    public SGridPaneView getView(final int type, final int subtype, final SGuiParams params) {
         SGridPaneView view = null;
         String title = "";
 
@@ -867,7 +867,7 @@ public class SModuleHrs extends SGuiModule {
     }
 
     @Override
-    public SGuiOptionPicker getOptionPicker(int type, int subtype, SGuiParams params) {
+    public SGuiOptionPicker getOptionPicker(final int type, final int subtype, final SGuiParams params) {
         String sql = "";
         ArrayList<SGridColumnForm> gridColumns = new ArrayList<SGridColumnForm>();
         SGuiOptionPickerSettings settings = null;
@@ -914,7 +914,7 @@ public class SModuleHrs extends SGuiModule {
     }
 
     @Override
-    public SGuiForm getForm(int type, int subtype, SGuiParams params) {
+    public SGuiForm getForm(final int type, final int subtype, final SGuiParams params) {
         SGuiForm form = null;
 
         switch (type) {
@@ -1132,7 +1132,7 @@ public class SModuleHrs extends SGuiModule {
     }
 
     @Override
-    public SGuiReport getReport(int type, int subtype, SGuiParams params) {
+    public SGuiReport getReport(final int type, final int subtype, final SGuiParams params) {
         SGuiReport guiReport = null;
 
         switch (type) {
