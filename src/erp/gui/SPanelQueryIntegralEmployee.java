@@ -16,6 +16,7 @@ import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.table.STableColumnForm;
+import erp.lib.table.STableConstants;
 import erp.lib.table.STablePaneGrid;
 import erp.lib.table.STableSetting;
 import erp.lib.table.STableTabInterface;
@@ -935,10 +936,11 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         resetBenefits();
         resetSettlement();
         i = 0;
-        aoTableColumns = new STableColumnForm[16];
+        aoTableColumns = new STableColumnForm[17];
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Empleado", 250);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", 75);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Periodo pago", 100);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Activo", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Categoría", 100);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo empleado", 100);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Departamento", 100);
@@ -1086,6 +1088,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             row.setPkEmployeeId(employeeId);
             row.setEmployeeNumber(resultSet.getString("emp.num"));
             row.setEmployeeName(resultSet.getString("bp.bp"));
+            row.setActive(resultSet.getBoolean("emp.b_act"));
             row.setEmployeeCategory(resultSet.getString("ct.code"));
             row.setEmployeeType(resultSet.getString("tp.code"));
             row.setDepartament(resultSet.getString("dep.name"));
@@ -1309,6 +1312,12 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         }   
     }
     
+    public static final int SETTLEMENT_YEARS_MIN = 15;
+    public static final int SETTLEMENT_DAYS_BY_YEAR = 12;
+    public static final int SETTLEMENT_SAL_DAY_LIMIT = 2;
+    public static final int SETTLEMENT_MONTH_BY_YEAR = 3;
+    public static final int SETTLEMENT_DAYS_BY_YEAR_SENIORITY = 20;
+    
     private void renderSettlement(int seniority, int seniorityDays, double paymentDaily, int mwzReferenceId) throws Exception {
         double rjdj = 0;
         double disl = 0;
@@ -1328,7 +1337,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         }
         disl += ((3 * 30.42) * paymentDaily);
         dicl += ((3 * 30.42) * paymentDaily) + (20 * ((double) seniority + ((double) seniorityDays / SHrsConsts.YEAR_DAYS)) * paymentDaily);
-        
+                
         jtfSettlement.setText(SLibUtils.DecimalFormatValue2D.format(rjdj) + "");
         jtfSettlementDisL.setText(SLibUtils.DecimalFormatValue2D.format(disl) + "");
         jtfSettlementDicL.setText(SLibUtils.DecimalFormatValue2D.format(dicl) + "");

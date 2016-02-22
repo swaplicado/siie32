@@ -149,7 +149,7 @@ public class SFormConfig extends SBeanForm {
         jPanel9.add(moIntFirstDayWeek);
 
         jlFirstDayWeekHelp.setForeground(new java.awt.Color(109, 109, 109));
-        jlFirstDayWeekHelp.setText("(1=Dom, 2=Lun, ..., 6=Sáb)");
+        jlFirstDayWeekHelp.setText("(1=Dom, 2=Lun, ..., 7=Sáb)");
         jlFirstDayWeekHelp.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel9.add(jlFirstDayWeekHelp);
 

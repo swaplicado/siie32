@@ -1668,18 +1668,29 @@ public abstract class STrnUtilities {
         }
     
     }
-
+    
     /**
      * Send by mail the required sales document.
      * @param client ERP Client interface.
-     * @param dpsKey Document key to send.
+     * @param cfd
+     * @param subtypeCfd
+     * @param contactType
+     * @param bizPartnerId
+     * @param bizPartnerBranchId
      * @return <code>true</code> when sent, otherwise <code>false</code>.
+     * @throws javax.mail.MessagingException
+     * @throws java.sql.SQLException
      */
     public static boolean sendMailCfd(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd, final int contactType, final int bizPartnerId, final int bizPartnerBranchId) throws MessagingException, SQLException, Exception {
         boolean send = false;
+        boolean canSend = true;
+        boolean mbIsCancel = false;
         String bizPartnerMail = "";
         String snd_subject = "";
+        String snd_body = "";
         String snd_To = "";
+        String msNumberDoc = "";
+        String msDocumentType = "";
         String sql = "";
         int id_snd = 0;
         ResultSet resultSet = null;
@@ -1696,13 +1707,15 @@ public abstract class STrnUtilities {
         SDbPayroll payroll = null;
         SDbPayrollReceipt payrollReceipt = null;
         DecimalFormat numberFormat = new DecimalFormat("00");
+        Date cancellationDate = null;
 
         bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { bizPartnerId }, SLibConstants.EXEC_MODE_SILENT);
 
         mms = getMms(client, SModSysConsts.CFGS_TP_MMS_CFD);
 
         if (mms.getQueryResultId() != SDbConsts.READ_OK) {
-            throw new Exception("No existe ningún correo configurado para envío de documentos.");
+            canSend = false;
+            throw new Exception("Se carece de correo para envío de documentos.");
         }
         else {
             if (bizPartnerBranchId != SLibConstants.UNDEFINED) {
@@ -1713,62 +1726,102 @@ public abstract class STrnUtilities {
             }
 
             if (bizPartnerMail.isEmpty()) {
-                throw new Exception("El receptor de documento no tiene ningún correo configurado para la recepción de documentos.");
+                canSend = false;
+                throw new Exception("El receptor carece de correo para recepción de documentos.");
             }
             else {
                 switch (cfd.getFkCfdTypeId()) {
                     case SCfdConsts.CFD_TYPE_DPS:
                         dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
-
-                        snd_subject = mms.getTextSubject() + " " + (dps.getNumberSeries().length() > 0 ? dps.getNumberSeries() + "-" : "") + dps.getNumber();
+                        msNumberDoc = (dps.getNumberSeries().length() > 0 ? dps.getNumberSeries() + "-" : "") + dps.getNumber();
+                        mbIsCancel = dps.getFkDpsStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
+                        if (SLibUtils.belongsTo(dps.getDpsTypeKey(), new int[][] { SDataConstantsSys.TRNU_TP_DPS_PUR_INV, SDataConstantsSys.TRNU_TP_DPS_SAL_INV })) {
+                            msDocumentType =  "Factura";
+                        }
+                        else if (SLibUtils.belongsTo(dps.getDpsTypeKey(), new int[][] { SDataConstantsSys.TRNU_TP_DPS_PUR_CN, SDataConstantsSys.TRNU_TP_DPS_SAL_CN })) {
+                            msDocumentType =  "Nota de Crédito";
+                        }
+                        cancellationDate = dps.getUserEditTs();
+                        
+                        snd_subject = mms.getTextSubject() + " " + msNumberDoc;
                         break;
                     case SCfdConsts.CFD_TYPE_PAYROLL:
                         switch (subtypeCfd) {
                             case SCfdConsts.CFDI_PAYROLL_VER_OLD:
                                 payrollFormer = (SDataFormerPayroll) SDataUtilities.readRegistry(client, SDataConstants.HRS_FORMER_PAYR, new int[] { cfd.getFkPayrollPayrollId_n() }, SLibConstants.EXEC_MODE_SILENT);
                                 payrollFormerEmp = (SDataFormerPayrollEmp) SDataUtilities.readRegistry(client, SDataConstants.HRS_FORMER_PAYR_EMP, new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, SLibConstants.EXEC_MODE_SILENT);
-
-                                snd_subject = mms.getTextSubject() + " " + payrollFormer.getYear() + " " + (payrollFormer.getType().compareTo(SHrsFormerConsts.PAY_WEE) == 0 ? SHrsFormerConsts.PAY_WEE_ABB : payrollFormer.getType().compareTo(SHrsFormerConsts.PAY_BIW) == 0 ? SHrsFormerConsts.PAY_BIW_ABB : payrollFormer.getType().compareTo(SHrsFormerConsts.PAY_MON) == 0 ? SHrsFormerConsts.PAY_MON_ABB : "") + " " +
+                                msNumberDoc = payrollFormer.getYear() + " " + (payrollFormer.getType().compareTo(SHrsFormerConsts.PAY_WEE) == 0 ? SHrsFormerConsts.PAY_WEE_ABB : payrollFormer.getType().compareTo(SHrsFormerConsts.PAY_BIW) == 0 ? SHrsFormerConsts.PAY_BIW_ABB : payrollFormer.getType().compareTo(SHrsFormerConsts.PAY_MON) == 0 ? SHrsFormerConsts.PAY_MON_ABB : "") + " " +
                                     numberFormat.format(payrollFormer.getNumber()) + " " + (payrollFormerEmp.getNumberSeries().length() > 0 ? payrollFormerEmp.getNumberSeries() + "-" : "") + payrollFormerEmp.getNumber();
+                                mbIsCancel = cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
+                                msDocumentType =  "Recibo de nómina";
+                                cancellationDate = payrollFormerEmp.getLastDbUpdate();
+
+                                snd_subject = mms.getTextSubject() + " " + msNumberDoc;
                                 break;
                             case SCfdConsts.CFDI_PAYROLL_VER_CUR:
                                 payroll = new SDbPayroll();
                                 payroll.read(client.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n() });
-
+                                
                                 payrollReceipt = new SDbPayrollReceipt();
                                 payrollReceipt.read(client.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
-                                
-                                snd_subject = mms.getTextSubject() + " " + payroll.getPeriodYear() + " " + (payroll.getAuxPaymentType().compareTo(SHrsFormerConsts.PAY_WEE) == 0 ? SHrsFormerConsts.PAY_WEE_ABB : payroll.getAuxPaymentType().compareTo(SHrsFormerConsts.PAY_BIW) == 0 ? SHrsFormerConsts.PAY_BIW_ABB : payroll.getAuxPaymentType().compareTo(SHrsFormerConsts.PAY_MON) == 0 ? SHrsFormerConsts.PAY_MON_ABB : "") + " " +
-                                    numberFormat.format(payroll.getNumber()) + " " + (payrollReceipt.getPayrollReceiptIssues() == null ? "" :(payrollReceipt.getPayrollReceiptIssues().getNumberSeries().length() > 0 ? payrollReceipt.getPayrollReceiptIssues().getNumberSeries() + "-" : "") + payrollReceipt.getPayrollReceiptIssues().getNumber());
+                                msNumberDoc = payroll.getPeriodYear() + " " + (payroll.getAuxPaymentType().compareTo(SHrsFormerConsts.PAY_WEE) == 0 ? SHrsFormerConsts.PAY_WEE_ABB : payroll.getAuxPaymentType().compareTo(SHrsFormerConsts.PAY_BIW) == 0 ? SHrsFormerConsts.PAY_BIW_ABB : payroll.getAuxPaymentType().compareTo(SHrsFormerConsts.PAY_MON) == 0 ? SHrsFormerConsts.PAY_MON_ABB : "") + " " +
+                                    numberFormat.format(payroll.getNumber()) + " " + (payrollReceipt.getPayrollReceiptIssues() == null ? "" : (payrollReceipt.getPayrollReceiptIssues().getNumberSeries().length() > 0 ? payrollReceipt.getPayrollReceiptIssues().getNumberSeries() + "-" : "") + payrollReceipt.getPayrollReceiptIssues().getNumber());
                                     //numberFormat.format(payroll.getNumber()) + " " + (payrollReceipt.getNumberSeries().length() > 0 ? payrollReceipt.getNumberSeries() + "-" : "") + payrollReceipt.getNumber(); XXX (jbarajas, 2015-10-07) remove by new table
+                                mbIsCancel = payrollReceipt.getPayrollReceiptIssues() == null ?  cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED : payrollReceipt.getPayrollReceiptIssues().getFkReceiptStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
+                                msDocumentType =  "Recibo de nómina";
+                                cancellationDate = payrollReceipt.getPayrollReceiptIssues() == null ? cfd.getTimestamp() : payrollReceipt.getPayrollReceiptIssues().getTsUserUpdate();
+                               
+                                snd_subject = mms.getTextSubject() + " " + msNumberDoc;
                                 break;
                             default:
+                                canSend = false;
                                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                         }
                         break;
                     default:
+                        canSend = false;
                         throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
 
-                pdfFile = new File(client.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName().replaceAll(".xml", ".pdf"));
-                xmlFile = new File(client.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName());
+                if (!mbIsCancel) {
+                    pdfFile = new File(client.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName().replaceAll(".xml", ".pdf"));
+                    xmlFile = new File(client.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName());
 
-                if (!pdfFile.exists()) {
-                    throw new Exception("El archivo PDF no existe.");
+                    if (!pdfFile.exists()) {
+                        canSend = false;
+                        throw new Exception("El archivo PDF no existe.");
+                    }
+                    else if (!xmlFile.exists()) {
+                        canSend = false;
+                        throw new Exception("El archivo XML no existe.");
+                    }
                 }
-                else if (!xmlFile.exists()) {
-                    throw new Exception("El archivo XML no existe.");
-                }
-                else {
+                
+                if (canSend) {
                     toRecipients = new ArrayList<>();
+                    snd_subject += " (" + (!mbIsCancel ? "emisión" : "cancelación") + ")";
+                    
+                    snd_body = "Emisor: " + client.getSessionXXX().getCurrentCompany().getDbmsDataCompany().getBizPartner() + "\n" +
+                                "RFC: " + client.getSessionXXX().getCurrentCompany().getDbmsDataCompany().getFiscalId() + "\n" +
+                                "Comprobante: " + msDocumentType + "\n" +
+                                "Folio: " + " " + msNumberDoc + "\n" +
+                                "Emisión: " +  client.getSessionXXX().getFormatters().getDateFormat().format(cfd.getTimestamp()) + "\n";
+                    
+                    if (mbIsCancel) {
+                        snd_body += "Cancelación: " +  client.getSessionXXX().getFormatters().getDateFormat().format(cancellationDate) + "\n";
+                    }
+                    
+                    snd_body += "\n" + mms.getTextBody();
 
                     sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
 
                     toRecipients.addAll(Arrays.asList(SLibUtils.textExplode(bizPartnerMail, ";")));
-                    mail = new SMail(sender, snd_subject, mms.getTextBody(), toRecipients);
+                    mail = new SMail(sender, snd_subject, snd_body, toRecipients);
 
-                    mail.getAttachments().add(xmlFile);
-                    mail.getAttachments().add(pdfFile);
+                    if (!mbIsCancel) {
+                        mail.getAttachments().add(xmlFile);
+                        mail.getAttachments().add(pdfFile);
+                    }
 
                     mail.send();
 

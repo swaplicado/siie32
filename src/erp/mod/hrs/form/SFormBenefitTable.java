@@ -309,7 +309,7 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 720, 450);
 
-        moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode.getText()), 10);
+        moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode.getText()), 5);
         moTextName.setTextSettings(SGuiUtils.getLabelName(jlName.getText()), 50);
         moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart.getText()), true);
         moKeyBenefitType.setKeySettings(miClient, SGuiUtils.getLabelName(jlBenefitType.getText()), true);

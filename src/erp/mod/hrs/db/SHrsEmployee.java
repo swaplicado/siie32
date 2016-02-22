@@ -39,6 +39,7 @@ public class SHrsEmployee {
     protected int mnDaysHiredAnnual;                 // hired days in fiscal year
     protected int mnDaysHiredPayroll;                 // hired days in the period payroll
     protected int mnBusinessDays;                 // business days in the period payroll
+    protected int mnSeniority;                 // seniority to payroll end
     protected double mdAccumulatedTaxableEarnings;                 // taxable amount accumulated of earnigs 
     protected SHrsDaysByPeriod moHrsDaysPrev;
     protected SHrsDaysByPeriod moHrsDaysCurr;
@@ -67,6 +68,7 @@ public class SHrsEmployee {
         mnDaysHiredAnnual = 0;
         mnDaysHiredPayroll = 0;
         mnBusinessDays = 0;
+        mnSeniority = 0;
         mdAccumulatedTaxableEarnings = 0;
         moHrsDaysPrev = null;
         moHrsDaysCurr = null;
@@ -83,6 +85,7 @@ public class SHrsEmployee {
     public void setDaysHiredAnnual(int n) { mnDaysHiredAnnual = n; }
     public void setDaysHiredPayroll(int n) { mnDaysHiredPayroll = n; }
     public void setBusinessDays(int n) { mnBusinessDays = n; }
+    public void setSeniority(int n) { mnSeniority = n; }
     public void setAccumulatedTaxableEarning(double d) { mdAccumulatedTaxableEarnings = d; }
     public void setHrsDaysPrev(SHrsDaysByPeriod o) { moHrsDaysPrev = o; }
     public void setHrsDaysCurr(SHrsDaysByPeriod o) { moHrsDaysCurr = o; }
@@ -110,6 +113,7 @@ public class SHrsEmployee {
     public int getDaysHiredAnnual() { return mnDaysHiredAnnual; }
     public int getDaysHiredPayroll() { return mnDaysHiredPayroll; }
     public int getBusinessDays() { return mnBusinessDays; }
+    public int getSeniority() { return mnSeniority; }
     public double getAccummulatedTaxableEarnings() { return mdAccumulatedTaxableEarnings; }
     public SHrsDaysByPeriod getHrsDaysPrev() { return moHrsDaysPrev; }
     public SHrsDaysByPeriod getHrsDaysCurr() { return moHrsDaysCurr; }

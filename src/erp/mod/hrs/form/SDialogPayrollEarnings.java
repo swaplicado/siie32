@@ -273,6 +273,12 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
         else if (row.getEarning().getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_HRS) {
             receiptEarning.setAmountUnitary(payrollReceipt.getReceipt().getPaymentHourly());
         }
+        else if (row.getEarning().getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_DAY) {
+            receiptEarning.setAmountUnitary(payrollReceipt.getReceipt().getPaymentDaily() * row.getEarning().getPayPercentage());
+        }
+        else if (row.getEarning().getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_HRS) {
+            receiptEarning.setAmountUnitary(payrollReceipt.getReceipt().getPaymentHourly() * row.getEarning().getPayPercentage());
+        }
         receiptEarning.setFactorAmount(1);
         
         amount = SLibUtils.round((receiptEarning.getUnits() * receiptEarning.getAmountUnitary()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
@@ -529,7 +535,6 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
                 
                 if ((earning.getFkAbsenceClassId_n() != SLibConsts.UNDEFINED && earning.getFkAbsenceTypeId_n() != SLibConsts.UNDEFINED) || earning.getFkBenefitTypeId() != SModSysConsts.HRSS_TP_BEN_NON) {
                     add = false;
-                    break;
                 }
                 
                 if (add) {

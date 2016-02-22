@@ -7,6 +7,8 @@ package erp.mod.hrs.db;
 import erp.mod.SModConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.db.SDbConsts;
@@ -29,6 +31,8 @@ public class SDbAccountingPayroll extends SDbRegistryUser {
     protected Date mtTsUserUpdate;
     */
 
+    protected ArrayList<SDbAccountingPayrollEmployee> maChildAccountingPayrollEmployee;
+
     public SDbAccountingPayroll() {
         super(SModConsts.HRS_ACC_PAY);
     }
@@ -48,6 +52,8 @@ public class SDbAccountingPayroll extends SDbRegistryUser {
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
+
+    public ArrayList<SDbAccountingPayrollEmployee> getChildAccountingPayrollEmployees() { return maChildAccountingPayrollEmployee; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -71,6 +77,8 @@ public class SDbAccountingPayroll extends SDbRegistryUser {
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
+
+        maChildAccountingPayrollEmployee = new ArrayList<SDbAccountingPayrollEmployee>();
     }
 
     @Override
@@ -92,12 +100,22 @@ public class SDbAccountingPayroll extends SDbRegistryUser {
 
     @Override
     public void computePrimaryKey(SGuiSession session) throws SQLException, Exception {
-        
+        ResultSet resultSet = null;
+
+        mnPkAccountingId = 0;
+
+        msSql = "SELECT COALESCE(MAX(id_acc), 0) + 1 FROM " + getSqlTable() + " WHERE id_pay = " + mnPkPayrollId + " ";
+        resultSet = session.getStatement().executeQuery(msSql);
+        if (resultSet.next()) {
+            mnPkAccountingId = resultSet.getInt(1);
+        }
     }
 
     @Override
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
+        Statement statement = null;
         ResultSet resultSet = null;
+        SDbAccountingPayrollEmployee accountingPayrollEmployee = null;
 
         initRegistry();
         initQueryMembers();
@@ -117,6 +135,18 @@ public class SDbAccountingPayroll extends SDbRegistryUser {
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
 
+            statement = session.getStatement().getConnection().createStatement();
+
+            msSql = "SELECT id_emp " +
+                    "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_PAY_RCP) + " " +
+                    "WHERE id_pay = " + mnPkPayrollId + " AND id_acc = " + mnPkAccountingId + "; ";
+            
+            resultSet = statement.executeQuery(msSql);
+            while (resultSet.next()) {
+                accountingPayrollEmployee = new SDbAccountingPayrollEmployee();
+                accountingPayrollEmployee.read(session, new int[] { mnPkPayrollId, mnPkAccountingId, resultSet.getInt(1) });
+                maChildAccountingPayrollEmployee.add(accountingPayrollEmployee);
+            }
             mbRegistryNew = false;
         }
 
@@ -161,6 +191,23 @@ public class SDbAccountingPayroll extends SDbRegistryUser {
         }
 
         session.getStatement().execute(msSql);
+
+        // Delete registries dependent:
+
+        msSql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_PAY) + " SET b_del = 1 " +
+                    "WHERE id_pay = " + mnPkPayrollId + " AND id_acc < " + mnPkAccountingId;
+        
+         session.getStatement().execute(msSql);
+        
+        // Save payrollReceips:
+        
+        for (SDbAccountingPayrollEmployee accountingPayrollEmployee : maChildAccountingPayrollEmployee) {
+            accountingPayrollEmployee.setRegistryNew(true);
+            accountingPayrollEmployee.setPkPayrollId(mnPkPayrollId);
+            accountingPayrollEmployee.setPkAccountingId(mnPkAccountingId);
+            accountingPayrollEmployee.save(session);
+        }
+        
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
     }
@@ -176,6 +223,10 @@ public class SDbAccountingPayroll extends SDbRegistryUser {
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
+
+        for (SDbAccountingPayrollEmployee receipt : this.getChildAccountingPayrollEmployees()) {
+            registry.getChildAccountingPayrollEmployees().add(receipt.clone());
+        }
 
         return registry;
     }

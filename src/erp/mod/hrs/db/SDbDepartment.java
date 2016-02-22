@@ -258,6 +258,7 @@ public class SDbDepartment extends SDbRegistryUser {
         session.getStatement().execute(msSql);
         
         if (mbRegistryNew) {
+            /*
             aAccountingEarning = createAccountingEarningConfiguration(session);
             aAccountingDeductions = createAccountingDeductionConfiguration(session);
             
@@ -267,6 +268,15 @@ public class SDbDepartment extends SDbRegistryUser {
             for (SDbAccountingDeduction accountingDeduction : aAccountingDeductions) {
                 accountingDeduction.save(session);
             }
+            */
+            SHrsAccounting accounting = new SHrsAccounting(null, session);
+                
+            accounting.setAccountingType(SModSysConsts.HRSS_TP_ACC_DEP);
+            accounting.setPkReferenceId(mnPkDepartmentId);
+            accounting.setFkUserInsertId(mnFkUserInsertId);
+            accounting.setFkUserUpdateId(mnFkUserUpdateId);
+            
+            accounting.save();
         }
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;

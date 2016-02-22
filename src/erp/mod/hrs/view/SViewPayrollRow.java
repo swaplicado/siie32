@@ -78,15 +78,15 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
         
         jbSignXml = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_SIGN), "Timbrar CFDI", this);
-        jbAnnul = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_ANNUL), "Anular nómina", this);
+        jbAnnul = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_ANNUL), "Anular rebibo nómina", this);
         jbGetXml = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML), "Obtener XML del comprobante", this);
         jbGetAcknowledgmentCancellation = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_CANCEL), "Obtener XML del acuse de cancelación del CFDI", this);
-        jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir nómina", this);
+        jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir CFDI rebibo nómina", this);
         jbPrintAcknowledgmentCancellation = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT_ACK_CAN), "Imprimir acuse de cancelación", this);
-        jbSend = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")), "Enviar nómina", this);
+        jbSend = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")), "Enviar rebibo nómina", this);
         jbVerifyCfdi = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_ok.gif")), "Verificar timbrado o cancelación del CFDI", this);
         jbDiactivatePac = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif")), "Limpiar inconsistencias del timbrado o cancelación del CFDI", this);
-        jbPrintReceipt = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_print.gif")), "Imprimir recibo", this);
+        jbPrintReceipt = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_print.gif")), "Imprimir rebibo recibo", this);
         
         moDialogAnnulCfdi = new SDialogAnnulCfdi((SClientInterface) miClient, true);
 
@@ -183,7 +183,10 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
                                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
                             }
                             else {
+                                /* XXX jbarajas 04/02/2016 sign and sending CFDI
                                 needUpdate = SCfdUtils.signCfdi((SClientInterface) miClient, cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR);
+                                */
+                                needUpdate = SCfdUtils.signAndSendCfdi((SClientInterface) miClient, cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, true);
                             }
                         }
                                 

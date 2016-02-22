@@ -24,6 +24,7 @@ import erp.mbps.data.SDataBizPartnerCategory;
 import erp.mbps.data.SDataEmployee;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.hrs.db.SHrsUtils;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -1122,7 +1123,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private void windowActivate() {
         if (mbFirstTime) {
             mbFirstTime = false;
-            jftNumber.requestFocus();
+            jtfFirstName.requestFocus();
         }
     }
     
@@ -1213,6 +1214,15 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moBizPartnerBranch.getDbmsBizPartnerBranchAddresses().add(address);
         moBizPartnerBranch.getDbmsBizPartnerBranchContacts().add(createBizPartnerBranchContact());
         moBizPartner.getDbmsBizPartnerBranches().add(moBizPartnerBranch);
+    }
+    
+    private void updateEmployeeNextNumber() {
+        try {
+            jftNumber.setValue(SHrsUtils.getEmployeeNextNumber(miClient.getSession().getStatement().getConnection()));
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
     }
 
     private SDataBizPartnerCategory createBizPartnerCategory(final int categoryId) {
@@ -1759,6 +1769,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jckChangeSalarySscBase.setSelected(true);
         updateStatusDateBenefits(true);
         updateStatusDateLastHire(true);
+        updateEmployeeNextNumber();
 
         itemStateChangePaymentType();
         //itemStateSalary();    // invocked allready by itemStateChangePaymentType()

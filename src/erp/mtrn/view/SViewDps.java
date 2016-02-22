@@ -6,6 +6,7 @@
 package erp.mtrn.view;
 
 import erp.cfd.SCfdConsts;
+import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
@@ -89,6 +90,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbGetAcknowledgmentCancellation;
     private javax.swing.JButton jbSignXml;
     private javax.swing.JButton jbVerifyCfdi;
+    private javax.swing.JButton jbSend;
     private javax.swing.JButton jbDiactivateFlags;
     private javax.swing.JButton jbRestoreSignXml;
     private javax.swing.JButton jbRestoreAcknowledgmentCancellation;
@@ -296,6 +298,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbVerifyCfdi.setPreferredSize(new Dimension(23, 23));
         jbVerifyCfdi.addActionListener(this);
         jbVerifyCfdi.setToolTipText("Verificar timbrado o cancelación del CFDI");
+        
+        jbSend = new JButton(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")));
+        jbSend.setPreferredSize(new Dimension(23, 23));
+        jbSend.addActionListener(this);
+        jbSend.setToolTipText("Enviar comprobante");
 
         jbRestoreSignXml = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_insert.gif")));
         jbRestoreSignXml.setPreferredSize(new Dimension(23, 23));
@@ -369,6 +376,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         addTaskBarLowerComponent(jbGetAcknowledgmentCancellation);
         addTaskBarLowerComponent(jbSignXml);
         addTaskBarLowerComponent(jbVerifyCfdi);
+        addTaskBarLowerComponent(jbSend);
         addTaskBarLowerComponent(jbRestoreSignXml);
         addTaskBarLowerComponent(jbRestoreAcknowledgmentCancellation);
         addTaskBarLowerComponent(jbDiactivateFlags);
@@ -401,6 +409,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbGetAcknowledgmentCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbSignXml.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbVerifyCfdi.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
+        jbSend.setEnabled((mbIsCategoryPur && mbIsOrd) || (mbIsCategorySal && (mbIsDoc || mbIsDocAdj)));
         jbRestoreSignXml.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbRestoreAcknowledgmentCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbDiactivateFlags.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
@@ -1625,7 +1634,12 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             break;
                         case SDataConstantsSys.TRNS_TP_XML_CFDI:
                             try {
+                                /* XXX jbarajas 03/02/2016 sign and sending CFDI
                                 if (SCfdUtils.signCfdi(miClient, dps.getDbmsDataCfd(), SLibConstants.UNDEFINED)) {
+                                    miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
+                                }
+                                */
+                                if (SCfdUtils.signAndSendCfdi(miClient, dps.getDbmsDataCfd(), SLibConstants.UNDEFINED, true)) {
                                     miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
                                 }
                             }
@@ -1662,6 +1676,28 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
            }
         }
 
+    }
+
+    private void actionSend() {
+        if (jbSend.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() != null) {
+                try {
+                    switch (mnTabTypeAux02) {
+                        case SDataConstantsSys.TRNX_TP_DPS_DOC:
+                        case SDataConstantsSys.TRNX_TP_DPS_ADJ:
+                            SCfdUtils.sendCfd((SClientInterface) miClient, SCfdConsts.CFD_TYPE_DPS, SCfdUtils.getCfd(miClient, SCfdConsts.CFD_TYPE_DPS, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_OLD);
+                            break;
+                        case SDataConstantsSys.TRNX_TP_DPS_ORD:
+                            STrnUtilities.sendMailOrder(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey(), mnTabTypeAux01);
+                            break;
+                        default:
+                    }
+                }
+                catch (Exception e) {
+                    SLibUtilities.renderException(this, e);
+                }
+            }
+        }
     }
 
     private void actionRestoreSignXml() throws Exception {
@@ -1950,6 +1986,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 }
                 else if (button == jbVerifyCfdi) {
                     actionVerifyCfdi();
+                }
+                else if (button == jbSend) {
+                    actionSend();
                 }
                 else if (button == jbRestoreSignXml) {
                     actionRestoreSignXml();

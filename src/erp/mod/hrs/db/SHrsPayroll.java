@@ -112,11 +112,29 @@ public class SHrsPayroll {
             for (SDbEarning earning : maEarnigs) {
                 if (earning.getPkEarningId() == automaticEarning.getPkEarningId()) {
                     hrsPayrollReceiptEarning.setEarning(earning);
+                    
+                    if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
+                        amount_unt = automaticEarning.getAmountUnitary();
+                    }
+                    else if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_DAY) {
+                        amount_unt = hrsPayrollReceipt.getReceipt().getPaymentDaily();
+                    }
+                    else if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_HRS) {
+                        amount_unt = hrsPayrollReceipt.getReceipt().getPaymentHourly();
+                    }
+                    else if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_DAY) {
+                        amount_unt = hrsPayrollReceipt.getReceipt().getPaymentDaily() * earning.getPayPercentage();
+                    }
+                    else if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_HRS) {
+                        amount_unt = hrsPayrollReceipt.getReceipt().getPaymentHourly() * earning.getPayPercentage();
+                    }
+                    unit = !earning.isDaysAdjustment() ? automaticEarning.getUnits() * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : (automaticEarning.getUnits() * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid());
+                    amount = SLibUtils.round((unit * amount_unt * earning.getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
                     break;
                 }
             }
 
-            payrollReceiptEarning = createHrsPayrollReceiptEarning(employeeId, automaticEarning.getUnits(), automaticEarning.getAmountUnitary(), automaticEarning.getAmount_r(), true,
+            payrollReceiptEarning = createHrsPayrollReceiptEarning(employeeId, automaticEarning.getUnits(), amount_unt, amount, true,
                     hrsPayrollReceiptEarning.getEarning(), automaticEarning.getFkLoanEmployeeId_n(), automaticEarning.getFkLoanLoanId_n(),
                     automaticEarning.getFkLoanTypeId_n(), hrsPayrollReceipt);
 
@@ -127,6 +145,9 @@ public class SHrsPayroll {
 
             move++;
         }
+        unit = 0;
+        amount_unt = 0;
+        amount = 0;
 
         if (moPayroll.isNormal()) {
             // Add earning and vacations:
@@ -164,6 +185,12 @@ public class SHrsPayroll {
                     }
                     else if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_HRS) {
                         amount_unt = hrsPayrollReceipt.getReceipt().getPaymentHourly();
+                    }
+                    else if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_DAY) {
+                        amount_unt = hrsPayrollReceipt.getReceipt().getPaymentDaily() * earning.getPayPercentage();
+                    }
+                    else if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_HRS) {
+                        amount_unt = hrsPayrollReceipt.getReceipt().getPaymentHourly() * earning.getPayPercentage();
                     }
                     unit = !earning.isDaysAdjustment() ? unitAlleged * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : (unitAlleged * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid());
                     amount = SLibUtils.round((unit * amount_unt), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
@@ -972,6 +999,12 @@ public class SHrsPayroll {
                 }
                 else if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_HRS) {
                     amount_unt = hrsPayrollReceipt.getReceipt().getPaymentHourly();
+                }
+                else if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_DAY) {
+                    amount_unt = hrsPayrollReceipt.getReceipt().getPaymentDaily() * earning.getPayPercentage();
+                }
+                else if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_HRS) {
+                    amount_unt = hrsPayrollReceipt.getReceipt().getPaymentHourly() * earning.getPayPercentage();
                 }
                 unit = !earning.isDaysAdjustment() ? unitAlleged * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : (unitAlleged * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid());
                 amount = SLibUtils.round((unit * amount_unt), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());

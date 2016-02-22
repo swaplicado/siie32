@@ -51,6 +51,21 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
     protected String msAuxAbsenceClass;
     protected String msAuxAbsenceType;
 
+    private boolean testDelete(SGuiSession session) throws Exception {
+        ResultSet resultSet = null;
+        boolean can = false;
+        
+        msSql = "SELECT COUNT(*) AS f_count FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS_CNS) + " " +
+                getSqlWhere() + " AND b_del = 0 ";
+        resultSet = session.getStatement().executeQuery(msSql);
+
+        if (!resultSet.next() || resultSet.getInt("f_count") == 0) {
+            can = true;
+        }
+        
+        return can;
+    }
+    
     public SDbAbsence() {
         super(SModConsts.HRS_ABS);
     }
@@ -328,6 +343,19 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;
+    }
+    
+    @Override
+    public boolean canDelete(SGuiSession session) throws SQLException, Exception {
+        boolean can = super.canDelete(session);
+
+        if (can) {
+            if (!testDelete(session)) {
+                can = false;
+                msQueryResult = "¡No es posible eliminar la incidencia, tiene consumos en nóminas!";
+            }
+        }
+        return can;
     }
 
     @Override

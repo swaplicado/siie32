@@ -819,6 +819,7 @@ public class SCfdPrint {
         double dTotalIsr = 0;
 
         String sPdfFileName = "";
+        String sSql = "";
 
         SDataFormerPayroll oFormerPayroll = null;
         SDataFormerPayrollEmp oFormerPayrollEmployee = null;
@@ -850,6 +851,8 @@ public class SCfdPrint {
                 
                 oFormerPayrollEmployee = new SDataFormerPayrollEmp();
                 oFormerPayrollEmployee.read(new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, miClient.getSession().getStatement());
+                
+                sSql = "SELECT id_pay, pay_note AS f_pay_nts FROM hrs_sie_pay WHERE id_pay = " + oFormerPayroll.getPkPayrollId();
                 break;
             case SCfdConsts.CFDI_PAYROLL_VER_CUR:
                 payroll = new SDbPayroll();
@@ -857,12 +860,16 @@ public class SCfdPrint {
                 
                 payrollReceipt = new SDbPayrollReceipt();
                 payrollReceipt.read(miClient.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
+                
+                sSql = "SELECT id_pay, nts AS f_pay_nts FROM hrs_pay WHERE id_pay = " + payroll.getPkPayrollId();
                 break;
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
 
         comprobante = DCfdUtils.getCfdi(cfd.getDocXml());
+        
+        map.put("sSql", sSql);
         map.put("sCfdFecha", SLibUtils.DbmsDateFormatDatetime.format(comprobante.getAttFecha().getDatetime()));
         map.put("sCfdFormaDePago", comprobante.getAttFormaDePago().getOption());
         map.put("sCfdNoCuentaPago", comprobante.getAttNumCtaPago().getString());

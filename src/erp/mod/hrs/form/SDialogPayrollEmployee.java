@@ -800,7 +800,8 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                     hrsReceiptEarningRow = (SHrsPayrollReceiptEarning) moGridEarningRow.getSelectedGridRow();
                     
                     if (hrsReceiptEarningRow.getReceiptEarning().isSystem()) {
-                        miClient.showMsgBoxInformation(SDbConsts.MSG_REG_ + hrsReceiptEarningRow.getEarning().getName() + SDbConsts.MSG_REG_IS_SYSTEM);
+                        miClient.showMsgBoxInformation(SDbConsts.MSG_REG_ + hrsReceiptEarningRow.getEarning().getName() + SDbConsts.MSG_REG_IS_SYSTEM + "\n" +
+                        "Se debe eliminar mediante la eliminación del consumo de incidencia respectivo.");
                     }
                     else {
                         for (SHrsPayrollReceiptEarning earning : moReceipt.getHrsEarnings()) {
@@ -1058,6 +1059,12 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
             }
             else if (moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_HRS) {
                 receiptEarning.setAmountUnitary(moReceipt.getReceipt().getPaymentHourly());
+            }
+            else if (moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_DAY) {
+                receiptEarning.setAmountUnitary(moReceipt.getReceipt().getPaymentDaily() * moEarning.getPayPercentage());
+            }
+            else if (moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_HRS) {
+                receiptEarning.setAmountUnitary(moReceipt.getReceipt().getPaymentHourly() * moEarning.getPayPercentage());
             }
 
             amount = SLibUtils.round((receiptEarning.getUnits() * receiptEarning.getAmountUnitary() * moEarning.getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());

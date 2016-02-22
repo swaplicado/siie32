@@ -10,6 +10,8 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.hrs.db.SHrsAccounting;
+import erp.mod.hrs.db.SHrsEmployeeHireLog;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
@@ -88,7 +90,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
 
     protected javax.swing.ImageIcon moXtaImageIconPhoto_n;
     protected javax.swing.ImageIcon moXtaImageIconSignature_n;
-
+    
     private void createHireLog(Connection connection) {
         String sql = "";
 
@@ -578,7 +580,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
             if (mbIsRegistryNew) {
                 mbDeleted = false;
                 mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
-
+                
                 sql = "INSERT INTO erp.hrsu_emp VALUES (" +
                         mnPkEmployeeId + ", " +
                         "'" + msNumber + "', " +
@@ -727,7 +729,20 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
             }
             
             if (mbIsRegistryNew) {
-                createHireLog(connection);
+                //createHireLog(connection); // XXX jbarajas 09/02/2016 create hire log in all companies with enable payroll module 
+                SHrsEmployeeHireLog employeeHireLog = new SHrsEmployeeHireLog(connection, null);
+                
+                employeeHireLog.setPkEmployeeId(mnPkEmployeeId);
+                employeeHireLog.setDateLastHire(mtDateLastHire);
+                //employeeHireLog.setDateLastDismiss_n(null);
+                employeeHireLog.setIsHire(mbActive);
+                employeeHireLog.setDeleted(mbDeleted);
+                employeeHireLog.setFkDismissedType(SModSysConsts.HRSU_TP_EMP_DIS_NON);
+                employeeHireLog.setFkUserInsertId(mnFkUserInsertId);
+                employeeHireLog.setFkUserUpdateId(mnFkUserUpdateId);
+                employeeHireLog.setIsFirtsHire(true);
+                
+                employeeHireLog.save();
             }
 
             if (mdAuxSalary != 0) {
@@ -752,8 +767,16 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
             }
         
             if (mbIsRegistryNew) {
-                createAccountingEarningConfiguration(connection);
-                createAccountingDeductionConfiguration(connection);
+                //createAccountingEarningConfiguration(connection);
+                //createAccountingDeductionConfiguration(connection); // XXX jbarajas 09/02/2016 create accounting earning and deducction configuration in all companies with enable payroll module
+                SHrsAccounting accounting = new SHrsAccounting(connection, null);
+                
+                accounting.setAccountingType(SModSysConsts.HRSS_TP_ACC_EMP);
+                accounting.setPkReferenceId(mnPkEmployeeId);
+                accounting.setFkUserInsertId(mnFkUserInsertId);
+                accounting.setFkUserUpdateId(mnFkUserUpdateId);
+            
+                accounting.save();
             }
 
             mbIsRegistryNew = false;

@@ -633,11 +633,15 @@ public abstract class SModConsts {
     public static final int HRSU_TP_PAY_SYS = 2064050;
 
     public static final int HRSR_PAY = 2065001;
+    public static final int HRSR_PRE_PAY = 2065002;
+    public static final int HRSR_PAY_RCP = 2065003;
     public static final int HRSR_AUX_EAR = 2065011;
     public static final int HRSR_AUX_EAR_EMP = 2065012;
     public static final int HRSR_AUX_DED = 2065021;
     public static final int HRSR_AUX_DED_EMP = 2065022;
     public static final int HRSR_PAY_TAX = 2065031;
+    public static final int HRSR_LIST_EAR = 2065041;
+    public static final int HRSR_LIST_DED = 2065042;
 
     public static final HashMap<Integer, String> TablesMap = new HashMap<Integer, String>();
 

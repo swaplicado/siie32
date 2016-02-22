@@ -128,7 +128,7 @@ public class SFormLoan extends SBeanForm implements ItemListener {
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlNumber.setText("Número:*");
+        jlNumber.setText("Número o folio:*");
         jlNumber.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel6.add(jlNumber);
 

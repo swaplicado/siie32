@@ -47,10 +47,16 @@ public class SHrsPayrollAnnul {
         
         if (mbAnnulSat) {
             if (mbIsPayrollAll) {
+                /* XXX jbarajas 04/02/2016 sign and sending CFDI
                 cancel = SCfdUtils.cancelCfdi(miClient, maCfds, mnCfdiPayrollVersion, mtDateAnnul, (mbAnnulSat && !maCfds.isEmpty()));
+                */
+                cancel = SCfdUtils.cancelAndSendCfdi(miClient, maCfds, mnCfdiPayrollVersion, mtDateAnnul, (mbAnnulSat && !maCfds.isEmpty()));
             }
             else {
+                /* XXX jbarajas 04/02/2016 sign and sending CFDI
                 cancel = SCfdUtils.cancelCfdi(miClient, maCfds.get(0), mnCfdiPayrollVersion, mtDateAnnul, (mbAnnulSat && !maCfds.isEmpty()));
+                */
+                cancel = SCfdUtils.cancelAndSendCfdi(miClient, maCfds.get(0), mnCfdiPayrollVersion, mtDateAnnul, (mbAnnulSat && !maCfds.isEmpty()), true);
             }
         }
         else {

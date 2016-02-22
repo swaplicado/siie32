@@ -13,6 +13,7 @@ public class SRowIntegralEmployee extends erp.lib.table.STableRow {
     protected int mnPkEmployeeId;
     protected String msEmployeeName;
     protected String msEmployeeNumber;
+    protected boolean mbActive;
     protected String msEmployeeCategory;
     protected String msEmployeeType;
     protected String msDepartament;
@@ -32,6 +33,7 @@ public class SRowIntegralEmployee extends erp.lib.table.STableRow {
         mnPkEmployeeId = 0;
         msEmployeeName = "";
         msEmployeeNumber = "";
+        mbActive = false;
         msEmployeeCategory = "";
         msEmployeeType = "";
         msDepartament = "";
@@ -54,6 +56,7 @@ public class SRowIntegralEmployee extends erp.lib.table.STableRow {
         mvValues.add(msEmployeeName);
         mvValues.add(msEmployeeNumber);
         mvValues.add(msSalaryType);
+        mvValues.add(mbActive);
         mvValues.add(msEmployeeCategory);
         mvValues.add(msEmployeeType);
         mvValues.add(msDepartament);
@@ -72,6 +75,7 @@ public class SRowIntegralEmployee extends erp.lib.table.STableRow {
     public void setPkEmployeeId(int n) { mnPkEmployeeId = n; }
     public void setEmployeeName(String s) { msEmployeeName = s; }
     public void setEmployeeNumber(String s) { msEmployeeNumber = s; }
+    public void setActive(boolean b) { mbActive = b; }
     public void setEmployeeCategory(String s) { msEmployeeCategory = s; }
     public void setEmployeeType(String s) { msEmployeeType = s; }
     public void setDepartament(String s) { msDepartament = s; }
@@ -90,6 +94,7 @@ public class SRowIntegralEmployee extends erp.lib.table.STableRow {
     public int getPkEmployeeId() { return mnPkEmployeeId; }
     public String getEmployeeName() { return msEmployeeName ; }
     public String getEmployeeNumber() { return msEmployeeNumber ; }
+    public boolean isActive() { return mbActive; }
     public String getEmployeeCategory() { return msEmployeeCategory; }
     public String getEmployeeType() { return msEmployeeType; }
     public String getDepartament() { return msDepartament; }

@@ -40,6 +40,7 @@ public class SDbAccountingDeduction extends SDbRegistryUser {
     
     protected String msAuxDeduction;
     protected String msAuxReference;
+    protected String msAuxTable;
 
     public SDbAccountingDeduction() {
         super(SModConsts.HRS_ACC_DED);
@@ -62,6 +63,7 @@ public class SDbAccountingDeduction extends SDbRegistryUser {
     
     public void setAuxDeduction(String s) { msAuxDeduction = s; }
     public void setAuxReference(String s) { msAuxReference = s; }
+    public void setAuxTable(String s) { msAuxTable = s; }
 
     public int getPkDeductionId() { return mnPkDeductionId; }
     public int getPkAccountingTypeId() { return mnPkAccountingTypeId; }
@@ -80,6 +82,7 @@ public class SDbAccountingDeduction extends SDbRegistryUser {
     
     public String getAuxDeduction() { return msAuxDeduction; }
     public String getAuxReference() { return msAuxReference; }
+    public String getAuxTable() { return msAuxTable; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -114,11 +117,12 @@ public class SDbAccountingDeduction extends SDbRegistryUser {
         
         msAuxDeduction = "";
         msAuxReference = "";
+        msAuxTable = "";
     }
 
     @Override
     public String getSqlTable() {
-        return SModConsts.TablesMap.get(mnRegistryType);
+        return (msAuxTable.isEmpty() ? "" : (msAuxTable + ".")) + SModConsts.TablesMap.get(mnRegistryType);
     }
 
     @Override

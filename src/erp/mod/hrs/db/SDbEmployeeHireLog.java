@@ -35,6 +35,7 @@ public class SDbEmployeeHireLog extends SDbRegistryUser {
     protected Date mtTsUserInsert;
     protected Date mtTsUserUpdate;
     */
+    protected String msAuxTable;
 
     public SDbEmployeeHireLog() {
         super(SModConsts.HRS_EMP_LOG_HIRE);
@@ -53,6 +54,8 @@ public class SDbEmployeeHireLog extends SDbRegistryUser {
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
+    
+    public void setAuxTable(String s) { msAuxTable = s; }
 
     public int getPkEmployeeId() { return mnPkEmployeeId; }
     public int getPkLogId() { return mnPkLogId; }
@@ -67,6 +70,8 @@ public class SDbEmployeeHireLog extends SDbRegistryUser {
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
+    
+    public String getAuxTable() { return msAuxTable; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -96,11 +101,13 @@ public class SDbEmployeeHireLog extends SDbRegistryUser {
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
+        
+        msAuxTable = "";
     }
 
     @Override
     public String getSqlTable() {
-        return SModConsts.TablesMap.get(mnRegistryType);
+        return (msAuxTable.isEmpty() ? "" : (msAuxTable + ".")) + SModConsts.TablesMap.get(mnRegistryType);
     }
 
     @Override

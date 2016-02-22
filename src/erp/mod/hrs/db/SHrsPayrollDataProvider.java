@@ -823,6 +823,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         
         hrsEmployee.setDaysHiredPayroll(getEmployeeHireDays(hrsEmployee.getEmployeeHireLogs(), dateStart, dateEnd));
         hrsEmployee.setBusinessDays(getEmployeeBusinessDays(hrsEmployee.getEmployeeHireLogs(), pHrsEmployee.getEmployee().getFkPaymentTypeId(), dateStart, dateEnd));
+        hrsEmployee.setSeniority(SHrsUtils.getSeniorityEmployee(moSession, pHrsEmployee.getEmployee().getDateBenefits(), dateEnd));
         hrsEmployee.getYearHrsAccumulatedEarnigs().addAll(getEmployeeAccumulatedEarnings(payrollId, employeeId, payrollYear, dateStart, dateEnd, SLibConsts.UNDEFINED, false));
         hrsEmployee.getYearHrsAccumulatedEarnigsByType().addAll(getEmployeeAccumulatedEarnings(payrollId, employeeId, payrollYear, dateStart, dateEnd, taxComputationType, true));
         hrsEmployee.getYearHrsAccumulatedEarnigsByTaxComputation().addAll(getEmployeeAccumulatedEarnings(payrollId, employeeId, payrollYear, dateStart, dateEnd, taxComputationType, false));

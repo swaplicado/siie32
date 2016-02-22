@@ -31,6 +31,8 @@ import erp.mitm.data.SDataItem;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SFinUtils;
+import erp.mod.hrs.db.SDbAccountingPayroll;
+import erp.mod.hrs.db.SDbAccountingPayrollEmployee;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SHrsFormerConsts;
 import erp.server.SServerConstants;
@@ -44,6 +46,7 @@ import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -73,6 +76,8 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
     private java.util.Vector<java.lang.Object[]> mvRecords; // idx 0: record registry (SDataRecord); idx 1: selected employees (Vector<Integer>)
     
     private SDbPayroll moPayroll;
+    private SDbAccountingPayroll moAccountingPayroll;
+    private ArrayList<SDbAccountingPayrollEmployee> maAccountingPayrollEmployees;
 
     /** Creates new form SDialogPayrollImport */
     public SDialogPayrollImport(erp.client.SClientInterface client, SDbPayroll payroll) {
@@ -368,6 +373,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
         jpEmployeesSelected.add(moTablePaneEmpSelected, BorderLayout.CENTER);
 
         moDateFormat = new SimpleDateFormat("yyyyMMdd");
+        moAccountingPayroll = new SDbAccountingPayroll();
 
         mnPayrollId = 0;
         msPayType = "";
@@ -696,6 +702,8 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
         mvRecords.clear();
         moFormerPayroll.getDbmsDataFormerPayrollEmp().clear();
         moFormerPayroll.getDbmsDataFormerPayrollMove().clear();
+        
+        moAccountingPayroll.setPkPayrollId(mnPayrollId);
 
         for (int i = 0; i < moTablePaneEmpSelected.getTableGuiRowCount(); i++) {
             add = true;
@@ -755,6 +763,8 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
             formerPayrollEmp.setFkNumberId((Integer) recordKey[4]);
 
             moFormerPayroll.getDbmsDataFormerPayrollEmp().add(formerPayrollEmp);
+            
+            moAccountingPayroll.getChildAccountingPayrollEmployees().add(row.getAccountingPayrollEmployee());
         }
     }
 
@@ -1307,6 +1317,8 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
             throw new Exception("¡Hay una diferencia entre el alcance neto de la nómina (" + miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(moPayroll.getAuxTotalNet()) +") y el monto neto de la afectación contable (" + miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(dDebit_r - dCredit_r) +")!");
         }
         
+        moAccountingPayroll.save(miClient.getSession());
+        
         oRequest = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
         oRequest.setPacket(moFormerPayroll);
         oResponse = miClient.getSessionXXX().request(oRequest);
@@ -1372,6 +1384,21 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
             }
         }
     }
+    
+    public SDbAccountingPayrollEmployee createAccountingPayrollEmployee(int employeeId) {
+        SDbAccountingPayrollEmployee accountingPayrollEmployee = new SDbAccountingPayrollEmployee();
+        
+        accountingPayrollEmployee.setPkPayrollId(mnPayrollId);
+        //accountingPayrollEmployee.setPkAccountingId(int n);
+        accountingPayrollEmployee.setPkEmployeeId(employeeId);
+        accountingPayrollEmployee.setFkRecordYearId(moCurrentRecord.getPkYearId());
+        accountingPayrollEmployee.setFkRecordPeriodId(moCurrentRecord.getPkPeriodId());
+        accountingPayrollEmployee.setFkRecordBookkeepingCenterId(moCurrentRecord.getPkBookkeepingCenterId());
+        accountingPayrollEmployee.setFkRecordRecordTypeId(moCurrentRecord.getPkRecordTypeId());
+        accountingPayrollEmployee.setFkRecordNumberId(moCurrentRecord.getPkNumberId());
+        
+        return accountingPayrollEmployee;
+    }
 
     public boolean actionAdd() {
         int index = 0;
@@ -1392,7 +1419,9 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                 row.getValues().add(jtfRecordBranch.getText());
                 row.getValues().add(jtfRecordNumber.getText());
                 row.getValues().add(moCurrentRecord.getDate());
-
+                
+                row.setAccountingPayrollEmployee(createAccountingPayrollEmployee(row.getFkBizPartnerId()));
+                
                 moTablePaneEmpAvailable.removeTableRow(index);
                 moTablePaneEmpAvailable.renderTableRows();
                 moTablePaneEmpAvailable.setTableRowSelection(index < moTablePaneEmpAvailable.getTableGuiRowCount() ? index : moTablePaneEmpAvailable.getTableGuiRowCount() - 1);

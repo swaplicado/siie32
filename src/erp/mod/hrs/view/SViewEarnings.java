@@ -52,6 +52,7 @@ public class SViewEarnings extends SGridPaneView implements ActionListener {
                 + "v.exem_sal_equ_mwz_lim, "
                 + "v.exem_sal_grt_mwz_per, "
                 + "v.exem_sal_grt_mwz_lim, "
+                + "v.pay_per, "
                 + "v.unt_max_wee, "
                 + "v.unt_fac, "
                 + "vt.name, "
@@ -116,6 +117,7 @@ public class SViewEarnings extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_8B, "v.exem_sal_equ_mwz_lim", "Límite exento si SB = SMZ"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_4D, "v.exem_sal_grt_mwz_per", "Porcentaje exento si SB > SMZ"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_8B, "v.exem_sal_grt_mwz_lim", "Límite exento si SB > SMZ"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_4D, "v.pay_per", "Porcentaje pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "v.unt_max_wee", "Unidades máximas"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_8D, "v.unt_fac", "Factor de cálculo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "vt.name", "Tipo percepción"));

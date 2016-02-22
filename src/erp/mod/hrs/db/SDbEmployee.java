@@ -8,6 +8,7 @@ package erp.mod.hrs.db;
 
 import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -562,7 +563,31 @@ public class SDbEmployee extends SDbRegistryUser {
             }
 
         if (mbRegistryNew || mbActive != mbAuxActive) {
-            createHireLog(session);
+            //createHireLog(session);
+            
+            SHrsEmployeeHireLog employeeHireLog = new SHrsEmployeeHireLog(null, session);
+                
+            employeeHireLog.setPkEmployeeId(mnPkEmployeeId);
+            employeeHireLog.setDateLastHire(mtDateLastHire);
+            //employeeHireLog.setDateLastDismiss_n(null);
+            employeeHireLog.setIsHire(mbActive);
+            employeeHireLog.setDeleted(mbDeleted);
+            employeeHireLog.setFkDismissedType(SModSysConsts.HRSU_TP_EMP_DIS_NON);
+            employeeHireLog.setFkUserInsertId(mnFkUserInsertId);
+            employeeHireLog.setFkUserUpdateId(mnFkUserUpdateId);
+            
+            employeeHireLog.setIsFirtsHire(false);
+            if (mbActive) {
+                employeeHireLog.setDateLastHire(mtXtaDate);
+                employeeHireLog.setNotesHire(msXtaNotes);
+            }
+            else {
+                employeeHireLog.setDateLastDismiss_n(mtXtaDate);
+                employeeHireLog.setNotesDismissed(msXtaNotes);
+            }
+            employeeHireLog.setIsHire(mbActive);
+            employeeHireLog.setFkDismissedType(mnXtaEmployeeDismissTypeId);
+            employeeHireLog.save();
         }
         
         mbRegistryNew = false;

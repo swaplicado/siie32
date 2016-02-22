@@ -333,7 +333,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                                 }
                                 
                                 SHrsCfdUtils.computeSignCfdi(miClient.getSession(), new int[] { key[0], key[1], key[2]  });
-                                detailMessage += (receiptIssue.getNumberSeries().length() > 0 ? receiptIssue.getNumberSeries() + "-" : "") + number + "   Timbrado.\n";
+                                detailMessage += (receiptIssue.getNumberSeries().length() > 0 ? receiptIssue.getNumberSeries() + "-" : "") + number + "   Timbrado y enviado.\n";
                                 cfdsCorrect ++;
                             break;
                     }
@@ -410,7 +410,6 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
             try {
                 switch (mnFormSubtype) {
                     case SCfdConsts.PROC_REQ_STAMP:
-
                         SCfdUtils.signCfdi(miClient, cfd, mnSubtypeCfd, false);
                         detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Timbrado.\n";
                         break;
@@ -429,6 +428,14 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                     case SCfdConsts.PROC_SND_DOC:
                         SCfdUtils.sendCfd(miClient, cfd.getFkCfdTypeId(), cfd, mnSubtypeCfd, false);
                         detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Enviado.\n";
+                        break;
+                    case SCfdConsts.PROC_REQ_STAMP_AND_SND:
+                        SCfdUtils.signAndSendCfdi(miClient, cfd, mnSubtypeCfd, false);
+                        detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Timbrado y enviado.\n";
+                        break;
+                    case SCfdConsts.PROC_REQ_ANNUL_AND_SND:
+                        SCfdUtils.cancelAndSendCfdi(miClient, cfd, mnSubtypeCfd, mtCancellationDate, mbValidateStamp, false);
+                        detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Anulado y enviado.\n";
                         break;
                     default:
                 }

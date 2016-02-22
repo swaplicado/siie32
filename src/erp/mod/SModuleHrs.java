@@ -1137,7 +1137,13 @@ public class SModuleHrs extends SGuiModule {
 
         switch (type) {
             case SModConsts.HRSR_PAY:
+                guiReport = new SGuiReport("reps/hrs_pay.jasper", "Nómina");
+                break;
+            case SModConsts.HRSR_PAY_RCP:
                 guiReport = new SGuiReport("reps/hrs_pay_rcp.jasper", "Recibo de nómina");
+                break;
+            case SModConsts.HRSR_PRE_PAY:
+                guiReport = new SGuiReport("reps/hrs_pre_pay.jasper", "Prenómina");
                 break;
             case SModConsts.HRSR_AUX_EAR:
                 guiReport = new SGuiReport("reps/hrs_pay_ear_aux.jasper", "Auxiliares de nóminas de percepciones");
@@ -1153,6 +1159,12 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRSR_PAY_TAX:
                 guiReport = new SGuiReport("reps/hrs_pay_tax.jasper", "Impuesto sobre nóminas");
+                break;
+            case SModConsts.HRSR_LIST_EAR:
+                guiReport = new SGuiReport("reps/hrs_pay_list_ear.jasper", "Listado de percepciones");
+                break;
+            case SModConsts.HRSR_LIST_DED:
+                guiReport = new SGuiReport("reps/hrs_pay_list_ded.jasper", "Listado de deducciones");
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

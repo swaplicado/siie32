@@ -131,7 +131,7 @@
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="jlNumber">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="N&#xfa;mero:*"/>
+                    <Property name="text" type="java.lang.String" value="N&#xfa;mero o folio:*"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[125, 23]"/>
                     </Property>

@@ -909,7 +909,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     
     @Override
     public boolean canDelete(SGuiSession session) throws SQLException, Exception {
-        boolean can = super.canSave(session);
+        boolean can = super.canDelete(session);
 
         if (can && moPayrollReceiptIssues != null) {
             if (moPayrollReceiptIssues.isStamped()) {

@@ -40,6 +40,7 @@ public class SDbAccountingEarning extends SDbRegistryUser {
     
     protected String msAuxEarning;
     protected String msAuxReference;
+    protected String msAuxTable;
 
     public SDbAccountingEarning() {
         super(SModConsts.HRS_ACC_EAR);
@@ -62,6 +63,7 @@ public class SDbAccountingEarning extends SDbRegistryUser {
     
     public void setAuxEarning(String s) { msAuxEarning = s; }
     public void setAuxReference(String s) { msAuxReference = s; }
+    public void setAuxTable(String s) { msAuxTable = s; }
 
     public int getPkEarningId() { return mnPkEarningId; }
     public int getPkAccountingTypeId() { return mnPkAccountingTypeId; }
@@ -80,6 +82,7 @@ public class SDbAccountingEarning extends SDbRegistryUser {
     
     public String getAuxEarning() { return msAuxEarning; }
     public String getAuxReference() { return msAuxReference; }
+    public String getAuxTable() { return msAuxTable; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -114,11 +117,12 @@ public class SDbAccountingEarning extends SDbRegistryUser {
         
         msAuxEarning = "";
         msAuxReference = "";
+        msAuxTable = "";
     }
 
     @Override
     public String getSqlTable() {
-        return SModConsts.TablesMap.get(mnRegistryType);
+        return (msAuxTable.isEmpty() ? "" : (msAuxTable + ".")) + SModConsts.TablesMap.get(mnRegistryType);
     }
 
     @Override

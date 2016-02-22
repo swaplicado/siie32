@@ -206,7 +206,7 @@ public abstract class SHrsCfdUtils {
     }
         
     public static void computeSignCfdi(final SGuiSession session, int[] keyReceipt) throws Exception {
-        SDataCfd cfdi = null;
+        SDataCfd cfd = null;
         SHrsFormerPayroll hrsFormerPayroll = null;
         SHrsFormerPayrollReceipt hrsFormerPayrollReceipt = null;
         
@@ -216,11 +216,14 @@ public abstract class SHrsCfdUtils {
         hrsFormerPayrollReceipt.setFechaEdicion(session.getCurrentDate());
         hrsFormerPayrollReceipt.setMoneda(session.getSessionCustom().getLocalCurrencyCode()); 
         
-        cfdi = computeCfdi(session, hrsFormerPayrollReceipt, keyReceipt[2], false);
-        if (cfdi == null) {
+        cfd = computeCfdi(session, hrsFormerPayrollReceipt, keyReceipt[2], false);
+        if (cfd == null) {
             throw new Exception("Error al leer el CFD, no se encontró el registro.");
         }
-        SCfdUtils.signCfdi((SClientInterface) session.getClient(), cfdi, SCfdConsts.CFDI_PAYROLL_VER_CUR, false);        
+        /* XXX jbarajas 04/02/2016 sign and sending CFDI
+        SCfdUtils.signCfdi((SClientInterface) session.getClient(), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, false);
+        */
+        SCfdUtils.signAndSendCfdi((SClientInterface) session.getClient(), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, false);  
     }
     
 }

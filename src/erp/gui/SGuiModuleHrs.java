@@ -311,10 +311,10 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmImp.add(jmImpCfdi);
 
         jmRep = new JMenu("Reportes");
-        jmiRepPayrollEarningsAux = new JMenuItem("Auxiliares de nóminas de percepciones");
-        jmiRepPayrollEarningsByEmployeeAux = new JMenuItem("Auxiliares de nóminas de percepciones por empleado");
-        jmiRepPayrollDeductionsAux = new JMenuItem("Auxiliares de nóminas de deducciones");
-        jmiRepPayrollDeductionsByEmployeeAux = new JMenuItem("Auxiliares de nóminas de deducciones por empleado");
+        jmiRepPayrollEarningsAux = new JMenuItem("Percepciones por periodo");
+        jmiRepPayrollEarningsByEmployeeAux = new JMenuItem("Percepciones por empleado por periodo");
+        jmiRepPayrollDeductionsAux = new JMenuItem("Deducciones por periodo");
+        jmiRepPayrollDeductionsByEmployeeAux = new JMenuItem("Deducciones por empleado por periodo");
         jmiRepPayrollTax = new JMenuItem("Impuesto sobre nóminas");
         
         jmRep.add(jmiRepPayrollEarningsAux);
@@ -880,16 +880,16 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                 showView(SDataConstants.TRN_CFD_SND_LOG, SCfdConsts.CFDI_PAYROLL_VER_OLD);
             }
             else if (item == jmiRepPayrollEarningsAux) {
-                new SDialogRepHrsAux((SGuiClient) miClient, SModConsts.HRSR_AUX_EAR, "Auxiliares de nóminas de percepciones").setFormVisible(true);
+                new SDialogRepHrsAux((SGuiClient) miClient, SModConsts.HRSR_AUX_EAR, "Percepciones por periodo").setFormVisible(true);
             }
             else if (item == jmiRepPayrollDeductionsAux) {
-                new SDialogRepHrsAux((SGuiClient) miClient, SModConsts.HRSR_AUX_DED, "Auxiliares de nóminas de deducciones").setFormVisible(true);
+                new SDialogRepHrsAux((SGuiClient) miClient, SModConsts.HRSR_AUX_DED, "Deducciones por periodo").setFormVisible(true);
             }
             else if (item == jmiRepPayrollEarningsByEmployeeAux) {
-                new SDialogRepHrsAux((SGuiClient) miClient, SModConsts.HRSR_AUX_EAR_EMP, "Auxiliares de nóminas de percepciones por empleado").setFormVisible(true);
+                new SDialogRepHrsAux((SGuiClient) miClient, SModConsts.HRSR_AUX_EAR_EMP, "Percepciones por empleado por periodo").setFormVisible(true);
             }
             else if (item == jmiRepPayrollDeductionsByEmployeeAux) {
-                new SDialogRepHrsAux((SGuiClient) miClient, SModConsts.HRSR_AUX_DED_EMP, "Auxiliares de nóminas de deducciones por empleado").setFormVisible(true);
+                new SDialogRepHrsAux((SGuiClient) miClient, SModConsts.HRSR_AUX_DED_EMP, "Deducciones por empleado por periodo").setFormVisible(true);
             }
             else if (item == jmiRepPayrollTax) {
                 new SDialogRepHrsPayrollTax((SGuiClient) miClient, "Impuesto sobre nóminas").setFormVisible(true);

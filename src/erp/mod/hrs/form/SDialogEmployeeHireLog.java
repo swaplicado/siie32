@@ -148,7 +148,7 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
             moEmployee.read(miClient.getSession(), employeeId);
             
             if (moEmployee.isActive()) {
-                moEmployeeHireLog = SHrsUtils.getEmployeeLastHired(miClient.getSession(), moEmployee.getPkEmployeeId());
+                moEmployeeHireLog = SHrsUtils.getEmployeeLastHired(miClient.getSession(), moEmployee.getPkEmployeeId(), "");
             }
 
             moKeyEmployeeDismissType.setEnabled(moEmployee.isActive());
