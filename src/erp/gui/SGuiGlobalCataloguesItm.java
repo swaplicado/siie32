@@ -497,7 +497,7 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
                     sViewTitle = "Ítems";
                     break;
                 case SDataConstants.ITMX_ITEM_SIMPLE:
-                    oViewClass = erp.mitm.view.SViewItemSimple.class;
+                    oViewClass = erp.mitm.view.SViewItemSimplified.class;
                     switch (auxType01) {
                         case SDataConstants.ITMX_ITEM_IDX_SAL_PRO:
                             sViewTitle = "Ítems productos";

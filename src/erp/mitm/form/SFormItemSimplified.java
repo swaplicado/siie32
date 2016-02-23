@@ -993,6 +993,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
             moItem.setFkItemLineId_n(SLibConstants.UNDEFINED);
             moItem.setIsInventoriable(false);
 
+            moItem.setFkItemStatusId(SModSysConsts.ITMS_ST_ITEM_ACT);
             moItem.setFkUnitUnitsContainedId(SDataConstantsSys.ITMU_UNIT_NA);
             moItem.setFkUnitUnitsVirtualId(SDataConstantsSys.ITMU_UNIT_NA);
             moItem.setFkUnitNetContentId(SDataConstantsSys.ITMU_UNIT_NA);

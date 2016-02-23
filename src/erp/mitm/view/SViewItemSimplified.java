@@ -22,7 +22,7 @@ import javax.swing.JButton;
  *
  * @author Néstor Ávalos, Sergio Flores
  */
-public class SViewItemSimple extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
+public class SViewItemSimplified extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
     private int mnFormType;
     private int[] manItemClassKey;
@@ -30,7 +30,7 @@ public class SViewItemSimple extends erp.lib.table.STableTab implements java.awt
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.mitm.form.SPanelFilterItemGeneric moPanelFilterItemGeneric;
 
-    public SViewItemSimple(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType) {
+    public SViewItemSimplified(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType) {
         super(client, tabTitle, SDataConstants.ITMX_ITEM_SIMPLE, auxType);
 
         if (SLibUtilities.belongsTo(mnTabTypeAux01, new int[] { SDataConstants.ITMX_ITEM_IDX_SAL_PRO, SDataConstants.ITMX_ITEM_IDX_PUR_CON })) {
@@ -96,7 +96,7 @@ public class SViewItemSimple extends erp.lib.table.STableTab implements java.awt
         jbDelete.setEnabled(false);
 
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[13];
+        STableColumn[] aoTableColumns = new STableColumn[14];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "i.id_item");
