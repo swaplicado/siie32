@@ -117,6 +117,7 @@ public class SViewItemSimple extends erp.lib.table.STableTab implements java.awt
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_fiscal_acc_inc", "Código agrupador SAT (ingresos)", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_fiscal_acc_exp", "Código agrupador SAT (egresos)", 200);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "si.name", "Estatus", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usr. creación", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "i.ts_new", "Creación", STableConstants.WIDTH_DATE_TIME);
@@ -194,10 +195,11 @@ public class SViewItemSimple extends erp.lib.table.STableTab implements java.awt
         }
 
         msSql = "SELECT i.id_item, i.item, i.item_key, i.b_del, i.ts_new, i.ts_edit, i.ts_del, " +
-                "ig.igen, u.symbol, CONCAT(fai.code, ' - ', fai.name) AS f_fiscal_acc_inc, CONCAT(fae.code, ' - ', fae.name) AS f_fiscal_acc_exp, " +
+                "ig.igen, si.name, u.symbol, CONCAT(fai.code, ' - ', fai.name) AS f_fiscal_acc_inc, CONCAT(fae.code, ' - ', fae.name) AS f_fiscal_acc_exp, " +
                 "un.usr, ue.usr, ud.usr, il.line " +
                 "FROM erp.itmu_item AS i " +
                 "INNER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " +
+                "INNER JOIN erp.itms_st_item AS si ON i.fid_st_item = si.id_st_item " +
                 "INNER JOIN erp.itmu_unit AS u ON i.fid_unit = u.id_unit " +
                 "INNER JOIN erp.fins_fiscal_acc AS fai ON i.fid_fiscal_acc_inc = fai.id_fiscal_acc " +
                 "INNER JOIN erp.fins_fiscal_acc AS fae ON i.fid_fiscal_acc_exp = fae.id_fiscal_acc " +

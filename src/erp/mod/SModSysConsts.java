@@ -132,6 +132,10 @@ public abstract class SModSysConsts {
     public static final int ITMS_LINK_MFR = 10;
     public static final int ITMS_LINK_ITEM = 11;
 
+    public static final int ITMS_ST_ITEM_ACT = 1;
+    public static final int ITMS_ST_ITEM_RES = 2;
+    public static final int ITMS_ST_ITEM_INA = 3;
+
     public static final int ITMU_UNIT_NA = 1;
     public static final int ITMU_UNIT_UNIT = 2;
     public static final int ITMU_UNIT_PCE = 3;

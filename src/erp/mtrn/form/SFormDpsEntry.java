@@ -1885,11 +1885,13 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         mvFields.add(moFieldDiscountDocCy);
         mvFields.add(moFieldSurplusPercentage);
         
-       /*mvFields.add(moFieldIsDpsPriceVariable);
+        /*
+        mvFields.add(moFieldIsDpsPriceVariable);
         mvFields.add(moFieldDpsContractBase);
         mvFields.add(moFieldDpsContractFuture);
         mvFields.add(moFieldDpsContractFactor);
-        mvFields.add(moFieldDpsContractExchangeRate);*/
+        mvFields.add(moFieldDpsContractExchangeRate);
+        */
         
         mvFields.add(moFieldContractPriceReferenceNumbrer);
         mvFields.add(moFieldContractPriceYear);
@@ -2124,7 +2126,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     }
 
     private void windowActivated() {
-            if (mbFirstTime) {
+        if (mbFirstTime) {
             mbFirstTime = false;
             if (mnFormStatus == SLibConstants.FORM_STATUS_READ_ONLY) {
                 jbCancel.requestFocus();
@@ -2595,7 +2597,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         renderFieldsStatus();
 
         if (calculate) {
-            calculateTotal();   // actually this clears all entry's value fields
+            calculateTotal(); // actually this clears all entry's value fields
         }
 
         mbUpdatingForm = false;
@@ -2689,8 +2691,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 jckIsDiscountUnitaryPercentage.setEnabled(false);
             }
             else {
-                //jckIsDiscountUnitaryPercentage.setEnabled(true && jtfOriginalPriceUnitaryCy.isEditable()); jbarajas
-                jckIsDiscountUnitaryPercentage.setEnabled(mbAllowDiscount);              // XXX requires user right to be enabled
+                jckIsDiscountUnitaryPercentage.setEnabled(mbAllowDiscount); // XXX requires user right to be enabled
 
             }
 
@@ -2698,8 +2699,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 jckIsDiscountEntryPercentage.setEnabled(false);
             }
             else {
-                //jckIsDiscountEntryPercentage.setEnabled(true && jtfOriginalPriceUnitaryCy.isEditable()); jbarajas
-                jckIsDiscountEntryPercentage.setEnabled(mbAllowDiscount);              // XXX requires user right to be enabled
+                jckIsDiscountEntryPercentage.setEnabled(mbAllowDiscount); // XXX requires user right to be enabled
             }
 
             if (!moParamDps.getIsDiscountDocApplying() || moItem.getDbmsIsFreeDiscountDoc()) {
@@ -2707,9 +2707,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 jckIsDiscountDocApplying.setSelected(false);
             }
             else {
-                //jckIsDiscountDocApplying.setEnabled(true && jtfOriginalPriceUnitaryCy.isEditable()); jbarajas
-                //jckIsDiscountDocApplying.setSelected(true && jtfOriginalPriceUnitaryCy.isEditable());
-                jckIsDiscountDocApplying.setEnabled(mbAllowDiscount);              // XXX requires user right to be enabled
+                jckIsDiscountDocApplying.setEnabled(mbAllowDiscount); // XXX requires user right to be enabled
                 jckIsDiscountDocApplying.setSelected(mbAllowDiscount);
             }
 
@@ -2763,20 +2761,24 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             switch(moParamBizPartner.getDbmsCategorySettingsCus().getFkCfdAddendaTypeId()) {
                 case SDataConstantsSys.BPSS_TP_CFD_ADD_NA:
                     break;
+                    
                 case SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA:
                     jlAddendaFkBarcode.setEnabled(mbEnableDataAddenda);
                     jcbAddendaFkBarcode.setEnabled(mbEnableDataAddenda);
                     break;
+                    
                 case SDataConstantsSys.BPSS_TP_CFD_ADD_LOREAL:
                     jlAddendaEntryNumber.setEnabled(mbEnableDataAddenda);
                     jtfAddendaEntryNumber.setEnabled(mbEnableDataAddenda);
                     break;
+                    
                 case SDataConstantsSys.BPSS_TP_CFD_ADD_BACHOCO:
                     jlAddendaNumberPosition.setEnabled(mbEnableDataAddenda);
                     jtfAddendaNumberPosition.setEnabled(mbEnableDataAddenda);
                     jlAddendaCenter.setEnabled(mbEnableDataAddenda);
                     jtfAddendaCenter.setEnabled(mbEnableDataAddenda);
                     break;
+                    
                 case SDataConstantsSys.BPSS_TP_CFD_ADD_ELEKTRA:
                     jlAddendaOrder.setEnabled(mbEnableDataAddenda);
                     jtfAddendaOrder.setEnabled(mbEnableDataAddenda);
@@ -2791,6 +2793,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     jlAddendaPartPriceUnitary.setEnabled(mbEnableDataAddenda);
                     jtfAddendaPartPriceUnitary.setEnabled(mbEnableDataAddenda);
                     break;
+                    
                 default:
             }
         }
@@ -2802,6 +2805,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         switch(moParamBizPartner.getDbmsCategorySettingsCus().getFkCfdAddendaTypeId()) {
             case SDataConstantsSys.BPSS_TP_CFD_ADD_NA:
                 break;
+                
             case SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA:
                 if (moDpsEntry.getDbmsDpsAddSorianaBarCode().length() > 0) {
                     jcbAddendaFkBarcode.setSelectedItem(moDpsEntry.getDbmsDpsAddSorianaBarCode());
@@ -2812,6 +2816,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     moFieldAddendaFkBarcode.setFieldValue(moDpsEntry.getDbmsDpsAddSorianaBarCode());
                 }
                 break;
+                
             case SDataConstantsSys.BPSS_TP_CFD_ADD_LOREAL:
                 if (moDpsEntry.getDbmsDpsAddLorealEntryNumber() > 0) {
                     moFieldAddendaEntryNumber.setFieldValue(moDpsEntry.getDbmsDpsAddLorealEntryNumber());
@@ -2820,6 +2825,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     moFieldAddendaEntryNumber.setFieldValue(0);
                 }
                 break;
+                
             case SDataConstantsSys.BPSS_TP_CFD_ADD_BACHOCO:
                 if (moDpsEntry.getDbmsDpsAddBachocoCenter().length() > 0) {
                     moFieldAddendaNumberPosition.setFieldValue(moDpsEntry.getDbmsDpsAddBachocoNumberPosition());
@@ -2827,6 +2833,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 }
                 moFieldAddendaCenter.setFieldValue(sCenter);
                 break;
+                
             case SDataConstantsSys.BPSS_TP_CFD_ADD_ELEKTRA:
                 moFieldAddendaOrder.setFieldValue(moDpsEntry.getDbmsDpsAddElektraOrder());
 
@@ -2844,6 +2851,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 moFieldAddendaParts.setFieldValue(moDpsEntry.getDbmsDpsAddElektraParts());
                 moFieldAddendaPartPriceUnitary.setFieldValue(moDpsEntry.getDbmsDpsAddElektraPartPriceUnitary());
                 break;
+                
             default:
         }
     }
@@ -3005,8 +3013,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
     private void itemStateIsDiscountUnitaryPercentage(boolean calculate) {
         if (moFieldIsDiscountUnitaryPercentage.getBoolean()) {
-            //jtfDiscountUnitaryPercentage.setEditable(true && jtfOriginalPriceUnitaryCy.isEditable()); jbarajas
-            //jtfDiscountUnitaryPercentage.setFocusable(true && jtfOriginalPriceUnitaryCy.isEditable()); jbarajas
             jtfDiscountUnitaryPercentage.setEditable(mbAllowDiscount);
             jtfDiscountUnitaryPercentage.setFocusable(mbAllowDiscount);
             jtfOriginalDiscountUnitaryCy.setEditable(false);
@@ -3017,8 +3023,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         else {
             jtfDiscountUnitaryPercentage.setEditable(false);
             jtfDiscountUnitaryPercentage.setFocusable(false);
-            //jtfOriginalDiscountUnitaryCy.setEditable(moItem == null ? false : !moItem.getDbmsIsFreeDiscountUnitary() && jtfOriginalPriceUnitaryCy.isEditable()); jbarajas
-            //jtfOriginalDiscountUnitaryCy.setFocusable(moItem == null ? false : !moItem.getDbmsIsFreeDiscountUnitary() && jtfOriginalPriceUnitaryCy.isEditable()); jbarajas
             jtfOriginalDiscountUnitaryCy.setEditable(moItem == null ? false : !moItem.getDbmsIsFreeDiscountUnitary() && mbAllowDiscount);
             jtfOriginalDiscountUnitaryCy.setFocusable(moItem == null ? false : !moItem.getDbmsIsFreeDiscountUnitary() && mbAllowDiscount);
 
@@ -3032,8 +3036,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
     private void itemStateIsDiscountEntryPercentage(boolean calculate) {
         if (moFieldIsDiscountEntryPercentage.getBoolean()) {
-            //jtfDiscountEntryPercentage.setEditable(true && jtfOriginalPriceUnitaryCy.isEditable()); jbarajas
-            //jtfDiscountEntryPercentage.setFocusable(true && jtfOriginalPriceUnitaryCy.isEditable()); jbarajas
             jtfDiscountEntryPercentage.setEditable(mbAllowDiscount);
             jtfDiscountEntryPercentage.setFocusable(mbAllowDiscount);
             jtfDiscountEntryCy.setEditable(false);
@@ -3044,8 +3046,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         else {
             jtfDiscountEntryPercentage.setEditable(false);
             jtfDiscountEntryPercentage.setFocusable(false);
-            //jtfDiscountEntryCy.setEditable(moItem == null ? false : !moItem.getIsFreeDiscountEntry() && jtfOriginalPriceUnitaryCy.isEditable()); jbarajas
-            //jtfDiscountEntryCy.setFocusable(moItem == null ? false : !moItem.getIsFreeDiscountEntry() && jtfOriginalPriceUnitaryCy.isEditable()); jbarajas
             jtfDiscountEntryCy.setEditable(moItem == null ? false : !moItem.getIsFreeDiscountEntry() && mbAllowDiscount);
             jtfDiscountEntryCy.setFocusable(moItem == null ? false : !moItem.getIsFreeDiscountEntry() && mbAllowDiscount);
 
@@ -3059,8 +3059,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
     private void itemStateIsDiscountDocApplying(boolean calculate) {
         if (moFieldIsDiscountDocApplying.getBoolean()) {
-            //jtfDiscountDocCy.setEditable(moParamDps == null ? false : !moParamDps.getIsDiscountDocPercentage() && jtfOriginalPriceUnitaryCy.isEditable()); jbarajas
-            //jtfDiscountDocCy.setFocusable(moParamDps == null ? false : !moParamDps.getIsDiscountDocPercentage() && jtfOriginalPriceUnitaryCy.isEditable()); jbarajas
             jtfDiscountDocCy.setEditable(moParamDps == null ? false : !moParamDps.getIsDiscountDocPercentage() && mbAllowDiscount);
             jtfDiscountDocCy.setFocusable(moParamDps == null ? false : !moParamDps.getIsDiscountDocPercentage() && mbAllowDiscount);
         }
@@ -3169,7 +3167,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         if (moDialogPriceUnitaryWizard.getFormResult() == SLibConstants.FORM_RESULT_OK) {
             moFieldOriginalQuantity.setFieldValue(moDialogPriceUnitaryWizard.getQuantity());
             moFieldOriginalPriceUnitaryCy.setFieldValue(moDialogPriceUnitaryWizard.getPriceUnitary());
-            calculateTotal();   // calculate total only if value has changed
+            calculateTotal(); // calculate total only if value has changed
         }
 
         jtfOriginalPriceUnitaryCy.requestFocus();
@@ -3311,19 +3309,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             if (mnAuxPriceEditIndex != -1) {
                 moAuxPriceEdit = (SDataDpsEntryPrice) moPaneGridPrices.getSelectedTableRow().getData();
                 
-//                if (moAuxPriceEdit.getIsDeleted()) {
-//                    actionPriceClearFields();
-//                    return;
-//                }
-                
                 enableDeliveryPriceButtonFields(false);
                 enablePriceEntryContractFields(true);
                 enableDeliveryPriceFields(true);
                 enablePriceGridFields(false);
 
-//                mAuxPriceEditIndex = index;
-                
-//                moAuxPriceEdit.setIsRegistryNew(false);
                 moAuxPriceEdit.setIsRegistryEdited(true);
                 
                 jtfContractPriceYear.setEditable(false);
@@ -3478,11 +3468,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     actionPriceClearFields();
                 }
                 else {
-                    miClient.showMsgBoxWarning("Ya hay un registro existente para ese periodo.");
+                    miClient.showMsgBoxWarning("Ya existe un registro para ese periodo de entrega.");
                 }
             }
             else {
-                miClient.showMsgBoxWarning("Capture un periodo de entrega primero.");
+                miClient.showMsgBoxWarning("Capturar previamente un periodo de entrega.");
             }
         }
     }
@@ -4017,18 +4007,18 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     }
     
     public void enablePriceContractFields (boolean enabled) {
-        boolean bCurUSD = ((moParamDps != null) && (moParamDps.getFkCurrencyId() == SModSysConsts.CFGU_CUR_USD));
-        boolean isDpsReqMonthDelivery = jckIsDpsReqMonthDelivery.isSelected();
         boolean isFormEdit = mnFormStatus != SLibConstants.FORM_STATUS_READ_ONLY;
+        boolean isCurUsd = ((moParamDps != null) && (moParamDps.getFkCurrencyId() == SModSysConsts.CFGU_CUR_USD));
+        boolean isDpsReqMonthDelivery = jckIsDpsReqMonthDelivery.isSelected();
         
         jckIsPriceConfirm.setEnabled(isFormEdit && enabled && isDpsReqMonthDelivery);
         jckIsPriceConfirm.setFocusable(isFormEdit && enabled && isDpsReqMonthDelivery);
-        jtfDpsContractBase.setEditable(isFormEdit && enabled && bCurUSD && isDpsReqMonthDelivery);
-        jtfDpsContractBase.setFocusable(isFormEdit && enabled && bCurUSD && isDpsReqMonthDelivery);
-        jtfDpsContractFuture.setEditable(isFormEdit && enabled && bCurUSD && isDpsReqMonthDelivery);
-        jtfDpsContractFuture.setFocusable(isFormEdit && enabled && bCurUSD && isDpsReqMonthDelivery);
+        jtfDpsContractBase.setEditable(isFormEdit && enabled && isCurUsd && isDpsReqMonthDelivery);
+        jtfDpsContractBase.setFocusable(isFormEdit && enabled && isCurUsd && isDpsReqMonthDelivery);
+        jtfDpsContractFuture.setEditable(isFormEdit && enabled && isCurUsd && isDpsReqMonthDelivery);
+        jtfDpsContractFuture.setFocusable(isFormEdit && enabled && isCurUsd && isDpsReqMonthDelivery);
         
-        jckIsDirectPrice.setEnabled(isFormEdit && enabled && bCurUSD);
+        jckIsDirectPrice.setEnabled(isFormEdit && enabled && isCurUsd);
         
         enablePriceEntryContractFields(false);
         enableDeliveryPriceFields(false);
@@ -4038,11 +4028,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     }
     
     public void enablePriceEntryContractFields (boolean enabled) {
-        boolean bCurUSD = ((moParamDps != null) && (moParamDps.getFkCurrencyId() == SModSysConsts.CFGU_CUR_USD));
-        boolean isDpsReqMonthDelivery = jckIsDpsReqMonthDelivery.isSelected();
         boolean isFormEdit = mnFormStatus != SLibConstants.FORM_STATUS_READ_ONLY;
+        boolean isCurUsd = ((moParamDps != null) && (moParamDps.getFkCurrencyId() == SModSysConsts.CFGU_CUR_USD));
+        boolean isDpsReqMonthDelivery = jckIsDpsReqMonthDelivery.isSelected();
         
-        jckIsDirectPrice.setEnabled(bCurUSD && isFormEdit && !enabled && isDpsReqMonthDelivery);
+        jckIsDirectPrice.setEnabled(isCurUsd && isFormEdit && !enabled && isDpsReqMonthDelivery);
         jtfContractPriceNumbrerReference.setEditable(isFormEdit && enabled && isDpsReqMonthDelivery);
         jtfContractPriceYear.setEditable(isFormEdit && enabled && isDpsReqMonthDelivery);
         jtfContractPriceMonth.setEditable(isFormEdit && enabled && isDpsReqMonthDelivery);
@@ -4166,7 +4156,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         }
     }
 
-    public void setEnableDataAddenda(boolean b) { mbEnableDataAddenda = b; }
+    public void setEnableDataAddenda(boolean b) {
+        mbEnableDataAddenda = b;
+    }
 
     public void activateSurplusPercentage() {
         jckIsSurplusPercentageApplying.setEnabled(true);
@@ -4233,11 +4225,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jtbGridPriceFilter.setSelected(true);
 
         // Add cell editor listener to just created taxes table:
+        
         moPaneTaxes.getTable().getColumnModel().getColumn(COL_TAX_CUR).setCellEditor(moPaneTaxes.getTable().getDefaultEditor(Number.class));
         moPaneTaxes.getTable().getColumnModel().getColumn(COL_TAX_CUR).getCellEditor().addCellEditorListener(this);
 
         renderBasicSettings();
-        renderItem(false, true);    // this function actually clears all form fields
+        renderItem(false, true); // this function actually clears all form fields
 
         jckIsDeleted.setEnabled(false);
         
@@ -4292,7 +4285,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     @Override
     public erp.lib.form.SFormValidation formValidate() {
         double originalQuantity = 0.0d; 
-        double quantityPrc = 0.0d; 
         String message = "";
         SFormValidation validation = new SFormValidation();
 
@@ -4370,20 +4362,17 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         }
 
         if (!validation.getIsError()) {
-
-            if (!validation.getIsError()) {
-                if (moFieldFkVehicleTypeId_n.getKeyAsIntArray()[0] > 0) {
-                    if (moFieldVehicleNumber.getString().isEmpty()) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlVehicleNumber.getText() + "'.");
-                        validation.setComponent(jtfVehicleNumber);
-                        jTabbedPane.setSelectedIndex(2);
-                    }
-                }
-                else if (!moFieldVehicleNumber.getString().isEmpty()) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkVehicleTypeId_n.getText() + "'.");
-                    validation.setComponent(jcbFkVehicleTypeId_n);
+            if (moFieldFkVehicleTypeId_n.getKeyAsIntArray()[0] > 0) {
+                if (moFieldVehicleNumber.getString().isEmpty()) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlVehicleNumber.getText() + "'.");
+                    validation.setComponent(jtfVehicleNumber);
                     jTabbedPane.setSelectedIndex(2);
                 }
+            }
+            else if (!moFieldVehicleNumber.getString().isEmpty()) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkVehicleTypeId_n.getText() + "'.");
+                validation.setComponent(jcbFkVehicleTypeId_n);
+                jTabbedPane.setSelectedIndex(2);
             }
         }
 
@@ -4679,7 +4668,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moDpsEntry.setDbmsCostCenter_n(!moPanelFkCostCenterId_n.getFieldAccount().getComponent().isEnabled() ? "" : (moPanelFkCostCenterId_n.getCurrentInputCostCenter() == null ? "" : moPanelFkCostCenterId_n.getCurrentInputCostCenter().getCostCenter()));
         moDpsEntry.setDbmsCostCenterCode(!moPanelFkCostCenterId_n.getFieldAccount().getComponent().isEnabled() ? "" : (moPanelFkCostCenterId_n.getCurrentInputCostCenter() == null ? "" : moPanelFkCostCenterId_n.getCurrentInputCostCenter().getCode()));
 
-        // Addenda datas row
+        // Addenda data row:
+        
         moDpsEntry.setDbmsDpsAddBachocoNumberPosition(moFieldAddendaNumberPosition.getInteger());
         moDpsEntry.setDbmsDpsAddBachocoCenter(moFieldAddendaCenter.getString());
         moDpsEntry.setDbmsDpsAddLorealEntryNumber(moFieldAddendaEntryNumber.getInteger());
@@ -4894,7 +4884,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
             if (isTextFieldForDpsEntryTotal(textField)) {
                 if (mdAuxCurrentValue != SLibUtilities.parseDouble(textField.getText())) {
-                    calculateTotal();   // calculate total only if value has changed
+                    calculateTotal(); // calculate total only if value has changed
                 }
                 mdAuxCurrentValue = 0;
             } else if (textField == jtfContractBase || textField == jtfContractFuture || textField == jtfContractFactor){
@@ -4906,7 +4896,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
             if (comboBox == jcbFkOriginalUnitId) {
                 if (moAuxCurrentUnitKey != moFieldFkOriginalUnitId.getKey()) {
-                    calculateTotal();   // calculate total only if value has changed
+                    calculateTotal(); // calculate total only if value has changed
                 }
                 moAuxCurrentUnitKey = null;
             }

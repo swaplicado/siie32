@@ -158,6 +158,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jbgStatus = new javax.swing.ButtonGroup();
         jTabbedPane = new javax.swing.JTabbedPane();
         jpRegistry = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
@@ -203,7 +204,6 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jckIsDeleted = new javax.swing.JCheckBox();
         jPanel65 = new javax.swing.JPanel();
         jckIsBulk = new javax.swing.JCheckBox();
-        jPanel64 = new javax.swing.JPanel();
         jckIsInventoriable = new javax.swing.JCheckBox();
         jckIsLotApplying = new javax.swing.JCheckBox();
         jPanel66 = new javax.swing.JPanel();
@@ -227,6 +227,11 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel63 = new javax.swing.JPanel();
         jlFkLevelTypeId = new javax.swing.JLabel();
         jcbFkLevelTypeId = new javax.swing.JComboBox();
+        jPanel64 = new javax.swing.JPanel();
+        jlItemStatus = new javax.swing.JLabel();
+        jrbStatusActive = new javax.swing.JRadioButton();
+        jrbStatusRestricted = new javax.swing.JRadioButton();
+        jrbStatusInactive = new javax.swing.JRadioButton();
         jPanel9 = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
         jPanel10 = new javax.swing.JPanel();
@@ -542,22 +547,18 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel65.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckIsBulk.setText("Es a granel");
-        jckIsBulk.setPreferredSize(new java.awt.Dimension(125, 23));
+        jckIsBulk.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel65.add(jckIsBulk);
-
-        jPanel51.add(jPanel65);
-
-        jPanel64.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckIsInventoriable.setText("Es inventariable");
         jckIsInventoriable.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel64.add(jckIsInventoriable);
+        jPanel65.add(jckIsInventoriable);
 
         jckIsLotApplying.setText("Aplica lote");
         jckIsLotApplying.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel64.add(jckIsLotApplying);
+        jPanel65.add(jckIsLotApplying);
 
-        jPanel51.add(jPanel64);
+        jPanel51.add(jPanel65);
 
         jPanel66.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -643,6 +644,29 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel63.add(jcbFkLevelTypeId);
 
         jPanel51.add(jPanel63);
+
+        jPanel64.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlItemStatus.setText("Estatus: *");
+        jlItemStatus.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel64.add(jlItemStatus);
+
+        jbgStatus.add(jrbStatusActive);
+        jrbStatusActive.setText("Activo");
+        jrbStatusActive.setPreferredSize(new java.awt.Dimension(65, 23));
+        jPanel64.add(jrbStatusActive);
+
+        jbgStatus.add(jrbStatusRestricted);
+        jrbStatusRestricted.setText("Restringido");
+        jrbStatusRestricted.setPreferredSize(new java.awt.Dimension(90, 23));
+        jPanel64.add(jrbStatusRestricted);
+
+        jbgStatus.add(jrbStatusInactive);
+        jrbStatusInactive.setText("Inactivo");
+        jrbStatusInactive.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel64.add(jrbStatusInactive);
+
+        jPanel51.add(jPanel64);
 
         jPanel1.add(jPanel51, java.awt.BorderLayout.EAST);
 
@@ -2610,6 +2634,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JButton jbModifyItemBarcode;
     private javax.swing.JButton jbModifyItemForeignLanguage;
     private javax.swing.JButton jbOk;
+    private javax.swing.ButtonGroup jbgStatus;
     private javax.swing.JComboBox jcbFkAdministrativeConceptTypeId;
     private javax.swing.JComboBox jcbFkBrandId;
     private javax.swing.JComboBox jcbFkDefaultItemRefId_n;
@@ -2671,6 +2696,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JLabel jlItem;
     private javax.swing.JLabel jlItemKey;
     private javax.swing.JLabel jlItemShort;
+    private javax.swing.JLabel jlItemStatus;
     private javax.swing.JLabel jlLength;
     private javax.swing.JLabel jlLengthUnitary;
     private javax.swing.JLabel jlMass;
@@ -2696,6 +2722,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JPanel jpConfig2Language;
     private javax.swing.JPanel jpItemBarcode;
     private javax.swing.JPanel jpRegistry;
+    private javax.swing.JRadioButton jrbStatusActive;
+    private javax.swing.JRadioButton jrbStatusInactive;
+    private javax.swing.JRadioButton jrbStatusRestricted;
     private javax.swing.JTextField jtfCode;
     private javax.swing.JTextField jtfItemKey;
     private javax.swing.JTextField jtfItemNameRo;
@@ -2749,6 +2778,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         readItemGenericParams();
 
         jtfPkItemId_Ro.setText("");
+        jrbStatusActive.setSelected(true);
         moItemForeignLanguagePane.createTable(null);
         moItemForeignLanguagePane.clearTableRows();
         moItemBarcodePane.createTable(null);
@@ -2981,6 +3011,19 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         itemStateIsInventoriable();
         computeItemKeyAndName();
+        
+        switch (moItem.getFkItemStatusId()) {
+            case SModSysConsts.ITMS_ST_ITEM_ACT:
+                jrbStatusActive.setSelected(true);
+                break;
+            case SModSysConsts.ITMS_ST_ITEM_RES:
+                jrbStatusRestricted.setSelected(true);
+                break;
+            case SModSysConsts.ITMS_ST_ITEM_INA:
+                jrbStatusInactive.setSelected(true);
+                break;
+            default:
+        }
 
         // Read the item foreign language descriptions:
 
@@ -3078,6 +3121,16 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moItem.setFkTaxableConceptTypeId(moFieldFkTaxableConceptTypeId.getKeyAsIntArray()[0]);
         moItem.setFkFiscalAccountIncId(moFieldFkFiscalAccountIncId.getKeyAsIntArray()[0]);
         moItem.setFkFiscalAccountExpId(moFieldFkFiscalAccountExpId.getKeyAsIntArray()[0]);
+        
+        if (jrbStatusActive.isSelected()) {
+            moItem.setFkItemStatusId(SModSysConsts.ITMS_ST_ITEM_ACT);
+        }
+        else if (jrbStatusRestricted.isSelected()) {
+            moItem.setFkItemStatusId(SModSysConsts.ITMS_ST_ITEM_RES);
+        }
+        else {
+            moItem.setFkItemStatusId(SModSysConsts.ITMS_ST_ITEM_INA);
+        }
 
         // Save item foreign language descriptions:
 

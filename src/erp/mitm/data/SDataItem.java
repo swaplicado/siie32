@@ -63,6 +63,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected boolean mbIsDeleted;
     protected int mnFkItemGenericId;
     protected int mnFkItemLineId_n;
+    protected int mnFkItemStatusId;
     protected int mnFkUnitId;
     protected int mnFkUnitUnitsContainedId;
     protected int mnFkUnitUnitsVirtualId;
@@ -145,6 +146,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkItemGenericId(int n) { mnFkItemGenericId = n; }
     public void setFkItemLineId_n(int n) { mnFkItemLineId_n = n; }
+    public void setFkItemStatusId(int n) { mnFkItemStatusId = n; }
     public void setFkUnitId(int n) { mnFkUnitId = n; }
     public void setFkUnitUnitsContainedId(int n) { mnFkUnitUnitsContainedId = n; }
     public void setFkUnitUnitsVirtualId(int n) { mnFkUnitUnitsVirtualId = n; }
@@ -215,6 +217,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkItemGenericId() { return mnFkItemGenericId; }
     public int getFkItemLineId_n() { return mnFkItemLineId_n; }
+    public int getFkItemStatusId() { return mnFkItemStatusId; }
     public int getFkUnitId() { return mnFkUnitId; }
     public int getFkUnitUnitsContainedId() { return mnFkUnitUnitsContainedId; }
     public int getFkUnitUnitsVirtualId() { return mnFkUnitUnitsVirtualId; }
@@ -324,6 +327,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
         mbIsDeleted = false;
         mnFkItemGenericId = 0;
         mnFkItemLineId_n = 0;
+        mnFkItemStatusId = 0;
         mnFkUnitId = 0;
         mnFkUnitUnitsContainedId = 0;
         mnFkUnitUnitsVirtualId = 0;
@@ -417,6 +421,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                 mbIsDeleted = resultSet.getBoolean("b_del");
                 mnFkItemGenericId = resultSet.getInt("fid_igen");
                 mnFkItemLineId_n = resultSet.getInt("fid_line_n");
+                mnFkItemStatusId = resultSet.getInt("fid_st_item");
                 mnFkUnitId = resultSet.getInt("fid_unit");
                 mnFkUnitUnitsContainedId = resultSet.getInt("fid_unit_units_cont");
                 mnFkUnitUnitsVirtualId = resultSet.getInt("fid_unit_units_virt");
@@ -522,7 +527,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?," +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?," +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?," +
-                    "?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkItemId);
             callableStatement.setString(nParam++, msKey);
             callableStatement.setString(nParam++, msItem);
@@ -567,6 +572,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
             callableStatement.setBoolean(nParam++, mbIsDeleted);
             callableStatement.setInt(nParam++, mnFkItemGenericId);
             if (mnFkItemLineId_n > 0) callableStatement.setInt(nParam++, mnFkItemLineId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
+            callableStatement.setInt(nParam++, mnFkItemStatusId);
             callableStatement.setInt(nParam++, mnFkUnitId);
             callableStatement.setInt(nParam++, mnFkUnitUnitsContainedId);
             callableStatement.setInt(nParam++, mnFkUnitUnitsVirtualId);
