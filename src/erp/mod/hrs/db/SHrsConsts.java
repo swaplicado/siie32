@@ -31,17 +31,24 @@ public class SHrsConsts {
     public static final int OVER_TIME_2X_MAX_DAY = 3;
     public static final int OVER_TIME_3X = 3;
     public static final float MONTH_DAYS = (float) YEAR_DAYS / YEAR_MONTHS;
+    public static final float MONTH_DAYS_FIXED = 30.42f;
 
-    public static final int SS_INC_MON = 1;         // money
+    public static final int RET_BONUS_YEARS_MIN = 15; // retirement bonus minimum years
+    public static final int RET_BONUS_DAYS_PER_YEAR = 12; // retirement bonus days per year
+    public static final int RET_BONUS_DMW_LIMIT = 2; // retirement bonus daily minimum wage limit
+    public static final int DIS_COMP_MONTHS = 3; // dismissal compensantion months
+    public static final int DIS_COMP_DAYS_PER_YEAR = 20; // dismissal compensantion days per year
+    
+    public static final int SS_INC_MON = 1; // money
     public static final int SS_INC_KND_SSC_LET = 2; // kind SSC less or equal than limit
-    public static final int SS_INC_KND_SSC_GT = 3;  // kind SSC greater than limit
-    public static final int SS_INC_PEN = 4;         // pensioner
-    public static final int SS_DIS_LIF = 5;         // disability & life
-    public static final int SS_CRE = 6;             // creche
-    public static final int SS_RSK = 7;             // risk
-    public static final int SS_RET = 8;             // retirement
-    public static final int SS_SEV = 9;             // severance
-    public static final int SS_HOM = 10;            // home
+    public static final int SS_INC_KND_SSC_GT = 3; // kind SSC greater than limit
+    public static final int SS_INC_PEN = 4; // pensioner
+    public static final int SS_DIS_LIF = 5; // disability & life
+    public static final int SS_CRE = 6; // creche
+    public static final int SS_RSK = 7; // risk
+    public static final int SS_RET = 8; // retirement
+    public static final int SS_SEV = 9; // severance
+    public static final int SS_HOM = 10; // home
 
     public static final String ERR_PERIOD_DATE_INVALID = "Fecha inválida en el período.";
 }
