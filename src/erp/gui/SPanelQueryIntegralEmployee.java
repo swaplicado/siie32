@@ -1312,12 +1312,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         }   
     }
     
-    public static final int SETTLEMENT_YEARS_MIN = 15;
-    public static final int SETTLEMENT_DAYS_BY_YEAR = 12;
-    public static final int SETTLEMENT_SAL_DAY_LIMIT = 2;
-    public static final int SETTLEMENT_MONTH_BY_YEAR = 3;
-    public static final int SETTLEMENT_DAYS_BY_YEAR_SENIORITY = 20;
-    
     private void renderSettlement(int seniority, int seniorityDays, double paymentDaily, int mwzReferenceId) throws Exception {
         double rjdj = 0;
         double disl = 0;
@@ -1326,18 +1320,26 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         
         MwzReferenceWage = SHrsUtils.getRecentMwz(miClient.getSession(), mwzReferenceId, miClient.getSession().getCurrentDate());
         
-        rjdj = (Double.parseDouble(jtfAnnualBonusPayProp.getText().replaceAll(",", "")) + Double.parseDouble(jtfVacationsPayProp.getText().replaceAll(",", "")) + Double.parseDouble(jtfVacationsBonusPayProp.getText().replaceAll(",", "")));
-        disl = (Double.parseDouble(jtfAnnualBonusPayProp.getText().replaceAll(",", "")) + Double.parseDouble(jtfVacationsPayProp.getText().replaceAll(",", "")) + Double.parseDouble(jtfVacationsBonusPayProp.getText().replaceAll(",", "")));
-        dicl = (Double.parseDouble(jtfAnnualBonusPayProp.getText().replaceAll(",", "")) + Double.parseDouble(jtfVacationsPayProp.getText().replaceAll(",", "")) + Double.parseDouble(jtfVacationsBonusPayProp.getText().replaceAll(",", "")));
+        rjdj = Double.parseDouble(jtfAnnualBonusPayProp.getText().replaceAll(",", "")) + Double.parseDouble(jtfVacationsPayProp.getText().replaceAll(",", "")) + Double.parseDouble(jtfVacationsBonusPayProp.getText().replaceAll(",", ""));
+        disl = Double.parseDouble(jtfAnnualBonusPayProp.getText().replaceAll(",", "")) + Double.parseDouble(jtfVacationsPayProp.getText().replaceAll(",", "")) + Double.parseDouble(jtfVacationsBonusPayProp.getText().replaceAll(",", ""));
+        dicl = Double.parseDouble(jtfAnnualBonusPayProp.getText().replaceAll(",", "")) + Double.parseDouble(jtfVacationsPayProp.getText().replaceAll(",", "")) + Double.parseDouble(jtfVacationsBonusPayProp.getText().replaceAll(",", ""));
         
-        if (seniority >= 15) {
-            rjdj += (12 * (paymentDaily > (2 * MwzReferenceWage) ? (2 * MwzReferenceWage) : paymentDaily) * ((double) seniority + ((double) seniorityDays / SHrsConsts.YEAR_DAYS)));
-            disl += (12 * (paymentDaily > (2 * MwzReferenceWage) ? (2 * MwzReferenceWage) : paymentDaily) * ((double) seniority + ((double) seniorityDays / SHrsConsts.YEAR_DAYS)));
-            dicl += (12 * (paymentDaily > (2 * MwzReferenceWage) ? (2 * MwzReferenceWage) : paymentDaily) * ((double) seniority + ((double) seniorityDays / SHrsConsts.YEAR_DAYS)));
+        if (seniority >= SHrsConsts.RET_BONUS_YEARS_MIN) {
+            rjdj += SHrsConsts.RET_BONUS_DAYS_PER_YEAR *
+                    (paymentDaily > (SHrsConsts.RET_BONUS_DMW_LIMIT * MwzReferenceWage) ? (SHrsConsts.RET_BONUS_DMW_LIMIT * MwzReferenceWage) : paymentDaily) *
+                    ((double) seniority + ((double) seniorityDays / SHrsConsts.YEAR_DAYS));
+            disl += SHrsConsts.RET_BONUS_DAYS_PER_YEAR *
+                    (paymentDaily > (SHrsConsts.RET_BONUS_DMW_LIMIT * MwzReferenceWage) ? (SHrsConsts.RET_BONUS_DMW_LIMIT * MwzReferenceWage) : paymentDaily) *
+                    ((double) seniority + ((double) seniorityDays / SHrsConsts.YEAR_DAYS));
+            dicl += SHrsConsts.RET_BONUS_DAYS_PER_YEAR *
+                    (paymentDaily > (SHrsConsts.RET_BONUS_DMW_LIMIT * MwzReferenceWage) ? (SHrsConsts.RET_BONUS_DMW_LIMIT * MwzReferenceWage) : paymentDaily) *
+                    ((double) seniority + ((double) seniorityDays / SHrsConsts.YEAR_DAYS));
         }
-        disl += ((3 * 30.42) * paymentDaily);
-        dicl += ((3 * 30.42) * paymentDaily) + (20 * ((double) seniority + ((double) seniorityDays / SHrsConsts.YEAR_DAYS)) * paymentDaily);
-                
+        
+        disl += (SHrsConsts.DIS_COMP_MONTHS * SHrsConsts.MONTH_DAYS_FIXED) * paymentDaily;
+        dicl += ((SHrsConsts.DIS_COMP_MONTHS * SHrsConsts.MONTH_DAYS_FIXED) * paymentDaily) +
+                (SHrsConsts.DIS_COMP_DAYS_PER_YEAR * ((double) seniority + ((double) seniorityDays / SHrsConsts.YEAR_DAYS)) * paymentDaily);
+        
         jtfSettlement.setText(SLibUtils.DecimalFormatValue2D.format(rjdj) + "");
         jtfSettlementDisL.setText(SLibUtils.DecimalFormatValue2D.format(disl) + "");
         jtfSettlementDicL.setText(SLibUtils.DecimalFormatValue2D.format(dicl) + "");
