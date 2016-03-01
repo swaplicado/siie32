@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
 import sa.lib.SLibRpnArgument;
+import sa.lib.SLibUtils;
 import sa.lib.srv.SSrvConsts;
 
 /**
@@ -725,7 +726,7 @@ public abstract class SDataReadTableRows {
                 aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "i.id_item");
 
                 i = 0;
-                aoQueryFields = new STableField[2];
+                aoQueryFields = new STableField[3];
                 if (piClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
                     aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item_key");
                     aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item");
@@ -734,12 +735,14 @@ public abstract class SDataReadTableRows {
                     aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item");
                     aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item_key");
                 }
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "si.name");
 
-                sSql = "SELECT i.id_item, i.item, i.item_key " +
+                sSql = "SELECT i.id_item, i.item, i.item_key, si.name " +
                         "FROM erp.itmu_item AS i " +
                         "INNER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " + (filterKey == null ? "" : "AND ig.fid_ct_item = " + ((int[]) filterKey)[0]) + " " +
                         (!bInventoriableNot ? "" : "AND i.b_inv = 0 ") +
                         (!bInventoriableOnly ? "" : "AND i.b_inv = 1 ") +
+                        "INNER JOIN erp.itms_st_item AS si ON i.fid_st_item = si.id_st_item " +
                         "WHERE i.b_del = 0 ";
 
                 switch (pnDataType) {
@@ -1003,201 +1006,93 @@ public abstract class SDataReadTableRows {
                 break;
 
             case SDataConstants.ITMX_ITEM_BY_KEY:
-                aoPkFields = new STableField[1];
-                aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "i.id_item");
-
-                i = 0;
-                if (filterKey == null || filterKey instanceof int[]) {
-                    aoQueryFields = new STableField[8];
-                }
-                else {
-                    aoQueryFields = new STableField[9];
-                }
-
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item_key");
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item");
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "u.symbol");
-                if (filterKey != null && filterKey instanceof Object[]) {
-                    aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "stock");
-                }
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "b.brd");
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "m.mfr");
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "icl.id_ct_item");
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "icl.id_cl_item");
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "icl.cl_item");
-
-                if (filterKey != null && filterKey instanceof Object[] && ((Object[]) filterKey)[1] != null) {
-                    oDate = new java.sql.Date(((java.util.Date)((Object[]) filterKey)[1]).getTime());
-                }
-                sSql = "SELECT i.id_item, i.item, i.item_key, u.symbol, b.brd, m.mfr, icl.id_ct_item, icl.id_cl_item, icl.cl_item " +
-                        ((filterKey == null || filterKey instanceof int[]) ? "" : (", trn_stk_get(" +
-                        ((filterKey == null || filterKey instanceof int[]) ? piClient.getSessionXXX().getWorkingYear() : (Integer)((Object[]) filterKey)[0]) + ", " +
-                        "i.id_item, " +
-                        ((filterKey == null || filterKey instanceof int[]) ? (Integer)((Object[]) filterKey)[2] == 0 ? " i.fid_unit" : (Integer)((Object[]) filterKey)[2] : " i.fid_unit") + ", " +
-                        "NULL, " +  // lot
-                        ((filterKey == null || filterKey instanceof int[]) ? " null" : (Integer)((Object[]) filterKey)[3]) + ", " +
-                        ((filterKey == null || filterKey instanceof int[]) ? " null" : (Integer)((Object[]) filterKey)[4]) + ", " +
-                        ((filterKey == null || filterKey instanceof int[]) ? " null" : "'" + oDate + "'") +  " " +
-                        ") AS stock ")) +
-                        "FROM erp.itmu_item AS i " +
-                        "INNER JOIN erp.itmu_unit AS u ON i.fid_unit = u.id_unit " +
-                        (!bInventoriableNot ? "" : "AND i.b_inv = 0 ") +
-                        (!bInventoriableOnly ? "" : "AND i.b_inv = 1 ") +
-                        "INNER JOIN erp.itmu_brd AS b ON i.fid_brd = b.id_brd " +
-                        "INNER JOIN erp.itmu_mfr AS m ON i.fid_mfr = m.id_mfr " +
-                        "INNER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " +
-                        "INNER JOIN erp.itms_cl_item AS icl ON ig.fid_ct_item = icl.id_ct_item AND ig.fid_cl_item = icl.id_cl_item " +
-                        "WHERE i.b_del = 0 " +
-                        "ORDER BY i.item_key, i.item, i.id_item ";
-                break;
-
             case SDataConstants.ITMX_ITEM_BY_NAME:
-                aoPkFields = new STableField[1];
-                aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "i.id_item");
-
-                i = 0;
-                if (filterKey == null || filterKey instanceof int[]) {
-                    aoQueryFields = new STableField[8];
-                }
-                else {
-                    aoQueryFields = new STableField[9];
-                }
-
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item");
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item_key");
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "u.symbol");
-                if (filterKey != null && filterKey instanceof Object[]) {
-                    aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "stock");
-                }
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "b.brd");
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "m.mfr");
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "icl.id_ct_item");
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "icl.id_cl_item");
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "icl.cl_item");
-
-                if (filterKey != null && filterKey instanceof Object[] && ((Object[]) filterKey)[1] != null) {
-                    oDate = new java.sql.Date(((java.util.Date)((Object[]) filterKey)[1]).getTime());
-                }
-                sSql = "SELECT i.id_item, i.item, i.item_key, u.symbol, b.brd, m.mfr, icl.id_ct_item, icl.id_cl_item, icl.cl_item " +
-                        ((filterKey == null || filterKey instanceof int[]) ? "" : (", trn_stk_get(" +
-                        ((filterKey == null || filterKey instanceof int[]) ? piClient.getSessionXXX().getWorkingYear() : (Integer)((Object[]) filterKey)[0]) + ", " +
-                        "i.id_item, " +
-                        ((filterKey == null || filterKey instanceof int[]) ? (Integer)((Object[]) filterKey)[2] == 0 ? " i.fid_unit" : (Integer)((Object[]) filterKey)[2] : " i.fid_unit") + ", " +
-                        "NULL, " +  // lot
-                        ((filterKey == null || filterKey instanceof int[]) ? " null" : (Integer)((Object[]) filterKey)[3]) + ", " +
-                        ((filterKey == null || filterKey instanceof int[]) ? " null" : (Integer)((Object[]) filterKey)[4]) + ", " +
-                        ((filterKey == null || filterKey instanceof int[]) ? " null" : "'" + oDate + "'") +  " " +
-                        ") AS stock ")) +
-                        "FROM erp.itmu_item AS i " +
-                        "INNER JOIN erp.itmu_unit AS u ON i.fid_unit = u.id_unit " +
-                        (!bInventoriableNot ? "" : "AND i.b_inv = 0 ") +
-                        (!bInventoriableOnly ? "" : "AND i.b_inv = 1 ") +
-                        "INNER JOIN erp.itmu_brd AS b ON i.fid_brd = b.id_brd " +
-                        "INNER JOIN erp.itmu_mfr AS m ON i.fid_mfr = m.id_mfr " +
-                        "INNER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " +
-                        "INNER JOIN erp.itms_cl_item AS icl ON ig.fid_ct_item = icl.id_ct_item AND ig.fid_cl_item = icl.id_cl_item " +
-                        "WHERE i.b_del = 0 " +
-                        "ORDER BY i.item, i.item_key, i.id_item ";
-                break;
-
             case SDataConstants.ITMX_ITEM_BY_BRAND:
-                aoPkFields = new STableField[1];
-                aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "i.id_item");
-
-                i = 0;
-                if (filterKey == null || filterKey instanceof int[]) {
-                    aoQueryFields = new STableField[8];
-                }
-                else {
-                    aoQueryFields = new STableField[9];
-                }
-
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "b.brd");
-                if (piClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
-                    aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item_key");
-                    aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item");
-                }
-                else {
-                    aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item");
-                    aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item_key");
-                }
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "u.symbol");
-                if (filterKey != null && filterKey instanceof Object[]) {
-                    aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "stock");
-                }
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "m.mfr");
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "icl.id_ct_item");
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "icl.id_cl_item");
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "icl.cl_item");
-
-                if (filterKey != null && filterKey instanceof Object[] && ((Object[]) filterKey)[1] != null) {
-                    oDate = new java.sql.Date(((java.util.Date)((Object[]) filterKey)[1]).getTime());
-                }
-                sSql = "SELECT i.id_item, i.item, i.item_key, u.symbol, b.brd, m.mfr, icl.id_ct_item, icl.id_cl_item, icl.cl_item " +
-                        ((filterKey == null || filterKey instanceof int[]) ? "" : (", trn_stk_get(" +
-                        ((filterKey == null || filterKey instanceof int[]) ? piClient.getSessionXXX().getWorkingYear() : (Integer)((Object[]) filterKey)[0]) + ", " +
-                        "i.id_item, " +
-                        ((filterKey == null || filterKey instanceof int[]) ? (Integer)((Object[]) filterKey)[2] == 0 ? " i.fid_unit" : (Integer)((Object[]) filterKey)[2] : " i.fid_unit") + ", " +
-                        "NULL, " +  // lot
-                        ((filterKey == null || filterKey instanceof int[]) ? " null" : (Integer)((Object[]) filterKey)[3]) + ", " +
-                        ((filterKey == null || filterKey instanceof int[]) ? " null" : (Integer)((Object[]) filterKey)[4]) + ", " +
-                        ((filterKey == null || filterKey instanceof int[]) ? " null" : "'" + oDate + "'") +  " " +
-                        ") AS stock ")) +
-                        "FROM erp.itmu_item AS i " +
-                        "INNER JOIN erp.itmu_unit AS u ON i.fid_unit = u.id_unit " +
-                        (!bInventoriableNot ? "" : "AND i.b_inv = 0 ") +
-                        (!bInventoriableOnly ? "" : "AND i.b_inv = 1 ") +
-                        "INNER JOIN erp.itmu_brd AS b ON i.fid_brd = b.id_brd " +
-                        "INNER JOIN erp.itmu_mfr AS m ON i.fid_mfr = m.id_mfr " +
-                        "INNER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " +
-                        "INNER JOIN erp.itms_cl_item AS icl ON ig.fid_ct_item = icl.id_ct_item AND ig.fid_cl_item = icl.id_cl_item " +
-                        "WHERE i.b_del = 0 " +
-                        "ORDER BY b.brd, " + (piClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "i.item_key, i.item, " : "i.item, i.item_key, ") + "i.id_item ";
-                break;
-
             case SDataConstants.ITMX_ITEM_BY_MANUFACTURER:
                 aoPkFields = new STableField[1];
                 aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "i.id_item");
+                
+                /* Filter Key, if provided:
+                 * Index 0: year
+                 * Index 1: cut off date
+                 * Index 2: unit of measure
+                 * Index 3: id warehouse (company branch)
+                 * Index 4: id warehouse (branch entity)
+                 */
 
                 i = 0;
                 if (filterKey == null || filterKey instanceof int[]) {
-                    aoQueryFields = new STableField[8];
-                }
-                else {
                     aoQueryFields = new STableField[9];
                 }
-
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "m.mfr");
-                if (piClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
-                    aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item_key");
-                    aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item");
-                }
                 else {
-                    aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item");
-                    aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item_key");
+                    aoQueryFields = new STableField[10];
+                }
+                
+                switch (pnDataType) {
+                    case SDataConstants.ITMX_ITEM_BY_KEY:
+                    case SDataConstants.ITMX_ITEM_BY_NAME:
+                        break;
+                    case SDataConstants.ITMX_ITEM_BY_BRAND:
+                        aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "b.brd");
+                        break;
+                    case SDataConstants.ITMX_ITEM_BY_MANUFACTURER:
+                        aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "m.mfr");
+                        break;
+                }
+                
+                switch (pnDataType) {
+                    case SDataConstants.ITMX_ITEM_BY_KEY:
+                        aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item_key");
+                        aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item");
+                        break;
+                    case SDataConstants.ITMX_ITEM_BY_NAME:
+                        aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item");
+                        aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item_key");
+                        break;
+                    case SDataConstants.ITMX_ITEM_BY_BRAND:
+                    case SDataConstants.ITMX_ITEM_BY_MANUFACTURER:
+                        if (piClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
+                            aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item_key");
+                            aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item");
+                        }
+                        else {
+                            aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item");
+                            aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item_key");
+                        }
+                        break;
+                }
+                
+                if (filterKey != null && filterKey instanceof Object[]) {
+                    aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "f_stock");
                 }
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "u.symbol");
-                if (filterKey != null && filterKey instanceof Object[]) {
-                    aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "stock");
+                
+                switch (pnDataType) {
+                    case SDataConstants.ITMX_ITEM_BY_KEY:
+                    case SDataConstants.ITMX_ITEM_BY_NAME:
+                        aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "b.brd");
+                        aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "m.mfr");
+                        break;
+                    case SDataConstants.ITMX_ITEM_BY_BRAND:
+                        aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "m.mfr");
+                        break;
+                    case SDataConstants.ITMX_ITEM_BY_MANUFACTURER:
+                        aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "b.brd");
+                        break;
                 }
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "b.brd");
+                
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "icl.id_ct_item");
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "icl.id_cl_item");
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "icl.cl_item");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "si.name");
 
                 if (filterKey != null && filterKey instanceof Object[] && ((Object[]) filterKey)[1] != null) {
                     oDate = new java.sql.Date(((java.util.Date)((Object[]) filterKey)[1]).getTime());
                 }
-                sSql = "SELECT i.id_item, i.item, i.item_key, u.symbol, b.brd, m.mfr, icl.id_ct_item, icl.id_cl_item, icl.cl_item " +
-                        ((filterKey == null || filterKey instanceof int[]) ? "" : (", trn_stk_get(" +
-                        ((filterKey == null || filterKey instanceof int[]) ? piClient.getSessionXXX().getWorkingYear() : (Integer)((Object[]) filterKey)[0]) + ", " +
-                        "i.id_item, " +
-                        ((filterKey == null || filterKey instanceof int[]) ? (Integer)((Object[]) filterKey)[2] == 0 ? " i.fid_unit" : (Integer)((Object[]) filterKey)[2] : " i.fid_unit") + ", " +
-                        "NULL, " +  // lot
-                        ((filterKey == null || filterKey instanceof int[]) ? " null" : (Integer)((Object[]) filterKey)[3]) + ", " +
-                        ((filterKey == null || filterKey instanceof int[]) ? " null" : (Integer)((Object[]) filterKey)[4]) + ", " +
-                        ((filterKey == null || filterKey instanceof int[]) ? " null" : "'" + oDate + "'") +  " " +
-                        ") AS stock ")) +
+                
+                sSql = "SELECT i.id_item, i.item, i.item_key, u.id_unit, u.symbol, b.id_brd, b.brd, m.id_mfr, m.mfr, icl.id_ct_item, icl.id_cl_item, icl.cl_item, si.id_st_item, si.name " +
+                        (filterKey == null || filterKey instanceof int[] ? "" : ", trn_stk_get(" +
+                        (Integer) ((Object[]) filterKey)[0] + ", i.id_item, i.fid_unit, NULL, " + (Integer) ((Object[]) filterKey)[3] + ", " + (Integer) ((Object[]) filterKey)[4] + ", '" + SLibUtils.DbmsDateFormatDate.format(oDate) + "') AS f_stock ") +
                         "FROM erp.itmu_item AS i " +
                         "INNER JOIN erp.itmu_unit AS u ON i.fid_unit = u.id_unit " +
                         (!bInventoriableNot ? "" : "AND i.b_inv = 0 ") +
@@ -1206,8 +1101,24 @@ public abstract class SDataReadTableRows {
                         "INNER JOIN erp.itmu_mfr AS m ON i.fid_mfr = m.id_mfr " +
                         "INNER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " +
                         "INNER JOIN erp.itms_cl_item AS icl ON ig.fid_ct_item = icl.id_ct_item AND ig.fid_cl_item = icl.id_cl_item " +
-                        "WHERE i.b_del = 0 " +
-                        "ORDER BY m.mfr, " + (piClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "i.item_key, i.item, " : "i.item, i.item_key, ") + "i.id_item ";
+                        "INNER JOIN erp.itms_st_item AS si ON i.fid_st_item = si.id_st_item " +
+                        "WHERE i.b_del = 0 ";
+                
+                switch (pnDataType) {
+                    case SDataConstants.ITMX_ITEM_BY_KEY:
+                        sSql += "ORDER BY i.item_key, i.item, i.id_item ";
+                        break;
+                    case SDataConstants.ITMX_ITEM_BY_NAME:
+                        sSql += "ORDER BY i.item, i.item_key, i.id_item ";
+                        break;
+                    case SDataConstants.ITMX_ITEM_BY_BRAND:
+                        sSql += "ORDER BY b.brd, b.id_brd, " + (piClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "i.item_key, i.item, " : "i.item, i.item_key, ") + "i.id_item ";
+                        break;
+                    case SDataConstants.ITMX_ITEM_BY_MANUFACTURER:
+                        sSql += "ORDER BY m.mfr, m.id_mfr, " + (piClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "i.item_key, i.item, " : "i.item, i.item_key, ") + "i.id_item ";
+                        break;
+                }
+                
                 break;
 
             default:

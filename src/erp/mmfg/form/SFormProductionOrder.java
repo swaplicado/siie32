@@ -30,6 +30,9 @@ import erp.mmfg.data.SDataProductionOrderNotes;
 import erp.mmfg.data.SDataProductionOrderNotesRow;
 import erp.mmfg.data.SDataProductionOrderPeriod;
 import erp.mmfg.data.SDataProductionOrderPeriodRow;
+import erp.mmfg.data.SMfgUtils;
+import erp.mod.SModSysConsts;
+import erp.mod.itm.db.SItmConsts;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -168,15 +171,15 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
         jPanel40 = new javax.swing.JPanel();
         jlQuantityOriginal = new javax.swing.JLabel();
         jtfQuantityOriginal = new javax.swing.JTextField();
-        jtfDbmsUnitSymbolQO = new javax.swing.JTextField();
+        jtfQuantityOriginalUnit = new javax.swing.JTextField();
         jPanel41 = new javax.swing.JPanel();
         jlQuantityRework = new javax.swing.JLabel();
         jtfQuantityRework = new javax.swing.JTextField();
-        jtfDbmsUnitSymbolQR = new javax.swing.JTextField();
+        jtfQuantityReworkUnit = new javax.swing.JTextField();
         jPanel21 = new javax.swing.JPanel();
         jlQuantity = new javax.swing.JLabel();
         jtfQuantity = new javax.swing.JTextField();
-        jtfDbmsUnitSymbol = new javax.swing.JTextField();
+        jtfQuantityUnit = new javax.swing.JTextField();
         jPanel27 = new javax.swing.JPanel();
         jlCharges = new javax.swing.JLabel();
         jtfCharges = new javax.swing.JTextField();
@@ -298,7 +301,7 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
 
         jPanel3.setMinimumSize(new java.awt.Dimension(428, 494));
         jPanel3.setPreferredSize(new java.awt.Dimension(700, 475));
-        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+        jPanel3.setLayout(new java.awt.BorderLayout());
 
         jPanel13.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel13.setPreferredSize(new java.awt.Dimension(565, 475));
@@ -371,7 +374,7 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
         jPanel19.add(jlFkItemId);
 
         jcbFkItemId.setMaximumRowCount(16);
-        jcbFkItemId.setPreferredSize(new java.awt.Dimension(390, 23));
+        jcbFkItemId.setPreferredSize(new java.awt.Dimension(400, 23));
         jcbFkItemId.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jcbFkItemIdItemStateChanged(evt);
@@ -380,7 +383,7 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
         jPanel19.add(jcbFkItemId);
 
         jbFkItemId.setText("...");
-        jbFkItemId.setToolTipText("Seleccionar producto terminado");
+        jbFkItemId.setToolTipText("Seleccionar producto");
         jbFkItemId.setFocusable(false);
         jbFkItemId.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel19.add(jbFkItemId);
@@ -394,7 +397,7 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
         jPanel20.add(jlFkBomId);
 
         jcbFkBomId.setMaximumRowCount(16);
-        jcbFkBomId.setPreferredSize(new java.awt.Dimension(390, 23));
+        jcbFkBomId.setPreferredSize(new java.awt.Dimension(400, 23));
         jcbFkBomId.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jcbFkBomIdItemStateChanged(evt);
@@ -422,7 +425,7 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
         jPanel18.add(jlReference);
 
         jtfReference.setText("REFERENCE");
-        jtfReference.setPreferredSize(new java.awt.Dimension(390, 23));
+        jtfReference.setPreferredSize(new java.awt.Dimension(400, 23));
         jtfReference.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 jtfReferenceFocusGained(evt);
@@ -454,11 +457,11 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
         });
         jPanel40.add(jtfQuantityOriginal);
 
-        jtfDbmsUnitSymbolQO.setEditable(false);
-        jtfDbmsUnitSymbolQO.setText("UNIT");
-        jtfDbmsUnitSymbolQO.setFocusable(false);
-        jtfDbmsUnitSymbolQO.setPreferredSize(new java.awt.Dimension(30, 23));
-        jPanel40.add(jtfDbmsUnitSymbolQO);
+        jtfQuantityOriginalUnit.setEditable(false);
+        jtfQuantityOriginalUnit.setText("UNIT");
+        jtfQuantityOriginalUnit.setFocusable(false);
+        jtfQuantityOriginalUnit.setPreferredSize(new java.awt.Dimension(35, 23));
+        jPanel40.add(jtfQuantityOriginalUnit);
 
         jPanel13.add(jPanel40);
 
@@ -478,11 +481,11 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
         });
         jPanel41.add(jtfQuantityRework);
 
-        jtfDbmsUnitSymbolQR.setEditable(false);
-        jtfDbmsUnitSymbolQR.setText("UNIT");
-        jtfDbmsUnitSymbolQR.setFocusable(false);
-        jtfDbmsUnitSymbolQR.setPreferredSize(new java.awt.Dimension(30, 23));
-        jPanel41.add(jtfDbmsUnitSymbolQR);
+        jtfQuantityReworkUnit.setEditable(false);
+        jtfQuantityReworkUnit.setText("UNIT");
+        jtfQuantityReworkUnit.setFocusable(false);
+        jtfQuantityReworkUnit.setPreferredSize(new java.awt.Dimension(35, 23));
+        jPanel41.add(jtfQuantityReworkUnit);
 
         jPanel13.add(jPanel41);
 
@@ -499,11 +502,11 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
         jtfQuantity.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel21.add(jtfQuantity);
 
-        jtfDbmsUnitSymbol.setEditable(false);
-        jtfDbmsUnitSymbol.setText("UNIT");
-        jtfDbmsUnitSymbol.setFocusable(false);
-        jtfDbmsUnitSymbol.setPreferredSize(new java.awt.Dimension(30, 23));
-        jPanel21.add(jtfDbmsUnitSymbol);
+        jtfQuantityUnit.setEditable(false);
+        jtfQuantityUnit.setText("UNIT");
+        jtfQuantityUnit.setFocusable(false);
+        jtfQuantityUnit.setPreferredSize(new java.awt.Dimension(35, 23));
+        jPanel21.add(jtfQuantityUnit);
 
         jPanel13.add(jPanel21);
 
@@ -531,7 +534,7 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
         jPanel30.add(jlDate);
 
         jtfDate.setText("DATE");
-        jtfDate.setPreferredSize(new java.awt.Dimension(100, 23));
+        jtfDate.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel30.add(jtfDate);
 
         jbDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
@@ -549,11 +552,11 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
         jPanel12.add(jlDateDelivery);
 
         jtfDateDelivery.setText("DELIVERY DATE");
-        jtfDateDelivery.setPreferredSize(new java.awt.Dimension(100, 23));
+        jtfDateDelivery.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel12.add(jtfDateDelivery);
 
         jbDateDelivery.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
-        jbDateDelivery.setToolTipText("Seleccionar fecha entrega");
+        jbDateDelivery.setToolTipText("Seleccionar fecha");
         jbDateDelivery.setFocusable(false);
         jbDateDelivery.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel12.add(jbDateDelivery);
@@ -589,7 +592,7 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
         jPanel26.add(jlFkProductionOrderId_n);
 
         jcbFkProductionOrderId_n.setMaximumRowCount(16);
-        jcbFkProductionOrderId_n.setPreferredSize(new java.awt.Dimension(390, 23));
+        jcbFkProductionOrderId_n.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel26.add(jcbFkProductionOrderId_n);
 
         jbFkProductionOrderId_n.setText("...");
@@ -601,7 +604,7 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
         jtfDummyProductionOrder_n.setEditable(false);
         jtfDummyProductionOrder_n.setHorizontalAlignment(javax.swing.JTextField.LEFT);
         jtfDummyProductionOrder_n.setText("0");
-        jtfDummyProductionOrder_n.setPreferredSize(new java.awt.Dimension(390, 23));
+        jtfDummyProductionOrder_n.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel26.add(jtfDummyProductionOrder_n);
 
         jPanel13.add(jPanel26);
@@ -613,7 +616,7 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
         jPanel31.add(jlFkBizPartnerId_n);
 
         jcbFkBizPartnerId_n.setMaximumRowCount(12);
-        jcbFkBizPartnerId_n.setPreferredSize(new java.awt.Dimension(390, 23));
+        jcbFkBizPartnerId_n.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel31.add(jcbFkBizPartnerId_n);
 
         jbFkBizPartnerId_n.setText("...");
@@ -643,7 +646,7 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
         jPanel42.add(jlFkBizPartnerOperatorId_n);
 
         jcbFkBizPartnerOperatorId_n.setMaximumRowCount(12);
-        jcbFkBizPartnerOperatorId_n.setPreferredSize(new java.awt.Dimension(390, 23));
+        jcbFkBizPartnerOperatorId_n.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel42.add(jcbFkBizPartnerOperatorId_n);
 
         jbFkBizPartnerOperatorId_n.setText("...");
@@ -654,10 +657,10 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
 
         jPanel13.add(jPanel42);
 
-        jPanel3.add(jPanel13);
+        jPanel3.add(jPanel13, java.awt.BorderLayout.CENTER);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Estado del documento:"));
-        jPanel1.setPreferredSize(new java.awt.Dimension(410, 475));
+        jPanel1.setPreferredSize(new java.awt.Dimension(400, 33));
         jPanel1.setRequestFocusEnabled(false);
         jPanel1.setLayout(new java.awt.GridLayout(18, 2, 0, 1));
 
@@ -923,7 +926,7 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
 
         jPanel1.add(jPanel24);
 
-        jPanel3.add(jPanel1);
+        jPanel3.add(jPanel1, java.awt.BorderLayout.EAST);
 
         getContentPane().add(jPanel3, java.awt.BorderLayout.PAGE_START);
 
@@ -1034,8 +1037,8 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-998)/2, (screenSize.height-735)/2, 998, 735);
+        setSize(new java.awt.Dimension(1040, 729));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -1353,9 +1356,9 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
         if (jcbFkBomId.getSelectedIndex() > 0) {
             moBom = (SDataBom) SDataUtilities.readRegistry(miClient, SDataConstants.MFG_BOM, moFieldFkBomId.getKey(), SLibConstants.EXEC_MODE_VERBOSE);
             moUnit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int[] { moBom.getFkUnitId() }, SLibConstants.EXEC_MODE_VERBOSE);
-            jtfDbmsUnitSymbol.setText(moUnit.getSymbol());
-            jtfDbmsUnitSymbolQO.setText(moUnit.getSymbol());
-            jtfDbmsUnitSymbolQR.setText(moUnit.getSymbol());
+            jtfQuantityUnit.setText(moUnit.getSymbol());
+            jtfQuantityOriginalUnit.setText(moUnit.getSymbol());
+            jtfQuantityReworkUnit.setText(moUnit.getSymbol());
         }
     }
 
@@ -1563,7 +1566,7 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
     private void actionPeriodNew() {
         moProductionOrderPeriodForm.formRefreshCatalogues();
         moProductionOrderPeriodForm.formReset();
-        moProductionOrderPeriodForm.setValue(1, jtfDbmsUnitSymbol.getText());
+        moProductionOrderPeriodForm.setValue(1, jtfQuantityUnit.getText());
         moProductionOrderPeriodForm.setValue(2, (moProductionOrder != null ? moProductionOrder.getFkOrdStatusId() : 0));
         moProductionOrderPeriodForm.setVisible(true);
 
@@ -1586,7 +1589,7 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
         if (mnIndex != -1) {
             moProductionOrderPeriod = (SDataProductionOrderPeriod) moProductionOrderPeriodsPane.getTableRow(mnIndex).getData();
             moProductionOrderPeriodForm.setRegistry(moProductionOrderPeriod);
-            moProductionOrderPeriodForm.setValue(1, jtfDbmsUnitSymbol.getText());
+            moProductionOrderPeriodForm.setValue(1, jtfQuantityUnit.getText());
             moProductionOrderPeriodForm.setValue(2, (moProductionOrder != null ? moProductionOrder.getFkOrdStatusId() : 0));
             moProductionOrderPeriodForm.setVisible(true);
 
@@ -1789,9 +1792,6 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
     private javax.swing.JTextField jtfDbmsExplotionMaterialsReference;
     private javax.swing.JFormattedTextField jtfDbmsLotDateExpired;
     private javax.swing.JTextField jtfDbmsStatus;
-    private javax.swing.JTextField jtfDbmsUnitSymbol;
-    private javax.swing.JTextField jtfDbmsUnitSymbolQO;
-    private javax.swing.JTextField jtfDbmsUnitSymbolQR;
     private javax.swing.JTextField jtfDbmsUserClose;
     private javax.swing.JTextField jtfDbmsUserEnd;
     private javax.swing.JTextField jtfDbmsUserLotAssigned;
@@ -1802,7 +1802,10 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
     private javax.swing.JTextField jtfNumberReference_n;
     private javax.swing.JTextField jtfQuantity;
     private javax.swing.JTextField jtfQuantityOriginal;
+    private javax.swing.JTextField jtfQuantityOriginalUnit;
     private javax.swing.JTextField jtfQuantityRework;
+    private javax.swing.JTextField jtfQuantityReworkUnit;
+    private javax.swing.JTextField jtfQuantityUnit;
     private javax.swing.JTextField jtfReference;
     private javax.swing.JFormattedTextField jtfTsClose_n;
     private javax.swing.JFormattedTextField jtfTsEnd_n;
@@ -1826,9 +1829,9 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
         }
 
-        jtfDbmsUnitSymbol.setText("");
-        jtfDbmsUnitSymbolQO.setText("");
-        jtfDbmsUnitSymbolQR.setText("");
+        jtfQuantityUnit.setText("");
+        jtfQuantityOriginalUnit.setText("");
+        jtfQuantityReworkUnit.setText("");
 
         moProductionOrderPeriodsPane.createTable(null);
         moProductionOrderPeriodsPane.clearTableRows();
@@ -1908,6 +1911,7 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
         moComboBoxItemBom.clear();
         moComboBoxItemBom.addComboBox(SDataConstants.ITMX_ITEM_BOM_ITEM, jcbFkItemId, jbFkItemId, null);
         moComboBoxItemBom.addComboBox(SDataConstants.MFG_BOM, jcbFkBomId, jbFkBomId);
+        
         SFormUtilities.populateComboBox(miClient, jcbFkBizPartnerId_n, SDataConstants.BPSX_BP_CUS);
         SFormUtilities.populateComboBox(miClient, jcbFkBizPartnerOperatorId_n, SDataConstants.BPSX_BP_ATT_EMP_MFG);
 
@@ -1924,13 +1928,11 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
 
     @Override
     public erp.lib.form.SFormValidation formValidate() {
-        String sMsg = "";
-
-        SDataProductionOrder oProductionOrder = null;
+        String msg = "";
+        SDataProductionOrder productionOrder = null;
         SFormValidation validation = new SFormValidation();
 
         for (int i = 0; i < mvFields.size(); i++) {
-
             // Validate if comboBox is disabled:
 
             if (jlFkCobId.getText().compareTo(mvFields.get(i).getFieldName()) == 0 ||
@@ -1953,22 +1955,34 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
 
         if (!validation.getIsError()) {
             if (((Boolean)((SFormComponentItem) jcbFkOrdTypeId.getModel().getSelectedItem()).getComplement()).booleanValue() &&
-                    (moProductionOrder == null || moProductionOrder.getFkOrdStatusId() == SDataConstantsSys.MFGS_ST_ORD_NEW) &&
+                    (productionOrder == null || productionOrder.getFkOrdStatusId() == SDataConstantsSys.MFGS_ST_ORD_NEW) &&
                     jcbFkProductionOrderId_n.getSelectedIndex() <= 0 && !jckIsForecast.isSelected()) {
-                validation.setMessage("La orden de producción requiere orden de producción padre");
+                validation.setMessage("La orden de producción requiere orden de producción padre.");
                 validation.setComponent(moFieldFkProductionOrderId_n.getComponent());
+            }
+            else {
+                // Validate that item is not restricted or inactive:
+                
+                if (moItem.getFkItemStatusId() == SModSysConsts.ITMS_ST_ITEM_INA) {
+                    validation.setMessage(SItmConsts.MSG_ERR_ST_ITEM_INA + "\n" + SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkItemId.getText() + "'."); // validate that item is not inactive
+                    validation.setComponent(jcbFkItemId);
+                }
+                else if (moItem.getFkItemStatusId() == SModSysConsts.ITMS_ST_ITEM_RES) {
+                    validation.setMessage(SItmConsts.MSG_ERR_ST_ITEM_RES + "\n" + SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkItemId.getText() + "'."); // falidate that item is not restricted
+                    validation.setComponent(jcbFkItemId);
+                }
             }
         }
 
-        /*
+        /* (2016-02-29, sflores: Why is this code block commented?, should it be removed?
         if (!validation.getIsError()) {
             if (((Boolean)((SFormComponentItem) jcbFkOrdTypeId.getModel().getSelectedItem()).getComplement()).booleanValue() &&
-                    (moProductionOrder == null || moProductionOrder.getFkOrdStatusId() == SDataConstantsSys.MFGS_ST_ORD_NEW) &&
+                    (productionOrder == null || productionOrder.getFkOrdStatusId() == SDataConstantsSys.MFGS_ST_ORD_NEW) &&
                     jcbFkProductionOrderId_n.getSelectedIndex() > 0 && !jckIsForecast.isSelected()) {
 
-                oProductionOrder = (SDataProductionOrder) SDataUtilities.readRegistry(miClient, SDataConstants.MFG_ORD, moFieldFkProductionOrderId_n.getKey(), SLibConstants.EXEC_MODE_VERBOSE);
+                productionOrder = (SDataProductionOrder) SDataUtilities.readRegistry(miClient, SDataConstants.MFG_ORD, moFieldFkProductionOrderId_n.getKey(), SLibConstants.EXEC_MODE_VERBOSE);
                 try {
-                    if (SDataUtilities.validateIngredientInFormula(miClient, oProductionOrder.getFkItemId_r(), oProductionOrder.getFkUnitId_r(), moFieldFkItemId_r.getKeyAsIntArray()[0],
+                    if (SDataUtilities.validateIngredientInFormula(miClient, productionOrder.getFkItemId_r(), productionOrder.getFkUnitId_r(), moFieldFkItemId_r.getKeyAsIntArray()[0],
                             moUnit.getPkUnitId(), jcbFkBomId.getSelectedItem().toString())<=0) {
                         validation.setMessage("La orden de producción padre no es un insumo de la orden de producción hijo, verifique las unidades");
                         validation.setComponent(moFieldFkProductionOrderId_n.getComponent());
@@ -1982,38 +1996,44 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
         */
 
         if (!validation.getIsError()) {
-            try {
-                sMsg = SDataUtilities.checkProductionOrderExternalRelations(miClient, moProductionOrder.getPkYearId(), moProductionOrder.getPkOrdId());
-                if (sMsg.length()>0) {
-                    validation.setMessage("No se puede modificar la orden de producción por tener movimientos de '"+ sMsg + "'");
-                    validation.setComponent(moFieldIsDeleted.getComponent());
-                }
-            }
-            catch (Exception e) {
-                System.out.println(e);
-            }
-        }
-
-        if (!validation.getIsError()) {
             if (!SDataUtilities.isPeriodOpen(miClient, moFieldDate.getDate())) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
                 validation.setComponent(jtfDate);
             }
+            else if (productionOrder != null) {
+                try {
+                    msg = SDataUtilities.checkProductionOrderExternalRelations(miClient, productionOrder.getPkYearId(), productionOrder.getPkOrdId());
+                    if (!msg.isEmpty()) {
+                        validation.setMessage("No se puede modificar la orden de producción por tener movimientos de '"+ msg + "'.");
+                    }
+                }
+                catch (Exception e) {
+                    validation.setMessage(e.toString());
+                }
+            }
+            else {
+                try {
+                    SMfgUtils.validateBomItems(miClient.getSession(), moFieldFkBomId.getKeyAsIntArray()[0], moFieldFkItemId_r.getKeyAsIntArray()[0]); // check for restricted or inactive components
+                }
+                catch (Exception e) {
+                    validation.setMessage(e.toString());
+                }
+            }
         }
 
-        if (!validation.getIsError() && moProductionOrder != null) {
-            if (moProductionOrder.getFkLotItemId_nr() > 0 && moProductionOrder.getFkLotUnitId_nr() > 0 && moProductionOrder.getFkLotId_n() > 0) {
-                if (moItem.getPkItemId() != moProductionOrder.getFkLotItemId_nr() && moItem.getFkUnitId() != moProductionOrder.getFkLotUnitId_nr()) {
+        if (!validation.getIsError() && productionOrder != null) {
+            if (productionOrder.getFkLotItemId_nr() > 0 && productionOrder.getFkLotUnitId_nr() > 0 && productionOrder.getFkLotId_n() > 0) {
+                if (moItem.getPkItemId() != productionOrder.getFkLotItemId_nr() && moItem.getFkUnitId() != productionOrder.getFkLotUnitId_nr()) {
                     if(miClient.showMsgBoxConfirm("El lote asignado a la orden de producción no corresponde al producto seleccionado. \n "
-                            + "¿Desea elimnar el lote '" + moProductionOrder.getDbmsLotItem() + " " + moProductionOrder.getDbmsLotUnit()
-                            + ", lote: " + moProductionOrder.getDbmsLot() + "'?") == JOptionPane.YES_OPTION) {
-                        moProductionOrder.setFkLotItemId_nr(0);
-                        moProductionOrder.setFkLotUnitId_nr(0);
-                        moProductionOrder.setFkLotId_n(0);
+                            + "¿Desea eliminar el lote '" + productionOrder.getDbmsLotItem() + " " + productionOrder.getDbmsLotUnit()
+                            + ", lote: " + productionOrder.getDbmsLot() + "'?") == JOptionPane.YES_OPTION) {
+                        productionOrder.setFkLotItemId_nr(0);
+                        productionOrder.setFkLotUnitId_nr(0);
+                        productionOrder.setFkLotId_n(0);
                     }
                     else {
-                        validation.setMessage("El lote '" + moProductionOrder.getDbmsLotItem() + " " + moProductionOrder.getDbmsLotUnit()
-                            + ", lote: " + moProductionOrder.getDbmsLot() + "' \n asignado a la orden de producción no corresponde al producto seleccionado.");
+                        validation.setMessage("El lote '" + productionOrder.getDbmsLotItem() + " " + productionOrder.getDbmsLotUnit()
+                            + ", lote: " + productionOrder.getDbmsLot() + "' \n asignado a la orden de producción no corresponde al producto seleccionado.");
                         validation.setComponent(moFieldFkItemId_r.getComponent());
                     }
                 }
@@ -2057,11 +2077,11 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
         moFieldFkBomId.setFieldValue(new int[] { moProductionOrder.getFkBomId() });
         moFieldReference.setFieldValue(moProductionOrder.getReference());
         moFieldQuantityOriginal.setFieldValue(moProductionOrder.getQuantityOriginal());
-        jtfDbmsUnitSymbolQO.setText(moProductionOrder.getDbmsBomUnitSymbol());
+        jtfQuantityOriginalUnit.setText(moProductionOrder.getDbmsBomUnitSymbol());
         moFieldQuantityRework.setFieldValue(moProductionOrder.getQuantityRework());
-        jtfDbmsUnitSymbolQR.setText(moProductionOrder.getDbmsBomUnitSymbol());
+        jtfQuantityReworkUnit.setText(moProductionOrder.getDbmsBomUnitSymbol());
         moFieldQuantity.setFieldValue(moProductionOrder.getQuantity());
-        jtfDbmsUnitSymbol.setText(moProductionOrder.getDbmsBomUnitSymbol());
+        jtfQuantityUnit.setText(moProductionOrder.getDbmsBomUnitSymbol());
         moFieldCharges.setFieldValue(moProductionOrder.getCharges());
         moFieldNumberReference_n.setFieldValue(moProductionOrder.getNumberReference_n());
         moFieldDate.setFieldValue(moProductionOrder.getDate());

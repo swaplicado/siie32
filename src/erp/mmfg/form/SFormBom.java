@@ -1,5 +1,5 @@
 /*
- * DFormCompany.java
+ * SFormBom.java
  *
  * Created on 17 de agosto de 2008, 01:42 AM
  */
@@ -28,19 +28,24 @@ import erp.mmfg.data.SDataBomNotes;
 import erp.mmfg.data.SDataBomNotesRow;
 import erp.mmfg.data.SDataBomSubgoods;
 import erp.mmfg.data.SDataBomSubgoodsRow;
+import erp.mod.SModSysConsts;
+import erp.mod.itm.db.SItmConsts;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.text.DecimalFormat;
 import java.util.Vector;
 import javax.swing.AbstractAction;
+import javax.swing.JComboBox;
 import javax.swing.JToggleButton;
+import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author  Néstor Ávalos
+ * @author  Néstor Ávalos, Sergio Flores
  */
-public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
+public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
     private int mnFormType;
     private int mnFormResult;
@@ -52,7 +57,7 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
 
     private erp.mmfg.data.SDataBom moBom;
     private erp.lib.form.SFormField moFieldFkCobId;
-    private erp.lib.form.SFormField moFieldFkItemRmId;
+    private erp.lib.form.SFormField moFieldFkItemId;
     private erp.lib.form.SFormField moFieldBom;
     private erp.lib.form.SFormField moFieldLevel;
     private erp.lib.form.SFormField moFieldQty;
@@ -66,9 +71,9 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
     private erp.lib.table.STablePaneGrid moBomLevelPane;
 
     private erp.mitm.data.SDataItem moItem;
-    private SDataUnit moUnit = null;
+    private erp.mitm.data.SDataUnit moUnit;
 
-    /** Creates new form DFormCompany */
+    /** Creates new form SFormBom */
     public SFormBom(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
@@ -93,12 +98,10 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         jPanel14 = new javax.swing.JPanel();
         jlFkCobId = new javax.swing.JLabel();
         jcbFkCobId = new javax.swing.JComboBox<SFormComponentItem>();
-        jlDummy = new javax.swing.JLabel();
         jbFkCobId = new javax.swing.JButton();
         jPanel17 = new javax.swing.JPanel();
-        jlFkItemRmId = new javax.swing.JLabel();
-        jcbFkItemRmId = new javax.swing.JComboBox<SFormComponentItem>();
-        jlDummy1 = new javax.swing.JLabel();
+        jlFkItemId = new javax.swing.JLabel();
+        jcbFkItemId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkItemId = new javax.swing.JButton();
         jPanel19 = new javax.swing.JPanel();
         jlBom = new javax.swing.JLabel();
@@ -106,43 +109,38 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         jPanel20 = new javax.swing.JPanel();
         jlQty = new javax.swing.JLabel();
         jtfQty = new javax.swing.JTextField();
-        jlDummy2 = new javax.swing.JLabel();
         jtfDbmsLotSugUnitSymbol = new javax.swing.JTextField();
         jPanel53 = new javax.swing.JPanel();
         jlCostPercentage = new javax.swing.JLabel();
-        jlDummy3 = new javax.swing.JLabel();
         jtfCostPercentage = new javax.swing.JTextField();
         jPanel12 = new javax.swing.JPanel();
         jlDateStart = new javax.swing.JLabel();
         jtfDateStart = new javax.swing.JFormattedTextField();
-        jlDummy4 = new javax.swing.JLabel();
         jbSetDateStart = new javax.swing.JButton();
         jPanel27 = new javax.swing.JPanel();
         jlDateEnd = new javax.swing.JLabel();
         jtfDateEnd_n = new javax.swing.JFormattedTextField();
-        jlDummy5 = new javax.swing.JLabel();
         jbSetDateEnd_n = new javax.swing.JButton();
         jPanel54 = new javax.swing.JPanel();
         jlLevel = new javax.swing.JLabel();
-        jlDummy6 = new javax.swing.JLabel();
         jtfLevel = new javax.swing.JTextField();
         jPanel28 = new javax.swing.JPanel();
         jckIsDeleted = new javax.swing.JCheckBox();
         jPanel3 = new javax.swing.JPanel();
         jTabbedPane = new javax.swing.JTabbedPane();
-        jpLevel = new javax.swing.JPanel();
+        jpPaneLevel = new javax.swing.JPanel();
         jpLevelAction = new javax.swing.JPanel();
         jbBomLevelCurrent = new javax.swing.JButton();
         jbBomLevelNew = new javax.swing.JButton();
         jbBomLevelEdit = new javax.swing.JButton();
         jbBomLevelDelete = new javax.swing.JButton();
         jtbEntryFilter = new javax.swing.JToggleButton();
-        jpSubgoods = new javax.swing.JPanel();
+        jpPaneSubgoods = new javax.swing.JPanel();
         jpSubgoodsAction = new javax.swing.JPanel();
         jbSubgoodsNew = new javax.swing.JButton();
         jbSubgoodsEdit = new javax.swing.JButton();
         jbSubgoodsDelete = new javax.swing.JButton();
-        jpNotes = new javax.swing.JPanel();
+        jpPaneNotes = new javax.swing.JPanel();
         jpNotesAction = new javax.swing.JPanel();
         jbNotesNew = new javax.swing.JButton();
         jbNotesEdit = new javax.swing.JButton();
@@ -169,18 +167,15 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         jpData.setPreferredSize(new java.awt.Dimension(520, 250));
         jpData.setLayout(new java.awt.GridLayout(9, 0));
 
-        jPanel14.setLayout(new java.awt.FlowLayout(0, 0, 0));
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkCobId.setForeground(java.awt.Color.blue);
         jlFkCobId.setText("Sucursal: *");
-        jlFkCobId.setPreferredSize(new java.awt.Dimension(120, 23));
+        jlFkCobId.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel14.add(jlFkCobId);
 
         jcbFkCobId.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel14.add(jcbFkCobId);
-
-        jlDummy.setPreferredSize(new java.awt.Dimension(1, 23));
-        jPanel14.add(jlDummy);
 
         jbFkCobId.setText("...");
         jbFkCobId.setToolTipText("Seleccionar sucursal");
@@ -190,37 +185,34 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
 
         jpData.add(jPanel14);
 
-        jPanel17.setLayout(new java.awt.FlowLayout(0, 0, 0));
+        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkItemRmId.setForeground(java.awt.Color.blue);
-        jlFkItemRmId.setText("Producto: *");
-        jlFkItemRmId.setPreferredSize(new java.awt.Dimension(120, 23));
-        jPanel17.add(jlFkItemRmId);
+        jlFkItemId.setForeground(java.awt.Color.blue);
+        jlFkItemId.setText("Producto: *");
+        jlFkItemId.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel17.add(jlFkItemId);
 
-        jcbFkItemRmId.setMaximumRowCount(16);
-        jcbFkItemRmId.setPreferredSize(new java.awt.Dimension(400, 23));
-        jcbFkItemRmId.addFocusListener(new java.awt.event.FocusAdapter() {
+        jcbFkItemId.setMaximumRowCount(16);
+        jcbFkItemId.setPreferredSize(new java.awt.Dimension(400, 23));
+        jcbFkItemId.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
-                jcbFkItemRmIdFocusLost(evt);
+                jcbFkItemIdFocusLost(evt);
             }
         });
-        jPanel17.add(jcbFkItemRmId);
-
-        jlDummy1.setPreferredSize(new java.awt.Dimension(1, 23));
-        jPanel17.add(jlDummy1);
+        jPanel17.add(jcbFkItemId);
 
         jbFkItemId.setText("...");
-        jbFkItemId.setToolTipText("Seleccionar producto terminado");
+        jbFkItemId.setToolTipText("Seleccionar producto");
         jbFkItemId.setFocusable(false);
         jbFkItemId.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel17.add(jbFkItemId);
 
         jpData.add(jPanel17);
 
-        jPanel19.setLayout(new java.awt.FlowLayout(0, 0, 0));
+        jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBom.setText("Referencia: *");
-        jlBom.setPreferredSize(new java.awt.Dimension(120, 23));
+        jlBom.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel19.add(jlBom);
 
         jtfBom.setText("DESCRIPTION");
@@ -229,107 +221,92 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
 
         jpData.add(jPanel19);
 
-        jPanel20.setLayout(new java.awt.FlowLayout(0, 0, 0));
+        jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlQty.setText("Lote sugerido:");
-        jlQty.setPreferredSize(new java.awt.Dimension(120, 23));
+        jlQty.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel20.add(jlQty);
 
         jtfQty.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jtfQty.setText("SUGGEST LOT");
-        jtfQty.setPreferredSize(new java.awt.Dimension(70, 23));
+        jtfQty.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel20.add(jtfQty);
-
-        jlDummy2.setPreferredSize(new java.awt.Dimension(1, 23));
-        jPanel20.add(jlDummy2);
 
         jtfDbmsLotSugUnitSymbol.setEditable(false);
         jtfDbmsLotSugUnitSymbol.setFocusable(false);
-        jtfDbmsLotSugUnitSymbol.setPreferredSize(new java.awt.Dimension(28, 23));
+        jtfDbmsLotSugUnitSymbol.setPreferredSize(new java.awt.Dimension(35, 23));
         jPanel20.add(jtfDbmsLotSugUnitSymbol);
 
         jpData.add(jPanel20);
 
-        jPanel53.setLayout(new java.awt.FlowLayout(0, 0, 0));
+        jPanel53.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCostPercentage.setText("Costo asignado: *");
-        jlCostPercentage.setPreferredSize(new java.awt.Dimension(120, 23));
+        jlCostPercentage.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel53.add(jlCostPercentage);
-
-        jlDummy3.setPreferredSize(new java.awt.Dimension(1, 23));
-        jPanel53.add(jlDummy3);
 
         jtfCostPercentage.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jtfCostPercentage.setText("COST PERCENTAGE");
-        jtfCostPercentage.setPreferredSize(new java.awt.Dimension(70, 23));
+        jtfCostPercentage.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel53.add(jtfCostPercentage);
 
         jpData.add(jPanel53);
 
-        jPanel12.setLayout(new java.awt.FlowLayout(0, 0, 0));
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateStart.setText("Fecha inicial vigencia: *");
-        jlDateStart.setPreferredSize(new java.awt.Dimension(120, 23));
+        jlDateStart.setText("Inicio vigencia: *");
+        jlDateStart.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel12.add(jlDateStart);
 
         jtfDateStart.setText("dd/mm/yyyy");
-        jtfDateStart.setPreferredSize(new java.awt.Dimension(66, 23));
+        jtfDateStart.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel12.add(jtfDateStart);
 
-        jlDummy4.setPreferredSize(new java.awt.Dimension(1, 23));
-        jPanel12.add(jlDummy4);
-
         jbSetDateStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
-        jbSetDateStart.setToolTipText("Seleccionar fecha inicial vigencia");
+        jbSetDateStart.setToolTipText("Seleccionar fecha");
         jbSetDateStart.setFocusable(false);
         jbSetDateStart.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel12.add(jbSetDateStart);
 
         jpData.add(jPanel12);
 
-        jPanel27.setLayout(new java.awt.FlowLayout(0, 0, 0));
+        jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateEnd.setText("Fecha final vigencia:");
-        jlDateEnd.setPreferredSize(new java.awt.Dimension(120, 23));
+        jlDateEnd.setText("Fin vigencia:");
+        jlDateEnd.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel27.add(jlDateEnd);
 
         jtfDateEnd_n.setText("dd/mm/yyyy");
-        jtfDateEnd_n.setPreferredSize(new java.awt.Dimension(66, 23));
+        jtfDateEnd_n.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel27.add(jtfDateEnd_n);
 
-        jlDummy5.setPreferredSize(new java.awt.Dimension(1, 23));
-        jPanel27.add(jlDummy5);
-
         jbSetDateEnd_n.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
-        jbSetDateEnd_n.setToolTipText("Seleccionar fecha final vigencia");
+        jbSetDateEnd_n.setToolTipText("Seleccionar fecha");
         jbSetDateEnd_n.setFocusable(false);
         jbSetDateEnd_n.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel27.add(jbSetDateEnd_n);
 
         jpData.add(jPanel27);
 
-        jPanel54.setLayout(new java.awt.FlowLayout(0, 0, 0));
+        jPanel54.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlLevel.setText("Nivel:");
-        jlLevel.setPreferredSize(new java.awt.Dimension(120, 23));
+        jlLevel.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel54.add(jlLevel);
-
-        jlDummy6.setPreferredSize(new java.awt.Dimension(1, 23));
-        jPanel54.add(jlDummy6);
 
         jtfLevel.setEditable(false);
         jtfLevel.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jtfLevel.setText("LEVEL");
         jtfLevel.setFocusable(false);
-        jtfLevel.setPreferredSize(new java.awt.Dimension(70, 23));
+        jtfLevel.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel54.add(jtfLevel);
 
         jpData.add(jPanel54);
 
-        jPanel28.setLayout(new java.awt.BorderLayout());
+        jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckIsDeleted.setText("Registro eliminado");
-        jPanel28.add(jckIsDeleted, java.awt.BorderLayout.WEST);
+        jPanel28.add(jckIsDeleted);
 
         jpData.add(jPanel28);
 
@@ -340,10 +317,10 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
 
         jTabbedPane.setBorder(javax.swing.BorderFactory.createTitledBorder("Detalle:"));
 
-        jpLevel.setLayout(new java.awt.BorderLayout());
+        jpPaneLevel.setLayout(new java.awt.BorderLayout());
 
         jpLevelAction.setPreferredSize(new java.awt.Dimension(779, 23));
-        jpLevelAction.setLayout(new java.awt.FlowLayout(0, 0, 0));
+        jpLevelAction.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
 
         jbBomLevelCurrent.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_new_main.gif"))); // NOI18N
         jbBomLevelCurrent.setToolTipText("Crear nivel 1");
@@ -376,14 +353,14 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         jtbEntryFilter.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_filter_on.gif"))); // NOI18N
         jpLevelAction.add(jtbEntryFilter);
 
-        jpLevel.add(jpLevelAction, java.awt.BorderLayout.PAGE_START);
+        jpPaneLevel.add(jpLevelAction, java.awt.BorderLayout.PAGE_START);
 
-        jTabbedPane.addTab("Niveles", jpLevel);
+        jTabbedPane.addTab("Niveles", jpPaneLevel);
 
-        jpSubgoods.setLayout(new java.awt.BorderLayout());
+        jpPaneSubgoods.setLayout(new java.awt.BorderLayout());
 
         jpSubgoodsAction.setPreferredSize(new java.awt.Dimension(779, 23));
-        jpSubgoodsAction.setLayout(new java.awt.FlowLayout(0, 0, 0));
+        jpSubgoodsAction.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
 
         jbSubgoodsNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_new.gif"))); // NOI18N
         jbSubgoodsNew.setToolTipText("Crear");
@@ -404,14 +381,14 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         jbSubgoodsDelete.setPreferredSize(new java.awt.Dimension(23, 23));
         jpSubgoodsAction.add(jbSubgoodsDelete);
 
-        jpSubgoods.add(jpSubgoodsAction, java.awt.BorderLayout.PAGE_START);
+        jpPaneSubgoods.add(jpSubgoodsAction, java.awt.BorderLayout.PAGE_START);
 
-        jTabbedPane.addTab("Subproductos", jpSubgoods);
+        jTabbedPane.addTab("Subproductos", jpPaneSubgoods);
 
-        jpNotes.setLayout(new java.awt.BorderLayout());
+        jpPaneNotes.setLayout(new java.awt.BorderLayout());
 
         jpNotesAction.setPreferredSize(new java.awt.Dimension(779, 23));
-        jpNotesAction.setLayout(new java.awt.FlowLayout(0, 0, 0));
+        jpNotesAction.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
 
         jbNotesNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_new.gif"))); // NOI18N
         jbNotesNew.setToolTipText("Crear");
@@ -432,16 +409,16 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         jbNotesDelete.setPreferredSize(new java.awt.Dimension(23, 23));
         jpNotesAction.add(jbNotesDelete);
 
-        jpNotes.add(jpNotesAction, java.awt.BorderLayout.PAGE_START);
+        jpPaneNotes.add(jpNotesAction, java.awt.BorderLayout.PAGE_START);
 
-        jTabbedPane.addTab("Notas", jpNotes);
+        jTabbedPane.addTab("Notas", jpPaneNotes);
 
         jPanel3.add(jTabbedPane, java.awt.BorderLayout.CENTER);
         jTabbedPane.getAccessibleContext().setAccessibleName("Subproductos");
 
         getContentPane().add(jPanel3, java.awt.BorderLayout.CENTER);
 
-        jPanel2.setLayout(new java.awt.FlowLayout(2));
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOK.setText("Aceptar"); // NOI18N
         jbOK.setToolTipText("[Ctrl + Enter]");
@@ -453,17 +430,17 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-858)/2, (screenSize.height-684)/2, 858, 684);
+        setSize(new java.awt.Dimension(858, 684));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
-    private void jcbFkItemRmIdFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jcbFkItemRmIdFocusLost
-        fkItemIdFocusLostFkItemId();
-    }//GEN-LAST:event_jcbFkItemRmIdFocusLost
+    private void jcbFkItemIdFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jcbFkItemIdFocusLost
+        itemStateChangedFkItemId();
+    }//GEN-LAST:event_jcbFkItemIdFocusLost
 
     private void initComponentsExtra() {
         int i;
@@ -472,28 +449,21 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         STableColumnForm oColumnsNotes[];
 
         mvFields = new Vector<SFormField>();
+        
+        moBomLevelPane = new STablePaneGrid(miClient);
+        moBomLevelPane.setDoubleClickAction(this, "publicActionLevelEdit");
+        jpPaneLevel.add(moBomLevelPane, BorderLayout.CENTER);
+
         moBomSubgoodPane = new STablePane(miClient);
         moBomSubgoodPane.setDoubleClickAction(this, "publicActionSubgoodEdit");
-        jpSubgoods.add(moBomSubgoodPane, BorderLayout.CENTER);
-
-        /*
-        moBomLevelPane = new STablePane(miClient);
-        moBomLevelPane.setDoubleClickAction(this, "publicActionLevelEdit");
-        jpLevel.add(moBomLevelPane, BorderLayout.CENTER);
-        */
+        jpPaneSubgoods.add(moBomSubgoodPane, BorderLayout.CENTER);
 
         moBomNotesPane = new STablePane(miClient);
         moBomNotesPane.setDoubleClickAction(this, "publicActionNotesEdit");
-        jpNotes.add(moBomNotesPane, BorderLayout.CENTER);
-
-        // Pane of document entries:
-
-        moBomLevelPane = new STablePaneGrid(miClient);
-        moBomLevelPane.setDoubleClickAction(this, "publicActionLevelEdit");
-        jpLevel.add(moBomLevelPane, BorderLayout.CENTER);
+        jpPaneNotes.add(moBomNotesPane, BorderLayout.CENTER);
 
         moFieldFkCobId = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkCobId, jlFkCobId);
-        moFieldFkItemRmId = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkItemRmId, jlFkItemRmId);
+        moFieldFkItemId = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkItemId, jlFkItemId);
         moFieldBom = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfBom, jlBom);
         moFieldBom.setLengthMax(50);
         moFieldLevel = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfLevel, jlLevel);
@@ -508,7 +478,7 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         moFieldIsDeleted = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
 
         mvFields.add(moFieldFkCobId);
-        mvFields.add(moFieldFkItemRmId);
+        mvFields.add(moFieldFkItemId);
         mvFields.add(moFieldBom);
         mvFields.add(moFieldLevel);
         mvFields.add(moFieldQty);
@@ -531,11 +501,12 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         jbFkItemId.addActionListener(this);
         jbFkCobId.addActionListener(this);
         jtbEntryFilter.addActionListener(this);
+        jcbFkItemId.addItemListener(this);
 
         i = 0;
         oColumnsLevel = new STableColumnForm[24];
         oColumnsLevel[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Nivel superior", 250);
-        oColumnsLevel[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Nivel", 37);
+        oColumnsLevel[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Nivel", 35);
         oColumnsLevel[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
         oColumnsLevel[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Insumo", 250);
         oColumnsLevel[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cantidad", STableConstants.WIDTH_QUANTITY_2X);
@@ -634,30 +605,22 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         }
     }
 
-    public void fkItemIdFocusLostFkItemId() {
-        if (jcbFkItemRmId.getSelectedIndex() > 0) {
-
-            // Assign unit from Bom or item:
-
-            moItem = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, moFieldFkItemRmId.getKey(), SLibConstants.EXEC_MODE_VERBOSE);
-
-            if (moBom != null) {
-                moUnit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int[] { moBom.getFkUnitId() }, SLibConstants.EXEC_MODE_VERBOSE);
-                jtfDbmsLotSugUnitSymbol.setText(moUnit != null ? moUnit.getSymbol() : "(n/a)");
-            }
-            else {
-                moUnit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int[] { moItem.getFkUnitId() }, SLibConstants.EXEC_MODE_VERBOSE);
-                jtfDbmsLotSugUnitSymbol.setText(((erp.lib.form.SFormComponentItem) jcbFkItemRmId.getModel().getSelectedItem()).getComplement().toString());
-            }
-
-            if (moFieldBom.getString().length() <= 0 ) {
-                if (jcbFkItemRmId.getSelectedItem().toString().length()<50) {
-                    moFieldBom.setFieldValue(jcbFkItemRmId.getSelectedItem().toString());
-                }
-                else {
-                    moFieldBom.setFieldValue(jcbFkItemRmId.getSelectedItem().toString().substring(0,49));
-                }
-            }
+    private void itemStateChangedFkItemId() {
+        String bom = "";
+        
+        if (jcbFkItemId.getSelectedIndex() <= 0) {
+            moItem = null;
+            moUnit = null;
+            
+            jtfDbmsLotSugUnitSymbol.setText("");
+            moFieldBom.setFieldValue("");
+        }
+        else {
+            moItem = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, moFieldFkItemId.getKey(), SLibConstants.EXEC_MODE_VERBOSE);
+            moUnit = moBom == null ? moItem.getDbmsDataUnit() : (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int[] { moBom.getFkUnitId() }, SLibConstants.EXEC_MODE_VERBOSE);
+            
+            jtfDbmsLotSugUnitSymbol.setText(moUnit.getSymbol());
+            moFieldBom.setFieldValue((bom = jcbFkItemId.getSelectedItem().toString()).length() <= 50 ? bom : bom.substring(0, 50));
         }
     }
 
@@ -688,8 +651,7 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
     }
 
     private void actionFkItemId() {
-        // miClient.pickOption(SDataConstants.ITMX_ITEM_IOG, moFieldFkItemRmId, SDataConstantsSys.ITMS_CL_ITEM_SAL_PRO);
-        miClient.pickOption(SDataConstants.ITMX_ITEM_BOM_ITEM, moFieldFkItemRmId, null);
+        miClient.pickOption(SDataConstants.ITMX_ITEM_BOM_ITEM, moFieldFkItemId, null);
     }
 
     private void enabledFields(boolean b) {
@@ -698,8 +660,8 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         jcbFkCobId.setFocusable(b);
         jbFkCobId.setEnabled(b);
 
-        jcbFkItemRmId.setEnabled(b);
-        jcbFkItemRmId.setFocusable(b);
+        jcbFkItemId.setEnabled(b);
+        jcbFkItemId.setFocusable(b);
         jbFkItemId.setEnabled(b);
 
         jckIsDeleted.setEnabled(!b);
@@ -799,16 +761,16 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         int index = 0;
         SFormBomSubgood oFormBomSubgood = new SFormBomSubgood(miClient);
         SDataBomSubgoods oDataBomSubgood = null;
-        SDataBomSubgoodsRow oDataBomSubgoodRow = null;
 
         oFormBomSubgood.formRefreshCatalogues();
         oFormBomSubgood.formReset();
-        oFormBomSubgood.setValue(1, jcbFkItemRmId.getSelectedItem());
+        oFormBomSubgood.setValue(1, jcbFkItemId.getSelectedItem());
         oFormBomSubgood.setVisible(true);
+        
         if (oFormBomSubgood.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
             oDataBomSubgood = (SDataBomSubgoods) oFormBomSubgood.getRegistry();
 
-            moBomSubgoodPane.addTableRow(oDataBomSubgoodRow = new SDataBomSubgoodsRow(oDataBomSubgood));
+            moBomSubgoodPane.addTableRow(new SDataBomSubgoodsRow(oDataBomSubgood));
             moBomSubgoodPane.renderTableRows();
             index = moBomSubgoodPane.getTableGuiRowCount() - 1;
             moBomSubgoodPane.getTable().setRowSelectionInterval(index, index);
@@ -820,20 +782,19 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         int index = moBomSubgoodPane.getTable().getSelectedRow();
         SFormBomSubgood oFormBomSubgood = new SFormBomSubgood(miClient);
         SDataBomSubgoods oDataBomSubgood = null;
-        SDataBomSubgoodsRow oDataBomSubgoodRow = null;
 
         oFormBomSubgood.formRefreshCatalogues();
         oFormBomSubgood.formReset();
-        //oDataBomSubgood = (SDataBomSubgoods) oFormBomSubgood.getRegistry();
+        
         if (index != -1) {
             oDataBomSubgood = (SDataBomSubgoods) moBomSubgoodPane.getTableRow(index).getData();
             oFormBomSubgood.setRegistry(oDataBomSubgood);
-            oFormBomSubgood.setValue(1, jcbFkItemRmId.getSelectedItem());
+            oFormBomSubgood.setValue(1, jcbFkItemId.getSelectedItem());
             oFormBomSubgood.setVisible(true);
             if (oFormBomSubgood.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
                 oDataBomSubgood = (SDataBomSubgoods) oFormBomSubgood.getRegistry();
 
-                moBomSubgoodPane.setTableRow(oDataBomSubgoodRow = new SDataBomSubgoodsRow(oDataBomSubgood), index);
+                moBomSubgoodPane.setTableRow(new SDataBomSubgoodsRow(oDataBomSubgood), index);
                 moBomSubgoodPane.renderTableRows();
             }
         }
@@ -856,13 +817,10 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         String sTopLevel = "";
         SFormBomLevels oFormBomLevel = null;
         SDataBom oDataBomLevel = null;
-        SDataBomLevelRow oDataBomLevelRow = null;
-
         SDataBomLevelRow oRow = null;
         Vector<Object> vValues = new Vector<Object>();
 
-        if (jcbFkItemRmId.getSelectedIndex() > 0) {
-
+        if (jcbFkItemId.getSelectedIndex() > 0) {
             oFormBomLevel = new SFormBomLevels(miClient);
             oFormBomLevel.formRefreshCatalogues();
             oFormBomLevel.formReset();
@@ -887,9 +845,9 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
                 oFormBomLevel.setValue(1, sTopLevel);
             } else {
                 level = 1;
-                nFkItemId = moFieldFkItemRmId.getKeyAsIntArray()[0];
+                nFkItemId = moFieldFkItemId.getKeyAsIntArray()[0];
                 nFkUnitId = moUnit.getPkUnitId();
-                sTopLevel = jcbFkItemRmId.getSelectedItem().toString();
+                sTopLevel = jcbFkItemId.getSelectedItem().toString();
                 oFormBomLevel.setValue(1, sTopLevel);
             }
 
@@ -898,7 +856,7 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
             if (nFkItemId > 0 && nFkUnitId > 0) {
 
                 oFormBomLevel.setValue(2,(java.lang.Object) level);
-                oFormBomLevel.setValue(3, moFieldFkItemRmId.getKeyAsIntArray()[0]);
+                oFormBomLevel.setValue(3, moFieldFkItemId.getKeyAsIntArray()[0]);
 
                 // Get sum total for percentaje:
 
@@ -933,7 +891,7 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
                         moBomLevelPane.removeTableRow( moBomLevelPane.getTableGuiRowCount()-1);
                     }
 
-                    moBomLevelPane.addTableRow(oDataBomLevelRow = new SDataBomLevelRow(oDataBomLevel));
+                    moBomLevelPane.addTableRow(new SDataBomLevelRow(oDataBomLevel));
                     moBomLevelPane.renderTableRows();
                     index = moBomLevelPane.getTableGuiRowCount() - 1;
                     moBomLevelPane.getTable().setRowSelectionInterval(index, index);
@@ -949,8 +907,6 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         int index = moBomLevelPane.getTable().getSelectedRow();
         SFormBomLevels oFormBomLevel = new SFormBomLevels(miClient);
         SDataBom oDataBomLevel = null;
-        SDataBomLevelRow oDataBomLevelRow = null;
-
         SDataBomLevelRow oRow = null;
         Vector<Object> vValues = new Vector<Object>();
 
@@ -996,7 +952,7 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
                     moBomLevelPane.removeTableRow( moBomLevelPane.getTableGuiRowCount()-1);
                 }
 
-                moBomLevelPane.setTableRow(oDataBomLevelRow = new SDataBomLevelRow(oDataBomLevel), index);
+                moBomLevelPane.setTableRow(new SDataBomLevelRow(oDataBomLevel), index);
                 moBomLevelPane.renderTableRows();
                 sumLevelValues();
             }
@@ -1007,11 +963,11 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         int index = 0;
         SFormBomNotes formBomNotes = new SFormBomNotes(miClient);
         SDataBomNotes dataBomNotes = null;
-        SDataBomNotesRow dataBomNotesRow = null;
 
         formBomNotes.formRefreshCatalogues();
         formBomNotes.formReset();
         formBomNotes.setVisible(true);
+        
         if (formBomNotes.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
             dataBomNotes = (SDataBomNotes) formBomNotes.getRegistry();
 
@@ -1022,7 +978,7 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
             dataBomNotes.setUserEditTs(miClient.getSessionXXX().getWorkingDate());
             dataBomNotes.setUserDeleteTs(miClient.getSessionXXX().getWorkingDate());
 
-            moBomNotesPane.addTableRow(dataBomNotesRow = new SDataBomNotesRow(dataBomNotes));
+            moBomNotesPane.addTableRow(new SDataBomNotesRow(dataBomNotes));
             moBomNotesPane.renderTableRows();
             index = moBomNotesPane.getTableGuiRowCount() - 1;
             moBomNotesPane.getTable().setRowSelectionInterval(index, index);
@@ -1034,11 +990,11 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         int index = moBomNotesPane.getTable().getSelectedRow();
         SFormBomNotes formNotes = new SFormBomNotes(miClient);
         SDataBomNotes dataNotes = null;
-        SDataBomNotesRow dataNotesRow = null;
 
         formNotes.formRefreshCatalogues();
         formNotes.formReset();
         dataNotes = (SDataBomNotes) formNotes.getRegistry();
+        
         if (index != -1) {
             dataNotes = (SDataBomNotes) moBomNotesPane.getTableRow(index).getData();
             formNotes.setRegistry(dataNotes);
@@ -1049,7 +1005,7 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
                 dataNotes.setDbmsUserEdit(miClient.getSessionXXX().getUser().getUser());
                 dataNotes.setUserEditTs(miClient.getSessionXXX().getWorkingDate());
 
-                moBomNotesPane.setTableRow(dataNotesRow = new SDataBomNotesRow(dataNotes), index);
+                moBomNotesPane.setTableRow(new SDataBomNotesRow(dataNotes), index);
                 moBomNotesPane.renderTableRows();
             }
         }
@@ -1106,29 +1062,22 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
     private javax.swing.JButton jbSubgoodsEdit;
     private javax.swing.JButton jbSubgoodsNew;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCobId;
-    private javax.swing.JComboBox<SFormComponentItem> jcbFkItemRmId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkItemId;
     private javax.swing.JCheckBox jckIsDeleted;
     private javax.swing.JLabel jlBom;
     private javax.swing.JLabel jlCostPercentage;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
-    private javax.swing.JLabel jlDummy;
-    private javax.swing.JLabel jlDummy1;
-    private javax.swing.JLabel jlDummy2;
-    private javax.swing.JLabel jlDummy3;
-    private javax.swing.JLabel jlDummy4;
-    private javax.swing.JLabel jlDummy5;
-    private javax.swing.JLabel jlDummy6;
     private javax.swing.JLabel jlFkCobId;
-    private javax.swing.JLabel jlFkItemRmId;
+    private javax.swing.JLabel jlFkItemId;
     private javax.swing.JLabel jlLevel;
     private javax.swing.JLabel jlQty;
     private javax.swing.JPanel jpData;
-    private javax.swing.JPanel jpLevel;
     private javax.swing.JPanel jpLevelAction;
-    private javax.swing.JPanel jpNotes;
     private javax.swing.JPanel jpNotesAction;
-    private javax.swing.JPanel jpSubgoods;
+    private javax.swing.JPanel jpPaneLevel;
+    private javax.swing.JPanel jpPaneNotes;
+    private javax.swing.JPanel jpPaneSubgoods;
     private javax.swing.JPanel jpSubgoodsAction;
     private javax.swing.JToggleButton jtbEntryFilter;
     private javax.swing.JTextField jtfBom;
@@ -1180,7 +1129,7 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
     @Override
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFkCobId, SDataConstants.BPSU_BPB, new int[] { miClient.getSessionXXX().getParamsCompany().getPkConfigCoId() });
-        SFormUtilities.populateComboBox(miClient, jcbFkItemRmId, SDataConstants.ITMX_ITEM_BOM_ITEM, null);
+        SFormUtilities.populateComboBox(miClient, jcbFkItemId, SDataConstants.ITMX_ITEM_BOM_ITEM, null);
     }
 
     @Override
@@ -1188,14 +1137,12 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         int nCount = 0;
         double dPercentage = 0;
         String sMsg = "";
-
-        SDataBom oLevel = null;
         SDataBomSubgoods oBomSubgoods = null;
         SFormValidation validation = new SFormValidation();
 
         for (int i = 0; i < mvFields.size(); i++) {
             if (jlFkCobId.getText().compareTo(mvFields.get(i).getFieldName()) == 0 ||
-                jlFkItemRmId.getText().compareTo(mvFields.get(i).getFieldName()) == 0) {
+                jlFkItemId.getText().compareTo(mvFields.get(i).getFieldName()) == 0) {
                 if (!((erp.lib.form.SFormField) mvFields.get(i)).validateFieldForcing()) {
                     validation.setIsError(true);
                     validation.setComponent(((erp.lib.form.SFormField) mvFields.get(i)).getComponent());
@@ -1212,36 +1159,47 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         }
 
         if (!validation.getIsError()) {
-            if (moFieldDateEnd_n.getDate() != null && moFieldDateEnd_n.getDate().before(moFieldDateStart.getDate())) {
-                    validation.setMessage("La fecha final no puede ser anterior a la fecha inicial.");
-                    validation.setComponent(jtfDateEnd_n);
+            if (moItem.getFkItemStatusId() == SModSysConsts.ITMS_ST_ITEM_INA) {
+                validation.setMessage(SItmConsts.MSG_ERR_ST_ITEM_INA + "\n" + 
+                        SGuiConsts.TXT_LBL_CODE + ": " + moItem.getKey() + "\n" +
+                        SGuiConsts.TXT_LBL_NAME + ": " + moItem.getItem());
+                validation.setComponent(jcbFkItemId);
             }
-        }
-
-        // Validate reference:
-
-        if (!validation.getIsError()) {
-            nCount = SDataUtilities.callProcedureVal(miClient, SProcConstants.MFG_BOM_VAL,
-                    new Object[] { (moBom != null ? moBom.getPkBomId() : 0), moFieldBom.getString() },
-                    SLibConstants.EXEC_MODE_VERBOSE);
-
-            // When BOM is new, and there is a bom with the same reference:
-
-            if ((moBom == null || moBom.getPkBomId() == 0) && nCount > 0) {
-                sMsg = "Ya existe una fórmula con esta misma referencia.";
+            else if (moItem.getFkItemStatusId() == SModSysConsts.ITMS_ST_ITEM_RES) {
+                validation.setMessage(SItmConsts.MSG_ERR_ST_ITEM_RES + "\n" + 
+                        SGuiConsts.TXT_LBL_CODE + ": " + moItem.getKey() + "\n" +
+                        SGuiConsts.TXT_LBL_NAME + ": " + moItem.getItem());
+                validation.setComponent(jcbFkItemId);
             }
-            else if (moBom != null && moBom.getPkBomId() > 0) {
+            else if (moFieldDateEnd_n.getDate() != null && moFieldDateEnd_n.getDate().before(moFieldDateStart.getDate())) {
+                validation.setMessage("La fecha final no puede ser anterior a la fecha inicial.");
+                validation.setComponent(jtfDateEnd_n);
+            }
+            else {
+                // Validate reference:
 
-                // When BOM isn't new, and there is a bom with the same reference:
+                nCount = SDataUtilities.callProcedureVal(miClient, SProcConstants.MFG_BOM_VAL,
+                        new Object[] { (moBom != null ? moBom.getPkBomId() : 0), moFieldBom.getString() },
+                        SLibConstants.EXEC_MODE_VERBOSE);
 
-                if (nCount > 1 || (nCount == 1 && moBom.getBom().compareTo(moFieldBom.getString()) != 0)) {
+                // When BOM is new, and there is a bom with the same reference:
+
+                if ((moBom == null || moBom.getPkBomId() == 0) && nCount > 0) {
                     sMsg = "Ya existe una fórmula con esta misma referencia.";
                 }
-            }
+                else if (moBom != null && moBom.getPkBomId() > 0) {
 
-            if (sMsg.length() > 0) {
-                validation.setMessage(sMsg);
-                validation.setComponent(jtfBom);
+                    // When BOM isn't new, and there is a bom with the same reference:
+
+                    if (nCount > 1 || (nCount == 1 && moBom.getBom().compareTo(moFieldBom.getString()) != 0)) {
+                        sMsg = "Ya existe una fórmula con esta misma referencia.";
+                    }
+                }
+
+                if (!sMsg.isEmpty()) {
+                    validation.setMessage(sMsg);
+                    validation.setComponent(jtfBom);
+                }
             }
         }
 
@@ -1297,7 +1255,7 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         moBom = (SDataBom) registry;
 
         moFieldFkCobId.setKey(new int[] { moBom.getFkCobId() });
-        moFieldFkItemRmId.setKey(new int[] { moBom.getFkItemId() });
+        moFieldFkItemId.setKey(new int[] { moBom.getFkItemId() });
         moFieldBom.setFieldValue(moBom.getBom());
         moFieldLevel.setFieldValue(moBom.getLevel());
         moFieldQty.setFieldValue(moBom.getQuantity());
@@ -1325,7 +1283,7 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         }
 
         enabledFields(false);
-        fkItemIdFocusLostFkItemId();
+        itemStateChangedFkItemId();
         sumLevelValues();
     }
 
@@ -1345,7 +1303,7 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
             moBom.setUserDeleteTs(miClient.getSessionXXX().getWorkingDate());
 
             moBom.setFkCobId(moFieldFkCobId.getKeyAsIntArray()[0]);
-            moBom.setFkItemId(moFieldFkItemRmId.getKeyAsIntArray()[0]);
+            moBom.setFkItemId(moFieldFkItemId.getKeyAsIntArray()[0]);
             moBom.setFkUnitId(moItem.getFkUnitId());
         }
         else {
@@ -1367,7 +1325,7 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         moBom.setDateStart(moFieldDateStart.getDate());
         moBom.setDateEnd_n(moFieldDateEnd_n.getDate());
         moBom.setIsDeleted(moFieldIsDeleted.getBoolean());
-        moBom.setRoot(moFieldFkItemRmId.getKeyAsIntArray()[0]);
+        moBom.setRoot(moFieldFkItemId.getKeyAsIntArray()[0]);
 
         moBom.getDbmsBomSubgoods().removeAllElements();
         for (int i = 0; i < moBomSubgoodPane.getTableGuiRowCount(); i++) {
@@ -1379,7 +1337,6 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
         moBom.getDbmsLevel().removeAllElements();
         for (int i = 0; i < moBomLevelPane.getTableGuiRowCount()-1; i++) {
             oLevel = (SDataBom) moBomLevelPane.getTableRow(i).getData();
-            //oLevel.setIsDeleted(moBom.getIsDeleted());
             moBom.getDbmsLevel().add(oLevel);
         }
 
@@ -1456,6 +1413,17 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
 
             if (toggleButton == jtbEntryFilter) {
                 actionEntryFilter();
+            }
+        }
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof JComboBox) {
+            JComboBox comboBox = (JComboBox) e.getSource();
+            
+            if (comboBox == jcbFkItemId) {
+                itemStateChangedFkItemId();
             }
         }
     }

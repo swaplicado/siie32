@@ -181,7 +181,7 @@
             <Property name="verticalGap" type="int" value="5"/>
           </Layout>
           <SubComponents>
-            <Component class="javax.swing.JRadioButton" name="jrbFindByKey">
+            <Component class="javax.swing.JRadioButton" name="jrbFindByItemKey">
               <Properties>
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                   <ComponentRef name="bgFind"/>
@@ -189,10 +189,10 @@
                 <Property name="text" type="java.lang.String" value="Por clave"/>
               </Properties>
               <Events>
-                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="jrbFindByKeyItemStateChanged"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="jrbFindByItemKeyItemStateChanged"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JRadioButton" name="jrbFindByName">
+            <Component class="javax.swing.JRadioButton" name="jrbFindByItemName">
               <Properties>
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                   <ComponentRef name="bgFind"/>
@@ -200,7 +200,7 @@
                 <Property name="text" type="java.lang.String" value="Por nombre"/>
               </Properties>
               <Events>
-                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="jrbFindByNameItemStateChanged"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="jrbFindByItemNameItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JRadioButton" name="jrbFindByBrand">
@@ -331,15 +331,15 @@
                 <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JToggleButton" name="jtbFindExactMatch">
+                <Component class="javax.swing.JCheckBox" name="jckFindExactMatch">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="B&#xfa;squeda exacta"/>
+                    <Property name="text" type="java.lang.String" value="Realizar b&#xfa;squeda exacta"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[125, 23]"/>
+                      <Dimension value="[200, 23]"/>
                     </Property>
                   </Properties>
                   <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jtbFindExactMatchActionPerformed"/>
+                    <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="jckFindExactMatchItemStateChanged"/>
                   </Events>
                 </Component>
               </SubComponents>

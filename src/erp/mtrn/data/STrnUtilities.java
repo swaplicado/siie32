@@ -970,6 +970,24 @@ public abstract class STrnUtilities {
 
         return msg;
     }
+    
+    /**
+     * Gets proper IOG category ID for for provided DPS class key.
+     * @param dpsClassKey DPS class key. Constants defined in SDataConstantsSys.
+     * @return Corresponding IOG category ID, if any, otherwise <code>SLibConsts.UNDEFINED</code>.
+     */
+    public static int getIogCatForDpsClass(final int[] dpsClassKey) {
+        int cat = SLibConsts.UNDEFINED;
+        
+        if (SLibUtils.belongsTo(dpsClassKey, new int[][] { SDataConstantsSys.TRNS_CL_DPS_PUR_EST, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC, SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ })) {
+            cat = SDataConstantsSys.TRNS_CT_IOG_IN;
+        }
+        else if (SLibUtils.belongsTo(dpsClassKey, new int[][] { SDataConstantsSys.TRNS_CL_DPS_SAL_EST, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC, SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ })) {
+            cat = SDataConstantsSys.TRNS_CT_IOG_OUT;
+        }
+        
+        return cat;
+    }
 
     /**
      * Validates appropriate warehouse item for provided parameter.

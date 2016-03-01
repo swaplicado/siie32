@@ -22,6 +22,8 @@ import erp.mmfg.data.SDataBom;
 import erp.mmfg.data.SDataBomNotes;
 import erp.mmfg.data.SDataBomNotesRow;
 import erp.mmfg.data.SDataBomSubstitute;
+import erp.mod.SModSysConsts;
+import erp.mod.itm.db.SItmConsts;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
@@ -31,17 +33,19 @@ import java.text.DecimalFormat;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JTextField;
+import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author  Néstor Ávalos
+ * @author  Néstor Ávalos, Sergio Flores
  */
 public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener {
 
     private int mnFormType;
     private int mnFormResult;
     private int mnFormStatus;
-    private int mnRoot;
+    private int mnRootItemId;
     private boolean mbFirstTime;
     private boolean mbResetingForm;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
@@ -74,7 +78,7 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
 
     private erp.lib.table.STablePaneGrid moBomLevelPane;
 
-    /** Creates new form DFormCompany */
+    /** Creates new form SFormBomLevels */
     public SFormBomLevels(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
@@ -96,8 +100,8 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
         jlLevel = new javax.swing.JLabel();
         jtfLevel = new javax.swing.JTextField();
         jPanel6 = new javax.swing.JPanel();
-        jlItemBom = new javax.swing.JLabel();
-        jtfItemBom = new javax.swing.JTextField();
+        jlRootItem = new javax.swing.JLabel();
+        jtfRootItem = new javax.swing.JTextField();
         jPanel7 = new javax.swing.JPanel();
         jlFkItemId = new javax.swing.JLabel();
         jcbFkItemId = new javax.swing.JComboBox<SFormComponentItem>();
@@ -136,11 +140,8 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
         jlItemSubstitutePercentageMax = new javax.swing.JLabel();
         jtfItemSubstitutePercentageMax = new javax.swing.JTextField();
         jPanel13 = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
         jckIsNotExplotion = new javax.swing.JCheckBox();
-        jPanel1 = new javax.swing.JPanel();
         jckIsRequested = new javax.swing.JCheckBox();
-        jPanel5 = new javax.swing.JPanel();
         jckIsDeleted = new javax.swing.JCheckBox();
         jpNotes = new javax.swing.JPanel();
         jpNotesAction = new javax.swing.JPanel();
@@ -168,29 +169,29 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlLevel.setText("Nivel:");
-        jlLevel.setPreferredSize(new java.awt.Dimension(140, 23));
+        jlLevel.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel27.add(jlLevel);
 
         jtfLevel.setEditable(false);
         jtfLevel.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jtfLevel.setText("0");
         jtfLevel.setFocusable(false);
-        jtfLevel.setPreferredSize(new java.awt.Dimension(70, 23));
+        jtfLevel.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel27.add(jtfLevel);
 
         jPanel3.add(jPanel27);
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlItemBom.setText("Producto:");
-        jlItemBom.setPreferredSize(new java.awt.Dimension(140, 23));
-        jPanel6.add(jlItemBom);
+        jlRootItem.setText("Producto:");
+        jlRootItem.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel6.add(jlRootItem);
 
-        jtfItemBom.setEditable(false);
-        jtfItemBom.setText("TOP LEVEL");
-        jtfItemBom.setFocusable(false);
-        jtfItemBom.setPreferredSize(new java.awt.Dimension(400, 23));
-        jPanel6.add(jtfItemBom);
+        jtfRootItem.setEditable(false);
+        jtfRootItem.setText("TOP LEVEL");
+        jtfRootItem.setFocusable(false);
+        jtfRootItem.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel6.add(jtfRootItem);
 
         jPanel3.add(jPanel6);
 
@@ -199,7 +200,7 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
 
         jlFkItemId.setForeground(java.awt.Color.blue);
         jlFkItemId.setText("Insumo: *");
-        jlFkItemId.setPreferredSize(new java.awt.Dimension(140, 23));
+        jlFkItemId.setPreferredSize(new java.awt.Dimension(100, 23));
         jlFkItemId.setRequestFocusEnabled(false);
         jPanel7.add(jlFkItemId);
 
@@ -213,7 +214,7 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
         jPanel7.add(jcbFkItemId);
 
         jbFkItemId.setText("...");
-        jbFkItemId.setToolTipText("Seleccionar materia prima");
+        jbFkItemId.setToolTipText("Seleccionar insumo");
         jbFkItemId.setFocusable(false);
         jbFkItemId.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel7.add(jbFkItemId);
@@ -222,8 +223,8 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlQty.setText("Cantidad: ");
-        jlQty.setPreferredSize(new java.awt.Dimension(140, 23));
+        jlQty.setText("Cantidad:");
+        jlQty.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel9.add(jlQty);
 
         jtfQty.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
@@ -233,7 +234,7 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
 
         jtfDbmsQtyUnitSymbol.setEditable(false);
         jtfDbmsQtyUnitSymbol.setFocusable(false);
-        jtfDbmsQtyUnitSymbol.setPreferredSize(new java.awt.Dimension(40, 23));
+        jtfDbmsQtyUnitSymbol.setPreferredSize(new java.awt.Dimension(35, 23));
         jPanel9.add(jtfDbmsQtyUnitSymbol);
 
         jPanel3.add(jPanel9);
@@ -241,7 +242,7 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
         jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPercentage.setText("Porcentaje:");
-        jlPercentage.setPreferredSize(new java.awt.Dimension(140, 23));
+        jlPercentage.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel26.add(jlPercentage);
 
         jtfPercentage.setEditable(false);
@@ -256,7 +257,7 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
         jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCost.setText("Costo:");
-        jlCost.setPreferredSize(new java.awt.Dimension(140, 23));
+        jlCost.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel28.add(jlCost);
 
         jtfCost.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
@@ -266,7 +267,7 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
 
         jtfDbmsQtyCostUnitSymbol.setEditable(false);
         jtfDbmsQtyCostUnitSymbol.setFocusable(false);
-        jtfDbmsQtyCostUnitSymbol.setPreferredSize(new java.awt.Dimension(40, 23));
+        jtfDbmsQtyCostUnitSymbol.setPreferredSize(new java.awt.Dimension(35, 23));
         jPanel28.add(jtfDbmsQtyCostUnitSymbol);
 
         jPanel3.add(jPanel28);
@@ -274,28 +275,28 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDuration.setText("Duración: ");
-        jlDuration.setPreferredSize(new java.awt.Dimension(140, 23));
+        jlDuration.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel10.add(jlDuration);
 
         jtfDuration.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jtfDuration.setText("0");
-        jtfDuration.setPreferredSize(new java.awt.Dimension(70, 23));
+        jtfDuration.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel10.add(jtfDuration);
 
         jlHr.setText(" hr");
-        jlHr.setPreferredSize(new java.awt.Dimension(13, 23));
+        jlHr.setPreferredSize(new java.awt.Dimension(35, 23));
         jPanel10.add(jlHr);
 
         jPanel3.add(jPanel10);
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateStart.setText("Fecha inicial vigencia: *");
-        jlDateStart.setPreferredSize(new java.awt.Dimension(140, 23));
+        jlDateStart.setText("Inicio vigencia: *");
+        jlDateStart.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel11.add(jlDateStart);
 
         jftDateStart.setText("dd/mm/yyyy");
-        jftDateStart.setPreferredSize(new java.awt.Dimension(100, 23));
+        jftDateStart.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel11.add(jftDateStart);
 
         jbSetDateStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
@@ -308,13 +309,13 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateEnd.setText("Fecha final vigencia: ");
-        jlDateEnd.setPreferredSize(new java.awt.Dimension(140, 23));
+        jlDateEnd.setText("Fin vigencia: ");
+        jlDateEnd.setPreferredSize(new java.awt.Dimension(100, 23));
         jlDateEnd.setRequestFocusEnabled(false);
         jPanel12.add(jlDateEnd);
 
         jftDateEnd_n.setText("dd/mm/yyyy");
-        jftDateEnd_n.setPreferredSize(new java.awt.Dimension(100, 23));
+        jftDateEnd_n.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel12.add(jftDateEnd_n);
 
         jbSetDateEnd_n.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
@@ -328,7 +329,7 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkItemSubstituteId.setText("Insumo sustituto: ");
-        jlFkItemSubstituteId.setPreferredSize(new java.awt.Dimension(140, 23));
+        jlFkItemSubstituteId.setPreferredSize(new java.awt.Dimension(100, 23));
         jlFkItemSubstituteId.setRequestFocusEnabled(false);
         jPanel19.add(jlFkItemSubstituteId);
 
@@ -342,7 +343,7 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
         jPanel19.add(jcbFkItemSubstituteId);
 
         jbFkItemSubstituteId.setText("...");
-        jbFkItemSubstituteId.setToolTipText("Seleccionar insumo sustituto");
+        jbFkItemSubstituteId.setToolTipText("Seleccionar insumo");
         jbFkItemSubstituteId.setFocusable(false);
         jbFkItemSubstituteId.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel19.add(jbFkItemSubstituteId);
@@ -351,8 +352,8 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
 
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlItemSubstitutePercentage.setText("Porcentaje sugerido i. sust.:");
-        jlItemSubstitutePercentage.setPreferredSize(new java.awt.Dimension(140, 23));
+        jlItemSubstitutePercentage.setText("Mezcla sugerida:");
+        jlItemSubstitutePercentage.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel29.add(jlItemSubstitutePercentage);
 
         jtfItemSubstitutePercentage.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
@@ -364,8 +365,8 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
 
         jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlItemSubstitutePercentageMax.setText("Porcentaje máximo i. sust.:");
-        jlItemSubstitutePercentageMax.setPreferredSize(new java.awt.Dimension(140, 23));
+        jlItemSubstitutePercentageMax.setText("Mezcla máxima:");
+        jlItemSubstitutePercentageMax.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel30.add(jlItemSubstitutePercentageMax);
 
         jtfItemSubstitutePercentageMax.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
@@ -377,22 +378,16 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jPanel4.setPreferredSize(new java.awt.Dimension(135, 15));
-        jPanel13.add(jPanel4);
-
         jckIsNotExplotion.setText("No explosionar");
+        jckIsNotExplotion.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel13.add(jckIsNotExplotion);
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(40, 15));
-        jPanel13.add(jPanel1);
-
         jckIsRequested.setText("Requerido en movimientos de inventarios");
+        jckIsRequested.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel13.add(jckIsRequested);
 
-        jPanel5.setPreferredSize(new java.awt.Dimension(40, 15));
-        jPanel13.add(jPanel5);
-
         jckIsDeleted.setText("Registro eliminado");
+        jckIsDeleted.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel13.add(jckIsDeleted);
 
         jPanel3.add(jPanel13);
@@ -442,8 +437,8 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-795)/2, (screenSize.height-547)/2, 795, 547);
+        setSize(new java.awt.Dimension(795, 547));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -451,11 +446,11 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
     }//GEN-LAST:event_formWindowActivated
 
     private void jcbFkItemIdItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbFkItemIdItemStateChanged
-        fkItemIdStateChangedFkItemId();
+        itemStateChangedFkItemId();
     }//GEN-LAST:event_jcbFkItemIdItemStateChanged
 
     private void jcbFkItemSubstituteIdItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbFkItemSubstituteIdItemStateChanged
-        fkItemSubstituteIdStateChangedFkItemSubstituteId();
+        itemStateChangedFkItemSubstituteId();
     }//GEN-LAST:event_jcbFkItemSubstituteIdItemStateChanged
 
     private void initComponentsExtra() {
@@ -467,7 +462,7 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
         moBomNotesPane.setDoubleClickAction(this, "publicActionNotesEdit");
         jpNotes.add(moBomNotesPane, BorderLayout.CENTER);
 
-        moFieldItemBom = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfItemBom, jlItemBom);
+        moFieldItemBom = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfRootItem, jlRootItem);
         moFieldItemBom.setLengthMax(255);
         moFieldFkItemId = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkItemId, jlFkItemId);
         moFieldFkItemId.setPickerButton(jbFkItemId);
@@ -571,17 +566,25 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
         }
     }
 
-    private void fkItemSubstituteIdStateChangedFkItemSubstituteId() {
-        if (jcbFkItemSubstituteId.getSelectedIndex()>0) {
-            moItemSubstitute = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, moFieldFkItemSubstituteId.getKey(), SLibConstants.EXEC_MODE_VERBOSE);
+    private void itemStateChangedFkItemId() {
+        if (jcbFkItemId.getSelectedIndex() <= 0) {
+            moItem = null;
+            jtfDbmsQtyUnitSymbol.setText("");
+            jtfDbmsQtyCostUnitSymbol.setText("");
+        }
+        else {
+            moItem = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, moFieldFkItemId.getKey(), SLibConstants.EXEC_MODE_VERBOSE);
+            jtfDbmsQtyUnitSymbol.setText(moItem.getDbmsDataUnit().getSymbol());
+            jtfDbmsQtyCostUnitSymbol.setText("$/" + moItem.getDbmsDataUnit().getSymbol());
         }
     }
 
-    private void fkItemIdStateChangedFkItemId() {
-        if (jcbFkItemId.getSelectedIndex()>0) {
-            jtfDbmsQtyUnitSymbol.setText(((erp.lib.form.SFormComponentItem) jcbFkItemId.getModel().getSelectedItem()).getComplement().toString());
-            jtfDbmsQtyCostUnitSymbol.setText("$/" + ((erp.lib.form.SFormComponentItem) jcbFkItemId.getModel().getSelectedItem()).getComplement().toString());
-            moItem = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, moFieldFkItemId.getKey(), SLibConstants.EXEC_MODE_VERBOSE);
+    private void itemStateChangedFkItemSubstituteId() {
+        if (jcbFkItemSubstituteId.getSelectedIndex() <= 0) {
+            moItemSubstitute = null;
+        }
+        else {
+            moItemSubstitute = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, moFieldFkItemSubstituteId.getKey(), SLibConstants.EXEC_MODE_VERBOSE);
         }
     }
 
@@ -697,7 +700,6 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
@@ -710,8 +712,6 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
     private javax.swing.JPanel jPanel29;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel30;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel9;
@@ -738,24 +738,24 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
     private javax.swing.JLabel jlFkItemId;
     private javax.swing.JLabel jlFkItemSubstituteId;
     private javax.swing.JLabel jlHr;
-    private javax.swing.JLabel jlItemBom;
     private javax.swing.JLabel jlItemSubstitutePercentage;
     private javax.swing.JLabel jlItemSubstitutePercentageMax;
     private javax.swing.JLabel jlLevel;
     private javax.swing.JLabel jlPercentage;
     private javax.swing.JLabel jlQty;
+    private javax.swing.JLabel jlRootItem;
     private javax.swing.JPanel jpNotes;
     private javax.swing.JPanel jpNotesAction;
     private javax.swing.JTextField jtfCost;
     private javax.swing.JTextField jtfDbmsQtyCostUnitSymbol;
     private javax.swing.JTextField jtfDbmsQtyUnitSymbol;
     private javax.swing.JTextField jtfDuration;
-    private javax.swing.JTextField jtfItemBom;
     private javax.swing.JTextField jtfItemSubstitutePercentage;
     private javax.swing.JTextField jtfItemSubstitutePercentageMax;
     private javax.swing.JTextField jtfLevel;
     private javax.swing.JTextField jtfPercentage;
     private javax.swing.JTextField jtfQty;
+    private javax.swing.JTextField jtfRootItem;
     // End of variables declaration//GEN-END:variables
 
     public void setBomLevels(erp.lib.table.STablePaneGrid o) { moBomLevelPane = o; }
@@ -782,7 +782,7 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
 
         moFieldDateStart.setFieldValue(miClient.getSessionXXX().getWorkingDate());
         moFieldDateEnd_n.setFieldValue(null);
-        mnRoot = 0;
+        mnRootItemId = 0;
 
         jcbFkItemId.setEnabled(true);
         jcbFkItemId.setFocusable(true);
@@ -824,39 +824,58 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
         }
 
         if (!validation.getIsError()) {
-            if (moFieldFkItemId.getKeyAsIntArray()[0] == mnRoot) {
-                miClient.showMsgBoxInformation("La materia prima seleccionada no puede ser igual al producto terminado");
-                validation.setIsError(true);
-                validation.setComponent(moFieldFkItemId.getComponent());
+            if (moFieldFkItemId.getKeyAsIntArray()[0] == mnRootItemId) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + jlFkItemId.getText() + "' " + SGuiConsts.ERR_MSG_FIELD_VAL_EQUAL_NOT + "'" + jlRootItem.getText() + "'.");
+                validation.setComponent(jcbFkItemId);
             }
-        }
-
-        if (!validation.getIsError()) {
-            if (jcbFkItemSubstituteId.getSelectedIndex()>0) {
-                if (moItem.getFkUnitId() != moItemSubstitute.getFkUnitId()) {
-                    validation.setMessage("Las unidades del insumo '" + moItem.getKey() + "' unidad '" + ((erp.lib.form.SFormComponentItem) jcbFkItemId.getModel().getSelectedItem()).getComplement().toString() +
-                            "' y el insumo sustituto '" + moItemSubstitute.getKey() + "' unidad '" + ((erp.lib.form.SFormComponentItem) jcbFkItemSubstituteId.getModel().getSelectedItem()).getComplement().toString() +
-                            "' deben ser iguales");
-                    validation.setComponent(moFieldFkItemSubstituteId.getComponent());
-                }
+            else if (jcbFkItemSubstituteId.getSelectedIndex() > 0 && moFieldFkItemSubstituteId.getKeyAsIntArray()[0] == moFieldFkItemId.getKeyAsIntArray()[0]) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + jlFkItemSubstituteId.getText() + "' " + SGuiConsts.ERR_MSG_FIELD_VAL_EQUAL_NOT + "'" + jlFkItemId.getText() + "'.");
+                validation.setComponent(jcbFkItemSubstituteId);
             }
-        }
-
-        if (!validation.getIsError()) {
-            if (moFieldItemSubstitutePercentage.getDouble() > moFieldItemSubstitutePercentageMax.getDouble()) {
-                validation.setMessage("El porcentaje sugerido no puede ser mayor al porcentaje máximo");
-                validation.setComponent(moFieldItemSubstitutePercentage.getComponent());
+            else if (jcbFkItemSubstituteId.getSelectedIndex() > 0 && moItem.getFkUnitId() != moItemSubstitute.getFkUnitId()) {
+                validation.setMessage("La unidad de " + SGuiUtils.getLabelName(jlFkItemId) + " '" + moItem.getItem() + " (" + moItem.getKey() + ")', '" + moItem.getDbmsDataUnit().getSymbol() + "',\n" + SGuiConsts.ERR_MSG_FIELD_VAL_EQUAL +
+                        "la de " + SGuiUtils.getLabelName(jlFkItemSubstituteId) + " '" + moItemSubstitute.getItem() + " (" + moItemSubstitute.getKey() + ")', '" + moItemSubstitute.getDbmsDataUnit().getSymbol() + "'.");
+                validation.setComponent(moFieldFkItemSubstituteId.getComponent());
             }
-        }
-
-        if (!validation.getIsError()) {
-            if (jcbFkItemId.getSelectedIndex() > 0 &&
-                    jcbFkItemSubstituteId.getSelectedIndex() > 0) {
-
-                if (moFieldFkItemId.getKeyAsIntArray()[0] == moFieldFkItemSubstituteId.getKeyAsIntArray()[0]) {
-                    validation.setMessage("El insumo e insumo sustituto deben ser diferentes.");
-                    validation.setComponent(moFieldFkItemSubstituteId.getComponent());
-                }
+            else if (moItem.getFkItemStatusId() == SModSysConsts.ITMS_ST_ITEM_INA) {
+                validation.setMessage(SItmConsts.MSG_ERR_ST_ITEM_INA + "\n" + 
+                        SGuiConsts.TXT_LBL_CODE + ": " + moItem.getKey() + "\n" +
+                        SGuiConsts.TXT_LBL_NAME + ": " + moItem.getItem());
+                validation.setComponent(jcbFkItemId);
+            }
+            else if (moItem.getFkItemStatusId() == SModSysConsts.ITMS_ST_ITEM_RES) {
+                validation.setMessage(SItmConsts.MSG_ERR_ST_ITEM_RES + "\n" + 
+                        SGuiConsts.TXT_LBL_CODE + ": " + moItem.getKey() + "\n" +
+                        SGuiConsts.TXT_LBL_NAME + ": " + moItem.getItem());
+                validation.setComponent(jcbFkItemId);
+            }
+            else if (moItemSubstitute != null && moItemSubstitute.getFkItemStatusId() == SModSysConsts.ITMS_ST_ITEM_INA) {
+                validation.setMessage(SItmConsts.MSG_ERR_ST_ITEM_INA + "\n" + 
+                        SGuiConsts.TXT_LBL_CODE + ": " + moItemSubstitute.getKey() + "\n" +
+                        SGuiConsts.TXT_LBL_NAME + ": " + moItemSubstitute.getItem());
+                validation.setComponent(jcbFkItemSubstituteId);
+            }
+            else if (moItemSubstitute != null && moItemSubstitute.getFkItemStatusId() == SModSysConsts.ITMS_ST_ITEM_RES) {
+                validation.setMessage(SItmConsts.MSG_ERR_ST_ITEM_RES + "\n" + 
+                        SGuiConsts.TXT_LBL_CODE + ": " + moItemSubstitute.getKey() + "\n" +
+                        SGuiConsts.TXT_LBL_NAME + ": " + moItemSubstitute.getItem());
+                validation.setComponent(jcbFkItemSubstituteId);
+            }
+            else if (jcbFkItemSubstituteId.getSelectedIndex() <= 0 && (moFieldItemSubstitutePercentage.getDouble() != 0d || moFieldItemSubstitutePercentageMax.getDouble() != 0d)) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + jlFkItemSubstituteId.getText() + "'.");
+                validation.setComponent(jcbFkItemSubstituteId);
+            }
+            else if (jcbFkItemSubstituteId.getSelectedIndex() > 0 && moFieldItemSubstitutePercentage.getDouble() == 0d) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + jlItemSubstitutePercentage.getText() + "'.");
+                validation.setComponent(jtfItemSubstitutePercentage);
+            }
+            else if (jcbFkItemSubstituteId.getSelectedIndex() > 0 && moFieldItemSubstitutePercentageMax.getDouble() == 0d) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + jlItemSubstitutePercentageMax.getText() + "'.");
+                validation.setComponent(jtfItemSubstitutePercentageMax);
+            }
+            else if (moFieldItemSubstitutePercentage.getDouble() >  moFieldItemSubstitutePercentageMax.getDouble()) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + jlItemSubstitutePercentage.getText() + "' " + SGuiConsts.ERR_MSG_FIELD_VAL_LESS_EQUAL + "'" + jlItemSubstitutePercentageMax.getText() + "'.");
+                validation.setComponent(jtfItemSubstitutePercentage);
             }
         }
 
@@ -986,7 +1005,7 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
         moBomLevel.setIsDeleted(moFieldIsDeleted.getBoolean());
         moBomLevel.setIsNotExplotion(moFieldIsNotExplotion.getBoolean());
         moBomLevel.setIsRequested(moFieldIsRequested.getBoolean());
-        moBomLevel.setRoot(mnRoot);
+        moBomLevel.setRoot(mnRootItemId);
         moBomLevel.setCost(moFieldCost.getDouble());
         moBomLevel.setPercentage(moFieldPercentage.getDouble());
 
@@ -1044,7 +1063,7 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
                 moFieldLevel.setInteger(SLibUtilities.parseInt(value.toString()));
                 break;
             case 3:
-                mnRoot = SLibUtilities.parseInt(value.toString());
+                mnRootItemId = SLibUtilities.parseInt(value.toString());
                 break;
             case 4:
                 dQuantityTotal = (Double) value;

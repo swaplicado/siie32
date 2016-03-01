@@ -29,6 +29,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Vector;
+import sa.lib.SLibConsts;
 
 /**
  *
@@ -89,8 +90,8 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
         jpOptionPane = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
-        jrbFindByKey = new javax.swing.JRadioButton();
-        jrbFindByName = new javax.swing.JRadioButton();
+        jrbFindByItemKey = new javax.swing.JRadioButton();
+        jrbFindByItemName = new javax.swing.JRadioButton();
         jrbFindByBrand = new javax.swing.JRadioButton();
         jrbFindByManufacturer = new javax.swing.JRadioButton();
         jPanel4 = new javax.swing.JPanel();
@@ -102,7 +103,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
         jlItemClass = new javax.swing.JLabel();
         jcbItemClass = new javax.swing.JComboBox();
         jPanel6 = new javax.swing.JPanel();
-        jtbFindExactMatch = new javax.swing.JToggleButton();
+        jckFindExactMatch = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Seleccionar ítem");
@@ -181,23 +182,23 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Búsqueda:"));
         jPanel3.setLayout(new java.awt.GridLayout(5, 1, 5, 5));
 
-        bgFind.add(jrbFindByKey);
-        jrbFindByKey.setText("Por clave");
-        jrbFindByKey.addItemListener(new java.awt.event.ItemListener() {
+        bgFind.add(jrbFindByItemKey);
+        jrbFindByItemKey.setText("Por clave");
+        jrbFindByItemKey.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jrbFindByKeyItemStateChanged(evt);
+                jrbFindByItemKeyItemStateChanged(evt);
             }
         });
-        jPanel3.add(jrbFindByKey);
+        jPanel3.add(jrbFindByItemKey);
 
-        bgFind.add(jrbFindByName);
-        jrbFindByName.setText("Por nombre");
-        jrbFindByName.addItemListener(new java.awt.event.ItemListener() {
+        bgFind.add(jrbFindByItemName);
+        jrbFindByItemName.setText("Por nombre");
+        jrbFindByItemName.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jrbFindByNameItemStateChanged(evt);
+                jrbFindByItemNameItemStateChanged(evt);
             }
         });
-        jPanel3.add(jrbFindByName);
+        jPanel3.add(jrbFindByItemName);
 
         bgFind.add(jrbFindByBrand);
         jrbFindByBrand.setText("Por marca");
@@ -265,14 +266,14 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jtbFindExactMatch.setText("Búsqueda exacta");
-        jtbFindExactMatch.setPreferredSize(new java.awt.Dimension(125, 23));
-        jtbFindExactMatch.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtbFindExactMatchActionPerformed(evt);
+        jckFindExactMatch.setText("Realizar búsqueda exacta");
+        jckFindExactMatch.setPreferredSize(new java.awt.Dimension(200, 23));
+        jckFindExactMatch.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jckFindExactMatchItemStateChanged(evt);
             }
         });
-        jPanel6.add(jtbFindExactMatch);
+        jPanel6.add(jckFindExactMatch);
 
         jPanel2.add(jPanel6, java.awt.BorderLayout.CENTER);
 
@@ -280,8 +281,8 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.NORTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-800)/2, (screenSize.height-500)/2, 800, 500);
+        setSize(new java.awt.Dimension(800, 500));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jbOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbOKActionPerformed
@@ -296,17 +297,17 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
-    private void jrbFindByKeyItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jrbFindByKeyItemStateChanged
+    private void jrbFindByItemKeyItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jrbFindByItemKeyItemStateChanged
         if (!mbResetingForm && evt.getStateChange() == ItemEvent.SELECTED) {
             populateTable();
         }
-    }//GEN-LAST:event_jrbFindByKeyItemStateChanged
+    }//GEN-LAST:event_jrbFindByItemKeyItemStateChanged
 
-    private void jrbFindByNameItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jrbFindByNameItemStateChanged
+    private void jrbFindByItemNameItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jrbFindByItemNameItemStateChanged
         if (!mbResetingForm && evt.getStateChange() == ItemEvent.SELECTED) {
             populateTable();
         }
-    }//GEN-LAST:event_jrbFindByNameItemStateChanged
+    }//GEN-LAST:event_jrbFindByItemNameItemStateChanged
 
     private void jrbFindByBrandItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jrbFindByBrandItemStateChanged
         if (!mbResetingForm && evt.getStateChange() == ItemEvent.SELECTED) {
@@ -319,10 +320,6 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
             populateTable();
         }
     }//GEN-LAST:event_jrbFindByManufacturerItemStateChanged
-
-    private void jtbFindExactMatchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtbFindExactMatchActionPerformed
-        actionFindKeyReleased();
-    }//GEN-LAST:event_jtbFindExactMatchActionPerformed
 
     private void jtfSearchTextKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jtfSearchTextKeyReleased
         actionFindKeyReleased();
@@ -337,6 +334,10 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
     private void jtfSearchTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfSearchTextActionPerformed
         actionSearchText();
     }//GEN-LAST:event_jtfSearchTextActionPerformed
+
+    private void jckFindExactMatchItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jckFindExactMatchItemStateChanged
+        actionFindKeyReleased();
+    }//GEN-LAST:event_jckFindExactMatchItemStateChanged
 
     private void initComponentsExtra() {
         mbResetingForm = true;
@@ -356,14 +357,14 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
 
         if (bgFind.getSelection() == null) {
             if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
-                jrbFindByKey.setSelected(true);
+                jrbFindByItemKey.setSelected(true);
             }
             else {
-                jrbFindByName.setSelected(true);
+                jrbFindByItemName.setSelected(true);
             }
         }
 
-        jtbFindExactMatch.setSelected(true);
+        jckFindExactMatch.setSelected(false);
 
         if (mnOptionType == SDataConstants.ITMX_ITEM_IOG) {
             jlItemClass.setEnabled(true);
@@ -436,49 +437,46 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
 
     private void populateTable() {
         int col = 0;
+        int dataType = SLibConsts.UNDEFINED;
+        String[] titles = null;
         HashMap<Integer, Object> params = new HashMap<Integer, Object>();
 
-        params.put(SLibConstants.VALUE_INV_ONLY, mbInventoriableOnly);
+        aoTableColumns = new STableColumnForm[showStock() ? 10 : 9];
 
-        mvTableRows.clear();
-        aoTableColumns = new STableColumnForm[!showStock() ? 8 : 9];
+        if (jrbFindByItemKey.isSelected() || jrbFindByItemName.isSelected()) {
+            dataType = jrbFindByItemKey.isSelected() ? SDataConstants.ITMX_ITEM_BY_KEY : SDataConstants.ITMX_ITEM_BY_NAME;
 
-        if (jrbFindByKey.isSelected()) {
-            mvTableRows = SDataReadTableRows.getTableRows(miClient, SDataConstants.ITMX_ITEM_BY_KEY, moFilterKey, params);
-
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
+            if (jrbFindByItemKey.isSelected()) {
+                aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
+                aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
+            }
+            else {
+                aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
+                aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
+            }
+            
             if (showStock()) {
                 aoTableColumns[col] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Existencias", STableConstants.WIDTH_QUANTITY_2X);
                 aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
             }
             aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
+            
             aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Marca", 100);
             aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Fabricante", 100);
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "ID categoría", 50);
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "ID clase", 50);
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clase", 100);
         }
-        else if (jrbFindByName.isSelected()) {
-            mvTableRows = SDataReadTableRows.getTableRows(miClient, SDataConstants.ITMX_ITEM_BY_NAME, moFilterKey, params);
-
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
-            if (showStock()) {
-                aoTableColumns[col] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Existencias", STableConstants.WIDTH_QUANTITY_2X);
-                aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        else if (jrbFindByBrand.isSelected() || jrbFindByManufacturer.isSelected()) {
+            
+            if (jrbFindByBrand.isSelected()) {
+                dataType = SDataConstants.ITMX_ITEM_BY_BRAND;
+                titles = new String[] { "Marca", "Fabricante" };
             }
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Marca", 100);
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Fabricante", 100);
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "ID categoría", 50);
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "ID clase", 50);
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clase", 100);
-        }
-        else if (jrbFindByBrand.isSelected()) {
-            mvTableRows = SDataReadTableRows.getTableRows(miClient, SDataConstants.ITMX_ITEM_BY_BRAND, moFilterKey, params);
+            else {
+                dataType = SDataConstants.ITMX_ITEM_BY_MANUFACTURER;
+                titles = new String[] { "Fabricante", "Marca" };
+            }
 
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Marca", 100);
+            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, titles[0], 100);
+            
             if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
                 aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
                 aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
@@ -487,38 +485,20 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
                 aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
                 aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
             }
+            
             if (showStock()) {
                 aoTableColumns[col] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Existencias", STableConstants.WIDTH_QUANTITY_2X);
                 aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
             }
             aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Fabricante", 100);
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "ID categoría", 50);
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "ID clase", 50);
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clase", 100);
+            
+            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, titles[1], 100);
         }
-        else if (jrbFindByManufacturer.isSelected()) {
-            mvTableRows = SDataReadTableRows.getTableRows(miClient, SDataConstants.ITMX_ITEM_BY_MANUFACTURER, moFilterKey, params);
-
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Fabricante", 100);
-            if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
-                aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
-                aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
-            }
-            else {
-                aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
-                aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
-            }
-            if (showStock()) {
-                aoTableColumns[col] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Existencias", STableConstants.WIDTH_QUANTITY_2X);
-                aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-            }
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Marca", 100);
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "ID categoría", 50);
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "ID clase", 50);
-            aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clase", 100);
-        }
+        
+        aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "ID categoría", 50);
+        aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "ID clase", 50);
+        aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clase", 100);
+        aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Estatus", 100);
 
         moOptionPane.clearTable();
 
@@ -526,10 +506,13 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
             moOptionPane.addTableColumn(column);
         }
 
+        params.put(SLibConstants.VALUE_INV_ONLY, mbInventoriableOnly);
+        mvTableRows.clear();
+        mvTableRows = SDataReadTableRows.getTableRows(miClient, dataType, moFilterKey, params);
+        
         moOptionPane.createTable();
         moOptionPane.getTable().addKeyListener(moKeyAdapterEnter);
         moOptionPane.getTable().getTableHeader().setReorderingAllowed(false);
-
         moOptionPane.getTableModel().getTableRows().addAll(mvTableRows);
         moOptionPane.renderTable();
         moOptionPane.layoutTable();
@@ -565,7 +548,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
                 // Item class filter is needed:
 
                 itemClassKey = (int[]) ((SFormComponentItem) jcbItemClass.getSelectedItem()).getPrimaryKey();
-                itemClassIndex = moOptionPane.getTableGuiColumnCount() - 3;
+                itemClassIndex = moOptionPane.getTableGuiColumnCount() - 4;
 
                 for (int i = 0; i < mvTableRows.size(); i++) {
                     row = mvTableRows.get(i);
@@ -579,7 +562,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
             if (jcbItemClass.getSelectedIndex() <= 0) {
                 // Item class filter is not needed:
 
-                if (jtbFindExactMatch.isSelected()) {
+                if (jckFindExactMatch.isSelected()) {
                     for (int i = 0; i < mvTableRows.size(); i++) {
                         row = mvTableRows.get(i);
                         if (((String) row.getValues().get(0)).length() >= length && find.compareTo(((String) row.getValues().get(0)).substring(0, length)) == 0) {
@@ -602,7 +585,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
                 itemClassKey = (int[]) ((SFormComponentItem) jcbItemClass.getSelectedItem()).getPrimaryKey();
                 itemClassIndex = moOptionPane.getTableGuiColumnCount() - 3;
 
-                if (jtbFindExactMatch.isSelected()) {
+                if (jckFindExactMatch.isSelected()) {
                     for (int i = 0; i < mvTableRows.size(); i++) {
                         row = mvTableRows.get(i);
                         if (((String) row.getValues().get(0)).length() >= length && find.compareTo(((String)row.getValues().get(0)).substring(0, length)) == 0 &&
@@ -669,6 +652,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOK;
     private javax.swing.JComboBox jcbItemClass;
+    private javax.swing.JCheckBox jckFindExactMatch;
     private javax.swing.JLabel jlCompanyBranchEntity;
     private javax.swing.JLabel jlItemClass;
     private javax.swing.JLabel jlSearchText;
@@ -676,10 +660,9 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
     private javax.swing.JPanel jpOptionPane;
     private javax.swing.JPanel jpSouth;
     private javax.swing.JRadioButton jrbFindByBrand;
-    private javax.swing.JRadioButton jrbFindByKey;
+    private javax.swing.JRadioButton jrbFindByItemKey;
+    private javax.swing.JRadioButton jrbFindByItemName;
     private javax.swing.JRadioButton jrbFindByManufacturer;
-    private javax.swing.JRadioButton jrbFindByName;
-    private javax.swing.JToggleButton jtbFindExactMatch;
     private javax.swing.JTextField jtfCompanyBranch;
     private javax.swing.JTextField jtfSearchText;
     private javax.swing.JTextField jtfWarehouse;

@@ -895,14 +895,14 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiBkkFiscalYearOpening.setEnabled(hasYearRight);
         jmiBkkFiscalYearOpeningDel.setEnabled(hasYearRight);
 
-        jmRec.setEnabled(hasBkrRight || hasRepRight || hasCatAccCashRight || hasMoveAccCash || hasMoveBpCdr || hasMoveBpDbr);
+        jmRec.setEnabled(hasBkrRight || hasRepRight || hasMoveAccCash || hasMoveBpCdr || hasMoveBpDbr);
         jmiRecRec.setEnabled(hasBkrRight);
         jmiRecRecEtyXml.setEnabled(hasBkrRight);
         jmiRecRecCash.setEnabled(hasBkrRight);
         jmiRecRecCash.setEnabled(false);    // XXX temporal code!!! (sflores, 2013-07-27)
         jmiRecBal.setEnabled(hasBkrRight || hasRepRight);
-        jmiRecBalCashAccountCash.setEnabled(hasBkrRight || hasCatAccCashRight || hasMoveBpCdr || hasMoveBpDbr || hasRepRight);
-        jmiRecBalCashAccountBank.setEnabled(hasBkrRight || hasCatAccCashRight || hasMoveBpCdr || hasMoveBpDbr || hasRepRight);
+        jmiRecBalCashAccountCash.setEnabled(hasBkrRight || hasMoveAccCash || hasRepRight);
+        jmiRecBalCashAccountBank.setEnabled(hasBkrRight || hasMoveAccCash || hasRepRight);
         jmiRecBalBizPartnerCus.setEnabled(hasBkrRight || hasRepRight);
         jmiRecBalBizPartnerSup.setEnabled(hasBkrRight || hasRepRight);
         jmiRecBalBizPartnerDbr.setEnabled(hasBkrRight || hasMoveBpDbr || hasRepRight);
@@ -919,6 +919,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinExchangeRate.setEnabled(hasExcRateRight);
         jmiFinCashCheck.setEnabled(hasMoveAccCash);
         jmiFinCashCounterReceipt.setEnabled(hasCounterReceiptRight);
+        jmiFinLayoutBank.setEnabled(hasMoveAccCash);
+        jmiFinLayoutBankPending.setEnabled(hasMoveAccCash);
+        jmiFinLayoutBankDone.setEnabled(hasMoveAccCash);
 
         jmRep.setEnabled(hasRepRight || hasRepFinRateRight || hasRepStatementRight);
         jmRepSheet.setEnabled(hasRepStatementRight);

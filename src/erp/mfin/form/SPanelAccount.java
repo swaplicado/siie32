@@ -11,11 +11,6 @@
 
 package erp.mfin.form;
 
-import java.awt.Color;
-import java.awt.event.KeyEvent;
-import javax.swing.JButton;
-import javax.swing.JFormattedTextField;
-
 import erp.data.SDataConstants;
 import erp.data.SDataUtilities;
 import erp.form.SFormFieldAccountId;
@@ -23,6 +18,11 @@ import erp.form.SFormFieldCostCenterId;
 import erp.lib.SLibConstants;
 import erp.mfin.data.SDataAccount;
 import erp.mfin.data.SDataCostCenter;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.KeyEvent;
+import javax.swing.JButton;
+import javax.swing.JFormattedTextField;
 
 /**
  *
@@ -243,11 +243,16 @@ public class SPanelAccount extends javax.swing.JPanel implements java.awt.event.
     private javax.swing.JTextField jtfAccount;
     // End of variables declaration//GEN-END:variables
 
-    public void setReadOnly(boolean readOnly) {
+    public void setReadOnly(final boolean readOnly) {
         jftAccountId.setEditable(!readOnly);
         jftAccountId.setFocusable(!readOnly);
         jbAccountId.setEnabled(!readOnly);
         jbAccountId.setVisible(!readOnly);
+    }
+    
+    public void setLabelsWidth(final int width) {
+        jlAccount.setPreferredSize(new Dimension(width, 23));
+        jlAccountId.setPreferredSize(new Dimension(width, 23));
     }
 
     public erp.form.SFormFieldAccount getFieldAccount() { return moFieldAccount; }

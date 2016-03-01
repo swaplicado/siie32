@@ -75,7 +75,6 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
             <Property name="alignment" type="int" value="0"/>
-            <Property name="horizontalGap" type="int" value="0"/>
             <Property name="verticalGap" type="int" value="0"/>
           </Layout>
           <SubComponents>
@@ -86,7 +85,7 @@
                 </Property>
                 <Property name="text" type="java.lang.String" value="Sucursal: *"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[120, 23]"/>
+                  <Dimension value="[100, 23]"/>
                 </Property>
               </Properties>
             </Component>
@@ -102,13 +101,6 @@
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
               </AuxValues>
-            </Component>
-            <Component class="javax.swing.JLabel" name="jlDummy">
-              <Properties>
-                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[1, 23]"/>
-                </Property>
-              </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="jbFkCobId">
               <Properties>
@@ -126,22 +118,21 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
             <Property name="alignment" type="int" value="0"/>
-            <Property name="horizontalGap" type="int" value="0"/>
             <Property name="verticalGap" type="int" value="0"/>
           </Layout>
           <SubComponents>
-            <Component class="javax.swing.JLabel" name="jlFkItemRmId">
+            <Component class="javax.swing.JLabel" name="jlFkItemId">
               <Properties>
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="ff" green="0" id="blue" palette="1" red="0" type="palette"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Producto: *"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[120, 23]"/>
+                  <Dimension value="[100, 23]"/>
                 </Property>
               </Properties>
             </Component>
-            <Component class="javax.swing.JComboBox" name="jcbFkItemRmId">
+            <Component class="javax.swing.JComboBox" name="jcbFkItemId">
               <Properties>
                 <Property name="maximumRowCount" type="int" value="16"/>
                 <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
@@ -152,23 +143,16 @@
                 </Property>
               </Properties>
               <Events>
-                <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="jcbFkItemRmIdFocusLost"/>
+                <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="jcbFkItemIdFocusLost"/>
               </Events>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
               </AuxValues>
             </Component>
-            <Component class="javax.swing.JLabel" name="jlDummy1">
-              <Properties>
-                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[1, 23]"/>
-                </Property>
-              </Properties>
-            </Component>
             <Component class="javax.swing.JButton" name="jbFkItemId">
               <Properties>
                 <Property name="text" type="java.lang.String" value="..."/>
-                <Property name="toolTipText" type="java.lang.String" value="Seleccionar producto terminado"/>
+                <Property name="toolTipText" type="java.lang.String" value="Seleccionar producto"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                   <Dimension value="[23, 23]"/>
@@ -181,7 +165,6 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
             <Property name="alignment" type="int" value="0"/>
-            <Property name="horizontalGap" type="int" value="0"/>
             <Property name="verticalGap" type="int" value="0"/>
           </Layout>
           <SubComponents>
@@ -189,7 +172,7 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Referencia: *"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[120, 23]"/>
+                  <Dimension value="[100, 23]"/>
                 </Property>
               </Properties>
             </Component>
@@ -207,7 +190,6 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
             <Property name="alignment" type="int" value="0"/>
-            <Property name="horizontalGap" type="int" value="0"/>
             <Property name="verticalGap" type="int" value="0"/>
           </Layout>
           <SubComponents>
@@ -215,7 +197,7 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Lote sugerido:"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[120, 23]"/>
+                  <Dimension value="[100, 23]"/>
                 </Property>
               </Properties>
             </Component>
@@ -224,14 +206,7 @@
                 <Property name="horizontalAlignment" type="int" value="4"/>
                 <Property name="text" type="java.lang.String" value="SUGGEST LOT"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[70, 23]"/>
-                </Property>
-              </Properties>
-            </Component>
-            <Component class="javax.swing.JLabel" name="jlDummy2">
-              <Properties>
-                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[1, 23]"/>
+                  <Dimension value="[100, 23]"/>
                 </Property>
               </Properties>
             </Component>
@@ -240,7 +215,7 @@
                 <Property name="editable" type="boolean" value="false"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[28, 23]"/>
+                  <Dimension value="[35, 23]"/>
                 </Property>
               </Properties>
             </Component>
@@ -250,7 +225,6 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
             <Property name="alignment" type="int" value="0"/>
-            <Property name="horizontalGap" type="int" value="0"/>
             <Property name="verticalGap" type="int" value="0"/>
           </Layout>
           <SubComponents>
@@ -258,14 +232,7 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Costo asignado: *"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[120, 23]"/>
-                </Property>
-              </Properties>
-            </Component>
-            <Component class="javax.swing.JLabel" name="jlDummy3">
-              <Properties>
-                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[1, 23]"/>
+                  <Dimension value="[100, 23]"/>
                 </Property>
               </Properties>
             </Component>
@@ -274,7 +241,7 @@
                 <Property name="horizontalAlignment" type="int" value="4"/>
                 <Property name="text" type="java.lang.String" value="COST PERCENTAGE"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[70, 23]"/>
+                  <Dimension value="[100, 23]"/>
                 </Property>
               </Properties>
             </Component>
@@ -284,15 +251,14 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
             <Property name="alignment" type="int" value="0"/>
-            <Property name="horizontalGap" type="int" value="0"/>
             <Property name="verticalGap" type="int" value="0"/>
           </Layout>
           <SubComponents>
             <Component class="javax.swing.JLabel" name="jlDateStart">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Fecha inicial vigencia: *"/>
+                <Property name="text" type="java.lang.String" value="Inicio vigencia: *"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[120, 23]"/>
+                  <Dimension value="[100, 23]"/>
                 </Property>
               </Properties>
             </Component>
@@ -300,14 +266,7 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="dd/mm/yyyy"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[66, 23]"/>
-                </Property>
-              </Properties>
-            </Component>
-            <Component class="javax.swing.JLabel" name="jlDummy4">
-              <Properties>
-                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[1, 23]"/>
+                  <Dimension value="[75, 23]"/>
                 </Property>
               </Properties>
             </Component>
@@ -316,7 +275,7 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/erp/img/cal_cal.gif"/>
                 </Property>
-                <Property name="toolTipText" type="java.lang.String" value="Seleccionar fecha inicial vigencia"/>
+                <Property name="toolTipText" type="java.lang.String" value="Seleccionar fecha"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                   <Dimension value="[23, 23]"/>
@@ -329,15 +288,14 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
             <Property name="alignment" type="int" value="0"/>
-            <Property name="horizontalGap" type="int" value="0"/>
             <Property name="verticalGap" type="int" value="0"/>
           </Layout>
           <SubComponents>
             <Component class="javax.swing.JLabel" name="jlDateEnd">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Fecha final vigencia:"/>
+                <Property name="text" type="java.lang.String" value="Fin vigencia:"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[120, 23]"/>
+                  <Dimension value="[100, 23]"/>
                 </Property>
               </Properties>
             </Component>
@@ -345,14 +303,7 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="dd/mm/yyyy"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[66, 23]"/>
-                </Property>
-              </Properties>
-            </Component>
-            <Component class="javax.swing.JLabel" name="jlDummy5">
-              <Properties>
-                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[1, 23]"/>
+                  <Dimension value="[75, 23]"/>
                 </Property>
               </Properties>
             </Component>
@@ -361,7 +312,7 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/erp/img/cal_cal.gif"/>
                 </Property>
-                <Property name="toolTipText" type="java.lang.String" value="Seleccionar fecha final vigencia"/>
+                <Property name="toolTipText" type="java.lang.String" value="Seleccionar fecha"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                   <Dimension value="[23, 23]"/>
@@ -374,7 +325,6 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
             <Property name="alignment" type="int" value="0"/>
-            <Property name="horizontalGap" type="int" value="0"/>
             <Property name="verticalGap" type="int" value="0"/>
           </Layout>
           <SubComponents>
@@ -382,14 +332,7 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Nivel:"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[120, 23]"/>
-                </Property>
-              </Properties>
-            </Component>
-            <Component class="javax.swing.JLabel" name="jlDummy6">
-              <Properties>
-                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[1, 23]"/>
+                  <Dimension value="[100, 23]"/>
                 </Property>
               </Properties>
             </Component>
@@ -400,7 +343,7 @@
                 <Property name="text" type="java.lang.String" value="LEVEL"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[70, 23]"/>
+                  <Dimension value="[75, 23]"/>
                 </Property>
               </Properties>
             </Component>
@@ -408,17 +351,15 @@
         </Container>
         <Container class="javax.swing.JPanel" name="jPanel28">
 
-          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+            <Property name="alignment" type="int" value="0"/>
+            <Property name="verticalGap" type="int" value="0"/>
+          </Layout>
           <SubComponents>
             <Component class="javax.swing.JCheckBox" name="jckIsDeleted">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Registro eliminado"/>
               </Properties>
-              <Constraints>
-                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-                  <BorderConstraints direction="West"/>
-                </Constraint>
-              </Constraints>
             </Component>
           </SubComponents>
         </Container>
@@ -452,7 +393,7 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
           <SubComponents>
-            <Container class="javax.swing.JPanel" name="jpLevel">
+            <Container class="javax.swing.JPanel" name="jpPaneLevel">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
                   <JTabbedPaneConstraints tabName="Niveles">
@@ -548,7 +489,7 @@
                 </Container>
               </SubComponents>
             </Container>
-            <Container class="javax.swing.JPanel" name="jpSubgoods">
+            <Container class="javax.swing.JPanel" name="jpPaneSubgoods">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
                   <JTabbedPaneConstraints tabName="Subproductos">
@@ -618,7 +559,7 @@
                 </Container>
               </SubComponents>
             </Container>
-            <Container class="javax.swing.JPanel" name="jpNotes">
+            <Container class="javax.swing.JPanel" name="jpPaneNotes">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
                   <JTabbedPaneConstraints tabName="Notas">

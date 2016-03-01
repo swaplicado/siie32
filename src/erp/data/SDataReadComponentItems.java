@@ -669,9 +669,9 @@ public abstract class SDataReadComponentItems {
             case SDataConstants.ITMX_ITEM_BOM_LEVEL:
                 lenPk = 1;
                 lenFk = 1;
-                sql = "SELECT i.id_item AS f_id_1, " + (!paramsErp.getIsItemKeyApplying() ? "i.item " :
+                sql = "SELECT i.id_item AS f_id_1, CONCAT(" + (!paramsErp.getIsItemKeyApplying() ? "i.item " :
                         (paramsErp.getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ?
-                        "CONCAT(i.item_key, ' - ', i.item) " : "CONCAT(i.item, ' - ', i.item_key) ")) + "AS f_item, " +
+                        "CONCAT(i.item_key, ' - ', i.item) " : "CONCAT(i.item, ' - ', i.item_key) ")) + ", CASE WHEN i.fid_st_item = " + SModSysConsts.ITMS_ST_ITEM_RES + " THEN ' (!)' WHEN i.fid_st_item = " + SModSysConsts.ITMS_ST_ITEM_INA + " THEN ' (/)' ELSE '' END) AS f_item, " +
                         "i.fid_igen AS f_fid_1, u.symbol AS f_comp " +
                         "FROM erp.itmu_item AS i " +
                         "INNER JOIN erp.itmu_unit AS u ON i.fid_unit = u.id_unit " +

@@ -34,6 +34,8 @@ import erp.mcfg.data.SDataCompanyBranchEntity;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
 import erp.mmfg.data.SDataProductionOrder;
+import erp.mod.SModSysConsts;
+import erp.mod.itm.db.SItmConsts;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.SDataDiogEntryRow;
@@ -58,6 +60,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.table.DefaultTableCellRenderer;
+import sa.lib.gui.SGuiConsts;
 
 /**
  *
@@ -1438,7 +1441,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     private void renderItemEntry(int[] key, double quantity) {
         moEntryItem = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, key, SLibConstants.EXEC_MODE_SILENT);
 
-        jtfEntryItem.setText(moEntryItem.getItem());
+        jtfEntryItem.setText(moEntryItem.getXtaItemWidthStatus());
         jtfEntryItemCode.setText(moEntryItem.getKey());
         jtfEntryUnitSymbol.setText(moEntryItem.getDbmsDataUnit().getSymbol());
         jtfEntryQuantity.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(quantity));
@@ -2443,11 +2446,19 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                 jtfEntryTextToFind.requestFocus();
             }
             else if (moEntryItem.getIsDeleted()) {
-                miClient.showMsgBoxWarning("El ítem de la partida del documento está eliminado.");
+                miClient.showMsgBoxWarning(SItmConsts.MSG_ERR_ITEM_DEL);
                 jtfEntryTextToFind.requestFocus();
             }
             else if (!moEntryItem.getIsInventoriable()) {
-                miClient.showMsgBoxWarning("El ítem de la partida del documento no es inventariable.");
+                miClient.showMsgBoxWarning(SItmConsts.MSG_ERR_ITEM_INV_NOT);
+                jtfEntryTextToFind.requestFocus();
+            }
+            else if (moEntryItem.getFkItemStatusId() == SModSysConsts.ITMS_ST_ITEM_INA) {
+                miClient.showMsgBoxWarning(SItmConsts.MSG_ERR_ST_ITEM_INA);
+                jtfEntryTextToFind.requestFocus();
+            }
+            else if (moEntryItem.getFkItemStatusId() == SModSysConsts.ITMS_ST_ITEM_RES && mnParamIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_IN) {
+                miClient.showMsgBoxWarning(SItmConsts.MSG_ERR_ST_ITEM_RES);
                 jtfEntryTextToFind.requestFocus();
             }
             else if (moFieldEntryQuantity.getDouble() == 0d) {
@@ -3115,6 +3126,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         String msg = "";
         Vector<Object> params = new Vector<Object>();
         Vector<SDataDiogEntry> entries = new Vector<SDataDiogEntry>();
+        SDataItem item = null;
         SFormValidation validation = new SFormValidation();
 
         for (int i = 0; i < mvFields.size(); i++) {
@@ -3188,8 +3200,26 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 
                 if (!validation.getIsError()) {
                     try {
-                        entries.clear();
                         entries.addAll(getCompleteEntries());
+                        
+                        // Validate that item is not restricted on in moves or inactive:
+                        
+                        for (SDataDiogEntry entry : entries) {
+                            item = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { entry.getFkItemId() }, SLibConstants.EXEC_MODE_VERBOSE);
+                            
+                            if (item.getFkItemStatusId() == SModSysConsts.ITMS_ST_ITEM_INA) {
+                                throw new Exception(SItmConsts.MSG_ERR_ST_ITEM_INA + "\n" + 
+                                        SGuiConsts.TXT_LBL_CODE + ": " + item.getKey() + "\n" +
+                                        SGuiConsts.TXT_LBL_NAME + ": " + item.getItem());
+                            }
+                            else if (item.getFkItemStatusId() == SModSysConsts.ITMS_ST_ITEM_RES && mnParamIogCategoryId == SModSysConsts.TRNS_CT_IOG_IN) {
+                                throw new Exception(SItmConsts.MSG_ERR_ST_ITEM_RES + "\n" + 
+                                        SGuiConsts.TXT_LBL_CODE + ": " + item.getKey() + "\n" +
+                                        SGuiConsts.TXT_LBL_NAME + ": " + item.getItem());
+                            }
+                        }
+                        
+                        // Validate item lots:
 
                         msg = STrnStockValidator.validateStockLots(miClient, entries, mnParamIogCategoryId, false);
                         if (msg.length() > 0) {

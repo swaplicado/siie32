@@ -8,6 +8,7 @@ package erp.mitm.data;
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.mod.SModSysConsts;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -647,5 +648,23 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     @Override
     public java.util.Date getLastDbUpdate() {
         return mtUserEditTs;
+    }
+    
+    public String getXtaItemWidthStatus() {
+        String item = getItem();
+        
+        switch (mnFkItemStatusId) {
+            case SModSysConsts.ITMS_ST_ITEM_ACT:
+                break;
+            case SModSysConsts.ITMS_ST_ITEM_RES:
+                item += " (!)";
+                break;
+            case SModSysConsts.ITMS_ST_ITEM_INA:
+                item += " (/)";
+                break;
+            default:
+        }
+        
+        return item;
     }
 }

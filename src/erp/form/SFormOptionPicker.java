@@ -438,7 +438,7 @@ public class SFormOptionPicker extends javax.swing.JDialog implements erp.lib.fo
             case SDataConstants.ITMU_ITEM:
             case SDataConstants.ITMX_ITEM_BOM_ITEM:
             case SDataConstants.ITMX_ITEM_BOM_LEVEL:
-                aoTableColumns = new STableColumnForm[2];
+                aoTableColumns = new STableColumnForm[3];
                 if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
                     aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
                     aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 400);
@@ -447,6 +447,7 @@ public class SFormOptionPicker extends javax.swing.JDialog implements erp.lib.fo
                     aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 400);
                     aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
                 }
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Estatus", 100);
 
                 setTitle("Seleccionar ítem");
                 break;

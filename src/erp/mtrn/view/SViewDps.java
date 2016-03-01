@@ -317,7 +317,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbDiactivateFlags = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif")));
         jbDiactivateFlags.setPreferredSize(new Dimension(23, 23));
         jbDiactivateFlags.addActionListener(this);
-        jbDiactivateFlags.setToolTipText("Limpiar inconsistencias del timbrado o cancelación del CFDI");
+        jbDiactivateFlags.setToolTipText("Limpiar inconsistencias de timbrado o cancelación del CFDI");
 
         moTabFilterUser = new STabFilterUsers(miClient, this);
         moTabFilterUser.removeButtonUser();

@@ -485,8 +485,10 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     /**
      * Validates entry stock move lots.
      * @param client GUI Client.
-     * @param diogCategoryId DIOG category.
-     * @param isIogBeingDeleted Flag that indicates that parent document is being deleted.
+     * @param iogCategoryId DIOG category.
+     * @param isDocBeingDeleted Flag that indicates that parent document is being deleted.
+     * @throws java.lang.Exception
+     * @return <code>String</code> with error message otherwise emtpy <code>String</code>.
      */
     public java.lang.String validateStockLots(final erp.client.SClientInterface client, final int iogCategoryId, final boolean isDocBeingDeleted) throws Exception {
         String msg = "";

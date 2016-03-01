@@ -404,7 +404,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlTotal = new javax.swing.JLabel();
         jtfTotal_rRo = new javax.swing.JTextField();
         jtfTotalCy_rRo = new javax.swing.JTextField();
-        jPanel2 = new javax.swing.JPanel();
         jTabbedPane = new javax.swing.JTabbedPane();
         jpEntries = new javax.swing.JPanel();
         jpEntriesControls = new javax.swing.JPanel();
@@ -601,12 +600,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpHeader.setLayout(new java.awt.BorderLayout());
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del documento:"));
-        jPanel4.setPreferredSize(new java.awt.Dimension(395, 341));
+        jPanel4.setPreferredSize(new java.awt.Dimension(400, 341));
         jPanel4.setLayout(new java.awt.BorderLayout());
 
         jPanel57.setLayout(new java.awt.GridLayout(13, 1, 0, 1));
 
-        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDpsType.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jlDpsType.setText("Tipo documento:");
@@ -622,7 +621,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel57.add(jPanel6);
 
-        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCompanyBranch.setText("Sucursal empresa:");
         jlCompanyBranch.setPreferredSize(new java.awt.Dimension(105, 23));
@@ -639,12 +638,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfCompanyBranchCodeRo.setBackground(java.awt.Color.lightGray);
         jtfCompanyBranchCodeRo.setText("CODE");
         jtfCompanyBranchCodeRo.setFocusable(false);
-        jtfCompanyBranchCodeRo.setPreferredSize(new java.awt.Dimension(93, 23));
+        jtfCompanyBranchCodeRo.setPreferredSize(new java.awt.Dimension(90, 23));
         jPanel12.add(jtfCompanyBranchCodeRo);
 
         jPanel57.add(jPanel12);
 
-        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBizPartner.setText("Asociado negocios:");
         jlBizPartner.setPreferredSize(new java.awt.Dimension(105, 23));
@@ -658,7 +657,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel57.add(jPanel7);
 
-        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBizPartnerBranch.setText("Sucursal asociado:");
         jlBizPartnerBranch.setPreferredSize(new java.awt.Dimension(105, 23));
@@ -672,7 +671,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel57.add(jPanel8);
 
-        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBizPartnerBranchAddressMain01.setText("Domicilio sucursal:");
         jlBizPartnerBranchAddressMain01.setPreferredSize(new java.awt.Dimension(105, 23));
@@ -686,7 +685,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel57.add(jPanel9);
 
-        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBizPartnerBranchAddressMain02.setPreferredSize(new java.awt.Dimension(105, 23));
         jPanel10.add(jlBizPartnerBranchAddressMain02);
@@ -699,7 +698,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel57.add(jPanel10);
 
-        jPanel65.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel65.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBizPartnerBranchAddress01.setText("Domicilio operación:");
         jlBizPartnerBranchAddress01.setPreferredSize(new java.awt.Dimension(105, 23));
@@ -713,7 +712,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel57.add(jPanel65);
 
-        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBizPartnerBranchAddress02.setPreferredSize(new java.awt.Dimension(105, 23));
         jPanel17.add(jlBizPartnerBranchAddress02);
@@ -726,7 +725,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel57.add(jPanel17);
 
-        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDate.setText("Fecha: *");
         jlDate.setPreferredSize(new java.awt.Dimension(105, 23));
@@ -742,8 +741,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbDate.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel11.add(jbDate);
 
-        jckIsRebill.setText("re - emisión");
-        jckIsRebill.setPreferredSize(new java.awt.Dimension(92, 23));
+        jckIsRebill.setText("Re-emisión");
+        jckIsRebill.setPreferredSize(new java.awt.Dimension(83, 23));
         jPanel11.add(jckIsRebill);
 
         jbBizPartnerBalance.setText("Saldo AN");
@@ -753,7 +752,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel57.add(jPanel11);
 
-        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlNumber.setText("Serie y folio: *");
         jlNumber.setPreferredSize(new java.awt.Dimension(105, 23));
@@ -770,12 +769,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jtfNumberReference.setText("ABC000ABC000");
         jtfNumberReference.setToolTipText("Referencia");
-        jtfNumberReference.setPreferredSize(new java.awt.Dimension(115, 23));
+        jtfNumberReference.setPreferredSize(new java.awt.Dimension(110, 23));
         jPanel16.add(jtfNumberReference);
 
         jPanel57.add(jPanel16);
 
-        jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckDateDoc.setText("Fecha docto.:");
         jckDateDoc.setMargin(new java.awt.Insets(2, 0, 2, 2));
@@ -804,7 +803,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel57.add(jPanel18);
 
-        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckDateStartCredit.setText("Base crédito:");
         jckDateStartCredit.setMargin(new java.awt.Insets(2, 0, 2, 2));
@@ -829,12 +828,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jftDateMaturityRo.setEditable(false);
         jftDateMaturityRo.setText("yyyy/mm/dd");
         jftDateMaturityRo.setFocusable(false);
-        jftDateMaturityRo.setPreferredSize(new java.awt.Dimension(70, 23));
+        jftDateMaturityRo.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel15.add(jftDateMaturityRo);
 
         jPanel57.add(jPanel15);
 
-        jPanel62.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel62.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateDocDelivery_n.setText("Entrega programada:");
         jlDateDocDelivery_n.setPreferredSize(new java.awt.Dimension(105, 23));
@@ -856,7 +855,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel62.add(jlDateDocLapsing_n);
 
         jftDateDocLapsing_n.setText("yyyy/mm/dd");
-        jftDateDocLapsing_n.setPreferredSize(new java.awt.Dimension(70, 23));
+        jftDateDocLapsing_n.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel62.add(jftDateDocLapsing_n);
 
         jbDateDocLapsing_n.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
@@ -876,7 +875,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel5.setLayout(new java.awt.GridLayout(11, 1, 0, 1));
 
-        jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkPaymentTypeId.setText("Tipo de pago: *");
         jlFkPaymentTypeId.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -887,7 +886,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel5.add(jPanel24);
 
-        jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckPayments.setText("Pagos prog.:");
         jckPayments.setFocusable(false);
@@ -902,7 +901,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel5.add(jPanel25);
 
-        jPanel35.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel35.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkPaymentSystemTypeId.setText("Método de pago: *");
         jlFkPaymentSystemTypeId.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -914,7 +913,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel5.add(jPanel35);
 
-        jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPayAccount.setText("No. cuenta pago:");
         jlPayAccount.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -926,7 +925,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel5.add(jPanel32);
 
-        jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkLanguageId.setText("Idioma: *");
         jlFkLanguageId.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -938,7 +937,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel5.add(jPanel26);
 
-        jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkDpsStatus.setText("Estado documento:");
         jlFkDpsStatus.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -952,7 +951,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel5.add(jPanel27);
 
-        jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkDpsStatusValidity.setText("Estado validez:");
         jlFkDpsStatusValidity.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -966,7 +965,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel5.add(jPanel28);
 
-        jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkDpsStatusAuthorization.setText("Estado autorización:");
         jlFkDpsStatusAuthorization.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -980,7 +979,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel5.add(jPanel29);
 
-        jPanel33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkDpsNatureId.setText("Naturaleza docto.: *");
         jlFkDpsNatureId.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -991,7 +990,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel5.add(jPanel33);
 
-        jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckIsAudited.setText("Auditado");
         jckIsAudited.setEnabled(false);
@@ -1005,7 +1004,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel5.add(jPanel30);
 
-        jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckIsAuthorized.setText("Autorizado");
         jckIsAuthorized.setEnabled(false);
@@ -1023,7 +1022,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel13.setLayout(new java.awt.GridLayout(2, 1, 0, 1));
 
-        jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckRecordUser.setText("Póliza contable:");
         jckRecordUser.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -1031,7 +1030,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel13.add(jPanel19);
 
-        jPanel34.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel34.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jtfRecordManualDateRo.setEditable(false);
         jtfRecordManualDateRo.setText("01/01/2000");
@@ -1071,13 +1070,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpHeader.add(jPanel3, java.awt.BorderLayout.CENTER);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Valor del documento:"));
-        jPanel1.setPreferredSize(new java.awt.Dimension(330, 302));
+        jPanel1.setPreferredSize(new java.awt.Dimension(350, 33));
         jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
 
         jpCurrency.setLayout(new java.awt.GridLayout(5, 1, 0, 1));
 
         jPanel20.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkCurrencyId.setForeground(java.awt.Color.blue);
         jlFkCurrencyId.setText("Moneda documento: *");
@@ -1096,7 +1095,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpCurrency.add(jPanel20);
 
         jPanel21.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlExchangeRateSystem.setText("Tipo de cambio sistema:");
         jlExchangeRateSystem.setPreferredSize(new java.awt.Dimension(135, 23));
@@ -1118,7 +1117,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpCurrency.add(jPanel21);
 
         jPanel22.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlExchangeRate.setText("Tipo de cambio: *");
         jlExchangeRate.setPreferredSize(new java.awt.Dimension(135, 23));
@@ -1138,7 +1137,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpCurrency.add(jPanel22);
 
         jPanel23.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckIsDiscountDocApplying.setText("Descuento:");
         jckIsDiscountDocApplying.setFocusable(false);
@@ -1147,7 +1146,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel23.add(jckIsDiscountDocApplying);
 
         jckIsDiscountDocPercentage.setText("%");
-        jckIsDiscountDocPercentage.setPreferredSize(new java.awt.Dimension(48, 23));
+        jckIsDiscountDocPercentage.setPreferredSize(new java.awt.Dimension(45, 23));
         jPanel23.add(jckIsDiscountDocPercentage);
 
         jtfDiscountDocPercentage.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -1157,7 +1156,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jpCurrency.add(jPanel23);
 
-        jPanel37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckIsCopy.setText("Es copia");
         jckIsCopy.setMargin(new java.awt.Insets(2, 0, 2, 2));
@@ -1170,7 +1169,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jpValue.setLayout(new java.awt.BorderLayout());
 
-        jPanel14.setLayout(new java.awt.GridLayout(7, 3, 2, 1));
+        jPanel14.setLayout(new java.awt.GridLayout(7, 3, 5, 1));
 
         jlCurrency.setText("Moneda:");
         jlCurrency.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -1306,9 +1305,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel1.add(jpValue, java.awt.BorderLayout.SOUTH);
 
-        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 2, 0));
-        jPanel1.add(jPanel2, java.awt.BorderLayout.CENTER);
-
         jpHeader.add(jPanel1, java.awt.BorderLayout.EAST);
 
         jpDocument.add(jpHeader, java.awt.BorderLayout.NORTH);
@@ -1317,7 +1313,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jpEntriesControls.setLayout(new java.awt.BorderLayout());
 
-        jpEntriesControlsWest.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 1, 0));
+        jpEntriesControlsWest.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 3, 0));
 
         jbEntryNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_new.gif"))); // NOI18N
         jbEntryNew.setToolTipText("Crear partida [Ctrl + N]");
@@ -1374,7 +1370,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jpEntriesControls.add(jpEntriesControlsWest, java.awt.BorderLayout.WEST);
 
-        jpEntriesControlsEast.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 2, 0));
+        jpEntriesControlsEast.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
         jlAdjustmentSubtypeId.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jlAdjustmentSubtypeId.setText("Tipo de ajuste: ");
@@ -1765,7 +1761,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jpNotes.setLayout(new java.awt.BorderLayout());
 
-        jpNotesControls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 1, 0));
+        jpNotesControls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 3, 0));
 
         jbNotesNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_new.gif"))); // NOI18N
         jbNotesNew.setToolTipText("Crear notas [Ctrl + N]");
@@ -2098,7 +2094,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
 
-        setSize(new java.awt.Dimension(1000, 675));
+        setSize(new java.awt.Dimension(1040, 709));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -6503,7 +6499,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel19;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel20;
     private javax.swing.JPanel jPanel21;
     private javax.swing.JPanel jPanel22;
