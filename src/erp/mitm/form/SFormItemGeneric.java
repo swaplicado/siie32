@@ -1850,7 +1850,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         jckIsItemLineApplying.setEnabled(miClient.getSessionXXX().getParamsErp().getIsItemNameWithVarieties());
         jckIsItemNameEditable.setEnabled(miClient.getSessionXXX().getParamsErp().getIsItemNameEditable());
         jckIsItemKeyApplying.setEnabled(miClient.getSessionXXX().getParamsErp().getIsItemKeyApplying());
-        jckIsItemKeyAutomatic.setEnabled(miClient.getSessionXXX().getParamsErp().getIsItemKeyAut());
+        jckIsItemKeyAutomatic.setEnabled(miClient.getSessionXXX().getParamsErp().getIsItemKeyAutomatic());
         jckIsItemKeyEditable.setEnabled(miClient.getSessionXXX().getParamsErp().getIsItemKeyEditable());
         jckIsInventoriable.setEnabled(miClient.getSessionXXX().getParamsErp().getIsInventoriable());
         jckIsBulk.setEnabled(miClient.getSessionXXX().getParamsErp().getIsBulk());
