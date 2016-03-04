@@ -497,13 +497,15 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
     private void jcbDbmsFkBizPartnerIdFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jcbDbmsFkBizPartnerIdFocusLost
         readBizPartnerCategory();
         
-        if (moBizPartnerCategory.getIsCompany()) {
-            if (msMsgError.isEmpty()) {
-                miClient.showMsgBoxWarning(msMsgError = "No se pueden dar de alta cuentas bancarias para empresas.");
+        if (moBizPartnerCategory != null) {
+            if (moBizPartnerCategory.getIsCompany()) {
+                if (msMsgError.isEmpty()) {
+                    miClient.showMsgBoxWarning(msMsgError = "No se pueden dar de alta cuentas bancarias para empresas.");
+                }
             }
-        }
-        else {
-            msMsgError = "";
+            else {
+                msMsgError = "";
+            }
         }
     }//GEN-LAST:event_jcbDbmsFkBizPartnerIdFocusLost
 

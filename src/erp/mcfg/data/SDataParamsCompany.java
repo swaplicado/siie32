@@ -56,6 +56,8 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     protected boolean mbIsPaymentSaturday;
     protected boolean mbIsPaymentSunday;
     protected boolean mbIsCfdiProduction;
+    protected boolean mbIsCfdiSendingAutomaticSal;
+    protected boolean mbIsCfdiSendingAutomaticHrs;
     protected boolean mbIsCanEdit;
     protected boolean mbIsCanDelete;
     protected boolean mbIsDeleted;
@@ -144,6 +146,8 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public void setIsPaymentSaturday(boolean b) { mbIsPaymentSaturday = b; }
     public void setIsPaymentSunday(boolean b) { mbIsPaymentSunday = b; }
     public void setIsCfdiProduction(boolean b) { mbIsCfdiProduction = b; }
+    public void setIsCfdiSendingAutomaticSal(boolean b) { mbIsCfdiSendingAutomaticSal = b; }
+    public void setIsCfdiSendingAutomaticHrs(boolean b) { mbIsCfdiSendingAutomaticHrs = b; }
     public void setIsCanEdit(boolean b) { mbIsCanEdit = b; }
     public void setIsCanDelete(boolean b) { mbIsCanDelete = b; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
@@ -222,6 +226,8 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public boolean getIsPaymentSaturday() { return mbIsPaymentSaturday; }
     public boolean getIsPaymentSunday() { return mbIsPaymentSunday; }
     public boolean getIsCfdiProduction() { return mbIsCfdiProduction; }
+    public boolean getIsCfdiSendingAutomaticSal() { return mbIsCfdiSendingAutomaticSal; }
+    public boolean getIsCfdiSendingAutomaticHrs() { return mbIsCfdiSendingAutomaticHrs; }
     public boolean getIsCanEdit() { return mbIsCanEdit; }
     public boolean getIsCanDelete() { return mbIsCanDelete; }
     public boolean getIsDeleted() { return mbIsDeleted; }
@@ -322,6 +328,8 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
         mbIsPaymentSaturday = false;
         mbIsPaymentSunday = false;
         mbIsCfdiProduction = false;
+        mbIsCfdiSendingAutomaticSal = false;
+        mbIsCfdiSendingAutomaticHrs = false;
         mbIsCanEdit = false;
         mbIsCanDelete = false;
         mbIsDeleted = false;
@@ -426,6 +434,8 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                 mbIsPaymentSaturday = resultSet.getBoolean("b_pay_sat");
                 mbIsPaymentSunday = resultSet.getBoolean("b_pay_sun");
                 mbIsCfdiProduction = resultSet.getBoolean("b_cfdi_prod");
+                mbIsCfdiSendingAutomaticSal = resultSet.getBoolean("b_cfdi_snd_aut_sal");
+                mbIsCfdiSendingAutomaticHrs = resultSet.getBoolean("b_cfdi_snd_aut_hrs");
                 mbIsCanEdit = resultSet.getBoolean("b_can_edit");
                 mbIsCanDelete = resultSet.getBoolean("b_can_del");
                 mbIsDeleted = resultSet.getBoolean("b_del");
@@ -531,7 +541,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?) }");
+                    "?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkConfigCoId);
             callableStatement.setInt(nParam++, mnDaysOfGraceSupplier);
             callableStatement.setInt(nParam++, mnDaysOfGraceCustomer);
@@ -569,6 +579,8 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
             callableStatement.setBoolean(nParam++, mbIsPaymentSaturday);
             callableStatement.setBoolean(nParam++, mbIsPaymentSunday);
             callableStatement.setBoolean(nParam++, mbIsCfdiProduction);
+            callableStatement.setBoolean(nParam++, mbIsCfdiSendingAutomaticSal);
+            callableStatement.setBoolean(nParam++, mbIsCfdiSendingAutomaticHrs);
             callableStatement.setBoolean(nParam++, mbIsCanEdit);
             callableStatement.setBoolean(nParam++, mbIsCanDelete);
             callableStatement.setBoolean(nParam++, mbIsDeleted);

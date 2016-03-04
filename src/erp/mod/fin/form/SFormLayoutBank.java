@@ -662,7 +662,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                      moTextConcept.setEnabled(mnLayout == SFinConsts.LAY_BANK_SANTANDER);
                     break;
                 case SDataConstantsSys.FINS_TP_PAY_BANK_SPEI_FD_N:
-                     moTextConcept.setEnabled(mnLayout == SFinConsts.LAY_BANK_HSBC || mnLayout == SFinConsts.LAY_BANK_SANTANDER);
+                     moTextConcept.setEnabled(mnLayout == SFinConsts.LAY_BANK_SANTANDER || mnLayout == SFinConsts.LAY_BANK_HSBC);
                     break;
                 case SDataConstantsSys.FINS_TP_PAY_BANK_SPEI_FD_Y:
                      moTextConcept.setEnabled(mnLayout == SFinConsts.LAY_BANK_SANTANDER);
@@ -839,6 +839,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
         layouts.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_HSBC }, SFinConsts.TXT_LAY_BANK_HSBC));
         layouts.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_SANTANDER }, SFinConsts.TXT_LAY_BANK_SANTANDER));
         layouts.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_BANBAJIO }, SFinConsts.TXT_LAY_BANK_BANBAJIO));
+        layouts.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_BBVA }, SFinConsts.TXT_LAY_BANK_BBVA));
         
         moKeyLayouId.removeAllItems();
         for (int i = 0; i < layouts.size(); i++) {
@@ -1070,6 +1071,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                     xmlRow.setReference(row.getReference());
                     xmlRow.setBajioBankCode(row.getBajioBankCode());
                     xmlRow.setBajioBankNick(row.getBajioBankAlias());
+                    xmlRow.setBankKey(row.getBankKey());
                     xmlRow.setRecYear(SLibConsts.UNDEFINED);
                     xmlRow.setRecPeriod(SLibConsts.UNDEFINED);
                     xmlRow.setRecBookkeepingCenter(SLibConsts.UNDEFINED);
@@ -1203,6 +1205,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                             xmlRow.setReference((dps.getNumberSeries().length() == 0 ? "" : dps.getNumberSeries() + "-") + dps.getNumber());
                             xmlRow.setBajioBankCode((String) layoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_BANK_CODE).getValue());
                             xmlRow.setBajioBankNick((String) layoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_NICK).getValue());
+                            xmlRow.setBankKey((int) layoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_KEY).getValue());
 
                             if (recordLayout != null) {
                                 xmlRow.setRecYear(recordLayout.getPkYearId());
@@ -1850,7 +1853,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
             for (SGridRow rowAux : moGridAbpSettings.getModel().getGridRows()) {
                 payRow = (SLayoutBankPaymentRow) rowAux;
 
-                if (payRow.getFinRecordLayout() != null || payRow.getFinRecordLayoutOld()!= null) {
+                if (payRow.getFinRecordLayout() != null || payRow.getFinRecordLayoutOld() != null) {
                     registry.getBankPaymentRows().add(payRow);
                 }
             }

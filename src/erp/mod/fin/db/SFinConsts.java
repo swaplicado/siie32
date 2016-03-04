@@ -13,10 +13,12 @@ public class SFinConsts {
     public static final int LAY_BANK_HSBC = 1;
     public static final int LAY_BANK_SANTANDER = 2;
     public static final int LAY_BANK_BANBAJIO = 3;
+    public static final int LAY_BANK_BBVA = 4;
 
     public static final java.lang.String TXT_LAY_BANK_HSBC = "LAYOUT HSBC";
     public static final java.lang.String TXT_LAY_BANK_SANTANDER = "LAYOUT SANTANDER";
     public static final java.lang.String TXT_LAY_BANK_BANBAJIO = "LAYOUT BANBAJIO";
+    public static final java.lang.String TXT_LAY_BANK_BBVA = "LAYOUT BBVA";
 
     public static final String TXT_BANK_BANK = "BCO.";
     public static final String TXT_BANK_BRA = "SUC.";

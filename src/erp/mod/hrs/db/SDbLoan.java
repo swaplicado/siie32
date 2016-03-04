@@ -33,7 +33,9 @@ public class SDbLoan extends SDbRegistryUser {
     protected double mdTotalAmount;
     protected double mdPaymentAmount;
     protected double mdPaymentFixed;
+    protected int mnPaymentPercentageReference;
     protected double mdPaymentPercentage;
+    protected double mdPaymentPercentageAmount;
     protected boolean mbClosed;
     //protected boolean mbDeleted;
     protected int mnFkLoanTypeId;
@@ -64,7 +66,9 @@ public class SDbLoan extends SDbRegistryUser {
     public void setTotalAmount(double d) { mdTotalAmount = d; }
     public void setPaymentAmount(double d) { mdPaymentAmount = d; }
     public void setPaymentFixed(double d) { mdPaymentFixed = d; }
+    public void setPaymentPercentageReference(int n) { mnPaymentPercentageReference = n; }
     public void setPaymentPercentage(double d) { mdPaymentPercentage = d; }
+    public void setPaymentPercentageAmount(double d) { mdPaymentPercentageAmount = d; }
     public void setClosed(boolean b) { mbClosed = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkLoanTypeId(int n) { mnFkLoanTypeId = n; }
@@ -85,7 +89,9 @@ public class SDbLoan extends SDbRegistryUser {
     public double getTotalAmount() { return mdTotalAmount; }
     public double getPaymentAmount() { return mdPaymentAmount; }
     public double getPaymentFixed() { return mdPaymentFixed; }
+    public int getPaymentPercentageReference() { return mnPaymentPercentageReference; }
     public double getPaymentPercentage() { return mdPaymentPercentage; }
+    public double getPaymentPercentageAmount() { return mdPaymentPercentageAmount; }
     public boolean isClosed() { return mbClosed; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkLoanTypeId() { return mnFkLoanTypeId; }
@@ -123,7 +129,9 @@ public class SDbLoan extends SDbRegistryUser {
         mdTotalAmount = 0;
         mdPaymentAmount = 0;
         mdPaymentFixed = 0;
+        mnPaymentPercentageReference = 0;
         mdPaymentPercentage = 0;
+        mdPaymentPercentageAmount = 0;
         mbClosed = false;
         mbDeleted = false;
         mnFkLoanTypeId = 0;
@@ -190,7 +198,9 @@ public class SDbLoan extends SDbRegistryUser {
             mdTotalAmount = resultSet.getDouble("tot_amt");
             mdPaymentAmount = resultSet.getDouble("pay_amt");
             mdPaymentFixed = resultSet.getDouble("pay_fix");
+            mnPaymentPercentageReference = resultSet.getInt("pay_per_ref");
             mdPaymentPercentage = resultSet.getDouble("pay_per");
+            mdPaymentPercentageAmount = resultSet.getDouble("pay_per_amt");
             mbClosed = resultSet.getBoolean("b_clo");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkLoanTypeId = resultSet.getInt("fk_tp_loan");
@@ -222,6 +232,7 @@ public class SDbLoan extends SDbRegistryUser {
         if (mbRegistryNew) {
             computePrimaryKey(session);
             mbDeleted = false;
+            mbClosed = false;
             mnFkUserInsertId = session.getUser().getPkUserId();
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
 
@@ -235,7 +246,9 @@ public class SDbLoan extends SDbRegistryUser {
                     mdTotalAmount + ", " + 
                     mdPaymentAmount + ", " + 
                     mdPaymentFixed + ", " + 
+                    mnPaymentPercentageReference + ", " + 
                     mdPaymentPercentage + ", " + 
+                    mdPaymentPercentageAmount + ", " + 
                     (mbClosed ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     mnFkLoanTypeId + ", " + 
@@ -263,7 +276,9 @@ public class SDbLoan extends SDbRegistryUser {
                     "tot_amt = " + mdTotalAmount + ", " +
                     "pay_amt = " + mdPaymentAmount + ", " +
                     "pay_fix = " + mdPaymentFixed + ", " +
+                    "pay_per_ref = " + mnPaymentPercentageReference + ", " +
                     "pay_per = " + mdPaymentPercentage + ", " +
+                    "pay_per_amt = " + mdPaymentPercentageAmount + ", " +
                     "b_clo = " + (mbClosed ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_tp_loan = " + mnFkLoanTypeId + ", " +
@@ -295,7 +310,9 @@ public class SDbLoan extends SDbRegistryUser {
         registry.setTotalAmount(this.getTotalAmount());
         registry.setPaymentAmount(this.getPaymentAmount());
         registry.setPaymentFixed(this.getPaymentFixed());
+        registry.setPaymentPercentageReference(this.getPaymentPercentageReference());
         registry.setPaymentPercentage(this.getPaymentPercentage());
+        registry.setPaymentPercentageAmount(this.getPaymentPercentageAmount());
         registry.setClosed(this.isClosed());
         registry.setDeleted(this.isDeleted());
         registry.setFkLoanTypeId(this.getFkLoanTypeId());

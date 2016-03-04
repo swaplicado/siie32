@@ -772,7 +772,8 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                     + "f_balance, "
                     + "f_tot, ";
                     if (mnGridSubtype == SModConsts.VIEW_SC_DET) {
-                        msSql += "b.bp AS f_bp, num_ser,  f_rcp_num, f_id_pay, b.id_bp AS f_id_bp, ";
+                        msSql += "b.bp AS f_bp, num_ser, f_rcp_num, f_id_pay, b.id_bp AS f_id_bp, "
+                                + "f_dt_iss, f_dt_pay, f_tp_pay_sys, ";
                     }
                     if (mnGridSubtype == SModConsts.VIEW_SC_DET) {
                         msSql += "CONCAT(num_ser, IF(LENGTH(num_ser) = 0, '', '-'), erp.lib_fix_int(f_rcp_num, " + SDataConstantsSys.NUM_LEN_DPS + ")) AS f_num, "
@@ -816,6 +817,9 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                     if (isCfdiPayrollVersionOld()) {
                         msSql += "FROM( "
                                 + "SELECT v.id_pay AS f_id_pay, v.pay_num, v.pay_num AS f_name, v.pay_year, v.pay_per, v.pay_type AS pay_type, v.dt_beg, v.dt_end, fid_bpr_n, pe.id_emp, pe.num_ser, pe.num AS f_rcp_num, "
+                                + "'' AS f_dt_iss, "
+                                + "'' AS f_dt_pay, "
+                                + "'' AS f_tp_pay_sys, "
                                 + "SUM(pe.debit) AS f_debit, "
                                 + "SUM(pe.credit) AS f_credit, "
                                 + "SUM(pe.debit - pe.credit) AS f_balance, "
@@ -831,6 +835,9 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                     else {
                         msSql += "FROM( "
                                 + "SELECT v.id_pay AS f_id_pay, v.num AS pay_num, v.num AS f_name, v.per_year AS pay_year, v.per AS pay_per, v.dt_sta AS dt_beg, v.dt_end, pe.id_emp, pei.id_iss, pei.fk_st_rcp, pei.num_ser, pei.num AS f_rcp_num, "
+                                + "pei.dt_iss AS f_dt_iss, "
+                                + "pei.dt_pay AS f_dt_pay, "
+                                + "(SELECT tp_pay_sys FROM " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_PAY_SYS) + " WHERE id_tp_pay_sys = pei.fk_tp_pay_sys) AS f_tp_pay_sys, "
                                 + "SUM(pei.ear_r) AS f_debit, "
                                 + "SUM(pei.ded_r) AS f_credit, "
                                 + "SUM(pei.pay_r) AS f_balance, "
@@ -886,6 +893,11 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "f_credit", "Deducciones $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "f_balance", "Alcance neto $"));
         if (mnGridSubtype == SModConsts.VIEW_SC_DET) {
+            if (!isCfdiPayrollVersionOld()) {
+                gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "f_dt_iss", "F emisión"));
+                gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "f_dt_pay", "F pago"));
+                gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_tp_pay_sys", "Método pago"));
+            }
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "f_con", "Iconsistente"));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "b_prc_ws", "Incorrecto PAC"));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "b_prc_sto_xml", "Incorrecto XML disco"));

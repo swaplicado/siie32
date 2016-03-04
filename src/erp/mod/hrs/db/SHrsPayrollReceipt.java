@@ -1535,12 +1535,14 @@ public class SHrsPayrollReceipt {
         int diferenceDaysPeriod = 0;
         double absenceConsumptionPendingDays = 0;
         double workingDaysAvailable = 0;
-        double recepitDays = 0;
+        double receiptDaysAvailable = 0;
+        double receiptDays = 0;
         boolean earFound = false;
         SHrsEmployeeDays employeeDays = moHrsEmployee.getEmployeeDays();
         
-        recepitDays = employeeDays.getReceiptDays();
+        receiptDays = employeeDays.getReceiptDays();
         workingDaysAvailable = employeeDays.getBusinessDays() - employeeDays.getDaysNotWorked_r();
+        receiptDaysAvailable = employeeDays.getReceiptDays() - employeeDays.getDaysNotWorked_r();
         diferenceDays = (int) SLibTimeUtils.getDaysDiff(absenceConsumption.getDateEnd(), absenceConsumption.getDateStart()) + 1;
         absenceConsumptionPendingDays = absence.getEffectiveDays() - SHrsUtils.getConsumptionPreviousDays(absence, moHrsEmployee);
         
@@ -1548,11 +1550,19 @@ public class SHrsPayrollReceipt {
         pendigEffectiveDays = (absence.getEffectiveDays() - SHrsUtils.getConsumptionPreviousDays(absence, moHrsEmployee)) - absenceConsumption.getEffectiveDays();
         
         if (moHrsPayroll.getPayroll().isNormal()) {
-            if (workingDaysAvailable <= 0) {
+            if (absence.getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_DIS) {
+                if (receiptDaysAvailable <= 0) {
+                    throw new Exception("No existen días naturales que asociar con la incidencia.");
+                }
+                else if (absenceConsumption.getEffectiveDays() > receiptDaysAvailable) {
+                    throw new Exception("Los días efectivos de consumo deben ser menor o igual a " + receiptDaysAvailable + ".");
+                }
+            }
+            else if (workingDaysAvailable <= 0) {
                 throw new Exception("No existen días laborables que asociar con la incidencia.");
             }
-            else if (absenceConsumption.getEffectiveDays() > (absence.getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_DIS ? recepitDays : workingDaysAvailable)) {
-                throw new Exception("Los días efectivos de consumo deben ser menor o igual a " + (absence.getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_DIS ? recepitDays : workingDaysAvailable) + ".");
+            else if (absenceConsumption.getEffectiveDays() > (absence.getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_DIS ? receiptDays : workingDaysAvailable)) {
+                throw new Exception("Los días efectivos de consumo deben ser menor o igual a " + (absence.getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_DIS ? receiptDays : workingDaysAvailable) + ".");
             }
             
             for (SDbAbsenceConsumption absenceConsumptionAux : moHrsEmployee.getHrsPayrollReceipt().getAbsenceConsumptions()) {
@@ -1561,8 +1571,8 @@ public class SHrsPayrollReceipt {
             
             diferenceDaysPeriod += (int) SLibTimeUtils.getDaysDiff(absenceConsumption.getDateEnd(), absenceConsumption.getDateStart()) + 1;
             
-            if (diferenceDaysPeriod > recepitDays) {
-                throw new Exception("Los días calendario comprendidos en los periodos de consumo son '" + diferenceDaysPeriod + "' y deben ser menor o igual a los días de la nómina del empleado que son '" + recepitDays + "'.");
+            if (diferenceDaysPeriod > receiptDays) {
+                throw new Exception("Los días calendario comprendidos en los periodos de consumo son '" + diferenceDaysPeriod + "' y deben ser menor o igual a los días de la nómina del empleado que son '" + receiptDays + "'.");
             }
         }
 
@@ -1602,6 +1612,29 @@ public class SHrsPayrollReceipt {
         
         return true;
      }
+    
+    public boolean validateDaysToBePaidWithAbsence() throws Exception {
+        double daysPayed = 0;
+        double daysAbsencePayed = 0;
+        
+        for (SHrsPayrollReceiptEarning hrsPayrollReceiptEarning : maHrsEarnings) {
+            if (hrsPayrollReceiptEarning.getEarning().isDaysWorked()) {
+                daysPayed += hrsPayrollReceiptEarning.getReceiptEarning().getUnits();
+            }
+        }
+        
+        for (SDbAbsenceConsumption absenceConsumption : maAbsenceConsumptionDays) {
+            if (absenceConsumption.getAbsence().IsAuxAbsencePayable()) {
+                daysAbsencePayed += absenceConsumption.getEffectiveDays();
+            }
+        }
+        
+        if (daysAbsencePayed > daysPayed) {
+            throw new Exception("Los días consumidos y pagados, no corresponden con los días pagados como percepciones.");
+        }
+        
+        return true;
+    }
      
      public SHrsPayrollReceipt clone() throws CloneNotSupportedException {
         SHrsPayrollReceipt registry = new SHrsPayrollReceipt();

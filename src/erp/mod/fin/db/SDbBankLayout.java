@@ -135,6 +135,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                 xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_SAN_BANK_CODE).setValue(xmlRow.getSantanderBankCode());
                 xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_BANK_CODE).setValue(xmlRow.getBajioBankCode());
                 xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_NICK).setValue(xmlRow.getBajioBankNick());
+                xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_KEY).setValue(xmlRow.getBankKey());
                 xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_APPLIED).setValue(xmlRow.getIsToPayed());
                 xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BP).setValue(xmlRow.getBizPartnerBranch());
                 xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).setValue(xmlRow.getBizPartnerBranchAccount());
@@ -217,7 +218,7 @@ public class SDbBankLayout extends SDbRegistryUser {
             
             // Account Credit:
         
-            sql = "SELECT fid_cur, " + (mnFkBankLayoutTypeId == SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? "acc_num " : "acc_num_std ")
+            sql = "SELECT fid_cur, " + (layout == SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? "acc_num " : "acc_num_std ")
                     + "FROM erp.bpsu_bank_acc "
                     + "WHERE id_bpb = " + (Integer) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BP).getValue() + " "
                     + "AND id_bank_acc = " + (Integer) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).getValue();
@@ -245,6 +246,7 @@ public class SDbBankLayout extends SDbRegistryUser {
             payment.setSantanderBankCode((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_SAN_BANK_CODE).getValue());
             payment.setBajioBankCode((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_BANK_CODE).getValue());
             payment.setBajioBankNick((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_NICK).getValue());
+            payment.setBankKey((int) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_KEY).getValue());
             
             payments.add(payment);
         }
@@ -261,6 +263,9 @@ public class SDbBankLayout extends SDbRegistryUser {
                   case SFinConsts.LAY_BANK_BANBAJIO:
                        msLayoutText = SFinUtilities.createLayoutBanBajioThird(payments, layoutTitle, mtDateLayout, mnConsecutive);
                       break;
+                  case SFinConsts.LAY_BANK_BBVA:
+                       msLayoutText = SFinUtilities.createLayoutBbvaThird(payments, layoutTitle);
+                      break;
                    default :
                        break;
                    }
@@ -275,6 +280,9 @@ public class SDbBankLayout extends SDbRegistryUser {
                       break;
                   case SFinConsts.LAY_BANK_BANBAJIO:
                        msLayoutText = SFinUtilities.createLayoutBanBajioTef(payments, layoutTitle, mtDateLayout, mnConsecutive);
+                      break;
+                   case SFinConsts.LAY_BANK_BBVA:
+                       msLayoutText = SFinUtilities.createLayoutBbvaTef(payments, layoutTitle);
                       break;
                    default :
                        break;
@@ -291,6 +299,9 @@ public class SDbBankLayout extends SDbRegistryUser {
                   case SFinConsts.LAY_BANK_BANBAJIO:
                        msLayoutText = SFinUtilities.createLayoutBanBajioSpeiFdN(payments, layoutTitle, mtDateLayout, mnConsecutive);
                       break;
+                   case SFinConsts.LAY_BANK_BBVA:
+                       msLayoutText = SFinUtilities.createLayoutBbvaSpei(payments, layoutTitle);
+                      break;
                    default :
                        break;
                    }
@@ -302,6 +313,9 @@ public class SDbBankLayout extends SDbRegistryUser {
                       break;
                   case SFinConsts.LAY_BANK_SANTANDER:
                        msLayoutText = SFinUtilities.createLayoutSantanderSpeiFdY(payments, layoutTitle);
+                      break;
+                   case SFinConsts.LAY_BANK_BBVA:
+                       msLayoutText = SFinUtilities.createLayoutBbvaSpei(payments, layoutTitle);
                       break;
                    default :
                        break;
@@ -319,6 +333,7 @@ public class SDbBankLayout extends SDbRegistryUser {
         for (SLayoutBankPaymentRow paymentRow : maBankPaymentRows) {
             // payment for delete:
             
+            found = false;
             if (paymentRow.getFinRecordLayoutOld() != null) {
                 if (paymentRow.getFinRecordLayout() == null ||
                         !(SLibUtils.compareKeys(paymentRow.getFinRecordLayout().getPrimaryKey(), paymentRow.getFinRecordLayoutOld().getPrimaryKey()))) {

@@ -72,6 +72,7 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport {
         jrbReportPayroll = new javax.swing.JRadioButton();
         jrbReportListEarning = new javax.swing.JRadioButton();
         jrbReportListDeductions = new javax.swing.JRadioButton();
+        jrbReportPayrollSummary = new javax.swing.JRadioButton();
         jPanel2 = new javax.swing.JPanel();
         jrbOrderByNumEmployee = new javax.swing.JRadioButton();
         jrbOrderByNameEmployee = new javax.swing.JRadioButton();
@@ -141,11 +142,11 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport {
 
         jPanel7.setLayout(new java.awt.BorderLayout());
 
-        jPanel9.setPreferredSize(new java.awt.Dimension(100, 100));
+        jPanel9.setPreferredSize(new java.awt.Dimension(100, 120));
         jPanel9.setLayout(new java.awt.BorderLayout());
 
         jPanel12.setBorder(javax.swing.BorderFactory.createTitledBorder("Reporte:"));
-        jPanel12.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
+        jPanel12.setLayout(new java.awt.GridLayout(5, 1, 0, 2));
 
         jbGrpReport.add(jrbReportPrePayroll);
         jrbReportPrePayroll.setSelected(true);
@@ -164,10 +165,14 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport {
         jrbReportListDeductions.setText("Listado de deducciones");
         jPanel12.add(jrbReportListDeductions);
 
+        jbGrpReport.add(jrbReportPayrollSummary);
+        jrbReportPayrollSummary.setText("Nómina resumen");
+        jPanel12.add(jrbReportPayrollSummary);
+
         jPanel9.add(jPanel12, java.awt.BorderLayout.WEST);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento:"));
-        jPanel2.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(5, 1, 0, 2));
 
         jbGrpOrderBy.add(jrbOrderByNumEmployee);
         jrbOrderByNumEmployee.setText("Número del empleado");
@@ -223,6 +228,7 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport {
     private javax.swing.JRadioButton jrbReportListDeductions;
     private javax.swing.JRadioButton jrbReportListEarning;
     private javax.swing.JRadioButton jrbReportPayroll;
+    private javax.swing.JRadioButton jrbReportPayrollSummary;
     private javax.swing.JRadioButton jrbReportPrePayroll;
     private sa.lib.gui.bean.SBeanFieldInteger moIntPayrollNumber;
     private sa.lib.gui.bean.SBeanFieldInteger moIntPeriodYear;
@@ -262,6 +268,8 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport {
                 else if (jrbOrderByNameDepartament.isSelected()) {
                     orderBy = "ORDER BY dep.code, dep.id_dep, bp.bp, bp.id_bp; ";
                 }
+                break;
+            case SModConsts.HRSR_PAY_SUM:
                 break;
             case SModConsts.HRSR_LIST_EAR:
                 if (jrbOrderByNumEmployee.isSelected()) {
@@ -324,7 +332,7 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport {
     @Override
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
-
+        
         if (validation.isValid()) {
             validation = moPanelHrsDepartaments.validatePanel();
         }
@@ -391,6 +399,16 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport {
                 moParamsMap.put("nYear", moIntPeriodYear.getValue());
                 moParamsMap.put("sPayrollType", moPayroll.getNumber() + "  " + (String) miClient.getSession().readField(SModConsts.HRSS_TP_PAY, new int[] { moPayroll.getFkPaymentTypeId() }, SDbRegistry.FIELD_NAME));
                 moParamsMap.put("sSqlOrderBy", getOrderBy(mnFormType));
+            }
+            else if (jrbReportPayrollSummary.isSelected()) {
+                mnFormType = SModConsts.HRSR_PAY_SUM;
+                
+                moParamsMap.put("nPayrollId", mnPayrollId);
+                moParamsMap.put("RegistroPatronal", ((SClientInterface) miClient).getSessionXXX().getParamsCompany().getRegistrySs());
+                moParamsMap.put("sEmiRfc", bizPartnerCompany.getFiscalId());
+                moParamsMap.put("tDateStart", moPayroll.getDateStart());
+                moParamsMap.put("tDateEnd", moPayroll.getDateEnd());
+                moParamsMap.put("nYear", moIntPeriodYear.getValue());
             }
         }
         catch (Exception e) {

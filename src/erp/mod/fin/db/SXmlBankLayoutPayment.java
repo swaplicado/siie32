@@ -27,6 +27,7 @@ public class SXmlBankLayoutPayment extends SXmlElement {
     public static final String ATT_LAY_PAY_SAN_BANK_CODE = "SantBankCode";
     public static final String ATT_LAY_PAY_BAJIO_BANK_CODE = "BajioBankCode";
     public static final String ATT_LAY_PAY_BAJIO_NICK = "BajioNick";
+    public static final String ATT_LAY_PAY_BANK_KEY = "BankKey";
     public static final String ATT_LAY_PAY_APPLIED = "PayApplied";
     public static final String ATT_LAY_PAY_BANK_BP = "PayBankBizPartnertId";
     public static final String ATT_LAY_PAY_BANK_BANK = "PayBankBankId";
@@ -50,6 +51,7 @@ public class SXmlBankLayoutPayment extends SXmlElement {
     protected SXmlAttribute moPaySantBankCode;
     protected SXmlAttribute moPayBajioBankCode;
     protected SXmlAttribute moPayBajioNick;
+    protected SXmlAttribute moPayBankKey;
     protected SXmlAttribute moPayApplied;
     protected SXmlAttribute moPayBankBizPartnertId;
     protected SXmlAttribute moPayBankBankId;
@@ -76,6 +78,7 @@ public class SXmlBankLayoutPayment extends SXmlElement {
         moPaySantBankCode = new SXmlAttribute(ATT_LAY_PAY_SAN_BANK_CODE);
         moPayBajioBankCode = new SXmlAttribute(ATT_LAY_PAY_BAJIO_BANK_CODE);
         moPayBajioNick = new SXmlAttribute(ATT_LAY_PAY_BAJIO_NICK);
+        moPayBankKey = new SXmlAttribute(ATT_LAY_PAY_BANK_KEY);
         moPayApplied = new SXmlAttribute(ATT_LAY_PAY_APPLIED);
         moPayBankBizPartnertId = new SXmlAttribute(ATT_LAY_PAY_BANK_BP);
         moPayBankBankId = new SXmlAttribute(ATT_LAY_PAY_BANK_BANK);
@@ -99,6 +102,7 @@ public class SXmlBankLayoutPayment extends SXmlElement {
         mvXmlAttributes.add(moPaySantBankCode);
         mvXmlAttributes.add(moPayBajioBankCode);
         mvXmlAttributes.add(moPayBajioNick);
+        mvXmlAttributes.add(moPayBankKey);
         mvXmlAttributes.add(moPayApplied);
         mvXmlAttributes.add(moPayBankBizPartnertId);
         mvXmlAttributes.add(moPayBankBankId);

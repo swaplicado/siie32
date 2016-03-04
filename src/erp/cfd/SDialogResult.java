@@ -333,7 +333,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                                 }
                                 
                                 SHrsCfdUtils.computeSignCfdi(miClient.getSession(), new int[] { key[0], key[1], key[2]  });
-                                detailMessage += (receiptIssue.getNumberSeries().length() > 0 ? receiptIssue.getNumberSeries() + "-" : "") + number + "   Timbrado y enviado.\n";
+                                detailMessage += (receiptIssue.getNumberSeries().length() > 0 ? receiptIssue.getNumberSeries() + "-" : "") + number + "   Timbrado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
                                 cfdsCorrect ++;
                             break;
                     }
@@ -430,12 +430,22 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                         detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Enviado.\n";
                         break;
                     case SCfdConsts.PROC_REQ_STAMP_AND_SND:
-                        SCfdUtils.signAndSendCfdi(miClient, cfd, mnSubtypeCfd, false);
-                        detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Timbrado y enviado.\n";
+                        if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
+                            SCfdUtils.signAndSendCfdi(miClient, cfd, mnSubtypeCfd, false);
+                        }
+                        else {
+                            SCfdUtils.signCfdi(miClient, cfd, mnSubtypeCfd, false);
+                        }
+                        detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "Timbrado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
                         break;
                     case SCfdConsts.PROC_REQ_ANNUL_AND_SND:
-                        SCfdUtils.cancelAndSendCfdi(miClient, cfd, mnSubtypeCfd, mtCancellationDate, mbValidateStamp, false);
-                        detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Anulado y enviado.\n";
+                        if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
+                            SCfdUtils.cancelAndSendCfdi(miClient, cfd, mnSubtypeCfd, mtCancellationDate, mbValidateStamp, false);
+                        }
+                        else {
+                            SCfdUtils.cancelCfdi(miClient, cfd, mnSubtypeCfd, mtCancellationDate, mbValidateStamp, false);
+                        }
+                        detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Anulado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
                         break;
                     default:
                 }

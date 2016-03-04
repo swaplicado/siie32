@@ -177,7 +177,7 @@
             <Container class="javax.swing.JPanel" name="jPanel9">
               <Properties>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[100, 100]"/>
+                  <Dimension value="[100, 120]"/>
                 </Property>
               </Properties>
               <Constraints>
@@ -204,8 +204,8 @@
 
                   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
                     <Property name="columns" type="int" value="1"/>
-                    <Property name="rows" type="int" value="4"/>
-                    <Property name="verticalGap" type="int" value="5"/>
+                    <Property name="rows" type="int" value="5"/>
+                    <Property name="verticalGap" type="int" value="2"/>
                   </Layout>
                   <SubComponents>
                     <Component class="javax.swing.JRadioButton" name="jrbReportPrePayroll">
@@ -241,6 +241,14 @@
                         <Property name="text" type="java.lang.String" value="Listado de deducciones"/>
                       </Properties>
                     </Component>
+                    <Component class="javax.swing.JRadioButton" name="jrbReportPayrollSummary">
+                      <Properties>
+                        <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                          <ComponentRef name="jbGrpReport"/>
+                        </Property>
+                        <Property name="text" type="java.lang.String" value="N&#xf3;mina resumen"/>
+                      </Properties>
+                    </Component>
                   </SubComponents>
                 </Container>
                 <Container class="javax.swing.JPanel" name="jPanel2">
@@ -259,8 +267,8 @@
 
                   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
                     <Property name="columns" type="int" value="1"/>
-                    <Property name="rows" type="int" value="4"/>
-                    <Property name="verticalGap" type="int" value="5"/>
+                    <Property name="rows" type="int" value="5"/>
+                    <Property name="verticalGap" type="int" value="2"/>
                   </Layout>
                   <SubComponents>
                     <Component class="javax.swing.JRadioButton" name="jrbOrderByNumEmployee">

@@ -11,6 +11,7 @@ import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.mhrs.data.SDataPayrollReceiptIssue;
 import erp.mod.SModConsts;
+import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SHrsPayrollAnnul;
 import erp.mod.hrs.db.SHrsUtils;
@@ -186,7 +187,12 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
                                 /* XXX jbarajas 04/02/2016 sign and sending CFDI
                                 needUpdate = SCfdUtils.signCfdi((SClientInterface) miClient, cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR);
                                 */
-                                needUpdate = SCfdUtils.signAndSendCfdi((SClientInterface) miClient, cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, true);
+                                if (((SClientInterface) miClient).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
+                                    needUpdate = SCfdUtils.signAndSendCfdi((SClientInterface) miClient, cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, true);
+                                }
+                                else {
+                                    needUpdate = SCfdUtils.signCfdi((SClientInterface) miClient, cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR);
+                                }
                             }
                         }
                                 
@@ -209,6 +215,7 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
         SHrsPayrollAnnul payrollAnnul = null;
         ArrayList<SDataCfd> cfds = null;
         ArrayList<SDataPayrollReceiptIssue> receiptIssues = null;
+        SDbPayroll payroll = null;
 
         if (jbAnnul.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
@@ -228,54 +235,61 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
-                        cfds = new ArrayList<SDataCfd>();
-                        receiptIssues = new ArrayList<SDataPayrollReceiptIssue>();
+                        payroll = (SDbPayroll) miClient.getSession().readRegistry(SModConsts.HRS_PAY, new int[] { gridRow.getRowPrimaryKey()[0] });
                         
-                        cfd = SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey());
-                        if (cfd != null) {
-                            cfds.add(cfd);
-                        }
-                        
-                        receiptIssue = new SDataPayrollReceiptIssue();
-            
-                        if (receiptIssue.read(new int[] { gridRow.getRowPrimaryKey()[0], gridRow.getRowPrimaryKey()[1], gridRow.getRowPrimaryKey()[2] }, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
-                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n El recibo no ha sido emitido.");
-                        }
-                        receiptIssues.add(receiptIssue);
-                                
-                        moDialogAnnulCfdi.formReset();
-                        moDialogAnnulCfdi.formRefreshCatalogues();
-                        moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, (cfds.isEmpty() ? miClient.getSession().getCurrentDate() : cfds.get(0).getTimestamp()));
-                        moDialogAnnulCfdi.setVisible(true);
-
-                        if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                            payrollAnnul = new SHrsPayrollAnnul((SClientInterface) miClient, cfds, receiptIssues, SCfdConsts.CFDI_PAYROLL_VER_CUR, false, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat());
-                            needUpdate = payrollAnnul.annulPayroll();
-                        }
-
-                        if (needUpdate) {
-                            miClient.getSession().notifySuscriptors(mnGridType);
-                        }
-                        
-                        /*
-                        if (cfd == null) {
-                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
+                        if (payroll.isClosed()) {
+                            miClient.showMsgBoxWarning("La nómina debe estar abierta.");
                         }
                         else {
+                            cfds = new ArrayList<SDataCfd>();
+                            receiptIssues = new ArrayList<SDataPayrollReceiptIssue>();
+
+                            cfd = SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey());
+                            if (cfd != null) {
+                                cfds.add(cfd);
+                            }
+
+                            receiptIssue = new SDataPayrollReceiptIssue();
+
+                            if (receiptIssue.read(new int[] { gridRow.getRowPrimaryKey()[0], gridRow.getRowPrimaryKey()[1], gridRow.getRowPrimaryKey()[2] }, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n El recibo no ha sido emitido.");
+                            }
+                            receiptIssues.add(receiptIssue);
+
                             moDialogAnnulCfdi.formReset();
                             moDialogAnnulCfdi.formRefreshCatalogues();
-                            moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, cfd.getTimestamp());
+                            moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, (cfds.isEmpty() ? miClient.getSession().getCurrentDate() : cfds.get(0).getTimestamp()));
                             moDialogAnnulCfdi.setVisible(true);
 
                             if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                                needUpdate = SCfdUtils.cancelCfdi((SClientInterface) miClient, cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat());
+                                payrollAnnul = new SHrsPayrollAnnul((SClientInterface) miClient, cfds, receiptIssues, SCfdConsts.CFDI_PAYROLL_VER_CUR, false, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat());
+                                needUpdate = payrollAnnul.annulPayroll();
                             }
 
                             if (needUpdate) {
                                 miClient.getSession().notifySuscriptors(mnGridType);
                             }
+
+                            /*
+                            if (cfd == null) {
+                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
+                            }
+                            else {
+                                moDialogAnnulCfdi.formReset();
+                                moDialogAnnulCfdi.formRefreshCatalogues();
+                                moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, cfd.getTimestamp());
+                                moDialogAnnulCfdi.setVisible(true);
+
+                                if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                                    needUpdate = SCfdUtils.cancelCfdi((SClientInterface) miClient, cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat());
+                                }
+
+                                if (needUpdate) {
+                                    miClient.getSession().notifySuscriptors(mnGridType);
+                                }
+                            }
+                            */
                         }
-                        */
                     }
                     catch (Exception e) {
                         SLibUtils.showException(this, e);
@@ -538,7 +552,10 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
             + "r.ear_r AS f_debit, "
             + "r.ded_r AS f_credit, "
             + "CONCAT(pei.num_ser, IF(LENGTH(pei.num_ser) = 0, '', '-'), erp.lib_fix_int(pei.num, " + SDataConstantsSys.NUM_LEN_DPS + ")) AS f_num_cfd, "
-            + "IF(pei.fk_st_rcp = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + SGridConsts.ICON_ANNUL + ", " + SGridConsts.ICON_NULL + ") AS f_ico, "  
+            + "IF(pei.fk_st_rcp = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + SGridConsts.ICON_ANNUL + ", " + SGridConsts.ICON_NULL + ") AS f_ico, "
+            + "pei.dt_iss AS f_dt_iss, "
+            + "pei.dt_pay AS f_dt_pay, "
+            + "(SELECT tp_pay_sys FROM " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_PAY_SYS) + " WHERE id_tp_pay_sys = pei.fk_tp_pay_sys) AS f_tp_pay_sys, "
             + "IF(c.ts IS NULL OR doc_xml = '', " + SGridConsts.ICON_NULL  + ", " /* without icon (not have CFDI associated) */
             + "IF(c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(uuid) = 0, " + SGridConsts.ICON_XML_PEND + ", " /* CFDI pending sign */
             + "IF(LENGTH(c.ack_can_xml) = 0 AND c.ack_can_pdf_n IS NULL, " + SGridConsts.ICON_XML_ISSU + ", " /* CFDI signed, canceled only SIIE */
@@ -616,6 +633,8 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, "v.f_num", "Número"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_sta", "F inicial"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_end", "F final"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "v.b_nor", "Normal"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "v.b_clo", "Cerrada"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "f_ico", "Estatus"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "f_ico_xml", "CFD"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_num_cfd", "Folio CFD", 75));
@@ -630,8 +649,9 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
         column.getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.SUBTRACTION, SLibRpnArgumentType.OPERATOR));
         gridColumnsViews.add(column);
         
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "v.b_nor", "Normal"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "v.b_clo", "Cerrada"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "f_dt_iss", "F emisión"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "f_dt_pay", "F pago"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_tp_pay_sys", "Método pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "f_prc_ws", "Incorrectos PAC"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "f_prc_sto_xml", "Incorrectos XML disco"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "f_prc_sto_pdf", "Incorrectos PDF disco"));

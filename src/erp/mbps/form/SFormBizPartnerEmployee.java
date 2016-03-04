@@ -24,6 +24,7 @@ import erp.mbps.data.SDataBizPartnerCategory;
 import erp.mbps.data.SDataEmployee;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsUtils;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -31,6 +32,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Vector;
 import javax.imageio.ImageIO;
@@ -1816,40 +1818,61 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                 break;
             }
         }
-
-        if (!validation.getIsError()) {
-
-            paramsValidation = new Object[] { moBizPartner == null ? SLibConsts.UNDEFINED : moBizPartner.getPkBizPartnerId(), composeName() };
-            if (SDataUtilities.callProcedureVal(miClient, SProcConstants.BPSU_BP, paramsValidation, SLibConstants.EXEC_MODE_VERBOSE) > 0) {
-                if (miClient.showMsgBoxConfirm("El valor del campo '" + jtfBizPartner_Ro.getToolTipText() + "' ya existe, ¿desea conservalo?") == JOptionPane.NO_OPTION) {
-                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jtfBizPartner_Ro.getToolTipText() + "'.");
-                    validation.setComponent(jtfFirstName);
-                }
-            }
-
+        
+        try {
             if (!validation.getIsError()) {
-                paramsValidation = new Object[] { moBizPartner == null ? SLibConsts.UNDEFINED : moBizPartner.getPkBizPartnerId(), moFieldFiscalId.getString() };
-                if (SDataUtilities.callProcedureVal(miClient, SProcConstants.BPSU_BP_FISCAL_ID, paramsValidation, SLibConstants.EXEC_MODE_VERBOSE) > 0) {
-                    if (miClient.showMsgBoxConfirm("El valor del campo '" + jlFiscalId.getText() + "' ya existe, ¿desea conservalo?") == JOptionPane.NO_OPTION) {
-                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlFiscalId.getText() + "'.");
-                        validation.setComponent(jtfFiscalId);
+
+                paramsValidation = new Object[] { moBizPartner == null ? SLibConsts.UNDEFINED : moBizPartner.getPkBizPartnerId(), composeName() };
+                if (SDataUtilities.callProcedureVal(miClient, SProcConstants.BPSU_BP, paramsValidation, SLibConstants.EXEC_MODE_VERBOSE) > 0) {
+                    if (miClient.showMsgBoxConfirm("El valor del campo '" + jtfBizPartner_Ro.getToolTipText() + "' ya existe, ¿desea conservalo?") == JOptionPane.NO_OPTION) {
+                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jtfBizPartner_Ro.getToolTipText() + "'.");
+                        validation.setComponent(jtfFirstName);
                     }
                 }
 
                 if (!validation.getIsError()) {
-                    if (!moFieldEmail.getString().isEmpty()) {
-                        msg = SLibUtilities.validateEmail(moFieldEmail.getString());
-                        if (!msg.isEmpty()) {
-                            validation.setMessage(msg);
-                            validation.setComponent(jtfEmail);
+                    paramsValidation = new Object[] { moBizPartner == null ? SLibConsts.UNDEFINED : moBizPartner.getPkBizPartnerId(), moFieldFiscalId.getString() };
+                    if (SDataUtilities.callProcedureVal(miClient, SProcConstants.BPSU_BP_FISCAL_ID, paramsValidation, SLibConstants.EXEC_MODE_VERBOSE) > 0) {
+                        if (miClient.showMsgBoxConfirm("El valor del campo '" + jlFiscalId.getText() + "' ya existe, ¿desea conservalo?") == JOptionPane.NO_OPTION) {
+                            validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlFiscalId.getText() + "'.");
+                            validation.setComponent(jtfFiscalId);
+                        }
+                    }
+
+                    if (!validation.getIsError()) {
+                        if (!moFieldEmail.getString().isEmpty()) {
+                            msg = SLibUtilities.validateEmail(moFieldEmail.getString());
+                            if (!msg.isEmpty()) {
+                                validation.setMessage(msg);
+                                validation.setComponent(jtfEmail);
+                            }
                         }
                     }
                 }
-            }
 
-            if (!validation.getIsError() && jckIsAddress.isSelected()) {
-                validation = moPanelBizPartnerBranchAddress.formValidate();
+                if (!validation.getIsError() && jckIsAddress.isSelected()) {
+                    validation = moPanelBizPartnerBranchAddress.formValidate();
+                }
+
+                if (!validation.getIsError()) {
+                    String sDateRfc = moFieldFiscalId.getString().substring(4, 10);
+                    int nYearRfc = Integer.parseInt(sDateRfc.substring(0, 2)) + SHrsConsts.YEAR_MAX_BIRTH > SLibTimeUtilities.digestYear(miClient.getSessionXXX().getSystemDate())[0] ? 
+                            Integer.parseInt(sDateRfc.substring(0, 2)) + SHrsConsts.YEAR_MIN_BIRTH : Integer.parseInt(sDateRfc.substring(0, 2)) + SHrsConsts.YEAR_MAX_BIRTH;
+
+                    Date tDateRfc = SLibTimeUtilities.createDate(nYearRfc, Integer.parseInt(sDateRfc.substring(2, 4)), Integer.parseInt(sDateRfc.substring(4, 6)));
+
+                    if (tDateRfc.compareTo(moFieldDateBirth.getDate()) != 0) {
+                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlDateBirth.getText() + "'\n " +
+                                "La fecha de nacimiento (" + miClient.getSessionXXX().getFormatters().getDateFormat().format(moFieldDateBirth.getDate()) + ") no corresponde a la " +
+                                "fecha del RFC (" + miClient.getSessionXXX().getFormatters().getDateFormat().format(tDateRfc) + ").");
+                        jTabbedPane1.setSelectedIndex(1);
+                        validation.setComponent(jftDateBirth);
+                    }
+                }
             }
+        }
+        catch (Exception e) {
+            SLibUtilities.printOutException(this, e);
         }
 
         return validation;

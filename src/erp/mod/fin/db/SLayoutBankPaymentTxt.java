@@ -27,6 +27,7 @@ public class SLayoutBankPaymentTxt {
     protected String msSantanderBankCode;
     protected String msBajioBankCode;
     protected String msBajioBankNick;
+    protected int mnBankKey;
 
     public SLayoutBankPaymentTxt() {
         mdTotalAmount = 0;
@@ -46,6 +47,7 @@ public class SLayoutBankPaymentTxt {
         msSantanderBankCode = "";
         msBajioBankCode = "";
         msBajioBankNick = "";
+        mnBankKey = 0;
     }
 
     public void setTotalAmount(double d) { mdTotalAmount = d; }
@@ -65,6 +67,7 @@ public class SLayoutBankPaymentTxt {
     public void setSantanderBankCode(String s) { msSantanderBankCode = s; }
     public void setBajioBankCode(String s) { msBajioBankCode = s; }
     public void setBajioBankNick(String s) { msBajioBankNick = s; }
+    public void setBankKey(int n) { mnBankKey = n; }
 
     public double getTotalAmount() { return mdTotalAmount; }
     public String getReference() { return msReference; }
@@ -83,4 +86,5 @@ public class SLayoutBankPaymentTxt {
     public String getSantanderBankCode() { return msSantanderBankCode; }
     public String getBajioBankCode() { return msBajioBankCode; }
     public String getBajioBankNick() { return msBajioBankNick; }
+    public int getBankKey() { return mnBankKey; }
 }

@@ -1639,8 +1639,15 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                     miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
                                 }
                                 */
-                                if (SCfdUtils.signAndSendCfdi(miClient, dps.getDbmsDataCfd(), SLibConstants.UNDEFINED, true)) {
-                                    miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
+                                if (((SClientInterface) miClient).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticSal()) {
+                                    if (SCfdUtils.signAndSendCfdi(miClient, dps.getDbmsDataCfd(), SLibConstants.UNDEFINED, true)) {
+                                        miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
+                                    }
+                                }
+                                else {
+                                    if (SCfdUtils.signCfdi(miClient, dps.getDbmsDataCfd(), SLibConstants.UNDEFINED)) {
+                                        miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
+                                    }
                                 }
                             }
                             catch (java.lang.Exception e) {

@@ -71,6 +71,7 @@ public class SXmlBankLayout extends SXmlDocument {
             row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_SAN_BANK_CODE).setValue(namedNodeMap.getNamedItem(SXmlBankLayoutPayment.ATT_LAY_PAY_SAN_BANK_CODE).getNodeValue());
             row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_BANK_CODE).setValue(namedNodeMap.getNamedItem(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_BANK_CODE).getNodeValue());
             row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_NICK).setValue(namedNodeMap.getNamedItem(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_NICK).getNodeValue());
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_KEY).setValue(SLibUtils.parseInt(namedNodeMap.getNamedItem(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_KEY).getNodeValue()));
             row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_APPLIED).setValue(namedNodeMap.getNamedItem(SXmlBankLayoutPayment.ATT_LAY_PAY_APPLIED).getNodeValue().compareTo("" + true) == 0);
             row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BP).setValue(SLibUtils.parseInt(namedNodeMap.getNamedItem(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BP).getNodeValue()));
             row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).setValue(SLibUtils.parseInt(namedNodeMap.getNamedItem(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).getNodeValue()));

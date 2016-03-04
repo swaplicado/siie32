@@ -245,7 +245,7 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
     private javax.swing.ButtonGroup moRadGroupFilterType;
     // End of variables declaration//GEN-END:variables
 
-    public void actionEnableFields() {
+    private void actionEnableFields() {
         if (moRadFilterTypePeriod.isSelected()) {
             moIntPeriodYear.setEnabled(true);
             moIntPeriodStart.setEnabled(true);    

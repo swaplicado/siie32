@@ -177,6 +177,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         ArrayList<SDataCfd> cfds = null;
         ArrayList<SDataPayrollReceiptIssue> receiptIssues = null;
         SHrsPayrollAnnul payrollAnnul = null;
+        SDbPayroll payroll = null;
 
         if (jbAnnul.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
@@ -196,42 +197,49 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
-                        cfds = SCfdUtils.getPayrollCfds((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey());
-                        receiptIssues = SHrsUtils.getPayrollReceiptIssues(miClient.getSession(), gridRow.getRowPrimaryKey());
+                        payroll = (SDbPayroll) miClient.getSession().readRegistry(SModConsts.HRS_PAY, gridRow.getRowPrimaryKey());
                         
-                        moDialogAnnulCfdi.formReset();
-                        moDialogAnnulCfdi.formRefreshCatalogues();
-                        moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, (cfds == null || cfds.isEmpty() ? miClient.getSession().getCurrentDate() : cfds.get(0).getTimestamp()));
-                        moDialogAnnulCfdi.setVisible(true);
-
-                        if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                            payrollAnnul = new SHrsPayrollAnnul((SClientInterface) miClient, cfds, receiptIssues, SCfdConsts.CFDI_PAYROLL_VER_CUR, true, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat());
-                            needUpdate = payrollAnnul.annulPayroll();
-                        }
-
-                        if (needUpdate) {
-                            miClient.getSession().notifySuscriptors(mnGridType);
-                        }
-                        
-                        /*
-                        if (cfds == null || cfds.isEmpty()) {
-                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
+                        if (payroll.isClosed()) {
+                            miClient.showMsgBoxWarning("La nómina debe estar abierta.");
                         }
                         else {
+                            cfds = SCfdUtils.getPayrollCfds((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey());
+                            receiptIssues = SHrsUtils.getPayrollReceiptIssues(miClient.getSession(), gridRow.getRowPrimaryKey());
+
                             moDialogAnnulCfdi.formReset();
                             moDialogAnnulCfdi.formRefreshCatalogues();
-                            moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, cfds.get(0).getTimestamp());
+                            moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, (cfds == null || cfds.isEmpty() ? miClient.getSession().getCurrentDate() : cfds.get(0).getTimestamp()));
                             moDialogAnnulCfdi.setVisible(true);
 
                             if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                                needUpdate = SCfdUtils.cancelCfdi((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_CUR, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat());
+                                payrollAnnul = new SHrsPayrollAnnul((SClientInterface) miClient, cfds, receiptIssues, SCfdConsts.CFDI_PAYROLL_VER_CUR, true, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat());
+                                needUpdate = payrollAnnul.annulPayroll();
                             }
 
                             if (needUpdate) {
                                 miClient.getSession().notifySuscriptors(mnGridType);
                             }
+
+                            /*
+                            if (cfds == null || cfds.isEmpty()) {
+                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
+                            }
+                            else {
+                                moDialogAnnulCfdi.formReset();
+                                moDialogAnnulCfdi.formRefreshCatalogues();
+                                moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, cfds.get(0).getTimestamp());
+                                moDialogAnnulCfdi.setVisible(true);
+
+                                if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                                    needUpdate = SCfdUtils.cancelCfdi((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_CUR, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat());
+                                }
+
+                                if (needUpdate) {
+                                    miClient.getSession().notifySuscriptors(mnGridType);
+                                }
+                            }
+                            */
                         }
-                        */
                     }
                     catch (Exception e) {
                         SLibUtils.showException(this, e);

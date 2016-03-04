@@ -7,9 +7,12 @@ package erp.mod.hrs.form;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbLoan;
+import erp.mod.hrs.db.SHrsConsts;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import javax.swing.JComboBox;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -17,14 +20,15 @@ import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
+import sa.lib.gui.bean.SBeanFieldRadio;
 import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
  * @author Juan Barajas
  */
-public class SFormLoan extends SBeanForm implements ItemListener {
-
+public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener {
+    
     private SDbLoan moRegistry;
 
     /**
@@ -47,6 +51,7 @@ public class SFormLoan extends SBeanForm implements ItemListener {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        moRadGroupSalaryType = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
@@ -86,11 +91,18 @@ public class SFormLoan extends SBeanForm implements ItemListener {
         jlPaymentPercentage = new javax.swing.JLabel();
         moDecPaymentPercentage = new sa.lib.gui.bean.SBeanFieldDecimal();
         jlExemptionSalaryEqualsMwzPercentageHelp2 = new javax.swing.JLabel();
+        jPanel14 = new javax.swing.JPanel();
+        moRadSd = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadSbc = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadOther = new sa.lib.gui.bean.SBeanFieldRadio();
+        jPanel15 = new javax.swing.JPanel();
+        jlSalaryOther = new javax.swing.JLabel();
+        moDecSalaryOther = new sa.lib.gui.bean.SBeanFieldDecimal();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(11, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(13, 1, 0, 5));
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -229,6 +241,31 @@ public class SFormLoan extends SBeanForm implements ItemListener {
 
         jPanel2.add(jPanel11);
 
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        moRadGroupSalaryType.add(moRadSd);
+        moRadSd.setText("SD");
+        jPanel14.add(moRadSd);
+
+        moRadGroupSalaryType.add(moRadSbc);
+        moRadSbc.setText("SBC");
+        jPanel14.add(moRadSbc);
+
+        moRadGroupSalaryType.add(moRadOther);
+        moRadOther.setText("Otro");
+        jPanel14.add(moRadOther);
+
+        jPanel2.add(jPanel14);
+
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlSalaryOther.setText("Salario referencia:");
+        jlSalaryOther.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel15.add(jlSalaryOther);
+        jPanel15.add(moDecSalaryOther);
+
+        jPanel2.add(jPanel15);
+
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -240,6 +277,8 @@ public class SFormLoan extends SBeanForm implements ItemListener {
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -262,6 +301,7 @@ public class SFormLoan extends SBeanForm implements ItemListener {
     private javax.swing.JLabel jlPaymentAmount;
     private javax.swing.JLabel jlPaymentFixed;
     private javax.swing.JLabel jlPaymentPercentage;
+    private javax.swing.JLabel jlSalaryOther;
     private javax.swing.JLabel jlTotalAmount;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd_n;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
@@ -269,15 +309,29 @@ public class SFormLoan extends SBeanForm implements ItemListener {
     private sa.lib.gui.bean.SBeanFieldDecimal moDecPaymentAmount;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecPaymentFixed;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecPaymentPercentage;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecSalaryOther;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecTotalAmount;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEmployee;
     private sa.lib.gui.bean.SBeanFieldKey moKeyLoanPaymentType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyLoanType;
+    private javax.swing.ButtonGroup moRadGroupSalaryType;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadOther;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadSbc;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadSd;
     private sa.lib.gui.bean.SBeanFieldText moTextNumber;
     // End of variables declaration//GEN-END:variables
 
+    public void actionEnableFields() {
+        moDecSalaryOther.setEditable(false);
+        moDecSalaryOther.setValue(0d);
+        
+        if (moRadOther.isEnabled() && moRadOther.isSelected()) {
+            moDecSalaryOther.setEditable(true);
+        }
+    }
+    
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 640, 400);
+        SGuiUtils.setWindowBounds(this, 720, 450);
 
         moKeyEmployee.setKeySettings(miClient, SGuiUtils.getLabelName(jlEmployee.getText()), true);
         moKeyLoanType.setKeySettings(miClient, SGuiUtils.getLabelName(jlLoanType.getText()), true);
@@ -290,6 +344,10 @@ public class SFormLoan extends SBeanForm implements ItemListener {
         moDecPaymentAmount.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentAmount.getText()), SGuiConsts.GUI_TYPE_DEC_QTY, false);
         moDecPaymentFixed.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentFixed.getText()), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, false);
         moDecPaymentPercentage.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentPercentage.getText()), SGuiConsts.GUI_TYPE_DEC_PER_DISC, false);
+        moRadSd.setBooleanSettings(SGuiUtils.getLabelName(moRadSd.getText()), true);
+        moRadSbc.setBooleanSettings(SGuiUtils.getLabelName(moRadSbc.getText()), false);
+        moRadOther.setBooleanSettings(SGuiUtils.getLabelName(moRadOther.getText()), false);
+        moDecSalaryOther.setDecimalSettings(SGuiUtils.getLabelName(jlSalaryOther.getText()), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, true);
 
         moFields.addField(moKeyEmployee);
         moFields.addField(moKeyLoanType);
@@ -302,8 +360,16 @@ public class SFormLoan extends SBeanForm implements ItemListener {
         moFields.addField(moDecPaymentAmount);
         moFields.addField(moDecPaymentFixed);
         moFields.addField(moDecPaymentPercentage);
+        moFields.addField(moRadSd);
+        moFields.addField(moRadSbc);
+        moFields.addField(moRadOther);
+        moFields.addField(moDecSalaryOther);
 
         moFields.setFormButton(jbSave);
+
+        moRadSd.addChangeListener(this);
+        moRadSbc.addChangeListener(this);
+        moRadOther.addChangeListener(this);
     }
 
     private void itemStateKeyLoanType() {
@@ -331,43 +397,57 @@ public class SFormLoan extends SBeanForm implements ItemListener {
     
     private void itemStateKeyLoanPaymentType() {
         if (moKeyLoanPaymentType.getValue().length == 0) {
-            moDecPaymentAmount.setEnabled(false);
-            moDecPaymentFixed.setEnabled(false);
-            moDecPaymentPercentage.setEnabled(false);
+            moDecPaymentAmount.setEditable(false);
+            moDecPaymentFixed.setEditable(false);
+            moDecPaymentPercentage.setEditable(false);
             moDecPaymentAmount.setValue(0d);
             moDecPaymentFixed.setValue(0d);
             moDecPaymentPercentage.setValue(0d);
+            moRadSd.setEnabled(false);
+            moRadSbc.setEnabled(false);
+            moRadOther.setEnabled(false);
         }
         else {
             switch (moKeyLoanPaymentType.getValue()[0]) {
                 case SModSysConsts.HRSS_TP_LOAN_PAY_AMT:
-                    moDecPaymentAmount.setEnabled(true);
-                    moDecPaymentFixed.setEnabled(false);
-                    moDecPaymentPercentage.setEnabled(false);
+                    moDecPaymentAmount.setEditable(true);
+                    moDecPaymentFixed.setEditable(false);
+                    moDecPaymentPercentage.setEditable(false);
                     moDecPaymentAmount.setValue(0d);
                     moDecPaymentFixed.setValue(0d);
                     moDecPaymentPercentage.setValue(0d);
+                    moRadSd.setEnabled(false);
+                    moRadSbc.setEnabled(false);
+                    moRadOther.setEnabled(false);
                     break;
                 case SModSysConsts.HRSS_TP_LOAN_PAY_FIX:
-                    moDecPaymentAmount.setEnabled(false);
-                    moDecPaymentFixed.setEnabled(true);
-                    moDecPaymentPercentage.setEnabled(false);
+                    moDecPaymentAmount.setEditable(false);
+                    moDecPaymentFixed.setEditable(true);
+                    moDecPaymentPercentage.setEditable(false);
                     moDecPaymentAmount.setValue(0d);
                     moDecPaymentFixed.setValue(0d);
                     moDecPaymentPercentage.setValue(0d);
+                    moRadSd.setEnabled(false);
+                    moRadSbc.setEnabled(false);
+                    moRadOther.setEnabled(false);
                     break;
                 case SModSysConsts.HRSS_TP_LOAN_PAY_PER:
-                    moDecPaymentAmount.setEnabled(false);
-                    moDecPaymentFixed.setEnabled(false);
-                    moDecPaymentPercentage.setEnabled(true);
+                    moDecPaymentAmount.setEditable(false);
+                    moDecPaymentFixed.setEditable(false);
+                    moDecPaymentPercentage.setEditable(true);
                     moDecPaymentAmount.setValue(0d);
                     moDecPaymentFixed.setValue(0d);
                     moDecPaymentPercentage.setValue(0d);
+                    
+                    moRadSd.setEnabled(true);
+                    moRadSbc.setEnabled(true);
+                    moRadOther.setEnabled(true);
                     break;
                 default:
                     break;
             }
         }
+        actionEnableFields();
     }
     
     @Override
@@ -419,25 +499,35 @@ public class SFormLoan extends SBeanForm implements ItemListener {
         moDecTotalAmount.setValue(moRegistry.getTotalAmount());
         moKeyLoanType.setValue(new int[] { moRegistry.getFkLoanTypeId() });
         moKeyLoanPaymentType.setValue(new int[] { moRegistry.getFkLoanPaymentTypeId() });
+        
+        moRadSd.setSelected(moRegistry.getPaymentPercentageReference() == SHrsConsts.SAL_REF_SAL);
+        moRadSbc.setSelected(moRegistry.getPaymentPercentageReference() == SHrsConsts.SAL_REF_SAL_SS);
+        moRadOther.setSelected(moRegistry.getPaymentPercentageReference() == SHrsConsts.SAL_REF_SAL_FIX);
 
         setFormEditable(true);
         
-        if (!moRegistry.isRegistryNew()) {
+        if (moRegistry.isRegistryNew()) {
+            moRadSbc.setSelected(true);
+        }
+        else {
             moKeyEmployee.setEnabled(false);
         }
         
         moDecCapital.setEditable(false);
         moDecTotalAmount.setEditable(false);
-        moDecPaymentAmount.setEnabled(false);
-        moDecPaymentFixed.setEnabled(false);
-        moDecPaymentPercentage.setEnabled(false);
+        moDecPaymentAmount.setEditable(false);
+        moDecPaymentFixed.setEditable(false);
+        moDecPaymentPercentage.setEditable(false);
         
         itemStateKeyLoanPaymentType();
         itemStateKeyLoanType();
+        actionEnableFields();
         
         moDecPaymentAmount.setValue(moRegistry.getPaymentAmount());
         moDecPaymentFixed.setValue(moRegistry.getPaymentFixed());
         moDecPaymentPercentage.setValue(moRegistry.getPaymentPercentage());
+        
+        moDecSalaryOther.setValue(moRegistry.getPaymentPercentageAmount());
 
         addAllListeners();
     }
@@ -459,6 +549,9 @@ public class SFormLoan extends SBeanForm implements ItemListener {
         registry.setPaymentPercentage(moDecPaymentPercentage.getValue());
         registry.setFkLoanTypeId(moKeyLoanType.getValue()[0]);
         registry.setFkLoanPaymentTypeId(moKeyLoanPaymentType.getValue()[0]);
+        
+        registry.setPaymentPercentageReference(moRadSd.isSelected() ? SHrsConsts.SAL_REF_SAL : moRadSbc.isSelected() ? SHrsConsts.SAL_REF_SAL_SS : SHrsConsts.SAL_REF_SAL_FIX);
+        registry.setPaymentPercentageAmount(moDecSalaryOther.getValue());
 
         return registry;
     }
@@ -477,15 +570,15 @@ public class SFormLoan extends SBeanForm implements ItemListener {
             }
             
             if (validation.isValid()) {
-                if (moDecPaymentAmount.isEnabled() && moDecPaymentAmount.getValue() == 0) {
+                if (moDecPaymentAmount.isEditable()&& moDecPaymentAmount.getValue() == 0) {
                     validation.setMessage("Se debe especificar un valor decimal para el campo '" + SGuiUtils.getLabelName(jlPaymentAmount.getText()) + "'.");
                     validation.setComponent(moDecPaymentAmount);
                 }
-                else if (moDecPaymentFixed.isEnabled() && moDecPaymentFixed.getValue() == 0) {
+                else if (moDecPaymentFixed.isEditable() && moDecPaymentFixed.getValue() == 0) {
                     validation.setMessage("Se debe especificar un valor decimal para el campo '" + SGuiUtils.getLabelName(jlPaymentFixed.getText()) + "'.");
                     validation.setComponent(moDecPaymentFixed);
                 }
-                else if (moDecPaymentPercentage.isEnabled() && moDecPaymentPercentage.getValue() == 0) {
+                else if (moDecPaymentPercentage.isEditable() && moDecPaymentPercentage.getValue() == 0) {
                     validation.setMessage("Se debe especificar un valor decimal para el campo '" + SGuiUtils.getLabelName(jlPaymentPercentage.getText()) + "'.");
                     validation.setComponent(moDecPaymentPercentage);
                 }
@@ -506,6 +599,16 @@ public class SFormLoan extends SBeanForm implements ItemListener {
             else if (comboBox == moKeyLoanType) {
                 itemStateKeyLoanType();
             }
+        }
+    }
+
+    @Override
+    public void stateChanged(ChangeEvent e) {
+        if (e.getSource() instanceof SBeanFieldRadio) {
+            if ((SBeanFieldRadio) e.getSource() == moRadOther) {
+                actionEnableFields();
+            }
+            
         }
     }
 }

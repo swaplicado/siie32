@@ -1420,7 +1420,12 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                                             if ((Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC)) {
                                                 // XXX jbarajas 03/02/2016 sign and sending CFDI
                                                 //SCfdUtils.cancelCfdi(miClient, ((SDataDps) moRegistry).getDbmsDataCfd(), SLibConstants.UNDEFINED, (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), (Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC));
-                                                SCfdUtils.cancelAndSendCfdi(miClient, ((SDataDps) moRegistry).getDbmsDataCfd(), SLibConstants.UNDEFINED, (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), (Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true);
+                                                if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticSal()) {
+                                                    SCfdUtils.cancelAndSendCfdi(miClient, ((SDataDps) moRegistry).getDbmsDataCfd(), SLibConstants.UNDEFINED, (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), (Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true);
+                                                }
+                                                else {
+                                                    SCfdUtils.cancelCfdi(miClient, ((SDataDps) moRegistry).getDbmsDataCfd(), SLibConstants.UNDEFINED, (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), (Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC));
+                                                }
                                                 result = SLibConstants.DB_ACTION_ANNUL_OK;
                                                 annul = false;
                                             }

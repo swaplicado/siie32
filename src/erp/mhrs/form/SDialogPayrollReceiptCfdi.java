@@ -97,7 +97,9 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
         jtfDatePayment = new javax.swing.JFormattedTextField();
         jbDatePayment = new javax.swing.JButton();
         jpEmployeesAvailable = new javax.swing.JPanel();
+        jlTotalAvailables = new javax.swing.JLabel();
         jpEmployeesSelected = new javax.swing.JPanel();
+        jlTotalSelected = new javax.swing.JLabel();
         jpControls = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jlDummy01 = new javax.swing.JLabel();
@@ -122,7 +124,7 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos de la nómina:"));
         jPanel1.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
-        jPanel3.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPayroll.setText("Nómina:");
         jlPayroll.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -142,7 +144,7 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
 
         jPanel1.add(jPanel3);
 
-        jPanel5.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPayrollDates.setText("Período nómina:");
         jlPayrollDates.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -156,7 +158,7 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
 
         jPanel1.add(jPanel5);
 
-        jPanel6.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPayrollNotes.setText("Comentarios:");
         jlPayrollNotes.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -177,7 +179,7 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
 
         jPanel8.setLayout(new java.awt.GridLayout(2, 0, 0, 5));
 
-        jpAccountingRecord.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jpAccountingRecord.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkPaymentSystemTypeId.setText("Método de pago:");
         jlFkPaymentSystemTypeId.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -205,7 +207,7 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
 
         jPanel8.add(jpAccountingRecord);
 
-        jpPaymentType.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jpPaymentType.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDummy2.setPreferredSize(new java.awt.Dimension(447, 23));
         jpPaymentType.add(jlDummy2);
@@ -231,11 +233,19 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
         jpEmployeesAvailable.setBorder(javax.swing.BorderFactory.createTitledBorder("Recibos disponibles:"));
         jpEmployeesAvailable.setPreferredSize(new java.awt.Dimension(350, 100));
         jpEmployeesAvailable.setLayout(new java.awt.BorderLayout());
+
+        jlTotalAvailables.setText("n");
+        jpEmployeesAvailable.add(jlTotalAvailables, java.awt.BorderLayout.SOUTH);
+
         jPanel4.add(jpEmployeesAvailable, java.awt.BorderLayout.LINE_START);
 
         jpEmployeesSelected.setBorder(javax.swing.BorderFactory.createTitledBorder("Recibos seleccionados:"));
         jpEmployeesSelected.setPreferredSize(new java.awt.Dimension(475, 100));
         jpEmployeesSelected.setLayout(new java.awt.BorderLayout());
+
+        jlTotalSelected.setText("n");
+        jpEmployeesSelected.add(jlTotalSelected, java.awt.BorderLayout.PAGE_END);
+
         jPanel4.add(jpEmployeesSelected, java.awt.BorderLayout.LINE_END);
 
         jpControls.setLayout(new java.awt.BorderLayout());
@@ -271,7 +281,7 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
 
         getContentPane().add(jpGrid, java.awt.BorderLayout.CENTER);
 
-        jPanel2.setLayout(new java.awt.FlowLayout(2));
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar");
         jbOk.setToolTipText("[Ctrl + Enter]");
@@ -294,8 +304,8 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-976)/2, (screenSize.height-638)/2, 976, 638);
+        setSize(new java.awt.Dimension(976, 638));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -309,7 +319,22 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
     private void jbCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbCancelActionPerformed
         actionCancel();
     }//GEN-LAST:event_jbCancelActionPerformed
-
+    
+    private void computeTotals() {
+        int countAvailables = 0;
+        int countSelected = 0;
+        
+        for (int i = 0; i < moTablePaneReceiptAvailable.getTableGuiRowCount(); i++) {
+            countAvailables++;
+        }
+        for (int i = 0; i < moTablePaneReceiptSelected.getTableGuiRowCount(); i++) {
+            countSelected++;
+        }
+        
+        jlTotalAvailables.setText(" " + countAvailables + " recibos disponibles.");
+        jlTotalSelected.setText(" " + countSelected + " recibos seleccionados.");
+    }
+    
     private void initComponentsExtra() {
         int i = 0;
         STableColumnForm[] aoTableColumns = null;
@@ -459,6 +484,7 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
                 SLibUtilities.renderException(this, e);
             }
         }
+        computeTotals();
     }
     
     @SuppressWarnings("unchecked")
@@ -529,6 +555,7 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
 
                 error = false;
             }
+            computeTotals();
         }
 
         return !error;
@@ -566,6 +593,7 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
 
             error = false;
         }
+        computeTotals();
 
         return !error;
     }
@@ -637,6 +665,8 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
     private javax.swing.JLabel jlPayroll;
     private javax.swing.JLabel jlPayrollDates;
     private javax.swing.JLabel jlPayrollNotes;
+    private javax.swing.JLabel jlTotalAvailables;
+    private javax.swing.JLabel jlTotalSelected;
     private javax.swing.JPanel jpAccountingRecord;
     private javax.swing.JPanel jpControls;
     private javax.swing.JPanel jpEmployeesAvailable;
