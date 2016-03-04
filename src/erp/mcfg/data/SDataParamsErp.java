@@ -57,7 +57,7 @@ public class SDataParamsErp extends erp.lib.data.SDataRegistry implements java.i
     protected boolean mbIsItemNameWithVarieties;
     protected boolean mbIsItemNameEditable;
     protected boolean mbIsItemKeyApplying;
-    protected boolean mbIsItemKeyAut;
+    protected boolean mbIsItemKeyAutomatic;
     protected boolean mbIsItemKeyWithVarieties;
     protected boolean mbIsItemKeyEditable;
     protected boolean mbIsInventoriable;
@@ -207,7 +207,7 @@ public class SDataParamsErp extends erp.lib.data.SDataRegistry implements java.i
     public void setIsItemNameWithVarieties(boolean b) { mbIsItemNameWithVarieties = b; }
     public void setIsItemNameEditable(boolean b) { mbIsItemNameEditable = b; }
     public void setIsItemKeyApplying(boolean b) { mbIsItemKeyApplying = b; }
-    public void setIsItemKeyAut(boolean b) { mbIsItemKeyAut = b; }
+    public void setIsItemKeyAutomatic(boolean b) { mbIsItemKeyAutomatic = b; }
     public void setIsItemKeyWithVarieties(boolean b) { mbIsItemKeyWithVarieties = b; }
     public void setIsItemKeyEditable(boolean b) { mbIsItemKeyEditable = b; }
     public void setIsInventoriable(boolean b) { mbIsInventoriable = b; }
@@ -350,7 +350,7 @@ public class SDataParamsErp extends erp.lib.data.SDataRegistry implements java.i
     public boolean getIsItemNameWithVarieties() { return mbIsItemNameWithVarieties; }
     public boolean getIsItemNameEditable() { return mbIsItemNameEditable; }
     public boolean getIsItemKeyApplying() { return mbIsItemKeyApplying; }
-    public boolean getIsItemKeyAut() { return mbIsItemKeyAut; }
+    public boolean getIsItemKeyAutomatic() { return mbIsItemKeyAutomatic; }
     public boolean getIsItemKeyWithVarieties() { return mbIsItemKeyWithVarieties; }
     public boolean getIsItemKeyEditable() { return mbIsItemKeyEditable; }
     public boolean getIsInventoriable() { return mbIsInventoriable; }
@@ -509,7 +509,7 @@ public class SDataParamsErp extends erp.lib.data.SDataRegistry implements java.i
         mbIsItemNameWithVarieties = false;
         mbIsItemNameEditable = false;
         mbIsItemKeyApplying = false;
-        mbIsItemKeyAut = false;
+        mbIsItemKeyAutomatic = false;
         mbIsItemKeyWithVarieties = false;
         mbIsItemKeyEditable = false;
         mbIsInventoriable = false;
@@ -673,7 +673,7 @@ public class SDataParamsErp extends erp.lib.data.SDataRegistry implements java.i
                 mbIsItemNameWithVarieties = resultSet.getBoolean("b_item_name_var");
                 mbIsItemNameEditable = resultSet.getBoolean("b_item_name_edit");
                 mbIsItemKeyApplying = resultSet.getBoolean("b_item_key");
-                mbIsItemKeyAut = resultSet.getBoolean("b_item_key_aut");
+                mbIsItemKeyAutomatic = resultSet.getBoolean("b_item_key_aut");
                 mbIsItemKeyWithVarieties = resultSet.getBoolean("b_item_key_var");
                 mbIsItemKeyEditable = resultSet.getBoolean("b_item_key_edit");
                 mbIsInventoriable = resultSet.getBoolean("b_inv");
@@ -865,7 +865,7 @@ public class SDataParamsErp extends erp.lib.data.SDataRegistry implements java.i
             callableStatement.setBoolean(nParam++, mbIsItemNameWithVarieties);
             callableStatement.setBoolean(nParam++, mbIsItemNameEditable);
             callableStatement.setBoolean(nParam++, mbIsItemKeyApplying);
-            callableStatement.setBoolean(nParam++, mbIsItemKeyAut);
+            callableStatement.setBoolean(nParam++, mbIsItemKeyAutomatic);
             callableStatement.setBoolean(nParam++, mbIsItemKeyWithVarieties);
             callableStatement.setBoolean(nParam++, mbIsItemKeyEditable);
             callableStatement.setBoolean(nParam++, mbIsInventoriable);
