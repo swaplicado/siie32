@@ -6,12 +6,10 @@
 package erp.mod.trn.view;
 
 import erp.data.SDataConstants;
+import erp.mcfg.data.SDataParamsErp;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import javax.swing.JButton;
-import javax.swing.JToggleButton;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
@@ -23,21 +21,17 @@ import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiDate;
-import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Sergio Flores
  */
-public class SViewInventoryCost extends SGridPaneView implements ActionListener {
-
-    public static final String TXT_DEC_INC = "Ver más decimales";
-    public static final String TXT_DEC_DEC = "Ver menos decimales";
+public class SViewInventoryCost extends SGridPaneView {
 
     private SGridFilterDateCutOff moFilterDateCutOff;
 
-    public SViewInventoryCost(SGuiClient client, int gridSubtype, String title, SGuiParams params) {
-        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRN_STK_COST, gridSubtype, title, params);
+    public SViewInventoryCost(SGuiClient client, int subtype, String title) {
+        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRNX_STK_COST, subtype, title, null);
         initComponentsCustom();
     }
 
@@ -46,20 +40,7 @@ public class SViewInventoryCost extends SGridPaneView implements ActionListener 
 
         moFilterDateCutOff = new SGridFilterDateCutOff(miClient, this);
         moFilterDateCutOff.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_DATE, SLibTimeUtils.getEndOfYear(miClient.getSession().getCurrentDate()).getTime()));
-
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDateCutOff);
-    }
-
-    @Override
-    public void actionPerformed(java.awt.event.ActionEvent e) {
-        if (e.getSource() instanceof javax.swing.JButton) {
-            JButton button = (JButton) e.getSource();
-
-        }
-        else if (e.getSource() instanceof javax.swing.JToggleButton) {
-            JToggleButton toggleButton = (JToggleButton) e.getSource();
-
-        }
     }
 
     @Override
@@ -71,85 +52,103 @@ public class SViewInventoryCost extends SGridPaneView implements ActionListener 
 
         filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE).getValue();
         if (filter != null) {
-
             sql += (sql.isEmpty() ? "" : "AND ") + "s.id_year = " + SLibTimeUtils.digestYear((SGuiDate) filter)[0] + " AND " +
                         "s.dt <= '" + SLibUtils.DbmsDateFormatDate.format((SGuiDate) filter) + "' ";
         }
 
-        filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
-        if ((Boolean) filter) {
-            sql += (sql.isEmpty() ? "" : "AND ") + "s.b_del = 0 ";
+        switch (mnGridSubtype) {
+            case SModConsts.CFGU_COB_ENT:
+                msSql = "SELECT "
+                        + "s.id_cob AS " + SDbConsts.FIELD_ID + "1, "
+                        + "s.id_wh AS " + SDbConsts.FIELD_ID + "2, "
+                        + "ent.code AS " + SDbConsts.FIELD_CODE + ", "
+                        + "ent.ent AS " + SDbConsts.FIELD_NAME + ", "
+                        + "bpb.code, "
+                        + "bpb.bpb, "
+                        + "SUM(s.debit) AS _dbt, "
+                        + "SUM(s.credit) AS _cdt, "
+                        + "SUM(s.debit - s.credit) AS _cst "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bpb ON .id_cob = bpb.id_bpb "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_COB_ENT) + " AS ent ON s.id_cob = ent.id_cob AND s.id_wh = ent.id_ent "
+                        + "WHERE s.b_del = 0 AND " + sql + " "
+                        + "GROUP BY s.id_cob, s.id_wh "
+                        + "HAVING _cst <> 0 "
+                        + "ORDER BY bpb.bpb, bpb.code, ent.ent, ent.code, s.id_cob, s.id_wh ";
+                break;
+                
+            case SModConsts.ITMU_ITEM:
+                msSql = "SELECT "
+                        + "s.id_item AS " + SDbConsts.FIELD_ID + "1, "
+                        + "s.id_unit AS " + SDbConsts.FIELD_ID + "2, "
+                        + "i.item_key AS " + SDbConsts.FIELD_CODE + ", "
+                        + "i.item AS " + SDbConsts.FIELD_NAME + ", "
+                        + "u.symbol, "
+                        + "u.unit, "
+                        + "SUM(s.mov_in) AS _mov_in, "
+                        + "SUM(s.mov_out) AS _mov_out, "
+                        + "SUM(s.mov_in - s.mov_out) AS _stk, "
+                        + "SUM(s.debit) AS _dbt, "
+                        + "SUM(s.credit) AS _cdt, "
+                        + "SUM(s.debit - s.credit) AS _cst"
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON s.id_item = i.id_item "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON s.id_unit = u.id_unit "
+                        + "WHERE s.b_del = 0 AND " + sql + " "
+                        + "GROUP BY s.id_item, s.id_unit "
+                        + "HAVING _stk <> 0 OR _cst <> 0 "
+                        + "ORDER BY "
+                        + (((SDataParamsErp) miClient.getSession().getConfigSystem()).getFkSortingItemTypeId() == SModSysConsts.CFGS_TP_SORT_KEY_NAME ? "i.item, i.item_key, " : "i.item_key, i.item, ")
+                        + "s.id_item, u.symbol, s.id_unit ";
+                break;
+                
+            default:
         }
-
-        msSql = "SELECT "
-                + "s.id_item AS " + SDbConsts.FIELD_ID + "1, "
-                + "s.id_unit AS " + SDbConsts.FIELD_ID + "2, "
-                + "i.item_key AS " + SDbConsts.FIELD_CODE + ", "
-                + "i.item AS " + SDbConsts.FIELD_NAME + ", "
-                + "u.symbol, "
-                + "SUM(s.mov_in) AS f_mov_i, "
-                + "SUM(s.mov_out) AS f_mov_o, "
-                + "SUM(s.mov_in - s.mov_out) AS f_stk, "
-                + "SUM(s.debit) AS f_debit, "
-                + "SUM(s.credit) AS f_credit, "
-                + "SUM(s.debit - s.credit) AS f_stk_cost, "
-                + "bpb.code, "
-                + "ent.code, "
-                + "ent.fid_ct_ent, "
-                + "ent.fid_tp_ent, "
-                + "0 AS " + SDbConsts.FIELD_USER_INS_ID + ", "
-                // + "v.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
-                + "'' AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
-                + "0 AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
-                //+ "v.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", "
-                + "'' AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG)  + " AS d "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " AS de ON "
-                + "d.id_year = de.id_year AND d.id_doc = de.id_doc "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s ON "
-                + "s.fid_diog_year = de.id_year AND s.fid_diog_doc = de.id_doc AND s.fid_diog_ety = de.id_ety "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON "
-                + "s.id_item = i.id_item "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON "
-                + "s.id_unit = u.id_unit "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bpb ON "
-                + "s.id_cob = bpb.id_bpb "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_COB_ENT) + " AS ent ON "
-                + "s.id_cob = ent.id_cob AND s.id_wh = ent.id_ent "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK_CFG) + " AS sc ON "
-                + "sc.id_item = i.id_item AND sc.id_unit = u.id_unit AND sc.id_cob = bpb.id_bpb AND sc.id_wh = ent.id_ent "
-                + "WHERE d.b_del = 0 AND de.b_del = 0 AND s.b_del = 0 AND " + sql + " "
-                + "GROUP BY " + (mnGridSubtype != SModConsts.TRNX_STK_WAH ? "s.id_item, s.id_unit, s.id_cob, s.id_wh " : "s.id_cob, s.id_wh ")
-                + "HAVING f_stk <> 0 "
-                + "OR (ent.fid_ct_ent = " + SModSysConsts.CFGS_TP_ENT_WH_MFG_RM[0] + " AND ent.fid_tp_ent = " + SModSysConsts.CFGS_TP_ENT_WH_MFG_RM[1] + " AND f_stk_cost <> 0) "
-                + "ORDER BY i.item_key, i.item, s.id_item, u.symbol, s.id_unit "
-                + ", bpb.code, ent.code, s.id_cob, s.id_wh ";
     }
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
-        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
+        SGridColumnView column = null;
+        ArrayList<SGridColumnView> columns = new ArrayList<SGridColumnView>();
 
-        if (mnGridSubtype != SModConsts.TRNX_STK_WAH) {
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, SDbConsts.FIELD_CODE, "Clave"));
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, SDbConsts.FIELD_NAME, "Ítem"));
+        switch (mnGridSubtype) {
+            case SModConsts.CFGU_COB_ENT:
+                columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "bpb.bpb", SGridConsts.COL_TITLE_NAME + " sucursal empresa"));
+                columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "bpb.code", SGridConsts.COL_TITLE_CODE + " sucursal empresa"));
+                columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "ent.ent", SGridConsts.COL_TITLE_NAME + " almacén"));
+                columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "ent.code", SGridConsts.COL_TITLE_CODE + " almacén"));
+                break;
+                
+            case SModConsts.ITMU_ITEM:
+                if (((SDataParamsErp) miClient.getSession().getConfigSystem()).getFkSortingItemTypeId() == SModSysConsts.CFGS_TP_SORT_KEY_NAME) {
+                    columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME + " ítem"));
+                    columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE + " ítem"));
+                }
+                else {
+                    columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE + " ítem"));
+                    columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME + " ítem"));
+                }
+
+                columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "_mov_in", "Entradas"));
+                columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "_mov_out", "Salidas"));
+                columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "_stk", "Existencias"));
+                columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "u.symbol", "Unidad"));
+                break;
+                
+            default:
         }
 
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "bpb.code", "Sucursal empresa"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "ent.code", "Almacén"));
+        column = new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_dbt", "Cargos $");
+        column.setSumApplying(true);
+        columns.add(column);
+        column = new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_cdt", "Abonos $");
+        column.setSumApplying(true);
+        columns.add(column);
+        column = new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_cst", "Saldo $");
+        column.setSumApplying(true);
+        columns.add(column);
 
-        if (mnGridSubtype != SModConsts.TRNX_STK_WAH) {
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "f_mov_i", "Entradas"));
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "f_mov_o", "Salidas"));
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "f_stk", "Existencias"));
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "u.symbol", "Unidad"));
-        }
-
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "f_debit", "Cargos $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "f_credit", "Abonos $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "f_stk_cost", "Saldo $"));
-
-        return gridColumnsViews;
+        return columns;
     }
 
     @Override
