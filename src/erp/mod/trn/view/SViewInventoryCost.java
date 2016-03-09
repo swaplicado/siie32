@@ -69,7 +69,7 @@ public class SViewInventoryCost extends SGridPaneView {
                         + "SUM(s.credit) AS _cdt, "
                         + "SUM(s.debit - s.credit) AS _cst "
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "
-                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bpb ON .id_cob = bpb.id_bpb "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bpb ON s.id_cob = bpb.id_bpb "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_COB_ENT) + " AS ent ON s.id_cob = ent.id_cob AND s.id_wh = ent.id_ent "
                         + "WHERE s.b_del = 0 AND " + sql + " "
                         + "GROUP BY s.id_cob, s.id_wh "
@@ -90,7 +90,7 @@ public class SViewInventoryCost extends SGridPaneView {
                         + "SUM(s.mov_in - s.mov_out) AS _stk, "
                         + "SUM(s.debit) AS _dbt, "
                         + "SUM(s.credit) AS _cdt, "
-                        + "SUM(s.debit - s.credit) AS _cst"
+                        + "SUM(s.debit - s.credit) AS _cst "
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON s.id_item = i.id_item "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON s.id_unit = u.id_unit "
@@ -115,8 +115,8 @@ public class SViewInventoryCost extends SGridPaneView {
             case SModConsts.CFGU_COB_ENT:
                 columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "bpb.bpb", SGridConsts.COL_TITLE_NAME + " sucursal empresa"));
                 columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "bpb.code", SGridConsts.COL_TITLE_CODE + " sucursal empresa"));
-                columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "ent.ent", SGridConsts.COL_TITLE_NAME + " almacén"));
-                columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "ent.code", SGridConsts.COL_TITLE_CODE + " almacén"));
+                columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME + " almacén"));
+                columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE + " almacén"));
                 break;
                 
             case SModConsts.ITMU_ITEM:
