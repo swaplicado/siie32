@@ -14,13 +14,27 @@ import erp.lib.SLibUtilities;
 import erp.lib.table.STableTabComponent;
 import erp.lib.table.STableTabInterface;
 import erp.mod.SModConsts;
-import erp.mod.SModSysConsts;
-import erp.mtrn.data.*;
-import erp.mtrn.form.*;
+import erp.mtrn.data.SDataDiog;
+import erp.mtrn.data.SDataDiogAdjustmentType;
+import erp.mtrn.data.SDataStockConfig;
+import erp.mtrn.data.SDataStockConfigDns;
+import erp.mtrn.data.SDataStockConfigItem;
+import erp.mtrn.data.SDataStockLot;
+import erp.mtrn.data.STrnDiogComplement;
+import erp.mtrn.form.SDialogDiogSaved;
+import erp.mtrn.form.SDialogRepStock;
+import erp.mtrn.form.SDialogRepStockMoves;
+import erp.mtrn.form.SDialogRepStockTrackingLot;
+import erp.mtrn.form.SDialogUtilStockClosing;
+import erp.mtrn.form.SFormDiog;
+import erp.mtrn.form.SFormDiogAdjustmentType;
+import erp.mtrn.form.SFormStockConfig;
+import erp.mtrn.form.SFormStockConfigDns;
+import erp.mtrn.form.SFormStockConfigItem;
+import erp.mtrn.form.SFormStockLot;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import sa.lib.gui.SGuiParams;
 
 /**
  *
@@ -86,10 +100,11 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiIogMfgConsumeOut;
     private javax.swing.JMenuItem jmiIogAuditPending;
     private javax.swing.JMenuItem jmiIogAudited;
-    private javax.swing.JMenuItem jmiIogStockValuation;
-    private javax.swing.JMenuItem jmiIogStockCostByWarehouse;
-    private javax.swing.JMenuItem jmiIogStockCostByItem;
-    private javax.swing.JMenuItem jmiIogStockCostByDiogType;
+    private javax.swing.JMenuItem jmiIogInventoryValuation;
+    private javax.swing.JMenuItem jmiIogInventoryMfgCost;
+    private javax.swing.JMenuItem jmiIogStockValueByWarehouse;
+    private javax.swing.JMenuItem jmiIogStockValueByItem;
+    private javax.swing.JMenuItem jmiIogStockValueByDiogType;
     private javax.swing.JMenuItem jmiIogStockClosing;
 
     private javax.swing.JMenu jmMenuStk;
@@ -290,10 +305,11 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogMfgConsumeOut = new JMenuItem("Docs. salida por consumo de insumos y productos");
         jmiIogAuditPending = new JMenuItem("Docs. inventarios por auditar");
         jmiIogAudited = new JMenuItem("Docs. inventarios auditados");
-        jmiIogStockValuation = new JMenuItem("Valuación de inventarios");
-        jmiIogStockCostByWarehouse = new JMenuItem("Costo de inventarios por almacén");
-        jmiIogStockCostByItem = new JMenuItem("Costo de inventarios por ítem");
-        jmiIogStockCostByDiogType = new JMenuItem("Costo de inventarios por tipo movimiento");
+        jmiIogInventoryValuation = new JMenuItem("Valuación de inventarios");
+        jmiIogInventoryMfgCost = new JMenuItem("Costos de producción por producto");
+        jmiIogStockValueByWarehouse = new JMenuItem("Valor de inventarios por almacén");
+        jmiIogStockValueByItem = new JMenuItem("Valor de inventarios por ítem");
+        jmiIogStockValueByDiogType = new JMenuItem("Valor de inventarios por tipo movimiento");
         jmiIogStockClosing = new JMenuItem("Generación de inventarios iniciales...");
         jmMenuIog.add(jmiIogStock);
         jmMenuIog.addSeparator();
@@ -312,12 +328,14 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuIog.add(jmiIogAuditPending);
         jmMenuIog.add(jmiIogAudited);
         jmMenuIog.addSeparator();
-        jmMenuIog.add(jmiIogStockValuation);
-        jmMenuIog.add(jmiIogStockCostByWarehouse);
-        jmMenuIog.add(jmiIogStockCostByItem);
-        jmMenuIog.add(jmiIogStockCostByDiogType);
+        jmMenuIog.add(jmiIogInventoryValuation);
+        jmMenuIog.add(jmiIogInventoryMfgCost);
+        jmMenuIog.add(jmiIogStockValueByWarehouse);
+        jmMenuIog.add(jmiIogStockValueByItem);
+        //jmMenuIog.add(jmiIogStockValueByDiogType); sflores, 2016-03-09, evaluating to remove it
         jmMenuIog.addSeparator();
         jmMenuIog.add(jmiIogStockClosing);
+        
         jmiIogStock.addActionListener(this);
         jmiIogMfgRmAssign.addActionListener(this);
         jmiIogMfgRmReturn.addActionListener(this);
@@ -329,10 +347,11 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogMfgConsumeOut.addActionListener(this);
         jmiIogAuditPending.addActionListener(this);
         jmiIogAudited.addActionListener(this);
-        jmiIogStockValuation.addActionListener(this);
-        jmiIogStockCostByWarehouse.addActionListener(this);
-        jmiIogStockCostByItem.addActionListener(this);
-        jmiIogStockCostByDiogType.addActionListener(this);
+        jmiIogInventoryValuation.addActionListener(this);
+        jmiIogInventoryMfgCost.addActionListener(this);
+        jmiIogStockValueByWarehouse.addActionListener(this);
+        jmiIogStockValueByItem.addActionListener(this);
+        jmiIogStockValueByDiogType.addActionListener(this);
         jmiIogStockClosing.addActionListener(this);
 
         jmMenuStk = new JMenu("Inventarios");
@@ -432,10 +451,11 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogMfgConsumeOut.setEnabled(hasRightMfgCon);
         jmiIogAuditPending.setEnabled(hasRightAudit);
         jmiIogAudited.setEnabled(hasRightAudit);
-        jmiIogStockValuation.setEnabled(hasRightInAdj || hasRightOutAdj);
-        jmiIogStockCostByWarehouse.setEnabled(hasRightInAdj || hasRightOutAdj);
-        jmiIogStockCostByItem.setEnabled(hasRightInAdj || hasRightOutAdj);
-        jmiIogStockCostByDiogType.setEnabled(hasRightInAdj || hasRightOutAdj);
+        jmiIogInventoryValuation.setEnabled(hasRightInAdj || hasRightOutAdj);
+        jmiIogInventoryMfgCost.setEnabled(hasRightInAdj || hasRightOutAdj);
+        jmiIogStockValueByWarehouse.setEnabled(hasRightInAdj || hasRightOutAdj);
+        jmiIogStockValueByItem.setEnabled(hasRightInAdj || hasRightOutAdj);
+        jmiIogStockValueByDiogType.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiIogStockClosing.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmMenuMfg.setEnabled(hasRightMfgRmAsg || hasRightMfgRmDev || hasRightMfgWpAsg || hasRightMfgWpDev || hasRightMfgFgAsg || hasRightMfgFgDev);
         jmiMfgPanelProdOrder.setEnabled(true);
@@ -1121,16 +1141,19 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiIogAudited) {
                 showView(SDataConstants.TRN_DIOG, SDataConstants.TRNX_DIOG_AUDITED);
             }
-            else if (item == jmiIogStockValuation) {
+            else if (item == jmiIogInventoryValuation) {
                 miClient.getSession().showView(SModConsts.TRN_INV_VAL, SLibConstants.UNDEFINED, null);
             }
-            else if (item == jmiIogStockCostByWarehouse) {
-                miClient.getSession().showView(SModConsts.TRN_STK_COST, SModConsts.TRNX_STK_WAH, null);
+            else if (item == jmiIogInventoryMfgCost) {
+                miClient.getSession().showView(SModConsts.TRN_INV_MFG_CST, SLibConstants.UNDEFINED, null);
             }
-            else if (item == jmiIogStockCostByItem) {
-                miClient.getSession().showView(SModConsts.TRN_STK_COST, SLibConstants.UNDEFINED, null);
+            else if (item == jmiIogStockValueByWarehouse) {
+                miClient.getSession().showView(SModConsts.TRNX_STK_COST, SModConsts.CFGU_COB_ENT, null);
             }
-            else if (item == jmiIogStockCostByDiogType) {
+            else if (item == jmiIogStockValueByItem) {
+                miClient.getSession().showView(SModConsts.TRNX_STK_COST, SModConsts.ITMU_ITEM, null);
+            }
+            else if (item == jmiIogStockValueByDiogType) {
                 miClient.getSession().showView(SModConsts.TRNX_STK_DIOG_TP, SModConsts.TRNX_STK_WAH, null);
             }
             else if (item == jmiIogStockClosing) {
