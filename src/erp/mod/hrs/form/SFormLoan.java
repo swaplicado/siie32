@@ -500,7 +500,7 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
         moKeyLoanType.setValue(new int[] { moRegistry.getFkLoanTypeId() });
         moKeyLoanPaymentType.setValue(new int[] { moRegistry.getFkLoanPaymentTypeId() });
         
-        moRadSd.setSelected(moRegistry.getPaymentPercentageReference() == SHrsConsts.SAL_REF_SAL);
+        moRadSd.setSelected(moRegistry.getPaymentPercentageReference() == SHrsConsts.SAL_REF_SAL || moRegistry.getPaymentPercentageReference() == SLibConsts.UNDEFINED);
         moRadSbc.setSelected(moRegistry.getPaymentPercentageReference() == SHrsConsts.SAL_REF_SAL_SS);
         moRadOther.setSelected(moRegistry.getPaymentPercentageReference() == SHrsConsts.SAL_REF_SAL_FIX);
 
