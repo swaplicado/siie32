@@ -1366,7 +1366,7 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
         if (jcbFkOrdTypeId.getSelectedIndex() >= 0) {
             if (jcbFkOrdTypeId.isEnabled()) {
                 switch (moFieldFkOrdTypeId.getKeyAsIntArray()[0]) {
-                    case SDataConstantsSys.MFGS_TP_ORD_CONTINUE:
+                    case SDataConstantsSys.MFGU_TP_ORD_CONTINUE:
                         jtfQuantityOriginal.setEnabled(false);
                         jtfQuantityOriginal.setFocusable(false);
                         moFieldQuantityOriginal.setIsMandatory(false);
