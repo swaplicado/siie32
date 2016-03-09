@@ -30,6 +30,7 @@ public class SLayoutBankXmlRow {
     protected String msSantanderBankCode;
     protected String msBajioBankCode;
     protected String msBajioBankNick;
+    protected int mnBankKey;
     protected int mnRecYear;
     protected int mnRecPeriod;
     protected int mnRecBookkeepingCenter;
@@ -58,6 +59,7 @@ public class SLayoutBankXmlRow {
         msSantanderBankCode = "";
         msBajioBankCode = "";
         msBajioBankNick = "";
+        mnBankKey = 0;
         mnRecYear = 0;
         mnRecPeriod = 0;
         mnRecBookkeepingCenter = 0;
@@ -86,6 +88,7 @@ public class SLayoutBankXmlRow {
     public void setSantanderBankCode(String s) { msSantanderBankCode = s; }
     public void setBajioBankCode(String s) { msBajioBankCode = s; }
     public void setBajioBankNick(String s) { msBajioBankNick = s; }
+    public void setBankKey(int n) { mnBankKey = n; }
     public void setRecYear(int n) { mnRecYear = n; }
     public void setRecPeriod(int n) { mnRecPeriod = n; }
     public void setRecBookkeepingCenter(int n) { mnRecBookkeepingCenter = n; }
@@ -117,6 +120,7 @@ public class SLayoutBankXmlRow {
     public String getSantanderBankCode() { return msSantanderBankCode; }
     public String getBajioBankCode() { return msBajioBankCode; }
     public String getBajioBankNick() { return msBajioBankNick; }
+    public int getBankKey() { return mnBankKey; }
     public int getRecYear() { return mnRecYear; }
     public int getRecPeriod() { return mnRecPeriod; }
     public int getRecBookkeepingCenter() { return mnRecBookkeepingCenter; }

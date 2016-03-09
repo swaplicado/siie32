@@ -1139,6 +1139,9 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRSR_PAY:
                 guiReport = new SGuiReport("reps/hrs_pay.jasper", "Nómina");
                 break;
+            case SModConsts.HRSR_PAY_SUM:
+                guiReport = new SGuiReport("reps/hrs_pay_summary.jasper", "Nómina resumen");
+                break;
             case SModConsts.HRSR_PAY_RCP:
                 guiReport = new SGuiReport("reps/hrs_pay_rcp.jasper", "Recibo de nómina");
                 break;

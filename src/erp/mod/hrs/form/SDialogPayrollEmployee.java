@@ -768,17 +768,17 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                 SGridColumnForm columnForm = null;
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<SGridColumnForm>();
 
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "#"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "#", 20));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Percepción", 135));
-                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Valor", 75, moGridEarningRow.getTable().getDefaultEditor(Double.class));
+                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Valor", 45, moGridEarningRow.getTable().getDefaultEditor(Double.class));
                 columnForm.setEditable(mbEditable);
                 gridColumnsForm.add(columnForm);
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "Valor unitario $", 100));
-                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto $", 75, moGridEarningRow.getTable().getDefaultEditor(Double.class));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "Valor unitario $", 80));
+                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto $", 70, moGridEarningRow.getTable().getDefaultEditor(Double.class));
                 columnForm.setEditable(mbEditable);
                 gridColumnsForm.add(columnForm);
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Valor ajustado"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Valor ajustado", 75));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Crédito/Préstamo"));
 
@@ -1346,8 +1346,10 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                 add = false;
                 moTextEarningCodeFind.requestFocus();
             }
-                
+            
+            /* XXX jbarajas (29-02-2016 Cycle 2) Capture allow multiple perceptions and payroll deductions in receipts
             if (add) {
+                
                 for (SHrsPayrollReceiptEarning earning : moReceipt.getHrsEarnings()) {
                     if (SLibUtils.compareKeys(new int[] { earning.getEarning().getPkEarningId()}, new int[] { moEarning.getPkEarningId() })) {
                         miClient.showMsgBoxWarning("La percepción '" + moEarning.getName() + "' no se puede agregar, ya existe en el recibo.");
@@ -1355,6 +1357,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                     }
                 }
             }
+            */
 
             if (add) {
                 itemStateEarning();
@@ -1828,12 +1831,12 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                 dispose();
             }
             else {
-                //if (moReceipt.validateDaysToBePaid()) {
-                updateReceipts();
-                super.actionSave();
+                //if (moReceipt.validateDaysToBePaidWithAbsence()) {
+                    updateReceipts();
+                    super.actionSave();
                 //}
+                }
             }
-        }
         catch (Exception e) {
             SLibUtils.showException(this, e);
         }

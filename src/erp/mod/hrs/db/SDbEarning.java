@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
@@ -516,11 +517,13 @@ public class SDbEarning extends SDbRegistryUser {
 
         session.getStatement().execute(msSql);
         
-        if (mnAuxAccountingConfigurationTypeId != SLibConsts.UNDEFINED &&
-                mnAuxAccountingConfigurationTypeId != mnFkAccountingConfigurationTypeId) {
+        if (mbRegistryNew || (mnAuxAccountingConfigurationTypeId != SLibConsts.UNDEFINED &&
+                mnAuxAccountingConfigurationTypeId != mnFkAccountingConfigurationTypeId)) {
             for (SDbAccountingEarning dbAccountingEarning : maAccountingEarning) {
-                dbAccountingEarning.setDeleted(true);
-                dbAccountingEarning.save(session);
+                if (SLibUtils.compareKeys(new int[] { dbAccountingEarning.getPkEarningId() }, new int[] { mnPkEarningId })) {
+                    dbAccountingEarning.setDeleted(true);
+                    dbAccountingEarning.save(session);
+                }
             }
         }
         createAccountingConfiguration(session);

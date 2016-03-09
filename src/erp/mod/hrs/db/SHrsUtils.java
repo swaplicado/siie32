@@ -1630,6 +1630,7 @@ public abstract class SHrsUtils {
         double amoutMonth = 0;
         double amout = 0;
         double adjustmentAux = 0;
+        double salaryReference = 0;
         SHrsDaysByPeriod hrsDaysPrev = hrsReceipt.getHrsEmployee().getHrsDaysPrev();
         SHrsDaysByPeriod hrsDaysCurr = hrsReceipt.getHrsEmployee().getHrsDaysCurr();
         SHrsDaysByPeriod hrsDaysNext = hrsReceipt.getHrsEmployee().getHrsDaysNext();
@@ -1655,11 +1656,21 @@ public abstract class SHrsUtils {
                 amoutAux += hrsDaysNext == null ? 0 : (amoutMonth / hrsDaysNext.getDaysPeriod() * (hrsDaysNext.getDaysPeriodPayroll() - hrsDaysNext.getDaysPeriodPayrollNotWorkedNotPaid()));
                 break;
             case SModSysConsts.HRSS_TP_LOAN_PAY_PER:
-                adjustmentAux += hrsDaysPrev == null ? 0 : ((hrsDaysPrev.getDaysPeriodPayroll() - hrsDaysPrev.getDaysPeriodPayrollNotWorkedNotPaid()) / hrsDaysPrev.getDaysPeriod()) * amoutAdjustment;
-                adjustmentAux += (hrsDaysCurr.getDaysPeriodPayroll() - hrsDaysCurr.getDaysPeriodPayrollNotWorkedNotPaid()) / hrsDaysCurr.getDaysPeriod() * amoutAdjustment;
-                adjustmentAux += hrsDaysNext == null ? 0 : ((hrsDaysNext.getDaysPeriodPayroll() - hrsDaysNext.getDaysPeriodPayrollNotWorkedNotPaid()) / hrsDaysNext.getDaysPeriod() * amoutAdjustment);
-                amoutAux = (hrsReceipt.getReceipt().getDaysHiredPayroll() - hrsReceipt.getReceipt().getDaysNotWorkedNotPaid()) * hrsReceipt.getReceipt().getPaymentDaily() * loan.getPaymentPercentage() + adjustmentAux;
-                //amoutAux = (hrsReceipt.getReceipt().getDaysHiredPayroll() - hrsReceipt.getReceipt().getDaysNotWorkedNotPaid()) * hrsReceipt.getReceipt().getSalarySscBase() * loan.getPaymentPercentage() + adjustmentAux; // XXX (2016-02-12) jbarajas to base Raul Franco
+                adjustmentAux += hrsDaysPrev == null ? 0 : (double) ((hrsDaysPrev.getDaysPeriodPayroll() - hrsDaysPrev.getDaysPeriodPayrollNotWorkedNotPaid()) / hrsDaysPrev.getDaysPeriod()) * amoutAdjustment;
+                adjustmentAux += (double) (hrsDaysCurr.getDaysPeriodPayroll() - hrsDaysCurr.getDaysPeriodPayrollNotWorkedNotPaid()) / hrsDaysCurr.getDaysPeriod() * amoutAdjustment;
+                adjustmentAux += hrsDaysNext == null ? 0 : (double) ((hrsDaysNext.getDaysPeriodPayroll() - hrsDaysNext.getDaysPeriodPayrollNotWorkedNotPaid()) / hrsDaysNext.getDaysPeriod() * amoutAdjustment);
+                
+                if (loan.getPaymentPercentageReference() == SHrsConsts.SAL_REF_SAL) {
+                    salaryReference = hrsReceipt.getReceipt().getPaymentDaily();
+                }
+                else if (loan.getPaymentPercentageReference() == SHrsConsts.SAL_REF_SAL_SS) {
+                    salaryReference = hrsReceipt.getReceipt().getSalarySscBase();
+                }
+                else if (loan.getPaymentPercentageReference() == SHrsConsts.SAL_REF_SAL_FIX) {
+                    salaryReference = loan.getPaymentPercentageAmount();
+                }
+                //amoutAux = (hrsReceipt.getReceipt().getDaysHiredPayroll() - hrsReceipt.getReceipt().getDaysNotWorkedNotPaid()) * hrsReceipt.getReceipt().getPaymentDaily() * loan.getPaymentPercentage() + adjustmentAux; // XXX (2016-03-04) jbarajas
+                amoutAux = (hrsReceipt.getReceipt().getDaysHiredPayroll() - hrsReceipt.getReceipt().getDaysNotWorkedNotPaid()) * salaryReference * loan.getPaymentPercentage() + adjustmentAux;
                 break;
             default:
                 break;

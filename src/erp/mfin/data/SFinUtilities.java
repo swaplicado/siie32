@@ -36,6 +36,13 @@ public abstract class SFinUtilities {
     public static final java.lang.String TXT_TYPE_ACCOUNT_CHECK = "01";
     public static final java.lang.String TXT_TYPE_ACCOUNT_CLABE = "40";
     
+    public static final java.lang.String TXT_TYPE_LAY_BBVA_TEF = "M";
+    public static final java.lang.String TXT_TYPE_LAY_BBVA_SPEI = "H";
+    
+    public static final java.lang.String TXT_TYPE_CUR_MXP_BBVA = "MXP";
+    public static final java.lang.String TXT_TYPE_CUR_USD_BBVA = "USD";
+    public static final java.lang.String TXT_TYPE_CUR_EUR_BBVA = "EUR";
+    
     private static double mdBalanceTot;
     private static double mdTaxChargedTot;
     private static boolean mbIsRepeated;
@@ -961,6 +968,88 @@ public abstract class SFinUtilities {
     
     public static java.lang.String createLayoutBanBajioSpeiFdN(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title, Date date, int consecutiveDay) {
         return createLayoutBanBajio(payments, title, date, date, consecutiveDay, TXT_TYPE_LAY_BANBAJIO_SPEI, TXT_TYPE_ACCOUNT_CLABE);
+    }
+    
+    public static java.lang.String createLayoutBbvaThird(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
+        java.lang.String sReference = "";
+        java.lang.String sAccountDebit = "";
+        java.lang.String sAccountCredit = "";
+        java.lang.String layout = "";
+        DecimalFormat formatDesc = new DecimalFormat("0000000000000.00");
+        mdBalanceTot = 0;
+        mdTaxChargedTot = 0;
+        mbIsRepeated = false;
+
+        try {
+            for (SLayoutBankPaymentTxt payment : payments) {
+
+                sReference = SLibUtilities.textToAlphanumeric(payment.getReference());
+                sAccountDebit = SLibUtilities.textTrim(payment.getAccountDebit());
+                sAccountCredit = SLibUtilities.textTrim(payment.getAccountCredit());
+                mdBalanceTot = payment.getTotalAmount();
+
+                layout += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 18 ? 0 : 18 - sAccountCredit.length())).concat(SLibUtilities.textLeft(sAccountCredit, 18)); // Credit acccount
+                layout += SLibUtilities.textRepeat("0", (sAccountDebit.length() >= 18 ? 0 : 18 - sAccountDebit.length())).concat(SLibUtilities.textLeft(sAccountDebit, 18)); // Debit acccount
+                layout += (payment.getCurrencyId() == 1 ? TXT_TYPE_CUR_MXP_BBVA : (payment.getCurrencyId() == 2 ? TXT_TYPE_CUR_USD_BBVA : TXT_TYPE_CUR_EUR_BBVA)); // badge
+                layout += formatDesc.format(mdBalanceTot); // Total amount
+                layout += (sReference.length() > 30 ? SLibUtilities.textLeft(sReference, 30) : sReference).concat(SLibUtilities.textRepeat(" ", (30 - sReference.length()))); // Reason Payment
+                
+                layout += "\r\n";
+            }
+        }
+        catch (java.lang.Exception e) {
+            SLibUtilities.renderException(STableUtilities.class.getName(), e);
+        }
+        return layout;
+    }
+    
+    public static java.lang.String createLayoutBbvaInterbank(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title, String availability) {
+        int n = 0;
+        java.lang.String sBizPartner = "";
+        java.lang.String sAccountDebit = "";
+        java.lang.String sAccountCredit = "";
+        java.lang.String sReference = "";
+        java.lang.String layout = "";
+        DecimalFormat formatDesc = new DecimalFormat("0000000000000.00");
+        mdBalanceTot = 0;
+
+        try {
+            for (SLayoutBankPaymentTxt payment : payments) {
+
+                n = (int) (Math.floor(Math.log10(payment.getBankKey())) + 1);
+                
+                sBizPartner = SLibUtilities.textToAlphanumeric(payment.getBizPartner());
+                sAccountDebit = SLibUtilities.textTrim(payment.getAccountDebit());
+                sAccountCredit = SLibUtilities.textTrim(payment.getAccountCredit());
+                sReference = SLibUtilities.textToAlphanumeric(payment.getReference());
+                mdBalanceTot = payment.getTotalAmount();
+
+                layout += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 18 ? 0 : 18 - sAccountCredit.length())).concat(SLibUtilities.textLeft(sAccountCredit, 18)); // Credit acccount
+                layout += SLibUtilities.textRepeat("0", (sAccountDebit.length() >= 18 ? 0 : 18 - sAccountDebit.length())).concat(SLibUtilities.textLeft(sAccountDebit, 18)); // Debit acccount
+                layout += TXT_TYPE_CUR_MXP_BBVA; // badge
+                layout += formatDesc.format(mdBalanceTot); // Total amount
+                layout += (sBizPartner.length() > 30 ? SLibUtilities.textLeft(sBizPartner, 30) : sBizPartner).concat(SLibUtilities.textRepeat(" ", (30 - sBizPartner.length()))); // Beneficiary
+                layout += TXT_TYPE_ACCOUNT_CLABE; // Type account
+                layout += SLibUtilities.textRepeat("0", 3 - n).concat(payment.getBankKey() + ""); // Benefisary Bank Number
+                layout += (sReference.length() > 30 ? SLibUtilities.textLeft(sReference, 30) : sReference).concat(SLibUtilities.textRepeat(" ", (30 - sReference.length()))); // Reason Payment
+                layout += SLibUtilities.textRepeat(" ", 7); // Numeric Reference
+                layout += availability; // Availability
+
+                layout += "\r\n";
+            }
+        }
+        catch (java.lang.Exception e) {
+            SLibUtilities.renderException(STableUtilities.class.getName(), e);
+        }
+        return layout;
+    }
+    
+    public static java.lang.String createLayoutBbvaTef(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
+        return createLayoutBbvaInterbank(payments, title, TXT_TYPE_LAY_BBVA_TEF);
+    }
+    
+    public static java.lang.String createLayoutBbvaSpei(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
+        return createLayoutBbvaInterbank(payments, title, TXT_TYPE_LAY_BBVA_SPEI);
     }
     
     /**

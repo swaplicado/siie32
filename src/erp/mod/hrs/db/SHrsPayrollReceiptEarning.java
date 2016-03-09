@@ -111,9 +111,9 @@ public class SHrsPayrollReceiptEarning implements SGridRow {
     }
     */
     public void computeAmount() {
-        if (moPayrollReceiptEarning.isUserEdited()) {
+        //if (moPayrollReceiptEarning.isUserEdited()) { /// XXX jbarajas (29-02-2016 Cycle 2) Always Recalculate the amount of perception based on the corresponding units where applicable.
             moPayrollReceiptEarning.setAmount_r(SLibUtils.round((moPayrollReceiptEarning.getUnits() * moPayrollReceiptEarning.getAmountUnitary() * moEarning.getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
-        }
+        //}
     }
     
     public SHrsPayrollReceiptEarning clone() throws CloneNotSupportedException {

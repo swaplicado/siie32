@@ -213,7 +213,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jbReceiptCaptureEarnings = new javax.swing.JButton();
         jbReceiptCaptureDeductions = new javax.swing.JButton();
         jpAvailableEmployees = new javax.swing.JPanel();
+        jlTotalAvailables = new javax.swing.JLabel();
         jpPayrollReceipts = new javax.swing.JPanel();
+        jlTotalSelected = new javax.swing.JLabel();
         jpControls = new javax.swing.JPanel();
         jPanel32 = new javax.swing.JPanel();
         jlDummy01 = new javax.swing.JLabel();
@@ -626,11 +628,19 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jpAvailableEmployees.setBorder(javax.swing.BorderFactory.createTitledBorder("Empleados disponibles:"));
         jpAvailableEmployees.setPreferredSize(new java.awt.Dimension(350, 100));
         jpAvailableEmployees.setLayout(new java.awt.BorderLayout());
+
+        jlTotalAvailables.setText("n");
+        jpAvailableEmployees.add(jlTotalAvailables, java.awt.BorderLayout.SOUTH);
+
         jPanel5.add(jpAvailableEmployees, java.awt.BorderLayout.LINE_START);
 
         jpPayrollReceipts.setBorder(javax.swing.BorderFactory.createTitledBorder("Recibos de nómina:"));
         jpPayrollReceipts.setPreferredSize(new java.awt.Dimension(475, 100));
         jpPayrollReceipts.setLayout(new java.awt.BorderLayout());
+
+        jlTotalSelected.setText("n");
+        jpPayrollReceipts.add(jlTotalSelected, java.awt.BorderLayout.PAGE_END);
+
         jPanel5.add(jpPayrollReceipts, java.awt.BorderLayout.LINE_END);
 
         jpControls.setLayout(new java.awt.BorderLayout());
@@ -747,9 +757,11 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JLabel jlTax;
     private javax.swing.JLabel jlTaxComputationType;
     private javax.swing.JLabel jlTaxSubsidy;
+    private javax.swing.JLabel jlTotalAvailables;
     private javax.swing.JLabel jlTotalDeductions;
     private javax.swing.JLabel jlTotalEarnings;
     private javax.swing.JLabel jlTotalNet;
+    private javax.swing.JLabel jlTotalSelected;
     private javax.swing.JLabel jlWorkingDays;
     private javax.swing.JLabel jlYear;
     private javax.swing.JPanel jpAvailableEmployees;
@@ -790,6 +802,21 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     /*
      * Private methods
      */
+    
+    private void computeTotals() {
+        int countAvailables = 0;
+        int countSelected = 0;
+        
+        for (int i = 0; i < moGridPaneEmployeesAvailable.getModel().getRowCount(); i++) {
+            countAvailables++;
+        }
+        for (int i = 0; i < moGridPaneEmployeesReceipt.getModel().getRowCount(); i++) {
+            countSelected++;
+        }
+        
+        jlTotalAvailables.setText(" " + countAvailables + " empleados disponibles.");
+        jlTotalSelected.setText(" " + countSelected + " recibos de nomina.");
+    }
 
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 1024, 640);
@@ -1369,6 +1396,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
                 updateFieldsStatus();
                 computePayrollValue();
+                computeTotals();
             }
             catch (Exception e) {
                 added = false;
@@ -1433,6 +1461,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
                 updateFieldsStatus();
                 computePayrollValue();
+                computeTotals();
             }
             catch (Exception e) {
                 ok = false;
@@ -1811,6 +1840,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
             populateEmployeesReceipt();         // XXX This method must be invoked just before populateEmployeesAvailable()! Improve this!
             populateEmployeesAvailable(false);
+            computeTotals();
 
             clearCurrentValues();
             updateFieldsStatus();

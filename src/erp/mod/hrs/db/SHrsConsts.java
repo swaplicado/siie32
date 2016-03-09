@@ -9,7 +9,6 @@ package erp.mod.hrs.db;
  * @author Sergio Flores
  */
 public class SHrsConsts {
-
     
     public static final int LAY_BANK_HSBC = 1;
     public static final int LAY_BANK_SANTANDER = 2;
@@ -49,6 +48,17 @@ public class SHrsConsts {
     public static final int SS_RET = 8; // retirement
     public static final int SS_SEV = 9; // severance
     public static final int SS_HOM = 10; // home
+    
+    public static final int YEAR_MIN_BIRTH = 1900;
+    public static final int YEAR_MAX_BIRTH = 2000;
+    
+    public static final int SAL_REF_SAL = 1;
+    public static final int SAL_REF_SAL_SS = 2;
+    public static final int SAL_REF_SAL_FIX = 3;
+    
+    public static final String TXT_SAL_REF_SAL = "SD";
+    public static final String TXT_SAL_REF_SAL_SS = "SBC";
+    public static final String TXT_SAL_REF_SAL_FIX = "OTRO";
 
     public static final String ERR_PERIOD_DATE_INVALID = "Fecha inválida en el período.";
 }

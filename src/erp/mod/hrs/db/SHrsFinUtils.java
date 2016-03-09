@@ -5,9 +5,15 @@
 package erp.mod.hrs.db;
 
 import erp.client.SClientInterface;
+import erp.data.SDataConstants;
 import erp.data.SDataUtilities;
+import erp.lib.SLibConstants;
+import erp.mfin.data.SDataAccount;
+import erp.mfin.data.SDataCostCenter;
 import erp.mfin.data.SDataRecord;
+import erp.mod.fin.db.SFinUtils;
 import java.sql.ResultSet;
+import sa.lib.SLibConsts;
 import sa.lib.gui.SGuiSession;
 
 /**
@@ -16,7 +22,7 @@ import sa.lib.gui.SGuiSession;
  */
 public abstract class SHrsFinUtils {
     
-    public static boolean canOpenPayRoll(final SGuiSession session,  final int payrollId) throws Exception {
+    public static boolean canOpenPayRoll(final SGuiSession session, final int payrollId) throws Exception {
         String sql = "";
         Object [] pk = null;
         SDataRecord moRecord = null;     
@@ -47,11 +53,11 @@ public abstract class SHrsFinUtils {
         return true;
     }
     
-    public static boolean canClosePayRoll(final SGuiSession session,  final int payrollId) throws Exception {
+    public static boolean canClosePayRoll(final SGuiSession session, final int payrollId) throws Exception {
         throw new Exception("Not supported yet.");
     }
     
-    public static void deletePayRollRecords(final SGuiSession session,  final int payrollId) throws Exception {
+    public static void deletePayRollRecords(final SGuiSession session, final int payrollId) throws Exception {
         String sql = "";
         
         sql = "UPDATE fin_rec_ety SET b_del = 1, fid_usr_del = " + session.getUser().getPkUserId() + ", ts_del = now() "
@@ -59,7 +65,7 @@ public abstract class SHrsFinUtils {
         session.getStatement().execute(sql);
     }
     
-    public static boolean isRecordPayroll(final SGuiSession session,  final int payrollId) throws Exception {
+    public static boolean isRecordPayroll(final SGuiSession session, final int payrollId) throws Exception {
         boolean isRecord = false;
         String sql = "";
         Object [] pk = null;
@@ -75,5 +81,48 @@ public abstract class SHrsFinUtils {
             isRecord = true;
         }
         return isRecord;
+    }
+    
+    public static boolean validateAccount(final SGuiSession session, final int accountId, final int costCenterId, final int bizPartnerId, final int itemId, final int taxBasicId, final int taxTaxId) throws Exception {
+        SDataAccount account = null;
+        SDataAccount accountMajor = null;
+        SDataCostCenter costCenter = null;
+        String fk_acc_s = "";
+        String fk_cc_s = "";
+        String sVal = "";
+        
+        fk_acc_s = SFinUtils.getAccountFormerIdXXX(session, accountId);
+        account = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.FIN_ACC, new Object[] { fk_acc_s }, SLibConstants.EXEC_MODE_VERBOSE);
+        
+        sVal = SDataUtilities.validateAccount((SClientInterface) session.getClient(), account, null);
+        if (sVal.length() != 0) {
+            throw new Exception("La cuenta contable ('" + fk_acc_s + "') tiene un inconveniente:\n" + sVal);
+        }
+        accountMajor = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.FIN_ACC, new Object[] { account.getDbmsPkAccountMajorId() }, SLibConstants.EXEC_MODE_VERBOSE);
+        
+        if (accountMajor.getIsRequiredCostCenter()) {
+            if (costCenterId == SLibConsts.UNDEFINED) {
+                throw new Exception("La cuenta contable ('" + fk_acc_s + "') tiene un inconveniente:\nRequiere centro de costos y no está definido.");
+            }
+            else {
+                fk_cc_s = SFinUtils.getCostCenterFormerIdXXX(session, costCenterId);
+                costCenter = (SDataCostCenter) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.FIN_CC, new Object[] { fk_cc_s }, SLibConstants.EXEC_MODE_VERBOSE);
+                sVal = SDataUtilities.validateCostCenter((SClientInterface) session.getClient(), costCenter, null);
+                if (sVal.length() != 0) {
+                    throw new Exception("'El centro de costo ('" + fk_cc_s + "') tiene un inconveniente:\n" + sVal);
+                }
+            }
+        }
+        if (accountMajor.getIsRequiredBizPartner() && bizPartnerId == SLibConsts.UNDEFINED) {
+            throw new Exception("La cuenta contable ('" + fk_acc_s + "') tiene un inconveniente:\nRequiere asociado de negocios y no está definido.");
+        }
+        if (accountMajor.getIsRequiredBizPartner() && itemId == SLibConsts.UNDEFINED) {
+            throw new Exception("La cuenta contable ('" + fk_acc_s + "') tiene un inconveniente:\nRequiere ítem y no está definido.");
+        }
+        if (accountMajor.getIsRequiredBizPartner() && taxBasicId == SLibConsts.UNDEFINED && taxTaxId == SLibConsts.UNDEFINED) {
+            throw new Exception("La cuenta contable ('" + fk_acc_s + "') tiene un inconveniente:\nRequiere impuesto y no está definido.");
+        }
+        
+        return true;
     }
 }

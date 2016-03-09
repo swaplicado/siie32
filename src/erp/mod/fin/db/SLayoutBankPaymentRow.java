@@ -222,4 +222,30 @@ public class SLayoutBankPaymentRow implements SGridRow {
                 break;
         }
     }
+    
+    public SLayoutBankPaymentRow clone() throws CloneNotSupportedException {
+        SLayoutBankPaymentRow registry = new SLayoutBankPaymentRow(miClient);
+        
+        registry.setBizPartnerId(this.getBizPartnerId());
+        registry.setBizPartnerBranchId(this.getBizPartnerBranchId());
+        registry.setBizPartnerBranchAccountId(this.getBizPartnerBranchAccountId());
+        registry.setBizPartner(this.getBizPartner());
+        registry.setBizPartnerKey(this.getBizPartnerKey());
+        registry.setIsForPayment(this.getIsForPayment());
+        registry.setIsToPayed(this.getIsToPayed());
+        registry.setBalance(this.getBalance());
+        registry.setBalanceTot(this.getBalanceTot());
+        registry.setCurrencyKey(this.getCurrencyKey());
+        registry.setAccountCredit(this.getAccountCredit());
+        registry.setRecordPeriod(this.getRecordPeriod());
+        registry.setRecordBkc(this.getRecordBkc());
+        registry.setRecordCob(this.getRecordCob());
+        registry.setRecordNumber(this.getRecordNumber());
+        registry.setRecordDate(this.getRecordDate());
+        registry.setLayoutBankPayment(this.getLayoutBankPayment());
+        registry.setFinRecordLayout(this.getFinRecordLayout());
+        registry.setFinRecordLayoutOld(this.getFinRecordLayoutOld());
+        
+        return registry;
+    }
 }

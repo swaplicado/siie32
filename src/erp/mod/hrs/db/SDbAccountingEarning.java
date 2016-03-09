@@ -85,6 +85,17 @@ public class SDbAccountingEarning extends SDbRegistryUser {
     public String getAuxTable() { return msAuxTable; }
 
     @Override
+    public boolean canSave(final SGuiSession session) throws SQLException, Exception {
+        boolean can = super.canSave(session);
+        
+        if (can) {
+            can = SHrsFinUtils.validateAccount(session, mnFkAccountId, mnFkCostCenterId_n, mnFkBizPartnerId_n, mnFkItemId_n, mnFkTaxBasicId_n, mnFkTaxTaxId_n);
+        }
+        
+        return true;
+    }
+    
+    @Override
     public void setPrimaryKey(int[] pk) {
         mnPkEarningId = pk[0];
         mnPkAccountingTypeId = pk[1];
