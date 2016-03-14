@@ -6,8 +6,10 @@ package erp.mod.hrs.db;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
 import erp.mfin.data.SDataAccount;
 import erp.mfin.data.SDataCostCenter;
 import erp.mfin.data.SDataRecord;
@@ -87,6 +89,7 @@ public abstract class SHrsFinUtils {
         SDataAccount account = null;
         SDataAccount accountMajor = null;
         SDataCostCenter costCenter = null;
+        int nSystemType = SDataConstantsSys.UNDEFINED;
         String fk_acc_s = "";
         String fk_cc_s = "";
         String sVal = "";
@@ -100,7 +103,7 @@ public abstract class SHrsFinUtils {
         }
         accountMajor = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.FIN_ACC, new Object[] { account.getDbmsPkAccountMajorId() }, SLibConstants.EXEC_MODE_VERBOSE);
         
-        if (accountMajor.getIsRequiredCostCenter()) {
+        if (accountMajor.getIsRequiredCostCenter() || accountMajor.getFkAccountTypeId_r() == SDataConstantsSys.FINS_TP_ACC_RES) {
             if (costCenterId == SLibConsts.UNDEFINED) {
                 throw new Exception("La cuenta contable ('" + fk_acc_s + "') tiene un inconveniente:\nRequiere centro de costos y no está definido.");
             }
@@ -113,13 +116,20 @@ public abstract class SHrsFinUtils {
                 }
             }
         }
-        if (accountMajor.getIsRequiredBizPartner() && bizPartnerId == SLibConsts.UNDEFINED) {
+        nSystemType = accountMajor.getFkAccountSystemTypeId();
+        
+        if ((accountMajor.getIsRequiredBizPartner() || SLibUtilities.belongsTo(nSystemType, new int[] {
+            SDataConstantsSys.FINS_TP_ACC_SYS_SUP, SDataConstantsSys.FINS_TP_ACC_SYS_CUS, SDataConstantsSys.FINS_TP_ACC_SYS_CDR, SDataConstantsSys.FINS_TP_ACC_SYS_DBR })) &&
+                bizPartnerId == SLibConsts.UNDEFINED) {
             throw new Exception("La cuenta contable ('" + fk_acc_s + "') tiene un inconveniente:\nRequiere asociado de negocios y no está definido.");
         }
-        if (accountMajor.getIsRequiredBizPartner() && itemId == SLibConsts.UNDEFINED) {
+        if ((accountMajor.getIsRequiredItem() || accountMajor.getFkAccountTypeId_r() == SDataConstantsSys.FINS_TP_ACC_RES) &&
+                itemId == SLibConsts.UNDEFINED) {
             throw new Exception("La cuenta contable ('" + fk_acc_s + "') tiene un inconveniente:\nRequiere ítem y no está definido.");
         }
-        if (accountMajor.getIsRequiredBizPartner() && taxBasicId == SLibConsts.UNDEFINED && taxTaxId == SLibConsts.UNDEFINED) {
+        if (SLibUtilities.belongsTo(nSystemType, new int[] {
+            SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT, SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT }) &&
+                taxBasicId == SLibConsts.UNDEFINED && taxTaxId == SLibConsts.UNDEFINED) {
             throw new Exception("La cuenta contable ('" + fk_acc_s + "') tiene un inconveniente:\nRequiere impuesto y no está definido.");
         }
         
