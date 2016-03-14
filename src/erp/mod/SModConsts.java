@@ -374,7 +374,7 @@ public abstract class SModConsts {
     public static final int TRN_STK_CFG_DNS = 2023046;
     public static final int TRN_STK = 2023047;
     public static final int TRN_INV_VAL = 2023048;
-    public static final int TRN_STK_COST = 2023049;
+    public static final int TRN_INV_MFG_CST = 2023049;
     public static final int TRN_CFD = 2023051;
     public static final int TRN_CFD_SIGN_LOG = 2023052;
     public static final int TRN_CFD_SIGN_LOG_MSG = 2023053;
@@ -390,10 +390,11 @@ public abstract class SModConsts {
     public static final int TRN_DNC_DIOG = 2023503;
     public static final int TRN_DNC_DIOG_DNS = 2023504;
 
-    public static final int TRNX_DPS_BAL = 2024001;         // document balance
-    public static final int TRNX_DPS_CON_SEND = 2024002;    // document send
-    public static final int TRNX_STK_WAH = 2024003;    // document send
-    public static final int TRNX_STK_DIOG_TP = 2024004;    // document send
+    public static final int TRNX_DPS_BAL = 2024001; // document balance
+    public static final int TRNX_DPS_CON_SEND = 2024002; // document send
+    public static final int TRNX_STK_WAH = 2024003; // document send
+    public static final int TRNX_STK_DIOG_TP = 2024004; // document send
+    public static final int TRNX_STK_COST = 2024049;
 
     public static final int TRNR_DPS_CON_BP = 2025001;
     public static final int TRNR_CON_STA = 2025002;
@@ -922,6 +923,7 @@ public abstract class SModConsts {
         TablesMap.put(TRN_STK_CFG_DNS, "trn_stk_cfg_dns");
         TablesMap.put(TRN_STK, "trn_stk");
         TablesMap.put(TRN_INV_VAL, "trn_inv_val");
+        TablesMap.put(TRN_INV_MFG_CST, "trn_inv_mfg_cst");
         TablesMap.put(TRN_CFD, "trn_cfd");
         TablesMap.put(TRN_CFD_SIGN_LOG, "trn_cfd_sign_log");
         TablesMap.put(TRN_CFD_SIGN_LOG_MSG, "trn_cfd_sign_log_msg");

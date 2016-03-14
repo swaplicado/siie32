@@ -33,6 +33,9 @@ public abstract class SModSysConsts {
     public static final int[] CFGS_TP_ENT_POS_POS = new int[] { 3, 1 };
     public static final int[] CFGS_TP_ENT_PLT_PLT = new int[] { 4, 1 };
 
+    public static final int CFGS_TP_SORT_KEY_NAME = 1;
+    public static final int CFGS_TP_SORT_NAME_KEY = 2;
+    
     public static final int CFGS_TP_MMS_CFD = 1;
     public static final int CFGS_TP_MMS_CON = 2;
     public static final int CFGS_TP_MMS_ORD_SAL = 3;
@@ -602,12 +605,14 @@ public abstract class SModSysConsts {
     public static final int[] TRNS_CL_IOG_IN_EXT = { 1, 4 };
     public static final int[] TRNS_CL_IOG_IN_INT = { 1, 5 };
     public static final int[] TRNS_CL_IOG_IN_MFG = { 1, 6 };
+    public static final int[] TRNS_CL_IOG_IN_EXP = { 1, 7 };
     public static final int[] TRNS_CL_IOG_OUT_PUR = { 2, 1 };
     public static final int[] TRNS_CL_IOG_OUT_SAL = { 2, 2 };
     public static final int[] TRNS_CL_IOG_OUT_ADJ = { 2, 3 };
     public static final int[] TRNS_CL_IOG_OUT_EXT = { 2, 4 };
     public static final int[] TRNS_CL_IOG_OUT_INT = { 2, 5 };
     public static final int[] TRNS_CL_IOG_OUT_MFG = { 2, 6 };
+    public static final int[] TRNS_CL_IOG_OUT_EXP = { 2, 7 };
 
     public static final int[] TRNS_TP_IOG_IN_PUR_PUR = { 1, 1, 1 };
     public static final int[] TRNS_TP_IOG_IN_SAL_SAL = { 1, 2, 1 };
@@ -630,6 +635,7 @@ public abstract class SModSysConsts {
     public static final int[] TRNS_TP_IOG_IN_MFG_CON = { 1, 6, 7 };
     public static final int[] TRNS_TP_IOG_IN_EXP_PUR = {1, 9, 1 };
     public static final int[] TRNS_TP_IOG_IN_EXP_MFG = {1, 9, 2 };
+    public static final int[] TRNS_TP_IOG_IN_CST_RM = {1, 9, 3 };
     public static final int[] TRNS_TP_IOG_OUT_PUR_PUR = { 2, 1, 1 };
     public static final int[] TRNS_TP_IOG_OUT_SAL_SAL = { 2, 2, 1 };
     public static final int[] TRNS_TP_IOG_OUT_ADJ_INV = { 2, 3, 1 };
@@ -651,6 +657,7 @@ public abstract class SModSysConsts {
     public static final int[] TRNS_TP_IOG_OUT_MFG_CON = { 2, 6, 7 };
     public static final int[] TRNS_TP_IOG_OUT_EXP_PUR = {2, 9, 1 };
     public static final int[] TRNS_TP_IOG_OUT_EXP_MFG = {2, 9, 2 };
+    public static final int[] TRNS_TP_IOG_OUT_CST_RM = {2, 9, 3 };
 
     public static final int TRNS_TP_LINK_ALL = 1;
     public static final int TRNS_TP_LINK_CT_ITEM = 2;
@@ -756,10 +763,16 @@ public abstract class SModSysConsts {
      * Manufacturing
      */
 
+    public static final int MFGS_ST_ORD_NEW = 1;
+    public static final int MFGS_ST_ORD_WEI = 2;
+    public static final int MFGS_ST_ORD_FLR = 3;
+    public static final int MFGS_ST_ORD_PRO = 4;
+    public static final int MFGS_ST_ORD_FIN = 5;
+    public static final int MFGS_ST_ORD_CLO = 6;
+
     public static final int MFGX_ORD_CST_DONE_NA = 0;
     public static final int MFGX_ORD_CST_DONE_NO = 1;
     public static final int MFGX_ORD_CST_DONE_YES = 2;
-
 
     /*
      * Human Resources

@@ -1005,6 +1005,7 @@ public abstract class SDataConstantsSys {
     public static final int[] TRNS_TP_IOG_IN_MFG_CON = { 1, 6, 7 };
     public static final int[] TRNS_TP_IOG_IN_EXP_PUR = {1, 9, 1 };
     public static final int[] TRNS_TP_IOG_IN_EXP_MFG = {1, 9, 2 };
+    public static final int[] TRNS_TP_IOG_IN_CST_RM = {1, 9, 3 };
     public static final int[] TRNS_TP_IOG_OUT_PUR_PUR = { 2, 1, 1 };
     public static final int[] TRNS_TP_IOG_OUT_SAL_SAL = { 2, 2, 1 };
     public static final int[] TRNS_TP_IOG_OUT_ADJ_INV = { 2, 3, 1 };
@@ -1026,6 +1027,7 @@ public abstract class SDataConstantsSys {
     public static final int[] TRNS_TP_IOG_OUT_MFG_CON = { 2, 6, 7 };
     public static final int[] TRNS_TP_IOG_OUT_EXP_PUR = {2, 9, 1 };
     public static final int[] TRNS_TP_IOG_OUT_EXP_MFG = {2, 9, 2 };
+    public static final int[] TRNS_TP_IOG_OUT_CST_RM = {2, 9, 3 };
 
     public static final int TRNS_TP_PAY_CASH = 1;
     public static final int TRNS_TP_PAY_CREDIT = 2;
@@ -1292,10 +1294,6 @@ public abstract class SDataConstantsSys {
     public static final int TRN_DPS_SAL_LINK_ORD_LINKED = 38;
     */
 
-    public static final int MFGX_ORD_CST_DONE_NA = 0;
-    public static final int MFGX_ORD_CST_DONE_NO = 1;
-    public static final int MFGX_ORD_CST_DONE_YES = 2;
-
     public static final java.lang.String getDpsTypeNameSng(final int type) {
         java.lang.String name = "";
 
@@ -1435,9 +1433,14 @@ public abstract class SDataConstantsSys {
     public static final int MKTS_ORIG_COMMS_DOC = 2;
     public static final int MKTS_ORIG_COMMS_ITEM = 3;
 
-    public static final int MFGS_TP_ORD_CONTINUE = 1;
+    public static final int MFGS_ST_ORD_NEW = 1; // new constants group for job order status (sflores, 2016-03-07)
+    public static final int MFGS_ST_ORD_WEI = 2; // new constants group for job order status (sflores, 2016-03-07)
+    public static final int MFGS_ST_ORD_FLR = 3; // new constants group for job order status (sflores, 2016-03-07)
+    public static final int MFGS_ST_ORD_PRO = 4; // new constants group for job order status (sflores, 2016-03-07)
+    public static final int MFGS_ST_ORD_FIN = 5; // new constants group for job order status (sflores, 2016-03-07)
+    public static final int MFGS_ST_ORD_CLO = 6; // new constants group for job order status (sflores, 2016-03-07)
 
-    public static final int MFGS_ST_ORD_NEW = 1;
+    //public static final int MFGS_ST_ORD_NEW = 1;
     public static final int MFGS_ST_ORD_LOT = 2;
     public static final int MFGS_ST_ORD_LOT_ASIG = 3;
     public static final int MFGS_ST_ORD_PROC = 4;
@@ -1462,6 +1465,12 @@ public abstract class SDataConstantsSys {
     public static final int MFGS_TP_HOUR_NML = 1;
     public static final int MFGS_TP_HOUR_DBL = 2;
     public static final int MFGS_TP_HOUR_TPL = 3;
+
+    public static final int MFGU_TP_ORD_CONTINUE = 1;
+    
+    public static final int MFGX_ORD_CST_DONE_NA = 0;
+    public static final int MFGX_ORD_CST_DONE_NO = 1;
+    public static final int MFGX_ORD_CST_DONE_YES = 2;
 
     public static final int VALUE_BIZ_PARTNER_TYPE = 1;
     public static final int VALUE_COMPANY_BRANCH = 1;
@@ -1618,7 +1627,7 @@ public abstract class SDataConstantsSys {
         "SET @ITMS_DEF_ITEM_KEY = " + ITMS_DEF_ITEM_KEY,
         "SET @ITMS_DEF_ITEM = " + ITMS_DEF_ITEM,
         "SET @ITMS_DEF_ITEM_SHORT = " + ITMS_DEF_ITEM_SHORT,
-        "SET @MFGS_TP_ORD_CONTINUE = " + MFGS_TP_ORD_CONTINUE,
+        "SET @MFGS_TP_ORD_CONTINUE = " + MFGU_TP_ORD_CONTINUE,
         "SET @MFGS_ST_ORD_NEW = " + MFGS_ST_ORD_NEW,
         "SET @MFGS_ST_ORD_LOT = " + MFGS_ST_ORD_LOT,
         "SET @MFGS_ST_ORD_LOT_ASIG = " + MFGS_ST_ORD_LOT_ASIG,

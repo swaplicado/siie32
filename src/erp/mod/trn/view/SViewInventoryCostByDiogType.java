@@ -126,6 +126,7 @@ public class SViewInventoryCostByDiogType extends SGridPaneView implements Actio
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
+        SGridColumnView gridColumnView = null;
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
 
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "t.code", "Código"));
@@ -148,9 +149,15 @@ public class SViewInventoryCostByDiogType extends SGridPaneView implements Actio
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "u.symbol", "Unidad"));
         }
 
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "f_debit", "Cargos $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "f_credit", "Abonos $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "f_stk_cost", "Saldo $"));
+        gridColumnView = new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "f_debit", "Cargos $");
+        gridColumnView.setSumApplying(true);
+        gridColumnsViews.add(gridColumnView);
+        gridColumnView = new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "f_credit", "Abonos $");
+        gridColumnView.setSumApplying(true);
+        gridColumnsViews.add(gridColumnView);
+        gridColumnView = new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "f_stk_cost", "Saldo $");
+        gridColumnView.setSumApplying(true);
+        gridColumnsViews.add(gridColumnView);
 
         return gridColumnsViews;
     }
@@ -159,7 +166,7 @@ public class SViewInventoryCostByDiogType extends SGridPaneView implements Actio
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
         moSuscriptionsSet.add(SModConsts.TRN_INV_VAL);
-        moSuscriptionsSet.add(SModConsts.TRN_STK_COST);
+        moSuscriptionsSet.add(SModConsts.TRNX_STK_COST);
         moSuscriptionsSet.add(SDataConstants.ITMU_ITEM);
         moSuscriptionsSet.add(SDataConstants.ITMU_UNIT);
         moSuscriptionsSet.add(SDataConstants.TRN_LOT);

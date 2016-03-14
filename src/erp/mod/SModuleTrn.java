@@ -8,6 +8,7 @@ import erp.data.SDataConstantsSys;
 import erp.mod.trn.db.SDbDps;
 import erp.mod.trn.db.SDbDpsEntry;
 import erp.mod.trn.db.SDbDpsEntryPrice;
+import erp.mod.trn.db.SDbInventoryMfgCost;
 import erp.mod.trn.db.SDbInventoryValuation;
 import erp.mod.trn.db.SDbItemRequiredDpsConfig;
 import erp.mod.trn.db.SDbMmsConfig;
@@ -18,6 +19,7 @@ import erp.mod.trn.view.SViewDpsEntryContractPrice;
 import erp.mod.trn.view.SViewDpsSendWebService;
 import erp.mod.trn.view.SViewInventoryCost;
 import erp.mod.trn.view.SViewInventoryCostByDiogType;
+import erp.mod.trn.view.SViewInventoryMfgCost;
 import erp.mod.trn.view.SViewInventoryValuation;
 import erp.mod.trn.view.SViewItemRequiredDpsConfig;
 import erp.mod.trn.view.SViewMmsConfig;
@@ -81,6 +83,9 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRN_INV_VAL:
                 registry = new SDbInventoryValuation();
+                break;
+            case SModConsts.TRN_INV_MFG_CST:
+                registry = new SDbInventoryMfgCost();
                 break;
             case SModConsts.TRN_MMS_CFG:
                 registry = new SDbMmsConfig();
@@ -150,10 +155,13 @@ public class SModuleTrn extends SGuiModule {
                 }
                 break;
             case SModConsts.TRN_INV_VAL:
-                view = new SViewInventoryValuation(miClient, subtype, "Valuación inv.", params);
+                view = new SViewInventoryValuation(miClient, "Valuación inventarios");
                 break;
-            case SModConsts.TRN_STK_COST:
-                view = new SViewInventoryCost(miClient, subtype, "Costo inv. " + (subtype != SModConsts.TRNX_STK_WAH ? "por ítem" : "por almacén"), params);
+            case SModConsts.TRN_INV_MFG_CST:
+                view = new SViewInventoryMfgCost(miClient, "Costos producción");
+                break;
+            case SModConsts.TRNX_STK_COST:
+                view = new SViewInventoryCost(miClient, subtype, "Valor inventarios " + (subtype == SModConsts.CFGU_COB_ENT ? "x almacén" : "x ítem"));
                 break;
             case SModConsts.TRNX_STK_DIOG_TP:
                 view = new SViewInventoryCostByDiogType(miClient, subtype, "Costo inv. por tipo mov.", params);
@@ -183,7 +191,7 @@ public class SModuleTrn extends SGuiModule {
                 form = moFormItemRequiredDpsConfig;
                 break;
             case SModConsts.TRN_INV_VAL:
-                if (moFormInventoryValuation == null) moFormInventoryValuation = new SFormInventoryValuation(miClient, SModConsts.TRN_INV_VAL, "Valuación de inventarios");
+                if (moFormInventoryValuation == null) moFormInventoryValuation = new SFormInventoryValuation(miClient, "Valuación de inventarios");
                 form = moFormInventoryValuation;
                 break;
             case SModConsts.TRN_MMS_CFG:

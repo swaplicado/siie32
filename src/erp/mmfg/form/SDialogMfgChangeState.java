@@ -220,7 +220,7 @@ public class SDialogMfgChangeState extends javax.swing.JDialog implements erp.li
                     case SDataConstantsSys.MFGS_ST_ORD_NEW:
                         if (mbNextState) {
                             oProductionOrder.setDateLot_n(moFieldDate.getDate());
-                            if (oProductionOrder.getFkOrdTypeId() != SDataConstantsSys.MFGS_TP_ORD_CONTINUE) {
+                            if (oProductionOrder.getFkOrdTypeId() != SDataConstantsSys.MFGU_TP_ORD_CONTINUE) {
 
                                 // Validate if production order has explotion:
 

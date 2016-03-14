@@ -436,7 +436,6 @@ public abstract class SDataConstants {
     public static final int TRNS_TP_XML_DVY = 207090;   // out of place! (sflores, 2014-01-06)
     public static final int TRNS_ST_XML_DVY = 207091;   // out of place! (sflores, 2014-01-06)
     public static final int TRNS_TP_CFD = 207092;       // out of place! (sflores, 2014-01-28)
-    public static final int TRN_STK_VAL = 207093;       // out of place! (sflores, 2014-01-28)
     public static final int TRN_DPS_XML_DVY = 207094;   // XXX eliminate! (sflores, 2014-01-28)
     public static final int TRN_CFD = 207095;           // out of place! (sflores, 2014-01-28)
     public static final int TRN_CFD_SND_LOG = 207096;   // out of place! (sflores, 2014-05-12)
