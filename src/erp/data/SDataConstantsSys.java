@@ -1524,6 +1524,9 @@ public abstract class SDataConstantsSys {
     public static final int REP_FIN_CHECK_REC = 206040;
     public static final int REP_FIN_DPS_PAY = 206041;
     public static final int REP_FIN_AUX_MOV_BPS = 206042;
+    public static final int REP_FIN_STA_BPS = 206046; // statement of account of business partner
+    public static final int REP_FIN_BPS_ACC = 206047; // not used yet, for future use
+    public static final int REP_FIN_BPS_ACC_AGI = 206048; // business partner accounts aging
 
     public static final int REP_TRN_DPS_BPS = 207001;
     public static final int REP_TRN_DPS_UNP = 207002;
