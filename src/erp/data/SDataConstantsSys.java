@@ -1146,10 +1146,6 @@ public abstract class SDataConstantsSys {
     public static final int TRNX_TP_DPS_BOL = 400;
     public static final int TRNX_TP_DPS_ADJ = 500;
 
-    public static final int TRNX_DPS_DOC_ANNUL = 1; // XXX Later: check if can be 301
-    public static final int TRNX_DPS_DOC_RISS = 2;  // XXX Later: check if can be 302
-    public static final int TRNX_DPS_DOC_REPL = 3;  // XXX Later: check if can be 303
-
     public static final int TRNX_DPS_BAL_ALL = 1;
     public static final int TRNX_DPS_BAL_PAY = 2;
     public static final int TRNX_DPS_BAL_PAY_PEND = 3;
