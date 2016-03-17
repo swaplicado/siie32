@@ -30,15 +30,16 @@ import net.sf.jasperreports.view.JasperViewer;
 public class SDialogRepAccountCashBalance extends javax.swing.JDialog implements java.awt.event.ActionListener {
 
     private erp.client.SClientInterface miClient;
-    private erp.lib.form.SFormField moFieldDate;
+    private erp.lib.form.SFormField moFieldDateCutoff;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
 
     /** Creates new form SDialogRepAccountCashBalance */
     public SDialogRepAccountCashBalance(erp.client.SClientInterface client) {
-        super(client.getFrame(), true);
+        super(client.getFrame(), false);
         miClient = client;
+        
         initComponents();
-        initComponentsExtra();
+        initComponentsCustom();
     }
 
     /** This method is called from within the constructor to
@@ -51,13 +52,14 @@ public class SDialogRepAccountCashBalance extends javax.swing.JDialog implements
     private void initComponents() {
 
         jPanel2 = new javax.swing.JPanel();
-        jPanel5 = new javax.swing.JPanel();
+        jPanel9 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
-        jlDate = new javax.swing.JLabel();
-        jftDate = new javax.swing.JFormattedTextField();
-        jbDate = new javax.swing.JButton();
-        jPanel9 = new javax.swing.JPanel();
+        jlDateCutoff = new javax.swing.JLabel();
+        jftDateCutoff = new javax.swing.JFormattedTextField();
+        jbPickDateCutoff = new javax.swing.JButton();
+        jPanel4 = new javax.swing.JPanel();
+        jckActiveOnly = new javax.swing.JCheckBox();
         jPanel1 = new javax.swing.JPanel();
         jpPrint = new javax.swing.JButton();
         jpClose = new javax.swing.JButton();
@@ -69,39 +71,38 @@ public class SDialogRepAccountCashBalance extends javax.swing.JDialog implements
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel5.setLayout(new java.awt.BorderLayout(0, 5));
+        jPanel9.setLayout(new java.awt.GridLayout(5, 1));
+        jPanel2.add(jPanel9, java.awt.BorderLayout.CENTER);
 
-        jPanel6.setLayout(new java.awt.GridLayout(3, 1, 0, 1));
+        jPanel6.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
-        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDate.setText("Fecha de corte: *");
-        jlDate.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel3.add(jlDate);
+        jlDateCutoff.setText("Fecha de corte: *");
+        jlDateCutoff.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel3.add(jlDateCutoff);
 
-        jftDate.setText("dd/mm/yyyy");
-        jftDate.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel3.add(jftDate);
+        jftDateCutoff.setText("dd/mm/yyyy");
+        jftDateCutoff.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel3.add(jftDateCutoff);
 
-        jbDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
-        jbDate.setToolTipText("Seleccionar fecha");
-        jbDate.setFocusable(false);
-        jbDate.setPreferredSize(new java.awt.Dimension(23, 23));
-        jbDate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jbDateActionPerformed(evt);
-            }
-        });
-        jPanel3.add(jbDate);
+        jbPickDateCutoff.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
+        jbPickDateCutoff.setToolTipText("Seleccionar fecha");
+        jbPickDateCutoff.setFocusable(false);
+        jbPickDateCutoff.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel3.add(jbPickDateCutoff);
 
         jPanel6.add(jPanel3);
 
-        jPanel5.add(jPanel6, java.awt.BorderLayout.NORTH);
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jPanel2.add(jPanel5, java.awt.BorderLayout.NORTH);
+        jckActiveOnly.setText("Solamente cuentas de dinero con estatus \"activo\"");
+        jckActiveOnly.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel4.add(jckActiveOnly);
 
-        jPanel9.setLayout(new java.awt.GridLayout(5, 1));
-        jPanel2.add(jPanel9, java.awt.BorderLayout.CENTER);
+        jPanel6.add(jPanel4);
+
+        jPanel2.add(jPanel6, java.awt.BorderLayout.NORTH);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
@@ -129,7 +130,7 @@ public class SDialogRepAccountCashBalance extends javax.swing.JDialog implements
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(400, 267));
+        setSize(new java.awt.Dimension(416, 289));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -141,50 +142,48 @@ public class SDialogRepAccountCashBalance extends javax.swing.JDialog implements
         actionClose();
     }//GEN-LAST:event_jpCloseActionPerformed
 
-    private void jbDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbDateActionPerformed
-
-    }//GEN-LAST:event_jbDateActionPerformed
-
-    private void initComponentsExtra() {
-        moFieldDate = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDate, jlDate);
-        moFieldDate.setPickerButton(jbDate);
-
-        moFieldDate.setFieldValue(miClient.getSessionXXX().getWorkingDate());
+    private void initComponentsCustom() {
+        moFieldDateCutoff = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateCutoff, jlDateCutoff);
+        moFieldDateCutoff.setPickerButton(jbPickDateCutoff);
 
         mvFields = new Vector<>();
-        mvFields.add(moFieldDate);
+        mvFields.add(moFieldDateCutoff);
+        
+        moFieldDateCutoff.setFieldValue(miClient.getSessionXXX().getWorkingDate());
+        jckActiveOnly.setSelected(true);
 
-        jbDate.addActionListener(this);
+        jbPickDateCutoff.addActionListener(this);
 
-        setModalityType(ModalityType.MODELESS);
         SFormUtilities.createActionMap(rootPane, this, "actionPrint", "print", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "actionClose", "close", KeyEvent.VK_ESCAPE, 0);
     }
 
     private java.lang.String createParamSql() {
-        int[] year = SLibTimeUtilities.digestYear(moFieldDate.getDate());
+        int[] year = SLibTimeUtilities.digestYear(moFieldDateCutoff.getDate());
         String sql = "";
 
-        sql = "SELECT e.id_cob, e.id_ent, bb.bpb, et.tp_ent, e.ent, e.code, ce.cur, ce.cur_key, e.b_del, ce.id_cur AS f_id_cur, re.fid_tp_sys_mov_xxx, " +
-                "SUM(IF(r.dt < '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDate.getDate()) + "',re.debit - re.credit, 0)) AS f_si, " +
-                "SUM(IF(r.dt = '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDate.getDate()) + "', re.debit, 0)) AS f_debit, " +
-                "SUM(IF(r.dt = '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDate.getDate()) + "', re.credit, 0)) AS f_credit, " +
-                "SUM(IF(r.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDate.getDate()) + "', re.debit - re.credit, 0)) AS f_sf, " +
-                "SUM(IF(r.dt < '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDate.getDate()) + "' AND ce.id_cur = c.id_cur,re.debit_cur - re.credit_cur, 0)) AS f_si_cur, " +
-                "SUM(IF(r.dt = '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDate.getDate()) + "' AND ce.id_cur = c.id_cur, re.debit_cur, 0)) AS f_debit_cur, " +
-                "SUM(IF(r.dt = '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDate.getDate()) + "' AND ce.id_cur = c.id_cur, re.credit_cur, 0)) AS f_credit_cur, " +
-                "SUM(IF(r.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDate.getDate()) + "' AND ce.id_cur = c.id_cur, re.debit_cur - re.credit_cur, 0)) AS f_sf_cur " +
+        sql = "SELECT e.id_cob, e.id_ent, bb.bpb, et.tp_ent, e.ent, e.code, ce.cur, ce.cur_key, e.b_act, e.b_del, ce.id_cur AS f_id_cur, re.fid_tp_sys_mov_xxx, " +
+                "SUM(IF(r.dt < '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateCutoff.getDate()) + "',re.debit - re.credit, 0)) AS f_si, " +
+                "SUM(IF(r.dt = '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateCutoff.getDate()) + "', re.debit, 0)) AS f_debit, " +
+                "SUM(IF(r.dt = '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateCutoff.getDate()) + "', re.credit, 0)) AS f_credit, " +
+                "SUM(IF(r.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateCutoff.getDate()) + "', re.debit - re.credit, 0)) AS f_sf, " +
+                "SUM(IF(r.dt < '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateCutoff.getDate()) + "' AND ce.id_cur = c.id_cur,re.debit_cur - re.credit_cur, 0)) AS f_si_cur, " +
+                "SUM(IF(r.dt = '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateCutoff.getDate()) + "' AND ce.id_cur = c.id_cur, re.debit_cur, 0)) AS f_debit_cur, " +
+                "SUM(IF(r.dt = '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateCutoff.getDate()) + "' AND ce.id_cur = c.id_cur, re.credit_cur, 0)) AS f_credit_cur, " +
+                "SUM(IF(r.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateCutoff.getDate()) + "' AND ce.id_cur = c.id_cur, re.debit_cur - re.credit_cur, 0)) AS f_sf_cur " +
                 "FROM fin_rec AS r " +
-                "INNER JOIN fin_rec_ety AS re ON r.id_year = " + year[0] + " AND r.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDate.getDate()) + "' AND r.id_year = re.id_year AND " +
-                "r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND r.b_del = 0 AND re.b_del = 0 " +
+                "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num " +
                 "INNER JOIN erp.cfgu_cur AS c ON re.fid_cur = c.id_cur " +
-                "INNER JOIN fin_acc AS a ON re.fid_acc = a.id_acc AND re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_CT_SYS_MOV_CASH + " AND re.fid_tp_sys_mov_xxx IN(" + SDataConstantsSys.FINS_CT_ACC_CASH_CASH + ", " + SDataConstantsSys.FINS_CT_ACC_CASH_BANK + ") " +
+                "INNER JOIN fin_acc AS a ON re.fid_acc = a.id_acc " +
                 "INNER JOIN erp.cfgu_cob_ent AS e ON re.fid_cob_n = e.id_cob AND re.fid_ent_n = e.id_ent " +
                 "INNER JOIN erp.cfgs_tp_ent AS et ON e.fid_ct_ent = et.id_ct_ent AND e.fid_tp_ent = et.id_tp_ent " +
                 "INNER JOIN erp.bpsu_bpb AS bb ON e.id_cob = bb.id_bpb " +
                 "INNER JOIN fin_acc_cash AS ac ON e.id_cob = ac.id_cob AND e.id_ent = ac.id_acc_cash " +
                 "INNER JOIN erp.cfgu_cur AS ce ON ac.fid_cur = ce.id_cur " +
-                "GROUP BY e.id_cob, e.id_ent, bb.bpb, e.ent, e.code, ce.cur_key, e.b_del " +
+                "WHERE r.b_del = 0 AND re.b_del = 0 AND r.id_year = " + year[0] + " AND r.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateCutoff.getDate()) + "' AND " +
+                "re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_CT_SYS_MOV_CASH + " AND re.fid_tp_sys_mov_xxx IN(" + SDataConstantsSys.FINS_CT_ACC_CASH_CASH + ", " + SDataConstantsSys.FINS_CT_ACC_CASH_BANK + ") " +
+                (jckActiveOnly.isSelected() ? "AND e.b_act = 1 " : "") +
+                "GROUP BY e.id_cob, e.id_ent, bb.bpb, e.ent, e.code, ce.cur_key, e.b_act, e.b_del " +
                 "ORDER BY bb.bpb, e.id_cob, re.fid_tp_sys_mov_xxx, ce.id_cur, e.ent, e.id_ent ";
 
         return sql;
@@ -203,7 +202,7 @@ public class SDialogRepAccountCashBalance extends javax.swing.JDialog implements
             map.put("sTitle", getTitle().toUpperCase());
             map.put("nCurrencyLocal", miClient.getSessionXXX().getParamsErp().getFkCurrencyId());
             map.put("sCurrencyLocalKey", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
-            map.put("tDt", moFieldDate.getDate());
+            map.put("tDt", moFieldDateCutoff.getDate());
             map.put("sSql", createParamSql());
 
             jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_FIN_ACC_CASH_BAL, map);
@@ -220,7 +219,7 @@ public class SDialogRepAccountCashBalance extends javax.swing.JDialog implements
     }
 
     private void actionDate() {
-        miClient.getGuiDatePickerXXX().pickDate(moFieldDate.getDate(), moFieldDate);
+        miClient.getGuiDatePickerXXX().pickDate(moFieldDateCutoff.getDate(), moFieldDateCutoff);
     }
 
     public void actionPrint() {
@@ -252,12 +251,13 @@ public class SDialogRepAccountCashBalance extends javax.swing.JDialog implements
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel9;
-    private javax.swing.JButton jbDate;
-    private javax.swing.JFormattedTextField jftDate;
-    private javax.swing.JLabel jlDate;
+    private javax.swing.JButton jbPickDateCutoff;
+    private javax.swing.JCheckBox jckActiveOnly;
+    private javax.swing.JFormattedTextField jftDateCutoff;
+    private javax.swing.JLabel jlDateCutoff;
     private javax.swing.JButton jpClose;
     private javax.swing.JButton jpPrint;
     // End of variables declaration//GEN-END:variables
@@ -267,7 +267,7 @@ public class SDialogRepAccountCashBalance extends javax.swing.JDialog implements
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
 
-            if (button == jbDate) {
+            if (button == jbPickDateCutoff) {
                 actionDate();
             }
         }
