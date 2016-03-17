@@ -1,5 +1,5 @@
 /*
- * DFormCompany.java
+ * SDialogRepBizPartnerMove.java
  *
  * Created on 19 de agosto de 2008, 11:10 AM
  */
@@ -31,7 +31,7 @@ import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
- * @author  Néstor Ávalos
+ * @author  Néstor Ávalos, Sergio Flores
  */
 public class SDialogRepBizPartnerMove extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -57,7 +57,7 @@ public class SDialogRepBizPartnerMove extends javax.swing.JDialog implements erp
     private int mnParamTpSysMov;
     private int mnParamCtSysMov;
 
-    /** Creates new form DFormCompany */
+    /** Creates new form SDialogRepBizPartnerMove */
     public SDialogRepBizPartnerMove(erp.client.SClientInterface client, int nType) {
         super(client.getFrame(), true);
         miClient = client;
@@ -117,7 +117,6 @@ public class SDialogRepBizPartnerMove extends javax.swing.JDialog implements erp
         jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Relación de saldos de "); // NOI18N
         setModal(true);
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -126,9 +125,9 @@ public class SDialogRepBizPartnerMove extends javax.swing.JDialog implements erp
             }
         });
 
+        jpData.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración del reporte:"));
         jpData.setLayout(new java.awt.BorderLayout());
 
-        jpReg.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración del reporte:"));
         jpReg.setLayout(new java.awt.BorderLayout(5, 5));
 
         jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Período:"));
@@ -195,7 +194,7 @@ public class SDialogRepBizPartnerMove extends javax.swing.JDialog implements erp
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Por tipo:"));
         jPanel3.setLayout(new java.awt.GridLayout(3, 1, 0, 2));
 
-        jPanel11.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         buttonGroup1.add(jrbBizPartner);
         jrbBizPartner.setSelected(true);
@@ -289,12 +288,12 @@ public class SDialogRepBizPartnerMove extends javax.swing.JDialog implements erp
 
         jpData.add(jpReg, java.awt.BorderLayout.PAGE_START);
 
-        jPanel1.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
         jpData.add(jPanel1, java.awt.BorderLayout.SOUTH);
 
         getContentPane().add(jpData, java.awt.BorderLayout.CENTER);
 
-        jPanel2.setLayout(new java.awt.FlowLayout(2));
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbReport.setText("Imprimir");
         jbReport.setToolTipText("[Ctrl + Enter]");
@@ -309,8 +308,8 @@ public class SDialogRepBizPartnerMove extends javax.swing.JDialog implements erp
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-522)/2, (screenSize.height-336)/2, 522, 336);
+        setSize(new java.awt.Dimension(522, 336));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -501,7 +500,7 @@ public class SDialogRepBizPartnerMove extends javax.swing.JDialog implements erp
         String sSqlCob = "";
         String sSql = "";
         String sCob = "";
-        String sReportTitle = "RELACIÓN DE SALDOS DE ";
+        String sTitle = "SALDOS DE ";
         String sEntity = "b.bp";
         String sTitleEntity = "ASOC. NEGOCIOS: ";
         String sTotalEntity = "TOTAL ASOC. NEGOCIOS";
@@ -547,7 +546,7 @@ public class SDialogRepBizPartnerMove extends javax.swing.JDialog implements erp
                             sTitleEntity += "(TODOS)";
                         }
 
-                        sReportTitle += (mnParamReportType == SDataConstantsSys.FINS_TP_ACC_SYS_SUP ? "PROVEEDORES " : "CLIENTES ");
+                        sTitle += (mnParamReportType == SDataConstantsSys.FINS_TP_ACC_SYS_SUP ? "PROVEEDORES" : "CLIENTES");
                         break;
                     case SDataConstantsSys.FINS_TP_ACC_SYS_DBR:
                     case SDataConstantsSys.FINS_TP_ACC_SYS_CDR:
@@ -563,7 +562,7 @@ public class SDialogRepBizPartnerMove extends javax.swing.JDialog implements erp
                             sTitleEntity += "(TODOS)";
                         }
 
-                        sReportTitle += (mnParamReportType == SDataConstantsSys.FINS_TP_ACC_SYS_DBR ? "DEUDORES DIVERSOS " : "ACREEDORES DIVERSOS ");
+                        sTitle += (mnParamReportType == SDataConstantsSys.FINS_TP_ACC_SYS_DBR ? "DEUDORES DIVERSOS" : "ACREEDORES DIVERSOS");
                         break;
                     case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_BANK:
                     case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_CASH:
@@ -582,8 +581,8 @@ public class SDialogRepBizPartnerMove extends javax.swing.JDialog implements erp
                             sTitleEntity += (mnParamReportType == SDataConstantsSys.FINS_TP_ACC_SYS_INV ? "(TODOS)" : "(TODAS)");
                         }
                         sSql += "INNER JOIN erp.bpsu_bpb AS bb ON e.id_cob = bb.id_bpb ";
-                        sReportTitle += (mnParamReportType == SDataConstantsSys.FINS_TP_ACC_SYS_CASH_BANK ? "BANCOS " :
-                            mnParamReportType == SDataConstantsSys.FINS_TP_ACC_SYS_CASH_CASH ? "CAJAS " : "INVENTARIOS " );
+                        sTitle += (mnParamReportType == SDataConstantsSys.FINS_TP_ACC_SYS_CASH_BANK ? "BANCOS" :
+                            mnParamReportType == SDataConstantsSys.FINS_TP_ACC_SYS_CASH_CASH ? "CAJAS" : "INVENTARIOS" );
                         sEntity = "e.ent";
                         sTotalEntity = (mnParamReportType == SDataConstantsSys.FINS_TP_ACC_SYS_CASH_BANK ? "TOTAL CUENTA BANCARIA" :
                             mnParamReportType == SDataConstantsSys.FINS_TP_ACC_SYS_CASH_CASH ? "TOTAL CAJA" : "TOTAL ALMACEN " );
@@ -606,10 +605,10 @@ public class SDialogRepBizPartnerMove extends javax.swing.JDialog implements erp
 
                 sSql += "LEFT OUTER JOIN erp.bpsu_bp AS b ON (b.id_bp = d.fid_sal_agt_bp_n OR b.id_bp = d.fid_sal_agt_n) ";
 
-                sReportTitle += "AGENTE ";
+                sTitle += "AGENTE";
             }
 
-            renderReport(sReportTitle, sSqlCob + sSql, sCob, sTitleEntity, sEntity, sTotalEntity);
+            renderReport(sTitle, sSqlCob + sSql, sCob, sTitleEntity, sEntity, sTotalEntity);
         }
         else {
             miClient.showMsgBoxWarning(validation.getMessage());
@@ -862,7 +861,7 @@ public class SDialogRepBizPartnerMove extends javax.swing.JDialog implements erp
                     case SDataConstantsSys.FINS_TP_ACC_SYS_CUS:
                         jlFkEntityId.setText("Cliente:");
                         jrbBizPartner.setText("Cliente");
-                        this.setTitle(this.getTitle() + "clientes");
+                        this.setTitle("Saldos de clientes");
                         jbFkEntityId.setToolTipText("Seleccionar cliente");
                         mnParamCtSysMov = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0];
                         mnParamTpSysMov = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1];
@@ -872,7 +871,7 @@ public class SDialogRepBizPartnerMove extends javax.swing.JDialog implements erp
                     case SDataConstantsSys.FINS_TP_ACC_SYS_SUP:
                         jlFkEntityId.setText("Proveedor:");
                         jrbBizPartner.setText("Proveedor");
-                        this.setTitle(this.getTitle() + "proveedores");
+                        this.setTitle("Saldos de proveedores");
                         jbFkEntityId.setToolTipText("Seleccionar proveedor");
                         mnParamCtSysMov = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0];
                         mnParamTpSysMov = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1];
@@ -880,7 +879,7 @@ public class SDialogRepBizPartnerMove extends javax.swing.JDialog implements erp
                     case SDataConstantsSys.FINS_TP_ACC_SYS_DBR:
                         jlFkEntityId.setText("Deudor diverso:");
                         jrbBizPartner.setText("Deudor diverso");
-                        this.setTitle(this.getTitle() + "deudores diversos");
+                        this.setTitle("Saldos de deudores diversos");
                         jbFkEntityId.setToolTipText("Seleccionar deudor diverso");
                         mnParamCtSysMov = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR[0];
                         mnParamTpSysMov = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR[1];
@@ -888,7 +887,7 @@ public class SDialogRepBizPartnerMove extends javax.swing.JDialog implements erp
                     case SDataConstantsSys.FINS_TP_ACC_SYS_CDR:
                         jlFkEntityId.setText("Acreedor diverso:");
                         jrbBizPartner.setText("Acreedor diverso");
-                        this.setTitle(this.getTitle() + "acreedores diversos");
+                        this.setTitle("Saldos de acreedores diversos");
                         jbFkEntityId.setToolTipText("Seleccionar acreedor diverso");
                         mnParamCtSysMov = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CDR[0];
                         mnParamTpSysMov = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR[1];
@@ -896,7 +895,7 @@ public class SDialogRepBizPartnerMove extends javax.swing.JDialog implements erp
                     case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_BANK:
                         jlFkEntityId.setText("Banco:");
                         jrbBizPartner.setText("Banco");
-                        this.setTitle(this.getTitle() + "bancos");
+                        this.setTitle("Saldos de bancos");
                         jbFkEntityId.setToolTipText("Seleccionar cuenta bancaria");
                         mnParamCtSysMov = SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK[0];
                         mnParamTpSysMov = SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK[1];
@@ -904,7 +903,7 @@ public class SDialogRepBizPartnerMove extends javax.swing.JDialog implements erp
                     case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_CASH:
                         jlFkEntityId.setText("Caja:");
                         jrbBizPartner.setText("Caja");
-                        this.setTitle(this.getTitle() + "cajas");
+                        this.setTitle("Saldos de cajas");
                         jbFkEntityId.setToolTipText("Seleccionar caja");
                         mnParamCtSysMov = SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH[0];
                         mnParamTpSysMov = SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH[1];
@@ -912,7 +911,7 @@ public class SDialogRepBizPartnerMove extends javax.swing.JDialog implements erp
                     case SDataConstantsSys.FINS_TP_ACC_SYS_INV:
                         jlFkEntityId.setText("Almacén:");
                         jrbBizPartner.setText("Almacén");
-                        this.setTitle(this.getTitle() + "almacenes");
+                        this.setTitle("Saldos de almacenes");
                         jbFkEntityId.setToolTipText("Seleccionar almacén");
                         mnParamCtSysMov = SDataConstantsSys.FINS_TP_SYS_MOV_ASSET_STOCK[0];
                         mnParamTpSysMov = SDataConstantsSys.FINS_TP_SYS_MOV_ASSET_STOCK[1];

@@ -83,7 +83,6 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
         jpClose = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Reporte de saldos");
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -164,8 +163,8 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-500)/2, (screenSize.height-300)/2, 500, 300);
+        setSize(new java.awt.Dimension(500, 300));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jpPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jpPrintActionPerformed
@@ -183,7 +182,7 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
     private void initComponentsExtra() {
         switch (mnBizPartnerCategoryId) {
             case SDataConstantsSys.BPSS_CT_BP_SUP:
-                setTitle(getTitle() + " de proveedores por documento");
+                setTitle("Saldos de proveedores por documento");
                 manSysMoveTypeKey = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP;
                 msBizPartnerCat = "PROVEEDOR";
                 msBizPartnerCatPlural = "PROVEEDORES";
@@ -192,7 +191,7 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
                 SFormUtilities.populateComboBox(miClient, jcbBizPartner, mnOptionPickerId = SDataConstants.BPSX_BP_SUP);
                 break;
             case SDataConstantsSys.BPSS_CT_BP_CUS:
-                setTitle(getTitle() + " de clientes por documento");
+                setTitle("Saldos de clientes por documento");
                 manSysMoveTypeKey = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS;
                 msBizPartnerCat = "CLIENTE";
                 msBizPartnerCatPlural = "CLIENTES";

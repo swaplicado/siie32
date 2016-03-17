@@ -22,6 +22,7 @@ import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mbps.data.SDataBizPartner;
 import erp.mfin.data.SDataAccount;
+import erp.mod.bps.db.SBpsUtils;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
@@ -34,8 +35,9 @@ import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBox;
 import javax.swing.JFormattedTextField;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.view.*;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
+import sa.gui.util.SUtilConsts;
 
 /**
  *
@@ -56,12 +58,12 @@ public class SDialogRepBizPartnerJournal extends javax.swing.JDialog implements 
 
     private int mnBizPartnerCategory;
     private int mnOptionPickerId;
-    private String msBizPartnerKey = "";
-    private String msBizPartnerCat = "";
-    private String msBizPartnerCatPlural = "";
+    private String msBizPartnerKey;
+    private String msBizPartnerCatSng;
+    private String msBizPartnerCatPlr;
     private java.lang.String msCurrentFkAccountId;
-    private int mnFidCtSysMov = 0;
-    private int mnFidTpSysMov = 0;
+    private int mnFidCtSysMov;
+    private int mnFidTpSysMov;
 
     private erp.mfin.form.SPanelAccount moPanelFkAccountId;
 
@@ -86,7 +88,7 @@ public class SDialogRepBizPartnerJournal extends javax.swing.JDialog implements 
 
         jPanel1 = new javax.swing.JPanel();
         jbPrint = new javax.swing.JButton();
-        jbExit = new javax.swing.JButton();
+        jbClose = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jpFilter = new javax.swing.JPanel();
         jpAccount = new javax.swing.JPanel();
@@ -107,7 +109,6 @@ public class SDialogRepBizPartnerJournal extends javax.swing.JDialog implements 
         jbDateEnd = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Reporte de ventas por cliente");
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -123,10 +124,10 @@ public class SDialogRepBizPartnerJournal extends javax.swing.JDialog implements 
         jbPrint.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel1.add(jbPrint);
 
-        jbExit.setText("Cerrar");
-        jbExit.setToolTipText("[Escape]");
-        jbExit.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel1.add(jbExit);
+        jbClose.setText("Cerrar");
+        jbClose.setToolTipText("[Escape]");
+        jbClose.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel1.add(jbClose);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
 
@@ -154,6 +155,7 @@ public class SDialogRepBizPartnerJournal extends javax.swing.JDialog implements 
         jPanel6.setPreferredSize(new java.awt.Dimension(135, 50));
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 2));
 
+        jlBizPartner.setText("Asociado negocios: *");
         jlBizPartner.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel6.add(jlBizPartner);
 
@@ -245,44 +247,32 @@ public class SDialogRepBizPartnerJournal extends javax.swing.JDialog implements 
         jpAccount.remove(jlDummyAccount);
         jpAccount.add(moPanelFkAccountId, BorderLayout.CENTER);
 
+        msBizPartnerCatSng = SBpsUtils.getBizPartnerCategoryName(mnBizPartnerCategory, SUtilConsts.NUM_SNG);
+        msBizPartnerCatPlr = SBpsUtils.getBizPartnerCategoryName(mnBizPartnerCategory, SUtilConsts.NUM_PLR);
+        jlBizPartner.setText(msBizPartnerCatSng + ": *");
+        setTitle("Reporte de auxiliares contables de " + msBizPartnerCatPlr.toLowerCase());
+        
         switch(mnBizPartnerCategory) {
             case SDataConstantsSys.BPSS_CT_BP_CUS:
-                msBizPartnerCat = "CLIENTE";
-                msBizPartnerCatPlural = "CLIENTES";
                 mnFidCtSysMov = SDataConstantsSys.FINS_CT_SYS_MOV_BPS;
                 mnFidTpSysMov = SDataConstantsSys.BPSS_CT_BP_CUS;
-                jlBizPartner.setText("Cliente:*");
-                setTitle("Reporte auxiliar de movimientos contables de " + msBizPartnerCatPlural.toLowerCase());
                 SFormUtilities.populateComboBox(miClient, jcbBizPartner, mnOptionPickerId = SDataConstants.BPSX_BP_CUS);
                 break;
             case SDataConstantsSys.BPSS_CT_BP_SUP:
-                msBizPartnerCat = "PROVEEDOR";
-                msBizPartnerCatPlural = "PROVEEDORES";
                 mnFidCtSysMov = SDataConstantsSys.FINS_CT_SYS_MOV_BPS;
                 mnFidTpSysMov = SDataConstantsSys.BPSS_CT_BP_SUP;
-                jlBizPartner.setText("Proveedor:*");
-                setTitle("Reporte auxiliar de movimientos contables de " + msBizPartnerCatPlural.toLowerCase());
                 SFormUtilities.populateComboBox(miClient, jcbBizPartner, mnOptionPickerId = SDataConstants.BPSX_BP_SUP);
                 break;
             case SDataConstantsSys.BPSS_CT_BP_DBR:
-                msBizPartnerCat = "DEUDOR DIVERSO";
-                msBizPartnerCatPlural = "DEUDORES DIVERSOS";
                 mnFidCtSysMov = SDataConstantsSys.FINS_CT_SYS_MOV_BPS;
                 mnFidTpSysMov = SDataConstantsSys.BPSS_CT_BP_DBR;
-                jlBizPartner.setText("Deudor diverso:*");
-                setTitle("Reporte auxiliar de movimientos contables de " + msBizPartnerCatPlural.toLowerCase());
                 SFormUtilities.populateComboBox(miClient, jcbBizPartner, mnOptionPickerId = SDataConstants.BPSX_BP_DBR);
                 break;
             case SDataConstantsSys.BPSS_CT_BP_CDR:
-                msBizPartnerCat = "ACREEDOR DIVERSO";
-                msBizPartnerCatPlural = "ACREEDORES DIVERSOS";
                 mnFidCtSysMov = SDataConstantsSys.FINS_CT_SYS_MOV_BPS;
                 mnFidTpSysMov = SDataConstantsSys.BPSS_CT_BP_CDR;
-                jlBizPartner.setText("Acreedor diverso:*");
-                setTitle("Reporte auxiliar de movimientos contables de " + msBizPartnerCatPlural.toLowerCase());
                 SFormUtilities.populateComboBox(miClient, jcbBizPartner, mnOptionPickerId = SDataConstants.BPSX_BP_CDR);
                 break;
-
             default:
         }
 
@@ -298,7 +288,7 @@ public class SDialogRepBizPartnerJournal extends javax.swing.JDialog implements 
         mvFields.add(moFieldBizPartner);
 
         jbPrint.addActionListener(this);
-        jbExit.addActionListener(this);
+        jbClose.addActionListener(this);
         jbDateInitial.addActionListener(this);
         jbDateEnd.addActionListener(this);
         jbBizPartner.addActionListener(this);
@@ -318,7 +308,7 @@ public class SDialogRepBizPartnerJournal extends javax.swing.JDialog implements 
             public void actionPerformed(ActionEvent e) { actionClose(); }
         };
 
-        SFormUtilities.putActionMap(getRootPane(), action, "exit", KeyEvent.VK_ESCAPE, 0);
+        SFormUtilities.putActionMap(getRootPane(), action, "close", KeyEvent.VK_ESCAPE, 0);
 
         formReset();
         actionIsAccount();
@@ -382,12 +372,12 @@ public class SDialogRepBizPartnerJournal extends javax.swing.JDialog implements 
                 map.put("nBizPartnerId", bizPartner.getPkBizPartnerId());
                 map.put("sBizPartner", bizPartner.getBizPartner());
                 map.put("sBizPartnerKey", msBizPartnerKey);
-                map.put("sBizPartnerCat", msBizPartnerCat);
-                map.put("sBizPartnerCatPlural", msBizPartnerCatPlural);
+                map.put("sBizPartnerCat", msBizPartnerCatSng.toUpperCase());
+                map.put("sBizPartnerCatPlural", msBizPartnerCatPlr.toUpperCase());
 
                 jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_FIN_AUX_MOV_BPS, map);
                 jasperViewer = new JasperViewer(jasperPrint, false);
-                jasperViewer.setTitle("Reporte auxiliar de movimientos contables de " + msBizPartnerCatPlural.toLowerCase());
+                jasperViewer.setTitle(getTitle());
                 jasperViewer.setVisible(true);
             }
             catch(Exception e) {
@@ -497,9 +487,9 @@ public class SDialogRepBizPartnerJournal extends javax.swing.JDialog implements 
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JButton jbBizPartner;
+    private javax.swing.JButton jbClose;
     private javax.swing.JButton jbDateEnd;
     private javax.swing.JButton jbDateInitial;
-    private javax.swing.JButton jbExit;
     private javax.swing.JButton jbPrint;
     private javax.swing.JComboBox jcbBizPartner;
     private javax.swing.JCheckBox jckIsAccount;
@@ -628,7 +618,7 @@ public class SDialogRepBizPartnerJournal extends javax.swing.JDialog implements 
             if (button == jbPrint) {
                 actionPrint();
             }
-            else if (button == jbExit) {
+            else if (button == jbClose) {
                 actionClose();
             }
             else if (button == jbDateInitial) {

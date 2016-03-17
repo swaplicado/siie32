@@ -17,6 +17,7 @@ import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
+import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
@@ -26,8 +27,8 @@ import java.awt.event.KeyEvent;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.AbstractAction;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.view.*;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -77,13 +78,13 @@ public class SDialogRepStock extends javax.swing.JDialog implements erp.lib.form
         jbDate = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jlCompanyBranch = new javax.swing.JLabel();
-        jcbCompanyBranch = new javax.swing.JComboBox();
+        jcbCompanyBranch = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel6 = new javax.swing.JPanel();
         jlWarehouse = new javax.swing.JLabel();
-        jcbWarehouse = new javax.swing.JComboBox();
+        jcbWarehouse = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel7 = new javax.swing.JPanel();
         jlItemGeneric = new javax.swing.JLabel();
-        jcbItemGeneric = new javax.swing.JComboBox();
+        jcbItemGeneric = new javax.swing.JComboBox<SFormComponentItem>();
         jckbShowLot = new javax.swing.JCheckBox();
         jckbIsTakeStk = new javax.swing.JCheckBox();
 
@@ -186,8 +187,8 @@ public class SDialogRepStock extends javax.swing.JDialog implements erp.lib.form
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-430)/2, (screenSize.height-300)/2, 430, 300);
+        setSize(new java.awt.Dimension(430, 300));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -343,9 +344,9 @@ public class SDialogRepStock extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JButton jbDate;
     private javax.swing.JButton jbExit;
     private javax.swing.JButton jbPrint;
-    private javax.swing.JComboBox jcbCompanyBranch;
-    private javax.swing.JComboBox jcbItemGeneric;
-    private javax.swing.JComboBox jcbWarehouse;
+    private javax.swing.JComboBox<SFormComponentItem> jcbCompanyBranch;
+    private javax.swing.JComboBox<SFormComponentItem> jcbItemGeneric;
+    private javax.swing.JComboBox<SFormComponentItem> jcbWarehouse;
     private javax.swing.JCheckBox jckbIsTakeStk;
     private javax.swing.JCheckBox jckbShowLot;
     private javax.swing.JFormattedTextField jftDate;

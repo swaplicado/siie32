@@ -20,6 +20,10 @@ import sa.lib.gui.SGuiSession;
  */
 public abstract class SBpsUtils {
 
+    /**
+     * @param idCategory Business partner category, constants defined in <code>erp.mod.SModSysConsts.BPSS_CT_BP_...</code>.
+     * @param number Number noun, constants defined in <code>sa.lib.SUtilConsts.NUM_...</code>.
+     */
     public static String getBizPartnerCategoryName(final int idCategory, final int number) {
         String name = "";
 

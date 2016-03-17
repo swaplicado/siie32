@@ -6,35 +6,27 @@
 
 package erp.mfin.form;
 
-import java.awt.Cursor;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Vector;
-import javax.swing.AbstractAction;
-
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
-import erp.lib.form.SFormComponentItem;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormOptionPickerInterface;
-import erp.lib.form.SFormValidation;
-import erp.lib.form.SFormUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
+import erp.lib.form.SFormComponentItem;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
 import erp.mbps.data.SDataBizPartner;
-import erp.SClient;
-
+import java.awt.Cursor;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.util.Date;
+import java.util.Map;
+import java.util.Vector;
+import javax.swing.AbstractAction;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
-import net.sf.jasperreports.view.save.JRPdfSaveContributor.*;
-import net.sf.jasperreports.view.JRViewer.*;
-import net.sf.jasperreports.view.save.JRMultipleSheetsXlsSaveContributor.*;
 
 /**
  *
@@ -121,7 +113,6 @@ public class SDialogRepFinMov extends javax.swing.JDialog implements erp.lib.for
         jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Movimientos de "); // NOI18N
         setModal(true);
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -272,8 +263,8 @@ public class SDialogRepFinMov extends javax.swing.JDialog implements erp.lib.for
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-522)/2, (screenSize.height-259)/2, 522, 259);
+        setSize(new java.awt.Dimension(522, 259));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -768,23 +759,23 @@ public class SDialogRepFinMov extends javax.swing.JDialog implements erp.lib.for
 
                 if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH)) {
                     jlFkEntityId.setText("Caja:");
-                    this.setTitle(this.getTitle() + "cajas ");
+                    this.setTitle("Movimientos contables de cajas ");
                 }
                 else if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK)) {
                     jlFkEntityId.setText("Cuenta bancaria:");
-                    this.setTitle(this.getTitle() + "cuentas bancarias ");
+                    this.setTitle("Movimientos contables de cuentas bancarias ");
                 }
                 else if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT)) {
                     jlFkEntityId.setText("Impuesto a favor:");
-                    this.setTitle(this.getTitle() + "impuestos a favor ");
+                    this.setTitle("Movimientos contables de impuestos a favor ");
                 }
                 else if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT)) {
                     jlFkEntityId.setText("Impuesto a cargo:");
-                    this.setTitle(this.getTitle() + "impuestos a cargo ");
+                    this.setTitle("Movimientos contables de impuestos a cargo ");
                 }
                 else if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_ASSET_STOCK)) {
                     jlFkEntityId.setText("Almacen:");
-                    this.setTitle(this.getTitle() + "almacenes ");
+                    this.setTitle("Movimientos contables de almacenes ");
                 }
                 else {
 
@@ -792,7 +783,7 @@ public class SDialogRepFinMov extends javax.swing.JDialog implements erp.lib.for
 
                     mnParamTpAccSys = mnParamTpSysMovId[0];
                     jlFkEntityId.setText("Ejercicio:");
-                    this.setTitle(this.getTitle() + "pérdidas y ganancias ");
+                    this.setTitle("Movimientos contables de pérdidas y ganancias ");
                     SFormUtilities.populateComboBox(miClient, jcbFkEntityId, SDataConstants.FIN_YEAR);
                 }
 
@@ -808,7 +799,7 @@ public class SDialogRepFinMov extends javax.swing.JDialog implements erp.lib.for
                     jlDateEnd.setEnabled(false);
                     jtfDateEnd.setEnabled(false);
                     jbDateEnd.setEnabled(false);
-                    this.setTitle(this.getTitle() + "por día");
+                    this.setTitle("Movimientos contables de por día");
                 }
 
                 if (miClient.getSessionXXX().getCurrentCompanyBranch() != null)

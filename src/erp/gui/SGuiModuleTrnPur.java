@@ -7,6 +7,7 @@ package erp.gui;
 
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.data.SDataRepConstants;
 import erp.gui.mod.cfg.SCfgMenu;
 import erp.gui.mod.cfg.SCfgMenuSection;
 import erp.gui.mod.cfg.SCfgMenuSectionItem;
@@ -19,9 +20,11 @@ import erp.mfin.form.SDialogRepBizPartnerAccountingMoves;
 import erp.mfin.form.SDialogRepBizPartnerBalance;
 import erp.mfin.form.SDialogRepBizPartnerBalanceDps;
 import erp.mfin.form.SDialogRepBizPartnerJournal;
-import erp.mfin.form.SDialogRepBizPartnerStatements;
+import erp.mfin.form.SDialogRepBizPartnerStatement;
 import erp.mfin.form.SFormCostCenterItem;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
+import erp.mod.bps.db.SBpsUtils;
 import erp.mod.trn.form.SDialogRepContractStatus;
 import erp.mtrn.data.SDataBizPartnerBlocking;
 import erp.mtrn.data.SDataDiogDncDocumentNumberSeries;
@@ -156,13 +159,11 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiRepBizPartnerBalance;
     private javax.swing.JMenuItem jmiRepBizPartnerBalanceDps;
     private javax.swing.JMenuItem jmiRepBizPartnerBalanceAging;
+    private javax.swing.JMenuItem jmiRepAccountStatements;
+    private javax.swing.JMenuItem jmiRepBizPartnerAccountingMoves;
+    private javax.swing.JMenuItem jmiRepBizPartnerJournal;
     private javax.swing.JMenuItem jmiRepBizPartnerBalanceCollection;
     private javax.swing.JMenuItem jmiRepBizPartnerBalanceCollectionDps;
-    private javax.swing.JMenuItem jmiRepAccountStatements;
-    private javax.swing.JMenuItem jmiRepAccountStatementsDps;
-    private javax.swing.JMenuItem jmiRepBizPartnerJournal;
-    private javax.swing.JMenuItem jmiRepBizPartnerAccountingMoves;
-    private javax.swing.JMenuItem jmiRepBizPartnerAccountingMovesDays;
     private javax.swing.JMenuItem jmiRepDpsList;
     private javax.swing.JMenuItem jmiRepDpsBizPartner;
     private javax.swing.JMenuItem jmiRepDpsWithBalance;
@@ -416,16 +417,14 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepBackorderOrderByItemBizPartner = new JMenuItem("Backorder de pedidos por ítem-proveedor");
         jmiRepBackorderOrderByItemBizPartnerBra = new JMenuItem("Backorder de pedidos por ítem-proveedor sucursal");
         jmiRepBizPartnerBalanceAgingView = new JMenuItem("Consulta de antigüedad de saldos de proveedores");
-        jmiRepBizPartnerBalance = new JMenuItem("Reporte de saldos proveedores...");
-        jmiRepBizPartnerBalanceDps = new JMenuItem("Reporte de saldos proveedores por documento...");
-        jmiRepBizPartnerBalanceAging = new JMenuItem("Reporte de antigüedad de saldos de proveedores...");
+        jmiRepBizPartnerBalance = new JMenuItem("Saldos proveedores...");
+        jmiRepBizPartnerBalanceDps = new JMenuItem("Saldos proveedores por documento...");
+        jmiRepBizPartnerBalanceAging = new JMenuItem("Antigüedad de saldos de proveedores...");
+        jmiRepAccountStatements = new JMenuItem("Estados de cuenta de proveedores...");
+        jmiRepBizPartnerAccountingMoves = new JMenuItem("Movimientos contables de proveedores por documento...");
+        jmiRepBizPartnerJournal = new JMenuItem("Reporte auxiliar de movimientos contables de proveedores...");
         jmiRepBizPartnerBalanceCollection = new JMenuItem("Reporte de cobranza esperada...");
         jmiRepBizPartnerBalanceCollectionDps = new JMenuItem("Reporte de cobranza esperada por documento...");
-        jmiRepAccountStatements = new JMenuItem("Estados de cuenta de proveedores...");
-        jmiRepAccountStatementsDps = new JMenuItem("Estados de cuenta de proveedores por documento...");
-        jmiRepBizPartnerAccountingMoves = new JMenuItem("Movimientos contables de proveedores...");
-        jmiRepBizPartnerAccountingMovesDays = new JMenuItem("Movimientos contables de proveedores con días de pago...");
-        jmiRepBizPartnerJournal = new JMenuItem("Reporte auxiliar de movimientos contables de proveedores...");
         jmiRepDpsList = new JMenuItem("Listado de facturas por período...");
         jmiRepDpsBizPartner = new JMenuItem("Reporte de facturas de proveedores...");
         jmiRepDpsWithBalance = new JMenuItem("Reporte de facturas con saldo de proveedores...");
@@ -474,18 +473,12 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmRep.add(jmiRepBizPartnerBalance);
         jmRep.add(jmiRepBizPartnerBalanceDps);
         jmRep.add(jmiRepBizPartnerBalanceAging);
-        jmRep.addSeparator();
-        //jmRep.add(jmiRepBizPartnerBalanceCollection);
-        //jmRep.add(jmiRepBizPartnerBalanceCollectionDps);
-        //jmRep.addSeparator();
-        /*
         jmRep.add(jmiRepAccountStatements);
-        jmRep.add(jmiRepAccountStatementsDps);
-        jmRep.add(jmiRepBizPartnerJournal);
-        jmRep.addSeparator();
-        */
         jmRep.add(jmiRepBizPartnerAccountingMoves);
-        jmRep.add(jmiRepBizPartnerAccountingMovesDays);
+        //jmRep.add(jmiRepBizPartnerJournal); // XXX needs to be checked prior to launch (sflores, 2016-03-14)
+        //jmRep.addSeparator();
+        //jmRep.add(jmiRepBizPartnerBalanceCollection); // report does not match with module, just for consistency (sflores, 2016-03-14)
+        //jmRep.add(jmiRepBizPartnerBalanceCollectionDps); // report does not match with module, just for consistency (sflores, 2016-03-14)
         jmRep.addSeparator();
         jmRep.add(jmiRepDpsList);
         jmRep.add(jmiRepDpsBizPartner);
@@ -613,10 +606,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepBizPartnerBalanceCollection.addActionListener(this);
         jmiRepBizPartnerBalanceCollectionDps.addActionListener(this);
         jmiRepAccountStatements.addActionListener(this);
-        jmiRepAccountStatementsDps.addActionListener(this);
         jmiRepBizPartnerJournal.addActionListener(this);
         jmiRepBizPartnerAccountingMoves.addActionListener(this);
-        jmiRepBizPartnerAccountingMovesDays.addActionListener(this);
         jmiRepDpsList.addActionListener(this);
         jmiRepDpsBizPartner.addActionListener(this);
         jmiRepDpsWithBalance.addActionListener(this);
@@ -1544,22 +1535,16 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                 new SDialogRepBizPartnerBalanceDps(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
             }
             else if (item == jmiRepBizPartnerBalanceAging) {
-                new SDialogRepBizPartnerBalanceAging(miClient, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP).setVisible(true);
+                new SDialogRepBizPartnerBalanceAging(miClient, SDataRepConstants.REP_ACC_AGI + " " + SBpsUtils.getBizPartnerCategoryName(SModSysConsts.BPSS_CT_BP_SUP, SUtilConsts.NUM_PLR).toLowerCase(), SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
             }
             else if (item == jmiRepAccountStatements) {
-                new SDialogRepBizPartnerStatements(miClient, SDataConstantsSys.BPSS_CT_BP_SUP, false).setVisible(true);
-            }
-            else if (item == jmiRepAccountStatementsDps) {
-                new SDialogRepBizPartnerStatements(miClient, SDataConstantsSys.BPSS_CT_BP_SUP, true).setVisible(true);
+                new SDialogRepBizPartnerStatement(miClient, SDataRepConstants.REP_STA + " " + SBpsUtils.getBizPartnerCategoryName(SModSysConsts.BPSS_CT_BP_SUP, SUtilConsts.NUM_PLR).toLowerCase(), SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
             }
             else if (item == jmiRepBizPartnerJournal) {
                 new SDialogRepBizPartnerJournal(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
             }
             else if (item == jmiRepBizPartnerAccountingMoves) {
                 new SDialogRepBizPartnerAccountingMoves(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
-            }
-            else if (item == jmiRepBizPartnerAccountingMovesDays) {
-                new SDialogRepBizPartnerAccountingMoves(miClient, SDataConstantsSys.BPSS_CT_BP_SUP, true).setVisible(true);
             }
             else if (item == jmiRepDpsList) {
                 moDialogRepDpsList.setParamIsSupplier(true);

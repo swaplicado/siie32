@@ -148,7 +148,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
         jbClose = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Auxiliares de contabilidad");
+        setTitle("Reporte de auxiliares contables");
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -166,7 +166,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Período:"));
         jPanel3.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
-        jPanel15.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateStart.setText("Fecha inicial:");
         jlDateStart.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -184,7 +184,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
 
         jPanel3.add(jPanel15);
 
-        jPanel16.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateEnd.setText("Fecha final:");
         jlDateEnd.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -244,7 +244,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
 
         jPanel9.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
 
-        jPanel7.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlLevel.setText("Profundidad ctas. contables:");
         jlLevel.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -266,7 +266,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
 
         jPanel9.add(jPanel7);
 
-        jPanel11.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckShowCostCenter.setText("Mostrar centros de costos");
         jckShowCostCenter.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -274,7 +274,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
 
         jPanel9.add(jPanel11);
 
-        jPanel18.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckShowEntity.setText("Mostrar entidades");
         jckShowEntity.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -301,7 +301,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
 
         jPanel9.add(jPanel18);
 
-        jPanel17.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckShowBizPartner.setText("Mostrar asoc. negocios");
         jckShowBizPartner.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -328,7 +328,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
 
         jPanel9.add(jPanel17);
 
-        jPanel14.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckShowItems.setText("Mostrar ítems");
         jckShowItems.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -355,7 +355,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
 
         jPanel9.add(jPanel14);
 
-        jPanel12.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckShowTax.setText("Mostrar impuesto");
         jckShowTax.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -382,7 +382,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
 
         jPanel9.add(jPanel12);
 
-        jPanel8.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckShowRecordAdjAudit.setText("Incluir ajustes de auditoría");
         jckShowRecordAdjAudit.setOpaque(false);
@@ -401,7 +401,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        jPanel1.setLayout(new java.awt.FlowLayout(2));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbPrint.setText("Imprimir");
         jbPrint.setToolTipText("[Ctrl + Enter]");
@@ -425,8 +425,8 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-816)/2, (screenSize.height-538)/2, 816, 538);
+        setSize(new java.awt.Dimension(816, 538));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jbPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbPrintActionPerformed
@@ -580,7 +580,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
             map.put("nDeep", miClient.getSessionXXX().getParamsErp().getDeepAccounts());
             map.put("nLengthLevel", SAccountConsts.LENGTH_LEVEL);
             map.put("nNumRecordLength", SDataConstantsSys.NUM_LEN_FIN_REC);
-            map.put("sTitle", "REPORTE DE AUXILIARES DE CONTABILIDAD");
+            map.put("sTitle", getTitle().toUpperCase());
             map.put("sCodeAccMin", msCodeAccMin);
             map.put("sCodeAccMax", msCodeAccMax);
             map.put("sAccountRank", "DE " + SAccountUtils.convertCodeUsr(mnMaskAcc, msCodeAccMin) + " A " + SAccountUtils.convertCodeUsr(mnMaskAcc, msCodeAccMax));

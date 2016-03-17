@@ -11,12 +11,6 @@
 
 package erp.mfin.form;
 
-import java.awt.Cursor;
-import java.awt.event.KeyEvent;
-import java.util.Map;
-import java.util.Vector;
-import javax.swing.JComponent;
-
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
@@ -26,6 +20,11 @@ import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
+import java.awt.Cursor;
+import java.awt.event.KeyEvent;
+import java.util.Map;
+import java.util.Vector;
+import javax.swing.JComponent;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
 
@@ -212,11 +211,11 @@ public class SDialogRepDpsPayment extends javax.swing.JDialog {
 
         switch (mnDpsCategoryId) {
             case SDataConstantsSys.TRNS_CT_DPS_PUR:
-                setTitle("Reporte de pagos por período");
+                setTitle("Reporte de pagos por periodo");
                 jckShowAgent.setEnabled(false);
                 break;
             case SDataConstantsSys.TRNS_CT_DPS_SAL:
-                setTitle("Reporte de cobros por período");
+                setTitle("Reporte de cobros por periodo");
                 break;
             default:
                 SLibUtilities.renderException(this, new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION));

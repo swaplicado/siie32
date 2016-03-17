@@ -52,7 +52,7 @@ public class SViewBomItems extends erp.lib.table.STableTab implements java.awt.e
 
         aoTableColumns = new STableColumn[6];
 
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb.bpb", "Sucursalxxxx empresa", 150);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb.bpb", "Sucursal empresa", 150);
 
         if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "it.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
@@ -75,7 +75,7 @@ public class SViewBomItems extends erp.lib.table.STableTab implements java.awt.e
 
     @Override
     public void createSqlQuery() {
-        String sqlWhere = "";
+        String idItem = "";
         STableSetting setting = null;
 
 
@@ -83,29 +83,28 @@ public class SViewBomItems extends erp.lib.table.STableTab implements java.awt.e
             setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
             if (setting.getType() == STableConstants.SETTING_FILTER_ITM_ITEM) {
                 if (((int[]) setting.getSetting())[0] > 0) {
-                    sqlWhere = "" + ((int[]) setting.getSetting())[0] + " ";
+                    idItem = "" + ((int[]) setting.getSetting())[0] + " ";
                 }
             }
         }
 
-        if (sqlWhere.equalsIgnoreCase("")) {
-            sqlWhere = " 0 ";
+        if (idItem.isEmpty()) {
+            idItem = "0";
         }
 
         msSql = "SELECT bpb.bpb, it.item_key, it.item, bom.bom, bom.qty, (SELECT u.symbol FROM erp.itmu_item AS it " +
                 "INNER JOIN erp.itmu_unit AS u ON it.fid_unit = u.id_unit " +
-                "WHERE it.id_item = " +  sqlWhere + ") AS unit " +
+                "WHERE it.id_item = " +  idItem + ") AS unit " +
                 "FROM mfg_bom AS bom " +
                 "INNER JOIN erp.bpsu_bpb AS bpb ON bom.fid_cob = bpb.id_bpb " +
                 "INNER JOIN erp.itmu_item AS it ON bom.root= it.id_item " +
                 "INNER JOIN erp.itmu_unit AS u ON it.fid_unit = u.id_unit " +
-                "WHERE bom.id_bom IN(SELECT id_bom " +
-                "FROM mfg_bom WHERE fid_item = " + sqlWhere + ") " +
-                "AND bom.b_del = FALSE " +
+                "WHERE bom.id_bom IN (SELECT id_bom " +
+                "FROM mfg_bom WHERE fid_item = " + idItem + " AND b_del = 0) " +
+                "AND bom.b_del = 0 " +
                 "GROUP BY bpb.bpb, it.item_key, it.item, bom.bom, bom.qty " +
                 "ORDER BY bpb.bpb, " + (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ?
                 "it.item_key, it.item, " : "it.item, it.item_key, ") + "bom.bom, bom.qty ";
-
     }
 
     @Override

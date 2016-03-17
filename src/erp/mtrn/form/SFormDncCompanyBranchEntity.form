@@ -113,6 +113,9 @@
               <Events>
                 <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="jcbPkCompanyBranchIdItemStateChanged"/>
               </Events>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+              </AuxValues>
             </Component>
             <Component class="javax.swing.JLabel" name="jlPkEntityId">
               <Properties>
@@ -133,6 +136,9 @@
                   </StringArray>
                 </Property>
               </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+              </AuxValues>
             </Component>
             <Component class="javax.swing.JLabel" name="jlPkDocNumberingCenterId">
               <Properties>
@@ -153,6 +159,9 @@
                   </StringArray>
                 </Property>
               </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+              </AuxValues>
             </Component>
             <Component class="javax.swing.JCheckBox" name="jckIsDeleted">
               <Properties>

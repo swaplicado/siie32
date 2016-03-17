@@ -623,7 +623,7 @@ public class SPanelAccounting extends javax.swing.JPanel implements erp.lib.tabl
                     }
                     else {
                         moDialogRepBizPartnerAccountingMoves.setBizPartnerId(((int[]) row.getPrimaryKey())[0]);
-                        moDialogRepBizPartnerAccountingMoves.resetForm();
+                        moDialogRepBizPartnerAccountingMoves.initForm();
                         moDialogRepBizPartnerAccountingMoves.setVisible(true);
                     }
                 }

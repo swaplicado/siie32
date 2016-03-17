@@ -11,20 +11,20 @@
 
 package erp.mfin.form;
 
+import erp.data.SDataConstants;
+import erp.data.SDataUtilities;
+import erp.data.SProcConstants;
+import erp.lib.SLibConstants;
+import erp.lib.form.SFormComponentItem;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
+import erp.mfin.data.SDataCheckWallet;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
-
-import erp.data.SDataConstants;
-import erp.data.SDataUtilities;
-import erp.data.SProcConstants;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormValidation;
-import erp.lib.form.SFormUtilities;
-import erp.lib.SLibConstants;
-import erp.mfin.data.SDataCheckWallet;
 
 /**
  *
@@ -73,9 +73,9 @@ public class SFormCheckWallet extends javax.swing.JDialog implements erp.lib.for
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jlFkCompanyBranchId = new javax.swing.JLabel();
-        jcbFkCompanyBranchId = new javax.swing.JComboBox();
+        jcbFkCompanyBranchId = new javax.swing.JComboBox<SFormComponentItem>();
         jlFkAccountCashId = new javax.swing.JLabel();
-        jcbFkAccountCashId = new javax.swing.JComboBox();
+        jcbFkAccountCashId = new javax.swing.JComboBox<SFormComponentItem>();
         jlNumberStart = new javax.swing.JLabel();
         jtfNumberStart = new javax.swing.JTextField();
         jlNumberEnd_n = new javax.swing.JLabel();
@@ -154,8 +154,8 @@ public class SFormCheckWallet extends javax.swing.JDialog implements erp.lib.for
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-400)/2, (screenSize.height-300)/2, 400, 300);
+        setSize(new java.awt.Dimension(400, 300));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -259,8 +259,8 @@ public class SFormCheckWallet extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JPanel jPanel3;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
-    private javax.swing.JComboBox jcbFkAccountCashId;
-    private javax.swing.JComboBox jcbFkCompanyBranchId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkAccountCashId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkCompanyBranchId;
     private javax.swing.JCheckBox jckIsActive;
     private javax.swing.JCheckBox jckIsDeleted;
     private javax.swing.JLabel jlFkAccountCashId;

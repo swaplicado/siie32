@@ -11,30 +11,26 @@
 
 package erp.mfin.form;
 
+import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
+import erp.lib.SLibConstants;
+import erp.lib.SLibTimeUtilities;
+import erp.lib.SLibUtilities;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
+import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
-import java.awt.BorderLayout;
 import java.awt.event.KeyEvent;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JFormattedTextField;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.view.*;
-import net.sf.jasperreports.view.save.JRPdfSaveContributor.*;
-import net.sf.jasperreports.view.JRViewer.*;
-import net.sf.jasperreports.view.save.JRMultipleSheetsXlsSaveContributor.*;
-
-import erp.data.SDataConstants;
-import erp.data.SDataConstantsSys;
-import erp.data.SDataUtilities;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormUtilities;
-import erp.lib.form.SFormValidation;
-import erp.lib.SLibConstants;
-import erp.lib.SLibTimeUtilities;
-import erp.lib.SLibUtilities;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -64,6 +60,9 @@ public class SDialogRepTaxesMoves extends javax.swing.JDialog implements erp.lib
 
         initComponents();
         initComponentsExtra();
+        
+        formRefreshCatalogues();
+        formReset();
     }
 
     /** This method is called from within the constructor to
@@ -101,7 +100,7 @@ public class SDialogRepTaxesMoves extends javax.swing.JDialog implements erp.lib
         jlDummyPaneAccountEnd = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Reporte de movimientos de impuestos");
+        setTitle("Movimientos contables de impuestos");
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -198,7 +197,7 @@ public class SDialogRepTaxesMoves extends javax.swing.JDialog implements erp.lib
         jpAccountInitial.setBorder(javax.swing.BorderFactory.createTitledBorder("Cuenta contable inicial:"));
         jpAccountInitial.setLayout(new java.awt.BorderLayout());
 
-        jlDummyPaneAccountInitial.setFont(new java.awt.Font("Tahoma", 1, 12));
+        jlDummyPaneAccountInitial.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jlDummyPaneAccountInitial.setText("[Panel cuenta contable]");
         jlDummyPaneAccountInitial.setPreferredSize(new java.awt.Dimension(100, 50));
         jpAccountInitial.add(jlDummyPaneAccountInitial, java.awt.BorderLayout.CENTER);
@@ -208,7 +207,7 @@ public class SDialogRepTaxesMoves extends javax.swing.JDialog implements erp.lib
         jpAccountEnd.setBorder(javax.swing.BorderFactory.createTitledBorder("Cuenta contable final:"));
         jpAccountEnd.setLayout(new java.awt.BorderLayout());
 
-        jlDummyPaneAccountEnd.setFont(new java.awt.Font("Tahoma", 1, 12));
+        jlDummyPaneAccountEnd.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jlDummyPaneAccountEnd.setText("[Panel cuenta contable]");
         jlDummyPaneAccountEnd.setPreferredSize(new java.awt.Dimension(100, 50));
         jpAccountEnd.add(jlDummyPaneAccountEnd, java.awt.BorderLayout.CENTER);
@@ -219,8 +218,8 @@ public class SDialogRepTaxesMoves extends javax.swing.JDialog implements erp.lib
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-550)/2, (screenSize.height-425)/2, 550, 425);
+        setSize(new java.awt.Dimension(550, 425));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated

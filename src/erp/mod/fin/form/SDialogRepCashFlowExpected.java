@@ -16,13 +16,13 @@ import sa.lib.gui.bean.SBeanDialogReport;
  *
  * @author Juan Barajas
  */
-public class SDialogRepIncomeExpenseDue extends SBeanDialogReport {
+public class SDialogRepCashFlowExpected extends SBeanDialogReport {
     
     /**
      * Creates new form SDialogRepContractByBizPartner
      */
-    public SDialogRepIncomeExpenseDue(SGuiClient client, int formSubtype, String title) {
-        setFormSettings(client, SModConsts.FINR_INC_EXP_DUE, formSubtype, title);
+    public SDialogRepCashFlowExpected(SGuiClient client, int formSubtype, String title) {
+        setFormSettings(client, SModConsts.FINR_CSH_FLW_EXP, formSubtype, title);
         initComponents();
         initComponentsCustom();
     }
@@ -55,7 +55,7 @@ public class SDialogRepIncomeExpenseDue extends SBeanDialogReport {
 
         jPanel2.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
 
-        jPanel11.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateStart.setText("Fecha base:*");
         jlDateStart.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -65,7 +65,7 @@ public class SDialogRepIncomeExpenseDue extends SBeanDialogReport {
         jPanel2.add(jPanel11);
         jPanel2.add(jPanel3);
 
-        jPanel13.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCompanyBranch.setText("Sucursal empresa:");
         jlCompanyBranch.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -130,7 +130,6 @@ public class SDialogRepIncomeExpenseDue extends SBeanDialogReport {
 
     public void reloadCatalogues() {
         miClient.getSession().populateCatalogue(moKeyCompanyBranch, SModConsts.BPSU_BPB, miClient.getSession().getConfigCompany().getCompanyId(), null);
-//        moKeyjCompanyBranchetSession().populateCatalogue(moKeyBizPartner, SModConsts.BPSU_BP, mnFormSubtype, null);
     }
 
     @Override
@@ -141,7 +140,6 @@ public class SDialogRepIncomeExpenseDue extends SBeanDialogReport {
 
     @Override
     public void createParamsMap() {
-           
         moParamsMap = miClient.createReportParams();
         moParamsMap.put("nLocalCurrencyId", miClient.getSession().getSessionCustom().getLocalCurrencyKey()[0]);
         moParamsMap.put("sLocalCurrencyKey", miClient.getSession().getSessionCustom().getLocalCurrency());

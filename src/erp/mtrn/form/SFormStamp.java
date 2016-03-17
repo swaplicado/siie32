@@ -93,20 +93,19 @@ public class SFormStamp extends javax.swing.JDialog implements erp.lib.form.SFor
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel3.setLayout(new java.awt.GridLayout(7, 0));
 
-        jPanel6.setLayout(new java.awt.FlowLayout(3, 5, 0));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
         jlPkPacId.setForeground(new java.awt.Color(0, 0, 255));
         jlPkPacId.setText("PAC:*");
         jlPkPacId.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel6.add(jlPkPacId);
 
-        jcbPkPacId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbPkPacId.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel6.add(jcbPkPacId);
 
         jPanel3.add(jPanel6);
 
-        jPanel1.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPkDateId.setText("Fecha:*");
         jlPkDateId.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -124,7 +123,7 @@ public class SFormStamp extends javax.swing.JDialog implements erp.lib.form.SFor
 
         jPanel3.add(jPanel1);
 
-        jPanel4.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlStampQty.setText("Cantidad de timbres:*");
         jlStampQty.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -137,7 +136,7 @@ public class SFormStamp extends javax.swing.JDialog implements erp.lib.form.SFor
 
         jPanel3.add(jPanel4);
 
-        jPanel7.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCode.setText("Código activación:*");
         jlCode.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -150,7 +149,7 @@ public class SFormStamp extends javax.swing.JDialog implements erp.lib.form.SFor
 
         jPanel3.add(jPanel7);
 
-        jPanel5.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDummy.setPreferredSize(new java.awt.Dimension(243, 0));
         jPanel5.add(jlDummy);
@@ -162,7 +161,7 @@ public class SFormStamp extends javax.swing.JDialog implements erp.lib.form.SFor
 
         getContentPane().add(jPanel3, java.awt.BorderLayout.CENTER);
 
-        jPanel2.setLayout(new java.awt.FlowLayout(2));
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar"); // NOI18N
         jbOk.setToolTipText("[Ctrl + Enter]");
@@ -175,8 +174,8 @@ public class SFormStamp extends javax.swing.JDialog implements erp.lib.form.SFor
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-400)/2, (screenSize.height-300)/2, 400, 300);
+        setSize(new java.awt.Dimension(400, 300));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated

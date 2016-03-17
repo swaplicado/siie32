@@ -289,7 +289,7 @@ public abstract class SModConsts {
     public static final int FINX_REC_CASH = 2014001;
     public static final int FINX_ACC_CASH_BANK = 2014002;
 
-    public static final int FINR_INC_EXP_DUE = 2015001;
+    public static final int FINR_CSH_FLW_EXP = 2015001;
     public static final int FINR_DPS_TAX_PEND = 2015011;
 
     /*

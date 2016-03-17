@@ -495,7 +495,7 @@ public class SDialogRepTrialBalanceDual extends javax.swing.JDialog implements j
 
         switch(mnReportType) {
             case SDataConstants.FIN_ACC:
-                setTitle("Balanza de comprobación de cuentas contables");
+                setTitle("Balanza de comprobación");
                 jckIsFilter.setText("Filtrar centro de costo");
                 jckShowEmpty.setText("Mostrar ctas. contables sin movimientos");
                 jlLevel.setText("Profundidad ctas. contables:");
@@ -511,7 +511,7 @@ public class SDialogRepTrialBalanceDual extends javax.swing.JDialog implements j
                 jsLevel.setModel(new SpinnerNumberModel(1, 1, miClient.getSessionXXX().getParamsErp().getDeepCostCenters(), 1));
 
                 if (mbIsAuxCostCenter) {
-                    setTitle("Reporte de auxiliares de centros de costo");
+                    setTitle("Reporte de auxiliares contables de centros de costo");
                     jsLevel.setValue((Integer) miClient.getSessionXXX().getParamsErp().getDeepCostCenters());
                     jsLevel.setEnabled(false);
                     jckShowItems.setEnabled(true);
@@ -589,7 +589,7 @@ public class SDialogRepTrialBalanceDual extends javax.swing.JDialog implements j
                     report = (Integer) jsLevel.getValue() == 1 ? SDataConstantsSys.REP_FIN_TRIAL_BAL_MAJOR : SDataConstantsSys.REP_FIN_TRIAL_BAL_DUAL;
 
                     map.put("nDeep", miClient.getSessionXXX().getParamsErp().getDeepAccounts());
-                    map.put("sTitle", "BALANZA DE COMPROBACIÓN DE CUENTAS CONTABLES");
+                    map.put("sTitle", getTitle().toUpperCase());
                     map.put("sLabelNo", "NO. CUENTA CONTABLE");
                     map.put("sLabelDescription", "CUENTA CONTABLE");
                     map.put("sRank", "RANGO CUENTAS CONTABLES: DE ");
@@ -606,7 +606,7 @@ public class SDialogRepTrialBalanceDual extends javax.swing.JDialog implements j
                     report = SDataConstantsSys.REP_FIN_TRIAL_BAL_DUAL;
 
                     map.put("nDeep", miClient.getSessionXXX().getParamsErp().getDeepCostCenters());
-                    map.put("sTitle", "BALANZA DE COMPROBACIÓN DE CENTROS DE COSTO");
+                    map.put("sTitle", getTitle().toUpperCase());
                     map.put("sLabelNo", "NO. CENTRO DE COSTO");
                     map.put("sLabelDescription", "CENTRO DE COSTO");
                     map.put("sRank", "RANGO CENTRO DE COSTOS: DE ");
@@ -620,7 +620,7 @@ public class SDialogRepTrialBalanceDual extends javax.swing.JDialog implements j
                     map.put("sSql", createParamSqlCostCenter());
 
                     if (mbIsAuxCostCenter) {
-                        map.put("sTitle", "REPORTE DE AUXILIARES DE CENTROS DE COSTO");
+                        map.put("sTitle", getTitle().toUpperCase());
                         map.put("bIsAuxCostCenter", true);
                         map.put("bIsWithDetail", jckIsWithDetail.isSelected() ? true : false);
                         map.put("bIsByCostCenter", jrbByCostCenterAccount.isSelected() ? true : false);

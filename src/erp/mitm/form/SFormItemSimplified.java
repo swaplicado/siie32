@@ -18,6 +18,7 @@ import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
+import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
@@ -91,7 +92,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         jPanel4 = new javax.swing.JPanel();
         jPanel52 = new javax.swing.JPanel();
         jlFkItemGenericId = new javax.swing.JLabel();
-        jcbFkItemGenericId = new javax.swing.JComboBox();
+        jcbFkItemGenericId = new javax.swing.JComboBox<SFormComponentItem>();
         jbPickItemGeneric = new javax.swing.JButton();
         jbEditItemGeneric = new javax.swing.JButton();
         jPanel54 = new javax.swing.JPanel();
@@ -116,16 +117,16 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         jtfItemNameShortRo = new javax.swing.JTextField();
         jPanel5 = new javax.swing.JPanel();
         jlFkUnitId = new javax.swing.JLabel();
-        jcbFkUnitId = new javax.swing.JComboBox();
+        jcbFkUnitId = new javax.swing.JComboBox<SFormComponentItem>();
         jbEditUnit = new javax.swing.JButton();
         jPanel45 = new javax.swing.JPanel();
         jlFkFiscalAccountIncId = new javax.swing.JLabel();
-        jcbFkFiscalAccountIncId = new javax.swing.JComboBox();
+        jcbFkFiscalAccountIncId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkFiscalAccountIncId = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jPanel46 = new javax.swing.JPanel();
         jlFkFiscalAccountExpId = new javax.swing.JLabel();
-        jcbFkFiscalAccountExpId = new javax.swing.JComboBox();
+        jcbFkFiscalAccountExpId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkFiscalAccountExpId = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jPanel8 = new javax.swing.JPanel();
@@ -148,7 +149,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
 
         jPanel4.setLayout(new java.awt.GridLayout(11, 1, 0, 5));
 
-        jPanel52.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel52.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkItemGenericId.setText("Ítem genérico: *");
         jlFkItemGenericId.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -173,7 +174,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
 
         jPanel4.add(jPanel52);
 
-        jPanel54.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel54.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlName.setText("Nombre: *");
         jlName.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -185,7 +186,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
 
         jPanel4.add(jPanel54);
 
-        jPanel60.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel60.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlNameShort.setText("Nombre cto.: *");
         jlNameShort.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -203,7 +204,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
 
         jPanel4.add(jPanel60);
 
-        jPanel56.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel56.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCode.setText("Código del ítem: *");
         jlCode.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -221,7 +222,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
 
         jPanel4.add(jPanel56);
 
-        jPanel57.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel57.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlItemKey.setText("Clave del ítem: *");
         jlItemKey.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -233,7 +234,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
 
         jPanel4.add(jPanel57);
 
-        jPanel58.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel58.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlItem.setText("Ítem:");
         jlItem.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -248,7 +249,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
 
         jPanel4.add(jPanel58);
 
-        jPanel59.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel59.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlItemShort.setText("Ítem corto:");
         jlItemShort.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -262,7 +263,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
 
         jPanel4.add(jPanel59);
 
-        jPanel5.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkUnitId.setText("Unidad física: *");
         jlFkUnitId.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -281,7 +282,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         jPanel4.add(jPanel5);
 
         jPanel45.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel45.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel45.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkFiscalAccountIncId.setText("Cód. agrupador: *");
         jlFkFiscalAccountIncId.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -305,7 +306,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         jPanel4.add(jPanel45);
 
         jPanel46.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel46.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel46.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkFiscalAccountExpId.setText("Cód. agrupador: *");
         jlFkFiscalAccountExpId.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -328,7 +329,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
 
         jPanel4.add(jPanel46);
 
-        jPanel8.setLayout(new java.awt.FlowLayout(0, 0, 0));
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
 
         jckIsDeleted.setText("Registro eliminado");
         jPanel8.add(jckIsDeleted);
@@ -340,7 +341,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
         jPanel1.setPreferredSize(new java.awt.Dimension(400, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(2));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOK.setText("Aceptar");
         jbOK.setToolTipText("[Ctrl + Enter]");
@@ -353,8 +354,8 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-616)/2, (screenSize.height-400)/2, 616, 400);
+        setSize(new java.awt.Dimension(616, 400));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -837,10 +838,10 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
     private javax.swing.JButton jbFkFiscalAccountIncId;
     private javax.swing.JButton jbOK;
     private javax.swing.JButton jbPickItemGeneric;
-    private javax.swing.JComboBox jcbFkFiscalAccountExpId;
-    private javax.swing.JComboBox jcbFkFiscalAccountIncId;
-    private javax.swing.JComboBox jcbFkItemGenericId;
-    private javax.swing.JComboBox jcbFkUnitId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkFiscalAccountExpId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkFiscalAccountIncId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkItemGenericId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkUnitId;
     private javax.swing.JCheckBox jckIsDeleted;
     private javax.swing.JLabel jlCode;
     private javax.swing.JLabel jlFkFiscalAccountExpId;

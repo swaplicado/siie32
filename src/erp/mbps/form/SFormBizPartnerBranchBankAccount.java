@@ -127,7 +127,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         jlPkBizPartnerBranchId = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         jbPkBizPartnerBranchId = new javax.swing.JButton();
-        jcbPkBizPartnerBranchId = new javax.swing.JComboBox();
+        jcbPkBizPartnerBranchId = new javax.swing.JComboBox<SFormComponentItem>();
         jlFkAccountCashCategoryId = new javax.swing.JLabel();
         jcbFkAccountCashCategoryId = new javax.swing.JComboBox();
         jlFkAccountCashTypeId = new javax.swing.JLabel();
@@ -184,7 +184,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         });
 
         jPanel1.setPreferredSize(new java.awt.Dimension(592, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(2));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar");
         jbOk.setToolTipText("[Ctrl + Enter]");
@@ -207,7 +207,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         jpBankAccountCard.setLayout(new java.awt.BorderLayout());
 
         jPanel18.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel18.setLayout(new java.awt.FlowLayout(0, 1, 0));
+        jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 1, 0));
 
         jbAddCard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_new.gif"))); // NOI18N
         jbAddCard.setToolTipText("Crear [Ctrl+N]");
@@ -227,7 +227,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         jpBankAccountLayout.setLayout(new java.awt.BorderLayout());
 
         jPanel21.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel21.setLayout(new java.awt.FlowLayout(0, 1, 0));
+        jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 1, 0));
         jpBankAccountLayout.add(jPanel21, java.awt.BorderLayout.NORTH);
 
         jPanel8.add(jpBankAccountLayout);
@@ -476,8 +476,8 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-916)/2, (screenSize.height-600)/2, 916, 600);
+        setSize(new java.awt.Dimension(916, 600));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -914,7 +914,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
     private javax.swing.JComboBox jcbFkBankId;
     private javax.swing.JComboBox jcbFkCardIssuerId;
     private javax.swing.JComboBox jcbFkCurrencyId;
-    private javax.swing.JComboBox jcbPkBizPartnerBranchId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbPkBizPartnerBranchId;
     private javax.swing.JCheckBox jckIsCardAppliyng;
     private javax.swing.JCheckBox jckIsDefault;
     private javax.swing.JCheckBox jckIsDeleted;

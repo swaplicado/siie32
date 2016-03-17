@@ -11,34 +11,30 @@
 
 package erp.mfin.form;
 
+import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
+import erp.lib.SLibConstants;
+import erp.lib.SLibTimeUtilities;
+import erp.lib.SLibUtilities;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.AbstractAction;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.view.*;
-import net.sf.jasperreports.view.save.JRPdfSaveContributor.*;
-import net.sf.jasperreports.view.JRViewer.*;
-import net.sf.jasperreports.view.save.JRMultipleSheetsXlsSaveContributor.*;
-
-import erp.data.SDataConstants;
-import erp.data.SDataConstantsSys;
-import erp.data.SDataUtilities;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormUtilities;
-import erp.lib.form.SFormValidation;
-import erp.lib.SLibConstants;
-import erp.lib.SLibTimeUtilities;
-import erp.lib.SLibUtilities;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
 public class SDialogRepAccountConcept extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
-
+    
     private int mnFormType;
     private int mnFormResult;
     private int mnFormStatus;
@@ -47,21 +43,28 @@ public class SDialogRepAccountConcept extends javax.swing.JDialog implements erp
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.client.SClientInterface miClient;
 
+    private int mnConcept;
     private erp.lib.form.SFormField moFieldDateInitial;
     private erp.lib.form.SFormField moFieldDateEnd;
     private erp.lib.form.SFormField moFieldConcept;
 
-    private boolean mbParamIsConceptAdministrative;
-
-    /** Creates new form SDialogRepAccountConcept */
-    public SDialogRepAccountConcept(erp.client.SClientInterface client) {
+    /**
+     * Creates new form SDialogRepAccountConcept
+     * @param client GUI client.
+     * @param concept Concept type desired. Constants defined in <code>SDataConstants</code> (FINU_TP_ADM_CPT or FINU_TP_TAX_CPT).
+     */
+    public SDialogRepAccountConcept(erp.client.SClientInterface client, int concept) {
         super(client.getFrame(), true);
         miClient =  client;
+        mnConcept = concept;
 
         initComponents();
         initComponentsExtra();
+        
+        formRefreshCatalogues();
+        formReset();
     }
-
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -72,9 +75,6 @@ public class SDialogRepAccountConcept extends javax.swing.JDialog implements erp
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
-        jPanel1 = new javax.swing.JPanel();
-        jbPrint = new javax.swing.JButton();
-        jbExit = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -93,6 +93,9 @@ public class SDialogRepAccountConcept extends javax.swing.JDialog implements erp
         jPanel9 = new javax.swing.JPanel();
         jlConcept = new javax.swing.JLabel();
         jcbConcept = new javax.swing.JComboBox();
+        jPanel1 = new javax.swing.JPanel();
+        jbPrint = new javax.swing.JButton();
+        jbExit = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Reporte de conceptos administrativos");
@@ -102,21 +105,6 @@ public class SDialogRepAccountConcept extends javax.swing.JDialog implements erp
                 formWindowActivated(evt);
             }
         });
-
-        jPanel1.setPreferredSize(new java.awt.Dimension(392, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
-
-        jbPrint.setText("Imprimir");
-        jbPrint.setToolTipText("[Ctrl + Enter]");
-        jbPrint.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel1.add(jbPrint);
-
-        jbExit.setText("Cerrar");
-        jbExit.setToolTipText("[Escape]");
-        jbExit.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel1.add(jbExit);
-
-        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración del reporte:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
@@ -200,8 +188,23 @@ public class SDialogRepAccountConcept extends javax.swing.JDialog implements erp
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-400)/2, (screenSize.height-305)/2, 400, 305);
+        jPanel1.setPreferredSize(new java.awt.Dimension(392, 33));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        jbPrint.setText("Imprimir");
+        jbPrint.setToolTipText("[Ctrl + Enter]");
+        jbPrint.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel1.add(jbPrint);
+
+        jbExit.setText("Cerrar");
+        jbExit.setToolTipText("[Escape]");
+        jbExit.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel1.add(jbExit);
+
+        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
+
+        setSize(new java.awt.Dimension(400, 305));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -226,6 +229,13 @@ public class SDialogRepAccountConcept extends javax.swing.JDialog implements erp
         jbDateInitial.addActionListener(this);
         jbDateEnd.addActionListener(this);
 
+        if (mnConcept == SDataConstants.FINU_TP_ADM_CPT) {
+            setTitle("Reporte de conceptos administrativos");
+        }
+        else  {
+            setTitle("Reporte de conceptos de impuestos");
+        }
+
         AbstractAction actionOk = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) { actionPrint(); }
@@ -246,12 +256,6 @@ public class SDialogRepAccountConcept extends javax.swing.JDialog implements erp
     private void windowActivated() {
         if (mbFirstTime) {
             mbFirstTime = false;
-            if (mbParamIsConceptAdministrative) {
-                setTitle("Reporte de conceptos administrativos");
-            }
-            else  {
-                setTitle("Reporte de conceptos de impuestos");
-            }
             jftDateInitial.requestFocus();
             jrbByAccountConcept.setSelected(true);
         }
@@ -280,19 +284,19 @@ public class SDialogRepAccountConcept extends javax.swing.JDialog implements erp
                 map.put("tDtInitial", moFieldDateInitial.getDate());
                 map.put("tDtEnd", moFieldDateEnd.getDate());
                 map.put("sConcept", moFieldConcept.getKeyAsIntArray()[0] == 0 ? "(TODOS)" : jcbConcept.getSelectedItem().toString());
-                map.put("sSqlIfConcept", mbParamIsConceptAdministrative ? " IF(i.fid_tp_adm_cpt <> " + SDataConstantsSys.FINU_TP_ADM_CPT_NA + ", cpi.tp_adm_cpt, cpig.tp_adm_cpt) AS concept, " :
+                map.put("sSqlIfConcept", mnConcept == SDataConstants.FINU_TP_ADM_CPT ? " IF(i.fid_tp_adm_cpt <> " + SDataConstantsSys.FINU_TP_ADM_CPT_NA + ", cpi.tp_adm_cpt, cpig.tp_adm_cpt) AS concept, " :
                     " IF(i.fid_tp_tax_cpt <> " + SDataConstantsSys.FINU_TP_TAX_CPT_NA + ", cpi.tp_tax_cpt, cpig.tp_tax_cpt) AS concept, ");
                 map.put("sTableConcept", getSqlTextInnerJoin());
                 map.put("sSqlConceptItem", moFieldConcept.getKeyAsIntArray()[0] == 0 ? "" : getSqlTextConcept());
                 map.put("sSqlGroupBy", getSqlTextGroupOrderBy()[0]);
                 map.put("sSqlOrderBy", getSqlTextGroupOrderBy()[1]);
                 map.put("nIdYear", SLibTimeUtilities.digestYear(moFieldDateInitial.getDate())[0]);
-                map.put("sTitle", "REPORTE DE CONCEPTOS" + (mbParamIsConceptAdministrative ? " ADMINISTRATIVOS" : " DE IMPUESTOS"));
+                map.put("sTitle", "REPORTE DE CONCEPTOS" + (mnConcept == SDataConstants.FINU_TP_ADM_CPT ? " ADMINISTRATIVOS" : " DE IMPUESTOS"));
                 map.put("bIsByConcept", jrbByAccountConcept.isSelected() ? false : true);
 
                 jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_FIN_ACC_CPT, map);
                 jasperViewer = new JasperViewer(jasperPrint, false);
-                jasperViewer.setTitle("Reporte de conceptos " + (mbParamIsConceptAdministrative ? "administrativos" : "de impuestos"));
+                jasperViewer.setTitle("Reporte de conceptos " + (mnConcept == SDataConstants.FINU_TP_ADM_CPT ? "administrativos" : "de impuestos"));
                 jasperViewer.setVisible(true);
             }
             catch(Exception e) {
@@ -334,7 +338,7 @@ public class SDialogRepAccountConcept extends javax.swing.JDialog implements erp
     private String getSqlTextInnerJoin() {
         String sQuery = "";
 
-        if (mbParamIsConceptAdministrative) {
+        if (mnConcept == SDataConstants.FINU_TP_ADM_CPT) {
             sQuery = "INNER JOIN erp.finu_tp_adm_cpt AS cpi ON " +
                     "i.fid_tp_adm_cpt = cpi.id_tp_adm_cpt " +
                     "INNER JOIN erp.finu_tp_adm_cpt AS cpig ON " +
@@ -368,7 +372,7 @@ public class SDialogRepAccountConcept extends javax.swing.JDialog implements erp
     private String getSqlTextConcept() {
         String text = "";
 
-        if (mbParamIsConceptAdministrative) {
+        if (mnConcept == SDataConstants.FINU_TP_ADM_CPT) {
             if (moFieldConcept.getKeyAsIntArray()[0] == SDataConstantsSys.FINU_TP_ADM_CPT_NA) {
                 text += " AND (i.fid_tp_adm_cpt = " + SDataConstantsSys.FINU_TP_ADM_CPT_NA + " AND ig.fid_tp_adm_cpt = " + SDataConstantsSys.FINU_TP_ADM_CPT_NA + ") ";
             }
@@ -434,7 +438,7 @@ public class SDialogRepAccountConcept extends javax.swing.JDialog implements erp
 
     @Override
     public void formRefreshCatalogues() {
-        SFormUtilities.populateComboBox(miClient, jcbConcept, mbParamIsConceptAdministrative ? SDataConstants.FINU_TP_ADM_CPT : SDataConstants.FINU_TP_TAX_CPT);
+        SFormUtilities.populateComboBox(miClient, jcbConcept, mnConcept);
     }
 
     @Override
@@ -527,6 +531,4 @@ public class SDialogRepAccountConcept extends javax.swing.JDialog implements erp
             }
         }
     }
-
-    public void setParamIsConceptAdministrative(boolean b) { mbParamIsConceptAdministrative = b; }
 }

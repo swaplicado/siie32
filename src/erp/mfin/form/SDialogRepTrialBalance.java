@@ -342,7 +342,7 @@ public class SDialogRepTrialBalance extends javax.swing.JDialog implements java.
             jckShowDetail.setEnabled(true);
             jlLevelCostCenter.setEnabled(true);
             jsLevelCostCenter.setEnabled(true);
-            setTitle("Balanza de comprobación por tipo de ítem");
+            setTitle("Balanza de comprobación por tipo de ítems");
         }
         else {
             jsLevelAccount.setValue(miClient.getSessionXXX().getParamsErp().getDeepAccounts() > 1 ? 2 : 1);
@@ -354,7 +354,7 @@ public class SDialogRepTrialBalance extends javax.swing.JDialog implements java.
             jsLevelCostCenter.setEnabled(false);
             jlLevelAccount.setEnabled(false);
             jsLevelAccount.setEnabled(false);
-            setTitle("Balanza de comprobación con centros de costo e ítems");
+            setTitle("Balanza de comprobación de centros de costo e ítems");
         }
 
         setModalityType(ModalityType.MODELESS);
@@ -416,7 +416,7 @@ public class SDialogRepTrialBalance extends javax.swing.JDialog implements java.
 
                 sql = createParamSql();
 
-                map.put("sTitle", "BALANZA DE COMPROBACIÓN ANALÍTICA CON CENTROS DE COSTO E ÍTEMS");
+                map.put("sTitle", getTitle().toUpperCase());
                 map.put("tDateStart", moFieldDateStart.getDate());
                 map.put("tDateEnd", moFieldDateEnd.getDate());
                 map.put("nLevel", (Integer) jsLevelAccount.getValue());

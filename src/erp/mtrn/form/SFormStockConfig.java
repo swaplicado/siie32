@@ -73,21 +73,21 @@ public class SFormStockConfig extends javax.swing.JDialog implements erp.lib.for
         jPanel8 = new javax.swing.JPanel();
         jPanel20 = new javax.swing.JPanel();
         jlPkItemId = new javax.swing.JLabel();
-        jcbPkItemId = new javax.swing.JComboBox();
+        jcbPkItemId = new javax.swing.JComboBox<SFormComponentItem>();
         jbPkItemId = new javax.swing.JButton();
         jtfItemKey = new javax.swing.JTextField();
         jPanel23 = new javax.swing.JPanel();
         jlPkUnitId = new javax.swing.JLabel();
-        jcbPkUnitId = new javax.swing.JComboBox();
+        jcbPkUnitId = new javax.swing.JComboBox<SFormComponentItem>();
         jbPkUnitId = new javax.swing.JButton();
         jtfUnitSymbol = new javax.swing.JTextField();
         jPanel24 = new javax.swing.JPanel();
         jlPkCompanyBranchId = new javax.swing.JLabel();
-        jcbPkCompanyBranchId = new javax.swing.JComboBox();
+        jcbPkCompanyBranchId = new javax.swing.JComboBox<SFormComponentItem>();
         jbPkCompanyBranchId = new javax.swing.JButton();
         jPanel25 = new javax.swing.JPanel();
         jlPkWarehouseId = new javax.swing.JLabel();
-        jcbPkWarehouseId = new javax.swing.JComboBox();
+        jcbPkWarehouseId = new javax.swing.JComboBox<SFormComponentItem>();
         jbPkWarehouseId = new javax.swing.JButton();
         jPanel28 = new javax.swing.JPanel();
         jlQuantityMinimum = new javax.swing.JLabel();
@@ -274,8 +274,8 @@ public class SFormStockConfig extends javax.swing.JDialog implements erp.lib.for
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-568)/2, (screenSize.height-384)/2, 568, 384);
+        setSize(new java.awt.Dimension(568, 384));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -423,10 +423,10 @@ public class SFormStockConfig extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JButton jbPkItemId;
     private javax.swing.JButton jbPkUnitId;
     private javax.swing.JButton jbPkWarehouseId;
-    private javax.swing.JComboBox jcbPkCompanyBranchId;
-    private javax.swing.JComboBox jcbPkItemId;
-    private javax.swing.JComboBox jcbPkUnitId;
-    private javax.swing.JComboBox jcbPkWarehouseId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbPkCompanyBranchId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbPkItemId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbPkUnitId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbPkWarehouseId;
     private javax.swing.JCheckBox jckIsDeleted;
     private javax.swing.JLabel jlPkCompanyBranchId;
     private javax.swing.JLabel jlPkItemId;

@@ -9,6 +9,7 @@ import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
+import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
@@ -60,15 +61,15 @@ public class SFormStockConfigDns extends javax.swing.JDialog implements erp.lib.
         jPanel2 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jlPkCompanyBranchId = new javax.swing.JLabel();
-        jcbPkCompanyBranchId = new javax.swing.JComboBox();
+        jcbPkCompanyBranchId = new javax.swing.JComboBox<SFormComponentItem>();
         jbPkCompanyBranchId = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
         jlPkWarehouseId = new javax.swing.JLabel();
-        jcbPkWarehouseId = new javax.swing.JComboBox();
+        jcbPkWarehouseId = new javax.swing.JComboBox<SFormComponentItem>();
         jbPkWarehouseId = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
         jlPkDocNumberSeriesId = new javax.swing.JLabel();
-        jcbPkDocNumberSeriesId = new javax.swing.JComboBox();
+        jcbPkDocNumberSeriesId = new javax.swing.JComboBox<SFormComponentItem>();
         jbPkDocNumberSeriesId = new javax.swing.JButton();
         jckIsDeleted = new javax.swing.JCheckBox();
         jPanel1 = new javax.swing.JPanel();
@@ -163,8 +164,8 @@ public class SFormStockConfigDns extends javax.swing.JDialog implements erp.lib.
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-445)/2, (screenSize.height-230)/2, 445, 230);
+        setSize(new java.awt.Dimension(445, 230));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -299,9 +300,9 @@ public class SFormStockConfigDns extends javax.swing.JDialog implements erp.lib.
     private javax.swing.JButton jbPkCompanyBranchId;
     private javax.swing.JButton jbPkDocNumberSeriesId;
     private javax.swing.JButton jbPkWarehouseId;
-    private javax.swing.JComboBox jcbPkCompanyBranchId;
-    private javax.swing.JComboBox jcbPkDocNumberSeriesId;
-    private javax.swing.JComboBox jcbPkWarehouseId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbPkCompanyBranchId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbPkDocNumberSeriesId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbPkWarehouseId;
     private javax.swing.JCheckBox jckIsDeleted;
     private javax.swing.JLabel jlPkCompanyBranchId;
     private javax.swing.JLabel jlPkDocNumberSeriesId;

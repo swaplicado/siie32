@@ -17,6 +17,7 @@ import erp.data.SDataUtilities;
 import erp.data.SProcConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
@@ -86,9 +87,9 @@ public class SFormDncDocumentNumberSeries extends javax.swing.JDialog implements
         jlDocCategory = new javax.swing.JLabel();
         jtfDocCategory = new javax.swing.JTextField();
         jlPkDocNumberingCenterId = new javax.swing.JLabel();
-        jcbPkDocNumberingCenterId = new javax.swing.JComboBox();
+        jcbPkDocNumberingCenterId = new javax.swing.JComboBox<SFormComponentItem>();
         jlPkDocNumberSeriesId = new javax.swing.JLabel();
-        jcbPkDocNumberSeriesId = new javax.swing.JComboBox();
+        jcbPkDocNumberSeriesId = new javax.swing.JComboBox<SFormComponentItem>();
         jlNumberStart = new javax.swing.JLabel();
         jtfNumberStart = new javax.swing.JTextField();
         jlNumberEnd_n = new javax.swing.JLabel();
@@ -208,8 +209,8 @@ public class SFormDncDocumentNumberSeries extends javax.swing.JDialog implements
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-400)/2, (screenSize.height-325)/2, 400, 325);
+        setSize(new java.awt.Dimension(400, 325));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -350,8 +351,8 @@ public class SFormDncDocumentNumberSeries extends javax.swing.JDialog implements
     private javax.swing.JButton jbApproveDate_n;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
-    private javax.swing.JComboBox jcbPkDocNumberSeriesId;
-    private javax.swing.JComboBox jcbPkDocNumberingCenterId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbPkDocNumberSeriesId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbPkDocNumberingCenterId;
     private javax.swing.JCheckBox jckIsDeleted;
     private javax.swing.JFormattedTextField jftApproveDate_n;
     private javax.swing.JLabel jlApproveDate_n;

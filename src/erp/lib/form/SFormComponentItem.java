@@ -40,6 +40,6 @@ public class SFormComponentItem implements java.io.Serializable {
     
     @Override
     public java.lang.String toString() {
-        return msItem;
+        return getItem();
     }
 }

@@ -43,8 +43,11 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
      */
     public SDialogFiscalXmlFile(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, title);
+        
         initComponents();
         initComponentsCustom();
+        
+        initForm();
     }
 
     /**

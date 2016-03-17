@@ -27,7 +27,7 @@ import javax.swing.SpinnerNumberModel;
  *
  * @author Sergio Flores
  */
-public class SDialogRepDpsMonthlyReport extends javax.swing.JDialog {
+public class SDialogRepDpsMonthReport extends javax.swing.JDialog {
 
     public static final int CFD = 1;
     public static final int CF = 2;
@@ -42,12 +42,15 @@ public class SDialogRepDpsMonthlyReport extends javax.swing.JDialog {
     private erp.lib.form.SFormField moFieldYear;
 
     /** Creates new form SDialogRepDpsMonthlyReport */
-    public SDialogRepDpsMonthlyReport(erp.client.SClientInterface client, int formType) {
+    public SDialogRepDpsMonthReport(erp.client.SClientInterface client, int formType) {
         super(client.getFrame(), true);
         miClient = client;
         mnFormType = formType;
+        
         initComponents();
         initComponentsExtra();
+        
+        initForm();
     }
 
     /** This method is called from within the constructor to
@@ -135,8 +138,8 @@ public class SDialogRepDpsMonthlyReport extends javax.swing.JDialog {
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-400)/2, (screenSize.height-300)/2, 400, 300);
+        setSize(new java.awt.Dimension(400, 300));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -252,7 +255,7 @@ public class SDialogRepDpsMonthlyReport extends javax.swing.JDialog {
     private javax.swing.JTextField jtfYear;
     // End of variables declaration//GEN-END:variables
 
-    public void resetForm() {
+    public void initForm() {
         int[] date = SLibTimeUtilities.digestDate(miClient.getSessionXXX().getWorkingDate());
 
         mnFormResult = SLibConstants.UNDEFINED;

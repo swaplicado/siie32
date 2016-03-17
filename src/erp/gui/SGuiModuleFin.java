@@ -7,6 +7,7 @@ package erp.gui;
 
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.data.SDataRepConstants;
 import erp.form.SFormOptionPicker;
 import erp.gui.mod.cfg.SCfgMenu;
 import erp.gui.mod.cfg.SCfgMenuSection;
@@ -41,8 +42,6 @@ import erp.mfin.data.SDataYear;
 import erp.mfin.form.SDialogRepAccount;
 import erp.mfin.form.SDialogRepAccountCashBalance;
 import erp.mfin.form.SDialogRepAccountConcept;
-import erp.mfin.form.SDialogRepAccountCostCenter;
-import erp.mfin.form.SDialogRepAccountingAux;
 import erp.mfin.form.SDialogRepAuxAccounting;
 import erp.mfin.form.SDialogRepBalanceSheet;
 import erp.mfin.form.SDialogRepBizPartnerAccountingMoves;
@@ -50,7 +49,8 @@ import erp.mfin.form.SDialogRepBizPartnerBalance;
 import erp.mfin.form.SDialogRepBizPartnerBalanceDps;
 import erp.mfin.form.SDialogRepBizPartnerJournal;
 import erp.mfin.form.SDialogRepBizPartnerMove;
-import erp.mfin.form.SDialogRepDpsMonthlyReport;
+import erp.mfin.form.SDialogRepBizPartnerStatement;
+import erp.mfin.form.SDialogRepDpsMonthReport;
 import erp.mfin.form.SDialogRepDpsPayment;
 import erp.mfin.form.SDialogRepFinMov;
 import erp.mfin.form.SDialogRepFinMovBankDayDet;
@@ -92,10 +92,11 @@ import erp.mfin.form.SFormTaxableConceptType;
 import erp.mfin.form.SFormYear;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.bps.db.SBpsUtils;
 import erp.mod.fin.db.SFiscalAccounts;
 import erp.mod.fin.form.SDialogFiscalAccountsConfig;
 import erp.mod.fin.form.SDialogFiscalXmlFile;
-import erp.mod.fin.form.SDialogRepIncomeExpenseDue;
+import erp.mod.fin.form.SDialogRepCashFlowExpected;
 import erp.mod.fin.form.SDialogReportTaxPending;
 import erp.mtrn.data.SDataCtr;
 import erp.mtrn.data.SDataDsm;
@@ -171,12 +172,12 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiRecRecEtyXml;
     private javax.swing.JMenuItem jmiRecRecCash;
     private javax.swing.JMenuItem jmiRecBal;
-    private javax.swing.JMenuItem jmiRecBalCashAccountCash;
-    private javax.swing.JMenuItem jmiRecBalCashAccountBank;
-    private javax.swing.JMenuItem jmiRecBalBizPartnerCus;
-    private javax.swing.JMenuItem jmiRecBalBizPartnerSup;
-    private javax.swing.JMenuItem jmiRecBalBizPartnerDbr;
-    private javax.swing.JMenuItem jmiRecBalBizPartnerCdr;
+    private javax.swing.JMenuItem jmiRecCashAccBalountCash;
+    private javax.swing.JMenuItem jmiRecCashAccBalountBank;
+    private javax.swing.JMenuItem jmiRecBizPartnerBalCus;
+    private javax.swing.JMenuItem jmiRecBizPartnerBalSup;
+    private javax.swing.JMenuItem jmiRecBizPartnerBalDbr;
+    private javax.swing.JMenuItem jmiRecBizPartnerBalCdr;
     private javax.swing.JMenuItem jmiRecBalInventory;
     private javax.swing.JMenuItem jmiRecBalTaxDebit;
     private javax.swing.JMenuItem jmiRecBalTaxCredit;
@@ -195,64 +196,71 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiFinLayoutBankDone;
 
     private javax.swing.JMenu jmRep;
-    private javax.swing.JMenuItem jmiRepAccount;
-    private javax.swing.JMenuItem jmiRepTrialBalance;
-    private javax.swing.JMenuItem jmiRepTrialBalanceItem;
-    private javax.swing.JMenuItem jmiRepTrialBalanceCostCenterItem;
-    private javax.swing.JMenuItem jmiRepTrialBalanceCostCenter;
-    private javax.swing.JMenu jmRepSheet;
-    private javax.swing.JMenuItem jmiRepBalanceSheet;
-    private javax.swing.JMenuItem jmiRepProfitLossStatement;
-    private javax.swing.JMenu jmRepFinBpsBalCash;
-    private javax.swing.JMenuItem jmiRepFinBpsBalCashCash;
-    private javax.swing.JMenuItem jmiRepFinBpsBalCashBank;
-    private javax.swing.JMenuItem jmiRepFinAccountCashBal;
-    private javax.swing.JMenu jmRepBizPartnerBalance;
-    private javax.swing.JMenuItem jmiRepBizPartnerBalanceCus;
-    private javax.swing.JMenuItem jmiRepBizPartnerBalanceSup;
-    private javax.swing.JMenuItem jmiRepBizPartnerBalanceDbr;
-    private javax.swing.JMenuItem jmiRepBizPartnerBalanceCdr;
-    private javax.swing.JMenuItem jmiRepBizPartnerBalanceCusDps;
-    private javax.swing.JMenuItem jmiRepBizPartnerBalanceSupDps;
-    private javax.swing.JMenu jmRepBizPartnerBalanceAging;
-    private javax.swing.JMenuItem jmiRepBizPartnerBalanceCusAging;
-    private javax.swing.JMenuItem jmiRepBizPartnerBalanceSupAging;
-    private javax.swing.JMenu jmRepBizPartnerAccountingMoves;
-    private javax.swing.JMenuItem jmiRepBizPartnerAccountingMovesCus;
-    private javax.swing.JMenuItem jmiRepBizPartnerAccountingMovesSup;
-    private javax.swing.JMenu jmiRepsBizPartnerAuxMoves;
-    private javax.swing.JMenuItem jmiRepsBizPartnerAuxMovesCus;
-    private javax.swing.JMenuItem jmiRepsBizPartnerAuxMovesSup;
-    private javax.swing.JMenuItem jmiRepsBizPartnerAuxMovesDbr;
-    private javax.swing.JMenuItem jmiRepsBizPartnerAuxMovesCdr;
-    private javax.swing.JMenu jmRepFinMov;
-    private javax.swing.JMenuItem jmiRepFinMovCash;
-    private javax.swing.JMenuItem jmiRepFinMovBank;
-    private javax.swing.JMenuItem jmiRepFinMovTax;
-    private javax.swing.JMenuItem jmiRepFinMovProfLoss;
-    private javax.swing.JMenuItem jmiRepFinMovCashDay;
-    private javax.swing.JMenuItem jmiRepFinMovBankDay;
-    private javax.swing.JMenu jmRepDpsPayment;
-    private javax.swing.JMenuItem jmiRepDpsPaymentSup;
-    private javax.swing.JMenuItem jmiRepDpsPaymentCus;
-    private javax.swing.JMenuItem jmiDpsPaymentSup;
-    private javax.swing.JMenuItem jmiDpsPaymentSupDetail;
-    private javax.swing.JMenuItem jmiDpsPaymentCus;
-    private javax.swing.JMenuItem jmiDpsPaymentCusDetail;
-    private javax.swing.JMenuItem jmiRepIncomeExpenseDue;
+    private javax.swing.JMenu jmRepTrialBal;
+    private javax.swing.JMenuItem jmiRepTrialBalStandard;
+    private javax.swing.JMenuItem jmiRepTrialBalCostCenter;
+    private javax.swing.JMenuItem jmiRepTrialBalCostCenterItem;
+    private javax.swing.JMenuItem jmiRepTrialBalItemType;
+    private javax.swing.JMenu jmRepFinStat;
+    private javax.swing.JMenuItem jmiRepFinStatBalanceSheet;
+    private javax.swing.JMenuItem jmiRepFinStatProfitLossStat;
+    private javax.swing.JMenu jmRepCashAccBal;
+    private javax.swing.JMenuItem jmiRepCashAccBalCash;
+    private javax.swing.JMenuItem jmiRepCashAccBalBank;
+    private javax.swing.JMenuItem jmiRepCashAccBal;
+    private javax.swing.JMenu jmRepCashAccMovs;
+    private javax.swing.JMenuItem jmiRepCashAccMovsCash;
+    private javax.swing.JMenuItem jmiRepCashAccMovsBank;
+    private javax.swing.JMenuItem jmiRepCashAccMovsCashDay;
+    private javax.swing.JMenuItem jmiRepCashAccMovsBankDay;
+    private javax.swing.JMenu jmRepBizPartnerBal;
+    private javax.swing.JMenuItem jmiRepBizPartnerBalCus;
+    private javax.swing.JMenuItem jmiRepBizPartnerBalSup;
+    private javax.swing.JMenuItem jmiRepBizPartnerBalDbr;
+    private javax.swing.JMenuItem jmiRepBizPartnerBalCdr;
+    private javax.swing.JMenuItem jmiRepBizPartnerBalDpsCus;
+    private javax.swing.JMenuItem jmiRepBizPartnerBalDpsSup;
+    private javax.swing.JMenu jmRepBizPartnerBalAging;
+    private javax.swing.JMenuItem jmiRepBizPartnerBalAgingCus;
+    private javax.swing.JMenuItem jmiRepBizPartnerBalAgingSup;
+    private javax.swing.JMenu jmRepBizPartnerStat;
+    private javax.swing.JMenuItem jmiRepBizPartnerStatCus;
+    private javax.swing.JMenuItem jmiRepBizPartnerStatSup;
+    private javax.swing.JMenuItem jmiRepBizPartnerStatDbr;
+    private javax.swing.JMenuItem jmiRepBizPartnerStatCdr;
+    private javax.swing.JMenu jmRepBizPartnerAccMovs;
+    private javax.swing.JMenuItem jmiRepBizPartnerAccMovsCus;
+    private javax.swing.JMenuItem jmiRepBizPartnerAccMovsSup;
+    private javax.swing.JMenu jmiRepBizPartnerLedger;
+    private javax.swing.JMenuItem jmiRepBizPartnerLedgerCus;
+    private javax.swing.JMenuItem jmiRepBizPartnerLedgerSup;
+    private javax.swing.JMenuItem jmiRepBizPartnerLedgerDbr;
+    private javax.swing.JMenuItem jmiRepBizPartnerLedgerCdr;
+    private javax.swing.JMenu jmRepAccMovs;
+    private javax.swing.JMenuItem jmiRepAccMovsTax;
+    private javax.swing.JMenuItem jmiRepAccMovsProfitLoss;
+    private javax.swing.JMenu jmRepCashFlow;
+    private javax.swing.JMenuItem jmiRepCashFlowPaysCus;
+    private javax.swing.JMenuItem jmiRepCashFlowPaysSup;
+    private javax.swing.JMenuItem jmiQryCashFlowPaysCusSum;
+    private javax.swing.JMenuItem jmiQryCashFlowPaysCusDet;
+    private javax.swing.JMenuItem jmiQryCashFlowPaysSupSum;
+    private javax.swing.JMenuItem jmiQryCashFlowPaysSupDet;
+    private javax.swing.JMenuItem jmiRepCashFlowExpected;
     private javax.swing.JMenuItem jmiRepLedgerAccount;
     private javax.swing.JMenuItem jmiRepLedgerCostCenter;
-    private javax.swing.JMenuItem jmiRepConceptAdminstrative;
-    private javax.swing.JMenuItem jmiRepConceptTaxable;
-    private javax.swing.JSeparator jsRepAuxiliar;
-    private javax.swing.JMenuItem jmiRepFinanceRecords;
+    private javax.swing.JMenuItem jmiRepConceptAdmin;
+    private javax.swing.JMenuItem jmiRepConceptTax;
+    private javax.swing.JSeparator jsRepAux1;
+    private javax.swing.JMenuItem jmiRepPrtJournalVouchers;
+    private javax.swing.JMenuItem jmiRepPrtChartOfAccounts;
     private javax.swing.JMenuItem jmiRepTaxesByConcept;
-    private javax.swing.JMenu jmRepFis;
-    private javax.swing.JMenuItem jmiRepFisTaxPendingPur;
-    private javax.swing.JMenuItem jmiRepFisTaxPendingSal;
-    private javax.swing.JMenuItem jmiRepFisXmlFile;
-    private javax.swing.JMenuItem jmiRepFisMonthlyReportCfd;
-    private javax.swing.JMenuItem jmiRepFisMonthlyReportCf;
+    private javax.swing.JMenu jmRepFiscal;
+    private javax.swing.JMenuItem jmiRepFiscalTaxPendSal;
+    private javax.swing.JMenuItem jmiRepFiscalTaxPendPur;
+    private javax.swing.JMenuItem jmiRepFiscalXmlFiles;
+    private javax.swing.JMenuItem jmiRepFiscalMonthRepCfd;
+    private javax.swing.JMenuItem jmiRepFiscalMonthRepCf;
 
     private erp.mfin.form.SFormRecord moFormRecord;
     private erp.mfin.form.SFormRecord moFormRecordRo;
@@ -315,15 +323,6 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private erp.form.SFormOptionPicker moPickerAdministrativeConceptType;
     private erp.form.SFormOptionPicker moPickerTaxableConceptType;
     private erp.form.SFormOptionPicker moPickerYear;
-
-    private erp.mfin.form.SDialogRepRecords moDialogRepRecords;
-    private erp.mfin.form.SDialogRepAccountingAux moDialogRepAccountingAux;
-    private erp.mfin.form.SDialogRepAccountConcept moDialogRepAccountConcept;
-    private erp.mfin.form.SDialogRepAccountCostCenter moDialogRepAccountCostCenter;
-    private erp.mfin.form.SDialogRepTaxesByConcept moDialogRepTaxesByConcept;
-    private erp.mfin.form.SDialogRepTaxesMoves moDialogRepTaxesMoves;
-    private erp.mfin.form.SDialogRepDpsMonthlyReport moDialogRepDpsMonthlyReportCfd;
-    private erp.mfin.form.SDialogRepDpsMonthlyReport moDialogRepDpsMonthlyReportCf;
 
     public SGuiModuleFin(erp.client.SClientInterface client) {
         super(client, SDataConstants.MOD_FIN);
@@ -479,12 +478,12 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRecRecEtyXml = new JMenuItem("Pólizas contables con XML");
         jmiRecRecCash = new JMenuItem("Pólizas contables de cuentas de dinero");
         jmiRecBal = new JMenuItem("Balanza de comprobación");
-        jmiRecBalCashAccountCash = new JMenuItem("Saldos cajas");
-        jmiRecBalCashAccountBank = new JMenuItem("Saldos cuentas bancarias");
-        jmiRecBalBizPartnerCus = new JMenuItem("Saldos clientes");
-        jmiRecBalBizPartnerSup = new JMenuItem("Saldos proveedores");
-        jmiRecBalBizPartnerDbr = new JMenuItem("Saldos deudores diversos");
-        jmiRecBalBizPartnerCdr = new JMenuItem("Saldos acreedores diversos");
+        jmiRecCashAccBalountCash = new JMenuItem("Saldos cajas");
+        jmiRecCashAccBalountBank = new JMenuItem("Saldos cuentas bancarias");
+        jmiRecBizPartnerBalCus = new JMenuItem("Saldos clientes");
+        jmiRecBizPartnerBalSup = new JMenuItem("Saldos proveedores");
+        jmiRecBizPartnerBalDbr = new JMenuItem("Saldos deudores diversos");
+        jmiRecBizPartnerBalCdr = new JMenuItem("Saldos acreedores diversos");
         jmiRecBalInventory = new JMenuItem("Saldos inventarios");
         jmiRecBalTaxDebit = new JMenuItem("Saldos impuestos a favor");
         jmiRecBalTaxCredit = new JMenuItem("Saldos impuestos a cargo");
@@ -499,13 +498,13 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRec.addSeparator();
         jmRec.add(jmiRecBal);
         jmRec.addSeparator();
-        jmRec.add(jmiRecBalCashAccountCash);
-        jmRec.add(jmiRecBalCashAccountBank);
+        jmRec.add(jmiRecCashAccBalountCash);
+        jmRec.add(jmiRecCashAccBalountBank);
         jmRec.addSeparator();
-        jmRec.add(jmiRecBalBizPartnerCus);
-        jmRec.add(jmiRecBalBizPartnerSup);
-        jmRec.add(jmiRecBalBizPartnerDbr);
-        jmRec.add(jmiRecBalBizPartnerCdr);
+        jmRec.add(jmiRecBizPartnerBalCus);
+        jmRec.add(jmiRecBizPartnerBalSup);
+        jmRec.add(jmiRecBizPartnerBalDbr);
+        jmRec.add(jmiRecBizPartnerBalCdr);
         jmRec.addSeparator();
         jmRec.add(jmiRecBalInventory);
         jmRec.addSeparator();
@@ -539,155 +538,170 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
 
         jmRep = new JMenu("Reportes");
 
-        jmiRepAccount = new JMenuItem("Listado de cuentas contables...");
-        jmiRepTrialBalance = new JMenuItem("Balanza de comprobación...");
-        jmiRepTrialBalanceItem = new JMenuItem("Balanza de comprobación por tipo de ítem...");
-        jmiRepTrialBalanceCostCenterItem = new JMenuItem("Balanza de comprobación con centros de costo e ítems...");
-        jmiRepTrialBalanceCostCenter = new JMenuItem("Balanza de comprobación de centros de costo...");
-        jmRepSheet = new JMenu("Estados financieros");
-        jmiRepBalanceSheet = new JMenuItem("Balance general...");
-        jmiRepProfitLossStatement = new JMenuItem("Estado de resultados...");
-        jmRepFinBpsBalCash = new JMenu("Saldos de cuentas de efectivo");
-        jmiRepFinBpsBalCashCash = new JMenuItem("Reporte de saldos de cajas...");
-        jmiRepFinBpsBalCashBank = new JMenuItem("Reporte de saldos de cuentas bancarias...");
-        jmiRepFinAccountCashBal = new JMenuItem("Reporte de saldos de cuentas de efectivo...");
-        jmRepBizPartnerBalance = new JMenu("Saldos de asociados de negocios");
-        jmiRepBizPartnerBalanceCus = new JMenuItem("Reporte de saldos de clientes...");
-        jmiRepBizPartnerBalanceSup = new JMenuItem("Reporte de saldos de proveedores...");
-        jmiRepBizPartnerBalanceDbr = new JMenuItem("Reporte de saldos de deudores diversos...");
-        jmiRepBizPartnerBalanceCdr = new JMenuItem("Reporte de saldos de acreedores diversos...");
-        jmiRepBizPartnerBalanceCusDps = new JMenuItem("Reporte de saldos de clientes por documento...");
-        jmiRepBizPartnerBalanceSupDps = new JMenuItem("Reporte de saldos de proveedores por documento...");
-        jmRepBizPartnerBalanceAging = new JMenu("Antigüedad de saldos de asociados de negocios");
-        jmiRepBizPartnerBalanceCusAging = new JMenuItem("Reporte de antigüedad de saldos de clientes...");
-        jmiRepBizPartnerBalanceSupAging = new JMenuItem("Reporte de antigüedad de saldos de proveedores...");
-        jmRepBizPartnerAccountingMoves = new JMenu("Movimientos contables de asociados de negocios");
-        jmiRepBizPartnerAccountingMovesCus = new JMenuItem("Movimientos contables de clientes...");
-        jmiRepBizPartnerAccountingMovesSup = new JMenuItem("Movimientos contables de proveedores...");
-        jmiRepsBizPartnerAuxMoves = new JMenu("Auxiliar de movimientos contables de asociados de negocios");
-        jmiRepsBizPartnerAuxMovesCus = new JMenuItem("Reporte auxiliar de movimientos contables de clientes...");
-        jmiRepsBizPartnerAuxMovesSup = new JMenuItem("Reporte auxiliar de movimientos contables de proveedores...");
-        jmiRepsBizPartnerAuxMovesDbr = new JMenuItem("Reporte auxiliar de movimientos contables de deudores diversos...");
-        jmiRepsBizPartnerAuxMovesCdr = new JMenuItem("Reporte auxiliar de movimientos contables de acreedores diversos...");
-
-        jmRepFinMov = new JMenu("Movimientos de cuentas de efectivo e impuestos");
-        jmiRepFinMovCash = new JMenuItem("Movimientos de cajas...");
-        jmiRepFinMovBank = new JMenuItem("Movimientos de cuentas bancarias...");
-        jmiRepFinMovTax = new JMenuItem("Movimientos de impuestos...");
-        jmiRepFinMovProfLoss = new JMenuItem("Movimientos de pérdidas y ganancias...");
-        jmiRepFinMovProfLoss.setEnabled(true);
-        jmiRepFinMovCashDay = new JMenuItem("Movimientos de cajas por día...");
-        jmiRepFinMovBankDay = new JMenuItem("Movimientos de cuentas bancarias por día...");
-
-        jmRepDpsPayment = new JMenu("Reportes de flujo de efectivo");
-        jmiRepDpsPaymentSup = new JMenuItem("Reporte de pagos por período...");
-        jmiRepDpsPaymentCus = new JMenuItem("Reporte de cobros por período...");
-        jmiDpsPaymentSup = new JMenuItem("Pagos por período");
-        jmiDpsPaymentSupDetail = new JMenuItem("Pagos por período a detalle");
-        jmiDpsPaymentCus = new JMenuItem("Cobros por período");
-        jmiDpsPaymentCusDetail = new JMenuItem("Cobros por período a detalle");
+        jmRepTrialBal = new JMenu("Balanzas de comprobación");
+        jmiRepTrialBalStandard = new JMenuItem("Balanza de comprobación...");
+        jmiRepTrialBalCostCenter = new JMenuItem("Balanza de comprobación de centros de costo...");
+        jmiRepTrialBalCostCenterItem = new JMenuItem("Balanza de comprobación de centros de costo e ítems...");
+        jmiRepTrialBalItemType = new JMenuItem("Balanza de comprobación por tipo de ítems...");
+        jmRepFinStat = new JMenu("Estados financieros");
+        jmiRepFinStatBalanceSheet = new JMenuItem("Balance general...");
+        jmiRepFinStatProfitLossStat = new JMenuItem("Estado de resultados...");
         
-        jmiRepIncomeExpenseDue = new JMenuItem("Reporte de ingresos y egresos esperados por periodo...");
+        jmRepCashAccBal = new JMenu("Saldos de cuentas de dinero");
+        jmiRepCashAccBalCash = new JMenuItem("Saldos de cajas...");
+        jmiRepCashAccBalBank = new JMenuItem("Saldos de cuentas bancarias...");
+        jmiRepCashAccBal = new JMenuItem("Saldos de cuentas de dinero...");
+        jmRepCashAccMovs = new JMenu("Movimientos de cuentas de dinero");
+        jmiRepCashAccMovsCash = new JMenuItem("Movimientos de cajas...");
+        jmiRepCashAccMovsBank = new JMenuItem("Movimientos de cuentas bancarias...");
+        jmiRepCashAccMovsCashDay = new JMenuItem("Movimientos de cajas por día...");
+        jmiRepCashAccMovsBankDay = new JMenuItem("Movimientos de cuentas bancarias por día...");
+        
+        jmRepBizPartnerBal = new JMenu("Saldos de asociados de negocios");
+        jmiRepBizPartnerBalCus = new JMenuItem("Saldos de clientes...");
+        jmiRepBizPartnerBalSup = new JMenuItem("Saldos de proveedores...");
+        jmiRepBizPartnerBalDbr = new JMenuItem("Saldos de deudores diversos...");
+        jmiRepBizPartnerBalCdr = new JMenuItem("Saldos de acreedores diversos...");
+        jmiRepBizPartnerBalDpsCus = new JMenuItem("Saldos de clientes por documento...");
+        jmiRepBizPartnerBalDpsSup = new JMenuItem("Saldos de proveedores por documento...");
+        jmRepBizPartnerBalAging = new JMenu("Antigüedad de saldos de asociados de negocios");
+        jmiRepBizPartnerBalAgingCus = new JMenuItem("Antigüedad de saldos de clientes...");
+        jmiRepBizPartnerBalAgingSup = new JMenuItem("Antigüedad de saldos de proveedores...");
+        jmRepBizPartnerStat = new JMenu("Estados de cuenta de asociados de negocios");
+        jmiRepBizPartnerStatCus = new JMenuItem("Estados de cuenta de clientes...");
+        jmiRepBizPartnerStatSup = new JMenuItem("Estados de cuenta de proveedores...");
+        jmiRepBizPartnerStatDbr = new JMenuItem("Estados de cuenta de deudores diversos...");
+        jmiRepBizPartnerStatCdr = new JMenuItem("Estados de cuenta de acreedores diversos...");
+        jmRepBizPartnerAccMovs = new JMenu("Movimientos contables de asociados de negocios");
+        jmiRepBizPartnerAccMovsCus = new JMenuItem("Movimientos contables de clientes por documento...");
+        jmiRepBizPartnerAccMovsSup = new JMenuItem("Movimientos contables de proveedores por documento...");
+        jmiRepBizPartnerLedger = new JMenu("Auxiliares contables de asociados de negocios");
+        jmiRepBizPartnerLedgerCus = new JMenuItem("Reporte de auxiliares contables de clientes...");
+        jmiRepBizPartnerLedgerSup = new JMenuItem("Reporte de auxiliares contables de proveedores...");
+        jmiRepBizPartnerLedgerDbr = new JMenuItem("Reporte de auxiliares contables de deudores diversos...");
+        jmiRepBizPartnerLedgerCdr = new JMenuItem("Reporte de auxiliares contables de acreedores diversos...");
+        
+        jmRepAccMovs = new JMenu("Movimientos contables de cuentas de sistema");
+        jmiRepAccMovsTax = new JMenuItem("Movimientos contables de impuestos...");
+        jmiRepAccMovsProfitLoss = new JMenuItem("Movimientos contables de pérdidas y ganancias...");
 
-        jmiRepLedgerAccount = new JMenuItem("Reporte de auxiliares de contabilidad...");
-        jmiRepLedgerCostCenter = new JMenuItem("Reporte de auxiliares de centros de costo...");
-        jmiRepConceptAdminstrative = new JMenuItem("Reporte de conceptos administrativos...");
-        jmiRepConceptTaxable = new JMenuItem("Reporte de conceptos de impuestos...");
-        jsRepAuxiliar = new JPopupMenu.Separator();
-        jmiRepFinanceRecords = new JMenuItem("Impresión de pólizas contables...");
+        jmRepCashFlow = new JMenu("Flujo de efectivo");
+        jmiRepCashFlowPaysCus = new JMenuItem("Reporte de cobros por periodo...");
+        jmiRepCashFlowPaysSup = new JMenuItem("Reporte de pagos por periodo...");
+        jmiQryCashFlowPaysCusSum = new JMenuItem("Consulta de cobros por periodo");
+        jmiQryCashFlowPaysCusDet = new JMenuItem("Consulta de cobros por periodo a detalle");
+        jmiQryCashFlowPaysSupSum = new JMenuItem("Consulta de pagos por periodo");
+        jmiQryCashFlowPaysSupDet = new JMenuItem("Consulta de pagos por periodo a detalle");
+        jmiRepCashFlowExpected = new JMenuItem("Reporte de ingresos y egresos esperados por periodo...");
+        
+        jmiRepLedgerAccount = new JMenuItem("Reporte de auxiliares contables...");
+        jmiRepLedgerCostCenter = new JMenuItem("Reporte de auxiliares contables de centros de costo...");
+        jmiRepConceptAdmin = new JMenuItem("Reporte de conceptos administrativos...");
+        jmiRepConceptTax = new JMenuItem("Reporte de conceptos de impuestos...");
+        jsRepAux1 = new JPopupMenu.Separator();
+        jmiRepPrtJournalVouchers = new JMenuItem("Impresión de pólizas contables...");
+        jmiRepPrtChartOfAccounts = new JMenuItem("Impresión de cuentas contables...");
         jmiRepTaxesByConcept = new JMenuItem("Reporte de impuestos por concepto...");
-
-        jmRepFis = new JMenu("Reportes fiscales");
-        jmiRepFisTaxPendingPur = new JMenuItem("Impuestos pendientes de egresos...");
-        jmiRepFisTaxPendingSal = new JMenuItem("Impuestos pendientes de ingresos...");
-        jmiRepFisXmlFile = new JMenuItem("Archivos contabilidad electrónica...");
-        jmiRepFisMonthlyReportCfd = new JMenuItem("Informe mensual de comprobantes digitales...");
-        jmiRepFisMonthlyReportCf = new JMenuItem("Informe mensual de comprobantes impresos...");
-
-        jmRep.add(jmiRepAccount);
-        jmRep.add(jmiRepTrialBalance);
-        jmRep.add(jmiRepTrialBalanceItem);
-        jmRep.add(jmiRepTrialBalanceCostCenterItem);
-        jmRep.add(jmiRepTrialBalanceCostCenter);
-
-        jmRep.addSeparator();
-
-        jmRepSheet.add(jmiRepBalanceSheet);
-        jmRepSheet.add(jmiRepProfitLossStatement);
-        jmRep.add(jmRepSheet);
-
-        jmRep.addSeparator();
-
-        jmRepFinBpsBalCash.add(jmiRepFinBpsBalCashCash);
-        jmRepFinBpsBalCash.add(jmiRepFinBpsBalCashBank);
-        jmRepFinBpsBalCash.addSeparator();
-        jmRepFinBpsBalCash.add(jmiRepFinAccountCashBal);
-        jmRep.add(jmRepFinBpsBalCash);
-
-        jmRepBizPartnerBalance.add(jmiRepBizPartnerBalanceCus);
-        jmRepBizPartnerBalance.add(jmiRepBizPartnerBalanceSup);
-        jmRepBizPartnerBalance.add(jmiRepBizPartnerBalanceDbr);
-        jmRepBizPartnerBalance.add(jmiRepBizPartnerBalanceCdr);
-        jmRepBizPartnerBalance.addSeparator();
-        jmRepBizPartnerBalance.add(jmiRepBizPartnerBalanceCusDps);
-        jmRepBizPartnerBalance.add(jmiRepBizPartnerBalanceSupDps);
-        jmRep.add(jmRepBizPartnerBalance);
-
-        jmRepBizPartnerBalanceAging.add(jmiRepBizPartnerBalanceCusAging);
-        jmRepBizPartnerBalanceAging.add(jmiRepBizPartnerBalanceSupAging);
-        jmRep.add(jmRepBizPartnerBalanceAging);
-
-        jmRepBizPartnerAccountingMoves.add(jmiRepBizPartnerAccountingMovesCus);
-        jmRepBizPartnerAccountingMoves.add(jmiRepBizPartnerAccountingMovesSup);
-        jmRep.add(jmRepBizPartnerAccountingMoves);
-
-        jmiRepsBizPartnerAuxMoves.add(jmiRepsBizPartnerAuxMovesCus);
-        jmiRepsBizPartnerAuxMoves.add(jmiRepsBizPartnerAuxMovesSup);
-        jmiRepsBizPartnerAuxMoves.add(jmiRepsBizPartnerAuxMovesDbr);
-        jmiRepsBizPartnerAuxMoves.add(jmiRepsBizPartnerAuxMovesCdr);
-        jmRep.add(jmiRepsBizPartnerAuxMoves);
-
-        jmRepFinMov.add(jmiRepFinMovCash);
-        jmRepFinMov.add(jmiRepFinMovBank);
-        jmRepFinMov.add(jmiRepFinMovTax);
-        jmRepFinMov.add(jmiRepFinMovProfLoss);
-        jmRepFinMov.addSeparator();
-        jmRepFinMov.add(jmiRepFinMovCashDay);
-        jmRepFinMov.add(jmiRepFinMovBankDay);
-        jmRep.add(jmRepFinMov);
-
-
-        jmRepDpsPayment.add(jmiRepDpsPaymentSup);
-        jmRepDpsPayment.add(jmiRepDpsPaymentCus);
-        jmRepDpsPayment.addSeparator();
-        jmRepDpsPayment.add(jmiDpsPaymentSup);
-        jmRepDpsPayment.add(jmiDpsPaymentSupDetail);
-        jmRepDpsPayment.add(jmiDpsPaymentCus);
-        jmRepDpsPayment.add(jmiDpsPaymentCusDetail);
-        jmRep.add(jmRepDpsPayment);
         
-        jmRep.add(jmiRepIncomeExpenseDue);
+        jmRepFiscal = new JMenu("Reportes fiscales");
+        jmiRepFiscalTaxPendSal = new JMenuItem("Impuestos pendientes de ingresos...");
+        jmiRepFiscalTaxPendPur = new JMenuItem("Impuestos pendientes de egresos...");
+        jmiRepFiscalXmlFiles = new JMenuItem("Archivos de contabilidad electrónica...");
+        jmiRepFiscalMonthRepCfd = new JMenuItem("Informe mensual de comprobantes digitales...");
+        jmiRepFiscalMonthRepCf = new JMenuItem("Informe mensual de comprobantes impresos...");
+        
+        jmRepTrialBal.add(jmiRepTrialBalStandard);
+        jmRepTrialBal.addSeparator();
+        jmRepTrialBal.add(jmiRepTrialBalCostCenter);
+        jmRepTrialBal.add(jmiRepTrialBalCostCenterItem);
+        jmRepTrialBal.addSeparator();
+        jmRepTrialBal.add(jmiRepTrialBalItemType);
+        jmRep.add(jmRepTrialBal);
+        jmRepFinStat.add(jmiRepFinStatBalanceSheet);
+        jmRepFinStat.add(jmiRepFinStatProfitLossStat);
+        jmRep.add(jmRepFinStat);
+        
+        jmRep.addSeparator();
+
+        jmRepCashAccBal.add(jmiRepCashAccBalCash);
+        jmRepCashAccBal.add(jmiRepCashAccBalBank);
+        jmRepCashAccBal.addSeparator();
+        jmRepCashAccBal.add(jmiRepCashAccBal);
+        jmRep.add(jmRepCashAccBal);
+        jmRepCashAccMovs.add(jmiRepCashAccMovsCash);
+        jmRepCashAccMovs.add(jmiRepCashAccMovsBank);
+        jmRepCashAccMovs.addSeparator();
+        jmRepCashAccMovs.add(jmiRepCashAccMovsCashDay);
+        jmRepCashAccMovs.add(jmiRepCashAccMovsBankDay);
+        jmRep.add(jmRepCashAccMovs);
+        
+        jmRep.addSeparator();
+        
+        jmRepBizPartnerBal.add(jmiRepBizPartnerBalCus);
+        jmRepBizPartnerBal.add(jmiRepBizPartnerBalSup);
+        jmRepBizPartnerBal.add(jmiRepBizPartnerBalDbr);
+        jmRepBizPartnerBal.add(jmiRepBizPartnerBalCdr);
+        jmRepBizPartnerBal.addSeparator();
+        jmRepBizPartnerBal.add(jmiRepBizPartnerBalDpsCus);
+        jmRepBizPartnerBal.add(jmiRepBizPartnerBalDpsSup);
+        jmRep.add(jmRepBizPartnerBal);
+        jmRepBizPartnerBalAging.add(jmiRepBizPartnerBalAgingCus);
+        jmRepBizPartnerBalAging.add(jmiRepBizPartnerBalAgingSup);
+        jmRep.add(jmRepBizPartnerBalAging);
+        jmRepBizPartnerStat.add(jmiRepBizPartnerStatCus);
+        jmRepBizPartnerStat.add(jmiRepBizPartnerStatSup);
+        jmRepBizPartnerStat.add(jmiRepBizPartnerStatDbr);
+        jmRepBizPartnerStat.add(jmiRepBizPartnerStatCdr);
+        jmRep.add(jmRepBizPartnerStat);
+        jmRepBizPartnerAccMovs.add(jmiRepBizPartnerAccMovsCus);
+        jmRepBizPartnerAccMovs.add(jmiRepBizPartnerAccMovsSup);
+        jmRep.add(jmRepBizPartnerAccMovs);
+        jmiRepBizPartnerLedger.add(jmiRepBizPartnerLedgerCus);
+        jmiRepBizPartnerLedger.add(jmiRepBizPartnerLedgerSup);
+        jmiRepBizPartnerLedger.add(jmiRepBizPartnerLedgerDbr);
+        jmiRepBizPartnerLedger.add(jmiRepBizPartnerLedgerCdr);
+        jmRep.add(jmiRepBizPartnerLedger);
 
         jmRep.addSeparator();
+        
+        jmRepAccMovs.add(jmiRepAccMovsTax);
+        jmRepAccMovs.add(jmiRepAccMovsProfitLoss);
+        jmRep.add(jmRepAccMovs);
+
+        jmRep.addSeparator();
+        
+        jmRepCashFlow.add(jmiRepCashFlowPaysCus);
+        jmRepCashFlow.add(jmiRepCashFlowPaysSup);
+        jmRepCashFlow.addSeparator();
+        jmRepCashFlow.add(jmiQryCashFlowPaysCusSum);
+        jmRepCashFlow.add(jmiQryCashFlowPaysCusDet);
+        jmRepCashFlow.add(jmiQryCashFlowPaysSupSum);
+        jmRepCashFlow.add(jmiQryCashFlowPaysSupDet);
+        jmRep.add(jmRepCashFlow);
+        jmRep.add(jmiRepCashFlowExpected);
+
+        jmRep.addSeparator();
+        
         jmRep.add(jmiRepLedgerAccount);
         jmRep.add(jmiRepLedgerCostCenter);
-        jmRep.add(jmiRepConceptAdminstrative);
-        jmRep.add(jmiRepConceptTaxable);
-        jmRep.add(jsRepAuxiliar);   // separator
-        jmRep.add(jmiRepFinanceRecords);
+        jmRep.add(jmiRepConceptAdmin);
+        jmRep.add(jmiRepConceptTax);
+        jmRep.add(jsRepAux1);   // separator
+        jmRep.add(jmiRepPrtJournalVouchers);
+        jmRep.add(jmiRepPrtChartOfAccounts);
         jmRep.addSeparator();
         jmRep.add(jmiRepTaxesByConcept);
+        
         jmRep.addSeparator();
-
-        jmRepFis.add(jmiRepFisTaxPendingPur);
-        jmRepFis.add(jmiRepFisTaxPendingSal);
-        jmRepFis.addSeparator();
-        jmRepFis.add(jmiRepFisXmlFile);
-        jmRepFis.addSeparator();
-        jmRepFis.add(jmiRepFisMonthlyReportCfd);
-        jmRepFis.add(jmiRepFisMonthlyReportCf);
-
-        jmRep.add(jmRepFis);
+        
+        jmRepFiscal.add(jmiRepFiscalTaxPendPur);
+        jmRepFiscal.add(jmiRepFiscalTaxPendSal);
+        jmRepFiscal.addSeparator();
+        jmRepFiscal.add(jmiRepFiscalXmlFiles);
+        jmRepFiscal.addSeparator();
+        jmRepFiscal.add(jmiRepFiscalMonthRepCfd);
+        jmRepFiscal.add(jmiRepFiscalMonthRepCf);
+        jmRep.add(jmRepFiscal);
 
         jmiCatAccount.addActionListener(this);
         jmiCatFiscalAccount.addActionListener(this);
@@ -722,12 +736,12 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRecRecEtyXml.addActionListener(this);
         jmiRecRecCash.addActionListener(this);
         jmiRecBal.addActionListener(this);
-        jmiRecBalCashAccountCash.addActionListener(this);
-        jmiRecBalCashAccountBank.addActionListener(this);
-        jmiRecBalBizPartnerCus.addActionListener(this);
-        jmiRecBalBizPartnerSup.addActionListener(this);
-        jmiRecBalBizPartnerDbr.addActionListener(this);
-        jmiRecBalBizPartnerCdr.addActionListener(this);
+        jmiRecCashAccBalountCash.addActionListener(this);
+        jmiRecCashAccBalountBank.addActionListener(this);
+        jmiRecBizPartnerBalCus.addActionListener(this);
+        jmiRecBizPartnerBalSup.addActionListener(this);
+        jmiRecBizPartnerBalDbr.addActionListener(this);
+        jmiRecBizPartnerBalCdr.addActionListener(this);
         jmiRecBalInventory.addActionListener(this);
         jmiRecBalTaxDebit.addActionListener(this);
         jmiRecBalTaxCredit.addActionListener(this);
@@ -757,63 +771,60 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgAccItemLink.addActionListener(this);
         jmiCfgTaxItemLink.addActionListener(this);
 
-        jmiRepAccount.addActionListener(this);
-        jmiRepTrialBalance.addActionListener(this);
-        jmiRepTrialBalanceItem.addActionListener(this);
-        jmiRepTrialBalanceCostCenterItem.addActionListener(this);
-        jmiRepTrialBalanceCostCenter.addActionListener(this);
-        jmiRepBalanceSheet.addActionListener(this);
-        jmiRepProfitLossStatement.addActionListener(this);
-        jmiRepFinBpsBalCashCash.addActionListener(this);
-        jmiRepFinBpsBalCashBank.addActionListener(this);
-        jmiRepFinAccountCashBal.addActionListener(this);
-        jmiRepBizPartnerBalanceCus.addActionListener(this);
-        jmiRepBizPartnerBalanceSup.addActionListener(this);
-        jmiRepBizPartnerBalanceDbr.addActionListener(this);
-        jmiRepBizPartnerBalanceCdr.addActionListener(this);
-        jmiRepBizPartnerBalanceCusDps.addActionListener(this);
-        jmiRepBizPartnerBalanceSupDps.addActionListener(this);
-        jmiRepBizPartnerBalanceCusAging.addActionListener(this);
-        jmiRepBizPartnerBalanceSupAging.addActionListener(this);
-        jmiRepBizPartnerAccountingMovesCus.addActionListener(this);
-        jmiRepBizPartnerAccountingMovesSup.addActionListener(this);
-        jmiRepsBizPartnerAuxMovesCus.addActionListener(this);
-        jmiRepsBizPartnerAuxMovesSup.addActionListener(this);
-        jmiRepsBizPartnerAuxMovesDbr.addActionListener(this);
-        jmiRepsBizPartnerAuxMovesCdr.addActionListener(this);
-        jmiRepFinMovCash.addActionListener(this);
-        jmiRepFinMovBank.addActionListener(this);
-        jmiRepFinMovTax.addActionListener(this);
-        jmiRepFinMovProfLoss.addActionListener(this);
-        jmiRepFinMovCashDay.addActionListener(this);
-        jmiRepFinMovBankDay.addActionListener(this);
-        jmiRepDpsPaymentSup.addActionListener(this);
-        jmiRepDpsPaymentCus.addActionListener(this);
-        jmiDpsPaymentSup.addActionListener(this);
-        jmiDpsPaymentSupDetail.addActionListener(this);
-        jmiDpsPaymentCus.addActionListener(this);
-        jmiDpsPaymentCusDetail.addActionListener(this);
-        jmiRepIncomeExpenseDue.addActionListener(this);
+        jmiRepTrialBalStandard.addActionListener(this);
+        jmiRepTrialBalCostCenter.addActionListener(this);
+        jmiRepTrialBalCostCenterItem.addActionListener(this);
+        jmiRepTrialBalItemType.addActionListener(this);
+        jmiRepFinStatBalanceSheet.addActionListener(this);
+        jmiRepFinStatProfitLossStat.addActionListener(this);
+        jmiRepCashAccBalCash.addActionListener(this);
+        jmiRepCashAccBalBank.addActionListener(this);
+        jmiRepCashAccBal.addActionListener(this);
+        jmiRepCashAccMovsCash.addActionListener(this);
+        jmiRepCashAccMovsBank.addActionListener(this);
+        jmiRepCashAccMovsCashDay.addActionListener(this);
+        jmiRepCashAccMovsBankDay.addActionListener(this);
+        jmiRepBizPartnerBalCus.addActionListener(this);
+        jmiRepBizPartnerBalSup.addActionListener(this);
+        jmiRepBizPartnerBalDbr.addActionListener(this);
+        jmiRepBizPartnerBalCdr.addActionListener(this);
+        jmiRepBizPartnerBalDpsCus.addActionListener(this);
+        jmiRepBizPartnerBalDpsSup.addActionListener(this);
+        jmiRepBizPartnerBalAgingCus.addActionListener(this);
+        jmiRepBizPartnerBalAgingSup.addActionListener(this);
+        jmiRepBizPartnerStatCus.addActionListener(this);
+        jmiRepBizPartnerStatSup.addActionListener(this);
+        jmiRepBizPartnerStatDbr.addActionListener(this);
+        jmiRepBizPartnerStatCdr.addActionListener(this);
+        jmiRepBizPartnerAccMovsCus.addActionListener(this);
+        jmiRepBizPartnerAccMovsSup.addActionListener(this);
+        jmiRepAccMovsTax.addActionListener(this);
+        jmiRepAccMovsProfitLoss.addActionListener(this);
+        jmiRepCashFlowPaysCus.addActionListener(this);
+        jmiRepCashFlowPaysSup.addActionListener(this);
+        jmiQryCashFlowPaysCusSum.addActionListener(this);
+        jmiQryCashFlowPaysCusDet.addActionListener(this);
+        jmiQryCashFlowPaysSupSum.addActionListener(this);
+        jmiQryCashFlowPaysSupDet.addActionListener(this);
+        jmiRepCashFlowExpected.addActionListener(this);
+        
+        
+        jmiRepBizPartnerLedgerCus.addActionListener(this);
+        jmiRepBizPartnerLedgerSup.addActionListener(this);
+        jmiRepBizPartnerLedgerDbr.addActionListener(this);
+        jmiRepBizPartnerLedgerCdr.addActionListener(this);
         jmiRepLedgerAccount.addActionListener(this);
         jmiRepLedgerCostCenter.addActionListener(this);
-        jmiRepConceptAdminstrative.addActionListener(this);
-        jmiRepConceptTaxable.addActionListener(this);
-        jmiRepFinanceRecords.addActionListener(this);
+        jmiRepConceptAdmin.addActionListener(this);
+        jmiRepConceptTax.addActionListener(this);
+        jmiRepPrtJournalVouchers.addActionListener(this);
         jmiRepTaxesByConcept.addActionListener(this);
-        jmiRepFisTaxPendingPur.addActionListener(this);
-        jmiRepFisTaxPendingSal.addActionListener(this);
-        jmiRepFisXmlFile.addActionListener(this);
-        jmiRepFisMonthlyReportCfd.addActionListener(this);
-        jmiRepFisMonthlyReportCf.addActionListener(this);
-
-        moDialogRepRecords = new SDialogRepRecords(miClient);
-        moDialogRepAccountingAux = new SDialogRepAccountingAux(miClient);
-        moDialogRepAccountConcept = new SDialogRepAccountConcept(miClient);
-        moDialogRepAccountCostCenter = new SDialogRepAccountCostCenter(miClient);
-        moDialogRepTaxesByConcept = new SDialogRepTaxesByConcept(miClient);
-        moDialogRepTaxesMoves = new SDialogRepTaxesMoves(miClient);
-        moDialogRepDpsMonthlyReportCfd = new SDialogRepDpsMonthlyReport(miClient, SDialogRepDpsMonthlyReport.CFD);
-        moDialogRepDpsMonthlyReportCf = new SDialogRepDpsMonthlyReport(miClient, SDialogRepDpsMonthlyReport.CF);
+        jmiRepPrtChartOfAccounts.addActionListener(this);
+        jmiRepFiscalTaxPendPur.addActionListener(this);
+        jmiRepFiscalTaxPendSal.addActionListener(this);
+        jmiRepFiscalXmlFiles.addActionListener(this);
+        jmiRepFiscalMonthRepCfd.addActionListener(this);
+        jmiRepFiscalMonthRepCf.addActionListener(this);
 
         // User rights:
 
@@ -901,12 +912,12 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRecRecCash.setEnabled(hasBkrRight);
         jmiRecRecCash.setEnabled(false);    // XXX temporal code!!! (sflores, 2013-07-27)
         jmiRecBal.setEnabled(hasBkrRight || hasRepRight);
-        jmiRecBalCashAccountCash.setEnabled(hasBkrRight || hasMoveAccCash || hasRepRight);
-        jmiRecBalCashAccountBank.setEnabled(hasBkrRight || hasMoveAccCash || hasRepRight);
-        jmiRecBalBizPartnerCus.setEnabled(hasBkrRight || hasRepRight);
-        jmiRecBalBizPartnerSup.setEnabled(hasBkrRight || hasRepRight);
-        jmiRecBalBizPartnerDbr.setEnabled(hasBkrRight || hasMoveBpDbr || hasRepRight);
-        jmiRecBalBizPartnerCdr.setEnabled(hasBkrRight || hasMoveBpCdr || hasRepRight);
+        jmiRecCashAccBalountCash.setEnabled(hasBkrRight || hasMoveAccCash || hasRepRight);
+        jmiRecCashAccBalountBank.setEnabled(hasBkrRight || hasMoveAccCash || hasRepRight);
+        jmiRecBizPartnerBalCus.setEnabled(hasBkrRight || hasRepRight);
+        jmiRecBizPartnerBalSup.setEnabled(hasBkrRight || hasRepRight);
+        jmiRecBizPartnerBalDbr.setEnabled(hasBkrRight || hasMoveBpDbr || hasRepRight);
+        jmiRecBizPartnerBalCdr.setEnabled(hasBkrRight || hasMoveBpCdr || hasRepRight);
         jmiRecBalInventory.setEnabled(hasBkrRight || hasRepRight);
         jmiRecBalTaxDebit.setEnabled(hasBkrRight || hasRepRight);
         jmiRecBalTaxCredit.setEnabled(hasBkrRight || hasRepRight);
@@ -924,7 +935,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinLayoutBankDone.setEnabled(hasMoveAccCash);
 
         jmRep.setEnabled(hasRepRight || hasRepFinRateRight || hasRepStatementRight);
-        jmRepSheet.setEnabled(hasRepStatementRight);
+        jmRepFinStat.setEnabled(hasRepStatementRight);
         
         // GUI configuration:
         
@@ -956,9 +967,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             section = new SCfgMenuSection("" + SDataConstants.MOD_FIN_REP_AUX);
             section.getChildItems().add(new SCfgMenuSectionItem(jmiRepLedgerAccount, "" + SDataConstants.FIN_ACC));
             section.getChildItems().add(new SCfgMenuSectionItem(jmiRepLedgerCostCenter, "" + SDataConstants.FIN_CC));
-            section.getChildItems().add(new SCfgMenuSectionItem(jmiRepConceptAdminstrative, "" + SDataConstants.FINU_TP_ADM_CPT));
-            section.getChildItems().add(new SCfgMenuSectionItem(jmiRepConceptTaxable, "" + SDataConstants.FINU_TP_TAX_CPT));
-            section.setChildSeparator(new SCfgMenuSectionSeparator(jsRepAuxiliar));
+            section.getChildItems().add(new SCfgMenuSectionItem(jmiRepConceptAdmin, "" + SDataConstants.FINU_TP_ADM_CPT));
+            section.getChildItems().add(new SCfgMenuSectionItem(jmiRepConceptTax, "" + SDataConstants.FINU_TP_TAX_CPT));
+            section.setChildSeparator(new SCfgMenuSectionSeparator(jsRepAux1));
             menu.getChildSections().add(section);
             module.getChildMenus().add(menu);
             
@@ -1520,10 +1531,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                     break;
                 case SDataConstants.TRNX_DPS_PAYS:
                     if (auxType01 == SDataConstantsSys.TRNS_CT_DPS_PUR) {
-                        sViewTitle = "Pagos período";
+                        sViewTitle = "Pagos periodo";
                     }
                     else if (auxType01 == SDataConstantsSys.TRNS_CT_DPS_SAL) {
-                        sViewTitle = "Cobros período";
+                        sViewTitle = "Cobros periodo";
                     }
                     if (auxType02 == SUtilConsts.QRY_DET) {
                         sViewTitle += " (detalle)";
@@ -1784,22 +1795,22 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiRecBal) {
                 showView(SDataConstants.FINX_ACCOUNTING, SDataConstants.FINX_ACCOUNTING);
             }
-            else if (item == jmiRecBalCashAccountCash) {
+            else if (item == jmiRecCashAccBalountCash) {
                 showView(SDataConstants.FINX_ACCOUNTING, SDataConstantsSys.FINS_TP_ACC_SYS_CASH_CASH);
             }
-            else if (item == jmiRecBalCashAccountBank) {
+            else if (item == jmiRecCashAccBalountBank) {
                 showView(SDataConstants.FINX_ACCOUNTING, SDataConstantsSys.FINS_TP_ACC_SYS_CASH_BANK);
             }
-            else if (item == jmiRecBalBizPartnerCus) {
+            else if (item == jmiRecBizPartnerBalCus) {
                 showView(SDataConstants.FINX_ACCOUNTING, SDataConstantsSys.FINS_TP_ACC_SYS_CUS);
             }
-            else if (item == jmiRecBalBizPartnerSup) {
+            else if (item == jmiRecBizPartnerBalSup) {
                 showView(SDataConstants.FINX_ACCOUNTING, SDataConstantsSys.FINS_TP_ACC_SYS_SUP);
             }
-            else if (item == jmiRecBalBizPartnerDbr) {
+            else if (item == jmiRecBizPartnerBalDbr) {
                 showView(SDataConstants.FINX_ACCOUNTING, SDataConstantsSys.FINS_TP_ACC_SYS_DBR);
             }
-            else if (item == jmiRecBalBizPartnerCdr) {
+            else if (item == jmiRecBizPartnerBalCdr) {
                 showView(SDataConstants.FINX_ACCOUNTING, SDataConstantsSys.FINS_TP_ACC_SYS_CDR);
             }
             else if (item == jmiRecBalInventory) {
@@ -1841,177 +1852,161 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiFinLayoutBankDone) {
                 miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModConsts.VIEW_ST_DONE, null);
             }
-            else if (item == jmiRepAccount) {
-                new SDialogRepAccount(miClient).setVisible(true);
-            }
-            else if (item == jmiRepTrialBalance) {
+            else if (item == jmiRepTrialBalStandard) {
                 new SDialogRepTrialBalanceDual(miClient, SDataConstants.FIN_ACC, false).setVisible(true);
             }
-            else if (item == jmiRepTrialBalanceItem) {
-                new SDialogRepTrialBalance(miClient, true).setVisible(true);
-            }
-            else if (item == jmiRepTrialBalanceCostCenterItem) {
-                new SDialogRepTrialBalance(miClient, false).setVisible(true);
-            }
-            else if (item == jmiRepTrialBalanceCostCenter) {
+            else if (item == jmiRepTrialBalCostCenter) {
                 new SDialogRepTrialBalanceDual(miClient, SDataConstants.FIN_CC, false).setVisible(true);
             }
-            else if (item == jmiRepBalanceSheet) {
+            else if (item == jmiRepTrialBalCostCenterItem) {
+                new SDialogRepTrialBalance(miClient, false).setVisible(true);
+            }
+            else if (item == jmiRepTrialBalItemType) {
+                new SDialogRepTrialBalance(miClient, true).setVisible(true);
+            }
+            else if (item == jmiRepFinStatBalanceSheet) {
                 new SDialogRepBalanceSheet(miClient).setVisible(true);
             }
-            else if (item == jmiRepProfitLossStatement) {
+            else if (item == jmiRepFinStatProfitLossStat) {
                 new SDialogRepProfitLossStatement(miClient).setVisible(true);
             }
-            else if (item == jmiRepFinBpsBalCashCash) {
+            else if (item == jmiRepCashAccBalCash) {
                 new SDialogRepBizPartnerMove(miClient, SDataConstantsSys.FINS_TP_ACC_SYS_CASH_CASH).setVisible(true);
             }
-            else if (item == jmiRepFinBpsBalCashBank) {
+            else if (item == jmiRepCashAccBalBank) {
                 new SDialogRepBizPartnerMove(miClient, SDataConstantsSys.FINS_TP_ACC_SYS_CASH_BANK).setVisible(true);
             }
-            else if (item == jmiRepFinAccountCashBal) {
+            else if (item == jmiRepCashAccBal) {
                 new SDialogRepAccountCashBalance(miClient).setVisible(true);
             }
-            else if (item == jmiRepBizPartnerBalanceCus) {
-                new SDialogRepBizPartnerBalance(miClient, SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
-            }
-            else if (item == jmiRepBizPartnerBalanceSup) {
-                new SDialogRepBizPartnerBalance(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
-            }
-            else if (item == jmiRepBizPartnerBalanceDbr) {
-                new SDialogRepBizPartnerBalance(miClient, SDataConstantsSys.BPSS_CT_BP_DBR).setVisible(true);
-            }
-            else if (item == jmiRepBizPartnerBalanceCdr) {
-                new SDialogRepBizPartnerBalance(miClient, SDataConstantsSys.BPSS_CT_BP_CDR).setVisible(true);
-            }
-            else if (item == jmiRepBizPartnerBalanceCusDps) {
-                new SDialogRepBizPartnerBalanceDps(miClient, SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
-            }
-            else if (item == jmiRepBizPartnerBalanceSupDps) {
-                new SDialogRepBizPartnerBalanceDps(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
-            }
-            else if (item == jmiRepBizPartnerBalanceCusAging) {
-                new SDialogRepBizPartnerBalanceAging(miClient, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS).setVisible(true);
-            }
-            else if (item == jmiRepBizPartnerBalanceSupAging) {
-                new SDialogRepBizPartnerBalanceAging(miClient, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP).setVisible(true);
-            }
-            else if (item == jmiRepBizPartnerAccountingMovesCus) {
-                new SDialogRepBizPartnerAccountingMoves(miClient, SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
-            }
-            else if (item == jmiRepBizPartnerAccountingMovesSup) {
-                new SDialogRepBizPartnerAccountingMoves(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
-            }
-            else if (item == jmiRepsBizPartnerAuxMovesCus) {
-                new SDialogRepBizPartnerJournal(miClient, SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
-            }
-            else if (item == jmiRepsBizPartnerAuxMovesSup) {
-                new SDialogRepBizPartnerJournal(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
-            }
-            else if (item == jmiRepsBizPartnerAuxMovesDbr) {
-                new SDialogRepBizPartnerJournal(miClient, SDataConstantsSys.BPSS_CT_BP_DBR).setVisible(true);
-            }
-            else if (item == jmiRepsBizPartnerAuxMovesCdr) {
-                new SDialogRepBizPartnerJournal(miClient, SDataConstantsSys.BPSS_CT_BP_CDR).setVisible(true);
-            }
-            else if (item == jmiRepFinMovCash) {
+            else if (item == jmiRepCashAccMovsCash) {
                 new SDialogRepFinMov(miClient, new Object[] { SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH, SDataConstants.UNDEFINED }).setVisible(true);
             }
-            else if (item == jmiRepFinMovBank) {
+            else if (item == jmiRepCashAccMovsBank) {
                 new SDialogRepFinMov(miClient, new Object[] { SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK, SDataConstants.UNDEFINED }).setVisible(true);
             }
-            else if (item == jmiRepFinMovTax) {
-                moDialogRepTaxesMoves.formRefreshCatalogues();
-                moDialogRepTaxesMoves.formReset();
-                moDialogRepTaxesMoves.setFormVisible(true);
-            }
-            else if (item == jmiRepFinMovProfLoss) {
-                new SDialogRepFinMov(miClient, new Object[] { new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS, SDataConstantsSys.FINS_TP_ACC_SYS_NA } , SDataConstants.UNDEFINED }).setVisible(true);
-            }
-            else if (item == jmiRepFinMovCashDay) {
+            else if (item == jmiRepCashAccMovsCashDay) {
                 new SDialogRepFinMovBankDayDet(miClient, new Object[] { SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH, SDataConstants.TRNR_ACCOUNT_CASH_PDAY }).setVisible(true);
             }
-            else if (item == jmiRepFinMovBankDay) {
+            else if (item == jmiRepCashAccMovsBankDay) {
                 new SDialogRepFinMovBankDayDet(miClient, new Object[] { SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK, SDataConstants.TRNR_ACCOUNT_BANK_PDAY }).setVisible(true);
             }
-            else if (item == jmiRepDpsPaymentSup) {
-                new SDialogRepDpsPayment(miClient, SDataConstantsSys.TRNS_CT_DPS_PUR).setVisible(true);
+            else if (item == jmiRepBizPartnerBalCus) {
+                new SDialogRepBizPartnerBalance(miClient, SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
             }
-            else if (item == jmiRepDpsPaymentCus) {
+            else if (item == jmiRepBizPartnerBalSup) {
+                new SDialogRepBizPartnerBalance(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
+            }
+            else if (item == jmiRepBizPartnerBalDbr) {
+                new SDialogRepBizPartnerBalance(miClient, SDataConstantsSys.BPSS_CT_BP_DBR).setVisible(true);
+            }
+            else if (item == jmiRepBizPartnerBalCdr) {
+                new SDialogRepBizPartnerBalance(miClient, SDataConstantsSys.BPSS_CT_BP_CDR).setVisible(true);
+            }
+            else if (item == jmiRepBizPartnerBalDpsCus) {
+                new SDialogRepBizPartnerBalanceDps(miClient, SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
+            }
+            else if (item == jmiRepBizPartnerBalDpsSup) {
+                new SDialogRepBizPartnerBalanceDps(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
+            }
+            else if (item == jmiRepBizPartnerBalAgingCus) {
+                new SDialogRepBizPartnerBalanceAging(miClient, SDataRepConstants.REP_ACC_AGI + " " + SBpsUtils.getBizPartnerCategoryName(SModSysConsts.BPSS_CT_BP_CUS, SUtilConsts.NUM_PLR).toLowerCase(), SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
+            }
+            else if (item == jmiRepBizPartnerBalAgingSup) {
+                new SDialogRepBizPartnerBalanceAging(miClient, SDataRepConstants.REP_ACC_AGI + " " + SBpsUtils.getBizPartnerCategoryName(SModSysConsts.BPSS_CT_BP_SUP, SUtilConsts.NUM_PLR).toLowerCase(), SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
+            }
+            else if (item == jmiRepBizPartnerStatCus) {
+                new SDialogRepBizPartnerStatement(miClient, SDataRepConstants.REP_STA + " " + SBpsUtils.getBizPartnerCategoryName(SModSysConsts.BPSS_CT_BP_CUS, SUtilConsts.NUM_PLR).toLowerCase(), SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
+            }
+            else if (item == jmiRepBizPartnerStatSup) {
+                new SDialogRepBizPartnerStatement(miClient, SDataRepConstants.REP_STA + " " + SBpsUtils.getBizPartnerCategoryName(SModSysConsts.BPSS_CT_BP_SUP, SUtilConsts.NUM_PLR).toLowerCase(), SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
+            }
+            else if (item == jmiRepBizPartnerStatDbr) {
+                new SDialogRepBizPartnerStatement(miClient, SDataRepConstants.REP_STA + " " + SBpsUtils.getBizPartnerCategoryName(SModSysConsts.BPSS_CT_BP_DBR, SUtilConsts.NUM_PLR).toLowerCase(), SDataConstantsSys.BPSS_CT_BP_DBR).setVisible(true);
+            }
+            else if (item == jmiRepBizPartnerStatCdr) {
+                new SDialogRepBizPartnerStatement(miClient, SDataRepConstants.REP_STA + " " + SBpsUtils.getBizPartnerCategoryName(SModSysConsts.BPSS_CT_BP_CDR, SUtilConsts.NUM_PLR).toLowerCase(), SDataConstantsSys.BPSS_CT_BP_CDR).setVisible(true);
+            }
+            else if (item == jmiRepBizPartnerAccMovsCus) {
+                new SDialogRepBizPartnerAccountingMoves(miClient, SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
+            }
+            else if (item == jmiRepBizPartnerAccMovsSup) {
+                new SDialogRepBizPartnerAccountingMoves(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
+            }
+            else if (item == jmiRepBizPartnerLedgerCus) {
+                new SDialogRepBizPartnerJournal(miClient, SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
+            }
+            else if (item == jmiRepBizPartnerLedgerSup) {
+                new SDialogRepBizPartnerJournal(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
+            }
+            else if (item == jmiRepBizPartnerLedgerDbr) {
+                new SDialogRepBizPartnerJournal(miClient, SDataConstantsSys.BPSS_CT_BP_DBR).setVisible(true);
+            }
+            else if (item == jmiRepBizPartnerLedgerCdr) {
+                new SDialogRepBizPartnerJournal(miClient, SDataConstantsSys.BPSS_CT_BP_CDR).setVisible(true);
+            }
+            else if (item == jmiRepAccMovsTax) {
+                new SDialogRepTaxesMoves(miClient).setFormVisible(true);
+            }
+            else if (item == jmiRepAccMovsProfitLoss) {
+                new SDialogRepFinMov(miClient, new Object[] { new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS, SDataConstantsSys.FINS_TP_ACC_SYS_NA } , SDataConstants.UNDEFINED }).setVisible(true);
+            }
+            else if (item == jmiRepCashFlowPaysCus) {
                 new SDialogRepDpsPayment(miClient, SDataConstantsSys.TRNS_CT_DPS_SAL).setVisible(true);
             }
-            else if (item == jmiDpsPaymentSup) {
-                showView(SDataConstants.TRNX_DPS_PAYS, SDataConstantsSys.TRNS_CT_DPS_PUR, SUtilConsts.QRY_SUM);
+            else if (item == jmiRepCashFlowPaysSup) {
+                new SDialogRepDpsPayment(miClient, SDataConstantsSys.TRNS_CT_DPS_PUR).setVisible(true);
             }
-            else if (item == jmiDpsPaymentSupDetail) {
-                showView(SDataConstants.TRNX_DPS_PAYS, SDataConstantsSys.TRNS_CT_DPS_PUR, SUtilConsts.QRY_DET);
-            }
-            else if (item == jmiDpsPaymentCus) {
+            else if (item == jmiQryCashFlowPaysCusSum) {
                 showView(SDataConstants.TRNX_DPS_PAYS, SDataConstantsSys.TRNS_CT_DPS_SAL, SUtilConsts.QRY_SUM);
             }
-            else if (item == jmiDpsPaymentCusDetail) {
+            else if (item == jmiQryCashFlowPaysCusDet) {
                 showView(SDataConstants.TRNX_DPS_PAYS, SDataConstantsSys.TRNS_CT_DPS_SAL, SUtilConsts.QRY_DET);
             }
-            else if (item == jmiRepIncomeExpenseDue){
-                new SDialogRepIncomeExpenseDue(miClient.getSession().getClient(), SModConsts.FINR_INC_EXP_DUE, "Reporte de ingresos y egresos esperados por periodo").setVisible(true);
-            } 
-            else if (item == jmiRepFinanceRecords) {
-                moDialogRepRecords.formRefreshCatalogues();
-                moDialogRepRecords.formReset();
-                moDialogRepRecords.setFormVisible(true);
+            else if (item == jmiQryCashFlowPaysSupSum) {
+                showView(SDataConstants.TRNX_DPS_PAYS, SDataConstantsSys.TRNS_CT_DPS_PUR, SUtilConsts.QRY_SUM);
+            }
+            else if (item == jmiQryCashFlowPaysSupDet) {
+                showView(SDataConstants.TRNX_DPS_PAYS, SDataConstantsSys.TRNS_CT_DPS_PUR, SUtilConsts.QRY_DET);
+            }
+            else if (item == jmiRepCashFlowExpected){
+                new SDialogRepCashFlowExpected(miClient.getSession().getClient(), SModConsts.FINR_CSH_FLW_EXP, SDataRepConstants.REP_CSH_FLW_EXP).setVisible(true);
             }
             else if (item == jmiRepLedgerAccount) {
-                /*
-                moDialogRepAccountingAux.formRefreshCatalogues();
-                moDialogRepAccountingAux.formReset();
-                moDialogRepAccountingAux.setFormVisible(true);
-                */
                 new SDialogRepAuxAccounting(miClient).setVisible(true);
             }
             else if (item == jmiRepLedgerCostCenter) {
-                /*
-                moDialogRepAccountCostCenter.formRefreshCatalogues();
-                moDialogRepAccountCostCenter.formReset();
-                moDialogRepAccountCostCenter.setFormVisible(true);
-                */
                 new SDialogRepTrialBalanceDual(miClient, SDataConstants.FIN_CC, true).setVisible(true);
             }
-            else if (item == jmiRepConceptAdminstrative) {
-                moDialogRepAccountConcept.setParamIsConceptAdministrative(true);
-                moDialogRepAccountConcept.formRefreshCatalogues();
-                moDialogRepAccountConcept.formReset();
-                moDialogRepAccountConcept.setFormVisible(true);
+            else if (item == jmiRepConceptAdmin) {
+                new SDialogRepAccountConcept(miClient, SDataConstants.FINU_TP_ADM_CPT).setVisible(true);
             }
-            else if (item == jmiRepConceptTaxable) {
-                moDialogRepAccountConcept.setParamIsConceptAdministrative(false);
-                moDialogRepAccountConcept.formRefreshCatalogues();
-                moDialogRepAccountConcept.formReset();
-                moDialogRepAccountConcept.setFormVisible(true);
+            else if (item == jmiRepConceptTax) {
+                new SDialogRepAccountConcept(miClient, SDataConstants.FINU_TP_TAX_CPT).setVisible(true);
+            }
+            else if (item == jmiRepPrtJournalVouchers) {
+                new SDialogRepRecords(miClient).setVisible(true);
+            }
+            else if (item == jmiRepPrtChartOfAccounts) {
+                new SDialogRepAccount(miClient).setVisible(true);
             }
             else if (item == jmiRepTaxesByConcept) {
-                moDialogRepTaxesByConcept.formRefreshCatalogues();
-                moDialogRepTaxesByConcept.formReset();
-                moDialogRepTaxesByConcept.setFormVisible(true);
+                new SDialogRepTaxesByConcept(miClient).setVisible(true);
             }
-            else if (item == jmiRepFisTaxPendingPur) {
-                SDialogReportTaxPending dialog = new SDialogReportTaxPending(miClient.getSession().getClient(), SModSysConsts.TRNS_CT_DPS_PUR, "Impuestos pendientes de egresos");
-                dialog.setVisible(true);
+            else if (item == jmiRepFiscalTaxPendSal) {
+                new SDialogReportTaxPending(miClient.getSession().getClient(), SModSysConsts.TRNS_CT_DPS_SAL, SDataRepConstants.REP_TAX_PND_SAL).setVisible(true);
             }
-            else if (item == jmiRepFisTaxPendingSal) {
-                SDialogReportTaxPending dialog = new SDialogReportTaxPending(miClient.getSession().getClient(), SModSysConsts.TRNS_CT_DPS_SAL, "Impuestos pendientes de ingresos");
-                dialog.setVisible(true);
+            else if (item == jmiRepFiscalTaxPendPur) {
+                new SDialogReportTaxPending(miClient.getSession().getClient(), SModSysConsts.TRNS_CT_DPS_PUR, SDataRepConstants.REP_TAX_PND_PUR).setVisible(true);
             }
-            else if (item == jmiRepFisXmlFile) {
-                SDialogFiscalXmlFile dialog = new SDialogFiscalXmlFile(miClient.getSession().getClient(), "Archivos contabilidad electrónica");
-                dialog.initForm();
-                dialog.setVisible(true);
+            else if (item == jmiRepFiscalXmlFiles) {
+                new SDialogFiscalXmlFile(miClient.getSession().getClient(), SDataRepConstants.REP_XML_FIL).setVisible(true);
             }
-            else if (item == jmiRepFisMonthlyReportCfd) {
-                moDialogRepDpsMonthlyReportCfd.resetForm();
-                moDialogRepDpsMonthlyReportCfd.setVisible(true);
+            else if (item == jmiRepFiscalMonthRepCfd) {
+                new SDialogRepDpsMonthReport(miClient, SDialogRepDpsMonthReport.CFD).setVisible(true);
             }
-            else if (item == jmiRepFisMonthlyReportCf) {
-                moDialogRepDpsMonthlyReportCf.resetForm();
-                moDialogRepDpsMonthlyReportCf.setVisible(true);
+            else if (item == jmiRepFiscalMonthRepCf) {
+                new SDialogRepDpsMonthReport(miClient, SDialogRepDpsMonthReport.CF).setVisible(true);
             }
             else if (item == jmiCfgAbpEntityCash) {
                 miClient.getSession().showView(SModConsts.FIN_ABP_ENT, SModSysConsts.CFGS_CT_ENT_CASH, null);

@@ -617,7 +617,7 @@ public class SModuleFin extends SGuiModule {
         SGuiReport guiReport = null;
 
         switch (type) {
-            case SModConsts.FINR_INC_EXP_DUE:
+            case SModConsts.FINR_CSH_FLW_EXP:
                 guiReport = new SGuiReport("reps/fin_inc_exp_due.jasper", "Reporte de ingresos y egresos esperados por periodo");
                 break;
             case SModConsts.FINR_DPS_TAX_PEND:

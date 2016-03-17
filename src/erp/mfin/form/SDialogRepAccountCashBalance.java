@@ -1,17 +1,11 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * SDialogRepBalanceSheet.java
+ * SDialogRepAccountCashBalance.java
  *
  * Created on 29/06/2010, 05:02:26 PM
  */
 
 package erp.mfin.form;
 
-import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
@@ -37,11 +31,9 @@ public class SDialogRepAccountCashBalance extends javax.swing.JDialog implements
 
     private erp.client.SClientInterface miClient;
     private erp.lib.form.SFormField moFieldDate;
-    private erp.lib.form.SFormField moFieldCurrencyId;
-    private erp.lib.form.SFormField moFieldExchangeRate;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
 
-    /** Creates new form SDialogRepBalanceSheet */
+    /** Creates new form SDialogRepAccountCashBalance */
     public SDialogRepAccountCashBalance(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
@@ -71,7 +63,7 @@ public class SDialogRepAccountCashBalance extends javax.swing.JDialog implements
         jpClose = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Reporte de saldos de cuentas de efectivo");
+        setTitle("Saldos de cuentas de dinero");
         setResizable(false);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
@@ -137,8 +129,8 @@ public class SDialogRepAccountCashBalance extends javax.swing.JDialog implements
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-400)/2, (screenSize.height-267)/2, 400, 267);
+        setSize(new java.awt.Dimension(400, 267));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jpPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jpPrintActionPerformed
@@ -208,10 +200,11 @@ public class SDialogRepAccountCashBalance extends javax.swing.JDialog implements
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
             map = miClient.createReportParams();
-            map.put("sSql", createParamSql());
+            map.put("sTitle", getTitle().toUpperCase());
             map.put("nCurrencyLocal", miClient.getSessionXXX().getParamsErp().getFkCurrencyId());
             map.put("sCurrencyLocalKey", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
             map.put("tDt", moFieldDate.getDate());
+            map.put("sSql", createParamSql());
 
             jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_FIN_ACC_CASH_BAL, map);
             jasperViewer = new JasperViewer(jasperPrint, false);
@@ -228,10 +221,6 @@ public class SDialogRepAccountCashBalance extends javax.swing.JDialog implements
 
     private void actionDate() {
         miClient.getGuiDatePickerXXX().pickDate(moFieldDate.getDate(), moFieldDate);
-    }
-
-    private void actionCurrencyId() {
-        miClient.pickOption(SDataConstants.CFGU_CUR, moFieldCurrencyId, null);
     }
 
     public void actionPrint() {

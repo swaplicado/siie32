@@ -103,6 +103,9 @@
                           <Dimension value="[320, 23]"/>
                         </Property>
                       </Properties>
+                      <AuxValues>
+                        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+                      </AuxValues>
                     </Component>
                     <Component class="javax.swing.JButton" name="jbPkItemId">
                       <Properties>
@@ -157,6 +160,9 @@
                           <Dimension value="[320, 23]"/>
                         </Property>
                       </Properties>
+                      <AuxValues>
+                        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+                      </AuxValues>
                     </Component>
                     <Component class="javax.swing.JButton" name="jbPkUnitId">
                       <Properties>
@@ -211,6 +217,9 @@
                           <Dimension value="[320, 23]"/>
                         </Property>
                       </Properties>
+                      <AuxValues>
+                        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+                      </AuxValues>
                     </Component>
                     <Component class="javax.swing.JButton" name="jbPkCompanyBranchId">
                       <Properties>
@@ -255,6 +264,9 @@
                           <Dimension value="[320, 23]"/>
                         </Property>
                       </Properties>
+                      <AuxValues>
+                        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+                      </AuxValues>
                     </Component>
                     <Component class="javax.swing.JButton" name="jbPkWarehouseId">
                       <Properties>

@@ -11,26 +11,23 @@
 
 package erp.mtrn.form;
 
+import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
+import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
+import erp.lib.form.SFormComponentItem;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.AbstractAction;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.view.*;
-import net.sf.jasperreports.view.save.JRPdfSaveContributor.*;
-import net.sf.jasperreports.view.JRViewer.*;
-import net.sf.jasperreports.view.save.JRMultipleSheetsXlsSaveContributor.*;
-
-import erp.data.SDataConstants;
-import erp.data.SDataConstantsSys;
-import erp.data.SDataUtilities;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormUtilities;
-import erp.lib.form.SFormValidation;
-import erp.lib.SLibConstants;
-import erp.lib.SLibUtilities;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -85,19 +82,19 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
         jbDate = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
         jlCompanyBranch = new javax.swing.JLabel();
-        jcbCompanyBranch = new javax.swing.JComboBox();
+        jcbCompanyBranch = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel5 = new javax.swing.JPanel();
         jlBizArea = new javax.swing.JLabel();
-        jcbBizArea = new javax.swing.JComboBox();
+        jcbBizArea = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel7 = new javax.swing.JPanel();
         jlBizPartner = new javax.swing.JLabel();
-        jcbBizPartner = new javax.swing.JComboBox();
+        jcbBizPartner = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel8 = new javax.swing.JPanel();
         jlAgent = new javax.swing.JLabel();
-        jcbAgent = new javax.swing.JComboBox();
+        jcbAgent = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel9 = new javax.swing.JPanel();
         jlRoute = new javax.swing.JLabel();
-        jcbRoute = new javax.swing.JComboBox();
+        jcbRoute = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel10 = new javax.swing.JPanel();
         jrbByLocalCurrency = new javax.swing.JRadioButton();
         jrbByDpsCurrency = new javax.swing.JRadioButton();
@@ -227,8 +224,8 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-450)/2, (screenSize.height-350)/2, 450, 350);
+        setSize(new java.awt.Dimension(450, 350));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -376,11 +373,11 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
     private javax.swing.JButton jbDate;
     private javax.swing.JButton jbExit;
     private javax.swing.JButton jbPrint;
-    private javax.swing.JComboBox jcbAgent;
-    private javax.swing.JComboBox jcbBizArea;
-    private javax.swing.JComboBox jcbBizPartner;
-    private javax.swing.JComboBox jcbCompanyBranch;
-    private javax.swing.JComboBox jcbRoute;
+    private javax.swing.JComboBox<SFormComponentItem> jcbAgent;
+    private javax.swing.JComboBox<SFormComponentItem> jcbBizArea;
+    private javax.swing.JComboBox<SFormComponentItem> jcbBizPartner;
+    private javax.swing.JComboBox<SFormComponentItem> jcbCompanyBranch;
+    private javax.swing.JComboBox<SFormComponentItem> jcbRoute;
     private javax.swing.JFormattedTextField jftDate;
     private javax.swing.JLabel jlAgent;
     private javax.swing.JLabel jlBizArea;

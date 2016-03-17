@@ -11,30 +11,26 @@
 
 package erp.mfin.form;
 
+import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
+import erp.lib.SLibConstants;
+import erp.lib.SLibTimeUtilities;
+import erp.lib.SLibUtilities;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.AbstractAction;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.view.*;
-import net.sf.jasperreports.view.save.JRPdfSaveContributor.*;
-import net.sf.jasperreports.view.JRViewer.*;
-import net.sf.jasperreports.view.save.JRMultipleSheetsXlsSaveContributor.*;
-
-import erp.data.SDataConstantsSys;
-import erp.data.SDataUtilities;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormUtilities;
-import erp.lib.form.SFormValidation;
-import erp.lib.SLibConstants;
-import erp.lib.SLibTimeUtilities;
-import erp.lib.SLibUtilities;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
 public class SDialogRepTaxesByConcept extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -56,6 +52,9 @@ public class SDialogRepTaxesByConcept extends javax.swing.JDialog implements erp
 
         initComponents();
         initComponentsExtra();
+        
+        formRefreshCatalogues();
+        formReset();
     }
 
     /** This method is called from within the constructor to

@@ -12,6 +12,7 @@ package erp.mtrn.form;
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.form.SFormComboBoxGroup;
+import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
@@ -76,16 +77,16 @@ public class SFormSystemNotes extends javax.swing.JDialog implements erp.lib.for
         jPanel3 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jlFkCategoryId = new javax.swing.JLabel();
-        jcbFkCategoryId = new javax.swing.JComboBox();
+        jcbFkCategoryId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel7 = new javax.swing.JPanel();
         jlFkClassId = new javax.swing.JLabel();
-        jcbFkClassId = new javax.swing.JComboBox();
+        jcbFkClassId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel8 = new javax.swing.JPanel();
         jlFkTypeId = new javax.swing.JLabel();
-        jcbFkTypeId = new javax.swing.JComboBox();
+        jcbFkTypeId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel10 = new javax.swing.JPanel();
         jlFkCurrencyId = new javax.swing.JLabel();
-        jcbFkCurrencyId = new javax.swing.JComboBox();
+        jcbFkCurrencyId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel9 = new javax.swing.JPanel();
         jckIsAutomatic = new javax.swing.JCheckBox();
         jckIsPrintable = new javax.swing.JCheckBox();
@@ -208,8 +209,8 @@ public class SFormSystemNotes extends javax.swing.JDialog implements erp.lib.for
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.NORTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-656)/2, (screenSize.height-388)/2, 656, 388);
+        setSize(new java.awt.Dimension(656, 388));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -302,10 +303,10 @@ public class SFormSystemNotes extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
-    private javax.swing.JComboBox jcbFkCategoryId;
-    private javax.swing.JComboBox jcbFkClassId;
-    private javax.swing.JComboBox jcbFkCurrencyId;
-    private javax.swing.JComboBox jcbFkTypeId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkCategoryId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkClassId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkCurrencyId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkTypeId;
     private javax.swing.JCheckBox jckIsAutomatic;
     private javax.swing.JCheckBox jckIsDeleted;
     private javax.swing.JCheckBox jckIsPrintable;

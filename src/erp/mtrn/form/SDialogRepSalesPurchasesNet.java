@@ -17,6 +17,7 @@ import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
+import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
@@ -26,8 +27,8 @@ import java.awt.event.KeyEvent;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.AbstractAction;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.view.*;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -86,7 +87,7 @@ public class SDialogRepSalesPurchasesNet extends javax.swing.JDialog implements 
         jPanel7 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         jlCompanyBranch = new javax.swing.JLabel();
-        jcbCompanyBranch = new javax.swing.JComboBox();
+        jcbCompanyBranch = new javax.swing.JComboBox<SFormComponentItem>();
         jrbBySummary = new javax.swing.JRadioButton();
         jrbByDetail = new javax.swing.JRadioButton();
         jckWithoutRelatedParty = new javax.swing.JCheckBox();
@@ -195,8 +196,8 @@ public class SDialogRepSalesPurchasesNet extends javax.swing.JDialog implements 
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-400)/2, (screenSize.height-300)/2, 400, 300);
+        setSize(new java.awt.Dimension(400, 300));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -348,7 +349,7 @@ public class SDialogRepSalesPurchasesNet extends javax.swing.JDialog implements 
     private javax.swing.JButton jbDateInitial;
     private javax.swing.JButton jbExit;
     private javax.swing.JButton jbPrint;
-    private javax.swing.JComboBox jcbCompanyBranch;
+    private javax.swing.JComboBox<SFormComponentItem> jcbCompanyBranch;
     private javax.swing.JCheckBox jckWithoutRelatedParty;
     private javax.swing.JFormattedTextField jftDateEnd;
     private javax.swing.JFormattedTextField jftDateInitial;

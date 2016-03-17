@@ -11,23 +11,23 @@
 
 package erp.mfin.form;
 
+import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
+import erp.data.SProcConstants;
+import erp.lib.SLibConstants;
+import erp.lib.form.SFormComponentItem;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
+import erp.mbps.form.SDialogPickerCompanyBranchEntity;
+import erp.mfin.data.SDataCheck;
+import erp.mfin.data.SDataCheckWallet;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
-
-import erp.data.SDataConstants;
-import erp.data.SDataConstantsSys;
-import erp.data.SDataUtilities;
-import erp.data.SProcConstants;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormValidation;
-import erp.lib.form.SFormUtilities;
-import erp.lib.SLibConstants;
-import erp.mbps.form.SDialogPickerCompanyBranchEntity;
-import erp.mfin.data.SDataCheck;
-import erp.mfin.data.SDataCheckWallet;
 
 /**
  *
@@ -75,7 +75,7 @@ public class SFormCheckAnnuled extends javax.swing.JDialog implements erp.lib.fo
         jPanel3 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jlPkCheckWalletId = new javax.swing.JLabel();
-        jcbPkCheckWalletId = new javax.swing.JComboBox();
+        jcbPkCheckWalletId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel7 = new javax.swing.JPanel();
         jlDate = new javax.swing.JLabel();
         jftDate = new javax.swing.JFormattedTextField();
@@ -168,8 +168,8 @@ public class SFormCheckAnnuled extends javax.swing.JDialog implements erp.lib.fo
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-408)/2, (screenSize.height-284)/2, 408, 284);
+        setSize(new java.awt.Dimension(408, 284));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jcbPkCheckWalletIdItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbPkCheckWalletIdItemStateChanged
@@ -317,7 +317,7 @@ public class SFormCheckAnnuled extends javax.swing.JDialog implements erp.lib.fo
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbDate;
     private javax.swing.JButton jbOk;
-    private javax.swing.JComboBox jcbPkCheckWalletId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbPkCheckWalletId;
     private javax.swing.JFormattedTextField jftDate;
     private javax.swing.JLabel jlDate;
     private javax.swing.JLabel jlNumber;

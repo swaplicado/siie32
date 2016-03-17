@@ -16,6 +16,7 @@ import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.data.SProcConstants;
 import erp.lib.SLibConstants;
+import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
@@ -78,11 +79,11 @@ public class SFormDncCompanyBranchEntity extends javax.swing.JDialog implements 
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jlPkCompanyBranchId = new javax.swing.JLabel();
-        jcbPkCompanyBranchId = new javax.swing.JComboBox();
+        jcbPkCompanyBranchId = new javax.swing.JComboBox<SFormComponentItem>();
         jlPkEntityId = new javax.swing.JLabel();
-        jcbPkEntityId = new javax.swing.JComboBox();
+        jcbPkEntityId = new javax.swing.JComboBox<SFormComponentItem>();
         jlPkDocNumberingCenterId = new javax.swing.JLabel();
-        jcbPkDocNumberingCenterId = new javax.swing.JComboBox();
+        jcbPkDocNumberingCenterId = new javax.swing.JComboBox<SFormComponentItem>();
         jckIsDeleted = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -146,8 +147,8 @@ public class SFormDncCompanyBranchEntity extends javax.swing.JDialog implements 
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-400)/2, (screenSize.height-300)/2, 400, 300);
+        setSize(new java.awt.Dimension(400, 300));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -262,9 +263,9 @@ public class SFormDncCompanyBranchEntity extends javax.swing.JDialog implements 
     private javax.swing.JPanel jPanel3;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
-    private javax.swing.JComboBox jcbPkCompanyBranchId;
-    private javax.swing.JComboBox jcbPkDocNumberingCenterId;
-    private javax.swing.JComboBox jcbPkEntityId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbPkCompanyBranchId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbPkDocNumberingCenterId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbPkEntityId;
     private javax.swing.JCheckBox jckIsDeleted;
     private javax.swing.JLabel jlPkCompanyBranchId;
     private javax.swing.JLabel jlPkDocNumberingCenterId;
