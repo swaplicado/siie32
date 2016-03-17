@@ -960,7 +960,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
     }
     
     private void actionLoadLayoutPath() {
-        miClient.getFileChooser().setSelectedFile(new File(((SClientInterface) miClient).getSessionXXX().getFormatters().getFileNameDatetimeFormat().format(new java.util.Date()) + " " + (moKeyBankLayoutType.getSelectedIndex() <= 0 ? "" : moKeyBankLayoutType.getSelectedItem().getItem().toLowerCase()) + ".txt"));
+        miClient.getFileChooser().setSelectedFile(new File(((SClientInterface) miClient).getSessionXXX().getFormatters().getFileNameDatetimeFormat().format(new java.util.Date()) + " " + (moKeyBankLayoutType.getSelectedIndex() <= 0 ? "" : SLibUtils.textToAscii(moKeyBankLayoutType.getSelectedItem().getItem().toLowerCase())) + ".txt"));
         if (miClient.getFileChooser().showSaveDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
             moTextLayoutPath.setValue(miClient.getFileChooser().getSelectedFile().getAbsolutePath());
         }

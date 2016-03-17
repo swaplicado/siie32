@@ -53,7 +53,7 @@ public class ImportPayrolls extends javax.swing.JFrame {
         jpbProgress = new javax.swing.JProgressBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Importar pólizas contables");
+        setTitle("Importar nóminas SIIE 1.0");
 
         jlDateImport.setText("Fecha de corte:");
         jlDateImport.setPreferredSize(new java.awt.Dimension(100, 20));
@@ -121,11 +121,12 @@ public class ImportPayrolls extends javax.swing.JFrame {
         moDbMySql = new SDataDatabase(SLibConstants.DBMS_MY_SQL);
 
         //   2015-10-23
-        moDbMySql.connect("192.168.1.19", "3306", "erp_pbas2", "root", "msroot");
+        moDbMySql.connect("192.168.1.19", "3306", "erp_otsa", "root", "msroot");
+        //moDbMySql.connect("localhost", "3306", "erp_otsa", "root", "msroot");
         moDbSqlServer = new SDataDatabase(SLibConstants.DBMS_SQL_SERVER_2005);
-        moDbSqlServer.connect("localhost\\SQLEXPRESS", "", "Pruebas", "jbarajas", "1120");
+        moDbSqlServer.connect("localhost\\SQLEXPRESS", "", "OpTron", "sa", "1120");
 
-        jftDateImport.setText("31/12/2007");
+        jftDateImport.setText("31/12/2015");
     }
     
     private int getBizPartnerId(java.sql.Statement stMySql, int empleado) throws java.lang.Exception {
@@ -472,7 +473,7 @@ public class ImportPayrolls extends javax.swing.JFrame {
                             (nPeriodoPago == 1 ? "1.1667" : "1") + ", " + nDiasNomina + ", " + nDiasLaborables + ", " + nDiasLaborados + ", 0, 0, 0, 0, " + nDiasNoLaboradosPagados + ", " + nDiasNoLaboradosNoPagados + ", " + (nDiasNoLaboradosPagados + nDiasNoLaboradosNoPagados) + ", " +
                             nDiasLaborados + ", " + rsSqlServerReceipt.getDouble("dias_pagados") + ", 0, 0, 0, 0, 0, 0, 0, " + dImpuestoTeorico + ", " + dImpuestoTeorico + ", " + dCreditoSalTeorico + ", " + dCreditoSalTeorico + ", 0, 0, " + rsSqlServerReceipt.getDouble("impuesto_acumulado") + ", 0, " +
                             rsSqlServerReceipt.getDouble("credito_sal_acumulado") + ", 0, " + rsSqlServerReceipt.getBoolean("es_reg_activo") + ", " + rsSqlServerReceipt.getBoolean("es_con_septimo") + ", 0, 0, " + rsSqlServerReceipt.getInt("fid_periodo_pago_tp") + ", " + (nTipoSalario == 0 ? "1" : nTipoSalario) + ", " +
-                            (rsSqlServerReceipt.getInt("fid_empleado_tp") + 1) + ", " + rsSqlServerReceipt.getInt("fid_empleado_cat") + ", " + rsSqlServerReceipt.getInt("fid_area_salario") + ", " + rsSqlServerReceipt.getInt("fid_departamento") + ", " + nEmployeePosition + ", " + nEmployeeShift + ", 2, 5, " + 
+                            (rsSqlServerReceipt.getInt("fid_empleado_tp") + 1) + ", " + rsSqlServerReceipt.getInt("fid_empleado_cat") + ", " + rsSqlServerReceipt.getInt("fid_area_salario") + ", " + (rsSqlServerReceipt.getInt("fid_departamento") + 1) + ", " + nEmployeePosition + ", " + nEmployeeShift + ", 2, 5, " + 
                             "1, 1, NOW(), NOW()); ";
                     
                     stMySql.execute(sSql);

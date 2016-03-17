@@ -181,7 +181,7 @@ public class SDbBankLayout extends SDbRegistryUser {
         resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next()) {
             layout = resultSet.getInt(1);
-            layoutTitle = resultSet.getString(2);
+            layoutTitle = SLibUtils.textToAscii(resultSet.getString(2));
             layoutBank = resultSet.getInt(3);
         }
         

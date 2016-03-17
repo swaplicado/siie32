@@ -644,6 +644,7 @@ public abstract class SModConsts {
     public static final int HRSR_PAY_TAX = 2065031;
     public static final int HRSR_LIST_EAR = 2065041;
     public static final int HRSR_LIST_DED = 2065042;
+    public static final int HRSR_WAGE_SAL = 2065051;
 
     public static final HashMap<Integer, String> TablesMap = new HashMap<Integer, String>();
 
