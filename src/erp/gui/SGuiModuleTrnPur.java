@@ -131,6 +131,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenu jmRep;
     private javax.swing.JMenu jmRepStats;
     private javax.swing.JMenu jmRepBackorder;
+    private javax.swing.JMenu jmRepQueries;
     private javax.swing.JMenuItem jmiRepTrnGlobal;
     private javax.swing.JMenuItem jmiRepTrnByMonth;
     private javax.swing.JMenuItem jmiRepTrnByItemGeneric;
@@ -150,7 +151,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiRepBackorderOrderByItem;
     private javax.swing.JMenuItem jmiRepBackorderOrderByItemBizPartner;
     private javax.swing.JMenuItem jmiRepBackorderOrderByItemBizPartnerBra;
-    private javax.swing.JMenuItem jmiRepBizPartnerBalanceAgingView;
+    private javax.swing.JMenuItem jmiQryBizPartnerBalance;
+    private javax.swing.JMenuItem jmiQryBizPartnerAccountsAging;
     private javax.swing.JMenuItem jmiRepBizPartnerBalance;
     private javax.swing.JMenuItem jmiRepBizPartnerBalanceDps;
     private javax.swing.JMenuItem jmiRepBizPartnerBalanceAging;
@@ -382,6 +384,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
 
         jmRep = new JMenu("Reportes");
         jmRepStats = new JMenu("Consultas de estadísticas de compras");
+        jmRepQueries = new JMenu("Consultas de saldos de proveedores");
         jmiRepTrnGlobal = new JMenuItem("Compras globales");
         jmiRepTrnByMonth = new JMenuItem("Compras globales por mes");
         jmiRepTrnByItemGeneric = new JMenuItem("Compras por ítem genérico");
@@ -402,7 +405,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepBackorderOrderByItem = new JMenuItem("Backorder de pedidos por ítem");
         jmiRepBackorderOrderByItemBizPartner = new JMenuItem("Backorder de pedidos por ítem-proveedor");
         jmiRepBackorderOrderByItemBizPartnerBra = new JMenuItem("Backorder de pedidos por ítem-proveedor sucursal");
-        jmiRepBizPartnerBalanceAgingView = new JMenuItem("Consulta de antigüedad de saldos de proveedores");
+        jmiQryBizPartnerBalance = new JMenuItem("Consulta de saldos de proveedores");
+        jmiQryBizPartnerAccountsAging = new JMenuItem("Consulta de antigüedad de saldos de proveedores");
         jmiRepBizPartnerBalance = new JMenuItem("Saldos proveedores...");
         jmiRepBizPartnerBalanceDps = new JMenuItem("Saldos proveedores por documento...");
         jmiRepBizPartnerBalanceAging = new JMenuItem("Antigüedad de saldos de proveedores...");
@@ -451,10 +455,12 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmRepBackorder.add(jmiRepBackorderOrderByItem);
         jmRepBackorder.add(jmiRepBackorderOrderByItemBizPartner);
         jmRepBackorder.add(jmiRepBackorderOrderByItemBizPartnerBra);
+        jmRepQueries.add(jmiQryBizPartnerBalance);
+        jmRepQueries.add(jmiQryBizPartnerAccountsAging);
 
         jmRep.add(jmRepStats);
         jmRep.add(jmRepBackorder);
-        jmRep.add(jmiRepBizPartnerBalanceAgingView);
+        jmRep.add(jmRepQueries);
         jmRep.addSeparator();
         jmRep.add(jmiRepBizPartnerBalance);
         jmRep.add(jmiRepBizPartnerBalanceDps);
@@ -580,7 +586,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepBackorderOrderByItem.addActionListener(this);
         jmiRepBackorderOrderByItemBizPartner.addActionListener(this);
         jmiRepBackorderOrderByItemBizPartnerBra.addActionListener(this);
-        jmiRepBizPartnerBalanceAgingView.addActionListener(this);
+        jmiQryBizPartnerBalance.addActionListener(this);
+        jmiQryBizPartnerAccountsAging.addActionListener(this);
         jmiRepBizPartnerBalance.addActionListener(this);
         jmiRepBizPartnerBalanceDps.addActionListener(this);
         jmiRepBizPartnerBalanceAging.addActionListener(this);
@@ -1459,7 +1466,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiRepBackorderOrderByItemBizPartnerBra) {
                 showView(SDataConstants.TRNX_DPS_BACKORDER, SDataConstantsSys.TRNX_PUR_BACKORDER_ORD_ITEM_BP_BRA, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]);
             }
-            else if (item == jmiRepBizPartnerBalanceAgingView) {
+            else if (item == jmiQryBizPartnerBalance) {
+                miClient.getGuiModule(SDataConstants.MOD_FIN).showView(SDataConstants.FINX_ACCOUNTING, SDataConstantsSys.FINS_TP_ACC_SYS_SUP);
+            }
+            else if (item == jmiQryBizPartnerAccountsAging) {
                 showView(SDataConstants.TRNX_DPS_BAL_AGING, SDataConstantsSys.TRNS_CT_DPS_PUR);
             }
             else if (item == jmiRepBizPartnerBalance) {

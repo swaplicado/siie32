@@ -14,12 +14,14 @@ package erp.mfin.form;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
+import erp.gui.SGuiUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsConsts;
 import erp.mod.bps.db.SBpsUtils;
@@ -30,7 +32,6 @@ import java.awt.event.KeyEvent;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JRadioButton;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
@@ -80,7 +81,7 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        bgReportType = new javax.swing.ButtonGroup();
+        bgType = new javax.swing.ButtonGroup();
         jPanel2 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
@@ -133,10 +134,12 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
         jlType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel9.add(jlType);
 
+        bgType.add(jrbTypeDateCutoff);
         jrbTypeDateCutoff.setText("Saldos al corte");
         jrbTypeDateCutoff.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel9.add(jrbTypeDateCutoff);
 
+        bgType.add(jrbTypePeriod);
         jrbTypePeriod.setText("Saldos por período");
         jrbTypePeriod.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel9.add(jrbTypePeriod);
@@ -350,7 +353,7 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
         }
     }
 
-    private void print() {
+    private void computeReport() {
         Cursor cursor = getCursor();
         Map<String, Object> map = null;
         JasperPrint jasperPrint = null;
@@ -378,15 +381,15 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
                 map.put("sTitle", getTitle().toUpperCase());
                 map.put("sBizPartner", msBizPartnerCatSng.toUpperCase() + ": " + (jcbBizPartner.getSelectedIndex() <= 0 ? SUtilConsts.ALL : jcbBizPartner.getSelectedItem().toString()));
                 map.put("sSalesAgent", jcbSalesAgent.getSelectedIndex() <= 0 ? "" : SBpsConsts.BPS_ATT_SAL_AGT.toUpperCase() + ": " + jcbSalesAgent.getSelectedItem().toString());
-                map.put("sCurrency", miClient.getSession().getSessionCustom().getLocalCurrency());
+                map.put("sCurrency", SUtilConsts.TXT_CURRENCY.toUpperCase() + ": " + miClient.getSession().getSessionCustom().getLocalCurrency());
                 map.put("sCurrencyCode", miClient.getSession().getSessionCustom().getLocalCurrencyCode());
-                map.put("nYear", SLibTimeUtilities.digestYear(moFieldDateCutoff.getDate())[0]);
+                map.put("nYear", SLibTimeUtilities.digestYear(moFieldDateStart.getDate())[0]);
                 map.put("tDateStart", moFieldDateStart.getDate());
                 map.put("tDateEnd", moFieldDateEnd.getDate());
                 map.put("nSysAccountClassId", mnSysAccountClassId);
                 map.put("nAccountTypeId", SModSysConsts.FINS_TP_ACC_BAL);
-                map.put("sFilterBizPartner", (jcbBizPartner.getSelectedIndex() <= 0 ? "" : "AND re.fid_bp_nr = " + moFieldBizPartner.getKeyAsIntArray()[0] + " "));
-                map.put("sFilterSalesAgent", (jcbSalesAgent.getSelectedIndex() <= 0 ? "" : "AND d.fid_sal_agt_n = " + moFieldSalesAgent.getKeyAsIntArray()[0] + " "));
+                map.put("sSqlFilterBizPartner", (jcbBizPartner.getSelectedIndex() <= 0 ? "" : "AND re.fid_bp_nr = " + moFieldBizPartner.getKeyAsIntArray()[0] + " "));
+                map.put("sSqlFilterSalesAgent", (jcbSalesAgent.getSelectedIndex() <= 0 ? "" : "AND d.fid_sal_agt_n = " + moFieldSalesAgent.getKeyAsIntArray()[0] + " "));
 
                 jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_FIN_BPS_BAL_PER, map);
             }
@@ -457,23 +460,14 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
     }
 
     public void actionPrint() {
-        boolean error = false;
-        JComponent component = null;
-
-        for (SFormField field : mvFields) {
-            if (!field.validateField()) {
-                error = true;
-                component = field.getComponent();
-            }
-        }
-
-        if (error) {
-            if (component != null) {
-                component.requestFocus();
-            }
+        SFormValidation validation = formValidate();
+                
+        if (validation.getIsError()) {
+            miClient.showMsgBoxWarning(validation.getMessage());
+            validation.getComponent().requestFocus();
         }
         else {
-            print();
+            computeReport();
         }
     }
 
@@ -482,7 +476,7 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup bgReportType;
+    private javax.swing.ButtonGroup bgType;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
@@ -517,7 +511,33 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
 
     public void initForm() {
         mbFirstTime = true;
-        moFieldDateCutoff.setFieldValue(miClient.getSessionXXX().getWorkingDate());
+        jrbTypeDateCutoff.setSelected(true);
+    }
+    
+    public erp.lib.form.SFormValidation formValidate() {
+        String msg = "";
+        SFormValidation validation = new SFormValidation();
+
+        for (int i = 0; i < mvFields.size(); i++) {
+            if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()) {
+                validation.setIsError(true);
+                validation.setComponent(((erp.lib.form.SFormField) mvFields.get(i)).getComponent());
+                break;
+            }
+        }
+        
+        if (!validation.getIsError()) {
+            if (jrbTypePeriod.isSelected()) {
+                msg = SGuiUtilities.validateDateRange(moFieldDateStart.getDate(), moFieldDateEnd.getDate());
+
+                if (!msg.isEmpty()) {
+                    validation.setMessage(msg);
+                    validation.setComponent(jftDateStart);
+                }
+            }
+        }
+
+        return validation;
     }
 
     @Override
