@@ -49,6 +49,12 @@ public class SHrsConsts {
     public static final int SS_SEV = 9; // severance
     public static final int SS_HOM = 10; // home
     
+    public static final int CAL_NET_AMT_TYPE = 1; // Calculeted net amout type
+    public static final int CAL_GROSS_AMT_TYPE = 2; // Calculeted gross amout type
+    
+    public static final String TXT_CAL_NET_AMT_TYPE = "Calcular ingreso neto"; // Calculeted net amout type
+    public static final String TXT_CAL_GROSS_AMT_TYPE = "Calcular ingreso bruto"; // Calculeted gross amout type
+    
     public static final int YEAR_MIN_BIRTH = 1900;
     public static final int YEAR_MAX_BIRTH = 2000;
     

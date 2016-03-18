@@ -1131,6 +1131,62 @@ public abstract class SHrsUtils {
         return balance;
     }
     
+    public static double getIntegrationFactorSbc(final SGuiSession session, final Date dateBenefits, final Date dateCut) throws Exception {
+        int seniority = 0;
+        int daysTableVacation = 0;
+        int daysTableAnnualBonus = 0;
+        double percentageTableVacationBonus = 0;
+        double salaryUnit = 1;
+        double integrationFactorSbc = 0;
+        SHrsBenefitTableByAnniversary benefitTableRow = null;
+        ArrayList<SHrsBenefitTableByAnniversary> aTableVacationByAnniversary = new ArrayList<SHrsBenefitTableByAnniversary>();
+        ArrayList<SHrsBenefitTableByAnniversary> aTableAnnualBonusByAnniversary = new ArrayList<SHrsBenefitTableByAnniversary>();
+        ArrayList<SHrsBenefitTableByAnniversary> aTableVacationBonusByAnniversary = new ArrayList<SHrsBenefitTableByAnniversary>();
+        ArrayList<SDbBenefitTable> aTableVacation = new ArrayList<SDbBenefitTable>();
+        ArrayList<SDbBenefitTable> aTableAnnualBonus = new ArrayList<SDbBenefitTable>();
+        ArrayList<SDbBenefitTable> aTableVacationBonus = new ArrayList<SDbBenefitTable>();
+        
+        aTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, SLibConsts.UNDEFINED, dateCut) }));
+        aTableAnnualBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_ANN_BON, SLibConsts.UNDEFINED, dateCut) }));
+        aTableVacationBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC_BON, SLibConsts.UNDEFINED, dateCut) }));
+        
+        if (dateBenefits != null) {
+            seniority = getSeniorityEmployee(session, dateBenefits, dateCut);
+        }
+        else {
+            seniority = 1;
+        }
+        
+        aTableVacationByAnniversary = getBenefitTablesAnniversarys(aTableVacation);
+        aTableAnnualBonusByAnniversary = getBenefitTablesAnniversarys(aTableAnnualBonus);
+        aTableVacationBonusByAnniversary = getBenefitTablesAnniversarys(aTableVacationBonus);
+        
+        for (SHrsBenefitTableByAnniversary row : aTableVacationByAnniversary) {
+            if (row.getBenefitAnn() <= seniority) {
+                benefitTableRow = row;
+            }
+        }
+        daysTableVacation = benefitTableRow == null ? 0 : (int) benefitTableRow.getValue();
+        
+        for (SHrsBenefitTableByAnniversary row : aTableAnnualBonusByAnniversary) {
+            if (row.getBenefitAnn() <= seniority) {
+                benefitTableRow = row;
+            }
+        }
+        daysTableAnnualBonus = benefitTableRow == null ? 0 : (int) benefitTableRow.getValue();
+        
+        for (SHrsBenefitTableByAnniversary row : aTableVacationBonusByAnniversary) {
+            if (row.getBenefitAnn() <= seniority) {
+                benefitTableRow = row;
+            }
+        }
+        percentageTableVacationBonus = benefitTableRow == null ? 0 : (double) benefitTableRow.getValue();
+        
+        integrationFactorSbc = salaryUnit + ((double) daysTableAnnualBonus / SHrsConsts.YEAR_DAYS) + (double) (daysTableVacation * percentageTableVacationBonus / SHrsConsts.YEAR_DAYS);
+        
+        return integrationFactorSbc;
+    }
+    
     public static String getEmployeeNextNumber(Connection connection) throws Exception {
         String nextNumber = "";
         String sql = "";
@@ -1678,6 +1734,179 @@ public abstract class SHrsUtils {
         amout = (SLibUtils.round(amoutAux, SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits()));
         
         return amout;
+    }
+    
+    public static double computeAmoutTax(final SDbTaxTable dbTaxTable, final double dTaxableAmount, final double fTableFactor) throws Exception {
+        double dTaxComputed = 0;
+        SDbTaxTableRow dbTaxTableRow = null;
+        
+        for (int i = 0; i < dbTaxTable.getChildRows().size(); i++) {
+            dbTaxTableRow = dbTaxTable.getChildRows().get(i);
+            if (dTaxableAmount >= SLibUtils.round(dbTaxTableRow.getLowerLimit() * fTableFactor, SUtilConsts.DECS_AMT) &&
+                    (i + 1 == dbTaxTable.getChildRows().size() || dTaxableAmount < SLibUtils.round(dbTaxTable.getChildRows().get(i + 1).getLowerLimit() * fTableFactor, SUtilConsts.DECS_AMT))) {
+                dTaxComputed = SLibUtils.round((dTaxableAmount - SLibUtils.round(dbTaxTableRow.getLowerLimit() * fTableFactor, SUtilConsts.DECS_AMT)) * dbTaxTableRow.getTaxRate() + dbTaxTableRow.getFixedFee() * fTableFactor, SUtilConsts.DECS_AMT);
+            }
+        }
+        
+        return dTaxComputed;
+    }
+    
+    public static double computeAmoutTaxSubsidy(final SDbTaxSubsidyTable dbSubsidyTable, final double dTaxableAmount, final double fTableFactor) throws Exception {
+        double dSubsidyComputed = 0;
+        SDbTaxSubsidyTableRow dbSubsidyTableRow = null;
+        
+        for (int i = 0; i < dbSubsidyTable.getChildRows().size(); i++) {
+            dbSubsidyTableRow = dbSubsidyTable.getChildRows().get(i);
+            if (dTaxableAmount >= dbSubsidyTableRow.getLowerLimit() * fTableFactor &&
+                    (i + 1 == dbSubsidyTable.getChildRows().size() || dTaxableAmount < dbSubsidyTable.getChildRows().get(i + 1).getLowerLimit() * fTableFactor)) {
+                dSubsidyComputed = SLibUtils.round(dbSubsidyTableRow.getTaxSubsidy() * fTableFactor, SUtilConsts.DECS_AMT);
+            }
+        }
+        
+        return dSubsidyComputed;
+    }
+    
+    public static double computeSSContribution(final SDbSsContributionTable dbSscTable, final double dSalarySsc, final double dMwzReferenceWage, final SHrsDaysByPeriod hrsDaysPrev,
+                                                    final SHrsDaysByPeriod hrsDaysCurr, final SHrsDaysByPeriod hrsDaysNext) throws Exception {
+        SDbSsContributionTableRow dbSscTableRow = null;
+        double dSscComputed = 0;
+        double dEarningSsc = 0;
+        
+        for (int i = 0; i < dbSscTable.getChildRows().size(); i++) {
+            dbSscTableRow = dbSscTable.getChildRows().get(i);
+            switch(dbSscTableRow.getPkRowId()) {
+                case SHrsConsts.SS_INC_MON:
+                case SHrsConsts.SS_INC_PEN:
+                    //dEarningSsc = SLibUtils.round((moReceipt.getDaysHiredPayroll() - moReceipt.getDaysIncapacityNotPaidPayroll()) * moReceipt.getSalarySscBase(), SUtilConsts.DECS_AMT);
+                    dEarningSsc = SLibUtils.round((hrsDaysPrev.getDaysPeriodPayroll() + hrsDaysCurr.getDaysPeriodPayroll() + hrsDaysNext.getDaysPeriodPayroll() - hrsDaysPrev.getDaysPeriodPayrollIncapacityNotPaid() - hrsDaysCurr.getDaysPeriodPayrollIncapacityNotPaid() - hrsDaysNext.getDaysPeriodPayrollIncapacityNotPaid()) * dSalarySsc, SUtilConsts.DECS_AMT);
+                    break;
+                case SHrsConsts.SS_INC_KND_SSC_LET:
+                    //dEarningSsc = SLibUtils.round((moReceipt.getDaysHiredPayroll() - moReceipt.getDaysIncapacityNotPaidPayroll()) * moHrsPayroll.getPayroll().getMwzReferenceWage(), SUtilConsts.DECS_AMT);
+                    dEarningSsc = SLibUtils.round((hrsDaysPrev.getDaysPeriodPayroll() + hrsDaysCurr.getDaysPeriodPayroll() + hrsDaysNext.getDaysPeriodPayroll() - hrsDaysPrev.getDaysPeriodPayrollIncapacityNotPaid() - hrsDaysCurr.getDaysPeriodPayrollIncapacityNotPaid() - hrsDaysNext.getDaysPeriodPayrollIncapacityNotPaid()) * dMwzReferenceWage, SUtilConsts.DECS_AMT);
+                    break;
+                case SHrsConsts.SS_INC_KND_SSC_GT:
+                    //dEarningSsc = SLibUtils.round(moReceipt.getSalarySscBase() <= (dbSscTableRow.getLowerLimitMwzReference() * moHrsPayroll.getPayroll().getMwzReferenceWage()) ? 0 :
+                    //       ((moReceipt.getDaysHiredPayroll() - moReceipt.getDaysIncapacityNotPaidPayroll()) * (moReceipt.getSalarySscBase() - (dbSscTableRow.getLowerLimitMwzReference() * moHrsPayroll.getPayroll().getMwzReferenceWage()))), SUtilConsts.DECS_AMT);
+                    dEarningSsc = SLibUtils.round(dSalarySsc <= (dbSscTableRow.getLowerLimitMwzReference() * dMwzReferenceWage) ? 0 :
+                           ((hrsDaysPrev.getDaysPeriodPayroll() + hrsDaysCurr.getDaysPeriodPayroll() + hrsDaysNext.getDaysPeriodPayroll() - hrsDaysPrev.getDaysPeriodPayrollIncapacityNotPaid() - hrsDaysCurr.getDaysPeriodPayrollIncapacityNotPaid() - hrsDaysNext.getDaysPeriodPayrollIncapacityNotPaid()) * (dSalarySsc - (dbSscTableRow.getLowerLimitMwzReference() * dMwzReferenceWage))), SUtilConsts.DECS_AMT);
+                    break;
+                case SHrsConsts.SS_DIS_LIF:
+                case SHrsConsts.SS_CRE:
+                case SHrsConsts.SS_RSK:
+                case SHrsConsts.SS_RET:
+                case SHrsConsts.SS_SEV:
+                case SHrsConsts.SS_HOM:
+                    //dEarningSsc = SLibUtils.round((moReceipt.getDaysHiredPayroll() - moReceipt.getDaysNotWorkedNotPaid()) * moReceipt.getSalarySscBase(), SUtilConsts.DECS_AMT);
+                    dEarningSsc = SLibUtils.round((hrsDaysPrev.getDaysPeriodPayroll() + hrsDaysCurr.getDaysPeriodPayroll() + hrsDaysNext.getDaysPeriodPayroll() - hrsDaysPrev.getDaysPeriodPayrollNotWorkedNotPaid() - hrsDaysCurr.getDaysPeriodPayrollNotWorkedNotPaid() - hrsDaysNext.getDaysPeriodPayrollNotWorkedNotPaid()) * dSalarySsc, SUtilConsts.DECS_AMT);
+                    break;
+                default:
+                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+            }
+            dSscComputed += SLibUtils.round(dEarningSsc * dbSscTableRow.getWorkerPercentage(), SUtilConsts.DECS_AMT);
+        }
+        
+        return dSscComputed;
+    }
+    
+    public static SHrsCalculatedNetGrossAmount computeNetAmountPayment(final SGuiSession session, final double dSbc, final double grossAmount, final Date dateCut) throws Exception {
+        SHrsCalculatedNetGrossAmount netGrossAmount = null;
+        SDbTaxTable dbTaxTable = null;
+        SDbTaxSubsidyTable dbSubsidyTable = null;
+        SDbSsContributionTable dbSscTable = null;
+        SDbConfig config = null;
+        SDbEmployee employee = null;
+        double dMwzReference = 0;
+        double dNetAmount = 0;
+        double dTaxAmount = 0;
+        double dTaxSubsidyAmount = 0;
+        double dSsContributionAmount = 0;
+        double dTableFactor = 0;
+        int year = SLibTimeUtils.digestYear(dateCut)[0];
+        int days = SLibTimeUtils.getMaxDayOfMonth(dateCut);
+        SHrsDaysByPeriod hrsDaysPrev = new SHrsDaysByPeriod(0, 0, 0, 0, 0, 0);
+        SHrsDaysByPeriod hrsDaysCurr = new SHrsDaysByPeriod(year, 0, days, days, 0, 0);
+        SHrsDaysByPeriod hrsDaysNext = new SHrsDaysByPeriod(0, 0, 0, 0, 0, 0);
+        
+        config = (SDbConfig) session.readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
+        //employee = (SDbEmployee) session.readRegistry(SModConsts.HRSU_EMP, new int[] { employeeId });
+        dbTaxTable = (SDbTaxTable) session.readRegistry(SModConsts.HRS_TAX, new int[] { getRecentTaxTable(session, dateCut) });
+        dbSubsidyTable = (SDbTaxSubsidyTable) session.readRegistry(SModConsts.HRS_TAX_SUB, new int[] { getRecentTaxSubsidyTable(session, dateCut) });
+        dbSscTable = (SDbSsContributionTable) session.readRegistry(SModConsts.HRS_SSC, new int[] { getRecentSsContributionTable(session, dateCut) });
+        dMwzReference = getRecentMwz(session, config.getFkMwzReferenceTypeId(), dateCut);
+        
+        dTableFactor = ((double) SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS) * days;
+        
+        dTaxAmount = SHrsUtils.computeAmoutTax(dbTaxTable, grossAmount, dTableFactor);
+        dTaxSubsidyAmount = SHrsUtils.computeAmoutTaxSubsidy(dbSubsidyTable, grossAmount, dTableFactor);
+        dSsContributionAmount = SHrsUtils.computeSSContribution(dbSscTable, dSbc, dMwzReference, hrsDaysPrev, hrsDaysCurr, hrsDaysNext);
+        
+        dNetAmount = grossAmount - dTaxAmount - dSsContributionAmount;
+        
+        netGrossAmount = new SHrsCalculatedNetGrossAmount(dNetAmount, grossAmount, dTaxAmount, dTaxSubsidyAmount, dSsContributionAmount);
+        netGrossAmount.setCalculatedAmountType(SHrsConsts.CAL_NET_AMT_TYPE);
+        
+        return netGrossAmount;
+    }
+    
+    public static SHrsCalculatedNetGrossAmount computeGrossAmountPayment(final SGuiSession session, final double dSbc, final double dNetAmount, final Date dateCut, final double tolerance) throws Exception {
+        SHrsCalculatedNetGrossAmount netGrossAmount = null;
+        SDbTaxTable dbTaxTable = null;
+        SDbTaxTableRow dbTaxTableRow = null;
+        int days = SLibTimeUtils.getMaxDayOfMonth(dateCut);
+        double dTableFactor = 0;
+        double average = 0;
+        double dGrossAmount = 0;
+        double limitInf = 0;
+        double limitSup = 0;
+        double dToleranceAux = 0;
+        boolean bCalculate = true;
+        
+        dbTaxTable = (SDbTaxTable) session.readRegistry(SModConsts.HRS_TAX, new int[] { getRecentTaxTable(session, dateCut) });
+        
+        dTableFactor = ((double) SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS) * days;
+        
+        if (dbTaxTable != null) {
+            for (int i = 0; i < dbTaxTable.getChildRows().size(); i++) {
+                dbTaxTableRow = dbTaxTable.getChildRows().get(i);
+                if (i == 0) {
+                    limitInf = SLibUtils.round(dbTaxTableRow.getLowerLimit() * dTableFactor, SUtilConsts.DECS_AMT);
+                }
+                if (dNetAmount <= SLibUtils.round(dbTaxTableRow.getLowerLimit() * dTableFactor, SUtilConsts.DECS_AMT)) {
+                    limitSup = SLibUtils.round(dbTaxTableRow.getLowerLimit() * dTableFactor, SUtilConsts.DECS_AMT);
+                }
+                
+                average = (limitInf + limitSup) / 2;
+
+                netGrossAmount = computeNetAmountPayment(session, dSbc, average, dateCut);
+                
+                if (netGrossAmount.getNetAmount() > dNetAmount) {
+                    break;
+                }
+            }
+        }
+        average = 0;
+
+        while (bCalculate) {
+            average = (limitInf + limitSup) / 2;
+
+            netGrossAmount = computeNetAmountPayment(session, dSbc, average, dateCut);
+
+            if (netGrossAmount.getNetAmount() > dNetAmount) {
+                limitSup = average;
+            }
+            else {
+                limitInf = average;
+            }
+            dToleranceAux = SLibUtils.round(dNetAmount - netGrossAmount.getNetAmount(), SUtilConsts.DECS_AMT);
+            
+            bCalculate = SLibUtils.round(limitInf, SUtilConsts.DECS_AMT) != SLibUtils.round(limitSup, SUtilConsts.DECS_AMT) && Math.abs(dToleranceAux) > tolerance;
+        }
+        dGrossAmount = average;
+        
+        netGrossAmount.setGrossAmount(dGrossAmount);
+        netGrossAmount.setCalculatedAmountType(SHrsConsts.CAL_GROSS_AMT_TYPE);
+        
+        return netGrossAmount;
     }
     
     public static double getAdjustmentLoan(final SHrsPayroll hrsPayroll, final int typeLoan) throws Exception {
