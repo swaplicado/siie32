@@ -348,8 +348,6 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmDpsAdj = new JMenu("Notas crédito");
         jmiDpsAdjDoc = new JMenuItem("Notas de crédito de compras");
         jmDpsAdj.add(jmiDpsAdjDoc);
-        jmDpsAdj.addSeparator();
-        //jmDpsAdj.add(?);
 
         jmStkDvy = new JMenu("Surtidos");
         jmiStkDvyPend = new JMenuItem("Compras por surtir");

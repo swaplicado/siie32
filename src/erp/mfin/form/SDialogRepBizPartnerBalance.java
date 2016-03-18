@@ -366,8 +366,8 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
                 map = miClient.createReportParams();
                 map.put("nSysMoveCatId", manSysMoveTypeKey[0]);
                 map.put("nSysMoveTypeId", manSysMoveTypeKey[1]);
-                map.put("sBizPartnerCat", msBizPartnerCatSng);
-                map.put("sBizPartnerCatPlural", msBizPartnerCatPlr);
+                map.put("sBizPartnerCat", msBizPartnerCatSng.toUpperCase());
+                map.put("sBizPartnerCatPlural", msBizPartnerCatPlr.toUpperCase());
                 map.put("sLocalCurrency", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency());
                 map.put("nYear", SLibTimeUtilities.digestYear(moFieldDateCutoff.getDate())[0]);
                 map.put("tDate", moFieldDateCutoff.getDate());
