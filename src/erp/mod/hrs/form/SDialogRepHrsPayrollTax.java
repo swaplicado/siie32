@@ -299,7 +299,7 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
             moParamsMap.put("nPeriodYear", moIntPeriodYear.getValue());
             moParamsMap.put("nPeriodStart", moIntPeriodStart.getValue());
             moParamsMap.put("nPeriodEnd", moIntPeriodEnd.getValue());
-            moParamsMap.put("sSqlWhere", " AND p.per_year >= " + moIntPeriodYear.getValue() + " AND p.per >= " + moIntPeriodStart.getValue() + " AND p.per <= " + moIntPeriodEnd.getValue() + " ");
+            moParamsMap.put("sSqlWhere", " AND p.per_year = " + moIntPeriodYear.getValue() + " AND p.per BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " ");
         }
         else if (moRadFilterTypeDate.isSelected()) {
             moParamsMap.put("bByPeriod", false);

@@ -208,6 +208,7 @@ public class SPanelHrsDepartaments extends SBeanPanel implements ItemListener {
 
             if (mnNumberDepartamentsSelects == 0) {
                 validation.setMessage("Aún no se ha especificado ningún departamento.");
+                validation.setComponent(mjchSelectAll);
             }
         }
         

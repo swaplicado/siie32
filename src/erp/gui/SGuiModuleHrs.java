@@ -17,8 +17,12 @@ import erp.lib.table.STableTabInterface;
 import erp.mhrs.form.SDialogFormerPayrollImport;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.form.SDialogRepHrsAux;
+import erp.mod.hrs.form.SDialogRepHrsEarDed;
 import erp.mod.hrs.form.SDialogRepHrsPayrollTax;
+import erp.mod.hrs.form.SDialogRepHrsPayrollWageSalaryFileCsv;
+import erp.mod.hrs.form.SFormCalculateNetGrossAmount;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -92,6 +96,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiPayAutoEarningsByEmployee;
     private javax.swing.JMenuItem jmiPayAutoDeductionsGlobal;
     private javax.swing.JMenuItem jmiPayAutoDeductionsByEmployee;
+    private javax.swing.JMenuItem jmiPayCalculatedAmountMonth;
     
     private javax.swing.JMenu jmBenefit;
     private javax.swing.JMenuItem jmiBenefitBenefitVac;
@@ -115,11 +120,13 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiImpCfdiSendingLog;
     
     private javax.swing.JMenu jmRep;
-    private javax.swing.JMenuItem jmiRepPayrollEarningsAux;
-    private javax.swing.JMenuItem jmiRepPayrollEarningsByEmployeeAux;
-    private javax.swing.JMenuItem jmiRepPayrollDeductionsAux;
-    private javax.swing.JMenuItem jmiRepPayrollDeductionsByEmployeeAux;
+    private javax.swing.JMenuItem jmiRepPayrollEarnings;
+    private javax.swing.JMenuItem jmiRepPayrollEarningsByEmployee;
+    private javax.swing.JMenuItem jmiRepPayrollDeductions;
+    private javax.swing.JMenuItem jmiRepPayrollDeductionsByEmployee;
     private javax.swing.JMenuItem jmiRepPayrollTax;
+    private javax.swing.JMenuItem jmiRepPayrollAux;
+    private javax.swing.JMenuItem jmiRepPayrollWageSalaryFileCsv;
 
     private erp.mhrs.form.SDialogFormerPayrollImport moDialogFormerPayrollImport;
 
@@ -240,6 +247,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayAutoEarningsByEmployee = new JMenuItem("Percepciones automáticas por empleado");
         jmiPayAutoDeductionsGlobal = new JMenuItem("Deducciones automáticas globales");
         jmiPayAutoDeductionsByEmployee = new JMenuItem("Deducciones automáticas por empleado");
+        jmiPayCalculatedAmountMonth = new JMenuItem("Calcular ingreso mensual");
 
         jmPay.add(jmiPayPayrollWeekly);
         jmPay.add(jmiPayPayrollWeeklyRec);
@@ -262,7 +270,11 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmPay.add(jmiPayAutoEarningsByEmployee);
         jmPay.add(jmiPayAutoDeductionsGlobal);
         jmPay.add(jmiPayAutoDeductionsByEmployee);
-        
+        /*
+        jmPay.addSeparator();
+        jmPay.add(jmiPayCalculatedAmountMonth);
+        */
+                
         jmBenefit = new JMenu("Prestaciones");
         jmiBenefitBenefitVac = new JMenuItem("Control de vacaciones");
         jmiBenefitBenefitBonVac = new JMenuItem("Control de prima vacacional");
@@ -311,18 +323,23 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmImp.add(jmImpCfdi);
 
         jmRep = new JMenu("Reportes");
-        jmiRepPayrollEarningsAux = new JMenuItem("Percepciones por periodo");
-        jmiRepPayrollEarningsByEmployeeAux = new JMenuItem("Percepciones por empleado por periodo");
-        jmiRepPayrollDeductionsAux = new JMenuItem("Deducciones por periodo");
-        jmiRepPayrollDeductionsByEmployeeAux = new JMenuItem("Deducciones por empleado por periodo");
-        jmiRepPayrollTax = new JMenuItem("Impuesto sobre nóminas");
+        jmiRepPayrollEarnings = new JMenuItem("Percepciones por periodo...");
+        jmiRepPayrollEarningsByEmployee = new JMenuItem("Percepciones por empleado por periodo...");
+        jmiRepPayrollDeductions = new JMenuItem("Deducciones por periodo...");
+        jmiRepPayrollDeductionsByEmployee = new JMenuItem("Deducciones por empleado por periodo...");
+        jmiRepPayrollTax = new JMenuItem("Impuesto sobre nóminas...");
+        jmiRepPayrollAux = new JMenuItem("Reportes auxiliares de nóminas...");
+        jmiRepPayrollWageSalaryFileCsv = new JMenuItem("Archivo CSV para declaración informativa de sueldos y salarios...");
         
-        jmRep.add(jmiRepPayrollEarningsAux);
-        jmRep.add(jmiRepPayrollEarningsByEmployeeAux);
-        jmRep.add(jmiRepPayrollDeductionsAux);
-        jmRep.add(jmiRepPayrollDeductionsByEmployeeAux);
+        jmRep.add(jmiRepPayrollEarnings);
+        jmRep.add(jmiRepPayrollEarningsByEmployee);
+        jmRep.add(jmiRepPayrollDeductions);
+        jmRep.add(jmiRepPayrollDeductionsByEmployee);
         jmRep.addSeparator();
         jmRep.add(jmiRepPayrollTax);
+        jmRep.add(jmiRepPayrollAux);
+        jmRep.addSeparator();
+        jmRep.add(jmiRepPayrollWageSalaryFileCsv);
 
         jmiCfgTaxTable.addActionListener(this);
         jmiCfgTaxTableRow.addActionListener(this);
@@ -378,6 +395,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayAutoEarningsByEmployee.addActionListener(this);
         jmiPayAutoDeductionsGlobal.addActionListener(this);
         jmiPayAutoDeductionsByEmployee.addActionListener(this);
+        jmiPayCalculatedAmountMonth.addActionListener(this);
         
         jmiBenefitBenefitVac.addActionListener(this);
         jmiBenefitBenefitBonVac.addActionListener(this);
@@ -397,11 +415,13 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiImpCfdiStampSignPending.addActionListener(this);
         jmiImpCfdiSendingLog.addActionListener(this);
         
-        jmiRepPayrollEarningsAux.addActionListener(this);
-        jmiRepPayrollDeductionsAux.addActionListener(this);
-        jmiRepPayrollEarningsByEmployeeAux.addActionListener(this);
-        jmiRepPayrollDeductionsByEmployeeAux.addActionListener(this);
+        jmiRepPayrollEarnings.addActionListener(this);
+        jmiRepPayrollDeductions.addActionListener(this);
+        jmiRepPayrollEarningsByEmployee.addActionListener(this);
+        jmiRepPayrollDeductionsByEmployee.addActionListener(this);
         jmiRepPayrollTax.addActionListener(this);
+        jmiRepPayrollAux.addActionListener(this);
+        jmiRepPayrollWageSalaryFileCsv.addActionListener(this);
 
         jmiCfgTaxTable.setEnabled(true);
         jmiCfgTaxTableRow.setEnabled(true);
@@ -464,6 +484,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayAutoEarningsByEmployee.setEnabled(true);
         jmiPayAutoDeductionsGlobal.setEnabled(true);
         jmiPayAutoDeductionsByEmployee.setEnabled(true);
+        jmiPayCalculatedAmountMonth.setEnabled(true);
         
         jmBenefit.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PAY).HasRight);
         jmiBenefitBenefitVac.setEnabled(true);
@@ -484,11 +505,13 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmImpCfdi.setEnabled(true);
         
         jmRep.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_REP).HasRight);
-        jmiRepPayrollEarningsAux.setEnabled(true);
-        jmiRepPayrollDeductionsAux.setEnabled(true);
-        jmiRepPayrollEarningsByEmployeeAux.setEnabled(true);
-        jmiRepPayrollDeductionsByEmployeeAux.setEnabled(true);
+        jmiRepPayrollEarnings.setEnabled(true);
+        jmiRepPayrollDeductions.setEnabled(true);
+        jmiRepPayrollEarningsByEmployee.setEnabled(true);
+        jmiRepPayrollDeductionsByEmployee.setEnabled(true);
         jmiRepPayrollTax.setEnabled(true);
+        jmiRepPayrollAux.setEnabled(true);
+        jmiRepPayrollWageSalaryFileCsv.setEnabled(true);
         
         // GUI configuration:
         
@@ -826,6 +849,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiPayAutoDeductionsByEmployee) {
                 miClient.getSession().showView(SModConsts.HRSX_AUT_DED, SModSysConsts.HRS_AUT_EMP, null);
             }
+            else if (item == jmiPayCalculatedAmountMonth) {
+                new SFormCalculateNetGrossAmount((SGuiClient) miClient, SHrsConsts.CAL_NET_AMT_TYPE, "Calcular ingreso mensual").setFormVisible(true);
+            }
             else if (item == jmiBenefitBenefitVac) {
                 miClient.getSession().showView(SModConsts.HRSX_BEN_MOV, SModSysConsts.HRSS_TP_BEN_VAC, null);
             }
@@ -879,20 +905,26 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiImpCfdiSendingLog) {
                 showView(SDataConstants.TRN_CFD_SND_LOG, SCfdConsts.CFDI_PAYROLL_VER_OLD);
             }
-            else if (item == jmiRepPayrollEarningsAux) {
-                new SDialogRepHrsAux((SGuiClient) miClient, SModConsts.HRSR_AUX_EAR, "Percepciones por periodo").setFormVisible(true);
+            else if (item == jmiRepPayrollEarnings) {
+                new SDialogRepHrsEarDed((SGuiClient) miClient, SModConsts.HRSR_EAR, "Percepciones por periodo").setFormVisible(true);
             }
-            else if (item == jmiRepPayrollDeductionsAux) {
-                new SDialogRepHrsAux((SGuiClient) miClient, SModConsts.HRSR_AUX_DED, "Deducciones por periodo").setFormVisible(true);
+            else if (item == jmiRepPayrollDeductions) {
+                new SDialogRepHrsEarDed((SGuiClient) miClient, SModConsts.HRSR_DED, "Deducciones por periodo").setFormVisible(true);
             }
-            else if (item == jmiRepPayrollEarningsByEmployeeAux) {
-                new SDialogRepHrsAux((SGuiClient) miClient, SModConsts.HRSR_AUX_EAR_EMP, "Percepciones por empleado por periodo").setFormVisible(true);
+            else if (item == jmiRepPayrollEarningsByEmployee) {
+                new SDialogRepHrsEarDed((SGuiClient) miClient, SModConsts.HRSR_EAR_EMP, "Percepciones por empleado por periodo").setFormVisible(true);
             }
-            else if (item == jmiRepPayrollDeductionsByEmployeeAux) {
-                new SDialogRepHrsAux((SGuiClient) miClient, SModConsts.HRSR_AUX_DED_EMP, "Deducciones por empleado por periodo").setFormVisible(true);
+            else if (item == jmiRepPayrollDeductionsByEmployee) {
+                new SDialogRepHrsEarDed((SGuiClient) miClient, SModConsts.HRSR_DED_EMP, "Deducciones por empleado por periodo").setFormVisible(true);
             }
             else if (item == jmiRepPayrollTax) {
                 new SDialogRepHrsPayrollTax((SGuiClient) miClient, "Impuesto sobre nóminas").setFormVisible(true);
+            }
+            else if (item == jmiRepPayrollAux) {
+                new SDialogRepHrsAux((SGuiClient) miClient, "Auxiliares de nóminas").setFormVisible(true);
+            }
+            else if (item == jmiRepPayrollWageSalaryFileCsv) {
+                new SDialogRepHrsPayrollWageSalaryFileCsv((SGuiClient) miClient, "Archivo CSV para declaración informativa de sueldos y salarios").setFormVisible(true);
             }
         }
     }

@@ -23,7 +23,7 @@ import sa.lib.gui.SGuiConsts;
  */
 public class SViewEmployeeWageLog extends SGridPaneView {
 
-    private SGridFilterPanel moFilterProject;
+    private SGridFilterPanel moFilterPaymentType;
 
     public SViewEmployeeWageLog(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_EMP_LOG_WAGE, SLibConsts.UNDEFINED, title);
@@ -33,10 +33,10 @@ public class SViewEmployeeWageLog extends SGridPaneView {
     private void initComponentsCustom() {
         setRowButtonsEnabled(false);
         
-        moFilterProject = new SGridFilterPanel(miClient, this, SModConsts.HRSS_TP_PAY, SLibConsts.UNDEFINED);
-        moFilterProject.initFilter(null);
+        moFilterPaymentType = new SGridFilterPanel(miClient, this, SModConsts.HRSS_TP_PAY, SLibConsts.UNDEFINED);
+        moFilterPaymentType.initFilter(null);
         
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterProject);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterPaymentType);
     }
 
     @Override

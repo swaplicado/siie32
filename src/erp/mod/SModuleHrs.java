@@ -1148,20 +1148,23 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRSR_PRE_PAY:
                 guiReport = new SGuiReport("reps/hrs_pre_pay.jasper", "Prenómina");
                 break;
-            case SModConsts.HRSR_AUX_EAR:
-                guiReport = new SGuiReport("reps/hrs_pay_ear_aux.jasper", "Auxiliares de nóminas de percepciones");
+            case SModConsts.HRSR_EAR:
+                guiReport = new SGuiReport("reps/hrs_pay_ear_aux.jasper", "Percepciones por periodo");
                 break;
-            case SModConsts.HRSR_AUX_DED:
-                guiReport = new SGuiReport("reps/hrs_pay_ded_aux.jasper", "Auxiliares de nóminas de deducciones");
+            case SModConsts.HRSR_DED:
+                guiReport = new SGuiReport("reps/hrs_pay_ded_aux.jasper", "Deducciones por periodo");
                 break;
-            case SModConsts.HRSR_AUX_EAR_EMP:
-                guiReport = new SGuiReport("reps/hrs_pay_ear_aux.jasper", "Auxiliares de nóminas de percepciones por empleado");
+            case SModConsts.HRSR_EAR_EMP:
+                guiReport = new SGuiReport("reps/hrs_pay_ear_aux.jasper", "Percepciones por empleado por periodo");
                 break;
-            case SModConsts.HRSR_AUX_DED_EMP:
-                guiReport = new SGuiReport("reps/hrs_pay_ded_aux.jasper", "Auxiliares de nóminas de deducciones por empleado");
+            case SModConsts.HRSR_DED_EMP:
+                guiReport = new SGuiReport("reps/hrs_pay_ded_aux.jasper", "Deducciones por empleado por periodo");
                 break;
             case SModConsts.HRSR_PAY_TAX:
                 guiReport = new SGuiReport("reps/hrs_pay_tax.jasper", "Impuesto sobre nóminas");
+                break;
+            case SModConsts.HRSR_PAY_AUX_EAR_DED:
+                guiReport = new SGuiReport("reps/hrs_pay_aux_ear_ded.jasper", "Reporte de percepciones y deducciones");
                 break;
             case SModConsts.HRSR_LIST_EAR:
                 guiReport = new SGuiReport("reps/hrs_pay_list_ear.jasper", "Listado de percepciones");

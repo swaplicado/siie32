@@ -59,6 +59,7 @@ public class SXmlBankLayout extends SXmlDocument {
             SXmlBankLayoutPayment row = new SXmlBankLayoutPayment();
             namedNodeMap = child.getAttributes();
 
+            /*
             row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).setValue(SLibUtils.parseDouble(namedNodeMap.getNamedItem(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).getNodeValue()));
             row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF).setValue(namedNodeMap.getNamedItem(SXmlBankLayoutPayment.ATT_LAY_PAY_REF).getNodeValue());
             row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CPT).setValue(namedNodeMap.getNamedItem(SXmlBankLayoutPayment.ATT_LAY_PAY_CPT).getNodeValue());
@@ -82,7 +83,32 @@ public class SXmlBankLayout extends SXmlDocument {
             row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_NUM).setValue(SLibUtils.parseInt(namedNodeMap.getNamedItem(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_NUM).getNodeValue()));
             row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_YEAR).setValue(SLibUtils.parseInt(namedNodeMap.getNamedItem(SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_YEAR).getNodeValue()));
             row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_NUM).setValue(SLibUtils.parseInt(namedNodeMap.getNamedItem(SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_NUM).getNodeValue()));
-
+            */
+            
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).setValue(SLibUtils.parseDouble(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_AMT, true)));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_REF, true));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CPT).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_CPT, true));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_VOU).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_VOU, true));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_ACC_TP).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_ACC_TP, true));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_BANK_CODE).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_BANK_CODE, true));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_ID_DBT).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_ID_DBT, true));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_ID_CRD).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_ID_CRD, true));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_DCRP).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_DCRP, true));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_SAN_BANK_CODE).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_SAN_BANK_CODE, true));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_BANK_CODE).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_BANK_CODE, true));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_NICK).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_NICK, true));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_KEY).setValue(SLibUtils.parseInt(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_KEY, false)));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_APPLIED).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_APPLIED, true).compareTo("" + true) == 0);
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BP).setValue(SLibUtils.parseInt(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BP, true)));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).setValue(SLibUtils.parseInt(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK, true)));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_YEAR).setValue(SLibUtils.parseInt(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_REC_YEAR, true)));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_PER).setValue(SLibUtils.parseInt(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_REC_PER, true)));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_BKC).setValue(SLibUtils.parseInt(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_REC_BKC, true)));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_REC_TP).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_REC_REC_TP, true));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_NUM).setValue(SLibUtils.parseInt(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_REC_NUM, true)));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_YEAR).setValue(SLibUtils.parseInt(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_YEAR, true)));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_NUM).setValue(SLibUtils.parseInt(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_NUM, true)));
+            
             // Documents:
             
             if (SXmlUtils.hasChildElement(child, SXmlBankLayoutPaymentDoc.NAME)) {

@@ -906,10 +906,12 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 return gridColumnsForm;
             }
             
+            /* XXX jbarajas 09/03/2016 Eliminate confusing for users.
             @Override
             public void actionMouseClicked() {
                 SFormPayroll.this.actionReceiptAdd();
             }
+            */
         };
 
         moGridPaneEmployeesAvailable.setForm(null);
@@ -982,10 +984,12 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 }
             }
             
+            /* XXX jbarajas 09/03/2016 Eliminate confusing for users.
             @Override
             public void actionMouseClicked() {
                 SFormPayroll.this.actionReceiptRemove();
             }
+            */
         };
 
         moGridPaneEmployeesReceipt.setForm(null);
@@ -1837,7 +1841,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             jtpPayroll.setSelectedIndex(0);
 
             setFormEditable(true);
-
+            
             populateEmployeesReceipt();         // XXX This method must be invoked just before populateEmployeesAvailable()! Improve this!
             populateEmployeesAvailable(false);
             computeTotals();

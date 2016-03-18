@@ -1817,7 +1817,7 @@ public abstract class STrnUtilities {
                 
                 if (canSend) {
                     toRecipients = new ArrayList<>();
-                    snd_subject += " (" + (!mbIsCancel ? "emisión" : "cancelación") + ")";
+                    snd_subject += (mbIsCancel ? " (cancelación)" : "");
                     
                     snd_body = "Emisor: " + client.getSessionXXX().getCurrentCompany().getDbmsDataCompany().getBizPartner() + "\n" +
                                 "RFC: " + client.getSessionXXX().getCurrentCompany().getDbmsDataCompany().getFiscalId() + "\n" +
