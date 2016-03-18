@@ -4415,20 +4415,19 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 validation.setComponent(moPanelFkCostCenterId_n.getFieldAccount().getComponent());
             }
             else {
-                try {
-                    // Validate that reference does not exist yet:
-                    
-                    SDataUtilities.validateDpsEtyReference(miClient.getSession(), moParamDps.getDpsClassKey(), moFieldReference.getString(), (int[]) moParamDps.getPrimaryKey());
-                }
-                catch (Exception e) {
-                    message = e.getMessage();
+                if (!moFieldReference.getString().isEmpty()) {
+                    try {
+                        // Validate that reference does not exist yet:
+
+                        SDataUtilities.validateDpsEtyReference(miClient.getSession(), moParamDps.getDpsClassKey(), moFieldReference.getString(), (int[]) moParamDps.getPrimaryKey());
+                    }
+                    catch (Exception e) {
+                        validation.setMessage(message = e.getMessage());
+                        validation.setComponent(jtfReference);
+                    }
                 }
                 
-                if (!message.isEmpty()) {
-                    validation.setMessage(message);
-                    validation.setComponent(jtfReference);
-                }
-                else {
+                if (message.isEmpty()) {
                     // Validate cost center:
                     
                     message = SDataUtilities.validateCostCenter(miClient, moPanelFkCostCenterId_n.getCurrentInputCostCenter(), moParamDps.getDate());
