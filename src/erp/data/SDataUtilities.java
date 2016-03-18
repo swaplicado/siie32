@@ -3200,7 +3200,7 @@ public abstract class SDataUtilities {
         return msg;
     }
 
-    public static void validateDpsEtyReference(final SGuiSession session, final int[] dpsClassKey, final int bizPartnerId, final String reference, final int[] dpsCurrentKey) throws Exception {
+    public static void validateDpsEtyReference(final SGuiSession session, final int[] dpsClassKey, final String reference, final int[] dpsCurrentKey) throws Exception {
         int i = 0;
         String sql = "";
         String txt = "";
@@ -3210,9 +3210,7 @@ public abstract class SDataUtilities {
                 + "FROM trn_dps AS d "
                 + "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc "
                 + "WHERE d.b_del = 0 AND de.b_del = 0 AND d.fid_st_dps <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " AND "
-                + "d.fid_ct_dps = " + dpsClassKey[0] + " AND d.fid_cl_dps = " + dpsClassKey[1] + " AND "
-                + (dpsClassKey[0] == SModSysConsts.TRNS_CT_DPS_PUR ? "d.fid_bp_r = " + bizPartnerId + " AND " : "")
-                + "de.ref = '" + reference + "' "
+                + "d.fid_ct_dps = " + dpsClassKey[0] + " AND d.fid_cl_dps = " + dpsClassKey[1] + " AND de.ref = '" + reference + "' "
                 + (dpsCurrentKey == null || dpsCurrentKey.length != 2 || dpsCurrentKey[0] == SLibConstants.UNDEFINED || dpsCurrentKey[1] == SLibConstants.UNDEFINED ?
                 "" : "AND NOT (d.id_year = " + dpsCurrentKey[0] + " AND d.id_doc = " + dpsCurrentKey[1] + ")")
                 + "ORDER BY d.num_ser, d.num, d.dt; ";

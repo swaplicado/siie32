@@ -4418,7 +4418,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 try {
                     // Validate that reference does not exist yet:
                     
-                    SDataUtilities.validateDpsEtyReference(miClient.getSession(), moParamDps.getDpsClassKey(), moParamBizPartner.getPkBizPartnerId(), moFieldReference.getString(), (int[]) moParamDps.getPrimaryKey());
+                    SDataUtilities.validateDpsEtyReference(miClient.getSession(), moParamDps.getDpsClassKey(), moFieldReference.getString(), (int[]) moParamDps.getPrimaryKey());
                 }
                 catch (Exception e) {
                     message = e.getMessage();
