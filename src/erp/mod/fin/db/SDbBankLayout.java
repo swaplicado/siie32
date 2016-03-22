@@ -863,6 +863,8 @@ public class SDbBankLayout extends SDbRegistryUser {
     @Override
     public void initRegistry() {
         initBaseRegistry();
+        
+        mlTimeout = 1000 * 60 * 120; // 2 hrs
 
         mnPkBankLayoutId = 0;
         mtDateLayout = null;
