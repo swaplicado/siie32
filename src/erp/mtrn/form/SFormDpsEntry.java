@@ -4414,6 +4414,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + moPanelFkCostCenterId_n.getFieldAccountLabel().getText() + "'.");
                 validation.setComponent(moPanelFkCostCenterId_n.getFieldAccount().getComponent());
             }
+            else if (moItem.getIsReference() && moFieldReference.getString().isEmpty()) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlReference.getText() + "'.");
+                validation.setComponent(jtfReference);
+            }
             else {
                 if (!moFieldReference.getString().isEmpty()) {
                     try {

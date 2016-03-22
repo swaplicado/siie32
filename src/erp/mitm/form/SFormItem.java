@@ -115,7 +115,6 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.lib.form.SFormField moFieldFkUnitAlternativeTypeId;
     private erp.lib.form.SFormField moFieldFkLevelTypeId;
     private erp.lib.form.SFormField moFieldUnitAlternativeBaseEquivalence;
-    private erp.lib.form.SFormField moFieldSurplusPercentage;
 
     private erp.lib.form.SFormField moFieldIsFreeDiscountUnitary;
     private erp.lib.form.SFormField moFieldIsFreeDiscountEntry;
@@ -123,6 +122,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.lib.form.SFormField moFieldIsFreePrice;
     private erp.lib.form.SFormField moFieldIsFreeDiscount;
     private erp.lib.form.SFormField moFieldIsFreeCommissions;
+    private erp.lib.form.SFormField moFieldSurplusPercentage;
+    private erp.lib.form.SFormField moFieldIsReference;
     private erp.lib.form.SFormField moFieldFkDefaultItemRefId_n;
     private erp.lib.form.SFormField moFieldFkAdministrativeConceptTypeId;
     private erp.lib.form.SFormField moFieldFkTaxableConceptTypeId;
@@ -314,6 +315,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jckIsFreeCommissions = new javax.swing.JCheckBox();
         jlSurplusPercentage = new javax.swing.JLabel();
         jtfSurplusPercentage = new javax.swing.JTextField();
+        jckIsReference = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
         jPanel49 = new javax.swing.JPanel();
         jlFkDefaultItemRefId_n = new javax.swing.JLabel();
@@ -1012,6 +1014,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfSurplusPercentage.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel39.add(jtfSurplusPercentage);
 
+        jckIsReference.setText("Referencia obligatoria");
+        jPanel39.add(jckIsReference);
+
         jpConfig1.add(jPanel39, java.awt.BorderLayout.CENTER);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración para contabilización:"));
@@ -1225,11 +1230,11 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jpConfig2Language.add(moItemForeignLanguagePane, BorderLayout.CENTER);
 
         moFieldFkItemGenericId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkItemGenericId, jlFkItemGenericId);
-        moFieldFkItemGenericId.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkItemGenericId.setPickerButton(jbFkItemGenericId);
+        moFieldFkItemGenericId.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkItemLineId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkItemLineId_n, jlFkItemLineId_n);
-        moFieldFkItemLineId_n.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkItemLineId_n.setPickerButton(jbFkItemLineId_n);
+        moFieldFkItemLineId_n.setTabbedPaneIndex(0, jTabbedPane);
         moFieldName = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfName, jlName);
         moFieldName.setLengthMax(50);
         moFieldName.setTabbedPaneIndex(0, jTabbedPane);
@@ -1279,20 +1284,20 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldFkUnitUnitsVirtualId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkUnitUnitsVirtualId, jlFkUnitUnitsVirtualId);
         moFieldFkUnitUnitsVirtualId.setTabbedPaneIndex(0, jTabbedPane);
         moFieldNetContent = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfNetContent, jlFkUnitNetContentId);
-        moFieldNetContent.setTabbedPaneIndex(0, jTabbedPane);
         moFieldNetContent.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsNetContentFormat());
+        moFieldNetContent.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkUnitNetContentId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkUnitNetContentId, jlFkUnitNetContentId);
         moFieldFkUnitNetContentId.setTabbedPaneIndex(0, jTabbedPane);
         moFieldIsNetContentVariable = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsNetContentVariable);
         moFieldIsNetContentVariable.setTabbedPaneIndex(0, jTabbedPane);
         moFieldNetContentUnitary = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfNetContentUnitary, jlFkUnitNetContentUnitaryId);
-        moFieldNetContentUnitary.setTabbedPaneIndex(0, jTabbedPane);
         moFieldNetContentUnitary.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsNetContentFormat());
+        moFieldNetContentUnitary.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkUnitNetContentUnitaryId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkUnitNetContentUnitaryId, jlFkUnitNetContentUnitaryId);
         moFieldFkUnitNetContentUnitaryId.setTabbedPaneIndex(0, jTabbedPane);
         moFieldUnitsPackage = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfUnitsPackage, jlFkItemPackageId_n);
-        moFieldUnitsPackage.setTabbedPaneIndex(0, jTabbedPane);
         moFieldUnitsPackage.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsNetContentFormat());
+        moFieldUnitsPackage.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkItemPackageId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkItemPackageId_n, jlFkItemPackageId_n);
         moFieldFkItemPackageId_n.setTabbedPaneIndex(0, jTabbedPane);
         moFieldProductionTime = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfProductionTime, jlProductionTime);
@@ -1302,38 +1307,38 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldWeightGross.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsWeigthGrossFormat());
         moFieldWeightGross.setTabbedPaneIndex(0, jTabbedPane);
         moFieldWeightDelivery = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfWeightDelivery, jlWeightDelivery);
-        moFieldWeightDelivery.setTabbedPaneIndex(0, jTabbedPane);
         moFieldWeightDelivery.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsWeightDeliveryFormat());
+        moFieldWeightDelivery.setTabbedPaneIndex(0, jTabbedPane);
         moFieldLength = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfLength, jlLength);
-        moFieldLength.setTabbedPaneIndex(0, jTabbedPane);
         moFieldLength.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsLengthFormat());
+        moFieldLength.setTabbedPaneIndex(0, jTabbedPane);
         moFieldLengthUnitary = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfLengthUnitary, jlLengthUnitary);
-        moFieldLengthUnitary.setTabbedPaneIndex(0, jTabbedPane);
         moFieldLengthUnitary.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsLengthFormat());
+        moFieldLengthUnitary.setTabbedPaneIndex(0, jTabbedPane);
         moFieldIsLengthVariable = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsLengthVariable);
         moFieldIsLengthVariable.setTabbedPaneIndex(0, jTabbedPane);
         moFieldSurface = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfSurface, jlSurface);
-        moFieldSurface.setTabbedPaneIndex(0, jTabbedPane);
         moFieldSurface.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsSurfaceFormat());
+        moFieldSurface.setTabbedPaneIndex(0, jTabbedPane);
         moFieldSurfaceUnitary = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfSurfaceUnitary, jlSurfaceUnitary);
-        moFieldSurfaceUnitary.setTabbedPaneIndex(0, jTabbedPane);
         moFieldSurfaceUnitary.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsSurfaceFormat());
+        moFieldSurfaceUnitary.setTabbedPaneIndex(0, jTabbedPane);
         moFieldIsSurfaceVariable = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsSurfaceVariable);
         moFieldIsSurfaceVariable.setTabbedPaneIndex(0, jTabbedPane);
         moFieldVolume = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfVolume, jlVolume);
-        moFieldVolume.setTabbedPaneIndex(0, jTabbedPane);
         moFieldVolume.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsVolumeFormat());
+        moFieldVolume.setTabbedPaneIndex(0, jTabbedPane);
         moFieldVolumeUnitary = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfVolumeUnitary, jlVolumeUnitary);
-        moFieldVolumeUnitary.setTabbedPaneIndex(0, jTabbedPane);
         moFieldVolumeUnitary.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsVolumeFormat());
+        moFieldVolumeUnitary.setTabbedPaneIndex(0, jTabbedPane);
         moFieldIsVolumeVariable = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsVolumeVariable);
         moFieldIsVolumeVariable.setTabbedPaneIndex(0, jTabbedPane);
         moFieldMass = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfMass, jlMass);
-        moFieldMass.setTabbedPaneIndex(0, jTabbedPane);
         moFieldMass.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsMassFormat());
+        moFieldMass.setTabbedPaneIndex(0, jTabbedPane);
         moFieldMassUnitary = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfMassUnitary, jlMassUnitary);
-        moFieldMassUnitary.setTabbedPaneIndex(0, jTabbedPane);
         moFieldMassUnitary.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsMassFormat());
+        moFieldMassUnitary.setTabbedPaneIndex(0, jTabbedPane);
         moFieldIsMassVariable = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsMassVariable);
         moFieldIsMassVariable.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkUnitAlternativeTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkUnitAlternativeTypeId, jlFkUnitAlternativeTypeId);
@@ -1343,9 +1348,6 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldUnitAlternativeBaseEquivalence = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfUnitAlternativeBaseEquivalence, jlUnitBaseEquivalence);
         moFieldUnitAlternativeBaseEquivalence.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsBaseEquivalenceFormat());
         moFieldUnitAlternativeBaseEquivalence.setTabbedPaneIndex(0, jTabbedPane);
-        moFieldSurplusPercentage = new SFormField(miClient, SLibConstants.DATA_TYPE_FLOAT, false, jtfSurplusPercentage, jlSurplusPercentage);
-        moFieldSurplusPercentage.setIsPercent(true);
-        moFieldSurplusPercentage.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat());
 
         moFieldIsFreeDiscountUnitary = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsFreeDiscountUnitary);
         moFieldIsFreeDiscountUnitary.setTabbedPaneIndex(1, jTabbedPane);
@@ -1359,21 +1361,27 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldIsFreeDiscount.setTabbedPaneIndex(1, jTabbedPane);
         moFieldIsFreeCommissions = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsFreeCommissions);
         moFieldIsFreeCommissions.setTabbedPaneIndex(1, jTabbedPane);
+        moFieldSurplusPercentage = new SFormField(miClient, SLibConstants.DATA_TYPE_FLOAT, false, jtfSurplusPercentage, jlSurplusPercentage);
+        moFieldSurplusPercentage.setIsPercent(true);
+        moFieldSurplusPercentage.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat());
+        moFieldSurplusPercentage.setTabbedPaneIndex(1, jTabbedPane);
+        moFieldIsReference = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsReference);
+        moFieldIsReference.setTabbedPaneIndex(1, jTabbedPane);
         moFieldFkDefaultItemRefId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkDefaultItemRefId_n, jlFkDefaultItemRefId_n);
         moFieldFkDefaultItemRefId_n.setPickerButton(jbFkDefaultItemRefId_n);
         moFieldFkDefaultItemRefId_n.setTabbedPaneIndex(1, jTabbedPane);
         moFieldFkAdministrativeConceptTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkAdministrativeConceptTypeId, jlFkAdministrativeConceptTypeId);
-        moFieldFkAdministrativeConceptTypeId.setTabbedPaneIndex(1, jTabbedPane);
         moFieldFkAdministrativeConceptTypeId.setPickerButton(jbFkAdministrativeConceptTypeId);
+        moFieldFkAdministrativeConceptTypeId.setTabbedPaneIndex(1, jTabbedPane);
         moFieldFkTaxableConceptTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkTaxableConceptTypeId, jlFkTaxableConceptTypeId);
-        moFieldFkTaxableConceptTypeId.setTabbedPaneIndex(1, jTabbedPane);
         moFieldFkTaxableConceptTypeId.setPickerButton(jbFkTaxableConceptTypeId);
+        moFieldFkTaxableConceptTypeId.setTabbedPaneIndex(1, jTabbedPane);
         moFieldFkFiscalAccountIncId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkFiscalAccountIncId, jlFkFiscalAccountIncId);
-        moFieldFkFiscalAccountIncId.setTabbedPaneIndex(1, jTabbedPane);
         moFieldFkFiscalAccountIncId.setPickerButton(jbFkFiscalAccountIncId);
+        moFieldFkFiscalAccountIncId.setTabbedPaneIndex(1, jTabbedPane);
         moFieldFkFiscalAccountExpId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkFiscalAccountExpId, jlFkFiscalAccountExpId);
-        moFieldFkFiscalAccountExpId.setTabbedPaneIndex(1, jTabbedPane);
         moFieldFkFiscalAccountExpId.setPickerButton(jbFkFiscalAccountExpId);
+        moFieldFkFiscalAccountExpId.setTabbedPaneIndex(1, jTabbedPane);
 
         mvFields.add(moFieldFkItemGenericId);
         mvFields.add(moFieldFkItemLineId_n);
@@ -1422,7 +1430,6 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         mvFields.add(moFieldFkUnitAlternativeTypeId);
         mvFields.add(moFieldFkLevelTypeId);
         mvFields.add(moFieldUnitAlternativeBaseEquivalence);
-        mvFields.add(moFieldSurplusPercentage);
 
         mvFields.add(moFieldIsFreeDiscountUnitary);
         mvFields.add(moFieldIsFreeDiscountEntry);
@@ -1430,6 +1437,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         mvFields.add(moFieldIsFreePrice);
         mvFields.add(moFieldIsFreeDiscount);
         mvFields.add(moFieldIsFreeCommissions);
+        mvFields.add(moFieldSurplusPercentage);
+        mvFields.add(moFieldIsReference);
         mvFields.add(moFieldFkDefaultItemRefId_n);
         mvFields.add(moFieldFkAdministrativeConceptTypeId);
         mvFields.add(moFieldFkTaxableConceptTypeId);
@@ -2670,6 +2679,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JCheckBox jckIsLotApplying;
     private javax.swing.JCheckBox jckIsMassVariable;
     private javax.swing.JCheckBox jckIsNetContentVariable;
+    private javax.swing.JCheckBox jckIsReference;
     private javax.swing.JCheckBox jckIsSurfaceVariable;
     private javax.swing.JCheckBox jckIsVolumeVariable;
     private javax.swing.JLabel jlCode;
@@ -2984,7 +2994,6 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldFkUnitAlternativeTypeId.setFieldValue(new int[] { moItem.getFkUnitAlternativeTypeId() });
         moFieldFkLevelTypeId.setFieldValue(new int[] { moItem.getFkLevelTypeId() });
         moFieldUnitAlternativeBaseEquivalence.setFieldValue(moItem.getUnitAlternativeBaseEquivalence());
-        moFieldSurplusPercentage.setFieldValue(moItem.getSurplusPercentage());
 
         moFieldIsFreeDiscountUnitary.setFieldValue(moItem.getIsFreeDiscountUnitary());
         moFieldIsFreeDiscountEntry.setFieldValue(moItem.getIsFreeDiscountEntry());
@@ -2992,6 +3001,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldIsFreePrice.setFieldValue(moItem.getIsFreePrice());
         moFieldIsFreeDiscount.setFieldValue(moItem.getIsFreeDiscount());
         moFieldIsFreeCommissions.setFieldValue(moItem.getIsFreeCommissions());
+        moFieldSurplusPercentage.setFieldValue(moItem.getSurplusPercentage());
+        moFieldIsReference.setFieldValue(moItem.getIsReference());
         moFieldFkDefaultItemRefId_n.setFieldValue(new int[] { moItem.getFkDefaultItemRefId_n() });
         moFieldFkAdministrativeConceptTypeId.setFieldValue(new int[] { moItem.getFkAdministrativeConceptTypeId() });
         moFieldFkTaxableConceptTypeId.setFieldValue(new int[] { moItem.getFkTaxableConceptTypeId() });
@@ -3109,7 +3120,6 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moItem.setFkUnitAlternativeTypeId(moFieldFkUnitAlternativeTypeId.getKeyAsIntArray()[0]);
         moItem.setFkLevelTypeId(moFieldFkLevelTypeId.getKeyAsIntArray()[0]);
         moItem.setUnitAlternativeBaseEquivalence(moFieldUnitAlternativeBaseEquivalence.getDouble());
-        moItem.setSurplusPercentage(moFieldSurplusPercentage.getDouble());
 
         moItem.setIsFreeDiscountUnitary(moFieldIsFreeDiscountUnitary.getBoolean());
         moItem.setIsFreeDiscountEntry(moFieldIsFreeDiscountEntry.getBoolean());
@@ -3117,6 +3127,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moItem.setIsFreePrice(moFieldIsFreePrice.getBoolean());
         moItem.setIsFreeDiscount(moFieldIsFreeDiscount.getBoolean());
         moItem.setIsFreeCommissions(moFieldIsFreeCommissions.getBoolean());
+        moItem.setSurplusPercentage(moFieldSurplusPercentage.getDouble());
+        moItem.setIsReference(moFieldIsReference.getBoolean());
         moItem.setFkDefaultItemRefId_n(jcbFkDefaultItemRefId_n.getSelectedIndex() <= 0 ? 0 : moFieldFkDefaultItemRefId_n.getKeyAsIntArray()[0]);
         moItem.setFkAdministrativeConceptTypeId(moFieldFkAdministrativeConceptTypeId.getKeyAsIntArray()[0]);
         moItem.setFkTaxableConceptTypeId(moFieldFkTaxableConceptTypeId.getKeyAsIntArray()[0]);

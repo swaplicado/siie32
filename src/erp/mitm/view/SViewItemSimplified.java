@@ -96,7 +96,7 @@ public class SViewItemSimplified extends erp.lib.table.STableTab implements java
         jbDelete.setEnabled(false);
 
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[14];
+        STableColumn[] aoTableColumns = new STableColumn[15];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "i.id_item");
@@ -115,6 +115,7 @@ public class SViewItemSimplified extends erp.lib.table.STableTab implements java
         }
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ig.igen", "Ítem genérico", 150);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_ref", "Referencia", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_fiscal_acc_inc", "Código agrupador SAT (ingresos)", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_fiscal_acc_exp", "Código agrupador SAT (egresos)", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "si.name", "Estatus", 100);
@@ -194,7 +195,7 @@ public class SViewItemSimplified extends erp.lib.table.STableTab implements java
             }
         }
 
-        msSql = "SELECT i.id_item, i.item, i.item_key, i.b_del, i.ts_new, i.ts_edit, i.ts_del, " +
+        msSql = "SELECT i.id_item, i.item, i.item_key, i.b_ref, i.b_del, i.ts_new, i.ts_edit, i.ts_del, " +
                 "ig.igen, si.name, u.symbol, CONCAT(fai.code, ' - ', fai.name) AS f_fiscal_acc_inc, CONCAT(fae.code, ' - ', fae.name) AS f_fiscal_acc_exp, " +
                 "un.usr, ue.usr, ud.usr, il.line " +
                 "FROM erp.itmu_item AS i " +

@@ -65,6 +65,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
     private erp.lib.form.SFormField moFieldFkUnitId;
     private erp.lib.form.SFormField moFieldFkFiscalAccountIncId;
     private erp.lib.form.SFormField moFieldFkFiscalAccountExpId;
+    private erp.lib.form.SFormField moFieldIsReference;
     private erp.lib.form.SFormField moFieldIsDeleted;
 
     private int[] manItemClassKey;
@@ -119,6 +120,8 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         jlFkUnitId = new javax.swing.JLabel();
         jcbFkUnitId = new javax.swing.JComboBox<SFormComponentItem>();
         jbEditUnit = new javax.swing.JButton();
+        jPanel9 = new javax.swing.JPanel();
+        jckIsReference = new javax.swing.JCheckBox();
         jPanel45 = new javax.swing.JPanel();
         jlFkFiscalAccountIncId = new javax.swing.JLabel();
         jcbFkFiscalAccountIncId = new javax.swing.JComboBox<SFormComponentItem>();
@@ -147,7 +150,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel4.setLayout(new java.awt.GridLayout(11, 1, 0, 5));
+        jPanel4.setLayout(new java.awt.GridLayout(12, 1, 0, 5));
 
         jPanel52.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -281,6 +284,14 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
 
         jPanel4.add(jPanel5);
 
+        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+
+        jckIsReference.setText("Referencia obligatoria");
+        jckIsReference.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel9.add(jckIsReference);
+
+        jPanel4.add(jPanel9);
+
         jPanel45.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel45.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -329,9 +340,13 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
 
         jPanel4.add(jPanel46);
 
-        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 0, 0));
 
+        jckIsDeleted.setForeground(java.awt.Color.red);
         jckIsDeleted.setText("Registro eliminado");
+        jckIsDeleted.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jckIsDeleted.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+        jckIsDeleted.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel8.add(jckIsDeleted);
 
         jPanel4.add(jPanel8);
@@ -354,7 +369,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(616, 400));
+        setSize(new java.awt.Dimension(656, 439));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -380,6 +395,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         moFieldFkFiscalAccountIncId.setPickerButton(jbFkFiscalAccountIncId);
         moFieldFkFiscalAccountExpId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkFiscalAccountExpId, jlFkFiscalAccountExpId);
         moFieldFkFiscalAccountExpId.setPickerButton(jbFkFiscalAccountExpId);
+        moFieldIsReference = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsReference);
         moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
 
         mvFields.add(moFieldFkItemGenericId);
@@ -390,6 +406,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         mvFields.add(moFieldFkUnitId);
         mvFields.add(moFieldFkFiscalAccountIncId);
         mvFields.add(moFieldFkFiscalAccountExpId);
+        mvFields.add(moFieldIsReference);
         mvFields.add(moFieldIsDeleted);
 
         jbOK.addActionListener(this);
@@ -829,6 +846,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
     private javax.swing.JPanel jPanel59;
     private javax.swing.JPanel jPanel60;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbComputeNewCode;
     private javax.swing.JButton jbCopyName;
@@ -843,6 +861,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
     private javax.swing.JComboBox<SFormComponentItem> jcbFkItemGenericId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkUnitId;
     private javax.swing.JCheckBox jckIsDeleted;
+    private javax.swing.JCheckBox jckIsReference;
     private javax.swing.JLabel jlCode;
     private javax.swing.JLabel jlFkFiscalAccountExpId;
     private javax.swing.JLabel jlFkFiscalAccountIncId;
@@ -963,6 +982,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         moFieldFkUnitId.setFieldValue(new int[] { moItem.getFkUnitId() });
         moFieldFkFiscalAccountIncId.setFieldValue(new int[] { moItem.getFkFiscalAccountIncId() });
         moFieldFkFiscalAccountExpId.setFieldValue(new int[] { moItem.getFkFiscalAccountExpId() });
+        moFieldIsReference.setFieldValue(moItem.getIsReference());
         moFieldIsDeleted.setFieldValue(moItem.getIsDeleted());
 
         if (moItem.getIsRegistryNew()) {
@@ -1026,6 +1046,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         moItem.setFkUnitId(moFieldFkUnitId.getKeyAsIntArray()[0]);
         moItem.setFkFiscalAccountIncId(moFieldFkFiscalAccountIncId.getKeyAsIntArray()[0]);
         moItem.setFkFiscalAccountExpId(moFieldFkFiscalAccountExpId.getKeyAsIntArray()[0]);
+        moItem.setIsReference(moFieldIsReference.getBoolean());
         moItem.setIsDeleted(moFieldIsDeleted.getBoolean());
 
         return moItem;
