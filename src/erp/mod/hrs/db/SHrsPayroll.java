@@ -247,6 +247,7 @@ public class SHrsPayroll {
     
     public ArrayList<SDbAbsenceConsumption> getAbsenceConsumptionDays(final SHrsPayrollReceipt hrsPayrollReceipt, final SHrsEmployee hrsEmployee) {
         int consumptionPreviousDays = 0;
+        double receiptDays = 0;
         double consumptionEffectiveDays = 0;
         int consumptionCurrentDays = 0;
         int businessDays = 0;
@@ -262,6 +263,7 @@ public class SHrsPayroll {
         try {
             aAbsenceConsumption = new ArrayList<SDbAbsenceConsumption>();
             
+            receiptDays = hrsEmployee.getEmployeeDays().getReceiptDays();
             workingDaysAbsence = hrsEmployee.getEmployeeDays().getBusinessDays();
             
             for (SDbAbsence absence : hrsEmployee.getAbsences()) {
@@ -271,8 +273,13 @@ public class SHrsPayroll {
                 
                 if (consumptionCurrentDays > 0 && !absence.isClosed()) {
                     if (absence.getDateStart().compareTo(hrsPayrollReceipt.getHrsPayroll().getPayroll().getDateEnd()) <= 0) {
+                        /* XXX jbarajas 2016-03-22 modified for consumption of days naturals
                         if (consumptionCurrentDays > (workingDaysAbsence - consumptionEffectiveDays)) {
                             consumptionCurrentDays = (int) (workingDaysAbsence - consumptionEffectiveDays);
+                        }
+                        */
+                        if (consumptionCurrentDays > ((absence.getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_DIS ? receiptDays : workingDaysAbsence) - consumptionEffectiveDays)) {
+                            consumptionCurrentDays = (int) ((absence.getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_DIS ? receiptDays : workingDaysAbsence) - consumptionEffectiveDays);
                         }
                         else {
                             isConsumptionlast = true;
@@ -305,7 +312,8 @@ public class SHrsPayroll {
                         }
 
                         consumptionEffectiveDays += consumptionCurrentDays;
-                        if (consumptionEffectiveDays >= workingDaysAbsence) {
+                        //if (consumptionEffectiveDays >= workingDaysAbsence) {  XXX jbarajas 2016-03-22 modified for consumption of days naturals
+                        if (consumptionEffectiveDays >= (absence.getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_DIS ? receiptDays : workingDaysAbsence)) {
                             break;
                         }
                     }

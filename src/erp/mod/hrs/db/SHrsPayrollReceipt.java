@@ -539,7 +539,7 @@ public class SHrsPayrollReceipt {
         }
 
         if (!aDeductionsToRemove.isEmpty()) {
-            if ((dTaxComputed - dTaxAccumulated) == 0) {
+            if ((dTaxComputed - dTaxAccumulated) <= 0) {
                 for (SHrsPayrollReceiptDeduction deduction : aDeductionsToRemove) {
                     maHrsDeductions.remove(deduction);
                 }
@@ -582,7 +582,7 @@ public class SHrsPayrollReceipt {
         }
 
         if (!aEarningsToRemove.isEmpty()) {
-            if ((dSubsidyComputed - dSubsidyAccumulated) == 0) {
+            if ((dSubsidyComputed - dSubsidyAccumulated) <= 0) {
                 for (SHrsPayrollReceiptEarning earning : aEarningsToRemove) {
                     maHrsEarnings.remove(earning);
                 }
@@ -1301,7 +1301,7 @@ public class SHrsPayrollReceipt {
         }
         
         if (earningNormal != null) {
-            
+
             for (SHrsPayrollReceiptEarning earning : moHrsEmployee.getHrsPayrollReceipt().getHrsEarnings()) {
                 if (SLibUtils.compareKeys(earning.getEarning().getPrimaryKey(), earningNormal.getPrimaryKey())) {
                     if (add) {
@@ -1312,7 +1312,7 @@ public class SHrsPayrollReceipt {
                     }
                     unit = !earningNormal.isDaysAdjustment() ? unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() : (unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() * moHrsEmployee.getEmployeeDays().getFactorDaysPaid());
                     amount = SLibUtils.round((unit * earning.getReceiptEarning().getAmountUnitary() * earningNormal.getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-                    
+
                     earning.getReceiptEarning().setUnitsAlleged(unitAlleged);
                     earning.getReceiptEarning().setUnits(unit);
                     earning.getReceiptEarning().setAmount_r(amount);
@@ -1344,7 +1344,7 @@ public class SHrsPayrollReceipt {
                     unit = !earningNormal.isDaysAdjustment() ? unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() : (unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() * moHrsEmployee.getEmployeeDays().getFactorDaysPaid());;
                 }
                 amount = SLibUtils.round((unit * amount_unt), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-            
+
                 hrsPayrollReceiptEarning = new SHrsPayrollReceiptEarning();
                 hrsPayrollReceiptEarning.setEarning(earningNormal);
 
