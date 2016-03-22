@@ -382,6 +382,8 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     @Override
     public void initRegistry() {
         initBaseRegistry();
+        
+        mlTimeout = 1000 * 60 * 120; // 2 hrs
 
         mnPkPayrollId = 0;
         mnPkEmployeeId = 0;
