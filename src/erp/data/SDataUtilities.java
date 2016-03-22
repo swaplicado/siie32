@@ -133,6 +133,8 @@ import erp.mmkt.data.SProcPriceListCustomerTypeVal;
 import erp.mmkt.data.SProcPriceListCustomerVal;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.bps.db.SBpsUtils;
+import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SDataBizPartnerBlocking;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataCfdPacType;
@@ -199,6 +201,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
 import sa.lib.srv.SSrvConsts;
@@ -3206,9 +3209,10 @@ public abstract class SDataUtilities {
         String txt = "";
         ResultSet resultSet = null;
         
-        sql = "SELECT DISTINCT d.num_ser, d.num, d.dt "
+        sql = "SELECT DISTINCT d.num_ser, d.num, d.dt, b.bp "
                 + "FROM trn_dps AS d "
                 + "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc "
+                + "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp "
                 + "WHERE d.b_del = 0 AND de.b_del = 0 AND d.fid_st_dps <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " AND "
                 + "d.fid_ct_dps = " + dpsClassKey[0] + " AND d.fid_cl_dps = " + dpsClassKey[1] + " AND de.ref = '" + reference + "' "
                 + (dpsCurrentKey == null || dpsCurrentKey.length != 2 || dpsCurrentKey[0] == SLibConstants.UNDEFINED || dpsCurrentKey[1] == SLibConstants.UNDEFINED ?
@@ -3217,12 +3221,13 @@ public abstract class SDataUtilities {
         resultSet = session.getStatement().executeQuery(sql);
         while (resultSet.next()) {
             i++;
-            txt += (txt.isEmpty() ? "" : ", ") + (resultSet.getString("d.num_ser").isEmpty() ? "" : resultSet.getString("d.num_ser") + "-") + resultSet.getString("d.num") +
-                    " (" + SLibUtils.DateFormatDate.format(resultSet.getDate("d.dt")) + ")";
+            txt += (txt.isEmpty() ? "" : ";\n") + "folio: " + (resultSet.getString("d.num_ser").isEmpty() ? "" : resultSet.getString("d.num_ser") + "-") + resultSet.getString("d.num") + ", "
+                    + "fecha: " + SLibUtils.DateFormatDate.format(resultSet.getDate("d.dt")) + ", "
+                    + SBpsUtils.getBizPartnerCategoryName(STrnUtils.getBizPartnerCategoryId(dpsClassKey[0]), SUtilConsts.NUM_SNG).toLowerCase() + ": " + resultSet.getString("b.bp");
         }
         
         if (!txt.isEmpty()) {
-            throw new Exception("¡La referencia '" + reference + "' ya existe en " + (i == 1 ? "el documento" : "los documentos") + " " + txt + "!");
+            throw new Exception("La referencia '" + reference + "' ya existe en " + (i == 1 ? "el documento" : "los documentos") + ":\n" + txt + ".");
         }
     }
 
