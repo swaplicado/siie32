@@ -199,6 +199,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiSession;
 import sa.lib.srv.SSrvConsts;
 import sa.lib.xml.SXmlUtils;
 
@@ -2717,6 +2719,9 @@ public abstract class SDataUtilities {
             case SDataConstantsSys.REP_FIN_BPS_BAL:
                 name = "reps/fin_bps_bal.jasper";
                 break;
+            case SDataConstantsSys.REP_FIN_BPS_BAL_PER:
+                name = "reps/fin_bps_bal_per.jasper";
+                break;
             case SDataConstantsSys.REP_FIN_BPS_BAL_DPS:
                 name = "reps/fin_bps_bal_dps.jasper";
                 break;
@@ -3193,6 +3198,32 @@ public abstract class SDataUtilities {
         }
 
         return msg;
+    }
+
+    public static void validateDpsEtyReference(final SGuiSession session, final int[] dpsClassKey, final String reference, final int[] dpsCurrentKey) throws Exception {
+        int i = 0;
+        String sql = "";
+        String txt = "";
+        ResultSet resultSet = null;
+        
+        sql = "SELECT DISTINCT d.num_ser, d.num, d.dt "
+                + "FROM trn_dps AS d "
+                + "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc "
+                + "WHERE d.b_del = 0 AND de.b_del = 0 AND d.fid_st_dps <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " AND "
+                + "d.fid_ct_dps = " + dpsClassKey[0] + " AND d.fid_cl_dps = " + dpsClassKey[1] + " AND de.ref = '" + reference + "' "
+                + (dpsCurrentKey == null || dpsCurrentKey.length != 2 || dpsCurrentKey[0] == SLibConstants.UNDEFINED || dpsCurrentKey[1] == SLibConstants.UNDEFINED ?
+                "" : "AND NOT (d.id_year = " + dpsCurrentKey[0] + " AND d.id_doc = " + dpsCurrentKey[1] + ")")
+                + "ORDER BY d.num_ser, d.num, d.dt; ";
+        resultSet = session.getStatement().executeQuery(sql);
+        while (resultSet.next()) {
+            i++;
+            txt += (txt.isEmpty() ? "" : ", ") + (resultSet.getString("d.num_ser").isEmpty() ? "" : resultSet.getString("d.num_ser") + "-") + resultSet.getString("d.num") +
+                    " (" + SLibUtils.DateFormatDate.format(resultSet.getDate("d.dt")) + ")";
+        }
+        
+        if (!txt.isEmpty()) {
+            throw new Exception("¡La referencia '" + reference + "' ya existe en " + (i == 1 ? "el documento" : "los documentos") + " " + txt + "!");
+        }
     }
 
     @SuppressWarnings("unchecked")

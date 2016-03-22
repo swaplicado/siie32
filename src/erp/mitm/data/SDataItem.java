@@ -55,6 +55,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected double mdWeightDelivery;
     protected double mdUnitAlternativeBaseEquivalence;
     protected double mdSurplusPercentage;
+    protected boolean mbIsReference;
     protected boolean mbIsFreePrice;
     protected boolean mbIsFreeDiscount;
     protected boolean mbIsFreeDiscountUnitary;
@@ -138,6 +139,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public void setWeightDelivery(double d) { mdWeightDelivery = d; }
     public void setUnitAlternativeBaseEquivalence(double d) { mdUnitAlternativeBaseEquivalence = d; }
     public void setSurplusPercentage(double d) { mdSurplusPercentage = d; }
+    public void setIsReference(boolean b) { mbIsReference = b; }
     public void setIsFreePrice(boolean b) { mbIsFreePrice = b; }
     public void setIsFreeDiscount(boolean b) { mbIsFreeDiscount = b; }
     public void setIsFreeDiscountUnitary(boolean b) { mbIsFreeDiscountUnitary = b; }
@@ -209,6 +211,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public double getWeightDelivery() { return mdWeightDelivery; }
     public double getUnitAlternativeBaseEquivalence() { return mdUnitAlternativeBaseEquivalence; }
     public double getSurplusPercentage() { return mdSurplusPercentage; }
+    public boolean getIsReference() { return mbIsReference; }
     public boolean getIsFreePrice() { return mbIsFreePrice; }
     public boolean getIsFreeDiscount() { return mbIsFreeDiscount; }
     public boolean getIsFreeDiscountUnitary() { return mbIsFreeDiscountUnitary; }
@@ -319,6 +322,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
         mdWeightDelivery = 0;
         mdUnitAlternativeBaseEquivalence = 0;
         mdSurplusPercentage = 0;
+        mbIsReference = false;
         mbIsFreePrice = false;
         mbIsFreeDiscount = false;
         mbIsFreeDiscountUnitary = false;
@@ -413,6 +417,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                 mdWeightDelivery = resultSet.getDouble("weight_delivery");
                 mdUnitAlternativeBaseEquivalence = resultSet.getDouble("unit_alt_base_equiv");
                 mdSurplusPercentage = resultSet.getDouble("surplus_per");
+                mbIsReference = resultSet.getBoolean("b_ref");
                 mbIsFreePrice = resultSet.getBoolean("b_free_price");
                 mbIsFreeDiscount = resultSet.getBoolean("b_free_disc");
                 mbIsFreeDiscountUnitary = resultSet.getBoolean("b_free_disc_u");
@@ -528,7 +533,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?," +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?," +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?," +
-                    "?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkItemId);
             callableStatement.setString(nParam++, msKey);
             callableStatement.setString(nParam++, msItem);
@@ -564,6 +569,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
             callableStatement.setDouble(nParam++, mdWeightDelivery);
             callableStatement.setDouble(nParam++, mdUnitAlternativeBaseEquivalence);
             callableStatement.setDouble(nParam++, mdSurplusPercentage);
+            callableStatement.setBoolean(nParam++, mbIsReference);
             callableStatement.setBoolean(nParam++, mbIsFreePrice);
             callableStatement.setBoolean(nParam++, mbIsFreeDiscount);
             callableStatement.setBoolean(nParam++, mbIsFreeDiscountUnitary);

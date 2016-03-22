@@ -1545,6 +1545,11 @@
                         </Property>
                       </Properties>
                     </Component>
+                    <Component class="javax.swing.JCheckBox" name="jckIsReference">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Referencia obligatoria"/>
+                      </Properties>
+                    </Component>
                   </SubComponents>
                 </Container>
                 <Container class="javax.swing.JPanel" name="jPanel2">

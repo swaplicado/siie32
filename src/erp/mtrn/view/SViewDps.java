@@ -627,26 +627,6 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         return key;
     }
 
-    /* XXX Method temporarily eliminated. Used in all printing methods. Check if it is not really needed. (sflores 2013-08-28)
-    private boolean isBizPartnerBlocked() {
-        boolean isBlocked = false;
-
-        if (mbIsOrd || mbIsDoc) {
-            try {
-                isBlocked = SDataUtilities.obtainIsBizPartnerBlockedByDps(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
-                if (isBlocked) {
-                    miClient.showMsgBoxWarning(SLibConstants.MSG_INF_BP_BLOCKED);
-                }
-            }
-            catch (Exception e) {
-                SLibUtilities.renderException(this, e);
-            }
-        }
-
-        return isBlocked;
-    }
-    */
-
     @Override
     public void actionNew() {
         if (jbNew.isEnabled()) {
@@ -1781,7 +1761,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         for (int i = 0; i < mvTableSettings.size(); i++) {
             setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
             if (setting.getType() == STableConstants.SETTING_FILTER_DELETED && setting.getStatus() == STableConstants.STATUS_ON) {
-                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "d.b_del = FALSE ";
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "d.b_del = 0 ";
             }
             else if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {
                 sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "d.dt");
@@ -1801,7 +1781,6 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
                 "(SELECT CONCAT(ord.id_year, '-', ord.num) FROM mfg_ord AS ord WHERE d.fid_mfg_year_n = ord.id_year AND d.fid_mfg_ord_n = ord.id_ord) AS num_ord, " +
                 "IF(d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + STableConstants.ICON_ST_ANNUL + ", " + STableConstants.ICON_NULL + ") AS f_ico, " +
-                //"IF(x.ts IS NULL OR doc_xml = '', " + STableConstants.ICON_NULL  + ", IF(x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFD + " OR x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_NA + ", " + STableConstants.ICON_XML + ", IF(x.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(uuid) = 0, " + STableConstants.ICON_XML_PEND + ", " + STableConstants.ICON_XML_SIGN + "))) AS f_ico_xml, " +
                 "IF(x.ts IS NULL OR doc_xml = '', " + STableConstants.ICON_NULL  + ", " + /* not is CFD not is CFDI */
                 "IF(x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFD + " OR x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_NA + ", " + STableConstants.ICON_XML + ", " + /* is CFD */
                 "IF(x.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(uuid) = 0, " + STableConstants.ICON_XML_PEND + ", " + /* CFDI pending sign */
@@ -1811,8 +1790,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 STableConstants.ICON_XML_SIGN + " " + /* CFDI signed, canceled only SIIE */
                 ")))))) AS f_ico_xml, " +
                 "bp.id_bp, bp.bp, bpc.bp_key, bpb.id_bpb, bpb.bpb, " +
-                "(SELECT c.cur_key FROM erp.cfgu_cur AS c WHERE d.fid_cur = c.id_cur) AS f_cur_key, 'MXN' AS f_cur_key_local, '" +
-                miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey() + "' AS f_cur_key, " +
+                "(SELECT c.cur_key FROM erp.cfgu_cur AS c WHERE d.fid_cur = c.id_cur) AS f_cur_key, " +
+                "'" + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + "' AS f_cur_key_local, " +
                 "(SELECT cob.code FROM erp.bpsu_bpb AS cob WHERE d.fid_cob = cob.id_bpb) AS f_cob_code, ul.usr, uc.usr, un.usr, ue.usr, ud.usr ";
 
         if (mbIsDoc || mbIsDocAdj) {
@@ -1854,27 +1833,15 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 break;
 
             case SDataConstantsSys.TRNX_TP_DPS_DOC:
-            case SDataConstantsSys.TRNX_TP_DPS_DOC + SDataConstantsSys.TRNX_DPS_DOC_ANNUL:
-            case SDataConstantsSys.TRNX_TP_DPS_DOC + SDataConstantsSys.TRNX_DPS_DOC_RISS:
-            case SDataConstantsSys.TRNX_TP_DPS_DOC + SDataConstantsSys.TRNX_DPS_DOC_REPL:
                 msSql += (mbIsCategoryPur ?
                         "d.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1] + " " :
-                        "d.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_DOC[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_DOC[1] + " ") + (
-                        mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_DOC + SDataConstantsSys.TRNX_DPS_DOC_ANNUL ? " AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED :
-                        mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_DOC + SDataConstantsSys.TRNX_DPS_DOC_RISS ? " AND d.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_RISS :
-                        mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_DOC + SDataConstantsSys.TRNX_DPS_DOC_REPL ? " AND d.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_REPL : "") + " ";
+                        "d.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_DOC[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_DOC[1] + " ");
                 break;
 
             case SDataConstantsSys.TRNX_TP_DPS_ADJ:
-            case SDataConstantsSys.TRNX_TP_DPS_ADJ + SDataConstantsSys.TRNX_DPS_DOC_ANNUL:
-            case SDataConstantsSys.TRNX_TP_DPS_ADJ + SDataConstantsSys.TRNX_DPS_DOC_RISS:
-            case SDataConstantsSys.TRNX_TP_DPS_ADJ + SDataConstantsSys.TRNX_DPS_DOC_REPL:
                 msSql += (mbIsCategoryPur ?
                         "d.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[1] + " " :
-                        "d.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ[1] + " ") + (
-                        mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_DOC + SDataConstantsSys.TRNX_DPS_DOC_ANNUL ? " AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED :
-                        mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_DOC + SDataConstantsSys.TRNX_DPS_DOC_RISS ? " AND d.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_RISS :
-                        mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_DOC + SDataConstantsSys.TRNX_DPS_DOC_REPL ? " AND d.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_REPL : "") + " ";
+                        "d.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ[1] + " ");
                 break;
             default:
         }

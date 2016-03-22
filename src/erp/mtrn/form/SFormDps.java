@@ -4089,7 +4089,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             case 1: // linked to commissions
                                 msg = "no puede ser posterior a la fecha de los documentos de comisiones.";
                                 break;
-                            case 2: // linked to diog's
+                            case 2: // linked to DIOG's
                                 msg = "no puede ser posterior a la fecha del documento de inventarios: '" + (String) vParams.get(1) + "'.";
                                 break;
                             case 3: // linked to shipments

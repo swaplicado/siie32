@@ -111,41 +111,36 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiOrdersLinkedEntry;
     private javax.swing.JMenuItem jmiOrdersLinksSource;
     private javax.swing.JMenuItem jmiOrdersLinksDestiny;
-    private javax.swing.JMenuItem jmiOrdersAutorizedPending;
-    private javax.swing.JMenuItem jmiOrdersAutorizedAutorized;
-    private javax.swing.JMenuItem jmiOrdersAutorizedRejected;
+    private javax.swing.JMenuItem jmiOrdersAutPending;
+    private javax.swing.JMenuItem jmiOrdersAutAutorized;
+    private javax.swing.JMenuItem jmiOrdersAutRejected;
     private javax.swing.JMenuItem jmiOrdersPrice;
-    private javax.swing.JMenuItem jmiOrdersPriceHistory;
+    private javax.swing.JMenuItem jmiOrdersPriceHist;
     private javax.swing.JMenu jmDps;
     private javax.swing.JMenuItem jmiDpsDoc;
     private javax.swing.JMenuItem jmiDpsEntry;
-    private javax.swing.JMenuItem jmiDpsAnnuled;
-    private javax.swing.JMenuItem jmiDpsReissued;
-    private javax.swing.JMenuItem jmiDpsReplaced;
+    private javax.swing.JMenuItem jmiDpsEntryRef;
     private javax.swing.JMenuItem jmiDpsLinksDestiny;
     private javax.swing.JMenuItem jmiDpsLinksTrace;
-    private javax.swing.JMenuItem jmiDpsAutorizedPending;
-    private javax.swing.JMenuItem jmiDpsAutorizedAutorized;
-    private javax.swing.JMenuItem jmiDpsAutorizedReject;
-    private javax.swing.JMenuItem jmiDpsAuditPending;
-    private javax.swing.JMenuItem jmiDpsAudited;
-    private javax.swing.JMenuItem jmiDpsSendPendingEmail;
-    private javax.swing.JMenuItem jmiDpsSentEmail;
-    private javax.swing.JMenuItem jmiDpsSendPendingWs;
-    private javax.swing.JMenuItem jmiDpsApprovedWs;
-    private javax.swing.JMenuItem jmiDpsRejectWs;
+    private javax.swing.JMenuItem jmiDpsAutPending;
+    private javax.swing.JMenuItem jmiDpsAutAutorized;
+    private javax.swing.JMenuItem jmiDpsAutReject;
+    private javax.swing.JMenuItem jmiDpsAudPending;
+    private javax.swing.JMenuItem jmiDpsAudAudited;
     private javax.swing.JMenuItem jmiDpsPrice;
-    private javax.swing.JMenuItem jmiDpsPriceHistory;
+    private javax.swing.JMenuItem jmiDpsPriceHist;
+    private javax.swing.JMenuItem jmiDpsMailPending;
+    private javax.swing.JMenuItem jmiDpsMailSent;
+    private javax.swing.JMenuItem jmiDpsWsPending;
+    private javax.swing.JMenuItem jmiDpsWsApproved;
+    private javax.swing.JMenuItem jmiDpsWsReject;
     private javax.swing.JMenu jmDpsAdj;
     private javax.swing.JMenuItem jmiDpsAdjDoc;
-    private javax.swing.JMenuItem jmiDpsAdjAnnuled;
-    private javax.swing.JMenuItem jmiDpsAdjReissued;
-    private javax.swing.JMenuItem jmiDpsAdjReplaced;
-    private javax.swing.JMenuItem jmiDpsAdjSendPendingEmail;
-    private javax.swing.JMenuItem jmiDpsAdjSentEmail;
-    private javax.swing.JMenuItem jmiDpsAdjSendPendingWs;
-    private javax.swing.JMenuItem jmiDpsAdjApprovedWs;
-    private javax.swing.JMenuItem jmiDpsAdjRejectWs;
+    private javax.swing.JMenuItem jmiDpsAdjMailPending;
+    private javax.swing.JMenuItem jmiDpsAdjMailSent;
+    private javax.swing.JMenuItem jmiDpsAdjWsPending;
+    private javax.swing.JMenuItem jmiDpsAdjWsApproved;
+    private javax.swing.JMenuItem jmiDpsAdjWsRejected;
     private javax.swing.JMenu jmStkDvy;
     private javax.swing.JMenuItem jmiStkDvyPend;
     private javax.swing.JMenuItem jmiStkDvyPendEntry;
@@ -162,6 +157,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenu jmRep;
     private javax.swing.JMenu jmRepStats;
     private javax.swing.JMenu jmRepBackorder;
+    private javax.swing.JMenu jmRepQueries;
     private javax.swing.JMenuItem jmiRepTrnGlobal;
     private javax.swing.JMenuItem jmiRepTrnByMonth;
     private javax.swing.JMenuItem jmiRepTrnByItemGeneric;
@@ -181,7 +177,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiRepBackorderOrderByItem;
     private javax.swing.JMenuItem jmiRepBackorderOrderByItemBizPartner;
     private javax.swing.JMenuItem jmiRepBackorderOrderByItemBizPartnerBra;
-    private javax.swing.JMenuItem jmiRepBizPartnerBalanceAgingView;
+    private javax.swing.JMenuItem jmiQryBizPartnerBalance;
+    private javax.swing.JMenuItem jmiQryBizPartnerAccountsAging;
     private javax.swing.JMenuItem jmiRepBizPartnerBalance;
     private javax.swing.JMenuItem jmiRepBizPartnerBalanceDps;
     private javax.swing.JMenuItem jmiRepBizPartnerBalanceAging;
@@ -331,11 +328,11 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiOrdersLinkedEntry = new JMenuItem("Pedidos procesados a detalle");
         jmiOrdersLinksSource = new JMenuItem("Vínculos de pedidos como origen");
         jmiOrdersLinksDestiny = new JMenuItem("Vínculos de pedidos como destino");
-        jmiOrdersAutorizedPending = new JMenuItem("Pedidos por autorizar");
-        jmiOrdersAutorizedAutorized = new JMenuItem("Pedidos autorizados");
-        jmiOrdersAutorizedRejected = new JMenuItem("Pedidos rechazados");
-        jmiOrdersPriceHistory = new JMenuItem("Historial de precios de ventas");
+        jmiOrdersAutPending = new JMenuItem("Pedidos por autorizar");
+        jmiOrdersAutAutorized = new JMenuItem("Pedidos autorizados");
+        jmiOrdersAutRejected = new JMenuItem("Pedidos rechazados");
         jmiOrdersPrice = new JMenuItem("Precios de ventas");
+        jmiOrdersPriceHist = new JMenuItem("Historial de precios de ventas");
         jmOrd.add(jmiOrders);
         jmOrd.addSeparator();
         jmOrd.add(jmiOrdersLinkPend);
@@ -347,81 +344,70 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmOrd.add(jmiOrdersLinksSource);
         jmOrd.add(jmiOrdersLinksDestiny);
         jmOrd.addSeparator();
-        jmOrd.add(jmiOrdersAutorizedPending);
-        jmOrd.add(jmiOrdersAutorizedAutorized);
-        jmOrd.add(jmiOrdersAutorizedRejected);
+        jmOrd.add(jmiOrdersAutPending);
+        jmOrd.add(jmiOrdersAutAutorized);
+        jmOrd.add(jmiOrdersAutRejected);
         jmOrd.addSeparator();
-        jmOrd.add(jmiOrdersPriceHistory);
         jmOrd.add(jmiOrdersPrice);
+        jmOrd.add(jmiOrdersPriceHist);
 
         jmDps = new JMenu("Facturas");
         jmiDpsDoc = new JMenuItem("Facturas de ventas");
         jmiDpsEntry = new JMenuItem("Facturas de ventas a detalle");
-        jmiDpsAnnuled = new JMenuItem("Anulación de facturas");
-        jmiDpsReissued = new JMenuItem("Reimpresión de facturas");
-        jmiDpsReplaced = new JMenuItem("Sustitución de facturas");
+        jmiDpsEntryRef = new JMenuItem("Referencias de partidas de facturas");
         jmiDpsLinksDestiny = new JMenuItem("Vínculos de facturas como destino");
         jmiDpsLinksTrace = new JMenuItem("Rastreo de vínculos de facturas");
-        jmiDpsAutorizedPending = new JMenuItem("Facturas por autorizar");
-        jmiDpsAutorizedAutorized = new JMenuItem("Facturas autorizadas");
-        jmiDpsAutorizedReject = new JMenuItem("Facturas rechazadas");
-        jmiDpsAuditPending = new JMenuItem("Facturas por auditar");
-        jmiDpsAudited = new JMenuItem("Facturas auditadas");
-        jmiDpsSendPendingEmail = new JMenuItem("Facturas por enviar por correo-e");
-        jmiDpsSentEmail = new JMenuItem("Facturas enviadas por correo-e");
-        jmiDpsSendPendingWs = new JMenuItem("Facturas por enviar por web-service");
-        jmiDpsApprovedWs = new JMenuItem("Facturas aceptadas por web-service");
-        jmiDpsRejectWs = new JMenuItem("Facturas rechazadas por web-service");
-        jmiDpsPriceHistory = new JMenuItem("Historial de precios de ventas");
+        jmiDpsAutPending = new JMenuItem("Facturas por autorizar");
+        jmiDpsAutAutorized = new JMenuItem("Facturas autorizadas");
+        jmiDpsAutReject = new JMenuItem("Facturas rechazadas");
+        jmiDpsAudPending = new JMenuItem("Facturas por auditar");
+        jmiDpsAudAudited = new JMenuItem("Facturas auditadas");
         jmiDpsPrice = new JMenuItem("Precios de ventas");
+        jmiDpsPriceHist = new JMenuItem("Historial de precios de ventas");
+        jmiDpsMailPending = new JMenuItem("Facturas por enviar por correo-e");
+        jmiDpsMailSent = new JMenuItem("Facturas enviadas por correo-e");
+        jmiDpsWsPending = new JMenuItem("Facturas por enviar por web-service");
+        jmiDpsWsApproved = new JMenuItem("Facturas aceptadas por web-service");
+        jmiDpsWsReject = new JMenuItem("Facturas rechazadas por web-service");
         jmDps.add(jmiDpsDoc);
         jmDps.add(jmiDpsEntry);
-        jmDps.addSeparator();
-        jmDps.add(jmiDpsAnnuled);
-        jmDps.add(jmiDpsReissued);
-        jmDps.add(jmiDpsReplaced);
+        jmDps.add(jmiDpsEntryRef);
         jmDps.addSeparator();
         jmDps.add(jmiDpsLinksDestiny);
         jmDps.add(jmiDpsLinksTrace);
         jmDps.addSeparator();
-        jmDps.add(jmiDpsAutorizedPending);
-        jmDps.add(jmiDpsAutorizedAutorized);
-        jmDps.add(jmiDpsAutorizedReject);
+        jmDps.add(jmiDpsAutPending);
+        jmDps.add(jmiDpsAutAutorized);
+        jmDps.add(jmiDpsAutReject);
         jmDps.addSeparator();
-        jmDps.add(jmiDpsAuditPending);
-        jmDps.add(jmiDpsAudited);
+        jmDps.add(jmiDpsAudPending);
+        jmDps.add(jmiDpsAudAudited);
         jmDps.addSeparator();
-        jmDps.add(jmiDpsSendPendingEmail);
-        jmDps.add(jmiDpsSentEmail);
+        jmDps.add(jmiDpsPrice);
+        jmDps.add(jmiDpsPriceHist);
         jmDps.addSeparator();
-        jmDps.add(jmiDpsSendPendingWs);
-        jmDps.add(jmiDpsApprovedWs);
-        jmDps.add(jmiDpsRejectWs);
+        jmDps.add(jmiDpsMailPending);
+        jmDps.add(jmiDpsMailSent);
         jmDps.addSeparator();
-        jmDps.add(jmiDpsPriceHistory);
+        jmDps.add(jmiDpsWsPending);
+        jmDps.add(jmiDpsWsApproved);
+        jmDps.add(jmiDpsWsReject);
 
         jmDpsAdj = new JMenu("Notas crédito");
         jmiDpsAdjDoc = new JMenuItem("Notas de crédito de ventas");
-        jmiDpsAdjAnnuled = new JMenuItem("Anulación de notas de crédito");
-        jmiDpsAdjReissued = new JMenuItem("Reimpresión de notas de crédito");
-        jmiDpsAdjReplaced = new JMenuItem("Sustitución de notas de crédito");
-        jmiDpsAdjSendPendingEmail = new JMenuItem("Notas de crédito por enviar por correo-e");
-        jmiDpsAdjSentEmail = new JMenuItem("Notas de crédito enviadas por correo-e");
-        jmiDpsAdjSendPendingWs = new JMenuItem("Notas de crédito por enviar por web-service");
-        jmiDpsAdjApprovedWs = new JMenuItem("Notas de crédito aceptadas por web-service");
-        jmiDpsAdjRejectWs = new JMenuItem("Notas de crédito rechazadas por web-service");
+        jmiDpsAdjMailPending = new JMenuItem("Notas de crédito por enviar por correo-e");
+        jmiDpsAdjMailSent = new JMenuItem("Notas de crédito enviadas por correo-e");
+        jmiDpsAdjWsPending = new JMenuItem("Notas de crédito por enviar por web-service");
+        jmiDpsAdjWsApproved = new JMenuItem("Notas de crédito aceptadas por web-service");
+        jmiDpsAdjWsRejected = new JMenuItem("Notas de crédito rechazadas por web-service");
         jmDpsAdj.add(jmiDpsAdjDoc);
         jmDpsAdj.addSeparator();
-        jmDpsAdj.add(jmiDpsAdjAnnuled);
-        jmDpsAdj.add(jmiDpsAdjReissued);
-        jmDpsAdj.add(jmiDpsAdjReplaced);
+        jmDpsAdj.add(jmiDpsAdjMailPending);
+        jmDpsAdj.add(jmiDpsAdjMailSent);
         jmDpsAdj.addSeparator();
-        jmDpsAdj.add(jmiDpsAdjSendPendingEmail);
-        jmDpsAdj.add(jmiDpsAdjSentEmail);
-        jmDpsAdj.addSeparator();
-        jmDpsAdj.add(jmiDpsAdjSendPendingWs);
-        jmDpsAdj.add(jmiDpsAdjApprovedWs);
-        jmDpsAdj.add(jmiDpsAdjRejectWs);
+        jmDpsAdj.add(jmiDpsAdjWsPending);
+        jmDpsAdj.add(jmiDpsAdjWsApproved);
+        jmDpsAdj.add(jmiDpsAdjWsRejected);
 
         jmStkDvy = new JMenu("Surtidos");
         jmiStkDvyPend = new JMenuItem("Ventas por surtir");
@@ -456,6 +442,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
 
         jmRep = new JMenu("Reportes");
         jmRepStats = new JMenu("Consultas de estadísticas de ventas");
+        jmRepQueries = new JMenu("Consultas de saldos de clientes");
         jmiRepTrnGlobal = new JMenuItem("Ventas globales");
         jmiRepTrnByMonth = new JMenuItem("Ventas globales por mes");
         jmiRepTrnByItemGeneric = new JMenuItem("Ventas por ítem genérico");
@@ -476,7 +463,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepBackorderOrderByItem = new JMenuItem("Backorder de pedidos por ítem");
         jmiRepBackorderOrderByItemBizPartner = new JMenuItem("Backorder de pedidos por ítem-cliente");
         jmiRepBackorderOrderByItemBizPartnerBra = new JMenuItem("Backorder de pedidos por ítem-cliente sucursal");
-        jmiRepBizPartnerBalanceAgingView = new JMenuItem("Consulta de antigüedad de saldos de clientes");
+        jmiQryBizPartnerBalance = new JMenuItem("Consulta de saldos de clientes");
+        jmiQryBizPartnerAccountsAging = new JMenuItem("Consulta de antigüedad de saldos de clientes");
         jmiRepBizPartnerBalance = new JMenuItem("Saldos clientes...");
         jmiRepBizPartnerBalanceDps = new JMenuItem("Saldos clientes por documento...");
         jmiRepBizPartnerBalanceAging = new JMenuItem("Antigüedad de saldos de clientes...");
@@ -527,10 +515,12 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmRepBackorder.add(jmiRepBackorderOrderByItem);
         jmRepBackorder.add(jmiRepBackorderOrderByItemBizPartner);
         jmRepBackorder.add(jmiRepBackorderOrderByItemBizPartnerBra);
+        jmRepQueries.add(jmiQryBizPartnerBalance);
+        jmRepQueries.add(jmiQryBizPartnerAccountsAging);
 
         jmRep.add(jmRepStats);
         jmRep.add(jmRepBackorder);
-        jmRep.add(jmiRepBizPartnerBalanceAgingView);
+        jmRep.add(jmRepQueries);
         jmRep.addSeparator();
         jmRep.add(jmiRepBizPartnerBalance);
         jmRep.add(jmiRepBizPartnerBalanceDps);
@@ -613,39 +603,34 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiOrdersLinkedEntry.addActionListener(this);
         jmiOrdersLinksSource.addActionListener(this);
         jmiOrdersLinksDestiny.addActionListener(this);
-        jmiOrdersAutorizedPending.addActionListener(this);
-        jmiOrdersAutorizedAutorized.addActionListener(this);
-        jmiOrdersAutorizedRejected.addActionListener(this);
-        jmiOrdersPriceHistory.addActionListener(this);
+        jmiOrdersAutPending.addActionListener(this);
+        jmiOrdersAutAutorized.addActionListener(this);
+        jmiOrdersAutRejected.addActionListener(this);
         jmiOrdersPrice.addActionListener(this);
+        jmiOrdersPriceHist.addActionListener(this);
         jmiDpsDoc.addActionListener(this);
         jmiDpsEntry.addActionListener(this);
-        jmiDpsAnnuled.addActionListener(this);
-        jmiDpsReissued.addActionListener(this);
-        jmiDpsReplaced.addActionListener(this);
+        jmiDpsEntryRef.addActionListener(this);
         jmiDpsLinksDestiny.addActionListener(this);
         jmiDpsLinksTrace.addActionListener(this);
-        jmiDpsAutorizedPending.addActionListener(this);
-        jmiDpsAutorizedAutorized.addActionListener(this);
-        jmiDpsAutorizedReject.addActionListener(this);
-        jmiDpsAuditPending.addActionListener(this);
-        jmiDpsAudited.addActionListener(this);
-        jmiDpsSendPendingEmail.addActionListener(this);
-        jmiDpsSentEmail.addActionListener(this);
-        jmiDpsSendPendingWs.addActionListener(this);
-        jmiDpsApprovedWs.addActionListener(this);
-        jmiDpsRejectWs.addActionListener(this);
-        jmiDpsPriceHistory.addActionListener(this);
+        jmiDpsAutPending.addActionListener(this);
+        jmiDpsAutAutorized.addActionListener(this);
+        jmiDpsAutReject.addActionListener(this);
+        jmiDpsAudPending.addActionListener(this);
+        jmiDpsAudAudited.addActionListener(this);
         jmiDpsPrice.addActionListener(this);
+        jmiDpsPriceHist.addActionListener(this);
+        jmiDpsMailPending.addActionListener(this);
+        jmiDpsMailSent.addActionListener(this);
+        jmiDpsWsPending.addActionListener(this);
+        jmiDpsWsApproved.addActionListener(this);
+        jmiDpsWsReject.addActionListener(this);
         jmiDpsAdjDoc.addActionListener(this);
-        jmiDpsAdjAnnuled.addActionListener(this);
-        jmiDpsAdjReissued.addActionListener(this);
-        jmiDpsAdjReplaced.addActionListener(this);
-        jmiDpsAdjSendPendingEmail.addActionListener(this);
-        jmiDpsAdjSentEmail.addActionListener(this);
-        jmiDpsAdjSendPendingWs.addActionListener(this);
-        jmiDpsAdjApprovedWs.addActionListener(this);
-        jmiDpsAdjRejectWs.addActionListener(this);
+        jmiDpsAdjMailPending.addActionListener(this);
+        jmiDpsAdjMailSent.addActionListener(this);
+        jmiDpsAdjWsPending.addActionListener(this);
+        jmiDpsAdjWsApproved.addActionListener(this);
+        jmiDpsAdjWsRejected.addActionListener(this);
         jmiStkDvyPend.addActionListener(this);
         jmiStkDvySupplied.addActionListener(this);
         jmiStkDvyPendEntry.addActionListener(this);
@@ -676,7 +661,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepBackorderOrderByItem.addActionListener(this);
         jmiRepBackorderOrderByItemBizPartner.addActionListener(this);
         jmiRepBackorderOrderByItemBizPartnerBra.addActionListener(this);
-        jmiRepBizPartnerBalanceAgingView.addActionListener(this);
+        jmiQryBizPartnerBalance.addActionListener(this);
+        jmiQryBizPartnerAccountsAging.addActionListener(this);
         jmiRepBizPartnerBalance.addActionListener(this);
         jmiRepBizPartnerBalanceDps.addActionListener(this);
         jmiRepBizPartnerBalanceAging.addActionListener(this);
@@ -734,37 +720,32 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmCon.setEnabled(hasRightDocEstimate);
 
         jmOrd.setEnabled(hasRightDocOrder || hasRightDocOrderAuthorize);
-        jmiOrdersPriceHistory.setEnabled(hasRightDocOrder && levelRightDocOrder >= SUtilConsts.LEV_AUTHOR);
         jmiOrdersPrice.setEnabled(hasRightDocOrder && levelRightDocOrder >= SUtilConsts.LEV_AUTHOR);
+        jmiOrdersPriceHist.setEnabled(hasRightDocOrder && levelRightDocOrder >= SUtilConsts.LEV_AUTHOR);
 
         jmDps.setEnabled(hasRightDocTransaction);
         jmiDpsDoc.setEnabled(hasRightDocTransaction);
         jmiDpsEntry.setEnabled(hasRightDocTransaction);
-        jmiDpsAnnuled.setEnabled(false);
-        jmiDpsReissued.setEnabled(false);
-        jmiDpsReplaced.setEnabled(false);
+        jmiDpsEntryRef.setEnabled(hasRightDocTransaction);
         jmiDpsLinksDestiny.setEnabled(hasRightDocTransaction);
         jmiDpsLinksTrace.setEnabled(hasRightDocTransaction);
-        jmiDpsAuditPending.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
-        jmiDpsAudited.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
-        jmiDpsSendPendingEmail.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
-        jmiDpsSentEmail.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
-        jmiDpsSendPendingWs.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
-        jmiDpsApprovedWs.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
-        jmiDpsRejectWs.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
-        jmiDpsPriceHistory.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
+        jmiDpsAudPending.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
+        jmiDpsAudAudited.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
         jmiDpsPrice.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
+        jmiDpsPriceHist.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
+        jmiDpsMailPending.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
+        jmiDpsMailSent.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
+        jmiDpsWsPending.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
+        jmiDpsWsApproved.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
+        jmiDpsWsReject.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
 
         jmDpsAdj.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjDoc.setEnabled(hasRightDocTransactionAdjust);
-        jmiDpsAdjAnnuled.setEnabled(false);
-        jmiDpsAdjReissued.setEnabled(false);
-        jmiDpsAdjReplaced.setEnabled(false);
-        jmiDpsAdjSendPendingEmail.setEnabled(hasRightDocTransactionAdjust);
-        jmiDpsAdjSentEmail.setEnabled(hasRightDocTransactionAdjust);
-        jmiDpsAdjSendPendingWs.setEnabled(hasRightDocTransactionAdjust);
-        jmiDpsAdjApprovedWs.setEnabled(hasRightDocTransactionAdjust);
-        jmiDpsAdjRejectWs.setEnabled(hasRightDocTransactionAdjust);
+        jmiDpsAdjMailPending.setEnabled(hasRightDocTransactionAdjust);
+        jmiDpsAdjMailSent.setEnabled(hasRightDocTransactionAdjust);
+        jmiDpsAdjWsPending.setEnabled(hasRightDocTransactionAdjust);
+        jmiDpsAdjWsApproved.setEnabled(hasRightDocTransactionAdjust);
+        jmiDpsAdjWsRejected.setEnabled(hasRightDocTransactionAdjust);
 
         jmStkDvy.setEnabled(hasRightInventoryOut);
         jmiStkDvyPend.setEnabled(hasRightInventoryOut);
@@ -1108,35 +1089,12 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
 
                 case SDataConstants.TRN_DPS:
                     oViewClass = erp.mtrn.view.SViewDps.class;
-                    switch (auxType02) {
-                        case SDataConstantsSys.TRNX_TP_DPS_EST_EST:
-                        case SDataConstantsSys.TRNX_TP_DPS_EST_CON:
-                        case SDataConstantsSys.TRNX_TP_DPS_ORD:
-                        case SDataConstantsSys.TRNX_TP_DPS_DOC:
-                        case SDataConstantsSys.TRNX_TP_DPS_ADJ:
-                            sViewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02);
-                            break;
-                        case SDataConstantsSys.TRNX_TP_DPS_DOC + SDataConstantsSys.TRNX_DPS_DOC_ANNUL:
-                            sViewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_DOC) + " anulación";
-                            break;
-                        case SDataConstantsSys.TRNX_TP_DPS_DOC + SDataConstantsSys.TRNX_DPS_DOC_RISS:
-                            sViewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_DOC) + " reimpresión";
-                            break;
-                        case SDataConstantsSys.TRNX_TP_DPS_DOC + SDataConstantsSys.TRNX_DPS_DOC_REPL:
-                            sViewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_DOC) + " sustitución";
-                            break;
-                        case SDataConstantsSys.TRNX_TP_DPS_ADJ + SDataConstantsSys.TRNX_DPS_DOC_ANNUL:
-                            sViewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_ADJ) + " anulación";
-                            break;
-                        case SDataConstantsSys.TRNX_TP_DPS_ADJ + SDataConstantsSys.TRNX_DPS_DOC_RISS:
-                            sViewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_ADJ) + " reimpresión";
-                            break;
-                        case SDataConstantsSys.TRNX_TP_DPS_ADJ + SDataConstantsSys.TRNX_DPS_DOC_REPL:
-                            sViewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_ADJ) + " sustitución";
-                            break;
-                        default:
-                            throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
-                    }
+                    sViewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02);
+                    break;
+
+                case SDataConstants.TRNX_DPS_ETY_REF:
+                    oViewClass = erp.mtrn.view.SViewDpsEntryReference.class;
+                    sViewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02) + " (referencias part.)";
                     break;
 
                 case SDataConstants.TRNX_DPS_LINK_PEND:
@@ -1197,6 +1155,11 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 case SDataConstants.TRNX_PRICE_HIST:
                     oViewClass = erp.mtrn.view.SViewPriceHistory.class;
                     sViewTitle = "VTA - Historial precios";
+                    break;
+
+                case SDataConstants.MKT_PLIST_ITEM:
+                    oViewClass = erp.mmkt.view.SViewPriceListItem.class;
+                    sViewTitle = "VTA - Precios de ítems";
                     break;
 
                 case SDataConstants.TRNX_DPS_BACKORDER:
@@ -1327,9 +1290,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     sViewTitle = "VTA - bitácora envíos CFDI";
                     break;
 
-                case SDataConstants.MKT_PLIST_ITEM:
-                    oViewClass = erp.mmkt.view.SViewPriceListItem.class;
-                    sViewTitle = "VTA - Precios de ítems";
+                case SDataConstants.TRN_DPS_SND_LOG:
+                    oViewClass = erp.mtrn.view.SViewDpsSendingLog.class;
+                    sViewTitle = "CPA - bitácora envíos docs.";
                     break;
 
                 default:
@@ -1574,17 +1537,14 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiOrdersLinksDestiny) {
                 showView(SDataConstants.TRNX_DPS_LINKS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_LINK_ORD_DES);
             }
-            else if (item == jmiOrdersAutorizedPending) {
+            else if (item == jmiOrdersAutPending) {
                 showView(SDataConstants.TRNX_DPS_AUTHORIZE_PEND, SDataConstantsSys.TRNX_DPS_SAL_ORD_AUT_PEND);
             }
-            else if (item == jmiOrdersAutorizedAutorized) {
+            else if (item == jmiOrdersAutAutorized) {
                 showView(SDataConstants.TRNX_DPS_AUTHORIZE_PEND, SDataConstantsSys.TRNX_DPS_SAL_ORD_AUT_AUT);
             }
-            else if (item == jmiOrdersAutorizedRejected) {
+            else if (item == jmiOrdersAutRejected) {
                 showView(SDataConstants.TRNX_DPS_AUTHORIZE_PEND, SDataConstantsSys.TRNX_DPS_SAL_ORD_AUT_REJ);
-            }
-            else if (item == jmiOrdersPrice) {
-                showView(SDataConstants.MKT_PLIST_ITEM, SDataConstantsSys.TRNS_CT_DPS_SAL);
             }
             else if (item == jmiDpsDoc) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_DOC);
@@ -1592,14 +1552,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiDpsEntry) {
                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_ALL);
             }
-            else if (item == jmiDpsAnnuled) {
-                showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_DOC + SDataConstantsSys.TRNX_DPS_DOC_ANNUL);
-            }
-            else if (item == jmiDpsReissued) {
-                showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_DOC + SDataConstantsSys.TRNX_DPS_DOC_RISS);
-            }
-            else if (item == jmiDpsReplaced) {
-                showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_DOC + SDataConstantsSys.TRNX_DPS_DOC_REPL);
+            else if (item == jmiDpsEntryRef) {
+                showView(SDataConstants.TRNX_DPS_ETY_REF, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_DOC);
             }
             else if (item == jmiDpsLinksDestiny) {
                 showView(SDataConstants.TRNX_DPS_LINKS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_LINK_DOC_DES);
@@ -1607,64 +1561,58 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiDpsLinksTrace) {
                 showView(SDataConstants.TRNX_DPS_LINKS_TRACE, SDataConstantsSys.TRNS_CT_DPS_SAL);
             }
-            else if (item == jmiDpsAutorizedPending) {
+            else if (item == jmiDpsAutPending) {
                 showView(SDataConstants.TRNX_DPS_AUTHORIZE_PEND, SDataConstantsSys.TRNX_DPS_SAL_DOC_AUT_PEND);
             }
-            else if (item == jmiDpsAutorizedAutorized) {
+            else if (item == jmiDpsAutAutorized) {
                 showView(SDataConstants.TRNX_DPS_AUTHORIZE_PEND, SDataConstantsSys.TRNX_DPS_SAL_DOC_AUT_AUT);
             }
-            else if (item == jmiDpsAutorizedReject) {
+            else if (item == jmiDpsAutReject) {
                 showView(SDataConstants.TRNX_DPS_AUTHORIZE_PEND, SDataConstantsSys.TRNX_DPS_SAL_DOC_AUT_REJ);
             }
-            else if (item == jmiDpsAuditPending) {
+            else if (item == jmiDpsAudPending) {
                 showView(SDataConstants.TRNX_DPS_AUDIT_PEND, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_DOC);
             }
-            else if (item == jmiDpsAudited) {
+            else if (item == jmiDpsAudAudited) {
                 showView(SDataConstants.TRNX_DPS_AUDITED, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_DOC);
             }
-            else if (item == jmiDpsSendPendingEmail) {
+            else if (item == jmiDpsPrice || item == jmiOrdersPrice) {
+                showView(SDataConstants.MKT_PLIST_ITEM, SDataConstantsSys.TRNS_CT_DPS_SAL);
+            }
+            else if (item == jmiDpsPriceHist || item == jmiOrdersPriceHist) {
+                showView(SDataConstants.TRNX_PRICE_HIST, SDataConstantsSys.TRNS_CT_DPS_SAL);
+            }
+            else if (item == jmiDpsMailPending) {
                 showView(SDataConstants.TRNX_DPS_SEND_PEND, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_DOC);
             }
-            else if (item == jmiDpsSentEmail) {
+            else if (item == jmiDpsMailSent) {
                 showView(SDataConstants.TRNX_DPS_SENT, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_DOC);
             }
-            else if (item == jmiDpsSendPendingWs) {
+            else if (item == jmiDpsWsPending) {
                 miClient.getSession().showView(SModConsts.TRN_CFD, SModSysConsts.TRNS_ST_XML_DVY_PENDING, new SGuiParams(SDataConstantsSys.TRNX_TP_DPS_DOC));
             }
-            else if (item == jmiDpsApprovedWs) {
+            else if (item == jmiDpsWsApproved) {
                 miClient.getSession().showView(SModConsts.TRN_CFD, SModSysConsts.TRNS_ST_XML_DVY_APPROVED, new SGuiParams(SDataConstantsSys.TRNX_TP_DPS_DOC));
             }
-            else if (item == jmiDpsRejectWs) {
+            else if (item == jmiDpsWsReject) {
                 miClient.getSession().showView(SModConsts.TRN_CFD, SModSysConsts.TRNS_ST_XML_DVY_REJECT, new SGuiParams(SDataConstantsSys.TRNX_TP_DPS_DOC));
-            }
-            else if (item == jmiDpsPriceHistory || item == jmiOrdersPriceHistory) {
-                showView(SDataConstants.TRNX_PRICE_HIST, SDataConstantsSys.TRNS_CT_DPS_SAL);
             }
             else if (item == jmiDpsAdjDoc) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
             }
-            else if (item == jmiDpsAdjAnnuled) {
-                showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ + SDataConstantsSys.TRNX_DPS_DOC_ANNUL);
-            }
-            else if (item == jmiDpsAdjReissued) {
-                showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ + SDataConstantsSys.TRNX_DPS_DOC_RISS);
-            }
-            else if (item == jmiDpsAdjReplaced) {
-                showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ + SDataConstantsSys.TRNX_DPS_DOC_REPL);
-            }
-            else if (item == jmiDpsAdjSendPendingEmail) {
+            else if (item == jmiDpsAdjMailPending) {
                 showView(SDataConstants.TRNX_DPS_SEND_PEND, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
             }
-            else if (item == jmiDpsAdjSentEmail) {
+            else if (item == jmiDpsAdjMailSent) {
                 showView(SDataConstants.TRNX_DPS_SENT, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
             }
-            else if (item == jmiDpsAdjSendPendingWs) {
+            else if (item == jmiDpsAdjWsPending) {
                 miClient.getSession().showView(SModConsts.TRN_CFD, SModSysConsts.TRNS_ST_XML_DVY_PENDING, new SGuiParams(SDataConstantsSys.TRNX_TP_DPS_ADJ));
             }
-            else if (item == jmiDpsAdjApprovedWs) {
+            else if (item == jmiDpsAdjWsApproved) {
                 miClient.getSession().showView(SModConsts.TRN_CFD, SModSysConsts.TRNS_ST_XML_DVY_APPROVED, new SGuiParams(SDataConstantsSys.TRNX_TP_DPS_ADJ));
             }
-            else if (item == jmiDpsAdjRejectWs) {
+            else if (item == jmiDpsAdjWsRejected) {
                 miClient.getSession().showView(SModConsts.TRN_CFD, SModSysConsts.TRNS_ST_XML_DVY_REJECT, new SGuiParams(SDataConstantsSys.TRNX_TP_DPS_ADJ));
             }
             else if (item == jmiStkDvyPend) {
@@ -1757,7 +1705,10 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiRepBackorderOrderByItemBizPartnerBra) {
                 showView(SDataConstants.TRNX_DPS_BACKORDER, SDataConstantsSys.TRNX_SAL_BACKORDER_ORD_ITEM_BP_BRA, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD[1]);
             }
-            else if (item == jmiRepBizPartnerBalanceAgingView) {
+            else if (item == jmiQryBizPartnerBalance) {
+                miClient.getGuiModule(SDataConstants.MOD_FIN).showView(SDataConstants.FINX_ACCOUNTING, SDataConstantsSys.FINS_TP_ACC_SYS_CUS);
+            }
+            else if (item == jmiQryBizPartnerAccountsAging) {
                 showView(SDataConstants.TRNX_DPS_BAL_AGING, SDataConstantsSys.TRNS_CT_DPS_SAL);
             }
             else if (item == jmiRepBizPartnerBalance) {

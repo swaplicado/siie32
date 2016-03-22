@@ -84,11 +84,11 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
         jPanel8 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jlDateStart = new javax.swing.JLabel();
-        jtfDateStart = new javax.swing.JFormattedTextField();
+        jftDateStart = new javax.swing.JFormattedTextField();
         jbPickDateStart = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jlDateEnd = new javax.swing.JLabel();
-        jtfDateEnd = new javax.swing.JFormattedTextField();
+        jftDateEnd = new javax.swing.JFormattedTextField();
         jbPickDateEnd = new javax.swing.JButton();
         jPanel15 = new javax.swing.JPanel();
         jlCoBranch = new javax.swing.JLabel();
@@ -131,9 +131,9 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
         jlDateStart.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jlDateStart);
 
-        jtfDateStart.setText("dd/mm/yyyy");
-        jtfDateStart.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel4.add(jtfDateStart);
+        jftDateStart.setText("dd/mm/yyyy");
+        jftDateStart.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel4.add(jftDateStart);
 
         jbPickDateStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
         jbPickDateStart.setToolTipText("Seleccionar fecha inicial");
@@ -149,9 +149,9 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
         jlDateEnd.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlDateEnd);
 
-        jtfDateEnd.setText("dd/mm/yyyy");
-        jtfDateEnd.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel5.add(jtfDateEnd);
+        jftDateEnd.setText("dd/mm/yyyy");
+        jftDateEnd.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel5.add(jftDateEnd);
 
         jbPickDateEnd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
         jbPickDateEnd.setToolTipText("Seleccionar fecha final");
@@ -268,9 +268,9 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
     private void initComponentsCustom() {
         String name = "";
         
-        moFieldDateStart = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jtfDateStart, jlDateStart);
+        moFieldDateStart = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateStart, jlDateStart);
         moFieldDateStart.setPickerButton(jbPickDateStart);
-        moFieldDateEnd = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jtfDateEnd, jlDateEnd);
+        moFieldDateEnd = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateEnd, jlDateEnd);
         moFieldDateEnd.setPickerButton(jbPickDateEnd);
         moFieldCoBranch = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCoBranch, jlCoBranch);
         moFieldCoBranch.setPickerButton(jbPickCoBranch);
@@ -351,7 +351,7 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
     private void windowActivated() {
         if (mbFirstTime) {
             mbFirstTime = false;
-            jtfDateStart.requestFocus();
+            jftDateStart.requestFocus();
         }
     }
 
@@ -524,6 +524,8 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
     private javax.swing.JComboBox<SFormComponentItem> jcbCoBranch;
     private javax.swing.JComboBox<SFormComponentItem> jcbSalesAgent;
     private javax.swing.JCheckBox jckAdvancePayments;
+    private javax.swing.JFormattedTextField jftDateEnd;
+    private javax.swing.JFormattedTextField jftDateStart;
     private javax.swing.JLabel jlBizPartner;
     private javax.swing.JLabel jlCoBranch;
     private javax.swing.JLabel jlDateEnd;
@@ -533,8 +535,6 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
     private javax.swing.JPanel jpParams;
     private javax.swing.JRadioButton jrbBizPartner;
     private javax.swing.JRadioButton jrbSalesAgent;
-    private javax.swing.JFormattedTextField jtfDateEnd;
-    private javax.swing.JFormattedTextField jtfDateStart;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -594,7 +594,7 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
 
             if (!msg.isEmpty()) {
                 validation.setMessage(msg);
-                validation.setComponent(jtfDateStart);
+                validation.setComponent(jftDateStart);
             }
         }
 

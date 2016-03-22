@@ -76,7 +76,7 @@
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JFormattedTextField" name="jtfDateStart">
+                <Component class="javax.swing.JFormattedTextField" name="jftDateStart">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="dd/mm/yyyy"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -113,7 +113,7 @@
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JFormattedTextField" name="jtfDateEnd">
+                <Component class="javax.swing.JFormattedTextField" name="jftDateEnd">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="dd/mm/yyyy"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">

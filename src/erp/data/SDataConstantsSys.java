@@ -1146,10 +1146,6 @@ public abstract class SDataConstantsSys {
     public static final int TRNX_TP_DPS_BOL = 400;
     public static final int TRNX_TP_DPS_ADJ = 500;
 
-    public static final int TRNX_DPS_DOC_ANNUL = 1; // XXX Later: check if can be 301
-    public static final int TRNX_DPS_DOC_RISS = 2;  // XXX Later: check if can be 302
-    public static final int TRNX_DPS_DOC_REPL = 3;  // XXX Later: check if can be 303
-
     public static final int TRNX_DPS_BAL_ALL = 1;
     public static final int TRNX_DPS_BAL_PAY = 2;
     public static final int TRNX_DPS_BAL_PAY_PEND = 3;
@@ -1487,7 +1483,8 @@ public abstract class SDataConstantsSys {
     public static final int REP_FIN_REC_CY = 206003;
     public static final int REP_FIN_RECS = 206004;
     public static final int REP_FIN_RECS_CY = 206005;
-    public static final int REP_FIN_BPS_BAL = 206006;
+    public static final int REP_FIN_BPS_BAL = 206006; // business partner balance (cutoff date)
+    public static final int REP_FIN_BPS_BAL_PER = 206049; // business partner balance (cutoff period)
     public static final int REP_FIN_BPS_BAL_DPS = 206007;
     public static final int REP_FIN_BPS_BAL_COLL = 206008;
     public static final int REP_FIN_BPS_BAL_COLL_DPS = 206009;

@@ -28,6 +28,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected int mnPkEntryId;
     protected java.lang.String msConceptKey;
     protected java.lang.String msConcept;
+    protected java.lang.String msReference;
     protected double mdQuantity;
     protected boolean mbIsDiscountDocApplying;
     protected boolean mbIsDiscountUnitaryPercentage;
@@ -171,6 +172,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setPkEntryId(int n) { mnPkEntryId = n; }
     public void setConceptKey(java.lang.String s) { msConceptKey = s; }
     public void setConcept(java.lang.String s) { msConcept = s; }
+    public void setReference(java.lang.String s) { msReference = s; }
     public void setQuantity(double d) { mdQuantity = d; }
     public void setIsDiscountDocApplying(boolean b) { mbIsDiscountDocApplying = b; }
     public void setIsDiscountUnitaryPercentage(boolean b) { mbIsDiscountUnitaryPercentage = b; }
@@ -255,6 +257,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public int getPkEntryId() { return mnPkEntryId; }
     public java.lang.String getConceptKey() { return msConceptKey; }
     public java.lang.String getConcept() { return msConcept; }
+    public java.lang.String getReference() { return msReference; }
     public double getQuantity() { return mdQuantity; }
     public boolean getIsDiscountDocApplying() { return mbIsDiscountDocApplying; }
     public boolean getIsDiscountUnitaryPercentage() { return mbIsDiscountUnitaryPercentage; }
@@ -424,6 +427,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mnPkEntryId = 0;
         msConceptKey = "";
         msConcept = "";
+        msReference = "";
         mdQuantity = 0;
         mbIsDiscountDocApplying = false;
         mbIsDiscountUnitaryPercentage = false;
@@ -576,6 +580,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 mnPkEntryId = resultSet.getInt("de.id_ety");
                 msConceptKey = resultSet.getString("de.concept_key");
                 msConcept = resultSet.getString("de.concept");
+                msReference = resultSet.getString("de.ref");
                 mdQuantity = resultSet.getDouble("de.qty");
                 mbIsDiscountDocApplying = resultSet.getBoolean("de.b_disc_doc");
                 mbIsDiscountUnitaryPercentage = resultSet.getBoolean("de.b_disc_u_per");
@@ -899,12 +904,13 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " + 
-                    "?) }");
+                    "?, ?) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkDocId);
             callableStatement.setInt(nParam++, mnPkEntryId);
             callableStatement.setString(nParam++, msConceptKey);
             callableStatement.setString(nParam++, msConcept);
+            callableStatement.setString(nParam++, msReference);
             callableStatement.setDouble(nParam++, mdQuantity);
             callableStatement.setBoolean(nParam++, mbIsDiscountDocApplying);
             callableStatement.setBoolean(nParam++, mbIsDiscountUnitaryPercentage);
@@ -1415,6 +1421,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setPkEntryId(mnPkEntryId);
         clone.setConceptKey(msConceptKey);
         clone.setConcept(msConcept);
+        clone.setReference(msReference);
         clone.setQuantity(mdQuantity);
         clone.setIsDiscountDocApplying(mbIsDiscountDocApplying);
         clone.setIsDiscountUnitaryPercentage(mbIsDiscountUnitaryPercentage);

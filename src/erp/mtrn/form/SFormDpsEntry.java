@@ -132,6 +132,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private erp.lib.form.SFormField moFieldIsDeleted;
     private erp.lib.form.SFormField moFieldFkTaxRegionId;
     private erp.lib.form.SFormField moFieldFkItemReferenceId_n;
+    private erp.lib.form.SFormField moFieldReference;
     private erp.lib.form.SFormField moFieldAddendaNumberPosition;
     private erp.lib.form.SFormField moFieldAddendaCenter;
     private erp.lib.form.SFormField moFieldAddendaEntryNumber;
@@ -299,6 +300,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jcbFkItemReferenceId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkItemReferenceId_n = new javax.swing.JButton();
         jLabel10 = new javax.swing.JLabel();
+        jPanel40 = new javax.swing.JPanel();
+        jlReference = new javax.swing.JLabel();
+        jtfReference = new javax.swing.JTextField();
         jpCostCenter = new javax.swing.JPanel();
         jlDummyCostCenter = new javax.swing.JLabel();
         jTabbedPane = new javax.swing.JTabbedPane();
@@ -520,8 +524,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jlKey.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel7.add(jlKey);
 
-        jtfKey.setText("KEY");
-        jtfKey.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtfKey.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel7.add(jtfKey);
 
         jbKey.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif"))); // NOI18N
@@ -541,7 +544,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jlConcept.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.add(jlConcept);
 
-        jtfConcept.setText("CONCEPT");
         jtfConcept.setPreferredSize(new java.awt.Dimension(425, 23));
         jPanel8.add(jtfConcept);
 
@@ -566,7 +568,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel10.add(jlFkOriginalUnitId);
 
         jcbFkOriginalUnitId.setMaximumRowCount(12);
-        jcbFkOriginalUnitId.setPreferredSize(new java.awt.Dimension(425, 23));
+        jcbFkOriginalUnitId.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel10.add(jcbFkOriginalUnitId);
 
         jbFkOriginalUnitId.setText("...");
@@ -984,6 +986,17 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel12.add(jLabel10);
 
         jPanel35.add(jPanel12);
+
+        jPanel40.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlReference.setText("Referencia:");
+        jlReference.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel40.add(jlReference);
+
+        jtfReference.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel40.add(jtfReference);
+
+        jPanel35.add(jPanel40);
 
         jPanel18.add(jPanel35, java.awt.BorderLayout.NORTH);
 
@@ -1875,6 +1888,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldFkTaxRegionId.setPickerButton(jbFkTaxRegionId);
         moFieldFkItemReferenceId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkItemReferenceId_n, jlFkItemReferenceId_n);
         moFieldFkItemReferenceId_n.setPickerButton(jbFkItemReferenceId_n);
+        moFieldReference = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfReference, jlReference);
+        moFieldReference.setLengthMax(25);
         moFieldAddendaNumberPosition = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, true, jtfAddendaNumberPosition, jlAddendaNumberPosition);
         moFieldAddendaNumberPosition.setTabbedPaneIndex(5, jTabbedPane);
         moFieldAddendaNumberPosition.setLengthMax(5);
@@ -1948,6 +1963,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         mvFields.add(moFieldIsDeleted);
         mvFields.add(moFieldFkTaxRegionId);
         mvFields.add(moFieldFkItemReferenceId_n);
+        mvFields.add(moFieldReference);
         mvFields.add(moFieldAddendaNumberPosition);
         mvFields.add(moFieldAddendaCenter);
         mvFields.add(moFieldAddendaEntryNumber);
@@ -2961,6 +2977,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
             jcbFkItemReferenceId_n.setEnabled(false);
             jbFkItemReferenceId_n.setEnabled(false);
+            jtfReference.setEditable(false);
+            jtfReference.setFocusable(false);
 
             moPanelFkCostCenterId_n.enableFields(false);
 
@@ -3011,6 +3029,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jbFkItemId.setEnabled(true);
             jckIsDeleted.setEnabled(!moDpsEntry.getIsRegistryNew());
 
+            jtfReference.setEditable(true);
+            jtfReference.setFocusable(true);
+            
             jcbFkTaxRegionId.setEnabled(true);
             jbFkTaxRegionId.setEnabled(true);
             jckIsTaxesAutomaticApplying.setEnabled(true);
@@ -3695,6 +3716,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JPanel jPanel38;
     private javax.swing.JPanel jPanel39;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel40;
     private javax.swing.JPanel jPanel41;
     private javax.swing.JPanel jPanel42;
     private javax.swing.JPanel jPanel43;
@@ -3817,6 +3839,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JLabel jlPriceUnitary;
     private javax.swing.JLabel jlPriceUnitaryReal_r;
     private javax.swing.JLabel jlQuantity;
+    private javax.swing.JLabel jlReference;
     private javax.swing.JLabel jlSecuritySeal;
     private javax.swing.JLabel jlSubtotalProvisional_r;
     private javax.swing.JLabel jlSubtotal_r;
@@ -3899,6 +3922,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JTextField jtfPriceUnitaryReal_rRo;
     private javax.swing.JTextField jtfPriceUnitaryRo;
     private javax.swing.JTextField jtfQuantityRo;
+    private javax.swing.JTextField jtfReference;
     private javax.swing.JTextField jtfSecuritySeal;
     private javax.swing.JTextField jtfSubtotalCy_rRo;
     private javax.swing.JTextField jtfSubtotalProvisionalCy_rRo;
@@ -4390,12 +4414,32 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + moPanelFkCostCenterId_n.getFieldAccountLabel().getText() + "'.");
                 validation.setComponent(moPanelFkCostCenterId_n.getFieldAccount().getComponent());
             }
+            else if (moItem.getIsReference() && moFieldReference.getString().isEmpty()) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlReference.getText() + "'.");
+                validation.setComponent(jtfReference);
+            }
             else {
-                message = SDataUtilities.validateCostCenter(miClient, moPanelFkCostCenterId_n.getCurrentInputCostCenter(), moParamDps.getDate());
+                if (!moFieldReference.getString().isEmpty()) {
+                    try {
+                        // Validate that reference does not exist yet:
 
-                if (message.length() > 0) {
-                    validation.setMessage(message);
-                    validation.setComponent(moPanelFkCostCenterId_n.getFieldAccount().getComponent());
+                        SDataUtilities.validateDpsEtyReference(miClient.getSession(), moParamDps.getDpsClassKey(), moFieldReference.getString(), (int[]) moParamDps.getPrimaryKey());
+                    }
+                    catch (Exception e) {
+                        validation.setMessage(message = e.getMessage());
+                        validation.setComponent(jtfReference);
+                    }
+                }
+                
+                if (message.isEmpty()) {
+                    // Validate cost center:
+                    
+                    message = SDataUtilities.validateCostCenter(miClient, moPanelFkCostCenterId_n.getCurrentInputCostCenter(), moParamDps.getDate());
+
+                    if (!message.isEmpty()) {
+                        validation.setMessage(message);
+                        validation.setComponent(moPanelFkCostCenterId_n.getFieldAccount().getComponent());
+                    }
                 }
             }
         }
@@ -4587,6 +4631,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldIsDeleted.setFieldValue(moDpsEntry.getIsDeleted());
         moFieldFkTaxRegionId.setFieldValue(new int[] { moDpsEntry.getFkTaxRegionId() });
         moFieldFkItemReferenceId_n.setFieldValue(new int[] { moDpsEntry.getFkItemRefId_n() });
+        moFieldReference.setFieldValue(moDpsEntry.getReference());
 
         jckIsSurplusPercentageApplying.setSelected(moDpsEntry.getSurplusPercentage() > 0);
 
@@ -4655,6 +4700,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         moDpsEntry.setConceptKey(moFieldKey.getString());
         moDpsEntry.setConcept(moFieldConcept.getString());
+        moDpsEntry.setReference(moFieldReference.getString());
 
         moDpsEntry.setLength(moFieldLength.getDouble());
         moDpsEntry.setSurface(moFieldSurface.getDouble());
