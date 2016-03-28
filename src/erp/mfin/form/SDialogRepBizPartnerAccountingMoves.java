@@ -208,7 +208,7 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
         msBizPartnerCatPlr = SBpsUtils.getBizPartnerCategoryName(mnBizPartnerCategoryId, SUtilConsts.NUM_PLR);
         jlBizPartner.setText(msBizPartnerCatSng + ": *");
         jbPickBizPartner.setToolTipText(SUtilConsts.TXT_SELECT + " " + msBizPartnerCatSng.toLowerCase());
-        setTitle("Movimientos contables de " + msBizPartnerCatPlr.toLowerCase() +" por docto.");
+        setTitle("Movimientos contables de " + msBizPartnerCatPlr.toLowerCase() +" por documento");
         
         switch (mnBizPartnerCategoryId) {
             case SDataConstantsSys.BPSS_CT_BP_SUP:
@@ -222,7 +222,7 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
             default:
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
         }
-
+        
         moFieldYear = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, true, jtfYear, jlYear);
         moFieldYear.setIntegerMin(2000);
         moFieldYear.setIntegerMax(2100);
