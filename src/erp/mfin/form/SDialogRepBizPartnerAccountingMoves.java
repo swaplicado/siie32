@@ -281,8 +281,8 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
             map = miClient.createReportParams();
             map.put("nSysMoveCatId", manSysMoveTypeKey[0]);
             map.put("nSysMoveTypeId", manSysMoveTypeKey[1]);
-            map.put("sBizPartnerCat", msBizPartnerCatSng);
-            map.put("sBizPartnerCatPlural", msBizPartnerCatPlr);
+            map.put("sBizPartnerCat", msBizPartnerCatSng.toUpperCase());
+            map.put("sBizPartnerCatPlural", msBizPartnerCatPlr.toUpperCase());
             map.put("nLocalCurrencyId", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId());
             map.put("sLocalCurrency", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency());
             map.put("nYear", year);
