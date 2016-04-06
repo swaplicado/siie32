@@ -606,7 +606,7 @@ public class SDbShipment extends SDbRegistryUser {
                         "FROM " +  SModConsts.TablesMap.get(SModConsts.LOG_SHIP) + " AS s " +
                         "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.LOG_SHIP_DEST) + " AS sd ON s.id_ship = sd.id_ship " +
                         "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.LOG_SHIP_DEST_ETY) + " AS sde ON sd.id_ship = sde.id_ship AND sd.id_dest = sde.id_dest " +
-                        "WHERE " + (destinyEntry.getFkDpsYearId_n() > 0 ?
+                        "WHERE s.b_del = 0 AND " + (destinyEntry.getFkDpsYearId_n() > 0 ?
                         "sde.fk_dps_year_n = " + destinyEntry.getFkDpsYearId_n() + " AND " +
                         "sde.fk_dps_doc_n = " + destinyEntry.getFkDpsDocId_n() + " AND " +
                         "sde.fk_dps_ety_n = " + destinyEntry.getFkDpsEntryId_n() :

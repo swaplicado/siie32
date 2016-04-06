@@ -62,7 +62,7 @@ public class SDialogFormerPayrollDate extends SBeanFormDialog implements FocusLi
 
         jPanel2.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
 
-        jPanel11.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateEmission.setText("Fecha emisión:*");
         jlDateEmission.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -71,7 +71,7 @@ public class SDialogFormerPayrollDate extends SBeanFormDialog implements FocusLi
 
         jPanel2.add(jPanel11);
 
-        jPanel12.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDatePayment.setText("Fecha pago:*");
         jlDatePayment.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -80,9 +80,9 @@ public class SDialogFormerPayrollDate extends SBeanFormDialog implements FocusLi
 
         jPanel2.add(jPanel12);
 
-        jPanel3.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        moBoolGenerateCfdiPendingSigned.setText("Solo generar CFDI por timbrar");
+        moBoolGenerateCfdiPendingSigned.setText("Solo regenerar CFDI por timbrar");
         moBoolGenerateCfdiPendingSigned.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel3.add(moBoolGenerateCfdiPendingSigned);
 

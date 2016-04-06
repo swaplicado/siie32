@@ -356,6 +356,7 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport {
             sDepartamentsName = (String) moPanelHrsDepartaments.getValue(SGuiConsts.PARAM_ITEM);
             moParamsMap.put("sSqlWhereDepartaments", sDepartamentsId.isEmpty() ? "" : " AND dep.id_dep IN(" + sDepartamentsId + ") ");
             moParamsMap.put("sDepartaments", sDepartamentsName.isEmpty() || (boolean) moPanelHrsDepartaments.getValue(SGuiConsts.PARAM_ROWS) ? "(TODOS)" : sDepartamentsName + " ");
+            moParamsMap.put("sPayrollType", moPayroll.getNumber() + "  " + (String) miClient.getSession().readField(SModConsts.HRSS_TP_PAY, new int[] { moPayroll.getFkPaymentTypeId() }, SDbRegistry.FIELD_NAME));
 
             if (jrbReportPrePayroll.isSelected()) {
                 mnFormType = SModConsts.HRSR_PRE_PAY;
@@ -375,7 +376,6 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport {
                 moParamsMap.put("tDateStart", moPayroll.getDateStart());
                 moParamsMap.put("tDateEnd", moPayroll.getDateEnd());
                 moParamsMap.put("nYear", moIntPeriodYear.getValue());
-                moParamsMap.put("sPayrollType", moPayroll.getNumber() + "  " + (String) miClient.getSession().readField(SModConsts.HRSS_TP_PAY, new int[] { moPayroll.getFkPaymentTypeId() }, SDbRegistry.FIELD_NAME));
                 moParamsMap.put("sSqlOrderBy", getOrderBy(mnFormType));
             }
             else if (jrbReportListEarning.isSelected()) {
@@ -386,7 +386,6 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport {
                 moParamsMap.put("tDateStart", moPayroll.getDateStart());
                 moParamsMap.put("tDateEnd", moPayroll.getDateEnd());
                 moParamsMap.put("nYear", moIntPeriodYear.getValue());
-                moParamsMap.put("sPayrollType", moPayroll.getNumber() + "  " + (String) miClient.getSession().readField(SModConsts.HRSS_TP_PAY, new int[] { moPayroll.getFkPaymentTypeId() }, SDbRegistry.FIELD_NAME));
                 moParamsMap.put("sSqlOrderBy", getOrderBy(mnFormType));
             }
             else if (jrbReportListDeductions.isSelected()) {
@@ -397,7 +396,6 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport {
                 moParamsMap.put("tDateStart", moPayroll.getDateStart());
                 moParamsMap.put("tDateEnd", moPayroll.getDateEnd());
                 moParamsMap.put("nYear", moIntPeriodYear.getValue());
-                moParamsMap.put("sPayrollType", moPayroll.getNumber() + "  " + (String) miClient.getSession().readField(SModConsts.HRSS_TP_PAY, new int[] { moPayroll.getFkPaymentTypeId() }, SDbRegistry.FIELD_NAME));
                 moParamsMap.put("sSqlOrderBy", getOrderBy(mnFormType));
             }
             else if (jrbReportPayrollSummary.isSelected()) {

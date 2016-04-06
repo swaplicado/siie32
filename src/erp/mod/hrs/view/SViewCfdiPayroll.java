@@ -53,7 +53,7 @@ import sa.lib.gui.SGuiParams;
 public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
 
     private SGridFilterDatePeriod moFilterDatePeriod;
-    private JButton jbImport;
+    private JButton jbReemit;
     private JButton jbSignXml;
     private JButton jbAnnul;
     private JButton jbGetXml;
@@ -80,7 +80,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
 
-        jbImport = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_IMPORT), "Generar CFDI", this);
+        jbReemit = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_IMPORT), "Regenerar CFDI", this);
         jbSignXml = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_SIGN), "Timbrar CFDI", this);
         jbAnnul = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_ANNUL), "Anular " + (mnGridSubtype == SModConsts.VIEW_SC_SUM ? "" : "recibo ") + "nómina", this);
         jbGetXml = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML), "Obtener XML del comprobante", this);
@@ -98,7 +98,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
 
         switch (mnGridSubtype) {
             case SModConsts.VIEW_SC_SUM:
-                jbImport.setEnabled(isCfdiPayrollVersionOld());
+                jbReemit.setEnabled(isCfdiPayrollVersionOld());
                 jbSignXml.setEnabled(true);
                 jbAnnul.setEnabled(true);
                 jbGetXml.setEnabled(false);
@@ -112,7 +112,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                 jbDiactivatePac.setEnabled(false);
                 break;
             case SModConsts.VIEW_SC_DET:
-                jbImport.setEnabled(false);
+                jbReemit.setEnabled(false);
                 jbSignXml.setEnabled(true);
                 jbAnnul.setEnabled(true);
                 jbGetXml.setEnabled(true);
@@ -130,7 +130,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
         }
 
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbImport);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbReemit);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSignXml);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAnnul);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGetXml);
@@ -144,11 +144,11 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDiactivatePac);
     }
 
-    private void actionImportPayroll() {
+    private void actionReemitPayroll() {
         SDataFormerPayroll oFormerPayroll = null;
         SHrsFormerPayroll payroll = null;
         
-        if (jbImport.isEnabled()) {
+        if (jbReemit.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
@@ -931,8 +931,8 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
 
-            if (button == jbImport) {
-                actionImportPayroll();
+            if (button == jbReemit) {
+                actionReemitPayroll();
             }
             else if (button == jbSignXml) {
                 actionSignPayroll();

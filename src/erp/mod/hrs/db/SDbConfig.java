@@ -58,10 +58,10 @@ public class SDbConfig extends SDbRegistryUser {
     public void setDateOperations(Date t) { mtDateOperations = t; }
     public void setFirstDayWeek(int n) { mnFirstDayWeek = n; }
     public void setLimitMwzReference(int n) { mnLimitMwzReference = n; }
+    public void setNumberSeries(String s) { msNumberSeries = s; }
     public void setBajioAffinityGroup(String s) { msBajioAffinityGroup = s; }
     public void setPayrollTaxRate(double d) { mdPayrollTaxRate = d; }
     public void setFornightStandard(boolean b) { mbFornightStandard = b; }
-    public void setNumberSeries(String s) { msNumberSeries = s; }
     public void setTaxSubsidyEarning(boolean b) { mbTaxSubsidyEarning = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkMwzTypeId(int n) { mnFkMwzTypeId = n; }
