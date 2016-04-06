@@ -27,7 +27,6 @@ import sa.lib.gui.SGuiConsts;
 public class SViewInventoryMfgCost extends SGridPaneView {
     
     private SGridFilterYear moFilterYear;
-    //private SGridFilterYearMonth moFilterYearMonth; sflores, 2016-03-09, about to be removed
     
     public SViewInventoryMfgCost(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRN_INV_MFG_CST, SLibConsts.UNDEFINED, title);
@@ -36,12 +35,6 @@ public class SViewInventoryMfgCost extends SGridPaneView {
         moFilterYear = new SGridFilterYear(client, this);
         moFilterYear.initFilter(SLibTimeUtils.digestYear(miClient.getSession().getCurrentDate()));
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterYear);
-        
-        /* sflores, 2016-03-09, about to be removed
-        moFilterYearMonth = new SGridFilterYearMonth(client, this);
-        moFilterYearMonth.initFilter(SLibTimeUtils.digestMonth(miClient.getSession().getCurrentDate()));
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterYearMonth);
-        */
     }
     
     private void initComponentsCustom() {
@@ -68,13 +61,6 @@ public class SViewInventoryMfgCost extends SGridPaneView {
             sql += (sql.isEmpty() ? "" : "AND ") + "v.id_year = " + ((int[]) filter)[0] + " ";
         }
 
-        /* sflores, 2016-03-09, about to be removed
-        filter = ((SGridFilterValue) moFiltersMap.get(SGridConsts.FILTER_YEAR_MONTH)).getValue();
-        if (filter != null && ((int[]) filter).length == 2) {
-            sql += (sql.isEmpty() ? "" : "AND ") + "v.id_year = " + ((int[]) filter)[0] + " AND v.id_per = " + ((int[]) filter)[1] + " ";
-        }
-        */
-        
         msSql = "SELECT "
                 + "v.id_year AS " + SDbConsts.FIELD_ID + "1, "
                 + "v.id_per AS " + SDbConsts.FIELD_ID + "2, "

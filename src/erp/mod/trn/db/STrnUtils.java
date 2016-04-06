@@ -55,8 +55,7 @@ public abstract class STrnUtils {
         return idCategory;
     }
 
-    public static double obtainLastPriceForSupplierItem(final SGuiSession session, final int nDpsCategory, final int pnItemId,
-            final String psBizPartnersIds) throws java.lang.Exception {
+    public static double obtainLastPriceForSupplierItem(final SGuiSession session, final int nDpsCategory, final int pnItemId, final String psBizPartnersIds) throws java.lang.Exception {
         double dItemDiscountUnitaryCur = 0;
         String sql = "";
         ResultSet resultSet = null;
@@ -81,6 +80,10 @@ public abstract class STrnUtils {
         return dItemDiscountUnitaryCur;
     }
 
+    public static String formatDocNumber(final String series, final String number) {
+        return (series.isEmpty() ? "" : series + "-") + number;
+    }
+    
     public static int obtainNextNumberForDps(SGuiSession session, String series, int[] docClassTypeKey) throws java.lang.Exception {
         int number = 0;
         String sql = "";

@@ -46,6 +46,7 @@ import erp.mfin.data.SFinanceTaxes;
 import erp.mfin.data.SFinanceUtilities;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SDbMmsConfig;
+import erp.mod.trn.db.STrnUtils;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -1510,7 +1511,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     public java.lang.String getDpsNumber() {
-        return (msNumberSeries.isEmpty() ? "" : msNumberSeries + "-") + msNumber;
+        return STrnUtils.formatDocNumber(msNumberSeries, msNumber);
     }
 
     @Override

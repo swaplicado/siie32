@@ -384,6 +384,8 @@ public abstract class SModConsts {
     public static final int TRN_SIGN = 2023057;
     public static final int TRN_MMS_LOG = 2023101;
     public static final int TRN_MMS_CFG = 2023102;
+    public static final int TRN_DVY = 2023121;
+    public static final int TRN_DVY_ETY = 2023122;
 
     public static final int TRN_DNC_DPS = 2023501;
     public static final int TRN_DNC_DPS_DNS = 2023502;
@@ -936,6 +938,8 @@ public abstract class SModConsts {
         TablesMap.put(TRN_SIGN, "trn_sign");
         TablesMap.put(TRN_MMS_LOG, "trn_mms_log");
         TablesMap.put(TRN_MMS_CFG, "trn_mms_cfg");
+        TablesMap.put(TRN_DVY, "trn_dvy");
+        TablesMap.put(TRN_DVY_ETY, "trn_dvy_ety");
 
         TablesMap.put(TRN_DNC_DPS, "trn_dnc_dps");
         TablesMap.put(TRN_DNC_DPS_DNS, "trn_dnc_dps_dns");

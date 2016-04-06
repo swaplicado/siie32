@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistryUser;
@@ -22,6 +23,8 @@ import sa.lib.gui.SGuiSession;
  * @author Juan Barajas, Sergio Flores
  */
 public class SDbDps extends SDbRegistryUser {
+    
+    public static final int FIELD_LINK = SDbRegistry.FIELD_BASE + 1;
 
     protected int mnPkYearId;
     protected int mnPkDocId;
@@ -70,6 +73,7 @@ public class SDbDps extends SDbRegistryUser {
     protected boolean mbIsClosed;
     protected boolean mbIsClosedCommissions;
     protected boolean mbIsShipped;
+    protected boolean mbIsRebill;
     protected boolean mbIsAudited;
     protected boolean mbIsAuthorized;
     protected boolean mbIsRecordAutomatic;
@@ -191,6 +195,7 @@ public class SDbDps extends SDbRegistryUser {
     public void setIsClosed(boolean b) { mbIsClosed = b; }
     public void setIsClosedCommissions(boolean b) { mbIsClosedCommissions = b; }
     public void setIsShipped(boolean b) { mbIsShipped = b; }
+    public void setIsRebill(boolean b) { mbIsRebill = b; }
     public void setIsAudited(boolean b) { mbIsAudited = b; }
     public void setIsAuthorized(boolean b) { mbIsAuthorized = b; }
     public void setIsRecordAutomatic(boolean b) { mbIsRecordAutomatic = b; }
@@ -302,6 +307,7 @@ public class SDbDps extends SDbRegistryUser {
     public boolean getIsClosed() { return mbIsClosed; }
     public boolean getIsClosedCommissions() { return mbIsClosedCommissions; }
     public boolean getIsShipped() { return mbIsShipped; }
+    public boolean getIsRebill() { return mbIsRebill; }
     public boolean getIsAudited() { return mbIsAudited; }
     public boolean getIsAuthorized() { return mbIsAuthorized; }
     public boolean getIsRecordAutomatic() { return mbIsRecordAutomatic; }
@@ -437,6 +443,7 @@ public class SDbDps extends SDbRegistryUser {
         mbIsClosed = false;
         mbIsClosedCommissions = false;
         mbIsShipped = false;
+        mbIsRebill = false;
         mbIsAudited = false;
         mbIsAuthorized = false;
         mbIsRecordAutomatic = false;
@@ -589,6 +596,7 @@ public class SDbDps extends SDbRegistryUser {
             mbIsClosed = resultSet.getBoolean("b_close");
             mbIsClosedCommissions = resultSet.getBoolean("b_close_comms");
             mbIsShipped = resultSet.getBoolean("b_ship");
+            mbIsRebill = resultSet.getBoolean("b_rebill");
             mbIsAudited = resultSet.getBoolean("b_audit");
             mbIsAuthorized = resultSet.getBoolean("b_authorn");
             mbIsRecordAutomatic = resultSet.getBoolean("b_rec_aut");
@@ -653,13 +661,12 @@ public class SDbDps extends SDbRegistryUser {
             mtUserEditTs = resultSet.getTimestamp("ts_edit");
             mtUserDeleteTs = resultSet.getTimestamp("ts_del");
                 
-                
             // Read aswell document entries:
 
             statement = session.getStatement().getConnection().createStatement();
             
             msSql = "SELECT id_year, id_doc, id_ety " +
-                    "FROM trn_dps_ety " +
+                    "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " " +
                     "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " " +
                     "ORDER BY fid_tp_dps_ety = " + SDataConstantsSys.TRNS_TP_DPS_ETY_VIRT + ", sort_pos, id_ety ";
             
@@ -684,5 +691,82 @@ public class SDbDps extends SDbRegistryUser {
     @Override
     public SDbRegistry clone() throws CloneNotSupportedException {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object readField(final Statement statement, final int[] pk, final int field) throws SQLException, Exception {
+        Object value = null;
+        ResultSet resultSet = null;
+
+        initQueryMembers();
+        mnQueryResultId = SDbConsts.READ_ERROR;
+
+        msSql = "SELECT ";
+
+        switch (field) {
+            case FIELD_LINK:
+                msSql += "b_link ";
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+
+        msSql += getSqlFromWhere(pk);
+
+        resultSet = statement.executeQuery(msSql);
+        if (!resultSet.next()) {
+            throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
+        }
+        else {
+            switch (field) {
+            case FIELD_LINK:
+                    value = resultSet.getBoolean(1);
+                    break;
+                default:
+            }
+        }
+
+        mnQueryResultId = SDbConsts.READ_OK;
+        return value;
+    }
+    
+    public void saveField(final Statement statement, final int[] pk, final int field, final Object value) throws SQLException, Exception {
+        boolean linked = (Boolean) readField(statement, pk, FIELD_LINK);
+        Link link = (Link) value;
+        
+        initQueryMembers();
+        mnQueryResultId = SDbConsts.SAVE_ERROR;
+        
+        msSql = "UPDATE " + getSqlTable() + " SET ";
+        
+        switch (field) {
+            case FIELD_LINK:
+                if (link.Link && !linked || !link.Link && linked) {
+                    msSql += "b_link = " + link.Link + ", fid_usr_link = " + link.UserId + ", ts_link = NOW() ";
+                }
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+        
+        msSql += getSqlWhere(pk);
+        
+        statement.execute(msSql);
+        
+        mbRegistryNew = false;
+        mnQueryResultId = SDbConsts.SAVE_OK;
+    }
+    
+    public class Link {
+        boolean Link;
+        int UserId;
+        
+        public Link(boolean link, int userId) {
+            Link = link;
+            UserId = userId;
+        }
+        
+        public Link() {
+            
+        }
     }
 }

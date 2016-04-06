@@ -5,17 +5,16 @@
 
 package erp.mtrn.view;
 
-import javax.swing.JButton;
-
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.data.SDataSqlUtilities;
 import erp.lib.table.STabFilterDatePeriod;
-import erp.lib.table.STableField;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
+import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import javax.swing.JButton;
 
 /**
  *
@@ -108,6 +107,9 @@ public class SViewDpsLinksQueryTrace extends erp.lib.table.STableTab implements 
         mvSuscriptors.add(SDataConstants.BPSU_BP_CT);
         mvSuscriptors.add(SDataConstants.BPSU_BPB);
         mvSuscriptors.add(SDataConstants.TRN_DPS);
+        mvSuscriptors.add(SDataConstants.TRN_DVY);
+        mvSuscriptors.add(SDataConstants.TRNX_DPS_LINK_PEND);
+        mvSuscriptors.add(SDataConstants.TRNX_DPS_LINKED);
         mvSuscriptors.add(SDataConstants.USRU_USR);
 
         populateTable();
