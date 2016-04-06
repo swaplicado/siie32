@@ -290,7 +290,7 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
                     moFormParams.getParamsMap().put(SModConsts.TRN_DPS, gridRow.getRowPrimaryKey());
                     super.actionRowNew();
                     
-                    ((SClientInterface) miClient).getGuiModule(SDataConstants.TRN_DVY).refreshCatalogues(SDataConstants.TRN_DVY); // former framework data change notification
+                    ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_DVY); // former framework data change notification
                 }
             }
         }
