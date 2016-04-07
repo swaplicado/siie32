@@ -337,7 +337,7 @@ public class SDbDeliveryEntry extends SDbRegistryUser implements SGridRow {
     }
     
     /**
-     * Resets DPS supply effect of current DPS and Order entries.
+     * Resets DPS supply effect (at delivery level) of current DPS and Order entries.
      */
     public void resetEntryEffect(final SGuiSession session) throws Exception {
         initQueryMembers();
@@ -347,15 +347,15 @@ public class SDbDeliveryEntry extends SDbRegistryUser implements SGridRow {
                 + "qty = ("
                 + "SELECT COALESCE(SUM(qty), 0.0) "
                 + "FROM " + getSqlTable() + " "
-                + "WHERE fk_dps_year = " + mnFkDpsYearId + " AND fk_dps_doc = " + mnFkDpsDocId + " AND fk_dps_ety =  " + mnFkDpsEntryId + " AND "
+                + "WHERE fk_dps_year = " + mnFkDpsYearId + " AND fk_dps_doc = " + mnFkDpsDocId + " AND fk_dps_ety = " + mnFkDpsEntryId + " AND "
                 + "fk_ord_year = " + mnFkOrderYearId + " AND fk_ord_doc = " + mnFkOrderDocId + " AND fk_ord_ety = " + mnFkOrderEntryId + " AND "
-                + "NOT (id_dvy = " + mnPkDeliveryId + " AND id_ety = " + mnPkEntryId + ")), "
+                + "NOT (id_dvy = " + mnPkDeliveryId + ")), "
                 + "orig_qty = ("
                 + "SELECT COALESCE(SUM(orig_qty), 0.0) "
                 + "FROM " + getSqlTable() + " "
-                + "WHERE fk_dps_year = " + mnFkDpsYearId + " AND fk_dps_doc = " + mnFkDpsDocId + " AND fk_dps_ety =  " + mnFkDpsEntryId + " AND "
+                + "WHERE fk_dps_year = " + mnFkDpsYearId + " AND fk_dps_doc = " + mnFkDpsDocId + " AND fk_dps_ety = " + mnFkDpsEntryId + " AND "
                 + "fk_ord_year = " + mnFkOrderYearId + " AND fk_ord_doc = " + mnFkOrderDocId + " AND fk_ord_ety = " + mnFkOrderEntryId + " AND "
-                + "NOT (id_dvy = " + mnPkDeliveryId + " AND id_ety = " + mnPkEntryId + ")) "
+                + "NOT (id_dvy = " + mnPkDeliveryId + ")) "
                 + "WHERE id_src_year = " + mnFkOrderYearId + " AND id_src_doc = " + mnFkOrderDocId + " AND id_src_ety = " + mnFkOrderEntryId + " AND "
                 + "id_des_year = " + mnFkDpsYearId + " AND id_des_doc = " + mnFkDpsDocId + " AND id_des_ety =  " + mnFkDpsEntryId + "; ";
         session.getStatement().execute(msSql);
@@ -364,7 +364,7 @@ public class SDbDeliveryEntry extends SDbRegistryUser implements SGridRow {
     }
     
     /**
-     * Applies DPS supply effect of current DPS and Order entries.
+     * Applies DPS supply effect (at delivery entry level) of current DPS and Order entries.
      */
     public void applyEntryEffect(final SGuiSession session) throws Exception {
         boolean insert = false;
@@ -403,7 +403,7 @@ public class SDbDeliveryEntry extends SDbRegistryUser implements SGridRow {
     }
     
     /**
-     * Disposes DPS supply effect of current DPS and Order entries if needed.
+     * Disposes DPS supply effect (at delivery entry level) of current DPS and Order entries if needed.
      */
     public void disposeEntryEffect(final SGuiSession session) throws Exception {
         Statement statement = null;

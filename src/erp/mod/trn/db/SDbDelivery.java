@@ -59,7 +59,8 @@ public class SDbDelivery extends SDbRegistryUser {
         
         statement = session.getStatement().getConnection().createStatement();
 
-        msSql = "SELECT id_ety FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DVY_ETY) + " " + getSqlWhere()
+        msSql = "SELECT id_ety FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DVY_ETY) + " " 
+                + getSqlWhere()
                 + "ORDER BY id_ety; ";
         resultSet = statement.executeQuery(msSql);
         while (resultSet.next()) {
