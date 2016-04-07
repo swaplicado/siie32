@@ -51,7 +51,7 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
      */
     public SViewDeliveryQuery(SGuiClient client, int subtype, String title, SGuiParams params) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRN_DVY, subtype, title, params);
-        setRowButtonsEnabled(true, false, false, false, false);
+        setRowButtonsEnabled(!isProcessed(), false, false, false, false);
         jtbFilterDeleted.setEnabled(false);
 
         mjDpsClose = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_close.gif")), SUtilConsts.TXT_CLOSE, this);
