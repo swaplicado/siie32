@@ -401,7 +401,7 @@ public abstract class SModConsts {
     public static final int TRNR_DPS_CON_BP = 2025001;
     public static final int TRNR_CON_STA = 2025002;
     public static final int TRNR_CON_STA_BP = 2025003;
-    public static final int TRNR_MON_DVY_PROG = 2025004;
+    public static final int TRNR_CON_MON_DVY_PROG = 2025004;
     public static final int TRNR_DPS_CON = 2025005;
 
     /*

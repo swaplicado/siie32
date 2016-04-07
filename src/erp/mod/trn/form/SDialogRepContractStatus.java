@@ -604,7 +604,7 @@ public class SDialogRepContractStatus extends SBeanDialogReport implements Chang
             }
             else if ((JRadioButton) e.getSource() == moRadioMonthlyDeliveryProgram) {
                 if (moRadioMonthlyDeliveryProgram.isSelected()) {
-                    mnFormType = SModConsts.TRNR_MON_DVY_PROG;
+                    mnFormType = SModConsts.TRNR_CON_MON_DVY_PROG;
                 }
             }
             else if ((JRadioButton) e.getSource() == moRadioDpsByContractByPeriod) {

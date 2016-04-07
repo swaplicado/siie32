@@ -65,7 +65,6 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
         if (isProcessed()) { // processed...
             moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
             moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
-
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         }
     }
@@ -88,6 +87,42 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
+        }
+    }
+
+    private void actionPerformedDpsClose() {
+        if (mjDpsClose.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else if (miClient.showMsgBoxConfirm("¿" + SUtilConsts.TXT_CLOSE + " " + SUtilConsts.TXT_DOC.toLowerCase() + "?") == JOptionPane.YES_OPTION) {
+                    changeDpsLink(gridRow, true);
+                }
+            }
+        }
+    }
+    
+    private void actionPerformedDpsOpen() {
+        if (mjDpsOpen.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else if (miClient.showMsgBoxConfirm("¿" + SUtilConsts.TXT_OPEN + " " + SUtilConsts.TXT_DOC.toLowerCase() + "?") == JOptionPane.YES_OPTION) {
+                    changeDpsLink(gridRow, false);
+                }
+            }
         }
     }
 
@@ -235,42 +270,6 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
         moSuscriptionsSet.add(SModConsts.ITMU_ITEM);
         moSuscriptionsSet.add(SModConsts.TRN_DPS);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
-    }
-
-    public void actionPerformedDpsClose() {
-        if (mjDpsClose.isEnabled()) {
-            if (jtTable.getSelectedRowCount() != 1) {
-                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-            }
-            else {
-                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-                }
-                else if (miClient.showMsgBoxConfirm("¿" + SUtilConsts.TXT_CLOSE + " " + SUtilConsts.TXT_DOC.toLowerCase() + "?") == JOptionPane.YES_OPTION) {
-                    changeDpsLink(gridRow, true);
-                }
-            }
-        }
-    }
-    
-    public void actionPerformedDpsOpen() {
-        if (mjDpsOpen.isEnabled()) {
-            if (jtTable.getSelectedRowCount() != 1) {
-                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-            }
-            else {
-                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-                }
-                else if (miClient.showMsgBoxConfirm("¿" + SUtilConsts.TXT_OPEN + " " + SUtilConsts.TXT_DOC.toLowerCase() + "?") == JOptionPane.YES_OPTION) {
-                    changeDpsLink(gridRow, false);
-                }
-            }
-        }
     }
     
     @Override

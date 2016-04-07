@@ -377,8 +377,10 @@ public class SDbDps extends SDbRegistryUser {
     public int[] getKeyDpsCategory() { return new int[] { mnFkDpsCategoryId }; }
     public int[] getKeyDpsClass() { return new int[] { mnFkDpsCategoryId, mnFkDpsClassId }; }
     public int[] getKeyDpsType() { return new int[] { mnFkDpsCategoryId, mnFkDpsClassId, mnFkDpsTypeId }; }
-    public String getDpsNumber() { return msNumberSeries.isEmpty() ? msNumber : msNumberSeries + "-" + msNumber; }
-
+    public int[] getKeyBizPartnerBranchAddress() { return new int[] { mnFkBizPartnerBranchId, mnFkBizPartnerBranchAddressId }; }
+    public int[] getKeyBizPartnerBranchAddressAlt() { return new int[] { mnFkBizPartnerBranchAltId, mnFkBizPartnerBranchAddressAltId }; }
+    public String getDpsNumber() { return STrnUtils.formatDocNumber(msNumberSeries, msNumber); }
+    
     /*
      * Overriden methods
      */

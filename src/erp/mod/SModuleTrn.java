@@ -249,13 +249,16 @@ public class SModuleTrn extends SGuiModule {
         SGuiReport guiReport = null;
 
         switch (type) {
+            case SModConsts.TRN_DVY:
+                guiReport = new SGuiReport("reps/trn_dvy.jasper", "Entrega de ventas");
+                break;
             case SModConsts.TRNR_CON_STA:
                 guiReport = new SGuiReport("reps/trn_con_sta.jasper", "Reporte de estatus de contratos");
                 break;
             case SModConsts.TRNR_CON_STA_BP:
                 guiReport = new SGuiReport("reps/trn_con_sta_bp.jasper", "Reporte de estatus de contratos");
                 break;
-            case SModConsts.TRNR_MON_DVY_PROG:
+            case SModConsts.TRNR_CON_MON_DVY_PROG:
                 guiReport = new SGuiReport("reps/trn_mon_dvy_prog.jasper", "Reporte de estatus de contratos");
                 break;
             case SModConsts.TRNR_DPS_CON:

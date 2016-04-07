@@ -156,4 +156,38 @@ public abstract class SBpsUtils {
         
         return bankAccountClaBeFormat;
     }
+    
+    public static String[] getAddress(final SGuiSession session, int[] keyAddress) throws Exception {
+        String sql = "";
+        String[] address = null;
+        ResultSet resultSet = null;
+        
+        sql = "SELECT a.street, a.street_num_ext, a.street_num_int, a.neighborhood, a.reference, "
+                + "a.locality, a.county, a.state, a.zip_code, c.cty "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB_ADD) + " AS a "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.LOCU_CTY) + " AS c ON a.fid_cty_n = c.id_cty "
+                + "WHERE a.id_bpb = " + keyAddress[0] + " AND a.id_add = " + keyAddress[1] + " ";
+        resultSet = session.getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            address = new String[3];
+
+            address[0] = SLibUtils.textTrim(resultSet.getString(
+                    "a.street") + 
+                    " " + resultSet.getString("a.street_num_ext") + 
+                    " " + resultSet.getString("a.street_num_int"));
+            
+            address[1] = SLibUtils.textTrim(
+                    resultSet.getString("a.neighborhood") + 
+                    " " + resultSet.getString("a.reference"));
+            
+            address[2] = SLibUtils.textTrim(
+                    resultSet.getString("a.locality") + 
+                            (resultSet.getString("a.county").isEmpty() ? "" : ", " + resultSet.getString("a.county")) + 
+                            (resultSet.getString("a.state").isEmpty() ? "" : ", " + resultSet.getString("a.state")) + 
+                            (resultSet.getString("c.cty") == null ? "" : ", " + resultSet.getString("c.cty")) + 
+                            " " + resultSet.getString("a.zip_code"));
+        }
+        
+        return address;
+    }
 }

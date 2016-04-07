@@ -94,8 +94,8 @@ public class SDbDeliveryEntry extends SDbRegistryUser implements SGridRow {
     public String getXtaEntryItemName() { return msXtaEntryItemName; }
     public String getXtaEntryOriginalUnitCode() { return msXtaEntryOriginalUnitCode; }
     
-    public int[] getUtilDpsEntryKey() { return new int[] { mnFkDpsYearId, mnFkDpsDocId, mnFkDpsEntryId }; }
-    public int[] getUtilOrderEntryKey() { return new int[] { mnFkOrderYearId, mnFkOrderDocId, mnFkOrderEntryId }; }
+    public int[] getKeyDpsEntry() { return new int[] { mnFkDpsYearId, mnFkDpsDocId, mnFkDpsEntryId }; }
+    public int[] getKeyOrderEntry() { return new int[] { mnFkOrderYearId, mnFkOrderDocId, mnFkOrderEntryId }; }
     
     @Override
     public void setPrimaryKey(int[] pk) {

@@ -4,15 +4,23 @@
  */
 package erp.mod.trn.view;
 
+import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
+import erp.mod.trn.db.STrnUtils;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import javax.swing.JButton;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridFilterDatePeriod;
+import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
+import sa.lib.grid.SGridRowView;
 import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
@@ -22,9 +30,10 @@ import sa.lib.gui.SGuiDate;
  *
  * @author Sergio Flores
  */
-public class SViewDelivery extends SGridPaneView {
+public class SViewDelivery extends SGridPaneView implements ActionListener {
 
     private SGridFilterDatePeriod moFilterDatePeriod;
+    private JButton mjPrint;
     
     /**
      * @param client GUI client.
@@ -37,12 +46,37 @@ public class SViewDelivery extends SGridPaneView {
 
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
-
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
+
+        mjPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), SUtilConsts.TXT_OPEN, this);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjPrint);
     }
     
     private boolean isSummary() {
         return mnGridSubtype == SUtilConsts.QRY_SUM;
+    }
+    
+    private void actionPerformedPrint() {
+        if (mjPrint.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else {
+                    try {
+                        STrnUtils.printDelivery(miClient, gridRow.getRowPrimaryKey()[0]);
+                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }
+                }
+            }
+        }
     }
     
     @Override
@@ -55,9 +89,14 @@ public class SViewDelivery extends SGridPaneView {
         moPaneSettings.setUserInsertApplying(true);
         moPaneSettings.setUserUpdateApplying(true);
 
+        filter = ((SGridFilterValue) moFiltersMap.get(SGridConsts.FILTER_DELETED)).getValue();
+        if ((Boolean) filter) {
+            where += (where.isEmpty() ? "" : "AND ") + "v.b_del = 0 ";
+        }
+
         filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
         if (filter != null) {
-            where = SGridUtils.getSqlFilterDate("v.dt", (SGuiDate) filter);
+            where += (where.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt", (SGuiDate) filter);
         }
         
         msSql = "SELECT v.id_dvy AS " + SDbConsts.FIELD_ID + "1, "
@@ -154,5 +193,16 @@ public class SViewDelivery extends SGridPaneView {
         moSuscriptionsSet.add(SModConsts.ITMU_ITEM);
         moSuscriptionsSet.add(SModConsts.TRN_DPS);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
+            JButton button = (JButton) e.getSource();
+            
+            if (button == mjPrint) {
+                actionPerformedPrint();
+            }
+        }
     }
 }

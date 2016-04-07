@@ -95,7 +95,7 @@ public class SDbDelivery extends SDbRegistryUser {
 
     public ArrayList<SDbDeliveryEntry> getChildEntries() { return maChildEntries; }
     
-    public int[] getUtilKeyDps() { return new int[] { mnFkDpsYearId, mnFkDpsDocId }; }
+    public int[] getKeyDps() { return new int[] { mnFkDpsYearId, mnFkDpsDocId }; }
     
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -266,8 +266,10 @@ public class SDbDelivery extends SDbRegistryUser {
         
         // e) apply entry effect of new child registries:
         
-        for (SDbDeliveryEntry child : maChildEntries) {
-            child.applyEntryEffect(session);
+        if (!mbDeleted) {
+            for (SDbDeliveryEntry child : maChildEntries) {
+                child.applyEntryEffect(session);
+            }
         }
         
         // f) dispose entry effect of former child registries:
@@ -303,5 +305,14 @@ public class SDbDelivery extends SDbRegistryUser {
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;
+    }
+    
+    @Override
+    public void delete(final SGuiSession session) throws SQLException, Exception {
+        
+        mbDeleted = !mbDeleted;
+        mnFkUserUpdateId = session.getUser().getPkUserId();
+        
+        save(session);
     }
 }

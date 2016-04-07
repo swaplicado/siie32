@@ -482,13 +482,13 @@ public class SFormDelivery extends SBeanForm implements SGridPaneFormOwner, Acti
             // Updtate current deliveries (net yet saved):
             
             for (SDbDeliveryEntry entry : maEntriesAdded) {
-                if (SLibUtils.compareKeys(orderEntry.EntryKey, entry.getUtilOrderEntryKey())) {
+                if (SLibUtils.compareKeys(orderEntry.EntryKey, entry.getKeyOrderEntry())) {
                     orderEntry.QuantityProcessed += entry.getOriginalQuantity();
                 }
             }
             
             for (SDbDeliveryEntry entry : maEntriesDeleted) {
-                if (SLibUtils.compareKeys(orderEntry.EntryKey, entry.getUtilOrderEntryKey())) {
+                if (SLibUtils.compareKeys(orderEntry.EntryKey, entry.getKeyOrderEntry())) {
                     orderEntry.QuantityProcessed -= entry.getOriginalQuantity();
                 }
             }
@@ -536,7 +536,7 @@ public class SFormDelivery extends SBeanForm implements SGridPaneFormOwner, Acti
         for (SGridRow row : moGridInvoiceEntries.getModel().getGridRows()) {
             SRowDeliveryInvoiceEntry invoiceEntry = (SRowDeliveryInvoiceEntry) row;
             
-            if (SLibUtils.compareKeys(invoiceEntry.EntryKey, deliveryEntry.getUtilDpsEntryKey())) {
+            if (SLibUtils.compareKeys(invoiceEntry.EntryKey, deliveryEntry.getKeyDpsEntry())) {
                 updateGridInvoiceEntry(invoiceEntry, -deliveryEntry.getOriginalQuantity()); // negative to subtract!
             }
         }
@@ -688,7 +688,7 @@ public class SFormDelivery extends SBeanForm implements SGridPaneFormOwner, Acti
         jtfNumber.setText("" + moRegistry.getNumber());
         moDate.setValue(moRegistry.getDate());
         
-        dps = (SDataDps) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_DPS, moRegistry.getUtilKeyDps(), SLibConstants.EXEC_MODE_STEALTH);
+        dps = (SDataDps) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_DPS, moRegistry.getKeyDps(), SLibConstants.EXEC_MODE_STEALTH);
         moPanelDps.setDps(dps, miClient.getSession().getCurrentDate());
 
         maEntriesAdded.clear();
@@ -738,7 +738,7 @@ public class SFormDelivery extends SBeanForm implements SGridPaneFormOwner, Acti
         
         if (validation.isValid()) {
             if (moGridDeliveryEntries.getModel().getGridRows().isEmpty()) {
-                validation.setMessage("El documento debe tener almenos una partida.");
+                validation.setMessage("El documento debe tener al menos una partida.");
             }
         }
         
