@@ -4,17 +4,22 @@
  */
 package erp.mod.trn.db;
 
+import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.bps.db.SBpsUtils;
+import erp.mod.bps.db.SDbBizPartner;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiSession;
 
 /**
@@ -55,8 +60,7 @@ public abstract class STrnUtils {
         return idCategory;
     }
 
-    public static double obtainLastPriceForSupplierItem(final SGuiSession session, final int nDpsCategory, final int pnItemId,
-            final String psBizPartnersIds) throws java.lang.Exception {
+    public static double obtainLastPriceForSupplierItem(final SGuiSession session, final int nDpsCategory, final int pnItemId, final String psBizPartnersIds) throws java.lang.Exception {
         double dItemDiscountUnitaryCur = 0;
         String sql = "";
         ResultSet resultSet = null;
@@ -81,6 +85,10 @@ public abstract class STrnUtils {
         return dItemDiscountUnitaryCur;
     }
 
+    public static String formatDocNumber(final String series, final String number) {
+        return (series.isEmpty() ? "" : series + "-") + number;
+    }
+    
     public static int obtainNextNumberForDps(SGuiSession session, String series, int[] docClassTypeKey) throws java.lang.Exception {
         int number = 0;
         String sql = "";
@@ -324,5 +332,50 @@ public abstract class STrnUtils {
         }
         
         return true;
+    }
+    
+    public static void printDelivery(final SGuiClient client, final int idDelivery) throws Exception {
+        HashMap<String, Object> params = null;
+        
+        SDbDelivery delivery = (SDbDelivery) client.getSession().readRegistry(SModConsts.TRN_DVY, new int[] { idDelivery });
+        SDbDps dps = (SDbDps) client.getSession().readRegistry(SModConsts.TRN_DPS, delivery.getKeyDps());
+        SDbBizPartner bizPartnerCom = (SDbBizPartner) client.getSession().readRegistry(SModConsts.BPSU_BP, new int[] { client.getSession().getConfigCompany().getCompanyId() });
+        SDbBizPartner bizPartnerBpr = (SDbBizPartner) client.getSession().readRegistry(SModConsts.BPSU_BP, new int[] { dps.getFkBizPartnerId_r() });
+        
+        String[] addressComMain = SBpsUtils.getAddress(client.getSession(), new int[] { bizPartnerCom.getRegHeadquarters().getPkBizPartnerBranchId(), 1 });
+        String[] addressComAlt = bizPartnerCom.getRegHeadquarters().getPkBizPartnerBranchId() == dps.getFkCompanyBranchId() ? 
+                new String[] { "(MISMO DOMICILIO)" } :
+                SBpsUtils.getAddress(null, new int[] { dps.getFkCompanyBranchId(), 1 });
+        
+        String[] addressBprMain = SBpsUtils.getAddress(client.getSession(), dps.getKeyBizPartnerBranchAddress());
+        String[] addressBprAlt = SLibUtils.compareKeys(dps.getKeyBizPartnerBranchAddress(), dps.getKeyBizPartnerBranchAddressAlt()) ? 
+                new String[] { "(MISMO DOMICILIO)" } :
+                SBpsUtils.getAddress(client.getSession(), dps.getKeyBizPartnerBranchAddressAlt());
+        
+        params = client.createReportParams();
+        params.put("nDeliveryId", idDelivery);
+        params.put("sDeliveryNumber", delivery.getNumber());
+        params.put("tDeliveryDate", delivery.getDate());
+        params.put("sInvoiceNumber", dps.getDpsNumber());
+        params.put("tInvoiceDate", dps.getDate());
+        params.put("sComName", bizPartnerCom.getBizPartner());
+        params.put("sComFiscalId", bizPartnerCom.getFiscalId());
+        params.put("sComMainAddress1", addressComMain[0]);
+        params.put("sComMainAddress2", addressComMain[1]);
+        params.put("sComMainAddress3", addressComMain[2]);
+        params.put("sComAltAddress1", addressComAlt[0]);
+        params.put("sComAltAddress2", addressComAlt.length == 1 ? "" : addressComAlt[1]);
+        params.put("sComAltAddress3", addressComAlt.length == 1 ? "" : addressComAlt[2]);
+        params.put("sBprName", bizPartnerBpr.getBizPartner());
+        params.put("sBprFiscalId", bizPartnerBpr.getFiscalId());
+        params.put("sBprMainAddress1", addressBprMain[0]);
+        params.put("sBprMainAddress2", addressBprMain[1]);
+        params.put("sBprMainAddress3", addressBprMain[2]);
+        params.put("sBprAltAddress1", addressBprAlt[0]);
+        params.put("sBprAltAddress2", addressBprAlt.length == 1 ? "" : addressBprAlt[1]);
+        params.put("sBprAltAddress3", addressBprAlt.length == 1 ? "" : addressBprAlt[2]);
+        params.put("sXmlBaseDir", ((SClientInterface) client).getSessionXXX().getParamsCompany().getXmlBaseDirectory());
+        
+        client.getSession().printReport(SModConsts.TRN_DVY, SLibConsts.UNDEFINED, null, params);
     }
 }

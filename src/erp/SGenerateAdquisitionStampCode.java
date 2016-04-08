@@ -80,7 +80,7 @@ public class SGenerateAdquisitionStampCode extends javax.swing.JFrame {
         jPanel5 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         jlPac = new javax.swing.JLabel();
-        jcbPac = new javax.swing.JComboBox();
+        jcbPac = new javax.swing.JComboBox<SGuiItem>();
         jPanel1 = new javax.swing.JPanel();
         jlDate = new javax.swing.JLabel();
         jftDate = new javax.swing.JFormattedTextField();
@@ -106,19 +106,18 @@ public class SGenerateAdquisitionStampCode extends javax.swing.JFrame {
 
         jPanel5.setLayout(new java.awt.GridLayout(4, 1));
 
-        jPanel8.setLayout(new java.awt.FlowLayout(0, 2, 5));
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 5));
 
         jlPac.setText("PAC:");
         jlPac.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.add(jlPac);
 
-        jcbPac.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbPac.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel8.add(jcbPac);
 
         jPanel5.add(jPanel8);
 
-        jPanel1.setLayout(new java.awt.FlowLayout(0, 2, 5));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 5));
 
         jlDate.setText("Fecha :");
         jlDate.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -130,7 +129,7 @@ public class SGenerateAdquisitionStampCode extends javax.swing.JFrame {
 
         jPanel5.add(jPanel1);
 
-        jPanel6.setLayout(new java.awt.FlowLayout(0, 2, 5));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 5));
 
         jlQuantity.setText("Cantidad:");
         jlQuantity.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -142,7 +141,7 @@ public class SGenerateAdquisitionStampCode extends javax.swing.JFrame {
 
         jPanel5.add(jPanel6);
 
-        jPanel7.setLayout(new java.awt.FlowLayout(0, 2, 5));
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 5));
 
         jlCode.setText("Código:");
         jlCode.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -159,11 +158,10 @@ public class SGenerateAdquisitionStampCode extends javax.swing.JFrame {
 
         getContentPane().add(jPanel3, java.awt.BorderLayout.CENTER);
 
-        jPanel2.setLayout(new java.awt.FlowLayout(2));
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbProcess.setText("Generar");
         jbProcess.setToolTipText("Generar código");
-        jbProcess.setActionCommand("Generar");
         jbProcess.setPreferredSize(new java.awt.Dimension(100, 23));
         jbProcess.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -240,7 +238,7 @@ public class SGenerateAdquisitionStampCode extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel8;
     private javax.swing.JButton jbClose;
     private javax.swing.JButton jbProcess;
-    private javax.swing.JComboBox jcbPac;
+    private javax.swing.JComboBox<SGuiItem> jcbPac;
     private javax.swing.JFormattedTextField jftDate;
     private javax.swing.JLabel jlCode;
     private javax.swing.JLabel jlDate;

@@ -222,6 +222,7 @@ public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.
         mvSuscriptors.add(SDataConstants.BPSU_BP_CT);
         mvSuscriptors.add(SDataConstants.BPSU_BPB);
         mvSuscriptors.add(SDataConstants.TRN_DPS);
+        mvSuscriptors.add(SDataConstants.TRN_DVY);
         mvSuscriptors.add(SDataConstants.TRNX_DPS_LINK_PEND);
         mvSuscriptors.add(SDataConstants.TRNX_DPS_LINKED);
         mvSuscriptors.add(SDataConstants.USRU_USR);

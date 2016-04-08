@@ -141,6 +141,13 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiDpsAdjWsPending;
     private javax.swing.JMenuItem jmiDpsAdjWsApproved;
     private javax.swing.JMenuItem jmiDpsAdjWsRejected;
+    private javax.swing.JMenu jmDpsDvy;
+    private javax.swing.JMenuItem jmiDpsDvyPend;
+    private javax.swing.JMenuItem jmiDpsDvyPendEntry;
+    private javax.swing.JMenuItem jmiDpsDvyDelivered;
+    private javax.swing.JMenuItem jmiDpsDvyDeliveredEntry;
+    private javax.swing.JMenuItem jmiDpsDvyDoc;
+    private javax.swing.JMenuItem jmiDpsDvyEntry;
     private javax.swing.JMenu jmStkDvy;
     private javax.swing.JMenuItem jmiStkDvyPend;
     private javax.swing.JMenuItem jmiStkDvyPendEntry;
@@ -409,6 +416,22 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmDpsAdj.add(jmiDpsAdjWsApproved);
         jmDpsAdj.add(jmiDpsAdjWsRejected);
 
+        jmDpsDvy = new JMenu("Entregas");
+        jmiDpsDvyPend = new JMenuItem("Ventas por entregar");
+        jmiDpsDvyPendEntry = new JMenuItem("Ventas por entregar a detalle");
+        jmiDpsDvyDelivered = new JMenuItem("Ventas entregadas");
+        jmiDpsDvyDeliveredEntry = new JMenuItem("Ventas entregadas a detalle");
+        jmiDpsDvyDoc = new JMenuItem("Entregas de ventas");
+        jmiDpsDvyEntry = new JMenuItem("Entregas de ventas a detalle");
+        jmDpsDvy.add(jmiDpsDvyPend);
+        jmDpsDvy.add(jmiDpsDvyPendEntry);
+        jmDpsDvy.addSeparator();
+        jmDpsDvy.add(jmiDpsDvyDelivered);
+        jmDpsDvy.add(jmiDpsDvyDeliveredEntry);
+        jmDpsDvy.addSeparator();
+        jmDpsDvy.add(jmiDpsDvyDoc);
+        jmDpsDvy.add(jmiDpsDvyEntry);
+    
         jmStkDvy = new JMenu("Surtidos");
         jmiStkDvyPend = new JMenuItem("Ventas por surtir");
         jmiStkDvyPendEntry = new JMenuItem("Ventas por surtir a detalle");
@@ -631,6 +654,12 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsAdjWsPending.addActionListener(this);
         jmiDpsAdjWsApproved.addActionListener(this);
         jmiDpsAdjWsRejected.addActionListener(this);
+        jmiDpsDvyPend.addActionListener(this);
+        jmiDpsDvyDelivered.addActionListener(this);
+        jmiDpsDvyPendEntry.addActionListener(this);
+        jmiDpsDvyDeliveredEntry.addActionListener(this);
+        jmiDpsDvyDoc.addActionListener(this);
+        jmiDpsDvyEntry.addActionListener(this);
         jmiStkDvyPend.addActionListener(this);
         jmiStkDvySupplied.addActionListener(this);
         jmiStkDvyPendEntry.addActionListener(this);
@@ -747,18 +776,26 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsAdjWsApproved.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjWsRejected.setEnabled(hasRightDocTransactionAdjust);
 
+        jmDpsDvy.setEnabled(hasRightInventoryOut);
+        jmiDpsDvyPend.setEnabled(hasRightInventoryOut);
+        jmiDpsDvyPendEntry.setEnabled(hasRightInventoryOut);
+        jmiDpsDvyDelivered.setEnabled(hasRightInventoryOut);
+        jmiDpsDvyDeliveredEntry.setEnabled(hasRightInventoryOut);
+        jmiDpsDvyDoc.setEnabled(hasRightInventoryOut);
+        jmiDpsDvyEntry.setEnabled(hasRightInventoryOut);
+        
         jmStkDvy.setEnabled(hasRightInventoryOut);
         jmiStkDvyPend.setEnabled(hasRightInventoryOut);
-        jmiStkDvySupplied.setEnabled(hasRightInventoryOut);
         jmiStkDvyPendEntry.setEnabled(hasRightInventoryOut);
+        jmiStkDvySupplied.setEnabled(hasRightInventoryOut);
         jmiStkDvySuppliedEntry.setEnabled(hasRightInventoryOut);
         jmiStkDvyDiog.setEnabled(hasRightInventoryOut);
         jmiStkDvyStatsConsumption.setEnabled(hasRightInventoryOut);
 
         jmStkRet.setEnabled(hasRightInventoryIn);
         jmiStkRetPending.setEnabled(hasRightInventoryIn);
-        jmiStkRetReturned.setEnabled(hasRightInventoryIn);
         jmiStkRetPendingEntry.setEnabled(hasRightInventoryIn);
+        jmiStkRetReturned.setEnabled(hasRightInventoryIn);
         jmiStkRetReturnedEntry.setEnabled(hasRightInventoryIn);
         jmiStkRetDiog.setEnabled(hasRightInventoryIn);
 
@@ -1434,7 +1471,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
 
     @Override
     public javax.swing.JMenu[] getMenues() {
-        return new JMenu[] { jmCat, jmEst, jmCon, jmOrd, jmDps, jmDpsAdj, jmStkDvy, jmStkRet, jmRep };
+        return new JMenu[] { jmCat, jmEst, jmCon, jmOrd, jmDps, jmDpsAdj, jmDpsDvy, jmStkDvy, jmStkRet, jmRep };
     }
 
     @Override
@@ -1614,6 +1651,24 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiDpsAdjWsRejected) {
                 miClient.getSession().showView(SModConsts.TRN_CFD, SModSysConsts.TRNS_ST_XML_DVY_REJECT, new SGuiParams(SDataConstantsSys.TRNX_TP_DPS_ADJ));
+            }
+            else if (item == jmiDpsDvyPend) {
+                miClient.getSession().showView(SModConsts.TRN_DVY, SUtilConsts.PROC_PEND, new SGuiParams(SUtilConsts.QRY_SUM));
+            }
+            else if (item == jmiDpsDvyPendEntry) {
+                miClient.getSession().showView(SModConsts.TRN_DVY, SUtilConsts.PROC_PEND, new SGuiParams(SUtilConsts.QRY_DET));
+            }
+            else if (item == jmiDpsDvyDelivered) {
+                miClient.getSession().showView(SModConsts.TRN_DVY, SUtilConsts.PROC, new SGuiParams(SUtilConsts.QRY_SUM));
+            }
+            else if (item == jmiDpsDvyDeliveredEntry) {
+                miClient.getSession().showView(SModConsts.TRN_DVY, SUtilConsts.PROC, new SGuiParams(SUtilConsts.QRY_DET));
+            }
+            else if (item == jmiDpsDvyDoc) {
+                miClient.getSession().showView(SModConsts.TRN_DVY, SUtilConsts.QRY_SUM, null);
+            }
+            else if (item == jmiDpsDvyEntry) {
+                miClient.getSession().showView(SModConsts.TRN_DVY, SUtilConsts.QRY_DET, null);
             }
             else if (item == jmiStkDvyPend) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_SUPPLY_PEND, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC[0], SDataConstantsSys.TRNS_CL_DPS_SAL_DOC[1]);

@@ -115,6 +115,7 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         jPanel5 = new javax.swing.JPanel();
         jlBizPartnerBranch = new javax.swing.JLabel();
         jtfBizPartnerBranch = new javax.swing.JTextField();
+        jtfBizPartnerBranchId_Ro = new javax.swing.JTextField();
         jPanel12 = new javax.swing.JPanel();
         jlFkTaxRegionId_n = new javax.swing.JLabel();
         jcbFkTaxRegionId_n = new javax.swing.JComboBox();
@@ -176,35 +177,42 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlBizPartnerBranch.setText("Nombre de la sucursal: *");
-        jlBizPartnerBranch.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlBizPartnerBranch.setText("Nombre de sucursal: *");
+        jlBizPartnerBranch.setPreferredSize(new java.awt.Dimension(110, 23));
         jPanel5.add(jlBizPartnerBranch);
 
-        jtfBizPartnerBranch.setPreferredSize(new java.awt.Dimension(239, 23));
+        jtfBizPartnerBranch.setPreferredSize(new java.awt.Dimension(178, 23));
         jPanel5.add(jtfBizPartnerBranch);
+
+        jtfBizPartnerBranchId_Ro.setEditable(false);
+        jtfBizPartnerBranchId_Ro.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfBizPartnerBranchId_Ro.setToolTipText("ID del registro");
+        jtfBizPartnerBranchId_Ro.setFocusable(false);
+        jtfBizPartnerBranchId_Ro.setPreferredSize(new java.awt.Dimension(70, 23));
+        jPanel5.add(jtfBizPartnerBranchId_Ro);
 
         jpBranch.add(jPanel5);
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFkTaxRegionId_n.setText("Región de impuestos:");
-        jlFkTaxRegionId_n.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlFkTaxRegionId_n.setPreferredSize(new java.awt.Dimension(110, 23));
         jPanel12.add(jlFkTaxRegionId_n);
 
         jcbFkTaxRegionId_n.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkTaxRegionId_n.setPreferredSize(new java.awt.Dimension(239, 23));
+        jcbFkTaxRegionId_n.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel12.add(jcbFkTaxRegionId_n);
 
         jpBranch.add(jPanel12);
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlFkAddressFormatTypeId_n.setText("Formato para domicilio:   ");
-        jlFkAddressFormatTypeId_n.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlFkAddressFormatTypeId_n.setText("Formato de domicilio:");
+        jlFkAddressFormatTypeId_n.setPreferredSize(new java.awt.Dimension(110, 23));
         jPanel10.add(jlFkAddressFormatTypeId_n);
 
         jcbFkAddressFormatTypeId_n.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkAddressFormatTypeId_n.setPreferredSize(new java.awt.Dimension(239, 23));
+        jcbFkAddressFormatTypeId_n.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel10.add(jcbFkAddressFormatTypeId_n);
 
         jpBranch.add(jPanel10);
@@ -212,20 +220,20 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlTelephone01.setText("Teléfono 01:");
-        jlTelephone01.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlTelephone01.setPreferredSize(new java.awt.Dimension(110, 23));
         jPanel3.add(jlTelephone01);
 
         jtfTelAreaCode01.setPreferredSize(new java.awt.Dimension(40, 23));
         jPanel3.add(jtfTelAreaCode01);
 
-        jtfTelNumber01.setPreferredSize(new java.awt.Dimension(80, 23));
+        jtfTelNumber01.setPreferredSize(new java.awt.Dimension(94, 23));
         jPanel3.add(jtfTelNumber01);
 
         jtfTelExt01.setPreferredSize(new java.awt.Dimension(40, 23));
         jPanel3.add(jtfTelExt01);
 
         jcbFkTelephoneType01Id.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkTelephoneType01Id.setPreferredSize(new java.awt.Dimension(73, 23));
+        jcbFkTelephoneType01Id.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel3.add(jcbFkTelephoneType01Id);
 
         jpBranch.add(jPanel3);
@@ -233,20 +241,20 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlTelephone02.setText("Teléfono 02:");
-        jlTelephone02.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlTelephone02.setPreferredSize(new java.awt.Dimension(110, 23));
         jPanel7.add(jlTelephone02);
 
         jtfTelAreaCode02.setPreferredSize(new java.awt.Dimension(40, 23));
         jPanel7.add(jtfTelAreaCode02);
 
-        jtfTelNumber02.setPreferredSize(new java.awt.Dimension(80, 23));
+        jtfTelNumber02.setPreferredSize(new java.awt.Dimension(94, 23));
         jPanel7.add(jtfTelNumber02);
 
         jtfTelExt02.setPreferredSize(new java.awt.Dimension(40, 23));
         jPanel7.add(jtfTelExt02);
 
         jcbFkTelephoneType02Id.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkTelephoneType02Id.setPreferredSize(new java.awt.Dimension(73, 23));
+        jcbFkTelephoneType02Id.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel7.add(jcbFkTelephoneType02Id);
 
         jpBranch.add(jPanel7);
@@ -254,20 +262,20 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlTelephone03.setText("Teléfono 03:");
-        jlTelephone03.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlTelephone03.setPreferredSize(new java.awt.Dimension(110, 23));
         jPanel8.add(jlTelephone03);
 
         jtfTelAreaCode03.setPreferredSize(new java.awt.Dimension(40, 23));
         jPanel8.add(jtfTelAreaCode03);
 
-        jtfTelNumber03.setPreferredSize(new java.awt.Dimension(80, 23));
+        jtfTelNumber03.setPreferredSize(new java.awt.Dimension(94, 23));
         jPanel8.add(jtfTelNumber03);
 
         jtfTelExt03.setPreferredSize(new java.awt.Dimension(40, 23));
         jPanel8.add(jtfTelExt03);
 
         jcbFkTelephoneType03Id.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkTelephoneType03Id.setPreferredSize(new java.awt.Dimension(73, 23));
+        jcbFkTelephoneType03Id.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel8.add(jcbFkTelephoneType03Id);
 
         jpBranch.add(jPanel8);
@@ -275,10 +283,10 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlEmail.setText("E-mail:");
-        jlEmail.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlEmail.setPreferredSize(new java.awt.Dimension(110, 23));
         jPanel9.add(jlEmail);
 
-        jtfEmail.setPreferredSize(new java.awt.Dimension(240, 23));
+        jtfEmail.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel9.add(jtfEmail);
 
         jpBranch.add(jPanel9);
@@ -586,6 +594,8 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         else {
             jtfBizPartnerBranch.setEnabled(true);
         }
+        
+        jtfBizPartnerBranchId_Ro.setText(moBizPartnerBranch == null ? "" : "" + moBizPartnerBranch.getPkBizPartnerBranchId());
     }
 
     private void renderBankAccount() {
@@ -877,6 +887,7 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
     private javax.swing.JPanel jpBranchNotesPane;
     private javax.swing.JPanel jpOficialAddress;
     private javax.swing.JTextField jtfBizPartnerBranch;
+    private javax.swing.JTextField jtfBizPartnerBranchId_Ro;
     private javax.swing.JTextField jtfEmail;
     private javax.swing.JTextField jtfTelAreaCode01;
     private javax.swing.JTextField jtfTelAreaCode02;

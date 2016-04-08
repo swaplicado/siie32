@@ -1017,7 +1017,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         jtfPkBizPartnerId_Ro.setEditable(false);
         jtfPkBizPartnerId_Ro.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfPkBizPartnerId_Ro.setToolTipText("ID del asociado de negocios");
+        jtfPkBizPartnerId_Ro.setToolTipText("ID del registro");
         jtfPkBizPartnerId_Ro.setFocusable(false);
         jtfPkBizPartnerId_Ro.setPreferredSize(new java.awt.Dimension(65, 23));
         jPanel41.add(jtfPkBizPartnerId_Ro);

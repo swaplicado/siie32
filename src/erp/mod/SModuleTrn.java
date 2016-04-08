@@ -5,6 +5,8 @@
 package erp.mod;
 
 import erp.data.SDataConstantsSys;
+import erp.mod.trn.db.SDbDelivery;
+import erp.mod.trn.db.SDbDeliveryEntry;
 import erp.mod.trn.db.SDbDps;
 import erp.mod.trn.db.SDbDpsEntry;
 import erp.mod.trn.db.SDbDpsEntryPrice;
@@ -12,9 +14,12 @@ import erp.mod.trn.db.SDbInventoryMfgCost;
 import erp.mod.trn.db.SDbInventoryValuation;
 import erp.mod.trn.db.SDbItemRequiredDpsConfig;
 import erp.mod.trn.db.SDbMmsConfig;
+import erp.mod.trn.form.SFormDelivery;
 import erp.mod.trn.form.SFormInventoryValuation;
 import erp.mod.trn.form.SFormItemRequiredDpsConfig;
 import erp.mod.trn.form.SFormMmsConfig;
+import erp.mod.trn.view.SViewDelivery;
+import erp.mod.trn.view.SViewDeliveryQuery;
 import erp.mod.trn.view.SViewDpsEntryContractPrice;
 import erp.mod.trn.view.SViewDpsSendWebService;
 import erp.mod.trn.view.SViewInventoryCost;
@@ -24,6 +29,7 @@ import erp.mod.trn.view.SViewInventoryValuation;
 import erp.mod.trn.view.SViewItemRequiredDpsConfig;
 import erp.mod.trn.view.SViewMmsConfig;
 import javax.swing.JMenu;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistry;
@@ -46,6 +52,7 @@ public class SModuleTrn extends SGuiModule {
     private SFormItemRequiredDpsConfig moFormItemRequiredDpsConfig;
     private SFormInventoryValuation moFormInventoryValuation;
     private SFormMmsConfig moFormMmsConfiguration;
+    private SFormDelivery moFormDelivery;
 
     public SModuleTrn(SGuiClient client, int subtype) {
         super(client, SModConsts.MOD_TRN_N, subtype);
@@ -59,6 +66,7 @@ public class SModuleTrn extends SGuiModule {
 
     @Override
     public SDbRegistry getRegistry(final int type, final SGuiParams params) {
+        int[] key = null;
         SDbRegistry registry = null;
 
         switch (type) {
@@ -89,6 +97,19 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRN_MMS_CFG:
                 registry = new SDbMmsConfig();
+                break;
+            case SModConsts.TRN_DVY:
+                registry = new SDbDelivery();
+                if (params != null) {
+                    key = (int[]) params.getParamsMap().get(SModConsts.TRN_DPS);
+                    if (key != null) {
+                        ((SDbDelivery) registry).setFkDpsYearId(key[0]);
+                        ((SDbDelivery) registry).setFkDpsDocId(key[1]);
+                    }
+                }
+                break;
+            case SModConsts.TRN_DVY_ETY:
+                registry = new SDbDeliveryEntry();
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -123,6 +144,7 @@ public class SModuleTrn extends SGuiModule {
 
     @Override
     public SGridPaneView getView(final int type, final int subtype, final SGuiParams params) {
+        String title = "";
         SGridPaneView view = null;
 
         switch (type) {
@@ -169,6 +191,19 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_MMS_CFG:
                 view = new SViewMmsConfig(miClient, "Configuración de ítems para envío por email");
                 break;
+            case SModConsts.TRN_DVY:
+                if (params == null) {
+                    title = "Entregas ventas";
+                    title += subtype == SUtilConsts.QRY_SUM ? "" : " (detalle)";
+                    view = new SViewDelivery(miClient, subtype, title);
+                }
+                else {
+                    title = "Ventas ";
+                    title += subtype == SUtilConsts.PROC ? "entregadas" : "x entregar";
+                    title += params.getType() == SUtilConsts.QRY_SUM ? "" : " (detalle)";
+                    view = new SViewDeliveryQuery(miClient, subtype, title, params);
+                }
+                break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -198,6 +233,10 @@ public class SModuleTrn extends SGuiModule {
                 if(moFormMmsConfiguration == null) moFormMmsConfiguration = new SFormMmsConfig(miClient, "Configuración de ítems para envío por email");
                 form = moFormMmsConfiguration;
                 break;
+            case SModConsts.TRN_DVY:
+                if(moFormDelivery == null) moFormDelivery = new SFormDelivery(miClient, "Entrega");
+                form = moFormDelivery;
+                break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -210,13 +249,16 @@ public class SModuleTrn extends SGuiModule {
         SGuiReport guiReport = null;
 
         switch (type) {
+            case SModConsts.TRN_DVY:
+                guiReport = new SGuiReport("reps/trn_dvy.jasper", "Entrega de ventas");
+                break;
             case SModConsts.TRNR_CON_STA:
                 guiReport = new SGuiReport("reps/trn_con_sta.jasper", "Reporte de estatus de contratos");
                 break;
             case SModConsts.TRNR_CON_STA_BP:
                 guiReport = new SGuiReport("reps/trn_con_sta_bp.jasper", "Reporte de estatus de contratos");
                 break;
-            case SModConsts.TRNR_MON_DVY_PROG:
+            case SModConsts.TRNR_CON_MON_DVY_PROG:
                 guiReport = new SGuiReport("reps/trn_mon_dvy_prog.jasper", "Reporte de estatus de contratos");
                 break;
             case SModConsts.TRNR_DPS_CON:

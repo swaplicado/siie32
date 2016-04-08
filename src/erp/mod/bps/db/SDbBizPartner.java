@@ -6,6 +6,7 @@
 package erp.mod.bps.db;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -54,6 +55,8 @@ public class SDbBizPartner extends SDbRegistryUser {
     protected Date mtUserNewTs;
     protected Date mtUserEditTs;
     protected Date mtUserDeleteTs;
+    
+    protected SDbBizPartnerBranch moRegHeadquarters;
 
     public SDbBizPartner() {
         super(SModConsts.BPSU_BP);
@@ -123,6 +126,10 @@ public class SDbBizPartner extends SDbRegistryUser {
     public Date getUserEditTs() { return mtUserEditTs; }
     public Date getUserDeleteTs() { return mtUserDeleteTs; }
 
+    public void setRegHeadquarters(SDbBizPartnerBranch o) { moRegHeadquarters = o; }
+    
+    public SDbBizPartnerBranch getRegHeadquarters() { return moRegHeadquarters; }
+    
     /*
      * Overriden methods
      */
@@ -170,6 +177,8 @@ public class SDbBizPartner extends SDbRegistryUser {
         mtUserNewTs = null;
         mtUserEditTs = null;
         mtUserDeleteTs = null;
+        
+        moRegHeadquarters = null;
     }
 
     @Override
@@ -235,6 +244,22 @@ public class SDbBizPartner extends SDbRegistryUser {
             mtUserNewTs = resultSet.getTimestamp("ts_new");
             mtUserEditTs = resultSet.getTimestamp("ts_edit");
             mtUserDeleteTs = resultSet.getTimestamp("ts_del");
+            
+            // Read aswell registry members:
+            
+            msSql = "SELECT id_bpb "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " "
+                    + "WHERE fid_bp = " + mnPkBizPartnerId + " AND fid_tp_bpb = " + SModSysConsts.BPSS_TP_BPB_HQ + " AND b_del = 0; ";
+            resultSet = session.getStatement().executeQuery(msSql);
+            if (!resultSet.next()) {
+                throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
+            }
+            else {
+                moRegHeadquarters = new SDbBizPartnerBranch();
+                moRegHeadquarters.read(session, new int[] { resultSet.getInt(1) });
+            }
+            
+            // Finish registry reading:
 
             mbRegistryNew = false;
         }

@@ -27,6 +27,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
     protected int mnPkEntryId;
     protected String msConceptKey;
     protected String msConcept;
+    protected java.lang.String msReference;
     protected double mdQuantity;
     protected boolean mbIsDiscountDocApplying;
     protected boolean mbIsDiscountUnitaryPercentage;
@@ -86,6 +87,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
     protected boolean mbIsDiscountRetailChain;
     protected boolean mbIsTaxesAutomaticApplying;
     protected boolean mbIsPriceVariable;
+    protected boolean mbIsPriceConfirm;
     protected boolean mbIsInventoriable;
     protected boolean mbIsDeleted;
     protected int mnFkItemId;
@@ -120,6 +122,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
     public void setPkEntryId(int n) { mnPkEntryId = n; }
     public void setConceptKey(String s) { msConceptKey = s; }
     public void setConcept(String s) { msConcept = s; }
+    public void setReference(java.lang.String s) { msReference = s; }
     public void setQuantity(double d) { mdQuantity = d; }
     public void setIsDiscountDocApplying(boolean b) { mbIsDiscountDocApplying = b; }
     public void setIsDiscountUnitaryPercentage(boolean b) { mbIsDiscountUnitaryPercentage = b; }
@@ -179,6 +182,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
     public void setIsDiscountRetailChain(boolean b) { mbIsDiscountRetailChain = b; }
     public void setIsTaxesAutomaticApplying(boolean b) { mbIsTaxesAutomaticApplying = b; }
     public void setIsPriceVariable(boolean b) { mbIsPriceVariable = b; }
+    public void setIsPriceConfirm(boolean b) { mbIsPriceConfirm = b; }
     public void setIsInventoriable(boolean b) { mbIsInventoriable = b; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkItemId(int n) { mnFkItemId = n; }
@@ -203,6 +207,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
     public int getPkEntryId() { return mnPkEntryId; }
     public String getConceptKey() { return msConceptKey; }
     public String getConcept() { return msConcept; }
+    public java.lang.String getReference() { return msReference; }
     public double getQuantity() { return mdQuantity; }
     public boolean getIsDiscountDocApplying() { return mbIsDiscountDocApplying; }
     public boolean getIsDiscountUnitaryPercentage() { return mbIsDiscountUnitaryPercentage; }
@@ -262,6 +267,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
     public boolean getIsDiscountRetailChain() { return mbIsDiscountRetailChain; }
     public boolean getIsTaxesAutomaticApplying() { return mbIsTaxesAutomaticApplying; }
     public boolean getIsPriceVariable() { return mbIsPriceVariable; }
+    public boolean getIsPriceConfirm() { return mbIsPriceConfirm; }
     public boolean getIsInventoriable() { return mbIsInventoriable; }
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkItemId() { return mnFkItemId; }
@@ -306,6 +312,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
         mnPkEntryId = 0;
         msConceptKey = "";
         msConcept = "";
+        msReference = "";
         mdQuantity = 0;
         mbIsDiscountDocApplying = false;
         mbIsDiscountUnitaryPercentage = false;
@@ -365,6 +372,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
         mbIsDiscountRetailChain = false;
         mbIsTaxesAutomaticApplying = false;
         mbIsPriceVariable = false;
+        mbIsPriceConfirm = false;
         mbIsInventoriable = false;
         mbIsDeleted = false;
         mnFkItemId = 0;
@@ -433,6 +441,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
             mnPkEntryId = resultSet.getInt("id_ety");
             msConceptKey = resultSet.getString("concept_key");
             msConcept = resultSet.getString("concept");
+            msReference = resultSet.getString("ref");
             mdQuantity = resultSet.getDouble("qty");
             mbIsDiscountDocApplying = resultSet.getBoolean("b_disc_doc");
             mbIsDiscountUnitaryPercentage = resultSet.getBoolean("b_disc_u_per");
@@ -492,6 +501,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
             mbIsDiscountRetailChain = resultSet.getBoolean("b_disc_retail_chain");
             mbIsTaxesAutomaticApplying = resultSet.getBoolean("b_tax_aut");
             mbIsPriceVariable = resultSet.getBoolean("b_prc_var");
+            mbIsPriceConfirm = resultSet.getBoolean("b_prc_cnf");
             mbIsInventoriable = resultSet.getBoolean("b_inv");
             mbIsDeleted = resultSet.getBoolean("b_del");
             mnFkItemId = resultSet.getInt("fid_item");

@@ -555,8 +555,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsPriceHist.addActionListener(this);
         jmiDpsAdjDoc.addActionListener(this);
         jmiStkDvyPend.addActionListener(this);
-        jmiStkDvySupplied.addActionListener(this);
         jmiStkDvyPendEntry.addActionListener(this);
+        jmiStkDvySupplied.addActionListener(this);
         jmiStkDvySuppliedEntry.addActionListener(this);
         jmiStkDvyDiog.addActionListener(this);
         jmiStkDvyStatsConsumption.addActionListener(this);
@@ -663,16 +663,16 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
 
         jmStkDvy.setEnabled(hasRightInventoryIn);
         jmiStkDvyPend.setEnabled(hasRightInventoryIn);
-        jmiStkDvySupplied.setEnabled(hasRightInventoryIn);
         jmiStkDvyPendEntry.setEnabled(hasRightInventoryIn);
+        jmiStkDvySupplied.setEnabled(hasRightInventoryIn);
         jmiStkDvySuppliedEntry.setEnabled(hasRightInventoryIn);
         jmiStkDvyDiog.setEnabled(hasRightInventoryIn);
         jmiStkDvyStatsConsumption.setEnabled(hasRightInventoryIn);
 
         jmStkRet.setEnabled(hasRightInventoryOut);
         jmiStkRetPending.setEnabled(hasRightInventoryOut);
-        jmiStkRetReturned.setEnabled(hasRightInventoryOut);
         jmiStkRetPendingEntry.setEnabled(hasRightInventoryOut);
+        jmiStkRetReturned.setEnabled(hasRightInventoryOut);
         jmiStkRetReturnedEntry.setEnabled(hasRightInventoryOut);
         jmiStkRetDiog.setEnabled(hasRightInventoryOut);
 
