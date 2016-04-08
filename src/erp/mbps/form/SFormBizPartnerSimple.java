@@ -208,7 +208,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
 
         jPanel19.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
 
-        jPanel6.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkBizPartnerIdentityTypeId.setText("Tipo de identidad: *");
         jlFkBizPartnerIdentityTypeId.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -224,7 +224,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
 
         jPanel19.add(jPanel6);
 
-        jPanel22.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFirstName.setText("Nombre(s): *");
         jlFirstName.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -236,7 +236,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
 
         jPanel19.add(jPanel22);
 
-        jPanel25.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlLastName.setText("Apellido(s): *");
         jlLastName.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -248,7 +248,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
 
         jPanel19.add(jPanel25);
 
-        jPanel26.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBizPartner.setText("Nombre: *");
         jlBizPartner.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -260,7 +260,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
 
         jPanel19.add(jPanel26);
 
-        jPanel27.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBizPartnerCommercial.setText("Nombre comercial:");
         jlBizPartnerCommercial.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -278,7 +278,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
 
         jPanel19.add(jPanel27);
 
-        jPanel29.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFiscalId.setText("RFC: *");
         jlFiscalId.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -325,7 +325,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
 
         jPanel15.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
-        jPanel10.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jLabel1.setPreferredSize(new java.awt.Dimension(25, 23));
         jPanel10.add(jLabel1);
@@ -353,7 +353,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
 
         jPanel15.add(jPanel10);
 
-        jPanel11.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jbCustomer.setText("Cliente");
         jbCustomer.setMargin(new java.awt.Insets(2, 0, 2, 0));
@@ -377,7 +377,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
 
         jPanel15.add(jPanel11);
 
-        jPanel12.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckIsAttBank.setText("Es banco");
         jckIsAttBank.setPreferredSize(new java.awt.Dimension(115, 23));
@@ -393,7 +393,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
 
         jPanel15.add(jPanel12);
 
-        jPanel14.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckIsAttEmployee.setText("Es empleado");
         jckIsAttEmployee.setPreferredSize(new java.awt.Dimension(115, 23));
@@ -447,7 +447,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
 
         jPanel16.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
-        jPanel7.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkBizPartnerTypeId.setText("Tipo asoc. neg.: *");
         jlFkBizPartnerTypeId.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -458,7 +458,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
 
         jPanel16.add(jPanel7);
 
-        jPanel8.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkBizPartnerCategoryId.setText("Categoría asoc. neg.: *");
         jlFkBizPartnerCategoryId.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -472,7 +472,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
 
         jPanel16.add(jPanel8);
 
-        jPanel18.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlKey.setText("Clave asoc. neg.: *");
         jlKey.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -484,10 +484,10 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
 
         jPanel16.add(jPanel18);
 
-        jPanel23.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
         jPanel16.add(jPanel23);
 
-        jPanel24.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlEmail.setText("E-mail:");
         jlEmail.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -509,19 +509,19 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
 
         jPanel5.setLayout(new java.awt.GridLayout(1, 2));
 
-        jPanel41.setLayout(new java.awt.FlowLayout(0));
+        jPanel41.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         jtfPkBizPartnerId_Ro.setEditable(false);
         jtfPkBizPartnerId_Ro.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfPkBizPartnerId_Ro.setToolTipText("ID del asociado de negocios");
         jtfPkBizPartnerId_Ro.setFocusable(false);
-        jtfPkBizPartnerId_Ro.setPreferredSize(new java.awt.Dimension(50, 23));
+        jtfPkBizPartnerId_Ro.setPreferredSize(new java.awt.Dimension(65, 23));
         jPanel41.add(jtfPkBizPartnerId_Ro);
 
         jPanel5.add(jPanel41);
 
         jPanel1.setPreferredSize(new java.awt.Dimension(392, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(2));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar");
         jbOk.setToolTipText("[Ctrl + Enter]");
@@ -536,8 +536,8 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
 
         getContentPane().add(jPanel5, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-972)/2, (screenSize.height-535)/2, 972, 535);
+        setSize(new java.awt.Dimension(972, 535));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
