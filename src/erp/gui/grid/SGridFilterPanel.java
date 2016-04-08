@@ -67,7 +67,7 @@ public class SGridFilterPanel extends JPanel implements SGridFilter, ActionListe
         jcbFilter.setPreferredSize(new java.awt.Dimension(150, 23));
         add(jcbFilter);
 
-        jbClearFilter.setIcon(new javax.swing.ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_clear.gif"))); // NOI18N
+        jbClearFilter.setIcon(new javax.swing.ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_delete_tmp.gif"))); // NOI18N
         jbClearFilter.setToolTipText("Quitar filtro");
         jbClearFilter.setPreferredSize(new java.awt.Dimension(23, 23));
         add(jbClearFilter);

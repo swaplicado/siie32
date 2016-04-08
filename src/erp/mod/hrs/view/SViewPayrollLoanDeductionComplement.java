@@ -4,12 +4,16 @@
  */
 package erp.mod.hrs.view;
 
+import erp.gui.grid.SGridFilterPanelEmployee;
+import erp.gui.grid.SGridFilterPanelLoan;
 import erp.mod.SModConsts;
 import java.util.ArrayList;
+import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridFilterDatePeriod;
+import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.grid.SGridUtils;
@@ -24,6 +28,8 @@ import sa.lib.gui.SGuiDate;
 public class SViewPayrollLoanDeductionComplement extends SGridPaneView {
 
     private SGridFilterDatePeriod moFilterDatePeriod;
+    private SGridFilterPanelEmployee moFilterEmployee;
+    private SGridFilterPanelLoan moFilterLoan;
 
     public SViewPayrollLoanDeductionComplement(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_PAY_RCP_DED, SModConsts.HRS_LOAN, title);
@@ -39,7 +45,15 @@ public class SViewPayrollLoanDeductionComplement extends SGridPaneView {
         
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
+
+        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this, SModConsts.HRSS_TP_PAY, SModConsts.HRSU_DEP);
+        moFilterEmployee.initFilter(null);
         
+        moFilterLoan = new SGridFilterPanelLoan(miClient, this, SModConsts.HRSS_TP_LOAN);
+        moFilterLoan.initFilter(null);
+        
+        getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
+        getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterLoan);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
     }
 
@@ -60,6 +74,45 @@ public class SViewPayrollLoanDeductionComplement extends SGridPaneView {
         
         filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
         sql += (sql.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt", (SGuiDate) filter);
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSS_TP_PAY)).getValue();
+        if (filter != null && ((int[]) filter).length == 1) {
+            sql += (sql.isEmpty() ? "" : "AND ") + "emp.fk_tp_pay = " + ((int[]) filter)[0] + " ";
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSU_DEP)).getValue();
+        if (filter != null && ((int[]) filter).length == 1) {
+            sql += (sql.isEmpty() ? "" : "AND ") + "emp.fk_dep = " + ((int[]) filter)[0] + " ";
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelEmployee.EMP_STATUS)).getValue();
+        if (filter != null && ((int) filter) != SLibConsts.UNDEFINED) {
+            if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ACT) {
+                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 1 ";
+            }
+            else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_INA) {
+                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 0 ";
+            }
+            else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ALL) {
+            }
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSS_TP_LOAN)) == null ? null : ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSS_TP_LOAN)).getValue();
+        if (filter != null && ((int[]) filter).length == 1) {
+            sql += (sql.isEmpty() ? "" : "AND ") + "ve.fk_tp_loan_n = " + ((int[]) filter)[0] + " ";
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelLoan.LOAN_STATUS)) == null ? null : ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelLoan.LOAN_STATUS)).getValue();
+        if (filter != null && ((int) filter) != SLibConsts.UNDEFINED) {
+            if ((int)filter == SGridFilterPanelLoan.LOAN_STATUS_OPEN) {
+                sql += (sql.isEmpty() ? "" : "AND ") + "l.b_clo = 0 ";
+            }
+            else if ((int)filter == SGridFilterPanelLoan.LOAN_STATUS_CLO) {
+                sql += (sql.isEmpty() ? "" : "AND ") + "l.b_clo = 1 ";
+            }
+            else if ((int)filter == SGridFilterPanelLoan.LOAN_STATUS_ALL) {
+            }
+        }
 
         msSql = "SELECT "
                 + "vd.id_pay AS " + SDbConsts.FIELD_ID + "1, "
@@ -67,7 +120,7 @@ public class SViewPayrollLoanDeductionComplement extends SGridPaneView {
                 + "vd.id_mov AS " + SDbConsts.FIELD_ID + "3, "
                 + "ded.code AS " + SDbConsts.FIELD_CODE + ", "
                 + "ded.name AS " + SDbConsts.FIELD_NAME + ", "
-                + "(SELECT bp.bp FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp WHERE bp.id_bp = v.id_emp) AS " + SDbConsts.FIELD_NAME + "_emp" + ", "
+                + "bp.bp AS " + SDbConsts.FIELD_NAME + "_emp" + ", "
                 + "CONCAT(tl.name,',', l.num) AS f_loan, "
                 + "vd.amt_r, "
                 + "v.dt, "
@@ -93,6 +146,10 @@ public class SViewPayrollLoanDeductionComplement extends SGridPaneView {
                 + "vd.fk_loan_emp_n = l.id_emp AND vd.fk_loan_loan_n = l.id_loan "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_LOAN) + " AS tl ON "
                 + "vd.fk_tp_loan_n = tl.id_tp_loan "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON "
+                + "v.id_emp = bp.id_bp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON "
+                + "v.id_emp = emp.id_emp "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
                 + "ORDER BY ded.name, f_name_emp, vd.id_pay , vd.id_emp, vd.id_mov ";
     }

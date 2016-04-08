@@ -4,15 +4,19 @@
  */
 package erp.mod.hrs.view;
 
+import erp.gui.grid.SGridFilterPanel;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import java.util.ArrayList;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
+import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
 
 /**
  *
@@ -20,9 +24,27 @@ import sa.lib.gui.SGuiClient;
  */
 public class SViewWorkerTypeSalary extends SGridPaneView {
 
+    private SGridFilterPanel moFilterWorkerType;
+    
     public SViewWorkerTypeSalary(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_WRK_SAL, SLibConsts.UNDEFINED, title);
+        initComponentsCustom();
+    }
+    
+    private void initComponentsCustom() {
         setRowButtonsEnabled(true, true, true, false, true);
+        
+        moFilterWorkerType = new SGridFilterPanel(miClient, this, SModConsts.HRSU_TP_WRK, SLibConsts.UNDEFINED);
+        moFilterWorkerType.initFilter(null);
+
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterWorkerType);
+        switch (mnGridSubtype) {
+            case SModSysConsts.HRSS_TP_ACC_DEP:
+            case SModSysConsts.HRSS_TP_ACC_EMP:
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterWorkerType);
+                break;
+            default:
+        }
     }
 
     @Override
@@ -37,6 +59,11 @@ public class SViewWorkerTypeSalary extends SGridPaneView {
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
         if ((Boolean) filter) {
             sql += (sql.isEmpty() ? "" : "AND ") + "v.b_del = 0 ";
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSU_TP_WRK)).getValue();
+        if (filter != null && ((int[]) filter).length == 1) {
+            sql += (sql.isEmpty() ? "" : "AND ") + "v.id_tp_wrk = " + ((int[]) filter)[0] + " ";
         }
 
         msSql = "SELECT "

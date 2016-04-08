@@ -4,6 +4,8 @@
  */
 package erp.mod.hrs.view;
 
+import erp.gui.grid.SGridFilterPanel;
+import erp.gui.grid.SGridFilterPanelEmployee;
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SDbAbsence;
 import erp.mod.hrs.form.SDialogAbsenceMovesCardex;
@@ -20,6 +22,7 @@ import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridFilterDatePeriod;
+import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.grid.SGridRowView;
@@ -37,6 +40,9 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
     private SGridFilterDatePeriod moFilterDatePeriod;
     private JButton jbCloseAbsence;
     private JButton jbCardex;
+    private SGridFilterPanelEmployee moFilterEmployee;
+    private SGridFilterPanel moFilterAbsenceClass;
+    private SGridFilterPanel moFilterBusinessPartner;
     
     private SDialogAbsenceMovesCardex moDialogAbsenceMovesCardex;
 
@@ -56,11 +62,23 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
         jbCloseAbsence = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_ok.gif")), "Cerrar incidencia", this);
         jbCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver movimientos", this);
         
+        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this, SModConsts.HRSS_TP_PAY, SModConsts.HRSU_DEP);
+        moFilterEmployee.initFilter(null);
+        
+        moFilterAbsenceClass = new SGridFilterPanel(miClient, this, SModConsts.HRSU_CL_ABS, SLibConsts.UNDEFINED);
+        moFilterAbsenceClass.initFilter(null);
+        
+        moFilterBusinessPartner = new SGridFilterPanel(miClient, this, SModConsts.HRSU_EMP, SLibConsts.UNDEFINED);
+        moFilterBusinessPartner.initFilter(null);
+        
         moDialogAbsenceMovesCardex = new SDialogAbsenceMovesCardex(miClient, "Movimientos de la incidencia");
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCloseAbsence);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCardex);
+        getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
+        getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterAbsenceClass);
+        getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterBusinessPartner);
     }
 
     /*
@@ -150,12 +168,44 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
 
         filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
         sql += (sql.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt", (SGuiDate) filter);
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSS_TP_PAY)).getValue();
+        if (filter != null && ((int[]) filter).length == 1) {
+            sql += (sql.isEmpty() ? "" : "AND ") + "emp.fk_tp_pay = " + ((int[]) filter)[0] + " ";
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSU_DEP)).getValue();
+        if (filter != null && ((int[]) filter).length == 1) {
+            sql += (sql.isEmpty() ? "" : "AND ") + "emp.fk_dep = " + ((int[]) filter)[0] + " ";
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelEmployee.EMP_STATUS)).getValue();
+        if (filter != null && ((int) filter) != SLibConsts.UNDEFINED) {
+            if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ACT) {
+                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 1 ";
+            }
+            else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_INA) {
+                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 0 ";
+            }
+            else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ALL) {
+            }
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSU_CL_ABS)) == null ? null : ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSU_CL_ABS)).getValue();
+        if (filter != null && ((int[]) filter).length == 1) {
+            sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_cl_abs = " + ((int[]) filter)[0] + " ";
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSU_EMP)) == null ? null : ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSU_EMP)).getValue();
+        if (filter != null && ((int[]) filter).length == 1) {
+            sql += (sql.isEmpty() ? "" : "AND ") + "v.id_emp = " + ((int[]) filter)[0] + " ";
+        }
 
         msSql = "SELECT "
                 + "v.id_emp AS " + SDbConsts.FIELD_ID + "1, "
                 + "v.id_abs AS " + SDbConsts.FIELD_ID + "2, "
                 + "'' AS " + SDbConsts.FIELD_CODE + ", "
-                + "emp.bp AS " + SDbConsts.FIELD_NAME + ", "
+                + "bp.bp AS " + SDbConsts.FIELD_NAME + ", "
                 + "v.num, "
                 + "v.dt, "
                 + "v.dt_sta, "
@@ -165,7 +215,7 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
                 + "v.ben_ann, "
                 + "v.ben_year, "
                 + "v.nts, "
-                + "emp.bp, "
+                + "bp.bp, "
                 + "cabs.name, "
                 + "tabs.name, "
                 + "v.b_clo, "
@@ -180,8 +230,10 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
                 + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " AS v "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS emp ON "
-                + "v.id_emp = emp.id_bp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON "
+                + "v.id_emp = bp.id_bp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON "
+                + "v.id_emp = emp.id_emp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_CL_ABS) + " AS cabs ON "
                 + "v.fk_cl_abs = cabs.id_cl_abs "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_ABS) + " AS tabs ON "
@@ -193,14 +245,14 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
                 + "v.fk_usr_upd = uu.id_usr "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
-                + "ORDER BY emp.bp, v.id_emp, v.dt, cabs.name, tabs.name, v.id_abs ";
+                + "ORDER BY bp.bp, v.id_emp, v.dt, cabs.name, tabs.name, v.id_abs ";
     }
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
 
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "emp.bp", "Empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "bp.bp", "Empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt", "Fecha registro"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "cabs.name", "Clase incidencia"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "tabs.name", "Tipo incidencia"));

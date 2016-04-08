@@ -27,7 +27,8 @@ import sa.lib.gui.SGuiConsts;
  */
 public class SViewAccountingDeduction extends SGridPaneView implements ActionListener {
 
-    private SGridFilterPanel moFilterProject;
+    private SGridFilterPanel moFilterDual;
+    private SGridFilterPanel moFilterDeduction;
 
     public SViewAccountingDeduction(SGuiClient client, int gridSubtype, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_ACC_DED, gridSubtype, title);
@@ -37,13 +38,17 @@ public class SViewAccountingDeduction extends SGridPaneView implements ActionLis
     private void initComponentsCustom() {
         setRowButtonsEnabled(false, false, true, false, false);
         
-        moFilterProject = new SGridFilterPanel(miClient, this, (mnGridSubtype == SModSysConsts.HRSS_TP_ACC_DEP ? SModConsts.HRSU_DEP : SModConsts.HRSU_EMP), SLibConsts.UNDEFINED);
-        moFilterProject.initFilter(null);
+        moFilterDual = new SGridFilterPanel(miClient, this, (mnGridSubtype == SModSysConsts.HRSS_TP_ACC_DEP ? SModConsts.HRSU_DEP : SModConsts.HRSU_EMP), SLibConsts.UNDEFINED);
+        moFilterDual.initFilter(null);
         
+        moFilterDeduction = new SGridFilterPanel(miClient, this, SModConsts.HRS_DED, SLibConsts.UNDEFINED);
+        moFilterDeduction.initFilter(null);
+
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDeduction);
         switch (mnGridSubtype) {
             case SModSysConsts.HRSS_TP_ACC_DEP:
             case SModSysConsts.HRSS_TP_ACC_EMP:
-                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterProject);
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDual);
                 break;
             default:
         }
@@ -72,6 +77,11 @@ public class SViewAccountingDeduction extends SGridPaneView implements ActionLis
                 }
                 break;
             default:
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRS_DED)).getValue();
+        if (filter != null && ((int[]) filter).length == 1) {
+            sql += (sql.isEmpty() ? "" : "AND ") + "v.id_ded = " + ((int[]) filter)[0] + " ";
         }
 
         msSql = "SELECT "

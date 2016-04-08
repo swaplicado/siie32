@@ -4,6 +4,8 @@
  */
 package erp.mod.hrs.view;
 
+import erp.gui.grid.SGridFilterPanelEmployee;
+import erp.gui.grid.SGridFilterPanelLoan;
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SDbLoan;
 import erp.mod.hrs.db.SHrsConsts;
@@ -20,6 +22,7 @@ import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
+import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.grid.SGridRowView;
@@ -33,6 +36,8 @@ import sa.lib.gui.SGuiConsts;
  */
 public class SViewLoan extends SGridPaneView implements ActionListener {
 
+    private SGridFilterPanelEmployee moFilterEmployee;
+    private SGridFilterPanelLoan moFilterLoan;
     private JButton jbCloseLoan;
     private JButton jbCardex;
     
@@ -40,16 +45,27 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
     
     public SViewLoan(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_LOAN, SLibConsts.UNDEFINED, title);
+        initComponentsCustom();
+    }
+    
+    private void initComponentsCustom() {
+        setRowButtonsEnabled(true, true, true, false, true);
 
+        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this, SModConsts.HRSS_TP_PAY, SModConsts.HRSU_DEP);
+        moFilterEmployee.initFilter(null);
+        
+        moFilterLoan = new SGridFilterPanelLoan(miClient, this, SModConsts.HRSS_TP_LOAN);
+        moFilterLoan.initFilter(null);
+        
         jbCloseLoan = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_ok.gif")), "Cerrar crédito/préstamo", this);
         jbCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver movimientos", this);
         
-        moDialogLoanPaymentsCardex = new SDialogLoanPaymentsCardex(client, "Control de crédito/préstamo");
+        moDialogLoanPaymentsCardex = new SDialogLoanPaymentsCardex(miClient, "Control de crédito/préstamo");
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCloseLoan);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCardex);
-        
-        setRowButtonsEnabled(true, true, true, false, true);
+        getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
+        getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterLoan);
     }
 
     private void actionCloseLoan() {
@@ -124,12 +140,51 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
         if ((Boolean) filter) {
             sql += (sql.isEmpty() ? "" : "AND ") + "v.b_del = 0 ";
         }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSS_TP_PAY)).getValue();
+        if (filter != null && ((int[]) filter).length == 1) {
+            sql += (sql.isEmpty() ? "" : "AND ") + "emp.fk_tp_pay = " + ((int[]) filter)[0] + " ";
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSU_DEP)).getValue();
+        if (filter != null && ((int[]) filter).length == 1) {
+            sql += (sql.isEmpty() ? "" : "AND ") + "emp.fk_dep = " + ((int[]) filter)[0] + " ";
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelEmployee.EMP_STATUS)).getValue();
+        if (filter != null && ((int) filter) != SLibConsts.UNDEFINED) {
+            if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ACT) {
+                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 1 ";
+            }
+            else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_INA) {
+                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 0 ";
+            }
+            else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ALL) {
+            }
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSS_TP_LOAN))== null ? null : ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSS_TP_LOAN)).getValue();
+        if (filter != null && ((int[]) filter).length == 1) {
+            sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_tp_loan = " + ((int[]) filter)[0] + " ";
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelLoan.LOAN_STATUS))== null ? null : ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelLoan.LOAN_STATUS)).getValue();
+        if (filter != null && ((int) filter) != SLibConsts.UNDEFINED) {
+            if ((int)filter == SGridFilterPanelLoan.LOAN_STATUS_OPEN) {
+                sql += (sql.isEmpty() ? "" : "AND ") + "v.b_clo = 0 ";
+            }
+            else if ((int)filter == SGridFilterPanelLoan.LOAN_STATUS_CLO) {
+                sql += (sql.isEmpty() ? "" : "AND ") + "v.b_clo = 1 ";
+            }
+            else if ((int)filter == SGridFilterPanelLoan.LOAN_STATUS_ALL) {
+            }
+        }
 
         msSql = "SELECT "
                 + "v.id_emp AS " + SDbConsts.FIELD_ID + "1, "
                 + "v.id_loan AS " + SDbConsts.FIELD_ID + "2, "
-                + "num AS " + SDbConsts.FIELD_CODE + ", "
-                + "num AS " + SDbConsts.FIELD_NAME + ", "
+                + "v.num AS " + SDbConsts.FIELD_CODE + ", "
+                + "v.num AS " + SDbConsts.FIELD_NAME + ", "
                 + "v.dt_sta AS " + SDbConsts.FIELD_DATE + ", "
                 + "v.dt_end_n AS " + SDbConsts.FIELD_DATE + "1, "
                 + "v.cap, "
@@ -162,6 +217,8 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
                 + "v.fk_tp_loan_pay = vtp.id_tp_loan_pay "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON "
                 + "v.id_emp = bp.id_bp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON "
+                + "v.id_emp = emp.id_emp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uc ON "
                 + "v.fk_usr_clo = uc.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "

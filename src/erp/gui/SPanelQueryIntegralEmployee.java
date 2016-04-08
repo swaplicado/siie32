@@ -13,6 +13,7 @@ package erp.gui;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
+import erp.gui.grid.SGridFilterPanelEmployee;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.table.STableColumnForm;
@@ -39,8 +40,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Vector;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JToggleButton;
 import javax.swing.event.ListSelectionEvent;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
@@ -65,7 +68,9 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private ArrayList<SHrsBenefitTableByAnniversary> maBenefitTableVacationBonByAnniversary = null;
     private ArrayList<SHrsBenefitTableByAnniversary> maBenefitTableAnnByAnniversarys = null;
     
-    private int mnPaymentTypeId;
+    private int mnFilterPaymentTypeId;
+    private int mnFilterDepartamentId;
+    private int mnFilterStatusEmployee;
     
     /** Creates new form SPanelQueryIntegralEmployee
      * @param client 
@@ -92,12 +97,17 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        gpbFilter = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jpEmployeesAvailable = new javax.swing.JPanel();
         jpFilter = new javax.swing.JPanel();
-        jcbFilter = new javax.swing.JComboBox();
-        jbClearFilter = new javax.swing.JButton();
+        jtbStatusEmployeeActive = new javax.swing.JToggleButton();
+        jtbStatusEmployeeInactive = new javax.swing.JToggleButton();
+        jtbStatusEmployeeAll = new javax.swing.JToggleButton();
+        jcbFilterPaymentType = new javax.swing.JComboBox();
+        jbClearFilterPaymentType = new javax.swing.JButton();
+        jlTotalAvailables = new javax.swing.JLabel();
         jpInformation = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
@@ -218,18 +228,37 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jpEmployeesAvailable.setBorder(javax.swing.BorderFactory.createTitledBorder("Empleados:"));
         jpEmployeesAvailable.setLayout(new java.awt.BorderLayout());
 
-        jpFilter.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jpFilter.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jcbFilter.setToolTipText("Filtrar");
-        jcbFilter.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpFilter.add(jcbFilter);
+        gpbFilter.add(jtbStatusEmployeeActive);
+        jtbStatusEmployeeActive.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_on.gif"))); // NOI18N
+        jtbStatusEmployeeActive.setSelected(true);
+        jtbStatusEmployeeActive.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpFilter.add(jtbStatusEmployeeActive);
 
-        jbClearFilter.setIcon(new javax.swing.ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_clear.gif"))); // NOI18N
-        jbClearFilter.setToolTipText("Quitar filtro");
-        jbClearFilter.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpFilter.add(jbClearFilter);
+        gpbFilter.add(jtbStatusEmployeeInactive);
+        jtbStatusEmployeeInactive.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_on.gif"))); // NOI18N
+        jtbStatusEmployeeInactive.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpFilter.add(jtbStatusEmployeeInactive);
+
+        gpbFilter.add(jtbStatusEmployeeAll);
+        jtbStatusEmployeeAll.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_filter_on.gif"))); // NOI18N
+        jtbStatusEmployeeAll.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpFilter.add(jtbStatusEmployeeAll);
+
+        jcbFilterPaymentType.setToolTipText("Filtrar periodo pago");
+        jcbFilterPaymentType.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpFilter.add(jcbFilterPaymentType);
+
+        jbClearFilterPaymentType.setIcon(new javax.swing.ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_delete_tmp.gif"))); // NOI18N
+        jbClearFilterPaymentType.setToolTipText("Quitar filtro periodo pago");
+        jbClearFilterPaymentType.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpFilter.add(jbClearFilterPaymentType);
 
         jpEmployeesAvailable.add(jpFilter, java.awt.BorderLayout.NORTH);
+
+        jlTotalAvailables.setText("n");
+        jpEmployeesAvailable.add(jlTotalAvailables, java.awt.BorderLayout.SOUTH);
 
         jPanel1.add(jpEmployeesAvailable, java.awt.BorderLayout.CENTER);
 
@@ -803,6 +832,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup gpbFilter;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
@@ -830,8 +860,8 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
-    private javax.swing.JButton jbClearFilter;
-    private javax.swing.JComboBox jcbFilter;
+    private javax.swing.JButton jbClearFilterPaymentType;
+    private javax.swing.JComboBox jcbFilterPaymentType;
     private javax.swing.JFormattedTextField jftDateBenefits;
     private javax.swing.JFormattedTextField jftDateBirth;
     private javax.swing.JFormattedTextField jftDateChangeSalary;
@@ -877,6 +907,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private javax.swing.JLabel jlSex;
     private javax.swing.JLabel jlSignature;
     private javax.swing.JLabel jlSocialSecurityNumber;
+    private javax.swing.JLabel jlTotalAvailables;
     private javax.swing.JLabel jlVacations;
     private javax.swing.JLabel jlVacationsBenefit;
     private javax.swing.JLabel jlVacationsBonus;
@@ -888,6 +919,9 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private javax.swing.JPanel jpEmployeesAvailable;
     private javax.swing.JPanel jpFilter;
     private javax.swing.JPanel jpInformation;
+    private javax.swing.JToggleButton jtbStatusEmployeeActive;
+    private javax.swing.JToggleButton jtbStatusEmployeeAll;
+    private javax.swing.JToggleButton jtbStatusEmployeeInactive;
     private javax.swing.JTextField jtfAlternativeId;
     private javax.swing.JTextField jtfAnnualBonusBenefit;
     private javax.swing.JTextField jtfAnnualBonusPayProp;
@@ -962,14 +996,26 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         populateBenefits();
         populateEmployee();
         updateOptions();
-        jbClearFilter.addActionListener(this);
+        jtbStatusEmployeeActive.setSelected(true);
+        actionEmpStatusStateChange();
+        jbClearFilterPaymentType.addActionListener(this);
+    }                                        
+
+    private void computeTotals() {
+        int countAvailables = 0;
+        
+        for (int i = 0; i < moTablePaneEmpAvailable.getTableGuiRowCount(); i++) {
+            countAvailables++;
+        }
+        
+        jlTotalAvailables.setText(" " + countAvailables + " empleados disponibles.");
     }
     
-    private void actionClearFilter() {
-        jbClearFilter.setEnabled(false);
-        jcbFilter.setSelectedIndex(0);
-        jcbFilter.requestFocus();
-        mnPaymentTypeId = SLibConsts.UNDEFINED;
+    private void actionClearFilterPaymentType() {
+        jbClearFilterPaymentType.setEnabled(false);
+        jcbFilterPaymentType.setSelectedIndex(0);
+        jcbFilterPaymentType.requestFocus();
+        mnFilterPaymentTypeId = SLibConsts.UNDEFINED;
         
         try {
             populateEmployee();
@@ -979,10 +1025,31 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         }
     }
     
-    private void itemStateChangedFilter() {
+    private void actionEmpStatusStateChange() {
         try {
-            mnPaymentTypeId = (((SGuiItem) jcbFilter.getSelectedItem()).getPrimaryKey().length == 0 ? SLibConsts.UNDEFINED : ((SGuiItem) jcbFilter.getSelectedItem()).getPrimaryKey()[0]);
-            jbClearFilter.setEnabled(jcbFilter.getSelectedIndex() > 0);
+            if (jtbStatusEmployeeActive.isSelected()) {
+                mnFilterStatusEmployee = SGridFilterPanelEmployee.EMP_STATUS_ACT;
+                jtbStatusEmployeeActive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_off.gif")));
+            }
+            else if (jtbStatusEmployeeInactive.isSelected()) {
+                mnFilterStatusEmployee = SGridFilterPanelEmployee.EMP_STATUS_INA;
+                jtbStatusEmployeeInactive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_off.gif")));
+            }
+            else if (jtbStatusEmployeeAll.isSelected()) {
+                mnFilterStatusEmployee = SGridFilterPanelEmployee.EMP_STATUS_ALL;
+                jtbStatusEmployeeAll.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif")));
+            }
+            populateEmployee();
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+    }
+    
+    private void itemStateChangedFilterPaymentType() {
+        try {
+            mnFilterPaymentTypeId = (((SGuiItem) jcbFilterPaymentType.getSelectedItem()).getPrimaryKey().length == 0 ? SLibConsts.UNDEFINED : ((SGuiItem) jcbFilterPaymentType.getSelectedItem()).getPrimaryKey()[0]);
+            jbClearFilterPaymentType.setEnabled(jcbFilterPaymentType.getSelectedIndex() > 0);
             populateEmployee();
         }
         catch (Exception e) {
@@ -991,13 +1058,19 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     }
     
     private void updateOptions() {
-        jcbFilter.removeItemListener(this);
+        jcbFilterPaymentType.removeItemListener(this);
+        jtbStatusEmployeeActive.removeItemListener(this);
+        jtbStatusEmployeeInactive.removeItemListener(this);
+        jtbStatusEmployeeAll.removeItemListener(this);
         
-        miClient.getSession().populateCatalogue(jcbFilter, SModConsts.HRSS_TP_PAY, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(jcbFilterPaymentType, SModConsts.HRSS_TP_PAY, SLibConsts.UNDEFINED, null);
         
-        actionClearFilter();
+        actionClearFilterPaymentType();
         
-        jcbFilter.addItemListener(this);
+        jcbFilterPaymentType.addItemListener(this);
+        jtbStatusEmployeeActive.addItemListener(this);
+        jtbStatusEmployeeInactive.addItemListener(this);
+        jtbStatusEmployeeAll.addItemListener(this);
     }
     
     private ArrayList<SDbBenefitTable> getBenefitTable(int benefitTableType) throws Exception {
@@ -1075,7 +1148,9 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
                 "INNER JOIN erp.bpsu_bpb AS bpb ON bpb.fid_bp = bp.id_bp " +
                 "INNER JOIN erp.bpsu_bpb_add AS a ON a.id_bpb = bpb.id_bpb " +
                 "LEFT OUTER JOIN erp.locu_cty AS cty ON cty.id_cty = a.fid_cty_n " + 
-                "WHERE emp.b_del = 0 AND bp.b_del = 0" + (mnPaymentTypeId != SLibConsts.UNDEFINED ? " AND emp.fk_tp_pay = " + mnPaymentTypeId : "") + " " +
+                "WHERE emp.b_del = 0 AND bp.b_del = 0" + (mnFilterPaymentTypeId != SLibConsts.UNDEFINED ? " AND emp.fk_tp_pay = " + mnFilterPaymentTypeId : "") + " " +
+                (mnFilterDepartamentId != SLibConsts.UNDEFINED ? " AND emp.fk_dep = " + mnFilterDepartamentId : "") + " " +
+                (mnFilterStatusEmployee != SLibConsts.UNDEFINED ? (mnFilterStatusEmployee == SGridFilterPanelEmployee.EMP_STATUS_ACT ? " AND emp.b_act = 1 " : (mnFilterStatusEmployee == SGridFilterPanelEmployee.EMP_STATUS_INA ? " AND emp.b_act = 0 " : "")) : "") + " " +
                 "GROUP BY emp.id_emp " +
                 "ORDER BY bp.bp, emp.id_emp, pay.name ";
 
@@ -1110,6 +1185,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
 
         moTablePaneEmpAvailable.renderTableRows();
         moTablePaneEmpAvailable.setTableRowSelection(0);
+        computeTotals();
     }
     
     public void resetEmployee() {
@@ -1409,8 +1485,8 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
             
-            if (button == jbClearFilter) {
-                actionClearFilter();
+            if (button == jbClearFilterPaymentType) {
+                actionClearFilterPaymentType();
             }
         }
     }
@@ -1421,8 +1497,23 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 JComboBox comboBox = (JComboBox) e.getSource();
 
-                if (comboBox == jcbFilter) {
-                    itemStateChangedFilter();
+                if (comboBox == jcbFilterPaymentType) {
+                    itemStateChangedFilterPaymentType();
+                }
+            }
+        }
+        else if (e.getSource() instanceof JToggleButton) {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                JToggleButton toggleButton = (JToggleButton) e.getSource();
+                
+                if (toggleButton == jtbStatusEmployeeActive) {
+                    actionEmpStatusStateChange();
+                }
+                else if (toggleButton == jtbStatusEmployeeInactive) {
+                    actionEmpStatusStateChange();
+                }
+                else if (toggleButton == jtbStatusEmployeeAll) {
+                    actionEmpStatusStateChange();
                 }
             }
         }

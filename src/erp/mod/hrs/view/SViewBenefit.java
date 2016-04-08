@@ -4,7 +4,7 @@
  */
 package erp.mod.hrs.view;
 
-import erp.gui.grid.SGridFilterPanel;
+import erp.gui.grid.SGridFilterPanelEmployee;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SHrsConsts;
@@ -40,7 +40,7 @@ import sa.lib.gui.SGuiDate;
  */
 public class SViewBenefit extends SGridPaneView implements ActionListener {
 
-    private SGridFilterPanel moFilterProject;
+    private SGridFilterPanelEmployee moFilterEmployee;
     private SGridFilterDate moFilterDate;
     private JButton jbCardex;
     private Date mtDateCut;
@@ -62,8 +62,7 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
         moFilterDate = new SGridFilterDate(miClient, this);
         mtDateCut = null;
         
-        moFilterProject = new SGridFilterPanel(miClient, this, SModConsts.HRSS_TP_PAY, SLibConsts.UNDEFINED);
-        moFilterProject.initFilter(null);
+        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this, SModConsts.HRSS_TP_PAY, SModConsts.HRSU_DEP);
         
         if (mnGridSubtype == SModSysConsts.HRSS_TP_BEN_ANN_BON) {
             moFilterDate.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_YEAR, SLibTimeUtils.getEndOfYear(miClient.getSession().getCurrentDate()).getTime()));
@@ -71,12 +70,13 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
         else {
             moFilterDate.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_YEAR, miClient.getSession().getCurrentDate().getTime()));
         }
+        moFilterEmployee.initFilter(null);
         jbCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver movimientos", this);
         
         moDialogBenefitCardex = new SDialogBenefitCardex(miClient, mnGridSubtype, "Control de la prestación");
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDate);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterProject);
+        getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCardex);
     }
 
@@ -132,6 +132,23 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
         filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSS_TP_PAY)).getValue();
         if (filter != null && ((int[]) filter).length == 1) {
             sql += (sql.isEmpty() ? "" : "AND ") + "emp.fk_tp_pay = " + ((int[]) filter)[0] + " ";
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSU_DEP)).getValue();
+        if (filter != null && ((int[]) filter).length == 1) {
+            sql += (sql.isEmpty() ? "" : "AND ") + "emp.fk_dep = " + ((int[]) filter)[0] + " ";
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelEmployee.EMP_STATUS)).getValue();
+        if (filter != null && ((int) filter) != SLibConsts.UNDEFINED) {
+            if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ACT) {
+                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 1 ";
+            }
+            else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_INA) {
+                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 0 ";
+            }
+            else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ALL) {
+            }
         }
 
         msSql = "SELECT "

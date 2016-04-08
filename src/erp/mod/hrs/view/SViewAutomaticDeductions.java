@@ -4,17 +4,21 @@
  */
 package erp.mod.hrs.view;
 
+import erp.gui.grid.SGridFilterPanelEmployee;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
+import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
 
 /**
  *
@@ -22,9 +26,26 @@ import sa.lib.gui.SGuiClient;
  */
 public class SViewAutomaticDeductions extends SGridPaneView implements ActionListener {
 
+    private SGridFilterPanelEmployee moFilterEmployee;
+
     public SViewAutomaticDeductions(SGuiClient client, int gridSubtype, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRSX_AUT_DED, gridSubtype, title);
+        initComponentsCustom();
+    }
+
+    /*
+     * Private methods
+     */
+
+    private void initComponentsCustom() {
         setRowButtonsEnabled(true, false, true, false, false);
+        
+        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this, SModConsts.HRSS_TP_PAY, SModConsts.HRSU_DEP);
+        moFilterEmployee.initFilter(null);
+        
+        if (mnGridSubtype == SModSysConsts.HRS_AUT_EMP) {
+            getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
+        }
     }
 
     @Override
@@ -39,6 +60,28 @@ public class SViewAutomaticDeductions extends SGridPaneView implements ActionLis
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
         if ((Boolean) filter) {
             sql += (sql.isEmpty() ? "" : "AND ") + "v.b_del = 0 ";
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSS_TP_PAY)).getValue();
+        if (filter != null && ((int[]) filter).length == 1) {
+            sql += (sql.isEmpty() ? "" : "AND ") + "emp.fk_tp_pay = " + ((int[]) filter)[0] + " ";
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSU_DEP)).getValue();
+        if (filter != null && ((int[]) filter).length == 1) {
+            sql += (sql.isEmpty() ? "" : "AND ") + "emp.fk_dep = " + ((int[]) filter)[0] + " ";
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelEmployee.EMP_STATUS)).getValue();
+        if (filter != null && ((int) filter) != SLibConsts.UNDEFINED) {
+            if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ACT) {
+                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 1 ";
+            }
+            else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_INA) {
+                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 0 ";
+            }
+            else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ALL) {
+            }
         }
 
         msSql = "SELECT "
@@ -76,6 +119,8 @@ public class SViewAutomaticDeductions extends SGridPaneView implements ActionLis
                 + "v.fk_usr_upd = uu.id_usr "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON "
                 + "v.fk_emp_n = bp.id_bp "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON "
+                + "v.fk_emp_n = emp.id_emp "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_LOAN) + " AS l ON "
                 + "v.fk_loan_emp_n = l.id_emp AND v.fk_loan_loan_n = l.id_loan "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_LOAN) + " AS tl ON "

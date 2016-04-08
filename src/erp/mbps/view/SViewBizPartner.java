@@ -7,6 +7,7 @@ package erp.mbps.view;
 
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.gui.grid.SGridFilterPanelEmployee;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.table.STabFilterDeleted;
@@ -17,17 +18,23 @@ import erp.lib.table.STableSetting;
 import erp.mbps.form.SDialogBizPartnerExport;
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SDbEmployee;
+import erp.mod.hrs.db.SDbEmployeeHireLog;
+import erp.mod.hrs.db.SHrsUtils;
 import erp.mod.hrs.form.SDialogEmployeeHireLog;
 import erp.table.SFilterConstants;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JToggleButton;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
+import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiItem;
 
 /**
@@ -39,9 +46,18 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private javax.swing.JButton jbBizPartnerExport;
     private javax.swing.JButton jbStatusEmployee;
-    private javax.swing.JComboBox jcbFilter;
-    private javax.swing.JButton jbClearFilter;
+    private javax.swing.JButton jbStatusEditEmployee;
+    private javax.swing.JButton jbStatusDeleteEmployee;
+    private javax.swing.JToggleButton jtbStatusEmployeeActive;
+    private javax.swing.JToggleButton jtbStatusEmployeeInactive;
+    private javax.swing.JToggleButton jtbStatusEmployeeAll;
+    private javax.swing.JComboBox jcbFilterPaymentType;
+    private javax.swing.JComboBox jcbFilterDepartament;
+    private javax.swing.JButton jbClearFilterPaymentType;
+    private javax.swing.JButton jbClearFilterDepartament;
 
+    private javax.swing.ButtonGroup bgStatusEmployee;
+    
     private int mnBizPartnerCategory;
     private java.lang.String msOrderKey;
 
@@ -49,7 +65,9 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     private erp.mod.hrs.form.SDialogEmployeeHireLog moDialogEmployeeHireLog;
     private boolean mbHasRightEmpWage;
     
-    private int mnPaymentTypeId;
+    private int mnFilterPaymentTypeId;
+    private int mnFilterDepartamentId;
+    private int mnFilterStatusEmployee;
 
     public SViewBizPartner(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType) {
         super(client, tabTitle, auxType);
@@ -74,27 +92,64 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         jbStatusEmployee.addActionListener(this);
         jbStatusEmployee.setToolTipText("Cambiar estatus alta/baja");
         jbStatusEmployee.setEnabled(false);
+        jbStatusEditEmployee = SGridUtils.createButton(new ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_edit.gif")), "Modificar estatus alta/baja", this);
+        jbStatusEditEmployee.setEnabled(false);
+        jbStatusDeleteEmployee = SGridUtils.createButton(new ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_delete_tmp.gif")), "Eliminar estatus alta/baja", this);
+        jbStatusDeleteEmployee.setEnabled(false);
 
         moTabFilterDeleted = new STabFilterDeleted(this);
-        jcbFilter = new javax.swing.JComboBox();
-        jcbFilter.setToolTipText("Filtrar");
-        jcbFilter.setPreferredSize(new java.awt.Dimension(150, 23));
+        bgStatusEmployee = new ButtonGroup();
         
-        jbClearFilter = new javax.swing.JButton();
-        jbClearFilter.setIcon(new javax.swing.ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_clear.gif")));
-        jbClearFilter.setToolTipText("Quitar filtro");
-        jbClearFilter.setPreferredSize(new java.awt.Dimension(23, 23));
-        jbClearFilter.addActionListener(this);
+        jtbStatusEmployeeActive = new JToggleButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_on.gif")));
+        jtbStatusEmployeeActive.setPreferredSize(new Dimension(23, 23));
+        jtbStatusEmployeeActive.addActionListener(this);
+        jtbStatusEmployeeActive.setToolTipText("Ver activos");
+        jtbStatusEmployeeActive.setEnabled(false);
+        jtbStatusEmployeeActive.setSelected(true);
+        bgStatusEmployee.add(jtbStatusEmployeeActive);
+        
+        jtbStatusEmployeeInactive = new JToggleButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_on.gif")));
+        jtbStatusEmployeeInactive.setPreferredSize(new Dimension(23, 23));
+        jtbStatusEmployeeInactive.addActionListener(this);
+        jtbStatusEmployeeInactive.setToolTipText("Ver inactivos");
+        jtbStatusEmployeeInactive.setEnabled(false);
+        bgStatusEmployee.add(jtbStatusEmployeeInactive);
+        
+        jtbStatusEmployeeAll = new JToggleButton(new ImageIcon(getClass().getResource("/erp/img/switch_filter_on.gif")));
+        jtbStatusEmployeeAll.setPreferredSize(new Dimension(23, 23));
+        jtbStatusEmployeeAll.addActionListener(this);
+        jtbStatusEmployeeAll.setToolTipText("Ver todos");
+        jtbStatusEmployeeAll.setEnabled(false);
+        bgStatusEmployee.add(jtbStatusEmployeeAll);
+        
+        jcbFilterPaymentType = new javax.swing.JComboBox();
+        jcbFilterPaymentType.setToolTipText("Filtrar periodo pago");
+        jcbFilterPaymentType.setPreferredSize(new java.awt.Dimension(125, 23));
+        
+        jbClearFilterPaymentType = SGridUtils.createButton(new ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_delete_tmp.gif")), "Quitar filtro periodo pago", this);
+        
+        jcbFilterDepartament= new javax.swing.JComboBox();
+        jcbFilterDepartament.setToolTipText("Filtrar departamento");
+        jcbFilterDepartament.setPreferredSize(new java.awt.Dimension(125, 23));
+        
+        jbClearFilterDepartament = SGridUtils.createButton(new ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_delete_tmp.gif")), "Quitar filtro departamento", this);
         
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
         addTaskBarUpperComponent(jbBizPartnerExport);
         
         if (mnTabTypeAux01 == SDataConstants.BPSX_BP_EMP) {
-            addTaskBarUpperComponent(jcbFilter);
-            addTaskBarUpperComponent(jbClearFilter);
+            addTaskBarLowerComponent(jtbStatusEmployeeActive);
+            addTaskBarLowerComponent(jtbStatusEmployeeInactive);
+            addTaskBarLowerComponent(jtbStatusEmployeeAll);
+            addTaskBarLowerComponent(jcbFilterPaymentType);
+            addTaskBarLowerComponent(jbClearFilterPaymentType);
+            addTaskBarUpperComponent(jcbFilterDepartament);
+            addTaskBarUpperComponent(jbClearFilterDepartament);
         }
         addTaskBarUpperComponent(jbStatusEmployee);
+        addTaskBarUpperComponent(jbStatusEditEmployee);
+        addTaskBarUpperComponent(jbStatusDeleteEmployee);
 
         STableField[] aoKeyFields = new STableField[1];
 
@@ -345,6 +400,11 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         jbBizPartnerExport.setEnabled(levelRightEditCategory >=  SUtilConsts.LEV_AUTHOR && mnTabTypeAux01 != SDataConstants.BPSU_BP && mnTabTypeAux01 != SDataConstants.BPSX_BP_ATT_SAL_AGT && mnTabTypeAux01 != SDataConstants.BPSX_BP_EMP &&
                 mnTabTypeAux01 != SDataConstants.BPSX_BP_ATT_BANK && mnTabTypeAux01 != SDataConstants.BPSX_BP_ATT_CARR);
         jbStatusEmployee.setEnabled(mnTabTypeAux01 == SDataConstants.BPSX_BP_EMP);
+        jbStatusEditEmployee.setEnabled(mnTabTypeAux01 == SDataConstants.BPSX_BP_EMP);
+        jbStatusDeleteEmployee.setEnabled(mnTabTypeAux01 == SDataConstants.BPSX_BP_EMP);
+        jtbStatusEmployeeActive.setEnabled(mnTabTypeAux01 == SDataConstants.BPSX_BP_EMP);
+        jtbStatusEmployeeInactive.setEnabled(mnTabTypeAux01 == SDataConstants.BPSX_BP_EMP);
+        jtbStatusEmployeeAll.setEnabled(mnTabTypeAux01 == SDataConstants.BPSX_BP_EMP);
 
         moDialogBizPartnerExport = new SDialogBizPartnerExport(miClient);
 
@@ -370,13 +430,14 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
 
         populateTable();
         updateOptions();
+        actionEmpStatusStateChange();
     }
     
-    private void actionClearFilter() {
-        jbClearFilter.setEnabled(false);
-        jcbFilter.setSelectedIndex(0);
-        jcbFilter.requestFocus();
-        mnPaymentTypeId = SLibConsts.UNDEFINED;
+    private void actionClearFilterPaymentType() {
+        jbClearFilterPaymentType.setEnabled(false);
+        jcbFilterPaymentType.setSelectedIndex(0);
+        jcbFilterPaymentType.requestFocus();
+        mnFilterPaymentTypeId = SLibConsts.UNDEFINED;
         
         try {
             populateTable();
@@ -386,10 +447,51 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         }
     }
     
-    private void itemStateChangedFilter() {
+    private void actionClearFilterDepartament() {
+        jbClearFilterDepartament.setEnabled(false);
+        jcbFilterDepartament.setSelectedIndex(0);
+        jcbFilterDepartament.requestFocus();
+        mnFilterDepartamentId = SLibConsts.UNDEFINED;
+        
         try {
-            mnPaymentTypeId = (((SGuiItem) jcbFilter.getSelectedItem()).getPrimaryKey().length == 0 ? SLibConsts.UNDEFINED : ((SGuiItem) jcbFilter.getSelectedItem()).getPrimaryKey()[0]);
-            jbClearFilter.setEnabled(jcbFilter.getSelectedIndex() > 0);
+            populateTable();
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+    }
+    
+    private void actionEmpStatusStateChange() {
+        if (jtbStatusEmployeeActive.isSelected()) {
+            mnFilterStatusEmployee = SGridFilterPanelEmployee.EMP_STATUS_ACT;
+            jtbStatusEmployeeActive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_off.gif")));
+        }
+        else if (jtbStatusEmployeeInactive.isSelected()) {
+            mnFilterStatusEmployee = SGridFilterPanelEmployee.EMP_STATUS_INA;
+            jtbStatusEmployeeInactive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_off.gif")));
+        }
+        else if (jtbStatusEmployeeAll.isSelected()) {
+            mnFilterStatusEmployee = SGridFilterPanelEmployee.EMP_STATUS_ALL;
+            jtbStatusEmployeeAll.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif")));
+        }
+        populateTable();
+    }
+    
+    private void itemStateChangedFilterPaymentType() {
+        try {
+            mnFilterPaymentTypeId = (((SGuiItem) jcbFilterPaymentType.getSelectedItem()).getPrimaryKey().length == 0 ? SLibConsts.UNDEFINED : ((SGuiItem) jcbFilterPaymentType.getSelectedItem()).getPrimaryKey()[0]);
+            jbClearFilterPaymentType.setEnabled(jcbFilterPaymentType.getSelectedIndex() > 0);
+            populateTable();
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+    }
+    
+    private void itemStateChangedFilterDepartament() {
+        try {
+            mnFilterDepartamentId = (((SGuiItem) jcbFilterDepartament.getSelectedItem()).getPrimaryKey().length == 0 ? SLibConsts.UNDEFINED : ((SGuiItem) jcbFilterDepartament.getSelectedItem()).getPrimaryKey()[0]);
+            jbClearFilterDepartament.setEnabled(jcbFilterDepartament.getSelectedIndex() > 0);
             populateTable();
         }
         catch (Exception e) {
@@ -398,13 +500,23 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     }
     
     private void updateOptions() {
-        jcbFilter.removeItemListener(this);
+        jcbFilterPaymentType.removeItemListener(this);
+        jcbFilterDepartament.removeItemListener(this);
+        jtbStatusEmployeeActive.removeItemListener(this);
+        jtbStatusEmployeeInactive.removeItemListener(this);
+        jtbStatusEmployeeAll.removeItemListener(this);
         
-        miClient.getSession().populateCatalogue(jcbFilter, SModConsts.HRSS_TP_PAY, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(jcbFilterPaymentType, SModConsts.HRSS_TP_PAY, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(jcbFilterDepartament, SModConsts.HRSU_DEP, SLibConsts.UNDEFINED, null);
         
-        actionClearFilter();
+        actionClearFilterPaymentType();
+        actionClearFilterDepartament();
         
-        jcbFilter.addItemListener(this);
+        jcbFilterPaymentType.addItemListener(this);
+        jcbFilterDepartament.addItemListener(this);
+        jtbStatusEmployeeActive.addItemListener(this);
+        jtbStatusEmployeeInactive.addItemListener(this);
+        jtbStatusEmployeeAll.addItemListener(this);
     }
 
     @Override
@@ -459,13 +571,13 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
 
         if (jbStatusEmployee.isEnabled()) {
             if (moTablePane.getSelectedTableRow() != null) {
-                moDialogEmployeeHireLog = new SDialogEmployeeHireLog((SGuiClient) miClient, "Cambio de estatus del empleado");
+                moDialogEmployeeHireLog = new SDialogEmployeeHireLog((SGuiClient) miClient, "Cambiar estatus del empleado");
 
-                moDialogEmployeeHireLog.setValue(SLibConsts.DATA_TYPE_KEY, moTablePane.getSelectedTableRow().getPrimaryKey());
+                moDialogEmployeeHireLog.setValue(SGuiConsts.PARAM_BPR, moTablePane.getSelectedTableRow().getPrimaryKey());
                 moDialogEmployeeHireLog.setFormVisible(true);
 
                 if (moDialogEmployeeHireLog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    employee = (SDbEmployee)  moDialogEmployeeHireLog.getValue(SLibConsts.UNDEFINED);
+                    employee = (SDbEmployee)  moDialogEmployeeHireLog.getValue(SGuiConsts.PARAM_BPR);
 
                     try {
                         employee.save(miClient.getSession());
@@ -475,6 +587,47 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                     }
 
                     miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).refreshCatalogues(mnTabTypeAux01);
+                }
+            }
+        }
+    }
+    
+    public void actionStatusEditChange() {
+        SDbEmployeeHireLog employeeHireLog = null;
+    
+        if (jbStatusEmployee.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() != null) {
+                moDialogEmployeeHireLog = new SDialogEmployeeHireLog((SGuiClient) miClient, "Modificar estatus del empleado");
+
+                moDialogEmployeeHireLog.setValue(SGuiConsts.PARAM_KEY, moTablePane.getSelectedTableRow().getPrimaryKey());
+                moDialogEmployeeHireLog.setFormVisible(true);
+
+                if (moDialogEmployeeHireLog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    try {
+                    employeeHireLog = (SDbEmployeeHireLog)  moDialogEmployeeHireLog.getValue(SGuiConsts.PARAM_KEY);
+                        if (SHrsUtils.editHireLog(miClient.getSession(), employeeHireLog)) {
+                            miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).refreshCatalogues(mnTabTypeAux01);
+                        }
+                        //employeeHireLog.save(miClient.getSession());
+                    }
+                    catch (Exception e) {
+                        SLibUtilities.renderException(this, e);
+                    }
+                }
+            }
+        }
+    }
+    
+    public void actionStatusDeleteChange() {
+        if (jbStatusDeleteEmployee.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() != null) {
+                try {
+                    if (SHrsUtils.deleteHireLog(miClient.getSession(), ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0])) {
+                        miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).refreshCatalogues(mnTabTypeAux01);
+                    }
+                }
+                catch (Exception e) {
+                    SLibUtilities.renderException(this, e);
                 }
             }
         }
@@ -558,7 +711,9 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 "LEFT OUTER JOIN erp.hrss_tp_rec_sche AS rshe ON e.fk_tp_rec_sche = rshe.id_tp_rec_sche " +
                 "LEFT OUTER JOIN erp.hrss_tp_pos_risk AS risk ON e.fk_tp_pos_risk = risk.id_tp_pos_risk " +
                 "LEFT OUTER JOIN erp.hrss_bank AS bank ON e.fk_bank_n = bank.id_bank ") +
-                (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) + (sqlBizPartner.length() == 0 ? "" : sqlBizPartner) + (mnPaymentTypeId != SLibConsts.UNDEFINED ? " AND e.fk_tp_pay = " + mnPaymentTypeId : "") + " " +
+                (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) + (sqlBizPartner.length() == 0 ? "" : sqlBizPartner) + (mnFilterPaymentTypeId != SLibConsts.UNDEFINED ? " AND e.fk_tp_pay = " + mnFilterPaymentTypeId : "") + " " +
+                (mnFilterDepartamentId != SLibConsts.UNDEFINED ? " AND e.fk_dep = " + mnFilterDepartamentId : "") + " " +
+                (mnFilterStatusEmployee != SLibConsts.UNDEFINED ? (mnFilterStatusEmployee == SGridFilterPanelEmployee.EMP_STATUS_ACT ? " AND e.b_act = 1 " : (mnFilterStatusEmployee == SGridFilterPanelEmployee.EMP_STATUS_INA ? " AND e.b_act = 0 " : "")) : "") + " " +
                 "ORDER BY " + msOrderKey;
     }
 
@@ -575,11 +730,20 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             else if (button == jbStatusEmployee) {
                 actionStatusChange();
             }
-            else if (button == jbClearFilter) {
-                    actionClearFilter();
-                }
+            else if (button == jbStatusEditEmployee) {
+                actionStatusEditChange();
+            }
+            else if (button == jbStatusDeleteEmployee) {
+                actionStatusDeleteChange();
+            }
+            else if (button == jbClearFilterPaymentType) {
+                    actionClearFilterPaymentType();
+            }
+            else if (button == jbClearFilterDepartament) {
+                    actionClearFilterDepartament();
             }
         }
+    }
 
     @Override
     public void itemStateChanged(ItemEvent e) {
@@ -587,8 +751,26 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 JComboBox comboBox = (JComboBox) e.getSource();
 
-                if (comboBox == jcbFilter) {
-                    itemStateChangedFilter();
+                if (comboBox == jcbFilterPaymentType) {
+                    itemStateChangedFilterPaymentType();
+                }
+                else if (comboBox == jcbFilterDepartament) {
+                    itemStateChangedFilterDepartament();
+                }
+            }
+        }
+        else if (e.getSource() instanceof JToggleButton) {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                JToggleButton toggleButton = (JToggleButton) e.getSource();
+                
+                if (toggleButton == jtbStatusEmployeeActive) {
+                    actionEmpStatusStateChange();
+                }
+                else if (toggleButton == jtbStatusEmployeeInactive) {
+                    actionEmpStatusStateChange();
+                }
+                else if (toggleButton == jtbStatusEmployeeAll) {
+                    actionEmpStatusStateChange();
                 }
             }
         }

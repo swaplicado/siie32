@@ -4,7 +4,7 @@
  */
 package erp.mod.hrs.view;
 
-import erp.gui.grid.SGridFilterPanel;
+import erp.gui.grid.SGridFilterPanelEmployee;
 import erp.mod.SModConsts;
 import java.util.ArrayList;
 import sa.lib.SLibConsts;
@@ -23,7 +23,7 @@ import sa.lib.gui.SGuiConsts;
  */
 public class SViewEmployeeWageLog extends SGridPaneView {
 
-    private SGridFilterPanel moFilterPaymentType;
+    private SGridFilterPanelEmployee moFilterEmployee;
 
     public SViewEmployeeWageLog(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_EMP_LOG_WAGE, SLibConsts.UNDEFINED, title);
@@ -33,10 +33,10 @@ public class SViewEmployeeWageLog extends SGridPaneView {
     private void initComponentsCustom() {
         setRowButtonsEnabled(false);
         
-        moFilterPaymentType = new SGridFilterPanel(miClient, this, SModConsts.HRSS_TP_PAY, SLibConsts.UNDEFINED);
-        moFilterPaymentType.initFilter(null);
+        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this, SModConsts.HRSS_TP_PAY, SModConsts.HRSU_DEP);
+        moFilterEmployee.initFilter(null);
         
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterPaymentType);
+        getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
     }
 
     @Override
@@ -56,6 +56,23 @@ public class SViewEmployeeWageLog extends SGridPaneView {
         filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSS_TP_PAY)).getValue();
         if (filter != null && ((int[]) filter).length == 1) {
             sql += (sql.isEmpty() ? "" : "AND ") + "emp.fk_tp_pay = " + ((int[]) filter)[0] + " ";
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSU_DEP)).getValue();
+        if (filter != null && ((int[]) filter).length == 1) {
+            sql += (sql.isEmpty() ? "" : "AND ") + "emp.fk_dep = " + ((int[]) filter)[0] + " ";
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelEmployee.EMP_STATUS)).getValue();
+        if (filter != null && ((int) filter) != SLibConsts.UNDEFINED) {
+            if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ACT) {
+                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 1 ";
+            }
+            else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_INA) {
+                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 0 ";
+            }
+            else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ALL) {
+            }
         }
 
         msSql = "SELECT "

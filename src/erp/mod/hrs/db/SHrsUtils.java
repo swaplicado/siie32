@@ -1259,14 +1259,14 @@ public abstract class SHrsUtils {
         return aEmployeeHireLogs;
     }
     
-    public static SDbEmployeeHireLog getEmployeeLastHired(final SGuiSession session, final int employeeId, final String table) throws Exception {
+    public static SDbEmployeeHireLog getEmployeeLastHired(final SGuiSession session, final int employeeId, final int logId, final String table) throws Exception {
         String sql = "";
         ResultSet resultSet = null;
         SDbEmployeeHireLog employeeHireLog = null;
         
         sql = "SELECT id_emp, id_log " +
             "FROM " + (table.isEmpty() ? "" : (table + ".")) + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " +
-            "WHERE b_del = 0 AND id_emp = " + employeeId + " AND dt_dis_n IS NULL " +
+            "WHERE b_del = 0 AND id_emp = " + employeeId + " AND dt_dis_n IS NULL AND id_log <> " + logId + " " +
             "ORDER BY dt_hire DESC, id_emp, id_log " +
             "LIMIT 1 ";
         
@@ -1277,6 +1277,123 @@ public abstract class SHrsUtils {
         }
         
         return employeeHireLog;
+    }
+    
+    public static SDbEmployeeHireLog getEmployeeLastDismiss(final SGuiSession session, final int employeeId, final int logId, final String table) throws Exception {
+        String sql = "";
+        ResultSet resultSet = null;
+        SDbEmployeeHireLog employeeHireLog = null;
+        
+        sql = "SELECT id_emp, id_log " +
+            "FROM " + (table.isEmpty() ? "" : (table + ".")) + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " +
+            "WHERE b_del = 0 AND id_emp = " + employeeId + " AND dt_dis_n IS NOT NULL AND id_log <> " + logId + " " +
+            "ORDER BY dt_dis_n DESC, id_emp, id_log " +
+            "LIMIT 1 ";
+        
+        resultSet = session.getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            employeeHireLog = new SDbEmployeeHireLog();
+            employeeHireLog.read(session, new int[] { resultSet.getInt("id_emp"), resultSet.getInt("id_log") });
+        }
+        
+        return employeeHireLog;
+    }
+    
+    public static boolean isFirtsHire(final SGuiSession session, final int employeeId, final int logId, final String table) throws Exception {
+        String sql = "";
+        ResultSet resultSet = null;
+        boolean isFirts = false;
+        SDbEmployeeHireLog employeeHireLog = null;
+        
+        sql = "SELECT COUNT(*) AS f_count, id_log " +
+            "FROM " + (table.isEmpty() ? "" : (table + ".")) + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " +
+            "WHERE b_del = 0 AND id_emp = " + employeeId + " ";
+        
+        resultSet = session.getStatement().executeQuery(sql);
+        if (resultSet.next() && resultSet.getInt("f_count") == 1) {
+            employeeHireLog = new SDbEmployeeHireLog();
+            employeeHireLog.read(session, new int[] { employeeId, resultSet.getInt("id_log") });
+            isFirts = employeeHireLog.getDateDismissed_n() == null;
+        }
+        
+        return isFirts;
+    }
+    
+    public static boolean deleteHireLog(final SGuiSession session, final int employeeId) throws Exception {
+        SDbEmployee employee = null;
+        SDbEmployeeHireLog employeeHireLog;
+        SHrsEmployeeHireLog hrsEmployeeHireLog;
+        
+        employee = new SDbEmployee();
+        employeeHireLog = new SDbEmployeeHireLog();
+        hrsEmployeeHireLog = new SHrsEmployeeHireLog(null,session);
+                
+        employee.read(session, new int[] { employeeId });
+
+        if (SHrsUtils.isFirtsHire(session, employee.getPkEmployeeId(), SLibConsts.UNDEFINED, "")) {
+            throw new Exception("El registro no se puede eliminar, es el único registro en la bitácora de alts/bajas.");
+        }
+        else {
+            if (employee.isActive()) {
+                employeeHireLog = SHrsUtils.getEmployeeLastHired(session, employee.getPkEmployeeId(), SLibConsts.UNDEFINED, "");
+            }
+            else {
+                employeeHireLog = SHrsUtils.getEmployeeLastDismiss(session, employee.getPkEmployeeId(), SLibConsts.UNDEFINED, "");
+            }
+
+            hrsEmployeeHireLog.setPkEmployeeId(employeeHireLog.getPkEmployeeId());
+            hrsEmployeeHireLog.setDateLastHire(employeeHireLog.getDateHire());
+            hrsEmployeeHireLog.setIsHire(!employee.isActive());
+            hrsEmployeeHireLog.setDeleted(employeeHireLog.isDeleted());
+            hrsEmployeeHireLog.setDateLastHire(employeeHireLog.getDateHire());
+            hrsEmployeeHireLog.setNotesHire(employeeHireLog.getNotesHire());
+            hrsEmployeeHireLog.setDateLastDismiss_n(employeeHireLog.getDateDismissed_n());
+            hrsEmployeeHireLog.setNotesDismissed(employeeHireLog.getNotesDismissed());
+            hrsEmployeeHireLog.setFkDismissedType(employeeHireLog.getFkEmployeeDismissTypeId());
+            hrsEmployeeHireLog.setFkUserInsertId(employeeHireLog.getFkUserInsertId());
+            hrsEmployeeHireLog.setFkUserUpdateId(employeeHireLog.getFkUserUpdateId());
+
+            hrsEmployeeHireLog.setIsFirtsHire(false);
+            hrsEmployeeHireLog.setIsCorrection(true);
+
+            if (employee.isActive()) {
+                hrsEmployeeHireLog.setDeleted(true);
+            }
+            else {
+                hrsEmployeeHireLog.setDateLastDismiss_n(null);
+                hrsEmployeeHireLog.setNotesDismissed("");
+                hrsEmployeeHireLog.setFkDismissedType(SModSysConsts.HRSU_TP_EMP_DIS_NON); 
+            }
+            hrsEmployeeHireLog.save();
+        }
+        
+        return true;
+    }
+    
+    public static boolean editHireLog(final SGuiSession session, final SDbEmployeeHireLog employeeHireLog) throws Exception {
+        SHrsEmployeeHireLog hrsEmployeeHireLog;
+        
+        hrsEmployeeHireLog = new SHrsEmployeeHireLog(null,session);
+
+        hrsEmployeeHireLog.setPkEmployeeId(employeeHireLog.getPkEmployeeId());
+        hrsEmployeeHireLog.setDateLastHire(employeeHireLog.getDateHire());
+        hrsEmployeeHireLog.setIsHire(employeeHireLog.isHired());
+        hrsEmployeeHireLog.setDeleted(employeeHireLog.isDeleted());
+        hrsEmployeeHireLog.setDateLastHire(employeeHireLog.getDateHire());
+        hrsEmployeeHireLog.setNotesHire(employeeHireLog.getNotesHire());
+        hrsEmployeeHireLog.setDateLastDismiss_n(employeeHireLog.getDateDismissed_n());
+        hrsEmployeeHireLog.setNotesDismissed(employeeHireLog.getNotesDismissed());
+        hrsEmployeeHireLog.setFkDismissedType(employeeHireLog.getFkEmployeeDismissTypeId());
+        hrsEmployeeHireLog.setFkUserInsertId(employeeHireLog.getFkUserInsertId());
+        hrsEmployeeHireLog.setFkUserUpdateId(employeeHireLog.getFkUserUpdateId());
+
+        hrsEmployeeHireLog.setIsFirtsHire(false);
+        hrsEmployeeHireLog.setIsCorrection(false);
+        hrsEmployeeHireLog.setIsEdit(true);
+        
+        hrsEmployeeHireLog.save();
+        
+        return true;
     }
     
     public static ArrayList<SHrsBenefit> readHrsBenefits(final SGuiSession session, final SDbEmployee employee, final int benefitType, final int aniversaryLimit, final int benefitYearAux, final int payrrollId, final ArrayList<SHrsBenefitTableByAnniversary> benefitTableByAnniversary, final ArrayList<SHrsBenefitTableByAnniversary> benefitTableByAnniversaryAux, final double paymentDaily) throws Exception {
@@ -1736,6 +1853,15 @@ public abstract class SHrsUtils {
         return amout;
     }
     
+    /**
+     * Function for calculed tax.
+     * @param dbTaxTable table of tax for use in calculation.
+     * @param dTaxableAmount amount taxable the earnings.
+     * @param fTableFactor adjustment factor for adjust the tax table.
+     * @return double amount calculated of tax.
+     * @throws Exception 
+     */
+    
     public static double computeAmoutTax(final SDbTaxTable dbTaxTable, final double dTaxableAmount, final double fTableFactor) throws Exception {
         double dTaxComputed = 0;
         SDbTaxTableRow dbTaxTableRow = null;
@@ -1751,6 +1877,15 @@ public abstract class SHrsUtils {
         return dTaxComputed;
     }
     
+    /**
+     * Function for calculed tax subsidy.
+     * @param dbSubsidyTable table of tax subsidy for use in calculation.
+     * @param dTaxableAmount amount taxable the earnings.
+     * @param fTableFactor adjustment factor for adjust the tax subsidy table.
+     * @return double amount calculated of tax subsidy.
+     * @throws Exception 
+     */
+    
     public static double computeAmoutTaxSubsidy(final SDbTaxSubsidyTable dbSubsidyTable, final double dTaxableAmount, final double fTableFactor) throws Exception {
         double dSubsidyComputed = 0;
         SDbTaxSubsidyTableRow dbSubsidyTableRow = null;
@@ -1765,6 +1900,18 @@ public abstract class SHrsUtils {
         
         return dSubsidyComputed;
     }
+    
+    /**
+     * Function for calculed security social contribution.
+     * @param dbSscTable table of ss contribution for use in calculation.
+     * @param dSalarySsc base salary contribution of employee.
+     * @param dMwzReferenceWage salary reference area.
+     * @param hrsDaysPrev quantity of days hired employee in previous period the payroll.
+     * @param hrsDaysCurr quantity of days hired employee in current period the payroll.
+     * @param hrsDaysNext quantity of days hired employee in next period the payroll.
+     * @return double amount calculated of security social contribution.
+     * @throws Exception 
+     */
     
     public static double computeSSContribution(final SDbSsContributionTable dbSscTable, final double dSalarySsc, final double dMwzReferenceWage, final SHrsDaysByPeriod hrsDaysPrev,
                                                     final SHrsDaysByPeriod hrsDaysCurr, final SHrsDaysByPeriod hrsDaysNext) throws Exception {
@@ -1808,13 +1955,106 @@ public abstract class SHrsUtils {
         return dSscComputed;
     }
     
-    public static SHrsCalculatedNetGrossAmount computeNetAmountPayment(final SGuiSession session, final double dSbc, final double grossAmount, final Date dateCut) throws Exception {
+    /**
+     * Function for calculed tax in base of articule 174 of RLISR.
+     * @param dbTaxTable table of tax for use in calculation.
+     * @param dTaxableAmount amount taxable the earnings configurated con articule 174 the RLISR.
+     * @param dAmountMonth amount for earnings normal in month in question.
+     * @param fTableFactor adjustment factor for adjust the tax table.
+     * @return double amount calculated of tax.
+     * @throws Exception 
+     */
+    
+    public static double computeAmoutTaxArt174(final SDbTaxTable dbTaxTable, final double dTaxableAmount, final double dAmountMonth, final double fTableFactor) throws Exception {
+        double amountFractionI = 0;
+        double amountFractionII = 0;
+        double amountFractionIII = 0;
+        double amountFractionAuxIII = 0;
+        double amountFractionIV = 0;
+        double amountFractionV = 0;
+        
+        // Fraction I:
+        
+        amountFractionI = dTaxableAmount / SHrsConsts.YEAR_DAYS * SHrsConsts.MONTH_DAYS_FIXED;
+        
+        // Fraction II:
+        
+        amountFractionII = computeAmoutTax(dbTaxTable, (dAmountMonth + amountFractionI), fTableFactor);
+        
+        // Fraction III:
+        
+        amountFractionAuxIII = computeAmoutTax(dbTaxTable, dAmountMonth, fTableFactor);
+        amountFractionIII = amountFractionAuxIII > 0 ? (amountFractionII - amountFractionAuxIII) : 0;
+        
+        // Fraction V:
+        
+        amountFractionV = amountFractionI == 0 ? 0 : (amountFractionIII / amountFractionI);
+        
+        // Fraction IV:
+        amountFractionIV = amountFractionAuxIII > 0 ? (dTaxableAmount * amountFractionV) : 0;
+        
+        
+        return amountFractionIV;
+    }
+    
+    /**
+     * Function for calculed tax subsidy in base of articule 174 of RLISR.
+     * @param dbSubsidyTable table of tax subsidy for use in calculation.
+     * @param dTaxableAmount amount taxable the earnings configurated con articule 174 the RLISR.
+     * @param dAmountMonth amount for earnings normal in month in question.
+     * @param fTableFactor adjustment factor for adjust the tax subsidy table.
+     * @return double amount calculated of tax subsidy.
+     * @throws Exception 
+     */
+    
+    public static double computeAmoutTaxSubsidyArt174(final SDbTaxSubsidyTable dbSubsidyTable, final double dTaxableAmount, final double dAmountMonth, final double fTableFactor) throws Exception {
+        double amountFractionI = 0;
+        double amountFractionII = 0;
+        double amountFractionIII = 0;
+        double amountFractionAuxIII = 0;
+        double amountFractionIV = 0;
+        double amountFractionV = 0;
+        
+        // Fraction I:
+        
+        amountFractionI = dTaxableAmount / SHrsConsts.YEAR_DAYS * SHrsConsts.MONTH_DAYS_FIXED;
+        
+        // Fraction II:
+        
+        amountFractionII = computeAmoutTaxSubsidy(dbSubsidyTable, (dAmountMonth + amountFractionI), fTableFactor);
+        
+        // Fraction III:
+        
+        amountFractionAuxIII = computeAmoutTaxSubsidy(dbSubsidyTable, dAmountMonth, fTableFactor);
+        amountFractionIII = amountFractionAuxIII > 0 ? (amountFractionII - amountFractionAuxIII) : 0;
+        
+        // Fraction V:
+        
+        amountFractionV = amountFractionI == 0 ? 0 : (amountFractionIII / amountFractionI);
+        
+        // Fraction IV:
+        amountFractionIV = amountFractionAuxIII > 0 ? (dTaxableAmount * amountFractionV) : 0;
+        
+        
+        return amountFractionIV;
+    }
+    
+    /**
+     * Function for calculated amount net.
+     * @param session User GUI session.
+     * @param dSalarySsc base salary contribution of employee.
+     * @param grossAmount amount gross.
+     * @param dateCut date of cut.
+     * @return
+     * @throws Exception 
+     */
+    
+    public static SHrsCalculatedNetGrossAmount computeNetAmountPayment(final SGuiSession session, final double dSalarySsc, final double grossAmount, final Date dateCut) throws Exception {
         SHrsCalculatedNetGrossAmount netGrossAmount = null;
         SDbTaxTable dbTaxTable = null;
         SDbTaxSubsidyTable dbSubsidyTable = null;
         SDbSsContributionTable dbSscTable = null;
         SDbConfig config = null;
-        SDbEmployee employee = null;
         double dMwzReference = 0;
         double dNetAmount = 0;
         double dTaxAmount = 0;
@@ -1828,7 +2068,6 @@ public abstract class SHrsUtils {
         SHrsDaysByPeriod hrsDaysNext = new SHrsDaysByPeriod(0, 0, 0, 0, 0, 0);
         
         config = (SDbConfig) session.readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
-        //employee = (SDbEmployee) session.readRegistry(SModConsts.HRSU_EMP, new int[] { employeeId });
         dbTaxTable = (SDbTaxTable) session.readRegistry(SModConsts.HRS_TAX, new int[] { getRecentTaxTable(session, dateCut) });
         dbSubsidyTable = (SDbTaxSubsidyTable) session.readRegistry(SModConsts.HRS_TAX_SUB, new int[] { getRecentTaxSubsidyTable(session, dateCut) });
         dbSscTable = (SDbSsContributionTable) session.readRegistry(SModConsts.HRS_SSC, new int[] { getRecentSsContributionTable(session, dateCut) });
@@ -1838,7 +2077,7 @@ public abstract class SHrsUtils {
         
         dTaxAmount = SHrsUtils.computeAmoutTax(dbTaxTable, grossAmount, dTableFactor);
         dTaxSubsidyAmount = SHrsUtils.computeAmoutTaxSubsidy(dbSubsidyTable, grossAmount, dTableFactor);
-        dSsContributionAmount = SHrsUtils.computeSSContribution(dbSscTable, dSbc, dMwzReference, hrsDaysPrev, hrsDaysCurr, hrsDaysNext);
+        dSsContributionAmount = SHrsUtils.computeSSContribution(dbSscTable, dSalarySsc, dMwzReference, hrsDaysPrev, hrsDaysCurr, hrsDaysNext);
         
         dNetAmount = grossAmount - dTaxAmount - dSsContributionAmount;
         
@@ -1848,7 +2087,17 @@ public abstract class SHrsUtils {
         return netGrossAmount;
     }
     
-    public static SHrsCalculatedNetGrossAmount computeGrossAmountPayment(final SGuiSession session, final double dSbc, final double dNetAmount, final Date dateCut, final double tolerance) throws Exception {
+    /**
+     * Function for calculated amount gross.
+     * @param session User GUI session.
+     * @param dSalarySsc base salary contribution of employee.
+     * @param dNetAmount amount net.
+     * @param dateCut date of cut.
+     * @return
+     * @throws Exception 
+     */
+    
+    public static SHrsCalculatedNetGrossAmount computeGrossAmountPayment(final SGuiSession session, final double dSalarySsc, final double dNetAmount, final Date dateCut, final double tolerance) throws Exception {
         SHrsCalculatedNetGrossAmount netGrossAmount = null;
         SDbTaxTable dbTaxTable = null;
         SDbTaxTableRow dbTaxTableRow = null;
@@ -1877,7 +2126,7 @@ public abstract class SHrsUtils {
                 
                 average = (limitInf + limitSup) / 2;
 
-                netGrossAmount = computeNetAmountPayment(session, dSbc, average, dateCut);
+                netGrossAmount = computeNetAmountPayment(session, dSalarySsc, average, dateCut);
                 
                 if (netGrossAmount.getNetAmount() > dNetAmount) {
                     break;
@@ -1889,7 +2138,7 @@ public abstract class SHrsUtils {
         while (bCalculate) {
             average = (limitInf + limitSup) / 2;
 
-            netGrossAmount = computeNetAmountPayment(session, dSbc, average, dateCut);
+            netGrossAmount = computeNetAmountPayment(session, dSalarySsc, average, dateCut);
 
             if (netGrossAmount.getNetAmount() > dNetAmount) {
                 limitSup = average;
