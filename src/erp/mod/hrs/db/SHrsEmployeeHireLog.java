@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Date;
+import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
 
@@ -35,6 +36,8 @@ public class SHrsEmployeeHireLog {
     protected int mnFkUserUpdateId;
     
     protected boolean mbIsFirtsHire;
+    protected boolean mbIsCorrection;
+    protected boolean mbIsEdit;
     protected SDbEmployeeHireLog moXtaEmployeeHireLog;
     
     private void computeCompanies() {
@@ -72,6 +75,8 @@ public class SHrsEmployeeHireLog {
         msNotesDismissed = "";
         
         mbIsFirtsHire = false;
+        mbIsCorrection = false;
+        mbIsEdit = false;
         moXtaEmployeeHireLog = null;
         
         computeCompanies();
@@ -90,6 +95,8 @@ public class SHrsEmployeeHireLog {
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     
     public void setIsFirtsHire(boolean b) { mbIsFirtsHire = b; } 
+    public void setIsCorrection(boolean b) { mbIsCorrection = b; } 
+    public void setIsEdit(boolean b) { mbIsEdit = b; } 
     public void setXtaEmployeeHireLog(SDbEmployeeHireLog o) { moXtaEmployeeHireLog = o; }
     
     public int getPkEmployeeHireLogId() { return mnPkEmployeeHireLogId; }
@@ -105,10 +112,14 @@ public class SHrsEmployeeHireLog {
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     
     public boolean isFirtsHire() { return mbIsFirtsHire; } 
+    public boolean isCorrection() { return mbIsCorrection; } 
+    public boolean isEdit() { return mbIsEdit; } 
     public SDbEmployeeHireLog getXtaEmployeeHireLog() { return moXtaEmployeeHireLog; }
     
     public void save() throws Exception {
+        SDbEmployee employee = null;
         SDbEmployeeHireLog employeeHireLog = null;
+        SDbEmployeeHireLog employeeHireLogAux = null;
         String sql = "";
         
         for (String tableName : msCompanies) {
@@ -132,33 +143,105 @@ public class SHrsEmployeeHireLog {
                     moConnection.createStatement().execute(sql);
             }
             else {
-                moXtaEmployeeHireLog = null;
-                
-                if (!mbIsHire) {
-                    moXtaEmployeeHireLog = SHrsUtils.getEmployeeLastHired(moSession, mnPkEmployeeId, tableName);
-                }
-                
-                if (moXtaEmployeeHireLog == null) {
-                    employeeHireLog = new SDbEmployeeHireLog();
+                if (mbIsEdit) {
+                    moXtaEmployeeHireLog = null;
+                    
+                    if (mbIsHire) {
+                        moXtaEmployeeHireLog = SHrsUtils.getEmployeeLastHired(moSession, mnPkEmployeeId, SLibConsts.UNDEFINED, tableName);
+                    }
+                    else {
+                        moXtaEmployeeHireLog = SHrsUtils.getEmployeeLastDismiss(moSession, mnPkEmployeeId, SLibConsts.UNDEFINED, tableName);
+                    }
+                    
+                    if (moXtaEmployeeHireLog == null) {
+                        employeeHireLog = new SDbEmployeeHireLog();
+                    }
+                    else {
+                        employeeHireLog = moXtaEmployeeHireLog;
+                    }
+                    if (mbIsHire) {
+                        employeeHireLog.setDateHire(mtDateLastHire);
+                        employeeHireLog.setNotesHire(msNotesHire);
+                    }
+                    else {
+                        employeeHireLog.setDateDismissed_n(mtDateLastDismissed);
+                        employeeHireLog.setNotesDismissed(msNotesDismissed);
+                    }
+
+                    employeeHireLog.setHired(mbIsHire);
+                    employeeHireLog.setDeleted(mbDeleted);
+                    employeeHireLog.setFkEmployeeDismissTypeId(mnFkDismissedType);
+                    employeeHireLog.setAuxTable(tableName);
+                    
+                    employeeHireLog.save(moSession);
+                    
+                    employee = new SDbEmployee();
+
+                    if (mbIsHire) {
+                        employee.saveField(moSession.getStatement(), new int[] { mnPkEmployeeId }, SDbEmployee.FIELD_DATE_LAST_HIRE, mtDateLastHire);
+                    }
+                    else {
+                        employee.saveField(moSession.getStatement(), new int[] { mnPkEmployeeId }, SDbEmployee.FIELD_DATE_LAST_DISMISS, mtDateLastDismissed);;
+                    }
                 }
                 else {
-                    employeeHireLog = moXtaEmployeeHireLog;
-                }
+                    moXtaEmployeeHireLog = null;
 
-                employeeHireLog.setPkEmployeeId(mnPkEmployeeId);
-                if (mbIsHire) {
-                    employeeHireLog.setDateHire(mtDateLastHire);
-                    employeeHireLog.setNotesHire(msNotesHire);
-                }
-                else {
-                    employeeHireLog.setDateDismissed_n(mtDateLastDismissed);
-                    employeeHireLog.setNotesDismissed(msNotesDismissed);
-                }
-                employeeHireLog.setHired(mbIsHire);
-                employeeHireLog.setFkEmployeeDismissTypeId(mnFkDismissedType);
-                employeeHireLog.setAuxTable(tableName);
+                    if (!mbIsHire) {
+                        moXtaEmployeeHireLog = SHrsUtils.getEmployeeLastHired(moSession, mnPkEmployeeId, SLibConsts.UNDEFINED, tableName);
+                    }
+                    else if (mbIsCorrection) {
+                        moXtaEmployeeHireLog = SHrsUtils.getEmployeeLastDismiss(moSession, mnPkEmployeeId, SLibConsts.UNDEFINED, tableName);
+                    }
 
-                employeeHireLog.save(moSession);
+                    if (moXtaEmployeeHireLog == null) {
+                        employeeHireLog = new SDbEmployeeHireLog();
+                    }
+                    else {
+                        employeeHireLog = moXtaEmployeeHireLog;
+                    }
+
+                    employeeHireLog.setPkEmployeeId(mnPkEmployeeId);
+                    if (mbIsHire) {
+                        if (mbIsCorrection) {
+                            employeeHireLog.setDateDismissed_n(mtDateLastDismissed);
+                            employeeHireLog.setNotesDismissed(msNotesDismissed);
+                        }
+                        else {
+                            employeeHireLog.setDateHire(mtDateLastHire);
+                            employeeHireLog.setNotesHire(msNotesHire);
+                        }
+                    }
+                    else {
+                        employeeHireLog.setDateDismissed_n(mtDateLastDismissed);
+                        employeeHireLog.setNotesDismissed(msNotesDismissed);
+                    }
+
+                    employeeHireLog.setHired(mbIsHire);
+                    employeeHireLog.setDeleted(mbDeleted);
+                    employeeHireLog.setFkEmployeeDismissTypeId(mnFkDismissedType);
+                    employeeHireLog.setAuxTable(tableName);
+
+                    employeeHireLog.save(moSession);
+
+                    if (mbIsCorrection) {
+                        employee = new SDbEmployee();
+
+                        employee.saveField(moSession.getStatement(), new int[] { mnPkEmployeeId }, SDbEmployee.FIELD_ACTIVE, mbIsHire);
+
+                        if (!mbIsHire) {
+                            employeeHireLogAux = SHrsUtils.getEmployeeLastDismiss(moSession, mnPkEmployeeId, employeeHireLog.getPkLogId(), tableName);
+                        }
+
+                        if (mbIsHire) {
+                            employee.saveField(moSession.getStatement(), new int[] { mnPkEmployeeId }, SDbEmployee.FIELD_DATE_LAST_DISMISS, null);
+                        }
+                        else {
+                            employee.saveField(moSession.getStatement(), new int[] { mnPkEmployeeId }, SDbEmployee.FIELD_DATE_LAST_DISMISS, employeeHireLogAux.getDateDismissed_n());
+                            employee.saveField(moSession.getStatement(), new int[] { mnPkEmployeeId }, SDbEmployee.FIELD_DATE_LAST_HIRE, employeeHireLogAux.getDateHire());
+                        }
+                    }
+            }
             }
         }
     }
