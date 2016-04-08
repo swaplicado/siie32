@@ -99,7 +99,7 @@ public class SViewPayrollLoanDeductionComplement extends SGridPaneView {
         
         filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSS_TP_LOAN)) == null ? null : ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSS_TP_LOAN)).getValue();
         if (filter != null && ((int[]) filter).length == 1) {
-            sql += (sql.isEmpty() ? "" : "AND ") + "ve.fk_tp_loan_n = " + ((int[]) filter)[0] + " ";
+            sql += (sql.isEmpty() ? "" : "AND ") + "vd.fk_tp_loan_n = " + ((int[]) filter)[0] + " ";
         }
         
         filter = ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelLoan.LOAN_STATUS)) == null ? null : ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelLoan.LOAN_STATUS)).getValue();
