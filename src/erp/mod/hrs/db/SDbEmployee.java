@@ -13,6 +13,7 @@ import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
@@ -26,6 +27,10 @@ import sa.lib.gui.SGuiSession;
  * @author Juan Barajas
  */
 public class SDbEmployee extends SDbRegistryUser {
+    
+    public static final int FIELD_ACTIVE = FIELD_BASE + 1;
+    public static final int FIELD_DATE_LAST_HIRE = FIELD_BASE + 2;
+    public static final int FIELD_DATE_LAST_DISMISS = FIELD_BASE + 3;
 
     protected int mnPkEmployeeId;
     protected String msNumber;
@@ -644,5 +649,33 @@ public class SDbEmployee extends SDbRegistryUser {
         registry.setTsUserUpdate(this.getTsUserUpdate());
 
         return registry;
+    }
+
+    @Override
+    public void saveField(final Statement statement, final int[] pk, final int field, final Object value) throws SQLException, Exception {
+        initQueryMembers();
+        mnQueryResultId = SDbConsts.SAVE_ERROR;
+
+        msSql = "UPDATE " + getSqlTable() + " SET ";
+
+        switch (field) {
+            case FIELD_ACTIVE:
+                msSql += "b_act = " + (boolean) value + " ";
+                break;
+            case FIELD_DATE_LAST_HIRE:
+                msSql += "dt_hire = '" + SLibUtils.DbmsDateFormatDate.format((Date) value) + "' ";
+                break;
+            case FIELD_DATE_LAST_DISMISS:
+                msSql += "dt_dis_n = " + (value == null ? null : "'" + SLibUtils.DbmsDateFormatDate.format((Date) value) + "'") + " ";
+                break;
+
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+
+        msSql += getSqlWhere(pk);
+        statement.execute(msSql);
+
+        mnQueryResultId = SDbConsts.SAVE_OK;
     }
 }
