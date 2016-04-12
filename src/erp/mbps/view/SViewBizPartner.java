@@ -462,17 +462,22 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     }
     
     private void actionEmpStatusStateChange() {
-        if (jtbStatusEmployeeActive.isSelected()) {
-            mnFilterStatusEmployee = SGridFilterPanelEmployee.EMP_STATUS_ACT;
-            jtbStatusEmployeeActive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_off.gif")));
+        if (!jtbStatusEmployeeActive.isEnabled()) {
+            mnFilterStatusEmployee = SLibConstants.UNDEFINED;
         }
-        else if (jtbStatusEmployeeInactive.isSelected()) {
-            mnFilterStatusEmployee = SGridFilterPanelEmployee.EMP_STATUS_INA;
-            jtbStatusEmployeeInactive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_off.gif")));
-        }
-        else if (jtbStatusEmployeeAll.isSelected()) {
-            mnFilterStatusEmployee = SGridFilterPanelEmployee.EMP_STATUS_ALL;
-            jtbStatusEmployeeAll.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif")));
+        else {
+            if (jtbStatusEmployeeActive.isSelected()) {
+                mnFilterStatusEmployee = SGridFilterPanelEmployee.EMP_STATUS_ACT;
+                jtbStatusEmployeeActive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_off.gif")));
+            }
+            else if (jtbStatusEmployeeInactive.isSelected()) {
+                mnFilterStatusEmployee = SGridFilterPanelEmployee.EMP_STATUS_INA;
+                jtbStatusEmployeeInactive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_off.gif")));
+            }
+            else if (jtbStatusEmployeeAll.isSelected()) {
+                mnFilterStatusEmployee = SGridFilterPanelEmployee.EMP_STATUS_ALL;
+                jtbStatusEmployeeAll.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif")));
+            }
         }
         populateTable();
     }
