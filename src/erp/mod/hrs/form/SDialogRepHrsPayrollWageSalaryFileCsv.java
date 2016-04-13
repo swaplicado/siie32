@@ -45,7 +45,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
      * @param title
      */
     public SDialogRepHrsPayrollWageSalaryFileCsv(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT,  SModConsts.HRSR_WAGE_SAL, SLibConsts.UNDEFINED, title);
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT,  SModConsts.HRSR_WAGE_SAL_CSV, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
     }
