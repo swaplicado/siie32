@@ -20,6 +20,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.form.SDialogRepHrsAux;
 import erp.mod.hrs.form.SDialogRepHrsEarDed;
+import erp.mod.hrs.form.SDialogRepHrsEarningsDeductionsFileCsv;
 import erp.mod.hrs.form.SDialogRepHrsPayrollTax;
 import erp.mod.hrs.form.SDialogRepHrsPayrollWageSalaryFileCsv;
 import erp.mod.hrs.form.SFormCalculateNetGrossAmount;
@@ -127,6 +128,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiRepPayrollTax;
     private javax.swing.JMenuItem jmiRepPayrollAux;
     private javax.swing.JMenuItem jmiRepPayrollWageSalaryFileCsv;
+    private javax.swing.JMenuItem jmiRepPayrollEarDedFileCsv;
 
     private erp.mhrs.form.SDialogFormerPayrollImport moDialogFormerPayrollImport;
 
@@ -330,6 +332,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepPayrollTax = new JMenuItem("Impuesto sobre nóminas...");
         jmiRepPayrollAux = new JMenuItem("Reportes auxiliares de nóminas...");
         jmiRepPayrollWageSalaryFileCsv = new JMenuItem("Archivo CSV para declaración informativa de sueldos y salarios...");
+        jmiRepPayrollEarDedFileCsv = new JMenuItem("Archivo CSV de percepciones y deducciones en el ejercicio...");
         
         jmRep.add(jmiRepPayrollEarnings);
         jmRep.add(jmiRepPayrollEarningsByEmployee);
@@ -340,6 +343,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRep.add(jmiRepPayrollAux);
         jmRep.addSeparator();
         jmRep.add(jmiRepPayrollWageSalaryFileCsv);
+        jmRep.add(jmiRepPayrollEarDedFileCsv);
 
         jmiCfgTaxTable.addActionListener(this);
         jmiCfgTaxTableRow.addActionListener(this);
@@ -422,6 +426,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepPayrollTax.addActionListener(this);
         jmiRepPayrollAux.addActionListener(this);
         jmiRepPayrollWageSalaryFileCsv.addActionListener(this);
+        jmiRepPayrollEarDedFileCsv.addActionListener(this);
 
         jmiCfgTaxTable.setEnabled(true);
         jmiCfgTaxTableRow.setEnabled(true);
@@ -512,6 +517,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepPayrollTax.setEnabled(true);
         jmiRepPayrollAux.setEnabled(true);
         jmiRepPayrollWageSalaryFileCsv.setEnabled(true);
+        jmiRepPayrollEarDedFileCsv.setEnabled(true);
         
         // GUI configuration:
         
@@ -925,6 +931,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiRepPayrollWageSalaryFileCsv) {
                 new SDialogRepHrsPayrollWageSalaryFileCsv((SGuiClient) miClient, "Archivo CSV para declaración informativa de sueldos y salarios").setFormVisible(true);
+            }
+            else if (item == jmiRepPayrollEarDedFileCsv) {
+                new SDialogRepHrsEarningsDeductionsFileCsv((SGuiClient) miClient, "Archivo CSV de percepciones y deducciones en el ejercicio").setFormVisible(true);
             }
         }
     }

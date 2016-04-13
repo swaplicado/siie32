@@ -423,6 +423,11 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
         boolean add = true;
 
         if (moTextName.getValue().length() > 0) {
+            if (mnFormSubtype == SModSysConsts.HRS_AUT_EMP && moKeyEmployee.getSelectedIndex() <= 0) {
+                miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlEmployee.getText()) + "'. ");
+                add = false;
+                moKeyEmployee.requestFocus();
+            }
             if (moDateDateEnd_n.getValue() != null) {
                 if (moDateDateEnd_n.getValue().before(moDateDateStart.getValue())) {
                     miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateEnd_n.getText()) + "' " +

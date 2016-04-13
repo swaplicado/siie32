@@ -544,7 +544,7 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
                 dSalaryDiary = moCompGrossAmount.getField().getValue() * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
             }
             else if (mnFormType == SHrsConsts.CAL_GROSS_AMT_TYPE) {
-                dSalaryDiary = moCompNetAmount.getField().getValue() * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
+                dSalaryDiary = moCompNetAmount.getField().getValue() * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS; // XXX el calculo del SD es incorrecto
             }
             dSalarySscBase = dSalaryDiary * SHrsUtils.getIntegrationFactorSbc(miClient.getSession(), (moEmployee == null ? null : moEmployee.getDateBenefits()), moDateDate.getValue());
             moCompSalarySscBase.getField().setValue(dSalarySscBase);
