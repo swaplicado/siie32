@@ -650,6 +650,7 @@ public abstract class SModConsts {
     public static final int HRSR_LIST_DED = 2065042;
     public static final int HRSR_WAGE_SAL_CSV = 2065051;
     public static final int HRSR_EAR_DED_CSV = 2065052;
+    public static final int HRSR_VAC_CSV = 2065053;
 
     public static final HashMap<Integer, String> TablesMap = new HashMap<Integer, String>();
 

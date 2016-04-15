@@ -23,6 +23,7 @@ import erp.mod.hrs.form.SDialogRepHrsEarDed;
 import erp.mod.hrs.form.SDialogRepHrsEarningsDeductionsFileCsv;
 import erp.mod.hrs.form.SDialogRepHrsPayrollTax;
 import erp.mod.hrs.form.SDialogRepHrsPayrollWageSalaryFileCsv;
+import erp.mod.hrs.form.SDialogRepVacationsFileCsv;
 import erp.mod.hrs.form.SFormCalculateNetGrossAmount;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
@@ -129,6 +130,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiRepPayrollAux;
     private javax.swing.JMenuItem jmiRepPayrollWageSalaryFileCsv;
     private javax.swing.JMenuItem jmiRepPayrollEarDedFileCsv;
+    private javax.swing.JMenuItem jmiRepVacationsFileCsv;
 
     private erp.mhrs.form.SDialogFormerPayrollImport moDialogFormerPayrollImport;
 
@@ -333,6 +335,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepPayrollAux = new JMenuItem("Reportes auxiliares de nóminas...");
         jmiRepPayrollWageSalaryFileCsv = new JMenuItem("Archivo CSV para declaración informativa de sueldos y salarios...");
         jmiRepPayrollEarDedFileCsv = new JMenuItem("Archivo CSV de percepciones y deducciones en el ejercicio...");
+        jmiRepVacationsFileCsv = new JMenuItem("Archivo CSV de vacaciones pendientes...");
         
         jmRep.add(jmiRepPayrollEarnings);
         jmRep.add(jmiRepPayrollEarningsByEmployee);
@@ -344,6 +347,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRep.addSeparator();
         jmRep.add(jmiRepPayrollWageSalaryFileCsv);
         jmRep.add(jmiRepPayrollEarDedFileCsv);
+        jmRep.addSeparator();
+        jmRep.add(jmiRepVacationsFileCsv);
 
         jmiCfgTaxTable.addActionListener(this);
         jmiCfgTaxTableRow.addActionListener(this);
@@ -427,6 +432,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepPayrollAux.addActionListener(this);
         jmiRepPayrollWageSalaryFileCsv.addActionListener(this);
         jmiRepPayrollEarDedFileCsv.addActionListener(this);
+        jmiRepVacationsFileCsv.addActionListener(this);
 
         jmiCfgTaxTable.setEnabled(true);
         jmiCfgTaxTableRow.setEnabled(true);
@@ -518,6 +524,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepPayrollAux.setEnabled(true);
         jmiRepPayrollWageSalaryFileCsv.setEnabled(true);
         jmiRepPayrollEarDedFileCsv.setEnabled(true);
+        jmiRepVacationsFileCsv.setEnabled(true);
         
         // GUI configuration:
         
@@ -934,6 +941,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiRepPayrollEarDedFileCsv) {
                 new SDialogRepHrsEarningsDeductionsFileCsv((SGuiClient) miClient, "Archivo CSV de percepciones y deducciones en el ejercicio").setFormVisible(true);
+            }
+            else if (item == jmiRepVacationsFileCsv) {
+                new SDialogRepVacationsFileCsv((SGuiClient) miClient, "Archivo CSV de vacaciones pendientes").setFormVisible(true);
             }
         }
     }

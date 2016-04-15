@@ -181,7 +181,7 @@
                 <Property name="verticalGap" type="int" value="2"/>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JRadioButton" name="jrbOrderByNumEmployee">
+                <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadOrderByNumEmployee">
                   <Properties>
                     <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                       <ComponentRef name="jbGrpOrderBy"/>
@@ -189,7 +189,7 @@
                     <Property name="text" type="java.lang.String" value="N&#xfa;mero del empleado"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JRadioButton" name="jrbOrderByNameEmployee">
+                <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadOrderByNameEmployee">
                   <Properties>
                     <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                       <ComponentRef name="jbGrpOrderBy"/>
@@ -197,7 +197,7 @@
                     <Property name="text" type="java.lang.String" value="Nombre del empleado"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JRadioButton" name="jrbOrderByNumDepartament">
+                <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadOrderByNumDepartament">
                   <Properties>
                     <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                       <ComponentRef name="jbGrpOrderBy"/>
@@ -205,7 +205,7 @@
                     <Property name="text" type="java.lang.String" value="C&#xf3;digo del departamento y n&#xfa;mero del empleado"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JRadioButton" name="jrbOrderByNameDepartament">
+                <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadOrderByNameDepartament">
                   <Properties>
                     <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                       <ComponentRef name="jbGrpOrderBy"/>

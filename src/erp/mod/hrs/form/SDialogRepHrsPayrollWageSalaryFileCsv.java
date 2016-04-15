@@ -86,10 +86,10 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         moKeyPaymentType = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
-        jrbOrderByNumEmployee = new javax.swing.JRadioButton();
-        jrbOrderByNameEmployee = new javax.swing.JRadioButton();
-        jrbOrderByNumDepartament = new javax.swing.JRadioButton();
-        jrbOrderByNameDepartament = new javax.swing.JRadioButton();
+        moRadOrderByNumEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadOrderByNameEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadOrderByNumDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadOrderByNameDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
@@ -177,22 +177,22 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
 
         jPanel5.setLayout(new java.awt.GridLayout(4, 1, 0, 2));
 
-        jbGrpOrderBy.add(jrbOrderByNumEmployee);
-        jrbOrderByNumEmployee.setText("Número del empleado");
-        jPanel5.add(jrbOrderByNumEmployee);
+        jbGrpOrderBy.add(moRadOrderByNumEmployee);
+        moRadOrderByNumEmployee.setText("Número del empleado");
+        jPanel5.add(moRadOrderByNumEmployee);
 
-        jbGrpOrderBy.add(jrbOrderByNameEmployee);
-        jrbOrderByNameEmployee.setText("Nombre del empleado");
-        jPanel5.add(jrbOrderByNameEmployee);
+        jbGrpOrderBy.add(moRadOrderByNameEmployee);
+        moRadOrderByNameEmployee.setText("Nombre del empleado");
+        jPanel5.add(moRadOrderByNameEmployee);
 
-        jbGrpOrderBy.add(jrbOrderByNumDepartament);
-        jrbOrderByNumDepartament.setText("Código del departamento y número del empleado");
-        jPanel5.add(jrbOrderByNumDepartament);
+        jbGrpOrderBy.add(moRadOrderByNumDepartament);
+        moRadOrderByNumDepartament.setText("Código del departamento y número del empleado");
+        jPanel5.add(moRadOrderByNumDepartament);
 
-        jbGrpOrderBy.add(jrbOrderByNameDepartament);
-        jrbOrderByNameDepartament.setSelected(true);
-        jrbOrderByNameDepartament.setText("Código del departamento y nombre del empleado");
-        jPanel5.add(jrbOrderByNameDepartament);
+        jbGrpOrderBy.add(moRadOrderByNameDepartament);
+        moRadOrderByNameDepartament.setSelected(true);
+        moRadOrderByNameDepartament.setText("Código del departamento y nombre del empleado");
+        jPanel5.add(moRadOrderByNameDepartament);
 
         jPanel4.add(jPanel5, java.awt.BorderLayout.NORTH);
 
@@ -220,10 +220,6 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
     private javax.swing.JLabel jlPeriodEnd;
     private javax.swing.JLabel jlPeriodStart;
     private javax.swing.JLabel jlYear;
-    private javax.swing.JRadioButton jrbOrderByNameDepartament;
-    private javax.swing.JRadioButton jrbOrderByNameEmployee;
-    private javax.swing.JRadioButton jrbOrderByNumDepartament;
-    private javax.swing.JRadioButton jrbOrderByNumEmployee;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
     private sa.lib.gui.bean.SBeanFieldInteger moIntPeriodEnd;
@@ -233,6 +229,10 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
     private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypeDate;
     private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypePeriod;
     private javax.swing.ButtonGroup moRadGroupFilterType;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNameDepartament;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNameEmployee;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNumDepartament;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNumEmployee;
     // End of variables declaration//GEN-END:variables
 
     private void actionEnableFields() {
@@ -255,16 +255,16 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
     private String getOrderBy() {
         String orderBy = "";
         
-        if (jrbOrderByNumEmployee.isSelected()) {
+        if (moRadOrderByNumEmployee.isSelected()) {
             orderBy = "ORDER BY e.num, b.id_bp, d.code, d.name, d.id_dep; ";
         }
-        else if (jrbOrderByNameEmployee.isSelected()) {
+        else if (moRadOrderByNameEmployee.isSelected()) {
             orderBy = "ORDER BY b.bp, b.id_bp, d.code, d.name, d.id_dep; ";
         }
-        else if (jrbOrderByNumDepartament.isSelected()) {
+        else if (moRadOrderByNumDepartament.isSelected()) {
             orderBy = "ORDER BY d.name, d.code, d.id_dep, e.num, b.id_bp; ";
         }
-        else if (jrbOrderByNameDepartament.isSelected()) {
+        else if (moRadOrderByNameDepartament.isSelected()) {
             orderBy = "ORDER BY d.name, d.code, d.id_dep, b.bp, b.id_bp; ";
         }
         
@@ -293,7 +293,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         return aEarnings;
     }
     
-    private double[] getAmountDeductions(final int year, final int periodStart, final int periodEnd, final int employeeId) throws Exception {
+    private double[] getAmountDeductions(final int employeeId) throws Exception {
         double amtDeduction[] = null;
         String sql = "";
         ResultSet resultSet = null;
@@ -304,8 +304,16 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
                 "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
                 "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp " +
                 "INNER JOIN hrs_ded AS d ON d.id_ded = prd.fk_ded " +
-                "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 AND p.per_year = " + year + " AND p.per BETWEEN " + periodStart + " AND " + periodEnd + " AND prd.id_emp = " + employeeId + " " +
+                "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 " +
                 (moKeyPaymentType.getSelectedIndex() > 0 ? " AND p.fk_tp_pay = " + moKeyPaymentType.getValue()[0] : "");
+                if (moRadFilterTypeDate.isSelected()) {
+                    sql += " AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' ";
+                }
+                else {
+                    sql += " AND p.per_year = " + moIntPeriodYear.getValue() + " " +
+                            "AND p.per BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " ";
+                }
+                sql += " AND prd.id_emp = " + employeeId + " ";
 
         resultSet = statement.executeQuery(sql);
         while (resultSet.next()) {
@@ -363,7 +371,12 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
                 
                 buffer = ((SClientInterface)miClient).getSessionXXX().getCompany().getCompany() + "\n";
                 buffer += "REPORTE PARA DECLARACIÓN INFORMATIVA DE SUELDOS Y SALARIOS\n";
-                buffer += "EJERCICIO: " + moIntPeriodYear.getValue() + " PERÍODO DEL " + moIntPeriodStart.getValue() + " AL " + moIntPeriodEnd.getValue() + "\n" ;
+                if (moRadFilterTypeDate.isSelected()) {
+                    buffer += "PERIODO: DEL " + SLibUtils.DateFormatDate.format(moDateDateStart.getValue()) + " AL " + SLibUtils.DateFormatDate.format(moDateDateEnd.getValue()) + "\n" ;
+                }
+                else {
+                    buffer += "EJERCICIO: " + moIntPeriodYear.getValue() + " PERÍODO DEL " + moIntPeriodStart.getValue() + " AL " + moIntPeriodEnd.getValue() + "\n" ;
+                }
                 buffer += "PERÍODO DE PAGO: " + (moKeyPaymentType.getSelectedIndex() > 0 ? moKeyPaymentType.getSelectedItem() : "(TODOS)") + "\n\n";
                 buffer += "Usuario: " + ((SClientInterface)miClient).getSessionXXX().getUser().getUser() + "\n";
                 buffer += "Emisión: " + ((SClientInterface) miClient).getSessionXXX().getFormatters().getDatetimeFormat().format(new java.util.Date()) + "\n";
@@ -389,10 +402,15 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
                         "INNER JOIN erp.hrsu_emp AS e ON e.id_emp = pre.id_emp " +
                         "INNER JOIN erp.bpsu_bp AS b ON b.id_bp = pre.id_emp " +
                         "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = e.fk_dep " +
-                        "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND p.per_year = " + moIntPeriodYear.getValue() + " " +
-                        "AND p.per BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " " +
-                        (moKeyPaymentType.getSelectedIndex() > 0 ? " AND p.fk_tp_pay = " + moKeyPaymentType.getValue()[0] : "") + " " +
-                        getOrderBy();
+                        "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 " +
+                        (moKeyPaymentType.getSelectedIndex() > 0 ? " AND p.fk_tp_pay = " + moKeyPaymentType.getValue()[0] : "") + " ";
+                        if (moRadFilterTypeDate.isSelected()) {
+                            sql += " AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' " + getOrderBy();
+                        }
+                        else {
+                            sql += " AND p.per_year = " + moIntPeriodYear.getValue() + " " +
+                                    "AND p.per BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " " + getOrderBy();
+                        }
 
                 resulSetEmployee = miClient.getSession().getStatement().getConnection().createStatement().executeQuery(sql);
                 while (resulSetEmployee.next()) {
@@ -420,10 +438,16 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
                                 "FROM hrs_pay AS p " +
                                 "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
                                 "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
-                                "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND p.per_year = " + moIntPeriodYear.getValue() + " " +
-                                "AND p.per BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " AND pre.id_emp = " + nEmployeeId + " " +
-                                (moKeyPaymentType.getSelectedIndex() > 0 ? " AND p.fk_tp_pay = " + moKeyPaymentType.getValue()[0] : "") + " " +
-                                "AND pre.fk_ear = " + earning.getPkEarningId() + " ";
+                                "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 " +
+                                (moKeyPaymentType.getSelectedIndex() > 0 ? " AND p.fk_tp_pay = " + moKeyPaymentType.getValue()[0] : "") + " AND pre.id_emp = " + nEmployeeId + " " +
+                                "AND pre.fk_ear = " + earning.getPkEarningId();
+                                if (moRadFilterTypeDate.isSelected()) {
+                                    sql += " AND p.dt_sta = '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' ";
+                                }
+                                else {
+                                    sql += " AND p.per_year = " + moIntPeriodYear.getValue() + " " +
+                                            "AND p.per BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " ";
+                                }
 
                         resulSet = miClient.getSession().getStatement().executeQuery(sql);
                         while (resulSet.next()) {
@@ -440,7 +464,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
                     }
                     dTotalAmountDelivered = SLibUtils.round(dTotalAmountTax + dTotalAmountExem, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
                     dTotalCost = SLibUtils.round(dTotalAmountDelivered + dPayrollTax + dEmployersImss, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-                    adAmountDeductions = getAmountDeductions(moIntPeriodYear.getValue(), moIntPeriodStart.getValue(), moIntPeriodEnd.getValue(), nEmployeeId);
+                    adAmountDeductions = getAmountDeductions(nEmployeeId);
                     if (adAmountDeductions != null) {
                         dDeduction = SLibUtils.round(adAmountDeductions[0], SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
                         dDeductionAll = SLibUtils.round(adAmountDeductions[1], SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
@@ -508,6 +532,10 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         moFields.addField(moDateDateStart);
         moFields.addField(moDateDateEnd);
         moFields.addField(moKeyPaymentType);
+        moFields.addField(moRadOrderByNumEmployee);
+        moFields.addField(moRadOrderByNameEmployee);
+        moFields.addField(moRadOrderByNumDepartament);
+        moFields.addField(moRadOrderByNameDepartament);
         
         moFields.setFormButton(jbSave);
         
@@ -517,7 +545,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         moRadFilterTypePeriod.setSelected(true);
         moDateDateStart.setValue(SLibTimeUtils.getBeginOfYear(miClient.getSession().getCurrentDate()));
         moDateDateEnd.setValue(SLibTimeUtils.getEndOfYear(miClient.getSession().getCurrentDate()));
-        jrbOrderByNameDepartament.setSelected(true);
+        moRadOrderByNameDepartament.setSelected(true);
         
         reloadCatalogues();
         actionEnableFields();

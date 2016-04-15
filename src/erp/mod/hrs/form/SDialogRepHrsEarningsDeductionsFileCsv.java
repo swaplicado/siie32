@@ -71,10 +71,10 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog {
         moKeyDeduction = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
-        jrbOrderByNumEmployee = new javax.swing.JRadioButton();
-        jrbOrderByNameEmployee = new javax.swing.JRadioButton();
-        jrbOrderByNumDepartament = new javax.swing.JRadioButton();
-        jrbOrderByNameDepartament = new javax.swing.JRadioButton();
+        moRadOrderByNumEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadOrderByNameEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadOrderByNumDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadOrderByNameDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
@@ -132,22 +132,22 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog {
 
         jPanel5.setLayout(new java.awt.GridLayout(4, 1, 0, 2));
 
-        jbGrpOrderBy.add(jrbOrderByNumEmployee);
-        jrbOrderByNumEmployee.setText("Número del empleado");
-        jPanel5.add(jrbOrderByNumEmployee);
+        jbGrpOrderBy.add(moRadOrderByNumEmployee);
+        moRadOrderByNumEmployee.setText("Número del empleado");
+        jPanel5.add(moRadOrderByNumEmployee);
 
-        jbGrpOrderBy.add(jrbOrderByNameEmployee);
-        jrbOrderByNameEmployee.setText("Nombre del empleado");
-        jPanel5.add(jrbOrderByNameEmployee);
+        jbGrpOrderBy.add(moRadOrderByNameEmployee);
+        moRadOrderByNameEmployee.setText("Nombre del empleado");
+        jPanel5.add(moRadOrderByNameEmployee);
 
-        jbGrpOrderBy.add(jrbOrderByNumDepartament);
-        jrbOrderByNumDepartament.setText("Código del departamento y número del empleado");
-        jPanel5.add(jrbOrderByNumDepartament);
+        jbGrpOrderBy.add(moRadOrderByNumDepartament);
+        moRadOrderByNumDepartament.setText("Código del departamento y número del empleado");
+        jPanel5.add(moRadOrderByNumDepartament);
 
-        jbGrpOrderBy.add(jrbOrderByNameDepartament);
-        jrbOrderByNameDepartament.setSelected(true);
-        jrbOrderByNameDepartament.setText("Código del departamento y nombre del empleado");
-        jPanel5.add(jrbOrderByNameDepartament);
+        jbGrpOrderBy.add(moRadOrderByNameDepartament);
+        moRadOrderByNameDepartament.setSelected(true);
+        moRadOrderByNameDepartament.setText("Código del departamento y nombre del empleado");
+        jPanel5.add(moRadOrderByNameDepartament);
 
         jPanel4.add(jPanel5, java.awt.BorderLayout.NORTH);
 
@@ -170,15 +170,15 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog {
     private javax.swing.JLabel jlEarning;
     private javax.swing.JLabel jlPaymentType;
     private javax.swing.JLabel jlYear;
-    private javax.swing.JRadioButton jrbOrderByNameDepartament;
-    private javax.swing.JRadioButton jrbOrderByNameEmployee;
-    private javax.swing.JRadioButton jrbOrderByNumDepartament;
-    private javax.swing.JRadioButton jrbOrderByNumEmployee;
     private sa.lib.gui.bean.SBeanFieldInteger moIntPeriodYear;
     private sa.lib.gui.bean.SBeanFieldKey moKeyDeduction;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEarning;
     private sa.lib.gui.bean.SBeanFieldKey moKeyPaymentType;
     private javax.swing.ButtonGroup moRadGroupFilterType;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNameDepartament;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNameEmployee;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNumDepartament;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNumEmployee;
     // End of variables declaration//GEN-END:variables
 
     private String getOrderBy() {
@@ -186,16 +186,16 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog {
         
         //"ORDER BY f_tp_ear_ded, f_code_ear_ded, f_name_ear_ded, f_id_ear_ded, code, name, id_dep, num, bp, id_emp "
         
-        if (jrbOrderByNumEmployee.isSelected()) {
+        if (moRadOrderByNumEmployee.isSelected()) {
             orderBy = "ORDER BY f_tp_ear_ded, f_code_ear_ded, f_name_ear_ded, f_id_ear_ded, num, bp, id_emp, code, name, id_dep; ";
         }
-        else if (jrbOrderByNameEmployee.isSelected()) {
+        else if (moRadOrderByNameEmployee.isSelected()) {
             orderBy = "ORDER BY f_tp_ear_ded, f_code_ear_ded, f_name_ear_ded, f_id_ear_ded, bp, id_emp, code, name, id_dep; ";
         }
-        else if (jrbOrderByNumDepartament.isSelected()) {
+        else if (moRadOrderByNumDepartament.isSelected()) {
             orderBy = "ORDER BY f_tp_ear_ded, f_code_ear_ded, f_name_ear_ded, f_id_ear_ded, code, name, id_dep, num, bp, id_emp; ";
         }
-        else if (jrbOrderByNameDepartament.isSelected()) {
+        else if (moRadOrderByNameDepartament.isSelected()) {
             orderBy = "ORDER BY f_tp_ear_ded, f_code_ear_ded, f_name_ear_ded, f_id_ear_ded, code, name, id_dep, bp, id_emp; ";
         }
         
@@ -385,9 +385,13 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog {
         moFields.addField(moKeyPaymentType);
         moFields.addField(moKeyEarning);
         moFields.addField(moKeyDeduction);
+        moFields.addField(moRadOrderByNumEmployee);
+        moFields.addField(moRadOrderByNameEmployee);
+        moFields.addField(moRadOrderByNumDepartament);
+        moFields.addField(moRadOrderByNameDepartament);
         
         moFields.setFormButton(jbSave);
-        jrbOrderByNameDepartament.setSelected(true);
+        moRadOrderByNameDepartament.setSelected(true);
         
         reloadCatalogues();
     }
