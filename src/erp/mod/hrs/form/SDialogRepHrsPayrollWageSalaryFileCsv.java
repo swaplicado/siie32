@@ -442,7 +442,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
                                 (moKeyPaymentType.getSelectedIndex() > 0 ? " AND p.fk_tp_pay = " + moKeyPaymentType.getValue()[0] : "") + " AND pre.id_emp = " + nEmployeeId + " " +
                                 "AND pre.fk_ear = " + earning.getPkEarningId();
                                 if (moRadFilterTypeDate.isSelected()) {
-                                    sql += " AND p.dt_sta = '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' ";
+                                    sql += " AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' ";
                                 }
                                 else {
                                     sql += " AND p.per_year = " + moIntPeriodYear.getValue() + " " +
