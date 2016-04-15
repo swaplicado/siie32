@@ -43,7 +43,7 @@ public class SDialogRepVacationsFileCsv extends SBeanFormDialog {
      * @param title
      */
     public SDialogRepVacationsFileCsv(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT,  SModConsts.HRSR_WAGE_SAL_CSV, SLibConsts.UNDEFINED, title);
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT,  SModConsts.HRSR_VAC_CSV, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
     }

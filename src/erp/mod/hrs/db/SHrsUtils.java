@@ -1235,6 +1235,24 @@ public abstract class SHrsUtils {
         
         return seniority;
     }
+    
+    public static int getDaysVacationsAll(final SGuiSession session, final int benefitAnn, final Date dateCut) throws Exception {
+        int daysTableVacation = 0;
+        ArrayList<SDbBenefitTable> aTableVacation = new ArrayList<SDbBenefitTable>();
+        ArrayList<SHrsBenefitTableByAnniversary> aTableVacationByAnniversary = new ArrayList<SHrsBenefitTableByAnniversary>();
+        
+        aTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, SLibConsts.UNDEFINED, dateCut) }));
+        
+        aTableVacationByAnniversary = getBenefitTablesAnniversarys(aTableVacation);
+        
+        for (SHrsBenefitTableByAnniversary row : aTableVacationByAnniversary) {
+            if (row.getBenefitAnn() <= benefitAnn) {
+                daysTableVacation += (int) row.getValue();
+            }
+        }
+        
+        return daysTableVacation;
+    }
 
     public static ArrayList<SDbEmployeeHireLog> getEmployeeHireLogs(final SGuiSession session, final int employeeId, final Date dateStart, final Date dateEnd) throws Exception {
         ArrayList<SDbEmployeeHireLog> aEmployeeHireLogs = new ArrayList<SDbEmployeeHireLog>();
@@ -1965,7 +1983,7 @@ public abstract class SHrsUtils {
      * @throws Exception 
      */
     
-    public static double computeAmoutTaxArt174(final SDbTaxTable dbTaxTable, final double dTaxableAmount, final double dAmountMonth, final double fTableFactor) throws Exception {
+    public static double computeAmoutTaxAlt(final SDbTaxTable dbTaxTable, final double dTaxableAmount, final double dAmountMonth, final double fTableFactor) throws Exception {
         double amountFractionI = 0;
         double amountFractionII = 0;
         double amountFractionIII = 0;
@@ -2007,7 +2025,7 @@ public abstract class SHrsUtils {
      * @throws Exception 
      */
     
-    public static double computeAmoutTaxSubsidyArt174(final SDbTaxSubsidyTable dbSubsidyTable, final double dTaxableAmount, final double dAmountMonth, final double fTableFactor) throws Exception {
+    public static double computeAmoutTaxSubsidyAlt(final SDbTaxSubsidyTable dbSubsidyTable, final double dTaxableAmount, final double dAmountMonth, final double fTableFactor) throws Exception {
         double amountFractionI = 0;
         double amountFractionII = 0;
         double amountFractionIII = 0;
