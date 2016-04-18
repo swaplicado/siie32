@@ -78,7 +78,7 @@ public class SDataPriceListLink extends erp.lib.data.SDataRegistry implements ja
         msDbmsReference = "";
     }
 
-    private java.lang.String query(java.lang.Object params){
+    private java.lang.String query(java.lang.Object params) {
         int[] key = (int[]) params;
         String sql = "";
 

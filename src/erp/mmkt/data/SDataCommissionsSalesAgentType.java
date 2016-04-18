@@ -140,7 +140,7 @@ public class SDataCommissionsSalesAgentType extends erp.lib.data.SDataRegistry i
         msDbmsReference = "";
     }
 
-    private java.lang.String query(java.lang.Object params){
+    private java.lang.String query(java.lang.Object params) {
         Object[] key = (Object[]) params;
         String sql = "";
 

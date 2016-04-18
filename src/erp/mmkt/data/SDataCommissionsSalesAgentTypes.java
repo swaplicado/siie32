@@ -149,7 +149,7 @@ public class SDataCommissionsSalesAgentTypes extends erp.lib.data.SDataRegistry 
         mvDbmsCommissionsSalesAgentType.removeAllElements();
     }
 
-    private java.lang.String query(int nType, java.lang.Object params){
+    private java.lang.String query(int nType, java.lang.Object params) {
         Object[] key = (Object[]) params;
         String sql = "";
 
