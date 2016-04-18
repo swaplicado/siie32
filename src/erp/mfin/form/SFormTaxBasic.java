@@ -166,7 +166,7 @@ public class SFormTaxBasic extends javax.swing.JDialog implements erp.lib.form.S
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
-    private void initComponentsExtra(){
+    private void initComponentsExtra() {
         int i = 0;
         erp.lib.table.STableColumnForm tableColumnsTaxes[];
 

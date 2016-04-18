@@ -152,7 +152,7 @@ public class SPanelAccountChangeDeep extends javax.swing.JPanel implements java.
         jtfAccount.setText("");
 
         if (msEmptyAccountId.compareTo(maoTextCodeLevelStds[0].getText()) != 0) {
-            if(moAccountMajor != null){
+            if(moAccountMajor != null) {
                 accountsAndDescription = SDataUtilities.getInputAccountsAndDescription(miClient, moAccountMajor.getPkAccountIdXXX(), mvAccountLevels);
                 moAccountMajor = (SDataAccount) accountsAndDescription[0];
                 moAccount = (SDataAccount) accountsAndDescription[1];
@@ -191,7 +191,7 @@ public class SPanelAccountChangeDeep extends javax.swing.JPanel implements java.
     public void refreshPanel() {
         updateAccount();
     }
-    public void resetPanel(){
+    public void resetPanel() {
         moTextCodeLevel2.setText("0");
     }
 

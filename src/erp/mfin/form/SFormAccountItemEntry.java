@@ -404,39 +404,51 @@ public class SFormAccountItemEntry extends javax.swing.JDialog implements erp.li
                             break;
 
                         case SDataConstantsSys.FINS_TP_ACC_ITEM_PUR:
-                            if (nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_PUR &&
+                            if (nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_INV &&
+                                nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_SUP &&
+                                nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_PUR &&
                                 nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_ASSET_FIX) {
-                                message = "'" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PUR }) + "'";
+                                message = "'" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_INV }) + "'";
+                                message += " o '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_SUP }) + "'";
+                                message += " o '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PUR }) + "'";
                                 message += " o '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_ASSET_FIX }) + "'";
                             }
                             break;
 
                         case SDataConstantsSys.FINS_TP_ACC_ITEM_PUR_ADJ_DEV:
                         case SDataConstantsSys.FINS_TP_ACC_ITEM_PUR_ADJ_DISC:
-                            if (nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_PUR &&
+                            if (nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_INV &&
+                                nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_SUP &&
+                                nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_PUR &&
                                 nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ &&
                                 nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_ASSET_FIX) {
-                                message = "'" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PUR }) + "'";
+                                message = "'" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_INV }) + "'";
+                                message += " o '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_SUP }) + "'";
+                                message += " o '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PUR }) + "'";
                                 message += " o '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ }) + "'";
                                 message += " o '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_ASSET_FIX }) + "'";
                             }
                             break;
 
                         case SDataConstantsSys.FINS_TP_ACC_ITEM_SAL:
-                            if (nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_SAL &&
+                            if (nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_CUS &&
+                                nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_SAL &&
                                 nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_PUR) {
-                                message = "'" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_SAL }) + "'";
+                                message = "'" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_CUS }) + "'";
+                                message += " o '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_SAL }) + "'";
                                 message += " o '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PUR }) + "'";
                             }
                             break;
 
                         case SDataConstantsSys.FINS_TP_ACC_ITEM_SAL_ADJ_DEV:
                         case SDataConstantsSys.FINS_TP_ACC_ITEM_SAL_ADJ_DISC:
-                            if (nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_SAL &&
+                            if (nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_CUS &&
+                                nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_SAL &&
                                 nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_SAL_ADJ &&
                                 nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_PUR &&
                                 nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ) {
-                                message = "'" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_SAL }) + "'";
+                                message = "'" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_CUS }) + "'";
+                                message += " o '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_SAL }) + "'";
                                 message += " o '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_SAL_ADJ }) + "'";
                                 message += " o '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PUR }) + "'";
                                 message += " o '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ }) + "'";

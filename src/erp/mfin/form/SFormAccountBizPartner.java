@@ -5,14 +5,6 @@
 
 package erp.mfin.form;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.Vector;
-import javax.swing.AbstractAction;
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
-
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
@@ -33,6 +25,13 @@ import erp.mfin.data.SDataAccountBizPartnerBpType;
 import erp.mfin.data.SDataAccountBizPartnerBpTypeRow;
 import erp.mfin.data.SDataAccountBizPartnerEntry;
 import erp.mfin.data.SDataAccountBizPartnerEntryRow;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.util.Vector;
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -782,7 +781,7 @@ public class SFormAccountBizPartner extends javax.swing.JDialog implements erp.l
 
                 if (!validation.getIsError()) {
                     if (moPaneBizPartnerTypes.getTableGuiRowCount() == 0 && moPaneBizPartners.getTableGuiRowCount() == 0) {
-                        if (miClient.showMsgBoxConfirm("No se han definido requistros a los que les aplique este paquete de configuración.\nDe cualquier forma, ¿está seguro que desea salir?") != JOptionPane.YES_OPTION) {
+                        if (miClient.showMsgBoxConfirm("No se han definido registros a los que les aplique este paquete de configuración.\nDe cualquier forma, ¿está seguro que desea salir?") != JOptionPane.YES_OPTION) {
                             validation.setMessage("Se deben definir registros a los que les aplique este paquete de configuración.");
                         }
                     }

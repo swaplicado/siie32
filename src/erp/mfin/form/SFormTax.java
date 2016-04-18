@@ -426,7 +426,7 @@ public class SFormTax extends javax.swing.JDialog implements erp.lib.form.SFormI
             moTax.setValueUnitary(moFieldValueUnitary.getDouble());
             moTax.setValue(0);
         }
-        else if (moFieldFkTaxCalculationTypeId.getKeyAsIntArray()[0] == SModSysConsts.FINS_TP_TAX_CAL_AMT_FIX){
+        else if (moFieldFkTaxCalculationTypeId.getKeyAsIntArray()[0] == SModSysConsts.FINS_TP_TAX_CAL_AMT_FIX) {
             moTax.setPercentage(0);
             moTax.setValueUnitary(0);
             moTax.setValue(moFieldValue.getDouble());

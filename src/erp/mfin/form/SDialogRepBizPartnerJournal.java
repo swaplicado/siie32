@@ -234,7 +234,7 @@ public class SDialogRepBizPartnerJournal extends javax.swing.JDialog implements 
         }
     }//GEN-LAST:event_jcbBizPartnerItemStateChanged
 
-    private void initComponentsExtra(){
+    private void initComponentsExtra() {
         mvFields = new Vector<SFormField>();
 
         try {

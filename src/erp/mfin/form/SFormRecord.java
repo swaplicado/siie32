@@ -1682,14 +1682,14 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         int userId = 0;
         SDataRecord record = null;
 
-        if(!SDataUtilities.validateAccountSyntax(miClient.getSessionXXX().getParamsCompany().getFkAccountDifferenceIncomeId_n())){
+        if (!SDataUtilities.validateAccountSyntax(miClient.getSessionXXX().getParamsCompany().getFkAccountDifferenceIncomeId_n())) {
             miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_EMPTY_ACC);
         }
-        else{            
-            if(!SDataUtilities.validateAccountSyntax(miClient.getSessionXXX().getParamsCompany().getFkCostCenterDifferenceIncomeId_n())){
+        else {            
+            if (!SDataUtilities.validateAccountSyntax(miClient.getSessionXXX().getParamsCompany().getFkCostCenterDifferenceIncomeId_n())) {
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_EMPTY_CC);
             }
-            else{                
+            else {                
                 moFormDifferenceIncomeExpense.setValue(SDataConstants.FIN_REC, moRecord);
                 moFormDifferenceIncomeExpense.setValue(SDataConstantsSys.FINS_CT_SYS_MOV_CASH, true);
                 moFormDifferenceIncomeExpense.formReset();
@@ -1718,14 +1718,14 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         int userId = 0;
         SDataRecord record = null;
 
-        if(!SDataUtilities.validateAccountSyntax(miClient.getSessionXXX().getParamsCompany().getFkAccountDifferenceExpenseId_n())){
+        if (!SDataUtilities.validateAccountSyntax(miClient.getSessionXXX().getParamsCompany().getFkAccountDifferenceExpenseId_n())) {
             miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_EMPTY_ACC);
         }
-        else{            
-            if(!SDataUtilities.validateAccountSyntax(miClient.getSessionXXX().getParamsCompany().getFkCostCenterDifferenceExpenseId_n())){
+        else {            
+            if (!SDataUtilities.validateAccountSyntax(miClient.getSessionXXX().getParamsCompany().getFkCostCenterDifferenceExpenseId_n())) {
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_EMPTY_CC);
             }
-            else{                
+            else {                
                 moFormDifferenceIncomeExpense.setValue(SDataConstants.FIN_REC, moRecord);
                 moFormDifferenceIncomeExpense.setValue(SDataConstantsSys.FINS_CT_SYS_MOV_CASH, false);
                 moFormDifferenceIncomeExpense.formReset();
@@ -1768,24 +1768,6 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             moPaneGridEntries.setTableRowSelection(moPaneGridEntries.getTableGuiRowCount() - 1);
         }
     }
-
-    /*private void actionCheckXXX() { // Not required
-        moFormCheck.setValue(SDataConstants.FIN_REC, moRecord);
-        moFormCheck.setValue(SDataConstants.FIN_ACC_CASH, moAccountCash);
-        moFormCheck.setValue(SDataConstants.FIN_CHECK, obtainRecordChecks());
-        moFormCheck.formReset();
-        moFormCheck.setFormVisible(true);
-
-        if (moFormCheck.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-            SDataRecordEntry entry = (SDataRecordEntry) moFormCheck.getRegistry();
-
-            moPaneGridEntries.addTableRow(new SDataRecordEntryRow(entry));
-            renumberEntries();
-            calculateBalance();
-            moPaneGridEntries.renderTableRows();
-            moPaneGridEntries.setTableRowSelection(moPaneGridEntries.getTableGuiRowCount() - 1);
-        }
-    }*/
 
     private void actionTransfer() {
         int userId = 0;
