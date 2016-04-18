@@ -170,13 +170,13 @@ public class SServiceSessions extends UnicastRemoteObject {
             if (!resultSet.next()) {
                 responseType = SLibConstants.LOGIN_ERROR_USR_INVALID;
             }
-            else if (!resultSet.getBoolean("b_act")){
+            else if (!resultSet.getBoolean("b_act")) {
                 responseType = SLibConstants.LOGIN_ERROR_USR_INACTIVE;
             }
-            else if (resultSet.getBoolean("b_del")){
+            else if (resultSet.getBoolean("b_del")) {
                 responseType = SLibConstants.LOGIN_ERROR_USR_DELETED;
             }
-            else if (resultSet.getString("usr_pswd").compareTo(pswd) != 0){
+            else if (resultSet.getString("usr_pswd").compareTo(pswd) != 0) {
                 responseType = SLibConstants.LOGIN_ERROR_USR_PSWD_INVALID;
             }
             else {

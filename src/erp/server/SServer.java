@@ -408,7 +408,7 @@ public class SServer extends UnicastRemoteObject implements SServerRemote, Runna
         System.out.println();
         System.out.println("- Destroying RMI Registry process...");
 
-        if (rmiRegistry != null){
+        if (rmiRegistry != null) {
             try {
                 UnicastRemoteObject.unexportObject(rmiRegistry, true);
             }
