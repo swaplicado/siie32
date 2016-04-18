@@ -659,7 +659,7 @@ public class SFormCost extends javax.swing.JDialog implements erp.lib.form.SForm
         }
     }
 
-    private void actionEntryNew(){
+    private void actionEntryNew() {
         boolean b=false;
         int i=0;
         int j=0;
@@ -1240,7 +1240,7 @@ public class SFormCost extends javax.swing.JDialog implements erp.lib.form.SForm
             else if (button == jbPkProductionOrderId_n) {
                 actionPkProductionOrderId_n();
             }
-            else if (button == jbGangAdd){
+            else if (button == jbGangAdd) {
                 mbGang = true;
                 actionEntryNew();
             }

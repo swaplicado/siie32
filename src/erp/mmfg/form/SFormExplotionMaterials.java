@@ -585,7 +585,7 @@ public class SFormExplotionMaterials extends javax.swing.JDialog implements erp.
         return oExpMatReqMat;
     }
 
-    private boolean validateRequisitionMaterials(java.lang.String sMsg){
+    private boolean validateRequisitionMaterials(java.lang.String sMsg) {
         boolean b = true;
 
         try {
@@ -1137,7 +1137,7 @@ public class SFormExplotionMaterials extends javax.swing.JDialog implements erp.
         }
     }
 
-    private boolean validateExplotionMaterials(java.lang.String sMsg){
+    private boolean validateExplotionMaterials(java.lang.String sMsg) {
         boolean b = true;
 
         try {
@@ -1292,7 +1292,7 @@ public class SFormExplotionMaterials extends javax.swing.JDialog implements erp.
         SDataProductionOrder oProductionOrder = null;
 
         for (int i = 0; i < mvFields.size(); i++) {
-            if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()){
+            if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()) {
                 validation.setIsError(true);
                 validation.setComponent(((erp.lib.form.SFormField) mvFields.get(i)).getComponent());
                 break;

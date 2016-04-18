@@ -809,7 +809,7 @@ public class SFormRequisition extends javax.swing.JDialog implements erp.lib.for
     }
     */
 
-    private boolean validateRequisitionMaterials(java.lang.String sMsg){
+    private boolean validateRequisitionMaterials(java.lang.String sMsg) {
         boolean b = true;
 
         try {
@@ -922,7 +922,7 @@ public class SFormRequisition extends javax.swing.JDialog implements erp.lib.for
         SFormValidation validation = new SFormValidation();
 
         for (int i = 0; i < mvFields.size(); i++) {
-            if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()){
+            if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()) {
                 validation.setIsError(true);
                 validation.setComponent(((erp.lib.form.SFormField) mvFields.get(i)).getComponent());
                 break;

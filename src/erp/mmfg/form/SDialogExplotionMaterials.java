@@ -422,7 +422,7 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
                 oExplotionMaterials.setValue(1, moFieldFkCobId.getKey());
 
                 ArrayList<int[]> fkEntityId = new ArrayList<>();
-                for(SFormComponentItem item : jliFkEntityId.getSelectedValuesList()){
+                for(SFormComponentItem item : jliFkEntityId.getSelectedValuesList()) {
                     fkEntityId.add((int[]) item.getPrimaryKey());
                 }
 
@@ -645,13 +645,13 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
             else if (button == jbCancel) {
                 actionCancel();
             }
-            else if (button == jbProdOrdStart){
+            else if (button == jbProdOrdStart) {
                 actionProdOrdStart();
             }
-            else if (button == jbProdOrdEnd){
+            else if (button == jbProdOrdEnd) {
                 actionProdOrdEnd();
             }
-            else if (button == jbFkCobId){
+            else if (button == jbFkCobId) {
                 actionFkCobId();
             }
             else if (button == jbDate) {

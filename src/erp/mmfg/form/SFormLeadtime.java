@@ -308,7 +308,7 @@ public class SFormLeadtime extends javax.swing.JDialog implements erp.lib.form.S
         setVisible(false);
     }
 
-    private void actionLtimeTypeNew(){
+    private void actionLtimeTypeNew() {
         int index = 0;
         SFormLeadtimeLink formLtimeLink = new erp.mmfg.form.SFormLeadtimeLink(miClient);
         SDataLeadtimeCo  dataLinkCo = null;
@@ -674,7 +674,7 @@ public class SFormLeadtime extends javax.swing.JDialog implements erp.lib.form.S
             else if (button == jbCancel) {
                 actionCancel();
             }
-            else if (button == jbTypeNew){
+            else if (button == jbTypeNew) {
                 actionLtimeTypeNew();
             }
             else if (button == jbTypeEdit) {

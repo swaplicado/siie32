@@ -503,7 +503,7 @@ public class SFormDrc extends javax.swing.JDialog implements erp.lib.form.SFormI
         setVisible(false);
     }
 
-    private void actioEntryNew(){
+    private void actioEntryNew() {
         int i=0;
         int j=0;
         java.util.Date tDateWeek = moFieldWeekStart.getDate();
@@ -938,7 +938,7 @@ public class SFormDrc extends javax.swing.JDialog implements erp.lib.form.SFormI
             else if (button == jbCancel) {
                 actionCancel();
             }
-            else if (button == jbEntryNew){
+            else if (button == jbEntryNew) {
                 actioEntryNew();
             }
             else if (button == jbEntryEdit) {

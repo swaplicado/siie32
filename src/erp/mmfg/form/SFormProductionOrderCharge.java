@@ -744,7 +744,7 @@ public class SFormProductionOrderCharge extends javax.swing.JDialog implements e
         STrnStockValidator validator = new STrnStockValidator(miClient, moProductionOrder.getPkYearId(), null , null);
 
         for (int i = 0; i < mvFields.size(); i++) {
-            if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()){
+            if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()) {
                 validation.setIsError(true);
                 validation.setComponent(((erp.lib.form.SFormField) mvFields.get(i)).getComponent());
                 break;

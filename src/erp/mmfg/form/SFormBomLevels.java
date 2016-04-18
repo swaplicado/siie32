@@ -653,7 +653,7 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
         setVisible(false);
     }
 
-    private void actionLevelNotesNew(){
+    private void actionLevelNotesNew() {
         int index = 0;
         SFormBomNotes formNotes = new erp.mmfg.form.SFormBomNotes(miClient);
         SDataBomNotes dataNotes = null;
@@ -1055,7 +1055,7 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
 
     @Override
     public void setValue(int type, java.lang.Object value) {
-        switch (type){
+        switch (type) {
             case 1:
                 moFieldItemBom.setFieldValue(value.toString());
                 break;
@@ -1122,7 +1122,7 @@ public class SFormBomLevels extends javax.swing.JDialog implements erp.lib.form.
             else if (button == jbCancel) {
                 actionCancel();
             }
-            else if (button == jbLevelNotesNew){
+            else if (button == jbLevelNotesNew) {
                 actionLevelNotesNew();
             }
             else if (button == jbLevelNotesEdit) {

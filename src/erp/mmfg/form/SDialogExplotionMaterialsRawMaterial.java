@@ -667,10 +667,10 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
 
                     if (b) {
 
-                        for (k=0; k < vItems.size(); k++){
+                        for (k=0; k < vItems.size(); k++) {
                             oAux = (java.lang.Object[]) vItems.get(k);
 
-                            if (SLibUtilities.parseInt(oAux[1].toString()) == SLibUtilities.parseInt(oList[1].toString())){
+                            if (SLibUtilities.parseInt(oAux[1].toString()) == SLibUtilities.parseInt(oList[1].toString())) {
                                 oAux[2] = ((Double) oAux[2]) + ((Double) oList[2]);
                                 vItems.set(k, oAux);
                                 b = false;
@@ -1238,7 +1238,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
         return moExpMatReqMat;
     }
 
-    private boolean validateRequisitionMaterials(){
+    private boolean validateRequisitionMaterials() {
         boolean b = true;
 
         try {
