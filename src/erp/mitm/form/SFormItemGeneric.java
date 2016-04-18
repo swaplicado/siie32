@@ -1691,7 +1691,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         if (jckIsUnitsContainedApplying.isSelected()) {
             jcbFkUnitUnitsContainedTypeId.setEnabled(true);
         }
-        else if (!jckIsUnitsContainedApplying.isSelected()){
+        else if (!jckIsUnitsContainedApplying.isSelected()) {
             jcbFkUnitUnitsContainedTypeId.setEnabled(false);
             moFieldFkUnitUnitsContainedTypeId.setFieldValue(new int[] { SDataConstantsSys.ITMU_TP_UNIT_NA });
         }
