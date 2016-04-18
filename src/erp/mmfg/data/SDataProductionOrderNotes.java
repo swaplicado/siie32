@@ -34,7 +34,7 @@ public class SDataProductionOrderNotes extends erp.lib.data.SDataRegistry implem
     protected java.lang.String msDbmsUserEdit;
     protected java.lang.String msDbmsUserDelete;
 
-    public SDataProductionOrderNotes (){
+    public SDataProductionOrderNotes () {
         super(SDataConstants.MFG_ORD_NTS);
         
         reset();

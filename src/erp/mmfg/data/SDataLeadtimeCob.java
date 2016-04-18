@@ -94,7 +94,7 @@ public class SDataLeadtimeCob extends erp.lib.data.SDataRegistry implements java
     
     public java.util.Vector<SDataLeadtimeCob> getDbmsTypes() { return mvDbmsTypes; }
 
-    private java.lang.String query(java.lang.Object params){
+    private java.lang.String query(java.lang.Object params) {
         int[] key = (int[]) params;
         String sql = "";
 

@@ -13,7 +13,7 @@ import erp.data.SDataConstants;
  */
 public class SDataCostRow extends erp.lib.table.STableRow {
 
-    public SDataCostRow(java.lang.Object data){
+    public SDataCostRow(java.lang.Object data) {
         moData = data;
         prepareTableRow();
     }

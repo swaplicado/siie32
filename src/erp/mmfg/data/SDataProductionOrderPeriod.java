@@ -27,7 +27,7 @@ public class SDataProductionOrderPeriod extends erp.lib.data.SDataRegistry imple
 
     protected java.lang.String msDbmsUnitSymbol;
 
-    public SDataProductionOrderPeriod(){
+    public SDataProductionOrderPeriod() {
         super(SDataConstants.MFG_ORD_PER);
         reset();
     }

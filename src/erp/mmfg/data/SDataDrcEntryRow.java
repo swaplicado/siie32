@@ -13,7 +13,7 @@ import erp.lib.SLibTimeUtilities;
  */
 public class SDataDrcEntryRow extends erp.lib.table.STableRow {
 
-    public SDataDrcEntryRow(java.lang.Object data){
+    public SDataDrcEntryRow(java.lang.Object data) {
         moData = data;
         prepareTableRow();
     }

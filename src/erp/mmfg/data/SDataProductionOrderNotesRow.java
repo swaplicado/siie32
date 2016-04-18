@@ -11,7 +11,7 @@ package erp.mmfg.data;
  */
 public class SDataProductionOrderNotesRow extends erp.lib.table.STableRow {
 
-    public SDataProductionOrderNotesRow(java.lang.Object data){
+    public SDataProductionOrderNotesRow(java.lang.Object data) {
         moData = data;
         prepareTableRow();
     }

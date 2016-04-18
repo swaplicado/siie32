@@ -63,7 +63,7 @@ public class SDataManufacturingLineConfigItem extends erp.lib.data.SDataRegistry
 
     public String getDbmsLine() { return msDbmsLine; }
 
-    private java.lang.String query(java.lang.Object params){
+    private java.lang.String query(java.lang.Object params) {
         int[] key = (int[]) params;
         String sql = "";
 
