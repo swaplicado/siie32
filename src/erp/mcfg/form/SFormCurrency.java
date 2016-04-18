@@ -329,7 +329,7 @@ public class SFormCurrency extends javax.swing.JDialog implements erp.lib.form.S
         SFormValidation validation = new SFormValidation();
 
         for (int i = 0; i < mvFields.size(); i++) {
-            if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()){
+            if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()) {
                 validation.setIsError(true);
                 validation.setComponent(((erp.lib.form.SFormField) mvFields.get(i)).getComponent());
                 break;
