@@ -327,7 +327,7 @@ public class SFormCustomerConfigurationCob extends javax.swing.JDialog implement
         SFormValidation validation = new SFormValidation();
 
         for (int i = 0; i < mvFields.size(); i++) {
-            if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()){
+            if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()) {
                 validation.setIsError(true);
                 validation.setComponent(((erp.lib.form.SFormField) mvFields.get(i)).getComponent());
                 break;

@@ -471,7 +471,7 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
         if (jcbPkCustomerId.getSelectedIndex() > 0) {
             bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, moFieldPkCustomerId.getKey(), SLibConstants.EXEC_MODE_SILENT);
 
-            if (bizPartner != null){
+            if (bizPartner != null) {
                 for (i=1; i < bizPartner.getDbmsBizPartnerBranches().size(); i++) {
                     moBizPartnerBranch = bizPartner.getDbmsBizPartnerBranches().get(i);
                     b = false;
@@ -573,7 +573,7 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
     private void readCustomerBranchConfig() {
         moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[]{moCustomerConfiguration.getPkCustomerId()}, SLibConstants.EXEC_MODE_SILENT);
 
-        if (moBizPartner != null){
+        if (moBizPartner != null) {
             for (int i = 0; i < moBizPartner.getDbmsBizPartnerBranches().size(); i++) {
                 moBizPartnerBranch = moBizPartner.getDbmsBizPartnerBranches().get(i);
             }
@@ -678,7 +678,7 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
         SFormValidation validation = new SFormValidation();
 
         for (int i = 0; i < mvFields.size(); i++) {
-            if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()){
+            if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()) {
                 validation.setIsError(true);
                 validation.setComponent(((erp.lib.form.SFormField) mvFields.get(i)).getComponent());
                 break;
