@@ -1702,7 +1702,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         if (moUserCompaniesPane.getSelectedTableRow() != null) {
             if (validateReturnCompany(((int[]) moUserCompaniesPane.getSelectedTableRow().getPrimaryKey())[0])) {
                 if (miClient.showMsgBoxConfirm("Ya existe una configuración para la empresa \n" + "'" +(String) moUserCompaniesPane.getSelectedTableRow().getValues().get(0) + "'" +
-                        ". \nEste movimiento borrará dicha configuración. ¿Desea continuar?") == JOptionPane.YES_OPTION){
+                        ". \nEste movimiento borrará dicha configuración. ¿Desea continuar?") == JOptionPane.YES_OPTION) {
                     removeBranches(((int[])moUserCompaniesPane.getSelectedTableRow().getPrimaryKey())[0]);
                     item = new SFormComponentItem(new int[] { ((int[])moUserCompaniesPane.getSelectedTableRow().getPrimaryKey())[0] }, (String) moUserCompaniesPane.getSelectedTableRow().getValues().get(0));
                     moUserCompaniesPane.removeTableRow(moUserCompaniesPane.getTable().getSelectedRow());
@@ -1732,7 +1732,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
             row = moUserCompaniesPane.getTableRow(i);
             if (validateReturnCompany(((int[])row.getPrimaryKey())[0])) {
                 if (miClient.showMsgBoxConfirm("Ya existe una configuración para la empresa \n" + "'" +(String) row.getValues().get(0) + "'" +
-                        ". \nEste movimiento borrará dicha configuración. ¿Desea continuar?") == JOptionPane.YES_OPTION){
+                        ". \nEste movimiento borrará dicha configuración. ¿Desea continuar?") == JOptionPane.YES_OPTION) {
                     removeBranches(((int[])row.getPrimaryKey())[0]);
                     vListCompanies.add(new SFormComponentItem(new int[] { ((int[])row.getPrimaryKey())[0] }, (String) row.getValues().get(0)));
                 }
@@ -1826,7 +1826,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         if (moUserCompanyBranchesPane.getSelectedTableRow() != null) {
             if (validateReturnBranch(((int[]) moUserCompanyBranchesPane.getSelectedTableRow().getPrimaryKey())[0])) {
                 if (miClient.showMsgBoxConfirm("Ya existe una configuración para la sucursal " + "'" + (String) moUserCompanyBranchesPane.getSelectedTableRow().getValues().get(0) + "'" +
-                        ". \nEste movimiento borrará dicha configuración. ¿Desea continuar?") == JOptionPane.YES_OPTION){
+                        ". \nEste movimiento borrará dicha configuración. ¿Desea continuar?") == JOptionPane.YES_OPTION) {
                     removeBranchesDependencies(((int[]) moUserCompanyBranchesPane.getSelectedTableRow().getPrimaryKey())[0]);
                     for (int i = 0; i < mvUserBranches.size(); i++) {
                         if (((int[]) mvUserBranches.get(i).get(0).getPrimaryKey())[0] == moFieldFkCompanyId.getKeyAsIntArray()[0]) {
@@ -1865,9 +1865,9 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         vListBranches.clear();
         for (x = 0; x < moUserCompanyBranchesPane.getTableModel().getRowCount(); x++) {
             row = moUserCompanyBranchesPane.getTableModel().getTableRow(x);
-            if (validateReturnBranch(((int[]) row.getPrimaryKey())[0])){
+            if (validateReturnBranch(((int[]) row.getPrimaryKey())[0])) {
                 if (miClient.showMsgBoxConfirm("Ya existe una configuración para la sucursal \n" + "'" +(String) row.getValues().get(0) + "'" +
-                        ". \nEste movimiento borrará dicha configuración. ¿Desea continuar?") == JOptionPane.YES_OPTION){
+                        ". \nEste movimiento borrará dicha configuración. ¿Desea continuar?") == JOptionPane.YES_OPTION) {
                     removeBranchesDependencies(((int[])row.getPrimaryKey())[0]);
                     vListBranches.add(new SFormComponentItem(row.getPrimaryKey(), (String) row.getValues().get(0)));
                 }
@@ -2470,7 +2470,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         if (jckIsUniversal.isSelected()) {
             if (moUserCompaniesPane.getTableModel().getRowCount() > 0) {
                 if (miClient.showMsgBoxConfirm("Ya existe una configuración para el usuario de acceso al sistema. " +
-                        "\nEste movimiento borrará dicha configuración. ¿Desea continuar?") == JOptionPane.YES_OPTION){
+                        "\nEste movimiento borrará dicha configuración. ¿Desea continuar?") == JOptionPane.YES_OPTION) {
                     jckIsUniversal.setSelected(true);
                     jbTransferCompany.setEnabled(false);
                     jbTransferAllCompany.setEnabled(false);
@@ -3858,7 +3858,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         // Save the access configuration for the companies:
 
         moUser.getDbmsAccessCompanies().clear();
-        if (moUserCompaniesPane.getTableModel().getRowCount() > 0){
+        if (moUserCompaniesPane.getTableModel().getRowCount() > 0) {
             for (x = 0 ; x < moUserCompaniesPane.getTableModel().getRowCount(); x++) {
                 company = new SDataAccessCompany();
                 company.setPkCompanyId(((int[]) moUserCompaniesPane.getTableRow(x).getPrimaryKey())[0]);
