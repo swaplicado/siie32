@@ -1042,7 +1042,7 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         }
 
         email.addAll(Arrays.asList(SLibUtils.textExplode(moFieldEmail.getString(), ";")));
-        for(String field:email){
+        for(String field:email) {
             if (!validation.getIsError() && field.length() > 0) {
                 field = SLibUtilities.validateEmail(field);
                 if (field.length() > 0) {

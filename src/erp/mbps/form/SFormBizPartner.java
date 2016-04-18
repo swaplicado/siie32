@@ -2795,7 +2795,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             moBizPartnerCategory.setPkBizPartnerCategoryId(moFieldFkBizPartnerCategoryId.getKeyAsIntArray()[0]);
             moBizPartnerCategory.setKey(moFieldKey.getString());
             moBizPartnerCategory.setCompanyKey(moFieldCompanyKey.getString());
-            if (moFieldFkCreditTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_NO){
+            if (moFieldFkCreditTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_NO) {
                 moBizPartnerCategory.setCreditLimit(0);
                 moBizPartnerCategory.setDaysOfCredit(0);
                 moBizPartnerCategory.setDaysOfGrace(0);
