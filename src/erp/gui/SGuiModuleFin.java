@@ -1969,7 +1969,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiQryCashFlowPaysSupDet) {
                 showView(SDataConstants.TRNX_DPS_PAYS, SDataConstantsSys.TRNS_CT_DPS_PUR, SUtilConsts.QRY_DET);
             }
-            else if (item == jmiRepCashFlowExpected){
+            else if (item == jmiRepCashFlowExpected) {
                 new SDialogRepCashFlowExpected(miClient.getSession().getClient(), SModConsts.FINR_CSH_FLW_EXP, SDataRepConstants.REP_CSH_FLW_EXP).setVisible(true);
             }
             else if (item == jmiRepLedgerAccount) {

@@ -804,103 +804,103 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
         if (e.getSource() instanceof javax.swing.JMenuItem) {
             javax.swing.JMenuItem item = (javax.swing.JMenuItem) e.getSource();
 
-            if (item == jmiBizPartner){
+            if (item == jmiBizPartner) {
                 showView(SDataConstants.BPSU_BP);
             }
-            else if (item == jmiBizPartnerCustomer){
+            else if (item == jmiBizPartnerCustomer) {
                 showView(SDataConstants.BPSX_BP_CUS);
             }
-            else if (item == jmiBizPartnerSupplier){
+            else if (item == jmiBizPartnerSupplier) {
                 showView(SDataConstants.BPSX_BP_SUP);
             }
-            else if (item == jmiBizPartnerDebtor){
+            else if (item == jmiBizPartnerDebtor) {
                 showView(SDataConstants.BPSX_BP_DBR);
             }
-            else if (item == jmiBizPartnerCreditor){
+            else if (item == jmiBizPartnerCreditor) {
                 showView(SDataConstants.BPSX_BP_CDR);
             }
-            else if (item == jmiBizPartnerAttBank){
+            else if (item == jmiBizPartnerAttBank) {
                 showView(SDataConstants.BPSX_BP_ATT_BANK);
             }
-            else if (item == jmiBizPartnerAttCarrier){
+            else if (item == jmiBizPartnerAttCarrier) {
                 showView(SDataConstants.BPSX_BP_ATT_CARR);
             }
-            else if (item == jmiBizPartnerAttEmployee){
+            else if (item == jmiBizPartnerAttEmployee) {
                 showView(SDataConstants.BPSX_BP_EMP);
             }
-            else if (item == jmiBizPartnerAttSalesAgent){
+            else if (item == jmiBizPartnerAttSalesAgent) {
                 showView(SDataConstants.BPSX_BP_ATT_SAL_AGT);
             }
-            else if (item == jmiBizPartnerCategorySupplier){
+            else if (item == jmiBizPartnerCategorySupplier) {
                 showView(SDataConstants.BPSU_BP_CT, SDataConstantsSys.BPSS_CT_BP_SUP);
             }
-            else if (item == jmiBizPartnerCategoryCustomer){
+            else if (item == jmiBizPartnerCategoryCustomer) {
                 showView(SDataConstants.BPSU_BP_CT, SDataConstantsSys.BPSS_CT_BP_CUS);
             }
-            else if (item == jmiBizPartnerBranch){
+            else if (item == jmiBizPartnerBranch) {
                 showView(SDataConstants.BPSU_BPB);
             }
-            else if (item == jmiBizPartnerBranchSupplier){
+            else if (item == jmiBizPartnerBranchSupplier) {
                 showView(SDataConstants.BPSX_BPB_SUP);
             }
-            else if (item == jmiBizPartnerBranchCustomer){
+            else if (item == jmiBizPartnerBranchCustomer) {
                 showView(SDataConstants.BPSX_BPB_CUS);
             }
-            else if (item == jmiBizPartnerBranchCreditor){
+            else if (item == jmiBizPartnerBranchCreditor) {
                 showView(SDataConstants.BPSX_BPB_CDR);
             }
-            else if (item == jmiBizPartnerBranchDebtor){
+            else if (item == jmiBizPartnerBranchDebtor) {
                 showView(SDataConstants.BPSX_BPB_DBR);
             }
-            else if (item == jmiBizPartnerBranchAddress){
+            else if (item == jmiBizPartnerBranchAddress) {
                 showView(SDataConstants.BPSU_BPB_ADD);
             }
-            else if (item == jmiBizPartnerBranchAddressSupplier){
+            else if (item == jmiBizPartnerBranchAddressSupplier) {
                 showView(SDataConstants.BPSX_BPB_ADD_SUP);
             }
-            else if (item == jmiBizPartnerBranchAddressCustomer){
+            else if (item == jmiBizPartnerBranchAddressCustomer) {
                 showView(SDataConstants.BPSX_BPB_ADD_CUS);
             }
-            else if (item == jmiBizPartnerBranchAddressCreditor){
+            else if (item == jmiBizPartnerBranchAddressCreditor) {
                 showView(SDataConstants.BPSX_BPB_ADD_CDR);
             }
-            else if (item == jmiBizPartnerBranchAddressDebtor){
+            else if (item == jmiBizPartnerBranchAddressDebtor) {
                 showView(SDataConstants.BPSX_BPB_ADD_DBR);
             }
-            else if (item == jmiBizPartnerBranchAddressEmployee){
+            else if (item == jmiBizPartnerBranchAddressEmployee) {
                 showView(SDataConstants.BPSX_BPB_ADD_EMP);
             }
-            else if (item == jmiBizPartnerBranchContact){
+            else if (item == jmiBizPartnerBranchContact) {
                 showView(SDataConstants.BPSU_BPB_CON);
             }
-            else if (item == jmiBizPartnerBranchContactSupplier){
+            else if (item == jmiBizPartnerBranchContactSupplier) {
                 showView(SDataConstants.BPSX_BPB_CON_SUP);
             }
-            else if (item == jmiBizPartnerBranchContactCustomer){
+            else if (item == jmiBizPartnerBranchContactCustomer) {
                 showView(SDataConstants.BPSX_BPB_CON_CUS);
             }
-            else if (item == jmiBizPartnerBranchContactCreditor){
+            else if (item == jmiBizPartnerBranchContactCreditor) {
                 showView(SDataConstants.BPSX_BPB_CON_CDR);
             }
-            else if (item == jmiBizPartnerBranchContactDebtor){
+            else if (item == jmiBizPartnerBranchContactDebtor) {
                 showView(SDataConstants.BPSX_BPB_CON_DBR);
             }
-            else if (item == jmiBizPartnerBranchBankAccount){
+            else if (item == jmiBizPartnerBranchBankAccount) {
                 showView(SDataConstants.BPSU_BANK_ACC);
             }
-            else if (item == jmiBizPartnerBranchBankAccountSupplier){
+            else if (item == jmiBizPartnerBranchBankAccountSupplier) {
                 showView(SDataConstants.BPSX_BANK_ACC_SUP);
             }
-            else if (item == jmiBizPartnerBranchBankAccountCustomer){
+            else if (item == jmiBizPartnerBranchBankAccountCustomer) {
                 showView(SDataConstants.BPSX_BANK_ACC_CUS);
             }
-            else if (item == jmiBizPartnerBranchBankAccountCreditor){
+            else if (item == jmiBizPartnerBranchBankAccountCreditor) {
                 showView(SDataConstants.BPSX_BANK_ACC_CDR);
             }
-            else if (item == jmiBizPartnerBranchBankAccountDebtor){
+            else if (item == jmiBizPartnerBranchBankAccountDebtor) {
                 showView(SDataConstants.BPSX_BANK_ACC_DBR);
             }
-            else if (item == jmiBizPartnerBranchBankAccountEmployee){
+            else if (item == jmiBizPartnerBranchBankAccountEmployee) {
                 showView(SDataConstants.BPSX_BANK_ACC_EMP);
             }
             else if (item == jmiBizPartnerType) {

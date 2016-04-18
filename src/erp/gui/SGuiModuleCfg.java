@@ -711,7 +711,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiCfgSystemNotes) {
                 showView(SDataConstants.TRN_SYS_NTS);
             }
-            else if (item == jmiCatLanguage){
+            else if (item == jmiCatLanguage) {
                 showView(SDataConstants.CFGU_LAN);
             }
             else if (item == jmiCatCurrency) {
