@@ -823,6 +823,16 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_EAR_TAX_SUB = 17;
     public static final int HRSS_TP_EAR_OVR_TME = 19;
 
+    public static final int HRSS_TP_DED_COMP_AMT = 1;
+    public static final int HRSS_TP_DED_COMP_DAY = 2;
+    public static final int HRSS_TP_DED_COMP_HRS = 3;
+    public static final int HRSS_TP_DED_COMP_PER_DAY = 12;
+    public static final int HRSS_TP_DED_COMP_PER_HRS = 13;
+    public static final int HRSS_TP_DED_COMP_PBT = 21;
+    public static final int HRSS_TP_DED_COMP_PAT = 22;
+    public static final int HRSS_TP_DED_COMP_IBT = 26;
+    public static final int HRSS_TP_DED_COMP_IAT = 27;
+
     public static final int HRSS_TP_DED_SSC = 1;
     public static final int HRSS_TP_DED_TAX = 2;
 
