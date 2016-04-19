@@ -24,7 +24,7 @@ import erp.lib.table.STableRow;
 import erp.lib.table.STableRowCustom;
 import erp.lib.table.STableUtilities;
 import erp.mbps.data.SDataEmployee;
-import erp.mfin.data.SFinanceUtilities;
+import erp.mfin.data.SFinAccountUtilities;
 import erp.mtrn.data.SCfdPacket;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataCfdSignLog;
@@ -44,7 +44,6 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
@@ -878,23 +877,23 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
 
                 case SServerConstants.REQ_OBJ_FIN_ACC_TAX_ID:
                     oParams = (Object[]) poRequest.getPacket();
-                    oResponse.setPacket(SFinanceUtilities.obtainTaxAccountId(
+                    oResponse.setPacket(SFinAccountUtilities.obtainTaxAccountId(
                             (int[]) oParams[0], (Integer) oParams[1], (java.util.Date) oParams[2],
-                            (Integer) oParams[3], moStatement, (SimpleDateFormat) oParams[4]));
+                            (Integer) oParams[3], moStatement));
                     break;
 
                 case SServerConstants.REQ_OBJ_FIN_ACC_BP:
                     oParams = (Object[]) poRequest.getPacket();
-                    oResponse.setPacket(SFinanceUtilities.obtainBizPartnerAccountConfigs(
+                    oResponse.setPacket(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
                             (Integer) oParams[0], (Integer) oParams[1], (Integer) oParams[2],
-                            (java.util.Date) oParams[3], (Integer) oParams[4], (Boolean) oParams[5], moStatement, (SimpleDateFormat) oParams[6]));
+                            (java.util.Date) oParams[3], (Integer) oParams[4], (Boolean) oParams[5], moStatement));
                     break;
 
                 case SServerConstants.REQ_OBJ_FIN_ACC_ITEM:
                     oParams = (Object[]) poRequest.getPacket();
-                    oResponse.setPacket(SFinanceUtilities.obtainItemAccountConfigs(
+                    oResponse.setPacket(SFinAccountUtilities.obtainItemAccountConfigs(
                             (Integer) oParams[0], (Integer) oParams[1], (java.util.Date) oParams[2],
-                            (Integer) oParams[3], (Boolean) oParams[4], moStatement, (SimpleDateFormat) oParams[5]));
+                            (Integer) oParams[3], (Boolean) oParams[4], moStatement));
                     break;
 
                 case SServerConstants.REQ_CFD:
