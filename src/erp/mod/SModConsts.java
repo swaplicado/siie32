@@ -553,7 +553,8 @@ public abstract class SModConsts {
     public static final int HRSS_TP_TAX_COMP = 2061021;
     public static final int HRSS_TP_EAR_COMP = 2061031;
     public static final int HRSS_TP_EAR_EXEM = 2061032;
-    public static final int HRSS_TP_EAR = 2061041;
+    public static final int HRSS_TP_EAR = 2061036;
+    public static final int HRSS_TP_DED_COMP = 2061041;
     public static final int HRSS_TP_DED = 2061046;
     public static final int HRSS_TP_BEN = 2061051;
     public static final int HRSS_TP_LOAN = 2061061;
@@ -1061,6 +1062,7 @@ public abstract class SModConsts {
         TablesMap.put(HRSS_TP_EAR_COMP, "erp.hrss_tp_ear_comp");
         TablesMap.put(HRSS_TP_EAR_EXEM, "erp.hrss_tp_ear_exem");
         TablesMap.put(HRSS_TP_EAR, "erp.hrss_tp_ear");
+        TablesMap.put(HRSS_TP_DED_COMP, "erp.hrss_tp_ded_comp");
         TablesMap.put(HRSS_TP_DED, "erp.hrss_tp_ded");
         TablesMap.put(HRSS_TP_BEN, "erp.hrss_tp_ben");
         TablesMap.put(HRSS_TP_LOAN, "erp.hrss_tp_loan");
