@@ -17,9 +17,9 @@ import erp.mfin.data.SDataAccountCash;
 import erp.mfin.data.SDataBookkeepingNumber;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
+import erp.mfin.data.SFinAccountConfigEntry;
+import erp.mfin.data.SFinAccountUtilities;
 import erp.mfin.data.SFinUtilities;
-import erp.mfin.data.SFinanceAccountConfig;
-import erp.mfin.data.SFinanceUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SDbBizPartner;
@@ -519,7 +519,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                     oDsmEntry.setFkBizPartnerId(dps.getFkBizPartnerId_r());
                     oDsmEntry.setDbmsFkBizPartnerBranchId_n(dps.getFkBizPartnerBranchId());
 
-                    Vector<SFinanceAccountConfig> config = SFinanceUtilities.obtainBizPartnerAccountConfigs((SClientInterface) session.getClient(), dps.getFkBizPartnerId_r(), SDataConstantsSys.BPSS_CT_BP_SUP,
+                    Vector<SFinAccountConfigEntry> config = SFinAccountUtilities.obtainBizPartnerAccountConfigs((SClientInterface) session.getClient(), dps.getFkBizPartnerId_r(), SDataConstantsSys.BPSS_CT_BP_SUP,
                             record.getPkBookkeepingCenterId(), record.getDate(), SDataConstantsSys.FINS_TP_ACC_BP_OP, dps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL);
                     if (config.size() > 0) {
                         oDsmEntry.setDbmsAccountOp(config.get(0).getAccountId());
@@ -536,7 +536,6 @@ public class SDbBankLayout extends SDbRegistryUser {
                     oDsm.setDbmsFkCompanyBranch(((SClientInterface) session.getClient()).getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getPkBizPartnerBranchId());
                     oDsm.setDbmsCompanyBranchCode(((SClientInterface) session.getClient()).getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranch(new int[] { record.getFkCompanyBranchId_n() }).getCode());
                     oDsm.setDbmsErpDecimalsValue(((SDataParamsErp) session.getConfigSystem()).getDecimalsValue());
-                    oDsm.setDateFormat(SLibUtils.DateFormatDate);
                     oDsm.setDbmsIsRecordSaved(false);
                     
                     oDsm = (SDataDsm) ((SClientInterface) session.getClient()).getGuiModule(SDataConstants.MOD_FIN).processRegistry(oDsm);
