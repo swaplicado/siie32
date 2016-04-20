@@ -1425,8 +1425,6 @@ public class SFormDsm extends javax.swing.JDialog implements erp.lib.form.SFormI
             moDsm.getDbmsNotes().add((SDataDsmNotes) moNotesPane.getTableRow(i).getData());
         }
 
-        moDsm.setDateFormat(miClient.getSessionXXX().getFormatters().getDateFormat());
-
         // [DSM]: Set record user object:
 
         moDsm.getRegistryComplements().clear(); // XXX

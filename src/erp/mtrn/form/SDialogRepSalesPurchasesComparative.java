@@ -488,7 +488,7 @@ public class SDialogRepSalesPurchasesComparative extends javax.swing.JDialog imp
         }
 
         if (!validation.getIsError()) {
-            if ((SLibTimeUtilities.digestYear(moFieldDateEnd.getDate())[0] - SLibTimeUtilities.digestYear(moFieldDateBegin.getDate())[0]) > 1){
+            if ((SLibTimeUtilities.digestYear(moFieldDateEnd.getDate())[0] - SLibTimeUtilities.digestYear(moFieldDateBegin.getDate())[0]) > 1) {
                 validation.setMessage("La fecha inicial debe pertenecer máximo al ejercicio anterior.");
                 validation.setComponent(jftDateBegin);
             }

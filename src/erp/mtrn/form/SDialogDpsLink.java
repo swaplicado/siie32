@@ -388,7 +388,7 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
         }                
     }
     
-     private void renderEntryPriceSatus(SFormComponentItem item){
+     private void renderEntryPriceSatus(SFormComponentItem item) {
         jtfOriginalQuantity.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(0));
         jtfOriginalQuantityProcessed.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(0));
         jtfOriginalQuantityAvailable.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(0));  
@@ -564,7 +564,7 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
                 //Need monthly delivery
 
                 if (!validation.getIsError() && isOrder) {
-                    if (moGuiDpsLink.pickGuiDpsSourceEntry((int[]) moParamDpsSource.getPrimaryKey(), (int[]) entry.getDpsEntryKey()).getGuiDpsSourceEntryPrices().size() > 0){
+                    if (moGuiDpsLink.pickGuiDpsSourceEntry((int[]) moParamDpsSource.getPrimaryKey(), (int[]) entry.getDpsEntryKey()).getGuiDpsSourceEntryPrices().size() > 0) {
                         if (entry.getAuxSGuiDpsEntryPrice() == null) {
                             validation.setMessage("Para el ítem '" + entry.getConcept() + " (" + entry.getConceptKey() + ")' en la partida # " + entry.getSortingPosition() + "\n" +
                                     "se debe seleccionar una entrega mensual.");

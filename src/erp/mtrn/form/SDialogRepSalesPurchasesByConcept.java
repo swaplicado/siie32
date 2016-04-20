@@ -249,7 +249,7 @@ public class SDialogRepSalesPurchasesByConcept extends javax.swing.JDialog imple
         }
     }//GEN-LAST:event_jcbCrossWithItemStateChanged
 
-    private void initComponentsExtra(){
+    private void initComponentsExtra() {
         mvFields = new Vector<SFormField>();
 
         moFieldDateInitial = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateInitial, jlDateInitial);

@@ -1120,7 +1120,7 @@ public class SFormDsmEntry extends javax.swing.JDialog implements erp.lib.form.S
         setVisible(false);
     }
 
-    private void actionNotesNew(){
+    private void actionNotesNew() {
         int index = 0;
         SFormDsmEntryNotes formNotes = new erp.mtrn.form.SFormDsmEntryNotes(miClient);
         SDataDsmEntryNotes dataNotes = null;
@@ -1649,7 +1649,7 @@ public class SFormDsmEntry extends javax.swing.JDialog implements erp.lib.form.S
             else if (button == jbCancel) {
                 actionCancel();
             }
-            else if (button == jbNotesNew){
+            else if (button == jbNotesNew) {
                 actionNotesNew();
             }
             else if (button == jbNotesEdit) {

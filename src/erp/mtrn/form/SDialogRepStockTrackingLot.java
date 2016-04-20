@@ -170,7 +170,7 @@ public class SDialogRepStockTrackingLot extends javax.swing.JDialog implements e
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
-    private void initComponentsExtra(){
+    private void initComponentsExtra() {
         mvFields = new Vector<SFormField>();
 
         moFieldPkItemId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbPkItemId, jlPkItemId);

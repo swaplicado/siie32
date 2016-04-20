@@ -217,7 +217,7 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
         }
     }//GEN-LAST:event_jcbUnitTypeItemStateChanged
 
-    private void initComponentsExtra(){
+    private void initComponentsExtra() {
         mvFields = new Vector<SFormField>();
 
         moFieldDateInitial = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateInitial, jlDateInitial);
