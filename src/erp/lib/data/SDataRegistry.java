@@ -7,7 +7,6 @@ package erp.lib.data;
 
 import erp.lib.SLibConstants;
 import java.util.Vector;
-import sa.lib.SLibUtils;
 
 /**
  *
@@ -25,10 +24,6 @@ public abstract class SDataRegistry implements java.io.Serializable {
     protected boolean mbIsRegistryRequestDelete;    // flag used in delete() for deletion action or reverting it
     protected int mnDbmsErrorId;
     protected java.lang.String msDbmsError;
-    protected java.text.SimpleDateFormat moDateFormat;
-    protected java.text.SimpleDateFormat moDbmsDateFormat;
-    protected java.text.SimpleDateFormat moDbmsDatetimeFormat;
-    protected java.text.SimpleDateFormat moDbmsTimeFormat;
     protected java.util.Vector<java.lang.Object> mvRegistryComplements;
     protected java.lang.Object moPostSaveTarget;
     protected java.lang.reflect.Method moPostSaveMethod;
@@ -54,10 +49,6 @@ public abstract class SDataRegistry implements java.io.Serializable {
     public void setIsRegistryRequestDelete(boolean b) { mbIsRegistryRequestDelete = b; }
     public void setDbmsErrorId(int n) { mnDbmsErrorId = n; }
     public void setDbmsError(java.lang.String s) { msDbmsError = s; }
-    public void setDateFormat(java.text.SimpleDateFormat o) { moDateFormat = o; }
-    public void setDbmsDateFormat(java.text.SimpleDateFormat o) { moDbmsDateFormat = o; }
-    public void setDbmsDatetimeFormat(java.text.SimpleDateFormat o) { moDbmsDatetimeFormat = o; }
-    public void setDbmsTimeFormat(java.text.SimpleDateFormat o) { moDbmsTimeFormat = o; }
     public void setPostSaveTarget(java.lang.Object o) { moPostSaveTarget = o; }
     public void setPostSaveMethod(java.lang.reflect.Method o) { moPostSaveMethod = o; }
     public void setPostSaveMethodArgs(java.lang.Object[] ao) { maoPostSaveMethodArgs = ao; }
@@ -71,10 +62,6 @@ public abstract class SDataRegistry implements java.io.Serializable {
     public boolean getIsRegistryRequestDelete() { return mbIsRegistryRequestDelete; }
     public int getDbmsErrorId() { return mnDbmsErrorId; }
     public java.lang.String getDbmsError() { return msDbmsError; }
-    public java.text.SimpleDateFormat getDateFormat() { return moDateFormat; }
-    public java.text.SimpleDateFormat getDbmsDateFormat() { return moDbmsDateFormat; }
-    public java.text.SimpleDateFormat getDbmsDatetimeFormat() { return moDbmsDatetimeFormat; }
-    public java.text.SimpleDateFormat getDbmsTimeFormat() { return moDbmsTimeFormat; }
     public java.lang.Object getPostSaveTarget() { return moPostSaveTarget; }
     public java.lang.reflect.Method getPostSaveMethod() { return moPostSaveMethod; }
     public java.lang.Object[] getPostSaveMethodArgs() { return maoPostSaveMethodArgs; }
@@ -107,10 +94,6 @@ public abstract class SDataRegistry implements java.io.Serializable {
         mbIsRegistryRequestDelete = true;
         mnDbmsErrorId = 0;
         msDbmsError = "";
-        moDateFormat = SLibUtils.DateFormatDate;
-        moDbmsDateFormat = SLibUtils.DbmsDateFormatDate;
-        moDbmsDatetimeFormat = SLibUtils.DbmsDateFormatDatetime;
-        moDbmsTimeFormat = SLibUtils.DbmsDateFormatTime;
         mvRegistryComplements.clear();
         moPostSaveTarget = null;
         moPostSaveMethod = null;
