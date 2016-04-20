@@ -64,7 +64,7 @@ public class SViewItem extends erp.lib.table.STableTab implements java.awt.event
         jbDelete.setEnabled(false);
 
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[39];
+        STableColumn[] aoTableColumns = new STableColumn[40];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "i.id_item");
@@ -102,6 +102,7 @@ public class SViewItem extends erp.lib.table.STableTab implements java.awt.event
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "i.surplus_per", "Excedente predeterminado", STableConstants.WIDTH_PERCENTAGE);
         aoTableColumns[i++].setCellRenderer(new STableCellRendererNumber(new DecimalFormat("#,##0" + "." + SLibUtilities.textRepeat("0", 4) + "%")));
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_ref", "Referencia", STableConstants.WIDTH_BOOLEAN);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_pre_pay", "Anticipo", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "brd.brd", "Marca", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "mfr.mfr", "Fabricante", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "emt.emt", "Elemento", 100);
@@ -193,7 +194,7 @@ public class SViewItem extends erp.lib.table.STableTab implements java.awt.event
         }
 
         msSql = "SELECT i.id_item, i.item, i.item_short, i.item_key, i.b_bulk, i.b_inv, i.b_lot, i.units_cont, " +
-                "i.units_virt, i.prod_time, i.weight_gross, i.weight_delivery, i.surplus_per, i.b_ref, " +
+                "i.units_virt, i.prod_time, i.weight_gross, i.weight_delivery, i.surplus_per, i.b_ref, i.b_pre_pay, " +
                 "i.b_free_price, i.b_free_disc, i.b_free_disc_u, i.b_free_disc_ety, i.b_free_disc_doc, i.b_free_comms, i.b_del, i.ts_new, i.ts_edit, i.ts_del, " +
                 "ig.igen, si.name, u.symbol, uc.symbol, uv.symbol, unc.symbol, uncu.symbol, tua.tp_unit, tl.tp_lev, brd.brd, " +
                 "mfr.mfr, emt.emt, un.usr, ue.usr, ud.usr, il.line " +
