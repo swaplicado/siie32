@@ -19,7 +19,7 @@ public class SGuiDpsEntry {
     private ArrayList<SGuiDpsEntryPrice> maGuiDpsSourceEntryPrices;
     private SClientInterface miClient;
 	
-    public SGuiDpsEntry(SClientInterface client, SDataDpsEntry dataDpsSourceEntry){
+    public SGuiDpsEntry(SClientInterface client, SDataDpsEntry dataDpsSourceEntry) {
         miClient = client;
         moDataDpsSourceEntry = dataDpsSourceEntry;
         maGuiDpsSourceEntryPrices = new ArrayList<>();
@@ -33,7 +33,7 @@ public class SGuiDpsEntry {
         SFormComponentItem componentItem = null;
         ArrayList<SFormComponentItem> formComponentEntryPrices =  new ArrayList<>();
         
-        for(SGuiDpsEntryPrice guiEntryPrice: maGuiDpsSourceEntryPrices){
+        for(SGuiDpsEntryPrice guiEntryPrice: maGuiDpsSourceEntryPrices) {
             if (guiEntryPrice.getDataDpsEntryPrice().getIsDeleted()|| guiEntryPrice.obtainQtyAvailable() <= 0.0d) {
                 continue;
             }

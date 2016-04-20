@@ -110,7 +110,7 @@ public class SDataStampsClosing extends erp.lib.data.SDataRegistry implements ja
                 }
             }
         }
-        if(!isProcessOk){
+        if(!isProcessOk) {
             throw new Exception("No existen timbres disponibles.");        
         }
     }

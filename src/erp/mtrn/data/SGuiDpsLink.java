@@ -46,7 +46,7 @@ public class SGuiDpsLink {
             for (SGuiDps guiDps: maGuiDpsSources) {
                 for (SGuiDpsEntry dpsEntry : guiDps.getGuiDpsSourceEntries()) {
                     for (SGuiDpsEntryPrice guiDpsEntryPrice : dpsEntry.getGuiDpsSourceEntryPrices()) {
-                        if(SLibUtilities.compareKeys(guiDps.getDataDpsSource().getPrimaryKey(), destinyEntryLink.getDbmsSourceDpsKey())){
+                        if(SLibUtilities.compareKeys(guiDps.getDataDpsSource().getPrimaryKey(), destinyEntryLink.getDbmsSourceDpsKey())) {
                              if (dataDpsDestinyEntry.getContractPriceYear() == guiDpsEntryPrice.getDataDpsEntryPrice().getContractPriceYear() && dataDpsDestinyEntry.getContractPriceMonth() == guiDpsEntryPrice.getDataDpsEntryPrice().getContractPriceMonth()) {
                                  guiDpsEntryPrice.addDataDpsDestinyEntry(dataDpsDestinyEntry);
                              }

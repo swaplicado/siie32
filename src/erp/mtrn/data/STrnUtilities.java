@@ -1614,7 +1614,7 @@ public abstract class STrnUtilities {
         sendMailContractInfo(client, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED, null, null, null);
     }
     
-    public static void sendMailDpsSummaryByPeriod(final SClientInterface client, final int[] dpsTypeKey, final Date start, final Date end,  ArrayList<String> recipientsTo, ArrayList<String> recipientsCc, ArrayList<String> recipientsBcc){
+    public static void sendMailDpsSummaryByPeriod(final SClientInterface client, final int[] dpsTypeKey, final Date start, final Date end,  ArrayList<String> recipientsTo, ArrayList<String> recipientsCc, ArrayList<String> recipientsBcc) {
         String mail = "";
         String sql = "";
         ResultSet resultSet = null;
@@ -1883,7 +1883,7 @@ public abstract class STrnUtilities {
             statusId = SModSysConsts.TRNS_ST_XML_DVY_REJECT;
             status = "RECHAZADO:\n" + "- " + sorianaUtils.getAcknowledgmentMsg() + ".";
         }
-        else if (sorianaUtils.getAcknowledgmentStatus().compareTo(SModSysConsts.TXT_ST_XML_DVY_APPROVED) == 0){
+        else if (sorianaUtils.getAcknowledgmentStatus().compareTo(SModSysConsts.TXT_ST_XML_DVY_APPROVED) == 0) {
             statusId = SModSysConsts.TRNS_ST_XML_DVY_APPROVED;
             status = "ACEPTADO.";
         }
@@ -2725,17 +2725,17 @@ public abstract class STrnUtilities {
             
             if (recipientsTo != null || recipientsCc != null || recipientsBcc != null) {
                 if (recipientsTo != null && !recipientsTo.isEmpty()) {
-                    for(String emailTo : recipientsTo){
+                    for(String emailTo : recipientsTo) {
                         toRecipients.addAll(Arrays.asList(SLibUtilities.textExplode(emailTo, ";")));
                     }
                 }
                 if (recipientsCc != null && !recipientsCc.isEmpty()) {
-                    for(String emailToCc: ccRecipients){
+                    for(String emailToCc: ccRecipients) {
                         ccRecipients.addAll(Arrays.asList(SLibUtilities.textExplode(emailToCc, ";")));
                     }
                 }
                 if (recipientsBcc != null && !recipientsBcc.isEmpty()) {
-                    for(String emailToBcc: recipientsBcc){
+                    for(String emailToBcc: recipientsBcc) {
                         bccRecipients.addAll(Arrays.asList(SLibUtilities.textExplode(emailToBcc, ";")));
                     }
                 }
