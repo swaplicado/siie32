@@ -15,6 +15,7 @@ import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Vector;
+import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 
 /**
@@ -85,6 +86,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected java.lang.String msTicket;
     protected int mnUserId;
     protected int mnSortingPosition;
+    protected boolean mbIsPrepayment;
     protected boolean mbIsDiscountRetailChain;
     protected boolean mbIsTaxesAutomaticApplying;
     protected boolean mbIsPriceVariable;
@@ -99,6 +101,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected int mnFkDpsAdjustmentSubtypeId;
     protected int mnFkDpsEntryTypeId;
     protected int mnFkVehicleTypeId_n;
+    protected int mnFkCashCompanyBranchId_n;
+    protected int mnFkCashAccountId_n;
     protected java.lang.String msFkCostCenterId_n;
     protected int mnFkItemRefId_n;
     protected int mnFkUserNewId;
@@ -229,6 +233,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setTicket(java.lang.String s) { msTicket = s; }
     public void setUserId(int n) { mnUserId = n; }
     public void setSortingPosition(int n) { mnSortingPosition = n; }
+    public void setIsPrepayment(boolean b) { mbIsPrepayment = b; }
     public void setIsDiscountRetailChain(boolean b) { mbIsDiscountRetailChain = b; }
     public void setIsTaxesAutomaticApplying(boolean b) { mbIsTaxesAutomaticApplying = b; }
     public void setIsPriceVariable(boolean b) { mbIsPriceVariable = b; }
@@ -243,6 +248,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setFkDpsAdjustmentSubtypeId(int n) { mnFkDpsAdjustmentSubtypeId = n; }
     public void setFkDpsEntryTypeId(int n) { mnFkDpsEntryTypeId = n; }
     public void setFkVehicleTypeId_n(int n) { mnFkVehicleTypeId_n = n; }
+    public void setFkCashCompanyBranchId_n(int n) { mnFkCashCompanyBranchId_n = n; }
+    public void setFkCashAccountId_n(int n) { mnFkCashAccountId_n = n; }
     public void setFkCostCenterId_n(java.lang.String s) { msFkCostCenterId_n = s; }
     public void setFkItemRefId_n(int n) { mnFkItemRefId_n = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
@@ -314,6 +321,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public java.lang.String getTicket() { return msTicket; }
     public int getUserId() { return mnUserId; }
     public int getSortingPosition() { return mnSortingPosition; }
+    public boolean getIsPrepayment() { return mbIsPrepayment; }
     public boolean getIsDiscountRetailChain() { return mbIsDiscountRetailChain; }
     public boolean getIsTaxesAutomaticApplying() { return mbIsTaxesAutomaticApplying; }
     public boolean getIsPriceVariable() { return mbIsPriceVariable; }
@@ -328,6 +336,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public int getFkDpsAdjustmentSubtypeId() { return mnFkDpsAdjustmentSubtypeId; }
     public int getFkDpsEntryTypeId() { return mnFkDpsEntryTypeId; }
     public int getFkVehicleTypeId_n() { return mnFkVehicleTypeId_n; }
+    public int getFkCashCompanyBranchId_n() { return mnFkCashCompanyBranchId_n; }
+    public int getFkCashAccountId_n() { return mnFkCashAccountId_n; }
     public java.lang.String getFkCostCenterId_n() { return msFkCostCenterId_n; }
     public int getFkItemRefId_n() { return mnFkItemRefId_n; }
     public int getFkUserNewId() { return mnFkUserNewId; }
@@ -484,6 +494,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         msTicket = "";
         mnUserId = 0;
         mnSortingPosition = 0;
+        mbIsPrepayment = false;
         mbIsDiscountRetailChain = false;
         mbIsTaxesAutomaticApplying = false;
         mbIsPriceVariable = false;
@@ -498,6 +509,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mnFkDpsAdjustmentSubtypeId = 0;
         mnFkDpsEntryTypeId = 0;
         mnFkVehicleTypeId_n = 0;
+        mnFkCashCompanyBranchId_n = 0;
+        mnFkCashAccountId_n = 0;
         msFkCostCenterId_n = "";
         mnFkItemRefId_n = 0;
         mnFkUserNewId = 0;
@@ -637,6 +650,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 msTicket = resultSet.getString("de.ticket");
                 mnUserId = resultSet.getInt("de.usr_id");
                 mnSortingPosition = resultSet.getInt("de.sort_pos");
+                mbIsPrepayment = resultSet.getBoolean("de.b_pre_pay");
                 mbIsDiscountRetailChain = resultSet.getBoolean("de.b_disc_retail_chain");
                 mbIsTaxesAutomaticApplying = resultSet.getBoolean("de.b_tax_aut");
                 mbIsPriceVariable = resultSet.getBoolean("de.b_prc_var");
@@ -651,6 +665,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 mnFkDpsAdjustmentSubtypeId = resultSet.getInt("de.fid_stp_dps_adj");
                 mnFkDpsEntryTypeId = resultSet.getInt("de.fid_tp_dps_ety");
                 mnFkVehicleTypeId_n = resultSet.getInt("de.fid_tp_veh_n");
+                mnFkCashCompanyBranchId_n = resultSet.getInt("de.fid_cash_cob_n");
+                mnFkCashAccountId_n = resultSet.getInt("de.fid_cash_acc_n");
                 msFkCostCenterId_n = resultSet.getString("de.fid_cc_n");
                 if (resultSet.wasNull()) {
                     msFkCostCenterId_n = "";
@@ -904,7 +920,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " + 
-                    "?, ?) }");
+                    "?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkDocId);
             callableStatement.setInt(nParam++, mnPkEntryId);
@@ -967,6 +983,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
             callableStatement.setString(nParam++, msTicket);
             callableStatement.setInt(nParam++, mnUserId);
             callableStatement.setInt(nParam++, mnSortingPosition);
+            callableStatement.setBoolean(nParam++, mbIsPrepayment);
             callableStatement.setBoolean(nParam++, mbIsDiscountRetailChain);
             callableStatement.setBoolean(nParam++, mbIsTaxesAutomaticApplying);
             callableStatement.setBoolean(nParam++, mbIsPriceVariable);
@@ -980,9 +997,11 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
             callableStatement.setInt(nParam++, mnFkDpsAdjustmentTypeId);
             callableStatement.setInt(nParam++, mnFkDpsAdjustmentSubtypeId);
             callableStatement.setInt(nParam++, mnFkDpsEntryTypeId);
-            if (mnFkVehicleTypeId_n > 0) callableStatement.setInt(nParam++, mnFkVehicleTypeId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
-            if (msFkCostCenterId_n.length() > 0) callableStatement.setString(nParam++, msFkCostCenterId_n); else callableStatement.setNull(nParam++, java.sql.Types.CHAR);
-            if (mnFkItemRefId_n > 0) callableStatement.setInt(nParam++, mnFkItemRefId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
+            if (mnFkVehicleTypeId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkVehicleTypeId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
+            if (mnFkCashCompanyBranchId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkCashCompanyBranchId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
+            if (mnFkCashAccountId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkCashAccountId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
+            if (msFkCostCenterId_n.length() > SLibConsts.UNDEFINED) callableStatement.setString(nParam++, msFkCostCenterId_n); else callableStatement.setNull(nParam++, java.sql.Types.CHAR);
+            if (mnFkItemRefId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkItemRefId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.INTEGER);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
@@ -1478,6 +1497,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setTicket(msTicket);
         clone.setUserId(mnUserId);
         clone.setSortingPosition(mnSortingPosition);
+        clone.setIsPrepayment(mbIsPrepayment);
         clone.setIsDiscountRetailChain(mbIsDiscountRetailChain);
         clone.setIsTaxesAutomaticApplying(mbIsTaxesAutomaticApplying);
         clone.setIsPriceVariable(mbIsPriceVariable);
@@ -1492,6 +1512,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setFkDpsAdjustmentSubtypeId(mnFkDpsAdjustmentSubtypeId);
         clone.setFkDpsEntryTypeId(mnFkDpsEntryTypeId);
         clone.setFkVehicleTypeId_n(mnFkVehicleTypeId_n);
+        clone.setFkCashCompanyBranchId_n(mnFkCashCompanyBranchId_n);
+        clone.setFkCashAccountId_n(mnFkCashAccountId_n);
         clone.setFkCostCenterId_n(msFkCostCenterId_n);
         clone.setFkItemRefId_n(mnFkItemRefId_n);
         clone.setFkUserNewId(mnFkUserNewId);
