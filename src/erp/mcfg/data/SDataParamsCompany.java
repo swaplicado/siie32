@@ -11,6 +11,7 @@ import erp.lib.SLibUtilities;
 import java.sql.Blob;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import sa.lib.SLibConsts;
 import sa.lib.gui.SGuiConfigCompany;
 
 /**
@@ -71,6 +72,8 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     protected int mnFkDefaultSalesRouteId_n;
     protected int mnFkItemDifferenceExpenseId_n;
     protected int mnFkItemDifferenceIncomeId_n;
+    protected int mnFkItemPrepaymentPurId_n;
+    protected int mnFkItemPrepaymentSalId_n;
     protected int mnFkItemLogisticsDeliveryId_n;
     protected int mnFkItemLogisticsStayId_n;
     protected int mnFkItemLogisticsManeuverId_n;
@@ -161,6 +164,8 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public void setFkDefaultSalesRouteId_n(int n) { mnFkDefaultSalesRouteId_n = n; }
     public void setFkItemDifferenceExpenseId_n(int n) { mnFkItemDifferenceExpenseId_n = n; }
     public void setFkItemDifferenceIncomeId_n(int n) { mnFkItemDifferenceIncomeId_n = n; }
+    public void setFkItemPrepaymentPurId_n(int n) { mnFkItemPrepaymentPurId_n = n; }
+    public void setFkItemPrepaymentSalId_n(int n) { mnFkItemPrepaymentSalId_n = n; }
     public void setFkItemLogisticsDeliveryId_n(int n) { mnFkItemLogisticsDeliveryId_n = n; }
     public void setFkItemLogisticsStayId_n(int n) { mnFkItemLogisticsStayId_n = n; }
     public void setFkItemLogisticsManeuverId_n(int n) { mnFkItemLogisticsManeuverId_n = n; }
@@ -241,6 +246,8 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public int getFkDefaultSalesRouteId_n() { return mnFkDefaultSalesRouteId_n; }
     public int getFkItemDifferenceExpenseId_n() { return mnFkItemDifferenceExpenseId_n; }
     public int getFkItemDifferenceIncomeId_n() { return mnFkItemDifferenceIncomeId_n; }
+    public int getFkItemPrepaymentPurId_n() { return mnFkItemPrepaymentPurId_n; }
+    public int getFkItemPrepaymentSalId_n() { return mnFkItemPrepaymentSalId_n; }
     public int getFkItemLogisticsDeliveryId_n() { return mnFkItemLogisticsDeliveryId_n; }
     public int getFkItemLogisticsStayId_n() { return mnFkItemLogisticsStayId_n; }
     public int getFkItemLogisticsManeuverId_n() { return mnFkItemLogisticsManeuverId_n; }
@@ -343,6 +350,8 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
         mnFkDefaultSalesRouteId_n = 0;
         mnFkItemDifferenceExpenseId_n = 0;
         mnFkItemDifferenceIncomeId_n = 0;
+        mnFkItemPrepaymentPurId_n = 0;
+        mnFkItemPrepaymentSalId_n = 0;
         mnFkItemLogisticsDeliveryId_n = 0;
         mnFkItemLogisticsStayId_n = 0;
         mnFkItemLogisticsManeuverId_n = 0;
@@ -449,6 +458,8 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                 mnFkDefaultSalesRouteId_n = resultSet.getInt("fid_sal_route_n");
                 mnFkItemDifferenceExpenseId_n = resultSet.getInt("fid_item_diff_exp_n");
                 mnFkItemDifferenceIncomeId_n = resultSet.getInt("fid_item_diff_inc_n");
+                mnFkItemPrepaymentPurId_n = resultSet.getInt("fid_item_pre_pay_pur_n");
+                mnFkItemPrepaymentSalId_n = resultSet.getInt("fid_item_pre_pay_sal_n");
                 mnFkItemLogisticsDeliveryId_n = resultSet.getInt("fid_item_log_delivery_n");
                 mnFkItemLogisticsStayId_n = resultSet.getInt("fid_item_log_stay_n");
                 mnFkItemLogisticsManeuverId_n = resultSet.getInt("fid_item_log_maneuver_n");
@@ -541,7 +552,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkConfigCoId);
             callableStatement.setInt(nParam++, mnDaysOfGraceSupplier);
             callableStatement.setInt(nParam++, mnDaysOfGraceCustomer);
@@ -584,36 +595,38 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
             callableStatement.setBoolean(nParam++, mbIsCanEdit);
             callableStatement.setBoolean(nParam++, mbIsCanDelete);
             callableStatement.setBoolean(nParam++, mbIsDeleted);
-            if (mnFkDefaultBookkeepingCenterId_n > 0) callableStatement.setInt(nParam++, mnFkDefaultBookkeepingCenterId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
-            if (mnFkDefaultTaxRegionId_n > 0) callableStatement.setInt(nParam++, mnFkDefaultTaxRegionId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
-            if (mnFkDefaultAddressFormatTypeId_n > 0) callableStatement.setInt(nParam++, mnFkDefaultAddressFormatTypeId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
-            if (mnFkDefaultCustomerTypeId_n > 0) callableStatement.setInt(nParam++, mnFkDefaultCustomerTypeId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
-            if (mnFkDefaultMarketSegmentId_n > 0) callableStatement.setInt(nParam++, mnFkDefaultMarketSegmentId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
-            if (mnFkDefaultMarketSubsegmentId_n > 0) callableStatement.setInt(nParam++, mnFkDefaultMarketSubsegmentId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
-            if (mnFkDefaultDistributionChannelId_n > 0) callableStatement.setInt(nParam++, mnFkDefaultDistributionChannelId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
-            if (mnFkDefaultSalesRouteId_n > 0) callableStatement.setInt(nParam++, mnFkDefaultSalesRouteId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
-            if (mnFkItemDifferenceExpenseId_n > 0) callableStatement.setInt(nParam++, mnFkItemDifferenceExpenseId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
-            if (mnFkItemDifferenceIncomeId_n > 0) callableStatement.setInt(nParam++, mnFkItemDifferenceIncomeId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
-            if (mnFkItemLogisticsDeliveryId_n > 0) callableStatement.setInt(nParam++, mnFkItemLogisticsDeliveryId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
-            if (mnFkItemLogisticsStayId_n > 0) callableStatement.setInt(nParam++, mnFkItemLogisticsStayId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
-            if (mnFkItemLogisticsManeuverId_n > 0) callableStatement.setInt(nParam++, mnFkItemLogisticsManeuverId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
-            if (mnFkItemLogisticsInsuranceId_n > 0) callableStatement.setInt(nParam++, mnFkItemLogisticsInsuranceId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
-            if (mnFkItemLogisticsCustomsExpId_n > 0) callableStatement.setInt(nParam++, mnFkItemLogisticsCustomsExpId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
-            if (mnFkItemLogisticsCustomsImpId_n > 0) callableStatement.setInt(nParam++, mnFkItemLogisticsCustomsImpId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
-            if (mnFkItemLogisticsTariffId_n > 0) callableStatement.setInt(nParam++, mnFkItemLogisticsTariffId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
-            if (mnFkItemLogisticsOtherId_n > 0) callableStatement.setInt(nParam++, mnFkItemLogisticsOtherId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
-            if (mnFkDocNumberSeriesLogisticsId_n > 0) callableStatement.setInt(nParam++, mnFkDocNumberSeriesLogisticsId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
+            if (mnFkDefaultBookkeepingCenterId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkDefaultBookkeepingCenterId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
+            if (mnFkDefaultTaxRegionId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkDefaultTaxRegionId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
+            if (mnFkDefaultAddressFormatTypeId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkDefaultAddressFormatTypeId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
+            if (mnFkDefaultCustomerTypeId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkDefaultCustomerTypeId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
+            if (mnFkDefaultMarketSegmentId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkDefaultMarketSegmentId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
+            if (mnFkDefaultMarketSubsegmentId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkDefaultMarketSubsegmentId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
+            if (mnFkDefaultDistributionChannelId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkDefaultDistributionChannelId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
+            if (mnFkDefaultSalesRouteId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkDefaultSalesRouteId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
+            if (mnFkItemDifferenceExpenseId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkItemDifferenceExpenseId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
+            if (mnFkItemDifferenceIncomeId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkItemDifferenceIncomeId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
+            if (mnFkItemPrepaymentPurId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkItemPrepaymentPurId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
+            if (mnFkItemPrepaymentSalId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkItemPrepaymentSalId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
+            if (mnFkItemLogisticsDeliveryId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkItemLogisticsDeliveryId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
+            if (mnFkItemLogisticsStayId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkItemLogisticsStayId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
+            if (mnFkItemLogisticsManeuverId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkItemLogisticsManeuverId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
+            if (mnFkItemLogisticsInsuranceId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkItemLogisticsInsuranceId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
+            if (mnFkItemLogisticsCustomsExpId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkItemLogisticsCustomsExpId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
+            if (mnFkItemLogisticsCustomsImpId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkItemLogisticsCustomsImpId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
+            if (mnFkItemLogisticsTariffId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkItemLogisticsTariffId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
+            if (mnFkItemLogisticsOtherId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkItemLogisticsOtherId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
+            if (mnFkDocNumberSeriesLogisticsId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkDocNumberSeriesLogisticsId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
             callableStatement.setInt(nParam++, mnFkDpsNatureLogisticsId);
             if (!msFkAccountDifferenceExpenseId_n.isEmpty()) callableStatement.setString(nParam++, msFkAccountDifferenceExpenseId_n); else callableStatement.setNull(nParam++, java.sql.Types.CHAR);
             if (!msFkAccountDifferenceIncomeId_n.isEmpty()) callableStatement.setString(nParam++, msFkAccountDifferenceIncomeId_n); else callableStatement.setNull(nParam++, java.sql.Types.CHAR);
             if (!msFkCostCenterDifferenceExpenseId_n.isEmpty()) callableStatement.setString(nParam++, msFkCostCenterDifferenceExpenseId_n); else callableStatement.setNull(nParam++, java.sql.Types.CHAR);
             if (!msFkCostCenterDifferenceIncomeId_n.isEmpty()) callableStatement.setString(nParam++, msFkCostCenterDifferenceIncomeId_n); else callableStatement.setNull(nParam++, java.sql.Types.CHAR);
-            if (mnFkBasicTaxCharged01Id_n > 0) callableStatement.setInt(nParam++, mnFkBasicTaxCharged01Id_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
-            if (mnFkBasicTaxCharged02Id_n > 0) callableStatement.setInt(nParam++, mnFkBasicTaxCharged02Id_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
-            if (mnFkBasicTaxRetained01Id_n > 0) callableStatement.setInt(nParam++, mnFkBasicTaxRetained01Id_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
-            if (mnFkBasicTaxRetained02Id_n > 0) callableStatement.setInt(nParam++, mnFkBasicTaxRetained02Id_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
+            if (mnFkBasicTaxCharged01Id_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkBasicTaxCharged01Id_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
+            if (mnFkBasicTaxCharged02Id_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkBasicTaxCharged02Id_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
+            if (mnFkBasicTaxRetained01Id_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkBasicTaxRetained01Id_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
+            if (mnFkBasicTaxRetained02Id_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkBasicTaxRetained02Id_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
             callableStatement.setInt(nParam++, mnFkMfgCostUnitTypeId);
-            if (mnFkCertificateId_n > 0) callableStatement.setInt(nParam++, mnFkCertificateId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
+            if (mnFkCertificateId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkCertificateId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
             callableStatement.setInt(nParam++, mnFkXmlTypeId);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
