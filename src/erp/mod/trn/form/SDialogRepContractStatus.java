@@ -397,7 +397,7 @@ public class SDialogRepContractStatus extends SBeanDialogReport implements Chang
 
         if (validation.isValid()) {
             if (moRadioContractStatusByBp.isSelected()) {
-                if (moKeyBizPartner.getSelectedIndex() <= 0){
+                if (moKeyBizPartner.getSelectedIndex() <= 0) {
                     validation.setComponent(moKeyBizPartner);
                     validation.setMessage("El valor para el campo '" + SGuiUtils.getLabelName(jlBizPartner) + "' es requerido.'");
                 }

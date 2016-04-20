@@ -286,7 +286,7 @@ public class SDialogSendMailContract extends sa.lib.gui.bean.SBeanFormDialog imp
         addAllListeners();
     }
     
-    public void actionEnableFields(boolean enable){
+    public void actionEnableFields(boolean enable) {
         moDateStart.setEnabled(enable);
         moDateEnd.setEnabled(enable);
         moIntNumberStart.setEnabled(!enable);
