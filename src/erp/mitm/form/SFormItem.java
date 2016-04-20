@@ -124,6 +124,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.lib.form.SFormField moFieldIsFreeCommissions;
     private erp.lib.form.SFormField moFieldSurplusPercentage;
     private erp.lib.form.SFormField moFieldIsReference;
+    private erp.lib.form.SFormField moFieldIsPrepayment;
     private erp.lib.form.SFormField moFieldFkDefaultItemRefId_n;
     private erp.lib.form.SFormField moFieldFkAdministrativeConceptTypeId;
     private erp.lib.form.SFormField moFieldFkTaxableConceptTypeId;
@@ -316,6 +317,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jlSurplusPercentage = new javax.swing.JLabel();
         jtfSurplusPercentage = new javax.swing.JTextField();
         jckIsReference = new javax.swing.JCheckBox();
+        jckIsPrepayment = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
         jPanel49 = new javax.swing.JPanel();
         jlFkDefaultItemRefId_n = new javax.swing.JLabel();
@@ -1017,6 +1019,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jckIsReference.setText("Referencia obligatoria");
         jPanel39.add(jckIsReference);
 
+        jckIsPrepayment.setText("Es anticipo");
+        jPanel39.add(jckIsPrepayment);
+
         jpConfig1.add(jPanel39, java.awt.BorderLayout.CENTER);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración para contabilización:"));
@@ -1180,7 +1185,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jtfPkItemId_Ro.setEditable(false);
         jtfPkItemId_Ro.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfPkItemId_Ro.setToolTipText("ID del ítem");
+        jtfPkItemId_Ro.setToolTipText("ID del registro");
         jtfPkItemId_Ro.setFocusable(false);
         jtfPkItemId_Ro.setPreferredSize(new java.awt.Dimension(65, 23));
         jPanel13.add(jtfPkItemId_Ro);
@@ -1367,6 +1372,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldSurplusPercentage.setTabbedPaneIndex(1, jTabbedPane);
         moFieldIsReference = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsReference);
         moFieldIsReference.setTabbedPaneIndex(1, jTabbedPane);
+        moFieldIsPrepayment = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsPrepayment);
+        moFieldIsPrepayment.setTabbedPaneIndex(1, jTabbedPane);
         moFieldFkDefaultItemRefId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkDefaultItemRefId_n, jlFkDefaultItemRefId_n);
         moFieldFkDefaultItemRefId_n.setPickerButton(jbFkDefaultItemRefId_n);
         moFieldFkDefaultItemRefId_n.setTabbedPaneIndex(1, jTabbedPane);
@@ -1439,6 +1446,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         mvFields.add(moFieldIsFreeCommissions);
         mvFields.add(moFieldSurplusPercentage);
         mvFields.add(moFieldIsReference);
+        mvFields.add(moFieldIsPrepayment);
         mvFields.add(moFieldFkDefaultItemRefId_n);
         mvFields.add(moFieldFkAdministrativeConceptTypeId);
         mvFields.add(moFieldFkTaxableConceptTypeId);
@@ -2679,6 +2687,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JCheckBox jckIsLotApplying;
     private javax.swing.JCheckBox jckIsMassVariable;
     private javax.swing.JCheckBox jckIsNetContentVariable;
+    private javax.swing.JCheckBox jckIsPrepayment;
     private javax.swing.JCheckBox jckIsReference;
     private javax.swing.JCheckBox jckIsSurfaceVariable;
     private javax.swing.JCheckBox jckIsVolumeVariable;
@@ -3003,6 +3012,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldIsFreeCommissions.setFieldValue(moItem.getIsFreeCommissions());
         moFieldSurplusPercentage.setFieldValue(moItem.getSurplusPercentage());
         moFieldIsReference.setFieldValue(moItem.getIsReference());
+        moFieldIsPrepayment.setFieldValue(moItem.getIsPrepayment());
         moFieldFkDefaultItemRefId_n.setFieldValue(new int[] { moItem.getFkDefaultItemRefId_n() });
         moFieldFkAdministrativeConceptTypeId.setFieldValue(new int[] { moItem.getFkAdministrativeConceptTypeId() });
         moFieldFkTaxableConceptTypeId.setFieldValue(new int[] { moItem.getFkTaxableConceptTypeId() });
@@ -3129,6 +3139,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moItem.setIsFreeCommissions(moFieldIsFreeCommissions.getBoolean());
         moItem.setSurplusPercentage(moFieldSurplusPercentage.getDouble());
         moItem.setIsReference(moFieldIsReference.getBoolean());
+        moItem.setIsPrepayment(moFieldIsPrepayment.getBoolean());
         moItem.setFkDefaultItemRefId_n(jcbFkDefaultItemRefId_n.getSelectedIndex() <= 0 ? 0 : moFieldFkDefaultItemRefId_n.getKeyAsIntArray()[0]);
         moItem.setFkAdministrativeConceptTypeId(moFieldFkAdministrativeConceptTypeId.getKeyAsIntArray()[0]);
         moItem.setFkTaxableConceptTypeId(moFieldFkTaxableConceptTypeId.getKeyAsIntArray()[0]);
