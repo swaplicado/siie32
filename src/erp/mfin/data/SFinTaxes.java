@@ -13,12 +13,12 @@ import java.util.Vector;
  *
  * @author Sergio Flores
  */
-public class SFinanceTaxes {
+public class SFinTaxes {
 
     private java.sql.Statement moStatement;
-    private java.util.Vector<erp.mfin.data.SFinanceTaxes.STax> mvTaxes;
+    private java.util.Vector<erp.mfin.data.SFinTaxes.STax> mvTaxes;
 
-    public SFinanceTaxes(java.sql.Statement statement) {
+    public SFinTaxes(java.sql.Statement statement) {
         moStatement = statement;
         mvTaxes = new Vector<STax>();
     }
@@ -27,7 +27,7 @@ public class SFinanceTaxes {
         mvTaxes.clear();
     }
 
-    public java.util.Vector<erp.mfin.data.SFinanceTaxes.STax> getTaxes() { return mvTaxes; }
+    public java.util.Vector<erp.mfin.data.SFinTaxes.STax> getTaxes() { return mvTaxes; }
 
     public void addTax(int[] auxDpsAuxKey, int[] taxKey, double value, double valueCy) throws java.lang.Exception {
         STax tax = getTax(auxDpsAuxKey, taxKey);
@@ -54,7 +54,7 @@ public class SFinanceTaxes {
         tax.addValueCy(valueCy);
     }
 
-    public erp.mfin.data.SFinanceTaxes.STax getTax(int[] auxDpsKey, int[] taxKey) {
+    public erp.mfin.data.SFinTaxes.STax getTax(int[] auxDpsKey, int[] taxKey) {
         STax tax = null;
 
         for (STax t : mvTaxes) {

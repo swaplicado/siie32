@@ -1135,7 +1135,7 @@ public abstract class SFinUtilities {
         resultSet = client.getSession().getStatement().executeQuery(sql);
         keys = new ArrayList<>();
         
-        while (resultSet.next()){
+        while (resultSet.next()) {
             key = new Object[6];
             key[0] = resultSet.getInt("id_year");
             key[1] = resultSet.getInt("id_per"); 
