@@ -19,6 +19,7 @@ import java.util.HashMap;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
+import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiSession;
 
@@ -175,7 +176,7 @@ public abstract class STrnUtils {
         return key;
     }
     
-    public static boolean existDpsItemConfiguration(final SGuiSession session, final int[] dpsTypeId, final int itemId) throws Exception {
+    public static boolean existDpsItemConfig(final SGuiSession session, final int[] keyDpsType, final int idItem) throws Exception {
         String sql = "";
         boolean exists = false;
         ArrayList<int[]> linkTypes = new ArrayList<>();
@@ -188,9 +189,9 @@ public abstract class STrnUtils {
 
         sql = "SELECT fk_tp_link, fk_ref " 
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_DPS_SRC_ITEM) + " "
-                + "WHERE b_del = 0 AND id_ct_dps = " + dpsTypeId[0] + " AND "
-                + "id_cl_dps = " + dpsTypeId[1]  + " AND "
-                + "id_tp_dps = " + dpsTypeId[2]  + " " 
+                + "WHERE b_del = 0 AND id_ct_dps = " + keyDpsType[0] + " AND "
+                + "id_cl_dps = " + keyDpsType[1]  + " AND "
+                + "id_tp_dps = " + keyDpsType[2]  + " " 
                 + "ORDER BY fk_tp_link ASC; ";
         resultSet = statement.executeQuery(sql);
         while (resultSet.next()) {
@@ -207,52 +208,52 @@ public abstract class STrnUtils {
                     sql = "SELECT c.id_ct_dps, c.id_cl_dps, c.id_tp_dps, c.id_cfg, c.fk_tp_link, c.fk_ref "
                             + "FROM " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_DPS_SRC_ITEM) + " AS c "
                             + "INNER JOIN erp.itmu_item AS i ON c.fk_ref = i.id_item "
-                            + "WHERE c.b_del = 0 AND i.id_item = " + itemId + " AND c.id_ct_dps = " + dpsTypeId[0] + " AND "
-                            + "c.id_cl_dps = " + dpsTypeId[1]  + " AND "
-                            + "c.id_tp_dps = " + dpsTypeId[2]  + "; ";
+                            + "WHERE c.b_del = 0 AND i.id_item = " + idItem + " AND c.id_ct_dps = " + keyDpsType[0] + " AND "
+                            + "c.id_cl_dps = " + keyDpsType[1]  + " AND "
+                            + "c.id_tp_dps = " + keyDpsType[2]  + "; ";
                     break;
 
                 case SDataConstantsSys.TRNS_TP_LINK_MFR:
                     sql = "SELECT c.id_ct_dps, c.id_cl_dps, c.id_tp_dps, c.id_cfg, c.fk_tp_link, c.fk_ref "
                             + "FROM " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_DPS_SRC_ITEM) + " AS c, erp.itmu_mfr AS mfr "
                             + "INNER JOIN erp.itmu_item AS i ON mfr.id_mfr = i.fid_mfr "
-                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND i.fid_mfr = " + linkType[1] + " AND c.id_ct_dps = " + dpsTypeId[0] + " AND "
-                            + "c.id_cl_dps = " + dpsTypeId[1]  + " AND "
-                            + "c.id_tp_dps = " + dpsTypeId[2]  + "; ";
+                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + idItem + " AND i.fid_mfr = " + linkType[1] + " AND c.id_ct_dps = " + keyDpsType[0] + " AND "
+                            + "c.id_cl_dps = " + keyDpsType[1]  + " AND "
+                            + "c.id_tp_dps = " + keyDpsType[2]  + "; ";
                     break;
 
                 case SDataConstantsSys.TRNS_TP_LINK_BRD:
                     sql = "SELECT c.id_ct_dps, c.id_cl_dps, c.id_tp_dps, c.id_cfg, c.fk_tp_link, c.fk_ref "
                             + "FROM " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_DPS_SRC_ITEM) + " AS c, erp.itmu_brd AS brd "
                             + "INNER JOIN erp.itmu_item AS i ON brd.id_brd = i.fid_brd "
-                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND i.fid_brd = " + linkType[1] + " AND c.id_ct_dps = " + dpsTypeId[0] + " AND "
-                            + "c.id_cl_dps = " + dpsTypeId[1]  + " AND "
-                            + "c.id_tp_dps = " + dpsTypeId[2]  + "; ";
+                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + idItem + " AND i.fid_brd = " + linkType[1] + " AND c.id_ct_dps = " + keyDpsType[0] + " AND "
+                            + "c.id_cl_dps = " + keyDpsType[1]  + " AND "
+                            + "c.id_tp_dps = " + keyDpsType[2]  + "; ";
                     break;
                 case SDataConstantsSys.TRNS_TP_LINK_LINE:
                     sql = "SELECT c.id_ct_dps, c.id_cl_dps, c.id_tp_dps, c.id_cfg, c.fk_tp_link, c.fk_ref "
                             + "FROM " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_DPS_SRC_ITEM) + " AS c, erp.itmu_line AS l "
                             + "INNER JOIN erp.itmu_item AS i ON l.id_line = i.fid_line_n "
-                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND i.fid_line_n = " + linkType[1] + " AND c.id_ct_dps = " + dpsTypeId[0] + " AND "
-                            + "c.id_cl_dps = " + dpsTypeId[1]  + " AND "
-                            + "c.id_tp_dps = " + dpsTypeId[2]  + "; ";
+                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + idItem + " AND i.fid_line_n = " + linkType[1] + " AND c.id_ct_dps = " + keyDpsType[0] + " AND "
+                            + "c.id_cl_dps = " + keyDpsType[1]  + " AND "
+                            + "c.id_tp_dps = " + keyDpsType[2]  + "; ";
                     break;
                 case SDataConstantsSys.TRNS_TP_LINK_IGEN:
                     sql = "SELECT c.id_ct_dps, c.id_cl_dps, c.id_tp_dps, c.id_cfg, c.fk_tp_link, c.fk_ref "
                             + "FROM " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_DPS_SRC_ITEM) + " AS c, erp.itmu_igen AS g "
                             + "INNER JOIN erp.itmu_item AS i ON g.id_igen = i.fid_igen "
-                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND i.fid_igen = " + linkType[1] + " AND c.id_ct_dps = " + dpsTypeId[0] + " AND "
-                            + "c.id_cl_dps = " + dpsTypeId[1]  + " AND "
-                            + "c.id_tp_dps = " + dpsTypeId[2]  + "; ";
+                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + idItem + " AND i.fid_igen = " + linkType[1] + " AND c.id_ct_dps = " + keyDpsType[0] + " AND "
+                            + "c.id_cl_dps = " + keyDpsType[1]  + " AND "
+                            + "c.id_tp_dps = " + keyDpsType[2]  + "; ";
                     break;
                 case SDataConstantsSys.TRNS_TP_LINK_IGRP:
                     sql = "SELECT c.id_ct_dps, c.id_cl_dps, c.id_tp_dps, c.id_cfg, c.fk_tp_link, c.fk_ref "
                             + "FROM " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_DPS_SRC_ITEM) + " AS c, erp.itmu_igrp AS grp "
                             + "INNER JOIN erp.itmu_igen AS gen ON grp.id_igrp = gen.fid_igrp "
                             + "INNER JOIN erp.itmu_item AS i ON gen.id_igen = i.fid_igen "
-                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND gen.fid_igrp = " + linkType[1] + " AND c.id_ct_dps = " + dpsTypeId[0] + " AND "
-                            + "c.id_cl_dps = " + dpsTypeId[1]  + " AND "
-                            + "c.id_tp_dps = " + dpsTypeId[2]  + "; ";
+                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + idItem + " AND gen.fid_igrp = " + linkType[1] + " AND c.id_ct_dps = " + keyDpsType[0] + " AND "
+                            + "c.id_cl_dps = " + keyDpsType[1]  + " AND "
+                            + "c.id_tp_dps = " + keyDpsType[2]  + "; ";
                     break;
                 case SDataConstantsSys.TRNS_TP_LINK_IFAM:
                     sql = "SELECT c.id_ct_dps, c.id_cl_dps, c.id_tp_dps, c.id_cfg, c.fk_tp_link, c.fk_ref "
@@ -260,36 +261,36 @@ public abstract class STrnUtils {
                             + "INNER JOIN erp.itmu_igrp AS grp ON fam.id_ifam = grp.fid_ifam "
                             + "INNER JOIN erp.itmu_igen AS gen ON gen.fid_igrp = grp.id_igrp "
                             + "INNER JOIN erp.itmu_item AS i ON gen.id_igen = i.fid_igen "
-                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND grp.fid_ifam = " + linkType[1] + " AND c.id_ct_dps = " + dpsTypeId[0] + " AND "
-                            + "c.id_cl_dps = " + dpsTypeId[1]  + " AND "
-                            + "c.id_tp_dps = " + dpsTypeId[2]  + "; ";
+                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + idItem + " AND grp.fid_ifam = " + linkType[1] + " AND c.id_ct_dps = " + keyDpsType[0] + " AND "
+                            + "c.id_cl_dps = " + keyDpsType[1]  + " AND "
+                            + "c.id_tp_dps = " + keyDpsType[2]  + "; ";
                     break;
                 case SDataConstantsSys.TRNS_TP_LINK_TP_ITEM:
                     sql = "SELECT c.id_ct_dps, c.id_cl_dps, c.id_tp_dps, c.id_cfg, c.fk_tp_link, c.fk_ref "
                             + "FROM " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_DPS_SRC_ITEM) + " AS c, erp.itms_tp_item AS tp "
                             + "INNER JOIN erp.itmu_igen AS gen ON gen.fid_tp_item = tp.id_tp_item "
                             + "INNER JOIN erp.itmu_item AS i ON gen.id_igen = i.fid_igen "
-                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND gen.fid_tp_item = " + linkType[1] + " AND c.id_ct_dps = " + dpsTypeId[0] + " AND "
-                            + "c.id_cl_dps = " + dpsTypeId[1]  + " AND "
-                            + "c.id_tp_dps = " + dpsTypeId[2]  + "; ";
+                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + idItem + " AND gen.fid_tp_item = " + linkType[1] + " AND c.id_ct_dps = " + keyDpsType[0] + " AND "
+                            + "c.id_cl_dps = " + keyDpsType[1]  + " AND "
+                            + "c.id_tp_dps = " + keyDpsType[2]  + "; ";
                     break;
                 case SDataConstantsSys.TRNS_TP_LINK_CL_ITEM:
                     sql = "SELECT c.id_ct_dps, c.id_cl_dps, c.id_tp_dps, c.id_cfg, c.fk_tp_link, c.fk_ref "
                             + "FROM " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_DPS_SRC_ITEM) + " AS c, erp.itms_cl_item AS cl "
                             + "INNER JOIN erp.itmu_igen AS gen ON gen.fid_cl_item = cl.id_cl_item "
                             + "INNER JOIN erp.itmu_item AS i ON gen.id_igen = i.fid_igen "
-                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND gen.fid_cl_item = " + linkType[1] + " AND c.id_ct_dps = " + dpsTypeId[0] + " AND "
-                            + "c.id_cl_dps = " + dpsTypeId[1]  + " AND "
-                            + "c.id_tp_dps = " + dpsTypeId[2]  + "; ";
+                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + idItem + " AND gen.fid_cl_item = " + linkType[1] + " AND c.id_ct_dps = " + keyDpsType[0] + " AND "
+                            + "c.id_cl_dps = " + keyDpsType[1]  + " AND "
+                            + "c.id_tp_dps = " + keyDpsType[2]  + "; ";
                     break;
                 case SDataConstantsSys.TRNS_TP_LINK_CT_ITEM:
                     sql = "SELECT c.id_ct_dps, c.id_cl_dps, c.id_tp_dps, c.id_cfg, c.fk_tp_link, c.fk_ref "
                             + "FROM " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_DPS_SRC_ITEM) + " AS c, erp.itms_ct_item AS ct "
                             + "INNER JOIN erp.itmu_igen AS gen ON gen.fid_ct_item = ct.id_ct_item "
                             + "INNER JOIN erp.itmu_item AS i ON gen.id_igen = i.fid_igen "
-                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND gen.fid_ct_item = " + linkType[1] + " AND c.id_ct_dps = " + dpsTypeId[0] + " AND "
-                            + "c.id_cl_dps = " + dpsTypeId[1]  + " AND "
-                            + "c.id_tp_dps = " + dpsTypeId[2]  + "; ";
+                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + idItem + " AND gen.fid_ct_item = " + linkType[1] + " AND c.id_ct_dps = " + keyDpsType[0] + " AND "
+                            + "c.id_cl_dps = " + keyDpsType[1]  + " AND "
+                            + "c.id_tp_dps = " + keyDpsType[2]  + "; ";
                     break;
 
                 case SDataConstantsSys.TRNS_TP_LINK_ALL:
@@ -311,24 +312,36 @@ public abstract class STrnUtils {
         return exists; 
     }
     
-    public static boolean canBeUsedItemDps(final SGuiSession session, final int[] dpsTypeId, final int itemId, final boolean hasDpsPrevious) throws Exception {
-        boolean can = false;
-        String item = "";
+    
+    /**
+     * Gets 
+     */
+    public static double getPrepayments(final SGuiSession session, final int idBizPartner, final int[] keyDps) throws Exception {
+        double balance = 0;
         String sql = "";
         ResultSet resultSet = null;
-
-        sql = "SELECT item FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " "
-                + "WHERE id_item = " + itemId + " ";
-
+        
+        sql = "SELECT COALESCE(SUM(de.stot_r), 0.0) "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc "
+                + "WHERE d.fid_bp_r = " + idBizPartner + " AND de.b_pre_pay = 1 AND "
+                + "NOT(d.id_year = " + keyDps[0] + " AND d.id_doc = " + keyDps[1] + ") AND d.b_del = 0 AND de.b_del = 0; ";
         resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next()) {
-            item = resultSet.getString("item");
+            balance = resultSet.getDouble(1);
         }
         
-        can = existDpsItemConfiguration(session, dpsTypeId, itemId);
+        return balance;
+    }
+    
+    /**
+     * Checks if item needs to be added to document from source document.
+     */
+    public static boolean checkItemStandaloneDoc(final SGuiSession session, final int[] keyDpsType, final int idItem, final boolean hasSourceDps) throws Exception {
+        boolean can = existDpsItemConfig(session, keyDpsType, idItem);
 
-        if (can && !hasDpsPrevious) {
-            throw new Exception("El ítem '" +  item + "' requiere ser agregado desde un documento origen.");
+        if (can && !hasSourceDps) {
+            throw new Exception("El ítem '" + (String) session.readField(SModConsts.ITMU_ITEM, new int[] { idItem }, SDbRegistry.FIELD_NAME) + "' necesita ser agregado desde un documento origen.");
         }
         
         return true;

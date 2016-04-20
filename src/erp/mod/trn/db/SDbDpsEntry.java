@@ -84,6 +84,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
     protected String msTicket;
     protected int mnUserId;
     protected int mnSortingPosition;
+    protected boolean mbIsPrepayment;
     protected boolean mbIsDiscountRetailChain;
     protected boolean mbIsTaxesAutomaticApplying;
     protected boolean mbIsPriceVariable;
@@ -179,6 +180,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
     public void setTicket(String s) { msTicket = s; }
     public void setUserId(int n) { mnUserId = n; }
     public void setSortingPosition(int n) { mnSortingPosition = n; }
+    public void setIsPrepayment(boolean b) { mbIsPrepayment = b; }
     public void setIsDiscountRetailChain(boolean b) { mbIsDiscountRetailChain = b; }
     public void setIsTaxesAutomaticApplying(boolean b) { mbIsTaxesAutomaticApplying = b; }
     public void setIsPriceVariable(boolean b) { mbIsPriceVariable = b; }
@@ -264,6 +266,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
     public String getTicket() { return msTicket; }
     public int getUserId() { return mnUserId; }
     public int getSortingPosition() { return mnSortingPosition; }
+    public boolean getIsPrepayment() { return mbIsPrepayment; }
     public boolean getIsDiscountRetailChain() { return mbIsDiscountRetailChain; }
     public boolean getIsTaxesAutomaticApplying() { return mbIsTaxesAutomaticApplying; }
     public boolean getIsPriceVariable() { return mbIsPriceVariable; }
@@ -369,6 +372,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
         msTicket = "";
         mnUserId = 0;
         mnSortingPosition = 0;
+        mbIsPrepayment = false;
         mbIsDiscountRetailChain = false;
         mbIsTaxesAutomaticApplying = false;
         mbIsPriceVariable = false;
@@ -498,6 +502,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
             msTicket = resultSet.getString("ticket");
             mnUserId = resultSet.getInt("usr_id");
             mnSortingPosition = resultSet.getInt("sort_pos");
+            mbIsPrepayment = resultSet.getBoolean("b_pre_pay");
             mbIsDiscountRetailChain = resultSet.getBoolean("b_disc_retail_chain");
             mbIsTaxesAutomaticApplying = resultSet.getBoolean("b_tax_aut");
             mbIsPriceVariable = resultSet.getBoolean("b_prc_var");
