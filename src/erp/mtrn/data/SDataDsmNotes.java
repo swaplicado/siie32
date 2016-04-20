@@ -36,7 +36,7 @@ public class SDataDsmNotes extends erp.lib.data.SDataRegistry implements java.io
     protected java.lang.String msDbmsUserEdit;
     protected java.lang.String msDbmsUserDelete;
 
-    public SDataDsmNotes (){
+    public SDataDsmNotes () {
         super(SDataConstants.TRN_DSM_NTS);
         
         reset();

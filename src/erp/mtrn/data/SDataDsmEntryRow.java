@@ -16,7 +16,7 @@ import erp.lib.SLibUtilities;
  */
 public class SDataDsmEntryRow extends erp.lib.table.STableRow {
 
-    public SDataDsmEntryRow(java.lang.Object data){
+    public SDataDsmEntryRow(java.lang.Object data) {
         moData = data;
         prepareTableRow();
     }

@@ -19,6 +19,7 @@ import java.sql.Statement;
 import java.util.Date;
 import java.util.Vector;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -98,7 +99,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
             //System.out.println("msDbmsSubsystemTypeBiz: " + msDbmsSubsystemTypeBiz);
             //System.out.println("msDbmsCompanyBranchCode: " + msDbmsCompanyBranchCode);
             //System.out.println("mtDate: " + mtDate.toString());
-            sConcept = msDbmsSubsystemTypeBiz + "; " + msDbmsCompanyBranchCode + "; " + moDateFormat.format(mtDate).toString();
+            sConcept = msDbmsSubsystemTypeBiz + "; " + msDbmsCompanyBranchCode + "; " + SLibUtils.DateFormatDate.format(mtDate).toString();
 
             // 4.2.2 Save accounting record:
 
@@ -209,7 +210,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
             oRecord.setFkUserNewId(mnFkUserNewId);
             oRecord.setFkUserEditId(mnFkUserEditId);
             oRecord.setFkUserDeleteId(mnFkUserEditId);
-            oRecord.setConcept(msDbmsSubsystemTypeBiz + "; " + msDbmsCompanyBranchCode + "; " + moDateFormat.format(mtDate).toString());
+            oRecord.setConcept(msDbmsSubsystemTypeBiz + "; " + msDbmsCompanyBranchCode + "; " + SLibUtils.DateFormatDate.format(mtDate).toString());
             //System.out.println("A1");
             if (oRecord.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
@@ -271,7 +272,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                      * Version 1.0
                      *
                     sConcept = msDbmsSubsystemTypeBiz + "; " + msDbmsCompanyBranchCode + "; " +
-                            moDateFormat.format(mtDate).toString() + "; " + oDsmEntry.getDbmsSubclassMove() + "; " +
+                            SLibUtils.DateFormatDate.format(mtDate).toString() + "; " + oDsmEntry.getDbmsSubclassMove() + "; " +
                             renderSubsystemSourceToDestiny(oDsmEntry) + "; " +
                             oDsmEntry.getDbmsBiz();
                     */
@@ -1851,7 +1852,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
 
         /*
-        switch (pos){
+        switch (pos) {
             case 0:
                 switch (typeAccSys) {
                     case SDataConstantsSys.FINS_TP_ACC_SYS_SUP:

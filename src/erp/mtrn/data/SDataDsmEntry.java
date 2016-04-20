@@ -75,7 +75,7 @@ public class SDataDsmEntry extends erp.lib.data.SDataRegistry implements java.io
 
     protected java.util.Vector<erp.mtrn.data.SDataDsmEntryNotes> mvDbmsDsmEntryNotes;
 
-    public SDataDsmEntry (){
+    public SDataDsmEntry () {
         super(SDataConstants.TRN_DSM_ETY);
 
         mvDbmsDsmEntryNotes = new Vector<SDataDsmEntryNotes>();

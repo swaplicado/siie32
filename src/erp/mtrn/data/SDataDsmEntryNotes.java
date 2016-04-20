@@ -37,7 +37,7 @@ public class SDataDsmEntryNotes extends erp.lib.data.SDataRegistry implements ja
     protected java.lang.String msDbmsUserEdit;
     protected java.lang.String msDbmsUserDelete;
 
-    public SDataDsmEntryNotes (){
+    public SDataDsmEntryNotes () {
         super(SDataConstants.TRN_DSM_ETY_NTS);
         
         reset();

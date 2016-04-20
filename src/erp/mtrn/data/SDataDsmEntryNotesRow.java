@@ -13,7 +13,7 @@ import erp.mtrn.data.SDataDsmEntryNotes;
  */
 public class SDataDsmEntryNotesRow extends erp.lib.table.STableRow {
 
-    public SDataDsmEntryNotesRow(java.lang.Object data){
+    public SDataDsmEntryNotesRow(java.lang.Object data) {
         moData = data;
         
         prepareTableRow();
