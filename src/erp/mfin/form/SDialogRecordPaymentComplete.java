@@ -24,8 +24,8 @@ import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mfin.data.SDataAccountCash;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
-import erp.mfin.data.SFinanceAccountConfig;
-import erp.mfin.data.SFinanceUtilities;
+import erp.mfin.data.SFinAccountConfigEntry;
+import erp.mfin.data.SFinAccountUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SDbBizPartner;
@@ -1527,7 +1527,7 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
         }
         if (!validation.getIsError()) {
             try {
-                Vector<SFinanceAccountConfig> config = SFinanceUtilities.obtainBizPartnerAccountConfigs(miClient, moDps.getFkBizPartnerId_r(), mnBizPartnerCategoryId,
+                Vector<SFinAccountConfigEntry> config = SFinAccountUtilities.obtainBizPartnerAccountConfigs(miClient, moDps.getFkBizPartnerId_r(), mnBizPartnerCategoryId,
                         moParamRecord.getPkBookkeepingCenterId(), moParamRecord.getDate(), SDataConstantsSys.FINS_TP_ACC_BP_OP, moDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL);
                 if (config == null) {
                     validation.setMessage("No se encuentra la cuenta contable del asociado de negocio");
@@ -1618,7 +1618,7 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
         oDsmEntry.setDbmsFkBizPartnerBranchId_n(moDps.getFkBizPartnerBranchId());
 
         try {
-            Vector<SFinanceAccountConfig> config = SFinanceUtilities.obtainBizPartnerAccountConfigs(miClient, moDps.getFkBizPartnerId_r(), mnBizPartnerCategoryId,
+            Vector<SFinAccountConfigEntry> config = SFinAccountUtilities.obtainBizPartnerAccountConfigs(miClient, moDps.getFkBizPartnerId_r(), mnBizPartnerCategoryId,
                     moParamRecord.getPkBookkeepingCenterId(), moParamRecord.getDate(), SDataConstantsSys.FINS_TP_ACC_BP_OP, moDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL);
             if (config.size() > 0) {
                 oDsmEntry.setDbmsAccountOp(config.get(0).getAccountId());
@@ -1647,7 +1647,6 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
         oDsm.setDbmsFkCompanyBranch(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getPkBizPartnerBranchId());
         oDsm.setDbmsCompanyBranchCode(branch.getCode());
         oDsm.setDbmsErpDecimalsValue(miClient.getSessionXXX().getParamsErp().getDecimalsValue());
-        oDsm.setDateFormat(miClient.getSessionXXX().getFormatters().getDateFormat());
         oDsm.setDbmsIsRecordSaved(false);
         oDsm.getDbmsEntry().add(oDsmEntry);
 
