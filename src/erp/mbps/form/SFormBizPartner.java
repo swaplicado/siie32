@@ -557,6 +557,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckIsAttEmployee.setText("Es empleado");
+        jckIsAttEmployee.setEnabled(false);
         jckIsAttEmployee.setPreferredSize(new java.awt.Dimension(115, 23));
         jckIsAttEmployee.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -1497,12 +1498,6 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jtfNotes.setEnabled(enable);
     }
     
-    private void setFieldEnableEmployee(boolean enable) {
-        jckIsAttEmployee.setEnabled(enable);
-        jckIsCategoryDeleted.setEnabled(enable || (mnParamBizPartnerCategoryFilter == SDataConstantsSys.BPSS_CT_BP_SUP || mnParamBizPartnerCategoryFilter == SDataConstantsSys.BPSS_CT_BP_CUS));
-        jckIsDeleted.setEnabled(enable);
-    }
-
     private void setIconCategory() {
         jlIconSupplier.setIcon(moBizPartner == null ? mnParamBizPartnerType == SDataConstants.BPSX_BP_SUP ? moIconHasCategorySup : moIconHasNotCategory : moBizPartner.getIsSupplier() || mnParamBizPartnerType == SDataConstants.BPSX_BP_SUP ? moIconHasCategorySup : moIconHasNotCategory);
         jlIconCustomer.setIcon(moBizPartner == null ? mnParamBizPartnerType == SDataConstants.BPSX_BP_CUS ? moIconHasCategoryCus : moIconHasNotCategory : moBizPartner.getIsCustomer() || mnParamBizPartnerType == SDataConstants.BPSX_BP_CUS ? moIconHasCategoryCus : moIconHasNotCategory);
@@ -2312,7 +2307,6 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         jckIsDeleted.setEnabled(false);
         jckIsCategoryDeleted.setEnabled(false);
-        setFieldEnableEmployee(false);
     }
 
     @Override
@@ -2687,8 +2681,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         }
 
         jckIsDeleted.setEnabled(true);
-        jckIsCategoryDeleted.setEnabled(true);
-        setFieldEnableEmployee(moBizPartner.getDbmsDataEmployee() == null);
+        jckIsCategoryDeleted.setEnabled(moBizPartner.getDbmsDataEmployee() == null || (moBizPartner.getDbmsDataEmployee() != null && (mnParamBizPartnerCategoryFilter == SDataConstantsSys.BPSS_CT_BP_SUP || mnParamBizPartnerCategoryFilter == SDataConstantsSys.BPSS_CT_BP_CUS)));
     }
 
     @Override

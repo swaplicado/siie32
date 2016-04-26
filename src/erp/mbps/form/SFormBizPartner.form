@@ -549,6 +549,7 @@
                             <Component class="javax.swing.JCheckBox" name="jckIsAttEmployee">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Es empleado"/>
+                                <Property name="enabled" type="boolean" value="false"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[115, 23]"/>
                                 </Property>
