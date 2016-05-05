@@ -412,6 +412,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         sql = "DELETE FROM mkt_comms WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";
         statement.execute(sql);
     }
+    
+    private void clearEntryDeliveryReferences(java.sql.Statement statement) throws java.sql.SQLException {
+        String sql = "UPDATE trn_dps_ety SET con_prc_year = 0, con_prc_mon = 0 WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId;
+        statement.execute(sql);
+    }
 
     private java.lang.String getAccountingRecordType() {
         String type = "";
@@ -2951,6 +2956,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     }
 
                     deleteLinks(oStatement);
+                    clearEntryDeliveryReferences(oStatement);
 
                     mnLastDbActionResult = SLibConstants.DB_ACTION_DELETE_OK;
                 }
@@ -4851,8 +4857,14 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 SLibUtilities.renderException(this, e);
             }
         }
+        
         if (!setCfgEmail.isEmpty()) {
-            client.showMsgBoxInformation("Se enviará correo de notificación a los destinatarios requeridos.");
+            msg = "Se enviará correo de notificación a los siguientes destinatarios:";
+            
+            for (String email : setCfgEmail) {
+                msg += "\n" + email;
+            }
+            client.showMsgBoxInformation(msg);
         }
         else {
             send = false;
