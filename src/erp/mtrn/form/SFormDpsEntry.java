@@ -34,6 +34,7 @@ import erp.mitm.data.SDataUnitType;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.itm.db.SItmConsts;
+import erp.mod.trn.db.STrnConsts;
 import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsDpsAdjustment;
@@ -68,7 +69,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author  Sergio Flores
+ * @author  Sergio Flores, Juan Barajas, Irving Sánchez, Gerardo Hernández
  */
 public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, javax.swing.event.CellEditorListener {
     
@@ -184,8 +185,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private boolean mbIsLastPrc;
     private erp.mmkt.data.SParamsItemPriceList moParamsItemPriceList;
     
-    private int mnAuxPriceEditIndex;
-    private SDataDpsEntryPrice moAuxPriceEdit;
+    private int mnAuxEntryPriceAction;
+    private int mnAuxEntryPriceEditedIndex;
+    private SDataDpsEntryPrice moAuxEntryPriceEdited;
 
     /** Creates new form DFormDpsEntry */
     public SFormDpsEntry(erp.client.SClientInterface client) {
@@ -2270,7 +2272,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     textField == jtfOriginalQuantity || textField == jtfOriginalPriceUnitaryCy || textField == jtfOriginalDiscountUnitaryCy ||
                     textField == jtfDiscountEntryCy || textField == jtfDiscountDocCy;
     }
-
+    
     private void calculateTotal() {
         int i = 0;
 
@@ -3373,9 +3375,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     }
 
     private void actionPriceNew() {
-        mnAuxPriceEditIndex = -1;
+        mnAuxEntryPriceAction = STrnConsts.ACTION_NEW;
+        mnAuxEntryPriceEditedIndex = -1;
         
-        moAuxPriceEdit = new SDataDpsEntryPrice();
+        moAuxEntryPriceEdited = new SDataDpsEntryPrice();
         
         if (jbGridPriceNew.isEnabled() || jbPriceNew.isEnabled()) {
             enableDeliveryPriceButtonFields(false);
@@ -3396,71 +3399,69 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             }
 
             calculateEntryPrice();
-            moAuxPriceEdit.setOriginalPriceUnitaryCySystem(moFieldPriceOriginalPriceUnitaryCy.getDouble());
+            moAuxEntryPriceEdited.setOriginalPriceUnitaryCySystem(moFieldPriceOriginalPriceUnitaryCy.getDouble());
             jtfContractPriceNumbrerReference.requestFocus();
         }
     }
 
     private void actionPriceEdit() {
         if (jbGridPriceEdit.isEnabled()) {
-            mnAuxPriceEditIndex = moPaneGridPrices.getTable().getSelectedRow();
+            mnAuxEntryPriceAction = STrnConsts.ACTION_EDIT;
+            mnAuxEntryPriceEditedIndex = moPaneGridPrices.getTable().getSelectedRow();
             
-            if (mnAuxPriceEditIndex != -1) {
-                moAuxPriceEdit = (SDataDpsEntryPrice) moPaneGridPrices.getSelectedTableRow().getData();
+            if (mnAuxEntryPriceEditedIndex != -1) {
+                moAuxEntryPriceEdited = (SDataDpsEntryPrice) moPaneGridPrices.getSelectedTableRow().getData();
                 
                 enableDeliveryPriceButtonFields(false);
                 enablePriceEntryContractFields(true);
                 enableDeliveryPriceFields(true);
                 enablePriceGridFields(false);
 
-                moAuxPriceEdit.setIsRegistryEdited(true);
-                
                 jtfContractPriceYear.setEditable(false);
                 jtfContractPriceMonth.setEditable(false);
                 
-                jckIsDirectPrice.setSelected(moAuxPriceEdit.getIsPriceVariable());
-                moFieldContractPriceReferenceNumbrer.setString(moAuxPriceEdit.getReferenceNumber());
-                moFieldContractPriceYear.setInteger(moAuxPriceEdit.getContractPriceYear());
-                moFieldContractPriceMonth.setInteger(moAuxPriceEdit.getContractPriceMonth());
-                moFieldPriceOriginalQuantity.setDouble(moAuxPriceEdit.getOriginalQuantity());
-                jckChangePrice.setSelected(moAuxPriceEdit.getOriginalPriceUnitaryCy() != moAuxPriceEdit.getOriginalPriceUnitaryCySystem());
-                moFieldPriceOriginalPriceUnitaryCy.setDouble(moAuxPriceEdit.getOriginalPriceUnitaryCy());
-                moFieldContractBase.setDouble(moAuxPriceEdit.getContractBase());
-                moFieldContractFuture.setDouble(moAuxPriceEdit.getContractFuture());
-                moFieldContractFactor.setDouble(moAuxPriceEdit.getContractFactor());
-                
+                jckIsDirectPrice.setSelected(moAuxEntryPriceEdited.getIsPriceVariable());
+                moFieldContractPriceReferenceNumbrer.setString(moAuxEntryPriceEdited.getReferenceNumber());
+                moFieldContractPriceYear.setInteger(moAuxEntryPriceEdited.getContractPriceYear());
+                moFieldContractPriceMonth.setInteger(moAuxEntryPriceEdited.getContractPriceMonth());
+                moFieldPriceOriginalQuantity.setDouble(moAuxEntryPriceEdited.getOriginalQuantity());
+                jckChangePrice.setSelected(moAuxEntryPriceEdited.getOriginalPriceUnitaryCy() != moAuxEntryPriceEdited.getOriginalPriceUnitaryCySystem());
+                moFieldPriceOriginalPriceUnitaryCy.setDouble(moAuxEntryPriceEdited.getOriginalPriceUnitaryCy());
+                moFieldContractBase.setDouble(moAuxEntryPriceEdited.getContractBase());
+                moFieldContractFuture.setDouble(moAuxEntryPriceEdited.getContractFuture());
+                moFieldContractFactor.setDouble(moAuxEntryPriceEdited.getContractFactor());
             }
         }
     }
 
     private void actionPriceDelete() {
         if (jbGridPriceDelete.isEnabled()) {
-            mnAuxPriceEditIndex = moPaneGridPrices.getTable().getSelectedRow();
+            mnAuxEntryPriceEditedIndex = moPaneGridPrices.getTable().getSelectedRow();
 
-            if (mnAuxPriceEditIndex != -1) {
+            if (mnAuxEntryPriceEditedIndex != -1) {
                 if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_DELETE) == JOptionPane.YES_OPTION) {
-                    moAuxPriceEdit = (SDataDpsEntryPrice) moPaneGridPrices.getTableRow(mnAuxPriceEditIndex).getData();
+                    moAuxEntryPriceEdited = (SDataDpsEntryPrice) moPaneGridPrices.getTableRow(mnAuxEntryPriceEditedIndex).getData();
 
-                    if (moAuxPriceEdit.getIsDeleted()) {
+                    if (moAuxEntryPriceEdited.getIsDeleted()) {
                         miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_REG_ALREADY_DELETE);
                     }
                     else {
-                        if (moAuxPriceEdit.getUserNewTs() == null) {
-                            moPaneGridPrices.removeTableRow(mnAuxPriceEditIndex);
+                        if (moAuxEntryPriceEdited.getUserNewTs() == null) {
+                            moPaneGridPrices.removeTableRow(mnAuxEntryPriceEditedIndex);
                         }
                         else {
-                            moAuxPriceEdit.setIsDeleted(true);
-                            moAuxPriceEdit.setFkUserDeleteId(miClient.getSession().getUser().getPkUserId());
-                            moAuxPriceEdit.setIsRegistryEdited(true);
-                            moAuxPriceEdit.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+                            moAuxEntryPriceEdited.setIsDeleted(true);
+                            moAuxEntryPriceEdited.setFkUserDeleteId(miClient.getSession().getUser().getPkUserId());
+                            moAuxEntryPriceEdited.setIsRegistryEdited(true);
+                            moAuxEntryPriceEdited.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
 
-                            moPaneGridPrices.setTableRow(new SDataDpsEntryPriceRow(moAuxPriceEdit), mnAuxPriceEditIndex);
+                            moPaneGridPrices.setTableRow(new SDataDpsEntryPriceRow(moAuxEntryPriceEdited), mnAuxEntryPriceEditedIndex);
                         }
 
                         moPaneGridPrices.renderTableRows();
-                        moPaneGridPrices.setTableRowSelection(mnAuxPriceEditIndex < moPaneGridPrices.getTableGuiRowCount() ? mnAuxPriceEditIndex : moPaneGridPrices.getTableGuiRowCount() - 1);
+                        moPaneGridPrices.setTableRowSelection(mnAuxEntryPriceEditedIndex < moPaneGridPrices.getTableGuiRowCount() ? mnAuxEntryPriceEditedIndex : moPaneGridPrices.getTableGuiRowCount() - 1);
                     }
-                    moAuxPriceEdit = null;
+                    moAuxEntryPriceEdited = null;
                 }                
             }
         }
@@ -3468,110 +3469,111 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
     private void actionPriceFilter() {
         if (jtbGridPriceFilter.isEnabled()) {
-            mnAuxPriceEditIndex = moPaneGridPrices.getTable().getSelectedRow();
+            mnAuxEntryPriceEditedIndex = moPaneGridPrices.getTable().getSelectedRow();
             moPaneGridPrices.setGridViewStatus(!jtbGridPriceFilter.isSelected() ? STableConstants.VIEW_STATUS_ALL : STableConstants.VIEW_STATUS_ALIVE);
             moPaneGridPrices.renderTableRows();
-            moPaneGridPrices.setTableRowSelection(mnAuxPriceEditIndex < moPaneGridPrices.getTableGuiRowCount() ? mnAuxPriceEditIndex : moPaneGridPrices.getTableGuiRowCount() - 1);
+            moPaneGridPrices.setTableRowSelection(mnAuxEntryPriceEditedIndex < moPaneGridPrices.getTableGuiRowCount() ? mnAuxEntryPriceEditedIndex : moPaneGridPrices.getTableGuiRowCount() - 1);
         }
     }
 
     private void actionPriceSave() {
-        if(jbPriceSave.isEnabled()) {
-            if (moAuxPriceEdit != null) {
-                if (moFieldContractPriceReferenceNumbrer.getString().isEmpty()) {
-                        miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + moFieldContractPriceReferenceNumbrer.getFieldName() + "'.");
-                        jtfContractPriceNumbrerReference.requestFocus();
-                        return;
-                }
-                
-                if (!moFieldContractPriceYear.validateFieldForcing() || !moFieldContractPriceMonth.validateFieldForcing()) {
-                    return;
-                }
-                
-                if (moFieldPriceOriginalQuantity.getDouble() < 0) {
-                        miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moFieldPriceOriginalQuantity.getFieldName() + "'.");
-                        jtfPriceOriginalQuantity.requestFocus();
-                        return;
-                }
-                
-                if (moFieldPriceOriginalPriceUnitaryCy.getDouble() < 0) {
-                        miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moFieldPriceOriginalPriceUnitaryCy.getFieldName() + "'.");
-                        jtfPriceOriginalPriceUnitaryCy.requestFocus();
-                        return;
-                }
-                
-                if (!jckIsDirectPrice.isSelected()) {
-                    if (moFieldContractBase.getDouble() <= 0) {
-                        miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moFieldContractBase.getFieldName() + "'.");
-                        jtfContractBase.requestFocus();
-                        return;
-                    }
-                    if (moFieldContractFuture.getDouble() <= 0) {
-                        miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moFieldContractFuture.getFieldName() + "'.");
-                        jtfContractFuture.requestFocus();
-                        return;
-                    }
-                    if (moFieldContractFactor.getDouble() <= 0) {
-                        miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moFieldContractFactor.getFieldName() + "'.");
-                        jtfContractFactor.requestFocus();
-                        return;
-                    }
-                }
-                
-                SDataDpsEntryPrice entryPrice = null;
-                boolean canSave = true;
-                
-                for (int i = 0; i < moPaneGridPrices.getGridRows().size(); i++) {
-                    entryPrice = (SDataDpsEntryPrice) moPaneGridPrices.getGridRows().get(i).getData();
-                    if (entryPrice.getContractPriceYear() == moFieldContractPriceYear.getInteger() && entryPrice.getContractPriceMonth() == moFieldContractPriceMonth.getInteger()) {
-                        canSave =(!entryPrice.getIsDeleted() && entryPrice.getIsRegistryEdited())|| (entryPrice.getIsDeleted() && entryPrice.getIsRegistryEdited()) || entryPrice.getIsDeleted();
-                    }
-                }
-                
-                if (canSave) {
-                    moAuxPriceEdit.setReferenceNumber(moFieldContractPriceReferenceNumbrer.getString());
-                    moAuxPriceEdit.setIsPriceVariable(jckIsDirectPrice.isSelected());
-                    moAuxPriceEdit.setContractPriceYear(moFieldContractPriceYear.getInteger());
-                    moAuxPriceEdit.setContractPriceMonth(moFieldContractPriceMonth.getInteger());
-                    moAuxPriceEdit.setOriginalQuantity(moFieldPriceOriginalQuantity.getDouble());
-
-                    moAuxPriceEdit.setOriginalPriceUnitaryCy(moFieldPriceOriginalPriceUnitaryCy.getDouble());
-                    moAuxPriceEdit.setContractBase(moFieldContractBase.getDouble());
-                    moAuxPriceEdit.setContractFuture(moFieldContractFuture.getDouble());
-                    moAuxPriceEdit.setContractFactor(moFieldContractFactor.getDouble());
-                    moAuxPriceEdit.setIsDeleted(false);
-                    
-                    if (moAuxPriceEdit.getUserNewTs() == null) {
-                        moAuxPriceEdit.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
-                        
-                        if (moAuxPriceEdit.getIsRegistryEdited()) {
-                            moAuxPriceEdit.setIsRegistryEdited(false);
-                            moPaneGridPrices.setTableRow(new SDataDpsEntryPriceRow(moAuxPriceEdit), moPaneGridPrices.getTable().convertRowIndexToView(mnAuxPriceEditIndex));
-                            moPaneGridPrices.renderTableRows();
-                            moPaneGridPrices.setTableRowSelection(mnAuxPriceEditIndex < 0 ? moPaneGridPrices.getTableGuiRowCount() - 1 : mnAuxPriceEditIndex);
-                            
-                        }
-                        else {
-                            moPaneGridPrices.addTableRow(new SDataDpsEntryPriceRow(moAuxPriceEdit));
-                            moPaneGridPrices.renderTableRows(); 
-                            moPaneGridPrices.setTableRowSelection(mnAuxPriceEditIndex < 0 ? moPaneGridPrices.getTableGuiRowCount() - 1 : mnAuxPriceEditIndex);
-
-                        }
-                    }
-                    else {
-                        moAuxPriceEdit.setFkUserEditId(miClient.getSession().getUser().getFkUserTypeId());
-                        moPaneGridPrices.setTableRow(new SDataDpsEntryPriceRow(moAuxPriceEdit), moPaneGridPrices.getTable().convertRowIndexToView(mnAuxPriceEditIndex));
-                        moPaneGridPrices.renderTableRows();
-                        moPaneGridPrices.setTableRowSelection(mnAuxPriceEditIndex < 0 ? moPaneGridPrices.getTableGuiRowCount() - 1 : mnAuxPriceEditIndex);
-                    }
-                    actionPriceClearFields();
-                }
-                else {
-                    miClient.showMsgBoxWarning("Ya existe un registro para ese periodo de entrega.");
-                }
+        SDataDpsEntryPrice entryPrice = null;
+        SFormValidation validation = new SFormValidation();
+        
+        if (jbPriceSave.isEnabled()) {
+            if (moAuxEntryPriceEdited == null) {
+                miClient.showMsgBoxWarning("Se debe capturar previamente un periodo de entrega."); // XXX remove if not needed!!!
             }
             else {
-                miClient.showMsgBoxWarning("Capturar previamente un periodo de entrega.");
+                // Validate if entry price can be saved:
+                
+                if (moFieldContractPriceReferenceNumbrer.getString().isEmpty()) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + moFieldContractPriceReferenceNumbrer.getFieldName() + "'.");
+                    validation.setComponent(jtfContractPriceNumbrerReference);
+                }
+                else if (!moFieldContractPriceYear.validateFieldForcing()) {
+                    validation.setIsError(true);
+                    validation.setComponent(jtfContractPriceYear);
+                }
+                else if (!moFieldContractPriceMonth.validateFieldForcing()) {
+                    validation.setIsError(true);
+                    validation.setComponent(jtfContractPriceMonth);
+                }
+                else if (moFieldPriceOriginalQuantity.getDouble() < 0) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moFieldPriceOriginalQuantity.getFieldName() + "'.");
+                    validation.setComponent(jtfPriceOriginalQuantity);
+                }
+                else if (moFieldPriceOriginalPriceUnitaryCy.getDouble() < 0) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moFieldPriceOriginalPriceUnitaryCy.getFieldName() + "'.");
+                    validation.setComponent(jtfPriceOriginalPriceUnitaryCy);
+                }
+                else if (!jckIsDirectPrice.isSelected() && moFieldContractBase.getDouble() <= 0) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moFieldContractBase.getFieldName() + "'.");
+                    validation.setComponent(jtfContractBase);
+                }
+                else if (!jckIsDirectPrice.isSelected() && moFieldContractFuture.getDouble() <= 0) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moFieldContractFuture.getFieldName() + "'.");
+                    validation.setComponent(jtfContractFuture);
+                }
+                else if (!jckIsDirectPrice.isSelected() && moFieldContractFactor.getDouble() <= 0) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moFieldContractFactor.getFieldName() + "'.");
+                    validation.setComponent(jtfContractFactor);
+                }
+                else {
+                    for (int i = 0; i < moPaneGridPrices.getGridRows().size(); i++) {
+                        entryPrice = (SDataDpsEntryPrice) moPaneGridPrices.getGridRows().get(i).getData();
+                        
+                        if (entryPrice.getContractPriceYear() == moFieldContractPriceYear.getInteger() && entryPrice.getContractPriceMonth() == moFieldContractPriceMonth.getInteger() && !entryPrice.getIsDeleted() && entryPrice != moAuxEntryPriceEdited) {
+                            validation.setMessage("Ya existe un registro para este periodo de entrega.");
+                            validation.setComponent(jtfContractPriceYear);
+                            break;
+                        }
+                    }
+                }
+                
+                if (validation.getIsError()) {
+                    if (validation.getComponent() != null) {
+                        validation.getComponent().requestFocus();
+                    }
+                    if (!validation.getMessage().isEmpty()) {
+                        miClient.showMsgBoxWarning(validation.getMessage());
+                    }
+                }
+                else {
+                    // Save entry price:
+                    
+                    moAuxEntryPriceEdited.setReferenceNumber(moFieldContractPriceReferenceNumbrer.getString());
+                    moAuxEntryPriceEdited.setIsPriceVariable(jckIsDirectPrice.isSelected());
+                    moAuxEntryPriceEdited.setContractPriceYear(moFieldContractPriceYear.getInteger());
+                    moAuxEntryPriceEdited.setContractPriceMonth(moFieldContractPriceMonth.getInteger());
+                    moAuxEntryPriceEdited.setOriginalQuantity(moFieldPriceOriginalQuantity.getDouble());
+
+                    moAuxEntryPriceEdited.setOriginalPriceUnitaryCy(moFieldPriceOriginalPriceUnitaryCy.getDouble());
+                    moAuxEntryPriceEdited.setContractBase(moFieldContractBase.getDouble());
+                    moAuxEntryPriceEdited.setContractFuture(moFieldContractFuture.getDouble());
+                    moAuxEntryPriceEdited.setContractFactor(moFieldContractFactor.getDouble());
+                    moAuxEntryPriceEdited.setIsRegistryEdited(!moAuxEntryPriceEdited.getIsRegistryNew());
+                    moAuxEntryPriceEdited.setIsDeleted(false);
+                    
+                    if (moAuxEntryPriceEdited.getIsRegistryNew()) {
+                        moAuxEntryPriceEdited.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
+                    }
+                    else {
+                        moAuxEntryPriceEdited.setFkUserEditId(miClient.getSession().getUser().getFkUserTypeId());
+                    }
+                    
+                    if (mnAuxEntryPriceAction == STrnConsts.ACTION_NEW) {
+                        moPaneGridPrices.addTableRow(new SDataDpsEntryPriceRow(moAuxEntryPriceEdited));
+                    }
+                    else {
+                        moPaneGridPrices.getTableModel().getTableRows().set(moPaneGridPrices.getTable().convertRowIndexToModel(mnAuxEntryPriceEditedIndex), new SDataDpsEntryPriceRow(moAuxEntryPriceEdited));
+                    }
+                    
+                    moPaneGridPrices.renderTableRows();
+                    moPaneGridPrices.setTableRowSelection(mnAuxEntryPriceEditedIndex < 0 ? moPaneGridPrices.getTableGuiRowCount() - 1 : mnAuxEntryPriceEditedIndex);
+                    moPaneGridPrices.getTableRow(mnAuxEntryPriceEditedIndex < 0 ? moPaneGridPrices.getTableGuiRowCount() - 1 : mnAuxEntryPriceEditedIndex).prepareTableRow();
+                    actionPriceClearFields();
+                }
             }
         }
     }
@@ -3593,10 +3595,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moFieldContractBase.setDouble(moFieldDpsContractBase.getDouble());
             moFieldContractFuture.setDouble(moFieldDpsContractFuture.getDouble());
             moFieldContractFactor.setDouble(moFieldDpsContractFactor.getDouble());
-            if (moAuxPriceEdit != null) {
-                moAuxPriceEdit.setIsRegistryEdited(false);
-                moAuxPriceEdit = null;
-                mnAuxPriceEditIndex = -1;
+            if (moAuxEntryPriceEdited != null) {
+                moAuxEntryPriceEdited.setIsRegistryEdited(false);
+                moAuxEntryPriceEdited = null;
+                mnAuxEntryPriceEditedIndex = -1;
             }
             jbPriceNew.requestFocus();
         }    
