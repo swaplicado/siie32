@@ -3403,8 +3403,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
     private void actionPriceEdit() {
         if (jbGridPriceEdit.isEnabled()) {
-            mnAuxPriceEditIndex = moPaneGridPrices.getTable().convertRowIndexToModel(moPaneGridPrices.getTable().getSelectedRow());
-
+            mnAuxPriceEditIndex = moPaneGridPrices.getTable().getSelectedRow();
+            
             if (mnAuxPriceEditIndex != -1) {
                 moAuxPriceEdit = (SDataDpsEntryPrice) moPaneGridPrices.getSelectedTableRow().getData();
                 

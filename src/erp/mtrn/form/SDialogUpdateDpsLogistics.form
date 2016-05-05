@@ -168,9 +168,9 @@
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
-                    <Component class="javax.swing.JCheckBox" name="jckDifferentDate">
+                    <Component class="javax.swing.JCheckBox" name="jckChangeDateStartCredit">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Definir otra fecha base cr&#xe9;dito"/>
+                        <Property name="text" type="java.lang.String" value="Cambiar fecha base de cr&#xe9;dito"/>
                         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                           <Insets value="[0, 0, 0, 0]"/>
                         </Property>
