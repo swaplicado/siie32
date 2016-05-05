@@ -332,18 +332,16 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         else {
             if (deleteWholeRecord) {
                 record.setIsRegistryEdited(true);
-                record.setFkUserEditId(mnFkUserEditId);
                 record.setIsDeleted(true);
-                record.setFkUserDeleteId(mnFkUserEditId);
+                record.setFkUserDeleteId(mnFkUserDeleteId);
 
                 for (SDataRecordEntry entry : record.getDbmsRecordEntries()) {
                     if (!entry.getIsDeleted()) {
                         // Delete aswell all non-deleted entries:
 
                         entry.setIsRegistryEdited(true);
-                        entry.setFkUserEditId(mnFkUserEditId);
                         entry.setIsDeleted(true);
-                        entry.setFkUserDeleteId(mnFkUserEditId);
+                        entry.setFkUserDeleteId(mnFkUserDeleteId);
                     }
                 }
             }
@@ -355,17 +353,15 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         if (isDocument()) {
                             if (entry.getFkDpsYearId_n() == mnPkYearId && entry.getFkDpsDocId_n() == mnPkDocId) {
                                 entry.setIsRegistryEdited(true);
-                                entry.setFkUserEditId(mnFkUserEditId);
                                 entry.setIsDeleted(true);
-                                entry.setFkUserDeleteId(mnFkUserEditId);
+                                entry.setFkUserDeleteId(mnFkUserDeleteId);
                             }
                         }
                         else {
                             if (entry.getFkDpsAdjustmentYearId_n() == mnPkYearId && entry.getFkDpsAdjustmentDocId_n() == mnPkDocId) {
                                 entry.setIsRegistryEdited(true);
-                                entry.setFkUserEditId(mnFkUserEditId);
                                 entry.setIsDeleted(true);
-                                entry.setFkUserDeleteId(mnFkUserEditId);
+                                entry.setFkUserDeleteId(mnFkUserDeleteId);
                             }
                         }
                     }
