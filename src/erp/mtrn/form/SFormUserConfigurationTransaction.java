@@ -11,20 +11,16 @@
 
 package erp.mtrn.form;
 
+import erp.data.SDataConstants;
+import erp.lib.SLibConstants;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
+import erp.mtrn.data.SDataUserConfigurationTransaction;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
-
-import erp.data.SDataConstants;
-import erp.data.SDataConstantsSys;
-import erp.data.SDataUtilities;
-import erp.data.SProcConstants;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormValidation;
-import erp.lib.form.SFormUtilities;
-import erp.lib.SLibConstants;
-import erp.mtrn.data.SDataUserConfigurationTransaction;
 
 /**
  *
@@ -96,6 +92,8 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jPanel7 = new javax.swing.JPanel();
         jtfSalesDocLimit_n = new javax.swing.JTextField();
         jtfCurrencyKeySalesDoc = new javax.swing.JTextField();
+        jPanel10 = new javax.swing.JPanel();
+        jPanel11 = new javax.swing.JPanel();
         jlCapacityVolumeMinPer = new javax.swing.JLabel();
         jPanel8 = new javax.swing.JPanel();
         jtfCapacityVolumeMinPer = new javax.swing.JTextField();
@@ -131,9 +129,9 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel3.setLayout(new java.awt.GridLayout(9, 2, 0, 1));
+        jPanel3.setLayout(new java.awt.GridLayout(10, 2, 0, 1));
 
-        jlUser.setText("Usuario:");
+        jlUser.setText("Nombre del usuario:");
         jPanel3.add(jlUser);
 
         jtfUser.setEditable(false);
@@ -145,36 +143,36 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jPanel3.add(jckIsPurchasesItemAllApplying);
         jPanel3.add(Dummy01);
 
-        jlPurchasesOrderLimit_n.setText("Límite para pedidos de compra:");
+        jlPurchasesOrderLimit_n.setText("Límite máx. autorizado pedidos compras:");
         jPanel3.add(jlPurchasesOrderLimit_n);
 
         jPanel4.setLayout(new java.awt.BorderLayout(2, 0));
 
         jtfPurchasesOrderLimit_n.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfPurchasesOrderLimit_n.setText("LIMIT PURCHASES ORDER");
+        jtfPurchasesOrderLimit_n.setText("0");
         jPanel4.add(jtfPurchasesOrderLimit_n, java.awt.BorderLayout.CENTER);
 
         jtfCurrencyKeyPurchasesOrder.setEditable(false);
         jtfCurrencyKeyPurchasesOrder.setText("CUR");
         jtfCurrencyKeyPurchasesOrder.setFocusable(false);
-        jtfCurrencyKeyPurchasesOrder.setPreferredSize(new java.awt.Dimension(40, 23));
+        jtfCurrencyKeyPurchasesOrder.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel4.add(jtfCurrencyKeyPurchasesOrder, java.awt.BorderLayout.EAST);
 
         jPanel3.add(jPanel4);
 
-        jlPurchasesDocLimit_n.setText("Límite para facturas de compra:");
+        jlPurchasesDocLimit_n.setText("Límite máx. autorizado facturas compras:");
         jPanel3.add(jlPurchasesDocLimit_n);
 
         jPanel5.setLayout(new java.awt.BorderLayout(2, 0));
 
         jtfPurchasesDocLimit_n.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfPurchasesDocLimit_n.setText("LIMIT PURCHASES DOC");
+        jtfPurchasesDocLimit_n.setText("0");
         jPanel5.add(jtfPurchasesDocLimit_n, java.awt.BorderLayout.CENTER);
 
         jtfCurrencyKeyPurchasesDoc.setEditable(false);
         jtfCurrencyKeyPurchasesDoc.setText("CUR");
         jtfCurrencyKeyPurchasesDoc.setFocusable(false);
-        jtfCurrencyKeyPurchasesDoc.setPreferredSize(new java.awt.Dimension(40, 23));
+        jtfCurrencyKeyPurchasesDoc.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel5.add(jtfCurrencyKeyPurchasesDoc, java.awt.BorderLayout.LINE_END);
 
         jPanel3.add(jPanel5);
@@ -183,65 +181,67 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jPanel3.add(jckIsSalesItemAllApplying);
         jPanel3.add(Dummy02);
 
-        jlSalesOrderLimit_n.setText("Límite para pedidos de venta:");
+        jlSalesOrderLimit_n.setText("Límite máx. autorizado pedidos ventas:");
         jPanel3.add(jlSalesOrderLimit_n);
 
         jPanel6.setLayout(new java.awt.BorderLayout(2, 0));
 
         jtfSalesOrderLimit_n.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfSalesOrderLimit_n.setText("LIMIT SALES ORDER");
+        jtfSalesOrderLimit_n.setText("0");
         jPanel6.add(jtfSalesOrderLimit_n, java.awt.BorderLayout.CENTER);
 
         jtfCurrencyKeySalesOrder.setEditable(false);
         jtfCurrencyKeySalesOrder.setText("CUR");
         jtfCurrencyKeySalesOrder.setFocusable(false);
-        jtfCurrencyKeySalesOrder.setPreferredSize(new java.awt.Dimension(40, 23));
+        jtfCurrencyKeySalesOrder.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel6.add(jtfCurrencyKeySalesOrder, java.awt.BorderLayout.LINE_END);
 
         jPanel3.add(jPanel6);
 
-        jlSalesDocLimit_n.setText("Límite para facturas de venta:");
+        jlSalesDocLimit_n.setText("Límite máx. autorizado facturas ventas:");
         jPanel3.add(jlSalesDocLimit_n);
 
         jPanel7.setLayout(new java.awt.BorderLayout(2, 0));
 
         jtfSalesDocLimit_n.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfSalesDocLimit_n.setText("LIMIT SALES DOC");
+        jtfSalesDocLimit_n.setText("0");
         jPanel7.add(jtfSalesDocLimit_n, java.awt.BorderLayout.CENTER);
 
         jtfCurrencyKeySalesDoc.setEditable(false);
         jtfCurrencyKeySalesDoc.setText("CUR");
         jtfCurrencyKeySalesDoc.setFocusable(false);
-        jtfCurrencyKeySalesDoc.setPreferredSize(new java.awt.Dimension(40, 23));
+        jtfCurrencyKeySalesDoc.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel7.add(jtfCurrencyKeySalesDoc, java.awt.BorderLayout.LINE_END);
 
         jPanel3.add(jPanel7);
+        jPanel3.add(jPanel10);
+        jPanel3.add(jPanel11);
 
-        jlCapacityVolumeMinPer.setText("Capacidad mínima de volumen:");
+        jlCapacityVolumeMinPer.setText("Capacidad mín. autorizada volumen embarques:");
         jlCapacityVolumeMinPer.setPreferredSize(new java.awt.Dimension(125, 14));
         jPanel3.add(jlCapacityVolumeMinPer);
 
         jPanel8.setLayout(new java.awt.BorderLayout(2, 0));
 
         jtfCapacityVolumeMinPer.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfCapacityVolumeMinPer.setText("LIMIT VOLUME");
+        jtfCapacityVolumeMinPer.setText("0");
         jPanel8.add(jtfCapacityVolumeMinPer, java.awt.BorderLayout.CENTER);
 
-        jlDummy.setPreferredSize(new java.awt.Dimension(40, 23));
+        jlDummy.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel8.add(jlDummy, java.awt.BorderLayout.LINE_END);
 
         jPanel3.add(jPanel8);
 
-        jlCapacityMassMinPer.setText("Capacidad mínima de masa:");
+        jlCapacityMassMinPer.setText("Capacidad mín. autorizada masa embarques:");
         jPanel3.add(jlCapacityMassMinPer);
 
         jPanel9.setLayout(new java.awt.BorderLayout(2, 0));
 
         jtfCapacityMassMinPer.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfCapacityMassMinPer.setText("LIMIT MASS");
+        jtfCapacityMassMinPer.setText("0");
         jPanel9.add(jtfCapacityMassMinPer, java.awt.BorderLayout.CENTER);
 
-        jlDummy1.setPreferredSize(new java.awt.Dimension(40, 23));
+        jlDummy1.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel9.add(jlDummy1, java.awt.BorderLayout.LINE_END);
 
         jPanel3.add(jPanel9);
@@ -250,8 +250,8 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-496)/2, (screenSize.height-338)/2, 496, 338);
+        setSize(new java.awt.Dimension(496, 338));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -338,6 +338,8 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
     private javax.swing.JLabel Dummy01;
     private javax.swing.JLabel Dummy02;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;

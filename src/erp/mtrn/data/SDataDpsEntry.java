@@ -1000,7 +1000,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
             if (mnFkVehicleTypeId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkVehicleTypeId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
             if (mnFkCashCompanyBranchId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkCashCompanyBranchId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
             if (mnFkCashAccountId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkCashAccountId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
-            if (msFkCostCenterId_n.length() > SLibConsts.UNDEFINED) callableStatement.setString(nParam++, msFkCostCenterId_n); else callableStatement.setNull(nParam++, java.sql.Types.CHAR);
+            if (!msFkCostCenterId_n.isEmpty()) callableStatement.setString(nParam++, msFkCostCenterId_n); else callableStatement.setNull(nParam++, java.sql.Types.CHAR);
             if (mnFkItemRefId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkItemRefId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.INTEGER);
