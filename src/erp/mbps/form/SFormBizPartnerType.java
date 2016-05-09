@@ -176,7 +176,7 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlCreditLimit.setText("Límite de crédito:");
+        jlCreditLimit.setText("Límite de crédito: *");
         jlCreditLimit.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel7.add(jlCreditLimit);
 
@@ -185,6 +185,7 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
         jtfCreditLimit.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel7.add(jtfCreditLimit);
 
+        jtfCurrencyKey.setEditable(false);
         jtfCurrencyKey.setEnabled(false);
         jtfCurrencyKey.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel7.add(jtfCurrencyKey);
@@ -193,7 +194,7 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlDaysOfCredit.setText("Días de crédito:");
+        jlDaysOfCredit.setText("Días de crédito: *");
         jlDaysOfCredit.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel8.add(jlDaysOfCredit);
 
@@ -240,8 +241,8 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-537)/2, (screenSize.height-361)/2, 537, 361);
+        setSize(new java.awt.Dimension(537, 361));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -256,10 +257,7 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
 
     private void jcbPkBizPartnerCategoryIdItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbPkBizPartnerCategoryIdItemStateChanged
         if (evt.getStateChange() == ItemEvent.SELECTED) {
-            jcbFkCreditTypeId.setEnabled(moFieldPkBizPartnerCategortyId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_CT_BP_SUP ||
-                moFieldPkBizPartnerCategortyId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_CT_BP_CUS);
-            jcbFkRiskTypeId.setEnabled(moFieldPkBizPartnerCategortyId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_CT_BP_SUP ||
-                moFieldPkBizPartnerCategortyId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_CT_BP_CUS);
+            renderCategorySettings();
         }
     }//GEN-LAST:event_jcbPkBizPartnerCategoryIdItemStateChanged
 
@@ -271,22 +269,68 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
         renderCreditLimit();
     }
     
-    private void renderCreditLimit() {
-        if (moFieldFkCreditTypeId.getKeyAsIntArray()[0] == 0 || moFieldFkCreditTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_NO) {
+    private void renderTypeCredit(){
+        if (moFieldPkBizPartnerCategortyId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_CT_BP_SUP ||moFieldPkBizPartnerCategortyId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_CT_BP_CUS){
+            jtfCreditLimit.setEnabled(true);
+            jtfDaysOfCredit.setEnabled(true);
+            jtfDaysOfGrace.setEnabled(true);           
+        }
+        else {
             jtfCreditLimit.setEnabled(false);
             jtfDaysOfCredit.setEnabled(false);
             jtfDaysOfGrace.setEnabled(false);
+            moFieldCreditLimit.setDouble(0d);
+            moFieldDaysOfCredit.setInteger(0);
+            moFieldDaysOfGrace.setInteger(0);
+
+        }
+    }
+    
+    private void renderCreditLimit() {
+        renderTypeCredit();
+        if (moFieldFkCreditTypeId.getKeyAsIntArray()[0] == 0 || moFieldFkCreditTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_NO) {
+            jtfCreditLimit.setEditable(false);
+            jtfCreditLimit.setFocusable(false);
+            jtfDaysOfCredit.setEditable(false);
+            jtfDaysOfCredit.setFocusable(false);
+            jtfDaysOfGrace.setEditable(false);
+            jtfDaysOfGrace.setFocusable(false);
+            moFieldCreditLimit.setDouble(0d);
+            moFieldDaysOfCredit.setInteger(0);
+            moFieldDaysOfGrace.setInteger(0);
+            
         }
         else if (moFieldFkCreditTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_LIM_NO) {
-            jtfCreditLimit.setEnabled(false);
-            jtfDaysOfCredit.setEnabled(true);
-            jtfDaysOfGrace.setEnabled(true);
+            jtfCreditLimit.setEditable(false);
+            jtfCreditLimit.setFocusable(false);
+            moFieldCreditLimit.setDouble(0d);
+            jtfDaysOfCredit.setEditable(true);
+            jtfDaysOfCredit.setFocusable(true);
+            jtfDaysOfGrace.setEditable(true);
+            jtfDaysOfGrace.setFocusable(true);
         }
         else {
-            jtfCreditLimit.setEnabled(true);
-            jtfDaysOfCredit.setEnabled(true);
-            jtfDaysOfGrace.setEnabled(true);
-        }
+            jtfCreditLimit.setEditable(true);
+            jtfCreditLimit.setFocusable(true);
+            jtfDaysOfCredit.setEditable(true);
+            jtfDaysOfCredit.setFocusable(true);
+            jtfDaysOfGrace.setEditable(true);
+            jtfDaysOfGrace.setFocusable(true);
+        }        
+    }
+    
+    private void renderCategorySettings() {
+        boolean enable=(moFieldPkBizPartnerCategortyId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_CT_BP_SUP ||moFieldPkBizPartnerCategortyId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_CT_BP_CUS);
+        jlFkCreditTypeId.setEnabled(enable);
+        moFieldFkCreditTypeId.setFieldValue(new int[] { SDataConstantsSys.BPSS_TP_CRED_CRED_NO });
+        jlCreditLimit.setEnabled(enable);
+        jlDaysOfCredit.setEnabled(enable);
+        jlDaysOfGrace.setEnabled(enable);
+        jlFkRiskTypeId.setEnabled(enable);
+        jcbFkCreditTypeId.setEnabled(enable);
+        jcbFkRiskTypeId.setEnabled(enable);
+        jtfCurrencyKey.setEnabled(enable);
+        renderTypeCredit();
     }
     
     private void initComponentsExtra() {
@@ -297,7 +341,7 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
         moFieldBizPartnerType.setLengthMax(50);
         moFieldFkCreditTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkCreditTypeId, jlFkCreditTypeId);
         moFieldFkRiskTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkRiskTypeId, jlFkRiskTypeId);
-        moFieldCreditLimit = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfCreditLimit, jlCreditLimit);
+        moFieldCreditLimit = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfCreditLimit, jlCreditLimit);
         moFieldDaysOfCredit = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfDaysOfCredit, jlDaysOfCredit);
         moFieldDaysOfGrace = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfDaysOfGrace, jlDaysOfGrace);
         moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
@@ -444,6 +488,17 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
             if (SDataUtilities.callProcedureVal(miClient, SProcConstants.BPSU_TP_BP, oParamsIn, SLibConstants.EXEC_MODE_VERBOSE) > 0) {
                 validation.setMessage("El valor del campo '"  + jlBizPartnerType.getText() + "' ya existe.");
                 validation.setComponent(jtfBizPartnerType);
+            }
+            else if ((moFieldPkBizPartnerCategortyId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_CT_BP_SUP || moFieldPkBizPartnerCategortyId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_CT_BP_CUS) &&
+                                jcbFkCreditTypeId.isEnabled() && moFieldFkCreditTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_LIM && moFieldCreditLimit.getDouble() == 0) {
+                                validation.setComponent(jtfCreditLimit);
+                                validation.setMessage("Se debe ingresar un valor para el campo '" + jlCreditLimit.getText() + "'.");
+                        }
+            else if ((moFieldPkBizPartnerCategortyId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_CT_BP_SUP || moFieldPkBizPartnerCategortyId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_CT_BP_CUS) &&
+            jcbFkCreditTypeId.isEnabled() && (moFieldFkCreditTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_LIM || moFieldFkCreditTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_LIM_NO) && 
+            moFieldDaysOfCredit.getDouble() == 0){
+                    validation.setComponent(jtfDaysOfCredit);
+                    validation.setMessage("Se debe ingresar un valor para el campo '" + jlDaysOfCredit.getText() + "'.");
             }
         }
 

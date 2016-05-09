@@ -46,6 +46,8 @@ public class SDataAccountCash extends erp.lib.data.SDataRegistry implements java
     
     protected int mnAuxFkBankId;
     protected java.lang.String msAuxBankAccountNumber;
+    
+    protected boolean mbAuxIsEntityActive;
 
     public SDataAccountCash() {
         super(SDataConstants.FIN_ACC_CASH);
@@ -106,6 +108,10 @@ public class SDataAccountCash extends erp.lib.data.SDataRegistry implements java
 
     public int getAuxFkBankId() { return mnAuxFkBankId; }
     public java.lang.String getAuxBankAccountNumber() { return msAuxBankAccountNumber; }
+    
+    public void setAuxIsEntityActive(boolean b) { mbAuxIsEntityActive=b; }
+    
+    public boolean getAuxIsEntityActive() { return mbAuxIsEntityActive; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -198,6 +204,7 @@ public class SDataAccountCash extends erp.lib.data.SDataRegistry implements java
 
                 msAuxEntity = moDbmsCompanyBranchEntity.getEntity();
                 msAuxCode = moDbmsCompanyBranchEntity.getCode();
+                mbAuxIsEntityActive = moDbmsCompanyBranchEntity.getIsActive();
                 
                 if (mnFkBankAccountId_n != 0) {
                     moDbmsBizPartnerBranchBankAccount = new SDataBizPartnerBranchBankAccount();
@@ -239,7 +246,8 @@ public class SDataAccountCash extends erp.lib.data.SDataRegistry implements java
                 moDbmsCompanyBranchEntity.setPkEntityId(0);
                 moDbmsCompanyBranchEntity.setEntity(msAuxEntity);
                 moDbmsCompanyBranchEntity.setCode(msAuxCode);
-                moDbmsCompanyBranchEntity.setIsActive(true);
+                moDbmsCompanyBranchEntity.setIsActive(mbAuxIsEntityActive);
+                //moDbmsCompanyBranchEntity.setIsActive(true);
                 moDbmsCompanyBranchEntity.setIsActiveIn(true);
                 moDbmsCompanyBranchEntity.setIsActiveOut(true);
                 moDbmsCompanyBranchEntity.setIsDeleted(false);
@@ -251,6 +259,7 @@ public class SDataAccountCash extends erp.lib.data.SDataRegistry implements java
             else {
                 moDbmsCompanyBranchEntity.setEntity(msAuxEntity);
                 moDbmsCompanyBranchEntity.setCode(msAuxCode);
+                moDbmsCompanyBranchEntity.setIsActive(mbAuxIsEntityActive);
                 moDbmsCompanyBranchEntity.setIsDeleted(mbIsDeleted);
                 moDbmsCompanyBranchEntity.setFkUserEditId(mnFkUserEditId);
             }

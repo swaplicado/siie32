@@ -47,6 +47,7 @@ public class SDialogUpdateDpsLogistics extends javax.swing.JDialog implements er
 
     private erp.lib.form.SFormField moFieldDateDelivery;
     private erp.lib.form.SFormField moFieldDateStartCredit;
+    private erp.lib.form.SFormField moFieldDateStartCreditRo;
     private erp.mtrn.data.SDataDps moDps;
     private erp.mtrn.form.SPanelDps moPanelDps;
 
@@ -80,7 +81,7 @@ public class SDialogUpdateDpsLogistics extends javax.swing.JDialog implements er
         jlPaymentTypeRo = new javax.swing.JLabel();
         jtfPaymentTypeRo = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
-        jckDifferentDate = new javax.swing.JCheckBox();
+        jckChangeDateStartCredit = new javax.swing.JCheckBox();
         jPanel13 = new javax.swing.JPanel();
         jlDateStartCreditRo = new javax.swing.JLabel();
         jftDateStartCreditRo = new javax.swing.JFormattedTextField();
@@ -104,7 +105,7 @@ public class SDialogUpdateDpsLogistics extends javax.swing.JDialog implements er
         jpDps.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jpDps.setLayout(new java.awt.BorderLayout());
 
-        jlPanelDps.setFont(new java.awt.Font("Tahoma", 1, 14));
+        jlPanelDps.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jlPanelDps.setText("[Panel de documento de compras-ventas]");
         jlPanelDps.setPreferredSize(new java.awt.Dimension(100, 200));
         jpDps.add(jlPanelDps, java.awt.BorderLayout.NORTH);
@@ -149,10 +150,10 @@ public class SDialogUpdateDpsLogistics extends javax.swing.JDialog implements er
 
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jckDifferentDate.setText("Definir otra fecha base crédito");
-        jckDifferentDate.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        jckDifferentDate.setPreferredSize(new java.awt.Dimension(250, 23));
-        jPanel2.add(jckDifferentDate);
+        jckChangeDateStartCredit.setText("Cambiar fecha base de crédito");
+        jckChangeDateStartCredit.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        jckChangeDateStartCredit.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel2.add(jckChangeDateStartCredit);
 
         jPanel1.add(jPanel2);
 
@@ -208,8 +209,8 @@ public class SDialogUpdateDpsLogistics extends javax.swing.JDialog implements er
 
         getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-900)/2, (screenSize.height-500)/2, 900, 500);
+        setSize(new java.awt.Dimension(900, 500));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -222,7 +223,9 @@ public class SDialogUpdateDpsLogistics extends javax.swing.JDialog implements er
 
         moFieldDateStartCredit = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateStartCredit, jlDateStartCredit);
         moFieldDateStartCredit.setPickerButton(jbDateStartCredit);
-
+        
+        moFieldDateStartCreditRo = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateStartCreditRo, jlDateStartCreditRo);
+        
         mvFields = new java.util.Vector<erp.lib.form.SFormField>();
         mvFields.add(moFieldDateDelivery);
         mvFields.add(moFieldDateStartCredit);
@@ -237,7 +240,7 @@ public class SDialogUpdateDpsLogistics extends javax.swing.JDialog implements er
         jbDateStartCredit.addActionListener(this);
 
         jftDateDelivery.addFocusListener(this);
-        jckDifferentDate.addItemListener(this);
+        jckChangeDateStartCredit.addItemListener(this);
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -269,22 +272,22 @@ public class SDialogUpdateDpsLogistics extends javax.swing.JDialog implements er
         jftDateStartCreditRo.setText(miClient.getSessionXXX().getFormatters().getDateFormat().format(moDps.getDateStartCredit()));
 
         if (moDps.getFkPaymentTypeId() == SDataConstantsSys.TRNS_TP_PAY_CASH) {
-            jckDifferentDate.setEnabled(false);
+            jckChangeDateStartCredit.setEnabled(false);
             jlDateStartCredit.setEnabled(false);
             jlDateStartCreditRo.setEnabled(false);
             jftDateStartCredit.setEnabled(false);
             jftDateStartCreditRo.setEnabled(false);
 
-            jckDifferentDate.setSelected(false);
+            jckChangeDateStartCredit.setSelected(false);
         }
         else {
-            jckDifferentDate.setEnabled(true);
+            jckChangeDateStartCredit.setEnabled(true);
             jlDateStartCredit.setEnabled(true);
             jlDateStartCreditRo.setEnabled(true);
             jftDateStartCredit.setEnabled(true);
             jftDateStartCreditRo.setEnabled(true);
 
-            jckDifferentDate.setSelected(moDps.getDateDelivery_n() != null && moDps.getDateDelivery_n().getTime() != moDps.getDateStartCredit().getTime());
+            jckChangeDateStartCredit.setSelected(moDps.getDateDelivery_n() != null && moDps.getDateDelivery_n().getTime() != moDps.getDateStartCredit().getTime());
         }
 
         itemStateDifferentDate();
@@ -297,9 +300,9 @@ public class SDialogUpdateDpsLogistics extends javax.swing.JDialog implements er
 
         in.add(moDps.getPkYearId());
         in.add(moDps.getPkDocId());
-        in.add(moDps.getFkPaymentTypeId() == SDataConstantsSys.TRNS_TP_PAY_CASH ? new java.util.Date(0) : moFieldDateStartCredit.getDate());    // new start credit date
-        in.add(new java.util.Date(0));              // omitted real shipment date
-        in.add(moFieldDateDelivery.getDate());      // new real delivery date
+        in.add((moDps.getFkPaymentTypeId() == SDataConstantsSys.TRNS_TP_PAY_CASH || !jckChangeDateStartCredit.isSelected()) ? new java.util.Date(0) : moFieldDateStartCredit.getDate()); // new start credit date
+        in.add(new java.util.Date(0)); // omit real shipment date
+        in.add(moFieldDateDelivery.getDate()); // new real delivery date
 
         out = SDataUtilities.callProcedure(miClient, SProcConstants.TRN_DPS_LOG_UPD, in, SLibConstants.EXEC_MODE_VERBOSE);
 
@@ -314,14 +317,17 @@ public class SDialogUpdateDpsLogistics extends javax.swing.JDialog implements er
     }
 
     private void copyDateDelivery() {
-        if (!jckDifferentDate.isSelected() && moFieldDateDelivery.getDate() != null &&
+        if (!jckChangeDateStartCredit.isSelected() && moFieldDateDelivery.getDate() != null &&
                 moDps != null && moDps.getFkPaymentTypeId() == SDataConstantsSys.TRNS_TP_PAY_CREDIT) {
+            moFieldDateStartCredit.setFieldValue(moFieldDateStartCreditRo.getDate());
+        }
+        else {
             moFieldDateStartCredit.setFieldValue(moFieldDateDelivery.getDate());
         }
     }
 
     private void itemStateDifferentDate() {
-        if (jckDifferentDate.isSelected() &&
+        if (jckChangeDateStartCredit.isSelected() &&
                 moDps != null && moDps.getFkPaymentTypeId() == SDataConstantsSys.TRNS_TP_PAY_CREDIT) {
             jftDateStartCredit.setEditable(true);
             jftDateStartCredit.setFocusable(true);
@@ -383,7 +389,7 @@ public class SDialogUpdateDpsLogistics extends javax.swing.JDialog implements er
     private javax.swing.JButton jbDateDelivery;
     private javax.swing.JButton jbDateStartCredit;
     private javax.swing.JButton jbOk;
-    private javax.swing.JCheckBox jckDifferentDate;
+    private javax.swing.JCheckBox jckChangeDateStartCredit;
     private javax.swing.JFormattedTextField jftDateDelivery;
     private javax.swing.JFormattedTextField jftDateStartCredit;
     private javax.swing.JFormattedTextField jftDateStartCreditRo;
@@ -417,7 +423,7 @@ public class SDialogUpdateDpsLogistics extends javax.swing.JDialog implements er
         }
 
         jtfPaymentTypeRo.setText("");
-        jckDifferentDate.setSelected(false);
+        jckChangeDateStartCredit.setSelected(false);
 
         itemStateDifferentDate();
     }
@@ -546,7 +552,7 @@ public class SDialogUpdateDpsLogistics extends javax.swing.JDialog implements er
         if (e.getSource() instanceof javax.swing.JCheckBox) {
             JCheckBox checkBox = (JCheckBox) e.getSource();
 
-            if (checkBox == jckDifferentDate) {
+            if (checkBox == jckChangeDateStartCredit) {
                 itemStateDifferentDate();
             }
         }
