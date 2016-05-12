@@ -92,8 +92,6 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
         jlTolerance = new javax.swing.JLabel();
         moCompTolerance = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
         jPanel27 = new javax.swing.JPanel();
-        jlSalarySscBase = new javax.swing.JLabel();
-        moCompSalarySscBase = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
         jPanel17 = new javax.swing.JPanel();
         jPanel21 = new javax.swing.JPanel();
         jPanel19 = new javax.swing.JPanel();
@@ -113,9 +111,15 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
         jPanel10 = new javax.swing.JPanel();
         jlTax = new javax.swing.JLabel();
         moCompTax = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jLabel1 = new javax.swing.JLabel();
+        jlSalary = new javax.swing.JLabel();
+        moCompSalary = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
         jPanel11 = new javax.swing.JPanel();
         jlSsContribution = new javax.swing.JLabel();
         moCompSsContribution = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jLabel2 = new javax.swing.JLabel();
+        jlSalarySscBase = new javax.swing.JLabel();
+        moCompSalarySscBase = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
         jPanel9 = new javax.swing.JPanel();
         jlTaxSubsidy = new javax.swing.JLabel();
         moCompTaxSubsidy = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
@@ -230,14 +234,6 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
         jPanel18.add(jPanel23);
 
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlSalarySscBase.setText("SBC:");
-        jlSalarySscBase.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel27.add(jlSalarySscBase);
-
-        moCompSalarySscBase.setEditable(false);
-        jPanel27.add(moCompSalarySscBase);
-
         jPanel18.add(jPanel27);
 
         jPanel16.add(jPanel18, java.awt.BorderLayout.NORTH);
@@ -313,6 +309,16 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
         jPanel10.add(jlTax);
         jPanel10.add(moCompTax);
 
+        jLabel1.setPreferredSize(new java.awt.Dimension(30, 23));
+        jPanel10.add(jLabel1);
+
+        jlSalary.setText("SD:");
+        jlSalary.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel10.add(jlSalary);
+
+        moCompSalary.setEditable(false);
+        jPanel10.add(moCompSalary);
+
         jPanel28.add(jPanel10);
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -321,6 +327,16 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
         jlSsContribution.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel11.add(jlSsContribution);
         jPanel11.add(moCompSsContribution);
+
+        jLabel2.setPreferredSize(new java.awt.Dimension(30, 23));
+        jPanel11.add(jLabel2);
+
+        jlSalarySscBase.setText("SBC:");
+        jlSalarySscBase.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel11.add(jlSalarySscBase);
+
+        moCompSalarySscBase.setEditable(false);
+        jPanel11.add(moCompSalarySscBase);
 
         jPanel28.add(jPanel11);
 
@@ -372,6 +388,8 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
@@ -415,6 +433,7 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
     private javax.swing.JLabel jlNetAmount;
     private javax.swing.JLabel jlNetAmountCalculated;
     private javax.swing.JLabel jlNetAmountWithSubsidy;
+    private javax.swing.JLabel jlSalary;
     private javax.swing.JLabel jlSalarySscBase;
     private javax.swing.JLabel jlSsContribution;
     private javax.swing.JLabel jlTax;
@@ -430,6 +449,7 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCompNetAmount;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCompNetAmountCalculated;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCompNetAmountWithSubsidy;
+    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCompSalary;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCompSalarySscBase;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCompSsContribution;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCompTax;
@@ -540,6 +560,7 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
         SHrsCalculatedNetGrossAmount netGrossAmount = null;
         
         try {
+            /*
             if (mnFormType == SHrsConsts.CAL_NET_AMT_TYPE) {
                 dSalaryDiary = moCompGrossAmount.getField().getValue() * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
             }
@@ -548,16 +569,17 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
             }
             dSalarySscBase = dSalaryDiary * SHrsUtils.getIntegrationFactorSbc(miClient.getSession(), (moEmployee == null ? null : moEmployee.getDateBenefits()), moDateDate.getValue());
             moCompSalarySscBase.getField().setValue(dSalarySscBase);
+            */
             
             if (mnFormType == SHrsConsts.CAL_NET_AMT_TYPE) {
-                netGrossAmount = SHrsUtils.computeNetAmountPayment(miClient.getSession(), moCompSalarySscBase.getField().getValue(), moCompGrossAmount.getField().getValue(), moDateDate.getValue());
+                netGrossAmount = SHrsUtils.computeNetAmountPayment(miClient.getSession(), moCompGrossAmount.getField().getValue(), moDateDate.getValue(), (moEmployee == null ? null : moEmployee.getDateBenefits()));
 
                 moCompNetAmountCalculated.getField().setValue(netGrossAmount.getNetAmount());
                 moCompGrossAmountCalculated.getField().setValue(0d);
                 moCompNetAmountWithSubsidy.getField().setValue(netGrossAmount.getNetAmountWithSubsidy());
             }
             else if (mnFormType == SHrsConsts.CAL_GROSS_AMT_TYPE) {
-                netGrossAmount = SHrsUtils.computeGrossAmountPayment(miClient.getSession(), moCompSalarySscBase.getField().getValue(), moCompNetAmount.getField().getValue(), moDateDate.getValue(), moCompTolerance.getField().getValue());                    
+                netGrossAmount = SHrsUtils.computeGrossAmountPayment(miClient.getSession(), moCompNetAmount.getField().getValue(), moDateDate.getValue(), moCompTolerance.getField().getValue(), (moEmployee == null ? null : moEmployee.getDateBenefits()));                    
 
                 moCompNetAmountCalculated.getField().setValue(0d);
                 moCompGrossAmountCalculated.getField().setValue(netGrossAmount.getGrossAmount());
@@ -567,6 +589,8 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
             moCompTax.getField().setValue(netGrossAmount.getTaxAmount());
             moCompTaxSubsidy.getField().setValue(netGrossAmount.getTaxSubsidyAmount());
             moCompSsContribution.getField().setValue(netGrossAmount.getSsContributionAmount());
+            moCompSalary.getField().setValue(netGrossAmount.getSalary());
+            moCompSalarySscBase.getField().setValue(netGrossAmount.getSalarySs());
         }
         catch (Exception e) {
             SLibUtils.printException(this, e);
@@ -590,6 +614,8 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
         moCompNetAmount.getField().setDecimalSettings(SGuiUtils.getLabelName(jlNetAmount.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, true);
         moCompTolerance.setCompoundFieldSettings(miClient);
         moCompTolerance.getField().setDecimalSettings(SGuiUtils.getLabelName(jlTolerance.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moCompSalary.setCompoundFieldSettings(miClient);
+        moCompSalary.getField().setDecimalSettings(SGuiUtils.getLabelName(jlSalary.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, true);
         moCompSalarySscBase.setCompoundFieldSettings(miClient);
         moCompSalarySscBase.getField().setDecimalSettings(SGuiUtils.getLabelName(jlSalarySscBase.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, true);
         moCompMwzWage.setCompoundFieldSettings(miClient);
@@ -625,7 +651,6 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
         moFields.addField(moCompGrossAmount.getField());
         moFields.addField(moCompNetAmount.getField());
         //moFields.addField(moCompTolerance);
-        moFields.addField(moCompSalarySscBase.getField());
         /*
         moFields.addField(moCompMwzWage.getField());
         moFields.addField(moCompAmountMwzWage.getField());
@@ -634,6 +659,10 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
         moFields.addField(moCompTax.getField());
         moFields.addField(moCompSsContribution.getField());
         moFields.addField(moCompTaxSubsidy.getField());
+        */
+        moFields.addField(moCompSalary.getField());
+        moFields.addField(moCompSalarySscBase.getField());
+        /*
         moFields.addField(moCompNetAmountCalculated.getField());
         moFields.addField(moCompGrossAmountCalculated.getField());
         moFields.addField(moCompNetAmountWithSubsidy.getField());
@@ -644,10 +673,11 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
         moCompGrossAmount.setEditable(false);
         moCompNetAmount.setEditable(false);
         moCompTolerance.setEditable(false);
-        moCompSalarySscBase.setEditable(false);
         moCompTax.setEditable(false);
         moCompSsContribution.setEditable(false);
         moCompTaxSubsidy.setEditable(false);
+        moCompSalary.setEditable(false);
+        moCompSalarySscBase.setEditable(false);
         moCompNetAmountCalculated.setEditable(false);
         moCompGrossAmountCalculated.setEditable(false);
         moCompNetAmountWithSubsidy.setEditable(false);
