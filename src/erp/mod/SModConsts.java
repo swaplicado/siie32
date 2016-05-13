@@ -633,6 +633,8 @@ public abstract class SModConsts {
     public static final int HRSX_EMP_INT = 2064061;
     public static final int HRSX_LOAN_PAY = 2064091;
     public static final int HRSX_ABS_MOV = 2064101;
+    public static final int HRSX_SSC_UPD = 2064102;
+    public static final int HRSX_EAR_SSC = 2064103;
 
     public static final int HRSU_TP_PAY_SYS = 2064050;
 
@@ -649,6 +651,7 @@ public abstract class SModConsts {
     public static final int HRSR_PAY_AUX_EAR_DED = 2065033;
     public static final int HRSR_LIST_EAR = 2065041;
     public static final int HRSR_LIST_DED = 2065042;
+    public static final int HRSR_ACT_EMP = 2065043;
     public static final int HRSR_WAGE_SAL_CSV = 2065051;
     public static final int HRSR_EAR_DED_CSV = 2065052;
     public static final int HRSR_VAC_CSV = 2065053;

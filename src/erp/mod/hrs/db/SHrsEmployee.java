@@ -41,6 +41,7 @@ public class SHrsEmployee {
     protected int mnBusinessDays;                 // business days in the period payroll
     protected int mnSeniority;                 // seniority to payroll end
     protected double mdAccumulatedTaxableEarnings;                 // taxable amount accumulated of earnigs 
+    protected double mdAccumulatedTaxableEarningsAlt;                 // taxable amount accumulated of earnigs configured for articule 174 the RLISR
     protected SHrsDaysByPeriod moHrsDaysPrev;
     protected SHrsDaysByPeriod moHrsDaysCurr;
     protected SHrsDaysByPeriod moHrsDaysNext;
@@ -70,6 +71,7 @@ public class SHrsEmployee {
         mnBusinessDays = 0;
         mnSeniority = 0;
         mdAccumulatedTaxableEarnings = 0;
+        mdAccumulatedTaxableEarningsAlt = 0;
         moHrsDaysPrev = null;
         moHrsDaysCurr = null;
         moHrsDaysNext = null;
@@ -87,6 +89,7 @@ public class SHrsEmployee {
     public void setBusinessDays(int n) { mnBusinessDays = n; }
     public void setSeniority(int n) { mnSeniority = n; }
     public void setAccumulatedTaxableEarning(double d) { mdAccumulatedTaxableEarnings = d; }
+    public void setAccumulatedTaxableEarningAlt(double d) { mdAccumulatedTaxableEarningsAlt = d; }
     public void setHrsDaysPrev(SHrsDaysByPeriod o) { moHrsDaysPrev = o; }
     public void setHrsDaysCurr(SHrsDaysByPeriod o) { moHrsDaysCurr = o; }
     public void setHrsDaysNext(SHrsDaysByPeriod o) { moHrsDaysNext = o; }
@@ -115,6 +118,7 @@ public class SHrsEmployee {
     public int getBusinessDays() { return mnBusinessDays; }
     public int getSeniority() { return mnSeniority; }
     public double getAccummulatedTaxableEarnings() { return mdAccumulatedTaxableEarnings; }
+    public double getAccummulatedTaxableEarningsAlt() { return mdAccumulatedTaxableEarningsAlt; }
     public SHrsDaysByPeriod getHrsDaysPrev() { return moHrsDaysPrev; }
     public SHrsDaysByPeriod getHrsDaysCurr() { return moHrsDaysCurr; }
     public SHrsDaysByPeriod getHrsDaysNext() { return moHrsDaysNext; }

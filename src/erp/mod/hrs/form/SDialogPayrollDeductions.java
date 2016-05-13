@@ -331,7 +331,8 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
         moGridEmployeeRow.getModel().clearGrid();
         
         if (moKeyDeduction.getValue()[0] > 0) { // read ear/ded
-            moComDeductionValue.setCompoundText((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { SModSysConsts.HRSS_TP_EAR_COMP_AMT }, SDbRegistry.FIELD_CODE));
+            //moComDeductionValue.setCompoundText((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { SModSysConsts.HRSS_TP_EAR_COMP_AMT }, SDbRegistry.FIELD_CODE)); XXX (jbarajas, 2016-04-20) new field for computation type
+            moComDeductionValue.setCompoundText((String) miClient.getSession().readField(SModConsts.HRSS_TP_DED_COMP, new int[] { (int) moKeyDeduction.getSelectedItem().getComplement() }, SDbRegistry.FIELD_CODE));
             
             for (SHrsPayrollReceipt hrsReceipt : maReceipts) { // read receipt
                 found = false;
@@ -348,7 +349,8 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
                             hrsReceiptDeductionRow.setPkMoveId(deduction.getPkMoveId());
                             hrsReceiptDeductionRow.setXtaEmployee(hrsReceipt.getHrsEmployee().getEmployee().getAuxEmployee());
                             hrsReceiptDeductionRow.setXtaValue(deduction.getReceiptDeduction().getAmountUnitary());
-                            hrsReceiptDeductionRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { SModSysConsts.HRSS_TP_EAR_COMP_AMT }, SDbRegistry.FIELD_CODE));
+                            //hrsReceiptDeductionRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { SModSysConsts.HRSS_TP_EAR_COMP_AMT }, SDbRegistry.FIELD_CODE)); XXX (jbarajas, 2016-04-20) new field for computation type
+                            hrsReceiptDeductionRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_DED_COMP, new int[] { deduction.getDeduction().getFkDeductionComputationTypeId() }, SDbRegistry.FIELD_CODE));
 
                             if (deduction.getReceiptDeduction() != null && deduction.getReceiptDeduction().getFkLoanEmployeeId_n() != SLibConsts.UNDEFINED) {
                                 hrsReceiptDeductionRow.setXtaLoan(deduction.getHrsReceipt().getHrsEmployee().getLoan(deduction.getReceiptDeduction().getFkLoanLoanId_n()).getLoanIdentificator());
@@ -370,7 +372,8 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
                         hrsReceiptDeductionRow.setPkMoveId(hrsReceipt.getHrsDeductions().size() + 1);
                         hrsReceiptDeductionRow.setXtaEmployee(hrsReceipt.getHrsEmployee().getEmployee().getAuxEmployee());
                         hrsReceiptDeductionRow.setXtaValue(0d);
-                        hrsReceiptDeductionRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { SModSysConsts.HRSS_TP_EAR_COMP_AMT }, SDbRegistry.FIELD_CODE));
+                        //hrsReceiptDeductionRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { SModSysConsts.HRSS_TP_EAR_COMP_AMT }, SDbRegistry.FIELD_CODE)); XXX (jbarajas, 2016-04-20) new field for computation type
+                        hrsReceiptDeductionRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_DED_COMP, new int[] { moDeductions.get(moKeyDeduction.getValue()[0]).getFkDeductionComputationTypeId() }, SDbRegistry.FIELD_CODE));
                         hrsReceiptDeductionRow.setPayment(false);
                         hrsReceiptDeductionRow.setXtaLoan("");
                         hrsReceiptDeductionRow.setReceiptDeduction(createReceipDeduction(hrsReceipt, hrsReceiptDeductionRow));
@@ -445,7 +448,7 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
             items.add(new SGuiItem(new int[] { 0 }, "- Deducción -"));
 
             for (SDbDeduction deduction : deductions) {
-                items.add(new SGuiItem(deduction.getPrimaryKey(), (deduction.getCode() + " - " + deduction.getName())));
+                items.add(new SGuiItem(deduction.getPrimaryKey(), (deduction.getCode() + " - " + deduction.getName()), deduction.getFkDeductionComputationTypeId()));
             }
             
             moKeyDeduction.removeAllItems();

@@ -95,6 +95,7 @@ public class SViewAutomaticDeductions extends SGridPaneView implements ActionLis
                 + "v.amt_unt, "
                 + "v.amt_r, "
                 + "vt.code, "
+                + "vtc.code, "
                 + "ded.code, "
                 + "ded.name, "
                 + "bp.bp, "
@@ -113,6 +114,8 @@ public class SViewAutomaticDeductions extends SGridPaneView implements ActionLis
                 + "v.id_ded = ded.id_ded "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_DED) + " AS vt ON "
                 + "v.fk_tp_ded = vt.id_tp_ded "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_DED_COMP) + " AS vtc ON "
+                + "ded.fk_tp_ded_comp = vtc.id_tp_ded_comp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
                 + "v.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
@@ -139,7 +142,7 @@ public class SViewAutomaticDeductions extends SGridPaneView implements ActionLis
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "ded.name", SGridConsts.COL_TITLE_NAME));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "ded.code", SGridConsts.COL_TITLE_CODE));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_8D, "v.amt_r", "Valor"));
-            //gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "vtc.code", "Unidad"));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "vtc.code", "Unidad"));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, "Fecha inicial"));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE + "1", "Fecha final"));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "l.num", "Crédito/Préstamo"));

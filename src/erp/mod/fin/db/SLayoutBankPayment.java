@@ -58,6 +58,7 @@ public class SLayoutBankPayment {
     
     public ArrayList<SLayoutBankDps> getLayoutBankDps() { return maLayoutBankDps; }
     
+    @Override
      public SLayoutBankPayment clone() throws CloneNotSupportedException {
         SLayoutBankPayment bankPayment = new SLayoutBankPayment(this.getBizPartnerId(), this.getBizPartnerBranchId(), this.getBizPartnerBranchAccountId());
         

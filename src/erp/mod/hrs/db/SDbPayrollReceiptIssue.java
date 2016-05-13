@@ -338,6 +338,48 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
         registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
+    
+    public Object readField(final Statement statement, final int[] pk, final int field) throws SQLException, Exception {
+        Object value = null;
+        ResultSet resultSet = null;
+
+        initQueryMembers();
+        mnQueryResultId = SDbConsts.READ_ERROR;
+
+        msSql = "SELECT ";
+
+        switch (field) {
+            case FIELD_NUMBER_SERIES:
+                msSql += "num_ser ";
+                break;
+            case FIELD_NUMBER:
+                msSql += "num ";
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+
+        msSql += getSqlFromWhere(pk);
+
+        resultSet = statement.executeQuery(msSql);
+        if (!resultSet.next()) {
+            throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
+        }
+        else {
+            switch (field) {
+                case FIELD_NUMBER_SERIES:
+                    value = resultSet.getString(1);
+                    break;
+                case FIELD_NUMBER:
+                    value = resultSet.getInt(1);
+                    break;
+                default:
+            }
+        }
+
+        mnQueryResultId = SDbConsts.READ_OK;
+        return value;
+    }
 
     @Override
     public void saveField(final Statement statement, final int[] pk, final int field, final Object value) throws Exception {

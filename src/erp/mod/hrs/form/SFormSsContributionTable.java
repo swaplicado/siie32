@@ -16,6 +16,8 @@ import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableRowSorter;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -541,16 +543,28 @@ public class SFormSsContributionTable extends SBeanForm implements ActionListene
         }
 
         moGridTableRows.populateGrid(rows);
+        moGridTableRows.getTable().getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        moGridTableRows.getTable().setColumnSelectionAllowed(false);
+        moGridTableRows.getTable().getTableHeader().setReorderingAllowed(false);
+        moGridTableRows.getTable().getTableHeader().setResizingAllowed(true);
+        moGridTableRows.getTable().setRowSorter(new TableRowSorter<AbstractTableModel>(moGridTableRows.getModel()));
+        moGridTableRows.getTable().getTableHeader().setEnabled(false);
         moGridTableRows.resetSortKeys();
         moGridTableRows.setSelectedGridRow(0);
-        moGridTableRows.getTable().getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        setFormEditable(false);
+        setFormEditable(true);
         jbEdit.setEnabled(false);
         jbRowAdd.setEnabled(false);
         jbRowUp.setEnabled(false);
         jbRowDown.setEnabled(false);
         jbRowRemove.setEnabled(false);
+        
+        moTextConcept.setEditable(false);
+        moTextSubconcept.setEditable(false);
+        moDecWorkerPercentage.setEditable(false);
+        moDecCompanyPercentage.setEditable(false);
+        moIntLowerLimitMwzReference.setEditable(false);
+        moIntLimitMwzReference.setEditable(false);
 
         addAllListeners();
     }

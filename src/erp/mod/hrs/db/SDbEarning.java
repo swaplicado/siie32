@@ -44,6 +44,7 @@ public class SDbEarning extends SDbRegistryUser {
     protected boolean mbDaysWorked;
     protected boolean mbWithholding;
     protected boolean mbPayrollTax;
+    protected boolean mbAlternativeTaxCalculation;
     /*
     protected boolean mbDeleted;
     protected boolean mbSystem;
@@ -215,6 +216,7 @@ public class SDbEarning extends SDbRegistryUser {
     public void setDaysAbsence(boolean b) { mbDaysAbsence = b; }
     public void setDaysWorked(boolean b) { mbDaysWorked = b; }
     public void setWithholding(boolean b) { mbWithholding = b; }
+    public void setAlternativeTaxCalculation(boolean b) { mbAlternativeTaxCalculation = b; }
     public void setPayrollTax(boolean b) { mbPayrollTax = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setSystem(boolean b) { mbSystem = b; }
@@ -251,6 +253,7 @@ public class SDbEarning extends SDbRegistryUser {
     public boolean isDaysAbsence() { return mbDaysAbsence; }
     public boolean isDaysWorked() { return mbDaysWorked; }
     public boolean isWithholding() { return mbWithholding; }
+    public boolean isAlternativeTaxCalculation() { return mbAlternativeTaxCalculation; }
     public boolean isPayrollTax() { return mbPayrollTax; }
     public boolean isDeleted() { return mbDeleted; }
     public boolean isSystem() { return mbSystem; }
@@ -303,6 +306,7 @@ public class SDbEarning extends SDbRegistryUser {
         mbDaysWorked = false;
         mbWithholding = false;
         mbPayrollTax = false;
+        mbAlternativeTaxCalculation = false;
         mbDeleted = false;
         mbSystem = false;
         mnFkEarningTypeId = 0;
@@ -385,6 +389,7 @@ public class SDbEarning extends SDbRegistryUser {
             mbDaysWorked = resultSet.getBoolean("b_day_wrk");
             mbWithholding = resultSet.getBoolean("b_who");
             mbPayrollTax = resultSet.getBoolean("b_pay_tax");
+            mbAlternativeTaxCalculation = resultSet.getBoolean("b_alt_tax");
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
             mnFkEarningTypeId = resultSet.getInt("fk_tp_ear");
@@ -455,7 +460,8 @@ public class SDbEarning extends SDbRegistryUser {
                     (mbDaysAbsence ? 1 : 0) + ", " +
                     (mbDaysWorked ? 1 : 0) + ", " +
                     (mbWithholding ? 1 : 0) + ", " +
-                    (mbPayrollTax ? 1 : 0) + ", " + 
+                    (mbPayrollTax ? 1 : 0) + ", " +
+                    (mbAlternativeTaxCalculation ? 1 : 0) + ", " +
                     (mbDeleted ? 1 : 0) + ", " +
                     (mbSystem ? 1 : 0) + ", " +
                     mnFkEarningTypeId + ", " +
@@ -497,6 +503,7 @@ public class SDbEarning extends SDbRegistryUser {
                     "b_day_wrk = " + (mbDaysWorked ? 1 : 0) + ", " +
                     "b_who = " + (mbWithholding ? 1 : 0) + ", " +
                     "b_pay_tax = " + (mbPayrollTax ? 1 : 0) + ", " +
+                    "b_alt_tax = " + (mbAlternativeTaxCalculation ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
                     "fk_tp_ear = " + mnFkEarningTypeId + ", " +
@@ -558,6 +565,7 @@ public class SDbEarning extends SDbRegistryUser {
         registry.setDaysWorked(this.isDaysWorked());
         registry.setWithholding(this.isWithholding());
         registry.setPayrollTax(this.isPayrollTax());
+        registry.setAlternativeTaxCalculation(this.isAlternativeTaxCalculation());
         registry.setDeleted(this.isDeleted());
         registry.setSystem(this.isSystem());
         registry.setFkEarningTypeId(this.getFkEarningTypeId());

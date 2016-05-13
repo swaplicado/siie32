@@ -61,6 +61,9 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
         jPanel5 = new javax.swing.JPanel();
         jlDeductionType = new javax.swing.JLabel();
         moKeyDeductionType = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel8 = new javax.swing.JPanel();
+        jlDeductionComputationType = new javax.swing.JLabel();
+        moKeyDeductionComputationType = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel3 = new javax.swing.JPanel();
         moBoolWithholding = new sa.lib.gui.bean.SBeanFieldBoolean();
         moBoolPayrollTax = new sa.lib.gui.bean.SBeanFieldBoolean();
@@ -87,7 +90,7 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(13, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(14, 1, 0, 5));
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -134,6 +137,17 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
         jPanel5.add(moKeyDeductionType);
 
         jPanel2.add(jPanel5);
+
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDeductionComputationType.setText("Tipo cálculo deducción:*");
+        jlDeductionComputationType.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel8.add(jlDeductionComputationType);
+
+        moKeyDeductionComputationType.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel8.add(moKeyDeductionComputationType);
+
+        jPanel2.add(jPanel8);
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -236,12 +250,14 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JLabel jlAbsenceClass;
     private javax.swing.JLabel jlAbsenceType;
     private javax.swing.JLabel jlAccountingConfigurationType;
     private javax.swing.JLabel jlAccountingRecordType;
     private javax.swing.JLabel jlBenefitType;
     private javax.swing.JLabel jlCode;
+    private javax.swing.JLabel jlDeductionComputationType;
     private javax.swing.JLabel jlDeductionType;
     private javax.swing.JLabel jlLoanType;
     private javax.swing.JLabel jlName;
@@ -254,6 +270,7 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
     private sa.lib.gui.bean.SBeanFieldKey moKeyAccountingConfigurationType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyAccountingRecordType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyBenefitType;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyDeductionComputationType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyDeductionType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyLoanType;
     private sa.lib.gui.bean.SBeanFieldText moTextCode;
@@ -262,7 +279,7 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 640, 400);
+        SGuiUtils.setWindowBounds(this, 720, 450);
 
         moFieldKeyGroup = new SGuiFieldKeyGroup(miClient);
         moFieldKeyGroup.addFieldKey(moKeyAbsenceClass, SModConsts.HRSU_CL_ABS, SLibConsts.UNDEFINED, null);
@@ -272,6 +289,7 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
         moTextName.setTextSettings(SGuiUtils.getLabelName(jlName.getText()), 100);
         moTextNameAbbreviated.setTextSettings(SGuiUtils.getLabelName(jlNameAbbreviated.getText()), 25);
         moKeyDeductionType.setKeySettings(miClient, SGuiUtils.getLabelName(jlDeductionType.getText()), true);
+        moKeyDeductionComputationType.setKeySettings(miClient, SGuiUtils.getLabelName(jlDeductionComputationType.getText()), true);
         moBoolWithholding.setBooleanSettings(SGuiUtils.getLabelName(moBoolWithholding.getText()), false);
         moBoolPayrollTax.setBooleanSettings(SGuiUtils.getLabelName(moBoolPayrollTax.getText()), false);
         moBoolLoan.setBooleanSettings(SGuiUtils.getLabelName(moBoolLoan.getText()), false);
@@ -286,6 +304,7 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
         moFields.addField(moTextName);
         moFields.addField(moTextNameAbbreviated);
         moFields.addField(moKeyDeductionType);
+        moFields.addField(moKeyDeductionComputationType);
         moFields.addField(moBoolWithholding);
         moFields.addField(moBoolPayrollTax);
         moFields.addField(moBoolLoan);
@@ -297,6 +316,11 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
         moFields.addField(moKeyAbsenceType);
 
         moFields.setFormButton(jbSave);
+    }
+
+    private void itemStateKeyEarningComputationType() {
+        if (moKeyDeductionComputationType.getValue().length > 0) {
+        }
     }
 
     private void itemStateBoolLoan() {
@@ -316,6 +340,7 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
     @Override
     public void reloadCatalogues() {
         miClient.getSession().populateCatalogue(moKeyDeductionType, SModConsts.HRSS_TP_DED, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyDeductionComputationType, SModConsts.HRSS_TP_DED_COMP, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyLoanType, SModConsts.HRSS_TP_LOAN, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyBenefitType, SModConsts.HRSS_TP_BEN, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyAccountingConfigurationType, SModConsts.HRSS_TP_ACC, SLibConsts.UNDEFINED, null);
@@ -345,6 +370,7 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
         moTextName.setValue(moRegistry.getName());
         moTextNameAbbreviated.setValue(moRegistry.getNameAbbreviated());
         moKeyDeductionType.setValue(new int[] { moRegistry.getFkDeductionTypeId() });
+        moKeyDeductionComputationType.setValue(new int[] { moRegistry.getFkDeductionComputationTypeId() });
         moBoolWithholding.setValue(moRegistry.isWithholding());
         moBoolPayrollTax.setValue(moRegistry.isPayrollTax());
         moBoolLoan.setValue(moRegistry.getFkLoanTypeId() > SModSysConsts.HRSS_TP_LOAN_NON);
@@ -357,6 +383,11 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
 
         setFormEditable(true);
         moBoolPayrollTax.setEditable(false);
+        moKeyDeductionComputationType.setEnabled(false);
+        
+        if (moRegistry.isRegistryNew()) {
+            moKeyDeductionComputationType.setValue(new int[] { SModSysConsts.HRSS_TP_DED_COMP_AMT });
+        }
         
         itemStateBoolLoan();
 
@@ -373,6 +404,7 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
         registry.setName(moTextName.getValue());
         registry.setNameAbbreviated(moTextNameAbbreviated.getValue());
         registry.setFkDeductionTypeId(moKeyDeductionType.getValue()[0]);
+        registry.setFkDeductionComputationTypeId(moKeyDeductionComputationType.getValue()[0]);
         registry.setWithholding(moBoolWithholding.getValue());
         registry.setPayrollTax(moBoolPayrollTax.getValue());
         registry.setFkLoanTypeId(moBoolLoan.getValue() ? moKeyLoanType.getValue()[0] : SModSysConsts.HRSS_TP_LOAN_NON);

@@ -222,6 +222,18 @@ public class SHrsPayrollReceiptDeduction implements SGridRow {
                         moPayrollReceiptDeduction.setUserEdited(true);
                     }
                     moPayrollReceiptDeduction.setAmountUnitary(mdXtaValue);
+                    
+                    /*
+                    // XXX (jbarajas, 2016-04-20) new field for computation type
+                    if (moDeduction.getFkDeductionComputationTypeId() == SModSysConsts.HRSS_TP_DED_COMP_AMT) {
+                        moPayrollReceiptDeduction.setAmountUnitary(mdXtaValue);
+                    }
+                    else {
+                        moPayrollReceiptDeduction.setUnitsAlleged(mdXtaValue);
+                        moPayrollReceiptDeduction.setUnits(mdXtaValue);
+                    }
+                    */
+                    
                     computeDeduction();
                     mbPayment = mdXtaValue != 0;
                     break;
@@ -233,6 +245,18 @@ public class SHrsPayrollReceiptDeduction implements SGridRow {
                     mbPayment = (boolean) value;
                     mdXtaValue = !mbPayment ? 0 : mdXtaValue;
                     moPayrollReceiptDeduction.setAmountUnitary(mdXtaValue);
+                    
+                    /*
+                    // XXX (jbarajas, 2016-04-20) new field for computation type
+                    if (moDeduction.getFkDeductionComputationTypeId() == SModSysConsts.HRSS_TP_DED_COMP_AMT) {
+                        moPayrollReceiptDeduction.setAmountUnitary(mdXtaValue);
+                    }
+                    else {
+                        moPayrollReceiptDeduction.setUnitsAlleged(mdXtaValue);
+                        moPayrollReceiptDeduction.setUnits(mdXtaValue);
+                    }
+                    */
+                    
                     if (!mbPayment) {
                         moPayrollReceiptDeduction.setFkLoanEmployeeId_n(SLibConsts.UNDEFINED);
                         moPayrollReceiptDeduction.setFkLoanLoanId_n(SLibConsts.UNDEFINED);

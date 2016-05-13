@@ -17,8 +17,10 @@ import erp.mod.hrs.db.SHrsUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
+import erp.print.Print;
 import erp.print.SDataConstantsPrint;
 import java.awt.Cursor;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Date;
 import sa.lib.SLibConsts;
@@ -26,6 +28,7 @@ import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiSession;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 
@@ -45,6 +48,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
     
     protected boolean mbFirstTime;
     protected int mnSubtypeCfd;
+    protected int mnNumCopies;
     
     /**
      * Creates new form SDialogResult
@@ -363,112 +367,148 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
         int cfdsIncorrect = 0;
         SDataFormerPayrollEmp payrollEmp = null;
         SDbPayrollReceipt payrollReceipt = null;
+        SDbPayrollReceiptIssue payrollReceiptIssue = null;
         SDataDps dps = null;
         String detailMessage = "";
         String numberSeries = "";
         String number = "";
+        Print print = null;
+        String sSql = "";
+        ResultSet resultSet = null;
         
         moIntTotalToProcess.setValue(maCfds.size());
         
         if (maCfds != null) {
             for(SDataCfd cfd : maCfds) {
-            cfdsProcessed++;
+                cfdsProcessed++;
 
-            switch (cfd.getFkCfdTypeId()) {
-                case SCfdConsts.CFD_TYPE_DPS:
-                    dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
+                switch (cfd.getFkCfdTypeId()) {
+                    case SCfdConsts.CFD_TYPE_DPS:
+                        dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
 
-                    numberSeries = dps.getNumberSeries();
-                    number = dps.getNumber();
-                    break;
-                case SCfdConsts.CFD_TYPE_PAYROLL:
-                    switch (mnSubtypeCfd) {
-                        case SCfdConsts.CFDI_PAYROLL_VER_OLD:
-                           payrollEmp = (SDataFormerPayrollEmp) SDataUtilities.readRegistry(miClient, SDataConstants.HRS_FORMER_PAYR_EMP, new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, SLibConstants.EXEC_MODE_SILENT);
+                        numberSeries = dps.getNumberSeries();
+                        number = dps.getNumber();
+                        break;
+                    case SCfdConsts.CFD_TYPE_PAYROLL:
+                        switch (mnSubtypeCfd) {
+                            case SCfdConsts.CFDI_PAYROLL_VER_OLD:
+                               payrollEmp = (SDataFormerPayrollEmp) SDataUtilities.readRegistry(miClient, SDataConstants.HRS_FORMER_PAYR_EMP, new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, SLibConstants.EXEC_MODE_SILENT);
 
-                            numberSeries = payrollEmp.getNumberSeries();
-                            number = "" + payrollEmp.getNumber();
-                            break;
-                        case SCfdConsts.CFDI_PAYROLL_VER_CUR:
-                            payrollReceipt = new SDbPayrollReceipt();
-                            payrollReceipt.read(miClient.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
-                            
-                            if (payrollReceipt.getPayrollReceiptIssues() != null) {
-                                numberSeries = payrollReceipt.getPayrollReceiptIssues().getNumberSeries();
-                                number = "" + payrollReceipt.getPayrollReceiptIssues().getNumber();
-                            }
-                            break;
-                        default:
-                            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-                    }
-                    
-                    break;
-                default:
-                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-            }
+                                numberSeries = payrollEmp.getNumberSeries();
+                                number = "" + payrollEmp.getNumber();
+                                break;
+                            case SCfdConsts.CFDI_PAYROLL_VER_CUR:
+                                /*
+                                payrollReceipt = new SDbPayrollReceipt();
+                                payrollReceipt.read(miClient.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
+                                
+                                if (payrollReceipt.getPayrollReceiptIssues() != null) {
+                                    numberSeries = payrollReceipt.getPayrollReceiptIssues().getNumberSeries();
+                                    number = "" + payrollReceipt.getPayrollReceiptIssues().getNumber();
+                                }
+                                */
+                                // Read Issue last:
 
-            try {
-                switch (mnFormSubtype) {
-                    case SCfdConsts.PROC_REQ_STAMP:
-                        SCfdUtils.signCfdi(miClient, cfd, mnSubtypeCfd, false);
-                        detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Timbrado.\n";
-                        break;
-                    case SCfdConsts.PROC_REQ_ANNUL:
-                        SCfdUtils.cancelCfdi(miClient, cfd, mnSubtypeCfd, mtCancellationDate, mbValidateStamp, false);
-                        detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Anulado.\n";
-                        break;
-                    case SCfdConsts.PROC_PRT_DOC:
-                        SCfdUtils.printCfd(miClient, cfd.getFkCfdTypeId(), cfd, SDataConstantsPrint.PRINT_MODE_STREAM, mnSubtypeCfd, false);
-                        detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Impreso.\n";
-                        break;
-                    case SCfdConsts.PROC_PRT_ACK_ANNUL:
-                        SCfdUtils.printAcknowledgmentCancellationCfd(miClient, cfd, SDataConstantsPrint.PRINT_MODE_STREAM, mnSubtypeCfd);
-                        detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Impreso.\n";
-                        break;
-                    case SCfdConsts.PROC_SND_DOC:
-                        SCfdUtils.sendCfd(miClient, cfd.getFkCfdTypeId(), cfd, mnSubtypeCfd, false);
-                        detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Enviado.\n";
-                        break;
-                    case SCfdConsts.PROC_REQ_STAMP_AND_SND:
-                        if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
-                            SCfdUtils.signAndSendCfdi(miClient, cfd, mnSubtypeCfd, false);
+                                sSql = "SELECT id_iss "
+                                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " "
+                                        + "WHERE id_pay = " + cfd.getFkPayrollReceiptPayrollId_n() + " AND id_emp = " + cfd.getFkPayrollReceiptEmployeeId_n() + " "
+                                        + "ORDER BY id_iss DESC LIMIT 1";
+
+                                resultSet = miClient.getSession().getDatabase().getConnection().createStatement().executeQuery(sSql);
+                                if (resultSet.next()) {
+                                    payrollReceiptIssue = new SDbPayrollReceiptIssue();
+                                    
+                                    numberSeries = (String) payrollReceiptIssue.readField(miClient.getSession().getDatabase().getConnection().createStatement(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), resultSet.getInt("id_iss") }, SDbPayrollReceiptIssue.FIELD_NUMBER_SERIES);
+                                    number = "" + (int) payrollReceiptIssue.readField(miClient.getSession().getDatabase().getConnection().createStatement(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), resultSet.getInt("id_iss") }, SDbPayrollReceiptIssue.FIELD_NUMBER);
+                                }
+                                break;
+                            default:
+                                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                         }
-                        else {
-                            SCfdUtils.signCfdi(miClient, cfd, mnSubtypeCfd, false);
-                        }
-                        detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "Timbrado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
-                        break;
-                    case SCfdConsts.PROC_REQ_ANNUL_AND_SND:
-                        if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
-                            SCfdUtils.cancelAndSendCfdi(miClient, cfd, mnSubtypeCfd, mtCancellationDate, mbValidateStamp, false);
-                        }
-                        else {
-                            SCfdUtils.cancelCfdi(miClient, cfd, mnSubtypeCfd, mtCancellationDate, mbValidateStamp, false);
-                        }
-                        detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Anulado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
+
                         break;
                     default:
+                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
-                cfdsCorrect++;
-            }
-            catch(Exception e) {
-                detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   " + e.getMessage() + "\n";
-                cfdsIncorrect++;
-            }
 
-            if (mnTotalStamps > 0) {
-                updateForm(cfdsProcessed, cfdsCorrect, cfdsIncorrect, detailMessage, mnTotalStamps);
-            }
-            else {
-                updateForm(cfdsProcessed, cfdsCorrect, cfdsIncorrect, detailMessage);
-            }
-            update(getGraphics());
-            jScrollPane1.getVerticalScrollBar().setValue(jScrollPane1.getVerticalScrollBar().getMaximum());
+                try {
+                    switch (mnFormSubtype) {
+                        case SCfdConsts.PROC_REQ_STAMP:
+                            SCfdUtils.signCfdi(miClient, cfd, mnSubtypeCfd, false);
+                            detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Timbrado.\n";
+                            break;
+                        case SCfdConsts.PROC_REQ_ANNUL:
+                            SCfdUtils.cancelCfdi(miClient, cfd, mnSubtypeCfd, mtCancellationDate, mbValidateStamp, false);
+                            detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Anulado.\n";
+                            break;
+                        case SCfdConsts.PROC_PRT_DOC:
+                            SCfdUtils.printCfd(miClient, cfd.getFkCfdTypeId(), cfd, SDataConstantsPrint.PRINT_MODE_STREAM, mnNumCopies, mnSubtypeCfd, false);
+                            detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Impreso.\n";
+                            break;
+                        case SCfdConsts.PROC_PRT_ACK_ANNUL:
+                            SCfdUtils.printAcknowledgmentCancellationCfd(miClient, cfd, SDataConstantsPrint.PRINT_MODE_STREAM, mnSubtypeCfd);
+                            detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Impreso.\n";
+                            break;
+                        case SCfdConsts.PROC_SND_DOC:
+                            SCfdUtils.sendCfd(miClient, cfd.getFkCfdTypeId(), cfd, mnSubtypeCfd, false);
+                            detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Enviado.\n";
+                            break;
+                        case SCfdConsts.PROC_REQ_STAMP_AND_SND:
+                            if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
+                                SCfdUtils.signAndSendCfdi(miClient, cfd, mnSubtypeCfd, false);
+                            }
+                            else {
+                                SCfdUtils.signCfdi(miClient, cfd, mnSubtypeCfd, false);
+                            }
+                            detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "Timbrado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
+                            break;
+                        case SCfdConsts.PROC_REQ_ANNUL_AND_SND:
+                            if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
+                                SCfdUtils.cancelAndSendCfdi(miClient, cfd, mnSubtypeCfd, mtCancellationDate, mbValidateStamp, false);
+                            }
+                            else {
+                                SCfdUtils.cancelCfdi(miClient, cfd, mnSubtypeCfd, mtCancellationDate, mbValidateStamp, false);
+                            }
+                            detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Anulado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
+                            break;
+                        case SCfdConsts.PROC_REQ_VERIFY:
+                            SCfdUtils.verifyCfdi(miClient, cfd, mnSubtypeCfd);
+                            detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Enviado.\n";
+                            break;
+                        default:
+                    }
+                    cfdsCorrect++;
+                }
+                catch(Exception e) {
+                    detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   " + e.getMessage() + "\n";
+                    cfdsIncorrect++;
+                }
+
+                if (mnTotalStamps > 0) {
+                    updateForm(cfdsProcessed, cfdsCorrect, cfdsIncorrect, detailMessage, mnTotalStamps);
+                }
+                else {
+                    updateForm(cfdsProcessed, cfdsCorrect, cfdsIncorrect, detailMessage);
+                }
+                update(getGraphics());
+                jScrollPane1.getVerticalScrollBar().setValue(jScrollPane1.getVerticalScrollBar().getMaximum());
             }
             miClient.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
     }
 
+    public synchronized SGuiSession getSession() {
+        SGuiSession session = new SGuiSession((SGuiClient) miClient);
+
+        session.setUser(miClient.getSessionXXX().getUser());                      // XXX this must be replaced
+        session.setSystemDate(miClient.getSessionXXX().getSystemDate());
+        session.setCurrentDate(miClient.getSessionXXX().getWorkingDate());
+        session.setUserTs(miClient.getSessionXXX().getSystemDate());
+        session.setDatabase(miClient.getSession().getDatabase());
+        
+        return session;
+    }
+    
     private void updateForm(final int totalProcess, final int totalCorrect, final int totalIncorrect, final String message, final int totalStamp) {
         moIntTotalProcess.setValue(totalProcess);
         moIntTotalCorrect.setValue(totalCorrect);
@@ -500,6 +540,10 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
         mtCancellationDate = cancellationDate;
         mbValidateStamp = validateStamp;
         mnSubtypeCfd = subtypeCfd;
+    }
+    
+    public void setNumberCopies(final int numCopies) {
+        mnNumCopies = numCopies;
     }
 
     @Override

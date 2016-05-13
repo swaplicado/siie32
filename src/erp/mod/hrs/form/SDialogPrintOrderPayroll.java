@@ -45,17 +45,45 @@ public class SDialogPrintOrderPayroll extends SBeanFormDialog {
 
         moRadGroupOrder = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        jlNumCopies = new javax.swing.JLabel();
+        moIntNumCopies = new sa.lib.gui.bean.SBeanFieldInteger();
+        jPanel6 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         moRadOrderByNumber = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel12 = new javax.swing.JPanel();
         moRadOrderByEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
+        jPanel13 = new javax.swing.JPanel();
+        moRadOrderByDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
 
         setTitle("Ordenamiento para impresión de nóminas");
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento por:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros de impresión:"));
+        jPanel3.setLayout(new java.awt.BorderLayout());
+
+        jPanel4.setLayout(new java.awt.GridLayout(1, 1));
+
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlNumCopies.setText("Núm. copias:");
+        jlNumCopies.setPreferredSize(new java.awt.Dimension(62, 23));
+        jPanel5.add(jlNumCopies);
+        jPanel5.add(moIntNumCopies);
+
+        jPanel4.add(jPanel5);
+
+        jPanel3.add(jPanel4, java.awt.BorderLayout.NORTH);
+
+        jPanel1.add(jPanel3, java.awt.BorderLayout.NORTH);
+
+        jPanel6.setLayout(new java.awt.BorderLayout());
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento por:"));
         jPanel2.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -74,7 +102,17 @@ public class SDialogPrintOrderPayroll extends SBeanFormDialog {
 
         jPanel2.add(jPanel12);
 
-        jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        moRadGroupOrder.add(moRadOrderByDepartament);
+        moRadOrderByDepartament.setText("Departamento");
+        jPanel13.add(moRadOrderByDepartament);
+
+        jPanel2.add(jPanel13);
+
+        jPanel6.add(jPanel2, java.awt.BorderLayout.NORTH);
+
+        jPanel1.add(jPanel6, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
@@ -83,8 +121,16 @@ public class SDialogPrintOrderPayroll extends SBeanFormDialog {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JLabel jlNumCopies;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntNumCopies;
     private javax.swing.ButtonGroup moRadGroupOrder;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByDepartament;
     private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByEmployee;
     private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNumber;
     // End of variables declaration//GEN-END:variables
@@ -94,11 +140,15 @@ public class SDialogPrintOrderPayroll extends SBeanFormDialog {
 
         jbSave.setText("Aceptar");
         
+        moIntNumCopies.setIntegerSettings(SGuiUtils.getLabelName(jlNumCopies), SGuiConsts.GUI_TYPE_INT, true);
         moRadOrderByNumber.setBooleanSettings(SGuiUtils.getLabelName(moRadOrderByNumber.getText()), true);
         moRadOrderByEmployee.setBooleanSettings(SGuiUtils.getLabelName(moRadOrderByEmployee.getText()), false);
+        moRadOrderByDepartament.setBooleanSettings(SGuiUtils.getLabelName(moRadOrderByDepartament.getText()), false);
 
-        moFields.addField(moRadOrderByEmployee);
+        moFields.addField(moIntNumCopies);
         moFields.addField(moRadOrderByNumber);
+        moFields.addField(moRadOrderByEmployee);
+        moFields.addField(moRadOrderByDepartament);
 
         moFields.setFormButton(jbSave);
         
@@ -150,7 +200,10 @@ public class SDialogPrintOrderPayroll extends SBeanFormDialog {
         else if (moRadOrderByEmployee.isSelected()) {
             mnOrderByType = SUtilConsts.PER_BPR;
         }
+        else if (moRadOrderByDepartament.isSelected()) {
+            mnOrderByType = SUtilConsts.PER_REF;
+        }
         
-        return mnOrderByType;
+        return type == SGuiConsts.PARAM_KEY ? mnOrderByType : moIntNumCopies.getValue();
     }
 }

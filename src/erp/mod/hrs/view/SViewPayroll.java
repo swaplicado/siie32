@@ -310,6 +310,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
     private void actionPrint() {
         SDialogPrintOrderPayroll dialogPrintOrderPayroll = null;
         int orderBy = 0;
+        int copiesNum = 0;
         
         if (jbPrint.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
@@ -334,9 +335,10 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                         dialogPrintOrderPayroll.setVisible(true);
                         
                         if (dialogPrintOrderPayroll.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                            orderBy = (int) dialogPrintOrderPayroll.getValue(SLibConsts.UNDEFINED);
+                            orderBy = (int) dialogPrintOrderPayroll.getValue(SGuiConsts.PARAM_KEY);
+                            copiesNum = (int) dialogPrintOrderPayroll.getValue(SLibConsts.UNDEFINED);
                         }
-                        SCfdUtils.printCfd((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey(), orderBy), SCfdConsts.CFDI_PAYROLL_VER_CUR);
+                        SCfdUtils.printCfd((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey(), orderBy), copiesNum, SCfdConsts.CFDI_PAYROLL_VER_CUR);
                     }
                     catch (Exception e) {
                         SLibUtils.showException(this, e);
