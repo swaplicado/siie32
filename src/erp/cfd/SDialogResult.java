@@ -17,7 +17,6 @@ import erp.mod.hrs.db.SHrsUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
-import erp.print.Print;
 import erp.print.SDataConstantsPrint;
 import java.awt.Cursor;
 import java.sql.ResultSet;
@@ -372,7 +371,6 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
         String detailMessage = "";
         String numberSeries = "";
         String number = "";
-        Print print = null;
         String sSql = "";
         ResultSet resultSet = null;
         
