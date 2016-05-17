@@ -102,7 +102,7 @@ public abstract class SHrsUtils {
                 sql = "SELECT rcp.id_emp, rcp.pay_r, emp.bank_acc " +
                         "FROM hrs_pay_rcp AS rcp " +
                         "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
-                        "WHERE rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " ";
+                        "WHERE rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0";
                 resultSet = client.getSession().getStatement().executeQuery(sql);
                 while (resultSet.next()) {
                     buffer = "";

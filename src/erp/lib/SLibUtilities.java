@@ -18,6 +18,7 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -388,6 +389,15 @@ public abstract class SLibUtilities {
         //JOptionPane.showMessageDialog(null, "[" + object.getClass().getName() + "] " + exception, "Excepción", JOptionPane.WARNING_MESSAGE);
         JOptionPane.showMessageDialog(null, (exception.getMessage() == null ? exception : exception.getMessage()) +
                 "\n\n[" + exception.getClass().getName() + " en " + object.getClass().getName() + "]", "Excepción", JOptionPane.WARNING_MESSAGE);
+    }
+    
+    public static void requestComponentFocus(javax.swing.JComponent component){
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                component.requestFocusInWindow();
+            }
+        });
     }
 
     /** Translates a value to its text representation. */

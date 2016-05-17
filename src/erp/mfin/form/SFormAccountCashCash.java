@@ -44,6 +44,7 @@ public class SFormAccountCashCash extends javax.swing.JDialog implements erp.lib
     private erp.lib.form.SFormField moFieldFkAccountCashTypeId;
     private erp.lib.form.SFormField moFieldFkCurrencyId;
     private erp.lib.form.SFormField moFieldIsDeleted;
+    private erp.lib.form.SFormField moFieldIsEntityActive;
 
     private erp.mfin.form.SPanelAccount moPanelFkAccountId;
 
@@ -86,8 +87,9 @@ public class SFormAccountCashCash extends javax.swing.JDialog implements erp.lib
         jpAccount = new javax.swing.JPanel();
         jlDummyAccount = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
-        jlDummy = new javax.swing.JLabel();
         jckIsDeleted = new javax.swing.JCheckBox();
+        jckIsEntityActive = new javax.swing.JCheckBox();
+        jlDummy = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -190,11 +192,14 @@ public class SFormAccountCashCash extends javax.swing.JDialog implements erp.lib
 
         jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlDummy.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel1.add(jlDummy);
-
         jckIsDeleted.setText("Registro eliminado");
         jPanel1.add(jckIsDeleted);
+
+        jckIsEntityActive.setText("Está activo");
+        jPanel1.add(jckIsEntityActive);
+
+        jlDummy.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel1.add(jlDummy);
 
         jPanel3.add(jPanel1, java.awt.BorderLayout.PAGE_END);
 
@@ -213,8 +218,8 @@ public class SFormAccountCashCash extends javax.swing.JDialog implements erp.lib
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-600)/2, (screenSize.height-400)/2, 600, 400);
+        setSize(new java.awt.Dimension(600, 400));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -242,7 +247,8 @@ public class SFormAccountCashCash extends javax.swing.JDialog implements erp.lib
         moFieldFkCurrencyId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkCurrencyId, jlFkCurrencyId);
         moFieldFkCurrencyId.setPickerButton(jbFkCurrencyId);
         moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsDeleted);
-
+        moFieldIsEntityActive = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsEntityActive);
+        
         mvFields = new Vector<SFormField>();
         mvFields.add(moFieldPkCompanyBranchId);
         mvFields.add(moFieldAuxEntity);
@@ -250,6 +256,7 @@ public class SFormAccountCashCash extends javax.swing.JDialog implements erp.lib
         mvFields.add(moFieldFkAccountCashTypeId);
         mvFields.add(moFieldFkCurrencyId);
         mvFields.add(moFieldIsDeleted);
+        mvFields.add(moFieldIsEntityActive);
 
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
@@ -335,6 +342,7 @@ public class SFormAccountCashCash extends javax.swing.JDialog implements erp.lib
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCurrencyId;
     private javax.swing.JComboBox<SFormComponentItem> jcbPkCompanyBranchId;
     private javax.swing.JCheckBox jckIsDeleted;
+    private javax.swing.JCheckBox jckIsEntityActive;
     private javax.swing.JLabel jlAuxCode;
     private javax.swing.JLabel jlAuxEntity;
     private javax.swing.JLabel jlDummy;
@@ -372,6 +380,8 @@ public class SFormAccountCashCash extends javax.swing.JDialog implements erp.lib
         jcbPkCompanyBranchId.setEnabled(true);
         jbPkCompanyBranchId.setEnabled(true);
         jckIsDeleted.setEnabled(false);
+        jckIsEntityActive.setEnabled(false);
+        jckIsEntityActive.setSelected(true);
 
         moPanelFkAccountId.resetPanel();
     }
@@ -445,10 +455,12 @@ public class SFormAccountCashCash extends javax.swing.JDialog implements erp.lib
 
         moFieldAuxCode.setFieldValue(moAccountCash.getAuxCode());
         moFieldAuxEntity.setFieldValue(moAccountCash.getAuxEntity());
+        jckIsEntityActive.setSelected(moAccountCash.getAuxIsEntityActive());
 
         jcbPkCompanyBranchId.setEnabled(false);
         jbPkCompanyBranchId.setEnabled(false);
         jckIsDeleted.setEnabled(true);
+        jckIsEntityActive.setEnabled(true);
 
         moPanelFkAccountId.refreshPanel();
     }
@@ -476,7 +488,8 @@ public class SFormAccountCashCash extends javax.swing.JDialog implements erp.lib
 
         moAccountCash.setAuxCode(moFieldAuxCode.getString());
         moAccountCash.setAuxEntity(moFieldAuxEntity.getString());
-
+        moAccountCash.setAuxIsEntityActive(moFieldIsEntityActive.getBoolean());
+        
         return moAccountCash;
     }
 

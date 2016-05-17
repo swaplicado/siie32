@@ -169,7 +169,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
 
     private javax.swing.JMenu jmRec;
     private javax.swing.JMenuItem jmiRecRec;
-    private javax.swing.JMenuItem jmiRecRecEtyXml;
+    private javax.swing.JMenuItem jmiRecRecEtyXmlIncome;
+    private javax.swing.JMenuItem jmiRecRecEtyXmlExpenses;
     private javax.swing.JMenuItem jmiRecRecCash;
     private javax.swing.JMenuItem jmiRecBal;
     private javax.swing.JMenuItem jmiRecCashAccBalountCash;
@@ -475,7 +476,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRec = new JMenu("Pólizas contables");
 
         jmiRecRec = new JMenuItem("Pólizas contables");
-        jmiRecRecEtyXml = new JMenuItem("Pólizas contables con XML");
+        jmiRecRecEtyXmlIncome = new JMenuItem("Pólizas contables con XML de ingresos");
+        jmiRecRecEtyXmlExpenses = new JMenuItem("Pólizas contables con XML de egresos");
         jmiRecRecCash = new JMenuItem("Pólizas contables de cuentas de dinero");
         jmiRecBal = new JMenuItem("Balanza de comprobación");
         jmiRecCashAccBalountCash = new JMenuItem("Saldos cajas");
@@ -493,7 +495,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRecDpsBizPartnerSup = new JMenuItem("Consulta pólizas contables de docs. de proveedores");
 
         jmRec.add(jmiRecRec);
-        jmRec.add(jmiRecRecEtyXml);
+        jmRec.add(jmiRecRecEtyXmlIncome);
+        jmRec.add(jmiRecRecEtyXmlExpenses);
         jmRec.add(jmiRecRecCash);
         jmRec.addSeparator();
         jmRec.add(jmiRecBal);
@@ -733,7 +736,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiBkkFiscalYearOpeningDel.addActionListener(this);
 
         jmiRecRec.addActionListener(this);
-        jmiRecRecEtyXml.addActionListener(this);
+        jmiRecRecEtyXmlIncome.addActionListener(this);
+        jmiRecRecEtyXmlExpenses.addActionListener(this);
         jmiRecRecCash.addActionListener(this);
         jmiRecBal.addActionListener(this);
         jmiRecCashAccBalountCash.addActionListener(this);
@@ -908,7 +912,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
 
         jmRec.setEnabled(hasBkrRight || hasRepRight || hasMoveAccCash || hasMoveBpCdr || hasMoveBpDbr);
         jmiRecRec.setEnabled(hasBkrRight);
-        jmiRecRecEtyXml.setEnabled(hasBkrRight);
+        jmiRecRecEtyXmlIncome.setEnabled(hasBkrRight);
+        jmiRecRecEtyXmlExpenses.setEnabled(hasBkrRight);
         jmiRecRecCash.setEnabled(hasBkrRight);
         jmiRecRecCash.setEnabled(false);    // XXX temporal code!!! (sflores, 2013-07-27)
         jmiRecBal.setEnabled(hasBkrRight || hasRepRight);
@@ -1449,8 +1454,16 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                     sViewTitle = "Pólizas contab.";
                     break;
                 case SDataConstants.FIN_REC_ETY:
-                    oViewClass = erp.mfin.view.SViewRecordEntriesXml.class;
-                    sViewTitle = "Pólizas contab. con XML";
+                    switch(auxType01){
+                        case SDataConstantsSys.TRNS_CT_DPS_PUR:
+                            oViewClass = erp.mfin.view.SViewRecordEntriesXml.class;
+                            sViewTitle = "Pólizas contab. con XML egresos";
+                            break;
+                        case SDataConstantsSys.TRNS_CT_DPS_SAL:
+                            oViewClass = erp.mfin.view.SViewRecordEntriesXml.class;
+                            sViewTitle = "Pólizas contab. con XML ingresos";
+                            break;
+                    }
                     break;
                 case SDataConstants.FINX_REC_CASH:
                     oViewClass = erp.mfin.view.SViewRecordCash.class;
@@ -1786,8 +1799,11 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiRecRec) {
                 showView(SDataConstants.FIN_REC);
             }
-            else if (item == jmiRecRecEtyXml) {
-                showView(SDataConstants.FIN_REC_ETY);
+            else if (item == jmiRecRecEtyXmlIncome) {
+                showView(SDataConstants.FIN_REC_ETY, SDataConstantsSys.TRNS_CT_DPS_SAL);
+            }
+            else if (item == jmiRecRecEtyXmlExpenses) {
+                showView(SDataConstants.FIN_REC_ETY, SDataConstantsSys.TRNS_CT_DPS_PUR);
             }
             else if (item == jmiRecRecCash) {
                 showView(SDataConstants.FINX_REC_CASH);
