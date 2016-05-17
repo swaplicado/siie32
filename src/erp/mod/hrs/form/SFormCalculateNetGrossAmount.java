@@ -467,13 +467,26 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
      * Private methods
      */
     
+    private void resetFields() {
+        moCompTax.getField().setValue(0d);
+        moCompSsContribution.getField().setValue(0d);
+        moCompTaxSubsidy.getField().setValue(0d);
+        moCompSalary.getField().setValue(0d);
+        moCompSalarySscBase.getField().setValue(0d);
+        moCompNetAmountCalculated.getField().setValue(0d);
+        moCompGrossAmountCalculated.getField().setValue(0d);
+        moCompNetAmountWithSubsidy.getField().setValue(0d);
+    }
+    
     public void actionEnableFields() {
         if (moRadFilterWithEmployee.isSelected()) {
             moKeyEmployee.setEnabled(true);
+            moDateDate.setEditable(true);
         }
         else if (moRadFilterWithoutEmployee.isSelected()) {
             moKeyEmployee.setSelectedIndex(0);
             moKeyEmployee.setEnabled(false);
+            moDateDate.setEditable(false);
         }
     }
     
@@ -527,17 +540,20 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
                 moCompGrossAmount.setEditable(true);
                 moCompNetAmount.getField().setValue(0d);
                 moCompNetAmount.setEditable(false);
+                resetFields();
             }
             else if (moKeyCalculateType.getSelectedItem().getPrimaryKey()[0] == SHrsConsts.CAL_GROSS_AMT_TYPE) {
                 mnFormType = SHrsConsts.CAL_GROSS_AMT_TYPE;
                 moCompGrossAmount.getField().setValue(0d);
                 moCompGrossAmount.setEditable(false);
                 moCompNetAmount.setEditable(true);
+                resetFields();
             }
         }
         else {
             moCompGrossAmount.setEditable(false);
             moCompNetAmount.setEditable(false);
+            resetFields();
         }
     }
     

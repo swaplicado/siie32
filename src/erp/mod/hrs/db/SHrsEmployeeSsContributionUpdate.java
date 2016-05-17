@@ -4,9 +4,13 @@
  */
 package erp.mod.hrs.db;
 
+import erp.mod.SModConsts;
+import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Date;
 import sa.lib.SLibUtils;
 import sa.lib.grid.SGridRow;
+import sa.lib.gui.SGuiSession;
 
 /**
  *
@@ -23,11 +27,15 @@ public class SHrsEmployeeSsContributionUpdate implements SGridRow {
     protected int mnDaysIncapacity;
     protected int mnDaysAbsenteeism;
     protected int mnDaysSuspension;
+    protected double mdAmountSys_r;
+    protected double mdAmount_r;
     protected double mdPaymentDailyProportional;
     protected boolean mbApply;
+    protected double mdSalaryDaily;
     protected double mdSalarySscBase;
     protected double mdSalarySscBaseNewSys;
     protected double mdSalarySscBaseNew;
+    protected Date mtDateSalarySscBase;
     
     protected ArrayList<SHrsEarningsSsContributionUpdate> maEarningsSsContributionUpdates;
 
@@ -41,11 +49,15 @@ public class SHrsEmployeeSsContributionUpdate implements SGridRow {
         mnDaysIncapacity = 0;
         mnDaysAbsenteeism = 0;
         mnDaysSuspension = 0;
+        mdAmountSys_r = 0;
+        mdAmount_r = 0;
         mdPaymentDailyProportional = 0;
         mbApply = false;
+        mdSalaryDaily = 0;
         mdSalarySscBase = 0;
         mdSalarySscBaseNewSys = 0;
         mdSalarySscBaseNew = 0;
+        mtDateSalarySscBase = null;
         
         maEarningsSsContributionUpdates = new ArrayList<SHrsEarningsSsContributionUpdate>();
     }
@@ -59,11 +71,15 @@ public class SHrsEmployeeSsContributionUpdate implements SGridRow {
     public void setDaysIncapacity(int n) { mnDaysIncapacity = n; }
     public void setDaysAbsenteeism(int n) { mnDaysAbsenteeism = n; }
     public void setDaysSuspension(int n) { mnDaysSuspension = n; }
+    public void setAmountSys_r(double d) { mdAmountSys_r = d; }
+    public void setAmount_r(double d) { mdAmount_r = d; }
     public void setPaymentDailyProportional(double d) { mdPaymentDailyProportional = d; }
     public void setIsApply(boolean b) { mbApply = b; }
+    public void setSalaryDaily(double d) { mdSalaryDaily = d; }
     public void setSalarySscBase(double d) { mdSalarySscBase = d; }
     public void setSalarySscBaseNewSys(double d) { mdSalarySscBaseNewSys = d; }
     public void setSalarySscBaseNew(double d) { mdSalarySscBaseNew = d; }
+    public void setDateSalarySscBase(Date t) { mtDateSalarySscBase = t; }
     
     public int getEmployeeId() { return mnEmployeeId; }
     public String getCodeEmployee() { return msCodeEmployee; }
@@ -74,30 +90,90 @@ public class SHrsEmployeeSsContributionUpdate implements SGridRow {
     public int getDaysIncapacity() { return mnDaysIncapacity; }
     public int getDaysAbsenteeism() { return mnDaysAbsenteeism; }
     public int getDaysSuspension() { return mnDaysSuspension; }
+    public double getAmountSys_r() { return mdAmountSys_r; }
+    public double getAmount_r() { return mdAmount_r; }
     public double getPaymentDailyProportional() { return mdPaymentDailyProportional; }
     public boolean isApply() { return mbApply; }
+    public double getSalaryDaily() { return mdSalaryDaily; }
     public double getSalarySscBase() { return mdSalarySscBase; }
     public double getSalarySscBaseNewSys() { return mdSalarySscBaseNewSys; }
     public double getSalarySscBaseNew() { return mdSalarySscBaseNew; }
+    public Date getDateSalarySscBase() { return mtDateSalarySscBase; }
     
     public ArrayList<SHrsEarningsSsContributionUpdate> getEarningsSsContributionUpdates() { return maEarningsSsContributionUpdates; }
     
     public int getTotalDays() { return mnDaysPeriod - (mnDaysIncapacity + mnDaysAbsenteeism + mnDaysSuspension); }
     
-    public double getTotalAmountEarnings() {
-        double total = 0;
+    public double getTotalAmountEarnings() { 
+        calculateAmountEarnings();
+        return mdAmount_r; }
     
-        for (SHrsEarningsSsContributionUpdate earningsSsContributionUpdate : maEarningsSsContributionUpdates) {
-            total += earningsSsContributionUpdate.getAmount();
-        }
+    public void calculateAmountEarnings() {
+        mdAmountSys_r = 0;
+        mdAmount_r = 0;
         
-        return total;
+        for (SHrsEarningsSsContributionUpdate earningsSsContributionUpdate : maEarningsSsContributionUpdates) {
+            mdAmountSys_r += earningsSsContributionUpdate.getAmountSys();
+            mdAmount_r += earningsSsContributionUpdate.getAmount();
+        }
     }
     
     public void computeSSContribution() {
         mdPaymentDailyProportional = getTotalDays() == 0 ?  0 : SLibUtils.round(getTotalAmountEarnings() / getTotalDays(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-        mdSalarySscBaseNew = mdSalarySscBase + mdPaymentDailyProportional;
+        mdSalarySscBaseNew = SLibUtils.round(mdSalarySscBase + mdPaymentDailyProportional, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
         mdSalarySscBaseNewSys = mdSalarySscBaseNew;
+    }
+
+    public void createSalarySscBaseLog(SGuiSession session) {
+        String sql = "";
+        ResultSet resultSet = null;
+        int nLogId = 0;
+
+        try {
+            nLogId = 0;
+
+            sql = "SELECT COALESCE(MAX(id_log), 0) + 1 FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_SAL_SSC) + " WHERE id_emp = " + mnEmployeeId + " ";
+            resultSet = session.getStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                nLogId = resultSet.getInt(1);
+            }
+
+            sql = "INSERT INTO " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_SAL_SSC) + " VALUES (" + mnEmployeeId + ", " +
+                    nLogId + ", " +
+                    "'" + SLibUtils.DbmsDateFormatDate.format(mtDateSalarySscBase) + "', " +
+                    mdSalarySscBaseNew + ", " +
+                    "0, " +
+                    session.getUser().getPkUserId() + ", " +
+                    session.getUser().getPkUserId() + ", " +
+                    "NOW()" + ", " +
+                    "NOW()" + " " +
+                    ")";
+
+            session.getStatement().execute(sql);
+        }
+        catch (java.lang.Exception e) {
+            SLibUtils.printException(this, e);
+        }
+    }
+    
+    public void updateSscEmployee(SGuiSession session) {
+        String sql = "";
+        
+        try {
+            sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " SET sal_ssc = " + mdSalarySscBaseNew + ", " +
+                    "dt_sal_ssc = '" + SLibUtils.DbmsDateFormatDate.format(mtDateSalarySscBase) + "' " +
+                    "WHERE id_emp = " + mnEmployeeId + " ";
+            
+            session.getStatement().execute(sql);
+        }
+        catch (java.lang.Exception e) {
+            SLibUtils.printException(this, e);
+        }
+    }
+    
+    public void save(SGuiSession session) {
+        createSalarySscBaseLog(session);
+        updateSscEmployee(session);
     }
 
     @Override
@@ -153,12 +229,15 @@ public class SHrsEmployeeSsContributionUpdate implements SGridRow {
                 value = msCodeDepartament;
                 break;
             case 4:
-                value = mbApply;
+                value = mdSalaryDaily;
                 break;
             case 5:
-                value = mdSalarySscBase;
+                value = mbApply;
                 break;
             case 6:
+                value = mdSalarySscBase;
+                break;
+            case 7:
                 value = mdSalarySscBaseNew;
                 break;
             default:
@@ -179,11 +258,13 @@ public class SHrsEmployeeSsContributionUpdate implements SGridRow {
             case 3:
                 break;
             case 4:
-                mbApply = (boolean) value;
                 break;
             case 5:
+                mbApply = (boolean) value;
                 break;
             case 6:
+                break;
+            case 7:
                 mdSalarySscBaseNew = (double) value;
                 break;
             default:

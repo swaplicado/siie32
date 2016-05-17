@@ -6,14 +6,17 @@ package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsEarningsSsContributionUpdate;
 import erp.mod.hrs.db.SHrsEmployeeSsContributionUpdate;
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.event.CellEditorListener;
@@ -71,12 +74,20 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
         jPanel1 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
-        jPanel8 = new javax.swing.JPanel();
-        jlDateStart = new javax.swing.JLabel();
-        moDateDateStart = new sa.lib.gui.bean.SBeanFieldDate();
+        jPanel35 = new javax.swing.JPanel();
+        jlYear = new javax.swing.JLabel();
+        moIntPeriodYear = new sa.lib.gui.bean.SBeanFieldInteger();
+        jPanel36 = new javax.swing.JPanel();
+        jlPeriodStart = new javax.swing.JLabel();
+        moIntPeriodStart = new sa.lib.gui.bean.SBeanFieldInteger();
+        jPanel37 = new javax.swing.JPanel();
+        jlPeriodEnd = new javax.swing.JLabel();
+        moIntPeriodEnd = new sa.lib.gui.bean.SBeanFieldInteger();
         jPanel9 = new javax.swing.JPanel();
-        jlDateEnd = new javax.swing.JLabel();
-        moDateDateEnd = new sa.lib.gui.bean.SBeanFieldDate();
+        jlDateUpdate = new javax.swing.JLabel();
+        moDateDateUpdate = new sa.lib.gui.bean.SBeanFieldDate();
+        jbShowEmployee = new javax.swing.JButton();
+        jbCleanEmployee = new javax.swing.JButton();
         jPanel12 = new javax.swing.JPanel();
         jpEmployee = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
@@ -112,25 +123,57 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
 
         jPanel7.setLayout(new java.awt.BorderLayout());
 
-        jPanel13.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+        jPanel13.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
-        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel35.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateStart.setText("Fecha inicial:");
-        jlDateStart.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel8.add(jlDateStart);
+        jlYear.setText("Ejercicio:*");
+        jlYear.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel35.add(jlYear);
 
-        moDateDateStart.setFocusable(false);
-        jPanel8.add(moDateDateStart);
+        moIntPeriodYear.setPreferredSize(new java.awt.Dimension(103, 23));
+        jPanel35.add(moIntPeriodYear);
 
-        jPanel13.add(jPanel8);
+        jPanel13.add(jPanel35);
+
+        jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlPeriodStart.setText("Período inicial:*");
+        jlPeriodStart.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel36.add(jlPeriodStart);
+
+        moIntPeriodStart.setPreferredSize(new java.awt.Dimension(103, 23));
+        jPanel36.add(moIntPeriodStart);
+
+        jPanel13.add(jPanel36);
+
+        jPanel37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlPeriodEnd.setText("Período final:*");
+        jlPeriodEnd.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel37.add(jlPeriodEnd);
+
+        moIntPeriodEnd.setPreferredSize(new java.awt.Dimension(103, 23));
+        jPanel37.add(moIntPeriodEnd);
+
+        jPanel13.add(jPanel37);
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateEnd.setText("Fecha final:");
-        jlDateEnd.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel9.add(jlDateEnd);
-        jPanel9.add(moDateDateEnd);
+        jlDateUpdate.setText("Fecha actualización:");
+        jlDateUpdate.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel9.add(jlDateUpdate);
+        jPanel9.add(moDateDateUpdate);
+
+        jbShowEmployee.setText("Mostar empleados");
+        jbShowEmployee.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jbShowEmployee.setPreferredSize(new java.awt.Dimension(115, 23));
+        jPanel9.add(jbShowEmployee);
+
+        jbCleanEmployee.setText("Limpiar empleados");
+        jbCleanEmployee.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jbCleanEmployee.setPreferredSize(new java.awt.Dimension(115, 23));
+        jPanel9.add(jbCleanEmployee);
 
         jPanel13.add(jPanel9);
 
@@ -141,7 +184,7 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
         jPanel12.setLayout(new java.awt.BorderLayout());
 
         jpEmployee.setBorder(javax.swing.BorderFactory.createTitledBorder("Empleados:"));
-        jpEmployee.setPreferredSize(new java.awt.Dimension(100, 150));
+        jpEmployee.setPreferredSize(new java.awt.Dimension(100, 200));
         jpEmployee.setLayout(new java.awt.BorderLayout());
         jPanel12.add(jpEmployee, java.awt.BorderLayout.NORTH);
 
@@ -158,7 +201,7 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDaysPeriod.setText("Días perido:");
+        jlDaysPeriod.setText("Días periodo:");
         jlDaysPeriod.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jlDaysPeriod);
 
@@ -253,26 +296,31 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel35;
+    private javax.swing.JPanel jPanel36;
+    private javax.swing.JPanel jPanel37;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
-    private javax.swing.JLabel jlDateEnd;
-    private javax.swing.JLabel jlDateStart;
+    private javax.swing.JButton jbCleanEmployee;
+    private javax.swing.JButton jbShowEmployee;
+    private javax.swing.JLabel jlDateUpdate;
     private javax.swing.JLabel jlDaysAbsenteeism;
     private javax.swing.JLabel jlDaysIncapacity;
     private javax.swing.JLabel jlDaysPeriod;
     private javax.swing.JLabel jlDaysSuspension;
     private javax.swing.JLabel jlDaysTotal;
     private javax.swing.JLabel jlPaymentDailyProp;
+    private javax.swing.JLabel jlPeriodEnd;
+    private javax.swing.JLabel jlPeriodStart;
     private javax.swing.JLabel jlTotalAmount;
+    private javax.swing.JLabel jlYear;
     private javax.swing.JPanel jpDaysInfo;
     private javax.swing.JPanel jpEarning;
     private javax.swing.JPanel jpEmployee;
-    private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd;
-    private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
+    private sa.lib.gui.bean.SBeanFieldDate moDateDateUpdate;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecPaymentDailyProp;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecTotalAmount;
     private sa.lib.gui.bean.SBeanFieldInteger moIntDaysAbsenteeism;
@@ -280,13 +328,24 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
     private sa.lib.gui.bean.SBeanFieldInteger moIntDaysPeriod;
     private sa.lib.gui.bean.SBeanFieldInteger moIntDaysSuspension;
     private sa.lib.gui.bean.SBeanFieldInteger moIntDaysTotal;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntPeriodEnd;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntPeriodStart;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntPeriodYear;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 800, 500);
+        SGuiUtils.setWindowBounds(this, 960, 600);
+        
+        jbSave.setText("Aceptar");
 
-        moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart.getText()), true);
-        moDateDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd.getText()), true);
+        moIntPeriodYear.setIntegerSettings(SGuiUtils.getLabelName(jlYear.getText()), SGuiConsts.GUI_TYPE_INT_CAL_YEAR, true);
+        moIntPeriodYear.setMinInteger(2000);
+        moIntPeriodYear.setMaxInteger(2100);
+        moIntPeriodStart.setIntegerSettings(SGuiUtils.getLabelName(jlPeriodStart.getText()), SGuiConsts.GUI_TYPE_INT_CAL_MONTH, true);
+        moIntPeriodStart.setMaxInteger(SHrsConsts.YEAR_MONTHS);
+        moIntPeriodEnd.setIntegerSettings(SGuiUtils.getLabelName(jlPeriodEnd.getText()), SGuiConsts.GUI_TYPE_INT_CAL_MONTH, true);
+        moIntPeriodEnd.setMaxInteger(SHrsConsts.YEAR_MONTHS);
+        moDateDateUpdate.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateUpdate.getText()), true);
         moIntDaysPeriod.setIntegerSettings(SGuiUtils.getLabelName(jlDaysPeriod.getText()), SGuiConsts.GUI_TYPE_INT, false);
         moIntDaysIncapacity.setIntegerSettings(SGuiUtils.getLabelName(jlDaysIncapacity.getText()), SGuiConsts.GUI_TYPE_INT, false);
         moIntDaysAbsenteeism.setIntegerSettings(SGuiUtils.getLabelName(jlDaysAbsenteeism.getText()), SGuiConsts.GUI_TYPE_INT, false);
@@ -296,15 +355,17 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
         moDecPaymentDailyProp.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentDailyProp.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         
         jbSelectAll = new JButton("Todo");
-        jbSelectAll.setToolTipText("Pagar");
+        jbSelectAll.setToolTipText("Seleccionar");
         jbSelectAll.setPreferredSize(new java.awt.Dimension(70, 23));
 
         jbCleanAll = new JButton("Nada");
-        jbCleanAll.setToolTipText("Pagar");
+        jbCleanAll.setToolTipText("Seleccionar");
         jbCleanAll.setPreferredSize(new java.awt.Dimension(70, 23));
         
-        moFields.addField(moDateDateStart);
-        moFields.addField(moDateDateEnd);
+        moFields.addField(moIntPeriodYear);
+        moFields.addField(moIntPeriodStart);
+        moFields.addField(moIntPeriodEnd);
+        moFields.addField(moDateDateUpdate);
         moFields.addField(moIntDaysPeriod);
         moFields.addField(moIntDaysIncapacity);
         moFields.addField(moIntDaysAbsenteeism);
@@ -326,20 +387,20 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
                 SGridColumnForm columnForm = null;
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<SGridColumnForm>();
 
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "Empleado"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Código empleado"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Departamento"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave empleado"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Departamento"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Código departamento"));
-                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Aplicar", moGridEmployeesRow.getTable().getDefaultEditor(Boolean.class));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "SD $"));
+                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Actualizar", moGridEmployeesRow.getTable().getDefaultEditor(Boolean.class));
                 columnForm.setEditable(true);
                 gridColumnsForm.add(columnForm);
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "SDI actual $"));
-                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "SDI nuevo $", moGridEmployeesRow.getTable().getDefaultEditor(Double.class));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "SBC actual $"));
+                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "SBC nuevo $", moGridEmployeesRow.getTable().getDefaultEditor(Double.class));
                 columnForm.setEditable(true);
                 gridColumnsForm.add(columnForm);
                 
                 moGridEmployeesRow.getTable().getDefaultEditor(Boolean.class).addCellEditorListener(SDialogPayrollEmployeeSsContributionUpdate.this);
-                moGridEmployeesRow.getTable().getDefaultEditor(Double.class).addCellEditorListener(SDialogPayrollEmployeeSsContributionUpdate.this);
                 moGridEmployeesRow.getTable().getDefaultEditor(Double.class).addCellEditorListener(SDialogPayrollEmployeeSsContributionUpdate.this);
                 
                 return gridColumnsForm;
@@ -352,8 +413,8 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
         moGridEmployeesRow.setForm(null);
         moGridEmployeesRow.setPaneFormOwner(null);
         */
-        mvFormGrids.add(moGridEmployeesRow);
         jpEmployee.add(moGridEmployeesRow, BorderLayout.CENTER);
+        //mvFormGrids.add(moGridEmployeesRow);
         
         moGridEarnigsRow = new SGridPaneForm(miClient, SModConsts.HRSX_EAR_SSC, SLibConsts.UNDEFINED, "Percepciones") {
             @Override
@@ -366,8 +427,8 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
                 SGridColumnForm columnForm = null;
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<SGridColumnForm>();
 
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Código percepción"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "Percepción"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Código percepción"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Percepción"));
                 columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto $", moGridEarnigsRow.getTable().getDefaultEditor(Double.class));
                 columnForm.setEditable(true);
                 gridColumnsForm.add(columnForm);
@@ -381,15 +442,13 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
         /*
         moGridEarnigsRow.setForm(null);
         moGridEarnigsRow.setPaneFormOwner(null);
-        mvFormGrids.add(moGridEarnigsRow);
         */
         jpEarning.add(moGridEarnigsRow, BorderLayout.CENTER);
+        //mvFormGrids.add(moGridEarnigsRow);
         
         reloadCatalogues();
         addAllListeners();
         
-        moDateDateStart.setEditable(false);
-        moDateDateEnd.setEditable(false);
         moIntDaysPeriod.setEditable(false);
         moIntDaysIncapacity.setEditable(false);
         moIntDaysAbsenteeism.setEditable(false);
@@ -397,6 +456,47 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
         moIntDaysTotal.setEditable(false);
         moDecTotalAmount.setEditable(false);
         moDecPaymentDailyProp.setEditable(false);
+        
+        moGridEmployeesRow.populateGrid(new Vector<SGridRow>(), this);
+        moGridEmployeesRow.resetSortKeys();
+        moGridEmployeesRow.setSelectedGridRow(0);
+        
+        moDateDateUpdate.setValue(miClient.getSession().getCurrentDate());
+        
+        populateEarnings(null);
+        
+        enableFields(true);
+    }
+    
+    private void enableFields(boolean enable) {
+        jbShowEmployee.setEnabled(enable);
+        jbCleanEmployee.setEnabled(!enable);
+        moIntPeriodYear.setEditable(enable);
+        moIntPeriodStart.setEditable(enable);
+        moIntPeriodEnd.setEditable(enable);
+    }
+    
+    private void actionShowEmployee() {
+        SGuiValidation validation = validateForm();
+        
+        if (validation.isValid()) {
+            enableFields(false);
+            populateEmployees();
+        }
+        else {
+            if (validation.getComponent() != null) {
+                validation.getComponent().requestFocus();
+            }
+            if (validation.getMessage().length() > 0) {
+                miClient.showMsgBoxWarning(validation.getMessage());
+            }
+        }
+    }
+    
+    private void actionCleanEmployee() {
+        enableFields(true);
+        moGridEmployeesRow.clearGridRows();
+        moGridEarnigsRow.clearGridRows();
     }
     
     private void actionSelectAll() {
@@ -433,6 +533,8 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
     
     private void populateEmployees() {
         int employeeId = 0;
+        Date mtDateStart = null;
+        Date mtDateEnd = null;
         SHrsEmployeeSsContributionUpdate employeeSsContributionUpdate = null;
         String sql = "";
         ResultSet resultSet = null;
@@ -441,12 +543,16 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
         Statement statement = null;
         Statement statementAux = null;
         
-        mnDaysPeriod = (int) SLibTimeUtils.getDaysDiff(moDateDateEnd.getValue(), moDateDateStart.getValue()) + 1;
+        mtDateStart = SLibTimeUtils.getBeginOfMonth(SLibTimeUtils.createDate(moIntPeriodYear.getValue(), moIntPeriodStart.getValue()));
+        mtDateEnd = SLibTimeUtils.getEndOfMonth(SLibTimeUtils.createDate(moIntPeriodYear.getValue(), moIntPeriodEnd.getValue()));
+        
+        mnDaysPeriod = (int) SLibTimeUtils.getDaysDiff(mtDateEnd, mtDateStart) + 1;
         try {
             statement = miClient.getSession().getDatabase().getConnection().createStatement();
             statementAux = miClient.getSession().getDatabase().getConnection().createStatement();
             
-            sql = "SELECT e.num, e.id_emp, e.sal_ssc, bp.bp, d.code, d.name "
+            sql = "SELECT e.num, e.id_emp, e.sal_ssc, bp.bp, d.code, d.name, "
+                    + "IF(e.fk_tp_pay = " + SModSysConsts.HRSS_TP_PAY_WEE + ", e.sal, (e.wage * " + SHrsConsts.YEAR_MONTHS + " / " + SHrsConsts.YEAR_DAYS + ")) AS _sd " 
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON bp.id_bp = e.id_emp "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS d ON d.id_dep = e.fk_dep "
@@ -464,14 +570,15 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
                 employeeSsContributionUpdate.setNameEmployee(resultSet.getString("bp"));
                 employeeSsContributionUpdate.setCodeDepartament(resultSet.getString("code"));
                 employeeSsContributionUpdate.setNameDepartament(resultSet.getString("name"));
+                employeeSsContributionUpdate.setSalaryDaily(resultSet.getDouble("_sd"));
                 employeeSsContributionUpdate.setSalarySscBase(resultSet.getDouble("sal_ssc"));
                 employeeSsContributionUpdate.setDaysPeriod(mnDaysPeriod);
 
                 sql = "SELECT a.fk_cl_abs, ac.eff_day "
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " AS a "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_ABS_CNS) + " AS ac ON ac.id_emp = a.id_emp AND ac.id_abs = a.id_abs "
-                        + "WHERE a.b_del = 0 AND ac.b_del = 0 AND ac.id_emp = " + employeeId + " AND ac.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' "
-                        + "AND ac.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' "
+                        + "WHERE a.b_del = 0 AND ac.b_del = 0 AND ac.id_emp = " + employeeId + " AND ac.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' "
+                        + "AND ac.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "' "
                         + "ORDER BY ac.id_abs, ac.id_cns ";
 
                 resultSetAux = statementAux.executeQuery(sql);
@@ -499,8 +606,10 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
         }
         
         moGridEmployeesRow.populateGrid(rows, this);
-        moGridEmployeesRow.createGridColumns();
+        moGridEmployeesRow.resetSortKeys();
         moGridEmployeesRow.setSelectedGridRow(0);
+        
+        populateEarnings(null);
     }
     
     private void processEditingEarningAmount() {
@@ -511,14 +620,15 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
     private void populateEarnings(final SHrsEmployeeSsContributionUpdate employeeSsContributionUpdate) {
        Vector<SGridRow> rows = new Vector<SGridRow>();
        
-       for (SHrsEarningsSsContributionUpdate contributionUpdate: employeeSsContributionUpdate.getEarningsSsContributionUpdates()) {
-           rows.add(contributionUpdate);
+       if (employeeSsContributionUpdate != null) {
+           for (SHrsEarningsSsContributionUpdate contributionUpdate: employeeSsContributionUpdate.getEarningsSsContributionUpdates()) {
+               rows.add(contributionUpdate);
+           }
        }
        
        moGridEarnigsRow.populateGrid(rows);
-       moGridEarnigsRow.clearSortKeys();
+       moGridEarnigsRow.resetSortKeys();
        moGridEarnigsRow.setSelectedGridRow(0);
-       moGridEarnigsRow.getTable().requestFocus();
     }
     
     private ArrayList<SHrsEarningsSsContributionUpdate> getEarnings(final int employeeId) {
@@ -538,8 +648,8 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " AS e ON e.id_ear = pre.fk_ear "
-                   + "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND pr.id_emp = " + employeeId + " AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' "
-                   + "AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' "
+                   + "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND pr.id_emp = " + employeeId + " AND p.per_year = " + moIntPeriodYear.getValue() + " "
+                   + "AND p.per BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " "
                    + "GROUP BY e.id_ear "
                    + "ORDER BY e.code, e.name ";
 
@@ -594,12 +704,16 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
     
     @Override
     public void addAllListeners() {
+        jbShowEmployee.addActionListener(this);
+        jbCleanEmployee.addActionListener(this);
         jbSelectAll.addActionListener(this);
         jbCleanAll.addActionListener(this);
     }
 
     @Override
     public void removeAllListeners() {
+        jbShowEmployee.removeActionListener(this);
+        jbCleanEmployee.removeActionListener(this);
         jbSelectAll.removeActionListener(this);
         jbCleanAll.removeActionListener(this);
     }
@@ -619,7 +733,6 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
 
     @Override
     public SGuiValidation validateForm() {
-        String msg = "";
         SGuiValidation validation = moFields.validateFields();
         
         return validation;
@@ -627,19 +740,7 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
 
     @Override
     public void setValue(final int type, final Object value) {
-        switch (type) {
-            case SGuiConsts.PARAM_DATE_STA:
-                moDateDateStart.setValue(value);
-                break;
-            case SGuiConsts.PARAM_DATE_END:
-                moDateDateEnd.setValue(value);
-                break;
-            case SModConsts.HRSU_EMP:
-                populateEmployees();
-                break;
-            default:
-                break;
-        }
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -649,11 +750,42 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
     
     @Override
     public void actionSave() {
+        Cursor cursor = null;
+        SHrsEmployeeSsContributionUpdate row = null;
+        ArrayList<SHrsEmployeeSsContributionUpdate> maHrsEmployeeSsContributionUpdate = null;
+        
         if (SGuiUtils.computeValidation(miClient, validateForm())) {
             try {
+                maHrsEmployeeSsContributionUpdate = new ArrayList<SHrsEmployeeSsContributionUpdate>();
+                cursor = getCursor();
+                setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                
+                for (SGridRow rowAux : moGridEmployeesRow.getModel().getGridRows()) {
+                    row = (SHrsEmployeeSsContributionUpdate) rowAux;
+                    if (row.isApply()) {
+                        row.setDateSalarySscBase(moDateDateUpdate.getValue());
+                        maHrsEmployeeSsContributionUpdate.add(row);
+                    }
+                }
+                
+                if (maHrsEmployeeSsContributionUpdate.isEmpty()) {
+                    miClient.showMsgBoxWarning("No se ha seleccionado ningún empleado para actualizar.");
+                }
+                else {
+                    for (SHrsEmployeeSsContributionUpdate employeeSsContributionUpdate : maHrsEmployeeSsContributionUpdate) {
+                        employeeSsContributionUpdate.save(miClient.getSession());
+                    }
+
+                    mnFormResult = SGuiConsts.FORM_RESULT_OK;
+                    dispose();
+                }
             }
             catch (Exception e) {
+                setCursor(cursor);
                 SLibUtils.showException(this, e);
+            }
+            finally {
+                setCursor(cursor);
             }
         }
     }
@@ -663,7 +795,13 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
             
-            if (button == jbSelectAll) {
+            if (button == jbShowEmployee) {
+                actionShowEmployee();
+            }
+            else if (button == jbCleanEmployee) {
+                actionCleanEmployee();
+            }
+            else if (button == jbSelectAll) {
                 actionSelectAll();
             }
             else if (button == jbCleanAll) {
@@ -675,7 +813,8 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
     @Override
     public void valueChanged(ListSelectionEvent e) {
         if (!e.getValueIsAdjusting()) {
-            if (moGridEmployeesRow.getTable().getSelectedRowCount() != -1) {
+            if (moGridEmployeesRow.getTable().getSelectedRowCount() != -1 &&
+                    moGridEmployeesRow.getSelectedGridRow() != null) {
                 loadEmployeeSelected(false);
             }
         }

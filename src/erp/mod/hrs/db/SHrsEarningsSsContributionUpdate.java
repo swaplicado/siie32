@@ -12,6 +12,7 @@ import sa.lib.grid.SGridRow;
  */
 public class SHrsEarningsSsContributionUpdate implements SGridRow {
 
+    protected int mnEmployeeId;
     protected int mnEarningId;
     protected String msCodeEarning;
     protected String msNameEarning;
@@ -19,19 +20,22 @@ public class SHrsEarningsSsContributionUpdate implements SGridRow {
     protected double mdAmount;
 
     public SHrsEarningsSsContributionUpdate() throws Exception {
+        mnEmployeeId = 0;
         mnEarningId = 0;
         msCodeEarning = "";
         msNameEarning = "";
         mdAmountSys = 0;
         mdAmount = 0;
     }
-
+    
+    public void setEmployeeId(int n) { mnEmployeeId = n; }
     public void setEarningId(int n) { mnEarningId = n; }
     public void setCodeEarning(String s) { msCodeEarning = s; }
     public void setNameEarning(String s) { msNameEarning = s; }
     public void setAmountSys(double d) { mdAmountSys = d; }
     public void setAmount(double d) { mdAmount = d; }
     
+    public int getEmployeeId() { return mnEmployeeId; }
     public int getEarningId() { return mnEarningId; }
     public String getCodeEarning() { return msCodeEarning; }
     public String getNameEarning() { return msNameEarning; }
@@ -40,7 +44,7 @@ public class SHrsEarningsSsContributionUpdate implements SGridRow {
 
     @Override
     public int[] getRowPrimaryKey() {
-        return new int[] { mnEarningId };
+        return new int[] { mnEmployeeId, mnEarningId };
     }
 
     @Override

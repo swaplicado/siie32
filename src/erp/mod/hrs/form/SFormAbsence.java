@@ -485,7 +485,9 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
             moIntEffectiveDays.setValue(mnWorkingDays);
         }
         
-        setSenority();
+        if (moRegistry.isRegistryNew()) {
+            setSenority();
+        }
     }
     
     private void actionStateChangeAnniversary() {

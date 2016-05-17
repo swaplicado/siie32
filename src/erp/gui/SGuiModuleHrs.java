@@ -18,6 +18,7 @@ import erp.mhrs.form.SDialogFormerPayrollImport;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SHrsConsts;
+import erp.mod.hrs.form.SDialogPayrollEmployeeSsContributionUpdate;
 import erp.mod.hrs.form.SDialogRepHrsActiveEmployees;
 import erp.mod.hrs.form.SDialogRepHrsAux;
 import erp.mod.hrs.form.SDialogRepHrsEarDed;
@@ -218,7 +219,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCat.add(jmiCatEmployeeHireLog);
         jmCat.add(jmiCatEmployeeWageLog);
         jmCat.add(jmiCatEmployeeSscBaseLog);
-        //jmCat.add(jmiCatEmployeeSscBaseUpdate);
+        jmCat.add(jmiCatEmployeeSscBaseUpdate);
         jmCat.addSeparator();
         jmCat.add(jmiCatEarnings);
         jmCat.add(jmiCatDeductions);
@@ -786,14 +787,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                 miClient.getSession().showView(SModConsts.HRS_EMP_LOG_SAL_SSC, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiCatEmployeeSscBaseUpdate) {
-                /*
-                SDialogPayrollEmployeeSsContributionUpdate modi = new SDialogPayrollEmployeeSsContributionUpdate((SGuiClient) miClient, "Actualización de salarios base de cotización");
-                modi.resetForm();
-                modi.setValue(SGuiConsts.PARAM_DATE_STA, SLibTimeUtils.getBeginOfMonth(miClient.getSession().getCurrentDate()));
-                modi.setValue(SGuiConsts.PARAM_DATE_END, SLibTimeUtils.getEndOfMonth(miClient.getSession().getCurrentDate()));
-                modi.setValue(SModConsts.HRSU_EMP, null);
-                modi.setVisible(true);
-                        */
+               new SDialogPayrollEmployeeSsContributionUpdate((SGuiClient) miClient, "Actualización de salario base cotización").setVisible(true);
             }
             else if (item == jmiCatEarnings) {
                 miClient.getSession().showView(SModConsts.HRS_EAR, SLibConsts.UNDEFINED, null);
