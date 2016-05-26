@@ -169,6 +169,10 @@ public class SDialogRepHrsActiveEmployees extends SBeanDialogReport {
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
         
+        if (validation.isValid()) {
+            validation = SGuiUtils.validateDateRange(moDateDateStart, moDateDateEnd);
+        }
+        
         return validation;
     }
     

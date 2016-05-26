@@ -112,6 +112,11 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
      */
 
     @Override
+    public void actionMouseClicked() {
+        actionShowCardex();
+    }
+    
+    @Override
     public void prepareSqlQuery() {
         String sql = "";
         String dateCut = "";
