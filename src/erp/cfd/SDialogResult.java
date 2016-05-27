@@ -17,6 +17,7 @@ import erp.mod.hrs.db.SHrsUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
+import erp.print.Print;
 import erp.print.SDataConstantsPrint;
 import java.awt.Cursor;
 import java.sql.ResultSet;
@@ -373,6 +374,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
         String number = "";
         String sSql = "";
         ResultSet resultSet = null;
+        Print print = null; 
         
         moIntTotalToProcess.setValue(maCfds.size());
         
@@ -440,7 +442,11 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                             detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Anulado.\n";
                             break;
                         case SCfdConsts.PROC_PRT_DOC:
-                            SCfdUtils.printCfd(miClient, cfd.getFkCfdTypeId(), cfd, SDataConstantsPrint.PRINT_MODE_STREAM, mnNumCopies, mnSubtypeCfd, false);
+                            print = new Print(miClient, cfd.getPkCfdId(), SDataConstantsPrint.PRINT_MODE_STREAM, mnNumCopies, mnSubtypeCfd, this);
+                            
+                            print.startThread();
+                            print.join();
+                            //SCfdUtils.printCfd(miClient, cfd.getFkCfdTypeId(), cfd, SDataConstantsPrint.PRINT_MODE_STREAM, mnNumCopies, mnSubtypeCfd, false);
                             detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Impreso.\n";
                             break;
                         case SCfdConsts.PROC_PRT_ACK_ANNUL:
@@ -477,7 +483,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                     }
                     cfdsCorrect++;
                 }
-                catch(Exception e) {
+                catch (Exception e) {
                     detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   " + e.getMessage() + "\n";
                     cfdsIncorrect++;
                 }
@@ -496,15 +502,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
     }
 
     public synchronized SGuiSession getSession() {
-        SGuiSession session = new SGuiSession((SGuiClient) miClient);
-
-        session.setUser(miClient.getSessionXXX().getUser());                      // XXX this must be replaced
-        session.setSystemDate(miClient.getSessionXXX().getSystemDate());
-        session.setCurrentDate(miClient.getSessionXXX().getWorkingDate());
-        session.setUserTs(miClient.getSessionXXX().getSystemDate());
-        session.setDatabase(miClient.getSession().getDatabase());
-        
-        return session;
+        return miClient.getSession();
     }
     
     private void updateForm(final int totalProcess, final int totalCorrect, final int totalIncorrect, final String message, final int totalStamp) {

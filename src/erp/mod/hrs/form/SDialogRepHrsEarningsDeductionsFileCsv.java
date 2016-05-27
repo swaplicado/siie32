@@ -261,7 +261,7 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog {
                 bw.write(SLibUtilities.textToAscii(buffer));
                 bw.write("\n\n");
                 
-                buffer = "PERCEPCIÓN_ID\",\"PERCEPCIÓN\",\"DEPARTAMENTO_ID\",\"DEPARTAMENTO\",\"EMPLEADO\",\"EMPLEADO_ID\"," + sPayrollNumberHeader + ""
+                buffer = "\"PERCEPCIÓN_ID\",\"PERCEPCIÓN\",\"DEPARTAMENTO_ID\",\"DEPARTAMENTO\",\"EMPLEADO\",\"EMPLEADO_ID\"," + sPayrollNumberHeader + ""
                         + "\"TOTAL\"";
 
                 bw.write(SLibUtilities.textToAscii(buffer));

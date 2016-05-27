@@ -735,6 +735,13 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
         
+        if (validation.isValid()) {
+            if (moIntPeriodStart.getValue() > moIntPeriodEnd.getValue()) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + SGuiUtils.getLabelName(jlPeriodEnd.getText()) + "'" + SGuiConsts.ERR_MSG_FIELD_VAL_GREAT_EQUAL + "'" + SGuiUtils.getLabelName(jlPeriodStart.getText()) + "'.");
+                validation.setComponent(moIntPeriodEnd);
+            }
+        }
+        
         return validation;
     }
 
@@ -750,6 +757,7 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
     
     @Override
     public void actionSave() {
+        boolean save = true;
         Cursor cursor = null;
         SHrsEmployeeSsContributionUpdate row = null;
         ArrayList<SHrsEmployeeSsContributionUpdate> maHrsEmployeeSsContributionUpdate = null;
@@ -763,21 +771,30 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
                 for (SGridRow rowAux : moGridEmployeesRow.getModel().getGridRows()) {
                     row = (SHrsEmployeeSsContributionUpdate) rowAux;
                     if (row.isApply()) {
-                        row.setDateSalarySscBase(moDateDateUpdate.getValue());
-                        maHrsEmployeeSsContributionUpdate.add(row);
+                        if (row.getSalarySscBaseNew() <= 0) {
+                             miClient.showMsgBoxWarning("El valor del SBC debe ser mayor a 0.");
+                             save = false;
+                             break;
+                        }
+                        else {
+                            row.setDateSalarySscBase(moDateDateUpdate.getValue());
+                            maHrsEmployeeSsContributionUpdate.add(row);
+                        }
                     }
                 }
                 
-                if (maHrsEmployeeSsContributionUpdate.isEmpty()) {
-                    miClient.showMsgBoxWarning("No se ha seleccionado ningún empleado para actualizar.");
-                }
-                else {
-                    for (SHrsEmployeeSsContributionUpdate employeeSsContributionUpdate : maHrsEmployeeSsContributionUpdate) {
-                        employeeSsContributionUpdate.save(miClient.getSession());
+                if (save) {
+                    if (maHrsEmployeeSsContributionUpdate.isEmpty()) {
+                        miClient.showMsgBoxWarning("No se ha seleccionado ningún empleado para actualizar.");
                     }
+                    else {
+                        for (SHrsEmployeeSsContributionUpdate employeeSsContributionUpdate : maHrsEmployeeSsContributionUpdate) {
+                            employeeSsContributionUpdate.save(miClient.getSession());
+                        }
 
-                    mnFormResult = SGuiConsts.FORM_RESULT_OK;
-                    dispose();
+                        mnFormResult = SGuiConsts.FORM_RESULT_OK;
+                        dispose();
+                    }
                 }
             }
             catch (Exception e) {

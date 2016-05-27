@@ -482,7 +482,9 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                     gridColumnsForm.add(column);
                     gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Monto pagar $"));
                     gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda"));
-                    gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "No. cuenta", 125));
+                    column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "No. cuenta", 125);
+                    column.setApostropheOnCsvRequired(true);
+                    gridColumnsForm.add(column);
                     gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_PER, "Período póliza"));
                     gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CO, "Centro contable"));
                     gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CO, "Sucursal empresa"));

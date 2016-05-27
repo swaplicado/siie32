@@ -31,7 +31,7 @@ import sa.lib.gui.SGuiUtils;
  */
 public class SGridFilterPanelEmployee extends JPanel implements SGridFilter, ActionListener, ItemListener {
 
-    public static int EMP_STATUS = 100;
+    public static int EMP_STATUS = 200;
     public static int EMP_STATUS_ACT = 2;
     public static int EMP_STATUS_INA = 3;
     public static int EMP_STATUS_ALL = 4;
