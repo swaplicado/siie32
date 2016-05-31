@@ -34,9 +34,9 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     protected double mdAmountTaxable;
     protected int mnBenefitYear;
     protected int mnBenefitAniversary;
+    protected boolean mbAlternativeTaxCalculation;
     protected boolean mbUserEdited;
     protected boolean mbAutomatic;
-    protected boolean mbAlternativeTaxCalculation;
     //protected boolean mbDeleted;
     //protected boolean mbSystem;
     protected int mnFkEarningTypeId;
@@ -162,9 +162,9 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         mdAmountTaxable = 0;
         mnBenefitYear = 0;
         mnBenefitAniversary = 0;
+        mbAlternativeTaxCalculation = false;
         mbUserEdited = false;
         mbAutomatic = false;
-        mbAlternativeTaxCalculation = false;
         mbDeleted = false;
         mbSystem = false;
         mnFkEarningTypeId = 0;
@@ -242,9 +242,9 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
             mdAmountTaxable = resultSet.getDouble("amt_taxa");
             mnBenefitYear = resultSet.getInt("ben_year");
             mnBenefitAniversary = resultSet.getInt("ben_ann");
+            mbAlternativeTaxCalculation = resultSet.getBoolean("b_alt_tax");
             mbUserEdited = resultSet.getBoolean("b_usr");
             mbAutomatic = resultSet.getBoolean("b_aut");
-            mbAlternativeTaxCalculation = resultSet.getBoolean("b_alt_tax");
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
             mnFkEarningTypeId = resultSet.getInt("fk_tp_ear");
@@ -309,9 +309,9 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
                     mdAmountTaxable + ", " + 
                     mnBenefitYear + ", " + 
                     mnBenefitAniversary + ", " + 
+                    (mbAlternativeTaxCalculation ? 1 : 0) + ", " +
                     (mbUserEdited ? 1 : 0) + ", " + 
                     (mbAutomatic ? 1 : 0) + ", " + 
-                    (mbAlternativeTaxCalculation ? 1 : 0) + ", " +
                     (mbDeleted ? 1 : 0) + ", " + 
                     (mbSystem ? 1 : 0) + ", " + 
                     mnFkEarningTypeId + ", " + 
@@ -345,9 +345,9 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
                     "amt_taxa = " + mdAmountTaxable + ", " +
                     "ben_year = " + mnBenefitYear + ", " +
                     "ben_ann = " + mnBenefitAniversary + ", " +
+                    "b_alt_tax = " + (mbAlternativeTaxCalculation ? 1 : 0) + ", " +
                     "b_usr = " + (mbUserEdited ? 1 : 0) + ", " +
                     "b_aut = " + (mbAutomatic ? 1 : 0) + ", " +
-                    "b_alt_tax = " + (mbAlternativeTaxCalculation ? 1 : 0) + ", " +
                     //"b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     //"b_sys = " + (mbSystem ? 1 : 0) + ", " +
                     "fk_tp_ear = " + mnFkEarningTypeId + ", " +
@@ -396,9 +396,9 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         registry.setAmountTaxable(this.getAmountTaxable());
         registry.setBenefitYear(this.getBenefitYear());
         registry.setBenefitAniversary(this.getBenefitAniversary());
+        registry.setAlternativeTaxCalculation(this.isAlternativeTaxCalculation());
         registry.setUserEdited(this.isUserEdited());
         registry.setAutomatic(this.isAutomatic());
-        registry.setAlternativeTaxCalculation(this.isAlternativeTaxCalculation());
         registry.setDeleted(this.isDeleted());
         registry.setSystem(this.isSystem());
         registry.setFkEarningTypeId(this.getFkEarningTypeId());
