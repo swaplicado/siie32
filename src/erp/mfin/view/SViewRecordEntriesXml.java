@@ -182,13 +182,13 @@ public class SViewRecordEntriesXml extends erp.lib.table.STableTab implements ja
                 "re.ts_new AS ts_new, re.ts_edit AS ts_edit, re.ts_del AS ts_del, acc.id_acc AS f_acc, acc.acc AS f_acc_name, cur.cur_key AS f_cur, bkc.code AS code_bkc, cob.code AS code_cob, e.ent AS ent, un.usr AS usr_un, ue.usr AS usr_ue, " +
                 "ud.usr AS usr_ud, CONCAT(re.id_year, '-', erp.lib_fix_int(re.id_per, 2)) as f_per, CONCAT(re.id_tp_rec, '-', erp.lib_fix_int(re.id_num, 6)) as f_num, re.exc_rate AS exc_rate, re.debit AS debit, " +
                 "re.credit AS credit, re.debit_cur AS debit_cur, re.credit_cur AS credit_cur, re.debit - re.credit AS f_balance, " +
-                "f_get_xml_atr('<cfdi:Emisor', 'nombre=', cfd.doc_xml) AS _xml_emisor_nombre, " +
-                "f_get_xml_atr('<cfdi:Emisor', 'rfc=', cfd.doc_xml) AS _xml_emisor_rfc, " +
-                "f_get_xml_atr('<cfdi:Receptor', 'nombre=', cfd.doc_xml) AS _xml_receptor_nombre, " +
-                "f_get_xml_atr('<cfdi:Receptor', 'rfc=', cfd.doc_xml) AS _xml_receptor_rfc, " +
-                "f_get_xml_atr('<cfdi:Comprobante', 'total=', cfd.doc_xml) AS _xml_total, " +
-                "CAST(REPLACE(f_get_xml_atr('<cfdi:Complemento', 'FechaTimbrado=', cfd.doc_xml), 'T', ' ') AS DATETIME) AS _xml_fecha_timbrado, " +
-                "f_get_xml_atr('<cfdi:Complemento', 'UUID=', cfd.doc_xml) AS _xml_uuid " +
+                "erp.f_get_xml_atr('<cfdi:Emisor', 'nombre=', cfd.doc_xml) AS _xml_emisor_nombre, " +
+                "erp.f_get_xml_atr('<cfdi:Emisor', 'rfc=', cfd.doc_xml) AS _xml_emisor_rfc, " +
+                "erp.f_get_xml_atr('<cfdi:Receptor', 'nombre=', cfd.doc_xml) AS _xml_receptor_nombre, " +
+                "erp.f_get_xml_atr('<cfdi:Receptor', 'rfc=', cfd.doc_xml) AS _xml_receptor_rfc, " +
+                "erp.f_get_xml_atr('<cfdi:Comprobante', 'total=', cfd.doc_xml) AS _xml_total, " +
+                "CAST(REPLACE(erp.f_get_xml_atr('<cfdi:Complemento', 'FechaTimbrado=', cfd.doc_xml), 'T', ' ') AS DATETIME) AS _xml_fecha_timbrado, " +
+                "erp.f_get_xml_atr('<cfdi:Complemento', 'UUID=', cfd.doc_xml) AS _xml_uuid " +
                 "FROM trn_cfd AS cfd " +
                 "INNER JOIN fin_rec_ety AS re ON re.id_year = cfd.fid_rec_year_n AND re.id_per = cfd.fid_rec_per_n AND re.id_bkc = cfd.fid_rec_bkc_n AND re.id_tp_rec = cfd.fid_rec_tp_rec_n AND re.id_num = cfd.fid_rec_num_n AND re.id_ety = cfd.fid_rec_ety_n AND cfd.doc_xml <> '' " +
                 "INNER JOIN fin_rec AS r ON r.id_year = re.id_year AND r.id_num = re.id_num AND  r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec " +
@@ -205,20 +205,20 @@ public class SViewRecordEntriesXml extends erp.lib.table.STableTab implements ja
                 "LEFT OUTER JOIN erp.cfgu_cob_ent AS e ON ac.id_cob = e.id_cob AND ac.id_acc_cash = e.id_ent " +
                 (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) +
                 (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR ? 
-                "AND f_get_xml_atr('<cfdi:Emisor', 'rfc=',cfd.doc_xml) NOT LIKE '" + miClient.getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId() + "' " :
-                "AND f_get_xml_atr('<cfdi:Emisor', 'rfc=',cfd.doc_xml) LIKE '" + miClient.getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId() + "' ") +
+                "AND erp.f_get_xml_atr('<cfdi:Emisor', 'rfc=',cfd.doc_xml) NOT LIKE '" + miClient.getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId() + "' " :
+                "AND erp.f_get_xml_atr('<cfdi:Emisor', 'rfc=',cfd.doc_xml) LIKE '" + miClient.getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId() + "' ") +
                 "UNION " +
                 "SELECT re.id_year AS id_year, re.id_per AS id_per, re.id_bkc AS id_bkc, re.id_tp_rec AS id_tp_rec, re.id_num AS id_num, re.id_ety AS id_ety, cfd.id_cfd AS id_cfd, r.dt AS dt, re.concept AS concept, re.b_del AS b_del, " +
                 "re.ts_new AS ts_new, re.ts_edit AS ts_edit, re.ts_del AS ts_del, acc.id_acc AS f_acc, acc.acc AS f_acc_name, cur.cur_key AS f_cur, bkc.code AS code_bkc, cob.code AS code_cob, e.ent AS ent, un.usr AS usr_un, ue.usr AS usr_ue, " +
                 "ud.usr AS usr_ud, CONCAT(re.id_year, '-', erp.lib_fix_int(re.id_per, 2)) as f_per, CONCAT(re.id_tp_rec, '-', erp.lib_fix_int(re.id_num, 6)) as f_num, re.exc_rate AS exc_rate, re.debit AS debit, " +
                 "re.credit AS credit, re.debit_cur AS debit_cur, re.credit_cur AS credit_cur, re.debit - re.credit AS f_balance, " +
-                "f_get_xml_atr('<cfdi:Emisor', 'nombre=', cfd.doc_xml) AS _xml_emisor_nombre, " +
-                "f_get_xml_atr('<cfdi:Emisor', 'rfc=', cfd.doc_xml) AS _xml_emisor_rfc, " +
-                "f_get_xml_atr('<cfdi:Receptor', 'nombre=', cfd.doc_xml) AS _xml_receptor_nombre, " +
-                "f_get_xml_atr('<cfdi:Receptor', 'rfc=', cfd.doc_xml) AS _xml_receptor_rfc, " +
-                "f_get_xml_atr('<cfdi:Comprobante', 'total=', cfd.doc_xml) AS _xml_total, " +
-                "CAST(REPLACE(f_get_xml_atr('<cfdi:Complemento', 'FechaTimbrado=', cfd.doc_xml), 'T', ' ') AS DATETIME) AS _xml_fecha_timbrado, " +
-                "f_get_xml_atr('<cfdi:Complemento', 'UUID=', cfd.doc_xml) AS _xml_uuid " +
+                "erp.f_get_xml_atr('<cfdi:Emisor', 'nombre=', cfd.doc_xml) AS _xml_emisor_nombre, " +
+                "erp.f_get_xml_atr('<cfdi:Emisor', 'rfc=', cfd.doc_xml) AS _xml_emisor_rfc, " +
+                "erp.f_get_xml_atr('<cfdi:Receptor', 'nombre=', cfd.doc_xml) AS _xml_receptor_nombre, " +
+                "erp.f_get_xml_atr('<cfdi:Receptor', 'rfc=', cfd.doc_xml) AS _xml_receptor_rfc, " +
+                "erp.f_get_xml_atr('<cfdi:Comprobante', 'total=', cfd.doc_xml) AS _xml_total, " +
+                "CAST(REPLACE(erp.f_get_xml_atr('<cfdi:Complemento', 'FechaTimbrado=', cfd.doc_xml), 'T', ' ') AS DATETIME) AS _xml_fecha_timbrado, " +
+                "erp.f_get_xml_atr('<cfdi:Complemento', 'UUID=', cfd.doc_xml) AS _xml_uuid " +
                 "FROM trn_cfd AS cfd " +
                 "INNER JOIN trn_dps AS dps ON cfd.fid_dps_year_n = dps.id_year AND cfd.fid_dps_doc_n = dps.id_doc " +
                 "INNER JOIN fin_rec_ety AS re ON re.fid_dps_year_n = dps.id_year AND re.fid_dps_doc_n = dps.id_doc " +

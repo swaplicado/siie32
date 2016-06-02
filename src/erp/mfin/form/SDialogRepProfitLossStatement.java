@@ -14,12 +14,14 @@ package erp.mfin.form;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
+import erp.gui.SGuiUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -407,7 +409,9 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
     public void actionPrint() {
         boolean error = false;
         JComponent component = null;
-
+        SFormValidation validation = new SFormValidation();
+        String msg = "";
+        
         for (SFormField field : mvFields) {
             if (!field.validateField()) {
                 error = true;
@@ -421,8 +425,20 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
             }
         }
         else {
-            print();
+            msg = SGuiUtilities.validateDateRange(moFieldDateBegin.getDate(), moFieldDateEnd.getDate());
+            
+            if (!msg.isEmpty()) {
+                error = true;
+                validation.setMessage(msg);
+                validation.setComponent(jftDateEnd);
+                miClient.showMsgBoxWarning(msg);
+                validation.getComponent().requestFocus();
+            }
         }
+        
+        if (!error) {
+            print();
+        }      
     }
 
     public void actionClose() {
