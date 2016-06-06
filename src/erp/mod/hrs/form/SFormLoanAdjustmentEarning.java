@@ -282,6 +282,7 @@ public class SFormLoanAdjustmentEarning extends SBeanForm implements ItemListene
         registry.setAmountUnitary(moCurPayment.getField().getValue());
         registry.setAmount_r(moCurPayment.getField().getValue());
         registry.setAutomatic(true);
+        registry.setAlternativeTaxCalculation(earning.isAlternativeTaxCalculation());// XXX (jbarajas, 2016-04-06) articule 174 RLISR
         registry.setFkEarningTypeId(earning.getFkEarningTypeId());
         registry.setFkEarningId(earning.getPkEarningId());
         registry.setFkBenefitTypeId(earning.getFkBenefitTypeId());

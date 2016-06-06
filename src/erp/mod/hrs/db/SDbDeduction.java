@@ -36,6 +36,7 @@ public class SDbDeduction extends SDbRegistryUser {
     protected boolean mbSystem;
     */
     protected int mnFkDeductionTypeId;
+    protected int mnFkDeductionComputationTypeId;
     protected int mnFkLoanTypeId;
     protected int mnFkBenefitTypeId;
     protected int mnFkAccountingConfigurationTypeId;
@@ -193,6 +194,7 @@ public class SDbDeduction extends SDbRegistryUser {
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setSystem(boolean b) { mbSystem = b; }
     public void setFkDeductionTypeId(int n) { mnFkDeductionTypeId = n; }
+    public void setFkDeductionComputationTypeId(int n) { mnFkDeductionComputationTypeId = n; }
     public void setFkLoanTypeId(int n) { mnFkLoanTypeId = n; }
     public void setFkBenefitTypeId(int n) { mnFkBenefitTypeId = n; }
     public void setFkAccountingConfigurationTypeId(int n) { mnFkAccountingConfigurationTypeId = n; }
@@ -215,6 +217,7 @@ public class SDbDeduction extends SDbRegistryUser {
     public boolean isDeleted() { return mbDeleted; }
     public boolean isSystem() { return mbSystem; }
     public int getFkDeductionTypeId() { return mnFkDeductionTypeId; }
+    public int getFkDeductionComputationTypeId() { return mnFkDeductionComputationTypeId; }
     public int getFkLoanTypeId() { return mnFkLoanTypeId; }
     public int getFkBenefitTypeId() { return mnFkBenefitTypeId; }
     public int getFkAccountingConfigurationTypeId() { return mnFkAccountingConfigurationTypeId; }
@@ -252,6 +255,7 @@ public class SDbDeduction extends SDbRegistryUser {
         mbDeleted = false;
         mbSystem = false;
         mnFkDeductionTypeId = 0;
+        mnFkDeductionComputationTypeId = 0;
         mnFkLoanTypeId = 0;
         mnFkBenefitTypeId = 0;
         mnFkAccountingConfigurationTypeId = 0;
@@ -320,6 +324,7 @@ public class SDbDeduction extends SDbRegistryUser {
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
             mnFkDeductionTypeId = resultSet.getInt("fk_tp_ded");
+            mnFkDeductionComputationTypeId = resultSet.getInt("fk_tp_ded_comp");
             mnFkLoanTypeId = resultSet.getInt("fk_tp_loan");
             mnFkBenefitTypeId = resultSet.getInt("fk_tp_ben");
             mnFkAccountingConfigurationTypeId = resultSet.getInt("fk_tp_acc_cfg");
@@ -377,6 +382,7 @@ public class SDbDeduction extends SDbRegistryUser {
                     (mbDeleted ? 1 : 0) + ", " + 
                     (mbSystem ? 1 : 0) + ", " + 
                     mnFkDeductionTypeId + ", " + 
+                    mnFkDeductionComputationTypeId + ", " + 
                     mnFkLoanTypeId + ", " + 
                     mnFkBenefitTypeId + ", " + 
                     mnFkAccountingConfigurationTypeId + ", " + 
@@ -404,6 +410,7 @@ public class SDbDeduction extends SDbRegistryUser {
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
                     "fk_tp_ded = " + mnFkDeductionTypeId + ", " +
+                    "fk_tp_ded_comp = " + mnFkDeductionComputationTypeId + ", " +
                     "fk_tp_loan = " + mnFkLoanTypeId + ", " +
                     "fk_tp_ben = " + mnFkBenefitTypeId + ", " +
                     "fk_tp_acc_cfg = " + mnFkAccountingConfigurationTypeId + ", " +
@@ -449,6 +456,7 @@ public class SDbDeduction extends SDbRegistryUser {
         registry.setDeleted(this.isDeleted());
         registry.setSystem(this.isSystem());
         registry.setFkDeductionTypeId(this.getFkDeductionTypeId());
+        registry.setFkDeductionComputationTypeId(this.getFkDeductionComputationTypeId());
         registry.setFkLoanTypeId(this.getFkLoanTypeId());
         registry.setFkBenefitTypeId(this.getFkBenefitTypeId());
         registry.setFkAccountingConfigurationTypeId(this.getFkAccountingConfigurationTypeId());

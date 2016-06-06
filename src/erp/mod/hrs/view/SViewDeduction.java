@@ -48,6 +48,7 @@ public class SViewDeduction extends SGridPaneView implements ActionListener {
                 + "v.name AS " + SDbConsts.FIELD_NAME + ", "
                 + "v.name_abbr, "
                 + "vt.name, "
+                + "dc.code, "
                 + "l.name, "
                 + "b.name, "
                 + "ac.name, "
@@ -67,6 +68,8 @@ public class SViewDeduction extends SGridPaneView implements ActionListener {
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_DED) + " AS v "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_DED) + " AS vt ON "
                 + "v.fk_tp_ded = vt.id_tp_ded "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_DED_COMP) + " AS dc ON "
+                + "v.fk_tp_ded_comp = dc.id_tp_ded_comp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_LOAN) + " AS l ON "
                 + "v.fk_tp_loan = l.id_tp_loan "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_BEN) + " AS b ON "
@@ -95,6 +98,7 @@ public class SViewDeduction extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "v.name_abbr", SGridConsts.COL_TITLE_NAME + " corto"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "vt.name", "Tipo deducción"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "dc.code", "Tipo cálculo deducción"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "l.name", "Tipo crédito/préstamo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "b.name", "Tipo prestación"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "ac.name", "Tipo configuración contable"));

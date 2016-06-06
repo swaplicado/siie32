@@ -1422,6 +1422,39 @@ public abstract class STrnUtilities {
         }
     }
 
+    public static String getMailToSendForOrder(final SClientInterface client, final int[] keyDoc) throws Exception {
+        String mailToSend = "";
+        SDataBizPartner bizPartner = null;
+        SDataDps oDps = null;
+        
+        oDps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, keyDoc, SLibConstants.EXEC_MODE_SILENT);
+        bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { oDps.getFkBizPartnerId_r() }, SLibConstants.EXEC_MODE_SILENT); 
+        mailToSend = bizPartner.getBizPartnerBranchContactMail(new int[] { oDps.getFkBizPartnerBranchId() });
+        if (mailToSend.isEmpty()) {
+            throw new Exception("El receptor de documento no tiene ningún correo configurado para la recepción de documentos.");
+        }
+
+        return mailToSend;
+    }
+
+    public static String getMailToSendForCfd(final SClientInterface client, final int contactType, final int bizPartnerId, final int bizPartnerBranchId) throws Exception {
+        String mailToSend = "";
+        SDataBizPartner bizPartner = null;
+
+        bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { bizPartnerId }, SLibConstants.EXEC_MODE_SILENT);
+        if (bizPartnerBranchId != SLibConstants.UNDEFINED) {
+            mailToSend = bizPartner.getBizPartnerBranchContactMail(new int[] { bizPartnerBranchId });
+        }
+        else {
+            mailToSend = bizPartner.getBizPartnerBranchContactMail(contactType);
+        }
+        if (mailToSend.isEmpty()) {
+            throw new Exception("El receptor de documento no tiene ningún correo configurado para la recepción de documentos.");
+        }
+        
+        return mailToSend;
+    }
+    
     /**
      * Send mail with information of contracts specificated.
      * @param client ERP Client interface.
@@ -1439,24 +1472,28 @@ public abstract class STrnUtilities {
         SMail mail = null;
         ArrayList<String> toRecipients = null;
         File pdf = null;
-        SDbMms mms = null;
-        SDataBizPartner bizPartner = null;
+        SDbMms mms = null;     
+        //SDataBizPartner bizPartner = null; XXX ghernandez 23-05-2016 confirm message to send email
         SDataBizPartner bizPartnerUserSend = null;
 
         try {
             client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
             mms = getMms(client, typeDoc == SDataConstantsSys.TRNS_CT_DPS_PUR ? SModSysConsts.CFGS_TP_MMS_ORD_PUR : SModSysConsts.CFGS_TP_MMS_ORD_SAL);
             oDps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, keyDoc, SLibConstants.EXEC_MODE_SILENT);
+            /* XXX ghernandez 23-05-2016 confirm message to send email
             bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { oDps.getFkBizPartnerId_r() }, SLibConstants.EXEC_MODE_SILENT); 
             
             bizPartnerMail = bizPartner.getBizPartnerBranchContactMail(new int[] { oDps.getFkBizPartnerBranchId() });
+            */ 
             
+            bizPartnerMail = getMailToSendForOrder(client,keyDoc);
             if (mms.getQueryResultId() != SDbConsts.READ_OK) {
                 client.showMsgBoxWarning("No existe ningún correo configurado para envío de pedidos.");
             }
+            /*XXX ghernandez 23-05-2016 confirm message to send email
             else if (bizPartnerMail.isEmpty()) {
                 throw new Exception("El receptor de documento no tiene ningún correo configurado para la recepción de documentos.");
-            }
+            }*/
             else {
                 if (((SDataUser) client.getSession().getUser()).getFkBizPartnerId_n() != SLibConstants.UNDEFINED) {
                     bizPartnerUserSend = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { ((SDataUser) client.getSession().getUser()).getFkBizPartnerId_n() }, SLibConstants.EXEC_MODE_SILENT); 
@@ -1710,15 +1747,15 @@ public abstract class STrnUtilities {
         String msNumberDoc = "";
         String msDocumentType = "";
         String sql = "";
-        int id_snd = 0;
-        ResultSet resultSet = null;
+        //int id_snd = 0;
+        //ResultSet resultSet = null;
         SMailSender sender = null;
         SMail mail = null;
         ArrayList<String> toRecipients = null;
         File pdfFile = null;
         File xmlFile = null;
         SDbMms mms = null;
-        SDataBizPartner bizPartner = null;
+        
         SDataDps dps = null;
         SDataFormerPayroll payrollFormer = null;
         SDataFormerPayrollEmp payrollFormerEmp = null;
@@ -1727,8 +1764,7 @@ public abstract class STrnUtilities {
         DecimalFormat numberFormat = new DecimalFormat("00");
         Date cancellationDate = null;
 
-        bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { bizPartnerId }, SLibConstants.EXEC_MODE_SILENT);
-
+        //bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { bizPartnerId }, SLibConstants.EXEC_MODE_SILENT);
         mms = getMms(client, SModSysConsts.CFGS_TP_MMS_CFD);
 
         if (mms.getQueryResultId() != SDbConsts.READ_OK) {
@@ -1736,12 +1772,15 @@ public abstract class STrnUtilities {
             throw new Exception("Se carece de correo para envío de documentos.");
         }
         else {
-            if (bizPartnerBranchId != SLibConstants.UNDEFINED) {
+            bizPartnerMail = getMailToSendForCfd(client, contactType, bizPartnerId, bizPartnerBranchId);
+            
+            /*if (bizPartnerBranchId != SLibConstants.UNDEFINED) {
                 bizPartnerMail = bizPartner.getBizPartnerBranchContactMail(new int[] { bizPartnerBranchId });
             }
             else {
                 bizPartnerMail = bizPartner.getBizPartnerBranchContactMail(contactType);
-            }
+            }*/
+            
 
             if (bizPartnerMail.isEmpty()) {
                 canSend = false;

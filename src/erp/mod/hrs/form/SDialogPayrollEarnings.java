@@ -250,6 +250,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
         receiptEarning.setPkEmployeeId(payrollReceipt.getHrsEmployee().getEmployee().getPkEmployeeId());
         receiptEarning.setPkMoveId(row.getPkMoveId());
         receiptEarning.setAutomatic(false);
+        receiptEarning.setAlternativeTaxCalculation(row.getEarning().isAlternativeTaxCalculation());// XXX (jbarajas, 2016-04-06) articule 174 RLISR
         
         // Unit:
         

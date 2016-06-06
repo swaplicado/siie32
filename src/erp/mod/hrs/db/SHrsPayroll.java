@@ -410,7 +410,7 @@ public class SHrsPayroll {
                             amountLoan = (amountLoan > balanceLoan ? balanceLoan : amountLoan);
                         }
 
-                        if (amountLoan >= 0) {
+                        if (amountLoan > 0) {
                             payrollReceiptDeduction = createHrsPayrollReceiptDeduction(employeeId, 1, amountLoan, amountLoan,
                                     hrsPayrollReceiptDeduction.getDeduction(), loan.getPkEmployeeId(), loan.getPkLoanId(),
                                     loan.getFkLoanTypeId());
@@ -444,6 +444,7 @@ public class SHrsPayroll {
         payrollReceiptEarning.setAmountSystem_r(amount_r);
         payrollReceiptEarning.setAmount_r(amount_r);
         payrollReceiptEarning.setAutomatic(isAutomatic);
+        payrollReceiptEarning.setAlternativeTaxCalculation(earning.isAlternativeTaxCalculation());// XXX (jbarajas, 2016-04-06) articule 174 RLISR
         payrollReceiptEarning.setPkEmployeeId(employeeId);
         payrollReceiptEarning.setFkEarningTypeId(earning.getFkEarningTypeId());
         payrollReceiptEarning.setFkEarningId(earning.getPkEarningId());
@@ -728,6 +729,19 @@ public class SHrsPayroll {
         return deduction;
     }
 
+    public SDbEmployee getDataEmployee(final int id) {
+        SDbEmployee employee = null;
+
+        for (SDbEmployee entry : maEmployees) {
+            if (entry.getPkEmployeeId() == id) {
+                employee = entry;
+                break;
+            }
+        }
+
+        return employee;
+    }
+
     public ArrayList<SDbAutomaticEarning> getAutomaticEarnings(final int employeeId, final Date dateStart, final Date dateEnd, final boolean normal) {
         ArrayList<SDbAutomaticEarning> aAutomaticEarnings = new ArrayList<SDbAutomaticEarning>();
 
@@ -782,8 +796,8 @@ public class SHrsPayroll {
         
         // Get receipt employee days:
 
-        //oHrsPayrollReceipt.getEffectiveDays().addAll(moPayrollDataProvider.getHrsReceiptEmployeeCalendar(moPayroll.getPkPayrollId(), employeeId, dateStart, dateEnd));
-        oHrsEmployee = moPayrollDataProvider.createEmployee(moPayroll.getPkPayrollId(), employeeId, payrollYear, payrollYearPeriod, fiscalYear, dateStart, dateEnd, taxComputationType);
+        //oHrsEmployee = moPayrollDataProvider.createEmployee(moPayroll.getPkPayrollId(), employeeId, payrollYear, payrollYearPeriod, fiscalYear, dateStart, dateEnd, taxComputationType);  // XXX (jbarajas, 2016-04-01) slowly open payroll
+        oHrsEmployee = moPayrollDataProvider.createEmployee(this, moPayroll.getPkPayrollId(), employeeId, payrollYear, payrollYearPeriod, fiscalYear, dateStart, dateEnd, taxComputationType);
         oHrsEmployee.setHrsPayrollReceipt(oHrsPayrollReceipt);
         oHrsPayrollReceipt.setHrsEmployee(oHrsEmployee);
         

@@ -12,6 +12,8 @@ import sa.lib.SLibConsts;
  */
 public class SHrsCalculatedNetGrossAmount {
     
+    protected double mdSalary;
+    protected double mdSalarySs;
     protected double mdNetAmountWithSubsidy;
     protected double mdNetAmount;
     protected double mdGrossAmount;
@@ -30,6 +32,8 @@ public class SHrsCalculatedNetGrossAmount {
         mnCalculatedAmountType = SLibConsts.UNDEFINED;
     }
     
+    public void setSalary(double d) { mdSalary = d; }
+    public void setSalarySs(double d) { mdSalarySs = d; }
     public void setNetAmountWithSubsidy(double d) { mdNetAmountWithSubsidy = d; }
     public void setNetAmount(double d) { mdNetAmount = d; }
     public void setGrossAmount(double d) { mdGrossAmount = d; }
@@ -38,6 +42,8 @@ public class SHrsCalculatedNetGrossAmount {
     public void setSsContributionAmount(double d) { mdSsContributionAmount = d; }
     public void setCalculatedAmountType(int n) { mnCalculatedAmountType = n; }
     
+    public double getSalary() { return mdSalary; }
+    public double getSalarySs() { return mdSalarySs; }
     public double getNetAmountWithSubsidy() { return mdNetAmountWithSubsidy; }
     public double getNetAmount() { return mdNetAmount; }
     public double getGrossAmount() { return mdGrossAmount; }
@@ -49,6 +55,8 @@ public class SHrsCalculatedNetGrossAmount {
     public SHrsCalculatedNetGrossAmount clone() throws CloneNotSupportedException {
         SHrsCalculatedNetGrossAmount registry = new SHrsCalculatedNetGrossAmount(SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, SLibConsts.UNDEFINED);
         
+        registry.setSalary(this.getSalary());
+        registry.setSalarySs(this.getSalarySs());
         registry.setNetAmountWithSubsidy(this.getNetAmountWithSubsidy());
         registry.setNetAmount(this.getNetAmount());
         registry.setGrossAmount(this.getGrossAmount());

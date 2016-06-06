@@ -2542,6 +2542,22 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                                 }
                             }
                         }
+                        
+                        if (!validation.getIsError()) {
+                            if (moEntryDps != null && (jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() > 0)) { 
+                                if (moEntryDps.getFkBizPartnerId_r() != moFieldFkBizPartnerId_nr.getKeyAsIntArray()[0]) {
+                                    validation.setMessage("El asociado de negocios de la partida debe ser igual al del documento seleccionado.");
+                                    validation.setComponent(jcbFkBizPartnerId_nr);
+                                }
+                            }
+                            
+                            if (!validation.getIsError() && moEntryDpsAdj != null && (jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() > 0)) { 
+                                if (moEntryDpsAdj.getFkBizPartnerId_r() != moFieldFkBizPartnerId_nr.getKeyAsIntArray()[0]) {
+                                    validation.setMessage("El asociado de negocios de la partida debe ser igual al del documento de ajuste seleccionado.");
+                                    validation.setComponent(jcbFkBizPartnerId_nr);
+                                }
+                            }
+                        }
                     }
                 }
             }

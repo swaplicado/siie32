@@ -325,6 +325,7 @@ public class SFormBenefitAdjustmentEarning extends SBeanForm implements ItemList
         registry.setAmountUnitary(moCurPayment.getField().getValue());
         registry.setAmount_r(moCurPayment.getField().getValue());
         registry.setAutomatic(true);
+        registry.setAlternativeTaxCalculation(earning.isAlternativeTaxCalculation());// XXX (jbarajas, 2016-04-06) articule 174 RLISR
         registry.setBenefitAniversary((Integer) jsAnniversary.getValue());
         registry.setBenefitYear(moIntBenefitYear.getValue());
         registry.setFkEarningTypeId(earning.getFkEarningTypeId());

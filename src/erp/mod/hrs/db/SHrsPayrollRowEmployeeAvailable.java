@@ -68,7 +68,7 @@ public class SHrsPayrollRowEmployeeAvailable implements SGridRow {
 
             aEmployeeHireLogs = SHrsUtils.getEmployeeHireLogs(session, employeeId, datePayrollStart, datePayrollEnd);
 
-            if (!aEmployeeHireLogs.isEmpty()) {
+            if (!aEmployeeHireLogs.isEmpty() || (aEmployeeHireLogs.isEmpty() && !active)) {
                 employeeAvailable = new SHrsPayrollRowEmployeeAvailable();
 
                 employeeAvailable.setPkEmployeeId(employeeId);

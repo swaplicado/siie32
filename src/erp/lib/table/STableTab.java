@@ -347,7 +347,7 @@ public abstract class STableTab extends javax.swing.JPanel implements erp.lib.ta
                             }
                         }
                     }
-
+  
                     moTablePane.addTableColumn(tableColumn);
                 }
                 else if (element instanceof SXmlSortKey) {

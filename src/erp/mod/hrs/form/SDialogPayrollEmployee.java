@@ -1086,6 +1086,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
             receiptEarning.setBenefitYear(moHrsBenefit.getBenefitYear());
             receiptEarning.setAutomatic(true);
         }
+        receiptEarning.setAlternativeTaxCalculation(row.getEarning().isAlternativeTaxCalculation());// XXX (jbarajas, 2016-04-06) articule 174 RLISR
         receiptEarning.setFkEarningTypeId(row.getEarning().getFkEarningTypeId());
         receiptEarning.setFkEarningId(row.getEarning().getPkEarningId());
 
@@ -1489,7 +1490,8 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         }
         else {
             moTextDeductionName.setValue(moDeduction.getName());
-            moComDeductionValue.setCompoundText((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { SModSysConsts.HRSS_TP_EAR_COMP_AMT }, SDbRegistry.FIELD_CODE));
+            //moComDeductionValue.setCompoundText((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { SModSysConsts.HRSS_TP_EAR_COMP_AMT }, SDbRegistry.FIELD_CODE)); XXX (jbarajas, 2016-04-20) new field for computation type
+            moComDeductionValue.setCompoundText((String) miClient.getSession().readField(SModConsts.HRSS_TP_DED_COMP, new int[] { moDeduction.getFkDeductionComputationTypeId() }, SDbRegistry.FIELD_CODE));
 
             resetDeductionLoan();
 
@@ -1554,7 +1556,8 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
             hrsReceiptDeductionRow.setPkMoveId(moReceipt.getHrsDeductions().size() + 1);
             hrsReceiptDeductionRow.setXtaEmployee(moReceipt.getHrsEmployee().getEmployee().getAuxEmployee());
             hrsReceiptDeductionRow.setXtaValue(moComDeductionValue.getField().getValue());
-            hrsReceiptDeductionRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { SModSysConsts.HRSS_TP_EAR_COMP_AMT }, SDbRegistry.FIELD_CODE));
+            //hrsReceiptDeductionRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { SModSysConsts.HRSS_TP_EAR_COMP_AMT }, SDbRegistry.FIELD_CODE)); XXX (jbarajas, 2016-04-20) new field for computation type
+            hrsReceiptDeductionRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_DED_COMP, new int[] { moDeduction.getFkDeductionComputationTypeId() }, SDbRegistry.FIELD_CODE));
             hrsReceiptDeductionRow.setReceiptDeduction(createReceipDeduction(moReceipt, hrsReceiptDeductionRow));
 
             try {
@@ -1621,7 +1624,8 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
             hrsReceiptDeductionRow.setXtaEmployee(moReceipt.getHrsEmployee().getEmployee().getAuxEmployee());
             hrsReceiptDeductionRow.setXtaValue(hrsDeductionRow.getReceiptDeduction().getAmountUnitary());
             hrsReceiptDeductionRow.setXtaAmount(hrsDeductionRow.getReceiptDeduction().getAmount_r());
-            hrsReceiptDeductionRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { SModSysConsts.HRSS_TP_EAR_COMP_AMT }, SDbRegistry.FIELD_CODE));
+            //hrsReceiptDeductionRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { SModSysConsts.HRSS_TP_EAR_COMP_AMT }, SDbRegistry.FIELD_CODE)); XXX (jbarajas, 2016-04-20) new field for computation type
+            hrsReceiptDeductionRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_DED_COMP, new int[] { hrsDeductionRow.getDeduction().getFkDeductionComputationTypeId() }, SDbRegistry.FIELD_CODE));
 
             if (hrsDeductionRow.getReceiptDeduction() != null && hrsDeductionRow.getReceiptDeduction().getFkLoanEmployeeId_n() != SLibConsts.UNDEFINED) {
                 hrsReceiptDeductionRow.setXtaLoan(hrsDeductionRow.getHrsReceipt().getHrsEmployee().getLoan(hrsDeductionRow.getReceiptDeduction().getFkLoanLoanId_n()) == null ? "" : hrsDeductionRow.getHrsReceipt().getHrsEmployee().getLoan(hrsDeductionRow.getReceiptDeduction().getFkLoanLoanId_n()).getLoanIdentificator());

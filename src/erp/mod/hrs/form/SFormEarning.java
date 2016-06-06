@@ -105,8 +105,6 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moBoolDaysAdjustment = new sa.lib.gui.bean.SBeanFieldBoolean();
         moBoolDaysAbsence = new sa.lib.gui.bean.SBeanFieldBoolean();
         moBoolDaysWorked = new sa.lib.gui.bean.SBeanFieldBoolean();
-        moBoolWithholding = new sa.lib.gui.bean.SBeanFieldBoolean();
-        moBoolPayrollTax = new sa.lib.gui.bean.SBeanFieldBoolean();
         moBoolLoan = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel24 = new javax.swing.JPanel();
         jPanel26 = new javax.swing.JPanel();
@@ -133,6 +131,9 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jPanel20 = new javax.swing.JPanel();
         jlAbsenceType = new javax.swing.JLabel();
         moKeyAbsenceType = new sa.lib.gui.bean.SBeanFieldKey();
+        moBoolWithholding = new sa.lib.gui.bean.SBeanFieldBoolean();
+        moBoolPayrollTax = new sa.lib.gui.bean.SBeanFieldBoolean();
+        moBoolTaxCalculationOptional = new sa.lib.gui.bean.SBeanFieldBoolean();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
@@ -344,14 +345,6 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moBoolDaysWorked.setPreferredSize(new java.awt.Dimension(135, 23));
         jPanel3.add(moBoolDaysWorked);
 
-        moBoolWithholding.setText("Es retención de ley");
-        moBoolWithholding.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel3.add(moBoolWithholding);
-
-        moBoolPayrollTax.setText("Aplica imp. sobre nómina");
-        moBoolPayrollTax.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel3.add(moBoolPayrollTax);
-
         moBoolLoan.setText("Es crédito/préstamo");
         moBoolLoan.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel3.add(moBoolLoan);
@@ -449,6 +442,18 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
 
         jPanel28.add(jPanel20);
 
+        moBoolWithholding.setText("Es retención de ley");
+        moBoolWithholding.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel28.add(moBoolWithholding);
+
+        moBoolPayrollTax.setText("Aplica imp. sobre nómina");
+        moBoolPayrollTax.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel28.add(moBoolPayrollTax);
+
+        moBoolTaxCalculationOptional.setText("Aplica cálculo imp. opcional");
+        moBoolTaxCalculationOptional.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel28.add(moBoolTaxCalculationOptional);
+
         jPanel26.add(jPanel28, java.awt.BorderLayout.CENTER);
 
         jPanel24.add(jPanel26, java.awt.BorderLayout.NORTH);
@@ -520,6 +525,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolDaysWorked;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolLoan;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolPayrollTax;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolTaxCalculationOptional;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolWelfare;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolWithholding;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecExemptionSalaryEqualsMwzPercentage;
@@ -566,8 +572,6 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moBoolDaysAdjustment.setBooleanSettings(SGuiUtils.getLabelName(moBoolDaysAdjustment.getText()), false);
         moBoolDaysAbsence.setBooleanSettings(SGuiUtils.getLabelName(moBoolDaysAbsence.getText()), false);
         moBoolDaysWorked.setBooleanSettings(SGuiUtils.getLabelName(moBoolDaysWorked.getText()), false);
-        moBoolWithholding.setBooleanSettings(SGuiUtils.getLabelName(moBoolWithholding.getText()), false);
-        moBoolPayrollTax.setBooleanSettings(SGuiUtils.getLabelName(moBoolPayrollTax.getText()), false);
         moBoolLoan.setBooleanSettings(SGuiUtils.getLabelName(moBoolLoan.getText()), false);
         moKeyEarningType.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningType.getText()), true);
         moKeyEarningComputationType.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningComputationType.getText()), true);
@@ -578,6 +582,9 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moKeyAccountingRecordType.setKeySettings(miClient, SGuiUtils.getLabelName(jlAccountingRecordType.getText()), true);
         moKeyAbsenceClass.setKeySettings(miClient, SGuiUtils.getLabelName(jlAbsenceClass.getText()), false);
         moKeyAbsenceType.setKeySettings(miClient, SGuiUtils.getLabelName(jlAbsenceType.getText()), false);
+        moBoolWithholding.setBooleanSettings(SGuiUtils.getLabelName(moBoolWithholding.getText()), false);
+        moBoolPayrollTax.setBooleanSettings(SGuiUtils.getLabelName(moBoolPayrollTax.getText()), false);
+        moBoolTaxCalculationOptional.setBooleanSettings(SGuiUtils.getLabelName(moBoolTaxCalculationOptional.getText()), false);
 
         moFields.addField(moTextCode);
         moFields.addField(moTextName);
@@ -596,8 +603,6 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moFields.addField(moBoolDaysAdjustment);
         moFields.addField(moBoolDaysAbsence);
         moFields.addField(moBoolDaysWorked);
-        moFields.addField(moBoolWithholding);
-        moFields.addField(moBoolPayrollTax);
         moFields.addField(moBoolLoan);
         moFields.addField(moKeyEarningType);
         moFields.addField(moKeyLoanType);
@@ -606,6 +611,9 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moFields.addField(moKeyAccountingRecordType);
         moFields.addField(moKeyAbsenceClass);
         moFields.addField(moKeyAbsenceType);
+        moFields.addField(moBoolWithholding);
+        moFields.addField(moBoolPayrollTax);
+        moFields.addField(moBoolTaxCalculationOptional);
 
         moFields.setFormButton(jbSave);
     }
@@ -735,6 +743,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moBoolDaysWorked.setValue(moRegistry.isDaysWorked());
         moBoolWithholding.setValue(moRegistry.isWithholding());
         moBoolPayrollTax.setValue(moRegistry.isPayrollTax());
+        moBoolTaxCalculationOptional.setValue(moRegistry.isAlternativeTaxCalculation());
         moKeyEarningType.setValue(new int[] { moRegistry.getFkEarningTypeId() });
         moKeyEarningComputationType.setValue(new int[] { moRegistry.getFkEarningComputationTypeId() });
         moKeyEarningExemptionType.setValue(new int[] { moRegistry.getFkEarningExemptionTypeId() });
@@ -778,6 +787,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         registry.setDaysWorked(moBoolDaysWorked.getValue());
         registry.setWithholding(moBoolWithholding.getValue());
         registry.setPayrollTax(moBoolPayrollTax.getValue());
+        registry.setAlternativeTaxCalculation(moBoolTaxCalculationOptional.getValue());
         registry.setFkEarningTypeId(moKeyEarningType.getValue()[0]);
         registry.setFkEarningComputationTypeId(moKeyEarningComputationType.getValue()[0]);
         registry.setFkEarningExemptionTypeId(moKeyEarningExemptionType.getValue()[0]);

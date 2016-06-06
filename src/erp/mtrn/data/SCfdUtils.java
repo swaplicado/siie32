@@ -2212,6 +2212,10 @@ public abstract class SCfdUtils implements Serializable {
     }
 
     public static void printCfd(final SClientInterface client, final int typeCfd, final SDataCfd cfd, int printMode, final int subtypeCfd, boolean isSaving) throws Exception {
+        printCfd(client, typeCfd, cfd, printMode, SDataConstantsPrint.PRINT_A_COPY, subtypeCfd, isSaving);
+    }
+    
+    public static void printCfd(final SClientInterface client, final int typeCfd, final SDataCfd cfd, int printMode, int copies, final int subtypeCfd, boolean isSaving) throws Exception {
         SCfdPrint cfdPrint = null;
         SDataDps dps = null;
         SCfdParams params = null;
@@ -2238,7 +2242,7 @@ public abstract class SCfdUtils implements Serializable {
                             cfdPrint.printCfdi(cfd, printMode, dps);
                             break;
                         case SCfdConsts.CFD_TYPE_PAYROLL:
-                            cfdPrint.printPayrollReceipt(cfd, printMode, subtypeCfd);
+                            cfdPrint.printPayrollReceipt(cfd, printMode, copies, subtypeCfd);
                             break;
                         default:
                             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -2273,13 +2277,16 @@ public abstract class SCfdUtils implements Serializable {
 
     public static void sendCfd(final SClientInterface client, final int typeCfd, final SDataCfd cfd, final int subtypeCfd, boolean isSingle) throws MessagingException, SQLException, Exception {
         SDataDps dps = null;
-
+        String bizPartnerMail;
+        
         switch (typeCfd) {
             case SCfdConsts.CFD_TYPE_DPS:
                 dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
 
                 if (canSend(client, cfd)) {
-                    if (!isSingle || client.showMsgBoxConfirm("¿Está seguro que desea enviar por correo-e el documento?") == JOptionPane.YES_OPTION) {
+                    bizPartnerMail = STrnUtilities.getMailToSendForCfd(client, SLibConstants.UNDEFINED, dps.getFkBizPartnerId_r(), dps.getFkBizPartnerBranchId()).replace(";", "\n");
+                    //if (!isSingle || client.showMsgBoxConfirm("¿Está seguro que desea enviar por correo-e el documento?") == JOptionPane.YES_OPTION) { //XXX ghernandez 23-05-2016 confirm message to send email
+                    if (!isSingle || client.showMsgBoxConfirm("El documento se enviará a los siguientes destinatarios:\n" + bizPartnerMail + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                         STrnUtilities.sendMailCfd(client, dps.getDbmsDataCfd(), SLibConstants.UNDEFINED, SLibConstants.UNDEFINED, dps.getFkBizPartnerId_r(), dps.getFkBizPartnerBranchId());
 
                         if (isSingle) {
@@ -2290,7 +2297,9 @@ public abstract class SCfdUtils implements Serializable {
                 break;
             case SCfdConsts.CFD_TYPE_PAYROLL:
                 if (canSend(client, cfd)) {
-                    if (!isSingle || client.showMsgBoxConfirm("¿Está seguro que desea enviar por correo-e el documento?") == JOptionPane.YES_OPTION) {
+                    bizPartnerMail = STrnUtilities.getMailToSendForCfd(client, subtypeCfd, SDataConstantsSys.BPSS_TP_CON_ADM, (subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? cfd.getFkPayrollBizPartnerId_n() : cfd.getFkPayrollReceiptEmployeeId_n())).replace(";", "\n");
+                    //if (!isSingle || client.showMsgBoxConfirm("¿Está seguro que desea enviar por correo-e el documento?") == JOptionPane.YES_OPTION) { //XXX ghernandez 23-05-2016 confirm message to send email
+                    if (!isSingle || client.showMsgBoxConfirm("El documento se enviará a los siguientes destinatarios:\n" + bizPartnerMail + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                         STrnUtilities.sendMailCfd(client, cfd, subtypeCfd, SDataConstantsSys.BPSS_TP_CON_ADM, (subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? cfd.getFkPayrollBizPartnerId_n() : cfd.getFkPayrollReceiptEmployeeId_n()));
 
                         if (isSingle) {
@@ -2574,6 +2583,37 @@ public abstract class SCfdUtils implements Serializable {
         client.getSession().getStatement().execute(sql);
 
         return true;
+    }
+
+    public static boolean verifyCfdi(final SClientInterface client, final ArrayList<SDataCfd> cfds, final int subtypeCfd) throws Exception {
+        boolean valid = false;
+        int stampAvailables = 0;
+        ArrayList<SDataCfd> cfdsValidate = null;
+        SDialogResult dialogResult = null;
+        
+        cfdsValidate = new ArrayList<SDataCfd>();
+        
+        if (cfds.isEmpty()) {
+            client.showMsgBoxInformation("No existen documentos para validar.");
+        }
+        else {
+            for(SDataCfd cfd : cfds) {
+                if (cfd.getIsProcessingWebService() || cfd.getIsProcessingStorageXml() || cfd.getIsProcessingStoragePdf()) {
+                    cfdsValidate.add(cfd);
+                }
+                cfdsValidate.add(cfd);
+            }
+
+            stampAvailables = getStampsAvailable(client, cfdsValidate.get(0).getFkCfdTypeId(), cfdsValidate.get(0).getTimestamp(), 0);
+            if (existsCfdiEmitInconsist(client, cfdsValidate)) {
+                dialogResult = new SDialogResult((SClient) client, "Resultados de verificación", SCfdConsts.PROC_REQ_VERIFY);
+
+                dialogResult.setFormParams(client, cfdsValidate, null, stampAvailables, null, false, subtypeCfd);
+                dialogResult.setVisible(true);
+            }
+        }
+
+        return valid;
     }
 
     public static boolean verifyCfdi(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd) throws Exception {
@@ -3448,7 +3488,7 @@ public abstract class SCfdUtils implements Serializable {
         }
     }
 
-    public static void printCfd(final SClientInterface client, final ArrayList<SDataCfd> cfds, final int subtypeCfd) throws Exception {
+    public static void printCfd(final SClientInterface client, final ArrayList<SDataCfd> cfds, int copies, final int subtypeCfd) throws Exception {
         ArrayList<SDataCfd> cfdsAux = null;
         SDialogResult dialogResult = null;
 
@@ -3468,6 +3508,7 @@ public abstract class SCfdUtils implements Serializable {
                 dialogResult = new SDialogResult((SClient) client, "Resultados de impresión", SCfdConsts.PROC_PRT_DOC);
 
                 dialogResult.setFormParams(client, cfdsAux, null, 0, null, false, subtypeCfd);
+                dialogResult.setNumberCopies(copies);
                 dialogResult.setVisible(true);
             }
         }
@@ -3729,9 +3770,17 @@ public abstract class SCfdUtils implements Serializable {
                     sqlInner += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON "
                             + "bp.id_bp = pei.id_emp ";
                 }
+                else if (orderBy == SUtilConsts.PER_REF) {
+                    sqlInner += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON "
+                                + "bp.id_bp = pei.id_emp "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pe ON "
+                                + "c.fid_pay_rcp_pay_n = pe.id_pay AND c.fid_pay_rcp_emp_n = pe.id_emp "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON "
+                                + "dep.id_dep = pe.fk_dep ";
+                }
                 sqlWhere = "WHERE NOT (c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND c.b_con = 0) AND c.fid_pay_rcp_pay_n = " + payrollKey[0] + 
                         (orderBy == SUtilConsts.PER_DOC ? " ORDER BY pei.num_ser, CAST(pei.num AS UNSIGNED INTEGER), pei.id_pay, pei.id_emp, pei.id_iss " : 
-                        orderBy == SUtilConsts.PER_BPR ? " ORDER BY bp.bp, bp.id_bp ": " ORDER BY c.id_cfd ");
+                        orderBy == SUtilConsts.PER_BPR ? " ORDER BY bp.bp, bp.id_bp " : orderBy == SUtilConsts.PER_REF ? " ORDER BY dep.code, dep.name, dep.id_dep, bp.bp, bp.id_bp " : " ORDER BY c.id_cfd ");
                 break;
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

@@ -102,7 +102,7 @@ public abstract class SHrsUtils {
                 sql = "SELECT rcp.id_emp, rcp.pay_r, emp.bank_acc " +
                         "FROM hrs_pay_rcp AS rcp " +
                         "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
-                        "WHERE rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " ";
+                        "WHERE rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0";
                 resultSet = client.getSession().getStatement().executeQuery(sql);
                 while (resultSet.next()) {
                     buffer = "";
@@ -1822,6 +1822,7 @@ public abstract class SHrsUtils {
         double amout = 0;
         double adjustmentAux = 0;
         double salaryReference = 0;
+        double balanceLoan = 0;
         SHrsDaysByPeriod hrsDaysPrev = hrsReceipt.getHrsEmployee().getHrsDaysPrev();
         SHrsDaysByPeriod hrsDaysCurr = hrsReceipt.getHrsEmployee().getHrsDaysCurr();
         SHrsDaysByPeriod hrsDaysNext = hrsReceipt.getHrsEmployee().getHrsDaysNext();
@@ -1833,6 +1834,10 @@ public abstract class SHrsUtils {
                 
                 if (loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA) {
                     amoutAux = amoutMonth;
+                
+                    balanceLoan = SHrsUtils.getBalanceLoan(loan, hrsReceipt.getHrsEmployee());
+
+                    amoutAux = (amoutAux > balanceLoan ? balanceLoan : amoutAux);
                 }
                 else {
                     amoutAux += hrsDaysPrev == null ? 0 : (amoutMonth / hrsDaysPrev.getDaysPeriod() * (hrsDaysPrev.getDaysPeriodPayroll() - hrsDaysPrev.getDaysPeriodPayrollNotWorkedNotPaid()));
@@ -2063,16 +2068,19 @@ public abstract class SHrsUtils {
      * @param dSalarySsc base salary contribution of employee.
      * @param grossAmount amount gross.
      * @param dateCut date of cut.
+     * @param dateBenefit
      * @return
      * @throws Exception 
      */
     
-    public static SHrsCalculatedNetGrossAmount computeNetAmountPayment(final SGuiSession session, final double dSalarySsc, final double grossAmount, final Date dateCut) throws Exception {
+    public static SHrsCalculatedNetGrossAmount computeNetAmountPayment(final SGuiSession session, final double grossAmount, final Date dateCut, final Date dateBenefit) throws Exception {
         SHrsCalculatedNetGrossAmount netGrossAmount = null;
         SDbTaxTable dbTaxTable = null;
         SDbTaxSubsidyTable dbSubsidyTable = null;
         SDbSsContributionTable dbSscTable = null;
         SDbConfig config = null;
+        double dSalaryDiary = 0;
+        double dSalarySsc = 0;
         double dMwzReference = 0;
         double dNetAmount = 0;
         double dTaxAmount = 0;
@@ -2084,6 +2092,9 @@ public abstract class SHrsUtils {
         SHrsDaysByPeriod hrsDaysPrev = new SHrsDaysByPeriod(0, 0, 0, 0, 0, 0);
         SHrsDaysByPeriod hrsDaysCurr = new SHrsDaysByPeriod(year, 0, days, days, 0, 0);
         SHrsDaysByPeriod hrsDaysNext = new SHrsDaysByPeriod(0, 0, 0, 0, 0, 0);
+        
+        dSalaryDiary = grossAmount * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
+        dSalarySsc = dSalaryDiary * getIntegrationFactorSbc(session, dateBenefit, dateCut);
         
         config = (SDbConfig) session.readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
         dbTaxTable = (SDbTaxTable) session.readRegistry(SModConsts.HRS_TAX, new int[] { getRecentTaxTable(session, dateCut) });
@@ -2101,6 +2112,8 @@ public abstract class SHrsUtils {
         
         netGrossAmount = new SHrsCalculatedNetGrossAmount(dNetAmount, grossAmount, dTaxAmount, dTaxSubsidyAmount, dSsContributionAmount);
         netGrossAmount.setCalculatedAmountType(SHrsConsts.CAL_NET_AMT_TYPE);
+        netGrossAmount.setSalary(dSalaryDiary);
+        netGrossAmount.setSalarySs(dSalarySsc);
         
         return netGrossAmount;
     }
@@ -2111,15 +2124,19 @@ public abstract class SHrsUtils {
      * @param dSalarySsc base salary contribution of employee.
      * @param dNetAmount amount net.
      * @param dateCut date of cut.
+     * @param tolerance
+     * @param dateBenefit
      * @return
      * @throws Exception 
      */
     
-    public static SHrsCalculatedNetGrossAmount computeGrossAmountPayment(final SGuiSession session, final double dSalarySsc, final double dNetAmount, final Date dateCut, final double tolerance) throws Exception {
+    public static SHrsCalculatedNetGrossAmount computeGrossAmountPayment(final SGuiSession session, final double dNetAmount, final Date dateCut, final double tolerance, final Date dateBenefit) throws Exception {
         SHrsCalculatedNetGrossAmount netGrossAmount = null;
         SDbTaxTable dbTaxTable = null;
         SDbTaxTableRow dbTaxTableRow = null;
         int days = SLibTimeUtils.getMaxDayOfMonth(dateCut);
+        double dSalaryDiary = 0;
+        double dSalarySsc = 0;
         double dTableFactor = 0;
         double average = 0;
         double dGrossAmount = 0;
@@ -2143,8 +2160,11 @@ public abstract class SHrsUtils {
                 }
                 
                 average = (limitInf + limitSup) / 2;
+                
+                dSalaryDiary = limitSup * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
+                dSalarySsc = dSalaryDiary * getIntegrationFactorSbc(session, dateBenefit, dateCut);
 
-                netGrossAmount = computeNetAmountPayment(session, dSalarySsc, average, dateCut);
+                netGrossAmount = computeNetAmountPayment(session, average, dateCut, dateBenefit);
                 
                 if (netGrossAmount.getNetAmount() > dNetAmount) {
                     break;
@@ -2155,8 +2175,11 @@ public abstract class SHrsUtils {
 
         while (bCalculate) {
             average = (limitInf + limitSup) / 2;
+            
+            dSalaryDiary = limitSup * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
+            dSalarySsc = dSalaryDiary * getIntegrationFactorSbc(session, dateBenefit, dateCut);
 
-            netGrossAmount = computeNetAmountPayment(session, dSalarySsc, average, dateCut);
+            netGrossAmount = computeNetAmountPayment(session, average, dateCut, dateBenefit);
 
             if (netGrossAmount.getNetAmount() > dNetAmount) {
                 limitSup = average;
@@ -2170,6 +2193,8 @@ public abstract class SHrsUtils {
         }
         dGrossAmount = average;
         
+        netGrossAmount.setSalary(dSalaryDiary);
+        netGrossAmount.setSalarySs(dSalarySsc);
         netGrossAmount.setGrossAmount(dGrossAmount);
         netGrossAmount.setCalculatedAmountType(SHrsConsts.CAL_GROSS_AMT_TYPE);
         

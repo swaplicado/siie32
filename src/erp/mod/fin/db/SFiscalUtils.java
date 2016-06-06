@@ -4,6 +4,7 @@
  */
 package erp.mod.fin.db;
 
+import erp.lib.SLibUtilities;
 import erp.mcfg.data.SDataParamsCompany;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -1169,7 +1170,7 @@ public abstract class SFiscalUtils {
                     + "fald2.id_ref_1 AS f_ld2_ref1, fald2.id_ref_2 AS f_ld2_ref2, fald2.acc_code, fald2.acc_name, "
                     + "fald3.id_ref_1 AS f_ld3_ref1, fald3.id_ref_2 AS f_ld3_ref2, fald3.acc_code, fald3.acc_name, "
                     + "fald4.id_ref_1 AS f_ld4_ref1, fald4.id_ref_2 AS f_ld4_ref2, fald4.acc_code, fald4.acc_name, "
-                    + "re.fid_dps_year_n, re.fid_dps_doc_n, doc.num_ser, doc.num, doc.tot_r, doc.exc_rate, doc_cur.id_cur, doc_fcur.id_fiscal_cur, doc_fcur.code, "
+                    + "re.fid_dps_year_n, re.fid_dps_doc_n, doc.num_ser, doc.num, doc.dt, doc.tot_r, doc.exc_rate, doc_cur.id_cur, doc_fcur.id_fiscal_cur, doc_fcur.code, "
                     + "@pos := INSTR(cfd.doc_xml, 'UUID=\"') AS f_cfd_pos, UPPER(IF(@pos = 0, '', MID(cfd.doc_xml, @pos + 6, 36))) AS f_cfd_uuid, doc_bp.fiscal_id, doc_bp.fiscal_frg_id, "
                     + "re.fid_check_wal_n, re.fid_check_n, acsh_bnk.acc_num, fbnk.id_fiscal_bank, fbnk.code, bnk_fcur.id_fiscal_cur, bnk_fcur.code, chk.num, chk.dt, chk.val, chk.benef, chk_bp.bp, chk_bp.fiscal_id "
                     + ""
@@ -1253,7 +1254,12 @@ public abstract class SFiscalUtils {
                                 resultSetRecEty.getString("doc_bp.fiscal_frg_id"), 
                                 resultSetRecEty.getDouble("doc.tot_r"),
                                 resultSetRecEty.getString("doc_fcur.code"),
-                                resultSetRecEty.getDouble("doc.exc_rat"));
+                                resultSetRecEty.getDouble("doc.exc_rate"));
+                    }
+                    else if (resultSetRecEty.getString("f_cfd_uuid") == null) {
+                        throw new Exception("El documento con folio '" + (resultSetRecEty.getString("doc.num_ser").isEmpty() ? "" : resultSetRecEty.getString("doc.num_ser") + "-") + resultSetRecEty.getString("doc.num")
+                                + "', fecha '" + SLibUtils.DateFormatDate.format(resultSetRecEty.getDate("doc.dt"))
+                                + " y rfc '"+resultSetRecEty.getString("doc_bp.fiscal_id")+"' no cuenta con UUID.");
                     }
                     else if (!resultSetRecEty.getString("f_cfd_uuid").isEmpty()) {
                         // Domestic document:
@@ -1262,7 +1268,7 @@ public abstract class SFiscalUtils {
                                 resultSetRecEty.getString("doc_bp.fiscal_id"), 
                                 resultSetRecEty.getDouble("doc.tot_r"),
                                 resultSetRecEty.getString("doc_fcur.code"),
-                                resultSetRecEty.getDouble("doc.exc_rat"));
+                                resultSetRecEty.getDouble("doc.exc_rate"));
                     }
 
                     if (xmlComp != null) {

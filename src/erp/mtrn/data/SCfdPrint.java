@@ -807,8 +807,12 @@ public class SCfdPrint {
                 throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
         }
     }
-
+    
     public void printPayrollReceipt(final SDataCfd cfd, final int pnPrintMode, final int subtypeCfd) throws java.lang.Exception {
+        printPayrollReceipt(cfd, pnPrintMode, SDataConstantsPrint.PRINT_A_COPY, subtypeCfd);
+    }
+    
+    public void printPayrollReceipt(final SDataCfd cfd, final int pnPrintMode, final int pnNumCopies, final int subtypeCfd) throws java.lang.Exception {
         int i = 0;
         int nTotalTiempoExtra = 0;
 
@@ -1092,12 +1096,12 @@ public class SCfdPrint {
                 JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
                 break;
             case SDataConstantsPrint.PRINT_MODE_STREAM:
-                JasperPrintManager.printReport(jasperPrint, false);
+                for (int j = 0; j < pnNumCopies; j++) {
+                    JasperPrintManager.printReport(jasperPrint, false);                    
+                }
                 break;
             default:
                 throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
         }
-
-
     }
 }

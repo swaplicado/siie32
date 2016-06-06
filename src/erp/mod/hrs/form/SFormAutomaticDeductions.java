@@ -106,7 +106,7 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
 
         jPanel2.setLayout(new java.awt.GridLayout(2, 1));
 
-        jPanel13.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlEmployee.setText("Empleado:*");
         jlEmployee.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -128,7 +128,7 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
 
         jPanel25.setLayout(new java.awt.GridLayout(2, 1));
 
-        jPanel5.setLayout(new java.awt.FlowLayout(3));
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
 
         moTextCodeFind.setText("sBeanFieldText1");
         moTextCodeFind.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -164,7 +164,7 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
 
         jPanel25.add(jPanel5);
 
-        jPanel24.setLayout(new java.awt.FlowLayout(3));
+        jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
 
         moTextName.setEditable(false);
         moTextName.setText("sBeanFieldText1");
@@ -345,7 +345,8 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
         try {
             automaticRow.setXtaDeductionCode((String) miClient.getSession().readField(SModConsts.HRS_DED, new int[] { moDeduction.getPkDeductionId() }, SDbRegistry.FIELD_CODE));
             automaticRow.setXtaDeduction((String) miClient.getSession().readField(SModConsts.HRS_DED, new int[] { moDeduction.getPkDeductionId() }, SDbRegistry.FIELD_NAME));
-            automaticRow.setXtaUnit("MXN");
+            //automaticRow.setXtaUnit("MXN"); XXX (jbarajas, 2016-04-20) new field for computation type
+            automaticRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_DED_COMP, new int[] { moDeduction.getFkDeductionComputationTypeId() }, SDbRegistry.FIELD_CODE));
             if (moKeyLoan_n.isEnabled() && moKeyLoan_n.getValue().length > 0) {
                 loan = new SDbLoan();
 
@@ -368,16 +369,17 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
     private void populateAutomaticRow() throws Exception {
         Vector<SGridRow> rows = new Vector<SGridRow>();
         SDbLoan loan = null;
-        SDbDeduction earning = null;
+        SDbDeduction deduction = null;
 
         for (SDbAutomaticDeduction row : moRegistry.getAutomaticDeductions()) {
-            earning = new SDbDeduction();
+            deduction = new SDbDeduction();
 
-            earning.read(miClient.getSession(), new int[] { row.getPkDeductionId() });
+            deduction.read(miClient.getSession(), new int[] { row.getPkDeductionId() });
 
             row.setXtaDeductionCode((String) miClient.getSession().readField(SModConsts.HRS_DED, new int[] { row.getPkDeductionId() }, SDbRegistry.FIELD_CODE));
             row.setXtaDeduction((String) miClient.getSession().readField(SModConsts.HRS_DED, new int[] { row.getPkDeductionId() }, SDbRegistry.FIELD_NAME));
-            row.setXtaUnit("MXN");
+            //row.setXtaUnit("MXN"); XXX (jbarajas, 2016-04-20) new field for computation type
+            row.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_DED_COMP, new int[] { deduction.getFkDeductionComputationTypeId() }, SDbRegistry.FIELD_CODE));
             if (row.getFkLoanEmployeeId_n() != SLibConsts.UNDEFINED) {
                 loan = new SDbLoan();
 
@@ -490,7 +492,8 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
             if (load) {
                 moTextName.setValue(moDeduction.getName());
                 moComValue.getField().getComponent().requestFocus();
-                moComValue.setCompoundText((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { SModSysConsts.HRSS_TP_EAR_COMP_AMT }, SDbRegistry.FIELD_CODE));
+                //moComValue.setCompoundText((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { SModSysConsts.HRSS_TP_EAR_COMP_AMT }, SDbRegistry.FIELD_CODE)); XXX (jbarajas, 2016-04-20) new field for computation type
+                moComValue.setCompoundText((String) miClient.getSession().readField(SModConsts.HRSS_TP_DED_COMP, new int[] { moDeduction.getFkDeductionComputationTypeId() }, SDbRegistry.FIELD_CODE));
 
                 resetLoan();
             }

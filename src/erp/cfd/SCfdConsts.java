@@ -34,6 +34,7 @@ public abstract class SCfdConsts {
     public static final int PROC_SND_DOC = 5;
     public static final int PROC_REQ_STAMP_AND_SND = 6;
     public static final int PROC_REQ_ANNUL_AND_SND = 7;
+    public static final int PROC_REQ_VERIFY = 8;    
 
     public static final int CFD_TYPE_DPS = 1;
     public static final int CFD_TYPE_PAYROLL = 2;

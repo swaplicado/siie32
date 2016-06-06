@@ -13,6 +13,7 @@ package erp.form;
 
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
 import erp.lib.form.SFormComboBoxGroup;
 import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormOptionPickerInterface;
@@ -21,6 +22,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -194,7 +196,11 @@ public class SFormOptionPickerBizPartner extends javax.swing.JDialog implements 
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
-        if (mbFirstTime) { mbFirstTime = false; jcbBizPartner.requestFocus(); }
+        if (mbFirstTime) {
+            mbFirstTime = false;
+         }
+        SLibUtilities.requestComponentFocus(jcbBizPartner);
+
     }//GEN-LAST:event_formWindowActivated
 
     private void jbOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbOkActionPerformed

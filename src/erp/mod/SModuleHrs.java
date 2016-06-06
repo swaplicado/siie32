@@ -273,6 +273,13 @@ public class SModuleHrs extends SGuiModule {
                     public String getSqlWhere(int[] pk) { return "WHERE id_tp_ded = " + pk[0] + " "; }
                 };
                 break;
+            case SModConsts.HRSS_TP_DED_COMP:
+                registry = new SDbRegistrySysFly(type) {
+                    public void initRegistry() { }
+                    public String getSqlTable() { return SModConsts.TablesMap.get(mnRegistryType); }
+                    public String getSqlWhere(int[] pk) { return "WHERE id_tp_ded_comp = " + pk[0] + " "; }
+                };
+                break;
             case SModConsts.HRSS_TP_BEN:
                 registry = new SDbRegistrySysFly(type) {
                     public void initRegistry() { }
@@ -496,6 +503,11 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRSS_TP_DED:
                 settings = new SGuiCatalogueSettings("Tipo deducción", 1);
                 sql = "SELECT id_tp_ded AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
+                break;
+            case SModConsts.HRSS_TP_DED_COMP:
+                settings = new SGuiCatalogueSettings("Tipo cálculo deducción", 1);
+                sql = "SELECT id_tp_ded_comp AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
                 break;
             case SModConsts.HRSS_TP_BEN:
@@ -1171,6 +1183,9 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRSR_LIST_DED:
                 guiReport = new SGuiReport("reps/hrs_pay_list_ded.jasper", "Listado de deducciones");
+                break;
+            case SModConsts.HRSR_ACT_EMP:
+                guiReport = new SGuiReport("reps/hrs_emp_act_by_period.jasper", "Reporte de empleados activos por periodo");
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

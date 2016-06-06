@@ -1133,7 +1133,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         try {
             computeRegistry();
             moHrsPayroll.setPayroll(moRegistry);
-            moHrsPayroll.computeEmployees(mbPayrollCopy);
+           //moHrsPayroll.computeEmployees(mbPayrollCopy); XXX (jbarajas, 2016-04-01) slowly open payroll
             moHrsPayroll.computeReceipts();
 
             populateEmployeesReceipt();
@@ -1242,6 +1242,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         //moGridPaneEmployeesAvailable.clearGridRows();
         //mvFormGrids.add(moGridPaneEmployeesAvailable);
         moGridPaneEmployeesAvailable.populateGrid(rows);
+        computeTotals();
     }
 
     private void populateEmployeesReceipt() {

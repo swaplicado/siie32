@@ -89,6 +89,7 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
         jlType = new javax.swing.JLabel();
         jrbTypeDateCutoff = new javax.swing.JRadioButton();
         jrbTypePeriod = new javax.swing.JRadioButton();
+        jrbTypeBalCred = new javax.swing.JRadioButton();
         jPanel3 = new javax.swing.JPanel();
         jlDateCutoff = new javax.swing.JLabel();
         jftDateCutoff = new javax.swing.JFormattedTextField();
@@ -141,8 +142,13 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
 
         bgType.add(jrbTypePeriod);
         jrbTypePeriod.setText("Saldos por período");
-        jrbTypePeriod.setPreferredSize(new java.awt.Dimension(150, 23));
+        jrbTypePeriod.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel9.add(jrbTypePeriod);
+
+        bgType.add(jrbTypeBalCred);
+        jrbTypeBalCred.setText("Saldos y créditos");
+        jrbTypeBalCred.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel9.add(jrbTypeBalCred);
 
         jPanel6.add(jPanel9);
 
@@ -341,6 +347,7 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
         jbPickSalesAgent.addActionListener(this);
         jrbTypeDateCutoff.addItemListener(this);
         jrbTypePeriod.addItemListener(this);
+        jrbTypeBalCred.addItemListener(this);
 
         SFormUtilities.createActionMap(rootPane, this, "actionPrint", "print", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "actionClose", "close", KeyEvent.VK_ESCAPE, 0);
@@ -376,7 +383,7 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
 
                 jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_FIN_BPS_BAL, map);
             }
-            else {
+            else if (jrbTypePeriod.isSelected()) {
                 map = miClient.createReportParams();
                 map.put("sTitle", getTitle().toUpperCase());
                 map.put("sBizPartner", msBizPartnerCatSng.toUpperCase() + ": " + (jcbBizPartner.getSelectedIndex() <= 0 ? SUtilConsts.ALL : jcbBizPartner.getSelectedItem().toString()));
@@ -392,6 +399,19 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
                 map.put("sSqlFilterSalesAgent", (jcbSalesAgent.getSelectedIndex() <= 0 ? "" : "AND d.fid_sal_agt_n = " + moFieldSalesAgent.getKeyAsIntArray()[0] + " "));
 
                 jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_FIN_BPS_BAL_PER, map);
+            }
+            else if (jrbTypeBalCred.isSelected()) {
+                map = miClient.createReportParams();
+                map.put("sTitle", getTitle().toUpperCase());
+                map.put("nSysMoveCatId", manSysMoveTypeKey[0]);
+                map.put("nSysMoveTypeId", manSysMoveTypeKey[1]);
+                map.put("sBizPartnerCat", msBizPartnerCatSng.toUpperCase());
+                map.put("sBizPartnerCatPlural", msBizPartnerCatPlr.toUpperCase());
+                map.put("sLocalCurrency", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency());
+                map.put("nYear", SLibTimeUtilities.digestYear(moFieldDateCutoff.getDate())[0]);
+                map.put("tDate", moFieldDateCutoff.getDate());
+               
+                jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_FIN_BPS_BAL_CRED, map);
             }
             
             jasperViewer = new JasperViewer(jasperPrint, false);
@@ -414,6 +434,8 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
             jbPickDateStart.setEnabled(false);
             jftDateEnd.setEnabled(false);
             jbPickDateEnd.setEnabled(false);
+            jcbBizPartner.setEnabled(true);
+            jbPickBizPartner.setEnabled(true);
             jcbSalesAgent.setEnabled(false);
             jbPickSalesAgent.setEnabled(false);
             
@@ -421,19 +443,39 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
             moFieldDateStart.resetField();
             moFieldDateEnd.resetField();
         }
-        else {
+        else if (jrbTypePeriod.isSelected()) {
             jftDateCutoff.setEnabled(false);
             jbPickDateCutoff.setEnabled(false);
             jftDateStart.setEnabled(true);
             jbPickDateStart.setEnabled(true);
             jftDateEnd.setEnabled(true);
             jbPickDateEnd.setEnabled(true);
+            jcbBizPartner.setEnabled(true);
+            jbPickBizPartner.setEnabled(true);
             jcbSalesAgent.setEnabled(mnBizPartnerCategoryId == SModSysConsts.BPSS_CT_BP_CUS);
             jbPickSalesAgent.setEnabled(mnBizPartnerCategoryId == SModSysConsts.BPSS_CT_BP_CUS);
             
             moFieldDateCutoff.resetField();
             moFieldDateStart.setFieldValue(SLibTimeUtils.getBeginOfMonth(miClient.getSession().getCurrentDate()));
             moFieldDateEnd.setFieldValue(SLibTimeUtils.getEndOfMonth(miClient.getSession().getCurrentDate()));
+        }
+        else if (jrbTypeBalCred.isSelected()) {
+            jftDateCutoff.setEnabled(true);
+            jbPickDateCutoff.setEnabled(true);
+            jftDateStart.setEnabled(false);
+            jbPickDateStart.setEnabled(false);
+            jftDateEnd.setEnabled(false);
+            jbPickDateEnd.setEnabled(false);
+            jcbBizPartner.setEnabled(false);
+            jbPickBizPartner.setEnabled(false);
+            jcbSalesAgent.setEnabled(false);
+            jbPickSalesAgent.setEnabled(false);
+            
+            moFieldDateCutoff.setFieldValue(miClient.getSession().getCurrentDate());
+            moFieldDateStart.resetField();
+            moFieldDateEnd.resetField();
+            moFieldBizPartner.resetField();
+            moFieldSalesAgent.resetField();
         }
         
         moFieldSalesAgent.resetField(); // allways reset sales agent
@@ -505,6 +547,7 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
     private javax.swing.JLabel jlType;
     private javax.swing.JButton jpClose;
     private javax.swing.JButton jpPrint;
+    private javax.swing.JRadioButton jrbTypeBalCred;
     private javax.swing.JRadioButton jrbTypeDateCutoff;
     private javax.swing.JRadioButton jrbTypePeriod;
     // End of variables declaration//GEN-END:variables
@@ -573,6 +616,9 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
                     itemStateChangedType();
                 }
                 else if (radioButton == jrbTypePeriod) {
+                    itemStateChangedType();
+                }
+                else if (radioButton == jrbTypeBalCred) {
                     itemStateChangedType();
                 }
             }

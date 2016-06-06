@@ -101,6 +101,7 @@ public class SDataAccountCash extends erp.lib.data.SDataRegistry implements java
     
     public void setAuxFkBankId(int n) { mnAuxFkBankId = n; }
     public void setAuxBankAccountNumber(java.lang.String s) { msAuxBankAccountNumber = s; }
+    public void setAuxIsEntityActive(boolean b) { mbAuxIsEntityActive = b; }
 
     public int getAuxFkCompanyId() { return mnAuxFkCompanyId; }
     public java.lang.String getAuxEntity() { return msAuxEntity; }
@@ -108,9 +109,6 @@ public class SDataAccountCash extends erp.lib.data.SDataRegistry implements java
 
     public int getAuxFkBankId() { return mnAuxFkBankId; }
     public java.lang.String getAuxBankAccountNumber() { return msAuxBankAccountNumber; }
-    
-    public void setAuxIsEntityActive(boolean b) { mbAuxIsEntityActive=b; }
-    
     public boolean getAuxIsEntityActive() { return mbAuxIsEntityActive; }
 
     @Override
@@ -156,6 +154,7 @@ public class SDataAccountCash extends erp.lib.data.SDataRegistry implements java
         
         mnAuxFkBankId = 0;
         msAuxBankAccountNumber = "";
+        mbAuxIsEntityActive = false;
     }
 
     @Override

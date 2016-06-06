@@ -38,7 +38,7 @@ import sa.lib.gui.SGuiDate;
  *
  * @author Juan Barajas
  */
-public class SViewBenefit extends SGridPaneView implements ActionListener {
+public class SViewVacations extends SGridPaneView implements ActionListener {
 
     private SGridFilterPanelEmployee moFilterEmployee;
     private SGridFilterDate moFilterDate;
@@ -47,7 +47,7 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
     
     private SDialogBenefitCardex moDialogBenefitCardex;
     
-    public SViewBenefit(SGuiClient client, int gridSubtype, String title) {
+    public SViewVacations(SGuiClient client, int gridSubtype, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRSX_BEN_MOV, gridSubtype, title);
         initComponentsCustom();
     }
@@ -112,11 +112,6 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
      */
 
     @Override
-    public void actionMouseClicked() {
-        actionShowCardex();
-    }
-    
-    @Override
     public void prepareSqlQuery() {
         String sql = "";
         String dateCut = "";
@@ -170,7 +165,7 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
                 + "IF(!emp.b_act, 0, TIMESTAMPDIFF(DAY,ADDDATE(emp.dt_ben, INTERVAL TIMESTAMPDIFF(YEAR,emp.dt_ben," + dateCut + ") YEAR)," + dateCut + ")) AS f_sen_day, "
                 + "IF(!emp.b_act OR TIMESTAMPDIFF(YEAR,emp.dt_ben," + dateCut + ") = 0, 0, TIMESTAMPDIFF(YEAR,emp.dt_ben," + dateCut + ")) AS f_ann, "
                 + "IF(!emp.b_act OR TIMESTAMPDIFF(YEAR,emp.dt_ben," + dateCut + ") = 0, 0, (IF(YEAR(ADDDATE(emp.dt_ben, INTERVAL TIMESTAMPDIFF(YEAR,emp.dt_ben," + dateCut + ") YEAR)) > YEAR(emp.dt_ben), YEAR(ADDDATE(emp.dt_ben, INTERVAL TIMESTAMPDIFF(YEAR,emp.dt_ben," + dateCut + ") YEAR)) - 1, YEAR(emp.dt_ben)))) AS f_ann_ano, "
-                + "IF(!emp.b_act OR TIMESTAMPDIFF(YEAR,emp.dt_ben," + dateCut + ") = 0, 0, IF(emp.b_act = 0, 0, vr.ben_day)) AS f_ben_day, "
+                + "IF(!emp.b_act OR TIMESTAMPDIFF(YEAR,emp.dt_ben," + dateCut + ") = 0, 0, IF(emp.b_act = 0, 0, (SELECT SUM(ben_day) FROM hrs_ben_row WHERE id_ben = vr.id_ben AND id_row <= vr.id_row))) AS f_ben_day, "
                 + "IF(v.fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC + ", 'día', '$') AS f_unit, "
                 + "IF(!emp.b_act OR TIMESTAMPDIFF(YEAR,emp.dt_ben," + dateCut + ") = 0, 0, (SELECT br.ben_day FROM hrs_ben AS b INNER JOIN hrs_ben_row AS br ON b.id_ben = br.id_ben "
                 + "WHERE fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC + " AND dt_sta <= " + dateCut + " AND br.id_row = ("
@@ -184,8 +179,7 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
                 + "IF(!emp.b_act OR TIMESTAMPDIFF(YEAR,emp.dt_ben," + dateCut + ") = 0, 0, IF(vr.ben_bon_per = 0, 1, vr.ben_bon_per)) AS f_bon_per, "
                 + "IF(!emp.b_act, 0, COALESCE(IF(emp.fk_tp_pay = " + SModSysConsts.HRSS_TP_PAY_FOR + ", emp.wage * " + SHrsConsts.YEAR_MONTHS + " / " + SHrsConsts.YEAR_DAYS + ", emp.sal), 0)) AS f_pay_day, "
                 + "IF(!emp.b_act, 0, COALESCE((IF(emp.fk_tp_pay = " + SModSysConsts.HRSS_TP_PAY_FOR + ", emp.wage * " + SHrsConsts.YEAR_MONTHS + " / " + SHrsConsts.YEAR_DAYS + ", emp.sal) / emp.wrk_hrs_day), 0)) AS f_pay_hr, "
-                //+ "IF(!emp.b_act OR TIMESTAMPDIFF(YEAR,emp.dt_ben," + dateCut + ") = 0, 0, IF(ear.ben_ann = TIMESTAMPDIFF(YEAR,emp.dt_ben," + dateCut + "), SUM(ear.unt_all), 0)) AS f_payed_unt, "
-                + "(SELECT COALESCE(SUM(unt_all), 0) FROM hrs_pay_rcp_ear WHERE b_del = 0 AND ben_ann = TIMESTAMPDIFF(YEAR,emp.dt_ben," + dateCut + ") AND fk_tp_ben = " + mnGridSubtype + " AND id_emp = emp.id_emp) AS f_payed_unt, "
+                + "(SELECT COALESCE(SUM(unt_all), 0) FROM hrs_pay_rcp_ear WHERE b_del = 0 AND ben_ann <> 0 AND ben_ann <= TIMESTAMPDIFF(YEAR,emp.dt_ben," + dateCut + ") AND fk_tp_ben = " + mnGridSubtype + " AND id_emp = emp.id_emp) AS f_payed_unt, "
                 + "IF(!emp.b_act OR TIMESTAMPDIFF(YEAR,emp.dt_ben," + dateCut + ") = 0, 0, IF(ear.ben_ann = TIMESTAMPDIFF(YEAR,emp.dt_ben," + dateCut + "), SUM(ear.amt_r), 0))  AS f_payed_amt, "
                 + "IF(!emp.b_act OR TIMESTAMPDIFF(YEAR,emp.dt_ben," + dateCut + ") = 0, 0, IF(ear.ben_ann <> TIMESTAMPDIFF(YEAR,emp.dt_ben," + dateCut + "), SUM(ear.unt_all), 0)) AS f_payed_unt_oth, "
                 + "IF(!emp.b_act OR TIMESTAMPDIFF(YEAR,emp.dt_ben," + dateCut + ") = 0, 0, IF(ear.ben_ann <> TIMESTAMPDIFF(YEAR,emp.dt_ben," + dateCut + "), SUM(ear.amt_r), 0))  AS f_payed_amt_oth "

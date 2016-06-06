@@ -6,6 +6,7 @@ package erp;
 
 import erp.client.SClientInterface;
 import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
 import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormUtilities;
 import erp.server.SLoginRequest;
@@ -169,7 +170,7 @@ public class SLogin extends JDialog {
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
         if (mbFirstTime) {
             mbFirstTime = false;
-            jtfUserName.requestFocus();
+            SLibUtilities.requestComponentFocus(jtfUserName);
         }
     }//GEN-LAST:event_formWindowActivated
 
@@ -180,7 +181,7 @@ public class SLogin extends JDialog {
     }//GEN-LAST:event_jltCompaniesMouseClicked
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        jtfUserName.requestFocus();
+        SLibUtilities.requestComponentFocus(jtfUserName);
     }//GEN-LAST:event_formWindowOpened
 
     private void initComponentsExtra() {
@@ -199,22 +200,22 @@ public class SLogin extends JDialog {
                 actionCancel();
             }
         };
-
+     
         SFormUtilities.putActionMap(getRootPane(), actionCancel, "cancel", KeyEvent.VK_ESCAPE, 0);
     }
 
     private void actionOk() {
         if (jtfUserName.getText().length() == 0) {
             miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlUserName.getText() + "'");
-            jtfUserName.requestFocus();
+            SLibUtilities.requestComponentFocus(jtfUserName);
         }
         else if (jpfUserPassword.getPassword().length == 0) {
             miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlUserPassword.getText() + "'");
-            jpfUserPassword.requestFocus();
+            SLibUtilities.requestComponentFocus(jpfUserPassword);
         }
         else if (jltCompanies.getSelectedIndex() == -1) {
             miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCompany.getText() + "'");
-            jltCompanies.requestFocus();
+            SLibUtilities.requestComponentFocus(jltCompanies);
         }
         else {
             mnFormResult = SLibConstants.FORM_RESULT_OK;

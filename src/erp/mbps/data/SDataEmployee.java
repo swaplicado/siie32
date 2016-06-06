@@ -175,7 +175,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
         try {
             nLogId = 0;
 
-            sql = "SELECT COALESCE(MAX(id_log), 0) + 1 FROM hrs_emp_log_sal_ssc WHERE id_emp = " + mnPkEmployeeId + " ";
+            sql = "SELECT COALESCE(MAX(id_log), 0) + 1 FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_SAL_SSC) + " WHERE id_emp = " + mnPkEmployeeId + " ";
             resultSet = connection.createStatement().executeQuery(sql);
             if (resultSet.next()) {
                 nLogId = resultSet.getInt(1);
@@ -183,7 +183,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
 
             connection.createStatement().execute(sql);
 
-            sql = "INSERT INTO hrs_emp_log_sal_ssc VALUES (" + mnPkEmployeeId + ", " +
+            sql = "INSERT INTO " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_SAL_SSC) + " VALUES (" + mnPkEmployeeId + ", " +
                     nLogId + ", " +
                     "'" + SLibUtils.DbmsDateFormatDate.format(date) + "', " +
                     mdSalarySscBase + ", " +

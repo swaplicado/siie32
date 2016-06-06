@@ -329,19 +329,24 @@ public class SDbBankLayout extends SDbRegistryUser {
     private void processLayoutBankPayments(final SGuiSession session) throws Exception {
         boolean found = false;
         SLayoutBankRecord bankRecord = null;
+        SLayoutBankPayment paymentApply = null;
+        SLayoutBankPayment paymentDelete = null;
         
         for (SLayoutBankPaymentRow paymentRow : maBankPaymentRows) {
             // payment for delete:
             
             found = false;
             if (paymentRow.getFinRecordLayoutOld() != null) {
+                
                 if (paymentRow.getFinRecordLayout() == null ||
                         !(SLibUtils.compareKeys(paymentRow.getFinRecordLayout().getPrimaryKey(), paymentRow.getFinRecordLayoutOld().getPrimaryKey()))) {
-                    paymentRow.getLayoutBankPayment().setAction(2);// 2: remove payment
+                    paymentDelete = paymentRow.getLayoutBankPayment().clone();
+                    
+                    paymentDelete.setAction(2);// 2: remove payment
                     
                     for (SLayoutBankRecord bankRecordRow : maBankRecords) {
                         if (SLibUtils.compareKeys(bankRecordRow.getFinRecordLayout().getPrimaryKey(), paymentRow.getFinRecordLayoutOld().getPrimaryKey())) {
-                            bankRecordRow.getLayoutBankPayments().add(paymentRow.getLayoutBankPayment());
+                            bankRecordRow.getLayoutBankPayments().add(paymentDelete);
                             found = true;
                             break;
                         }
@@ -349,7 +354,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                     
                     if (!found) {
                         bankRecord = new SLayoutBankRecord(paymentRow.getFinRecordLayoutOld());
-                        bankRecord.getLayoutBankPayments().add(paymentRow.getLayoutBankPayment());
+                        bankRecord.getLayoutBankPayments().add(paymentDelete);
                         maBankRecords.add(bankRecord);
                     }
                 }
@@ -360,11 +365,13 @@ public class SDbBankLayout extends SDbRegistryUser {
             if (paymentRow.getFinRecordLayout() != null) {
                 if (paymentRow.getFinRecordLayoutOld() == null ||
                         !(SLibUtils.compareKeys(paymentRow.getFinRecordLayout().getPrimaryKey(), paymentRow.getFinRecordLayoutOld().getPrimaryKey()))) {
-                    paymentRow.getLayoutBankPayment().setAction(1);// 1: apply payment
+                    paymentApply = paymentRow.getLayoutBankPayment().clone();
+                    
+                    paymentApply.setAction(1);// 1: apply payment
                     
                     for (SLayoutBankRecord bankRecordRow : maBankRecords) {
                         if (SLibUtils.compareKeys(bankRecordRow.getFinRecordLayout().getPrimaryKey(), paymentRow.getFinRecordLayout().getPrimaryKey())) {
-                            bankRecordRow.getLayoutBankPayments().add(paymentRow.getLayoutBankPayment());
+                            bankRecordRow.getLayoutBankPayments().add(paymentApply);
                             found = true;
                             break;
                         }
@@ -372,7 +379,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                     
                     if (!found) {
                         bankRecord = new SLayoutBankRecord(paymentRow.getFinRecordLayout());
-                        bankRecord.getLayoutBankPayments().add(paymentRow.getLayoutBankPayment());
+                        bankRecord.getLayoutBankPayments().add(paymentApply);
                         maBankRecords.add(bankRecord);
                     }
                 }

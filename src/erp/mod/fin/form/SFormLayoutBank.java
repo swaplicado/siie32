@@ -193,6 +193,12 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
         jlBalanceTotPay = new javax.swing.JLabel();
         moDecBalanceTotPay = new sa.lib.gui.bean.SBeanFieldDecimal();
 
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
+
         jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
 
         jPanel23.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
@@ -363,6 +369,10 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
         getAccessibleContext().setAccessibleDescription("");
     }// </editor-fold>//GEN-END:initComponents
 
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        actionCancel();
+    }//GEN-LAST:event_formWindowClosing
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
@@ -472,7 +482,9 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                     gridColumnsForm.add(column);
                     gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Monto pagar $"));
                     gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda"));
-                    gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "No. cuenta", 125));
+                    column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "No. cuenta", 125);
+                    column.setApostropheOnCsvRequired(true);
+                    gridColumnsForm.add(column);
                     gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_PER, "Período póliza"));
                     gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CO, "Centro contable"));
                     gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CO, "Sucursal empresa"));
@@ -496,6 +508,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                     gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda"));
                     column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "No. cuenta", 125, moTableCellEditorOptions);
                     column.setEditable(true);
+                    column.setApostropheOnCsvRequired(true);
                     gridColumnsForm.add(column);
                     column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "E-mail", 100, moGridAbpSettings.getTable().getDefaultEditor(String.class));
                     column.setEditable(true);
