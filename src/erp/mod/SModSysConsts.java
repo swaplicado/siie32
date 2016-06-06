@@ -241,33 +241,6 @@ public abstract class SModSysConsts {
     public static final int FINS_CL_SYS_ACC_BPR_CDR = 23;
     public static final int FINS_CL_SYS_ACC_BPR_DBR = 24;
 
-    public static final int[] FINS_TP_SYS_MOV_NA = new int[] { 1, 1 };
-    public static final int[] FINS_TP_SYS_MOV_ASSET_ASSET = new int[] { 2, 1 };
-    public static final int[] FINS_TP_SYS_MOV_ASSET_STOCK = new int[] { 2, 2 };
-    public static final int[] FINS_TP_SYS_MOV_CASH_CASH = new int[] { 3, 1 };
-    public static final int[] FINS_TP_SYS_MOV_CASH_BANK = new int[] { 3, 2 };
-    public static final int[] FINS_TP_SYS_MOV_BPS_CO = new int[] { 4, 1 };
-    public static final int[] FINS_TP_SYS_MOV_BPS_SUP = new int[] { 4, 2 };
-    public static final int[] FINS_TP_SYS_MOV_BPS_CUS = new int[] { 4, 3 };
-    public static final int[] FINS_TP_SYS_MOV_BPS_CDR = new int[] { 4, 4 };
-    public static final int[] FINS_TP_SYS_MOV_BPS_DBR = new int[] { 4, 5 };
-    public static final int[] FINS_TP_SYS_MOV_TAX_DBT = new int[] { 5, 1 };
-    public static final int[] FINS_TP_SYS_MOV_TAX_DBT_PEND = new int[] { 5, 2 };
-    public static final int[] FINS_TP_SYS_MOV_TAX_DBT_PEND_ADV = new int[] { 5, 3 };
-    public static final int[] FINS_TP_SYS_MOV_TAX_CDT = new int[] { 5, 11 };
-    public static final int[] FINS_TP_SYS_MOV_TAX_CDT_PEND = new int[] { 5, 12 };
-    public static final int[] FINS_TP_SYS_MOV_TAX_CDT_PEND_ADV = new int[] { 5, 13 };
-    public static final int[] FINS_TP_SYS_MOV_PUR_ASSET = new int[] { 6, 1 };
-    public static final int[] FINS_TP_SYS_MOV_PUR_GOOD = new int[] { 6, 2 };
-    public static final int[] FINS_TP_SYS_MOV_PUR_SERV = new int[] { 6, 3 };
-    public static final int[] FINS_TP_SYS_MOV_SAL_ASSET = new int[] { 7, 1 };
-    public static final int[] FINS_TP_SYS_MOV_SAL_GOOD = new int[] { 7, 2 };
-    public static final int[] FINS_TP_SYS_MOV_SAL_SERV = new int[] { 7, 3 };
-    public static final int[] FINS_TP_SYS_MOV_COGS_ASSET = new int[] { 8, 1 };
-    public static final int[] FINS_TP_SYS_MOV_COGS_GOOD = new int[] { 8, 2 };
-    public static final int[] FINS_TP_SYS_MOV_PROF_LOSS = new int[] { 9, 1 };
-    public static final int[] FINS_TP_SYS_MOV_PROF_PROF = new int[] { 9, 2 };
-
     public static final int[] FINS_TP_SYS_ACC_NA_NA = new int[] { 1, 1 };
     public static final int[] FINS_TP_SYS_ACC_ENT_CSH_CSH = new int[] { 11, 1 };
     public static final int[] FINS_TP_SYS_ACC_ENT_CSH_BNK = new int[] { 11, 2 };
