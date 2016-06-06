@@ -4,7 +4,7 @@
  */
 
 /*
- * SRemoveAddenda.java
+ * SUtilRemoveAddenda.java
  *
  * Created on 14/09/2012
  */
@@ -33,7 +33,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  *
  * @author Juan Barajas
  */
-public class SRemoveAddenda extends javax.swing.JFrame {
+public class SUtilRemoveAddenda extends javax.swing.JFrame {
 
     private String msXml = "";
     private JFileChooser moFileChooser = null;
@@ -41,7 +41,7 @@ public class SRemoveAddenda extends javax.swing.JFrame {
     private File moFile = null;
 
     /** Creates new form SSetupClient */
-    public SRemoveAddenda() {
+    public SUtilRemoveAddenda() {
         initComponents();
         initComponentsExtra();
     }
@@ -129,8 +129,8 @@ public class SRemoveAddenda extends javax.swing.JFrame {
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-480)/2, (screenSize.height-300)/2, 480, 300);
+        setSize(new java.awt.Dimension(480, 300));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jbProcessActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbProcessActionPerformed
@@ -149,7 +149,7 @@ public class SRemoveAddenda extends javax.swing.JFrame {
         try {
             actionOpen();
         } catch (IOException ex) {
-            Logger.getLogger(SRemoveAddenda.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SUtilRemoveAddenda.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jbOpenActionPerformed
 
@@ -227,7 +227,7 @@ public class SRemoveAddenda extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new SRemoveAddenda().setVisible(true);
+                new SUtilRemoveAddenda().setVisible(true);
             }
         });
     }

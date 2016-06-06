@@ -4,7 +4,7 @@
  */
 
 /*
- * SSetupApp.java
+ * SUtilClientSetup.java
  *
  * Created on 13/05/2013, 09:00:00 AM
  */
@@ -23,13 +23,13 @@ import sa.lib.gui.SGuiUtils;
  *
  * @author Sergio Flores
  */
-public class SSetupApp extends javax.swing.JFrame {
+public class SUtilClientSetup extends javax.swing.JFrame {
 
     private boolean mbFirstActivation;
     private SParamsApp moParamsApp;
 
     /** Creates new form SSetupClient */
-    public SSetupApp() {
+    public SUtilClientSetup() {
         initComponents();
         initComponentsCustom();
     }
@@ -345,8 +345,8 @@ public class SSetupApp extends javax.swing.JFrame {
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-616)/2, (screenSize.height-413)/2, 616, 413);
+        setSize(new java.awt.Dimension(616, 413));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jbClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbClearActionPerformed
@@ -376,7 +376,7 @@ public class SSetupApp extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new SSetupApp().setVisible(true);
+                new SUtilClientSetup().setVisible(true);
             }
         });
     }
