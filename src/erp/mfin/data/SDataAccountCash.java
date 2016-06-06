@@ -38,7 +38,7 @@ public class SDataAccountCash extends erp.lib.data.SDataRegistry implements java
     protected java.util.Date mtUserDeleteTs;
 
     protected erp.mcfg.data.SDataCompanyBranchEntity moDbmsCompanyBranchEntity;
-    protected erp.mbps.data.SDataBizPartnerBranchBankAccount moDbmsBizPartnerBranchBankAccount ;
+    protected erp.mbps.data.SDataBizPartnerBranchBankAccount moDbmsBizPartnerBranchBankAccount;
 
     protected int mnAuxFkCompanyId;
     protected java.lang.String msAuxEntity;
