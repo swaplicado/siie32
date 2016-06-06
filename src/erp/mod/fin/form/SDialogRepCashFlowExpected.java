@@ -4,6 +4,7 @@
  */
 package erp.mod.fin.form;
 
+import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import sa.lib.SLibTimeUtils;
@@ -143,14 +144,14 @@ public class SDialogRepCashFlowExpected extends SBeanDialogReport {
         moParamsMap = miClient.createReportParams();
         moParamsMap.put("nLocalCurrencyId", miClient.getSession().getSessionCustom().getLocalCurrencyKey()[0]);
         moParamsMap.put("sLocalCurrencyKey", miClient.getSession().getSessionCustom().getLocalCurrency());
-        moParamsMap.put("nCashSysMoveTypeId", SModSysConsts.FINS_TP_SYS_MOV_CASH_CASH[1]);
-        moParamsMap.put("nCashSysMoveCatId", SModSysConsts.FINS_TP_SYS_MOV_CASH_CASH[0]);
-        moParamsMap.put("nBankSysMoveTypeId", SModSysConsts.FINS_TP_SYS_MOV_CASH_BANK[1]);
-        moParamsMap.put("nBankSysMoveCatId", SModSysConsts.FINS_TP_SYS_MOV_CASH_BANK[0]);
-        moParamsMap.put("nCustomerysMoveTypeId", SModSysConsts.FINS_TP_SYS_MOV_BPS_CUS[1]);
-        moParamsMap.put("nCustomerSysMoveCatId", SModSysConsts.FINS_TP_SYS_MOV_BPS_CUS[0]);
-        moParamsMap.put("nSupplerSysMoveTypeId", SModSysConsts.FINS_TP_SYS_MOV_BPS_SUP[1]);
-        moParamsMap.put("nSupplierSysMoveCatId", SModSysConsts.FINS_TP_SYS_MOV_BPS_SUP[0]);
+        moParamsMap.put("nCashSysMoveTypeId", SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH[1]);
+        moParamsMap.put("nCashSysMoveCatId", SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH[0]);
+        moParamsMap.put("nBankSysMoveTypeId", SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK[1]);
+        moParamsMap.put("nBankSysMoveCatId", SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK[0]);
+        moParamsMap.put("nCustomerysMoveTypeId", SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]);
+        moParamsMap.put("nCustomerSysMoveCatId", SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0]);
+        moParamsMap.put("nSupplerSysMoveTypeId", SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1]);
+        moParamsMap.put("nSupplierSysMoveCatId", SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0]);
         moParamsMap.put("nBpCustomerCategoryId", SModSysConsts.BPSS_CT_BP_CUS);
         moParamsMap.put("nBpSupplierCategoryId", SModSysConsts.BPSS_CT_BP_SUP);
         moParamsMap.put("nFidStDps", SModSysConsts.TRNS_ST_DPS_EMITED);
