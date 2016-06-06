@@ -39,13 +39,16 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.mbps.data.SDataBizPartnerBranch;
+import erp.mfin.data.SDataAccountCash;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.data.SFinAccountConfig;
 import erp.mfin.data.SFinAccountConfigEntry;
 import erp.mfin.data.SFinAccountUtilities;
 import erp.mfin.data.SFinAmount;
-import erp.mfin.data.SFinTaxes;
+import erp.mfin.data.SFinAmounts;
+import erp.mfin.data.SFinDpsTaxes;
+import erp.mfin.data.SFinMovement;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SDbMmsConfig;
 import erp.mod.trn.db.STrnUtils;
@@ -78,6 +81,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public static final int FIELD_CLO_COMMS = 4;
     public static final int FIELD_CLO_COMMS_USR = 5;
     public static final int FIELD_USR = 6;
+    public static final String MSG_ERR_FIN_REC_USR = "No se ha especificado la póliza contable de usuario.";
+    public static final String MSG_ERR_DOC_PRE_PAY = "El tipo de documento no permite anticipos. ";
+    public static final String MSG_ERR_ACC_UNK_ = "No se encontró la configuración de cuentas contables para el ";
+    public static final String MSG_ERR_ACC_EMP_ = "La configuración de cuentas contables está vacía para el ";
 
     protected int mnPkYearId;
     protected int mnPkDocId;
@@ -414,7 +421,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         statement.execute(sql);
     }
 
-    private java.lang.String getAccountingRecordType() {
+    private java.lang.String getAccRecordType() {
         String type = "";
         int[] docClassKey = new int[] { mnFkDpsCategoryId, mnFkDpsClassId };
 
@@ -434,7 +441,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         return type;
     }
 
-    private java.lang.Object createAccountingRecordKey(java.sql.Statement statement) throws java.lang.Exception {
+    private java.lang.Object createAccRecordKey(java.sql.Statement statement) throws java.lang.Exception {
         int[] period = null;
         Object[] key = null;
         SDataBizPartnerBranch branch = new SDataBizPartnerBranch();
@@ -449,14 +456,15 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             key[0] = period[0];
             key[1] = period[1];
             key[2] = branch.getDbmsDataCompanyBranchBkc().getPkBookkepingCenterId();
-            key[3] = getAccountingRecordType();
+            key[3] = getAccRecordType();
             key[4] = 0;
         }
 
         return key;
     }
 
-    private erp.mfin.data.SDataRecordEntry createAccountingRecordEntry(java.lang.String accountId, java.lang.String costCenterId, int[] accMoveSubclassKey, int[] sysAccountTypeKey, int[] sysMoveTypeKey, int[] sysMoveTypeKeyXXX, int[] auxDpsKey) {
+    private erp.mfin.data.SDataRecordEntry createAccRecordEntry(java.lang.String idAccount, java.lang.String idCostCenter, 
+            int[] keyAccMoveSubclass, int[] keySysAccountType, int[] keySysMoveType, int[] keySysMoveTypeXXX, int[] keyAuxDps_n, int[] keyCashAccount_n) {
         SDataRecordEntry entry = new SDataRecordEntry();
 
         entry.setPkYearId((Integer) ((Object[]) moDbmsRecordKey)[0]);
@@ -478,25 +486,25 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         entry.setSortingPosition(0);
         entry.setIsSystem(true);
         entry.setIsDeleted(false);
-        entry.setFkAccountIdXXX(accountId);
-        entry.setFkAccountingMoveTypeId(accMoveSubclassKey[0]);
-        entry.setFkAccountingMoveClassId(accMoveSubclassKey[1]);
-        entry.setFkAccountingMoveSubclassId(accMoveSubclassKey[2]);
-        entry.setFkSystemMoveClassId(sysMoveTypeKey[0]);
-        entry.setFkSystemMoveTypeId(sysMoveTypeKey[1]);
-        entry.setFkSystemAccountClassId(sysAccountTypeKey[0]);
-        entry.setFkSystemAccountTypeId(sysAccountTypeKey[1]);
-        entry.setFkSystemMoveCategoryIdXXX(sysMoveTypeKeyXXX[0]);
-        entry.setFkSystemMoveTypeIdXXX(sysMoveTypeKeyXXX[1]);
+        entry.setFkAccountIdXXX(idAccount);
+        entry.setFkAccountingMoveTypeId(keyAccMoveSubclass[0]);
+        entry.setFkAccountingMoveClassId(keyAccMoveSubclass[1]);
+        entry.setFkAccountingMoveSubclassId(keyAccMoveSubclass[2]);
+        entry.setFkSystemMoveClassId(keySysMoveType[0]);
+        entry.setFkSystemMoveTypeId(keySysMoveType[1]);
+        entry.setFkSystemAccountClassId(keySysAccountType[0]);
+        entry.setFkSystemAccountTypeId(keySysAccountType[1]);
+        entry.setFkSystemMoveCategoryIdXXX(keySysMoveTypeXXX[0]);
+        entry.setFkSystemMoveTypeIdXXX(keySysMoveTypeXXX[1]);
         entry.setFkCurrencyId(mnFkCurrencyId);
-        entry.setFkCostCenterIdXXX_n(costCenterId);
+        entry.setFkCostCenterIdXXX_n(idCostCenter);
         entry.setFkCheckWalletId_n(0);
         entry.setFkCheckId_n(0);
         entry.setFkBizPartnerId_nr(mnFkBizPartnerId_r);
         entry.setFkBizPartnerBranchId_n(mnFkBizPartnerBranchId);
         entry.setFkReferenceCategoryId_n(0);
-        entry.setFkCompanyBranchId_n(0);
-        entry.setFkEntityId_n(0);
+        entry.setFkCompanyBranchId_n(keyCashAccount_n == null ? 0 : keyCashAccount_n[0]);
+        entry.setFkEntityId_n(keyCashAccount_n == null ? 0 : keyCashAccount_n[1]);
         entry.setFkTaxBasicId_n(0);
         entry.setFkTaxId_n(0);
         entry.setFkYearId_n(0);
@@ -508,8 +516,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             entry.setFkDpsAdjustmentDocId_n(0);
         }
         else {
-            entry.setFkDpsYearId_n(auxDpsKey[0]);
-            entry.setFkDpsDocId_n(auxDpsKey[1]);
+            entry.setFkDpsYearId_n(keyAuxDps_n[0]);
+            entry.setFkDpsDocId_n(keyAuxDps_n[1]);
             entry.setFkDpsAdjustmentYearId_n(mnPkYearId);
             entry.setFkDpsAdjustmentDocId_n(mnPkDocId);
         }
@@ -626,7 +634,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 oCallableStatement = poConnection.prepareCall("{ CALL trn_dps_bal(?, ?, ?, ?, ?, ?) }");
                 oCallableStatement.setInt(i++, mnPkYearId);
                 oCallableStatement.setInt(i++, mnPkDocId);
-                oCallableStatement.setInt(i++, getAccountSystemTypeForBizPartnerXXX());
+                oCallableStatement.setInt(i++, getAccSysTypeIdBizPartnerXXX());
                 oCallableStatement.registerOutParameter(i++, java.sql.Types.DECIMAL);
                 oCallableStatement.registerOutParameter(i++, java.sql.Types.DECIMAL);
                 oCallableStatement.registerOutParameter(i++, java.sql.Types.SMALLINT);
@@ -768,7 +776,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     "FROM fin_rec AS r INNER JOIN fin_rec_ety AS re ON " +
                                     "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
                                     "r.b_del = 0 AND re.b_del = 0 AND re.fid_dps_year_n = " + mnPkYearId + " AND re.fid_dps_doc_n = " + mnPkDocId + " AND " +
-                                    "re.fid_tp_acc_mov <> " + getAccountingMoveSubclassKey()[0] + " ";
+                                    "re.fid_tp_acc_mov <> " + getAccMvtSubclassKeyBizPartner()[0] + " ";
                             sMsgAux = "¡El documento está en uso por pólizas contables como documento!";
                         }
                         else {
@@ -781,7 +789,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     "FROM fin_rec AS r INNER JOIN fin_rec_ety AS re ON " +
                                     "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
                                     "r.b_del = 0 AND re.b_del = 0 AND re.fid_dps_adj_year_n = " + mnPkYearId + " AND re.fid_dps_adj_doc_n = " + mnPkDocId + " AND " +
-                                    "re.fid_tp_acc_mov <> " + getAccountingMoveSubclassKey()[0] + " ";
+                                    "re.fid_tp_acc_mov <> " + getAccMvtSubclassKeyBizPartner()[0] + " ";
                             sMsgAux = "¡El documento está en uso por pólizas contables como documento de ajuste!";
                         }
                         else {
@@ -955,193 +963,231 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
     }
 
-    private int getBizPartnerCategoryId() {
-        int type = SDataConstantsSys.UNDEFINED;
+    private int getAccSysTypeIdBizPartnerXXX() {
+        int id = SLibConsts.UNDEFINED;
 
         if (isDocumentPur() || isAdjustmentPur()) {
-            type = SDataConstantsSys.BPSS_CT_BP_SUP;
+            id = SDataConstantsSys.FINS_TP_ACC_SYS_SUP;
         }
         else if (isDocumentSal() || isAdjustmentSal()) {
-            type = SDataConstantsSys.BPSS_CT_BP_CUS;
+            id = SDataConstantsSys.FINS_TP_ACC_SYS_CUS;
         }
 
-        return type;
+        return id;
     }
 
-    private int getItemAccountTypeId(erp.mtrn.data.SDataDpsEntry entry) {
-        int type = SDataConstantsSys.UNDEFINED;
-
-        if (isDocumentPur()) {
-            type = SDataConstantsSys.FINS_TP_ACC_ITEM_PUR;
-        }
-        else if (isDocumentSal()) {
-            type = SDataConstantsSys.FINS_TP_ACC_ITEM_SAL;
-        }
-        else if (isAdjustmentPur()) {
-            type = entry.getFkDpsAdjustmentTypeId() == SDataConstantsSys.TRNS_TP_DPS_ADJ_RET ? SDataConstantsSys.FINS_TP_ACC_ITEM_PUR_ADJ_DEV : SDataConstantsSys.FINS_TP_ACC_ITEM_PUR_ADJ_DISC;
-        }
-        else if (isAdjustmentSal()) {
-            type = entry.getFkDpsAdjustmentTypeId() == SDataConstantsSys.TRNS_TP_DPS_ADJ_RET ? SDataConstantsSys.FINS_TP_ACC_ITEM_SAL_ADJ_DEV : SDataConstantsSys.FINS_TP_ACC_ITEM_SAL_ADJ_DISC;
-        }
-
-        return type;
-    }
-
-    private int[] getSystemAccountTypeKey() {
-        int[] type = null;
+    private int[] getSysAccTypeKeyBizPartner() {
+        int[] key = null;
 
         if (isDocumentPur() || isAdjustmentPur()) {
-            type = SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL;
+            key = SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL;
         }
         else if (isDocumentSal() || isAdjustmentSal()) {
-            type = SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL;
+            key = SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL;
         }
         else {
-            type = SModSysConsts.FINS_TP_SYS_ACC_NA_NA;
+            key = SModSysConsts.FINS_TP_SYS_ACC_NA_NA;
         }
 
-        return type;
+        return key;
     }
 
-    private int getAccountSystemTypeForBizPartnerXXX() {
-        int systemType = SLibConstants.UNDEFINED;
+    private int[] getSysAccTypeKeyAccountCash(SDataAccountCash cash) {
+        int[] key = null;
+
+        switch (cash.getFkAccountCashCategoryId()) {
+            case SDataConstantsSys.FINS_CT_ACC_CASH_CASH:
+                key = SModSysConsts.FINS_TP_SYS_ACC_ENT_CSH_CSH;
+                break;
+            case SDataConstantsSys.FINS_CT_ACC_CASH_BANK:
+                key = SModSysConsts.FINS_TP_SYS_ACC_ENT_CSH_BNK;
+                break;
+            default:
+        }
+
+        return key;
+    }
+
+    private int[] getSysMvtTypeKeyBizPartnerXXX() {
+        int[] key = SDataConstantsSys.FINS_TP_SYS_MOV_NA;
 
         if (isDocumentPur() || isAdjustmentPur()) {
-            systemType = SDataConstantsSys.FINS_TP_ACC_SYS_SUP;
+            key = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP;
         }
         else if (isDocumentSal() || isAdjustmentSal()) {
-            systemType = SDataConstantsSys.FINS_TP_ACC_SYS_CUS;
+            key = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS;
         }
 
-        return systemType;
+        return key;
     }
 
-    private int[] getSystemMoveTypeForBizPartner() {
-        int[] type = SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT;
+    private int[] getSysMvtTypeKeyBizPartner() {
+        int[] key = SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT;
 
         if (isDocumentPur()) {
-            type = SModSysConsts.FINS_TP_SYS_MOV_PUR;
+            key = SModSysConsts.FINS_TP_SYS_MOV_PUR;
         }
         else if (isAdjustmentPur()) {
             if (SLibUtils.compareKeys(getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_PUR_CN)) {
-                type = SModSysConsts.FINS_TP_SYS_MOV_PUR_DEC;
+                key = SModSysConsts.FINS_TP_SYS_MOV_PUR_DEC;
             }
             else {
-                type = SModSysConsts.FINS_TP_SYS_MOV_PUR_INC;
+                key = SModSysConsts.FINS_TP_SYS_MOV_PUR_INC;
             }
         }
         else if (isDocumentSal()) {
-            type = SModSysConsts.FINS_TP_SYS_MOV_SAL;
+            key = SModSysConsts.FINS_TP_SYS_MOV_SAL;
         }
         else if (isAdjustmentSal()) {
             if (SLibUtils.compareKeys(getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CN)) {
-                type = SModSysConsts.FINS_TP_SYS_MOV_SAL_DEC;
+                key = SModSysConsts.FINS_TP_SYS_MOV_SAL_DEC;
             }
             else {
-                type = SModSysConsts.FINS_TP_SYS_MOV_SAL_INC;
+                key = SModSysConsts.FINS_TP_SYS_MOV_SAL_INC;
             }
         }
 
-        return type;
+        return key;
     }
 
-    private int[] getSystemMoveTypeForBizPartnerXXX() {
-        int[] type = SDataConstantsSys.FINS_TP_SYS_MOV_NA;
+    private int[] getSysMvtTypeKeyAccountCashXXX(SDataAccountCash cash) {
+        int[] key = null;
 
-        if (isDocumentPur() || isAdjustmentPur()) {
-            type = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP;
-        }
-        else if (isDocumentSal() || isAdjustmentSal()) {
-            type = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS;
+        switch (cash.getFkAccountCashCategoryId()) {
+            case SDataConstantsSys.FINS_CT_ACC_CASH_CASH:
+                key = SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH;
+                break;
+            case SDataConstantsSys.FINS_CT_ACC_CASH_BANK:
+                key = SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK;
+                break;
+            default:
         }
 
-        return type;
+        return key;
     }
 
-    private int[] getSystemMoveTypeForItem(final int adjustmentType) {
-        int[] type = SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT;
+    private int[] getSysMvtTypeKeyAccountCash() {
+        int[] key = SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT;
 
         if (isDocumentPur()) {
-            type = SModSysConsts.FINS_TP_SYS_MOV_PUR;
+            key = SModSysConsts.FINS_TP_SYS_MOV_MO_SUP_ADV;
         }
         else if (isAdjustmentPur()) {
-            if (SLibUtils.compareKeys(getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_PUR_CN)) {
-                type = adjustmentType == SDataConstantsSys.TRNS_TP_DPS_ADJ_DISC ? SModSysConsts.FINS_TP_SYS_MOV_PUR_DEC_DIS : SModSysConsts.FINS_TP_SYS_MOV_PUR_DEC_RET;
-            }
-            else {
-                type = adjustmentType == SDataConstantsSys.TRNS_TP_DPS_ADJ_DISC ? SModSysConsts.FINS_TP_SYS_MOV_PUR_INC_INC : SModSysConsts.FINS_TP_SYS_MOV_PUR_INC_ADD;
-            }
+            key = SModSysConsts.FINS_TP_SYS_MOV_MI_SUP_ADV;
         }
         else if (isDocumentSal()) {
-            type = SModSysConsts.FINS_TP_SYS_MOV_SAL;
+            key = SModSysConsts.FINS_TP_SYS_MOV_MI_CUS_ADV;
         }
         else if (isAdjustmentSal()) {
-            if (SLibUtils.compareKeys(getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CN)) {
-                type = adjustmentType == SDataConstantsSys.TRNS_TP_DPS_ADJ_DISC ? SModSysConsts.FINS_TP_SYS_MOV_SAL_DEC_DIS : SModSysConsts.FINS_TP_SYS_MOV_SAL_DEC_RET;
-            }
-            else {
-                type = adjustmentType == SDataConstantsSys.TRNS_TP_DPS_ADJ_DISC ? SModSysConsts.FINS_TP_SYS_MOV_SAL_INC_INC : SModSysConsts.FINS_TP_SYS_MOV_SAL_INC_ADD;
-            }
+            key = SModSysConsts.FINS_TP_SYS_MOV_MO_CUS_ADV;
         }
 
-        return type;
+        return key;
     }
 
-    private int[] getSystemMoveTypeForItemXXX() {
+    private int[] getSysMvtTypeKeyItemXXX() {
         return SDataConstantsSys.FINS_TP_SYS_MOV_NA;
     }
 
-    private int[] getSystemMoveTypeForTax(final int taxType, final int taxAppType) {
-        int[] type = SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT;
+    private int[] getSysMvtTypeKeyItem(final int adjustmentType) {
+        int[] key = SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT;
 
-        if (isDocumentPur() || isAdjustmentPur()) {
-            if (taxType == SModSysConsts.FINS_TP_TAX_CHARGED) {
-                type = taxAppType == SModSysConsts.FINS_TP_TAX_APP_ACCR ? SModSysConsts.FINS_TP_SYS_MOV_PUR_TAX_DBT_PAI : SModSysConsts.FINS_TP_SYS_MOV_PUR_TAX_DBT_PEN;
+        if (isDocumentPur()) {
+            key = SModSysConsts.FINS_TP_SYS_MOV_PUR;
+        }
+        else if (isAdjustmentPur()) {
+            if (SLibUtils.compareKeys(getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_PUR_CN)) {
+                key = adjustmentType == SDataConstantsSys.TRNS_TP_DPS_ADJ_DISC ? SModSysConsts.FINS_TP_SYS_MOV_PUR_DEC_DIS : SModSysConsts.FINS_TP_SYS_MOV_PUR_DEC_RET;
             }
             else {
-                type = taxAppType == SModSysConsts.FINS_TP_TAX_APP_ACCR ? SModSysConsts.FINS_TP_SYS_MOV_PUR_TAX_CDT_PAI : SModSysConsts.FINS_TP_SYS_MOV_PUR_TAX_CDT_PEN;
+                key = adjustmentType == SDataConstantsSys.TRNS_TP_DPS_ADJ_DISC ? SModSysConsts.FINS_TP_SYS_MOV_PUR_INC_INC : SModSysConsts.FINS_TP_SYS_MOV_PUR_INC_ADD;
             }
         }
-        else if (isDocumentSal() || isAdjustmentSal()) {
-            if (taxType == SModSysConsts.FINS_TP_TAX_CHARGED) {
-                type = taxAppType == SModSysConsts.FINS_TP_TAX_APP_ACCR ? SModSysConsts.FINS_TP_SYS_MOV_SAL_TAX_CDT_PAI : SModSysConsts.FINS_TP_SYS_MOV_SAL_TAX_CDT_PEN;
+        else if (isDocumentSal()) {
+            key = SModSysConsts.FINS_TP_SYS_MOV_SAL;
+        }
+        else if (isAdjustmentSal()) {
+            if (SLibUtils.compareKeys(getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CN)) {
+                key = adjustmentType == SDataConstantsSys.TRNS_TP_DPS_ADJ_DISC ? SModSysConsts.FINS_TP_SYS_MOV_SAL_DEC_DIS : SModSysConsts.FINS_TP_SYS_MOV_SAL_DEC_RET;
             }
             else {
-                type = taxAppType == SModSysConsts.FINS_TP_TAX_APP_ACCR ? SModSysConsts.FINS_TP_SYS_MOV_SAL_TAX_DBT_PAI : SModSysConsts.FINS_TP_SYS_MOV_SAL_TAX_DBT_PEN;
+                key = adjustmentType == SDataConstantsSys.TRNS_TP_DPS_ADJ_DISC ? SModSysConsts.FINS_TP_SYS_MOV_SAL_INC_INC : SModSysConsts.FINS_TP_SYS_MOV_SAL_INC_ADD;
             }
         }
 
-        return type;
+        return key;
     }
 
-    private int[] getSystemMoveTypeForTaxXXX(final int taxType, final int taxAppType) {
-        int[] type = SDataConstantsSys.FINS_TP_SYS_MOV_NA;
+    private int[] getSysMvtTypeKeyTaxXXX(final int taxType, final int taxAppType) {
+        int[] key = SDataConstantsSys.FINS_TP_SYS_MOV_NA;
 
         if (isDocumentPur() || isAdjustmentPur()) {
             if (taxType == SModSysConsts.FINS_TP_TAX_CHARGED) {
-                type = taxAppType == SModSysConsts.FINS_TP_TAX_APP_ACCR ? SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT : SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT_PEND;
+                key = taxAppType == SModSysConsts.FINS_TP_TAX_APP_ACCR ? SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT : SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT_PEND;
             }
             else {
-                type = taxAppType == SModSysConsts.FINS_TP_TAX_APP_ACCR ? SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT : SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT_PEND;
+                key = taxAppType == SModSysConsts.FINS_TP_TAX_APP_ACCR ? SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT : SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT_PEND;
             }
         }
         else if (isDocumentSal() || isAdjustmentSal()) {
             if (taxType == SModSysConsts.FINS_TP_TAX_CHARGED) {
-                type = taxAppType == SModSysConsts.FINS_TP_TAX_APP_ACCR ? SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT : SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT_PEND;
+                key = taxAppType == SModSysConsts.FINS_TP_TAX_APP_ACCR ? SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT : SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT_PEND;
             }
             else {
-                type = taxAppType == SModSysConsts.FINS_TP_TAX_APP_ACCR ? SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT : SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT_PEND;
+                key = taxAppType == SModSysConsts.FINS_TP_TAX_APP_ACCR ? SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT : SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT_PEND;
             }
         }
 
-        return type;
+        return key;
+    }
+
+    private int[] getSysMvtTypeKeyTax(final int taxType, final int taxAppType) {
+        int[] key = SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT;
+
+        if (isDocumentPur() || isAdjustmentPur()) {
+            if (taxType == SModSysConsts.FINS_TP_TAX_CHARGED) {
+                key = taxAppType == SModSysConsts.FINS_TP_TAX_APP_ACCR ? SModSysConsts.FINS_TP_SYS_MOV_PUR_TAX_DBT_PAI : SModSysConsts.FINS_TP_SYS_MOV_PUR_TAX_DBT_PEN;
+            }
+            else {
+                key = taxAppType == SModSysConsts.FINS_TP_TAX_APP_ACCR ? SModSysConsts.FINS_TP_SYS_MOV_PUR_TAX_CDT_PAI : SModSysConsts.FINS_TP_SYS_MOV_PUR_TAX_CDT_PEN;
+            }
+        }
+        else if (isDocumentSal() || isAdjustmentSal()) {
+            if (taxType == SModSysConsts.FINS_TP_TAX_CHARGED) {
+                key = taxAppType == SModSysConsts.FINS_TP_TAX_APP_ACCR ? SModSysConsts.FINS_TP_SYS_MOV_SAL_TAX_CDT_PAI : SModSysConsts.FINS_TP_SYS_MOV_SAL_TAX_CDT_PEN;
+            }
+            else {
+                key = taxAppType == SModSysConsts.FINS_TP_TAX_APP_ACCR ? SModSysConsts.FINS_TP_SYS_MOV_SAL_TAX_DBT_PAI : SModSysConsts.FINS_TP_SYS_MOV_SAL_TAX_DBT_PEN;
+            }
+        }
+
+        return key;
+    }
+
+    private int getAccItemTypeId(erp.mtrn.data.SDataDpsEntry entry) {
+        int id = SDataConstantsSys.UNDEFINED;
+
+        if (isDocumentPur()) {
+            id = SDataConstantsSys.FINS_TP_ACC_ITEM_PUR;
+        }
+        else if (isDocumentSal()) {
+            id = SDataConstantsSys.FINS_TP_ACC_ITEM_SAL;
+        }
+        else if (isAdjustmentPur()) {
+            id = entry.getFkDpsAdjustmentTypeId() == SDataConstantsSys.TRNS_TP_DPS_ADJ_RET ? SDataConstantsSys.FINS_TP_ACC_ITEM_PUR_ADJ_DEV : SDataConstantsSys.FINS_TP_ACC_ITEM_PUR_ADJ_DISC;
+        }
+        else if (isAdjustmentSal()) {
+            id = entry.getFkDpsAdjustmentTypeId() == SDataConstantsSys.TRNS_TP_DPS_ADJ_RET ? SDataConstantsSys.FINS_TP_ACC_ITEM_SAL_ADJ_DEV : SDataConstantsSys.FINS_TP_ACC_ITEM_SAL_ADJ_DISC;
+        }
+
+        return id;
     }
 
     /*
      * Public functions
      */
 
-    public int[] getAccountingMoveSubclassKey() {
+    public int[] getAccMvtSubclassKeyBizPartner() {
         int[] moveSubclassKey = null;
 
         if (isDocumentPur()) {
@@ -1160,7 +1206,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         return moveSubclassKey;
     }
 
-    public int[] getAccountingMoveSubclassKeyForAdjs() {
+    public int[] getAccMvtSubclassKeyBizPartnerAdjustment() {
         int[] moveSubclassKey = null;
 
         if (isDocumentPur()) {
@@ -1168,6 +1214,25 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
         else if (isDocumentSal()) {
             moveSubclassKey = SDataConstantsSys.FINS_CLS_ACC_MOV_SAL_ADJ_DISC;
+        }
+
+        return moveSubclassKey;
+    }
+
+    public int[] getAccMvtSubclassKeyAccountCash() {
+        int[] moveSubclassKey = null;
+
+        if (isDocumentPur()) {
+            moveSubclassKey = SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_SUP_ADV;
+        }
+        else if (isAdjustmentPur()) {
+            moveSubclassKey = SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_SUP_ADV_REF;
+        }
+        else if (isDocumentSal()) {
+            moveSubclassKey = SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_CUS_ADV;
+        }
+        else if (isAdjustmentSal()) {
+            moveSubclassKey = SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_CUS_ADV_REF;
         }
 
         return moveSubclassKey;
@@ -1686,7 +1751,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         ResultSet oResultSet = null;
         Statement oStatementAux = null;
 
-        mnLastDbActionResult = SLibConstants.UNDEFINED;
+        mnLastDbActionResult = SLibConsts.UNDEFINED;
         reset();
 
         try {
@@ -1848,7 +1913,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                 // Check if document class requires an accounting record:
 
-                anMoveSubclassKey = getAccountingMoveSubclassKey();
+                anMoveSubclassKey = getAccMvtSubclassKeyBizPartner();
 
                 if (anMoveSubclassKey != null) {
                     // Read aswell accounting record:
@@ -1948,23 +2013,30 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     @Override
     public int save(java.sql.Connection connection) {
         int i = 0;
-        int j = 0;
         int nParam = 0;
         int nSortingPosition = 0;
-        int nDecimals = 4;
+        int nDecimals = SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits();
         int nTaxTypeId = SLibConsts.UNDEFINED;
         int nTaxAppTypeId = SLibConsts.UNDEFINED;
-        int nRecordEntryPosition = 0;
+        int nTaxAccTypeId = SLibConsts.UNDEFINED;
+        int nPositionToAdjust = 0;
         double dDebit = 0;
         double dCredit = 0;
         double dDebitCy = 0;
         double dCreditCy = 0;
-        double dHigherValue = 0;
+        double dGreatestAmount = 0;
         boolean isNewRecord = false;
-        int[] anMoveSubclassKey = null;
-        int[] anSysAccountTypeKey = null;
-        int[] anSysMoveTypeKey = null;
-        int[] anSysMoveTypeKeyXXX = null;
+        boolean appliesPrepayment = false;
+        int[] anAccMvtSubclassKey = null;
+        int[] anSysAccTypeKeyBpr = null;
+        int[] anSysMvtTypeKeyBpr = null;
+        int[] anSysMvtTypeKeyBprXXX = null;
+        int[] anSysAccTypeKeyItem = null;
+        int[] anSysMvtTypeKeyItem = null;
+        int[] anSysMvtTypeKeyItemXXX = null;
+        int[] anSysAccTypeKeyTax = null;
+        int[] anSysMvtTypeKeyTax = null;
+        int[] anSysMvtTypeKeyTaxXXX = null;
         String sSql = "";
         String sConcept = "";
         String sConceptAux = "";
@@ -1976,15 +2048,17 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         CallableStatement oCallableStatement = null;
         SDataRecord oRecord = null;
         SDataRecordEntry oRecordEntry = null;
-        SFinTaxes oFinTaxes = null;
-        SFinAccountConfig oConfigBizPartnerOps = null;
-        SFinAccountConfig oConfigBizPartnerPay = null;
+        SFinDpsTaxes oDpsTaxes = null;
+        SDataAccountCash oAccountCash = null;
+        SFinAccountConfig oConfigBpr = null;
         SFinAccountConfig oConfigItem = null;
-        ArrayList<SFinAmount> aValues = null;
-        ArrayList<SFinAmount> aTotals = new ArrayList<>();
-        ArrayList<int[]> aAuxDpsKeys = new ArrayList<>();
+        SFinAmount oAmount = null;
+        SFinAmount oAmountBprBal = null;
+        SFinAmount oAmountBprPay = null;
+        SFinAmounts oAmounts = new SFinAmounts();
+        ArrayList<SFinAmount> aAmountEntries = null;
 
-        mnLastDbActionResult = SLibConstants.UNDEFINED;
+        mnLastDbActionResult = SLibConsts.UNDEFINED;
 
         try {
             updateAuthorizationStatus(connection);  // applys only for orders and documents
@@ -2003,7 +2077,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ? ) }");
+                    "?, ?, ?) }");
             oCallableStatement.setInt(nParam++, mnPkYearId);
             oCallableStatement.setInt(nParam++, mnPkDocId);
             oCallableStatement.setDate(nParam++, new java.sql.Date(mtDate.getTime()));
@@ -2120,7 +2194,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             }
             else {
                 oStatement = connection.createStatement();
-                oFinTaxes = new SFinTaxes(oStatement);
+                oDpsTaxes = new SFinDpsTaxes(oStatement);
 
                 // 1. Obtain decimals for calculations:
 
@@ -2169,10 +2243,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 // 4. Save aswell journal voucher if this document class requires it:
 
                 //System.out.println("dps 3.4");
-                anMoveSubclassKey = getAccountingMoveSubclassKey();
+                anAccMvtSubclassKey = getAccMvtSubclassKeyBizPartner();
 
                 //System.out.println("dps 3.5");
-                if (anMoveSubclassKey != null) {
+                if (anAccMvtSubclassKey != null) {
                     // 4.1 Prepare journal voucher (accounting record):
 
                     //System.out.println("dps 3.5.1");
@@ -2192,14 +2266,14 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             if (!mbIsRecordAutomatic) {
                                 // Journal voucher is not automatic:
 
-                                throw new Exception("No se ha especificado la póliza contable de usuario.");
+                                throw new Exception(MSG_ERR_FIN_REC_USR);
                             }
                             else {
                                 // Journal voucher is automatic:
 
                                 if (moAuxFormerRecordKey == null || !mbAuxIsFormerRecordAutomatic) {
                                     isNewRecord = true;
-                                    moDbmsRecordKey = (Object[]) createAccountingRecordKey(oStatement);
+                                    moDbmsRecordKey = (Object[]) createAccRecordKey(oStatement);
                                 }
                                 else {
                                     if (SLibTimeUtilities.isBelongingToPeriod(mtDate, (Integer) ((Object[]) moAuxFormerRecordKey)[0], (Integer) ((Object[]) moAuxFormerRecordKey)[1])) {
@@ -2207,7 +2281,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     }
                                     else {
                                         isNewRecord = true;
-                                        moDbmsRecordKey = (Object[]) createAccountingRecordKey(oStatement);
+                                        moDbmsRecordKey = (Object[]) createAccRecordKey(oStatement);
                                     }
                                 }
                             }
@@ -2227,7 +2301,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 "id_ct_dps = " + mnFkDpsCategoryId + " AND id_cl_dps = " + mnFkDpsClassId + " AND id_tp_dps = " + mnFkDpsTypeId + " ";
                         oResultSet = oStatement.executeQuery(sSql);
                         if (oResultSet.next()) {
-                            sConcept += oResultSet.getString("code") + " " + msNumberSeries + (msNumberSeries.length() == 0 ? "" : "-") + msNumber + "; ";
+                            sConcept += oResultSet.getString("code") + " " + getDpsNumber() + "; ";
                         }
                         else {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
@@ -2307,50 +2381,88 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                         // 4.3 Business partner's asset or liability:
                         
-                        oConfigBizPartnerOps = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
-                                mnFkBizPartnerId_r, getBizPartnerCategoryId(), oRecord.getPkBookkeepingCenterId(), mtDate, SDataConstantsSys.FINS_TP_ACC_BP_OP, isDebitForBizPartner(), oStatement));
+                        // Add values:
+                        
+                        for (SDataDpsEntry entry : mvDbmsDpsEntries) {
+                            if (entry.isAccountable()) {
+                                if (isDocument()) { // document is an invoice
+                                    if (entry.getIsPrepayment()) {
+                                        appliesPrepayment = true;
+                                        
+                                        if (entry.getQuantity() >= 0) {
+                                            // Increment cash account's balance:
+                                            
+                                            oAmounts.addAmountForCashAccount(entry.getKeyCashAccount(), new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), true, SFinMovement.INCREMENT)); // add grouping by referenced cash account
+                                        }
+                                        else {
+                                            // Decrement business partner's balance:
+                                            
+                                            if (oAmountBprPay == null) {
+                                                oAmounts.getAmounts().add(oAmountBprPay = new SFinAmount(0, 0, true, SFinMovement.DECREMENT)); // in-line instantiation!
+                                            }
 
-                        if (isDocument()) {
-                            // One accounting record entry per document:
-
-                            aTotals.add(new SFinAmount(mdTotal_r, mdTotalCy_r));
-                        }
-                        else {
-                            // One accounting record entry per each document entry:
-
-                            for (SDataDpsEntry entry : mvDbmsDpsEntries) {
-                                if (entry.isAccountable()) {
-                                    aTotals.add(new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r()));
-                                    aAuxDpsKeys.add(new int[] { entry.getAuxPkDpsYearId(), entry.getAuxPkDpsDocId() });
+                                            oAmountBprPay.addAmount(-entry.getTotal_r(), -entry.getTotalCy_r()); // only one amount per business partner
+                                        }
+                                    }
+                                    else {
+                                        // Increment business partner's balance:
+                                        
+                                        if (oAmountBprBal == null) {
+                                            oAmounts.getAmounts().add(oAmountBprBal = new SFinAmount(0, 0)); // in-line instantiation!
+                                        }
+                                        
+                                        oAmountBprBal.addAmount(entry.getTotal_r(), entry.getTotalCy_r()); // only one amount per business partner
+                                    }
+                                }
+                                else { // document is a credit note
+                                    if (entry.getIsPrepayment()) {
+                                        throw new Exception(MSG_ERR_DOC_PRE_PAY);
+                                    }
+                                    else {
+                                        // Decrement business partner document's balance:
+                                            
+                                        oAmounts.addAmountForDocument(entry.getKeyAuxDps(), new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r())); // add grouping by referenced invoice
+                                    }
                                 }
                             }
                         }
+                        
+                        // Validate final sum of added values, adjust difference if necessary:
+                        
+                        oAmounts.checkAmount(mdTotal_r);
+                        
+                        // Create journal voucher entries:
+                        
+                        oConfigBpr = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
+                                mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
+                                mtDate, SDataConstantsSys.FINS_TP_ACC_BP_OP, isDebitForBizPartner(), oStatement));
 
-                        anSysAccountTypeKey = getSystemAccountTypeKey();
-                        anSysMoveTypeKey = getSystemMoveTypeForBizPartner();
-                        anSysMoveTypeKeyXXX = getSystemMoveTypeForBizPartnerXXX();
+                        anSysAccTypeKeyBpr = getSysAccTypeKeyBizPartner();
+                        anSysMvtTypeKeyBpr = getSysMvtTypeKeyBizPartner();
+                        anSysMvtTypeKeyBprXXX = getSysMvtTypeKeyBizPartnerXXX();
+                        
+                        for (SFinAmount amount : oAmounts.getAmounts()) {
+                            if (amount.IsPrepayment && amount.Movement == SFinMovement.INCREMENT) {
+                                oAccountCash = new SDataAccountCash();
+                                oAccountCash.read(amount.KeyRefCashAccount, oStatement);
 
-                        for (i = 0; i < aTotals.size(); i++) {
-                            aValues = oConfigBizPartnerOps.prorateAmount(aTotals.get(i));
-
-                            for (j = 0; j < oConfigBizPartnerOps.getAccountConfigEntries().size(); j++) {
-                                oRecordEntry = createAccountingRecordEntry(
-                                        oConfigBizPartnerOps.getAccountConfigEntries().get(j).getAccountId(),
-                                        oConfigBizPartnerOps.getAccountConfigEntries().get(j).getCostCenterId(),
-                                        anMoveSubclassKey, anSysAccountTypeKey, anSysMoveTypeKey, anSysMoveTypeKeyXXX,
-                                        isDocument() ? null : aAuxDpsKeys.get(i));
+                                oRecordEntry = createAccRecordEntry(
+                                        oAccountCash.getFkAccountId(),
+                                        "",
+                                        getAccMvtSubclassKeyAccountCash(), getSysAccTypeKeyAccountCash(oAccountCash), getSysMvtTypeKeyAccountCash(), getSysMvtTypeKeyAccountCashXXX(oAccountCash),
+                                        null, amount.KeyRefCashAccount);
 
                                 if (isDebitForBizPartner()) {
-                                    oRecordEntry.setDebit(aValues.get(j).Amount);
+                                    oRecordEntry.setDebit(amount.Amount);
                                     oRecordEntry.setCredit(0);
-                                    oRecordEntry.setDebitCy(aValues.get(j).AmountCy);
+                                    oRecordEntry.setDebitCy(amount.AmountCy);
                                     oRecordEntry.setCreditCy(0);
                                 }
                                 else {
                                     oRecordEntry.setDebit(0);
-                                    oRecordEntry.setCredit(aValues.get(j).Amount);
+                                    oRecordEntry.setCredit(amount.Amount);
                                     oRecordEntry.setDebitCy(0);
-                                    oRecordEntry.setCreditCy(aValues.get(j).AmountCy);
+                                    oRecordEntry.setCreditCy(amount.AmountCy);
                                 }
 
                                 oRecordEntry.setConcept(sConcept);
@@ -2358,79 +2470,198 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                                 oRecord.getDbmsRecordEntries().add(oRecordEntry);
                             }
+                            else {
+                                aAmountEntries = oConfigBpr.prorateAmount(amount);
+
+                                for (i = 0; i < oConfigBpr.getAccountConfigEntries().size(); i++) {
+                                    oRecordEntry = createAccRecordEntry(
+                                            oConfigBpr.getAccountConfigEntries().get(i).getAccountId(),
+                                            oConfigBpr.getAccountConfigEntries().get(i).getCostCenterId(),
+                                            anAccMvtSubclassKey, anSysAccTypeKeyBpr, anSysMvtTypeKeyBpr, anSysMvtTypeKeyBprXXX,
+                                            isAdjustment() ? amount.KeyRefDocument : null, null);
+                                    if (amount.IsPrepayment) { // decrementing prepayment entry:
+                                        if (isDebitForBizPartner()) {
+                                            oRecordEntry.setDebit(0);
+                                            oRecordEntry.setCredit(aAmountEntries.get(i).Amount);
+                                            oRecordEntry.setDebitCy(0);
+                                            oRecordEntry.setCreditCy(aAmountEntries.get(i).AmountCy);
+                                        }
+                                        else {
+                                            oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
+                                            oRecordEntry.setCredit(0);
+                                            oRecordEntry.setDebitCy(aAmountEntries.get(i).AmountCy);
+                                            oRecordEntry.setCreditCy(0);
+                                        }
+                                    }
+                                    else { // ordinary entry:
+                                        if (isDebitForBizPartner()) {
+                                            oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
+                                            oRecordEntry.setCredit(0);
+                                            oRecordEntry.setDebitCy(aAmountEntries.get(i).AmountCy);
+                                            oRecordEntry.setCreditCy(0);
+                                        }
+                                        else {
+                                            oRecordEntry.setDebit(0);
+                                            oRecordEntry.setCredit(aAmountEntries.get(i).Amount);
+                                            oRecordEntry.setDebitCy(0);
+                                            oRecordEntry.setCreditCy(aAmountEntries.get(i).AmountCy);
+                                        }
+                                    }
+
+                                    oRecordEntry.setConcept(sConcept);
+                                    oRecordEntry.setSortingPosition(++nSortingPosition);
+
+                                    oRecord.getDbmsRecordEntries().add(oRecordEntry);
+                                }
+                            }
                         }
 
                         // 4.4 Purchases or sales:
 
+                        if (appliesPrepayment) { // prevent from reading configuration when not needed!
+                            oConfigBpr = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
+                                    mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
+                                    mtDate, SDataConstantsSys.FINS_TP_ACC_BP_PAY, isDebitForBizPartner(), oStatement));
+                        }
+
                         for (SDataDpsEntry entry : mvDbmsDpsEntries) {
                             if (entry.isAccountable()) {
-                                oConfigItem = new SFinAccountConfig(SFinAccountUtilities.obtainItemAccountConfigs(
-                                        entry.getFkItemRefId_n() != SLibConstants.UNDEFINED ? entry.getFkItemRefId_n() : entry.getFkItemId(), oRecord.getPkBookkeepingCenterId(), mtDate, getItemAccountTypeId(entry), isDebitForOperations(), oStatement));
-                                
-                                sConceptEntryAux = sConceptAux;
-                                anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_NA_NA;
-                                anSysMoveTypeKey = getSystemMoveTypeForItem(entry.getFkDpsAdjustmentTypeId());
-                                anSysMoveTypeKeyXXX = getSystemMoveTypeForItemXXX();
-
-                                aValues = oConfigItem.prorateAmount(new SFinAmount(entry.getSubtotal_r(), entry.getSubtotalCy_r()));
-
-                                for (i = 0; i < oConfigItem.getAccountConfigEntries().size(); i++) {
-                                    oRecordEntry = createAccountingRecordEntry(
-                                            oConfigItem.getAccountConfigEntries().get(i).getAccountId(),
-                                            !entry.getFkCostCenterId_n().isEmpty() ? entry.getFkCostCenterId_n() : oConfigItem.getAccountConfigEntries().get(i).getCostCenterId(),
-                                            anMoveSubclassKey, anSysAccountTypeKey, anSysMoveTypeKey, anSysMoveTypeKeyXXX,
-                                            isDocument() ? null : new int[] { entry.getAuxPkDpsYearId(), entry.getAuxPkDpsDocId() });
-
-                                    if (isDebitForOperations()) {
-                                        oRecordEntry.setDebit(aValues.get(i).Amount);
-                                        oRecordEntry.setCredit(0);
-                                        oRecordEntry.setDebitCy(aValues.get(i).AmountCy);
-                                        oRecordEntry.setCreditCy(0);
+                                if (entry.getIsPrepayment()) {
+                                    if (entry.getQuantity() >= 0) {
+                                        oAmount = new SFinAmount(entry.getSubtotal_r(), entry.getSubtotalCy_r());
                                     }
                                     else {
-                                        oRecordEntry.setDebit(0);
-                                        oRecordEntry.setCredit(aValues.get(i).Amount);
-                                        oRecordEntry.setDebitCy(0);
-                                        oRecordEntry.setCreditCy(aValues.get(i).AmountCy);
+                                        oAmount = new SFinAmount(-entry.getSubtotal_r(), -entry.getSubtotalCy_r());
+                                    }
+
+                                    aAmountEntries = oConfigBpr.prorateAmount(oAmount);
+                                    
+                                    for (i = 0; i < oConfigBpr.getAccountConfigEntries().size(); i++) {
+                                        oRecordEntry = createAccRecordEntry(
+                                                oConfigBpr.getAccountConfigEntries().get(i).getAccountId(),
+                                                oConfigBpr.getAccountConfigEntries().get(i).getCostCenterId(),
+                                                anAccMvtSubclassKey, anSysAccTypeKeyBpr, anSysMvtTypeKeyBpr, anSysMvtTypeKeyBprXXX,
+                                                null, null);
+
+                                        oRecordEntry.setFkDpsYearId_n(SLibConsts.UNDEFINED);
+                                        oRecordEntry.setFkDpsDocId_n(SLibConsts.UNDEFINED);
+                                        
+                                        if (entry.getQuantity() >= 0) {
+                                            if (isDebitForOperations()) {
+                                                oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
+                                                oRecordEntry.setCredit(0);
+                                                oRecordEntry.setDebitCy(aAmountEntries.get(i).AmountCy);
+                                                oRecordEntry.setCreditCy(0);
+                                            }
+                                            else {
+                                                oRecordEntry.setDebit(0);
+                                                oRecordEntry.setCredit(aAmountEntries.get(i).Amount);
+                                                oRecordEntry.setDebitCy(0);
+                                                oRecordEntry.setCreditCy(aAmountEntries.get(i).AmountCy);
+                                            }
+                                        }
+                                        else {
+                                            if (isDebitForOperations()) {
+                                                oRecordEntry.setDebit(0);
+                                                oRecordEntry.setCredit(aAmountEntries.get(i).Amount);
+                                                oRecordEntry.setDebitCy(0);
+                                                oRecordEntry.setCreditCy(aAmountEntries.get(i).AmountCy);
+                                            }
+                                            else {
+                                                oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
+                                                oRecordEntry.setCredit(0);
+                                                oRecordEntry.setDebitCy(aAmountEntries.get(i).AmountCy);
+                                                oRecordEntry.setCreditCy(0);
+                                            }
+                                        }
+
+                                        oRecordEntry.setConcept(sConcept);
+                                        oRecordEntry.setSortingPosition(++nSortingPosition);
+
+                                        oRecord.getDbmsRecordEntries().add(oRecordEntry);
+                                    }
+                                }
+                                else {
+                                    oConfigItem = new SFinAccountConfig(SFinAccountUtilities.obtainItemAccountConfigs(
+                                            entry.getFkItemRefId_n() != SLibConsts.UNDEFINED ? entry.getFkItemRefId_n() : entry.getFkItemId(), oRecord.getPkBookkeepingCenterId(), 
+                                            mtDate, getAccItemTypeId(entry), isDebitForOperations(), oStatement));
+
+                                    sConceptEntryAux = sConceptAux;
+                                    anSysAccTypeKeyItem = SModSysConsts.FINS_TP_SYS_ACC_NA_NA;
+                                    anSysMvtTypeKeyItem = getSysMvtTypeKeyItem(entry.getFkDpsAdjustmentTypeId());
+                                    anSysMvtTypeKeyItemXXX = getSysMvtTypeKeyItemXXX();
+
+                                    aAmountEntries = oConfigItem.prorateAmount(new SFinAmount(entry.getSubtotal_r(), entry.getSubtotalCy_r()));
+
+                                    for (i = 0; i < oConfigItem.getAccountConfigEntries().size(); i++) {
+                                        oRecordEntry = createAccRecordEntry(
+                                                oConfigItem.getAccountConfigEntries().get(i).getAccountId(),
+                                                !entry.getFkCostCenterId_n().isEmpty() ? entry.getFkCostCenterId_n() : oConfigItem.getAccountConfigEntries().get(i).getCostCenterId(),
+                                                anAccMvtSubclassKey, anSysAccTypeKeyItem, anSysMvtTypeKeyItem, anSysMvtTypeKeyItemXXX,
+                                                isAdjustment() ? entry.getKeyAuxDps() : null, null);
+
+                                        if (isDebitForOperations()) {
+                                            oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
+                                            oRecordEntry.setCredit(0);
+                                            oRecordEntry.setDebitCy(aAmountEntries.get(i).AmountCy);
+                                            oRecordEntry.setCreditCy(0);
+                                        }
+                                        else {
+                                            oRecordEntry.setDebit(0);
+                                            oRecordEntry.setCredit(aAmountEntries.get(i).Amount);
+                                            oRecordEntry.setDebitCy(0);
+                                            oRecordEntry.setCreditCy(aAmountEntries.get(i).AmountCy);
+                                        }
+
+                                        sConceptEntryAux += (entry.getConcept().length() <= 0 ? "" : "; " + entry.getConcept());
+                                        if (sConceptEntryAux.length() > 100) {
+                                            sConceptEntryAux = sConceptEntryAux.substring(0, 100 - 3).trim() + "...";
+                                        }
+
+                                        oRecordEntry.setConcept(sConceptEntryAux);
+                                        oRecordEntry.setSortingPosition(++nSortingPosition);
+
+                                        if (entry.getFkItemRefId_n() == SLibConsts.UNDEFINED) {
+                                            oRecordEntry.setUnits(entry.getOriginalQuantity());
+                                            oRecordEntry.setFkItemId_n(entry.getFkItemId());
+                                            oRecordEntry.setFkUnitId_n(entry.getFkOriginalUnitId());
+                                            oRecordEntry.setFkItemAuxId_n(SLibConsts.UNDEFINED);
+                                        }
+                                        else {
+                                            oRecordEntry.setUnits(0);
+                                            oRecordEntry.setFkItemId_n(entry.getFkItemRefId_n());
+                                            oRecordEntry.setFkUnitId_n(SModSysConsts.ITMU_UNIT_NA);
+                                            oRecordEntry.setFkItemAuxId_n(entry.getFkItemId());
+                                        }
+
+                                        oRecord.getDbmsRecordEntries().add(oRecordEntry);
+                                    }
+                                }
+                                
+                                for (SDataDpsEntryTax tax : entry.getDbmsEntryTaxes()) {
+                                    if (entry.getQuantity() >= 0) {
+                                        oAmount = new SFinAmount(tax.getTax(), tax.getTaxCy(), entry.getIsPrepayment(), SFinMovement.INCREMENT); // "is prepayment" argument isn't really needed on taxes context, used just for consistence
+                                    }
+                                    else {
+                                        oAmount = new SFinAmount(-tax.getTax(), -tax.getTaxCy(), entry.getIsPrepayment(), SFinMovement.DECREMENT); // "is prepayment" argument isn't really needed on taxes context, used just for consistence
                                     }
                                     
-                                    sConceptEntryAux += (entry.getConcept().length() <= 0 ? "" : "; " + entry.getConcept());
-                                    if (sConceptEntryAux.length() > 100) {
-                                        sConceptEntryAux = sConceptEntryAux.substring(0, 100 - 3).trim() + "...";
-                                    }
-
-                                    oRecordEntry.setConcept(sConceptEntryAux);
-                                    oRecordEntry.setSortingPosition(++nSortingPosition);
-
-                                    if (entry.getFkItemRefId_n() == 0) {
-                                        oRecordEntry.setUnits(entry.getOriginalQuantity());
-                                        oRecordEntry.setFkItemId_n(entry.getFkItemId());
-                                        oRecordEntry.setFkUnitId_n(entry.getFkOriginalUnitId());
-                                        oRecordEntry.setFkItemAuxId_n(SLibConstants.UNDEFINED);
-                                    }
-                                    else {
-                                        oRecordEntry.setUnits(0);
-                                        oRecordEntry.setFkItemId_n(entry.getFkItemRefId_n());
-                                        oRecordEntry.setFkUnitId_n(SModSysConsts.ITMU_UNIT_NA);
-                                        oRecordEntry.setFkItemAuxId_n(entry.getFkItemId());
-                                    }
-
-                                    oRecord.getDbmsRecordEntries().add(oRecordEntry);
-                                }
-
-                                for (SDataDpsEntryTax tax : entry.getDbmsEntryTaxes()) {
-                                    oFinTaxes.addTax(isDocument() ? new int[] { mnPkYearId, mnPkDocId } : new int[] { entry.getAuxPkDpsYearId(), entry.getAuxPkDpsDocId() },
-                                            new int[] { tax.getPkTaxBasicId(), tax.getPkTaxId() }, tax.getTax(), tax.getTaxCy());
+                                    oDpsTaxes.addTax(isDocument() ? (int[]) getPrimaryKey() : entry.getKeyAuxDps(), tax.getKeyTax(), oAmount);
                                 }
                             }
                         }
 
                         // 4.5 Purchases or sales taxes:
-
-                        for (SFinTaxes.STax tax : oFinTaxes.getTaxes()) {
-                            sAccountId = SFinAccountUtilities.obtainTaxAccountId(tax.getTaxKey(), mnFkDpsCategoryId, mtDate,
-                                    tax.getFkTaxApplicationTypeId() == SModSysConsts.FINS_TP_TAX_APP_ACCR ? SDataConstantsSys.FINX_ACC_PAY : SDataConstantsSys.FINX_ACC_PAY_PEND,
-                                    oStatement);
+                        
+                        for (SFinDpsTaxes.STax tax : oDpsTaxes.getTaxes()) {
+                            if (tax.getMovement() == SFinMovement.DECREMENT) {
+                                nTaxAccTypeId = SDataConstantsSys.FINX_ACC_PAY_PEND; // decrement occurs when prepayment applied into invoice
+                            }
+                            else {
+                                nTaxAccTypeId = tax.getFkTaxApplicationTypeId() == SModSysConsts.FINS_TP_TAX_APP_ACCR ? SDataConstantsSys.FINX_ACC_PAY : SDataConstantsSys.FINX_ACC_PAY_PEND;
+                            }
+                            
+                            sAccountId = SFinAccountUtilities.obtainTaxAccountId(tax.getKeyTax(), mnFkDpsCategoryId, mtDate, nTaxAccTypeId, oStatement);
 
                             sSql = "SELECT fid_tp_tax, fid_tp_tax_app FROM erp.finu_tax " +
                                     "WHERE id_tax_bas = " + tax.getPkTaxBasicId() + " AND id_tax = " + tax.getPkTaxId() + " ";
@@ -2443,25 +2674,41 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                             }
 
-                            anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_NA_NA;
-                            anSysMoveTypeKey = getSystemMoveTypeForTax(nTaxTypeId, nTaxAppTypeId);
-                            anSysMoveTypeKeyXXX = getSystemMoveTypeForTaxXXX(nTaxTypeId, nTaxAppTypeId);
+                            anSysAccTypeKeyTax = SModSysConsts.FINS_TP_SYS_ACC_NA_NA;
+                            anSysMvtTypeKeyTax = getSysMvtTypeKeyTax(nTaxTypeId, nTaxAppTypeId);
+                            anSysMvtTypeKeyTaxXXX = getSysMvtTypeKeyTaxXXX(nTaxTypeId, nTaxAppTypeId);
 
-                            oRecordEntry = createAccountingRecordEntry(
-                                    sAccountId, "", anMoveSubclassKey, anSysAccountTypeKey, anSysMoveTypeKey, anSysMoveTypeKeyXXX,
-                                    isDocument() ? null : tax.getAuxDpsKey());
+                            oRecordEntry = createAccRecordEntry(
+                                    sAccountId, "", anAccMvtSubclassKey, anSysAccTypeKeyTax, anSysMvtTypeKeyTax, anSysMvtTypeKeyTaxXXX,
+                                    isAdjustment() ? tax.getKeyDps() : null, null);
 
-                            if (isDebitForTaxes(tax.getFkTaxTypeId())) {
-                                oRecordEntry.setDebit(tax.getValue());
-                                oRecordEntry.setCredit(0);
-                                oRecordEntry.setDebitCy(tax.getValueCy());
-                                oRecordEntry.setCreditCy(0);
+                            if (tax.getMovement() == SFinMovement.INCREMENT) {
+                                if (isDebitForTaxes(tax.getFkTaxTypeId())) {
+                                    oRecordEntry.setDebit(tax.getValue());
+                                    oRecordEntry.setCredit(0);
+                                    oRecordEntry.setDebitCy(tax.getValueCy());
+                                    oRecordEntry.setCreditCy(0);
+                                }
+                                else {
+                                    oRecordEntry.setDebit(0);
+                                    oRecordEntry.setCredit(tax.getValue());
+                                    oRecordEntry.setDebitCy(0);
+                                    oRecordEntry.setCreditCy(tax.getValueCy());
+                                }
                             }
-                            else {
-                                oRecordEntry.setDebit(0);
-                                oRecordEntry.setCredit(tax.getValue());
-                                oRecordEntry.setDebitCy(0);
-                                oRecordEntry.setCreditCy(tax.getValueCy());
+                            else { // prepayment applied into invoice
+                                if (isDebitForTaxes(tax.getFkTaxTypeId())) {
+                                    oRecordEntry.setDebit(0);
+                                    oRecordEntry.setCredit(tax.getValue());
+                                    oRecordEntry.setDebitCy(0);
+                                    oRecordEntry.setCreditCy(tax.getValueCy());
+                                }
+                                else {
+                                    oRecordEntry.setDebit(tax.getValue());
+                                    oRecordEntry.setCredit(0);
+                                    oRecordEntry.setDebitCy(tax.getValueCy());
+                                    oRecordEntry.setCreditCy(0);
+                                }
                             }
 
                             oRecordEntry.setConcept(sConcept);
@@ -2474,8 +2721,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                         // 4.6 Validate accounting record:
 
-                        nRecordEntryPosition = 0;
-                        dHigherValue = 0;
+                        dDebit = 0;
+                        dCredit = 0;
+                        dDebitCy = 0;
+                        dCreditCy = 0;
+                        nPositionToAdjust = 0;
+                        dGreatestAmount = 0;
                         for (i = 0; i < oRecord.getDbmsRecordEntries().size(); i++) {
 
                             oRecordEntry = oRecord.getDbmsRecordEntries().get(i);
@@ -2487,18 +2738,18 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                                 if (SLibUtils.compareKeys(new int[] { mnFkDpsCategoryId, mnFkDpsClassId }, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC) ||
                                     SLibUtils.compareKeys(new int[] { mnFkDpsCategoryId, mnFkDpsClassId }, SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ)) {
-                                    if (oRecordEntry.getDebit() > dHigherValue) {
+                                    if (oRecordEntry.getDebit() > dGreatestAmount) {
 
-                                        dHigherValue = oRecordEntry.getDebit();
-                                        nRecordEntryPosition = i;
+                                        dGreatestAmount = oRecordEntry.getDebit();
+                                        nPositionToAdjust = i;
                                     }
                                 }
                                 else if (SLibUtils.compareKeys(new int[] { mnFkDpsCategoryId, mnFkDpsClassId }, SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ) ||
                                     SLibUtils.compareKeys(new int[] { mnFkDpsCategoryId, mnFkDpsClassId }, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC)) {
-                                    if (oRecordEntry.getCredit() > dHigherValue) {
+                                    if (oRecordEntry.getCredit() > dGreatestAmount) {
 
-                                        dHigherValue = oRecordEntry.getCredit();
-                                        nRecordEntryPosition = i;
+                                        dGreatestAmount = oRecordEntry.getCredit();
+                                        nPositionToAdjust = i;
                                     }
                                 }
                             }
@@ -2506,7 +2757,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                         if (dDebit != dCredit) {
 
-                            oRecordEntry = oRecord.getDbmsRecordEntries().get(nRecordEntryPosition);
+                            oRecordEntry = oRecord.getDbmsRecordEntries().get(nPositionToAdjust);
                             if (SLibUtils.compareKeys(new int[] { mnFkDpsCategoryId, mnFkDpsClassId }, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC) ||
                                 SLibUtils.compareKeys(new int[] { mnFkDpsCategoryId, mnFkDpsClassId }, SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ)) {
 
@@ -2528,7 +2779,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 }
                             }
 
-                            oRecord.getDbmsRecordEntries().set(nRecordEntryPosition, oRecordEntry);
+                            oRecord.getDbmsRecordEntries().set(nPositionToAdjust, oRecordEntry);
                         }
 
                         // 4.7 Finally, save journal voucher (acounting record):
@@ -2650,125 +2901,111 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     @Override
     public int canSave(java.sql.Connection connection) {
-        int[] anMoveSubclassKey = null;
-        Object[] oRecordKey = null;
-        String sSql = "";
-        String sTax = "";
-        String sItem = "";
-        String sAccountId = "";
-        Statement oStatement = null;
-        ResultSet oResultSet = null;
-        Vector<SFinAccountConfigEntry> vAccountConfigs = null;
-        SFinTaxes oFinanceTaxes = null;
+        int[] keyMoveSubclass = null;
+        Object[] keyRecord = null;
+        String sql = "";
+        String name = "";
+        String idAccount = "";
+        Statement statement = null;
+        ResultSet resultSet = null;
+        Vector<SFinAccountConfigEntry> accountConfigs = null;
+        SFinDpsTaxes finDpsTaxes = null;
 
         mnLastDbActionResult = SLibConstants.DB_CAN_SAVE_YES;
 
         // Check if all elements of this DPS have an account for automatic accounting:
 
         try {
-            //System.out.println("dps canSave 1");
-            anMoveSubclassKey = getAccountingMoveSubclassKey();
+            keyMoveSubclass = getAccMvtSubclassKeyBizPartner();
 
-            //System.out.println("dps canSave 2");
-            if (anMoveSubclassKey != null) {
+            if (keyMoveSubclass != null) {
                 // Current document needs an accounting record:
 
-                //System.out.println("dps canSave 2.1");
-                oStatement = connection.createStatement();
-                oFinanceTaxes = new SFinTaxes(oStatement);
+                statement = connection.createStatement();
+                finDpsTaxes = new SFinDpsTaxes(statement);
 
-                //System.out.println("dps canSave 2.2");
-                oRecordKey = (Object[]) createAccountingRecordKey(oStatement);
+                keyRecord = (Object[]) createAccRecordKey(statement);
 
                 // 1. Check business partner's liability or asset:
 
-                //System.out.println("dps canSave 2.3");
                 try {
-                    vAccountConfigs = SFinAccountUtilities.obtainBizPartnerAccountConfigs(
-                            mnFkBizPartnerId_r, getBizPartnerCategoryId(), (Integer) oRecordKey[2], mtDate,
-                            SDataConstantsSys.FINS_TP_ACC_BP_OP, isDebitForBizPartner(), oStatement);
+                    accountConfigs = SFinAccountUtilities.obtainBizPartnerAccountConfigs(
+                            mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), (Integer) keyRecord[2], mtDate,
+                            SDataConstantsSys.FINS_TP_ACC_BP_OP, isDebitForBizPartner(), statement);
                 }
                 catch (Exception e) {
-                    msDbmsError = "No se encontró la configuración de las cuentas contables de sistema para el asociado de negocios.\n[" + e + "]";
+                    msDbmsError = MSG_ERR_ACC_UNK_ + "asociado de negocios.\n[" + e + "]";
                     throw new Exception(msDbmsError);
                 }
 
                 // 2. Check purchases or sales:
 
-                //System.out.println("dps canSave 2.4");
                 for (SDataDpsEntry entry : mvDbmsDpsEntries) {
-                    //System.out.println("dps canSave 2.4.1");
                     if (entry.isAccountable()) {
-                        //System.out.println("dps canSave 2.4.1.1");
                         try {
                             if (entry.getFkItemRefId_n() == 0) {
-                                sItem = entry.getConcept();
+                                name = entry.getConcept();
                             }
                             else {
-                                sSql = "SELECT item FROM erp.itmu_item WHERE id_item = " + entry.getFkItemRefId_n() + " ";
-                                oResultSet = oStatement.executeQuery(sSql);
-                                if (!oResultSet.next()) {
-                                    msDbmsError = "No se encontró el nombre del ítem " + entry.getFkItemRefId_n() + ".";
-                                    throw new Exception(msDbmsError);
+                                sql = "SELECT item FROM erp.itmu_item WHERE id_item = " + entry.getFkItemRefId_n() + " ";
+                                resultSet = statement.executeQuery(sql);
+                                if (!resultSet.next()) {
+                                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                                 }
                                 else {
-                                    sItem = oResultSet.getString("item");
+                                    name = resultSet.getString("item");
                                 }
                             }
 
-                            vAccountConfigs = SFinAccountUtilities.obtainItemAccountConfigs(
-                                    entry.getFkItemRefId_n() != 0 ? entry.getFkItemRefId_n() : entry.getFkItemId(), (Integer) oRecordKey[2], mtDate,
-                                    getItemAccountTypeId(entry), isDebitForOperations(), oStatement);
+                            accountConfigs = SFinAccountUtilities.obtainItemAccountConfigs(
+                                    entry.getFkItemRefId_n() != 0 ? entry.getFkItemRefId_n() : entry.getFkItemId(), (Integer) keyRecord[2], mtDate,
+                                    getAccItemTypeId(entry), isDebitForOperations(), statement);
 
-                            for (SFinAccountConfigEntry config : vAccountConfigs) {
-                                sAccountId = config.getAccountId();
-                                sAccountId = sAccountId.replaceAll("0", "");
-                                sAccountId = sAccountId.replaceAll("-", "");
-                                if (sAccountId.length() == 0) {
-                                    msDbmsError = "La configuración de las cuentas contables de sistema para el ítem:\n'" + sItem + "' es la cuenta vacía.";
+                            for (SFinAccountConfigEntry config : accountConfigs) {
+                                idAccount = config.getAccountId();
+                                idAccount = idAccount.replaceAll("0", "");
+                                idAccount = idAccount.replaceAll("-", "");
+                                if (idAccount.length() == 0) {
+                                    msDbmsError = MSG_ERR_ACC_EMP_ + "ítem:\n'" + name + "'.";
                                     throw new Exception(msDbmsError);
                                 }
                             }
                         }
                         catch (Exception e) {
-                            msDbmsError = "No se encontró la configuración de las cuentas contables de sistema para el ítem:\n'" + sItem + "'.\n[" + e + "]";
+                            msDbmsError = MSG_ERR_ACC_UNK_ + "ítem:\n'" + name + "'.\n[" + e + "]";
                             throw new Exception(msDbmsError);
                         }
 
                         for (SDataDpsEntryTax tax : entry.getDbmsEntryTaxes()) {
-                            oFinanceTaxes.addTax(isDocument() ? new int[] { mnPkYearId, mnPkDocId } : new int[] { entry.getAuxPkDpsYearId(), entry.getAuxPkDpsDocId() },
-                                    new int[] { tax.getPkTaxBasicId(), tax.getPkTaxId() }, tax.getTax(), tax.getTaxCy());
+                            finDpsTaxes.addTax(isDocument() ? (int[]) getPrimaryKey() : entry.getKeyAuxDps(), tax.getKeyTax(), new SFinAmount(tax.getTax(), tax.getTaxCy()));
                         }
                     }
                 }
 
                 // 3. Check purchases or sales taxes:
 
-                //System.out.println("dps canSave 2.5");
-                for (SFinTaxes.STax tax : oFinanceTaxes.getTaxes()) {
+                for (SFinDpsTaxes.STax tax : finDpsTaxes.getTaxes()) {
                     try {
-                        sAccountId = SFinAccountUtilities.obtainTaxAccountId(tax.getTaxKey(), mnFkDpsCategoryId, mtDate,
+                        idAccount = SFinAccountUtilities.obtainTaxAccountId(tax.getKeyTax(), mnFkDpsCategoryId, mtDate,
                                 tax.getFkTaxApplicationTypeId() == SModSysConsts.FINS_TP_TAX_APP_ACCR ? SDataConstantsSys.FINX_ACC_PAY : SDataConstantsSys.FINX_ACC_PAY_PEND,
-                                oStatement);
+                                statement);
                     }
                     catch (Exception e) {
                         // Read tax name:
 
-                        sSql = "SELECT tax FROM erp.finu_tax WHERE id_tax_bas = " + tax.getPkTaxBasicId() + " AND id_tax = " + tax.getPkTaxId() + " ";
-                        oResultSet = oStatement.executeQuery(sSql);
-                        if (!oResultSet.next()) {
+                        sql = "SELECT tax FROM erp.finu_tax WHERE id_tax_bas = " + tax.getPkTaxBasicId() + " AND id_tax = " + tax.getPkTaxId() + " ";
+                        resultSet = statement.executeQuery(sql);
+                        if (!resultSet.next()) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                         }
                         else {
-                            sTax = oResultSet.getString("tax");
+                            name = resultSet.getString("tax");
                         }
 
-                        msDbmsError = "No se encontró la configuración de las cuentas contables de sistema para el impuesto:\n'" + sTax + "'.\n[" + e + "]";
+                        msDbmsError = MSG_ERR_ACC_UNK_ + "impuesto:\n'" + name + "'.\n[" + e + "]";
                         throw new Exception(msDbmsError);
                     }
                 }
-
-                //System.out.println("dps canSave 2.6");
             }
         }
         catch (SQLException exception) {
@@ -2791,7 +3028,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     @Override
     public int canAnnul(java.sql.Connection connection) {
-        mnLastDbActionResult = SLibConstants.UNDEFINED;
+        mnLastDbActionResult = SLibConsts.UNDEFINED;
 
         try {
             if (testDeletion(connection, "No se puede anular el documento: ", SDbConsts.ACTION_ANNUL)) {
@@ -2818,7 +3055,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     @Override
     public int canDelete(java.sql.Connection connection) {
-        mnLastDbActionResult = SLibConstants.UNDEFINED;
+        mnLastDbActionResult = SLibConsts.UNDEFINED;
 
         try {
             if (testDeletion(connection, "No se puede eliminar el documento: ", SDbConsts.ACTION_DELETE)) {
@@ -2851,7 +3088,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         Statement oStatement = null;
         ResultSet oResultSet = null;
 
-        mnLastDbActionResult = SLibConstants.UNDEFINED;
+        mnLastDbActionResult = SLibConsts.UNDEFINED;
 
         try {
             oStatement = connection.createStatement();
@@ -2930,7 +3167,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         String sMsg = "No se puede eliminar el documento: ";
         Statement oStatement = null;
 
-        mnLastDbActionResult = SLibConstants.UNDEFINED;
+        mnLastDbActionResult = SLibConsts.UNDEFINED;
 
         try {
             oStatement = connection.createStatement();
@@ -3573,850 +3810,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         return addendaelektra;
     }
 
-    /*
-     * XXX Change to new structure of CFDI generation (jbarajas 2014-05-07)
-     *
-    public cfd.DElement createCfdRootElement() throws java.lang.Exception {
-        int nMoneda = 0;
-        double dImpto = 0;
-        double dImptoTasa = 0;
-        double dTotalImptoRetenido = 0;
-        double dTotalImptoTrasladado = 0;
-        double dTotalPesoBruto = 0;
-        double dTotalPesoNeto = 0;
-        double dIvaPorcentaje = 0;
-        float fVersion = 0;
-        SDataBizPartnerBranchAddress oReceptor = null;
-        Double oValue = null;
-        int[] anDateDps = SLibTimeUtilities.digestDate(mtDate);
-        int[] anDateEdit = SLibTimeUtilities.digestDate(mtUserEditTs);
-        java.util.Date tDate = null;
-        GregorianCalendar oGregorianCalendar = null;
-        Vector<DElementAdicionalConcepto> vConcepto = new Vector<DElementAdicionalConcepto>();
-        Vector<DElementNota> vNota = new Vector<DElementNota>();
-        Set<Double> setKeyImptos = null;
-        HashMap<Double, Double> hmImpto = null;
-        HashMap<Double, Double> hmRetenidoIva = new HashMap<Double, Double>();
-        HashMap<Double, Double> hmRetenidoIsr = new HashMap<Double, Double>();
-        HashMap<Double, Double> hmTrasladadoIva = new HashMap<Double, Double>();
-        HashMap<Double, Double> hmTrasladadoIeps = new HashMap<Double, Double>();
-
-        if (SLibUtilities.compareKeys(anDateDps, anDateEdit)) {
-            tDate = mtUserEditTs;
-        }
-        else {
-            oGregorianCalendar = new GregorianCalendar();
-            oGregorianCalendar.setTime(mtUserEditTs);
-            oGregorianCalendar.set(GregorianCalendar.YEAR, anDateDps[0]);
-            oGregorianCalendar.set(GregorianCalendar.MONTH, anDateDps[1] - 1);  // January is month 0
-            oGregorianCalendar.set(GregorianCalendar.DATE, anDateDps[2]);
-            tDate = oGregorianCalendar.getTime();
-        }
-
-        if (SLibTimeUtilities.digestYear(mtDate)[0] <= 2011) {
-            fVersion = 2.0f;
-        }
-        else if (SLibTimeUtilities.digestYear(mtDate)[0] >= 2012) {
-            fVersion = 2.2f;
-        }
-
-        DElementComprobante comprobante = new DElementComprobante(fVersion);
-
-        comprobante.getAttSerie().setString(msNumberSeries);
-        comprobante.getAttFolio().setString(msNumber);
-        comprobante.getAttFecha().setDatetime(tDate);
-        comprobante.getAttNoAprobacion().setInteger(mnApproveNumber);
-        comprobante.getAttAnoAprobacion().setInteger(mnApproveYear);
-
-        if (mnPayments <= 1) {
-            comprobante.getAttFormaDePago().setOption(DAttributeOptionFormaPago.CFD_UNA_EXHIBICION);
-        }
-        else {
-            comprobante.getAttFormaDePago().setOption("" + mnPayments, DAttributeOptionFormaPago.CFD_PARCIALIDADES);
-        }
-
-        comprobante.getAttCondicionesDePago().setOption(mnFkPaymentTypeId == SDataConstantsSys.TRNS_TP_PAY_CASH ? DAttributeOptionCondicionesPago.CFD_CONTADO : DAttributeOptionCondicionesPago.CFD_CREDITO);
-        comprobante.getAttSubTotal().setDouble(mdSubtotalProvisionalCy_r);
-        comprobante.getAttDescuento().setDouble(mdDiscountDocCy_r);
-        comprobante.getAttMotivoDescuento().setString(mdDiscountDocCy_r == 0 ? "" : "DESCUENTO");
-        comprobante.getAttTipoCambio().setDouble(mdExchangeRate);
-        comprobante.getAttMoneda().setString(msDbmsCurrencyKey);
-        comprobante.getAttTotal().setDouble(mdTotalCy_r);
-
-        comprobante.getAttMetodoDePago().setString(msPaymentMethod);
-
-        comprobante.getAttTipoDeComprobante().setOption(isDocument() ? DAttributeOptionTipoComprobante.CFD_INGRESO : DAttributeOptionTipoComprobante.CFD_EGRESO);
-
-        comprobante.getEltEmisor().getAttRfc().setString(moAuxCfdParams.getEmisor().getFiscalId());
-        comprobante.getEltEmisor().getAttNombre().setString(moAuxCfdParams.getEmisor().getProperName());
-        comprobante.getEltEmisor().getEltDomicilioFiscal().getAttCalle().setString(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getStreet());
-        comprobante.getEltEmisor().getEltDomicilioFiscal().getAttNoExterior().setString(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getStreetNumberExt());
-        comprobante.getEltEmisor().getEltDomicilioFiscal().getAttNoInterior().setString(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getStreetNumberInt());
-        comprobante.getEltEmisor().getEltDomicilioFiscal().getAttColonia().setString(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getNeighborhood());
-        comprobante.getEltEmisor().getEltDomicilioFiscal().getAttLocalidad().setString(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getLocality());
-        comprobante.getEltEmisor().getEltDomicilioFiscal().getAttReferencia().setString(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getReference());
-        comprobante.getEltEmisor().getEltDomicilioFiscal().getAttMunicipio().setString(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getCounty());
-        comprobante.getEltEmisor().getEltDomicilioFiscal().getAttEstado().setString(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getState());
-        comprobante.getEltEmisor().getEltDomicilioFiscal().getAttPais().setString(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getCountry());
-        comprobante.getEltEmisor().getEltDomicilioFiscal().getAttCodigoPostal().setString(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getZipCode());
-
-        if (moAuxCfdParams.getLugarExpedicion() != null) {
-            comprobante.getEltEmisor().setEltOpcExpedidoEn(new DElementTipoUbicacion("ExpedidoEn"));
-            comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttCalle().setString(moAuxCfdParams.getLugarExpedicion().getStreet());
-            comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttNoExterior().setString(moAuxCfdParams.getLugarExpedicion().getStreetNumberExt());
-            comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttNoInterior().setString(moAuxCfdParams.getLugarExpedicion().getStreetNumberInt());
-            comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttColonia().setString(moAuxCfdParams.getLugarExpedicion().getNeighborhood());
-            comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttLocalidad().setString(moAuxCfdParams.getLugarExpedicion().getLocality());
-            comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttReferencia().setString(moAuxCfdParams.getLugarExpedicion().getReference());
-            comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttMunicipio().setString(moAuxCfdParams.getLugarExpedicion().getCounty());
-            comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttEstado().setString(moAuxCfdParams.getLugarExpedicion().getState());
-            comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttPais().setString(moAuxCfdParams.getLugarExpedicion().getDbmsDataCountry().getCountry());
-            comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttCodigoPostal().setString(moAuxCfdParams.getLugarExpedicion().getZipCode());
-            comprobante.getAttLugarExpedicion().setString(moAuxCfdParams.getLugarExpedicion().getLocality() + ", " + moAuxCfdParams.getLugarExpedicion().getState());
-        }
-        else {
-            comprobante.getAttLugarExpedicion().setString(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getLocality() + ", " + moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getState());
-        }
-
-        comprobante.getAttNumCtaPago().setString(msPaymentAccount);
-
-        for (int i = 0; i < moAuxCfdParams.getRegimenFiscal().length; i++) {
-            cfd.ver2.DElementRegimenFiscal regimen = new cfd.ver2.DElementRegimenFiscal();
-            regimen.getAttRegimen().setString(moAuxCfdParams.getRegimenFiscal()[i]);
-            comprobante.getEltEmisor().getEltHijosRegimenFiscal().add(regimen);
-        }
-
-        comprobante.getEltReceptor().getAttRfc().setString(moAuxCfdParams.getReceptor().getFiscalId());
-        comprobante.getEltReceptor().getAttNombre().setString(moAuxCfdParams.getReceptor().getProperName());
-
-        if(moAuxCfdParams.getReceptorBranch().getIsAddressPrintable()) {
-            oReceptor = moAuxCfdParams.getReceptorBranch().getDbmsBizPartnerBranchAddressOfficial();
-        }
-        else {
-            oReceptor = moAuxCfdParams.getReceptor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial();
-        }
-        comprobante.getEltReceptor().getEltDomicilio().getAttCalle().setString(oReceptor.getStreet());
-        comprobante.getEltReceptor().getEltDomicilio().getAttNoExterior().setString(oReceptor.getStreetNumberExt());
-        comprobante.getEltReceptor().getEltDomicilio().getAttNoInterior().setString(oReceptor.getStreetNumberInt());
-        comprobante.getEltReceptor().getEltDomicilio().getAttColonia().setString(oReceptor.getNeighborhood());
-        comprobante.getEltReceptor().getEltDomicilio().getAttLocalidad().setString(oReceptor.getLocality());
-        comprobante.getEltReceptor().getEltDomicilio().getAttReferencia().setString(oReceptor.getReference());
-        comprobante.getEltReceptor().getEltDomicilio().getAttMunicipio().setString(oReceptor.getCounty());
-        comprobante.getEltReceptor().getEltDomicilio().getAttEstado().setString(oReceptor.getState());
-        comprobante.getEltReceptor().getEltDomicilio().getAttPais().setString(oReceptor.getDbmsDataCountry().getCountry());
-        comprobante.getEltReceptor().getEltDomicilio().getAttCodigoPostal().setString(oReceptor.getZipCode());
-
-        for (SDataDpsEntry entry : mvDbmsDpsEntries) {
-            if (entry.isAccountable()) {
-                DElementConcepto concepto = new DElementConcepto();
-                DElementAdicionalConcepto adicionalConcepto = new DElementAdicionalConcepto();
-
-                concepto.getAttCantidad().setDouble(entry.getOriginalQuantity());
-                concepto.getAttUnidad().setString(entry.getDbmsOriginalUnitSymbol());
-                concepto.getAttNoIdentificacion().setString("");
-                concepto.getAttDescripcion().setString(entry.getConcept());
-                concepto.getAttValorUnitario().setDouble(entry.getPriceUnitarySystemCy());
-                concepto.getAttImporte().setDouble(entry.getSubtotalCy_r());
-
-                comprobante.getEltConceptos().getEltHijosConcepto().add(concepto);
-
-                adicionalConcepto.getAttClaveConcepto().setString(entry.getConceptKey());
-                adicionalConcepto.getAttPresentacion().setString("");
-                adicionalConcepto.getAttDescuentoUnitario().setDouble(entry.getOriginalDiscountUnitaryCy());
-                adicionalConcepto.getAttDescuento().setDouble(entry.getDiscountEntryCy());
-                adicionalConcepto.getAttPesoBruto().setDouble(entry.getWeightGross());
-                adicionalConcepto.getAttPesoNeto().setDouble(entry.getMass());
-
-                dTotalPesoBruto += entry.getWeightGross();
-                dTotalPesoNeto += entry.getMass();
-
-                vNota.clear();
-
-                for (SDataDpsEntryNotes note : entry.getDbmsEntryNotes()) {
-                    if (!note.getIsDeleted() && note.getIsPrintable()) {
-                        DElementNota nota = new DElementNota();
-                        nota.getAttTexto().setString(note.getNotes());
-                        vNota.add(nota);
-                    }
-                }
-
-                if (vNota.size() > 0) {
-                    DElementNotas notas = new DElementNotas();
-                    notas.getEltHijosNota().addAll(vNota);
-                    adicionalConcepto.setEltOpcNotas(notas);
-                }
-
-                vConcepto.add(adicionalConcepto);
-
-                // Document entry taxes:
-
-                for (SDataDpsEntryTax tax : entry.getDbmsEntryTaxes()) {
-                    if (tax.getFkTaxCalculationTypeId() != SModSysConsts.FINS_TP_TAX_CAL_RATE) {
-                        throw new Exception("Todos los impuestos deben ser en base a una tasa (" + tax.getFkTaxCalculationTypeId() + ").");
-                    }
-                    else {
-                        hmImpto = null;
-                        dImptoTasa = 0;
-
-                        switch (tax.getFkTaxTypeId()) {
-                            case SModSysConsts.FINS_TP_TAX_RETAINED:
-                                switch (tax.getPkTaxBasicId()) {
-                                    case 1: // IVA
-                                        dImptoTasa = 1;   // on CFD's XML retained taxes have no rate
-                                        hmImpto = hmRetenidoIva;
-                                        break;
-                                    case 2: // ISR
-                                        dImptoTasa = 1;   // on CFD's XML retained taxes have no rate
-                                        hmImpto = hmRetenidoIsr;
-                                        break;
-                                    default:
-                                        throw new Exception("Todos los impuestos retenidos deben ser conocidos (" + tax.getPkTaxBasicId() + ").");
-                                }
-                                break;
-
-                            case SModSysConsts.FINS_TP_TAX_CHARGED:
-                                switch (tax.getPkTaxBasicId()) {
-                                    case 1: // IVA
-                                        hmImpto = hmTrasladadoIva;
-                                        break;
-                                    case 3: // IEPS
-                                        hmImpto = hmTrasladadoIeps;
-                                        break;
-                                    default:
-                                        throw new Exception("Todos los impuestos trasladados deben ser conocidos (" + tax.getPkTaxBasicId() + ").");
-                                }
-                                break;
-
-                            default:
-                                throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + tax.getFkTaxTypeId() + ").");
-                        }
-
-                        if (dImptoTasa == 0) {
-                            dImptoTasa = tax.getPercentage();
-                        }
-
-                        oValue = hmImpto.get(dImptoTasa);
-                        dImpto = oValue == null ? 0 : oValue.doubleValue();
-                        hmImpto.put(dImptoTasa, dImpto + tax.getTaxCy());
-                    }
-                }
-            }
-        }
-
-        // Retained taxes:
-
-        DElementImpuestosRetenidos impuestosRetenidos = new DElementImpuestosRetenidos();
-
-        hmImpto = hmRetenidoIva;
-        if (!hmImpto.isEmpty()) {
-            setKeyImptos = hmImpto.keySet();
-            for (Double key : setKeyImptos) {
-                DElementImpuestoRetencion impuestoRetencion = new DElementImpuestoRetencion();
-
-                dImpto = hmImpto.get(key);
-                if (dImpto != 0) {
-                    dTotalImptoRetenido += dImpto;
-                    impuestoRetencion.getAttImpuesto().setOption(DAttributeOptionImpuestoRetencion.CFD_IVA);
-                    impuestoRetencion.getAttImporte().setDouble(dImpto);
-
-                    impuestosRetenidos.getEltHijosImpuestoRetenido().add(impuestoRetencion);
-                }
-            }
-        }
-
-        hmImpto = hmRetenidoIsr;
-        if (!hmImpto.isEmpty()) {
-            setKeyImptos = hmImpto.keySet();
-            for (Double key : setKeyImptos) {
-                DElementImpuestoRetencion impuestoRetencion = new DElementImpuestoRetencion();
-
-                dImpto = hmImpto.get(key);
-                if (dImpto != 0) {
-                    dTotalImptoRetenido += dImpto;
-                    impuestoRetencion.getAttImpuesto().setOption(DAttributeOptionImpuestoRetencion.CFD_ISR);
-                    impuestoRetencion.getAttImporte().setDouble(dImpto);
-
-                    impuestosRetenidos.getEltHijosImpuestoRetenido().add(impuestoRetencion);
-                }
-            }
-        }
-
-        if (impuestosRetenidos.getEltHijosImpuestoRetenido().size() > 0) {
-            comprobante.getEltImpuestos().getAttTotalImpuestosRetenidos().setDouble(dTotalImptoRetenido);
-            comprobante.getEltImpuestos().setEltOpcImpuestosRetenidos(impuestosRetenidos);
-        }
-
-        // Charged taxes:
-
-        DElementImpuestosTrasladados impuestosTrasladados = new DElementImpuestosTrasladados();
-
-        hmImpto = hmTrasladadoIva;
-        if (!hmImpto.isEmpty()) {
-            setKeyImptos = hmImpto.keySet();
-            for (Double key : setKeyImptos) {
-                DElementImpuestoTraslado impuestoTraslado = new DElementImpuestoTraslado();
-
-                dImpto = hmImpto.get(key);
-                /* XXX Check if this modification must remain (sflores, 2012-07-24).
-                if (dImpto != 0) {
-                 */
-    /*
-                    dTotalImptoTrasladado += dImpto;
-                    impuestoTraslado.getAttImpuesto().setOption(DAttributeOptionImpuestoTraslado.CFD_IVA);
-                    impuestoTraslado.getAttTasa().setDouble(key * 100); // tax rate as "integer" value
-                    impuestoTraslado.getAttImporte().setDouble(dImpto);
-
-                    impuestosTrasladados.getEltHijosImpuestoTrasladado().add(impuestoTraslado);
-                    dIvaPorcentaje = (key * 100);
-                /* XXX Check if this modification must remain (sflores, 2012-07-24).
-                }
-                 */
-    /*
-            }
-        }
-
-        hmImpto = hmTrasladadoIeps;
-        if (!hmImpto.isEmpty()) {
-            setKeyImptos = hmImpto.keySet();
-            for (Double key : setKeyImptos) {
-                DElementImpuestoTraslado impuestoTraslado = new DElementImpuestoTraslado();
-
-                dImpto = hmImpto.get(key);
-                /* XXX Check if this modification must remain (sflores, 2012-07-24).
-                if (dImpto != 0) {
-                 */
-    /*
-                    dTotalImptoTrasladado += dImpto;
-                    impuestoTraslado.getAttImpuesto().setOption(DAttributeOptionImpuestoTraslado.CFD_IEPS);
-                    impuestoTraslado.getAttTasa().setDouble(key * 100); // tax rate as "integer" value
-                    impuestoTraslado.getAttImporte().setDouble(dImpto);
-
-                    impuestosTrasladados.getEltHijosImpuestoTrasladado().add(impuestoTraslado);
-                /* XXX Check if this modification must remain (sflores, 2012-07-24).
-                }
-                 */
-    /*
-            }
-        }
-
-        if (impuestosTrasladados.getEltHijosImpuestoTrasladado().size() > 0) {
-            comprobante.getEltImpuestos().getAttTotalImpuestosTrasladados().setDouble(dTotalImptoTrasladado);
-            comprobante.getEltImpuestos().setEltOpcImpuestosTrasladados(impuestosTrasladados);
-        }
-
-        // Addenda:
-
-        switch (mnFkCurrencyId) {
-            case 1: // MXN
-                nMoneda = DAttributeOptionMoneda.CFD_MXN;
-                break;
-            case 2: // USD
-                nMoneda = DAttributeOptionMoneda.CFD_USD;
-                break;
-            case 3: // EUR
-                nMoneda = DAttributeOptionMoneda.CFD_EUR;
-                break;
-            default:
-                throw new Exception("La moneda debe ser conocida (" + mnFkCurrencyId + ").");
-        }
-
-        DElementAddenda1 addenda1 = new DElementAddenda1();
-
-        addenda1.getEltMoneda().getAttClaveMoneda().setOption(nMoneda);
-        addenda1.getEltMoneda().getAttTipoDeCambio().setDouble(mdExchangeRate);
-        addenda1.getEltAdicional().getAttDiasDeCredito().setInteger(mnDaysOfCredit);
-        addenda1.getEltAdicional().getAttEmbarque().setString("");
-        addenda1.getEltAdicional().getAttOrdenDeEmbarque().setString("");
-        addenda1.getEltAdicional().getAttOrdenDeCompra().setString(msNumberReference);
-        addenda1.getEltAdicional().getAttContrato().setString(moAuxCfdParams.getContrato());
-        addenda1.getEltAdicional().getAttPedido().setString(moAuxCfdParams.getPedido());
-        addenda1.getEltAdicional().getAttFactura().setString(moAuxCfdParams.getFactura());
-        addenda1.getEltAdicional().getAttCliente().setString(moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getKey());
-        addenda1.getEltAdicional().getAttSucursal().setString("" + mnFkCompanyBranchId);
-        addenda1.getEltAdicional().getAttAgente().setString("" + mnFkSalesAgentId_n);
-        addenda1.getEltAdicional().getAttRuta().setString(moAuxCfdParams.getRuta());
-        addenda1.getEltAdicional().getAttChofer().setString(msDriver);
-        addenda1.getEltAdicional().getAttPlacas().setString(msPlate);
-        addenda1.getEltAdicional().getAttBoleto().setString(msTicket);
-        addenda1.getEltAdicional().getAttPesoBruto().setDouble(dTotalPesoBruto);
-        addenda1.getEltAdicional().getAttPesoNeto().setDouble(dTotalPesoNeto);
-        addenda1.getEltAdicional().getAttUnidadPesoBruto().setString(moAuxCfdParams.getUnidadPesoBruto());
-        addenda1.getEltAdicional().getAttUnidadPesoNeto().setString(moAuxCfdParams.getUnidadPesoNeto());
-        addenda1.getEltAdicional().getEltAdicionalConceptos().getEltHijosAdicionalConcepto().addAll(vConcepto);
-
-        vNota.clear();
-
-        for (SDataDpsNotes notes : mvDbmsDpsNotes) {
-            if (!notes.getIsDeleted() && notes.getIsPrintable()) {
-                DElementNota nota = new DElementNota();
-                nota.getAttTexto().setString(notes.getNotes());
-                vNota.add(nota);
-            }
-        }
-
-        if (vNota.size() > 0) {
-            DElementNotas notas = new DElementNotas();
-            notas.getEltHijosNota().addAll(vNota);
-            addenda1.getEltAdicional().setEltOpcNotas(notas);
-        }
-
-        DElementPagare pagare = new DElementPagare();
-        pagare.getAttFecha().setDate(mtDate);
-        pagare.getAttFechaDeVencimiento().setDate(SLibTimeUtilities.addDate(mtDateStartCredit, 0, 0, mnDaysOfCredit));
-        pagare.getAttImporte().setDouble(mdTotalCy_r);
-        pagare.getAttClaveMoneda().setString(msDbmsCurrencyKey);
-        pagare.getAttInteresMoratorio().setDouble(moAuxCfdParams.getInterestDelayRate());
-        addenda1.setEltOpcPagare(pagare);
-
-        DElementAddenda addenda = new DElementAddenda();
-        addenda.getElements().add(addenda1);
-
-        if (isDocumentSal() || isAdjustmentSal()) {
-            switch (moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getFkCfdAddendaTypeId()) {
-                case SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA:
-                    addenda.getElements().add(computeAddendaSoriana());
-                    break;
-                case SDataConstantsSys.BPSS_TP_CFD_ADD_LOREAL:
-                    addenda.getElements().add(computeAddendaLoreal(dIvaPorcentaje));
-                    break;
-                case SDataConstantsSys.BPSS_TP_CFD_ADD_BACHOCO:
-                    addenda.getElements().add(computeAddendaBachoco(dIvaPorcentaje));
-                    break;
-                case SDataConstantsSys.BPSS_TP_CFD_ADD_MODELO:
-                    addenda.getElements().add(computeAddendaGrupoModelo(dIvaPorcentaje));
-                    break;
-                case SDataConstantsSys.BPSS_TP_CFD_ADD_ELEKTRA:
-                    addenda.getElements().add(computeAddendaElektra());
-                    break;
-                default:
-            }
-        }
-
-        if (moAuxCfdParams.getAgregarAddenda()) {
-            comprobante.setEltOpcAddenda(addenda);
-        }
-
-        return comprobante;
-    }
-
-    public cfd.DElement createCfdiRootElement() throws java.lang.Exception {
-        int nMoneda = 0;
-        double dImpto = 0;
-        double dImptoTasa = 0;
-        double dTotalImptoRetenido = 0;
-        double dTotalImptoTrasladado = 0;
-        double dTotalPesoBruto = 0;
-        double dTotalPesoNeto = 0;
-        double dIvaPorcentaje = 0;
-        SDataBizPartnerBranchAddress sReceptor = null;
-        Double oValue = null;
-        int[] anDateDps = SLibTimeUtilities.digestDate(mtDate);
-        int[] anDateEdit = SLibTimeUtilities.digestDate(mtUserEditTs);
-        java.util.Date tDate = null;
-        GregorianCalendar oGregorianCalendar = null;
-        Vector<DElementAdicionalConcepto> vConcepto = new Vector<DElementAdicionalConcepto>();
-        Vector<DElementNota> vNota = new Vector<DElementNota>();
-        Set<Double> setKeyImptos = null;
-        HashMap<Double, Double> hmImpto = null;
-        HashMap<Double, Double> hmRetenidoIva = new HashMap<Double, Double>();
-        HashMap<Double, Double> hmRetenidoIsr = new HashMap<Double, Double>();
-        HashMap<Double, Double> hmTrasladadoIva = new HashMap<Double, Double>();
-        HashMap<Double, Double> hmTrasladadoIeps = new HashMap<Double, Double>();
-
-        if (SLibUtilities.compareKeys(anDateDps, anDateEdit)) {
-            tDate = mtUserEditTs;
-        }
-        else {
-            oGregorianCalendar = new GregorianCalendar();
-            oGregorianCalendar.setTime(mtUserEditTs);
-            oGregorianCalendar.set(GregorianCalendar.YEAR, anDateDps[0]);
-            oGregorianCalendar.set(GregorianCalendar.MONTH, anDateDps[1] - 1);  // January is month 0
-            oGregorianCalendar.set(GregorianCalendar.DATE, anDateDps[2]);
-            tDate = oGregorianCalendar.getTime();
-        }
-
-        cfd.ver3.DElementComprobante comprobante = new cfd.ver3.DElementComprobante();
-
-        comprobante.getAttSerie().setString(msNumberSeries);
-        comprobante.getAttFolio().setString(msNumber);
-        comprobante.getAttFecha().setDatetime(tDate);
-
-        if (mnPayments <= 1) {
-            comprobante.getAttFormaDePago().setOption(DAttributeOptionFormaPago.CFD_UNA_EXHIBICION);
-        }
-        else {
-            comprobante.getAttFormaDePago().setOption("" + mnPayments, DAttributeOptionFormaPago.CFD_PARCIALIDADES);
-        }
-
-        comprobante.getAttCondicionesDePago().setOption(mnFkPaymentTypeId == SDataConstantsSys.TRNS_TP_PAY_CASH ? DAttributeOptionCondicionesPago.CFD_CONTADO : DAttributeOptionCondicionesPago.CFD_CREDITO);
-        comprobante.getAttSubTotal().setDouble(mdSubtotalProvisionalCy_r);
-        comprobante.getAttTipoCambio().setDouble(mdExchangeRate);
-        comprobante.getAttMoneda().setString(msDbmsCurrencyKey);
-        comprobante.getAttTotal().setDouble(mdTotalCy_r);
-
-        comprobante.getAttTipoDeComprobante().setOption(isDocument() ? DAttributeOptionTipoComprobante.CFD_INGRESO : DAttributeOptionTipoComprobante.CFD_EGRESO);
-
-        comprobante.getAttMetodoDePago().setString(msPaymentMethod);
-
-        comprobante.getEltEmisor().getAttRfc().setString(moAuxCfdParams.getEmisor().getFiscalId());
-        comprobante.getEltEmisor().getAttNombre().setString(moAuxCfdParams.getEmisor().getProperName());
-        comprobante.getEltEmisor().getEltDomicilioFiscal().getAttCalle().setString(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getStreet());
-        comprobante.getEltEmisor().getEltDomicilioFiscal().getAttNoExterior().setString(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getStreetNumberExt());
-        comprobante.getEltEmisor().getEltDomicilioFiscal().getAttNoInterior().setString(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getStreetNumberInt());
-        comprobante.getEltEmisor().getEltDomicilioFiscal().getAttColonia().setString(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getNeighborhood());
-        comprobante.getEltEmisor().getEltDomicilioFiscal().getAttLocalidad().setString(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getLocality());
-        comprobante.getEltEmisor().getEltDomicilioFiscal().getAttReferencia().setString(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getReference());
-        comprobante.getEltEmisor().getEltDomicilioFiscal().getAttMunicipio().setString(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getCounty());
-        comprobante.getEltEmisor().getEltDomicilioFiscal().getAttEstado().setString(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getState());
-        comprobante.getEltEmisor().getEltDomicilioFiscal().getAttCodigoPostal().setString(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getZipCode());
-        comprobante.getEltEmisor().getEltDomicilioFiscal().getAttPais().setString(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getCountry());
-
-        if (moAuxCfdParams.getLugarExpedicion() != null) {
-            comprobante.getEltEmisor().setEltOpcExpedidoEn(new cfd.ver3.DElementTipoUbicacion("cfdi:ExpedidoEn"));
-            comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttCalle().setString(moAuxCfdParams.getLugarExpedicion().getStreet());
-            comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttNoExterior().setString(moAuxCfdParams.getLugarExpedicion().getStreetNumberExt());
-            comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttNoInterior().setString(moAuxCfdParams.getLugarExpedicion().getStreetNumberInt());
-            comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttColonia().setString(moAuxCfdParams.getLugarExpedicion().getNeighborhood());
-            comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttLocalidad().setString(moAuxCfdParams.getLugarExpedicion().getLocality());
-            comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttReferencia().setString(moAuxCfdParams.getLugarExpedicion().getReference());
-            comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttMunicipio().setString(moAuxCfdParams.getLugarExpedicion().getCounty());
-            comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttEstado().setString(moAuxCfdParams.getLugarExpedicion().getState());
-            comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttCodigoPostal().setString(moAuxCfdParams.getLugarExpedicion().getZipCode());
-            comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttPais().setString(moAuxCfdParams.getLugarExpedicion().getDbmsDataCountry().getCountry());
-            comprobante.getAttLugarExpedicion().setString(moAuxCfdParams.getLugarExpedicion().getLocality() + ", " + moAuxCfdParams.getLugarExpedicion().getState());
-        }
-        else {
-            comprobante.getAttLugarExpedicion().setString(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getLocality() + ", " + moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getState());
-        }
-
-        comprobante.getAttNumCtaPago().setString(msPaymentAccount);
-
-        for (int i = 0; i < moAuxCfdParams.getRegimenFiscal().length; i++) {
-            cfd.ver3.DElementRegimenFiscal regimen = new cfd.ver3.DElementRegimenFiscal();
-            regimen.getAttRegimen().setString(moAuxCfdParams.getRegimenFiscal()[i]);
-            comprobante.getEltEmisor().getEltHijosRegimenFiscal().add(regimen);
-        }
-
-        comprobante.getEltReceptor().getAttRfc().setString(moAuxCfdParams.getReceptor().getFiscalId());
-        comprobante.getEltReceptor().getAttNombre().setString(moAuxCfdParams.getReceptor().getProperName());
-
-        if (moAuxCfdParams.getReceptorBranch().getIsAddressPrintable()) {
-            sReceptor = moAuxCfdParams.getReceptorBranch().getDbmsBizPartnerBranchAddressOfficial();
-        }
-        else {
-            sReceptor = moAuxCfdParams.getReceptor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial();
-        }
-        comprobante.getEltReceptor().getEltDomicilio().getAttCalle().setString(sReceptor.getStreet());
-        comprobante.getEltReceptor().getEltDomicilio().getAttNoExterior().setString(sReceptor.getStreetNumberExt());
-        comprobante.getEltReceptor().getEltDomicilio().getAttNoInterior().setString(sReceptor.getStreetNumberInt());
-        comprobante.getEltReceptor().getEltDomicilio().getAttColonia().setString(sReceptor.getNeighborhood());
-        comprobante.getEltReceptor().getEltDomicilio().getAttLocalidad().setString(sReceptor.getLocality());
-        comprobante.getEltReceptor().getEltDomicilio().getAttReferencia().setString(sReceptor.getReference());
-        comprobante.getEltReceptor().getEltDomicilio().getAttMunicipio().setString(sReceptor.getCounty());
-        comprobante.getEltReceptor().getEltDomicilio().getAttEstado().setString(sReceptor.getState());
-        comprobante.getEltReceptor().getEltDomicilio().getAttCodigoPostal().setString(sReceptor.getZipCode());
-        comprobante.getEltReceptor().getEltDomicilio().getAttPais().setString(sReceptor.getDbmsDataCountry().getCountry());
-
-        for (SDataDpsEntry entry : mvDbmsDpsEntries) {
-            if (entry.isAccountable()) {
-                cfd.ver3.DElementConcepto concepto = new cfd.ver3.DElementConcepto();
-                DElementAdicionalConcepto adicionalConcepto = new DElementAdicionalConcepto();
-
-                concepto.getAttNoIdentificacion().setString(entry.getConceptKey());
-                concepto.getAttUnidad().setString(entry.getDbmsOriginalUnitSymbol());
-                concepto.getAttCantidad().setDouble(entry.getOriginalQuantity());
-                concepto.getAttDescripcion().setString(entry.getConcept());
-                concepto.getAttValorUnitario().setDouble(entry.getPriceUnitarySystemCy());
-                concepto.getAttImporte().setDouble(entry.getSubtotalCy_r());
-
-                comprobante.getEltConceptos().getEltHijosConcepto().add(concepto);
-
-                adicionalConcepto.getAttClaveConcepto().setString(entry.getConceptKey());
-                adicionalConcepto.getAttPresentacion().setString("");
-                adicionalConcepto.getAttDescuentoUnitario().setDouble(entry.getOriginalDiscountUnitaryCy());
-                adicionalConcepto.getAttDescuento().setDouble(entry.getDiscountEntryCy());
-                adicionalConcepto.getAttPesoBruto().setDouble(entry.getWeightGross());
-                adicionalConcepto.getAttPesoNeto().setDouble(entry.getMass());
-
-                dTotalPesoBruto += entry.getWeightGross();
-                dTotalPesoNeto += entry.getMass();
-
-                vNota.clear();
-
-                for (SDataDpsEntryNotes note : entry.getDbmsEntryNotes()) {
-                    if (!note.getIsDeleted() && note.getIsPrintable()) {
-                        DElementNota nota = new DElementNota();
-                        nota.getAttTexto().setString(note.getNotes());
-                        vNota.add(nota);
-                    }
-                }
-
-                if (vNota.size() > 0) {
-                    DElementNotas notas = new DElementNotas();
-                    notas.getEltHijosNota().addAll(vNota);
-                    adicionalConcepto.setEltOpcNotas(notas);
-                }
-
-                vConcepto.add(adicionalConcepto);
-
-                // Document entry taxes:
-
-                for (SDataDpsEntryTax tax : entry.getDbmsEntryTaxes()) {
-                    if (tax.getFkTaxCalculationTypeId() != SModSysConsts.FINS_TP_TAX_CAL_RATE) {
-                        throw new Exception("Todos los impuestos deben ser en base a una tasa (" + tax.getFkTaxCalculationTypeId() + ").");
-                    }
-                    else {
-                        hmImpto = null;
-                        dImptoTasa = 0;
-
-                        switch (tax.getFkTaxTypeId()) {
-                            case SModSysConsts.FINS_TP_TAX_RETAINED:
-                                switch (tax.getPkTaxBasicId()) {
-                                    case 1: // IVA
-                                        dImptoTasa = 1;   // on CFDI's XML retained taxes have no rate
-                                        hmImpto = hmRetenidoIva;
-                                        break;
-                                    case 2: // ISR
-                                        dImptoTasa = 1;   // on CFDI's XML retained taxes have no rate
-                                        hmImpto = hmRetenidoIsr;
-                                        break;
-                                    default:
-                                        throw new Exception("Todos los impuestos retenidos deben ser conocidos (" + tax.getPkTaxBasicId() + ").");
-                                }
-                                break;
-
-                            case SModSysConsts.FINS_TP_TAX_CHARGED:
-                                switch (tax.getPkTaxBasicId()) {
-                                    case 1: // IVA
-                                        hmImpto = hmTrasladadoIva;
-                                        break;
-                                    case 3: // IEPS
-                                        hmImpto = hmTrasladadoIeps;
-                                        break;
-                                    default:
-                                        throw new Exception("Todos los impuestos trasladados deben ser conocidos (" + tax.getPkTaxBasicId() + ").");
-                                }
-                                break;
-
-                            default:
-                                throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + tax.getFkTaxTypeId() + ").");
-                        }
-
-                        if (dImptoTasa == 0) {
-                            dImptoTasa = tax.getPercentage();
-                        }
-
-                        oValue = hmImpto.get(dImptoTasa);
-                        dImpto = oValue == null ? 0 : oValue.doubleValue();
-                        hmImpto.put(dImptoTasa, dImpto + tax.getTaxCy());
-                    }
-                }
-            }
-        }
-
-        // Retained taxes:
-
-        cfd.ver3.DElementImpuestosRetenidos impuestosRetenidos = new cfd.ver3.DElementImpuestosRetenidos();
-
-        hmImpto = hmRetenidoIva;
-        if (!hmImpto.isEmpty()) {
-            setKeyImptos = hmImpto.keySet();
-            for (Double key : setKeyImptos) {
-                cfd.ver3.DElementImpuestoRetencion impuestoRetencion = new cfd.ver3.DElementImpuestoRetencion();
-
-                dImpto = hmImpto.get(key);
-                if (dImpto != 0) {
-                    dTotalImptoRetenido += dImpto;
-                    impuestoRetencion.getAttImpuesto().setOption(DAttributeOptionImpuestoRetencion.CFD_IVA);
-                    impuestoRetencion.getAttImporte().setDouble(dImpto);
-
-                    impuestosRetenidos.getEltHijosImpuestoRetenido().add(impuestoRetencion);
-                }
-            }
-        }
-
-        hmImpto = hmRetenidoIsr;
-        if (!hmImpto.isEmpty()) {
-            setKeyImptos = hmImpto.keySet();
-            for (Double key : setKeyImptos) {
-                cfd.ver3.DElementImpuestoRetencion impuestoRetencion = new cfd.ver3.DElementImpuestoRetencion();
-
-                dImpto = hmImpto.get(key);
-                if (dImpto != 0) {
-                    dTotalImptoRetenido += dImpto;
-                    impuestoRetencion.getAttImpuesto().setOption(DAttributeOptionImpuestoRetencion.CFD_ISR);
-                    impuestoRetencion.getAttImporte().setDouble(dImpto);
-
-                    impuestosRetenidos.getEltHijosImpuestoRetenido().add(impuestoRetencion);
-                }
-            }
-        }
-
-        if (impuestosRetenidos.getEltHijosImpuestoRetenido().size() > 0) {
-            comprobante.getEltImpuestos().getAttTotalImpuestosRetenidos().setDouble(dTotalImptoRetenido);
-            comprobante.getEltImpuestos().setEltOpcImpuestosRetenidos(impuestosRetenidos);
-        }
-
-        // Charged taxes:
-
-        cfd.ver3.DElementImpuestosTrasladados impuestosTrasladados = new cfd.ver3.DElementImpuestosTrasladados();
-
-        hmImpto = hmTrasladadoIva;
-        if (!hmImpto.isEmpty()) {
-            setKeyImptos = hmImpto.keySet();
-            for (Double key : setKeyImptos) {
-                cfd.ver3.DElementImpuestoTraslado impuestoTraslado = new cfd.ver3.DElementImpuestoTraslado();
-
-                dImpto = hmImpto.get(key);
-                /* XXX Check if this modification must remain (sflores, 2012-07-24).
-                if (dImpto != 0) {
-                 */
-    /*
-                    dTotalImptoTrasladado += dImpto;
-                    impuestoTraslado.getAttImpuesto().setOption(DAttributeOptionImpuestoTraslado.CFD_IVA);
-                    impuestoTraslado.getAttTasa().setDouble(key * 100); // tax rate as "integer" value
-                    impuestoTraslado.getAttImporte().setDouble(dImpto);
-
-                    impuestosTrasladados.getEltHijosImpuestoTrasladado().add(impuestoTraslado);
-                    dIvaPorcentaje = (key * 100);
-                /* XXX Check if this modification must remain (sflores, 2012-07-24).
-                }
-                 */
-    /*
-            }
-        }
-
-        hmImpto = hmTrasladadoIeps;
-        if (!hmImpto.isEmpty()) {
-            setKeyImptos = hmImpto.keySet();
-            for (Double key : setKeyImptos) {
-                cfd.ver3.DElementImpuestoTraslado impuestoTraslado = new cfd.ver3.DElementImpuestoTraslado();
-
-                dImpto = hmImpto.get(key);
-                /* XXX Check if this modification must remain (sflores, 2012-07-24).
-                if (dImpto != 0) {
-                 */
-    /*
-                    dTotalImptoTrasladado += dImpto;
-                    impuestoTraslado.getAttImpuesto().setOption(DAttributeOptionImpuestoTraslado.CFD_IEPS);
-                    impuestoTraslado.getAttTasa().setDouble(key * 100); // tax rate as "integer" value
-                    impuestoTraslado.getAttImporte().setDouble(dImpto);
-
-                    impuestosTrasladados.getEltHijosImpuestoTrasladado().add(impuestoTraslado);
-                /* XXX Check if this modification must remain (sflores, 2012-07-24).
-                }
-                 */
-    /*
-            }
-        }
-
-        if (impuestosTrasladados.getEltHijosImpuestoTrasladado().size() > 0) {
-            comprobante.getEltImpuestos().getAttTotalImpuestosTrasladados().setDouble(dTotalImptoTrasladado);
-            comprobante.getEltImpuestos().setEltOpcImpuestosTrasladados(impuestosTrasladados);
-        }
-
-        // Addenda:
-
-        switch (mnFkCurrencyId) {
-            case 1: // MXN
-                nMoneda = DAttributeOptionMoneda.CFD_MXN;
-                break;
-            case 2: // USD
-                nMoneda = DAttributeOptionMoneda.CFD_USD;
-                break;
-            case 3: // EUR
-                nMoneda = DAttributeOptionMoneda.CFD_EUR;
-                break;
-            default:
-                throw new Exception("La moneda debe ser conocida (" + mnFkCurrencyId + ").");
-        }
-
-        if (moAuxCfdParams.getAgregarAddenda()) {
-            // Create element Addenda1:
-
-            DElementAddenda1 addenda1 = new DElementAddenda1();
-
-            addenda1.getEltMoneda().getAttClaveMoneda().setOption(nMoneda);
-            addenda1.getEltMoneda().getAttTipoDeCambio().setDouble(mdExchangeRate);
-            addenda1.getEltAdicional().getAttDiasDeCredito().setInteger(mnDaysOfCredit);
-            addenda1.getEltAdicional().getAttEmbarque().setString("");
-            addenda1.getEltAdicional().getAttOrdenDeEmbarque().setString("");
-            addenda1.getEltAdicional().getAttOrdenDeCompra().setString(msNumberReference);
-            addenda1.getEltAdicional().getAttContrato().setString(moAuxCfdParams.getContrato());
-            addenda1.getEltAdicional().getAttPedido().setString(moAuxCfdParams.getPedido());
-            addenda1.getEltAdicional().getAttFactura().setString(moAuxCfdParams.getFactura());
-            addenda1.getEltAdicional().getAttCliente().setString(moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getKey());
-            addenda1.getEltAdicional().getAttSucursal().setString("" + mnFkCompanyBranchId);
-            addenda1.getEltAdicional().getAttAgente().setString("" + mnFkSalesAgentId_n);
-            addenda1.getEltAdicional().getAttRuta().setString(moAuxCfdParams.getRuta());
-            addenda1.getEltAdicional().getAttChofer().setString(msDriver);
-            addenda1.getEltAdicional().getAttPlacas().setString(msPlate);
-            addenda1.getEltAdicional().getAttBoleto().setString(msTicket);
-            addenda1.getEltAdicional().getAttPesoBruto().setDouble(dTotalPesoBruto);
-            addenda1.getEltAdicional().getAttPesoNeto().setDouble(dTotalPesoNeto);
-            addenda1.getEltAdicional().getAttUnidadPesoBruto().setString(moAuxCfdParams.getUnidadPesoBruto());
-            addenda1.getEltAdicional().getAttUnidadPesoNeto().setString(moAuxCfdParams.getUnidadPesoNeto());
-            addenda1.getEltAdicional().getEltAdicionalConceptos().getEltHijosAdicionalConcepto().addAll(vConcepto);
-
-            vNota.clear();
-
-            for (SDataDpsNotes notes : mvDbmsDpsNotes) {
-                if (!notes.getIsDeleted() && notes.getIsPrintable()) {
-                    DElementNota nota = new DElementNota();
-                    nota.getAttTexto().setString(notes.getNotes());
-                    vNota.add(nota);
-                }
-            }
-
-            if (vNota.size() > 0) {
-                DElementNotas notas = new DElementNotas();
-                notas.getEltHijosNota().addAll(vNota);
-                addenda1.getEltAdicional().setEltOpcNotas(notas);
-            }
-
-            DElementPagare pagare = new DElementPagare();
-            pagare.getAttFecha().setDate(mtDate);
-            pagare.getAttFechaDeVencimiento().setDate(SLibTimeUtilities.addDate(mtDateStartCredit, 0, 0, mnDaysOfCredit));
-            pagare.getAttImporte().setDouble(mdTotalCy_r);
-            pagare.getAttClaveMoneda().setString(msDbmsCurrencyKey);
-            pagare.getAttInteresMoratorio().setDouble(moAuxCfdParams.getInterestDelayRate());
-            addenda1.setEltOpcPagare(pagare);
-
-            cfd.ver3.DElementAddenda addenda = new cfd.ver3.DElementAddenda();
-            addenda.getElements().add(addenda1);
-
-            // Create custom addendas when needed:
-
-            if (isDocumentSal() || isAdjustmentSal()) {
-                switch (moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getFkCfdAddendaTypeId()) {
-                    case SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA:
-                        addenda.getElements().add(computeAddendaSoriana());
-                        break;
-                    case SDataConstantsSys.BPSS_TP_CFD_ADD_LOREAL:
-                        addenda.getElements().add(computeAddendaLoreal(dIvaPorcentaje));
-                        break;
-                    case SDataConstantsSys.BPSS_TP_CFD_ADD_BACHOCO:
-                        addenda.getElements().add(computeAddendaBachoco(dIvaPorcentaje));
-                        break;
-                    case SDataConstantsSys.BPSS_TP_CFD_ADD_MODELO:
-                        addenda.getElements().add(computeAddendaGrupoModelo(dIvaPorcentaje));
-                        break;
-                    case SDataConstantsSys.BPSS_TP_CFD_ADD_ELEKTRA:
-                        addenda.getElements().add(computeAddendaElektra());
-                        break;
-                    default:
-                }
-            }
-
-            // Add elements to Comprobante:
-
-            comprobante.setEltOpcAddenda(addenda);
-        }
-
-        return comprobante;
-    }
-    */
-
     @Override
     public int getCfdTipoCfdXml() {
         return SCfdConsts.CFD_TYPE_DPS;
@@ -4780,7 +4173,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void saveField(java.sql.Connection connection, final int[] pk, final int field, final Object value) throws Exception {
         String sSql = "";
 
-        mnLastDbActionResult = SLibConstants.UNDEFINED;
+        mnLastDbActionResult = SLibConsts.UNDEFINED;
 
         sSql = "UPDATE trn_dps SET ";
 
@@ -4842,7 +4235,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             try {
                 mmsConfigKey = STrnUtilities.readMmsConfigurationByLinkType(client, mmsType, entry.getFkItemId());
                 
-                if (mmsConfigKey[0] != SLibConstants.UNDEFINED) {
+                if (mmsConfigKey[0] != SLibConsts.UNDEFINED) {
                     mmsConfig = new SDbMmsConfig();
                     mmsConfig.read(client.getSession(), mmsConfigKey);
                     
@@ -4866,22 +4259,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             send = false;
         }
         
-        /* jbarajas 2015-08-20 ommited by client request
-        if (!setCfgEmail.isEmpty()) {
-            if (isEdited) {
-                if (client.showMsgBoxConfirm("Se enviará correo de notificación a los destinatarios requeridos.\n ¿Desea continuar?") == JOptionPane.NO_OPTION) {
-                    send = false;
-                }
-            }
-            else {
-               client.showMsgBoxInformation("Se enviará correo de notificación a los destinatarios requeridos.");
-            }
-        }
-        else {
-            send = false;
-        }
-        */
-        
         if (send) {
             for (String cfgEmail : setCfgEmail) {
                 try {
@@ -4890,7 +4267,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     for (SDataDpsEntry entry : mvDbmsDpsEntries) {
                         mmsConfigKey = STrnUtilities.readMmsConfigurationByLinkType(client, mmsType, entry.getFkItemId());
 
-                        if (mmsConfigKey[0] != SLibConstants.UNDEFINED) {
+                        if (mmsConfigKey[0] != SLibConsts.UNDEFINED) {
                             mmsConfig = new SDbMmsConfig();
                             mmsConfig.read(client.getSession(), mmsConfigKey);
 
