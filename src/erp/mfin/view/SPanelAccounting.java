@@ -497,7 +497,6 @@ public class SPanelAccounting extends javax.swing.JPanel implements erp.lib.tabl
         mvSuscriptors.add(SDataConstants.FIN_REC);
         mvSuscriptors.add(SDataConstants.TRN_DPS);
         mvSuscriptors.add(SDataConstants.TRN_DIOG);
-        mvSuscriptors.add(SDataConstants.TRN_DSM);
 
         for (STableColumnForm col : aoTableColumns) {
             moPaneAccounting.addTableColumn(col);

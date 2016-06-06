@@ -30,7 +30,6 @@ import erp.mtrn.data.SDataBizPartnerBlocking;
 import erp.mtrn.data.SDataDiogDncDocumentNumberSeries;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsDncDocumentNumberSeries;
-import erp.mtrn.data.SDataDsm;
 import erp.mtrn.form.SDialogRepBizPartnerBalanceAging;
 import erp.mtrn.form.SDialogRepContractStock;
 import erp.mtrn.form.SDialogRepDpsBizPartner;
@@ -49,7 +48,6 @@ import erp.mtrn.form.SDialogRepSalesPurchasesPriceUnitary;
 import erp.mtrn.form.SFormBizPartnerBlocking;
 import erp.mtrn.form.SFormDncDocumentNumberSeries;
 import erp.mtrn.form.SFormDps;
-import erp.mtrn.form.SFormDsm;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -182,7 +180,6 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
 
     private erp.mtrn.form.SFormDps moFormDps;
     private erp.mtrn.form.SFormDps moFormDpsRo;
-    private erp.mtrn.form.SFormDsm moFormDsm;
     private erp.mtrn.form.SFormBizPartnerBlocking moFormBizPartnerBlocking;
     private erp.mtrn.form.SFormDncDocumentNumberSeries moFormDncDocumentNumberSeriesDps;
     private erp.mtrn.form.SFormDncDocumentNumberSeries moFormDncDocumentNumberSeriesDiog;
@@ -830,16 +827,6 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                         moRegistry = new SDataDps();
                     }
                     break;
-                case SDataConstants.TRN_DSM:
-                    if (moFormDsm == null) {
-                        moFormDsm = new SFormDsm(miClient);
-                    }
-                    if (pk != null) {
-                        moRegistry = new SDataDsm();
-                    }
-                    miForm = moFormDsm;
-                    miForm.setValue(1, auxType);
-                    break;
                 case SDataConstants.FIN_CC_ITEM:
                     if (moFormCostCenterItem == null) {
                         moFormCostCenterItem = new SFormCostCenterItem(miClient);
@@ -1105,11 +1092,6 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                 case SDataConstants.TRNX_DPS_PAYED:
                     oViewClass = erp.mtrn.view.SViewDpsPay.class;
                     sViewTitle = "Cuentas pagadas";
-                    break;
-
-                case SDataConstants.TRN_DSM:
-                    oViewClass = erp.mtrn.view.SViewDsm.class;
-                    sViewTitle = "Movimientos proveedores";
                     break;
 
                 case SDataConstants.TRNX_DPS_QRY:

@@ -23,8 +23,6 @@ import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogNotesRow;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsNotesRow;
-import erp.mtrn.data.SDataDsm;
-import erp.mtrn.data.SDataDsmEntryNotesRow;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -50,7 +48,6 @@ public class SDialogShowDocumentNotes extends javax.swing.JDialog implements erp
     private erp.lib.table.STablePane moNotesPane;
     private erp.mtrn.data.SDataDiog moDiog;
     private erp.mtrn.data.SDataDps moDps;
-    private erp.mtrn.data.SDataDsm moDsm;
 
     /** Creates new form SDialogShowDocumentNotes */
     public SDialogShowDocumentNotes(erp.client.SClientInterface client, int typeDocument) {
@@ -176,12 +173,6 @@ public class SDialogShowDocumentNotes extends javax.swing.JDialog implements erp
                 moDiog = (SDataDiog) SDataUtilities.readRegistry(miClient, mnParamTypeDocument, moParamDocumentKey, SLibConstants.EXEC_MODE_SILENT);
                 for (int i = 0; i < moDiog.getDbmsNotes().size(); i++) {
                     moNotesPane.addTableRow(new SDataDiogNotesRow(moDiog.getDbmsNotes().get(i)));
-                }
-                break;
-            case SDataConstants.TRN_DSM:
-                moDsm = (SDataDsm) SDataUtilities.readRegistry(miClient, mnParamTypeDocument, moParamDocumentKey, SLibConstants.EXEC_MODE_SILENT);
-                for (int i = 0; i < moDsm.getDbmsNotes().size(); i++) {
-                    moNotesPane.addTableRow(new SDataDsmEntryNotesRow(moDsm.getDbmsNotes().get(i)));
                 }
                 break;
             default:
