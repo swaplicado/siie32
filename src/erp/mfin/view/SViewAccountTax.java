@@ -51,7 +51,7 @@ public class SViewAccountTax extends erp.lib.table.STableTab implements java.awt
         //jbDelete.setEnabled(false);
 
         STableField[] aoKeyFields = new STableField[4];
-        STableColumn[] aoTableColumns = new STableColumn[16];
+        STableColumn[] aoTableColumns = new STableColumn[14];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "at.id_tax_bas");
@@ -70,8 +70,6 @@ public class SViewAccountTax extends erp.lib.table.STableTab implements java.awt
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ap.acc", "Cta. efectivamente pagados", STableConstants.WIDTH_ACCOUNT);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_acc_pay_pend", "No. cta. pendientes pago", STableConstants.WIDTH_ACCOUNT_ID);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "app.acc", "Cta. pendientes pago", STableConstants.WIDTH_ACCOUNT);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_acc_adv", "No. cta. pendientes pago anticipos", STableConstants.WIDTH_ACCOUNT_ID);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "appa.acc", "Cta. pendientes pago anticipos", STableConstants.WIDTH_ACCOUNT);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "at.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usr. creación", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "at.ts_new", "Creación", STableConstants.WIDTH_DATE_TIME);
@@ -140,11 +138,10 @@ public class SViewAccountTax extends erp.lib.table.STableTab implements java.awt
             }
         }
 
-        msSql = "SELECT at.*, t.id_tax_bas, t.id_tax, t.tax, cd.ct_dps, at.fid_acc_pay, at.fid_acc_pay_pend, at.fid_acc_pay_pend_adv, " +
+        msSql = "SELECT at.*, t.id_tax_bas, t.id_tax, t.tax, cd.ct_dps, at.fid_acc_pay, at.fid_acc_pay_pend, " +
                 "f_acc_usr(" + ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskAccount() + ", ap.code) AS f_acc_pay, " +
                 "f_acc_usr(" + ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskAccount() + ", app.code) AS f_acc_pay_pend, " +
-                "f_acc_usr(" + ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskAccount() + ", appa.code) AS f_acc_adv, " +
-                "ap.acc, app.acc, appa.acc, un.usr, ue.usr, ud.usr " +
+                "ap.acc, app.acc, un.usr, ue.usr, ud.usr " +
                 "FROM fin_acc_tax AS at " +
                 "INNER JOIN erp.finu_tax AS t ON " +
                 "at.id_tax_bas = t.id_tax_bas AND at.id_tax = t.id_tax " +
@@ -154,8 +151,6 @@ public class SViewAccountTax extends erp.lib.table.STableTab implements java.awt
                 "at.fid_acc_pay = ap.id_acc " +
                 "INNER JOIN fin_acc AS app ON " +
                 "at.fid_acc_pay_pend = app.id_acc " +
-                "INNER JOIN fin_acc AS appa ON " +
-                "at.fid_acc_pay_pend_adv = appa.id_acc " +
                 "INNER JOIN erp.usru_usr AS un ON " +
                 "at.fid_usr_new = un.id_usr " +
                 "INNER JOIN erp.usru_usr AS ue ON " +
