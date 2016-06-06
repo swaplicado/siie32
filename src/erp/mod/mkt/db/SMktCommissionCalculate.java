@@ -140,8 +140,8 @@ public class SMktCommissionCalculate extends SDbRegistryUser {
             "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS sr " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS sre ON " +
             "sr.id_year = sre.id_year AND sr.id_per = sre.id_per AND sr.id_bkc = sre.id_bkc AND sr.id_tp_rec = sre.id_tp_rec AND " +
-            "sr.id_num = sre.id_num AND sr.b_del = 0 AND sre.b_del = 0 AND sre.fid_ct_sys_mov_xxx = " + SModSysConsts.FINS_TP_SYS_MOV_BPS_CUS[0] + " AND " +
-            "sre.fid_tp_sys_mov_xxx = " + SModSysConsts.FINS_TP_SYS_MOV_BPS_CUS[1] + " " +
+            "sr.id_num = sre.id_num AND sr.b_del = 0 AND sre.b_del = 0 AND sre.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0] + " AND " +
+            "sre.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1] + " " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS sd ON " +
             "sre.fid_dps_year_n = sd.id_year AND sre.fid_dps_doc_n = sd.id_doc AND sd.fid_ct_dps = " + SModSysConsts.TRNS_CT_DPS_SAL + " AND " +
             "sd.fid_cl_dps = " + SModSysConsts.TRNS_CL_DPS_SAL_DOC[1] + " AND sd.fid_st_dps = " + SModSysConsts.TRNS_ST_DPS_EMITED + " AND " +
@@ -156,8 +156,8 @@ public class SMktCommissionCalculate extends SDbRegistryUser {
             "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS sr " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS sre ON " +
             "sr.id_year = sre.id_year AND sr.id_per = sre.id_per AND sr.id_bkc = sre.id_bkc AND sr.id_tp_rec = sre.id_tp_rec AND " +
-            "sr.id_num = sre.id_num AND sr.b_del = 0 AND sre.b_del = 0 AND sre.fid_ct_sys_mov_xxx = " + SModSysConsts.FINS_TP_SYS_MOV_BPS_CUS[0] + " AND " +
-            "sre.fid_tp_sys_mov_xxx = " + SModSysConsts.FINS_TP_SYS_MOV_BPS_CUS[1] + " " +
+            "sr.id_num = sre.id_num AND sr.b_del = 0 AND sre.b_del = 0 AND sre.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0] + " AND " +
+            "sre.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1] + " " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS sd ON " +
             "sre.fid_dps_year_n = sd.id_year AND sre.fid_dps_doc_n = sd.id_doc AND sd.fid_ct_dps = " + SModSysConsts.TRNS_CT_DPS_SAL + " AND " +
             "sd.fid_cl_dps = " + SModSysConsts.TRNS_CL_DPS_SAL_DOC[1] + " AND sd.fid_st_dps = " + SModSysConsts.TRNS_ST_DPS_EMITED + " AND " +
@@ -188,8 +188,8 @@ public class SMktCommissionCalculate extends SDbRegistryUser {
             "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS r " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re ON " +
             "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND " +
-            "r.id_num = re.id_num AND r.b_del = 0 AND re.b_del = 0 AND re.fid_ct_sys_mov_xxx = " + SModSysConsts.FINS_TP_SYS_MOV_BPS_CUS[0] + " AND " +
-            "re.fid_tp_sys_mov_xxx = " + SModSysConsts.FINS_TP_SYS_MOV_BPS_CUS[1] + " " +
+            "r.id_num = re.id_num AND r.b_del = 0 AND re.b_del = 0 AND re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0] + " AND " +
+            "re.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1] + " " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON " +
             "re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc AND d.fid_ct_dps = " + SModSysConsts.TRNS_CT_DPS_SAL + " AND " +
             "d.fid_cl_dps = " + SModSysConsts.TRNS_CL_DPS_SAL_DOC[1] + " AND d.fid_st_dps = " + SModSysConsts.TRNS_ST_DPS_EMITED + " AND " +
