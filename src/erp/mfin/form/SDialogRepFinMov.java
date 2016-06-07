@@ -10,6 +10,7 @@ import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
+import erp.gui.SGuiUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
@@ -707,13 +708,19 @@ public class SDialogRepFinMov extends javax.swing.JDialog implements erp.lib.for
     @Override
     public erp.lib.form.SFormValidation formValidate() {
         SFormValidation validation = new SFormValidation();
-
+        String msg = "";
+        
         for (int i = 0; i < mvFields.size(); i++) {
             if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()) {
                 validation.setIsError(true);
                 validation.setComponent(((erp.lib.form.SFormField) mvFields.get(i)).getComponent());
                 break;
             }
+        }
+        msg = SGuiUtilities.validateDateRange(moFieldDateStart.getDate(), moFieldDateEnd.getDate());
+        if (!msg.isEmpty()){
+            validation.setMessage(msg);
+            validation.setComponent(jtfDateStart);
         }
 
         return validation;

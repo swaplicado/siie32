@@ -2277,13 +2277,16 @@ public abstract class SCfdUtils implements Serializable {
 
     public static void sendCfd(final SClientInterface client, final int typeCfd, final SDataCfd cfd, final int subtypeCfd, boolean isSingle) throws MessagingException, SQLException, Exception {
         SDataDps dps = null;
-
+        String bizPartnerMail;
+        
         switch (typeCfd) {
             case SCfdConsts.CFD_TYPE_DPS:
                 dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
 
                 if (canSend(client, cfd)) {
-                    if (!isSingle || client.showMsgBoxConfirm("¿Está seguro que desea enviar por correo-e el documento?") == JOptionPane.YES_OPTION) {
+                    bizPartnerMail = STrnUtilities.getMailToSendForCfd(client, SLibConstants.UNDEFINED, dps.getFkBizPartnerId_r(), dps.getFkBizPartnerBranchId()).replace(";", "\n");
+                    //if (!isSingle || client.showMsgBoxConfirm("¿Está seguro que desea enviar por correo-e el documento?") == JOptionPane.YES_OPTION) { //XXX ghernandez 23-05-2016 confirm message to send email
+                    if (!isSingle || client.showMsgBoxConfirm("El documento se enviará a los siguientes destinatarios:\n" + bizPartnerMail + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                         STrnUtilities.sendMailCfd(client, dps.getDbmsDataCfd(), SLibConstants.UNDEFINED, SLibConstants.UNDEFINED, dps.getFkBizPartnerId_r(), dps.getFkBizPartnerBranchId());
 
                         if (isSingle) {
@@ -2294,7 +2297,9 @@ public abstract class SCfdUtils implements Serializable {
                 break;
             case SCfdConsts.CFD_TYPE_PAYROLL:
                 if (canSend(client, cfd)) {
-                    if (!isSingle || client.showMsgBoxConfirm("¿Está seguro que desea enviar por correo-e el documento?") == JOptionPane.YES_OPTION) {
+                    bizPartnerMail = STrnUtilities.getMailToSendForCfd(client, subtypeCfd, SDataConstantsSys.BPSS_TP_CON_ADM, (subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? cfd.getFkPayrollBizPartnerId_n() : cfd.getFkPayrollReceiptEmployeeId_n())).replace(";", "\n");
+                    //if (!isSingle || client.showMsgBoxConfirm("¿Está seguro que desea enviar por correo-e el documento?") == JOptionPane.YES_OPTION) { //XXX ghernandez 23-05-2016 confirm message to send email
+                    if (!isSingle || client.showMsgBoxConfirm("El documento se enviará a los siguientes destinatarios:\n" + bizPartnerMail + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                         STrnUtilities.sendMailCfd(client, cfd, subtypeCfd, SDataConstantsSys.BPSS_TP_CON_ADM, (subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? cfd.getFkPayrollBizPartnerId_n() : cfd.getFkPayrollReceiptEmployeeId_n()));
 
                         if (isSingle) {

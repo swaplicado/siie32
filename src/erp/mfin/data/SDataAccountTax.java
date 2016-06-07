@@ -5,12 +5,11 @@
 
 package erp.mfin.data;
 
-import java.sql.CallableStatement;
-import java.sql.ResultSet;
-
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import java.sql.CallableStatement;
+import java.sql.ResultSet;
 
 /**
  *
@@ -25,7 +24,6 @@ public class SDataAccountTax extends erp.lib.data.SDataRegistry implements java.
     protected boolean mbIsDeleted;
     protected java.lang.String msFkAccountPaymentId;
     protected java.lang.String msFkAccountPaymentPendingId;
-    protected java.lang.String msFkAccountPaymentPendingAdvanceId;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
     protected int mnFkUserDeleteId;
@@ -45,7 +43,6 @@ public class SDataAccountTax extends erp.lib.data.SDataRegistry implements java.
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkAccountPaymentId(java.lang.String s) { msFkAccountPaymentId = s; }
     public void setFkAccountPaymentPendingId(java.lang.String s) { msFkAccountPaymentPendingId = s; }
-    public void setFkAccountPaymentPendingAdvanceId(java.lang.String s) { msFkAccountPaymentPendingAdvanceId = s; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
     public void setFkUserDeleteId(int n) { mnFkUserDeleteId = n; }
@@ -60,7 +57,6 @@ public class SDataAccountTax extends erp.lib.data.SDataRegistry implements java.
     public boolean getIsDeleted() { return mbIsDeleted; }
     public java.lang.String getFkAccountPaymentId() { return msFkAccountPaymentId; }
     public java.lang.String getFkAccountPaymentPendingId() { return msFkAccountPaymentPendingId; }
-    public java.lang.String getFkAccountPaymentPendingAdvanceId() { return msFkAccountPaymentPendingAdvanceId; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
     public int getFkUserDeleteId() { return mnFkUserDeleteId; }
@@ -92,7 +88,6 @@ public class SDataAccountTax extends erp.lib.data.SDataRegistry implements java.
         mbIsDeleted = false;
         msFkAccountPaymentId = "";
         msFkAccountPaymentPendingId = "";
-        msFkAccountPaymentPendingAdvanceId = "";
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
         mnFkUserDeleteId = 0;
@@ -125,7 +120,6 @@ public class SDataAccountTax extends erp.lib.data.SDataRegistry implements java.
                 mbIsDeleted = resultSet.getBoolean("b_del");
                 msFkAccountPaymentId = resultSet.getString("fid_acc_pay");
                 msFkAccountPaymentPendingId = resultSet.getString("fid_acc_pay_pend");
-                msFkAccountPaymentPendingAdvanceId = resultSet.getString("fid_acc_pay_pend_adv");
                 mnFkUserNewId = resultSet.getInt("fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("fid_usr_edit");
                 mnFkUserDeleteId = resultSet.getInt("fid_usr_del");
@@ -159,8 +153,7 @@ public class SDataAccountTax extends erp.lib.data.SDataRegistry implements java.
         try {
             callableStatement = connection.prepareCall(
                     "{ CALL fin_acc_tax_save(" +
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?," +
-                    "?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkTaxBasicId);
             callableStatement.setInt(nParam++, mnPkTaxId);
             callableStatement.setInt(nParam++, mnPkDpsCategoryId);
@@ -168,7 +161,6 @@ public class SDataAccountTax extends erp.lib.data.SDataRegistry implements java.
             callableStatement.setBoolean(nParam++, mbIsDeleted);
             callableStatement.setString(nParam++, msFkAccountPaymentId);
             callableStatement.setString(nParam++, msFkAccountPaymentPendingId);
-            callableStatement.setString(nParam++, msFkAccountPaymentPendingAdvanceId);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.CHAR);

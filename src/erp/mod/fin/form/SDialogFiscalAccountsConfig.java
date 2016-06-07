@@ -213,6 +213,7 @@ public class SDialogFiscalAccountsConfig extends SBeanFormDialog implements Acti
 
             @Override
             public void initGrid() {
+                setRowButtonsEnabled(false);
                 removePanelCommands();
             }
 

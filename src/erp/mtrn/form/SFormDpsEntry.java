@@ -2497,6 +2497,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             //jckIsBulk.setEnabled(false); // allways remains disabled
             //jckIsInventoriable.setEnabled(false); // allways remains disabled
             //jckIsPrepayment.setEnabled(false); // allways remains disabled
+            //jckIsDiscountRetailChain.setEnabled(false);
             
             jtfKey.setEditable(false);
             jtfKey.setFocusable(false);
@@ -4280,7 +4281,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     }
 
     public void activateDiscountRetailChain() {
-        jckIsDiscountRetailChain.setSelected(true);
+        moFieldIsDiscountRetailChain.setFieldValue(true);
     }
 
     /*

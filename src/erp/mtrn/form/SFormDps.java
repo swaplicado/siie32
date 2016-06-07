@@ -6243,7 +6243,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jtfExchangeRate.setFocusable(false);
             jbExchangeRateSystem.setEnabled(false);
             jbExchangeRate.setEnabled(false);
-            jbEntryWizard.setEnabled(!mbIsAdj ? true : false);
+            jbEntryWizard.setEnabled(!mbIsAdj);
 
             moFieldExchangeRateSystem.setFieldValue(1d);
             moFieldExchangeRate.setFieldValue(1d);
@@ -6960,7 +6960,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mnSalesSupervisorBizPartnerId_n = 0;
         mbFormSettingsOk = true;
         mbIsNumberEditable = true;
-        mbHasRightOrderDelay = mbIsSales ? miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD_DELAY).HasRight :
+        mbHasRightOrderDelay = mbIsSales ? 
+                miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD_DELAY).HasRight :
                 miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_DELAY).HasRight;
 
         moPaneGridEntries.createTable();
@@ -8226,8 +8227,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, registry.getPrimaryKey(), SLibConstants.EXEC_MODE_STEALTH);
         
         sendMail = (SLibUtilities.compareKeys(SDataConstantsSys.TRNU_TP_DPS_SAL_CON, dps.getDpsTypeKey()) ||
-                        SLibUtilities.compareKeys(SDataConstantsSys.TRNU_TP_DPS_SAL_ORD, dps.getDpsTypeKey()));/* &&
-                        dps.getUserNewTs().compareTo(dps.getUserEditTs()) == 0;*/
+                        SLibUtilities.compareKeys(SDataConstantsSys.TRNU_TP_DPS_SAL_ORD, dps.getDpsTypeKey()));
         
         if (SLibUtilities.compareKeys(SDataConstantsSys.TRNU_TP_DPS_SAL_CON, dps.getDpsTypeKey())) {
             mmsType = SModSysConsts.CFGS_TP_MMS_CON;

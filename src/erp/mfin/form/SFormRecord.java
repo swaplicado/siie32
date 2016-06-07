@@ -952,7 +952,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         }
     }
 
-    private int obtainNewUserId() {
+    private int obtainNextUserId() {
         int userId = 0;
 
         for (STableRow row : moPaneGridEntries.getGridRows()) {
@@ -1539,7 +1539,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                 moDialogPaymentCus.setFormVisible(true);
 
                 if (moDialogPaymentCus.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    userId = obtainNewUserId();
+                    userId = obtainNextUserId();
                     record = (SDataRecord) moDialogPaymentCus.getRegistry();
 
                     if (record.getDbmsRecordEntries().size() > 0) {
@@ -1578,7 +1578,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                 moDialogPaymentCompleteCus.setFormVisible(true);
 
                 if (moDialogPaymentCompleteCus.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    userId = obtainNewUserId();
+                    userId = obtainNextUserId();
                     record = (SDataRecord) moDialogPaymentCompleteCus.getRegistry();
 
                     if (record.getDbmsRecordEntries().size() > 0) {
@@ -1618,7 +1618,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                 moDialogPaymentSup.setFormVisible(true);
 
                 if (moDialogPaymentSup.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    userId = obtainNewUserId();
+                    userId = obtainNextUserId();
                     record = (SDataRecord) moDialogPaymentSup.getRegistry();
 
                     if (record.getDbmsRecordEntries().size() > 0) {
@@ -1657,7 +1657,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                 moDialogPaymentCompleteSup.setFormVisible(true);
 
                 if (moDialogPaymentCompleteSup.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    userId = obtainNewUserId();
+                    userId = obtainNextUserId();
                     record = (SDataRecord) moDialogPaymentCompleteSup.getRegistry();
 
                     if (record.getDbmsRecordEntries().size() > 0) {
@@ -1696,7 +1696,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                 moFormDifferenceIncomeExpense.setFormVisible(true);
 
                 if (moFormDifferenceIncomeExpense.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    userId = obtainNewUserId();
+                    userId = obtainNextUserId();
                     record = (SDataRecord) moFormDifferenceIncomeExpense.getRegistry();
 
                     if (record.getDbmsRecordEntries().size() > 0) {
@@ -1732,7 +1732,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                 moFormDifferenceIncomeExpense.setFormVisible(true);
 
                 if (moFormDifferenceIncomeExpense.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    userId = obtainNewUserId();
+                    userId = obtainNextUserId();
                     record = (SDataRecord) moFormDifferenceIncomeExpense.getRegistry();
 
                     if (record.getDbmsRecordEntries().size() > 0) {
@@ -1781,7 +1781,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         moFormAccountCashTransfer.setFormVisible(true);
 
         if (moFormAccountCashTransfer.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-            userId = obtainNewUserId();
+            userId = obtainNextUserId();
             record = (SDataRecord) moFormAccountCashTransfer.getRegistry();
 
             if (record.getDbmsRecordEntries().size() > 0) {

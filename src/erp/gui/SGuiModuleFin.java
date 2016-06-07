@@ -99,10 +99,8 @@ import erp.mod.fin.form.SDialogFiscalXmlFile;
 import erp.mod.fin.form.SDialogRepCashFlowExpected;
 import erp.mod.fin.form.SDialogReportTaxPending;
 import erp.mtrn.data.SDataCtr;
-import erp.mtrn.data.SDataDsm;
 import erp.mtrn.form.SDialogRepBizPartnerBalanceAging;
 import erp.mtrn.form.SFormCtr;
-import erp.mtrn.form.SFormDsm;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -291,7 +289,6 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private erp.mfin.form.SFormCheckWallet moFormCheckWallet;
     private erp.mfin.form.SFormCheckFormat moFormCheckFormat;
     private erp.mfin.form.SFormCheckAnnuled moFormCheckAnnuled;
-    private erp.mtrn.form.SFormDsm moFormDsm;
     private erp.mtrn.form.SFormCtr moFormCtr;
 
     private erp.form.SFormOptionPicker moPickerAccountSpecializedType;
@@ -1293,16 +1290,6 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                     }
                     miForm = moFormItemConfig;
                     break;
-                case SDataConstants.TRN_DSM:
-                    if (moFormDsm == null) {
-                        moFormDsm = new SFormDsm(miClient);
-                    }
-                    if (pk != null) {
-                        moRegistry = new SDataDsm();
-                    }
-                    miForm = moFormDsm;
-                    miForm.setValue(1,  auxType);
-                    break;
                 case SDataConstants.TRN_CTR:
                     if (moFormCtr == null) {
                         moFormCtr = new SFormCtr(miClient);
@@ -1537,10 +1524,6 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                 case SDataConstants.TRN_CTR:
                     oViewClass = erp.mtrn.view.SViewCtr.class;
                     sViewTitle = "Contrarecibos";
-                    break;
-                case SDataConstants.TRN_DSM:
-                    oViewClass = erp.mtrn.view.SViewDsm.class;
-                    sViewTitle = "Movimientos de asociados de negocios (ctes)";
                     break;
                 case SDataConstants.TRNX_DPS_PAYS:
                     if (auxType01 == SDataConstantsSys.TRNS_CT_DPS_PUR) {

@@ -5,12 +5,11 @@
 
 package erp.mtrn.data;
 
-import java.sql.CallableStatement;
-import java.sql.ResultSet;
-
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import java.sql.CallableStatement;
+import java.sql.ResultSet;
 
 /**
  *
@@ -82,6 +81,9 @@ public class SDataDpsEntryTax extends erp.lib.data.SDataRegistry implements java
     public java.lang.String getDbmsTaxType() { return msDbmsTaxType; }
     public java.lang.String getDbmsTaxCalculationType() { return msDbmsTaxCalculationType; }
     public java.lang.String getDbmsTaxApplicationType() { return msDbmsTaxApplicationType; }
+    
+    public int[] getKeyDpsEntry() { return new int[] { mnPkYearId, mnPkDocId, mnPkEntryId }; }
+    public int[] getKeyTax() { return new int[] { mnPkTaxBasicId, mnPkTaxId }; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {

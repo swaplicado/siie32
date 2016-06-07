@@ -7,58 +7,55 @@ package erp.mfin.data;
 
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  *
  * @author Sergio Flores
  */
-public class SFinTaxes {
+public class SFinDpsTaxes {
 
     private java.sql.Statement moStatement;
-    private java.util.Vector<erp.mfin.data.SFinTaxes.STax> mvTaxes;
+    private java.util.ArrayList<erp.mfin.data.SFinDpsTaxes.STax> mvTaxes;
 
-    public SFinTaxes(java.sql.Statement statement) {
+    public SFinDpsTaxes(java.sql.Statement statement) {
         moStatement = statement;
-        mvTaxes = new Vector<STax>();
+        mvTaxes = new ArrayList<>();
     }
 
-    public void clearTaxes() {
-        mvTaxes.clear();
-    }
+    public java.util.ArrayList<erp.mfin.data.SFinDpsTaxes.STax> getTaxes() { return mvTaxes; }
 
-    public java.util.Vector<erp.mfin.data.SFinTaxes.STax> getTaxes() { return mvTaxes; }
-
-    public void addTax(int[] auxDpsAuxKey, int[] taxKey, double value, double valueCy) throws java.lang.Exception {
-        STax tax = getTax(auxDpsAuxKey, taxKey);
+    public void addTax(int[] keyDps, int[] keyTax, SFinAmount amount) throws java.lang.Exception {
+        STax tax = getTax(keyDps, keyTax, amount.Movement);
 
         if (tax == null) {
             SDataTax dataTax = new SDataTax();
-            if (dataTax.read(taxKey, moStatement) != SLibConstants.DB_ACTION_READ_OK) {
+            if (dataTax.read(keyTax, moStatement) != SLibConstants.DB_ACTION_READ_OK) {
                 throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ);
             }
             else {
                 tax = new STax();
-                tax.setPkAuxDpsYearId(auxDpsAuxKey[0]);
-                tax.setPkAuxDpsDocId(auxDpsAuxKey[1]);
+                tax.setPkDpsYearId(keyDps[0]);
+                tax.setPkDpsDocId(keyDps[1]);
                 tax.setPkTaxBasicId(dataTax.getPkTaxBasicId());
                 tax.setPkTaxId(dataTax.getPkTaxId());
                 tax.setFkTaxTypeId(dataTax.getFkTaxTypeId());
                 tax.setFkTaxCalculationTypeId(dataTax.getFkTaxCalculationTypeId());
                 tax.setFkTaxApplicationTypeId(dataTax.getFkTaxApplicationTypeId());
+                tax.setMovement(amount.Movement);
                 mvTaxes.add(tax);
             }
         }
 
-        tax.addValue(value);
-        tax.addValueCy(valueCy);
+        tax.addValue(amount.Amount);
+        tax.addValueCy(amount.AmountCy);
     }
 
-    public erp.mfin.data.SFinTaxes.STax getTax(int[] auxDpsKey, int[] taxKey) {
+    public erp.mfin.data.SFinDpsTaxes.STax getTax(int[] keyDps, int[] keyTax, SFinMovement movement) {
         STax tax = null;
 
         for (STax t : mvTaxes) {
-            if (SLibUtilities.compareKeys(t.getAuxDpsKey(), auxDpsKey) && SLibUtilities.compareKeys(t.getTaxKey(), taxKey)) {
+            if (SLibUtilities.compareKeys(t.getKeyDps(), keyDps) && SLibUtilities.compareKeys(t.getKeyTax(), keyTax) && t.getMovement() == movement) {
                 tax = t;
                 break;
             }
@@ -69,8 +66,8 @@ public class SFinTaxes {
 
     public class STax {
 
-        private int mnPkAuxDpsYearId;
-        private int mnPkAuxDpsDocId;
+        private int mnPkDpsYearId;
+        private int mnPkDpsDocId;
         private int mnPkTaxBasicId;
         private int mnPkTaxId;
         private double mdValue;
@@ -78,10 +75,11 @@ public class SFinTaxes {
         private int mnFkTaxTypeId;
         private int mnFkTaxCalculationTypeId;
         private int mnFkTaxApplicationTypeId;
+        private SFinMovement meMovement;
 
         public STax() {
-            mnPkAuxDpsYearId = 0;
-            mnPkAuxDpsDocId = 0;
+            mnPkDpsYearId = 0;
+            mnPkDpsDocId = 0;
             mnPkTaxBasicId = 0;
             mnPkTaxId = 0;
             mdValue = 0;
@@ -89,10 +87,11 @@ public class SFinTaxes {
             mnFkTaxTypeId = 0;
             mnFkTaxCalculationTypeId = 0;
             mnFkTaxApplicationTypeId = 0;
+            meMovement = SFinMovement.INCREMENT;
         }
 
-        public void setPkAuxDpsYearId(int n) { mnPkAuxDpsYearId = n; }
-        public void setPkAuxDpsDocId(int n) { mnPkAuxDpsDocId = n; }
+        public void setPkDpsYearId(int n) { mnPkDpsYearId = n; }
+        public void setPkDpsDocId(int n) { mnPkDpsDocId = n; }
         public void setPkTaxBasicId(int n) { mnPkTaxBasicId = n; }
         public void setPkTaxId(int n) { mnPkTaxId = n; }
         public void setValue(double d) { mdValue = d; }
@@ -100,9 +99,10 @@ public class SFinTaxes {
         public void setFkTaxTypeId(int n) { mnFkTaxTypeId = n; }
         public void setFkTaxCalculationTypeId(int n) { mnFkTaxCalculationTypeId = n; }
         public void setFkTaxApplicationTypeId(int n) { mnFkTaxApplicationTypeId = n; }
+        public void setMovement(SFinMovement e) { meMovement = e; }
 
-        public int getPkAuxDpsYearId() { return mnPkAuxDpsYearId; }
-        public int getPkAuxDpsDocId() { return mnPkAuxDpsDocId; }
+        public int getPkDpsYearId() { return mnPkDpsYearId; }
+        public int getPkDpsDocId() { return mnPkDpsDocId; }
         public int getPkTaxBasicId() { return mnPkTaxBasicId; }
         public int getPkTaxId() { return mnPkTaxId; }
         public double getValue() { return mdValue; }
@@ -110,9 +110,10 @@ public class SFinTaxes {
         public int getFkTaxTypeId() { return mnFkTaxTypeId; }
         public int getFkTaxCalculationTypeId() { return mnFkTaxCalculationTypeId; }
         public int getFkTaxApplicationTypeId() { return mnFkTaxApplicationTypeId; }
+        public SFinMovement getMovement() { return meMovement; }
 
-        public int[] getAuxDpsKey() { return new int[] { mnPkAuxDpsYearId, mnPkAuxDpsDocId }; }
-        public int[] getTaxKey() { return new int[] { mnPkTaxBasicId, mnPkTaxId }; }
+        public int[] getKeyDps() { return new int[] { mnPkDpsYearId, mnPkDpsDocId }; }
+        public int[] getKeyTax() { return new int[] { mnPkTaxBasicId, mnPkTaxId }; }
         public void addValue(double d) { mdValue += d; }
         public void addValueCy(double d) { mdValueCy += d; }
     }

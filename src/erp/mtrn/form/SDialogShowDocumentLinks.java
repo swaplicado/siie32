@@ -453,8 +453,8 @@ public class SDialogShowDocumentLinks extends javax.swing.JDialog implements erp
             else {
                 // DPS links:
 
-                anSubclassKey = moParamDps.getAccountingMoveSubclassKey();
-                anSubclassKeyForAdjs = moParamDps.getAccountingMoveSubclassKeyForAdjs();
+                anSubclassKey = moParamDps.getAccMvtSubclassKeyBizPartner();
+                anSubclassKeyForAdjs = moParamDps.getAccMvtSubclassKeyBizPartnerAdjustment();
 
                 sSql = "" +
                         "SELECT DISTINCT 1 AS f_id_type, 'VÍNCULO COMO ORIGEN' AS f_type, d.dt, t.code AS f_code, CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +

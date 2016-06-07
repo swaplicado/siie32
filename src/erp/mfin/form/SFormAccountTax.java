@@ -17,7 +17,6 @@ import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
 import erp.data.SProcConstants;
 import erp.lib.SLibConstants;
-import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormComboBoxGroup;
 import erp.lib.form.SFormField;
@@ -57,7 +56,6 @@ public class SFormAccountTax extends javax.swing.JDialog implements erp.lib.form
 
     private erp.mfin.form.SPanelAccount moPanelFkAccountId;
     private erp.mfin.form.SPanelAccount moPanelFkAccountPendingId;
-    private erp.mfin.form.SPanelAccount moPanelFkAccountPendingAdvanceId;
 
     /** Creates new form SFormTaxGroupEntry */
     public SFormAccountTax(erp.client.SClientInterface client) {
@@ -105,8 +103,6 @@ public class SFormAccountTax extends javax.swing.JDialog implements erp.lib.form
         jlDummyAccount = new javax.swing.JLabel();
         jpAccountPending = new javax.swing.JPanel();
         jlDummyAccountPending = new javax.swing.JLabel();
-        jpAccountPendingAdvance = new javax.swing.JPanel();
-        jlDummyAccountPendingAdvance = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -216,9 +212,9 @@ public class SFormAccountTax extends javax.swing.JDialog implements erp.lib.form
 
         jPanel8.add(jPanel3, java.awt.BorderLayout.NORTH);
 
-        jPanel4.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
+        jPanel4.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
-        jpAccount.setBorder(javax.swing.BorderFactory.createTitledBorder("Impuestos efectivamente pagados:"));
+        jpAccount.setBorder(javax.swing.BorderFactory.createTitledBorder("Contabilización de impuestos efectivamente pagados:"));
         jpAccount.setLayout(new java.awt.BorderLayout());
 
         jlDummyAccount.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
@@ -228,25 +224,15 @@ public class SFormAccountTax extends javax.swing.JDialog implements erp.lib.form
 
         jPanel4.add(jpAccount);
 
-        jpAccountPending.setBorder(javax.swing.BorderFactory.createTitledBorder("Impuestos pendientes de pago:"));
+        jpAccountPending.setBorder(javax.swing.BorderFactory.createTitledBorder("Contabilización de impuestos pendientes de pago:"));
         jpAccountPending.setLayout(new java.awt.BorderLayout());
 
-        jlDummyAccountPending.setFont(new java.awt.Font("Tahoma", 1, 12));
+        jlDummyAccountPending.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jlDummyAccountPending.setText("[Panel cuenta contable]");
         jlDummyAccountPending.setPreferredSize(new java.awt.Dimension(100, 50));
         jpAccountPending.add(jlDummyAccountPending, java.awt.BorderLayout.CENTER);
 
         jPanel4.add(jpAccountPending);
-
-        jpAccountPendingAdvance.setBorder(javax.swing.BorderFactory.createTitledBorder("Impuestos pendientes de pago contra anticipos:"));
-        jpAccountPendingAdvance.setLayout(new java.awt.BorderLayout());
-
-        jlDummyAccountPendingAdvance.setFont(new java.awt.Font("Tahoma", 1, 12));
-        jlDummyAccountPendingAdvance.setText("[Panel cuenta contable]");
-        jlDummyAccountPendingAdvance.setPreferredSize(new java.awt.Dimension(100, 50));
-        jpAccountPendingAdvance.add(jlDummyAccountPendingAdvance, java.awt.BorderLayout.CENTER);
-
-        jPanel4.add(jpAccountPendingAdvance);
 
         jPanel8.add(jPanel4, java.awt.BorderLayout.CENTER);
 
@@ -268,8 +254,8 @@ public class SFormAccountTax extends javax.swing.JDialog implements erp.lib.form
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-700)/2, (screenSize.height-500)/2, 700, 500);
+        setSize(new java.awt.Dimension(700, 500));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -280,7 +266,6 @@ public class SFormAccountTax extends javax.swing.JDialog implements erp.lib.form
         try {
             moPanelFkAccountId = new SPanelAccount(miClient, SDataConstants.FIN_ACC, false, true, false);
             moPanelFkAccountPendingId = new SPanelAccount(miClient, SDataConstants.FIN_ACC, false, true, false);
-            moPanelFkAccountPendingAdvanceId = new SPanelAccount(miClient, SDataConstants.FIN_ACC, false, true, false);
         }
         catch (Exception e) {
             SLibUtilities.renderException(this, e);
@@ -291,9 +276,6 @@ public class SFormAccountTax extends javax.swing.JDialog implements erp.lib.form
 
         jpAccountPending.remove(jlDummyAccountPending);
         jpAccountPending.add(moPanelFkAccountPendingId, BorderLayout.CENTER);
-
-        jpAccountPendingAdvance.remove(jlDummyAccountPendingAdvance);
-        jpAccountPendingAdvance.add(moPanelFkAccountPendingAdvanceId, BorderLayout.CENTER);
 
         moComboBoxGroup = new SFormComboBoxGroup(miClient);
 
@@ -406,14 +388,12 @@ public class SFormAccountTax extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JLabel jlDummy01;
     private javax.swing.JLabel jlDummyAccount;
     private javax.swing.JLabel jlDummyAccountPending;
-    private javax.swing.JLabel jlDummyAccountPendingAdvance;
     private javax.swing.JLabel jlPkDateStartId;
     private javax.swing.JLabel jlPkDpsCategoryId;
     private javax.swing.JLabel jlPkTaxBasicId;
     private javax.swing.JLabel jlPkTaxId;
     private javax.swing.JPanel jpAccount;
     private javax.swing.JPanel jpAccountPending;
-    private javax.swing.JPanel jpAccountPendingAdvance;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -448,7 +428,6 @@ public class SFormAccountTax extends javax.swing.JDialog implements erp.lib.form
         moComboBoxGroup.reset();
         moPanelFkAccountId.resetPanel();
         moPanelFkAccountPendingId.resetPanel();
-        moPanelFkAccountPendingAdvanceId.resetPanel();
     }
 
     @Override
@@ -464,11 +443,9 @@ public class SFormAccountTax extends javax.swing.JDialog implements erp.lib.form
     public erp.lib.form.SFormValidation formValidate() {
         int nSystemTypeId = SDataConstantsSys.FINS_TP_ACC_SYS_NA;
         int nSystemTypePendingId = SDataConstantsSys.FINS_TP_ACC_SYS_NA;
-        int nSystemTypePendingAdvanceId = SDataConstantsSys.FINS_TP_ACC_SYS_NA;
         String message = "";
         SDataAccount account = null;
         SDataAccount accountPending = null;
-        SDataAccount accountPendingAdvance = null;
         SFormValidation validation = new SFormValidation();
 
         for (int i = 0; i < mvFields.size(); i++) {
@@ -520,22 +497,6 @@ public class SFormAccountTax extends javax.swing.JDialog implements erp.lib.form
                         else {
                             nSystemTypePendingId = moPanelFkAccountPendingId.getDataAccountMajor().getFkAccountSystemTypeId();
                         }
-
-                        accountPendingAdvance = moPanelFkAccountPendingAdvanceId.getCurrentInputAccount();
-                        message = SDataUtilities.validateAccount(miClient, accountPendingAdvance, null);
-
-                        if (message.length() > 0) {
-                            validation.setMessage(message);
-                            validation.setComponent(moPanelFkAccountPendingAdvanceId.getFieldAccount().getComponent());
-                        }
-                        else {
-                            if (accountPendingAdvance.getLevel() == 1) {
-                                nSystemTypePendingAdvanceId = accountPendingAdvance.getFkAccountSystemTypeId();
-                            }
-                            else {
-                                nSystemTypePendingAdvanceId = moPanelFkAccountPendingAdvanceId.getDataAccountMajor().getFkAccountSystemTypeId();
-                            }
-                        }
                     }
                 }
 
@@ -553,13 +514,6 @@ public class SFormAccountTax extends javax.swing.JDialog implements erp.lib.form
                                 "'" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT }) + "' o " +
                                 "'" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT }) + "'.");
                         validation.setComponent(moPanelFkAccountPendingId.getFieldAccount().getComponent());
-                    }
-                    else if (nSystemTypePendingAdvanceId != SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT &&
-                        nSystemTypePendingAdvanceId != SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT) {
-                        validation.setMessage("El tipo de cuenta de sistema de la cuenta contable de '" + ((TitledBorder) jpAccountPendingAdvance.getBorder()).getTitle() + "' deber ser:\n" +
-                                "'" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT }) + "' o " +
-                                "'" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT }) + "'.");
-                        validation.setComponent(moPanelFkAccountPendingAdvanceId.getFieldAccount().getComponent());
                     }
                 }
             }
@@ -599,7 +553,6 @@ public class SFormAccountTax extends javax.swing.JDialog implements erp.lib.form
         moFieldIsDeleted.setFieldValue(moAccountTax.getIsDeleted());
         moPanelFkAccountId.getFieldAccount().setFieldValue(moAccountTax.getFkAccountPaymentId());
         moPanelFkAccountPendingId.getFieldAccount().setFieldValue(moAccountTax.getFkAccountPaymentPendingId());
-        moPanelFkAccountPendingAdvanceId.getFieldAccount().setFieldValue(moAccountTax.getFkAccountPaymentPendingAdvanceId());
 
         jcbPkTaxBasicId.setEnabled(false);
         jcbPkTaxId.setEnabled(false);
@@ -613,7 +566,6 @@ public class SFormAccountTax extends javax.swing.JDialog implements erp.lib.form
 
         moPanelFkAccountId.refreshPanel();
         moPanelFkAccountPendingId.refreshPanel();
-        moPanelFkAccountPendingAdvanceId.refreshPanel();
     }
 
     @Override
@@ -633,7 +585,6 @@ public class SFormAccountTax extends javax.swing.JDialog implements erp.lib.form
         moAccountTax.setIsDeleted(moFieldIsDeleted.getBoolean());
         moAccountTax.setFkAccountPaymentId(moPanelFkAccountId.getFieldAccount().getString());
         moAccountTax.setFkAccountPaymentPendingId(moPanelFkAccountPendingId.getFieldAccount().getString());
-        moAccountTax.setFkAccountPaymentPendingAdvanceId(moPanelFkAccountPendingAdvanceId.getFieldAccount().getString());
 
         return moAccountTax;
     }

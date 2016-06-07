@@ -57,13 +57,13 @@ public class SDataFiscalYearClosing extends erp.lib.data.SDataRegistry implement
                 debit = 0;
                 credit = rs.getDouble("f_bal");
                 sysAccountTypeKey = SModSysConsts.FINS_TP_SYS_MOV_YO_CDT;
-                sysAccountMovTypeKey = SModSysConsts.FINS_TP_SYS_MOV_PROF_PROF;
+                sysAccountMovTypeKey = SDataConstantsSys.FINS_TP_SYS_MOV_PROF_PROF;
             }
             else {
                 debit = - rs.getDouble("f_bal");
                 credit = 0;
                 sysAccountTypeKey = SModSysConsts.FINS_TP_SYS_MOV_YO_DBT;
-                sysAccountMovTypeKey = SModSysConsts.FINS_TP_SYS_MOV_PROF_LOSS;
+                sysAccountMovTypeKey = SDataConstantsSys.FINS_TP_SYS_MOV_PROF_LOSS;
             }
 
             if (rs.getDouble("f_bal_cur") >= 0) {

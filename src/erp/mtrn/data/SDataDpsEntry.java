@@ -145,7 +145,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
 
     protected int mnAuxPkDpsYearId; // DPS for adjustment DPS in record entries
     protected int mnAuxPkDpsDocId; // DPS for adjustment DPS in record entries
-    protected int[] mnAuxPkDpsEntryPrice; // DPS for adjustment DPS in record entries
+    protected int[] manAuxPkDpsEntryPrice;
     protected boolean mbAuxPreserveQuantity; // preserve customized quantity
 
     protected boolean mbFlagReadLinksAswell; // Read aswell links and adjustments
@@ -401,20 +401,22 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
 
     public void setAuxPkDpsYearId(int n) { mnAuxPkDpsYearId = n; }
     public void setAuxPkDpsDocId(int n) { mnAuxPkDpsDocId = n; }
-    public void setAuxPkDpsEntryPrice(int[] n) { mnAuxPkDpsEntryPrice = n; }
+    public void setAuxPkDpsEntryPrice(int[] n) { manAuxPkDpsEntryPrice = n; }
     public void setAuxPreserveQuantity(boolean b) { mbAuxPreserveQuantity = b; }
 
     public int getAuxPkDpsYearId() { return mnAuxPkDpsYearId; }
     public int getAuxPkDpsDocId() { return mnAuxPkDpsDocId; }
-    public int[] getAuxPkDpsEntryPriceId() { return mnAuxPkDpsEntryPrice; }
+    public int[] getAuxPkDpsEntryPriceId() { return manAuxPkDpsEntryPrice; }
     public boolean isAuxPreserveQuantity() { return mbAuxPreserveQuantity; }
 
     public void setFlagReadLinksAswell(boolean b) { mbFlagReadLinksAswell = b; }
     public boolean getFlagReadLinksAswell() { return mbFlagReadLinksAswell; }
 
-    public int[] getDpsKey() { return new int[] { mnPkYearId, mnPkDocId }; }
-    public int[] getDpsAdjustmentType() { return new int[] { mnFkDpsAdjustmentTypeId }; }
-    public int[] getDpsAdjustmentSubtype() { return new int[] { mnFkDpsAdjustmentTypeId, mnFkDpsAdjustmentSubtypeId }; }
+    public int[] getKeyDps() { return new int[] { mnPkYearId, mnPkDocId }; }
+    public int[] getKeyDpsAdjustmentType() { return new int[] { mnFkDpsAdjustmentTypeId }; }
+    public int[] getKeyDpsAdjustmentSubtype() { return new int[] { mnFkDpsAdjustmentTypeId, mnFkDpsAdjustmentSubtypeId }; }
+    public int[] getKeyCashAccount() { return new int[] { mnFkCashCompanyBranchId_n, mnFkCashAccountId_n }; }
+    public int[] getKeyAuxDps() { return new int[] { mnAuxPkDpsYearId, mnAuxPkDpsDocId }; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -553,7 +555,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
 
         mnAuxPkDpsYearId = 0;
         mnAuxPkDpsDocId = 0;
-        mnAuxPkDpsEntryPrice = null;
+        manAuxPkDpsEntryPrice = null;
         mbAuxPreserveQuantity = false;
     }
 
@@ -841,12 +843,12 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                                 + "WHERE id_des_year = " + mnPkYearId + " AND id_des_doc = " + mnPkDocId + " AND id_des_ety = " + mnPkEntryId + " ;";
                         resultSet = statement.executeQuery(sql);
                         while (resultSet.next()) {
-                            mnAuxPkDpsEntryPrice = new int[4]; 
+                            manAuxPkDpsEntryPrice = new int[4]; 
                             
-                            mnAuxPkDpsEntryPrice[0] = resultSet.getInt("ds.id_src_year");
-                            mnAuxPkDpsEntryPrice[1] = resultSet.getInt("ds.id_src_doc");
-                            mnAuxPkDpsEntryPrice[2] = resultSet.getInt("ds.id_src_ety");
-                            mnAuxPkDpsEntryPrice[3] = resultSet.getInt("dep.id_prc");                        
+                            manAuxPkDpsEntryPrice[0] = resultSet.getInt("ds.id_src_year");
+                            manAuxPkDpsEntryPrice[1] = resultSet.getInt("ds.id_src_doc");
+                            manAuxPkDpsEntryPrice[2] = resultSet.getInt("ds.id_src_ety");
+                            manAuxPkDpsEntryPrice[3] = resultSet.getInt("dep.id_prc");                        
                         }
                     }
 
@@ -1000,7 +1002,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
             if (mnFkVehicleTypeId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkVehicleTypeId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
             if (mnFkCashCompanyBranchId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkCashCompanyBranchId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
             if (mnFkCashAccountId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkCashAccountId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
-            if (msFkCostCenterId_n.length() > SLibConsts.UNDEFINED) callableStatement.setString(nParam++, msFkCostCenterId_n); else callableStatement.setNull(nParam++, java.sql.Types.CHAR);
+            if (!msFkCostCenterId_n.isEmpty()) callableStatement.setString(nParam++, msFkCostCenterId_n); else callableStatement.setNull(nParam++, java.sql.Types.CHAR);
             if (mnFkItemRefId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkItemRefId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.INTEGER);
@@ -1555,7 +1557,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
 
         clone.setAuxPkDpsYearId(mnAuxPkDpsYearId);
         clone.setAuxPkDpsDocId(mnAuxPkDpsDocId);
-        clone.setAuxPkDpsEntryPrice(mnAuxPkDpsEntryPrice);
+        clone.setAuxPkDpsEntryPrice(manAuxPkDpsEntryPrice);
         clone.setAuxPreserveQuantity(mbAuxPreserveQuantity);
 
         return clone;

@@ -2395,7 +2395,6 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     @Override
     public int process(java.sql.Connection connection) {
-
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
         try {

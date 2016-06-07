@@ -5,9 +5,6 @@
 
 package erp.mtrn.view;
 
-import java.util.Date;
-import javax.swing.JButton;
-
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
@@ -17,10 +14,8 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
-
-import net.sf.jasperreports.view.save.JRPdfSaveContributor.*;
-import net.sf.jasperreports.view.JRViewer.*;
-import net.sf.jasperreports.view.save.JRMultipleSheetsXlsSaveContributor.*;
+import java.util.Date;
+import javax.swing.JButton;
 
 /**
  *
@@ -169,7 +164,6 @@ public class SViewDpsPay extends erp.lib.table.STableTab implements java.awt.eve
         }
 
         mvSuscriptors.add(mnTabType);
-        mvSuscriptors.add(SDataConstants.TRN_DSM);
         mvSuscriptors.add(SDataConstants.TRN_DPS);
         mvSuscriptors.add(SDataConstants.CFGU_CUR);
         mvSuscriptors.add(SDataConstants.BPSU_BP);
