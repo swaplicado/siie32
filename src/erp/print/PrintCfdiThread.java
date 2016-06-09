@@ -42,7 +42,7 @@ import sa.lib.db.SDbRegistry;
  *
  * @author JBarajas
  */
-public class Print extends Thread {
+public class PrintCfdiThread extends Thread {
 
     protected SClientInterface miClient;
     protected int mnCfdId;
@@ -52,7 +52,7 @@ public class Print extends Thread {
     
     protected SDialogResult moDialogResult;
     
-    public Print(final SClientInterface client, final int cfdId, final int pnPrintMode, final int pnNumCopies, final int pnSubtypeCfd, SDialogResult dialogResult) {
+    public PrintCfdiThread(final SClientInterface client, final int cfdId, final int pnPrintMode, final int pnNumCopies, final int pnSubtypeCfd, final SDialogResult dialogResult) {
         miClient = client;
         mnCfdId = cfdId;
         mnPrintMode = pnPrintMode;

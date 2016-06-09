@@ -17,7 +17,7 @@ import sa.lib.db.SDbConsts;
 
 /**
  *
- * @author Néstor Ávalos, Sergio Flores
+ * @author Néstor Ávalos, Sergio Flores, Juan Barajas
  */
 public class SHrsPayrollReceipt {
 
@@ -251,6 +251,8 @@ public class SHrsPayrollReceipt {
         double dTaxableEarnings = 0;
         double dTaxableEarningsAlt = 0;
         double dAmountMonth = 0;
+        double dTaxNet = 0;
+        double dTaxAccumulatedNet = 0;
         boolean bComputeTax = false;
         boolean foundTax = false;
         boolean foundSubsidy = false;
@@ -489,6 +491,8 @@ public class SHrsPayrollReceipt {
                 oReceiptDeductionTax.setReceiptDeduction(dbReceiptDeductionTax);
 
                 //maHrsDeductions.add(oReceiptDeductionTax); XXX jbarajas 2015-09-10 update deduction when is user
+                
+                dTaxNet = dbReceiptDeductionTax.getAmountUnitary();
             }
 
             // Compute tax subsidy:
@@ -561,17 +565,20 @@ public class SHrsPayrollReceipt {
                 oReceiptEarningSubsidy.setXtaValue(dbReceiptEarningSubsidy.getUnits());
 
                 //maHrsEarnings.add(oReceiptEarningSubsidy); XXX jbarajas 2015-09-10 update deduction when is user
+                
+                dTaxNet -= dbReceiptEarningSubsidy.getAmountUnitary();
             }
         }
-
-         // Remove previous tax:
+        
+        // Remove previous tax:
 
         aDeductionsToRemove = new ArrayList<SHrsPayrollReceiptDeduction>();
 
         for (SHrsPayrollReceiptDeduction deduction : maHrsDeductions) {
             if (deduction.getReceiptDeduction().getFkDeductionTypeId() == SModSysConsts.HRSS_TP_DED_TAX) {
                 if (deduction.getReceiptDeduction().isUserEdited() || !deduction.getReceiptDeduction().isAutomatic()) {
-                    deduction.getReceiptDeduction().setAmountSystem_r(SLibUtils.round(dTaxComputed - dTaxAccumulated, SUtilConsts.DECS_AMT));    // preserve user input
+                    //deduction.getReceiptDeduction().setAmountSystem_r(SLibUtils.round(dTaxComputed - dTaxAccumulated, SUtilConsts.DECS_AMT)); XXX (jbarajas, 2016-05-17) new computation for tax, net or tax subsidy and tax by separate    // preserve user input
+                    deduction.getReceiptDeduction().setAmountSystem_r(!moHrsPayroll.getConfig().isTaxNet() ? SLibUtils.round(dTaxComputed - dTaxAccumulated, SUtilConsts.DECS_AMT) : (dTaxNet > 0 ? dTaxNet : 0));    // preserve user input
                     dTaxSetByUser += SLibUtils.round(deduction.getReceiptDeduction().getAmount_r(), SUtilConsts.DECS_AMT);
                     foundTax = true;
                 }
@@ -582,7 +589,7 @@ public class SHrsPayrollReceipt {
         }
 
         if (!aDeductionsToRemove.isEmpty()) {
-            if ((dTaxComputed - dTaxAccumulated) <= 0) {
+            if ((!moHrsPayroll.getConfig().isTaxNet() ? (dTaxComputed - dTaxAccumulated) : dTaxNet) <= 0) {
                 for (SHrsPayrollReceiptDeduction deduction : aDeductionsToRemove) {
                     maHrsDeductions.remove(deduction);
                 }
@@ -595,7 +602,8 @@ public class SHrsPayrollReceipt {
                 for (SHrsPayrollReceiptDeduction deductionRemove : aDeductionsToRemove) {
                     for (SHrsPayrollReceiptDeduction deduction : maHrsDeductions) {
                         if (SLibUtils.compareKeys(new int[] { deduction.getPkMoveId() }, new int[] { deductionRemove.getPkMoveId() })) {
-                            deduction.getReceiptDeduction().setAmountUnitary(SLibUtils.round(dTaxComputed - dTaxAccumulated, SUtilConsts.DECS_AMT));
+                            //deduction.getReceiptDeduction().setAmountUnitary(SLibUtils.round(dTaxComputed - dTaxAccumulated, SUtilConsts.DECS_AMT)); XXX (jbarajas, 2016-05-17) new computation for tax, net or tax subsidy and tax by separate
+                            deduction.getReceiptDeduction().setAmountUnitary(!moHrsPayroll.getConfig().isTaxNet() ? SLibUtils.round(dTaxComputed - dTaxAccumulated, SUtilConsts.DECS_AMT) : (dTaxNet > 0 ? dTaxNet : 0));
                             deduction.getReceiptDeduction().setAmountSystem_r(deduction.getReceiptDeduction().getAmountUnitary());
                             deduction.getReceiptDeduction().setAmount_r(deduction.getReceiptDeduction().getAmountUnitary());
                         }
@@ -604,7 +612,17 @@ public class SHrsPayrollReceipt {
             }
         }
         else if (!foundTax && oReceiptDeductionTax != null) {
-            maHrsDeductions.add(oReceiptDeductionTax);
+            // maHrsDeductions.add(oReceiptDeductionTax); XXX (jbarajas, 2016-05-17) new computation for tax, net or tax subsidy and tax by separate
+            if (!moHrsPayroll.getConfig().isTaxNet()) {
+                maHrsDeductions.add(oReceiptDeductionTax);
+            }
+            else if (dTaxNet > 0) {
+                oReceiptDeductionTax.getReceiptDeduction().setAmountUnitary(dTaxNet);
+                oReceiptDeductionTax.getReceiptDeduction().setAmountSystem_r(oReceiptDeductionTax.getReceiptDeduction().getAmountUnitary());
+                oReceiptDeductionTax.getReceiptDeduction().setAmount_r(oReceiptDeductionTax.getReceiptDeduction().getAmountUnitary());
+                
+                maHrsDeductions.add(oReceiptDeductionTax);
+            }
         }
         
         // Remove previous tax subsidy:
@@ -614,7 +632,8 @@ public class SHrsPayrollReceipt {
         for (SHrsPayrollReceiptEarning earning : maHrsEarnings) {
             if (earning.getReceiptEarning().getFkEarningTypeId() == SModSysConsts.HRSS_TP_EAR_TAX_SUB) {
                 if (earning.getReceiptEarning().isUserEdited() || !earning.getReceiptEarning().isAutomatic()) {
-                    earning.getReceiptEarning().setAmountSystem_r(SLibUtils.round(dSubsidyComputed - dSubsidyAccumulated, SUtilConsts.DECS_AMT));    // preserve user input
+                    //earning.getReceiptEarning().setAmountSystem_r(SLibUtils.round(dSubsidyComputed - dSubsidyAccumulated, SUtilConsts.DECS_AMT)); XXX (jbarajas, 2016-05-17) new computation for tax, net or tax subsidy and tax by separate    // preserve user input
+                    earning.getReceiptEarning().setAmountSystem_r(!moHrsPayroll.getConfig().isTaxNet() ? SLibUtils.round(dSubsidyComputed - dSubsidyAccumulated, SUtilConsts.DECS_AMT) : (dTaxNet < 0 ? Math.abs(dTaxNet) : 0));    // preserve user input
                     dSubsidySetByUser += SLibUtils.round( earning.getReceiptEarning().getAmount_r(), SUtilConsts.DECS_AMT);
                     foundSubsidy = true;
                 }
@@ -625,7 +644,7 @@ public class SHrsPayrollReceipt {
         }
 
         if (!aEarningsToRemove.isEmpty()) {
-            if ((dSubsidyComputed - dSubsidyAccumulated) <= 0) {
+            if ((!moHrsPayroll.getConfig().isTaxNet() ? (dSubsidyComputed - dSubsidyAccumulated) <= 0 : dTaxNet > 0)) {
                 for (SHrsPayrollReceiptEarning earning : aEarningsToRemove) {
                     maHrsEarnings.remove(earning);
                 }
@@ -638,7 +657,8 @@ public class SHrsPayrollReceipt {
                 for (SHrsPayrollReceiptEarning earningRemove : aEarningsToRemove) {
                     for (SHrsPayrollReceiptEarning earning : maHrsEarnings) {
                         if (SLibUtils.compareKeys(new int[] { earning.getPkMoveId() }, new int[] { earningRemove.getPkMoveId() })) {
-                            earning.getReceiptEarning().setAmountUnitary(SLibUtils.round(dSubsidyComputed - dSubsidyAccumulated, SUtilConsts.DECS_AMT));
+                            //earning.getReceiptEarning().setAmountUnitary(SLibUtils.round(dSubsidyComputed - dSubsidyAccumulated, SUtilConsts.DECS_AMT)); XXX (jbarajas, 2016-05-17) new computation for tax, net or tax subsidy and tax by separate
+                            earning.getReceiptEarning().setAmountUnitary(!moHrsPayroll.getConfig().isTaxNet() ? SLibUtils.round(dSubsidyComputed - dSubsidyAccumulated, SUtilConsts.DECS_AMT) : (dTaxNet < 0 ? Math.abs(dTaxNet) : 0));
                             earning.getReceiptEarning().setAmountSystem_r(earning.getReceiptEarning().getAmountUnitary());
                             earning.getReceiptEarning().setAmount_r(earning.getReceiptEarning().getAmountUnitary());
                         }
@@ -647,7 +667,17 @@ public class SHrsPayrollReceipt {
             }
         }
         else if (!foundSubsidy && oReceiptEarningSubsidy != null) {
-            maHrsEarnings.add(oReceiptEarningSubsidy);
+            // maHrsEarnings.add(oReceiptEarningSubsidy); XXX (jbarajas, 2016-05-17) new computation for tax, net or tax subsidy and tax by separate
+            if (!moHrsPayroll.getConfig().isTaxNet()) {
+                maHrsEarnings.add(oReceiptEarningSubsidy);
+            }
+            else if (dTaxNet < 0) {
+                oReceiptEarningSubsidy.getReceiptEarning().setAmountUnitary(Math.abs(dTaxNet));
+                oReceiptEarningSubsidy.getReceiptEarning().setAmountSystem_r(oReceiptEarningSubsidy.getReceiptEarning().getAmountUnitary());
+                oReceiptEarningSubsidy.getReceiptEarning().setAmount_r(oReceiptEarningSubsidy.getReceiptEarning().getAmountUnitary());
+                
+                maHrsEarnings.add(oReceiptEarningSubsidy);
+            }
         }
         
         if (!bComputeTax) {
@@ -677,18 +707,27 @@ public class SHrsPayrollReceipt {
                     moReceipt.setTaxSubsidyAnnualActual(0);
                     break;
                 case SModSysConsts.HRSS_TP_TAX_COMP_PAY:
+                    /* XXX (jbarajas, 2016-05-17) new computation for tax, net or tax subsidy and tax by separate:
                     moReceipt.setTaxPayrollTheorical(dTaxComputed);
                     //moReceipt.setTaxPayrollActual(!aDeductionsByUser.isEmpty() ? dTaxSetByUser : moReceipt.getTaxPayrollTheorical()); XXX jbarajas 2015-09-10 update deduction when is user
                     moReceipt.setTaxPayrollActual(dTaxSetByUser != 0 ? dTaxSetByUser : moReceipt.getTaxPayrollTheorical());
                     moReceipt.setTaxSubsidyPayrollTheorical(dSubsidyComputed);
                     //moReceipt.setTaxSubsidyPayrollActual(!aEarningsByUser.isEmpty() ? dSubsidySetByUser : moReceipt.getTaxSubsidyPayrollTheorical()); XXX jbarajas 2015-09-10 update deduction when is user
                     moReceipt.setTaxSubsidyPayrollActual(dSubsidySetByUser != 0 ? dSubsidySetByUser : moReceipt.getTaxSubsidyPayrollTheorical());
+                    */
+                    
+                    moReceipt.setTaxPayrollTheorical(!moHrsPayroll.getConfig().isTaxNet() ? dTaxComputed : (dTaxNet > 0 ? dTaxNet : 0));
+                    moReceipt.setTaxPayrollActual(dTaxSetByUser != 0 ? dTaxSetByUser : moReceipt.getTaxPayrollTheorical());
+                    moReceipt.setTaxSubsidyPayrollTheorical(!moHrsPayroll.getConfig().isTaxNet() ? dSubsidyComputed : (dTaxNet < 0 ? Math.abs(dTaxNet) : 0));
+                    moReceipt.setTaxSubsidyPayrollActual(dSubsidySetByUser != 0 ? dSubsidySetByUser : moReceipt.getTaxSubsidyPayrollTheorical());
+                    
                     moReceipt.setTaxAnnualTheorical(0);
                     moReceipt.setTaxAnnualActual(0);
                     moReceipt.setTaxSubsidyAnnualTheorical(0);
                     moReceipt.setTaxSubsidyAnnualActual(0);
                     break;
                 case SModSysConsts.HRSS_TP_TAX_COMP_ANN:
+                    /* XXX (jbarajas, 2016-05-17) new computation for tax, net or tax subsidy and tax by separate:
                     moReceipt.setTaxPayrollTheorical(dTaxComputed <= dTaxAccumulated ? 0 : SLibUtils.round(dTaxComputed - dTaxAccumulated, SUtilConsts.DECS_AMT));
                     //moReceipt.setTaxPayrollActual(!aDeductionsByUser.isEmpty() ? dTaxSetByUser : moReceipt.getTaxPayrollTheorical()); XXX jbarajas 2015-09-10 update deduction when is user
                     moReceipt.setTaxPayrollActual(dTaxSetByUser != 0 ? dTaxSetByUser : moReceipt.getTaxPayrollTheorical());
@@ -699,6 +738,18 @@ public class SHrsPayrollReceipt {
                     moReceipt.setTaxAnnualActual(dTaxAccumulated);
                     moReceipt.setTaxSubsidyAnnualTheorical(dSubsidyComputed);
                     moReceipt.setTaxSubsidyAnnualActual(dSubsidyAccumulated);
+                    */
+                    
+                    dTaxAccumulatedNet = (dTaxAccumulated - dSubsidyAccumulated);
+                    
+                    moReceipt.setTaxPayrollTheorical(!moHrsPayroll.getConfig().isTaxNet() ? (dTaxComputed <= dTaxAccumulated ? 0 : SLibUtils.round(dTaxComputed - dTaxAccumulated, SUtilConsts.DECS_AMT)) : (dTaxAccumulatedNet > 0 ? dTaxAccumulatedNet : 0));
+                    moReceipt.setTaxPayrollActual(dTaxSetByUser != 0 ? dTaxSetByUser : moReceipt.getTaxPayrollTheorical());
+                    moReceipt.setTaxSubsidyPayrollTheorical(dSubsidyComputed <= dSubsidyAccumulated ? 0 : SLibUtils.round(dSubsidyComputed - dSubsidyAccumulated, SUtilConsts.DECS_AMT));
+                    moReceipt.setTaxSubsidyPayrollActual(dSubsidySetByUser != 0 ? dSubsidySetByUser : moReceipt.getTaxSubsidyPayrollTheorical());
+                    moReceipt.setTaxAnnualTheorical(!moHrsPayroll.getConfig().isTaxNet() ? dTaxComputed : (dTaxNet > 0 ? dTaxNet : 0));
+                    moReceipt.setTaxAnnualActual(!moHrsPayroll.getConfig().isTaxNet() ? dTaxAccumulated : (dTaxAccumulatedNet > 0 ? dTaxAccumulatedNet : 0));
+                    moReceipt.setTaxSubsidyAnnualTheorical(!moHrsPayroll.getConfig().isTaxNet() ? dSubsidyComputed : (dTaxNet < 0 ? Math.abs(dTaxNet) : 0));
+                    moReceipt.setTaxSubsidyAnnualActual(!moHrsPayroll.getConfig().isTaxNet() ? dSubsidyAccumulated : (dTaxAccumulatedNet < 0 ? Math.abs(dTaxAccumulatedNet) : 0));
                     break;
                 default:
                     throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

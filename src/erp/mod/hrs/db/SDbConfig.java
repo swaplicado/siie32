@@ -30,6 +30,7 @@ public class SDbConfig extends SDbRegistryUser {
     protected double mdPayrollTaxRate;
     protected boolean mbFornightStandard;
     protected boolean mbTaxSubsidyEarning;
+    protected boolean mbTaxNet;
     //protected boolean mbDeleted;
     protected int mnFkMwzTypeId;
     protected int mnFkMwzReferenceTypeId;
@@ -63,6 +64,7 @@ public class SDbConfig extends SDbRegistryUser {
     public void setPayrollTaxRate(double d) { mdPayrollTaxRate = d; }
     public void setFornightStandard(boolean b) { mbFornightStandard = b; }
     public void setTaxSubsidyEarning(boolean b) { mbTaxSubsidyEarning = b; }
+    public void setTaxNet(boolean b) { mbTaxNet = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkMwzTypeId(int n) { mnFkMwzTypeId = n; }
     public void setFkMwzReferenceTypeId(int n) { mnFkMwzReferenceTypeId = n; }
@@ -90,6 +92,7 @@ public class SDbConfig extends SDbRegistryUser {
     public double getPayrollTaxRate() { return mdPayrollTaxRate; }
     public boolean isFornightStandard() { return mbFornightStandard; }
     public boolean isTaxSubsidyEarning() { return mbTaxSubsidyEarning; }
+    public boolean isTaxNet() { return mbTaxNet; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkMwzTypeId() { return mnFkMwzTypeId; }
     public int getFkMwzReferenceTypeId() { return mnFkMwzReferenceTypeId; }
@@ -131,6 +134,7 @@ public class SDbConfig extends SDbRegistryUser {
         mdPayrollTaxRate = 0;
         mbFornightStandard = false;
         mbTaxSubsidyEarning = false;
+        mbTaxNet = false;
         mbDeleted = false;
         mnFkMwzTypeId = 0;
         mnFkMwzReferenceTypeId = 0;
@@ -193,6 +197,7 @@ public class SDbConfig extends SDbRegistryUser {
             mdPayrollTaxRate = resultSet.getDouble("pay_tax_rate");
             mbFornightStandard = resultSet.getBoolean("b_for_std");
             mbTaxSubsidyEarning = resultSet.getBoolean("b_tax_sub_ear");
+            mbTaxNet = resultSet.getBoolean("b_tax_net");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkMwzTypeId = resultSet.getInt("fk_tp_mwz");
             mnFkMwzReferenceTypeId = resultSet.getInt("fk_tp_mwz_ref");
@@ -241,6 +246,7 @@ public class SDbConfig extends SDbRegistryUser {
                     mdPayrollTaxRate + ", " + 
                     (mbFornightStandard ? 1 : 0) + ", " + 
                     (mbTaxSubsidyEarning ? 1 : 0) + ", " +
+                    (mbTaxNet ? 1 : 0) + ", " +
                     (mbDeleted ? 1 : 0) + ", " +
                     mnFkMwzTypeId + ", " +
                     mnFkMwzReferenceTypeId + ", " +
@@ -273,6 +279,7 @@ public class SDbConfig extends SDbRegistryUser {
                     "pay_tax_rate = " + mdPayrollTaxRate + ", " +
                     "b_for_std = " + (mbFornightStandard ? 1 : 0) + ", " +
                     "b_tax_sub_ear = " + (mbTaxSubsidyEarning ? 1 : 0) + ", " +
+                    "b_tax_net = " + (mbTaxNet ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_tp_mwz = " + mnFkMwzTypeId + ", " +
                     "fk_tp_mwz_ref = " + mnFkMwzReferenceTypeId + ", " +
@@ -311,6 +318,7 @@ public class SDbConfig extends SDbRegistryUser {
         registry.setPayrollTaxRate(this.getPayrollTaxRate());
         registry.setFornightStandard(this.isFornightStandard());
         registry.setTaxSubsidyEarning(this.isTaxSubsidyEarning());
+        registry.setTaxNet(this.isTaxNet());
         registry.setDeleted(this.isDeleted());
         registry.setFkMwzTypeId(this.getFkMwzTypeId());
         registry.setFkMwzReferenceTypeId(this.getFkMwzReferenceTypeId());

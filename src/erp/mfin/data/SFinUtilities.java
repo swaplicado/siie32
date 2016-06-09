@@ -5,12 +5,16 @@
 package erp.mfin.data;
 
 import erp.client.SClientInterface;
+import erp.data.SDataConstants;
+import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.table.STableUtilities;
 import erp.mod.fin.db.SDbAccount;
+import erp.mod.fin.db.SFinUtils;
 import erp.mod.fin.db.SLayoutBankPaymentTxt;
 import erp.mod.fin.db.SLayoutBankRow;
+import erp.mtrn.data.SDataDpsEntry;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -1115,8 +1119,7 @@ public abstract class SFinUtilities {
         return true;
     }
     
-    
-    public static boolean changeRecortEntriesAccount(final SClientInterface client, final int [] keyOldAccount, final int[] keyNewAccount) throws Exception {
+    public static boolean changeRecordEntriesAccount(final SClientInterface client, final int [] keyOldAccount, final int[] keyNewAccount) throws Exception {
         SDataRecordEntry recordEntry = null;
         SDbAccount oldAccount = null;
         SDbAccount newAccount = null;
@@ -1161,4 +1164,89 @@ public abstract class SFinUtilities {
         
         return true;
     }
+    
+    public static String getAccountForDpsEntry(final SClientInterface client, int[] dpsEntryPk) throws Exception {
+        ResultSet resultSet = null;
+        String account = "";
+        String sql = "";
+        SDataDpsEntry entry = (SDataDpsEntry) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS_ETY, dpsEntryPk, SLibConstants.EXEC_MODE_VERBOSE);
+        
+        sql = "SELECT fid_acc " +
+                "FROM trn_dps_rec AS dr " +
+                "INNER JOIN fin_rec AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num " +
+                "INNER JOIN fin_rec_ety AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num " +
+                "WHERE dr.id_dps_year = " + dpsEntryPk[0] + " AND dr.id_dps_doc = " + dpsEntryPk[1] + " AND re.b_del = 0 AND re.fid_item_n = " + entry.getFkItemId();
+        resultSet = client.getSession().getStatement().executeQuery(sql);
+        
+        while (resultSet.next()) {
+            account = resultSet.getString("fid_acc");
+        }
+        
+        return account;
+    }
+    
+    public static String getCostCenterForDpsEntry(final SClientInterface client, int[] dpsEntryPk) throws Exception {
+        ResultSet resultSet = null;
+        String costCenter = "";
+        String sql = "";
+        SDataDpsEntry entry = (SDataDpsEntry) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS_ETY, dpsEntryPk, SLibConstants.EXEC_MODE_VERBOSE);
+        
+        sql = "SELECT IF(fid_cc_n IS NULL, '', fid_cc_n) AS _cc " +
+                "FROM trn_dps_rec AS dr " +
+                "INNER JOIN fin_rec AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num " +
+                "INNER JOIN fin_rec_ety AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num " +
+                "WHERE dr.id_dps_year = " + dpsEntryPk[0] + " AND dr.id_dps_doc = " + dpsEntryPk[1] + " AND re.b_del = 0 AND re.fid_item_n = " + entry.getFkItemId();
+        resultSet = client.getSession().getStatement().executeQuery(sql);
+        
+        while (resultSet.next()) {
+            costCenter = resultSet.getString("_cc");
+        }
+        
+        return costCenter;
+    }
+    
+    public static boolean updateAccountCostCenterForDpsEntry(final SClientInterface client, int[] dpsEntryPk, String account, String costCenter) throws Exception {
+        int accountPk = 0;
+        int costCenterPk = 0;
+        ResultSet resultSet = null;
+        String sql = "";
+        Object[] key = null;
+        SDataDpsEntry entry = null;
+        
+        entry = (SDataDpsEntry) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS_ETY, dpsEntryPk, SLibConstants.EXEC_MODE_VERBOSE);
+        accountPk = SFinUtils.getAccountId(client.getSession(), account);
+        costCenterPk = SFinUtils.getCostCenterId(client.getSession(), costCenter);
+        
+        sql = "SELECT re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety " +
+                "FROM trn_dps_rec AS dr " +
+                "INNER JOIN fin_rec AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num " +
+                "INNER JOIN fin_rec_ety AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num " +
+                "WHERE dr.id_dps_year = " + dpsEntryPk[0] + " AND dr.id_dps_doc = " + dpsEntryPk[1] + " AND re.b_del = 0 AND re.fid_item_n = " + entry.getFkItemId();
+        resultSet = client.getSession().getStatement().executeQuery(sql);
+        
+        while (resultSet.next()) {
+            key = new Object[6];
+            key[0] = resultSet.getInt("re.id_year");
+            key[1] = resultSet.getInt("re.id_per"); 
+            key[2] = resultSet.getInt("re.id_bkc"); 
+            key[3] = resultSet.getString("re.id_tp_rec"); 
+            key[4] = resultSet.getInt("re.id_num"); 
+            key[5] = resultSet.getInt("re.id_ety");
+        }
+        
+        sql = "UPDATE fin_rec_ety SET fid_acc = '" + account + "', fk_acc = " + accountPk + ", " +
+                (costCenter.isEmpty() ? "fid_cc_n = NULL, fk_cc_n = 0" : "fid_cc_n = '" + costCenter + "', fk_cc_n = " + costCenterPk) + ", " +
+                "fid_usr_edit = " + client.getSession().getUser().getPkUserId() + ", ts_edit = NOW() " +
+                "WHERE id_year = " + key[0] + " AND id_per = " + key[1] + " AND id_bkc = " + key[2] + " AND id_tp_rec = '" + key[3] + "' AND id_num = " + key[4] + " AND " +
+                "id_ety = " + key[5] + ";";
+        client.getSession().getStatement().execute(sql);
+        
+        sql = "UPDATE trn_dps_ety " +
+                "SET " + (costCenter.isEmpty() ? "fid_cc_n = NULL " : "fid_cc_n = '" + costCenter + "' ") +
+                "WHERE id_year = " + dpsEntryPk[0] + " AND id_doc = " + dpsEntryPk[1] + " AND id_ety = " + dpsEntryPk[2] + ";";
+        client.getSession().getStatement().execute(sql);
+        
+        return true;
+    }
+
 }

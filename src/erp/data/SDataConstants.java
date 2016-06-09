@@ -350,6 +350,7 @@ public abstract class SDataConstants {
     public static final int FINX_TAX_GRP_ALL_IGEN = 206513;
     public static final int FINX_TAX_BAS_TAX = 206514;
     public static final int FINX_ACCOUNTING = 206515;
+    public static final int FINX_ACCOUNTING_ALL = 206521;
     public static final int FINX_ACC_BP_QRY = 206516;
     public static final int FINX_ACC_ITEM_QRY = 206517;
     public static final int FINX_REC_USER = 206518;

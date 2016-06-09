@@ -61,7 +61,12 @@ public class SDialogRepTrialBalanceDual extends javax.swing.JDialog implements j
 
     private boolean mbIsAuxCostCenter;
 
-    /** Creates new form SDialogRepTrialBalanceAndBalanceCostCenter */
+    /** 
+     * Creates new form SDialogRepTrialBalanceAndBalanceCostCenter
+     * @param client
+     * @param nReportType
+     * @param bIsAux 
+     **/
     public SDialogRepTrialBalanceDual(erp.client.SClientInterface client, int nReportType, boolean bIsAux) {
         super(client.getFrame(), true);
         miClient = client;
@@ -622,19 +627,19 @@ public class SDialogRepTrialBalanceDual extends javax.swing.JDialog implements j
                     if (mbIsAuxCostCenter) {
                         map.put("sTitle", getTitle().toUpperCase());
                         map.put("bIsAuxCostCenter", true);
-                        map.put("bIsWithDetail", jckIsWithDetail.isSelected() ? true : false);
-                        map.put("bIsByCostCenter", jrbByCostCenterAccount.isSelected() ? true : false);
+                        map.put("bIsWithDetail", jckIsWithDetail.isSelected());
+                        map.put("bIsByCostCenter", jrbByCostCenterAccount.isSelected());
                         map.put("nNumRecordLength", SDataConstantsSys.NUM_LEN_FIN_REC);
                         map.put("sSql", jrbByCostCenterAccount.isSelected() ? createParamSqlCostCenter() : createParamSqlAccount());
                         map.put("sSqlAccountRange", " AND re.fid_acc BETWEEN '" + msAccountStartId + "' AND '" + msAccountEndId + "' ");
                         map.put("sSqlCostCenterRange", " AND re.fid_cc_n BETWEEN '" + msCostCenterBeginId + "' AND '" + msCostCenterEndId + "' ");
                         map.put("sSqlItem", moFieldItem.getKeyAsIntArray()[0] == 0 ? "" : " AND re.fid_item_n = " + moFieldItem.getKeyAsIntArray()[0] + " ");
-                        map.put("bIsItemOrderByKey", miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? true : false);
-                        map.put("sSqlGroupBy", jckShowItems.isSelected() ? jrbByCostCenterAccount.isSelected() ? " GROUP BY i.item_key, i.item, re.fid_acc, r.dt, re.concept, bkc.code, cob.code " :
-                            " GROUP BY i.item_key, i.item, re.fid_cc_n, r.dt, re.concept, bkc.code, cob.code " : jrbByCostCenterAccount.isSelected() ? " GROUP BY re.fid_acc, r.dt, re.concept, bkc.code, cob.code, i.item_key, i.item " :
+                        map.put("bIsItemOrderByKey", miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME);
+                        map.put("sSqlGroupBy", jckShowItems.isSelected() ? jrbByCostCenterAccount.isSelected() ? " GROUP BY re.fid_acc, i.item_key, i.item, r.dt, re.concept, bkc.code, cob.code " :
+                            " GROUP BY re.fid_cc_n, i.item_key, i.item, r.dt, re.concept, bkc.code, cob.code " : jrbByCostCenterAccount.isSelected() ? " GROUP BY re.fid_acc, r.dt, re.concept, bkc.code, cob.code, i.item_key, i.item " :
                             " GROUP BY re.fid_cc_n, r.dt, re.concept, bkc.code, cob.code, i.item_key, i.item ");
-                        map.put("sSqlOrderBy", jckShowItems.isSelected() ? jrbByCostCenterAccount.isSelected() ? " ORDER BY i.item_key, i.item, re.fid_acc, r.dt, re.concept, bkc.code, cob.code " :
-                            " ORDER BY i.item_key, i.item, re.fid_cc_n, r.dt, re.concept, bkc.code, cob.code " : jrbByCostCenterAccount.isSelected() ? " ORDER BY re.fid_acc, r.dt, re.concept, bkc.code, cob.code, i.item_key, i.item " :
+                        map.put("sSqlOrderBy", jckShowItems.isSelected() ? jrbByCostCenterAccount.isSelected() ? " ORDER BY re.fid_acc, i.item_key, i.item, r.dt, re.concept, bkc.code, cob.code " :
+                            " ORDER BY re.fid_cc_n, i.item_key, i.item, r.dt, re.concept, bkc.code, cob.code " : jrbByCostCenterAccount.isSelected() ? " ORDER BY re.fid_acc, r.dt, re.concept, bkc.code, cob.code, i.item_key, i.item " :
                             " ORDER BY re.fid_cc_n, r.dt, re.concept, bkc.code, cob.code, i.item_key, i.item ");
                     }
                     break;

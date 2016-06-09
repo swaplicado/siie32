@@ -505,6 +505,10 @@ public abstract class SModSysConsts {
     public static final String FINU_TP_REC_SUBSYS_DBR = "SD";
     public static final String FINU_TP_REC_JOURNAL = "Dr";
     public static final String FINU_TP_REC_CASH_BANK = "CB";
+    
+    public static final int FIN_LAY_BANK_REC = 1;
+    public static final int FIN_LAY_BANK_DPS = 2;
+    public static final int FIN_LAY_BANK_ADV = 3;
 
     /*
      * Transactions

@@ -810,7 +810,7 @@ public abstract class STableTab extends javax.swing.JPanel implements erp.lib.ta
                         index = moTablePane.getTableGuiRowCount() - 1;
                     }
 
-                    if (index < moTablePane.getTableGuiRowCount()) {
+                    if (index != -1 && index < moTablePane.getTableGuiRowCount()) {
                         moTablePane.getTable().setRowSelectionInterval(index, index);
                     }
                 }

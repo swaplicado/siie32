@@ -50,6 +50,7 @@ public class SViewConfig extends SGridPaneView {
                 + "v.pay_tax_rate, "
                 + "v.b_for_std, "
                 + "v.b_tax_sub_ear, "
+                + "v.b_tax_net, "
                 + "tmwz.name, "
                 + "tmwz_ref.name, "
                 + "ttax_comp.name, "
@@ -113,6 +114,7 @@ public class SViewConfig extends SGridPaneView {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_4D, "v.pay_tax_rate", "Imp sobre nóminas"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_for_std", "Quincenas fijas 15 días"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_tax_sub_ear", "Sub impto percepción"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_tax_net", "Impto neto"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tmwz.name", "Área geo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tmwz_ref.name", "Área geo referencia"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "ttax_comp.name", "Cálculo impto default"));

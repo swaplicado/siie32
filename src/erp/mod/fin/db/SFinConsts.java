@@ -19,6 +19,9 @@ public class SFinConsts {
     public static final java.lang.String TXT_LAY_BANK_SANTANDER = "LAYOUT SANTANDER";
     public static final java.lang.String TXT_LAY_BANK_BANBAJIO = "LAYOUT BANBAJIO";
     public static final java.lang.String TXT_LAY_BANK_BBVA = "LAYOUT BBVA";
+    
+    public static final int LAY_BANK_TYPE_DPS = 1;
+    public static final int LAY_BANK_TYPE_ADV = 2;
 
     public static final String TXT_BANK_BANK = "BCO.";
     public static final String TXT_BANK_BRA = "SUC.";

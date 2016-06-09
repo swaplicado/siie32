@@ -68,6 +68,8 @@ public class SPanelAccounting extends javax.swing.JPanel implements erp.lib.tabl
 
     protected boolean mbShowRecordAdjYearEnd;
     protected boolean mbShowRecordAdjAudit;
+    
+    protected java.lang.String msAuxAccountId;
 
     /** Creates new form SPanelAccounting */
     public SPanelAccounting(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType) {
@@ -309,8 +311,11 @@ public class SPanelAccounting extends javax.swing.JPanel implements erp.lib.tabl
         moFilterYear = new STabFilterYear(miClient, this);
         moDialogAccountingDetail = new SDialogAccountingDetail(miClient, mnTabTypeAux01);
         moDialogRepBizPartnerAccountingMoves = null;
+        msAuxAccountId = "";
 
-        moPaneAccounting.setDoubleClickAction(this, "publicActionDetail");
+        if (mnTabTypeAux01 != SDataConstants.FINX_ACCOUNTING_ALL) {
+            moPaneAccounting.setDoubleClickAction(this, "publicActionDetail");
+        }
         add(moPaneAccounting, BorderLayout.CENTER);
 
         jpFilters.add(moFilterYear);
@@ -349,6 +354,7 @@ public class SPanelAccounting extends javax.swing.JPanel implements erp.lib.tabl
         i = 0;
         switch (mnTabTypeAux01) {
             case SDataConstants.FINX_ACCOUNTING:
+            case SDataConstants.FINX_ACCOUNTING_ALL:
                 aoTableColumns = new STableColumnForm[11];
                 aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. cuenta contable", STableConstants.WIDTH_ACCOUNT_ID);
                 aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererStyle());
@@ -497,9 +503,14 @@ public class SPanelAccounting extends javax.swing.JPanel implements erp.lib.tabl
         mvSuscriptors.add(SDataConstants.FIN_REC);
         mvSuscriptors.add(SDataConstants.TRN_DPS);
         mvSuscriptors.add(SDataConstants.TRN_DIOG);
+        mvSuscriptors.add(SDataConstants.TRN_DSM);
 
         for (STableColumnForm col : aoTableColumns) {
             moPaneAccounting.addTableColumn(col);
+        }
+        
+        if (mnTabTypeAux01 == SDataConstants.FINX_ACCOUNTING_ALL) {
+            jbDetail.setEnabled(false);
         }
 
         jbDetail.addActionListener(this);
@@ -567,6 +578,7 @@ public class SPanelAccounting extends javax.swing.JPanel implements erp.lib.tabl
                 if (jtbMoney.isSelected()) {
                     switch (mnTabTypeAux01) {
                         case SDataConstants.FINX_ACCOUNTING:
+                        case SDataConstants.FINX_ACCOUNTING_ALL:
                             currencyKey = new int[] { ((SPanelAccountingRow) row).getFkCurrencyId() };
                             break;
 
@@ -628,6 +640,516 @@ public class SPanelAccounting extends javax.swing.JPanel implements erp.lib.tabl
                 }
             }
         }
+    }
+
+    private java.lang.String createParamSqlAccount() {
+        int len = 0;
+        String sql = "";
+        String sSqlWhere = "";
+        String account = miClient.getSessionXXX().getParamsErp().getFormatAccountId().replace('9', '0');
+        Vector<Integer> levels = SDataUtilities.getAccountLevels(account);
+
+        sSqlWhere = (!jtbRecordAdjYearEnd.isSelected() ? " AND r.b_adj_year = 0 " : "") +
+                    (!jtbRecordAdjAudit.isSelected() ? " AND r.b_adj_audit = 0 " : "");
+
+        for (int i = 1; i <= miClient.getSessionXXX().getParamsErp().getDeepAccounts(); i++) {
+            len = i < levels.size() ? levels.get(i) - 1 : account.length();
+
+            /*
+             * 'a' stands for account
+             * 'am' stands for major account
+             */
+
+            sql += (sql.length() == 0 ? "" : "UNION ") +
+                    "SELECT " + ("CONCAT(LEFT(re.fid_acc, " + len + "), '" + account.substring(len) + "')") + " AS f_id_acc, " +
+                    "re.fid_acc, am.deep, am.fid_tp_acc_sys, am.fid_tp_acc_r, " + i + " AS f_lev, " +
+                    "(SELECT a.acc FROM fin_acc AS a WHERE a.id_acc = CONCAT(LEFT(re.fid_acc, " + len + "), '" + account.substring(len) + "')) AS f_acc, " +
+                    "a.dt_start, a.dt_end_n, a.b_act, a.b_del, " +
+                    "" + miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() + " AS f_id_cur, " +
+                    "'" + miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey() + "' AS f_cur_key, " +
+                    "IF(" + i + " = 1, " + STableConstants.STYLE_BOLD + ", IF(" + i + " < " + levels.size() + " AND " + i + " < am.deep, " + STableConstants.STYLE_ITALIC + ", " + STableConstants.UNDEFINED + ")) AS f_style, " +
+                    "COUNT(*) AS f_count, " +
+                    "SUM(CASE WHEN r.dt < '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateStart) + "' THEN re.debit ELSE 0 END) - " +
+                    "SUM(CASE WHEN r.dt < '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateStart) + "' THEN re.credit ELSE 0 END) AS f_ob, " +
+                    "SUM(CASE WHEN r.dt >= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateStart) + "' THEN re.debit ELSE 0 END) AS f_dbt, " +
+                    "SUM(CASE WHEN r.dt >= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateStart) + "' THEN re.credit ELSE 0 END) AS f_cdt " +
+                    "FROM fin_rec AS r INNER JOIN fin_rec_ety AS re ON " +
+                    "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
+                    "r.id_year = " + mnYear + " AND r.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateEnd) + "' AND r.b_del = 0 AND re.b_del = 0 " + sSqlWhere +
+                    "INNER JOIN fin_acc AS a ON " +
+                    "a.id_acc = re.fid_acc " +
+                    "INNER JOIN fin_acc AS am ON " +
+                    "am.id_acc = CONCAT(LEFT(re.fid_acc, " + (levels.get(1) - 1) + "), '" + account.substring(levels.get(1) - 1) + "') " +
+                    "GROUP BY " + ("CONCAT(LEFT(re.fid_acc, " + len + "), '" + account.substring(len) + "') ");
+        }
+
+        sql += "ORDER BY f_id_acc, f_lev ";
+
+        return sql;
+    }
+    
+    private java.lang.String createParamSqlAccountSubsystem(final int accountSubsytemType) {
+        return createParamSqlAccountSubsystem(SLibConstants.UNDEFINED, accountSubsytemType);
+    }
+    
+    private java.lang.String createParamSqlAccountSubsystem(final int accountType, final int accountSubsytemType) {
+        String sSql = "";
+        String sSqlWhere = "";
+        String sCur = "";
+        String sSelect = "";
+        String sGroupBy = "";
+        String sOrderBy = "";
+        
+        sCur = jtbMoney.isSelected() ? "_cur" : "";
+
+        sSqlWhere = (!mbShowRecordAdjYearEnd ? " AND b_adj_year = 0 " : "") +
+                    (!mbShowRecordAdjAudit ? " AND b_adj_audit = 0 " : "");
+
+        if (accountType != SLibConstants.UNDEFINED) {
+            sSql += "SELECT " +
+                    "i.id_item, IF(LENGTH(i.item_short) = 0, i.item, i.item_short) AS f_item, i.item_key, " +
+                    "SUM(CASE WHEN r.dt < '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateStart) + "' THEN re.debit ELSE 0 END) - " +
+                    "SUM(CASE WHEN r.dt < '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateStart) + "' THEN re.credit ELSE 0 END) AS f_ob, " +
+                    "SUM(CASE WHEN r.dt >= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateStart) + "' THEN re.debit ELSE 0 END) AS f_dbt, " +
+                    "SUM(CASE WHEN r.dt >= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateStart) + "' THEN re.credit ELSE 0 END) AS f_cdt " +
+                    "FROM fin_rec AS r INNER JOIN fin_rec_ety AS re ON " +
+                    "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
+                    "r.id_year = " + mnYear + " AND r.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateEnd) + "' AND r.b_del = 0 AND re.b_del = 0 " +
+                    (msAuxAccountId.isEmpty() ? "" : " AND re.fid_acc = '" + msAuxAccountId + "' ") + sSqlWhere +
+                    "LEFT OUTER JOIN erp.itmu_item AS i ON " +
+                    "re.fid_item_n = i.id_item " +
+                    "GROUP BY i.id_item, i.item, i.item_key " +
+                    "ORDER BY " +
+                    (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ?
+                    "i.item_key, f_item, i.id_item " :
+                    "f_item, i.item_key, i.id_item ");
+        }
+        else {
+            switch (accountSubsytemType) {
+                case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_CASH:
+                case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_BANK:
+                    sSelect = "e.id_cob, e.id_ent, bb.bpb, e.ent, e.code, ce.cur_key, e.b_del";
+                    sGroupBy = "e.id_cob, e.id_ent, bb.bpb, e.ent, e.code, ce.cur_key, e.b_del";
+                    sOrderBy = "bb.bpb, e.id_cob, e.ent, e.id_ent";
+                    break;
+
+                case SDataConstantsSys.FINS_TP_ACC_SYS_INV:
+                    sSelect = "e.id_cob, e.id_ent, bb.bpb, e.ent, e.code, e.b_del";
+                    sGroupBy = "e.id_cob, e.id_ent, bb.bpb, e.ent, e.code, e.b_del";
+                    sOrderBy = "bb.bpb, e.id_cob, e.ent, e.id_ent";
+                    break;
+
+                case SDataConstantsSys.FINS_TP_ACC_SYS_SUP:
+                case SDataConstantsSys.FINS_TP_ACC_SYS_CUS:
+                case SDataConstantsSys.FINS_TP_ACC_SYS_CDR:
+                case SDataConstantsSys.FINS_TP_ACC_SYS_DBR:
+                    sSelect = "b.id_bp, b.bp, b.b_del";
+                    sGroupBy = "b.id_bp, b.bp, b.b_del";
+                    sOrderBy = "b.bp, b.id_bp";
+                    break;
+
+                case SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS:
+                    sSelect = "y.id_year, CONVERT(y.id_year, CHAR(4)) AS f_year, y.b_del";
+                    sGroupBy = "y.id_year, y.b_del";
+                    sOrderBy = "y.id_year";
+                    break;
+
+                case SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT:
+                case SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT:
+                    sSelect = "t.id_tax_bas, t.id_tax, tb.tax_bas, t.tax, t.b_del";
+                    sGroupBy = "t.id_tax_bas, t.id_tax, tb.tax_bas, t.tax, t.b_del";
+                    sOrderBy = "tb.tax_bas, t.id_tax_bas, t.tax, t.id_tax";
+                    break;
+                case SDataConstantsSys.FINS_TP_ACC_SYS_PUR:
+                case SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ:
+                    break;
+
+                default:
+            }
+
+            // II. Read all accounting moves belonging to current period:
+
+            sSql = "SELECT " + sSelect + ", " +
+                    (jtbMoney.isSelected() ? "c.id_cur AS f_id_cur, c.cur_key AS f_cur_key, " :
+                        "" + miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() + " AS f_id_cur, " +
+                        "'" + miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey() + "' AS f_cur_key, ") +
+                    "SUM(IF(r.dt < '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateStart) + "', re.debit" + sCur + " - re.credit" + sCur + ", 0)) AS f_si, " +
+                    "SUM(IF(r.dt >= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateStart) + "' AND r.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateEnd) + "', re.debit" + sCur + ", 0)) AS f_debit, " +
+                    "SUM(IF(r.dt >= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateStart) + "' AND r.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateEnd) + "', re.credit" + sCur + ", 0)) AS f_credit, " +
+                    "SUM(IF(r.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateEnd) + "', re.debit" + sCur + " - re.credit" + sCur + ", 0)) AS f_sf " +
+                    "FROM fin_rec AS r INNER JOIN fin_rec_ety AS re ON " +
+                    "r.id_year = " + mnYear + " AND r.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateEnd) + "' AND " +
+                    "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND r.b_del = 0 AND re.b_del = 0 " + sSqlWhere +
+                    (msAuxAccountId.isEmpty() ? "" : " AND re.fid_acc = '" + msAuxAccountId + "' ") +
+                    "INNER JOIN erp.cfgu_cur AS c ON " +
+                    "re.fid_cur = c.id_cur " +
+                    "INNER JOIN fin_acc AS a ON " +
+                    "re.fid_acc = a.id_acc ";
+
+            switch (accountSubsytemType) {
+                case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_CASH:
+                case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_BANK:
+                    switch (accountSubsytemType) {
+                        case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_CASH:
+                            sSql += "AND re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH[0] + " " +
+                                    "AND re.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH[1] + " ";
+                            break;
+                        case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_BANK:
+                            sSql += "AND re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK[0] + " " +
+                                    "AND re.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK[1] + " ";
+                            break;
+                        default:
+                    }
+
+                    sSql += "INNER JOIN erp.cfgu_cob_ent AS e ON " +
+                            "re.fid_cob_n = e.id_cob AND re.fid_ent_n = e.id_ent " +
+                            "INNER JOIN erp.bpsu_bpb AS bb ON " +
+                            "e.id_cob = bb.id_bpb " +
+                            "INNER JOIN fin_acc_cash AS ac ON " +
+                            "e.id_cob = ac.id_cob AND e.id_ent = ac.id_acc_cash " +
+                            "INNER JOIN erp.cfgu_cur AS ce ON " +
+                            "ac.fid_cur = ce.id_cur ";
+                    break;
+
+                case SDataConstantsSys.FINS_TP_ACC_SYS_INV:
+                    sSql += "AND re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_ASSET_STOCK[0] + " " +
+                            "AND re.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_ASSET_STOCK[1] + " " +
+                            "LEFT OUTER JOIN erp.cfgu_cob_ent AS e ON " +
+                            "re.fid_cob_n = e.id_cob AND re.fid_ent_n = e.id_ent " +
+                            "LEFT OUTER JOIN erp.bpsu_bpb AS bb ON " +
+                            "e.id_cob = bb.id_bpb ";
+                    break;
+
+                case SDataConstantsSys.FINS_TP_ACC_SYS_SUP:
+                case SDataConstantsSys.FINS_TP_ACC_SYS_CUS:
+                case SDataConstantsSys.FINS_TP_ACC_SYS_CDR:
+                case SDataConstantsSys.FINS_TP_ACC_SYS_DBR:
+                    switch (accountSubsytemType) {
+                        case SDataConstantsSys.FINS_TP_ACC_SYS_SUP:
+                            sSql += "AND re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] + " " +
+                                    "AND re.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] + " ";
+                            break;
+                        case SDataConstantsSys.FINS_TP_ACC_SYS_CUS:
+                            sSql += "AND re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0] + " " +
+                                    "AND re.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1] + " ";
+                            break;
+                        case SDataConstantsSys.FINS_TP_ACC_SYS_CDR:
+                            sSql += "AND re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CDR[0] + " " +
+                                    "AND re.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CDR[1] + " ";
+                            break;
+                        case SDataConstantsSys.FINS_TP_ACC_SYS_DBR:
+                            sSql += "AND re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR[0] + " " +
+                                    "AND re.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR[1] + " ";
+                            break;
+                        default:
+                    }
+
+                    sSql += "INNER JOIN erp.bpsu_bp AS b ON " +
+                            "re.fid_bp_nr = b.id_bp ";
+                    break;
+
+                case SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS:
+                    sSql += "AND re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_CT_SYS_MOV_PROF + " " +
+                            "LEFT OUTER JOIN fin_year AS y ON " +
+                            "re.fid_year_n = y.id_year ";
+                    break;
+
+                case SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT:
+                case SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT:
+                    sSql += "AND re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_CT_SYS_MOV_TAX + " ";
+
+                    switch (accountSubsytemType) {
+                        case SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT:
+                            sSql += "AND re.fid_tp_sys_mov_xxx in (" +
+                                    SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT[1] + ", " +
+                                    SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT_PEND[1] + ", " +
+                                    SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT_PEND_ADV[1] + ") ";
+                            break;
+                        case SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT:
+                            sSql += "AND re.fid_tp_sys_mov_xxx in (" +
+                                    SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT[1] + ", " +
+                                    SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT_PEND[1] + ", " +
+                                    SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT_PEND_ADV[1] + ") ";
+                            break;
+                        default:
+                    }
+
+                    sSql += "LEFT OUTER JOIN erp.finu_tax AS t ON " +
+                            "re.fid_tax_bas_n = t.id_tax_bas AND re.fid_tax_n = t.id_tax " +
+                            "LEFT OUTER JOIN erp.finu_tax_bas AS tb ON " +
+                            "t.id_tax_bas = tb.id_tax_bas ";
+                    break;
+
+                default:
+            }
+
+            sSql += "GROUP BY " + sGroupBy +
+                    (jtbMoney.isSelected() ? ", c.id_cur, c.cur_key " : " ") +
+                    "ORDER BY " + sOrderBy +
+                    (jtbMoney.isSelected() ? ", c.cur_key, c.id_cur " : " ");
+        }
+        return sSql;
+    }
+
+    @SuppressWarnings("unchecked")
+    private boolean populateTableAccountingAll() throws java.lang.Exception {
+        int nDeep = 0;
+        int nLevel = 0;
+        int accountType = 0;
+        int accountSubsytemType = 0;
+        double dOpeningBalance = 0;
+        double dOpeningBalanceTotal = 0;
+        double dDebit = 0;
+        double dDebitTotal = 0;
+        double dCredit = 0;
+        double dCreditTotal = 0;
+        boolean bIsDataAvailable = false;
+        String sSql = "";
+        String sAccountId = "";
+        Vector<Vector<Object>> vQueryRows = null;
+        SPanelAccountingRow oAccountingRow = null;
+        SServerRequest oRequest = null;
+        SServerResponse oResponse = null;
+        
+        
+        // I. Read all active accounts belonging to current period:
+
+        sSql = createParamSqlAccount();
+
+        oRequest = new SServerRequest(SServerConstants.REQ_DB_QUERY_SIMPLE, sSql);
+        oResponse = miClient.getSessionXXX().request(oRequest);
+
+        if (oResponse.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+            throw new Exception(oResponse.getMessage());
+        }
+        else {
+            vQueryRows = (Vector<Vector<Object>>) oResponse.getPacket();
+            for (Vector<Object> queryRow : vQueryRows) {
+                bIsDataAvailable = true;
+                
+                nDeep = ((Number) queryRow.get(2)).intValue();
+                accountType = ((Number) queryRow.get(4)).intValue();
+                accountSubsytemType = ((Number) queryRow.get(3)).intValue();
+                nLevel = ((Number) queryRow.get(5)).intValue();
+                msAuxAccountId = "";
+
+                oAccountingRow = new SPanelAccountingRow();
+                sAccountId = (String) queryRow.get(0);
+                
+                oAccountingRow.setPrimaryKey(new Object[] { sAccountId });
+                oAccountingRow.setPkAccountId(sAccountId);
+                oAccountingRow.setAccount((String) queryRow.get(6));
+                oAccountingRow.setDateStart((java.util.Date) queryRow.get(7));
+                oAccountingRow.setDateEnd_n((java.util.Date) queryRow.get(8));
+                oAccountingRow.setIsActive(((Number) queryRow.get(9)).intValue() == 1);
+                oAccountingRow.setIsDeleted(((Number) queryRow.get(10)).intValue() == 1);
+                oAccountingRow.setFkCurrencyId(((Number) queryRow.get(11)).intValue());  // when currency is set by constant, a BigInteger number is get
+                oAccountingRow.setCurrencyKey((String) queryRow.get(12));
+                oAccountingRow.setStyle(((Number) queryRow.get(13)).intValue());
+                
+                dOpeningBalance = ((Number) queryRow.get(15)).doubleValue();
+                dDebit = ((Number) queryRow.get(16)).doubleValue();
+                dCredit = ((Number) queryRow.get(17)).doubleValue();
+
+                if (!jtbMoney.isSelected() && nLevel == nDeep) {
+                    dOpeningBalanceTotal += dOpeningBalance;
+                    dDebitTotal += dDebit;
+                    dCreditTotal += dCredit;
+                }
+
+                oAccountingRow.setOpeningBalance(oAccountingRow.getOpeningBalance() + dOpeningBalance);
+                oAccountingRow.setDebit(oAccountingRow.getDebit() + dDebit);
+                oAccountingRow.setCredit(oAccountingRow.getCredit() + dCredit);
+                
+                oAccountingRow.prepareTableRow();
+
+                if (nLevel <= nDeep) {
+                    moPaneAccounting.addTableRow(oAccountingRow);
+                }
+                
+                if ((SLibUtilities.belongsTo(accountSubsytemType , new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_CASH_CASH, SDataConstantsSys.FINS_TP_ACC_SYS_CASH_BANK,
+                        SDataConstantsSys.FINS_TP_ACC_SYS_INV, SDataConstantsSys.FINS_TP_ACC_SYS_SUP, SDataConstantsSys.FINS_TP_ACC_SYS_CUS, SDataConstantsSys.FINS_TP_ACC_SYS_CDR,
+                        SDataConstantsSys.FINS_TP_ACC_SYS_DBR, SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS, SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT, SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT,
+                        SDataConstantsSys.FINS_TP_ACC_SYS_PUR, SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ }) || 
+                        SLibUtilities.belongsTo(accountType , new int[] { SDataConstantsSys.FINS_TP_ACC_RES})) &&
+                        nLevel == nDeep) {
+                    msAuxAccountId = sAccountId;
+                    
+                    if (SLibUtilities.belongsTo(accountType , new int[] { SDataConstantsSys.FINS_TP_ACC_RES})) {
+                        sSql = createParamSqlAccountSubsystem(accountType, accountSubsytemType);
+                    }
+                    else {
+                        sSql = createParamSqlAccountSubsystem(accountSubsytemType);
+                    }
+                    
+                    oRequest = new SServerRequest(SServerConstants.REQ_DB_QUERY_SIMPLE, sSql);
+                    oResponse = miClient.getSessionXXX().request(oRequest);
+
+                    if (oResponse.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+                        throw new Exception(oResponse.getMessage());
+                    }
+                    else {
+                        vQueryRows = (Vector<Vector<Object>>) oResponse.getPacket();
+                        for (Vector<Object> queryRowAux : vQueryRows) {
+                            oAccountingRow = new SPanelAccountingRow();
+                            
+                            switch (accountSubsytemType) {
+                                case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_CASH:
+                                case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_BANK:
+                                    //oAccountingRow.setPrimaryKey(new Object[] { ((Number) queryRowAux.get(0)).intValue(), ((Number) queryRowAux.get(1)).intValue() });
+                                    oAccountingRow.setPrimaryKey(null);
+                                    oAccountingRow.setPkAccountId("");
+                                    oAccountingRow.setAccount((String) queryRowAux.get(3));
+                                    oAccountingRow.setDateStart(null);
+                                    oAccountingRow.setDateEnd_n(null);
+                                    oAccountingRow.setIsActive(true);
+                                    //oAccountingRow.setIsDeleted(((Number) queryRowAux.get(6)).intValue() == 1);
+                                    oAccountingRow.setIsDeleted((Boolean) queryRowAux.get(6));
+                                    oAccountingRow.setFkCurrencyId(((Number) queryRowAux.get(7)).intValue());  // when currency is set by constant, a BigInteger number is get
+                                    oAccountingRow.setCurrencyKey((String) queryRowAux.get(8));
+                                    oAccountingRow.setStyle(SLibConstants.UNDEFINED);
+
+                                    dOpeningBalance = ((Number) queryRowAux.get(9)).doubleValue();
+                                    dDebit = ((Number) queryRowAux.get(10)).doubleValue();
+                                    dCredit = ((Number) queryRowAux.get(11)).doubleValue();
+                                    break;
+
+                                case SDataConstantsSys.FINS_TP_ACC_SYS_INV:
+                                    //oAccountingRow.setPrimaryKey(new Object[] {  queryRowAux.get(0) == null ? 1 : ((Number) queryRowAux.get(0)).intValue(), ((Number) queryRowAux.get(1)).intValue() });
+                                    oAccountingRow.setPrimaryKey(null);
+                                    oAccountingRow.setPkAccountId("");
+                                    oAccountingRow.setAccount(queryRowAux.get(0) == null ? "(N/D)" : (String) queryRowAux.get(3));
+                                    oAccountingRow.setDateStart(null);
+                                    oAccountingRow.setDateEnd_n(null);
+                                    oAccountingRow.setIsActive(true);
+                                    oAccountingRow.setIsDeleted(queryRowAux.get(0) == null ? false : (Boolean) queryRowAux.get(5));
+                                    oAccountingRow.setFkCurrencyId(((Number) queryRowAux.get(6)).intValue());  // when currency is set by constant, a BigInteger number is get
+                                    oAccountingRow.setCurrencyKey((String) queryRowAux.get(7));
+                                    oAccountingRow.setStyle(SLibConstants.UNDEFINED);
+
+                                    dOpeningBalance = ((Number) queryRowAux.get(8)).doubleValue();
+                                    dDebit = ((Number) queryRowAux.get(9)).doubleValue();
+                                    dCredit = ((Number) queryRowAux.get(10)).doubleValue();
+                                    break;
+
+                                case SDataConstantsSys.FINS_TP_ACC_SYS_SUP:
+                                case SDataConstantsSys.FINS_TP_ACC_SYS_CUS:
+                                case SDataConstantsSys.FINS_TP_ACC_SYS_CDR:
+                                case SDataConstantsSys.FINS_TP_ACC_SYS_DBR:
+                                    //oAccountingRow.setPrimaryKey(new Object[] { ((Number) queryRowAux.get(0)).intValue() });
+                                    oAccountingRow.setPrimaryKey(null);
+                                    oAccountingRow.setPkAccountId("");
+                                    oAccountingRow.setAccount((String) queryRowAux.get(1));
+                                    oAccountingRow.setDateStart(null);
+                                    oAccountingRow.setDateEnd_n(null);
+                                    oAccountingRow.setIsActive(true);
+                                    oAccountingRow.setIsDeleted((Boolean) queryRowAux.get(2));
+                                    oAccountingRow.setFkCurrencyId(((Number) queryRowAux.get(3)).intValue());  // when currency is set by constant, a BigInteger number is get
+                                    oAccountingRow.setCurrencyKey((String) queryRowAux.get(4));
+                                    oAccountingRow.setStyle(SLibConstants.UNDEFINED);
+
+                                    dOpeningBalance = ((Number) queryRowAux.get(5)).doubleValue();
+                                    dDebit = ((Number) queryRowAux.get(6)).doubleValue();
+                                    dCredit = ((Number) queryRowAux.get(7)).doubleValue();
+                                break;
+
+                                case SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS:
+                                    //oAccountingRow.setPrimaryKey(new Object[] { queryRowAux.get(0) == null ? 1 : ((Number) queryRowAux.get(0)).intValue() });
+                                    oAccountingRow.setPrimaryKey(null);
+                                    oAccountingRow.setPkAccountId("");
+                                    oAccountingRow.setAccount(queryRowAux.get(0) == null ? "(N/D)" : (String) queryRowAux.get(1));
+                                    oAccountingRow.setDateStart(null);
+                                    oAccountingRow.setDateEnd_n(null);
+                                    oAccountingRow.setIsActive(true);
+                                    oAccountingRow.setIsDeleted(queryRowAux.get(0) == null ? false : (Boolean) queryRowAux.get(2));
+                                    oAccountingRow.setFkCurrencyId(((Number) queryRowAux.get(3)).intValue());  // when currency is set by constant, a BigInteger number is get
+                                    oAccountingRow.setCurrencyKey((String) queryRowAux.get(4));
+                                    oAccountingRow.setStyle(SLibConstants.UNDEFINED);
+
+                                    dOpeningBalance = ((Number) queryRowAux.get(5)).doubleValue();
+                                    dDebit = ((Number) queryRowAux.get(6)).doubleValue();
+                                    dCredit = ((Number) queryRowAux.get(7)).doubleValue();
+                                    
+                                    break;
+
+                                case SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT:
+                                case SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT:
+                                    //oAccountingRow.setPrimaryKey(new Object[] { queryRowAux.get(0) == null ? 2 : ((Number) queryRowAux.get(0)).intValue(), ((Number) queryRowAux.get(1)).intValue() });
+                                    oAccountingRow.setPrimaryKey(null);
+                                    oAccountingRow.setPkAccountId("");
+                                    oAccountingRow.setAccount(queryRowAux.get(0) == null ? "(N/D)" : (String) queryRowAux.get(3));
+                                    oAccountingRow.setDateStart(null);
+                                    oAccountingRow.setDateEnd_n(null);
+                                    oAccountingRow.setIsActive(true);
+                                    oAccountingRow.setIsDeleted(queryRowAux.get(0) == null ? false : (Boolean) queryRowAux.get(4));
+                                    oAccountingRow.setFkCurrencyId(((Number) queryRowAux.get(5)).intValue());  // when currency is set by constant, a BigInteger number is get
+                                    oAccountingRow.setCurrencyKey((String) queryRowAux.get(6));
+                                    oAccountingRow.setStyle(SLibConstants.UNDEFINED);
+
+                                    dOpeningBalance = ((Number) queryRowAux.get(7)).doubleValue();
+                                    dDebit = ((Number) queryRowAux.get(8)).doubleValue();
+                                    dCredit = ((Number) queryRowAux.get(9)).doubleValue();
+                                    break;
+
+                                default:
+                            }
+                            
+                            switch (accountType) {
+                                case SDataConstantsSys.FINS_TP_ACC_RES:
+                                    //oAccountingRow.setPrimaryKey(new Object[] { ((Number) queryRowAux.get(0)).intValue(), ((Number) queryRowAux.get(1)).intValue() });
+                                    oAccountingRow.setPrimaryKey(null);
+                                    oAccountingRow.setPkAccountId("");
+                                    oAccountingRow.setAccount((String) queryRowAux.get(2) + " - " + (String) queryRowAux.get(1));
+                                    oAccountingRow.setDateStart(null);
+                                    oAccountingRow.setDateEnd_n(null);
+                                    oAccountingRow.setIsActive(true);
+                                    oAccountingRow.setIsDeleted(((Number) queryRow.get(10)).intValue() == 1);
+                                    oAccountingRow.setFkCurrencyId(((Number) queryRow.get(11)).intValue());  // when currency is set by constant, a BigInteger number is get
+                                    oAccountingRow.setCurrencyKey((String) queryRow.get(12));
+                                    oAccountingRow.setStyle(SLibConstants.UNDEFINED);
+
+                                    dOpeningBalance = ((Number) queryRowAux.get(3)).doubleValue();
+                                    dDebit = ((Number) queryRowAux.get(4)).doubleValue();
+                                    dCredit = ((Number) queryRowAux.get(5)).doubleValue();
+                                    break;
+
+                                default:
+                            }
+                                    
+                            
+                            oAccountingRow.setOpeningBalance(dOpeningBalance);
+                            oAccountingRow.setDebit(dDebit);
+                            oAccountingRow.setCredit(dCredit);
+
+                            oAccountingRow.prepareTableRow();
+                            
+                            moPaneAccounting.addTableRow(oAccountingRow);
+                        }
+                    }
+                }
+            }
+            
+            if (!jtbMoney.isSelected()) {
+                bIsDataAvailable = true;
+
+                oAccountingRow = new SPanelAccountingRow();
+                oAccountingRow.setIsSummary(true);
+                oAccountingRow.setPkAccountId("[TOTALES]");
+                oAccountingRow.setAccount("");
+                oAccountingRow.setDateStart(null);
+                oAccountingRow.setDateEnd_n(null);
+                oAccountingRow.setIsActive(false);
+                oAccountingRow.setIsDeleted(false);
+                oAccountingRow.setOpeningBalance(dOpeningBalanceTotal);
+                oAccountingRow.setDebit(dDebitTotal);
+                oAccountingRow.setCredit(dCreditTotal);
+                oAccountingRow.prepareTableRow();
+
+                moPaneAccounting.addTableRow(oAccountingRow);
+            }
+        }
+        
+        return bIsDataAvailable; 
     }
 
     @SuppressWarnings("unchecked")
@@ -916,169 +1438,7 @@ public class SPanelAccounting extends javax.swing.JPanel implements erp.lib.tabl
         SServerRequest oRequest = null;
         SServerResponse oResponse = null;
 
-        sCur = jtbMoney.isSelected() ? "_cur" : "";
-
-        switch (mnTabTypeAux01) {
-            case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_CASH:
-            case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_BANK:
-                sSelect = "e.id_cob, e.id_ent, bb.bpb, e.ent, e.code, ce.cur_key, e.b_del";
-                sGroupBy = "e.id_cob, e.id_ent, bb.bpb, e.ent, e.code, ce.cur_key, e.b_del";
-                sOrderBy = "bb.bpb, e.id_cob, e.ent, e.id_ent";
-                break;
-
-            case SDataConstantsSys.FINS_TP_ACC_SYS_INV:
-                sSelect = "e.id_cob, e.id_ent, bb.bpb, e.ent, e.code, e.b_del";
-                sGroupBy = "e.id_cob, e.id_ent, bb.bpb, e.ent, e.code, e.b_del";
-                sOrderBy = "bb.bpb, e.id_cob, e.ent, e.id_ent";
-                break;
-
-            case SDataConstantsSys.FINS_TP_ACC_SYS_SUP:
-            case SDataConstantsSys.FINS_TP_ACC_SYS_CUS:
-            case SDataConstantsSys.FINS_TP_ACC_SYS_CDR:
-            case SDataConstantsSys.FINS_TP_ACC_SYS_DBR:
-                sSelect = "b.id_bp, b.bp, b.b_del";
-                sGroupBy = "b.id_bp, b.bp, b.b_del";
-                sOrderBy = "b.bp, b.id_bp";
-                break;
-
-            case SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS:
-                sSelect = "y.id_year, CONVERT(y.id_year, CHAR(4)) AS f_year, y.b_del";
-                sGroupBy = "y.id_year, y.b_del";
-                sOrderBy = "y.id_year";
-                break;
-
-            case SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT:
-            case SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT:
-                sSelect = "t.id_tax_bas, t.id_tax, tb.tax_bas, t.tax, t.b_del";
-                sGroupBy = "t.id_tax_bas, t.id_tax, tb.tax_bas, t.tax, t.b_del";
-                sOrderBy = "tb.tax_bas, t.id_tax_bas, t.tax, t.id_tax";
-                break;
-
-            default:
-        }
-
-        sSqlWhere = (!mbShowRecordAdjYearEnd ? " AND b_adj_year = 0 " : "") +
-                    (!mbShowRecordAdjAudit ? " AND b_adj_audit = 0 " : "");
-
-        // II. Read all accounting moves belonging to current period:
-
-        sSql = "SELECT " + sSelect + ", " +
-                (jtbMoney.isSelected() ? "c.id_cur AS f_id_cur, c.cur_key AS f_cur_key, " :
-                    "" + miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() + " AS f_id_cur, " +
-                    "'" + miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey() + "' AS f_cur_key, ") +
-                "SUM(IF(r.dt < '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateStart) + "', re.debit" + sCur + " - re.credit" + sCur + ", 0)) AS f_si, " +
-                "SUM(IF(r.dt >= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateStart) + "' AND r.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateEnd) + "', re.debit" + sCur + ", 0)) AS f_debit, " +
-                "SUM(IF(r.dt >= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateStart) + "' AND r.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateEnd) + "', re.credit" + sCur + ", 0)) AS f_credit, " +
-                "SUM(IF(r.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateEnd) + "', re.debit" + sCur + " - re.credit" + sCur + ", 0)) AS f_sf " +
-                "FROM fin_rec AS r INNER JOIN fin_rec_ety AS re ON " +
-                "r.id_year = " + mnYear + " AND r.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateEnd) + "' AND " +
-                "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND r.b_del = 0 AND re.b_del = 0 " + sSqlWhere +
-                "INNER JOIN erp.cfgu_cur AS c ON " +
-                "re.fid_cur = c.id_cur " +
-                "INNER JOIN fin_acc AS a ON " +
-                "re.fid_acc = a.id_acc ";
-
-        switch (mnTabTypeAux01) {
-            case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_CASH:
-            case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_BANK:
-                switch (mnTabTypeAux01) {
-                    case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_CASH:
-                        sSql += "AND re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH[0] + " " +
-                                "AND re.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH[1] + " ";
-                        break;
-                    case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_BANK:
-                        sSql += "AND re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK[0] + " " +
-                                "AND re.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK[1] + " ";
-                        break;
-                    default:
-                }
-
-                sSql += "INNER JOIN erp.cfgu_cob_ent AS e ON " +
-                        "re.fid_cob_n = e.id_cob AND re.fid_ent_n = e.id_ent " +
-                        "INNER JOIN erp.bpsu_bpb AS bb ON " +
-                        "e.id_cob = bb.id_bpb " +
-                        "INNER JOIN fin_acc_cash AS ac ON " +
-                        "e.id_cob = ac.id_cob AND e.id_ent = ac.id_acc_cash " +
-                        "INNER JOIN erp.cfgu_cur AS ce ON " +
-                        "ac.fid_cur = ce.id_cur ";
-                break;
-
-            case SDataConstantsSys.FINS_TP_ACC_SYS_INV:
-                sSql += "AND re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_ASSET_STOCK[0] + " " +
-                        "AND re.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_ASSET_STOCK[1] + " " +
-                        "LEFT OUTER JOIN erp.cfgu_cob_ent AS e ON " +
-                        "re.fid_cob_n = e.id_cob AND re.fid_ent_n = e.id_ent " +
-                        "LEFT OUTER JOIN erp.bpsu_bpb AS bb ON " +
-                        "e.id_cob = bb.id_bpb ";
-                break;
-
-            case SDataConstantsSys.FINS_TP_ACC_SYS_SUP:
-            case SDataConstantsSys.FINS_TP_ACC_SYS_CUS:
-            case SDataConstantsSys.FINS_TP_ACC_SYS_CDR:
-            case SDataConstantsSys.FINS_TP_ACC_SYS_DBR:
-                switch (mnTabTypeAux01) {
-                    case SDataConstantsSys.FINS_TP_ACC_SYS_SUP:
-                        sSql += "AND re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] + " " +
-                                "AND re.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] + " ";
-                        break;
-                    case SDataConstantsSys.FINS_TP_ACC_SYS_CUS:
-                        sSql += "AND re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0] + " " +
-                                "AND re.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1] + " ";
-                        break;
-                    case SDataConstantsSys.FINS_TP_ACC_SYS_CDR:
-                        sSql += "AND re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CDR[0] + " " +
-                                "AND re.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CDR[1] + " ";
-                        break;
-                    case SDataConstantsSys.FINS_TP_ACC_SYS_DBR:
-                        sSql += "AND re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR[0] + " " +
-                                "AND re.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR[1] + " ";
-                        break;
-                    default:
-                }
-
-                sSql += "INNER JOIN erp.bpsu_bp AS b ON " +
-                        "re.fid_bp_nr = b.id_bp ";
-                break;
-
-            case SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS:
-                sSql += "AND re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_CT_SYS_MOV_PROF + " " +
-                        "LEFT OUTER JOIN fin_year AS y ON " +
-                        "re.fid_year_n = y.id_year ";
-                break;
-
-            case SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT:
-            case SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT:
-                sSql += "AND re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_CT_SYS_MOV_TAX + " ";
-
-                switch (mnTabTypeAux01) {
-                    case SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT:
-                        sSql += "AND re.fid_tp_sys_mov_xxx in (" +
-                                SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT[1] + ", " +
-                                SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT_PEND[1] + ", " +
-                                SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT_PEND_ADV[1] + ") ";
-                        break;
-                    case SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT:
-                        sSql += "AND re.fid_tp_sys_mov_xxx in (" +
-                                SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT[1] + ", " +
-                                SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT_PEND[1] + ", " +
-                                SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT_PEND_ADV[1] + ") ";
-                        break;
-                    default:
-                }
-
-                sSql += "LEFT OUTER JOIN erp.finu_tax AS t ON " +
-                        "re.fid_tax_bas_n = t.id_tax_bas AND re.fid_tax_n = t.id_tax " +
-                        "LEFT OUTER JOIN erp.finu_tax_bas AS tb ON " +
-                        "t.id_tax_bas = tb.id_tax_bas ";
-                break;
-
-            default:
-        }
-
-        sSql += "GROUP BY " + sGroupBy +
-                (jtbMoney.isSelected() ? ", c.id_cur, c.cur_key " : " ") +
-                "ORDER BY " + sOrderBy +
-                (jtbMoney.isSelected() ? ", c.cur_key, c.id_cur " : " ");
+        sSql = createParamSqlAccountSubsystem(mnTabTypeAux01);
 
         oRequest = new SServerRequest(SServerConstants.REQ_DB_QUERY_SIMPLE, sSql);
         oResponse = miClient.getSessionXXX().request(oRequest);
@@ -1405,6 +1765,9 @@ public class SPanelAccounting extends javax.swing.JPanel implements erp.lib.tabl
             switch (mnTabTypeAux01) {
                 case SDataConstants.FINX_ACCOUNTING:
                     isDataAvailable = populateTableAccounting();
+                    break;
+                case SDataConstants.FINX_ACCOUNTING_ALL:
+                    isDataAvailable = populateTableAccountingAll();
                     break;
 
                 case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_CASH:

@@ -337,8 +337,9 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                         if (dialogPrintOrderPayroll.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                             orderBy = (int) dialogPrintOrderPayroll.getValue(SGuiConsts.PARAM_KEY);
                             copiesNum = (int) dialogPrintOrderPayroll.getValue(SLibConsts.UNDEFINED);
+                            
+                            SCfdUtils.printCfd((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey(), orderBy), copiesNum, SCfdConsts.CFDI_PAYROLL_VER_CUR);
                         }
-                        SCfdUtils.printCfd((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey(), orderBy), copiesNum, SCfdConsts.CFDI_PAYROLL_VER_CUR);
                     }
                     catch (Exception e) {
                         SLibUtils.showException(this, e);

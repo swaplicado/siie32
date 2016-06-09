@@ -5,6 +5,7 @@
 package erp.mod.fin.view;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SDbBankLayout;
 import erp.mod.fin.db.SFinConsts;
 import java.awt.event.ActionEvent;
@@ -37,21 +38,21 @@ public class SViewBankLayoutPayments extends SGridPaneView implements ActionList
     private JButton jbPayment;
     private JButton jbCloseLayout;
     
-    public SViewBankLayoutPayments(SGuiClient client, int gridSubtype, String title) {
-        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.FIN_LAY_BANK, gridSubtype, title);
+    public SViewBankLayoutPayments(SGuiClient client, int gridSubtype, String title, SGuiParams params) {
+        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.FIN_LAY_BANK, gridSubtype, title, params);
         setRowButtonsEnabled(false);
         initComponentsCustom();
     }
     
     private void initComponentsCustom() {
-        if (mnGridSubtype == SModConsts.VIEW_ST_DONE) {
+        if (mnGridMode == SModConsts.VIEW_ST_DONE) {
             moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
             moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
             
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         }
         jbPayment = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_money.gif")), "Aplicar pagos", this);
-        jbCloseLayout = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_ok.gif")), (mnGridSubtype == SModConsts.VIEW_ST_PEND ? "Cerrar" : "Abrir") + " layout para pago", this);
+        jbCloseLayout = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_ok.gif")), (mnGridMode == SModConsts.VIEW_ST_PEND ? "Cerrar" : "Abrir") + " layout para pago", this);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPayment);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCloseLayout);
     }
@@ -93,8 +94,8 @@ public class SViewBankLayoutPayments extends SGridPaneView implements ActionList
                     SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
 
                     bankLayout = (SDbBankLayout) miClient.getSession().readRegistry(SModConsts.FIN_LAY_BANK, gridRow.getRowPrimaryKey());
-                    if (miClient.showMsgBoxConfirm("Está por " + (mnGridSubtype == SModConsts.VIEW_ST_PEND ? "cerrar" : "abrir") + " el layout para pago.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
-                        if (mnGridSubtype == SModConsts.VIEW_ST_DONE) {
+                    if (miClient.showMsgBoxConfirm("Está por " + (mnGridMode == SModConsts.VIEW_ST_PEND ? "cerrar" : "abrir") + " el layout para pago.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                        if (mnGridMode == SModConsts.VIEW_ST_DONE) {
                             if (!bankLayout.isClosedPayment()) {
                                 miClient.showMsgBoxWarning("¡El layout no se puede abrir, no fué cerrado de forma manual!");
                                 canClose = false;
@@ -129,7 +130,7 @@ public class SViewBankLayoutPayments extends SGridPaneView implements ActionList
             sql += (sql.isEmpty() ? "" : "AND ") + "l.b_del = 0 ";
         }
         
-        if (mnGridSubtype == SModConsts.VIEW_ST_DONE) {
+        if (mnGridMode == SModConsts.VIEW_ST_DONE) {
             filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
             sql += (sql.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("l.dt_lay", (SGuiDate) filter);
         }
@@ -172,8 +173,9 @@ public class SViewBankLayoutPayments extends SGridPaneView implements ActionList
                 + "l.fk_usr_upd = uu.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uc ON "
                 + "l.fk_usr_clo_pay = uc.id_usr "
-                + (sql.length() == 0 ? "" : "WHERE " + sql)
-                + (mnGridSubtype == SModConsts.VIEW_ST_PEND ? "HAVING f_tra_x_pay <> 0 AND l.b_clo_pay = 0 " : "HAVING f_tra_x_pay = 0 OR l.b_clo_pay = 1 ")
+                + "WHERE l.trn_tp = " + (mnGridSubtype == SModSysConsts.FIN_LAY_BANK_DPS ? SFinConsts.LAY_BANK_TYPE_DPS : SFinConsts.LAY_BANK_TYPE_ADV) + (sql.length() == 0 ? "" : " AND " + sql) + " "
+                //+ (sql.length() == 0 ? "" : "WHERE " + sql)
+                + (mnGridMode == SModConsts.VIEW_ST_PEND ? "HAVING f_tra_x_pay <> 0 AND l.b_clo_pay = 0 " : "HAVING f_tra_x_pay = 0 OR l.b_clo_pay = 1 ")
                 + "ORDER BY l.dt_lay, l.dt_due, l.id_lay_bank ";
     }
 

@@ -7,6 +7,7 @@ package erp.mod.fin.view;
 import erp.client.SClientInterface;
 import erp.mfin.data.SFinUtilities;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SDbBankLayout;
 import erp.mod.fin.db.SFinConsts;
 import java.awt.event.ActionEvent;
@@ -15,7 +16,6 @@ import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import sa.gui.util.SUtilConsts;
-import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
@@ -39,8 +39,8 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
     private JButton jbPayment;
     private JButton jbGetLayout;
     
-    public SViewBankLayout(SGuiClient client, String title) {
-        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.FIN_LAY_BANK, SLibConsts.UNDEFINED, title);
+    public SViewBankLayout(SGuiClient client, int gridSubtype, String title) {
+        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.FIN_LAY_BANK, gridSubtype, title);
         setRowButtonsEnabled(true, false, true, false, true);
         initComponentsCustom();
     }
@@ -85,6 +85,9 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
                     bankLayout = (SDbBankLayout) miClient.getSession().readRegistry(SModConsts.FIN_LAY_BANK, gridRow.getRowPrimaryKey(), SDbConsts.MODE_VERBOSE);
                     if (bankLayout.getDocsPayed() > 0) {
                         miClient.showMsgBoxWarning(SDbConsts.MSG_REG_DENIED_UPDATE + "\n¡Existen documentos con pagos aplicados!");
+                    }
+                    else if (bankLayout.getTransfersPayed()> 0) {
+                        miClient.showMsgBoxWarning(SDbConsts.MSG_REG_DENIED_UPDATE + "\n¡Existen transferencias con pagos aplicados!");
                     }
                     else {
                         params = moFormParams != null ? moFormParams : new SGuiParams();
@@ -198,7 +201,8 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
                 + "l.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
                 + "l.fk_usr_upd = uu.id_usr "
-                + (sql.length() == 0 ? "" : "WHERE " + sql)
+                + "WHERE l.trn_tp = " + (mnGridSubtype == SModSysConsts.FIN_LAY_BANK_DPS ? SFinConsts.LAY_BANK_TYPE_DPS : SFinConsts.LAY_BANK_TYPE_ADV) + (sql.length() == 0 ? "" : " AND " + sql) + " "
+                //+ (sql.l+ "WHERE tp_lay = " + (mnGridSubtype == SModSysConsts.FIN_LAY_BANK_DPS ? SFinConsts.LAY_BANK_TYPE_DPS : SFinConsts.LAY_BANK_TYPE_ADV) + (sql.length() == 0 ? "" : " AND " + sql) + " "ength() == 0 ? "" : "WHERE " + sql)
                 + "ORDER BY l.dt_lay, l.dt_due, l.id_lay_bank ";
     }
 
@@ -220,9 +224,11 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.tra", "Transferencias", 100));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.tra_pay", "Transferencias pagadas", 100));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "f_tra_x_pay", "Transferencias x pagar", 100));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.doc", "Documentos", 100));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.doc_pay", "Documentos pagados", 100));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "f_doc_x_pay", "Documentos x pagar", 100));
+        if (mnGridSubtype == SModSysConsts.FIN_LAY_BANK_DPS) {
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.doc", "Documentos", 100));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.doc_pay", "Documentos pagados", 100));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "f_doc_x_pay", "Documentos x pagar", 100));            
+        }
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));

@@ -7,8 +7,10 @@ package erp.mod.fin.db;
 
 import erp.data.SDataConstantsSys;
 import erp.mbps.data.SDataBizPartnerBranchBankAccount;
+import erp.mod.SModSysConsts;
 import java.util.ArrayList;
 import java.util.HashMap;
+import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiClient;
@@ -204,8 +206,16 @@ public class SLayoutBankRow implements SGridRow {
     }
     
     public void setPrimaryKey(int[] pk) {
-        mnPkYearId = pk[0];
-        mnPkDocId = pk[1];
+        int[] key = new int[] { SLibConsts.UNDEFINED };
+        
+        if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_DPS) {
+            mnPkYearId = pk[0];
+            mnPkDocId = pk[1];
+        }
+        else if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_ADV) {
+            mnBizPartnerId = pk[0];
+        }
+        
     }
     
     public int getLayoutRowType() { return mnLayoutRowType; }
@@ -260,7 +270,16 @@ public class SLayoutBankRow implements SGridRow {
 
     @Override
     public int[] getRowPrimaryKey() {
-        return new int[] { mnPkYearId, mnPkDocId };
+        int[] key = new int[] { SLibConsts.UNDEFINED };
+        
+        if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_DPS) {
+            key = new int[] { mnPkYearId, mnPkDocId };
+        }
+        else if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_ADV) {
+            key = new int[] { mnBizPartnerId };
+        }
+        
+        return key;
     }
 
     @Override
@@ -297,118 +316,178 @@ public class SLayoutBankRow implements SGridRow {
     public Object getRowValueAt(int col) {
         Object value = null;
 
-        switch (col) {
-            case 0:
-                value = msBizPartner;
-                break;
-            case 1:
-                value = msBizPartnerKey;
-                break;
-            case 2:
-                value = msTypeDps;
-                break;
-            case 3:
-                value = msNumberSer;
-                break;
-            case 4:
-                value = mtDate;
-                break;
-            case 5:
-                value = msBizPartnerBranchCob;
-                break;
-            case 6:
-                value = mbIsForPayment;
-                break;
-            case 7:
-                value = mdBalance;
-                break;
-            case 8:
-                value = mdBalanceTot;
-                break;
-            case 9:
-                value = msCurrencyKey;
-                break;
-            case 10:
-                value = msAccountCredit;
-                break;
-            case 11:
-                value = msEmail;
-                break;
-            case 12:
-                value = msBizPartnerCreditFiscalId;
-                break;
-            case 13:
-                value = mdSubTotal;
-                break;
-            case 14:
-                value = mdTaxCharged;
-                break;
-            case 15:
-                value = mdTaxRetained;
-                break;
-            case 16:
-                value = mdTotal;
-                break;
-            case 17:
-                value = mtDateMaturityRo;
-                break;
-            default:
+        if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_DPS) {
+            switch (col) {
+                case 0:
+                    value = msBizPartner;
+                    break;
+                case 1:
+                    value = msBizPartnerKey;
+                    break;
+                case 2:
+                    value = msTypeDps;
+                    break;
+                case 3:
+                    value = msNumberSer;
+                    break;
+                case 4:
+                    value = mtDate;
+                    break;
+                case 5:
+                    value = msBizPartnerBranchCob;
+                    break;
+                case 6:
+                    value = mbIsForPayment;
+                    break;
+                case 7:
+                    value = mdBalance;
+                    break;
+                case 8:
+                    value = mdBalanceTot;
+                    break;
+                case 9:
+                    value = msCurrencyKey;
+                    break;
+                case 10:
+                    value = msAccountCredit;
+                    break;
+                case 11:
+                    value = msEmail;
+                    break;
+                case 12:
+                    value = msBizPartnerCreditFiscalId;
+                    break;
+                case 13:
+                    value = mdSubTotal;
+                    break;
+                case 14:
+                    value = mdTaxCharged;
+                    break;
+                case 15:
+                    value = mdTaxRetained;
+                    break;
+                case 16:
+                    value = mdTotal;
+                    break;
+                case 17:
+                    value = mtDateMaturityRo;
+                    break;
+                default:
+            }
         }
+        else if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_ADV) {
+            switch (col) {
+                case 0:
+                    value = msBizPartner;
+                    break;
+                case 1:
+                    value = msBizPartnerKey;
+                    break;
+                case 2:
+                    value = mdBalanceTot;
+                    break;
+                case 3:
+                    value = msCurrencyKey;
+                    break;
+                case 4:
+                    value = msAccountCredit;
+                    break;
+                case 5:
+                    value = msEmail;
+                    break;
+                case 6:
+                    value = msBizPartnerCreditFiscalId;
+                    break;
+                default:
+            }
+        }
+        
 
         return value;
     }
 
     @Override
     public void setRowValueAt(Object value, int row) {
-        switch (row) {
-            case 0:
-                break;
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                break;
-            case 5:
-                break;
-            case 6:
-                mbIsForPayment = (boolean) value;
-                break;
-            case 7:
-                break;
-            case 8:
-                mdBalanceTot = (double) value;
-                break;
-            case 9:
-                break;
-            case 10:
-                if (value == null) {
-                    msAccountCredit = "";
-                }
-                else {
-                    msAccountCredit = ((SGuiItem) value).getItem();
-                    //msAccountCredit = (String) value;
-                }
-                break;
-            case 11:
-                msEmail = (String) value;
-                break;
-            case 12:
-                break;
-            case 13:
-                break;
-            case 14:
-                break;
-            case 15:
-                break;
-            case 16:
-                break;
-            case 17:
-                break;
-            default:
-                break;
+        if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_DPS) {
+            switch (row) {
+                case 0:
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    break;
+                case 5:
+                    break;
+                case 6:
+                    mbIsForPayment = (boolean) value;
+                    break;
+                case 7:
+                    break;
+                case 8:
+                    mdBalanceTot = (double) value;
+                    break;
+                case 9:
+                    break;
+                case 10:
+                    if (value == null) {
+                        msAccountCredit = "";
+                    }
+                    else {
+                        msAccountCredit = ((SGuiItem) value).getItem();
+                        //msAccountCredit = (String) value;
+                    }
+                    break;
+                case 11:
+                    msEmail = (String) value;
+                    break;
+                case 12:
+                    break;
+                case 13:
+                    break;
+                case 14:
+                    break;
+                case 15:
+                    break;
+                case 16:
+                    break;
+                case 17:
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_ADV) {
+            switch (row) {
+                case 0:
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    mdBalanceTot = (double) value;
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    if (value == null) {
+                        msAccountCredit = "";
+                    }
+                    else {
+                        msAccountCredit = ((SGuiItem) value).getItem();
+                        //msAccountCredit = (String) value;
+                    }
+                    break;
+                case 5:
+                    msEmail = (String) value;
+                    break;
+                case 6:
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

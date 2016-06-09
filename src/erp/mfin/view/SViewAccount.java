@@ -9,6 +9,7 @@ import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
 import erp.lib.gui.SGuiModule;
 import erp.lib.table.STabFilterDeleted;
 import erp.lib.table.STableColumn;
@@ -21,8 +22,6 @@ import erp.mfin.data.SFinUtilities;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import sa.gui.util.SUtilConsts;
 
@@ -187,22 +186,24 @@ public class SViewAccount extends erp.lib.table.STableTab implements java.awt.ev
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
             oldAccount = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
             guiModule = miClient.getGuiModule(SDataConstants.MOD_FIN);
+            
             try {
-                if (SFinUtilities.changeDeepAccount(miClient, new int[] {oldAccount.getPkAccountId()}, 2, true)) {
+                if (SFinUtilities.changeDeepAccount(miClient, new int[] { oldAccount.getPkAccountId() }, 2, true)) {
                     guiModule.setFormComplement(oldAccount);
                     
                     if (guiModule.showForm(mnTabType, SDataConstantsSys.FINX_ACC_DEEP, null) == SLibConstants.DB_ACTION_SAVE_OK) {
                         newAccount = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, ((SDataAccount) guiModule.getRegistry()).getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
-                        SFinUtilities.changeRecortEntriesAccount(miClient, new int[] {oldAccount.getPkAccountId()},new int[] {newAccount.getPkAccountId()});
+                        SFinUtilities.changeRecordEntriesAccount(miClient, new int[] { oldAccount.getPkAccountId() },new int[] { newAccount.getPkAccountId() });
                     }
                     else {
-                        SFinUtilities.changeDeepAccount(miClient, new int[] {oldAccount.getPkAccountId()}, 1, false);
+                        SFinUtilities.changeDeepAccount(miClient, new int[] { oldAccount.getPkAccountId() }, 1, false);
                     }
                     
                     miClient.getGuiModule(SDataConstants.MOD_FIN).refreshCatalogues(mnTabType);
                 }
-            } catch (Exception ex) {
-                miClient.showMsgBoxWarning(ex.getMessage());
+            }
+            catch (Exception ex) {
+                SLibUtilities.renderException(this, ex);
             }
         }
         setCursor(cursor);

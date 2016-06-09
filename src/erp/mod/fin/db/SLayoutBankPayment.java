@@ -12,6 +12,7 @@ import java.util.ArrayList;
  */
 public class SLayoutBankPayment {
 
+    protected int mnLayoutPaymentType;
     protected int mnBizPartnerId;
     protected int mnBizPartnerBranchId;
     protected int mnBizPartnerBranchBankAccountId;
@@ -24,7 +25,8 @@ public class SLayoutBankPayment {
     
     protected ArrayList<SLayoutBankDps> maLayoutBankDps;
 
-    public SLayoutBankPayment(int bizPartnerId, int bizPartnerBranchId, int bizPartnerBranchBankAccountId) {
+    public SLayoutBankPayment(int layoutRowType, int bizPartnerId, int bizPartnerBranchId, int bizPartnerBranchBankAccountId) {
+        mnLayoutPaymentType = layoutRowType;
         mnBizPartnerId = bizPartnerId;
         mnBizPartnerBranchId = bizPartnerBranchId;
         mnBizPartnerBranchBankAccountId = bizPartnerBranchBankAccountId;
@@ -34,6 +36,7 @@ public class SLayoutBankPayment {
         maLayoutBankDps = new ArrayList<SLayoutBankDps>();
     }
 
+    public void setLayoutRowType(int n) { mnLayoutPaymentType = n; }
     public void setBizPartnerId(int n) { mnBizPartnerId = n; }
     public void setBizPartnerBranchId(int n) { mnBizPartnerBranchId = n; }
     public void setBizPartnerBranchAccountId(int n) { mnBizPartnerBranchBankAccountId = n; }
@@ -46,6 +49,7 @@ public class SLayoutBankPayment {
     
     public void setLayoutBankDps(ArrayList<SLayoutBankDps> o) { maLayoutBankDps = o; }
 
+    public int getLayoutPaymentType() { return mnLayoutPaymentType; }
     public int getBizPartnerId() { return mnBizPartnerId; }
     public int getBizPartnerBranchId() { return mnBizPartnerBranchId; }
     public int getBizPartnerBranchAccountId() { return mnBizPartnerBranchBankAccountId; }
@@ -60,7 +64,7 @@ public class SLayoutBankPayment {
     
     @Override
      public SLayoutBankPayment clone() throws CloneNotSupportedException {
-        SLayoutBankPayment bankPayment = new SLayoutBankPayment(this.getBizPartnerId(), this.getBizPartnerBranchId(), this.getBizPartnerBranchAccountId());
+        SLayoutBankPayment bankPayment = new SLayoutBankPayment(this.getLayoutPaymentType(), this.getBizPartnerId(), this.getBizPartnerBranchId(), this.getBizPartnerBranchAccountId());
         
         bankPayment.setCurrencyId(this.getCurrencyId());
         bankPayment.setAmount(this.getAmount());

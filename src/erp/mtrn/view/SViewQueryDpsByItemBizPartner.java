@@ -8,13 +8,19 @@ package erp.mtrn.view;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
 import erp.lib.table.STabFilterDatePeriodRange;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
+import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mfin.data.SFinUtilities;
 import erp.mitm.form.SPanelFilterItem;
+import erp.mtrn.form.SDialogUpdateDpsAccountCenterCost;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
+import java.awt.Dimension;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
@@ -29,6 +35,9 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
     private erp.lib.table.STabFilterDatePeriodRange moTabFilterDatePeriodRange;
     private erp.mitm.form.SPanelFilterItem moPanelFilterItem;
     private erp.table.STabFilterBizPartner moTabFilterBizPartner;
+    private erp.mtrn.form.SDialogUpdateDpsAccountCenterCost moDialogUpdateDpsAccountCostCenter;
+    
+    private javax.swing.JButton jbAccountCostCenter;
 
     private boolean mbHasRightAuthor = false;
 
@@ -44,6 +53,12 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
         moTabFilterDatePeriodRange = new STabFilterDatePeriodRange(miClient, this);
         moPanelFilterItem = new SPanelFilterItem(miClient, this, true);
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, isPurchase() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
+        moDialogUpdateDpsAccountCostCenter = new SDialogUpdateDpsAccountCenterCost(miClient);
+
+        jbAccountCostCenter = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_bkk_csh.gif")));
+        jbAccountCostCenter.setPreferredSize(new Dimension(23, 23));
+        jbAccountCostCenter.addActionListener(this);
+        jbAccountCostCenter.setToolTipText("Modificar contabilización");
 
         if (isPurchase()) {
             levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_TRN).Level;
@@ -58,6 +73,10 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
         removeTaskBarUpperComponent(jbEdit);
         removeTaskBarUpperComponent(jbDelete);
         addTaskBarUpperComponent(moTabFilterDatePeriodRange);
+        if (SLibUtils.belongsTo(mnTabTypeAux01, new int[] { SDataConstantsSys.TRNX_PUR_DPS_BY_ITEM_BP_ALL, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_ALL })) {
+            addTaskBarUpperSeparator();
+            addTaskBarUpperComponent(jbAccountCostCenter);
+        }
         if (SLibUtils.belongsTo(mnTabTypeAux01, new int[] { SDataConstantsSys.TRNX_PUR_DPS_BY_ITEM_BP_FIL, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_FIL })) {
             addTaskBarUpperSeparator();
             addTaskBarUpperComponent(moPanelFilterItem);
@@ -76,8 +95,17 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
 
         moTablePane.reset();
 
+        STableField[] aoKeyFields = new STableField[3];
         maoTableColumns = new STableColumn[28];
 
+        i = 0;
+        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "de.id_year");
+        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "de.id_doc");
+        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "de.id_ety");
+        for (i = 0; i < aoKeyFields.length; i++) {
+            moTablePane.getPrimaryKeyFields().add(aoKeyFields[i]);
+        }
+        
         i = 0;
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "d.dt", "Fecha doc.", STableConstants.WIDTH_DATE);
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "dt.code", "Tipo doc.", STableConstants.WIDTH_CODE_DOC);
@@ -138,6 +166,38 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
         return isPurchase;
     }
 
+    private void actionAccountCostCenter() {
+        String account = "";
+        String costCenter = "";
+        
+        if (jbAccountCostCenter.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() == null) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else if (!moTablePane.getSelectedTableRow().getIsSummary()) {
+                try {
+                    int gui = isPurchase() ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;    // GUI module
+
+                    account = SFinUtilities.getAccountForDpsEntry(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                    costCenter = SFinUtilities.getCostCenterForDpsEntry(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+
+                    moDialogUpdateDpsAccountCostCenter.formReset();
+                    moDialogUpdateDpsAccountCostCenter.setValue(SDataConstants.TRN_DPS, new int[] { ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0], ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[1] });
+                    moDialogUpdateDpsAccountCostCenter.setValue(SDataConstants.TRN_DPS_ETY, moTablePane.getSelectedTableRow().getPrimaryKey());
+                    moDialogUpdateDpsAccountCostCenter.setValue(SDataConstants.FIN_ACC, new String[] { account, costCenter }); 
+                    moDialogUpdateDpsAccountCostCenter.setFormVisible(true);
+
+                    if (moDialogUpdateDpsAccountCostCenter.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                        miClient.getGuiModule(gui).refreshCatalogues(mnTabType);
+                    }
+                }
+                catch (Exception e) {
+                    SLibUtilities.renderException(this, e);
+                }
+            }
+        }
+    }
+
     @Override
     public void createSqlQuery() {
         java.util.Date[] range = null;
@@ -176,7 +236,7 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
 
 //        renderTableColumns();
 
-        msSql = "SELECT d.dt, dt.code, CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS folio, cob.code, bp.bp, bpc.bp_key, bpb.bpb, de.concept_key, it.item, de.orig_qty, u.symbol, de.price_u_cur, de.stot_cur_r, de.tax_charged_cur_r, de.tax_retained_cur_r,  de.tot_cur_r, c.cur_key, " +
+        msSql = "SELECT de.id_year, de.id_doc, de.id_ety, d.dt, dt.code, CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS folio, cob.code, bp.bp, bpc.bp_key, bpb.bpb, de.concept_key, it.item, de.orig_qty, u.symbol, de.price_u_cur, de.stot_cur_r, de.tax_charged_cur_r, de.tax_retained_cur_r,  de.tot_cur_r, c.cur_key, " +
                 "de.price_u, de.stot_r, de.tax_charged_r, de.tax_retained_r,  de.tot_r, '"  + miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey() + "' AS f_cur_key, " +
                 "de.id_ety , rbc.code, rcb.code, CONCAT(r.id_year, '-', erp.lib_fix_int(r.id_per, 2)) as f_rper, " +
                 "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, " + SDataConstantsSys.NUM_LEN_FIN_REC + ")) as f_rnum " +
@@ -228,6 +288,10 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
 
         if (e.getSource() instanceof javax.swing.JButton) {
             JButton button = (JButton) e.getSource();
+                
+            if (button == jbAccountCostCenter) {
+                actionAccountCostCenter();
+            }
 
         }
     }

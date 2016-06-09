@@ -5,12 +5,16 @@
 
 package erp.mod.fin.db;
 
+import erp.mod.SModSysConsts;
+import sa.lib.SLibConsts;
+
 /**
  *
  * @author Juan Barajas
  */
 public class SLayoutBankXmlRow {
     
+    protected int mnLayoutXmlRowType;
     protected int mnDpsYear;
     protected int mnDpsDoc;
     protected double mdAmount;
@@ -40,6 +44,7 @@ public class SLayoutBankXmlRow {
     protected int mnBookkeepingNumber;
 
     public SLayoutBankXmlRow() {
+        mnLayoutXmlRowType = 0;
         mnDpsYear = 0;
         mnDpsDoc = 0;
         mdAmount = 0;
@@ -69,6 +74,7 @@ public class SLayoutBankXmlRow {
         mnBookkeepingNumber = 0;
     }
 
+    public void setLayoutXmlRowType(int n) { mnLayoutXmlRowType = n; }
     public void setDpsYear(int n) { mnDpsYear = n; }
     public void setDpsDoc(int n) { mnDpsDoc = n; }
     public void setAmount(double d) { mdAmount = d; }
@@ -98,9 +104,19 @@ public class SLayoutBankXmlRow {
     public void setBookkeepingNumber(int n) { mnBookkeepingNumber = n; }
     
     public int[] getPrimaryKey() {
-        return new int[] { mnDpsYear, mnDpsDoc };
+        int[] key = new int[] { SLibConsts.UNDEFINED };
+        
+        if (mnLayoutXmlRowType == SModSysConsts.FIN_LAY_BANK_DPS) {
+            key = new int[] { mnDpsYear, mnDpsDoc };
+        }
+        else if (mnLayoutXmlRowType == SModSysConsts.FIN_LAY_BANK_ADV) {
+            key = new int[] { mnBizPartner };
+        }
+        
+        return key;
     }
     
+    public int getLayoutXmlRowType() { return mnLayoutXmlRowType; }
     public int getDpsYear() { return mnDpsYear; }
     public int getDpsDoc() { return mnDpsDoc; }
     public double getAmount() { return mdAmount; }

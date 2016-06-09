@@ -474,6 +474,7 @@ public class SDialogAccountingDetail extends javax.swing.JDialog implements java
 
         switch (mnDetailType) {
             case SDataConstants.FINX_ACCOUNTING:
+            case SDataConstants.FINX_ACCOUNTING_ALL:
                 jtfSubsystem.setText("MOVIMIENTOS DE BALANZA DE COMPROBACIÓN");
                 jlField01.setText("No. cuenta contable:");
                 jlField02.setText("Cuenta contable:");
@@ -720,6 +721,7 @@ public class SDialogAccountingDetail extends javax.swing.JDialog implements java
 
             switch (mnDetailType) {
                 case SDataConstants.FINX_ACCOUNTING:
+                case SDataConstants.FINX_ACCOUNTING_ALL:
                     String accountId = (String) ((Object[]) moParamPrimaryKey)[0];
                     Object[] accountsAndDescription = SDataUtilities.getInputAccountsAndDescription(miClient, accountId, mvAccountLevels);
 

@@ -17,7 +17,7 @@ import erp.mod.hrs.db.SHrsUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
-import erp.print.Print;
+import erp.print.PrintCfdiThread;
 import erp.print.SDataConstantsPrint;
 import java.awt.Cursor;
 import java.sql.ResultSet;
@@ -374,7 +374,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
         String number = "";
         String sSql = "";
         ResultSet resultSet = null;
-        Print print = null; 
+        PrintCfdiThread print = null; 
         
         moIntTotalToProcess.setValue(maCfds.size());
         
@@ -442,7 +442,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                             detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Anulado.\n";
                             break;
                         case SCfdConsts.PROC_PRT_DOC:
-                            print = new Print(miClient, cfd.getPkCfdId(), SDataConstantsPrint.PRINT_MODE_STREAM, mnNumCopies, mnSubtypeCfd, this);
+                            print = new PrintCfdiThread(miClient, cfd.getPkCfdId(), SDataConstantsPrint.PRINT_MODE_STREAM, mnNumCopies, mnSubtypeCfd, this);
                             
                             print.startThread();
                             print.join();
