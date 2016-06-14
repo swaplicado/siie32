@@ -285,7 +285,10 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jcbCompanyBranchEntity = new javax.swing.JComboBox<SFormComponentItem>();
         Dummy6 = new javax.swing.JLabel();
         jckIsUniversalBranch = new javax.swing.JCheckBox();
-        jPanel2 = new javax.swing.JPanel();
+        jpControls = new javax.swing.JPanel();
+        jpControls1 = new javax.swing.JPanel();
+        jtfPkUserId_Ro = new javax.swing.JTextField();
+        jpControls2 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
 
@@ -1061,21 +1064,36 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
 
-        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        jpControls.setLayout(new java.awt.GridLayout(1, 2));
+
+        jpControls1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jtfPkUserId_Ro.setEditable(false);
+        jtfPkUserId_Ro.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPkUserId_Ro.setToolTipText("ID del registro");
+        jtfPkUserId_Ro.setFocusable(false);
+        jtfPkUserId_Ro.setPreferredSize(new java.awt.Dimension(65, 23));
+        jpControls1.add(jtfPkUserId_Ro);
+
+        jpControls.add(jpControls1);
+
+        jpControls2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar"); // NOI18N
         jbOk.setToolTipText("[Ctrl + Enter]");
         jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel2.add(jbOk);
+        jpControls2.add(jbOk);
 
         jbCancel.setText("Cancelar"); // NOI18N
         jbCancel.setToolTipText("[Escape]");
-        jPanel2.add(jbCancel);
+        jpControls2.add(jbCancel);
 
-        getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
+        jpControls.add(jpControls2);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-808)/2, (screenSize.height-534)/2, 808, 534);
+        getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
+
+        setSize(new java.awt.Dimension(808, 534));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -3366,7 +3384,6 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel19;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel20;
     private javax.swing.JPanel jPanel21;
     private javax.swing.JPanel jPanel22;
@@ -3523,10 +3540,14 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JList<SFormComponentItem> jltUserPlants;
     private javax.swing.JList<SFormComponentItem> jltUserPos;
     private javax.swing.JList<SFormComponentItem> jltUserWarehouses;
+    private javax.swing.JPanel jpControls;
+    private javax.swing.JPanel jpControls1;
+    private javax.swing.JPanel jpControls2;
     private javax.swing.JPanel jpUserCompany;
     private javax.swing.JPanel jpUserCompanyBranches;
     private javax.swing.JPasswordField jpfUserPassword;
     private javax.swing.JPasswordField jpfUserPasswordConfirm;
+    private javax.swing.JTextField jtfPkUserId_Ro;
     private javax.swing.JTextField jtfUser;
     // End of variables declaration//GEN-END:variables
 
@@ -3545,6 +3566,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jpfUserPassword.setText("");
         jpfUserPasswordConfirm.setText("");
+        jtfPkUserId_Ro.setText("");
 
         for (int i = 0; i < mvFields.size(); i++) {
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
@@ -3689,6 +3711,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldIsActive.setFieldValue(moUser.getIsActive());
         moFieldIsDeleted.setFieldValue(moUser.getIsDeleted());
         moFieldFkBizPartnerId.setFieldValue(new int[] { moUser.getFkBizPartnerId_n() });
+        jtfPkUserId_Ro.setText("" + moUser.getPkUserId());
 
         jpfUserPassword.setEnabled(false);
         jpfUserPasswordConfirm.setEnabled(false);
