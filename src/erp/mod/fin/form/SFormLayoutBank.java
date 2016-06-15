@@ -2022,6 +2022,10 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
             registry.setPostSaveMethodArgs(new Object[] { miClient });
         }
         registry.getXmlRows().addAll(maXmlRows);
+         
+        if (mnFormSubtype != SModConsts.FIN_REC) {
+            registry.setTransactionType(mnFormSubtype == SModSysConsts.FIN_LAY_BANK_DPS ? SFinConsts.LAY_BANK_TYPE_DPS : SFinConsts.LAY_BANK_TYPE_ADV);
+        }
 
         if (mnFormSubtype == SModConsts.FIN_REC) {
             for (SGridRow rowAux : moGridPayments.getModel().getGridRows()) {

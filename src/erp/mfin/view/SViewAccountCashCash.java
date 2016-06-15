@@ -40,7 +40,7 @@ public class SViewAccountCashCash extends erp.lib.table.STableTab implements jav
         addTaskBarUpperComponent(moTabFilterDeleted);
 
         STableField[] aoKeyFields = new STableField[2];
-        STableColumn[] aoTableColumns = new STableColumn[14];
+        STableColumn[] aoTableColumns = new STableColumn[15];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "ac.id_cob");
@@ -57,6 +57,7 @@ public class SViewAccountCashCash extends erp.lib.table.STableTab implements jav
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "t.tp_acc_cash", "Tipo de cuenta", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_acc", "No. cuenta contable", STableConstants.WIDTH_ACCOUNT_ID);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "a.acc", "Cuenta contable", STableConstants.WIDTH_ACCOUNT);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "e.b_act", "Activo", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ac.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usr. creación", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "ac.ts_new", "Creación", STableConstants.WIDTH_DATE_TIME);
@@ -126,7 +127,7 @@ public class SViewAccountCashCash extends erp.lib.table.STableTab implements jav
             }
         }
 
-        msSql = "SELECT ac.id_cob, ac.id_acc_cash, e.ent, e.code, ac.b_del, ac.fid_acc, f_acc_usr(" + ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskAccount() + ", a.code) AS f_acc, " +
+        msSql = "SELECT ac.id_cob, ac.id_acc_cash, e.ent, e.code, e.b_act, ac.b_del, ac.fid_acc, f_acc_usr(" + ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskAccount() + ", a.code) AS f_acc, " +
                 "ac.ts_new, ac.ts_edit, ac.ts_del, " +
                 "cob.id_bpb, cob.bpb, a.acc, t.tp_acc_cash, c.cur_key, " +
                 "un.usr, ue.usr, ud.usr " +

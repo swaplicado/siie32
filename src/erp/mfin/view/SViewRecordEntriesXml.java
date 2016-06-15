@@ -25,7 +25,7 @@ import javax.swing.JButton;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Gerardo Hernández
  */
 public class SViewRecordEntriesXml extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -175,7 +175,6 @@ public class SViewRecordEntriesXml extends erp.lib.table.STableTab implements ja
                 }
             }
         }
-       
 
         msSql = "SELECT * FROM " +
                 "(SELECT re.id_year AS id_year, re.id_per AS id_per, re.id_bkc AS id_bkc, re.id_tp_rec AS id_tp_rec, re.id_num AS id_num, re.id_ety AS id_ety, cfd.id_cfd AS id_cfd, r.dt AS dt, re.concept AS concept, re.b_del AS b_del, " +

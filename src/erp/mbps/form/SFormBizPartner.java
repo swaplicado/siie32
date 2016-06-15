@@ -2049,14 +2049,16 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     }
 
     private void renderCreditLimit() {
-        if ((moFieldFkCreditTypeId_n.getKeyAsIntArray()[0] == 0 || moFieldFkCreditTypeId_n.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_NO) || !jckIsCreditByUser.isSelected()) {
+        if ((moFieldFkCreditTypeId_n.getKeyAsIntArray()[0] == 0 || moFieldFkCreditTypeId_n.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_NO) || 
+                !jckIsCreditByUser.isSelected()) {
             jtfCreditLimit.setEditable(false);
             jtfCreditLimit.setFocusable(false);
             jtfDaysOfCredit.setEditable(false);
             jtfDaysOfCredit.setFocusable(false);
             jtfDaysOfGrace.setEditable(false);
             jtfDaysOfGrace.setFocusable(false);
-            if (jckIsCreditByUser.isSelected()){
+            
+            if (jckIsCreditByUser.isSelected()) {
                  moFieldCreditLimit.setDouble(0d);
                  moFieldDaysOfCredit.setInteger(0);
                  moFieldDaysOfGrace.setInteger(0);
@@ -2096,16 +2098,14 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             jbFkLanguageId_n.setEnabled(true);
             jbAddBranch.setEnabled(true);
         }
-        else{
+        else if (mnParamBizPartnerType == SDataConstants.BPSX_BP_CO) {
+            jbAddBranch.setEnabled(true);
+        }
+        else {
             jlCreditLimit.setEnabled(false);
             jlDaysOfCredit.setEnabled(false);
             jlDaysOfGrace.setEnabled(false);
             jlFkRiskTypeId.setEnabled(true);
-        }   
-        if (mnParamBizPartnerType == SDataConstants.BPSX_BP_CO) {
-            jbAddBranch.setEnabled(true);
-        }
-        else {
             jcbFkCreditTypeId_n.setEnabled(false);
             jlFkCfdAddendaTypeId.setEnabled(false);
             jckIsCreditByUser.setEnabled(false);
@@ -2147,6 +2147,22 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 moFieldDaysOfCredit.setFieldValue(moBizPartnerType.getDaysOfCredit());
                 moFieldDaysOfGrace.setFieldValue( moBizPartnerType.getDaysOfGrace());
                 moFieldFkRiskTypeId.setFieldValue(new int[] { moBizPartnerType.getFkRiskTypeId()});
+            }
+        }
+        else {
+            if (moBizPartnerCategory == null) {
+                moFieldFkCreditTypeId_n.setFieldValue(new int[] { SModSysConsts.BPSS_TP_CRED_CRED_NO });
+                moFieldCreditLimit.setFieldValue(0d);
+                moFieldDaysOfCredit.setFieldValue(0);
+                moFieldDaysOfGrace.setFieldValue(0);
+                moFieldFkRiskTypeId.setFieldValue(new int[] { SModSysConsts.BPSS_RISK_C });
+            }
+            else {
+                moFieldFkCreditTypeId_n.setFieldValue(new int[] { moBizPartnerCategory.getFkCreditTypeId_n() });
+                moFieldCreditLimit.setFieldValue(moBizPartnerCategory.getCreditLimit());
+                moFieldDaysOfCredit.setFieldValue(moBizPartnerCategory.getDaysOfCredit());
+                moFieldDaysOfGrace.setFieldValue( moBizPartnerCategory.getDaysOfGrace());
+                moFieldFkRiskTypeId.setFieldValue(new int[] { moBizPartnerCategory.getFkRiskTypeId_n()});
             }
         }
     }
@@ -2688,19 +2704,15 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
             moFieldKey.setFieldValue(moBizPartnerCategory.getKey());
             moFieldCompanyKey.setFieldValue(moBizPartnerCategory.getCompanyKey());
-            
-            moFieldIsCreditByUser.setFieldValue(moBizPartnerCategory.getIsCreditByUser());
-            
-            //invocar función que muestra cfg de crédito del tipo de cliente
                     
             if (moBizPartnerCategory.getIsCreditByUser()) {
                 moFieldFkCreditTypeId_n.setFieldValue(new int[] { moBizPartnerCategory.getEffectiveCreditTypeId() });
                 moFieldCreditLimit.setFieldValue(moBizPartnerCategory.getEffectiveCreditLimit());
                 moFieldDaysOfCredit.setFieldValue(moBizPartnerCategory.getEffectiveDaysOfCredit());
                 moFieldDaysOfGrace.setFieldValue(moBizPartnerCategory.getEffectiveDaysOfGrace());
+                moFieldFkRiskTypeId.setFieldValue(new int[] { moBizPartnerCategory.getEffectiveRiskTypeId() });
             }
             
-            moFieldFkRiskTypeId.setFieldValue(new int[] { moBizPartnerCategory.getIsCreditByUser() ? moBizPartnerCategory.getEffectiveRiskTypeId() : SLibConstants.UNDEFINED });
             moFieldFkLanguageId.setFieldValue(new int[] { moBizPartnerCategory.getFkLanguageId_n() });
             moFieldFkCurrencyId.setFieldValue(new int[] { moBizPartnerCategory.getFkCurrencyId_n() });
             moFieldDateStart.setFieldValue(moBizPartnerCategory.getDateStart());
@@ -2715,7 +2727,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         renderCreditLimit();
         renderCategorySettings();
         renderBizPartnerCategories();
-        itemStateChangedIsCreditApplying();
+        moFieldIsCreditByUser.setFieldValue(moBizPartnerCategory.getIsCreditByUser());
         if (mnParamBizPartnerType != SDataConstants.BPSX_BP_CO) {
             setLanguageEnabled(moBizPartnerCategory != null && moBizPartnerCategory.getFkLanguageId_n() > 0 && moBizPartnerCategory.getFkLanguageId_n() != miClient.getSessionXXX().getParamsErp().getFkLanguageId());
             setCurrencyEnabled(moBizPartnerCategory != null && moBizPartnerCategory.getFkCurrencyId_n() > 0 && moBizPartnerCategory.getFkCurrencyId_n() != miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId());
@@ -2858,7 +2870,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             moBizPartnerCategory.setPkBizPartnerCategoryId(moFieldFkBizPartnerCategoryId.getKeyAsIntArray()[0]);
             moBizPartnerCategory.setKey(moFieldKey.getString());
             moBizPartnerCategory.setCompanyKey(moFieldCompanyKey.getString());
-            if (moFieldFkCreditTypeId_n.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_NO) {
+            
+            if (!jckIsCreditByUser.isSelected()) {
                 moBizPartnerCategory.setCreditLimit(0);
                 moBizPartnerCategory.setDaysOfCredit(0);
                 moBizPartnerCategory.setDaysOfGrace(0);
@@ -2873,8 +2886,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             moBizPartnerCategory.setIsCreditByUser(jckIsCreditByUser.isSelected());
             moBizPartnerCategory.setFkBizPartnerCategoryId(moFieldFkBizPartnerCategoryId.getKeyAsIntArray()[0]);
             moBizPartnerCategory.setFkBizPartnerTypeId(moFieldFkBizPartnerTypeId.getKeyAsIntArray()[1]);
-            moBizPartnerCategory.setFkCreditTypeId_n(moFieldFkCreditTypeId_n.getKeyAsIntArray()[0]);
-            moBizPartnerCategory.setFkRiskTypeId_n(moFieldFkRiskTypeId.getKeyAsIntArray()[0]);
+            moBizPartnerCategory.setFkCreditTypeId_n(!jckIsCreditByUser.isSelected() ? SDataConstantsSys.BPSS_TP_CRED_CRED_NO : moFieldFkCreditTypeId_n.getKeyAsIntArray()[0]);
+            moBizPartnerCategory.setFkRiskTypeId_n(!jckIsCreditByUser.isSelected() ? SModSysConsts.BPSS_RISK_C : moFieldFkRiskTypeId.getKeyAsIntArray()[0]);
             moBizPartnerCategory.setFkCfdAddendaTypeId(moFieldFkCfdAddendaTypeId.getKeyAsIntArray()[0]);
             moBizPartnerCategory.setFkLanguageId_n(moBizPartnerCategory.getPkBizPartnerCategoryId() == SDataConstantsSys.BPSS_CT_BP_SUP || moBizPartnerCategory.getPkBizPartnerCategoryId() == SDataConstantsSys.BPSS_CT_BP_CUS ? moFieldFkLanguageId.getKeyAsIntArray()[0] : -1);
             moBizPartnerCategory.setFkCurrencyId_n(moFieldFkCurrencyId.getKeyAsIntArray()[0] <= 0 ? -1 : moFieldFkCurrencyId.getKeyAsIntArray()[0]);
