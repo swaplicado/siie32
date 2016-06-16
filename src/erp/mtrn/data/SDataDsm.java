@@ -1408,7 +1408,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                             "a.id_tax_bas = " + nPkTaxBasicId + " AND " +
                             "a.id_tax = " + nPkTaxId + " AND " +
                             "a.id_ct_dps = " + oDsmEntry.getDbmsFkDpsCategoryId() + " AND " +
-                            "a.id_dt_start <= '" + tPkDateStartId + "' " +
+                            "a.id_dt_start <= '" + SLibUtils.DbmsDateFormatDate.format(tPkDateStartId) + "' " +
                             "ORDER BY a.id_dt_start DESC ";
 
                         //System.out.println("sSql FIN ACCOUNT: " + sSql);
