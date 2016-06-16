@@ -2727,7 +2727,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         renderCreditLimit();
         renderCategorySettings();
         renderBizPartnerCategories();
-        moFieldIsCreditByUser.setFieldValue(moBizPartnerCategory.getIsCreditByUser());
+        moFieldIsCreditByUser.setFieldValue(moBizPartnerCategory != null ? moBizPartnerCategory.getIsCreditByUser() : false);
+        itemStateChangedIsCreditApplying();
         if (mnParamBizPartnerType != SDataConstants.BPSX_BP_CO) {
             setLanguageEnabled(moBizPartnerCategory != null && moBizPartnerCategory.getFkLanguageId_n() > 0 && moBizPartnerCategory.getFkLanguageId_n() != miClient.getSessionXXX().getParamsErp().getFkLanguageId());
             setCurrencyEnabled(moBizPartnerCategory != null && moBizPartnerCategory.getFkCurrencyId_n() > 0 && moBizPartnerCategory.getFkCurrencyId_n() != miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId());
