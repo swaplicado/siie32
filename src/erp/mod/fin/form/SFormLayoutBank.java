@@ -2037,6 +2037,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
             }
             registry.setTransfers(moGridPayments.getModel().getGridRows().size());
         }
+        registry.setExchangeRate(1);
         
         if (!maLocks.isEmpty()) {
             registry.getLocks().addAll(maLocks);

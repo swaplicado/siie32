@@ -60,6 +60,7 @@ public class SDbBankLayout extends SDbRegistryUser {
     protected Date mtDateDue;
     protected String msConcept;
     protected int mnConsecutive;
+    protected double mdExchangeRate;
     protected double mdAmount;
     protected double mdAmountPayed;
     protected int mnTransfers;
@@ -489,19 +490,19 @@ public class SDbBankLayout extends SDbRegistryUser {
                         oDsmEntry.setFkUserNewId(session.getUser().getPkUserId());
 
                         oDsmEntry.setSourceReference("");
-                        oDsmEntry.setFkSourceCurrencyId(bankPayment.getCurrencyId());
-                        oDsmEntry.setSourceValueCy(bankPayment.getAmount());
-                        oDsmEntry.setSourceValue(bankPayment.getAmount());
-                        oDsmEntry.setSourceExchangeRateSystem(bankPayment.getExcRate());
-                        oDsmEntry.setSourceExchangeRate(bankPayment.getExcRate());
+                        oDsmEntry.setFkSourceCurrencyId(dps.getFkCurrencyId());
+                        oDsmEntry.setSourceValueCy(bankDps.getDpsAmount());
+                        oDsmEntry.setSourceValue(bankDps.getDpsAmount());
+                        oDsmEntry.setSourceExchangeRateSystem(mdExchangeRate);
+                        oDsmEntry.setSourceExchangeRate(mdExchangeRate);
 
                         oDsmEntry.setFkDestinyDpsYearId_n(dps.getPkYearId());
                         oDsmEntry.setFkDestinyDpsDocId_n(dps.getPkDocId());
                         oDsmEntry.setFkDestinyCurrencyId(dps.getFkCurrencyId());
                         oDsmEntry.setDestinyValueCy(bankDps.getDpsAmount());
                         oDsmEntry.setDestinyValue(bankDps.getDpsAmount());
-                        oDsmEntry.setDestinyExchangeRateSystem(dps.getExchangeRate());
-                        oDsmEntry.setDestinyExchangeRate(dps.getExchangeRate());
+                        oDsmEntry.setDestinyExchangeRateSystem(mdExchangeRate);
+                        oDsmEntry.setDestinyExchangeRate(mdExchangeRate);
                         oDsmEntry.setDbmsFkDpsCategoryId(dps.getFkDpsCategoryId());
                         oDsmEntry.setDbmsDestinyDps((!dps.getNumberSeries().isEmpty() ? dps.getNumberSeries() + "-" : "") + dps.getNumber());
                         oDsmEntry.setDbmsSubclassMove(session.readField(SModConsts.FINS_CLS_ACC_MOV, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP, SDbRegistry.FIELD_NAME) + "");
@@ -830,6 +831,7 @@ public class SDbBankLayout extends SDbRegistryUser {
     public void setDateDue(Date t) { mtDateDue = t; }
     public void setConcept(String s) { msConcept = s; }
     public void setConsecutive(int n) { mnConsecutive = n; }
+    public void setExchangeRate(double d) { mdExchangeRate = d; }
     public void setAmount(double d) { mdAmount = d; }
     public void setAmountPayed(double d) { mdAmountPayed = d; }
     public void setTransfers(int n) { mnTransfers = n; }
@@ -859,6 +861,7 @@ public class SDbBankLayout extends SDbRegistryUser {
     public Date getDateDue() { return mtDateDue; }
     public String getConcept() { return msConcept; }
     public int getConsecutive() { return mnConsecutive; }
+    public double getExchangeRate() { return mdExchangeRate; }
     public double getAmount() { return mdAmount; }
     public double getAmountPayed() { return mdAmountPayed; }
     public int getTransfers() { return mnTransfers; }
@@ -912,6 +915,7 @@ public class SDbBankLayout extends SDbRegistryUser {
         mtDateDue = null;
         msConcept = "";
         mnConsecutive = 0;
+        mdExchangeRate = 0;
         mdAmount = 0;
         mdAmountPayed = 0;
         mnTransfers = 0;
@@ -988,6 +992,7 @@ public class SDbBankLayout extends SDbRegistryUser {
             mtDateDue = resultSet.getDate("dt_due");
             msConcept = resultSet.getString("cpt");
             mnConsecutive = resultSet.getInt("con");
+            //mdExchangeRate = resultSet.getDouble("amt");
             mdAmount = resultSet.getDouble("amt");
             mdAmountPayed = resultSet.getDouble("amt_pay");
             mnTransfers = resultSet.getInt("tra");
@@ -1043,6 +1048,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateDue) + "', " + 
                     "'" + msConcept + "', " + 
                     mnConsecutive + ", " + 
+                    //mdExchangeRate + ", " + 
                     mdAmount + ", " + 
                     mdAmountPayed + ", " + 
                     mnTransfers + ", " + 
@@ -1072,6 +1078,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                     "dt_due = '" + SLibUtils.DbmsDateFormatDate.format(mtDateDue) + "', " +
                     "cpt = '" + msConcept + "', " +
                     "con = " + mnConsecutive + ", " +
+                    //"amt = " + mdExchangeRate + ", " +
                     "amt = " + mdAmount + ", " +
                     "amt_pay = " + mdAmountPayed + ", " +
                     "tra = " + mnTransfers + ", " +
@@ -1109,6 +1116,7 @@ public class SDbBankLayout extends SDbRegistryUser {
         registry.setDateDue(this.getDateDue());
         registry.setConcept(this.getConcept());
         registry.setConsecutive(this.getConsecutive());
+        registry.setExchangeRate(this.getExchangeRate());
         registry.setAmount(this.getAmount());
         registry.setAmountPayed(this.getAmountPayed());
         registry.setTransfers(this.getTransfers());
