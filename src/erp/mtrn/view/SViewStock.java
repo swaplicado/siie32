@@ -15,6 +15,7 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mod.SModSysConsts;
 import erp.mtrn.form.SDialogStockCardex;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterCompanyBranchEntity;
@@ -24,6 +25,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JToggleButton;
 import javax.swing.table.DefaultTableCellRenderer;
+import sa.lib.SLibRpnArgument;
+import sa.lib.SLibRpnArgumentType;
+import sa.lib.SLibRpnOperator;
 
 /**
  *
@@ -94,7 +98,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
 
-                aoTableColumns = new STableColumn[6];
+                aoTableColumns = new STableColumn[8];
                 break;
 
             case SDataConstants.TRNX_STK_STK_WH:
@@ -105,7 +109,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_cob");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_wh");
 
-                aoTableColumns = new STableColumn[12];
+                aoTableColumns = new STableColumn[14];
                 break;
 
             case SDataConstants.TRNX_STK_LOT:
@@ -115,7 +119,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_lot");
 
-                aoTableColumns = new STableColumn[9];
+                aoTableColumns = new STableColumn[11];
                 break;
 
             case SDataConstants.TRNX_STK_LOT_WH:
@@ -127,7 +131,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_cob");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_wh");
 
-                aoTableColumns = new STableColumn[11];
+                aoTableColumns = new STableColumn[13];
                 break;
 
             default:
@@ -180,6 +184,13 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stk", "Existencias", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_val_u", "Val. u. máx. $", STableConstants.WIDTH_VALUE_UNITARY);
+        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "", "Val. máx. $", STableConstants.WIDTH_VALUE);
+        aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
+        aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_stk", SLibRpnArgumentType.OPERAND));
+        aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_val_u", SLibRpnArgumentType.OPERAND));
+        aoTableColumns[i++].getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.MULTIPLICATION, SLibRpnArgumentType.OPERATOR));
 
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);
@@ -265,6 +276,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
     @Override
     @SuppressWarnings("unchecked")
     public void createSqlQuery() {
+        int year = 0;
         int[] key = null;
         Date date = null;
         String sqlWhere = "";
@@ -279,7 +291,8 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
             }
             else if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {
                 date = (Date) setting.getSetting();
-                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "s.id_year = " + SLibTimeUtilities.digestYear(date)[0] + " AND " +
+                year = SLibTimeUtilities.digestYear(date)[0];
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "s.id_year = " + year + " AND " +
                         "s.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(date) + "' ";
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_COB_ENT) {
@@ -300,7 +313,9 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 (!showLots() ? "" : "s.id_lot, l.lot, l.dt_exp_n, l.b_block, ") +
                 (!showWarehouses() ? "" : "s.id_cob, s.id_wh, bpb.code, ent.code, sc.qty_min, sc.qty_max, sc.rop, " +
                  "IF(SUM(s.mov_in - s.mov_out) <= sc.qty_min, " + STableConstants.ICON_VIEW_LIG_RED + ", IF(sc.qty_min < SUM(s.mov_in - s.mov_out) AND SUM(s.mov_in - s.mov_out) <= sc.rop, "  + STableConstants.ICON_VIEW_LIG_YEL + ", IF(SUM(s.mov_in - s.mov_out) > sc.rop  AND SUM(s.mov_in - s.mov_out) <= sc.qty_max, "  + STableConstants.ICON_VIEW_LIG_GRE + ", IF(SUM(s.mov_in - s.mov_out) > sc.qty_max, " + STableConstants.ICON_WARN + ", " + STableConstants.ICON_VIEW_LIG_WHI + ")))) AS f_ico, ") +
-                "SUM(s.mov_in) AS f_mov_i, SUM(s.mov_out) AS f_mov_o, SUM(s.mov_in - s.mov_out) AS f_stk " +
+                "SUM(s.mov_in) AS f_mov_i, SUM(s.mov_out) AS f_mov_o, SUM(s.mov_in - s.mov_out) AS f_stk, " +
+                "(SELECT COALESCE(MAX(sx.cost_u), 0.0) FROM trn_stk AS sx WHERE sx.id_year = " + year + " AND sx.id_item = s.id_item AND sx.id_unit = s.id_unit AND NOT sx.b_del AND " +
+                "sx.fid_ct_iog = " + SModSysConsts.TRNS_CL_IOG_IN_ADJ[0] + " AND sx.fid_cl_iog = " + SModSysConsts.TRNS_CL_IOG_IN_ADJ[1] + ") AS f_val_u " +
                 "FROM trn_stk AS s " +
                 "INNER JOIN erp.itmu_item AS i ON s.id_item = i.id_item " +
                 "INNER JOIN erp.itmu_unit AS u ON s.id_unit = u.id_unit " +
