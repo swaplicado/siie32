@@ -1996,26 +1996,26 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             break; // accounting record was found!
                         }
                     }
-                }
+                    
+                    // Read aswell Bookkeeping Number, if any (Bookkeeping Numbers implemented from SIIE release 3.2 050.03):
 
-                // Read aswell Bookkeeping Number, if any (Bookkeeping Numbers implemented from SIIE release 3.2 050.03):
-
-                sSql = "SELECT DISTINCT fid_bkk_year_n, fid_bkk_num_n "
-                        + "FROM fin_rec AS r "
-                        + "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
-                        + "INNER JOIN fin_bkk_num AS b ON re.fid_bkk_year_n = b.id_year AND re.fid_bkk_num_n = b.id_num "
-                        + "WHERE NOT r.b_del AND NOT re.b_del AND re.fid_tp_acc_mov = " + anMoveSubclassKey[0] + " AND NOT b.b_del AND ";
-                if (isDocument()) {
-                    sSql += "re.fid_dps_year_n = " + mnPkYearId + " AND re.fid_dps_doc_n = " + mnPkDocId + " ";
-                }
-                else {
-                    sSql += "re.fid_dps_adj_year_n = " + mnPkYearId + " AND re.fid_dps_adj_doc_n = " + mnPkDocId + " ";
-                }
-                oResultSet = statement.executeQuery(sSql);
-                if (oResultSet.next()) {
-                    moDbmsDataBookkeepingNumber = new SDataBookkeepingNumber();
-                    if (moDbmsDataBookkeepingNumber.read(new int[] { oResultSet.getInt("fid_bkk_year_n"), oResultSet.getInt("fid_bkk_num_n") }, oStatementAux) != SLibConstants.DB_ACTION_READ_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                    sSql = "SELECT DISTINCT fid_bkk_year_n, fid_bkk_num_n "
+                            + "FROM fin_rec AS r "
+                            + "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
+                            + "INNER JOIN fin_bkk_num AS b ON re.fid_bkk_year_n = b.id_year AND re.fid_bkk_num_n = b.id_num "
+                            + "WHERE NOT r.b_del AND NOT re.b_del AND re.fid_tp_acc_mov = " + anMoveSubclassKey[0] + " AND NOT b.b_del AND ";
+                    if (isDocument()) {
+                        sSql += "re.fid_dps_year_n = " + mnPkYearId + " AND re.fid_dps_doc_n = " + mnPkDocId + " ";
+                    }
+                    else {
+                        sSql += "re.fid_dps_adj_year_n = " + mnPkYearId + " AND re.fid_dps_adj_doc_n = " + mnPkDocId + " ";
+                    }
+                    oResultSet = statement.executeQuery(sSql);
+                    if (oResultSet.next()) {
+                        moDbmsDataBookkeepingNumber = new SDataBookkeepingNumber();
+                        if (moDbmsDataBookkeepingNumber.read(new int[] { oResultSet.getInt("fid_bkk_year_n"), oResultSet.getInt("fid_bkk_num_n") }, oStatementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                        }
                     }
                 }
 
