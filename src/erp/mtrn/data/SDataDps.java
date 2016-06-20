@@ -40,6 +40,7 @@ import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mfin.data.SDataAccountCash;
+import erp.mfin.data.SDataBookkeepingNumber;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.data.SFinAccountConfig;
@@ -212,9 +213,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected boolean mbAuxIsNeedCfd;
     protected boolean mbAuxIsValidate;
 
-    protected erp.mtrn.data.SDataDpsAddenda moDbmsDataAddenda;
-    protected erp.mtrn.data.SDataDpsAddendaEntry moDataAddendaEntry;
+    protected erp.mfin.data.SDataBookkeepingNumber moDbmsDataBookkeepingNumber;
     protected erp.mtrn.data.SDataCfd moDbmsDataCfd;
+    protected erp.mtrn.data.SDataDpsAddenda moDbmsDataAddenda;
 
     protected String msCfdExpeditionLocality;
     protected String msCfdExpeditionState;
@@ -356,19 +357,28 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 for (SDataRecordEntry entry : record.getDbmsRecordEntries()) {
                     if (!entry.getIsDeleted()) {
                         // Delete aswell all non-deleted entries:
-
-                        if (isDocument()) {
-                            if (entry.getFkDpsYearId_n() == mnPkYearId && entry.getFkDpsDocId_n() == mnPkDocId) {
+                        
+                        if (moDbmsDataBookkeepingNumber != null) {
+                            if (entry.getFkBookkeepingYearId_n()== moDbmsDataBookkeepingNumber.getPkYearId() && entry.getFkBookkeepingNumberId_n() == moDbmsDataBookkeepingNumber.getPkNumberId()) {
                                 entry.setIsRegistryEdited(true);
                                 entry.setIsDeleted(true);
                                 entry.setFkUserDeleteId(mnFkUserDeleteId);
                             }
                         }
                         else {
-                            if (entry.getFkDpsAdjustmentYearId_n() == mnPkYearId && entry.getFkDpsAdjustmentDocId_n() == mnPkDocId) {
-                                entry.setIsRegistryEdited(true);
-                                entry.setIsDeleted(true);
-                                entry.setFkUserDeleteId(mnFkUserDeleteId);
+                            if (isDocument()) {
+                                if (entry.getFkDpsYearId_n() == mnPkYearId && entry.getFkDpsDocId_n() == mnPkDocId) {
+                                    entry.setIsRegistryEdited(true);
+                                    entry.setIsDeleted(true);
+                                    entry.setFkUserDeleteId(mnFkUserDeleteId);
+                                }
+                            }
+                            else {
+                                if (entry.getFkDpsAdjustmentYearId_n() == mnPkYearId && entry.getFkDpsAdjustmentDocId_n() == mnPkDocId) {
+                                    entry.setIsRegistryEdited(true);
+                                    entry.setIsDeleted(true);
+                                    entry.setFkUserDeleteId(mnFkUserDeleteId);
+                                }
                             }
                         }
                     }
@@ -377,6 +387,14 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
             if (record.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                 throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE);
+            }
+
+            if (moDbmsDataBookkeepingNumber != null && !moDbmsDataBookkeepingNumber.getIsDeleted()) {
+                moDbmsDataBookkeepingNumber.setIsDeleted(true);
+                moDbmsDataBookkeepingNumber.setFkUserDeleteId(mnFkUserDeleteId);
+                if (moDbmsDataBookkeepingNumber.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE);
+                }
             }
         }
 
@@ -472,17 +490,17 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         entry.setPkBookkeepingCenterId((Integer) ((Object[]) moDbmsRecordKey)[2]);
         entry.setPkRecordTypeId((String) ((Object[]) moDbmsRecordKey)[3]);
         entry.setPkNumberId((Integer) ((Object[]) moDbmsRecordKey)[4]);
-        entry.setPkEntryId(0);
+        //entry.setPkEntryId(...); // will be set on save
         entry.setConcept("");
         entry.setReference("");
         entry.setIsReferenceTax(false);
-        entry.setDebit(0);
-        entry.setCredit(0);
+        entry.setDebit(0.0);
+        entry.setCredit(0.0);
         entry.setExchangeRate(mdExchangeRate);
         entry.setExchangeRateSystem(mdExchangeRateSystem);
-        entry.setDebitCy(0);
-        entry.setCreditCy(0);
-        entry.setUnits(0);
+        entry.setDebitCy(0.0);
+        entry.setCreditCy(0.0);
+        entry.setUnits(0.0);
         entry.setSortingPosition(0);
         entry.setIsSystem(true);
         entry.setIsDeleted(false);
@@ -498,22 +516,22 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         entry.setFkSystemMoveTypeIdXXX(keySysMoveTypeXXX[1]);
         entry.setFkCurrencyId(mnFkCurrencyId);
         entry.setFkCostCenterIdXXX_n(idCostCenter);
-        entry.setFkCheckWalletId_n(0);
-        entry.setFkCheckId_n(0);
+        entry.setFkCheckWalletId_n(SLibConsts.UNDEFINED);
+        entry.setFkCheckId_n(SLibConsts.UNDEFINED);
         entry.setFkBizPartnerId_nr(mnFkBizPartnerId_r);
         entry.setFkBizPartnerBranchId_n(mnFkBizPartnerBranchId);
-        entry.setFkReferenceCategoryId_n(0);
+        entry.setFkReferenceCategoryId_n(SLibConsts.UNDEFINED);
         entry.setFkCompanyBranchId_n(keyCashAccount_n == null ? 0 : keyCashAccount_n[0]);
         entry.setFkEntityId_n(keyCashAccount_n == null ? 0 : keyCashAccount_n[1]);
-        entry.setFkTaxBasicId_n(0);
-        entry.setFkTaxId_n(0);
-        entry.setFkYearId_n(0);
+        entry.setFkTaxBasicId_n(SLibConsts.UNDEFINED);
+        entry.setFkTaxId_n(SLibConsts.UNDEFINED);
+        entry.setFkYearId_n(SLibConsts.UNDEFINED);
 
         if (isDocument()) {
             entry.setFkDpsYearId_n(mnPkYearId);
             entry.setFkDpsDocId_n(mnPkDocId);
-            entry.setFkDpsAdjustmentYearId_n(0);
-            entry.setFkDpsAdjustmentDocId_n(0);
+            entry.setFkDpsAdjustmentYearId_n(SLibConsts.UNDEFINED);
+            entry.setFkDpsAdjustmentDocId_n(SLibConsts.UNDEFINED);
         }
         else {
             entry.setFkDpsYearId_n(keyAuxDps_n[0]);
@@ -522,11 +540,18 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             entry.setFkDpsAdjustmentDocId_n(mnPkDocId);
         }
 
-        entry.setFkDiogYearId_n(0);
-        entry.setFkDiogDocId_n(0);
-        entry.setFkItemId_n(0);
-        entry.setFkItemAuxId_n(0);
-        entry.setFkUnitId_n(0);
+        entry.setFkDiogYearId_n(SLibConsts.UNDEFINED);
+        entry.setFkDiogDocId_n(SLibConsts.UNDEFINED);
+        entry.setFkMfgYearId_n(SLibConsts.UNDEFINED);
+        entry.setFkMfgOrdId_n(SLibConsts.UNDEFINED);
+        entry.setFkCostGicId_n(SLibConsts.UNDEFINED);
+        entry.setFkPayrollFormerId_n(SLibConsts.UNDEFINED);
+        entry.setFkPayrollId_n(SLibConsts.UNDEFINED);
+        entry.setFkItemId_n(SLibConsts.UNDEFINED);
+        entry.setFkItemAuxId_n(SLibConsts.UNDEFINED);
+        entry.setFkUnitId_n(SLibConsts.UNDEFINED);
+        entry.setFkBookkeepingYearId_n(moDbmsDataBookkeepingNumber == null ? 0 : moDbmsDataBookkeepingNumber.getPkYearId());
+        entry.setFkBookkeepingNumberId_n(moDbmsDataBookkeepingNumber == null ? 0 : moDbmsDataBookkeepingNumber.getPkNumberId());
 
         if (mbIsRegistryNew) {
             entry.setFkUserNewId(mnFkUserNewId);
@@ -1548,8 +1573,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxIsNeedCfd(boolean b) { mbAuxIsNeedCfd = b; }
     public void setAuxIsValidate(boolean b) { mbAuxIsValidate = b; }
 
-    public void setDbmsDataAddenda(erp.mtrn.data.SDataDpsAddenda o) { moDbmsDataAddenda = o; }
+    public void setDbmsDataBookkeepingNumber(erp.mfin.data.SDataBookkeepingNumber o) { moDbmsDataBookkeepingNumber = o; }
     public void setDbmsDataCfd(erp.mtrn.data.SDataCfd o) { moDbmsDataCfd = o; }
+    public void setDbmsDataAddenda(erp.mtrn.data.SDataDpsAddenda o) { moDbmsDataAddenda = o; }
 
     public java.lang.Object getDbmsRecordKey() { return moDbmsRecordKey; }
     public java.util.Date getDbmsRecordDate() { return mtDbmsRecordDate; }
@@ -1562,8 +1588,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public boolean getAuxIsNeedCfd() { return mbAuxIsNeedCfd; }
     public boolean getAuxIsValidate() { return mbAuxIsValidate; }
 
-    public erp.mtrn.data.SDataDpsAddenda getDbmsDataAddenda() { return moDbmsDataAddenda; }
+    public erp.mfin.data.SDataBookkeepingNumber getDbmsDataBookkeepingNumber() { return moDbmsDataBookkeepingNumber; }
     public erp.mtrn.data.SDataCfd getDbmsDataCfd() { return moDbmsDataCfd; }
+    public erp.mtrn.data.SDataDpsAddenda getDbmsDataAddenda() { return moDbmsDataAddenda; }
 
     public erp.mtrn.data.SDataDpsEntry getDbmsDpsEntry(int[] pk) {
         SDataDpsEntry entry = null;
@@ -1735,8 +1762,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         moAuxCfdParams = null;
         mbAuxIsNeedCfd = false;
 
-        moDbmsDataAddenda = null;
+        moDbmsDataBookkeepingNumber = null;
         moDbmsDataCfd = null;
+        moDbmsDataAddenda = null;
 
         msCfdExpeditionLocality = "";
         msCfdExpeditionState = "";
@@ -1756,7 +1784,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
         try {
             sSql = "SELECT d.*, c.cur, c.cur_key FROM trn_dps AS d INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
-                    "WHERE id_year = " + anKey[0] + " AND id_doc = " + anKey[1] + " ";
+                    "WHERE d.id_year = " + anKey[0] + " AND d.id_doc = " + anKey[1] + " ";
             oResultSet = statement.executeQuery(sSql);
             if (!oResultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
@@ -1882,7 +1910,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 // Read aswell document notes:
 
                 sSql = "SELECT id_year, id_doc, id_nts FROM trn_dps_nts " +
-                        "WHERE id_year = " + anKey[0] + " AND id_doc = " + anKey[1] + " " +
+                        "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " " +
                         "ORDER BY id_year, id_doc, id_nts ";
                 oResultSet = statement.executeQuery(sSql);
                 while (oResultSet.next()) {
@@ -1898,7 +1926,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 // Read aswell document entries:
 
                 sSql = "SELECT id_year, id_doc, id_ety FROM trn_dps_ety " +
-                        "WHERE id_year = " + anKey[0] + " AND id_doc = " + anKey[1] + " " +
+                        "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " " +
                         "ORDER BY fid_tp_dps_ety = " + SDataConstantsSys.TRNS_TP_DPS_ETY_VIRT + ", sort_pos, id_ety ";
                 oResultSet = statement.executeQuery(sSql);
                 while (oResultSet.next()) {
@@ -1965,14 +1993,35 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 ((Object[]) moAuxFormerRecordKey)[4] = ((Object[]) moDbmsRecordKey)[4];
                             }
 
-                            break;  // accounting record was found!
+                            break; // accounting record was found!
                         }
                     }
                 }
 
-                // Read XML:
+                // Read aswell Bookkeeping Number, if any (Bookkeeping Numbers implemented from SIIE release 3.2 050.03):
 
-                sSql = "SELECT id_cfd FROM trn_cfd WHERE fid_dps_year_n = " + anKey[0] + " AND fid_dps_doc_n = " + anKey[1] + " ";
+                sSql = "SELECT DISTINCT fid_bkk_year_n, fid_bkk_num_n "
+                        + "FROM fin_rec AS r "
+                        + "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
+                        + "INNER JOIN fin_bkk_num AS b ON re.fid_bkk_year_n = b.id_year AND re.fid_bkk_num_n = b.id_num "
+                        + "WHERE NOT r.b_del AND NOT re.b_del AND re.fid_tp_acc_mov = " + anMoveSubclassKey[0] + " AND NOT b.b_del AND ";
+                if (isDocument()) {
+                    sSql += "re.fid_dps_year_n = " + mnPkYearId + " AND re.fid_dps_doc_n = " + mnPkDocId + " ";
+                }
+                else {
+                    sSql += "re.fid_dps_adj_year_n = " + mnPkYearId + " AND re.fid_dps_adj_doc_n = " + mnPkDocId + " ";
+                }
+                oResultSet = statement.executeQuery(sSql);
+                if (oResultSet.next()) {
+                    moDbmsDataBookkeepingNumber = new SDataBookkeepingNumber();
+                    if (moDbmsDataBookkeepingNumber.read(new int[] { oResultSet.getInt("fid_bkk_year_n"), oResultSet.getInt("fid_bkk_num_n") }, oStatementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                    }
+                }
+
+                // Read aswell CFD:
+
+                sSql = "SELECT id_cfd FROM trn_cfd WHERE fid_dps_year_n = " + mnPkYearId + " AND fid_dps_doc_n = " + mnPkDocId + " ";
                 oResultSet = statement.executeQuery(sSql);
                 if (oResultSet.next()) {
                     moDbmsDataCfd = new SDataCfd();
@@ -1981,9 +2030,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     }
                 }
 
-                // Read addenda:
+                // Read aswell CFD's Addenda:
 
-                sSql = "SELECT COUNT(*) FROM trn_dps_add WHERE id_year = " + anKey[0] + " AND id_doc = " + anKey[1] + " ";
+                sSql = "SELECT COUNT(*) FROM trn_dps_add WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";
                 oResultSet = statement.executeQuery(sSql);
                 if (oResultSet.next()) {
                     if (oResultSet.getInt(1) > 0) {
@@ -2063,7 +2112,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         try {
             updateAuthorizationStatus(connection);  // applys only for orders and documents
 
-            //System.out.println("dps 1");
             nParam = 1;
             oCallableStatement = connection.prepareCall(
                     "{ CALL trn_dps_save(" +
@@ -2183,12 +2231,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             oCallableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);
             oCallableStatement.execute();
 
-            //System.out.println("dps 2");
             mnPkDocId = oCallableStatement.getInt(nParam - 3);
             mnDbmsErrorId = oCallableStatement.getInt(nParam - 2);
             msDbmsError = oCallableStatement.getString(nParam - 1);
 
-            //System.out.println("dps 3");
             if (mnDbmsErrorId != 0) {
                 throw new Exception(msDbmsError);
             }
@@ -2198,7 +2244,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                 // 1. Obtain decimals for calculations:
 
-                //System.out.println("dps 3.1");
                 sSql = "SELECT decs_val FROM erp.cfg_param_erp WHERE id_erp = 1 ";
                 oResultSet = oStatement.executeQuery(sSql);
                 if (oResultSet.next()) {
@@ -2242,14 +2287,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                 // 4. Save aswell journal voucher if this document class requires it:
 
-                //System.out.println("dps 3.4");
                 anAccMvtSubclassKey = getAccMvtSubclassKeyBizPartner();
 
-                //System.out.println("dps 3.5");
                 if (anAccMvtSubclassKey != null) {
                     // 4.1 Prepare journal voucher (accounting record):
 
-                    //System.out.println("dps 3.5.1");
                     if (mbIsDeleted) {
                         // Delete aswell former journal voucher:
 
@@ -2366,8 +2408,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             oRecord.setIsSystem(true);
                             oRecord.setIsDeleted(false);
                             oRecord.setFkCompanyBranchId(mnFkCompanyBranchId);
-                            oRecord.setFkCompanyBranchId_n(0);
-                            oRecord.setFkAccountCashId_n(0);
+                            oRecord.setFkCompanyBranchId_n(SLibConsts.UNDEFINED);
+                            oRecord.setFkAccountCashId_n(SLibConsts.UNDEFINED);
 
                             if (mbIsRegistryNew) {
                                 oRecord.setFkUserNewId(mnFkUserNewId);
@@ -2377,6 +2419,14 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 oRecord.setFkUserNewId(mnFkUserEditId);
                                 oRecord.setFkUserEditId(mnFkUserEditId);
                             }
+                        }
+                        
+                        if (moDbmsDataBookkeepingNumber == null || moDbmsDataBookkeepingNumber.getIsDeleted()) {
+                            moDbmsDataBookkeepingNumber = new SDataBookkeepingNumber();
+                            moDbmsDataBookkeepingNumber.setPkYearId(mnPkYearId);
+                            //moDbmsDataBookkeepingNumber.setPkNumberId(...); will be set on save
+                            moDbmsDataBookkeepingNumber.setFkUserNewId(mnFkUserNewId);
+                            moDbmsDataBookkeepingNumber.save(connection);
                         }
 
                         // 4.3 Business partner's asset or liability:
@@ -2756,7 +2806,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         }
 
                         if (dDebit != dCredit) {
-
                             oRecordEntry = oRecord.getDbmsRecordEntries().get(nPositionToAdjust);
                             if (SLibUtils.compareKeys(new int[] { mnFkDpsCategoryId, mnFkDpsClassId }, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC) ||
                                 SLibUtils.compareKeys(new int[] { mnFkDpsCategoryId, mnFkDpsClassId }, SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ)) {
@@ -2800,12 +2849,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             mtDbmsRecordDate = oRecord.getDate();
                         }
                     }
-                    //System.out.println("dps 3.5.2");
                 }
 
                 // 5. If document is deleted, delete aswell its links:
 
-                //System.out.println("dps 3.6");
                 if (mbIsDeleted) {
                     deleteLinks(oStatement);
                 }
@@ -2835,23 +2882,23 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     moDbmsDataAddenda.getDbmsDpsAddEntries().clear();
 
                     for (SDataDpsEntry entry : mvDbmsDpsEntries) {
-                        moDataAddendaEntry = new SDataDpsAddendaEntry();
+                        SDataDpsAddendaEntry addendaEntry = new SDataDpsAddendaEntry();
 
-                        moDataAddendaEntry.setPkYearId(entry.getPkYearId());
-                        moDataAddendaEntry.setPkDocId(entry.getPkDocId());
-                        moDataAddendaEntry.setPkEntryId(entry.getPkEntryId());
-                        moDataAddendaEntry.setBachocoNumeroPosicion(entry.getDbmsDpsAddBachocoNumberPosition());
-                        moDataAddendaEntry.setBachocoCentro(entry.getDbmsDpsAddBachocoCenter());
-                        moDataAddendaEntry.setLorealEntryNumber(entry.getDbmsDpsAddLorealEntryNumber());
-                        moDataAddendaEntry.setSorianaCodigo(entry.getDbmsDpsAddSorianaBarCode());
-                        moDataAddendaEntry.setElektraOrder(entry.getDbmsDpsAddElektraOrder());
-                        moDataAddendaEntry.setElektraBarcode(entry.getDbmsDpsAddElektraBarcode());
-                        moDataAddendaEntry.setElektraCages(entry.getDbmsDpsAddElektraCages());
-                        moDataAddendaEntry.setElektraCagePriceUnitary(entry.getDbmsDpsAddElektraCagePriceUnitary());
-                        moDataAddendaEntry.setElektraParts(entry.getDbmsDpsAddElektraParts());
-                        moDataAddendaEntry.setElektraPartPriceUnitary(entry.getDbmsDpsAddElektraPartPriceUnitary());
+                        addendaEntry.setPkYearId(entry.getPkYearId());
+                        addendaEntry.setPkDocId(entry.getPkDocId());
+                        addendaEntry.setPkEntryId(entry.getPkEntryId());
+                        addendaEntry.setBachocoNumeroPosicion(entry.getDbmsDpsAddBachocoNumberPosition());
+                        addendaEntry.setBachocoCentro(entry.getDbmsDpsAddBachocoCenter());
+                        addendaEntry.setLorealEntryNumber(entry.getDbmsDpsAddLorealEntryNumber());
+                        addendaEntry.setSorianaCodigo(entry.getDbmsDpsAddSorianaBarCode());
+                        addendaEntry.setElektraOrder(entry.getDbmsDpsAddElektraOrder());
+                        addendaEntry.setElektraBarcode(entry.getDbmsDpsAddElektraBarcode());
+                        addendaEntry.setElektraCages(entry.getDbmsDpsAddElektraCages());
+                        addendaEntry.setElektraCagePriceUnitary(entry.getDbmsDpsAddElektraCagePriceUnitary());
+                        addendaEntry.setElektraParts(entry.getDbmsDpsAddElektraParts());
+                        addendaEntry.setElektraPartPriceUnitary(entry.getDbmsDpsAddElektraPartPriceUnitary());
 
-                        moDbmsDataAddenda.getDbmsDpsAddEntries().add(moDataAddendaEntry);
+                        moDbmsDataAddenda.getDbmsDpsAddEntries().add(addendaEntry);
                     }
 
                     if (moAuxCfdParams.getTipoAddenda() != SDataConstantsSys.BPSS_TP_CFD_ADD_NA) {
