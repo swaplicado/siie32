@@ -94,73 +94,73 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab implements 
         }
 
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "jan", msHeaderTitle + asMonths[0] + ".", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_01", msHeaderTitle + asMonths[0] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_01", "Total neto " + asMonths[0] + ". $ ", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "feb", msHeaderTitle + asMonths[1] + ".", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_02", msHeaderTitle + asMonths[1] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_02", "Total neto " + asMonths[1] + ". $ ", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "mar", msHeaderTitle + asMonths[2] + ".", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_03", msHeaderTitle + asMonths[2] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_03", "Total neto " + asMonths[2] + ". $ ", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "apr", msHeaderTitle + asMonths[3] + ".", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_04", msHeaderTitle + asMonths[3] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_04", "Total neto " + asMonths[3] + ". $ ", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "may", msHeaderTitle + asMonths[4] + ".", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_05", msHeaderTitle + asMonths[4] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_05", "Total neto " + asMonths[4] + ". $ ", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "jun", msHeaderTitle + asMonths[5] + ".", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_06", msHeaderTitle + asMonths[5] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_06", "Total neto " + asMonths[5] + ". $ ", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "jul", msHeaderTitle + asMonths[6] + ".", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_07", msHeaderTitle + asMonths[6] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_07", "Total neto " + asMonths[6] + ". $ ", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "aug", msHeaderTitle + asMonths[7] + ".", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_08", msHeaderTitle + asMonths[7] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_08", "Total neto " + asMonths[7] + ". $ ", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "sep", msHeaderTitle + asMonths[8] + ".", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_09", msHeaderTitle + asMonths[8] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_09", "Total neto " + asMonths[8] + ". $ ", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "oct", msHeaderTitle + asMonths[9] + ".", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_10", msHeaderTitle + asMonths[9] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_10", "Total neto " + asMonths[9] + ". $ ", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "nov", msHeaderTitle + asMonths[10] + ".", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_11", msHeaderTitle + asMonths[10] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_11", "Total neto " + asMonths[10] + ". $ ", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "dece", msHeaderTitle + asMonths[11] + ".", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_12", msHeaderTitle + asMonths[11] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_12", "Total neto " + asMonths[11] + ". $ ", STableConstants.WIDTH_VALUE_2X);
@@ -288,29 +288,29 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab implements 
 //        renderTableColumns();
 
         msSql = "SELECT de.fid_item, de.fid_unit, i.item_key, i.item, " +
-                    createQueryUnit(MONTH_JAN) + " AS jan, " +
+                    createQueryUnit(MONTH_JAN) + " AS f_qty_01, " +
                     createQueryBalance(MONTH_JAN) + " AS f_stot_01, " +
-                    createQueryUnit(MONTH_FEB) + " AS feb, " +
+                    createQueryUnit(MONTH_FEB) + " AS f_qty_02, " +
                     createQueryBalance(MONTH_FEB) + " AS f_stot_02, " +
-                    createQueryUnit(MONTH_MAR) + " AS mar, " +
+                    createQueryUnit(MONTH_MAR) + " AS f_qty_03, " +
                     createQueryBalance(MONTH_MAR) + " AS f_stot_03, " +
-                    createQueryUnit(MONTH_APR) + " AS apr, " +
+                    createQueryUnit(MONTH_APR) + " AS f_qty_04, " +
                     createQueryBalance(MONTH_APR) + " AS f_stot_04, " +
-                    createQueryUnit(MONTH_MAY) + " AS may, " +
+                    createQueryUnit(MONTH_MAY) + " AS f_qty_05, " +
                     createQueryBalance(MONTH_MAY) + " AS f_stot_05, " +
-                    createQueryUnit(MONTH_JUN) + " AS jun, " +
+                    createQueryUnit(MONTH_JUN) + " AS f_qty_06, " +
                     createQueryBalance(MONTH_JUN) + " AS f_stot_06, " +
-                    createQueryUnit(MONTH_JUL) + " AS jul, " +
+                    createQueryUnit(MONTH_JUL) + " AS f_qty_07, " +
                     createQueryBalance(MONTH_JUL) + " AS f_stot_07, " +
-                    createQueryUnit(MONTH_AUG) + " AS aug, " +
+                    createQueryUnit(MONTH_AUG) + " AS f_qty_08, " +
                     createQueryBalance(MONTH_AUG) + " AS f_stot_08, " +
-                    createQueryUnit(MONTH_SEP) + " AS sep, " +
+                    createQueryUnit(MONTH_SEP) + " AS f_qty_09, " +
                     createQueryBalance(MONTH_SEP) + " AS f_stot_09, " +
-                    createQueryUnit(MONTH_OCT) + " AS oct, " +
+                    createQueryUnit(MONTH_OCT) + " AS f_qty_10, " +
                     createQueryBalance(MONTH_OCT) + " AS f_stot_10, " +
-                    createQueryUnit(MONTH_NOV) + " AS nov, " +
+                    createQueryUnit(MONTH_NOV) + " AS f_qty_11, " +
                     createQueryBalance(MONTH_NOV) + " AS f_stot_11, " +
-                    createQueryUnit(MONTH_DEC) + " AS dece, " +
+                    createQueryUnit(MONTH_DEC) + " AS f_qty_12, " +
                     createQueryBalance(MONTH_DEC) + " AS f_stot_12, (SELECT unit_base FROM erp.itmu_tp_unit WHERE id_tp_unit = " +
                     (typeUnitTotal == SDataConstantsSys.TRNX_TP_UNIT_TOT_QTY ? SDataConstantsSys.ITMU_TP_UNIT_QTY :
                         typeUnitTotal == SDataConstantsSys.TRNX_TP_UNIT_TOT_LEN ? SDataConstantsSys.ITMU_TP_UNIT_LEN :
@@ -323,7 +323,9 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab implements 
                     "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " +
                     "WHERE d.b_del = 0 AND de.b_del = 0 " + sqlDatePeriod +
                     "GROUP BY i.item_key, i.item " +
-                    "HAVING f_stot_01 <> 0 OR f_stot_02 <> 0 OR f_stot_03 <> 0 OR f_stot_04 <> 0 OR f_stot_05 <> 0 OR f_stot_06 <> 0 OR f_stot_07 <> 0 OR f_stot_08 <> 0 OR f_stot_09 <> 0 OR f_stot_10 <> 0 OR f_stot_11 <> 0 OR f_stot_12 <> 0 " +
+                    "HAVING f_stot_01 <> 0 OR f_qty_01 <> 0 OR f_stot_02 <> 0 OR f_qty_02 <> 0 OR f_stot_03 <> 0 OR f_qty_03 <> 0 OR f_stot_04 <> 0 OR f_qty_04 <> 0 OR f_stot_05 <> 0 OR f_qty_05 <> 0 OR " +
+                    "f_stot_06 <> 0 OR f_qty_06 <> 0 OR f_stot_07 <> 0 OR f_qty_07 <> 0 OR f_stot_08 <> 0 OR f_qty_08 <> 0 OR f_stot_09 <> 0 OR f_qty_09 <> 0 OR f_stot_10 <> 0 OR f_qty_10 <> 0 OR " +
+                    "f_stot_11 <> 0 OR f_qty_11 <> 0 OR f_stot_12 <> 0 OR f_qty_12 <> 0 " +
                     "ORDER BY i.item_key, i.item ";
     }
 
