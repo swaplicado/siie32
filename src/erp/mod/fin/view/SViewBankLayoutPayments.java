@@ -147,7 +147,8 @@ public class SViewBankLayoutPayments extends SGridPaneView implements ActionList
                 + "IF(tp.lay_bank = " + SFinConsts.LAY_BANK_SANTANDER + ", '" + SFinConsts.TXT_LAY_BANK_SANTANDER + "', "
                 + "IF(tp.lay_bank = " + SFinConsts.LAY_BANK_BANBAJIO + ", '" + SFinConsts.TXT_LAY_BANK_BANBAJIO + "', "
                 + "IF(tp.lay_bank = " + SFinConsts.LAY_BANK_BBVA + ", '" + SFinConsts.TXT_LAY_BANK_BBVA + "', "
-                + "'NO IDENTIFICADO')))) AS f_lay, "
+                + "IF(tp.lay_bank = " + SFinConsts.LAY_BANK_BANAMEX + ", '" + SFinConsts.TXT_LAY_BANK_BANAMEX + "', "
+                + "'NO IDENTIFICADO'))))) AS f_lay, "
                 + "CONCAT(e.ent, ' (', e.code, ')') AS f_ent, l.b_del, "
                 + "(SELECT c.cur_key FROM erp.cfgu_cur AS c WHERE a.fid_cur = c.id_cur) AS f_cur_key, l.b_clo_pay, "
                 + "l.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
@@ -188,8 +189,8 @@ public class SViewBankLayoutPayments extends SGridPaneView implements ActionList
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_lay", "Layout", 150));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_tp_lay", "Tipo layout", 200));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_ent", "Cuenta cargo", 250));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "l.cpt", "Concepto", 250));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.con", "Consecutivo", 50));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "l.cpt", "Concepto/Descripción", 250));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.con", "Consecutivo día", 50));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "l.amt", "Monto $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "l.amt_pay", "Monto pagado $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "f_amt_x_pay", "Monto x pagar $"));

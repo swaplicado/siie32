@@ -17,7 +17,9 @@ public class SLayoutBankPaymentTxt {
     protected int mnBizPartnerId;
     protected String msBizPartner;
     protected String msAccountCredit;
+    protected String msAccountBranchCredit;
     protected String msAccountDebit;
+    protected String msAccountBranchDebit;
     protected int mnCurrencyId;
     protected int mnHsbcFiscalVoucher;
     protected int mnHsbcBankCode;
@@ -37,7 +39,9 @@ public class SLayoutBankPaymentTxt {
         mnBizPartnerId = 0;
         msBizPartner = "";
         msAccountCredit = "";
+        msAccountBranchCredit = "";
         msAccountDebit = "";
+        msAccountBranchDebit = "";
         mnCurrencyId = 0;
         mnHsbcFiscalVoucher = 0;
         mnHsbcBankCode = 0;
@@ -57,7 +61,9 @@ public class SLayoutBankPaymentTxt {
     public void setBizPartnerId(int n) { mnBizPartnerId = n; }
     public void setBizPartner(String s) { msBizPartner = s; }
     public void setAccountCredit(String s) { msAccountCredit = s; }
+    public void setAccountBranchCredit(String s) { msAccountBranchCredit = s; }
     public void setAccountDebit(String s) { msAccountDebit = s; }
+    public void setAccountBranchDebit(String s) { msAccountBranchDebit = s; }
     public void setCurrencyId(int n) { mnCurrencyId = n; }
     public void setHsbcFiscalVoucher(int n) { mnHsbcFiscalVoucher = n; }
     public void setHsbcBankCode(int n) { mnHsbcBankCode = n; }
@@ -76,7 +82,9 @@ public class SLayoutBankPaymentTxt {
     public int getBizPartnerId() { return mnBizPartnerId; }
     public String getBizPartner() { return msBizPartner; }
     public String getAccountCredit() { return msAccountCredit; }
+    public String getAccountBranchCredit() { return msAccountBranchCredit; }
     public String getAccountDebit() { return msAccountDebit; }
+    public String getAccountBranchDebit() { return msAccountBranchDebit; }
     public int getCurrencyId() { return mnCurrencyId; }
     public int getHsbcFiscalVoucher() { return mnHsbcFiscalVoucher; }
     public int getHsbcBankCode() { return mnHsbcBankCode; }

@@ -157,6 +157,7 @@ public class SDbBankLayout extends SDbRegistryUser {
         }
         layoutXml.getXmlElements().addAll(xmlLayoutPays);
         msLayoutXml = layoutXml.getXmlString();
+        mnTransfers = xmlLayoutPays.size();
         
         computeLayoutText(session, xmlLayoutPays);
     }
@@ -168,7 +169,9 @@ public class SDbBankLayout extends SDbRegistryUser {
         int bizPartnerId = 0;
         String bizPartner = "";
         String accountDebit = "";
+        String accountBranchDebit = "";
         String accountCredit = "";
+        String accountBranchCredit = "";
         String layoutTitle = "";
         String sql = "";
         ResultSet resultSet = null;
@@ -208,7 +211,7 @@ public class SDbBankLayout extends SDbRegistryUser {
             
             // Account Debit:
         
-            sql = "SELECT acc_num "
+            sql = "SELECT acc_num, bankb_num "
                     + "FROM fin_acc_cash AS cash "
                     + "INNER JOIN erp.bpsu_bank_acc AS bank ON bank.id_bpb = cash.fid_bpb_n AND bank.id_bank_acc = cash.fid_bank_acc_n "
                     + "WHERE cash.id_cob = " + mnFkBankCompanyBranchId + " "
@@ -217,11 +220,12 @@ public class SDbBankLayout extends SDbRegistryUser {
             resultSet = session.getStatement().executeQuery(sql);
             if (resultSet.next()) {
                 accountDebit = resultSet.getString(1);
+                accountBranchDebit = resultSet.getString(2);
             }
             
             // Account Credit:
         
-            sql = "SELECT fid_cur, " + (layout == SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? "acc_num " : "acc_num_std ")
+            sql = "SELECT fid_cur, " + (layout == SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? "acc_num " : "acc_num_std ") + ", bankb_num "
                     + "FROM erp.bpsu_bank_acc "
                     + "WHERE id_bpb = " + (Integer) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BP).getValue() + " "
                     + "AND id_bank_acc = " + (Integer) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).getValue();
@@ -230,6 +234,7 @@ public class SDbBankLayout extends SDbRegistryUser {
             if (resultSet.next()) {
                 currencyId = resultSet.getInt(1);
                 accountCredit = resultSet.getString(2);
+                accountBranchCredit = resultSet.getString(3);
             }
             
             payment.setTotalAmount((double) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).getValue());
@@ -239,8 +244,10 @@ public class SDbBankLayout extends SDbRegistryUser {
             payment.setBizPartnerId(bizPartnerId);
             payment.setBizPartner(bizPartner);
             payment.setAccountDebit(accountDebit);
+            payment.setAccountBranchDebit(accountBranchDebit);
             payment.setCurrencyId(currencyId);
             payment.setAccountCredit(accountCredit);
+            payment.setAccountBranchCredit(accountBranchCredit);
             payment.setHsbcFiscalVoucher((Integer) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_VOU).getValue());
             payment.setHsbcBankCode((Integer) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_BANK_CODE).getValue());
             payment.setHsbcAccountType((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_ACC_TP).getValue());
@@ -269,6 +276,9 @@ public class SDbBankLayout extends SDbRegistryUser {
                   case SFinConsts.LAY_BANK_BBVA:
                        msLayoutText = SFinUtilities.createLayoutBbvaThird(payments, layoutTitle);
                       break;
+                  case SFinConsts.LAY_BANK_BANAMEX:
+                       msLayoutText = SFinUtilities.createLayoutBanamexThird(payments, layoutTitle);
+                      break;
                    default :
                        break;
                    }
@@ -276,7 +286,7 @@ public class SDbBankLayout extends SDbRegistryUser {
            case SDataConstantsSys.FINS_TP_PAY_BANK_TEF:
                 switch (layoutBank) {
                    case SFinConsts.LAY_BANK_HSBC:
-                       msLayoutText = SFinUtilities.createLayoutHsbcTef(payments, layoutTitle);
+                       msLayoutText = SFinUtilities.createLayoutHsbcTef(payments, layoutTitle, mtDateLayout);
                       break;
                   case SFinConsts.LAY_BANK_SANTANDER:
                        msLayoutText = SFinUtilities.createLayoutSantanderTef(payments, layoutTitle);
@@ -286,6 +296,9 @@ public class SDbBankLayout extends SDbRegistryUser {
                       break;
                    case SFinConsts.LAY_BANK_BBVA:
                        msLayoutText = SFinUtilities.createLayoutBbvaTef(payments, layoutTitle);
+                      break;
+                   case SFinConsts.LAY_BANK_BANAMEX:
+                       msLayoutText = SFinUtilities.createLayoutBanamexTef(payments, layoutTitle, session);
                       break;
                    default :
                        break;
@@ -305,6 +318,9 @@ public class SDbBankLayout extends SDbRegistryUser {
                    case SFinConsts.LAY_BANK_BBVA:
                        msLayoutText = SFinUtilities.createLayoutBbvaSpei(payments, layoutTitle);
                       break;
+                   case SFinConsts.LAY_BANK_BANAMEX:
+                       msLayoutText = SFinUtilities.createLayoutBanamexSpei(payments, layoutTitle, session);
+                      break;
                    default :
                        break;
                    }
@@ -319,6 +335,9 @@ public class SDbBankLayout extends SDbRegistryUser {
                       break;
                    case SFinConsts.LAY_BANK_BBVA:
                        msLayoutText = SFinUtilities.createLayoutBbvaSpei(payments, layoutTitle);
+                      break;
+                   case SFinConsts.LAY_BANK_BANAMEX:
+                       msLayoutText = SFinUtilities.createLayoutBanamexSpei(payments, layoutTitle, session);
                       break;
                    default :
                        break;

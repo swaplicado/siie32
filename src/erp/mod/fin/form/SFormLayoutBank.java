@@ -100,9 +100,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
     private double mdBalanceTot;
     private double mdBalancePayed;
     private int mnNumberDocs;
-    private int mnNumberTransfer;
     private int mnNumberRecordDistint;
-    private String msLayoutText;
     private java.lang.String msAccountDebit;
     private java.lang.String msDebitFiscalId;
     private java.lang.String msAccountCredit;
@@ -693,13 +691,13 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
 
             switch (mnLayoutType) {
                  case SDataConstantsSys.FINS_TP_PAY_BANK_THIRD:
-                     moTextConcept.setEnabled(mnLayout == SFinConsts.LAY_BANK_SANTANDER);
+                     moTextConcept.setEnabled(mnLayout == SFinConsts.LAY_BANK_SANTANDER || mnLayout == SFinConsts.LAY_BANK_HSBC);
                     break;
                 case SDataConstantsSys.FINS_TP_PAY_BANK_TEF:
                      moTextConcept.setEnabled(mnLayout == SFinConsts.LAY_BANK_SANTANDER);
                     break;
                 case SDataConstantsSys.FINS_TP_PAY_BANK_SPEI_FD_N:
-                     moTextConcept.setEnabled(mnLayout == SFinConsts.LAY_BANK_SANTANDER || mnLayout == SFinConsts.LAY_BANK_HSBC);
+                     moTextConcept.setEnabled(mnLayout == SFinConsts.LAY_BANK_SANTANDER);
                     break;
                 case SDataConstantsSys.FINS_TP_PAY_BANK_SPEI_FD_Y:
                      moTextConcept.setEnabled(mnLayout == SFinConsts.LAY_BANK_SANTANDER);
@@ -877,6 +875,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
         layouts.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_SANTANDER }, SFinConsts.TXT_LAY_BANK_SANTANDER));
         layouts.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_BANBAJIO }, SFinConsts.TXT_LAY_BANK_BANBAJIO));
         layouts.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_BBVA }, SFinConsts.TXT_LAY_BANK_BBVA));
+        layouts.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_BANAMEX }, SFinConsts.TXT_LAY_BANK_BANAMEX));
         
         moKeyLayouId.removeAllItems();
         for (int i = 0; i < layouts.size(); i++) {
@@ -1922,7 +1921,6 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
         jtfRows.setText("0/0");
         jckDateMaturityRo.setSelected(true);
         jckAccountAll.setSelected(true);
-        mnNumberTransfer = 0;
         mnNumberDocs = 0;
 
         moCurrentRecord = null;
@@ -1946,7 +1944,6 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
         
         moDateDate.setValue(moRegistry.getDateLayout());
         moDateDateDue.setValue(moRegistry.getDateDue());
-        moTextConcept.setValue(moRegistry.getConcept());
         moIntConsecutiveDay.setValue(moRegistry.getConsecutive());
         moKeyBankLayoutType.setValue(new int[] { moRegistry.getFkBankLayoutTypeId() });
         moKeyLayouId.setValue((int[]) moKeyBankLayoutType.getSelectedItem().getComplement());
@@ -1957,6 +1954,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
         
         renderBankLayoutSettings();
         renderAccountSettings();
+        moTextConcept.setValue(moRegistry.getConcept());
         if (mnFormSubtype == SModConsts.FIN_REC) {
             loadPaymentsXml();
             moDecBalanceTot.setValue(moRegistry.getAmount());
@@ -1978,6 +1976,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
         setFormEditable(true);
         jbPickRecord.setEnabled(false);
         enableFields(moRegistry.isRegistryNew());
+        moKeyBankLayoutType.setEnabled(false);
         moDecBalanceTot.setEditable(false);
         moDecBalanceTotPay.setEditable(false);
 
@@ -1987,7 +1986,6 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
     @Override
     public SDbBankLayout getRegistry() throws Exception {
         SDbBankLayout registry = moRegistry.clone();
-        ArrayList<SLayoutBankRecord> aBankRecords = null;
         SLayoutBankPaymentRow payRow = null;
 
         if (mnFormSubtype != SModConsts.FIN_REC) {
