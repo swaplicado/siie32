@@ -391,7 +391,7 @@ public abstract class SLibUtilities {
                 "\n\n[" + exception.getClass().getName() + " en " + object.getClass().getName() + "]", "Excepción", JOptionPane.WARNING_MESSAGE);
     }
     
-    public static void requestComponentFocus(javax.swing.JComponent component){
+    public static void requestComponentFocus(final javax.swing.JComponent component){
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
