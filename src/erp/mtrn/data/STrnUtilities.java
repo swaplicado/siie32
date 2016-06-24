@@ -1515,15 +1515,16 @@ public abstract class STrnUtilities {
                 }
 
                 if (canSend) {
-                    pdf = new File("temp", oDps.getNumberSeries() +
-                    (oDps.getNumberSeries().isEmpty() ? "" : "_") + oDps.getNumber() + ".pdf");
+                    pdf = new File("temp", oDps.getNumberSeries() + (oDps.getNumberSeries().isEmpty() ? "" : "_") + oDps.getNumber() + ".pdf");
 
                     createReportOrder(client, pdf, oDps, SDataConstantsPrint.PRINT_MODE_PDF);
 
                     mail.getAttachments().add(pdf);
                     mail.send();
 
-                    addressee = String.join(";", toRecipients);
+                    for (String recipient : toRecipients) {
+                        addressee += (addressee.isEmpty() ? "" : ";") + recipient;
+                    }
 
                     if (!STrnUtilities.insertDpsSendLog(client, oDps, addressee, false)) {
                     }
