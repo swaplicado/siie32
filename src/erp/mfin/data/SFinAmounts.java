@@ -108,7 +108,7 @@ public class SFinAmounts {
         sum = SLibUtils.round(sum, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
         
         if (total != sum && greatest != null) {
-            greatest.Amount = SLibUtils.round(total - sum, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+            greatest.Amount = SLibUtils.round(greatest.Amount + (total - sum), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
         }
     }
 }
