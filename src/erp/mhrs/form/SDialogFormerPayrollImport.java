@@ -1293,7 +1293,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
         // Obtain payroll structure:
 
         moPayroll = SHrsFormerUtils.readFormerPayroll((SClientInterface) miClient, miClient.getSession().getStatement(), mnPayrollId, miClient.getSession().getConfigCompany().getCompanyId(), moFieldDate.getDate(), moFieldDatePayment.getDate());
-        SCfdUtils.computeCfdiPayroll(miClient, moPayroll);
+        SCfdUtils.computeCfdiPayroll(miClient, moPayroll, false); // generate all CFDI
 
         miClient.getGuiModule(SDataConstants.MOD_FIN).refreshCatalogues(SDataConstants.FIN_REC);
         miClient.getGuiModule(SDataConstants.MOD_HRS).refreshCatalogues(SDataConstants.HRS_FORMER_PAYR);
@@ -1433,12 +1433,12 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
     public void actionOk() {
         Cursor cursor = null;
 
-        if (moTablePaneEmpAvailable.getTableGuiRowCount() > 0) {
-            miClient.showMsgBoxWarning("Todavía quedan empleados disponibles sin ser seleccionados.");
+        if (moTablePaneEmpSelected.getTableGuiColumnCount() == 0) {
+            miClient.showMsgBoxWarning("No hay empleados seleccionados.");
             moTablePaneEmpAvailable.requestFocus();
         }
-        else if (moTablePaneEmpSelected.getTableGuiColumnCount() == 0) {
-            miClient.showMsgBoxWarning("No hay empleados seleccionados.");
+        else if (moTablePaneEmpAvailable.getTableGuiRowCount() > 0) {
+            miClient.showMsgBoxWarning("Se debe seleccionar todos los empleados disponibles.");
             moTablePaneEmpAvailable.requestFocus();
         }
         else if (moFieldDate.getDate() == null) {

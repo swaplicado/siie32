@@ -404,11 +404,10 @@ public abstract class SCfdUtils implements Serializable {
         return true;
     }
 
-    private static void validateReceiptsConsistent(SClientInterface client, SHrsFormerPayroll payroll, SHrsFormerPayroll payrollXml, final boolean cfdiPendingSigned ) throws Exception {
+    private static void validateReceiptsConsistent(SClientInterface client, SHrsFormerPayroll payroll, SHrsFormerPayroll payrollXml, final boolean isRegenerateOnlyNonStampedCfdi) throws Exception {
         boolean isConsistent = false;
         boolean isFound = false;
         boolean add = true;
-        int index = 0;
         int cfdId = SLibConsts.UNDEFINED;
         String sql = "";
         ResultSet resultSet = null;
@@ -418,7 +417,7 @@ public abstract class SCfdUtils implements Serializable {
         // Validate payroll receipts consistent:
 
         if (payroll == null) {
-            throw new Exception("Payroll null");
+            throw new Exception("Payroll is null.");
         }
         else {
             moCfdPackets = new ArrayList<SCfdPacket>();
@@ -459,7 +458,7 @@ public abstract class SCfdUtils implements Serializable {
                             while (resultSet.next()) {
                                 if (resultSet.getInt("fid_st_xml") != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
                                     if (resultSet.getInt("fid_st_xml") == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
-                                        add = !cfdiPendingSigned;
+                                        add = !isRegenerateOnlyNonStampedCfdi;
                                         cfdId = isConsistent ? resultSet.getInt("id_cfd") : SLibConsts.UNDEFINED;
                                     }
                                     else {
@@ -514,12 +513,11 @@ public abstract class SCfdUtils implements Serializable {
                     packet.setCfdRootElement(comprobanteCfdi);
 
                     moCfdPackets.add(packet);
-                    index++;
                 }
             }
         }
 
-        if (!cfdiPendingSigned && payroll.getChildPayrollReceipts().size() != moCfdPackets.size()) {
+        if (!isRegenerateOnlyNonStampedCfdi && payroll.getChildPayrollReceipts().size() != moCfdPackets.size()) {
             client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             throw new Exception("No se generó el CFDI para todos los recibos de la nómina '" + payroll.getPkNominaId() + "'.");
         }
@@ -625,25 +623,27 @@ public abstract class SCfdUtils implements Serializable {
         boolean next = true;
 
         try {
-            if (cfd.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_CFD) {
-                dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
-                dps.setAuxIsValidate(isValidate);
+            switch (cfd.getFkCfdTypeId()) {
+                case SDataConstantsSys.TRNS_TP_CFD_CFD:
+                    dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
+                    dps.setAuxIsValidate(isValidate);
 
-                // Attempt to gain data lock:
+                    lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, dps.getPrimaryKey(), 1000 * 60); // 1 minute timeout
+                    break;
+                case SDataConstantsSys.TRNS_TP_CFD_PAY:
+                    if (subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_CUR) {
+                        receiptIssue = new SDataPayrollReceiptIssue();
 
-                lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, dps.getPrimaryKey(), 1000 * 60);     // 1 minute timeout
+                        if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, client.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                        }
+
+                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SModConsts.HRS_PAY_RCP_ISS, receiptIssue.getPrimaryKey(), 1000 * 60); // 1 minute timeout
+                    }
+                    break;
+                default:
             }
-            else if (cfd.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_PAY) {
-                receiptIssue = new SDataPayrollReceiptIssue();
-                
-                if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, client.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
-                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                }
-                // Attempt to gain data lock:
-
-                lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SModConsts.HRS_PAY_RCP_ISS, receiptIssue.getPrimaryKey(), 1000 * 60);     // 1 minute timeout
-            }
-
+            
             if (status == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
                 if (!isUpdateAckPdf) {
                     acknowledgmentCancel = cancel(client, cfd, date, isValidate, pacId);
@@ -2491,72 +2491,67 @@ public abstract class SCfdUtils implements Serializable {
         }
     }
 
-    public static void computeCfdiPayroll(final SClientInterface client, final SHrsFormerPayroll payroll) throws Exception {
-        computeCfdiPayroll(client, payroll, false);
-    }
-
-    public static void computeCfdiPayroll(final SClientInterface client, SHrsFormerPayroll payroll, final boolean cfdiPendingSigned) throws Exception {
-        SHrsFormerPayroll payrollXml = null;
-        ArrayList<SDataCfd> cfdPayroll = null;
-        ArrayList<SDataCfd> cfds = null;
+    public static void computeCfdiPayroll(final SClientInterface client, final SHrsFormerPayroll formerPayroll, final boolean isRegenerateOnlyNonStampedCfdi) throws Exception {
+        SHrsFormerPayroll formerPayrollDummy = null;
+        ArrayList<SDataCfd> formerPayrollCfds = null;
+        ArrayList<SDataCfd> formerPayrollCfdsEmited = null;
         SDbFormerPayrollImport payrollImport = null;
-        boolean canContinue = true;
 
         client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
-        if (canContinue) {
-            if (payroll.isValidPayroll()) {
-                cfdPayroll = new ArrayList<SDataCfd>();
+        if (formerPayroll.isValidPayroll()) {
+            formerPayrollCfdsEmited = new ArrayList<SDataCfd>();
 
-                cfds = getPayrollCfds(client, SCfdConsts.CFDI_PAYROLL_VER_OLD, new int[] { payroll.getPkNominaId() });
+            formerPayrollCfds = getPayrollCfds(client, SCfdConsts.CFDI_PAYROLL_VER_OLD, new int[] { formerPayroll.getPkNominaId() });
 
-                for (SDataCfd cfd : cfds) {
-                    if (cfd.getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
-                        cfdPayroll.add(cfd);
-                    }
+            for (SDataCfd cfd : formerPayrollCfds) {
+                if (cfd.getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
+                    formerPayrollCfdsEmited.add(cfd);
                 }
+            }
 
-                payrollXml = new SHrsFormerPayroll(client);
+            formerPayrollDummy = new SHrsFormerPayroll(client);
 
-                if (!cfdPayroll.isEmpty()) {
-                    payrollXml.setPkNominaId(cfdPayroll.get(0).getFkPayrollPayrollId_n());
-                    payrollXml.setFecha(cfdPayroll.get(0).getTimestamp());
+            if (!formerPayrollCfdsEmited.isEmpty()) {
+                formerPayrollDummy.setPkNominaId(formerPayrollCfdsEmited.get(0).getFkPayrollPayrollId_n());
+                formerPayrollDummy.setFecha(formerPayrollCfdsEmited.get(0).getTimestamp());
 
-                    payrollXml.renderPayroll(cfdPayroll, SCfdConsts.CFDI_PAYROLL_VER_OLD);
-                }
+                formerPayrollDummy.renderPayroll(formerPayrollCfdsEmited, SCfdConsts.CFDI_PAYROLL_VER_OLD);
+            }
 
-                validateReceiptsConsistent(client, payroll, payrollXml, cfdiPendingSigned);
+            validateReceiptsConsistent(client, formerPayroll, formerPayrollDummy, isRegenerateOnlyNonStampedCfdi);
 
-                payrollImport = new SDbFormerPayrollImport();
+            payrollImport = new SDbFormerPayrollImport();
 
-                payrollImport.setPayrollId(payroll.getPkNominaId());
-                payrollImport.setGenerateCfdiPendingSigned(cfdiPendingSigned);
-                payrollImport.setCfdPackets(moCfdPackets);
+            payrollImport.setPayrollId(formerPayroll.getPkNominaId());
+            payrollImport.setRegenerateOnlyNonStampedCfdi(isRegenerateOnlyNonStampedCfdi);
+            payrollImport.setCfdPackets(moCfdPackets);
 
-                SServerRequest request = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
-                request.setPacket(payrollImport);
-                SServerResponse response = client.getSessionXXX().request(request);
+            SServerRequest request = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
+            request.setPacket(payrollImport);
+            SServerResponse response = client.getSessionXXX().request(request);
 
-                if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
-                    client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                    throw new Exception(response.getMessage());
-                }
-                else {
-                    if (response.getResultType() != SLibConstants.DB_ACTION_SAVE_OK) {
-                        client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                        throw new Exception("Código de error al emitir el CFD: " + SLibConstants.MSG_ERR_DB_REG_SAVE + ".");
-                    }
-                    else {
-                        client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                        client.showMsgBoxInformation("CFDI de nómina generados correctamente.");
-                    }
-                }
+            if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+                client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                throw new Exception(response.getMessage());
             }
             else {
-                client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                throw new Exception("Los CFDI de nómina '" + payroll.getPkNominaId() + "' no se generaron correctamente.");
+                if (response.getResultType() != SLibConstants.DB_ACTION_SAVE_OK) {
+                    client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                    throw new Exception("Código de error al emitir el CFD: " + SLibConstants.MSG_ERR_DB_REG_SAVE + ".");
+                }
+                else {
+                    client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                    client.showMsgBoxInformation("CFDI de nómina generados correctamente.");
+                }
             }
         }
+        else {
+            client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            throw new Exception("Los CFDI de nómina '" + formerPayroll.getPkNominaId() + "' no se generaron correctamente.");
+        }
+        
+        client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
 
     public static void  processAnnul(final SClientInterface client, final ArrayList<SDataCfd> cfds) throws Exception {

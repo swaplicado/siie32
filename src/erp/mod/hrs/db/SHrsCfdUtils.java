@@ -186,7 +186,7 @@ public abstract class SHrsCfdUtils {
             payrollImport = new SDbFormerPayrollImport();
             
             payrollImport.setPayrollId(receipt.getPayroll().getPkNominaId());
-            payrollImport.setGenerateCfdiPendingSigned(cfdiPendingSigned);
+            payrollImport.setRegenerateOnlyNonStampedCfdi(cfdiPendingSigned);
             payrollImport.setCfdPackets(moCfdPackets);
             
             SServerRequest request = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);

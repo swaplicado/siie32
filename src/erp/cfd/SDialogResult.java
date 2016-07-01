@@ -41,7 +41,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
     protected SClientInterface miClient;
     
     protected ArrayList<SDataCfd> maCfds;
-    protected ArrayList<int[]> manPayrollReceiptsId;
+    protected ArrayList<int[]> maPayrollReceiptsIds;
     protected int mnTotalStamps;
     protected Date mtCancellationDate;
     protected boolean mbValidateStamp;
@@ -299,12 +299,10 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
     }
     
     private void process() throws Exception {
-        
         miClient.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
         
-        if (manPayrollReceiptsId != null) {
+        if (maPayrollReceiptsIds != null) {
             processPayroll();
-        
         }
         else if (maCfds != null) {
             processCfd();            
@@ -319,9 +317,9 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
         String detailMessage = "";
         SDbPayrollReceiptIssue receiptIssue = null;
         
-         if (manPayrollReceiptsId != null) {
+        if (maPayrollReceiptsIds != null) {
             receiptIssue = new SDbPayrollReceiptIssue();
-            for (int[] key : manPayrollReceiptsId) {
+            for (int[] key : maPayrollReceiptsIds) {
                 cfdsProcessed ++;
                 try {
                     switch (mnFormSubtype) {
@@ -336,7 +334,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                                     }
                                 }
                                 
-                                SHrsCfdUtils.computeSignCfdi(miClient.getSession(), new int[] { key[0], key[1], key[2]  });
+                                SHrsCfdUtils.computeSignCfdi(miClient.getSession(), new int[] { key[0], key[1], key[2] });
                                 detailMessage += (receiptIssue.getNumberSeries().length() > 0 ? receiptIssue.getNumberSeries() + "-" : "") + number + "   Timbrado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
                                 cfdsCorrect ++;
                             break;
@@ -356,8 +354,8 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                 update(getGraphics());
                 jScrollPane1.getVerticalScrollBar().setValue(jScrollPane1.getVerticalScrollBar().getMaximum());
             }
+            
             miClient.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        
         }
     }
 
@@ -392,7 +390,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                     case SCfdConsts.CFD_TYPE_PAYROLL:
                         switch (mnSubtypeCfd) {
                             case SCfdConsts.CFDI_PAYROLL_VER_OLD:
-                               payrollEmp = (SDataFormerPayrollEmp) SDataUtilities.readRegistry(miClient, SDataConstants.HRS_FORMER_PAYR_EMP, new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, SLibConstants.EXEC_MODE_SILENT);
+                                payrollEmp = (SDataFormerPayrollEmp) SDataUtilities.readRegistry(miClient, SDataConstants.HRS_FORMER_PAYR_EMP, new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, SLibConstants.EXEC_MODE_SILENT);
 
                                 numberSeries = payrollEmp.getNumberSeries();
                                 number = "" + payrollEmp.getNumber();
@@ -531,7 +529,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
         mbFirstTime = true;
         miClient = client;
         maCfds = cfds;
-        manPayrollReceiptsId = payrollReceipts;
+        maPayrollReceiptsIds = payrollReceipts;
         mnTotalStamps = totalStamp;
         mtCancellationDate = cancellationDate;
         mbValidateStamp = validateStamp;

@@ -26,7 +26,7 @@ import java.util.Date;
 public class SDbFormerPayrollImport extends SDataRegistry implements Serializable {
 
     protected int mnPayrollId;
-    protected boolean mbGenerateCfdiPendingSigned;
+    protected boolean mbRegenerateOnlyNonStampedCfdi;
     protected ArrayList<SCfdPacket> moCfdPackets;
 
     public SDbFormerPayrollImport() {
@@ -35,11 +35,11 @@ public class SDbFormerPayrollImport extends SDataRegistry implements Serializabl
     }
 
     public void setPayrollId(int n) { mnPayrollId = n; }
-    public void setGenerateCfdiPendingSigned(boolean b) { mbGenerateCfdiPendingSigned = b; }
+    public void setRegenerateOnlyNonStampedCfdi(boolean b) { mbRegenerateOnlyNonStampedCfdi = b; }
     public void setCfdPackets(ArrayList<SCfdPacket> o) { moCfdPackets = o; }
 
-    public int getPayroll() { return mnPayrollId; }
-    public boolean getGenerateCfdiPendingSigned() { return mbGenerateCfdiPendingSigned; }
+    public int getPayrollId() { return mnPayrollId; }
+    public boolean isRegenerateOnlyNonStampedCfdi() { return mbRegenerateOnlyNonStampedCfdi; }
     public ArrayList<SCfdPacket> getCfdPackets() { return moCfdPackets; }
 
     @Override
@@ -57,7 +57,7 @@ public class SDbFormerPayrollImport extends SDataRegistry implements Serializabl
         super.resetRegistry();
 
         mnPayrollId = 0;
-        mbGenerateCfdiPendingSigned = false;
+        mbRegenerateOnlyNonStampedCfdi = false;
         moCfdPackets = new ArrayList<SCfdPacket>();
     }
 
@@ -140,7 +140,7 @@ public class SDbFormerPayrollImport extends SDataRegistry implements Serializabl
                 }
                 
             }
-            if (mbGenerateCfdiPendingSigned) {
+            if (mbRegenerateOnlyNonStampedCfdi) {
                 sSql = "UPDATE trn_cfd AS c " +
                         "INNER JOIN hrs_sie_pay_emp AS pe ON c.fid_pay_pay_n = pe.id_pay AND c.fid_pay_emp_n = pe.id_emp AND c.fid_pay_bpr_n = pe.fid_bpr_n AND pe.b_del = 0 SET c.b_con = 1 " +
                         "WHERE c.fid_pay_pay_n = " + mnPayrollId + " AND c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " ";

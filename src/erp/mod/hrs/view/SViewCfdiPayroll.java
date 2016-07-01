@@ -55,20 +55,20 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
 
     private SGridFilterDatePeriod moFilterDatePeriod;
     private JButton jbReemit;
-    private JButton jbSignXml;
-    private JButton jbAnnul;
+    private JButton jbSignPayroll;
+    private JButton jbAnnulPayroll;
     private JButton jbGetXml;
     private JButton jbGetAcknowledgmentCancellation;
     private JButton jbPrint;
     private JButton jbPrintAcknowledgmentCancellation;
-    private JButton jbSend;
+    private JButton jbSendMail;
     private JButton jbVerifyCfdi;
-    private JButton jbRestoreSignXml;
+    private JButton jbRestoreSignedXml;
     private JButton jbRestoreAcknowledgmentCancellation;
-    private JButton jbDiactivatePac;
+    private JButton jbDeactivateControlFlags;
 
     private SDialogAnnulCfdi moDialogAnnulCfdi;
-    private SDialogFormerPayrollDate moDialogDate;
+    private SDialogFormerPayrollDate moDialogFormerPayrollDate;
 
     public SViewCfdiPayroll(SGuiClient client, int subType, String title, SGuiParams params) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_SIE_PAY, subType, title, params);
@@ -82,49 +82,49 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
 
         jbReemit = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_IMPORT), "Regenerar CFDI", this);
-        jbSignXml = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_SIGN), "Timbrar CFDI", this);
-        jbAnnul = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_ANNUL), "Anular " + (mnGridSubtype == SModConsts.VIEW_SC_SUM ? "" : "recibo ") + "nómina", this);
+        jbSignPayroll = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_SIGN), "Timbrar CFDI", this);
+        jbAnnulPayroll = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_ANNUL), "Anular " + (mnGridSubtype == SModConsts.VIEW_SC_SUM ? "" : "recibo ") + "nómina", this);
         jbGetXml = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML), "Obtener XML del comprobante", this);
         jbGetAcknowledgmentCancellation = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_CANCEL), "Obtener XML del acuse de cancelación del CFDI", this);
         jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir " + (mnGridSubtype == SModConsts.VIEW_SC_SUM ? "" : "recibo ") + "nómina", this);
         jbPrintAcknowledgmentCancellation = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT_ACK_CAN), "Imprimir acuse de cancelación", this);
-        jbSend = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")), "Enviar " + (mnGridSubtype == SModConsts.VIEW_SC_SUM ? "" : "recibo ") + "nómina", this);
+        jbSendMail = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")), "Enviar " + (mnGridSubtype == SModConsts.VIEW_SC_SUM ? "" : "recibo ") + "nómina", this);
         jbVerifyCfdi = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_ok.gif")), "Verificar timbrado o cancelación " + (mnGridSubtype == SModConsts.VIEW_SC_SUM ? "de los " : "del ") + "CFDI", this);
-        jbRestoreSignXml = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_insert.gif")), "Insertar XML timbrado del CFDI", this);
+        jbRestoreSignedXml = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_insert.gif")), "Insertar XML timbrado del CFDI", this);
         jbRestoreAcknowledgmentCancellation = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_insert.gif")), "Insertar PDF del acuse de cancelación del CFDI", this);
-        jbDiactivatePac = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif")), "Limpiar inconsistencias del timbrado o cancelación del CFDI", this);
+        jbDeactivateControlFlags = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif")), "Limpiar inconsistencias del timbrado o cancelación del CFDI", this);
 
         moDialogAnnulCfdi = new SDialogAnnulCfdi((SClientInterface) miClient, true);
-        moDialogDate = new SDialogFormerPayrollDate(miClient, SModConsts.HRSX_DATE, "Fecha de pago");
+        moDialogFormerPayrollDate = new SDialogFormerPayrollDate(miClient, SModConsts.HRSX_DATE, "Fecha de pago");
 
         switch (mnGridSubtype) {
             case SModConsts.VIEW_SC_SUM:
                 jbReemit.setEnabled(isCfdiPayrollVersionOld());
-                jbSignXml.setEnabled(true);
-                jbAnnul.setEnabled(true);
+                jbSignPayroll.setEnabled(true);
+                jbAnnulPayroll.setEnabled(true);
                 jbGetXml.setEnabled(false);
                 jbGetAcknowledgmentCancellation.setEnabled(false);
                 jbPrint.setEnabled(true);
                 jbPrintAcknowledgmentCancellation.setEnabled(true);
-                jbSend.setEnabled(true);
+                jbSendMail.setEnabled(true);
                 jbVerifyCfdi.setEnabled(true);
-                jbRestoreSignXml.setEnabled(false);
+                jbRestoreSignedXml.setEnabled(false);
                 jbRestoreAcknowledgmentCancellation.setEnabled(false);
-                jbDiactivatePac.setEnabled(false);
+                jbDeactivateControlFlags.setEnabled(false);
                 break;
             case SModConsts.VIEW_SC_DET:
                 jbReemit.setEnabled(false);
-                jbSignXml.setEnabled(true);
-                jbAnnul.setEnabled(true);
+                jbSignPayroll.setEnabled(true);
+                jbAnnulPayroll.setEnabled(true);
                 jbGetXml.setEnabled(true);
                 jbGetAcknowledgmentCancellation.setEnabled(true);
                 jbPrint.setEnabled(true);
                 jbPrintAcknowledgmentCancellation.setEnabled(true);
-                jbSend.setEnabled(true);
+                jbSendMail.setEnabled(true);
                 jbVerifyCfdi.setEnabled(true);
-                jbRestoreSignXml.setEnabled(true);
+                jbRestoreSignedXml.setEnabled(true);
                 jbRestoreAcknowledgmentCancellation.setEnabled(true);
-                jbDiactivatePac.setEnabled(true);
+                jbDeactivateControlFlags.setEnabled(true);
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -132,17 +132,17 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
 
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbReemit);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSignXml);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAnnul);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSignPayroll);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAnnulPayroll);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGetXml);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGetAcknowledgmentCancellation);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrint);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrintAcknowledgmentCancellation);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSend);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSendMail);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbVerifyCfdi);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbRestoreSignXml);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbRestoreSignedXml);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbRestoreAcknowledgmentCancellation);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDiactivatePac);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDeactivateControlFlags);
     }
 
     private void actionReemitPayroll() {
@@ -167,13 +167,13 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
-                        moDialogDate.setFormReset();
-                        moDialogDate.setVisible(true);
+                        moDialogFormerPayrollDate.setFormReset();
+                        moDialogFormerPayrollDate.setVisible(true);
 
-                        if (moDialogDate.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                        if (moDialogFormerPayrollDate.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
                             payroll = SHrsFormerUtils.readFormerPayroll((SClientInterface) miClient, miClient.getSession().getStatement(),
-                                    ((int []) gridRow.getRowPrimaryKey())[0], miClient.getSession().getConfigCompany().getCompanyId(), moDialogDate.getDateEmission(), moDialogDate.getDatePayment());
-                            SCfdUtils.computeCfdiPayroll((SClientInterface) miClient, payroll, moDialogDate.getGenerateCfdiPendingSigned());
+                                    ((int []) gridRow.getRowPrimaryKey())[0], miClient.getSession().getConfigCompany().getCompanyId(), moDialogFormerPayrollDate.getDateEmission(), moDialogFormerPayrollDate.getDatePayment());
+                            SCfdUtils.computeCfdiPayroll((SClientInterface) miClient, payroll, moDialogFormerPayrollDate.isRegenerateOnlyNonStampedCfdi());
 
                             // Update date of payment:
 
@@ -182,7 +182,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
 
                             if (oFormerPayroll != null) {
                                 oFormerPayroll.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
-                                oFormerPayroll.setDatePayment(moDialogDate.getDatePayment());
+                                oFormerPayroll.setDatePayment(moDialogFormerPayrollDate.getDatePayment());
 
                                 if (oFormerPayroll.saveField((miClient.getSession().getDatabase().getConnection()), new int[] { ((int []) gridRow.getRowPrimaryKey())[0] }) != SLibConstants.DB_ACTION_SAVE_OK) {
                                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE + "\n- No se pudo actualizar la fecha de pago.");
@@ -209,7 +209,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
         SDataCfd cfd = null;
         SDataPayrollReceiptIssue receiptIssue = null;
         
-        if (jbSignXml.isEnabled()) {
+        if (jbSignPayroll.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
@@ -226,15 +226,18 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                     miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
                 }
                 else {
-                    receiptIssue = new SDataPayrollReceiptIssue();
-                    
                     try {
                         if (mnGridSubtype == SModConsts.VIEW_SC_SUM) {
+                            // Stamp all payroll receipts:
+                            
                             needUpdate = SCfdUtils.signCfdi((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), gridRow.getRowPrimaryKey()), (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
                         }
                         else {
+                            // Stamp current payroll receipt:
+                            
                             cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
+                            receiptIssue = new SDataPayrollReceiptIssue();
                             if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
                                 throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n El recibo no ha sido emitido.");
                             }
@@ -273,7 +276,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
         ArrayList<SDataPayrollReceiptIssue> receiptIssues = null;
         SDataPayrollReceiptIssue receiptIssue = null;
 
-        if (jbAnnul.isEnabled()) {
+        if (jbAnnulPayroll.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
@@ -518,7 +521,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
     }
 
     private void actionSendMail() {
-        if (jbSend.isEnabled()) {
+        if (jbSendMail.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
@@ -592,12 +595,12 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
         }
     }
 
-    private void actionRestoreSignXml() {
+    private void actionRestoreSignedXml() {
         boolean needUpdate = true;
         SDataCfd cfd = null;
         SDataPayrollReceiptIssue receiptIssue = null;
 
-        if (jbRestoreSignXml.isEnabled()) {
+        if (jbRestoreSignedXml.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
@@ -691,8 +694,8 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
         }
     }
     
-    private void actionCfdiDiactivateFlags() {
-        if (jbDiactivatePac.isEnabled()) {
+    private void actionDeactivateControlFlags() {
+        if (jbDeactivateControlFlags.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
@@ -940,10 +943,10 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
             if (button == jbReemit) {
                 actionReemitPayroll();
             }
-            else if (button == jbSignXml) {
+            else if (button == jbSignPayroll) {
                 actionSignPayroll();
             }
-            else if (button == jbAnnul) {
+            else if (button == jbAnnulPayroll) {
                 actionAnnulPayroll();
             }
             else if (button == jbGetXml) {
@@ -958,20 +961,20 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
             else if (button == jbPrintAcknowledgmentCancellation) {
                 actionPrintAcknowledgmentCancellation();
             }
-            else if (button == jbSend) {
+            else if (button == jbSendMail) {
                 actionSendMail();
             }
             else if (button == jbVerifyCfdi) {
                 actionVerifyCfdi();
             }
-            else if (button == jbRestoreSignXml) {
-                actionRestoreSignXml();
+            else if (button == jbRestoreSignedXml) {
+                actionRestoreSignedXml();
             }
             else if (button == jbRestoreAcknowledgmentCancellation) {
                 actionRestoreAcknowledgmentCancellation();
             }
-            else if (button == jbDiactivatePac) {
-                actionCfdiDiactivateFlags();
+            else if (button == jbDeactivateControlFlags) {
+                actionDeactivateControlFlags();
             }
         }
     }

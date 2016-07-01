@@ -18,7 +18,10 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Sergio Flores
+ * 
+ * 3.2 052.03; 2016-06-30; Sergio Flores:
+ * Clarification of ambiguous field GenerateCfdiPendingSigned, changed to RegenerateOnlyNonStampedCfdi
  */
 public class SDialogFormerPayrollDate extends SBeanFormDialog implements FocusListener {
 
@@ -53,14 +56,14 @@ public class SDialogFormerPayrollDate extends SBeanFormDialog implements FocusLi
         jlDatePayment = new javax.swing.JLabel();
         moDatePayment = new sa.lib.gui.bean.SBeanFieldDate();
         jPanel3 = new javax.swing.JPanel();
-        moBoolGenerateCfdiPendingSigned = new sa.lib.gui.bean.SBeanFieldBoolean();
+        moBoolRegenerateOnlyNonStampedCfdi = new sa.lib.gui.bean.SBeanFieldBoolean();
 
         setTitle("Generación de CFDI");
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -82,9 +85,9 @@ public class SDialogFormerPayrollDate extends SBeanFormDialog implements FocusLi
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        moBoolGenerateCfdiPendingSigned.setText("Solo regenerar CFDI por timbrar");
-        moBoolGenerateCfdiPendingSigned.setPreferredSize(new java.awt.Dimension(250, 23));
-        jPanel3.add(moBoolGenerateCfdiPendingSigned);
+        moBoolRegenerateOnlyNonStampedCfdi.setText("Volver a generar solamente CFDI's por timbrar");
+        moBoolRegenerateOnlyNonStampedCfdi.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel3.add(moBoolRegenerateOnlyNonStampedCfdi);
 
         jPanel2.add(jPanel3);
 
@@ -101,7 +104,7 @@ public class SDialogFormerPayrollDate extends SBeanFormDialog implements FocusLi
     private javax.swing.JPanel jPanel3;
     private javax.swing.JLabel jlDateEmission;
     private javax.swing.JLabel jlDatePayment;
-    private sa.lib.gui.bean.SBeanFieldBoolean moBoolGenerateCfdiPendingSigned;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolRegenerateOnlyNonStampedCfdi;
     private sa.lib.gui.bean.SBeanFieldDate moDateEmission;
     private sa.lib.gui.bean.SBeanFieldDate moDatePayment;
     // End of variables declaration//GEN-END:variables
@@ -116,11 +119,11 @@ public class SDialogFormerPayrollDate extends SBeanFormDialog implements FocusLi
 
         moDateEmission.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEmission.getText()), true);
         moDatePayment.setDateSettings(miClient, SGuiUtils.getLabelName(jlDatePayment.getText()), true);
-        moBoolGenerateCfdiPendingSigned.setBooleanSettings(moBoolGenerateCfdiPendingSigned.getText(), false);
+        moBoolRegenerateOnlyNonStampedCfdi.setBooleanSettings(moBoolRegenerateOnlyNonStampedCfdi.getText(), true);
 
         moFields.addField(moDateEmission);
         moFields.addField(moDatePayment);
-        moFields.addField(moBoolGenerateCfdiPendingSigned);
+        moFields.addField(moBoolRegenerateOnlyNonStampedCfdi);
 
         moFields.setFormButton(jbSave);
 
@@ -133,12 +136,12 @@ public class SDialogFormerPayrollDate extends SBeanFormDialog implements FocusLi
 
     public Date getDateEmission() { return moDateValueEmission; }
     public Date getDatePayment() { return moDateValuePayment; }
-    public boolean getGenerateCfdiPendingSigned() { return moBoolGenerateCfdiPendingSigned.getValue(); }
+    public boolean isRegenerateOnlyNonStampedCfdi() { return moBoolRegenerateOnlyNonStampedCfdi.getValue(); }
 
     public void setFormReset() {
         moDateEmission.setValue(miClient.getSession().getCurrentDate());
         moDatePayment.setValue(null);
-        moBoolGenerateCfdiPendingSigned.setValue(true);
+        moBoolRegenerateOnlyNonStampedCfdi.setValue(true);
     }
 
     public void reloadCatalogues() {
