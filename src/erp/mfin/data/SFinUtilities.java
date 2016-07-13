@@ -120,6 +120,23 @@ public abstract class SFinUtilities {
         }
     }
 
+    public static String getFileNameLayout(SGuiSession session, int layoutId) throws Exception {
+        String fileName = "";
+        String sql = "";
+        ResultSet resulSet = null;
+
+        sql = "SELECT file_name " +
+               "FROM erp.finu_tp_lay_bank " +
+               "WHERE b_del = 0 AND id_tp_lay_bank = " + layoutId;
+
+        resulSet = session.getStatement().executeQuery(sql);
+        if (resulSet.next()) {
+            fileName = resulSet.getString("file_name");
+        }
+        
+        return fileName;
+    }
+    
     public static String getBizPartnerForBanamex(SGuiSession session, int bizPartnerId) throws Exception {
         String bizPartner = "";
         String firstname = "";
@@ -134,17 +151,17 @@ public abstract class SFinUtilities {
               "WHERE id_bp = " + bizPartnerId;
 
         resulSet = session.getStatement().executeQuery(sql);
-        while (resulSet.next()) {
+        if (resulSet.next()) {
             if (resulSet.getInt("fid_tp_bp_idy") == SModSysConsts.BPSS_TP_BP_IDY_ORG) {
                 firstname = resulSet.getString("bp");
-                bizPartner = ", " + SLibUtilities.textToAlphanumeric(firstname) + " /";
+                bizPartner = "," + SLibUtilities.textToAlphanumeric(firstname) + "/";
             }
             else {
                 firstname = resulSet.getString("firstname");
                 lastname = resulSet.getString("lastname");
                 fatherLastname = lastname.substring(0, lastname.indexOf(" "));
                 motherLastname = lastname.substring(fatherLastname.length() + 1);
-                bizPartner = SLibUtilities.textToAlphanumeric(firstname) + ", " + SLibUtilities.textToAlphanumeric(fatherLastname) + "/ " + SLibUtilities.textToAlphanumeric(motherLastname);
+                bizPartner = SLibUtilities.textToAlphanumeric(firstname) + "," + SLibUtilities.textToAlphanumeric(fatherLastname) + "/" + SLibUtilities.textToAlphanumeric(motherLastname);
             }
         }
         return bizPartner;
@@ -1113,7 +1130,7 @@ public abstract class SFinUtilities {
                 layout += lapse; // Lapse
                 layout += payment.getHsbcFiscalIdCredit().concat(SLibUtilities.textRepeat(" ", (14 - payment.getHsbcFiscalIdCredit().length()))); // RFC
                 layout += formatDescTax.format(0d).replace(".", ""); // IVA
-                layout += SLibUtilities.textRepeat("0", 3 - n).concat(payment.getBankKey() + ""); // Benefisary Bank Number
+                layout += SLibUtilities.textRepeat("0", 4 - n).concat(payment.getBankKey() + ""); // Benefisary Bank Number
                 layout += "000000"; // Date application
                 layout += "0000"; // Hour application
                 

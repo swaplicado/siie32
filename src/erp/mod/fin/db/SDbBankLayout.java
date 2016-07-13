@@ -180,7 +180,7 @@ public class SDbBankLayout extends SDbRegistryUser {
 
         // layout name:
         
-        sql = "SELECT fid_tp_pay_bank, tp_lay_bank, lay_bank "
+        sql = "SELECT fid_tp_pay_bank, file_name, lay_bank "
                 + "FROM erp.finu_tp_lay_bank "
                 + "WHERE id_tp_lay_bank = " + mnFkBankLayoutTypeId;
         

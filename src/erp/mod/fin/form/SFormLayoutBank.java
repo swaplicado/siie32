@@ -19,6 +19,7 @@ import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mbps.data.SDataBizPartnerBranchBankAccount;
 import erp.mfin.data.SDataAccountCash;
 import erp.mfin.data.SDataRecord;
+import erp.mfin.data.SFinUtilities;
 import erp.mfin.form.SDialogRecordPicker;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -45,6 +46,7 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -997,10 +999,13 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
     }
     
     private void actionLoadLayoutPath() {
-        String nameFile = (moKeyBankLayoutType.getSelectedIndex() <= 0 ? "" : SLibUtils.textToAscii(moKeyBankLayoutType.getSelectedItem().getItem().toLowerCase().replaceAll("/", " ")));
+        SimpleDateFormat fileNameDatetimeFormat = new SimpleDateFormat("yyMMdd HHmm");
+        //String nameFile = (moKeyBankLayoutType.getSelectedIndex() <= 0 ? "" : SLibUtils.textToAscii(moKeyBankLayoutType.getSelectedItem().getItem().toLowerCase().replaceAll("/", " ")));
+        String nameFile = "";
         
         try {
-            nameFile = SLibUtils.validateSafePath(((SClientInterface) miClient).getSessionXXX().getFormatters().getFileNameDatetimeFormat().format(new java.util.Date()) + " " + nameFile + ".txt");
+            nameFile = (moKeyBankLayoutType.getSelectedIndex() <= 0 ? "" : SLibUtils.textToAscii(SFinUtilities.getFileNameLayout(miClient.getSession(), moKeyBankLayoutType.getSelectedItem().getPrimaryKey()[0]).toLowerCase().replaceAll("/", " ")));
+            nameFile = SLibUtils.validateSafePath(fileNameDatetimeFormat.format(new java.util.Date()) + " " + nameFile + ".txt");
         
             miClient.getFileChooser().setSelectedFile(new File(nameFile));
             if (miClient.getFileChooser().showSaveDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
