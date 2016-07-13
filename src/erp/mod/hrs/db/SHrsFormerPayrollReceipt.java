@@ -7,7 +7,6 @@ package erp.mod.hrs.db;
 import cfd.DAttributeOptionCondicionesPago;
 import cfd.DAttributeOptionFormaPago;
 import cfd.DAttributeOptionImpuestoRetencion;
-import cfd.DAttributeOptionMetodoPago;
 import cfd.DAttributeOptionTipoComprobante;
 import cfd.DElement;
 import cfd.ver3.DElementDeduccion;
@@ -29,6 +28,11 @@ import sa.lib.SLibUtils;
 /**
  *
  * @author Juan Barajas
+ * 
+ * Maintenance Log
+ * 2016-07-11, Sergio Flores:
+ *  Deletion of obsolete import sentences.
+ * 
  */
 public class SHrsFormerPayrollReceipt implements SCfdXml {
 

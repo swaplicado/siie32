@@ -4,7 +4,6 @@
  */
 package erp.mod.hrs.db;
 
-import cfd.util.DUtilities;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
@@ -18,6 +17,7 @@ import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -101,7 +101,7 @@ public class SDbFormerPayrollImport extends SDataRegistry implements Serializabl
                     xmlFileName += ((cfd.ver3.DElementComprobante) packet.getCfdRootElement()).getEltEmisor().getAttRfc().getString() + "_";
                     xmlFileName += ((cfd.ver3.DElementComprobante) packet.getCfdRootElement()).getAttTipoDeComprobante().getOption().substring(0, 1).toUpperCase() + "_";
                     xmlFileName += (((cfd.ver3.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString().length() == 0 ? "" : ((cfd.ver3.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString() + "_");
-                    xmlFileName += decimalFormat.format(DUtilities.parseLong(((cfd.ver3.DElementComprobante) packet.getCfdRootElement()).getAttFolio().getString())) + ".xml";
+                    xmlFileName += decimalFormat.format(SLibUtils.parseLong(((cfd.ver3.DElementComprobante) packet.getCfdRootElement()).getAttFolio().getString())) + ".xml";
                     dateCfd = ((cfd.ver3.DElementComprobante) packet.getCfdRootElement()).getAttFecha().getDatetime();
 
                     cfd.setPkCfdId(packet.getCfdId());

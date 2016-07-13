@@ -4,7 +4,7 @@
  */
 package erp.mtrn.form;
 
-import cfd.util.DUtilities;
+import cfd.util.DUtilUtils;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -3476,7 +3476,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         String[] asLastPayment = null;
 
         SFormUtilities.populateComboBox(miClient, jcbPayAccount, SDataConstants.BPSX_BANK_ACC, new int[] { bizPartnerId, SLibTimeUtilities.digestYear(moFieldDate.getDate())[0],
-                                        mbIsSales ? SDataConstantsSys.TRNS_CT_DPS_SAL : SDataConstantsSys.TRNS_CT_DPS_PUR });;
+                                        mbIsSales ? SDataConstantsSys.TRNS_CT_DPS_SAL : SDataConstantsSys.TRNS_CT_DPS_PUR });
         SFormUtilities.populateComboBox(miClient, jcbFkPaymentSystemTypeId, SDataConstants.TRNU_TP_PAY_SYS, new int[] { bizPartnerId, SLibTimeUtilities.digestYear(moFieldDate.getDate())[0],
                                         mbIsSales ? SDataConstantsSys.TRNS_CT_DPS_SAL : SDataConstantsSys.TRNS_CT_DPS_PUR });
         jcbPayAccount.removeItemAt(0);
@@ -7912,7 +7912,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             try {
                 cfd = moDps.getDbmsDataCfd() != null ? moDps.getDbmsDataCfd() : new SDataCfd();
 
-                sFileXml = DUtilities.readXml(msFileXmlPath);
+                sFileXml = DUtilUtils.readXml(msFileXmlPath);
                 if (cfd != null) {
                     cfd.setCertNumber("");
                     cfd.setStringSigned("");

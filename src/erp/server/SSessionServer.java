@@ -5,7 +5,6 @@
 package erp.server;
 
 import cfd.DCfd;
-import cfd.util.DUtilities;
 import erp.cfd.SCfdConsts;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadComponentItems;
@@ -56,6 +55,7 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.util.JRLoader;
 import sa.lib.SLibConsts;
 import sa.lib.SLibRpnArgument;
+import sa.lib.SLibUtils;
 import sa.lib.srv.SSrvConsts;
 import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvRequest;
@@ -516,7 +516,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                 xmlFileName += ((cfd.ver2.DElementComprobante) packet.getCfdRootElement()).getEltEmisor().getAttRfc().getString() + "_";
                 xmlFileName += ((cfd.ver2.DElementComprobante) packet.getCfdRootElement()).getAttTipoDeComprobante().getOption().substring(0, 1).toUpperCase() + "_";
                 xmlFileName += (((cfd.ver2.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString().length() == 0 ? "" : ((cfd.ver2.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString() + "_");
-                xmlFileName += moCfd.getDecimalFormat().format(DUtilities.parseLong(((cfd.ver2.DElementComprobante) packet.getCfdRootElement()).getAttFolio().getString())) + ".xml";
+                xmlFileName += moCfd.getDecimalFormat().format(SLibUtils.parseLong(((cfd.ver2.DElementComprobante) packet.getCfdRootElement()).getAttFolio().getString())) + ".xml";
                 dateCfd = ((cfd.ver2.DElementComprobante) packet.getCfdRootElement()).getAttFecha().getDatetime();
             }
             else if (packet.getCfdRootElement() instanceof cfd.ver3.DElementComprobante) {
@@ -525,7 +525,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                 xmlFileName += ((cfd.ver3.DElementComprobante) packet.getCfdRootElement()).getEltEmisor().getAttRfc().getString() + "_";
                 xmlFileName += ((cfd.ver3.DElementComprobante) packet.getCfdRootElement()).getAttTipoDeComprobante().getOption().substring(0, 1).toUpperCase() + "_";
                 xmlFileName += (((cfd.ver3.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString().length() == 0 ? "" : ((cfd.ver3.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString() + "_");
-                xmlFileName += moCfd.getDecimalFormat().format(DUtilities.parseLong(((cfd.ver3.DElementComprobante) packet.getCfdRootElement()).getAttFolio().getString())) + ".xml";
+                xmlFileName += moCfd.getDecimalFormat().format(SLibUtils.parseLong(((cfd.ver3.DElementComprobante) packet.getCfdRootElement()).getAttFolio().getString())) + ".xml";
                 dateCfd = ((cfd.ver3.DElementComprobante) packet.getCfdRootElement()).getAttFecha().getDatetime();
             }
             else {
@@ -608,6 +608,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                         xmlSign.setFkSignTypeId(SDataConstantsSys.TRNS_TP_SIGN_OUT_ANNULED[1]);
                         xmlSign.setFkCfdId_n(cfd.getPkCfdId());
                     }
+                    
                     // XXX Guardar bitácora de timbrado 7
 
                     if (packet.getLogSignId() != SLibConstants.UNDEFINED) {
