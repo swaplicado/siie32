@@ -3095,7 +3095,7 @@ public abstract class SCfdUtils implements Serializable {
         comprobante.getAttTotal().setDouble(cfdXml.getCfdTotal());
 
         comprobante.getAttTipoDeComprobante().setOption(cfdXml.getCfdTipoDeComprobante());
-        comprobante.getAttMetodoDePago().setString(cfdXml.getCfdMetodoDePago());
+        comprobante.getAttMetodoDePago().setString(DCfdUtils.getMetodoPagoClave(cfdXml.getCfdMetodoDePago()));
 
         emisor = new SDbCfdBizPartner(client);
         emisor.setBizPartnerId(cfdXml.getEmisor());

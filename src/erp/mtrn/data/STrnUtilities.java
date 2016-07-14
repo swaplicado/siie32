@@ -2379,7 +2379,7 @@ public abstract class STrnUtilities {
     * @param yearId Year the DPS
     * @return String array (wich index 0 is last payment and index 1 last bank account for payment).
     */
-    public static String[] getLastPayment(final SClientInterface client, final int bizPartnerId, final int categoryDpsId, final int yearId) {
+    public static String[] getLastPaymentSettings(final SClientInterface client, final int bizPartnerId, final int categoryDpsId, final int yearId) {
         String asPaymentInfo[] = new String[2];
         String sql = "";
         ResultSet resultSet = null;

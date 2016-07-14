@@ -442,6 +442,7 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
     private void populatePayroll() {
         Object field = null;
         ArrayList<SHrsPayrollEmployeeReceipt> rowsSelected = null;
+        
         if (!maHrsPayrollEmployeeReceipt.isEmpty()) {
             jtfPayrollPeriod.setText(maHrsPayrollEmployeeReceipt.get(0).getPeriodYear() + "-" + (maHrsPayrollEmployeeReceipt.get(0).getPeriod() >= 10 ? "" : "0" ) + maHrsPayrollEmployeeReceipt.get(0).getPeriod());
             jtfPayrollNumber.setText((maHrsPayrollEmployeeReceipt.get(0).getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? "SEM " : "QNA " ) + maHrsPayrollEmployeeReceipt.get(0).getPayrollNumber());
@@ -462,10 +463,10 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
 
                     row.setPaymentTypeSys((String) field);
                     if (row.getPaymentTypeSysId() == SDataConstantsSys.TRNU_TP_PAY_SYS_NA) {
-                        moTablePaneReceiptAvailable.addTableRow(row);
+                        moTablePaneReceiptAvailable.addTableRow(row);   // receipt has not been added yet
                     }
                     else {
-                        rowsSelected.add(row);
+                        rowsSelected.add(row);                          // receipt had been added already
                     }
                 }
                 moTablePaneReceiptAvailable.renderTableRows();

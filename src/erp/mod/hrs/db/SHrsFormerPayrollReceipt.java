@@ -18,7 +18,6 @@ import erp.cfd.SCfdDataConcepto;
 import erp.cfd.SCfdDataImpuesto;
 import erp.cfd.SCfdXml;
 import erp.client.SClientInterface;
-import erp.data.SDataConstantsSys;
 import erp.mod.SModSysConsts;
 import java.util.ArrayList;
 import java.util.Date;
@@ -396,52 +395,24 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
         return DAttributeOptionTipoComprobante.CFD_EGRESO;
     }
 
+    /**
+     * Maintenance Log:
+     * 
+     * 2016-07-14, Sergio Flores: implementation of new payment method catalogue (erp.TRNU_TP_PAY_SYS DB table).
+     */
+    
     @Override
     public String getCfdMetodoDePago() {
-        String sMetodoPago = "";
-        int nMetodoPago = 0;
-
-        switch (mnMetodoPago) {
-            case SDataConstantsSys.TRNU_TP_PAY_SYS_CASH:
-                nMetodoPago = SDataConstantsSys.TRNU_TP_PAY_SYS_CASH;
-                break;
-            case SDataConstantsSys.TRNU_TP_PAY_SYS_CHECK:
-                nMetodoPago = SDataConstantsSys.TRNU_TP_PAY_SYS_CHECK;
-                break;
-            case SDataConstantsSys.TRNU_TP_PAY_SYS_CHECK_TRANSF:
-                nMetodoPago = SDataConstantsSys.TRNU_TP_PAY_SYS_CHECK_TRANSF;
-                break;
-            case SDataConstantsSys.TRNU_TP_PAY_SYS_TRANSF:
-                nMetodoPago = SDataConstantsSys.TRNU_TP_PAY_SYS_TRANSF;
-                break;
-            case SDataConstantsSys.TRNU_TP_PAY_SYS_CARD_DBT:
-            case SDataConstantsSys.TRNU_TP_PAY_SYS_CARD_DBT_WWW:
-            case SDataConstantsSys.TRNU_TP_PAY_SYS_CARD_DBT_TEL:
-                nMetodoPago = SDataConstantsSys.TRNU_TP_PAY_SYS_CARD_DBT;
-                break;
-            case SDataConstantsSys.TRNU_TP_PAY_SYS_CARD_CDT:
-            case SDataConstantsSys.TRNU_TP_PAY_SYS_CARD_CDT_WWW:
-            case SDataConstantsSys.TRNU_TP_PAY_SYS_CARD_CDT_TEL:
-                nMetodoPago = SDataConstantsSys.TRNU_TP_PAY_SYS_CARD_CDT;
-                break;
-            case SDataConstantsSys.TRNU_TP_PAY_SYS_CARD_SRV:
-                nMetodoPago = SDataConstantsSys.TRNU_TP_PAY_SYS_CARD_SRV;
-                break;
-            case SDataConstantsSys.TRNU_TP_PAY_SYS_E_PURSE:
-                nMetodoPago = SDataConstantsSys.TRNU_TP_PAY_SYS_E_PURSE;
-                break;
-            default:
-                nMetodoPago = SDataConstantsSys.TRNU_TP_PAY_SYS_NA;
-        }
+        String metodoPago = "";
 
         try {
-            sMetodoPago = SHrsFormerUtils.getPaymentMethod(miClient, nMetodoPago);
+            metodoPago = SHrsFormerUtils.getPaymentMethod(miClient, mnMetodoPago);
         }
         catch (Exception e) {
             SLibUtils.printException(this, e);
         }
 
-        return sMetodoPago;
+        return metodoPago;
     }
 
     @Override
