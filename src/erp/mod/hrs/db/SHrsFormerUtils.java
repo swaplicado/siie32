@@ -388,13 +388,13 @@ public abstract class SHrsFormerUtils {
         String sql = "";
         ResultSet resultSet = null;
 
-        sql = "SELECT tp_pay_sys " +
+        sql = "SELECT cfd_pay_met " +
                 "FROM erp.trnu_tp_pay_sys " +
                 "WHERE b_del = 0 AND id_tp_pay_sys = " + paymentMethodId + " ";
         resultSet = client.getSession().getStatement().executeQuery(sql);
 
         if (resultSet.next()) {
-            paymentMethod = resultSet.getString("tp_pay_sys");
+            paymentMethod = resultSet.getString("cfd_pay_met");
         }
 
         return paymentMethod;
