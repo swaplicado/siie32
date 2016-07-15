@@ -205,6 +205,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
     }
 
     private void actionSignPayroll() {
+        boolean sign = true;
         boolean needUpdate = false;
         SDataCfd cfd = null;
         SDataPayrollReceiptIssue receiptIssue = null;
@@ -237,21 +238,28 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                             
                             cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
-                            receiptIssue = new SDataPayrollReceiptIssue();
-                            if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
-                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n El recibo no ha sido emitido.");
+                            if (!isCfdiPayrollVersionOld()) {
+                                receiptIssue = new SDataPayrollReceiptIssue();
+                                
+                                if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n El recibo no ha sido emitido.");
+                                }
+
+                                if (receiptIssue.isDeleted()) {
+                                    sign = false;
+                                    miClient.showMsgBoxWarning("El recibo '" + receiptIssue.getIssueNumber() + "' está eliminado.");
+                                }
+                                else if (receiptIssue.getFkReceiptStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
+                                    sign = false;
+                                    miClient.showMsgBoxWarning("El recibo '" + receiptIssue.getIssueNumber() + "' está anulado.");
+                                }
+                                else if (!SDataUtilities.isPeriodOpen((SClientInterface) miClient, receiptIssue.getDateIssue())) {
+                                    sign = false;
+                                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
+                                }
                             }
                             
-                            if (receiptIssue.isDeleted()) {
-                                miClient.showMsgBoxWarning("El recibo '" + receiptIssue.getIssueNumber() + "' está eliminado.");
-                            }
-                            else if (receiptIssue.getFkReceiptStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
-                                miClient.showMsgBoxWarning("El recibo '" + receiptIssue.getIssueNumber() + "' está anulado.");
-                            }
-                            else if (!SDataUtilities.isPeriodOpen((SClientInterface) miClient, receiptIssue.getDateIssue())) {
-                                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
-                            }
-                            else {
+                            if (sign) {
                                 needUpdate = SCfdUtils.signCfdi((SClientInterface) miClient, cfd, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
                             }
                         }
@@ -295,11 +303,13 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                 else {
                     try {
                         receiptIssues = new ArrayList<SDataPayrollReceiptIssue>();
-                        receiptIssue = new SDataPayrollReceiptIssue();
                         
                         if (mnGridSubtype == SModConsts.VIEW_SC_SUM) {
                             cfds = SCfdUtils.getPayrollCfds((SClientInterface) miClient, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), gridRow.getRowPrimaryKey());
-                            receiptIssues = SHrsUtils.getPayrollReceiptIssues(miClient.getSession(), gridRow.getRowPrimaryKey());
+                            
+                            if (!isCfdiPayrollVersionOld()) {
+                                receiptIssues = SHrsUtils.getPayrollReceiptIssues(miClient.getSession(), gridRow.getRowPrimaryKey());
+                            }
                         }
                         else {
                             cfds = new ArrayList<SDataCfd>();
@@ -309,10 +319,14 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                                 cfds.add(cfd);
                             }
             
-                            if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
-                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                            if (!isCfdiPayrollVersionOld()) {
+                                receiptIssue = new SDataPayrollReceiptIssue();
+                                
+                                if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                                }
+                                receiptIssues.add(receiptIssue);
                             }
-                            receiptIssues.add(receiptIssue);
                         }
 
                         moDialogAnnulCfdi.formReset();
@@ -596,6 +610,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
     }
 
     private void actionRestoreSignedXml() {
+        boolean restore = true;
         boolean needUpdate = true;
         SDataCfd cfd = null;
         SDataPayrollReceiptIssue receiptIssue = null;
@@ -618,23 +633,29 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
-                        receiptIssue = new SDataPayrollReceiptIssue();
                         cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
-                         if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
-                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                         }
+                        if (!isCfdiPayrollVersionOld()) {
+                            receiptIssue = new SDataPayrollReceiptIssue();
+                            
+                            if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                                restore = false;
+                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                            }
 
-                         if (receiptIssue.isDeleted()) {
-                             miClient.showMsgBoxWarning("El documento '" + receiptIssue.getIssueNumber() + "' está eliminado.");
-                         }
-                         else {
-                             needUpdate = SCfdUtils.restoreSignXml((SClientInterface) miClient, receiptIssue.getDbmsDataCfd(), true, SLibConstants.UNDEFINED);
+                            if (receiptIssue.isDeleted()) {
+                                restore = false;
+                                miClient.showMsgBoxWarning("El documento '" + receiptIssue.getIssueNumber() + "' está eliminado.");
+                            }
+                        }
+                        
+                        if (restore) {
+                            needUpdate = SCfdUtils.restoreSignXml((SClientInterface) miClient, (receiptIssue == null ? cfd : receiptIssue.getDbmsDataCfd()), true, SLibConstants.UNDEFINED);
 
-                             if (needUpdate) {
-                                 miClient.getSession().notifySuscriptors(mnGridType);
-                             }
-                         }
+                            if (needUpdate) {
+                                miClient.getSession().notifySuscriptors(mnGridType);
+                            }
+                        }
                     }
                     catch (Exception e) {
                         miClient.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -646,6 +667,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
     }
 
     private void actionRestoreAcknowledgmentCancellation() {
+        boolean restore = true;
         boolean needUpdate = true;
         SDataCfd cfd = null;
         SDataPayrollReceiptIssue receiptIssue = null;
@@ -668,17 +690,24 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
-                        receiptIssue = new SDataPayrollReceiptIssue();
                         cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-                        if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
-                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                        }
+                        
+                        if (!isCfdiPayrollVersionOld()) {
+                            receiptIssue = new SDataPayrollReceiptIssue();
+                            
+                            if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                                restore = false;
+                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                            }
 
-                        if (receiptIssue.isDeleted()) {
-                            miClient.showMsgBoxWarning("El documento '" + receiptIssue.getIssueNumber() + "' está eliminado.");
+                            if (receiptIssue.isDeleted()) {
+                                restore = false;
+                                miClient.showMsgBoxWarning("El documento '" + receiptIssue.getIssueNumber() + "' está eliminado.");
+                            }
                         }
-                        else {
-                            needUpdate = SCfdUtils.restoreAcknowledgmentCancellation((SClientInterface) miClient, receiptIssue.getDbmsDataCfd(), true, SLibConstants.UNDEFINED);
+                        
+                        if (restore) {
+                            needUpdate = SCfdUtils.restoreAcknowledgmentCancellation((SClientInterface) miClient, (receiptIssue == null ? cfd : receiptIssue.getDbmsDataCfd()), true, SLibConstants.UNDEFINED);
 
                             if (needUpdate) {
                                 miClient.getSession().notifySuscriptors(mnGridType);

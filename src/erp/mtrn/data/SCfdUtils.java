@@ -830,7 +830,7 @@ public abstract class SCfdUtils implements Serializable {
                 managementCfdi(client, cfd, SDataConstantsSys.TRNS_ST_DPS_ANNULED, client.getSessionXXX().getSystemDate(), true, true, pacId, subtypeCfd);
             }
             else {
-                processAnnul(client, cfd);
+                processAnnul(client, cfd, subtypeCfd);
             }
             canceled = true;
         }
@@ -1806,7 +1806,7 @@ public abstract class SCfdUtils implements Serializable {
         }
     }
     
-    private static void  processAnnul(final SClientInterface client, final SDataCfd cfd) throws Exception {
+    private static void  processAnnul(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd) throws Exception {
         int result = SLibConstants.UNDEFINED;
         String error = "";
         SDataDps dps = null;
@@ -1869,56 +1869,59 @@ public abstract class SCfdUtils implements Serializable {
             else {
                 // Annul Payroll CFDI:
 
-                receiptIssue = new SDataPayrollReceiptIssue();
+                if (subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_CUR) {
+                    receiptIssue = new SDataPayrollReceiptIssue();
                 
-                if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, client.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
-                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                }
-                
-                // Attempt to gain data lock:
-
-                lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, receiptIssue.getPrimaryKey(), 1000 * 60);     // 1 minute timeout
-
-                if (receiptIssue != null) {
-                    request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL);
-                    request.setPacket(receiptIssue);
-                    response = client.getSessionXXX().request(request);
-
-                    if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
-                        error = response.getMessage();
+                    if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, client.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
-                    else {
-                        result = response.getResultType();
 
-                        if (result != SLibConstants.DB_CAN_ANNUL_YES) {
-                            error = SLibConstants.MSG_ERR_DB_REG_ANNUL_CAN + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage());
+                    // Attempt to gain data lock:
+
+                    lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, receiptIssue.getPrimaryKey(), 1000 * 60);     // 1 minute timeout
+
+                    if (receiptIssue != null) {
+                        request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL);
+                        request.setPacket(receiptIssue);
+                        response = client.getSessionXXX().request(request);
+
+                        if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+                            error = response.getMessage();
                         }
                         else {
-                            // Annul registry:
+                            result = response.getResultType();
 
-                            receiptIssue.setIsRegistryRequestAnnul(true);
-                            receiptIssue.setFkUserUpdateId(client.getSession().getUser().getPkUserId());
-
-                            request = new SServerRequest(SServerConstants.REQ_DB_ACTION_ANNUL);
-                            request.setPacket(receiptIssue);
-                            response = client.getSessionXXX().request(request);
-
-                            if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
-                                error = response.getMessage();
+                            if (result != SLibConstants.DB_CAN_ANNUL_YES) {
+                                error = SLibConstants.MSG_ERR_DB_REG_ANNUL_CAN + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage());
                             }
                             else {
-                                result = response.getResultType();
+                                // Annul registry:
 
-                                if (result != SLibConstants.DB_ACTION_ANNUL_OK) {
-                                    error = SLibConstants.MSG_ERR_DB_REG_ANNUL + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage());
+                                receiptIssue.setIsRegistryRequestAnnul(true);
+                                receiptIssue.setFkUserUpdateId(client.getSession().getUser().getPkUserId());
+
+                                request = new SServerRequest(SServerConstants.REQ_DB_ACTION_ANNUL);
+                                request.setPacket(receiptIssue);
+                                response = client.getSessionXXX().request(request);
+
+                                if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+                                    error = response.getMessage();
+                                }
+                                else {
+                                    result = response.getResultType();
+
+                                    if (result != SLibConstants.DB_ACTION_ANNUL_OK) {
+                                        error = SLibConstants.MSG_ERR_DB_REG_ANNUL + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage());
+                                    }
                                 }
                             }
                         }
                     }
+                    else {
+                        error = SLibConstants.MSG_ERR_DB_REG_READ;
+                    }
                 }
-                else {
-                    error = SLibConstants.MSG_ERR_DB_REG_READ;
-                }
+                
 
                 /*
                 request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL);
@@ -2196,7 +2199,7 @@ public abstract class SCfdUtils implements Serializable {
                         canceled = managementCfdi(client, cfd, SDataConstantsSys.TRNS_ST_DPS_ANNULED, cancellationDate, isSingle, false, pacId, subtypeCfd);
                     }
                     else {
-                        processAnnul(client, cfd);
+                        processAnnul(client, cfd, subtypeCfd);
                         canceled = true;
                     }
                 }
@@ -2375,7 +2378,7 @@ public abstract class SCfdUtils implements Serializable {
                         sendNotification = true;
                     }
                     else {
-                        processAnnul(client, cfd);
+                        processAnnul(client, cfd, subtypeCfd);
                         canceled = true;
                     }
                 }
@@ -2554,9 +2557,9 @@ public abstract class SCfdUtils implements Serializable {
         client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
 
-    public static void  processAnnul(final SClientInterface client, final ArrayList<SDataCfd> cfds) throws Exception {
+    public static void  processAnnul(final SClientInterface client, final ArrayList<SDataCfd> cfds, final int subtypeCfd) throws Exception {
         for (SDataCfd cfd : cfds) {
-            processAnnul(client, cfd);
+            processAnnul(client, cfd, subtypeCfd);
         }
     }
 
