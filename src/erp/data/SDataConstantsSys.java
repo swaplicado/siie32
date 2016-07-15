@@ -8,6 +8,11 @@ package erp.data;
 /**
  *
  * @author Sergio Flores
+ * 
+ * Maintenance Log:
+ * 
+ * 2016-07-14, Sergio Flores: implementation of new payment method catalogue (erp.TRNU_TP_PAY_SYS DB table).
+ * 
  */
 public abstract class SDataConstantsSys {
 
@@ -1119,22 +1124,18 @@ public abstract class SDataConstantsSys {
     public static final int[] TRNU_TP_DPS_SAL_CN = { 2, 5, 1 };
 
     public static final int TRNU_TP_PAY_SYS_NA = 1;
-    public static final int TRNU_TP_PAY_SYS_CASH = 2;
-    public static final int TRNU_TP_PAY_SYS_CHECK = 3;
-    //public static final int TRNU_TP_PAY_SYS_DEP = 4;              // deprecated since 2014
-    public static final int TRNU_TP_PAY_SYS_TRANSF = 5;
-    public static final int TRNU_TP_PAY_SYS_CARD_DBT = 6;
-    public static final int TRNU_TP_PAY_SYS_CARD_CDT = 7;
-    public static final int TRNU_TP_PAY_SYS_CARD_DBT_WWW = 8;
-    public static final int TRNU_TP_PAY_SYS_CARD_CDT_WWW = 9;
-    public static final int TRNU_TP_PAY_SYS_CARD_DBT_TEL = 10;
-    public static final int TRNU_TP_PAY_SYS_CARD_CDT_TEL = 11;
-    public static final int TRNU_TP_PAY_SYS_CARD_SRV = 12;
-    public static final int TRNU_TP_PAY_SYS_E_PURSE = 13;
-    public static final int TRNU_TP_PAY_SYS_CHECK_TRANSF = 14;
-    //public static final int TRNU_TP_PAY_SYS_UNDEF = 19;           // deprecated since 2014
-    //public static final int TRNU_TP_PAY_SYS_OTHER = 99;           // deprecated since 2014
-
+    public static final int TRNU_TP_PAY_SYS_CASH = 11;
+    public static final int TRNU_TP_PAY_SYS_CHECK = 12;
+    public static final int TRNU_TP_PAY_SYS_TRANSF = 13;
+    public static final int TRNU_TP_PAY_SYS_CARD_DBT = 21;
+    public static final int TRNU_TP_PAY_SYS_CARD_CDT = 22;
+    public static final int TRNU_TP_PAY_SYS_CARD_SRV = 23;
+    public static final int TRNU_TP_PAY_SYS_E_PURSE = 31;
+    public static final int TRNU_TP_PAY_SYS_E_MONEY = 32;
+    public static final int TRNU_TP_PAY_SYS_FOOD_STP = 41;
+    public static final int TRNU_TP_PAY_SYS_UNDEF = 98;
+    public static final int TRNU_TP_PAY_SYS_OTHER = 99;
+    
     public static final int TRNU_TP_IOG_ADJ_NA = 1;
 
     public static final int TRNX_TP_DPS_EST = 100;

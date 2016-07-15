@@ -15,7 +15,7 @@ import cfd.DAttributeOptionFormaPago;
 import cfd.DAttributeOptionImpuestoTraslado;
 import cfd.DCfdUtils;
 import cfd.DElement;
-import cfd.util.DUtilities;
+import cfd.util.DUtilUtils;
 import cfd.ver3.DElementTimbreFiscalDigital;
 import erp.SClient;
 import erp.cfd.SCfdConsts;
@@ -487,7 +487,7 @@ public abstract class SCfdUtils implements Serializable {
                     packet.setCfdId(cfdId);
                     packet.setIsConsistent(!isFound || cfdId == SLibConsts.UNDEFINED ? true: isConsistent);
                     comprobanteCfdi = (cfd.ver3.DElementComprobante) SCfdUtils.createCfdiRootElement(client, receipt);
-                    packet.setStringSigned(DUtilities.generateOriginalString(comprobanteCfdi));
+                    packet.setStringSigned(DUtilUtils.generateOriginalString(comprobanteCfdi));
                     packet.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_PAY);
                     packet.setFkXmlTypeId(SDataConstantsSys.TRNS_TP_XML_CFDI);
                     packet.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW);
@@ -2449,14 +2449,14 @@ public abstract class SCfdUtils implements Serializable {
                 case SDataConstantsSys.TRNS_TP_XML_CFD:
                     comprobanteCfd = (cfd.ver2.DElementComprobante) createCfdRootElement(client, dps);
 
-                    packet.setStringSigned(DUtilities.generateOriginalString(comprobanteCfd));
+                    packet.setStringSigned(DUtilUtils.generateOriginalString(comprobanteCfd));
                     packet.setFkXmlTypeId(SDataConstantsSys.TRNS_TP_XML_CFD);
                     packet.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);
                     break;
                 case SDataConstantsSys.TRNS_TP_XML_CFDI:
                     comprobanteCfdi = (cfd.ver3.DElementComprobante) createCfdiRootElement(client, dps);
 
-                    packet.setStringSigned(DUtilities.generateOriginalString(comprobanteCfdi));
+                    packet.setStringSigned(DUtilUtils.generateOriginalString(comprobanteCfdi));
                     packet.setFkXmlTypeId(SDataConstantsSys.TRNS_TP_XML_CFDI);
                     packet.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW);
                     break;
@@ -2729,7 +2729,7 @@ public abstract class SCfdUtils implements Serializable {
         restoreCfdi.setFormVisible(true);
 
         if (restoreCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-            fileXml = DUtilities.readXml(restoreCfdi.getFileXml());
+            fileXml = DUtilUtils.readXml(restoreCfdi.getFileXml());
 
             if (isUser) {
                 // XXX Abrir bitácora de timbrado
@@ -3098,7 +3098,7 @@ public abstract class SCfdUtils implements Serializable {
         comprobante.getAttTotal().setDouble(cfdXml.getCfdTotal());
 
         comprobante.getAttTipoDeComprobante().setOption(cfdXml.getCfdTipoDeComprobante());
-        comprobante.getAttMetodoDePago().setString(cfdXml.getCfdMetodoDePago());
+        comprobante.getAttMetodoDePago().setString(DCfdUtils.getMetodoPagoClave(cfdXml.getCfdMetodoDePago()));
 
         emisor = new SDbCfdBizPartner(client);
         emisor.setBizPartnerId(cfdXml.getEmisor());

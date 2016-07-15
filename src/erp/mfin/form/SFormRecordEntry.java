@@ -5,7 +5,7 @@
 
 package erp.mfin.form;
 
-import cfd.util.DUtilities;
+import cfd.util.DUtilUtils;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
@@ -2812,7 +2812,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                     if (cfd == null) {
                         cfd = new SDataCfd();
                     
-                        sFileXml = DUtilities.readXml(row.getPathXml());
+                        sFileXml = DUtilUtils.readXml(row.getPathXml());
                         cfd.setCertNumber("");
                         cfd.setStringSigned("");
                         cfd.setSignature("");

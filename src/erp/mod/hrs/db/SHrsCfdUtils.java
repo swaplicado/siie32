@@ -4,7 +4,7 @@
  */
 package erp.mod.hrs.db;
 
-import cfd.util.DUtilities;
+import cfd.util.DUtilUtils;
 import erp.cfd.SCfdConsts;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
@@ -155,7 +155,7 @@ public abstract class SHrsCfdUtils {
             packet.setCfdId(cfdId);
             packet.setIsConsistent(cfdId == SLibConstants.UNDEFINED ? true : false);
             comprobanteCfdi = (cfd.ver3.DElementComprobante) SCfdUtils.createCfdiRootElement((SClientInterface)session.getClient(), receipt);
-            packet.setStringSigned(DUtilities.generateOriginalString(comprobanteCfdi));
+            packet.setStringSigned(DUtilUtils.generateOriginalString(comprobanteCfdi));
             packet.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_PAY);
             packet.setFkXmlTypeId(SDataConstantsSys.TRNS_TP_XML_CFDI);
             packet.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW);

@@ -499,7 +499,7 @@ public class SCfdPrint {
         map.put("sCfdCondicionesDePagoOpc", comprobante.getAttCondicionesDePago().getOption());
         map.put("dCfdSubTotal", comprobante.getAttSubTotal().getDouble());
         map.put("dCfdTotal", comprobante.getAttTotal().getDouble());
-        map.put("sCfdMetodoDePagoOpc", comprobante.getAttMetodoDePago().getString());
+        map.put("sCfdMetodoDePagoOpc", DCfdUtils.composeMetodoPago(comprobante.getAttMetodoDePago().getString()));
         map.put("sExpedidoEn", comprobante.getAttLugarExpedicion().getString());
         map.put("sCfdTipoDeComprobante", comprobante.getAttTipoDeComprobante().getOption());
         map.put("sCfdNoCuentaPago", comprobante.getAttNumCtaPago().getString());
@@ -881,7 +881,7 @@ public class SCfdPrint {
         map.put("dCfdSubtotal", comprobante.getAttSubTotal().getDouble());
         map.put("dCfdDescuento", comprobante.getAttDescuento().getDouble());
         map.put("dCfdTotal", comprobante.getAttTotal().getDouble());
-        map.put("sCfdMetodoDePagoOpc", comprobante.getAttMetodoDePago().getString());
+        map.put("sCfdMetodoDePagoOpc", DCfdUtils.composeMetodoPago(comprobante.getAttMetodoDePago().getString()));
         map.put("sExpedidoEn", comprobante.getAttLugarExpedicion().getString());
         map.put("sCfdTipoComprobante", comprobante.getAttTipoDeComprobante().getOption());
         map.put("sCfdNoCuentaPago", comprobante.getAttNumCtaPago().getString());
