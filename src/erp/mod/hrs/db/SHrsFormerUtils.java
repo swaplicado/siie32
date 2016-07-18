@@ -383,7 +383,24 @@ public abstract class SHrsFormerUtils {
         return hrsPayroll;
     }
 
-    public static String getPaymentMethod(final SClientInterface client, final int paymentMethodId) throws Exception {
+    public static String getPaymentMethodName(final SClientInterface client, final int paymentMethodId) throws Exception {
+        String paymentMethod = "";
+        String sql = "";
+        ResultSet resultSet = null;
+
+        sql = "SELECT tp_pay_sys " +
+                "FROM erp.trnu_tp_pay_sys " +
+                "WHERE b_del = 0 AND id_tp_pay_sys = " + paymentMethodId + " ";
+        resultSet = client.getSession().getStatement().executeQuery(sql);
+
+        if (resultSet.next()) {
+            paymentMethod = resultSet.getString("tp_pay_sys");
+        }
+
+        return paymentMethod;
+    }
+    
+    public static String getPaymentMethodCode(final SClientInterface client, final int paymentMethodId) throws Exception {
         String paymentMethod = "";
         String sql = "";
         ResultSet resultSet = null;
@@ -404,7 +421,8 @@ public abstract class SHrsFormerUtils {
         Properties properties = null;
         Connection connectionOdbc;
 
-        Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
+         //Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 
         if (client.getSessionXXX().getParamsCompany().getFormerSystemOdbcUser().length() == 0) {
             connectionOdbc = DriverManager.getConnection("jdbc:odbc:" + client.getSessionXXX().getParamsCompany().getFormerSystemOdbc());
@@ -413,12 +431,14 @@ public abstract class SHrsFormerUtils {
             properties = new Properties();
             properties.put("user", client.getSessionXXX().getParamsCompany().getFormerSystemOdbcUser());
             properties.put("password", client.getSessionXXX().getParamsCompany().getFormerSystemOdbcUserPassword());
-            connectionOdbc = DriverManager.getConnection("jdbc:odbc:" + client.getSessionXXX().getParamsCompany().getFormerSystemOdbc(), properties);
+            //connectionOdbc = DriverManager.getConnection("jdbc:odbc:" + client.getSessionXXX().getParamsCompany().getFormerSystemOdbc(), properties);
+            connectionOdbc = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=Gs;user=sa; password=1120;");
         }
 
         if (connectionOdbc == null || connectionOdbc.isClosed()) {
             throw new Exception("No se pudo establecer la conexión con el origen de datos ODBC '" + client.getSessionXXX().getParamsCompany().getFormerSystemOdbc() + "'.");
         }
+
 
         return connectionOdbc;
     }

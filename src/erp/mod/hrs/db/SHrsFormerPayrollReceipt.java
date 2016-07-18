@@ -406,7 +406,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
         String metodoPago = "";
 
         try {
-            metodoPago = SHrsFormerUtils.getPaymentMethod(miClient, mnMetodoPago);
+            metodoPago = SHrsFormerUtils.getPaymentMethodName(miClient, mnMetodoPago);
         }
         catch (Exception e) {
             SLibUtils.printException(this, e);
