@@ -421,8 +421,7 @@ public abstract class SHrsFormerUtils {
         Properties properties = null;
         Connection connectionOdbc;
 
-         //Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
 
         if (client.getSessionXXX().getParamsCompany().getFormerSystemOdbcUser().length() == 0) {
             connectionOdbc = DriverManager.getConnection("jdbc:odbc:" + client.getSessionXXX().getParamsCompany().getFormerSystemOdbc());
@@ -431,8 +430,7 @@ public abstract class SHrsFormerUtils {
             properties = new Properties();
             properties.put("user", client.getSessionXXX().getParamsCompany().getFormerSystemOdbcUser());
             properties.put("password", client.getSessionXXX().getParamsCompany().getFormerSystemOdbcUserPassword());
-            //connectionOdbc = DriverManager.getConnection("jdbc:odbc:" + client.getSessionXXX().getParamsCompany().getFormerSystemOdbc(), properties);
-            connectionOdbc = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=Gs;user=sa; password=1120;");
+            connectionOdbc = DriverManager.getConnection("jdbc:odbc:" + client.getSessionXXX().getParamsCompany().getFormerSystemOdbc(), properties);
         }
 
         if (connectionOdbc == null || connectionOdbc.isClosed()) {
