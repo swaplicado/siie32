@@ -2302,7 +2302,7 @@ public abstract class SCfdUtils implements Serializable {
                 break;
             case SCfdConsts.CFD_TYPE_PAYROLL:
                 if (canSend(client, cfd)) {
-                    bizPartnerMail = STrnUtilities.getMailToSendForCfd(client, subtypeCfd, SDataConstantsSys.BPSS_TP_CON_ADM, (subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? cfd.getFkPayrollBizPartnerId_n() : cfd.getFkPayrollReceiptEmployeeId_n())).replace(";", "\n");
+                    bizPartnerMail = STrnUtilities.getMailToSendForCfd(client, SDataConstantsSys.BPSS_TP_CON_ADM, (subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? cfd.getFkPayrollBizPartnerId_n() : cfd.getFkPayrollReceiptEmployeeId_n()), SLibConstants.UNDEFINED).replace(";", "\n");
                     //if (!isSingle || client.showMsgBoxConfirm("¿Está seguro que desea enviar por correo-e el documento?") == JOptionPane.YES_OPTION) { //XXX ghernandez 23-05-2016 confirm message to send email
                     if (!isSingle || client.showMsgBoxConfirm("El documento se enviará a los siguientes destinatarios:\n" + bizPartnerMail + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                         STrnUtilities.sendMailCfd(client, cfd, subtypeCfd, SDataConstantsSys.BPSS_TP_CON_ADM, (subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? cfd.getFkPayrollBizPartnerId_n() : cfd.getFkPayrollReceiptEmployeeId_n()));
