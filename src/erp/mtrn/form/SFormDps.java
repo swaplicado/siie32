@@ -7199,7 +7199,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jckShipments.getText() + "'.");
                         validation.setComponent(jtfShipments);
                     }
-                    else if (mbIsSales && (mbIsDoc || mbIsAdj) && moFieldFkPaymentSystemTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNU_TP_PAY_SYS_NA) {
+                    else if (mbIsSales && (mbIsDoc || mbIsAdj) && moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CASH && moFieldFkPaymentSystemTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNU_TP_PAY_SYS_NA) {
                         validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkPaymentSystemTypeId.getText() + "'.");
                         validation.setComponent(jcbFkPaymentSystemTypeId);
                     }
