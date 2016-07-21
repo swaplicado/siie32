@@ -121,10 +121,10 @@ public class ImportPayrolls extends javax.swing.JFrame {
         moDbMySql = new SDataDatabase(SLibConstants.DBMS_MY_SQL);
 
         //   2015-10-23
-        moDbMySql.connect("192.168.1.19", "3306", "erp_otsa", "root", "msroot");
-        //moDbMySql.connect("localhost", "3306", "erp_otsa", "root", "msroot");
+        //moDbMySql.connect("192.168.1.19", "3306", "erp_otsa", "root", "msroot");
+        moDbMySql.connect("localhost", "3306", "erp_gs", "root", "msroot");
         moDbSqlServer = new SDataDatabase(SLibConstants.DBMS_SQL_SERVER_2005);
-        moDbSqlServer.connect("localhost\\SQLEXPRESS", "", "OpTron", "sa", "1120");
+        moDbSqlServer.connect("localhost\\SQLEXPRESS", "", "GS", "sa", "1120");
 
         jftDateImport.setText("31/12/2015");
     }
@@ -312,6 +312,7 @@ public class ImportPayrolls extends javax.swing.JFrame {
         int nCredito = 0;
         int nPrestamo = 0;
         int nLoanType = 0;
+        int nWorkedDays = 0;
         String sNum_Ser = "";
         int nNum = 0;
         int nPaymentSysType = 0;
@@ -417,10 +418,11 @@ public class ImportPayrolls extends javax.swing.JFrame {
                 nDiasLaborables = rsSqlServerPayroll.getInt("dias_laborables");
                 nAreaSalario = rsSqlServerPayroll.getInt("fid_area_salario");
                 nAreaSalarioReferencia = rsSqlServerPayroll.getInt("fid_area_salario_ref");
+                nWorkedDays = (int) SLibTimeUtilities.getDaysDiff(tDateEnd, tDateStart) + 1;
 
                 sSql = "INSERT INTO hrs_pay VALUES (" +
                         nIdNomina + ", " + nYear + ", " + nYear + ", " + rsSqlServerPayroll.getInt("periodo") + ", " + rsSqlServerPayroll.getInt("nomina_num") + ", " + 
-                        "'" + sdfMySql.format(tDateStart) + "', '" + sdfMySql.format(tDateEnd) + "', DATEDIFF('" + sdfMySql.format(tDateEnd) + "', '" + sdfMySql.format(tDateStart) + "') + 1" + ", " + nDiasNomina + ", " + nDiasLaborables + ", " +
+                        "'" + sdfMySql.format(tDateStart) + "', '" + sdfMySql.format(tDateEnd) + "', " /*DATEDIFF('" + sdfMySql.format(tDateEnd) + "', '" + sdfMySql.format(tDateStart) + "') + 1"*/ + (nWorkedDays < 0 ? 0 : nWorkedDays) + ", " + nDiasNomina + ", " + (nDiasLaborables < 0 ? 0 : nDiasLaborables) + ", " +
                         rsSqlServerPayroll.getDouble("sma") + ", " + rsSqlServerPayroll.getDouble("smar") + ", '" + rsSqlServerPayroll.getString("comentarios") + "', " + rsSqlServerPayroll.getBoolean("es_normal") + ", " + rsSqlServerPayroll.getBoolean("es_con_calc_ss") + ", 0, 0, " + rsSqlServerPayroll.getBoolean("es_cerrada") + ", 0, " + nPeriodoPago + ", " +
                         (nAreaSalario != 0 ? nAreaSalario : nAreaSalarioReferencia) + ", " + nAreaSalarioReferencia + ", " + rsSqlServerPayroll.getInt("fid_calc_impuesto_tp") + ", " + rsSqlServerPayroll.getInt("fid_tabla_impuesto") + ", " + rsSqlServerPayroll.getInt("fid_tabla_credito_sal") + ", " + rsSqlServerPayroll.getInt("fid_tabla_ss") + ", " +
                         "1, 1, 1, NOW(), NOW(), NOW()); ";
@@ -496,7 +498,7 @@ public class ImportPayrolls extends javax.swing.JFrame {
                         sSql = "INSERT INTO hrs_pay_rcp_ear VALUES (" +
                             nIdNomina + ", " + nBizPartner + ", " + rsSqlServerReceiptEarnings.getInt("id_mov") + ", " + (dUnidades == 0 ? 1 : dUnidades) + ", " + (dUnidades == 0 ? 1 : dUnidades) + ", 1, " + 
                             (dAmount / (dUnidades == 0 ? 1 : dUnidades)) + ", " + dAmount + ", " + dAmount + ", " + (dAmount - dAmountTaxable) + ", " + dAmountTaxable + ", " +
-                            "0, 0, 1, 1, 0, 1, " + nEarningType + ", " + nEarning + ", " + nEarningBenefitType + ", NULL, NULL, NULL, " +
+                            "0, 0, 0, 1, 1, 0, 1, " + nEarningType + ", " + nEarning + ", " + nEarningBenefitType + ", NULL, NULL, NULL, " +
                             "1, 1, NOW(), NOW()); ";
                     
                         stMySql.execute(sSql);
