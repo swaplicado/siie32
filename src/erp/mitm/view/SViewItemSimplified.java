@@ -90,13 +90,13 @@ public class SViewItemSimplified extends erp.lib.table.STableTab implements java
 
         levelRightEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_ITM_ITEM).Level;
 
-        jbNew.setEnabled(levelRightEdit >=  SDataConstantsSys.USRS_TP_LEV_AUTHOR);
-        jbEdit.setEnabled(levelRightEdit >=  SDataConstantsSys.USRS_TP_LEV_AUTHOR);
-        jbCopy.setEnabled(levelRightEdit >=  SDataConstantsSys.USRS_TP_LEV_AUTHOR);
+        jbNew.setEnabled(levelRightEdit >= SDataConstantsSys.USRS_TP_LEV_AUTHOR);
+        jbEdit.setEnabled(levelRightEdit >= SDataConstantsSys.USRS_TP_LEV_AUTHOR);
+        jbCopy.setEnabled(levelRightEdit >= SDataConstantsSys.USRS_TP_LEV_AUTHOR);
         jbDelete.setEnabled(false);
 
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[16];
+        STableColumn[] aoTableColumns = new STableColumn[17];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "i.id_item");
@@ -119,6 +119,7 @@ public class SViewItemSimplified extends erp.lib.table.STableTab implements java
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_pre_pay", "Anticipo", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_fiscal_acc_inc", "Código agrupador SAT (ingresos)", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_fiscal_acc_exp", "Código agrupador SAT (egresos)", 200);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ae.tp_acc_ebitda", "Cuenta EBITDA", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "si.name", "Estatus", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usr. creación", STableConstants.WIDTH_USER);
@@ -197,12 +198,13 @@ public class SViewItemSimplified extends erp.lib.table.STableTab implements java
         }
 
         msSql = "SELECT i.id_item, i.item, i.item_key, i.b_ref, i.b_pre_pay, i.b_del, i.ts_new, i.ts_edit, i.ts_del, " +
-                "ig.igen, si.name, u.symbol, CONCAT(fai.code, ' - ', fai.name) AS f_fiscal_acc_inc, CONCAT(fae.code, ' - ', fae.name) AS f_fiscal_acc_exp, " +
+                "ig.igen, si.name, u.symbol, ae.tp_acc_ebitda, CONCAT(fai.code, ' - ', fai.name) AS f_fiscal_acc_inc, CONCAT(fae.code, ' - ', fae.name) AS f_fiscal_acc_exp, " +
                 "un.usr, ue.usr, ud.usr, il.line " +
                 "FROM erp.itmu_item AS i " +
                 "INNER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " +
                 "INNER JOIN erp.itms_st_item AS si ON i.fid_st_item = si.id_st_item " +
                 "INNER JOIN erp.itmu_unit AS u ON i.fid_unit = u.id_unit " +
+                "INNER JOIN erp.finu_tp_acc_ebitda AS ae ON i.fid_tp_acc_ebitda = ae.id_tp_acc_ebitda " +
                 "INNER JOIN erp.fins_fiscal_acc AS fai ON i.fid_fiscal_acc_inc = fai.id_fiscal_acc " +
                 "INNER JOIN erp.fins_fiscal_acc AS fae ON i.fid_fiscal_acc_exp = fae.id_fiscal_acc " +
                 "INNER JOIN erp.usru_usr AS un ON i.fid_usr_new = un.id_usr " +

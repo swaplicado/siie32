@@ -85,6 +85,8 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
         jtfExchangeRate = new javax.swing.JTextField();
         jbExchangeRate = new javax.swing.JButton();
         jPanel9 = new javax.swing.JPanel();
+        jPanel12 = new javax.swing.JPanel();
+        jckShowEbitda = new javax.swing.JCheckBox();
         jPanel10 = new javax.swing.JPanel();
         jckShowRecordAdjYearEnd = new javax.swing.JCheckBox();
         jPanel11 = new javax.swing.JPanel();
@@ -193,6 +195,13 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
 
         jPanel9.setLayout(new java.awt.GridLayout(4, 1));
 
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jckShowEbitda.setText("Mostrar EBITDA");
+        jPanel12.add(jckShowEbitda);
+
+        jPanel9.add(jPanel12);
+
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckShowRecordAdjYearEnd.setText("Incluir ajustes de cierre");
@@ -236,8 +245,8 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-400)/2, (screenSize.height-300)/2, 400, 300);
+        setSize(new java.awt.Dimension(400, 300));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jpPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jpPrintActionPerformed
@@ -335,7 +344,7 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
 
         return netSales;
     }
-
+    
     private void print() {
         Cursor cursor = getCursor();
         Map<String, Object> map = null;
@@ -358,8 +367,8 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
             map.put("dNetSales", readNetSales());
             map.put("sCurrency", ((SFormComponentItem) jcbCurrencyId.getSelectedItem()).getItem());
             map.put("dExchangeRate", moFieldExchangeRate.getDouble());
-            map.put("sSqlWhere", (!jckShowRecordAdjYearEnd.isSelected() ? " AND b_adj_year = 0 " : "") +
-                    (!jckShowRecordAdjAudit.isSelected() ? " AND b_adj_audit = 0 " : ""));
+            map.put("sSqlWhere", (!jckShowRecordAdjYearEnd.isSelected() ? " AND b_adj_year = 0 " : "") + (!jckShowRecordAdjAudit.isSelected() ? " AND b_adj_audit = 0 " : ""));
+            map.put("bEbitda", jckShowEbitda.isSelected());
 
             jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_FIN_STAT_PROF_LOSS, map);
             jasperViewer = new JasperViewer(jasperPrint, false);
@@ -449,6 +458,7 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -462,6 +472,7 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
     private javax.swing.JButton jbDateEnd;
     private javax.swing.JButton jbExchangeRate;
     private javax.swing.JComboBox jcbCurrencyId;
+    private javax.swing.JCheckBox jckShowEbitda;
     private javax.swing.JCheckBox jckShowRecordAdjAudit;
     private javax.swing.JCheckBox jckShowRecordAdjYearEnd;
     private javax.swing.JFormattedTextField jftDateBegin;

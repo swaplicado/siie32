@@ -1494,7 +1494,7 @@
                   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
                     <Property name="columns" type="int" value="2"/>
                     <Property name="horizontalGap" type="int" value="5"/>
-                    <Property name="rows" type="int" value="5"/>
+                    <Property name="rows" type="int" value="6"/>
                     <Property name="verticalGap" type="int" value="5"/>
                   </Layout>
                   <SubComponents>
@@ -1573,7 +1573,7 @@
 
                   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
                     <Property name="columns" type="int" value="1"/>
-                    <Property name="rows" type="int" value="5"/>
+                    <Property name="rows" type="int" value="6"/>
                     <Property name="verticalGap" type="int" value="5"/>
                   </Layout>
                   <SubComponents>
@@ -1713,6 +1713,53 @@
                         </Component>
                       </SubComponents>
                     </Container>
+                    <Container class="javax.swing.JPanel" name="jPanel47">
+                      <Properties>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[100, 23]"/>
+                        </Property>
+                      </Properties>
+
+                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                        <Property name="alignment" type="int" value="0"/>
+                        <Property name="verticalGap" type="int" value="0"/>
+                      </Layout>
+                      <SubComponents>
+                        <Component class="javax.swing.JLabel" name="jlFkAccountEbitdaTypeId">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Tipo cuenta EBITDA: *"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[200, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JComboBox" name="jcbFkAccountEbitdaTypeId">
+                          <Properties>
+                            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                              <StringArray count="4">
+                                <StringItem index="0" value="Item 1"/>
+                                <StringItem index="1" value="Item 2"/>
+                                <StringItem index="2" value="Item 3"/>
+                                <StringItem index="3" value="Item 4"/>
+                              </StringArray>
+                            </Property>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[250, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JButton" name="jbFkAccountEbitdaTypeId">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="..."/>
+                            <Property name="toolTipText" type="java.lang.String" value="Seleccionar tipo de cuenta EBITDA"/>
+                            <Property name="focusable" type="boolean" value="false"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[23, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                      </SubComponents>
+                    </Container>
                     <Container class="javax.swing.JPanel" name="jPanel45">
                       <Properties>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -1751,7 +1798,7 @@
                         <Component class="javax.swing.JButton" name="jbFkFiscalAccountIncId">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="..."/>
-                            <Property name="toolTipText" type="java.lang.String" value="Seleccionar c&#xf3;digo agrupador SAT ingresos"/>
+                            <Property name="toolTipText" type="java.lang.String" value="Seleccionar c&#xf3;digo agrupador SAT (ingresos)"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[23, 23]"/>
@@ -1798,7 +1845,7 @@
                         <Component class="javax.swing.JButton" name="jbFkFiscalAccountExpId">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="..."/>
-                            <Property name="toolTipText" type="java.lang.String" value="Seleccionar c&#xf3;digo agrupador SAT egresos"/>
+                            <Property name="toolTipText" type="java.lang.String" value="Seleccionar c&#xf3;digo agrupador SAT (egresos)"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[23, 23]"/>
