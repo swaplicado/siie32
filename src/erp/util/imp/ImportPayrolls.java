@@ -122,9 +122,12 @@ public class ImportPayrolls extends javax.swing.JFrame {
 
         //   2015-10-23
         //moDbMySql.connect("192.168.1.19", "3306", "erp_otsa", "root", "msroot");
+        // Edwin
         moDbMySql.connect("localhost", "3306", "erp_gs", "root", "msroot");
         moDbSqlServer = new SDataDatabase(SLibConstants.DBMS_SQL_SERVER_2005);
-        moDbSqlServer.connect("localhost\\SQLEXPRESS", "", "GS", "sa", "1120");
+        //moDbSqlServer.connect("localhost\\SQLEXPRESS", "", "GS", "sa", "1120");
+        // Brianda
+        moDbSqlServer.connect("192.168.1.13\\SQLEXPRESS", "", "GS", "sa", "1120");
 
         jftDateImport.setText("31/12/2015");
     }
@@ -134,8 +137,12 @@ public class ImportPayrolls extends javax.swing.JFrame {
         String sql = "";
         ResultSet rsMySql = null;
 
+        /*
         sql = "SELECT id_emp FROM erp.hrsu_emp " +
                 "WHERE num='" + empleado + "'; ";
+        */
+        sql = "SELECT id_emp FROM erp.temp_map_num_bp " +
+                "WHERE id_empleado=" + empleado + "; ";
         rsMySql = stMySql.executeQuery(sql);
         if (rsMySql.next()) {
             bizPartnerId = rsMySql.getInt("id_emp");
