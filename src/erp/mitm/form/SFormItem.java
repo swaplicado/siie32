@@ -128,6 +128,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.lib.form.SFormField moFieldFkDefaultItemRefId_n;
     private erp.lib.form.SFormField moFieldFkAdministrativeConceptTypeId;
     private erp.lib.form.SFormField moFieldFkTaxableConceptTypeId;
+    private erp.lib.form.SFormField moFieldFkAccountEbitdaTypeId;
     private erp.lib.form.SFormField moFieldFkFiscalAccountIncId;
     private erp.lib.form.SFormField moFieldFkFiscalAccountExpId;
 
@@ -331,6 +332,10 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jlFkTaxableConceptTypeId = new javax.swing.JLabel();
         jcbFkTaxableConceptTypeId = new javax.swing.JComboBox();
         jbFkTaxableConceptTypeId = new javax.swing.JButton();
+        jPanel47 = new javax.swing.JPanel();
+        jlFkAccountEbitdaTypeId = new javax.swing.JLabel();
+        jcbFkAccountEbitdaTypeId = new javax.swing.JComboBox();
+        jbFkAccountEbitdaTypeId = new javax.swing.JButton();
         jPanel45 = new javax.swing.JPanel();
         jlFkFiscalAccountIncId = new javax.swing.JLabel();
         jcbFkFiscalAccountIncId = new javax.swing.JComboBox();
@@ -987,7 +992,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jpConfig1.setLayout(new java.awt.BorderLayout());
 
         jPanel39.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración para comercialización:"));
-        jPanel39.setLayout(new java.awt.GridLayout(5, 2, 5, 5));
+        jPanel39.setLayout(new java.awt.GridLayout(6, 2, 5, 5));
 
         jckIsFreeDiscountUnitary.setText("Sin descuento unitario");
         jPanel39.add(jckIsFreeDiscountUnitary);
@@ -1025,7 +1030,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jpConfig1.add(jPanel39, java.awt.BorderLayout.CENTER);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración para contabilización:"));
-        jPanel2.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
 
         jPanel49.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -1083,6 +1088,25 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel2.add(jPanel43);
 
+        jPanel47.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel47.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFkAccountEbitdaTypeId.setText("Tipo cuenta EBITDA: *");
+        jlFkAccountEbitdaTypeId.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel47.add(jlFkAccountEbitdaTypeId);
+
+        jcbFkAccountEbitdaTypeId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbFkAccountEbitdaTypeId.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel47.add(jcbFkAccountEbitdaTypeId);
+
+        jbFkAccountEbitdaTypeId.setText("...");
+        jbFkAccountEbitdaTypeId.setToolTipText("Seleccionar tipo de cuenta EBITDA");
+        jbFkAccountEbitdaTypeId.setFocusable(false);
+        jbFkAccountEbitdaTypeId.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel47.add(jbFkAccountEbitdaTypeId);
+
+        jPanel2.add(jPanel47);
+
         jPanel45.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel45.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -1095,7 +1119,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel45.add(jcbFkFiscalAccountIncId);
 
         jbFkFiscalAccountIncId.setText("...");
-        jbFkFiscalAccountIncId.setToolTipText("Seleccionar código agrupador SAT ingresos");
+        jbFkFiscalAccountIncId.setToolTipText("Seleccionar código agrupador SAT (ingresos)");
         jbFkFiscalAccountIncId.setFocusable(false);
         jbFkFiscalAccountIncId.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel45.add(jbFkFiscalAccountIncId);
@@ -1114,7 +1138,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel46.add(jcbFkFiscalAccountExpId);
 
         jbFkFiscalAccountExpId.setText("...");
-        jbFkFiscalAccountExpId.setToolTipText("Seleccionar código agrupador SAT egresos");
+        jbFkFiscalAccountExpId.setToolTipText("Seleccionar código agrupador SAT (egresos)");
         jbFkFiscalAccountExpId.setFocusable(false);
         jbFkFiscalAccountExpId.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel46.add(jbFkFiscalAccountExpId);
@@ -1383,6 +1407,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldFkTaxableConceptTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkTaxableConceptTypeId, jlFkTaxableConceptTypeId);
         moFieldFkTaxableConceptTypeId.setPickerButton(jbFkTaxableConceptTypeId);
         moFieldFkTaxableConceptTypeId.setTabbedPaneIndex(1, jTabbedPane);
+        moFieldFkAccountEbitdaTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkAccountEbitdaTypeId, jlFkAccountEbitdaTypeId);
+        moFieldFkAccountEbitdaTypeId.setPickerButton(jbFkAccountEbitdaTypeId);
+        moFieldFkAccountEbitdaTypeId.setTabbedPaneIndex(1, jTabbedPane);
         moFieldFkFiscalAccountIncId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkFiscalAccountIncId, jlFkFiscalAccountIncId);
         moFieldFkFiscalAccountIncId.setPickerButton(jbFkFiscalAccountIncId);
         moFieldFkFiscalAccountIncId.setTabbedPaneIndex(1, jTabbedPane);
@@ -1450,6 +1477,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         mvFields.add(moFieldFkDefaultItemRefId_n);
         mvFields.add(moFieldFkAdministrativeConceptTypeId);
         mvFields.add(moFieldFkTaxableConceptTypeId);
+        mvFields.add(moFieldFkAccountEbitdaTypeId);
         mvFields.add(moFieldFkFiscalAccountIncId);
         mvFields.add(moFieldFkFiscalAccountExpId);
 
@@ -1474,6 +1502,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jbFkDefaultItemRefId_n.addActionListener(this);
         jbFkAdministrativeConceptTypeId.addActionListener(this);
         jbFkTaxableConceptTypeId.addActionListener(this);
+        jbFkAccountEbitdaTypeId.addActionListener(this);
         jbFkFiscalAccountIncId.addActionListener(this);
         jbFkFiscalAccountExpId.addActionListener(this);
 
@@ -2418,6 +2447,10 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         miClient.pickOption(SDataConstants.FINU_TP_TAX_CPT, moFieldFkTaxableConceptTypeId, null);
     }
 
+    private void actionFkAccountEbitdaTypeId() {
+        miClient.pickOption(SDataConstants.FINU_TP_ACC_EBITDA, moFieldFkAccountEbitdaTypeId, null);
+    }
+
     private void actionFkFiscalAccountIncId() {
         miClient.pickOption(SDataConstants.FINS_FISCAL_ACC, moFieldFkFiscalAccountIncId, null);
     }
@@ -2605,6 +2638,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JPanel jPanel44;
     private javax.swing.JPanel jPanel45;
     private javax.swing.JPanel jPanel46;
+    private javax.swing.JPanel jPanel47;
     private javax.swing.JPanel jPanel49;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel50;
@@ -2641,6 +2675,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JButton jbCopyPresentation;
     private javax.swing.JButton jbEditItemGeneric;
     private javax.swing.JButton jbEditUnit;
+    private javax.swing.JButton jbFkAccountEbitdaTypeId;
     private javax.swing.JButton jbFkAdministrativeConceptTypeId;
     private javax.swing.JButton jbFkDefaultItemRefId_n;
     private javax.swing.JButton jbFkFiscalAccountExpId;
@@ -2653,6 +2688,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JButton jbModifyItemForeignLanguage;
     private javax.swing.JButton jbOk;
     private javax.swing.ButtonGroup jbgStatus;
+    private javax.swing.JComboBox jcbFkAccountEbitdaTypeId;
     private javax.swing.JComboBox jcbFkAdministrativeConceptTypeId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkBrandId;
     private javax.swing.JComboBox jcbFkDefaultItemRefId_n;
@@ -2692,6 +2728,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JCheckBox jckIsSurfaceVariable;
     private javax.swing.JCheckBox jckIsVolumeVariable;
     private javax.swing.JLabel jlCode;
+    private javax.swing.JLabel jlFkAccountEbitdaTypeId;
     private javax.swing.JLabel jlFkAdministrativeConceptTypeId;
     private javax.swing.JLabel jlFkBrandId;
     private javax.swing.JLabel jlFkDefaultItemRefId_n;
@@ -2806,8 +2843,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         moFieldFkUnitAlternativeTypeId.setFieldValue(new int[] { SDataConstantsSys.ITMU_TP_UNIT_NA });
         moFieldFkLevelTypeId.setFieldValue(new int[] { SDataConstantsSys.ITMU_TP_LEV_NA });
-        moFieldFkAdministrativeConceptTypeId.setFieldValue(new int[] { SDataConstantsSys.FINU_TP_ADM_CPT_NA });
-        moFieldFkTaxableConceptTypeId.setFieldValue(new int[] { SDataConstantsSys.FINU_TP_TAX_CPT_NA });
+        moFieldFkAdministrativeConceptTypeId.setFieldValue(new int[] { SDataConstantsSys.NA });
+        moFieldFkTaxableConceptTypeId.setFieldValue(new int[] { SDataConstantsSys.NA });
+        moFieldFkAccountEbitdaTypeId.setFieldValue(new int[] { SDataConstantsSys.NA });
         moFieldFkFiscalAccountIncId.setFieldValue(new int[] { SModSysConsts.FINS_FISCAL_ACC_NA });
         moFieldFkFiscalAccountExpId.setFieldValue(new int[] { SModSysConsts.FINS_FISCAL_ACC_NA });
 
@@ -2830,6 +2868,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         SFormUtilities.populateComboBox(miClient, jcbFkDefaultItemRefId_n, SDataConstants.ITMU_ITEM);
         SFormUtilities.populateComboBox(miClient, jcbFkAdministrativeConceptTypeId, SDataConstants.FINU_TP_ADM_CPT);
         SFormUtilities.populateComboBox(miClient, jcbFkTaxableConceptTypeId, SDataConstants.FINU_TP_TAX_CPT);
+        SFormUtilities.populateComboBox(miClient, jcbFkAccountEbitdaTypeId, SDataConstants.FINU_TP_ACC_EBITDA);
         SFormUtilities.populateComboBox(miClient, jcbFkFiscalAccountIncId, SDataConstants.FINS_FISCAL_ACC);
         SFormUtilities.populateComboBox(miClient, jcbFkFiscalAccountExpId, SDataConstants.FINS_FISCAL_ACC);
         mbResetingForm = false;
@@ -3016,6 +3055,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldFkDefaultItemRefId_n.setFieldValue(new int[] { moItem.getFkDefaultItemRefId_n() });
         moFieldFkAdministrativeConceptTypeId.setFieldValue(new int[] { moItem.getFkAdministrativeConceptTypeId() });
         moFieldFkTaxableConceptTypeId.setFieldValue(new int[] { moItem.getFkTaxableConceptTypeId() });
+        moFieldFkAccountEbitdaTypeId.setFieldValue(new int[] { moItem.getFkAccountEbitdaTypeId()});
         moFieldFkFiscalAccountIncId.setFieldValue(new int[] { moItem.getFkFiscalAccountIncId() });
         moFieldFkFiscalAccountExpId.setFieldValue(new int[] { moItem.getFkFiscalAccountExpId() });
         jtfPkItemId_Ro.setText("" + moItem.getPkItemId());
@@ -3143,6 +3183,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moItem.setFkDefaultItemRefId_n(jcbFkDefaultItemRefId_n.getSelectedIndex() <= 0 ? 0 : moFieldFkDefaultItemRefId_n.getKeyAsIntArray()[0]);
         moItem.setFkAdministrativeConceptTypeId(moFieldFkAdministrativeConceptTypeId.getKeyAsIntArray()[0]);
         moItem.setFkTaxableConceptTypeId(moFieldFkTaxableConceptTypeId.getKeyAsIntArray()[0]);
+        moItem.setFkAccountEbitdaTypeId(moFieldFkAccountEbitdaTypeId.getKeyAsIntArray()[0]);
         moItem.setFkFiscalAccountIncId(moFieldFkFiscalAccountIncId.getKeyAsIntArray()[0]);
         moItem.setFkFiscalAccountExpId(moFieldFkFiscalAccountExpId.getKeyAsIntArray()[0]);
         
@@ -3246,6 +3287,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
             }
             else if (button == jbFkTaxableConceptTypeId) {
                 actionFkTaxableConceptTypeId();
+            }
+            else if (button == jbFkAccountEbitdaTypeId) {
+                actionFkAccountEbitdaTypeId();
             }
             else if (button == jbFkFiscalAccountIncId) {
                 actionFkFiscalAccountIncId();

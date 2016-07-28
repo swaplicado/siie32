@@ -824,7 +824,7 @@ public class SFormAccountMajor extends javax.swing.JDialog implements erp.lib.fo
             jbFkAccountEbitdaTypeId.setEnabled(true);
         }
         else {
-            moFieldFkAccountEbitdaTypeId.setFieldValue(new int[] { SDataConstantsSys.FINU_TP_ACC_EBITDA_NA });
+            moFieldFkAccountEbitdaTypeId.setFieldValue(new int[] { SDataConstantsSys.NA });
         }
     }
 
@@ -857,7 +857,7 @@ public class SFormAccountMajor extends javax.swing.JDialog implements erp.lib.fo
             //jbFkAssetFixedTypeId.setEnabled(true);
         }
         else {
-            moFieldFkAssetFixedTypeId.setFieldValue(new int[] { SDataConstantsSys.FINU_TP_ASSET_FIX_NA });
+            moFieldFkAssetFixedTypeId.setFieldValue(new int[] { SDataConstantsSys.NA });
         }
 
         if (SLibUtilities.compareKeys(moFieldFkAccountUserSubclassId.getKey(), SDataConstantsSys.FINU_CLS_ACC_USR_ASSET_DIF)) {
@@ -865,7 +865,7 @@ public class SFormAccountMajor extends javax.swing.JDialog implements erp.lib.fo
             //jbFkAssetDifferredTypeId.setEnabled(true);
         }
         else {
-            moFieldFkAssetDifferredTypeId.setFieldValue(new int[] { SDataConstantsSys.FINU_TP_ASSET_DIF_NA });
+            moFieldFkAssetDifferredTypeId.setFieldValue(new int[] { SDataConstantsSys.NA });
         }
 
         if (SLibUtilities.compareKeys(moFieldFkAccountUserSubclassId.getKey(), SDataConstantsSys.FINU_CLS_ACC_USR_LIABTY_DIF)) {
@@ -873,7 +873,7 @@ public class SFormAccountMajor extends javax.swing.JDialog implements erp.lib.fo
             //jbFkLiabilityDifferredTypeId.setEnabled(true);
         }
         else {
-            moFieldFkLiabilityDifferredTypeId.setFieldValue(new int[] { SDataConstantsSys.FINU_TP_LIABTY_DIF_NA });
+            moFieldFkLiabilityDifferredTypeId.setFieldValue(new int[] { SDataConstantsSys.NA });
         }
 
         if (SLibUtilities.compareKeys(moFieldFkAccountUserSubclassId.getKey(), SDataConstantsSys.FINU_CLS_ACC_USR_EXPEN_OP)) {
@@ -881,7 +881,7 @@ public class SFormAccountMajor extends javax.swing.JDialog implements erp.lib.fo
             //jbFkExpenseOperativeTypeId.setEnabled(true);
         }
         else {
-            moFieldFkExpenseOperativeTypeId.setFieldValue(new int[] { SDataConstantsSys.FINU_TP_EXPEN_OP_NA });
+            moFieldFkExpenseOperativeTypeId.setFieldValue(new int[] { SDataConstantsSys.NA });
         }
     }
 
@@ -1103,8 +1103,8 @@ public class SFormAccountMajor extends javax.swing.JDialog implements erp.lib.fo
         moFieldIsActive.setFieldValue(true);
 
         moFieldFkAccountSystemTypeId.setFieldValue(new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_NA });
-        moFieldFkAdministrativeConceptTypeId.setFieldValue(new int[] { SDataConstantsSys.FINU_TP_ADM_CPT_NA });
-        moFieldFkTaxableConceptTypeId.setFieldValue(new int[] { SDataConstantsSys.FINU_TP_TAX_CPT_NA });
+        moFieldFkAdministrativeConceptTypeId.setFieldValue(new int[] { SDataConstantsSys.NA });
+        moFieldFkTaxableConceptTypeId.setFieldValue(new int[] { SDataConstantsSys.NA });
         moFieldFkFiscalAccountId.setFieldValue(new int[] { SModSysConsts.FINS_FISCAL_ACC_NA });
 
         jcbFkAccountSystemTypeId.setEnabled(true);

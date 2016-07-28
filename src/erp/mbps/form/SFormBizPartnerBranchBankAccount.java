@@ -693,7 +693,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
             jcbFkCardIssuerId.setFocusable(false);
             jbAddCard.setEnabled(false);
             jbModifyCard.setEnabled(false);
-            moFieldFkCardIssuerId.setKey(new int[] { SDataConstantsSys.FINU_CARD_ISS_NA });
+            moFieldFkCardIssuerId.setKey(new int[] { SDataConstantsSys.NA });
         }
     }
 
@@ -1174,7 +1174,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         moBizPartnerBranchBankAccount.setCodeAba(moFieldCodeAba.getString());
         moBizPartnerBranchBankAccount.setCodeSwift(moFieldCodeSwift.getString());
         moBizPartnerBranchBankAccount.setAliasBajio(moFieldAliasBajio.getString());
-        moBizPartnerBranchBankAccount.setFkCardIssuerId(moFieldFkCardIssuerId.getKeyAsIntArray()[0] == 0 ? SDataConstantsSys.FINU_CARD_ISS_NA : moFieldFkCardIssuerId.getKeyAsIntArray()[0]);
+        moBizPartnerBranchBankAccount.setFkCardIssuerId(moFieldFkCardIssuerId.getKeyAsIntArray()[0] == 0 ? SDataConstantsSys.NA : moFieldFkCardIssuerId.getKeyAsIntArray()[0]);
         moBizPartnerBranchBankAccount.setIsCardApplying(moFieldIsCardApplying.getBoolean());
         moBizPartnerBranchBankAccount.setIsDefault(moFieldIsDefault.getBoolean());
         moBizPartnerBranchBankAccount.setIsDeleted(moFieldIsDeleted.getBoolean());

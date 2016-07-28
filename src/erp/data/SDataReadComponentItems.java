@@ -1115,7 +1115,7 @@ public abstract class SDataReadComponentItems {
                 break;
             case SDataConstants.FINU_TP_ACC_EBITDA:
                 lenPk = 1;
-                sql = "SELECT id_tp_acc_ebitda AS f_id_1, tp_acc_ebitda AS f_item FROM erp.finu_tp_acc_ebitda WHERE b_del = 0 ";
+                sql = "SELECT id_tp_acc_ebitda AS f_id_1, tp_acc_ebitda AS f_item FROM erp.finu_tp_acc_ebitda WHERE NOT b_del ORDER BY sort_pos ";
                 text = "tipo de cuenta EBITDA";
                 break;
             case SDataConstants.FINU_TP_ASSET_FIX:

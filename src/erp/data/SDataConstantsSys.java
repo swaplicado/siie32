@@ -17,6 +17,7 @@ package erp.data;
 public abstract class SDataConstantsSys {
 
     public static final int UNDEFINED = 0;
+    public static final int NA = 1;
 
     public static final int CFGS_CT_ENT_CASH = 1;
     public static final int CFGS_CT_ENT_WH = 2;
@@ -841,8 +842,6 @@ public abstract class SDataConstantsSys {
 
     public static final int FINU_TAX_BAS_VAT = 1;
 
-    public static final int FINU_CARD_ISS_NA = 1;
-
     public static final java.lang.String FINU_TP_REC_FY_OPEN = "EA";
     public static final java.lang.String FINU_TP_REC_FY_END = "EC";
     public static final java.lang.String FINU_TP_REC_PUR = "C";
@@ -905,26 +904,6 @@ public abstract class SDataConstantsSys {
     public static final int [] FINU_CLS_ACC_USR_RES_CRE_OTH = { 3, 2, 5 };
     public static final int [] FINU_CLS_ACC_USR_ORD_DEB = { 4, 1, 1 };
     public static final int [] FINU_CLS_ACC_USR_ORD_CRE = { 4, 2, 1 };
-
-    public static final int FINU_TP_ACC_LEDGER_NA = 1;
-
-    public static final int FINU_TP_ACC_EBITDA_NA = 1;
-    public static final int FINU_TP_ACC_EBITDA_INT = 2;
-    public static final int FINU_TP_ACC_EBITDA_TAX = 3;
-    public static final int FINU_TP_ACC_EBITDA_DEPREC = 4;
-    public static final int FINU_TP_ACC_EBITDA_AMORT = 5;
-
-    public static final int FINU_TP_ASSET_FIX_NA = 1;
-
-    public static final int FINU_TP_ASSET_DIF_NA = 1;
-
-    public static final int FINU_TP_LIABTY_DIF_NA = 1;
-
-    public static final int FINU_TP_EXPEN_OP_NA = 1;
-
-    public static final int FINU_TP_ADM_CPT_NA = 1;
-
-    public static final int FINU_TP_TAX_CPT_NA = 1;
 
     public static final int FINX_ACC_PAY = 1;
     public static final int FINX_ACC_PAY_PEND = 2;

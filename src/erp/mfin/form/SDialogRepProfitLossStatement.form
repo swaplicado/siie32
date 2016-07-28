@@ -244,6 +244,20 @@
             <Property name="rows" type="int" value="4"/>
           </Layout>
           <SubComponents>
+            <Container class="javax.swing.JPanel" name="jPanel12">
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                <Property name="alignment" type="int" value="0"/>
+                <Property name="verticalGap" type="int" value="0"/>
+              </Layout>
+              <SubComponents>
+                <Component class="javax.swing.JCheckBox" name="jckShowEbitda">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Mostrar EBITDA"/>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
             <Container class="javax.swing.JPanel" name="jPanel10">
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">

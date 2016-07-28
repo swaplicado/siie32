@@ -2368,8 +2368,8 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         moFieldNamingOrdinaryPosName.setFieldValue(1);
         moFieldNamingOrdinaryPosPresentation.setFieldValue(2);
         moFieldFkDefaultItemRefeferenceId_n.setFieldValue(null);
-        moFieldFkAdministrativeConceptTypeId.setFieldValue(new int[] { SDataConstantsSys.FINU_TP_ADM_CPT_NA });
-        moFieldFkTaxableConceptTypeId.setFieldValue(new int[] { SDataConstantsSys.FINU_TP_TAX_CPT_NA });
+        moFieldFkAdministrativeConceptTypeId.setFieldValue(new int[] { SDataConstantsSys.NA });
+        moFieldFkTaxableConceptTypeId.setFieldValue(new int[] { SDataConstantsSys.NA });
         jltBizAreaAsignated.setListData(new Vector<SFormComponentItem>());
 
         readErpParams();

@@ -515,9 +515,9 @@ public class SFormAccount extends javax.swing.JDialog implements erp.lib.form.SF
         moFieldDateStart.setFieldValue(SLibTimeUtils.getBeginOfYear(miClient.getSessionXXX().getWorkingDate()));
         moFieldDateEnd_n.setFieldValue(null);
         moFieldIsActive.setFieldValue(true);
-        moFieldFkAccountEbitdaTypeId.setFieldValue(new int[] { SDataConstantsSys.FINU_TP_ACC_EBITDA_NA });
-        moFieldFkAdministrativeConceptTypeId.setFieldValue(new int[] { SDataConstantsSys.FINU_TP_ADM_CPT_NA });
-        moFieldFkTaxableConceptTypeId.setFieldValue(new int[] { SDataConstantsSys.FINU_TP_TAX_CPT_NA });
+        moFieldFkAccountEbitdaTypeId.setFieldValue(new int[] { SDataConstantsSys.NA });
+        moFieldFkAdministrativeConceptTypeId.setFieldValue(new int[] { SDataConstantsSys.NA });
+        moFieldFkTaxableConceptTypeId.setFieldValue(new int[] { SDataConstantsSys.NA });
         moFieldFkFiscalAccountId.setFieldValue(new int[] { SModSysConsts.FINS_FISCAL_ACC_NA });
     
         if (mnFormType == SDataConstantsSys.FINX_ACC) {
@@ -683,12 +683,12 @@ public class SFormAccount extends javax.swing.JDialog implements erp.lib.form.SF
 
             moAccount.setFkAccountSpecializedTypeId(SDataConstantsSys.FINS_TP_ACC_SPE_NA);
             moAccount.setFkAccountSystemTypeId(SDataConstantsSys.FINS_TP_ACC_SYS_NA);
-            moAccount.setFkAccountLedgerTypeId(SDataConstantsSys.FINU_TP_ACC_LEDGER_NA);
+            moAccount.setFkAccountLedgerTypeId(SDataConstantsSys.NA);
 
-            moAccount.setFkAssetFixedTypeId(SDataConstantsSys.FINU_TP_ASSET_FIX_NA);
-            moAccount.setFkAssetDifferredTypedId(SDataConstantsSys.FINU_TP_ASSET_DIF_NA);
-            moAccount.setFkLiabilityDifferredTypeId(SDataConstantsSys.FINU_TP_LIABTY_DIF_NA);
-            moAccount.setFkExpenseOperativeTypeId(SDataConstantsSys.FINU_TP_EXPEN_OP_NA);
+            moAccount.setFkAssetFixedTypeId(SDataConstantsSys.NA);
+            moAccount.setFkAssetDifferredTypedId(SDataConstantsSys.NA);
+            moAccount.setFkLiabilityDifferredTypeId(SDataConstantsSys.NA);
+            moAccount.setFkExpenseOperativeTypeId(SDataConstantsSys.NA);
 
             moAccount.setDeep(0);   // for all non major accounts deep is 0
             

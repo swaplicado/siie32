@@ -278,7 +278,7 @@ public class SDataAccountCash extends erp.lib.data.SDataRegistry implements java
                         moDbmsBizPartnerBranchBankAccount.setFkCurrencyId(mnFkCurrencyId);
                         moDbmsBizPartnerBranchBankAccount.setBankAccount(msAuxEntity);
                         moDbmsBizPartnerBranchBankAccount.setBankAccountNumber(msAuxBankAccountNumber);
-                        moDbmsBizPartnerBranchBankAccount.setFkCardIssuerId(SDataConstantsSys.FINU_CARD_ISS_NA);
+                        moDbmsBizPartnerBranchBankAccount.setFkCardIssuerId(SDataConstantsSys.NA);
                         moDbmsBizPartnerBranchBankAccount.setIsDeleted(false);
                         moDbmsBizPartnerBranchBankAccount.setFkUserNewId(mnFkUserNewId);
                     }

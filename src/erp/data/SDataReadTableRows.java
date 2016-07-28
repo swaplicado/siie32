@@ -1286,8 +1286,7 @@ public abstract class SDataReadTableRows {
                 aoQueryFields = new STableField[1];
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "tp_acc_ebitda");
 
-                sSql = "SELECT id_tp_acc_ebitda, tp_acc_ebitda FROM erp.finu_tp_acc_ebitda " +
-                        "WHERE b_del = 0 ";     // no "order by" because by now, this table is a "system table"
+                sSql = "SELECT id_tp_acc_ebitda, tp_acc_ebitda FROM erp.finu_tp_acc_ebitda WHERE NOT b_del ORDER BY sort_pos ";
                 break;
 
             case SDataConstants.FINU_TP_REC:

@@ -284,8 +284,8 @@ public class SDialogRepAccountConcept extends javax.swing.JDialog implements erp
                 map.put("tDtInitial", moFieldDateInitial.getDate());
                 map.put("tDtEnd", moFieldDateEnd.getDate());
                 map.put("sConcept", moFieldConcept.getKeyAsIntArray()[0] == 0 ? "(TODOS)" : jcbConcept.getSelectedItem().toString());
-                map.put("sSqlIfConcept", mnConcept == SDataConstants.FINU_TP_ADM_CPT ? " IF(i.fid_tp_adm_cpt <> " + SDataConstantsSys.FINU_TP_ADM_CPT_NA + ", cpi.tp_adm_cpt, cpig.tp_adm_cpt) AS concept, " :
-                    " IF(i.fid_tp_tax_cpt <> " + SDataConstantsSys.FINU_TP_TAX_CPT_NA + ", cpi.tp_tax_cpt, cpig.tp_tax_cpt) AS concept, ");
+                map.put("sSqlIfConcept", mnConcept == SDataConstants.FINU_TP_ADM_CPT ? " IF(i.fid_tp_adm_cpt <> " + SDataConstantsSys.NA + ", cpi.tp_adm_cpt, cpig.tp_adm_cpt) AS concept, " :
+                    " IF(i.fid_tp_tax_cpt <> " + SDataConstantsSys.NA + ", cpi.tp_tax_cpt, cpig.tp_tax_cpt) AS concept, ");
                 map.put("sTableConcept", getSqlTextInnerJoin());
                 map.put("sSqlConceptItem", moFieldConcept.getKeyAsIntArray()[0] == 0 ? "" : getSqlTextConcept());
                 map.put("sSqlGroupBy", getSqlTextGroupOrderBy()[0]);
@@ -373,16 +373,16 @@ public class SDialogRepAccountConcept extends javax.swing.JDialog implements erp
         String text = "";
 
         if (mnConcept == SDataConstants.FINU_TP_ADM_CPT) {
-            if (moFieldConcept.getKeyAsIntArray()[0] == SDataConstantsSys.FINU_TP_ADM_CPT_NA) {
-                text += " AND (i.fid_tp_adm_cpt = " + SDataConstantsSys.FINU_TP_ADM_CPT_NA + " AND ig.fid_tp_adm_cpt = " + SDataConstantsSys.FINU_TP_ADM_CPT_NA + ") ";
+            if (moFieldConcept.getKeyAsIntArray()[0] == SDataConstantsSys.NA) {
+                text += " AND (i.fid_tp_adm_cpt = " + SDataConstantsSys.NA + " AND ig.fid_tp_adm_cpt = " + SDataConstantsSys.NA + ") ";
             }
             else {
                 text += " AND (i.fid_tp_adm_cpt = " + moFieldConcept.getKeyAsIntArray()[0] + " OR ig.fid_tp_adm_cpt = " + moFieldConcept.getKeyAsIntArray()[0] + ") ";
             }
         }
         else {
-            if (moFieldConcept.getKeyAsIntArray()[0] == SDataConstantsSys.FINU_TP_ADM_CPT_NA) {
-                text += " AND (i.fid_tp_tax_cpt = " + SDataConstantsSys.FINU_TP_ADM_CPT_NA + " AND ig.fid_tp_tax_cpt = " + SDataConstantsSys.FINU_TP_ADM_CPT_NA + ") ";
+            if (moFieldConcept.getKeyAsIntArray()[0] == SDataConstantsSys.NA) {
+                text += " AND (i.fid_tp_tax_cpt = " + SDataConstantsSys.NA + " AND ig.fid_tp_tax_cpt = " + SDataConstantsSys.NA + ") ";
             }
             else {
                 text += " AND (i.fid_tp_tax_cpt = " + moFieldConcept.getKeyAsIntArray()[0] + " OR ig.fid_tp_tax_cpt = " + moFieldConcept.getKeyAsIntArray()[0] + ") ";
