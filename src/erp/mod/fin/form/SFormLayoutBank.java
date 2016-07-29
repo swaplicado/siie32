@@ -1572,7 +1572,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                      mvLayoutRows.get(i).setAccountCredit(row.getAccountCredit());
                      mvLayoutRows.get(i).setBalanceTot(row.getBalanceTot());
                      mvLayoutRows.get(i).setBalanceTotByBizPartner(row.getBalanceTot());
-                     mvLayoutRows.get(i).setBankKey(SLibUtilities.parseInt((row.getAccountCredit().length() > 0 ? row.getAccountCredit().substring(0, 3) : "000")));
+                     mvLayoutRows.get(i).setBankKey(SLibUtilities.parseInt((row.getAccountCredit().length() > 10 ? row.getAccountCredit().substring(0, 3) : "000")));
                      mvLayoutRows.get(i).setEmail(row.getEmail());
                      mvLayoutRows.get(i).setSantanderBankCode(mvLayoutRows.get(i).getCodeBankAccountCredit().get(row.getAccountCredit()));
                      mvLayoutRows.get(i).setBajioBankCode(mvLayoutRows.get(i).getCodeBankAccountCredit().get(row.getAccountCredit()));
