@@ -3497,7 +3497,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         else {
             lastPaymentSettings = STrnUtilities.getLastPaymentSettings(miClient, idBizPartner, categoryDps, year);
             
-            paymentSystem = SCfdConsts.MetodoPagoIdsMap.get(lastPaymentSettings[0]);
+            if (SCfdConsts.MetodoPagoIdsMap.containsKey(lastPaymentSettings[0])) {
+                paymentSystem = SCfdConsts.MetodoPagoIdsMap.get(lastPaymentSettings[0]);
+            }
+            else {
+                paymentSystem = SDataConstantsSys.TRNU_TP_PAY_SYS_NA;
+            }
+            
             paymentAccount = lastPaymentSettings[1];
         }
         

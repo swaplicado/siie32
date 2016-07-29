@@ -2393,12 +2393,12 @@ public abstract class STrnUtilities {
 
             resultSet = client.getSession().getStatement().executeQuery(sql);
             if (resultSet.next()) {
-               asPaymentInfo[0] = resultSet.getString("pay_method");  // last payment type
-               asPaymentInfo[1] = resultSet.getString("pay_account");  // last bank account for payment
+               asPaymentInfo[0] = resultSet.getString("pay_method");    // last payment method type
+               asPaymentInfo[1] = resultSet.getString("pay_account");   // last bank account on payment
             }
             else {
-               asPaymentInfo[0] = SUtilConsts.NON_APPLYING;  // payment type default
-               asPaymentInfo[1] = "";  // bank account for payment default
+               asPaymentInfo[0] = SUtilConsts.NON_APPLYING;             // default payment method type
+               asPaymentInfo[1] = "";                                   // default bank account on payment
             }
         }
         catch (Exception e) {
