@@ -156,8 +156,12 @@ public class ImportPayrolls extends javax.swing.JFrame {
         String sql = "";
         ResultSet rsMySql = null;
 
+        /*
         sql = "SELECT fk_pos FROM erp.hrsu_emp " +
                 "WHERE num='" + empleado + "'; ";
+        */
+        sql = "SELECT fk_pos FROM erp.temp_map_num_bp " +
+                "WHERE id_empleado=" + empleado + "; ";
         rsMySql = stMySql.executeQuery(sql);
         if (rsMySql.next()) {
             positionId = rsMySql.getInt("fk_pos");
@@ -171,8 +175,12 @@ public class ImportPayrolls extends javax.swing.JFrame {
         String sql = "";
         ResultSet rsMySql = null;
 
+        /*
         sql = "SELECT fk_sht FROM erp.hrsu_emp " +
                 "WHERE num='" + empleado + "'; ";
+        */
+        sql = "SELECT fk_sht FROM erp.temp_map_num_bp " +
+                "WHERE id_empleado=" + empleado + "; ";
         rsMySql = stMySql.executeQuery(sql);
         if (rsMySql.next()) {
             shiftId = rsMySql.getInt("fk_sht");
