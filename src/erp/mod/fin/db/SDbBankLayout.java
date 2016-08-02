@@ -495,7 +495,7 @@ public class SDbBankLayout extends SDbRegistryUser {
             }
             else {
                 // Settings of document:
-                amountPayed += bankPayment.getAmount();
+                amountPayed = SLibUtils.round(amountPayed + bankPayment.getAmount(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
                 sBizPartner = session.readField(SModConsts.BPSU_BP, new int[] { bankPayment.getBizPartnerId() }, SDbBizPartner.FIELD_NAME_COMM) + "";
 
                 if (bankPayment.getLayoutPaymentType() == SModSysConsts.FIN_LAY_BANK_DPS) {
