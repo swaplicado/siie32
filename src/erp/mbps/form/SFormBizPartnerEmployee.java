@@ -646,6 +646,11 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel17.add(jlFkDepartment);
 
         jcbFkDepartment.setPreferredSize(new java.awt.Dimension(200, 23));
+        jcbFkDepartment.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jcbFkDepartmentItemStateChanged(evt);
+            }
+        });
         jPanel17.add(jcbFkDepartment);
 
         jPanel4.add(jPanel17);
@@ -945,6 +950,12 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         itemStateChangedIsAddress();
     }//GEN-LAST:event_jckIsAddressItemStateChanged
 
+    private void jcbFkDepartmentItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbFkDepartmentItemStateChanged
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+            itemStateChangedDepartament();
+        }
+    }//GEN-LAST:event_jcbFkDepartmentItemStateChanged
+
     private void initComponentsExtra() {
         mvFields = new Vector<SFormField>();
 
@@ -1172,6 +1183,23 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         }
         else {
             jftAlternativeId.setText("");
+        }
+    }
+    private void itemStateChangedDepartament() {
+        renderPosition();
+    }
+    
+    private void renderPosition() {
+        if (moFieldFkDepartment.getKeyAsIntArray()[0] > 0) {
+            jcbFkPosition.setEnabled(true);
+            SFormUtilities.populateComboBox(miClient, jcbFkPosition, SModConsts.HRSU_POS, moFieldFkDepartment.getKeyAsIntArray()[0]);
+            if (jcbFkPosition.getItemCount() <= 2) {
+                jcbFkPosition.setSelectedIndex(jcbFkPosition.getItemCount() - 1);
+            }
+        }
+        else {
+            jcbFkPosition.setEnabled(false);
+            jcbFkPosition.removeAllItems();
         }
     }
 
@@ -1797,7 +1825,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         SFormUtilities.populateComboBox(miClient, jcbFkEmployeeType, SModConsts.HRSU_TP_EMP);
         SFormUtilities.populateComboBox(miClient, jcbFkWorkerType, SModConsts.HRSU_TP_WRK);
         SFormUtilities.populateComboBox(miClient, jcbFkDepartment, SModConsts.HRSU_DEP);
-        SFormUtilities.populateComboBox(miClient, jcbFkPosition, SModConsts.HRSU_POS);
+        //SFormUtilities.populateComboBox(miClient, jcbFkPosition, SModConsts.HRSU_POS);
         SFormUtilities.populateComboBox(miClient, jcbFkShift, SModConsts.HRSU_SHT);
         SFormUtilities.populateComboBox(miClient, jcbFkRecruitmentSchemeType, SModConsts.HRSS_TP_REC_SCHE);
         SFormUtilities.populateComboBox(miClient, jcbFkPositionRiskType, SModConsts.HRSS_TP_POS_RISK);

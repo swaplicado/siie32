@@ -1817,7 +1817,10 @@ public abstract class SDataReadComponentItems {
             case SModConsts.HRSU_POS:
                 lenPk = 1;
                 sql = "SELECT id_pos AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_POS) + " WHERE b_del = 0 ORDER BY name, id_pos ";
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_POS) + " "
+                        + "WHERE b_del = 0 "
+                        + (pk != null ? " AND fk_dep = " + ((int) pk) : "") + " " 
+                        + "ORDER BY name, id_pos ";
                 text = "puesto";
                 break;
             case SModConsts.HRSU_SHT:
