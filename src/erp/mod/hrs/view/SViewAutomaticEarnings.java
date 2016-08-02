@@ -72,15 +72,17 @@ public class SViewAutomaticEarnings extends SGridPaneView implements ActionListe
             sql += (sql.isEmpty() ? "" : "AND ") + "emp.fk_dep = " + ((int[]) filter)[0] + " ";
         }
         
-        filter = ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelEmployee.EMP_STATUS)).getValue();
-        if (filter != null && ((int) filter) != SLibConsts.UNDEFINED) {
-            if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ACT) {
-                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 1 ";
-            }
-            else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_INA) {
-                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 0 ";
-            }
-            else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ALL) {
+        if (mnGridSubtype == SModSysConsts.HRS_AUT_EMP) {
+            filter = ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelEmployee.EMP_STATUS)).getValue();
+            if (filter != null && ((int) filter) != SLibConsts.UNDEFINED) {
+                if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ACT) {
+                    sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 1 ";
+                }
+                else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_INA) {
+                    sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 0 ";
+                }
+                else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ALL) {
+                }
             }
         }
 
