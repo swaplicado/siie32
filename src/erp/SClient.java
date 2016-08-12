@@ -91,7 +91,7 @@ import sa.lib.gui.bean.SBeanForm;
 import sa.lib.gui.bean.SBeanFormDialog;
 import sa.lib.gui.bean.SBeanFormProcess;
 import sa.lib.gui.bean.SBeanOptionPicker;
-import sa.lib.img.DImgConsts;
+import sa.lib.img.SImgConsts;
 import sa.lib.srv.SSrvCompany;
 import sa.lib.xml.SXmlUtils;
 
@@ -2064,16 +2064,16 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             case SModConsts.MOD_HRS_N:
                 imageIcon = moIconModuleHrs;
                 break;
-            case DImgConsts.ICO_GUI_CLOSE:
+            case SImgConsts.ICO_GUI_CLOSE:
                 imageIcon = moIconCloseActive;
                 break;
-            case DImgConsts.ICO_GUI_CLOSE_INA:
+            case SImgConsts.ICO_GUI_CLOSE_INA:
                 imageIcon = moIconCloseInactive;
                 break;
-            case DImgConsts.ICO_GUI_CLOSE_BRI:
+            case SImgConsts.ICO_GUI_CLOSE_BRI:
                 imageIcon = moIconCloseBright;
                 break;
-            case DImgConsts.ICO_GUI_CLOSE_DAR:
+            case SImgConsts.ICO_GUI_CLOSE_DAR:
                 imageIcon = moIconCloseDark;
                 break;
             default:
