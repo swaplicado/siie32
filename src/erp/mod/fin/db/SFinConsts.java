@@ -22,6 +22,8 @@ public class SFinConsts {
     public static final java.lang.String TXT_LAY_BANK_BBVA = "LAYOUT BBVA";
     public static final java.lang.String TXT_LAY_BANK_BANAMEX = "LAYOUT BANAMEX";
     
+    public static final java.lang.String TXT_VAL = "VALUACIÓN";
+    
     public static final int LAY_BANK_TYPE_DPS = 1;
     public static final int LAY_BANK_TYPE_ADV = 2;
 
