@@ -34,8 +34,12 @@ public class SFinConsts {
     public static final String RFC_DOM = "XAXX010101000";
     public static final String RFC_INT = "XEXX010101000";
 
-    public static final String ERR_MSG_ABP_ENT_NOT_FOUND = "No se encontró un paquete de configuración contable para la entidad: ";
-    public static final String ERR_MSG_ABP_BPS_NOT_FOUND = "No se encontró un paquete de configuración contable para el asociado de negocios: ";
-    public static final String ERR_MSG_ABP_ITEM_NOT_FOUND = "No se encontró un paquete de configuración contable para el ítem: ";
-    public static final String ERR_MSG_ABP_TAX_NOT_FOUND = "No se encontró un paquete de configuración contable para el impuesto: ";
+    public static final String MSG_ERR_ABP_ENT_NOT_FOUND = "No se encontró un paquete de configuración contable para la entidad: ";
+    public static final String MSG_ERR_ABP_BPS_NOT_FOUND = "No se encontró un paquete de configuración contable para el asociado de negocios: ";
+    public static final String MSG_ERR_ABP_ITEM_NOT_FOUND = "No se encontró un paquete de configuración contable para el ítem: ";
+    public static final String MSG_ERR_ABP_TAX_NOT_FOUND = "No se encontró un paquete de configuración contable para el impuesto: ";
+    
+    public static final String MSG_ERR_GUI_CFG_DIFF_ACC = "En la configuración de la empresa no se ha definido la cuenta contable para diferencias cambiarias.";
+    public static final String MSG_ERR_GUI_CFG_DIFF_CC = "En la configuración de la empresa no se ha definido el centro de costos para diferencias cambiarias.";
+    public static final String MSG_ERR_GUI_CFG_DIFF_ITEM = "En la configuración de la empresa no se ha definido el ítem (ingresos/egresos) para diferencias cambiarias.";
 }
