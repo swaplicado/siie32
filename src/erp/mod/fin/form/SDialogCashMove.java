@@ -1132,7 +1132,7 @@ public class SDialogCashMove extends SBeanFormDialog implements SDialogCash, Act
         SDataCheck check = null;
 
         if (moAbpCash == null) {
-            throw new Exception(SFinConsts.ERR_MSG_ABP_ENT_NOT_FOUND + "'" + moCashXXX.getAuxEntity() + "'.");
+            throw new Exception(SFinConsts.MSG_ERR_ABP_ENT_NOT_FOUND + "'" + moCashXXX.getAuxEntity() + "'.");
         }
         else {
             entry = new SDataRecordEntry();
@@ -1251,7 +1251,7 @@ public class SDialogCashMove extends SBeanFormDialog implements SDialogCash, Act
             // Counterpart for standard move:
 
             if (moAbpCash == null) {
-                throw new Exception(SFinConsts.ERR_MSG_ABP_ENT_NOT_FOUND + "'" + moCashXXX.getAuxEntity() + "'.");
+                throw new Exception(SFinConsts.MSG_ERR_ABP_ENT_NOT_FOUND + "'" + moCashXXX.getAuxEntity() + "'.");
             }
             else {
                 entry = new SDataRecordEntry();
@@ -1395,7 +1395,7 @@ public class SDialogCashMove extends SBeanFormDialog implements SDialogCash, Act
             abpTransferCash = moSessionCustom.getAbpEntity(manTransferCashKey);
 
             if (abpTransferCash == null) {
-                throw new Exception(SFinConsts.ERR_MSG_ABP_ENT_NOT_FOUND + "'" + moCashXXX.getAuxEntity() + "'.");
+                throw new Exception(SFinConsts.MSG_ERR_ABP_ENT_NOT_FOUND + "'" + moCashXXX.getAuxEntity() + "'.");
             }
             else {
                 entry = new SDataRecordEntry();
@@ -1494,7 +1494,7 @@ public class SDialogCashMove extends SBeanFormDialog implements SDialogCash, Act
         SDataRecordEntry entry = null;
 
         if (abpCash == null) {
-            throw new Exception(SFinConsts.ERR_MSG_ABP_ENT_NOT_FOUND + "'" + moCashXXX.getAuxEntity() + "'.");
+            throw new Exception(SFinConsts.MSG_ERR_ABP_ENT_NOT_FOUND + "'" + moCashXXX.getAuxEntity() + "'.");
         }
         else {
             entry = new SDataRecordEntry();
