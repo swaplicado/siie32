@@ -318,7 +318,7 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
         moFields.setFormButton(jbSave);
     }
 
-    private void itemStateKeyEarningComputationType() {
+    private void itemStateKeyDeductionComputationType() {
         if (moKeyDeductionComputationType.getValue().length > 0) {
         }
     }
@@ -361,6 +361,7 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
             jtfRegistryKey.setText("");
+            moRegistry.setAuxAccountingConfigurationTypeId(SLibConsts.UNDEFINED);
         }
         else {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));

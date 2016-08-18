@@ -338,8 +338,6 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     private ArrayList<SHrsPayrollReceipt> getHrsPayrollReceipts(final SHrsPayroll hrsPayroll, final int payrollId, final boolean isCopy, final boolean isNew) throws Exception {
         String sql = "";
         SDbPayrollReceipt payrollReceipt = null;
-        SDbEarning earning = null;
-        SDbDeduction deduction = null;
 
         SHrsEmployee hrsEmployee = null;
         SHrsPayrollReceipt hrsPayrollReceipt = null;
@@ -415,7 +413,8 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                         hrsPayroll.getPayroll().getDateStart(), hrsPayroll.getPayroll().getDateEnd(), hrsPayroll.getPayroll().getFkTaxComputationTypeId());
                 hrsEmployee.setHrsPayrollReceipt(hrsPayrollReceipt);
                 hrsPayrollReceipt.setHrsEmployee(hrsEmployee);
-                hrsPayrollReceipt.setReceipt(hrsPayroll.createPayrollReceipt(hrsEmployee));
+                hrsPayrollReceipt.setReceipt(payrollReceipt);
+                //hrsPayrollReceipt.setReceipt(hrsPayroll.createPayrollReceipt(hrsEmployee)); XXX (jbarajas, 2016-08-16) slowly open payroll
                 hrsPayrollReceipt.getReceipt().setRegistryNew(payrollReceipt.isRegistryNew());
                 hrsPayrollReceipt.getReceipt().setPayrollReceiptIssue(payrollReceipt.getPayrollReceiptIssues());
                 /* XXX (jbarajas, 2015-10-07) remove by new table
@@ -426,7 +425,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 hrsPayrollReceipt.getReceipt().setDatePayment(payrollReceipt.getDatePayment());
                 hrsPayrollReceipt.getReceipt().setFkPaymentSystemTypeId(payrollReceipt.getFkPaymentSystemTypeId());
                 */
-                hrsPayrollReceipt.computeDbPayrollReceiptDays();
+                //hrsPayrollReceipt.computeDbPayrollReceiptDays(); XXX (jbarajas, 2016-08-16) slowly open payroll
                 //hrsPayrollReceipt.computeDbPayrollReceipt();  XXX jbarajas 2015-05-11
 
                 aPayrollReceipts.add(hrsPayrollReceipt);

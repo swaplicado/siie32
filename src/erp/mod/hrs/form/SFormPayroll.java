@@ -1163,8 +1163,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         }
 
         if (mnDaysCalendarPayroll > 0) {
-            //XXX calculate labor days of payrroll
-            //workingDays = moIntPayrollDays.getValue() - (SHrsConsts.WEEK_DAYS - moConfig.getWorkingDaysWeek()) * (mnFormSubtype == SModSysConsts.HRSS_TP_PAY_WEE ? 1 : 2);
             workingDays = (mnFormSubtype == SModSysConsts.HRSS_TP_PAY_WEE ? moWorkingDaySettings.getWorkingDaysWeek() : moConfig.isFornightStandard() ? SHrsConsts.FORNIGHT_FIXED_DAYS : mnDaysCalendarPayroll);
             
             moIntPayrollDays.setValue(mnFormSubtype == SModSysConsts.HRSS_TP_PAY_FOR && moConfig.isFornightStandard() ? SHrsConsts.FORNIGHT_FIXED_DAYS : mnDaysCalendarPayroll);

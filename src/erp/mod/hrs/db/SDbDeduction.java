@@ -7,11 +7,9 @@
 package erp.mod.hrs.db;
 
 import erp.mod.SModConsts;
-import erp.mod.SModSysConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
@@ -52,6 +50,7 @@ public class SDbDeduction extends SDbRegistryUser {
     
     protected int mnAuxAccountingConfigurationTypeId;
     
+    /*
     protected ArrayList<SDbAccountingDeduction> maAccountingDeduction;
     
     private SDbAccountingDeduction createAccountingDeduction() {
@@ -70,7 +69,6 @@ public class SDbDeduction extends SDbRegistryUser {
         accountingDeduction.setFkUserUpdateId();
         accountingDeduction.setTsUserInsert();
         accountingDeduction.setTsUserUpdate();
-        */
         
         return accountingDeduction;
     }
@@ -180,6 +178,7 @@ public class SDbDeduction extends SDbRegistryUser {
             maAccountingDeduction.addAll(aAccountingDeduction);
         }
     }
+    */
     
     public SDbDeduction() {
         super(SModConsts.HRS_DED);
@@ -230,7 +229,7 @@ public class SDbDeduction extends SDbRegistryUser {
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
     public int getAuxAccountingConfigurationTypeId() { return mnAuxAccountingConfigurationTypeId; }
-    public ArrayList<SDbAccountingDeduction> getAccountingDeduction() { return maAccountingDeduction; }
+    //public ArrayList<SDbAccountingDeduction> getAccountingDeduction() { return maAccountingDeduction; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -268,7 +267,7 @@ public class SDbDeduction extends SDbRegistryUser {
         mtTsUserUpdate = null;
         
         mnAuxAccountingConfigurationTypeId = 0;
-        maAccountingDeduction = new ArrayList<SDbAccountingDeduction>();
+        //maAccountingDeduction = new ArrayList<SDbAccountingDeduction>();
     }
 
     @Override
@@ -338,6 +337,7 @@ public class SDbDeduction extends SDbRegistryUser {
             
             mnAuxAccountingConfigurationTypeId = mnFkAccountingConfigurationTypeId;
 
+            /*
             statement = session.getStatement().getConnection().createStatement();
 
             msSql = "SELECT id_ref " +
@@ -350,6 +350,7 @@ public class SDbDeduction extends SDbRegistryUser {
                 accountingDeduction.read(session, new int[] { mnPkDeductionId, mnFkAccountingConfigurationTypeId, resultSet.getInt(1) });
                 maAccountingDeduction.add(accountingDeduction);
             }
+            */
 
             mbRegistryNew = false;
         }
@@ -426,6 +427,9 @@ public class SDbDeduction extends SDbRegistryUser {
 
         session.getStatement().execute(msSql);
         
+        SHrsUtils.createAccountingDeductionConfiguration(session, mnPkDeductionId, mnFkAccountingConfigurationTypeId, mnAuxAccountingConfigurationTypeId, mbRegistryNew);
+        
+        /*
         if (mnAuxAccountingConfigurationTypeId != SLibConsts.UNDEFINED &&
                 mnAuxAccountingConfigurationTypeId != mnFkAccountingConfigurationTypeId) {
             for (SDbAccountingDeduction dbAccountingDeduction : maAccountingDeduction) {
@@ -438,6 +442,7 @@ public class SDbDeduction extends SDbRegistryUser {
         for (SDbAccountingDeduction dbAccountingDeduction : maAccountingDeduction) {
             dbAccountingDeduction.save(session);
         }
+        */
         
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
@@ -469,7 +474,7 @@ public class SDbDeduction extends SDbRegistryUser {
         registry.setTsUserUpdate(this.getTsUserUpdate());
         
         registry.setAuxAccountingConfigurationTypeId(this.getAuxAccountingConfigurationTypeId());
-        registry.getAccountingDeduction().addAll(this.getAccountingDeduction());
+        //registry.getAccountingDeduction().addAll(this.getAccountingDeduction());
 
         return registry;
     }

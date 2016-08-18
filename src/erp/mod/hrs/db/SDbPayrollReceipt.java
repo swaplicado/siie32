@@ -904,6 +904,12 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         for (SDbPayrollReceiptDeduction receiptDeduction : this.getChildPayrollReceiptDeductions()) {
             registry.getChildPayrollReceiptDeductions().add(receiptDeduction.clone());
         }
+        
+        for (SDbAbsenceConsumption receiptAbsenceConsumption : this.getChildAbsenceConsumption()) {
+            registry.getChildAbsenceConsumption().add(receiptAbsenceConsumption.clone());
+        }
+        
+        registry.setPayrollReceiptIssue(this.getPayrollReceiptIssues() == null ? null : this.getPayrollReceiptIssues().clone());
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;
