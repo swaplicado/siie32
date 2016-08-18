@@ -785,7 +785,7 @@ public class SDialogCashMoveBizPartner extends SBeanFormDialog implements SDialo
         SDataCheck check = null;
 
         if (moAbpCash == null) {
-            throw new Exception(SFinConsts.ERR_MSG_ABP_ENT_NOT_FOUND + "'" + moCashXXX.getAuxEntity() + "'.");
+            throw new Exception(SFinConsts.MSG_ERR_ABP_ENT_NOT_FOUND + "'" + moCashXXX.getAuxEntity() + "'.");
         }
         else {
             entry = new SDataRecordEntry();
@@ -911,10 +911,10 @@ public class SDialogCashMoveBizPartner extends SBeanFormDialog implements SDialo
         SDbAbpBizPartner abpBizPartner = moSessionCustom.getAbpBizPartner(moKeyBizPartner.getValue()[0], mnBizPartnerCategoryId);
 
         if (moAbpCash == null) {
-            throw new Exception(SFinConsts.ERR_MSG_ABP_ENT_NOT_FOUND + "'" + moCashXXX.getAuxEntity() + "'.");
+            throw new Exception(SFinConsts.MSG_ERR_ABP_ENT_NOT_FOUND + "'" + moCashXXX.getAuxEntity() + "'.");
         }
         if (abpBizPartner == null) {
-            throw new Exception(SFinConsts.ERR_MSG_ABP_BPS_NOT_FOUND + "'" + moKeyBizPartner.getSelectedItem().getItem() + "'.");
+            throw new Exception(SFinConsts.MSG_ERR_ABP_BPS_NOT_FOUND + "'" + moKeyBizPartner.getSelectedItem().getItem() + "'.");
         }
         else {
             entry = new SDataRecordEntry();

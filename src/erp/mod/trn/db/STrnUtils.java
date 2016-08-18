@@ -312,20 +312,25 @@ public abstract class STrnUtils {
         return exists; 
     }
     
-    
     /**
-     * Gets 
+     * Gets absolut balance of prepayments for provided business partner.
+     * @param session Current user's system session.
+     * @param idBizPartner Business partner's (customer or provider) primary key.
+     * @param keyDps Business partner's current document in order to descart its prepayments if any.
+     * @param idCurrency Currency for retrieving prepayments' balance amount. When undefined value is provided, currency is local currency.
      */
-    public static double getPrepayments(final SGuiSession session, final int idBizPartner, final int[] keyDps) throws Exception {
+    public static double getPrepaymentsBalance(final SGuiSession session, final int idBizPartner, final int[] keyDps, final int idCurrency) throws Exception {
         double balance = 0;
         String sql = "";
         ResultSet resultSet = null;
         
-        sql = "SELECT COALESCE(SUM(de.stot_r), 0.0) "
+        sql = "SELECT COALESCE(SUM(" + (idCurrency == SLibConsts.UNDEFINED ? "de.stot_r" : "de.stot_cur_r") + "), 0.0) "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc "
                 + "WHERE d.fid_bp_r = " + idBizPartner + " AND de.b_pre_pay = 1 AND "
-                + "NOT(d.id_year = " + keyDps[0] + " AND d.id_doc = " + keyDps[1] + ") AND d.b_del = 0 AND de.b_del = 0; ";
+                + "NOT (d.id_year = " + keyDps[0] + " AND d.id_doc = " + keyDps[1] + ") AND "
+                + (idCurrency == SLibConsts.UNDEFINED ? "" : "d.fid_cur = " + idCurrency + " AND ")
+                + "NOT d.b_del AND NOT de.b_del; ";
         resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next()) {
             balance = resultSet.getDouble(1);

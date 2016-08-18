@@ -19,8 +19,8 @@ import cfd.ext.elektra.DElementDetalle;
 import cfd.ext.elektra.DElementImpuestos;
 import cfd.ext.elektra.DElementProducto;
 import cfd.ext.elektra.DElementTrasladado;
-import cfd.ext.facturainterfactura.DElementCuerpo;
-import cfd.ext.facturainterfactura.DElementFacturainterfactura;
+import cfd.ext.interfactura.DElementCuerpo;
+import cfd.ext.interfactura.DElementFacturaInterfactura;
 import cfd.ext.soriana.DElementArticulos;
 import cfd.ext.soriana.DElementDSCargaRemisionProv;
 import cfd.ext.soriana.DElementFolioNotaEntrada;
@@ -3291,227 +3291,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     /**
-     * Create addenda for L'Oreal
-     * @param dIvaPct Tax rate applied to DPS
-     * @return Addenda
-     * @throws java.lang.Exception
-     */
-    private DElementFacturainterfactura computeAddendaLoreal(double dIvapct) throws java.lang.Exception {
-        int nMoneda = 0;
-        int nCondigoPago = 0;
-        double dIvaPctCuerpo = 0;
-        java.util.Date tDate = null;
-        GregorianCalendar oGregorianCalendar = null;
-        int[] anDateDps = SLibTimeUtilities.digestDate(mtDate);
-        int[] anDateEdit = SLibTimeUtilities.digestDate(mtUserEditTs);
-        Vector<DElementCuerpo> vCuerpo = new Vector<>();
-
-        if (SLibUtilities.compareKeys(anDateDps, anDateEdit)) {
-            tDate = mtUserEditTs;
-        }
-        else {
-            oGregorianCalendar = new GregorianCalendar();
-            oGregorianCalendar.setTime(mtUserEditTs);
-            oGregorianCalendar.set(GregorianCalendar.YEAR, anDateDps[0]);
-            oGregorianCalendar.set(GregorianCalendar.MONTH, anDateDps[1] - 1);  // January is month 0
-            oGregorianCalendar.set(GregorianCalendar.DATE, anDateDps[2]);
-            tDate = oGregorianCalendar.getTime();
-        }
-
-        nCondigoPago = moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getEffectiveDaysOfCredit();
-
-        for (SDataDpsEntry entry : mvDbmsDpsEntries) {
-            if (entry.isAccountable()) {
-                DElementCuerpo cuerpo = new DElementCuerpo();
-
-                dIvaPctCuerpo = entry.getDbmsEntryTaxes().get(0).getPercentage() * 100;
-
-                if (dIvapct == dIvaPctCuerpo) {
-                    cuerpo.getAttPartida().setInteger(entry.getDbmsDpsAddLorealEntryNumber());
-                    cuerpo.getAttCantidad().setDouble(entry.getOriginalQuantity());
-                    cuerpo.getAttConcepto().setString(entry.getConcept());
-                    cuerpo.getAttPUnitario().setDouble(entry.getPriceUnitary());
-                    cuerpo.getAttImporte().setDouble(entry.getSubtotal_r());
-                    cuerpo.getAttUnidadMedida().setString(entry.getDbmsUnitSymbol().toUpperCase());
-                }
-                else {
-                    cuerpo.getAttPartida().setInteger(entry.getDbmsDpsAddLorealEntryNumber());
-                    cuerpo.getAttCantidad().setDouble(entry.getOriginalQuantity());
-                    cuerpo.getAttConcepto().setString(entry.getConcept());
-                    cuerpo.getAttPUnitario().setDouble(entry.getPriceUnitary());
-                    cuerpo.getAttImporte().setDouble(entry.getSubtotal_r());
-                    cuerpo.getAttUnidadMedida().setString(entry.getDbmsUnitSymbol().toUpperCase());
-                    cuerpo.getAttIva().setDouble(entry.getTaxCharged_r());
-                    cuerpo.getAttIVAPCT().setDouble(dIvaPctCuerpo);
-                }
-                vCuerpo.add(cuerpo);
-            }
-        }
-
-        switch (mnFkCurrencyId) {
-            case 1: // MXN
-                nMoneda = DAttributeOptionMoneda.CFD_MXN;
-                break;
-            case 2: // USD
-                nMoneda = DAttributeOptionMoneda.CFD_USD;
-                break;
-            case 3: // EUR
-                nMoneda = DAttributeOptionMoneda.CFD_EUR;
-                break;
-            default:
-                throw new Exception("La moneda debe ser conocida (" + mnFkCurrencyId + ").");
-        }
-
-        DElementFacturainterfactura addendaLoreal = new DElementFacturainterfactura();
-
-        addendaLoreal.getAttxmlns().setString("https://www.interfactura.com/Schemas/Documentos");
-        addendaLoreal.getAttTipoDocumento().setString("Factura");
-        addendaLoreal.getAttschemaLocation().setString("https://www.interfactura.com/Schemas/Documentos https://www.interfactura.com/Schemas/Documentos/DocumentoInterfactura.xsd");
-
-        addendaLoreal.getEltEmisor().getAttRefEmisor().setString("0103399");
-        addendaLoreal.getEltReceptor().getAttRefReceptor().setString("0101427");
-
-        addendaLoreal.getEltEncabezado().getAttMoneda().setOption(nMoneda);
-        addendaLoreal.getEltEncabezado().getAttFolioOrdenCompra().setString(msNumberReference);
-        addendaLoreal.getEltEncabezado().getAttFolioNotaRecepcion().setString(moAuxCfdParams.getLorealFolioNotaRecepcion());
-        addendaLoreal.getEltEncabezado().getAttFecha().setDatetime(tDate);
-        addendaLoreal.getEltEncabezado().getAttCondicionPago().setString("" + nCondigoPago);
-        addendaLoreal.getEltEncabezado().getAttIVAPCT().setDouble(dIvapct);
-        addendaLoreal.getEltEncabezado().getAttNumProveedor().setString(moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getCompanyKey());
-        addendaLoreal.getEltEncabezado().getAttCargoTipo().setString("");
-        addendaLoreal.getEltEncabezado().getAttSubTotal().setDouble(mdSubtotal_r);
-        addendaLoreal.getEltEncabezado().getAttSerie().setString(msNumberSeries);
-        addendaLoreal.getEltEncabezado().getAttFolio().setString(msNumber);
-        addendaLoreal.getEltEncabezado().getAttIva().setDouble(mdTaxCharged_r);
-        addendaLoreal.getEltEncabezado().getAttTotal().setDouble(mdTotal_r);
-        addendaLoreal.getEltEncabezado().getAttObservaciones().setString("");
-
-        addendaLoreal.getEltEncabezado().getEltHijosEncabezado().addAll(vCuerpo);
-
-        return addendaLoreal;
-    }
-
-    /**
-     * Create addenda for Bachoco
-     * @param dIvaPct Tax rate applied to DPS
-     * @return Addenda
-     * @throws java.lang.Exception
-     */
-    private DElementPayment computeAddendaBachoco(double dIvapct) throws java.lang.Exception {
-        int nMoneda = 0;
-        String sStatusDoc = "";
-        String sEntityType = "";
-        String sReceptorNumber = "";
-        java.util.Date tDate = null;
-        GregorianCalendar oGregorianCalendar = null;
-        SimpleDateFormat oSimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        int[] anDateDps = SLibTimeUtilities.digestDate(mtDate);
-        int[] anDateEdit = SLibTimeUtilities.digestDate(mtUserEditTs);
-        int[] anTypeDoc = {mnFkDpsCategoryId, mnFkDpsClassId, mnFkDpsTypeId};
-        Vector<DElementLineItem> vLineItem = new Vector<>();
-
-        if (SLibUtilities.compareKeys(anDateDps, anDateEdit)) {
-            tDate = mtUserEditTs;
-        }
-        else {
-            oGregorianCalendar = new GregorianCalendar();
-            oGregorianCalendar.setTime(mtUserEditTs);
-            oGregorianCalendar.set(GregorianCalendar.YEAR, anDateDps[0]);
-            oGregorianCalendar.set(GregorianCalendar.MONTH, anDateDps[1] - 1);  // January is month 0
-            oGregorianCalendar.set(GregorianCalendar.DATE, anDateDps[2]);
-            tDate = oGregorianCalendar.getTime();
-            oSimpleDateFormat.format(tDate);
-        }
-
-        switch (mnFkDpsStatusId) {
-            case SDataConstantsSys.TRNS_ST_DPS_EMITED:
-                sStatusDoc = "ORIGINAL";
-                break;
-            case SDataConstantsSys.TRNS_ST_DPS_ANNULED:
-                sStatusDoc = "DELETE";
-                break;
-            default:
-                break;
-        }
-
-        if (SLibUtilities.compareKeys(anTypeDoc, SDataConstantsSys.TRNU_TP_DPS_SAL_INV)) {
-            sEntityType = "INVOICE";
-        }
-        else if (SLibUtilities.compareKeys(anTypeDoc, SDataConstantsSys.TRNU_TP_DPS_SAL_CN)) {
-            sEntityType = "CREDIT_NOTE";
-        }
-
-        for (int i = 0; i < (10 - moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getCompanyKey().length()); i++) {
-            sReceptorNumber += "0";
-        }
-        sReceptorNumber += moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getCompanyKey();
-
-        for (SDataDpsEntry entry : mvDbmsDpsEntries) {
-            if (entry.isAccountable()) {
-                DElementLineItem vItem = new DElementLineItem();
-
-                vItem.getAttType().setString("SimpleinvoiceLineItemType");
-                vItem.getAttNumber().setInteger(entry.getDbmsDpsAddBachocoNumberPosition());
-                vItem.getEltTradeItemIdentification().getEltGtin().setValue(entry.getDbmsDpsAddBachocoCenter());
-                vItem.getEltAditionalQuantity().getAttQuantityType().setString("NUM_CONSUMER_UNITS"); // XXX UNIDAD CONSUMO
-                vItem.getEltAditionalQuantity().setValue("" + entry.getOriginalQuantity());
-                vItem.getEltNetPrice().getEltAmount().setValue("" + entry.getPriceUnitary());
-                vItem.getEltAdditionalInformation().getEltReferenceIdentification().getAttType().setString("ON");
-                vItem.getEltAdditionalInformation().getEltReferenceIdentification().setValue("X"); // ORDEN DE INVERSION
-                vLineItem.add(vItem);
-            }
-        }
-
-        switch (mnFkCurrencyId) {
-            case 1: // MXN
-                nMoneda = DAttributeOptionMoneda.CFD_MXN;
-                break;
-            case 2: // USD
-                nMoneda = DAttributeOptionMoneda.CFD_USD;
-                break;
-            case 3: // EUR
-                nMoneda = DAttributeOptionMoneda.CFD_EUR;
-                break;
-            default:
-                throw new Exception("La moneda debe ser conocida (" + mnFkCurrencyId + ").");
-        }
-
-        DElementPayment addendaBachoco = new DElementPayment();
-
-        addendaBachoco.getAttType().setString("SimpleInvoiceType");
-        addendaBachoco.getAttContentVersion().setString("1.3.1");
-        addendaBachoco.getAttDocStructureVersion().setString("AMC7.1");
-        addendaBachoco.getAttDocStatus().setString(sStatusDoc);
-        addendaBachoco.getAttDeliveryDate().setDate(tDate);
-        addendaBachoco.getEltPaymentIdentification().getEltEntityType().setValue(sEntityType);
-        addendaBachoco.getEltPaymentIdentification().getEltCreatorIdentification().setValue(msNumberSeries + msNumber);
-        addendaBachoco.getEltSpecialInstruction().getAttCode().setString("PUR");
-        addendaBachoco.getEltSpecialInstruction().getEltText().setValue("X");
-        addendaBachoco.getEltOrderIdentification().getEltReferenceIdentification().getAttType().setString("ON");
-        addendaBachoco.getEltOrderIdentification().getEltReferenceIdentification().setValue(msNumberReference);
-        addendaBachoco.getEltDeliveryNote().getEltReferenceIdentification().setValue(moAuxCfdParams.getBachocoDivision());
-        addendaBachoco.getEltBuyer().getEltGln().setValue("X");
-        addendaBachoco.getEltBuyer().getEltContactInformation().getEltPersonOrDepartmentName().getEltText().setValue(moAuxCfdParams.getBachocoOrganizacionCompra());
-        addendaBachoco.getEltSeller().getEltGln().setValue(sReceptorNumber);
-        addendaBachoco.getEltShipTo().getEltGln().setValue(moAuxCfdParams.getBachocoSociedad());
-        addendaBachoco.getEltInvoiceCreator().getEltAlternatePartyIdentification().getAttType().setString("IA");
-        addendaBachoco.getEltInvoiceCreator().getEltAlternatePartyIdentification().setValue(sReceptorNumber);
-        addendaBachoco.getEltCustoms().getEltAlternatePartyIdentification().getAttType().setString("TN");
-        addendaBachoco.getEltCustoms().getEltAlternatePartyIdentification().setValue("X"); // XXX No. PEDIMENTO
-        addendaBachoco.getEltCurrency().getAttCurrencyISOCode().setOption(nMoneda);
-        addendaBachoco.getEltCurrency().getEltCurrencyFunction().setValue("BILLING_CURRENCY"); // DIVISA DE FACTURACION
-        addendaBachoco.getEltItem().getEltHijosLineItem().addAll(vLineItem);
-        addendaBachoco.getEltTotalAmount().getEltAmount().setValue("" + mdSubtotalCy_r);
-        addendaBachoco.getEltTax().getAttType().setString("VAT"); // XXX IMPUESTO
-        addendaBachoco.getEltTax().getEltTaxPercentage().setValue("" + dIvapct);
-        addendaBachoco.getEltTax().getEltTaxAmount().setValue("" + mdTaxCharged_r);
-        addendaBachoco.getEltTax().getEltTaxCategory().setValue("TRANSFERIDO"); // XXX TIPO IMPUESTO
-        addendaBachoco.getEltPayableAmount().getEltAmount().setValue("" + mdTotal_r);
-
-        return addendaBachoco;
-    }
-
-    /**
      * Create addenda for Soriana
      * @return Addenda
      * @throws java.lang.Exception
@@ -3524,6 +3303,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         int[] anDateDps = SLibTimeUtilities.digestDate(mtDate);
         int[] anDateEdit = SLibTimeUtilities.digestDate(mtUserEditTs);
         Vector<DElementArticulos> vArticulos = new Vector<>();
+        DElementDSCargaRemisionProv addendaSoriana = new DElementDSCargaRemisionProv();
 
         if (SLibUtilities.compareKeys(anDateDps, anDateEdit)) {
             tDate = mtUserEditTs;
@@ -3538,7 +3318,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             oSimpleDateFormat.format(tDate);
         }
 
-        DElementDSCargaRemisionProv addendaSoriana = new DElementDSCargaRemisionProv();
+        // Create addenda:
+        
         totalItems = 0;
         for (SDataDpsEntry entry : mvDbmsDpsEntries) {
             if (entry.isAccountable()) {
@@ -3609,6 +3390,229 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     /**
+     * Create addenda for L'Oreal
+     * @param dIvaPct Tax rate applied to DPS
+     * @return Addenda
+     * @throws java.lang.Exception
+     */
+    private DElementFacturaInterfactura computeAddendaLoreal(double dIvapct) throws java.lang.Exception {
+        int nMoneda = 0;
+        int nCondigoPago = 0;
+        double dIvaPctCuerpo = 0;
+        java.util.Date tDate = null;
+        GregorianCalendar oGregorianCalendar = null;
+        int[] anDateDps = SLibTimeUtilities.digestDate(mtDate);
+        int[] anDateEdit = SLibTimeUtilities.digestDate(mtUserEditTs);
+        Vector<DElementCuerpo> vCuerpo = new Vector<>();
+        DElementFacturaInterfactura addendaLoreal = new DElementFacturaInterfactura();
+
+        if (SLibUtilities.compareKeys(anDateDps, anDateEdit)) {
+            tDate = mtUserEditTs;
+        }
+        else {
+            oGregorianCalendar = new GregorianCalendar();
+            oGregorianCalendar.setTime(mtUserEditTs);
+            oGregorianCalendar.set(GregorianCalendar.YEAR, anDateDps[0]);
+            oGregorianCalendar.set(GregorianCalendar.MONTH, anDateDps[1] - 1);  // January is month 0
+            oGregorianCalendar.set(GregorianCalendar.DATE, anDateDps[2]);
+            tDate = oGregorianCalendar.getTime();
+        }
+
+        nCondigoPago = moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getEffectiveDaysOfCredit();
+
+        for (SDataDpsEntry entry : mvDbmsDpsEntries) {
+            if (entry.isAccountable()) {
+                DElementCuerpo cuerpo = new DElementCuerpo();
+
+                dIvaPctCuerpo = entry.getDbmsEntryTaxes().get(0).getPercentage() * 100;
+
+                if (dIvapct == dIvaPctCuerpo) {
+                    cuerpo.getAttPartida().setInteger(entry.getDbmsDpsAddLorealEntryNumber());
+                    cuerpo.getAttCantidad().setDouble(entry.getOriginalQuantity());
+                    cuerpo.getAttConcepto().setString(entry.getConcept());
+                    cuerpo.getAttPUnitario().setDouble(entry.getPriceUnitary());
+                    cuerpo.getAttImporte().setDouble(entry.getSubtotal_r());
+                    cuerpo.getAttUnidadMedida().setString(entry.getDbmsUnitSymbol().toUpperCase());
+                }
+                else {
+                    cuerpo.getAttPartida().setInteger(entry.getDbmsDpsAddLorealEntryNumber());
+                    cuerpo.getAttCantidad().setDouble(entry.getOriginalQuantity());
+                    cuerpo.getAttConcepto().setString(entry.getConcept());
+                    cuerpo.getAttPUnitario().setDouble(entry.getPriceUnitary());
+                    cuerpo.getAttImporte().setDouble(entry.getSubtotal_r());
+                    cuerpo.getAttUnidadMedida().setString(entry.getDbmsUnitSymbol().toUpperCase());
+                    cuerpo.getAttIva().setDouble(entry.getTaxCharged_r());
+                    cuerpo.getAttIVAPCT().setDouble(dIvaPctCuerpo);
+                }
+                vCuerpo.add(cuerpo);
+            }
+        }
+
+        switch (mnFkCurrencyId) {
+            case 1: // MXN
+                nMoneda = DAttributeOptionMoneda.CFD_MXN;
+                break;
+            case 2: // USD
+                nMoneda = DAttributeOptionMoneda.CFD_USD;
+                break;
+            case 3: // EUR
+                nMoneda = DAttributeOptionMoneda.CFD_EUR;
+                break;
+            default:
+                throw new Exception("La moneda debe ser conocida (" + mnFkCurrencyId + ").");
+        }
+
+        // Create addenda:
+
+        addendaLoreal.getAttxmlns().setString("https://www.interfactura.com/Schemas/Documentos");
+        addendaLoreal.getAttTipoDocumento().setString("Factura");
+        addendaLoreal.getAttschemaLocation().setString("https://www.interfactura.com/Schemas/Documentos https://www.interfactura.com/Schemas/Documentos/DocumentoInterfactura.xsd");
+
+        addendaLoreal.getEltEmisor().getAttRefEmisor().setString("0103399");
+        addendaLoreal.getEltReceptor().getAttRefReceptor().setString("0101427");
+
+        addendaLoreal.getEltEncabezado().getAttMoneda().setOption(nMoneda);
+        addendaLoreal.getEltEncabezado().getAttFolioOrdenCompra().setString(msNumberReference);
+        addendaLoreal.getEltEncabezado().getAttFolioNotaRecepcion().setString(moAuxCfdParams.getLorealFolioNotaRecepcion());
+        addendaLoreal.getEltEncabezado().getAttFecha().setDatetime(tDate);
+        addendaLoreal.getEltEncabezado().getAttCondicionPago().setString("" + nCondigoPago);
+        addendaLoreal.getEltEncabezado().getAttIVAPCT().setDouble(dIvapct);
+        addendaLoreal.getEltEncabezado().getAttNumProveedor().setString(moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getCompanyKey());
+        addendaLoreal.getEltEncabezado().getAttCargoTipo().setString("");
+        addendaLoreal.getEltEncabezado().getAttSubTotal().setDouble(mdSubtotal_r);
+        addendaLoreal.getEltEncabezado().getAttSerie().setString(msNumberSeries);
+        addendaLoreal.getEltEncabezado().getAttFolio().setString(msNumber);
+        addendaLoreal.getEltEncabezado().getAttIva().setDouble(mdTaxCharged_r);
+        addendaLoreal.getEltEncabezado().getAttTotal().setDouble(mdTotal_r);
+        addendaLoreal.getEltEncabezado().getAttObservaciones().setString("");
+
+        addendaLoreal.getEltEncabezado().getEltHijosEncabezado().addAll(vCuerpo);
+
+        return addendaLoreal;
+    }
+
+    /**
+     * Create addenda for Bachoco
+     * @param dIvaPct Tax rate applied to DPS
+     * @return Addenda
+     * @throws java.lang.Exception
+     */
+    private DElementPayment computeAddendaBachoco(double dIvapct) throws java.lang.Exception {
+        int nMoneda = 0;
+        String sStatusDoc = "";
+        String sEntityType = "";
+        String sReceptorNumber = "";
+        java.util.Date tDate = null;
+        GregorianCalendar oGregorianCalendar = null;
+        SimpleDateFormat oSimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        int[] anDateDps = SLibTimeUtilities.digestDate(mtDate);
+        int[] anDateEdit = SLibTimeUtilities.digestDate(mtUserEditTs);
+        int[] anTypeDoc = {mnFkDpsCategoryId, mnFkDpsClassId, mnFkDpsTypeId};
+        Vector<DElementLineItem> vLineItem = new Vector<>();
+        DElementPayment addendaBachoco = new DElementPayment();
+
+        if (SLibUtilities.compareKeys(anDateDps, anDateEdit)) {
+            tDate = mtUserEditTs;
+        }
+        else {
+            oGregorianCalendar = new GregorianCalendar();
+            oGregorianCalendar.setTime(mtUserEditTs);
+            oGregorianCalendar.set(GregorianCalendar.YEAR, anDateDps[0]);
+            oGregorianCalendar.set(GregorianCalendar.MONTH, anDateDps[1] - 1);  // January is month 0
+            oGregorianCalendar.set(GregorianCalendar.DATE, anDateDps[2]);
+            tDate = oGregorianCalendar.getTime();
+            oSimpleDateFormat.format(tDate);
+        }
+
+        switch (mnFkDpsStatusId) {
+            case SDataConstantsSys.TRNS_ST_DPS_EMITED:
+                sStatusDoc = "ORIGINAL";
+                break;
+            case SDataConstantsSys.TRNS_ST_DPS_ANNULED:
+                sStatusDoc = "DELETE";
+                break;
+            default:
+                break;
+        }
+
+        if (SLibUtilities.compareKeys(anTypeDoc, SDataConstantsSys.TRNU_TP_DPS_SAL_INV)) {
+            sEntityType = "INVOICE";
+        }
+        else if (SLibUtilities.compareKeys(anTypeDoc, SDataConstantsSys.TRNU_TP_DPS_SAL_CN)) {
+            sEntityType = "CREDIT_NOTE";
+        }
+
+        for (int i = 0; i < (10 - moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getCompanyKey().length()); i++) {
+            sReceptorNumber += "0";
+        }
+        sReceptorNumber += moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getCompanyKey();
+
+        for (SDataDpsEntry entry : mvDbmsDpsEntries) {
+            if (entry.isAccountable()) {
+                DElementLineItem vItem = new DElementLineItem();
+
+                vItem.getAttType().setString("SimpleinvoiceLineItemType");
+                vItem.getAttNumber().setInteger(entry.getDbmsDpsAddBachocoNumberPosition());
+                vItem.getEltTradeItemIdentification().getEltGtin().setValue(entry.getDbmsDpsAddBachocoCenter());
+                vItem.getEltAditionalQuantity().getAttQuantityType().setString("NUM_CONSUMER_UNITS"); // XXX UNIDAD CONSUMO
+                vItem.getEltAditionalQuantity().setValue("" + entry.getOriginalQuantity());
+                vItem.getEltNetPrice().getEltAmount().setValue("" + entry.getPriceUnitary());
+                vItem.getEltAdditionalInformation().getEltReferenceIdentification().getAttType().setString("ON");
+                vItem.getEltAdditionalInformation().getEltReferenceIdentification().setValue("X"); // ORDEN DE INVERSION
+                vLineItem.add(vItem);
+            }
+        }
+
+        switch (mnFkCurrencyId) {
+            case 1: // MXN
+                nMoneda = DAttributeOptionMoneda.CFD_MXN;
+                break;
+            case 2: // USD
+                nMoneda = DAttributeOptionMoneda.CFD_USD;
+                break;
+            case 3: // EUR
+                nMoneda = DAttributeOptionMoneda.CFD_EUR;
+                break;
+            default:
+                throw new Exception("La moneda debe ser conocida (" + mnFkCurrencyId + ").");
+        }
+
+        // Create addenda:
+
+        addendaBachoco.getAttType().setString("SimpleInvoiceType");
+        addendaBachoco.getAttContentVersion().setString("1.3.1");
+        addendaBachoco.getAttDocStructureVersion().setString("AMC7.1");
+        addendaBachoco.getAttDocStatus().setString(sStatusDoc);
+        addendaBachoco.getAttDeliveryDate().setDate(tDate);
+        addendaBachoco.getEltPaymentIdentification().getEltEntityType().setValue(sEntityType);
+        addendaBachoco.getEltPaymentIdentification().getEltCreatorIdentification().setValue(msNumberSeries + msNumber);
+        addendaBachoco.getEltSpecialInstruction().getAttCode().setString("PUR");
+        addendaBachoco.getEltSpecialInstruction().getEltText().setValue("X");
+        addendaBachoco.getEltOrderIdentification().getEltReferenceIdentification().getAttType().setString("ON");
+        addendaBachoco.getEltOrderIdentification().getEltReferenceIdentification().setValue(msNumberReference);
+        addendaBachoco.getEltDeliveryNote().getEltReferenceIdentification().setValue(moAuxCfdParams.getBachocoDivision());
+        addendaBachoco.getEltBuyer().getEltGln().setValue("X");
+        addendaBachoco.getEltBuyer().getEltContactInformation().getEltPersonOrDepartmentName().getEltText().setValue(moAuxCfdParams.getBachocoOrganizacionCompra());
+        addendaBachoco.getEltSeller().getEltGln().setValue(sReceptorNumber);
+        addendaBachoco.getEltShipTo().getEltGln().setValue(moAuxCfdParams.getBachocoSociedad());
+        addendaBachoco.getEltInvoiceCreator().getEltAlternatePartyIdentification().getAttType().setString("IA");
+        addendaBachoco.getEltInvoiceCreator().getEltAlternatePartyIdentification().setValue(sReceptorNumber);
+        addendaBachoco.getEltCustoms().getEltAlternatePartyIdentification().getAttType().setString("TN");
+        addendaBachoco.getEltCustoms().getEltAlternatePartyIdentification().setValue("X"); // XXX No. PEDIMENTO
+        addendaBachoco.getEltCurrency().getAttCurrencyISOCode().setOption(nMoneda);
+        addendaBachoco.getEltCurrency().getEltCurrencyFunction().setValue("BILLING_CURRENCY"); // DIVISA DE FACTURACION
+        addendaBachoco.getEltItem().getEltHijosLineItem().addAll(vLineItem);
+        addendaBachoco.getEltTotalAmount().getEltAmount().setValue("" + mdSubtotalCy_r);
+        addendaBachoco.getEltTax().getAttType().setString("VAT"); // XXX IMPUESTO
+        addendaBachoco.getEltTax().getEltTaxPercentage().setValue("" + dIvapct);
+        addendaBachoco.getEltTax().getEltTaxAmount().setValue("" + mdTaxCharged_r);
+        addendaBachoco.getEltTax().getEltTaxCategory().setValue("TRANSFERIDO"); // XXX TIPO IMPUESTO
+        addendaBachoco.getEltPayableAmount().getEltAmount().setValue("" + mdTotal_r);
+
+        return addendaBachoco;
+    }
+
+    /**
      * Create addenda for Grupo Modelo
      * @param dIvaPct Tax rate applied to DPS
      * @return Addenda
@@ -3630,6 +3634,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         int[] anDateEdit = SLibTimeUtilities.digestDate(mtUserEditTs);
         int[] anTypeDoc = {mnFkDpsCategoryId, mnFkDpsClassId, mnFkDpsTypeId};
         Vector<cfd.ext.grupomodelo.DElementLineItem> vLineItem = new Vector<>();
+        cfd.ext.grupomodelo.DElementAddendaModelo addendaGrupoModelo = new cfd.ext.grupomodelo.DElementAddendaModelo();
 
         if (SLibUtilities.compareKeys(anDateDps, anDateEdit)) {
             tDate = mtUserEditTs;
@@ -3713,45 +3718,45 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 throw new Exception("La moneda debe ser conocida (" + mnFkCurrencyId + ").");
         }
 
-        cfd.ext.grupomodelo.DElementAddendaModelo addendagrupomodelo = new cfd.ext.grupomodelo.DElementAddendaModelo();
+        // Create addenda:
 
-        addendagrupomodelo.getAttXmlns().setString("http://www.gmodelo.com.mx/CFD/Addenda/Receptor");
-        addendagrupomodelo.getAttSchemaLocation().setString("http://www.gmodelo.com.mx/CFD/Addenda/Receptor https://femodelo.gmodelo.com/Addenda/ADDENDAMODELO.xsd");
+        addendaGrupoModelo.getAttXmlns().setString("http://www.gmodelo.com.mx/CFD/Addenda/Receptor");
+        addendaGrupoModelo.getAttSchemaLocation().setString("http://www.gmodelo.com.mx/CFD/Addenda/Receptor https://femodelo.gmodelo.com/Addenda/ADDENDAMODELO.xsd");
 
-        addendagrupomodelo.getEltPayment().getAttType().setString("SimpleInvoiceType");
-        addendagrupomodelo.getEltPayment().getAttContentVersion().setString("1.3.1");
-        addendagrupomodelo.getEltPayment().getAttDocStructureVersion().setString("AMC7.1");
-        addendagrupomodelo.getEltPayment().getAttDocStatus().setString(sStatusDoc);
-        addendagrupomodelo.getEltPayment().getEltPaymentIdentification().getEltEntityType().setValue(sEntityType);
-        addendagrupomodelo.getEltPayment().getEltPaymentIdentification().getEltCreatorIdentification().setValue(msNumberSeries + msNumber);
-        addendagrupomodelo.getEltPayment().getEltSpecialInstruction().getAttCode().setString("PUR");
-        addendagrupomodelo.getEltPayment().getEltSpecialInstruction().getEltText().setValue(moAuxCfdParams.getModeloDpsDescripcion());
-        addendagrupomodelo.getEltPayment().getEltOrderIdentification().getEltReferenceIdentification().getAttType().setString("ON");
-        addendagrupomodelo.getEltPayment().getEltOrderIdentification().getEltReferenceIdentification().setValue(msNumberReference);
-        addendagrupomodelo.getEltPayment().getEltOrderIdentification().getEltReferenceDate().setValue(oSimpleDateFormat.format(tDate));
-        addendagrupomodelo.getEltPayment().getEltBuyer().getEltGln().setValue("7504001186019");
-        addendagrupomodelo.getEltPayment().getEltBuyer().getEltContactInformation().getEltPersonOrDepartmentName().getEltText().setValue(moAuxCfdParams.getBachocoSociedad());
-        addendagrupomodelo.getEltPayment().getEltInvoiceCreator().getEltGln().setValue("7500000000000");
-        addendagrupomodelo.getEltPayment().getEltInvoiceCreator().getEltAlternatePartyIdentification().getAttType().setString("IA");
-        addendagrupomodelo.getEltPayment().getEltInvoiceCreator().getEltAlternatePartyIdentification().setValue(sReceptorNumber);
-        addendagrupomodelo.getEltPayment().getEltInvoiceCreator().getEltNameAddress().getEltName().setValue(moAuxCfdParams.getEmisor().getProperName().length() > 35 ? moAuxCfdParams.getEmisor().getProperName().substring(0, 34) : moAuxCfdParams.getEmisor().getProperName());
-        addendagrupomodelo.getEltPayment().getEltInvoiceCreator().getEltNameAddress().getEltStreetAddressOne().setValue(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getStreet());
-        addendagrupomodelo.getEltPayment().getEltInvoiceCreator().getEltNameAddress().getEltCity().setValue(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getState());
-        addendagrupomodelo.getEltPayment().getEltInvoiceCreator().getEltNameAddress().getEltPostalCode().setValue(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getZipCode());
-        addendagrupomodelo.getEltPayment().getEltCurrency().getAttCurrencyISOCode().setOption(nMoneda);
-        addendagrupomodelo.getEltPayment().getEltCurrency().getEltCurrencyFunction().setValue("BILLING_CURRENCY");
-        addendagrupomodelo.getEltPayment().getEltCurrency().getEltCurrencyRate().setValue("" + oDecimalFormat.format(mdExchangeRate));
-        addendagrupomodelo.getEltPayment().getEltTotalAmount().getEltAmount().setValue("" + oDecimalFormat.format(mdTotalCy_r));
-        addendagrupomodelo.getEltPayment().getEltBaseAmount().getEltAmount().setValue("" + oDecimalFormat.format(mdSubtotalCy_r));
-        addendagrupomodelo.getEltPayment().getEltTax().getAttType().setString("VAT");
-        addendagrupomodelo.getEltPayment().getEltTax().getEltTaxPercentage().setValue("" + oDecimalFormat.format(dIvapct));
-        addendagrupomodelo.getEltPayment().getEltTax().getEltTaxAmount().setValue("" + oDecimalFormat.format(mdTaxCharged_r));
-        addendagrupomodelo.getEltPayment().getEltTax().getEltTaxCategory().setValue("TRANSFERIDO");
-        addendagrupomodelo.getEltPayment().getEltPayableAmount().getEltAmount().setValue("" + oDecimalFormat.format(mdTotal_r));
+        addendaGrupoModelo.getEltPayment().getAttType().setString("SimpleInvoiceType");
+        addendaGrupoModelo.getEltPayment().getAttContentVersion().setString("1.3.1");
+        addendaGrupoModelo.getEltPayment().getAttDocStructureVersion().setString("AMC7.1");
+        addendaGrupoModelo.getEltPayment().getAttDocStatus().setString(sStatusDoc);
+        addendaGrupoModelo.getEltPayment().getEltPaymentIdentification().getEltEntityType().setValue(sEntityType);
+        addendaGrupoModelo.getEltPayment().getEltPaymentIdentification().getEltCreatorIdentification().setValue(msNumberSeries + msNumber);
+        addendaGrupoModelo.getEltPayment().getEltSpecialInstruction().getAttCode().setString("PUR");
+        addendaGrupoModelo.getEltPayment().getEltSpecialInstruction().getEltText().setValue(moAuxCfdParams.getModeloDpsDescripcion());
+        addendaGrupoModelo.getEltPayment().getEltOrderIdentification().getEltReferenceIdentification().getAttType().setString("ON");
+        addendaGrupoModelo.getEltPayment().getEltOrderIdentification().getEltReferenceIdentification().setValue(msNumberReference);
+        addendaGrupoModelo.getEltPayment().getEltOrderIdentification().getEltReferenceDate().setValue(oSimpleDateFormat.format(tDate));
+        addendaGrupoModelo.getEltPayment().getEltBuyer().getEltGln().setValue("7504001186019");
+        addendaGrupoModelo.getEltPayment().getEltBuyer().getEltContactInformation().getEltPersonOrDepartmentName().getEltText().setValue(moAuxCfdParams.getBachocoSociedad());
+        addendaGrupoModelo.getEltPayment().getEltInvoiceCreator().getEltGln().setValue("7500000000000");
+        addendaGrupoModelo.getEltPayment().getEltInvoiceCreator().getEltAlternatePartyIdentification().getAttType().setString("IA");
+        addendaGrupoModelo.getEltPayment().getEltInvoiceCreator().getEltAlternatePartyIdentification().setValue(sReceptorNumber);
+        addendaGrupoModelo.getEltPayment().getEltInvoiceCreator().getEltNameAddress().getEltName().setValue(moAuxCfdParams.getEmisor().getProperName().length() > 35 ? moAuxCfdParams.getEmisor().getProperName().substring(0, 34) : moAuxCfdParams.getEmisor().getProperName());
+        addendaGrupoModelo.getEltPayment().getEltInvoiceCreator().getEltNameAddress().getEltStreetAddressOne().setValue(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getStreet());
+        addendaGrupoModelo.getEltPayment().getEltInvoiceCreator().getEltNameAddress().getEltCity().setValue(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getState());
+        addendaGrupoModelo.getEltPayment().getEltInvoiceCreator().getEltNameAddress().getEltPostalCode().setValue(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getZipCode());
+        addendaGrupoModelo.getEltPayment().getEltCurrency().getAttCurrencyISOCode().setOption(nMoneda);
+        addendaGrupoModelo.getEltPayment().getEltCurrency().getEltCurrencyFunction().setValue("BILLING_CURRENCY");
+        addendaGrupoModelo.getEltPayment().getEltCurrency().getEltCurrencyRate().setValue("" + oDecimalFormat.format(mdExchangeRate));
+        addendaGrupoModelo.getEltPayment().getEltTotalAmount().getEltAmount().setValue("" + oDecimalFormat.format(mdTotalCy_r));
+        addendaGrupoModelo.getEltPayment().getEltBaseAmount().getEltAmount().setValue("" + oDecimalFormat.format(mdSubtotalCy_r));
+        addendaGrupoModelo.getEltPayment().getEltTax().getAttType().setString("VAT");
+        addendaGrupoModelo.getEltPayment().getEltTax().getEltTaxPercentage().setValue("" + oDecimalFormat.format(dIvapct));
+        addendaGrupoModelo.getEltPayment().getEltTax().getEltTaxAmount().setValue("" + oDecimalFormat.format(mdTaxCharged_r));
+        addendaGrupoModelo.getEltPayment().getEltTax().getEltTaxCategory().setValue("TRANSFERIDO");
+        addendaGrupoModelo.getEltPayment().getEltPayableAmount().getEltAmount().setValue("" + oDecimalFormat.format(mdTotal_r));
 
-        addendagrupomodelo.getEltPayment().getEltItem().getEltHijosLineItem().addAll(vLineItem);
+        addendaGrupoModelo.getEltPayment().getEltItem().getEltHijosLineItem().addAll(vLineItem);
 
-        return addendagrupomodelo;
+        return addendaGrupoModelo;
     }
 
     /**
@@ -3765,6 +3770,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         double dImpuestosTrasladados = 0;
         int[] anTypeDoc = {mnFkDpsCategoryId, mnFkDpsClassId, mnFkDpsTypeId};
         String sNotes = "";
+        DElementAp addendaElektra = new DElementAp();
 
         cfd.ext.elektra.DElementDetailItems oDetailItems = new DElementDetailItems();
         cfd.ext.elektra.DElementDetalle oDetalle = null;
@@ -3840,21 +3846,20 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             }
         }
 
-        DElementAp addendaelektra = new DElementAp();
+        // Create addenda:
 
+        addendaElektra.getAttXmlns().setString("http://www.tiendasneto.com/ap");
+        addendaElektra.getAttSchemaLocation().setString("http://www.tiendasneto.com/ap addenda_prov.xsd");
 
-        addendaelektra.getAttXmlns().setString("http://www.tiendasneto.com/ap");
-        addendaelektra.getAttSchemaLocation().setString("http://www.tiendasneto.com/ap addenda_prov.xsd");
-
-        addendaelektra.getAttTipoComprobante().setString(
+        addendaElektra.getAttTipoComprobante().setString(
                 SLibUtilities.compareKeys(anTypeDoc, SDataConstantsSys.TRNU_TP_DPS_SAL_INV) ? "FE" :
                 SLibUtilities.compareKeys(anTypeDoc, SDataConstantsSys.TRNU_TP_DPS_SAL_CN) ? "NC" :
                 SLibUtilities.compareKeys(anTypeDoc, SDataConstantsSys.TRNU_TP_DPS_SAL_REC) ? "ND" : "?");
-        addendaelektra.getAttPlazoPago().setString(mnDaysOfCredit + " DIAS"); // XXX: Validate is 'DIAS' is declared like a constant
-        addendaelektra.getAttObservaciones().setString(sNotes);
-        addendaelektra.getEltDetalleProductos().getEltDetalle().addAll(oDetailItems.getEltDetalle());
+        addendaElektra.getAttPlazoPago().setString(mnDaysOfCredit + " DIAS"); // XXX: Validate is 'DIAS' is declared like a constant
+        addendaElektra.getAttObservaciones().setString(sNotes);
+        addendaElektra.getEltDetalleProductos().getEltDetalle().addAll(oDetailItems.getEltDetalle());
 
-        return addendaelektra;
+        return addendaElektra;
     }
 
     @Override

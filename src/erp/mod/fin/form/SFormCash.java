@@ -1357,7 +1357,7 @@ public class SFormCash extends SBeanForm implements SGridPaneFormOwner, ActionLi
         moAbpCash = moSessionCustom.getAbpEntity((int[]) moCashXXX.getPrimaryKey());
 
         if (moAbpCash == null) {
-            throw new Exception(SFinConsts.ERR_MSG_ABP_ENT_NOT_FOUND + "'" + moCashXXX.getAuxEntity() + "'.");
+            throw new Exception(SFinConsts.MSG_ERR_ABP_ENT_NOT_FOUND + "'" + moCashXXX.getAuxEntity() + "'.");
         }
 
         manCashCurrencyKey = new int[] { moCashXXX.getFkCurrencyId() };
