@@ -290,7 +290,8 @@ public class ImportPayrolls extends javax.swing.JFrame {
         int nAreaSalario = 0;
         int nAreaSalarioReferencia = 0;
         int nDiasNomina = 0;
-        int nPeriodoPago = 0;
+        int nPeriodoPagoNomina = 0;
+        int nPeriodoPagoRecibo = 0;
         int nDiasLaborables = 0;
         int nWorkHrsDay = 0;
         double dPaymentDaily = 0;
@@ -429,7 +430,8 @@ public class ImportPayrolls extends javax.swing.JFrame {
                 nIdNomina = rsSqlServerPayroll.getInt("id_nomina");
                 tDateStart = sdfMagic.parse(rsSqlServerPayroll.getString("fecha_ini"));
                 tDateEnd = sdfMagic.parse(rsSqlServerPayroll.getString("fecha_fin"));
-                nPeriodoPago = rsSqlServerPayroll.getInt("fid_periodo_pago_tp");
+                nPeriodoPagoNomina = rsSqlServerPayroll.getInt("fid_periodo_pago_tp");
+                                
                 nDiasNomina = rsSqlServerPayroll.getInt("dias_nomina");
                 nDiasLaborables = rsSqlServerPayroll.getInt("dias_laborables");
                 nAreaSalario = rsSqlServerPayroll.getInt("fid_area_salario");
@@ -439,7 +441,7 @@ public class ImportPayrolls extends javax.swing.JFrame {
                 sSql = "INSERT INTO hrs_pay VALUES (" +
                         nIdNomina + ", " + nYear + ", " + nYear + ", " + rsSqlServerPayroll.getInt("periodo") + ", " + rsSqlServerPayroll.getInt("nomina_num") + ", " + 
                         "'" + sdfMySql.format(tDateStart) + "', '" + sdfMySql.format(tDateEnd) + "', " /*DATEDIFF('" + sdfMySql.format(tDateEnd) + "', '" + sdfMySql.format(tDateStart) + "') + 1"*/ + (nWorkedDays < 0 ? 0 : nWorkedDays) + ", " + nDiasNomina + ", " + (nDiasLaborables < 0 ? 0 : nDiasLaborables) + ", " +
-                        rsSqlServerPayroll.getDouble("sma") + ", " + rsSqlServerPayroll.getDouble("smar") + ", '" + rsSqlServerPayroll.getString("comentarios") + "', " + rsSqlServerPayroll.getBoolean("es_normal") + ", " + rsSqlServerPayroll.getBoolean("es_con_calc_ss") + ", 0, 0, " + rsSqlServerPayroll.getBoolean("es_cerrada") + ", 0, " + nPeriodoPago + ", " +
+                        rsSqlServerPayroll.getDouble("sma") + ", " + rsSqlServerPayroll.getDouble("smar") + ", '" + rsSqlServerPayroll.getString("comentarios") + "', " + rsSqlServerPayroll.getBoolean("es_normal") + ", " + rsSqlServerPayroll.getBoolean("es_con_calc_ss") + ", 0, 0, " + rsSqlServerPayroll.getBoolean("es_cerrada") + ", 0, " + (nPeriodoPagoNomina == 3 ? 2 : nPeriodoPagoNomina) + ", " +
                         (nAreaSalario != 0 ? nAreaSalario : nAreaSalarioReferencia) + ", " + nAreaSalarioReferencia + ", " + rsSqlServerPayroll.getInt("fid_calc_impuesto_tp") + ", " + rsSqlServerPayroll.getInt("fid_tabla_impuesto") + ", " + rsSqlServerPayroll.getInt("fid_tabla_credito_sal") + ", " + rsSqlServerPayroll.getInt("fid_tabla_ss") + ", " +
                         "1, 1, 1, NOW(), NOW(), NOW()); ";
                 stMySql.execute(sSql);
@@ -481,10 +483,15 @@ public class ImportPayrolls extends javax.swing.JFrame {
                         nDiasAusenciaVacIncap + nDiasFaltadosIncap + nDiasFaltadosIncapSs;
                     dImpuestoTeorico = rsSqlServerReceipt.getDouble("impuesto_teorico");
                     dCreditoSalTeorico = rsSqlServerReceipt.getDouble("credito_sal_teorico");
+                    nPeriodoPagoRecibo = rsSqlServerReceipt.getInt("fid_periodo_pago_tp");
                     nTipoSalario = rsSqlServerReceipt.getInt("fid_salario_tp");
                     nEmployeeDepartament = rsSqlServerReceipt.getInt("fid_departamento");
                     nEmployeePosition = getEmployeePositionId(stMySql, nIdEmpleado);
                     nEmployeeShift = getEmployeeShiftId(stMySql, nIdEmpleado);
+                    
+                    if (nPeriodoPagoNomina != nPeriodoPagoRecibo) {
+                        throw new Exception("El periodo de pago de la nómina es distinto del periodo de pagop del recibo.");
+                    }
                     
                     /* OTRAS EMPRESAS
                     sSql = "INSERT INTO hrs_pay_rcp VALUES (" +
@@ -499,14 +506,13 @@ public class ImportPayrolls extends javax.swing.JFrame {
                     
                     // UNIVERSAL IMPRESORA:
                     
-                    sSql = "INSERT INTO hrs_pay_rcp VALUES (" +
+                   sSql = "INSERT INTO hrs_pay_rcp VALUES (" +
                             nIdNomina + ", " + nBizPartner + ", '" + sdfMySql.format(tDateBenefit) + "', '" + sdfMySql.format(tDateHire) + "', " + (tDateDis == null ? "NULL" : "'" + sdfMySql.format(tDateDis) + "'") + ", " + 
                             dPaymentDaily + ", " + rsSqlServerReceipt.getDouble("sueldo") + ", " + rsSqlServerReceipt.getDouble("salario_bc") + ", " + nWorkHrsDay + ", " + dPaymentDaily + ", " + dPaymentHour + ", 1, " +
-                            (nPeriodoPago == 1 ? "1.1667" : "1") + ", " + nDiasNomina + ", " + nDiasLaborables + ", " + nDiasLaborados + ", 0, 0, 0, 0, " + nDiasNoLaboradosPagados + ", " + nDiasNoLaboradosNoPagados + ", " + (nDiasNoLaboradosPagados + nDiasNoLaboradosNoPagados) + ", " +
+                            (nPeriodoPagoRecibo == 1 ? "1.1667" : "1") + ", " + nDiasNomina + ", " + nDiasLaborables + ", " + nDiasLaborados + ", 0, 0, 0, 0, " + nDiasNoLaboradosPagados + ", " + nDiasNoLaboradosNoPagados + ", " + (nDiasNoLaboradosPagados + nDiasNoLaboradosNoPagados) + ", " +
                             nDiasLaborados + ", " + rsSqlServerReceipt.getDouble("dias_pagados") + ", 0, 0, 0, 0, 0, 0, 0, " + dImpuestoTeorico + ", " + dImpuestoTeorico + ", " + dCreditoSalTeorico + ", " + dCreditoSalTeorico + ", 0, 0, " + rsSqlServerReceipt.getDouble("impuesto_acumulado") + ", 0, " +
-                            rsSqlServerReceipt.getDouble("credito_sal_acumulado") + ", 0, " + rsSqlServerReceipt.getBoolean("es_reg_activo") + ", " + rsSqlServerReceipt.getBoolean("es_con_septimo") + ", 0, 0, " + rsSqlServerReceipt.getInt("fid_periodo_pago_tp") + ", " + (nTipoSalario == 0 ? "1" : nTipoSalario) + ", " +
-                            (rsSqlServerReceipt.getInt("fid_empleado_tp") + 1) + ", " + rsSqlServerReceipt.getInt("fid_empleado_cat") + ", " + rsSqlServerReceipt.getInt("fid_area_salario") + ", " + 
-                            (nEmployeeDepartament >= 10 ? nEmployeeDepartament - 7 : nEmployeeDepartament + 1) + ", " + nEmployeePosition + ", " + nEmployeeShift + ", 2, 5, " + 
+                            rsSqlServerReceipt.getDouble("credito_sal_acumulado") + ", 0, " + rsSqlServerReceipt.getBoolean("es_reg_activo") + ", " + rsSqlServerReceipt.getBoolean("es_con_septimo") + ", 0, 0, " + (nPeriodoPagoRecibo == 3 ? 2 : nPeriodoPagoRecibo) + ", " + (nTipoSalario == 0 ? "1" : nTipoSalario) + ", " +
+                            (rsSqlServerReceipt.getInt("fid_empleado_tp") + 1) + ", " + rsSqlServerReceipt.getInt("fid_empleado_cat") + ", " + rsSqlServerReceipt.getInt("fid_area_salario") + ", " + (rsSqlServerReceipt.getInt("fid_departamento") + 1) + ", " + nEmployeePosition + ", " + nEmployeeShift + ", 2, 5, " + 
                             "1, 1, NOW(), NOW()); ";
                     
                     stMySql.execute(sSql);
