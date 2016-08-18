@@ -209,6 +209,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private int mnSalesSupervisorBizPartnerId_n;
     private int mnPrepaymentsItemId;
     private double mdPrepayments;
+    private double mdPrepaymentsCy;
     private java.lang.Object moRecordUserKey;
     private sa.lib.srv.SSrvLock moRecordUserLock;
     private erp.mfin.data.SDataRecord moRecordUser;
@@ -379,9 +380,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfExchangeRate = new javax.swing.JTextField();
         jbExchangeRate = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
-        jlPrepayments = new javax.swing.JLabel();
-        jtfPrepayments = new javax.swing.JTextField();
-        jtfPrepaymentsCurRo = new javax.swing.JTextField();
+        jlPrepaymentsCy = new javax.swing.JLabel();
+        jtfPrepaymentsCy = new javax.swing.JTextField();
+        jtfPrepaymentsCyCurRo = new javax.swing.JTextField();
+        jbPrepayments = new javax.swing.JButton();
         jlPrepaymentsWarning = new javax.swing.JLabel();
         jPanel23 = new javax.swing.JPanel();
         jckIsDiscountDocApplying = new javax.swing.JCheckBox();
@@ -1146,25 +1148,32 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPrepayments.setText("Anticipos disponibles:");
-        jlPrepayments.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel2.add(jlPrepayments);
+        jlPrepaymentsCy.setText("Anticipos disponibles:");
+        jlPrepaymentsCy.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel2.add(jlPrepaymentsCy);
 
-        jtfPrepayments.setEditable(false);
-        jtfPrepayments.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfPrepayments.setText("0.00");
-        jtfPrepayments.setFocusable(false);
-        jtfPrepayments.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel2.add(jtfPrepayments);
+        jtfPrepaymentsCy.setEditable(false);
+        jtfPrepaymentsCy.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPrepaymentsCy.setText("0.00");
+        jtfPrepaymentsCy.setFocusable(false);
+        jtfPrepaymentsCy.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel2.add(jtfPrepaymentsCy);
 
-        jtfPrepaymentsCurRo.setEditable(false);
-        jtfPrepaymentsCurRo.setText("CUR");
-        jtfPrepaymentsCurRo.setFocusable(false);
-        jtfPrepaymentsCurRo.setPreferredSize(new java.awt.Dimension(35, 23));
-        jPanel2.add(jtfPrepaymentsCurRo);
+        jtfPrepaymentsCyCurRo.setEditable(false);
+        jtfPrepaymentsCyCurRo.setText("CUR");
+        jtfPrepaymentsCyCurRo.setFocusable(false);
+        jtfPrepaymentsCyCurRo.setPreferredSize(new java.awt.Dimension(35, 23));
+        jPanel2.add(jtfPrepaymentsCyCurRo);
+
+        jbPrepayments.setText("...");
+        jbPrepayments.setToolTipText("Ver anticipos totales");
+        jbPrepayments.setFocusable(false);
+        jbPrepayments.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel2.add(jbPrepayments);
 
         jlPrepaymentsWarning.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlPrepaymentsWarning.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_warn.png"))); // NOI18N
+        jlPrepaymentsWarning.setOpaque(true);
         jlPrepaymentsWarning.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel2.add(jlPrepaymentsWarning);
 
@@ -2446,6 +2455,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbFkCurrencyId.addActionListener(this);
         jbExchangeRateSystem.addActionListener(this);
         jbExchangeRate.addActionListener(this);
+        jbPrepayments.addActionListener(this);
         jbEntryNew.addActionListener(this);
         jbEntryEdit.addActionListener(this);
         jbEntryDelete.addActionListener(this);
@@ -3216,7 +3226,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
     private void renderBasicSettings() {
         jtfCurrencySystemKeyRo.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
-        jtfPrepaymentsCurRo.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
     }
 
     private void renderDpsType() {
@@ -3372,9 +3381,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
 
-    private void renderBizPartnerPrepayments() {
+    private void renderBizPartnerPrepaymentsBalance() {
         mnPrepaymentsItemId = SLibConsts.UNDEFINED;
         mdPrepayments = 0;
+        mdPrepaymentsCy = 0;
         
         if (moBizPartner != null) {
             if (moDps.getFkDpsCategoryId() == SModSysConsts.TRNS_CT_DPS_PUR) {
@@ -3385,14 +3395,26 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
             
             try {
-                mdPrepayments = STrnUtils.getPrepayments(miClient.getSession(), moBizPartner.getPkBizPartnerId(), (int[]) moDps.getPrimaryKey());
+                mdPrepayments = STrnUtils.getPrepaymentsBalance(
+                        miClient.getSession(), moBizPartner.getPkBizPartnerId(), (int[]) moDps.getPrimaryKey(), 
+                        SLibConsts.UNDEFINED);
+                
+                if (jcbFkCurrencyId.getSelectedIndex() <= 0) {
+                    mdPrepaymentsCy = mdPrepayments;
+                }
+                else {
+                    mdPrepaymentsCy = STrnUtils.getPrepaymentsBalance(
+                            miClient.getSession(), moBizPartner.getPkBizPartnerId(), (int[]) moDps.getPrimaryKey(), 
+                            moFieldFkCurrencyId.getKeyAsIntArray()[0]);
+                }
             }
             catch (Exception e) {
                 SLibUtils.showException(this, e);
             }
         }
         
-        jtfPrepayments.setText(SLibUtils.getDecimalFormatAmount().format(mdPrepayments));
+        jtfPrepaymentsCy.setText(SLibUtils.getDecimalFormatAmount().format(mdPrepaymentsCy));
+        jtfPrepaymentsCyCurRo.setText(jtfCurrencyKeyRo.getText());
         jlPrepaymentsWarning.setVisible(mdPrepayments > 0);
     }
     
@@ -4347,7 +4369,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         adecuatePaymentTypeSettings();
         renderBizPartner();
-        renderBizPartnerPrepayments();
+        renderBizPartnerPrepaymentsBalance();
     }
 
     private void prepareDpsEntryComplementary(erp.mtrn.data.SDataDpsEntry oDpsEntryAdjustment, erp.mtrn.data.SDataDpsEntry oDpsEntryComplementary) {
@@ -4898,6 +4920,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
     private void actionExchangeRate() {
         calculateTotal();
+    }
+
+    private void actionPrepayments() {
+        try {
+            miClient.showMsgBoxInformation("Saldo global de anticipos totales del asociado de negocios en moneda local: $ " + SLibUtils.getDecimalFormatAmount().format(mdPrepayments) + " " + jtfCurrencySystemKeyRo.getText() + ".");
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
     }
 
     private void actionEntryNew() {
@@ -6272,6 +6303,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         if (calculate) {
             calculateTotal();
         }
+        
+        renderBizPartnerPrepaymentsBalance();
     }
 
     private void itemChangeFkIncotermId() {
@@ -6681,6 +6714,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbNotesEdit;
     private javax.swing.JButton jbNotesNew;
     private javax.swing.JButton jbOk;
+    private javax.swing.JButton jbPrepayments;
     private javax.swing.JButton jbRecordManualSelect;
     private javax.swing.JButton jbRecordManualView;
     private javax.swing.JButton jbSalesAgent;
@@ -6786,7 +6820,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlNumber;
     private javax.swing.JLabel jlNumberNoteIn;
     private javax.swing.JLabel jlPaymentAccount;
-    private javax.swing.JLabel jlPrepayments;
+    private javax.swing.JLabel jlPrepaymentsCy;
     private javax.swing.JLabel jlPrepaymentsWarning;
     private javax.swing.JLabel jlQuantityTotal;
     private javax.swing.JLabel jlRemission;
@@ -6863,8 +6897,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JTextField jtfNumberNoteIn;
     private javax.swing.JTextField jtfNumberReference;
     private javax.swing.JTextField jtfPayments;
-    private javax.swing.JTextField jtfPrepayments;
-    private javax.swing.JTextField jtfPrepaymentsCurRo;
+    private javax.swing.JTextField jtfPrepaymentsCy;
+    private javax.swing.JTextField jtfPrepaymentsCyCurRo;
     private javax.swing.JTextField jtfQuantityTotal;
     private javax.swing.JTextField jtfRecordManualBranchRo;
     private javax.swing.JTextField jtfRecordManualDateRo;
@@ -7019,7 +7053,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         renderRecordManual();
         renderRecordAutomatic();
         renderBizPartner();
-        renderBizPartnerPrepayments();
+        renderBizPartnerPrepaymentsBalance();
         renderDateMaturity();
         renderSalesAgentBizPartner(null);
         renderSalesAgent(null);
@@ -7123,7 +7157,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     @Override
     public erp.lib.form.SFormValidation formValidate() {
         int[] key = null;
-        double prepayments = 0;
+        double prepaymentsCy = 0;
         String msg = "";
         SFormValidation validation = new SFormValidation();
 
@@ -7484,22 +7518,23 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             if (!validation.getIsError()) {
                 // Validate prepayments:
                 
-                if (mdPrepayments > 0) {
+                if (mdPrepaymentsCy > 0) {
                     for (STableRow row : moPaneGridEntries.getGridRows()) {
                         if (((SDataDpsEntry) row.getData()).getFkItemId() == mnPrepaymentsItemId) {
-                            prepayments += ((SDataDpsEntry) row.getData()).getSubtotal_r();
+                            prepaymentsCy += ((SDataDpsEntry) row.getData()).getSubtotalCy_r();
                         }
                     }
                     
-                    if (prepayments == 0) {
+                    if (prepaymentsCy == 0) {
                         if (miClient.showMsgBoxConfirm("'" + moBizPartner.getBizPartner() + "' tiene anticipos,\n"
                                 + "¿está seguro que no desea aplicarlos en este documento?") != JOptionPane.YES_OPTION) {
                             validation.setMessage("Se debe aplicar anticipos en este documento.");
                             validation.setComponent(moPaneGridEntries);
                         }
                     }
-                    else if (mdPrepayments + prepayments < 0) {
-                        validation.setMessage("La aplicación de anticipos (" + SLibUtils.getDecimalFormatAmount().format(-prepayments) + ") no puede ser mayor a $ " + SLibUtils.getDecimalFormatAmount().format(mdPrepayments) + ".");
+                    else if (mdPrepaymentsCy + prepaymentsCy < 0) {
+                        validation.setMessage("La aplicación total de anticipos $ " + SLibUtils.getDecimalFormatAmount().format(-prepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + " "
+                                + "no puede ser mayor al saldo actual de anticipos $ " + SLibUtils.getDecimalFormatAmount().format(mdPrepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + ".");
                         validation.setComponent(moPaneGridEntries);
                     }
                 }
@@ -7675,7 +7710,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         renderRecordManual();
         renderRecordAutomatic();
         renderBizPartner();
-        renderBizPartnerPrepayments();
+        renderBizPartnerPrepaymentsBalance();
         renderDateMaturity();
         renderSalesAgentBizPartner(moDps.getFkSalesAgentBizPartnerId_n() == 0 ? null : new int[] { moDps.getFkSalesAgentBizPartnerId_n() });
         renderSalesAgent(moDps.getFkSalesAgentId_n() == 0 ? null : new int[] { moDps.getFkSalesAgentId_n() });
@@ -8041,6 +8076,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
             else if (button == jbExchangeRate) {
                 actionExchangeRate();
+            }
+            else if (button == jbPrepayments) {
+                actionPrepayments();
             }
             else if (button == jbEntryNew) {
                 actionEntryNew();
