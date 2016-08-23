@@ -955,18 +955,6 @@ public class SHrsPayrollReceipt {
         }
     }
 
-    private int getDaysAbsencePayed(ArrayList<SHrsPayrollReceiptEarning> aHrsPayrollReceiptEarnings) {
-        int daysAbsencePayed = 0;
-
-        for (SHrsPayrollReceiptEarning hrsPayrollReceiptEarning : aHrsPayrollReceiptEarnings) {
-            if (hrsPayrollReceiptEarning.getEarning().isDaysAbsence()) {
-                daysAbsencePayed += hrsPayrollReceiptEarning.getReceiptEarning().getUnits();
-            }
-        }
-
-        return daysAbsencePayed;
-    }
-
     private double getDaysWorkedPayed(ArrayList<SHrsPayrollReceiptEarning> aHrsPayrollReceiptEarnings) {
         double daysWorkedPayed = 0;
 
@@ -1507,31 +1495,11 @@ public class SHrsPayrollReceipt {
         moReceipt.setDaysNotWorkedNotPaid(moHrsEmployee.getEmployeeDays().getDaysNotWorkedNotPaid());
         moReceipt.setDaysNotWorked_r(moHrsEmployee.getEmployeeDays().getDaysNotWorked_r());
         moReceipt.setPayrollTaxableDays_r(moHrsEmployee.getEmployeeDays().getPayrollTaxableDays_r());
-        //moReceipt.setPayrollFactorTax(d); // Update in the computeReceiptTax function
         moReceipt.setAnnualTaxableDays_r(moHrsEmployee.getEmployeeDays().getAnnualTaxableDays_r());
-        //moReceipt.setAnnualFactorTax(d); // Update in the computeReceiptTax function
         moReceipt.setDaysToBePaid_r(getDaysToBePaid(moHrsEmployee.getHrsPayrollReceipt().getHrsEarnings()));
         moReceipt.setDaysPaid(getDaysWorkedPayed(moHrsEmployee.getHrsPayrollReceipt().getHrsEarnings()));
-        /*
-        moReceipt.setDaysAbsence(moHrsEmployee.getEmployeeDays().getDaysCalendarAbsence());
-        moReceipt.setDaysAbsencePayed(getDaysAbsencePayed(moHrsEmployee.getHrsPayrollReceipt().getHrsEarnings()));
-        moReceipt.setDaysWorkedPayed(getDaysWorkedPayed(moHrsEmployee.getHrsPayrollReceipt().getHrsEarnings()));
-        */
         computeHrsDaysByPeriod();
     }
-    
-    /* XXX jbarajas 2015-05-11
-    public void computeDbPayrollReceipt() throws Exception {
-        // Compute dbPayrollReceipt values:
-
-        moReceipt.setEarningsExemption_r(moHrsEmployee.getHrsPayrollReceipt().getTotalEarningsExempt());
-        moReceipt.setEarningsTaxable_r(moHrsEmployee.getHrsPayrollReceipt().getTotalEarningsTaxable());
-        moReceipt.setEarnings_r(moHrsEmployee.getHrsPayrollReceipt().getTotalEarnings());
-        moReceipt.setDeductions_r(moHrsEmployee.getHrsPayrollReceipt().getTotalDeductions());
-        moReceipt.setPayment_r(moReceipt.getEarnings_r() - moReceipt.getDeductions_r());
-        moReceipt.setDaysAdjustment(false); // XXX: Pending
-     }
-    */
      
     public void computeHrsDaysByPeriod() throws Exception {
         int year = 0;
@@ -1593,10 +1561,6 @@ public class SHrsPayrollReceipt {
         if (daysPeriodPayroll > 0) {
             for (SDbAbsenceConsumption absenceConsumption : moHrsEmployee.getAbsencesConsumptions()) {
                 difDays = absenceConsumption.getEffectiveDays();
-                
-                /*
-                EXCLUIR LAS VACACIONES COMO DIA NO TRABAJADOS PARA CALCULAR DIAS DEL PERIODO EN CREDITOS
-                */
                 
                 for (int i = 0; i < difDays; i++) {
                     if (SLibTimeUtils.isBelongingToPeriod(SLibTimeUtils.addDate(absenceConsumption.getDateStart(), 0, 0, i), year, periodYear) &&

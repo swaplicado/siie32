@@ -1166,7 +1166,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                                     "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
                                     "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
                                     "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + mnPayrollId + " " +
-                                    "AND ear.id_ear = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") AND d.id_dep = " + nF_id_ref + " " + 
+                                    "AND ear.id_ear = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ")" + (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_DEP ? (" AND d.id_dep = " + nF_id_ref + " ") : "") + 
                                     "GROUP BY ear.id_ear, ear.name_abbr, d.id_dep, d.name, d.code " +
 
                                     "UNION " +
@@ -1211,7 +1211,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                                     "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
                                     "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
                                     "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + mnPayrollId + " " +
-                                    "AND ded.id_ded = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") AND d.id_dep = " + nF_id_ref + " " +
+                                    "AND ded.id_ded = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ")" + (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_DEP ? (" AND d.id_dep = " + nF_id_ref + " ") : "") +
                                     "GROUP BY ded.id_ded, ded.name_abbr, d.id_dep, d.name, d.code " +
 
                                     "UNION " +

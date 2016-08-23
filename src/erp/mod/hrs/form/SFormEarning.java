@@ -721,6 +721,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
             jtfRegistryKey.setText("");
+            moRegistry.setAuxAccountingConfigurationTypeId(SLibConsts.UNDEFINED);
         }
         else {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));

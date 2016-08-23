@@ -7,15 +7,12 @@
 package erp.mod.hrs.db;
 
 import erp.mod.SModConsts;
-import erp.mod.SModSysConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
-import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
@@ -66,6 +63,7 @@ public class SDbEarning extends SDbRegistryUser {
     */
     protected int mnAuxAccountingConfigurationTypeId;
     
+    /*  XXX (jbarajas, 2016-08-05) slowly open payroll
     protected ArrayList<SDbAccountingEarning> maAccountingEarning;
     
     private SDbAccountingEarning createAccountingEarning() {
@@ -84,7 +82,7 @@ public class SDbEarning extends SDbRegistryUser {
         accountingEarning.setFkUserUpdateId();
         accountingEarning.setTsUserInsert();
         accountingEarning.setTsUserUpdate();
-        */
+        
         
         return accountingEarning;
     }
@@ -106,7 +104,7 @@ public class SDbEarning extends SDbRegistryUser {
         return accountingEarning;
     }
     
-    private void createAccountingConfiguration(final SGuiSession session) throws Exception {
+    private void createAccountingEarningConfiguration(final SGuiSession session) throws Exception {
         ResultSet resultSet = null;
         String sql = "";
         ArrayList<SDbAccountingEarning> aAccountingEarning = new ArrayList<SDbAccountingEarning>();
@@ -194,6 +192,7 @@ public class SDbEarning extends SDbRegistryUser {
             maAccountingEarning.addAll(aAccountingEarning);
         }
     }
+    */
 
     public SDbEarning() {
         super(SModConsts.HRS_EAR);
@@ -272,7 +271,7 @@ public class SDbEarning extends SDbRegistryUser {
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
     public int getAuxAccountingConfigurationTypeId() { return mnAuxAccountingConfigurationTypeId; }
-    public ArrayList<SDbAccountingEarning> getAccountingEarning() { return maAccountingEarning; }
+    //public ArrayList<SDbAccountingEarning> getAccountingEarning() { return maAccountingEarning; } XXX (jbarajas, 2016-08-05) slowly open payroll
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -324,7 +323,7 @@ public class SDbEarning extends SDbRegistryUser {
         mtTsUserUpdate = null;
         
         mnAuxAccountingConfigurationTypeId = 0;
-        maAccountingEarning = new ArrayList<SDbAccountingEarning>();
+        //maAccountingEarning = new ArrayList<SDbAccountingEarning>(); XXX (jbarajas, 2016-08-05) slowly open payroll
     }
 
     @Override
@@ -359,7 +358,7 @@ public class SDbEarning extends SDbRegistryUser {
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
         Statement statement = null;
         ResultSet resultSet = null;
-        SDbAccountingEarning accountingEarning = null;
+        //SDbAccountingEarning accountingEarning = null; XXX (jbarajas, 2016-08-05) slowly open payroll
 
         initRegistry();
         initQueryMembers();
@@ -408,6 +407,7 @@ public class SDbEarning extends SDbRegistryUser {
             
             mnAuxAccountingConfigurationTypeId = mnFkAccountingConfigurationTypeId;
 
+            /* XXX (jbarajas, 2016-08-05) slowly open payroll
             statement = session.getStatement().getConnection().createStatement();
 
             msSql = "SELECT id_ref " +
@@ -420,6 +420,7 @@ public class SDbEarning extends SDbRegistryUser {
                 accountingEarning.read(session, new int[] { mnPkEarningId, mnFkAccountingConfigurationTypeId, resultSet.getInt(1) });
                 maAccountingEarning.add(accountingEarning);
             }
+            */
             
             mbRegistryNew = false;
         }
@@ -524,6 +525,10 @@ public class SDbEarning extends SDbRegistryUser {
 
         session.getStatement().execute(msSql);
         
+        
+        SHrsUtils.createAccountingEarningConfiguration(session, mnPkEarningId, mnFkAccountingConfigurationTypeId, mnAuxAccountingConfigurationTypeId, mbRegistryNew);
+        
+        /*  XXX (jbarajas, 2016-08-05) slowly open payroll
         if (mbRegistryNew || (mnAuxAccountingConfigurationTypeId != SLibConsts.UNDEFINED &&
                 mnAuxAccountingConfigurationTypeId != mnFkAccountingConfigurationTypeId)) {
             for (SDbAccountingEarning dbAccountingEarning : maAccountingEarning) {
@@ -533,11 +538,12 @@ public class SDbEarning extends SDbRegistryUser {
                 }
             }
         }
-        createAccountingConfiguration(session);
+        createAccountingEarningConfiguration(session);
         
         for (SDbAccountingEarning dbAccountingEarning : maAccountingEarning) {
             dbAccountingEarning.save(session);
         }
+        */
         
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
@@ -583,7 +589,7 @@ public class SDbEarning extends SDbRegistryUser {
         registry.setTsUserUpdate(this.getTsUserUpdate());
         
         registry.setAuxAccountingConfigurationTypeId(this.getAuxAccountingConfigurationTypeId());
-        registry.getAccountingEarning().addAll(this.getAccountingEarning());
+        //registry.getAccountingEarning().addAll(this.getAccountingEarning()); XXX (jbarajas, 2016-08-05) slowly open payroll
 
         return registry;
     }

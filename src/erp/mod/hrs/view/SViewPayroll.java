@@ -13,7 +13,6 @@ import erp.mhrs.data.SDataPayrollReceiptIssue;
 import erp.mhrs.form.SDialogPayrollImport;
 import erp.mhrs.form.SDialogPayrollReceiptCfdi;
 import erp.mod.SModConsts;
-import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SHrsCfdUtils;
 import erp.mod.hrs.db.SHrsFinUtils;
@@ -99,21 +98,25 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         moDialogAnnulCfdi = new SDialogAnnulCfdi((SClientInterface) miClient, true);
         
         jbImport.setEnabled(true);
+        /* XXX (jbarajas, 2016-08-16) slowly open payroll
         jbAnnul.setEnabled(true);
         //jbGetXml.setEnabled(true);
         //jbGetAcknowledgmentCancellation.setEnabled(true);
         jbPrint.setEnabled(true);
         jbPrintAcknowledgmentCancellation.setEnabled(true);
         jbSend.setEnabled(true);
+        */
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbImport);
+        /* XXX (jbarajas, 2016-08-16) slowly open payroll
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAnnul);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGetXml);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGetAcknowledgmentCancellation);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrint);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrintAcknowledgmentCancellation);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSend);
+        */
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbClosePayroll);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrintReportsPayroll);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayout);
@@ -630,7 +633,8 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
             + "pr.id_pay = pd.id_pay AND pr.id_emp = pd.id_emp AND pd.b_del = 0 "
             + "WHERE p.id_pay = v.id_pay "
             + "GROUP BY p.id_pay), 0) AS f_credit, "
-            + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " WHERE b_del = 0 AND id_pay = v.id_pay GROUP BY id_pay) AS f_tot, "
+            + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " WHERE b_del = 0 AND id_pay = v.id_pay GROUP BY id_pay) AS f_tot "
+            /* XXX (jbarajas, 2016-08-16) slowly open payroll
             + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c1 "
             + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
             + "c1.fid_pay_rcp_pay_n = pei.id_pay AND c1.fid_pay_rcp_emp_n = pei.id_emp AND c1.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 AND pei.fk_st_rcp = "  + SModSysConsts.TRNS_ST_DPS_EMITED + " "
@@ -651,6 +655,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
             + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
             + "c1.fid_pay_rcp_pay_n = pei.id_pay AND c1.fid_pay_rcp_emp_n = pei.id_emp AND c1.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 "
             + "WHERE b_prc_sto_pdf = 1 AND fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n) AS f_prc_sto_pdf "
+            */
             + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS v "
             + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uc ON "
             + "v.fk_usr_clo = uc.id_usr "
@@ -658,12 +663,14 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
             + "v.fk_usr_ins = ui.id_usr "
             + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
             + "v.fk_usr_upd = uu.id_usr "
+            /* XXX (jbarajas, 2016-08-16) slowly open payroll
             + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON "
             + "v.id_pay = c.fid_pay_rcp_pay_n AND NOT (c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND c.b_con = 0) "
             + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
             + "c.fid_pay_rcp_pay_n = pei.id_pay AND c.fid_pay_rcp_emp_n = pei.id_emp AND c.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 AND pei.fk_st_rcp = "  + SModSysConsts.TRNS_ST_DPS_EMITED + " "
             + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNS_ST_DPS) + " AS st ON "
             + "c.fid_st_xml = st.id_st_dps "
+            */
             + (sql.isEmpty() ? "" : "WHERE " + sql)
             + "GROUP BY v.num, v.id_pay "
             + "ORDER BY v.num, v.id_pay ";
@@ -692,11 +699,13 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.nts", "Notas"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_0D, "f_tot", "Recibos totales", 100));
         
+        /* XXX (jbarajas, 2016-08-16) slowly open payroll
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_0D, "f_sign", "CFDI timbrados", 100));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_0D, "f_new", "CFDI x timbrar", 100));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_0D, "f_prc_ws", "CFDI incorrectos PAC", 100));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_0D, "f_prc_sto_xml", "CFDI incorrectos XML disco", 100));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_0D, "f_prc_sto_pdf", "CFDI incorrectos PDF disco", 100));
+        */
         
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "f_usr_close", "Usr cierre"));
