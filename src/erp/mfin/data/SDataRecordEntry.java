@@ -26,6 +26,8 @@ import sa.lib.SLibConsts;
  * @author Sergio Flores
  */
 public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java.io.Serializable, sa.lib.grid.SGridRow {
+    
+    public static final int LEN_CONCEPT = 100;
 
     protected int mnPkYearId;
     protected int mnPkPeriodId;
