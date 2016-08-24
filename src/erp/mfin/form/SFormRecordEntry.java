@@ -1482,7 +1482,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                     break;
 
                 case SDataConstantsSys.FINS_TP_ACC_SYS_CUS:
-                    key = moFieldDebit.getDouble() >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_INC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_DEC_ADJ;
+                    key = moFieldDebit.getDouble() >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_INC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_DEC_ADJ;
                     break;
 
                 case SDataConstantsSys.FINS_TP_ACC_SYS_CDR:
@@ -1490,7 +1490,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                     break;
 
                 case SDataConstantsSys.FINS_TP_ACC_SYS_DBR:
-                    key = moFieldDebit.getDouble() >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_INC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_DEC_ADJ;
+                    key = moFieldDebit.getDouble() >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_INC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_DEC_ADJ;
                     break;
 
                 case SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT:
