@@ -6,6 +6,7 @@ package erp.mfin.data;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
 import javax.swing.JFileChooser;
+import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
 
 /**
@@ -1346,5 +1348,20 @@ public abstract class SFinUtilities {
         
         return true;
     }
-
+    
+    public static boolean isSysMovementNatureDebtor(final int[] keySystemMovementType) {
+        return SLibUtils.belongsTo(keySystemMovementType, new int[][] { SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR });
+    }
+    
+    public static boolean isSysMovementNatureCreditor(final int[] keySystemMovementType) {
+        return SLibUtils.belongsTo(keySystemMovementType, new int[][] { SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CDR });
+    }
+    
+    public static boolean isSysMovementCashAccount(final int[] keySystemMovementType) {
+        return SLibUtils.belongsTo(keySystemMovementType, new int[][] { SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK });
+    }
+    
+    public static boolean isSysMovementBizPartner(final int[] keySystemMovementType) {
+        return isSysMovementNatureDebtor(keySystemMovementType) || isSysMovementNatureCreditor(keySystemMovementType);
+    }
 }
