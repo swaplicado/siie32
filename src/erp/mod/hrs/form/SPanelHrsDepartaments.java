@@ -103,6 +103,7 @@ public class SPanelHrsDepartaments extends SBeanPanel implements ItemListener {
         //mvFormGrids.add(moGridDepartamentsRow);
         
         populateDepartaments();
+        mjchSelectAll.setSelected(true);
     }
     
     private void getDepartaments() {

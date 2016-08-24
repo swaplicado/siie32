@@ -775,15 +775,9 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ChangeListener
                     msg = moHrsBenefit.validate(SHrsBenefit.VALID_AMOUNT_TO_PAID_AMOUNT_SYS, SHrsBenefit.VALIDATION_BENEFIT_TYPE);
 
                     if (!msg.isEmpty()) {
-                        if (mnEarningComputationTypeId == SModSysConsts.HRSS_TP_EAR_COMP_AMT && moCurAmount.getField().getValue() < amountSys) {
+                        if (miClient.showMsgBoxConfirm(msg + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.NO_OPTION) {
                             validation.setMessage(msg);
                             validation.setComponent(moCurAmount.getField().getComponent());
-                        }
-                        else {
-                            if (miClient.showMsgBoxConfirm(msg + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.NO_OPTION) {
-                                validation.setMessage(msg);
-                                validation.setComponent(moCurAmount.getField().getComponent());
-                            }
                         }
                     }
                 }

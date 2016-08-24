@@ -18,6 +18,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -25,13 +27,14 @@ import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
+import sa.lib.gui.bean.SBeanFieldBoolean;
 import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
  * @author Juan Barajas
  */
-public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog {
+public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog implements ChangeListener {
    
     /**
      * Creates new form SDialogRepHrsEarningsDeductionsFileCsv
@@ -66,9 +69,11 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog {
         jPanel15 = new javax.swing.JPanel();
         jlEarning = new javax.swing.JLabel();
         moKeyEarning = new sa.lib.gui.bean.SBeanFieldKey();
+        moBoolShowEarnings = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel17 = new javax.swing.JPanel();
         jlDeduction = new javax.swing.JLabel();
         moKeyDeduction = new sa.lib.gui.bean.SBeanFieldKey();
+        moBoolShowDeductions = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         moRadOrderByNumEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
@@ -112,6 +117,10 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog {
         moKeyEarning.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel15.add(moKeyEarning);
 
+        moBoolShowEarnings.setText("Mostrar percepciones");
+        moBoolShowEarnings.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel15.add(moBoolShowEarnings);
+
         jPanel2.add(jPanel15);
 
         jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -122,6 +131,10 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog {
 
         moKeyDeduction.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel17.add(moKeyDeduction);
+
+        moBoolShowDeductions.setText("Mostrar deducciones");
+        moBoolShowDeductions.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel17.add(moBoolShowDeductions);
 
         jPanel2.add(jPanel17);
 
@@ -170,6 +183,8 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog {
     private javax.swing.JLabel jlEarning;
     private javax.swing.JLabel jlPaymentType;
     private javax.swing.JLabel jlYear;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolShowDeductions;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolShowEarnings;
     private sa.lib.gui.bean.SBeanFieldInteger moIntPeriodYear;
     private sa.lib.gui.bean.SBeanFieldKey moKeyDeduction;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEarning;
@@ -181,6 +196,11 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog {
     private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNumEmployee;
     // End of variables declaration//GEN-END:variables
 
+    private void actionEnableFieldsEarDed() {
+        moKeyEarning.setEnabled(moBoolShowEarnings.isSelected());
+        moKeyDeduction.setEnabled(moBoolShowDeductions.isSelected());
+    }
+    
     private String getOrderBy() {
         String orderBy = "";
         
@@ -275,7 +295,7 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog {
                         "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = e.fk_dep " +
                         "INNER JOIN hrs_ear AS ear ON ear.id_ear = pre.fk_ear " +
                         "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND p.per_year = " + moIntPeriodYear.getValue() + " " +
-                        (moKeyEarning.getSelectedIndex() > 0 ? " AND ear.id_ear = " + moKeyEarning.getValue()[0] : "") + " " +
+                        (!moKeyEarning.isEnabled() ? " AND ear.id_ear = 0 " : (moKeyEarning.getSelectedIndex() > 0 ? " AND ear.id_ear = " + moKeyEarning.getValue()[0] : "")) + " " +
                         (moKeyPaymentType.getSelectedIndex() > 0 ? " AND p.fk_tp_pay = " + moKeyPaymentType.getValue()[0] : "") + " " +
                         "UNION " +
                         "SELECT DISTINCT 2 AS f_tp_ear_ded, ded.code AS f_code_ear_ded, ded.name AS f_name_ear_ded, ded.id_ded AS f_id_ear_ded, d.code, d.name, d.id_dep, e.num, b.bp, prd.id_emp " +
@@ -287,7 +307,7 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog {
                         "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = e.fk_dep " +
                         "INNER JOIN hrs_ded AS ded ON ded.id_ded = prd.fk_ded " +
                         "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 AND p.per_year = " + moIntPeriodYear.getValue() + " " +
-                        (moKeyDeduction.getSelectedIndex() > 0 ? " AND ded.id_ded = " + moKeyDeduction.getValue()[0] : "") + " " +
+                        (!moKeyDeduction.isEnabled() ? " AND ded.id_ded = 0 " : (moKeyDeduction.getSelectedIndex() > 0 ? " AND ded.id_ded = " + moKeyDeduction.getValue()[0] : "")) + " " +
                         (moKeyPaymentType.getSelectedIndex() > 0 ? " AND p.fk_tp_pay = " + moKeyPaymentType.getValue()[0] : "") + " " +
                         getOrderBy();
 
@@ -394,14 +414,20 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog {
         moRadOrderByNameDepartament.setSelected(true);
         
         reloadCatalogues();
+        addAllListeners();
+        actionEnableFieldsEarDed();
     }
 
     @Override
     public void addAllListeners() {
+        moBoolShowEarnings.addChangeListener(this);
+        moBoolShowDeductions.addChangeListener(this);
     }
 
     @Override
     public void removeAllListeners() {
+        moBoolShowEarnings.removeChangeListener(this);
+        moBoolShowDeductions.removeChangeListener(this);
     }
     
     @Override
@@ -424,6 +450,13 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog {
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
         
+        if (validation.isValid()) {
+            if (!moKeyEarning.isEnabled() && !moKeyDeduction.isEnabled()) {
+                validation.setMessage("Se debe especificar que quiere mostrar, percepciones ó deducciones.");
+                validation.setComponent(moBoolShowEarnings);
+            }
+        }
+        
         return validation;
     }
     
@@ -432,6 +465,16 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog {
         if (jbSave.isEnabled()) {
             if (SGuiUtils.computeValidation(miClient, validateForm())) {
                 computeReport();
+            }
+        }
+    }
+
+    @Override
+    public void stateChanged(ChangeEvent e) {
+        if (e.getSource() instanceof SBeanFieldBoolean) {
+            if ((SBeanFieldBoolean) e.getSource() == moBoolShowEarnings ||
+                    (SBeanFieldBoolean) e.getSource() == moBoolShowDeductions) {
+                actionEnableFieldsEarDed();
             }
         }
     }

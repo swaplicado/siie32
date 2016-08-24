@@ -924,222 +924,15 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
         oStatementCfg = miClient.getSession().getStatement().getConnection().createStatement();
         oStatementRec = miClient.getSession().getStatement().getConnection().createStatement();
 
-        initPayrollRecords();
+        if (SHrsFinUtils.existsAccountingSettingsForPayrollAll(miClient.getSession(), mnPayrollId)) {
+            initPayrollRecords();
 
-        for (Object[] records : mvRecords) {
-            oRecord = (SDataRecord) records[0];
-            sEmployees = composeEmployeeQuery((Vector<Integer>) records[1]);
-            nEntryId = oRecord.getDbmsRecordEntries().size();
+            for (Object[] records : mvRecords) {
+                oRecord = (SDataRecord) records[0];
+                sEmployees = composeEmployeeQuery((Vector<Integer>) records[1]);
+                nEntryId = oRecord.getDbmsRecordEntries().size();
 
-            for (nType = 1; nType <= 2; nType++) {
-                if (nType == 1) {
-                    /* Perception:
-                     * Accountable link level:
-                     * 1. Global
-                     * 2. By departatment
-                     * 3. By employee
-                     */
-
-                    sSql = "SELECT v.id_tp_acc AS f_id_tipo, ear.id_ear AS f_id_aux, rtrim(ear.name_abbr) AS f_aux, v.id_ref AS f_id_ref, '' AS f_ref, '' AS f_ref_cve, " +
-                                "v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-                                "FROM hrs_pay AS p " +
-                                "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                                "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
-                                "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
-                                "INNER JOIN hrs_acc_ear AS v ON v.id_ear = ear.id_ear " +
-                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
-                                "GROUP BY v.id_tp_acc, ear.id_ear, rtrim(ear.name_abbr), v.id_ref, v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-
-                                "UNION " +
-
-                                "SELECT v.id_tp_acc AS f_id_tipo, ear.id_ear AS f_id_aux, rtrim(ear.name_abbr) AS f_aux, v.id_ref AS f_id_ref, rtrim(d.name) AS f_ref, rtrim(d.code) AS f_ref_cve, " +
-                                "v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-                                "FROM hrs_pay AS p " +
-                                "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                                "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
-                                "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
-                                "INNER JOIN hrs_acc_ear AS v ON v.id_ear = ear.id_ear " +
-                                "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep AND v.id_ref = d.id_dep " +
-                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
-                                "GROUP BY v.id_tp_acc, ear.id_ear, rtrim(ear.name_abbr), v.id_ref, rtrim(d.name), rtrim(d.code), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-
-                                "UNION " +
-
-                                "SELECT v.id_tp_acc AS f_id_tipo, ear.id_ear AS f_id_aux, rtrim(ear.name_abbr) AS f_aux, v.id_ref AS f_id_ref, rtrim(bp.bp) AS f_ref, '' AS f_ref_cve, " +
-                                "v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-                                "FROM hrs_pay AS p " +
-                                "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                                "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
-                                "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
-                                "INNER JOIN hrs_acc_ear AS v ON v.id_ear = ear.id_ear " +
-                                "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp AND v.id_ref = emp.id_emp " +
-                                "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
-                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
-                                "GROUP BY v.id_tp_acc, ear.id_ear, rtrim(ear.name_abbr), v.id_ref, rtrim(bp.bp), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-                                "ORDER BY f_id_tipo, f_id_aux, f_ref; ";
-                    sType = "percepción";
-                }
-                else {
-                    /* Deduction:
-                     * Accountable link level:
-                     * 1. Global
-                     * 2. By departatment
-                     * 3. By employee
-                     */
-
-                    sSql = "SELECT v.id_tp_acc AS f_id_tipo, ded.id_ded AS f_id_aux, rtrim(ded.name_abbr) AS f_aux, v.id_ref AS f_id_ref, '' AS f_ref, '' AS f_ref_cve, " +
-                                "v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-                                "FROM hrs_pay AS p " +
-                                "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                                "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
-                                "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
-                                "INNER JOIN hrs_acc_ded AS v ON v.id_ded = ded.id_ded " +
-                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
-                                "GROUP BY v.id_tp_acc, ded.id_ded, rtrim(ded.name_abbr), v.id_ref, v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-
-                                "UNION " +
-
-                                "SELECT v.id_tp_acc AS f_id_tipo, ded.id_ded AS f_id_aux, rtrim(ded.name_abbr) AS f_aux, v.id_ref AS f_id_ref, rtrim(d.name) AS f_ref, rtrim(d.code) AS f_ref_cve, " +
-                                "v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-                                "FROM hrs_pay AS p " +
-                                "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                                "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
-                                "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
-                                "INNER JOIN hrs_acc_ded AS v ON v.id_ded = ded.id_ded " +
-                                "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep AND v.id_ref = d.id_dep " +
-                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
-                                "GROUP BY v.id_tp_acc, ded.id_ded, rtrim(ded.name_abbr), v.id_ref, rtrim(d.name), rtrim(d.code), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-
-                                "UNION " +
-
-                                "SELECT v.id_tp_acc AS f_id_tipo, ded.id_ded AS f_id_aux, rtrim(ded.name_abbr) AS f_aux, v.id_ref AS f_id_ref, rtrim(bp.bp) AS f_ref, '' AS f_ref_cve, " +
-                                "v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-                                "FROM hrs_pay AS p " +
-                                "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                                "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
-                                "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
-                                "INNER JOIN hrs_acc_ded AS v ON v.id_ded = ded.id_ded " +
-                                "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp AND v.id_ref = emp.id_emp " +
-                                "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
-                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
-                                "GROUP BY v.id_tp_acc, ded.id_ded, rtrim(ded.name_abbr), v.id_ref, rtrim(bp.bp), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-                                "ORDER BY f_id_tipo, f_id_aux, f_ref ";
-                    sType = "deducción";
-                }
-
-                oResultSetCfg = oStatementCfg.executeQuery(sSql);
-                while (oResultSetCfg.next()) {
-                    nF_id_tipo = oResultSetCfg.getInt("f_id_tipo");
-                    nF_id_aux = oResultSetCfg.getInt("f_id_aux");
-                    nF_aux = oResultSetCfg.getString("f_aux");
-                    nF_id_ref = oResultSetCfg.getInt("f_id_ref");
-                    sF_ref = oResultSetCfg.getString("f_ref");
-                    sF_ref_cve = oResultSetCfg.getString("f_ref_cve");
-                    fk_acc = oResultSetCfg.getInt("fk_acc");
-                    fk_cc_n = oResultSetCfg.getInt("fk_cc_n");
-                    fk_item_n = oResultSetCfg.getInt("fk_item_n");
-                    fk_bp_n = oResultSetCfg.getInt("fk_bp_n");
-                    fk_tax_bas_n = oResultSetCfg.getInt("fk_tax_bas_n");
-                    fk_tax_tax_n = oResultSetCfg.getInt("fk_tax_tax_n");
-
-                    oAccount = null;
-                    oCostCenter = null;
-                    oBizPartner = null;
-                    oTax = null;
-                    oItems = null;
-
-                    switch (nF_id_tipo) {
-                        case SModSysConsts.HRSS_TP_ACC_GBL: // global link
-                            sMsg = "La configuración de contabilización para la " + sType + " No. " + nF_id_aux + " '" + nF_aux + "'\ndel campo ";
-                            break;
-                        case SModSysConsts.HRSS_TP_ACC_DEP: // link by department
-                            sMsg = "La configuración de contabilización para la " + sType + " No. " + nF_id_aux + " '" + nF_aux + "',\ndel departamento No. " + sF_ref_cve + " '" + sF_ref + "' (" + nF_id_ref + "), del campo ";
-                            break;
-                        case SModSysConsts.HRSS_TP_ACC_EMP: // link by employee
-                            sMsg = "La configuración de contabilización para la " + sType + " No. " + nF_id_aux + " '" + nF_aux + "',\ndel empleado No. " + nF_id_ref + " '" + sF_ref + "', del campo ";
-                            break;
-                        default:
-                    }
-
-                    // Validate account:
-
-                    if (fk_acc == SLibConstants.UNDEFINED) {
-                        throw new Exception(sMsg + "'cuenta contable' no ha sido especificada aún.");
-                    }
-                    else {
-                        fk_acc_s = SFinUtils.getAccountFormerIdXXX(miClient.getSession(), fk_acc);
-                        oAccount = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, new Object[] { fk_acc_s }, SLibConstants.EXEC_MODE_VERBOSE);
-                        sVal = SDataUtilities.validateAccount(miClient, oAccount, null);
-                        if (sVal.length() != 0) {
-                            throw new Exception(sMsg + "'cuenta contable' ('" + fk_acc_s + "') tiene un inconveniente:\n" + sVal);
-                        }
-
-                        oAccountMajor = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, new Object[] { oAccount.getDbmsPkAccountMajorId() }, SLibConstants.EXEC_MODE_VERBOSE);
-                        
-                        if (!SHrsFinUtils.validateAccount(miClient.getSession(), fk_acc, fk_cc_n, fk_bp_n, fk_item_n, fk_tax_bas_n, fk_tax_tax_n)) {
-                        }
-                    }
-
-                    // Validate cost center:
-
-                    if (fk_cc_n != SLibConstants.UNDEFINED) {
-                        fk_cc_s = SFinUtils.getCostCenterFormerIdXXX(miClient.getSession(), fk_cc_n);
-                        oCostCenter = (SDataCostCenter) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_CC, new Object[] { fk_cc_s }, SLibConstants.EXEC_MODE_VERBOSE);
-                        sVal = SDataUtilities.validateCostCenter(miClient, oCostCenter, null);
-                        if (sVal.length() != 0) {
-                            throw new Exception(sMsg + "'centro de costo' ('" + fk_cc_s + "') tiene un inconveniente:\n" + sVal);
-                        }
-                    }
-                    else if (oAccount.getDbmsIsRequiredCostCenter()) {
-                        throw new Exception(sMsg + "'centro de costo' ('" + fk_cc_s + "') tiene un inconveniente:\nLa cuenta contable correspondiente '" + fk_acc_s + "' requiere de un centro de costo.");
-                    }
-
-                    // Validate item:
-
-                    if (fk_item_n > SLibConstants.UNDEFINED) {
-                        oItems = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM,  new int[] { fk_item_n }, SLibConstants.EXEC_MODE_VERBOSE);
-                        if (oItems == null) {
-                            throw new Exception(sMsg + "'ítem' ('" + fk_item_n + "') tiene un inconveniente:\nEl registro no existe.");
-                        }
-                        /*
-                        else if (oItems != 1) {
-                            throw new Exception(sMsg + "'ítem' ('" + fk_item_n + "') tiene un inconveniente:\nSe encontraron " + oItems.length + " registros.");
-                        }
-                        */
-                        else if (oItems.getIsDeleted()) {
-                            throw new Exception(sMsg + "'ítem' ('" + fk_item_n + "') tiene un inconveniente:\nEl registro está eliminado.");
-                        }
-                    }
-
-                    // Validate business partner:
-
-                    if (fk_bp_n == 0) {
-                        if (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_EMP) {
-                            throw new Exception(sMsg + "'asociado de negocios' ('" + fk_bp_n + "') tiene un inconveniente:\nNo se ha especificado el asociado de negocios.");
-                        }
-                    }
-                    else {
-                        oBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { fk_bp_n }, SLibConstants.EXEC_MODE_VERBOSE);
-                        if (oBizPartner == null) {
-                            throw new Exception(sMsg + "'asociado de negocios' ('" + fk_bp_n + "') tiene un inconveniente:\nEl registro no existe.");
-                        }
-                        else if (oBizPartner.getIsDeleted()) {
-                            throw new Exception(sMsg + "'asociado de negocios' ('" + fk_bp_n + "') tiene un inconveniente:\nEl registro está eliminado.");
-                        }
-                    }
-
-                    // Validate tax:
-
-                    if (fk_tax_bas_n != 0 && fk_tax_tax_n != 0) {
-                        oTax = (SDataTax) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TAX, new int[] { fk_tax_bas_n, fk_tax_tax_n }, SLibConstants.EXEC_MODE_VERBOSE);
-                        if (oTax == null) {
-                            throw new Exception(sMsg + "'impuesto' ('" + fk_tax_bas_n + ", " + fk_tax_tax_n + "') tiene un inconveniente:\nEl registro no existe.");
-                        }
-                        else if (oTax.getIsDeleted()) {
-                            throw new Exception(sMsg + "'impuesto' ('" + fk_tax_bas_n + ", " + fk_tax_tax_n + "') tiene un inconveniente:\nEl registro está eliminado.");
-                        }
-                    }
-                    
+                for (nType = 1; nType <= 2; nType++) {
                     if (nType == 1) {
                         /* Perception:
                          * Accountable link level:
@@ -1147,42 +940,44 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                          * 2. By departatment
                          * 3. By employee
                          */
-                        
-                        sSql = "SELECT ear.fk_tp_acc_rec AS f_id_tipo_rec, ear.id_ear, ear.name_abbr, 0 AS f_id_ref, '' AS f_ref, '' AS f_ref_cve, SUM(rcp_ear.amt_r) AS f_mto " +
+
+                        sSql = "SELECT v.id_tp_acc AS f_id_tipo, ear.id_ear AS f_id_aux, rtrim(ear.name_abbr) AS f_aux, v.id_ref AS f_id_ref, '' AS f_ref, '' AS f_ref_cve, " +
+                                    "v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
                                     "FROM hrs_pay AS p " +
                                     "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
                                     "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
                                     "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
-                                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + mnPayrollId + " " +
-                                    "AND ear.id_ear = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") " +
-                                    "GROUP BY ear.id_ear, ear.name_abbr " +
+                                    "INNER JOIN hrs_acc_ear AS v ON v.id_ear = ear.id_ear " +
+                                    "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                    "GROUP BY v.id_tp_acc, ear.id_ear, rtrim(ear.name_abbr), v.id_ref, v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
 
                                     "UNION " +
 
-                                    "SELECT ear.fk_tp_acc_rec AS f_id_tipo_rec, ear.id_ear, ear.name_abbr, d.id_dep AS f_id_ref, d.name AS f_ref, d.code AS f_ref_cve, SUM(rcp_ear.amt_r) AS f_mto " +
+                                    "SELECT v.id_tp_acc AS f_id_tipo, ear.id_ear AS f_id_aux, rtrim(ear.name_abbr) AS f_aux, v.id_ref AS f_id_ref, rtrim(d.name) AS f_ref, rtrim(d.code) AS f_ref_cve, " +
+                                    "v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
                                     "FROM hrs_pay AS p " +
                                     "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
                                     "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
                                     "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
-                                    "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
-                                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + mnPayrollId + " " +
-                                    "AND ear.id_ear = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ")" + (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_DEP ? (" AND d.id_dep = " + nF_id_ref + " ") : "") + 
-                                    "GROUP BY ear.id_ear, ear.name_abbr, d.id_dep, d.name, d.code " +
+                                    "INNER JOIN hrs_acc_ear AS v ON v.id_ear = ear.id_ear " +
+                                    "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep AND v.id_ref = d.id_dep " +
+                                    "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                    "GROUP BY v.id_tp_acc, ear.id_ear, rtrim(ear.name_abbr), v.id_ref, rtrim(d.name), rtrim(d.code), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
 
                                     "UNION " +
 
-                                    "SELECT ear.fk_tp_acc_rec AS f_id_tipo_rec, ear.id_ear, ear.name_abbr, bp.id_bp AS f_id_ref, bp.bp AS f_ref, '' AS f_ref_cve, SUM(rcp_ear.amt_r) AS f_mto " +
+                                    "SELECT v.id_tp_acc AS f_id_tipo, ear.id_ear AS f_id_aux, rtrim(ear.name_abbr) AS f_aux, v.id_ref AS f_id_ref, rtrim(bp.bp) AS f_ref, '' AS f_ref_cve, " +
+                                    "v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
                                     "FROM hrs_pay AS p " +
                                     "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
                                     "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
                                     "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
-                                    "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
+                                    "INNER JOIN hrs_acc_ear AS v ON v.id_ear = ear.id_ear " +
+                                    "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp AND v.id_ref = emp.id_emp " +
                                     "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
-                                    "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
-                                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " " +
-                                    "AND ear.id_ear = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") " + ((nF_id_tipo == SModSysConsts.HRSS_TP_ACC_EMP) ? ("AND emp.id_emp = " + nF_id_ref + " ") : (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_DEP) ? ("AND d.id_dep = " + nF_id_ref + " ") : "") + //AND emp.id_emp IN (" + sEmployees + ") " +
-                                    "GROUP BY ear.id_ear, ear.name_abbr, bp.id_bp, bp.bp " +
-                                    "ORDER BY f_id_tipo_rec, id_ear, f_ref; ";
+                                    "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                    "GROUP BY v.id_tp_acc, ear.id_ear, rtrim(ear.name_abbr), v.id_ref, rtrim(bp.bp), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
+                                    "ORDER BY f_id_tipo, f_id_aux, f_ref; ";
                         sType = "percepción";
                     }
                     else {
@@ -1193,149 +988,356 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                          * 3. By employee
                          */
 
-                        sSql = "SELECT ded.fk_tp_acc_rec AS f_id_tipo_rec, ded.id_ded, ded.name_abbr, 0 AS f_id_ref, '' AS f_ref, '' AS f_ref_cve, SUM(rcp_ded.amt_r) AS f_mto " +
+                        sSql = "SELECT v.id_tp_acc AS f_id_tipo, ded.id_ded AS f_id_aux, rtrim(ded.name_abbr) AS f_aux, v.id_ref AS f_id_ref, '' AS f_ref, '' AS f_ref_cve, " +
+                                    "v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
                                     "FROM hrs_pay AS p " +
                                     "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
                                     "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
                                     "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
-                                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + mnPayrollId + " " +
-                                    "AND ded.id_ded = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") " +
-                                    "GROUP BY ded.id_ded, ded.name_abbr " +
+                                    "INNER JOIN hrs_acc_ded AS v ON v.id_ded = ded.id_ded " +
+                                    "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                    "GROUP BY v.id_tp_acc, ded.id_ded, rtrim(ded.name_abbr), v.id_ref, v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
 
                                     "UNION " +
 
-                                    "SELECT ded.fk_tp_acc_rec AS f_id_tipo_rec, ded.id_ded, ded.name_abbr, d.id_dep AS f_id_ref, d.name AS f_ref, d.code AS f_ref_cve, SUM(rcp_ded.amt_r) AS f_mto " +
+                                    "SELECT v.id_tp_acc AS f_id_tipo, ded.id_ded AS f_id_aux, rtrim(ded.name_abbr) AS f_aux, v.id_ref AS f_id_ref, rtrim(d.name) AS f_ref, rtrim(d.code) AS f_ref_cve, " +
+                                    "v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
                                     "FROM hrs_pay AS p " +
                                     "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
                                     "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
                                     "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
-                                    "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
-                                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + mnPayrollId + " " +
-                                    "AND ded.id_ded = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ")" + (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_DEP ? (" AND d.id_dep = " + nF_id_ref + " ") : "") +
-                                    "GROUP BY ded.id_ded, ded.name_abbr, d.id_dep, d.name, d.code " +
+                                    "INNER JOIN hrs_acc_ded AS v ON v.id_ded = ded.id_ded " +
+                                    "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep AND v.id_ref = d.id_dep " +
+                                    "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                    "GROUP BY v.id_tp_acc, ded.id_ded, rtrim(ded.name_abbr), v.id_ref, rtrim(d.name), rtrim(d.code), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
 
                                     "UNION " +
 
-                                    "SELECT ded.fk_tp_acc_rec AS f_id_tipo_rec, ded.id_ded, ded.name_abbr, bp.id_bp AS f_id_ref, bp.bp AS f_ref, emp.num AS f_ref_cve, SUM(rcp_ded.amt_r) AS f_mto " +
+                                    "SELECT v.id_tp_acc AS f_id_tipo, ded.id_ded AS f_id_aux, rtrim(ded.name_abbr) AS f_aux, v.id_ref AS f_id_ref, rtrim(bp.bp) AS f_ref, '' AS f_ref_cve, " +
+                                    "v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
                                     "FROM hrs_pay AS p " +
                                     "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
                                     "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
                                     "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
-                                    "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
+                                    "INNER JOIN hrs_acc_ded AS v ON v.id_ded = ded.id_ded " +
+                                    "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp AND v.id_ref = emp.id_emp " +
                                     "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
-                                    "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
-                                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " " +
-                                    "AND ded.id_ded = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") " + ((nF_id_tipo == SModSysConsts.HRSS_TP_ACC_EMP) ? ("AND emp.id_emp = " + nF_id_ref + " ") : (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_DEP) ? ("AND d.id_dep = " + nF_id_ref + " ") : "") + //AND emp.id_emp IN (" + sEmployees + ") " +
-                                    "GROUP BY ded.id_ded, ded.name_abbr, bp.id_bp, bp.bp " +
-                                    "ORDER BY f_id_tipo_rec, id_ded, f_ref; ";
+                                    "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                    "GROUP BY v.id_tp_acc, ded.id_ded, rtrim(ded.name_abbr), v.id_ref, rtrim(bp.bp), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
+                                    "ORDER BY f_id_tipo, f_id_aux, f_ref ";
                         sType = "deducción";
                     }
-                    
-                    oResultSetRec = oStatementRec.executeQuery(sSql);
-                    while (oResultSetRec.next()) {
-                        nF_id_tipo_rec = oResultSetRec.getInt("f_id_tipo_rec");
-                        nF_id_ref = oResultSetRec.getInt("f_id_ref");
-                        sF_ref = oResultSetRec.getString("f_ref");
-                        sF_ref_cve = oResultSetRec.getString("f_ref_cve");
-                        dF_mto = oResultSetRec.getDouble("f_mto");
-                        
-                        // Create record entry:
 
-                        switch (nF_id_tipo_rec) {
+                    oResultSetCfg = oStatementCfg.executeQuery(sSql);
+                    while (oResultSetCfg.next()) {
+                        nF_id_tipo = oResultSetCfg.getInt("f_id_tipo");
+                        nF_id_aux = oResultSetCfg.getInt("f_id_aux");
+                        nF_aux = oResultSetCfg.getString("f_aux");
+                        nF_id_ref = oResultSetCfg.getInt("f_id_ref");
+                        sF_ref = oResultSetCfg.getString("f_ref");
+                        sF_ref_cve = oResultSetCfg.getString("f_ref_cve");
+                        fk_acc = oResultSetCfg.getInt("fk_acc");
+                        fk_cc_n = oResultSetCfg.getInt("fk_cc_n");
+                        fk_item_n = oResultSetCfg.getInt("fk_item_n");
+                        fk_bp_n = oResultSetCfg.getInt("fk_bp_n");
+                        fk_tax_bas_n = oResultSetCfg.getInt("fk_tax_bas_n");
+                        fk_tax_tax_n = oResultSetCfg.getInt("fk_tax_tax_n");
+
+                        oAccount = null;
+                        oCostCenter = null;
+                        oBizPartner = null;
+                        oTax = null;
+                        oItems = null;
+
+                        switch (nF_id_tipo) {
                             case SModSysConsts.HRSS_TP_ACC_GBL: // global link
-                                concept = msPayTypeAbbr + ". " + moFormerPayroll.getNumber() + "; " + nF_aux;
+                                sMsg = "La configuración de contabilización para la " + sType + " No. " + nF_id_aux + " '" + nF_aux + "'\ndel campo ";
                                 break;
                             case SModSysConsts.HRSS_TP_ACC_DEP: // link by department
-                                concept = msPayTypeAbbr + ". " + moFormerPayroll.getNumber() + "; " + nF_aux + "; " + sF_ref_cve + ". " + sF_ref;
+                                sMsg = "La configuración de contabilización para la " + sType + " No. " + nF_id_aux + " '" + nF_aux + "',\ndel departamento No. " + sF_ref_cve + " '" + sF_ref + "' (" + nF_id_ref + "), del campo ";
                                 break;
                             case SModSysConsts.HRSS_TP_ACC_EMP: // link by employee
-                                concept = msPayTypeAbbr + ". " + moFormerPayroll.getNumber() + "; " + nF_aux + "; " + sF_ref_cve + ". " + sF_ref;
+                                sMsg = "La configuración de contabilización para la " + sType + " No. " + nF_id_aux + " '" + nF_aux + "',\ndel empleado No. " + nF_id_ref + " '" + sF_ref + "', del campo ";
                                 break;
                             default:
                         }
 
-                        if (nType == 1) {
-                            if (dF_mto >= 0d) {
-                                debit = dF_mto;
-                                credit = 0;
+                        // Validate account:
+
+                        if (fk_acc == SLibConstants.UNDEFINED) {
+                            throw new Exception(sMsg + "'cuenta contable' no ha sido especificada aún.");
+                        }
+                        else {
+                            fk_acc_s = SFinUtils.getAccountFormerIdXXX(miClient.getSession(), fk_acc);
+                            oAccount = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, new Object[] { fk_acc_s }, SLibConstants.EXEC_MODE_VERBOSE);
+                            sVal = SDataUtilities.validateAccount(miClient, oAccount, null);
+                            if (sVal.length() != 0) {
+                                throw new Exception(sMsg + "'cuenta contable' ('" + fk_acc_s + "') tiene un inconveniente:\n" + sVal);
                             }
-                            else {
-                                debit = 0;
-                                credit = -dF_mto;
+
+                            oAccountMajor = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, new Object[] { oAccount.getDbmsPkAccountMajorId() }, SLibConstants.EXEC_MODE_VERBOSE);
+
+                            if (!SHrsFinUtils.validateAccount(miClient.getSession(), fk_acc, fk_cc_n, fk_bp_n, fk_item_n, fk_tax_bas_n, fk_tax_tax_n)) {
+                            }
+                        }
+
+                        // Validate cost center:
+
+                        if (fk_cc_n != SLibConstants.UNDEFINED) {
+                            fk_cc_s = SFinUtils.getCostCenterFormerIdXXX(miClient.getSession(), fk_cc_n);
+                            oCostCenter = (SDataCostCenter) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_CC, new Object[] { fk_cc_s }, SLibConstants.EXEC_MODE_VERBOSE);
+                            sVal = SDataUtilities.validateCostCenter(miClient, oCostCenter, null);
+                            if (sVal.length() != 0) {
+                                throw new Exception(sMsg + "'centro de costo' ('" + fk_cc_s + "') tiene un inconveniente:\n" + sVal);
+                            }
+                        }
+                        else if (oAccount.getDbmsIsRequiredCostCenter()) {
+                            throw new Exception(sMsg + "'centro de costo' ('" + fk_cc_s + "') tiene un inconveniente:\nLa cuenta contable correspondiente '" + fk_acc_s + "' requiere de un centro de costo.");
+                        }
+
+                        // Validate item:
+
+                        if (fk_item_n > SLibConstants.UNDEFINED) {
+                            oItems = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM,  new int[] { fk_item_n }, SLibConstants.EXEC_MODE_VERBOSE);
+                            if (oItems == null) {
+                                throw new Exception(sMsg + "'ítem' ('" + fk_item_n + "') tiene un inconveniente:\nEl registro no existe.");
+                            }
+                            /*
+                            else if (oItems != 1) {
+                                throw new Exception(sMsg + "'ítem' ('" + fk_item_n + "') tiene un inconveniente:\nSe encontraron " + oItems.length + " registros.");
+                            }
+                            */
+                            else if (oItems.getIsDeleted()) {
+                                throw new Exception(sMsg + "'ítem' ('" + fk_item_n + "') tiene un inconveniente:\nEl registro está eliminado.");
+                            }
+                        }
+
+                        // Validate business partner:
+
+                        if (fk_bp_n == 0) {
+                            if (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_EMP) {
+                                throw new Exception(sMsg + "'asociado de negocios' ('" + fk_bp_n + "') tiene un inconveniente:\nNo se ha especificado el asociado de negocios.");
                             }
                         }
                         else {
-                            if (dF_mto >= 0d) {
-                                debit = 0;
-                                credit = dF_mto;
+                            oBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { fk_bp_n }, SLibConstants.EXEC_MODE_VERBOSE);
+                            if (oBizPartner == null) {
+                                throw new Exception(sMsg + "'asociado de negocios' ('" + fk_bp_n + "') tiene un inconveniente:\nEl registro no existe.");
+                            }
+                            else if (oBizPartner.getIsDeleted()) {
+                                throw new Exception(sMsg + "'asociado de negocios' ('" + fk_bp_n + "') tiene un inconveniente:\nEl registro está eliminado.");
+                            }
+                        }
+
+                        // Validate tax:
+
+                        if (fk_tax_bas_n != 0 && fk_tax_tax_n != 0) {
+                            oTax = (SDataTax) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TAX, new int[] { fk_tax_bas_n, fk_tax_tax_n }, SLibConstants.EXEC_MODE_VERBOSE);
+                            if (oTax == null) {
+                                throw new Exception(sMsg + "'impuesto' ('" + fk_tax_bas_n + ", " + fk_tax_tax_n + "') tiene un inconveniente:\nEl registro no existe.");
+                            }
+                            else if (oTax.getIsDeleted()) {
+                                throw new Exception(sMsg + "'impuesto' ('" + fk_tax_bas_n + ", " + fk_tax_tax_n + "') tiene un inconveniente:\nEl registro está eliminado.");
+                            }
+                        }
+
+                        if (nType == 1) {
+                            /* Perception:
+                             * Accountable link level:
+                             * 1. Global
+                             * 2. By departatment
+                             * 3. By employee
+                             */
+
+                            sSql = "SELECT ear.fk_tp_acc_rec AS f_id_tipo_rec, ear.id_ear, ear.name_abbr, 0 AS f_id_ref, '' AS f_ref, '' AS f_ref_cve, SUM(rcp_ear.amt_r) AS f_mto " +
+                                        "FROM hrs_pay AS p " +
+                                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
+                                        "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
+                                        "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
+                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + mnPayrollId + " " +
+                                        "AND ear.id_ear = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                        "GROUP BY ear.id_ear, ear.name_abbr " +
+
+                                        "UNION " +
+
+                                        "SELECT ear.fk_tp_acc_rec AS f_id_tipo_rec, ear.id_ear, ear.name_abbr, d.id_dep AS f_id_ref, d.name AS f_ref, d.code AS f_ref_cve, SUM(rcp_ear.amt_r) AS f_mto " +
+                                        "FROM hrs_pay AS p " +
+                                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
+                                        "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
+                                        "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
+                                        "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
+                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + mnPayrollId + " " +
+                                        "AND ear.id_ear = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ")" + (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_DEP ? (" AND d.id_dep = " + nF_id_ref + " ") : "") + 
+                                        "GROUP BY ear.id_ear, ear.name_abbr, d.id_dep, d.name, d.code " +
+
+                                        "UNION " +
+
+                                        "SELECT ear.fk_tp_acc_rec AS f_id_tipo_rec, ear.id_ear, ear.name_abbr, bp.id_bp AS f_id_ref, bp.bp AS f_ref, '' AS f_ref_cve, SUM(rcp_ear.amt_r) AS f_mto " +
+                                        "FROM hrs_pay AS p " +
+                                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
+                                        "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
+                                        "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
+                                        "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
+                                        "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
+                                        "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
+                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " " +
+                                        "AND ear.id_ear = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") " + ((nF_id_tipo == SModSysConsts.HRSS_TP_ACC_EMP) ? ("AND emp.id_emp = " + nF_id_ref + " ") : (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_DEP) ? ("AND d.id_dep = " + nF_id_ref + " ") : "") + //AND emp.id_emp IN (" + sEmployees + ") " +
+                                        "GROUP BY ear.id_ear, ear.name_abbr, bp.id_bp, bp.bp " +
+                                        "ORDER BY f_id_tipo_rec, id_ear, f_ref; ";
+                            sType = "percepción";
+                        }
+                        else {
+                            /* Deduction:
+                             * Accountable link level:
+                             * 1. Global
+                             * 2. By departatment
+                             * 3. By employee
+                             */
+
+                            sSql = "SELECT ded.fk_tp_acc_rec AS f_id_tipo_rec, ded.id_ded, ded.name_abbr, 0 AS f_id_ref, '' AS f_ref, '' AS f_ref_cve, SUM(rcp_ded.amt_r) AS f_mto " +
+                                        "FROM hrs_pay AS p " +
+                                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
+                                        "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
+                                        "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
+                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + mnPayrollId + " " +
+                                        "AND ded.id_ded = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                        "GROUP BY ded.id_ded, ded.name_abbr " +
+
+                                        "UNION " +
+
+                                        "SELECT ded.fk_tp_acc_rec AS f_id_tipo_rec, ded.id_ded, ded.name_abbr, d.id_dep AS f_id_ref, d.name AS f_ref, d.code AS f_ref_cve, SUM(rcp_ded.amt_r) AS f_mto " +
+                                        "FROM hrs_pay AS p " +
+                                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
+                                        "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
+                                        "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
+                                        "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
+                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + mnPayrollId + " " +
+                                        "AND ded.id_ded = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ")" + (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_DEP ? (" AND d.id_dep = " + nF_id_ref + " ") : "") +
+                                        "GROUP BY ded.id_ded, ded.name_abbr, d.id_dep, d.name, d.code " +
+
+                                        "UNION " +
+
+                                        "SELECT ded.fk_tp_acc_rec AS f_id_tipo_rec, ded.id_ded, ded.name_abbr, bp.id_bp AS f_id_ref, bp.bp AS f_ref, emp.num AS f_ref_cve, SUM(rcp_ded.amt_r) AS f_mto " +
+                                        "FROM hrs_pay AS p " +
+                                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
+                                        "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
+                                        "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
+                                        "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
+                                        "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
+                                        "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
+                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " " +
+                                        "AND ded.id_ded = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") " + ((nF_id_tipo == SModSysConsts.HRSS_TP_ACC_EMP) ? ("AND emp.id_emp = " + nF_id_ref + " ") : (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_DEP) ? ("AND d.id_dep = " + nF_id_ref + " ") : "") + //AND emp.id_emp IN (" + sEmployees + ") " +
+                                        "GROUP BY ded.id_ded, ded.name_abbr, bp.id_bp, bp.bp " +
+                                        "ORDER BY f_id_tipo_rec, id_ded, f_ref; ";
+                            sType = "deducción";
+                        }
+
+                        oResultSetRec = oStatementRec.executeQuery(sSql);
+                        while (oResultSetRec.next()) {
+                            nF_id_tipo_rec = oResultSetRec.getInt("f_id_tipo_rec");
+                            nF_id_ref = oResultSetRec.getInt("f_id_ref");
+                            sF_ref = oResultSetRec.getString("f_ref");
+                            sF_ref_cve = oResultSetRec.getString("f_ref_cve");
+                            dF_mto = oResultSetRec.getDouble("f_mto");
+
+                            // Create record entry:
+
+                            switch (nF_id_tipo_rec) {
+                                case SModSysConsts.HRSS_TP_ACC_GBL: // global link
+                                    concept = msPayTypeAbbr + ". " + moFormerPayroll.getNumber() + "; " + nF_aux;
+                                    break;
+                                case SModSysConsts.HRSS_TP_ACC_DEP: // link by department
+                                    concept = msPayTypeAbbr + ". " + moFormerPayroll.getNumber() + "; " + nF_aux + "; " + sF_ref_cve + ". " + sF_ref;
+                                    break;
+                                case SModSysConsts.HRSS_TP_ACC_EMP: // link by employee
+                                    concept = msPayTypeAbbr + ". " + moFormerPayroll.getNumber() + "; " + nF_aux + "; " + sF_ref_cve + ". " + sF_ref;
+                                    break;
+                                default:
+                            }
+
+                            if (nType == 1) {
+                                if (dF_mto >= 0d) {
+                                    debit = dF_mto;
+                                    credit = 0;
+                                }
+                                else {
+                                    debit = 0;
+                                    credit = -dF_mto;
+                                }
                             }
                             else {
-                                debit = -dF_mto;
-                                credit = 0;
+                                if (dF_mto >= 0d) {
+                                    debit = 0;
+                                    credit = dF_mto;
+                                }
+                                else {
+                                    debit = -dF_mto;
+                                    credit = 0;
+                                }
                             }
-                        }
 
-                        dDebit_r += debit;
-                        dCredit_r += credit;
+                            dDebit_r += debit;
+                            dCredit_r += credit;
 
-                        switch (oAccountMajor.getFkAccountSystemTypeId()) {
-                            case SDataConstantsSys.FINS_TP_ACC_SYS_SUP:
-                                anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL;
-                                anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_DEC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_INC_ADJ;
-                                anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP;
-                                break;
-                            case SDataConstantsSys.FINS_TP_ACC_SYS_CUS:
-                                anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL;
-                                anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_INC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_DEC_ADJ;
-                                anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS;
-                                break;
-                            case SDataConstantsSys.FINS_TP_ACC_SYS_CDR:
-                                anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_CDR_BAL;
-                                anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_DEC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_INC_ADJ;
-                                anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CDR;
-                                break;
-                            case SDataConstantsSys.FINS_TP_ACC_SYS_DBR:
-                                anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_DBR_BAL;
-                                anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_INC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_DEC_ADJ;
-                                anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR;
-                                break;
-                            default:
-                                anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_NA_NA;
-                                anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT : SModSysConsts.FINS_TP_SYS_MOV_JOU_CDT;
-                                anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_NA;
-                        }
+                            switch (oAccountMajor.getFkAccountSystemTypeId()) {
+                                case SDataConstantsSys.FINS_TP_ACC_SYS_SUP:
+                                    anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL;
+                                    anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_DEC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_INC_ADJ;
+                                    anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP;
+                                    break;
+                                case SDataConstantsSys.FINS_TP_ACC_SYS_CUS:
+                                    anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL;
+                                    anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_INC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_DEC_ADJ;
+                                    anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS;
+                                    break;
+                                case SDataConstantsSys.FINS_TP_ACC_SYS_CDR:
+                                    anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_CDR_BAL;
+                                    anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_DEC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_INC_ADJ;
+                                    anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CDR;
+                                    break;
+                                case SDataConstantsSys.FINS_TP_ACC_SYS_DBR:
+                                    anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_DBR_BAL;
+                                    anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_INC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_DEC_ADJ;
+                                    anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR;
+                                    break;
+                                default:
+                                    anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_NA_NA;
+                                    anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT : SModSysConsts.FINS_TP_SYS_MOV_JOU_CDT;
+                                    anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_NA;
+                            }
 
-                        oRecord.getDbmsRecordEntries().add(createRecordEntry(oRecord.getPrimaryKey(), SLibUtilities.textLeft(concept, 100),
-                                debit, credit, fk_acc_s, fk_cc_s, fk_item_n,
-                                oBizPartner == null ? SLibConstants.UNDEFINED : oBizPartner.getPkBizPartnerId(),
-                                oBizPartner == null ? SLibConstants.UNDEFINED : oBizPartner.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId(),
-                                new int[] { fk_tax_bas_n, fk_tax_tax_n }, anSysAccountTypeKey, anSysMoveTypeKey, anSysMoveTypeKeyXXX));
+                            oRecord.getDbmsRecordEntries().add(createRecordEntry(oRecord.getPrimaryKey(), SLibUtilities.textLeft(concept, 100),
+                                    debit, credit, fk_acc_s, fk_cc_s, fk_item_n,
+                                    oBizPartner == null ? SLibConstants.UNDEFINED : oBizPartner.getPkBizPartnerId(),
+                                    oBizPartner == null ? SLibConstants.UNDEFINED : oBizPartner.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId(),
+                                    new int[] { fk_tax_bas_n, fk_tax_tax_n }, anSysAccountTypeKey, anSysMoveTypeKey, anSysMoveTypeKeyXXX));
 
-                        // Create payroll move:
+                            // Create payroll move:
 
-                        oPayrollMove = new SDataFormerPayrollMove();
-                        oPayrollMove.setPkPayrollId(mnPayrollId);
-                        oPayrollMove.setPkMoveId(++nMoveId);
-                        oPayrollMove.setType(nType);
-                        oPayrollMove.setTransactionId(nF_id_aux);
-                        oPayrollMove.setTransaction(nF_aux);
-                        oPayrollMove.setReferenceId(nF_id_ref);
-                        oPayrollMove.setReference(sF_ref);
-                        oPayrollMove.setReferenceKey(sF_ref_cve);
-                        oPayrollMove.setAmount(dF_mto);
-                        oPayrollMove.setFkYearId(oRecord.getPkYearId());
-                        oPayrollMove.setFkPeriodId(oRecord.getPkPeriodId());
-                        oPayrollMove.setFkBookkeepingCenterId(oRecord.getPkBookkeepingCenterId());
-                        oPayrollMove.setFkRecordTypeId(oRecord.getPkRecordTypeId());
-                        oPayrollMove.setFkNumberId(oRecord.getPkNumberId());
-                        oPayrollMove.setFkEntryId(++nEntryId);
+                            oPayrollMove = new SDataFormerPayrollMove();
+                            oPayrollMove.setPkPayrollId(mnPayrollId);
+                            oPayrollMove.setPkMoveId(++nMoveId);
+                            oPayrollMove.setType(nType);
+                            oPayrollMove.setTransactionId(nF_id_aux);
+                            oPayrollMove.setTransaction(nF_aux);
+                            oPayrollMove.setReferenceId(nF_id_ref);
+                            oPayrollMove.setReference(sF_ref);
+                            oPayrollMove.setReferenceKey(sF_ref_cve);
+                            oPayrollMove.setAmount(dF_mto);
+                            oPayrollMove.setFkYearId(oRecord.getPkYearId());
+                            oPayrollMove.setFkPeriodId(oRecord.getPkPeriodId());
+                            oPayrollMove.setFkBookkeepingCenterId(oRecord.getPkBookkeepingCenterId());
+                            oPayrollMove.setFkRecordTypeId(oRecord.getPkRecordTypeId());
+                            oPayrollMove.setFkNumberId(oRecord.getPkNumberId());
+                            oPayrollMove.setFkEntryId(++nEntryId);
 
-                        moFormerPayroll.getDbmsDataFormerPayrollMove().add(oPayrollMove);
-                    } // end record
-                } // end configuration
+                            moFormerPayroll.getDbmsDataFormerPayrollMove().add(oPayrollMove);
+                        } // end record
+                    } // end configuration
+                }
+
+                moFormerPayroll.getAuxDataRecord().add(oRecord);
             }
-
-            moFormerPayroll.getAuxDataRecord().add(oRecord);
         }
         
         moFormerPayroll.setDebit_r(dDebit_r);
