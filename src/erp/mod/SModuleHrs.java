@@ -939,7 +939,7 @@ public class SModuleHrs extends SGuiModule {
                 form = moFormAbsenceType;
                 break;
             case SModConsts.HRSU_TP_EMP_DIS:
-                if (moFormEmployeeDismissType == null) moFormEmployeeDismissType = new SFormEmployeeDismissType(miClient, "Tipo baja empleado");
+                if (moFormEmployeeDismissType == null) moFormEmployeeDismissType = new SFormEmployeeDismissType(miClient, "Tipo baja");
                 form = moFormEmployeeDismissType;
                 break;
             case SModConsts.HRSU_TP_EMP:

@@ -20,6 +20,7 @@ import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanDialogReport;
+import sa.lib.gui.bean.SBeanFieldBoolean;
 import sa.lib.gui.bean.SBeanFieldRadio;
 
 /**
@@ -87,9 +88,11 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
         jPanel15 = new javax.swing.JPanel();
         jlEarning = new javax.swing.JLabel();
         moKeyEarning = new sa.lib.gui.bean.SBeanFieldKey();
+        moBoolShowEarnings = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel17 = new javax.swing.JPanel();
         jlDeduction = new javax.swing.JLabel();
         moKeyDeduction = new sa.lib.gui.bean.SBeanFieldKey();
+        moBoolShowDeductions = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel14 = new javax.swing.JPanel();
         jlPaymentType = new javax.swing.JLabel();
         moKeyPaymentType = new sa.lib.gui.bean.SBeanFieldKey();
@@ -232,6 +235,10 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
         moKeyEarning.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel15.add(moKeyEarning);
 
+        moBoolShowEarnings.setText("Mostrar percepciones");
+        moBoolShowEarnings.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel15.add(moBoolShowEarnings);
+
         jPanel5.add(jPanel15);
 
         jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -242,6 +249,10 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
 
         moKeyDeduction.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel17.add(moKeyDeduction);
+
+        moBoolShowDeductions.setText("Mostrar deducciones");
+        moBoolShowDeductions.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel17.add(moBoolShowDeductions);
 
         jPanel5.add(jPanel17);
 
@@ -350,6 +361,8 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
     private javax.swing.JRadioButton jrbOrderByNumEmployee;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolAllEmployee;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolIsDetail;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolShowDeductions;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolShowEarnings;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolShowEmployees;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
@@ -369,7 +382,7 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
     private sa.lib.gui.bean.SBeanFieldRadio moRadReportTypeEarDed;
     // End of variables declaration//GEN-END:variables
 
-    private void actionEnableFields() {
+    private void actionEnableFieldsDates() {
         if (moRadFilterTypePeriod.isSelected()) {
             moIntPeriodYear.setEnabled(true);
             moIntPeriodStart.setEnabled(true);    
@@ -384,6 +397,11 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
             moDateDateStart.setEnabled(true);
             moDateDateEnd.setEnabled(true);
         }
+    }
+    
+    private void actionEnableFieldsEarDed() {
+        moKeyEarning.setEnabled(moBoolShowEarnings.isSelected());
+        moKeyDeduction.setEnabled(moBoolShowDeductions.isSelected());
     }
     
     private String getOrderBy() {
@@ -453,12 +471,18 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
         moRadFilterTypePeriod.addChangeListener(this);
         moRadFilterTypeDate.addChangeListener(this);
         
+        moBoolShowEarnings.addChangeListener(this);
+        moBoolShowDeductions.addChangeListener(this);
+        
         moRadFilterTypePeriod.setSelected(true);
         moDateDateStart.setValue(SLibTimeUtils.getBeginOfYear(miClient.getSession().getCurrentDate()));
         moDateDateEnd.setValue(SLibTimeUtils.getEndOfYear(miClient.getSession().getCurrentDate()));
         
+        moBoolIsDetail.setSelected(true);
+        
         reloadCatalogues();
-        actionEnableFields();
+        actionEnableFieldsDates();
+        actionEnableFieldsEarDed();
     }
 
     private void populateEmployee() {
@@ -490,6 +514,13 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
             }
             else if (moRadFilterTypeDate.isSelected()) {
                 validation = SGuiUtils.validateDateRange(moDateDateStart, moDateDateEnd);
+            }
+            
+            if (validation.isValid()) {
+                if (!moKeyEarning.isEnabled() && !moKeyDeduction.isEnabled()) {
+                    validation.setMessage("Se debe especificar que quiere mostrar, percepciones ó deducciones.");
+                    validation.setComponent(moBoolShowEarnings);
+                }
             }
             
             if (validation.isValid()) {
@@ -560,8 +591,8 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
         moParamsMap.put("sDepartaments", sDepartamentsName.isEmpty() || (boolean) moPanelHrsDepartaments.getValue(SGuiConsts.PARAM_ROWS) ? "(TODOS)" : sDepartamentsName + " ");
         
         moParamsMap.put("sSqlWhere", sSqlWhere);
-        moParamsMap.put("sSqlWhereEarning", moKeyEarning.getSelectedIndex() > 0 ? " AND ear.id_ear = " + moKeyEarning.getValue()[0] : "");
-        moParamsMap.put("sSqlWhereDeduction", moKeyDeduction.getSelectedIndex() > 0 ? " AND ded.id_ded = " + moKeyDeduction.getValue()[0] : "");
+        moParamsMap.put("sSqlWhereEarning", !moKeyEarning.isEnabled() ? " AND ear.id_ear = 0 " : (moKeyEarning.getSelectedIndex() > 0 ? " AND ear.id_ear = " + moKeyEarning.getValue()[0] : ""));
+        moParamsMap.put("sSqlWhereDeduction", !moKeyDeduction.isEnabled() ? " AND ded.id_ded = 0 " : (moKeyDeduction.getSelectedIndex() > 0 ? " AND ded.id_ded = " + moKeyDeduction.getValue()[0] : ""));
         
         moParamsMap.put("sSqlOrderBy", mnFormType == SModConsts.HRSR_PAY_AUX_EAR_DED ? getOrderBy() : "");
     }
@@ -571,9 +602,15 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
         if (e.getSource() instanceof SBeanFieldRadio) {
             if ((SBeanFieldRadio) e.getSource() == moRadFilterTypePeriod ||
                     (SBeanFieldRadio) e.getSource() == moRadFilterTypeDate) {
-                actionEnableFields();
+                actionEnableFieldsDates();
             }
             
+        }
+        else if (e.getSource() instanceof SBeanFieldBoolean) {
+            if ((SBeanFieldBoolean) e.getSource() == moBoolShowEarnings ||
+                    (SBeanFieldBoolean) e.getSource() == moBoolShowDeductions) {
+                actionEnableFieldsEarDed();
+            }
         }
     }
 }

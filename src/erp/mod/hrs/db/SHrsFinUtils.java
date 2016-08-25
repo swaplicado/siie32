@@ -13,8 +13,10 @@ import erp.lib.SLibUtilities;
 import erp.mfin.data.SDataAccount;
 import erp.mfin.data.SDataCostCenter;
 import erp.mfin.data.SDataRecord;
+import erp.mod.SModConsts;
 import erp.mod.fin.db.SFinUtils;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import sa.lib.SLibConsts;
 import sa.lib.gui.SGuiSession;
 
@@ -83,6 +85,71 @@ public abstract class SHrsFinUtils {
             isRecord = true;
         }
         return isRecord;
+    }
+    
+    /**
+     * Validate if exists any accounting settings for all earning and deduction  of the payroll.
+     * @param session User GUI session.
+     * @param payrollId payroll ID to validate.
+     * @return
+     * @throws Exception 
+     */
+    public static boolean existsAccountingSettingsForPayrollAll(final SGuiSession session, final int payrollId) throws Exception {
+        String sql = "";
+        int payrollMovType;
+        int earningDeductionId;
+        String msgError = "";
+        SDbEarning earning = null;
+        SDbDeduction deduction = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        ResultSet resultSetAcc = null;
+        
+        statement = session.getStatement().getConnection().createStatement();
+        
+        sql = "SELECT DISTINCT " + SModConsts.HRS_PAY_RCP_EAR + " AS _tp, pre.fk_ear AS _id "
+                + "FROM hrs_pay AS p "
+                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                + "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                + "WHERE p.id_pay = " + payrollId + " "
+                + "UNION "
+                + "SELECT DISTINCT " + SModConsts.HRS_PAY_RCP_DED + " AS _tp, prd.fk_ded AS _id "
+                + "FROM hrs_pay AS p "
+                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                + "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
+                + "WHERE p.id_pay = " + payrollId + "; ";
+        
+        resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
+        while (resultSet.next()) {
+            payrollMovType = resultSet.getInt("_tp");
+            earningDeductionId = resultSet.getInt("_id");
+                    
+            if (payrollMovType == SModConsts.HRS_PAY_RCP_EAR) {
+                earning = new SDbEarning();
+                earning.read(session, new int[] { earningDeductionId });
+                
+                msgError = "percepción " + " No. " + earning.getCode() + " '" + earning.getNameAbbreviated()+ "'."; 
+                
+                sql = "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_EAR) + " "
+                        + "WHERE b_del = 0 AND id_ear = " + earningDeductionId;
+            }
+            else {
+                deduction = new SDbDeduction();
+                deduction.read(session, new int[] { earningDeductionId });
+                
+                msgError = "deducción " + " No. " + deduction.getCode() + " '" + deduction.getNameAbbreviated()+ "'."; 
+                
+                sql = "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_DED) + " "
+                        + "WHERE b_del = 0 AND id_ded = " + resultSet.getInt("_id");
+            }
+            
+            resultSetAcc = statement.executeQuery(sql);
+            if (!resultSetAcc.next()) {
+                throw new Exception("Falta la configuración de contabilización para la " + msgError);
+            }
+        }
+        
+        return true;
     }
     
     public static boolean validateAccount(final SGuiSession session, final int accountId, final int costCenterId, final int bizPartnerId, final int itemId, final int taxBasicId, final int taxTaxId) throws Exception {

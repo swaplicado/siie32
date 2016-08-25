@@ -1192,7 +1192,7 @@ public abstract class SHrsUtils {
         String sql = "";
         ResultSet resultSet = null;
 
-        sql = "SELECT COALESCE(MAX(num), 0) + 1 "
+        sql = "SELECT COALESCE(MAX(CAST(num AS UNSIGNED INTEGER)), 0) + 1 "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + "; ";
 
         resultSet = connection.createStatement().executeQuery(sql);

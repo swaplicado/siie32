@@ -58,6 +58,7 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
         jPanel22 = new javax.swing.JPanel();
         jlNameAbbreviated = new javax.swing.JLabel();
         moTextNameAbbreviated = new sa.lib.gui.bean.SBeanFieldText();
+        jlNameAbbreviatedHelp = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         jlDeductionType = new javax.swing.JLabel();
         moKeyDeductionType = new sa.lib.gui.bean.SBeanFieldKey();
@@ -124,6 +125,13 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
         moTextNameAbbreviated.setText("sBeanFieldText1");
         moTextNameAbbreviated.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel22.add(moTextNameAbbreviated);
+
+        jlNameAbbreviatedHelp.setForeground(new java.awt.Color(109, 109, 109));
+        jlNameAbbreviatedHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jlNameAbbreviatedHelp.setText("(Nombre utilizado para la contabilización y concepto en XML)");
+        jlNameAbbreviatedHelp.setToolTipText("");
+        jlNameAbbreviatedHelp.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel22.add(jlNameAbbreviatedHelp);
 
         jPanel2.add(jPanel22);
 
@@ -262,6 +270,7 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
     private javax.swing.JLabel jlLoanType;
     private javax.swing.JLabel jlName;
     private javax.swing.JLabel jlNameAbbreviated;
+    private javax.swing.JLabel jlNameAbbreviatedHelp;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolLoan;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolPayrollTax;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolWithholding;
