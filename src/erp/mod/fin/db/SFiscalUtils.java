@@ -4,7 +4,6 @@
  */
 package erp.mod.fin.db;
 
-import erp.lib.SLibUtilities;
 import erp.mcfg.data.SDataParamsCompany;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -721,7 +720,11 @@ public abstract class SFiscalUtils {
      * XML: Balanza de comprobación.
      */
 
-    public static int[] getLastChartOfAccountsPeriod(final SGuiSession session) throws Exception {
+    /**
+     * Gets the more recent available chart of accounts.
+     * @param session User GUI session.
+     */
+    public static int[] getLastChartOfAccounts(final SGuiSession session) throws Exception {
         int[] period = null;
         String sql = "";
         ResultSet resultSet = null;
@@ -730,6 +733,35 @@ public abstract class SFiscalUtils {
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_FISCAL_ACC_LINK) + " "
                 + "WHERE id_year = (SELECT MAX(id_year) FROM " + SModConsts.TablesMap.get(SModConsts.FIN_FISCAL_ACC_LINK) + ") "
                 + "GROUP BY f_year ";
+
+        resultSet = session.getStatement().executeQuery(sql);
+        if (!resultSet.next()) {
+            throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + "\nConfiguración para contabilidad en medios electrónicos.");
+        }
+        else {
+            period = new int[] { resultSet.getInt(1), resultSet.getInt(2) };
+        }
+
+        return period;
+    }
+
+    /**
+     * Gets the suitablest chart of accounts for requested year and month.
+     * @param session User GUI session.
+     * @param reqYear Requested year.
+     * @param reqMonth Requested month.
+     */
+    public static int[] getSuitableChartOfAccounts(final SGuiSession session, final int reqYear, final int reqMonth) throws Exception {
+        int[] period = null;
+        String sql = "";
+        ResultSet resultSet = null;
+
+        sql = "SELECT id_year AS f_year, MAX(id_per) AS f_month "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_FISCAL_ACC_LINK) + " "
+                + "WHERE (id_year = " + reqYear + " AND id_per <= " + reqMonth + ") OR id_year < " + reqYear + " "
+                + "GROUP BY id_year "
+                + "ORDER BY f_year DESC "
+                + "LIMIT 1";
 
         resultSet = session.getStatement().executeQuery(sql);
         if (!resultSet.next()) {
@@ -914,6 +946,14 @@ public abstract class SFiscalUtils {
         SXmlDocument xmlDoc = null;
         SXmlElement xmlCtas = null;
 
+        if (periodYear < SFiscalConsts.YEAR_MIN || periodYear > SLibTimeConsts.YEAR_MAX) {
+            throw new Exception("El atributo 'Anio' debe ser mínimo " + SFiscalConsts.YEAR_MIN + " y máximo " + SLibTimeConsts.YEAR_MAX + ".");
+        }
+
+        if (periodMonth < SLibTimeConsts.MONTH_MIN || periodMonth > SLibTimeConsts.MONTH_MAX) {
+            throw new Exception("El atributo 'Mes' debe ser mínimo " + SLibTimeConsts.MONTH_MIN + " y máximo " + SLibTimeConsts.MONTH_MAX + ".");
+        }
+
         company = (SDbBizPartner) session.readRegistry(SModConsts.BPSU_BP, new int[] { session.getConfigCompany().getCompanyId() });
 
         xmlDoc = new SXmlDocument("BCE:Balanza", false) {
@@ -938,7 +978,7 @@ public abstract class SFiscalUtils {
             xmlDoc.getXmlAttributes().add(new SXmlAttribute("FechaModBal", DateFormatFecha.format(lastModification)));
         }
 
-        coaPeriod = getLastChartOfAccountsPeriod(session);
+        coaPeriod = getSuitableChartOfAccounts(session, periodYear, periodMonth);
 
         sql = createQueryBalanza11(session, periodYear, periodMonth, coaPeriod[0], coaPeriod[1]);
 
@@ -1102,6 +1142,14 @@ public abstract class SFiscalUtils {
         SXmlElement xmlComp = null;
         SXmlElement xmlPago = null;
 
+        if (periodYear < SFiscalConsts.YEAR_MIN || periodYear > SLibTimeConsts.YEAR_MAX) {
+            throw new Exception("El atributo 'Anio' debe ser mínimo " + SFiscalConsts.YEAR_MIN + " y máximo " + SLibTimeConsts.YEAR_MAX + ".");
+        }
+
+        if (periodMonth < SLibTimeConsts.MONTH_MIN || periodMonth > SLibTimeConsts.MONTH_MAX) {
+            throw new Exception("El atributo 'Mes' debe ser mínimo " + SLibTimeConsts.MONTH_MIN + " y máximo " + SLibTimeConsts.MONTH_MAX + ".");
+        }
+
         company = (SDbBizPartner) session.readRegistry(SModConsts.BPSU_BP, new int[] { session.getConfigCompany().getCompanyId() });
 
         xmlDoc = new SXmlDocument("PLZ:Polizas", false) {
@@ -1129,15 +1177,7 @@ public abstract class SFiscalUtils {
             xmlDoc.getXmlAttributes().add(new SXmlAttribute("NumTramite", numTramite));
         }
 
-        coaPeriod = getLastChartOfAccountsPeriod(session);
-
-        if (periodYear < SFiscalConsts.YEAR_MIN || periodYear > SLibTimeConsts.YEAR_MAX) {
-            throw new Exception("El atributo 'Anio' debe ser mínimo " + SFiscalConsts.YEAR_MIN + " y máximo " + SLibTimeConsts.YEAR_MAX + ".");
-        }
-
-        if (periodMonth < SLibTimeConsts.MONTH_MIN || periodMonth > SLibTimeConsts.MONTH_MAX) {
-            throw new Exception("El atributo 'Mes' debe ser mínimo " + SLibTimeConsts.MONTH_MIN + " y máximo " + SLibTimeConsts.MONTH_MAX + ".");
-        }
+        coaPeriod = getSuitableChartOfAccounts(session, periodYear, periodMonth);
 
         /*
          * Obtain journal vouchers as follows:
@@ -1464,6 +1504,14 @@ public abstract class SFiscalUtils {
         SXmlElement xmlCuenta = null;
         SXmlElement xmlDetalleAux = null;
 
+        if (periodYear < SFiscalConsts.YEAR_MIN || periodYear > SLibTimeConsts.YEAR_MAX) {
+            throw new Exception("El atributo 'Anio' debe ser mínimo " + SFiscalConsts.YEAR_MIN + " y máximo " + SLibTimeConsts.YEAR_MAX + ".");
+        }
+
+        if (periodMonth < SLibTimeConsts.MONTH_MIN || periodMonth > SLibTimeConsts.MONTH_MAX) {
+            throw new Exception("El atributo 'Mes' debe ser mínimo " + SLibTimeConsts.MONTH_MIN + " y máximo " + SLibTimeConsts.MONTH_MAX + ".");
+        }
+
         company = (SDbBizPartner) session.readRegistry(SModConsts.BPSU_BP, new int[] { session.getConfigCompany().getCompanyId() });
 
         xmlDoc = new SXmlDocument("AuxiliarCtas:AuxiliarCtas", false) {
@@ -1491,15 +1539,7 @@ public abstract class SFiscalUtils {
             xmlDoc.getXmlAttributes().add(new SXmlAttribute("NumTramite", numTramite));
         }
 
-        coaPeriod = getLastChartOfAccountsPeriod(session);
-
-        if (periodYear < SFiscalConsts.YEAR_MIN || periodYear > SLibTimeConsts.YEAR_MAX) {
-            throw new Exception("El atributo 'Anio' debe ser mínimo " + SFiscalConsts.YEAR_MIN + " y máximo " + SLibTimeConsts.YEAR_MAX + ".");
-        }
-
-        if (periodMonth < SLibTimeConsts.MONTH_MIN || periodMonth > SLibTimeConsts.MONTH_MAX) {
-            throw new Exception("El atributo 'Mes' debe ser mínimo " + SLibTimeConsts.MONTH_MIN + " y máximo " + SLibTimeConsts.MONTH_MAX + ".");
-        }
+        coaPeriod = getSuitableChartOfAccounts(session, periodYear, periodMonth);
 
         dateOpen = SLibUtils.DbmsDateFormatDate.format(SLibTimeUtils.createDate(periodYear, periodMonth));
         dateClose = SLibUtils.DbmsDateFormatDate.format(SLibTimeUtils.getEndOfMonth(SLibTimeUtils.createDate(periodYear, periodMonth)));

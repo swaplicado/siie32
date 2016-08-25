@@ -77,6 +77,7 @@ public abstract class STableConstants {
     public static final int SETTING_OPTION_TAXES = 101;
     public static final int SETTING_OPTION_CURRENCY_LOCAL = 102;
     public static final int SETTING_OPTION_DATE_TYPE = 103;
+    public static final int SETTING_OPTION_SWITCH = 109;
 
     public static final int REFRESH_MODE_RESET = 1;
     public static final int REFRESH_MODE_RELOAD = 2;

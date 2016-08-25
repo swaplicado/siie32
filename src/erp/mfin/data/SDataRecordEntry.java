@@ -327,6 +327,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     public int[] getKeyBookkeepingNumber() { return new int[] { mnFkBookkeepingYearId_n, mnFkBookkeepingNumberId_n }; }
     public int[] getKeySystemMoveClass() { return new int[] { mnFkSystemMoveClassId }; }
     public int[] getKeySystemMoveType() { return new int[] { mnFkSystemMoveClassId, mnFkSystemMoveTypeId }; }
+    public int[] getKeySystemMoveTypeXXX() { return new int[] { mnFkSystemMoveCategoryIdXXX, mnFkSystemMoveTypeIdXXX }; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
