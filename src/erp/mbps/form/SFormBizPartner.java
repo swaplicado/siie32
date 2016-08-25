@@ -2534,8 +2534,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                                 validation.setMessage("Se debe ingresar un valor para el campo '" + jlCreditLimit.getText() + "'.");
                         }
                         else if ((moFieldFkBizPartnerCategoryId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_CT_BP_SUP || moFieldFkBizPartnerCategoryId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_CT_BP_CUS) &&
-                                jcbFkCreditTypeId_n.isEnabled() && (moFieldFkCreditTypeId_n.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_LIM || moFieldFkCreditTypeId_n.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_LIM_NO) && 
-                                moFieldDaysOfCredit.getDouble() == 0) {
+                                jcbFkCreditTypeId_n.isEnabled() && moFieldFkCreditTypeId_n.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_LIM && moFieldDaysOfCredit.getDouble() == 0) {
                                 validation.setComponent(jtfDaysOfCredit);
                                 validation.setMessage("Se debe ingresar un valor para el campo '" + jlDaysOfCredit.getText() + "'.");
                         }
