@@ -43,6 +43,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import sa.lib.SLibConsts;
 
 /**
  *
@@ -107,6 +108,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         jpPaymentNorth = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         jlAccountCash = new javax.swing.JLabel();
+        jtfCompanyBranchRo = new javax.swing.JTextField();
         jtfAccountCashRo = new javax.swing.JTextField();
         jtfAccountCashCodeRo = new javax.swing.JTextField();
         jtfAccountCashCurRo = new javax.swing.JTextField();
@@ -171,18 +173,24 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         jpPayment.setLayout(new java.awt.BorderLayout());
 
         jpPaymentNorth.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos de la cuenta de efectivo:"));
-        jpPaymentNorth.setLayout(new java.awt.GridLayout(4, 1, 0, 1));
+        jpPaymentNorth.setLayout(new java.awt.GridLayout(4, 1, 0, 2));
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlAccountCash.setText("Cuenta de efectivo:");
+        jlAccountCash.setText("Cuenta dinero:");
         jlAccountCash.setPreferredSize(new java.awt.Dimension(135, 23));
         jPanel11.add(jlAccountCash);
+
+        jtfCompanyBranchRo.setEditable(false);
+        jtfCompanyBranchRo.setText("COMPANY BRANCH");
+        jtfCompanyBranchRo.setFocusable(false);
+        jtfCompanyBranchRo.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel11.add(jtfCompanyBranchRo);
 
         jtfAccountCashRo.setEditable(false);
         jtfAccountCashRo.setText("CASH ACCOUNT");
         jtfAccountCashRo.setFocusable(false);
-        jtfAccountCashRo.setPreferredSize(new java.awt.Dimension(306, 23));
+        jtfAccountCashRo.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel11.add(jtfAccountCashRo);
 
         jtfAccountCashCodeRo.setEditable(false);
@@ -194,7 +202,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         jtfAccountCashCurRo.setEditable(false);
         jtfAccountCashCurRo.setText("CURRENCY");
         jtfAccountCashCurRo.setFocusable(false);
-        jtfAccountCashCurRo.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtfAccountCashCurRo.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel11.add(jtfAccountCashCurRo);
 
         jpPaymentNorth.add(jPanel11);
@@ -215,7 +223,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlAccExchangeRateSys.setText("Tipo de cambio de sistema:");
+        jlAccExchangeRateSys.setText("Tipo de cambio sistema:");
         jlAccExchangeRateSys.setPreferredSize(new java.awt.Dimension(135, 23));
         jPanel10.add(jlAccExchangeRateSys);
 
@@ -296,7 +304,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         jpPayment.add(jpPaymentCenter, java.awt.BorderLayout.CENTER);
 
         jpPaymentSouth.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del movimiento contable:"));
-        jpPaymentSouth.setLayout(new java.awt.GridLayout(3, 1, 0, 1));
+        jpPaymentSouth.setLayout(new java.awt.GridLayout(3, 1, 0, 2));
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
@@ -508,14 +516,14 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) { actionOk(); }
+            public void actionPerformed(ActionEvent e) { actionPerformedOk(); }
         };
 
         SFormUtilities.putActionMap(getRootPane(), actionOk, "ok", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
 
         AbstractAction actionCancel = new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) { actionCancel(); }
+            public void actionPerformed(ActionEvent e) { actionPerformedCancel(); }
         };
 
         SFormUtilities.putActionMap(getRootPane(), actionCancel, "cancel", KeyEvent.VK_ESCAPE, 0);
@@ -538,6 +546,8 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
     }
 
     private void renderParamSettings() {
+        SDataBizPartnerBranch branch = null;
+        
         if (moParamAccountCash == null) {
             jtfAccExchangeRateSysRo.setEnabled(false);
             jtfAccExchangeRate.setEnabled(false);
@@ -550,6 +560,8 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
             jtfAccExchangeRateSysRo.setText("");
             jtfAccExchangeRate.setText("");
 
+            jlAccountCash.setEnabled(false);
+            jtfCompanyBranchRo.setText("");
             jtfAccountCashRo.setText("");
             jtfAccountCashCodeRo.setText("");
             jtfAccountCashCurRo.setText("");
@@ -562,7 +574,10 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
             jcbFkCheckId_n.setEnabled(false);
         }
         else {
-            if (moParamAccountCash.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) {
+            branch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(
+                    miClient, SDataConstants.BPSU_BPB, new int[] { moParamRecord.getDbmsDataAccountCash().getPkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
+            
+            if (miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { moParamAccountCash.getFkCurrencyId() })) {
                 jtfAccExchangeRateSysRo.setEnabled(false);
                 jtfAccExchangeRate.setEnabled(false);
 
@@ -592,6 +607,8 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
                 }
             }
 
+            jlAccountCash.setEnabled(true);
+            jtfCompanyBranchRo.setText(branch.getBizPartnerBranch());
             jtfAccountCashRo.setText(moParamAccountCash.getDbmsCompanyBranchEntity().getEntity());
             jtfAccountCashCodeRo.setText(moParamAccountCash.getDbmsCompanyBranchEntity().getCode());
             jtfAccountCashCurRo.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.CFGU_CUR, new int[] { moParamAccountCash.getFkCurrencyId() }));
@@ -599,9 +616,8 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
             msAccCurKey = SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.CFGU_CUR, new int[] { moParamAccountCash.getFkCurrencyId() }, SLibConstants.DESCRIPTION_CODE);
 
             jckIsExchangeRatePreserverd.setEnabled(false);
-            jckIsExchangeRatePreserverd.setSelected(mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ?
-                miClient.getSessionXXX().getParamsCompany().getIsExchangeRatePurPreserved() :
-                miClient.getSessionXXX().getParamsCompany().getIsExchangeRateSalPreserved());
+            jckIsExchangeRatePreserverd.setSelected(mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? 
+                    miClient.getSessionXXX().getParamsCompany().getIsExchangeRatePurPreserved() : miClient.getSessionXXX().getParamsCompany().getIsExchangeRateSalPreserved());
 
             if ((mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP || mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS) && moParamAccountCash.getIsCheckWalletApplying()) {
                 jlFkCheckId_n.setEnabled(true);
@@ -615,7 +631,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
     }
 
     private void renderDpsSettings() {
-        if (moParamAccountCash == null || moDps == null) {
+        if (moDps == null) {
             jtfDpsValueCy.setEnabled(false);
             jtfDpsValue.setEnabled(false);
             jtfDpsExchangeRateSysRo.setEnabled(false);
@@ -631,13 +647,13 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
             jtfDpsValue.setText("");
             jtfDpsExchangeRateSysRo.setText("");
             jtfDpsExchangeRate.setText("");
-
+            
             jtfDpsValueCyCurKeyRo.setText("");
         }
         else {
             jtfDpsValueCy.setEnabled(true);
 
-            if (moDps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) {
+            if (miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { moDps.getFkCurrencyId() })) {
                 jtfDpsValue.setEnabled(false);
                 jtfDpsExchangeRateSysRo.setEnabled(false);
                 jtfDpsExchangeRate.setEnabled(false);
@@ -657,56 +673,66 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
                 jbDpsValue.setEnabled(true);
                 jbDpsExchangeRateSys.setEnabled(true);
                 jbDpsExchangeRate.setEnabled(true);
-                jbDpsExchangeRateCopy.setEnabled(moParamAccountCash.getFkCurrencyId() == moDps.getFkCurrencyId());
+                jbDpsExchangeRateCopy.setEnabled(moParamAccountCash != null && moParamAccountCash.getFkCurrencyId() == moDps.getFkCurrencyId());
             }
             
-            if (moFieldConcept.getString().length() == 0) {
-                updateConcept();
+            jtfDpsValueCyCurKeyRo.setText(miClient.getSession().getSessionCustom().getCurrencyCode(new int[] { moDps.getFkCurrencyId() }));
+            
+            if (moFieldConcept.getString().isEmpty()) {
+                actionPerformedConcept();
             }
-            jtfDpsValueCyCurKeyRo.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.CFGU_CUR, new int[] { moDps.getFkCurrencyId() }, SLibConstants.DESCRIPTION_CODE));
         }
     }
 
     private void updateDpsPayment() {
-        double excRate = 0;
+        double exr = 0;
 
         if (moDps != null && madDpsBalance != null) {
-            if (jckIsExchangeRatePreserverd.isSelected()) {
-                if (moDps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) {
+            if (!jckIsExchangeRatePreserverd.isSelected()) {
+                // Set default exchange rate:
+                
+                moFieldDpsExchangeRateSys.setFieldValue(madDpsBalance[1] == 0d ? 1d : madDpsBalance[0] / madDpsBalance[1]);
+                
+                moFieldDpsExchangeRate.setFieldValue(moFieldDpsExchangeRateSys.getDouble());    // default exchange rate aswell
+                
+                // Set default payment amount:
+                
+                moFieldDpsValueCy.setFieldValue(madDpsBalance[1]);
+                moFieldDpsValue.setFieldValue(madDpsBalance[0]);
+            }
+            else {
+                // Set default exchange rate:
+                
+                if (miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { moDps.getFkCurrencyId() })) {
                     moFieldDpsExchangeRateSys.setFieldValue(1d);
-                    moFieldDpsExchangeRate.setFieldValue(1d);
                 }
-                else if (moDps.getFkCurrencyId() == moParamAccountCash.getFkCurrencyId()) {
+                else if (moParamAccountCash != null && moParamAccountCash.getFkCurrencyId() == moDps.getFkCurrencyId()) {
                     moFieldDpsExchangeRateSys.setFieldValue(moFieldAccExchangeRateSys.getDouble());
-                    moFieldDpsExchangeRate.setFieldValue(moFieldAccExchangeRateSys.getDouble());
                 }
                 else {
                     try {
-                        excRate = SDataUtilities.obtainExchangeRate(miClient, moDps.getFkCurrencyId(), moParamRecord.getDate());
+                        exr = SDataUtilities.obtainExchangeRate(miClient, moDps.getFkCurrencyId(), moParamRecord.getDate());
                     }
                     catch (Exception e) {
                         SLibUtilities.renderException(this, e);
                     }
 
-                    moFieldDpsExchangeRateSys.setFieldValue(excRate);
-                    moFieldDpsExchangeRate.setFieldValue(excRate);
+                    moFieldDpsExchangeRateSys.setFieldValue(exr);
                 }
 
+                moFieldDpsExchangeRate.setFieldValue(moFieldDpsExchangeRateSys.getDouble());    // default exchange rate aswell
+                
+                // Set default payment amount:
+                
                 moFieldDpsValueCy.setFieldValue(madDpsBalance[1]);
                 moFieldDpsValue.setFieldValue(madDpsBalance[1] * moFieldDpsExchangeRate.getDouble());
-            }
-            else {
-                moFieldDpsValueCy.setFieldValue(madDpsBalance[1]);
-                moFieldDpsValue.setFieldValue(madDpsBalance[0]);
-                moFieldDpsExchangeRateSys.setFieldValue(madDpsBalance[1] == 0d ? 1d : madDpsBalance[0] / madDpsBalance[1]);
-                moFieldDpsExchangeRate.setFieldValue(madDpsBalance[1] == 0d ? 1d : madDpsBalance[0] / madDpsBalance[1]);
             }
         }
     }
 
-    private void updatePayment() {
-        if (moParamAccountCash != null && moDps != null) {
-            if (moParamAccountCash.getFkCurrencyId() == moDps.getFkCurrencyId()) {
+    private void updateDpsExchangeRate() {
+        if (moDps != null) {
+            if (moParamAccountCash != null && moParamAccountCash.getFkCurrencyId() == moDps.getFkCurrencyId()) {
                 if (moFieldDpsValueCy.getDouble() == 0d) {
                     moFieldDpsExchangeRateSys.setFieldValue(moFieldAccExchangeRateSys.getDouble());
                     moFieldDpsExchangeRate.setFieldValue(moFieldAccExchangeRate.getDouble());
@@ -715,19 +741,8 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         }
     }
     
-    private void updateConcept() {
-        String bizPartner = "";
-        
-        if (moDps != null) {
-            bizPartner = miClient.getSession().readField(SModConsts.BPSU_BP, new int[] { moDps.getFkBizPartnerId_r() }, SDbBizPartner.FIELD_NAME_COMM) + "";
-
-            moFieldConcept.setString((jcbFkCheckId_n.getSelectedIndex() > 0 ? "CH " + ((Integer) ((SFormComponentItem) jcbFkCheckId_n.getSelectedItem()).getComplement()) + " / " + moParamAccountCash.getAuxCode() + " / " : "") + 
-                            "F " + (!moDps.getNumberSeries().isEmpty() ? moDps.getNumberSeries() + "-" : "") + moDps.getNumber() + " / " + bizPartner);
-        }
-    }
-
     private void focusLostAccExchangeRate() {
-        updatePayment();
+        updateDpsExchangeRate();
     }
 
     private void focusLostDpsValueCy() {
@@ -765,7 +780,29 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         */
     }
 
-    private void actionAccExchangeRateSys() {
+    private void actionPerformedOk() {
+        SFormValidation validation = formValidate();
+
+        if (validation.getIsError()) {
+            if (validation.getComponent() != null) {
+                validation.getComponent().requestFocus();
+            }
+            if (validation.getMessage().length() > 0) {
+                miClient.showMsgBoxWarning(validation.getMessage());
+            }
+        }
+        else {
+            mnFormResult = SLibConstants.FORM_RESULT_OK;
+            setVisible(false);
+        }
+    }
+
+    private void actionPerformedCancel() {
+        mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
+        setVisible(false);
+    }
+
+    private void actionPerformedAccExchangeRateSys() {
         double rate = miClient.pickExchangeRate(moParamAccountCash.getFkCurrencyId(), moParamRecord.getDate());
 
         if (rate != 0d) {
@@ -775,12 +812,12 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         }
     }
 
-    private void actionAccExchangeRate() {
+    private void actionPerformedAccExchangeRate() {
         moFieldAccExchangeRate.setFieldValue(moFieldAccExchangeRateSys.getDouble());
         moFieldAccExchangeRate.getComponent().requestFocus();
     }
 
-    private void actionAccExchangeRateAcumView() {
+    private void actionPerformedAccExchangeRateAcumView() {
         miClient.showMsgBoxInformation(
                 "Tipo de cambio acumulado al día: " + miClient.getSessionXXX().getFormatters().getDateFormat().format(moParamRecord.getDate()) + "\n" +
                 "Saldo " + miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey() + ": $ " +
@@ -790,12 +827,12 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
                 "Tipo de cambio acumulado: " + miClient.getSessionXXX().getFormatters().getDecimalsExchangeRateFormat().format(madParamAccountCashBal[1] == 0d ? 0d : madParamAccountCashBal[0] / madParamAccountCashBal[1]) + ".");
     }
 
-    private void actionAccExchangeRateAcumSet() {
+    private void actionPerformedAccExchangeRateAcumSet() {
         moFieldAccExchangeRate.setFieldValue(madParamAccountCashBal[1] == 0d ? 0d : madParamAccountCashBal[0] / madParamAccountCashBal[1]);
         moFieldAccExchangeRate.getComponent().requestFocus();
     }
 
-    private void actionDpsValueCy() {
+    private void actionPerformedDpsValueCy() {
         if (moFieldDpsExchangeRate.getDouble() == 0d) {
             moFieldDpsExchangeRate.getComponent().requestFocus();
         }
@@ -806,7 +843,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         }
     }
 
-    private void actionDpsValue() {
+    private void actionPerformedDpsValue() {
         if (moFieldDpsExchangeRate.getDouble() == 0d) {
             moFieldDpsExchangeRate.getComponent().requestFocus();
         }
@@ -817,7 +854,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         }
     }
 
-    private void actionDpsExchangeRateSys() {
+    private void actionPerformedDpsExchangeRateSys() {
         double rate = miClient.pickExchangeRate(moDps.getFkCurrencyId(), moParamRecord.getDate());
 
         if (rate != 0d) {
@@ -827,7 +864,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         }
     }
 
-    private void actionDpsExchangeRate() {
+    private void actionPerformedDpsExchangeRate() {
         if (moFieldDpsValueCy.getDouble() != 0d) {
             if (moFieldDpsValue.getDouble() == 0d) {
                 moFieldDpsValue.getComponent().requestFocus();
@@ -846,31 +883,20 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         }
     }
     
-    private void actionDpsExchangeRateCopy() {
+    private void actionPerformedDpsExchangeRateCopy() {
         moFieldDpsExchangeRate.setFieldValue(moFieldAccExchangeRate.getDouble());
         moFieldDpsExchangeRate.getComponent().requestFocus();
     }
 
-    private void actionOk() {
-        SFormValidation validation = formValidate();
+    private void actionPerformedConcept() {
+        String bizPartner = "";
+        
+        if (moDps != null) {
+            bizPartner = miClient.getSession().readField(SModConsts.BPSU_BP, new int[] { moDps.getFkBizPartnerId_r() }, SDbBizPartner.FIELD_NAME_COMM) + "";
 
-        if (validation.getIsError()) {
-            if (validation.getComponent() != null) {
-                validation.getComponent().requestFocus();
-            }
-            if (validation.getMessage().length() > 0) {
-                miClient.showMsgBoxWarning(validation.getMessage());
-            }
+            moFieldConcept.setString((jcbFkCheckId_n.getSelectedIndex() > 0 ? "CH " + ((Integer) ((SFormComponentItem) jcbFkCheckId_n.getSelectedItem()).getComplement()) + " / " + moParamAccountCash.getAuxCode() + " / " : "") + 
+                            "F " + (!moDps.getNumberSeries().isEmpty() ? moDps.getNumberSeries() + "-" : "") + moDps.getNumber() + " / " + bizPartner);
         }
-        else {
-            mnFormResult = SLibConstants.FORM_RESULT_OK;
-            setVisible(false);
-        }
-    }
-
-    private void actionCancel() {
-        mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
-        setVisible(false);
     }
 
     public void actionDps() {
@@ -933,6 +959,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
     private javax.swing.JTextField jtfAccountCashCodeRo;
     private javax.swing.JTextField jtfAccountCashCurRo;
     private javax.swing.JTextField jtfAccountCashRo;
+    private javax.swing.JTextField jtfCompanyBranchRo;
     private javax.swing.JTextField jtfConcept;
     private javax.swing.JTextField jtfDateRo;
     private javax.swing.JTextField jtfDpsExchangeRate;
@@ -986,7 +1013,6 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
 
     @Override
     public erp.lib.form.SFormValidation formValidate() {
-        int decs = miClient.getSessionXXX().getParamsErp().getDecimalsValue();
         String msg = "";
         SFormValidation validation = new SFormValidation();
 
@@ -1029,33 +1055,17 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
                                 }
                             }
                         }
-
-                        /*
-                        if (!validation.getIsError()) {
-                            if (moFieldDpsValue.getDouble() > madDpsBalance[0]) {
-                                msg = "El valor para el campo '" + jlDpsValue.getText() + "' no debería ser mayor al saldo del documento en " + jtfDpsValueCurKeyRo.getText() + ".\n" +
-                                        "Existe una diferencia de " + miClient.getSessionXXX().getFormatters().getDecimalsCurrencyFormat().format(Math.abs(moFieldDpsValue.getDouble() - madDpsBalance[0])) + ".\n" + SLibConstants.MSG_CNF_MSG_CONT;
-                                if (miClient.showMsgBoxConfirm(msg) != JOptionPane.YES_OPTION) {
-                                    msg = "El valor para el campo '" + jlDpsValue.getText() + "' debe ser menor o igual a " +
-                                            miClient.getSessionXXX().getFormatters().getDecimalsCurrencyFormat().format(madDpsBalance[0]) + " " + jtfDpsValueCurKeyRo.getText() + ".\n";
-                                    validation.setMessage(msg);
-                                    if (jtfDpsValue.isEnabled()) {
-                                        validation.setComponent(jtfDpsValue);
-                                    }
-                                }
-                            }
-                        }
-                        */
                     }
                 }
             }
         }
+        
         if (!validation.getIsError()) {
             try {
                 Vector<SFinAccountConfigEntry> config = SFinAccountUtilities.obtainBizPartnerAccountConfigs(miClient, moDps.getFkBizPartnerId_r(), mnBizPartnerCategoryId,
                         moParamRecord.getPkBookkeepingCenterId(), moParamRecord.getDate(), SDataConstantsSys.FINS_TP_ACC_BP_OP, moDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL);
                 if (config == null) {
-                    validation.setMessage("No se encuentra la cuenta contable del asociado de negocio");
+                    validation.setMessage("No se encuentró la cuenta contable del asociado de negocios.");
                 }
             }
             catch (Exception e) {
@@ -1093,7 +1103,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
 
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
-        double excDiff = 0;
+        int idBranch = SLibConsts.UNDEFINED;
         SDataDsmEntry oDsmEntry = new SDataDsmEntry();
         SDataDsm oDsm = new SDataDsm();
         SDataRecord oRecord = null;
@@ -1119,19 +1129,14 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         oDsmEntry.setFkDestinyCurrencyId(moDps.getFkCurrencyId());
         oDsmEntry.setDestinyValueCy(moFieldDpsValueCy.getDouble());
         oDsmEntry.setDestinyValue(moFieldDpsValue.getDouble());
-        oDsmEntry.setDestinyExchangeRateSystem(moFieldDpsExchangeRateSys.getDouble() == 0 ? moFieldDpsExchangeRate.getDouble() : moFieldDpsExchangeRateSys.getDouble());
+        oDsmEntry.setDestinyExchangeRateSystem(moFieldDpsExchangeRateSys.getDouble() != 0 ? moFieldDpsExchangeRateSys.getDouble() : moFieldDpsExchangeRate.getDouble());
         oDsmEntry.setDestinyExchangeRate(moFieldDpsExchangeRate.getDouble());
         oDsmEntry.setDbmsFkDpsCategoryId(moDps.getFkDpsCategoryId());
-        oDsmEntry.setDbmsDestinyDps((moDps.getNumberSeries().toString().length() > 0 ? moDps.getNumberSeries() + "-" : "") + moDps.getNumber());
+        oDsmEntry.setDbmsDestinyDps(moDps.getDpsNumber());
         oDsmEntry.setDbmsSubclassMove(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_CLS_ACC_MOV, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP));
         oDsmEntry.setDbmsBiz(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSU_BP, new int[] { moDps.getFkBizPartnerId_r() }));
         oDsmEntry.setDbmsDestinyTpDps(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNU_TP_DPS, new int[] { moDps.getFkDpsCategoryId(), moDps.getFkDpsClassId(), moDps.getFkDpsTypeId() }, SLibConstants.DESCRIPTION_CODE));
 
-        /*
-        oDsmEntry.setFkAccountingMoveTypeId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[0]);
-        oDsmEntry.setFkAccountingMoveClassId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[1]);
-        oDsmEntry.setFkAccountingMoveSubclassId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[2]);
-        */
         oDsmEntry.setFkAccountingMoveTypeId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[0]);
         oDsmEntry.setFkAccountingMoveClassId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[1]);
         oDsmEntry.setFkAccountingMoveSubclassId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[2]);
@@ -1161,19 +1166,19 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
                 break;
         }
 
-        branch = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranch(new int[] {moParamRecord.getFkCompanyBranchId_n()});
+        idBranch = moParamRecord.getFkCompanyBranchId_n() != SLibConsts.UNDEFINED ? moParamRecord.getFkCompanyBranchId_n() : moParamRecord.getFkCompanyBranchId();
+        branch = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranch(new int[] { idBranch });
 
         oDsm.setDbmsErpTaxModel(miClient.getSessionXXX().getParamsErp().getTaxModel());
         oDsm.setDate(miClient.getSessionXXX().getWorkingDate());
         oDsm.setFkSubsystemCategoryId(mnBizPartnerCategoryId);
-        oDsm.setFkCompanyBranchId(moParamRecord.getFkCompanyBranchId_n());
+        oDsm.setFkCompanyBranchId(idBranch);
         oDsm.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
-        oDsm.setDbmsFkCompanyBranch(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getPkBizPartnerBranchId());
+        oDsm.setDbmsFkCompanyBranch(moParamRecord.getFkCompanyBranchId());
         oDsm.setDbmsCompanyBranchCode(branch.getCode());
         oDsm.setDbmsErpDecimalsValue(miClient.getSessionXXX().getParamsErp().getDecimalsValue());
         oDsm.setDbmsIsRecordSaved(false);
         oDsm.getDbmsEntry().add(oDsmEntry);
-
 
         try {
             oDsm = (SDataDsm) miClient.getGuiModule(SDataConstants.MOD_FIN).processRegistry(oDsm);
@@ -1192,16 +1197,11 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
                 }
             }
 
-            for (SDataRecordEntry entry : oRecord.getDbmsRecordEntries()) {
-                if (moFieldConcept.getString().length() > 0) {
+            if (!moFieldConcept.getString().isEmpty()) {
+                for (SDataRecordEntry entry : oRecord.getDbmsRecordEntries()) {
                     entry.setConcept(moFieldConcept.getString());
                 }
             }
-            /*
-            if (moFieldConcept.getString().length() > 0 && oRecord.getDbmsRecordEntries().size() >= 1) {
-                oRecord.getDbmsRecordEntries().get(0).setConcept(moFieldConcept.getString());
-            }
-            */
         }
         catch(Exception e) {
             SLibUtilities.renderException(this, e);
@@ -1271,40 +1271,40 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
             javax.swing.JButton button = (javax.swing.JButton) e.getSource();
 
             if (button == jbOk) {
-                actionOk();
+                actionPerformedOk();
             }
             else if (button == jbCancel) {
-                actionCancel();
+                actionPerformedCancel();
             }
             else if (button == jbAccExchangeRateSys) {
-                actionAccExchangeRateSys();
+                actionPerformedAccExchangeRateSys();
             }
             else if (button == jbAccExchangeRate) {
-                actionAccExchangeRate();
+                actionPerformedAccExchangeRate();
             }
             else if (button == jbAccExchangeRateAcumView) {
-                actionAccExchangeRateAcumView();
+                actionPerformedAccExchangeRateAcumView();
             }
             else if (button == jbAccExchangeRateAcumSet) {
-                actionAccExchangeRateAcumSet();
+                actionPerformedAccExchangeRateAcumSet();
             }
             else if (button == jbDpsValueCy) {
-                actionDpsValueCy();
+                actionPerformedDpsValueCy();
             }
             else if (button == jbDpsValue) {
-                actionDpsValue();
+                actionPerformedDpsValue();
             }
             else if (button == jbDpsExchangeRateSys) {
-                actionDpsExchangeRateSys();
+                actionPerformedDpsExchangeRateSys();
             }
             else if (button == jbDpsExchangeRate) {
-                actionDpsExchangeRate();
+                actionPerformedDpsExchangeRate();
             }
             else if (button == jbDpsExchangeRateCopy) {
-                actionDpsExchangeRateCopy();
+                actionPerformedDpsExchangeRateCopy();
             }
             else if (button == jbConcept) {
-                updateConcept();
+                actionPerformedConcept();
             }
         }
     }

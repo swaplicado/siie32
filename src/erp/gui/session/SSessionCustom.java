@@ -730,7 +730,7 @@ public class SSessionCustom implements SGuiSessionCustom {
         return taxGroup;
     }
 
-    public ArrayList<SDataDpsEntryTax> getDpsEntryTaxes(int idItem, int idTaxRegion, int idIdyEmisor, int idIdyReceptor, Date date, double quantity, double amountCy, double exchangeRate) throws SQLException, Exception {
+    public ArrayList<SDataDpsEntryTax> getDpsEntryTaxes(int idItem, boolean isPrepayment, int idTaxRegion, int idIdyEmisor, int idIdyReceptor, Date date, double quantity, double amountCy, double exchangeRate) throws SQLException, Exception {
         int order = 0;
         boolean orderFound = false;
         double amountTaxCy = 0;
@@ -766,12 +766,12 @@ public class SSessionCustom implements SGuiSessionCustom {
                             entryTax.setValue(tax.getValue());
                             entryTax.setFkTaxTypeId(tax.getFkTaxTypeId());
                             entryTax.setFkTaxCalculationTypeId(tax.getFkTaxCalculationTypeId());
-                            entryTax.setFkTaxApplicationTypeId(tax.getFkTaxApplicationTypeId());
+                            entryTax.setFkTaxApplicationTypeId(isPrepayment && quantity >= 0 ? SModSysConsts.FINS_TP_TAX_APP_ACCR : tax.getFkTaxApplicationTypeId());
 
                             entryTax.setDbmsTax(tax.getTax());
                             entryTax.setDbmsTaxType(tax.getTaxType());
                             entryTax.setDbmsTaxCalculationType(tax.getTaxCalculationType());
-                            entryTax.setDbmsTaxApplicationType(tax.getTaxApplicationType());
+                            entryTax.setDbmsTaxApplicationType(isPrepayment && quantity >= 0 ? SModSysConsts.FINS_TP_TAX_APP_ACCR_NAME : tax.getTaxApplicationType());
 
                             switch (tax.getFkTaxCalculationTypeId()) {
                                 case SModSysConsts.FINS_TP_TAX_CAL_RATE:

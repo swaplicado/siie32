@@ -1245,7 +1245,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
             try {
                 mvDbmsEntryTaxes.clear();
                 mvDbmsEntryTaxes.addAll(((SSessionCustom) piClient.getSession().getSessionCustom()).getDpsEntryTaxes(
-                        mnFkItemId, mnFkTaxRegionId, pnIdyEmisorId, pnIdyReceptorId, ptDate, mdQuantity, mdSubtotalCy_r, pdExchangeRate));
+                        mnFkItemId, mbIsPrepayment, mnFkTaxRegionId, pnIdyEmisorId, pnIdyReceptorId, ptDate, mdQuantity, mdSubtotalCy_r, pdExchangeRate));
             }
             catch (Exception e) {
                 SLibUtils.showException(this, e);

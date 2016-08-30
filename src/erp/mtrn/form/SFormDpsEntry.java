@@ -2259,7 +2259,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
             if (moParamDps.isDocumentOrAdjustmentSal() && mbEnableDataAddenda) {
                 jTabbedPane.setEnabledAt(TAB_CFD, true);
-                renderAddendaDatas();
+                renderAddendaData();
             }
             else {
                 jTabbedPane.setEnabledAt(TAB_CFD, false);
@@ -2318,7 +2318,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moDpsEntry.setFkUnitId(moItem.getFkUnitId());
             moDpsEntry.setFkOriginalUnitId(moFieldFkOriginalUnitId.getKeyAsIntArray()[0]);
             moDpsEntry.setFkTaxRegionId(moFieldFkTaxRegionId.getKeyAsIntArray()[0]);
-
+            moDpsEntry.setIsPrepayment(moItem.getIsPrepayment());
+            
             moDpsEntry.setDbmsFkItemGenericId(moItem.getFkItemGenericId());
 
             moDpsEntry.calculateTotal(miClient, moParamDps.getDate(),
@@ -2615,7 +2616,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             if (moParamDps.isDocumentOrAdjustmentSal() && mbEnableDataAddenda) {
                 SFormUtilities.populateComboBox(miClient, jcbAddendaFkBarcode, SDataConstants.ITMU_ITEM_BARC, new int[] { moItem.getPkItemId() });
                 jcbAddendaFkBarcode.removeItemAt(0);
-                renderAddendaDatas();
+                renderAddendaData();
             }
             
             // Initialize fields:
@@ -2852,7 +2853,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         }
     }
 
-    private void renderAddendaDatas() {
+    private void renderAddendaData() {
         if (jbOk.isEnabled()) {
             switch(moParamBizPartner.getDbmsCategorySettingsCus().getFkCfdAddendaTypeId()) {
                 case SDataConstantsSys.BPSS_TP_CFD_ADD_NA:
@@ -2895,7 +2896,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         }
     }
 
-    private void setAddendaDatas() {
+    private void setAddendaData() {
         String sCenter = "";
         
         switch(moParamBizPartner.getDbmsCategorySettingsCus().getFkCfdAddendaTypeId()) {
@@ -4653,10 +4654,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldOriginalDiscountUnitaryCy.setFieldValue(moDpsEntry.getOriginalDiscountUnitaryCy());
         moFieldDiscountEntryCy.setFieldValue(moDpsEntry.getDiscountEntryCy());
         moFieldDiscountDocCy.setFieldValue(moDpsEntry.getDiscountDocCy());
-        
-        
-        
-        
+        // ...
         moFieldLength.setFieldValue(moDpsEntry.getLength());
         moFieldSurface.setFieldValue(moDpsEntry.getSurface());
         moFieldVolume.setFieldValue(moDpsEntry.getVolume());
@@ -4728,7 +4726,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         if (moParamDps.isDocumentOrAdjustmentSal()) {
             jTabbedPane.setEnabledAt(TAB_CFD, true);
-            setAddendaDatas();
+            setAddendaData();
         }
 
         mbResetingForm = false;
