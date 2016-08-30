@@ -105,6 +105,11 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
      */
     
     private void computeReceiptValue() {
+        mdEarningsExemption_r = 0;
+        mdEarningsTaxable_r = 0;
+        mdEarnings_r = 0;
+        mdDeductions_r = 0;
+        
         for (SDbPayrollReceiptEarning earning : maChildPayrollReceiptEarnings) {
             mdEarningsExemption_r += earning.getAmountExempt();
             mdEarningsTaxable_r += earning.getAmountTaxable();
