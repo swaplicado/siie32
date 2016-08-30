@@ -34,14 +34,17 @@ import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import sa.lib.SLibConsts;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
-public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener {
+public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.FocusListener {
 
     private int mnFormType;
     private int mnFormResult;
@@ -54,9 +57,9 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
     private erp.mfin.data.SDataCheck moCheck;
     private erp.lib.form.SFormField moFieldConcept;
     private erp.lib.form.SFormField moFieldFkBizPartnerId;
-    private erp.lib.form.SFormField moFieldFkCurrencyBizPartnerId;
+    private erp.lib.form.SFormField moFieldFkBizPartnerCurrencyId;
     private erp.lib.form.SFormField moFieldValueCy;
-    private erp.lib.form.SFormField moFieldExchangeRateSystem;
+    private erp.lib.form.SFormField moFieldExchangeRateSys;
     private erp.lib.form.SFormField moFieldValue;
     private erp.lib.form.SFormField moFieldExchangeRate;
     private erp.lib.form.SFormField moFieldFkCheckId_n;
@@ -65,7 +68,7 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
 
     private erp.mfin.data.SDataRecord moParamRecord;
     private erp.mfin.data.SDataRecordEntry moRecordEntry;
-    private erp.mcfg.data.SDataCurrency moCurrency;
+    private erp.mcfg.data.SDataCurrency moCurrencyRecord;
     private erp.mcfg.data.SDataCurrency moCurrencyBizPartner;
     private int mnParamBizPartnerCategory;
     private int[] manParamAccountingMove;
@@ -100,29 +103,29 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
         jlAccountCash = new javax.swing.JLabel();
         jtfCompanyBranch = new javax.swing.JTextField();
         jtfAccountCash = new javax.swing.JTextField();
-        jtfCode = new javax.swing.JTextField();
+        jtfAccountCashCode = new javax.swing.JTextField();
         jPanel8 = new javax.swing.JPanel();
-        jlCurrency = new javax.swing.JLabel();
-        jtfCurrency = new javax.swing.JTextField();
+        jlAccountCashCurrency = new javax.swing.JLabel();
+        jtfAccountCashCurrency = new javax.swing.JTextField();
         jPanel9 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jlFkBizPartnerId = new javax.swing.JLabel();
         jcbFkBizPartnerId = new javax.swing.JComboBox();
         jbFkBizPartnerId = new javax.swing.JButton();
         jPanel13 = new javax.swing.JPanel();
-        jlCurrencyBizPartner = new javax.swing.JLabel();
-        jtfCurrencyBizPartner = new javax.swing.JTextField();
+        jlBizPartnerCurrency = new javax.swing.JLabel();
+        jtfBizPartnerCurrency = new javax.swing.JTextField();
         jPanel5 = new javax.swing.JPanel();
-        jlFkCurrencyBizPartnerId = new javax.swing.JLabel();
-        jcbFkCurrencyBizPartnerId = new javax.swing.JComboBox();
-        jbFkCurrencyBizPartnerId = new javax.swing.JButton();
+        jlFkBizPartnerCurrencyId = new javax.swing.JLabel();
+        jcbFkBizPartnerCurrencyId = new javax.swing.JComboBox();
+        jbFkBizPartnerCurrencyId = new javax.swing.JButton();
         jPanel10 = new javax.swing.JPanel();
         jlValueCy = new javax.swing.JLabel();
         jtfValueCy = new javax.swing.JTextField();
         jbValueCy = new javax.swing.JButton();
-        jlExchangeRateSystem = new javax.swing.JLabel();
-        jtfExchangeRateSystem = new javax.swing.JTextField();
-        jbExchangeRateSystem = new javax.swing.JButton();
+        jlExchangeRateSys = new javax.swing.JLabel();
+        jtfExchangeRateSys = new javax.swing.JTextField();
+        jbExchangeRateSys = new javax.swing.JButton();
         jbExchangeRateAccountCashView = new javax.swing.JButton();
         jPanel11 = new javax.swing.JPanel();
         jlValue = new javax.swing.JLabel();
@@ -131,9 +134,9 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
         jlExchangeRate = new javax.swing.JLabel();
         jtfExchangeRate = new javax.swing.JTextField();
         jbExchangeRate = new javax.swing.JButton();
-        jbExchangeRateAccountCash = new javax.swing.JButton();
+        jbExchangeRateAccountCashSet = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
-        jckIsCheckApplying = new javax.swing.JCheckBox();
+        jckCheckApplying = new javax.swing.JCheckBox();
         jcbFkCheckId_n = new javax.swing.JComboBox();
         jPanel12 = new javax.swing.JPanel();
         jlConcept = new javax.swing.JLabel();
@@ -165,62 +168,57 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel3.setLayout(new java.awt.GridLayout(11, 1, 0, 1));
+        jPanel3.setLayout(new java.awt.GridLayout(10, 1, 0, 2));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlAccountCash.setText("Cuenta de efectivo: ");
+        jlAccountCash.setText("Cuenta de dinero:");
         jlAccountCash.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel4.add(jlAccountCash);
 
         jtfCompanyBranch.setEditable(false);
         jtfCompanyBranch.setText("COMPANY BRANCH");
         jtfCompanyBranch.setFocusable(false);
-        jtfCompanyBranch.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtfCompanyBranch.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel4.add(jtfCompanyBranch);
 
         jtfAccountCash.setEditable(false);
         jtfAccountCash.setText("ACCOUNT CASH");
         jtfAccountCash.setFocusable(false);
-        jtfAccountCash.setPreferredSize(new java.awt.Dimension(170, 23));
+        jtfAccountCash.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel4.add(jtfAccountCash);
 
-        jtfCode.setEditable(false);
-        jtfCode.setText("CODE");
-        jtfCode.setFocusable(false);
-        jtfCode.setPreferredSize(new java.awt.Dimension(73, 23));
-        jPanel4.add(jtfCode);
+        jtfAccountCashCode.setEditable(false);
+        jtfAccountCashCode.setText("CODE");
+        jtfAccountCashCode.setFocusable(false);
+        jtfAccountCashCode.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel4.add(jtfAccountCashCode);
 
         jPanel3.add(jPanel4);
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlCurrency.setText("Moneda cuenta de efectivo:");
-        jlCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel8.add(jlCurrency);
+        jlAccountCashCurrency.setText("Moneda cuenta de dinero:");
+        jlAccountCashCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel8.add(jlAccountCashCurrency);
 
-        jtfCurrency.setEditable(false);
-        jtfCurrency.setText("CURRENCY");
-        jtfCurrency.setFocusable(false);
-        jtfCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel8.add(jtfCurrency);
+        jtfAccountCashCurrency.setEditable(false);
+        jtfAccountCashCurrency.setText("CURRENCY");
+        jtfAccountCashCurrency.setFocusable(false);
+        jtfAccountCashCurrency.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel8.add(jtfAccountCashCurrency);
 
         jPanel3.add(jPanel8);
         jPanel3.add(jPanel9);
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlFkBizPartnerId.setText("Asociado de negocios: *");
+        jlFkBizPartnerId.setText("Asociado negocios: *");
         jlFkBizPartnerId.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel6.add(jlFkBizPartnerId);
 
         jcbFkBizPartnerId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkBizPartnerId.setPreferredSize(new java.awt.Dimension(372, 23));
-        jcbFkBizPartnerId.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jcbFkBizPartnerIdItemStateChanged(evt);
-            }
-        });
+        jcbFkBizPartnerId.setPreferredSize(new java.awt.Dimension(375, 23));
         jPanel6.add(jcbFkBizPartnerId);
 
         jbFkBizPartnerId.setText("jButton1");
@@ -233,38 +231,33 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlCurrencyBizPartner.setText("Moneda asociado de negocios:");
-        jlCurrencyBizPartner.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel13.add(jlCurrencyBizPartner);
+        jlBizPartnerCurrency.setText("Moneda asociado negocios:");
+        jlBizPartnerCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel13.add(jlBizPartnerCurrency);
 
-        jtfCurrencyBizPartner.setEditable(false);
-        jtfCurrencyBizPartner.setText("CURRENCY BIZ PARTNER");
-        jtfCurrencyBizPartner.setFocusable(false);
-        jtfCurrencyBizPartner.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel13.add(jtfCurrencyBizPartner);
+        jtfBizPartnerCurrency.setEditable(false);
+        jtfBizPartnerCurrency.setText("CURRENCY BIZ PARTNER");
+        jtfBizPartnerCurrency.setFocusable(false);
+        jtfBizPartnerCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel13.add(jtfBizPartnerCurrency);
 
         jPanel3.add(jPanel13);
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlFkCurrencyBizPartnerId.setText("Moneda del movimiento:");
-        jlFkCurrencyBizPartnerId.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel5.add(jlFkCurrencyBizPartnerId);
+        jlFkBizPartnerCurrencyId.setText("Moneda movimiento:");
+        jlFkBizPartnerCurrencyId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel5.add(jlFkBizPartnerCurrencyId);
 
-        jcbFkCurrencyBizPartnerId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkCurrencyBizPartnerId.setPreferredSize(new java.awt.Dimension(200, 23));
-        jcbFkCurrencyBizPartnerId.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jcbFkCurrencyBizPartnerIdItemStateChanged(evt);
-            }
-        });
-        jPanel5.add(jcbFkCurrencyBizPartnerId);
+        jcbFkBizPartnerCurrencyId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbFkBizPartnerCurrencyId.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel5.add(jcbFkBizPartnerCurrencyId);
 
-        jbFkCurrencyBizPartnerId.setText("jButton1");
-        jbFkCurrencyBizPartnerId.setToolTipText("Seleccionar moneda");
-        jbFkCurrencyBizPartnerId.setFocusable(false);
-        jbFkCurrencyBizPartnerId.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel5.add(jbFkCurrencyBizPartnerId);
+        jbFkBizPartnerCurrencyId.setText("jButton1");
+        jbFkBizPartnerCurrencyId.setToolTipText("Seleccionar moneda");
+        jbFkBizPartnerCurrencyId.setFocusable(false);
+        jbFkBizPartnerCurrencyId.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel5.add(jbFkBizPartnerCurrencyId);
 
         jPanel3.add(jPanel5);
 
@@ -275,7 +268,7 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
         jPanel10.add(jlValueCy);
 
         jtfValueCy.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfValueCy.setText("1,000,000,000.00");
+        jtfValueCy.setText("0.00");
         jtfValueCy.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel10.add(jtfValueCy);
 
@@ -285,22 +278,22 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
         jbValueCy.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel10.add(jbValueCy);
 
-        jlExchangeRateSystem.setText("Tipo de cambio sistema:");
-        jlExchangeRateSystem.setPreferredSize(new java.awt.Dimension(118, 23));
-        jPanel10.add(jlExchangeRateSystem);
+        jlExchangeRateSys.setText("Tipo de cambio sistema:");
+        jlExchangeRateSys.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel10.add(jlExchangeRateSys);
 
-        jtfExchangeRateSystem.setEditable(false);
-        jtfExchangeRateSystem.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfExchangeRateSystem.setText("1,000,000,000.00");
-        jtfExchangeRateSystem.setFocusable(false);
-        jtfExchangeRateSystem.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel10.add(jtfExchangeRateSystem);
+        jtfExchangeRateSys.setEditable(false);
+        jtfExchangeRateSys.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfExchangeRateSys.setText("0.00");
+        jtfExchangeRateSys.setFocusable(false);
+        jtfExchangeRateSys.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel10.add(jtfExchangeRateSys);
 
-        jbExchangeRateSystem.setText("jButton5");
-        jbExchangeRateSystem.setToolTipText("Seleccionar tipo de cambio sistema");
-        jbExchangeRateSystem.setFocusable(false);
-        jbExchangeRateSystem.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel10.add(jbExchangeRateSystem);
+        jbExchangeRateSys.setText("jButton5");
+        jbExchangeRateSys.setToolTipText("Seleccionar tipo de cambio sistema");
+        jbExchangeRateSys.setFocusable(false);
+        jbExchangeRateSys.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel10.add(jbExchangeRateSys);
 
         jbExchangeRateAccountCashView.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif"))); // NOI18N
         jbExchangeRateAccountCashView.setToolTipText("Ver tipo de cambio acumulado");
@@ -317,7 +310,7 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
         jPanel11.add(jlValue);
 
         jtfValue.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfValue.setText("1,000,000,000.00");
+        jtfValue.setText("0.00");
         jtfValue.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel11.add(jtfValue);
 
@@ -328,11 +321,11 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
         jPanel11.add(jbValue);
 
         jlExchangeRate.setText("Tipo de cambio: *");
-        jlExchangeRate.setPreferredSize(new java.awt.Dimension(118, 23));
+        jlExchangeRate.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel11.add(jlExchangeRate);
 
         jtfExchangeRate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfExchangeRate.setText("1,000,000,000.00");
+        jtfExchangeRate.setText("0.00");
         jtfExchangeRate.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel11.add(jtfExchangeRate);
 
@@ -342,32 +335,22 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
         jbExchangeRate.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel11.add(jbExchangeRate);
 
-        jbExchangeRateAccountCash.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_money.gif"))); // NOI18N
-        jbExchangeRateAccountCash.setToolTipText("Asignar tipo de cambio acumulado");
-        jbExchangeRateAccountCash.setFocusable(false);
-        jbExchangeRateAccountCash.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel11.add(jbExchangeRateAccountCash);
+        jbExchangeRateAccountCashSet.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_money.gif"))); // NOI18N
+        jbExchangeRateAccountCashSet.setToolTipText("Asignar tipo de cambio acumulado");
+        jbExchangeRateAccountCashSet.setFocusable(false);
+        jbExchangeRateAccountCashSet.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel11.add(jbExchangeRateAccountCashSet);
 
         jPanel3.add(jPanel11);
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jckIsCheckApplying.setText("Cheque del movimiento");
-        jckIsCheckApplying.setPreferredSize(new java.awt.Dimension(150, 23));
-        jckIsCheckApplying.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jckIsCheckApplyingItemStateChanged(evt);
-            }
-        });
-        jPanel7.add(jckIsCheckApplying);
+        jckCheckApplying.setText("Cheque del movimiento");
+        jckCheckApplying.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel7.add(jckCheckApplying);
 
         jcbFkCheckId_n.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbFkCheckId_n.setPreferredSize(new java.awt.Dimension(200, 23));
-        jcbFkCheckId_n.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jcbFkCheckId_nFocusLost(evt);
-            }
-        });
         jPanel7.add(jcbFkCheckId_n);
 
         jPanel3.add(jPanel7);
@@ -379,7 +362,7 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
         jPanel12.add(jlConcept);
 
         jtfConcept.setText("CONCEPT");
-        jtfConcept.setPreferredSize(new java.awt.Dimension(397, 23));
+        jtfConcept.setPreferredSize(new java.awt.Dimension(375, 23));
         jPanel12.add(jtfConcept);
 
         jPanel3.add(jPanel12);
@@ -388,82 +371,61 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-575)/2, (screenSize.height-375)/2, 575, 375);
+        setSize(new java.awt.Dimension(616, 414));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
-    private void jckIsCheckApplyingItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jckIsCheckApplyingItemStateChanged
-        if (!mbResetingForm) {
-            itemStateChangedIsCheckApplying();
-        }
-    }//GEN-LAST:event_jckIsCheckApplyingItemStateChanged
-
-    private void jcbFkBizPartnerIdItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbFkBizPartnerIdItemStateChanged
-        if (!mbResetingForm) {
-            if (evt.getStateChange() == ItemEvent.SELECTED) {
-                itemStateChangedBizPartner();
-            }
-        }
-    }//GEN-LAST:event_jcbFkBizPartnerIdItemStateChanged
-
-    private void jcbFkCurrencyBizPartnerIdItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbFkCurrencyBizPartnerIdItemStateChanged
-        if (!mbResetingForm) {
-            if (evt.getStateChange() == ItemEvent.SELECTED) {
-                itemStateChangedFkCurrencyBizPartnerId();
-            }
-        }
-    }//GEN-LAST:event_jcbFkCurrencyBizPartnerIdItemStateChanged
-
-    private void jcbFkCheckId_nFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jcbFkCheckId_nFocusLost
-        focusLostFkCheckId_n();
-    }//GEN-LAST:event_jcbFkCheckId_nFocusLost
-
     private void initComponentsExtra() {
         mvFields = new Vector<SFormField>();
 
-        moFieldConcept = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfConcept, jlConcept);
-        moFieldConcept.setLengthMax(100);
         moFieldFkBizPartnerId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkBizPartnerId, jlFkBizPartnerId);
         moFieldFkBizPartnerId.setPickerButton(jbFkBizPartnerId);
-        moFieldFkCurrencyBizPartnerId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkCurrencyBizPartnerId, jlFkCurrencyBizPartnerId);
-        moFieldFkCurrencyBizPartnerId.setPickerButton(jbFkCurrencyBizPartnerId);
+        moFieldFkBizPartnerCurrencyId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkBizPartnerCurrencyId, jlFkBizPartnerCurrencyId);
+        moFieldFkBizPartnerCurrencyId.setPickerButton(jbFkBizPartnerCurrencyId);
         moFieldValueCy = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfValueCy, jlValueCy);
         moFieldValueCy.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
-        moFieldExchangeRateSystem = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfExchangeRateSystem, jlExchangeRateSystem);
-        moFieldExchangeRateSystem.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsExchangeRateFormat());
+        moFieldExchangeRateSys = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfExchangeRateSys, jlExchangeRateSys);
+        moFieldExchangeRateSys.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsExchangeRateFormat());
         moFieldValue = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfValue, jlValue);
         moFieldValue.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
         moFieldExchangeRate = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfExchangeRate, jlExchangeRate);
         moFieldExchangeRate.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsExchangeRateFormat());
-        moFieldFkCheckId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkCheckId_n, jckIsCheckApplying);
+        moFieldFkCheckId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkCheckId_n, jckCheckApplying);
+        moFieldConcept = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfConcept, jlConcept);
+        moFieldConcept.setLengthMax(100);
 
-        mvFields.add(moFieldConcept);
         mvFields.add(moFieldFkBizPartnerId);
-        mvFields.add(moFieldFkCurrencyBizPartnerId);
+        mvFields.add(moFieldFkBizPartnerCurrencyId);
         mvFields.add(moFieldValueCy);
+        mvFields.add(moFieldExchangeRateSys);
         mvFields.add(moFieldValue);
-        mvFields.add(moFieldExchangeRateSystem);
         mvFields.add(moFieldExchangeRate);
         mvFields.add(moFieldFkCheckId_n);
+        mvFields.add(moFieldConcept);
 
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
         jbFkBizPartnerId.addActionListener(this);
-        jbFkCurrencyBizPartnerId.addActionListener(this);
+        jbFkBizPartnerCurrencyId.addActionListener(this);
         jbExchangeRate.addActionListener(this);
-        jbExchangeRateSystem.addActionListener(this);
+        jbExchangeRateSys.addActionListener(this);
         jbValueCy.addActionListener(this);
         jbValue.addActionListener(this);
-        jbExchangeRateAccountCash.addActionListener(this);
+        jbExchangeRateAccountCashSet.addActionListener(this);
         jbExchangeRateAccountCashView.addActionListener(this);
+        
+        jcbFkBizPartnerId.addItemListener(this);
+        jcbFkBizPartnerCurrencyId.addItemListener(this);
+        jckCheckApplying.addItemListener(this);
 
         jtfValueCy.addFocusListener(this);
         jtfValue.addFocusListener(this);
         jtfExchangeRate.addFocusListener(this);
+        jcbFkCheckId_n.addFocusListener(this);
 
         moParamRecord = null;
         mvParamCheckVector = new Vector<SDataCheck>();
@@ -474,14 +436,14 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) { actionOk(); }
+            public void actionPerformed(ActionEvent e) { actionPerformedOk(); }
         };
 
         SFormUtilities.putActionMap(getRootPane(), actionOk, "ok", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
 
         AbstractAction action = new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) { actionCancel(); }
+            public void actionPerformed(ActionEvent e) { actionPerformedCancel(); }
         };
 
         SFormUtilities.putActionMap(getRootPane(), action, "cancel", KeyEvent.VK_ESCAPE, 0);
@@ -490,66 +452,168 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
     private void windowActivated() {
         if (mbFirstTime) {
             mbFirstTime = false;
+            setFormTitle();
             readAccountCashInformation();
             jcbFkBizPartnerId.requestFocus();
         }
-
-        setFormTitle();
     }
 
-    private void actionOk() {
-        SFormValidation validation = formValidate();
+    private void setFormTitle() {
+        if (SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_CUS_ADV)) {
+            setTitle("Cobro anticipo a clientes");
+        }
+        else if (SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_CUS_ADV_REF)) {
+            setTitle("Devolución anticipo a clientes");
+        }
+        else if (SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_SUP_ADV)) {
+            setTitle("Pago anticipo a proveedores");
+        }
+        else if (SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_SUP_ADV_REF)) {
+            setTitle("Devolución anticipo a proveedores");
+        }
+        else if (SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_EXT_DBR)) {
+            setTitle("Abono a deudores diversos");
+        }
+        else if (SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_EXT_DBR)) {
+            setTitle("Cargo a deudores diversos");
+        }
+        else if (SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_EXT_CDR)) {
+            setTitle("Abono a acreedores diversos");
+        }
+        else if (SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_EXT_CDR)) {
+            setTitle("Cargo a acreedores diversos");
+        }
+    }
+    
+    private void readAccountCashInformation() {
+        SDataBizPartnerBranch branch = null;
+        
+        if (moParamRecord.getDbmsDataAccountCash() == null) {
+            moCurrencyRecord = miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency();
 
-        if (validation.getIsError()) {
-            if (validation.getComponent() != null) {
-                validation.getComponent().requestFocus();
-            }
-            if (validation.getMessage().length() > 0) {
-                miClient.showMsgBoxWarning(validation.getMessage());
-            }
+            jlAccountCash.setEnabled(false);
+            jlAccountCashCurrency.setEnabled(false);
+            jtfCompanyBranch.setText("");
+            jtfAccountCash.setText("");
+            jtfAccountCashCode.setText("");
         }
         else {
-            mnFormResult = SLibConstants.FORM_RESULT_OK;
-            setVisible(false);
+            branch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(
+                    miClient, SDataConstants.BPSU_BPB, new int[] { moParamRecord.getDbmsDataAccountCash().getPkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
+
+            moCurrencyRecord = (SDataCurrency) SDataUtilities.readRegistry(
+                    miClient, SDataConstants.CFGU_CUR, new int[] { moParamRecord.getDbmsDataAccountCash().getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
+
+            jlAccountCash.setEnabled(true);
+            jlAccountCashCurrency.setEnabled(true);
+            jtfCompanyBranch.setText(branch.getBizPartnerBranch());
+            jtfAccountCash.setText(moParamRecord.getDbmsDataAccountCash().getDbmsCompanyBranchEntity().getEntity());
+            jtfAccountCashCode.setText(moParamRecord.getDbmsDataAccountCash().getDbmsCompanyBranchEntity().getCode());
+
+            jtfCompanyBranch.setCaretPosition(0);
+            jtfAccountCash.setCaretPosition(0);
+            jtfAccountCashCode.setCaretPosition(0);
+        }
+        
+        jtfAccountCashCurrency.setText(moCurrencyRecord.getCurrency());
+        jtfAccountCashCurrency.setCaretPosition(0);
+    }
+
+    private void readBizPartnerCurrency() {
+        int idCurrency = SLibConsts.UNDEFINED;
+        SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(
+                miClient, SDataConstants.BPSU_BP, moFieldFkBizPartnerId.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);;
+        
+        moCurrencyBizPartner = null;
+
+        switch(mnParamBizPartnerCategory) {
+            case SDataConstants.BPSX_BP_SUP:
+                idCurrency = bizPartner.getDbmsCategorySettingsSup().getFkCurrencyId_n();
+                break;
+            case SDataConstants.BPSX_BP_CUS:
+                idCurrency = bizPartner.getDbmsCategorySettingsCus().getFkCurrencyId_n();
+                break;
+            case SDataConstants.BPSX_BP_CDR:
+                idCurrency = bizPartner.getDbmsCategorySettingsCdr().getFkCurrencyId_n();
+                break;
+            case SDataConstants.BPSX_BP_DBR:
+                idCurrency = bizPartner.getDbmsCategorySettingsDbr().getFkCurrencyId_n();
+                break;
+            default:
+        }
+        
+        if (idCurrency != SLibConsts.UNDEFINED) {
+            moCurrencyBizPartner = (SDataCurrency) SDataUtilities.readRegistry(
+                    miClient, SDataConstants.CFGU_CUR, new int[] { idCurrency }, SLibConstants.EXEC_MODE_SILENT);
+        }
+
+        if (moCurrencyBizPartner == null) {
+            moCurrencyBizPartner = miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency();
+        }
+
+        jtfBizPartnerCurrency.setText(moCurrencyBizPartner.getCurrency());
+        moFieldFkBizPartnerCurrencyId.setKey(new int[] { moCurrencyBizPartner.getPkCurrencyId() });
+
+        renderCurrencySettings();
+    }
+
+    private void renderCurrencySettings() {
+        if (miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { moCurrencyBizPartner.getPkCurrencyId() })) {
+            jtfValue.setEditable(false);
+            jtfValue.setFocusable(false);
+            jtfExchangeRate.setEditable(false);
+            jtfExchangeRate.setFocusable(false);
+            
+            jbValueCy.setEnabled(false);
+            jbValue.setEnabled(false);
+            jbExchangeRateSys.setEnabled(false);
+            jbExchangeRate.setEnabled(false);
+            
+            jbExchangeRateAccountCashView.setEnabled(false);
+            jbExchangeRateAccountCashSet.setEnabled(false);
+
+            moFieldExchangeRateSys.setFieldValue(1d);
+            moFieldExchangeRate.setFieldValue(1d);
+        }
+        else {
+            jtfValue.setEditable(true);
+            jtfValue.setFocusable(true);
+            jtfExchangeRate.setEditable(true);
+            jtfExchangeRate.setFocusable(true);
+            
+            jbValueCy.setEnabled(true);
+            jbValue.setEnabled(true);
+            jbExchangeRateSys.setEnabled(true);
+            jbExchangeRate.setEnabled(true);
+            
+            jbExchangeRateAccountCashView.setEnabled(true);
+            jbExchangeRateAccountCashSet.setEnabled(true);
+
+            jbExchangeRateAccountCashView.setEnabled(!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { moCurrencyRecord.getPkCurrencyId() }));
+            jbExchangeRateAccountCashSet.setEnabled(!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { moCurrencyRecord.getPkCurrencyId() }));
+
+            moFieldExchangeRate.setFieldValue(obtainExchangeRate());
         }
     }
 
-    private void actionCancel() {
-        mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
-        setVisible(false);
+    private boolean isMoneyIn() {
+        return
+            SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_CUS_ADV) ||
+            SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_SUP_ADV_REF) ||
+            SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_EXT_CDR) ||
+            SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_EXT_DBR);
     }
 
-    private double obtainTodayExchangeRate() {
-        double rate = 0;
-
-        try {
-            rate = SDataUtilities.obtainExchangeRate(miClient,
-                moFieldFkCurrencyBizPartnerId.getKeyAsIntArray()[0], moParamRecord.getDate());
-        }
-        catch (Exception e) {
-            SLibUtilities.printOutException(this, e);
-        }
-
-        return rate;
-    }
-
-    private double obtainExchangeRateAccountCash() {
-        double rate = 0;
-        double[] balance = null;
-
-        try {
-            balance = obtainCurrentAccountCashBalance();
-            rate = balance[0] == 0d ? 0d : balance[0] / balance[1];
-        }
-        catch (Exception e) {
-            SLibUtilities.printOutException(this, e);
-        }
-
-        return rate;
+    private boolean isDebit() {
+        return
+            SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_CUS_ADV_REF) ||
+            SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_SUP_ADV) ||
+            SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_EXT_CDR) ||
+            SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_EXT_DBR);
     }
 
     private double[] obtainCurrentAccountCashBalance() {
-        double[] balance = new double[2];
+        double[] balance = null;
 
         try {
             balance = SDataUtilities.obtainAccountCashBalanceUpdated(miClient,
@@ -566,274 +630,33 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
         return balance;
     }
 
-    private void renderCurrencySettings() {
-        if (moCurrencyBizPartner.getPkCurrencyId() != miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) {
-            jtfValue.setEnabled(true);
-            jbValue.setEnabled(true);
-            jtfExchangeRate.setEnabled(true);
-            jbExchangeRate.setEnabled(true);
-            jbExchangeRateSystem.setEnabled(true);
-            jbExchangeRateAccountCashView.setEnabled(true);
-            jbExchangeRateAccountCash.setEnabled(true);
+    private double obtainExchangeRate() {
+        double exr = 0;
 
-            moFieldExchangeRate.setFieldValue(obtainTodayExchangeRate());
-
-            if (moCurrency.getPkCurrencyId() == miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) {
-                jbExchangeRateAccountCashView.setEnabled(false);
-                jbExchangeRateAccountCash.setEnabled(false);
-            }
-            else {
-                jbExchangeRateAccountCashView.setEnabled(true);
-                jbExchangeRateAccountCash.setEnabled(true);
-            }
+        try {
+            exr = SDataUtilities.obtainExchangeRate(miClient,
+                moFieldFkBizPartnerCurrencyId.getKeyAsIntArray()[0], moParamRecord.getDate());
         }
-        else {
-            jtfValue.setEnabled(false);
-            jbValue.setEnabled(false);
-            jtfExchangeRate.setEnabled(false);
-            jbExchangeRateSystem.setEnabled(false);
-            jbExchangeRate.setEnabled(false);
-            jbExchangeRateAccountCashView.setEnabled(false);
-            jbExchangeRateAccountCash.setEnabled(false);
-
-            moFieldExchangeRateSystem.setFieldValue(1);
-            moFieldExchangeRate.setFieldValue(1);
+        catch (Exception e) {
+            SLibUtilities.printOutException(this, e);
         }
+
+        return exr;
     }
 
-    private void itemStateChangedIsCheckApplying() {
-        if (!jckIsCheckApplying.isSelected()) {
-            jcbFkCheckId_n.setEnabled(false);
-        }
-        else {
-            jcbFkCheckId_n.setEnabled(true);
-            jcbFkCheckId_n.requestFocus();
-        }
-    }
-
-    private void itemStateChangedBizPartner() {
-        if (moFieldFkBizPartnerId.getKeyAsIntArray()[0] > 0) {
-            jcbFkCurrencyBizPartnerId.setEnabled(true);
-            jbFkCurrencyBizPartnerId.setEnabled(true);
-            readBizPartnerCurrency();
-        }
-        else {
-            jcbFkCurrencyBizPartnerId.setEnabled(false);
-            jbFkCurrencyBizPartnerId.setEnabled(false);
-            renderCurrencySettings();
-        }
-    }
-
-    private void itemStateChangedFkCurrencyBizPartnerId() {
-        if (moFieldFkCurrencyBizPartnerId.getKeyAsIntArray()[0] > 0) {
-            moCurrencyBizPartner = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR,
-                new int[] { moFieldFkCurrencyBizPartnerId.getKeyAsIntArray()[0] }, SLibConstants.EXEC_MODE_SILENT);
-        }
-        else {
-            moCurrencyBizPartner = miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency();
-        }
-
-        renderCurrencySettings();
-    }
-
-    private void actionExchangeRateSystem() {
-        double rate = miClient.pickExchangeRate(moCurrencyBizPartner.getPkCurrencyId(), miClient.getSessionXXX().getWorkingDate());
-
-        if (rate != 0d) {
-            moFieldExchangeRateSystem.setFieldValue(rate);
-            if (moFieldExchangeRate.getDouble() == 0) {
-                moFieldExchangeRate.setFieldValue(rate);
-            }
-            jtfExchangeRate.requestFocus();
-        }
-    }
-
-    private void actionValueCy() {
-        if (moFieldExchangeRate.getDouble() == 0) {
-            jtfExchangeRate.requestFocus();
-        }
-        else {
-            moFieldValueCy.setFieldValue(SLibUtilities.round(moFieldValue.getDouble() / moFieldExchangeRate.getDouble(),
-                    miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
-            jtfValueCy.requestFocus();
-        }
-    }
-
-    private void actionValue() {
-        if (moFieldExchangeRate.getDouble() == 0) {
-            jtfExchangeRate.requestFocus();
-        }
-        else {
-            moFieldValue.setFieldValue(SLibUtilities.round(moFieldValueCy.getDouble() * moFieldExchangeRate.getDouble(),
-                    miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
-            jtfValue.requestFocus();
-        }
-    }
-
-    private void actionExchangeRate() {
-        if (moFieldValueCy.getDouble() != 0) {
-
-            if (moFieldValue.getDouble() == 0) {
-                jtfValueCy.requestFocus();
-            }
-            else {
-                moFieldExchangeRate.setFieldValue(moFieldValue.getDouble() / moFieldValueCy.getDouble());
-                jtfExchangeRate.requestFocus();
-            }
-        }
-        else if (moFieldValue.getDouble() != 0) {
-            jtfValue.requestFocus();
-        }
-        else {
-            jtfExchangeRate.requestFocus();
-        }
-    }
-
-    private void actionExchangeRateAccountCash() {
-        moFieldExchangeRate.setFieldValue(obtainExchangeRateAccountCash());
-        jtfExchangeRate.requestFocus();
-    }
-
-    private void actionExchangeRateAccountCashView() {
+    private double obtainExchangeRateAccountCash() {
         double[] balance = null;
+        double exr = 0;
 
         try {
             balance = obtainCurrentAccountCashBalance();
-
-            miClient.showMsgBoxInformation(
-                    "Tipo de cambio acumulado al día: " + miClient.getSessionXXX().getFormatters().getDateFormat().format(moParamRecord.getDate()) + "\n" +
-                    "Saldo " + miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey() + ": $ " +
-                    miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(balance[0]) + ".\n" +
-                    "Saldo " + moCurrency.getKey() + ": $ " +
-                    miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(balance[1]) + ".\n" +
-                    "Tipo de cambio acumulado: " + miClient.getSessionXXX().getFormatters().getDecimalsExchangeRateFormat().format(balance[1] == 0d ? 0d : balance[0] / balance[1]) + ".");
+            exr = balance[0] == 0d ? 0d : balance[0] / balance[1];
         }
         catch (Exception e) {
-            SLibUtilities.renderException(this, e);
-        }
-    }
-
-    private void focusLostValueCy() {
-        if (moFieldValueCy.getDouble() != 0) {
-
-            if (!jtfValue.isEnabled() || moFieldValue.getDouble() == 0) {
-                moFieldValue.setFieldValue(SLibUtilities.round(moFieldValueCy.getDouble() * moFieldExchangeRate.getDouble(),
-                    miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
-            }
-            else if (moFieldExchangeRate.getDouble() == 0) {
-                moFieldExchangeRate.setFieldValue(SLibUtilities.round(moFieldValue.getDouble() / moFieldValueCy.getDouble(),
-                    miClient.getSessionXXX().getParamsErp().getDecimalsExchangeRate()));
-            }
-        }
-    }
-
-    private void focusLostValue() {
-        if (moFieldValue.getDouble() != 0) {
-
-            if (moFieldValueCy.getDouble() == 0 && moFieldExchangeRate.getDouble() != 0) {
-                moFieldValueCy.setFieldValue(SLibUtilities.round(moFieldValue.getDouble() / moFieldExchangeRate.getDouble(),
-                    miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
-            }
-            else if (moFieldValueCy.getDouble() != 0 && moFieldExchangeRate.getDouble() == 0) {
-                moFieldExchangeRate.setFieldValue(SLibUtilities.round(moFieldValue.getDouble() / moFieldValueCy.getDouble(),
-                    miClient.getSessionXXX().getParamsErp().getDecimalsExchangeRate()));
-            }
-        }
-    }
-
-    private void focusLostExchangeRate() {
-        if (moFieldValueCy.getDouble() != 0 && moFieldValue.getDouble() == 0) {
-            moFieldValue.setFieldValue(SLibUtilities.round(moFieldValueCy.getDouble() * moFieldExchangeRate.getDouble(),
-                    miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
-        }
-    }
-
-    private void focusLostFkCheckId_n() {
-        if (jcbFkCheckId_n.getSelectedIndex() > 0 && moFieldConcept.getString().length() == 0) {
-            jtfConcept.setText("CH " + ((Integer) ((SFormComponentItem) jcbFkCheckId_n.getSelectedItem()).getComplement()) + "; " + moParamRecord.getDbmsDataAccountCash().getAuxCode() + " ");
-        }
-    }
-
-    private boolean isMoneyIn() {
-        return
-                SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_CUS_ADV) ||
-                SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_SUP_ADV_REF) ||
-                SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_EXT_CDR) ||
-                SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_EXT_DBR);
-    }
-
-    private boolean isDebit() {
-        return
-                SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_CUS_ADV_REF) ||
-                SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_SUP_ADV) ||
-                SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_EXT_CDR) ||
-                SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_EXT_DBR);
-    }
-
-    private void actionjbFkBizPartnerId() {
-        miClient.pickOption(mnParamBizPartnerCategory, moFieldFkBizPartnerId, null);
-    }
-
-    private void actionjbFkCurrencyBizPartnerId() {
-        miClient.pickOption(SDataConstants.CFGU_CUR, moFieldFkCurrencyBizPartnerId, null);
-    }
-
-    private void readAccountCashInformation() {
-        SDataBizPartnerBranch oBranch = null;
-
-        oBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient,
-                SDataConstants.BPSU_BPB, new int[] { moParamRecord.getDbmsDataAccountCash().getPkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
-        moCurrency = (SDataCurrency) SDataUtilities.readRegistry(miClient,
-                SDataConstants.CFGU_CUR, new int[] { moParamRecord.getDbmsDataAccountCash().getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
-
-        jtfCompanyBranch.setText(oBranch.getBizPartnerBranch());
-        jtfAccountCash.setText(moParamRecord.getDbmsDataAccountCash().getDbmsCompanyBranchEntity().getEntity());
-        jtfCode.setText(moParamRecord.getDbmsDataAccountCash().getDbmsCompanyBranchEntity().getCode());
-        jtfCurrency.setText(moCurrency.getCurrency());
-    }
-
-    private void readBizPartnerCurrency() {
-        moCurrencyBizPartner = null;
-        SDataBizPartner oBizPartner = null;
-
-        oBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, moFieldFkBizPartnerId.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
-
-        switch(mnParamBizPartnerCategory) {
-            case SDataConstants.BPSX_BP_SUP:
-                if (oBizPartner.getDbmsCategorySettingsSup().getFkCurrencyId_n() > 0) {
-                    moCurrencyBizPartner = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR,
-                                new int[] { oBizPartner.getDbmsCategorySettingsSup().getFkCurrencyId_n() }, SLibConstants.EXEC_MODE_SILENT);
-                }
-                break;
-            case SDataConstants.BPSX_BP_CUS:
-                if (oBizPartner.getDbmsCategorySettingsCus().getFkCurrencyId_n() > 0) {
-                    moCurrencyBizPartner = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR,
-                                new int[] { oBizPartner.getDbmsCategorySettingsCus().getFkCurrencyId_n() }, SLibConstants.EXEC_MODE_SILENT);
-                }
-                break;
-            case SDataConstants.BPSX_BP_CDR:
-                if (oBizPartner.getDbmsCategorySettingsCdr().getFkCurrencyId_n() > 0) {
-                    moCurrencyBizPartner = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR,
-                                new int[] { oBizPartner.getDbmsCategorySettingsCdr().getFkCurrencyId_n() }, SLibConstants.EXEC_MODE_SILENT);
-                }
-                break;
-            case SDataConstants.BPSX_BP_DBR:
-                if (oBizPartner.getDbmsCategorySettingsDbr().getFkCurrencyId_n() > 0) {
-                moCurrencyBizPartner = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR,
-                            new int[] { oBizPartner.getDbmsCategorySettingsDbr().getFkCurrencyId_n() }, SLibConstants.EXEC_MODE_SILENT);
-                }
-                break;
-            default:
+            SLibUtilities.printOutException(this, e);
         }
 
-        if (moCurrencyBizPartner == null) {
-            moCurrencyBizPartner = miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency();
-        }
-
-        jtfCurrencyBizPartner.setText(moCurrencyBizPartner.getCurrency());
-        moFieldFkCurrencyBizPartnerId.setKey(new int[] { moCurrencyBizPartner.getPkCurrencyId() });
-
-        renderCurrencySettings();
+        return exr;
     }
 
     private java.lang.String getBizPartnerAccountId() {
@@ -894,7 +717,7 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
         oEntry.setDebit(isDebit() ? moFieldValue.getDouble() : 0d);
         oEntry.setCredit(isDebit() ? 0d : moFieldValue.getDouble());
         oEntry.setExchangeRate(moFieldExchangeRate.getDouble());
-        oEntry.setExchangeRateSystem(moFieldExchangeRateSystem.getDouble());
+        oEntry.setExchangeRateSystem(moFieldExchangeRateSys.getDouble());
         oEntry.setDebitCy(isDebit() ? moFieldValueCy.getDouble() : 0d);
         oEntry.setCreditCy(isDebit() ? 0d : moFieldValueCy.getDouble());
         oEntry.setFkAccountIdXXX(getBizPartnerAccountId());
@@ -933,16 +756,24 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
                 mnParamBizPartnerCategory == SDataConstants.BPSX_BP_CUS ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1] :
                 mnParamBizPartnerCategory == SDataConstants.BPSX_BP_CDR ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CDR[1] :
                 SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR[1]);
-        oEntry.setFkCurrencyId(moFieldFkCurrencyBizPartnerId.getKeyAsIntArray()[0]);
+        oEntry.setFkCurrencyId(moFieldFkBizPartnerCurrencyId.getKeyAsIntArray()[0]);
         oEntry.setFkBizPartnerId_nr(moFieldFkBizPartnerId.getKeyAsIntArray()[0]);
-        oEntry.setFkCompanyBranchId_n(moParamRecord.getDbmsDataAccountCash().getPkCompanyBranchId());
-        oEntry.setFkEntityId_n(moParamRecord.getDbmsDataAccountCash().getPkAccountCashId());
+        
+        if (moParamRecord.getDbmsDataAccountCash() == null) {
+            oEntry.setFkCompanyBranchId_n(SLibConsts.UNDEFINED);
+            oEntry.setFkEntityId_n(SLibConsts.UNDEFINED);
+        }
+        else {
+            oEntry.setFkCompanyBranchId_n(moParamRecord.getDbmsDataAccountCash().getPkCompanyBranchId());
+            oEntry.setFkEntityId_n(moParamRecord.getDbmsDataAccountCash().getPkAccountCashId());
+        }
+        
         oEntry.setDbmsAccount(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FIN_ACC, new Object[] { oEntry.getFkAccountIdXXX() }));
         oEntry.setDbmsAccountComplement(moFieldFkBizPartnerId.getString());
         oEntry.setDbmsAccountingMoveSubclass(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_CLS_ACC_MOV, SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL));
-        oEntry.setDbmsCurrencyKey((String) ((SFormComponentItem) jcbFkCurrencyBizPartnerId.getSelectedItem()).getComplement());
+        oEntry.setDbmsCurrencyKey((String) ((SFormComponentItem) jcbFkBizPartnerCurrencyId.getSelectedItem()).getComplement());
 
-        if (!jckIsCheckApplying.isSelected()) {
+        if (!jckCheckApplying.isSelected()) {
             oEntry.setFkCheckWalletId_n(0);
             oEntry.setFkCheckId_n(0);
             oEntry.setAuxCheckNumber(0);
@@ -958,30 +789,186 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
         return oEntry;
     }
 
-    public void setFormTitle() {
-        if (SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_CUS_ADV)) {
-            setTitle("Ingreso anticipo cobro a clientes");
+    private void actionPerformedOk() {
+        SFormValidation validation = formValidate();
+
+        if (validation.getIsError()) {
+            if (validation.getComponent() != null) {
+                validation.getComponent().requestFocus();
+            }
+            if (validation.getMessage().length() > 0) {
+                miClient.showMsgBoxWarning(validation.getMessage());
+            }
         }
-        else if (SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_CUS_ADV_REF)) {
-            setTitle("Egreso reembolso anticipo cobro a clientes");
+        else {
+            mnFormResult = SLibConstants.FORM_RESULT_OK;
+            setVisible(false);
         }
-        else if (SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_SUP_ADV)) {
-            setTitle("Egreso anticipo pago a proveedores");
+    }
+
+    private void actionPerformedCancel() {
+        mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
+        setVisible(false);
+    }
+
+    private void actionPerformedBizPartnerId() {
+        miClient.pickOption(mnParamBizPartnerCategory, moFieldFkBizPartnerId, null);
+    }
+
+    private void actionPerformedCurrencyBizPartnerId() {
+        miClient.pickOption(SDataConstants.CFGU_CUR, moFieldFkBizPartnerCurrencyId, null);
+    }
+
+    private void actionPerformedExchangeRateSystem() {
+        double rate = miClient.pickExchangeRate(moCurrencyBizPartner.getPkCurrencyId(), miClient.getSessionXXX().getWorkingDate());
+
+        if (rate != 0d) {
+            moFieldExchangeRateSys.setFieldValue(rate);
+            if (moFieldExchangeRate.getDouble() == 0) {
+                moFieldExchangeRate.setFieldValue(rate);
+            }
+            jtfExchangeRate.requestFocus();
         }
-        else if (SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_SUP_ADV_REF)) {
-            setTitle("Ingreso reembolso anticipo pago a proveedores");
+    }
+
+    private void actionPerformedValueCy() {
+        if (moFieldExchangeRate.getDouble() == 0) {
+            jtfExchangeRate.requestFocus();
         }
-        else if (SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_EXT_DBR)) {
-            setTitle("Ingreso por deudores diversos");
+        else {
+            moFieldValueCy.setFieldValue(SLibUtilities.round(moFieldValue.getDouble() / moFieldExchangeRate.getDouble(),
+                    miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
+            jtfValueCy.requestFocus();
         }
-        else if (SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_EXT_DBR)) {
-            setTitle("Egreso por deudores diversos");
+    }
+
+    private void actionPerformedValue() {
+        if (moFieldExchangeRate.getDouble() == 0) {
+            jtfExchangeRate.requestFocus();
         }
-        else if (SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_EXT_CDR)) {
-            setTitle("Ingreso por acreedores diversos");
+        else {
+            moFieldValue.setFieldValue(SLibUtilities.round(moFieldValueCy.getDouble() * moFieldExchangeRate.getDouble(),
+                    miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
+            jtfValue.requestFocus();
         }
-        else if (SLibUtilities.compareKeys(manParamAccountingMove, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_EXT_CDR)) {
-            setTitle("Egreso por acreedores diversos");
+    }
+
+    private void actionPerformedExchangeRate() {
+        if (moFieldValueCy.getDouble() != 0) {
+
+            if (moFieldValue.getDouble() == 0) {
+                jtfValueCy.requestFocus();
+            }
+            else {
+                moFieldExchangeRate.setFieldValue(moFieldValue.getDouble() / moFieldValueCy.getDouble());
+                jtfExchangeRate.requestFocus();
+            }
+        }
+        else if (moFieldValue.getDouble() != 0) {
+            jtfValue.requestFocus();
+        }
+        else {
+            jtfExchangeRate.requestFocus();
+        }
+    }
+
+    private void actionPerformedExchangeRateAccountCashView() {
+        double[] balance = null;
+
+        try {
+            balance = obtainCurrentAccountCashBalance();
+
+            miClient.showMsgBoxInformation(
+                    "Tipo de cambio acumulado al día: " + miClient.getSessionXXX().getFormatters().getDateFormat().format(moParamRecord.getDate()) + "\n" +
+                    "Saldo " + miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey() + ": $ " +
+                    miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(balance[0]) + ".\n" +
+                    "Saldo " + moCurrencyRecord.getKey() + ": $ " +
+                    miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(balance[1]) + ".\n" +
+                    "Tipo de cambio acumulado: " + miClient.getSessionXXX().getFormatters().getDecimalsExchangeRateFormat().format(balance[1] == 0d ? 0d : balance[0] / balance[1]) + ".");
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+    }
+
+    private void actionPerformedExchangeRateAccountCashSet() {
+        moFieldExchangeRate.setFieldValue(obtainExchangeRateAccountCash());
+        jtfExchangeRate.requestFocus();
+    }
+
+    private void itemStateChangedBizPartner() {
+        if (moFieldFkBizPartnerId.getKeyAsIntArray()[0] > 0) {
+            jcbFkBizPartnerCurrencyId.setEnabled(true);
+            jbFkBizPartnerCurrencyId.setEnabled(true);
+            readBizPartnerCurrency();
+        }
+        else {
+            jcbFkBizPartnerCurrencyId.setEnabled(false);
+            jbFkBizPartnerCurrencyId.setEnabled(false);
+            renderCurrencySettings();
+        }
+    }
+
+    private void itemStateChangedBizPartnerCurrency() {
+        if (moFieldFkBizPartnerCurrencyId.getKeyAsIntArray()[0] > 0) {
+            moCurrencyBizPartner = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR,
+                new int[] { moFieldFkBizPartnerCurrencyId.getKeyAsIntArray()[0] }, SLibConstants.EXEC_MODE_SILENT);
+        }
+        else {
+            moCurrencyBizPartner = miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency();
+        }
+
+        renderCurrencySettings();
+    }
+
+    private void itemStateChangedCheckApplying() {
+        if (!jckCheckApplying.isSelected()) {
+            jcbFkCheckId_n.setEnabled(false);
+        }
+        else {
+            jcbFkCheckId_n.setEnabled(true);
+            jcbFkCheckId_n.requestFocus();
+        }
+    }
+
+    private void focusLostValueCy() {
+        if (moFieldValueCy.getDouble() != 0) {
+
+            if (!jtfValue.isEditable()|| moFieldValue.getDouble() == 0) {
+                moFieldValue.setFieldValue(SLibUtilities.round(moFieldValueCy.getDouble() * moFieldExchangeRate.getDouble(),
+                    miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
+            }
+            else if (moFieldExchangeRate.getDouble() == 0) {
+                moFieldExchangeRate.setFieldValue(SLibUtilities.round(moFieldValue.getDouble() / moFieldValueCy.getDouble(),
+                    miClient.getSessionXXX().getParamsErp().getDecimalsExchangeRate()));
+            }
+        }
+    }
+
+    private void focusLostValue() {
+        if (moFieldValue.getDouble() != 0) {
+
+            if (moFieldValueCy.getDouble() == 0 && moFieldExchangeRate.getDouble() != 0) {
+                moFieldValueCy.setFieldValue(SLibUtilities.round(moFieldValue.getDouble() / moFieldExchangeRate.getDouble(),
+                    miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
+            }
+            else if (moFieldValueCy.getDouble() != 0 && moFieldExchangeRate.getDouble() == 0) {
+                moFieldExchangeRate.setFieldValue(SLibUtilities.round(moFieldValue.getDouble() / moFieldValueCy.getDouble(),
+                    miClient.getSessionXXX().getParamsErp().getDecimalsExchangeRate()));
+            }
+        }
+    }
+
+    private void focusLostExchangeRate() {
+        if (moFieldValueCy.getDouble() != 0 && moFieldValue.getDouble() == 0) {
+            moFieldValue.setFieldValue(SLibUtilities.round(moFieldValueCy.getDouble() * moFieldExchangeRate.getDouble(),
+                    miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
+        }
+    }
+
+    private void focusLostCheck() {
+        if (jcbFkCheckId_n.getSelectedIndex() > 0 && moFieldConcept.getString().length() == 0) {
+            jtfConcept.setText("CH " + ((Integer) ((SFormComponentItem) jcbFkCheckId_n.getSelectedItem()).getComplement()) + "; " + moParamRecord.getDbmsDataAccountCash().getAuxCode() + " ");
         }
     }
 
@@ -1001,36 +988,36 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
     private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbExchangeRate;
-    private javax.swing.JButton jbExchangeRateAccountCash;
+    private javax.swing.JButton jbExchangeRateAccountCashSet;
     private javax.swing.JButton jbExchangeRateAccountCashView;
-    private javax.swing.JButton jbExchangeRateSystem;
+    private javax.swing.JButton jbExchangeRateSys;
+    private javax.swing.JButton jbFkBizPartnerCurrencyId;
     private javax.swing.JButton jbFkBizPartnerId;
-    private javax.swing.JButton jbFkCurrencyBizPartnerId;
     private javax.swing.JButton jbOk;
     private javax.swing.JButton jbValue;
     private javax.swing.JButton jbValueCy;
+    private javax.swing.JComboBox jcbFkBizPartnerCurrencyId;
     private javax.swing.JComboBox jcbFkBizPartnerId;
     private javax.swing.JComboBox jcbFkCheckId_n;
-    private javax.swing.JComboBox jcbFkCurrencyBizPartnerId;
-    private javax.swing.JCheckBox jckIsCheckApplying;
+    private javax.swing.JCheckBox jckCheckApplying;
     private javax.swing.JLabel jlAccountCash;
+    private javax.swing.JLabel jlAccountCashCurrency;
+    private javax.swing.JLabel jlBizPartnerCurrency;
     private javax.swing.JLabel jlConcept;
-    private javax.swing.JLabel jlCurrency;
-    private javax.swing.JLabel jlCurrencyBizPartner;
     private javax.swing.JLabel jlExchangeRate;
-    private javax.swing.JLabel jlExchangeRateSystem;
+    private javax.swing.JLabel jlExchangeRateSys;
+    private javax.swing.JLabel jlFkBizPartnerCurrencyId;
     private javax.swing.JLabel jlFkBizPartnerId;
-    private javax.swing.JLabel jlFkCurrencyBizPartnerId;
     private javax.swing.JLabel jlValue;
     private javax.swing.JLabel jlValueCy;
     private javax.swing.JTextField jtfAccountCash;
-    private javax.swing.JTextField jtfCode;
+    private javax.swing.JTextField jtfAccountCashCode;
+    private javax.swing.JTextField jtfAccountCashCurrency;
+    private javax.swing.JTextField jtfBizPartnerCurrency;
     private javax.swing.JTextField jtfCompanyBranch;
     private javax.swing.JTextField jtfConcept;
-    private javax.swing.JTextField jtfCurrency;
-    private javax.swing.JTextField jtfCurrencyBizPartner;
     private javax.swing.JTextField jtfExchangeRate;
-    private javax.swing.JTextField jtfExchangeRateSystem;
+    private javax.swing.JTextField jtfExchangeRateSys;
     private javax.swing.JTextField jtfValue;
     private javax.swing.JTextField jtfValueCy;
     // End of variables declaration//GEN-END:variables
@@ -1054,18 +1041,21 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
         }
 
         moCurrencyBizPartner = null;
-        jtfCurrencyBizPartner.setText("");
-        jckIsCheckApplying.setEnabled(isMoneyIn() ? false : true);
-        jckIsCheckApplying.setSelected(false);
-        jcbFkCurrencyBizPartnerId.setEnabled(false);
-        jtfValue.setEnabled(false);
+        jtfBizPartnerCurrency.setText("");
+        jckCheckApplying.setEnabled(isMoneyIn() ? false : true);
+        jckCheckApplying.setSelected(false);
+        jcbFkBizPartnerCurrencyId.setEnabled(false);
+        jtfValue.setEditable(false);
+        jtfValue.setFocusable(false);
+        jbValueCy.setEnabled(false);
         jbValue.setEnabled(false);
-        jtfExchangeRate.setEnabled(false);
-        jbExchangeRateSystem.setEnabled(false);
+        jtfExchangeRate.setEditable(false);
+        jtfExchangeRate.setFocusable(false);
+        jbExchangeRateSys.setEnabled(false);
         jbExchangeRate.setEnabled(false);
         jbExchangeRateAccountCashView.setEnabled(false);
-        jbExchangeRateAccountCash.setEnabled(false);
-        itemStateChangedIsCheckApplying();
+        jbExchangeRateAccountCashSet.setEnabled(false);
+        itemStateChangedCheckApplying();
         mbResetingForm = false;
     }
 
@@ -1073,7 +1063,7 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
     public void formRefreshCatalogues() {
         mbResetingForm = true;
         SFormUtilities.populateComboBox(miClient, jcbFkBizPartnerId, mnParamBizPartnerCategory);
-        SFormUtilities.populateComboBox(miClient, jcbFkCurrencyBizPartnerId, SDataConstants.CFGU_CUR);
+        SFormUtilities.populateComboBox(miClient, jcbFkBizPartnerCurrencyId, SDataConstants.CFGU_CUR);
     }
 
     @Override
@@ -1097,8 +1087,8 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
                     validation.setComponent(jtfValueCy);
                 }
             }
-            else if (jckIsCheckApplying.isSelected() && jcbFkCheckId_n.getSelectedIndex() <= 0) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jckIsCheckApplying.getText() + "'.");
+            else if (jckCheckApplying.isSelected() && jcbFkCheckId_n.getSelectedIndex() <= 0) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jckCheckApplying.getText() + "'.");
                 validation.setComponent(jcbFkCheckId_n);
             }
             else if (getBizPartnerAccountId().length() == 0) {
@@ -1138,7 +1128,7 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
         moFieldFkBizPartnerId.setKey(new int[] { moRecordEntry.getFkBizPartnerId_nr() });
         moFieldValueCy.setFieldValue(moCheck.getValue());
         moFieldValue.setFieldValue(moRecordEntry.getCredit());
-        moFieldExchangeRateSystem.setFieldValue(moRecordEntry.getExchangeRateSystem());
+        moFieldExchangeRateSys.setFieldValue(moRecordEntry.getExchangeRateSystem());
         moFieldExchangeRate.setFieldValue(moRecordEntry.getExchangeRate());
 
         mnFkUser = moRecordEntry.getFkUserNewId();
@@ -1146,39 +1136,44 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
 
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
-        moRecordEntry = prepareRecordEntry();
-
-        return moRecordEntry;
+        return moRecordEntry = prepareRecordEntry();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void setValue(int type, java.lang.Object value) {
-        if (type == SDataConstants.FIN_REC) {
-            moParamRecord = (SDataRecord) value;
-        }
-        else if (type == SDataConstants.FIN_CHECK) {
-            SFormComponentItem item = null;
-            mvParamCheckVector = (Vector<SDataCheck>) value;
-            jcbFkCheckId_n.removeAllItems();
-            jcbFkCheckId_n.addItem(new SFormComponentItem(new int[] { 0, 0 }, "(Seleccionar cheque)"));
+        switch (type) {
+            case SDataConstants.FIN_REC:
+                moParamRecord = (SDataRecord) value;
+                break;
+                
+            case SDataConstants.FIN_CHECK:
+                SFormComponentItem item = null;
+                mvParamCheckVector = (Vector<SDataCheck>) value;
+                jcbFkCheckId_n.removeAllItems();
+                jcbFkCheckId_n.addItem(new SFormComponentItem(new int[] { 0, 0 }, "(Seleccionar cheque)"));
 
-            for (SDataCheck check : mvParamCheckVector) {
-                item = new SFormComponentItem(check.getPrimaryKey(), "#" + check.getNumber() + "; " +
-                        miClient.getSessionXXX().getFormatters().getDecimalsCurrencyFormat().format(check.getValue()) + "; " +
-                        check.getBeneficiary());
-                item.setComplement(check.getNumber());
+                for (SDataCheck check : mvParamCheckVector) {
+                    item = new SFormComponentItem(check.getPrimaryKey(), "#" + check.getNumber() + "; " +
+                            miClient.getSessionXXX().getFormatters().getDecimalsCurrencyFormat().format(check.getValue()) + "; " +
+                            check.getBeneficiary());
+                    item.setComplement(check.getNumber());
 
-                jcbFkCheckId_n.addItem(item);
-            }
+                    jcbFkCheckId_n.addItem(item);
+                }
 
-            jcbFkCheckId_n.setSelectedIndex(0);
-        }
-        else if (type == SDataConstants.BPSU_BP) {
-            mnParamBizPartnerCategory = (Integer) value;
-        }
-        else if (type == SDataConstants.FINS_CLS_ACC_MOV) {
-            manParamAccountingMove = (int[]) value;
+                jcbFkCheckId_n.setSelectedIndex(0);
+                break;
+                
+            case SDataConstants.BPSU_BP:
+                mnParamBizPartnerCategory = (Integer) value;
+                break;
+                
+            case SDataConstants.FINS_CLS_ACC_MOV:
+                manParamAccountingMove = (int[]) value;
+                break;
+                
+            default:
         }
     }
 
@@ -1198,38 +1193,65 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
             javax.swing.JButton button = (javax.swing.JButton) e.getSource();
 
             if (button == jbOk) {
-                actionOk();
+                actionPerformedOk();
             }
             else if (button == jbCancel) {
-                actionCancel();
+                actionPerformedCancel();
             }
             else if (button == jbFkBizPartnerId) {
-                actionjbFkBizPartnerId();
+                actionPerformedBizPartnerId();
             }
-            else if (button == jbFkCurrencyBizPartnerId) {
-                actionjbFkCurrencyBizPartnerId();
+            else if (button == jbFkBizPartnerCurrencyId) {
+                actionPerformedCurrencyBizPartnerId();
             }
             else if (button == jbValueCy) {
-                actionValueCy();
+                actionPerformedValueCy();
             }
             else if (button == jbValue) {
-                actionValue();
+                actionPerformedValue();
             }
-            else if (button == jbExchangeRateSystem) {
-                actionExchangeRateSystem();
+            else if (button == jbExchangeRateSys) {
+                actionPerformedExchangeRateSystem();
             }
             else if (button == jbExchangeRate) {
-                actionExchangeRate();
-            }
-            else if (button == jbExchangeRateAccountCash) {
-                actionExchangeRateAccountCash();
+                actionPerformedExchangeRate();
             }
             else if (button == jbExchangeRateAccountCashView) {
-                actionExchangeRateAccountCashView();
+                actionPerformedExchangeRateAccountCashView();
+            }
+            else if (button == jbExchangeRateAccountCashSet) {
+                actionPerformedExchangeRateAccountCashSet();
             }
         }
     }
 
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof javax.swing.JComboBox) {
+            if (!mbResetingForm) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    JComboBox comboBox = (JComboBox) e.getSource();
+                    
+                    if (comboBox == jcbFkBizPartnerId) {
+                        itemStateChangedBizPartner();
+                    }
+                    else if (comboBox == jcbFkBizPartnerCurrencyId) {
+                        itemStateChangedBizPartnerCurrency();
+                    }
+                }
+            }
+        }
+        else if (e.getSource() instanceof javax.swing.JCheckBox) {
+            if (!mbResetingForm) {
+                JCheckBox checkBox = (JCheckBox) e.getSource();
+                
+                if (checkBox == jckCheckApplying) {
+                    itemStateChangedCheckApplying();
+                }
+            }
+        }
+    }
+    
     @Override
     public void focusGained(java.awt.event.FocusEvent e) {
 
@@ -1248,6 +1270,13 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
             }
             else if (textField == jtfExchangeRate) {
                 focusLostExchangeRate();
+            }
+        }
+        else if (e.getSource() instanceof javax.swing.JComboBox) {
+            JComboBox comboBox = (JComboBox) e.getSource();
+            
+            if (comboBox == jcbFkCheckId_n) {
+                focusLostCheck();
             }
         }
     }

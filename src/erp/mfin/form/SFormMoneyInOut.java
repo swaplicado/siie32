@@ -11,32 +11,31 @@
 
 package erp.mfin.form;
 
+import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
+import erp.data.SDataReadDescriptions;
+import erp.data.SDataUtilities;
+import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
+import erp.mcfg.data.SDataCurrency;
+import erp.mfin.data.SDataAccountCash;
+import erp.mfin.data.SDataRecord;
+import erp.mfin.data.SDataRecordEntry;
+import erp.mod.SModSysConsts;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-import erp.data.SDataConstants;
-import erp.data.SDataConstantsSys;
-import erp.data.SDataReadDescriptions;
-import erp.data.SDataUtilities;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormValidation;
-import erp.lib.form.SFormUtilities;
-import erp.lib.SLibConstants;
-import erp.lib.SLibUtilities;
-import erp.mcfg.data.SDataCurrency;
-import erp.mfin.data.SDataAccountCash;
-import erp.mfin.data.SDataRecord;
-import erp.mfin.data.SDataRecordEntry;
-import erp.mod.SModSysConsts;
-import java.awt.event.ItemEvent;
-
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
 public class SFormMoneyInOut extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener {
 
@@ -144,7 +143,7 @@ public class SFormMoneyInOut extends javax.swing.JDialog implements erp.lib.form
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel3.setLayout(new java.awt.GridLayout(9, 1, 0, 1));
+        jPanel3.setLayout(new java.awt.GridLayout(6, 1, 0, 2));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
@@ -171,7 +170,7 @@ public class SFormMoneyInOut extends javax.swing.JDialog implements erp.lib.form
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlFkAccountCashId.setText("Cuenta de efectivo: *");
+        jlFkAccountCashId.setText("Cuenta de dinero: *");
         jlFkAccountCashId.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel9.add(jlFkAccountCashId);
 
@@ -194,14 +193,14 @@ public class SFormMoneyInOut extends javax.swing.JDialog implements erp.lib.form
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlCurrency.setText("Moneda:");
+        jlCurrency.setText("Moneda cuenta de dinero:");
         jlCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel5.add(jlCurrency);
 
         jtfCurrency.setEditable(false);
         jtfCurrency.setText("CURRENCY");
         jtfCurrency.setFocusable(false);
-        jtfCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtfCurrency.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel5.add(jtfCurrency);
 
         jPanel3.add(jPanel5);
@@ -225,7 +224,7 @@ public class SFormMoneyInOut extends javax.swing.JDialog implements erp.lib.form
         jPanel6.add(jlValueCy);
 
         jtfValueCy.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfValueCy.setText("1,000,000,000.00");
+        jtfValueCy.setText("0.00");
         jtfValueCy.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jtfValueCy);
 
@@ -241,7 +240,7 @@ public class SFormMoneyInOut extends javax.swing.JDialog implements erp.lib.form
 
         jtfExchangeRateSystem.setEditable(false);
         jtfExchangeRateSystem.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfExchangeRateSystem.setText("1,000,000,000.00");
+        jtfExchangeRateSystem.setText("0.00");
         jtfExchangeRateSystem.setFocusable(false);
         jtfExchangeRateSystem.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jtfExchangeRateSystem);
@@ -267,7 +266,7 @@ public class SFormMoneyInOut extends javax.swing.JDialog implements erp.lib.form
         jPanel7.add(jlValue);
 
         jtfValue.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfValue.setText("1,000,000,000.00");
+        jtfValue.setText("0.00");
         jtfValue.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel7.add(jtfValue);
 
@@ -282,7 +281,7 @@ public class SFormMoneyInOut extends javax.swing.JDialog implements erp.lib.form
         jPanel7.add(jlExchangeRate);
 
         jtfExchangeRate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfExchangeRate.setText("1,000,000,000.00");
+        jtfExchangeRate.setText("0.00");
         jtfExchangeRate.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel7.add(jtfExchangeRate);
 
@@ -304,8 +303,8 @@ public class SFormMoneyInOut extends javax.swing.JDialog implements erp.lib.form
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-575)/2, (screenSize.height-375)/2, 575, 375);
+        setSize(new java.awt.Dimension(575, 375));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -391,7 +390,7 @@ public class SFormMoneyInOut extends javax.swing.JDialog implements erp.lib.form
     private void windowActivated() {
         if (mbFirstTime) {
             mbFirstTime = false;
-            setTitle(mbParamIsMoneyIn ? "Ingreso de efectivo" : "Egreso de efectivo");
+            setTitle((mbParamIsMoneyIn ? "Ingreso" : "Egreso") + " de dinero");
             if (moParamAccountCash != null) {
                 renderAccountCashSettings(false);
                 moFieldFkAccountCashId.setKey(new int[] { moParamAccountCash.getPkCompanyBranchId(),
@@ -485,9 +484,12 @@ public class SFormMoneyInOut extends javax.swing.JDialog implements erp.lib.form
             jtfCurrency.setText(moCurrency.getCurrency());
 
             if (moCurrency.getPkCurrencyId() != miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) {
-               jtfValue.setEnabled(true);
+               jtfValue.setEditable(true);
+               jtfValue.setFocusable(true);
+               jbValueCy.setEnabled(true);
                jbValue.setEnabled(true);
-               jtfExchangeRate.setEnabled(true);
+               jtfExchangeRate.setEditable(true);
+               jtfExchangeRate.setFocusable(true);
                jbExchangeRate.setEnabled(true);
                jbExchangeRateSystem.setEnabled(true);
                jbExchangeRateAccountCashView.setEnabled(true);
@@ -501,9 +503,12 @@ public class SFormMoneyInOut extends javax.swing.JDialog implements erp.lib.form
                }
             }
             else {
-               jtfValue.setEnabled(false);
+               jtfValue.setEditable(false);
+               jtfValue.setFocusable(false);
+               jbValueCy.setEnabled(false);
                jbValue.setEnabled(false);
-               jtfExchangeRate.setEnabled(false);
+               jtfExchangeRate.setEditable(false);
+               jtfExchangeRate.setFocusable(false);
                jbExchangeRateSystem.setEnabled(false);
                jbExchangeRate.setEnabled(false);
                jbExchangeRateAccountCashView.setEnabled(false);
@@ -602,7 +607,7 @@ public class SFormMoneyInOut extends javax.swing.JDialog implements erp.lib.form
     private void focusLostValueCy() {
         if (moFieldValueCy.getDouble() != 0) {
 
-            if (!jtfValue.isEnabled() || moFieldValue.getDouble() == 0) {
+            if (!jtfValue.isEditable()|| moFieldValue.getDouble() == 0) {
                 moFieldValue.setFieldValue(SLibUtilities.round(moFieldValueCy.getDouble() * moFieldExchangeRate.getDouble(),
                     miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
             }
@@ -779,9 +784,12 @@ public class SFormMoneyInOut extends javax.swing.JDialog implements erp.lib.form
 
         jcbFkAccountCashId.removeAllItems();
         jcbFkAccountCashId.setEnabled(false);
-        jtfValue.setEnabled(false);
+        jtfValue.setEditable(false);
+        jtfValue.setFocusable(false);
+        jbValueCy.setEnabled(false);
         jbValue.setEnabled(false);
-        jtfExchangeRate.setEnabled(false);
+        jtfExchangeRate.setEditable(false);
+        jtfExchangeRate.setFocusable(false);
         jbExchangeRateSystem.setEnabled(false);
         jbExchangeRate.setEnabled(false);
         jbExchangeRateAccountCashView.setEnabled(false);

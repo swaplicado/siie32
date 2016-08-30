@@ -1473,8 +1473,8 @@ public abstract class SDataUtilities {
      * index 1: balance in cash account provided currency.
      */
     @SuppressWarnings("unchecked")
-    public static double[] obtainAccountCashBalanceUpdated(erp.client.SClientInterface client, int entityCurrencyId, java.util.Date cutOffDate,
-            java.lang.Object entityKey, java.lang.Object systemMoveTypeKey, erp.mfin.data.SDataRecord record, erp.mfin.data.SDataRecordEntry currentRecordEntry) throws java.lang.Exception {
+    public static double[] obtainAccountCashBalanceUpdated(erp.client.SClientInterface client, int entityCurrencyId, java.util.Date cutOffDate, java.lang.Object entityKey, 
+            java.lang.Object systemMoveTypeKey, erp.mfin.data.SDataRecord record, erp.mfin.data.SDataRecordEntry currentRecordEntry) throws java.lang.Exception {
 
         double[] balance = obtainAccountCashBalance(client, entityCurrencyId, cutOffDate, entityKey, systemMoveTypeKey, record.getPrimaryKey());
 

@@ -2568,7 +2568,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                         // 4.4 Purchases or sales:
 
-                        if (appliesPrepayment) { // prevent from reading configuration when not needed!
+                        if (appliesPrepayment) { // prevent from reading prepayment configuration when not needed!
                             oConfigBpr = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
                                     mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
                                     mtDate, SDataConstantsSys.FINS_TP_ACC_BP_PAY, isDebitForBizPartner(), oStatement));
@@ -2577,6 +2577,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         for (SDataDpsEntry entry : mvDbmsDpsEntries) {
                             if (entry.isAccountable()) {
                                 if (entry.getIsPrepayment()) {
+                                    // Document entry for prepayment:
+                                    
                                     if (entry.getQuantity() >= 0) {
                                         oAmount = new SFinAmount(entry.getSubtotal_r(), entry.getSubtotalCy_r());
                                     }
@@ -2632,6 +2634,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     }
                                 }
                                 else {
+                                    // Standard document entry:
+                                    
                                     oConfigItem = new SFinAccountConfig(SFinAccountUtilities.obtainItemAccountConfigs(
                                             entry.getFkItemRefId_n() != SLibConsts.UNDEFINED ? entry.getFkItemRefId_n() : entry.getFkItemId(), oRecord.getPkBookkeepingCenterId(), 
                                             mtDate, getAccItemTypeId(entry), isDebitForOperations(), oStatement));
@@ -2690,10 +2694,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 
                                 for (SDataDpsEntryTax tax : entry.getDbmsEntryTaxes()) {
                                     if (entry.getQuantity() >= 0) {
-                                        oAmount = new SFinAmount(tax.getTax(), tax.getTaxCy(), entry.getIsPrepayment(), SFinMovement.INCREMENT); // "is prepayment" argument isn't really needed on taxes context, used just for consistence
+                                        oAmount = new SFinAmount(tax.getTax(), tax.getTaxCy(), entry.getIsPrepayment(), SFinMovement.INCREMENT);
                                     }
                                     else {
-                                        oAmount = new SFinAmount(-tax.getTax(), -tax.getTaxCy(), entry.getIsPrepayment(), SFinMovement.DECREMENT); // "is prepayment" argument isn't really needed on taxes context, used just for consistence
+                                        oAmount = new SFinAmount(-tax.getTax(), -tax.getTaxCy(), entry.getIsPrepayment(), SFinMovement.DECREMENT);
                                     }
                                     
                                     oDpsTaxes.addTax(isDocument() ? (int[]) getPrimaryKey() : entry.getKeyAuxDps(), tax.getKeyTax(), oAmount);
@@ -2708,7 +2712,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 nTaxAccTypeId = SDataConstantsSys.FINX_ACC_PAY_PEND; // decrement occurs when prepayment applied into invoice
                             }
                             else {
-                                nTaxAccTypeId = tax.getFkTaxApplicationTypeId() == SModSysConsts.FINS_TP_TAX_APP_ACCR ? SDataConstantsSys.FINX_ACC_PAY : SDataConstantsSys.FINX_ACC_PAY_PEND;
+                                nTaxAccTypeId = tax.isPrepayment() || tax.getFkTaxApplicationTypeId() == SModSysConsts.FINS_TP_TAX_APP_ACCR ? SDataConstantsSys.FINX_ACC_PAY : SDataConstantsSys.FINX_ACC_PAY_PEND;
                             }
                             
                             sAccountId = SFinAccountUtilities.obtainTaxAccountId(tax.getKeyTax(), mnFkDpsCategoryId, mtDate, nTaxAccTypeId, oStatement);
@@ -2716,12 +2720,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             sSql = "SELECT fid_tp_tax, fid_tp_tax_app FROM erp.finu_tax " +
                                     "WHERE id_tax_bas = " + tax.getPkTaxBasicId() + " AND id_tax = " + tax.getPkTaxId() + " ";
                             oResultSet = oStatement.executeQuery(sSql);
-                            if (oResultSet.next()) {
-                                nTaxTypeId = oResultSet.getInt("fid_tp_tax");
-                                nTaxAppTypeId = oResultSet.getInt("fid_tp_tax_app");
+                            if (!oResultSet.next()) {
+                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                             }
                             else {
-                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                                nTaxTypeId = oResultSet.getInt("fid_tp_tax");
+                                nTaxAppTypeId = tax.isPrepayment() && tax.getMovement() == SFinMovement.INCREMENT ? SModSysConsts.FINS_TP_TAX_APP_ACCR : oResultSet.getInt("fid_tp_tax_app");
                             }
 
                             anSysAccTypeKeyTax = SModSysConsts.FINS_TP_SYS_ACC_NA_NA;

@@ -454,6 +454,9 @@ public abstract class SModSysConsts {
     public static final int FINS_TP_TAX_APP_ACCR = 1;
     public static final int FINS_TP_TAX_APP_CASH = 2;
 
+    public static final String FINS_TP_TAX_APP_ACCR_NAME = "DEVENGADO";
+    public static final String FINS_TP_TAX_APP_CASH_NAME = "PAGADO";
+
     public static final int FINS_FISCAL_ACC_NA = 1;
     public static final String FINS_FISCAL_ACC_NA_CODE = "0";
     public static final String FINS_FISCAL_ACC_NA_NAME = "(N/A)";
