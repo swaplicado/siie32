@@ -35,7 +35,7 @@ import javax.swing.JTextField;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
 public class SFormMoneyInOut extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener {
 
@@ -170,7 +170,7 @@ public class SFormMoneyInOut extends javax.swing.JDialog implements erp.lib.form
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlFkAccountCashId.setText("Cuenta de efectivo: *");
+        jlFkAccountCashId.setText("Cuenta de dinero: *");
         jlFkAccountCashId.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel9.add(jlFkAccountCashId);
 
@@ -193,14 +193,14 @@ public class SFormMoneyInOut extends javax.swing.JDialog implements erp.lib.form
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlCurrency.setText("Moneda:");
+        jlCurrency.setText("Moneda cuenta de dinero:");
         jlCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel5.add(jlCurrency);
 
         jtfCurrency.setEditable(false);
         jtfCurrency.setText("CURRENCY");
         jtfCurrency.setFocusable(false);
-        jtfCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtfCurrency.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel5.add(jtfCurrency);
 
         jPanel3.add(jPanel5);

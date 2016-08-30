@@ -169,7 +169,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jlGuiConceptPolicy = new javax.swing.JLabel();
         jcbGuiConceptPolicy = new javax.swing.JComboBox<SFormComponentItem>();
         jpCommandsCashAccount = new javax.swing.JPanel();
-        jpCommands21 = new javax.swing.JPanel();
+        jpCommandsCashAccount1 = new javax.swing.JPanel();
         jPanel22 = new javax.swing.JPanel();
         jbMoneyIn = new javax.swing.JButton();
         jbMoneyInOther = new javax.swing.JButton();
@@ -183,7 +183,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbMiCreditCdr = new javax.swing.JButton();
         jbMiCreditDbr = new javax.swing.JButton();
         jbMiExchangeRate = new javax.swing.JButton();
-        jpCommands22 = new javax.swing.JPanel();
+        jpCommandsCashAccount2 = new javax.swing.JPanel();
         jPanel25 = new javax.swing.JPanel();
         jbMoneyOut = new javax.swing.JButton();
         jbMoneyOutOther = new javax.swing.JButton();
@@ -198,22 +198,20 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbMoDebitDbr = new javax.swing.JButton();
         jbMoExchangeRate = new javax.swing.JButton();
         jpCommandsJournal = new javax.swing.JPanel();
-        jpCommands31 = new javax.swing.JPanel();
+        jpCommandsJournal1 = new javax.swing.JPanel();
         jpControlCashAccount2 = new javax.swing.JPanel();
         jbDbtPaymentSup = new javax.swing.JButton();
         jbDbtAdvanceSup = new javax.swing.JButton();
         jbDbtAdvanceCusDev = new javax.swing.JButton();
         jbDbtDebitCdr = new javax.swing.JButton();
         jbDbtDebitDbr = new javax.swing.JButton();
-        jbDbtExchangeRate = new javax.swing.JButton();
-        jpCommands32 = new javax.swing.JPanel();
+        jpCommandsJournal2 = new javax.swing.JPanel();
         jpControlCashAccount3 = new javax.swing.JPanel();
         jbCdtPaymentCus = new javax.swing.JButton();
         jbCdtAdvanceCus = new javax.swing.JButton();
         jbCdtAdvanceSupDev = new javax.swing.JButton();
         jbCdtCreditCdr = new javax.swing.JButton();
         jbCdtCreditDbr = new javax.swing.JButton();
-        jbCdtExchangeRate = new javax.swing.JButton();
         jpControls = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -319,7 +317,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlFkAccountCashId_n.setText("Cuenta de efectivo:");
+        jlFkAccountCashId_n.setText("Cuenta de dinero:");
         jlFkAccountCashId_n.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel9.add(jlFkAccountCashId_n);
 
@@ -538,7 +536,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
 
         jpCommandsCashAccount.setLayout(new java.awt.GridLayout(2, 1));
 
-        jpCommands21.setLayout(new java.awt.BorderLayout());
+        jpCommandsCashAccount1.setLayout(new java.awt.BorderLayout());
 
         jPanel22.setBorder(javax.swing.BorderFactory.createTitledBorder("Ingresos:"));
         jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
@@ -567,7 +565,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jLabel3.setPreferredSize(new java.awt.Dimension(65, 23));
         jPanel22.add(jLabel3);
 
-        jpCommands21.add(jPanel22, java.awt.BorderLayout.CENTER);
+        jpCommandsCashAccount1.add(jPanel22, java.awt.BorderLayout.CENTER);
 
         jPanel23.setBorder(javax.swing.BorderFactory.createTitledBorder("Contrapartidas ingresos:"));
         jPanel23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
@@ -608,11 +606,11 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbMiExchangeRate.setPreferredSize(new java.awt.Dimension(95, 23));
         jPanel23.add(jbMiExchangeRate);
 
-        jpCommands21.add(jPanel23, java.awt.BorderLayout.EAST);
+        jpCommandsCashAccount1.add(jPanel23, java.awt.BorderLayout.EAST);
 
-        jpCommandsCashAccount.add(jpCommands21);
+        jpCommandsCashAccount.add(jpCommandsCashAccount1);
 
-        jpCommands22.setLayout(new java.awt.BorderLayout());
+        jpCommandsCashAccount2.setLayout(new java.awt.BorderLayout());
 
         jPanel25.setBorder(javax.swing.BorderFactory.createTitledBorder("Egresos:"));
         jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
@@ -648,7 +646,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbMoneyOutTransfer.setPreferredSize(new java.awt.Dimension(65, 23));
         jPanel25.add(jbMoneyOutTransfer);
 
-        jpCommands22.add(jPanel25, java.awt.BorderLayout.CENTER);
+        jpCommandsCashAccount2.add(jPanel25, java.awt.BorderLayout.CENTER);
 
         jPanel26.setBorder(javax.swing.BorderFactory.createTitledBorder("Contrapartidas egresos:"));
         jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
@@ -689,15 +687,15 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbMoExchangeRate.setPreferredSize(new java.awt.Dimension(95, 23));
         jPanel26.add(jbMoExchangeRate);
 
-        jpCommands22.add(jPanel26, java.awt.BorderLayout.EAST);
+        jpCommandsCashAccount2.add(jPanel26, java.awt.BorderLayout.EAST);
 
-        jpCommandsCashAccount.add(jpCommands22);
+        jpCommandsCashAccount.add(jpCommandsCashAccount2);
 
         jpCommands.add(jpCommandsCashAccount, java.awt.BorderLayout.CENTER);
 
-        jpCommandsJournal.setLayout(new java.awt.GridLayout(2, 1));
+        jpCommandsJournal.setLayout(new java.awt.GridLayout(1, 2));
 
-        jpCommands31.setLayout(new java.awt.BorderLayout());
+        jpCommandsJournal1.setLayout(new java.awt.BorderLayout());
 
         jpControlCashAccount2.setBorder(javax.swing.BorderFactory.createTitledBorder("Cargos:"));
         jpControlCashAccount2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
@@ -732,18 +730,12 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbDbtDebitDbr.setPreferredSize(new java.awt.Dimension(95, 23));
         jpControlCashAccount2.add(jbDbtDebitDbr);
 
-        jbDbtExchangeRate.setText("Pérdida cambios");
-        jbDbtExchangeRate.setToolTipText("Pérdida por diferencia cambiaria");
-        jbDbtExchangeRate.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbDbtExchangeRate.setPreferredSize(new java.awt.Dimension(95, 23));
-        jpControlCashAccount2.add(jbDbtExchangeRate);
+        jpCommandsJournal1.add(jpControlCashAccount2, java.awt.BorderLayout.CENTER);
 
-        jpCommands31.add(jpControlCashAccount2, java.awt.BorderLayout.CENTER);
+        jpCommandsJournal.add(jpCommandsJournal1);
 
-        jpCommandsJournal.add(jpCommands31);
-
-        jpCommands32.setBorder(javax.swing.BorderFactory.createTitledBorder("Abonos:"));
-        jpCommands32.setLayout(new java.awt.BorderLayout());
+        jpCommandsJournal2.setBorder(javax.swing.BorderFactory.createTitledBorder("Abonos:"));
+        jpCommandsJournal2.setLayout(new java.awt.BorderLayout());
 
         jpControlCashAccount3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
@@ -777,15 +769,9 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbCdtCreditDbr.setPreferredSize(new java.awt.Dimension(95, 23));
         jpControlCashAccount3.add(jbCdtCreditDbr);
 
-        jbCdtExchangeRate.setText("Ganancia cambios");
-        jbCdtExchangeRate.setToolTipText("Ganancia por diferencia cambiaria");
-        jbCdtExchangeRate.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbCdtExchangeRate.setPreferredSize(new java.awt.Dimension(95, 23));
-        jpControlCashAccount3.add(jbCdtExchangeRate);
+        jpCommandsJournal2.add(jpControlCashAccount3, java.awt.BorderLayout.CENTER);
 
-        jpCommands32.add(jpControlCashAccount3, java.awt.BorderLayout.CENTER);
-
-        jpCommandsJournal.add(jpCommands32);
+        jpCommandsJournal.add(jpCommandsJournal2);
 
         jpCommands.add(jpCommandsJournal, java.awt.BorderLayout.SOUTH);
 
@@ -937,14 +923,12 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbDbtAdvanceCusDev.addActionListener(this);
         jbDbtDebitCdr.addActionListener(this);
         jbDbtDebitDbr.addActionListener(this);
-        jbDbtExchangeRate.addActionListener(this);
         
         jbCdtPaymentCus.addActionListener(this);
         jbCdtAdvanceCus.addActionListener(this);
         jbCdtAdvanceSupDev.addActionListener(this);
         jbCdtCreditCdr.addActionListener(this);
         jbCdtCreditDbr.addActionListener(this);
-        jbCdtExchangeRate.addActionListener(this);
         
         jcbFkAccountCashId_n.addItemListener(this);
 
@@ -1751,14 +1735,12 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private javax.swing.JButton jbCdtAdvanceSupDev;
     private javax.swing.JButton jbCdtCreditCdr;
     private javax.swing.JButton jbCdtCreditDbr;
-    private javax.swing.JButton jbCdtExchangeRate;
     private javax.swing.JButton jbCdtPaymentCus;
     private javax.swing.JButton jbDate;
     private javax.swing.JButton jbDbtAdvanceCusDev;
     private javax.swing.JButton jbDbtAdvanceSup;
     private javax.swing.JButton jbDbtDebitCdr;
     private javax.swing.JButton jbDbtDebitDbr;
-    private javax.swing.JButton jbDbtExchangeRate;
     private javax.swing.JButton jbDbtPaymentSup;
     private javax.swing.JButton jbEntryDelete;
     private javax.swing.JButton jbEntryEdit;
@@ -1813,13 +1795,13 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private javax.swing.JPanel jpCommands11;
     private javax.swing.JPanel jpCommands12;
     private javax.swing.JPanel jpCommands13;
-    private javax.swing.JPanel jpCommands21;
-    private javax.swing.JPanel jpCommands22;
-    private javax.swing.JPanel jpCommands31;
-    private javax.swing.JPanel jpCommands32;
     private javax.swing.JPanel jpCommandsCashAccount;
+    private javax.swing.JPanel jpCommandsCashAccount1;
+    private javax.swing.JPanel jpCommandsCashAccount2;
     private javax.swing.JPanel jpCommandsEntries;
     private javax.swing.JPanel jpCommandsJournal;
+    private javax.swing.JPanel jpCommandsJournal1;
+    private javax.swing.JPanel jpCommandsJournal2;
     private javax.swing.JPanel jpControlCashAccount2;
     private javax.swing.JPanel jpControlCashAccount3;
     private javax.swing.JPanel jpControls;
@@ -1919,14 +1901,12 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbDbtAdvanceCusDev.setEnabled(true);
         jbDbtDebitCdr.setEnabled(true);
         jbDbtDebitDbr.setEnabled(true);
-        jbDbtExchangeRate.setEnabled(true);
         
         jbCdtPaymentCus.setEnabled(true);
         jbCdtAdvanceCus.setEnabled(true);
         jbCdtAdvanceSupDev.setEnabled(true);
         jbCdtCreditCdr.setEnabled(true);
         jbCdtCreditDbr.setEnabled(true);
-        jbCdtExchangeRate.setEnabled(true);
         
         jbOk.setEnabled(true);
 
@@ -2112,14 +2092,12 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             jbDbtAdvanceCusDev.setEnabled(false);
             jbDbtDebitCdr.setEnabled(false);
             jbDbtDebitDbr.setEnabled(false);
-            jbDbtExchangeRate.setEnabled(false);
 
             jbCdtPaymentCus.setEnabled(false);
             jbCdtAdvanceCus.setEnabled(false);
             jbCdtAdvanceSupDev.setEnabled(false);
             jbCdtCreditCdr.setEnabled(false);
             jbCdtCreditDbr.setEnabled(false);
-            jbCdtExchangeRate.setEnabled(false);
 
             jbOk.setEnabled(false);
 
@@ -2263,7 +2241,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             else if (button == jbMiCreditDbr || button == jbCdtCreditDbr) {
                 actionPerformedMoneyInOutBizPartner(SDataConstants.BPSX_BP_DBR, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_EXT_DBR);
             }
-            else if (button == jbMiExchangeRate || button == jbCdtExchangeRate) {
+            else if (button == jbMiExchangeRate) {
                 actionPerformedExrProfitLoss(true);
             }
             
@@ -2297,7 +2275,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             else if (button == jbMoDebitDbr || button == jbDbtDebitDbr) {
                 actionPerformedMoneyInOutBizPartner(SDataConstants.BPSX_BP_DBR, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_EXT_DBR);
             }
-            else if (button == jbMoExchangeRate || button == jbDbtExchangeRate) {
+            else if (button == jbMoExchangeRate) {
                 actionPerformedExrProfitLoss(false);
             }
         }

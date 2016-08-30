@@ -177,7 +177,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlAccountCash.setText("Cuenta dinero:");
+        jlAccountCash.setText("Cuenta de dinero:");
         jlAccountCash.setPreferredSize(new java.awt.Dimension(135, 23));
         jPanel11.add(jlAccountCash);
 

@@ -172,7 +172,7 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlAccountCash.setText("Cuenta dinero:");
+        jlAccountCash.setText("Cuenta de dinero:");
         jlAccountCash.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel4.add(jlAccountCash);
 
@@ -198,7 +198,7 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlAccountCashCurrency.setText("Moneda cuenta dinero:");
+        jlAccountCashCurrency.setText("Moneda cuenta de dinero:");
         jlAccountCashCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel8.add(jlAccountCashCurrency);
 

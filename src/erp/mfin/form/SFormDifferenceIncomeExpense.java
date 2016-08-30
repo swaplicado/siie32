@@ -30,7 +30,7 @@ import javax.swing.AbstractAction;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
 public class SFormDifferenceIncomeExpense extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener {
 
@@ -78,12 +78,12 @@ public class SFormDifferenceIncomeExpense extends javax.swing.JDialog implements
         jtfCompanyBranch = new javax.swing.JTextField();
         jtfAccountCash = new javax.swing.JTextField();
         jtfCode = new javax.swing.JTextField();
-        jPanel5 = new javax.swing.JPanel();
-        jlConcept = new javax.swing.JLabel();
-        jtfConcept = new javax.swing.JTextField();
         jPanel6 = new javax.swing.JPanel();
         jlCurrency = new javax.swing.JLabel();
         jtfCurrency = new javax.swing.JTextField();
+        jPanel5 = new javax.swing.JPanel();
+        jlConcept = new javax.swing.JLabel();
+        jtfConcept = new javax.swing.JTextField();
         jPanel7 = new javax.swing.JPanel();
         jlValue = new javax.swing.JLabel();
         jtfValue = new javax.swing.JTextField();
@@ -113,12 +113,12 @@ public class SFormDifferenceIncomeExpense extends javax.swing.JDialog implements
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel3.setLayout(new java.awt.GridLayout(4, 1, 0, 1));
+        jPanel3.setLayout(new java.awt.GridLayout(4, 1, 0, 2));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlAccountCash.setText("Cuenta de efectivo:");
-        jlAccountCash.setPreferredSize(new java.awt.Dimension(160, 23));
+        jlAccountCash.setText("Cuenta de dinero:");
+        jlAccountCash.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel4.add(jlAccountCash);
 
         jtfCompanyBranch.setEditable(false);
@@ -130,7 +130,7 @@ public class SFormDifferenceIncomeExpense extends javax.swing.JDialog implements
         jtfAccountCash.setEditable(false);
         jtfAccountCash.setText("ACCOUNT CASH");
         jtfAccountCash.setFocusable(false);
-        jtfAccountCash.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtfAccountCash.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel4.add(jtfAccountCash);
 
         jtfCode.setEditable(false);
@@ -141,22 +141,10 @@ public class SFormDifferenceIncomeExpense extends javax.swing.JDialog implements
 
         jPanel3.add(jPanel4);
 
-        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
-
-        jlConcept.setText("Concepto de la partida: *");
-        jlConcept.setPreferredSize(new java.awt.Dimension(160, 23));
-        jPanel5.add(jlConcept);
-
-        jtfConcept.setText("CONCEPT");
-        jtfConcept.setPreferredSize(new java.awt.Dimension(360, 23));
-        jPanel5.add(jtfConcept);
-
-        jPanel3.add(jPanel5);
-
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlCurrency.setText("Moneda cuenta de efectivo:");
-        jlCurrency.setPreferredSize(new java.awt.Dimension(160, 23));
+        jlCurrency.setText("Moneda cuenta de dinero:");
+        jlCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel6.add(jlCurrency);
 
         jtfCurrency.setEditable(false);
@@ -167,14 +155,26 @@ public class SFormDifferenceIncomeExpense extends javax.swing.JDialog implements
 
         jPanel3.add(jPanel6);
 
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlConcept.setText("Concepto de la partida: *");
+        jlConcept.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel5.add(jlConcept);
+
+        jtfConcept.setText("CONCEPT");
+        jtfConcept.setPreferredSize(new java.awt.Dimension(375, 23));
+        jPanel5.add(jtfConcept);
+
+        jPanel3.add(jPanel5);
+
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlValue.setText("Monto en moneda local (ML): *");
-        jlValue.setPreferredSize(new java.awt.Dimension(160, 23));
+        jlValue.setText("Monto moneda local (ML): *");
+        jlValue.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel7.add(jlValue);
 
         jtfValue.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfValue.setText("1,000,000,000.00");
+        jtfValue.setText("0.00");
         jtfValue.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel7.add(jtfValue);
 
@@ -184,8 +184,8 @@ public class SFormDifferenceIncomeExpense extends javax.swing.JDialog implements
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-554)/2, (screenSize.height-350)/2, 554, 350);
+        setSize(new java.awt.Dimension(616, 414));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
