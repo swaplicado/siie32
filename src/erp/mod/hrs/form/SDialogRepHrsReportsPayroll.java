@@ -267,7 +267,6 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
     // End of variables declaration//GEN-END:variables
 
     private void actionEnableShowGroupDepartament() {
-        moBoolShowGroupDepartament.setSelected(true);
         if (moRadReportListEarning.isSelected() || moRadReportListDeductions.isSelected() || moRadReportPayrollSummary.isSelected()) {
             moBoolShowGroupDepartament.setEnabled(false);
         }
@@ -310,10 +309,10 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
                 break;
             case SModConsts.HRSR_PAY:
                 if (moRadOrderByNumEmployee.isSelected()) {
-                    orderBy = "ORDER BY dep.code, dep.id_dep, emp.num, bp.id_bp; ";
+                    orderBy = "ORDER BY emp.num, bp.id_bp; ";
                 }
                 else if (moRadOrderByNameEmployee.isSelected()) {
-                    orderBy = "ORDER BY dep.code, dep.id_dep, bp.bp, bp.id_bp; ";
+                    orderBy = "ORDER BY bp.bp, bp.id_bp; ";
                 }
                 else if (moRadOrderByNumDepartament.isSelected()) {
                     orderBy = "ORDER BY dep.code, dep.id_dep, emp.num, bp.id_bp; ";
