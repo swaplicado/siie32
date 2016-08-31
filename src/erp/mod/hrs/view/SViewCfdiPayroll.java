@@ -19,10 +19,10 @@ import erp.mod.hrs.db.SHrsFormerUtils;
 import erp.mod.hrs.db.SHrsPayrollAnnul;
 import erp.mod.hrs.db.SHrsUtils;
 import erp.mod.hrs.form.SDialogFormerPayrollDate;
+import erp.mod.hrs.form.SDialogPrintOrderPayroll;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.form.SDialogAnnulCfdi;
-import erp.print.SDataConstantsPrint;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -439,8 +439,11 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
     }
 
     private void actionPrint() {
+        SDialogPrintOrderPayroll dialogPrintOrderPayroll = null;
         ArrayList<SDataCfd> cfdAux = null;
         ArrayList<SDataCfd> cfds = null;
+        int orderBy = 0;
+        int copiesNum = 0;
 
         if (jbPrint.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
@@ -461,18 +464,26 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                 else {
                     try {
                         if (mnGridSubtype == SModConsts.VIEW_SC_SUM) {
+                            dialogPrintOrderPayroll = new SDialogPrintOrderPayroll(miClient, "Ordenamiento de impresión");
+
+                            dialogPrintOrderPayroll.setVisible(true);
                             cfdAux = new ArrayList<SDataCfd>();
                             cfds = new ArrayList<SDataCfd>();
+                            
+                            if (dialogPrintOrderPayroll.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                                orderBy = (int) dialogPrintOrderPayroll.getValue(SGuiConsts.PARAM_KEY);
+                                copiesNum = (int) dialogPrintOrderPayroll.getValue(SLibConsts.UNDEFINED);
 
-                            cfdAux = SCfdUtils.getPayrollCfds((SClientInterface) miClient, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), gridRow.getRowPrimaryKey());
+                                cfdAux = SCfdUtils.getPayrollCfds((SClientInterface) miClient, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), gridRow.getRowPrimaryKey(), orderBy);
 
-                            for(SDataCfd cfd : cfdAux) {
-                                if (cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
-                                    cfds.add(cfd);
+                                for(SDataCfd cfd : cfdAux) {
+                                    if (cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
+                                        cfds.add(cfd);
+                                    }
                                 }
-                            }
 
-                            SCfdUtils.printCfd((SClientInterface) miClient, cfds, SDataConstantsPrint.PRINT_A_COPY, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
+                                SCfdUtils.printCfd((SClientInterface) miClient, cfds, copiesNum, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
+                            }
                         }
                         else {
                             SCfdUtils.printCfd((SClientInterface) miClient, SCfdConsts.CFD_TYPE_PAYROLL, (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT), (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
