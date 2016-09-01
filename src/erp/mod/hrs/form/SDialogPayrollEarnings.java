@@ -282,7 +282,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
         }
         receiptEarning.setFactorAmount(1);
         
-        amount = SLibUtils.round((receiptEarning.getUnits() * receiptEarning.getAmountUnitary()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+        amount = SLibUtils.round((receiptEarning.getUnits() * receiptEarning.getAmountUnitary() * row.getEarning().getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
         receiptEarning.setAmountSystem_r(amount);
         
         receiptEarning.setAmount_r(amount);
