@@ -1114,16 +1114,16 @@ public abstract class SHrsUtils {
             balance -= hrsEmployee.getLoanPayment(loan.getPkLoanId()).getTotalPayment();
         }
         
-        for (SHrsPayrollReceiptEarning deduction : hrsEmployee.getHrsPayrollReceipt().getHrsEarnings()) {
-            if (SLibUtils.compareKeys(new int[] { deduction.getReceiptEarning().getFkLoanEmployeeId_n(), deduction.getReceiptEarning().getFkLoanLoanId_n()}, 
-                    loan.getPrimaryKey())) {
-                balance += deduction.getReceiptEarning().getAmount_r();
+        for (SHrsPayrollReceiptEarning earning : hrsEmployee.getHrsPayrollReceipt().getHrsEarnings()) {
+            if (SLibUtils.compareKeys(new int[] { earning.getReceiptEarning().getFkLoanEmployeeId_n(), earning.getReceiptEarning().getFkLoanLoanId_n()}, 
+                    loan.getPrimaryKey()) && earning.getReceiptEarning().isUserEdited()) {
+                balance += earning.getReceiptEarning().getAmount_r();
             }
         }
         
         for (SHrsPayrollReceiptDeduction deduction : hrsEmployee.getHrsPayrollReceipt().getHrsDeductions()) {
             if (SLibUtils.compareKeys(new int[] { deduction.getReceiptDeduction().getFkLoanEmployeeId_n(), deduction.getReceiptDeduction().getFkLoanLoanId_n()}, 
-                    loan.getPrimaryKey())) {
+                    loan.getPrimaryKey()) && deduction.getReceiptDeduction().isUserEdited()) {
                 balance -= deduction.getReceiptDeduction().getAmount_r();
             }
         }
@@ -1504,7 +1504,13 @@ public abstract class SHrsUtils {
         String sql = "";
         String deductionsTaxRetained = "";
         String cia_reg_imss = "";
-        //SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        double dAmountEarTax = 0;
+        double dAmountEarExe = 0;
+        double dAmountDedTax = 0;
+        double dAmountDedExe = 0;
+        double dTotalEar = 0;
+        double dTotalDed = 0;
+        double dTotalDedRet = 0;
 
         SHrsFormerPayroll hrsPayroll = null;
         SHrsFormerPayrollReceipt hrsPayrollReceipt = null;
@@ -1625,6 +1631,13 @@ public abstract class SHrsUtils {
         resultSet = statement.executeQuery(sql);
 
         while (resultSet.next()) {
+            dAmountEarTax = 0;
+            dAmountEarExe = 0;
+            dAmountDedTax = 0;
+            dAmountDedExe = 0;
+            dTotalEar = 0;
+            dTotalDed = 0;
+            dTotalDedRet = 0;
             hrsPayrollReceipt = new SHrsFormerPayrollReceipt(hrsPayroll, client);
 
             // Obtain employee company branch:
@@ -1665,10 +1678,12 @@ public abstract class SHrsUtils {
             hrsPayrollReceipt.setSalarioBaseCotApor(resultSet.getDouble("f_emp_sal_bc"));
             hrsPayrollReceipt.setRiesgoPuesto(resultSet.getInt("f_emp_risk"));
             hrsPayrollReceipt.setSalarioDiarioIntegrado(hrsPayrollReceipt.getSalarioBaseCotApor());
+            /* XXX (2016-08-31) jbarajas It're obtained detail of earnings and deductions.
             hrsPayrollReceipt.setTotalPercepciones(resultSet.getDouble("f_ear"));
             hrsPayrollReceipt.setTotalDeducciones(resultSet.getDouble("f_ded"));
             hrsPayrollReceipt.setTotalRetenciones(resultSet.getDouble("f_emp_tot_rent_ret"));
             hrsPayrollReceipt.setTotalNeto(resultSet.getDouble("f_emp_tot_net"));
+            */
             hrsPayrollReceipt.setFechaEdicion(resultSet.getDate("f_emp_date_edit"));
             hrsPayrollReceipt.setSerie(SLibUtilities.textTrim(resultSet.getString("pei.num_ser")));
             hrsPayrollReceipt.setFolio(resultSet.getInt("pei.num"));
@@ -1735,8 +1750,10 @@ public abstract class SHrsUtils {
 
                 resultSetAux = statementAux.executeQuery(sql);
                 while (resultSetAux.next()) {
-
                     hrsPayrollConcept = new SHrsFormerPayrollConcept();
+                    dAmountEarTax = resultSetAux.getDouble("f_conc_mont_grav");
+                    dAmountEarExe = resultSetAux.getDouble("f_conc_mont_ext");
+                    dTotalEar += (dAmountEarTax + dAmountEarExe);
 
                     hrsPayrollConcept.setClaveEmpresa(SLibUtilities.textTrim(resultSetAux.getString("f_conc_cve")));
                     hrsPayrollConcept.setConcepto(SLibUtilities.textTrim(resultSetAux.getString("f_conc")));
@@ -1744,8 +1761,8 @@ public abstract class SHrsUtils {
                     claveOficial = hrsPayrollConcept.getClaveOficial();
                     hrsPayrollConcept.setCantidad(claveOficial == SModSysConsts.HRSS_TP_EAR_OVR_TME ? Math.ceil(resultSetAux.getDouble("f_conc_qty")) : resultSetAux.getDouble("f_conc_qty"));
                     hrsPayrollConcept.setHoras_r(resultSetAux.getInt("f_conc_hrs"));
-                    hrsPayrollConcept.setTotalGravado(resultSetAux.getDouble("f_conc_mont_grav"));
-                    hrsPayrollConcept.setTotalExento(resultSetAux.getDouble("f_conc_mont_ext"));
+                    hrsPayrollConcept.setTotalGravado(dAmountEarTax);
+                    hrsPayrollConcept.setTotalExento(dAmountEarExe);
                     hrsPayrollConcept.setPkTipoConcepto(resultSetAux.getInt("f_conc_tp"));
                     hrsPayrollConcept.setPkSubtipoConcepto(resultSetAux.getInt("f_conc_stp"));
 
@@ -1765,7 +1782,7 @@ public abstract class SHrsUtils {
 
                 // Obtain deductions:
                 
-                sql = "SELECT ded.code AS f_conc_cve, ded.fk_tp_ded AS f_conc_cfdi, " +
+                sql = "SELECT ded.code AS f_conc_cve, ded.fk_tp_ded AS f_conc_cfdi, ded.fk_tp_ded, " +
                         "(CASE WHEN rcp_ded.fk_loan_emp_n IS NULL AND rcp_ded.fk_loan_loan_n IS NULL THEN ded.name ELSE " +
                         "CAST(CONCAT(ded.name,'; ', ltp.name, '; no. ', l.num, '; ini.: ', l.dt_sta) AS CHAR CHARACTER SET latin1) END) AS f_conc, " +
                         "rcp_ded.unt AS f_conc_qty, 0 AS f_conc_hrs, '' AS f_conc_unid, rcp_ded.amt_r AS f_conc_mont_grav, 0 AS f_conc_mont_ext, " +
@@ -1781,21 +1798,31 @@ public abstract class SHrsUtils {
 
                 resultSetAux = statementAux.executeQuery(sql);
                 while (resultSetAux.next()) {
-
                     hrsPayrollConcept = new SHrsFormerPayrollConcept();
+                    dAmountDedTax = resultSetAux.getDouble("f_conc_mont_grav");
+                    dAmountDedExe = resultSetAux.getDouble("f_conc_mont_ext");
+                    dTotalDed += (dAmountDedTax + dAmountDedExe);
+                    
+                    if (resultSetAux.getInt("ded.fk_tp_ded") == SModSysConsts.HRSS_TP_DED_TAX) {
+                        dTotalDedRet += (dAmountDedTax + dAmountDedExe);
+                    }
 
                     hrsPayrollConcept.setClaveEmpresa(SLibUtilities.textTrim(resultSetAux.getString("f_conc_cve")));
                     hrsPayrollConcept.setClaveOficial(resultSetAux.getInt("f_conc_cfdi"));
                     hrsPayrollConcept.setConcepto(SLibUtilities.textTrim(resultSetAux.getString("f_conc")));
                     hrsPayrollConcept.setCantidad(SLibUtils.round(resultSetAux.getDouble("f_conc_qty"), SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits()));
                     hrsPayrollConcept.setHoras_r(resultSetAux.getInt("f_conc_hrs"));
-                    hrsPayrollConcept.setTotalGravado(resultSetAux.getDouble("f_conc_mont_grav"));
-                    hrsPayrollConcept.setTotalExento(resultSetAux.getDouble("f_conc_mont_ext"));
+                    hrsPayrollConcept.setTotalGravado(dAmountDedTax);
+                    hrsPayrollConcept.setTotalExento(dAmountDedExe);
                     hrsPayrollConcept.setPkTipoConcepto(resultSetAux.getInt("f_conc_tp"));
                     hrsPayrollConcept.setPkSubtipoConcepto(resultSetAux.getInt("f_conc_stp"));
 
                     hrsPayrollReceipt.getChildPayrollConcept().add(hrsPayrollConcept);
                 }
+                hrsPayrollReceipt.setTotalPercepciones(dTotalEar);
+                hrsPayrollReceipt.setTotalDeducciones(dTotalDed);
+                hrsPayrollReceipt.setTotalRetenciones(dTotalDedRet);
+                hrsPayrollReceipt.setTotalNeto(dTotalEar - dTotalDed);
             }
         }
 
