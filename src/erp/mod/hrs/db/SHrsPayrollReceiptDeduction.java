@@ -12,7 +12,7 @@ import sa.lib.grid.SGridRow;
  *
  * @author Néstor Ávalos
  */
-public class SHrsPayrollReceiptDeduction implements SGridRow {
+public class SHrsPayrollReceiptDeduction implements SGridRow, Comparable {
     
     public static final int BY_EMP = 1;
     public static final int BY_DED = 2;
@@ -295,5 +295,12 @@ public class SHrsPayrollReceiptDeduction implements SGridRow {
                     break;
             }
         }
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        String compareCode = ((SHrsPayrollReceiptDeduction) o).getDeduction().getCode();
+        
+        return this.moDeduction.getCode().compareTo(compareCode);
     }
 }

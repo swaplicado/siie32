@@ -7,6 +7,7 @@ package erp.mod.hrs.db;
 import erp.lib.SLibUtilities;
 import erp.mod.SModSysConsts;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import sa.gui.util.SUtilConsts;
@@ -623,6 +624,7 @@ public class SHrsPayrollReceipt {
                 
                 maHrsDeductions.add(oReceiptDeductionTax);
             }
+            renumberDeductions();
         }
         
         // Remove previous tax subsidy:
@@ -650,7 +652,6 @@ public class SHrsPayrollReceipt {
                 }
 
                 aEarningsToRemove.clear();
-
                 renumberEarnings();
             }
             else {
@@ -678,6 +679,7 @@ public class SHrsPayrollReceipt {
                 
                 maHrsEarnings.add(oReceiptEarningSubsidy);
             }
+            renumberEarnings();
         }
         
         if (!bComputeTax) {
@@ -935,7 +937,6 @@ public class SHrsPayrollReceipt {
                 }
 
                 aDeductionsToRemove.clear();
-
                 renumberDeductions();
             }
             else {
@@ -952,6 +953,7 @@ public class SHrsPayrollReceipt {
         }
         else if (!foundSsc && oReceiptDeductionSsc != null) {
             maHrsDeductions.add(oReceiptDeductionSsc);
+            renumberDeductions();
         }
     }
 
@@ -1022,6 +1024,8 @@ public class SHrsPayrollReceipt {
 
     public void renumberEarnings() {
         int i = 0;
+        
+        Collections.sort(maHrsEarnings);
         for (SHrsPayrollReceiptEarning earning : maHrsEarnings) {
             earning.setPkMoveId(++i);
         }
@@ -1073,6 +1077,8 @@ public class SHrsPayrollReceipt {
 
     public void renumberDeductions() {
         int i = 0;
+        
+        Collections.sort(maHrsDeductions);
         for (SHrsPayrollReceiptDeduction deduction : maHrsDeductions) {
             deduction.setPkMoveId(++i);
         }
@@ -1559,6 +1565,7 @@ public class SHrsPayrollReceipt {
         }
 
         if (daysPeriodPayroll > 0) {
+            /* XXX (jbarajas, 2016-08-25) Consume days absences inside payroll.
             for (SDbAbsenceConsumption absenceConsumption : moHrsEmployee.getAbsencesConsumptions()) {
                 difDays = absenceConsumption.getEffectiveDays();
                 
@@ -1575,14 +1582,17 @@ public class SHrsPayrollReceipt {
                     }
                 }
             }
+            */
             
             for (SDbAbsenceConsumption absenceConsumption : maAbsenceConsumptionDays) {
                 difDays = absenceConsumption.getEffectiveDays();
                 
                 for (int i = 0; i < difDays; i++) {
+                    /* XXX (jbarajas, 2016-08-25) Consume days absences inside payroll.
                     if (SLibTimeUtils.isBelongingToPeriod(SLibTimeUtils.addDate(absenceConsumption.getDateStart(), 0, 0, i), year, periodYear) &&
                         SLibTimeUtils.isBelongingToPeriod(SLibTimeUtils.addDate(absenceConsumption.getDateStart(), 0, 0, i), moHrsEmployee.getPeriodStart(), moHrsEmployee.getPeriodEnd()) &&
-                        !absenceConsumption.getAbsence().IsAuxAbsencePayable() &&
+                    */
+                    if (!absenceConsumption.getAbsence().IsAuxAbsencePayable() &&
                         absenceConsumption.getAbsence().getFkAbsenceClassId() != SModSysConsts.HRSU_CL_ABS_VAC) {
                         daysPeriodPayrollNotWorkedNotPaid++;
                         

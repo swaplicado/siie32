@@ -13,7 +13,7 @@ import sa.lib.grid.SGridRow;
  *
  * @author Néstor Ávalos
  */
-public class SHrsPayrollReceiptEarning implements SGridRow {
+public class SHrsPayrollReceiptEarning implements SGridRow, Comparable {
 
     public static final int BY_EMP = 1;
     public static final int BY_EAR = 2;
@@ -438,5 +438,12 @@ public class SHrsPayrollReceiptEarning implements SGridRow {
                     break;
             }
         }
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        String compareCode = ((SHrsPayrollReceiptEarning) o).getEarning().getCode();
+        
+        return this.moEarning.getCode().compareTo(compareCode);
     }
 }
