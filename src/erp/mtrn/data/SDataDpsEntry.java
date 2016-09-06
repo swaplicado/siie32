@@ -1188,8 +1188,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         if (mbAuxPreserveQuantity) {
             // Seldom case: quantity must be preserved
             
-            dFactQty = mdQuantity / mdOriginalQuantity;
-            dFactValUnit = 1d / dFactQty;
+            dFactQty = mdOriginalQuantity == 0 ? 0 : mdQuantity / mdOriginalQuantity;
+            dFactValUnit = dFactQty == 0 ? 0 : 1d / dFactQty;
         }
         else {
             // Common case: quantity must be calculated
