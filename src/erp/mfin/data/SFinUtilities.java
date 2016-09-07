@@ -1349,19 +1349,29 @@ public abstract class SFinUtilities {
         return true;
     }
     
-    public static boolean isSysMovementNatureDebtor(final int[] keySystemMovementType) {
-        return SLibUtils.belongsTo(keySystemMovementType, new int[][] { SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR });
+    public static boolean isSysMovementNatureDebtor(final int[] keySystemMovementType, final boolean isDocumentAvailable) {
+        return SLibUtils.compareKeys(keySystemMovementType, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR) ||
+                (SLibUtils.compareKeys(keySystemMovementType, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS) && isDocumentAvailable) ||
+                (SLibUtils.compareKeys(keySystemMovementType, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP) && !isDocumentAvailable);
     }
     
-    public static boolean isSysMovementNatureCreditor(final int[] keySystemMovementType) {
-        return SLibUtils.belongsTo(keySystemMovementType, new int[][] { SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CDR });
+    public static boolean isSysMovementNatureCreditor(final int[] keySystemMovementType, final boolean isDocumentAvailable) {
+        return SLibUtils.compareKeys(keySystemMovementType, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CDR) ||
+                (SLibUtils.compareKeys(keySystemMovementType, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP) && isDocumentAvailable) ||
+                (SLibUtils.compareKeys(keySystemMovementType, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS) && !isDocumentAvailable);
     }
     
     public static boolean isSysMovementCashAccount(final int[] keySystemMovementType) {
-        return SLibUtils.belongsTo(keySystemMovementType, new int[][] { SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK });
+        return SLibUtils.belongsTo(keySystemMovementType, new int[][] { 
+            SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH, 
+            SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK });
     }
     
     public static boolean isSysMovementBizPartner(final int[] keySystemMovementType) {
-        return isSysMovementNatureDebtor(keySystemMovementType) || isSysMovementNatureCreditor(keySystemMovementType);
+        return SLibUtils.belongsTo(keySystemMovementType, new int[][] { 
+            SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP, 
+            SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS, 
+            SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CDR, 
+            SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR });
     }
 }
