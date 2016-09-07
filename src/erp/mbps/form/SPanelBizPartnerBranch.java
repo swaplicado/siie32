@@ -143,6 +143,7 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         jPanel9 = new javax.swing.JPanel();
         jlEmail = new javax.swing.JLabel();
         jtfEmail = new javax.swing.JTextField();
+        jlAddingMultipleMailHelp = new javax.swing.JLabel();
         jpBranchAddress = new javax.swing.JPanel();
         jpOficialAddress = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
@@ -284,10 +285,19 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
 
         jlEmail.setText("E-mail:");
         jlEmail.setPreferredSize(new java.awt.Dimension(110, 23));
+        jlEmail.setRequestFocusEnabled(false);
         jPanel9.add(jlEmail);
 
-        jtfEmail.setPreferredSize(new java.awt.Dimension(250, 23));
+        jtfEmail.setToolTipText("");
+        jtfEmail.setPreferredSize(new java.awt.Dimension(225, 23));
         jPanel9.add(jtfEmail);
+
+        jlAddingMultipleMailHelp.setForeground(new java.awt.Color(109, 109, 109));
+        jlAddingMultipleMailHelp.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlAddingMultipleMailHelp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlAddingMultipleMailHelp.setToolTipText("Para agregar más de un correo sepárelos \";\" y sin espacios p. ej. , (ejemplo1@mail.com;ejemplo2@mail.com)");
+        jlAddingMultipleMailHelp.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel9.add(jlAddingMultipleMailHelp);
 
         jpBranch.add(jPanel9);
 
@@ -608,6 +618,8 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
             jbModifyBankAccount.setEnabled(true);
         }
     }
+    
+   
 
     private void actionAddAddress() {
         SDataBizPartnerBranchAddress dataBizPartnerBranchAddress = null;
@@ -872,6 +884,7 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
     private javax.swing.JComboBox jcbFkTelephoneType03Id;
     private javax.swing.JCheckBox jckIsAddPrt;
     private javax.swing.JCheckBox jckIsDeleted;
+    private javax.swing.JLabel jlAddingMultipleMailHelp;
     private javax.swing.JLabel jlBizPartnerBranch;
     private javax.swing.JLabel jlEmail;
     private javax.swing.JLabel jlFkAddressFormatTypeId_n;
@@ -899,7 +912,7 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
     private javax.swing.JTextField jtfTelNumber02;
     private javax.swing.JTextField jtfTelNumber03;
     // End of variables declaration//GEN-END:variables
-
+  
     @Override
     public void formClearRegistry() {
         throw new UnsupportedOperationException("Not supported yet.");
