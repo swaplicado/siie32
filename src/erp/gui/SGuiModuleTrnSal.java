@@ -1309,11 +1309,6 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     sViewTitle = "VTA - bitácora envíos CFDI";
                     break;
 
-                case SDataConstants.TRN_DPS_SND_LOG:
-                    oViewClass = erp.mtrn.view.SViewDpsSendingLog.class;
-                    sViewTitle = "CPA - bitácora envíos docs.";
-                    break;
-
                 default:
                     throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
             }

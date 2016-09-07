@@ -94,10 +94,12 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
 import erp.mod.fin.db.SFiscalAccounts;
+import erp.mod.fin.form.SDialogDpsExchangeDif;
 import erp.mod.fin.form.SDialogFiscalAccountsConfig;
 import erp.mod.fin.form.SDialogFiscalXmlFile;
 import erp.mod.fin.form.SDialogRepCashFlowExpected;
 import erp.mod.fin.form.SDialogReportTaxPending;
+import erp.mod.fin.form.SDialogValuationBalances;
 import erp.mtrn.data.SDataCtr;
 import erp.mtrn.form.SDialogRepBizPartnerBalanceAging;
 import erp.mtrn.form.SFormCtr;
@@ -189,6 +191,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
 
     private javax.swing.JMenu jmFin;
     private javax.swing.JMenuItem jmiFinExchangeRate;
+    private javax.swing.JMenuItem jmiFinExchangeRateAdjusment;
+    private javax.swing.JMenuItem jmiFinExchangeDifferenceDps;
+    
     private javax.swing.JMenuItem jmiFinCashCheck;
     private javax.swing.JMenuItem jmiFinCashCounterReceipt;
     private javax.swing.JSeparator jsFinCash;
@@ -527,6 +532,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFin = new JMenu("Finanzas");
 
         jmiFinExchangeRate = new JMenuItem("Tipos de cambio");
+        jmiFinExchangeRateAdjusment = new JMenuItem("Ajuste de tipo de cambio");
+        jmiFinExchangeDifferenceDps = new JMenuItem("Diferencias cambiarias en documentos pagados");
         jmiFinCashCheck = new JMenuItem("Cheques");
         jmiFinCashCounterReceipt = new JMenuItem("Contrarrecibos");
         jsFinCash = new JPopupMenu.Separator();
@@ -538,6 +545,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinLayoutBankDoneAdvances = new JMenuItem("Layouts de anticipos pagados");
 
         jmFin.add(jmiFinExchangeRate);
+        jmFin.add(jmiFinExchangeRateAdjusment);
+        jmFin.add(jmiFinExchangeDifferenceDps);
         jmFin.addSeparator();
         jmFin.add(jmiFinCashCheck);
         jmFin.add(jmiFinCashCounterReceipt);
@@ -767,6 +776,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRecDpsBizPartnerSup.addActionListener(this);
 
         jmiFinExchangeRate.addActionListener(this);
+        jmiFinExchangeRateAdjusment.addActionListener(this);
+        jmiFinExchangeDifferenceDps.addActionListener(this);
         jmiFinCashCheck.addActionListener(this);
         jmiFinCashCounterReceipt.addActionListener(this);
         jmiFinLayoutBank.addActionListener(this);
@@ -1863,6 +1874,12 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiFinExchangeRate) {
                 showView(SDataConstants.FIN_EXC_RATE);
+            }
+            else if (item == jmiFinExchangeRateAdjusment) { //ucastaneda 15/08/2016
+                new SDialogValuationBalances(miClient.getSession().getClient(), " Ajustes por valuación de saldos en moneda extranjera.").setVisible(true);
+            }
+            else if (item == jmiFinExchangeDifferenceDps) {
+                new SDialogDpsExchangeDif(miClient.getSession().getClient(), "Ajustes por diferencia cambiaria al liquidar documentos.").setVisible(true);
             }
             else if (item == jmiFinCashCheck) {
                 showView(SDataConstants.FIN_CHECK);

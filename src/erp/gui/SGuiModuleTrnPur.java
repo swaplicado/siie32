@@ -944,6 +944,11 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                     auxType01 = viewType;
                     break;
 
+                case SDataConstants.TRN_DPS_SND_LOG:
+                    oViewClass = erp.mtrn.view.SViewDpsSendingLog.class;
+                    sViewTitle = "CPA - bitácora envíos docs.";
+                    break;
+                
                 case SDataConstants.TRN_BP_BLOCK:
                     oViewClass = erp.mtrn.view.SViewBizPartnerBlocking.class;
                     sViewTitle = "Bloqueo proveedores";
