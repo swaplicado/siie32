@@ -187,8 +187,16 @@ public class SDialogPayrollPicker extends JDialog {
 
             sql = "SELECT p.id_pay, p.per_year, p.per, p.num, p.dt_sta, p.dt_end, " +
                     "p.b_clo, p.nts, tp.id_tp_pay, tp.code, " +
-                    "(SELECT SUM(rcp.ear_r) FROM hrs_pay_rcp AS rcp WHERE rcp.b_del = 0 AND rcp.id_pay = p.id_pay) AS f_ear, " +
-                    "(SELECT SUM(rcp.ded_r) FROM hrs_pay_rcp AS rcp WHERE rcp.b_del = 0 AND rcp.id_pay = p.id_pay) AS f_ded " +
+                    "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
+                    "FROM hrs_pay_rcp AS r " +
+                    "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
+                    "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ear.b_del = 0) AS f_ear, " +
+                    "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) " +
+                    "FROM hrs_pay_rcp AS r " +
+                    "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = r.id_pay AND rcp_ded.id_emp = r.id_emp " +
+                    "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ded.b_del = 0) AS f_ded, " +
+                    //"(SELECT SUM(rcp.ear_r) FROM hrs_pay_rcp AS rcp WHERE rcp.b_del = 0 AND rcp.id_pay = p.id_pay) AS f_ear, " +
+                    //"(SELECT SUM(rcp.ded_r) FROM hrs_pay_rcp AS rcp WHERE rcp.b_del = 0 AND rcp.id_pay = p.id_pay) AS f_ded " +
                     "FROM hrs_pay AS p " +
                     "INNER JOIN erp.hrss_tp_pay AS tp ON p.fk_tp_pay = tp.id_tp_pay " +
                     "WHERE p.b_del = 0 " +
