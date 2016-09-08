@@ -662,6 +662,7 @@ public class SHrsPayrollReceipt {
                             earning.getReceiptEarning().setAmountUnitary(!moHrsPayroll.getConfig().isTaxNet() ? SLibUtils.round(dSubsidyComputed - dSubsidyAccumulated, SUtilConsts.DECS_AMT) : (dTaxNet < 0 ? Math.abs(dTaxNet) : 0));
                             earning.getReceiptEarning().setAmountSystem_r(earning.getReceiptEarning().getAmountUnitary());
                             earning.getReceiptEarning().setAmount_r(earning.getReceiptEarning().getAmountUnitary());
+                            earning.getReceiptEarning().setAmountExempt(earning.getReceiptEarning().getAmountUnitary());
                         }
                     }
                 }
@@ -676,6 +677,7 @@ public class SHrsPayrollReceipt {
                 oReceiptEarningSubsidy.getReceiptEarning().setAmountUnitary(Math.abs(dTaxNet));
                 oReceiptEarningSubsidy.getReceiptEarning().setAmountSystem_r(oReceiptEarningSubsidy.getReceiptEarning().getAmountUnitary());
                 oReceiptEarningSubsidy.getReceiptEarning().setAmount_r(oReceiptEarningSubsidy.getReceiptEarning().getAmountUnitary());
+                oReceiptEarningSubsidy.getReceiptEarning().setAmountExempt(oReceiptEarningSubsidy.getReceiptEarning().getAmountUnitary());
                 
                 maHrsEarnings.add(oReceiptEarningSubsidy);
             }

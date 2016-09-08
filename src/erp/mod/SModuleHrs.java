@@ -1178,6 +1178,9 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRSR_PAY_AUX_EAR_DED:
                 guiReport = new SGuiReport("reps/hrs_pay_aux_ear_ded.jasper", "Reporte de percepciones y deducciones");
                 break;
+            case SModConsts.HRSR_PAY_EAR_DED:
+                guiReport = new SGuiReport("reps/hrs_pay_ear_ded.jasper", "Reporte de percepciones y deducciones");
+                break;
             case SModConsts.HRSR_LIST_EAR:
                 guiReport = new SGuiReport("reps/hrs_pay_list_ear.jasper", "Listado de percepciones");
                 break;
