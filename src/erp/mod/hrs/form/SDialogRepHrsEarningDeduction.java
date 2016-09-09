@@ -526,7 +526,7 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         }
         else if (moRadReportTypeEmployee.isSelected()) {
             if (moRadOrderByNumEmployee.isSelected()) {
-                orderBy += "f_emp_num, _g2_name, _g2, ";
+                orderBy += "CAST(f_emp_num AS UNSIGNED INTEGER), _g2_name, _g2, ";
             }
             else if (moRadOrderByNameEmployee.isSelected()) {
                 orderBy += "_g2_name, _g2, ";
@@ -535,7 +535,7 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         }
         else if (moRadReportTypeEmployeeDep.isSelected()) {
             if (moRadOrderByNumEmployee.isSelected()) {
-                orderBy += "f_emp_num, _g1_name, _g1, ";
+                orderBy += "CAST(f_emp_num AS UNSIGNED INTEGER), _g1_name, _g1, ";
             }
             else if (moRadOrderByNameEmployee.isSelected()) {
                 orderBy += "_g1_name, _g1, ";
@@ -567,7 +567,7 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
             }
             
             if (moRadOrderByNumEmployee.isSelected()) {
-                orderBy += "f_emp_num, _g2_name, _g2, ";
+                orderBy += "CAST(f_emp_num AS UNSIGNED INTEGER), _g2_name, _g2, ";
             }
             else if (moRadOrderByNameEmployee.isSelected()) {
                 orderBy += "_g2_name, _g2, ";

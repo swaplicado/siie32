@@ -404,24 +404,30 @@ public class SHrsPayroll {
 
                         amountLoan = SHrsUtils.computeAmoutLoan(hrsPayrollReceipt, loan);
 
-                        if (loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA) {
+                        if (loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA_COM || loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA_UNI ||
+                                loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA_TPS) {
                             balanceLoan = SHrsUtils.getBalanceLoan(loan, hrsPayrollReceipt.getHrsEmployee());
 
                             amountLoan = (amountLoan > balanceLoan ? balanceLoan : amountLoan);
                         }
 
                         if (amountLoan > 0) {
-                            payrollReceiptDeduction = createHrsPayrollReceiptDeduction(employeeId, 1, amountLoan, amountLoan,
-                                    hrsPayrollReceiptDeduction.getDeduction(), loan.getPkEmployeeId(), loan.getPkLoanId(),
-                                    loan.getFkLoanTypeId());
+                            if (hrsPayrollReceiptDeduction.getDeduction() == null) {
+                                throw new Exception("No se encontró ninguna deducción para agregar el préstamo '" + loan.getLoanIdentificator() + "'.");
+                            }
+                            else {
+                                payrollReceiptDeduction = createHrsPayrollReceiptDeduction(employeeId, 1, amountLoan, amountLoan,
+                                        hrsPayrollReceiptDeduction.getDeduction(), loan.getPkEmployeeId(), loan.getPkLoanId(),
+                                        loan.getFkLoanTypeId());
 
-                            payrollReceiptDeduction.setUserEdited(false);
-                            hrsPayrollReceiptDeduction.setReceiptDeduction(payrollReceiptDeduction);
-                            hrsPayrollReceiptDeduction.setPkMoveId(move);
-                            hrsPayrollReceiptDeduction.setHrsReceipt(hrsPayrollReceipt);
-                            aHrsPayrollReceiptDeductions.add(hrsPayrollReceiptDeduction);
+                                payrollReceiptDeduction.setUserEdited(false);
+                                hrsPayrollReceiptDeduction.setReceiptDeduction(payrollReceiptDeduction);
+                                hrsPayrollReceiptDeduction.setPkMoveId(move);
+                                hrsPayrollReceiptDeduction.setHrsReceipt(hrsPayrollReceipt);
+                                aHrsPayrollReceiptDeductions.add(hrsPayrollReceiptDeduction);
 
-                            move++;
+                                move++;
+                            }
                         }
                     }
                 }

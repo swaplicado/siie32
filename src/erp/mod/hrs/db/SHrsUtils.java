@@ -1888,7 +1888,8 @@ public abstract class SHrsUtils {
             case SModSysConsts.HRSS_TP_LOAN_PAY_AMT:
                 amoutMonth = loan.getPaymentAmount() + amoutAdjustment;
                 
-                if (loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA) {
+                if (loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA_COM || loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA_UNI ||
+                        loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA_TPS) {
                     amoutAux = amoutMonth;
                 
                     balanceLoan = SHrsUtils.getBalanceLoan(loan, hrsReceipt.getHrsEmployee());
@@ -2255,24 +2256,6 @@ public abstract class SHrsUtils {
         netGrossAmount.setCalculatedAmountType(SHrsConsts.CAL_GROSS_AMT_TYPE);
         
         return netGrossAmount;
-    }
-    
-    public static double getAdjustmentLoan(final SHrsPayroll hrsPayroll, final int typeLoan) throws Exception {
-        double amout = 0;
-        
-        switch (typeLoan) {
-            case SModSysConsts.HRSS_TP_LOAN_LOA:
-                break;
-            case SModSysConsts.HRSS_TP_LOAN_HOM:
-                amout = 7.5;
-                break;
-            case SModSysConsts.HRSS_TP_LOAN_CON:
-                break;
-            default:
-                break;
-        }
-        
-        return amout;
     }
     
     /**
