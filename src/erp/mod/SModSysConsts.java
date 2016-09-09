@@ -823,6 +823,9 @@ public abstract class SModSysConsts {
 
     public static final int HRSS_TP_LOAN_NON = 1;
     public static final int HRSS_TP_LOAN_LOA = 2;
+    public static final int HRSS_TP_LOAN_LOA_COM = 2;   // company
+    public static final int HRSS_TP_LOAN_LOA_UNI = 3;   // union
+    public static final int HRSS_TP_LOAN_LOA_TPS = 4;   // third parties
     public static final int HRSS_TP_LOAN_HOM = 11;
     public static final int HRSS_TP_LOAN_CON = 12;
 
