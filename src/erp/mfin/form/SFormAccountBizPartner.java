@@ -323,7 +323,8 @@ public class SFormAccountBizPartner extends javax.swing.JDialog implements erp.l
         msEmptyCostCenterId = SDataUtilities.createNewFormattedCostCenterId(miClient, miClient.getSessionXXX().getParamsErp().getDeepCostCenters());
         manAccountTypes = new int[] {
             SDataConstantsSys.FINS_TP_ACC_BP_OP,
-            SDataConstantsSys.FINS_TP_ACC_BP_PAY
+            SDataConstantsSys.FINS_TP_ACC_BP_PAY,
+            SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL
         };
 
         jbOk.addActionListener(this);

@@ -1,7 +1,5 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright © Software Aplicado SA de CV. All rights reserverd.
  */
 package erp.mfin.data;
 
@@ -23,16 +21,16 @@ public class SFinAmounts {
     public ArrayList<SFinAmount> getAmounts() { return maAmounts; }
     
     /**
-     * Gets amount that matches document key provided if any, otherwise null.
+     * Gets amount that matches the document key provided if any, otherwise null.
      * @param key Document key.
      * @return Found amount.
      */
     public SFinAmount getAmountByDocument(final int[] key) {
         SFinAmount amount = null;
         
-        for (SFinAmount sfa : maAmounts) {
-            if (SLibUtils.compareKeys(key, sfa.KeyRefDocument)) {
-                amount = sfa;
+        for (SFinAmount a : maAmounts) {
+            if (SLibUtils.compareKeys(key, a.KeyRefDocument) && a.AmountType == SFinAmountType.DOCUMENT) {
+                amount = a;
                 break;
             }
         }
@@ -41,16 +39,16 @@ public class SFinAmounts {
     }
     
     /**
-     * Gets amount that matches cash account key provided if any, otherwise null.
-     * @param key Document key.
+     * Gets amount that matches the cash account key provided if any, otherwise null.
+     * @param key Cash account key.
      * @return Found amount.
      */
     public SFinAmount getAmountByCashAccount(final int[] key) {
         SFinAmount amount = null;
         
-        for (SFinAmount sfa : maAmounts) {
-            if (SLibUtils.compareKeys(key, sfa.KeyRefCashAccount)) {
-                amount = sfa;
+        for (SFinAmount a : maAmounts) {
+            if (SLibUtils.compareKeys(key, a.KeyRefCashAccount) && a.AmountType == SFinAmountType.CASH_ACCOUNT) {
+                amount = a;
                 break;
             }
         }
@@ -58,29 +56,75 @@ public class SFinAmounts {
         return amount;
     }
     
-    public void addAmountForDocument(final int[] key, final SFinAmount amount) {
-        SFinAmount sma = getAmountByDocument(key);
+    /**
+     * Gets amount for advance billed if any, otherwise null.
+     * @return Found amount.
+     */
+    public SFinAmount getAmountForAdvanceBilled() {
+        SFinAmount amount = null;
         
-        if (sma == null) {
-            sma = new SFinAmount(amount);
-            sma.KeyRefDocument = key;
-            maAmounts.add(sma);
+        for (SFinAmount a : maAmounts) {
+            if (a.AmountType == SFinAmountType.ADVANCE_BILLED) {
+                amount = a;
+                break;
+            }
+        }
+        
+        return amount;
+    }
+    
+    /**
+     * Adds amount that matches the document key provided.
+     * @param key Document key.
+     * @param amount Amount to be added.
+     */
+    public void addAmountForDocument(final int[] key, final SFinAmount amount) {
+        SFinAmount a = getAmountByDocument(key);
+        
+        if (a == null) {
+            a = new SFinAmount(amount);
+            a.AmountType = SFinAmountType.DOCUMENT;
+            a.KeyRefDocument = key;
+            maAmounts.add(a);
         }
         else {
-            sma.addAmount(amount);
+            a.addAmount(amount);
         }
     }
     
+    /**
+     * Adds amount that matches the cash account key provided.
+     * @param key Cash account key.
+     * @param amount Amount to be added.
+     */
     public void addAmountForCashAccount(final int[] key, final SFinAmount amount) {
-        SFinAmount sma = getAmountByCashAccount(key);
+        SFinAmount a = getAmountByCashAccount(key);
         
-        if (sma == null) {
-            sma = new SFinAmount(amount);
-            sma.KeyRefCashAccount = key;
-            maAmounts.add(sma);
+        if (a == null) {
+            a = new SFinAmount(amount);
+            a.AmountType = SFinAmountType.CASH_ACCOUNT;
+            a.KeyRefCashAccount = key;
+            maAmounts.add(a);
         }
         else {
-            sma.addAmount(amount);
+            a.addAmount(amount);
+        }
+    }
+    
+    /**
+     * Adds amount for advance billed.
+     * @param amount Amount to be added.
+     */
+    public void addAmountForAdvanceBilled(final SFinAmount amount) {
+        SFinAmount a = getAmountForAdvanceBilled();
+        
+        if (a == null) {
+            a = new SFinAmount(amount);
+            a.AmountType = SFinAmountType.ADVANCE_BILLED;
+            maAmounts.add(a);
+        }
+        else {
+            a.addAmount(amount);
         }
     }
     
@@ -92,16 +136,16 @@ public class SFinAmounts {
         double sum = 0;
         SFinAmount greatest = null;
         
-        for (SFinAmount sfa : maAmounts) {
-            if (sfa.Movement == SFinMovement.INCREMENT) {
-                sum += sfa.Amount;
+        for (SFinAmount a : maAmounts) {
+            if (a.Movement == SFinMovement.INCREMENT) {
+                sum += a.Amount;
             }
             else {
-                sum -= sfa.Amount;
+                sum -= a.Amount;
             }
             
-            if (greatest == null || sfa.Amount > greatest.Amount) {
-                greatest = sfa;
+            if (greatest == null || a.Amount > greatest.Amount) {
+                greatest = a;
             }
         }
         

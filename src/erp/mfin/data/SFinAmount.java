@@ -1,7 +1,5 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright © Software Aplicado SA de CV. All rights reserverd.
  */
 package erp.mfin.data;
 
@@ -14,27 +12,25 @@ public class SFinAmount {
     public double Amount;
     public double AmountCy;
     public boolean IsPrepayment;
+    public SFinAmountType AmountType;
     public SFinMovement Movement;
     
     public int[] KeyRefDocument;
     public int[] KeyRefCashAccount;
 
-    public SFinAmount() {
-        this(0, 0, false, SFinMovement.INCREMENT);
-    }
-
     public SFinAmount(SFinAmount amount) {
-        this(amount.Amount, amount.AmountCy, amount.IsPrepayment, amount.Movement);
+        this(amount.Amount, amount.AmountCy, amount.IsPrepayment, amount.AmountType, amount.Movement);
     }
 
     public SFinAmount(double amount, double amountCy) {
-        this(amount, amountCy, false, SFinMovement.INCREMENT);
+        this(amount, amountCy, false, SFinAmountType.UNDEFINED, SFinMovement.INCREMENT);
     }
 
-    public SFinAmount(double amount, double amountCy, boolean isPrepayment, SFinMovement movement) {
+    public SFinAmount(double amount, double amountCy, boolean isPrepayment, SFinAmountType amountType, SFinMovement movement) {
         Amount = amount;
         AmountCy = amountCy;
         IsPrepayment = isPrepayment;
+        AmountType = amountType;
         Movement = movement;
         
         KeyRefDocument = null;

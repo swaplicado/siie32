@@ -415,7 +415,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public int[] getKeyDps() { return new int[] { mnPkYearId, mnPkDocId }; }
     public int[] getKeyDpsAdjustmentType() { return new int[] { mnFkDpsAdjustmentTypeId }; }
     public int[] getKeyDpsAdjustmentSubtype() { return new int[] { mnFkDpsAdjustmentTypeId, mnFkDpsAdjustmentSubtypeId }; }
-    public int[] getKeyCashAccount() { return new int[] { mnFkCashCompanyBranchId_n, mnFkCashAccountId_n }; }
+    public int[] getKeyCashAccount_n() { return mnFkCashCompanyBranchId_n == SLibConsts.UNDEFINED ? null : new int[] { mnFkCashCompanyBranchId_n, mnFkCashAccountId_n }; }
     public int[] getKeyAuxDps() { return new int[] { mnAuxPkDpsYearId, mnAuxPkDpsDocId }; }
 
     @Override
