@@ -437,7 +437,7 @@ public class SDbBankLayout extends SDbRegistryUser {
         Statement statementAux = null;
         SDataDsmEntry oDsmEntry = null;
         SDataDsm oDsm = new SDataDsm();
-        SLayoutBankAccountingAdvence accountingAdvence = null;
+        SLayoutBankAccountingAdvance accountingAdvance = null;
         SDataDps dps = null;
         SDataRecord record = null;
         SDataRecord recordDsm = null;
@@ -577,25 +577,25 @@ public class SDbBankLayout extends SDbRegistryUser {
                     recordEntrys.insertElementAt(createRecordEntryAccountCash(session, dps, sBizPartner, amountPayed, nBookkeepingYear, nBookkeepingNum, bankPayment.getBizPartnerBranchId(), bankPayment.getBizPartnerBranchAccountId(), referenceBank), 0);
                 }
                 else if (bankPayment.getLayoutPaymentType() == SModSysConsts.FIN_LAY_BANK_ADV) {
-                    accountingAdvence = new SLayoutBankAccountingAdvence(session, bankPayment.getBizPartnerId(), bankPayment.getBizPartnerBranchId(), bankPayment.getBizPartnerBranchAccountId(), mnFkBankCompanyBranchId, mnFkBankAccountCashId);
+                    accountingAdvance = new SLayoutBankAccountingAdvance(session, bankPayment.getBizPartnerId(), bankPayment.getBizPartnerBranchId(), bankPayment.getBizPartnerBranchAccountId(), mnFkBankCompanyBranchId, mnFkBankAccountCashId);
                     
-                    accountingAdvence.setBankLayoutTypeId(mnFkBankLayoutTypeId);
-                    accountingAdvence.setBizPartnerId(bankPayment.getBizPartnerId());
-                    accountingAdvence.setBizPartnerBranchId(bankPayment.getBizPartnerBranchId());
-                    accountingAdvence.setBizPartnerBranchAccountCreditId(bankPayment.getBizPartnerBranchAccountId());
-                    accountingAdvence.setCompanyBranchId(mnFkBankCompanyBranchId);
-                    accountingAdvence.setCompanyBranchAccountDebitId(mnFkBankAccountCashId);
-                    accountingAdvence.setAmount(bankPayment.getAmount());
-                    accountingAdvence.setCurrencyId(bankPayment.getCurrencyId());
-                    accountingAdvence.setExcRate(1);
-                    accountingAdvence.setExcRateSystem(1);
-                    accountingAdvence.setBookkeepingYearId_n(nBookkeepingYear);
-                    accountingAdvence.setBookkeepingNumberId_n(nBookkeepingNum);
-                    accountingAdvence.setBookkeepingCenterId(record.getPkBookkeepingCenterId());
-                    accountingAdvence.setDate(mtDateLayout);
-                    accountingAdvence.setBizPartner(sBizPartner);
+                    accountingAdvance.setBankLayoutTypeId(mnFkBankLayoutTypeId);
+                    accountingAdvance.setBizPartnerId(bankPayment.getBizPartnerId());
+                    accountingAdvance.setBizPartnerBranchId(bankPayment.getBizPartnerBranchId());
+                    accountingAdvance.setBizPartnerBranchAccountCreditId(bankPayment.getBizPartnerBranchAccountId());
+                    accountingAdvance.setCompanyBranchId(mnFkBankCompanyBranchId);
+                    accountingAdvance.setCompanyBranchAccountDebitId(mnFkBankAccountCashId);
+                    accountingAdvance.setAmount(bankPayment.getAmount());
+                    accountingAdvance.setCurrencyId(bankPayment.getCurrencyId());
+                    accountingAdvance.setExcRate(1);
+                    accountingAdvance.setExcRateSystem(1);
+                    accountingAdvance.setBookkeepingYearId_n(nBookkeepingYear);
+                    accountingAdvance.setBookkeepingNumberId_n(nBookkeepingNum);
+                    accountingAdvance.setBookkeepingCenterId(record.getPkBookkeepingCenterId());
+                    accountingAdvance.setDate(mtDateLayout);
+                    accountingAdvance.setBizPartner(sBizPartner);
                     
-                    for (SDataRecordEntry entry : accountingAdvence.getDbmsRecordEntries()) {
+                    for (SDataRecordEntry entry : accountingAdvance.getDbmsRecordEntries()) {
                         entry.setSortingPosition(++nSortingPosition);
                         recordEntrys.add(entry);
                     }
