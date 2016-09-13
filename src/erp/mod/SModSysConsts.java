@@ -833,6 +833,15 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_LOAN_PAY_PER = 3;
 
     public static final int HRSS_TP_REC_SCHE_X = 2;
+    public static final int HRSS_TP_REC_SCHE_WAG = 2; //wages & salaries
+    public static final int HRSS_TP_REC_SCHE_RET = 3; //retirees
+    public static final int HRSS_TP_REC_SCHE_PEN = 4; //pensioners
+    public static final int HRSS_TP_REC_SCHE_ASS_COO = 5; //cooperative society members
+    public static final int HRSS_TP_REC_SCHE_ASS_CIV = 6; //civil society & association members
+    public static final int HRSS_TP_REC_SCHE_ASS_BRD = 7; //board members
+    public static final int HRSS_TP_REC_SCHE_ASS_SAL = 8; //sales representatives
+    public static final int HRSS_TP_REC_SCHE_ASS_PRO = 9; //professionals
+    public static final int HRSS_TP_REC_SCHE_ASS_SHA = 10; //shareholders
 
     public static final int HRSS_TP_POS_RISK_CL1 = 1;
     public static final int HRSS_TP_POS_RISK_CL2 = 2;
