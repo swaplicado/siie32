@@ -1,8 +1,6 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright © Software Aplicado SA de CV. All rights reserverd.
  */
-
 package erp.mfin.data;
 
 import erp.lib.SLibConstants;

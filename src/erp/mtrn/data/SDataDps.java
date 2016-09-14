@@ -47,6 +47,7 @@ import erp.mfin.data.SFinAccountConfig;
 import erp.mfin.data.SFinAccountConfigEntry;
 import erp.mfin.data.SFinAccountUtilities;
 import erp.mfin.data.SFinAmount;
+import erp.mfin.data.SFinAmountType;
 import erp.mfin.data.SFinAmounts;
 import erp.mfin.data.SFinDpsTaxes;
 import erp.mfin.data.SFinMovement;
@@ -82,8 +83,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public static final int FIELD_CLO_COMMS = 4;
     public static final int FIELD_CLO_COMMS_USR = 5;
     public static final int FIELD_USR = 6;
+    public static final String TXT_ADV_BILL = "facturación anticipos";
     public static final String MSG_ERR_FIN_REC_USR = "No se ha especificado la póliza contable de usuario.";
-    public static final String MSG_ERR_DOC_PRE_PAY = "El tipo de documento no permite anticipos. ";
     public static final String MSG_ERR_ACC_UNK_ = "No se encontró la configuración de cuentas contables para el ";
     public static final String MSG_ERR_ACC_EMP_ = "La configuración de cuentas contables está vacía para el ";
 
@@ -2076,6 +2077,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         double dGreatestAmount = 0;
         boolean isNewRecord = false;
         boolean appliesPrepayment = false;
+        boolean appliesAdvanceBilled = false;
         int[] anAccMvtSubclassKey = null;
         int[] anSysAccTypeKeyBpr = null;
         int[] anSysMvtTypeKeyBpr = null;
@@ -2099,7 +2101,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         SDataRecordEntry oRecordEntry = null;
         SFinDpsTaxes oDpsTaxes = null;
         SDataAccountCash oAccountCash = null;
-        SFinAccountConfig oConfigBpr = null;
+        SFinAccountConfig oConfigBprOp = null;
+        SFinAccountConfig oConfigBprAdvBill = null;
         SFinAccountConfig oConfigItem = null;
         SFinAmount oAmount = null;
         SFinAmount oAmountBprBal = null;
@@ -2440,15 +2443,23 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         appliesPrepayment = true;
                                         
                                         if (entry.getQuantity() >= 0) {
-                                            // Increment cash account's balance:
-                                            
-                                            oAmounts.addAmountForCashAccount(entry.getKeyCashAccount(), new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), true, SFinMovement.INCREMENT)); // add grouping by referenced cash account
+                                            if (entry.getKeyCashAccount_n() != null) {
+                                                // Increment cash account's balance:
+                                                
+                                                oAmounts.addAmountForCashAccount(entry.getKeyCashAccount_n(), new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), true, SFinAmountType.CASH_ACCOUNT, SFinMovement.INCREMENT)); // add grouping by referenced cash account
+                                            }
+                                            else {
+                                                // Increment advance billed's balance:
+                                                
+                                                appliesAdvanceBilled = true;
+                                                oAmounts.addAmountForAdvanceBilled(new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), true, SFinAmountType.ADVANCE_BILLED, SFinMovement.INCREMENT)); // add into lonely group
+                                            }
                                         }
                                         else {
                                             // Decrement business partner's balance:
                                             
                                             if (oAmountBprPay == null) {
-                                                oAmounts.getAmounts().add(oAmountBprPay = new SFinAmount(0, 0, true, SFinMovement.DECREMENT)); // in-line instantiation!
+                                                oAmounts.getAmounts().add(oAmountBprPay = new SFinAmount(0, 0, true, SFinAmountType.UNDEFINED, SFinMovement.DECREMENT)); // in-line instantiation!
                                             }
 
                                             oAmountBprPay.addAmount(-entry.getTotal_r(), -entry.getTotalCy_r()); // only one amount per business partner
@@ -2465,14 +2476,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     }
                                 }
                                 else { // document is a credit note
-                                    if (entry.getIsPrepayment()) {
-                                        throw new Exception(MSG_ERR_DOC_PRE_PAY);
-                                    }
-                                    else {
-                                        // Decrement business partner document's balance:
-                                            
-                                        oAmounts.addAmountForDocument(entry.getKeyAuxDps(), new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r())); // add grouping by referenced invoice
-                                    }
+                                    // Decrement a business partner document's balance:
+
+                                    oAmounts.addAmountForDocument(entry.getKeyAuxDps(), new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r())); // add grouping by referenced invoice
                                 }
                             }
                         }
@@ -2483,9 +2489,15 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         
                         // Create journal voucher entries:
                         
-                        oConfigBpr = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
+                        oConfigBprOp = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
                                 mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
                                 mtDate, SDataConstantsSys.FINS_TP_ACC_BP_OP, isDebitForBizPartner(), oStatement));
+
+                        if (appliesAdvanceBilled) {
+                            oConfigBprAdvBill = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
+                                    mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
+                                    mtDate, SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL, isDebitForBizPartner(), oStatement));
+                        }
 
                         anSysAccTypeKeyBpr = getSysAccTypeKeyBizPartner();
                         anSysMvtTypeKeyBpr = getSysMvtTypeKeyBizPartner();
@@ -2493,40 +2505,77 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         
                         for (SFinAmount amount : oAmounts.getAmounts()) {
                             if (amount.IsPrepayment && amount.Movement == SFinMovement.INCREMENT) {
-                                oAccountCash = new SDataAccountCash();
-                                oAccountCash.read(amount.KeyRefCashAccount, oStatement);
+                                switch (amount.AmountType) {
+                                    case CASH_ACCOUNT: // user requested prepayment accounting into a cash account
+                                        oAccountCash = new SDataAccountCash();
+                                        oAccountCash.read(amount.KeyRefCashAccount, oStatement);
 
-                                oRecordEntry = createAccRecordEntry(
-                                        oAccountCash.getFkAccountId(),
-                                        "",
-                                        getAccMvtSubclassKeyAccountCash(), getSysAccTypeKeyAccountCash(oAccountCash), getSysMvtTypeKeyAccountCash(), getSysMvtTypeKeyAccountCashXXX(oAccountCash),
-                                        null, amount.KeyRefCashAccount);
+                                        oRecordEntry = createAccRecordEntry(
+                                                oAccountCash.getFkAccountId(),
+                                                "",
+                                                getAccMvtSubclassKeyAccountCash(), getSysAccTypeKeyAccountCash(oAccountCash), getSysMvtTypeKeyAccountCash(), getSysMvtTypeKeyAccountCashXXX(oAccountCash),
+                                                null, amount.KeyRefCashAccount);
 
-                                if (isDebitForBizPartner()) {
-                                    oRecordEntry.setDebit(amount.Amount);
-                                    oRecordEntry.setCredit(0);
-                                    oRecordEntry.setDebitCy(amount.AmountCy);
-                                    oRecordEntry.setCreditCy(0);
+                                        if (isDebitForBizPartner()) {
+                                            oRecordEntry.setDebit(amount.Amount);
+                                            oRecordEntry.setCredit(0);
+                                            oRecordEntry.setDebitCy(amount.AmountCy);
+                                            oRecordEntry.setCreditCy(0);
+                                        }
+                                        else {
+                                            oRecordEntry.setDebit(0);
+                                            oRecordEntry.setCredit(amount.Amount);
+                                            oRecordEntry.setDebitCy(0);
+                                            oRecordEntry.setCreditCy(amount.AmountCy);
+                                        }
+
+                                        oRecordEntry.setConcept(sConcept);
+                                        oRecordEntry.setSortingPosition(++nSortingPosition);
+
+                                        oRecord.getDbmsRecordEntries().add(oRecordEntry);
+                                        break;
+                                        
+                                    case ADVANCE_BILLED: // user requested prepayment accounting into business partner pending advance payments
+                                        aAmountEntries = oConfigBprAdvBill.prorateAmount(amount);
+                                        
+                                        for (i = 0; i < oConfigBprAdvBill.getAccountConfigEntries().size(); i++) {
+                                            oRecordEntry = createAccRecordEntry(
+                                                    oConfigBprAdvBill.getAccountConfigEntries().get(i).getAccountId(),
+                                                    oConfigBprAdvBill.getAccountConfigEntries().get(i).getCostCenterId(),
+                                                    anAccMvtSubclassKey, SModSysConsts.FINS_TP_SYS_ACC_NA_NA, anSysMvtTypeKeyBpr, SDataConstantsSys.FINS_TP_SYS_MOV_NA,
+                                                    null, null);
+                                            
+                                            if (isDebitForBizPartner()) {
+                                                oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
+                                                oRecordEntry.setCredit(0);
+                                                oRecordEntry.setDebitCy(aAmountEntries.get(i).AmountCy);
+                                                oRecordEntry.setCreditCy(0);
+                                            }
+                                            else {
+                                                oRecordEntry.setDebit(0);
+                                                oRecordEntry.setCredit(aAmountEntries.get(i).Amount);
+                                                oRecordEntry.setDebitCy(0);
+                                                oRecordEntry.setCreditCy(aAmountEntries.get(i).AmountCy);
+                                            }
+
+                                            oRecordEntry.setConcept(sConcept);
+                                            oRecordEntry.setSortingPosition(++nSortingPosition);
+
+                                            oRecord.getDbmsRecordEntries().add(oRecordEntry);
+                                        }
+                                        break;
+                                        
+                                    default:
+                                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(" + TXT_ADV_BILL + ")");
                                 }
-                                else {
-                                    oRecordEntry.setDebit(0);
-                                    oRecordEntry.setCredit(amount.Amount);
-                                    oRecordEntry.setDebitCy(0);
-                                    oRecordEntry.setCreditCy(amount.AmountCy);
-                                }
-
-                                oRecordEntry.setConcept(sConcept);
-                                oRecordEntry.setSortingPosition(++nSortingPosition);
-
-                                oRecord.getDbmsRecordEntries().add(oRecordEntry);
                             }
                             else {
-                                aAmountEntries = oConfigBpr.prorateAmount(amount);
+                                aAmountEntries = oConfigBprOp.prorateAmount(amount);
 
-                                for (i = 0; i < oConfigBpr.getAccountConfigEntries().size(); i++) {
+                                for (i = 0; i < oConfigBprOp.getAccountConfigEntries().size(); i++) {
                                     oRecordEntry = createAccRecordEntry(
-                                            oConfigBpr.getAccountConfigEntries().get(i).getAccountId(),
-                                            oConfigBpr.getAccountConfigEntries().get(i).getCostCenterId(),
+                                            oConfigBprOp.getAccountConfigEntries().get(i).getAccountId(),
+                                            oConfigBprOp.getAccountConfigEntries().get(i).getCostCenterId(),
                                             anAccMvtSubclassKey, anSysAccTypeKeyBpr, anSysMvtTypeKeyBpr, anSysMvtTypeKeyBprXXX,
                                             isAdjustment() ? amount.KeyRefDocument : null, null);
                                     if (amount.IsPrepayment) { // decrementing prepayment entry:
@@ -2569,7 +2618,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         // 4.4 Purchases or sales:
 
                         if (appliesPrepayment) { // prevent from reading prepayment configuration when not needed!
-                            oConfigBpr = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
+                            oConfigBprOp = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
                                     mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
                                     mtDate, SDataConstantsSys.FINS_TP_ACC_BP_PAY, isDebitForBizPartner(), oStatement));
                         }
@@ -2586,12 +2635,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         oAmount = new SFinAmount(-entry.getSubtotal_r(), -entry.getSubtotalCy_r());
                                     }
 
-                                    aAmountEntries = oConfigBpr.prorateAmount(oAmount);
+                                    aAmountEntries = oConfigBprOp.prorateAmount(oAmount);
                                     
-                                    for (i = 0; i < oConfigBpr.getAccountConfigEntries().size(); i++) {
+                                    for (i = 0; i < oConfigBprOp.getAccountConfigEntries().size(); i++) {
                                         oRecordEntry = createAccRecordEntry(
-                                                oConfigBpr.getAccountConfigEntries().get(i).getAccountId(),
-                                                oConfigBpr.getAccountConfigEntries().get(i).getCostCenterId(),
+                                                oConfigBprOp.getAccountConfigEntries().get(i).getAccountId(),
+                                                oConfigBprOp.getAccountConfigEntries().get(i).getCostCenterId(),
                                                 anAccMvtSubclassKey, anSysAccTypeKeyBpr, anSysMvtTypeKeyBpr, anSysMvtTypeKeyBprXXX,
                                                 null, null);
 
@@ -2694,10 +2743,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 
                                 for (SDataDpsEntryTax tax : entry.getDbmsEntryTaxes()) {
                                     if (entry.getQuantity() >= 0) {
-                                        oAmount = new SFinAmount(tax.getTax(), tax.getTaxCy(), entry.getIsPrepayment(), SFinMovement.INCREMENT);
+                                        oAmount = new SFinAmount(tax.getTax(), tax.getTaxCy(), entry.getIsPrepayment(), SFinAmountType.UNDEFINED, SFinMovement.INCREMENT);
                                     }
                                     else {
-                                        oAmount = new SFinAmount(-tax.getTax(), -tax.getTaxCy(), entry.getIsPrepayment(), SFinMovement.DECREMENT);
+                                        oAmount = new SFinAmount(-tax.getTax(), -tax.getTaxCy(), entry.getIsPrepayment(), SFinAmountType.UNDEFINED, SFinMovement.DECREMENT);
                                     }
                                     
                                     oDpsTaxes.addTax(isDocument() ? (int[]) getPrimaryKey() : entry.getKeyAuxDps(), tax.getKeyTax(), oAmount);
