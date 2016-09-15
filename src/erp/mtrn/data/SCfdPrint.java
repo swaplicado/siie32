@@ -422,6 +422,7 @@ public class SCfdPrint {
         String sPdfFileName = "";
         BufferedImage biQrCode = null;  // cannot be really used, because is not serializable
         cfd.ver3.DElementComprobante comprobante = null;
+        int nPaymentMethodCode = 0;
 
         if (dps.getFkBizPartnerBranchAddressId() != 1) {
             address = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB_ADD,
@@ -499,7 +500,13 @@ public class SCfdPrint {
         map.put("sCfdCondicionesDePagoOpc", comprobante.getAttCondicionesDePago().getOption());
         map.put("dCfdSubTotal", comprobante.getAttSubTotal().getDouble());
         map.put("dCfdTotal", comprobante.getAttTotal().getDouble());
-        map.put("sCfdMetodoDePagoOpc", DCfdUtils.composeMetodoPago(comprobante.getAttMetodoDePago().getString()));
+        if (comprobante.getAttMetodoDePago().getString().length() != 2) {
+            map.put("sCfdMetodoDePagoOpc", comprobante.getAttMetodoDePago().getString());
+        }
+        else {
+            nPaymentMethodCode = SLibUtils.parseInt(comprobante.getAttMetodoDePago().getString());
+            map.put("sCfdMetodoDePagoOpc", nPaymentMethodCode == 0 ? comprobante.getAttMetodoDePago().getString() : DCfdUtils.composeMetodoPago(comprobante.getAttMetodoDePago().getString()));
+        }
         map.put("sExpedidoEn", comprobante.getAttLugarExpedicion().getString());
         map.put("sCfdTipoDeComprobante", comprobante.getAttTipoDeComprobante().getOption());
         map.put("sCfdNoCuentaPago", comprobante.getAttNumCtaPago().getString());
