@@ -295,13 +295,13 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         switch (reportId) {
             case SModConsts.HRSR_PRE_PAY:
                 if (moRadOrderByNumEmployee.isSelected()) {
-                    orderBy = "ORDER BY dep.name, dep.id_dep, emp.num, bp.id_bp; ";
+                    orderBy = "ORDER BY dep.name, dep.id_dep, CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp; ";
                 }
                 else if (moRadOrderByNameEmployee.isSelected()) {
                     orderBy = "ORDER BY dep.name, dep.id_dep, bp.bp, bp.id_bp; ";
                 }
                 else if (moRadOrderByNumDepartament.isSelected()) {
-                    orderBy = "ORDER BY dep.name, dep.code, dep.id_dep, emp.num, bp.id_bp; ";
+                    orderBy = "ORDER BY dep.name, dep.code, dep.id_dep, CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp; ";
                 }
                 else if (moRadOrderByNameDepartament.isSelected()) {
                     orderBy = "ORDER BY dep.name, dep.code, dep.id_dep, bp.bp, bp.id_bp; ";
@@ -309,13 +309,13 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
                 break;
             case SModConsts.HRSR_PAY:
                 if (moRadOrderByNumEmployee.isSelected()) {
-                    orderBy = "ORDER BY emp.num, bp.id_bp; ";
+                    orderBy = "ORDER BY CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp; ";
                 }
                 else if (moRadOrderByNameEmployee.isSelected()) {
                     orderBy = "ORDER BY bp.bp, bp.id_bp; ";
                 }
                 else if (moRadOrderByNumDepartament.isSelected()) {
-                    orderBy = "ORDER BY dep.code, dep.id_dep, emp.num, bp.id_bp; ";
+                    orderBy = "ORDER BY dep.code, dep.id_dep, CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp; ";
                 }
                 else if (moRadOrderByNameDepartament.isSelected()) {
                     orderBy = "ORDER BY dep.code, dep.id_dep, bp.bp, bp.id_bp; ";
@@ -325,13 +325,13 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
                 break;
             case SModConsts.HRSR_LIST_EAR:
                 if (moRadOrderByNumEmployee.isSelected()) {
-                    orderBy = "ORDER BY ear.name, ear.code, ear.id_ear, emp.num, bp.id_bp; ";
+                    orderBy = "ORDER BY ear.name, ear.code, ear.id_ear, CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp; ";
                 }
                 else if (moRadOrderByNameEmployee.isSelected()) {
                     orderBy = "ORDER BY ear.name, ear.code, ear.id_ear, bp.bp, bp.id_bp; ";
                 }
                 else if (moRadOrderByNumDepartament.isSelected()) {
-                    orderBy = "ORDER BY ear.name, ear.code, ear.id_ear, dep.code, dep.id_dep, emp.num, bp.id_bp; ";
+                    orderBy = "ORDER BY ear.name, ear.code, ear.id_ear, dep.code, dep.id_dep, CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp; ";
                 }
                 else if (moRadOrderByNameDepartament.isSelected()) {
                     orderBy = "ORDER BY ear.name, ear.code, ear.id_ear, dep.code, dep.id_dep, bp.bp, bp.id_bp; ";
@@ -339,13 +339,13 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
                 break;
             case SModConsts.HRSR_LIST_DED:
                 if (moRadOrderByNumEmployee.isSelected()) {
-                    orderBy = "ORDER BY ded.name, ded.code, ded.id_ded, emp.num, bp.id_bp; ";
+                    orderBy = "ORDER BY ded.name, ded.code, ded.id_ded, CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp; ";
                 }
                 else if (moRadOrderByNameEmployee.isSelected()) {
                     orderBy = "ORDER BY ded.name, ded.code, ded.id_ded, bp.bp, bp.id_bp; ";
                 }
                 else if (moRadOrderByNumDepartament.isSelected()) {
-                    orderBy = "ORDER BY ded.name, ded.code, ded.id_ded, dep.code, dep.id_dep, emp.num, bp.id_bp; ";
+                    orderBy = "ORDER BY ded.name, ded.code, ded.id_ded, dep.code, dep.id_dep, CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp; ";
                 }
                 else if (moRadOrderByNameDepartament.isSelected()) {
                     orderBy = "ORDER BY ded.name, ded.code, ded.id_ded, dep.code, dep.id_dep, bp.bp, bp.id_bp; ";

@@ -28,7 +28,7 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Juan Barajas
  */
-public class SLayoutBankAccountingAdvence {
+public class SLayoutBankAccountingAdvance {
 
     protected SGuiSession moSession;
     
@@ -50,7 +50,7 @@ public class SLayoutBankAccountingAdvence {
     
     protected ArrayList<SDataRecordEntry> maRecordEntries;
 
-    public SLayoutBankAccountingAdvence(final SGuiSession session, final int bizPartnerId, final int bizPartnerBranchId, final int bizPartnerBranchBankAccountId, final int companyBranchId, final int companyBranchAccountDebitId) {
+    public SLayoutBankAccountingAdvance(final SGuiSession session, final int bizPartnerId, final int bizPartnerBranchId, final int bizPartnerBranchBankAccountId, final int companyBranchId, final int companyBranchAccountDebitId) {
         moSession = session;
         mnBankLayoutTypeId = 0;
         mnBizPartnerId = bizPartnerId;

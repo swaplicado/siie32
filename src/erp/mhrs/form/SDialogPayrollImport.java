@@ -610,7 +610,15 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                 // Display payroll data:
 
                 sql = "SELECT bp.bp, bp.id_bp, emp.id_emp, d.id_dep, d.name, d.code, " +
-                        "SUM(rcp.ear_r) AS f_ear, SUM(rcp.ded_r) AS f_ded, " +
+                        "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
+                        "FROM hrs_pay_rcp AS r " +
+                        "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
+                        "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ear.b_del = 0 AND rcp_ear.id_emp = rcp.id_emp) AS f_ear, " +
+                        "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) " +
+                        "FROM hrs_pay_rcp AS r " +
+                        "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = r.id_pay AND rcp_ded.id_emp = r.id_emp " +
+                        "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.id_emp = rcp.id_emp) AS f_ded, " +
+                        //"SUM(rcp.ear_r) AS f_ear, SUM(rcp.ded_r) AS f_ded, " +
                         "rcp.wage, rcp.pay_day_r, rcp.sal_ssc, rcp.wrk_day, rcp.day_wrk, rcp.day_pad, " +
                         "st.name, et.code AS tp_emp, ec.code AS tp_wrk " +
                         "FROM hrs_pay AS p " +

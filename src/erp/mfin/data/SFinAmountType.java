@@ -7,7 +7,9 @@ package erp.mfin.data;
  *
  * @author Sergio Flores
  */
-public enum SFinMovement {
-    INCREMENT,
-    DECREMENT
+public enum SFinAmountType {
+    UNDEFINED,
+    DOCUMENT,
+    CASH_ACCOUNT,
+    ADVANCE_BILLED
 }

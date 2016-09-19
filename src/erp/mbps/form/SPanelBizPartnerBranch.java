@@ -295,7 +295,7 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         jlAddingMultipleMailHelp.setForeground(new java.awt.Color(109, 109, 109));
         jlAddingMultipleMailHelp.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlAddingMultipleMailHelp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlAddingMultipleMailHelp.setToolTipText("Para agregar más de un correo sepárelos \";\" y sin espacios p. ej. , (ejemplo1@mail.com;ejemplo2@mail.com)");
+        jlAddingMultipleMailHelp.setToolTipText("Para varios correos separarlos con \";\", sin espacios, p. ej., \"ejemplo1@mail.com;ejemplo2@mail.com\"");
         jlAddingMultipleMailHelp.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel9.add(jlAddingMultipleMailHelp);
 

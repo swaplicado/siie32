@@ -78,7 +78,15 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
         maoDbmsCategorySettings = null;
         reset();
     }
+    
+    /*
+     * Private methods:
+     */
 
+    /*
+     * Public methods:
+     */
+    
     public void setPkBizPartnerId(int n) { mnPkBizPartnerId = n; }
     public void setBizPartner(java.lang.String s) { msBizPartner = s; }
     public void setBizPartnerCommercial(java.lang.String s) { msBizPartnerCommercial = s; }
@@ -605,85 +613,85 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
     }
 
     /**
-     * Obtain mail for contact
-     * @param branckKey Primary key of the business partner branch
-     * @return Mail of contact
-     */
-    public String getBizPartnerBranchContactMail(int[] branckKey) {
-        return getBizPartnerBranchContactMail(branckKey, SLibConstants.UNDEFINED);
-    }
-
-    /**
-     * Obtain mail for contact
+     * Obtain mail for requested business partner's branch, if any, and requested contact type.
+     * @param keyBranch_n Primary key of the business partner branch
      * @param contactType Contact of type (SDataConstantsSys.BPSS_TP_CON_)
      * @return Mail of contact
      */
-    public String getBizPartnerBranchContactMail(int contactType) {
-        return getBizPartnerBranchContactMail(null, contactType);
-    }
-
-    /**
-     * Obtain mail for contact
-     * @param branchKey Primary key of the business partner branch
-     * @param contactType Contact of type (SDataConstantsSys.BPSS_TP_CON_)
-     * @return Mail of contact
-     */
-    public String getBizPartnerBranchContactMail(int[] branchKey, int contactType) {
-        String mail = "";
+    public String getBizPartnerBranchContactMail(int[] keyBranch_n, int contactType) {
+        String mails = "";
         SDataBizPartnerBranch branch = null;
         SDataBizPartnerBranchContact contact = null;
         int[] anTypesContact = { SDataConstantsSys.BPSS_TP_CON_PAY, SDataConstantsSys.BPSS_TP_CON_PUR, SDataConstantsSys.BPSS_TP_CON_ADM };
 
-        if (branchKey != null) {
-            branch = getDbmsBizPartnerBranch(branchKey);
+        if (keyBranch_n == null) {
+            branch = getDbmsHqBranch();
         }
         else {
-            branch = getDbmsHqBranch();
+            branch = getDbmsBizPartnerBranch(keyBranch_n);
         }
 
         if (branch != null) {
             contact = getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0);
 
-            mail = contact.getEmail01();
+            mails = contact.getEmail01();
 
-            if (mail.isEmpty()) {
+            if (mails.isEmpty()) {
                 for (int i = 0; i < anTypesContact.length; i++) {
                     for (int j = 0; j < branch.getDbmsBizPartnerBranchContacts().size(); j++) {
                         contact = branch.getDbmsBizPartnerBranchContacts().get(j);
 
                         if (contactType != SLibConstants.UNDEFINED && contact.getPkContactTypeId() == contactType) {
-                            mail = contact.getEmail01();
+                            mails = contact.getEmail01();
 
-                            if (mail.isEmpty()) {
-                                mail = contact.getEmail02();
+                            if (mails.isEmpty()) {
+                                mails = contact.getEmail02();
                             }
                             break;
                         }
                         else if (contact.getPkContactTypeId() == anTypesContact[i] && !contact.getIsDeleted()) {
-                            mail = contact.getEmail01();
+                            mails = contact.getEmail01();
 
-                            if (mail.isEmpty()) {
-                                mail = contact.getEmail02();
+                            if (mails.isEmpty()) {
+                                mails = contact.getEmail02();
                             }
                         }
-                        if (!mail.isEmpty()) {
+                        if (!mails.isEmpty()) {
                             break;
                         }
                     }
-                    if (!mail.isEmpty()) {
+                    if (!mails.isEmpty()) {
                         break;
                     }
                 }
             }
         }
 
-        if (mail.isEmpty() && branchKey != null) {
-            mail = getBizPartnerBranchContactMail(null, contactType);
+        if (mails.isEmpty() && keyBranch_n != null) {
+            mails = getBizPartnerBranchContactMail(null, contactType);
         }
 
-        return mail;
+        return mails;
     }
 
+    /**
+     * Obtain mail for default contact of requested business partner's branch.
+     * @param keyBranch Primary key of the business partner's branch.
+     * @return Mail of contact.
+     */
+    public String getBizPartnerBranchContactMail(int[] keyBranch) {
+        return getBizPartnerBranchContactMail(keyBranch, SLibConstants.UNDEFINED);
+    }
+
+    /**
+     * Obtain mail for requested contact type of business partner's headquarters.
+     * @param contactType Contact type (SDataConstantsSys.BPSS_TP_CON_) or SLibConstants.UNDEFINED for default contact.
+     * @return Mail of contact.
+     */
+    public String getBizPartnerContactMail(int contactType) {
+        return getBizPartnerBranchContactMail(null, contactType);
+    }
+    
     public int[] getSalesAgentKey(int[] branchKey) {
         int[] pk = null;
         SDataCustomerBranchConfig oConfig = null;

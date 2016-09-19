@@ -10,7 +10,9 @@ import erp.cfd.SCfdConsts;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.lib.xml.SXmlUtilities;
 import erp.mod.SModConsts;
+import erp.mod.trn.db.STrnUtils;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -19,8 +21,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.imageio.ImageIO;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
+import sa.lib.xml.SXmlUtils;
 
 /**
  *
@@ -87,6 +93,27 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected boolean mbAuxIsSign;
     protected boolean mbAuxIsValidate;
 
+    public String getCfdNumber() {
+        String numberSer = "";
+        String number = "";
+        
+        try {
+            Document doc = SXmlUtilities.parseDocument(msDocXml);
+            Node node = null;
+            NamedNodeMap namedNodeMap = null;
+
+            node = SXmlUtils.extractElements(doc, mnFkXmlTypeId == SDataConstantsSys.TRNS_TP_XML_CFD ? "Comprobante" : "cfdi:Comprobante").item(0);
+            namedNodeMap = node.getAttributes();
+
+            numberSer = SXmlUtilities.extractAttributeValue(namedNodeMap, "serie", false);
+            number = SXmlUtilities.extractAttributeValue(namedNodeMap, "folio", false);
+        }
+        catch (Exception e) {
+            SLibUtilities.printOutException(this, e);
+        }
+        return STrnUtils.formatDocNumber(numberSer, number);
+    }
+    
     private boolean testDeletion(java.lang.String psMsg, int nAction) throws java.lang.Exception {
         String sMsg = psMsg;
         

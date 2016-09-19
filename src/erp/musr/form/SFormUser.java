@@ -51,6 +51,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     private int mnFormStatus;
     private boolean mbFirstTime;
     private boolean mbResetingForm;
+    private boolean mbResetCompanyBranchEntities;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.client.SClientInterface miClient;
 
@@ -1351,6 +1352,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         };
 
         SFormUtilities.putActionMap(getRootPane(), action, "cancel", KeyEvent.VK_ESCAPE, 0);
+        mbResetCompanyBranchEntities = false;
     }
 
     private void windowActivated() {
@@ -1501,6 +1503,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     }
 
     private void itemStateChangedCompanyBranchEntity() {
+        mbResetCompanyBranchEntities = true;
         populateListUserCashAccounts();
         populateListCompanyBranchCashAccounts();
         populateListUserWarehouses();
@@ -1511,6 +1514,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         populateListCompanyBranchPlants();
         populateEntityCheckBox(moFieldFkCompanyBranchEntityId.getKeyAsIntArray()[0]);
         jckIsUniversalBranch.setSelected(getIsUniversalCompanyBranch(moFieldFkCompanyBranchEntityId.getKeyAsIntArray()[0]));
+        mbResetCompanyBranchEntities = false;
     }
 
    private void itemStateChangedCompanyEntity() {
@@ -1545,7 +1549,9 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                             }
                         }
                         renderButtonsCashAccountIsUniversal();
-                        mvUserBranches.get(i).get(j).getValues().set(3, jckIsUniversalCashAccount.isSelected());
+                        if (!mbResetCompanyBranchEntities) {
+                            mvUserBranches.get(i).get(j).getValues().set(3, jckIsUniversalCashAccount.isSelected());
+                        }
                     }
                 }
             }
@@ -1569,7 +1575,9 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                             }
                         }
                         renderButtonsWarehouseIsUniversal();
-                        mvUserBranches.get(i).get(j).getValues().set(4, jckIsUniversalWarehouse.isSelected());
+                        if (!mbResetCompanyBranchEntities) {
+                            mvUserBranches.get(i).get(j).getValues().set(4, jckIsUniversalWarehouse.isSelected());
+                        }
                     }
                 }
             }
@@ -1593,7 +1601,9 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                             }
                         }
                         renderButtonsPosIsUniversal();
-                        mvUserBranches.get(i).get(j).getValues().set(5, jckIsUniversalPos.isSelected());
+                        if (!mbResetCompanyBranchEntities) {
+                            mvUserBranches.get(i).get(j).getValues().set(5, jckIsUniversalPos.isSelected());
+                        }
                     }
                 }
             }
@@ -1617,7 +1627,9 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                             }
                         }
                         renderButtonsPlantsIsUniversal();
-                        mvUserBranches.get(i).get(j).getValues().set(6, jckIsUniversalPlant.isSelected());
+                        if (!mbResetCompanyBranchEntities) {
+                            mvUserBranches.get(i).get(j).getValues().set(6, jckIsUniversalPlant.isSelected());
+                        }
                     }
                 }
             }
@@ -3605,6 +3617,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jckIsUniversalPlant.setSelected(false);
         renderButtons();
         readErpInformation();
+        mbResetCompanyBranchEntities = false;
         mbResetingForm = false;
     }
 

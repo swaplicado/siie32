@@ -362,7 +362,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
                                     earningRow.getReceiptEarning().setUnitsAlleged(hrsReceiptEarningRow.getXtaValueAlleged());
                                     earningRow.getReceiptEarning().setUnits(hrsReceiptEarningRow.getXtaValue());
                                 }
-                                amount = SLibUtils.round((earningRow.getReceiptEarning().getUnits() * earningRow.getReceiptEarning().getAmountUnitary()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                                amount = SLibUtils.round((earningRow.getReceiptEarning().getUnits() * earningRow.getReceiptEarning().getAmountUnitary() * earningRow.getEarning().getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
                                 earningRow.getReceiptEarning().setAmountSystem_r(amount);
 
                                 earningRow.getReceiptEarning().setAmount_r(amount);

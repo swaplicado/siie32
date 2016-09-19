@@ -378,7 +378,9 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
         moDecTotalAmount.setEditable(false);
         if (moKeyLoanType.getSelectedIndex() > SLibConsts.UNDEFINED) {
             switch (moKeyLoanType.getValue()[0]) {
-                case SModSysConsts.HRSS_TP_LOAN_LOA:
+                case SModSysConsts.HRSS_TP_LOAN_LOA_COM:
+                case SModSysConsts.HRSS_TP_LOAN_LOA_UNI:
+                case SModSysConsts.HRSS_TP_LOAN_LOA_TPS:
                     jlHelp.setText("(por periodo de pago)");
                     moDecCapital.setEditable(true);
                     moDecTotalAmount.setEditable(true);

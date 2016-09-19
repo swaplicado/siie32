@@ -99,10 +99,19 @@ public abstract class SHrsUtils {
                 bw.write(buffer);
                 bw.newLine();
                 
-                sql = "SELECT rcp.id_emp, rcp.pay_r, emp.bank_acc " +
-                        "FROM hrs_pay_rcp AS rcp " +
+                sql = "SELECT rcp.id_emp, emp.bank_acc, " +
+                        "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
+                        "FROM hrs_pay_rcp AS r " +
+                        "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
+                        "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ear.b_del = 0 AND rcp_ear.id_emp = rcp.id_emp) - " +
+                        "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) " +
+                        "FROM hrs_pay_rcp AS r " +
+                        "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = r.id_pay AND rcp_ded.id_emp = r.id_emp " +
+                        "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.id_emp = rcp.id_emp) AS _pay_net " +
+                        "FROM hrs_pay AS p " +
+                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
                         "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
-                        "WHERE rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0";
+                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0";
                 resultSet = client.getSession().getStatement().executeQuery(sql);
                 while (resultSet.next()) {
                     buffer = "";
@@ -110,7 +119,7 @@ public abstract class SHrsUtils {
                     sAccountCredit = SLibUtilities.textTrim(resultSet.getString("emp.bank_acc"));
                     leyend = "DEPOSITO DE NOMINA";
                     employeeId = resultSet.getInt("rcp.id_emp");
-                    mdBalance = resultSet.getDouble("rcp.pay_r");
+                    mdBalance = resultSet.getDouble("_pay_net");
                     mdBalanceTotal += mdBalance;
 
                     n = (int) (Math.floor(Math.log10(nMoveNum)) + 1);
@@ -1537,8 +1546,14 @@ public abstract class SHrsUtils {
         // Obtain payroll header:
 
         sql = "SELECT p.per_year, p.id_pay, tp.code, p.num, p.id_pay, NOW() AS f_date, p.dt_sta, p.dt_end, " +
-                "SUM(rcp.ear_r) AS f_ear, " +
-                "SUM(rcp.ded_r) AS f_ded, " +
+                "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
+                "FROM hrs_pay_rcp AS r " +
+                "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
+                "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ear.b_del = 0 AND rcp_ear.id_emp = rcp.id_emp) AS f_ear, " +
+                "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) " +
+                "FROM hrs_pay_rcp AS r " +
+                "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = r.id_pay AND rcp_ded.id_emp = r.id_emp " +
+                "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.id_emp = rcp.id_emp) AS f_ded, " +
                 "pei.dt_iss, " +
                 "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) " +
                 "FROM hrs_pay_rcp AS r " +
@@ -1604,13 +1619,27 @@ public abstract class SHrsUtils {
                 "emp.dt_hire AS f_emp_alta, p.dt_sta AS f_nom_date_start, p.dt_end AS f_nom_date_end, " +
                 "TIMESTAMPDIFF(DAY, emp.dt_ben, p.dt_end) / " + SHrsConsts.WEEK_DAYS + " AS f_emp_sen, pos.name AS f_emp_pos, " +
                 "'' AS f_emp_cont_tp, '' AS f_emp_jorn_tp, tp.name AS f_emp_pay, rcp.sal_ssc AS f_emp_sal_bc, ris.id_tp_pos_risk AS f_emp_risk, " +
-                "SUM(rcp.ear_r) AS f_ear, " +
-                "SUM(rcp.ded_r) AS f_ded, " +
+                "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
+                "FROM hrs_pay_rcp AS r " +
+                "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
+                "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ear.b_del = 0 AND rcp_ear.id_emp = rcp.id_emp) AS f_ear, " +
+                "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) " +
+                "FROM hrs_pay_rcp AS r " +
+                "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = r.id_pay AND rcp_ded.id_emp = r.id_emp " +
+                "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.id_emp = rcp.id_emp) AS f_ded, " +
                 "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) " +
                 "FROM hrs_pay_rcp AS r " +
                 "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = r.id_pay AND rcp_ded.id_emp = r.id_emp " +
                 "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.id_emp = rcp.id_emp AND rcp_ded.fk_ded IN (" + deductionsTaxRetained + ")) AS f_emp_tot_rent_ret, " +
-                "SUM(rcp.pay_r) AS f_emp_tot_net, NOW() AS f_emp_date_edit " +
+                "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
+                "FROM hrs_pay_rcp AS r " +
+                "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
+                "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ear.b_del = 0 AND rcp_ear.id_emp = rcp.id_emp) -" +
+                "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) " +
+                "FROM hrs_pay_rcp AS r " +
+                "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = r.id_pay AND rcp_ded.id_emp = r.id_emp " +
+                "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.id_emp = rcp.id_emp) AS f_emp_tot_net, " +
+                "NOW() AS f_emp_date_edit " +
                 "FROM hrs_pay AS p " +
                 "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
                 "INNER JOIN hrs_pay_rcp_iss AS pei ON " +
@@ -1859,7 +1888,8 @@ public abstract class SHrsUtils {
             case SModSysConsts.HRSS_TP_LOAN_PAY_AMT:
                 amoutMonth = loan.getPaymentAmount() + amoutAdjustment;
                 
-                if (loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA) {
+                if (loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA_COM || loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA_UNI ||
+                        loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA_TPS) {
                     amoutAux = amoutMonth;
                 
                     balanceLoan = SHrsUtils.getBalanceLoan(loan, hrsReceipt.getHrsEmployee());
@@ -2226,24 +2256,6 @@ public abstract class SHrsUtils {
         netGrossAmount.setCalculatedAmountType(SHrsConsts.CAL_GROSS_AMT_TYPE);
         
         return netGrossAmount;
-    }
-    
-    public static double getAdjustmentLoan(final SHrsPayroll hrsPayroll, final int typeLoan) throws Exception {
-        double amout = 0;
-        
-        switch (typeLoan) {
-            case SModSysConsts.HRSS_TP_LOAN_LOA:
-                break;
-            case SModSysConsts.HRSS_TP_LOAN_HOM:
-                amout = 7.5;
-                break;
-            case SModSysConsts.HRSS_TP_LOAN_CON:
-                break;
-            default:
-                break;
-        }
-        
-        return amout;
     }
     
     /**

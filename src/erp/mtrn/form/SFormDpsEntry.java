@@ -61,6 +61,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
@@ -207,6 +208,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        bgAccOptions = new javax.swing.ButtonGroup();
         jpRegistry = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
@@ -409,9 +411,16 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jlTicket = new javax.swing.JLabel();
         jtfTicket = new javax.swing.JTextField();
         jPanel55 = new javax.swing.JPanel();
+        jPanel57 = new javax.swing.JPanel();
+        jlAccOptions = new javax.swing.JLabel();
+        jradAccCashAccount = new javax.swing.JRadioButton();
+        jradAccAdvanceBilled = new javax.swing.JRadioButton();
         jPanel56 = new javax.swing.JPanel();
         jlFkCashAccountId_n = new javax.swing.JLabel();
         jcbFkCashAccountId_n = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel58 = new javax.swing.JPanel();
+        jlFkCashAccountId_n1 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
         jpExtraDataUnits = new javax.swing.JPanel();
         jpExtraDataUnitsNorth = new javax.swing.JPanel();
         jPanel27 = new javax.swing.JPanel();
@@ -1386,7 +1395,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jpExtraDataContract.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos adicionales:"));
         jpExtraDataContract.setLayout(new java.awt.BorderLayout());
 
-        jPanel38.setLayout(new java.awt.GridLayout(6, 1, 0, 1));
+        jPanel38.setLayout(new java.awt.GridLayout(8, 1, 0, 1));
 
         jPanel41.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
@@ -1434,7 +1443,27 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel47.add(jtfTicket);
 
         jPanel38.add(jPanel47);
+
+        jPanel55.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
         jPanel38.add(jPanel55);
+
+        jPanel57.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlAccOptions.setText("Contabilizar en:");
+        jlAccOptions.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel57.add(jlAccOptions);
+
+        bgAccOptions.add(jradAccCashAccount);
+        jradAccCashAccount.setText("Cuenta dinero");
+        jradAccCashAccount.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel57.add(jradAccCashAccount);
+
+        bgAccOptions.add(jradAccAdvanceBilled);
+        jradAccAdvanceBilled.setText("Anticipos fact.");
+        jradAccAdvanceBilled.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel57.add(jradAccAdvanceBilled);
+
+        jPanel38.add(jPanel57);
 
         jPanel56.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
@@ -1446,6 +1475,18 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel56.add(jcbFkCashAccountId_n);
 
         jPanel38.add(jPanel56);
+
+        jPanel58.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlFkCashAccountId_n1.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel58.add(jlFkCashAccountId_n1);
+
+        jLabel11.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
+        jLabel11.setText("Para la contrapartida del anticipo.");
+        jLabel11.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel58.add(jLabel11);
+
+        jPanel38.add(jPanel58);
 
         jpExtraDataContract.add(jPanel38, java.awt.BorderLayout.NORTH);
 
@@ -1604,13 +1645,13 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel25.add(jLabel3);
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
-        jLabel4.setText("Asociar la partida con movimientos de almacén (entrada o salida).");
+        jLabel4.setText("Asociar la partida con movimientos de almacén (i.e., entrada o salida).");
         jLabel4.setPreferredSize(new java.awt.Dimension(318, 23));
         jPanel25.add(jLabel4);
 
         jpExtraDataOtherNorth.add(jPanel25);
 
-        jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel26.setLayout(new java.awt.GridLayout(2, 1));
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
         jLabel5.setText("Vincular una partida:");
@@ -1618,7 +1659,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel26.add(jLabel5);
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
-        jLabel6.setText("Asociar la partida con otro documento (e.g. de pedido a factura).");
+        jLabel6.setText("Asociar la partida con otro documento (e.g., de pedido a factura).");
         jLabel6.setPreferredSize(new java.awt.Dimension(328, 23));
         jPanel26.add(jLabel6);
 
@@ -2189,6 +2230,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jckIsDpsReqMonthDelivery.addItemListener(this);
         jckIsDirectPrice.addItemListener(this);
         jckChangePrice.addItemListener(this);
+        
+        jradAccCashAccount.addItemListener(this);
+        jradAccAdvanceBilled.addItemListener(this);
 
         SFormUtilities.createActionMap(rootPane, this, "publicPriceUnitaryCyWizard", "priceUnitaryCyWizard", KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "publicActionNotesNew", "notesNew", KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK);
@@ -2952,6 +2996,18 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             default:
         }
     }
+    
+    private void renderAccOptions() {
+        if (jradAccCashAccount.isSelected()) {
+            jcbFkCashAccountId_n.setEnabled(true);
+        }
+        else {
+            jcbFkCashAccountId_n.setEnabled(false);
+            if (jcbFkCashAccountId_n.getItemCount() > 0) {
+                jcbFkCashAccountId_n.setSelectedIndex(0);
+            }
+        }
+    }
 
     private void setTaxesColumnEditable(boolean editable) {
         int index = moPaneTaxes.getTable().getSelectedRow();
@@ -3028,6 +3084,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfVehicleNumber.setEditable(false);
             jtfSecuritySeal.setEditable(false);
             jtfTicket.setEditable(false);
+            jradAccCashAccount.setEnabled(false);
+            jradAccAdvanceBilled.setEnabled(false);
+            bgAccOptions.clearSelection();
             jcbFkCashAccountId_n.setEnabled(false);
 
             jbNotesNew.setEnabled(false);
@@ -3071,7 +3130,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfVehicleNumber.setEditable(true);
             jtfSecuritySeal.setEditable(true);
             jtfTicket.setEditable(true);
-            jcbFkCashAccountId_n.setEnabled(true);
+            jradAccCashAccount.setEnabled(true);
+            jradAccAdvanceBilled.setEnabled(true);
+            bgAccOptions.clearSelection();
+            renderAccOptions();
 
             jbNotesNew.setEnabled(true);
             jbNotesEdit.setEnabled(true);
@@ -3721,8 +3783,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup bgAccOptions;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
@@ -3786,6 +3850,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JPanel jPanel54;
     private javax.swing.JPanel jPanel55;
     private javax.swing.JPanel jPanel56;
+    private javax.swing.JPanel jPanel57;
+    private javax.swing.JPanel jPanel58;
     private javax.swing.JPanel jPanel59;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel63;
@@ -3855,6 +3921,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JCheckBox jckIsPriceConfirm;
     private javax.swing.JCheckBox jckIsSurplusPercentageApplying;
     private javax.swing.JCheckBox jckIsTaxesAutomaticApplying;
+    private javax.swing.JLabel jlAccOptions;
     private javax.swing.JLabel jlAddendaCagePriceUnitary;
     private javax.swing.JLabel jlAddendaCages;
     private javax.swing.JLabel jlAddendaCenter;
@@ -3880,6 +3947,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JLabel jlDpsContractFuture;
     private javax.swing.JLabel jlDummyCostCenter;
     private javax.swing.JLabel jlFkCashAccountId_n;
+    private javax.swing.JLabel jlFkCashAccountId_n1;
     private javax.swing.JLabel jlFkItemId;
     private javax.swing.JLabel jlFkItemReferenceId_n;
     private javax.swing.JLabel jlFkOriginalUnitId;
@@ -3930,6 +3998,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JPanel jpRegistry;
     private javax.swing.JPanel jpTaxInfo;
     private javax.swing.JPanel jpTaxes;
+    private javax.swing.JRadioButton jradAccAdvanceBilled;
+    private javax.swing.JRadioButton jradAccCashAccount;
     private javax.swing.JToggleButton jtbGridPriceFilter;
     private javax.swing.JToggleButton jtbNotesFilter;
     private javax.swing.JTextField jtfAddendaCagePriceUnitary;
@@ -4471,7 +4541,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 validation.setComponent(jtfVehicleNumber);
                 jTabbedPane.setSelectedIndex(TAB_MKT);
             }
-            else if (moItem.getIsPrepayment() && moFieldOriginalQuantity.getDouble() > 0 && jcbFkCashAccountId_n.getSelectedIndex() <= 0) {
+            else if (moItem.getIsPrepayment() && moFieldOriginalQuantity.getDouble() > 0 && !jradAccCashAccount.isSelected() && !jradAccAdvanceBilled.isSelected()) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlAccOptions.getText() + "'.");
+                validation.setComponent(jradAccCashAccount);
+                jTabbedPane.setSelectedIndex(TAB_MKT);
+            }
+            else if (moItem.getIsPrepayment() && moFieldOriginalQuantity.getDouble() > 0 && jradAccCashAccount.isSelected() && jcbFkCashAccountId_n.getSelectedIndex() <= 0) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkCashAccountId_n.getText() + "'.");
                 validation.setComponent(jcbFkCashAccountId_n);
                 jTabbedPane.setSelectedIndex(TAB_MKT);
@@ -4519,7 +4594,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         if (!validation.getIsError() && moParamDps.isForSales()) {
             if (moParamBizPartner.getDbmsCategorySettingsCus().getFkCfdAddendaTypeId() == SDataConstantsSys.BPSS_TP_CFD_ADD_ELEKTRA) {
                 if (moFieldAddendaNumberPosition.getInteger() % 10 != 0) {
-                    validation.setMessage("El valor para el campo " + "'" + jlAddendaNumberPosition.getText() + "' debe ser multiplo de 10.");
+                    validation.setMessage("El valor para el campo '" + jlAddendaNumberPosition.getText() + "' debe ser múltiplo de 10.");
                     validation.setComponent(jtfAddendaNumberPosition);
                 }
                 else if (jcbAddendaFkBarcode.isEnabled() && moFieldAddendaFkBarcode.getString().length() == 0) {
@@ -4671,8 +4746,19 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldVehicleNumber.setFieldValue(moDpsEntry.getVehicleNumber());
         moFieldSecuritySeal.setFieldValue(moDpsEntry.getSecuritySeal());
         moFieldTicket.setFieldValue(moDpsEntry.getTicket());
-        moFieldFkBankAccountId_n.setFieldValue(new int[] { moDpsEntry.getFkCashCompanyBranchId_n(), moDpsEntry.getFkCashAccountId_n() });
+        
         moFieldIsPrepayment.setFieldValue(moDpsEntry.getIsPrepayment());
+        if (moDpsEntry.getIsPrepayment()) {
+            if (moDpsEntry.getKeyCashAccount_n() != null) {
+                jradAccCashAccount.setSelected(true);
+            }
+            else {
+                jradAccAdvanceBilled.setSelected(true);
+            }
+            renderAccOptions();
+        }
+        moFieldFkBankAccountId_n.setFieldValue(moDpsEntry.getKeyCashAccount_n());
+        
         moFieldIsDiscountRetailChain.setFieldValue(moDpsEntry.getIsDiscountRetailChain());
         moFieldIsTaxesAutomaticApplying.setFieldValue(moDpsEntry.getIsTaxesAutomaticApplying());
         moFieldIsInventoriable.setFieldValue(moDpsEntry.getIsInventoriable());
@@ -5089,6 +5175,13 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 }
                 else if (comboBox == jcbFkTaxRegionId) {
                     itemChangedFkTaxRegionId();
+                }
+            }
+            else if (e.getSource() instanceof javax.swing.JRadioButton && e.getStateChange() == ItemEvent.SELECTED) {
+                JRadioButton radioButton = (JRadioButton) e.getSource();
+                
+                if (radioButton == jradAccCashAccount || radioButton == jradAccAdvanceBilled) {
+                    renderAccOptions();
                 }
             }
         }
