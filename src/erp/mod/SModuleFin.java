@@ -92,6 +92,8 @@ public class SModuleFin extends SGuiModule {
     private SBeanOptionPicker moPickerExchangeRateEur;
     private SBeanOptionPicker moPickerTaxes;
 
+    
+    
     public SModuleFin(SGuiClient client) {
         super(client, SModConsts.MOD_FIN_N, SLibConsts.UNDEFINED);
         moModuleIcon = miClient.getImageIcon(mnModuleType);
