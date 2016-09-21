@@ -44,7 +44,7 @@ public class SDataLeadtimeCob extends erp.lib.data.SDataRegistry implements java
     protected int mnDbmsAuxSortingItem;
 
     public SDataLeadtimeCob() {
-        super(SDataConstants.MFG_LT_COB);
+        super(SDataConstants.TRN_SUP_LT_COB);
 
         mvDbmsTypes = new Vector<SDataLeadtimeCob>();
         reset();

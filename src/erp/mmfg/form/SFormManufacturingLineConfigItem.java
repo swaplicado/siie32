@@ -457,7 +457,7 @@ public class SFormManufacturingLineConfigItem extends javax.swing.JDialog implem
 
         /*
         if (!validation.getIsError()) {
-             if (mnFormType == SDataConstants.MFG_LT_CO) {
+             if (mnFormType == SDataConstants.TRN_SUP_LT_CO) {
                 if (moManufacturingLineConfigItem == null) {
                     if (SDataUtilities.callProcedureVal(miClient, SProcConstants.MFG_LTIME_LINK_CO_VAL,
                             new Object[] { mnPkSupplierId, moFieldPkLinkTypeId.getKeyAsIntArray()[0],
@@ -478,7 +478,7 @@ public class SFormManufacturingLineConfigItem extends javax.swing.JDialog implem
                         }
                     }
                 }
-             } else if (mnFormType == SDataConstants.MFG_LT_COB) {
+             } else if (mnFormType == SDataConstants.TRN_SUP_LT_COB) {
                 if (moLinkTypeCob == null) {
                     if (SDataUtilities.callProcedureVal(miClient, SProcConstants.MFG_LTIME_LINK_COB_VAL,
                             new Object[] { mnPkCobId, mnPkSupplierId, moFieldPkLinkTypeId.getKeyAsIntArray()[0],

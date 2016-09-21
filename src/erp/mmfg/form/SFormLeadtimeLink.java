@@ -467,7 +467,7 @@ public class SFormLeadtimeLink extends javax.swing.JDialog implements erp.lib.fo
         }
 
         if (!validation.getIsError()) {
-             if (mnFormType == SDataConstants.MFG_LT_CO) {
+             if (mnFormType == SDataConstants.TRN_SUP_LT_CO) {
                 if (moLinkTypeCo == null) {
                     if (SDataUtilities.callProcedureVal(miClient, SProcConstants.MFG_LTIME_LINK_CO_VAL,
                             new Object[] { mnPkSupplierId, moFieldFkLinkTypeId.getKeyAsIntArray()[0],
@@ -488,7 +488,7 @@ public class SFormLeadtimeLink extends javax.swing.JDialog implements erp.lib.fo
                         }
                     }
                 }
-             } else if (mnFormType == SDataConstants.MFG_LT_COB) {
+             } else if (mnFormType == SDataConstants.TRN_SUP_LT_COB) {
                 if (moLinkTypeCob == null) {
                     if (SDataUtilities.callProcedureVal(miClient, SProcConstants.MFG_LTIME_LINK_COB_VAL,
                             new Object[] { mnPkCobId, mnPkSupplierId, moFieldFkLinkTypeId.getKeyAsIntArray()[0],
@@ -538,7 +538,7 @@ public class SFormLeadtimeLink extends javax.swing.JDialog implements erp.lib.fo
     @Override
     public void setRegistry(erp.lib.data.SDataRegistry registry) {
 
-        if (mnFormType == SDataConstants.MFG_LT_CO) {
+        if (mnFormType == SDataConstants.TRN_SUP_LT_CO) {
             moLinkTypeCo = (SDataLeadtimeCo) registry;
 
             moFieldFkLinkTypeId.setKey(new int[] { moLinkTypeCo.getFkLinkTypeId() });
@@ -560,7 +560,7 @@ public class SFormLeadtimeLink extends javax.swing.JDialog implements erp.lib.fo
             moLinkTypeCo.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
             moLinkTypeCo.setUserEditTs(miClient.getSessionXXX().getSystemDate());
 
-        } else if (mnFormType == SDataConstants.MFG_LT_COB) {
+        } else if (mnFormType == SDataConstants.TRN_SUP_LT_COB) {
             moLinkTypeCob = (SDataLeadtimeCob) registry;
 
             moFieldFkLinkTypeId.setKey(new int[] { moLinkTypeCob.getFkLinkTypeId() });
@@ -598,7 +598,7 @@ public class SFormLeadtimeLink extends javax.swing.JDialog implements erp.lib.fo
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
 
-        if (mnFormType == SDataConstants.MFG_LT_CO) {
+        if (mnFormType == SDataConstants.TRN_SUP_LT_CO) {
             if (moLinkTypeCo == null) {
                 moLinkTypeCo = new SDataLeadtimeCo();
 
@@ -643,7 +643,7 @@ public class SFormLeadtimeLink extends javax.swing.JDialog implements erp.lib.fo
             moLinkTypeCo.setDbmsTypeLink(jcbFkLinkTypeId.getSelectedItem().toString());
             moLinkTypeCo.setDbmsReference(moFieldFkLinkTypeId.getKeyAsIntArray()[0] != SDataConstantsSys.TRNS_TP_LINK_ALL ? jcbFkReferenceId.getSelectedItem().toString() : SDataConstantsSys.TXT_TRNS_TP_LINK_ALL);
 
-        } else if (mnFormType == SDataConstants.MFG_LT_COB) {
+        } else if (mnFormType == SDataConstants.TRN_SUP_LT_COB) {
             if (moLinkTypeCob == null) {
                 moLinkTypeCob = new SDataLeadtimeCob();
 
@@ -690,7 +690,7 @@ public class SFormLeadtimeLink extends javax.swing.JDialog implements erp.lib.fo
             moLinkTypeCob.setDbmsReference(moFieldFkLinkTypeId.getKeyAsIntArray()[0] != SDataConstantsSys.TRNS_TP_LINK_ALL ? jcbFkReferenceId.getSelectedItem().toString() : SDataConstantsSys.TXT_TRNS_TP_LINK_ALL);
         }
 
-        return mnFormType == SDataConstants.MFG_LT_CO ? moLinkTypeCo : moLinkTypeCob;
+        return mnFormType == SDataConstants.TRN_SUP_LT_CO ? moLinkTypeCo : moLinkTypeCob;
     }
 
     @Override

@@ -26,7 +26,7 @@ public class SDataLeadtimeRow extends erp.lib.table.STableRow {
         SDataLeadtimeCo ltimeCo = null;
         SDataLeadtimeCob ltimeCob = null;
 
-        if (mnFormType == SDataConstants.MFG_LT_CO) {
+        if (mnFormType == SDataConstants.TRN_SUP_LT_CO) {
             ltimeCo = (SDataLeadtimeCo) moData;
 
             mvValues.clear();
@@ -40,7 +40,7 @@ public class SDataLeadtimeRow extends erp.lib.table.STableRow {
             mvValues.add(ltimeCo.getUserEditTs());
             mvValues.add(ltimeCo.getDbmsUserDelete());
             mvValues.add(ltimeCo.getUserDeleteTs());
-        } else if (mnFormType == SDataConstants.MFG_LT_COB) {
+        } else if (mnFormType == SDataConstants.TRN_SUP_LT_COB) {
             ltimeCob = (SDataLeadtimeCob) moData;
             
             mvValues.clear();

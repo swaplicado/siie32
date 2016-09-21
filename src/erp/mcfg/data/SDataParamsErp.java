@@ -162,7 +162,7 @@ public class SDataParamsErp extends erp.lib.data.SDataRegistry implements java.i
     protected erp.mcfg.data.SDataCurrency moDbmsDataCurrency;
 
     public SDataParamsErp() {
-        super(SDataConstants.CFGU_PARAM_ERP);
+        super(SDataConstants.CFG_PARAM_ERP);
         reset();
     }
 

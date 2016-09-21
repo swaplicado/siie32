@@ -52,7 +52,7 @@ public class SFormLeadtime extends javax.swing.JDialog implements erp.lib.form.S
     public SFormLeadtime(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
-        mnFormType = SDataConstants.MFG_LT_CO;
+        mnFormType = SDataConstants.TRN_SUP_LT_CO;
 
         initComponents();
         initComponentsExtra();
@@ -315,7 +315,7 @@ public class SFormLeadtime extends javax.swing.JDialog implements erp.lib.form.S
         SDataLeadtimeCob dataLinkCob = null;
         SDataLeadtimeRow dataLinkRow = null;
 
-        if (mnFormType == SDataConstants.MFG_LT_COB) {
+        if (mnFormType == SDataConstants.TRN_SUP_LT_COB) {
             if (jcbPkCobId.getSelectedIndex() <= 0) {
                 miClient.showMsgBoxWarning("Se debe seleccionar una opción para el campo 'Sucursal: *'.");
                 jcbPkCobId.requestFocus();
@@ -332,12 +332,12 @@ public class SFormLeadtime extends javax.swing.JDialog implements erp.lib.form.S
         formLtimeLink.formReset();
         formLtimeLink.formRefreshCatalogues();
 
-        if (mnFormType == SDataConstants.MFG_LT_CO) {
+        if (mnFormType == SDataConstants.TRN_SUP_LT_CO) {
             for (int i = 0; i < moLeadtimeType.getTableGuiRowCount(); i++) {
                 dataLinkCo = ((SDataLeadtimeCo) moLeadtimeType.getTableRow(i).getData());
                 formLtimeLink.setValue(4, dataLinkCo);
             }
-        } else if (mnFormType == SDataConstants.MFG_LT_COB) {
+        } else if (mnFormType == SDataConstants.TRN_SUP_LT_COB) {
             formLtimeLink.setValue(1, moFieldPkCobId.getKeyAsIntArray()[0]);
 
             for (int i = 0; i < moLeadtimeType.getTableGuiRowCount(); i++) {
@@ -350,11 +350,11 @@ public class SFormLeadtime extends javax.swing.JDialog implements erp.lib.form.S
         formLtimeLink.setValue(3, mnFormType);
         formLtimeLink.setVisible(true);
         if (formLtimeLink.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
-            if (mnFormType == SDataConstants.MFG_LT_CO) {
+            if (mnFormType == SDataConstants.TRN_SUP_LT_CO) {
                 dataLinkCo = (SDataLeadtimeCo) formLtimeLink.getRegistry();
 
                 moLeadtimeType.addTableRow(dataLinkRow = new SDataLeadtimeRow(dataLinkCo, mnFormType));
-            } else if (mnFormType == SDataConstants.MFG_LT_COB) {
+            } else if (mnFormType == SDataConstants.TRN_SUP_LT_COB) {
                 dataLinkCob = (SDataLeadtimeCob) formLtimeLink.getRegistry();
 
                 moLeadtimeType.addTableRow(dataLinkRow = new SDataLeadtimeRow(dataLinkCob, mnFormType));
@@ -377,12 +377,12 @@ public class SFormLeadtime extends javax.swing.JDialog implements erp.lib.form.S
         formLtimeLink.formReset();
         formLtimeLink.formRefreshCatalogues();
 
-        if (mnFormType == SDataConstants.MFG_LT_CO) {
+        if (mnFormType == SDataConstants.TRN_SUP_LT_CO) {
             for (int i = 0; i < moLeadtimeType.getTableGuiRowCount(); i++) {
                 dataLinkCo = ((SDataLeadtimeCo) moLeadtimeType.getTableRow(i).getData());
                 formLtimeLink.setValue(4, dataLinkCo);
             }
-        } else if (mnFormType == SDataConstants.MFG_LT_COB) {
+        } else if (mnFormType == SDataConstants.TRN_SUP_LT_COB) {
             formLtimeLink.setValue(1, moFieldPkCobId.getKeyAsIntArray()[0]);
 
             for (int i = 0; i < moLeadtimeType.getTableGuiRowCount(); i++) {
@@ -394,21 +394,21 @@ public class SFormLeadtime extends javax.swing.JDialog implements erp.lib.form.S
         formLtimeLink.setValue(2, moFieldPkSupplierId.getKeyAsIntArray()[0]);
         formLtimeLink.setValue(3, mnFormType);
         if (index != -1) {
-            if (mnFormType == SDataConstants.MFG_LT_CO) {
+            if (mnFormType == SDataConstants.TRN_SUP_LT_CO) {
                 dataLinkCo = (SDataLeadtimeCo) moLeadtimeType.getTableRow(index).getData();
                 formLtimeLink.setRegistry(dataLinkCo);
-            } else if (mnFormType == SDataConstants.MFG_LT_COB) {
+            } else if (mnFormType == SDataConstants.TRN_SUP_LT_COB) {
                 dataLinkCob = (SDataLeadtimeCob) moLeadtimeType.getTableRow(index).getData();
                 formLtimeLink.setRegistry(dataLinkCob);
             }
 
             formLtimeLink.setVisible(true);
             if (formLtimeLink.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
-                if (mnFormType == SDataConstants.MFG_LT_CO) {
+                if (mnFormType == SDataConstants.TRN_SUP_LT_CO) {
                     dataLinkCo = (SDataLeadtimeCo) formLtimeLink.getRegistry();
 
                     moLeadtimeType.setTableRow(dataLinkRow = new SDataLeadtimeRow(dataLinkCo, mnFormType), index);
-                } else if (mnFormType == SDataConstants.MFG_LT_COB) {
+                } else if (mnFormType == SDataConstants.TRN_SUP_LT_COB) {
                     dataLinkCob = (SDataLeadtimeCob) formLtimeLink.getRegistry();
 
                     moLeadtimeType.setTableRow(dataLinkRow = new SDataLeadtimeRow(dataLinkCob, mnFormType), index);
@@ -470,13 +470,13 @@ public class SFormLeadtime extends javax.swing.JDialog implements erp.lib.form.S
         moLeadtimeType.createTable(null);
         moLeadtimeType.clearTableRows();
 
-        if (mnFormType == SDataConstants.MFG_LT_CO) {
+        if (mnFormType == SDataConstants.TRN_SUP_LT_CO) {
             jcbPkCobId.setEnabled(false);
             jcbPkCobId.setFocusable(false);
 
             jbPkCobId.setEnabled(false);
             jbPkCobId.setFocusable(false);
-        } else if (mnFormType == SDataConstants.MFG_LT_COB) {
+        } else if (mnFormType == SDataConstants.TRN_SUP_LT_COB) {
             jcbPkCobId.setEnabled(true);
             jcbPkCobId.setFocusable(true);
 
@@ -495,7 +495,7 @@ public class SFormLeadtime extends javax.swing.JDialog implements erp.lib.form.S
 
     @Override
     public void formRefreshCatalogues() {
-        if (mnFormType == SDataConstants.MFG_LT_COB)
+        if (mnFormType == SDataConstants.TRN_SUP_LT_COB)
             SFormUtilities.populateComboBox(miClient, jcbPkCobId, SDataConstants.BPSU_BPB, new int[] { miClient.getSessionXXX().getParamsCompany().getPkConfigCoId() });
 
         SFormUtilities.populateComboBox(miClient, jcbPkSupplierId, SDataConstants.BPSX_BP_SUP);
@@ -509,7 +509,7 @@ public class SFormLeadtime extends javax.swing.JDialog implements erp.lib.form.S
         SDataLeadtimeCob leadtimeCob = null;
 
 
-        if (mnFormType == SDataConstants.MFG_LT_CO)
+        if (mnFormType == SDataConstants.TRN_SUP_LT_CO)
             moFieldPkCobId.setIsMandatory(false);
 
         for (i = 0; i < mvFields.size(); i++) {
@@ -521,7 +521,7 @@ public class SFormLeadtime extends javax.swing.JDialog implements erp.lib.form.S
         }
 
         if (!validation.getIsError()) {
-            if (mnFormType == SDataConstants.MFG_LT_CO) {
+            if (mnFormType == SDataConstants.TRN_SUP_LT_CO) {
                 if (moLeadtimeCo == null) {
                     if (SDataUtilities.callProcedureVal(miClient, SProcConstants.MFG_LTIME_CO_VAL,
                             new Object[] { moFieldPkSupplierId.getKeyAsIntArray()[0] },
@@ -533,7 +533,7 @@ public class SFormLeadtime extends javax.swing.JDialog implements erp.lib.form.S
                         validation.setComponent(jcbPkSupplierId);
                     }
                 }
-            } else  if (mnFormType == SDataConstants.MFG_LT_COB) {
+            } else  if (mnFormType == SDataConstants.TRN_SUP_LT_COB) {
                 if (moLeadtimeCob == null) {
                     if (SDataUtilities.callProcedureVal(miClient, SProcConstants.MFG_LTIME_COB_VAL,
                             new Object[] { moFieldPkCobId.getKeyAsIntArray()[0], moFieldPkSupplierId.getKeyAsIntArray()[0] },
@@ -576,7 +576,7 @@ public class SFormLeadtime extends javax.swing.JDialog implements erp.lib.form.S
         int i = 0;
         SDataLeadtimeRow dataTypeRow = null;
 
-        if (mnFormType == SDataConstants.MFG_LT_CO) {
+        if (mnFormType == SDataConstants.TRN_SUP_LT_CO) {
             moLeadtimeCo = (erp.mmfg.data.SDataLeadtimeCo) registry;
 
             moFieldPkSupplierId.setKey(new int[] { moLeadtimeCo.getPkSupplierId() });
@@ -585,7 +585,7 @@ public class SFormLeadtime extends javax.swing.JDialog implements erp.lib.form.S
                 dataTypeRow = new SDataLeadtimeRow(moLeadtimeCo.getDbmsTypes().get(i), mnFormType);
                 moLeadtimeType.addTableRow(dataTypeRow);
             }
-        } else if (mnFormType == SDataConstants.MFG_LT_COB) {
+        } else if (mnFormType == SDataConstants.TRN_SUP_LT_COB) {
             moLeadtimeCob = (erp.mmfg.data.SDataLeadtimeCob) registry;
 
             moFieldPkCobId.setKey(new int[] { moLeadtimeCob.getPkCobId() });
@@ -612,7 +612,7 @@ public class SFormLeadtime extends javax.swing.JDialog implements erp.lib.form.S
 
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
-        if (mnFormType == SDataConstants.MFG_LT_CO) {
+        if (mnFormType == SDataConstants.TRN_SUP_LT_CO) {
             if (moLeadtimeCo == null) {
                 moLeadtimeCo = new erp.mmfg.data.SDataLeadtimeCo();
                 moLeadtimeCo.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
@@ -627,7 +627,7 @@ public class SFormLeadtime extends javax.swing.JDialog implements erp.lib.form.S
             for (int i = 0; i < moLeadtimeType.getTableGuiRowCount(); i++) {
                 moLeadtimeCo.getDbmsTypes().add((SDataLeadtimeCo) moLeadtimeType.getTableRow(i).getData());
             }
-        } else if (mnFormType == SDataConstants.MFG_LT_COB) {
+        } else if (mnFormType == SDataConstants.TRN_SUP_LT_COB) {
             if (moLeadtimeCob == null) {
                 moLeadtimeCob = new erp.mmfg.data.SDataLeadtimeCob();
                 moLeadtimeCob.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
@@ -645,7 +645,7 @@ public class SFormLeadtime extends javax.swing.JDialog implements erp.lib.form.S
             }
         }
 
-        return mnFormType == SDataConstants.MFG_LT_CO ? moLeadtimeCo : moLeadtimeCob;
+        return mnFormType == SDataConstants.TRN_SUP_LT_CO ? moLeadtimeCo : moLeadtimeCob;
     }
 
     @Override

@@ -619,11 +619,11 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             setFrameWaitCursor();
 
             switch (viewType) {
-                case SDataConstants.HRS_FORMER_PAYR:
+                case SDataConstants.HRS_SIE_PAY:
                     oViewClass = erp.mhrs.view.SViewFormerPayroll.class;
                     sViewTitle = "Nóminas imp.";
                     break;
-                case SDataConstants.HRS_FORMER_PAYR_EMP:
+                case SDataConstants.HRS_SIE_PAY_EMP:
                     oViewClass = erp.mhrs.view.SViewFormerPayrollEmp.class;
                     sViewTitle = "Nóminas imp. vs. pólizas contables";
                     break;
@@ -910,10 +910,10 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                 miClient.getSession().showView(SModConsts.HRS_ADV_SET, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiImpFormerPayroll) {
-                showView(SDataConstants.HRS_FORMER_PAYR);
+                showView(SDataConstants.HRS_SIE_PAY);
             }
             else if (item == jmiImpFormerPayrollEmp) {
-                showView(SDataConstants.HRS_FORMER_PAYR_EMP);
+                showView(SDataConstants.HRS_SIE_PAY_EMP);
             }
             else if (item == jmiImpImport) {
                 if (moDialogFormerPayrollImport == null) {

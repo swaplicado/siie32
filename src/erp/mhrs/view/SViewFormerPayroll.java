@@ -25,7 +25,7 @@ public class SViewFormerPayroll extends erp.lib.table.STableTab {
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
 
     public SViewFormerPayroll(erp.client.SClientInterface client, java.lang.String tabTitle) {
-        super(client, tabTitle, SDataConstants.HRS_FORMER_PAYR);
+        super(client, tabTitle, SDataConstants.HRS_SIE_PAY);
         initComponents();
     }
 

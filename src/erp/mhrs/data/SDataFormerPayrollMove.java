@@ -34,7 +34,7 @@ public class SDataFormerPayrollMove extends erp.lib.data.SDataRegistry implement
     protected int mnFkEntryId;
 
     public SDataFormerPayrollMove() {
-        super(SDataConstants.HRS_FORMER_PAYR_MOV);
+        super(SDataConstants.HRS_SIE_PAY_MOV);
         reset();
     }
 

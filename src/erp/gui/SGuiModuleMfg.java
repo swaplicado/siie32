@@ -369,7 +369,7 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
                         moFormLeadtime.setValue(1,  auxType);
                     }
                     if (pk != null) {
-                        if (auxType == SDataConstants.MFG_LT_CO) {
+                        if (auxType == SDataConstants.TRN_SUP_LT_CO) {
                             moRegistry = new SDataLeadtimeCo();
                             ((SDataLeadtimeCo) moRegistry).setDbmsAuxSortingItem(miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId());
                         }
@@ -566,10 +566,10 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
                     break;
                 case SDataConstants.MFGX_LT:
                     switch (auxType01) {
-                        case SDataConstants.MFG_LT_CO:
+                        case SDataConstants.TRN_SUP_LT_CO:
                             sViewTitle = "Prod. leadtime empresa";
                             break;
-                        case SDataConstants.MFG_LT_COB:
+                        case SDataConstants.TRN_SUP_LT_COB:
                             sViewTitle = "Prod. leadtime sucursal";
                             break;
                     }
@@ -788,10 +788,10 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
                 moDialogExplotionMaterials.setFormVisible(true);
             }
             else if (item == jmiLeadtimeCo) {
-                showView(SDataConstants.MFGX_LT, SDataConstants.MFG_LT_CO);
+                showView(SDataConstants.MFGX_LT, SDataConstants.TRN_SUP_LT_CO);
             }
             else if (item == jmiLeadtimeCob) {
-                showView(SDataConstants.MFGX_LT, SDataConstants.MFG_LT_COB);
+                showView(SDataConstants.MFGX_LT, SDataConstants.TRN_SUP_LT_COB);
             }
             else if (item == jmiGang) {
                 showView(SDataConstants.MFGU_GANG);

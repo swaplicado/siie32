@@ -1287,7 +1287,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
         }
 
         miClient.getGuiModule(SDataConstants.MOD_FIN).refreshCatalogues(SDataConstants.FIN_REC);
-        miClient.getGuiModule(SDataConstants.MOD_HRS).refreshCatalogues(SDataConstants.HRS_FORMER_PAYR);
+        miClient.getGuiModule(SDataConstants.MOD_HRS).refreshCatalogues(SDataConstants.HRS_SIE_PAY);
         miClient.showMsgBoxInformation("La nómina ha sido importada.");
 
         // Obtain payroll structure:
@@ -1296,7 +1296,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
         SCfdUtils.computeCfdiPayroll(miClient, moPayroll, false); // generate all CFDI
 
         miClient.getGuiModule(SDataConstants.MOD_FIN).refreshCatalogues(SDataConstants.FIN_REC);
-        miClient.getGuiModule(SDataConstants.MOD_HRS).refreshCatalogues(SDataConstants.HRS_FORMER_PAYR);
+        miClient.getGuiModule(SDataConstants.MOD_HRS).refreshCatalogues(SDataConstants.HRS_SIE_PAY);
         ((SClient) miClient).getSession().notifySuscriptors(SModConsts.HRS_SIE_PAY);
     }
 

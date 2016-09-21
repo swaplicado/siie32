@@ -184,9 +184,6 @@ public abstract class SDataReadDescriptions {
             case SDataConstants.TRNS_TP_PAY:
                 sql = "SELECT tp_pay AS descrip FROM erp.trns_tp_pay WHERE id_tp_pay = " + ((int[]) pk)[0] + " ";
                 break;
-            case SDataConstants.TRNS_TP_PAY_WAY:
-                sql = "SELECT tp_pay_way AS descrip FROM erp.trns_tp_pay_way WHERE id_tp_pay_way = " + ((int[]) pk)[0] + " ";
-                break;
             case SDataConstants.TRNS_ST_DPS:
                 sql = "SELECT st_dps AS descrip FROM erp.trns_st_dps WHERE id_st_dps = " + ((int[]) pk)[0] + " ";
                 break;

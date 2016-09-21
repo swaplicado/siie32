@@ -1352,11 +1352,6 @@ public abstract class SDataReadComponentItems {
                 sql = "SELECT id_tp_pay AS f_id_1, tp_pay AS f_item FROM erp.trns_tp_pay ORDER BY id_tp_pay ";
                 text = "tipo de pago";
                 break;
-            case SDataConstants.TRNS_TP_PAY_WAY:
-                lenPk = 1;
-                sql = "SELECT id_tp_pay_way AS f_id_1, tp_pay_way AS f_item FROM erp.trns_tp_pay_way ORDER BY id_tp_pay_way ";
-                text = "tipo de forma de pago";
-                break;
             case SDataConstants.TRNU_TP_PAY_SYS:
                 lenPk = 1;
 

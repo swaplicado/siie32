@@ -58,7 +58,7 @@ public class SDataFormerPayrollEmp extends erp.lib.data.SDataRegistry implements
     }
 
     public SDataFormerPayrollEmp() {
-        super(SDataConstants.HRS_FORMER_PAYR_EMP);
+        super(SDataConstants.HRS_SIE_PAY_EMP);
         reset();
     }
 

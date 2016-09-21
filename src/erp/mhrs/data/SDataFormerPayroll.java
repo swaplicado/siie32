@@ -52,7 +52,7 @@ public class SDataFormerPayroll extends erp.lib.data.SDataRegistry implements ja
     protected java.util.Vector<erp.mfin.data.SDataRecord> mvAuxDataRecord;
 
     public SDataFormerPayroll() {
-        super(SDataConstants.HRS_FORMER_PAYR);
+        super(SDataConstants.HRS_SIE_PAY);
 
         mvDbmsDataFormerPayrollEmp = new Vector<SDataFormerPayrollEmp>();
         mvDbmsDataFormerPayrollMove = new Vector<SDataFormerPayrollMove>();

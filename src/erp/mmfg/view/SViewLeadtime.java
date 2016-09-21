@@ -43,7 +43,7 @@ public class SViewLeadtime extends erp.lib.table.STableTab implements java.awt.e
         erp.lib.table.STableColumn[] aoTableColumns = null;
 
         switch (mnTabTypeAux01) {
-            case SDataConstants.MFG_LT_CO:
+            case SDataConstants.TRN_SUP_LT_CO:
                 aoKeyFields = new STableField[2];
                 aoTableColumns = new STableColumn[8];
 
@@ -64,7 +64,7 @@ public class SViewLeadtime extends erp.lib.table.STableTab implements java.awt.e
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ud.usr", "Usr. eliminación", STableConstants.WIDTH_USER);
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "t.ts_del", "Eliminación", STableConstants.WIDTH_DATE_TIME);
                 break;
-            case SDataConstants.MFG_LT_COB:
+            case SDataConstants.TRN_SUP_LT_COB:
                 aoKeyFields = new STableField[3];
                 aoTableColumns = new STableColumn[9];
 
@@ -141,7 +141,7 @@ public class SViewLeadtime extends erp.lib.table.STableTab implements java.awt.e
         }
 
         switch (mnTabTypeAux01) {
-            case SDataConstants.MFG_LT_CO:
+            case SDataConstants.TRN_SUP_LT_CO:
                 msSql = "SELECT DISTINCT t.*, b.bp, un.usr, ue.usr, ud.usr " +
                     "FROM trn_sup_lt_co t " +
                     "INNER JOIN erp.bpsu_bp b ON t.id_sup = b.id_bp " +
@@ -152,7 +152,7 @@ public class SViewLeadtime extends erp.lib.table.STableTab implements java.awt.e
                     "GROUP BY t.id_sup " +
                     "ORDER BY b.bp, t.id_ety ";
                 break;
-             case SDataConstants.MFG_LT_COB:
+             case SDataConstants.TRN_SUP_LT_COB:
                  msSql = "SELECT DISTINCT t.*, b.bp, bpb.bpb, un.usr, ue.usr, ud.usr " +
                     "FROM trn_sup_lt_cob t " +
                     "INNER JOIN erp.bpsu_bp b ON t.id_sup = b.id_bp " +

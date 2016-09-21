@@ -108,7 +108,6 @@ public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.ev
     private erp.form.SFormOptionPicker moPickerCustomerConfiguration;
     private erp.form.SFormOptionPicker moPickerPriceList;
     private erp.form.SFormOptionPicker moPickerPriceListCustomer;
-    private erp.form.SFormOptionPicker moPickerPriceListCustomerType;
     private erp.form.SFormOptionPicker moPickerSegment;
     private erp.form.SFormOptionPicker moPickerSubsegment;
     private erp.form.SFormOptionPicker moPickerDistributionChannel;
@@ -254,7 +253,6 @@ public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.ev
         moPickerCustomerConfiguration = null;
         moPickerPriceList = null;
         moPickerPriceListCustomer = null;
-        moPickerPriceListCustomerType = null;
         moPickerSegment = null;
         moPickerSubsegment = null;
         moPickerDistributionChannel = null;
@@ -489,7 +487,7 @@ public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.ev
                     oViewClass = erp.mmkt.view.SViewSalesRoute.class;
                     sViewTitle = "Rutas ventas";
                     break;
-                case SDataConstants.MKTU_SAL_AGT:
+                case SDataConstants.MKTX_SAL_AGT:
                     oViewClass = erp.mbps.view.SViewBizPartner.class;
                     sViewTitle = "Agentes ventas";
                     auxType01 = SDataConstants.BPSX_BP_ATT_SAL_AGT;
@@ -582,9 +580,6 @@ public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.ev
                 case SDataConstants.MKT_PLIST_CUS:
                     picker = moPickerPriceListCustomer = SFormOptionPicker.createOptionPicker(miClient, optionType, moPickerPriceListCustomer);
                     break;
-                case SDataConstants.MKT_PLIST_CUS_TP:
-                    picker = moPickerPriceListCustomerType = SFormOptionPicker.createOptionPicker(miClient, optionType, moPickerPriceListCustomerType);
-                    break;
                 case SDataConstants.MKTU_MKT_SEGM:
                     picker = moPickerSegment = SFormOptionPicker.createOptionPicker(miClient, optionType, moPickerSegment);
                     break;
@@ -665,7 +660,7 @@ public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.ev
                 showView(SDataConstants.MKTU_SAL_ROUTE);
             }
             else if (item == jmiSalesAgent) {
-                showView(SDataConstants.MKTU_SAL_AGT);
+                showView(SDataConstants.MKTX_SAL_AGT);
             }
 
             else if (item == jmiSalesPriceList) {

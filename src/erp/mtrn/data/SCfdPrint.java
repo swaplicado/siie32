@@ -728,7 +728,7 @@ public class SCfdPrint {
             case SCfdConsts.CFD_TYPE_PAYROLL:
                 switch (subtypeCfd) {
                     case SCfdConsts.CFDI_PAYROLL_VER_OLD:
-                        payrollEmp = (SDataFormerPayrollEmp) SDataUtilities.readRegistry(miClient, SDataConstants.HRS_FORMER_PAYR_EMP, new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, SLibConstants.EXEC_MODE_SILENT);
+                        payrollEmp = (SDataFormerPayrollEmp) SDataUtilities.readRegistry(miClient, SDataConstants.HRS_SIE_PAY_EMP, new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, SLibConstants.EXEC_MODE_SILENT);
                         break;
                     case SCfdConsts.CFDI_PAYROLL_VER_CUR:
                         payrollReceipt = new SDbPayrollReceipt();

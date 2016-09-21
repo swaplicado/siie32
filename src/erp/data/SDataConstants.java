@@ -5,6 +5,8 @@
 
 package erp.data;
 
+import java.util.HashMap;
+
 /**
  *
  * @author Sergio Flores
@@ -97,8 +99,8 @@ public abstract class SDataConstants {
     public static final int CFGU_CO = 201012;
     public static final int CFGU_COB_ENT = 201013;
     public static final int CFGU_LAN = 201014;
-    public static final int CFGU_PARAM_ERP = 201015;
-    public static final int CFGU_PARAM_CO = 201016;
+    public static final int CFG_PARAM_ERP = 201015;
+    public static final int CFG_PARAM_CO = 201016;
     public static final int CFGU_CERT = 201017;
 
     public static final int CFGX_COB_ENT_CASH = 201501;
@@ -119,11 +121,8 @@ public abstract class SDataConstants {
     public static final int USRU_ACCESS_COB_ENT_UNIV = 202010;
     public static final int USRU_PRV_USR = 202011;
     public static final int USRU_PRV_CO = 202012;
-    public static final int USRU_PRV_COB = 202013;
     public static final int USRU_ROL_USR = 202014;
     public static final int USRU_ROL_CO = 202015;
-    public static final int USRU_ROL_COB = 202016;
-    public static final int USRU_PREF = 202017;
     public static final int USRU_USR = 202018;
 
     public static final int USRX_RIGHT = 202501;
@@ -239,7 +238,6 @@ public abstract class SDataConstants {
     public static final int ITMU_TP_BRD = 205022;
     public static final int ITMU_TP_EMT = 205023;
     public static final int ITMU_TP_MFR = 205024;
-    public static final int ITMS_TP_LOT_REQ = 205025;
 
     public static final int ITMX_ITEM_BY_KEY = 205501;
     public static final int ITMX_ITEM_BY_NAME = 205502;
@@ -269,10 +267,10 @@ public abstract class SDataConstants {
     public static final int FINS_TP_ACC = 206008;
     public static final int FINS_CL_ACC = 206009;
     public static final int FINS_CLS_ACC = 206010;
-    public static final int FINS_TP_ACC_SPE= 206011;
+    public static final int FINS_TP_ACC_SPE = 206011;
     public static final int FINS_TP_ACC_SYS = 206012;
-    public static final int FINS_CT_SYS_MOV = 206013;
-    public static final int FINS_TP_SYS_MOV = 206014;
+    public static final int FINS_CT_SYS_MOV = 206013;   // fins_ct_sys_mov_xxx
+    public static final int FINS_TP_SYS_MOV = 206014;   // fins_tp_sys_mov_xxx
     public static final int FINS_CT_ACC_CASH = 206015;
     public static final int FINS_TP_ACC_CASH = 206016;
     public static final int FINS_TP_ACC_BP = 206017;
@@ -365,7 +363,6 @@ public abstract class SDataConstants {
     public static final int TRNS_CL_IOG = 207006;
     public static final int TRNS_TP_IOG = 207007;
     public static final int TRNS_TP_PAY = 207011;
-    public static final int TRNS_TP_PAY_WAY = 207012;
     public static final int TRNS_TP_LINK = 207013;
     public static final int TRNS_TP_DPS_EVT = 207014;
     public static final int TRNS_TP_DPS_PRT = 207015;
@@ -561,7 +558,6 @@ public abstract class SDataConstants {
     public static final int MKTU_MKT_SEGM_SUB = 208005;
     public static final int MKTU_DIST_CHAN = 208006;
     public static final int MKTU_SAL_ROUTE = 208007;
-    public static final int MKTU_SAL_AGT = 208008;
     public static final int MKT_CFG_CUS = 208009;
     public static final int MKT_CFG_CUSB = 208010;
     public static final int MKT_CFG_SAL_AGT = 208011;
@@ -570,16 +566,15 @@ public abstract class SDataConstants {
     public static final int MKT_PLIST_ITEM = 208014;
     public static final int MKT_PLIST_PRICE = 208015;
     public static final int MKT_PLIST_BP_LINK = 208016;
-    public static final int MKT_PLIST_CUS = 208017;     // XXX eliminate! (sflores, 2014-02-26)
-    public static final int MKT_PLIST_CUS_TP = 208018;  // XXX eliminate! (sflores, 2014-02-26)
+    public static final int MKT_PLIST_CUS = 208017;
     public static final int MKT_COMMS_SAL_AGT = 208019;
     public static final int MKT_COMMS_SAL_AGT_TP = 208020;
-    public static final int MKT_COMMS_DPS = 208021;     // XXX eliminate, no loger useful! (sflores, 2014-09-01)
     public static final int MKT_COMMS_LOG = 208021;
     public static final int MKT_COMMS = 208022;
     public static final int MKT_COMMS_PAY = 208023;
     public static final int MKT_COMMS_PAY_ETY = 208024;
 
+    public static final int MKTX_SAL_AGT = 208008;
     public static final int MKTX_COMMS_ITEM_SAL_AGT = 208030;
     public static final int MKTX_COMMS_SAL_AGT_CONS = 208031;
     public static final int MKTX_COMMS_SAL_AGT_TP_CONS = 208032;
@@ -620,12 +615,7 @@ public abstract class SDataConstants {
     public static final int MFG_EXP_REQ = 210026;
     public static final int MFG_REQ_ETY = 210027;
     public static final int MFG_REQ_PUR = 210028;
-    public static final int MFG_DRC = 210029;
-    public static final int MFG_DRC_ETY = 210030;
-    public static final int MFG_DRC_ETY_HR = 210031;
     public static final int MFG_COST = 210032;
-    public static final int MFG_LT_CO = 210033;
-    public static final int MFG_LT_COB = 210034;
     public static final int MFGU_LINE = 210035;
     public static final int MFGU_LINE_CFG_ITEM = 210036;
 
@@ -657,9 +647,341 @@ public abstract class SDataConstants {
     public static final int MFGX_PROD_BY_ITM_BIZ = 210223;
     public static final int MFGX_PROD_BY_BIZ_ITM = 210224;
 
-    public static final int HRS_FORMER_PAYR = 220001;
-    public static final int HRS_FORMER_PAYR_EMP = 220002;
-    public static final int HRS_FORMER_PAYR_MOV = 220003;
+    public static final int HRS_SIE_PAY = 220001;
+    public static final int HRS_SIE_PAY_EMP = 220002;
+    public static final int HRS_SIE_PAY_MOV = 220003;
 
     public static final java.lang.String MSG_ERR_DATA_NOT_FOUND = "El tipo de registro no existe.";
+    
+    public static final HashMap<Integer, String> TablesMap = new HashMap<Integer, String>();
+
+    static {
+        TablesMap.put(CFGS_CT_ENT, "erp.cfgs_ct_ent");
+        TablesMap.put(CFGS_TP_ENT, "erp.cfgs_tp_ent");
+        TablesMap.put(CFGS_TP_SORT, "erp.cfgs_tp_sort");
+        TablesMap.put(CFGS_TP_BAL, "erp.cfgs_tp_bal");
+        TablesMap.put(CFGS_TP_REL, "erp.cfgs_tp_rel");
+        TablesMap.put(CFGS_TP_FMT_D, "erp.cfgs_tp_fmt_d");
+        TablesMap.put(CFGS_TP_FMT_DT, "erp.cfgs_tp_fmt_dt");
+        TablesMap.put(CFGS_TP_FMT_T, "erp.cfgs_tp_fmt_t");
+        TablesMap.put(CFGS_TP_DBMS, "erp.cfgs_tp_dbms");
+        TablesMap.put(CFGS_TP_MOD, "erp.cfgs_tp_mod");
+
+        TablesMap.put(CFGU_CUR, "erp.cfgu_cur");
+        TablesMap.put(CFGU_CO, "erp.cfgu_co");
+        TablesMap.put(CFGU_COB_ENT, "erp.cfgu_cob_ent");
+        TablesMap.put(CFGU_LAN, "erp.cfgu_lan");
+        TablesMap.put(CFG_PARAM_ERP, "erp.cfg_param_erp");
+        TablesMap.put(CFGU_CERT, "erp.cfgu_cert");
+
+        TablesMap.put(CFG_PARAM_CO, "erp.cfg_param_co");
+
+        TablesMap.put(USRS_TP_LEV, "erp.usrs_tp_lev");
+        TablesMap.put(USRS_TP_PRV, "erp.usrs_tp_prv");
+        TablesMap.put(USRS_TP_ROL, "erp.usrs_tp_rol");
+        TablesMap.put(USRS_PRV, "erp.usrs_prv");
+        TablesMap.put(USRS_ROL, "erp.usrs_rol");
+        TablesMap.put(USRS_ROL_PRV, "erp.usrs_rol_prv");
+
+        TablesMap.put(USRU_ACCESS_CO, "erp.usru_access_co");
+        TablesMap.put(USRU_ACCESS_COB, "erp.usru_access_cob");
+        TablesMap.put(USRU_ACCESS_COB_ENT, "erp.usru_access_cob_ent");
+        TablesMap.put(USRU_ACCESS_COB_ENT_UNIV, "erp.usru_access_cob_ent_univ");
+        TablesMap.put(USRU_PRV_USR, "erp.usru_prv_usr");
+        TablesMap.put(USRU_PRV_CO, "erp.usru_prv_co");
+        TablesMap.put(USRU_ROL_USR, "erp.usru_rol_usr");
+        TablesMap.put(USRU_ROL_CO, "erp.usru_rol_co");
+        TablesMap.put(USRU_USR, "erp.usru_usr");
+
+        TablesMap.put(LOCU_CTY, "erp.locu_cty");
+
+        TablesMap.put(BPSS_CT_BP, "erp.bpss_ct_bp");
+        TablesMap.put(BPSS_TP_BP_IDY, "erp.bpss_tp_bp_idy");
+        TablesMap.put(BPSS_TP_BP_ATT, "erp.bpss_tp_bp_att");
+        TablesMap.put(BPSS_TP_BPB, "erp.bpss_tp_bpb");
+        TablesMap.put(BPSS_TP_ADD, "erp.bpss_tp_add");
+        TablesMap.put(BPSS_TP_ADD_FMT, "erp.bpss_tp_add_fmt");
+        TablesMap.put(BPSS_TP_CON, "erp.bpss_tp_con");
+        TablesMap.put(BPSS_TP_TEL, "erp.bpss_tp_tel");
+        TablesMap.put(BPSS_TP_CRED, "erp.bpss_tp_cred");
+        TablesMap.put(BPSS_TP_CFD_ADD, "erp.bpss_tp_cfd_add");
+        TablesMap.put(BPSS_TP_RISK, "erp.bpss_tp_risk");
+        TablesMap.put(BPSS_LINK, "erp.bpss_link");
+
+        TablesMap.put(BPSU_BP, "erp.bpsu_bp");
+        TablesMap.put(BPSU_BP_CT, "erp.bpsu_bp_ct");
+        TablesMap.put(BPSU_BP_ATT, "erp.bpsu_bp_att");
+        TablesMap.put(BPSU_BP_BA, "erp.bpsu_bp_ba");
+        TablesMap.put(BPSU_BP_NTS, "erp.bpsu_bp_nts");
+        TablesMap.put(BPSU_BPB, "erp.bpsu_bpb");
+        TablesMap.put(BPSU_BPB_NTS, "erp.bpsu_bpb_nts");
+        TablesMap.put(BPSU_BPB_ADD, "erp.bpsu_bpb_add");
+        TablesMap.put(BPSU_BPB_ADD_NTS, "erp.bpsu_bpb_add_nts");
+        TablesMap.put(BPSU_BPB_CON, "erp.bpsu_bpb_con");
+        TablesMap.put(BPSU_BANK_ACC, "erp.bpsu_bank_acc");
+        TablesMap.put(BPSU_BANK_ACC_LAY_BANK, "erp.bpsu_bank_acc_lay_bank");
+        TablesMap.put(BPSU_BANK_ACC_CARD, "erp.bpsu_bank_acc_card");
+        TablesMap.put(BPSU_BANK_ACC_NTS, "erp.bpsu_bank_acc_nts");
+        TablesMap.put(BPSU_TP_BP, "erp.bpsu_tp_bp");
+        TablesMap.put(BPSU_BA, "erp.bpsu_ba");
+
+        TablesMap.put(ITMS_CT_ITEM, "erp.itms_ct_item");
+        TablesMap.put(ITMS_CL_ITEM, "erp.itms_cl_item");
+        TablesMap.put(ITMS_TP_ITEM, "erp.itms_tp_item");
+        TablesMap.put(ITMS_TP_SNR, "erp.itms_tp_snr");
+
+        TablesMap.put(ITMU_IFAM, "erp.itmu_ifam");
+        TablesMap.put(ITMU_IGRP, "erp.itmu_igrp");
+        TablesMap.put(ITMU_IGEN, "erp.itmu_igen");
+        TablesMap.put(ITMU_IGEN_BA, "erp.itmu_igen_ba");
+        TablesMap.put(ITMU_LINE, "erp.itmu_line");
+        TablesMap.put(ITMU_ITEM, "erp.itmu_item");
+        TablesMap.put(ITMU_ITEM_BARC, "erp.itmu_item_barc");
+        TablesMap.put(ITMU_CFG_ITEM_LAN, "erp.itmu_cfg_item_lan");
+        TablesMap.put(ITMU_CFG_ITEM_BP, "erp.itmu_cfg_item_bp");
+        TablesMap.put(ITMU_TP_LEV, "erp.itmu_tp_lev");
+        TablesMap.put(ITMU_TP_UNIT, "erp.itmu_tp_unit");
+        TablesMap.put(ITMU_UNIT, "erp.itmu_unit");
+        TablesMap.put(ITMU_TP_VAR, "erp.itmu_tp_var");
+        TablesMap.put(ITMU_VAR, "erp.itmu_var");
+        TablesMap.put(ITMU_TP_BRD, "erp.itmu_tp_brd");
+        TablesMap.put(ITMU_BRD, "erp.itmu_brd");
+        TablesMap.put(ITMU_TP_MFR, "erp.itmu_tp_mfr");
+        TablesMap.put(ITMU_MFR, "erp.itmu_mfr");
+        TablesMap.put(ITMU_TP_EMT, "erp.itmu_tp_emt");
+        TablesMap.put(ITMU_EMT, "erp.itmu_emt");
+
+        TablesMap.put(FINS_TP_BKR, "erp.fins_tp_bkr");
+        TablesMap.put(FINS_TP_ACC_MOV, "erp.fins_tp_acc_mov");
+        TablesMap.put(FINS_CL_ACC_MOV, "erp.fins_cl_acc_mov");
+        TablesMap.put(FINS_CLS_ACC_MOV, "erp.fins_cls_acc_mov");
+        TablesMap.put(FINS_TP_ACC, "erp.fins_tp_acc");
+        TablesMap.put(FINS_CL_ACC, "erp.fins_cl_acc");
+        TablesMap.put(FINS_CLS_ACC, "erp.fins_cls_acc");
+        TablesMap.put(FINS_TP_ACC_SPE, "erp.fins_tp_acc_spe");
+        TablesMap.put(FINS_TP_ACC_SYS, "erp.fins_tp_acc_sys");
+        TablesMap.put(FINS_CT_SYS_MOV, "erp.fins_ct_sys_mov_xxx");
+        TablesMap.put(FINS_TP_SYS_MOV, "erp.fins_tp_sys_mov_xxx");
+        TablesMap.put(FINS_CT_ACC_CASH, "erp.fins_ct_acc_cash");
+        TablesMap.put(FINS_TP_ACC_CASH, "erp.fins_tp_acc_cash");
+        TablesMap.put(FINS_TP_TAX, "erp.fins_tp_tax");
+        TablesMap.put(FINS_TP_TAX_CAL, "erp.fins_tp_tax_cal");
+        TablesMap.put(FINS_TP_TAX_APP, "erp.fins_tp_tax_app");
+        TablesMap.put(FINS_TP_ACC_BP, "erp.fins_tp_acc_bp");
+        TablesMap.put(FINS_TP_ACC_ITEM, "erp.fins_tp_acc_item");
+        TablesMap.put(FINS_TP_CARD, "erp.fins_tp_card");
+        TablesMap.put(FINS_TP_PAY_BANK, "erp.fins_tp_pay_bank");
+        TablesMap.put(FINS_ST_FIN_MOV, "erp.fins_st_fin_mov");
+        TablesMap.put(FINS_FISCAL_ACC, "erp.fins_fiscal_acc");
+        TablesMap.put(FINS_FISCAL_CUR, "erp.fins_fiscal_cur");
+        TablesMap.put(FINS_FISCAL_BANK, "erp.fins_fiscal_bank");
+        TablesMap.put(FINS_FISCAL_PAY_MET, "erp.fins_fiscal_pay_met");
+
+        TablesMap.put(FINU_TAX_REG, "erp.finu_tax_reg");
+        TablesMap.put(FINU_TAX_IDY, "erp.finu_tax_idy");
+        TablesMap.put(FINU_TAX_BAS, "erp.finu_tax_bas");
+        TablesMap.put(FINU_TAX, "erp.finu_tax");
+        TablesMap.put(FINU_CARD_ISS, "erp.finu_card_iss");
+        TablesMap.put(FINU_CHECK_FMT, "erp.finu_check_fmt");
+        TablesMap.put(FINU_CHECK_FMT_GP, "erp.finu_check_fmt_gp");
+        TablesMap.put(FINU_TP_REC, "erp.finu_tp_rec");
+        TablesMap.put(FINU_TP_ACC_USR, "erp.finu_tp_acc_usr");
+        TablesMap.put(FINU_CL_ACC_USR, "erp.finu_cl_acc_usr");
+        TablesMap.put(FINU_CLS_ACC_USR, "erp.finu_cls_acc_usr");
+        TablesMap.put(FINU_TP_ACC_LEDGER, "erp.finu_tp_acc_ledger");
+        TablesMap.put(FINU_TP_ACC_EBITDA, "erp.finu_tp_acc_ebitda");
+        TablesMap.put(FINU_TP_ASSET_FIX, "erp.finu_tp_asset_fix");
+        TablesMap.put(FINU_TP_ASSET_DIF, "erp.finu_tp_asset_dif");
+        TablesMap.put(FINU_TP_LIABTY_DIF, "erp.finu_tp_liabty_dif");
+        TablesMap.put(FINU_TP_EXPEN_OP, "erp.finu_tp_expen_op");
+        TablesMap.put(FINU_TP_ADM_CPT, "erp.finu_tp_adm_cpt");
+        TablesMap.put(FINU_TP_TAX_CPT, "erp.finu_tp_tax_cpt");
+        TablesMap.put(FINU_TP_LAY_BANK, "erp.finu_tp_lay_bank");
+        TablesMap.put(FINU_COST_GIC, "erp.finu_cost_gic");
+
+        TablesMap.put(TRNS_CT_DPS, "erp.trns_ct_dps");
+        TablesMap.put(TRNS_CL_DPS, "erp.trns_cl_dps");
+        TablesMap.put(TRNS_TP_DPS_ADJ, "erp.trns_tp_dps_adj");
+        TablesMap.put(TRNS_STP_DPS_ADJ, "erp.trns_stp_dps_adj");
+        TablesMap.put(TRNS_CT_IOG, "erp.trns_ct_iog");
+        TablesMap.put(TRNS_CL_IOG, "erp.trns_cl_iog");
+        TablesMap.put(TRNS_TP_IOG, "erp.trns_tp_iog");
+        TablesMap.put(TRNS_TP_PAY, "erp.trns_tp_pay");
+        TablesMap.put(TRNS_TP_LINK, "erp.trns_tp_link");
+        TablesMap.put(TRNS_TP_DPS_EVT, "erp.trns_tp_dps_evt");
+        TablesMap.put(TRNS_TP_DPS_PRT, "erp.trns_tp_dps_prt");
+        TablesMap.put(TRNS_TP_DPS_ETY, "erp.trns_tp_dps_ety");
+        TablesMap.put(TRNS_ST_DPS, "erp.trns_st_dps");
+        TablesMap.put(TRNS_ST_DPS_VAL, "erp.trns_st_dps_val");
+        TablesMap.put(TRNS_ST_DPS_AUTHORN, "erp.trns_st_dps_authorn");
+        TablesMap.put(TRNS_CT_SIGN, "erp.trns_ct_sign");
+        TablesMap.put(TRNS_TP_SIGN, "erp.trns_tp_sign");
+        TablesMap.put(TRNS_TP_XML, "erp.trns_tp_xml");
+        TablesMap.put(TRNS_TP_XML_DVY, "erp.trns_tp_xml_dvy");
+        TablesMap.put(TRNS_ST_XML_DVY, "erp.trns_st_xml_dvy");
+        TablesMap.put(TRNS_TP_CFD, "erp.trns_tp_cfd");
+
+        TablesMap.put(TRNU_DPS_NAT, "erp.trnu_dps_nat");
+        TablesMap.put(TRNU_TP_DPS, "erp.trnu_tp_dps");
+        TablesMap.put(TRNU_TP_DPS_SRC_ITEM, "erp.trnu_tp_dps_src_item");
+        TablesMap.put(TRNU_TP_PAY_SYS, "erp.trnu_tp_pay_sys");
+        TablesMap.put(TRNU_TP_IOG_ADJ, "erp.trnu_tp_iog_adj");
+        TablesMap.put(TRNU_TP_DPS_ANN, "erp.trnu_tp_dps_ann");
+
+        TablesMap.put(MKTS_TP_DISC_APP, "erp.mkts_tp_disc_app");
+
+        TablesMap.put(MFGS_ST_ORD, "erp.mfgs_st_ord");
+        TablesMap.put(MFGS_PTY_ORD, "erp.mfgs_pty_ord");
+        TablesMap.put(MFGS_TP_REQ, "erp.mfgs_tp_req");
+        TablesMap.put(MFGS_TP_COST_OBJ, "erp.mfgs_tp_cost_obj");
+
+        TablesMap.put(MFGU_TP_ORD, "erp.mfgu_tp_ord");
+        TablesMap.put(MFGU_TURN, "erp.mfgu_turn");
+
+        TablesMap.put(FIN_YEAR, "fin_year");
+        TablesMap.put(FIN_YEAR_PER, "fin_year_per");
+        TablesMap.put(FIN_EXC_RATE, "fin_exc_rate");
+        TablesMap.put(FIN_ACC, "fin_acc");
+        TablesMap.put(FIN_CC, "fin_cc");
+        TablesMap.put(FIN_ACC_CASH, "fin_acc_cash");
+        TablesMap.put(FIN_CHECK_WAL, "fin_check_wal");
+        TablesMap.put(FIN_CHECK, "fin_check");
+        TablesMap.put(FIN_TAX_GRP, "fin_tax_grp");
+        TablesMap.put(FIN_TAX_GRP_ETY, "fin_tax_grp_ety");
+        TablesMap.put(FIN_TAX_GRP_IGEN, "fin_tax_grp_igen");
+        TablesMap.put(FIN_TAX_GRP_ITEM, "fin_tax_grp_item");
+
+        TablesMap.put(FIN_BKK_NUM, "fin_bkk_num");
+        TablesMap.put(FIN_REC, "fin_rec");
+        TablesMap.put(FIN_REC_ETY, "fin_rec_ety");
+        TablesMap.put(FIN_ACC_BP, "fin_acc_bp");
+        TablesMap.put(FIN_ACC_BP_ETY, "fin_acc_bp_ety");
+        TablesMap.put(FIN_ACC_BP_TP_BP, "fin_acc_bp_tp_bp");
+        TablesMap.put(FIN_ACC_BP_BP, "fin_acc_bp_bp");
+        TablesMap.put(FIN_ACC_ITEM, "fin_acc_item");
+        TablesMap.put(FIN_ACC_ITEM_ETY, "fin_acc_item_ety");
+        TablesMap.put(FIN_ACC_ITEM_ITEM, "fin_acc_item_item");
+        TablesMap.put(FIN_ACC_TAX, "fin_acc_tax");
+        TablesMap.put(FIN_ACC_COB_ENT, "fin_acc_cob_ent");
+        TablesMap.put(FIN_CC_ITEM, "fin_cc_item");
+        TablesMap.put(FIN_COB_BKC, "fin_cob_bkc");
+        TablesMap.put(FIN_LAY_BANK, "fin_lay_bank");
+        TablesMap.put(FIN_BKC, "fin_bkc");
+
+        TablesMap.put(TRN_DNS_DPS, "trn_dns_dps");
+        TablesMap.put(TRN_DNS_DIOG, "trn_dns_diog");
+        TablesMap.put(TRN_DNC_DPS_COB, "trn_dnc_dps_cob");
+        TablesMap.put(TRN_DNC_DPS_COB_ENT, "trn_dnc_dps_cob_ent");
+        TablesMap.put(TRN_DNC_DIOG_COB, "trn_dnc_diog_cob");
+        TablesMap.put(TRN_DNC_DIOG_COB_ENT, "trn_dnc_diog_cob_ent");
+        TablesMap.put(TRN_BP_BLOCK, "trn_bp_block");
+        TablesMap.put(TRN_SUP_LT_CO, "trn_sup_lt_co");
+        TablesMap.put(TRN_SUP_LT_COB, "trn_sup_lt_cob");
+        TablesMap.put(TRN_SYS_NTS, "trn_sys_nts");
+        TablesMap.put(TRN_DPS, "trn_dps");
+        TablesMap.put(TRN_DPS_SND_LOG, "trn_dps_snd_log");
+        TablesMap.put(TRN_DPS_ADD, "trn_dps_add");
+        TablesMap.put(TRN_DPS_ADD_ETY, "trn_dps_add_ety");
+        TablesMap.put(TRN_DPS_EVT, "trn_dps_evt");
+        TablesMap.put(TRN_DPS_NTS, "trn_dps_nts");
+        TablesMap.put(TRN_DPS_ETY, "trn_dps_ety");
+        TablesMap.put(TRN_DPS_ETY_NTS, "trn_dps_ety_nts");
+        TablesMap.put(TRN_DPS_ETY_PRC, "trn_dps_ety_prc");
+        TablesMap.put(TRN_DPS_ETY_TAX, "trn_dps_ety_tax");
+        TablesMap.put(TRN_DPS_ETY_COMMS, "trn_dps_ety_comms");
+        TablesMap.put(TRN_DPS_RISS, "trn_dps_riss");
+        TablesMap.put(TRN_DPS_REPL, "trn_dps_repl");
+        TablesMap.put(TRN_DPS_DPS_SUPPLY, "trn_dps_dps_supply");
+        TablesMap.put(TRN_DPS_DPS_ADJ, "trn_dps_dps_adj");
+        TablesMap.put(TRN_DPS_IOG_CHG, "trn_dps_iog_chg");
+        TablesMap.put(TRN_DPS_IOG_WAR, "trn_dps_iog_war");
+        TablesMap.put(TRN_DPS_REC, "trn_dps_rec");
+        TablesMap.put(TRN_DIOG, "trn_diog");
+        TablesMap.put(TRN_DIOG_NTS, "trn_diog_nts");
+        TablesMap.put(TRN_DIOG_ETY, "trn_diog_ety");
+        TablesMap.put(TRN_DIOG_REC, "trn_diog_rec");
+        TablesMap.put(TRN_CTR, "trn_ctr");
+        TablesMap.put(TRN_CTR_ETY, "trn_ctr_ety");
+        TablesMap.put(TRN_DSM, "trn_dsm");
+        TablesMap.put(TRN_DSM_NTS, "trn_dsm_nts");
+        TablesMap.put(TRN_DSM_ETY, "trn_dsm_ety");
+        TablesMap.put(TRN_DSM_ETY_NTS, "trn_dsm_ety_nts");
+        TablesMap.put(TRN_DSM_REC, "trn_dsm_rec");
+        TablesMap.put(TRN_USR_CFG, "trn_usr_cfg");
+        TablesMap.put(TRN_USR_CFG_IFAM, "trn_usr_cfg_ifam");
+        TablesMap.put(TRN_USR_CFG_BA, "trn_usr_cfg_ba");
+        TablesMap.put(TRN_LOT, "trn_lot");
+        TablesMap.put(TRN_STK_CFG, "trn_stk_cfg");
+        TablesMap.put(TRN_STK_CFG_ITEM, "trn_stk_cfg_item");
+        TablesMap.put(TRN_STK_CFG_DNS, "trn_stk_cfg_dns");
+        TablesMap.put(TRN_STK, "trn_stk");
+        TablesMap.put(TRN_CFD, "trn_cfd");
+        TablesMap.put(TRN_CFD_SIGN_LOG, "trn_cfd_sign_log");
+        TablesMap.put(TRN_CFD_SND_LOG, "trn_cfd_snd_log");
+        TablesMap.put(TRN_PAC, "trn_pac");
+        TablesMap.put(TRN_TP_CFD_PAC, "trn_tp_cfd_pac");
+        TablesMap.put(TRN_SIGN, "trn_sign");
+        TablesMap.put(TRN_MMS_LOG, "trn_mms_log");
+        TablesMap.put(TRN_DVY, "trn_dvy");
+        TablesMap.put(TRN_DVY_ETY, "trn_dvy_ety");
+        TablesMap.put(TRN_DNC_DPS, "trn_dnc_dps");
+        TablesMap.put(TRN_DNC_DPS_DNS, "trn_dnc_dps_dns");
+        TablesMap.put(TRN_DNC_DIOG, "trn_dnc_diog");
+        TablesMap.put(TRN_DNC_DIOG_DNS, "trn_dnc_diog_dns");
+
+        TablesMap.put(MKT_CFG_CUS, "mkt_cfg_cus");
+        TablesMap.put(MKT_CFG_CUSB, "mkt_cfg_cusb");
+        TablesMap.put(MKT_CFG_SAL_AGT, "mkt_cfg_sal_agt");
+        TablesMap.put(MKT_PLIST_GRP, "mkt_plist_grp");
+        TablesMap.put(MKT_PLIST, "mkt_plist");
+        TablesMap.put(MKT_PLIST_ITEM, "mkt_plist_item");
+        TablesMap.put(MKT_PLIST_PRICE, "mkt_plist_price");
+        TablesMap.put(MKT_PLIST_CUS, "mkt_plist_cus");
+        TablesMap.put(MKT_COMMS_SAL_AGT, "mkt_comms_sal_agt");
+        TablesMap.put(MKT_COMMS_SAL_AGT_TP, "mkt_comms_sal_agt_tp");
+        TablesMap.put(MKT_COMMS_LOG, "mkt_comms_log");
+        TablesMap.put(MKT_COMMS, "mkt_comms");
+        TablesMap.put(MKT_COMMS_PAY, "mkt_comms_pay");
+        TablesMap.put(MKT_COMMS_PAY_ETY, "mkt_comms_pay_ety");
+
+        TablesMap.put(MKTU_TP_CUS, "mktu_tp_cus");
+        TablesMap.put(MKTU_TP_SAL_AGT, "mktu_tp_sal_agt");
+        TablesMap.put(MKTU_MKT_SEGM, "mktu_mkt_segm");
+        TablesMap.put(MKTU_MKT_SEGM_SUB, "mktu_mkt_segm_sub");
+        TablesMap.put(MKTU_DIST_CHAN, "mktu_dist_chan");
+        TablesMap.put(MKTU_SAL_ROUTE, "mktu_sal_route");
+
+        TablesMap.put(MFG_BOM, "mfg_bom");
+        TablesMap.put(MFG_BOM_NTS, "mfg_bom_nts");
+        TablesMap.put(MFG_SGDS, "mfg_sgds");
+        TablesMap.put(MFG_BOM_SUB, "mfg_bom_sub");
+        TablesMap.put(MFG_LINE, "mfg_line");
+
+        TablesMap.put(MFGU_GANG, "mfgu_gang");
+        TablesMap.put(MFGU_GANG_ETY, "mfgu_gang_ety");
+        TablesMap.put(MFGU_LINE, "mfgu_line");
+        TablesMap.put(MFGU_LINE_CFG_ITEM, "mfgu_line_cfg_item");
+
+        TablesMap.put(MFG_ORD, "mfg_ord");
+        TablesMap.put(MFG_ORD_PER, "mfg_ord_per");
+        TablesMap.put(MFG_ORD_NTS, "mfg_ord_nts");
+        TablesMap.put(MFG_ORD_CHG, "mfg_ord_chg");
+        TablesMap.put(MFG_ORD_CHG_ETY, "mfg_ord_chg_ety");
+        TablesMap.put(MFG_ORD_CHG_ETY_LOT, "mfg_ord_chg_ety_lot");
+        TablesMap.put(MFG_ORD_SGDS, "mfg_ord_sgds");
+        TablesMap.put(MFG_EXP, "mfg_exp");
+        TablesMap.put(MFG_EXP_ORD, "mfg_exp_ord");
+        TablesMap.put(MFG_EXP_ETY_ITEM, "mfg_exp_ety_item");
+        TablesMap.put(MFG_EXP_ETY, "mfg_exp_ety");
+        TablesMap.put(MFG_REQ, "mfg_req");
+        TablesMap.put(MFG_EXP_REQ, "mfg_exp_req");
+        TablesMap.put(MFG_REQ_ETY, "mfg_req_ety");
+        TablesMap.put(MFG_REQ_PUR, "mfg_req_pur");
+
+        TablesMap.put(MFG_COST, "mfg_cost");
+
+        TablesMap.put(HRS_SIE_PAY, "hrs_sie_pay");
+        TablesMap.put(HRS_SIE_PAY_EMP, "hrs_sie_pay_emp");
+        TablesMap.put(HRS_SIE_PAY_MOV, "hrs_sie_pay_mov");
+    }
 }

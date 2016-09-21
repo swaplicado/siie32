@@ -752,10 +752,10 @@ public abstract class SDataUtilities {
                 registry = new SDataExplotionMaterialsEntry();
                 break;
 
-            case SDataConstants.HRS_FORMER_PAYR:
+            case SDataConstants.HRS_SIE_PAY:
                 registry = new SDataFormerPayroll();
                 break;
-            case SDataConstants.HRS_FORMER_PAYR_EMP:
+            case SDataConstants.HRS_SIE_PAY_EMP:
                 registry = new SDataFormerPayrollEmp();
                 break;
 

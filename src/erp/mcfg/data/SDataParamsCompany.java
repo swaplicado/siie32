@@ -108,7 +108,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     protected erp.mcfg.data.SDataCertificate moDbmsCertificate_n;
 
     public SDataParamsCompany() {
-        super(SDataConstants.CFGU_PARAM_CO);
+        super(SDataConstants.CFG_PARAM_CO);
         reset();
     }
 

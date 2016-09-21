@@ -258,8 +258,8 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
             
             menu = new SCfgMenu(jmCfg, "" + SDataConstants.MOD_CFG_CFG);
             section = new SCfgMenuSection("" + SDataConstants.MOD_CFG_CFG_CFG);
-            section.getChildItems().add(new SCfgMenuSectionItem(jmiCfgParamsCompany, "" + SDataConstants.CFGU_PARAM_CO));
-            section.getChildItems().add(new SCfgMenuSectionItem(jmiCfgParamsErp, "" + SDataConstants.CFGU_PARAM_ERP));
+            section.getChildItems().add(new SCfgMenuSectionItem(jmiCfgParamsCompany, "" + SDataConstants.CFG_PARAM_CO));
+            section.getChildItems().add(new SCfgMenuSectionItem(jmiCfgParamsErp, "" + SDataConstants.CFG_PARAM_ERP));
             section.setChildSeparator(new SCfgMenuSectionSeparator(jsCfgParams));
             menu.getChildSections().add(section);
             section = new SCfgMenuSection("" + SDataConstants.MOD_CFG_CFG_DNS);
@@ -660,10 +660,10 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
             javax.swing.JMenuItem item = (javax.swing.JMenuItem) e.getSource();
 
             if (item == jmiCfgParamsCompany) {
-                showView(SDataConstants.CFGU_PARAM_CO);
+                showView(SDataConstants.CFG_PARAM_CO);
             }
             else if (item == jmiCfgParamsErp) {
-                showView(SDataConstants.CFGU_PARAM_ERP);
+                showView(SDataConstants.CFG_PARAM_ERP);
             }
             else if (item == jmiCfgDnsDps) {
                 showView(SDataConstants.TRN_DNS_DPS);
