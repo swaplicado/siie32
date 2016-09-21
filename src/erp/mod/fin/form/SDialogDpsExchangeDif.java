@@ -12,8 +12,8 @@ import erp.lib.SLibConstants;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.form.SDialogRecordPicker;
 import erp.mod.SModConsts;
+import erp.mod.fin.db.SDpsExchangeDif;
 import erp.mod.fin.db.SFinConsts;
-import erp.mod.fin.db.SValuationBalances;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -377,7 +377,7 @@ public class SDialogDpsExchangeDif extends SBeanFormDialog implements ActionList
     public void actionSave() {
         String msg = "";
         SSrvLock lock = null;
-        SValuationBalances sbe = null;
+        SDpsExchangeDif sbe = null;
         
         if (SGuiUtils.computeValidation(miClient, validateForm())) {
             msg = "Se determina la diferencia cambiaria con los siguientes parámetros:\n" +
@@ -390,7 +390,7 @@ public class SDialogDpsExchangeDif extends SBeanFormDialog implements ActionList
                 try {
                     lock = SSrvUtils.gainLock(miClient.getSession(), ((SClientInterface) miClient).getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, moRecord.getPrimaryKey(), moRecord.getRegistryTimeout());
                     
-                    sbe = new SValuationBalances(miClient);
+                    sbe = new SDpsExchangeDif(miClient);
                     sbe.setRecYear(moCalYear.getValue());
                     sbe.setRecPeriod(moCalPeriod.getValue());
                     sbe.setEndOfMonth(mtEndOfMonth);

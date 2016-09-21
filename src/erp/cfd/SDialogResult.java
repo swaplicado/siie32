@@ -432,7 +432,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                 try {
                     switch (mnFormSubtype) {
                         case SCfdConsts.PROC_REQ_STAMP:
-                            SCfdUtils.signCfdi(miClient, cfd, mnSubtypeCfd, false);
+                            SCfdUtils.signCfdi(miClient, cfd, mnSubtypeCfd, false, false);
                             detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Timbrado.\n";
                             break;
                         case SCfdConsts.PROC_REQ_ANNUL:
@@ -452,15 +452,15 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                             detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Impreso.\n";
                             break;
                         case SCfdConsts.PROC_SND_DOC:
-                            SCfdUtils.sendCfd(miClient, cfd.getFkCfdTypeId(), cfd, mnSubtypeCfd, false);
+                            SCfdUtils.sendCfd(miClient, cfd.getFkCfdTypeId(), cfd, mnSubtypeCfd, false, false, true);
                             detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Enviado.\n";
                             break;
                         case SCfdConsts.PROC_REQ_STAMP_AND_SND:
                             if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
-                                SCfdUtils.signAndSendCfdi(miClient, cfd, mnSubtypeCfd, false);
+                                SCfdUtils.signAndSendCfdi(miClient, cfd, mnSubtypeCfd, false, false);
                             }
                             else {
-                                SCfdUtils.signCfdi(miClient, cfd, mnSubtypeCfd, false);
+                                SCfdUtils.signCfdi(miClient, cfd, mnSubtypeCfd, false, false);
                             }
                             detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "Timbrado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
                             break;

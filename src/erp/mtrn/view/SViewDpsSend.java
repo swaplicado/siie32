@@ -419,7 +419,7 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
                     switch (mnTabTypeAux02) {
                         case SDataConstantsSys.TRNX_TP_DPS_DOC:
                         case SDataConstantsSys.TRNX_TP_DPS_ADJ:
-                            SCfdUtils.sendCfd((SClientInterface) miClient, SCfdConsts.CFD_TYPE_DPS, SCfdUtils.getCfd(miClient, SCfdConsts.CFD_TYPE_DPS, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_OLD);
+                            SCfdUtils.sendCfd((SClientInterface) miClient, SCfdConsts.CFD_TYPE_DPS, SCfdUtils.getCfd(miClient, SCfdConsts.CFD_TYPE_DPS, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_OLD, true, false);
                             send = true;
                             break;
                         case SDataConstantsSys.TRNX_TP_DPS_ORD:

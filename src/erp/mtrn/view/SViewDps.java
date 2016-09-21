@@ -1621,7 +1621,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                 }
                                 */
                                 if (((SClientInterface) miClient).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticSal()) {
-                                    if (SCfdUtils.signAndSendCfdi(miClient, dps.getDbmsDataCfd(), SLibConstants.UNDEFINED, true)) {
+                                    if (SCfdUtils.signAndSendCfdi(miClient, dps.getDbmsDataCfd(), SLibConstants.UNDEFINED, true, true)) {
                                         miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
                                     }
                                 }
@@ -1674,7 +1674,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     switch (mnTabTypeAux02) {
                         case SDataConstantsSys.TRNX_TP_DPS_DOC:
                         case SDataConstantsSys.TRNX_TP_DPS_ADJ:
-                            SCfdUtils.sendCfd((SClientInterface) miClient, SCfdConsts.CFD_TYPE_DPS, SCfdUtils.getCfd(miClient, SCfdConsts.CFD_TYPE_DPS, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_OLD);
+                            SCfdUtils.sendCfd((SClientInterface) miClient, SCfdConsts.CFD_TYPE_DPS, SCfdUtils.getCfd(miClient, SCfdConsts.CFD_TYPE_DPS, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_OLD, true, false);
                             break;
                         case SDataConstantsSys.TRNX_TP_DPS_ORD:
                             bizPartnerMail = STrnUtilities.getMailToSendForOrder(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()).replace(";", "\n");

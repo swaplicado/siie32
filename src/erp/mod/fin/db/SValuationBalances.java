@@ -148,16 +148,16 @@ public class SValuationBalances {
             case SDataConstantsSys.FINS_CT_SYS_MOV_CASH:
                 sql = "SELECT re.fid_cob_n AS _id_cob, re.fid_ent_n AS _id_ent, e.ent, e.code, "
                         + "re.fid_acc, re.fk_acc, re.fid_ct_sys_mov_xxx, re.fid_tp_sys_mov_xxx, "
-                        + "SUM(re.debit_cur - re.credit_cur) AS _bal_cur, SUM(re.debit - re.credit) AS _bal "
+                        + "SUM(if( c.id_cur = " + mnCurrencyId + " ,re.debit_cur - re.credit_cur,0)) AS _bal_cur, SUM(re.debit - re.credit) AS _bal "
                         + "FROM fin_rec AS r "
                         + "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
                         + "INNER JOIN erp.cfgu_cur AS c ON re.fid_cur = c.id_cur "
                         + "INNER JOIN erp.cfgu_cob_ent AS e ON re.fid_cob_n = e.id_cob AND re.fid_ent_n = e.id_ent "
                         + "WHERE r.id_year = " + mnRecYear + " AND r.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtEndOfMonth) + "' AND NOT r.b_del AND NOT re.b_del AND "
-                        + "re.fid_ct_sys_mov_xxx = " + idCategorySystemMove + " AND re.fid_cur = " + mnCurrencyId + " "
+                        + "re.fid_ct_sys_mov_xxx = " + idCategorySystemMove + " "
                         + "GROUP BY re.fid_cob_n , re.fid_ent_n , e.ent, e.code, "
                         + "re.fid_acc, re.fk_acc, re.fid_ct_sys_mov_xxx, re.fid_tp_sys_mov_xxx "
-                        + "HAVING SUM(re.debit_cur - re.credit_cur) <> 0.0 "
+                        + "HAVING SUM(if( c.id_cur = " + mnCurrencyId + " ,re.debit_cur - re.credit_cur,0)) <> 0.0 "
                         + "ORDER BY e.ent, e.code, re.fid_cob_n, re.fid_ent_n; ";
                 break;
                 

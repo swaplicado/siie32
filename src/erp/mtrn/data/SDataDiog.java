@@ -225,6 +225,38 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         }
     }
 
+    /**
+     * Verifies that the document (Dps) exists in the detailed inventory(iog) 
+     * if the document does not appear in the detail, the value would be null in case 
+     * there is no other document reference, other wise it will take the first document
+     * reference.
+     * 
+     */
+    private void verifyDpsRelation(){
+        boolean bDpsExist = false;
+        int nDpsNumberId_n = SLibConstants.UNDEFINED; 
+        int nDpsYearId_n = SLibConstants.UNDEFINED;
+        
+        
+        for (SDataDiogEntry entry : mvDbmsDiogEntries) {
+            if (entry.getFkDpsDocId_n() == mnFkDpsDocId_n && entry.getFkDpsYearId_n() == mnFkDpsYearId_n) {
+                bDpsExist = true;
+                break;
+            }
+            else if ((entry.getFkDpsDocId_n() != SLibConstants.UNDEFINED && entry.getFkDpsYearId_n() != SLibConstants.UNDEFINED) &&
+                    (nDpsNumberId_n == SLibConstants.UNDEFINED && nDpsYearId_n == SLibConstants.UNDEFINED)) {
+                nDpsNumberId_n = entry.getFkDpsDocId_n();
+                nDpsYearId_n = entry.getFkDpsYearId_n();
+            }
+        }
+         
+        if (!bDpsExist) {
+            mnFkDpsDocId_n = nDpsNumberId_n;
+            mnFkDpsYearId_n = nDpsYearId_n;
+        }
+        
+    }
+    
     /*
      * Public methods
      */
@@ -584,6 +616,8 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
         try {
+            verifyDpsRelation();
+            
             // Create bookkeeping number:
 
             //System.out.println("SDataDiog: 1a");
