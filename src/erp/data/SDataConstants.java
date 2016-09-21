@@ -381,7 +381,7 @@ public abstract class SDataConstants {
     public static final int TRNU_TP_DPS_SRC_ITEM = 207023;  // out of place, because of number! (sflores, 2015-10-01)
     public static final int TRNU_TP_PAY_SYS = 207026;
     public static final int TRNU_TP_IOG_ADJ = 207027;
-    public static final int TRNU_PAC = 207030;              // out of place, because of number! (sflores, 2015-10-01)
+    public static final int TRNU_TP_DPS_ANN = 207030;       // out of place, because of number! (sflores, 2016-09-21)
     public static final int TRN_DNS_DPS = 207028;
     public static final int TRN_DNS_DIOG = 207029;
     public static final int TRN_DNC_DPS_COB = 207031;

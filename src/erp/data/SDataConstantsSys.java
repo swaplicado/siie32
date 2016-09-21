@@ -1118,6 +1118,8 @@ public abstract class SDataConstantsSys {
     
     public static final int TRNU_TP_IOG_ADJ_NA = 1;
 
+    public static final int TRNU_TP_DPS_ANN_NA = 1;
+    
     public static final int TRNX_TP_DPS_EST = 100;
     public static final int TRNX_TP_DPS_EST_EST = 101;
     public static final int TRNX_TP_DPS_EST_CON = 102;
