@@ -990,7 +990,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
             registryDummy.setFkDepartmentId(SModSysConsts.HRSU_DEP_NON);
             registryDummy.setFkPositionId(SModSysConsts.HRSU_POS_NON);
             registryDummy.setFkShiftId(SModSysConsts.HRSU_SHT_NON);
-            registryDummy.setFkRecruitmentSchemeTypeId(SModSysConsts.HRSS_TP_REC_SCHE_X);
+            registryDummy.setFkRecruitmentSchemeTypeId(SModSysConsts.HRSS_TP_REC_SCHE_WAG);
             registryDummy.setFkPositionRiskTypeId(SModSysConsts.HRSS_TP_POS_RISK_CL1);
 
             registryDummy.save(session);
