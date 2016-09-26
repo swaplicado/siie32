@@ -45,6 +45,7 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
 
 /**
@@ -378,7 +379,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel29.add(jftAlternativeId);
 
         jlSocialSecurityNumber.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jlSocialSecurityNumber.setText("NSS:*");
+        jlSocialSecurityNumber.setText("NSS:");
         jlSocialSecurityNumber.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel29.add(jlSocialSecurityNumber);
 
@@ -985,8 +986,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         // Employee:
 
-        moFieldSocialSecurityNumber = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfSocialSecurityNumber, jlSocialSecurityNumber);
-        moFieldSocialSecurityNumber.setLengthMin(11);
+        moFieldSocialSecurityNumber = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfSocialSecurityNumber, jlSocialSecurityNumber);
+        //moFieldSocialSecurityNumber.setLengthMin(11);
         moFieldSocialSecurityNumber.setLengthMax(11);
         moFieldSocialSecurityNumber.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldFkBank_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkBank_n, jlFkBank_n);
@@ -1867,6 +1868,15 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                         }
                     }
 
+                    if (!validation.getIsError()) {
+                        if (!SLibUtils.belongsTo(moFieldFkRecruitmentSchemeType.getKeyAsIntArray()[0],
+                                new int[] { SModSysConsts.HRSS_TP_REC_SCHE_ASS_COO, SModSysConsts.HRSS_TP_REC_SCHE_ASS_CIV, SModSysConsts.HRSS_TP_REC_SCHE_ASS_BRD, 
+                                    SModSysConsts.HRSS_TP_REC_SCHE_ASS_SAL, SModSysConsts.HRSS_TP_REC_SCHE_ASS_PRO, SModSysConsts.HRSS_TP_REC_SCHE_ASS_SHA }) && moFieldSocialSecurityNumber.getString().length() < 11) {
+                            validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlSocialSecurityNumber.getText() + "'.");
+                            validation.setComponent(jtfSocialSecurityNumber);
+                        }
+                    }
+                    
                     if (!validation.getIsError()) {
                         if (!moFieldEmail.getString().isEmpty()) {
                             msg = SLibUtilities.validateEmail(moFieldEmail.getString());

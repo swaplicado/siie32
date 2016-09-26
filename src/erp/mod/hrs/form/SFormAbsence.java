@@ -578,6 +578,9 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
 
         if (moRegistry.isRegistryNew()) {
             moKeyEmployee.setEnabled(true);
+            if (moRegistry.getFkAbsenceClassId() == SLibConsts.UNDEFINED) {
+                moFieldKeyGroup.resetGroup();
+            }
         }
         else {
             moKeyEmployee.setEnabled(false);

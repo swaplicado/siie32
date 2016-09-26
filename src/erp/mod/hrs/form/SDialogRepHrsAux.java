@@ -7,8 +7,11 @@ package erp.mod.hrs.form;
 import erp.client.SClientInterface;
 import erp.mbps.data.SDataBizPartner;
 import erp.mod.SModConsts;
-import erp.mod.hrs.db.SHrsConsts;
 import java.awt.BorderLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import javax.swing.ImageIcon;
+import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import sa.lib.SLibConsts;
@@ -20,14 +23,13 @@ import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanDialogReport;
-import sa.lib.gui.bean.SBeanFieldBoolean;
 import sa.lib.gui.bean.SBeanFieldRadio;
 
 /**
  *
  * @author Juan Barajas
  */
-public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListener {
+public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListener, ItemListener {
     
     protected SPanelHrsDepartaments moPanelHrsDepartaments;
     
@@ -53,7 +55,9 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
 
         moGroupReportType = new javax.swing.ButtonGroup();
         moGroupFilterType = new javax.swing.ButtonGroup();
-        moGroupOrderBy = new javax.swing.ButtonGroup();
+        moGroupOrderByEmployee = new javax.swing.ButtonGroup();
+        moGroupOrderByDepartament = new javax.swing.ButtonGroup();
+        moGroupFilterTypeEarDed = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel16 = new javax.swing.JPanel();
@@ -68,13 +72,13 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
         moRadFilterTypeDate = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel35 = new javax.swing.JPanel();
         jlYear = new javax.swing.JLabel();
-        moIntPeriodYear = new sa.lib.gui.bean.SBeanFieldInteger();
+        moIntPeriodYear = new sa.lib.gui.bean.SBeanFieldCalendarYear();
         jPanel36 = new javax.swing.JPanel();
         jlPeriodStart = new javax.swing.JLabel();
-        moIntPeriodStart = new sa.lib.gui.bean.SBeanFieldInteger();
+        moIntPeriodStart = new sa.lib.gui.bean.SBeanFieldCalendarMonth();
         jPanel37 = new javax.swing.JPanel();
         jlPeriodEnd = new javax.swing.JLabel();
-        moIntPeriodEnd = new sa.lib.gui.bean.SBeanFieldInteger();
+        moIntPeriodEnd = new sa.lib.gui.bean.SBeanFieldCalendarMonth();
         jPanel11 = new javax.swing.JPanel();
         jlDateStart = new javax.swing.JLabel();
         moDateDateStart = new sa.lib.gui.bean.SBeanFieldDate();
@@ -84,24 +88,27 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
         jPanel13 = new javax.swing.JPanel();
         jlEmployee = new javax.swing.JLabel();
         moKeyEmployee = new sa.lib.gui.bean.SBeanFieldKey();
-        moBoolAllEmployee = new sa.lib.gui.bean.SBeanFieldBoolean();
+        jtbEmployeeActive = new javax.swing.JToggleButton();
+        jPanel21 = new javax.swing.JPanel();
+        moRadShowEarDed = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel15 = new javax.swing.JPanel();
-        jlEarning = new javax.swing.JLabel();
+        moRadShowEar = new sa.lib.gui.bean.SBeanFieldRadio();
         moKeyEarning = new sa.lib.gui.bean.SBeanFieldKey();
-        moBoolShowEarnings = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel17 = new javax.swing.JPanel();
-        jlDeduction = new javax.swing.JLabel();
+        moRadShowDed = new sa.lib.gui.bean.SBeanFieldRadio();
         moKeyDeduction = new sa.lib.gui.bean.SBeanFieldKey();
-        moBoolShowDeductions = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel14 = new javax.swing.JPanel();
         jlPaymentType = new javax.swing.JLabel();
         moKeyPaymentType = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel7 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
-        jrbOrderByNumEmployee = new javax.swing.JRadioButton();
-        jrbOrderByNameEmployee = new javax.swing.JRadioButton();
-        jrbOrderByNumDepartament = new javax.swing.JRadioButton();
-        jrbOrderByNameDepartament = new javax.swing.JRadioButton();
+        jPanel10 = new javax.swing.JPanel();
+        moRadOrderByNumEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadOrderByNameEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
+        jPanel19 = new javax.swing.JPanel();
+        jPanel20 = new javax.swing.JPanel();
+        moRadOrderByNumDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadOrderByNameDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel9 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         moBoolIsDetail = new sa.lib.gui.bean.SBeanFieldBoolean();
@@ -135,7 +142,7 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
 
         jPanel16.add(jPanel18, java.awt.BorderLayout.NORTH);
 
-        jPanel5.setLayout(new java.awt.GridLayout(10, 1, 0, 5));
+        jPanel5.setLayout(new java.awt.GridLayout(11, 1));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -160,8 +167,6 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
         jlYear.setText("Ejercicio:*");
         jlYear.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel35.add(jlYear);
-
-        moIntPeriodYear.setPreferredSize(new java.awt.Dimension(103, 23));
         jPanel35.add(moIntPeriodYear);
 
         jPanel5.add(jPanel35);
@@ -171,8 +176,6 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
         jlPeriodStart.setText("Período inicial:*");
         jlPeriodStart.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel36.add(jlPeriodStart);
-
-        moIntPeriodStart.setPreferredSize(new java.awt.Dimension(103, 23));
         jPanel36.add(moIntPeriodStart);
 
         jPanel5.add(jPanel36);
@@ -182,8 +185,6 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
         jlPeriodEnd.setText("Período final:*");
         jlPeriodEnd.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel37.add(jlPeriodEnd);
-
-        moIntPeriodEnd.setPreferredSize(new java.awt.Dimension(103, 23));
         jPanel37.add(moIntPeriodEnd);
 
         jPanel5.add(jPanel37);
@@ -215,44 +216,41 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
         moKeyEmployee.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel13.add(moKeyEmployee);
 
-        moBoolAllEmployee.setText("Ver todos");
-        moBoolAllEmployee.setPreferredSize(new java.awt.Dimension(75, 23));
-        moBoolAllEmployee.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                moBoolAllEmployeeItemStateChanged(evt);
-            }
-        });
-        jPanel13.add(moBoolAllEmployee);
+        jtbEmployeeActive.setIcon(new javax.swing.ImageIcon("C:\\Users\\JBarajas\\Documents\\NetBeansProjects_8\\sa-lib-10\\src\\sa\\lib\\img\\swi_filter_on.gif")); // NOI18N
+        jtbEmployeeActive.setToolTipText("Filtrar eliminados");
+        jtbEmployeeActive.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel13.add(jtbEmployeeActive);
 
         jPanel5.add(jPanel13);
 
-        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 2));
 
-        jlEarning.setText("Percepción:");
-        jlEarning.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel15.add(jlEarning);
+        moGroupFilterTypeEarDed.add(moRadShowEarDed);
+        moRadShowEarDed.setText("Percepciones y deducciones");
+        moRadShowEarDed.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel21.add(moRadShowEarDed);
+
+        jPanel5.add(jPanel21);
+
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 2));
+
+        moGroupFilterTypeEarDed.add(moRadShowEar);
+        moRadShowEar.setText("Percepciones");
+        jPanel15.add(moRadShowEar);
 
         moKeyEarning.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel15.add(moKeyEarning);
 
-        moBoolShowEarnings.setText("Mostrar percepciones");
-        moBoolShowEarnings.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel15.add(moBoolShowEarnings);
-
         jPanel5.add(jPanel15);
 
-        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 2));
 
-        jlDeduction.setText("Deducción:");
-        jlDeduction.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel17.add(jlDeduction);
+        moGroupFilterTypeEarDed.add(moRadShowDed);
+        moRadShowDed.setText("Deducciones");
+        jPanel17.add(moRadShowDed);
 
         moKeyDeduction.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel17.add(moKeyDeduction);
-
-        moBoolShowDeductions.setText("Mostrar deducciones");
-        moBoolShowDeductions.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel17.add(moBoolShowDeductions);
 
         jPanel5.add(jPanel17);
 
@@ -273,25 +271,37 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
 
         jPanel7.setLayout(new java.awt.BorderLayout());
 
-        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento:"));
-        jPanel6.setLayout(new java.awt.GridLayout(4, 1, 0, 2));
+        jPanel6.setLayout(new java.awt.BorderLayout());
 
-        moGroupOrderBy.add(jrbOrderByNumEmployee);
-        jrbOrderByNumEmployee.setText("Número del empleado");
-        jPanel6.add(jrbOrderByNumEmployee);
+        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento empleado:"));
+        jPanel10.setLayout(new java.awt.GridLayout(2, 1));
 
-        moGroupOrderBy.add(jrbOrderByNameEmployee);
-        jrbOrderByNameEmployee.setText("Nombre del empleado");
-        jPanel6.add(jrbOrderByNameEmployee);
+        moGroupOrderByEmployee.add(moRadOrderByNumEmployee);
+        moRadOrderByNumEmployee.setText("Número del empleado");
+        jPanel10.add(moRadOrderByNumEmployee);
 
-        moGroupOrderBy.add(jrbOrderByNumDepartament);
-        jrbOrderByNumDepartament.setText("Código del departamento y número del empleado");
-        jPanel6.add(jrbOrderByNumDepartament);
+        moGroupOrderByEmployee.add(moRadOrderByNameEmployee);
+        moRadOrderByNameEmployee.setText("Nombre del empleado");
+        jPanel10.add(moRadOrderByNameEmployee);
 
-        moGroupOrderBy.add(jrbOrderByNameDepartament);
-        jrbOrderByNameDepartament.setSelected(true);
-        jrbOrderByNameDepartament.setText("Código del departamento y nombre del empleado");
-        jPanel6.add(jrbOrderByNameDepartament);
+        jPanel6.add(jPanel10, java.awt.BorderLayout.NORTH);
+
+        jPanel19.setLayout(new java.awt.BorderLayout());
+
+        jPanel20.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento departamento:"));
+        jPanel20.setLayout(new java.awt.GridLayout(2, 1));
+
+        moGroupOrderByDepartament.add(moRadOrderByNumDepartament);
+        moRadOrderByNumDepartament.setText("Número del departamento");
+        jPanel20.add(moRadOrderByNumDepartament);
+
+        moGroupOrderByDepartament.add(moRadOrderByNameDepartament);
+        moRadOrderByNameDepartament.setText("Nombre del departamento");
+        jPanel20.add(moRadOrderByNameDepartament);
+
+        jPanel19.add(jPanel20, java.awt.BorderLayout.NORTH);
+
+        jPanel6.add(jPanel19, java.awt.BorderLayout.CENTER);
 
         jPanel7.add(jPanel6, java.awt.BorderLayout.NORTH);
 
@@ -319,12 +329,9 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void moBoolAllEmployeeItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_moBoolAllEmployeeItemStateChanged
-        populateEmployee();
-    }//GEN-LAST:event_moBoolAllEmployeeItemStateChanged
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
@@ -333,7 +340,10 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel18;
+    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel20;
+    private javax.swing.JPanel jPanel21;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel35;
     private javax.swing.JPanel jPanel36;
@@ -346,8 +356,6 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
     private javax.swing.JPanel jPanel9;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
-    private javax.swing.JLabel jlDeduction;
-    private javax.swing.JLabel jlEarning;
     private javax.swing.JLabel jlEmployee;
     private javax.swing.JLabel jlPaymentType;
     private javax.swing.JLabel jlPeriodEnd;
@@ -355,33 +363,46 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
     private javax.swing.JLabel jlRepType;
     private javax.swing.JLabel jlRepType1;
     private javax.swing.JLabel jlYear;
-    private javax.swing.JRadioButton jrbOrderByNameDepartament;
-    private javax.swing.JRadioButton jrbOrderByNameEmployee;
-    private javax.swing.JRadioButton jrbOrderByNumDepartament;
-    private javax.swing.JRadioButton jrbOrderByNumEmployee;
-    private sa.lib.gui.bean.SBeanFieldBoolean moBoolAllEmployee;
+    private javax.swing.JToggleButton jtbEmployeeActive;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolIsDetail;
-    private sa.lib.gui.bean.SBeanFieldBoolean moBoolShowDeductions;
-    private sa.lib.gui.bean.SBeanFieldBoolean moBoolShowEarnings;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolShowEmployees;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
     private javax.swing.ButtonGroup moGroupFilterType;
-    private javax.swing.ButtonGroup moGroupOrderBy;
+    private javax.swing.ButtonGroup moGroupFilterTypeEarDed;
+    private javax.swing.ButtonGroup moGroupOrderByDepartament;
+    private javax.swing.ButtonGroup moGroupOrderByEmployee;
     private javax.swing.ButtonGroup moGroupReportType;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntPeriodEnd;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntPeriodStart;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntPeriodYear;
+    private sa.lib.gui.bean.SBeanFieldCalendarMonth moIntPeriodEnd;
+    private sa.lib.gui.bean.SBeanFieldCalendarMonth moIntPeriodStart;
+    private sa.lib.gui.bean.SBeanFieldCalendarYear moIntPeriodYear;
     private sa.lib.gui.bean.SBeanFieldKey moKeyDeduction;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEarning;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEmployee;
     private sa.lib.gui.bean.SBeanFieldKey moKeyPaymentType;
     private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypeDate;
     private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypePeriod;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNameDepartament;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNameEmployee;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNumDepartament;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNumEmployee;
     private sa.lib.gui.bean.SBeanFieldRadio moRadReportTypeAux;
     private sa.lib.gui.bean.SBeanFieldRadio moRadReportTypeEarDed;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadShowDed;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadShowEar;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadShowEarDed;
     // End of variables declaration//GEN-END:variables
 
+    private void actionEmpStatusStateChange() {
+        if (jtbEmployeeActive.isSelected()) {
+            jtbEmployeeActive.setSelectedIcon(new ImageIcon(getClass().getResource("/sa/lib/img/swi_filter_off.gif")));
+        }
+        else {
+            jtbEmployeeActive.setSelectedIcon(new ImageIcon(getClass().getResource("/sa/lib/img/swi_filter_on.gif")));
+        }
+        populateEmployee();
+    }
+    
     private void actionEnableFieldsDates() {
         if (moRadFilterTypePeriod.isSelected()) {
             moIntPeriodYear.setEnabled(true);
@@ -400,27 +421,29 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
     }
     
     private void actionEnableFieldsEarDed() {
-        moKeyEarning.setEnabled(moBoolShowEarnings.isSelected());
-        moKeyDeduction.setEnabled(moBoolShowDeductions.isSelected());
+        moKeyEarning.setEnabled(moRadShowEarDed.isSelected() || moRadShowEar.isSelected());
+        moKeyDeduction.setEnabled(moRadShowEarDed.isSelected() || moRadShowDed.isSelected());
     }
     
     private String getOrderBy() {
         String orderBy = "";
         
-        //ORDER BY f_tp_ear_ded, f_ear_ded, f_ear_ded_id, id_dep, f_dep_code, f_dep_name, f_emp_num, bp, id_bp, f_pay, f_pay_id;
+        orderBy = "ORDER BY f_tp_ear_ded, f_ear_ded, f_ear_ded_id, ";
         
-        if (jrbOrderByNumEmployee.isSelected()) {
-            orderBy = "ORDER BY f_tp_ear_ded, f_ear_ded, f_ear_ded_id, f_emp_num, bp, id_bp, f_dep_code, f_dep_name, id_dep, f_pay, f_pay_id; ";
+        if (moRadOrderByNumDepartament.isSelected()) {
+            orderBy += "f_dep_code, id_dep, ";
         }
-        else if (jrbOrderByNameEmployee.isSelected()) {
-            orderBy = "ORDER BY f_tp_ear_ded, f_ear_ded, f_ear_ded_id, bp, id_bp, f_dep_code, f_dep_name, id_dep, f_pay, f_pay_id; ";
+        else if (moRadOrderByNameDepartament.isSelected()) {
+            orderBy += "f_dep_name, id_dep, ";
         }
-        else if (jrbOrderByNumDepartament.isSelected()) {
-            orderBy = "ORDER BY f_tp_ear_ded, f_ear_ded, f_ear_ded_id, f_dep_code, f_dep_name, id_dep, f_emp_num, bp, id_bp, f_pay, f_pay_id; ";
+        
+        if (moRadOrderByNumEmployee.isSelected()) {
+            orderBy += "CAST(f_emp_num AS UNSIGNED INTEGER), id_bp, ";
         }
-        else if (jrbOrderByNameDepartament.isSelected()) {
-            orderBy = "ORDER BY f_tp_ear_ded, f_ear_ded, f_ear_ded_id, f_dep_code, f_dep_name, id_dep, bp, id_bp, f_pay, f_pay_id; ";
+        else if (moRadOrderByNameEmployee.isSelected()) {
+            orderBy += "bp, id_bp, ";
         }
+        orderBy += "f_pay, f_pay_id; ";
         
         return orderBy;
     }
@@ -434,18 +457,17 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
         moRadReportTypeEarDed.setBooleanSettings(SGuiUtils.getLabelName(moRadReportTypeEarDed.getText()), true);
         moRadFilterTypePeriod.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypePeriod.getText()), true);
         moRadFilterTypeDate.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypeDate.getText()), false);
-        moIntPeriodYear.setIntegerSettings(SGuiUtils.getLabelName(jlYear.getText()), SGuiConsts.GUI_TYPE_INT_CAL_YEAR, true);
-        moIntPeriodYear.setMinInteger(2000);
-        moIntPeriodYear.setMaxInteger(2100);
-        moIntPeriodStart.setIntegerSettings(SGuiUtils.getLabelName(jlPeriodStart.getText()), SGuiConsts.GUI_TYPE_INT_CAL_MONTH, true);
-        moIntPeriodStart.setMaxInteger(SHrsConsts.YEAR_MONTHS);
-        moIntPeriodEnd.setIntegerSettings(SGuiUtils.getLabelName(jlPeriodEnd.getText()), SGuiConsts.GUI_TYPE_INT_CAL_MONTH, true);
-        moIntPeriodEnd.setMaxInteger(SHrsConsts.YEAR_MONTHS);
+        moIntPeriodYear.setCalendarSettings(SGuiUtils.getLabelName(jlYear.getText()));
+        moIntPeriodStart.setCalendarSettings(SGuiUtils.getLabelName(jlPeriodStart.getText()));
+        moIntPeriodEnd.setCalendarSettings(SGuiUtils.getLabelName(jlPeriodEnd.getText()));
         moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart.getText()), true);
         moDateDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd.getText()), true);
         moKeyEmployee.setKeySettings(miClient, SGuiUtils.getLabelName(jlEmployee.getText()), false);
-        moKeyEarning.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarning.getText()), false);
-        moKeyDeduction.setKeySettings(miClient, SGuiUtils.getLabelName(jlDeduction.getText()), false);
+        moRadShowEarDed.setBooleanSettings(SGuiUtils.getLabelName(moRadShowEarDed.getText()), true);
+        moRadShowEar.setBooleanSettings(SGuiUtils.getLabelName(moRadShowEar.getText()), false);
+        moKeyEarning.setKeySettings(miClient, SGuiUtils.getLabelName(moRadShowEar.getText()), false);
+        moRadShowDed.setBooleanSettings(SGuiUtils.getLabelName(moRadShowDed.getText()), false);
+        moKeyDeduction.setKeySettings(miClient, SGuiUtils.getLabelName(moRadShowDed.getText()), false);
         moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
 
         jPanel3.add(moPanelHrsDepartaments, BorderLayout.CENTER);
@@ -460,7 +482,10 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
         moFields.addField(moDateDateStart);
         moFields.addField(moDateDateEnd);
         moFields.addField(moKeyEmployee);
+        moFields.addField(moRadShowEarDed);
+        moFields.addField(moRadShowEar);
         moFields.addField(moKeyEarning);
+        moFields.addField(moRadShowDed);
         moFields.addField(moKeyDeduction);
         moFields.addField(moKeyPaymentType);
 
@@ -471,12 +496,23 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
         moRadFilterTypePeriod.addChangeListener(this);
         moRadFilterTypeDate.addChangeListener(this);
         
-        moBoolShowEarnings.addChangeListener(this);
-        moBoolShowDeductions.addChangeListener(this);
+        moRadShowEarDed.addChangeListener(this);
+        moRadShowEar.addChangeListener(this);
+        moRadShowDed.addChangeListener(this);
         
+        jtbEmployeeActive.addItemListener(this);
+        
+        moRadShowEarDed.setSelected(true);
+        moRadOrderByNameEmployee.setSelected(true);
+        moRadOrderByNameDepartament.setSelected(true);
         moRadFilterTypePeriod.setSelected(true);
+        moIntPeriodYear.setValue(miClient.getSession().getCurrentYear());
+        moIntPeriodStart.setValue(SLibTimeUtils.digestMonth(miClient.getSession().getCurrentDate())[1]);
+        moIntPeriodEnd.setValue(SLibTimeUtils.digestMonth(miClient.getSession().getCurrentDate())[1]);
         moDateDateStart.setValue(SLibTimeUtils.getBeginOfYear(miClient.getSession().getCurrentDate()));
         moDateDateEnd.setValue(SLibTimeUtils.getEndOfYear(miClient.getSession().getCurrentDate()));
+        
+        jtbEmployeeActive.setSelected(false);
         
         moBoolIsDetail.setSelected(true);
         
@@ -486,8 +522,8 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
     }
 
     private void populateEmployee() {
-        if (moBoolAllEmployee.getValue()) {
-            miClient.getSession().populateCatalogue(moKeyEmployee, erp.mod.SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, new SGuiParams(SGuiConsts.PARAM_BPR_TP));
+        if (jtbEmployeeActive.isSelected()) {
+            miClient.getSession().populateCatalogue(moKeyEmployee, erp.mod.SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, new SGuiParams(SGuiConsts.PARAM_REGS_ACT));
         }
         else {
             miClient.getSession().populateCatalogue(moKeyEmployee, erp.mod.SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, null);
@@ -514,13 +550,6 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
             }
             else if (moRadFilterTypeDate.isSelected()) {
                 validation = SGuiUtils.validateDateRange(moDateDateStart, moDateDateEnd);
-            }
-            
-            if (validation.isValid()) {
-                if (!moKeyEarning.isEnabled() && !moKeyDeduction.isEnabled()) {
-                    validation.setMessage("Se debe especificar que quiere mostrar, percepciones ó deducciones.");
-                    validation.setComponent(moBoolShowEarnings);
-                }
             }
             
             if (validation.isValid()) {
@@ -591,8 +620,19 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
         moParamsMap.put("sDepartaments", sDepartamentsName.isEmpty() || (boolean) moPanelHrsDepartaments.getValue(SGuiConsts.PARAM_ROWS) ? "(TODOS)" : sDepartamentsName + " ");
         
         moParamsMap.put("sSqlWhere", sSqlWhere);
+        
+        if (moRadShowEarDed.isSelected()) {
+            moParamsMap.put("sSqlWhereEarning", moKeyEarning.getSelectedIndex() > 0 ? " AND ear.id_ear = " + moKeyEarning.getValue()[0] : "");
+            moParamsMap.put("sSqlWhereDeduction", moKeyDeduction.getSelectedIndex() > 0 ? " AND ded.id_ded = " + moKeyDeduction.getValue()[0] : "");
+        }
+        else {
+            moParamsMap.put("sSqlWhereEarning", !moKeyEarning.isEnabled() ? " AND ear.id_ear = 0 " : moKeyEarning.getSelectedIndex() > 0 ? " AND ear.id_ear = " + moKeyEarning.getValue()[0] : "");
+            moParamsMap.put("sSqlWhereDeduction", !moKeyDeduction.isEnabled() ? " AND ded.id_ded = 0 " : moKeyDeduction.getSelectedIndex() > 0 ? " AND ded.id_ded = " + moKeyDeduction.getValue()[0] : "");
+        }
+        /*
         moParamsMap.put("sSqlWhereEarning", !moKeyEarning.isEnabled() ? " AND ear.id_ear = 0 " : (moKeyEarning.getSelectedIndex() > 0 ? " AND ear.id_ear = " + moKeyEarning.getValue()[0] : ""));
         moParamsMap.put("sSqlWhereDeduction", !moKeyDeduction.isEnabled() ? " AND ded.id_ded = 0 " : (moKeyDeduction.getSelectedIndex() > 0 ? " AND ded.id_ded = " + moKeyDeduction.getValue()[0] : ""));
+        */
         
         moParamsMap.put("sSqlOrderBy", mnFormType == SModConsts.HRSR_PAY_AUX_EAR_DED ? getOrderBy() : "");
     }
@@ -604,12 +644,21 @@ public class SDialogRepHrsAux extends SBeanDialogReport implements ChangeListene
                     (SBeanFieldRadio) e.getSource() == moRadFilterTypeDate) {
                 actionEnableFieldsDates();
             }
-            
-        }
-        else if (e.getSource() instanceof SBeanFieldBoolean) {
-            if ((SBeanFieldBoolean) e.getSource() == moBoolShowEarnings ||
-                    (SBeanFieldBoolean) e.getSource() == moBoolShowDeductions) {
+            else if ((SBeanFieldRadio) e.getSource() == moRadShowEarDed ||
+                    (SBeanFieldRadio) e.getSource() == moRadShowEar ||
+                    (SBeanFieldRadio) e.getSource() == moRadShowDed) {
                 actionEnableFieldsEarDed();
+            }
+        }
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof JToggleButton) {
+            JToggleButton toggleButton = (JToggleButton) e.getSource();
+
+            if (toggleButton == jtbEmployeeActive) {
+                actionEmpStatusStateChange();
             }
         }
     }

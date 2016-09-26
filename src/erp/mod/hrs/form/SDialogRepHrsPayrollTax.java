@@ -6,7 +6,6 @@ package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SDbConfig;
-import erp.mod.hrs.db.SHrsConsts;
 import java.awt.BorderLayout;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -57,13 +56,13 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
         moRadFilterTypeDate = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel35 = new javax.swing.JPanel();
         jlYear = new javax.swing.JLabel();
-        moIntPeriodYear = new sa.lib.gui.bean.SBeanFieldInteger();
+        moIntPeriodYear = new sa.lib.gui.bean.SBeanFieldCalendarYear();
         jPanel36 = new javax.swing.JPanel();
         jlPeriodStart = new javax.swing.JLabel();
-        moIntPeriodStart = new sa.lib.gui.bean.SBeanFieldInteger();
+        moIntPeriodStart = new sa.lib.gui.bean.SBeanFieldCalendarMonth();
         jPanel37 = new javax.swing.JPanel();
         jlPeriodEnd = new javax.swing.JLabel();
-        moIntPeriodEnd = new sa.lib.gui.bean.SBeanFieldInteger();
+        moIntPeriodEnd = new sa.lib.gui.bean.SBeanFieldCalendarMonth();
         jPanel11 = new javax.swing.JPanel();
         jlDateStart = new javax.swing.JLabel();
         moDateDateStart = new sa.lib.gui.bean.SBeanFieldDate();
@@ -97,8 +96,6 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
         jlYear.setText("Ejercicio:*");
         jlYear.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel35.add(jlYear);
-
-        moIntPeriodYear.setPreferredSize(new java.awt.Dimension(103, 23));
         jPanel35.add(moIntPeriodYear);
 
         jPanel2.add(jPanel35);
@@ -108,8 +105,6 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
         jlPeriodStart.setText("Período inicial:*");
         jlPeriodStart.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel36.add(jlPeriodStart);
-
-        moIntPeriodStart.setPreferredSize(new java.awt.Dimension(103, 23));
         jPanel36.add(moIntPeriodStart);
 
         jPanel2.add(jPanel36);
@@ -119,8 +114,6 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
         jlPeriodEnd.setText("Período final:*");
         jlPeriodEnd.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel37.add(jlPeriodEnd);
-
-        moIntPeriodEnd.setPreferredSize(new java.awt.Dimension(103, 23));
         jPanel37.add(moIntPeriodEnd);
 
         jPanel2.add(jPanel37);
@@ -181,9 +174,9 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
     private javax.swing.JLabel jlYear;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntPeriodEnd;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntPeriodStart;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntPeriodYear;
+    private sa.lib.gui.bean.SBeanFieldCalendarMonth moIntPeriodEnd;
+    private sa.lib.gui.bean.SBeanFieldCalendarMonth moIntPeriodStart;
+    private sa.lib.gui.bean.SBeanFieldCalendarYear moIntPeriodYear;
     private sa.lib.gui.bean.SBeanFieldKey moKeyPaymentType;
     private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypeDate;
     private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypePeriod;
@@ -214,13 +207,9 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
 
         moRadFilterTypePeriod.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypePeriod.getText()), true);
         moRadFilterTypeDate.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypeDate.getText()), false);
-        moIntPeriodYear.setIntegerSettings(SGuiUtils.getLabelName(jlYear.getText()), SGuiConsts.GUI_TYPE_INT_CAL_YEAR, true);
-        moIntPeriodYear.setMinInteger(2000);
-        moIntPeriodYear.setMaxInteger(2100);
-        moIntPeriodStart.setIntegerSettings(SGuiUtils.getLabelName(jlPeriodStart.getText()), SGuiConsts.GUI_TYPE_INT_CAL_MONTH, true);
-        moIntPeriodStart.setMaxInteger(SHrsConsts.YEAR_MONTHS);
-        moIntPeriodEnd.setIntegerSettings(SGuiUtils.getLabelName(jlPeriodEnd.getText()), SGuiConsts.GUI_TYPE_INT_CAL_MONTH, true);
-        moIntPeriodEnd.setMaxInteger(SHrsConsts.YEAR_MONTHS);
+        moIntPeriodYear.setCalendarSettings(SGuiUtils.getLabelName(jlYear.getText()));
+        moIntPeriodStart.setCalendarSettings(SGuiUtils.getLabelName(jlPeriodStart.getText()));
+        moIntPeriodEnd.setCalendarSettings(SGuiUtils.getLabelName(jlPeriodEnd.getText()));
         moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart.getText()), true);
         moDateDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd.getText()), true);
         moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
@@ -243,6 +232,9 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
         moRadFilterTypeDate.addChangeListener(this);
         
         moRadFilterTypePeriod.setSelected(true);
+        moIntPeriodYear.setValue(miClient.getSession().getCurrentYear());
+        moIntPeriodStart.setValue(SLibTimeUtils.digestMonth(miClient.getSession().getCurrentDate())[1]);
+        moIntPeriodEnd.setValue(SLibTimeUtils.digestMonth(miClient.getSession().getCurrentDate())[1]);
         moDateDateStart.setValue(SLibTimeUtils.getBeginOfYear(miClient.getSession().getCurrentDate()));
         moDateDateEnd.setValue(SLibTimeUtils.getEndOfYear(miClient.getSession().getCurrentDate()));
         

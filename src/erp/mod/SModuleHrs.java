@@ -602,8 +602,8 @@ public class SModuleHrs extends SGuiModule {
                 sql = "SELECT e.id_emp AS " + SDbConsts.FIELD_ID + "1, bp.bp AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " AS e "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON e.id_emp = bp.id_bp "
-                        + "WHERE bp.b_del = 0 AND e.b_del = 0  "
-                        + (params != null ? (params.getType() == SGuiConsts.PARAM_BPR_TP ? "" : "AND e.b_act = 1 ") : "AND e.b_act = 1 ")
+                        + "WHERE "
+                        + (params == null ? " bp.b_del = 0 AND e.b_del = 0 AND e.b_act = 1 " : (params.getType() == SGuiConsts.PARAM_REGS_ACT ? "bp.b_del = 0 AND e.b_del = 0 " : "bp.b_del = 0 AND e.b_del = 0 AND e.b_act = 1 "))
                         + "ORDER BY bp.bp, e.id_emp ";
                 break;
             case SModConsts.HRS_TAX:

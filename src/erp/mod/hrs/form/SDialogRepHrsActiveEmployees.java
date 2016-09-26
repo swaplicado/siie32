@@ -38,7 +38,8 @@ public class SDialogRepHrsActiveEmployees extends SBeanDialogReport {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jbGrpOrderBy = new javax.swing.ButtonGroup();
+        moGroupOrderByEmployee = new javax.swing.ButtonGroup();
+        moGroupOrderByDepartament = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
@@ -48,9 +49,11 @@ public class SDialogRepHrsActiveEmployees extends SBeanDialogReport {
         jlDateEnd = new javax.swing.JLabel();
         moDateDateEnd = new sa.lib.gui.bean.SBeanFieldDate();
         jPanel4 = new javax.swing.JPanel();
-        jPanel5 = new javax.swing.JPanel();
+        jPanel8 = new javax.swing.JPanel();
         moRadOrderByNumEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadOrderByNameEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
+        jPanel19 = new javax.swing.JPanel();
+        jPanel10 = new javax.swing.JPanel();
         moRadOrderByNumDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadOrderByNameDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
 
@@ -79,29 +82,37 @@ public class SDialogRepHrsActiveEmployees extends SBeanDialogReport {
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento:"));
         jPanel4.setLayout(new java.awt.BorderLayout());
 
-        jPanel5.setLayout(new java.awt.GridLayout(4, 1, 0, 2));
+        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento empleado:"));
+        jPanel8.setLayout(new java.awt.GridLayout(2, 1));
 
-        jbGrpOrderBy.add(moRadOrderByNumEmployee);
+        moGroupOrderByEmployee.add(moRadOrderByNumEmployee);
         moRadOrderByNumEmployee.setText("Número del empleado");
-        jPanel5.add(moRadOrderByNumEmployee);
+        jPanel8.add(moRadOrderByNumEmployee);
 
-        jbGrpOrderBy.add(moRadOrderByNameEmployee);
+        moGroupOrderByEmployee.add(moRadOrderByNameEmployee);
         moRadOrderByNameEmployee.setText("Nombre del empleado");
-        jPanel5.add(moRadOrderByNameEmployee);
+        jPanel8.add(moRadOrderByNameEmployee);
 
-        jbGrpOrderBy.add(moRadOrderByNumDepartament);
-        moRadOrderByNumDepartament.setText("Código del departamento y número del empleado");
-        jPanel5.add(moRadOrderByNumDepartament);
+        jPanel4.add(jPanel8, java.awt.BorderLayout.NORTH);
 
-        jbGrpOrderBy.add(moRadOrderByNameDepartament);
-        moRadOrderByNameDepartament.setSelected(true);
-        moRadOrderByNameDepartament.setText("Código del departamento y nombre del empleado");
-        jPanel5.add(moRadOrderByNameDepartament);
+        jPanel19.setLayout(new java.awt.BorderLayout());
 
-        jPanel4.add(jPanel5, java.awt.BorderLayout.NORTH);
+        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento departamento:"));
+        jPanel10.setLayout(new java.awt.GridLayout(2, 1));
+
+        moGroupOrderByDepartament.add(moRadOrderByNumDepartament);
+        moRadOrderByNumDepartament.setText("Número del departamento");
+        jPanel10.add(moRadOrderByNumDepartament);
+
+        moGroupOrderByDepartament.add(moRadOrderByNameDepartament);
+        moRadOrderByNameDepartament.setText("Nombre del departamento");
+        jPanel10.add(moRadOrderByNameDepartament);
+
+        jPanel19.add(jPanel10, java.awt.BorderLayout.NORTH);
+
+        jPanel4.add(jPanel19, java.awt.BorderLayout.CENTER);
 
         jPanel1.add(jPanel4, java.awt.BorderLayout.CENTER);
 
@@ -110,16 +121,19 @@ public class SDialogRepHrsActiveEmployees extends SBeanDialogReport {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.ButtonGroup jbGrpOrderBy;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
+    private javax.swing.ButtonGroup moGroupOrderByDepartament;
+    private javax.swing.ButtonGroup moGroupOrderByEmployee;
     private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNameDepartament;
     private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNameEmployee;
     private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNumDepartament;
@@ -130,17 +144,19 @@ public class SDialogRepHrsActiveEmployees extends SBeanDialogReport {
         String orderBy = "";
         
         if (moRadOrderByNumEmployee.isSelected()) {
-            orderBy = "ORDER BY emp.num, bp.id_bp, dep.code, dep.name, dep.id_dep, l.dt_hire, l.dt_dis_n; ";
+            orderBy = "ORDER BY CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp, ";
         }
         else if (moRadOrderByNameEmployee.isSelected()) {
-            orderBy = "ORDER BY bp.bp, bp.id_bp, dep.code, dep.name, dep.id_dep, l.dt_hire, l.dt_dis_n; ";
+            orderBy = "ORDER BY bp.bp, bp.id_bp, ";
         }
-        else if (moRadOrderByNumDepartament.isSelected()) {
-            orderBy = "ORDER BY dep.name, dep.code, dep.id_dep, emp.num, bp.id_bp, l.dt_hire, l.dt_dis_n; ";
+        
+        if (moRadOrderByNumDepartament.isSelected()) {
+            orderBy += "dep.code, dep.id_dep, ";
         }
         else if (moRadOrderByNameDepartament.isSelected()) {
-            orderBy = "ORDER BY dep.name, dep.code, dep.id_dep, bp.bp, bp.id_bp, l.dt_hire, l.dt_dis_n; ";
+            orderBy += "dep.name, dep.id_dep, ";
         }
+        orderBy += "l.dt_hire, l.dt_dis_n; ";
         
         return orderBy;
     }
@@ -162,6 +178,7 @@ public class SDialogRepHrsActiveEmployees extends SBeanDialogReport {
         
         moDateDateStart.setValue(SLibTimeUtils.getBeginOfYear(miClient.getSession().getCurrentDate()));
         moDateDateEnd.setValue(SLibTimeUtils.getEndOfYear(miClient.getSession().getCurrentDate()));
+        moRadOrderByNameEmployee.setSelected(true);
         moRadOrderByNameDepartament.setSelected(true);
     }
 

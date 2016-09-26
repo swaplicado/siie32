@@ -8,12 +8,16 @@ package erp.mod.hrs.form;
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SRowDepartamentPanel;
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Vector;
-import javax.swing.JCheckBox;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JToggleButton;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -30,10 +34,12 @@ import sa.lib.gui.bean.SBeanPanel;
  *
  * @author JBarajas
  */
-public class SPanelHrsDepartaments extends SBeanPanel implements ItemListener {
+public class SPanelHrsDepartaments extends SBeanPanel implements ItemListener, ActionListener {
 
     protected SGridPaneForm moGridDepartamentsRow;
-    protected JCheckBox mjchSelectAll;
+    protected JButton mjbSelectAll;
+    protected JButton mjbDeselectAll;
+    protected JToggleButton mjtbFilterDeleted;
     protected int mnNumberDepartamentsSelects;
     protected boolean mbIsSelectedAll;
     protected String msDepartamentsSelectedsId;
@@ -66,8 +72,21 @@ public class SPanelHrsDepartaments extends SBeanPanel implements ItemListener {
     }// </editor-fold>//GEN-END:initComponents
 
     private void initComponentsCustom() {
-        mjchSelectAll = new JCheckBox("Todos");
-        mjchSelectAll.addItemListener(this);
+        
+        mjbSelectAll = new JButton("Seleccionar todos");
+        mjbDeselectAll = new JButton("Deseleccionar todos");
+        
+        mjtbFilterDeleted = new JToggleButton();
+        mjtbFilterDeleted.setIcon(new javax.swing.ImageIcon(getClass().getResource("/sa/lib/img/swi_filter_on.gif")));
+        mjtbFilterDeleted.setToolTipText("Filtrar eliminados");
+        mjtbFilterDeleted.setPreferredSize(new java.awt.Dimension(23, 23));
+        
+        mjbSelectAll.addActionListener(this);
+        mjbDeselectAll.addActionListener(this);
+        mjtbFilterDeleted.addItemListener(this);
+        
+        mjtbFilterDeleted.setSelected(false);
+        
         mnNumberDepartamentsSelects = 0;
         mbIsSelectedAll = false;
         msDepartamentsSelectedsId = "";
@@ -95,7 +114,9 @@ public class SPanelHrsDepartaments extends SBeanPanel implements ItemListener {
                 return gridColumnsForm;
             }
         };
-        moGridDepartamentsRow.getPanelCommandsSys(SGuiConsts.PANEL_RIGHT).add(mjchSelectAll, 0);
+        moGridDepartamentsRow.getPanelCommandsSys(SGuiConsts.PANEL_RIGHT).add(mjtbFilterDeleted, 0);
+        moGridDepartamentsRow.getPanelCommandsSys(SGuiConsts.PANEL_RIGHT).add(mjbSelectAll, 1);
+        moGridDepartamentsRow.getPanelCommandsSys(SGuiConsts.PANEL_RIGHT).add(mjbDeselectAll, 2);
         
         moGridDepartamentsRow.setForm(null);
         moGridDepartamentsRow.setPaneFormOwner(null);
@@ -103,8 +124,19 @@ public class SPanelHrsDepartaments extends SBeanPanel implements ItemListener {
         //mvFormGrids.add(moGridDepartamentsRow);
         
         populateDepartaments();
-        mjchSelectAll.setSelected(true);
+        itemStateChangedSelectAll(true);
     }
+    
+    private void actionDepStatusStateChange() {
+        if (mjtbFilterDeleted.isSelected()) {
+            mjtbFilterDeleted.setSelectedIcon(new ImageIcon(getClass().getResource("/sa/lib/img/swi_filter_off.gif")));
+        }
+        else {
+            mjtbFilterDeleted.setSelectedIcon(new ImageIcon(getClass().getResource("/sa/lib/img/swi_filter_on.gif")));
+        }
+        populateDepartaments();
+    }
+    
     
     private void getDepartaments() {
         SRowDepartamentPanel payRow = null;
@@ -126,12 +158,12 @@ public class SPanelHrsDepartaments extends SBeanPanel implements ItemListener {
         mbIsSelectedAll = mnNumberDepartamentsSelects == moGridDepartamentsRow.getModel().getRowCount();
     }
     
-    private void itemStateChangedSelectAll() {
+    private void itemStateChangedSelectAll(boolean selected) {
         SRowDepartamentPanel payRow = null;
         
         for (SGridRow row : moGridDepartamentsRow.getModel().getGridRows()) {
             payRow = (SRowDepartamentPanel) row;
-            payRow.setIsSelected(mjchSelectAll.isSelected());
+            payRow.setIsSelected(selected);
         }
         moGridDepartamentsRow.renderGridRows();
         moGridDepartamentsRow.setSelectedGridRow(0);
@@ -149,7 +181,7 @@ public class SPanelHrsDepartaments extends SBeanPanel implements ItemListener {
         try {
             sql = "SELECT id_dep, code, name "
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " "
-                    + "WHERE b_del = 0 "
+                    + (!mjtbFilterDeleted.isSelected() ? "WHERE b_del = 0 " : "")
                     + "ORDER BY code, name, id_dep ";
 
             resultSet = miClient.getSession().getStatement().getConnection().createStatement().executeQuery(sql);
@@ -209,7 +241,7 @@ public class SPanelHrsDepartaments extends SBeanPanel implements ItemListener {
 
             if (mnNumberDepartamentsSelects == 0) {
                 validation.setMessage("Aún no se ha especificado ningún departamento.");
-                validation.setComponent(mjchSelectAll);
+                validation.setComponent(mjbSelectAll);
             }
         }
         
@@ -238,12 +270,26 @@ public class SPanelHrsDepartaments extends SBeanPanel implements ItemListener {
     }
 
     @Override
-    public void itemStateChanged(ItemEvent e) {
-        if (e.getSource() instanceof JCheckBox) {
-            JCheckBox button = (JCheckBox) e.getSource();
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
+            JButton button = (JButton) e.getSource();
 
-            if (button == mjchSelectAll) {
-                itemStateChangedSelectAll();
+            if (button == mjbSelectAll) {
+                itemStateChangedSelectAll(true);
+            }
+            else if (button == mjbDeselectAll) {
+                itemStateChangedSelectAll(false);
+            }
+        }
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof JToggleButton) {
+            JToggleButton toggleButton = (JToggleButton) e.getSource();
+
+            if (toggleButton == mjtbFilterDeleted) {
+                actionDepStatusStateChange();
             }
         }
     }

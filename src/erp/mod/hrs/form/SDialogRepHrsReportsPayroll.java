@@ -54,8 +54,9 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jbGrpOrderBy = new javax.swing.ButtonGroup();
         jbGrpReport = new javax.swing.ButtonGroup();
+        moGroupOrderByEmployee = new javax.swing.ButtonGroup();
+        moGroupOrderByDepartament = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
@@ -83,8 +84,11 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         moRadReportListDeductions = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadReportPayrollSummary = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel2 = new javax.swing.JPanel();
+        jPanel14 = new javax.swing.JPanel();
         moRadOrderByNumEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadOrderByNameEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
+        jPanel19 = new javax.swing.JPanel();
+        jPanel15 = new javax.swing.JPanel();
         moRadOrderByNumDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadOrderByNameDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel3 = new javax.swing.JPanel();
@@ -159,13 +163,13 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
 
         jPanel7.setLayout(new java.awt.BorderLayout());
 
-        jPanel9.setPreferredSize(new java.awt.Dimension(100, 120));
+        jPanel9.setPreferredSize(new java.awt.Dimension(100, 135));
         jPanel9.setLayout(new java.awt.BorderLayout());
 
         jPanel13.setLayout(new java.awt.BorderLayout());
 
         jPanel12.setBorder(javax.swing.BorderFactory.createTitledBorder("Reporte:"));
-        jPanel12.setLayout(new java.awt.GridLayout(5, 1, 0, 2));
+        jPanel12.setLayout(new java.awt.GridLayout(5, 1));
 
         jbGrpReport.add(moRadReportPrePayroll);
         moRadReportPrePayroll.setSelected(true);
@@ -195,25 +199,37 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
 
         jPanel13.add(jPanel12, java.awt.BorderLayout.WEST);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento:"));
-        jPanel2.setLayout(new java.awt.GridLayout(5, 1, 0, 2));
+        jPanel2.setLayout(new java.awt.GridLayout(2, 0));
 
-        jbGrpOrderBy.add(moRadOrderByNumEmployee);
+        jPanel14.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento empleado:"));
+        jPanel14.setLayout(new java.awt.GridLayout(2, 1));
+
+        moGroupOrderByEmployee.add(moRadOrderByNumEmployee);
         moRadOrderByNumEmployee.setText("Número del empleado");
-        jPanel2.add(moRadOrderByNumEmployee);
+        jPanel14.add(moRadOrderByNumEmployee);
 
-        jbGrpOrderBy.add(moRadOrderByNameEmployee);
+        moGroupOrderByEmployee.add(moRadOrderByNameEmployee);
         moRadOrderByNameEmployee.setText("Nombre del empleado");
-        jPanel2.add(moRadOrderByNameEmployee);
+        jPanel14.add(moRadOrderByNameEmployee);
 
-        jbGrpOrderBy.add(moRadOrderByNumDepartament);
-        moRadOrderByNumDepartament.setText("Código del departamento y número del empleado");
-        jPanel2.add(moRadOrderByNumDepartament);
+        jPanel2.add(jPanel14);
 
-        jbGrpOrderBy.add(moRadOrderByNameDepartament);
-        moRadOrderByNameDepartament.setSelected(true);
-        moRadOrderByNameDepartament.setText("Código del departamento y nombre del empleado");
-        jPanel2.add(moRadOrderByNameDepartament);
+        jPanel19.setLayout(new java.awt.BorderLayout());
+
+        jPanel15.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento departamento:"));
+        jPanel15.setLayout(new java.awt.GridLayout(2, 1));
+
+        moGroupOrderByDepartament.add(moRadOrderByNumDepartament);
+        moRadOrderByNumDepartament.setText("Número del departamento");
+        jPanel15.add(moRadOrderByNumDepartament);
+
+        moGroupOrderByDepartament.add(moRadOrderByNameDepartament);
+        moRadOrderByNameDepartament.setText("Nombre del departamento");
+        jPanel15.add(moRadOrderByNameDepartament);
+
+        jPanel19.add(jPanel15, java.awt.BorderLayout.NORTH);
+
+        jPanel2.add(jPanel19);
 
         jPanel13.add(jPanel2, java.awt.BorderLayout.CENTER);
 
@@ -235,6 +251,9 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel5;
@@ -242,7 +261,6 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
-    private javax.swing.ButtonGroup jbGrpOrderBy;
     private javax.swing.ButtonGroup jbGrpReport;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
@@ -250,6 +268,8 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
     private javax.swing.JLabel jlPayrollNumber;
     private javax.swing.JLabel jlYear;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolShowGroupDepartament;
+    private javax.swing.ButtonGroup moGroupOrderByDepartament;
+    private javax.swing.ButtonGroup moGroupOrderByEmployee;
     private sa.lib.gui.bean.SBeanFieldInteger moIntPayrollNumber;
     private sa.lib.gui.bean.SBeanFieldInteger moIntPeriodYear;
     private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNameDepartament;
@@ -294,34 +314,41 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         
         switch (reportId) {
             case SModConsts.HRSR_PRE_PAY:
+                orderBy = "ORDER BY ";
+                
+                if (moBoolShowGroupDepartament.isSelected()) {
+                    if (moRadOrderByNumDepartament.isSelected()) {
+                        orderBy += "dep.name, dep.code, dep.id_dep, ";
+                    }
+                    else if (moRadOrderByNameDepartament.isSelected()) {
+                        orderBy += "dep.name, dep.code, dep.id_dep, ";
+                    }
+                }
+                
                 if (moRadOrderByNumEmployee.isSelected()) {
-                    orderBy = "ORDER BY dep.name, dep.id_dep, CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp; ";
+                    orderBy += "CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp; ";
                 }
                 else if (moRadOrderByNameEmployee.isSelected()) {
-                    orderBy = "ORDER BY dep.name, dep.id_dep, bp.bp, bp.id_bp; ";
-                }
-                else if (moRadOrderByNumDepartament.isSelected()) {
-                    orderBy = "ORDER BY dep.name, dep.code, dep.id_dep, CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp; ";
-                }
-                else if (moRadOrderByNameDepartament.isSelected()) {
-                    orderBy = "ORDER BY dep.name, dep.code, dep.id_dep, bp.bp, bp.id_bp; ";
+                    orderBy += "bp.bp, bp.id_bp; ";
                 }
                 break;
             case SModConsts.HRSR_PAY:
+                orderBy = "ORDER BY ";
+                
+                if (moBoolShowGroupDepartament.isSelected()) {
+                    if (moRadOrderByNumDepartament.isSelected()) {
+                        orderBy += "dep.code, dep.id_dep, ";
+                    }
+                    else if (moRadOrderByNameDepartament.isSelected()) {
+                        orderBy += "dep.name, dep.id_dep, ";
+                    }
+                }
                 if (moRadOrderByNumEmployee.isSelected()) {
-                    orderBy = "ORDER BY CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp; ";
+                    orderBy += "CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp ";
                 }
                 else if (moRadOrderByNameEmployee.isSelected()) {
-                    orderBy = "ORDER BY bp.bp, bp.id_bp; ";
+                    orderBy += "bp.bp, bp.id_bp ";
                 }
-                else if (moRadOrderByNumDepartament.isSelected()) {
-                    orderBy = "ORDER BY dep.code, dep.id_dep, CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp; ";
-                }
-                else if (moRadOrderByNameDepartament.isSelected()) {
-                    orderBy = "ORDER BY dep.code, dep.id_dep, bp.bp, bp.id_bp; ";
-                }
-                break;
-            case SModConsts.HRSR_PAY_SUM:
                 break;
             case SModConsts.HRSR_LIST_EAR:
                 if (moRadOrderByNumEmployee.isSelected()) {
@@ -329,12 +356,6 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
                 }
                 else if (moRadOrderByNameEmployee.isSelected()) {
                     orderBy = "ORDER BY ear.name, ear.code, ear.id_ear, bp.bp, bp.id_bp; ";
-                }
-                else if (moRadOrderByNumDepartament.isSelected()) {
-                    orderBy = "ORDER BY ear.name, ear.code, ear.id_ear, dep.code, dep.id_dep, CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp; ";
-                }
-                else if (moRadOrderByNameDepartament.isSelected()) {
-                    orderBy = "ORDER BY ear.name, ear.code, ear.id_ear, dep.code, dep.id_dep, bp.bp, bp.id_bp; ";
                 }
                 break;
             case SModConsts.HRSR_LIST_DED:
@@ -344,12 +365,8 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
                 else if (moRadOrderByNameEmployee.isSelected()) {
                     orderBy = "ORDER BY ded.name, ded.code, ded.id_ded, bp.bp, bp.id_bp; ";
                 }
-                else if (moRadOrderByNumDepartament.isSelected()) {
-                    orderBy = "ORDER BY ded.name, ded.code, ded.id_ded, dep.code, dep.id_dep, CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp; ";
-                }
-                else if (moRadOrderByNameDepartament.isSelected()) {
-                    orderBy = "ORDER BY ded.name, ded.code, ded.id_ded, dep.code, dep.id_dep, bp.bp, bp.id_bp; ";
-                }
+                break;
+            case SModConsts.HRSR_PAY_SUM:
                 break;
         }
         
@@ -377,6 +394,8 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         
         moBoolShowGroupDepartament.addChangeListener(this);
         moBoolShowGroupDepartament.setSelected(true);
+        moRadOrderByNameEmployee.setSelected(true);
+        moRadOrderByNameDepartament.setSelected(true);
         
         moPanelHrsDepartaments = new SPanelHrsDepartaments(miClient);
 
