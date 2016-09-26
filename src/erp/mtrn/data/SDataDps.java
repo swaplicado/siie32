@@ -151,6 +151,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected int mnFkDpsStatusId;
     protected int mnFkDpsValidityStatusId;
     protected int mnFkDpsAuthorizationStatusId;
+    protected int mnFkDpsAnnulationTypeId;
     protected int mnFkDpsNatureId;
     protected int mnFkCompanyBranchId;
     protected int mnFkBizPartnerId_r;
@@ -1399,6 +1400,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setFkDpsStatusId(int n) { mnFkDpsStatusId = n; }
     public void setFkDpsValidityStatusId(int n) { mnFkDpsValidityStatusId = n; }
     public void setFkDpsAuthorizationStatusId(int n) { mnFkDpsAuthorizationStatusId = n; }
+    public void setFkDpsAnnulationTypeId(int n) { mnFkDpsAnnulationTypeId = n; }
     public void setFkDpsNatureId(int n) { mnFkDpsNatureId = n; }
     public void setFkCompanyBranchId(int n) { mnFkCompanyBranchId = n; }
     public void setFkBizPartnerId_r(int n) { mnFkBizPartnerId_r = n; }
@@ -1511,6 +1513,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public int getFkDpsStatusId() { return mnFkDpsStatusId; }
     public int getFkDpsValidityStatusId() { return mnFkDpsValidityStatusId; }
     public int getFkDpsAuthorizationStatusId() { return mnFkDpsAuthorizationStatusId; }
+    public int getFkDpsAnnulationTypeId() { return mnFkDpsAnnulationTypeId; }
     public int getFkDpsNatureId() { return mnFkDpsNatureId; }
     public int getFkCompanyBranchId() { return mnFkCompanyBranchId; }
     public int getFkBizPartnerId_r() { return mnFkBizPartnerId_r; }
@@ -1701,6 +1704,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnFkDpsStatusId = 0;
         mnFkDpsValidityStatusId = 0;
         mnFkDpsAuthorizationStatusId = 0;
+        mnFkDpsAnnulationTypeId = 0;
         mnFkDpsNatureId = 0;
         mnFkCompanyBranchId = 0;
         mnFkBizPartnerId_r = 0;
@@ -1854,6 +1858,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnFkDpsStatusId = oResultSet.getInt("d.fid_st_dps");
                 mnFkDpsValidityStatusId = oResultSet.getInt("d.fid_st_dps_val");
                 mnFkDpsAuthorizationStatusId = oResultSet.getInt("d.fid_st_dps_authorn");
+                mnFkDpsAnnulationTypeId = oResultSet.getInt("fid_tp_dps_ann");
                 mnFkDpsNatureId = oResultSet.getInt("fid_dps_nat");
                 mnFkCompanyBranchId = oResultSet.getInt("d.fid_cob");
                 mnFkBizPartnerId_r = oResultSet.getInt("d.fid_bp_r");
@@ -2128,7 +2133,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?) }");
+                    "?, ?, ?, ?) }");
             oCallableStatement.setInt(nParam++, mnPkYearId);
             oCallableStatement.setInt(nParam++, mnPkDocId);
             oCallableStatement.setDate(nParam++, new java.sql.Date(mtDate.getTime()));
@@ -2192,6 +2197,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             oCallableStatement.setInt(nParam++, mnFkDpsStatusId);
             oCallableStatement.setInt(nParam++, mnFkDpsValidityStatusId);
             oCallableStatement.setInt(nParam++, mnFkDpsAuthorizationStatusId);
+            oCallableStatement.setInt(nParam++, mnFkDpsAnnulationTypeId);
             oCallableStatement.setInt(nParam++, mnFkDpsNatureId);
             oCallableStatement.setInt(nParam++, mnFkCompanyBranchId);
             oCallableStatement.setInt(nParam++, mnFkBizPartnerId_r);
@@ -3199,7 +3205,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 if (testDeletion(connection, sMsg, SDbConsts.ACTION_ANNUL)) {
                     mnFkDpsStatusId = SDataConstantsSys.TRNS_ST_DPS_ANNULED;
 
-                    sSql = "UPDATE trn_dps SET fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " +
+                    sSql = "UPDATE trn_dps SET fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + "fid_tp_dps_ann=" + mnFkDpsAnnulationTypeId + ", " +
                             "stot_prov_r = 0, disc_doc_r = 0, stot_r = 0, tax_charged_r = 0, tax_retained_r = 0, tot_r = 0, " +
                             "stot_prov_cur_r = 0, disc_doc_cur_r = 0, stot_cur_r = 0, tax_charged_cur_r = 0, tax_retained_cur_r = 0, tot_cur_r = 0, " +
                             "fid_usr_edit = " + mnFkUserEditId + ", ts_edit = NOW() " +

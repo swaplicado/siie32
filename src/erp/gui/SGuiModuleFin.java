@@ -173,6 +173,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiRecRecEtyXmlIncome;
     private javax.swing.JMenuItem jmiRecRecEtyXmlExpenses;
     private javax.swing.JMenuItem jmiRecRecCash;
+    private javax.swing.JMenuItem jmiRecRecAud;
+    private javax.swing.JMenuItem jmiRecRecAudPend;
     private javax.swing.JMenuItem jmiRecBal;
     private javax.swing.JMenuItem jmiRecBalAll;// XXX (jbarajas 2016-10-26) new view for trial balance in maximo nivel
     private javax.swing.JMenuItem jmiRecCashAccBalountCash;
@@ -486,6 +488,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRecRecEtyXmlIncome = new JMenuItem("Pólizas contables con XML de ingresos");
         jmiRecRecEtyXmlExpenses = new JMenuItem("Pólizas contables con XML de egresos");
         jmiRecRecCash = new JMenuItem("Pólizas contables de cuentas de dinero");
+        jmiRecRecAud = new JMenuItem("Pólizas contables auditadas");
+        jmiRecRecAudPend = new JMenuItem("Pólizas contables por auditar");
         jmiRecBal = new JMenuItem("Balanza de comprobación");
         jmiRecBalAll = new JMenuItem("Balanza de comprobación completa");
         jmiRecCashAccBalountCash = new JMenuItem("Saldos cajas");
@@ -506,6 +510,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRec.add(jmiRecRecEtyXmlIncome);
         jmRec.add(jmiRecRecEtyXmlExpenses);
         jmRec.add(jmiRecRecCash);
+        jmRec.addSeparator();
+        jmRec.add(jmiRecRecAud);
+        jmRec.add(jmiRecRecAudPend);
         jmRec.addSeparator();
         jmRec.add(jmiRecBal);
         jmRec.add(jmiRecBalAll);
@@ -759,6 +766,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRecRecEtyXmlIncome.addActionListener(this);
         jmiRecRecEtyXmlExpenses.addActionListener(this);
         jmiRecRecCash.addActionListener(this);
+        jmiRecRecAud.addActionListener(this);
+        jmiRecRecAudPend.addActionListener(this);
         jmiRecBal.addActionListener(this);
         jmiRecBalAll.addActionListener(this);
         jmiRecCashAccBalountCash.addActionListener(this);
@@ -942,6 +951,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRecRecEtyXmlExpenses.setEnabled(hasBkrRight);
         jmiRecRecCash.setEnabled(hasBkrRight);
         jmiRecRecCash.setEnabled(false);    // XXX temporal code!!! (sflores, 2013-07-27)
+        jmiRecRecAud.setEnabled(hasBkrRight);
+        jmiRecRecAudPend.setEnabled(hasBkrRight);
         jmiRecBal.setEnabled(hasBkrRight || hasRepRight);
         jmiRecBalAll.setEnabled(hasBkrRight || hasRepRight);
         jmiRecCashAccBalountCash.setEnabled(hasBkrRight || hasMoveAccCash || hasRepRight);
@@ -1816,7 +1827,13 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                 actionFinFiscalYearOpeningDel();
             }
             else if (item == jmiRecRec) {
-                showView(SDataConstants.FIN_REC);
+                showView(SDataConstants.FIN_REC, SDataConstants.UNDEFINED);
+            }
+            else if (item == jmiRecRecAud) {
+                showView(SDataConstants.FIN_REC, SUtilConsts.AUD);
+            }
+            else if (item == jmiRecRecAudPend) {
+                showView(SDataConstants.FIN_REC, SUtilConsts.AUD_PEND);
             }
             else if (item == jmiRecRecEtyXmlIncome) {
                 showView(SDataConstants.FIN_REC_ETY, SDataConstantsSys.TRNS_CT_DPS_SAL);

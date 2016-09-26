@@ -2538,6 +2538,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
     private void windowActivated() {
         boolean bContinue = true;
+        boolean bExists = false;
+        SDataDpsNotes dpsNotes = null;
+        SDataDpsNotes dpsNotesAux = null;
 
         if (mbFirstTime) {
             mbFirstTime = false;
@@ -2679,9 +2682,19 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     }
 
                     // Render system notes:
-
                     for (SDataDpsNotesRow row : STrnUtilities.getSystemNotes(miClient, moDpsType.getPkDpsCategoryId(), moDpsType.getPkDpsClassId(), moDpsType.getPkDpsTypeId(), moDps.getFkCurrencyId())) {
-                        moPaneGridNotes.addTableRow(row);
+                        bExists = false;
+                        dpsNotes = (SDataDpsNotes) row.getData();
+                        for (STableRow note: moPaneGridNotes.getGridRows()){
+                            dpsNotesAux = (SDataDpsNotes) note.getData();
+                            if (dpsNotes.getNotes().equals(dpsNotesAux.getNotes())) {
+                                bExists = true;
+                                break;
+                            }
+                        }
+                        if (!bExists){
+                            moPaneGridNotes.addTableRow(row);
+                        }
                     }
                     moPaneGridNotes.renderTableRows();
                     moPaneGridNotes.setTableRowSelection(0);
@@ -3179,6 +3192,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         dps.setFkDpsStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);
         dps.setFkDpsValidityStatusId(SDataConstantsSys.TRNS_ST_DPS_VAL_EFF);
         dps.setFkDpsAuthorizationStatusId(SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
+        dps.setFkDpsAnnulationTypeId(SModSysConsts.TRNU_TP_DPS_ANN_NA);
         dps.setFkUserLinkedId(SDataConstantsSys.USRX_USER_NA);
         dps.setFkUserClosedId(SDataConstantsSys.USRX_USER_NA);
         dps.setFkUserClosedCommissionsId(SDataConstantsSys.USRX_USER_NA);
@@ -4554,7 +4568,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         SDataDps dpsContrato = null;
         SDataCustomerBranchConfig cusBranchConfig = null;
         SCfdParams params = new SCfdParams();
-
+        
         params.setReceptor(moBizPartner);
         params.setReceptorBranch(moBizPartnerBranch);
         params.setEmisor(miClient.getSessionXXX().getCompany().getDbmsDataCompany());
@@ -4738,6 +4752,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         boolean ok = true;
         String sLimitCredit = "";
         double balance = obtainBizPartnerBalance();
+        double totalBalance = 0;
 
         if (moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CREDIT) {
             if (moBizPartnerCategory == null) {
@@ -4763,7 +4778,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
             else {
 
-                if ((balance + moDps.getTotal_r()) > moBizPartnerCategory.getEffectiveCreditLimit()) {
+                totalBalance = moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CREDIT ? balance + moDps.getTotal_r() : balance;
+                if ((totalBalance) > moBizPartnerCategory.getEffectiveCreditLimit()) {
                     sLimitCredit =
                             "La suma del saldo actual del asociado de negocios " +
                             miClient.getSessionXXX().getFormatters().getDecimalsCurrencyLocalFormat().format(balance) + "\n" +
@@ -7505,7 +7521,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     SDataDpsEntry entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
                     
                     try {
-                        STrnUtils.checkItemStandaloneDoc(miClient.getSession(), moDps.getDpsTypeKey(), entry.getFkItemId(), entry.hasDpsLinksAsDestiny());
+                        if (!miClient.getSession().getUser().isAdministrator()) {
+                            STrnUtils.checkItemStandaloneDoc(miClient.getSession(), moDps.getDpsTypeKey(), entry.getFkItemId(), entry.hasDpsLinksAsDestiny());
+                        }
                     }
                     catch (Exception e) {
                         validation.setMessage(e.getMessage());

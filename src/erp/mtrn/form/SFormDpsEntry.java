@@ -4669,7 +4669,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             }
         }
 
-        if (!validation.getIsError()) {
+        if (!validation.getIsError() && !miClient.getSession().getUser().isAdministrator()) {
             // Check if entry item needs to be added to document from source document:
 
             try {
