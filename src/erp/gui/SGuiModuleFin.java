@@ -1827,7 +1827,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                 actionFinFiscalYearOpeningDel();
             }
             else if (item == jmiRecRec) {
-                showView(SDataConstants.FIN_REC, SDataConstants.UNDEFINED);
+                showView(SDataConstants.FIN_REC, SDataConstants.FIN_REC);
             }
             else if (item == jmiRecRecAud) {
                 showView(SDataConstants.FIN_REC, SUtilConsts.AUD);

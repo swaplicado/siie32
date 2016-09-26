@@ -406,6 +406,7 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
 
             msSql += "WHERE id_year = " + mnPkYearId + " AND id_per = " + mnPkPeriodId + " AND " +
                         "id_bkc = " + mnPkBookkeepingCenterId + " AND id_tp_rec = '" + msPkRecordTypeId + "' AND id_num = " + mnPkNumberId + " ";
+            
             statement.execute(msSql);
 
             queryResultId = SLibConstants.DB_ACTION_SAVE_OK;

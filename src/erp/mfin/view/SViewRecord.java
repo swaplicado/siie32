@@ -184,7 +184,7 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
     }
     
     private void enableHandButtons(){
-        if (mnViewType == SDataConstantsSys.UNDEFINED) {
+        if (mnViewType == SDataConstants.FIN_REC) {
             mjbAuthorize.setEnabled(false);
             mjbReject.setEnabled(false);
         }
@@ -338,7 +338,7 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
         SDataRecord oRecord;
         String auditMsg = mbActionAudit ? SLibConstants.MSG_CNF_DOC_AUDIT_YES : SLibConstants.MSG_CNF_DOC_AUDIT_NO;
         
-        if(miClient.showMsgBoxConfirm(auditMsg) == JOptionPane.YES_OPTION) {
+        if (miClient.showMsgBoxConfirm(auditMsg) == JOptionPane.YES_OPTION) {
         
             oRecord = (SDataRecord) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_REC, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
             oRecord.setPrimaryKey(moTablePane.getSelectedTableRow().getPrimaryKey());
