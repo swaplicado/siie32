@@ -60,7 +60,7 @@ public class SServiceDataLocks implements Serializable {
     }
 
 
-    private SSrvLock getLock(final int companyId, final int registryType, Object pk) {
+    private SSrvLock getLock(final int companyId, final int registryType, final Object pk) {
         SSrvLock lockFound = null;
 
         for (SSrvLock lock : mvLocks) {
@@ -151,6 +151,7 @@ public class SServiceDataLocks implements Serializable {
         
         return lastTs;
     }
+    
     /*
      * Public methods:
      */
