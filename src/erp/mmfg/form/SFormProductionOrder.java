@@ -1359,6 +1359,20 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
             jtfQuantityUnit.setText(moUnit.getSymbol());
             jtfQuantityOriginalUnit.setText(moUnit.getSymbol());
             jtfQuantityReworkUnit.setText(moUnit.getSymbol());
+            
+            if (jcbFkOrdTypeId.getSelectedIndex() >= 0) {
+               if (((SFormComponentItem) jcbFkOrdTypeId.getModel().getSelectedItem()).getComplement() != null) {
+                    if (((Boolean)((SFormComponentItem) jcbFkOrdTypeId.getModel().getSelectedItem()).getComplement()).booleanValue()) {
+                        jcbFkProductionOrderId_n.setEnabled(true);
+                        jbFkProductionOrderId_n.setEnabled(true);
+                        SFormUtilities.populateComboBox(miClient, jcbFkProductionOrderId_n, SDataConstants.MFG_ORD, new Object[] { "" + SDataConstantsSys.MFGS_ST_ORD_NEW, SDataConstants.MFGX_ORD_MAIN_FA, false, moBom.getRoot() });
+                    }
+                    else {
+                        jcbFkProductionOrderId_n.setEnabled(false);
+                        jbFkProductionOrderId_n.setEnabled(false);
+                    }
+                }
+            }
         }
     }
 
@@ -1374,8 +1388,6 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
                         jbPeriodNew.setFocusable(true);
                         jbPeriodEdit.setEnabled(true);
                         jbPeriodEdit.setFocusable(true);
-                        jcbFkProductionOrderId_n.setEnabled(false);
-                        jcbFkProductionOrderId_n.setFocusable(false);
                         jbFkProductionOrderId_n.setEnabled(false);
                         break;
                     default:
@@ -1386,21 +1398,8 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
                         jbPeriodNew.setFocusable(false);
                         jbPeriodEdit.setEnabled(false);
                         jbPeriodEdit.setFocusable(false);
-                        jcbFkProductionOrderId_n.setEnabled(true);
-                        jcbFkProductionOrderId_n.setFocusable(true);
                         jbFkProductionOrderId_n.setEnabled(true);
                         break;
-                }
-            }
-
-            if (((SFormComponentItem) jcbFkOrdTypeId.getModel().getSelectedItem()).getComplement() != null) {
-                if (((Boolean)((SFormComponentItem) jcbFkOrdTypeId.getModel().getSelectedItem()).getComplement()).booleanValue()) {
-                    jcbFkProductionOrderId_n.setEnabled(true);
-                    jbFkProductionOrderId_n.setEnabled(true);
-                }
-                else {
-                    jcbFkProductionOrderId_n.setEnabled(false);
-                    jbFkProductionOrderId_n.setEnabled(false);
                 }
             }
         }
@@ -1917,8 +1916,7 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
 
         SFormUtilities.populateComboBox(miClient, jcbFkOrdTypeId, SDataConstants.MFGU_TP_ORD);
         SFormUtilities.populateComboBox(miClient, jcbFkOrdPriorityId, SDataConstants.MFGS_PTY_ORD);
-        SFormUtilities.populateComboBox(miClient, jcbFkProductionOrderId_n, SDataConstants.MFG_ORD, new Object[] { "" + SDataConstantsSys.MFGS_ST_ORD_NEW, SDataConstants.MFGX_ORD_MAIN_FA, false });
-
+      
         SFormUtilities.populateComboBox(miClient, jcbFkTurnDeliveryId, SDataConstants.MFGU_TURN);
         SFormUtilities.populateComboBox(miClient, jcbFkTurnLotAssignedId, SDataConstants.MFGU_TURN);
         SFormUtilities.populateComboBox(miClient, jcbFkTurnStartId, SDataConstants.MFGU_TURN);

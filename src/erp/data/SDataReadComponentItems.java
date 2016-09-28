@@ -1695,6 +1695,7 @@ public abstract class SDataReadComponentItems {
                     (Integer)((Object[]) pk)[1] == SDataConstants.MFGX_ORD_MAIN_FA ? "AND t.b_req_fat = 0 AND t.id_tp > 1 " :
                     (Integer)((Object[]) pk)[1] == SDataConstants.MFGX_ORD_MAIN_CH ? "AND t.b_req_fat = 1 AND t.id_tp > 1 " : "") +
                     " AND o.b_for = " + ((Boolean)((Object[]) pk)[2] == false ? "0 " : "1 ")) +
+                    (((Object[]) pk).length <= 3 ? "" :((Integer)((Object[]) pk)[3] == SDataConstants.UNDEFINED ? "" : "AND o.fid_item_r IN (SELECT fid_item FROM mfg_bom WHERE root = " +(Integer)((Object[]) pk)[3] + " )")) +    
                     "ORDER BY f_id_1, f_id_2, f_item ";
                 text = "orden de producción";
                 isComplementApplying = true;
