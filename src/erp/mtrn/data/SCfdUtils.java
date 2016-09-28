@@ -25,7 +25,6 @@ import erp.cfd.SCfdDataImpuesto;
 import erp.cfd.SCfdXml;
 import erp.cfd.SCfdiSignature;
 import erp.cfd.SDialogResult;
-import erp.cfd.SDialogCfdSend;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -66,7 +65,6 @@ import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.rmi.RemoteException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -93,7 +91,6 @@ import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
-import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.srv.SSrvConsts;
 import sa.lib.srv.SSrvLock;
@@ -116,6 +113,7 @@ public abstract class SCfdUtils implements Serializable {
     
     private static final String TXT_SEND = "Enviar CFDI";
     private static final String TXT_SIGN_SEND = "Timbrar y enviar CFDI";
+    public static final String TXT_SEND_DPS = "Enviar documento";
     
     /*
      * Private static methods:
@@ -327,54 +325,6 @@ public abstract class SCfdUtils implements Serializable {
         return true;
     }
     
-    /**
-     * Confirms CFDI mail sending.
-     * @param client ERP Client interface.
-     * @param title Dialog's title.
-     * @param cfd CFI to be send.
-     * @param idBizPartner id of Bussines Partner.
-     * @param idBizPartnerBranch id of Bussines Partner Branch.
-     * @return CFDI mail sending confirmation.
-     * @throws RemoteException, Exception
-     */
-    private static boolean confirmSend(final SClientInterface client, final String title, final SDataCfd cfd, final int idBizPartner, final int idBizPartnerBranch) throws RemoteException, Exception {
-        boolean send = false;
-        SSrvLock lock = null;
-        SServerRequest request = null;
-        SServerResponse response = null;
-        SDialogCfdSend dlgCfdSend = null;
-        SDataBizPartner bizPartner  = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { idBizPartner }, SLibConstants.EXEC_MODE_SILENT);
-        
-        dlgCfdSend = new SDialogCfdSend((SGuiClient) client, title, cfd, bizPartner, idBizPartnerBranch);
-        dlgCfdSend.setVisible(true);
-
-        if (dlgCfdSend.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-            if ((boolean) dlgCfdSend.getValue(SDialogCfdSend.VAL_IS_EMAIL_EDITED)) {
-                lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.BPSU_BP, new int[] { idBizPartner }, bizPartner.getRegistryTimeout());
-                
-                if (idBizPartnerBranch == SLibConsts.UNDEFINED) {
-                    bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).setEmail01(((String) dlgCfdSend.getValue(SDialogCfdSend.VAL_EMAIL)));
-                }
-                else {
-                    bizPartner.getDbmsBizPartnerBranch(new int[] { idBizPartnerBranch }).getDbmsBizPartnerBranchContacts().get(0).setEmail01(((String) dlgCfdSend.getValue(SDialogCfdSend.VAL_EMAIL)));
-                }
-                
-                request = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
-                request.setPacket(bizPartner);
-                response = client.getSessionXXX().request(request);
-
-                SSrvUtils.releaseLock(client.getSession(), lock);
-                
-                if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
-                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage()));
-                }
-            }
-            
-            send = true;
-        }
-        
-        return send;
-    }
     
     private static boolean existsCfdiEmitInconsist(final SClientInterface client, final ArrayList<SDataCfd> cfds) throws Exception {
         if (cfds != null) {
@@ -2347,7 +2297,7 @@ public abstract class SCfdUtils implements Serializable {
             }
             
             if (confirmSending) {
-                send = confirmSend(client, TXT_SEND, cfd, idBizPartner, idBizPartnerBranch);
+                send = STrnUtilities.confirmSend(client, TXT_SEND, cfd, null, idBizPartner, idBizPartnerBranch);
             }
 
             if (send) {
@@ -2398,7 +2348,7 @@ public abstract class SCfdUtils implements Serializable {
                     default:
                 }
                 
-                if (!confirmSending || confirmSend(client,TXT_SIGN_SEND, cfd, idBizPartner, idBizPartnerBranch)) {
+                if (!confirmSending || STrnUtilities.confirmSend(client,TXT_SIGN_SEND, cfd, null, idBizPartner, idBizPartnerBranch)) {
                     sign = signCfdi(client, cfd, subtypeCfd, isSingle, false);
                     
                     // Send CFDI:

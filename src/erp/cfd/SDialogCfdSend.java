@@ -8,6 +8,7 @@ import erp.lib.SLibUtilities;
 import erp.mbps.data.SDataBizPartner;
 import erp.mod.SModConsts;
 import erp.mtrn.data.SDataCfd;
+import erp.mtrn.data.SDataDps;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
@@ -31,14 +32,16 @@ public class SDialogCfdSend extends SBeanFormDialog implements ActionListener {
 
     private SDataCfd moCfd;     // XXX obsolete framework, no alternative options yet!
     private SDataBizPartner moBizPartner;    // XXX obsolete framework, no alternative options yet!
+    private SDataDps moDps; // XXX obsolete framework, no alternative options yet!
     private int mnBizPartnerBranch;
     
     /**
      * Creates new form SFormCfdSend
      */
-    public SDialogCfdSend(SGuiClient client, String title, SDataCfd cfd, SDataBizPartner bizPartner, int bizPartnerBranch) {
+    public SDialogCfdSend(SGuiClient client, String title, SDataCfd cfd, SDataDps dps, SDataBizPartner bizPartner, int bizPartnerBranch) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_CFD, SLibConsts.UNDEFINED, title);
         moCfd = cfd;
+        moDps = dps;
         moBizPartner = bizPartner;
         mnBizPartnerBranch = bizPartnerBranch;
         initComponents();
@@ -83,14 +86,14 @@ public class SDialogCfdSend extends SBeanFormDialog implements ActionListener {
             }
         });
 
-        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Opciones para el CFDI:"));
+        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Opciones para el documento:"));
         jPanel6.setLayout(new java.awt.BorderLayout());
 
         jPanel7.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlCfdNumber.setText("Folio CFDI:");
+        jlCfdNumber.setText("Folio del documento:");
         jlCfdNumber.setMaximumSize(new java.awt.Dimension(200, 23));
         jlCfdNumber.setMinimumSize(new java.awt.Dimension(200, 23));
         jlCfdNumber.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -203,7 +206,7 @@ public class SDialogCfdSend extends SBeanFormDialog implements ActionListener {
         
         moFields.setFormButton(jbSave);
 
-        mtfCfdNumber.setText(moCfd.getCfdNumber());
+        mtfCfdNumber.setText(moCfd != null ? moCfd.getCfdNumber() : moDps.getDpsNumber());
         mtfBizPartner.setText(moBizPartner.getBizPartner());
         
         mtfCfdNumber.setCaretPosition(0);

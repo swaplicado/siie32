@@ -7,6 +7,7 @@ package erp.mtrn.data;
 
 import erp.SClient;
 import erp.cfd.SCfdConsts;
+import erp.cfd.SDialogCfdSend;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -41,6 +42,7 @@ import erp.server.SServerResponse;
 import java.awt.Cursor;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.rmi.RemoteException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -59,10 +61,13 @@ import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
+import sa.lib.gui.SGuiClient;
 import sa.lib.mail.SMail;
 import sa.lib.mail.SMailConsts;
 import sa.lib.mail.SMailSender;
 import sa.lib.srv.SSrvConsts;
+import sa.lib.srv.SSrvLock;
+import sa.lib.srv.SSrvUtils;
 import sor.utils.SSorianaUtils;
 
 /**
@@ -1452,6 +1457,84 @@ public abstract class STrnUtilities {
         }
         
         return mailToSend;
+    }
+    
+     /**
+     * Confirms CFDI mail sending.
+     * @param client ERP Client interface.
+     * @param title Dialog's title.
+     * @param cfd CFI to be send.
+     * @param dps DPS to be send.
+     * @param idBizPartner id of Bussines Partner.
+     * @param idBizPartnerBranch id of Bussines Partner Branch.
+     * @return CFDI mail sending confirmation.
+     * @throws RemoteException, Exception
+     */
+    public static boolean confirmSend(final SClientInterface client, final String title, final SDataCfd cfd, final SDataDps dps, final int idBizPartner, final int idBizPartnerBranch) throws RemoteException, Exception {
+        boolean send = false;
+        SSrvLock lock = null;
+        SServerRequest request = null;
+        SServerResponse response = null;
+        SDialogCfdSend dlgCfdSend = null;
+        SDataBizPartner bizPartner  = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { idBizPartner }, SLibConstants.EXEC_MODE_SILENT);
+        
+        dlgCfdSend = new SDialogCfdSend((SGuiClient) client, title, cfd, dps, bizPartner, idBizPartnerBranch);
+        dlgCfdSend.setVisible(true);
+
+        if (dlgCfdSend.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+            if ((boolean) dlgCfdSend.getValue(SDialogCfdSend.VAL_IS_EMAIL_EDITED)) {
+                lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.BPSU_BP, new int[] { idBizPartner }, bizPartner.getRegistryTimeout());
+                
+                if (idBizPartnerBranch == SLibConsts.UNDEFINED) {
+                    bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).setEmail01(((String) dlgCfdSend.getValue(SDialogCfdSend.VAL_EMAIL)));
+                }
+                else {
+                    bizPartner.getDbmsBizPartnerBranch(new int[] { idBizPartnerBranch }).getDbmsBizPartnerBranchContacts().get(0).setEmail01(((String) dlgCfdSend.getValue(SDialogCfdSend.VAL_EMAIL)));
+                }
+                
+                request = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
+                request.setPacket(bizPartner);
+                response = client.getSessionXXX().request(request);
+
+                SSrvUtils.releaseLock(client.getSession(), lock);
+                
+                if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage()));
+                }
+            }
+            
+            send = true;
+        }
+        
+        return send;
+    }
+   
+       /**
+     * Sends a DPS
+     * @param client ERP Client interface.
+     * @param typeDps Type DPS .
+     * @param dpsKey DPS key.
+     * @param confirmSending It is true when the confirmation will be done.
+     * @param catchExceptions When true all exceptions are handled internally, otherwise are shown into dialog messages.
+     * @throws javax.mail.MessagingException, java.sql.SQLException
+     */
+    public static void sendDps(final SClientInterface client, final int typeDps, final int[] dpsKey,boolean confirmSending, boolean catchExceptions) throws MessagingException, SQLException, Exception {
+        boolean send = true;
+        int idBizPartner = SLibConsts.UNDEFINED;
+        int idBizPartnerBranch = SLibConsts.UNDEFINED;
+        SDataDps dps = null;
+        
+        dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, dpsKey, SLibConstants.EXEC_MODE_SILENT);
+        idBizPartner = dps.getFkBizPartnerId_r();
+        idBizPartnerBranch = dps.getFkBizPartnerBranchId();
+            
+        if (confirmSending) {
+            send = confirmSend(client, SCfdUtils.TXT_SEND_DPS, null, dps, idBizPartner, idBizPartnerBranch);
+        }
+
+        if (send) {
+            sendMailOrder(client, dpsKey, typeDps);
+        }
     }
     
     /**

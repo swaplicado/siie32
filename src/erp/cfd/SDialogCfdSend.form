@@ -44,7 +44,7 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Opciones para el CFDI:"/>
+            <TitledBorder title="Opciones para el documento:"/>
           </Border>
         </Property>
       </Properties>
@@ -78,7 +78,7 @@
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="jlCfdNumber">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Folio CFDI:"/>
+                    <Property name="text" type="java.lang.String" value="Folio del documento:"/>
                     <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[200, 23]"/>
                     </Property>
