@@ -748,6 +748,9 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                 case SSrvConsts.REQ_LOCK_STATUS:
                     lock = (SSrvLock) request.getPacket();
                     response.setPacket(moServer.getServiceDataLocks().getLockStatus(lock.getLockId()));
+                    if ((Integer) response.getPacket() == 0){
+                        response.setPacket( SSrvConsts.LOCK_ST_EXPIRED );
+                    }
                     break;
 
                 case SSrvConsts.REQ_LOCK_RELEASE:
