@@ -742,7 +742,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
 
                 case SSrvConsts.REQ_LOCK_RECOVER:
                     lock = (SSrvLock) request.getPacket();
-                    response.setPacket(moServer.getServiceDataLocks().recoverLock(mnSessionId, lock.getCompanyId(), lock.getRegistryType(), lock.getPrimaryKey(), lock.getTimeout()));
+                    response.setPacket(moServer.getServiceDataLocks().recoverLock(mnSessionId, lock.getCompanyId(), lock.getRegistryType(), lock.getPrimaryKey(), lock.getTimeout(), lock.getTimestamp()));
                     break;
 
                 case SSrvConsts.REQ_LOCK_STATUS:
