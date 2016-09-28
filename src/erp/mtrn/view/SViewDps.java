@@ -119,6 +119,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private boolean mbHasRightDelete = false;
     private boolean mbHasRightAnnul = false;
     private boolean mbHasRightLogistics = false;
+    
+    private static final String TXT_SEND = "Enviar documento";
 
     /**
      * View to audit documents.
@@ -1668,7 +1670,6 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
     private void actionSend() {
         if (jbSend.isEnabled()) {
-            String bizPartnerMail;
             if (moTablePane.getSelectedTableRow() != null) {
                 try {
                     switch (mnTabTypeAux02) {
@@ -1677,10 +1678,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             SCfdUtils.sendCfd((SClientInterface) miClient, SCfdConsts.CFD_TYPE_DPS, SCfdUtils.getCfd(miClient, SCfdConsts.CFD_TYPE_DPS, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_OLD, true, false);
                             break;
                         case SDataConstantsSys.TRNX_TP_DPS_ORD:
-                            bizPartnerMail = STrnUtilities.getMailToSendForOrder(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()).replace(";", "\n");
-                            if (miClient.showMsgBoxConfirm("El documento se enviará a los siguientes destinatarios:\n" + bizPartnerMail + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION){
-                                STrnUtilities.sendMailOrder(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey(), mnTabTypeAux01);
-                            }
+                            STrnUtilities.sendDps((SClientInterface) miClient, mnTabTypeAux01, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey(), true, false);
                             break;
                         default:
                     }
