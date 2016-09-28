@@ -214,7 +214,7 @@
                         <Component class="javax.swing.JLabel" name="jlSocialSecurityNumber">
                           <Properties>
                             <Property name="horizontalAlignment" type="int" value="4"/>
-                            <Property name="text" type="java.lang.String" value="NSS:*"/>
+                            <Property name="text" type="java.lang.String" value="NSS:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[50, 23]"/>
                             </Property>

@@ -252,7 +252,6 @@ public class SFormAutomaticEarnings extends SBeanForm implements SGridPaneFormOw
         moKeyLoan_n.setKeySettings(miClient, SGuiUtils.getLabelName(jlLoan_n), false);
         moBoolNormal.setBooleanSettings(SGuiUtils.getLabelName(moBoolNormal.getText()), false);
 
-
         moFields.addField(moKeyEmployee);
         moFields.addField(moTextCodeFind);
         //moFields.addField(moTextName);
@@ -480,6 +479,12 @@ public class SFormAutomaticEarnings extends SBeanForm implements SGridPaneFormOw
             moTextCodeFind.requestFocus();
         }
         else {
+            if ((moEarning.getFkAbsenceClassId_n() != SLibConsts.UNDEFINED && moEarning.getFkAbsenceTypeId_n() != SLibConsts.UNDEFINED) || moEarning.getFkBenefitTypeId() != SModSysConsts.HRSS_TP_BEN_NON) {
+                miClient.showMsgBoxWarning("No se pueden agregar percepciones de tipo incidencia y/o prestación.");
+                load = false;
+                moTextCodeFind.requestFocus();
+            }
+            
             if (moEarning.getFkLoanTypeId() != SModSysConsts.HRSS_TP_LOAN_NON) {
                 if (mnFormSubtype == SModSysConsts.HRS_AUT_GBL) {
                     miClient.showMsgBoxWarning("No se pueden agregar percepciones de tipo crédito/préstamo.");

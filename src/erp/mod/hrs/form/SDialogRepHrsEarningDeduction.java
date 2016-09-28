@@ -247,8 +247,8 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         moKeyEmployee.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel13.add(moKeyEmployee);
 
-        jtbEmployeeActive.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_on.gif"))); // NOI18N
-        jtbEmployeeActive.setToolTipText("Filtrar inactivos");
+        jtbEmployeeActive.setIcon(new javax.swing.ImageIcon("C:\\Users\\JBarajas\\Documents\\NetBeansProjects_8\\sa-lib-10\\src\\sa\\lib\\img\\swi_filter_on.gif")); // NOI18N
+        jtbEmployeeActive.setToolTipText("Filtrar eliminados");
         jtbEmployeeActive.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel13.add(jtbEmployeeActive);
 
@@ -342,9 +342,9 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
 
         jPanel7.add(jPanel6, java.awt.BorderLayout.NORTH);
 
-        jPanel9.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento:"));
         jPanel9.setLayout(new java.awt.BorderLayout());
 
+        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento empleado:"));
         jPanel8.setLayout(new java.awt.GridLayout(2, 1));
 
         moGroupOrderByEmployee.add(moRadOrderByNumEmployee);
@@ -359,10 +359,11 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
 
         jPanel19.setLayout(new java.awt.BorderLayout());
 
+        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento departamento:"));
         jPanel10.setLayout(new java.awt.GridLayout(2, 1));
 
         moGroupOrderByDepartament.add(moRadOrderByNumDepartament);
-        moRadOrderByNumDepartament.setText("Código del departamento");
+        moRadOrderByNumDepartament.setText("Número del departamento");
         jPanel10.add(moRadOrderByNumDepartament);
 
         moGroupOrderByDepartament.add(moRadOrderByNameDepartament);
@@ -461,10 +462,10 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
 
     private void actionEmpStatusStateChange() {
         if (jtbEmployeeActive.isSelected()) {
-            jtbEmployeeActive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_off.gif")));
+            jtbEmployeeActive.setSelectedIcon(new ImageIcon(getClass().getResource("/sa/lib/img/swi_filter_off.gif")));
         }
         else {
-            jtbEmployeeActive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_on.gif")));
+            jtbEmployeeActive.setSelectedIcon(new ImageIcon(getClass().getResource("/sa/lib/img/swi_filter_on.gif")));
         }
         populateEmployee();
     }
@@ -487,8 +488,8 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
     }
     
     private void actionEnableFieldsEarDed() {
-        moKeyEarning.setEnabled(moRadShowEar.isSelected());
-        moKeyDeduction.setEnabled(moRadShowDed.isSelected());
+        moKeyEarning.setEnabled(moRadShowEarDed.isSelected() || moRadShowEar.isSelected());
+        moKeyDeduction.setEnabled(moRadShowEarDed.isSelected() || moRadShowDed.isSelected());
     }
     
     private String getColumSelect(int type) {
@@ -603,7 +604,7 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         moRadFilterTypeDate.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypeDate.getText()), false);
         moIntPeriodYear.setCalendarSettings(SGuiUtils.getLabelName(jlYear.getText()));
         moIntPeriodStart.setCalendarSettings(SGuiUtils.getLabelName(jlPeriodStart.getText()));
-        moIntPeriodEnd.setCalendarSettings(SGuiUtils.getLabelName(jlPeriodStart.getText()));
+        moIntPeriodEnd.setCalendarSettings(SGuiUtils.getLabelName(jlPeriodEnd.getText()));
         moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart.getText()), true);
         moDateDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd.getText()), true);
         moRadOrderByNumEmployee.setBooleanSettings(SGuiUtils.getLabelName(moRadOrderByNumEmployee.getText()), false);
@@ -646,6 +647,7 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         moRadFilterTypePeriod.addChangeListener(this);
         moRadFilterTypeDate.addChangeListener(this);
         
+        moRadShowEarDed.addChangeListener(this);
         moRadShowEar.addChangeListener(this);
         moRadShowDed.addChangeListener(this);
         
@@ -654,8 +656,8 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         moRadReportTypeEarDed.setSelected(true);
         moRadShowEarDed.setSelected(true);
         moRadFilterTypePeriod.setSelected(true);
-        moRadOrderByNumEmployee.setSelected(true);
-        moRadOrderByNumDepartament.setSelected(true);
+        moRadOrderByNameEmployee.setSelected(true);
+        moRadOrderByNameDepartament.setSelected(true);
         
         jtbEmployeeActive.setSelected(false);
         moRadIsSummary.setSelected(true);
@@ -673,7 +675,7 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
 
     private void populateEmployee() {
         if (jtbEmployeeActive.isSelected()) {
-            miClient.getSession().populateCatalogue(moKeyEmployee, erp.mod.SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, new SGuiParams(SGuiConsts.PARAM_BPR_TP));
+            miClient.getSession().populateCatalogue(moKeyEmployee, erp.mod.SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, new SGuiParams(SGuiConsts.PARAM_REGS_ACT));
         }
         else {
             miClient.getSession().populateCatalogue(moKeyEmployee, erp.mod.SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, null);
@@ -760,7 +762,11 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         moParamsMap.put("sColumnsDed", getColumSelect(2));
         moParamsMap.put("sSqlWhere", sSqlWhere);
         
-        if (!moRadShowEarDed.isSelected()) {
+        if (moRadShowEarDed.isSelected()) {
+            moParamsMap.put("sSqlWhereEarning", moKeyEarning.getSelectedIndex() > 0 ? " AND ear.id_ear = " + moKeyEarning.getValue()[0] : "");
+            moParamsMap.put("sSqlWhereDeduction", moKeyDeduction.getSelectedIndex() > 0 ? " AND ded.id_ded = " + moKeyDeduction.getValue()[0] : "");
+        }
+        else {
             moParamsMap.put("sSqlWhereEarning", !moKeyEarning.isEnabled() ? " AND ear.id_ear = 0 " : moKeyEarning.getSelectedIndex() > 0 ? " AND ear.id_ear = " + moKeyEarning.getValue()[0] : "");
             moParamsMap.put("sSqlWhereDeduction", !moKeyDeduction.isEnabled() ? " AND ded.id_ded = 0 " : moKeyDeduction.getSelectedIndex() > 0 ? " AND ded.id_ded = " + moKeyDeduction.getValue()[0] : "");
         }
@@ -774,7 +780,8 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
                     (SBeanFieldRadio) e.getSource() == moRadFilterTypeDate) {
                 actionEnableFieldsDates();
             }
-            else if ((SBeanFieldRadio) e.getSource() == moRadShowEar ||
+            else if ((SBeanFieldRadio) e.getSource() == moRadShowEarDed ||
+                    (SBeanFieldRadio) e.getSource() == moRadShowEar ||
                     (SBeanFieldRadio) e.getSource() == moRadShowDed) {
                 actionEnableFieldsEarDed();
             }

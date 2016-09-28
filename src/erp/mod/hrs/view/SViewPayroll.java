@@ -13,6 +13,7 @@ import erp.mhrs.data.SDataPayrollReceiptIssue;
 import erp.mhrs.form.SDialogPayrollImport;
 import erp.mhrs.form.SDialogPayrollReceiptCfdi;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SHrsCfdUtils;
 import erp.mod.hrs.db.SHrsFinUtils;
@@ -163,7 +164,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                                 // XXX jbarajas 04/02/2016 sign and sending CFDI
                                 dialogResult = new SDialogResult(miClient, "Resultados de timbrado y envío", SCfdConsts.PROC_REQ_STAMP);
                                 mnTotalStamps = SCfdUtils.getStampsAvailable((SClientInterface) miClient, SCfdConsts.CFD_TYPE_PAYROLL, miClient.getSession().getCurrentDate(), 0);
-                                dialogResult.setFormParams((SClientInterface) miClient, null, receiptCfdi.manPayrollEmployeeReceipts, mnTotalStamps, null, false, SCfdConsts.CFDI_PAYROLL_VER_CUR);
+                                dialogResult.setFormParams((SClientInterface) miClient, null, receiptCfdi.manPayrollEmployeeReceipts, mnTotalStamps, null, false, SCfdConsts.CFDI_PAYROLL_VER_CUR, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                                 dialogResult.setVisible(true);
                         }
                     }
@@ -208,14 +209,15 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                         else {
                             cfds = SCfdUtils.getPayrollCfds((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey());
                             receiptIssues = SHrsUtils.getPayrollReceiptIssues(miClient.getSession(), gridRow.getRowPrimaryKey());
-
+                                                    
                             moDialogAnnulCfdi.formReset();
                             moDialogAnnulCfdi.formRefreshCatalogues();
                             moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, (cfds == null || cfds.isEmpty() ? miClient.getSession().getCurrentDate() : cfds.get(0).getTimestamp()));
+                            moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DPS_TP, (cfds == null || cfds.isEmpty() ? SLibConstants.UNDEFINED : cfds.get(0).getFkCfdTypeId()));
                             moDialogAnnulCfdi.setVisible(true);
 
                             if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                                payrollAnnul = new SHrsPayrollAnnul((SClientInterface) miClient, cfds, receiptIssues, SCfdConsts.CFDI_PAYROLL_VER_CUR, true, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat());
+                                payrollAnnul = new SHrsPayrollAnnul((SClientInterface) miClient, cfds, receiptIssues, SCfdConsts.CFDI_PAYROLL_VER_CUR, true, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat(), moDialogAnnulCfdi.getTpDpsAnn());
                                 needUpdate = payrollAnnul.annulPayroll();
                             }
 

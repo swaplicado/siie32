@@ -109,10 +109,12 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiDpsAutReject;
     private javax.swing.JMenuItem jmiDpsAudPending;
     private javax.swing.JMenuItem jmiDpsAudAudited;
+    private javax.swing.JMenuItem jmiDpsAnnulled;
     private javax.swing.JMenuItem jmiDpsPrice;
     private javax.swing.JMenuItem jmiDpsPriceHist;
     private javax.swing.JMenu jmDpsAdj;
     private javax.swing.JMenuItem jmiDpsAdjDoc;
+    private javax.swing.JMenuItem jmiDpsAdjDocAnn;
     private javax.swing.JMenu jmStkDvy;
     private javax.swing.JMenuItem jmiStkDvyPend;
     private javax.swing.JMenuItem jmiStkDvyPendEntry;
@@ -323,6 +325,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsAutReject = new JMenuItem("Facturas rechazadas");
         jmiDpsAudPending = new JMenuItem("Facturas por auditar");
         jmiDpsAudAudited = new JMenuItem("Facturas auditadas");
+        jmiDpsAnnulled = new JMenuItem("Facturas anuladas");
         jmiDpsPrice = new JMenuItem("Precios de compras");
         jmiDpsPriceHist = new JMenuItem("Historial de precios de compras");
         jmDps.add(jmiDpsDoc);
@@ -339,12 +342,17 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmDps.add(jmiDpsAudPending);
         jmDps.add(jmiDpsAudAudited);
         jmDps.addSeparator();
+        jmDps.add(jmiDpsAnnulled);
+        jmDps.addSeparator();
         jmDps.add(jmiDpsPrice);
         jmDps.add(jmiDpsPriceHist);
 
         jmDpsAdj = new JMenu("Notas crédito");
         jmiDpsAdjDoc = new JMenuItem("Notas de crédito de compras");
+        jmiDpsAdjDocAnn = new JMenuItem("Notas de crédito anuladas");
         jmDpsAdj.add(jmiDpsAdjDoc);
+        jmDpsAdj.addSeparator();
+        jmDpsAdj.add(jmiDpsAdjDocAnn);
 
         jmStkDvy = new JMenu("Surtidos");
         jmiStkDvyPend = new JMenuItem("Compras por surtir");
@@ -548,9 +556,11 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsAutReject.addActionListener(this);
         jmiDpsAudPending.addActionListener(this);
         jmiDpsAudAudited.addActionListener(this);
+        jmiDpsAnnulled.addActionListener(this);
         jmiDpsPrice.addActionListener(this);
         jmiDpsPriceHist.addActionListener(this);
         jmiDpsAdjDoc.addActionListener(this);
+        jmiDpsAdjDocAnn.addActionListener(this);
         jmiStkDvyPend.addActionListener(this);
         jmiStkDvyPendEntry.addActionListener(this);
         jmiStkDvySupplied.addActionListener(this);
@@ -652,11 +662,13 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsLinksTrace.setEnabled(hasRightDocTransaction);
         jmiDpsAudPending.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
         jmiDpsAudAudited.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
+        jmiDpsAnnulled.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
         jmiDpsPrice.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmiDpsPriceHist.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
 
         jmDpsAdj.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjDoc.setEnabled(hasRightDocTransactionAdjust);
+        jmiDpsAdjDocAnn.setEnabled(hasRightDocTransactionAdjust);
 
         jmStkDvy.setEnabled(hasRightInventoryIn);
         jmiStkDvyPend.setEnabled(hasRightInventoryIn);
@@ -1013,6 +1025,11 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                     oViewClass = erp.mtrn.view.SViewDpsAudit.class;
                     sViewTitle = "CPA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02) + " auditad@s";
                     break;
+                
+                case SDataConstants.TRNU_TP_DPS_ANN:
+                    oViewClass = erp.mtrn.view.SViewDpsAudit.class;
+                    sViewTitle = "CPA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02) + " anulad@s";
+                    break;
 
                 case SDataConstants.TRNX_DPS_SEND_PEND:
                     oViewClass = erp.mtrn.view.SViewDpsSend.class;
@@ -1352,6 +1369,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiDpsAudAudited) {
                 showView(SDataConstants.TRNX_DPS_AUDITED, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_DOC);
             }
+            else if (item == jmiDpsAnnulled) {
+                showView(SDataConstants.TRNU_TP_DPS_ANN, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_DOC);
+            }
             else if (item == jmiDpsPrice || item == jmiOrdersPrice) {
                 showView(SDataConstants.MKT_PLIST_ITEM, SDataConstantsSys.TRNS_CT_DPS_PUR);
             }
@@ -1360,6 +1380,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiDpsAdjDoc) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_ADJ);
+            }
+            else if (item == jmiDpsAdjDocAnn) {
+                showView(SDataConstants.TRNU_TP_DPS_ANN, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_ADJ);
             }
             else if (item == jmiStkDvyPend) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_SUPPLY_PEND, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[0], SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1]);

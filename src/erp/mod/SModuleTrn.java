@@ -131,6 +131,13 @@ public class SModuleTrn extends SGuiModule {
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = FALSE "
                         + "ORDER BY tp_dps, id_ct_dps, id_cl_dps, id_tp_dps ";
                 break;
+            case SModConsts.TRNU_TP_DPS_ANN:
+                settings = new SGuiCatalogueSettings("Cancelación", 1);
+                sql = "SELECT id_tp_dps_ann AS " + SDbConsts.FIELD_ID + "1, tp_dps_ann AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE b_del = 0 "
+                        + "ORDER BY id_tp_dps_ann ";
+                break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }

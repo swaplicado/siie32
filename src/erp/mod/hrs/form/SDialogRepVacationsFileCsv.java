@@ -76,7 +76,7 @@ public class SDialogRepVacationsFileCsv extends SBeanFormDialog {
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateCut.setText("Fecha inicial:*");
+        jlDateCut.setText("Fecha corte:*");
         jlDateCut.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel11.add(jlDateCut);
         jPanel11.add(moDateDateCut);

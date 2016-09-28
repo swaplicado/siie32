@@ -384,12 +384,16 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
                     jlHelp.setText("(por periodo de pago)");
                     moDecCapital.setEditable(true);
                     moDecTotalAmount.setEditable(true);
+                    moDecCapital.setValue(0d);
+                    moDecTotalAmount.setValue(0d);
                     break;
                 case SModSysConsts.HRSS_TP_LOAN_HOM:
                 case SModSysConsts.HRSS_TP_LOAN_CON:
                     jlHelp.setText("(por mes)");
                     moDecCapital.setEditable(false);
                     moDecTotalAmount.setEditable(false);
+                    moDecCapital.setValue(0d);
+                    moDecTotalAmount.setValue(0d);
                     break;
                 default:
                     break;

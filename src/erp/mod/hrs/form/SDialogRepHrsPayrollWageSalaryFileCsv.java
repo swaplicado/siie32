@@ -9,7 +9,6 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SDbEarning;
-import erp.mod.hrs.db.SHrsConsts;
 import java.awt.Cursor;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -60,7 +59,8 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
     private void initComponents() {
 
         moRadGroupFilterType = new javax.swing.ButtonGroup();
-        jbGrpOrderBy = new javax.swing.ButtonGroup();
+        moGroupOrderByEmployee = new javax.swing.ButtonGroup();
+        moGroupOrderByDepartament = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
@@ -68,13 +68,13 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         moRadFilterTypeDate = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel35 = new javax.swing.JPanel();
         jlYear = new javax.swing.JLabel();
-        moIntPeriodYear = new sa.lib.gui.bean.SBeanFieldInteger();
+        moIntPeriodYear = new sa.lib.gui.bean.SBeanFieldCalendarYear();
         jPanel36 = new javax.swing.JPanel();
         jlPeriodStart = new javax.swing.JLabel();
-        moIntPeriodStart = new sa.lib.gui.bean.SBeanFieldInteger();
+        moIntPeriodStart = new sa.lib.gui.bean.SBeanFieldCalendarMonth();
         jPanel37 = new javax.swing.JPanel();
         jlPeriodEnd = new javax.swing.JLabel();
-        moIntPeriodEnd = new sa.lib.gui.bean.SBeanFieldInteger();
+        moIntPeriodEnd = new sa.lib.gui.bean.SBeanFieldCalendarMonth();
         jPanel11 = new javax.swing.JPanel();
         jlDateStart = new javax.swing.JLabel();
         moDateDateStart = new sa.lib.gui.bean.SBeanFieldDate();
@@ -85,9 +85,11 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         jlPaymentType = new javax.swing.JLabel();
         moKeyPaymentType = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel4 = new javax.swing.JPanel();
-        jPanel5 = new javax.swing.JPanel();
+        jPanel8 = new javax.swing.JPanel();
         moRadOrderByNumEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadOrderByNameEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
+        jPanel19 = new javax.swing.JPanel();
+        jPanel10 = new javax.swing.JPanel();
         moRadOrderByNumDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadOrderByNameDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
 
@@ -113,8 +115,6 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         jlYear.setText("Ejercicio:*");
         jlYear.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel35.add(jlYear);
-
-        moIntPeriodYear.setPreferredSize(new java.awt.Dimension(103, 23));
         jPanel35.add(moIntPeriodYear);
 
         jPanel2.add(jPanel35);
@@ -124,8 +124,6 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         jlPeriodStart.setText("Período inicial:*");
         jlPeriodStart.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel36.add(jlPeriodStart);
-
-        moIntPeriodStart.setPreferredSize(new java.awt.Dimension(103, 23));
         jPanel36.add(moIntPeriodStart);
 
         jPanel2.add(jPanel36);
@@ -135,8 +133,6 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         jlPeriodEnd.setText("Período final:*");
         jlPeriodEnd.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel37.add(jlPeriodEnd);
-
-        moIntPeriodEnd.setPreferredSize(new java.awt.Dimension(103, 23));
         jPanel37.add(moIntPeriodEnd);
 
         jPanel2.add(jPanel37);
@@ -172,29 +168,37 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento:"));
         jPanel4.setLayout(new java.awt.BorderLayout());
 
-        jPanel5.setLayout(new java.awt.GridLayout(4, 1, 0, 2));
+        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento empleado:"));
+        jPanel8.setLayout(new java.awt.GridLayout(2, 1));
 
-        jbGrpOrderBy.add(moRadOrderByNumEmployee);
+        moGroupOrderByEmployee.add(moRadOrderByNumEmployee);
         moRadOrderByNumEmployee.setText("Número del empleado");
-        jPanel5.add(moRadOrderByNumEmployee);
+        jPanel8.add(moRadOrderByNumEmployee);
 
-        jbGrpOrderBy.add(moRadOrderByNameEmployee);
+        moGroupOrderByEmployee.add(moRadOrderByNameEmployee);
         moRadOrderByNameEmployee.setText("Nombre del empleado");
-        jPanel5.add(moRadOrderByNameEmployee);
+        jPanel8.add(moRadOrderByNameEmployee);
 
-        jbGrpOrderBy.add(moRadOrderByNumDepartament);
-        moRadOrderByNumDepartament.setText("Código del departamento y número del empleado");
-        jPanel5.add(moRadOrderByNumDepartament);
+        jPanel4.add(jPanel8, java.awt.BorderLayout.NORTH);
 
-        jbGrpOrderBy.add(moRadOrderByNameDepartament);
-        moRadOrderByNameDepartament.setSelected(true);
-        moRadOrderByNameDepartament.setText("Código del departamento y nombre del empleado");
-        jPanel5.add(moRadOrderByNameDepartament);
+        jPanel19.setLayout(new java.awt.BorderLayout());
 
-        jPanel4.add(jPanel5, java.awt.BorderLayout.NORTH);
+        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento departamento:"));
+        jPanel10.setLayout(new java.awt.GridLayout(2, 1));
+
+        moGroupOrderByDepartament.add(moRadOrderByNumDepartament);
+        moRadOrderByNumDepartament.setText("Número del departamento");
+        jPanel10.add(moRadOrderByNumDepartament);
+
+        moGroupOrderByDepartament.add(moRadOrderByNameDepartament);
+        moRadOrderByNameDepartament.setText("Nombre del departamento");
+        jPanel10.add(moRadOrderByNameDepartament);
+
+        jPanel19.add(jPanel10, java.awt.BorderLayout.NORTH);
+
+        jPanel4.add(jPanel19, java.awt.BorderLayout.CENTER);
 
         jPanel1.add(jPanel4, java.awt.BorderLayout.CENTER);
 
@@ -203,17 +207,18 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel35;
     private javax.swing.JPanel jPanel36;
     private javax.swing.JPanel jPanel37;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.ButtonGroup jbGrpOrderBy;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
     private javax.swing.JLabel jlPaymentType;
@@ -222,9 +227,11 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
     private javax.swing.JLabel jlYear;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntPeriodEnd;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntPeriodStart;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntPeriodYear;
+    private javax.swing.ButtonGroup moGroupOrderByDepartament;
+    private javax.swing.ButtonGroup moGroupOrderByEmployee;
+    private sa.lib.gui.bean.SBeanFieldCalendarMonth moIntPeriodEnd;
+    private sa.lib.gui.bean.SBeanFieldCalendarMonth moIntPeriodStart;
+    private sa.lib.gui.bean.SBeanFieldCalendarYear moIntPeriodYear;
     private sa.lib.gui.bean.SBeanFieldKey moKeyPaymentType;
     private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypeDate;
     private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypePeriod;
@@ -256,16 +263,17 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         String orderBy = "";
         
         if (moRadOrderByNumEmployee.isSelected()) {
-            orderBy = "ORDER BY e.num, b.id_bp, d.code, d.name, d.id_dep; ";
+            orderBy = "ORDER BY CAST(e.num AS UNSIGNED INTEGER), b.id_bp, ";
         }
         else if (moRadOrderByNameEmployee.isSelected()) {
-            orderBy = "ORDER BY b.bp, b.id_bp, d.code, d.name, d.id_dep; ";
+            orderBy = "ORDER BY b.bp, b.id_bp, ";
         }
-        else if (moRadOrderByNumDepartament.isSelected()) {
-            orderBy = "ORDER BY d.name, d.code, d.id_dep, e.num, b.id_bp; ";
+        
+        if (moRadOrderByNumDepartament.isSelected()) {
+            orderBy += "d.code, d.id_dep ";
         }
         else if (moRadOrderByNameDepartament.isSelected()) {
-            orderBy = "ORDER BY d.name, d.code, d.id_dep, b.bp, b.id_bp; ";
+            orderBy += "d.name, d.id_dep ";
         }
         
         return orderBy;
@@ -512,13 +520,9 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
 
         moRadFilterTypePeriod.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypePeriod.getText()), true);
         moRadFilterTypeDate.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypeDate.getText()), false);
-        moIntPeriodYear.setIntegerSettings(SGuiUtils.getLabelName(jlYear.getText()), SGuiConsts.GUI_TYPE_INT_CAL_YEAR, true);
-        moIntPeriodYear.setMinInteger(2000);
-        moIntPeriodYear.setMaxInteger(2100);
-        moIntPeriodStart.setIntegerSettings(SGuiUtils.getLabelName(jlPeriodStart.getText()), SGuiConsts.GUI_TYPE_INT_CAL_MONTH, true);
-        moIntPeriodStart.setMaxInteger(SHrsConsts.YEAR_MONTHS);
-        moIntPeriodEnd.setIntegerSettings(SGuiUtils.getLabelName(jlPeriodEnd.getText()), SGuiConsts.GUI_TYPE_INT_CAL_MONTH, true);
-        moIntPeriodEnd.setMaxInteger(SHrsConsts.YEAR_MONTHS);
+        moIntPeriodYear.setCalendarSettings(SGuiUtils.getLabelName(jlYear.getText()));
+        moIntPeriodStart.setCalendarSettings(SGuiUtils.getLabelName(jlPeriodStart.getText()));
+        moIntPeriodEnd.setCalendarSettings(SGuiUtils.getLabelName(jlPeriodEnd.getText()));
         moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart.getText()), true);
         moDateDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd.getText()), true);
         moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
@@ -543,8 +547,12 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         moRadFilterTypeDate.addChangeListener(this);
         
         moRadFilterTypePeriod.setSelected(true);
+        moIntPeriodYear.setValue(miClient.getSession().getCurrentYear());
+        moIntPeriodStart.setValue(SLibTimeUtils.digestMonth(miClient.getSession().getCurrentDate())[1]);
+        moIntPeriodEnd.setValue(SLibTimeUtils.digestMonth(miClient.getSession().getCurrentDate())[1]);
         moDateDateStart.setValue(SLibTimeUtils.getBeginOfYear(miClient.getSession().getCurrentDate()));
         moDateDateEnd.setValue(SLibTimeUtils.getEndOfYear(miClient.getSession().getCurrentDate()));
+        moRadOrderByNameEmployee.setSelected(true);
         moRadOrderByNameDepartament.setSelected(true);
         
         reloadCatalogues();
@@ -588,7 +596,6 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
                 validation = SGuiUtils.validateDateRange(moDateDateStart, moDateDateEnd);
             }
         }
-                
         
         return validation;
     }

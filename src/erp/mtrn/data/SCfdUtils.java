@@ -869,7 +869,7 @@ public abstract class SCfdUtils implements Serializable {
         return signed;
     }
 
-    private static boolean cancelCfdiFinkok(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd) throws Exception {
+    private static boolean cancelCfdiFinkok(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd, final int tpDpsAnn) throws Exception {
         boolean canceled = false;
         int pacId = 0;
 
@@ -880,7 +880,7 @@ public abstract class SCfdUtils implements Serializable {
                 managementCfdi(client, cfd, SDataConstantsSys.TRNS_ST_DPS_ANNULED, client.getSessionXXX().getSystemDate(), true, true, pacId, subtypeCfd);
             }
             else {
-                processAnnul(client, cfd, subtypeCfd);
+                processAnnul(client, cfd, subtypeCfd, tpDpsAnn);
             }
             canceled = true;
         }
@@ -1874,7 +1874,7 @@ public abstract class SCfdUtils implements Serializable {
         }
     }
     
-    private static void  processAnnul(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd) throws Exception {
+    private static void  processAnnul(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd, final int tpDpsAnn) throws Exception {
         int result = SLibConstants.UNDEFINED;
         String error = "";
         SDataDps dps = null;
@@ -1911,6 +1911,7 @@ public abstract class SCfdUtils implements Serializable {
                             // Annul registry:
 
                             dps.setIsRegistryRequestAnnul(true);
+                            dps.setFkDpsAnnulationTypeId(tpDpsAnn);
                             dps.setFkUserEditId(client.getSession().getUser().getPkUserId());
 
                             request = new SServerRequest(SServerConstants.REQ_DB_ACTION_ANNUL);
@@ -2203,7 +2204,7 @@ public abstract class SCfdUtils implements Serializable {
         return signed;
     }
 
-    public static boolean cancelCfdi(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd, final Date cancellationDate, boolean validateStamp, boolean isSingle) throws Exception {
+    public static boolean cancelCfdi(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd, final Date cancellationDate, boolean validateStamp, boolean isSingle, int tpDpsAnn) throws Exception {
         boolean canceled = false;
         boolean tryCanceled = true;
         int pacId = 0;
@@ -2211,38 +2212,44 @@ public abstract class SCfdUtils implements Serializable {
         pacId = getPacCfdSignedId(client, cfd);
 
         if (canCfdiCancel(client, cfd, false)) {
-            while (tryCanceled) {
-                if (pacId == 0 && !existsPacConfiguration(client, cfd)) {
-                    throw new Exception("No existe ningún PAC configurado para este tipo de CFDI.");
-                }
-                else if (validateStamp) {
-                    if (isNeedStamps(client, cfd, SDbConsts.ACTION_ANNUL, pacId) && getStampsAvailable(client, cfd.getFkCfdTypeId(), cfd.getTimestamp(), pacId) <= 0) {
-                        if (pacId == 0) {
-                            throw new Exception("No existen timbres disponibles.");
+            if (validateStamp) {
+                while (tryCanceled) {
+                    if (pacId == 0 && !existsPacConfiguration(client, cfd)) {
+                        throw new Exception("No existe ningún PAC configurado para este tipo de CFDI.");
+                    }
+                    else if (validateStamp) {
+                        if (isNeedStamps(client, cfd, SDbConsts.ACTION_ANNUL, pacId) && getStampsAvailable(client, cfd.getFkCfdTypeId(), cfd.getTimestamp(), pacId) <= 0) {
+                            if (pacId == 0) {
+                                throw new Exception("No existen timbres disponibles.");
+                            }
                         }
                     }
-                }
 
-                if (!isSingle || client.showMsgBoxConfirm("La anulación de un CFDI no puede revertirse.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
-                    // Open Sign & Cancel Log entry:
-                    
-                    mnLogSignId = 0;
-                    createSignCancelLog(client, "", SCfdConsts.ACTION_ANNUL, SCfdConsts.STATUS_NA, cfd, pacId != 0 ? pacId : getPacConfiguration(client, cfd.getFkCfdTypeId()).getFkPacId());
+                    if (!isSingle || client.showMsgBoxConfirm("La anulación de un CFDI no puede revertirse.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                        // Open Sign & Cancel Log entry:
 
-                    if (canCfdiCancelWebService(client, cfd, pacId)) {
-                        canceled = managementCfdi(client, cfd, SDataConstantsSys.TRNS_ST_DPS_ANNULED, cancellationDate, isSingle, false, pacId, subtypeCfd);
+                        mnLogSignId = 0;
+                        createSignCancelLog(client, "", SCfdConsts.ACTION_ANNUL, SCfdConsts.STATUS_NA, cfd, pacId != 0 ? pacId : getPacConfiguration(client, cfd.getFkCfdTypeId()).getFkPacId());
+
+                        if (canCfdiCancelWebService(client, cfd, pacId)) {
+                            canceled = managementCfdi(client, cfd, SDataConstantsSys.TRNS_ST_DPS_ANNULED, cancellationDate, isSingle, false, pacId, subtypeCfd);
+                        }
+                        else {
+                            processAnnul(client, cfd, subtypeCfd, tpDpsAnn);
+                            canceled = true;
+                        }
                     }
                     else {
-                        processAnnul(client, cfd, subtypeCfd);
-                        canceled = true;
+                        pacId = 0;
+                        updateProcessCfd(client, cfd, false);
                     }
-                }
-                else {
+                    tryCanceled = !(pacId == 0 || canceled);
                     pacId = 0;
-                    updateProcessCfd(client, cfd, false);
                 }
-                tryCanceled = !(pacId == 0 || canceled);
-                pacId = 0;
+            }
+            else {
+                processAnnul(client, cfd, subtypeCfd, tpDpsAnn);
+                canceled = true;
             }
         }
         return canceled;
@@ -2432,7 +2439,7 @@ public abstract class SCfdUtils implements Serializable {
         return signAndSend;
     }
 
-    public static boolean cancelAndSendCfdi(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd, final Date cancellationDate, boolean validateStamp, boolean isSingle) throws Exception {
+    public static boolean cancelAndSendCfdi(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd, final Date cancellationDate, boolean validateStamp, boolean isSingle, int tpDpsAnn) throws Exception {
         boolean canceled = false;
         boolean tryCanceled = true;
         int pacId = 0;
@@ -2442,52 +2449,58 @@ public abstract class SCfdUtils implements Serializable {
         pacId = getPacCfdSignedId(client, cfd);
 
         if (canCfdiCancel(client, cfd, false)) {
-            while (tryCanceled) {
-                if (pacId == 0 && !existsPacConfiguration(client, cfd)) {
-                    throw new Exception("No existe ningún PAC configurado para este tipo de CFDI.");
-                }
-                else if (validateStamp) {
-                    if (isNeedStamps(client, cfd, SDbConsts.ACTION_ANNUL, pacId) && getStampsAvailable(client, cfd.getFkCfdTypeId(), cfd.getTimestamp(), pacId) <= 0) {
-                        if (pacId == 0) {
-                            throw new Exception("No existen timbres disponibles.");
+            if (validateStamp) {
+                while (tryCanceled) {
+                    if (pacId == 0 && !existsPacConfiguration(client, cfd)) {
+                        throw new Exception("No existe ningún PAC configurado para este tipo de CFDI.");
+                    }
+                    else if (validateStamp) {
+                        if (isNeedStamps(client, cfd, SDbConsts.ACTION_ANNUL, pacId) && getStampsAvailable(client, cfd.getFkCfdTypeId(), cfd.getTimestamp(), pacId) <= 0) {
+                            if (pacId == 0) {
+                                throw new Exception("No existen timbres disponibles.");
+                            }
+                        }
+                    }
+
+                    if (!isSingle || client.showMsgBoxConfirm("La anulación de un CFDI no puede revertirse.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                        // Open Sign & Cancel Log entry:
+
+                        mnLogSignId = 0;
+                        createSignCancelLog(client, "", SCfdConsts.ACTION_ANNUL, SCfdConsts.STATUS_NA, cfd, pacId != 0 ? pacId : getPacConfiguration(client, cfd.getFkCfdTypeId()).getFkPacId());
+
+                        if (canCfdiCancelWebService(client, cfd, pacId)) {
+                            canceled = managementCfdi(client, cfd, SDataConstantsSys.TRNS_ST_DPS_ANNULED, cancellationDate, isSingle, false, pacId, subtypeCfd);
+                            sendNotification = true;
+                        }
+                        else {
+                            processAnnul(client, cfd, subtypeCfd, tpDpsAnn);
+                            canceled = true;
+                        }
+                    }
+                    else {
+                        pacId = 0;
+                        updateProcessCfd(client, cfd, false);
+                    }
+                    tryCanceled = !(pacId == 0 || canceled);
+                    pacId = 0;
+
+                    // Send CFDI:
+
+                    if (sendNotification) {
+                        try {
+                            cfdAuxSend = (SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, cfd.getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+
+                            sendCfd(client, cfdAuxSend.getFkCfdTypeId(), cfdAuxSend, subtypeCfd, false, false, false);
+                        }
+                        catch (Exception e) {
+                            throw new Exception("Anulado, pero no enviado: " + e.getMessage());
                         }
                     }
                 }
-
-                if (!isSingle || client.showMsgBoxConfirm("La anulación de un CFDI no puede revertirse.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
-                    // Open Sign & Cancel Log entry:
-                    
-                    mnLogSignId = 0;
-                    createSignCancelLog(client, "", SCfdConsts.ACTION_ANNUL, SCfdConsts.STATUS_NA, cfd, pacId != 0 ? pacId : getPacConfiguration(client, cfd.getFkCfdTypeId()).getFkPacId());
-
-                    if (canCfdiCancelWebService(client, cfd, pacId)) {
-                        canceled = managementCfdi(client, cfd, SDataConstantsSys.TRNS_ST_DPS_ANNULED, cancellationDate, isSingle, false, pacId, subtypeCfd);
-                        sendNotification = true;
-                    }
-                    else {
-                        processAnnul(client, cfd, subtypeCfd);
-                        canceled = true;
-                    }
-                }
-                else {
-                    pacId = 0;
-                    updateProcessCfd(client, cfd, false);
-                }
-                tryCanceled = !(pacId == 0 || canceled);
-                pacId = 0;
-                
-                // Send CFDI:
-                
-                if (sendNotification) {
-                    try {
-                        cfdAuxSend = (SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, cfd.getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-
-                        sendCfd(client, cfdAuxSend.getFkCfdTypeId(), cfdAuxSend, subtypeCfd, false, false, false);
-                    }
-                    catch (Exception e) {
-                        throw new Exception("Anulado, pero no enviado: " + e.getMessage());
-                    }
-                }
+            }
+            else {
+                processAnnul(client, cfd, subtypeCfd, tpDpsAnn);
+                canceled = true;
             }
         }
         
@@ -2644,9 +2657,9 @@ public abstract class SCfdUtils implements Serializable {
         client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
 
-    public static void  processAnnul(final SClientInterface client, final ArrayList<SDataCfd> cfds, final int subtypeCfd) throws Exception {
+    public static void  processAnnul(final SClientInterface client, final ArrayList<SDataCfd> cfds, final int subtypeCfd, int tpDpsAnn) throws Exception {
         for (SDataCfd cfd : cfds) {
-            processAnnul(client, cfd, subtypeCfd);
+            processAnnul(client, cfd, subtypeCfd, tpDpsAnn);
         }
     }
 
@@ -2693,7 +2706,7 @@ public abstract class SCfdUtils implements Serializable {
             if (existsCfdiEmitInconsist(client, cfdsValidate)) {
                 dialogResult = new SDialogResult((SClient) client, "Resultados de verificación", SCfdConsts.PROC_REQ_VERIFY);
 
-                dialogResult.setFormParams(client, cfdsValidate, null, stampAvailables, null, false, subtypeCfd);
+                dialogResult.setFormParams(client, cfdsValidate, null, stampAvailables, null, false, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                 dialogResult.setVisible(true);
             }
         }
@@ -2750,7 +2763,7 @@ public abstract class SCfdUtils implements Serializable {
                             valid = stampedCfdiFinkok(client, cfd, subtypeCfd);
                         }
                         else {
-                            valid = getReceiptCancellationCfdi(client, cfd, subtypeCfd);
+                            valid = getReceiptCancellationCfdi(client, cfd, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                         }
                     }
                 }
@@ -3399,7 +3412,7 @@ public abstract class SCfdUtils implements Serializable {
                         if (signed) {
                             dialogResult = new SDialogResult((SClient) client, "Resultados de timbrado", SCfdConsts.PROC_REQ_STAMP);
 
-                            dialogResult.setFormParams(client, cfdsAux, null, stampAvailables, null, needSign, subtypeCfd);
+                            dialogResult.setFormParams(client, cfdsAux, null, stampAvailables, null, needSign, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                             dialogResult.setVisible(true);
                         }
                     }
@@ -3452,7 +3465,7 @@ public abstract class SCfdUtils implements Serializable {
                         if (signedSent) {
                             dialogResult = new SDialogResult((SClient) client, "Resultados de timbrado y enviado", SCfdConsts.PROC_REQ_STAMP_AND_SND);
 
-                            dialogResult.setFormParams(client, cfdsAux, null, stampAvailables, null, needSign, subtypeCfd);
+                            dialogResult.setFormParams(client, cfdsAux, null, stampAvailables, null, needSign, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                             dialogResult.setVisible(true);
                         }
                     }
@@ -3463,11 +3476,11 @@ public abstract class SCfdUtils implements Serializable {
         return signedSent;
     }
 
-    public static boolean cancelCfdi(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd, final Date cancellationDate, boolean validateStamp) throws Exception {
-        return cancelCfdi(client, cfd, subtypeCfd, cancellationDate, validateStamp, true);
+    public static boolean cancelCfdi(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd, final Date cancellationDate, boolean validateStamp, int tpDpsAnn) throws Exception {
+        return cancelCfdi(client, cfd, subtypeCfd, cancellationDate, validateStamp, true, tpDpsAnn);
     }
 
-    public static boolean cancelCfdi(final SClientInterface client, final ArrayList<SDataCfd> cfds, final int subtypeCfd, final Date cancellationDate, boolean validateStamp) throws Exception {
+    public static boolean cancelCfdi(final SClientInterface client, final ArrayList<SDataCfd> cfds, final int subtypeCfd, final Date cancellationDate, boolean validateStamp, int tpDpsAnn) throws Exception {
         boolean cancel = false;
         int stampAvailables = 0;
         ArrayList<SDataCfd> cfdsAux = null;
@@ -3502,7 +3515,7 @@ public abstract class SCfdUtils implements Serializable {
                     if (cancel && client.showMsgBoxConfirm("La anulación de un CFDI no puede revertirse.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                         dialogResult = new SDialogResult((SClient) client, "Resultados de anulación", SCfdConsts.PROC_REQ_ANNUL);
 
-                        dialogResult.setFormParams(client, cfdsAux, null, 0, cancellationDate, validateStamp, subtypeCfd);
+                        dialogResult.setFormParams(client, cfdsAux, null, 0, cancellationDate, validateStamp, subtypeCfd, tpDpsAnn);
                         dialogResult.setVisible(true);
                     }
                 }
@@ -3512,7 +3525,7 @@ public abstract class SCfdUtils implements Serializable {
         return cancel;
     }
     
-    public static boolean cancelAndSendCfdi(final SClientInterface client, final ArrayList<SDataCfd> cfds, final int subtypeCfd, final Date cancellationDate, boolean validateStamp) throws Exception {
+    public static boolean cancelAndSendCfdi(final SClientInterface client, final ArrayList<SDataCfd> cfds, final int subtypeCfd, final Date cancellationDate, boolean validateStamp, int tpDpsAnn) throws Exception {
         boolean cancel = false;
         int stampAvailables = 0;
         ArrayList<SDataCfd> cfdsAux = null;
@@ -3547,7 +3560,7 @@ public abstract class SCfdUtils implements Serializable {
                     if (cancel && client.showMsgBoxConfirm("La anulación de un CFDI no puede revertirse.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                         dialogResult = new SDialogResult((SClient) client, "Resultados de anulación y envío", SCfdConsts.PROC_REQ_ANNUL_AND_SND);
 
-                        dialogResult.setFormParams(client, cfdsAux, null, 0, cancellationDate, validateStamp, subtypeCfd);
+                        dialogResult.setFormParams(client, cfdsAux, null, 0, cancellationDate, validateStamp, subtypeCfd, tpDpsAnn);
                         dialogResult.setVisible(true);
                     }
                 }
@@ -3585,7 +3598,7 @@ public abstract class SCfdUtils implements Serializable {
             if (client.showMsgBoxConfirm("¿Está seguro que desea imprimir " + cfdsAux.size() + " documentos?") == JOptionPane.YES_OPTION) {
                 dialogResult = new SDialogResult((SClient) client, "Resultados de impresión", SCfdConsts.PROC_PRT_DOC);
 
-                dialogResult.setFormParams(client, cfdsAux, null, 0, null, false, subtypeCfd);
+                dialogResult.setFormParams(client, cfdsAux, null, 0, null, false, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                 dialogResult.setNumberCopies(copies);
                 dialogResult.setVisible(true);
             }
@@ -3620,7 +3633,7 @@ public abstract class SCfdUtils implements Serializable {
             if (client.showMsgBoxConfirm("¿Está seguro que desea imprimir " + cfdsAux.size() + " acuses de cancelación?") == JOptionPane.YES_OPTION) {
                 dialogResult = new SDialogResult((SClient) client, "Resultados de impresión de acuses de cancelación", SCfdConsts.PROC_PRT_ACK_ANNUL);
 
-                dialogResult.setFormParams(client, cfdsAux, null, 0, null, false, subtypeCfd);
+                dialogResult.setFormParams(client, cfdsAux, null, 0, null, false, subtypeCfd, subtypeCfd);
                 dialogResult.setVisible(true);
             }
         }
@@ -3792,7 +3805,7 @@ public abstract class SCfdUtils implements Serializable {
             if (client.showMsgBoxConfirm("¿Está seguro que desea enviar por correo-e " + cfdsAux.size() + " documentos?") == JOptionPane.YES_OPTION) {
                 dialogResult = new SDialogResult((SClient) client, "Resultados de envío", SCfdConsts.PROC_SND_DOC);
 
-                dialogResult.setFormParams(client, cfdsAux, null, 0, null, false, subtypeCfd);
+                dialogResult.setFormParams(client, cfdsAux, null, 0, null, false, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                 dialogResult.setVisible(true);
             }
         }
@@ -3817,8 +3830,8 @@ public abstract class SCfdUtils implements Serializable {
         return signed;
     }
 
-    public static boolean getReceiptCancellationCfdi(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd) throws Exception {
-       return cancelCfdiFinkok(client, cfd, subtypeCfd);
+    public static boolean getReceiptCancellationCfdi(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd, final int tpDpsAnn) throws Exception {
+       return cancelCfdiFinkok(client, cfd, subtypeCfd, tpDpsAnn);
     }
 
     public static ArrayList<SDataCfd> getPayrollCfds(final SClientInterface client, final int typeCfd, final int[] payrollKey) throws Exception {

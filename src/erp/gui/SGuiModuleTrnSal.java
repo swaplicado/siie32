@@ -125,6 +125,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiDpsAutReject;
     private javax.swing.JMenuItem jmiDpsAudPending;
     private javax.swing.JMenuItem jmiDpsAudAudited;
+    private javax.swing.JMenuItem jmiDpsEntryAnulled;
     private javax.swing.JMenuItem jmiDpsPrice;
     private javax.swing.JMenuItem jmiDpsPriceHist;
     private javax.swing.JMenuItem jmiDpsMailPending;
@@ -134,6 +135,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiDpsWsReject;
     private javax.swing.JMenu jmDpsAdj;
     private javax.swing.JMenuItem jmiDpsAdjDoc;
+    private javax.swing.JMenuItem jmDpsAdjAnnulled;
     private javax.swing.JMenuItem jmiDpsAdjMailPending;
     private javax.swing.JMenuItem jmiDpsAdjMailSent;
     private javax.swing.JMenuItem jmiDpsAdjWsPending;
@@ -366,6 +368,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsAutReject = new JMenuItem("Facturas rechazadas");
         jmiDpsAudPending = new JMenuItem("Facturas por auditar");
         jmiDpsAudAudited = new JMenuItem("Facturas auditadas");
+        jmiDpsEntryAnulled = new JMenuItem("Facturas anuladas");
         jmiDpsPrice = new JMenuItem("Precios de ventas");
         jmiDpsPriceHist = new JMenuItem("Historial de precios de ventas");
         jmiDpsMailPending = new JMenuItem("Facturas por enviar por correo-e");
@@ -387,6 +390,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmDps.add(jmiDpsAudPending);
         jmDps.add(jmiDpsAudAudited);
         jmDps.addSeparator();
+        jmDps.add(jmiDpsEntryAnulled);
+        jmDps.addSeparator();
         jmDps.add(jmiDpsPrice);
         jmDps.add(jmiDpsPriceHist);
         jmDps.addSeparator();
@@ -399,12 +404,15 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
 
         jmDpsAdj = new JMenu("Notas crédito");
         jmiDpsAdjDoc = new JMenuItem("Notas de crédito de ventas");
+        jmDpsAdjAnnulled = new JMenuItem("Notas de crédito anuladas");
         jmiDpsAdjMailPending = new JMenuItem("Notas de crédito por enviar por correo-e");
         jmiDpsAdjMailSent = new JMenuItem("Notas de crédito enviadas por correo-e");
         jmiDpsAdjWsPending = new JMenuItem("Notas de crédito por enviar por web-service");
         jmiDpsAdjWsApproved = new JMenuItem("Notas de crédito aceptadas por web-service");
         jmiDpsAdjWsRejected = new JMenuItem("Notas de crédito rechazadas por web-service");
         jmDpsAdj.add(jmiDpsAdjDoc);
+        jmDpsAdj.addSeparator();
+        jmDpsAdj.add(jmDpsAdjAnnulled);
         jmDpsAdj.addSeparator();
         jmDpsAdj.add(jmiDpsAdjMailPending);
         jmDpsAdj.add(jmiDpsAdjMailSent);
@@ -638,6 +646,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsAutReject.addActionListener(this);
         jmiDpsAudPending.addActionListener(this);
         jmiDpsAudAudited.addActionListener(this);
+        jmiDpsEntryAnulled.addActionListener(this);
         jmiDpsPrice.addActionListener(this);
         jmiDpsPriceHist.addActionListener(this);
         jmiDpsMailPending.addActionListener(this);
@@ -646,6 +655,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsWsApproved.addActionListener(this);
         jmiDpsWsReject.addActionListener(this);
         jmiDpsAdjDoc.addActionListener(this);
+        jmDpsAdjAnnulled.addActionListener(this);
         jmiDpsAdjMailPending.addActionListener(this);
         jmiDpsAdjMailSent.addActionListener(this);
         jmiDpsAdjWsPending.addActionListener(this);
@@ -757,6 +767,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsLinksTrace.setEnabled(hasRightDocTransaction);
         jmiDpsAudPending.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
         jmiDpsAudAudited.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
+        jmiDpsEntryAnulled.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
         jmiDpsPrice.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmiDpsPriceHist.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmiDpsMailPending.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
@@ -767,6 +778,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
 
         jmDpsAdj.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjDoc.setEnabled(hasRightDocTransactionAdjust);
+        jmDpsAdjAnnulled.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjMailPending.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjMailSent.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjWsPending.setEnabled(hasRightDocTransactionAdjust);
@@ -1115,7 +1127,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     oViewClass = erp.mtrn.view.SViewDps.class;
                     sViewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02);
                     break;
-
+                    
                 case SDataConstants.TRNX_DPS_ETY_REF:
                     oViewClass = erp.mtrn.view.SViewDpsEntryReference.class;
                     sViewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02) + " (referencias part.)";
@@ -1164,6 +1176,11 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 case SDataConstants.TRNX_DPS_AUDITED:
                     oViewClass = erp.mtrn.view.SViewDpsAudit.class;
                     sViewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02) + " auditad@s";
+                    break;
+                    
+                case SDataConstants.TRNU_TP_DPS_ANN:
+                    oViewClass = erp.mtrn.view.SViewDpsCancelled.class;
+                    sViewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02) + " anulad@s";
                     break;
 
                 case SDataConstants.TRNX_DPS_SEND_PEND:
@@ -1384,18 +1401,18 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                                         }
                                         */
                                         else {
-                                            if ((Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC)) {
+                                            //if ((Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC)) {
                                                 // XXX jbarajas 03/02/2016 sign and sending CFDI
                                                 //SCfdUtils.cancelCfdi(miClient, ((SDataDps) moRegistry).getDbmsDataCfd(), SLibConstants.UNDEFINED, (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), (Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC));
                                                 if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticSal()) {
-                                                    SCfdUtils.cancelAndSendCfdi(miClient, ((SDataDps) moRegistry).getDbmsDataCfd(), SLibConstants.UNDEFINED, (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), (Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true);
+                                                    SCfdUtils.cancelAndSendCfdi(miClient, ((SDataDps) moRegistry).getDbmsDataCfd(), SLibConstants.UNDEFINED, (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), (Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true, (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN));
                                                 }
                                                 else {
-                                                    SCfdUtils.cancelCfdi(miClient, ((SDataDps) moRegistry).getDbmsDataCfd(), SLibConstants.UNDEFINED, (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), (Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC));
+                                                    SCfdUtils.cancelCfdi(miClient, ((SDataDps) moRegistry).getDbmsDataCfd(), SLibConstants.UNDEFINED, (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), (Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN));
                                                 }
                                                 result = SLibConstants.DB_ACTION_ANNUL_OK;
                                                 annul = false;
-                                            }
+                                            //}
                                         }
                                     }
                                 }
@@ -1590,6 +1607,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiDpsAudAudited) {
                 showView(SDataConstants.TRNX_DPS_AUDITED, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_DOC);
             }
+            else if (item == jmiDpsEntryAnulled) {
+                showView(SDataConstants.TRNU_TP_DPS_ANN, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_DOC);
+            }
             else if (item == jmiDpsPrice || item == jmiOrdersPrice) {
                 showView(SDataConstants.MKT_PLIST_ITEM, SDataConstantsSys.TRNS_CT_DPS_SAL);
             }
@@ -1613,6 +1633,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiDpsAdjDoc) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
+            }
+            else if (item == jmDpsAdjAnnulled) {
+                showView(SDataConstants.TRNU_TP_DPS_ANN, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
             }
             else if (item == jmiDpsAdjMailPending) {
                 showView(SDataConstants.TRNX_DPS_SEND_PEND, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ);

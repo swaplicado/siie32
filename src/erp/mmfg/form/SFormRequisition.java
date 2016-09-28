@@ -23,6 +23,7 @@ import erp.mmfg.data.SDataRequisition;
 import erp.mmfg.data.SDataRequisitionEntry;
 import erp.mmfg.data.SDataRequisitionEntryRow;
 import erp.mmfg.data.SDataRequisitionPurchaseOrder;
+import erp.mod.SModSysConsts;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.server.SServerConstants;
@@ -542,6 +543,7 @@ public class SFormRequisition extends javax.swing.JDialog implements erp.lib.for
         moDps.setFkDpsStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);
         moDps.setFkDpsValidityStatusId(SDataConstantsSys.TRNS_ST_DPS_VAL_EFF);
         moDps.setFkDpsAuthorizationStatusId(SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING);
+        moDps.setFkDpsAnnulationTypeId(SModSysConsts.TRNU_TP_DPS_ANN_NA);
         moDps.setFkUserLinkedId(SDataConstantsSys.USRX_USER_NA);
         moDps.setFkUserClosedId(SDataConstantsSys.USRX_USER_NA);
         moDps.setFkUserAuditedId(SDataConstantsSys.USRX_USER_NA);
