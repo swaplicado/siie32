@@ -190,6 +190,7 @@ public class SDbShipment extends SDbRegistryUser {
         moDpsOrder.setFkDpsStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);
         moDpsOrder.setFkDpsValidityStatusId(SDataConstantsSys.TRNS_ST_DPS_VAL_EFF);
         moDpsOrder.setFkDpsAuthorizationStatusId(SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING);
+        moDpsOrder.setFkDpsAnnulationTypeId(SModSysConsts.TRNU_TP_DPS_ANN_NA);
         moDpsOrder.setFkDpsNatureId(miClient_xxx.getSessionXXX().getParamsCompany().getFkDpsNatureLogisticsId());
         moDpsOrder.setFkUserLinkedId(SDataConstantsSys.USRX_USER_NA);
         moDpsOrder.setFkUserClosedId(SDataConstantsSys.USRX_USER_NA);

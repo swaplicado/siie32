@@ -31,8 +31,9 @@ public class SHrsPayrollAnnul {
     protected boolean mbIsPayrollAll;
     protected Date mtDateAnnul;
     protected boolean mbAnnulSat;
+    protected int mnTpDpsAnn;
     
-    public SHrsPayrollAnnul(SClientInterface client, ArrayList<SDataCfd> cfds, ArrayList<SDataPayrollReceiptIssue> receiptIssues, int cfdiPayrollVersion, boolean isPayrollAll, Date dateAnnul, boolean annulSat) {
+    public SHrsPayrollAnnul(SClientInterface client, ArrayList<SDataCfd> cfds, ArrayList<SDataPayrollReceiptIssue> receiptIssues, int cfdiPayrollVersion, boolean isPayrollAll, Date dateAnnul, boolean annulSat, int tpDpsAnn) {
         miClient = client;
         maCfds = cfds;
         maReceiptIssues = receiptIssues;
@@ -40,6 +41,7 @@ public class SHrsPayrollAnnul {
         mbIsPayrollAll = isPayrollAll;
         mtDateAnnul = dateAnnul;
         mbAnnulSat = annulSat;
+        mnTpDpsAnn = tpDpsAnn;
     }
     
     public boolean annulPayroll() throws Exception {
@@ -51,10 +53,10 @@ public class SHrsPayrollAnnul {
                 cancel = SCfdUtils.cancelCfdi(miClient, maCfds, mnCfdiPayrollVersion, mtDateAnnul, (mbAnnulSat && !maCfds.isEmpty()));
                 */
                 if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
-                    cancel = SCfdUtils.cancelAndSendCfdi(miClient, maCfds, mnCfdiPayrollVersion, mtDateAnnul, (mbAnnulSat && !maCfds.isEmpty()));
+                    cancel = SCfdUtils.cancelAndSendCfdi(miClient, maCfds, mnCfdiPayrollVersion, mtDateAnnul, (mbAnnulSat && !maCfds.isEmpty()), mnTpDpsAnn);
                 }
                 else {
-                    cancel = SCfdUtils.cancelCfdi(miClient, maCfds, mnCfdiPayrollVersion, mtDateAnnul, (mbAnnulSat && !maCfds.isEmpty()));
+                    cancel = SCfdUtils.cancelCfdi(miClient, maCfds, mnCfdiPayrollVersion, mtDateAnnul, (mbAnnulSat && !maCfds.isEmpty()), mnTpDpsAnn);
                 }
             }
             else {
@@ -62,10 +64,10 @@ public class SHrsPayrollAnnul {
                 cancel = SCfdUtils.cancelCfdi(miClient, maCfds.get(0), mnCfdiPayrollVersion, mtDateAnnul, (mbAnnulSat && !maCfds.isEmpty()));
                 */
                 if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
-                    cancel = SCfdUtils.cancelAndSendCfdi(miClient, maCfds.get(0), mnCfdiPayrollVersion, mtDateAnnul, (mbAnnulSat && !maCfds.isEmpty()), true);
+                    cancel = SCfdUtils.cancelAndSendCfdi(miClient, maCfds.get(0), mnCfdiPayrollVersion, mtDateAnnul, (mbAnnulSat && !maCfds.isEmpty()), true, mnTpDpsAnn);
                 }
                 else {
-                    cancel = SCfdUtils.cancelCfdi(miClient, maCfds.get(0), mnCfdiPayrollVersion, mtDateAnnul, (mbAnnulSat && !maCfds.isEmpty()));
+                    cancel = SCfdUtils.cancelCfdi(miClient, maCfds.get(0), mnCfdiPayrollVersion, mtDateAnnul, (mbAnnulSat && !maCfds.isEmpty()), mnTpDpsAnn);
                 }
             }
         }

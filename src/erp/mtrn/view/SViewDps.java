@@ -29,6 +29,7 @@ import erp.mbps.data.SDataBizPartnerBranchContact;
 import erp.mcfg.data.SDataCurrency;
 import erp.mfin.form.SDialogAccountingMoveDpsBizPartner;
 import erp.mitm.data.SDataUnit;
+import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mtrn.data.SCfdPrint;
 import erp.mtrn.data.SCfdUtils;
@@ -700,18 +701,21 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             moDialogAnnulCfdi.formReset();
                             moDialogAnnulCfdi.formRefreshCatalogues();
                             moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, dps.getDate());
+                            moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DPS_TP, dps.getCfdTipoDeComprobante());
                             moDialogAnnulCfdi.setVisible(true);
 
                             if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                                 annul = true;
                                 params.getParamsMap().put(SGuiConsts.PARAM_DATE, moDialogAnnulCfdi.getDate());
                                 params.getParamsMap().put(SGuiConsts.PARAM_REQ_DOC, moDialogAnnulCfdi.getAnnulSat()); // SGuiConsts.PARAM_REQ_DOC is used to indicate if SAT cancellation is required
+                                params.getParamsMap().put(SModConsts.TRNU_TP_DPS_ANN, moDialogAnnulCfdi.getTpDpsAnn());
                             }
                         }
                         else {
                             annul = true;
                             params.getParamsMap().put(SGuiConsts.PARAM_DATE, miClient.getSession().getCurrentDate());
                             params.getParamsMap().put(SGuiConsts.PARAM_REQ_DOC, false);
+                            params.getParamsMap().put(SModConsts.TRNU_TP_DPS_ANN, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                         }
                     }
 

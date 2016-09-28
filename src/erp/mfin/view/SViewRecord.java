@@ -25,6 +25,7 @@ import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.util.Map;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
 import sa.gui.util.SUtilConsts;
@@ -38,12 +39,18 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
     private javax.swing.JButton mjbPrintRecord;
     private javax.swing.JButton mjbPrintRecordCurrency;
     private javax.swing.JButton jbCopy;
+    private javax.swing.JButton mjbAuthorize;
+    private javax.swing.JButton mjbReject;
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     private erp.mfin.view.SPanelFilterRecordType moPanelFilterRecordType;
+    private int mnViewType;
+    private boolean mbActionAudit;
 
-    public SViewRecord(erp.client.SClientInterface client, java.lang.String tabTitle) {
+    public SViewRecord(erp.client.SClientInterface client, java.lang.String tabTitle, int viewType) {
         super(client, tabTitle, SDataConstants.FIN_REC);
+        mnViewType = viewType;
+        mbActionAudit = false;
         initComponents();
     }
 
@@ -59,11 +66,21 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
         mjbPrintRecordCurrency.addActionListener(this);
         mjbPrintRecord.setToolTipText("Imprimir póliza, moneda local");
         mjbPrintRecordCurrency.setToolTipText("Imprimir póliza, moneda póliza");
+        
+        mjbAuthorize = new JButton(miClient.getImageIcon(SLibConstants.ICON_APPROVE));
+        mjbReject = new JButton(miClient.getImageIcon(SLibConstants.ICON_APPROVE_NO));
 
         jbCopy = new JButton(miClient.getImageIcon(SLibConstants.ICON_COPY));
         jbCopy.setPreferredSize(new Dimension(23, 23));
         jbCopy.setToolTipText("Copiar");
         jbCopy.addActionListener(this);
+        
+        mjbAuthorize.setPreferredSize(new Dimension(23, 23));
+        mjbReject.setPreferredSize(new Dimension(23, 23));
+        mjbAuthorize.addActionListener(this);
+        mjbReject.addActionListener(this);
+        mjbAuthorize.setToolTipText("Audita Póliza");
+        mjbReject.setToolTipText("No audita Póliza");
 
         moTabFilterDeleted = new STabFilterDeleted(this);
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
@@ -80,10 +97,14 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(mjbPrintRecord);
         addTaskBarUpperComponent(mjbPrintRecordCurrency);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(mjbAuthorize);
+        addTaskBarUpperComponent(mjbReject);
 
         jbDelete.setEnabled(false);
         mjbPrintRecord.setEnabled(true);
         mjbPrintRecordCurrency.setEnabled(true);
+        enableHandButtons();
 
         STableField[] aoKeyFields = new STableField[5];
         STableColumn[] aoTableColumns = new STableColumn[26];
@@ -161,6 +182,21 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
 
         populateTable();
     }
+    
+    private void enableHandButtons(){
+        if (mnViewType == SDataConstants.FIN_REC) {
+            mjbAuthorize.setEnabled(false);
+            mjbReject.setEnabled(false);
+        }
+        else if (mnViewType == SUtilConsts.AUD_PEND) {
+            mjbAuthorize.setEnabled(true);
+            mjbReject.setEnabled(false);
+        }
+        else {
+            mjbAuthorize.setEnabled(false);
+            mjbReject.setEnabled(true);
+        }
+    }
 
     @Override
     public void actionNew() {
@@ -189,7 +225,7 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
     @Override
     public void actionDelete() {
         if (jbDelete.isEnabled()) {
-
+            
         }
     }
 
@@ -297,6 +333,28 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
             }
         }
     }
+    
+    private void actionAudit(){
+        SDataRecord oRecord;
+        String auditMsg = mbActionAudit ? SLibConstants.MSG_CNF_DOC_AUDIT_YES : SLibConstants.MSG_CNF_DOC_AUDIT_NO;
+        
+        if (miClient.showMsgBoxConfirm(auditMsg) == JOptionPane.YES_OPTION) {
+        
+            oRecord = (SDataRecord) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_REC, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+            oRecord.setPrimaryKey(moTablePane.getSelectedTableRow().getPrimaryKey());
+            try {
+                oRecord.saveField(miClient.getSession().getDatabase().getConnection(), SUtilConsts.AUD, mbActionAudit);
+                populateTable();
+            }
+            catch (Exception e) {
+                SLibUtilities.renderException(this, e);
+            }
+        }
+    }
+    
+    private void actionNoAudit(){
+        actionAudit();
+    }
 
     @Override
     public void createSqlQuery() {
@@ -317,7 +375,18 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
                 }
             }
         }
-
+        
+        switch (mnViewType) {
+            
+            case SUtilConsts.AUD:
+                sqlWhere += " AND r.b_audit = 1 ";
+                break;
+            case SUtilConsts.AUD_PEND:
+                sqlWhere += " AND r.b_audit = 0 ";
+                break;
+            default:
+        }
+        
         msSql = "SELECT r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num, r.dt, r.concept, r.b_adj_year, r.b_adj_audit, r.b_audit, r.b_authorn, r.b_sys, r.b_del, " +
                 "r.ts_audit, r.ts_authorn, r.ts_new, r.ts_edit, r.ts_del, " +
                 "bkc.code, cob.code, e.ent, uaud.usr, uaut.usr, un.usr, ue.usr, ud.usr, " +
@@ -367,6 +436,14 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
             }
             else if (button == jbCopy) {
                 actionCopy();
+            }
+            else if (button == mjbAuthorize) {
+                mbActionAudit = true;
+                actionAudit();
+            }
+            else if (button == mjbReject) {
+                mbActionAudit = false;
+                actionNoAudit();
             }
         }
     }

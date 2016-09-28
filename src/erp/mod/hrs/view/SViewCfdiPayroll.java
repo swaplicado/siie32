@@ -22,6 +22,7 @@ import erp.mod.hrs.form.SDialogFormerPayrollDate;
 import erp.mod.hrs.form.SDialogPrintOrderPayroll;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
+import erp.mtrn.data.SDataDps;
 import erp.mtrn.form.SDialogAnnulCfdi;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
@@ -279,6 +280,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
     private void actionAnnulPayroll() {
         boolean needUpdate = false;
         SDataCfd cfd = null;
+        SDataDps dps = null;
         ArrayList<SDataCfd> cfds = null;
         SHrsPayrollAnnul payrollAnnul = null;
         ArrayList<SDataPayrollReceiptIssue> receiptIssues = null;
@@ -328,14 +330,15 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                                 receiptIssues.add(receiptIssue);
                             }
                         }
-
+                        
                         moDialogAnnulCfdi.formReset();
                         moDialogAnnulCfdi.formRefreshCatalogues();
                         moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, (cfds == null || cfds.isEmpty() ? miClient.getSession().getCurrentDate() : cfds.get(0).getTimestamp()));
+                        moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DPS_TP, (cfds == null || cfds.isEmpty() ? cfd == null ? SLibConstants.UNDEFINED : cfd.getFkCfdTypeId() : cfds.get(0).getFkCfdTypeId()));
                         moDialogAnnulCfdi.setVisible(true);
 
                         if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                            payrollAnnul = new SHrsPayrollAnnul((SClientInterface) miClient, cfds, receiptIssues, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), mnGridSubtype == SModConsts.VIEW_SC_SUM, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat());
+                            payrollAnnul = new SHrsPayrollAnnul((SClientInterface) miClient, cfds, receiptIssues, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), mnGridSubtype == SModConsts.VIEW_SC_SUM, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat(), moDialogAnnulCfdi.getTpDpsAnn());
                             needUpdate = payrollAnnul.annulPayroll();
                         }
 

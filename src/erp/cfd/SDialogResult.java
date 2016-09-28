@@ -49,6 +49,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
     protected boolean mbFirstTime;
     protected int mnSubtypeCfd;
     protected int mnNumCopies;
+    protected int mnTpDpsAnn;
     
     /**
      * Creates new form SDialogResult
@@ -436,7 +437,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                             detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Timbrado.\n";
                             break;
                         case SCfdConsts.PROC_REQ_ANNUL:
-                            SCfdUtils.cancelCfdi(miClient, cfd, mnSubtypeCfd, mtCancellationDate, mbValidateStamp, false);
+                            SCfdUtils.cancelCfdi(miClient, cfd, mnSubtypeCfd, mtCancellationDate, mbValidateStamp, false, mnTpDpsAnn);
                             detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Anulado.\n";
                             break;
                         case SCfdConsts.PROC_PRT_DOC:
@@ -466,10 +467,10 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                             break;
                         case SCfdConsts.PROC_REQ_ANNUL_AND_SND:
                             if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
-                                SCfdUtils.cancelAndSendCfdi(miClient, cfd, mnSubtypeCfd, mtCancellationDate, mbValidateStamp, false);
+                                SCfdUtils.cancelAndSendCfdi(miClient, cfd, mnSubtypeCfd, mtCancellationDate, mbValidateStamp, false, mnTpDpsAnn);
                             }
                             else {
-                                SCfdUtils.cancelCfdi(miClient, cfd, mnSubtypeCfd, mtCancellationDate, mbValidateStamp, false);
+                                SCfdUtils.cancelCfdi(miClient, cfd, mnSubtypeCfd, mtCancellationDate, mbValidateStamp, false, mnTpDpsAnn);
                             }
                             detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Anulado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
                             break;
@@ -525,7 +526,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
         jtaMessage.setText(message);
     }
     
-    public void setFormParams(final SClientInterface client, final ArrayList<SDataCfd> cfds, final ArrayList<int[]> payrollReceipts, final int totalStamp, Date cancellationDate, final boolean validateStamp, final int subtypeCfd) {
+    public void setFormParams(final SClientInterface client, final ArrayList<SDataCfd> cfds, final ArrayList<int[]> payrollReceipts, final int totalStamp, Date cancellationDate, final boolean validateStamp, final int subtypeCfd, final int tpDpsAnn) {
         mbFirstTime = true;
         miClient = client;
         maCfds = cfds;
@@ -534,6 +535,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
         mtCancellationDate = cancellationDate;
         mbValidateStamp = validateStamp;
         mnSubtypeCfd = subtypeCfd;
+        mnTpDpsAnn = tpDpsAnn;
     }
     
     public void setNumberCopies(final int numCopies) {

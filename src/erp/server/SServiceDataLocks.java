@@ -6,6 +6,7 @@
 package erp.server;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Vector;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
@@ -173,7 +174,7 @@ public class SServiceDataLocks implements Serializable {
         return lock;
     }
 
-    public synchronized SSrvLock recoverLock(final int sessionId, final int companyId, final int registryType, final Object key, final long timeout) {
+    public synchronized SSrvLock recoverLock(final int sessionId, final int companyId, final int registryType, final Object key, final long timeout, final Date timestamp_n) {
         SSrvLock lock = getLock(companyId, registryType, key);
 
         moServer.renderMessageLn(msService + "Recovering lock for session [" + sessionId + "] (company=" + companyId + ", type=" + registryType + ")...");
