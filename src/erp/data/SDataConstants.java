@@ -650,6 +650,8 @@ public abstract class SDataConstants {
     public static final int HRS_SIE_PAY = 220001;
     public static final int HRS_SIE_PAY_EMP = 220002;
     public static final int HRS_SIE_PAY_MOV = 220003;
+    
+    public static final int MAX_ID = 1000000;
 
     public static final java.lang.String MSG_ERR_DATA_NOT_FOUND = "El tipo de registro no existe.";
     
