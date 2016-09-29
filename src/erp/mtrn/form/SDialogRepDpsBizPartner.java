@@ -344,6 +344,7 @@ public class SDialogRepDpsBizPartner extends javax.swing.JDialog implements erp.
                 map.put("sBizPartner", moFieldBizPartner.getKeyAsIntArray()[0] == 0 ? "(TODOS)" : jcbBizPartner.getSelectedItem().toString());
                 map.put("nFidStDps", SDataConstantsSys.TRNS_ST_DPS_EMITED);
                 map.put("nFidStDpsVal", SDataConstantsSys.TRNS_ST_DPS_VAL_EFF);
+                map.put("sMark", mbParamIsSupplier ? "" : SDataConstantsSys.TXT_UNSIGNED);
 
                 jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_DPS_BPS, map);
                 jasperViewer = new JasperViewer(jasperPrint, false);

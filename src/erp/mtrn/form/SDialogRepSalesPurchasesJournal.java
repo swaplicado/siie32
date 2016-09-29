@@ -280,6 +280,7 @@ public class SDialogRepSalesPurchasesJournal extends javax.swing.JDialog impleme
                 map.put("nFidClsAccMovAdjDis", mbParamIsSupplier ? SDataConstantsSys.FINS_CLS_ACC_MOV_PUR_ADJ_DISC[2] : SDataConstantsSys.FINS_CLS_ACC_MOV_SAL_ADJ_DISC[2]);
                 map.put("sCurrencyErp", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
                 map.put("nFidAccountSystemCategoryId", mbParamIsSupplier ? SDataConstantsSys.FINS_CT_SYS_MOV_PUR : SDataConstantsSys.FINS_CT_SYS_MOV_SAL);
+                map.put("sMark", mbParamIsSupplier ? "" : SDataConstantsSys.TXT_UNSIGNED);
 
                 jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_PS_DIARY, map);
                 jasperViewer = new JasperViewer(jasperPrint, false);

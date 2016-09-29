@@ -290,6 +290,8 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
                 map.put("nFidStDps", SDataConstantsSys.TRNS_ST_DPS_EMITED);
                 map.put("nFidStDpsVal", SDataConstantsSys.TRNS_ST_DPS_VAL_EFF);
                 map.put("nIdCurrencyLocal", miClient.getSessionXXX().getParamsErp().getFkCurrencyId());
+                map.put("sMark", mbParamIsSupplier ? "" : SDataConstantsSys.TXT_UNSIGNED);
+
 
                 jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_DPS_LIST, map);
                 jasperViewer = new JasperViewer(jasperPrint, false);

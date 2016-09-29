@@ -340,6 +340,7 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
                 map.put("sUnit", sUnit);
                 map.put("sUnitBase", unitType == null ? "" : unitType.getUnitBase());
                 map.put("sTitle", mbParamIsSupplier ? "DETALLADO DE COMPRAS POR " : "DETALLADO DE VENTAS POR ");
+                map.put("sMark", mbParamIsSupplier ? "" : SDataConstantsSys.TXT_UNSIGNED);
 
                 jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_DPS_BPS_DETAIL, map);
                 jasperViewer = new JasperViewer(jasperPrint, false);

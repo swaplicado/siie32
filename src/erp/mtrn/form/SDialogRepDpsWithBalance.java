@@ -327,6 +327,7 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
                 map.put("nFidStDpsVal", SDataConstantsSys.TRNS_ST_DPS_VAL_EFF);
                 map.put("nFidAccSysCat", mbParamIsSupplier ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0]);
                 map.put("nFidAccSysTp", mbParamIsSupplier ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]);
+                map.put("sMark", mbParamIsSupplier ? "" : SDataConstantsSys.TXT_UNSIGNED);
 
                 jasperPrint = SDataUtilities.fillReport(miClient, jrbByDpsCurrency.isSelected() ? SDataConstantsSys.REP_TRN_DPS_UNP_CY : SDataConstantsSys.REP_TRN_DPS_UNP, map);
                 jasperViewer = new JasperViewer(jasperPrint, false);

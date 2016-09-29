@@ -1563,6 +1563,7 @@ public abstract class SDataConstantsSys {
 
     public static final java.lang.String TXT_TRNS_TP_LINK_ALL = "DEFAULT";
     public static final java.lang.String TXT_DOUBLE_CLICK = "(Doble click para elegir opción)";
+    public static final java.lang.String TXT_UNSIGNED = "*"; // to be used in DPS reports
     public static final java.lang.String REP_TXT_PROF_LOSS_SPA = "RESULTADO DEL EJERCICIO";
     public static final java.lang.String REP_TXT_PROF_LOSS_ENG = "PROFIT AND LOSS";
 

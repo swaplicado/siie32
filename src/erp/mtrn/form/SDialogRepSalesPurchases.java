@@ -28,8 +28,8 @@ import java.awt.event.KeyEvent;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.AbstractAction;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.view.*;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -434,7 +434,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
                 if (jckIsWithUnits.isSelected()) {
                     map.put("sUnitsColumn", moFieldUnitType.getKeyAsIntArray()[0] == SDataConstantsSys.TRNX_TP_UNIT_TOT_QTY ? "CANT. BRUTA." : moFieldUnitType.getKeyAsIntArray()[0] == SDataConstantsSys.TRNX_TP_UNIT_TOT_LEN ? "LONG. BRUTA" :
                         moFieldUnitType.getKeyAsIntArray()[0] == SDataConstantsSys.TRNX_TP_UNIT_TOT_SURF ? "SUP. BRUTA" : moFieldUnitType.getKeyAsIntArray()[0] == SDataConstantsSys.TRNX_TP_UNIT_TOT_VOL ? "VOL. BRUTA" : "MASA BRUTA");
-                    map.put("sUnitsColumnReturn", moFieldUnitType.getKeyAsIntArray()[0] == SDataConstantsSys.TRNX_TP_UNIT_TOT_QTY ? "CANT. DEV." : moFieldUnitType.getKeyAsIntArray()[0] == SDataConstantsSys.TRNX_TP_UNIT_TOT_LEN ? "LONG. DEV." :
+                   map.put("sUnitsColumnReturn", moFieldUnitType.getKeyAsIntArray()[0] == SDataConstantsSys.TRNX_TP_UNIT_TOT_QTY ? "CANT. DEV." : moFieldUnitType.getKeyAsIntArray()[0] == SDataConstantsSys.TRNX_TP_UNIT_TOT_LEN ? "LONG. DEV." :
                         moFieldUnitType.getKeyAsIntArray()[0] == SDataConstantsSys.TRNX_TP_UNIT_TOT_SURF ? "SUP. DEV." : moFieldUnitType.getKeyAsIntArray()[0] == SDataConstantsSys.TRNX_TP_UNIT_TOT_VOL ? "VOL. DEV." : "MASA DEV.");
                     map.put("sUnitsNet", moFieldUnitType.getKeyAsIntArray()[0] == SDataConstantsSys.TRNX_TP_UNIT_TOT_QTY ? "CANT. NETA" : moFieldUnitType.getKeyAsIntArray()[0] == SDataConstantsSys.TRNX_TP_UNIT_TOT_LEN ? "LONG. NETA" :
                         moFieldUnitType.getKeyAsIntArray()[0] == SDataConstantsSys.TRNX_TP_UNIT_TOT_SURF ? "SUP. NETA" : moFieldUnitType.getKeyAsIntArray()[0] == SDataConstantsSys.TRNX_TP_UNIT_TOT_VOL ? "VOL. NETO" : "MASA NETA");
@@ -442,6 +442,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
                     map.put("sSqlUnitsColumnsRet", createColumnsUnitsAdjReturn(moFieldUnitType.getKeyAsIntArray()[0]));
                     map.put("sUnitBase", getUnitBase(moFieldUnitType.getKeyAsIntArray()[0]));
                 }
+                map.put("sMark", mbParamIsSupplier ? "" : SDataConstantsSys.TXT_UNSIGNED);
 
                 jasperPrint = SDataUtilities.fillReport(miClient, jckIsWithUnits.isSelected() ? SDataConstantsSys.REP_TRN_PS_UNIT : SDataConstantsSys.REP_TRN_PS, map);
                 jasperViewer = new JasperViewer(jasperPrint, false);
