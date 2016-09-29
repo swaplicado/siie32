@@ -189,6 +189,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private int mnAuxEntryPriceAction;
     private int mnAuxEntryPriceEditedIndex;
     private SDataDpsEntryPrice moAuxEntryPriceEdited;
+    
+    private boolean mbHasRightOmitSourceDoc;
 
     /** Creates new form DFormDpsEntry */
     public SFormDpsEntry(erp.client.SClientInterface client) {
@@ -4451,7 +4453,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldDpsContractFuture.setDouble(0d);
         moFieldDpsContractFactor.setDouble(0.10d);
         jckIsPriceConfirm.setSelected(false);
-        
+     
+        mbHasRightOmitSourceDoc = moParamDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL ? 
+            miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_OMT_DOC_SRC).HasRight :
+            miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_OMT_DOC_SRC).HasRight;
+              
         actionPriceClearFields();
     }
 
@@ -4669,11 +4675,13 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             }
         }
 
-        if (!validation.getIsError() && !miClient.getSession().getUser().isAdministrator()) {
+        if (!validation.getIsError()) {
             // Check if entry item needs to be added to document from source document:
 
             try {
-                STrnUtils.checkItemStandaloneDoc(miClient.getSession(), moParamDps.getDpsTypeKey(), moItem.getPkItemId(), moDpsEntry.hasDpsLinksAsDestiny());
+                if (!mbHasRightOmitSourceDoc) {
+                    STrnUtils.checkItemStandaloneDoc(miClient.getSession(), moParamDps.getDpsTypeKey(), moItem.getPkItemId(), moDpsEntry.hasDpsLinksAsDestiny());
+                }
             }
             catch (Exception e) {
                 validation.setMessage(e.getMessage());

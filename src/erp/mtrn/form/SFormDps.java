@@ -239,6 +239,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
     private int mnTypeDelivery;
     private boolean mbHasRightOrderDelay;
+    private boolean mbHasRightOmitSourceDoc;
 
     /**
      * Creates new form DFormDps
@@ -4752,7 +4753,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         boolean ok = true;
         String sLimitCredit = "";
         double balance = obtainBizPartnerBalance();
-        double totalBalance = 0;
+        double totalBal = 0;
 
         if (moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CREDIT) {
             if (moBizPartnerCategory == null) {
@@ -4777,9 +4778,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
             }
             else {
-
-                totalBalance = moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CREDIT ? balance + moDps.getTotal_r() : balance;
-                if ((totalBalance) > moBizPartnerCategory.getEffectiveCreditLimit()) {
+                totalBal = moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CASH ? balance : balance + moDps.getTotal_r();
+                if ((totalBal) > moBizPartnerCategory.getEffectiveCreditLimit()) {
                     sLimitCredit =
                             "La suma del saldo actual del asociado de negocios " +
                             miClient.getSessionXXX().getFormatters().getDecimalsCurrencyLocalFormat().format(balance) + "\n" +
@@ -7020,7 +7020,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mbHasRightOrderDelay = mbIsSales ? 
                 miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD_DELAY).HasRight :
                 miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_DELAY).HasRight;
-
+        mbHasRightOmitSourceDoc = mbIsSales ? 
+                miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_OMT_DOC_SRC).HasRight :
+                miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_OMT_DOC_SRC).HasRight;
         moPaneGridEntries.createTable();
         moPaneGridEntries.clearTableRows();
         moPaneGridEntries.setGridViewStatus(STableConstants.VIEW_STATUS_ALIVE);
@@ -7521,7 +7523,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     SDataDpsEntry entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
                     
                     try {
-                        if (!miClient.getSession().getUser().isAdministrator()) {
+                        if (!mbHasRightOmitSourceDoc) { //condition for check items
                             STrnUtils.checkItemStandaloneDoc(miClient.getSession(), moDps.getDpsTypeKey(), entry.getFkItemId(), entry.hasDpsLinksAsDestiny());
                         }
                     }
