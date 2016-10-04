@@ -11,7 +11,6 @@ import erp.lib.SLibUtilities;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Vector;
-import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 
@@ -21,6 +20,8 @@ import sa.lib.SLibUtils;
  */
 public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
+    public static final int FIELD_AUDIT = 1;
+    
     protected int mnPkYearId;
     protected int mnPkPeriodId;
     protected int mnPkBookkeepingCenterId;
@@ -386,35 +387,22 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
     }
     
     public void saveField(java.sql.Connection connection, final int field, final Object value) throws Exception {
-
-        Statement statement = null;
+        Statement statement = null;    
+        String msSql = "UPDATE " + "fin_rec " + "SET ";
         
-        int queryResultId = SLibConstants.DB_ACTION_SAVE_ERROR;
-        String msSql = "UPDATE " + "fin_rec" + " SET ";
-        
-        try {
-            switch (field) {
-                case SUtilConsts.AUD:
-                    msSql += "b_audit = " + (boolean) value + ", ts_audit = NOW(), fid_usr_audit = " + mnFkUserEditId + " ";
-                    break;
-                
-                default:
-                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-            }
-            
-            statement = connection.createStatement();
-
-            msSql += "WHERE id_year = " + mnPkYearId + " AND id_per = " + mnPkPeriodId + " AND " +
-                        "id_bkc = " + mnPkBookkeepingCenterId + " AND id_tp_rec = '" + msPkRecordTypeId + "' AND id_num = " + mnPkNumberId + " ";
-            
-            statement.execute(msSql);
-
-            queryResultId = SLibConstants.DB_ACTION_SAVE_OK;
+        switch (field) {
+            case FIELD_AUDIT:
+                msSql += "b_audit = " + (boolean) value + ", ts_audit = NOW(), fid_usr_audit = " + mnFkUserEditId + " ";
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
-        catch (Exception e) {
-            SLibUtilities.printOutException(this, e);
-        }
-        
+
+        statement = connection.createStatement();
+        msSql += "WHERE id_year = " + mnPkYearId + " AND id_per = " + mnPkPeriodId + " AND " +
+                    "id_bkc = " + mnPkBookkeepingCenterId + " AND id_tp_rec = '" + msPkRecordTypeId + "' AND id_num = " + mnPkNumberId + " ";
+
+        statement.execute(msSql);
     }
 
     @Override

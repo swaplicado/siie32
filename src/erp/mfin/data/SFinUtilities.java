@@ -151,7 +151,7 @@ public abstract class SFinUtilities {
               "FROM erp.bpsu_bp " +
               "WHERE id_bp = " + bizPartnerId;
 
-        resulSet = session.getStatement().executeQuery(sql);
+        resulSet = session.getDatabase().getConnection().createStatement().executeQuery(sql);
         if (resulSet.next()) {
             if (resulSet.getInt("fid_tp_bp_idy") == SModSysConsts.BPSS_TP_BP_IDY_ORG) {
                 firstname = resulSet.getString("bp");
@@ -160,8 +160,8 @@ public abstract class SFinUtilities {
             else {
                 firstname = resulSet.getString("firstname");
                 lastname = resulSet.getString("lastname");
-                fatherLastname = lastname.substring(0, lastname.indexOf(" "));
-                motherLastname = lastname.substring(fatherLastname.length() + 1);
+                fatherLastname = lastname.substring(0, !lastname.contains(" ") ? lastname.length() : lastname.indexOf(" "));
+                motherLastname = lastname.length() > fatherLastname.length() + 1 ? lastname.substring(fatherLastname.length() + 1) : "";
                 bizPartner = SLibUtilities.textToAlphanumeric(firstname) + "," + SLibUtilities.textToAlphanumeric(fatherLastname) + "/" + SLibUtilities.textToAlphanumeric(motherLastname);
             }
         }

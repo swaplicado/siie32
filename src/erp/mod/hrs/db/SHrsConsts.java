@@ -10,14 +10,6 @@ package erp.mod.hrs.db;
  */
 public class SHrsConsts {
     
-    public static final int LAY_BANK_HSBC = 1;
-    public static final int LAY_BANK_SANTANDER = 2;
-    public static final int LAY_BANK_BANBAJIO = 3;
-
-    public static final java.lang.String TXT_LAY_BANK_HSBC = "LAYOUT HSBC";
-    public static final java.lang.String TXT_LAY_BANK_SANTANDER = "LAYOUT SANTANDER";
-    public static final java.lang.String TXT_LAY_BANK_BANBAJIO = "LAYOUT BANBAJIO";
-    
     public static final int YEAR_DAYS = 365;
     public static final int YEAR_DAYS_FORNIGHTS_FIXED = 360;
     public static final int YEAR_WEEKS = 52;

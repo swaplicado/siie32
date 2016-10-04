@@ -6,11 +6,14 @@ package erp.mod.hrs.db;
 
 import erp.cfd.SCfdConsts;
 import erp.client.SClientInterface;
+import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.table.STableUtilities;
 import erp.mbps.data.SDataBizPartner;
+import erp.mfin.data.SFinUtilities;
 import erp.mhrs.data.SDataPayrollReceiptIssue;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -45,6 +48,163 @@ import sa.lib.gui.SGuiSession;
  * @author Juan Barajas
  */
 public abstract class SHrsUtils {
+    
+    public static void createLayoutBanamexPayroll(SGuiClient client, int payrollId, java.lang.String title, Date dateApplication, String accountDebit, int consecutiveDay, int bankId) {
+        ResultSet resultSetHeader = null;
+        ResultSet resultSetDetail = null;
+        BufferedWriter bw = null;
+        DecimalFormat formatDescTotal = new DecimalFormat("0000000000000000.00");
+        SimpleDateFormat formatDateData = new SimpleDateFormat("yyMMdd");
+        SimpleDateFormat formatDateTitle = new SimpleDateFormat("yyMMdd HHmm");
+        SDataBizPartner oBizPartner = null;
+        SDbPayroll moPayroll = null;
+        String sql = "";
+        String fileName = "";
+        String buffer = "";
+        String sAccountDebit = "";
+        String sAccountCredit = "";
+        String sBizPartner = "";
+        String sDescription = "";
+        String sCompany = "";
+        double mdBalance = 0;
+        double mdBalanceTotal = 0;
+        int nMoveNumTotal = 0;
+        
+        oBizPartner = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) client, SDataConstants.BPSU_BP, new int[] { bankId }, SLibConstants.EXEC_MODE_SILENT);
+        moPayroll = (SDbPayroll)  client.getSession().readRegistry(SModConsts.HRS_PAY, new int[] { payrollId }, SDbConsts.MODE_STEALTH);
+        sDescription = (moPayroll.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? SHrsFormerConsts.PAY_WEE_ABB : SHrsFormerConsts.PAY_BIW_ABB ) + moPayroll.getNumber() + " " + formatDateData.format(dateApplication);
+        sCompany = ((SClientInterface) client).getSessionXXX().getCompany().getDbmsDataCompany().getBizPartner();
+        
+        fileName = formatDateTitle.format(new Date()).concat(" bmx nom");
+
+        client.getFileChooser().setSelectedFile(new File(fileName));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+
+            try {
+                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "ASCII"));
+                
+                sAccountDebit = SLibUtilities.textTrim(accountDebit).replace("-", "");
+                
+                // control registry (type 1)
+                buffer += "1"; //type of registry
+                buffer += SLibUtilities.textRepeat("0", 12 - oBizPartner.getDbmsCategorySettingsSup().getCompanyKey().length()).concat(oBizPartner.getDbmsCategorySettingsSup().getCompanyKey()); //client
+                buffer += formatDateData.format(dateApplication); //payment date
+                buffer += SLibUtilities.textRepeat("0", 4 - ("" + consecutiveDay).length()).concat("" + consecutiveDay); //sequential number
+                buffer += sCompany.length() > 36 ? sCompany.substring(0,35) : sCompany.concat(SLibUtilities.textRepeat(" ", 36 - sCompany.length())); //company's name
+                buffer += sDescription.concat(SLibUtilities.textRepeat(" ", (sDescription.length() >= 20 ? 0 : 20 - sDescription.length()))); //description
+                buffer += "15"; //nature of file
+                buffer += "D"; //layout version
+                buffer += "01"; //type of debit
+                
+                bw.write(buffer);
+                bw.newLine();
+                
+                // global registry (Type 2)
+                sql = "SELECT rcp.id_emp, emp.bank_acc, " +
+                        "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
+                        "FROM hrs_pay_rcp AS r " +
+                        "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
+                        "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ear.b_del = 0 AND rcp_ear.id_emp = rcp.id_emp) - " +
+                        "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) " +
+                        "FROM hrs_pay_rcp AS r " +
+                        "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = r.id_pay AND rcp_ded.id_emp = r.id_emp " +
+                        "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.id_emp = rcp.id_emp) AS pay_net " +
+                        "FROM hrs_pay AS p " +
+                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
+                        "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
+                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0 ";
+                
+                resultSetHeader = client.getSession().getStatement().executeQuery(sql);
+                while (resultSetHeader.next()) {
+                    mdBalanceTotal += resultSetHeader.getDouble("pay_net");
+                    nMoveNumTotal++;
+                }
+                
+                buffer = "";
+                buffer += "2"; //type of registry
+                buffer += "1"; //type of operation
+                buffer += "001"; //currency key
+                buffer += formatDescTotal.format(mdBalanceTotal).replace(".", ""); //amount to be debit
+                buffer += "01"; //account type
+                buffer += SLibUtilities.textRepeat("0", 20 - sAccountDebit.length()).concat(sAccountDebit); //account number
+                buffer += SLibUtilities.textRepeat("0", 6 - ("" + nMoveNumTotal).length()).concat("" + nMoveNumTotal); //total credits
+                
+                bw.write(buffer);
+                bw.newLine();
+                
+                // detail registry (type 3)
+                sql = "SELECT rcp.id_emp, emp.bank_acc, " +
+                        "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
+                        "FROM hrs_pay_rcp AS r " +
+                        "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
+                        "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ear.b_del = 0 AND rcp_ear.id_emp = rcp.id_emp) - " +
+                        "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) " +
+                        "FROM hrs_pay_rcp AS r " +
+                        "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = r.id_pay AND rcp_ded.id_emp = r.id_emp " +
+                        "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.id_emp = rcp.id_emp) AS pay_net " +
+                        "FROM hrs_pay AS p " +
+                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
+                        "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
+                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0 ";
+                
+                resultSetDetail = client.getSession().getStatement().executeQuery(sql);
+                while (resultSetDetail.next()) {
+                    buffer = "";
+                    
+                    sAccountCredit = SLibUtilities.textTrim(resultSetDetail.getString("emp.bank_acc"));
+                    mdBalance = resultSetDetail.getDouble("pay_net");
+                    sBizPartner = SFinUtilities.getBizPartnerForBanamex(client.getSession(), resultSetDetail.getInt("rcp.id_emp"));
+                    
+                    buffer += "3"; //type of registry
+                    buffer += "0"; //type of operation
+                    buffer += "001"; //payment method
+                    buffer += "01"; //payment type
+                    buffer += "001"; //currency key
+                    buffer += formatDescTotal.format(mdBalance).replace(".", ""); //amount
+                    buffer += "03"; //type of account credit
+                    buffer += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 20 ? 0 : 20 - sAccountCredit.length())).concat(sAccountCredit); //Credit account
+                    buffer += sDescription.concat(sDescription.length() > 16 ? sDescription.substring(0,15) : (SLibUtilities.textRepeat(" ", (sDescription.length() == 16 ? 0 : 16 - sDescription.length())))); //payment reference
+                    buffer += sBizPartner.concat(sBizPartner.length() > 55 ? sBizPartner.substring(0,54) : (SLibUtilities.textRepeat(" ", (sBizPartner.length() == 55 ? 0 : 55 - sBizPartner.length())))); //beneficiary
+                    buffer += SLibUtilities.textRepeat(" ", 35); //reference 1
+                    buffer += SLibUtilities.textRepeat(" ", 35); //reference 2
+                    buffer += SLibUtilities.textRepeat(" ", 35); //reference 3
+                    buffer += SLibUtilities.textRepeat(" ", 35); //reference 4
+                    buffer += SLibUtilities.textRepeat("0", 4); //key bank
+                    buffer += "00"; //term
+                    buffer += SLibUtilities.textRepeat(" ", 14); //RFC
+                    buffer += SLibUtilities.textRepeat("0", 8); //IVA
+                    buffer += SLibUtilities.textRepeat(" ", 80); //future use
+                    buffer += SLibUtilities.textRepeat(" ", 50); //future use
+                    
+                    bw.write(buffer);
+                    bw.newLine();                    
+                }
+                
+                // Summary:
+                
+                buffer = "";
+                buffer += "4";//type of registry
+                buffer += "001";//currency key
+                buffer += SLibUtilities.textRepeat("0", 6 - (nMoveNumTotal + "").length()).concat(nMoveNumTotal + ""); //number of credits
+                buffer += formatDescTotal.format(mdBalanceTotal).replace(".", ""); //total amount of credits
+                buffer += SLibUtilities.textRepeat("0", 5).concat("1"); //number of debit
+                buffer += formatDescTotal.format(mdBalanceTotal).replace(".", ""); //total amount of debit
+
+                bw.write(buffer);
+                bw.newLine();
+                bw.flush();
+                bw.close();
+
+                if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                    SLibUtilities.launchFile(file.getPath());
+                }
+            }
+            catch (java.lang.Exception e) {
+                SLibUtilities.renderException(STableUtilities.class.getName(), e);
+            }
+        }
+    }
 
     public static void createLayoutBanBajioPayroll(SGuiClient client, int payrollId, java.lang.String title, Date dateApplication, String accountDebit, int consecutiveDay) {
         ResultSet resultSet = null;
@@ -112,6 +272,7 @@ public abstract class SHrsUtils {
                         "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
                         "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
                         "WHERE p.b_del = 0 AND rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0";
+                
                 resultSet = client.getSession().getStatement().executeQuery(sql);
                 while (resultSet.next()) {
                     buffer = "";
@@ -150,7 +311,8 @@ public abstract class SHrsUtils {
                     nMoveNumTotal++;
                 }
 
-                // Summary
+                // Summary:
+                
                 buffer = "";
                 n = (int) (Math.floor(Math.log10(nMoveNum)) + 1);
                 m = (int) (Math.floor(Math.log10(nMoveNumTotal)) + 1);

@@ -32,62 +32,64 @@ import sa.gui.util.SUtilConsts;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Edwin Carmona
  */
 public class SViewRecord extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
+    private javax.swing.JButton mjbCopy;
     private javax.swing.JButton mjbPrintRecord;
-    private javax.swing.JButton mjbPrintRecordCurrency;
-    private javax.swing.JButton jbCopy;
-    private javax.swing.JButton mjbAuthorize;
-    private javax.swing.JButton mjbReject;
+    private javax.swing.JButton mjbPrintRecordCy;
+    private javax.swing.JButton mjbAudit;
+    private javax.swing.JButton mjbAuditRevoke;
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     private erp.mfin.view.SPanelFilterRecordType moPanelFilterRecordType;
     private int mnViewType;
-    private boolean mbActionAudit;
 
+    /**
+     * @param cliente GUI client.
+     * @param tabTitle View's tab title.
+     * @param viewType View's tipe. Constants allowed: SLibConsts.UNDEFINED = standard view, all accounting records; SUtilConsts.AUD = audited records; SUtilConsts.AUD_PEND = audit pending records.
+     */
     public SViewRecord(erp.client.SClientInterface client, java.lang.String tabTitle, int viewType) {
         super(client, tabTitle, SDataConstants.FIN_REC);
         mnViewType = viewType;
-        mbActionAudit = false;
         initComponents();
     }
 
     private void initComponents() {
-        int i;
+        int col = 0;
         int levelRightEdit = SDataConstantsSys.UNDEFINED;
 
+        mjbCopy = new JButton(miClient.getImageIcon(SLibConstants.ICON_COPY));
+        mjbCopy.setPreferredSize(new Dimension(23, 23));
+        mjbCopy.setToolTipText("Copiar");
+        mjbCopy.addActionListener(this);
+        
         mjbPrintRecord = new JButton(miClient.getImageIcon(SLibConstants.ICON_PRINT));
-        mjbPrintRecordCurrency = new JButton(miClient.getImageIcon(SLibConstants.ICON_PRINT));
+        mjbPrintRecordCy = new JButton(miClient.getImageIcon(SLibConstants.ICON_PRINT));
         mjbPrintRecord.setPreferredSize(new Dimension(23, 23));
-        mjbPrintRecordCurrency.setPreferredSize(new Dimension(23, 23));
-        mjbPrintRecord.addActionListener(this);
-        mjbPrintRecordCurrency.addActionListener(this);
+        mjbPrintRecordCy.setPreferredSize(new Dimension(23, 23));
         mjbPrintRecord.setToolTipText("Imprimir póliza, moneda local");
-        mjbPrintRecordCurrency.setToolTipText("Imprimir póliza, moneda póliza");
+        mjbPrintRecordCy.setToolTipText("Imprimir póliza, moneda póliza");
+        mjbPrintRecord.addActionListener(this);
+        mjbPrintRecordCy.addActionListener(this);
         
-        mjbAuthorize = new JButton(miClient.getImageIcon(SLibConstants.ICON_APPROVE));
-        mjbReject = new JButton(miClient.getImageIcon(SLibConstants.ICON_APPROVE_NO));
-
-        jbCopy = new JButton(miClient.getImageIcon(SLibConstants.ICON_COPY));
-        jbCopy.setPreferredSize(new Dimension(23, 23));
-        jbCopy.setToolTipText("Copiar");
-        jbCopy.addActionListener(this);
-        
-        mjbAuthorize.setPreferredSize(new Dimension(23, 23));
-        mjbReject.setPreferredSize(new Dimension(23, 23));
-        mjbAuthorize.addActionListener(this);
-        mjbReject.addActionListener(this);
-        mjbAuthorize.setToolTipText("Audita Póliza");
-        mjbReject.setToolTipText("No audita Póliza");
+        mjbAudit = new JButton(miClient.getImageIcon(SLibConstants.ICON_APPROVE));
+        mjbAuditRevoke = new JButton(miClient.getImageIcon(SLibConstants.ICON_APPROVE_NO));
+        mjbAudit.setPreferredSize(new Dimension(23, 23));
+        mjbAuditRevoke.setPreferredSize(new Dimension(23, 23));
+        mjbAudit.setToolTipText("Marcar como auditado");
+        mjbAuditRevoke.setToolTipText("Desmarcar como auditado");
+        mjbAudit.addActionListener(this);
+        mjbAuditRevoke.addActionListener(this);
 
         moTabFilterDeleted = new STabFilterDeleted(this);
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         moPanelFilterRecordType = new SPanelFilterRecordType(miClient, this);
 
         addTaskBarUpperSeparator();
-        addTaskBarUpperComponent(jbCopy);
+        addTaskBarUpperComponent(mjbCopy);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
         addTaskBarUpperSeparator();
@@ -96,60 +98,55 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
         addTaskBarUpperComponent(moPanelFilterRecordType);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(mjbPrintRecord);
-        addTaskBarUpperComponent(mjbPrintRecordCurrency);
+        addTaskBarUpperComponent(mjbPrintRecordCy);
         addTaskBarUpperSeparator();
-        addTaskBarUpperComponent(mjbAuthorize);
-        addTaskBarUpperComponent(mjbReject);
-
-        jbDelete.setEnabled(false);
-        mjbPrintRecord.setEnabled(true);
-        mjbPrintRecordCurrency.setEnabled(true);
-        enableHandButtons();
+        addTaskBarUpperComponent(mjbAudit);
+        addTaskBarUpperComponent(mjbAuditRevoke);
 
         STableField[] aoKeyFields = new STableField[5];
         STableColumn[] aoTableColumns = new STableColumn[26];
 
-        i = 0;
-        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "r.id_year");
-        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "r.id_per");
-        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "r.id_bkc");
-        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "r.id_tp_rec");
-        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "r.id_num");
-        for (i = 0; i < aoKeyFields.length; i++) {
+        col = 0;
+        aoKeyFields[col++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "r.id_year");
+        aoKeyFields[col++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "r.id_per");
+        aoKeyFields[col++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "r.id_bkc");
+        aoKeyFields[col++] = new STableField(SLibConstants.DATA_TYPE_STRING, "r.id_tp_rec");
+        aoKeyFields[col++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "r.id_num");
+        for (int i = 0; i < aoKeyFields.length; i++) {
             moTablePane.getPrimaryKeyFields().add(aoKeyFields[i]);
         }
 
-        i = 0;
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_per", "Período póliza", STableConstants.WIDTH_YEAR_PERIOD);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bkc.code", "Centro contable", STableConstants.WIDTH_CODE_COB);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cob.code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num", "Folio póliza", STableConstants.WIDTH_RECORD_NUM);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "r.dt", "Fecha póliza", STableConstants.WIDTH_DATE);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "r.concept", "Concepto", 200);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_debit", "Cargos $", STableConstants.WIDTH_VALUE_2X);
-        aoTableColumns[i++].setSumApplying(true);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_credit", "Abonos $", STableConstants.WIDTH_VALUE_2X);
-        aoTableColumns[i++].setSumApplying(true);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_balance", "Saldo $", STableConstants.WIDTH_VALUE_2X);
-        aoTableColumns[i++].setSumApplying(true);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "r.b_sys", "Sistema", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "e.ent", "Cuenta efectivo", 100);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "r.b_adj_year", "Cierre", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "r.b_adj_audit", "Auditoría", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "r.b_audit", "Auditada", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uaud.usr", "Usr. auditoría", STableConstants.WIDTH_USER);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "r.ts_audit", "Auditoría", STableConstants.WIDTH_DATE_TIME);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "r.b_authorn", "Autorizada", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uaut.usr", "Usr. autorización", STableConstants.WIDTH_USER);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "r.ts_authorn", "Autorización", STableConstants.WIDTH_DATE_TIME);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "r.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usr. creación", STableConstants.WIDTH_USER);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "r.ts_new", "Creación", STableConstants.WIDTH_DATE_TIME);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ue.usr", "Usr. modificación", STableConstants.WIDTH_USER);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "r.ts_edit", "Modificación", STableConstants.WIDTH_DATE_TIME);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ud.usr", "Usr. eliminación", STableConstants.WIDTH_USER);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "r.ts_del", "Eliminación", STableConstants.WIDTH_DATE_TIME);
-        for (i = 0; i < aoTableColumns.length; i++) {
+        col = 0;
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_per", "Período póliza", STableConstants.WIDTH_YEAR_PERIOD);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bkc.code", "Centro contable", STableConstants.WIDTH_CODE_COB);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cob.code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num", "Folio póliza", STableConstants.WIDTH_RECORD_NUM);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "r.dt", "Fecha póliza", STableConstants.WIDTH_DATE);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "r.concept", "Concepto", 200);
+        aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_debit", "Cargos $", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[col++].setSumApplying(true);
+        aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_credit", "Abonos $", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[col++].setSumApplying(true);
+        aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_balance", "Saldo $", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[col++].setSumApplying(true);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "r.b_sys", "Sistema", STableConstants.WIDTH_BOOLEAN);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "e.ent", "Cuenta efectivo", 100);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "r.b_adj_year", "Cierre", STableConstants.WIDTH_BOOLEAN);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "r.b_adj_audit", "Auditoría", STableConstants.WIDTH_BOOLEAN);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "r.b_audit", "Auditada", STableConstants.WIDTH_BOOLEAN);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uaud.usr", "Usr. auditoría", STableConstants.WIDTH_USER);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "r.ts_audit", "Auditoría", STableConstants.WIDTH_DATE_TIME);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "r.b_authorn", "Autorizada", STableConstants.WIDTH_BOOLEAN);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uaut.usr", "Usr. autorización", STableConstants.WIDTH_USER);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "r.ts_authorn", "Autorización", STableConstants.WIDTH_DATE_TIME);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "r.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usr. creación", STableConstants.WIDTH_USER);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "r.ts_new", "Creación", STableConstants.WIDTH_DATE_TIME);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ue.usr", "Usr. modificación", STableConstants.WIDTH_USER);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "r.ts_edit", "Modificación", STableConstants.WIDTH_DATE_TIME);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ud.usr", "Usr. eliminación", STableConstants.WIDTH_USER);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "r.ts_del", "Eliminación", STableConstants.WIDTH_DATE_TIME);
+        for (int i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);
         }
 
@@ -158,8 +155,12 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
 
         jbNew.setEnabled(levelRightEdit >= SUtilConsts.LEV_AUTHOR);
         jbEdit.setEnabled(levelRightEdit >= SUtilConsts.LEV_AUTHOR);
-        jbCopy.setEnabled(levelRightEdit >= SUtilConsts.LEV_AUTHOR);
-        //jbDelete.setEnabled(false);
+        mjbCopy.setEnabled(levelRightEdit >= SUtilConsts.LEV_AUTHOR);
+        jbDelete.setEnabled(false);
+        mjbPrintRecord.setEnabled(true);
+        mjbPrintRecordCy.setEnabled(true);
+        mjbAudit.setEnabled(mnViewType == SUtilConsts.AUD_PEND);
+        mjbAuditRevoke.setEnabled(mnViewType == SUtilConsts.AUD);
 
         setIsSummaryApplying(true);
 
@@ -181,21 +182,6 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
         mvSuscriptors.add(SDataConstants.USRU_USR);
 
         populateTable();
-    }
-    
-    private void enableHandButtons(){
-        if (mnViewType == SDataConstants.FIN_REC) {
-            mjbAuthorize.setEnabled(false);
-            mjbReject.setEnabled(false);
-        }
-        else if (mnViewType == SUtilConsts.AUD_PEND) {
-            mjbAuthorize.setEnabled(true);
-            mjbReject.setEnabled(false);
-        }
-        else {
-            mjbAuthorize.setEnabled(false);
-            mjbReject.setEnabled(true);
-        }
     }
 
     @Override
@@ -232,7 +218,7 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
     public void actionCopy() {
         SDataRecord oRecord = null;
 
-        if (jbCopy.isEnabled()) {
+        if (mjbCopy.isEnabled()) {
             if (moTablePane.getSelectedTableRow() != null && !moTablePane.getSelectedTableRow().getIsSummary()) {
                 oRecord = (SDataRecord) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_REC, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
@@ -293,7 +279,7 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
         }
     }
 
-    private void actionPrintCurrency() {
+    private void actionPrintCy() {
         Cursor cursor = getCursor();
         Map<String, Object> map = null;
         JasperPrint jasperPrint = null;
@@ -334,26 +320,22 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
         }
     }
     
-    private void actionAudit(){
-        SDataRecord oRecord;
-        String auditMsg = mbActionAudit ? SLibConstants.MSG_CNF_DOC_AUDIT_YES : SLibConstants.MSG_CNF_DOC_AUDIT_NO;
+    private void actionAudit(boolean audit) {
+        SDataRecord record;
+        String msg = audit ? SLibConstants.MSG_CNF_DOC_AUDIT_YES : SLibConstants.MSG_CNF_DOC_AUDIT_NO;
         
-        if (miClient.showMsgBoxConfirm(auditMsg) == JOptionPane.YES_OPTION) {
-        
-            oRecord = (SDataRecord) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_REC, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-            oRecord.setPrimaryKey(moTablePane.getSelectedTableRow().getPrimaryKey());
+        if (miClient.showMsgBoxConfirm(msg) == JOptionPane.YES_OPTION) {
+            record = (SDataRecord) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_REC, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+            record.setPrimaryKey(moTablePane.getSelectedTableRow().getPrimaryKey());
+            
             try {
-                oRecord.saveField(miClient.getSession().getDatabase().getConnection(), SUtilConsts.AUD, mbActionAudit);
+                record.saveField(miClient.getSession().getDatabase().getConnection(), SDataRecord.FIELD_AUDIT, audit);
                 populateTable();
             }
             catch (Exception e) {
                 SLibUtilities.renderException(this, e);
             }
         }
-    }
-    
-    private void actionNoAudit(){
-        actionAudit();
     }
 
     @Override
@@ -364,25 +346,24 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
         for (int i = 0; i < mvTableSettings.size(); i++) {
             setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
             if (setting.getType() == STableConstants.SETTING_FILTER_DELETED && setting.getStatus() == STableConstants.STATUS_ON) {
-                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "r.b_del = FALSE ";
+                sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "r.b_del = FALSE ";
             }
             else if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {
-                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "r.dt");
+                sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "r.dt");
             }
             else if (setting.getType() == STableConstants.SETTING_FILTER_FIN_REC_TYPE) {
-                if (((String) setting.getSetting()).length() > 0) {
-                    sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "r.id_tp_rec = '" + (String) setting.getSetting() + "' ";
+                if (!((String) setting.getSetting()).isEmpty()) {
+                    sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "r.id_tp_rec = '" + (String) setting.getSetting() + "' ";
                 }
             }
         }
         
         switch (mnViewType) {
-            
             case SUtilConsts.AUD:
-                sqlWhere += " AND r.b_audit = 1 ";
+                sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "r.b_audit = 1 ";
                 break;
             case SUtilConsts.AUD_PEND:
-                sqlWhere += " AND r.b_audit = 0 ";
+                sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "r.b_audit = 0 ";
                 break;
             default:
         }
@@ -425,25 +406,23 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
     public void actionPerformed(java.awt.event.ActionEvent e) {
         super.actionPerformed(e);
 
-        if (e.getSource() instanceof javax.swing.JButton) {
+        if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
 
-            if (button == mjbPrintRecord) {
-                actionPrint();
-            }
-            else if (button == mjbPrintRecordCurrency) {
-                actionPrintCurrency();
-            }
-            else if (button == jbCopy) {
+            if (button == mjbCopy) {
                 actionCopy();
             }
-            else if (button == mjbAuthorize) {
-                mbActionAudit = true;
-                actionAudit();
+            else if (button == mjbPrintRecord) {
+                actionPrint();
             }
-            else if (button == mjbReject) {
-                mbActionAudit = false;
-                actionNoAudit();
+            else if (button == mjbPrintRecordCy) {
+                actionPrintCy();
+            }
+            else if (button == mjbAudit) {
+                actionAudit(true);
+            }
+            else if (button == mjbAuditRevoke) {
+                actionAudit(false);
             }
         }
     }

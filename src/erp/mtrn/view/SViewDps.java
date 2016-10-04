@@ -333,7 +333,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         moDialogUpdateDpsRefCommissions = new SDialogUpdateDpsReferenceComms(miClient);
         moDialogContractAnalysis = new SDialogContractAnalysis(miClient);
         moDialogAccountingMoveDpsBizPartner = new SDialogAccountingMoveDpsBizPartner(miClient, mnTabTypeAux01);
-        moDialogAnnulCfdi = new SDialogAnnulCfdi(miClient, true);
+        moDialogAnnulCfdi = new SDialogAnnulCfdi(miClient);
         moCfdPrint = new SCfdPrint(miClient);
 
         if (mbIsOrd || mbIsDoc || mbIsDocAdj) {
@@ -701,21 +701,21 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             moDialogAnnulCfdi.formReset();
                             moDialogAnnulCfdi.formRefreshCatalogues();
                             moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, dps.getDate());
-                            moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DPS_TP, dps.getCfdTipoDeComprobante());
+                            moDialogAnnulCfdi.setValue(SModConsts.TRNS_TP_CFD, dps.getCfdTipoDeComprobante());
                             moDialogAnnulCfdi.setVisible(true);
 
                             if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                                 annul = true;
                                 params.getParamsMap().put(SGuiConsts.PARAM_DATE, moDialogAnnulCfdi.getDate());
                                 params.getParamsMap().put(SGuiConsts.PARAM_REQ_DOC, moDialogAnnulCfdi.getAnnulSat()); // SGuiConsts.PARAM_REQ_DOC is used to indicate if SAT cancellation is required
-                                params.getParamsMap().put(SModConsts.TRNU_TP_DPS_ANN, moDialogAnnulCfdi.getTpDpsAnn());
+                                params.getParamsMap().put(SModConsts.TRNU_TP_DPS_ANN, moDialogAnnulCfdi.getDpsAnnulationType()); // cause of annulation
                             }
                         }
                         else {
                             annul = true;
                             params.getParamsMap().put(SGuiConsts.PARAM_DATE, miClient.getSession().getCurrentDate());
                             params.getParamsMap().put(SGuiConsts.PARAM_REQ_DOC, false);
-                            params.getParamsMap().put(SModConsts.TRNU_TP_DPS_ANN, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                            params.getParamsMap().put(SModConsts.TRNU_TP_DPS_ANN, SModSysConsts.TRNU_TP_DPS_ANN_NA); // cause of annulation
                         }
                     }
 

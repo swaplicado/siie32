@@ -96,7 +96,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         jbPrintReportsPayroll = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Reportes de nómina", this);
         jbLayout = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout pago de nóminas", this);
         
-        moDialogAnnulCfdi = new SDialogAnnulCfdi((SClientInterface) miClient, true);
+        moDialogAnnulCfdi = new SDialogAnnulCfdi((SClientInterface) miClient);
         
         jbImport.setEnabled(true);
         /* XXX (jbarajas, 2016-08-16) slowly open payroll
@@ -213,11 +213,11 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                             moDialogAnnulCfdi.formReset();
                             moDialogAnnulCfdi.formRefreshCatalogues();
                             moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, (cfds == null || cfds.isEmpty() ? miClient.getSession().getCurrentDate() : cfds.get(0).getTimestamp()));
-                            moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DPS_TP, (cfds == null || cfds.isEmpty() ? SLibConstants.UNDEFINED : cfds.get(0).getFkCfdTypeId()));
+                            moDialogAnnulCfdi.setValue(SModConsts.TRNS_TP_CFD, (cfds == null || cfds.isEmpty() ? SLibConstants.UNDEFINED : cfds.get(0).getFkCfdTypeId()));
                             moDialogAnnulCfdi.setVisible(true);
 
                             if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                                payrollAnnul = new SHrsPayrollAnnul((SClientInterface) miClient, cfds, receiptIssues, SCfdConsts.CFDI_PAYROLL_VER_CUR, true, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat(), moDialogAnnulCfdi.getTpDpsAnn());
+                                payrollAnnul = new SHrsPayrollAnnul((SClientInterface) miClient, cfds, receiptIssues, SCfdConsts.CFDI_PAYROLL_VER_CUR, true, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat(), moDialogAnnulCfdi.getDpsAnnulationType());
                                 needUpdate = payrollAnnul.annulPayroll();
                             }
 

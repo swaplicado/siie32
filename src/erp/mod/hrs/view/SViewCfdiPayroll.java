@@ -95,7 +95,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
         jbRestoreAcknowledgmentCancellation = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_insert.gif")), "Insertar PDF del acuse de cancelación del CFDI", this);
         jbDeactivateControlFlags = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif")), "Limpiar inconsistencias del timbrado o cancelación del CFDI", this);
 
-        moDialogAnnulCfdi = new SDialogAnnulCfdi((SClientInterface) miClient, true);
+        moDialogAnnulCfdi = new SDialogAnnulCfdi((SClientInterface) miClient);
         moDialogFormerPayrollDate = new SDialogFormerPayrollDate(miClient, SModConsts.HRSX_DATE, "Fecha de pago");
 
         switch (mnGridSubtype) {
@@ -334,11 +334,11 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                         moDialogAnnulCfdi.formReset();
                         moDialogAnnulCfdi.formRefreshCatalogues();
                         moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, (cfds == null || cfds.isEmpty() ? miClient.getSession().getCurrentDate() : cfds.get(0).getTimestamp()));
-                        moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DPS_TP, (cfds == null || cfds.isEmpty() ? cfd == null ? SLibConstants.UNDEFINED : cfd.getFkCfdTypeId() : cfds.get(0).getFkCfdTypeId()));
+                        moDialogAnnulCfdi.setValue(SModConsts.TRNS_TP_CFD, (cfds == null || cfds.isEmpty() ? cfd == null ? SLibConstants.UNDEFINED : cfd.getFkCfdTypeId() : cfds.get(0).getFkCfdTypeId()));
                         moDialogAnnulCfdi.setVisible(true);
 
                         if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                            payrollAnnul = new SHrsPayrollAnnul((SClientInterface) miClient, cfds, receiptIssues, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), mnGridSubtype == SModConsts.VIEW_SC_SUM, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat(), moDialogAnnulCfdi.getTpDpsAnn());
+                            payrollAnnul = new SHrsPayrollAnnul((SClientInterface) miClient, cfds, receiptIssues, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), mnGridSubtype == SModConsts.VIEW_SC_SUM, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat(), moDialogAnnulCfdi.getDpsAnnulationType());
                             needUpdate = payrollAnnul.annulPayroll();
                         }
 
