@@ -293,6 +293,7 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
         jckAnnulSat.setSelected(true);
         mtDateDps = null;
         
+        moKeyDpsAnnulationType.setValue(new int[] { SModSysConsts.TRNU_TP_DPS_ANN_NA });
         enableFieldDpsAnnulationType();
     }
 
