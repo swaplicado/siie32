@@ -227,7 +227,7 @@ public class SViewDpsAnnulled extends erp.lib.table.STableTab implements java.aw
                 "INNER JOIN erp.bpsu_bp AS bp ON d.fid_bp_r = bp.id_bp " +
                 "INNER JOIN erp.bpsu_bp_ct AS bpc ON bp.id_bp = bpc.id_bp " +
                 "INNER JOIN erp.bpsu_bpb AS bpb ON d.fid_bpb = bpb.id_bpb " +
-                "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps AND ";
+                "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps ";
 
         msSql +=
                 "INNER JOIN erp.usru_usr AS ul ON d.fid_usr_link = ul.id_usr " +
