@@ -7341,10 +7341,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                             validation.setComponent(jbRecordManualSelect);
                                         }
                                         else if (!SLibTimeUtilities.isBelongingToPeriod(moFieldDate.getDate(), moRecordUser.getPkYearId(), moRecordUser.getPkPeriodId())) {
-                                            validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_DATE_REC);
-                                            validation.setComponent(jftDate);
+                                            if (miClient.showMsgBoxConfirm(SLibConstants.MSG_ERR_GUI_PER_DATE_REC + "\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlDate.getText() + "'.");
+                                                validation.setComponent(jftDate);
+                                            }
+                                            else if (!SDataUtilities.isPeriodOpen(miClient, moRecordUser.getDate())) {
+                                                validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
+                                                validation.setComponent(jckRecordUser);
+                                            }
                                         }
-                                        else {
+                                        
+                                        if (!validation.getIsError()) {
                                             try {
                                                 SSrvUtils.verifyLockStatus(miClient.getSession(), moRecordUserLock);
                                             }
