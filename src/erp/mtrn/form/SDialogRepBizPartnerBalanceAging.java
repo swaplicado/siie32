@@ -517,6 +517,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
     private void computeReport15_30_45() {
         // Former report style:
         
+        int nSortBizPartner = 0;
         String nameCoBranch = "";
         String nameBizPartner = "";
         String sqlCoBranch = "";
@@ -544,6 +545,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         }
 
         if (mnBizPartnerCategory == SModSysConsts.BPSS_CT_BP_SUP) {
+            nSortBizPartner = miClient.getSessionXXX().getParamsErp().getFkSortingSupplierTypeId();
             if (miClient.getSessionXXX().getParamsErp().getFkSortingSupplierTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
                 sqlOrderBy = "ct.bp_key, bp.bp_comm, bp.bp, bp.id_bp, ac.fid_tp_acc_r, ac.fid_cl_acc_r ASC ";
             }
@@ -555,6 +557,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
             }
         }
         else {
+            nSortBizPartner = miClient.getSessionXXX().getParamsErp().getFkSortingCustomerTypeId();
             if (miClient.getSessionXXX().getParamsErp().getFkSortingCustomerTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
                 sqlOrderBy = "ct.bp_key, bp.bp_comm, bp.bp, bp.id_bp, ac.fid_tp_acc_r, ac.fid_cl_acc_r DESC ";
             }
@@ -581,6 +584,9 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
             oMap.put("tDateCut", moFieldDateCutoff.getDate());
             oMap.put("nDateEval", (jrbDocDateDueDate.isSelected() ? 1 : 0)); // 1: Due's date, 0: Credit's date.
             oMap.put("nSort", (jrbDocSortDate.isSelected() ? 1 : 0)); // 1: Sort by date, 0: Sort by num doc.
+            oMap.put("nCfgsTpSortNameKey", SDataConstantsSys.CFGS_TP_SORT_NAME_KEY);
+            oMap.put("nCfgsTpSortKeyName", SDataConstantsSys.CFGS_TP_SORT_KEY_NAME);
+            oMap.put("nCfgsTpSort", nSortBizPartner);
             oMap.put("sSqlFkBpId", sqlBizPartner);
             oMap.put("sSqlCob", sqlCoBranch);
             oMap.put("sSqlOrderBy", sqlOrderBy);

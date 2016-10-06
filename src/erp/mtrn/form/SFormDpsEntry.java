@@ -2308,7 +2308,13 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             }
             else {
                 jTabbedPane.setEnabledAt(TAB_CFD, false);
-            } 
+            }
+            
+            if (moParamDps != null) {
+                mbRightOmitSourceDoc = moParamDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL ? 
+                    miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_OMT_DOC_SRC).HasRight :
+                    miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_OMT_DOC_SRC).HasRight;
+            }
         }
     }
 
@@ -4368,7 +4374,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     @Override
     public void formReset() {
         mbResetingForm = true;
-
+        mbRightOmitSourceDoc = false;
         mbAllowDiscount = true;
         
         mnFormResult = SLibConstants.UNDEFINED;
@@ -4453,11 +4459,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldDpsContractFactor.setDouble(0.10d);
         jckIsPriceConfirm.setSelected(false);
 
-        /*
-        mbHasRightOmitSourceDoc = moParamDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL ? 
-            miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_OMT_DOC_SRC).HasRight :
-            miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_OMT_DOC_SRC).HasRight;
-        */
         actionPriceClearFields();
     }
 
@@ -5001,7 +5002,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
             default:
         }
-
+        
         mbUpdatingForm = false;
     }
 
