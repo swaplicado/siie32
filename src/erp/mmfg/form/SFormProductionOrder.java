@@ -2194,8 +2194,8 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
             moProductionOrder = new SDataProductionOrder();
             moProductionOrder.setPkYearId(period[0]);
             moProductionOrder.setFkOrdStatusId(SDataConstantsSys.MFGS_ST_ORD_NEW);
-            moProductionOrder.setFkOrdYearId_n(moFieldFkProductionOrderId_n.getKeyAsIntArray()[0]);
-            moProductionOrder.setFkOrdId_n(moFieldFkProductionOrderId_n.getKeyAsIntArray()[1]);
+            moProductionOrder.setFkOrdYearId_n(jcbFkProductionOrderId_n.isEnabled() ? moFieldFkProductionOrderId_n.getKeyAsIntArray()[0] : SLibConstants.UNDEFINED);
+            moProductionOrder.setFkOrdId_n(jcbFkProductionOrderId_n.isEnabled() ? moFieldFkProductionOrderId_n.getKeyAsIntArray()[1] : SLibConstants.UNDEFINED);
             moProductionOrder.setFkUserLotAssignedId(1);
             moProductionOrder.setFkUserStartId(1);
             moProductionOrder.setFkUserEndId(1);
@@ -2206,8 +2206,8 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
             moProductionOrder.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
 
             if (moProductionOrder.getFkOrdStatusId() == SDataConstantsSys.MFGS_ST_ORD_NEW) {
-                moProductionOrder.setFkOrdYearId_n(moFieldFkProductionOrderId_n.getKeyAsIntArray()[0]);
-                moProductionOrder.setFkOrdId_n(moFieldFkProductionOrderId_n.getKeyAsIntArray()[1]);
+                moProductionOrder.setFkOrdYearId_n(jcbFkProductionOrderId_n.isEnabled() ? moFieldFkProductionOrderId_n.getKeyAsIntArray()[0] : SLibConstants.UNDEFINED);
+                moProductionOrder.setFkOrdId_n(jcbFkProductionOrderId_n.isEnabled() ? moFieldFkProductionOrderId_n.getKeyAsIntArray()[1] : SLibConstants.UNDEFINED);
             }
         }
 
