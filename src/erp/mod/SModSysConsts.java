@@ -788,6 +788,7 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_EAR_COMP_HRS = 3; // Hours
     public static final int HRSS_TP_EAR_COMP_PER_DAY = 12; // % Day
     public static final int HRSS_TP_EAR_COMP_PER_HRS = 13; // % Hour
+    public static final int HRSS_TP_EAR_COMP_PER_EAR = 21; // % Earnings
 
     public static final int HRSS_TP_EAR_EXEM_NON = 1;       // Non applicable
     public static final int HRSS_TP_EAR_EXEM_PER = 11;      // Percentage
