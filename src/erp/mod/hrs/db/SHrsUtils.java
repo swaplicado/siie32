@@ -75,7 +75,7 @@ public abstract class SHrsUtils {
         sDescription = (moPayroll.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? SHrsFormerConsts.PAY_WEE_ABB : SHrsFormerConsts.PAY_BIW_ABB ) + moPayroll.getNumber() + " " + formatDateData.format(dateApplication);
         sCompany = ((SClientInterface) client).getSessionXXX().getCompany().getDbmsDataCompany().getBizPartner();
         
-        fileName = formatDateTitle.format(new Date()).concat(" bmx nom");
+        fileName = formatDateTitle.format(new Date()).concat(" bmx nom.txt");
 
         client.getFileChooser().setSelectedFile(new File(fileName));
         if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
@@ -326,6 +326,89 @@ public abstract class SHrsUtils {
 
                 bw.write(buffer);
                 bw.newLine();
+                bw.flush();
+                bw.close();
+
+                if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                    SLibUtilities.launchFile(file.getPath());
+                }
+            }
+            catch (java.lang.Exception e) {
+                SLibUtilities.renderException(STableUtilities.class.getName(), e);
+            }
+        }
+    }
+    
+    /**
+    * Creates layout to payroll with BBVA 
+    *@param client
+    *@param payrollId
+    *@param dateApplication
+    *@param consecutiveDay
+    */
+     public static void createLayoutBancomerPayroll(SGuiClient client, int payrollId, Date dateApplication, int consecutiveDay) {
+        ResultSet resulSet = null;
+        Statement statement = null;
+        String sql = "";
+        String fileName = "";
+        String sBizPartner = "";
+        int nMoveNum = 1;
+        int n = 0;
+        java.lang.String sAccountCredit = "";
+        java.lang.String buffer = "";
+        DecimalFormat formatDesc = new DecimalFormat("0000000000000.00");
+        SimpleDateFormat formatDateTitle = new SimpleDateFormat("yyMMdd HHmm");
+        double mdBalance = 0;
+        
+        fileName = formatDateTitle.format(new Date()).concat(" bbva nom.txt");
+        
+        client.getFileChooser().setSelectedFile(new File(fileName));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+
+            try {
+                statement = client.getSession().getStatement();
+                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "ASCII"));
+                
+                sql = "SELECT rcp.id_emp, emp.bank_acc, b.bp, " +
+                        "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
+                        "FROM hrs_pay_rcp AS r " +
+                        "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
+                        "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ear.b_del = 0 AND rcp_ear.id_emp = rcp.id_emp) - " +
+                        "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) " +
+                        "FROM hrs_pay_rcp AS r " +
+                        "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = r.id_pay AND rcp_ded.id_emp = r.id_emp " +
+                        "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.id_emp = rcp.id_emp) AS _pay_net " +
+                        "FROM hrs_pay AS p " +
+                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
+                        "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
+                        "INNER JOIN erp.bpsu_bp AS b ON emp.id_emp = b.id_bp " +
+                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0 " +
+                        "ORDER BY rcp.id_emp, emp.bank_acc, b.bp";
+                
+                resulSet = statement.executeQuery(sql);
+                while (resulSet.next()) {
+                    buffer = "";
+                    
+                    sAccountCredit = SLibUtilities.textTrim(resulSet.getString("emp.bank_acc"));
+                    mdBalance = resulSet.getDouble("_pay_net");
+                    sBizPartner = SLibUtilities.textToAlphanumeric(SLibUtilities.textTrim(resulSet.getString("b.bp")));
+                  
+                    n = (int) (Math.floor(Math.log10(nMoveNum)) + 1);
+                     
+                    buffer += SLibUtilities.textRepeat("0", 9 - n).concat(nMoveNum++ + "");
+                    buffer += SLibUtilities.textRepeat(" ", 16); // Blank
+                    buffer += "99";
+                    buffer += sAccountCredit.concat(sAccountCredit.length() > 20 ? sAccountCredit.substring(0,20) : (SLibUtilities.textRepeat(" ", (sAccountCredit.length() == 20 ? 0 : 20 - sAccountCredit.length())))); 
+                    buffer += formatDesc.format(mdBalance).replace(".", "");
+                    buffer += sBizPartner.concat(sBizPartner.length() > 40 ? sBizPartner.substring(0,40) : (SLibUtilities.textRepeat(" ", (sBizPartner.length() == 40 ? 0 : 40 - sBizPartner.length())))); //beneficiary
+                    buffer += "001";
+                    buffer += "001";
+                    
+                    bw.write(buffer);
+                    bw.newLine();
+                }
+
                 bw.flush();
                 bw.close();
 

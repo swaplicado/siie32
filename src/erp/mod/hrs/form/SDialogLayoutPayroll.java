@@ -226,6 +226,7 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements FocusListen
         items.add(new SGuiItem(new int[] { SLibConsts.UNDEFINED }, "(" + SUtilConsts.TXT_SELECT + " layout)"));
         items.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_BANBAJIO }, SFinConsts.TXT_LAY_BANK_BANBAJIO));
         items.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_BANAMEX }, SFinConsts.TXT_LAY_BANK_BANAMEX));
+        items.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_BBVA }, SFinConsts.TXT_LAY_BANK_BBVA));
         
         moKeyLayoutId.removeAllItems();
         for (SGuiItem item : items) {
@@ -276,12 +277,15 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements FocusListen
                 }
                 else {
                     switch (moKeyLayoutId.getValue()[0]) {
-                       case SFinConsts.LAY_BANK_BANBAJIO:
+                        case SFinConsts.LAY_BANK_BANBAJIO:
                            SHrsUtils.createLayoutBanBajioPayroll(miClient, mnPayrollId, moKeyLayoutId.getSelectedItem().getItem(), moDateEmission.getValue(), msAccountDebit, moIntConsecutiveDay.getValue());
                            break;
-                       case SFinConsts.LAY_BANK_BANAMEX:
+                        case SFinConsts.LAY_BANK_BANAMEX:
                            SHrsUtils.createLayoutBanamexPayroll(miClient, mnPayrollId, moKeyLayoutId.getSelectedItem().getItem(), moDateEmission.getValue(), msAccountDebit, moIntConsecutiveDay.getValue(), moDataBizPartnerBranchBankAccount.getFkBankId());
                            break;
+                        case SFinConsts.LAY_BANK_BBVA:
+                           SHrsUtils.createLayoutBancomerPayroll(miClient, mnPayrollId, moDateValueApplication,  moIntConsecutiveDay.getValue());
+                           break;   
                         default :
                             break;
                     }
