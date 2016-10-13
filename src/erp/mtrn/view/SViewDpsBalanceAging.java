@@ -55,8 +55,8 @@ public class SViewDpsBalanceAging extends erp.lib.table.STableTab implements jav
         addTaskBarUpperComponent(moTabFilterBizPartner);
 
         STableField[] aoKeyFields = new STableField[2];
-        STableColumn[] aoTableColumns = new STableColumn[27];
-
+        STableColumn[] aoTableColumns = new STableColumn[mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_SAL ? 28 : 27];
+        
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "d.id_year");
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "d.id_doc");
@@ -102,6 +102,9 @@ public class SViewDpsBalanceAging extends erp.lib.table.STableTab implements jav
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num", "Folio doc.", STableConstants.WIDTH_DOC_NUM);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "d.dt_start_cred", "Base créd.", STableConstants.WIDTH_DATE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "date_exp", "Vencimiento", STableConstants.WIDTH_DATE);
+        if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_SAL) {
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "agent", "Agente de Vtas.", 150);
+        }
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "d.b_audit", "Auditado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "date_due", "Mora", 50);
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "range1", "1-15", STableConstants.WIDTH_VALUE);
@@ -211,6 +214,7 @@ public class SViewDpsBalanceAging extends erp.lib.table.STableTab implements jav
             "(IF(ac.fid_tp_acc_r = " + (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_SAL ? SDataConstantsSys.FINS_CL_ACC_LIABTY[0] : SDataConstantsSys.FINS_CL_ACC_ASSET[0]) + " AND " +
             "ac.fid_cl_acc_r = " + (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_SAL ? SDataConstantsSys.FINS_CL_ACC_LIABTY[1] : SDataConstantsSys.FINS_CL_ACC_ASSET[1]) + ", " +
             "'(ANT)', IF(d.num_ser IS NULL AND d.num IS NULL, '(S/D)',CONCAT(d.num_ser,IF(LENGTH(d.num_ser) = 0, '', '-'), d.num)))) AS f_num, " +
+            "(SELECT bp FROM erp.bpsu_bp WHERE id_bp = COALESCE(d.fid_sal_agt_bp_n, 0)) AS agent, " +
             "DATE_ADD(" + sqlDateType + ", INTERVAL d.days_cred DAY) AS date_exp, " +
             "DATEDIFF('" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(tSqlDateCut) + "', DATE_ADD(" + sqlDateType + ", INTERVAL d.days_cred DAY)) AS date_due, " +
             "c.cur_key, cb.code, c.id_cur, COALESCE(bp1.id_bp, 0) AS agt, COALESCE(rt.id_sal_route, 0) AS rt, d.tot_r, d.tot_r - COALESCE( " +

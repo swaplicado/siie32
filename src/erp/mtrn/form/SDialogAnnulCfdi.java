@@ -35,6 +35,7 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.lib.form.SFormField moFieldDate;
     private erp.lib.form.SFormField moFieldAnnulSat;
+    private erp.lib.form.SFormField moFieldTypeAnnul;
     
     private Date mtDateDps;
     
@@ -161,11 +162,13 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
         moFieldDate = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jtfDateStart, jlDateStart);
         moFieldDate.setPickerButton(jbDate);
         moFieldAnnulSat = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckAnnulSat, jckAnnulSat);
+        moFieldTypeAnnul = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, moKeyDpsAnnulationType.getComponent(), jlDpsAnnulationType);
         moKeyDpsAnnulationType.setKeySettings((SGuiClient) miClient, jlDpsAnnulationType.getName(), true);
         
         mvFields = new Vector<SFormField>();
         mvFields.add(moFieldDate);
         mvFields.add(moFieldAnnulSat);
+        mvFields.add( moFieldTypeAnnul);
 
         jbCancel.addActionListener(this);
         jbOk.addActionListener(this);
