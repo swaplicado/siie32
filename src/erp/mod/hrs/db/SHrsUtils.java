@@ -49,6 +49,16 @@ import sa.lib.gui.SGuiSession;
  */
 public abstract class SHrsUtils {
     
+    /**
+     * Creates layout to payroll with Banamex
+     * @param client
+     * @param payrollId
+     * @param title
+     * @param dateApplication
+     * @param accountDebit
+     * @param consecutiveDay
+     * @param bankId ID the bank to payment
+     */
     public static void createLayoutBanamexPayroll(SGuiClient client, int payrollId, java.lang.String title, Date dateApplication, String accountDebit, int consecutiveDay, int bankId) {
         ResultSet resultSetHeader = null;
         ResultSet resultSetDetail = null;
@@ -56,6 +66,7 @@ public abstract class SHrsUtils {
         DecimalFormat formatDescTotal = new DecimalFormat("0000000000000000.00");
         SimpleDateFormat formatDateData = new SimpleDateFormat("yyMMdd");
         SimpleDateFormat formatDateTitle = new SimpleDateFormat("yyMMdd HHmm");
+        SDbConfig moConfig;
         SDataBizPartner oBizPartner = null;
         SDbPayroll moPayroll = null;
         String sql = "";
@@ -68,12 +79,17 @@ public abstract class SHrsUtils {
         String sCompany = "";
         double mdBalance = 0;
         double mdBalanceTotal = 0;
+        int nBankKey = 0;
+        int n = 0;
         int nMoveNumTotal = 0;
+        int nEmployeeBankId = 0;
+        int nEmployeeBankAuxId = 0;
         
+        moConfig = (SDbConfig) client.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
         oBizPartner = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) client, SDataConstants.BPSU_BP, new int[] { bankId }, SLibConstants.EXEC_MODE_SILENT);
         moPayroll = (SDbPayroll)  client.getSession().readRegistry(SModConsts.HRS_PAY, new int[] { payrollId }, SDbConsts.MODE_STEALTH);
         sDescription = (moPayroll.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? SHrsFormerConsts.PAY_WEE_ABB : SHrsFormerConsts.PAY_BIW_ABB ) + moPayroll.getNumber() + " " + formatDateData.format(dateApplication);
-        sCompany = ((SClientInterface) client).getSessionXXX().getCompany().getDbmsDataCompany().getBizPartner();
+        sCompany = SLibUtilities.textToAlphanumeric(((SClientInterface) client).getSessionXXX().getCompany().getDbmsDataCompany().getBizPartner());
         
         fileName = formatDateTitle.format(new Date()).concat(" bmx nom.txt");
 
@@ -134,7 +150,7 @@ public abstract class SHrsUtils {
                 bw.newLine();
                 
                 // detail registry (type 3)
-                sql = "SELECT rcp.id_emp, emp.bank_acc, " +
+                sql = "SELECT rcp.id_emp, emp.bank_acc, COALESCE(emp.fk_bank_n, 0) AS _bank_id, " +
                         "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
                         "FROM hrs_pay_rcp AS r " +
                         "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
@@ -155,14 +171,22 @@ public abstract class SHrsUtils {
                     sAccountCredit = SLibUtilities.textTrim(resultSetDetail.getString("emp.bank_acc"));
                     mdBalance = resultSetDetail.getDouble("pay_net");
                     sBizPartner = SFinUtilities.getBizPartnerForBanamex(client.getSession(), resultSetDetail.getInt("rcp.id_emp"));
+                    nEmployeeBankAuxId = resultSetDetail.getInt("_bank_id");
+                    nEmployeeBankId = nEmployeeBankAuxId == SLibConsts.UNDEFINED ? moConfig.getFkBankId() : nEmployeeBankAuxId;
+                    
+                    if (nEmployeeBankId != oBizPartner.getFkFiscalBankId()) {
+                        nBankKey = SLibUtilities.parseInt((sAccountCredit.length() > 10 ? sAccountCredit.substring(0, 3) : "000"));
+                        
+                        n = (int) (Math.floor(Math.log10(nBankKey)) + 1);
+                    }
                     
                     buffer += "3"; //type of registry
                     buffer += "0"; //type of operation
-                    buffer += "001"; //payment method
+                    buffer += (nEmployeeBankId != oBizPartner.getFkFiscalBankId() ? "002" : "001"); //payment method
                     buffer += "01"; //payment type
                     buffer += "001"; //currency key
                     buffer += formatDescTotal.format(mdBalance).replace(".", ""); //amount
-                    buffer += "03"; //type of account credit
+                    buffer += (nEmployeeBankId != oBizPartner.getFkFiscalBankId() ? "40" : "03"); //type of account credit
                     buffer += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 20 ? 0 : 20 - sAccountCredit.length())).concat(sAccountCredit); //Credit account
                     buffer += sDescription.concat(sDescription.length() > 16 ? sDescription.substring(0,15) : (SLibUtilities.textRepeat(" ", (sDescription.length() == 16 ? 0 : 16 - sDescription.length())))); //payment reference
                     buffer += sBizPartner.concat(sBizPartner.length() > 55 ? sBizPartner.substring(0,54) : (SLibUtilities.textRepeat(" ", (sBizPartner.length() == 55 ? 0 : 55 - sBizPartner.length())))); //beneficiary
@@ -170,7 +194,7 @@ public abstract class SHrsUtils {
                     buffer += SLibUtilities.textRepeat(" ", 35); //reference 2
                     buffer += SLibUtilities.textRepeat(" ", 35); //reference 3
                     buffer += SLibUtilities.textRepeat(" ", 35); //reference 4
-                    buffer += SLibUtilities.textRepeat("0", 4); //key bank
+                    buffer += (nEmployeeBankId != oBizPartner.getFkFiscalBankId() ? SLibUtilities.textRepeat("0", 4 - n).concat(nBankKey + "") : SLibUtilities.textRepeat("0", 4)); //key bank
                     buffer += "00"; //term
                     buffer += SLibUtilities.textRepeat(" ", 14); //RFC
                     buffer += SLibUtilities.textRepeat("0", 8); //IVA
@@ -206,6 +230,15 @@ public abstract class SHrsUtils {
         }
     }
 
+    /**
+     * Creates layout to payroll with BanBajio
+     * @param client
+     * @param payrollId
+     * @param title
+     * @param dateApplication
+     * @param accountDebit
+     * @param consecutiveDay 
+     */
     public static void createLayoutBanBajioPayroll(SGuiClient client, int payrollId, java.lang.String title, Date dateApplication, String accountDebit, int consecutiveDay) {
         ResultSet resultSet = null;
         String sql = "";
@@ -1571,6 +1604,80 @@ public abstract class SHrsUtils {
         return employeeHireLog;
     }
     
+    public static int getEmployeeHireDays(final ArrayList<SDbEmployeeHireLog> aEmployeeHireLogs, final Date dateStart, final Date dateEnd) throws Exception {
+        int daysHired = 0;
+        
+        for (SDbEmployeeHireLog hireLog : aEmployeeHireLogs) {
+            if (hireLog.getDateHire().compareTo(dateStart) <= 0) {
+                daysHired += SLibTimeUtils.getDaysDiff(hireLog.getDateDismissed_n() == null ? dateEnd : hireLog.getDateDismissed_n().compareTo(dateEnd) >= 0 ? dateEnd : hireLog.getDateDismissed_n(), dateStart) + 1;
+            }
+            else if (hireLog.getDateHire().compareTo(dateStart) >= 0) {
+                daysHired += SLibTimeUtils.getDaysDiff(hireLog.getDateDismissed_n() == null ? dateEnd : hireLog.getDateDismissed_n().compareTo(dateEnd) >= 0 ? dateEnd : hireLog.getDateDismissed_n(), hireLog.getDateHire()) + 1;
+            }
+        }
+        
+        return daysHired;
+    }
+    
+    public static int getEmployeeIncapacityNotPayed(final ArrayList<SDbAbsenceConsumption> aAbsenceConsumptions, final Date dateStart, final Date dateEnd) {
+        int daysIncapacityNotPaidAnnual = 0;
+        
+        for (SDbAbsenceConsumption absenceConsumption : aAbsenceConsumptions) {
+            if (SLibTimeUtils.isBelongingToPeriod(absenceConsumption.getDateStart(), dateStart, dateEnd) && 
+                    absenceConsumption.getAbsence().getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_DIS && !absenceConsumption.getAbsence().IsAuxAbsencePayable()) {
+                daysIncapacityNotPaidAnnual += absenceConsumption.getEffectiveDays();
+            }
+        }
+        
+        return daysIncapacityNotPaidAnnual;
+    }
+    
+    public static ArrayList<SDbAbsenceConsumption> getEmployeeAbsencesConsumption(final SGuiSession session, final ArrayList<SDbAbsence> aAbsences, final int payrollId) throws Exception {
+        ArrayList<SDbAbsenceConsumption> aAbsencesConsumptions = new ArrayList<SDbAbsenceConsumption>();
+        SDbAbsenceConsumption absenceConsumption = null;
+        String sql = "";
+        ResultSet resultSet = null;
+        Statement statement = session.getDatabase().getConnection().createStatement();
+
+        for (SDbAbsence absence : aAbsences) {
+            sql = "SELECT id_cns " +
+            "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS_CNS) + " " +
+            "WHERE b_del = 0 AND id_emp = " + absence.getPkEmployeeId() + " AND id_abs = " + absence.getPkAbsenceId() + " AND fk_rcp_pay <> " + payrollId + " " +
+            "ORDER BY id_emp, id_abs, id_cns ";
+
+            resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                absenceConsumption = new SDbAbsenceConsumption();
+                absenceConsumption.read(session, new int[] { absence.getPkEmployeeId(), absence.getPkAbsenceId(), resultSet.getInt("id_cns") });
+                aAbsencesConsumptions.add(absenceConsumption);
+            }
+        }
+        
+        return aAbsencesConsumptions;
+    }
+    
+    public static ArrayList<SDbAbsence> getEmployeeAbsences(final SGuiSession session, final int employeeId) throws Exception {
+        ArrayList<SDbAbsence> aAbsences = new ArrayList<SDbAbsence>();
+        SDbAbsence absence = null;
+        String sql = "";
+        ResultSet resultSet = null;
+        Statement statement = session.getDatabase().getConnection().createStatement();
+
+        sql = "SELECT id_emp, id_abs, eff_day " +
+            "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " " +
+            "WHERE b_del = 0 AND b_clo = 0 AND id_emp = " + employeeId + " " +
+            "ORDER BY dt_sta, id_emp, id_abs ";
+
+        resultSet = statement.executeQuery(sql);
+        while (resultSet.next()) {
+            absence = new SDbAbsence();
+            absence.read(session, new int[] { resultSet.getInt("id_emp"), resultSet.getInt("id_abs") });
+            aAbsences.add(absence);
+        }
+        
+        return aAbsences;
+    }
+    
     public static boolean isFirtsHire(final SGuiSession session, final int employeeId, final int logId, final String table) throws Exception {
         String sql = "";
         ResultSet resultSet = null;
@@ -2501,6 +2608,62 @@ public abstract class SHrsUtils {
         netGrossAmount.setCalculatedAmountType(SHrsConsts.CAL_GROSS_AMT_TYPE);
         
         return netGrossAmount;
+    }
+    
+    public static SHrsAmountEarning getAmountEarningByEmployee(final SGuiSession session, final int employeeId, final int earningTypeId, final int periodYear, final Date dateCut) throws Exception {
+        SHrsAmountEarning amountEarning = null;
+        String sql = "";
+        ResultSet resultSet = null;
+        Statement statement = session.getDatabase().getConnection().createStatement();
+
+        sql = "SELECT SUM(pre.amt_r) AS f_amount, SUM(pre.amt_exem) AS f_exem, SUM(pre.amt_taxa) AS f_taxa " +
+            "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
+            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON " +
+            "p.id_pay = pr.id_pay " +
+            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON " +
+            "pr.id_pay = pre.id_pay AND pr.id_emp = pre.id_emp " +
+            "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND pr.id_emp = " + employeeId + 
+            (earningTypeId == SLibConsts.UNDEFINED ? "" : " AND pre.fk_tp_ear = " + earningTypeId) + " AND " +
+            "p.per_year = " + periodYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateCut) + "'";
+        
+        resultSet = statement.executeQuery(sql);
+        if (resultSet.next()) {
+            amountEarning = new SHrsAmountEarning(earningTypeId);
+            
+            amountEarning.setAmount(resultSet.getDouble("f_amount"));
+            amountEarning.setAmountExempt(resultSet.getDouble("f_exem"));
+            amountEarning.setAmountTaxable(resultSet.getDouble("f_taxa"));
+        }
+        
+        return amountEarning;
+    }
+    
+    public static double getAmountDeductionByEmployee(final SGuiSession session, final int employeeId, final int deductionTypeId, final int periodYear, final Date dateCut) throws Exception {
+        double amountDeduction = 0;
+        String sql = "";
+        ResultSet resultSet = null;
+        Statement statement = session.getDatabase().getConnection().createStatement();
+
+        sql = "SELECT SUM(prd.amt_r) AS f_amount " +
+            "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
+            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON " +
+            "p.id_pay = pr.id_pay " +
+            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON " +
+            "pr.id_pay = prd.id_pay AND pr.id_emp = prd.id_emp " +
+            "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 AND pr.id_emp = " + employeeId + 
+            (deductionTypeId == SLibConsts.UNDEFINED ? "" : " AND prd.fk_tp_ded = " + deductionTypeId) + " AND " +
+            "p.per_year = " + periodYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateCut) + "'";
+        
+        resultSet = statement.executeQuery(sql);
+        if (resultSet.next()) {
+            amountDeduction =resultSet.getDouble("f_amount");
+        }
+        
+        return amountDeduction;
+    }
+    
+    public static SHrsAmountEarning getAmountEarningsByEmployee(final SGuiSession session, final int employeeId, final int periodYear, final Date dateCut) throws Exception {
+        return getAmountEarningByEmployee(session, employeeId, SLibConsts.UNDEFINED, periodYear, dateCut);
     }
     
     /**

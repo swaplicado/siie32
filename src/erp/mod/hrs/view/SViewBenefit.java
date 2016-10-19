@@ -131,26 +131,26 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
         }
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
         if ((Boolean) filter) {
-            sql += (sql.isEmpty() ? " AND " : "") + "emp.b_act = 1 ";
+            sql += (sql.isEmpty() ? " AND " : "") + "emp.b_del = 0 ";
         }
         
         filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSS_TP_PAY)).getValue();
         if (filter != null && ((int[]) filter).length == 1) {
-            sql += (sql.isEmpty() ? "" : "AND ") + "emp.fk_tp_pay = " + ((int[]) filter)[0] + " ";
+            sql += (sql.isEmpty() ? "" : "") + "AND emp.fk_tp_pay = " + ((int[]) filter)[0] + " ";
         }
         
         filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSU_DEP)).getValue();
         if (filter != null && ((int[]) filter).length == 1) {
-            sql += (sql.isEmpty() ? "" : "AND ") + "emp.fk_dep = " + ((int[]) filter)[0] + " ";
+            sql += (sql.isEmpty() ? "" : "") + "AND emp.fk_dep = " + ((int[]) filter)[0] + " ";
         }
         
         filter = ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelEmployee.EMP_STATUS)).getValue();
         if (filter != null && ((int) filter) != SLibConsts.UNDEFINED) {
             if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ACT) {
-                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 1 ";
+                sql += (sql.isEmpty() ? "" : "") + " AND emp.b_act = 1 ";
             }
             else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_INA) {
-                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 0 ";
+                sql += (sql.isEmpty() ? "" : "") + " AND emp.b_act = 0 ";
             }
             else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ALL) {
             }
