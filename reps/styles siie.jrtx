@@ -129,4 +129,5 @@
 	<style name="Footer left" style="Parent footer" forecolor="#000000" hAlign="Left"/>
 	<style name="Footer center" style="Parent footer" forecolor="#000000" hAlign="Center"/>
 	<style name="Footer right" style="Parent footer" forecolor="#000000" hAlign="Right"/>
+	<style name="Background row" backcolor="#CCCCCC"/>
 </jasperTemplate>
