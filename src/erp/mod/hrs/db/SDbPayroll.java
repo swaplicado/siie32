@@ -40,6 +40,7 @@ public class SDbPayroll extends SDbRegistryUser {
     protected double mdMwzReferenceWage;
     protected String msNotes;
     protected boolean mbNormal;
+    protected boolean mbTaxSubsidy;
     protected boolean mbSsContribution;
     protected boolean mbFornightStandard;
     protected boolean mbAccounting;
@@ -137,6 +138,7 @@ public class SDbPayroll extends SDbRegistryUser {
     public void setMwzReferenceWage(double d) { mdMwzReferenceWage = d; }
     public void setNotes(String s) { msNotes = s; }
     public void setNormal(boolean b) { mbNormal = b; }
+    public void setTaxSubsidy(boolean b) { mbTaxSubsidy = b; }
     public void setSsContribution(boolean b) { mbSsContribution = b; }
     public void setFornightStandard(boolean b) { mbFornightStandard = b; }
     public void setAccounting(boolean b) { mbAccounting = b; }
@@ -170,6 +172,7 @@ public class SDbPayroll extends SDbRegistryUser {
     public double getMwzReferenceWage() { return mdMwzReferenceWage; }
     public String getNotes() { return msNotes; }
     public boolean isNormal() { return mbNormal; }
+    public boolean isTaxSubsidy() { return mbTaxSubsidy; }
     public boolean isSsContribution() { return mbSsContribution; }
     public boolean isFornightStandard() { return mbFornightStandard; }
     public boolean isAccounting() { return mbAccounting; }
@@ -234,6 +237,7 @@ public class SDbPayroll extends SDbRegistryUser {
         mdMwzReferenceWage = 0;
         msNotes = "";
         mbNormal = false;
+        mbTaxSubsidy = false;
         mbSsContribution = false;
         mbFornightStandard = false;
         mbAccounting = false;
@@ -324,6 +328,7 @@ public class SDbPayroll extends SDbRegistryUser {
             mdMwzReferenceWage = resultSet.getDouble("p.mwz_ref_wage");
             msNotes = resultSet.getString("p.nts");
             mbNormal = resultSet.getBoolean("p.b_nor");
+            //mbTaxSubsidy = resultSet.getBoolean("p.b_tax_sub");
             mbSsContribution = resultSet.getBoolean("p.b_ssc");
             mbFornightStandard = resultSet.getBoolean("p.b_for_std");
             mbAccounting = resultSet.getBoolean("p.b_acc");
@@ -404,6 +409,7 @@ public class SDbPayroll extends SDbRegistryUser {
                     mdMwzReferenceWage + ", " +
                     "'" + msNotes + "', " +
                     (mbNormal ? 1 : 0) + ", " +
+                    (mbTaxSubsidy ? 1 : 0) + ", " + 
                     (mbSsContribution ? 1 : 0) + ", " +
                     (mbFornightStandard ? 1 : 0) + ", " + 
                     (mbAccounting ? 1 : 0) + ", " + 
@@ -442,6 +448,7 @@ public class SDbPayroll extends SDbRegistryUser {
                     "mwz_ref_wage = " + mdMwzReferenceWage + ", " +
                     "nts = '" + msNotes + "', " +
                     "b_nor = " + (mbNormal ? 1 : 0) + ", " +
+                    "b_tax_sub = " + (mbTaxSubsidy ? 1 : 0) + ", " +
                     "b_ssc = " + (mbSsContribution ? 1 : 0) + ", " +
                     "b_for_std = " + (mbFornightStandard ? 1 : 0) + ", " +
                     "b_acc = " + (mbAccounting ? 1 : 0) + ", " +
@@ -505,6 +512,7 @@ public class SDbPayroll extends SDbRegistryUser {
         registry.setMwzReferenceWage(this.getMwzReferenceWage());
         registry.setNotes(this.getNotes());
         registry.setNormal(this.isNormal());
+        registry.setTaxSubsidy(this.isTaxSubsidy());
         registry.setSsContribution(this.isSsContribution());
         registry.setFornightStandard(this.isFornightStandard());
         registry.setAccounting(this.isAccounting());

@@ -313,16 +313,41 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         return aAutomaticDeductions;
     }
 
-    private ArrayList<SDbEmployee> getEmployees(final int paymentType) throws Exception {
+    private String getEmployeesByPayroll(final int payrollId) throws Exception {
         String sql = "";
+        String employeeIds = "";
+        ResultSet resultSet = null;
+        Statement statement = moSession.getDatabase().getConnection().createStatement();
+
+        sql = "SELECT pr.id_emp " +
+                "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
+                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON " +
+                "p.id_pay = pr.id_pay " +
+                "WHERE pr.b_del = 0 AND p.id_pay = " + payrollId + " ";
+
+        resultSet = statement.executeQuery(sql);
+        while (resultSet.next()) {
+            employeeIds += ((employeeIds.length() == 0 ? "" : ", ") + resultSet.getInt("pr.id_emp"));
+        }
+
+        return employeeIds;
+    }
+    
+    private ArrayList<SDbEmployee> getEmployees(final int paymentType, final int payrollId) throws Exception {
+        String sql = "";
+        String employeeIds = "";
         SDbEmployee employee = null;
         ArrayList<SDbEmployee> aEmployees = new ArrayList<SDbEmployee>();
         ResultSet resultSet = null;
         Statement statement = moSession.getDatabase().getConnection().createStatement();
+        
+        if (payrollId != SLibConsts.UNDEFINED) {
+            employeeIds = getEmployeesByPayroll(payrollId);
+        }
 
         sql = "SELECT * "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " "
-                + "WHERE b_del = 0 AND fk_tp_pay = " + paymentType + " "
+                + "WHERE b_del = 0 AND (fk_tp_pay = " + paymentType + (employeeIds.isEmpty() ? "" : " OR id_emp IN(" + employeeIds + ")") + ") "
                 + "ORDER BY id_emp ";
 
         resultSet = statement.executeQuery(sql);
@@ -822,7 +847,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
 
         // Employees:
 
-        hrsPayroll.getEmployees().addAll(getEmployees(payroll.getFkPaymentTypeId()));
+        hrsPayroll.getEmployees().addAll(getEmployees(payroll.getFkPaymentTypeId(), payroll.getPkPayrollId()));
 
         // Receipts:
 

@@ -116,7 +116,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                         new int[] { (int) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BP).getValue(), (int) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).getValue() })) {
                     found = true;
                     payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).setValue(((double) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).getValue()) + xmlRow.getAmount());
-                    payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF).setValue(((String) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF).getValue()) + "," + xmlRow.getReference());
+                    payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALP).setValue(((String) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALP).getValue()) + "," + xmlRow.getReference());
                     payment.getXmlElements().add(xmlLayoutDoc);
                     break;
                 }
@@ -126,7 +126,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                 xmlLayoutPay = new SXmlBankLayoutPayment();
             
                 xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).setValue(xmlRow.getAmount());
-                xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF).setValue(xmlRow.getReference());
+                xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALP).setValue(xmlRow.getReference());
                 xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CPT).setValue(xmlRow.getConcept());
                 xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_VOU).setValue(xmlRow.getHsbcFiscalVoucher());
                 xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_ACC_TP).setValue(xmlRow.getHsbcAccountType());
@@ -238,7 +238,7 @@ public class SDbBankLayout extends SDbRegistryUser {
             }
             
             payment.setTotalAmount((double) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).getValue());
-            payment.setReference((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF).getValue());
+            payment.setReference((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALP).getValue());
             payment.setConcept((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CPT).getValue());
             payment.setDescription((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_DCRP).getValue());
             payment.setBizPartnerId(bizPartnerId);

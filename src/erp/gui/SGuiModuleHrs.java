@@ -18,9 +18,10 @@ import erp.mhrs.form.SDialogFormerPayrollImport;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SHrsConsts;
+import erp.mod.hrs.form.SDialogCalculateEstimateISR;
 import erp.mod.hrs.form.SDialogPayrollEmployeeSsContributionUpdate;
 import erp.mod.hrs.form.SDialogRepHrsActiveEmployees;
-import erp.mod.hrs.form.SDialogRepHrsAux;
+import erp.mod.hrs.form.SDialogRepHrsAuxPayroll;
 import erp.mod.hrs.form.SDialogRepHrsEarDed;
 import erp.mod.hrs.form.SDialogRepHrsEarningDeduction;
 import erp.mod.hrs.form.SDialogRepHrsEarningsDeductionsFileCsv;
@@ -103,6 +104,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiPayAutoDeductionsGlobal;
     private javax.swing.JMenuItem jmiPayAutoDeductionsByEmployee;
     private javax.swing.JMenuItem jmiPayCalculatedAmountMonth;
+    private javax.swing.JMenuItem jmiPayCalculatedEstimateIsr;
     
     private javax.swing.JMenu jmBenefit;
     private javax.swing.JMenuItem jmiBenefitBenefitVac;
@@ -260,6 +262,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayAutoDeductionsGlobal = new JMenuItem("Deducciones automáticas globales");
         jmiPayAutoDeductionsByEmployee = new JMenuItem("Deducciones automáticas por empleado");
         jmiPayCalculatedAmountMonth = new JMenuItem("Calcular ingreso mensual");
+        jmiPayCalculatedEstimateIsr = new JMenuItem("Calcular ISR acumulado");
 
         jmPay.add(jmiPayPayrollWeekly);
         jmPay.add(jmiPayPayrollWeeklyRec);
@@ -285,6 +288,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         
         jmPay.addSeparator();
         jmPay.add(jmiPayCalculatedAmountMonth);
+        jmPay.add(jmiPayCalculatedEstimateIsr);
         
                 
         jmBenefit = new JMenu("Prestaciones");
@@ -418,6 +422,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayAutoDeductionsGlobal.addActionListener(this);
         jmiPayAutoDeductionsByEmployee.addActionListener(this);
         jmiPayCalculatedAmountMonth.addActionListener(this);
+        jmiPayCalculatedEstimateIsr.addActionListener(this);
         
         jmiBenefitBenefitVac.addActionListener(this);
         jmiBenefitBenefitBonVac.addActionListener(this);
@@ -512,6 +517,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayAutoDeductionsGlobal.setEnabled(true);
         jmiPayAutoDeductionsByEmployee.setEnabled(true);
         jmiPayCalculatedAmountMonth.setEnabled(true);
+        jmiPayCalculatedEstimateIsr.setEnabled(true);
         
         jmBenefit.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PAY).HasRight);
         jmiBenefitBenefitVac.setEnabled(true);
@@ -885,6 +891,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiPayCalculatedAmountMonth) {
                 new SFormCalculateNetGrossAmount((SGuiClient) miClient, SHrsConsts.CAL_NET_AMT_TYPE, "Calcular ingreso mensual").setFormVisible(true);
             }
+            else if (item == jmiPayCalculatedEstimateIsr) {
+                new SDialogCalculateEstimateISR((SGuiClient) miClient, "Calcular ingreso mensual").setFormVisible(true);
+            }
             else if (item == jmiBenefitBenefitVac) {
                 miClient.getSession().showView(SModConsts.HRSX_BEN_MOV, SModSysConsts.HRSS_TP_BEN_VAC, null);
             }
@@ -957,7 +966,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                 new SDialogRepHrsPayrollTax((SGuiClient) miClient, "Impuesto sobre nóminas").setFormVisible(true);
             }
             else if (item == jmiRepPayrollAux) {
-                new SDialogRepHrsAux((SGuiClient) miClient, "Auxiliares de nóminas").setFormVisible(true);
+                //new SDialogRepHrsAux((SGuiClient) miClient, "Auxiliares de nóminas").setFormVisible(true);
+                new SDialogRepHrsAuxPayroll((SGuiClient) miClient, "Auxiliares de nóminas").setFormVisible(true);
             }
             else if (item == jmiRepPayrollWageSalaryFileCsv) {
                 new SDialogRepHrsPayrollWageSalaryFileCsv((SGuiClient) miClient, "Archivo CSV para declaración informativa de sueldos y salarios").setFormVisible(true);

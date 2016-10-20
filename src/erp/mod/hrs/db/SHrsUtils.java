@@ -2656,7 +2656,7 @@ public abstract class SHrsUtils {
         
         resultSet = statement.executeQuery(sql);
         if (resultSet.next()) {
-            amountDeduction =resultSet.getDouble("f_amount");
+            amountDeduction = resultSet.getDouble("f_amount");
         }
         
         return amountDeduction;

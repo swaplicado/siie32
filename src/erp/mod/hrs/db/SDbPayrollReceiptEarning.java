@@ -63,7 +63,8 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         
         earning = (SDbEarning) session.readRegistry(SModConsts.HRS_EAR, new int[] { mnFkEarningId });
         
-        mdAmountSystem_r = (SLibUtils.round((mdUnits * mdAmountUnitary * mdFactorAmount * earning.getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
+        //mdAmountSystem_r = (SLibUtils.round((mdUnits * mdAmountUnitary * mdFactorAmount * earning.getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
+        mdAmountSystem_r = (SLibUtils.round((mdUnits * mdAmountUnitary * mdFactorAmount), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
     }
 
     public void setPkPayrollId(int n) { mnPkPayrollId = n; }

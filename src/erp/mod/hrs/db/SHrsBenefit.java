@@ -5,6 +5,7 @@
 package erp.mod.hrs.db;
 
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
 
 /**
@@ -83,8 +84,8 @@ public class SHrsBenefit {
     public double getFactorAmount() { return mdFactorAmount; }
     public boolean isEditAmount() { return mbIsEditAmount; }
     
-    public double getValuePending() { return mdValue - mdValuePayed - mdValuePayedReceipt; }
-    public double getAmountPending() { return mdAmount - mdAmountPayed - mdAmountPayedReceipt; }
+    public double getValuePending() { return SLibUtils.round((mdValue - mdValuePayed - mdValuePayedReceipt), SLibUtils.DecimalFormatValue4D.getMaximumFractionDigits()) ; }
+    public double getAmountPending() { return SLibUtils.round((mdAmount - mdAmountPayed - mdAmountPayedReceipt), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()); }
     
     public String validate(int valid, int validationType) throws Exception {
         String msg = "";

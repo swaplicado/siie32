@@ -278,7 +278,7 @@ public class SFormAccountingDeduction extends SBeanForm implements ActionListene
         moPanelCostCenter.setAccountNameWidth(275);
 
         moPanelAccount.setComponentPrevious(moTextReference);
-        moPanelAccount.setComponentNext(moPanelCostCenter);
+        moPanelAccount.setComponentNext(moPanelCostCenter.getTextNumberFirst());
         moPanelCostCenter.setComponentPrevious(moPanelAccount.getTextNumberFirst());
         moPanelCostCenter.setComponentNext(moKeyBizPartner);
         

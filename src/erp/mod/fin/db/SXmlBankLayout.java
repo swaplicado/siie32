@@ -60,7 +60,7 @@ public class SXmlBankLayout extends SXmlDocument {
             namedNodeMap = child.getAttributes();
             
             row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).setValue(SLibUtils.parseDouble(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_AMT, true)));
-            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_REF, true));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALP).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALP, true));
             row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CPT).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_CPT, true));
             row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_VOU).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_VOU, true));
             row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_ACC_TP).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_ACC_TP, true));

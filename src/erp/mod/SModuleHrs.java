@@ -493,7 +493,10 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRSS_TP_EAR_EXEM:
                 settings = new SGuiCatalogueSettings("Tipo exención percepción", 1);
                 sql = "SELECT id_tp_ear_exem AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE b_del = 0 "
+                        + (params != null && params.getKey() != null ? " AND id_tp_ear_exem IN( " + SModSysConsts.HRSS_TP_EAR_EXEM_NON + ", " + params.getKey()[0] + ")" : "") + " " 
+                        + "ORDER BY sort ";
                 break;
             case SModConsts.HRSS_TP_EAR:
                 settings = new SGuiCatalogueSettings("Tipo percepción", 1);
@@ -1174,6 +1177,9 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRSR_PAY_TAX:
                 guiReport = new SGuiReport("reps/hrs_pay_tax.jasper", "Impuesto sobre nóminas");
+                break;
+            case SModConsts.HRSR_PAY_AUX:
+                guiReport = new SGuiReport("reps/hrs_pay_aux_pay.jasper", "Auxiliares de nóminas");
                 break;
             case SModConsts.HRSR_PAY_AUX_EAR_DED:
                 guiReport = new SGuiReport("reps/hrs_pay_aux_ear_ded.jasper", "Reporte de percepciones y deducciones");

@@ -76,6 +76,8 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
     protected SGridPaneForm moGridDeductionRow;
     protected SGridPaneForm moGridAbsenceConsumptionRow;
     
+    protected SDialogPayrollEarning modDialogPayrollEarning;
+    
     protected double mdAmountLoan;
     protected SHrsBenefit moHrsBenefit;
     
@@ -760,7 +762,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         moGridEarningRow = new SGridPaneForm(miClient, SModConsts.HRSX_PAY_REC_EAR, SLibConsts.UNDEFINED, "Percepciones") {
             @Override
             public void initGrid() {
-                setRowButtonsEnabled(false, false, true);
+                setRowButtonsEnabled(false, true, true);
             }
 
             @Override
@@ -774,17 +776,37 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                 columnForm.setEditable(mbEditable);
                 gridColumnsForm.add(columnForm);
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "Valor unitario $", 80));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "Monto unitario $", 80));
                 columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto $", 70, moGridEarningRow.getTable().getDefaultEditor(Double.class));
                 columnForm.setEditable(mbEditable);
                 gridColumnsForm.add(columnForm);
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Valor ajustado", 75));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Valor ajustado", 60));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Crédito/Préstamo"));
 
                 moGridEarningRow.getTable().getDefaultEditor(Double.class).addCellEditorListener(SDialogPayrollEmployee.this);
 
                 return gridColumnsForm;
+            }
+            
+            @Override
+            public void actionRowEdit() {
+                SHrsPayrollReceiptEarning hrsPayrollReceiptEarning = null;
+                
+                try {
+                    hrsPayrollReceiptEarning = (SHrsPayrollReceiptEarning) moGridEarningRow.getSelectedGridRow();
+
+                    modDialogPayrollEarning = new SDialogPayrollEarning(miClient, hrsPayrollReceiptEarning.clone(), "Percepción");
+                    modDialogPayrollEarning.setVisible(true);
+                    
+                    if (modDialogPayrollEarning.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                        populateEarnings();
+                        populateDeductions();
+                    }
+                }
+                catch (Exception e) {
+                    SLibUtils.printException(this, e);
+                }
             }
             
             @Override
@@ -990,6 +1012,12 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         addAllListeners();
     }
     
+    private void enableFieldValueEarning() {
+        if (moEarning != null) {
+            moComEarningValue.getField().setEditable(!moEarning.isDaysWorkedBased()); // not editable for earnings than dependent of worked days.
+        }
+    }
+    
     private void validateCellEditor(int col) {
         SGridRow row = null;
         SHrsPayrollReceiptEarning hrsReceiptEarningRow = null;
@@ -999,8 +1027,9 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
             hrsReceiptEarningRow = (SHrsPayrollReceiptEarning) row;
             
             if (col == COL_BAL) {
-                if (!(hrsReceiptEarningRow.getEarning().getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_AMT &&
-                                (hrsReceiptEarningRow.getEarning().getFkAbsenceClassId_n() == SLibConsts.UNDEFINED && hrsReceiptEarningRow.getEarning().getFkAbsenceTypeId_n() == SLibConsts.UNDEFINED))) {
+                if ((!(hrsReceiptEarningRow.getEarning().getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_AMT &&
+                                (hrsReceiptEarningRow.getEarning().getFkAbsenceClassId_n() == SLibConsts.UNDEFINED && hrsReceiptEarningRow.getEarning().getFkAbsenceTypeId_n() == SLibConsts.UNDEFINED))) ||
+                                        hrsReceiptEarningRow.getEarning().isDaysWorkedBased()) {
                     miClient.showMsgBoxWarning("No se puede modificar el campo 'Valor' para la percepción '" + hrsReceiptEarningRow.getEarning().getName() + "', solo el campo 'Monto $'");
                 }
             }
@@ -1026,6 +1055,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         }
     }
 
+    /* XXX (jbarajas, 2016-09-12) concentrate in one place the calculation of perceptions and deductions.
     private SDbPayrollReceiptEarning createReceipEarning(SHrsPayrollReceipt payrollReceipt, SHrsPayrollReceiptEarning row) {
         double amount = 0;
         SDbPayrollReceiptEarning receiptEarning = null;
@@ -1091,6 +1121,27 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         receiptEarning.setFkEarningId(row.getEarning().getPkEarningId());
 
         return receiptEarning;
+    }
+    */
+    
+    private SDbPayrollReceiptEarning createReceipEarning(SHrsPayrollReceipt payrollReceipt, SHrsPayrollReceiptEarning row) {
+        double amount_unt = 0;
+        double unit = 0;
+        
+        if (moHrsBenefit == null) {
+            if (moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
+                unit = row.getXtaValueAlleged() == 0 ? 0d : 1d;
+                amount_unt = row.getXtaValue();
+            }
+            else {
+                unit = row.getXtaValueAlleged();
+            }
+        }
+        else {
+            unit = moHrsBenefit.getValuePayedReceipt();
+        }
+
+        return payrollReceipt.getHrsPayroll().createHrsPayrollReceiptEarning(payrollReceipt, moHrsBenefit, unit, amount_unt, moHrsBenefit != null, moEarning, SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, row.getPkMoveId());
     }
 
     private SDbPayrollReceiptDeduction createReceipDeduction(SHrsPayrollReceipt payrollReceipt, SHrsPayrollReceiptDeduction row) {
@@ -1348,17 +1399,18 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                 moTextEarningCodeFind.requestFocus();
             }
             
-            /* XXX jbarajas (29-02-2016 Cycle 2) Capture allow multiple perceptions and payroll deductions in receipts
+            // Capture allow multiple perceptions in payroll receipts:
+            
             if (add) {
-                
                 for (SHrsPayrollReceiptEarning earning : moReceipt.getHrsEarnings()) {
-                    if (SLibUtils.compareKeys(new int[] { earning.getEarning().getPkEarningId()}, new int[] { moEarning.getPkEarningId() })) {
+                    if (SLibUtils.compareKeys(new int[] { earning.getEarning().getPkEarningId()}, new int[] { moEarning.getPkEarningId() }) &&
+                            (earning.getEarning().isDaysWorkedBased() || earning.getEarning().getFkEarningExemptionTypeId() == SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL ||
+                            earning.getEarning().getFkEarningExemptionTypeYearId() == SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL)) {
                         miClient.showMsgBoxWarning("La percepción '" + moEarning.getName() + "' no se puede agregar, ya existe en el recibo.");
                         add = false;
                     }
                 }
             }
-            */
 
             if (add) {
                 itemStateEarning();
@@ -1452,11 +1504,15 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
 
                     resetEarningLoan();
 
+                    enableFieldValueEarning();
                     if (moKeyEarningLoan_n.isEnabled()) {
                         moKeyEarningLoan_n.requestFocus();
                     }
-                    else {
+                    else if (moComEarningValue.getField().isEditable()) {
                         moComEarningValue.getField().getComponent().requestFocus();
+                    }
+                    else {
+                        jbEarningAdd.requestFocus();
                     }
                     // Create benefit registry if is necesary:
 
@@ -1519,9 +1575,15 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
 
             hrsReceiptEarningRow.setPkMoveId(moReceipt.getHrsEarnings().size() + 1);
             hrsReceiptEarningRow.setXtaEmployee(moReceipt.getHrsEmployee().getEmployee().getAuxEmployee());
-            hrsReceiptEarningRow.setXtaValueAlleged(moComEarningValue.getField().getValue());
-            hrsReceiptEarningRow.setXtaValue(!moEarning.isDaysAdjustment() ? moComEarningValue.getField().getValue() * moReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : (moComEarningValue.getField().getValue() * moReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * moReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid()));
-            //hrsReceiptEarningRow.setXtaValue(moEarning.getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_DAY ? moComEarningValue.getField().getValue() : moComEarningValue.getField().getValue()  * moReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar());
+            
+            if (moComEarningValue.getField().isEditable()) {
+                hrsReceiptEarningRow.setXtaValueAlleged(moComEarningValue.getField().getValue());
+            }
+            else {
+                hrsReceiptEarningRow.setXtaValueAlleged(1d);
+            }
+            
+            hrsReceiptEarningRow.setXtaValue(SLibUtils.round(!moEarning.isDaysAdjustment() ? moComEarningValue.getField().getValue() * moReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : (moComEarningValue.getField().getValue() * moReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * moReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid()), SLibUtils.DecimalFormatValue8D.getMaximumFractionDigits()));
             hrsReceiptEarningRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { moEarning.getFkEarningComputationTypeId() }, SDbRegistry.FIELD_CODE));
             hrsReceiptEarningRow.setReceiptEarning(createReceipEarning(moReceipt, hrsReceiptEarningRow));
 
@@ -1583,7 +1645,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         Vector<SGridRow> rows = new Vector<SGridRow>();
         SHrsPayrollReceiptEarning hrsReceiptEarningRow = null;
 
-        moGridEarningRow.setRowButtonsEnabled(false, false, mbEditable);
+        moGridEarningRow.setRowButtonsEnabled(false, true, mbEditable);
         for (SHrsPayrollReceiptEarning hrsEarningRow : moReceipt.getHrsEarnings()) {
             hrsReceiptEarningRow = new SHrsPayrollReceiptEarning();
 
@@ -1769,7 +1831,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
             
             if ((daysToBePaid + daysAbsence) != daysToBePaidMax) {
                 msg = "Los días a pagar '" + daysToBePaid + "' " + (daysAbsence == 0 ? "" : "más los días de incidencias '" + daysAbsence + "' ") + "son diferentes a los días laborables del empleado '" + daysToBePaidMax + "'.";
-                if (miClient.showMsgBoxConfirm(msg + "\n"+ SGuiConsts.MSG_CNF_CONT) == JOptionPane.NO_OPTION) {
+                if (miClient.showMsgBoxConfirm(msg + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.NO_OPTION) {
                     validation.setMessage(msg);
                     validation.setComponent(moTextEarningCodeFind);
                 }

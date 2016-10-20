@@ -52,12 +52,14 @@ public class SViewEarnings extends SGridPaneView implements ActionListener {
                 + "v.exem_sal_equ_mwz_lim, "
                 + "v.exem_sal_grt_mwz_per, "
                 + "v.exem_sal_grt_mwz_lim, "
+                + "v.exem_mwz_year, "
                 + "v.pay_per, "
                 + "v.unt_max_wee, "
                 + "v.unt_fac, "
                 + "vt.name, "
                 + "ec.code, "
                 + "ee.name, "
+                + "eey.name, "
                 + "l.name, "
                 + "b.name, "
                 + "ac.name, "
@@ -68,6 +70,7 @@ public class SViewEarnings extends SGridPaneView implements ActionListener {
                 + "v.b_day_adj, "
                 + "v.b_day_abs, "
                 + "v.b_day_wrk, "
+                + "v.b_day_wrk_bas, "
                 + "v.b_who, "
                 + "v.b_pay_tax, "
                 + "v.b_alt_tax, "
@@ -86,6 +89,8 @@ public class SViewEarnings extends SGridPaneView implements ActionListener {
                 + "v.fk_tp_ear_comp = ec.id_tp_ear_comp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_EAR_EXEM) + " AS ee ON "
                 + "v.fk_tp_ear_exem = ee.id_tp_ear_exem "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_EAR_EXEM) + " AS eey ON "
+                + "v.fk_tp_ear_exem_year = eey.id_tp_ear_exem "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_LOAN) + " AS l ON "
                 + "v.fk_tp_loan = l.id_tp_loan "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_BEN) + " AS b ON "
@@ -113,17 +118,19 @@ public class SViewEarnings extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "v.name_abbr", SGridConsts.COL_TITLE_NAME + " corto"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_8B, "v.exem_mwz", "Salarios mínimos exentos"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_4D, "v.exem_sal_equ_mwz_per", "Porcentaje exento si SB = SMZ"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_8B, "v.exem_sal_equ_mwz_lim", "Límite exento si SB = SMZ"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_4D, "v.exem_sal_grt_mwz_per", "Porcentaje exento si SB > SMZ"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_8B, "v.exem_sal_grt_mwz_lim", "Límite exento si SB > SMZ"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_8D, "v.exem_mwz", "Salarios mínimos exentos base"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_8D, "v.exem_mwz_year", "Salarios mínimos exentos opcional"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_8D, "v.exem_sal_equ_mwz_per", "Porcentaje exento si SB = SMZ"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_8D, "v.exem_sal_equ_mwz_lim", "Límite exento si SB = SMZ"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_8D, "v.exem_sal_grt_mwz_per", "Porcentaje exento si SB > SMZ"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_8D, "v.exem_sal_grt_mwz_lim", "Límite exento si SB > SMZ"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_4D, "v.pay_per", "Porcentaje pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "v.unt_max_wee", "Unidades máximas"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_8D, "v.unt_fac", "Factor de cálculo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "vt.name", "Tipo percepción"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "ec.code", "Tipo cálculo percepción"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "ee.name", "Tipo exención percepción"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "ee.name", "Tipo exención percepción base"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "eey.name", "Tipo exención percepción opcional"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "l.name", "Tipo crédito/préstamo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "b.name", "Tipo prestación"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "ac.name", "Tipo configuración contable"));
@@ -134,6 +141,7 @@ public class SViewEarnings extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "v.b_day_adj", "Aplica días ajuste"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "v.b_day_abs", "Aplica días incidencia"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "v.b_day_wrk", "Aplica días trabajados"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "v.b_day_wrk_bas", "En base días trabajados"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "v.b_who", "Es retención de ley"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "v.b_pay_tax", "Aplica impuesto sobre nóminas"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "v.b_alt_tax", "Aplica cálculo imp. opcional"));

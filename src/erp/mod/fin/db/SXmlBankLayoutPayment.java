@@ -16,7 +16,7 @@ public class SXmlBankLayoutPayment extends SXmlElement {
 
     public static final String NAME = "Pay";
     public static final String ATT_LAY_PAY_AMT = "PayAmount";
-    public static final String ATT_LAY_PAY_REF = "PayReference";
+    public static final String ATT_LAY_PAY_REF_ALP = "PayReferenceAlpha";
     public static final String ATT_LAY_PAY_CPT = "PayConcept";
     public static final String ATT_LAY_PAY_HSBC_FIS_VOU = "HsbcFiscalVoucher";
     public static final String ATT_LAY_PAY_HSBC_ACC_TP = "HsbcAccountType";
@@ -69,7 +69,7 @@ public class SXmlBankLayoutPayment extends SXmlElement {
         super(NAME);
 
         moPayAmount = new SXmlAttribute(ATT_LAY_PAY_AMT);
-        moPayReference = new SXmlAttribute(ATT_LAY_PAY_REF);
+        moPayReference = new SXmlAttribute(ATT_LAY_PAY_REF_ALP);
         moPayConcept = new SXmlAttribute(ATT_LAY_PAY_CPT);
         moPayHsbcFiscalVoucher = new SXmlAttribute(ATT_LAY_PAY_HSBC_FIS_VOU);
         moPayHsbcAccountType = new SXmlAttribute(ATT_LAY_PAY_HSBC_ACC_TP);

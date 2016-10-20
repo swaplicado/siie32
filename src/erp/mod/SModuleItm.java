@@ -5,6 +5,8 @@
 
 package erp.mod;
 
+import erp.data.SDataConstantsSys;
+import erp.mcfg.data.SDataParamsErp;
 import erp.mod.itm.db.SDbItem;
 import erp.mod.itm.db.SDbUnit;
 import erp.mod.itm.db.SDbUnitType;
@@ -142,12 +144,17 @@ public class SModuleItm extends SGuiModule {
                 break;
             case SModConsts.ITMU_ITEM:
                 settings = new SGuiCatalogueSettings("Ítems", 1, 1);
-                sql = "SELECT i.id_item AS " + SDbConsts.FIELD_ID + "1, CONCAT(i.item, ' (', i.item_key, ')') AS " + SDbConsts.FIELD_ITEM + ", " +
+                sql = "SELECT i.id_item AS " + SDbConsts.FIELD_ID + "1, " +
+                        (!((SDataParamsErp) miClient.getSession().getConfigSystem()).getIsItemKeyApplying() ? "i.item " :
+                        (((SDataParamsErp) miClient.getSession().getConfigSystem()).getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ?
+                        "CONCAT(i.item_key, ' - ', i.item) " : "CONCAT(i.item, ' - ', i.item_key) ")) + " AS " + SDbConsts.FIELD_ITEM + ", " +
                         "i.fid_igen AS " + SDbConsts.FIELD_FK + "1, u.symbol AS f_comp " +
                         "FROM " + SModConsts.TablesMap.get(type) + " AS i " +
                         "INNER JOIN erp.itmu_unit AS u ON i.fid_unit = u.id_unit " +
                         "INNER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " +
-                        "WHERE i.b_del = 0 ORDER BY i.item, id_item ";
+                        "WHERE i.b_del = 0 " +
+                        "ORDER BY " + (!((SDataParamsErp) miClient.getSession().getConfigSystem()).getIsItemKeyApplying() ? "i.item, " :
+                        ((SDataParamsErp) miClient.getSession().getConfigSystem()).getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "i.item_key, i.item, " : "i.item, i.item_key, ") + "id_item ";
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

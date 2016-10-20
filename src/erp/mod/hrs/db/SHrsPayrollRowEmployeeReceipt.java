@@ -16,6 +16,7 @@ import sa.lib.grid.SGridRow;
 public class SHrsPayrollRowEmployeeReceipt implements SGridRow {
 
     protected int mnPkEmployeeId;
+    protected int mnFkPaymentTypeId;
     protected String msCode;
     protected String msName;
     protected double mdTotalEarnings;
@@ -27,6 +28,7 @@ public class SHrsPayrollRowEmployeeReceipt implements SGridRow {
 
     public SHrsPayrollRowEmployeeReceipt() {
         mnPkEmployeeId = 0;
+        mnFkPaymentTypeId = 0;
         msCode = "";
         msName = "";
         mdTotalEarnings = 0;
@@ -38,6 +40,7 @@ public class SHrsPayrollRowEmployeeReceipt implements SGridRow {
     }
 
     public void setPkEmployeeId(int n) { mnPkEmployeeId = n; }
+    public void setFkPaymentTypeId(int n) { mnFkPaymentTypeId = n; }
     public void setCode(String s) { msCode = s; }
     public void setName(String s) { msName = s; }
     public void setTotalEarnings(double d) { mdTotalEarnings = d; }
@@ -45,6 +48,7 @@ public class SHrsPayrollRowEmployeeReceipt implements SGridRow {
     public void setTotalNet(double d) { mdTotalNet = d; }
 
     public int getPkEmployeeId() { return mnPkEmployeeId; }
+    public int getFkPaymentTypeId() { return mnFkPaymentTypeId; }
     public String getCode() { return msCode ; }
     public String getName() { return msName ; }
     public double getTotalEarnings() { return mdTotalEarnings ; }
@@ -65,6 +69,7 @@ public class SHrsPayrollRowEmployeeReceipt implements SGridRow {
             employeeReceipt = new SHrsPayrollRowEmployeeReceipt();
 
             employeeReceipt.setPkEmployeeId(hrsPayrollReceipt.getHrsEmployee().getEmployee().getPkEmployeeId());
+            employeeReceipt.setFkPaymentTypeId(hrsPayrollReceipt.getHrsEmployee().getEmployee().getFkPaymentTypeId());
             employeeReceipt.setCode(hrsPayrollReceipt.getHrsEmployee().getEmployee().getNumber());
             employeeReceipt.setName(hrsPayrollReceipt.getHrsEmployee().getEmployee().getAuxEmployee());
             employeeReceipt.setTotalEarnings(hrsPayrollReceipt.getTotalEarnings());

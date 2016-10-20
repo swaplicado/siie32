@@ -79,7 +79,7 @@ public class SHrsPayrollReceiptEarning implements SGridRow, Comparable {
     public String getXtaUnit() { return msXtaUnit; }
     public String getXtaLoan() { return msXtaLoan; }
     public double getXtaAmount() { return mdXtaAmount; }
-
+    
     /* XXX jbarajas 15/04/2015
     public void computeEarning() {
         switch (moEarning.getFkEarningComputationTypeId()) {
@@ -110,10 +110,17 @@ public class SHrsPayrollReceiptEarning implements SGridRow, Comparable {
         }
     }
     */
+    
+    public void computeEarning() {
+        if (moEarning.isDaysWorkedBased() && !moPayrollReceiptEarning.isUserEdited()) {
+            moPayrollReceiptEarning.setAmountUnitary(moHrsPayrollReceipt.getTotalEarningsDependentsDaysWorked() * moEarning.getPayPercentage());
+            computeAmount();
+        }
+    }
+    
     public void computeAmount() {
-        //if (moPayrollReceiptEarning.isUserEdited()) { /// XXX jbarajas (29-02-2016 Cycle 2) Always Recalculate the amount of perception based on the corresponding units where applicable.
-            moPayrollReceiptEarning.setAmount_r(SLibUtils.round((moPayrollReceiptEarning.getUnits() * moPayrollReceiptEarning.getAmountUnitary() * moEarning.getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
-        //}
+        //moPayrollReceiptEarning.setAmount_r(SLibUtils.round((moPayrollReceiptEarning.getUnits() * moPayrollReceiptEarning.getAmountUnitary() * moEarning.getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
+        moPayrollReceiptEarning.setAmount_r(SLibUtils.round((moPayrollReceiptEarning.getUnits() * moPayrollReceiptEarning.getAmountUnitary() * moPayrollReceiptEarning.getFactorAmount()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
     }
     
     public SHrsPayrollReceiptEarning clone() throws CloneNotSupportedException {
@@ -121,7 +128,7 @@ public class SHrsPayrollReceiptEarning implements SGridRow, Comparable {
         
         hrsPayrollReceiptEarning.setReceiptEarning(this.getReceiptEarning().clone());
         hrsPayrollReceiptEarning.setEarning(this.getEarning().clone());
-        //hrsPayrollReceiptEarning.setHrsReceipt(this.getHrsReceipt());
+        hrsPayrollReceiptEarning.setHrsReceipt(this.getHrsReceipt()); // XXX jbarajas (29-09-2016) review why was discussed 
 
         hrsPayrollReceiptEarning.setPkMoveId(this.getPkMoveId());
         hrsPayrollReceiptEarning.setRowType(this.getRowType());
@@ -256,18 +263,19 @@ public class SHrsPayrollReceiptEarning implements SGridRow, Comparable {
                     // Employee:
                     break;
                 case 1:
-                    if (moEarning.getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_AMT &&
+                    if ((moEarning.getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_AMT &&
+                                moEarning.getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_PER_EAR) &&
                             (moEarning.getFkAbsenceClassId_n() == SLibConsts.UNDEFINED && moEarning.getFkAbsenceTypeId_n() == SLibConsts.UNDEFINED)) {
                         mdXtaValueAlleged = (double) value;
 
-                        if (moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
+                        if (moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT || moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_EAR) {
                             moPayrollReceiptEarning.setUserEdited(mdXtaValueAlleged != moPayrollReceiptEarning.getAmountUnitary());
                             moPayrollReceiptEarning.setAmountUnitary(mdXtaValueAlleged);
                         }
                         else {
                             moPayrollReceiptEarning.setUserEdited(mdXtaValueAlleged != moPayrollReceiptEarning.getUnitsAlleged());
                             moPayrollReceiptEarning.setUnitsAlleged(mdXtaValueAlleged);
-                            moPayrollReceiptEarning.setUnits(moEarning.getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_DAY ? mdXtaValueAlleged : (!moEarning.isDaysAdjustment() ? mdXtaValueAlleged * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : mdXtaValueAlleged * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid()));
+                            moPayrollReceiptEarning.setUnits(SLibUtils.round(moEarning.getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_DAY ? mdXtaValueAlleged : (!moEarning.isDaysAdjustment() ? mdXtaValueAlleged * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : mdXtaValueAlleged * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid()), SLibUtils.DecimalFormatValue8D.getMaximumFractionDigits()));
                         }
                         // computeEarning(); XXX jbarajas 15/04/2015
                         computeAmount();
@@ -285,7 +293,8 @@ public class SHrsPayrollReceiptEarning implements SGridRow, Comparable {
                     if ((moEarning.getFkBenefitTypeId() != SModSysConsts.HRSS_TP_BEN_NON && 
                             (double) value >= moPayrollReceiptEarning.getAmount_r()) ||
                             moEarning.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_NON) {
-                        if (moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT && 
+                        if ((moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT ||
+                                moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_EAR) && 
                                 moEarning.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_NON) {
                             moPayrollReceiptEarning.setUserEdited((double) value != moPayrollReceiptEarning.getAmountUnitary());
                             moPayrollReceiptEarning.setAmountUnitary((double) value);
@@ -328,7 +337,7 @@ public class SHrsPayrollReceiptEarning implements SGridRow, Comparable {
                     mdXtaValue = !mbPayment ? 0 : mdXtaValue;
                     moPayrollReceiptEarning.setUserEdited(true);
 
-                    if (moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
+                    if (moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT || moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_EAR) {
                         moPayrollReceiptEarning.setAmountUnitary(mdXtaValue);
                     }
                     else {
@@ -359,18 +368,19 @@ public class SHrsPayrollReceiptEarning implements SGridRow, Comparable {
                     // Earning name:
                     break;
                 case 2:
-                    if (moEarning.getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_AMT &&
+                    if ((moEarning.getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_AMT && 
+                            moEarning.getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_PER_EAR) &&
                             (moEarning.getFkAbsenceClassId_n() == SLibConsts.UNDEFINED && moEarning.getFkAbsenceTypeId_n() == SLibConsts.UNDEFINED)) {
                         mdXtaValueAlleged = (double) value;
 
-                        if (moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
+                        if (moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT || moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_EAR) {
                             moPayrollReceiptEarning.setUserEdited(mdXtaValueAlleged != moPayrollReceiptEarning.getAmountUnitary());
                             moPayrollReceiptEarning.setAmountUnitary(mdXtaValueAlleged);
                         }
                         else {
                             moPayrollReceiptEarning.setUserEdited(mdXtaValueAlleged != moPayrollReceiptEarning.getUnitsAlleged());
                             moPayrollReceiptEarning.setUnitsAlleged(mdXtaValueAlleged);
-                            moPayrollReceiptEarning.setUnits(moEarning.getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_DAY ? mdXtaValueAlleged : (!moEarning.isDaysAdjustment() ? mdXtaValueAlleged * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : mdXtaValueAlleged * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid()));
+                            moPayrollReceiptEarning.setUnits(SLibUtils.round(moEarning.getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_DAY ? mdXtaValueAlleged : (!moEarning.isDaysAdjustment() ? mdXtaValueAlleged * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : mdXtaValueAlleged * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid()), SLibUtils.DecimalFormatValue8D.getMaximumFractionDigits()));
                         }
 
                         try {
@@ -394,7 +404,8 @@ public class SHrsPayrollReceiptEarning implements SGridRow, Comparable {
                     if ((moEarning.getFkBenefitTypeId() != SModSysConsts.HRSS_TP_BEN_NON && 
                             (double) value >= moPayrollReceiptEarning.getAmount_r()) ||
                             moEarning.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_NON) {
-                        if (moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT && 
+                        if ((moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT || 
+                            moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_EAR) && 
                                 moEarning.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_NON) {
                             moPayrollReceiptEarning.setUserEdited((double) value != moPayrollReceiptEarning.getAmountUnitary());
                             moPayrollReceiptEarning.setAmountUnitary((double) value);

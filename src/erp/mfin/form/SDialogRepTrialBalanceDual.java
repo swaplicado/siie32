@@ -698,7 +698,8 @@ public class SDialogRepTrialBalanceDual extends javax.swing.JDialog implements j
                     "a.id_acc = re.fid_acc AND re.fid_acc >= '" + msAccountStartId + "' AND re.fid_acc <= '" + msAccountEndId + "' " +
                     "INNER JOIN fin_acc AS am ON " +
                     "am.id_acc = CONCAT(LEFT(re.fid_acc, " + (levels.get(1) - 1) + "), '" + account.substring(levels.get(1) - 1) + "') " +
-                    (jckIsFilter.isSelected() ? "WHERE re.fid_cc_n >= '" + msCostCenterBeginId + "' AND re.fid_cc_n <= '" + msCostCenterEndId + "' " : "") + (mbIsAuxCostCenter ? " OR re.fid_cc_n IS NULL " : "") +
+                    (jckIsFilter.isSelected() ? "WHERE (re.fid_cc_n >= '" + msCostCenterBeginId + "' AND re.fid_cc_n <= '" + msCostCenterEndId + "' " : "") + (mbIsAuxCostCenter ? " OR re.fid_cc_n IS NULL " : "") + (jckIsFilter.isSelected() ? ") " : " ") +
+                    (moFieldItem.getKeyAsIntArray()[0] == 0 ? "" : (jckIsFilter.isSelected() ? "AND " : " WHERE ") + " re.fid_item_n = " + moFieldItem.getKeyAsIntArray()[0] + " ") +
                     "GROUP BY " + ((Integer) jsLevel.getValue() == 1 ? "LEFT(re.fid_acc, " + len + ") " : "CONCAT(LEFT(re.fid_acc, " + len + "), '" + account.substring(len) + "') ") +
                     (jckShowEmpty.isSelected() ? "" : "HAVING NOT (f_ob = 0 AND f_dbt = 0 AND f_cdt = 0) ");
         }
@@ -745,7 +746,7 @@ public class SDialogRepTrialBalanceDual extends javax.swing.JDialog implements j
                     "INNER JOIN fin_cc AS cm ON " +
                     "cm.id_cc = CONCAT(LEFT(re.fid_cc_n, " + (levels.get(1) - 1) + "), '" + costCenter.substring(levels.get(1) - 1) + "') " +
                     (jckIsFilter.isSelected() ? "WHERE re.fid_acc >= '" + msAccountStartId + "' AND re.fid_acc <= '" + msAccountEndId + "' " : "") +
-                    (moFieldItem.getKeyAsIntArray()[0] == 0 ? "" : "AND re.fid_item_n = " + moFieldItem.getKeyAsIntArray()[0] + " ") +
+                    (moFieldItem.getKeyAsIntArray()[0] == 0 ? "" : (jckIsFilter.isSelected() ? "AND " : " WHERE ") + " re.fid_item_n = " + moFieldItem.getKeyAsIntArray()[0] + " ") +
                     (mbIsAuxCostCenter ? "GROUP BY CONCAT(LEFT(re.fid_cc_n, " + len + "), '" + costCenter.substring(len) + "') " : "GROUP BY " + ((Integer) jsLevel.getValue() == 1 ? "LEFT(re.fid_cc_n, " + len + ") " : "CONCAT(LEFT(re.fid_cc_n, " + len + "), '" + costCenter.substring(len) + "') ")) +
                     (jckShowEmpty.isSelected() ? "" : "HAVING f_count > 0 ");
         }

@@ -328,8 +328,8 @@ public class SFormAutomaticEarnings extends SBeanForm implements SGridPaneFormOw
         automaticRow = new SDbAutomaticEarning();
 
         automaticRow.setPkEarningId(moEarning.getPkEarningId());
-        automaticRow.setUnits(moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT ? 1 : moComValue.getField().getValue());
-        automaticRow.setAmountUnitary(moEarning.getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_AMT ? 1 : moComValue.getField().getValue());
+        automaticRow.setUnits((moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT || moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_EAR) ? 1 : moComValue.getField().getValue());
+        automaticRow.setAmountUnitary((moEarning.getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_AMT || moEarning.getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_PER_EAR) ? 1 : moComValue.getField().getValue());
         automaticRow.setAmount_r(automaticRow.getUnits() * automaticRow.getAmountUnitary());
         automaticRow.setDateStart(moDateDateStart.getValue());
         automaticRow.setDateEnd_n(moDateDateEnd_n.getValue());
@@ -401,6 +401,10 @@ public class SFormAutomaticEarnings extends SBeanForm implements SGridPaneFormOw
         else {
             moKeyEmployee.setEnabled(false);
         }
+    }
+    
+    private void enableFieldValue(final boolean enable) {
+        moComValue.getField().setEditable(enable);
     }
 
     private void resetFields() {
@@ -495,6 +499,9 @@ public class SFormAutomaticEarnings extends SBeanForm implements SGridPaneFormOw
 
             if (load) {
                 moTextName.setValue(moEarning.getName());
+                
+                enableFieldValue(!moEarning.isDaysWorkedBased());
+                
                 moComValue.getField().getComponent().requestFocus();
                 moComValue.setCompoundText((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { moEarning.getFkEarningComputationTypeId() }, SDbRegistry.FIELD_CODE));
 

@@ -19,6 +19,7 @@ import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiFieldKeyGroup;
+import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanForm;
@@ -66,12 +67,19 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jPanel7 = new javax.swing.JPanel();
         jlEarningComputationType = new javax.swing.JLabel();
         moKeyEarningComputationType = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel29 = new javax.swing.JPanel();
+        jlDummy1 = new javax.swing.JLabel();
+        jlSettingsBase = new javax.swing.JLabel();
+        jlSettingsOptional = new javax.swing.JLabel();
         jPanel16 = new javax.swing.JPanel();
         jlEarningExemptionType = new javax.swing.JLabel();
         moKeyEarningExemptionType = new sa.lib.gui.bean.SBeanFieldKey();
+        moKeyEarningExemptionTypeYear = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel8 = new javax.swing.JPanel();
         jlExemptionMwz = new javax.swing.JLabel();
-        moIntExemptionMwz = new sa.lib.gui.bean.SBeanFieldInteger();
+        moDecExemptionMwz = new sa.lib.gui.bean.SBeanFieldDecimal();
+        jlDummy = new javax.swing.JLabel();
+        moDecExemptionMwzYear = new sa.lib.gui.bean.SBeanFieldDecimal();
         jlExemptionMwzHelp = new javax.swing.JLabel();
         jPanel9 = new javax.swing.JPanel();
         jlExemptionSalaryEqualsMwzPercentage = new javax.swing.JLabel();
@@ -79,7 +87,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jlExemptionSalaryEqualsMwzPercentageHelp = new javax.swing.JLabel();
         jPanel10 = new javax.swing.JPanel();
         jlExemptionSalaryEqualsMwzLimit = new javax.swing.JLabel();
-        moIntExemptionSalaryEqualsMwzLimit = new sa.lib.gui.bean.SBeanFieldInteger();
+        moDecExemptionSalaryEqualsMwzLimit = new sa.lib.gui.bean.SBeanFieldDecimal();
         jlExemptionSalaryEqualsMwzLimitHelp = new javax.swing.JLabel();
         jPanel11 = new javax.swing.JPanel();
         jlExemptionSalaryGreaterMwzPercentage = new javax.swing.JLabel();
@@ -87,7 +95,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jlExemptionSalaryGreaterMwzPercentageHelp = new javax.swing.JLabel();
         jPanel12 = new javax.swing.JPanel();
         jlExemptionSalaryGreaterMwzLimit = new javax.swing.JLabel();
-        moIntExemptionSalaryGreaterMwzLimit = new sa.lib.gui.bean.SBeanFieldInteger();
+        moDecExemptionSalaryGreaterMwzLimit = new sa.lib.gui.bean.SBeanFieldDecimal();
         jlExemptionSalaryGreaterMwzLimitHelp = new javax.swing.JLabel();
         jPanel23 = new javax.swing.JPanel();
         jlPayPercentage = new javax.swing.JLabel();
@@ -105,6 +113,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moBoolDaysAdjustment = new sa.lib.gui.bean.SBeanFieldBoolean();
         moBoolDaysAbsence = new sa.lib.gui.bean.SBeanFieldBoolean();
         moBoolDaysWorked = new sa.lib.gui.bean.SBeanFieldBoolean();
+        moBoolDaysWorkedBased = new sa.lib.gui.bean.SBeanFieldBoolean();
         moBoolLoan = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel24 = new javax.swing.JPanel();
         jPanel26 = new javax.swing.JPanel();
@@ -140,7 +149,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
 
         jPanel25.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(14, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(15, 1, 0, 5));
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -195,6 +204,21 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
 
         jPanel2.add(jPanel7);
 
+        jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDummy1.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel29.add(jlDummy1);
+
+        jlSettingsBase.setText("Configuración base:");
+        jlSettingsBase.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel29.add(jlSettingsBase);
+
+        jlSettingsOptional.setText("Configuración opcional:");
+        jlSettingsOptional.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel29.add(jlSettingsOptional);
+
+        jPanel2.add(jPanel29);
+
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlEarningExemptionType.setText("Tipo exención percepción:*");
@@ -204,6 +228,9 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moKeyEarningExemptionType.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel16.add(moKeyEarningExemptionType);
 
+        moKeyEarningExemptionTypeYear.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel16.add(moKeyEarningExemptionTypeYear);
+
         jPanel2.add(jPanel16);
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -211,13 +238,17 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jlExemptionMwz.setText("Salarios mínimos exentos:");
         jlExemptionMwz.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel8.add(jlExemptionMwz);
-        jPanel8.add(moIntExemptionMwz);
+        jPanel8.add(moDecExemptionMwz);
+
+        jlDummy.setPreferredSize(new java.awt.Dimension(95, 23));
+        jPanel8.add(jlDummy);
+        jPanel8.add(moDecExemptionMwzYear);
 
         jlExemptionMwzHelp.setForeground(new java.awt.Color(109, 109, 109));
         jlExemptionMwzHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jlExemptionMwzHelp.setText("(Monto exento expresado en número de salarios mínimos del área geográfica)");
         jlExemptionMwzHelp.setToolTipText("");
-        jlExemptionMwzHelp.setPreferredSize(new java.awt.Dimension(650, 23));
+        jlExemptionMwzHelp.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel8.add(jlExemptionMwzHelp);
 
         jPanel2.add(jPanel8);
@@ -243,7 +274,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jlExemptionSalaryEqualsMwzLimit.setText("Tope exención si SB = SMA:");
         jlExemptionSalaryEqualsMwzLimit.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel10.add(jlExemptionSalaryEqualsMwzLimit);
-        jPanel10.add(moIntExemptionSalaryEqualsMwzLimit);
+        jPanel10.add(moDecExemptionSalaryEqualsMwzLimit);
 
         jlExemptionSalaryEqualsMwzLimitHelp.setForeground(new java.awt.Color(109, 109, 109));
         jlExemptionSalaryEqualsMwzLimitHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
@@ -275,7 +306,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jlExemptionSalaryGreaterMwzLimit.setText("Tope exención si SB > SMA:");
         jlExemptionSalaryGreaterMwzLimit.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel12.add(jlExemptionSalaryGreaterMwzLimit);
-        jPanel12.add(moIntExemptionSalaryGreaterMwzLimit);
+        jPanel12.add(moDecExemptionSalaryGreaterMwzLimit);
 
         jlExemptionSalaryGreaterMwzLimitHelp.setForeground(new java.awt.Color(109, 109, 109));
         jlExemptionSalaryGreaterMwzLimitHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
@@ -344,6 +375,10 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moBoolDaysWorked.setText("Aplica días trabajados");
         moBoolDaysWorked.setPreferredSize(new java.awt.Dimension(135, 23));
         jPanel3.add(moBoolDaysWorked);
+
+        moBoolDaysWorkedBased.setText("En base días pagados");
+        moBoolDaysWorkedBased.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel3.add(moBoolDaysWorkedBased);
 
         moBoolLoan.setText("Es crédito/préstamo");
         moBoolLoan.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -485,6 +520,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JPanel jPanel26;
     private javax.swing.JPanel jPanel27;
     private javax.swing.JPanel jPanel28;
+    private javax.swing.JPanel jPanel29;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
@@ -498,6 +534,8 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JLabel jlAccountingRecordType;
     private javax.swing.JLabel jlBenefitType;
     private javax.swing.JLabel jlCode;
+    private javax.swing.JLabel jlDummy;
+    private javax.swing.JLabel jlDummy1;
     private javax.swing.JLabel jlEarningComputationType;
     private javax.swing.JLabel jlEarningExemptionType;
     private javax.swing.JLabel jlEarningType;
@@ -517,25 +555,29 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JLabel jlNameAbbreviatedHelp;
     private javax.swing.JLabel jlPayPercentage;
     private javax.swing.JLabel jlPayPercentageHelp;
+    private javax.swing.JLabel jlSettingsBase;
+    private javax.swing.JLabel jlSettingsOptional;
     private javax.swing.JLabel jlUnitsFactor;
     private javax.swing.JLabel jlUnitsMaximumWeek;
     private javax.swing.JLabel jlUnitsMaximumWeekHelp;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolDaysAbsence;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolDaysAdjustment;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolDaysWorked;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolDaysWorkedBased;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolLoan;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolPayrollTax;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolTaxCalculationOptional;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolWelfare;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolWithholding;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecExemptionMwz;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecExemptionMwzYear;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecExemptionSalaryEqualsMwzLimit;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecExemptionSalaryEqualsMwzPercentage;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecExemptionSalaryGreaterMwzLimit;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecExemptionSalaryGreaterMwzPercentage;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecPayPercentage;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecUnitsFactor;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecUnitsMaximumWeek;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntExemptionMwz;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntExemptionSalaryEqualsMwzLimit;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntExemptionSalaryGreaterMwzLimit;
     private sa.lib.gui.bean.SBeanFieldKey moKeyAbsenceClass;
     private sa.lib.gui.bean.SBeanFieldKey moKeyAbsenceType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyAccountingConfigurationType;
@@ -543,6 +585,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
     private sa.lib.gui.bean.SBeanFieldKey moKeyBenefitType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEarningComputationType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEarningExemptionType;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyEarningExemptionTypeYear;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEarningType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyLoanType;
     private sa.lib.gui.bean.SBeanFieldText moTextCode;
@@ -560,11 +603,12 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode.getText()), 10);
         moTextName.setTextSettings(SGuiUtils.getLabelName(jlName.getText()), 100);
         moTextNameAbbreviated.setTextSettings(SGuiUtils.getLabelName(jlNameAbbreviated.getText()), 25);
-        moIntExemptionMwz.setIntegerSettings(SGuiUtils.getLabelName(jlExemptionMwz.getText()), SGuiConsts.GUI_TYPE_INT, false);
+        moDecExemptionMwz.setDecimalSettings(SGuiUtils.getLabelName(jlExemptionMwz.getText()), SGuiConsts.GUI_TYPE_DEC, false);
+        moDecExemptionMwzYear.setDecimalSettings(SGuiUtils.getLabelName(jlExemptionMwz.getText()), SGuiConsts.GUI_TYPE_DEC, false);
         moDecExemptionSalaryEqualsMwzPercentage.setDecimalSettings(SGuiUtils.getLabelName(jlExemptionSalaryEqualsMwzPercentage.getText()), SGuiConsts.GUI_TYPE_DEC_PER_DISC, false);
-        moIntExemptionSalaryEqualsMwzLimit.setIntegerSettings(SGuiUtils.getLabelName(jlExemptionSalaryEqualsMwzLimit.getText()), SGuiConsts.GUI_TYPE_INT, false);
+        moDecExemptionSalaryEqualsMwzLimit.setDecimalSettings(SGuiUtils.getLabelName(jlExemptionSalaryEqualsMwzLimit.getText()), SGuiConsts.GUI_TYPE_DEC, false);
         moDecExemptionSalaryGreaterMwzPercentage.setDecimalSettings(SGuiUtils.getLabelName(jlExemptionSalaryGreaterMwzPercentage.getText()), SGuiConsts.GUI_TYPE_DEC_PER_DISC, false);
-        moIntExemptionSalaryGreaterMwzLimit.setIntegerSettings(SGuiUtils.getLabelName(jlExemptionSalaryGreaterMwzLimit.getText()), SGuiConsts.GUI_TYPE_INT, false);
+        moDecExemptionSalaryGreaterMwzLimit.setDecimalSettings(SGuiUtils.getLabelName(jlExemptionSalaryGreaterMwzLimit.getText()), SGuiConsts.GUI_TYPE_DEC, false);
         moDecPayPercentage.setDecimalSettings(SGuiUtils.getLabelName(jlPayPercentage.getText()), SGuiConsts.GUI_TYPE_DEC_PER_DISC, true);
         moDecUnitsMaximumWeek.setDecimalSettings(SGuiUtils.getLabelName(jlUnitsMaximumWeek.getText()), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, false);
         moDecUnitsFactor.setDecimalSettings(SGuiUtils.getLabelName(jlUnitsFactor.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, true);
@@ -572,10 +616,12 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moBoolDaysAdjustment.setBooleanSettings(SGuiUtils.getLabelName(moBoolDaysAdjustment.getText()), false);
         moBoolDaysAbsence.setBooleanSettings(SGuiUtils.getLabelName(moBoolDaysAbsence.getText()), false);
         moBoolDaysWorked.setBooleanSettings(SGuiUtils.getLabelName(moBoolDaysWorked.getText()), false);
+        moBoolDaysWorkedBased.setBooleanSettings(SGuiUtils.getLabelName(moBoolDaysWorkedBased.getText()), false);
         moBoolLoan.setBooleanSettings(SGuiUtils.getLabelName(moBoolLoan.getText()), false);
         moKeyEarningType.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningType.getText()), true);
         moKeyEarningComputationType.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningComputationType.getText()), true);
         moKeyEarningExemptionType.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningExemptionType.getText()), true);
+        moKeyEarningExemptionTypeYear.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningExemptionType.getText()), true);
         moKeyLoanType.setKeySettings(miClient, SGuiUtils.getLabelName(jlLoanType.getText()), false);
         moKeyBenefitType.setKeySettings(miClient, SGuiUtils.getLabelName(jlBenefitType.getText()), true);
         moKeyAccountingConfigurationType.setKeySettings(miClient, SGuiUtils.getLabelName(jlAccountingConfigurationType.getText()), true);
@@ -591,11 +637,13 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moFields.addField(moTextNameAbbreviated);
         moFields.addField(moKeyEarningComputationType);
         moFields.addField(moKeyEarningExemptionType);
-        moFields.addField(moIntExemptionMwz);
+        moFields.addField(moKeyEarningExemptionTypeYear);
+        moFields.addField(moDecExemptionMwz);
+        moFields.addField(moDecExemptionMwzYear);
         moFields.addField(moDecExemptionSalaryEqualsMwzPercentage);
-        moFields.addField(moIntExemptionSalaryEqualsMwzLimit);
+        moFields.addField(moDecExemptionSalaryEqualsMwzLimit);
         moFields.addField(moDecExemptionSalaryGreaterMwzPercentage);
-        moFields.addField(moIntExemptionSalaryGreaterMwzLimit);
+        moFields.addField(moDecExemptionSalaryGreaterMwzLimit);
         moFields.addField(moDecPayPercentage);
         moFields.addField(moDecUnitsMaximumWeek);
         moFields.addField(moDecUnitsFactor);
@@ -603,6 +651,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moFields.addField(moBoolDaysAdjustment);
         moFields.addField(moBoolDaysAbsence);
         moFields.addField(moBoolDaysWorked);
+        moFields.addField(moBoolDaysWorkedBased);
         moFields.addField(moBoolLoan);
         moFields.addField(moKeyEarningType);
         moFields.addField(moKeyLoanType);
@@ -631,6 +680,8 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
                 moDecUnitsMaximumWeek.setValue(0d);
                 moBoolDaysWorked.setSelected(false);
                 moBoolDaysWorked.setEnabled(false);
+                moBoolDaysWorkedBased.setSelected(false);
+                moBoolDaysWorkedBased.setEnabled(false);
             }
             else {
                 moDecUnitsMaximumWeek.setEnabled(true);
@@ -638,13 +689,19 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
                 if (moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_DAY) {
                     moBoolDaysWorked.setEnabled(true);
                 }
+                else if (moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_PER_EAR) {
+                    moBoolDaysWorkedBased.setEnabled(true);
+                }
                 else {
                     moBoolDaysWorked.setSelected(false);
                     moBoolDaysWorked.setEnabled(false);
+                    moBoolDaysWorkedBased.setSelected(false);
+                    moBoolDaysWorkedBased.setEnabled(false);
                 }
                 
                 if (moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_PER_DAY ||
-                        moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_PER_HRS) {
+                        moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_PER_HRS ||
+                        moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_PER_EAR) {
                     moDecPayPercentage.setEnabled(true);
                 }
                 else {
@@ -658,26 +715,38 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
     private void itemStateKeyEarningExemptionType() {
         if (moKeyEarningExemptionType.getValue().length > 0) {
             if (moKeyEarningExemptionType.getValue()[0] != SModSysConsts.HRSS_TP_EAR_EXEM_PER) {
-                moIntExemptionMwz.setEnabled(true);
+                moDecExemptionMwz.setEnabled(true);
                 moDecExemptionSalaryEqualsMwzPercentage.setEnabled(false);
-                moIntExemptionSalaryEqualsMwzLimit.setEnabled(false);
+                moDecExemptionSalaryEqualsMwzLimit.setEnabled(false);
                 moDecExemptionSalaryGreaterMwzPercentage.setEnabled(false);
-                moIntExemptionSalaryGreaterMwzLimit.setEnabled(false);
+                moDecExemptionSalaryGreaterMwzLimit.setEnabled(false);
                 moDecExemptionSalaryEqualsMwzPercentage.setValue(0d);
-                moIntExemptionSalaryEqualsMwzLimit.setValue(0);
+                moDecExemptionSalaryEqualsMwzLimit.setValue(0d);
                 moDecExemptionSalaryGreaterMwzPercentage.setValue(0d);
-                moIntExemptionSalaryGreaterMwzLimit.setValue(0);
+                moDecExemptionSalaryGreaterMwzLimit.setValue(0d);
                 moBoolWelfare.setSelected(false);
                 moBoolWelfare.setEnabled(false);
             }
             else {
-                moIntExemptionMwz.setEnabled(false);
-                moIntExemptionMwz.setValue(0);
+                moDecExemptionMwz.setEnabled(false);
+                moDecExemptionMwz.setValue(0d);
                 moDecExemptionSalaryEqualsMwzPercentage.setEnabled(true);
-                moIntExemptionSalaryEqualsMwzLimit.setEnabled(true);
+                moDecExemptionSalaryEqualsMwzLimit.setEnabled(true);
                 moDecExemptionSalaryGreaterMwzPercentage.setEnabled(true);
-                moIntExemptionSalaryGreaterMwzLimit.setEnabled(true);
+                moDecExemptionSalaryGreaterMwzLimit.setEnabled(true);
                 moBoolWelfare.setEnabled(true);
+            }
+        }
+    }
+    
+    private void itemStateKeyEarningExemptionTypeYear() {
+        if (moKeyEarningExemptionTypeYear.getValue().length > 0) {
+            if (moKeyEarningExemptionTypeYear.getValue()[0] != SModSysConsts.HRSS_TP_EAR_EXEM_PER) {
+                moDecExemptionMwzYear.setEnabled(true);
+            }
+            else {
+                moDecExemptionMwzYear.setEnabled(false);
+                moDecExemptionMwzYear.setValue(0d);
             }
         }
     }
@@ -687,6 +756,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moBoolLoan.addActionListener(this);
         moKeyEarningComputationType.addItemListener(this);
         moKeyEarningExemptionType.addItemListener(this);
+        moKeyEarningExemptionTypeYear.addItemListener(this);
     }
 
     @Override
@@ -694,6 +764,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moBoolLoan.addActionListener(this);
         moKeyEarningComputationType.removeItemListener(this);
         moKeyEarningExemptionType.removeItemListener(this);
+        moKeyEarningExemptionTypeYear.removeItemListener(this);
     }
 
     @Override
@@ -701,6 +772,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         miClient.getSession().populateCatalogue(moKeyEarningType, SModConsts.HRSS_TP_EAR, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyEarningComputationType, SModConsts.HRSS_TP_EAR_COMP, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyEarningExemptionType, SModConsts.HRSS_TP_EAR_EXEM, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyEarningExemptionTypeYear, SModConsts.HRSS_TP_EAR_EXEM, SLibConsts.UNDEFINED, new SGuiParams(new int[] { SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL }));
         miClient.getSession().populateCatalogue(moKeyLoanType, SModConsts.HRSS_TP_LOAN, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyBenefitType, SModConsts.HRSS_TP_BEN, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyAccountingConfigurationType, SModConsts.HRSS_TP_ACC, SLibConsts.UNDEFINED, null);
@@ -730,11 +802,12 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moTextCode.setValue(moRegistry.getCode());
         moTextName.setValue(moRegistry.getName());
         moTextNameAbbreviated.setValue(moRegistry.getNameAbbreviated());
-        moIntExemptionMwz.setValue(moRegistry.getExemptionMwz());
+        moDecExemptionMwz.setValue(moRegistry.getExemptionMwz());
+        moDecExemptionMwzYear.setValue(moRegistry.getExemptionMwzYear());
         moDecExemptionSalaryEqualsMwzPercentage.setValue(moRegistry.getExemptionSalaryEqualsMwzPercentage());
-        moIntExemptionSalaryEqualsMwzLimit.setValue(moRegistry.getExemptionSalaryEqualsMwzLimit());
+        moDecExemptionSalaryEqualsMwzLimit.setValue(moRegistry.getExemptionSalaryEqualsMwzLimit());
         moDecExemptionSalaryGreaterMwzPercentage.setValue(moRegistry.getExemptionSalaryGreaterMwzPercentage());
-        moIntExemptionSalaryGreaterMwzLimit.setValue(moRegistry.getExemptionSalaryGreaterMwzLimit());
+        moDecExemptionSalaryGreaterMwzLimit.setValue(moRegistry.getExemptionSalaryGreaterMwzLimit());
         moDecPayPercentage.setValue(moRegistry.getPayPercentage());
         moDecUnitsMaximumWeek.setValue(moRegistry.getUnitsMaximumWeek());
         moDecUnitsFactor.setValue(moRegistry.getUnitsFactor());
@@ -742,12 +815,14 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moBoolDaysAdjustment.setValue(moRegistry.isDaysAdjustment());
         moBoolDaysAbsence.setValue(moRegistry.isDaysAbsence());
         moBoolDaysWorked.setValue(moRegistry.isDaysWorked());
+        moBoolDaysWorkedBased.setValue(moRegistry.isDaysWorkedBased());
         moBoolWithholding.setValue(moRegistry.isWithholding());
         moBoolPayrollTax.setValue(moRegistry.isPayrollTax());
         moBoolTaxCalculationOptional.setValue(moRegistry.isAlternativeTaxCalculation());
         moKeyEarningType.setValue(new int[] { moRegistry.getFkEarningTypeId() });
         moKeyEarningComputationType.setValue(new int[] { moRegistry.getFkEarningComputationTypeId() });
         moKeyEarningExemptionType.setValue(new int[] { moRegistry.getFkEarningExemptionTypeId() });
+        moKeyEarningExemptionTypeYear.setValue(new int[] { moRegistry.getFkEarningExemptionTypeYearId() });
         moBoolLoan.setValue(moRegistry.getFkLoanTypeId() > SModSysConsts.HRSS_TP_LOAN_NON);
         moKeyLoanType.setValue(moRegistry.isRegistryNew() ? new int[] { SModSysConsts.HRSS_TP_LOAN_NON } : new int[] { moRegistry.getFkLoanTypeId() });
         moKeyBenefitType.setValue(new int[] { moRegistry.getFkBenefitTypeId() });
@@ -774,11 +849,12 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         registry.setCode(moTextCode.getValue());
         registry.setName(moTextName.getValue());
         registry.setNameAbbreviated(moTextNameAbbreviated.getValue());
-        registry.setExemptionMwz(moIntExemptionMwz.getValue());
+        registry.setExemptionMwz(moDecExemptionMwz.getValue());
+        registry.setExemptionMwzYear(moDecExemptionMwzYear.getValue());
         registry.setExemptionSalaryEqualsMwzPercentage(moDecExemptionSalaryEqualsMwzPercentage.getValue());
-        registry.setExemptionSalaryEqualsMwzLimit(moIntExemptionSalaryEqualsMwzLimit.getValue());
+        registry.setExemptionSalaryEqualsMwzLimit(moDecExemptionSalaryEqualsMwzLimit.getValue());
         registry.setExemptionSalaryGreaterMwzPercentage(moDecExemptionSalaryGreaterMwzPercentage.getValue());
-        registry.setExemptionSalaryGreaterMwzLimit(moIntExemptionSalaryGreaterMwzLimit.getValue());
+        registry.setExemptionSalaryGreaterMwzLimit(moDecExemptionSalaryGreaterMwzLimit.getValue());
         registry.setPayPercentage(moDecPayPercentage.getValue());
         registry.setUnitsMaximumWeek(moDecUnitsMaximumWeek.getValue());
         registry.setUnitsFactor(moDecUnitsFactor.getValue());
@@ -786,12 +862,14 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         registry.setDaysAdjustment(moBoolDaysAdjustment.getValue());
         registry.setDaysAbsence(moBoolDaysAbsence.getValue());
         registry.setDaysWorked(moBoolDaysWorked.getValue());
+        registry.setDaysWorkedBased(moBoolDaysWorkedBased.getValue());
         registry.setWithholding(moBoolWithholding.getValue());
         registry.setPayrollTax(moBoolPayrollTax.getValue());
         registry.setAlternativeTaxCalculation(moBoolTaxCalculationOptional.getValue());
         registry.setFkEarningTypeId(moKeyEarningType.getValue()[0]);
         registry.setFkEarningComputationTypeId(moKeyEarningComputationType.getValue()[0]);
         registry.setFkEarningExemptionTypeId(moKeyEarningExemptionType.getValue()[0]);
+        registry.setFkEarningExemptionTypeYearId(moKeyEarningExemptionTypeYear.getValue()[0]);
         registry.setFkLoanTypeId(moBoolLoan.getValue() ? moKeyLoanType.getValue()[0] : SModSysConsts.HRSS_TP_LOAN_NON);
         registry.setFkBenefitTypeId(moKeyBenefitType.getValue()[0]);
         registry.setFkAccountingConfigurationTypeId(moKeyAccountingConfigurationType.getValue()[0]);
@@ -851,6 +929,14 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
                     validation.setComponent(moKeyAccountingRecordType);
                 }
             }
+            
+            if (validation.isValid()) {
+                if (moKeyEarningExemptionType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL && 
+                        moKeyEarningExemptionTypeYear.getValue()[0] == SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlEarningExemptionType.getText()) + "'.");
+                    validation.setComponent(moKeyEarningExemptionTypeYear);
+                }
+            }
         }
         
         return validation;
@@ -877,6 +963,9 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
             }
             else if (comboBox == moKeyEarningExemptionType) {
                 itemStateKeyEarningExemptionType();
+            }
+            else if (comboBox == moKeyEarningExemptionTypeYear) {
+                itemStateKeyEarningExemptionTypeYear();
             }
         }
     }

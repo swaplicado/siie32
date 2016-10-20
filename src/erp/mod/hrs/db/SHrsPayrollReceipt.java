@@ -56,7 +56,10 @@ public class SHrsPayrollReceipt {
         return taxableEarnings;
     }
     
-    // XXX (jbarajas, 2016-04-06) articule 174 RLISR
+    /**
+     * Get amount taxed amount of earnings configured based on articule 174 RLISR
+     * @return 
+     */
     private double getTaxableEarningsAlt() {
         double taxableEarnings = 0;
 
@@ -71,7 +74,7 @@ public class SHrsPayrollReceipt {
     
     private void computeEarnings() {
         for (SHrsPayrollReceiptEarning receiptEarning : maHrsEarnings) {
-            // receiptEarning.computeEarning(); XXX jbarajas 15/04/2015
+            receiptEarning.computeEarning(); //XXX jbarajas 15/04/2015
         }
     }
 
@@ -104,6 +107,7 @@ public class SHrsPayrollReceipt {
     private void computeEarningExempt(SHrsPayrollReceiptAccumulatedEarnings payrollReceiptAccumulatedEarnings) throws Exception {
         double amountExemp = 0;
         double amountAccumulateExemp = 0;
+        double amountAccumulateExempYear = 0;
         double minimumExemptionWage = 0;
         double limitExemption = 0;
         double salaryEmployee = 0;
@@ -126,101 +130,116 @@ public class SHrsPayrollReceipt {
                 // Verify type of exemption:
 
                 amountExemp = 0;
-                switch (earning.getFkEarningExemptionTypeId()) {
-                    case SModSysConsts.HRSS_TP_EAR_EXEM_NON:
-                        break;
-                    case SModSysConsts.HRSS_TP_EAR_EXEM_PER:
-
-                        // Compute employe salary if is necessary:
-
-                        salaryEmployee = SLibUtils.round(moHrsEmployee.getEmployee().getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ?
-                            moHrsEmployee.getEmployee().getSalary() : ((moHrsEmployee.getEmployee().getWage() * SHrsConsts.YEAR_MONTHS) / SHrsConsts.YEAR_DAYS), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-
-                        // Compute exempt:
-
-                        if (salaryEmployee == moHrsPayroll.getPayroll().getMwzWage()) {
-
-                            // Limit exempt:
-
-                            limitExemption = SLibUtils.round(earning.getExemptionSalaryEqualsMwzLimit() * moHrsPayroll.getPayroll().getMwzWage(), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-                            amountExemp = SLibUtils.round(earning.getExemptionSalaryEqualsMwzPercentage() * hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r(), SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits());
-                        }
-                        else if (salaryEmployee > moHrsPayroll.getPayroll().getMwzWage()) {
-
-                            // Limit exempt:
-
-                            limitExemption = SLibUtils.round(earning.getExemptionSalaryGreaterMwzLimit() * moHrsPayroll.getPayroll().getMwzWage(), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-                            amountExemp = SLibUtils.round(earning.getExemptionSalaryGreaterMwzPercentage() * hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r(), SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits());
-                        }
-
-                        if (limitExemption != 0 && amountExemp > limitExemption) {
-                            amountExemp = limitExemption;
-                        }
-
-                        break;
-
-                    case SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL:
-                    case SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_EVT:
-
-                        // Obtain accumulated if is necessary:
-
-                        if (amountAccumulateExemp == 0 &&
-                                earning.getFkEarningExemptionTypeId() == SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL) {
-
-                            hrsAccumulatedEarning = moHrsEmployee.getAccumulatedEarning(earning.getPkEarningId());
-                            amountAccumulateExemp = hrsAccumulatedEarning != null ? hrsAccumulatedEarning.getExemption() : 0;
-                        }
-
-                        // Compute exempt:
-
-                        if (earning.getExemptionMwz() > 0) {
-
-                            minimumExemptionWage = SLibUtils.round(earning.getExemptionMwz() * moHrsPayroll.getPayroll().getMwzWage(), SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits());
-                            if ((minimumExemptionWage - amountAccumulateExemp) < 0) {
-                                amountExemp = 0;
-                            }
-                            else if ((minimumExemptionWage - amountAccumulateExemp) <= hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r()) {
-                                amountExemp = SLibUtils.round(minimumExemptionWage - amountAccumulateExemp, SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits());
-                            }
-                            else {
-                                amountExemp = hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r();
-                            }
-                        }
-
-                        // Accumulate exempt if there is another earning:
-
-                        amountAccumulateExemp += amountExemp;
-
-                        break;
-                    case SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_SEN:
-                        // Compute exempt:
-                        seniority = moHrsEmployee.getSeniority();
-                                
-                        seniorityDays = ((int) SLibTimeUtils.getDaysDiff(moHrsPayroll.getPayroll().getDateEnd(), SLibTimeUtils.addDate(moHrsEmployee.getEmployee().getDateBenefits(), seniority, 0, 0)));
-                                //((double) seniority + ((double) seniorityDays / SHrsConsts.YEAR_DAYS)));
-                        
-                        minimumExemptionWageSeniority = ((double) seniority + ((double) seniorityDays / SHrsConsts.YEAR_DAYS)) * earning.getExemptionMwz();
-
-                        if (earning.getExemptionMwz() > 0) {
-
-                            minimumExemptionWage = SLibUtils.round(minimumExemptionWageSeniority * moHrsPayroll.getPayroll().getMwzWage(), SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits());
-                            if (minimumExemptionWage <= hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r()) {
-                                amountExemp = SLibUtils.round(minimumExemptionWage, SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits());
-                            }
-                            else {
-                                amountExemp = hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r();
-                            }
-                        }
-                        break;
-
-                    default:
-                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración percepción)");
+                
+                // Calculate exempt for year:
+                
+                if (earning.getFkEarningExemptionTypeYearId() == SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL) {
+                    amountAccumulateExempYear = computeEarningExemptYear(hrsPayrollReceiptEarning);
                 }
+                
+                if (earning.getFkEarningExemptionTypeYearId() == SModSysConsts.HRSS_TP_EAR_EXEM_NON || amountAccumulateExempYear > 0) {
+                    switch (earning.getFkEarningExemptionTypeId()) {
+                        case SModSysConsts.HRSS_TP_EAR_EXEM_NON:
+                            break;
+                        case SModSysConsts.HRSS_TP_EAR_EXEM_PER:
 
-                // Validate that amountExemp doesn´t exceed the amount_r:
+                            // Compute employe salary if is necessary:
 
-                if (amountExemp > hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r()) {
-                    amountExemp = hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r();
+                            salaryEmployee = SLibUtils.round(moReceipt.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ?
+                                moReceipt.getSalary() : ((moReceipt.getWage() * SHrsConsts.YEAR_MONTHS) / SHrsConsts.YEAR_DAYS), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+
+                            // Compute exempt:
+
+                            if (salaryEmployee == moHrsPayroll.getPayroll().getMwzWage()) {
+
+                                // Limit exempt:
+
+                                limitExemption = SLibUtils.round(earning.getExemptionSalaryEqualsMwzLimit() * moHrsPayroll.getPayroll().getMwzWage(), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                                amountExemp = SLibUtils.round(earning.getExemptionSalaryEqualsMwzPercentage() * hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r(), SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits());
+                            }
+                            else if (salaryEmployee > moHrsPayroll.getPayroll().getMwzWage()) {
+
+                                // Limit exempt:
+
+                                limitExemption = SLibUtils.round(earning.getExemptionSalaryGreaterMwzLimit() * moHrsPayroll.getPayroll().getMwzWage(), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                                amountExemp = SLibUtils.round(earning.getExemptionSalaryGreaterMwzPercentage() * hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r(), SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits());
+                            }
+
+                            if (limitExemption != 0 && amountExemp > limitExemption) {
+                                amountExemp = limitExemption;
+                            }
+
+                            break;
+
+                        case SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL:
+                        case SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_EVT:
+
+                            // Obtain accumulated if is necessary:
+
+                            if (amountAccumulateExemp == 0 &&
+                                    earning.getFkEarningExemptionTypeId() == SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL) {
+
+                                hrsAccumulatedEarning = moHrsEmployee.getAccumulatedEarning(earning.getPkEarningId());
+                                amountAccumulateExemp = hrsAccumulatedEarning != null ? hrsAccumulatedEarning.getExemption() : 0;
+                            }
+
+                            // Compute exempt:
+
+                            if (earning.getExemptionMwz() > 0) {
+
+                                minimumExemptionWage = SLibUtils.round(earning.getExemptionMwz() * moHrsPayroll.getPayroll().getMwzWage(), SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits());
+                                if ((minimumExemptionWage - amountAccumulateExemp) < 0) {
+                                    amountExemp = 0;
+                                }
+                                else if ((minimumExemptionWage - amountAccumulateExemp) <= hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r()) {
+                                    amountExemp = SLibUtils.round(minimumExemptionWage - amountAccumulateExemp, SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits());
+                                }
+                                else {
+                                    amountExemp = hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r();
+                                }
+                            }
+
+                            // Accumulate exempt if there is another earning:
+
+                            amountAccumulateExemp += amountExemp;
+
+                            break;
+                        case SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_SEN:
+                            // Compute exempt:
+                            seniority = moHrsEmployee.getSeniority();
+
+                            seniorityDays = ((int) SLibTimeUtils.getDaysDiff(moHrsPayroll.getPayroll().getDateEnd(), SLibTimeUtils.addDate(moHrsEmployee.getEmployee().getDateBenefits(), seniority, 0, 0)));
+                                    //((double) seniority + ((double) seniorityDays / SHrsConsts.YEAR_DAYS)));
+
+                            minimumExemptionWageSeniority = ((double) seniority + ((double) seniorityDays / SHrsConsts.YEAR_DAYS)) * earning.getExemptionMwz();
+
+                            if (earning.getExemptionMwz() > 0) {
+
+                                minimumExemptionWage = SLibUtils.round(minimumExemptionWageSeniority * moHrsPayroll.getPayroll().getMwzWage(), SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits());
+                                if (minimumExemptionWage <= hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r()) {
+                                    amountExemp = SLibUtils.round(minimumExemptionWage, SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits());
+                                }
+                                else {
+                                    amountExemp = hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r();
+                                }
+                            }
+                            break;
+
+                        default:
+                            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración percepción)");
+                    }
+
+                    // Validate that amountExemp doesn´t exceed the amountAccumulateExempYear:
+                    
+                    if (amountAccumulateExempYear > 0 && amountAccumulateExempYear < amountExemp) {
+                        amountExemp = amountAccumulateExempYear;
+                    }
+                    
+                    // Validate that amountExemp doesn´t exceed the amount_r:
+
+                    if (amountExemp > hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r()) {
+                        amountExemp = hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r();
+                    }
                 }
 
                 payrollReceiptEarning.setAmountExempt(amountExemp);
@@ -228,6 +247,32 @@ public class SHrsPayrollReceipt {
                 hrsPayrollReceiptEarning.setReceiptEarning(payrollReceiptEarning);
             //} XXX jbarajas 2016-01-16 calculate exemption for all earnings
         }
+    }
+    
+    private double computeEarningExemptYear(SHrsPayrollReceiptEarning hrsPayrollReceiptEarning) throws Exception {
+        double amountExemp = 0;
+        double amountAccumulateExemp = 0;
+        double minimumExemptionWage = 0;
+        SDbEarning earning = null;
+        SHrsAccumulatedEarning hrsAccumulatedEarning = null;
+        
+        earning = hrsPayrollReceiptEarning.getEarning();
+        
+        hrsAccumulatedEarning = moHrsEmployee.getAccumulatedEarning(earning.getPkEarningId());
+        amountAccumulateExemp = hrsAccumulatedEarning != null ? hrsAccumulatedEarning.getExemption() : 0;
+        
+        minimumExemptionWage = SLibUtils.round(earning.getExemptionMwzYear() * moHrsPayroll.getPayroll().getMwzWage() * SHrsConsts.YEAR_DAYS, SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits());
+        if ((minimumExemptionWage - amountAccumulateExemp) < 0) {
+            amountExemp = 0;
+        }
+        else if ((minimumExemptionWage - amountAccumulateExemp) <= hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r()) {
+            amountExemp = SLibUtils.round(minimumExemptionWage - amountAccumulateExemp, SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits());
+        }
+        else {
+            amountExemp = hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r();
+        }
+        
+        return amountExemp;
     }
 
     private void computeDeductions() {
@@ -312,89 +357,13 @@ public class SHrsPayrollReceipt {
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
 
-        /* XXX jbarajas 2015-09-10 update deduction when is user
-        // Remove previous tax:
-
-        aDeductionsToRemove = new ArrayList<SHrsPayrollReceiptDeduction>();
-        aDeductionsByUser = new ArrayList<SHrsPayrollReceiptDeduction>();
-
-        for (SHrsPayrollReceiptDeduction deduction : maHrsDeductions) {
-            if (deduction.getReceiptDeduction().getFkDeductionTypeId() == SModSysConsts.HRSS_TP_DED_TAX) {
-                if (deduction.getReceiptDeduction().isUserEdited()) {
-                    aDeductionsByUser.add(deduction);    // preserve user input
-                }
-                else {
-                    aDeductionsToRemove.add(deduction);  // delete previous system computations
-                }
-            }
-        }
-
-        for (SHrsPayrollReceiptDeduction deduction : aDeductionsToRemove) {
-            maHrsDeductions.remove(deduction);
-        }
-
-        aDeductionsToRemove.clear();
-
-        i = 0;
-        for (SHrsPayrollReceiptDeduction deduction : maHrsDeductions) {
-            deduction.setPkMoveId(++i);
-        }
-        */
-
         if (oAccumulatedTax != null) {
             dTaxAccumulated = SLibUtils.round(oAccumulatedTax.getAcummulated(), SUtilConsts.DECS_AMT);
         }
 
-        /* XXX jbarajas 2015-09-10 update deduction when is user
-        // Preserve tax set by user:
-
-        for (SHrsPayrollReceiptDeduction deduction : aDeductionsByUser) {
-            deduction.getReceiptDeduction().setAmountSystem_r(0);
-            dTaxSetByUser += SLibUtils.round(deduction.getReceiptDeduction().getAmount_r(), SUtilConsts.DECS_AMT);
-        }
-        dTaxSetByUser = SLibUtils.round(dTaxSetByUser, SUtilConsts.DECS_AMT);
-
-        // Remove previous tax subsidy:
-
-        aEarningsToRemove = new ArrayList<SHrsPayrollReceiptEarning>();
-        aEarningsByUser = new ArrayList<SHrsPayrollReceiptEarning>();
-
-        for (SHrsPayrollReceiptEarning earning : maHrsEarnings) {
-            if (earning.getReceiptEarning().getFkEarningTypeId() == SModSysConsts.HRSS_TP_EAR_TAX_SUB) {
-                if (earning.getReceiptEarning().isUserEdited()) {
-                    aEarningsByUser.add(earning);    // preserve user input
-                }
-                else {
-                    aEarningsToRemove.add(earning);  // delete previous system computations
-                }
-            }
-        }
-
-        for (SHrsPayrollReceiptEarning earning : aEarningsToRemove) {
-            maHrsEarnings.remove(earning);
-        }
-
-        aEarningsToRemove.clear();
-
-        i = 0;
-        for (SHrsPayrollReceiptEarning earning : maHrsEarnings) {
-            earning.setPkMoveId(++i);
-        }
-        */
-
         if (oAccumulatedSubsidy != null) {
             dSubsidyAccumulated = SLibUtils.round(oAccumulatedSubsidy.getAcummulated(), SUtilConsts.DECS_AMT);
         }
-
-        /* XXX jbarajas 2015-09-10 update deduction when is user
-        // Preserve tax subsidy set by user:
-
-        for (SHrsPayrollReceiptEarning earning : aEarningsByUser) {
-            earning.getReceiptEarning().setAmountSystem_r(0);
-            dSubsidySetByUser += SLibUtils.round(earning.getReceiptEarning().getAmount_r(), SUtilConsts.DECS_AMT);
-        }
-        dSubsidySetByUser = SLibUtils.round(dSubsidySetByUser, SUtilConsts.DECS_AMT);
-        */
 
         if (bComputeTax) {
             for (SHrsPayrollReceiptEarning earning : maHrsEarnings) {
@@ -633,7 +602,7 @@ public class SHrsPayrollReceipt {
 
         for (SHrsPayrollReceiptEarning earning : maHrsEarnings) {
             if (earning.getReceiptEarning().getFkEarningTypeId() == SModSysConsts.HRSS_TP_EAR_TAX_SUB) {
-                if (earning.getReceiptEarning().isUserEdited() || !earning.getReceiptEarning().isAutomatic()) {
+                if ((earning.getReceiptEarning().isUserEdited() || !earning.getReceiptEarning().isAutomatic()) && moHrsPayroll.getPayroll().isTaxSubsidy()) {
                     //earning.getReceiptEarning().setAmountSystem_r(SLibUtils.round(dSubsidyComputed - dSubsidyAccumulated, SUtilConsts.DECS_AMT)); XXX (jbarajas, 2016-05-17) new computation for tax, net or tax subsidy and tax by separate    // preserve user input
                     earning.getReceiptEarning().setAmountSystem_r(!moHrsPayroll.getConfig().isTaxNet() ? SLibUtils.round(dSubsidyComputed - dSubsidyAccumulated, SUtilConsts.DECS_AMT) : (dTaxNet < 0 ? Math.abs(dTaxNet) : 0));    // preserve user input
                     dSubsidySetByUser += SLibUtils.round( earning.getReceiptEarning().getAmount_r(), SUtilConsts.DECS_AMT);
@@ -646,7 +615,8 @@ public class SHrsPayrollReceipt {
         }
 
         if (!aEarningsToRemove.isEmpty()) {
-            if ((!moHrsPayroll.getConfig().isTaxNet() ? (dSubsidyComputed - dSubsidyAccumulated) <= 0 : dTaxNet > 0)) {
+            if ((!moHrsPayroll.getConfig().isTaxNet() ? (dSubsidyComputed - dSubsidyAccumulated) <= 0 : dTaxNet > 0) ||
+                    !moHrsPayroll.getPayroll().isTaxSubsidy()) {
                 for (SHrsPayrollReceiptEarning earning : aEarningsToRemove) {
                     maHrsEarnings.remove(earning);
                 }
@@ -670,10 +640,10 @@ public class SHrsPayrollReceipt {
         }
         else if (!foundSubsidy && oReceiptEarningSubsidy != null) {
             // maHrsEarnings.add(oReceiptEarningSubsidy); XXX (jbarajas, 2016-05-17) new computation for tax, net or tax subsidy and tax by separate
-            if (!moHrsPayroll.getConfig().isTaxNet()) {
+            if (!moHrsPayroll.getConfig().isTaxNet() && moHrsPayroll.getPayroll().isTaxSubsidy()) {
                 maHrsEarnings.add(oReceiptEarningSubsidy);
             }
-            else if (dTaxNet < 0) {
+            else if (dTaxNet < 0 && moHrsPayroll.getPayroll().isTaxSubsidy()) {
                 oReceiptEarningSubsidy.getReceiptEarning().setAmountUnitary(Math.abs(dTaxNet));
                 oReceiptEarningSubsidy.getReceiptEarning().setAmountSystem_r(oReceiptEarningSubsidy.getReceiptEarning().getAmountUnitary());
                 oReceiptEarningSubsidy.getReceiptEarning().setAmount_r(oReceiptEarningSubsidy.getReceiptEarning().getAmountUnitary());
@@ -722,7 +692,10 @@ public class SHrsPayrollReceipt {
                     
                     moReceipt.setTaxPayrollTheorical(!moHrsPayroll.getConfig().isTaxNet() ? dTaxComputed : (dTaxNet > 0 ? dTaxNet : 0));
                     moReceipt.setTaxPayrollActual(dTaxSetByUser != 0 ? dTaxSetByUser : moReceipt.getTaxPayrollTheorical());
-                    moReceipt.setTaxSubsidyPayrollTheorical(!moHrsPayroll.getConfig().isTaxNet() ? dSubsidyComputed : (dTaxNet < 0 ? Math.abs(dTaxNet) : 0));
+                    //moReceipt.setTaxSubsidyPayrollTheorical(!moHrsPayroll.getConfig().isTaxNet() ? dSubsidyComputed : (dTaxNet < 0 ? Math.abs(dTaxNet) : 0));
+                    if (moHrsPayroll.getPayroll().isTaxSubsidy()) {
+                        moReceipt.setTaxSubsidyPayrollTheorical(!moHrsPayroll.getConfig().isTaxNet() ? dSubsidyComputed : (dTaxNet < 0 ? Math.abs(dTaxNet) : 0));
+                    }
                     moReceipt.setTaxSubsidyPayrollActual(dSubsidySetByUser != 0 ? dSubsidySetByUser : moReceipt.getTaxSubsidyPayrollTheorical());
                     
                     moReceipt.setTaxAnnualTheorical(0);
@@ -748,12 +721,19 @@ public class SHrsPayrollReceipt {
                     
                     moReceipt.setTaxPayrollTheorical(!moHrsPayroll.getConfig().isTaxNet() ? (dTaxComputed <= dTaxAccumulated ? 0 : SLibUtils.round(dTaxComputed - dTaxAccumulated, SUtilConsts.DECS_AMT)) : (dTaxAccumulatedNet > 0 ? dTaxAccumulatedNet : 0));
                     moReceipt.setTaxPayrollActual(dTaxSetByUser != 0 ? dTaxSetByUser : moReceipt.getTaxPayrollTheorical());
-                    moReceipt.setTaxSubsidyPayrollTheorical(dSubsidyComputed <= dSubsidyAccumulated ? 0 : SLibUtils.round(dSubsidyComputed - dSubsidyAccumulated, SUtilConsts.DECS_AMT));
+                    //moReceipt.setTaxSubsidyPayrollTheorical(dSubsidyComputed <= dSubsidyAccumulated ? 0 : SLibUtils.round(dSubsidyComputed - dSubsidyAccumulated, SUtilConsts.DECS_AMT));
+                    if (moHrsPayroll.getPayroll().isTaxSubsidy()) {
+                        moReceipt.setTaxSubsidyPayrollTheorical(dSubsidyComputed <= dSubsidyAccumulated ? 0 : SLibUtils.round(dSubsidyComputed - dSubsidyAccumulated, SUtilConsts.DECS_AMT));
+                    }
                     moReceipt.setTaxSubsidyPayrollActual(dSubsidySetByUser != 0 ? dSubsidySetByUser : moReceipt.getTaxSubsidyPayrollTheorical());
                     moReceipt.setTaxAnnualTheorical(!moHrsPayroll.getConfig().isTaxNet() ? dTaxComputed : (dTaxNet > 0 ? dTaxNet : 0));
                     moReceipt.setTaxAnnualActual(!moHrsPayroll.getConfig().isTaxNet() ? dTaxAccumulated : (dTaxAccumulatedNet > 0 ? dTaxAccumulatedNet : 0));
-                    moReceipt.setTaxSubsidyAnnualTheorical(!moHrsPayroll.getConfig().isTaxNet() ? dSubsidyComputed : (dTaxNet < 0 ? Math.abs(dTaxNet) : 0));
-                    moReceipt.setTaxSubsidyAnnualActual(!moHrsPayroll.getConfig().isTaxNet() ? dSubsidyAccumulated : (dTaxAccumulatedNet < 0 ? Math.abs(dTaxAccumulatedNet) : 0));
+                    //moReceipt.setTaxSubsidyAnnualTheorical(!moHrsPayroll.getConfig().isTaxNet() ? dSubsidyComputed : (dTaxNet < 0 ? Math.abs(dTaxNet) : 0));
+                    //moReceipt.setTaxSubsidyAnnualActual(!moHrsPayroll.getConfig().isTaxNet() ? dSubsidyAccumulated : (dTaxAccumulatedNet < 0 ? Math.abs(dTaxAccumulatedNet) : 0));
+                    if (moHrsPayroll.getPayroll().isTaxSubsidy()) {
+                        moReceipt.setTaxSubsidyAnnualTheorical(!moHrsPayroll.getConfig().isTaxNet() ? dSubsidyComputed : (dTaxNet < 0 ? Math.abs(dTaxNet) : 0));
+                        moReceipt.setTaxSubsidyAnnualActual(!moHrsPayroll.getConfig().isTaxNet() ? dSubsidyAccumulated : (dTaxAccumulatedNet < 0 ? Math.abs(dTaxAccumulatedNet) : 0));
+                    }
                     break;
                 default:
                     throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -779,45 +759,6 @@ public class SHrsPayrollReceipt {
         SHrsDaysByPeriod hrsDaysCurr = moHrsEmployee.getHrsDaysCurr();
         SHrsDaysByPeriod hrsDaysNext = moHrsEmployee.getHrsDaysNext();
         
-        /* XXX jbarajas 2015-09-09 update deduction when is user
-        // Remove previous SS contribution:
-
-        aDeductionsToRemove = new ArrayList<SHrsPayrollReceiptDeduction>();
-        aDeductionsByUser = new ArrayList<SHrsPayrollReceiptDeduction>();
-
-        for (SHrsPayrollReceiptDeduction deduction : maHrsDeductions) {
-            if (deduction.getReceiptDeduction().getFkDeductionTypeId() == SModSysConsts.HRSS_TP_DED_SSC) {
-                if (deduction.getReceiptDeduction().isUserEdited()) {
-                    aDeductionsByUser.add(deduction);    // preserve user input
-                }
-                else {
-                    aDeductionsToRemove.add(deduction);  // delete previous system computations
-                }
-            }
-        }
-
-        for (SHrsPayrollReceiptDeduction deduction : aDeductionsToRemove) {
-            maHrsDeductions.remove(deduction);
-        }
-
-        aDeductionsToRemove.clear();
-
-        i = 0;
-        for (SHrsPayrollReceiptDeduction deduction : maHrsDeductions) {
-            deduction.setPkMoveId(++i);
-        }
-
-        // Preserve SS contribution set by user:
-
-        for (SHrsPayrollReceiptDeduction deduction : aDeductionsByUser) {
-            deduction.getReceiptDeduction().setAmountSystem_r(0);
-            dSscSetByUser += SLibUtils.round(deduction.getReceiptDeduction().getAmount_r(), SUtilConsts.DECS_AMT);
-        }
-        dSscSetByUser = SLibUtils.round(dSscSetByUser, SUtilConsts.DECS_AMT);
-        
-        if (moHrsPayroll.getPayroll().isSsContribution() && aDeductionsByUser.isEmpty()) {
-            
-        */
         if (moHrsPayroll.getPayroll().isSsContribution()) {
             // Compute SS contribution:
 
@@ -875,22 +816,7 @@ public class SHrsPayrollReceipt {
                 }
                 dSscComputed += SLibUtils.round(dEarningSsc * dbSscTableRow.getWorkerPercentage(), SUtilConsts.DECS_AMT);
             }
-            /* XXX jbarajas 2015-05-13
-            dMwzTimes = moHrsPayroll.getPayroll().getMwzWage() == 0 ? 0 : moReceipt.getPaymentDaily() / moHrsPayroll.getPayroll().getMwzWage();
-            dEarningSsc = SLibUtils.round(moReceipt.getDaysPaid() * moReceipt.getSalarySscBase(), SUtilConsts.DECS_AMT);
-
-            for (i = 0; i < dbSscTable.getChildRows().size(); i++) {
-                dbSscTableRow = dbSscTable.getChildRows().get(i);
-                dSscComputed += SLibUtils.round(dMwzTimes < dbSscTableRow.getLowerLimitMwzReference() ? 0 :
-                        (dEarningSsc - (dbSscTableRow.getLowerLimitMwzReference() * moHrsPayroll.getPayroll().getMwzReferenceWage() * moReceipt.getDaysPaid())) * dbSscTableRow.getWorkerPercentage(), SUtilConsts.DECS_AMT);
-             }
-             */
-
-            /* XXX jbarajas 2015-09-09 update deduction when is user
-            if (!aDeductionsByUser.isEmpty()) {
-                aDeductionsByUser.get(0).getReceiptDeduction().setAmountSystem_r(dSscComputed);
-            }
-            */
+            
             if (dSscComputed != 0) {
                 dbReceiptDeductionSsc = new SDbPayrollReceiptDeduction();
                 dbReceiptDeductionSsc.setPkPayrollId(moReceipt.getPkPayrollId());
@@ -967,18 +893,6 @@ public class SHrsPayrollReceipt {
                 daysWorkedPayed += hrsPayrollReceiptEarning.getReceiptEarning().getUnits();
             }
         }
-        
-        /*
-        if (daysWorkedPayed >= moHrsPayroll.getPayroll().getReceiptDays()) {
-            daysWorkedPayed = 0;
-            
-            for (SHrsPayrollReceiptEarning hrsPayrollReceiptEarning : aHrsPayrollReceiptEarnings) {
-                if (hrsPayrollReceiptEarning.getEarning().isDaysWorked()) {
-                    daysWorkedPayed += hrsPayrollReceiptEarning.getReceiptEarning().getUnits();
-                }
-            }
-        }
-        */
 
         return daysWorkedPayed;
     }
@@ -1252,7 +1166,7 @@ public class SHrsPayrollReceipt {
         computeReceiptSsContribution();
         // XXX (jbarajas, 2016-04-11) compute amount per deductions of law
     }
-
+    
     public double getTotalEarnings() {
         double totalEarnings = 0;
 
@@ -1287,6 +1201,18 @@ public class SHrsPayrollReceipt {
         }
 
         return totalEarningsTaxed;
+    }
+    
+    public double getTotalEarningsDependentsDaysWorked() {
+        double totalEarnings = 0;
+
+        for (SHrsPayrollReceiptEarning receiptEarning : maHrsEarnings) {
+            if (receiptEarning.getEarning().isDaysWorked()) {
+                totalEarnings += receiptEarning.getReceiptEarning().getAmount_r();   
+            }
+        }
+
+        return totalEarnings;
     }
 
     public double getTotalDeductions() {
@@ -1401,7 +1327,7 @@ public class SHrsPayrollReceipt {
                     else {
                         unitAlleged = earning.getReceiptEarning().getUnitsAlleged() + (unitAlleged > workingDaysAvailable ? workingDaysAvailable : unitAlleged);
                     }
-                    unit = !earningNormal.isDaysAdjustment() ? unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() : (unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() * moHrsEmployee.getEmployeeDays().getFactorDaysPaid());
+                    unit = SLibUtils.round((!earningNormal.isDaysAdjustment() ? unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() : (unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() * moHrsEmployee.getEmployeeDays().getFactorDaysPaid())), SLibUtils.DecimalFormatValue8D.getMaximumFractionDigits());
                     amount = SLibUtils.round((unit * earning.getReceiptEarning().getAmountUnitary() * earningNormal.getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
 
                     earning.getReceiptEarning().setUnitsAlleged(unitAlleged);
@@ -1421,10 +1347,11 @@ public class SHrsPayrollReceipt {
             }
 
             if (!found) {
+                
                 if (earningNormal.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
                     amount_unt = unitAlleged;
-                    unit = 1;
                 }
+                /* XXX (jbarajas, 2016-09-12) concentrate in one place the calculation of perceptions and deductions.
                 else if (earningNormal.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_DAY) {
                     amount_unt = moHrsEmployee.getHrsPayrollReceipt().getReceipt().getPaymentDaily();
                     unit = !earningNormal.isDaysAdjustment() ? unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() : (unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() * moHrsEmployee.getEmployeeDays().getFactorDaysPaid());;
@@ -1442,14 +1369,17 @@ public class SHrsPayrollReceipt {
                     unit = !earningNormal.isDaysAdjustment() ? unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() : (unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() * moHrsEmployee.getEmployeeDays().getFactorDaysPaid());;
                 }
                 amount = SLibUtils.round((unit * amount_unt), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                */
 
                 // XXX (jbarajas, 2016-04-01) remove earning normal with value zero
                 if (unitAlleged > 0) {
                     hrsPayrollReceiptEarning = new SHrsPayrollReceiptEarning();
                     hrsPayrollReceiptEarning.setEarning(earningNormal);
-
+                    /* XXX (jbarajas, 2016-09-12) concentrate in one place the calculation of perceptions and deductions.
                     payrollReceiptEarning = moHrsPayroll.createHrsPayrollReceiptEarning(moHrsEmployee.getEmployee().getPkEmployeeId(), unitAlleged, amount_unt, amount, true, earningNormal,
                         SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, earningNormal.getFkLoanTypeId(), moHrsEmployee.getHrsPayrollReceipt());
+                    */
+                    payrollReceiptEarning = moHrsPayroll.createHrsPayrollReceiptEarning(moHrsEmployee.getHrsPayrollReceipt(), null, unitAlleged, amount_unt, true, earningNormal, SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, earningNormal.getFkLoanTypeId(), moHrsEmployee.getHrsPayrollReceipt().getHrsEarnings().size() + 1);
 
                     hrsPayrollReceiptEarning.setReceiptEarning(payrollReceiptEarning);
                     hrsPayrollReceiptEarning.setPkMoveId(moHrsEmployee.getHrsPayrollReceipt().getHrsEarnings().size() + 1);

@@ -113,9 +113,11 @@ public class SHrsPayroll {
                 if (earning.getPkEarningId() == automaticEarning.getPkEarningId()) {
                     hrsPayrollReceiptEarning.setEarning(earning);
                     
+                    
                     if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
                         amount_unt = automaticEarning.getAmountUnitary();
                     }
+                    /* XXX (jbarajas, 2016-09-12) concentrate in one place the calculation of perceptions and deductions.
                     else if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_DAY) {
                         amount_unt = hrsPayrollReceipt.getReceipt().getPaymentDaily();
                     }
@@ -130,13 +132,19 @@ public class SHrsPayroll {
                     }
                     unit = !earning.isDaysAdjustment() ? automaticEarning.getUnits() * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : (automaticEarning.getUnits() * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid());
                     amount = SLibUtils.round((unit * amount_unt * earning.getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                    */
                     break;
                 }
             }
 
+            /* XXX (jbarajas, 2016-09-12) concentrate in one place the calculation of perceptions and deductions.
             payrollReceiptEarning = createHrsPayrollReceiptEarning(employeeId, automaticEarning.getUnits(), amount_unt, amount, true,
                     hrsPayrollReceiptEarning.getEarning(), automaticEarning.getFkLoanEmployeeId_n(), automaticEarning.getFkLoanLoanId_n(),
                     automaticEarning.getFkLoanTypeId_n(), hrsPayrollReceipt);
+            */
+            
+            payrollReceiptEarning = createHrsPayrollReceiptEarning(hrsPayrollReceipt, null, automaticEarning.getUnits(), amount_unt, true, hrsPayrollReceiptEarning.getEarning(), 
+                    automaticEarning.getFkLoanEmployeeId_n(), automaticEarning.getFkLoanLoanId_n(), automaticEarning.getFkLoanTypeId_n(), move);
 
             hrsPayrollReceiptEarning.setReceiptEarning(payrollReceiptEarning);
             hrsPayrollReceiptEarning.setPkMoveId(move);
@@ -177,9 +185,11 @@ public class SHrsPayroll {
 
             if (moConfig.getFkEarningEarningId_n() != SLibConsts.UNDEFINED && unitAlleged > 0) {
                 for (SDbEarning earning : maEarnigs) {
+                    
                     if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
                         amount_unt = unitAlleged;
                     }
+                    /* XXX (jbarajas, 2016-09-12) concentrate in one place the calculation of perceptions and deductions.
                     else if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_DAY) {
                         amount_unt = hrsPayrollReceipt.getReceipt().getPaymentDaily();
                     }
@@ -194,14 +204,20 @@ public class SHrsPayroll {
                     }
                     unit = !earning.isDaysAdjustment() ? unitAlleged * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : (unitAlleged * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid());
                     amount = SLibUtils.round((unit * amount_unt), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                    */
 
                     if (SLibUtils.compareKeys(earning.getPrimaryKey(), new int[] { moConfig.getFkEarningEarningId_n() })) {
                         hrsPayrollReceiptEarning = new SHrsPayrollReceiptEarning();
                         hrsPayrollReceiptEarning.setEarning(earning);
 
+                        /* XXX (jbarajas, 2016-09-12) concentrate in one place the calculation of perceptions and deductions.
                         payrollReceiptEarning = createHrsPayrollReceiptEarning(employeeId, unitAlleged, amount_unt, amount, true, earning,
                             SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, earning.getFkLoanTypeId(), hrsPayrollReceipt);
+                        */
 
+                        payrollReceiptEarning = createHrsPayrollReceiptEarning(hrsPayrollReceipt, null, unitAlleged, amount_unt, true, earning, 
+                            SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, earning.getFkLoanTypeId(), move);
+                        
                         hrsPayrollReceiptEarning.setReceiptEarning(payrollReceiptEarning);
                         hrsPayrollReceiptEarning.setPkMoveId(move);
                         hrsPayrollReceiptEarning.setHrsReceipt(hrsPayrollReceipt);
@@ -444,7 +460,7 @@ public class SHrsPayroll {
         SDbPayrollReceiptEarning payrollReceiptEarning = new SDbPayrollReceiptEarning();
         
         payrollReceiptEarning.setUnitsAlleged(units);
-        payrollReceiptEarning.setUnits(!earning.isDaysAdjustment() ? units * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : (units * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid()));
+        payrollReceiptEarning.setUnits(SLibUtils.round(!earning.isDaysAdjustment() ? units * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : (units * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid()), SLibUtils.DecimalFormatValue8D.getMaximumFractionDigits()));
         payrollReceiptEarning.setFactorAmount(1);
         payrollReceiptEarning.setAmountUnitary(amount_unit);
         payrollReceiptEarning.setAmountSystem_r(amount_r);
@@ -458,6 +474,82 @@ public class SHrsPayroll {
         payrollReceiptEarning.setFkLoanEmployeeId_n(loanEmployeeId_n);
         payrollReceiptEarning.setFkLoanLoanId_n(loanLoanId_n);
         payrollReceiptEarning.setFkLoanTypeId_n(loanTypeId_n);
+
+        return payrollReceiptEarning;
+    }
+    
+    public SDbPayrollReceiptEarning createHrsPayrollReceiptEarning( final SHrsPayrollReceipt hrsPayrollReceipt, final SHrsBenefit hrsBenefit, final double unitAlleged, final double pAmount_unt, final boolean isAutomatic,
+            final SDbEarning earning, final int loanEmployeeId_n, final int loanLoanId_n, final int loanTypeId_n, final int moveId) {
+        double unit = 0;
+        double amount_unt = 0;
+        double amount = 0;
+        SDbPayrollReceiptEarning payrollReceiptEarning = new SDbPayrollReceiptEarning();
+        
+        if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
+            amount_unt = pAmount_unt;
+        }
+        else if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_DAY) {
+            amount_unt = hrsPayrollReceipt.getReceipt().getPaymentDaily();
+        }
+        else if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_HRS) {
+            amount_unt = hrsPayrollReceipt.getReceipt().getPaymentHourly();
+        }
+        else if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_DAY) {
+            amount_unt = hrsPayrollReceipt.getReceipt().getPaymentDaily() * earning.getPayPercentage();
+        }
+        else if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_HRS) {
+            amount_unt = hrsPayrollReceipt.getReceipt().getPaymentHourly() * earning.getPayPercentage();
+        }
+        else if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_EAR) {
+            amount_unt = hrsPayrollReceipt.getTotalEarningsDependentsDaysWorked() * earning.getPayPercentage();
+        }
+        unit = SLibUtils.round(!earning.isDaysAdjustment() ? unitAlleged * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : (unitAlleged * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * hrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid()), SLibUtils.DecimalFormatValue8D.getMaximumFractionDigits());
+        amount = SLibUtils.round((unit * amount_unt * earning.getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                
+        payrollReceiptEarning.setPkPayrollId(hrsPayrollReceipt.getReceipt().getPkPayrollId());
+        payrollReceiptEarning.setPkEmployeeId(hrsPayrollReceipt.getHrsEmployee().getEmployee().getPkEmployeeId());
+        payrollReceiptEarning.setPkMoveId(moveId);
+        payrollReceiptEarning.setUnitsAlleged(unitAlleged);
+        payrollReceiptEarning.setUnits(unit);
+        payrollReceiptEarning.setAlternativeTaxCalculation(earning.isAlternativeTaxCalculation());// XXX (jbarajas, 2016-04-06) articule 174 RLISR
+        /*
+        payrollReceiptEarning.setAmountExempt(double d);
+        payrollReceiptEarning.setAmountTaxable(double d);
+        payrollReceiptEarning.setUserEdited(boolean b);
+        payrollReceiptEarning.setDeleted(boolean b);
+        payrollReceiptEarning.setSystem(boolean b);
+        */
+        payrollReceiptEarning.setFkEarningTypeId(earning.getFkEarningTypeId());
+        payrollReceiptEarning.setFkEarningId(earning.getPkEarningId());
+        payrollReceiptEarning.setFkLoanEmployeeId_n(loanEmployeeId_n);
+        payrollReceiptEarning.setFkLoanLoanId_n(loanLoanId_n);
+        payrollReceiptEarning.setFkLoanTypeId_n(loanTypeId_n);
+        
+        if (hrsBenefit == null) {
+            payrollReceiptEarning.setFactorAmount(earning.getUnitsFactor());
+            payrollReceiptEarning.setAmountUnitary(amount_unt);
+            payrollReceiptEarning.setAmountSystem_r(amount);
+            payrollReceiptEarning.setAmount_r(amount);
+            payrollReceiptEarning.setFkBenefitTypeId(earning.getFkBenefitTypeId());
+            payrollReceiptEarning.setBenefitYear(0);
+            payrollReceiptEarning.setBenefitAniversary(0);
+        }
+        else {
+            payrollReceiptEarning.setFactorAmount(hrsBenefit.getFactorAmount());
+            payrollReceiptEarning.setAmountUnitary(hrsPayrollReceipt.getReceipt().getPaymentDaily());
+            payrollReceiptEarning.setAmountSystem_r(hrsBenefit.getAmountPayedReceiptSys());
+            payrollReceiptEarning.setAmount_r(hrsBenefit.getAmountPayedReceipt());
+            payrollReceiptEarning.setFkBenefitTypeId(hrsBenefit.getBenefitTypeId());
+            payrollReceiptEarning.setBenefitYear(hrsBenefit.getBenefitYear());
+            payrollReceiptEarning.setBenefitAniversary(hrsBenefit.getBenefitAnn());
+        }
+        payrollReceiptEarning.setAutomatic(isAutomatic);
+        /*
+        payrollReceiptEarning.setFkUserInsertId(int n);
+        payrollReceiptEarning.setFkUserUpdateId(int n);
+        payrollReceiptEarning.setTsUserInsert(Date t);
+        payrollReceiptEarning.setTsUserUpdate(Date t);
+        */
 
         return payrollReceiptEarning;
     }
@@ -1019,9 +1111,11 @@ public class SHrsPayroll {
                 hrsPayrollReceiptEarning = new SHrsPayrollReceiptEarning();
                 hrsPayrollReceiptEarning.setEarning(earning);
                 
+                
                 if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
                     amount_unt = unitAlleged;
                 }
+                /* XXX (jbarajas, 2016-09-12) concentrate in one place the calculation of perceptions and deductions.
                 else if (earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_DAY) {
                     amount_unt = hrsPayrollReceipt.getReceipt().getPaymentDaily();
                 }
@@ -1039,7 +1133,11 @@ public class SHrsPayroll {
 
                 payrollReceiptEarning = createHrsPayrollReceiptEarning(hrsPayrollReceipt.getHrsEmployee().getEmployee().getPkEmployeeId(), unitAlleged, amount_unt, amount, false, earning,
                     SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, earning.getFkLoanTypeId(), hrsPayrollReceipt);
+                */
 
+                payrollReceiptEarning = createHrsPayrollReceiptEarning(hrsPayrollReceipt, null, unitAlleged, amount_unt, false, earning, 
+                            SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, earning.getFkLoanTypeId(), move);
+                
                 payrollReceiptEarning.setSystem(true);
                 if (earning.getFkBenefitTypeId() != SModSysConsts.HRSS_TP_BEN_NON) {
                     payrollReceiptEarning.setFactorAmount(1);

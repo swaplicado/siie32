@@ -93,15 +93,16 @@ public class SDialogRepHrsEarDed extends SBeanDialogReport implements ChangeList
 
         jPanel5.setLayout(new java.awt.GridLayout(9, 1, 0, 5));
 
-        jPanel4.setLayout(new java.awt.BorderLayout());
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         moRadGroupFilterType.add(moRadFilterTypePeriod);
         moRadFilterTypePeriod.setText("Por periodo");
-        jPanel4.add(moRadFilterTypePeriod, java.awt.BorderLayout.WEST);
+        jPanel4.add(moRadFilterTypePeriod);
 
         moRadGroupFilterType.add(moRadFilterTypeDate);
         moRadFilterTypeDate.setText("Por rango de fechas");
-        jPanel4.add(moRadFilterTypeDate, java.awt.BorderLayout.CENTER);
+        moRadFilterTypeDate.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel4.add(moRadFilterTypeDate);
 
         jPanel5.add(jPanel4);
 
@@ -116,7 +117,7 @@ public class SDialogRepHrsEarDed extends SBeanDialogReport implements ChangeList
 
         jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPeriodStart.setText("Período inicial:*");
+        jlPeriodStart.setText("Periodo inicial:*");
         jlPeriodStart.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel36.add(jlPeriodStart);
         jPanel36.add(moIntPeriodStart);
@@ -125,7 +126,7 @@ public class SDialogRepHrsEarDed extends SBeanDialogReport implements ChangeList
 
         jPanel37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPeriodEnd.setText("Período final:*");
+        jlPeriodEnd.setText("Periodo final:*");
         jlPeriodEnd.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel37.add(jlPeriodEnd);
         jPanel37.add(moIntPeriodEnd);

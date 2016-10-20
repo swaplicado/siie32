@@ -510,7 +510,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ChangeListener
     private void actionCalculateAmount() {
         double units = 0;
         
-        units = (!mbIsDaysAdjustment ? moDecDaysToPaid.getValue() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : moDecDaysToPaid.getValue() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid());
+        units = SLibUtils.round((!mbIsDaysAdjustment ? moDecDaysToPaid.getValue() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : moDecDaysToPaid.getValue() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid()), SLibUtils.DecimalFormatValue8D.getMaximumFractionDigits());
         moCurAmount.getField().setValue(units * moHrsPayrollReceipt.getReceipt().getPaymentDaily() * (mnFormType == SModSysConsts.HRSS_TP_BEN_VAC_BON ? moDecBonusPercentageTable.getValue() : 1));
     }
     
@@ -577,45 +577,6 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ChangeListener
             
             maHrsBenefits = SHrsUtils.readHrsBenefits(miClient.getSession(), moEmployee, mnFormType, seniority, mnBenefitYear, moHrsPayrollReceipt.getHrsPayroll().getPayroll().getPkPayrollId(), maBenefitTableByAnniversary, maBenefitTableByAnniversaryAux, moHrsPayrollReceipt.getReceipt().getPaymentDaily());
             
-            /* XXX jbarajas (11-09-2015) is complement in the method.
-            // To complete benefits registries accumulated by benefit type:
-            
-            if (moBenefit != null) {
-                for (SHrsBenefit hrsBenefit : maHrsBenefits) {
-                    benefitTableRow = null;
-                    benefitTableRowAux = null;
-            
-                    for (SHrsBenefitTableByAnniversary row : maBenefitTableByAnniversary) {
-                        if (row.getBenefitAnn() <= hrsBenefit.getBenefitAnn()) {
-                            benefitTableRow = row;
-                        }
-                    }
-
-                    if (moBenefitAux != null) {
-                        if (mnFormType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-                            for (SHrsBenefitTableByAnniversary row : maBenefitTableByAnniversaryAux) {
-                                if (row.getBenefitAnn() <= hrsBenefit.getBenefitAnn()) {
-                                    benefitTableRowAux = row;
-                                }
-                            }
-                        }
-                    }
-
-                    if (mnFormType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-                        hrsBenefit.setValue(benefitTableRow == null || benefitTableRowAux == null ? 0d : benefitTableRowAux.getValue());
-                        hrsBenefit.setAmount(benefitTableRow == null || benefitTableRowAux == null ? 0d : benefitTableRowAux.getValue() * moHrsPayrollReceipt.getReceipt().getPaymentDaily() * benefitTableRow.getValue());
-                    }
-                    else {
-                        hrsBenefit.setValue(benefitTableRow == null ? 0d : benefitTableRow.getValue());
-                        hrsBenefit.setAmount(benefitTableRow == null ? 0d : benefitTableRow.getValue() * moHrsPayrollReceipt.getReceipt().getPaymentDaily());
-                    }
-                }
-            }
-            
-            benefitTableRow = null;
-            benefitTableRowAux = null;
-            */
-            
             // Obtain benefit table row more appropiate for seniority:
             if (moBenefit != null) {
                 for (SHrsBenefitTableByAnniversary row : maBenefitTableByAnniversary) {
@@ -648,7 +609,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ChangeListener
             }
             else {
                 moIntDaysToPaidTable.setValue(benefitTableRow == null ? 0 : (int) benefitTableRow.getValue());
-                moDecBonusPercentageTable.setValue(benefitTableRow == null ? 0d : 0d);
+                moDecBonusPercentageTable.setValue(benefitTableRow == null ? 0d : 1d);
             }
             
             for (SHrsBenefit hrsBenefit : maHrsBenefits) {
@@ -677,7 +638,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ChangeListener
     private void createHrsBenefit() {
         double units = 0;
         
-        units = (!mbIsDaysAdjustment ? moDecDaysToPaid.getValue() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : moDecDaysToPaid.getValue() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid());
+        units = SLibUtils.round((!mbIsDaysAdjustment ? moDecDaysToPaid.getValue() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : moDecDaysToPaid.getValue() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid()), SLibUtils.DecimalFormatValue8D.getMaximumFractionDigits());
         moHrsBenefit = new SHrsBenefit(mnFormType, (Integer) jsAnniversary.getValue(), mnBenefitYear);
         
         for (SHrsBenefit hrsBenefit : maHrsBenefits) {
@@ -708,7 +669,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ChangeListener
         String msg = "";
         SGuiValidation validation = moFields.validateFields();
 
-        units = (!mbIsDaysAdjustment ? moDecDaysToPaid.getValue() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : moDecDaysToPaid.getValue() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid());
+        units = SLibUtils.round((!mbIsDaysAdjustment ? moDecDaysToPaid.getValue() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : moDecDaysToPaid.getValue() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid()), SLibUtils.DecimalFormatValue8D.getMaximumFractionDigits());
         try {
             if (validation.isValid()) {
                 daysDiff = moIntDaysToPaidTable.getValue() - (moDecDaysPayed.getValue() + moDecDaysToPaid.getValue());

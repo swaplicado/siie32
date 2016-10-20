@@ -36,6 +36,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
+import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -62,6 +63,9 @@ import sa.lib.gui.bean.SBeanForm;
  */
 public class SFormPayroll extends SBeanForm implements ActionListener, ItemListener, FocusListener, ChangeListener {
 
+    private final static String TXT_WITH_TAX_SUB_PAY = "Con pago de subsidio al impuesto.";
+    private final static String TXT_WITHOUT_TAX_SUB_PAY = "Sin pago de subsidio al impuesto";
+    
     private SDbPayroll moRegistry;
     private SDbConfig moConfig;
     private SDbWorkingDaySettings moWorkingDaySettings;
@@ -88,6 +92,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private int mnDaysCalendarPayroll;
     
     private boolean mbIsReadOnly;
+    private boolean mbIsWithTaxSubsidy;
     /**
      * Creates new form SFormPayroll
      * @param client
@@ -177,6 +182,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel19 = new javax.swing.JPanel();
         moBoolSsContribution = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel18 = new javax.swing.JPanel();
+        jbTaxSubsidyChange = new javax.swing.JButton();
+        moTextWithTaxSubsidy = new sa.lib.gui.bean.SBeanFieldText();
         jPanel22 = new javax.swing.JPanel();
         jlMwzType = new javax.swing.JLabel();
         moKeyMwzType = new sa.lib.gui.bean.SBeanFieldKey();
@@ -451,7 +458,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTaxSubsidy.setText("Tabla subsidio impuesto:*");
+        jlTaxSubsidy.setText("Tabla subsidio al impuesto:*");
         jlTaxSubsidy.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel26.add(jlTaxSubsidy);
 
@@ -473,13 +480,24 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        moBoolSsContribution.setText("Es nómina con cálculo de retención del SS");
+        moBoolSsContribution.setText("Con cálculo de retención del SS");
         moBoolSsContribution.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel19.add(moBoolSsContribution);
 
         jPanel21.add(jPanel19);
 
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jbTaxSubsidyChange.setText("...");
+        jbTaxSubsidyChange.setToolTipText("Cambiar estatus de pago de subsidio al impuesto");
+        jbTaxSubsidyChange.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel18.add(jbTaxSubsidyChange);
+
+        moTextWithTaxSubsidy.setEditable(false);
+        moTextWithTaxSubsidy.setText("sBeanFieldText1");
+        moTextWithTaxSubsidy.setPreferredSize(new java.awt.Dimension(275, 23));
+        jPanel18.add(moTextWithTaxSubsidy);
+
         jPanel21.add(jPanel18);
 
         jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -740,6 +758,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JButton jbReceiptCaptureEarnings;
     private javax.swing.JButton jbReceiptRemove;
     private javax.swing.JButton jbReceiptRemoveAll;
+    private javax.swing.JButton jbTaxSubsidyChange;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
     private javax.swing.JLabel jlDummy01;
@@ -797,6 +816,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private sa.lib.gui.bean.SBeanFieldRadio moRadNormal;
     private sa.lib.gui.bean.SBeanFieldRadio moRadSpecial;
     private sa.lib.gui.bean.SBeanFieldText moTextNotes;
+    private sa.lib.gui.bean.SBeanFieldText moTextWithTaxSubsidy;
     // End of variables declaration//GEN-END:variables
 
     /*
@@ -852,6 +872,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moKeyTaxSubsidy.setKeySettings(miClient, SGuiUtils.getLabelName(jlTaxSubsidy.getText()), true);
         moKeySsContribution.setKeySettings(miClient, SGuiUtils.getLabelName(jlSsContribution.getText()), true);
         moBoolSsContribution.setBooleanSettings(SGuiUtils.getLabelName(moBoolSsContribution.getText()), false);
+        moTextWithTaxSubsidy.setTextSettings("", 255);
         moKeyMwzType.setKeySettings(miClient, SGuiUtils.getLabelName(jlMwzType.getText()), true);
         moDecMwzWage.setCompoundFieldSettings(miClient);
         moDecMwzWage.getField().setDecimalSettings(SGuiUtils.getLabelName(jlMwzWage.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, true);
@@ -880,6 +901,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moFields.addField(moKeyTaxSubsidy);
         moFields.addField(moKeySsContribution);
         moFields.addField(moBoolSsContribution);
+        //moFields.addField(moTextWithTaxSubsidy);
         moFields.addField(moKeyMwzType);
         moFields.addField(moKeyMwzReferenceType);
         moFields.setFormButton(jbSave);
@@ -1035,6 +1057,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             moKeyMwzReferenceType.setEnabled(enable);
             jbReceiptCaptureEarnings.setEnabled(enable);
             jbReceiptCaptureDeductions.setEnabled(enable);
+            jbTaxSubsidyChange.setEnabled(!mbIsReadOnly);
             jbReceiptAdd.setEnabled(!mbIsReadOnly);
             jbReceiptAddAll.setEnabled(!mbIsReadOnly);
             jbReceiptRemove.setEnabled(!mbIsReadOnly);
@@ -1099,6 +1122,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moRegistry.setNormal(moRadNormal.getValue());
         moRegistry.setClosed(moBoolClosed.getValue());
         moRegistry.setSsContribution(moBoolSsContribution.getValue());
+        moRegistry.setTaxSubsidy(mbIsWithTaxSubsidy);
         moRegistry.setFornightStandard(moConfig.isFornightStandard());
         moRegistry.setMwzWage(moDecMwzWage.getField().getValue());
         moRegistry.setMwzReferenceWage(moDecMwzReferenceWage.getField().getValue());
@@ -1128,15 +1152,22 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             moRegistry.setFkMwzReferenceTypeId(moKeyMwzReferenceType.getValue()[0]);
         }
     }
-
+    
+    private void computePayroll() {
+        computeRegistry();
+        moHrsPayroll.setPayroll(moRegistry);
+        populateEmployeesReceipt();
+    }
+    
     private void computeReceipts() {
         try {
-            computeRegistry();
-            moHrsPayroll.setPayroll(moRegistry);
-           //moHrsPayroll.computeEmployees(mbPayrollCopy); XXX (jbarajas, 2016-04-01) slowly open payroll
+            //computeRegistry();
+            //moHrsPayroll.setPayroll(moRegistry);
+            //moHrsPayroll.computeEmployees(mbPayrollCopy); XXX (jbarajas, 2016-04-01) slowly open payroll
+            computePayroll();
             moHrsPayroll.computeReceipts();
 
-            populateEmployeesReceipt();
+            //populateEmployeesReceipt();
             computePayrollValue();
         }
         catch (Exception e) {
@@ -1330,7 +1361,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             jtpPayroll.setSelectedIndex(1);
 
             if (!mbIsReadOnly) {
-                computeReceipts();
+                computePayroll();
             }
             /*
             computeRegistry();
@@ -1386,6 +1417,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 moGridPaneEmployeesAvailable.setSelectedGridRow(index < moGridPaneEmployeesAvailable.getModel().getRowCount() ? index : moGridPaneEmployeesAvailable.getModel().getRowCount() - 1);
 
                 rowEmployeeReceipt.setPkEmployeeId(rowEmployeeAvailable.getPkEmployeeId());
+                rowEmployeeReceipt.setFkPaymentTypeId(rowEmployeeAvailable.getFkPaymentTypeId());
                 rowEmployeeReceipt.setCode(rowEmployeeAvailable.getCode());
                 rowEmployeeReceipt.setName(rowEmployeeAvailable.getName());
                 rowEmployeeReceipt.setTotalEarnings(hrsPayrollReceipt.getTotalEarnings());
@@ -1454,14 +1486,17 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 moGridPaneEmployeesReceipt.renderGridRows();
                 moGridPaneEmployeesReceipt.setSelectedGridRow(index < moGridPaneEmployeesReceipt.getModel().getRowCount() ? index : moGridPaneEmployeesReceipt.getModel().getRowCount() - 1);
                 
-                rowEmployeeAvailable.setPkEmployeeId(rowEmployeeReceipt.getPkEmployeeId());
-                rowEmployeeAvailable.setCode(rowEmployeeReceipt.getCode());
-                rowEmployeeAvailable.setName(rowEmployeeReceipt.getName());
+                if (mnFormSubtype == rowEmployeeReceipt.getFkPaymentTypeId()) {
+                    rowEmployeeAvailable.setPkEmployeeId(rowEmployeeReceipt.getPkEmployeeId());
+                    rowEmployeeAvailable.setFkPaymentTypeId(rowEmployeeReceipt.getFkPaymentTypeId());
+                    rowEmployeeAvailable.setCode(rowEmployeeReceipt.getCode());
+                    rowEmployeeAvailable.setName(rowEmployeeReceipt.getName());
 
-                moGridPaneEmployeesAvailable.addGridRow(rowEmployeeAvailable);
-                moGridPaneEmployeesAvailable.renderGridRows();
-                moGridPaneEmployeesAvailable.setSelectedGridRow(moGridPaneEmployeesAvailable.getModel().getRowCount() - 1);
-
+                    moGridPaneEmployeesAvailable.addGridRow(rowEmployeeAvailable);
+                    moGridPaneEmployeesAvailable.renderGridRows();
+                    moGridPaneEmployeesAvailable.setSelectedGridRow(moGridPaneEmployeesAvailable.getModel().getRowCount() - 1);
+                }
+                
                 updateFieldsStatus();
                 computePayrollValue();
                 computeTotals();
@@ -1569,6 +1604,19 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             SLibUtils.printException(this, e);
         }
     }
+    
+    private void actionTaxSubsidy() {
+       if (mbIsWithTaxSubsidy) {
+           if (miClient.showMsgBoxConfirm("Se quitará el pago de subsidio al impuesto a todos los recibos que lo tengan.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+               mbIsWithTaxSubsidy = false;
+           }
+       }
+       else {
+           mbIsWithTaxSubsidy = true;
+       }
+       moTextWithTaxSubsidy.setValue(mbIsWithTaxSubsidy ? TXT_WITH_TAX_SUB_PAY : TXT_WITHOUT_TAX_SUB_PAY);
+       computeReceipts();
+    }
 
     private void focusLostPeriodYear() throws Exception {
         if (moIntPeriodYear.getValue() < 2000) {
@@ -1668,6 +1716,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jbEmployeeViewAll.addActionListener(this);
         jbReceiptCaptureEarnings.addActionListener(this);
         jbReceiptCaptureDeductions.addActionListener(this);
+        jbTaxSubsidyChange.addActionListener(this);
         
         moRadNormal.addItemListener(this);
         moRadSpecial.addItemListener(this);
@@ -1705,6 +1754,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jbEmployeeViewAll.removeActionListener(this);
         jbReceiptCaptureEarnings.removeActionListener(this);
         jbReceiptCaptureDeductions.removeActionListener(this);
+        jbTaxSubsidyChange.removeActionListener(this);
 
         moRadNormal.removeItemListener(this);
         moRadSpecial.removeItemListener(this);
@@ -1743,6 +1793,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         mnFormResult = SLibConsts.UNDEFINED;
         mbFirstActivation = true;
         mbIsReadOnly = false;
+        mbIsWithTaxSubsidy = true;
         maPayrollReceiptsDelete.clear();
 
         removeAllListeners();
@@ -1763,6 +1814,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 moRegistry.setNormal(true);
                 moRegistry.setClosed(false);
                 moRegistry.setSsContribution(true);
+                moRegistry.setTaxSubsidy(mbIsWithTaxSubsidy);
 
                 // Set default payroll settings:
 
@@ -1830,6 +1882,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             moRadSpecial.setValue(!moRegistry.isNormal());
             moBoolClosed.setValue(moRegistry.isClosed());
             moBoolSsContribution.setValue(moRegistry.isSsContribution());
+            mbIsWithTaxSubsidy = moRegistry.isTaxSubsidy();
+            moTextWithTaxSubsidy.setValue(mbIsWithTaxSubsidy ? TXT_WITH_TAX_SUB_PAY : TXT_WITHOUT_TAX_SUB_PAY);
 
             moDecTotalEarnings.getField().setValue(moRegistry.getAuxTotalEarnings());
             moDecTotalDeductions.getField().setValue(moRegistry.getAuxTotalDeductions());
@@ -1877,6 +1931,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         //registry.setNormal(moBoolNormal.getValue());
         registry.setNormal(moRadNormal.getValue());
         registry.setSsContribution(moBoolSsContribution.getValue());
+        registry.setTaxSubsidy(mbIsWithTaxSubsidy);
         registry.setClosed(moBoolClosed.getValue());
         registry.setFkPaymentTypeId(mnFormSubtype);
         registry.setFkMwzTypeId(moKeyMwzType.getValue()[0]);
@@ -2026,6 +2081,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 }
                 else if (button == jbReceiptCaptureDeductions) {
                     actionReceiptCaptureDeductions();
+                }
+                else if (button == jbTaxSubsidyChange) {
+                    actionTaxSubsidy();
                 }
             }
         }
