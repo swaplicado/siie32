@@ -708,8 +708,9 @@ public abstract class SModSysConsts {
 
     public static final int LOGS_TP_CAR_NA = 1;
     public static final int LOGS_TP_CAR_OWN = 2;
-    public static final int LOGS_TP_CAR_CAR = 3;
-    public static final int LOGS_TP_CAR_OTH = 4;
+    public static final int LOGS_TP_CAR_BPR = 3;
+    public static final int LOGS_TP_CAR_CAR = 4;
+    public static final int LOGS_TP_CAR_OTH = 9;
 
     public static final int LOGS_TP_DOC_SHIP_DPS = 1;
     public static final int LOGS_TP_DOC_SHIP_IOG = 2;
