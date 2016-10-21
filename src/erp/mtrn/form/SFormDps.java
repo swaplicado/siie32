@@ -2776,16 +2776,20 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         boolean bContinue = true;
 
         if (isDocumentApplyCreditRiskPurchases() || isDocumentApplyCreditRiskSales()) {
-            if (nRiskType == SModSysConsts.BPSS_RISK_D) {
+            if (nRiskType == SModSysConsts.BPSS_RISK_D_BLK) {
                 miClient.showMsgBoxWarning(SLibConstants.MSG_INF_BP_BLOCKED);
                 bContinue = false;
             }
+            else if (nRiskType == SModSysConsts.BPSS_RISK_E_TRL) {
+                miClient.showMsgBoxWarning(SLibConstants.MSG_INF_BP_TRIAL);
+                bContinue = false;
+            }
             else {
-                val_LimCredit = (nRiskType == SModSysConsts.BPSS_RISK_B || nRiskType == SModSysConsts.BPSS_RISK_C ? true : false);
-                val_ExpDocs = (nRiskType == SModSysConsts.BPSS_RISK_A || nRiskType == SModSysConsts.BPSS_RISK_B ||
-                        nRiskType == SModSysConsts.BPSS_RISK_C ? true : false);
-                can_OmitLimCredit = (nRiskType == SModSysConsts.BPSS_RISK_B ? true : false);
-                can_OmitExpDocs = (nRiskType == SModSysConsts.BPSS_RISK_A || nRiskType == SModSysConsts.BPSS_RISK_B ? true : false);
+                val_LimCredit = (nRiskType == SModSysConsts.BPSS_RISK_B_RSK_M || nRiskType == SModSysConsts.BPSS_RISK_C_RSK_H ? true : false);
+                val_ExpDocs = (nRiskType == SModSysConsts.BPSS_RISK_A_RSK_L || nRiskType == SModSysConsts.BPSS_RISK_B_RSK_M ||
+                        nRiskType == SModSysConsts.BPSS_RISK_C_RSK_H ? true : false);
+                can_OmitLimCredit = (nRiskType == SModSysConsts.BPSS_RISK_B_RSK_M ? true : false);
+                can_OmitExpDocs = (nRiskType == SModSysConsts.BPSS_RISK_A_RSK_L || nRiskType == SModSysConsts.BPSS_RISK_B_RSK_M ? true : false);
 
                 if (val_LimCredit && !bizPartnerLimitCredit(openDoc, can_OmitLimCredit)) {
                     bContinue = false;
