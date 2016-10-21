@@ -454,25 +454,25 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
 
         jPanel3.add(jPanel21, java.awt.BorderLayout.CENTER);
 
-        jPanel20.setBorder(javax.swing.BorderFactory.createTitledBorder("Cuentas de correo electrónico:"));
+        jPanel20.setBorder(javax.swing.BorderFactory.createTitledBorder("Cuentas de correo-e:"));
         jPanel20.setPreferredSize(new java.awt.Dimension(352, 75));
         jPanel20.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlEmail01.setText("Mail 01:");
+        jlEmail01.setText("Cuenta correo-e 01:");
         jlEmail01.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel13.add(jlEmail01);
 
-        jtfEmail01.setText("EMAIL 01");
+        jtfEmail01.setText("CUENTA CORREO-E 01");
         jtfEmail01.setPreferredSize(new java.awt.Dimension(225, 23));
         jPanel13.add(jtfEmail01);
 
-        jlEmail02.setText("Mail 02:");
+        jlEmail02.setText("Cuenta correo-e 02:");
         jlEmail02.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel13.add(jlEmail02);
 
-        jtfEmail02.setText("EMAIL 02");
+        jtfEmail02.setText("CUENTA CORREO-E 02");
         jtfEmail02.setPreferredSize(new java.awt.Dimension(235, 23));
         jPanel13.add(jtfEmail02);
 

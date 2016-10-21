@@ -124,7 +124,7 @@ public class SDialogCfdSend extends SBeanFormDialog implements ActionListener {
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlEmail.setText("E-mail destinatario:*");
+        jlEmail.setText("Cuenta correo-e*");
         jlEmail.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlEmail);
 
@@ -133,7 +133,7 @@ public class SDialogCfdSend extends SBeanFormDialog implements ActionListener {
         jPanel5.add(moTextEmail);
 
         jbEmailEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
-        jbEmailEdit.setToolTipText("Modificar e-mail destinatarios");
+        jbEmailEdit.setToolTipText("Modificar cuenta correo-e de destinatarios");
         jbEmailEdit.setFocusable(false);
         jbEmailEdit.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel5.add(jbEmailEdit);
@@ -141,7 +141,7 @@ public class SDialogCfdSend extends SBeanFormDialog implements ActionListener {
         jlAddingMultipleMailHelp.setForeground(new java.awt.Color(109, 109, 109));
         jlAddingMultipleMailHelp.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlAddingMultipleMailHelp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlAddingMultipleMailHelp.setToolTipText("Para varios correos separarlos con \";\", sin espacios, p. ej., \"ejemplo1@mail.com;ejemplo2@mail.com\"");
+        jlAddingMultipleMailHelp.setToolTipText("Para varias cuentas de correo-e, separarlas con \";\", sin espacios, p. ej., \"ejemplo1@mail.com;ejemplo2@mail.com\"");
         jlAddingMultipleMailHelp.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel5.add(jlAddingMultipleMailHelp);
 
@@ -155,7 +155,7 @@ public class SDialogCfdSend extends SBeanFormDialog implements ActionListener {
         jPanel8.add(jlDummy1);
 
         jlDummy2.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
-        jlDummy2.setText("Cambios al e-mail se guardan en el asociado de negocios.");
+        jlDummy2.setText("Cambios a la cuenta de correo-e se guardan en el asociado de negocios.");
         jlDummy2.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel8.add(jlDummy2);
 

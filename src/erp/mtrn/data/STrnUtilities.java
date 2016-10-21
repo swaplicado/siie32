@@ -1435,7 +1435,7 @@ public abstract class STrnUtilities {
         mailToSend = bizPartner.getBizPartnerBranchContactMail(new int[] { oDps.getFkBizPartnerBranchId() });
         
         if (mailToSend.isEmpty()) {
-            throw new Exception("El receptor del documento no tiene buzones de correo.");
+            throw new Exception("El receptor del documento no tiene buzones de correo-e.");
         }
         
         return mailToSend;
@@ -1453,7 +1453,7 @@ public abstract class STrnUtilities {
         }
         
         if (mailToSend.isEmpty()) {
-            throw new Exception("El receptor del documento no tiene buzones de correo.");
+            throw new Exception("El receptor del documento no tiene buzones de correo-e.");
         }
         
         return mailToSend;
@@ -1564,7 +1564,7 @@ public abstract class STrnUtilities {
             
             bizPartnerMail = getMailToSendForOrder(client,keyDoc);
             if (mms.getQueryResultId() != SDbConsts.READ_OK) {
-                client.showMsgBoxWarning("No existe ningún correo configurado para envío de pedidos.");
+                client.showMsgBoxWarning("No existe ningún correo-e configurado para envío de pedidos.");
             }
             else {
                 if (((SDataUser) client.getSession().getUser()).getFkBizPartnerId_n() != SLibConstants.UNDEFINED) {
@@ -1576,7 +1576,7 @@ public abstract class STrnUtilities {
                 toRecipients = new ArrayList<String>(Arrays.asList(SLibUtils.textExplode(bizPartnerMail, ";")));
 
                 if (toRecipients.isEmpty()) {
-                    client.showMsgBoxWarning("No existe ningún destinatario configurado.");
+                    client.showMsgBoxWarning("No existe ningún correo-e destinatario configurado.");
                     canSend = false;
                 }
                 else {
@@ -1599,7 +1599,7 @@ public abstract class STrnUtilities {
                     }
 
                     pdf.delete();
-                    client.showMsgBoxInformation("El correo ha sido enviado.\n" + msg);
+                    client.showMsgBoxInformation("El correo-e ha sido enviado.\n" + msg);
                 }
             }
         }
@@ -1638,7 +1638,7 @@ public abstract class STrnUtilities {
             mms = getMms(client, SModSysConsts.CFGS_TP_MMS_CON);
 
             if (mms.getQueryResultId() != SDbConsts.READ_OK) {
-                client.showMsgBoxWarning("No existe ningún correo configurado para envío de movimientos de contratos.");
+                client.showMsgBoxWarning("No existe ningún correo-e configurado para envío de movimientos de contratos.");
             }
             else {
                 aTrnDocs = obtainContractsToSend(client, numberStart, numberEnd);
@@ -1700,7 +1700,7 @@ public abstract class STrnUtilities {
                                     (((STrnDoc) aTrnDocs.get(i)).getNumberSeries().isEmpty() ? "" : "_") + ((STrnDoc) aTrnDocs.get(i)).getNumber() + ".pdf");
                             pdf.delete();
                         }
-                        client.showMsgBoxInformation("El correo ha sido enviado.\n" + msg);
+                        client.showMsgBoxInformation("El correo-e ha sido enviado.\n" + msg);
                     }
                 }
             }
@@ -1837,14 +1837,14 @@ public abstract class STrnUtilities {
 
             if (mms.getQueryResultId() != SDbConsts.READ_OK) {
                 canSend = false;
-                throw new Exception("Se carece de correo para envío de documentos.");
+                throw new Exception("Se carece de correo-e para envío de documentos.");
             }
             else {
                 mails = getMailToSendForCfd(client, bizPartnerId, bizPartnerBranchId, contactType);
 
                 if (mails.isEmpty()) {
                     canSend = false;
-                    throw new Exception("El receptor carece de correo para recepción de documentos.");
+                    throw new Exception("El receptor carece de correo-e para recepción de documentos.");
                 }
                 else {
                     switch (cfd.getFkCfdTypeId()) {
@@ -2755,7 +2755,7 @@ public abstract class STrnUtilities {
             + "<br> "
             + "<hr> "
             + "<span id =\"info\"> " 
-            + SLibUtils.textToHtml("Favor de no responder este correo, fue generado de forma automática.") 
+            + SLibUtils.textToHtml("Favor de no responder este correo-e, fue generado de forma automática.") 
             + "<br>" 
             + appName+ " &copy;" + copyright + " " + appProvider 
             + "</span><span id=\"website\"><br> " 
@@ -2820,7 +2820,7 @@ public abstract class STrnUtilities {
         mms = getMms(client, mmsTypeId);
 
         if (mms.getQueryResultId() != SDbConsts.READ_OK) {
-            throw new Exception("No existe ningún correo configurado para envío de movimientos de pedidos.");
+            throw new Exception("No existe ningún correo-e configurado para envío de movimientos de pedidos.");
         }
         else {
             toRecipients = new ArrayList<>();
@@ -2857,7 +2857,7 @@ public abstract class STrnUtilities {
             }
             
             if (toRecipients.isEmpty()) {
-                throw new Exception("No existe ningún destinatario configurado.");
+                throw new Exception("No existe ningún correo-e destinatario configurado.");
             }
             try {
                 sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());

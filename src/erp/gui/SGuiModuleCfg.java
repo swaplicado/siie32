@@ -137,7 +137,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgCfdiStampClosing = new JMenuItem("Generación de inventario inicial de timbres...");
         jmiCfgDpsNature = new JMenuItem("Naturaleza de docs. de C/V");
         jmiCfgSystemNotes = new JMenuItem("Notas predefinidas de docs. de C/V");
-        jmiCfgMmsItem = new JMenuItem("Configuración de ítems para envío por email");
+        jmiCfgMmsItem = new JMenuItem("Configuración de ítems para envío por correo-e");
         jmiCfgItemRequiredDps = new JMenuItem("Configuración de ítems obligatorios con documentos origen");
 
         jmCfg.add(jmiCfgParamsCompany);

@@ -138,8 +138,8 @@ public class SViewBizPartnerBranchContact extends erp.lib.table.STableTab implem
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_tel3.tp_tel", "Tipo teléfono 03", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb_con.nextel_id_01", "Nextel 01", 75);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb_con.nextel_id_02", "Nextel 02", 75);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb_con.email_01", "Mail 01", 150);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb_con.email_02", "Mail 02", 150);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb_con.email_01", "Cuenta correo-e 01", 150);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb_con.email_02", "Cuenta correo-e 02", 150);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb_con.skype_01", "Skype 01", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb_con.skype_02", "Skype 02", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bp.b_del", "Asoc. negocios eliminado", STableConstants.WIDTH_BOOLEAN);

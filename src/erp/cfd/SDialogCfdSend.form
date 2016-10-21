@@ -145,7 +145,7 @@
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="jlEmail">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="E-mail destinatario:*"/>
+                    <Property name="text" type="java.lang.String" value="Cuenta correo-e*"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[100, 23]"/>
                     </Property>
@@ -164,7 +164,7 @@
                     <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                       <Image iconType="3" name="/erp/img/icon_std_edit.gif"/>
                     </Property>
-                    <Property name="toolTipText" type="java.lang.String" value="Modificar e-mail destinatarios"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Modificar cuenta correo-e de destinatarios"/>
                     <Property name="focusable" type="boolean" value="false"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[23, 23]"/>
@@ -180,7 +180,7 @@
                     <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                       <Image iconType="3" name="/erp/img/icon_view_help.png"/>
                     </Property>
-                    <Property name="toolTipText" type="java.lang.String" value="Para varios correos separarlos con &quot;;&quot;, sin espacios, p. ej., &quot;ejemplo1@mail.com;ejemplo2@mail.com&quot;"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Para varias cuentas de correo-e, separarlas con &quot;;&quot;, sin espacios, p. ej., &quot;ejemplo1@mail.com;ejemplo2@mail.com&quot;"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[23, 23]"/>
                     </Property>
@@ -213,7 +213,7 @@
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Tahoma" size="11" style="2"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="Cambios al e-mail se guardan en el asociado de negocios."/>
+                    <Property name="text" type="java.lang.String" value="Cambios a la cuenta de correo-e se guardan en el asociado de negocios."/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[350, 23]"/>
                     </Property>

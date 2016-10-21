@@ -470,7 +470,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmRep.add(jmiRepBizPartnerBalanceAging);
         jmRep.add(jmiRepAccountStatements);
         jmRep.add(jmiRepBizPartnerAccountingMoves);
-        //jmRep.add(jmiRepBizPartnerJournal); // XXX needs to be checked prior to launch (sflores, 2016-03-14)
+        jmRep.add(jmiRepBizPartnerJournal); // XXX needs to be checked prior to launch (sflores, 2016-03-14)
         //jmRep.addSeparator();
         //jmRep.add(jmiRepBizPartnerBalanceCollection); // report does not match with module, just for consistency (sflores, 2016-03-14)
         //jmRep.add(jmiRepBizPartnerBalanceCollectionDps); // report does not match with module, just for consistency (sflores, 2016-03-14)

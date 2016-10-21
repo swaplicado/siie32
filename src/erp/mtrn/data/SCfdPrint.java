@@ -470,6 +470,7 @@ public class SCfdPrint {
         }
 
         map.put("sTelEmiDom", sTelsEmiDom);
+        map.put("sWeb", miClient.getSessionXXX().getCompany().getDbmsDataCompany().getWeb() == null ? "" : miClient.getSessionXXX().getCompany().getDbmsDataCompany().getWeb());
 
         if (miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranch(new int[]{dps.getFkCompanyBranchId()}).getDbmsBizPartnerBranchContacts().size() > 0) {
             contact = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranch(new int[]{dps.getFkCompanyBranchId()}).getDbmsBizPartnerBranchContacts().get(0);
