@@ -328,7 +328,7 @@ public class SDbPayroll extends SDbRegistryUser {
             mdMwzReferenceWage = resultSet.getDouble("p.mwz_ref_wage");
             msNotes = resultSet.getString("p.nts");
             mbNormal = resultSet.getBoolean("p.b_nor");
-            //mbTaxSubsidy = resultSet.getBoolean("p.b_tax_sub");
+            mbTaxSubsidy = resultSet.getBoolean("p.b_tax_sub");
             mbSsContribution = resultSet.getBoolean("p.b_ssc");
             mbFornightStandard = resultSet.getBoolean("p.b_for_std");
             mbAccounting = resultSet.getBoolean("p.b_acc");

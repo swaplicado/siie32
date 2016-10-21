@@ -258,7 +258,7 @@ public class SDbEarning extends SDbRegistryUser {
             mdExemptionSalaryEqualsMwzLimit = resultSet.getDouble("exem_sal_equ_mwz_lim");
             mdExemptionSalaryGreaterMwzPercentage = resultSet.getDouble("exem_sal_grt_mwz_per");
             mdExemptionSalaryGreaterMwzLimit = resultSet.getDouble("exem_sal_grt_mwz_lim");
-            //mdExemptionMwzYear = resultSet.getDouble("exem_mwz_year");
+            mdExemptionMwzYear = resultSet.getDouble("exem_mwz_year");
             mdPayPercentage = resultSet.getDouble("pay_per");
             mdUnitsMaximumWeek = resultSet.getDouble("unt_max_wee");
             mdUnitsFactor = resultSet.getDouble("unt_fac");
@@ -266,7 +266,7 @@ public class SDbEarning extends SDbRegistryUser {
             mbDaysAdjustment = resultSet.getBoolean("b_day_adj");
             mbDaysAbsence = resultSet.getBoolean("b_day_abs");
             mbDaysWorked = resultSet.getBoolean("b_day_wrk");
-            //mbDaysWorkedBased = resultSet.getBoolean("b_day_wrk_bas");
+            mbDaysWorkedBased = resultSet.getBoolean("b_day_wrk_bas");
             mbWithholding = resultSet.getBoolean("b_who");
             mbPayrollTax = resultSet.getBoolean("b_pay_tax");
             mbAlternativeTaxCalculation = resultSet.getBoolean("b_alt_tax");
