@@ -2508,7 +2508,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbFkDpsNatureId.addItemListener(this);
         jcbFkCurrencyId.addItemListener(this);
         jcbFkIncotermId.addItemListener(this);
-        jcbFkVehicleTypeId_n.addItemListener(this);
         jcbFkCarrierTypeId.addItemListener(this);
         jcbCfdAddendaSubtypeId.addItemListener(this);
 
@@ -6371,38 +6370,35 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
     private void itemChangeFkCarrierTypeId() {
         boolean enableCarrier = moFieldFkCarrierTypeId.getKeyAsIntArray()[0] == SModSysConsts.LOGS_TP_CAR_CAR;
-        boolean enableVehicle = moFieldFkCarrierTypeId.getKeyAsIntArray()[0] == SModSysConsts.LOGS_TP_CAR_OWN;
-        boolean enableDriverPlate = moFieldFkCarrierTypeId.getKeyAsIntArray()[0] > SModSysConsts.LOGS_TP_CAR_NA;
+        boolean enableTypeVehicle = moFieldFkCarrierTypeId.getKeyAsIntArray()[0] > SModSysConsts.LOGS_TP_CAR_NA;
 
         jcbFkCarrierId_n.setEnabled(enableCarrier);
         jbFkCarrierId_n.setEnabled(enableCarrier);
-        jcbFkVehicleTypeId_n.setEnabled(enableVehicle);
-
+        
+        jcbFkVehicleTypeId_n.setEnabled(enableTypeVehicle);
+        jcbDriver.setEnabled(enableTypeVehicle);
+        jcbPlate.setEnabled(enableTypeVehicle);
+        
         if (!enableCarrier) {
             moFieldFkCarrierId_n.setFieldValue(null);
         }
 
-        if (!enableVehicle) {
+        if (!enableTypeVehicle) {
             moFieldFkVehicleTypeId_n.setFieldValue(null);
+            moFieldDriver.setFieldValue("");
+            moFieldPlate.setFieldValue("");
         }
-
-        jcbDriver.setEnabled(enableDriverPlate);
-        jcbPlate.setEnabled(enableDriverPlate);
+        
+        itemChangeFkVehicleTypeId_n();
     }
 
     private void itemChangeFkVehicleTypeId_n() {
+	boolean enableVehicle = jcbFkVehicleTypeId_n.getSelectedIndex() > 0 && moFieldFkCarrierTypeId.getKeyAsIntArray()[0] == SModSysConsts.LOGS_TP_CAR_OWN;
+        
         SFormUtilities.populateComboBox(miClient, jcbFkVehicleId_n, SModConsts.LOG_VEH, new int[] { moFieldFkVehicleTypeId_n.getKeyAsIntArray()[0] });
-
-        if (jcbFkVehicleTypeId_n.getSelectedIndex() > 0) {
-            jcbFkVehicleId_n.setEnabled(true);
-            jbFkVehicleId_n.setEnabled(true);
-            moFieldFkVehicleId_n.setFieldValue(new int[] { moDps.getFkVehicleId_n() });
-        }
-        else {
-            jcbFkVehicleId_n.setEnabled(false);
-            jbFkVehicleId_n.setEnabled(false);
-            moFieldFkVehicleId_n.setFieldValue(null);
-        }
+        
+        jcbFkVehicleId_n.setEnabled(enableVehicle);
+        jbFkVehicleId_n.setEnabled(enableVehicle);
     }
 
     private void itemChangeCfdAddendaSubtypeId() {
@@ -7700,6 +7696,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldFkSpotDesId_n.setFieldValue(new int[] { moDps.getFkSpotDestinyId_n() });
         moFieldFkModeOfTransportationTypeId.setFieldValue(new int[] { moDps.getFkModeOfTransportationTypeId() });
         moFieldFkCarrierTypeId.setFieldValue(new int[] { moDps.getFkCarrierTypeId() });
+        itemChangeFkCarrierTypeId();
         moFieldFkCarrierId_n.setFieldValue(new int[] { moDps.getFkCarrierId_n() });
         moFieldFkVehicleTypeId_n.setFieldValue(new int[] { moDps.getFkVehicleTypeId_n() });
         itemChangeFkVehicleTypeId_n();
