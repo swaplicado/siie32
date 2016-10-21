@@ -282,6 +282,7 @@ public abstract class SLibConstants {
     public static final java.lang.String MSG_INF_NO_NOTES_DPS = "El documento no tiene notas.";
     public static final java.lang.String MSG_INF_NO_NOTES_DPS_ETY = "La partida del documento no tiene notas.";
     public static final java.lang.String MSG_INF_BP_BLOCKED = "El asociado de negocios está bloqueado.";
+    public static final java.lang.String MSG_INF_BP_TRIAL = "El asociado de negocios está en jurídico.";
     public static final java.lang.String MSG_INF_NOT_AUTHORN_ORD = "El pedido no está autorizado.";
     public static final java.lang.String MSG_INF_NOT_AUTHORN_DOC = "El documento no está autorizado.";
 
