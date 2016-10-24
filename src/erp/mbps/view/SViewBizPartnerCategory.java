@@ -106,11 +106,11 @@ public class SViewBizPartnerCategory extends erp.lib.table.STableTab implements 
                 "INNER JOIN erp.bpss_tp_cred AS tctp ON " +
                 "btp.fid_tp_cred = tctp.id_tp_cred " +
                 "INNER JOIN erp.bpss_risk AS trtp ON " +
-                "btp.fid_tp_risk = trtp.id_risk " +
+                "btp.fid_risk = trtp.id_risk " +
                 "LEFT OUTER JOIN erp.bpss_tp_cred AS tcct ON " +
                 "bct.fid_tp_cred_n = tcct.id_tp_cred " +
                 "LEFT OUTER JOIN erp.bpss_risk AS trct ON " +
-                "bct.fid_tp_risk_n = trct.id_risk " +
+                "bct.fid_risk_n = trct.id_risk " +
                 (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) +
                 "ORDER BY b.bp, bct.id_bp, bct.id_ct_bp ";
     }

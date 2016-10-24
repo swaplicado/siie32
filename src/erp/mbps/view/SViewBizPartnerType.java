@@ -142,7 +142,7 @@ public class SViewBizPartnerType extends erp.lib.table.STableTab implements java
                 "LEFT OUTER JOIN erp.bpss_tp_cred AS tc ON " +
                 "bpsu_tp_bp.fid_tp_cred = tc.id_tp_cred " +
                 "LEFT OUTER JOIN erp.bpss_risk AS tr ON " +
-                "bpsu_tp_bp.fid_tp_risk = tr.id_risk " +
+                "bpsu_tp_bp.fid_risk = tr.id_risk " +
                 (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) +
                 "ORDER BY bpsu_tp_bp.id_ct_bp, bpss_ct_bp.ct_bp, bpsu_tp_bp.tp_bp, bpsu_tp_bp.id_tp_bp ";
     }
