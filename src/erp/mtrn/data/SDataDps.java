@@ -4359,7 +4359,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
         
         if (!setCfgEmail.isEmpty()) {
-            msg = "Se enviará correo de notificación a los siguientes destinatarios:";
+            msg = "Se enviará correo-e de notificación a los siguientes destinatarios:";
             
             for (String email : setCfgEmail) {
                 msg += "\n" + email;

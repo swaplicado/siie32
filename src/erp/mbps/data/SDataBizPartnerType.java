@@ -141,7 +141,7 @@ public class SDataBizPartnerType extends erp.lib.data.SDataRegistry implements j
                 mbIsCanDelete = resultSet.getBoolean("b_can_del");
                 mbIsDeleted = resultSet.getBoolean("b_del");
                 mnFkCreditTypeId = resultSet.getInt("fid_tp_cred");
-                mnFkRiskTypeId = resultSet.getInt("fid_tp_risk");
+                mnFkRiskTypeId = resultSet.getInt("fid_risk");
                 mnFkUserNewId = resultSet.getInt("fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("fid_usr_edit");
                 mnFkUserDeleteId = resultSet.getInt("fid_usr_del");

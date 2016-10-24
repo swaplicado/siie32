@@ -2508,7 +2508,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbFkDpsNatureId.addItemListener(this);
         jcbFkCurrencyId.addItemListener(this);
         jcbFkIncotermId.addItemListener(this);
-        jcbFkVehicleTypeId_n.addItemListener(this);
         jcbFkCarrierTypeId.addItemListener(this);
         jcbCfdAddendaSubtypeId.addItemListener(this);
 
@@ -2777,16 +2776,20 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         boolean bContinue = true;
 
         if (isDocumentApplyCreditRiskPurchases() || isDocumentApplyCreditRiskSales()) {
-            if (nRiskType == SModSysConsts.BPSS_RISK_D) {
+            if (nRiskType == SModSysConsts.BPSS_RISK_D_BLK) {
                 miClient.showMsgBoxWarning(SLibConstants.MSG_INF_BP_BLOCKED);
                 bContinue = false;
             }
+            else if (nRiskType == SModSysConsts.BPSS_RISK_E_TRL) {
+                miClient.showMsgBoxWarning(SLibConstants.MSG_INF_BP_TRIAL);
+                bContinue = false;
+            }
             else {
-                val_LimCredit = (nRiskType == SModSysConsts.BPSS_RISK_B || nRiskType == SModSysConsts.BPSS_RISK_C ? true : false);
-                val_ExpDocs = (nRiskType == SModSysConsts.BPSS_RISK_A || nRiskType == SModSysConsts.BPSS_RISK_B ||
-                        nRiskType == SModSysConsts.BPSS_RISK_C ? true : false);
-                can_OmitLimCredit = (nRiskType == SModSysConsts.BPSS_RISK_B ? true : false);
-                can_OmitExpDocs = (nRiskType == SModSysConsts.BPSS_RISK_A || nRiskType == SModSysConsts.BPSS_RISK_B ? true : false);
+                val_LimCredit = (nRiskType == SModSysConsts.BPSS_RISK_B_RSK_M || nRiskType == SModSysConsts.BPSS_RISK_C_RSK_H ? true : false);
+                val_ExpDocs = (nRiskType == SModSysConsts.BPSS_RISK_A_RSK_L || nRiskType == SModSysConsts.BPSS_RISK_B_RSK_M ||
+                        nRiskType == SModSysConsts.BPSS_RISK_C_RSK_H ? true : false);
+                can_OmitLimCredit = (nRiskType == SModSysConsts.BPSS_RISK_B_RSK_M ? true : false);
+                can_OmitExpDocs = (nRiskType == SModSysConsts.BPSS_RISK_A_RSK_L || nRiskType == SModSysConsts.BPSS_RISK_B_RSK_M ? true : false);
 
                 if (val_LimCredit && !bizPartnerLimitCredit(openDoc, can_OmitLimCredit)) {
                     bContinue = false;
@@ -6371,38 +6374,35 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
     private void itemChangeFkCarrierTypeId() {
         boolean enableCarrier = moFieldFkCarrierTypeId.getKeyAsIntArray()[0] == SModSysConsts.LOGS_TP_CAR_CAR;
-        boolean enableVehicle = moFieldFkCarrierTypeId.getKeyAsIntArray()[0] == SModSysConsts.LOGS_TP_CAR_OWN;
-        boolean enableDriverPlate = moFieldFkCarrierTypeId.getKeyAsIntArray()[0] > SModSysConsts.LOGS_TP_CAR_NA;
+        boolean enableTypeVehicle = moFieldFkCarrierTypeId.getKeyAsIntArray()[0] > SModSysConsts.LOGS_TP_CAR_NA;
 
         jcbFkCarrierId_n.setEnabled(enableCarrier);
         jbFkCarrierId_n.setEnabled(enableCarrier);
-        jcbFkVehicleTypeId_n.setEnabled(enableVehicle);
-
+        
+        jcbFkVehicleTypeId_n.setEnabled(enableTypeVehicle);
+        jcbDriver.setEnabled(enableTypeVehicle);
+        jcbPlate.setEnabled(enableTypeVehicle);
+        
         if (!enableCarrier) {
             moFieldFkCarrierId_n.setFieldValue(null);
         }
 
-        if (!enableVehicle) {
+        if (!enableTypeVehicle) {
             moFieldFkVehicleTypeId_n.setFieldValue(null);
+            moFieldDriver.setFieldValue("");
+            moFieldPlate.setFieldValue("");
         }
-
-        jcbDriver.setEnabled(enableDriverPlate);
-        jcbPlate.setEnabled(enableDriverPlate);
+        
+        itemChangeFkVehicleTypeId_n();
     }
 
     private void itemChangeFkVehicleTypeId_n() {
+	boolean enableVehicle = jcbFkVehicleTypeId_n.getSelectedIndex() > 0 && moFieldFkCarrierTypeId.getKeyAsIntArray()[0] == SModSysConsts.LOGS_TP_CAR_OWN;
+        
         SFormUtilities.populateComboBox(miClient, jcbFkVehicleId_n, SModConsts.LOG_VEH, new int[] { moFieldFkVehicleTypeId_n.getKeyAsIntArray()[0] });
-
-        if (jcbFkVehicleTypeId_n.getSelectedIndex() > 0) {
-            jcbFkVehicleId_n.setEnabled(true);
-            jbFkVehicleId_n.setEnabled(true);
-            moFieldFkVehicleId_n.setFieldValue(new int[] { moDps.getFkVehicleId_n() });
-        }
-        else {
-            jcbFkVehicleId_n.setEnabled(false);
-            jbFkVehicleId_n.setEnabled(false);
-            moFieldFkVehicleId_n.setFieldValue(null);
-        }
+        
+        jcbFkVehicleId_n.setEnabled(enableVehicle);
+        jbFkVehicleId_n.setEnabled(enableVehicle);
     }
 
     private void itemChangeCfdAddendaSubtypeId() {
@@ -7700,6 +7700,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldFkSpotDesId_n.setFieldValue(new int[] { moDps.getFkSpotDestinyId_n() });
         moFieldFkModeOfTransportationTypeId.setFieldValue(new int[] { moDps.getFkModeOfTransportationTypeId() });
         moFieldFkCarrierTypeId.setFieldValue(new int[] { moDps.getFkCarrierTypeId() });
+        itemChangeFkCarrierTypeId();
         moFieldFkCarrierId_n.setFieldValue(new int[] { moDps.getFkCarrierId_n() });
         moFieldFkVehicleTypeId_n.setFieldValue(new int[] { moDps.getFkVehicleTypeId_n() });
         itemChangeFkVehicleTypeId_n();

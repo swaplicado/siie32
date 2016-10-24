@@ -102,10 +102,11 @@ public abstract class SModSysConsts {
     public static final int BPSS_TP_CFD_ADD_CFD_ADD_LOREAL = 3;
     public static final int BPSS_TP_CFD_ADD_CFD_ADD_BACHOCO = 4;
 
-    public static final int BPSS_RISK_A = 1;
-    public static final int BPSS_RISK_B = 2;
-    public static final int BPSS_RISK_C = 3;
-    public static final int BPSS_RISK_D = 4;
+    public static final int BPSS_RISK_A_RSK_L = 1;
+    public static final int BPSS_RISK_B_RSK_M = 2;
+    public static final int BPSS_RISK_C_RSK_H = 3;
+    public static final int BPSS_RISK_D_BLK = 4;
+    public static final int BPSS_RISK_E_TRL = 5;
 
     public static final int BPSS_LINK_ALL = 1;
     public static final int BPSS_LINK_CUS_MKT_TP = 2;

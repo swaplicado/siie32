@@ -420,7 +420,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlEmail.setText("E-mail:");
+        jlEmail.setText("Cuenta correo-e:");
         jlEmail.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel7.add(jlEmail);
 

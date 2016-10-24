@@ -32,7 +32,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     protected int mnFkBizPartnerCategoryId;
     protected int mnFkBizPartnerTypeId;
     protected int mnFkCreditTypeId_n;
-    protected int mnFkRiskTypeId_n;
+    protected int mnFkRiskId_n;
     protected int mnFkCfdAddendaTypeId;
     protected int mnFkLanguageId_n;
     protected int mnFkCurrencyId_n;
@@ -80,7 +80,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     public void setFkBizPartnerCategoryId(int n) { mnFkBizPartnerCategoryId = n; }
     public void setFkBizPartnerTypeId(int n) { mnFkBizPartnerTypeId = n; }
     public void setFkCreditTypeId_n(int n) { mnFkCreditTypeId_n = n; }
-    public void setFkRiskTypeId_n(int n) { mnFkRiskTypeId_n = n; }
+    public void setFkRiskTypeId_n(int n) { mnFkRiskId_n = n; }
     public void setFkCfdAddendaTypeId(int n) { mnFkCfdAddendaTypeId = n; }
     public void setFkLanguageId_n(int n) { mnFkLanguageId_n = n; }
     public void setFkCurrencyId_n(int n) { mnFkCurrencyId_n = n; }
@@ -105,7 +105,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     public int getFkBizPartnerCategoryId() { return mnFkBizPartnerCategoryId; }
     public int getFkBizPartnerTypeId() { return mnFkBizPartnerTypeId; }
     public int getFkCreditTypeId_n() { return mnFkCreditTypeId_n; }
-    public int getFkRiskTypeId_n() { return mnFkRiskTypeId_n; }
+    public int getFkRiskTypeId_n() { return mnFkRiskId_n; }
     public int getFkCfdAddendaTypeId() { return mnFkCfdAddendaTypeId; }
     public int getFkLanguageId_n() { return mnFkLanguageId_n; }
     public int getFkCurrencyId_n() { return mnFkCurrencyId_n; }
@@ -175,7 +175,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
         mnFkBizPartnerCategoryId = 0;
         mnFkBizPartnerTypeId = 0;
         mnFkCreditTypeId_n = 0;
-        mnFkRiskTypeId_n = 0;
+        mnFkRiskId_n = 0;
         mnFkCfdAddendaTypeId = 0;
         mnFkLanguageId_n = 0;
         mnFkCurrencyId_n = 0;
@@ -216,7 +216,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
 
         try {
             sql = "SELECT bp_ct.*, ct_bp.ct_bp, tp_bp.tp_bp, tp_cred.tp_cred, lan.lan_key, cur.cur_key, un.usr, ue.usr, ud.usr, " +
-                    "tp_bp.cred_lim, tp_bp.days_cred, tp_bp.days_grace, tp_bp.fid_tp_cred, tp_bp.fid_tp_risk " +
+                    "tp_bp.cred_lim, tp_bp.days_cred, tp_bp.days_grace, tp_bp.fid_tp_cred, tp_bp.fid_risk " +
                     "FROM erp.bpsu_bp_ct AS bp_ct " +
                     "INNER JOIN erp.bpss_ct_bp AS ct_bp ON bp_ct.fid_ct_bp = ct_bp.id_ct_bp " +
                     "INNER JOIN erp.bpsu_tp_bp AS tp_bp ON bp_ct.fid_tp_bp = tp_bp.id_tp_bp AND tp_bp.id_ct_bp = ct_bp.id_ct_bp " +
@@ -247,8 +247,8 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
                 mnFkBizPartnerTypeId = resultSet.getInt("bp_ct.fid_tp_bp");
                 mnFkCreditTypeId_n = resultSet.getInt("bp_ct.fid_tp_cred_n");
                 if (resultSet.wasNull()) mnFkCreditTypeId_n = 0;
-                mnFkRiskTypeId_n = resultSet.getInt("bp_ct.fid_tp_risk_n");
-                if (resultSet.wasNull()) mnFkRiskTypeId_n = 0;
+                mnFkRiskId_n = resultSet.getInt("bp_ct.fid_risk_n");
+                if (resultSet.wasNull()) mnFkRiskId_n = 0;
                 mnFkCfdAddendaTypeId = resultSet.getInt("bp_ct.fid_tp_cfd_add");
                 mnFkLanguageId_n = resultSet.getInt("bp_ct.fid_lan_n");
                 if (resultSet.wasNull()) mnFkLanguageId_n = 0;
@@ -275,14 +275,14 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
                     mnEffectiveDaysOfCredit = mnDaysOfCredit;
                     mnEffectiveDaysOfGrace = mnDaysOfGrace;
                     mnEffectiveCreditTypeId = mnFkCreditTypeId_n;
-                    mnEffectiveRiskTypeId = mnFkRiskTypeId_n;
+                    mnEffectiveRiskTypeId = mnFkRiskId_n;
                 }
                 else {
                     mdEffectiveCreditLimit = resultSet.getDouble("tp_bp.cred_lim");
                     mnEffectiveDaysOfCredit = resultSet.getInt("tp_bp.days_cred");
                     mnEffectiveDaysOfGrace = resultSet.getInt("tp_bp.days_grace");
                     mnEffectiveCreditTypeId = resultSet.getInt("tp_bp.fid_tp_cred");
-                    mnEffectiveRiskTypeId = resultSet.getInt("tp_bp.fid_tp_risk");
+                    mnEffectiveRiskTypeId = resultSet.getInt("tp_bp.fid_risk");
                 }
 
                 mbIsRegistryNew = false;
@@ -313,7 +313,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
                     "{ CALL erp.bpsu_bp_ct_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?," +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?," +
-                    "?) }");
+                    "?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkBizPartnerId);
             callableStatement.setInt(nParam++, mnPkBizPartnerCategoryId);
             callableStatement.setString(nParam++, msKey);
@@ -321,14 +321,18 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
             callableStatement.setDouble(nParam++, mdCreditLimit);
             callableStatement.setInt(nParam++, mnDaysOfCredit);
             callableStatement.setInt(nParam++, mnDaysOfGrace);
+            callableStatement.setDouble(nParam++, 0.0);
+            callableStatement.setDouble(nParam++, 0.0);
             callableStatement.setDate(nParam++, new java.sql.Date(mtDateStart.getTime()));
             if (mtDateEnd_n != null) callableStatement.setDate(nParam++, new java.sql.Date(mtDateEnd_n.getTime())); else callableStatement.setNull(nParam++, java.sql.Types.DATE);
             callableStatement.setBoolean(nParam++, mbIsCreditByUser);
+            callableStatement.setBoolean(nParam++, false);
+            callableStatement.setBoolean(nParam++, false);
             callableStatement.setBoolean(nParam++, mbIsDeleted);
             callableStatement.setInt(nParam++, mnFkBizPartnerCategoryId);
             callableStatement.setInt(nParam++, mnFkBizPartnerTypeId);
             if (mnFkCreditTypeId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkCreditTypeId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
-            if (mnFkRiskTypeId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkRiskTypeId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
+            if (mnFkRiskId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkRiskId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
             callableStatement.setInt(nParam++, mnFkCfdAddendaTypeId);
             if (mnFkLanguageId_n > SLibConsts.UNDEFINED && mnFkLanguageId_n != mnAuxLanguageSysId) callableStatement.setInt(nParam++, mnFkLanguageId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
             if (mnFkCurrencyId_n > SLibConsts.UNDEFINED && mnFkCurrencyId_n != mnAuxCurrencySysId) callableStatement.setInt(nParam++, mnFkCurrencyId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);

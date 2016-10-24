@@ -310,7 +310,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiContractsLinks = new JMenuItem("Vínculos de contratos como origen");
         jmiContractsLinkPendEntryPrice = new JMenuItem("Entregas mensuales de contratos por procesar");
         jmiContractsLinkedEntryPrice = new JMenuItem("Entregas mensuales de contratos procesados");
-        jmiContractsSendMail = new JMenuItem("Envío de contratos por email");
+        jmiContractsSendMail = new JMenuItem("Envío de contratos por correo-e");
         jmCon.add(jmiContracts);
         jmCon.addSeparator();
         jmCon.add(jmiContractsLinkPend);
@@ -555,7 +555,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmRep.add(jmiRepBizPartnerBalanceAging);
         jmRep.add(jmiRepAccountStatements);
         jmRep.add(jmiRepBizPartnerAccountingMoves);
-        //jmRep.add(jmiRepBizPartnerJournal); // XXX needs to be checked prior to launch (sflores, 2016-03-14)
+        jmRep.add(jmiRepBizPartnerJournal); // XXX needs to be checked prior to launch (sflores, 2016-03-14)
         jmRep.addSeparator();
         jmRep.add(jmiRepBizPartnerBalanceCollection);
         jmRep.add(jmiRepBizPartnerBalanceCollectionDps);
@@ -1545,7 +1545,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 miClient.getSession().showView(SModConsts.TRN_DPS_ETY_PRC, SModConsts.MOD_TRN_SAL_N, new SGuiParams(SModConsts.VIEW_ST_DONE));
             }
             else if (item == jmiContractsSendMail) {
-                new SDialogSendMailContract(miClient.getSession().getClient(), miClient, "Envío de contratos por email").setVisible(true);
+                new SDialogSendMailContract(miClient.getSession().getClient(), miClient, "Envío de contratos por correo-e").setVisible(true);
             }
             else if (item == jmiOrders) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ORD);

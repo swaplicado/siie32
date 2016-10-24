@@ -2135,7 +2135,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         map.put("sUserName", moSessionXXX.getUser().getUser());
         map.put("sVendorLabel", SClient.VENDOR_COPYRIGHT);
         map.put("sVendorWebsite", SClient.VENDOR_WEBSITE);
-        map.put("bShowDetailBackground", false);
+        map.put("bShowDetailBackground", moSessionXXX.getParamsCompany().getIsReportsBackground());
         map.put("oDateFormat", SLibUtils.DateFormatDate);
         map.put("oDatetimeFormat", SLibUtils.DateFormatDatetime);
         map.put("oTimeFormat", SLibUtils.DateFormatTime);

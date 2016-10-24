@@ -8,7 +8,6 @@ package erp.lib;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.ResultSet;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Vector;
@@ -885,7 +884,7 @@ public abstract class SLibUtilities {
             new InternetAddress(sEmail).validate();
 
         } catch (AddressException e) {
-            sError = "El correo electrónico '" + sEmail + "', es inválido:\n" + e.getMessage();
+            sError = "La cuenta de correo-e '" + sEmail + "', es inválido:\n" + e.getMessage();
         }
 
         return sError;

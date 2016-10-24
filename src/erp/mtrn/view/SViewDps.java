@@ -402,10 +402,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbViewAccountingRecord.setEnabled(mbIsDoc || mbIsDocAdj);
         jbViewAccountingDetailsDps.setEnabled(mbIsDoc);
         jbViewAccountingDetailsBizPartner.setEnabled(mbIsDoc);
-        jbPrint.setEnabled(mbIsOrd || mbIsCategorySal && (mbIsEstEst || mbIsEstCon || mbIsDoc || mbIsDocAdj));
+        jbPrint.setEnabled(mbIsOrd || mbIsCategorySal && (mbIsEstEst || mbIsEstCon || mbIsDoc || mbIsDocAdj) || (mbIsCategoryPur && mbIsEstCon));
         jbPrintAcknowledgmentCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbPrintPhotoInvoice.setEnabled(mbIsCategorySal && mbIsDoc);
-        jbPrintContract.setEnabled(mbIsCategorySal && mbIsEstCon);
+        jbPrintContract.setEnabled((mbIsCategorySal || mbIsCategoryPur) && mbIsEstCon);
         jbPrintContractMoves.setEnabled(mbIsCategorySal && mbIsEstCon);
         jbPrintOrderGoods.setEnabled(mbIsCategorySal && mbIsOrd);
         jbGetXml.setEnabled((mbIsDoc || mbIsDocAdj));
@@ -647,7 +647,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     @Override
     public void actionEdit() {
        if (jbEdit.isEnabled()) {
-           if (moTablePane.getSelectedTableRow() != null && !moTablePane.getSelectedTableRow().getIsSummary()) {
+           if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+               miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+           }
+           else{
                 int gui = mbIsCategoryPur ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;    // GUI module
 
                 miClient.getGuiModule(gui).setFormComplement(getDpsTypeKey());  // document type key
@@ -664,7 +667,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     @Override
     public void actionDelete() {
        if (jbDelete.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() == null) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
             else {
@@ -685,46 +688,46 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         boolean annul = true;
 
         if (jbAnnul.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() == null) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
             else {
-                if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_ANNUL) == JOptionPane.YES_OPTION) {
-                    int gui = mbIsCategoryPur ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;    // GUI module
-                    dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+                    if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_ANNUL) == JOptionPane.YES_OPTION) {
+                        int gui = mbIsCategoryPur ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;    // GUI module
+                        dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
-                    if (dps.getDbmsDataCfd() != null && dps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI) {
-                        annul = false;
-                        params = new SGuiParams();
+                        if (dps.getDbmsDataCfd() != null && dps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI) {
+                            annul = false;
+                            params = new SGuiParams();
 
-                        if (dps.getDbmsDataCfd().isStamped()) {
-                            moDialogAnnulCfdi.formReset();
-                            moDialogAnnulCfdi.formRefreshCatalogues();
-                            moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, dps.getDate());
-                            moDialogAnnulCfdi.setValue(SModConsts.TRNS_TP_CFD, dps.getCfdTipoDeComprobante());
-                            moDialogAnnulCfdi.setVisible(true);
+                            if (dps.getDbmsDataCfd().isStamped()) {
+                                moDialogAnnulCfdi.formReset();
+                                moDialogAnnulCfdi.formRefreshCatalogues();
+                                moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, dps.getDate());
+                                moDialogAnnulCfdi.setValue(SModConsts.TRNS_TP_CFD, dps.getCfdTipoDeComprobante());
+                                moDialogAnnulCfdi.setVisible(true);
 
-                            if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                                if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                                    annul = true;
+                                    params.getParamsMap().put(SGuiConsts.PARAM_DATE, moDialogAnnulCfdi.getDate());
+                                    params.getParamsMap().put(SGuiConsts.PARAM_REQ_DOC, moDialogAnnulCfdi.getAnnulSat()); // SGuiConsts.PARAM_REQ_DOC is used to indicate if SAT cancellation is required
+                                    params.getParamsMap().put(SModConsts.TRNU_TP_DPS_ANN, moDialogAnnulCfdi.getDpsAnnulationType()); // cause of annulation
+                                }
+                            }
+                            else {
                                 annul = true;
-                                params.getParamsMap().put(SGuiConsts.PARAM_DATE, moDialogAnnulCfdi.getDate());
-                                params.getParamsMap().put(SGuiConsts.PARAM_REQ_DOC, moDialogAnnulCfdi.getAnnulSat()); // SGuiConsts.PARAM_REQ_DOC is used to indicate if SAT cancellation is required
-                                params.getParamsMap().put(SModConsts.TRNU_TP_DPS_ANN, moDialogAnnulCfdi.getDpsAnnulationType()); // cause of annulation
+                                params.getParamsMap().put(SGuiConsts.PARAM_DATE, miClient.getSession().getCurrentDate());
+                                params.getParamsMap().put(SGuiConsts.PARAM_REQ_DOC, false);
+                                params.getParamsMap().put(SModConsts.TRNU_TP_DPS_ANN, SModSysConsts.TRNU_TP_DPS_ANN_NA); // cause of annulation
                             }
                         }
-                        else {
-                            annul = true;
-                            params.getParamsMap().put(SGuiConsts.PARAM_DATE, miClient.getSession().getCurrentDate());
-                            params.getParamsMap().put(SGuiConsts.PARAM_REQ_DOC, false);
-                            params.getParamsMap().put(SModConsts.TRNU_TP_DPS_ANN, SModSysConsts.TRNU_TP_DPS_ANN_NA); // cause of annulation
-                        }
-                    }
 
-                    if (annul) {
-                        if (miClient.getGuiModule(gui).annulRegistry(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey(), params) == SLibConstants.DB_ACTION_ANNUL_OK) {
-                            miClient.getGuiModule(gui).refreshCatalogues(mnTabType);
+                        if (annul) {
+                            if (miClient.getGuiModule(gui).annulRegistry(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey(), params) == SLibConstants.DB_ACTION_ANNUL_OK) {
+                                miClient.getGuiModule(gui).refreshCatalogues(mnTabType);
+                            }
                         }
                     }
-                }
             }
         }
     }
@@ -758,7 +761,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
     private void actionCopy() {
         if (jbCopy.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() == null) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
             else {
@@ -775,7 +778,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
     private void actionDelivery() {
         if (jbDelivery.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() == null) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
             else {
@@ -794,7 +797,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
     private void actionReferenceCommissions() {
         if (jbReferenceCommissions.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() == null) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
             else {
@@ -813,19 +816,32 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
     private void actionViewNotes() {
         if (jbViewNotes.isEnabled()) {
-            SModuleUtilities.showDocumentNotes(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow());
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                SModuleUtilities.showDocumentNotes(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow());
+            }
         }
     }
 
     private void actionViewLinks() {
         if (jbViewLinks.isEnabled()) {
-            SModuleUtilities.showDocumentLinks(miClient, moTablePane.getSelectedTableRow());
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                SModuleUtilities.showDocumentLinks(miClient, moTablePane.getSelectedTableRow());
+            }
         }
     }
 
     private void actionViewContractAnalysis() {
         if (jbViewContractAnalysis.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() != null) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
                 SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
 
                 moDialogContractAnalysis.formReset();
@@ -837,7 +853,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
     private void actionViewAccountingRecord() {
         if (jbViewAccountingRecord.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() == null) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
             else {
@@ -854,7 +870,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
     private void actionViewAccountingDetailsDps() {
         if (jbViewAccountingDetailsDps.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() == null) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
             else {
@@ -874,7 +890,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
     private void actionViewAccountingDetailsBizPartner() {
         if (jbViewAccountingDetailsDps.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() == null) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
             else {
@@ -922,7 +938,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             Vector<String> vUnit = null;
             String sContact = "";
 
-            if (moTablePane.getSelectedTableRow() != null/* && !isBizPartnerBlocked()*/) {
+            if (moTablePane.getSelectedTableRow() == null/* && !isBizPartnerBlocked()*/|| moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
                 oDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
                 if (oDps.getDbmsDataCfd() != null) {
@@ -1101,7 +1120,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             setCursor(cursor);
                         }
                     }
-                    else if (SLibUtilities.compareKeys(keyDpsType, SDataConstantsSys.TRNU_TP_DPS_SAL_CON)) {
+                    else if (SLibUtilities.compareKeys(keyDpsType, SDataConstantsSys.TRNU_TP_DPS_SAL_CON) || SLibUtilities.compareKeys(keyDpsType, SDataConstantsSys.TRNU_TP_DPS_PUR_CON)) {
                         // Sales contract:
 
                         vPrice = new Vector<>();
@@ -1112,10 +1131,21 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             map = miClient.createReportParams();
                             map.put("nIdYear", oDps.getPkYearId());
                             map.put("nIdDoc", oDps.getPkDocId());
-                            map.put("sAddressLine1", addressContract[0]);
-                            map.put("sAddressLine2", addressContract[1]);
-                            map.put("sAddressLine3", addressContract[2]);
-                            map.put("sAddressLine4", addressContract.length > 3 ? addressContract[3] : "");
+                            
+                            if (SLibUtilities.compareKeys(keyDpsType, SDataConstantsSys.TRNU_TP_DPS_SAL_CON)) {
+                                map.put("sAddressLine1", addressContract[0]);
+                                map.put("sAddressLine2", addressContract[1]);
+                                map.put("sAddressLine3", addressContract[2]);
+                                map.put("sAddressLine4", addressContract.length > 3 ? addressContract[3] : "");
+                            }
+                            else {
+                                addressOficial = miClient.getSessionXXX().getCurrentCompanyBranch().getDbmsBizPartnerBranchAddressOfficial().obtainAddress(nFkRecAddressFormatTypeId_n,
+                                    SDataBizPartnerBranchAddress.ADDRESS_4ROWS, bincludeCountry);
+                                map.put("sAddressLine1", addressOficial[0] == null || addressOficial[0].isEmpty() ? "": addressOficial[0]);
+                                map.put("sAddressLine2", addressOficial[1] == null || addressOficial[1].isEmpty() ? "": addressOficial[1]);
+                                map.put("sAddressLine3", addressOficial[2] == null || addressOficial[2].isEmpty() ? "": addressOficial[2]);
+                                map.put("sAddressLine4", addressOficial.length > 3 ? addressOficial[3] : "");
+                            }
 
                             vPrice.add("");
                             for (i = 0; i < oDps.getDbmsDpsEntries().size(); i++) {
@@ -1165,6 +1195,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             }
 
                             map.put("sContact", sContact.length() == 0 ? oBizPartnerBranch.getDbmsBizPartner() : sContact);
+                            map.put("ctBpCus", SDataConstantsSys.BPSS_CT_BP_CUS);
+                            map.put("ctBpSup", SDataConstantsSys.BPSS_CT_BP_SUP);
+                            map.put("nFidCtBp", SLibUtilities.compareKeys(keyDpsType, SDataConstantsSys.TRNU_TP_DPS_SAL_CON) ? SDataConstantsSys.BPSS_CT_BP_CUS : SDataConstantsSys.BPSS_CT_BP_SUP);
                             map.put("oDecimalFormat", miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormatFixed4());
                             map.put("oQuantityFormat", miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat());
                             map.put("oDateTextFormat", miClient.getSessionXXX().getFormatters().getDateTextFormat());
@@ -1215,14 +1248,18 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             Vector<String> vUnit = null;
             String sContact = "";
 
-            if (moTablePane.getSelectedTableRow() != null) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
                 oDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
                 oCompanyBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { oDps.getFkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
                 oBizPartnerBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { oDps.getFkBizPartnerBranchId() }, SLibConstants.EXEC_MODE_SILENT);
                 oAddress = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB_ADD, new int [] { oDps.getFkBizPartnerBranchId(),
                     oDps.getFkBizPartnerBranchAddressId() }, SLibConstants.EXEC_MODE_SILENT);
                 oCurrency = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { oDps.getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
-
+                int [] keyDpsType = new int[] { oDps.getFkDpsCategoryId(), oDps.getFkDpsClassId(), oDps.getFkDpsTypeId() };
+                
                 if (oBizPartnerBranch.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
                         nFkRecAddressFormatTypeId_n = oBizPartnerBranch.getFkAddressFormatTypeId_n();
                     }
@@ -1253,8 +1290,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 addressDeliveryCompany = oCompanyBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(nFkEmiAddressFormatTypeId_n,
                     SDataBizPartnerBranchAddress.ADDRESS_4ROWS, bincludeCountry);
 
-                if (oDps.getFkDpsCategoryId() == SDataConstantsSys.TRNU_TP_DPS_SAL_CON[0] && oDps.getFkDpsClassId() == SDataConstantsSys.TRNU_TP_DPS_SAL_CON[1] &&
-                        oDps.getFkDpsTypeId() == SDataConstantsSys.TRNU_TP_DPS_SAL_CON[2]) {
+                if ((oDps.getFkDpsCategoryId() == SDataConstantsSys.TRNU_TP_DPS_SAL_CON[0] && oDps.getFkDpsClassId() == SDataConstantsSys.TRNU_TP_DPS_SAL_CON[1] &&
+                        oDps.getFkDpsTypeId() == SDataConstantsSys.TRNU_TP_DPS_SAL_CON[2]) || 
+                    (oDps.getFkDpsCategoryId() == SDataConstantsSys.TRNU_TP_DPS_PUR_CON[0] && oDps.getFkDpsClassId() == SDataConstantsSys.TRNU_TP_DPS_PUR_CON[1] &&
+                        oDps.getFkDpsTypeId() == SDataConstantsSys.TRNU_TP_DPS_PUR_CON[2])) {
                     vPrice = new Vector<>();
                     vUnit = new Vector<>();
                     try {
@@ -1263,10 +1302,20 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         map = miClient.createReportParams();
                         map.put("nIdYear", oDps.getPkYearId());
                         map.put("nIdDoc", oDps.getPkDocId());
-                        map.put("sAddressLine1", addressContract[0]);
-                        map.put("sAddressLine2", addressContract[1]);
-                        map.put("sAddressLine3", addressContract[2]);
-                        map.put("sAddressLine4", addressContract.length > 3 ? addressContract[3] : "");
+                        if (SLibUtilities.compareKeys(keyDpsType, SDataConstantsSys.TRNU_TP_DPS_SAL_CON)) {
+                                map.put("sAddressLine1", addressContract[0]);
+                                map.put("sAddressLine2", addressContract[1]);
+                                map.put("sAddressLine3", addressContract[2]);
+                                map.put("sAddressLine4", addressContract.length > 3 ? addressContract[3] : "");
+                            }
+                            else {
+                                addressOficial = miClient.getSessionXXX().getCurrentCompanyBranch().getDbmsBizPartnerBranchAddressOfficial().obtainAddress(nFkRecAddressFormatTypeId_n,
+                                    SDataBizPartnerBranchAddress.ADDRESS_4ROWS, bincludeCountry);
+                                map.put("sAddressLine1", addressOficial[0] == null || addressOficial[0].isEmpty() ? "": addressOficial[0]);
+                                map.put("sAddressLine2", addressOficial[1] == null || addressOficial[1].isEmpty() ? "": addressOficial[1]);
+                                map.put("sAddressLine3", addressOficial[2] == null || addressOficial[2].isEmpty() ? "": addressOficial[2]);
+                                map.put("sAddressLine4", addressOficial.length > 3 ? addressOficial[3] : "");
+                            }
 
                         vPrice.add("");
                         for (i = 0; i < oDps.getDbmsDpsEntries().size(); i++) {
@@ -1331,6 +1380,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         }
 
                         map.put("sContact", sContact.length() == 0 ? oBizPartnerBranch.getDbmsBizPartner() : sContact);
+                        map.put("ctBpCus", SDataConstantsSys.BPSS_CT_BP_CUS);
+                        map.put("ctBpSup", SDataConstantsSys.BPSS_CT_BP_SUP);
+                        map.put("nFidCtBp", SLibUtilities.compareKeys(keyDpsType, SDataConstantsSys.TRNU_TP_DPS_SAL_CON) ? SDataConstantsSys.BPSS_CT_BP_CUS : SDataConstantsSys.BPSS_CT_BP_SUP);
                         map.put("oDecimalFormat", miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormatFixed4());
                         map.put("oQuantityFormat", miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat());
                         map.put("oDateTextFormat", miClient.getSessionXXX().getFormatters().getDateTextFormat());
@@ -1356,7 +1408,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
     private void actionPrintContractMoves() {
         if (jbPrintContractMoves.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() != null) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
                 STrnUtilities.createReportContractAnalysis(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
             }
         }
@@ -1382,7 +1437,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             SDataUser oUserBuyer = null;
             SDataUser oUserAuthorize = null;
 
-            if (moTablePane.getSelectedTableRow() != null/* && !isBizPartnerBlocked()*/) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
                 oDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
                 oCompanyBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { oDps.getFkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
                 oBizPartnerBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { oDps.getFkBizPartnerBranchId() }, SLibConstants.EXEC_MODE_SILENT);
@@ -1460,7 +1518,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             SDataBizPartnerBranchAddress oAddress = null;
             SDataCurrency oCurrency = null;
 
-            if (moTablePane.getSelectedTableRow() != null/* && !isBizPartnerBlocked()*/) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
                 oDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
                 if (oDps.getDbmsDataCfd() != null) {
@@ -1528,7 +1589,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
     private void actionGetXml() {
         if (jbGetXml.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() != null && !moTablePane.getSelectedTableRow().getIsSummary()) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
                 try {
                     SCfdUtils.getXmlCfd(miClient, SCfdUtils.getCfd(miClient, SCfdConsts.CFD_TYPE_DPS, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()));
                 }
@@ -1541,7 +1605,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
     private void actionPrintAcknowledgmentCancellation() {
         if (jbPrintAcknowledgmentCancellation.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() != null && !moTablePane.getSelectedTableRow().getIsSummary()) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
                 try {
                     SCfdUtils.printAcknowledgmentCancellationCfd(miClient, SCfdUtils.getCfd(miClient, SCfdConsts.CFD_TYPE_DPS, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()), SLibConstants.UNDEFINED);
                 }
@@ -1554,7 +1621,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
     private void actionGetAcknowledgmentCancellation() {
         if (jbGetAcknowledgmentCancellation.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() != null && !moTablePane.getSelectedTableRow().getIsSummary()) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
                 try {
                     SCfdUtils.getAcknowledgmentCancellationCfd(miClient, SCfdUtils.getCfd(miClient, SCfdConsts.CFD_TYPE_DPS, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()));
                 }
@@ -1570,7 +1640,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         SDataDps dps = null;
 
         if (jbSignXml.isEnabled()) {
-           if (moTablePane.getSelectedTableRow() != null && !moTablePane.getSelectedTableRow().getIsSummary()) {
+           if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
                 dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
                 if (dps.getIsDeleted()) {
@@ -1653,7 +1726,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         SDataDps dps = null;
 
         if (jbVerifyCfdi.isEnabled()) {
-           if (moTablePane.getSelectedTableRow() != null && !moTablePane.getSelectedTableRow().getIsSummary()) {
+           if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
                 dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
                 if (dps.getIsDeleted()) {
@@ -1674,7 +1750,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
     private void actionSend() {
         if (jbSend.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() != null) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
                 try {
                     switch (mnTabTypeAux02) {
                         case SDataConstantsSys.TRNX_TP_DPS_DOC:
@@ -1699,7 +1778,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         SDataDps dps = null;
 
         if (jbRestoreSignXml.isEnabled()) {
-           if (moTablePane.getSelectedTableRow() != null && !moTablePane.getSelectedTableRow().getIsSummary()) {
+           if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
                 dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
                 if (dps.getIsDeleted()) {
@@ -1721,7 +1803,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         SDataDps dps = null;
 
         if (jbRestoreAcknowledgmentCancellation.isEnabled()) {
-           if (moTablePane.getSelectedTableRow() != null && !moTablePane.getSelectedTableRow().getIsSummary()) {
+           if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
                 dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
                 if (dps.getIsDeleted()) {
@@ -1742,7 +1827,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         SDataDps dps = null;
 
         if (jbDiactivateFlags.isEnabled()) {
-           if (moTablePane.getSelectedTableRow() != null && !moTablePane.getSelectedTableRow().getIsSummary()) {
+           if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
                 dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
                 if (dps.getIsDeleted()) {

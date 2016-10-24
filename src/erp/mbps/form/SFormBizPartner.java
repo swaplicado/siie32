@@ -2114,7 +2114,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             jbAddBranch.setEnabled(false);
 
             moFieldFkCreditTypeId_n.setFieldValue(new int[] { SDataConstantsSys.BPSS_TP_CRED_CRED_NO });
-            moFieldFkRiskTypeId.setFieldValue(new int[] { SModSysConsts.BPSS_RISK_C });
+            moFieldFkRiskTypeId.setFieldValue(new int[] { SModSysConsts.BPSS_RISK_C_RSK_H });
             moFieldCreditLimit.setFieldValue(0d);
             moFieldDaysOfCredit.setFieldValue(0);
             moFieldDaysOfGrace.setFieldValue(0);
@@ -2139,7 +2139,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 moFieldCreditLimit.setFieldValue(0d);
                 moFieldDaysOfCredit.setFieldValue(0);
                 moFieldDaysOfGrace.setFieldValue(0);
-                moFieldFkRiskTypeId.setFieldValue(new int[] { SModSysConsts.BPSS_RISK_C });
+                moFieldFkRiskTypeId.setFieldValue(new int[] { SModSysConsts.BPSS_RISK_C_RSK_H });
             }
             else {
                 moFieldFkCreditTypeId_n.setFieldValue(new int[] { moBizPartnerType.getFkCreditTypeId() });
@@ -2155,7 +2155,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 moFieldCreditLimit.setFieldValue(0d);
                 moFieldDaysOfCredit.setFieldValue(0);
                 moFieldDaysOfGrace.setFieldValue(0);
-                moFieldFkRiskTypeId.setFieldValue(new int[] { SModSysConsts.BPSS_RISK_C });
+                moFieldFkRiskTypeId.setFieldValue(new int[] { SModSysConsts.BPSS_RISK_C_RSK_H });
             }
             else {
                 moFieldFkCreditTypeId_n.setFieldValue(new int[] { moBizPartnerCategory.getFkCreditTypeId_n() });
@@ -2887,7 +2887,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             moBizPartnerCategory.setFkBizPartnerCategoryId(moFieldFkBizPartnerCategoryId.getKeyAsIntArray()[0]);
             moBizPartnerCategory.setFkBizPartnerTypeId(moFieldFkBizPartnerTypeId.getKeyAsIntArray()[1]);
             moBizPartnerCategory.setFkCreditTypeId_n(!jckIsCreditByUser.isSelected() ? SDataConstantsSys.BPSS_TP_CRED_CRED_NO : moFieldFkCreditTypeId_n.getKeyAsIntArray()[0]);
-            moBizPartnerCategory.setFkRiskTypeId_n(!jckIsCreditByUser.isSelected() ? SModSysConsts.BPSS_RISK_C : moFieldFkRiskTypeId.getKeyAsIntArray()[0]);
+            moBizPartnerCategory.setFkRiskTypeId_n(!jckIsCreditByUser.isSelected() ? SModSysConsts.BPSS_RISK_C_RSK_H : moFieldFkRiskTypeId.getKeyAsIntArray()[0]);
             moBizPartnerCategory.setFkCfdAddendaTypeId(moFieldFkCfdAddendaTypeId.getKeyAsIntArray()[0]);
             moBizPartnerCategory.setFkLanguageId_n(moBizPartnerCategory.getPkBizPartnerCategoryId() == SDataConstantsSys.BPSS_CT_BP_SUP || moBizPartnerCategory.getPkBizPartnerCategoryId() == SDataConstantsSys.BPSS_CT_BP_CUS ? moFieldFkLanguageId.getKeyAsIntArray()[0] : -1);
             moBizPartnerCategory.setFkCurrencyId_n(moFieldFkCurrencyId.getKeyAsIntArray()[0] <= 0 ? -1 : moFieldFkCurrencyId.getKeyAsIntArray()[0]);

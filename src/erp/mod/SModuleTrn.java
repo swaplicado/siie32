@@ -196,7 +196,7 @@ public class SModuleTrn extends SGuiModule {
                 view = new SViewInventoryCostByDiogType(miClient, subtype, "Costo inv. por tipo mov.", params);
                 break;
             case SModConsts.TRN_MMS_CFG:
-                view = new SViewMmsConfig(miClient, "Configuración de ítems para envío por email");
+                view = new SViewMmsConfig(miClient, "Configuración de ítems para envío por correo-e");
                 break;
             case SModConsts.TRN_DVY:
                 if (params == null) {
@@ -237,7 +237,7 @@ public class SModuleTrn extends SGuiModule {
                 form = moFormInventoryValuation;
                 break;
             case SModConsts.TRN_MMS_CFG:
-                if(moFormMmsConfiguration == null) moFormMmsConfiguration = new SFormMmsConfig(miClient, "Configuración de ítems para envío por email");
+                if(moFormMmsConfiguration == null) moFormMmsConfiguration = new SFormMmsConfig(miClient, "Configuración de ítems para envío por correo-e");
                 form = moFormMmsConfiguration;
                 break;
             case SModConsts.TRN_DVY:

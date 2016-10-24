@@ -147,7 +147,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
 
         jPanel19.setLayout(new java.awt.GridLayout(12, 1, 0, 5));
 
-        jPanel6.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkBizPartnerIdentityTypeId.setForeground(new java.awt.Color(0, 0, 255));
         jlFkBizPartnerIdentityTypeId.setText("Tipo de identidad: *");
@@ -159,7 +159,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
 
         jPanel19.add(jPanel6);
 
-        jPanel22.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFirstName.setText("Nombre(s): *");
         jlFirstName.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -171,7 +171,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
 
         jPanel19.add(jPanel22);
 
-        jPanel25.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlLastName.setText("Apellido(s): *");
         jlLastName.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -183,7 +183,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
 
         jPanel19.add(jPanel25);
 
-        jPanel26.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBizPartner.setText("Nombre: *");
         jlBizPartner.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -195,7 +195,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
 
         jPanel19.add(jPanel26);
 
-        jPanel27.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBizPartnerCommercial.setText("Nombre comercial:");
         jlBizPartnerCommercial.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -213,7 +213,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
 
         jPanel19.add(jPanel27);
 
-        jPanel29.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFiscalId.setText("RFC: *");
         jlFiscalId.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -240,19 +240,19 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
 
         jPanel19.add(jPanel29);
 
-        jPanel24.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlEmail.setText("E-mail:");
+        jlEmail.setText("Cuenta correo-e:");
         jlEmail.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel24.add(jlEmail);
 
-        jtfEmail.setText("E-MAIL");
+        jtfEmail.setText("CUENTA CORREO-E");
         jtfEmail.setPreferredSize(new java.awt.Dimension(240, 23));
         jPanel24.add(jtfEmail);
 
         jPanel19.add(jPanel24);
 
-        jPanel28.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCodeBankSantander.setText("Código Santander:");
         jlCodeBankSantander.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -264,7 +264,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
 
         jPanel19.add(jPanel28);
 
-        jPanel30.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCodeBankBanBajio.setText("Código BanBajío:");
         jlCodeBankBanBajio.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -276,7 +276,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
 
         jPanel19.add(jPanel30);
 
-        jPanel11.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkFiscalBankId.setText("Banco SAT: *");
         jlFkFiscalBankId.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -293,7 +293,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
 
         jPanel19.add(jPanel11);
 
-        jPanel10.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkSalesAgentTypeId.setText("Tipo de agente ventas:");
         jlFkSalesAgentTypeId.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -319,7 +319,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
 
         jPanel5.setLayout(new java.awt.GridLayout(1, 2));
 
-        jPanel41.setLayout(new java.awt.FlowLayout(0));
+        jPanel41.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         jtfPkBizPartnerId_Ro.setEditable(false);
         jtfPkBizPartnerId_Ro.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -331,7 +331,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         jPanel5.add(jPanel41);
 
         jPanel1.setPreferredSize(new java.awt.Dimension(392, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(2));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar");
         jbOk.setToolTipText("[Ctrl + Enter]");
@@ -346,8 +346,8 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
 
         getContentPane().add(jPanel5, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-656)/2, (screenSize.height-438)/2, 656, 438);
+        setSize(new java.awt.Dimension(656, 438));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
