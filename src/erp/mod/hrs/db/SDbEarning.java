@@ -40,10 +40,10 @@ public class SDbEarning extends SDbRegistryUser {
     protected boolean mbDaysAdjustment;
     protected boolean mbDaysAbsence;
     protected boolean mbDaysWorked;
-    protected boolean mbWithholding;
-    protected boolean mbPayrollTax;
-    protected boolean mbAlternativeTaxCalculation;
     protected boolean mbDaysWorkedBased;
+    protected boolean mbWithholding;
+    protected boolean mbAlternativeTaxCalculation;
+    protected boolean mbPayrollTax;
     /*
     protected boolean mbDeleted;
     protected boolean mbSystem;
@@ -87,10 +87,10 @@ public class SDbEarning extends SDbRegistryUser {
     public void setDaysAdjustment(boolean b) { mbDaysAdjustment = b; }
     public void setDaysAbsence(boolean b) { mbDaysAbsence = b; }
     public void setDaysWorked(boolean b) { mbDaysWorked = b; }
+    public void setDaysWorkedBased(boolean b) { mbDaysWorkedBased = b; }
     public void setWithholding(boolean b) { mbWithholding = b; }
     public void setAlternativeTaxCalculation(boolean b) { mbAlternativeTaxCalculation = b; }
     public void setPayrollTax(boolean b) { mbPayrollTax = b; }
-    public void setDaysWorkedBased(boolean b) { mbDaysWorkedBased = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setSystem(boolean b) { mbSystem = b; }
     public void setFkEarningTypeId(int n) { mnFkEarningTypeId = n; }
@@ -107,7 +107,7 @@ public class SDbEarning extends SDbRegistryUser {
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
-    
+
     public void setAuxAccountingConfigurationTypeId(int n) { mnAuxAccountingConfigurationTypeId = n; }
 
     public int getPkEarningId() { return mnPkEarningId; }
@@ -127,10 +127,10 @@ public class SDbEarning extends SDbRegistryUser {
     public boolean isDaysAdjustment() { return mbDaysAdjustment; }
     public boolean isDaysAbsence() { return mbDaysAbsence; }
     public boolean isDaysWorked() { return mbDaysWorked; }
+    public boolean isDaysWorkedBased() { return mbDaysWorkedBased; }
     public boolean isWithholding() { return mbWithholding; }
     public boolean isAlternativeTaxCalculation() { return mbAlternativeTaxCalculation; }
     public boolean isPayrollTax() { return mbPayrollTax; }
-    public boolean isDaysWorkedBased() { return mbDaysWorkedBased; }
     public boolean isDeleted() { return mbDeleted; }
     public boolean isSystem() { return mbSystem; }
     public int getFkEarningTypeId() { return mnFkEarningTypeId; }
@@ -147,7 +147,7 @@ public class SDbEarning extends SDbRegistryUser {
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
-    
+
     public int getAuxAccountingConfigurationTypeId() { return mnAuxAccountingConfigurationTypeId; }
     //public ArrayList<SDbAccountingEarning> getAccountingEarning() { return maAccountingEarning; } XXX (jbarajas, 2016-08-05) slowly open payroll
 
@@ -182,14 +182,16 @@ public class SDbEarning extends SDbRegistryUser {
         mbDaysAdjustment = false;
         mbDaysAbsence = false;
         mbDaysWorked = false;
+        mbDaysWorkedBased = false;
         mbWithholding = false;
-        mbPayrollTax = false;
         mbAlternativeTaxCalculation = false;
+        mbPayrollTax = false;
         mbDeleted = false;
         mbSystem = false;
         mnFkEarningTypeId = 0;
         mnFkEarningComputationTypeId = 0;
         mnFkEarningExemptionTypeId = 0;
+        mnFkEarningExemptionTypeYearId = 0;
         mnFkLoanTypeId = 0;
         mnFkBenefitTypeId = 0;
         mnFkAccountingConfigurationTypeId = 0;
@@ -258,7 +260,7 @@ public class SDbEarning extends SDbRegistryUser {
             mdExemptionSalaryEqualsMwzLimit = resultSet.getDouble("exem_sal_equ_mwz_lim");
             mdExemptionSalaryGreaterMwzPercentage = resultSet.getDouble("exem_sal_grt_mwz_per");
             mdExemptionSalaryGreaterMwzLimit = resultSet.getDouble("exem_sal_grt_mwz_lim");
-            //mdExemptionMwzYear = resultSet.getDouble("exem_mwz_year");
+            mdExemptionMwzYear = resultSet.getDouble("exem_mwz_year");
             mdPayPercentage = resultSet.getDouble("pay_per");
             mdUnitsMaximumWeek = resultSet.getDouble("unt_max_wee");
             mdUnitsFactor = resultSet.getDouble("unt_fac");
@@ -266,16 +268,16 @@ public class SDbEarning extends SDbRegistryUser {
             mbDaysAdjustment = resultSet.getBoolean("b_day_adj");
             mbDaysAbsence = resultSet.getBoolean("b_day_abs");
             mbDaysWorked = resultSet.getBoolean("b_day_wrk");
-            //mbDaysWorkedBased = resultSet.getBoolean("b_day_wrk_bas");
+            mbDaysWorkedBased = resultSet.getBoolean("b_day_wrk_bas");
             mbWithholding = resultSet.getBoolean("b_who");
-            mbPayrollTax = resultSet.getBoolean("b_pay_tax");
             mbAlternativeTaxCalculation = resultSet.getBoolean("b_alt_tax");
+            mbPayrollTax = resultSet.getBoolean("b_pay_tax");
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
             mnFkEarningTypeId = resultSet.getInt("fk_tp_ear");
             mnFkEarningComputationTypeId = resultSet.getInt("fk_tp_ear_comp");
             mnFkEarningExemptionTypeId = resultSet.getInt("fk_tp_ear_exem");
-            //mnFkEarningExemptionTypeYearId = resultSet.getInt("fk_tp_ear_exem_year");
+            mnFkEarningExemptionTypeYearId = resultSet.getInt("fk_tp_ear_exem_year");
             mnFkLoanTypeId = resultSet.getInt("fk_tp_loan");
             mnFkBenefitTypeId = resultSet.getInt("fk_tp_ben");
             mnFkAccountingConfigurationTypeId = resultSet.getInt("fk_tp_acc_cfg");
@@ -286,7 +288,7 @@ public class SDbEarning extends SDbRegistryUser {
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
-            
+
             mnAuxAccountingConfigurationTypeId = mnFkAccountingConfigurationTypeId;
 
             /* XXX (jbarajas, 2016-08-05) slowly open payroll
@@ -326,10 +328,10 @@ public class SDbEarning extends SDbRegistryUser {
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
 
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
-                    mnPkEarningId + ", " +
-                    "'" + msCode + "', " +
-                    "'" + msName + "', " +
-                    "'" + msNameAbbreviated + "', " +  
+                    mnPkEarningId + ", " + 
+                    "'" + msCode + "', " + 
+                    "'" + msName + "', " + 
+                    "'" + msNameAbbreviated + "', " + 
                     mdExemptionMwz + ", " + 
                     mdExemptionSalaryEqualsMwzPercentage + ", " + 
                     mdExemptionSalaryEqualsMwzLimit + ", " + 
@@ -337,32 +339,32 @@ public class SDbEarning extends SDbRegistryUser {
                     mdExemptionSalaryGreaterMwzLimit + ", " + 
                     mdExemptionMwzYear + ", " + 
                     mdPayPercentage + ", " + 
-                    mdUnitsMaximumWeek + ", " +
-                    mdUnitsFactor + ", " +
-                    (mbWelfare ? 1 : 0) + ", " +
-                    (mbDaysAdjustment ? 1 : 0) + ", " +
-                    (mbDaysAbsence ? 1 : 0) + ", " +
-                    (mbDaysWorked ? 1 : 0) + ", " +
-                    (mbDaysWorkedBased ? 1 : 0) + ", " +
-                    (mbWithholding ? 1 : 0) + ", " +
-                    (mbPayrollTax ? 1 : 0) + ", " +
-                    (mbAlternativeTaxCalculation ? 1 : 0) + ", " +
-                    (mbDeleted ? 1 : 0) + ", " +
-                    (mbSystem ? 1 : 0) + ", " +
-                    mnFkEarningTypeId + ", " +
-                    mnFkEarningComputationTypeId + ", " +
-                    mnFkEarningExemptionTypeId + ", " +
-                    mnFkEarningExemptionTypeYearId + ", " +
-                    mnFkLoanTypeId + ", " +
+                    mdUnitsMaximumWeek + ", " + 
+                    mdUnitsFactor + ", " + 
+                    (mbWelfare ? 1 : 0) + ", " + 
+                    (mbDaysAdjustment ? 1 : 0) + ", " + 
+                    (mbDaysAbsence ? 1 : 0) + ", " + 
+                    (mbDaysWorked ? 1 : 0) + ", " + 
+                    (mbDaysWorkedBased ? 1 : 0) + ", " + 
+                    (mbWithholding ? 1 : 0) + ", " + 
+                    (mbAlternativeTaxCalculation ? 1 : 0) + ", " + 
+                    (mbPayrollTax ? 1 : 0) + ", " + 
+                    (mbDeleted ? 1 : 0) + ", " + 
+                    (mbSystem ? 1 : 0) + ", " + 
+                    mnFkEarningTypeId + ", " + 
+                    mnFkEarningComputationTypeId + ", " + 
+                    mnFkEarningExemptionTypeId + ", " + 
+                    mnFkEarningExemptionTypeYearId + ", " + 
+                    mnFkLoanTypeId + ", " + 
                     mnFkBenefitTypeId + ", " + 
                     mnFkAccountingConfigurationTypeId + ", " + 
                     mnFkAccountingRecordTypeId + ", " + 
                     (mnFkAbsenceClassId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkAbsenceClassId_n) + ", " +
                     (mnFkAbsenceTypeId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkAbsenceTypeId_n) + ", " +
-                    mnFkUserInsertId + ", " +
-                    mnFkUserUpdateId + ", " +
-                    "NOW()" + ", " +
-                    "NOW()" + " " +
+                    mnFkUserInsertId + ", " + 
+                    mnFkUserUpdateId + ", " + 
+                    "NOW()" + ", " + 
+                    "NOW()" + " " + 
                     ")";
         }
         else {
@@ -390,8 +392,8 @@ public class SDbEarning extends SDbRegistryUser {
                     "b_day_wrk = " + (mbDaysWorked ? 1 : 0) + ", " +
                     "b_day_wrk_bas = " + (mbDaysWorkedBased ? 1 : 0) + ", " +
                     "b_who = " + (mbWithholding ? 1 : 0) + ", " +
-                    "b_pay_tax = " + (mbPayrollTax ? 1 : 0) + ", " +
                     "b_alt_tax = " + (mbAlternativeTaxCalculation ? 1 : 0) + ", " +
+                    "b_pay_tax = " + (mbPayrollTax ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
                     "fk_tp_ear = " + mnFkEarningTypeId + ", " +
@@ -460,8 +462,8 @@ public class SDbEarning extends SDbRegistryUser {
         registry.setDaysWorked(this.isDaysWorked());
         registry.setDaysWorkedBased(this.isDaysWorkedBased());
         registry.setWithholding(this.isWithholding());
-        registry.setPayrollTax(this.isPayrollTax());
         registry.setAlternativeTaxCalculation(this.isAlternativeTaxCalculation());
+        registry.setPayrollTax(this.isPayrollTax());
         registry.setDeleted(this.isDeleted());
         registry.setSystem(this.isSystem());
         registry.setFkEarningTypeId(this.getFkEarningTypeId());
@@ -478,7 +480,7 @@ public class SDbEarning extends SDbRegistryUser {
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
-        
+
         registry.setAuxAccountingConfigurationTypeId(this.getAuxAccountingConfigurationTypeId());
         //registry.getAccountingEarning().addAll(this.getAccountingEarning()); XXX (jbarajas, 2016-08-05) slowly open payroll
 
