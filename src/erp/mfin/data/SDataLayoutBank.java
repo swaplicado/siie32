@@ -6,20 +6,19 @@
 package erp.mfin.data;
 
 import erp.client.SClientInterface;
-import java.sql.ResultSet;
-import java.sql.Statement;
-
-import erp.mod.fin.db.SFinRecordLayout;
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.table.STableUtilities;
+import erp.mod.fin.db.SFinRecordLayout;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.sql.CallableStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.swing.JFileChooser;
@@ -49,6 +48,7 @@ public class SDataLayoutBank extends erp.lib.data.SDataRegistry implements java.
     protected int mnFkBankLayoutTypeId;
     protected int mnFkBankCompanyBranchId;
     protected int mnFkBankAccountCashId;
+    protected int mnFkDpsCurId;
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
     protected Date mtTsUserInsert;
@@ -89,6 +89,7 @@ public class SDataLayoutBank extends erp.lib.data.SDataRegistry implements java.
     public void setFkBankLayoutTypeId(int n) { mnFkBankLayoutTypeId = n; }
     public void setFkBankCompanyBranchId(int n) { mnFkBankCompanyBranchId = n; }
     public void setFkBankAccountCashId(int n) { mnFkBankAccountCashId = n; }
+    public void setFkDpsCurId(int n) { mnFkDpsCurId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
@@ -112,6 +113,7 @@ public class SDataLayoutBank extends erp.lib.data.SDataRegistry implements java.
     public int getFkBankLayoutTypeId() { return mnFkBankLayoutTypeId; }
     public int getFkBankCompanyBranchId() { return mnFkBankCompanyBranchId; }
     public int getFkBankAccountCashId() { return mnFkBankAccountCashId; }
+    public int getFkDpsCurId() { return mnFkDpsCurId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
@@ -151,6 +153,7 @@ public class SDataLayoutBank extends erp.lib.data.SDataRegistry implements java.
         mnFkBankLayoutTypeId = 0;
         mnFkBankCompanyBranchId = 0;
         mnFkBankAccountCashId = 0;
+        mnFkDpsCurId = 1;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
@@ -197,8 +200,8 @@ public class SDataLayoutBank extends erp.lib.data.SDataRegistry implements java.
                 mnConsecutive = resultSet.getInt("con");
                 mdAmount = resultSet.getDouble("amt");
                 mdAmountPayed = resultSet.getDouble("amt_pay");
-                mnDocs = resultSet.getInt("doc");
-                mnDocsPayed = resultSet.getInt("doc_pay");
+                mnDocs = resultSet.getInt("dps");
+                mnDocsPayed = resultSet.getInt("dps_pay");
                 msLayoutText = resultSet.getString("lay_txt");
                 msLayoutXml = resultSet.getString("lay_xml");
                 mbDeleted = resultSet.getBoolean("b_del");
@@ -206,6 +209,7 @@ public class SDataLayoutBank extends erp.lib.data.SDataRegistry implements java.
                 mnFkBankLayoutTypeId = resultSet.getInt("fk_tp_lay_bank");
                 mnFkBankCompanyBranchId = resultSet.getInt("fk_bank_cob");
                 mnFkBankAccountCashId = resultSet.getInt("fk_bank_acc_cash");
+                mnFkDpsCurId = resultSet.getInt("fk_dps_cur");
                 mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
                 mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
                 mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
@@ -268,6 +272,7 @@ public class SDataLayoutBank extends erp.lib.data.SDataRegistry implements java.
                         mnFkBankLayoutTypeId + ", " + 
                         mnFkBankCompanyBranchId + ", " + 
                         mnFkBankAccountCashId + ", " + 
+                        mnFkDpsCurId + ", " +
                         mnFkUserInsertId + ", " + 
                         mnFkUserUpdateId + ", " + 
                         "NOW()" + " , " +
@@ -283,8 +288,8 @@ public class SDataLayoutBank extends erp.lib.data.SDataRegistry implements java.
                         "con = " + mnConsecutive + ", " +
                         "amt = " + mdAmount + ", " +
                         "amt_pay = " + mdAmountPayed + ", " +
-                        "doc = " + mnDocs + ", " +
-                        "doc_pay = " + mnDocsPayed + ", " +
+                        "dps = " + mnDocs + ", " +
+                        "dps_pay = " + mnDocsPayed + ", " +
                         "lay_txt = '" + msLayoutText + "', " +
                         "lay_xml = '" + msLayoutXml + "', " +
                         "b_del = " + (mbDeleted ? 1 : 0) + ", " +
@@ -292,6 +297,7 @@ public class SDataLayoutBank extends erp.lib.data.SDataRegistry implements java.
                         "fk_tp_lay_bank = " + mnFkBankLayoutTypeId + ", " +
                         "fk_bank_cob = " + mnFkBankCompanyBranchId + ", " +
                         "fk_bank_acc_cash = " + mnFkBankAccountCashId + ", " +
+                        "fk_dps_cur = " + mnFkDpsCurId + ", " +
                         "fk_usr_ins = " + mnFkUserInsertId + ", " +
                         "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                         "ts_usr_ins = " + "NOW()" + ", " +

@@ -178,7 +178,7 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
                 + "l.dt_lay, l.dt_due, l.cpt, l.con, "
                 + "l.amt, l.amt_pay, (l.amt - l.amt_pay) AS f_amt_x_pay, "
                 + "l.tra, l.tra_pay, (l.tra - l.tra_pay) AS f_tra_x_pay, "
-                + "l.doc, l.doc_pay, (l.doc - l.doc_pay) AS f_doc_x_pay, "
+                + "l.dps, l.dps_pay, (l.dps - l.dps_pay) AS f_doc_x_pay, "
                 + "tp.tp_lay_bank AS f_tp_lay, "
                 + "IF(tp.lay_bank = " + SFinConsts.LAY_BANK_HSBC + ", '" + SFinConsts.TXT_LAY_BANK_HSBC + "', "
                 + "IF(tp.lay_bank = " + SFinConsts.LAY_BANK_SANTANDER + ", '" + SFinConsts.TXT_LAY_BANK_SANTANDER + "', "
@@ -230,8 +230,8 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.tra_pay", "Transferencias pagadas", 100));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "f_tra_x_pay", "Transferencias x pagar", 100));
         if (mnGridSubtype == SModSysConsts.FIN_LAY_BANK_DPS) {
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.doc", "Documentos", 100));
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.doc_pay", "Documentos pagados", 100));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.dps", "Documentos", 100));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.dps_pay", "Documentos pagados", 100));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "f_doc_x_pay", "Documentos x pagar", 100));            
         }
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));

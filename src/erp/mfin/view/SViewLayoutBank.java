@@ -5,17 +5,16 @@
 
 package erp.mfin.view;
 
-import java.awt.Dimension;
-import javax.swing.JButton;
-
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.table.STabFilterDeleted;
-import erp.lib.table.STableField;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
+import erp.lib.table.STableField;
 import erp.mod.fin.db.SFinConsts;
+import java.awt.Dimension;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 
 /**
  *
@@ -73,8 +72,8 @@ public class SViewLayoutBank extends erp.lib.table.STableTab implements java.awt
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "l.amt_pay", "Monto pagado $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_amt_x_pay", "Monto x pagar $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_cur_key_local", "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "l.doc", "Documentos", 100);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "l.doc_pay", "Documentos pagados", 100);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "l.dps", "Documentos", 100);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "l.dps_pay", "Documentos pagados", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_doc_x_pay", "Documentos x pagar", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "l.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usr. creación", STableConstants.WIDTH_USER);
@@ -136,7 +135,7 @@ public class SViewLayoutBank extends erp.lib.table.STableTab implements java.awt
             }
         }
 
-        msSql = "SELECT l.id_lay_bank, l.dt_lay, l.dt_due, l.cpt, l.con, l.amt, l.amt_pay, (l.amt - l.amt_pay) AS f_amt_x_pay, l.doc, l.doc_pay, (l.doc - l.doc_pay) AS f_doc_x_pay, tp.tp_lay_bank AS f_tp_lay, " +
+        msSql = "SELECT l.id_lay_bank, l.dt_lay, l.dt_due, l.cpt, l.con, l.amt, l.amt_pay, (l.amt - l.amt_pay) AS f_amt_x_pay, l.dps, l.dps_pay, (l.dps - l.dps_pay) AS f_doc_x_pay, tp.tp_lay_bank AS f_tp_lay, " +
                 "IF(l.fk_lay_bank = " + SFinConsts.LAY_BANK_HSBC + ", '" + SFinConsts.TXT_LAY_BANK_HSBC + "', IF(l.fk_lay_bank = " + SFinConsts.LAY_BANK_SANTANDER + ", '" + SFinConsts.TXT_LAY_BANK_SANTANDER + "', '" + SFinConsts.TXT_LAY_BANK_BANBAJIO + "')) AS f_lay, " +
                 "CONCAT(e.ent, ' (', e.code, ')') AS f_ent, l.b_del, " +
                 "(SELECT c.cur_key FROM erp.cfgu_cur AS c WHERE a.fid_cur = c.id_cur) AS f_cur_key, 'MXN' AS f_cur_key_local, " +

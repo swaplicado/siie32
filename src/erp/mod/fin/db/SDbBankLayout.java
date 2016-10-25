@@ -75,6 +75,7 @@ public class SDbBankLayout extends SDbRegistryUser {
     protected int mnFkBankLayoutTypeId;
     protected int mnFkBankCompanyBranchId;
     protected int mnFkBankAccountCashId;
+    protected int mnFkDocsCur;
     protected int mnFkUserClosedPaymentId;
     /*
     protected int mnFkUserInsertId;
@@ -108,6 +109,9 @@ public class SDbBankLayout extends SDbRegistryUser {
             xmlLayoutDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_YEAR).setValue(xmlRow.getDpsYear());
             xmlLayoutDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_DOC).setValue(xmlRow.getDpsDoc());
             xmlLayoutDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT).setValue(xmlRow.getAmount());
+            xmlLayoutDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT_CY).setValue(xmlRow.getAmountCy());
+            xmlLayoutDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_CUR).setValue(xmlRow.getCurrencyId());
+            xmlLayoutDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EXT_RATE).setValue(xmlRow.getExchangeRate());
             
             for (SXmlBankLayoutPayment payment : xmlLayoutPays) {
                 found = false;
@@ -116,6 +120,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                         new int[] { (int) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BP).getValue(), (int) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).getValue() })) {
                     found = true;
                     payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).setValue(((double) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).getValue()) + xmlRow.getAmount());
+                    payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT_CY).setValue(((double) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT_CY).getValue()) + xmlRow.getAmountCy());
                     payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALP).setValue(((String) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALP).getValue()) + "," + xmlRow.getReference());
                     payment.getXmlElements().add(xmlLayoutDoc);
                     break;
@@ -127,6 +132,10 @@ public class SDbBankLayout extends SDbRegistryUser {
             
                 xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).setValue(xmlRow.getAmount());
                 xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALP).setValue(xmlRow.getReference());
+                xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CUR).setValue(xmlRow.getCurrencyId());
+                xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_EXT_RATE).setValue(xmlRow.getExchangeRate());
+                
+                xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF).setValue(xmlRow.getReference());
                 xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CPT).setValue(xmlRow.getConcept());
                 xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_VOU).setValue(xmlRow.getHsbcFiscalVoucher());
                 xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_ACC_TP).setValue(xmlRow.getHsbcAccountType());
@@ -495,7 +504,8 @@ public class SDbBankLayout extends SDbRegistryUser {
             }
             else {
                 // Settings of document:
-                amountPayed = SLibUtils.round((amountPayed + bankPayment.getAmount()), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+                //amountPayed = SLibUtils.round((amountPayed + bankPayment.getAmount()), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+                amountPayed = SLibUtils.round((amountPayed + bankPayment.getAmount().getAmountOriginal()), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
                 sBizPartner = session.readField(SModConsts.BPSU_BP, new int[] { bankPayment.getBizPartnerId() }, SDbBizPartner.FIELD_NAME_COMM) + "";
 
                 if (bankPayment.getLayoutPaymentType() == SModSysConsts.FIN_LAY_BANK_DPS) {
@@ -585,8 +595,10 @@ public class SDbBankLayout extends SDbRegistryUser {
                     accountingAdvance.setBizPartnerBranchAccountCreditId(bankPayment.getBizPartnerBranchAccountId());
                     accountingAdvance.setCompanyBranchId(mnFkBankCompanyBranchId);
                     accountingAdvance.setCompanyBranchAccountDebitId(mnFkBankAccountCashId);
-                    accountingAdvance.setAmount(bankPayment.getAmount());
-                    accountingAdvance.setCurrencyId(bankPayment.getCurrencyId());
+                    accountingAdvance.setAmount(bankPayment.getAmount().getAmountOriginal());
+                    accountingAdvance.setCurrencyId(bankPayment.getAmount().getCurrencyOriginalId());
+                    //accountingAdvance.setAmount(bankPayment.getAmount());
+                    //accountingAdvance.setCurrencyId(bankPayment.getCurrencyId());
                     accountingAdvance.setExcRate(1);
                     accountingAdvance.setExcRateSystem(1);
                     accountingAdvance.setBookkeepingYearId_n(nBookkeepingYear);
@@ -865,6 +877,7 @@ public class SDbBankLayout extends SDbRegistryUser {
     public void setFkBankLayoutTypeId(int n) { mnFkBankLayoutTypeId = n; }
     public void setFkBankCompanyBranchId(int n) { mnFkBankCompanyBranchId = n; }
     public void setFkBankAccountCashId(int n) { mnFkBankAccountCashId = n; }
+    public void setFkDocsCur(int n) { mnFkDocsCur = n; }
     public void setFkUserClosedPaymentId(int n) { mnFkUserClosedPaymentId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
@@ -895,6 +908,7 @@ public class SDbBankLayout extends SDbRegistryUser {
     public int getFkBankLayoutTypeId() { return mnFkBankLayoutTypeId; }
     public int getFkBankCompanyBranchId() { return mnFkBankCompanyBranchId; }
     public int getFkBankAccountCashId() { return mnFkBankAccountCashId; }
+    public int getFkDocsCur() { return mnFkDocsCur; }
     public int getFkUserClosedPaymentId() { return mnFkUserClosedPaymentId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
@@ -949,6 +963,7 @@ public class SDbBankLayout extends SDbRegistryUser {
         mnFkBankLayoutTypeId = 0;
         mnFkBankCompanyBranchId = 0;
         mnFkBankAccountCashId = 0;
+        mnFkDocsCur = 1;
         mnFkUserClosedPaymentId = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
@@ -1011,13 +1026,13 @@ public class SDbBankLayout extends SDbRegistryUser {
             mtDateDue = resultSet.getDate("dt_due");
             msConcept = resultSet.getString("cpt");
             mnConsecutive = resultSet.getInt("con");
-            //mdExchangeRate = resultSet.getDouble("amt");
+
             mdAmount = resultSet.getDouble("amt");
             mdAmountPayed = resultSet.getDouble("amt_pay");
             mnTransfers = resultSet.getInt("tra");
             mnTransfersPayed = resultSet.getInt("tra_pay");
-            mnDocs = resultSet.getInt("doc");
-            mnDocsPayed = resultSet.getInt("doc_pay");
+            mnDocs = resultSet.getInt("dps");
+            mnDocsPayed = resultSet.getInt("dps_pay");
             msLayoutText = resultSet.getString("lay_txt");
             msLayoutXml = resultSet.getString("lay_xml");
             mnTransactionType = resultSet.getInt("trn_tp");
@@ -1026,6 +1041,7 @@ public class SDbBankLayout extends SDbRegistryUser {
             mnFkBankLayoutTypeId = resultSet.getInt("fk_tp_lay_bank");
             mnFkBankCompanyBranchId = resultSet.getInt("fk_bank_cob");
             mnFkBankAccountCashId = resultSet.getInt("fk_bank_acc_cash");
+            mnFkDocsCur = resultSet.getInt("fk_doc_cur");
             mnFkUserClosedPaymentId = resultSet.getInt("fk_usr_clo_pay");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
@@ -1081,6 +1097,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                     (mbDeleted ? 1 : 0) + ", " + 
                     mnFkBankLayoutTypeId + ", " + 
                     mnFkBankCompanyBranchId + ", " + 
+                    mnFkDocsCur + ", " +
                     mnFkBankAccountCashId + ", " + 
                     mnFkUserClosedPaymentId + ", " + 
                     mnFkUserInsertId + ", " + 
@@ -1102,8 +1119,8 @@ public class SDbBankLayout extends SDbRegistryUser {
                     "amt_pay = " + mdAmountPayed + ", " +
                     "tra = " + mnTransfers + ", " +
                     "tra_pay = " + mnTransfersPayed + ", " +
-                    "doc = " + mnDocs + ", " +
-                    "doc_pay = " + mnDocsPayed + ", " +
+                    "dps = " + mnDocs + ", " +
+                    "dps_pay = " + mnDocsPayed + ", " +
                     "lay_txt = '" + msLayoutText + "', " +
                     "lay_xml = '" + msLayoutXml + "', " +
                     "trn_tp = " + mnTransactionType + ", " +
@@ -1112,6 +1129,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                     "fk_tp_lay_bank = " + mnFkBankLayoutTypeId + ", " +
                     "fk_bank_cob = " + mnFkBankCompanyBranchId + ", " +
                     "fk_bank_acc_cash = " + mnFkBankAccountCashId + ", " +
+                    "fk_dps_cur = " + mnFkDocsCur + ", " +
                     "fk_usr_clo_pay = " + mnFkUserClosedPaymentId + ", " +
                     "fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
@@ -1150,6 +1168,7 @@ public class SDbBankLayout extends SDbRegistryUser {
         registry.setFkBankLayoutTypeId(this.getFkBankLayoutTypeId());
         registry.setFkBankCompanyBranchId(this.getFkBankCompanyBranchId());
         registry.setFkBankAccountCashId(this.getFkBankAccountCashId());
+        registry.setFkDocsCur(this.getFkDocsCur());
         registry.setFkUserClosedPaymentId(this.getFkUserClosedPaymentId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
