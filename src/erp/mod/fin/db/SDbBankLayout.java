@@ -109,10 +109,7 @@ public class SDbBankLayout extends SDbRegistryUser {
             xmlLayoutDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_YEAR).setValue(xmlRow.getDpsYear());
             xmlLayoutDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_DOC).setValue(xmlRow.getDpsDoc());
             xmlLayoutDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT).setValue(xmlRow.getAmount());
-            xmlLayoutDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT_CY).setValue(xmlRow.getAmountCy());
-            xmlLayoutDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_CUR).setValue(xmlRow.getCurrencyId());
-            xmlLayoutDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EXT_RATE).setValue(xmlRow.getExchangeRate());
-            
+                        
             for (SXmlBankLayoutPayment payment : xmlLayoutPays) {
                 found = false;
                 
@@ -120,7 +117,6 @@ public class SDbBankLayout extends SDbRegistryUser {
                         new int[] { (int) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BP).getValue(), (int) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).getValue() })) {
                     found = true;
                     payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).setValue(((double) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).getValue()) + xmlRow.getAmount());
-                    payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT_CY).setValue(((double) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT_CY).getValue()) + xmlRow.getAmountCy());
                     payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALP).setValue(((String) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALP).getValue()) + "," + xmlRow.getReference());
                     payment.getXmlElements().add(xmlLayoutDoc);
                     break;
@@ -132,10 +128,7 @@ public class SDbBankLayout extends SDbRegistryUser {
             
                 xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).setValue(xmlRow.getAmount());
                 xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALP).setValue(xmlRow.getReference());
-                xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CUR).setValue(xmlRow.getCurrencyId());
-                xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_EXT_RATE).setValue(xmlRow.getExchangeRate());
-                
-                xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF).setValue(xmlRow.getReference());
+               
                 xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CPT).setValue(xmlRow.getConcept());
                 xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_VOU).setValue(xmlRow.getHsbcFiscalVoucher());
                 xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_ACC_TP).setValue(xmlRow.getHsbcAccountType());
@@ -504,8 +497,7 @@ public class SDbBankLayout extends SDbRegistryUser {
             }
             else {
                 // Settings of document:
-                //amountPayed = SLibUtils.round((amountPayed + bankPayment.getAmount()), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-                amountPayed = SLibUtils.round((amountPayed + bankPayment.getAmount().getAmountOriginal()), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+                amountPayed = SLibUtils.round((amountPayed + bankPayment.getAmount()), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
                 sBizPartner = session.readField(SModConsts.BPSU_BP, new int[] { bankPayment.getBizPartnerId() }, SDbBizPartner.FIELD_NAME_COMM) + "";
 
                 if (bankPayment.getLayoutPaymentType() == SModSysConsts.FIN_LAY_BANK_DPS) {
@@ -595,10 +587,8 @@ public class SDbBankLayout extends SDbRegistryUser {
                     accountingAdvance.setBizPartnerBranchAccountCreditId(bankPayment.getBizPartnerBranchAccountId());
                     accountingAdvance.setCompanyBranchId(mnFkBankCompanyBranchId);
                     accountingAdvance.setCompanyBranchAccountDebitId(mnFkBankAccountCashId);
-                    accountingAdvance.setAmount(bankPayment.getAmount().getAmountOriginal());
-                    accountingAdvance.setCurrencyId(bankPayment.getAmount().getCurrencyOriginalId());
-                    //accountingAdvance.setAmount(bankPayment.getAmount());
-                    //accountingAdvance.setCurrencyId(bankPayment.getCurrencyId());
+                    accountingAdvance.setAmount(bankPayment.getAmount());
+                    accountingAdvance.setCurrencyId(bankPayment.getCurrencyId());
                     accountingAdvance.setExcRate(1);
                     accountingAdvance.setExcRateSystem(1);
                     accountingAdvance.setBookkeepingYearId_n(nBookkeepingYear);
@@ -1097,8 +1087,8 @@ public class SDbBankLayout extends SDbRegistryUser {
                     (mbDeleted ? 1 : 0) + ", " + 
                     mnFkBankLayoutTypeId + ", " + 
                     mnFkBankCompanyBranchId + ", " + 
-                    mnFkDocsCur + ", " +
                     mnFkBankAccountCashId + ", " + 
+                    mnFkDocsCur + ", " +
                     mnFkUserClosedPaymentId + ", " + 
                     mnFkUserInsertId + ", " + 
                     mnFkUserUpdateId + ", " + 
