@@ -1041,7 +1041,7 @@ public class SDbBankLayout extends SDbRegistryUser {
             mnFkBankLayoutTypeId = resultSet.getInt("fk_tp_lay_bank");
             mnFkBankCompanyBranchId = resultSet.getInt("fk_bank_cob");
             mnFkBankAccountCashId = resultSet.getInt("fk_bank_acc_cash");
-            mnFkDocsCur = resultSet.getInt("fk_doc_cur");
+            mnFkDocsCur = resultSet.getInt("fk_dps_cur");
             mnFkUserClosedPaymentId = resultSet.getInt("fk_usr_clo_pay");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
