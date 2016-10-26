@@ -291,6 +291,7 @@ public abstract class SModConsts {
 
     public static final int FINR_CSH_FLW_EXP = 2015001;
     public static final int FINR_DPS_TAX_PEND = 2015011;
+    public static final int FINR_LAY_BANK = 2015021;
 
     /*
      * Transactions
