@@ -16,7 +16,11 @@ public class SXmlBankLayoutPayment extends SXmlElement {
 
     public static final String NAME = "Pay";
     public static final String ATT_LAY_PAY_AMT = "PayAmount";
+    public static final String ATT_LAY_PAY_AMT_CY = "PayAmountCy";
     public static final String ATT_LAY_PAY_REF_ALP = "PayReferenceAlpha";
+    public static final String ATT_LAY_PAY_CUR = "PayCurrency";
+    public static final String ATT_LAY_PAY_EXT_RATE = "PayExchangeRate";
+    public static final String ATT_LAY_PAY_REF = "PayReference";
     public static final String ATT_LAY_PAY_CPT = "PayConcept";
     public static final String ATT_LAY_PAY_HSBC_FIS_VOU = "HsbcFiscalVoucher";
     public static final String ATT_LAY_PAY_HSBC_ACC_TP = "HsbcAccountType";
@@ -43,6 +47,9 @@ public class SXmlBankLayoutPayment extends SXmlElement {
     protected SXmlAttribute moPayReference;
     protected SXmlAttribute moPayConcept;
     protected SXmlAttribute moPayAmount;
+    protected SXmlAttribute moPayAmountCy;
+    protected SXmlAttribute moPayCurrency;
+    protected SXmlAttribute moPayExchangeRate;
     protected SXmlAttribute moPayHsbcFiscalVoucher;
     protected SXmlAttribute moPayHsbcAccountType;
     protected SXmlAttribute moPayHsbcBankCode;
@@ -69,6 +76,9 @@ public class SXmlBankLayoutPayment extends SXmlElement {
         super(NAME);
 
         moPayAmount = new SXmlAttribute(ATT_LAY_PAY_AMT);
+        moPayAmountCy = new SXmlAttribute(ATT_LAY_PAY_AMT_CY);
+        moPayCurrency = new SXmlAttribute(ATT_LAY_PAY_CUR);
+        moPayExchangeRate = new SXmlAttribute(ATT_LAY_PAY_EXT_RATE);
         moPayReference = new SXmlAttribute(ATT_LAY_PAY_REF_ALP);
         moPayConcept = new SXmlAttribute(ATT_LAY_PAY_CPT);
         moPayHsbcFiscalVoucher = new SXmlAttribute(ATT_LAY_PAY_HSBC_FIS_VOU);
@@ -96,6 +106,9 @@ public class SXmlBankLayoutPayment extends SXmlElement {
         mvXmlAttributes.add(moPayReference);
         mvXmlAttributes.add(moPayConcept);
         mvXmlAttributes.add(moPayAmount);
+        mvXmlAttributes.add(moPayAmountCy);
+        mvXmlAttributes.add(moPayCurrency);
+        mvXmlAttributes.add(moPayExchangeRate);
         mvXmlAttributes.add(moPayHsbcFiscalVoucher);
         mvXmlAttributes.add(moPayHsbcAccountType);
         mvXmlAttributes.add(moPayHsbcBankCode);
