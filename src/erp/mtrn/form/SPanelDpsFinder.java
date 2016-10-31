@@ -213,6 +213,7 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         jbSearchBizPartnerId.addActionListener(this);
         jbSearchDps.addActionListener(this);
         jbDeleteDps.addActionListener(this);
+        jcbSearchBizPartnerId.addActionListener(this);
 
         jtfSearchNumberSeries.addFocusListener(this);
     }
@@ -277,7 +278,7 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
     }
 
     private void updateFormBizPartnerStatus() {
-        if (!mbIsBizPartnerRequired) {
+        if (!mbIsBizPartnerRequired) { 
             jlSearchBizPartnerId.setEnabled(false);
             jcbSearchBizPartnerId.setEnabled(false);
             jbSearchBizPartnerId.setEnabled(false);
@@ -287,14 +288,19 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
             jlSearchBizPartnerId.setEnabled(true);
             jcbSearchBizPartnerId.setEnabled(true);
             jbSearchBizPartnerId.setEnabled(true);
-            SFormUtilities.populateComboBox(miClient, jcbSearchBizPartnerId, mnOptionsBizPartnerType);
         }
+        SFormUtilities.populateComboBox(miClient, jcbSearchBizPartnerId, mnOptionsBizPartnerType);
     }
 
     private void actionSearchBizPartner() {
-        miClient.pickOption(SDataConstants.BPSX_BP_SUP, moFieldSearchBizPartnerId, null);
+        if (mnOptionsBizPartnerType == SDataConstants.BPSX_BP_SUP) {
+            miClient.pickOption(SDataConstants.BPSX_BP_SUP, moFieldSearchBizPartnerId, null);
+        }
+        else if (mnOptionsBizPartnerType == SDataConstants.BPSX_BP_CUS) {
+            miClient.pickOption(SDataConstants.BPSX_BP_CUS, moFieldSearchBizPartnerId, null);
+        }
     }
-
+    
     private void actionSearchDps() {
         Object[] filterKey = null;
 
@@ -350,6 +356,14 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         }
     }
 
+    private void actionRefreshDps() {
+        if (moDps != null) {
+            if (((int[]) moFieldSearchBizPartnerId.getFieldValue())[0] != moDps.getFkBizPartnerId_r()) {
+                actionDeleteDps();
+            }
+        }    
+    }
+    
     private void actionDeleteDps() {
         moDps = null;
         moPanelDps.setDps(moDps, null);
@@ -454,13 +468,18 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
             mbIsBizPartnerRequired = true;
             updateFormBizPartnerStatus();
         }
-        else {
-            mnOptionsBizPartnerType = SLibConstants.UNDEFINED;
-            mbIsBizPartnerRequired = false;
-            updateFormBizPartnerStatus();
-        }
+        else if (SLibUtilities.compareKeys(manParamDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC)) {
+                mnOptionsBizPartnerType = SDataConstants.BPSX_BP_CUS;
+                mbIsBizPartnerRequired = true;
+                updateFormBizPartnerStatus();
+            }
+            else {
+                mnOptionsBizPartnerType = SLibConstants.UNDEFINED;
+                mbIsBizPartnerRequired = false;
+                updateFormBizPartnerStatus();
+            }
     }
-
+    
     public boolean getIsLocalCurrency() {
         return jckIsLocalCurrency.isSelected();
     }
@@ -497,8 +516,15 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
                 actionDeleteDps();
             }
         }
+        if (e.getSource() instanceof javax.swing.JComboBox) {
+                javax.swing.JComboBox comboBox = (javax.swing.JComboBox) e.getSource();
+            
+                if (comboBox == jcbSearchBizPartnerId) {
+                    actionRefreshDps();
+                }
+        }
     }
-
+ 
     @Override
     public void focusGained(FocusEvent e) {
 
