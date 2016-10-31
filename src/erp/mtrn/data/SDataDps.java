@@ -361,7 +361,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         // Delete aswell all non-deleted entries:
                         
                         if (moDbmsDataBookkeepingNumber != null) {
-                            if (entry.getFkBookkeepingYearId_n()== moDbmsDataBookkeepingNumber.getPkYearId() && entry.getFkBookkeepingNumberId_n() == moDbmsDataBookkeepingNumber.getPkNumberId()) {
+                            if (entry.getFkBookkeepingYearId_n() == moDbmsDataBookkeepingNumber.getPkYearId() && entry.getFkBookkeepingNumberId_n() == moDbmsDataBookkeepingNumber.getPkNumberId()) {
                                 entry.setIsRegistryEdited(true);
                                 entry.setIsDeleted(true);
                                 entry.setFkUserDeleteId(mnFkUserDeleteId);
@@ -3347,6 +3347,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mtDbmsRecordDate = null;
         mbAuxIsFormerRecordAutomatic = false;
         moAuxFormerRecordKey = null;
+        moDbmsDataBookkeepingNumber = null;
     }
 
     /**

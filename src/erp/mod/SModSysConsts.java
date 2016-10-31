@@ -45,6 +45,8 @@ public abstract class SModSysConsts {
     public static final int CFGU_CUR_USD = 2;
     public static final int CFGU_CUR_EUR = 3;
 
+    public static final int CFGU_FUNC_NON = 1;
+    
     public static final int CFGX_IVM_FIFO = 1;
     public static final int CFGX_IVM_LIFO = 2;
     public static final int CFGX_IVM_AVG = 3;
@@ -666,7 +668,7 @@ public abstract class SModSysConsts {
     public static final int TRNX_DIOG_CST_TRAN_NA = 0;
     public static final int TRNX_DIOG_CST_TRAN_NO = 1;
     public static final int TRNX_DIOG_CST_TRAN_YES = 2;
-
+    
     /*
      * Marketing
      */

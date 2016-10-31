@@ -82,10 +82,12 @@ public abstract class SModConsts {
     public static final int CFGU_COB_ENT = 1012003;
     public static final int CFGU_LAN = 1012004;
     public static final int CFG_PARAM_ERP = 1012005;
-    public static final int CFGU_CERT = 1012006;
+    
+    public static final int CFGU_CERT = 1013001;
+    public static final int CFGU_FUNC = 1013011;
 
-    public static final int CFG_MMS = 1012501;
-    public static final int CFG_PARAM_CO = 1012502;
+    public static final int CFG_MMS = 1013501;
+    public static final int CFG_PARAM_CO = 1013502;
 
     /*
      * Users
@@ -110,6 +112,7 @@ public abstract class SModConsts {
     public static final int USRU_USR = 1022009;
 
     public static final int USR_USR_GUI = 1023001;
+    public static final int USR_USR_FUNC = 1023011;
 
     /*
      * Localities
@@ -291,6 +294,7 @@ public abstract class SModConsts {
 
     public static final int FINR_CSH_FLW_EXP = 2015001;
     public static final int FINR_DPS_TAX_PEND = 2015011;
+    public static final int FINR_LAY_BANK = 2015021;
 
     /*
      * Transactions
@@ -392,11 +396,12 @@ public abstract class SModConsts {
     public static final int TRN_DNC_DIOG = 2023503;
     public static final int TRN_DNC_DIOG_DNS = 2023504;
 
-    public static final int TRNX_DPS_BAL = 2024001; // document balance
-    public static final int TRNX_DPS_CON_SEND = 2024002; // document send
-    public static final int TRNX_STK_WAH = 2024003; // document send
-    public static final int TRNX_STK_DIOG_TP = 2024004; // document send
-    public static final int TRNX_STK_COST = 2024049;
+    public static final int TRNX_DPS_BAL = 2024001;         // document balance
+    public static final int TRNX_DPS_CON_SEND = 2024002;    // document send
+    public static final int TRNX_STK_WAH = 2024003;         // stock by warehouse
+    public static final int TRNX_STK_DIOG_TP = 2024004;     // stock-document type
+    public static final int TRNX_STK_COST = 2024049;        // stock cost
+    public static final int TRNX_OPER_CTRL = 2024051;       // operations control
 
     public static final int TRNR_DPS_CON_BP = 2025001;
     public static final int TRNR_CON_STA = 2025002;

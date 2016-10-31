@@ -25,9 +25,13 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     protected double mdCreditLimit;
     protected int mnDaysOfCredit;
     protected int mnDaysOfGrace;
+    protected double mdGuarantee;
+    protected double mdInsurance;
     protected java.util.Date mtDateStart;
     protected java.util.Date mtDateEnd_n;
     protected boolean mbIsCreditByUser;
+    protected boolean mbIsGuaranteeInProcess;
+    protected boolean mbIsInsuranceInProcess;
     protected boolean mbIsDeleted;
     protected int mnFkBizPartnerCategoryId;
     protected int mnFkBizPartnerTypeId;
@@ -73,9 +77,13 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     public void setCreditLimit(double d) { mdCreditLimit = d; }
     public void setDaysOfCredit(int n) { mnDaysOfCredit = n; }
     public void setDaysOfGrace(int n) { mnDaysOfGrace = n; }
+    public void setGuarantee(double d) { mdGuarantee = d; }
+    public void setInsurance(double d) { mdInsurance = d; }
     public void setDateStart(java.util.Date t) { mtDateStart = t; }
     public void setDateEnd_n(java.util.Date t) { mtDateEnd_n = t; }
     public void setIsCreditByUser(boolean b) { mbIsCreditByUser = b; }
+    public void setIsGuaranteeInProcess(boolean b) { mbIsGuaranteeInProcess = b; }
+    public void setIsInsuranceInProcess(boolean b) { mbIsInsuranceInProcess = b; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkBizPartnerCategoryId(int n) { mnFkBizPartnerCategoryId = n; }
     public void setFkBizPartnerTypeId(int n) { mnFkBizPartnerTypeId = n; }
@@ -98,9 +106,13 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     public double getCreditLimit() { return mdCreditLimit; }
     public int getDaysOfCredit() { return mnDaysOfCredit; }
     public int getDaysOfGrace() { return mnDaysOfGrace; }
+    public double getGuarantee() { return mdGuarantee; }
+    public double getInsurance() { return mdInsurance; }
     public java.util.Date getDateStart() { return mtDateStart; }
     public java.util.Date getDateEnd_n() { return mtDateEnd_n; }
     public boolean getIsCreditByUser() { return mbIsCreditByUser; }
+    public boolean getIsGuaranteeInProcess() { return mbIsGuaranteeInProcess; }
+    public boolean getIsInsuranceInProcess() { return mbIsInsuranceInProcess; }
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkBizPartnerCategoryId() { return mnFkBizPartnerCategoryId; }
     public int getFkBizPartnerTypeId() { return mnFkBizPartnerTypeId; }
@@ -168,9 +180,13 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
         mdCreditLimit = 0;
         mnDaysOfCredit = 0;
         mnDaysOfGrace = 0;
+        mdGuarantee = 0;
+        mdInsurance = 0;
         mtDateStart = null;
         mtDateEnd_n = null;
         mbIsCreditByUser = false;
+        mbIsGuaranteeInProcess = false;
+        mbIsInsuranceInProcess = false;
         mbIsDeleted = false;
         mnFkBizPartnerCategoryId = 0;
         mnFkBizPartnerTypeId = 0;
@@ -239,9 +255,13 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
                 mdCreditLimit = resultSet.getDouble("bp_ct.cred_lim");
                 mnDaysOfCredit = resultSet.getInt("bp_ct.days_cred");
                 mnDaysOfGrace = resultSet.getInt("bp_ct.days_grace");
+                mdGuarantee = resultSet.getDouble("bp_ct.garnt");
+                mdInsurance = resultSet.getDouble("bp_ct.insur");
                 mtDateStart = resultSet.getDate("bp_ct.dt_start");
                 mtDateEnd_n = resultSet.getDate("bp_ct.dt_end_n");
                 mbIsCreditByUser = resultSet.getBoolean("b_cred_usr");
+                mbIsGuaranteeInProcess = resultSet.getBoolean("bp_ct.b_garnt_prc");
+                mbIsInsuranceInProcess = resultSet.getBoolean("bp_ct.b_insur_prc");
                 mbIsDeleted = resultSet.getBoolean("bp_ct.b_del");
                 mnFkBizPartnerCategoryId = resultSet.getInt("bp_ct.fid_ct_bp");
                 mnFkBizPartnerTypeId = resultSet.getInt("bp_ct.fid_tp_bp");
@@ -321,13 +341,13 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
             callableStatement.setDouble(nParam++, mdCreditLimit);
             callableStatement.setInt(nParam++, mnDaysOfCredit);
             callableStatement.setInt(nParam++, mnDaysOfGrace);
-            callableStatement.setDouble(nParam++, 0.0);
-            callableStatement.setDouble(nParam++, 0.0);
+            callableStatement.setDouble(nParam++, mdGuarantee);
+            callableStatement.setDouble(nParam++, mdInsurance);
             callableStatement.setDate(nParam++, new java.sql.Date(mtDateStart.getTime()));
             if (mtDateEnd_n != null) callableStatement.setDate(nParam++, new java.sql.Date(mtDateEnd_n.getTime())); else callableStatement.setNull(nParam++, java.sql.Types.DATE);
             callableStatement.setBoolean(nParam++, mbIsCreditByUser);
-            callableStatement.setBoolean(nParam++, false);
-            callableStatement.setBoolean(nParam++, false);
+            callableStatement.setBoolean(nParam++, mbIsGuaranteeInProcess);
+            callableStatement.setBoolean(nParam++, mbIsInsuranceInProcess);
             callableStatement.setBoolean(nParam++, mbIsDeleted);
             callableStatement.setInt(nParam++, mnFkBizPartnerCategoryId);
             callableStatement.setInt(nParam++, mnFkBizPartnerTypeId);
