@@ -11,6 +11,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
 import erp.mod.bps.db.SDbBizPartner;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.Date;
 import java.util.HashMap;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiClient;
@@ -337,6 +339,81 @@ public abstract class STrnUtils {
         }
         
         return balance;
+    }
+    
+    /**
+     * Obtain amount in currency local accumulated by user and for date cut.
+     * @param connection Connection database.
+     * @param keyDps Dps primaryKey for ommit
+     * @param dateAuxLimit Date auxiliar for obtain limit date.
+     * @param userId User ID.
+     * @return
+     * @throws Exception 
+     */
+    public static double getOrderAmountMonthUser(final Connection connection, final int[] keyDps, final Date dateAuxLimit, final int userId) throws Exception {
+        double amount = 0;
+        String sql = "";
+        ResultSet resultSet = null;
+        
+        sql = "SELECT COALESCE(SUM(de.stot_r), 0.0) AS _amt "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc "
+                + "WHERE NOT d.b_del AND NOT de.b_del AND d.fid_usr_new = " + userId + " AND d.dt >= '" + SLibUtils.DbmsDateFormatDate.format(SLibTimeUtils.getBeginOfMonth(dateAuxLimit)) + "' AND d.dt <= '" + SLibUtils.DbmsDateFormatDate.format(SLibTimeUtils.getEndOfMonth(dateAuxLimit)) + "' AND "
+                + "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " AND "
+                + "d.id_year = " + keyDps[0] + " AND d.id_doc <> " + keyDps[1]  + " ";
+        
+        resultSet = connection.createStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            amount = resultSet.getDouble("_amt");
+        }
+        
+        return amount;
+    }
+    
+    /**
+     * Obtain amount in currency local accumulated by functional area and for date cut.
+     * @param connection Connection database.
+     * @param keyDps Dps primaryKey for ommit
+     * @param dateAuxLimit Date auxiliar for obtain limit date.
+     * @param funcAreaId Functional area ID.
+     * @return
+     * @throws Exception 
+     */
+    public static double getOrderAmountMonthFunctionalArea(final Connection connection, final int[] keyDps, final Date dateAuxLimit, final int funcAreaId) throws Exception {
+        double amount = 0;
+        String sql = "";
+        ResultSet resultSet = null;
+        
+        sql = "SELECT COALESCE(SUM(de.stot_r), 0.0) AS _amt "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc "
+                + "WHERE NOT d.b_del AND NOT de.b_del AND d.fid_func = " + funcAreaId + " AND d.dt >= '" + SLibUtils.DbmsDateFormatDate.format(SLibTimeUtils.getBeginOfMonth(dateAuxLimit)) + "' AND d.dt <= '" + SLibUtils.DbmsDateFormatDate.format(SLibTimeUtils.getEndOfMonth(dateAuxLimit)) + "' AND "
+                + "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " AND "
+                + "d.id_year = " + keyDps[0] + " AND d.id_doc <> " + keyDps[1]  + " ";
+        
+        resultSet = connection.createStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            amount = resultSet.getDouble("_amt");
+        }
+        
+        return amount;
+    }
+    
+    public static double getMaxLimitMonthFunctionalArea(final Connection connection, final int funcAreaId) throws Exception {
+        double amount = 0;
+        String sql = "";
+        ResultSet resultSet = null;
+        
+        sql = "SELECT exp_mon "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " "
+                + "WHERE id_func = " + funcAreaId + " ";
+        
+        resultSet = connection.createStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            amount = resultSet.getDouble("exp_mon");
+        }
+        
+        return amount;
     }
     
     /**

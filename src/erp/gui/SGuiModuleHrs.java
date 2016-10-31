@@ -350,13 +350,15 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepVacationsFileCsv = new JMenuItem("Archivo CSV de vacaciones pendientes...");
         jmiRepEmployeeActiveByPeriod = new JMenuItem("Reporte de empleados activos por periodo...");
         
+        jmRep.add(jmiRepPayrollTax);
+        jmRep.addSeparator();
         jmRep.add(jmiRepPayrollEarningsDeductions);
+        /*
         jmRep.add(jmiRepPayrollEarnings);
         jmRep.add(jmiRepPayrollEarningsByEmployee);
         jmRep.add(jmiRepPayrollDeductions);
         jmRep.add(jmiRepPayrollDeductionsByEmployee);
-        jmRep.addSeparator();
-        jmRep.add(jmiRepPayrollTax);
+        */
         jmRep.add(jmiRepPayrollAux);
         jmRep.addSeparator();
         jmRep.add(jmiRepPayrollWageSalaryFileCsv);

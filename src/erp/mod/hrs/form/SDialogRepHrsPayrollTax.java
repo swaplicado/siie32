@@ -5,6 +5,7 @@
 package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbConfig;
 import java.awt.BorderLayout;
 import javax.swing.event.ChangeEvent;
@@ -27,6 +28,7 @@ import sa.lib.gui.bean.SBeanFieldRadio;
 public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements ChangeListener {
     
     protected SPanelHrsDepartaments moPanelHrsDepartaments;
+    private SPanelHrsFilterPayrollStatus moPanelHrsFilterPayrollStatus;
     
     /**
      * Creates new form SDialogRepHrsPayrollTax
@@ -54,6 +56,7 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
         jPanel3 = new javax.swing.JPanel();
         moRadFilterTypePeriod = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadFilterTypeDate = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadFilterTypeDatePay = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel35 = new javax.swing.JPanel();
         jlYear = new javax.swing.JLabel();
         moIntPeriodYear = new sa.lib.gui.bean.SBeanFieldCalendarYear();
@@ -69,6 +72,7 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
         jPanel12 = new javax.swing.JPanel();
         jlDateEnd = new javax.swing.JLabel();
         moDateDateEnd = new sa.lib.gui.bean.SBeanFieldDate();
+        jpFilterStatusPay = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
         jlPaymentType = new javax.swing.JLabel();
         moKeyPaymentType = new sa.lib.gui.bean.SBeanFieldKey();
@@ -77,17 +81,23 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(8, 1, 0, 5));
 
-        jPanel3.setLayout(new java.awt.BorderLayout());
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         moRadGroupFilterType.add(moRadFilterTypePeriod);
         moRadFilterTypePeriod.setText("Por periodo");
-        jPanel3.add(moRadFilterTypePeriod, java.awt.BorderLayout.WEST);
+        jPanel3.add(moRadFilterTypePeriod);
 
         moRadGroupFilterType.add(moRadFilterTypeDate);
         moRadFilterTypeDate.setText("Por rango de fechas");
-        jPanel3.add(moRadFilterTypeDate, java.awt.BorderLayout.CENTER);
+        moRadFilterTypeDate.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel3.add(moRadFilterTypeDate);
+
+        moRadGroupFilterType.add(moRadFilterTypeDatePay);
+        moRadFilterTypeDatePay.setText("Por fecha pago nómina");
+        moRadFilterTypeDatePay.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel3.add(moRadFilterTypeDatePay);
 
         jPanel2.add(jPanel3);
 
@@ -136,6 +146,9 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
 
         jPanel2.add(jPanel12);
 
+        jpFilterStatusPay.setLayout(new java.awt.BorderLayout());
+        jPanel2.add(jpFilterStatusPay);
+
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPaymentType.setText("Periodo pago:");
@@ -172,6 +185,7 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
     private javax.swing.JLabel jlPeriodEnd;
     private javax.swing.JLabel jlPeriodStart;
     private javax.swing.JLabel jlYear;
+    private javax.swing.JPanel jpFilterStatusPay;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
     private sa.lib.gui.bean.SBeanFieldCalendarMonth moIntPeriodEnd;
@@ -179,6 +193,7 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
     private sa.lib.gui.bean.SBeanFieldCalendarYear moIntPeriodYear;
     private sa.lib.gui.bean.SBeanFieldKey moKeyPaymentType;
     private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypeDate;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypeDatePay;
     private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypePeriod;
     private javax.swing.ButtonGroup moRadGroupFilterType;
     // End of variables declaration//GEN-END:variables
@@ -190,13 +205,21 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
             moIntPeriodEnd.setEnabled(true);
             moDateDateStart.setEnabled(false);
             moDateDateEnd.setEnabled(false);
+            moPanelHrsFilterPayrollStatus.setSelectedAll();
         }
-        else if (moRadFilterTypeDate.isSelected()) {
+        else if (moRadFilterTypeDate.isSelected() || moRadFilterTypeDatePay.isSelected()) {
             moIntPeriodYear.setEnabled(false);
             moIntPeriodStart.setEnabled(false);    
             moIntPeriodEnd.setEnabled(false);
             moDateDateStart.setEnabled(true);
             moDateDateEnd.setEnabled(true);
+            
+            if (moRadFilterTypeDatePay.isSelected()) {
+                moPanelHrsFilterPayrollStatus.setSelectedClose();
+            }
+            else {
+                moPanelHrsFilterPayrollStatus.setSelectedAll();
+            }
         }
     }
     
@@ -204,6 +227,7 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
         SGuiUtils.setWindowBounds(this, 720, 450);
         
         moPanelHrsDepartaments = new SPanelHrsDepartaments(miClient);
+        moPanelHrsFilterPayrollStatus = new SPanelHrsFilterPayrollStatus(miClient);
 
         moRadFilterTypePeriod.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypePeriod.getText()), true);
         moRadFilterTypeDate.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypeDate.getText()), false);
@@ -215,6 +239,8 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
         moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
 
         jPanel4.add(moPanelHrsDepartaments, BorderLayout.CENTER);
+        jpFilterStatusPay.add(moPanelHrsFilterPayrollStatus, BorderLayout.CENTER);
+        moPanelHrsFilterPayrollStatus.setSelectedAll();
         
         moFields.addField(moRadFilterTypePeriod);
         moFields.addField(moRadFilterTypeDate);
@@ -230,6 +256,7 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
         
         moRadFilterTypePeriod.addChangeListener(this);
         moRadFilterTypeDate.addChangeListener(this);
+        moRadFilterTypeDatePay.addChangeListener(this);
         
         moRadFilterTypePeriod.setSelected(true);
         moIntPeriodYear.setValue(miClient.getSession().getCurrentYear());
@@ -257,7 +284,7 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
                     validation.setComponent(moIntPeriodEnd);
                 }
             }
-            else if (moRadFilterTypeDate.isSelected()) {
+            else if (moRadFilterTypeDate.isSelected() || moRadFilterTypeDatePay.isSelected()) {
                 validation = SGuiUtils.validateDateRange(moDateDateStart, moDateDateEnd);
             }
             
@@ -275,6 +302,9 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
         SDbConfig config = null;
         String sDepartamentsId = "";
         String sDepartamentsName = "";
+        String sSqlWhere = "";
+        String sSqlInnerIssue = "";
+        int payrollStatus = (int) moPanelHrsFilterPayrollStatus.getValue(SLibConsts.UNDEFINED);
         
         moParamsMap = miClient.createReportParams();
         config = (SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
@@ -287,18 +317,45 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
         moParamsMap.put("sDepartaments", sDepartamentsName.isEmpty() || (boolean) moPanelHrsDepartaments.getValue(SGuiConsts.PARAM_ROWS) ? "(TODOS)" : sDepartamentsName + " ");
         
         if (moRadFilterTypePeriod.isSelected()) {
+            sSqlWhere = " AND p.per_year = " + moIntPeriodYear.getValue() + " AND p.per BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " ";            
+        }
+        else if (moRadFilterTypeDate.isSelected()) {
+            sSqlWhere = " AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' ";            
+        }
+        
+        if (payrollStatus != SPanelHrsFilterPayrollStatus.STATUS_UNDEF) {
+            if (payrollStatus == SPanelHrsFilterPayrollStatus.STATUS_CLOSE) {
+                    sSqlWhere +=  " AND p.b_clo = 1 ";                
+            }
+            else if (payrollStatus == SPanelHrsFilterPayrollStatus.STATUS_OPEN) {
+                    sSqlWhere +=  " AND p.b_clo = 0 ";
+            }
+        }
+        
+        if (moRadFilterTypeDatePay.isSelected()) {
+            sSqlInnerIssue = "INNER JOIN hrs_pay_rcp_iss AS rcp_iss ON rcp_iss.id_pay = rcp.id_pay AND rcp_iss.id_emp = rcp.id_emp AND rcp_iss.dt_pay BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue())
+                    + "' AND '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' AND rcp_iss.b_del = 0 AND rcp_iss.fk_st_rcp <> " + SModSysConsts.TRNS_ST_DPS_ANNULED;
+        }
+        
+        if (moRadFilterTypePeriod.isSelected()) {
             moParamsMap.put("bByPeriod", true);
             moParamsMap.put("nPeriodYear", moIntPeriodYear.getValue());
             moParamsMap.put("nPeriodStart", moIntPeriodStart.getValue());
             moParamsMap.put("nPeriodEnd", moIntPeriodEnd.getValue());
-            moParamsMap.put("sSqlWhere", " AND p.per_year = " + moIntPeriodYear.getValue() + " AND p.per BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " ");
+            moParamsMap.put("sSqlWhere", sSqlWhere);
         }
         else if (moRadFilterTypeDate.isSelected()) {
             moParamsMap.put("bByPeriod", false);
             moParamsMap.put("tDateStart", moDateDateStart.getValue());
             moParamsMap.put("tDateEnd", moDateDateEnd.getValue());
-            moParamsMap.put("sSqlWhere", " AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' ");
+            moParamsMap.put("sSqlWhere", sSqlWhere);
         }
+        else if (moRadFilterTypeDatePay.isSelected()) {
+            moParamsMap.put("bByPeriod", false);
+            moParamsMap.put("tDateStart", moDateDateStart.getValue());
+            moParamsMap.put("tDateEnd", moDateDateEnd.getValue());
+        }
+        moParamsMap.put("sSqlInnerIssue", sSqlInnerIssue);
         
         moParamsMap.put("sSqlWherePaymentType", moKeyPaymentType.getSelectedIndex() > 0 ? " AND p.fk_tp_pay = " + moKeyPaymentType.getValue()[0] : "");
         moParamsMap.put("sPaymentType", moKeyPaymentType.getSelectedIndex() > 0 ? moKeyPaymentType.getSelectedItem() : "(TODOS)");
@@ -308,7 +365,8 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
     public void stateChanged(ChangeEvent e) {
         if (e.getSource() instanceof SBeanFieldRadio) {
             if ((SBeanFieldRadio) e.getSource() == moRadFilterTypePeriod ||
-                    (SBeanFieldRadio) e.getSource() == moRadFilterTypeDate) {
+                    (SBeanFieldRadio) e.getSource() == moRadFilterTypeDate ||
+                    (SBeanFieldRadio) e.getSource() == moRadFilterTypeDatePay) {
                 actionEnableFields();
             }
             

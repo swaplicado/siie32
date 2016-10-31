@@ -229,6 +229,9 @@ public abstract class SDataReadDescriptions {
             case SDataConstants.MFGU_TP_ORD:
                 sql = "SELECT tp AS descrip FROM erp.mfgu_tp_ord WHERE id_tp = " + ((int[]) pk)[0] + " ";
                 break;
+            case SModConsts.CFGU_FUNC:
+                sql = "SELECT " + (descriptionType == SLibConstants.DESCRIPTION_CODE ? "code" : "name") + " AS descrip FROM cfgu_func WHERE id_func = " + ((int[]) pk)[0] + " ";
+                break;
             case SModConsts.LOGS_TP_MOT:
                 sql = "SELECT name AS descrip FROM " + SModConsts.TablesMap.get(catalogue) + " WHERE id_tp_mot = " + ((int[]) pk)[0] + " ";
                 break;

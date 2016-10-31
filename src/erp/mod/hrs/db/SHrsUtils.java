@@ -188,7 +188,7 @@ public abstract class SHrsUtils {
                     buffer += formatDescTotal.format(mdBalance).replace(".", ""); //amount
                     buffer += (nEmployeeBankId != oBizPartner.getFkFiscalBankId() ? "40" : "03"); //type of account credit
                     buffer += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 20 ? 0 : 20 - sAccountCredit.length())).concat(sAccountCredit); //Credit account
-                    buffer += sDescription.concat(sDescription.length() > 16 ? sDescription.substring(0,15) : (SLibUtilities.textRepeat(" ", (sDescription.length() == 16 ? 0 : 16 - sDescription.length())))); //payment reference
+                    buffer += (nEmployeeBankId != oBizPartner.getFkFiscalBankId() ? formatDateData.format(dateApplication).concat((SLibUtilities.textRepeat(" ", (formatDateData.format(dateApplication).length() == 16 ? 0 : 16 - formatDateData.format(dateApplication).length())))) : sDescription.concat(sDescription.length() > 16 ? sDescription.substring(0,15) : (SLibUtilities.textRepeat(" ", (sDescription.length() == 16 ? 0 : 16 - sDescription.length()))))); //payment reference
                     buffer += sBizPartner.concat(sBizPartner.length() > 55 ? sBizPartner.substring(0,54) : (SLibUtilities.textRepeat(" ", (sBizPartner.length() == 55 ? 0 : 55 - sBizPartner.length())))); //beneficiary
                     buffer += SLibUtilities.textRepeat(" ", 35); //reference 1
                     buffer += SLibUtilities.textRepeat(" ", 35); //reference 2

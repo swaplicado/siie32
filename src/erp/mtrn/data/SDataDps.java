@@ -87,7 +87,26 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public static final String MSG_ERR_FIN_REC_USR = "No se ha especificado la póliza contable de usuario.";
     public static final String MSG_ERR_ACC_UNK_ = "No se encontró la configuración de cuentas contables para el ";
     public static final String MSG_ERR_ACC_EMP_ = "La configuración de cuentas contables está vacía para el ";
-
+    
+    public static final int AUT_AUTHORN_REJ_NA = 1;
+    public static final int AUT_AUTHORN_REJ_LIM_USR = 2;
+    public static final int AUT_AUTHORN_REJ_LIM_USR_MON = 3;
+    public static final int AUT_AUTHORN_REJ_LIM_FUNC_MON = 4;
+    
+    public static final String TXT_AUT_AUTHORN_REJ_NA = "No aplica";
+    public static final String TXT_AUT_AUTHORN_REJ_LIM_USR = "Tope evento usuario";
+    public static final String TXT_AUT_AUTHORN_REJ_LIM_USR_MON = "Tope mensual usuario";
+    public static final String TXT_AUT_AUTHORN_REJ_LIM_FUNC_MON = "Tope mensual área funcional";
+    
+    public static final HashMap<Integer, String> AutAuthornRejMap = new HashMap<Integer, String>();
+    
+    static {
+        AutAuthornRejMap.put(AUT_AUTHORN_REJ_NA, TXT_AUT_AUTHORN_REJ_NA);
+        AutAuthornRejMap.put(AUT_AUTHORN_REJ_LIM_USR, TXT_AUT_AUTHORN_REJ_LIM_USR);
+        AutAuthornRejMap.put(AUT_AUTHORN_REJ_LIM_USR_MON, TXT_AUT_AUTHORN_REJ_LIM_USR_MON);
+        AutAuthornRejMap.put(AUT_AUTHORN_REJ_LIM_FUNC_MON, TXT_AUT_AUTHORN_REJ_LIM_FUNC_MON);
+    }
+            
     protected int mnPkYearId;
     protected int mnPkDocId;
     protected java.util.Date mtDate;
@@ -130,6 +149,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected int mnPayments;
     protected java.lang.String msPaymentMethod;
     protected java.lang.String msPaymentAccount;
+    protected int mnAutomaticAuthorizationRejection;
     protected boolean mbIsPublic;
     protected boolean mbIsLinked;
     protected boolean mbIsClosed;
@@ -154,6 +174,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected int mnFkDpsAnnulationTypeId;
     protected int mnFkDpsNatureId;
     protected int mnFkCompanyBranchId;
+    protected int mnFkFunctionalAreaId;
     protected int mnFkBizPartnerId_r;
     protected int mnFkBizPartnerBranchId;
     protected int mnFkBizPartnerBranchAddressId;
@@ -235,8 +256,30 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
      * Private functions
      */
 
+    private boolean isDpsAuthorizedUser(SDataUserConfigurationTransaction oUserConfig) throws java.sql.SQLException, java.lang.Exception {
+        return oUserConfig.getPurchasesOrderLimit_n() == 0 || oUserConfig.getPurchasesOrderLimit_n() >= mdTotal_r;
+    }
+    
+    private boolean isDpsAuthorizedUserMonth(java.sql.Connection connection, SDataUserConfigurationTransaction oUserConfig) throws java.sql.SQLException, java.lang.Exception {
+        double amtAccumUser = 0;
+        
+        amtAccumUser = STrnUtils.getOrderAmountMonthUser(connection, (int[]) getPrimaryKey(), mtDate, mnFkUserNewId);
+        
+        return oUserConfig.getPurchasesOrderLimitMonthly_n() == 0 || (oUserConfig.getPurchasesOrderLimitMonthly_n() >= mdTotal_r && oUserConfig.getPurchasesOrderLimitMonthly_n() >= (amtAccumUser + mdTotal_r));
+    }
+    
+    private boolean isDpsAuthorizedFunctionalAreaMonth(java.sql.Connection connection) throws java.sql.SQLException, java.lang.Exception {
+        double limitFuncArea = 0;
+        double amtAccumFuncArea = 0;
+        
+        limitFuncArea = STrnUtils.getMaxLimitMonthFunctionalArea(connection, mnFkFunctionalAreaId);
+        amtAccumFuncArea = STrnUtils.getOrderAmountMonthFunctionalArea(connection, (int[]) getPrimaryKey(), mtDate, mnFkFunctionalAreaId);
+        
+        return limitFuncArea == 0 || (limitFuncArea >= mdTotal_r && limitFuncArea >= (amtAccumFuncArea + mdTotal_r));
+    }
+    
     private boolean isDpsAuthorized(java.sql.Connection connection) throws java.sql.SQLException, java.lang.Exception {
-        boolean isAutorized = false;
+        boolean autorized = false;
         Statement oStatement = null;
         SDataUserConfigurationTransaction oUserConfig = null;
 
@@ -249,24 +292,55 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
         else {
             if (mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_PUR) {
+                if (isOrderPur()) {
+                    autorized = isDpsAuthorizedUser(oUserConfig);
+                    
+                    if (!autorized) {
+                        mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_LIM_USR;
+                    }
+                    else {
+                        autorized = isDpsAuthorizedUserMonth(connection, oUserConfig);
+                        
+                        if (!autorized) {
+                            mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_LIM_USR_MON;
+                        }
+                        else {
+                            autorized = isDpsAuthorizedFunctionalAreaMonth(connection);
+                            
+                            if (!autorized) {
+                                mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_LIM_FUNC_MON;
+                            }
+                            else {
+                                mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_NA;
+                            }
+                        }
+                    }
+                }
+                else if (isDocumentPur()) {
+                    if (oUserConfig.getPurchasesDocLimit_n() == 0 || oUserConfig.getPurchasesDocLimit_n() >= mdTotal_r) {
+                        autorized = true;
+                    }
+                }
+                /*
                 if (isOrderPur() && (oUserConfig.getPurchasesOrderLimit_n() == 0 || oUserConfig.getPurchasesOrderLimit_n() >= mdTotal_r)) {
                     isAutorized = true;
                 }
                 else if (isDocumentPur() && (oUserConfig.getPurchasesDocLimit_n() == 0 || oUserConfig.getPurchasesDocLimit_n() >= mdTotal_r)) {
                     isAutorized = true;
                 }
+                */
             }
             else if (mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_SAL) {
                 if (isOrderSal() && (oUserConfig.getSalesOrderLimit_n() == 0 || oUserConfig.getSalesOrderLimit_n() >= mdTotal_r)) {
-                    isAutorized = true;
+                    autorized = true;
                 }
                 else if (isDocumentSal() && (oUserConfig.getSalesDocLimit_n() == 0 || oUserConfig.getSalesDocLimit_n() >= mdTotal_r)) {
-                    isAutorized = true;
+                    autorized = true;
                 }
             }
         }
 
-        return isAutorized;
+        return autorized;
     }
 
     private void updateAuthorizationStatus(java.sql.Connection connection) throws java.sql.SQLException, java.lang.Exception {
@@ -1379,6 +1453,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setPayments(int n) { mnPayments = n; }
     public void setPaymentMethod(java.lang.String s) { msPaymentMethod = s; }
     public void setPaymentAccount(java.lang.String s) { msPaymentAccount = s; }
+    public void setAutomaticAuthorizationRejection(int n) { mnAutomaticAuthorizationRejection = n; }
     public void setIsPublic(boolean b) { mbIsPublic = b; }
     public void setIsLinked(boolean b) { mbIsLinked = b; }
     public void setIsClosed(boolean b) { mbIsClosed = b; }
@@ -1403,6 +1478,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setFkDpsAnnulationTypeId(int n) { mnFkDpsAnnulationTypeId = n; }
     public void setFkDpsNatureId(int n) { mnFkDpsNatureId = n; }
     public void setFkCompanyBranchId(int n) { mnFkCompanyBranchId = n; }
+    public void setFkFunctionalAreaId(int n) { mnFkFunctionalAreaId = n; }
     public void setFkBizPartnerId_r(int n) { mnFkBizPartnerId_r = n; }
     public void setFkBizPartnerBranchId(int n) { mnFkBizPartnerBranchId = n; }
     public void setFkBizPartnerBranchAddressId(int n) { mnFkBizPartnerBranchAddressId = n; }
@@ -1492,6 +1568,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public int getPayments() { return mnPayments; }
     public java.lang.String getPaymentMethod() { return msPaymentMethod; }
     public java.lang.String getPaymentAccount() { return msPaymentAccount; }
+    public int getAutomaticAuthorizationRejection() { return mnAutomaticAuthorizationRejection; }
     public boolean getIsPublic() { return mbIsPublic; }
     public boolean getIsLinked() { return mbIsLinked; }
     public boolean getIsClosed() { return mbIsClosed; }
@@ -1516,6 +1593,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public int getFkDpsAnnulationTypeId() { return mnFkDpsAnnulationTypeId; }
     public int getFkDpsNatureId() { return mnFkDpsNatureId; }
     public int getFkCompanyBranchId() { return mnFkCompanyBranchId; }
+    public int getFkFunctionalAreaId() { return mnFkFunctionalAreaId; }
     public int getFkBizPartnerId_r() { return mnFkBizPartnerId_r; }
     public int getFkBizPartnerBranchId() { return mnFkBizPartnerBranchId; }
     public int getFkBizPartnerBranchAddressId() { return mnFkBizPartnerBranchAddressId; }
@@ -1683,6 +1761,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnPayments = 0;
         msPaymentMethod = "";
         msPaymentAccount = "";
+        mnAutomaticAuthorizationRejection = 0;
         mbIsPublic = false;
         mbIsLinked = false;
         mbIsClosed = false;
@@ -1707,6 +1786,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnFkDpsAnnulationTypeId = 0;
         mnFkDpsNatureId = 0;
         mnFkCompanyBranchId = 0;
+        mnFkFunctionalAreaId = 0;
         mnFkBizPartnerId_r = 0;
         mnFkBizPartnerBranchId = 0;
         mnFkBizPartnerBranchAddressId = 0;
@@ -1837,6 +1917,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnPayments = oResultSet.getInt("d.payments");
                 msPaymentMethod = oResultSet.getString("d.pay_method");
                 msPaymentAccount = oResultSet.getString("d.pay_account");
+                mnAutomaticAuthorizationRejection = oResultSet.getInt("d.aut_authorn_rej");
                 mbIsPublic = oResultSet.getBoolean("d.b_pub");
                 mbIsLinked = oResultSet.getBoolean("d.b_link");
                 mbIsClosed = oResultSet.getBoolean("d.b_close");
@@ -1859,8 +1940,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnFkDpsValidityStatusId = oResultSet.getInt("d.fid_st_dps_val");
                 mnFkDpsAuthorizationStatusId = oResultSet.getInt("d.fid_st_dps_authorn");
                 mnFkDpsAnnulationTypeId = oResultSet.getInt("fid_tp_dps_ann");
-                mnFkDpsNatureId = oResultSet.getInt("fid_dps_nat");
+                mnFkDpsNatureId = oResultSet.getInt("d.fid_dps_nat");
                 mnFkCompanyBranchId = oResultSet.getInt("d.fid_cob");
+                mnFkFunctionalAreaId = oResultSet.getInt("d.fid_func");
                 mnFkBizPartnerId_r = oResultSet.getInt("d.fid_bp_r");
                 mnFkBizPartnerBranchId = oResultSet.getInt("d.fid_bpb");
                 mnFkBizPartnerBranchAddressId = oResultSet.getInt("d.fid_add");
@@ -2133,7 +2215,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?) }");
             oCallableStatement.setInt(nParam++, mnPkYearId);
             oCallableStatement.setInt(nParam++, mnPkDocId);
             oCallableStatement.setDate(nParam++, new java.sql.Date(mtDate.getTime()));
@@ -2176,6 +2258,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             oCallableStatement.setInt(nParam++, mnPayments);
             oCallableStatement.setString(nParam++, msPaymentMethod);
             oCallableStatement.setString(nParam++, msPaymentAccount);
+            oCallableStatement.setInt(nParam++, mnAutomaticAuthorizationRejection);
             oCallableStatement.setBoolean(nParam++, mbIsPublic);
             oCallableStatement.setBoolean(nParam++, mbIsLinked);
             oCallableStatement.setBoolean(nParam++, mbIsClosed);
@@ -2200,6 +2283,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             oCallableStatement.setInt(nParam++, mnFkDpsAnnulationTypeId);
             oCallableStatement.setInt(nParam++, mnFkDpsNatureId);
             oCallableStatement.setInt(nParam++, mnFkCompanyBranchId);
+            oCallableStatement.setInt(nParam++, mnFkFunctionalAreaId);
             oCallableStatement.setInt(nParam++, mnFkBizPartnerId_r);
             oCallableStatement.setInt(nParam++, mnFkBizPartnerBranchId);
             oCallableStatement.setInt(nParam++, mnFkBizPartnerBranchAddressId);

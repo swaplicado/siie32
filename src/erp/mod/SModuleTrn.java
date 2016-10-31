@@ -28,6 +28,7 @@ import erp.mod.trn.view.SViewInventoryMfgCost;
 import erp.mod.trn.view.SViewInventoryValuation;
 import erp.mod.trn.view.SViewItemRequiredDpsConfig;
 import erp.mod.trn.view.SViewMmsConfig;
+import erp.mod.trn.view.SViewOrderLimitMonth;
 import javax.swing.JMenu;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
@@ -194,6 +195,9 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_STK_DIOG_TP:
                 view = new SViewInventoryCostByDiogType(miClient, subtype, "Costo inv. por tipo mov.", params);
+                break;
+            case SModConsts.TRNX_ORD_LIM_MAX:
+                view = new SViewOrderLimitMonth(miClient, "Límite máx. mensual " + (subtype == SModConsts.USRU_USR ? "x usuario" : "x área funcional"), subtype, params);
                 break;
             case SModConsts.TRN_MMS_CFG:
                 view = new SViewMmsConfig(miClient, "Configuración de ítems para envío por correo-e");

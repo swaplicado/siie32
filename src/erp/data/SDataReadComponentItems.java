@@ -183,6 +183,17 @@ public abstract class SDataReadComponentItems {
                 sql += "WHERE e.b_del = 0 AND e.fid_ct_ent = " + category + " " +
                         "ORDER BY b.bpb, e.ent, e.id_cob, e.id_ent ";
                 break;
+            case SModConsts.CFGU_FUNC:
+                /* Use of Object pk:
+                 * pk[0] = Filter: Array integer; user ID. It's optional, if is null inner join statement is unnecesary.
+                 */
+                lenPk = 1;
+                sql = "SELECT fa.id_func AS f_id_1, name AS f_item "
+                        + "FROM cfgu_func AS fa "
+                        + (pk == null ? "" : "INNER JOIN usr_usr_func AS fau ON fau.id_func = fa.id_func AND fau.id_usr = " + ((int[]) pk)[0] + " ")
+                        + "WHERE b_del = 0 ORDER BY fa.name, fa.id_func ";
+                text = "área funcional";
+                break;
 
             default:
                 break;

@@ -31,7 +31,6 @@ import erp.mfin.form.SDialogAccountingMoveDpsBizPartner;
 import erp.mitm.data.SDataUnit;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mtrn.data.SCfdPrint;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.STrnUtilities;
@@ -44,6 +43,7 @@ import erp.musr.data.SDataUser;
 import erp.print.SDataConstantsPrint;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterDocumentNature;
+import erp.table.STabFilterFunctionalArea;
 import erp.table.STabFilterUsers;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -99,13 +99,13 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     private erp.table.STabFilterDocumentNature moTabFilterDocumentNature;
+    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
     private erp.mtrn.form.SDialogUpdateDpsLogistics moDialogUpdateDpsLogistics;
     private erp.mtrn.form.SDialogUpdateDpsReferenceComms moDialogUpdateDpsRefCommissions;
     private erp.mtrn.form.SDialogContractAnalysis moDialogContractAnalysis;
     private erp.mtrn.form.SDialogDpsFinder moDialogDpsFinder;
     private erp.mfin.form.SDialogAccountingMoveDpsBizPartner moDialogAccountingMoveDpsBizPartner;
     private erp.mtrn.form.SDialogAnnulCfdi moDialogAnnulCfdi;
-    private erp.mtrn.data.SCfdPrint moCfdPrint;
 
     private boolean mbIsCategoryPur = false;
     private boolean mbIsCategorySal = false;
@@ -329,12 +329,12 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         moTabFilterDeleted = new STabFilterDeleted(this);
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, mbIsEstCon ? SLibConstants.GUI_DATE_AS_YEAR : SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC);
         moDialogUpdateDpsLogistics = new SDialogUpdateDpsLogistics(miClient);
         moDialogUpdateDpsRefCommissions = new SDialogUpdateDpsReferenceComms(miClient);
         moDialogContractAnalysis = new SDialogContractAnalysis(miClient);
         moDialogAccountingMoveDpsBizPartner = new SDialogAccountingMoveDpsBizPartner(miClient, mnTabTypeAux01);
         moDialogAnnulCfdi = new SDialogAnnulCfdi(miClient);
-        moCfdPrint = new SCfdPrint(miClient);
 
         if (mbIsOrd || mbIsDoc || mbIsDocAdj) {
             createImportFinder = true;
@@ -387,6 +387,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         addTaskBarLowerComponent(moTabFilterUser);
         addTaskBarLowerSeparator();
         addTaskBarLowerComponent(moTabFilterDocumentNature);
+        addTaskBarLowerComponent(moTabFilterFunctionalArea);
 
         jbNew.setEnabled(mbHasRightNew);
         jbEdit.setEnabled(true);
@@ -421,10 +422,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         STableColumn[] aoTableColumns = null;
 
         if (mbIsDoc || mbIsDocAdj) {
-            aoTableColumns = new STableColumn[45];  // four extra columns for accounting record
+            aoTableColumns = new STableColumn[46];  // four extra columns for accounting record
         }
         else {
-            aoTableColumns = new STableColumn[40];
+            aoTableColumns = new STableColumn[41];
         }
 
         i = 0;
@@ -522,6 +523,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "d.tot_r", "Total $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++].setSumApplying(true);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_cur_key_local", "Moneda local", STableConstants.WIDTH_CURRENCY_KEY);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_fa_code", "Área funcional", STableConstants.WIDTH_CODE_DOC);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_dn_code", "Naturaleza doc.", STableConstants.WIDTH_CODE_DOC);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "d.comms_ref", "Referencia coms.", STableConstants.WIDTH_DOC_NUM_REF);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "num_ord", "Ord. prod.", STableConstants.WIDTH_DOC_NUM);
@@ -1866,12 +1868,18 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "d.fid_dps_nat = " + ((Integer) setting.getSetting()) + " ";
                 }
             }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_ARE) {
+                if (((Integer) setting.getSetting()) != SLibConstants.UNDEFINED) {
+                    sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "d.fid_func = " + ((Integer) setting.getSetting()) + " ";
+                }
+            }
         }
 
         msSql = "SELECT d.id_year, d.id_doc, d.dt, d.dt_doc_delivery_n, d.num_ref, d.comms_ref, d.exc_rate, " +
                 "d.stot_r, d.tax_charged_r, d.tax_retained_r, d.tot_r, " +
                 "d.stot_cur_r, d.tax_charged_cur_r, d.tax_retained_cur_r, d.tot_cur_r, " +
                 "d.b_copy, d.b_link, d.b_close, d.b_audit, d.b_del, d.ts_link, d.ts_close, d.ts_new, d.ts_edit, d.ts_del, dt.code, " +
+                "(SELECT fa.code FROM cfgu_func AS fa WHERE d.fid_func = fa.id_func) AS f_fa_code, " +
                 "(SELECT dn.code FROM erp.trnu_dps_nat AS dn WHERE d.fid_dps_nat = dn.id_dps_nat) AS f_dn_code, " +
                 "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
                 "(SELECT CONCAT(src.num_ser, IF(length(src.num_ser) = 0, '', '-'), src.num) AS id_ped " +

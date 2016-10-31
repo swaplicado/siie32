@@ -8,7 +8,9 @@ import erp.client.SClientInterface;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbEarning;
+import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -38,6 +40,8 @@ import sa.lib.gui.bean.SBeanFormDialog;
  */
 public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog implements ChangeListener {
    
+    private SPanelHrsFilterPayrollStatus moPanelHrsFilterPayrollStatus;
+    
     /**
      * Creates new form SDialogRepHrsPayrollWageSalaryFileCsv
      * @param client
@@ -66,6 +70,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         jPanel3 = new javax.swing.JPanel();
         moRadFilterTypePeriod = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadFilterTypeDate = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadFilterTypeDatePay = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel35 = new javax.swing.JPanel();
         jlYear = new javax.swing.JLabel();
         moIntPeriodYear = new sa.lib.gui.bean.SBeanFieldCalendarYear();
@@ -84,6 +89,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         jPanel14 = new javax.swing.JPanel();
         jlPaymentType = new javax.swing.JLabel();
         moKeyPaymentType = new sa.lib.gui.bean.SBeanFieldKey();
+        jpFilterStatusPay = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         moRadOrderByNumEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
@@ -96,17 +102,23 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(8, 1, 0, 5));
 
-        jPanel3.setLayout(new java.awt.BorderLayout());
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         moRadGroupFilterType.add(moRadFilterTypePeriod);
         moRadFilterTypePeriod.setText("Por periodo");
-        jPanel3.add(moRadFilterTypePeriod, java.awt.BorderLayout.WEST);
+        jPanel3.add(moRadFilterTypePeriod);
 
         moRadGroupFilterType.add(moRadFilterTypeDate);
         moRadFilterTypeDate.setText("Por rango de fechas");
-        jPanel3.add(moRadFilterTypeDate, java.awt.BorderLayout.CENTER);
+        moRadFilterTypeDate.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel3.add(moRadFilterTypeDate);
+
+        moRadGroupFilterType.add(moRadFilterTypeDatePay);
+        moRadFilterTypeDatePay.setText("Por fecha pago nómina");
+        moRadFilterTypeDatePay.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel3.add(moRadFilterTypeDatePay);
 
         jPanel2.add(jPanel3);
 
@@ -165,6 +177,9 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         jPanel14.add(moKeyPaymentType);
 
         jPanel2.add(jPanel14);
+
+        jpFilterStatusPay.setLayout(new java.awt.BorderLayout());
+        jPanel2.add(jpFilterStatusPay);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
@@ -225,6 +240,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
     private javax.swing.JLabel jlPeriodEnd;
     private javax.swing.JLabel jlPeriodStart;
     private javax.swing.JLabel jlYear;
+    private javax.swing.JPanel jpFilterStatusPay;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
     private javax.swing.ButtonGroup moGroupOrderByDepartament;
@@ -234,6 +250,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
     private sa.lib.gui.bean.SBeanFieldCalendarYear moIntPeriodYear;
     private sa.lib.gui.bean.SBeanFieldKey moKeyPaymentType;
     private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypeDate;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypeDatePay;
     private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypePeriod;
     private javax.swing.ButtonGroup moRadGroupFilterType;
     private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNameDepartament;
@@ -249,13 +266,21 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
             moIntPeriodEnd.setEnabled(true);
             moDateDateStart.setEnabled(false);
             moDateDateEnd.setEnabled(false);
+            moPanelHrsFilterPayrollStatus.setSelectedAll();
         }
-        else if (moRadFilterTypeDate.isSelected()) {
+        else if (moRadFilterTypeDate.isSelected() || moRadFilterTypeDatePay.isSelected()) {
             moIntPeriodYear.setEnabled(false);
             moIntPeriodStart.setEnabled(false);    
             moIntPeriodEnd.setEnabled(false);
             moDateDateStart.setEnabled(true);
             moDateDateEnd.setEnabled(true);
+            
+            if (moRadFilterTypeDatePay.isSelected()) {
+                moPanelHrsFilterPayrollStatus.setSelectedClose();
+            }
+            else {
+                moPanelHrsFilterPayrollStatus.setSelectedAll();
+            }
         }
     }
     
@@ -301,7 +326,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         return aEarnings;
     }
     
-    private double[] getAmountDeductions(final int employeeId) throws Exception {
+    private double[] getAmountDeductions(final int employeeId, final String sqlStatusPay) throws Exception {
         double amtDeduction[] = null;
         String sql = "";
         ResultSet resultSet = null;
@@ -310,16 +335,20 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         sql = "SELECT SUM(IF(d.b_who = 1, prd.amt_r, 0)) AS f_ded, SUM(prd.amt_r) AS f_ded_all " +
                 "FROM hrs_pay AS p " +
                 "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                (!moRadFilterTypeDatePay.isSelected() ?  "" : "INNER JOIN hrs_pay_rcp_iss AS rcp_iss ON rcp_iss.id_pay = pr.id_pay AND rcp_iss.id_emp = pr.id_emp "
+                + "AND rcp_iss.dt_pay BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' "
+                + "AND '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' AND rcp_iss.b_del = 0 AND rcp_iss.fk_st_rcp <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " ") +
                 "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp " +
                 "INNER JOIN hrs_ded AS d ON d.id_ded = prd.fk_ded " +
-                "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 " +
+                "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 " + sqlStatusPay +
                 (moKeyPaymentType.getSelectedIndex() > 0 ? " AND p.fk_tp_pay = " + moKeyPaymentType.getValue()[0] : "");
-                if (moRadFilterTypeDate.isSelected()) {
-                    sql += " AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' ";
-                }
-                else {
+                
+                if (moRadFilterTypePeriod.isSelected()) {
                     sql += " AND p.per_year = " + moIntPeriodYear.getValue() + " " +
                             "AND p.per BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " ";
+                }
+                else if (moRadFilterTypeDate.isSelected()) {
+                    sql += " AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' ";
                 }
                 sql += " AND prd.id_emp = " + employeeId + " ";
 
@@ -336,6 +365,8 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
     
     private void computeReport() {
         String sql = "";
+        String sSqlInnerIssue = "";
+        String sqlStatusPay = "";
         ResultSet resulSetEmployee = null;
         ResultSet resulSet = null;
         String buffer = "";
@@ -357,6 +388,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         double adAmountDeductions[];
         Cursor cursor = getCursor();
         ArrayList<SDbEarning> aEarnings = new ArrayList<SDbEarning>();
+        int payrollStatus = (int) moPanelHrsFilterPayrollStatus.getValue(SLibConsts.UNDEFINED);
 
         try {
             miClient.getFileChooser().setSelectedFile(new File(getTitle() + " " + ((SClientInterface) miClient).getSessionXXX().getFormatters().getFileNameDatetimeFormat().format(new java.util.Date()) + ".csv"));
@@ -379,7 +411,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
                 
                 buffer = ((SClientInterface)miClient).getSessionXXX().getCompany().getCompany() + "\n";
                 buffer += "REPORTE PARA DECLARACIÓN INFORMATIVA DE SUELDOS Y SALARIOS\n";
-                if (moRadFilterTypeDate.isSelected()) {
+                if (moRadFilterTypeDate.isSelected() || moRadFilterTypeDatePay.isSelected()) {
                     buffer += "PERIODO: DEL " + SLibUtils.DateFormatDate.format(moDateDateStart.getValue()) + " AL " + SLibUtils.DateFormatDate.format(moDateDateEnd.getValue()) + "\n" ;
                 }
                 else {
@@ -407,18 +439,32 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
                         "FROM hrs_pay AS p " +
                         "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
                         "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                        (!moRadFilterTypeDatePay.isSelected() ?  "" : " INNER JOIN hrs_pay_rcp_iss AS rcp_iss ON rcp_iss.id_pay = pr.id_pay AND rcp_iss.id_emp = pr.id_emp "
+                        + "AND rcp_iss.dt_pay BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' "
+                        + "AND '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' AND rcp_iss.b_del = 0 AND rcp_iss.fk_st_rcp <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " ") +
                         "INNER JOIN erp.hrsu_emp AS e ON e.id_emp = pre.id_emp " +
                         "INNER JOIN erp.bpsu_bp AS b ON b.id_bp = pre.id_emp " +
                         "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = e.fk_dep " +
                         "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 " +
                         (moKeyPaymentType.getSelectedIndex() > 0 ? " AND p.fk_tp_pay = " + moKeyPaymentType.getValue()[0] : "") + " ";
-                        if (moRadFilterTypeDate.isSelected()) {
-                            sql += " AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' " + getOrderBy();
-                        }
-                        else {
+                        
+                        if (moRadFilterTypePeriod.isSelected()) {
                             sql += " AND p.per_year = " + moIntPeriodYear.getValue() + " " +
                                     "AND p.per BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " " + getOrderBy();
                         }
+                        else if (moRadFilterTypeDate.isSelected()) {
+                            sql += " AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' " + getOrderBy();
+                        }
+        
+                        if (payrollStatus != SPanelHrsFilterPayrollStatus.STATUS_UNDEF) {
+                            if (payrollStatus == SPanelHrsFilterPayrollStatus.STATUS_CLOSE) {
+                                sql += sqlStatusPay = " AND p.b_clo = 1 ";                
+                            }
+                            else if (payrollStatus == SPanelHrsFilterPayrollStatus.STATUS_OPEN) {
+                                sql += sqlStatusPay = " AND p.b_clo = 0 ";
+                            }
+                        }
+        
 
                 resulSetEmployee = miClient.getSession().getStatement().getConnection().createStatement().executeQuery(sql);
                 while (resulSetEmployee.next()) {
@@ -445,16 +491,20 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
                         sql = "SELECT SUM(pre.amt_exem) AS f_exem, SUM(pre.amt_taxa) AS f_tax " +
                                 "FROM hrs_pay AS p " +
                                 "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                                (!moRadFilterTypeDatePay.isSelected() ?  "" : " INNER JOIN hrs_pay_rcp_iss AS rcp_iss ON rcp_iss.id_pay = pr.id_pay AND rcp_iss.id_emp = pr.id_emp "
+                                + "AND rcp_iss.dt_pay BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' "
+                                + "AND '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' AND rcp_iss.b_del = 0 AND rcp_iss.fk_st_rcp <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " ") +
                                 "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
-                                "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 " +
+                                "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 " + sqlStatusPay +
                                 (moKeyPaymentType.getSelectedIndex() > 0 ? " AND p.fk_tp_pay = " + moKeyPaymentType.getValue()[0] : "") + " AND pre.id_emp = " + nEmployeeId + " " +
                                 "AND pre.fk_ear = " + earning.getPkEarningId();
-                                if (moRadFilterTypeDate.isSelected()) {
-                                    sql += " AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' ";
-                                }
-                                else {
+                                
+                                if (moRadFilterTypePeriod.isSelected()) {
                                     sql += " AND p.per_year = " + moIntPeriodYear.getValue() + " " +
                                             "AND p.per BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " ";
+                                }
+                                else if (moRadFilterTypeDate.isSelected()) {
+                                    sql += " AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' ";
                                 }
 
                         resulSet = miClient.getSession().getStatement().executeQuery(sql);
@@ -472,7 +522,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
                     }
                     dTotalAmountDelivered = SLibUtils.round(dTotalAmountTax + dTotalAmountExem, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
                     dTotalCost = SLibUtils.round(dTotalAmountDelivered + dPayrollTax + dEmployersImss, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-                    adAmountDeductions = getAmountDeductions(nEmployeeId);
+                    adAmountDeductions = getAmountDeductions(nEmployeeId, sqlStatusPay);
                     if (adAmountDeductions != null) {
                         dDeduction = SLibUtils.round(adAmountDeductions[0], SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
                         dDeductionAll = SLibUtils.round(adAmountDeductions[1], SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
@@ -516,10 +566,15 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 720, 450);
         
+        moPanelHrsFilterPayrollStatus = new SPanelHrsFilterPayrollStatus(miClient);
+        jpFilterStatusPay.add(moPanelHrsFilterPayrollStatus, BorderLayout.CENTER);
+        moPanelHrsFilterPayrollStatus.setSelectedAll();
+        
         jbSave.setText("Guardar");
 
         moRadFilterTypePeriod.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypePeriod.getText()), true);
         moRadFilterTypeDate.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypeDate.getText()), false);
+        moRadFilterTypeDatePay.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypeDatePay.getText()), false);
         moIntPeriodYear.setCalendarSettings(SGuiUtils.getLabelName(jlYear.getText()));
         moIntPeriodStart.setCalendarSettings(SGuiUtils.getLabelName(jlPeriodStart.getText()));
         moIntPeriodEnd.setCalendarSettings(SGuiUtils.getLabelName(jlPeriodEnd.getText()));
@@ -529,6 +584,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         
         moFields.addField(moRadFilterTypePeriod);
         moFields.addField(moRadFilterTypeDate);
+        moFields.addField(moRadFilterTypeDatePay);
         
         moFields.addField(moIntPeriodYear);
         moFields.addField(moIntPeriodStart);
@@ -545,6 +601,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         
         moRadFilterTypePeriod.addChangeListener(this);
         moRadFilterTypeDate.addChangeListener(this);
+        moRadFilterTypeDatePay.addChangeListener(this);
         
         moRadFilterTypePeriod.setSelected(true);
         moIntPeriodYear.setValue(miClient.getSession().getCurrentYear());
@@ -592,7 +649,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
                     validation.setComponent(moIntPeriodEnd);
                 }
             }
-            else if (moRadFilterTypeDate.isSelected()) {
+            else if (moRadFilterTypeDate.isSelected() || moRadFilterTypeDatePay.isSelected()) {
                 validation = SGuiUtils.validateDateRange(moDateDateStart, moDateDateEnd);
             }
         }
@@ -613,7 +670,8 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
     public void stateChanged(ChangeEvent e) {
         if (e.getSource() instanceof SBeanFieldRadio) {
             if ((SBeanFieldRadio) e.getSource() == moRadFilterTypePeriod ||
-                    (SBeanFieldRadio) e.getSource() == moRadFilterTypeDate) {
+                    (SBeanFieldRadio) e.getSource() == moRadFilterTypeDate ||
+                    (SBeanFieldRadio) e.getSource() == moRadFilterTypeDatePay) {
                 actionEnableFields();
             }
             

@@ -3002,7 +3002,8 @@ public abstract class SDataUtilities {
      * @param catalogue Constants defined in erp.data.SDataConstants.
      */
     public static boolean isCatalogueCfg(int catalogue) {
-        return catalogue >= SDataConstants.GLOBAL_CAT_CFG && catalogue < SDataConstants.GLOBAL_CAT_USR;
+        return catalogue >= SDataConstants.GLOBAL_CAT_CFG && catalogue < SDataConstants.GLOBAL_CAT_USR ||
+                catalogue >= SModConsts.CFGS_CT_ENT && catalogue <= SModConsts.CFG_PARAM_CO;
     }
 
     /**

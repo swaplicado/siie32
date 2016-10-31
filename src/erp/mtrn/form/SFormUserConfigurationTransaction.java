@@ -13,14 +13,18 @@ package erp.mtrn.form;
 
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
+import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
+import erp.mod.SModConsts;
 import erp.mtrn.data.SDataUserConfigurationTransaction;
+import erp.musr.data.SDataUserFunctionalArea;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -39,12 +43,17 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
     private erp.mtrn.data.SDataUserConfigurationTransaction moUserConfigurationTransaction;
     private erp.lib.form.SFormField moFieldIsPurchasesItemAllApplying;
     private erp.lib.form.SFormField moFieldPurchasesOrderLimit_n;
+    private erp.lib.form.SFormField moFieldPurchasesOrderLimitMonthly_n;
     private erp.lib.form.SFormField moFieldPurchasesDocLimit_n;
     private erp.lib.form.SFormField moFieldIsSalesItemAllApplying;
     private erp.lib.form.SFormField moFieldSalesOrderLimit_n;
+    private erp.lib.form.SFormField moFieldSalesOrderLimitMonthly_n;
     private erp.lib.form.SFormField moFieldSalesDocLimit_n;
     private erp.lib.form.SFormField moFieldCapacityVolumeMinPercentage;
     private erp.lib.form.SFormField moFieldCapacityMassMinPercentage;
+    private java.util.Vector<erp.lib.form.SFormComponentItem> mvFunctionalsAreas;
+    private java.util.Vector<erp.lib.form.SFormComponentItem> mvUserFunctionalsAreas;
+    private java.util.Vector<erp.lib.form.SFormComponentItem> mvEmptyListItems;
 
     /** Creates new form SFormUserConfigurationTransaction */
     public SFormUserConfigurationTransaction(erp.client.SClientInterface client) {
@@ -65,9 +74,7 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        jbOk = new javax.swing.JButton();
-        jbCancel = new javax.swing.JButton();
+        jTabbedPane = new javax.swing.JTabbedPane();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jlUser = new javax.swing.JLabel();
@@ -78,6 +85,10 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jPanel4 = new javax.swing.JPanel();
         jtfPurchasesOrderLimit_n = new javax.swing.JTextField();
         jtfCurrencyKeyPurchasesOrder = new javax.swing.JTextField();
+        jlPurchasesOrderLimitMonthly_n = new javax.swing.JLabel();
+        jPanel12 = new javax.swing.JPanel();
+        jtfPurchasesOrderLimitMonthly_n = new javax.swing.JTextField();
+        jtfCurrencyKeyPurchasesOrderLimitMonthly_n = new javax.swing.JTextField();
         jlPurchasesDocLimit_n = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         jtfPurchasesDocLimit_n = new javax.swing.JTextField();
@@ -88,6 +99,10 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jPanel6 = new javax.swing.JPanel();
         jtfSalesOrderLimit_n = new javax.swing.JTextField();
         jtfCurrencyKeySalesOrder = new javax.swing.JTextField();
+        jlSalesOrderLimitMonthly_n = new javax.swing.JLabel();
+        jPanel13 = new javax.swing.JPanel();
+        jtfSalesOrderLimitMonthly_n = new javax.swing.JTextField();
+        jtfCurrencyKeySalesOrderLimitMonthly_n = new javax.swing.JTextField();
         jlSalesDocLimit_n = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
         jtfSalesDocLimit_n = new javax.swing.JTextField();
@@ -102,6 +117,33 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jPanel9 = new javax.swing.JPanel();
         jtfCapacityMassMinPer = new javax.swing.JTextField();
         jlDummy1 = new javax.swing.JLabel();
+        jPanel14 = new javax.swing.JPanel();
+        jPanel70 = new javax.swing.JPanel();
+        jPanel84 = new javax.swing.JPanel();
+        jPanel85 = new javax.swing.JPanel();
+        jlFunctionalsAreasSystem = new javax.swing.JLabel();
+        jScrollPane11 = new javax.swing.JScrollPane();
+        jltFunctionalsAreas = new javax.swing.JList<SFormComponentItem>();
+        jpUserFunctionalsAreas = new javax.swing.JPanel();
+        jlFunctionalsAreasUser = new javax.swing.JLabel();
+        jScrollPane12 = new javax.swing.JScrollPane();
+        jltUserFunctionalsAreas = new javax.swing.JList<SFormComponentItem>();
+        jPanel86 = new javax.swing.JPanel();
+        jPanel87 = new javax.swing.JPanel();
+        jPanel88 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        jPanel91 = new javax.swing.JPanel();
+        jPanel89 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        jPanel90 = new javax.swing.JPanel();
+        jbTransferFunctionalsAreas = new javax.swing.JButton();
+        jbTransferAllFunctionalsAreas = new javax.swing.JButton();
+        jbReturnFunctionalsAreas = new javax.swing.JButton();
+        jbReturnAllFunctionalsAreas = new javax.swing.JButton();
+        jPanel92 = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        jbOk = new javax.swing.JButton();
+        jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Configuración de usuario para transacciones");
@@ -112,24 +154,10 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
             }
         });
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(392, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
-
-        jbOk.setText("Aceptar");
-        jbOk.setToolTipText("[Ctrl + Enter]");
-        jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel1.add(jbOk);
-
-        jbCancel.setText("Cancelar");
-        jbCancel.setToolTipText("[Escape]");
-        jPanel1.add(jbCancel);
-
-        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
-
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel3.setLayout(new java.awt.GridLayout(10, 2, 0, 1));
+        jPanel3.setLayout(new java.awt.GridLayout(12, 2, 0, 1));
 
         jlUser.setText("Nombre del usuario:");
         jPanel3.add(jlUser);
@@ -159,6 +187,23 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jPanel4.add(jtfCurrencyKeyPurchasesOrder, java.awt.BorderLayout.EAST);
 
         jPanel3.add(jPanel4);
+
+        jlPurchasesOrderLimitMonthly_n.setText("Límite máx. mensual autorizado pedidos compras:");
+        jPanel3.add(jlPurchasesOrderLimitMonthly_n);
+
+        jPanel12.setLayout(new java.awt.BorderLayout(2, 0));
+
+        jtfPurchasesOrderLimitMonthly_n.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPurchasesOrderLimitMonthly_n.setText("0");
+        jPanel12.add(jtfPurchasesOrderLimitMonthly_n, java.awt.BorderLayout.CENTER);
+
+        jtfCurrencyKeyPurchasesOrderLimitMonthly_n.setEditable(false);
+        jtfCurrencyKeyPurchasesOrderLimitMonthly_n.setText("CUR");
+        jtfCurrencyKeyPurchasesOrderLimitMonthly_n.setFocusable(false);
+        jtfCurrencyKeyPurchasesOrderLimitMonthly_n.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel12.add(jtfCurrencyKeyPurchasesOrderLimitMonthly_n, java.awt.BorderLayout.EAST);
+
+        jPanel3.add(jPanel12);
 
         jlPurchasesDocLimit_n.setText("Límite máx. autorizado facturas compras:");
         jPanel3.add(jlPurchasesDocLimit_n);
@@ -197,6 +242,23 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jPanel6.add(jtfCurrencyKeySalesOrder, java.awt.BorderLayout.LINE_END);
 
         jPanel3.add(jPanel6);
+
+        jlSalesOrderLimitMonthly_n.setText("Límite máx. mensual autorizado pedidos ventas:");
+        jPanel3.add(jlSalesOrderLimitMonthly_n);
+
+        jPanel13.setLayout(new java.awt.BorderLayout(2, 0));
+
+        jtfSalesOrderLimitMonthly_n.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfSalesOrderLimitMonthly_n.setText("0");
+        jPanel13.add(jtfSalesOrderLimitMonthly_n, java.awt.BorderLayout.CENTER);
+
+        jtfCurrencyKeySalesOrderLimitMonthly_n.setEditable(false);
+        jtfCurrencyKeySalesOrderLimitMonthly_n.setText("CUR");
+        jtfCurrencyKeySalesOrderLimitMonthly_n.setFocusable(false);
+        jtfCurrencyKeySalesOrderLimitMonthly_n.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel13.add(jtfCurrencyKeySalesOrderLimitMonthly_n, java.awt.BorderLayout.LINE_END);
+
+        jPanel3.add(jPanel13);
 
         jlSalesDocLimit_n.setText("Límite máx. autorizado facturas ventas:");
         jPanel3.add(jlSalesDocLimit_n);
@@ -246,11 +308,124 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
 
         jPanel3.add(jPanel9);
 
-        jPanel2.add(jPanel3, java.awt.BorderLayout.NORTH);
+        jPanel2.add(jPanel3, java.awt.BorderLayout.CENTER);
 
-        getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
+        jTabbedPane.addTab("Límites de transacciones", jPanel2);
 
-        setSize(new java.awt.Dimension(496, 338));
+        jPanel14.setLayout(new java.awt.BorderLayout());
+
+        jPanel70.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración de acceso:"));
+        jPanel70.setLayout(new java.awt.BorderLayout());
+
+        jPanel84.setLayout(new java.awt.BorderLayout());
+
+        jPanel85.setPreferredSize(new java.awt.Dimension(230, 200));
+        jPanel85.setLayout(new java.awt.BorderLayout());
+
+        jlFunctionalsAreasSystem.setText("Áreas funcionales disponibles:");
+        jlFunctionalsAreasSystem.setPreferredSize(new java.awt.Dimension(115, 23));
+        jPanel85.add(jlFunctionalsAreasSystem, java.awt.BorderLayout.PAGE_START);
+
+        jltFunctionalsAreas.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jltFunctionalsAreasMouseClicked(evt);
+            }
+        });
+        jScrollPane11.setViewportView(jltFunctionalsAreas);
+
+        jPanel85.add(jScrollPane11, java.awt.BorderLayout.CENTER);
+
+        jPanel84.add(jPanel85, java.awt.BorderLayout.WEST);
+
+        jpUserFunctionalsAreas.setPreferredSize(new java.awt.Dimension(280, 200));
+        jpUserFunctionalsAreas.setLayout(new java.awt.BorderLayout());
+
+        jlFunctionalsAreasUser.setText("Áreas funcionales del usuario:");
+        jlFunctionalsAreasUser.setPreferredSize(new java.awt.Dimension(105, 23));
+        jpUserFunctionalsAreas.add(jlFunctionalsAreasUser, java.awt.BorderLayout.PAGE_START);
+
+        jltUserFunctionalsAreas.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jltUserFunctionalsAreasMouseClicked(evt);
+            }
+        });
+        jScrollPane12.setViewportView(jltUserFunctionalsAreas);
+
+        jpUserFunctionalsAreas.add(jScrollPane12, java.awt.BorderLayout.CENTER);
+
+        jPanel84.add(jpUserFunctionalsAreas, java.awt.BorderLayout.EAST);
+
+        jPanel86.setPreferredSize(new java.awt.Dimension(200, 100));
+        jPanel86.setLayout(new java.awt.BorderLayout());
+
+        jPanel87.setPreferredSize(new java.awt.Dimension(100, 130));
+        jPanel87.setLayout(new java.awt.BorderLayout());
+
+        jPanel88.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel88.add(jLabel5);
+
+        jPanel87.add(jPanel88, java.awt.BorderLayout.NORTH);
+
+        jPanel91.setLayout(new java.awt.BorderLayout());
+
+        jPanel89.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel89.add(jLabel6);
+
+        jPanel91.add(jPanel89, java.awt.BorderLayout.NORTH);
+
+        jPanel90.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel90.setLayout(new java.awt.GridLayout(4, 1));
+
+        jbTransferFunctionalsAreas.setText(">");
+        jbTransferFunctionalsAreas.setToolTipText("Agregar");
+        jPanel90.add(jbTransferFunctionalsAreas);
+
+        jbTransferAllFunctionalsAreas.setText(">>");
+        jbTransferAllFunctionalsAreas.setToolTipText("Agregar todos");
+        jPanel90.add(jbTransferAllFunctionalsAreas);
+
+        jbReturnFunctionalsAreas.setText("<");
+        jbReturnFunctionalsAreas.setToolTipText("Remover");
+        jPanel90.add(jbReturnFunctionalsAreas);
+
+        jbReturnAllFunctionalsAreas.setText("<<");
+        jbReturnAllFunctionalsAreas.setToolTipText("Remover todos");
+        jPanel90.add(jbReturnAllFunctionalsAreas);
+
+        jPanel91.add(jPanel90, java.awt.BorderLayout.CENTER);
+
+        jPanel87.add(jPanel91, java.awt.BorderLayout.CENTER);
+
+        jPanel86.add(jPanel87, java.awt.BorderLayout.NORTH);
+
+        jPanel84.add(jPanel86, java.awt.BorderLayout.CENTER);
+
+        jPanel70.add(jPanel84, java.awt.BorderLayout.NORTH);
+
+        jPanel92.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel70.add(jPanel92, java.awt.BorderLayout.CENTER);
+
+        jPanel14.add(jPanel70, java.awt.BorderLayout.CENTER);
+
+        jTabbedPane.addTab("Áreas funcionales", jPanel14);
+
+        getContentPane().add(jTabbedPane, java.awt.BorderLayout.CENTER);
+
+        jPanel1.setPreferredSize(new java.awt.Dimension(392, 33));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        jbOk.setText("Aceptar");
+        jbOk.setToolTipText("[Ctrl + Enter]");
+        jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel1.add(jbOk);
+
+        jbCancel.setText("Cancelar");
+        jbCancel.setToolTipText("[Escape]");
+        jPanel1.add(jbCancel);
+
+        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
+
+        setSize(new java.awt.Dimension(656, 439));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -258,17 +433,33 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
+    private void jltFunctionalsAreasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jltFunctionalsAreasMouseClicked
+        if (evt.getClickCount() == 2) {
+            mouseClickedFunctionalsAreas();
+        }
+    }//GEN-LAST:event_jltFunctionalsAreasMouseClicked
+
+    private void jltUserFunctionalsAreasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jltUserFunctionalsAreasMouseClicked
+        if (evt.getClickCount() == 2) {
+            mouseClickedUserFunctionalsAreas();
+        }
+    }//GEN-LAST:event_jltUserFunctionalsAreasMouseClicked
+
     private void initComponentsExtra() {
         mvFields = new Vector<SFormField>();
 
         moFieldIsPurchasesItemAllApplying = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsPurchasesItemAllApplying);
         moFieldPurchasesOrderLimit_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfPurchasesOrderLimit_n, jlPurchasesOrderLimit_n);
         moFieldPurchasesOrderLimit_n.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
+        moFieldPurchasesOrderLimitMonthly_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfPurchasesOrderLimitMonthly_n, jlPurchasesOrderLimitMonthly_n);
+        moFieldPurchasesOrderLimitMonthly_n.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
         moFieldPurchasesDocLimit_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfPurchasesDocLimit_n, jlPurchasesDocLimit_n);
         moFieldPurchasesDocLimit_n.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
         moFieldIsSalesItemAllApplying = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsSalesItemAllApplying);
         moFieldSalesOrderLimit_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfSalesOrderLimit_n, jlSalesOrderLimit_n);
         moFieldSalesOrderLimit_n.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
+        moFieldSalesOrderLimitMonthly_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfSalesOrderLimitMonthly_n, jlSalesOrderLimitMonthly_n);
+        moFieldSalesOrderLimitMonthly_n.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
         moFieldSalesDocLimit_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfSalesDocLimit_n, jlSalesDocLimit_n);
         moFieldSalesDocLimit_n.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
         moFieldCapacityVolumeMinPercentage = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfCapacityVolumeMinPer, jlCapacityVolumeMinPer);
@@ -280,13 +471,24 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
 
         mvFields.add(moFieldIsPurchasesItemAllApplying);
         mvFields.add(moFieldPurchasesOrderLimit_n);
+        mvFields.add(moFieldPurchasesOrderLimitMonthly_n);
         mvFields.add(moFieldPurchasesDocLimit_n);
         mvFields.add(moFieldIsSalesItemAllApplying);
         mvFields.add(moFieldSalesOrderLimit_n);
+        mvFields.add(moFieldSalesOrderLimitMonthly_n);
         mvFields.add(moFieldSalesDocLimit_n);
         mvFields.add(moFieldCapacityVolumeMinPercentage);
         mvFields.add(moFieldCapacityMassMinPercentage);
 
+        jbTransferFunctionalsAreas.addActionListener(this);
+        jbTransferAllFunctionalsAreas.addActionListener(this);
+        jbReturnFunctionalsAreas.addActionListener(this);
+        jbReturnAllFunctionalsAreas.addActionListener(this);
+        
+        mvEmptyListItems = new Vector<SFormComponentItem>();
+        mvFunctionalsAreas = new Vector<SFormComponentItem>();
+        mvUserFunctionalsAreas = new Vector<SFormComponentItem>();
+        
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
 
@@ -309,6 +511,109 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         if (mbFirstTime) {
             mbFirstTime = false;
             jckIsPurchasesItemAllApplying.requestFocus();
+        }
+    }
+    
+    private void readerFunctionalAreasDataBase() {
+        mvFunctionalsAreas.clear();
+
+        SFormUtilities.populateList(miClient, jltFunctionalsAreas, SModConsts.CFGU_FUNC);
+
+        for (int j = 0; j < jltFunctionalsAreas.getModel().getSize(); j++) {
+            mvFunctionalsAreas.add((SFormComponentItem) jltFunctionalsAreas.getModel().getElementAt(j));
+        }
+    }
+    
+    private void loadFunctionalAreasUserDataBase() {
+        SFormComponentItem item = null;
+        boolean isLast = false;
+        boolean found = false;
+        int indexFuncArea = 0;
+        
+        for (SDataUserFunctionalArea functionalArea : moUserConfigurationTransaction.getUserFunctionalArea()) {
+            indexFuncArea = 0;
+            isLast = false;
+            
+            while (!isLast) {
+                jltFunctionalsAreas.setSelectedIndex(indexFuncArea);
+            
+                if (jltFunctionalsAreas.getSelectedIndex() != -1) {
+                    item = (SFormComponentItem) jltFunctionalsAreas.getModel().getElementAt(indexFuncArea);
+                }
+                else {
+                    isLast = true;
+                }
+                
+                found = false;
+                if (item != null) {
+                    if (SLibUtils.compareKeys((int[]) item.getPrimaryKey(), new int[] { functionalArea.getPkFunctionalAreaId() })) {
+                        SFormUtilities.addListItem(jltUserFunctionalsAreas, item);
+                        SFormUtilities.removeListSelectedItem(jltFunctionalsAreas);
+                        found = true;
+                    }
+                }
+                indexFuncArea++;
+                
+                if (found || indexFuncArea == jltFunctionalsAreas.getModel().getSize()) {
+                    isLast = true;
+                }
+            }
+        }
+    }
+    
+    private void populateListFunctionalsAreas() {
+        readerFunctionalAreasDataBase();
+        
+        jltFunctionalsAreas.setListData(mvEmptyListItems);
+        
+        SFormUtilities.populateList(miClient, jltFunctionalsAreas, SModConsts.CFGU_FUNC);
+    }
+
+    private void actionTransferFunctionalsAreas() {
+         SFormComponentItem item = null;
+
+         if (jltFunctionalsAreas.getSelectedIndex() != -1) {
+             item = SFormUtilities.removeListSelectedItem(jltFunctionalsAreas);
+             
+             SFormUtilities.addListItem(jltUserFunctionalsAreas, item);
+             
+             if (jltFunctionalsAreas.getModel().getSize() >= 0) {
+                 jltFunctionalsAreas.setSelectedIndex(0);
+             }
+         }
+    }
+
+    private void actionTransferAllFunctionalsAreas() {
+        int from = 0;
+        int rows = jltFunctionalsAreas.getModel().getSize();
+
+        for (int row = 0; row < rows; row++) {
+            jltFunctionalsAreas.setSelectedIndex(from);
+            actionTransferFunctionalsAreas();
+        }
+    }
+
+    private void actionReturnFunctionalsAreas() {
+         SFormComponentItem item = null;
+         
+        if (jltUserFunctionalsAreas.getSelectedIndex() != -1) {
+            item = SFormUtilities.removeListSelectedItem(jltUserFunctionalsAreas);
+             
+             SFormUtilities.addListItem(jltFunctionalsAreas, item);
+             
+             if (jltUserFunctionalsAreas.getModel().getSize() >= 0) {
+                 jltUserFunctionalsAreas.setSelectedIndex(0);
+             }
+        }
+    }
+
+    private void actionReturnAllFunctionalsAreas() {
+        int from = 0;
+        int rows = jltUserFunctionalsAreas.getModel().getSize();
+
+        for (int row = 0; row < rows; row++) {
+            jltUserFunctionalsAreas.setSelectedIndex(from);
+            actionReturnFunctionalsAreas();
         }
     }
 
@@ -334,42 +639,83 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         setVisible(false);
     }
 
+    private void mouseClickedFunctionalsAreas() {
+        actionTransferFunctionalsAreas();
+    }
+
+    private void mouseClickedUserFunctionalsAreas() {
+        actionReturnFunctionalsAreas();
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Dummy01;
     private javax.swing.JLabel Dummy02;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel70;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel84;
+    private javax.swing.JPanel jPanel85;
+    private javax.swing.JPanel jPanel86;
+    private javax.swing.JPanel jPanel87;
+    private javax.swing.JPanel jPanel88;
+    private javax.swing.JPanel jPanel89;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JPanel jPanel90;
+    private javax.swing.JPanel jPanel91;
+    private javax.swing.JPanel jPanel92;
+    private javax.swing.JScrollPane jScrollPane11;
+    private javax.swing.JScrollPane jScrollPane12;
+    private javax.swing.JTabbedPane jTabbedPane;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
+    private javax.swing.JButton jbReturnAllFunctionalsAreas;
+    private javax.swing.JButton jbReturnFunctionalsAreas;
+    private javax.swing.JButton jbTransferAllFunctionalsAreas;
+    private javax.swing.JButton jbTransferFunctionalsAreas;
     private javax.swing.JCheckBox jckIsPurchasesItemAllApplying;
     private javax.swing.JCheckBox jckIsSalesItemAllApplying;
     private javax.swing.JLabel jlCapacityMassMinPer;
     private javax.swing.JLabel jlCapacityVolumeMinPer;
     private javax.swing.JLabel jlDummy;
     private javax.swing.JLabel jlDummy1;
+    private javax.swing.JLabel jlFunctionalsAreasSystem;
+    private javax.swing.JLabel jlFunctionalsAreasUser;
     private javax.swing.JLabel jlPurchasesDocLimit_n;
+    private javax.swing.JLabel jlPurchasesOrderLimitMonthly_n;
     private javax.swing.JLabel jlPurchasesOrderLimit_n;
     private javax.swing.JLabel jlSalesDocLimit_n;
+    private javax.swing.JLabel jlSalesOrderLimitMonthly_n;
     private javax.swing.JLabel jlSalesOrderLimit_n;
     private javax.swing.JLabel jlUser;
+    private javax.swing.JList<SFormComponentItem> jltFunctionalsAreas;
+    private javax.swing.JList<SFormComponentItem> jltUserFunctionalsAreas;
+    private javax.swing.JPanel jpUserFunctionalsAreas;
     private javax.swing.JTextField jtfCapacityMassMinPer;
     private javax.swing.JTextField jtfCapacityVolumeMinPer;
     private javax.swing.JTextField jtfCurrencyKeyPurchasesDoc;
     private javax.swing.JTextField jtfCurrencyKeyPurchasesOrder;
+    private javax.swing.JTextField jtfCurrencyKeyPurchasesOrderLimitMonthly_n;
     private javax.swing.JTextField jtfCurrencyKeySalesDoc;
     private javax.swing.JTextField jtfCurrencyKeySalesOrder;
+    private javax.swing.JTextField jtfCurrencyKeySalesOrderLimitMonthly_n;
     private javax.swing.JTextField jtfPurchasesDocLimit_n;
+    private javax.swing.JTextField jtfPurchasesOrderLimitMonthly_n;
     private javax.swing.JTextField jtfPurchasesOrderLimit_n;
     private javax.swing.JTextField jtfSalesDocLimit_n;
+    private javax.swing.JTextField jtfSalesOrderLimitMonthly_n;
     private javax.swing.JTextField jtfSalesOrderLimit_n;
     private javax.swing.JTextField jtfUser;
     // End of variables declaration//GEN-END:variables
@@ -386,20 +732,25 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         mbFirstTime = true;
 
         moUserConfigurationTransaction = null;
+        
+        jTabbedPane.setSelectedIndex(0);
 
         for (int i = 0; i < mvFields.size(); i++) {
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
         }
 
         jtfCurrencyKeyPurchasesOrder.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
+        jtfCurrencyKeyPurchasesOrderLimitMonthly_n.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
         jtfCurrencyKeyPurchasesDoc.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
         jtfCurrencyKeySalesOrder.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
+        jtfCurrencyKeySalesOrderLimitMonthly_n.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
         jtfCurrencyKeySalesDoc.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
+        jltUserFunctionalsAreas.setListData(mvEmptyListItems);
     }
 
     @Override
     public void formRefreshCatalogues() {
-
+        populateListFunctionalsAreas();
     }
 
     @Override
@@ -444,16 +795,22 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jtfUser.setText(moUserConfigurationTransaction.getDbmsUser());
         moFieldIsPurchasesItemAllApplying.setFieldValue(moUserConfigurationTransaction.getIsPurchasesItemAllApplying());
         moFieldPurchasesOrderLimit_n.setFieldValue(moUserConfigurationTransaction.getPurchasesOrderLimit_n());
+        moFieldPurchasesOrderLimitMonthly_n.setFieldValue(moUserConfigurationTransaction.getPurchasesOrderLimitMonthly_n());
         moFieldPurchasesDocLimit_n.setFieldValue(moUserConfigurationTransaction.getPurchasesDocLimit_n());
         moFieldIsSalesItemAllApplying.setFieldValue(moUserConfigurationTransaction.getIsSalesItemAllApplying());
         moFieldSalesOrderLimit_n.setFieldValue(moUserConfigurationTransaction.getSalesOrderLimit_n());
+        moFieldSalesOrderLimitMonthly_n.setFieldValue(moUserConfigurationTransaction.getSalesOrderLimitMonthly_n());
         moFieldSalesDocLimit_n.setFieldValue(moUserConfigurationTransaction.getSalesDocLimit_n());
         moFieldCapacityVolumeMinPercentage.setFieldValue(moUserConfigurationTransaction.getCapacityVolumeMinPercentage());
         moFieldCapacityMassMinPercentage.setFieldValue(moUserConfigurationTransaction.getCapacityMassMinPercentage());
+        
+        loadFunctionalAreasUserDataBase();
     }
 
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
+        SDataUserFunctionalArea functionalArea = null;
+        
         if (moUserConfigurationTransaction == null) {
             moUserConfigurationTransaction = new SDataUserConfigurationTransaction();
             moUserConfigurationTransaction.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
@@ -464,12 +821,24 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
 
         moUserConfigurationTransaction.setIsPurchasesItemAllApplying(moFieldIsPurchasesItemAllApplying.getBoolean());
         moUserConfigurationTransaction.setPurchasesOrderLimit_n(moFieldPurchasesOrderLimit_n.getDouble() == 0 ? -1 : moFieldPurchasesOrderLimit_n.getDouble());
+        moUserConfigurationTransaction.setPurchasesOrderLimitMonthly_n(moFieldPurchasesOrderLimitMonthly_n.getDouble() == 0 ? -1 : moFieldPurchasesOrderLimitMonthly_n.getDouble());
         moUserConfigurationTransaction.setPurchasesDocLimit_n(moFieldPurchasesDocLimit_n.getDouble() == 0 ? -1 : moFieldPurchasesDocLimit_n.getDouble());
         moUserConfigurationTransaction.setIsSalesItemAllApplying(moFieldIsSalesItemAllApplying.getBoolean());
         moUserConfigurationTransaction.setSalesOrderLimit_n(moFieldSalesOrderLimit_n.getDouble() == 0 ? -1 : moFieldSalesOrderLimit_n.getDouble());
+        moUserConfigurationTransaction.setSalesOrderLimitMonthly_n(moFieldSalesOrderLimitMonthly_n.getDouble() == 0 ? -1 : moFieldSalesOrderLimitMonthly_n.getDouble());
         moUserConfigurationTransaction.setSalesDocLimit_n(moFieldSalesDocLimit_n.getDouble() == 0 ? -1 : moFieldSalesDocLimit_n.getDouble());
         moUserConfigurationTransaction.setCapacityVolumeMinPercentage(moFieldCapacityVolumeMinPercentage.getDouble());
         moUserConfigurationTransaction.setCapacityMassMinPercentage(moFieldCapacityMassMinPercentage.getDouble());
+        
+        // Save functional areas:
+        
+        moUserConfigurationTransaction.getUserFunctionalArea().clear();
+        for (int j = 0; j < jltUserFunctionalsAreas.getModel().getSize(); j++) {
+            functionalArea = new SDataUserFunctionalArea();
+            
+            functionalArea.setPkFunctionalAreaId(((int[]) ((SFormComponentItem) jltUserFunctionalsAreas.getModel().getElementAt(j)).getPrimaryKey())[0]);
+            moUserConfigurationTransaction.getUserFunctionalArea().add(functionalArea);
+        }
 
         return moUserConfigurationTransaction;
     }
@@ -499,6 +868,18 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
             }
             else if (button == jbCancel) {
                 actionCancel();
+            }
+            else if (button == jbTransferFunctionalsAreas) {
+                actionTransferFunctionalsAreas();
+            }
+            else if (button == jbTransferAllFunctionalsAreas) {
+                actionTransferAllFunctionalsAreas();
+            }
+            else if (button == jbReturnFunctionalsAreas) {
+                actionReturnFunctionalsAreas();
+            }
+            else if (button == jbReturnAllFunctionalsAreas) {
+                actionReturnAllFunctionalsAreas();
             }
         }
     }

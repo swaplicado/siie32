@@ -39,7 +39,7 @@ public class SViewUserConfigurationTransaction extends erp.lib.table.STableTab i
         addTaskBarUpperComponent(moTabFilterDeleted);
 
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[16];
+        STableColumn[] aoTableColumns = new STableColumn[18];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "u.id_usr");
@@ -52,10 +52,14 @@ public class SViewUserConfigurationTransaction extends erp.lib.table.STableTab i
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "u.b_pur_item_all", "Cpa. todos ítems", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "u.pur_ord_lim_n", "Lím. peds. cpa. $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "u.pur_ord_lim_mon_n", "Lím. peds. cpa. men. $", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "u.pur_doc_lim_n", "Lím. facs. cpa. $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "u.b_sal_item_all", "Vta. todos ítems", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "u.sal_ord_lim_n", "Lím. peds. vta. $", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "u.sal_ord_lim_mon_n", "Lím. peds. vta. men. $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "u.sal_doc_lim_n", "Lím. facs. vta. $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());

@@ -96,6 +96,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiOrdersAutRejected;
     private javax.swing.JMenuItem jmiOrdersPrice;
     private javax.swing.JMenuItem jmiOrdersPriceHist;
+    private javax.swing.JMenuItem jmiOrdersFunctionalArea;
+    private javax.swing.JMenuItem jmiOrdersUsr;
     private javax.swing.JMenuItem jmiOrdersMailPending;
     private javax.swing.JMenuItem jmiOrdersMailSent;
     private javax.swing.JMenu jmDps;
@@ -291,6 +293,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiOrdersAutRejected = new JMenuItem("Pedidos rechazados");
         jmiOrdersPrice = new JMenuItem("Precios de compras");
         jmiOrdersPriceHist = new JMenuItem("Historial de precios de compras");
+        jmiOrdersFunctionalArea = new JMenuItem("Control de límite máximo mensual por área funcional");
+        jmiOrdersUsr = new JMenuItem("Control de límite máximo mensual por usuario");
         jmiOrdersMailPending = new JMenuItem("Pedidos por enviar por correo-e");
         jmiOrdersMailSent = new JMenuItem("Pedidos enviados por correo-e");
         jmOrd.add(jmiOrders);
@@ -310,6 +314,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmOrd.addSeparator();
         jmOrd.add(jmiOrdersPrice);
         jmOrd.add(jmiOrdersPriceHist);
+        jmOrd.addSeparator();
+        jmOrd.add(jmiOrdersFunctionalArea);
+        jmOrd.add(jmiOrdersUsr);
         jmOrd.addSeparator();
         jmOrd.add(jmiOrdersMailPending);
         jmOrd.add(jmiOrdersMailSent);
@@ -544,6 +551,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiOrdersAutRejected.addActionListener(this);
         jmiOrdersPrice.addActionListener(this);
         jmiOrdersPriceHist.addActionListener(this);
+        jmiOrdersFunctionalArea.addActionListener(this);
+        jmiOrdersUsr.addActionListener(this);
         jmiOrdersMailPending.addActionListener(this);
         jmiOrdersMailSent.addActionListener(this);
         jmiDpsDoc.addActionListener(this);
@@ -651,6 +660,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmOrd.setEnabled(hasRightDocOrder || hasRightDocOrderAuthorize);
         jmiOrdersPrice.setEnabled(hasRightDocOrder && levelRightDocOrder >= SUtilConsts.LEV_AUTHOR);
         jmiOrdersPriceHist.setEnabled(hasRightDocOrder && levelRightDocOrder >= SUtilConsts.LEV_AUTHOR);
+        jmiOrdersFunctionalArea.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
+        jmiOrdersUsr.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
         jmiOrdersMailPending.setEnabled(hasRightDocOrder);
         jmiOrdersMailSent.setEnabled(hasRightDocOrder);
 
@@ -1377,6 +1388,12 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiDpsPriceHist || item == jmiOrdersPriceHist) {
                 showView(SDataConstants.TRNX_PRICE_HIST, SDataConstantsSys.TRNS_CT_DPS_PUR);
+            }
+            else if (item == jmiOrdersFunctionalArea) {
+                 miClient.getSession().showView(SModConsts.TRNX_ORD_LIM_MAX, SModConsts.CFGU_FUNC, new SGuiParams(SModSysConsts.TRNS_CT_DPS_PUR));
+            }
+            else if (item == jmiOrdersUsr) {
+                 miClient.getSession().showView(SModConsts.TRNX_ORD_LIM_MAX, SModConsts.USRU_USR, new SGuiParams(SModSysConsts.TRNS_CT_DPS_PUR));
             }
             else if (item == jmiDpsAdjDoc) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_ADJ);

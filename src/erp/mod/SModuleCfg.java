@@ -8,7 +8,10 @@ package erp.mod;
 import erp.mod.cfg.db.SDbCompanyBranchEntity;
 import erp.mod.cfg.db.SDbCountry;
 import erp.mod.cfg.db.SDbCurrency;
+import erp.mod.cfg.db.SDbFunctionalArea;
 import erp.mod.cfg.db.SDbLanguage;
+import erp.mod.cfg.form.SFormFunctionalsAreas;
+import erp.mod.cfg.view.SViewFunctionalsAreas;
 import javax.swing.JMenu;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
@@ -28,6 +31,8 @@ import sa.lib.gui.SGuiReport;
  */
 public class SModuleCfg extends SGuiModule {
 
+    private SFormFunctionalsAreas moFunctionalsAreas;
+    
     public SModuleCfg(SGuiClient client) {
         super(client, SModConsts.MOD_CFG_N, SLibConsts.UNDEFINED);
         moModuleIcon = miClient.getImageIcon(mnModuleType);
@@ -51,6 +56,9 @@ public class SModuleCfg extends SGuiModule {
                 break;
             case SModConsts.CFGU_COB_ENT:
                 registry = new SDbCompanyBranchEntity();
+                break;
+            case SModConsts.CFGU_FUNC:
+                registry = new SDbFunctionalArea();
                 break;
             case SModConsts.LOCU_CTY:
                 registry = new SDbCountry();
@@ -93,6 +101,13 @@ public class SModuleCfg extends SGuiModule {
                         "WHERE b_del = 0 " +
                         "ORDER BY name, id_tp_mms ";
                 break;
+            case SModConsts.CFGU_FUNC:
+                settings = new SGuiCatalogueSettings("Área funcional", 1, 1, SLibConsts.DATA_TYPE_TEXT);
+                sql = "SELECT id_func AS " + SDbConsts.FIELD_ID + "1, 1 AS " + SDbConsts.FIELD_FK + "1, name AS " + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_COMP + " " +
+                        "FROM " + SModConsts.TablesMap.get(type) + " " +
+                        "WHERE b_del = 0 " +
+                        "ORDER BY name, id_func ";
+                break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -108,6 +123,14 @@ public class SModuleCfg extends SGuiModule {
     public SGridPaneView getView(final int type, final int subtype, final SGuiParams params) {
         SGridPaneView view = null;
 
+        switch (type) {
+            case SModConsts.CFGU_FUNC:
+                view = new SViewFunctionalsAreas(miClient, "Áreas funcionales");
+                break;
+            default:
+                miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+        
         return view;
     }
 
@@ -119,7 +142,16 @@ public class SModuleCfg extends SGuiModule {
     @Override
     public SGuiForm getForm(final int type, final int subtype, final SGuiParams params) {
         SGuiForm form = null;
-
+        
+        switch (type) {
+            case SModConsts.CFGU_FUNC:
+                if (moFunctionalsAreas == null) moFunctionalsAreas = new SFormFunctionalsAreas(miClient, "Área funcional");
+                form = moFunctionalsAreas;
+                break;
+            default:
+                miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+        
         return form;
     }
 

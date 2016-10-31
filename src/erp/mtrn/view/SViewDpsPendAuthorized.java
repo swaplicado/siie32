@@ -20,11 +20,13 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mod.SModConsts;
 import erp.mtrn.data.SDataDps;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
 import erp.table.STabFilterCompanyBranch;
 import erp.table.STabFilterDocumentNature;
+import erp.table.STabFilterFunctionalArea;
 import erp.table.STabFilterUsers;
 import java.awt.Dimension;
 import java.util.Vector;
@@ -49,6 +51,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     private erp.table.STabFilterUsers moTabFilterUser;
     private erp.table.STabFilterDocumentNature moTabFilterDocumentNature;
+    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
 
     private boolean mbHasRightAuthor = false;
     private boolean mbHasRightRejectOwn = false;
@@ -118,6 +121,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
         moTabFilterUser.removeButtonUser();
         moTabFilterUser.setUserId(mbHasRightAuthor ? miClient.getSession().getUser().getPkUserId() : SDataConstantsSys.UNDEFINED);
         moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC);
 
         if (isViewDocsPending()) {
             moTabFilterDateCutOff = new STabFilterDateCutOff(miClient, this, SLibTimeUtilities.getEndOfYear(miClient.getSessionXXX().getWorkingDate()));
@@ -148,6 +152,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
         addTaskBarUpperComponent(moTabFilterUser);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDocumentNature);
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
 
         mjbAuthorize.setEnabled(hasRightAuthorize && (isViewDocsPending() || isViewDocsRejected()));
         mjbReject.setEnabled((hasRightAuthorize || mbHasRightRejectOwn) && (isViewDocsPending() || isViewDocsAuthorized()));
@@ -156,7 +161,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
         mjbViewLinks.setEnabled(true);
 
         aoKeyFields = new STableField[2];
-        aoTableColumns = new STableColumn[14];
+        aoTableColumns = new STableColumn[(isViewDocsPending() || isViewDocsRejected() ? 15 : 14)];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "d.id_year");
@@ -197,6 +202,9 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "d.tot_cur_r", "Total mon $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.cur_key", "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "sa.st_dps_authorn", "Estatus", 100);
+        if (isViewDocsPending() || isViewDocsRejected()) {
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_aut_auth_rej", "No autorización automática", 100);
+        }
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ua.usr", "Usr. autorización", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "d.ts_authorn", "Autorizado", STableConstants.WIDTH_DATE_TIME);
         for (i = 0; i < aoTableColumns.length; i++) {
@@ -294,7 +302,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
                     params.add(miClient.getSession().getUser().getPkUserId());
                     params = SDataUtilities.callProcedure(miClient, SProcConstants.TRN_DPS_UPD, params, SLibConstants.EXEC_MODE_SILENT);
 
-                    if (params.size() == 0) {
+                    if (params.isEmpty()) {
                         miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_PROCESS);
                     }
                     else {
@@ -418,6 +426,11 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
                     sqlDocNature += (sqlDocNature.length() == 0 ? "" : "AND ") + "d.fid_dps_nat = " + ((Integer) setting.getSetting()) + " ";
                 }
             }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_ARE) {
+                if (((Integer) setting.getSetting()) != SLibConstants.UNDEFINED) {
+                    sqlDocNature += (sqlDocNature.length() == 0 ? "" : "AND ") + "d.fid_func = " + ((Integer) setting.getSetting()) + " ";
+                }
+            }
         }
 
         switch (mnTabTypeAux01) {
@@ -469,6 +482,12 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
 
         msSql = "SELECT d.id_year, d.id_doc, d.dt, d.dt_doc_delivery_n, d.num_ref, d.b_close, d.b_del, d.ts_close, " +
                 "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
+                (isViewDocsPending() || isViewDocsRejected() ? 
+                ("IF(d.aut_authorn_rej = " + SDataDps.AUT_AUTHORN_REJ_LIM_USR + ", '" + SDataDps.AutAuthornRejMap.get(SDataDps.AUT_AUTHORN_REJ_LIM_USR) + "', " +
+                "IF(d.aut_authorn_rej = " + SDataDps.AUT_AUTHORN_REJ_LIM_USR_MON + ", '" + SDataDps.AutAuthornRejMap.get(SDataDps.AUT_AUTHORN_REJ_LIM_USR_MON) + "', " +
+                "IF(d.aut_authorn_rej = " + SDataDps.AUT_AUTHORN_REJ_LIM_FUNC_MON + ", '" + SDataDps.AutAuthornRejMap.get(SDataDps.AUT_AUTHORN_REJ_LIM_FUNC_MON) + "', '" +
+                SDataDps.AutAuthornRejMap.get(SDataDps.AUT_AUTHORN_REJ_NA) + "'))) " +
+                "AS _aut_auth_rej, ") : "") + 
                 "d.ts_authorn, d.tot_cur_r, dt.code, c.cur_key, b.id_bp, b.bp, bc.bp_key, bb.id_bpb, bb.bpb, cb.code, sa.st_dps_authorn, ua.usr " +
                 "FROM trn_dps AS d " +
                 "INNER JOIN erp.trnu_tp_dps AS dt ON " +

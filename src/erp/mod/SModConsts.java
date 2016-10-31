@@ -401,7 +401,7 @@ public abstract class SModConsts {
     public static final int TRNX_STK_WAH = 2024003;         // stock by warehouse
     public static final int TRNX_STK_DIOG_TP = 2024004;     // stock-document type
     public static final int TRNX_STK_COST = 2024049;        // stock cost
-    public static final int TRNX_OPER_CTRL = 2024051;       // operations control
+    public static final int TRNX_ORD_LIM_MAX = 2024051;       // operations control
 
     public static final int TRNR_DPS_CON_BP = 2025001;
     public static final int TRNR_CON_STA = 2025002;
@@ -682,7 +682,9 @@ public abstract class SModConsts {
         TablesMap.put(CFGU_COB_ENT, "erp.cfgu_cob_ent");
         TablesMap.put(CFGU_LAN, "erp.cfgu_lan");
         TablesMap.put(CFG_PARAM_ERP, "erp.cfg_param_erp");
+        
         TablesMap.put(CFGU_CERT, "erp.cfgu_cert");
+        TablesMap.put(CFGU_FUNC, "cfgu_func");
 
         TablesMap.put(CFG_MMS, "cfg_mms");
         TablesMap.put(CFG_PARAM_CO, "cfg_param_co");
@@ -706,6 +708,7 @@ public abstract class SModConsts {
         TablesMap.put(USRU_USR, "erp.usru_usr");
 
         TablesMap.put(USR_USR_GUI, "usr_usr_gui");
+        TablesMap.put(USR_USR_FUNC, "usr_usr_func");
 
         TablesMap.put(LOCU_CTY, "erp.locu_cty");
 

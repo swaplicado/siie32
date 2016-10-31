@@ -67,7 +67,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
-import java.io.FileNotFoundException;
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.Vector;
@@ -145,6 +144,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.lib.form.SFormField moFieldFkPaymentSystemTypeId;
     private erp.lib.form.SFormField moFieldPaymentAccount;
     private erp.lib.form.SFormField moFieldFkLanguajeId;
+    private erp.lib.form.SFormField moFieldFkFunctionalAreaId;
     private erp.lib.form.SFormField moFieldFkDpsNatureId;
     private erp.lib.form.SFormField moFieldFkCurrencyId;
     private erp.lib.form.SFormField moFieldFkProductionOrderId_n;
@@ -348,6 +348,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel29 = new javax.swing.JPanel();
         jlFkDpsStatusAuthorization = new javax.swing.JLabel();
         jtfFkDpsStatusAuthorizationRo = new javax.swing.JTextField();
+        jPanel92 = new javax.swing.JPanel();
+        jlFkFunctionalArea = new javax.swing.JLabel();
+        jcbFkFunctionalArea = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel33 = new javax.swing.JPanel();
         jlFkDpsNatureId = new javax.swing.JLabel();
         jcbFkDpsNatureId = new javax.swing.JComboBox<SFormComponentItem>();
@@ -885,7 +888,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Estado del documento:"));
         jPanel3.setLayout(new java.awt.BorderLayout());
 
-        jPanel5.setLayout(new java.awt.GridLayout(11, 1, 0, 1));
+        jPanel5.setLayout(new java.awt.GridLayout(12, 1, 0, 1));
 
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -989,6 +992,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel29.add(jtfFkDpsStatusAuthorizationRo);
 
         jPanel5.add(jPanel29);
+
+        jPanel92.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFkFunctionalArea.setText("Área funcional: *");
+        jlFkFunctionalArea.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel92.add(jlFkFunctionalArea);
+
+        jcbFkFunctionalArea.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel92.add(jcbFkFunctionalArea);
+
+        jPanel5.add(jPanel92);
 
         jPanel33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -2212,6 +2226,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldPaymentAccount = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, (JTextField) jcbPaymentAccount.getEditor().getEditorComponent(), jlPaymentAccount);
         moFieldPaymentAccount.setLengthMax(20);
         moFieldFkLanguajeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkLanguageId, jlFkLanguageId);
+        moFieldFkFunctionalAreaId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkFunctionalArea, jlFkFunctionalArea);
         moFieldFkDpsNatureId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkDpsNatureId, jlFkDpsNatureId);
         moFieldFkCurrencyId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkCurrencyId, jlFkCurrencyId);
         moFieldFkCurrencyId.setPickerButton(jbFkCurrencyId);
@@ -2284,6 +2299,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mvFields.add(moFieldFkPaymentSystemTypeId);
         mvFields.add(moFieldPaymentAccount);
         mvFields.add(moFieldFkLanguajeId);
+        mvFields.add(moFieldFkFunctionalAreaId);
         mvFields.add(moFieldFkDpsNatureId);
         mvFields.add(moFieldIsAudited);
         mvFields.add(moFieldIsAuthorized);
@@ -2766,6 +2782,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             (SLibUtilities.compareKeys(moDpsType.getPrimaryKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_INV) &&
                 miClient.getSessionXXX().getParamsErp().getIsSalesCreditInvoice())
             ? true : false;
+    }
+    
+    private boolean isFunctionalAreasApply() {
+        return !mbIsSales && mbIsOrd && miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas();
     }
 
     private boolean bizPartnerCreditRisk(final int nRiskType, final boolean openDoc) {
@@ -3803,6 +3823,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlFkContactId_n.setEnabled(mbIsSales);
         jcbFkContactId_n.setEnabled(mbIsSales);
         jckIsRebill.setEnabled(mbIsOrd);
+        
+        jcbFkFunctionalArea.setEnabled(isFunctionalAreasApply());
     }
 
     private void updateFormEditStatus(boolean enable) {
@@ -6699,6 +6721,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JPanel jPanel9;
     private javax.swing.JPanel jPanel90;
     private javax.swing.JPanel jPanel91;
+    private javax.swing.JPanel jPanel92;
     private javax.swing.JTabbedPane jTabbedPane;
     private javax.swing.JButton jbBizPartnerBalance;
     private javax.swing.JButton jbCancel;
@@ -6745,6 +6768,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JComboBox<SFormComponentItem> jcbFkContactId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCurrencyId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkDpsNatureId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkFunctionalArea;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkIncotermId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkLanguageId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkModeOfTransportationTypeId;
@@ -6821,6 +6845,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlFkDpsStatus;
     private javax.swing.JLabel jlFkDpsStatusAuthorization;
     private javax.swing.JLabel jlFkDpsStatusValidity;
+    private javax.swing.JLabel jlFkFunctionalArea;
     private javax.swing.JLabel jlFkIncotermId;
     private javax.swing.JLabel jlFkLanguageId;
     private javax.swing.JLabel jlFkModeOfTransportationTypeId;
@@ -7057,7 +7082,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldFkPaymentTypeId.setFieldValue(new int[] { SDataConstantsSys.TRNS_TP_PAY_CASH });
         moFieldFkPaymentSystemTypeId.setFieldValue(new int[] { SDataConstantsSys.TRNU_TP_PAY_SYS_NA });
         moFieldPaymentAccount.setFieldValue("");
-        moFieldFkDpsNatureId.setFieldValue(new int[] { SDataConstantsSys.TRNU_DPS_NAT_DEF });
+        moFieldFkFunctionalAreaId.setFieldValue(new int[] { SDataConstantsSys.TRNU_DPS_NAT_DEF });
+        if (!isFunctionalAreasApply()) { 
+            moFieldFkDpsNatureId.setFieldValue(new int[] { SModSysConsts.CFGU_FUNC_NON });
+        }
         moFieldFkIncotermId.setFieldValue(new int[] { SModSysConsts.LOGS_INC_NA });
         moFieldFkModeOfTransportationTypeId.setFieldValue(new int[] { SModSysConsts.LOGS_TP_MOT_NA });
         moFieldFkCarrierTypeId.setFieldValue(new int[] { SModSysConsts.LOGS_TP_CAR_NA });
@@ -7156,6 +7184,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         SFormUtilities.populateComboBox(miClient, jcbFkPaymentSystemTypeId, SDataConstants.TRNU_TP_PAY_SYS);
         SFormUtilities.populateComboBox(miClient, jcbFkLanguageId, SDataConstants.CFGU_LAN);
         SFormUtilities.populateComboBox(miClient, jcbFkDpsNatureId, SDataConstants.TRNU_DPS_NAT);
+        if (!isFunctionalAreasApply()) {
+            SFormUtilities.populateComboBox(miClient, jcbFkFunctionalArea, SModConsts.CFGU_FUNC);
+        }
+        else {
+            SFormUtilities.populateComboBox(miClient, jcbFkFunctionalArea, SModConsts.CFGU_FUNC, new int[] { miClient.getSessionXXX().getUser().getPkUserId() });
+        }
         SFormUtilities.populateComboBox(miClient, jcbFkCurrencyId, SDataConstants.CFGU_CUR);
         SFormUtilities.populateComboBox(miClient, jcbAdjustmentSubtypeId, SDataConstants.TRNS_STP_DPS_ADJ);
         SFormUtilities.populateComboBox(miClient, jcbTaxRegionId, SDataConstants.FINU_TAX_REG);
@@ -7691,6 +7725,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldFkPaymentSystemTypeId.setFieldValue(new int[] { moDps.getFkPaymentSystemTypeId() });
         renderLastPaymentSettings(moDps.getFkBizPartnerId_r());
         moFieldFkLanguajeId.setFieldValue(new int[] { moDps.getFkLanguajeId() });
+        moFieldFkFunctionalAreaId.setFieldValue(new int[] { moDps.getFkFunctionalAreaId() });
         moFieldFkDpsNatureId.setFieldValue(new int[] { moDps.getFkDpsNatureId() });
         moFieldFkCurrencyId.setFieldValue(new int[] { !mbIsLocalCurrency ? moDps.getFkCurrencyId() : miClient.getSessionXXX().getParamsErp().getFkCurrencyId()});
         setBizPartner(new int[] { moDps.getFkBizPartnerId_r() }, new int[] { moDps.getFkBizPartnerBranchId() }, new int[] { moDps.getFkBizPartnerBranchId(), moDps.getFkBizPartnerBranchAddressId() });
@@ -7901,6 +7936,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         //moDps.setFkSalesAgentBizPartnerId_n(...
 
         moDps.setFkLanguajeId(moFieldFkLanguajeId.getKeyAsIntArray()[0]);
+        moDps.setFkFunctionalAreaId(moFieldFkFunctionalAreaId.getKeyAsIntArray()[0]);
         moDps.setFkDpsNatureId(moFieldFkDpsNatureId.getKeyAsIntArray()[0]);
         moDps.setFkCurrencyId(moFieldFkCurrencyId.getKeyAsIntArray()[0]);
         moDps.setFkSalesAgentId_n(mnSalesAgentId_n);
@@ -7993,9 +8029,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
                     moDps.setDbmsDataCfd(cfd);
                 }
-            }
-            catch (FileNotFoundException e) {
-                SLibUtilities.renderException(this, e);
             }
             catch (Exception e) {
                 SLibUtilities.renderException(this, e);
