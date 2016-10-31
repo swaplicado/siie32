@@ -799,7 +799,10 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
     private void readBizPartnerCategory() {
         if (moFieldDbmsPkBizPartnerId.getKeyAsIntArray()[0] > 0) {
             moBizPartnerCategory = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, moFieldDbmsPkBizPartnerId.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
-        }
+        } 
+        else if (moBizPartnerBranchBankAccount != null) {
+             moBizPartnerCategory = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { moBizPartnerBranchBankAccount.getDbmsPkBizPartnerId() }, SLibConstants.EXEC_MODE_SILENT);
+        }   
     }
     
     private void readBizPartnerBranches() {
@@ -1096,7 +1099,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
             moFieldDbmsPkBizPartnerId.setKey(new int[] { moBizPartnerBranchBankAccount.getDbmsPkBizPartnerId() });
             moFieldPkBizPartnerBranchId.setKey(new int[] { moBizPartnerBranchBankAccount.getPkBizPartnerBranchId() });
         }
-
+        
         moFieldFkAccountCashCategoryId.setFieldValue(new int[] { moBizPartnerBranchBankAccount.getFkAccountCashCategoryId() });
         moFieldFkAccountCashTypeId.setFieldValue(new int[] { moBizPartnerBranchBankAccount.getFkAccountCashCategoryId(), moBizPartnerBranchBankAccount.getFkAccountCashTypeId() });
         moFieldFkBankId.setFieldValue(new int[] { moBizPartnerBranchBankAccount.getFkBankId() });
