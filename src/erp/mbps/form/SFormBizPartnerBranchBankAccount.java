@@ -49,7 +49,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.client.SClientInterface miClient;
 
-    private erp.mbps.data.SDataBizPartner moBizPartnerCategory;
+    private erp.mbps.data.SDataBizPartner moBizPartner;
     private erp.mbps.data.SDataBizPartnerBranchBankAccount moBizPartnerBranchBankAccount;
     private erp.lib.form.SFormComboBoxGroup moComboBoxGroupBizPartnerBranch;
     private erp.lib.form.SFormComboBoxGroup moComboBoxGroupCategoryTypeCashAccount;
@@ -495,10 +495,10 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
     }//GEN-LAST:event_jcbDbmsFkBizPartnerIdItemStateChanged
 
     private void jcbDbmsFkBizPartnerIdFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jcbDbmsFkBizPartnerIdFocusLost
-        readBizPartnerCategory();
+        readBizPartner();
         
-        if (moBizPartnerCategory != null) {
-            if (moBizPartnerCategory.getIsCompany()) {
+        if (moBizPartner != null) {
+            if (moBizPartner.getIsCompany()) {
                 if (msMsgError.isEmpty()) {
                     miClient.showMsgBoxWarning(msMsgError = "No se pueden dar de alta cuentas bancarias para empresas.");
                 }
@@ -796,13 +796,10 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         miClient.pickOption(SDataConstants.FINU_CARD_ISS, moFieldFkCardIssuerId, null);
     }
 
-    private void readBizPartnerCategory() {
+    private void readBizPartner() {
         if (moFieldDbmsPkBizPartnerId.getKeyAsIntArray()[0] > 0) {
-            moBizPartnerCategory = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, moFieldDbmsPkBizPartnerId.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
+            moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, moFieldDbmsPkBizPartnerId.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
         } 
-        else if (moBizPartnerBranchBankAccount != null) {
-             moBizPartnerCategory = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { moBizPartnerBranchBankAccount.getDbmsPkBizPartnerId() }, SLibConstants.EXEC_MODE_SILENT);
-        }   
     }
     
     private void readBizPartnerBranches() {
@@ -967,7 +964,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         mnFormStatus = SLibConstants.UNDEFINED;
         mbFirstTime = true;
 
-        moBizPartnerCategory = null;
+        moBizPartner = null;
         moBizPartnerBranchBankAccount = null;
 
         for (int i = 0; i < mvFields.size(); i++) {
@@ -1143,8 +1140,10 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
 
         renderBizPartnerSettings();
         renderBankAccountCardSettings();
-        readBizPartnerCategory();
-        jckIsDeleted.setEnabled(moBizPartnerCategory != null && !moBizPartnerCategory.getIsCompany() ? true : false);
+        
+        moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { moBizPartnerBranchBankAccount.getDbmsPkBizPartnerId() }, SLibConstants.EXEC_MODE_SILENT);
+       
+        jckIsDeleted.setEnabled(moBizPartner != null && !moBizPartner.getIsCompany() ? true : false);
         jbDbmsFkBizPartnerId.setEnabled(false);
         jbPkBizPartnerBranchId.setEnabled(false);
     }
