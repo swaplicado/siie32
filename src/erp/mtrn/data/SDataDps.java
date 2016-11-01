@@ -88,10 +88,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public static final String MSG_ERR_ACC_UNK_ = "No se encontró la configuración de cuentas contables para el ";
     public static final String MSG_ERR_ACC_EMP_ = "La configuración de cuentas contables está vacía para el ";
     
-    public static final int AUT_AUTHORN_REJ_NA = 1;
-    public static final int AUT_AUTHORN_REJ_LIM_USR = 2;
-    public static final int AUT_AUTHORN_REJ_LIM_USR_MON = 3;
-    public static final int AUT_AUTHORN_REJ_LIM_FUNC_MON = 4;
+    public static final int AUT_AUTHORN_REJ_NA = 0;
+    public static final int AUT_AUTHORN_REJ_LIM_USR = 1;
+    public static final int AUT_AUTHORN_REJ_LIM_USR_MON = 2;
+    public static final int AUT_AUTHORN_REJ_LIM_FUNC_MON = 3;
     
     public static final String TXT_AUT_AUTHORN_REJ_NA = "No aplica";
     public static final String TXT_AUT_AUTHORN_REJ_LIM_USR = "Tope evento usuario";
