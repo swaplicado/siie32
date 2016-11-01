@@ -41,13 +41,15 @@ public class SXmlBankLayoutPaymentDoc extends SXmlElement {
         moRowCurrency = new SXmlAttribute(ATT_LAY_ROW_CUR);
         moRowExchangeRate = new SXmlAttribute(ATT_LAY_ROW_EXT_RATE);
         moRowObservation = new SXmlAttribute(ATT_LAY_ROW_OBS);
-
+        
         mvXmlAttributes.add(moRowDpsYear);
         mvXmlAttributes.add(moRowDpsDoc);
         mvXmlAttributes.add(moRowAmount);
+        /*
         mvXmlAttributes.add(moRowAmountCy);
         mvXmlAttributes.add(moRowCurrency);
         mvXmlAttributes.add(moRowExchangeRate);
         mvXmlAttributes.add(moRowObservation);
+        */
     }
 }

@@ -67,9 +67,11 @@ public class SDbBankLayout extends SDbRegistryUser {
     protected int mnTransfersPayed;
     protected int mnDocs;
     protected int mnDocsPayed;
+    protected int mnLayoutStatus;
     protected String msLayoutText;
     protected String msLayoutXml;
     protected int mnTransactionType;
+    protected int mnAuthorizationRequests;
     protected boolean mbClosedPayment;
     //protected boolean mbDeleted;
     protected int mnFkBankLayoutTypeId;
@@ -863,8 +865,10 @@ public class SDbBankLayout extends SDbRegistryUser {
     public void setLayoutXml(String s) { msLayoutXml = s; }
     public void setTransactionType(int n) { mnTransactionType = n; }
     public void setClosedPayment(boolean b) { mbClosedPayment = b; }
+    public void setLayoutStatus(int n) { mnLayoutStatus = n; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkBankLayoutTypeId(int n) { mnFkBankLayoutTypeId = n; }
+    public void setAuthorizationRequests(int n) { mnAuthorizationRequests = n; }
     public void setFkBankCompanyBranchId(int n) { mnFkBankCompanyBranchId = n; }
     public void setFkBankAccountCashId(int n) { mnFkBankAccountCashId = n; }
     public void setFkDocsCur(int n) { mnFkDocsCur = n; }
@@ -888,11 +892,13 @@ public class SDbBankLayout extends SDbRegistryUser {
     public double getAmountPayed() { return mdAmountPayed; }
     public int getTransfers() { return mnTransfers; }
     public int getTransfersPayed() { return mnTransfersPayed; }
+    public int getLayoutStatus() { return mnLayoutStatus; }
     public int getDocs() { return mnDocs; }
     public int getDocsPayed() { return mnDocsPayed; }
     public String getLayoutText() { return msLayoutText; }
     public String getLayoutXml() { return msLayoutXml; }
     public int getTransactionType() { return mnTransactionType; }
+    public int getAuthorizationRequests() { return mnAuthorizationRequests; }
     public boolean isClosedPayment() { return mbClosedPayment; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkBankLayoutTypeId() { return mnFkBankLayoutTypeId; }
@@ -945,9 +951,11 @@ public class SDbBankLayout extends SDbRegistryUser {
         mnTransfersPayed = 0;
         mnDocs = 0;
         mnDocsPayed = 0;
+        mnLayoutStatus = 0;
         msLayoutText = "";
         msLayoutXml = "";
         mnTransactionType = 0;
+        mnAuthorizationRequests = 0;
         mbClosedPayment = false;
         mbDeleted = false;
         mnFkBankLayoutTypeId = 0;
@@ -1023,9 +1031,11 @@ public class SDbBankLayout extends SDbRegistryUser {
             mnTransfersPayed = resultSet.getInt("tra_pay");
             mnDocs = resultSet.getInt("dps");
             mnDocsPayed = resultSet.getInt("dps_pay");
+            mnLayoutStatus = resultSet.getInt("lay_st");
             msLayoutText = resultSet.getString("lay_txt");
             msLayoutXml = resultSet.getString("lay_xml");
             mnTransactionType = resultSet.getInt("trn_tp");
+            mnAuthorizationRequests = resultSet.getInt("auth_req");
             mbClosedPayment = resultSet.getBoolean("b_clo_pay");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkBankLayoutTypeId = resultSet.getInt("fk_tp_lay_bank");
@@ -1080,9 +1090,11 @@ public class SDbBankLayout extends SDbRegistryUser {
                     mnTransfersPayed + ", " + 
                     mnDocs + ", " + 
                     mnDocsPayed + ", " + 
+                    mnLayoutStatus + ", " + 
                     "'" + msLayoutText + "', " + 
                     "'" + msLayoutXml + "', " +
                     mnTransactionType + ", " + 
+                    mnAuthorizationRequests + ", " + 
                     (mbClosedPayment ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     mnFkBankLayoutTypeId + ", " + 
@@ -1111,9 +1123,11 @@ public class SDbBankLayout extends SDbRegistryUser {
                     "tra_pay = " + mnTransfersPayed + ", " +
                     "dps = " + mnDocs + ", " +
                     "dps_pay = " + mnDocsPayed + ", " +
+                    "lay_st = " + mnLayoutStatus + ", " +
                     "lay_txt = '" + msLayoutText + "', " +
                     "lay_xml = '" + msLayoutXml + "', " +
                     "trn_tp = " + mnTransactionType + ", " +
+                    "auth_req = " + mnAuthorizationRequests + ", " +
                     "b_clo_pay = " + (mbClosedPayment ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_tp_lay_bank = " + mnFkBankLayoutTypeId + ", " +
@@ -1150,9 +1164,11 @@ public class SDbBankLayout extends SDbRegistryUser {
         registry.setTransfersPayed(this.getTransfersPayed());
         registry.setDocs(this.getDocs());
         registry.setDocsPayed(this.getDocsPayed());
+        registry.setLayoutStatus(this.getLayoutStatus());
         registry.setLayoutText(this.getLayoutText());
         registry.setLayoutXml(this.getLayoutXml());
         registry.setTransactionType(this.getTransactionType());
+        registry.setAuthorizationRequests(this.getAuthorizationRequests());
         registry.setClosedPayment(this.isClosedPayment());
         registry.setDeleted(this.isDeleted());
         registry.setFkBankLayoutTypeId(this.getFkBankLayoutTypeId());

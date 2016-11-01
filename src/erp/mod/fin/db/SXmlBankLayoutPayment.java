@@ -106,9 +106,9 @@ public class SXmlBankLayoutPayment extends SXmlElement {
         mvXmlAttributes.add(moPayReference);
         mvXmlAttributes.add(moPayConcept);
         mvXmlAttributes.add(moPayAmount);
-        mvXmlAttributes.add(moPayAmountCy);
-        mvXmlAttributes.add(moPayCurrency);
-        mvXmlAttributes.add(moPayExchangeRate);
+       // mvXmlAttributes.add(moPayAmountCy);
+       // mvXmlAttributes.add(moPayCurrency);
+        //mvXmlAttributes.add(moPayExchangeRate);
         mvXmlAttributes.add(moPayHsbcFiscalVoucher);
         mvXmlAttributes.add(moPayHsbcAccountType);
         mvXmlAttributes.add(moPayHsbcBankCode);
