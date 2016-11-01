@@ -265,6 +265,7 @@ public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistr
 
             for (SDataUserFunctionalArea userFunctionalArea : maUserFunctionalArea) {
                 userFunctionalArea.setPkUserId(mnPkUserId);
+                userFunctionalArea.setIsRegistryNew(true);
 
                 if (userFunctionalArea.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
