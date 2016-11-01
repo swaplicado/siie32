@@ -7086,6 +7086,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         if (!isFunctionalAreasApply()) { 
             moFieldFkDpsNatureId.setFieldValue(new int[] { SModSysConsts.CFGU_FUNC_NON });
         }
+        else {
+            if (jcbFkFunctionalArea.getItemCount() == 2) {
+                jcbFkFunctionalArea.setSelectedIndex(1);
+            }
+        }
         moFieldFkIncotermId.setFieldValue(new int[] { SModSysConsts.LOGS_INC_NA });
         moFieldFkModeOfTransportationTypeId.setFieldValue(new int[] { SModSysConsts.LOGS_TP_MOT_NA });
         moFieldFkCarrierTypeId.setFieldValue(new int[] { SModSysConsts.LOGS_TP_CAR_NA });

@@ -770,12 +770,14 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
                 validation.setIsError(true);
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlPurchasesOrderLimitMonthly_n.getText() + "'.");
                 validation.setComponent(jtfPurchasesOrderLimitMonthly_n);
+                jTabbedPane.setSelectedIndex(0);
             }
             
             if (!validation.getIsError() && moFieldSalesOrderLimitMonthly_n.getDouble() > 0 && moFieldSalesOrderLimitMonthly_n.getDouble() < moFieldSalesOrderLimit_n.getDouble()) {
                 validation.setIsError(true);
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlSalesOrderLimitMonthly_n.getText() + "'.");
                 validation.setComponent(jtfSalesOrderLimitMonthly_n);
+                jTabbedPane.setSelectedIndex(0);
             }
         }
 
