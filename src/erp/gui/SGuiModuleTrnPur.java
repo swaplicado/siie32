@@ -1038,7 +1038,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                     break;
                 
                 case SDataConstants.TRNU_TP_DPS_ANN:
-                    oViewClass = erp.mtrn.view.SViewDpsAudit.class;
+                    oViewClass = erp.mtrn.view.SViewDpsAnnulled.class;
                     sViewTitle = "CPA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02) + " anulad@s";
                     break;
 

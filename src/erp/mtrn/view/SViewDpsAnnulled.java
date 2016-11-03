@@ -44,7 +44,7 @@ public class SViewDpsAnnulled extends erp.lib.table.STableTab implements java.aw
      * @param auxType02 Constants defined in SDataConstantsSys (TRNX_TP_DPS...).
      */
     public SViewDpsAnnulled(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01, int auxType02) {
-        super(client, tabTitle, SDataConstants.TRN_DPS, auxType01, auxType02);
+        super(client, tabTitle, SDataConstants.TRNU_TP_DPS_ANN, auxType01, auxType02);
         initComponents();
     }
 
@@ -225,7 +225,8 @@ public class SViewDpsAnnulled extends erp.lib.table.STableTab implements java.aw
         msSql +=
                 "FROM trn_dps AS d " +
                 "INNER JOIN erp.bpsu_bp AS bp ON d.fid_bp_r = bp.id_bp " +
-                "INNER JOIN erp.bpsu_bp_ct AS bpc ON bp.id_bp = bpc.id_bp " +
+                "INNER JOIN erp.bpsu_bp_ct AS bpc ON bp.id_bp = bpc.id_bp AND bpc.id_ct_bp = " +
+                (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS) + " " +
                 "INNER JOIN erp.bpsu_bpb AS bpb ON d.fid_bpb = bpb.id_bpb " +
                 "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps ";
 
@@ -236,8 +237,16 @@ public class SViewDpsAnnulled extends erp.lib.table.STableTab implements java.aw
                 "INNER JOIN erp.usru_usr AS ue ON d.fid_usr_edit = ue.id_usr " +
                 "INNER JOIN erp.usru_usr AS ud ON d.fid_usr_del = ud.id_usr " +
                 "LEFT OUTER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n AND d.id_doc = x.fid_dps_doc_n ";
-
-        msSql += (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere);
+        
+                if (mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_DOC) {
+                    msSql += "WHERE " + (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR ? "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1] + " AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] + " " :
+                                        "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1] + " AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2] + " ");
+                }
+                else if (mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ADJ) {
+                    msSql += "WHERE " + (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR ? "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CN[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] + " AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CN[2] + " " :
+                                        "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CN[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CN[1] + " AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CN[2] + " ");
+                }
+                msSql += (sqlWhere.length() == 0 ? "" : "AND " + sqlWhere);
 
         if (getDpsSortingType() == SDataConstantsSys.CFGS_TP_SORT_BIZ_P_DOC) {
             msSql += "ORDER BY ";
