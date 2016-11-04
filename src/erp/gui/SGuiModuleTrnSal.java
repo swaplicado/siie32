@@ -1200,7 +1200,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
 
                 case SDataConstants.MKT_PLIST_ITEM:
                     oViewClass = erp.mmkt.view.SViewPriceListItem.class;
-                    sViewTitle = "VTA - Precios de ítems";
+                    sViewTitle = "VTA - Precios de ventas";
                     break;
 
                 case SDataConstants.TRNX_DPS_BACKORDER:

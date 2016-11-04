@@ -1059,7 +1059,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                     
                 case SDataConstants.MKT_PLIST_ITEM:
                     oViewClass = erp.mmkt.view.SViewPriceListItem.class;
-                    sViewTitle = "CPA - Precios de ítems";
+                    sViewTitle = "CPA - Precios de compras";
                     break;
 
                 case SDataConstants.TRNX_DPS_BACKORDER:
