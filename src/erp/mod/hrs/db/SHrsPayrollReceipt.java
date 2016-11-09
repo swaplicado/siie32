@@ -790,17 +790,17 @@ public class SHrsPayrollReceipt {
                     case SHrsConsts.SS_INC_MON:
                     case SHrsConsts.SS_INC_PEN:
                         //dEarningSsc = SLibUtils.round((moReceipt.getDaysHiredPayroll() - moReceipt.getDaysIncapacityNotPaidPayroll()) * moReceipt.getSalarySscBase(), SUtilConsts.DECS_AMT);
-                        dEarningSsc = SLibUtils.round((hrsDaysPrev.getDaysPeriodPayroll() + hrsDaysCurr.getDaysPeriodPayroll() + hrsDaysNext.getDaysPeriodPayroll() - hrsDaysPrev.getDaysPeriodPayrollIncapacityNotPaid() - hrsDaysCurr.getDaysPeriodPayrollIncapacityNotPaid() - hrsDaysNext.getDaysPeriodPayrollIncapacityNotPaid()) * moReceipt.getSalarySscBase(), SUtilConsts.DECS_AMT);
+                        dEarningSsc = SLibUtils.round((hrsDaysPrev.getPeriodPayrollDays() + hrsDaysCurr.getPeriodPayrollDays() + hrsDaysNext.getPeriodPayrollDays() - hrsDaysPrev.getDaysIncapacityNotPaid() - hrsDaysCurr.getDaysIncapacityNotPaid() - hrsDaysNext.getDaysIncapacityNotPaid()) * moReceipt.getSalarySscBase(), SUtilConsts.DECS_AMT);
                         break;
                     case SHrsConsts.SS_INC_KND_SSC_LET:
                         //dEarningSsc = SLibUtils.round((moReceipt.getDaysHiredPayroll() - moReceipt.getDaysIncapacityNotPaidPayroll()) * moHrsPayroll.getPayroll().getMwzReferenceWage(), SUtilConsts.DECS_AMT);
-                        dEarningSsc = SLibUtils.round((hrsDaysPrev.getDaysPeriodPayroll() + hrsDaysCurr.getDaysPeriodPayroll() + hrsDaysNext.getDaysPeriodPayroll() - hrsDaysPrev.getDaysPeriodPayrollIncapacityNotPaid() - hrsDaysCurr.getDaysPeriodPayrollIncapacityNotPaid() - hrsDaysNext.getDaysPeriodPayrollIncapacityNotPaid()) * moHrsPayroll.getPayroll().getMwzReferenceWage(), SUtilConsts.DECS_AMT);
+                        dEarningSsc = SLibUtils.round((hrsDaysPrev.getPeriodPayrollDays() + hrsDaysCurr.getPeriodPayrollDays() + hrsDaysNext.getPeriodPayrollDays() - hrsDaysPrev.getDaysIncapacityNotPaid() - hrsDaysCurr.getDaysIncapacityNotPaid() - hrsDaysNext.getDaysIncapacityNotPaid()) * moHrsPayroll.getPayroll().getMwzReferenceWage(), SUtilConsts.DECS_AMT);
                         break;
                     case SHrsConsts.SS_INC_KND_SSC_GT:
                         //dEarningSsc = SLibUtils.round(moReceipt.getSalarySscBase() <= (dbSscTableRow.getLowerLimitMwzReference() * moHrsPayroll.getPayroll().getMwzReferenceWage()) ? 0 :
                         //       ((moReceipt.getDaysHiredPayroll() - moReceipt.getDaysIncapacityNotPaidPayroll()) * (moReceipt.getSalarySscBase() - (dbSscTableRow.getLowerLimitMwzReference() * moHrsPayroll.getPayroll().getMwzReferenceWage()))), SUtilConsts.DECS_AMT);
                         dEarningSsc = SLibUtils.round(moReceipt.getSalarySscBase() <= (dbSscTableRow.getLowerLimitMwzReference() * moHrsPayroll.getPayroll().getMwzReferenceWage()) ? 0 :
-                               ((hrsDaysPrev.getDaysPeriodPayroll() + hrsDaysCurr.getDaysPeriodPayroll() + hrsDaysNext.getDaysPeriodPayroll() - hrsDaysPrev.getDaysPeriodPayrollIncapacityNotPaid() - hrsDaysCurr.getDaysPeriodPayrollIncapacityNotPaid() - hrsDaysNext.getDaysPeriodPayrollIncapacityNotPaid()) * (moReceipt.getSalarySscBase() - (dbSscTableRow.getLowerLimitMwzReference() * moHrsPayroll.getPayroll().getMwzReferenceWage()))), SUtilConsts.DECS_AMT);
+                               ((hrsDaysPrev.getPeriodPayrollDays() + hrsDaysCurr.getPeriodPayrollDays() + hrsDaysNext.getPeriodPayrollDays() - hrsDaysPrev.getDaysIncapacityNotPaid() - hrsDaysCurr.getDaysIncapacityNotPaid() - hrsDaysNext.getDaysIncapacityNotPaid()) * (moReceipt.getSalarySscBase() - (dbSscTableRow.getLowerLimitMwzReference() * moHrsPayroll.getPayroll().getMwzReferenceWage()))), SUtilConsts.DECS_AMT);
                         break;
                     case SHrsConsts.SS_DIS_LIF:
                     case SHrsConsts.SS_CRE:
@@ -809,7 +809,7 @@ public class SHrsPayrollReceipt {
                     case SHrsConsts.SS_SEV:
                     case SHrsConsts.SS_HOM:
                         //dEarningSsc = SLibUtils.round((moReceipt.getDaysHiredPayroll() - moReceipt.getDaysNotWorkedNotPaid()) * moReceipt.getSalarySscBase(), SUtilConsts.DECS_AMT);
-                        dEarningSsc = SLibUtils.round((hrsDaysPrev.getDaysPeriodPayroll() + hrsDaysCurr.getDaysPeriodPayroll() + hrsDaysNext.getDaysPeriodPayroll() - hrsDaysPrev.getDaysPeriodPayrollNotWorkedNotPaid() - hrsDaysCurr.getDaysPeriodPayrollNotWorkedNotPaid() - hrsDaysNext.getDaysPeriodPayrollNotWorkedNotPaid()) * moReceipt.getSalarySscBase(), SUtilConsts.DECS_AMT);
+                        dEarningSsc = SLibUtils.round((hrsDaysPrev.getPeriodPayrollDays() + hrsDaysCurr.getPeriodPayrollDays() + hrsDaysNext.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid() - hrsDaysCurr.getDaysNotWorkedNotPaid() - hrsDaysNext.getDaysNotWorkedNotPaid()) * moReceipt.getSalarySscBase(), SUtilConsts.DECS_AMT);
                         break;
                     default:
                         throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -1440,8 +1440,11 @@ public class SHrsPayrollReceipt {
     }
      
     public void computeHrsDaysByPeriod() throws Exception {
+        int difDays = 0;
         int year = 0;
         int periodYear = 0;
+        int daysNotWorkedNotPaid = 0;
+        int daysIncapacityNotPaid = 0;
         SHrsEmployeeDays employeeDays = moHrsEmployee.getEmployeeDays();
         SHrsDaysByPeriod hrsDaysPrev = null;
         SHrsDaysByPeriod hrsDaysCurr = null;
@@ -1468,6 +1471,38 @@ public class SHrsPayrollReceipt {
         
         hrsDaysNext = createHrsDaysByPeriod(year, periodYear);
         
+        for (SDbAbsenceConsumption absenceConsumption : maAbsenceConsumptionDays) {
+            difDays = absenceConsumption.getEffectiveDays();
+
+            for (int i = 0; i < difDays; i++) {
+                if (!absenceConsumption.getAbsence().IsAuxAbsencePayable() &&
+                    absenceConsumption.getAbsence().getFkAbsenceClassId() != SModSysConsts.HRSU_CL_ABS_VAC) {
+                    daysNotWorkedNotPaid++; // sum days not worked and not paid (DNWNP)
+
+                    if (absenceConsumption.getAbsence().getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_DIS) {
+                        daysIncapacityNotPaid++; // sum days of incapacity not paid (DINP)
+                    }
+                }
+            }
+        }
+        
+        // Set DNWNP and DINP for previous period:
+        hrsDaysPrev.setDaysNotPaid(daysNotWorkedNotPaid, daysIncapacityNotPaid);
+        
+        // Get pending DNWNP and DINP to set:
+        daysNotWorkedNotPaid -= hrsDaysPrev.getDaysNotWorkedNotPaid();
+        daysIncapacityNotPaid -= hrsDaysPrev.getDaysIncapacityNotPaid();
+        
+        // Set DNWNP and DINP for current period:
+        hrsDaysCurr.setDaysNotPaid(daysNotWorkedNotPaid, daysIncapacityNotPaid);
+        
+        // Get pending DNTNP and DINP days to set:
+        daysNotWorkedNotPaid -= hrsDaysCurr.getDaysNotWorkedNotPaid();
+        daysIncapacityNotPaid -= hrsDaysCurr.getDaysIncapacityNotPaid();
+        
+        // Set DNWNP and DINP for next period:
+        hrsDaysNext.setDaysNotPaid(daysNotWorkedNotPaid, daysIncapacityNotPaid);
+        
         moHrsEmployee.setHrsDaysPrev(hrsDaysPrev);
         moHrsEmployee.setHrsDaysCurr(hrsDaysCurr);
         moHrsEmployee.setHrsDaysNext(hrsDaysNext);
@@ -1476,8 +1511,6 @@ public class SHrsPayrollReceipt {
     private SHrsDaysByPeriod createHrsDaysByPeriod(final int year, final int periodYear) {
         int daysPeriod = 0;
         int daysPeriodPayroll = 0;
-        int daysPeriodPayrollNotWorkedNotPaid = 0;
-        int daysPeridPayrollIncapacityNotPaid = 0;
         int difDays = 0;
         Date dateStart = null;
         Date dateEnd = null;
@@ -1495,49 +1528,11 @@ public class SHrsPayrollReceipt {
                 }
             }
         }
-
-        if (daysPeriodPayroll > 0) {
-            /* XXX (jbarajas, 2016-08-25) Consume days absences inside payroll.
-            for (SDbAbsenceConsumption absenceConsumption : moHrsEmployee.getAbsencesConsumptions()) {
-                difDays = absenceConsumption.getEffectiveDays();
-                
-                for (int i = 0; i < difDays; i++) {
-                    if (SLibTimeUtils.isBelongingToPeriod(SLibTimeUtils.addDate(absenceConsumption.getDateStart(), 0, 0, i), year, periodYear) &&
-                        SLibTimeUtils.isBelongingToPeriod(SLibTimeUtils.addDate(absenceConsumption.getDateStart(), 0, 0, i), moHrsEmployee.getPeriodStart(), moHrsEmployee.getPeriodEnd()) &&
-                        !absenceConsumption.getAbsence().IsAuxAbsencePayable() &&
-                        absenceConsumption.getAbsence().getFkAbsenceClassId() != SModSysConsts.HRSU_CL_ABS_VAC) {
-                        daysPeriodPayrollNotWorkedNotPaid++;
-                        
-                        if (absenceConsumption.getAbsence().getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_DIS) {
-                            daysPeridPayrollIncapacityNotPaid++;
-                        }
-                    }
-                }
-            }
-            */
-            
-            for (SDbAbsenceConsumption absenceConsumption : maAbsenceConsumptionDays) {
-                difDays = absenceConsumption.getEffectiveDays();
-                
-                for (int i = 0; i < difDays; i++) {
-                    /* XXX (jbarajas, 2016-08-25) Consume days absences inside payroll.
-                    if (SLibTimeUtils.isBelongingToPeriod(SLibTimeUtils.addDate(absenceConsumption.getDateStart(), 0, 0, i), year, periodYear) &&
-                        SLibTimeUtils.isBelongingToPeriod(SLibTimeUtils.addDate(absenceConsumption.getDateStart(), 0, 0, i), moHrsEmployee.getPeriodStart(), moHrsEmployee.getPeriodEnd()) &&
-                    */
-                    if (!absenceConsumption.getAbsence().IsAuxAbsencePayable() &&
-                        absenceConsumption.getAbsence().getFkAbsenceClassId() != SModSysConsts.HRSU_CL_ABS_VAC) {
-                        daysPeriodPayrollNotWorkedNotPaid++;
-                        
-                        if (absenceConsumption.getAbsence().getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_DIS) {
-                            daysPeridPayrollIncapacityNotPaid++;
-                        }
-                    }
-                }
-            }
-        }
         
-        return new SHrsDaysByPeriod(year, periodYear, daysPeriod, daysPeriodPayroll, daysPeriodPayrollNotWorkedNotPaid, daysPeridPayrollIncapacityNotPaid);
+        return new SHrsDaysByPeriod(year, periodYear, daysPeriod, daysPeriodPayroll);
     }
+    
+    
     
     public boolean validateAbsenceConsumption(SDbAbsence absence, SDbAbsenceConsumption absenceConsumption) throws Exception {
         int diferencePendingDays = 0;

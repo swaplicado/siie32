@@ -2249,21 +2249,21 @@ public abstract class SHrsUtils {
                     amoutAux = (amoutAux > balanceLoan ? balanceLoan : amoutAux);
                 }
                 else {
-                    amoutAux += hrsDaysPrev == null ? 0 : (amoutMonth / hrsDaysPrev.getDaysPeriod() * (hrsDaysPrev.getDaysPeriodPayroll() - hrsDaysPrev.getDaysPeriodPayrollNotWorkedNotPaid()));
-                    amoutAux += amoutMonth / hrsDaysCurr.getDaysPeriod() * (hrsDaysCurr.getDaysPeriodPayroll() - hrsDaysCurr.getDaysPeriodPayrollNotWorkedNotPaid());
-                    amoutAux += hrsDaysNext == null ? 0 : (amoutMonth / hrsDaysNext.getDaysPeriod() * (hrsDaysNext.getDaysPeriodPayroll() - hrsDaysNext.getDaysPeriodPayrollNotWorkedNotPaid()));
+                    amoutAux += hrsDaysPrev == null ? 0 : (amoutMonth / hrsDaysPrev.getPeriodDays() * (hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()));
+                    amoutAux += amoutMonth / hrsDaysCurr.getPeriodDays() * (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid());
+                    amoutAux += hrsDaysNext == null ? 0 : (amoutMonth / hrsDaysNext.getPeriodDays() * (hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()));
                 }
                 break;
             case SModSysConsts.HRSS_TP_LOAN_PAY_FIX:
                 amoutMonth = loan.getPaymentFixed() * hrsReceipt.getHrsPayroll().getPayroll().getMwzReferenceWage() + amoutAdjustment;
-                amoutAux += hrsDaysPrev == null ? 0 : (amoutMonth / hrsDaysPrev.getDaysPeriod() * (hrsDaysPrev.getDaysPeriodPayroll() - hrsDaysPrev.getDaysPeriodPayrollNotWorkedNotPaid()));
-                amoutAux += amoutMonth / hrsDaysCurr.getDaysPeriod() * (hrsDaysCurr.getDaysPeriodPayroll() - hrsDaysCurr.getDaysPeriodPayrollNotWorkedNotPaid());
-                amoutAux += hrsDaysNext == null ? 0 : (amoutMonth / hrsDaysNext.getDaysPeriod() * (hrsDaysNext.getDaysPeriodPayroll() - hrsDaysNext.getDaysPeriodPayrollNotWorkedNotPaid()));
+                amoutAux += hrsDaysPrev == null ? 0 : (amoutMonth / hrsDaysPrev.getPeriodDays() * (hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()));
+                amoutAux += amoutMonth / hrsDaysCurr.getPeriodDays() * (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid());
+                amoutAux += hrsDaysNext == null ? 0 : (amoutMonth / hrsDaysNext.getPeriodDays() * (hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()));
                 break;
             case SModSysConsts.HRSS_TP_LOAN_PAY_PER:
-                adjustmentAux += hrsDaysPrev == null ? 0 : (double) ((hrsDaysPrev.getDaysPeriodPayroll() - hrsDaysPrev.getDaysPeriodPayrollNotWorkedNotPaid()) / hrsDaysPrev.getDaysPeriod()) * amoutAdjustment;
-                adjustmentAux += (double) (hrsDaysCurr.getDaysPeriodPayroll() - hrsDaysCurr.getDaysPeriodPayrollNotWorkedNotPaid()) / hrsDaysCurr.getDaysPeriod() * amoutAdjustment;
-                adjustmentAux += hrsDaysNext == null ? 0 : (double) ((hrsDaysNext.getDaysPeriodPayroll() - hrsDaysNext.getDaysPeriodPayrollNotWorkedNotPaid()) / hrsDaysNext.getDaysPeriod() * amoutAdjustment);
+                adjustmentAux += hrsDaysPrev == null ? 0 : (double) ((hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()) / hrsDaysPrev.getPeriodDays()) * amoutAdjustment;
+                adjustmentAux += (double) (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid()) / hrsDaysCurr.getPeriodDays() * amoutAdjustment;
+                adjustmentAux += hrsDaysNext == null ? 0 : (double) ((hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()) / hrsDaysNext.getPeriodDays() * amoutAdjustment);
                 
                 if (loan.getPaymentPercentageReference() == SHrsConsts.SAL_REF_SAL) {
                     salaryReference = hrsReceipt.getReceipt().getPaymentDaily();
@@ -2357,17 +2357,17 @@ public abstract class SHrsUtils {
                 case SHrsConsts.SS_INC_MON:
                 case SHrsConsts.SS_INC_PEN:
                     //dEarningSsc = SLibUtils.round((moReceipt.getDaysHiredPayroll() - moReceipt.getDaysIncapacityNotPaidPayroll()) * moReceipt.getSalarySscBase(), SUtilConsts.DECS_AMT);
-                    dEarningSsc = SLibUtils.round((hrsDaysPrev.getDaysPeriodPayroll() + hrsDaysCurr.getDaysPeriodPayroll() + hrsDaysNext.getDaysPeriodPayroll() - hrsDaysPrev.getDaysPeriodPayrollIncapacityNotPaid() - hrsDaysCurr.getDaysPeriodPayrollIncapacityNotPaid() - hrsDaysNext.getDaysPeriodPayrollIncapacityNotPaid()) * dSalarySsc, SUtilConsts.DECS_AMT);
+                    dEarningSsc = SLibUtils.round((hrsDaysPrev.getPeriodPayrollDays() + hrsDaysCurr.getPeriodPayrollDays() + hrsDaysNext.getPeriodPayrollDays() - hrsDaysPrev.getDaysIncapacityNotPaid() - hrsDaysCurr.getDaysIncapacityNotPaid() - hrsDaysNext.getDaysIncapacityNotPaid()) * dSalarySsc, SUtilConsts.DECS_AMT);
                     break;
                 case SHrsConsts.SS_INC_KND_SSC_LET:
                     //dEarningSsc = SLibUtils.round((moReceipt.getDaysHiredPayroll() - moReceipt.getDaysIncapacityNotPaidPayroll()) * moHrsPayroll.getPayroll().getMwzReferenceWage(), SUtilConsts.DECS_AMT);
-                    dEarningSsc = SLibUtils.round((hrsDaysPrev.getDaysPeriodPayroll() + hrsDaysCurr.getDaysPeriodPayroll() + hrsDaysNext.getDaysPeriodPayroll() - hrsDaysPrev.getDaysPeriodPayrollIncapacityNotPaid() - hrsDaysCurr.getDaysPeriodPayrollIncapacityNotPaid() - hrsDaysNext.getDaysPeriodPayrollIncapacityNotPaid()) * dMwzReferenceWage, SUtilConsts.DECS_AMT);
+                    dEarningSsc = SLibUtils.round((hrsDaysPrev.getPeriodPayrollDays() + hrsDaysCurr.getPeriodPayrollDays() + hrsDaysNext.getPeriodPayrollDays() - hrsDaysPrev.getDaysIncapacityNotPaid() - hrsDaysCurr.getDaysIncapacityNotPaid() - hrsDaysNext.getDaysIncapacityNotPaid()) * dMwzReferenceWage, SUtilConsts.DECS_AMT);
                     break;
                 case SHrsConsts.SS_INC_KND_SSC_GT:
                     //dEarningSsc = SLibUtils.round(moReceipt.getSalarySscBase() <= (dbSscTableRow.getLowerLimitMwzReference() * moHrsPayroll.getPayroll().getMwzReferenceWage()) ? 0 :
                     //       ((moReceipt.getDaysHiredPayroll() - moReceipt.getDaysIncapacityNotPaidPayroll()) * (moReceipt.getSalarySscBase() - (dbSscTableRow.getLowerLimitMwzReference() * moHrsPayroll.getPayroll().getMwzReferenceWage()))), SUtilConsts.DECS_AMT);
                     dEarningSsc = SLibUtils.round(dSalarySsc <= (dbSscTableRow.getLowerLimitMwzReference() * dMwzReferenceWage) ? 0 :
-                           ((hrsDaysPrev.getDaysPeriodPayroll() + hrsDaysCurr.getDaysPeriodPayroll() + hrsDaysNext.getDaysPeriodPayroll() - hrsDaysPrev.getDaysPeriodPayrollIncapacityNotPaid() - hrsDaysCurr.getDaysPeriodPayrollIncapacityNotPaid() - hrsDaysNext.getDaysPeriodPayrollIncapacityNotPaid()) * (dSalarySsc - (dbSscTableRow.getLowerLimitMwzReference() * dMwzReferenceWage))), SUtilConsts.DECS_AMT);
+                           ((hrsDaysPrev.getPeriodPayrollDays() + hrsDaysCurr.getPeriodPayrollDays() + hrsDaysNext.getPeriodPayrollDays() - hrsDaysPrev.getDaysIncapacityNotPaid() - hrsDaysCurr.getDaysIncapacityNotPaid() - hrsDaysNext.getDaysIncapacityNotPaid()) * (dSalarySsc - (dbSscTableRow.getLowerLimitMwzReference() * dMwzReferenceWage))), SUtilConsts.DECS_AMT);
                     break;
                 case SHrsConsts.SS_DIS_LIF:
                 case SHrsConsts.SS_CRE:
@@ -2376,7 +2376,7 @@ public abstract class SHrsUtils {
                 case SHrsConsts.SS_SEV:
                 case SHrsConsts.SS_HOM:
                     //dEarningSsc = SLibUtils.round((moReceipt.getDaysHiredPayroll() - moReceipt.getDaysNotWorkedNotPaid()) * moReceipt.getSalarySscBase(), SUtilConsts.DECS_AMT);
-                    dEarningSsc = SLibUtils.round((hrsDaysPrev.getDaysPeriodPayroll() + hrsDaysCurr.getDaysPeriodPayroll() + hrsDaysNext.getDaysPeriodPayroll() - hrsDaysPrev.getDaysPeriodPayrollNotWorkedNotPaid() - hrsDaysCurr.getDaysPeriodPayrollNotWorkedNotPaid() - hrsDaysNext.getDaysPeriodPayrollNotWorkedNotPaid()) * dSalarySsc, SUtilConsts.DECS_AMT);
+                    dEarningSsc = SLibUtils.round((hrsDaysPrev.getPeriodPayrollDays() + hrsDaysCurr.getPeriodPayrollDays() + hrsDaysNext.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid() - hrsDaysCurr.getDaysNotWorkedNotPaid() - hrsDaysNext.getDaysNotWorkedNotPaid()) * dSalarySsc, SUtilConsts.DECS_AMT);
                     break;
                 default:
                     throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -2498,9 +2498,9 @@ public abstract class SHrsUtils {
         double dTableFactor = 0;
         int year = SLibTimeUtils.digestYear(dateCut)[0];
         int days = SLibTimeUtils.getMaxDayOfMonth(dateCut);
-        SHrsDaysByPeriod hrsDaysPrev = new SHrsDaysByPeriod(0, 0, 0, 0, 0, 0);
-        SHrsDaysByPeriod hrsDaysCurr = new SHrsDaysByPeriod(year, 0, days, days, 0, 0);
-        SHrsDaysByPeriod hrsDaysNext = new SHrsDaysByPeriod(0, 0, 0, 0, 0, 0);
+        SHrsDaysByPeriod hrsDaysPrev = new SHrsDaysByPeriod(0, 0, 0, 0);
+        SHrsDaysByPeriod hrsDaysCurr = new SHrsDaysByPeriod(year, 0, days, days);
+        SHrsDaysByPeriod hrsDaysNext = new SHrsDaysByPeriod(0, 0, 0, 0);
         
         dSalaryDiary = grossAmount * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
         dSalarySsc = dSalaryDiary * getIntegrationFactorSbc(session, dateBenefit, dateCut);
