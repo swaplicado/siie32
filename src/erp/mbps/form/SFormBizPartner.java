@@ -96,6 +96,10 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private erp.lib.form.SFormField moFieldCompanyKey;
     private erp.lib.form.SFormField moFieldFkCreditTypeId_n;
     private erp.lib.form.SFormField moFieldFkRiskTypeId;
+    private erp.lib.form.SFormField moFieldGuaranteeAmount;
+    private erp.lib.form.SFormField moFieldInsuranceAmount;
+    private erp.lib.form.SFormField moFieldIsInInsurProcess;
+    private erp.lib.form.SFormField moFieldIsInGuarProcess;
     private erp.lib.form.SFormField moFieldCreditLimit;
     private erp.lib.form.SFormField moFieldDaysOfCredit;
     private erp.lib.form.SFormField moFieldDaysOfGrace;
@@ -223,36 +227,51 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jcbFkBizArea = new javax.swing.JComboBox();
         jckIsCategoryDeleted = new javax.swing.JCheckBox();
         jpCategory = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
-        jPanel35 = new javax.swing.JPanel();
-        jpCustomConfig = new javax.swing.JPanel();
+        jPanel44 = new javax.swing.JPanel();
+        jPanel45 = new javax.swing.JPanel();
+        jPanel29 = new javax.swing.JPanel();
         jlFkBizPartnerCategoryId = new javax.swing.JLabel();
         jcbFkBizPartnerCategoryId = new javax.swing.JComboBox();
+        jPanel36 = new javax.swing.JPanel();
         jlFkBizPartnerTypeId = new javax.swing.JLabel();
-        jPanel44 = new javax.swing.JPanel();
         jcbFkBizPartnerTypeId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkBizPartnerTypeId = new javax.swing.JButton();
+        jPanel37 = new javax.swing.JPanel();
         jlKey = new javax.swing.JLabel();
         jftKey = new javax.swing.JFormattedTextField();
+        jPanel38 = new javax.swing.JPanel();
         jlCompanyKey = new javax.swing.JLabel();
         jtfCompanyKey = new javax.swing.JTextField();
-        jckIsCreditByUser = new javax.swing.JCheckBox();
+        jPanel39 = new javax.swing.JPanel();
         jlDummy01 = new javax.swing.JLabel();
+        jckIsCreditByUser = new javax.swing.JCheckBox();
+        jPanel40 = new javax.swing.JPanel();
         jlFkCreditTypeId_n = new javax.swing.JLabel();
         jcbFkCreditTypeId_n = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel43 = new javax.swing.JPanel();
         jlCreditLimit = new javax.swing.JLabel();
-        jPanel45 = new javax.swing.JPanel();
         jtfCreditLimit = new javax.swing.JTextField();
         jtfCurrencyKey = new javax.swing.JTextField();
+        jPanel48 = new javax.swing.JPanel();
         jlDaysOfCredit = new javax.swing.JLabel();
-        jPanel46 = new javax.swing.JPanel();
         jtfDaysOfCredit = new javax.swing.JTextField();
+        jPanel49 = new javax.swing.JPanel();
         jlDaysOfGrace = new javax.swing.JLabel();
-        jPanel47 = new javax.swing.JPanel();
         jtfDaysOfGrace = new javax.swing.JTextField();
+        jPanel50 = new javax.swing.JPanel();
         jlFkRiskTypeId = new javax.swing.JLabel();
         jcbFkRiskTypeId = new javax.swing.JComboBox<SFormComponentItem>();
-        jpAditonalInformation = new javax.swing.JPanel();
+        jPanel51 = new javax.swing.JPanel();
+        jlGuarantee = new javax.swing.JLabel();
+        jtfGuarantee = new javax.swing.JTextField();
+        jtfCurrencyKeyGuar = new javax.swing.JTextField();
+        jckGuarInProcess = new javax.swing.JCheckBox();
+        jPanel52 = new javax.swing.JPanel();
+        jlInsurance = new javax.swing.JLabel();
+        jtfInsurance = new javax.swing.JTextField();
+        jtfCurrencyKeyInsur = new javax.swing.JTextField();
+        jckInsurInProcess = new javax.swing.JCheckBox();
+        jPanel46 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jlFkLanguageId_n = new javax.swing.JLabel();
         jcbFkLanguageId_n = new javax.swing.JComboBox<SFormComponentItem>();
@@ -599,53 +618,74 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         jpCategory.setLayout(new java.awt.BorderLayout());
 
-        jPanel3.setLayout(new java.awt.BorderLayout());
+        jPanel44.setLayout(new java.awt.BorderLayout());
 
-        jPanel35.setPreferredSize(new java.awt.Dimension(100, 300));
-        jPanel35.setLayout(new java.awt.BorderLayout());
+        jPanel45.setBorder(javax.swing.BorderFactory.createTitledBorder("Información de crédito"));
+        jPanel45.setLayout(new java.awt.GridLayout(12, 1, 0, 2));
 
-        jpCustomConfig.setBorder(javax.swing.BorderFactory.createTitledBorder("Información de crédito:"));
-        jpCustomConfig.setPreferredSize(new java.awt.Dimension(400, 20));
-        jpCustomConfig.setLayout(new java.awt.GridLayout(10, 2, 0, 2));
+        jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFkBizPartnerCategoryId.setText("Categoría de asociado de negocios: *");
-        jpCustomConfig.add(jlFkBizPartnerCategoryId);
+        jlFkBizPartnerCategoryId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel29.add(jlFkBizPartnerCategoryId);
 
         jcbFkBizPartnerCategoryId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbFkBizPartnerCategoryId.setEnabled(false);
         jcbFkBizPartnerCategoryId.setFocusable(false);
-        jpCustomConfig.add(jcbFkBizPartnerCategoryId);
+        jcbFkBizPartnerCategoryId.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel29.add(jcbFkBizPartnerCategoryId);
+
+        jPanel45.add(jPanel29);
+
+        jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFkBizPartnerTypeId.setText("Tipo de asociado de negocios: *");
-        jpCustomConfig.add(jlFkBizPartnerTypeId);
+        jlFkBizPartnerTypeId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel36.add(jlFkBizPartnerTypeId);
 
-        jPanel44.setLayout(new java.awt.BorderLayout(5, 0));
-
-        jcbFkBizPartnerTypeId.setPreferredSize(new java.awt.Dimension(180, 23));
+        jcbFkBizPartnerTypeId.setPreferredSize(new java.awt.Dimension(200, 23));
         jcbFkBizPartnerTypeId.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jcbFkBizPartnerTypeIdItemStateChanged(evt);
             }
         });
-        jPanel44.add(jcbFkBizPartnerTypeId, java.awt.BorderLayout.CENTER);
+        jPanel36.add(jcbFkBizPartnerTypeId);
 
         jbFkBizPartnerTypeId.setText("jButton3");
         jbFkBizPartnerTypeId.setToolTipText("Seleccionar tipo de asociado de negocios");
         jbFkBizPartnerTypeId.setFocusable(false);
         jbFkBizPartnerTypeId.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel44.add(jbFkBizPartnerTypeId, java.awt.BorderLayout.EAST);
+        jPanel36.add(jbFkBizPartnerTypeId);
 
-        jpCustomConfig.add(jPanel44);
+        jPanel45.add(jPanel36);
+
+        jPanel37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlKey.setText("Clave del asociado de negocios: *");
-        jpCustomConfig.add(jlKey);
+        jlKey.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel37.add(jlKey);
 
         jftKey.setFocusLostBehavior(javax.swing.JFormattedTextField.PERSIST);
-        jpCustomConfig.add(jftKey);
+        jftKey.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel37.add(jftKey);
+
+        jPanel45.add(jPanel37);
+
+        jPanel38.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlCompanyKey.setText("Clave empresa (asignada por el AN):");
-        jpCustomConfig.add(jlCompanyKey);
-        jpCustomConfig.add(jtfCompanyKey);
+        jlCompanyKey.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel38.add(jlCompanyKey);
+
+        jtfCompanyKey.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel38.add(jtfCompanyKey);
+
+        jPanel45.add(jPanel38);
+
+        jPanel39.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlDummy01.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel39.add(jlDummy01);
 
         jckIsCreditByUser.setText("Configuración manual de crédito");
         jckIsCreditByUser.addItemListener(new java.awt.event.ItemListener() {
@@ -653,71 +693,129 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 jckIsCreditByUserItemStateChanged(evt);
             }
         });
-        jpCustomConfig.add(jckIsCreditByUser);
-        jpCustomConfig.add(jlDummy01);
+        jPanel39.add(jckIsCreditByUser);
+
+        jPanel45.add(jPanel39);
+
+        jPanel40.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFkCreditTypeId_n.setText("Tipo de crédito: *");
-        jpCustomConfig.add(jlFkCreditTypeId_n);
+        jlFkCreditTypeId_n.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel40.add(jlFkCreditTypeId_n);
 
+        jcbFkCreditTypeId_n.setPreferredSize(new java.awt.Dimension(200, 23));
         jcbFkCreditTypeId_n.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jcbFkCreditTypeId_nItemStateChanged(evt);
             }
         });
-        jpCustomConfig.add(jcbFkCreditTypeId_n);
+        jPanel40.add(jcbFkCreditTypeId_n);
+
+        jPanel45.add(jPanel40);
+
+        jPanel43.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlCreditLimit.setText("Límite de crédito: *");
-        jpCustomConfig.add(jlCreditLimit);
-
-        jPanel45.setLayout(new java.awt.BorderLayout(5, 0));
+        jlCreditLimit.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel43.add(jlCreditLimit);
 
         jtfCreditLimit.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfCreditLimit.setText("0.00");
-        jtfCreditLimit.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel45.add(jtfCreditLimit, java.awt.BorderLayout.CENTER);
+        jtfCreditLimit.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel43.add(jtfCreditLimit);
 
         jtfCurrencyKey.setEditable(false);
         jtfCurrencyKey.setFocusable(false);
-        jtfCurrencyKey.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel45.add(jtfCurrencyKey, java.awt.BorderLayout.EAST);
+        jtfCurrencyKey.setPreferredSize(new java.awt.Dimension(35, 23));
+        jPanel43.add(jtfCurrencyKey);
 
-        jpCustomConfig.add(jPanel45);
+        jPanel45.add(jPanel43);
+
+        jPanel48.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlDaysOfCredit.setText("Días de crédito: *");
-        jpCustomConfig.add(jlDaysOfCredit);
-
-        jPanel46.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+        jlDaysOfCredit.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel48.add(jlDaysOfCredit);
 
         jtfDaysOfCredit.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfDaysOfCredit.setText("0");
-        jtfDaysOfCredit.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel46.add(jtfDaysOfCredit);
+        jtfDaysOfCredit.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel48.add(jtfDaysOfCredit);
 
-        jpCustomConfig.add(jPanel46);
+        jPanel45.add(jPanel48);
+
+        jPanel49.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlDaysOfGrace.setText("Días de gracia:");
-        jpCustomConfig.add(jlDaysOfGrace);
-
-        jPanel47.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+        jlDaysOfGrace.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel49.add(jlDaysOfGrace);
 
         jtfDaysOfGrace.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfDaysOfGrace.setText("0");
-        jtfDaysOfGrace.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel47.add(jtfDaysOfGrace);
+        jtfDaysOfGrace.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel49.add(jtfDaysOfGrace);
 
-        jpCustomConfig.add(jPanel47);
+        jPanel45.add(jPanel49);
+
+        jPanel50.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFkRiskTypeId.setText("Tipo de riesgo: *");
-        jlFkRiskTypeId.setPreferredSize(new java.awt.Dimension(200, 23));
-        jpCustomConfig.add(jlFkRiskTypeId);
+        jlFkRiskTypeId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel50.add(jlFkRiskTypeId);
 
         jcbFkRiskTypeId.setPreferredSize(new java.awt.Dimension(200, 23));
-        jpCustomConfig.add(jcbFkRiskTypeId);
+        jPanel50.add(jcbFkRiskTypeId);
 
-        jPanel35.add(jpCustomConfig, java.awt.BorderLayout.WEST);
+        jPanel45.add(jPanel50);
 
-        jpAditonalInformation.setBorder(javax.swing.BorderFactory.createTitledBorder("Información adicional:"));
-        jpAditonalInformation.setLayout(new java.awt.GridLayout(10, 1, 0, 2));
+        jPanel51.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlGuarantee.setText("Monto garantía:");
+        jlGuarantee.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel51.add(jlGuarantee);
+
+        jtfGuarantee.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfGuarantee.setText("0.00");
+        jtfGuarantee.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel51.add(jtfGuarantee);
+
+        jtfCurrencyKeyGuar.setEditable(false);
+        jtfCurrencyKeyGuar.setFocusable(false);
+        jtfCurrencyKeyGuar.setPreferredSize(new java.awt.Dimension(35, 23));
+        jPanel51.add(jtfCurrencyKeyGuar);
+
+        jckGuarInProcess.setText("En trámite");
+        jckGuarInProcess.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel51.add(jckGuarInProcess);
+
+        jPanel45.add(jPanel51);
+
+        jPanel52.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlInsurance.setText("Monto seguro:");
+        jlInsurance.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel52.add(jlInsurance);
+
+        jtfInsurance.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfInsurance.setText("0.00");
+        jtfInsurance.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel52.add(jtfInsurance);
+
+        jtfCurrencyKeyInsur.setEditable(false);
+        jtfCurrencyKeyInsur.setFocusable(false);
+        jtfCurrencyKeyInsur.setPreferredSize(new java.awt.Dimension(35, 23));
+        jPanel52.add(jtfCurrencyKeyInsur);
+
+        jckInsurInProcess.setText("En trámite");
+        jckInsurInProcess.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel52.add(jckInsurInProcess);
+
+        jPanel45.add(jPanel52);
+
+        jPanel44.add(jPanel45, java.awt.BorderLayout.WEST);
+
+        jPanel46.setBorder(javax.swing.BorderFactory.createTitledBorder("Información adicional"));
+        jPanel46.setLayout(new java.awt.GridLayout(12, 1, 0, 2));
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -740,7 +838,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jbEditLanguage.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel7.add(jbEditLanguage);
 
-        jpAditonalInformation.add(jPanel7);
+        jPanel46.add(jPanel7);
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -763,7 +861,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jbEditCurrency.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel8.add(jbEditCurrency);
 
-        jpAditonalInformation.add(jPanel8);
+        jPanel46.add(jPanel8);
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -781,7 +879,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jbSetDateStart.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel9.add(jbSetDateStart);
 
-        jpAditonalInformation.add(jPanel9);
+        jPanel46.add(jPanel9);
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -799,10 +897,10 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jbSetDateEnd.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel10.add(jbSetDateEnd);
 
-        jpAditonalInformation.add(jPanel10);
+        jPanel46.add(jPanel10);
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-        jpAditonalInformation.add(jPanel14);
+        jPanel46.add(jPanel14);
 
         jPanel23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -813,7 +911,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jcbFkCfdAddendaTypeId.setPreferredSize(new java.awt.Dimension(208, 23));
         jPanel23.add(jcbFkCfdAddendaTypeId);
 
-        jpAditonalInformation.add(jPanel23);
+        jPanel46.add(jPanel23);
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -824,7 +922,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jtfWeb.setPreferredSize(new java.awt.Dimension(340, 23));
         jPanel5.add(jtfWeb);
 
-        jpAditonalInformation.add(jPanel5);
+        jPanel46.add(jPanel5);
 
         jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -835,13 +933,11 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jtfNotes.setPreferredSize(new java.awt.Dimension(340, 23));
         jPanel22.add(jtfNotes);
 
-        jpAditonalInformation.add(jPanel22);
+        jPanel46.add(jPanel22);
 
-        jPanel35.add(jpAditonalInformation, java.awt.BorderLayout.CENTER);
+        jPanel44.add(jPanel46, java.awt.BorderLayout.CENTER);
 
-        jPanel3.add(jPanel35, java.awt.BorderLayout.NORTH);
-
-        jpCategory.add(jPanel3, java.awt.BorderLayout.NORTH);
+        jpCategory.add(jPanel44, java.awt.BorderLayout.NORTH);
 
         jpBizPartnerBranch.setBorder(javax.swing.BorderFactory.createTitledBorder("Sucursales del asociado de negocios:"));
         jpBizPartnerBranch.setPreferredSize(new java.awt.Dimension(787, 250));
@@ -1225,6 +1321,14 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moFieldFkCreditTypeId_n.setTabbedPaneIndex(1, jTabbedPane1);
         moFieldFkRiskTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkRiskTypeId, jlFkRiskTypeId);
         moFieldFkRiskTypeId.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldGuaranteeAmount = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfGuarantee, jlGuarantee);
+        moFieldGuaranteeAmount.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldIsInGuarProcess  = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckGuarInProcess);
+        moFieldIsInGuarProcess.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldInsuranceAmount = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfInsurance, jlInsurance);
+        moFieldInsuranceAmount.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldIsInInsurProcess  = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckInsurInProcess);
+        moFieldIsInInsurProcess.setTabbedPaneIndex(1, jTabbedPane1);
         moFieldCreditLimit = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfCreditLimit, jlCreditLimit);
         moFieldCreditLimit.setTabbedPaneIndex(1, jTabbedPane1);
         moFieldDaysOfCredit = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfDaysOfCredit, jlDaysOfCredit);
@@ -1287,6 +1391,10 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         mvFieldsCategory.add(moFieldDaysOfCredit);
         mvFieldsCategory.add(moFieldDaysOfGrace);
         mvFieldsCategory.add(moFieldFkRiskTypeId);
+        mvFieldsCategory.add(moFieldGuaranteeAmount);
+        mvFieldsCategory.add(moFieldInsuranceAmount);
+        mvFieldsCategory.add(moFieldIsInGuarProcess);
+        mvFieldsCategory.add(moFieldIsInInsurProcess);
         mvFieldsCategory.add(moFieldIsCreditByUser);
         mvFieldsCategory.add(moFieldFkLanguageId);
         mvFieldsCategory.add(moFieldFkCurrencyId);
@@ -1528,6 +1636,10 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moBizPartnerCategory.setCreditLimit(0);
         moBizPartnerCategory.setDaysOfCredit(0);
         moBizPartnerCategory.setDaysOfGrace(0);
+        moBizPartnerCategory.setGuarantee(0);
+        moBizPartnerCategory.setInsurance(0);
+        moBizPartnerCategory.setIsGuaranteeInProcess(jckGuarInProcess.isSelected());
+        moBizPartnerCategory.setIsInsuranceInProcess(jckInsurInProcess.isSelected());
         moBizPartnerCategory.setDateStart(moFieldDateStart.getDate());
         moBizPartnerCategory.setDateEnd_n(moFieldDateEnd.getDate());
         moBizPartnerCategory.setIsCreditByUser(jckIsCreditByUser.isSelected());
@@ -1876,21 +1988,30 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JPanel jPanel26;
     private javax.swing.JPanel jPanel27;
     private javax.swing.JPanel jPanel28;
-    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel29;
     private javax.swing.JPanel jPanel30;
     private javax.swing.JPanel jPanel31;
     private javax.swing.JPanel jPanel32;
     private javax.swing.JPanel jPanel33;
     private javax.swing.JPanel jPanel34;
-    private javax.swing.JPanel jPanel35;
+    private javax.swing.JPanel jPanel36;
+    private javax.swing.JPanel jPanel37;
+    private javax.swing.JPanel jPanel38;
+    private javax.swing.JPanel jPanel39;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel40;
     private javax.swing.JPanel jPanel41;
     private javax.swing.JPanel jPanel42;
+    private javax.swing.JPanel jPanel43;
     private javax.swing.JPanel jPanel44;
     private javax.swing.JPanel jPanel45;
     private javax.swing.JPanel jPanel46;
-    private javax.swing.JPanel jPanel47;
+    private javax.swing.JPanel jPanel48;
+    private javax.swing.JPanel jPanel49;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel50;
+    private javax.swing.JPanel jPanel51;
+    private javax.swing.JPanel jPanel52;
     private javax.swing.JPanel jPanel55;
     private javax.swing.JPanel jPanel56;
     private javax.swing.JPanel jPanel57;
@@ -1945,6 +2066,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JComboBox<SFormComponentItem> jcbFkSalesRouteId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkSalesSupervisorId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkTaxIdentityTypeId;
+    private javax.swing.JCheckBox jckGuarInProcess;
+    private javax.swing.JCheckBox jckInsurInProcess;
     private javax.swing.JCheckBox jckIsAttBank;
     private javax.swing.JCheckBox jckIsAttCarrier;
     private javax.swing.JCheckBox jckIsAttEmployee;
@@ -1994,20 +2117,20 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JLabel jlFkSalesRouteId;
     private javax.swing.JLabel jlFkSalesSupervisorId_n;
     private javax.swing.JLabel jlFkTaxIdentityTypeId;
+    private javax.swing.JLabel jlGuarantee;
     private javax.swing.JLabel jlIconCreditor;
     private javax.swing.JLabel jlIconCustomer;
     private javax.swing.JLabel jlIconDebtor;
     private javax.swing.JLabel jlIconSupplier;
+    private javax.swing.JLabel jlInsurance;
     private javax.swing.JLabel jlKey;
     private javax.swing.JLabel jlLastName;
     private javax.swing.JLabel jlNotes;
     private javax.swing.JLabel jlWeb;
-    private javax.swing.JPanel jpAditonalInformation;
     private javax.swing.JPanel jpBizPartner;
     private javax.swing.JPanel jpBizPartnerBranch;
     private javax.swing.JPanel jpCategory;
     private javax.swing.JPanel jpCob;
-    private javax.swing.JPanel jpCustomConfig;
     private javax.swing.JPanel jpMarketing;
     private javax.swing.JPanel jpNotesAction;
     private javax.swing.JTextField jtfBizPartner;
@@ -2015,11 +2138,15 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JTextField jtfCompanyKey;
     private javax.swing.JTextField jtfCreditLimit;
     private javax.swing.JTextField jtfCurrencyKey;
+    private javax.swing.JTextField jtfCurrencyKeyGuar;
+    private javax.swing.JTextField jtfCurrencyKeyInsur;
     private javax.swing.JTextField jtfDaysOfCredit;
     private javax.swing.JTextField jtfDaysOfGrace;
     private javax.swing.JTextField jtfFirstName;
     private javax.swing.JTextField jtfFiscalFrgId;
     private javax.swing.JTextField jtfFiscalId;
+    private javax.swing.JTextField jtfGuarantee;
+    private javax.swing.JTextField jtfInsurance;
     private javax.swing.JTextField jtfLastName;
     private javax.swing.JTextField jtfNotes;
     private javax.swing.JTextField jtfPkBizPartnerId_Ro;
@@ -2115,6 +2242,10 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
             moFieldFkCreditTypeId_n.setFieldValue(new int[] { SDataConstantsSys.BPSS_TP_CRED_CRED_NO });
             moFieldFkRiskTypeId.setFieldValue(new int[] { SModSysConsts.BPSS_RISK_C_RSK_H });
+            moFieldGuaranteeAmount.setFieldValue(0d);
+            moFieldInsuranceAmount.setFieldValue(0d);
+            moFieldIsInGuarProcess.setFieldValue(false);
+            moFieldIsInInsurProcess.setFieldValue(false);
             moFieldCreditLimit.setFieldValue(0d);
             moFieldDaysOfCredit.setFieldValue(0);
             moFieldDaysOfGrace.setFieldValue(0);
@@ -2140,6 +2271,10 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 moFieldDaysOfCredit.setFieldValue(0);
                 moFieldDaysOfGrace.setFieldValue(0);
                 moFieldFkRiskTypeId.setFieldValue(new int[] { SModSysConsts.BPSS_RISK_C_RSK_H });
+                moFieldGuaranteeAmount.setFieldValue(0d);
+                moFieldInsuranceAmount.setFieldValue(0d);
+                moFieldIsInGuarProcess.setFieldValue(false);
+                moFieldIsInInsurProcess.setFieldValue(false);
             }
             else {
                 moFieldFkCreditTypeId_n.setFieldValue(new int[] { moBizPartnerType.getFkCreditTypeId() });
@@ -2147,6 +2282,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 moFieldDaysOfCredit.setFieldValue(moBizPartnerType.getDaysOfCredit());
                 moFieldDaysOfGrace.setFieldValue( moBizPartnerType.getDaysOfGrace());
                 moFieldFkRiskTypeId.setFieldValue(new int[] { moBizPartnerType.getFkRiskTypeId()});
+//                moFieldGuaranteeAmount.setFieldValue(moBizPartnerType.getGuarantee());
+//                moFieldGuaranteeAmount.setFieldValue(moBizPartnerType.getInsurance());
             }
         }
         else {
@@ -2156,6 +2293,10 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 moFieldDaysOfCredit.setFieldValue(0);
                 moFieldDaysOfGrace.setFieldValue(0);
                 moFieldFkRiskTypeId.setFieldValue(new int[] { SModSysConsts.BPSS_RISK_C_RSK_H });
+                moFieldGuaranteeAmount.setFieldValue(0d);
+                moFieldInsuranceAmount.setFieldValue(0d);
+                moFieldIsInGuarProcess.setFieldValue(false);
+                moFieldIsInInsurProcess.setFieldValue(false);
             }
             else {
                 moFieldFkCreditTypeId_n.setFieldValue(new int[] { moBizPartnerCategory.getFkCreditTypeId_n() });
@@ -2163,6 +2304,10 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 moFieldDaysOfCredit.setFieldValue(moBizPartnerCategory.getDaysOfCredit());
                 moFieldDaysOfGrace.setFieldValue( moBizPartnerCategory.getDaysOfGrace());
                 moFieldFkRiskTypeId.setFieldValue(new int[] { moBizPartnerCategory.getFkRiskTypeId_n()});
+                moFieldGuaranteeAmount.setFieldValue(moBizPartnerCategory.getGuarantee());
+                moFieldInsuranceAmount.setFieldValue(moBizPartnerCategory.getInsurance());
+                moFieldIsInGuarProcess.setFieldValue(moBizPartnerCategory.getIsGuaranteeInProcess());
+                moFieldIsInInsurProcess.setFieldValue(moBizPartnerCategory.getIsInsuranceInProcess());
             }
         }
     }
@@ -2358,6 +2503,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         jckIsCreditByUser.setSelected(false);
         jtfCurrencyKey.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
+        jtfCurrencyKeyGuar.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
+        jtfCurrencyKeyInsur.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
 
         renderBizPartnerCategories();
 
@@ -2710,6 +2857,10 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 moFieldDaysOfCredit.setFieldValue(moBizPartnerCategory.getEffectiveDaysOfCredit());
                 moFieldDaysOfGrace.setFieldValue(moBizPartnerCategory.getEffectiveDaysOfGrace());
                 moFieldFkRiskTypeId.setFieldValue(new int[] { moBizPartnerCategory.getEffectiveRiskTypeId() });
+                moFieldGuaranteeAmount.setFieldValue(moBizPartnerCategory.getGuarantee());
+                moFieldInsuranceAmount.setFieldValue(moBizPartnerCategory.getInsurance());
+                moFieldIsInGuarProcess.setFieldValue(moBizPartnerCategory.getIsGuaranteeInProcess());
+                moFieldIsInInsurProcess.setFieldValue(moBizPartnerCategory.getIsInsuranceInProcess());
             }
             
             moFieldFkLanguageId.setFieldValue(new int[] { moBizPartnerCategory.getFkLanguageId_n() });
@@ -2875,11 +3026,19 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 moBizPartnerCategory.setCreditLimit(0);
                 moBizPartnerCategory.setDaysOfCredit(0);
                 moBizPartnerCategory.setDaysOfGrace(0);
+                moBizPartnerCategory.setGuarantee(0);
+                moBizPartnerCategory.setInsurance(0);
+                moBizPartnerCategory.setIsGuaranteeInProcess(false);
+                moBizPartnerCategory.setIsInsuranceInProcess(false);
             }
             else {
                 moBizPartnerCategory.setCreditLimit(moFieldCreditLimit.getDouble());
                 moBizPartnerCategory.setDaysOfCredit(moFieldDaysOfCredit.getInteger());
                 moBizPartnerCategory.setDaysOfGrace(moFieldDaysOfGrace.getInteger());
+                moBizPartnerCategory.setGuarantee(moFieldGuaranteeAmount.getDouble());
+                moBizPartnerCategory.setInsurance(moFieldInsuranceAmount.getDouble());
+                moBizPartnerCategory.setIsGuaranteeInProcess(moFieldIsInGuarProcess.getBoolean());
+                moBizPartnerCategory.setIsInsuranceInProcess(moFieldIsInInsurProcess.getBoolean());
             }
             moBizPartnerCategory.setDateStart(moFieldDateStart.getDate());
             moBizPartnerCategory.setDateEnd_n(moFieldDateEnd.getDate());

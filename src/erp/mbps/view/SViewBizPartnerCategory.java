@@ -36,7 +36,7 @@ public class SViewBizPartnerCategory extends erp.lib.table.STableTab implements 
         jbDelete.setEnabled(false);
 
         STableField[] aoKeyFields = new STableField[2];
-        STableColumn[] aoTableColumns = new STableColumn[12];
+        STableColumn[] aoTableColumns = new STableColumn[16];
 
         moTabFilterDeleted = new STabFilterDeleted(this);
 
@@ -61,6 +61,12 @@ public class SViewBizPartnerCategory extends erp.lib.table.STableTab implements 
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_days_cred", "Días créd.", STableConstants.WIDTH_NUM_INTEGER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_days_grace", "Días gracia", STableConstants.WIDTH_NUM_INTEGER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_tp_risk", "Tipo riesgo", 150);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "bct.garnt", "Monto garantía $", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererNumberDouble());
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bct.b_garnt_prc", "En trámite (garantía)", STableConstants.WIDTH_BOOLEAN);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "bct.insur", "Monto seguro $", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererNumberDouble());
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bct.b_insur_prc", "En trámite (seguro)", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ta.tp_cfd_add", "Tipo addenda CFD", 150);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "btp.tp_bp", "Tipo asoc. neg.", 150);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bct.b_del", "Eliminado (categoría)", STableConstants.WIDTH_BOOLEAN);
@@ -94,6 +100,7 @@ public class SViewBizPartnerCategory extends erp.lib.table.STableTab implements 
                 "IF(bct.b_cred_usr, bct.days_grace, btp.days_grace) AS f_days_grace, " +
                 "IF(bct.b_cred_usr, tcct.tp_cred, tctp.tp_cred) AS f_tp_cred, " +
                 "IF(bct.b_cred_usr, trct.name, trtp.name) AS f_tp_risk, " +
+                "bct.garnt, bct.insur, bct.b_garnt_prc, bct.b_insur_prc, " +
                 "btp.id_ct_bp, btp.id_tp_bp, btp.tp_bp, " +
                 "ta.id_tp_cfd_add, ta.tp_cfd_add " +
                 "FROM erp.bpsu_bp AS b " +

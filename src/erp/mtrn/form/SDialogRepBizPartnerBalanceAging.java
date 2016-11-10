@@ -124,6 +124,9 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jcbCurrency = new javax.swing.JComboBox<SFormComponentItem>();
         jbPickCurrency = new javax.swing.JButton();
         jlCurrencyWarning = new javax.swing.JLabel();
+        jPanel105 = new javax.swing.JPanel();
+        jlShowAmounts = new javax.swing.JLabel();
+        moBoolShowAmounts = new sa.lib.gui.bean.SBeanFieldBoolean();
         jpControls = new javax.swing.JPanel();
         jbPrint = new javax.swing.JButton();
         jbClose = new javax.swing.JButton();
@@ -307,6 +310,17 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
 
         jPanel7.add(jPanel98);
 
+        jPanel105.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlShowAmounts.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel105.add(jlShowAmounts);
+
+        moBoolShowAmounts.setText("Ver seguro y garantía");
+        moBoolShowAmounts.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel105.add(moBoolShowAmounts);
+
+        jPanel7.add(jPanel105);
+
         jpParams.add(jPanel7, java.awt.BorderLayout.NORTH);
 
         getContentPane().add(jpParams, java.awt.BorderLayout.CENTER);
@@ -325,7 +339,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
 
         getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(496, 339));
+        setSize(new java.awt.Dimension(576, 389));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -420,7 +434,8 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         String sqlFilterSalesAgent = "";
         String sqlFilterCurrency = "";
         String sqlSortBy = "";
-        int report = 0;
+        boolean bShowGarntInsur = false;
+        int nReportType = 0;
         Cursor oCursor = getCursor();
         JasperPrint print = null;
         JasperViewer viewer = null;
@@ -480,13 +495,15 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
                 default:
             }
             
-            //report = moBoolShowAmounts.getValue() ? SDataConstantsSys.REP_FIN_BPS_ACC_AGI : SDataConstantsSys.REP_FIN_BPS_ACC_AGI;
+            bShowGarntInsur = moBoolShowAmounts.getValue();
+            nReportType = bShowGarntInsur ? SDataConstantsSys.REP_FIN_BPS_ACC_AGI_CRED : SDataConstantsSys.REP_FIN_BPS_ACC_AGI;
             
             map = miClient.createReportParams();
             map.put("sTitle", getTitle().toUpperCase());
             map.put("bShowDetail", jrbRepTypeDetail.isSelected());
             map.put("sCoBranch", txtCoBranch);
             map.put("sBizPartner", txtBizPartner);
+            map.put("nBizPartnerCategory", mnBizPartnerCategory);
             map.put("sSalesAgent", txtSalesAgent);
             map.put("nLocalCurrencyId", miClient.getSession().getSessionCustom().getLocalCurrencyKey()[0]);
             map.put("nCurrencyId", moFieldCurrency.getKeyAsIntArray()[0]);
@@ -500,10 +517,11 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
             map.put("sSqlFilterSalesAgent", sqlFilterSalesAgent);
             map.put("sSqlFilterCurrency", sqlFilterCurrency);
             map.put("sSqlSortBy", sqlSortBy);
+            map.put("bShowGarntInsur", bShowGarntInsur);
 
             // Report view:
 
-            print = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_FIN_BPS_ACC_AGI, map);
+            print = SDataUtilities.fillReport(miClient, nReportType, map);
             viewer = new JasperViewer(print, false);
             viewer.setTitle(getTitle());
             viewer.setVisible(true);
@@ -644,21 +662,21 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
     private void itemStateChangedDueType() {
         moFieldSalesAgent.resetField();
         moFieldCurrency.setFieldValue(miClient.getSession().getSessionCustom().getLocalCurrencyKey());
-        //moBoolShowAmounts.setSelected(false);
+        moBoolShowAmounts.setSelected(false);
                 
         if (jrbDueType30_60_90d.isSelected()) {
             jcbSalesAgent.setEnabled(mnBizPartnerCategory == SModSysConsts.BPSS_CT_BP_CUS);
             jbPickSalesAgent.setEnabled(mnBizPartnerCategory == SModSysConsts.BPSS_CT_BP_CUS);
             jcbCurrency.setEnabled(true);
             jbPickCurrency.setEnabled(true);
-            //moBoolShowAmounts.setEnabled(true);
+            moBoolShowAmounts.setEnabled(true);
         }
         else {
             jcbSalesAgent.setEnabled(false);
             jbPickSalesAgent.setEnabled(false);
             jcbCurrency.setEnabled(false);
             jbPickCurrency.setEnabled(false);
-            //moBoolShowAmounts.setEnabled(false);
+            moBoolShowAmounts.setEnabled(false);
         }
     }
 
@@ -724,6 +742,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
     private javax.swing.JPanel jPanel102;
     private javax.swing.JPanel jPanel103;
     private javax.swing.JPanel jPanel104;
+    private javax.swing.JPanel jPanel105;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel7;
@@ -750,6 +769,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
     private javax.swing.JLabel jlDueType;
     private javax.swing.JLabel jlRepType;
     private javax.swing.JLabel jlSalesAgent;
+    private javax.swing.JLabel jlShowAmounts;
     private javax.swing.JPanel jpControls;
     private javax.swing.JPanel jpParams;
     private javax.swing.JRadioButton jrbDocDateBaseCredit;
@@ -761,6 +781,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
     private javax.swing.JRadioButton jrbRepTypeDetail;
     private javax.swing.JRadioButton jrbRepTypeSummary;
     private javax.swing.JFormattedTextField jtfDateCutoff;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolShowAmounts;
     // End of variables declaration//GEN-END:variables
 
     @Override

@@ -1038,7 +1038,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                     break;
                 
                 case SDataConstants.TRNU_TP_DPS_ANN:
-                    oViewClass = erp.mtrn.view.SViewDpsAudit.class;
+                    oViewClass = erp.mtrn.view.SViewDpsAnnulled.class;
                     sViewTitle = "CPA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02) + " anulad@s";
                     break;
 
@@ -1059,7 +1059,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                     
                 case SDataConstants.MKT_PLIST_ITEM:
                     oViewClass = erp.mmkt.view.SViewPriceListItem.class;
-                    sViewTitle = "CPA - Precios de ítems";
+                    sViewTitle = "CPA - Precios de compras";
                     break;
 
                 case SDataConstants.TRNX_DPS_BACKORDER:
