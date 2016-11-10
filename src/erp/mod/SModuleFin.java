@@ -354,11 +354,13 @@ public class SModuleFin extends SGuiModule {
                         + "FROM " + SModConsts.TablesMap.get(type) + " AS ac "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_COB_ENT) + " AS ce ON "
                         + "ac.id_cob = ce.id_cob AND ac.id_acc_cash = ce.id_ent "
+                        + (params == null ? "" : (params.getKey().length == 1 ? "" : " INNER JOIN erp.bpsu_bank_acc AS bbc ON ac.fid_bpb_n = bbc.id_bpb AND ac.fid_bank_acc_n = bbc.id_bank_acc "))
                         + "WHERE ac.b_del = 0 AND ce.b_del = 0 " + (params != null && params.getKey() != null ? " AND ac.fid_cur = " + params.getKey()[0] : "") + " ";
                 switch (subtype) {
                     case SModConsts.FINX_ACC_CASH_BANK:
                         sql += "AND ce.fid_ct_ent = " + SDataConstantsSys.CFGS_TP_ENT_CASH_BANK[0] + " AND " +
-                                "ce.fid_tp_ent = " + SDataConstantsSys.CFGS_TP_ENT_CASH_BANK[1] + " ";
+                                "ce.fid_tp_ent = " + SDataConstantsSys.CFGS_TP_ENT_CASH_BANK[1] + " " +
+                                (params == null ? "" : (params.getKey().length == 1 ? "" : " AND bbc.fid_bank = " + params.getKey()[1] + " " ));
                         break;
                     default:
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

@@ -1479,13 +1479,22 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                     oViewClass = erp.mfin.view.SViewYear.class;
                     sViewTitle = "Apertura/cierre ejercicios contab.";
                     break;
-
                 case SDataConstants.FIN_REC:
                     oViewClass = erp.mfin.view.SViewRecord.class;
-                    sViewTitle = "Pólizas contab.";
+                    switch(auxType01) {
+                        case SDataConstants.FIN_REC:
+                            sViewTitle = "Pólizas contab.";
+                            break;
+                        case SUtilConsts.AUD:
+                            sViewTitle = "Pólizas auditadas.";
+                            break;
+                        case SUtilConsts.AUD_PEND:
+                            sViewTitle = "Pólizas por auditar.";
+                            break;
+                    }
                     break;
                 case SDataConstants.FIN_REC_ETY:
-                    switch(auxType01){
+                    switch(auxType01) {
                         case SDataConstantsSys.TRNS_CT_DPS_PUR:
                             oViewClass = erp.mfin.view.SViewRecordEntriesXml.class;
                             sViewTitle = "Pólizas contab. con XML egresos";

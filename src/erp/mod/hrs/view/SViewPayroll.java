@@ -18,6 +18,7 @@ import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SHrsCfdUtils;
 import erp.mod.hrs.db.SHrsFinUtils;
 import erp.mod.hrs.db.SHrsPayrollAnnul;
+import erp.mod.hrs.db.SHrsPayrollRowEmployeeAvailable;
 import erp.mod.hrs.db.SHrsUtils;
 import erp.mod.hrs.form.SDialogLayoutPayroll;
 import erp.mod.hrs.form.SDialogPrintOrderPayroll;
@@ -523,6 +524,8 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
     }
 
     private void actionLayout() {
+        SHrsPayrollRowEmployeeAvailable receipt = null;
+        
         if (jbLayout.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
@@ -541,7 +544,9 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
-                        moDialogLayoutPayroll = new SDialogLayoutPayroll(miClient, gridRow.getRowPrimaryKey()[0], "Layout para pagos de nóminas");
+                        receipt = new SHrsPayrollRowEmployeeAvailable();
+                        receipt.obtainEmployeesAvailableByPayroll(miClient.getSession(), gridRow.getRowPrimaryKey()[0]);
+                        moDialogLayoutPayroll = new SDialogLayoutPayroll(miClient, gridRow.getRowPrimaryKey()[0], "Layout para pagos de nóminas", receipt.getHrsPayrollEmployeesAvailable());
                         moDialogLayoutPayroll.resetForm();
                         moDialogLayoutPayroll.setVisible(true);
 

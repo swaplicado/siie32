@@ -58,8 +58,9 @@ public abstract class SHrsUtils {
      * @param accountDebit
      * @param consecutiveDay
      * @param bankId ID the bank to payment
+     * @param employees employees ids
      */
-    public static void createLayoutBanamexPayroll(SGuiClient client, int payrollId, java.lang.String title, Date dateApplication, String accountDebit, int consecutiveDay, int bankId) {
+    public static void createLayoutBanamexPayroll(SGuiClient client, int payrollId, java.lang.String title, Date dateApplication, String accountDebit, int consecutiveDay, int bankId, String[] employees) {
         ResultSet resultSetHeader = null;
         ResultSet resultSetDetail = null;
         BufferedWriter bw = null;
@@ -77,6 +78,7 @@ public abstract class SHrsUtils {
         String sBizPartner = "";
         String sDescription = "";
         String sCompany = "";
+        String employeesId = "";
         double mdBalance = 0;
         double mdBalanceTotal = 0;
         int nBankKey = 0;
@@ -90,6 +92,7 @@ public abstract class SHrsUtils {
         moPayroll = (SDbPayroll)  client.getSession().readRegistry(SModConsts.HRS_PAY, new int[] { payrollId }, SDbConsts.MODE_STEALTH);
         sDescription = (moPayroll.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? SHrsFormerConsts.PAY_WEE_ABB : SHrsFormerConsts.PAY_BIW_ABB ) + moPayroll.getNumber() + " " + formatDateData.format(dateApplication);
         sCompany = SLibUtilities.textToAlphanumeric(((SClientInterface) client).getSessionXXX().getCompany().getDbmsDataCompany().getBizPartner());
+        employeesId = SLibUtils.textImplode(employees, ",");
         
         fileName = formatDateTitle.format(new Date()).concat(" bmx nom.txt");
 
@@ -129,7 +132,8 @@ public abstract class SHrsUtils {
                         "FROM hrs_pay AS p " +
                         "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
                         "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
-                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0 ";
+                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0 " +
+                        "AND rcp.id_emp IN (" + employeesId + ")";
                 
                 resultSetHeader = client.getSession().getStatement().executeQuery(sql);
                 while (resultSetHeader.next()) {
@@ -162,7 +166,8 @@ public abstract class SHrsUtils {
                         "FROM hrs_pay AS p " +
                         "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
                         "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
-                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0 ";
+                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0 " +
+                        "AND rcp.id_emp IN (" + employeesId + ")";
                 
                 resultSetDetail = client.getSession().getStatement().executeQuery(sql);
                 while (resultSetDetail.next()) {
@@ -202,7 +207,7 @@ public abstract class SHrsUtils {
                     buffer += SLibUtilities.textRepeat(" ", 50); //future use
                     
                     bw.write(buffer);
-                    bw.newLine();                    
+                    bw.newLine();
                 }
                 
                 // Summary:
@@ -237,9 +242,10 @@ public abstract class SHrsUtils {
      * @param title
      * @param dateApplication
      * @param accountDebit
-     * @param consecutiveDay 
+     * @param consecutiveDay
+     * @param employees employees ids
      */
-    public static void createLayoutBanBajioPayroll(SGuiClient client, int payrollId, java.lang.String title, Date dateApplication, String accountDebit, int consecutiveDay) {
+    public static void createLayoutBanBajioPayroll(SGuiClient client, int payrollId, java.lang.String title, Date dateApplication, String accountDebit, int consecutiveDay, String[] employees) {
         ResultSet resultSet = null;
         String sql = "";
         String fileName = "";
@@ -250,6 +256,7 @@ public abstract class SHrsUtils {
         int employeeId = 0;
         int dayFileName = 0;
         int monthFileName = 0;
+        String employeesId = "";
         java.lang.String sAccountDebit = "";
         java.lang.String sAccountCredit = "";
         java.lang.String leyend = "";
@@ -266,6 +273,7 @@ public abstract class SHrsUtils {
         monthFileName = SLibTimeUtils.digestDate(dateApplication)[1];
         n = (int) (Math.floor(Math.log10(consecutiveDay)) + 1);
         m = (int) (Math.floor(Math.log10(dayFileName)) + 1);
+        employeesId = SLibUtils.textImplode(employees, ",");
         
         fileName = "D" + config.getBajioAffinityGroup() + SLibUtilities.textRepeat("0", 2 - n).concat(consecutiveDay + "") + (monthFileName < 10 ? "0." + monthFileName : "1." + (monthFileName - 10)) + SLibUtilities.textRepeat("0", 2 - m).concat(dayFileName + "")+ "";
 
@@ -304,7 +312,8 @@ public abstract class SHrsUtils {
                         "FROM hrs_pay AS p " +
                         "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
                         "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
-                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0";
+                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0 " +
+                        "AND rcp.id_emp IN (" + employeesId + ")";
                 
                 resultSet = client.getSession().getStatement().executeQuery(sql);
                 while (resultSet.next()) {
@@ -378,13 +387,15 @@ public abstract class SHrsUtils {
     *@param payrollId
     *@param dateApplication
     *@param consecutiveDay
+    *@param employees employees ids
     */
-     public static void createLayoutBancomerPayroll(SGuiClient client, int payrollId, Date dateApplication, int consecutiveDay) {
+     public static void createLayoutBancomerPayroll(SGuiClient client, int payrollId, Date dateApplication, int consecutiveDay, String[] employees) {
         ResultSet resulSet = null;
         Statement statement = null;
         String sql = "";
         String fileName = "";
         String sBizPartner = "";
+        String employeesId = "";
         int nMoveNum = 1;
         int n = 0;
         java.lang.String sAccountCredit = "";
@@ -394,6 +405,8 @@ public abstract class SHrsUtils {
         double mdBalance = 0;
         
         fileName = formatDateTitle.format(new Date()).concat(" bbva nom.txt");
+        
+        employeesId = SLibUtils.textImplode(employees, ",");
         
         client.getFileChooser().setSelectedFile(new File(fileName));
         if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
@@ -417,6 +430,7 @@ public abstract class SHrsUtils {
                         "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
                         "INNER JOIN erp.bpsu_bp AS b ON emp.id_emp = b.id_bp " +
                         "WHERE p.b_del = 0 AND rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0 " +
+                        "AND rcp.id_emp IN (" + employeesId + ") " +
                         "ORDER BY rcp.id_emp, emp.bank_acc, b.bp";
                 
                 resulSet = statement.executeQuery(sql);

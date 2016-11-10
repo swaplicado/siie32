@@ -44,16 +44,14 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     private erp.mfin.view.SPanelFilterRecordType moPanelFilterRecordType;
-    private int mnViewType;
 
     /**
      * @param cliente GUI client.
      * @param tabTitle View's tab title.
-     * @param viewType View's tipe. Constants allowed: SLibConsts.UNDEFINED = standard view, all accounting records; SUtilConsts.AUD = audited records; SUtilConsts.AUD_PEND = audit pending records.
+     * @param viewType View's tipe. Constants allowed: SDataConstants.FIN_REC = standard view, all accounting records; SUtilConsts.AUD = audited records; SUtilConsts.AUD_PEND = audit pending records.
      */
     public SViewRecord(erp.client.SClientInterface client, java.lang.String tabTitle, int viewType) {
-        super(client, tabTitle, SDataConstants.FIN_REC);
-        mnViewType = viewType;
+        super(client, tabTitle, SDataConstants.FIN_REC, viewType);        
         initComponents();
     }
 
@@ -159,8 +157,8 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
         jbDelete.setEnabled(false);
         mjbPrintRecord.setEnabled(true);
         mjbPrintRecordCy.setEnabled(true);
-        mjbAudit.setEnabled(mnViewType == SUtilConsts.AUD_PEND);
-        mjbAuditRevoke.setEnabled(mnViewType == SUtilConsts.AUD);
+        mjbAudit.setEnabled(mnTabTypeAux01 == SUtilConsts.AUD_PEND);
+        mjbAuditRevoke.setEnabled(mnTabTypeAux01 == SUtilConsts.AUD);
 
         setIsSummaryApplying(true);
 
@@ -358,7 +356,7 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
             }
         }
         
-        switch (mnViewType) {
+        switch (mnTabTypeAux01) {
             case SUtilConsts.AUD:
                 sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "r.b_audit = 1 ";
                 break;

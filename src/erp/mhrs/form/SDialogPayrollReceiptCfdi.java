@@ -133,7 +133,7 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
         jtfPayrollPeriod.setEditable(false);
         jtfPayrollPeriod.setText("2001-01");
         jtfPayrollPeriod.setFocusable(false);
-        jtfPayrollPeriod.setPreferredSize(new java.awt.Dimension(75, 23));
+        jtfPayrollPeriod.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel3.add(jtfPayrollPeriod);
 
         jtfPayrollNumber.setEditable(false);
@@ -153,7 +153,7 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
         jtfPayrollDates.setEditable(false);
         jtfPayrollDates.setText("01/01/2001 - 01/01/2001");
         jtfPayrollDates.setFocusable(false);
-        jtfPayrollDates.setPreferredSize(new java.awt.Dimension(152, 23));
+        jtfPayrollDates.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel5.add(jtfPayrollDates);
 
         jPanel1.add(jPanel5);
