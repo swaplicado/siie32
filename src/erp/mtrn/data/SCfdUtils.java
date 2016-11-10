@@ -223,7 +223,7 @@ public abstract class SCfdUtils implements Serializable {
                             "(" + client.getSessionXXX().getFormatters().getDateFormat().format(client.getSessionXXX().getSystemDate()) + ").\n" +
                             "¿Está seguro que desea timbrar el documento?") == JOptionPane.YES_OPTION;
                 }
-                else if (SLibTimeUtilities.getDaysDiff(client.getSessionXXX().getSystemDate(), SLibTimeUtils.convertToDateOnly(cfd.getTimestamp())) > 2) {
+                else if (SLibTimeUtilities.getDaysDiff(client.getSessionXXX().getSystemDate(), SLibTimeUtils.convertToDateOnly(cfd.getTimestamp())) > SCfdConsts.CFDI_STAMP_DELAY_DAYS) {
                     throw new Exception("La fecha del documento " +
                             "(" + client.getSessionXXX().getFormatters().getDateFormat().format(cfd.getTimestamp()) + ") es anterior a la fecha del sistema por más de 2 días " +
                             "(" + client.getSessionXXX().getFormatters().getDateFormat().format(client.getSessionXXX().getSystemDate()) + ").\n" +
@@ -621,6 +621,7 @@ public abstract class SCfdUtils implements Serializable {
         SSrvLock lock = null;
         String acknowledgmentCancel = "";
         String xmlStamping = "";
+        String warningMessage = "";
         boolean consumeStamp = true;
         boolean next = true;
 
@@ -742,13 +743,15 @@ public abstract class SCfdUtils implements Serializable {
                         next = true;
 
                         if (isSingle) {
+                            warningMessage = verifyCertificateExpiration(client);
+                            
                             if (status == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
                                 client.showMsgBoxInformation("El documento ha sido anulado correctamente." + (!isNeedStamps(client, cfd, SDbConsts.ACTION_ANNUL, pacId == 0 ? pacId : pac.getPkPacId()) || !consumeStamp ? "" :
-                                                "\nTimbres disponibles: " + getStampsAvailable(client, cfd.getFkCfdTypeId(), cfd.getTimestamp(), pacId == 0 ? pacId : pac.getPkPacId()) + "."));
+                                                "\nTimbres disponibles: " + getStampsAvailable(client, cfd.getFkCfdTypeId(), cfd.getTimestamp(), pacId == 0 ? pacId : pac.getPkPacId()) + "." + (warningMessage.isEmpty() ? "" : "\n" + warningMessage)));
                             }
                             else {
                                 client.showMsgBoxInformation("El documento ha sido timbrado correctamente. " + (!isNeedStamps(client, cfd, SDbConsts.ACTION_SAVE, pacId == 0 ? pacId : pac.getPkPacId()) ? "" :
-                                                "\nTimbres disponibles: " + getStampsAvailable(client, cfd.getFkCfdTypeId(), cfd.getTimestamp(), pacId == 0 ? pacId : pac.getPkPacId()) + "."));
+                                                "\nTimbres disponibles: " + getStampsAvailable(client, cfd.getFkCfdTypeId(), cfd.getTimestamp(), pacId == 0 ? pacId : pac.getPkPacId()) + "." + (warningMessage.isEmpty() ? "" : "\n" + warningMessage)));
                             }
                         }
 
@@ -2139,7 +2142,7 @@ public abstract class SCfdUtils implements Serializable {
 
     public static boolean signCfdi(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd, boolean isSingle, boolean confirmSending) throws Exception {
         boolean signed = false;
-
+        
         if (canCfdiSign(client, cfd, false)) {
             if (!isSingle || !confirmSending || client.showMsgBoxConfirm("¿Está seguro que desea timbrar el documento?") == JOptionPane.YES_OPTION) {
                 // Open Sign & Cancel Log entry:
@@ -2339,38 +2342,38 @@ public abstract class SCfdUtils implements Serializable {
             // Sign CFDI:
             
             if (canCfdiSign(client, cfd, false)) {
-				
+
                 switch (cfd.getFkCfdTypeId()) {
                     case SCfdConsts.CFD_TYPE_DPS:
                         dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
                         idBizPartner = dps.getFkBizPartnerId_r();
                         idBizPartnerBranch = dps.getFkBizPartnerBranchId();
                         break;
-                        
+
                     case SCfdConsts.CFD_TYPE_PAYROLL:
                         idBizPartner = subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? cfd.getFkPayrollBizPartnerId_n() : cfd.getFkPayrollReceiptEmployeeId_n();
                         idBizPartnerBranch = SLibConsts.UNDEFINED; // do not really needed, just for consistence
                         break;
-                        
+
                     default:
                 }
-                
+
                 if (!confirmSending || STrnUtilities.confirmSend(client,TXT_SIGN_SEND, cfd, null, idBizPartner, idBizPartnerBranch)) {
                     sign = signCfdi(client, cfd, subtypeCfd, isSingle, false);
-                    
+
                     // Send CFDI:
-                    
+
                     if (sign) {
-			cfdAuxSend = (SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, cfd.getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-                        
-			if (confirmSending) {
+                        cfdAuxSend = (SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, cfd.getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+
+                        if (confirmSending) {
                             confirmSending = false;
                             catchExceptions = true;
                         }
                         else{
                             catchExceptions = true;
                         }
-                        
+
                         sendCfd(client, cfdAuxSend.getFkCfdTypeId(), cfdAuxSend, subtypeCfd, false, confirmSending, catchExceptions);
                         signAndSend = true;
                     }
@@ -3300,6 +3303,26 @@ public abstract class SCfdUtils implements Serializable {
         return stringWriter.toString();
     }
 
+    /**
+     * Verifies the expiration date of current certificate. If there are fewer days than the ones specified, it generates a warning message.
+     * @param client
+     * @return Warning message if any, other wise empty string.
+     */
+    public static String verifyCertificateExpiration(final SClientInterface client) {
+        String message = "";
+        Date expiration = client.getSessionXXX().getParamsCompany().getDbmsDataCertificate_n().getExpirationDate();
+        long daysToExpire = SLibTimeUtils.getDaysDiff(expiration, client.getSessionXXX().getSystemDate());
+        
+        if (daysToExpire > 0 && daysToExpire <= SCfdConsts.CER_EXP_DAYS_WARN) {
+            message = "!ADVERTENCIA: El CSD caducará en " + daysToExpire + " " + (daysToExpire == 1 ? "día" : "días") + "!";
+        }
+        else if (daysToExpire <= 0) {
+            message = "!ADVERTENCIA: El CSD ya caducó!";
+        }
+        
+        return message;
+    }
+    
     public static boolean signCfdi(final SClientInterface client, final SDataCfd cfd, int subtypeCfd) throws Exception {
         boolean signed = false;
         ArrayList<SDataCfd> cfdsValidate = null;
