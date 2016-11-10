@@ -3958,7 +3958,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             itemChangeFkPaymentTypeId(false);           // it invokes itemStatePayments() and itemStateDateStartCredit()
 
             jcbFkPaymentTypeId.setEnabled(!moDps.getIsCopied());
-            jtfDaysOfCredit.setEditable(!moDps.getIsCopied());
+            jtfDaysOfCredit.setEditable(!moDps.getIsCopied() && moFieldFkPaymentTypeId.getKeyAsIntArray()[0] != SDataConstantsSys.TRNS_TP_PAY_CASH);
+            jtfDaysOfCredit.setFocusable(!moDps.getIsCopied() && moFieldFkPaymentTypeId.getKeyAsIntArray()[0] != SDataConstantsSys.TRNS_TP_PAY_CASH);
             jcbFkPaymentSystemTypeId.setEnabled(true);
             jcbPaymentAccount.setEnabled(true);
             //jcbFkLanguageId.setEnabled(true);
