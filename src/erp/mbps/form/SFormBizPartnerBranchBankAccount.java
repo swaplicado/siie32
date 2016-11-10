@@ -46,6 +46,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
     private int mnFormStatus;
     private boolean mbFirstTime;
     private boolean mbResetingForm;
+    private boolean mbParamIsCompany;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.client.SClientInterface miClient;
 
@@ -799,6 +800,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
     private void readBizPartner() {
         if (moFieldDbmsPkBizPartnerId.getKeyAsIntArray()[0] > 0) {
             moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, moFieldDbmsPkBizPartnerId.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
+            mbParamIsCompany = moBizPartner.getIsCompany();
         } 
     }
     
@@ -963,6 +965,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         mnFormResult = SLibConstants.UNDEFINED;
         mnFormStatus = SLibConstants.UNDEFINED;
         mbFirstTime = true;
+        mbParamIsCompany = true;
 
         moBizPartner = null;
         moBizPartnerBranchBankAccount = null;
@@ -1074,7 +1077,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
     public void setFormVisible(boolean visible) {
         setVisible(visible);
     }
-
+    
     @Override
     public int getFormStatus() {
         return mnFormStatus;
@@ -1141,9 +1144,9 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         renderBizPartnerSettings();
         renderBankAccountCardSettings();
         
-        moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { moBizPartnerBranchBankAccount.getDbmsPkBizPartnerId() }, SLibConstants.EXEC_MODE_SILENT);
+        readBizPartner();
        
-        jckIsDeleted.setEnabled(moBizPartner != null && !moBizPartner.getIsCompany() ? true : false);
+        jckIsDeleted.setEnabled(!mbParamIsCompany);
         jbDbmsFkBizPartnerId.setEnabled(false);
         jbPkBizPartnerBranchId.setEnabled(false);
     }
@@ -1205,27 +1208,33 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
 
     @Override
     public void setValue(int type, java.lang.Object value) {
-        if (type == SDataConstantsSys.VALUE_BIZ_PARTNER_TYPE) {
-            switch(((int[]) value)[0]) {
-                case SDataConstants.BPSU_BANK_ACC:
-                    mnParamBizPartnerType = SDataConstants.BPSU_BP;
-                    break;
-                case SDataConstants.BPSX_BANK_ACC_SUP:
-                    mnParamBizPartnerType = SDataConstants.BPSX_BP_SUP;
-                    break;
-                case SDataConstants.BPSX_BANK_ACC_CUS:
-                    mnParamBizPartnerType = SDataConstants.BPSX_BP_CUS;
-                    break;
-                case SDataConstants.BPSX_BANK_ACC_CDR:
-                    mnParamBizPartnerType = SDataConstants.BPSX_BP_CDR;
-                    break;
-                case SDataConstants.BPSX_BANK_ACC_DBR:
-                    mnParamBizPartnerType = SDataConstants.BPSX_BP_DBR;
-                    break;
-                case SDataConstants.BPSX_BANK_ACC_EMP:
-                    mnParamBizPartnerType = SDataConstants.BPSX_BP_EMP;
-                    break;
-            }
+        switch (type) {
+            case SDataConstants.CFGU_CO:
+                mbParamIsCompany = (Boolean) value;
+                break;
+            case SDataConstantsSys.VALUE_BIZ_PARTNER_TYPE:
+                switch(((int[]) value)[0]) {
+                    case SDataConstants.BPSU_BANK_ACC:
+                        mnParamBizPartnerType = SDataConstants.BPSU_BP;
+                        break;
+                    case SDataConstants.BPSX_BANK_ACC_SUP:
+                        mnParamBizPartnerType = SDataConstants.BPSX_BP_SUP;
+                        break;
+                    case SDataConstants.BPSX_BANK_ACC_CUS:
+                        mnParamBizPartnerType = SDataConstants.BPSX_BP_CUS;
+                        break;
+                    case SDataConstants.BPSX_BANK_ACC_CDR:
+                        mnParamBizPartnerType = SDataConstants.BPSX_BP_CDR;
+                        break;
+                    case SDataConstants.BPSX_BANK_ACC_DBR:
+                        mnParamBizPartnerType = SDataConstants.BPSX_BP_DBR;
+                        break;
+                    case SDataConstants.BPSX_BANK_ACC_EMP:
+                        mnParamBizPartnerType = SDataConstants.BPSX_BP_EMP;
+                        break;
+                }
+                break;
+            default:
         }
     }
 
