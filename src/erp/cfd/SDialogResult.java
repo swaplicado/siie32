@@ -95,6 +95,8 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
         jPanel25 = new javax.swing.JPanel();
         jlTotalAvailables = new javax.swing.JLabel();
         moIntTotalAvailables = new sa.lib.gui.bean.SBeanFieldInteger();
+        jPanel8 = new javax.swing.JPanel();
+        jlWarningMesage = new javax.swing.JLabel();
         jpDetail = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -114,7 +116,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
 
         jPanel5.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
-        jPanel6.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlTotalToProcess.setText("CFDI a procesar:");
         jlTotalToProcess.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -125,7 +127,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
 
         jPanel5.add(jPanel6);
 
-        jPanel21.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlTotalCorrect.setText("Procesados correctamente:");
         jlTotalCorrect.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -136,7 +138,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
 
         jPanel5.add(jPanel21);
 
-        jPanel22.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlTotalIncorrect.setText("Procesados incorrectamente:");
         jlTotalIncorrect.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -147,7 +149,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
 
         jPanel5.add(jPanel22);
 
-        jPanel4.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlTotalProcess.setText("CFDI procesados:");
         jlTotalProcess.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -162,7 +164,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
 
         jpStampInfo.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
-        jPanel7.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlTotalStamps.setText("Timbres disponibles:");
         jlTotalStamps.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -173,7 +175,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
 
         jpStampInfo.add(jPanel7);
 
-        jPanel24.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlTotalConsumed.setText("Timbres consumidos:");
         jlTotalConsumed.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -184,7 +186,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
 
         jpStampInfo.add(jPanel24);
 
-        jPanel25.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlTotalAvailables.setText("Timbres restantes:");
         jlTotalAvailables.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -194,6 +196,15 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
         jPanel25.add(moIntTotalAvailables);
 
         jpStampInfo.add(jPanel25);
+
+        jPanel8.setLayout(new java.awt.GridLayout(1, 0));
+
+        jlWarningMesage.setToolTipText("");
+        jlWarningMesage.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        jlWarningMesage.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        jPanel8.add(jlWarningMesage);
+
+        jpStampInfo.add(jPanel8);
 
         jpInformation.add(jpStampInfo);
 
@@ -240,6 +251,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel jlTotalAvailables;
     private javax.swing.JLabel jlTotalConsumed;
@@ -248,6 +260,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
     private javax.swing.JLabel jlTotalProcess;
     private javax.swing.JLabel jlTotalStamps;
     private javax.swing.JLabel jlTotalToProcess;
+    private javax.swing.JLabel jlWarningMesage;
     private javax.swing.JPanel jpDetail;
     private javax.swing.JPanel jpInformation;
     private javax.swing.JPanel jpStampInfo;
@@ -279,6 +292,8 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
 
         jbSave.setEnabled(false);
         jbCancel.setText("Aceptar");
+        
+        jlWarningMesage.setText("");
         
         moIntTotalToProcess.setIntegerSettings(SGuiUtils.getLabelName(jlTotalToProcess), SGuiConsts.GUI_TYPE_INT, true);
         moIntTotalProcess.setIntegerSettings(SGuiUtils.getLabelName(jlTotalProcess), SGuiConsts.GUI_TYPE_INT, true);
@@ -316,6 +331,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
         int cfdsCorrect = 0;
         int cfdsIncorrect = 0;
         String detailMessage = "";
+        String warningMessage = "";
         SDbPayrollReceiptIssue receiptIssue = null;
         
         if (maPayrollReceiptsIds != null) {
@@ -356,6 +372,9 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                 jScrollPane1.getVerticalScrollBar().setValue(jScrollPane1.getVerticalScrollBar().getMaximum());
             }
             
+            warningMessage = SCfdUtils.verifyCertificateExpiration(miClient);
+            jlWarningMesage.setText(warningMessage);
+            
             miClient.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
     }
@@ -372,6 +391,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
         String numberSeries = "";
         String number = "";
         String sSql = "";
+        String warningMessage = "";
         ResultSet resultSet = null;
         PrintCfdiThread print = null; 
         
@@ -496,6 +516,10 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                 update(getGraphics());
                 jScrollPane1.getVerticalScrollBar().setValue(jScrollPane1.getVerticalScrollBar().getMaximum());
             }
+            
+            warningMessage = SCfdUtils.verifyCertificateExpiration(miClient);
+            jlWarningMesage.setText(warningMessage);
+           
             miClient.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
     }

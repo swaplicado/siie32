@@ -675,6 +675,7 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
             moFormBizPartnerBranchBankAccount.setParamBizPartnerBranchDescription(jtfBizPartnerBranch.getText());
             moFormBizPartnerBranchBankAccount.formRefreshCatalogues();
             moFormBizPartnerBranchBankAccount.formReset();
+            moFormBizPartnerBranchBankAccount.setValue(SDataConstants.CFGU_CO, mbParamIsCompany);
             moFormBizPartnerBranchBankAccount.setVisible(true);
 
             if (moFormBizPartnerBranchBankAccount.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
@@ -702,6 +703,7 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
                 moFormBizPartnerBranchBankAccount.setParamBizPartnerBranchDescription(jtfBizPartnerBranch.getText());
                 moFormBizPartnerBranchBankAccount.formRefreshCatalogues();
                 moFormBizPartnerBranchBankAccount.formReset();
+                moFormBizPartnerBranchBankAccount.setValue(SDataConstants.CFGU_CO, mbParamIsCompany);
                 moFormBizPartnerBranchBankAccount.setRegistry((SDataBizPartnerBranchBankAccount) moBizPartnerBranchBankAccountPane.getTableRow(index).getData());
                 moFormBizPartnerBranchBankAccount.setVisible(true);
 

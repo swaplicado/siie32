@@ -74,6 +74,10 @@ public abstract class SCfdConsts {
     public static final String ERR_MSG_PROCESSING_XML_STORAGE = "No se pudo almacenar el archivo XML en el disco.";
     public static final String ERR_MSG_PROCESSING_PDF_STORAGE = "No se pudo almacenar el archivo PDF en el disco.";
 
+    public static final int CER_EXP_DAYS_WARN = 30;     // days before certificate expiration to show warning message
+
+    public static final int CFDI_STAMP_DELAY_DAYS = 2;  // maximum dealy days to CFDI stamping
+
     public static final int CFDI_FILE_XML = 1;
     public static final int CFDI_FILE_PDF = 2;
 
