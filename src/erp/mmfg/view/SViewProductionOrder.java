@@ -35,6 +35,7 @@ import java.util.Vector;
 import javax.swing.JButton;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
+import sa.gui.util.SUtilConsts;
 
 /**
  *
@@ -76,6 +77,13 @@ public class SViewProductionOrder extends erp.lib.table.STableTab implements jav
 
     private void initComponents() {
         int i;
+        int nLevelOrderStatusNew = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ORD_ST_NEW).Level;
+        int nLevelOrderStatusLot = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ORD_ST_LOT).Level;
+        int nLevelOrderStatusLotAssing = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ORD_ST_LOT_ASG).Level;
+        int nLevelOrderStatusLotProcess = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ORD_ST_PROC).Level;
+        int nLevelOrderStatusLotEnd = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ORD_ST_END).Level;
+        int nLevelOrderStatusLotClose = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ORD_ST_CLS).Level;
+        int nLevelOrderStatusDelay = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.MFGS_ST_ORD_DLY).Level;
         boolean bPrivilegeOrderCreate = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ORD_NEW).HasRight;
         boolean bPrivilegeOrderStatusNew = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ORD_ST_NEW).HasRight;
         boolean bPrivilegeOrderStatusLot = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ORD_ST_LOT).HasRight;
@@ -83,9 +91,10 @@ public class SViewProductionOrder extends erp.lib.table.STableTab implements jav
         boolean bPrivilegeOrderStatusProcess = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ORD_ST_PROC).HasRight;
         boolean bPrivilegeOrderStatusEnd = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ORD_ST_END).HasRight;
         boolean bPrivilegeOrderStatusClose = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ORD_ST_CLS).HasRight;
+        boolean bPrivilegeOrderStatusDelay = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.MFGS_ST_ORD_DLY).HasRight;
         boolean bPrivilegeOrderAssignRework = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ASG_REW).HasRight;
         boolean bPrivilegeOrderAssignDate = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ASG_DATE).HasRight;
-
+        
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, mnTabTypeAux01 != SDataConstantsSys.MFGS_ST_ORD_DLY ?
             SLibConstants.GUI_DATE_AS_YEAR_MONTH : SLibConstants.GUI_DATE_AS_DATE);
         moTabFilterDeleted = new STabFilterDeleted(this);
@@ -166,25 +175,20 @@ public class SViewProductionOrder extends erp.lib.table.STableTab implements jav
         jbEdit.setEnabled(true);
         //jbDelete.setEnabled(false);
         jbProductionOrderPreviousStep.setEnabled(
-                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_LOT && !bPrivilegeOrderStatusLot) ||
-                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_LOT_ASIG && !bPrivilegeOrderStatusLotAssign) ||
-                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_PROC && !bPrivilegeOrderStatusProcess) ||
-                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_END && !bPrivilegeOrderStatusEnd) ||
-                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_CLS && !bPrivilegeOrderStatusClose) ||
-                mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_NEW ||
-                mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_DLY ||
-                mnTabTypeAux01 == SDataConstants.MFGX_ORD_FOR ||
-                mnTabTypeAux01 == SDataConstants.MFGX_ORD_ALL ? false : true);
+                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_LOT && bPrivilegeOrderStatusLot && nLevelOrderStatusLot >= SUtilConsts.LEV_CAPTURE) ||
+                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_LOT_ASIG && bPrivilegeOrderStatusLotAssign && nLevelOrderStatusLotAssing >= SUtilConsts.LEV_CAPTURE) ||
+                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_PROC && bPrivilegeOrderStatusProcess && nLevelOrderStatusLotProcess >= SUtilConsts.LEV_CAPTURE) ||
+                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_END && bPrivilegeOrderStatusEnd && nLevelOrderStatusLotEnd >= SUtilConsts.LEV_CAPTURE) ||
+                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_CLS && bPrivilegeOrderStatusClose && nLevelOrderStatusLotClose >= SUtilConsts.LEV_CAPTURE) ||
+                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_DLY && bPrivilegeOrderStatusDelay && nLevelOrderStatusDelay >= SUtilConsts.LEV_CAPTURE));  //XXX VALIDATIONS FOR STATUS WHERE CAN NOT BE BACK      
         jbProductionOrderNextStep.setEnabled(
-                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_NEW && !bPrivilegeOrderStatusNew) ||
-                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_LOT && !bPrivilegeOrderStatusLot) ||
-                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_LOT_ASIG && !bPrivilegeOrderStatusLotAssign) ||
-                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_PROC && !bPrivilegeOrderStatusProcess) ||
-                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_END && !bPrivilegeOrderStatusEnd) ||
-                mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_CLS ||
-                mnTabTypeAux01 == SDataConstants.MFGX_ORD_ALL ||
-                mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_DLY ||
-                mnTabTypeAux01 == SDataConstants.MFGX_ORD_FOR ? false : true);
+                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_NEW && bPrivilegeOrderStatusNew && nLevelOrderStatusNew >= SUtilConsts.LEV_CAPTURE) ||
+                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_LOT && bPrivilegeOrderStatusLot && nLevelOrderStatusLot >= SUtilConsts.LEV_CAPTURE) ||
+                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_LOT_ASIG && bPrivilegeOrderStatusLotAssign && nLevelOrderStatusLotAssing >= SUtilConsts.LEV_CAPTURE) ||
+                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_PROC && bPrivilegeOrderStatusProcess && nLevelOrderStatusLotProcess >= SUtilConsts.LEV_CAPTURE) ||
+                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_END && bPrivilegeOrderStatusEnd && nLevelOrderStatusLotEnd >= SUtilConsts.LEV_CAPTURE) ||
+                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_DLY && bPrivilegeOrderStatusDelay && nLevelOrderStatusDelay >= SUtilConsts.LEV_CAPTURE));  //XXX VALIDATIONS FOR STATUS WHERE CAN NOT BE MOVED FORWARD
+      
         jbAssignLotFinishedGood.setEnabled(mnTabTypeAux02 == SDataConstants.MFGX_ORD_LOT_FG ? true : false);
         jbPrintPerformance.setEnabled(mnTabTypeAux01 != SDataConstants.MFGX_ORD_FOR ? true : false);
         jbAssignQuantityRework.setEnabled(bPrivilegeOrderAssignRework && (
