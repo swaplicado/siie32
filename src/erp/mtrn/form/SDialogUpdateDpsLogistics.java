@@ -287,7 +287,7 @@ public class SDialogUpdateDpsLogistics extends javax.swing.JDialog implements er
             jftDateStartCredit.setEnabled(true);
             jftDateStartCreditRo.setEnabled(true);
 
-            jckChangeDateStartCredit.setSelected(moDps.getDateDelivery_n() != null && moDps.getDateDelivery_n().getTime() != moDps.getDateStartCredit().getTime());
+            jckChangeDateStartCredit.setSelected(true);
         }
 
         itemStateDifferentDate();
