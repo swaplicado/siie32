@@ -245,7 +245,7 @@
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextRecipientsTo">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="sBeanFieldText3"/>
-                        <Property name="toolTipText" type="java.lang.String" value="Ejemplo: email1; email2..."/>
+                        <Property name="toolTipText" type="java.lang.String" value="Ejemplo: correo-e1;correo-e2..."/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[250, 23]"/>
                         </Property>
@@ -271,7 +271,7 @@
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextRecipientsCc">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="sBeanFieldText3"/>
-                        <Property name="toolTipText" type="java.lang.String" value="Ejemplo: email1; email2..."/>
+                        <Property name="toolTipText" type="java.lang.String" value="Ejemplo: correo-e1; correo-e2..."/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[250, 23]"/>
                         </Property>
@@ -297,7 +297,7 @@
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextRecipientsBcc">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="sBeanFieldText3"/>
-                        <Property name="toolTipText" type="java.lang.String" value="Ejemplo: email1; email2..."/>
+                        <Property name="toolTipText" type="java.lang.String" value="Ejemplo: correo-e1; correo-e2..."/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[250, 23]"/>
                         </Property>

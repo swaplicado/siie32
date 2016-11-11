@@ -108,7 +108,7 @@ public class SFormMmsConfig extends SBeanForm {
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTextEmail.setText("Correo(s):*");
+        jlTextEmail.setText("Correo-e(s):*");
         jlTextEmail.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlTextEmail);
 
