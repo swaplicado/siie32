@@ -2323,7 +2323,6 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
         mnFormResult = SLibConsts.UNDEFINED;
         mbFirstActivation = true;
         jtfRows.setText("0/0");
-        jckDateMaturityRo.setSelected(true);
         jckAccountAll.setSelected(true);
         mnNumberDocs = 0;
 
@@ -2338,6 +2337,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
         reloadCatalogues();
        
         if (moRegistry.isRegistryNew()) {
+            jckDateMaturityRo.setSelected(true);
             initializateNewLayout();
             renderBankLayoutSettings();
         }
