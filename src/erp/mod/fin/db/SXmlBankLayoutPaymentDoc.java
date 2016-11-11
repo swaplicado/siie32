@@ -45,11 +45,9 @@ public class SXmlBankLayoutPaymentDoc extends SXmlElement {
         mvXmlAttributes.add(moRowDpsYear);
         mvXmlAttributes.add(moRowDpsDoc);
         mvXmlAttributes.add(moRowAmount);
-        /*
         mvXmlAttributes.add(moRowAmountCy);
         mvXmlAttributes.add(moRowCurrency);
         mvXmlAttributes.add(moRowExchangeRate);
         mvXmlAttributes.add(moRowObservation);
-        */
     }
 }

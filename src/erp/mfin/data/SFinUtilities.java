@@ -138,6 +138,25 @@ public abstract class SFinUtilities {
         return fileName;
     }
     
+    public static String getNameTypePayLayout(SGuiSession session, int layoutId) throws Exception {
+        String typePayBank = "";
+        String sql = "";
+        ResultSet resulSet = null;
+
+        sql = "SELECT tpb.tp_pay_bank " +
+                "FROM erp.fins_tp_pay_bank AS tpb " +
+                "INNER JOIN erp.finu_tp_lay_bank AS tlb ON tpb.id_tp_pay_bank = tlb.fid_tp_pay_bank " +
+                "INNER JOIN fin_lay_bank AS flb ON tlb.id_tp_lay_bank = flb.fk_tp_lay_bank " +
+                "WHERE flb.id_lay_bank = " + layoutId + ";";
+
+        resulSet = session.getStatement().executeQuery(sql);
+        if (resulSet.next()) {
+            typePayBank = resulSet.getString("tpb.tp_pay_bank");
+        }
+        
+        return typePayBank;
+    }
+    
     public static String getBizPartnerForBanamex(SGuiSession session, int bizPartnerId) throws Exception {
         String bizPartner = "";
         String firstname = "";

@@ -98,6 +98,8 @@ import erp.mod.fin.form.SDialogDpsExchangeDif;
 import erp.mod.fin.form.SDialogFiscalAccountsConfig;
 import erp.mod.fin.form.SDialogFiscalXmlFile;
 import erp.mod.fin.form.SDialogRepCashFlowExpected;
+import erp.mod.fin.form.SDialogRepMovsFileCvs;
+import erp.mod.fin.form.SDialogRepMovsIncExp;
 import erp.mod.fin.form.SDialogReportTaxPending;
 import erp.mod.fin.form.SDialogValuationBalances;
 import erp.mtrn.data.SDataCtr;
@@ -258,6 +260,13 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiQryCashFlowPaysSupSum;
     private javax.swing.JMenuItem jmiQryCashFlowPaysSupDet;
     private javax.swing.JMenuItem jmiRepCashFlowExpected;
+    private javax.swing.JMenu jmRepAccIncExp;
+    private javax.swing.JMenuItem jmiRepAccIncNet;
+    private javax.swing.JMenuItem jmiRepAccIncNetAdj;
+    private javax.swing.JMenuItem jmiRepFileCsvInc;
+    private javax.swing.JMenuItem jmiRepAccExpNet;
+    private javax.swing.JMenuItem jmiRepAccExpNetAdj;
+    private javax.swing.JMenuItem jmiRepFileCsvExp;
     private javax.swing.JMenuItem jmiRepLedgerAccount;
     private javax.swing.JMenuItem jmiRepLedgerCostCenter;
     private javax.swing.JMenuItem jmiRepConceptAdmin;
@@ -624,6 +633,14 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiQryCashFlowPaysSupDet = new JMenuItem("Consulta de pagos por periodo a detalle");
         jmiRepCashFlowExpected = new JMenuItem("Reporte de ingresos y egresos esperados por periodo...");
         
+        jmRepAccIncExp = new JMenu("Reportes de ingresos y egresos contables");
+        jmiRepAccIncNet = new JMenuItem("Reporte de ingresos contables netos");
+        jmiRepAccIncNetAdj = new JMenuItem("Reporte de ingreos contables y sus ajustes");
+        jmiRepFileCsvInc = new JMenuItem("Archivo CSV de ingresos contables");
+        jmiRepAccExpNet = new JMenuItem("Reporte de egresos contables netos");
+        jmiRepAccExpNetAdj = new JMenuItem("Reporte de egresos contables y sus ajustes");
+        jmiRepFileCsvExp = new JMenuItem("Archivo CSV de egresos contables");
+        
         jmiRepLedgerAccount = new JMenuItem("Reporte de auxiliares contables...");
         jmiRepLedgerCostCenter = new JMenuItem("Reporte de auxiliares contables de centros de costo...");
         jmiRepConceptAdmin = new JMenuItem("Reporte de conceptos administrativos...");
@@ -708,6 +725,17 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRepCashFlow.add(jmiQryCashFlowPaysSupSum);
         jmRepCashFlow.add(jmiQryCashFlowPaysSupDet);
         jmRep.add(jmRepCashFlow);
+        
+        jmRepAccIncExp.add(jmiRepAccIncNet);
+        jmRepAccIncExp.add(jmiRepAccIncNetAdj);
+        jmRepAccIncExp.add(jmiRepFileCsvInc);
+        jmRepAccIncExp.addSeparator();
+        jmRepAccIncExp.add(jmiRepAccExpNet);
+        jmRepAccIncExp.add(jmiRepAccExpNetAdj);
+        jmRepAccIncExp.add(jmiRepFileCsvExp);
+        
+        jmRep.add(jmRepAccIncExp);
+        
         jmRep.add(jmiRepCashFlowExpected);
 
         jmRep.addSeparator();
@@ -846,7 +874,12 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiQryCashFlowPaysSupSum.addActionListener(this);
         jmiQryCashFlowPaysSupDet.addActionListener(this);
         jmiRepCashFlowExpected.addActionListener(this);
-        
+        jmiRepAccIncNet.addActionListener(this);
+        jmiRepAccIncNetAdj.addActionListener(this);
+        jmiRepFileCsvInc.addActionListener(this);
+        jmiRepAccExpNet.addActionListener(this);
+        jmiRepAccExpNetAdj.addActionListener(this);
+        jmiRepFileCsvExp.addActionListener(this);
         
         jmiRepBizPartnerLedgerCus.addActionListener(this);
         jmiRepBizPartnerLedgerSup.addActionListener(this);
@@ -1479,22 +1512,13 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                     oViewClass = erp.mfin.view.SViewYear.class;
                     sViewTitle = "Apertura/cierre ejercicios contab.";
                     break;
+
                 case SDataConstants.FIN_REC:
                     oViewClass = erp.mfin.view.SViewRecord.class;
-                    switch(auxType01) {
-                        case SDataConstants.FIN_REC:
-                            sViewTitle = "Pólizas contab.";
-                            break;
-                        case SUtilConsts.AUD:
-                            sViewTitle = "Pólizas auditadas.";
-                            break;
-                        case SUtilConsts.AUD_PEND:
-                            sViewTitle = "Pólizas por auditar.";
-                            break;
-                    }
+                    sViewTitle = "Pólizas contab.";
                     break;
                 case SDataConstants.FIN_REC_ETY:
-                    switch(auxType01) {
+                    switch(auxType01){
                         case SDataConstantsSys.TRNS_CT_DPS_PUR:
                             oViewClass = erp.mfin.view.SViewRecordEntriesXml.class;
                             sViewTitle = "Pólizas contab. con XML egresos";
@@ -2052,6 +2076,24 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiRepCashFlowExpected) {
                 new SDialogRepCashFlowExpected(miClient.getSession().getClient(), SModConsts.FINR_CSH_FLW_EXP, SDataRepConstants.REP_CSH_FLW_EXP).setVisible(true);
             }
+            else if (item == jmiRepAccIncNet) {
+                new SDialogRepMovsIncExp(miClient.getSession().getClient(), SDataConstantsSys.TRNS_CT_DPS_SAL, SUtilConsts.QRY_SUM,"Reporte de ingresos contables netos").setVisible(true);
+            }
+            else if (item == jmiRepAccIncNetAdj) {
+                new SDialogRepMovsIncExp(miClient.getSession().getClient(), SDataConstantsSys.TRNS_CT_DPS_SAL, SUtilConsts.QRY_DET,"Reporte de ingresos contables netos y sus ajustes").setVisible(true);
+            }
+            else if (item == jmiRepFileCsvInc) {
+                new SDialogRepMovsFileCvs(miClient.getSession().getClient(), SDataConstantsSys.TRNS_CT_DPS_SAL, "Archivo de exportación de ingresos contables").setVisible(true);
+            }    
+            else if (item == jmiRepAccExpNet) {
+                new SDialogRepMovsIncExp(miClient.getSession().getClient(), SDataConstantsSys.TRNS_CT_DPS_PUR, SUtilConsts.QRY_SUM,"Reporte de egresos contables netos").setVisible(true);
+            }
+            else if (item == jmiRepAccExpNetAdj) {
+                new SDialogRepMovsIncExp(miClient.getSession().getClient(), SDataConstantsSys.TRNS_CT_DPS_PUR, SUtilConsts.QRY_DET,"Reporte de egresos contables netos y sus ajustes").setVisible(true);
+            }
+            else if (item == jmiRepFileCsvExp) {
+                new SDialogRepMovsFileCvs(miClient.getSession().getClient(), SDataConstantsSys.TRNS_CT_DPS_PUR, "Archivo de exportación de egresos contables").setVisible(true);
+            }    
             else if (item == jmiRepLedgerAccount) {
                 new SDialogRepAuxAccounting(miClient).setVisible(true);
             }

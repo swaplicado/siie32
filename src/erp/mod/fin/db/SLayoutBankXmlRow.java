@@ -18,7 +18,11 @@ public class SLayoutBankXmlRow {
     protected int mnDpsYear;
     protected int mnDpsDoc;
     protected double mdAmount;
+    protected double mdAmountCy;
     protected double mdAmountPayed;
+    protected double mdAmountPayedCy;
+    protected double mdExchangeRate;
+    protected int mnCurrencyId;
     protected boolean mbIsToPayed;
     protected int mnBizPartner;
     protected int mnBizPartnerBranch;
@@ -42,13 +46,17 @@ public class SLayoutBankXmlRow {
     protected int mnRecNumber;
     protected int mnBookkeepingYear;
     protected int mnBookkeepingNumber;
+    protected String msObservation;
 
     public SLayoutBankXmlRow() {
         mnLayoutXmlRowType = 0;
         mnDpsYear = 0;
         mnDpsDoc = 0;
         mdAmount = 0;
+        mdAmountCy = 0;
         mdAmountPayed = 0;
+        mdExchangeRate = 0;
+        mnCurrencyId = 0;
         mbIsToPayed = false;
         mnBizPartner = 0;
         mnBizPartnerBranch = 0;
@@ -72,14 +80,19 @@ public class SLayoutBankXmlRow {
         mnRecNumber = 0;
         mnBookkeepingYear = 0;
         mnBookkeepingNumber = 0;
+        msObservation = "";
     }
 
     public void setLayoutXmlRowType(int n) { mnLayoutXmlRowType = n; }
     public void setDpsYear(int n) { mnDpsYear = n; }
     public void setDpsDoc(int n) { mnDpsDoc = n; }
     public void setAmount(double d) { mdAmount = d; }
+    public void setAmountCy(double d) { mdAmountCy = d; }
     public void setAmountPayed(double d) { mdAmountPayed = d; }
+    public void setAmountPayedCy(double d) { mdAmountPayedCy = d; }
+    public void setExchangeRate(double d) { mdExchangeRate = d; }
     public void setIsToPayed(boolean b) { mbIsToPayed = b; }
+    public void setCurrencyId(int i) { mnCurrencyId = i; }
     public void setBizPartner(int n) { mnBizPartner = n; }
     public void setBizPartnerBranch(int n) { mnBizPartnerBranch = n; }
     public void setBizPartnerBranchAccount(int n) { mnBizPartnerBranchBankAccount = n; }
@@ -102,6 +115,7 @@ public class SLayoutBankXmlRow {
     public void setRecNumber(int n) { mnRecNumber = n; }
     public void setBookkeepingYear(int n) { mnBookkeepingYear = n; }
     public void setBookkeepingNumber(int n) { mnBookkeepingNumber = n; }
+    public void setObservation(String s) { msObservation = s; }
     
     public int[] getPrimaryKey() {
         int[] key = new int[] { SLibConsts.UNDEFINED };
@@ -120,7 +134,11 @@ public class SLayoutBankXmlRow {
     public int getDpsYear() { return mnDpsYear; }
     public int getDpsDoc() { return mnDpsDoc; }
     public double getAmount() { return mdAmount; }
+    public double getAmountCy() { return mdAmountCy; }
     public double getAmountPayed() { return mdAmountPayed; }
+    public double getAmountPayedCy() { return mdAmountPayedCy; }
+    public double getExchangeRate() { return mdExchangeRate; }
+    public int getCurrencyId() { return mnCurrencyId; }
     public boolean getIsToPayed() { return mbIsToPayed; }
     public int getBizPartner() { return mnBizPartner; }
     public int getBizPartnerBranch() { return mnBizPartnerBranch; }
@@ -144,4 +162,5 @@ public class SLayoutBankXmlRow {
     public int getRecNumber() { return mnRecNumber; }
     public int getBookkeepingYear() { return mnBookkeepingYear; }
     public int getBookkeepingNumber() { return mnBookkeepingNumber; }
+    public String getObservation() { return msObservation; }
 }

@@ -172,6 +172,9 @@ public abstract class SDataReadDescriptions {
             case SDataConstants.FINU_CLS_ACC_USR:
                 sql = "SELECT cls_acc_usr AS descrip FROM erp.finu_cls_acc_usr WHERE id_tp_acc_usr = " + ((int[]) pk)[0] + " AND id_cl_acc_usr = " + ((int[]) pk)[1] + " AND id_cls_acc_usr = " + ((int[]) pk)[2] + " ";
                 break;
+            case SDataConstants.FINU_TP_LAY_BANK:
+                sql = "SELECT tp_lay_bank AS descrip FROM erp.finu_tp_lay_bank WHERE id_tp_lay_bank = " + ((int[]) pk)[0] + " ";
+                break;
             case SDataConstants.FIN_ACC:
                 sql = "SELECT acc AS descrip FROM fin_acc WHERE id_acc = '" + ((Object[]) pk)[0] + "' ";
                 break;

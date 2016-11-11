@@ -44,10 +44,19 @@ public class SLayoutBankRow implements SGridRow {
     protected boolean mbIsForPayment;
     protected boolean mbIsToPayed;
     protected double mdBalance;
-    protected double mdBalanceTot;
+    protected SMoney moBalance;   //amount in local currency
+    protected SMoney moBalanceCy; //Amout in origial currency
+    protected SMoney moBalanceTot;
+    protected double mdExchangeRate;
+    protected double mdBalanceCy;
+    protected double mdBalanceTotCy;
+    protected double mdBalanceAccountDebit;
+    protected double mdBalanceAccountDebitTot;
+    
     protected double mdBalanceTotByBizPartner;
     protected double mdBalancePayed;
     protected java.lang.String msCurrencyKey;
+    protected java.lang.String msCurrencyKeyCy;
     protected java.lang.String msAccountCredit;
     protected java.lang.String msEmail;
     protected java.lang.String msBizPartnerCreditFiscalId;
@@ -56,7 +65,7 @@ public class SLayoutBankRow implements SGridRow {
     protected double mdTaxRetained;
     protected double mdTotal;
     protected double mdTotalVat;
-
+   
     protected java.lang.String msAccountDebit;
     protected java.lang.String msBizPartnerDebitFiscalId;
     protected java.lang.String msAccountType;
@@ -68,6 +77,7 @@ public class SLayoutBankRow implements SGridRow {
     protected int mnApply;
     protected int mnBankKey;
     protected int mnCurrencyId;    
+    protected String msObservation;
     
     protected ArrayList<SDataBizPartnerBranchBankAccount> maBranchBankAccountsCredit;
     protected ArrayList<SGuiItem> maAccountCredit;
@@ -100,10 +110,18 @@ public class SLayoutBankRow implements SGridRow {
         mbIsForPayment = false;
         mbIsToPayed = false;
         mdBalance = 0;
-        mdBalanceTot = 0;
+        moBalance = null;
+        moBalanceCy = null;
+        moBalanceTot = null;
+        mdExchangeRate = 0;
+        mdBalanceCy = 0;
+        mdBalanceTotCy = 0;
+        mdBalanceAccountDebit = 0;
+        mdBalanceAccountDebitTot = 0;       
         mdBalanceTotByBizPartner = 0;
         mdBalancePayed = 0;
         msCurrencyKey = "";
+        msCurrencyKeyCy = "";      
         msAccountCredit = "";
         msEmail = "";
         msBizPartnerCreditFiscalId = "";
@@ -111,8 +129,7 @@ public class SLayoutBankRow implements SGridRow {
         mdTaxCharged = 0;
         mdTaxRetained = 0;
         mdTotal = 0;
-        mdTotalVat = 0;
-
+        mdTotalVat = 0;        
         msAccountDebit = "";
         msBizPartnerDebitFiscalId = "";
         msAccountType = "";
@@ -124,10 +141,10 @@ public class SLayoutBankRow implements SGridRow {
         mnApply = 0;
         mnBankKey = 0;
         mnCurrencyId = 0;
+        msObservation = "";
         
         moCodeBankAccountCredit = new HashMap<String, String>();
-        moAliasBankAccountCredit = new HashMap<String, String>();
-        
+        moAliasBankAccountCredit = new HashMap<String, String>();        
         maBranchBankAccountsCredit = new ArrayList<SDataBizPartnerBranchBankAccount>();
     }
 
@@ -150,11 +167,13 @@ public class SLayoutBankRow implements SGridRow {
     public void setBizPartnerBranchCob(String s) { msBizPartnerBranchCob = s; }
     public void setIsForPayment(boolean b) { mbIsForPayment = b; }
     public void setIsToPayed(boolean b) { mbIsToPayed = b; }
-    public void setBalance(double d) { mdBalance = d; }
-    public void setBalanceTot(double d) { mdBalanceTot = d; }
+    public void setBalance (SMoney o) { moBalance = o; }
+    public void setBalanceCy (SMoney o) { moBalanceCy = o; }
+    public void setBalanceTot(SMoney o) { moBalanceTot = o; }
     public void setBalanceTotByBizPartner(double d) { mdBalanceTotByBizPartner = d; }
     public void setBalancePayed(double d) { mdBalancePayed = d; }
     public void setCurrencyKey(java.lang.String s) { msCurrencyKey = s; }
+    public void setCurrencyKeyCy(java.lang.String s) { msCurrencyKeyCy = s; }
     public void setAccountCredit(java.lang.String s) { msAccountCredit = s; }
     public void setEmail(java.lang.String s) { msEmail = s; }
     public void setBizPartnerCreditFiscalId(String s) { msBizPartnerCreditFiscalId = s; }
@@ -163,7 +182,7 @@ public class SLayoutBankRow implements SGridRow {
     public void setTaxRetained(double d) { mdTaxRetained = d; }
     public void setTotal(double d) { mdTotal = d; }
     public void setTotalVat(double d) { mdTotalVat = d; }
-
+    public void setExchangeRate(double d) { moBalanceTot.setExchangeRate(d); }
     public void setAccountDebit(java.lang.String s) { msAccountDebit = s; }
     public void setBizPartnerDebitFiscalId(String s) { msBizPartnerDebitFiscalId = s; }
     public void setAccType(java.lang.String s) { msAccountType = s; }
@@ -175,6 +194,7 @@ public class SLayoutBankRow implements SGridRow {
     public void setApply(int n) { mnApply = n; }
     public void setBankKey(int n) { mnBankKey = n; }
     public void setCurrencyId(int n) { mnCurrencyId = n; }
+    public void setObservation(String s) { msObservation = s; }
     public void setAccountCreditArray(ArrayList<SGuiItem> a) { maAccountCredit = a; }
     
     public void setBranchBankAccountCreditArray(ArrayList<SDataBizPartnerBranchBankAccount> a) { maBranchBankAccountsCredit = a; }
@@ -237,11 +257,13 @@ public class SLayoutBankRow implements SGridRow {
     public java.lang.String getBizPartnerBranchCob() { return msBizPartnerBranchCob; }
     public boolean getIsForPayment() { return mbIsForPayment; }
     public boolean getIsToPayed() { return mbIsToPayed; }
-    public double getBalance() { return mdBalance; }
-    public double getBalanceTot() { return mdBalanceTot; }
+    public SMoney getBalance() { return moBalance; }
+    public SMoney getBalanceCy() { return moBalanceCy; }
+    public SMoney getBalanceTot() { return moBalanceTot; }
     public double getBalanceTotByBizPartner() { return mdBalanceTotByBizPartner; }
     public double getBalancePayed() { return mdBalancePayed; }
     public java.lang.String getCurrencyKey() { return msCurrencyKey; }
+    public java.lang.String getCurrencyKeyCy() { return msCurrencyKeyCy; }
     public java.lang.String getAccountCredit() { return msAccountCredit; }
     public java.lang.String getEmail() { return msEmail; }
     public java.lang.String getBizPartnerCreditFiscalId() { return msBizPartnerCreditFiscalId; }
@@ -250,7 +272,7 @@ public class SLayoutBankRow implements SGridRow {
     public double getTaxRetained() { return mdTaxRetained; }
     public double getTotal() { return mdTotal; }
     public double getTotalVat() { return mdTotalVat; }
-
+    public double getExchangeRate() { return mdExchangeRate; }
     public java.lang.String getAccountDebit() { return msAccountDebit; }
     public java.lang.String getBizPartnerDebitFiscalId() { return msBizPartnerDebitFiscalId; }
     public java.lang.String getAccType() { return msAccountType; }
@@ -262,6 +284,7 @@ public class SLayoutBankRow implements SGridRow {
     public int getApply() { return mnApply; }
     public int getBankKey() { return mnBankKey; }
     public int getCurrencyId() { return mnCurrencyId; }
+    public String getObservation() { return msObservation; }
     public ArrayList<SGuiItem> getAccountCreditArray() { return maAccountCredit; }
     public HashMap<String, String> getCodeBankAccountCredit() { return moCodeBankAccountCredit; }
     public HashMap<String, String> getAliasBankAccountCredit() { return moAliasBankAccountCredit; }
@@ -317,62 +340,71 @@ public class SLayoutBankRow implements SGridRow {
         Object value = null;
 
         if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_DPS) {
-            switch (col) {
-                case 0:
-                    value = msBizPartner;
-                    break;
-                case 1:
-                    value = msBizPartnerKey;
-                    break;
-                case 2:
-                    value = msTypeDps;
-                    break;
-                case 3:
-                    value = msNumberSer;
-                    break;
-                case 4:
-                    value = mtDate;
-                    break;
-                case 5:
-                    value = msBizPartnerBranchCob;
-                    break;
-                case 6:
-                    value = mbIsForPayment;
-                    break;
-                case 7:
-                    value = mdBalance;
-                    break;
-                case 8:
-                    value = mdBalanceTot;
-                    break;
-                case 9:
-                    value = msCurrencyKey;
-                    break;
-                case 10:
-                    value = msAccountCredit;
-                    break;
-                case 11:
-                    value = msEmail;
-                    break;
-                case 12:
-                    value = msBizPartnerCreditFiscalId;
-                    break;
-                case 13:
-                    value = mdSubTotal;
-                    break;
-                case 14:
-                    value = mdTaxCharged;
-                    break;
-                case 15:
-                    value = mdTaxRetained;
-                    break;
-                case 16:
-                    value = mdTotal;
-                    break;
-                case 17:
-                    value = mtDateMaturityRo;
-                    break;
-                default:
+                switch (col) {
+                    case 0:
+                        value = msBizPartner;
+                        break;
+                    case 1:
+                        value = msTypeDps;
+                        break;
+                    case 2:
+                        value = msNumberSer;
+                        break;
+                    case 3:
+                        value = mtDate;
+                        break;
+                    case 4:
+                        value = msBizPartnerBranchCob;
+                        break;
+                    case 5:
+                        value = mbIsForPayment;
+                        break;
+                    case 6:
+                        value = moBalance.getAmountOriginal();
+                        break;
+                    case 7:
+                        value = moBalanceTot.getAmountOriginal(); ///amount to pay
+                        break;
+                    case 8:
+                        value = msCurrencyKeyCy;
+                        break;
+                    case 9:
+                        value = moBalanceTot.getExchangeRate();
+                        break;
+                    case 10:
+                        value = moBalanceTot.getAmountLocal(); ///amount to pay in banck currency
+                        break;
+                    case 11:
+                        value = msCurrencyKey; // bank key currency
+                        break;    
+                    case 12:
+                        value = msAccountCredit;
+                        break;
+                    case 13:
+                        value = msEmail;
+                        break;
+                    case 14:
+                        value = msBizPartnerCreditFiscalId;
+                        break;
+                    case 15:
+                        value = mdSubTotal;
+                        break;
+                    case 16:
+                        value = mdTaxCharged;
+                        break;
+                    case 17:
+                        value = mdTaxRetained;
+                        break;
+                    case 18:
+                        value = mdTotal;
+                        break;
+                    case 19:
+                        value = mtDateMaturityRo;
+                        break;
+                    case 20:
+                        value = msObservation;
+                        break;
+                   default:
             }
         }
         else if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_ADV) {
@@ -384,7 +416,7 @@ public class SLayoutBankRow implements SGridRow {
                     value = msBizPartnerKey;
                     break;
                 case 2:
-                    value = mdBalanceTot;
+                    value = moBalanceTot.getAmountOriginal();
                     break;
                 case 3:
                     value = msCurrencyKey;
@@ -398,11 +430,13 @@ public class SLayoutBankRow implements SGridRow {
                 case 6:
                     value = msBizPartnerCreditFiscalId;
                     break;
+                case 7:
+                    value = msObservation;
+                    break;
                 default:
             }
         }
         
-
         return value;
     }
 
@@ -421,32 +455,34 @@ public class SLayoutBankRow implements SGridRow {
                 case 4:
                     break;
                 case 5:
-                    break;
-                case 6:
                     mbIsForPayment = (boolean) value;
                     break;
+                case 6:
+                    break;
                 case 7:
+                    moBalanceTot.setAmountOriginal((double) value);
                     break;
                 case 8:
-                    mdBalanceTot = (double) value;
                     break;
                 case 9:
+                    if (moBalance.getCurrencyLocalId() != moBalanceTot.getCurrencyOriginalId()) { 
+                        moBalanceTot.setExchangeRate((double) value);
+                    }   
                     break;
                 case 10:
+                    break;
+                case 11:
+                    break;    
+                case 12:
                     if (value == null) {
                         msAccountCredit = "";
                     }
                     else {
                         msAccountCredit = ((SGuiItem) value).getItem();
-                        //msAccountCredit = (String) value;
                     }
                     break;
-                case 11:
-                    msEmail = (String) value;
-                    break;
-                case 12:
-                    break;
                 case 13:
+                    msEmail = (String) value;
                     break;
                 case 14:
                     break;
@@ -455,6 +491,13 @@ public class SLayoutBankRow implements SGridRow {
                 case 16:
                     break;
                 case 17:
+                    break;
+                case 18:
+                    break;
+                case 19:
+                    break;
+                case 20:
+                    msObservation = (String) value;
                     break;
                 default:
                     break;
@@ -467,7 +510,7 @@ public class SLayoutBankRow implements SGridRow {
                 case 1:
                     break;
                 case 2:
-                    mdBalanceTot = (double) value;
+                     moBalanceTot.setAmountOriginal((double) value);
                     break;
                 case 3:
                     break;
@@ -477,7 +520,6 @@ public class SLayoutBankRow implements SGridRow {
                     }
                     else {
                         msAccountCredit = ((SGuiItem) value).getItem();
-                        //msAccountCredit = (String) value;
                     }
                     break;
                 case 5:
@@ -485,6 +527,8 @@ public class SLayoutBankRow implements SGridRow {
                     break;
                 case 6:
                     break;
+                case 7:
+                    msObservation = (String) value;
                 default:
                     break;
             }

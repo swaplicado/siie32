@@ -515,6 +515,7 @@ public abstract class SModSysConsts {
     public static final int FIN_LAY_BANK_REC = 1;
     public static final int FIN_LAY_BANK_DPS = 2;
     public static final int FIN_LAY_BANK_ADV = 3;
+    public static final int FIN_LAY_BANK_QRY = 4;
 
     /*
      * Transactions

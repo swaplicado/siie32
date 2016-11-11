@@ -186,10 +186,9 @@ public class SViewBankLayoutPayments extends SGridPaneView implements ActionList
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
         
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "l.dt_lay", "Pago"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "l.dt_due", "Vencimiento"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_lay", "Layout", 150));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, SDbConsts.FIELD_ID + "1", "Folio", 50));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_tp_lay", "Tipo layout", 200));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_ent", "Cuenta cargo", 250));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_ent", "Cuenta bancaria", 250));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "l.cpt", "Concepto/Descripción", 250));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.con", "Consecutivo día", 50));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "l.amt", "Monto $"));
