@@ -171,7 +171,7 @@ public class SDialogSendMailContract extends sa.lib.gui.bean.SBeanFormDialog imp
         jPanel8.add(jlRecipientsTo);
 
         moTextRecipientsTo.setText("sBeanFieldText3");
-        moTextRecipientsTo.setToolTipText("Ejemplo: email1; email2...");
+        moTextRecipientsTo.setToolTipText("Ejemplo: correo-e1;correo-e2...");
         moTextRecipientsTo.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel8.add(moTextRecipientsTo);
 
@@ -184,7 +184,7 @@ public class SDialogSendMailContract extends sa.lib.gui.bean.SBeanFormDialog imp
         jPanel9.add(jlRecipientsCc);
 
         moTextRecipientsCc.setText("sBeanFieldText3");
-        moTextRecipientsCc.setToolTipText("Ejemplo: email1; email2...");
+        moTextRecipientsCc.setToolTipText("Ejemplo: correo-e1; correo-e2...");
         moTextRecipientsCc.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel9.add(moTextRecipientsCc);
 
@@ -197,7 +197,7 @@ public class SDialogSendMailContract extends sa.lib.gui.bean.SBeanFormDialog imp
         jPanel10.add(jlRecipientsBcc);
 
         moTextRecipientsBcc.setText("sBeanFieldText3");
-        moTextRecipientsBcc.setToolTipText("Ejemplo: email1; email2...");
+        moTextRecipientsBcc.setToolTipText("Ejemplo: correo-e1; correo-e2...");
         moTextRecipientsBcc.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel10.add(moTextRecipientsBcc);
 
