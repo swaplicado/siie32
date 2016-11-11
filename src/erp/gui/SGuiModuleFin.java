@@ -98,8 +98,6 @@ import erp.mod.fin.form.SDialogDpsExchangeDif;
 import erp.mod.fin.form.SDialogFiscalAccountsConfig;
 import erp.mod.fin.form.SDialogFiscalXmlFile;
 import erp.mod.fin.form.SDialogRepCashFlowExpected;
-import erp.mod.fin.form.SDialogRepMovsFileCvs;
-import erp.mod.fin.form.SDialogRepMovsIncExp;
 import erp.mod.fin.form.SDialogReportTaxPending;
 import erp.mod.fin.form.SDialogValuationBalances;
 import erp.mtrn.data.SDataCtr;
@@ -2076,24 +2074,6 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiRepCashFlowExpected) {
                 new SDialogRepCashFlowExpected(miClient.getSession().getClient(), SModConsts.FINR_CSH_FLW_EXP, SDataRepConstants.REP_CSH_FLW_EXP).setVisible(true);
             }
-            else if (item == jmiRepAccIncNet) {
-                new SDialogRepMovsIncExp(miClient.getSession().getClient(), SDataConstantsSys.TRNS_CT_DPS_SAL, SUtilConsts.QRY_SUM,"Reporte de ingresos contables netos").setVisible(true);
-            }
-            else if (item == jmiRepAccIncNetAdj) {
-                new SDialogRepMovsIncExp(miClient.getSession().getClient(), SDataConstantsSys.TRNS_CT_DPS_SAL, SUtilConsts.QRY_DET,"Reporte de ingresos contables netos y sus ajustes").setVisible(true);
-            }
-            else if (item == jmiRepFileCsvInc) {
-                new SDialogRepMovsFileCvs(miClient.getSession().getClient(), SDataConstantsSys.TRNS_CT_DPS_SAL, "Archivo de exportación de ingresos contables").setVisible(true);
-            }    
-            else if (item == jmiRepAccExpNet) {
-                new SDialogRepMovsIncExp(miClient.getSession().getClient(), SDataConstantsSys.TRNS_CT_DPS_PUR, SUtilConsts.QRY_SUM,"Reporte de egresos contables netos").setVisible(true);
-            }
-            else if (item == jmiRepAccExpNetAdj) {
-                new SDialogRepMovsIncExp(miClient.getSession().getClient(), SDataConstantsSys.TRNS_CT_DPS_PUR, SUtilConsts.QRY_DET,"Reporte de egresos contables netos y sus ajustes").setVisible(true);
-            }
-            else if (item == jmiRepFileCsvExp) {
-                new SDialogRepMovsFileCvs(miClient.getSession().getClient(), SDataConstantsSys.TRNS_CT_DPS_PUR, "Archivo de exportación de egresos contables").setVisible(true);
-            }    
             else if (item == jmiRepLedgerAccount) {
                 new SDialogRepAuxAccounting(miClient).setVisible(true);
             }
