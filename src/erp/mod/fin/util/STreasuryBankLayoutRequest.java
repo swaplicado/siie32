@@ -120,6 +120,9 @@ public class STreasuryBankLayoutRequest {
                             SLibUtils.showException(this, e);
                         }
                     }
+                    else {
+                        miClient.showMsgBoxWarning("No existe PDF para envío.");
+                    }
                 }
                 else {
                     miClient.showMsgBoxWarning("No existe ningún correo-e configurado para envío de solicitudes.");
