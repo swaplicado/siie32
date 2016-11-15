@@ -35,7 +35,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Uriel Castañeda
  */
 public class SDialogRepMovsFileCvs extends SBeanFormDialog implements ActionListener {
   /**

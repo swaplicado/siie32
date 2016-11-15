@@ -38,7 +38,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Uriel Castañeda
  */
 public class SViewBankLayout extends SGridPaneView implements ActionListener {
 
