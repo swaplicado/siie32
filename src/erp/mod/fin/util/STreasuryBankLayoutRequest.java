@@ -97,26 +97,40 @@ public class STreasuryBankLayoutRequest {
         
         if (mms.getQueryResultId() == SDbConsts.READ_OK) {
             sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
-            toRecipients = new ArrayList<String>(Arrays.asList(SLibUtils.textExplode(mms.getRecipientTo(), ";")));
             
-            if (!toRecipients.isEmpty()) {
-                recipientsCc = new ArrayList<String>(Arrays.asList(SLibUtilities.textExplode(mms.getRecipientCarbonCopy(), ";")));
-                mail = new SMail(sender, subject, body, toRecipients, recipientsCc);
+            if (mms.getRecipientTo() != null && !mms.getRecipientTo().isEmpty()) {
+                toRecipients = new ArrayList<String>(Arrays.asList(SLibUtils.textExplode(mms.getRecipientTo(), ";")));
                 
-                if (pdf != null) {
-                    mail.getAttachments().add(pdf);
-                    try {
-                        mail.send();
-                        sent = true;
+                if (!toRecipients.isEmpty()) {
+                    if (mms.getRecipientCarbonCopy() != null && !mms.getRecipientCarbonCopy().isEmpty()) {
+                        recipientsCc = new ArrayList<String>(Arrays.asList(SLibUtilities.textExplode(mms.getRecipientCarbonCopy(), ";")));
+                        mail = new SMail(sender, subject, body, toRecipients, recipientsCc);
                     }
-                    catch (Exception e) {
-                        SLibUtils.showException(this, e);
+                    else {
+                        mail = new SMail(sender, subject, body, toRecipients);
+                    }
+                    
+                    if (pdf != null) {
+                        mail.getAttachments().add(pdf);
+                        try {
+                            mail.send();
+                            sent = true;
+                        }
+                        catch (Exception e) {
+                            SLibUtils.showException(this, e);
+                        }
+                    }
+                    else {
+                        miClient.showMsgBoxWarning("No existe PDF para envío.");
                     }
                 }
+                else {
+                    miClient.showMsgBoxWarning("No existe ningún correo-e configurado para envío de solicitudes.");
+                }
             }
-        }
-        else {
-            miClient.showMsgBoxWarning("No existe ningún correo-e configurado para envío de solicitudes.");
+            else {
+                miClient.showMsgBoxWarning("No existe ningún correo-e configurado para envío de solicitudes.");
+            }    
         }
         
         return sent;
