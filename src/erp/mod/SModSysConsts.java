@@ -40,6 +40,7 @@ public abstract class SModSysConsts {
     public static final int CFGS_TP_MMS_CON = 2;
     public static final int CFGS_TP_MMS_ORD_SAL = 3;
     public static final int CFGS_TP_MMS_ORD_PUR = 4;
+    public static final int CFGS_TP_MMS_FIN_PAY_AUTH_REQ = 11;
 
     public static final int CFGU_CUR_MXN = 1;
     public static final int CFGU_CUR_USD = 2;

@@ -84,7 +84,7 @@ import sa.lib.xml.SXmlElement;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Uriel Castañeda
  */
 public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemListener, CellEditorListener {
 

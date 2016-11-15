@@ -13,12 +13,14 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
+import java.util.Date;
 import java.util.Deque;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SortOrder;
 import sa.lib.SLibRpnArgumentType;
 import sa.lib.SLibRpnOperator;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -29,7 +31,7 @@ public abstract class STableUtilities {
     private static int seek(erp.lib.table.STablePane tablePane, int pnCol, javax.swing.SortOrder poSortOrder, int pnFirstRow, int pnLastRow, double pdValue) {
         int nMiddleRow = 0;
         double dComparison = 0;
-
+        
         nMiddleRow = pnFirstRow + ((pnLastRow - pnFirstRow) / 2);
         dComparison = pdValue - ((Number) tablePane.getTable().getValueAt(nMiddleRow, pnCol)).doubleValue();
 
@@ -68,7 +70,7 @@ public abstract class STableUtilities {
     private static int seek(erp.lib.table.STablePane tablePane, int pnCol, javax.swing.SortOrder poSortOrder, int pnFirstRow, int pnLastRow, java.lang.String psValue) {
         int nMiddleRow = 0;
         int nComparison = 0;
-
+        
         nMiddleRow = pnFirstRow + ((pnLastRow - pnFirstRow) / 2);
         nComparison = psValue.compareToIgnoreCase(
         (((java.lang.String) tablePane.getTable().getValueAt(nMiddleRow, pnCol)).length() > psValue.length() ?
@@ -110,38 +112,38 @@ public abstract class STableUtilities {
     private static int seek(erp.lib.table.STablePane tablePane, int pnCol, javax.swing.SortOrder poSortOrder, int pnFirstRow, int pnLastRow, java.util.Date ptValue) {
         int nMiddleRow = 0;
         int nComparison = 0;
+        
+            nMiddleRow = pnFirstRow + ((pnLastRow - pnFirstRow) / 2);
+            nComparison = ptValue.compareTo((java.util.Date) tablePane.getTable().getValueAt(nMiddleRow, pnCol));
 
-        nMiddleRow = pnFirstRow + ((pnLastRow - pnFirstRow) / 2);
-        nComparison = ptValue.compareTo((java.util.Date) tablePane.getTable().getValueAt(nMiddleRow, pnCol));
+            if (nComparison == 0) {
+                return nMiddleRow;
+            }
 
-        if (nComparison == 0) {
-            return nMiddleRow;
-        }
-
-        if (poSortOrder == SortOrder.ASCENDING) {
-            if (nComparison < 0) {
-                if ((nMiddleRow - 1) >= pnFirstRow) {
-                    return seek(tablePane, pnCol, poSortOrder, pnFirstRow, nMiddleRow - 1, ptValue);
+            if (poSortOrder == SortOrder.ASCENDING) {
+                if (nComparison < 0) {
+                    if ((nMiddleRow - 1) >= pnFirstRow) {
+                        return seek(tablePane, pnCol, poSortOrder, pnFirstRow, nMiddleRow - 1, ptValue);
+                    }
+                }
+                else {
+                    if (pnLastRow >= (nMiddleRow + 1)) {
+                        return seek(tablePane, pnCol, poSortOrder, nMiddleRow + 1, pnLastRow, ptValue);
+                    }
                 }
             }
-            else {
-                if (pnLastRow >= (nMiddleRow + 1)) {
-                    return seek(tablePane, pnCol, poSortOrder, nMiddleRow + 1, pnLastRow, ptValue);
+            else if (poSortOrder == SortOrder.DESCENDING) {
+                if (nComparison < 0) {
+                    if (pnLastRow >= (nMiddleRow + 1)) {
+                        return seek(tablePane, pnCol, poSortOrder, nMiddleRow + 1, pnLastRow, ptValue);
+                    }
+                }
+                else {
+                    if ((nMiddleRow - 1) >= pnFirstRow) {
+                        return seek(tablePane, pnCol, poSortOrder, pnFirstRow, nMiddleRow - 1, ptValue);
+                    }
                 }
             }
-        }
-        else if (poSortOrder == SortOrder.DESCENDING) {
-            if (nComparison < 0) {
-                if (pnLastRow >= (nMiddleRow + 1)) {
-                    return seek(tablePane, pnCol, poSortOrder, nMiddleRow + 1, pnLastRow, ptValue);
-                }
-            }
-            else {
-                if ((nMiddleRow - 1) >= pnFirstRow) {
-                    return seek(tablePane, pnCol, poSortOrder, pnFirstRow, nMiddleRow - 1, ptValue);
-                }
-            }
-        }
 
         return -1;
     }
@@ -208,38 +210,47 @@ public abstract class STableUtilities {
                         default:
                             break;
                     }
-
+                    
+                    if (row == -1) {
+                        row = seekGeneral(poTablePane, psValue);
+                    }
+                    
                     if (row == -1) {
                         piClient.showMsgBoxWarning("No se encontró ningún registro para el valor '" + psValue + "'.");
                     }
                     else {
-                        // Go back to first occurrence of value:
-                        switch (poTablePane.getTableColumn(col).getColumnType()) {
-                            case SLibConstants.DATA_TYPE_BOOLEAN:
-                            case SLibConstants.DATA_TYPE_INTEGER:
-                            case SLibConstants.DATA_TYPE_LONG:
-                            case SLibConstants.DATA_TYPE_FLOAT:
-                            case SLibConstants.DATA_TYPE_DOUBLE:
-                                while (row > 0 && dValue == ((Number) poTablePane.getTable().getValueAt(row - 1, col)).doubleValue()) {
-                                    row--;
-                                }
-                                break;
-                            case SLibConstants.DATA_TYPE_STRING:
-                                while (row > 0 && psValue.compareToIgnoreCase(
-                                (((String) poTablePane.getTable().getValueAt(row - 1, col)).length() > psValue.length() ?
-                                ((String) poTablePane.getTable().getValueAt(row - 1, col)).substring(0, psValue.length()) :
-                                (String) poTablePane.getTable().getValueAt(row - 1, col))) == 0) {
-                                    row--;
-                                }
-                                break;
-                            case SLibConstants.DATA_TYPE_DATE:
-                            case SLibConstants.DATA_TYPE_DATE_TIME:
-                            case SLibConstants.DATA_TYPE_TIME:
-                                while (row > 0 && tValue.compareTo((java.util.Date) poTablePane.getTable().getValueAt(row - 1, col)) == 0) {
-                                    row--;
-                                }
-                                break;
-                            default:
+                        try {
+                            // Go back to first occurrence of value:
+                            switch (poTablePane.getTableColumn(col).getColumnType()) {
+                                case SLibConstants.DATA_TYPE_BOOLEAN:
+                                case SLibConstants.DATA_TYPE_INTEGER:
+                                case SLibConstants.DATA_TYPE_LONG:
+                                case SLibConstants.DATA_TYPE_FLOAT:
+                                case SLibConstants.DATA_TYPE_DOUBLE:
+                                    while (row > 0 && dValue == ((Number) poTablePane.getTable().getValueAt(row - 1, col)).doubleValue()) {
+                                        row--;
+                                    }
+                                    break;
+                                case SLibConstants.DATA_TYPE_STRING:
+                                    while (row > 0 && psValue.compareToIgnoreCase(
+                                    (((String) poTablePane.getTable().getValueAt(row - 1, col)).length() > psValue.length() ?
+                                    ((String) poTablePane.getTable().getValueAt(row - 1, col)).substring(0, psValue.length()) :
+                                    (String) poTablePane.getTable().getValueAt(row - 1, col))) == 0) {
+                                        row--;
+                                    }
+                                    break;
+                                case SLibConstants.DATA_TYPE_DATE:
+                                case SLibConstants.DATA_TYPE_DATE_TIME:
+                                case SLibConstants.DATA_TYPE_TIME:
+                                    while (row > 0 && tValue.compareTo((java.util.Date) poTablePane.getTable().getValueAt(row - 1, col)) == 0) {
+                                        row--;
+                                    }
+                                    break;
+                                default:
+                            }
+                        }
+                        catch (Exception e) {
+                            SLibUtilities.printOutException(STableUtilities.class, e);
                         }
 
                         // Scroll to value:
@@ -249,6 +260,129 @@ public abstract class STableUtilities {
                 }
             }
         }
+    }
+    
+    private static int seekGeneral(erp.lib.table.STablePane poTablePane, String psValue) {
+        int result = -1;
+        int columnIndex = 0;
+        					
+        // While the column is not the last
+        while (columnIndex < poTablePane.getTable().getColumnCount()) {
+            switch (poTablePane.getTableColumn(columnIndex).getColumnType()) {
+                case SLibConstants.DATA_TYPE_STRING:
+                    result = seekByString(poTablePane, columnIndex, psValue);
+                    break;
+                case SLibConstants.DATA_TYPE_BOOLEAN:
+                case SLibConstants.DATA_TYPE_DOUBLE:
+                case SLibConstants.DATA_TYPE_FLOAT:
+                case SLibConstants.DATA_TYPE_INTEGER:
+                case SLibConstants.DATA_TYPE_LONG:
+                    result = seekByPrimitiveValue(poTablePane, columnIndex, psValue);
+                    break;
+                case SLibConstants.DATA_TYPE_DATE:
+                case SLibConstants.DATA_TYPE_DATE_TIME:
+                case SLibConstants.DATA_TYPE_TIME:
+                    result = seekByDate(poTablePane, columnIndex, psValue);
+                    break;
+                default:
+            }
+            
+            if (result > -1) {
+                break;
+            }
+            else {
+                columnIndex++;
+            }
+        }
+
+        return result;
+    }
+
+    private static int seekByString(erp.lib.table.STablePane poTablePane, int column, String psValue) {
+        int row = 0;
+        int numRows = poTablePane.getTableGuiRowCount();
+        String value = "";
+        int result = -1;
+        
+        while (row < numRows) {
+            // Get the value of the table in the search column and current row as string
+            value = (String) poTablePane.getTable().getValueAt(row, column);
+            if (value != null && value.toUpperCase().contains(psValue.toUpperCase())) {
+                result = row;
+                break;
+            }
+            row++;
+        }
+    
+	// If the value was not found, return -1	
+        return result;
+    }
+    
+    private static int seekByPrimitiveValue(erp.lib.table.STablePane poTablePane, int column, String psValue) {
+        int row = 0;
+        int numRows = poTablePane.getTableGuiRowCount();
+        String value = "";
+        int result = -1;
+        
+        while (row < numRows) {
+            try {
+                // Get the value of the table in the search column and current row and it is transformed into a string
+                value = ((Number) poTablePane.getTable().getValueAt(row, column)).toString();
+                if (value != null && value.toUpperCase().contains(psValue.toUpperCase())) {
+                    result = row;
+                    break;
+                }
+            }
+            catch (Exception e) {
+                SLibUtilities.printOutException(STableUtilities.class, e);
+            }
+
+            row++;
+        }
+        
+        // If the value was not found, return -1
+        return result;
+    }
+    
+    private static int seekByDate(erp.lib.table.STablePane poTablePane, int column, String psValue) {
+        int row = 0;
+        int numRows = poTablePane.getTableGuiRowCount();
+        String value = "";
+        int result = -1;
+        SimpleDateFormat formatDate = null;
+        
+        switch (poTablePane.getTableColumn(column).getColumnType()) {
+            case SLibConstants.DATA_TYPE_DATE:
+                formatDate = SLibUtils.DateFormatDate;
+                break;
+            case SLibConstants.DATA_TYPE_DATE_TIME:
+                formatDate = SLibUtils.DateFormatDatetime;
+                break;
+            case SLibConstants.DATA_TYPE_TIME:
+                formatDate = SLibUtils.DateFormatTime;
+                break;
+            default:
+                formatDate = SLibUtils.DateFormatDate;
+        }
+        
+        while (row < numRows) {
+            try {
+                // Get the value of the table in the search column and current row as date and format
+                value = formatDate.format((Date) poTablePane.getTable().getValueAt(row, column));
+                if (value != null && value.toUpperCase().contains(psValue.toUpperCase())) {
+                    result = row;
+                    break;
+                }
+            }
+            catch (Exception e) {
+                SLibUtilities.printOutException(STableUtilities.class, e);
+            }
+            
+            row++;
+        }
+        
+        // If the value was not found, return -1
+        return result;
     }
 
     public static void actionExportCsv(erp.client.SClientInterface client, erp.lib.table.STablePane tablePane, java.lang.String title) {
