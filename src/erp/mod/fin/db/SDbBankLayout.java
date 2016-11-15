@@ -55,12 +55,6 @@ public class SDbBankLayout extends SDbRegistryUser {
     public static final int FIELD_CLOSE = FIELD_BASE + 1;
     public static final int FIELD_CLOSE_USER = FIELD_BASE + 2;
     
-    public static final int LAY_BANK_NEW_ST = 0;
-    public static final int LAY_BANK_APPROVED_ST = 1;
-    
-    public static final String LAY_BANK_NEW_TEXT_ST = "NUEVO";
-    public static final String LAY_BANK_APPROVED_TEXT_ST = "APROBADO";
-    
     protected int mnPkBankLayoutId;
     protected Date mtDateLayout;
     protected Date mtDateDue;

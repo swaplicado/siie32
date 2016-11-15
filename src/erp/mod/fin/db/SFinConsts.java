@@ -26,6 +26,12 @@ public class SFinConsts {
     
     public static final int LAY_BANK_TYPE_DPS = 1;
     public static final int LAY_BANK_TYPE_ADV = 2;
+    
+    public static final int LAY_BANK_NEW_ST = 0;
+    public static final int LAY_BANK_APPROVED_ST = 1;
+    
+    public static final String LAY_BANK_NEW_TEXT_ST = "NUEVO";
+    public static final String LAY_BANK_APPROVED_TEXT_ST = "APROBADO";
 
     public static final String TXT_BANK_BANK = "BCO.";
     public static final String TXT_BANK_BRA = "SUC.";

@@ -105,8 +105,8 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
                 else {
                     bankLayout = (SDbBankLayout) miClient.getSession().readRegistry(SModConsts.FIN_LAY_BANK, gridRow.getRowPrimaryKey(), SDbConsts.MODE_VERBOSE);
                     
-                    if (bankLayout.getLayoutStatus() == SDbBankLayout.LAY_BANK_APPROVED_ST) {
-                        miClient.showMsgBoxWarning("El layout no puede ser modificado en estatus " + SDbBankLayout.LAY_BANK_APPROVED_TEXT_ST);
+                    if (bankLayout.getLayoutStatus() == SFinConsts.LAY_BANK_APPROVED_ST) {
+                        miClient.showMsgBoxWarning("El layout no puede ser modificado en estatus " + SFinConsts.LAY_BANK_APPROVED_TEXT_ST);
                     }
                     else if (bankLayout.getDocsPayed() > 0) {
                         miClient.showMsgBoxWarning(SDbConsts.MSG_REG_DENIED_UPDATE + "\n¡Existen documentos con pagos aplicados!");
@@ -242,8 +242,8 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
         bankLayout = readLayout();
         if (bankLayout != null) {
             try {
-                if (bankLayout.getLayoutStatus() == SDbBankLayout.LAY_BANK_APPROVED_ST) {
-                    SFinUtils.changeLayoutStatus(miClient, bankLayout, SDbBankLayout.LAY_BANK_NEW_ST);
+                if (bankLayout.getLayoutStatus() == SFinConsts.LAY_BANK_APPROVED_ST) {
+                    SFinUtils.changeLayoutStatus(miClient, bankLayout, SFinConsts.LAY_BANK_NEW_ST);
                     miClient.getSession().notifySuscriptors(mnGridType);
                 }
             }
@@ -300,7 +300,7 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
                 + "l.amt, l.amt_pay, (l.amt - l.amt_pay) AS f_amt_x_pay, "
                 + "l.tra, l.tra_pay, (l.tra - l.tra_pay) AS f_tra_x_pay, "
                 + "l.dps, l.dps_pay, (l.dps - l.dps_pay) AS f_doc_x_pay, "
-                + "IF (l.lay_st = "+ SDbBankLayout.LAY_BANK_APPROVED_ST + ", '" + SDbBankLayout.LAY_BANK_APPROVED_TEXT_ST + "', '" + SDbBankLayout.LAY_BANK_NEW_TEXT_ST + "') AS status, l.auth_req, "
+                + "IF (l.lay_st = "+ SFinConsts.LAY_BANK_APPROVED_ST + ", '" + SFinConsts.LAY_BANK_APPROVED_TEXT_ST + "', '" + SFinConsts.LAY_BANK_NEW_TEXT_ST + "') AS status, l.auth_req, "
                 + "tp.tp_lay_bank AS f_tp_lay, "
                 + "IF(tp.lay_bank = " + SFinConsts.LAY_BANK_HSBC + ", '" + SFinConsts.TXT_LAY_BANK_HSBC + "', "
                 + "IF(tp.lay_bank = " + SFinConsts.LAY_BANK_SANTANDER + ", '" + SFinConsts.TXT_LAY_BANK_SANTANDER + "', "

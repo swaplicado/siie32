@@ -7,8 +7,10 @@ package erp.mod.fin.util;
 
 import erp.client.SClientInterface;
 import erp.lib.SLibUtilities;
+import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbMms;
 import erp.mod.fin.db.SDbBankLayout;
+import erp.mod.fin.db.SFinConsts;
 import static erp.mtrn.data.STrnUtilities.getMms;
 import java.io.File;
 import java.util.ArrayList;
@@ -58,8 +60,8 @@ public class STreasuryBankLayoutRequest {
                 
                 if (done) {
                     try {
-                        if (moBankLayout.getLayoutStatus() == SDbBankLayout.LAY_BANK_NEW_ST) {
-                            SFinUtils.changeLayoutStatus(miClient, moBankLayout, SDbBankLayout.LAY_BANK_APPROVED_ST);
+                        if (moBankLayout.getLayoutStatus() == SFinConsts.LAY_BANK_NEW_ST) {
+                            SFinUtils.changeLayoutStatus(miClient, moBankLayout, SFinConsts.LAY_BANK_APPROVED_ST);
                         }
                         SFinUtils.increaseLayoutRequest(miClient, moBankLayout);
                     }
@@ -90,12 +92,12 @@ public class STreasuryBankLayoutRequest {
                "Banco: " + parameters.getBank() + "\n" +
                "Cuenta bancaria: " + parameters.getBankAccount() + "\n" +
                "Tipo de pago: " + parameters.getTypePayment() + "\n" +
-               "Total: " + parameters.getTotal() + " " + parameters.getCurrency() + "\n\n\n" +
+               "Total: " + SLibUtils.DecimalFormatValue2D.format( parameters.getTotal()) + " " + parameters.getCurrency() + "\n\n\n" +
                comment;
         
-        mms = getMms((SClientInterface) miClient, 1);
+        mms = getMms((SClientInterface) miClient, SModSysConsts.CFGS_TP_MMS_FIN_PAY_AUTH_REQ);
         
-        if (mms.getQueryResultId() == SDbConsts.READ_OK) {
+        if (mms != null && mms.getQueryResultId() == SDbConsts.READ_OK) {
             sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
             
             if (mms.getRecipientTo() != null && !mms.getRecipientTo().isEmpty()) {
@@ -131,6 +133,9 @@ public class STreasuryBankLayoutRequest {
             else {
                 miClient.showMsgBoxWarning("No existe ningún correo-e configurado para envío de solicitudes.");
             }    
+        }
+        else {
+                miClient.showMsgBoxWarning("No existe ninguna configuración para envío de solicitudes.");
         }
         
         return sent;
