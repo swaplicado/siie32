@@ -31,7 +31,6 @@ import sa.lib.SLibConsts;
 import sa.lib.SLibRpnArgument;
 import sa.lib.SLibRpnArgumentType;
 import sa.lib.SLibRpnUtils;
-import sa.lib.SLibUtils;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.xml.SXmlColumnView;
 import sa.lib.grid.xml.SXmlGridXml;
@@ -377,7 +376,9 @@ public abstract class STableTab extends javax.swing.JPanel implements erp.lib.ta
             }
         }
         catch (Exception e) {
-            SLibUtils.showException(this, e);
+            SLibUtilities.printOutException(this, e);
+            miClient.showMsgBoxInformation(SGridConsts.ERR_MSG_PREFS_VIEW);
+            actionRefresh(STableConstants.REFRESH_MODE_RESET);
         }
 
         // Check if customized columns are equivalent to default columns:
@@ -623,8 +624,15 @@ public abstract class STableTab extends javax.swing.JPanel implements erp.lib.ta
             SLibUtilities.renderException(this, e);
         }
         finally {
-            moTablePane.getTable().getRowSorter().setSortKeys(miSortKeysList);
-
+            try {
+                moTablePane.getTable().getRowSorter().setSortKeys(miSortKeysList);
+            }
+            catch(java.lang.Exception e) {
+                SLibUtilities.printOutException(this, e);
+                miClient.showMsgBoxInformation(SGridConsts.ERR_MSG_PREFS_VIEW);
+                actionRefresh(STableConstants.REFRESH_MODE_RESET);
+            }
+            
             if (bIsDataAvailable) {
                 moTablePane.setTableRowSelection(0);
                 jtfSeek.setEnabled(true);
