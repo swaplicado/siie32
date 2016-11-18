@@ -218,7 +218,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbDeliveryAddress = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_loc.gif")));
         jbDeliveryAddress.setPreferredSize(new Dimension(23, 23));
         jbDeliveryAddress.addActionListener(this);
-        jbDeliveryAddress.setToolTipText("Actualizar domicilio de entrega");
+        jbDeliveryAddress.setToolTipText("Actualizar domicilio de operación");
 
         jbDelivery = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_DELIVERY));
         jbDelivery.setPreferredSize(new Dimension(23, 23));
@@ -802,6 +802,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 moDialogUpdateDpsDlvryAddrss.setFormVisible(true);
 
                 if (moDialogUpdateDpsDlvryAddrss.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    miClient.showMsgBoxInformation("El domicilio de operación fue actualizado.");
                     miClient.getGuiModule(gui).refreshCatalogues(mnTabType);
                 }
             }

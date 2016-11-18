@@ -76,7 +76,7 @@ public class SDialogUpdateDpsDeliveryAddress extends javax.swing.JDialog impleme
         jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Actualización de fechas de entrega del documento");
+        setTitle("Actualización de domicilio de operación del documento");
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -99,7 +99,7 @@ public class SDialogUpdateDpsDeliveryAddress extends javax.swing.JDialog impleme
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlCurrentOperationAddress.setText("Domicilio operación entrega:");
+        jlCurrentOperationAddress.setText("Domicilio operación actual:");
         jlCurrentOperationAddress.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel11.add(jlCurrentOperationAddress);
 
@@ -113,7 +113,7 @@ public class SDialogUpdateDpsDeliveryAddress extends javax.swing.JDialog impleme
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlNewOperationAddress.setText("Nuevo domicilio operación:");
+        jlNewOperationAddress.setText("Domicilio operación nuevo:");
         jlNewOperationAddress.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel3.add(jlNewOperationAddress);
 
