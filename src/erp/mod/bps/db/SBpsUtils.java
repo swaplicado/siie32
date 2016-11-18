@@ -12,11 +12,12 @@ import java.util.ArrayList;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Edwin Carmona
  */
 public abstract class SBpsUtils {
 
@@ -141,6 +142,38 @@ public abstract class SBpsUtils {
         }
         
         return bankAccountNumberFormat;
+    }
+    
+    public static int bankAccountOcurrences(final SGuiClient client, final String accNum, final int idBank, final int[] bankAccPk) throws Exception {
+        ResultSet resultSet = null;
+        int occurrences = 0;
+        String sql = "";
+        
+        sql = "SELECT COUNT(*) AS number FROM erp.bpsu_bank_acc WHERE acc_num = '" + accNum + "' AND fid_bank = " + idBank +
+                (bankAccPk != null ? " AND id_bpb != " + bankAccPk[0] + " AND id_bank_acc != " + bankAccPk[1] : "");
+        resultSet = client.getSession().getStatement().executeQuery(sql);
+
+        if (resultSet.next()) {
+            occurrences = resultSet.getInt("number");
+        }
+        
+        return occurrences;
+    }
+    
+    public static int stdBankAccountOcurrences(final SGuiClient client, final String accNumStd, final int[] bankAccPk) throws Exception {
+        ResultSet resultSet = null;
+        int occurrences = 0;
+        String sql = "";
+        
+        sql = "SELECT COUNT(*) as number FROM erp.bpsu_bank_acc WHERE acc_num_std = '" + accNumStd + "'" +
+                (bankAccPk != null ? " AND id_bpb != " + bankAccPk[0] + " AND id_bank_acc != " + bankAccPk[1] : "");
+        resultSet = client.getSession().getStatement().executeQuery(sql);
+
+        if (resultSet.next()) {
+            occurrences = resultSet.getInt("number");
+        }
+        
+        return occurrences;
     }
     
     public static String bankAccountClaBeFormat(final String bankAccountClaBe) {
