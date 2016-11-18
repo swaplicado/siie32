@@ -34,10 +34,11 @@ import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
 import java.util.Vector;
 import javax.swing.AbstractAction;
+import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Edwin Carmona
  */
 public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -1062,6 +1063,28 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
                         break;
                     }
                 }
+            }
+        }
+        
+        if (!validation.getIsError()) {
+            try {
+                if (SBpsUtils.bankAccountOcurrences((SGuiClient) miClient, moFieldBankAccountNumber.getString(), moFieldFkBankId.getKeyAsIntArray()[0],
+                        moBizPartnerBranchBankAccount == null ? null : (int []) moBizPartnerBranchBankAccount.getPrimaryKey()) > 0) {
+                    validation.setMessage("El campo " + jlBankAccountNumber.getText() + " ya existe.");
+                    validation.setComponent(jtfBankAccountNumber);
+                }
+
+                if (!validation.getIsError()) {
+                    if (SBpsUtils.stdBankAccountOcurrences((SGuiClient) miClient, moFieldBankAccountNumberStd.getString(),
+                            moBizPartnerBranchBankAccount == null ? null : (int []) moBizPartnerBranchBankAccount.getPrimaryKey()) > 0) {
+                        validation.setMessage("El campo '" + jlBankAccountNumberStd.getText() + "' ya existe.");
+                        validation.setComponent(jtfBankAccountNumberStd);
+                    }
+                }
+            }
+            catch (Exception e) {
+                validation.setIsError(true);
+                SLibUtilities.renderException(this, e);
             }
         }
 
