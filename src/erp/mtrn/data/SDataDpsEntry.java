@@ -80,10 +80,14 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected double mdContractFuture;
     protected double mdContractFactor;
     protected int mnContractPriceYear;
-    protected int mnContractPriceMonth;    
-    protected java.lang.String msVehicleNumber;
-    protected java.lang.String msSecuritySeal;
+    protected int mnContractPriceMonth;
+    protected java.lang.String msSealQuality;
+    protected java.lang.String msSealSecurity;
+    protected java.lang.String msDriver;
+    protected java.lang.String msPlate;
     protected java.lang.String msTicket;
+    protected java.lang.String msContainerTank;
+    protected java.lang.String msVgm;
     protected int mnUserId;
     protected int mnSortingPosition;
     protected boolean mbIsPrepayment;
@@ -228,9 +232,13 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setContractFactor(double d) { mdContractFactor = d; }
     public void setContractPriceYear(int n) { mnContractPriceYear = n; }
     public void setContractPriceMonth(int n) { mnContractPriceMonth = n; }
-    public void setVehicleNumber(java.lang.String s) { msVehicleNumber = s; }
-    public void setSecuritySeal(java.lang.String s) { msSecuritySeal = s; }
+    public void setSealQuality(java.lang.String s) { msSealQuality = s; }
+    public void setSealSecurity(java.lang.String s) { msSealSecurity = s; }
+    public void setDriver(java.lang.String s) { msDriver = s; }
+    public void setPlate(java.lang.String s) { msPlate = s; }
     public void setTicket(java.lang.String s) { msTicket = s; }
+    public void setContainerTank(java.lang.String s) { msContainerTank = s; }
+    public void setVgm(java.lang.String s) { msVgm = s; }
     public void setUserId(int n) { mnUserId = n; }
     public void setSortingPosition(int n) { mnSortingPosition = n; }
     public void setIsPrepayment(boolean b) { mbIsPrepayment = b; }
@@ -316,9 +324,13 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public double getContractFactor() { return mdContractFactor; }
     public int getContractPriceYear() { return mnContractPriceYear; }
     public int getContractPriceMonth() { return mnContractPriceMonth; }
-    public java.lang.String getVehicleNumber() { return msVehicleNumber; }
-    public java.lang.String getSecuritySeal() { return msSecuritySeal; }
+    public java.lang.String getSealQuality() { return msSealQuality; }
+    public java.lang.String getSealSecurity() { return msSealSecurity; }
+    public java.lang.String getDriver() { return msDriver; }
+    public java.lang.String getPlate() { return msPlate; }
     public java.lang.String getTicket() { return msTicket; }
+    public java.lang.String getContainerTank() { return msContainerTank; }
+    public java.lang.String getVgm() { return msVgm; }
     public int getUserId() { return mnUserId; }
     public int getSortingPosition() { return mnSortingPosition; }
     public boolean getIsPrepayment() { return mbIsPrepayment; }
@@ -491,9 +503,13 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mdContractFactor = 0;
         mnContractPriceYear = 0;
         mnContractPriceMonth = 0;
-        msVehicleNumber = "";
-        msSecuritySeal = "";
+        msSealQuality = "";
+        msSealSecurity = "";
+        msDriver = "";
+        msPlate = "";
         msTicket = "";
+        msContainerTank = "";
+        msVgm = "";
         mnUserId = 0;
         mnSortingPosition = 0;
         mbIsPrepayment = false;
@@ -647,9 +663,13 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 mdContractFactor = resultSet.getDouble("de.con_factor");
                 mnContractPriceYear = resultSet.getInt("de.con_prc_year");
                 mnContractPriceMonth = resultSet.getInt("de.con_prc_mon");
-                msVehicleNumber = resultSet.getString("de.veh_num");
-                msSecuritySeal = resultSet.getString("de.sec_seal");
+                msSealQuality = resultSet.getString("de.seal_qlt");
+                msSealSecurity = resultSet.getString("de.seal_sec");
+                msDriver = resultSet.getString("de.driver");
+                msPlate = resultSet.getString("de.plate");
                 msTicket = resultSet.getString("de.ticket");
+                msContainerTank = resultSet.getString("de.cont_tank");
+                msVgm = resultSet.getString("de.vgm");
                 mnUserId = resultSet.getInt("de.usr_id");
                 mnSortingPosition = resultSet.getInt("de.sort_pos");
                 mbIsPrepayment = resultSet.getBoolean("de.b_pre_pay");
@@ -922,7 +942,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " + 
-                    "?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkDocId);
             callableStatement.setInt(nParam++, mnPkEntryId);
@@ -980,9 +1000,13 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
             callableStatement.setDouble(nParam++, mdContractFactor);
             callableStatement.setInt(nParam++, mnContractPriceYear);
             callableStatement.setInt(nParam++, mnContractPriceMonth);
-            callableStatement.setString(nParam++, msVehicleNumber);
-            callableStatement.setString(nParam++, msSecuritySeal);
+            callableStatement.setString(nParam++, msSealQuality);
+            callableStatement.setString(nParam++, msSealSecurity);
+            callableStatement.setString(nParam++, msDriver);
+            callableStatement.setString(nParam++, msPlate);
             callableStatement.setString(nParam++, msTicket);
+            callableStatement.setString(nParam++, msContainerTank);
+            callableStatement.setString(nParam++, msVgm);
             callableStatement.setInt(nParam++, mnUserId);
             callableStatement.setInt(nParam++, mnSortingPosition);
             callableStatement.setBoolean(nParam++, mbIsPrepayment);
@@ -1494,9 +1518,13 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setContractFactor(mdContractFactor);
         clone.setContractPriceYear(mnContractPriceYear);
         clone.setContractPriceMonth(mnContractPriceMonth);
-        clone.setVehicleNumber(msVehicleNumber);
-        clone.setSecuritySeal(msSecuritySeal);
+        clone.setSealQuality(msSealQuality);
+        clone.setSealSecurity(msSealSecurity);
+        clone.setDriver(msDriver);
+        clone.setPlate(msPlate);
         clone.setTicket(msTicket);
+        clone.setContainerTank(msContainerTank);
+        clone.setVgm(msVgm);
         clone.setUserId(mnUserId);
         clone.setSortingPosition(mnSortingPosition);
         clone.setIsPrepayment(mbIsPrepayment);

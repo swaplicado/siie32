@@ -79,6 +79,9 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
     protected boolean mbIsFreeDiscountEntry;
     protected boolean mbIsFreeDiscountDoc;
     protected boolean mbIsFreeCommissions;
+    protected boolean mbIsDataShipDomesticReq;
+    protected boolean mbIsDataShipInternationalReq;
+    protected boolean mbIsDataShipQualityReq;
     protected boolean mbIsItemReferenceRequired;
     protected boolean mbIsDeleted;
     protected int mnFkItemGroupId;
@@ -170,6 +173,9 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
     public void setIsFreeDiscountEntry(boolean b) { mbIsFreeDiscountEntry = b; }
     public void setIsFreeDiscountDoc(boolean b) { mbIsFreeDiscountDoc = b; }
     public void setIsFreeCommissions(boolean b) { mbIsFreeCommissions = b; }
+    public void setIsDataShipDomesticReq(boolean b) { mbIsDataShipDomesticReq = b; }
+    public void setIsDataShipInternationalReq(boolean b) { mbIsDataShipInternationalReq = b; }
+    public void setIsDataShipQualityReq(boolean b) { mbIsDataShipQualityReq = b; }
     public void setIsItemReferenceRequired(boolean b) { mbIsItemReferenceRequired = b; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkItemGroupId(int n) { mnFkItemGroupId = n; }
@@ -252,6 +258,9 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
     public boolean getIsFreeDiscountEntry() { return mbIsFreeDiscountEntry; }
     public boolean getIsFreeDiscountDoc() { return mbIsFreeDiscountDoc; }
     public boolean getIsFreeCommissions() { return mbIsFreeCommissions; }
+    public boolean getIsDataShipDomesticReq() { return mbIsDataShipDomesticReq; }
+    public boolean getIsDataShipInternationalReq() { return mbIsDataShipInternationalReq; }
+    public boolean getIsDataQualityReq() { return mbIsDataShipQualityReq; }
     public boolean getIsItemReferenceRequired() { return mbIsItemReferenceRequired; }
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkItemGroupId() { return mnFkItemGroupId; }
@@ -357,6 +366,9 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
         mbIsFreeDiscountEntry = false;
         mbIsFreeDiscountDoc = false;
         mbIsFreeCommissions = false;
+        mbIsDataShipDomesticReq = false;
+        mbIsDataShipInternationalReq = false;
+        mbIsDataShipQualityReq = false;
         mbIsItemReferenceRequired = false;
         mbIsDeleted = false;
         mnFkItemGroupId = 0;
@@ -464,6 +476,9 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
                 mbIsFreeDiscountEntry = resultSet.getBoolean("igen.b_free_disc_ety");
                 mbIsFreeDiscountDoc = resultSet.getBoolean("igen.b_free_disc_doc");
                 mbIsFreeCommissions = resultSet.getBoolean("igen.b_free_comms");
+                mbIsDataShipDomesticReq = resultSet.getBoolean("igen.b_ship_dom");
+                mbIsDataShipInternationalReq = resultSet.getBoolean("igen.b_ship_int");
+                mbIsDataShipQualityReq = resultSet.getBoolean("igen.b_ship_qlt");
                 mbIsItemReferenceRequired = resultSet.getBoolean("igen.b_item_ref");
                 mbIsDeleted = resultSet.getBoolean("igen.b_del");
                 mnFkItemGroupId = resultSet.getInt("igen.fid_igrp");
@@ -543,7 +558,8 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                    "?, ? ) }");
             callableStatement.setInt(nParam++, mnPkItemGenericId);
             callableStatement.setString(nParam++, msItemGeneric);
             callableStatement.setString(nParam++, msItemGenericShort);
@@ -604,6 +620,9 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
             callableStatement.setBoolean(nParam++, mbIsFreeDiscountEntry);
             callableStatement.setBoolean(nParam++, mbIsFreeDiscountDoc);
             callableStatement.setBoolean(nParam++, mbIsFreeCommissions);
+            callableStatement.setBoolean(nParam++, mbIsDataShipDomesticReq);
+            callableStatement.setBoolean(nParam++, mbIsDataShipInternationalReq);
+            callableStatement.setBoolean(nParam++, mbIsDataShipQualityReq);
             callableStatement.setBoolean(nParam++, mbIsItemReferenceRequired);
             callableStatement.setBoolean(nParam++, mbIsDeleted);
             callableStatement.setInt(nParam++, mnFkItemGroupId);

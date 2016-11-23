@@ -43,6 +43,8 @@ import javax.swing.JTextField;
  */
 public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener {
 
+    private static final int TAB_SHIPMENT = 2;
+    
     private int mnFormType;
     private int mnFormResult;
     private int mnFormStatus;
@@ -131,9 +133,12 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
     private erp.lib.form.SFormField moFieldFkDefaultItemRefeferenceId_n;
     private erp.lib.form.SFormField moFieldFkAdministrativeConceptTypeId;
     private erp.lib.form.SFormField moFieldFkTaxableConceptTypeId;
-
+    private erp.lib.form.SFormField moFieldIsShipDomestic;
+    private erp.lib.form.SFormField moFieldIsShipInternational;
+    private erp.lib.form.SFormField moFieldIsShipQuality;
+    
     private boolean mbIsLotApplyingBySystem;
-
+    
     /** Creates new form SFormItemGeneric */
     public SFormItemGeneric(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
@@ -357,6 +362,15 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         jlFkTaxableConceptTypeId = new javax.swing.JLabel();
         jcbFkTaxableConceptTypeId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkTaxableConceptTypeId = new javax.swing.JButton();
+        jpShipment = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        jckIsDomesticShipment = new javax.swing.JCheckBox();
+        jPanel7 = new javax.swing.JPanel();
+        jckIsInternationalShipment = new javax.swing.JCheckBox();
+        jPanel8 = new javax.swing.JPanel();
+        jckIsQualityShipment = new javax.swing.JCheckBox();
         jpCommand = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -1217,6 +1231,43 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
 
         jTabbedPane.addTab("Configuración", jpProperties);
 
+        jpShipment.setLayout(new java.awt.BorderLayout());
+
+        jPanel3.setLayout(new java.awt.GridLayout(6, 1));
+
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración de embarque"));
+        jPanel4.setLayout(new java.awt.GridLayout(3, 1));
+
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jckIsDomesticShipment.setText("Embarque nacional");
+        jckIsDomesticShipment.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel5.add(jckIsDomesticShipment);
+
+        jPanel4.add(jPanel5);
+
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jckIsInternationalShipment.setText("Embarque internacional");
+        jckIsInternationalShipment.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel7.add(jckIsInternationalShipment);
+
+        jPanel4.add(jPanel7);
+
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jckIsQualityShipment.setText("Calidad");
+        jckIsQualityShipment.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel8.add(jckIsQualityShipment);
+
+        jPanel4.add(jPanel8);
+
+        jPanel3.add(jPanel4);
+
+        jpShipment.add(jPanel3, java.awt.BorderLayout.CENTER);
+
+        jTabbedPane.addTab("Embarque", jpShipment);
+
         getContentPane().add(jTabbedPane, java.awt.BorderLayout.CENTER);
 
         jpCommand.setPreferredSize(new java.awt.Dimension(792, 33));
@@ -1431,6 +1482,13 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         moFieldFkTaxableConceptTypeId.setTabbedPaneIndex(1, jTabbedPane);
         moFieldFkTaxableConceptTypeId.setPickerButton(jbFkTaxableConceptTypeId);
 
+        moFieldIsShipDomestic = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDomesticShipment);
+        moFieldIsShipDomestic.setTabbedPaneIndex(2, jTabbedPane);
+        moFieldIsShipInternational = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsInternationalShipment);
+        moFieldIsShipInternational.setTabbedPaneIndex(2, jTabbedPane);
+        moFieldIsShipQuality = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsQualityShipment);
+        moFieldIsShipQuality.setTabbedPaneIndex(2, jTabbedPane);
+        
         mvFields.add(moFieldFkItemCategoryId);
         mvFields.add(moFieldFkItemClassId);
         mvFields.add(moFieldFkItemTypeId);
@@ -1507,6 +1565,9 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         mvFields.add(moFieldFkDefaultItemRefeferenceId_n);
         mvFields.add(moFieldFkAdministrativeConceptTypeId);
         mvFields.add(moFieldFkTaxableConceptTypeId);
+        mvFields.add(moFieldIsShipDomestic);
+        mvFields.add(moFieldIsShipInternational);
+        mvFields.add(moFieldIsShipQuality);
 
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
@@ -1847,6 +1908,10 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
             jbCopyItemGeneric.setEnabled(false);
         }
 
+        if (!miClient.getSessionXXX().getCompany().getIsModuleLog()){
+            jTabbedPane.remove(TAB_SHIPMENT);
+        }
+        
         jckIsItemLineApplying.setEnabled(miClient.getSessionXXX().getParamsErp().getIsItemNameWithVarieties());
         jckIsItemNameEditable.setEnabled(miClient.getSessionXXX().getParamsErp().getIsItemNameEditable());
         jckIsItemKeyApplying.setEnabled(miClient.getSessionXXX().getParamsErp().getIsItemKeyApplying());
@@ -2144,14 +2209,19 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel28;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel35;
     private javax.swing.JPanel jPanel36;
     private javax.swing.JPanel jPanel38;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel43;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel56;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel62;
     private javax.swing.JPanel jPanel63;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JTabbedPane jTabbedPane;
     private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JButton jbBizAreaAssign;
@@ -2182,12 +2252,14 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JComboBox<SFormComponentItem> jcbFkUnitUnitsVirtualTypeId;
     private javax.swing.JCheckBox jckIsBulk;
     private javax.swing.JCheckBox jckIsDeleted;
+    private javax.swing.JCheckBox jckIsDomesticShipment;
     private javax.swing.JCheckBox jckIsFreeCommissions;
     private javax.swing.JCheckBox jckIsFreeDiscount;
     private javax.swing.JCheckBox jckIsFreeDiscountDoc;
     private javax.swing.JCheckBox jckIsFreeDiscountEntry;
     private javax.swing.JCheckBox jckIsFreeDiscountUnitary;
     private javax.swing.JCheckBox jckIsFreePrice;
+    private javax.swing.JCheckBox jckIsInternationalShipment;
     private javax.swing.JCheckBox jckIsInventoriable;
     private javax.swing.JCheckBox jckIsItemKeyApplying;
     private javax.swing.JCheckBox jckIsItemKeyAutomatic;
@@ -2206,6 +2278,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JCheckBox jckIsNetContentApplying;
     private javax.swing.JCheckBox jckIsNetContentUnitaryApplying;
     private javax.swing.JCheckBox jckIsNetContentVariable;
+    private javax.swing.JCheckBox jckIsQualityShipment;
     private javax.swing.JCheckBox jckIsSurfaceApplying;
     private javax.swing.JCheckBox jckIsSurfaceUnitaryApplying;
     private javax.swing.JCheckBox jckIsSurfaceVariable;
@@ -2317,6 +2390,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JPanel jpRegistry32;
     private javax.swing.JPanel jpRegistryCenter;
     private javax.swing.JPanel jpRegistryNorth;
+    private javax.swing.JPanel jpShipment;
     private javax.swing.JScrollPane jspBizAreaAsignated;
     private javax.swing.JScrollPane jsptBizAreaAvailable;
     private javax.swing.JTextField jtfCode;
@@ -2682,6 +2756,9 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         moFieldIsFreeDiscountUnitary.setFieldValue(moItemGeneric.getIsFreeDiscountUnitary());
         moFieldIsFreeDiscountEntry.setFieldValue(moItemGeneric.getIsFreeDiscountEntry());
         moFieldIsFreeDiscountDoc.setFieldValue(moItemGeneric.getIsFreeDiscountDoc());
+        moFieldIsShipDomestic.setFieldValue(moItemGeneric.getIsDataShipDomesticReq());
+        moFieldIsShipInternational.setFieldValue(moItemGeneric.getIsDataShipInternationalReq());
+        moFieldIsShipQuality.setFieldValue(moItemGeneric.getIsDataQualityReq());
         moFieldIsFreePrice.setFieldValue(moItemGeneric.getIsFreePrice());
         moFieldIsFreeDiscount.setFieldValue(moItemGeneric.getIsFreeDiscount());
         moFieldIsFreeCommissions.setFieldValue(moItemGeneric.getIsFreeCommissions());
@@ -2809,6 +2886,9 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         moItemGeneric.setIsFreePrice(moFieldIsFreePrice.getBoolean());
         moItemGeneric.setIsFreeDiscount(moFieldIsFreeDiscount.getBoolean());
         moItemGeneric.setIsFreeCommissions(moFieldIsFreeCommissions.getBoolean());
+        moItemGeneric.setIsDataShipDomesticReq(moFieldIsShipDomestic.getBoolean());
+        moItemGeneric.setIsDataShipInternationalReq(moFieldIsShipInternational.getBoolean());
+        moItemGeneric.setIsDataShipQualityReq(moFieldIsShipQuality.getBoolean());
         moItemGeneric.setIsItemReferenceRequired(moFieldIsItemRefRequired.getBoolean());
         moItemGeneric.setFkDefaultItemRefId_n(moFieldFkDefaultItemRefeferenceId_n.getKeyAsIntArray()[0]);
         moItemGeneric.setFkAdministrativeConceptTypeId(moFieldFkAdministrativeConceptTypeId.getKeyAsIntArray()[0]);
