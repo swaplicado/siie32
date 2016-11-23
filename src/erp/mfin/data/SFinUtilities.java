@@ -730,6 +730,14 @@ public abstract class SFinUtilities {
     }
     
     public static java.lang.String createLayoutSantanderTef(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    public static java.lang.String createLayoutSantanderSpeiFdNOld(erp.client.SClientInterface client, Vector<SLayoutBankRow> vRows, java.lang.String title) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    public static java.lang.String createLayoutSantanderSpeiFdN(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
         java.lang.String sBizPartner = "";
         java.lang.String sBizPartnerSantanderCode = "";
         java.lang.String sAccountDebit = "";
@@ -772,20 +780,12 @@ public abstract class SFinUtilities {
         return layout;
     }
     
-    public static java.lang.String createLayoutSantanderSpeiFdNOld(erp.client.SClientInterface client, Vector<SLayoutBankRow> vRows, java.lang.String title) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-    
-    public static java.lang.String createLayoutSantanderSpeiFdN(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-    
     public static java.lang.String createLayoutSantanderSpeiFdYOld(erp.client.SClientInterface client, Vector<SLayoutBankRow> vRows, java.lang.String title) {
         return createLayoutSantanderTefOld(client, vRows, title);
     }
     
     public static java.lang.String createLayoutSantanderSpeiFdY(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
-        return createLayoutSantanderTef(payments, title);
+        return createLayoutSantanderSpeiFdN(payments, title);
     }
     
     public static java.lang.String createLayoutBanBajioOld(erp.client.SClientInterface client, Vector<SLayoutBankRow> vRows, java.lang.String title, Date date, Date dateApplication, int consecutiveDay, String typeLay, String typeAccountCredit) {
