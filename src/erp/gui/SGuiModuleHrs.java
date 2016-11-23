@@ -18,6 +18,7 @@ import erp.mhrs.form.SDialogFormerPayrollImport;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SHrsConsts;
+import erp.mod.hrs.form.SDialogCalculateEstimateIncomeTax;
 import erp.mod.hrs.form.SDialogPayrollEmployeeSsContributionUpdate;
 import erp.mod.hrs.form.SDialogRepHrsActiveEmployees;
 import erp.mod.hrs.form.SDialogRepHrsAuxPayroll;
@@ -222,7 +223,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCat.add(jmiCatEmployeeHireLog);
         jmCat.add(jmiCatEmployeeWageLog);
         jmCat.add(jmiCatEmployeeSscBaseLog);
-        jmCat.add(jmiCatEmployeeSscBaseUpdate);
+        //jmCat.add(jmiCatEmployeeSscBaseUpdate); XXX (2016-10-25) jbarajas is necesary revision
         jmCat.addSeparator();
         jmCat.add(jmiCatEarnings);
         jmCat.add(jmiCatDeductions);
@@ -261,7 +262,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayAutoDeductionsGlobal = new JMenuItem("Deducciones automáticas globales");
         jmiPayAutoDeductionsByEmployee = new JMenuItem("Deducciones automáticas por empleado");
         jmiPayCalculatedAmountMonth = new JMenuItem("Calcular ingreso mensual");
-        jmiPayCalculatedEstimateIncomeTax = new JMenuItem("Calcular ISR acumulado");
+        jmiPayCalculatedEstimateIncomeTax = new JMenuItem("Calcular impuesto acumulado");
 
         jmPay.add(jmiPayPayrollWeekly);
         jmPay.add(jmiPayPayrollWeeklyRec);
@@ -287,7 +288,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         
         jmPay.addSeparator();
         jmPay.add(jmiPayCalculatedAmountMonth);
-        //jmPay.add(jmiPayCalculatedEstimateIncomeTax);
+        jmPay.add(jmiPayCalculatedEstimateIncomeTax);
         
                 
         jmBenefit = new JMenu("Prestaciones");
@@ -893,7 +894,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                 new SFormCalculateNetGrossAmount((SGuiClient) miClient, SHrsConsts.CAL_NET_AMT_TYPE, "Calcular ingreso mensual").setFormVisible(true);
             }
             else if (item == jmiPayCalculatedEstimateIncomeTax) {
-                //new SDialogCalculateEstimateISR((SGuiClient) miClient, "Calcular ingreso mensual").setFormVisible(true);
+                new SDialogCalculateEstimateIncomeTax((SGuiClient) miClient, "Calcular impuesto acumulado").setFormVisible(true);
             }
             else if (item == jmiBenefitBenefitVac) {
                 miClient.getSession().showView(SModConsts.HRSX_BEN_MOV, SModSysConsts.HRSS_TP_BEN_VAC, null);
