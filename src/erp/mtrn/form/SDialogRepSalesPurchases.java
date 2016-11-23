@@ -24,10 +24,12 @@ import erp.lib.form.SFormValidation;
 import erp.mitm.data.SDataUnitType;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.AbstractAction;
+import javax.swing.JRadioButton;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
 
@@ -35,7 +37,7 @@ import net.sf.jasperreports.view.JasperViewer;
  *
  * @author Alfonso Flores
  */
-public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
+public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
     private int mnFormType;
     private int mnFormResult;
@@ -45,12 +47,13 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.client.SClientInterface miClient;
 
-    private erp.lib.form.SFormField moFieldDateInitial;
+    private erp.lib.form.SFormField moFieldDateStart;
     private erp.lib.form.SFormField moFieldDateEnd;
+    private erp.lib.form.SFormField moFieldCurrency;
     private erp.lib.form.SFormField moFieldCompanyBranch;
     private erp.lib.form.SFormField moFieldCrossWith;
-    private erp.lib.form.SFormField moFieldUnitType;
     private erp.lib.form.SFormField moFieldItemCategory;
+    private erp.lib.form.SFormField moFieldUnitType;
 
     private boolean mbParamIsSupplier;
 
@@ -72,20 +75,29 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        buttonGroup1 = new javax.swing.ButtonGroup();
+        bgByOptions = new javax.swing.ButtonGroup();
+        bgCurrency = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jbPrint = new javax.swing.JButton();
         jbExit = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
-        jlDateInitial = new javax.swing.JLabel();
-        jftDateInitial = new javax.swing.JFormattedTextField();
-        jbDateInitial = new javax.swing.JButton();
+        jlDateStart = new javax.swing.JLabel();
+        jftDateStart = new javax.swing.JFormattedTextField();
+        jbDateStart = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jlDateEnd = new javax.swing.JLabel();
         jftDateEnd = new javax.swing.JFormattedTextField();
         jbDateEnd = new javax.swing.JButton();
+        jPanel15 = new javax.swing.JPanel();
+        jrbCurrencyLoc = new javax.swing.JRadioButton();
+        jPanel16 = new javax.swing.JPanel();
+        jrbCurrencyDoc = new javax.swing.JRadioButton();
+        jlCurrencyDocWarning = new javax.swing.JLabel();
+        jPanel18 = new javax.swing.JPanel();
+        jlCurrency = new javax.swing.JLabel();
+        jcbCurrency = new javax.swing.JComboBox();
         jPanel9 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jlCompanyBranch = new javax.swing.JLabel();
@@ -136,24 +148,24 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración del reporte:"));
         jPanel2.setLayout(new java.awt.BorderLayout(0, 1));
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Período:"));
-        jPanel3.setLayout(new java.awt.GridLayout(2, 1, 0, 1));
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Período y moneda:"));
+        jPanel3.setLayout(new java.awt.GridLayout(5, 1, 0, 2));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateInitial.setText("Fecha inicial: *");
-        jlDateInitial.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel4.add(jlDateInitial);
+        jlDateStart.setText("Fecha inicial: *");
+        jlDateStart.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel4.add(jlDateStart);
 
-        jftDateInitial.setText("dd/mm/yyyy");
-        jftDateInitial.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel4.add(jftDateInitial);
+        jftDateStart.setText("dd/mm/yyyy");
+        jftDateStart.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel4.add(jftDateStart);
 
-        jbDateInitial.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_date_day.gif"))); // NOI18N
-        jbDateInitial.setToolTipText("Seleccionar fecha inicial");
-        jbDateInitial.setFocusable(false);
-        jbDateInitial.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel4.add(jbDateInitial);
+        jbDateStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_date_day.gif"))); // NOI18N
+        jbDateStart.setToolTipText("Seleccionar fecha inicial");
+        jbDateStart.setFocusable(false);
+        jbDateStart.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel4.add(jbDateStart);
 
         jPanel3.add(jPanel4);
 
@@ -175,6 +187,41 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
 
         jPanel3.add(jPanel5);
 
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+
+        bgCurrency.add(jrbCurrencyLoc);
+        jrbCurrencyLoc.setText("Moneda local");
+        jrbCurrencyLoc.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel15.add(jrbCurrencyLoc);
+
+        jPanel3.add(jPanel15);
+
+        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+
+        bgCurrency.add(jrbCurrencyDoc);
+        jrbCurrencyDoc.setText("Moneda documento");
+        jrbCurrencyDoc.setPreferredSize(new java.awt.Dimension(120, 23));
+        jPanel16.add(jrbCurrencyDoc);
+
+        jlCurrencyDocWarning.setForeground(new java.awt.Color(255, 0, 0));
+        jlCurrencyDocWarning.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel16.add(jlCurrencyDocWarning);
+
+        jPanel3.add(jPanel16);
+
+        jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlCurrency.setText("Moneda:*");
+        jlCurrency.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel18.add(jlCurrency);
+
+        jcbCurrency.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbCurrency.setSelectedIndex(-1);
+        jcbCurrency.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel18.add(jcbCurrency);
+
+        jPanel3.add(jPanel18);
+
         jPanel2.add(jPanel3, java.awt.BorderLayout.NORTH);
 
         jPanel9.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtros del reporte:"));
@@ -182,8 +229,8 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlCompanyBranch.setText("Sucursal de la empresa:");
-        jlCompanyBranch.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlCompanyBranch.setText("Sucursal empresa:");
+        jlCompanyBranch.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jlCompanyBranch);
 
         jcbCompanyBranch.setPreferredSize(new java.awt.Dimension(424, 23));
@@ -191,10 +238,10 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
 
         jPanel9.add(jPanel6, java.awt.BorderLayout.NORTH);
 
-        jPanel7.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        jPanel7.setLayout(new java.awt.GridLayout(4, 1, 0, 1));
+        jPanel7.setLayout(new java.awt.GridLayout(4, 1));
 
-        buttonGroup1.add(jrbByBizPartner);
+        bgByOptions.add(jrbByBizPartner);
+        jrbByBizPartner.setText("<Por asociado de negocios>");
         jrbByBizPartner.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jrbByBizPartnerItemStateChanged(evt);
@@ -202,7 +249,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         });
         jPanel7.add(jrbByBizPartner);
 
-        buttonGroup1.add(jrbBySalesAgent);
+        bgByOptions.add(jrbBySalesAgent);
         jrbBySalesAgent.setText("Por agente de ventas");
         jrbBySalesAgent.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -211,7 +258,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         });
         jPanel7.add(jrbBySalesAgent);
 
-        buttonGroup1.add(jrbByItemGeneric);
+        bgByOptions.add(jrbByItemGeneric);
         jrbByItemGeneric.setText("Por ítem genérico");
         jrbByItemGeneric.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -220,7 +267,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         });
         jPanel7.add(jrbByItemGeneric);
 
-        buttonGroup1.add(jrbByItem);
+        bgByOptions.add(jrbByItem);
         jrbByItem.setText("Por ítem");
         jrbByItem.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -240,7 +287,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCrossWith.setText("Cruce con:");
-        jlCrossWith.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlCrossWith.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel11.add(jlCrossWith);
 
         jcbCrossWith.setPreferredSize(new java.awt.Dimension(424, 23));
@@ -251,7 +298,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlItemCategory.setText("Categoría de ítem: ");
-        jlItemCategory.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlItemCategory.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel14.add(jlItemCategory);
 
         jcbItemCategory.setPreferredSize(new java.awt.Dimension(424, 23));
@@ -274,8 +321,8 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlUnitType.setText("Tipo de unidad:");
-        jlUnitType.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlUnitType.setText("Tipo de unidad:*");
+        jlUnitType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel13.add(jlUnitType);
 
         jcbUnitType.setPreferredSize(new java.awt.Dimension(424, 23));
@@ -291,8 +338,8 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-600)/2, (screenSize.height-470)/2, 600, 470);
+        setSize(new java.awt.Dimension(600, 470));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -328,28 +375,32 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
     }//GEN-LAST:event_jckIsWithUnitsItemStateChanged
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
-        moFieldDateInitial = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateInitial, jlDateInitial);
-        moFieldDateInitial.setPickerButton(jbDateInitial);
+        moFieldDateStart = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateStart, jlDateStart);
+        moFieldDateStart.setPickerButton(jbDateStart);
         moFieldDateEnd = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateEnd, jlDateEnd);
         moFieldDateEnd.setPickerButton(jbDateEnd);
+        moFieldCurrency = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCurrency, jlCurrency);
         moFieldCompanyBranch = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCompanyBranch, jlCompanyBranch);
         moFieldCrossWith = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCrossWith, jlCrossWith);
-        moFieldUnitType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbUnitType, jlUnitType);
         moFieldItemCategory = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbItemCategory, jlItemCategory);
+        moFieldUnitType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbUnitType, jlUnitType);
 
-        mvFields.add(moFieldDateInitial);
+        mvFields.add(moFieldDateStart);
         mvFields.add(moFieldDateEnd);
+        mvFields.add(moFieldCurrency);
         mvFields.add(moFieldCompanyBranch);
         mvFields.add(moFieldCrossWith);
-        mvFields.add(moFieldUnitType);
         mvFields.add(moFieldItemCategory);
+        mvFields.add(moFieldUnitType);
 
         jbPrint.addActionListener(this);
         jbExit.addActionListener(this);
-        jbDateInitial.addActionListener(this);
+        jbDateStart.addActionListener(this);
         jbDateEnd.addActionListener(this);
+        jrbCurrencyLoc.addItemListener(this);
+        jrbCurrencyDoc.addItemListener(this);
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -373,14 +424,16 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
             mbFirstTime = false;
             if (mbParamIsSupplier) {
                 setTitle("Reporte de compras netas");
-                jrbByBizPartner.setText("Por Proveedor");
+                jrbByBizPartner.setText("Por proveedor");
             }
             else  {
                 setTitle("Reporte de ventas netas");
-                jrbByBizPartner.setText("Por Cliente");
+                jrbByBizPartner.setText("Por cliente");
             }
-            jftDateInitial.requestFocus();
+            jftDateStart.requestFocus();
             jrbByBizPartner.setSelected(true);
+            jrbCurrencyLoc.setSelected(true);
+            populateComboBoxUnitsType();
         }
     }
 
@@ -390,7 +443,10 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         Map<String, Object> map = null;
         JasperPrint jasperPrint = null;
         JasperViewer jasperViewer = null;
-
+        int nCurrency = 0;
+        String sCurrency = "";
+        String sqlCurrency = "";
+        
         if (validation.getIsError()) {
             if (validation.getComponent() != null) {
                 validation.getComponent().requestFocus();
@@ -401,10 +457,21 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         }
         else {
             try {
+                if (jrbCurrencyDoc.isSelected()) {
+                    sCurrency = jcbCurrency.getSelectedItem().toString();
+                    nCurrency = moFieldCurrency.getKeyAsIntArray()[0];
+                    sqlCurrency = " doc.fid_cur = " + nCurrency + " AND ";
+                }
+                else {
+                    sCurrency = miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency();
+                    nCurrency = miClient.getSession().getSessionCustom().getLocalCurrencyKey()[0];
+                    sqlCurrency = "";
+                }
+                
                 setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
                 map = miClient.createReportParams();
-                map.put("tDtInitial", moFieldDateInitial.getDate());
+                map.put("tDtInitial", moFieldDateStart.getDate());
                 map.put("tDtEnd", moFieldDateEnd.getDate());
                 map.put("sCompanyBranch", moFieldCompanyBranch.getKeyAsIntArray()[0] == 0 ? "(TODAS)" : jcbCompanyBranch.getSelectedItem().toString());
                 map.put("nFidCtDps", mbParamIsSupplier ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[0]);
@@ -414,7 +481,9 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
                 map.put("sSqlWhereCompanyBranchAdjRet", moFieldCompanyBranch.getKeyAsIntArray()[0] == 0 ? "" : " AND r.fid_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0]);
                 map.put("sSqlWhereCompanyBranchAdjDis", moFieldCompanyBranch.getKeyAsIntArray()[0] == 0 ? "" : " AND d.fid_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0]);
                 map.put("sTitle", mbParamIsSupplier ? "REPORTE DE COMPRAS NETAS" : "REPORTE DE VENTAS NETAS");
-                map.put("sLocalCurrency", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency());
+                map.put("sCurrency", sCurrency);
+                map.put("nCurrency", nCurrency);
+                map.put("nLocalCurrency", miClient.getSession().getSessionCustom().getLocalCurrencyKey()[0]);
                 map.put("nFidCtDpsAdj", mbParamIsSupplier ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[0]);
                 map.put("nFidClDpsAdj", mbParamIsSupplier ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[1]);
                 map.put("nFidTpDpsAdj", mbParamIsSupplier ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[2]);
@@ -424,6 +493,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
                 map.put("nFidStDpsVal", SDataConstantsSys.TRNS_ST_DPS_VAL_EFF);
                 map.put("nFidCtBp", mbParamIsSupplier ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
                 map.put("sSqlItemCategory", moFieldItemCategory.getKeyAsIntArray()[0] == 0 ? "" : " AND ig.fid_ct_item = " + moFieldItemCategory.getKeyAsIntArray()[0]);
+                map.put("sSqlWhereCur", sqlCurrency);
                 map.put("sSqlGroupBy", (String) createQuerySentenceValues()[0]);
                 map.put("sSqlOrderBy", (String) createQuerySentenceValues()[1]);
                 map.put("sDetailConcept", (String) createQuerySentenceValues()[2]);
@@ -431,6 +501,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
                 map.put("nTpDetail", (Integer) createQuerySentenceValues()[4]);
                 map.put("nTpGroup", (Integer) createQuerySentenceValues()[5]);
                 map.put("bShowGroup", (Boolean) createQuerySentenceValues()[6]);
+                
                 if (jckIsWithUnits.isSelected()) {
                     map.put("sUnitsColumn", moFieldUnitType.getKeyAsIntArray()[0] == SDataConstantsSys.TRNX_TP_UNIT_TOT_QTY ? "CANT. BRUTA." : moFieldUnitType.getKeyAsIntArray()[0] == SDataConstantsSys.TRNX_TP_UNIT_TOT_LEN ? "LONG. BRUTA" :
                         moFieldUnitType.getKeyAsIntArray()[0] == SDataConstantsSys.TRNX_TP_UNIT_TOT_SURF ? "SUP. BRUTA" : moFieldUnitType.getKeyAsIntArray()[0] == SDataConstantsSys.TRNX_TP_UNIT_TOT_VOL ? "VOL. BRUTA" : "MASA BRUTA");
@@ -463,26 +534,12 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         setVisible(false);
     }
 
-    private void actionDateInitial() {
-        miClient.getGuiDatePickerXXX().formReset();
-        miClient.getGuiDatePickerXXX().setDate(moFieldDateInitial.getDate());
-        miClient.getGuiDatePickerXXX().setVisible(true);
-
-        if (miClient.getGuiDatePickerXXX().getFormResult() == SLibConstants.FORM_RESULT_OK) {
-            moFieldDateInitial.setFieldValue(miClient.getGuiDatePickerXXX().getGuiDate());
-            jftDateInitial.requestFocus();
-        }
+    private void actionDateStart() {
+        miClient.getGuiDatePickerXXX().pickDate(moFieldDateStart.getDate(), moFieldDateStart);
     }
 
     private void actionDateEnd() {
-        miClient.getGuiDatePickerXXX().formReset();
-        miClient.getGuiDatePickerXXX().setDate(moFieldDateEnd.getDate());
-        miClient.getGuiDatePickerXXX().setVisible(true);
-
-        if (miClient.getGuiDatePickerXXX().getFormResult() == SLibConstants.FORM_RESULT_OK) {
-            moFieldDateEnd.setFieldValue(miClient.getGuiDatePickerXXX().getGuiDate());
-            jftDateEnd.requestFocus();
-        }
+        miClient.getGuiDatePickerXXX().pickDate(moFieldDateEnd.getDate(), moFieldDateEnd);
     }
 
     private void popultateComboBoxCross() {
@@ -523,7 +580,6 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         SFormComponentItem vol = null;
         SFormComponentItem mass = null;
 
-        if (jckIsWithUnits.isSelected()) {
             jcbUnitType.removeAllItems();
 
             qty = new SFormComponentItem(new int[] { SDataConstantsSys.TRNX_TP_UNIT_TOT_QTY }, "CANTIDAD");
@@ -537,7 +593,6 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
             jcbUnitType.addItem(surf);
             jcbUnitType.addItem(vol);
             jcbUnitType.addItem(mass);
-        }
     }
 
     private void renderComboBoxUnitsType() {
@@ -812,6 +867,24 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         return columns;
     }
 
+    private void itemStateChangedCurrency() {
+        if (jrbCurrencyLoc.isSelected()) {
+            jlCurrencyDocWarning.setText("");
+            jcbCurrency.setEnabled(false);
+            moFieldCurrency.setKey(miClient.getSession().getSessionCustom().getLocalCurrencyKey());
+            jckIsWithUnits.setEnabled(true);
+        }
+        else if (jrbCurrencyDoc.isSelected()) {
+            jlCurrencyDocWarning.setText("NOTA: ¡Solo operaciones en esta moneda!");
+            jcbCurrency.setEnabled(true);
+            jcbCurrency.setSelectedIndex(0);
+            jckIsWithUnits.setEnabled(false);
+        }
+        
+        jckIsWithUnits.setSelected(false);
+        renderComboBoxUnitsType();
+    }
+    
     private void itemStateChangedByBizPartner() {
         popultateComboBoxCross();
     }
@@ -834,13 +907,17 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.ButtonGroup bgByOptions;
+    private javax.swing.ButtonGroup bgCurrency;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
+    private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -850,26 +927,31 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbDateEnd;
-    private javax.swing.JButton jbDateInitial;
+    private javax.swing.JButton jbDateStart;
     private javax.swing.JButton jbExit;
     private javax.swing.JButton jbPrint;
     private javax.swing.JComboBox<SFormComponentItem> jcbCompanyBranch;
     private javax.swing.JComboBox<SFormComponentItem> jcbCrossWith;
+    private javax.swing.JComboBox jcbCurrency;
     private javax.swing.JComboBox<SFormComponentItem> jcbItemCategory;
     private javax.swing.JComboBox<SFormComponentItem> jcbUnitType;
     private javax.swing.JCheckBox jckIsWithUnits;
     private javax.swing.JFormattedTextField jftDateEnd;
-    private javax.swing.JFormattedTextField jftDateInitial;
+    private javax.swing.JFormattedTextField jftDateStart;
     private javax.swing.JLabel jlCompanyBranch;
     private javax.swing.JLabel jlCrossWith;
+    private javax.swing.JLabel jlCurrency;
+    private javax.swing.JLabel jlCurrencyDocWarning;
     private javax.swing.JLabel jlDateEnd;
-    private javax.swing.JLabel jlDateInitial;
+    private javax.swing.JLabel jlDateStart;
     private javax.swing.JLabel jlItemCategory;
     private javax.swing.JLabel jlUnitType;
     private javax.swing.JRadioButton jrbByBizPartner;
     private javax.swing.JRadioButton jrbByItem;
     private javax.swing.JRadioButton jrbByItemGeneric;
     private javax.swing.JRadioButton jrbBySalesAgent;
+    private javax.swing.JRadioButton jrbCurrencyDoc;
+    private javax.swing.JRadioButton jrbCurrencyLoc;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -887,7 +969,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
         }
 
-        moFieldDateInitial.setFieldValue(SLibTimeUtilities.getBeginOfMonth(miClient.getSessionXXX().getWorkingDate()));
+        moFieldDateStart.setFieldValue(SLibTimeUtilities.getBeginOfMonth(miClient.getSessionXXX().getWorkingDate()));
         moFieldDateEnd.setFieldValue(SLibTimeUtilities.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()));
         mbResetingForm = false;
         jckIsWithUnits.setSelected(false);
@@ -900,6 +982,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         mbResetingForm = true;
         SFormUtilities.populateComboBox(miClient, jcbCompanyBranch, SDataConstants.BPSU_BPB, new int[] { miClient.getSessionXXX().getCurrentCompany().getPkCompanyId() });
         SFormUtilities.populateComboBox(miClient, jcbItemCategory, SDataConstants.ITMS_CT_ITEM);
+        SFormUtilities.populateComboBox(miClient, jcbCurrency, SDataConstants.CFGU_CUR);
     }
 
     @Override
@@ -915,9 +998,16 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         }
 
         if (!validation.getIsError()) {
-            if (moFieldDateEnd.getDate().compareTo(moFieldDateInitial.getDate()) < 0) {
+            if (moFieldDateEnd.getDate().compareTo(moFieldDateStart.getDate()) < 0) {
                 validation.setMessage("La fecha final debe ser mayor o igual a la fecha inicial.");
                 validation.setComponent(jftDateEnd);
+            }
+        }
+        
+        if (!validation.getIsError()) {
+            if (jrbCurrencyDoc.isSelected() && jcbCurrency.getSelectedIndex() == 0) {
+                validation.setMessage("Seleccione moneda");
+                validation.setComponent(jcbCurrency);
             }
         }
 
@@ -974,20 +1064,32 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         if (e.getSource() instanceof javax.swing.JButton) {
             javax.swing.JButton button = (javax.swing.JButton) e.getSource();
 
-            if (button == jbPrint) {
+            if (button == jbDateStart) {
+                actionDateStart();
+            }
+            else if (button == jbDateEnd) {
+                actionDateEnd();
+            }
+            else if (button == jbPrint) {
                 actionPrint();
             }
             else if (button == jbExit) {
                 actionClose();
             }
-            else if (button == jbDateInitial) {
-                actionDateInitial();
-            }
-            else if (button == jbDateEnd) {
-                actionDateEnd();
-            }
         }
     }
 
     public void setParamIsSupplier(boolean b) { mbParamIsSupplier = b; }
+    
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof JRadioButton) {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                JRadioButton radioButton = (JRadioButton) e.getSource();
+                
+                if (radioButton == jrbCurrencyDoc || radioButton == jrbCurrencyLoc) {
+                    itemStateChangedCurrency();
+                }
+            }
+        }
+    }
 }
