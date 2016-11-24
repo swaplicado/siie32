@@ -13,4 +13,6 @@ public abstract class STrnConsts {
 
     public static final int ACTION_NEW = 1;
     public static final int ACTION_EDIT = 2;
+    
+    public static final String TXT_FIELD_BLANK = "-";
 }

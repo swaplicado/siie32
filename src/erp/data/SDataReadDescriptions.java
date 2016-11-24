@@ -226,6 +226,9 @@ public abstract class SDataReadDescriptions {
             case SDataConstants.TRNS_TP_IOG:
                 sql = "SELECT " + (descriptionType == SLibConstants.DESCRIPTION_CODE ? "code" : "tp_iog") + " AS descrip FROM erp.trns_tp_iog WHERE id_ct_iog = " + ((int[]) pk)[0] + " AND id_cl_iog = " + ((int[]) pk)[1] + " AND id_tp_iog = " + ((int[]) pk)[2] + " ";
                 break;
+            case SDataConstants.TRN_DPS:
+                sql = "SELECT CONCAT(num_ser, IF(length(num_ser) = 0, '', '-'), num) AS descrip FROM trn_dps WHERE id_year = " + ((int[]) pk)[0] +" AND id_doc = " + ((int[]) pk)[1] + " ";
+                break;    
             case SDataConstants.TRN_DPS_ADD:
                 sql = "SELECT tp_cfd_add FROM erp.bpss_tp_cfd_add WHERE id_tp_cfd_add = " + ((int[]) pk)[0] + " ";
                 break;

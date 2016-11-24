@@ -36,9 +36,11 @@ import erp.mfin.data.SDataRecord;
 import erp.mfin.form.SDialogRecordPicker;
 import erp.mfin.form.SPanelRecord;
 import erp.mitm.data.SDataItem;
+import erp.mitm.data.SDataItemGeneric;
 import erp.mmkt.data.SDataCustomerBranchConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.trn.db.STrnConsts;
 import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SCfdParams;
 import erp.mtrn.data.SDataCfd;
@@ -460,9 +462,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel40 = new javax.swing.JPanel();
         jcbFkProductionOrderId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkProductionOrderId_n = new javax.swing.JButton();
-        jPanel36 = new javax.swing.JPanel();
-        jlTicket = new javax.swing.JLabel();
-        jtfTicket = new javax.swing.JTextField();
         jpOtherMarketing = new javax.swing.JPanel();
         jPanel46 = new javax.swing.JPanel();
         jPanel60 = new javax.swing.JPanel();
@@ -520,6 +519,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlDriver = new javax.swing.JLabel();
         jcbDriver = new javax.swing.JComboBox();
         jcbPlate = new javax.swing.JComboBox();
+        jPanel36 = new javax.swing.JPanel();
+        jlTicket = new javax.swing.JLabel();
+        jtfTicket = new javax.swing.JTextField();
         jpNotes = new javax.swing.JPanel();
         jpNotesControls = new javax.swing.JPanel();
         jbNotesNew = new javax.swing.JButton();
@@ -1543,18 +1545,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel39.add(jPanel40);
 
-        jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
-
-        jlTicket.setText("Boleto báscula:");
-        jlTicket.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel36.add(jlTicket);
-
-        jtfTicket.setText("TICKET");
-        jtfTicket.setPreferredSize(new java.awt.Dimension(107, 23));
-        jPanel36.add(jtfTicket);
-
-        jPanel39.add(jPanel36);
-
         jpOtherSupply.add(jPanel39, java.awt.BorderLayout.NORTH);
 
         jpMarketing.add(jpOtherSupply, java.awt.BorderLayout.WEST);
@@ -1670,7 +1660,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpOtherLogistics.setPreferredSize(new java.awt.Dimension(375, 10));
         jpOtherLogistics.setLayout(new java.awt.BorderLayout());
 
-        jPanel49.setLayout(new java.awt.GridLayout(9, 1, 0, 1));
+        jPanel49.setLayout(new java.awt.GridLayout(10, 1, 0, 1));
 
         jPanel50.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel50.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
@@ -1810,6 +1800,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel55.add(jcbPlate);
 
         jPanel49.add(jPanel55);
+
+        jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlTicket.setText("Boleto(s) báscula:");
+        jlTicket.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel36.add(jlTicket);
+
+        jtfTicket.setText("TICKET");
+        jtfTicket.setPreferredSize(new java.awt.Dimension(107, 23));
+        jPanel36.add(jtfTicket);
+
+        jPanel49.add(jPanel36);
 
         jpOtherLogistics.add(jPanel49, java.awt.BorderLayout.NORTH);
 
@@ -2209,9 +2211,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldDriver = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, (JTextField) jcbDriver.getEditor().getEditorComponent(), jlDriver);
         moFieldDriver.setLengthMax(50);
         moFieldPlate = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, (JTextField) jcbPlate.getEditor().getEditorComponent(), jlDriver);
-        moFieldPlate.setLengthMax(15);
+        moFieldPlate.setLengthMax(25);
         moFieldTicket = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfTicket, jlTicket);
-        moFieldTicket.setLengthMax(25);
+        moFieldTicket.setLengthMax(50);
         moFieldShipments = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfShipments, jckShipments);
         moFieldPayments = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfPayments, jckPayments);
         moFieldIsLinked = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsLinked);
@@ -5929,6 +5931,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         if (jbEntryViewLinks.isEnabled()) {
             int links = 0;
             int index = moPaneGridEntries.getTable().getSelectedRow();
+            String sourseDps = "";
             SDataDpsEntry entry = null;
 
             if (index != -1) {
@@ -5944,7 +5947,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 links = moDialogShowDocumentLinks.readLinks();
 
                 if (links == 0) {
-                    miClient.showMsgBoxInformation(SLibConstants.MSG_INF_NO_LINK_DPS_ETY);
+                    if (mnFormStatus == SLibConstants.FORM_STATUS_EDIT && entry.hasDpsLinksAsSource()) {
+                        sourseDps = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.TRN_DPS, entry.getDbmsDpsLinksAsSource().elementAt(0).getDbmsSourceDpsKey(), SLibConstants.DESCRIPTION_CODE);
+                        miClient.showMsgBoxInformation("Documento origen: " + sourseDps);
+                    }
+                    else if (mnFormStatus == SLibConstants.FORM_STATUS_EDIT && entry.hasDpsLinksAsDestiny()) {
+                        sourseDps = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.TRN_DPS, entry.getDbmsDpsLinksAsDestiny().elementAt(0).getDbmsSourceDpsKey(), SLibConstants.DESCRIPTION_CODE);
+                        miClient.showMsgBoxInformation("Documento destino: " + sourseDps);
+                    }
+                    else {
+                        miClient.showMsgBoxInformation(SLibConstants.MSG_INF_NO_LINK_DPS_ETY);
+                    }
                 }
                 else {
                     moDialogShowDocumentLinks.setFormVisible(true);
@@ -6573,7 +6586,116 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
         }
     }
+    
+    /**
+     * Verify if shipment data is needed
+     * @return 
+     */
+    private String validateRequiredShipmentData() {
+        boolean reqShipDomesticData = false;
+        boolean reqShipInternationalData = false;
+        boolean reqShipQualityData = false;
+        String rowMessageNumbers = "";
+        String shipmentMessageMissingData = "";
+        SDataItemGeneric itemGeneric = null;
 
+        for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
+            SDataDpsEntry entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
+
+            itemGeneric = (SDataItemGeneric) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_IGEN, new int[] { entry.getDbmsFkItemGenericId() }, SLibConstants.EXEC_MODE_SILENT);
+
+            reqShipDomesticData = itemGeneric.getIsDataShipDomesticReq();
+            reqShipInternationalData = itemGeneric.getIsDataShipInternationalReq();
+            reqShipQualityData = itemGeneric.getIsDataQualityReq();
+
+            rowMessageNumbers = "Partida número : " + String.valueOf(i + 1) + " " + entry.getConceptKey() + "\n";
+            
+            if (reqShipDomesticData || reqShipInternationalData || reqShipQualityData) {
+                if (STrnUtils.validateShipmentDataValue(entry.getDriver(), (reqShipDomesticData && (SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD) || SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC))))) {
+                    shipmentMessageMissingData += rowMessageNumbers;
+                }
+                else if (STrnUtils.validateShipmentDataValue(entry.getPlate(), (reqShipDomesticData && (SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD) || SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC))))) {
+                    shipmentMessageMissingData += rowMessageNumbers;
+                }
+                else if (STrnUtils.validateShipmentDataValue(entry.getContainerTank(), (reqShipDomesticData && (SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD) || SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC))))) {
+                    shipmentMessageMissingData += rowMessageNumbers;
+                }
+                else if (STrnUtils.validateShipmentDataValue(entry.getSealQuality(), (reqShipQualityData && (SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD) || SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC))))) {
+                    shipmentMessageMissingData += rowMessageNumbers;
+                }
+                else if (STrnUtils.validateShipmentDataValue(entry.getSealSecurity(), (reqShipQualityData && (SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD) || SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC))))) {
+                    shipmentMessageMissingData += rowMessageNumbers;
+                }
+                else if (STrnUtils.validateShipmentDataValue(entry.getTicket(), (reqShipDomesticData && (SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD) || SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC))))) {
+                    shipmentMessageMissingData += rowMessageNumbers;
+                }
+                else if (STrnUtils.validateShipmentDataValue(entry.getVgm(), (reqShipInternationalData && (SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD) || SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC))))) {
+                    shipmentMessageMissingData += rowMessageNumbers;
+                }
+            }
+        }
+
+        if (!shipmentMessageMissingData.isEmpty()) {
+            shipmentMessageMissingData = ("Tiene las siguientes partidas con valores faltantes \n" + shipmentMessageMissingData );
+        }
+        
+        return shipmentMessageMissingData;
+    }
+    
+    /**
+     *  Verify valid but provisional data in shipmente fields
+     */
+    private String validateProvisionalShipmentData() {
+        boolean reqShipDomesticData = false;
+        boolean reqShipInternationalData = false;
+        boolean reqShipQualityData = false;
+        String shipmentMessage = "";
+        String rowMessageNumbers = "";
+        SDataItemGeneric itemGeneric = null;
+
+        for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
+            SDataDpsEntry entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
+
+            itemGeneric = (SDataItemGeneric) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_IGEN, new int[] { entry.getDbmsFkItemGenericId() }, SLibConstants.EXEC_MODE_SILENT);
+
+            reqShipDomesticData = itemGeneric.getIsDataShipDomesticReq();
+            reqShipInternationalData = itemGeneric.getIsDataShipInternationalReq();
+            reqShipQualityData = itemGeneric.getIsDataQualityReq();
+
+            rowMessageNumbers = "Partida número : " + String.valueOf(i + 1) + " " + entry.getConceptKey() + "\n";
+           
+            if (reqShipDomesticData || reqShipInternationalData || reqShipQualityData) {
+                if (reqShipDomesticData && entry.getDriver().compareTo(STrnConsts.TXT_FIELD_BLANK) == 0) {
+                    shipmentMessage += rowMessageNumbers;
+                }
+                else if (reqShipDomesticData && entry.getPlate().compareTo(STrnConsts.TXT_FIELD_BLANK) == 0) {
+                    shipmentMessage += rowMessageNumbers;
+                }
+                else if (reqShipDomesticData && entry.getContainerTank().compareTo(STrnConsts.TXT_FIELD_BLANK) == 0) {
+                    shipmentMessage += rowMessageNumbers;
+                }
+                else if (reqShipQualityData && entry.getSealQuality().compareTo(STrnConsts.TXT_FIELD_BLANK) == 0) {
+                    shipmentMessage += rowMessageNumbers;
+                }
+                else if (reqShipQualityData && entry.getSealSecurity().compareTo(STrnConsts.TXT_FIELD_BLANK) == 0) {
+                    shipmentMessage += rowMessageNumbers;
+                }
+                else if (reqShipDomesticData && entry.getTicket().compareTo(STrnConsts.TXT_FIELD_BLANK) == 0) {
+                    shipmentMessage += rowMessageNumbers;
+                }
+                else if (reqShipInternationalData && entry.getVgm().compareTo(STrnConsts.TXT_FIELD_BLANK) == 0) {
+                    shipmentMessage += rowMessageNumbers;
+                }
+            }
+        }
+
+        if (!shipmentMessage.isEmpty()) {
+            shipmentMessage = ("Tiene las siguientes partidas con valores faltantes \n" + shipmentMessage );
+        }
+        
+        return shipmentMessage;
+    }
+    
     public void publicActionDependentNew() {
         if (jTabbedPane.getSelectedIndex() == 0) {
             actionEntryNew();
@@ -7578,6 +7700,23 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         validation.setMessage(e.getMessage());
                         validation.setComponent(moPaneGridEntries);
                         SLibUtilities.printOutException(this, e);
+                    }
+                }
+            }
+            
+            if (!validation.getIsError() && (SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD) || SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC))) {
+                String shipmentMessageMissingData = validateRequiredShipmentData();
+                
+                if (!shipmentMessageMissingData.isEmpty()) {
+                        validation.setMessage(shipmentMessageMissingData);
+                        validation.setComponent(moPaneGridEntries);
+                }
+                else{
+                    String shipmentMessage = validateProvisionalShipmentData();
+                
+                    if (!shipmentMessage.isEmpty() && miClient.showMsgBoxConfirm(shipmentMessage) != JOptionPane.YES_OPTION) {
+                        validation.setMessage("Revise la información de las partidas.");
+                        validation.setComponent(moPaneGridEntries);
                     }
                 }
             }
