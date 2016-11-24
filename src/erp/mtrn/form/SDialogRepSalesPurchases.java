@@ -446,6 +446,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         int nCurrency = 0;
         String sCurrency = "";
         String sqlCurrency = "";
+        String sSumStot = "";
         
         if (validation.getIsError()) {
             if (validation.getComponent() != null) {
@@ -458,11 +459,13 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         else {
             try {
                 if (jrbCurrencyDoc.isSelected()) {
+                    sSumStot = " COALESCE(SUM(e.stot_cur_r),0) ";
                     sCurrency = jcbCurrency.getSelectedItem().toString();
                     nCurrency = moFieldCurrency.getKeyAsIntArray()[0];
                     sqlCurrency = " doc.fid_cur = " + nCurrency + " AND ";
                 }
                 else {
+                    sSumStot = " COALESCE(SUM(e.stot_r),0) ";
                     sCurrency = miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency();
                     nCurrency = miClient.getSession().getSessionCustom().getLocalCurrencyKey()[0];
                     sqlCurrency = "";
@@ -481,6 +484,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
                 map.put("sSqlWhereCompanyBranchAdjRet", moFieldCompanyBranch.getKeyAsIntArray()[0] == 0 ? "" : " AND r.fid_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0]);
                 map.put("sSqlWhereCompanyBranchAdjDis", moFieldCompanyBranch.getKeyAsIntArray()[0] == 0 ? "" : " AND d.fid_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0]);
                 map.put("sTitle", mbParamIsSupplier ? "REPORTE DE COMPRAS NETAS" : "REPORTE DE VENTAS NETAS");
+                map.put("sSumStot", sSumStot);
                 map.put("sCurrency", sCurrency);
                 map.put("nCurrency", nCurrency);
                 map.put("nLocalCurrency", miClient.getSession().getSessionCustom().getLocalCurrencyKey()[0]);
