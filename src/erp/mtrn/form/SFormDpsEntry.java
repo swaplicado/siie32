@@ -4595,8 +4595,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         mbResetingForm = false;
     }
     
-    
-    
     public String validateShipmentData() {
         String message = "";
         

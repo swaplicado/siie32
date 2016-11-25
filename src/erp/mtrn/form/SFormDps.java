@@ -6607,7 +6607,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         return shipmentMessageMissingData;
     }
     
-    
     /**
      *  Verify valid but provisional data in shipmente fields
      */
@@ -6624,57 +6623,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         
         return shipmentMessageMissingData;
     }
-  /*  private String validateProvisionalShipmentData() {
-        boolean reqShipDomesticData = false;
-        boolean reqShipInternationalData = false;
-        boolean reqShipQualityData = false;
-        String shipmentMessage = "";
-        String rowMessageNumbers = "";
-        SDataItemGeneric itemGeneric = null;
-
-        for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
-            SDataDpsEntry entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
-
-            itemGeneric = (SDataItemGeneric) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_IGEN, new int[] { entry.getDbmsFkItemGenericId() }, SLibConstants.EXEC_MODE_SILENT);
-
-            reqShipDomesticData = itemGeneric.getIsDataShipDomesticReq();
-            reqShipInternationalData = itemGeneric.getIsDataShipInternationalReq();
-            reqShipQualityData = itemGeneric.getIsDataQualityReq();
-
-            rowMessageNumbers = "Partida número : " + String.valueOf(i + 1) + " " + entry.getConceptKey() + "\n";
-           
-            if (reqShipDomesticData || reqShipInternationalData || reqShipQualityData) {
-                if (reqShipDomesticData && entry.getDriver().compareTo(STrnConsts.TXT_FIELD_BLANK) == 0) {
-                    shipmentMessage += rowMessageNumbers;
-                }
-                else if (reqShipDomesticData && entry.getPlate().compareTo(STrnConsts.TXT_FIELD_BLANK) == 0) {
-                    shipmentMessage += rowMessageNumbers;
-                }
-                else if (reqShipDomesticData && entry.getContainerTank().compareTo(STrnConsts.TXT_FIELD_BLANK) == 0) {
-                    shipmentMessage += rowMessageNumbers;
-                }
-                else if (reqShipQualityData && entry.getSealQuality().compareTo(STrnConsts.TXT_FIELD_BLANK) == 0) {
-                    shipmentMessage += rowMessageNumbers;
-                }
-                else if (reqShipQualityData && entry.getSealSecurity().compareTo(STrnConsts.TXT_FIELD_BLANK) == 0) {
-                    shipmentMessage += rowMessageNumbers;
-                }
-                else if (reqShipDomesticData && entry.getTicket().compareTo(STrnConsts.TXT_FIELD_BLANK) == 0) {
-                    shipmentMessage += rowMessageNumbers;
-                }
-                else if (reqShipInternationalData && entry.getVgm().compareTo(STrnConsts.TXT_FIELD_BLANK) == 0) {
-                    shipmentMessage += rowMessageNumbers;
-                }
-            }
-        }
-
-        if (!shipmentMessage.isEmpty()) {
-            shipmentMessage = ("Tiene las siguientes partidas con valores provisionales \n" + shipmentMessage + "\n ¿Desea conservarlos?");
-        }
-        
-        return shipmentMessage;
-    }*/
-    
+ 
     public void publicActionDependentNew() {
         if (jTabbedPane.getSelectedIndex() == 0) {
             actionEntryNew();
