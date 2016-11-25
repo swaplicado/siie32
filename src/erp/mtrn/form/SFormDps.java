@@ -6596,7 +6596,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             SDataDpsEntry entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
 
             if (entry.isMissingRequiredShipmentData()) {
-                shipmentMessageMissingData = "Partida número : " + String.valueOf(i + 1) + "; Concepto : " + entry.getConcept() + "\n";
+                shipmentMessageMissingData = "Partida número : " + String.valueOf(i + 1) + " Concepto : " + entry.getConcept() + "\n";
             }
         }
 
@@ -7598,7 +7598,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         }
                     }
                 }
-            }
+            }   
             
             if (!validation.getIsError()) {
                 if (mnSalesSupervisorId_n != 0 && mnSalesAgentId_n == 0) {
