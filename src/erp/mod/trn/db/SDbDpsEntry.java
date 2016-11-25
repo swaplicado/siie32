@@ -79,7 +79,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
     protected double mdContractFactor;
     protected int mnContractPriceYear;
     protected int mnContractPriceMonth;    
-    protected String msVehicleNumber;
+    protected String msPlate;
     protected String msSecuritySeal;
     protected String msTicket;
     protected int mnUserId;
@@ -175,7 +175,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
     public void setContractFactor(double d) { mdContractFactor = d; }
     public void setContractPriceYear(int n) { mnContractPriceYear = n; }
     public void setContractPriceMonth(int n) { mnContractPriceMonth = n; }
-    public void setVehicleNumber(String s) { msVehicleNumber = s; }
+    public void setPlate(String s) { msPlate = s; }
     public void setSecuritySeal(String s) { msSecuritySeal = s; }
     public void setTicket(String s) { msTicket = s; }
     public void setUserId(int n) { mnUserId = n; }
@@ -261,7 +261,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
     public double getContractFactor() { return mdContractFactor; }
     public int getContractPriceYear() { return mnContractPriceYear; }
     public int getContractPriceMonth() { return mnContractPriceMonth; }
-    public String getVehicleNumber() { return msVehicleNumber; }
+    public String getPlate() { return msPlate; }
     public String getSecuritySeal() { return msSecuritySeal; }
     public String getTicket() { return msTicket; }
     public int getUserId() { return mnUserId; }
@@ -367,7 +367,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
         mdContractFactor = 0;
         mnContractPriceYear = 0;
         mnContractPriceMonth = 0;
-        msVehicleNumber = "";
+        msPlate = "";
         msSecuritySeal = "";
         msTicket = "";
         mnUserId = 0;
@@ -497,7 +497,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
             mdContractFactor = resultSet.getDouble("con_factor");
             mnContractPriceYear = resultSet.getInt("con_prc_year");
             mnContractPriceMonth = resultSet.getInt("con_prc_mon");
-            msVehicleNumber = resultSet.getString("veh_num");
+            msPlate = resultSet.getString("plate");
             msSecuritySeal = resultSet.getString("sec_seal");
             msTicket = resultSet.getString("ticket");
             mnUserId = resultSet.getInt("usr_id");

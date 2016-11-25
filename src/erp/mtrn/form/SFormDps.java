@@ -36,11 +36,9 @@ import erp.mfin.data.SDataRecord;
 import erp.mfin.form.SDialogRecordPicker;
 import erp.mfin.form.SPanelRecord;
 import erp.mitm.data.SDataItem;
-import erp.mitm.data.SDataItemGeneric;
 import erp.mmkt.data.SDataCustomerBranchConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.trn.db.STrnConsts;
 import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SCfdParams;
 import erp.mtrn.data.SDataCfd;
@@ -5949,11 +5947,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 if (links == 0) {
                     if (mnFormStatus == SLibConstants.FORM_STATUS_EDIT && entry.hasDpsLinksAsSource()) {
                         sourseDps = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.TRN_DPS, entry.getDbmsDpsLinksAsSource().elementAt(0).getDbmsSourceDpsKey(), SLibConstants.DESCRIPTION_CODE);
-                        miClient.showMsgBoxInformation("Documento origen: " + sourseDps);
+                        miClient.showMsgBoxInformation("Documento destino: " + sourseDps);
                     }
                     else if (mnFormStatus == SLibConstants.FORM_STATUS_EDIT && entry.hasDpsLinksAsDestiny()) {
                         sourseDps = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.TRN_DPS, entry.getDbmsDpsLinksAsDestiny().elementAt(0).getDbmsSourceDpsKey(), SLibConstants.DESCRIPTION_CODE);
-                        miClient.showMsgBoxInformation("Documento destino: " + sourseDps);
+                        miClient.showMsgBoxInformation("Documento origen: " + sourseDps);
                     }
                     else {
                         miClient.showMsgBoxInformation(SLibConstants.MSG_INF_NO_LINK_DPS_ETY);
@@ -6592,60 +6590,41 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
      * @return 
      */
     private String validateRequiredShipmentData() {
-        boolean reqShipDomesticData = false;
-        boolean reqShipInternationalData = false;
-        boolean reqShipQualityData = false;
-        String rowMessageNumbers = "";
         String shipmentMessageMissingData = "";
-        SDataItemGeneric itemGeneric = null;
-
+        
         for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
             SDataDpsEntry entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
 
-            itemGeneric = (SDataItemGeneric) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_IGEN, new int[] { entry.getDbmsFkItemGenericId() }, SLibConstants.EXEC_MODE_SILENT);
-
-            reqShipDomesticData = itemGeneric.getIsDataShipDomesticReq();
-            reqShipInternationalData = itemGeneric.getIsDataShipInternationalReq();
-            reqShipQualityData = itemGeneric.getIsDataQualityReq();
-
-            rowMessageNumbers = "Partida número : " + String.valueOf(i + 1) + " " + entry.getConceptKey() + "\n";
-            
-            if (reqShipDomesticData || reqShipInternationalData || reqShipQualityData) {
-                if (STrnUtils.validateShipmentDataValue(entry.getDriver(), (reqShipDomesticData && (SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD) || SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC))))) {
-                    shipmentMessageMissingData += rowMessageNumbers;
-                }
-                else if (STrnUtils.validateShipmentDataValue(entry.getPlate(), (reqShipDomesticData && (SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD) || SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC))))) {
-                    shipmentMessageMissingData += rowMessageNumbers;
-                }
-                else if (STrnUtils.validateShipmentDataValue(entry.getContainerTank(), (reqShipDomesticData && (SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD) || SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC))))) {
-                    shipmentMessageMissingData += rowMessageNumbers;
-                }
-                else if (STrnUtils.validateShipmentDataValue(entry.getSealQuality(), (reqShipQualityData && (SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD) || SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC))))) {
-                    shipmentMessageMissingData += rowMessageNumbers;
-                }
-                else if (STrnUtils.validateShipmentDataValue(entry.getSealSecurity(), (reqShipQualityData && (SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD) || SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC))))) {
-                    shipmentMessageMissingData += rowMessageNumbers;
-                }
-                else if (STrnUtils.validateShipmentDataValue(entry.getTicket(), (reqShipDomesticData && (SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD) || SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC))))) {
-                    shipmentMessageMissingData += rowMessageNumbers;
-                }
-                else if (STrnUtils.validateShipmentDataValue(entry.getVgm(), (reqShipInternationalData && (SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD) || SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC))))) {
-                    shipmentMessageMissingData += rowMessageNumbers;
-                }
+            if (entry.isMissingRequiredShipmentData()) {
+                shipmentMessageMissingData = "Partida número : " + String.valueOf(i + 1) + "; Concepto : " + entry.getConcept() + "\n";
             }
         }
 
         if (!shipmentMessageMissingData.isEmpty()) {
-            shipmentMessageMissingData = ("Tiene las siguientes partidas con valores faltantes \n" + shipmentMessageMissingData );
+            shipmentMessageMissingData = ("Tiene valores de embarque faltantes en : \n" + shipmentMessageMissingData);
         }
         
         return shipmentMessageMissingData;
     }
     
+    
     /**
      *  Verify valid but provisional data in shipmente fields
      */
     private String validateProvisionalShipmentData() {
+        String shipmentMessageMissingData = "";
+         
+        for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
+            SDataDpsEntry entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
+
+            if (entry.isValueProvisionalShipmentData()) {
+                shipmentMessageMissingData = "Tiene partidas con valores de embarque provisionales. \n ¿Desea conservarlos?";
+            }
+        }
+        
+        return shipmentMessageMissingData;
+    }
+  /*  private String validateProvisionalShipmentData() {
         boolean reqShipDomesticData = false;
         boolean reqShipInternationalData = false;
         boolean reqShipQualityData = false;
@@ -6690,11 +6669,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
 
         if (!shipmentMessage.isEmpty()) {
-            shipmentMessage = ("Tiene las siguientes partidas con valores faltantes \n" + shipmentMessage );
+            shipmentMessage = ("Tiene las siguientes partidas con valores provisionales \n" + shipmentMessage + "\n ¿Desea conservarlos?");
         }
         
         return shipmentMessage;
-    }
+    }*/
     
     public void publicActionDependentNew() {
         if (jTabbedPane.getSelectedIndex() == 0) {

@@ -1475,7 +1475,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jlQualitySeal.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel55.add(jlQualitySeal);
 
-        jtfSealQuality.setText("QUALITY SEALS");
+        jtfSealQuality.setText("SEAL QUALITY");
         jtfSealQuality.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel55.add(jtfSealQuality);
 
@@ -1494,7 +1494,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jlSecuritySeal.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel57.add(jlSecuritySeal);
 
-        jtfSecuritySeal.setText("QUALITY SEALS");
+        jtfSecuritySeal.setText("SEAL SECURITY");
         jtfSecuritySeal.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel57.add(jtfSecuritySeal);
 
@@ -2031,11 +2031,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldSealQuality = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfSealQuality, jlQualitySeal);
         moFieldSealQuality.setLengthMax(100);
         moFieldSealSecurity = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfSecuritySeal, jlSecuritySeal);
-        moFieldSealSecurity.setLongMax(50);
+        moFieldSealSecurity.setLengthMax(50);
         moFieldTicket = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfTicket, jlTicket);
         moFieldTicket.setLengthMax(50);
         moFieldVgm = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfVgm, jlVgm);
-        moFieldVgm.setLongMax(15);
+        moFieldVgm.setLengthMax(15);
         moFieldFkBankAccountId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkCashAccountId_n, jlFkCashAccountId_n);
         moFieldLength = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfLength, jlLength);
         moFieldLength.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsLengthFormat());
@@ -4600,25 +4600,25 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     public String validateShipmentData() {
         String message = "";
         
-        if (isBlank(moFieldDriver.getString())) {
+        if (SDataDpsEntry.isProvisionalValue(moFieldDriver.getString())) {
             message += moFieldDriver.getFieldName() + "\n";
         }
-        if (isBlank(moFieldPlate.getString())) {
+        if (SDataDpsEntry.isProvisionalValue(moFieldPlate.getString())) {
             message = message +  moFieldPlate.getFieldName() + "\n";
         }
-        if (isBlank(moFieldContainerTank.getString())) {
+        if (SDataDpsEntry.isProvisionalValue(moFieldContainerTank.getString())) {
             message = message + moFieldContainerTank.getFieldName() + "\n";
         }
-        if (isBlank(moFieldSealQuality.getString())) {
+        if (SDataDpsEntry.isProvisionalValue(moFieldSealQuality.getString())) {
             message = message + moFieldSealQuality.getFieldName() + "\n";
         }
-        if (isBlank(moFieldSealSecurity.getString())) {
+        if (SDataDpsEntry.isProvisionalValue(moFieldSealSecurity.getString())) {
             message = message + moFieldSealSecurity.getFieldName() + "\n";
         }
-        if (isBlank(moFieldTicket.getString())) {
+        if (SDataDpsEntry.isProvisionalValue(moFieldTicket.getString())) {
             message = message + moFieldTicket.getFieldName() + "\n";
         }
-        if (isBlank(moFieldVgm.getString())) {
+        if (SDataDpsEntry.isProvisionalValue(moFieldVgm.getString())) {
             message = message + moFieldVgm.getFieldName() + "\n";
         }
         
@@ -4701,42 +4701,42 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + moPanelFkCostCenterId_n.getFieldAccountLabel().getText() + "'.");
                 validation.setComponent(moPanelFkCostCenterId_n.getFieldAccount().getComponent());
             }
-            else if (jcbFkVehicleTypeId_n.getSelectedIndex() <= 0 && STrnUtils.validateShipmentDataValue(moFieldPlate.getString(), (reqShipDomesticData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+            else if (jcbFkVehicleTypeId_n.getSelectedIndex() <= 0 && SDataDpsEntry.validateShipmentDataValue(moFieldPlate.getString(), (reqShipDomesticData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkVehicleTypeId_n.getText() + "'.");
                 validation.setComponent(jcbFkVehicleTypeId_n);
                 jTabbedPane.setSelectedIndex(TAB_MKT);
             }
-            else if (STrnUtils.validateShipmentDataValue(moFieldDriver.getString(), (reqShipDomesticData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+            else if (SDataDpsEntry.validateShipmentDataValue(moFieldDriver.getString(), (reqShipDomesticData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDriver.getText() + "'.");
                 validation.setComponent(jtfDriver);
                 jTabbedPane.setSelectedIndex(TAB_MKT);
             }
-            else if (reqShipDomesticData && jcbFkVehicleTypeId_n.getSelectedIndex() > 0 && STrnUtils.validateShipmentDataValue(moFieldPlate.getString(), (reqShipDomesticData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+            else if (reqShipDomesticData && jcbFkVehicleTypeId_n.getSelectedIndex() > 0 && SDataDpsEntry.validateShipmentDataValue(moFieldPlate.getString(), (reqShipDomesticData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlVehicleNumber.getText() + "'.");
                 validation.setComponent(jtfVehicleNumber);
                 jTabbedPane.setSelectedIndex(TAB_MKT);
             }
-            else if (STrnUtils.validateShipmentDataValue(moFieldContainerTank.getString(), (reqShipDomesticData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+            else if (SDataDpsEntry.validateShipmentDataValue(moFieldContainerTank.getString(), (reqShipDomesticData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlContainerTank.getText() + "'.");
                 validation.setComponent(jtfContTank);
                 jTabbedPane.setSelectedIndex(TAB_MKT);
             }
-            else if (STrnUtils.validateShipmentDataValue(moFieldSealQuality.getString(), (reqShipQualityData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+            else if (SDataDpsEntry.validateShipmentDataValue(moFieldSealQuality.getString(), (reqShipQualityData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlQualitySeal.getText() + "'.");
                 validation.setComponent(jtfSealQuality);
                 jTabbedPane.setSelectedIndex(TAB_MKT);
             }
-            else if (STrnUtils.validateShipmentDataValue(moFieldSealSecurity.getString(), (reqShipQualityData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+            else if (SDataDpsEntry.validateShipmentDataValue(moFieldSealSecurity.getString(), (reqShipQualityData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlSecuritySeal.getText() + "'.");
                 validation.setComponent(jtfSecuritySeal);
                 jTabbedPane.setSelectedIndex(TAB_MKT);
             }
-             else if (STrnUtils.validateShipmentDataValue(moFieldTicket.getString(), (reqShipDomesticData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+             else if (SDataDpsEntry.validateShipmentDataValue(moFieldTicket.getString(), (reqShipDomesticData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlTicket.getText() + "'.");
                 validation.setComponent(jtfTicket);
                 jTabbedPane.setSelectedIndex(TAB_MKT);
             }
-            else if (STrnUtils.validateShipmentDataValue(moFieldVgm.getString(), (reqShipInternationalData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+            else if (SDataDpsEntry.validateShipmentDataValue(moFieldVgm.getString(), (reqShipInternationalData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlVgm.getText() + "'.");
                 validation.setComponent(jtfVgm);
                 jTabbedPane.setSelectedIndex(TAB_MKT);
