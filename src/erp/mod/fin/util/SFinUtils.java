@@ -91,7 +91,7 @@ public class SFinUtils {
                     oRow.setBalance(dBalancePayment);
                     oRow.setBalanceTot(0);
                     oRow.setCurrencyKey(oBranchBankAccount.getDbmsCurrencyKey());
-                    oRow.setAccountCredit(oLayout.getFkBankLayoutTypeId() == SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? oBranchBankAccount.getBankAccountNumberStd(): oBranchBankAccount.getBankAccountNumber());
+                    oRow.setAccountCredit(oLayout.getFkBankLayoutTypeId() != SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? oBranchBankAccount.getBankAccountNumberStd(): oBranchBankAccount.getBankAccountNumber());
                     oRow.setIsForPayment((boolean) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_APPLIED).getValue());
                     oRow.setIsToPayed((boolean) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_APPLIED).getValue());
                     
