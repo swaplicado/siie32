@@ -777,6 +777,10 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_PAY_WEE = 1; // Weekly 
     public static final int HRSS_TP_PAY_FOR = 2; // Fortnightly 
 
+    public static final int HRSS_TP_PAY_SHT_NOR = 1; // Normal
+    public static final int HRSS_TP_PAY_SHT_SPE = 2; // Special
+    public static final int HRSS_TP_PAY_SHT_EXT = 3; // Extraordinary
+
     public static final int HRSS_TP_SAL_FIX = 1; // Fixed
     public static final int HRSS_TP_SAL_VAR = 2; // Variable
     public static final int HRSS_TP_SAL_MIX = 3; // Mixed

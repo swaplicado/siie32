@@ -415,17 +415,7 @@ public abstract class STrnUtils {
         
         return amount;
     }
-    
-    /**
-     * Validates if a field is requierd and has a valid value
-     * @param value
-     * @param requiered
-     * @return 
-     */
-    public static boolean validateShipmentDataValue(final String value, final boolean requiered) {
-        return ((value.isEmpty() || value == STrnConsts.TXT_FIELD_BLANK) && requiered) ; 
-    }
-  
+
     /**
      * Checks if item needs to be added to document from source document.
      */
