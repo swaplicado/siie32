@@ -553,7 +553,8 @@ public abstract class SModConsts {
     public static final int HRSS_CL_HRS_CAT = 2061001;
     public static final int HRSS_TP_HRS_CAT = 2061002;
     public static final int HRSS_TP_PAY = 2061011;
-    public static final int HRSS_TP_SAL = 2061012;
+    public static final int HRSS_TP_PAY_SHT = 2061012;
+    public static final int HRSS_TP_SAL = 2061013;
     public static final int HRSS_TP_ACC = 2061016;
     public static final int HRSS_TP_TAX_COMP = 2061021;
     public static final int HRSS_TP_EAR_COMP = 2061031;
