@@ -5,20 +5,19 @@
 
 package erp.mitm.view;
 
-import java.awt.Dimension;
-import java.text.DecimalFormat;
-import javax.swing.JButton;
-
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.table.STabFilterDeleted;
 import erp.lib.table.STableCellRendererNumber;
-import erp.lib.table.STableField;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
+import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import java.awt.Dimension;
+import java.text.DecimalFormat;
+import javax.swing.JButton;
 import sa.gui.util.SUtilConsts;
 /**
  *
@@ -59,7 +58,7 @@ public class SViewItemGeneric extends erp.lib.table.STableTab implements java.aw
         jbDelete.setEnabled(false);
 
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[38];
+        STableColumn[] aoTableColumns = new STableColumn[41];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "ig.id_igen");
@@ -100,6 +99,9 @@ public class SViewItemGeneric extends erp.lib.table.STableTab implements java.aw
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_free_price", "S/precio", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_free_disc", "S/desc.", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_free_comms", "S/comisión", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_ship_dom", "Embarque nacional", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_ship_int", "Embarque internacional", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_ship_qlt", "Calidad", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usr. creación", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "ig.ts_new", "Creación", STableConstants.WIDTH_DATE_TIME);
@@ -170,7 +172,7 @@ public class SViewItemGeneric extends erp.lib.table.STableTab implements java.aw
 
         msSql = "SELECT ig.id_igen, igen,igen, ig.igen_short, ig.code, ig.b_line, ig.b_item_short, ig.b_item_name_edit, ig.b_item_key_edit, " +
                 "ig.b_inv, ig.b_lot, ig.b_bulk, ig.days_exp, ig.b_weight_gross, ig.b_weight_delivery, " +
-                "ig.b_free_price, ig.b_free_disc, ig.b_free_disc_u, ig.b_free_disc_ety, ig.b_free_disc_doc, ig.b_free_comms, ig.b_del, ig.surplus_per, " +
+                "ig.b_free_price, ig.b_free_disc, ig.b_free_disc_u, ig.b_free_disc_ety, ig.b_free_disc_doc, ig.b_free_comms, ig.b_ship_dom, ig.b_ship_int, ig.b_ship_qlt, ig.b_del, ig.surplus_per, " +
                 "ict.ct_item, icl.cl_item, itp.tp_item, igrp.igrp, ifam.ifam, tu.tp_unit, tuc.tp_unit, tuv.tp_unit, tunc.tp_unit, tuncu.tp_unit, snr.tp_snr, " +
                 "ig.ts_new, ig.ts_edit, ig.ts_del, un.usr, ue.usr, ud.usr " +
                 "FROM erp.itmu_igen AS ig " +

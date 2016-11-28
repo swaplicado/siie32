@@ -11,6 +11,7 @@ import erp.gui.session.SSessionCustom;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mod.SModSysConsts;
+import erp.mod.trn.db.STrnConsts;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -80,10 +81,14 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected double mdContractFuture;
     protected double mdContractFactor;
     protected int mnContractPriceYear;
-    protected int mnContractPriceMonth;    
-    protected java.lang.String msVehicleNumber;
-    protected java.lang.String msSecuritySeal;
+    protected int mnContractPriceMonth;
+    protected java.lang.String msSealQuality;
+    protected java.lang.String msSealSecurity;
+    protected java.lang.String msDriver;
+    protected java.lang.String msPlate;
     protected java.lang.String msTicket;
+    protected java.lang.String msContainerTank;
+    protected java.lang.String msVgm;
     protected int mnUserId;
     protected int mnSortingPosition;
     protected boolean mbIsPrepayment;
@@ -113,6 +118,9 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected java.util.Date mtUserDeleteTs;
 
     protected int mnDbmsFkItemGenericId;
+    protected boolean mbDbmsItemGenDataShipDomesticReq;
+    protected boolean mbDbmsItemGenDataShipInternationalReq;
+    protected boolean mbDbmsItemGenDataShipQualityReq;
     protected java.lang.String msDbmsItem;
     protected java.lang.String msDbmsUnitSymbol;
     protected java.lang.String msDbmsOriginalUnitSymbol;
@@ -228,9 +236,13 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setContractFactor(double d) { mdContractFactor = d; }
     public void setContractPriceYear(int n) { mnContractPriceYear = n; }
     public void setContractPriceMonth(int n) { mnContractPriceMonth = n; }
-    public void setVehicleNumber(java.lang.String s) { msVehicleNumber = s; }
-    public void setSecuritySeal(java.lang.String s) { msSecuritySeal = s; }
+    public void setSealQuality(java.lang.String s) { msSealQuality = s; }
+    public void setSealSecurity(java.lang.String s) { msSealSecurity = s; }
+    public void setDriver(java.lang.String s) { msDriver = s; }
+    public void setPlate(java.lang.String s) { msPlate = s; }
     public void setTicket(java.lang.String s) { msTicket = s; }
+    public void setContainerTank(java.lang.String s) { msContainerTank = s; }
+    public void setVgm(java.lang.String s) { msVgm = s; }
     public void setUserId(int n) { mnUserId = n; }
     public void setSortingPosition(int n) { mnSortingPosition = n; }
     public void setIsPrepayment(boolean b) { mbIsPrepayment = b; }
@@ -316,9 +328,13 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public double getContractFactor() { return mdContractFactor; }
     public int getContractPriceYear() { return mnContractPriceYear; }
     public int getContractPriceMonth() { return mnContractPriceMonth; }
-    public java.lang.String getVehicleNumber() { return msVehicleNumber; }
-    public java.lang.String getSecuritySeal() { return msSecuritySeal; }
+    public java.lang.String getSealQuality() { return msSealQuality; }
+    public java.lang.String getSealSecurity() { return msSealSecurity; }
+    public java.lang.String getDriver() { return msDriver; }
+    public java.lang.String getPlate() { return msPlate; }
     public java.lang.String getTicket() { return msTicket; }
+    public java.lang.String getContainerTank() { return msContainerTank; }
+    public java.lang.String getVgm() { return msVgm; }
     public int getUserId() { return mnUserId; }
     public int getSortingPosition() { return mnSortingPosition; }
     public boolean getIsPrepayment() { return mbIsPrepayment; }
@@ -348,6 +364,9 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
 
     public void setDbmsFkItemGenericId(int n) { mnDbmsFkItemGenericId = n; }
+    public void setDbmsItemGenDataShipDomesticReq(boolean b) { mbDbmsItemGenDataShipDomesticReq = b; }
+    public void setDbmsItemGenDataShipInternationalReq(boolean b) { mbDbmsItemGenDataShipInternationalReq = b; }
+    public void setDbmsItemGenDataShipQualityReq(boolean b) { mbDbmsItemGenDataShipQualityReq = b; }
     public void setDbmsItem(java.lang.String s) { msDbmsItem = s; }
     public void setDbmsUnitSymbol(java.lang.String s) { msDbmsUnitSymbol = s; }
     public void setDbmsOriginalUnitSymbol(java.lang.String s) { msDbmsOriginalUnitSymbol = s; }
@@ -369,6 +388,9 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setDbmsDpsAddElektraPartPriceUnitary(double d) { mdDbmsDpsAddElektraPartPriceUnitary = d; }
 
     public int getDbmsFkItemGenericId() { return mnDbmsFkItemGenericId; }
+    public boolean getDbmsItemGenDataShipDomesticReq() { return mbDbmsItemGenDataShipDomesticReq; }
+    public boolean getDbmsItemGenDataShipInternationalReq() { return mbDbmsItemGenDataShipInternationalReq; }
+    public boolean getDbmsItemGenDataShipQualityReq() { return mbDbmsItemGenDataShipQualityReq; }
     public java.lang.String getDbmsItem() { return msDbmsItem; }
     public java.lang.String getDbmsUnitSymbol() { return msDbmsUnitSymbol; }
     public java.lang.String getDbmsOriginalUnitSymbol() { return msDbmsOriginalUnitSymbol; }
@@ -491,9 +513,13 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mdContractFactor = 0;
         mnContractPriceYear = 0;
         mnContractPriceMonth = 0;
-        msVehicleNumber = "";
-        msSecuritySeal = "";
+        msSealQuality = "";
+        msSealSecurity = "";
+        msDriver = "";
+        msPlate = "";
         msTicket = "";
+        msContainerTank = "";
+        msVgm = "";
         mnUserId = 0;
         mnSortingPosition = 0;
         mbIsPrepayment = false;
@@ -523,6 +549,9 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mtUserDeleteTs = null;
 
         mnDbmsFkItemGenericId = 0;
+        mbDbmsItemGenDataShipDomesticReq = false;
+        mbDbmsItemGenDataShipInternationalReq = false;
+        mbDbmsItemGenDataShipQualityReq = false;
         msDbmsItem = "";
         msDbmsUnitSymbol = "";
         msDbmsOriginalUnitSymbol = "";
@@ -570,11 +599,12 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         reset();
 
         try {
-            sql = "SELECT de.*, i.item, i.fid_igen, u.symbol, ou.symbol, " +
+            sql = "SELECT de.*, i.item, i.fid_igen, igen.b_ship_dom, igen.b_ship_int, igen.b_ship_qlt, u.symbol, ou.symbol, " +
                     "tr.tax_reg, tda.stp_dps_adj, tde.tp_dps_ety, cc.code, cc.cc, ir.item, ade.bac_num_pos, ade.bac_cen, ade.lor_num_ety, ade.sor_cod, " +
                     "ade.ele_ord, ade.ele_barc, ade.ele_cag, ade.ele_cag_price_u, ade.ele_par, ade.ele_par_price_u " +
                     "FROM trn_dps_ety AS de " +
                     "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " +
+                    "INNER JOIN erp.itmu_igen AS igen ON i.fid_igen = igen.id_igen " +
                     "INNER JOIN erp.itmu_unit as u ON de.fid_unit = u.id_unit " +
                     "INNER JOIN erp.itmu_unit as ou ON de.fid_orig_unit = ou.id_unit " +
                     "INNER JOIN erp.finu_tax_reg AS tr ON de.fid_tax_reg = tr.id_tax_reg " +
@@ -647,9 +677,13 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 mdContractFactor = resultSet.getDouble("de.con_factor");
                 mnContractPriceYear = resultSet.getInt("de.con_prc_year");
                 mnContractPriceMonth = resultSet.getInt("de.con_prc_mon");
-                msVehicleNumber = resultSet.getString("de.veh_num");
-                msSecuritySeal = resultSet.getString("de.sec_seal");
+                msSealQuality = resultSet.getString("de.seal_qlt");
+                msSealSecurity = resultSet.getString("de.seal_sec");
+                msDriver = resultSet.getString("de.driver");
+                msPlate = resultSet.getString("de.plate");
                 msTicket = resultSet.getString("de.ticket");
+                msContainerTank = resultSet.getString("de.cont_tank");
+                msVgm = resultSet.getString("de.vgm");
                 mnUserId = resultSet.getInt("de.usr_id");
                 mnSortingPosition = resultSet.getInt("de.sort_pos");
                 mbIsPrepayment = resultSet.getBoolean("de.b_pre_pay");
@@ -682,6 +716,9 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 mtUserDeleteTs = resultSet.getTimestamp("de.ts_del");
 
                 mnDbmsFkItemGenericId = resultSet.getInt("i.fid_igen");
+                mbDbmsItemGenDataShipDomesticReq = resultSet.getBoolean("igen.b_ship_dom");
+                mbDbmsItemGenDataShipInternationalReq = resultSet.getBoolean("igen.b_ship_int");
+                mbDbmsItemGenDataShipQualityReq = resultSet.getBoolean("igen.b_ship_qlt");
                 msDbmsItem = resultSet.getString("i.item");
                 msDbmsUnitSymbol = resultSet.getString("u.symbol");
                 msDbmsOriginalUnitSymbol = resultSet.getString("ou.symbol");
@@ -922,7 +959,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " + 
-                    "?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkDocId);
             callableStatement.setInt(nParam++, mnPkEntryId);
@@ -980,9 +1017,13 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
             callableStatement.setDouble(nParam++, mdContractFactor);
             callableStatement.setInt(nParam++, mnContractPriceYear);
             callableStatement.setInt(nParam++, mnContractPriceMonth);
-            callableStatement.setString(nParam++, msVehicleNumber);
-            callableStatement.setString(nParam++, msSecuritySeal);
+            callableStatement.setString(nParam++, msSealQuality);
+            callableStatement.setString(nParam++, msSealSecurity);
+            callableStatement.setString(nParam++, msDriver);
+            callableStatement.setString(nParam++, msPlate);
             callableStatement.setString(nParam++, msTicket);
+            callableStatement.setString(nParam++, msContainerTank);
+            callableStatement.setString(nParam++, msVgm);
             callableStatement.setInt(nParam++, mnUserId);
             callableStatement.setInt(nParam++, mnSortingPosition);
             callableStatement.setBoolean(nParam++, mbIsPrepayment);
@@ -1423,6 +1464,9 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mvDbmsEntryPrices.clear();
 
         mnDbmsFkItemGenericId = 0;
+        mbDbmsItemGenDataShipDomesticReq = false;
+        mbDbmsItemGenDataShipInternationalReq = false;
+        mbDbmsItemGenDataShipQualityReq = false;
     }
 
     public boolean hasDpsLinksAsSource() { return mvDbmsDpsLinksAsSource.size() > 0; }
@@ -1494,9 +1538,13 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setContractFactor(mdContractFactor);
         clone.setContractPriceYear(mnContractPriceYear);
         clone.setContractPriceMonth(mnContractPriceMonth);
-        clone.setVehicleNumber(msVehicleNumber);
-        clone.setSecuritySeal(msSecuritySeal);
+        clone.setSealQuality(msSealQuality);
+        clone.setSealSecurity(msSealSecurity);
+        clone.setDriver(msDriver);
+        clone.setPlate(msPlate);
         clone.setTicket(msTicket);
+        clone.setContainerTank(msContainerTank);
+        clone.setVgm(msVgm);
         clone.setUserId(mnUserId);
         clone.setSortingPosition(mnSortingPosition);
         clone.setIsPrepayment(mbIsPrepayment);
@@ -1526,6 +1574,9 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setUserDeleteTs(mtUserDeleteTs);
 
         clone.setDbmsFkItemGenericId(mnDbmsFkItemGenericId);
+        clone.setDbmsItemGenDataShipDomesticReq(mbDbmsItemGenDataShipDomesticReq);
+        clone.setDbmsItemGenDataShipInternationalReq(mbDbmsItemGenDataShipInternationalReq);
+        clone.setDbmsItemGenDataShipQualityReq(mbDbmsItemGenDataShipQualityReq);
         clone.setDbmsItem(msDbmsItem);
         clone.setDbmsUnitSymbol(msDbmsUnitSymbol);
         clone.setDbmsOriginalUnitSymbol(msDbmsOriginalUnitSymbol);
@@ -1561,5 +1612,84 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setAuxPreserveQuantity(mbAuxPreserveQuantity);
 
         return clone;
+    }
+    
+    /**
+     * Validates if a field is requierd and has a valid value
+     * @param value
+     * @param requiered
+     * @return 
+     */
+    public static boolean validateShipmentDataValue(final String value, final boolean requiered) {
+        return ((value.isEmpty() || value == STrnConsts.TXT_FIELD_BLANK) && requiered) ; 
+    }
+    
+     /**
+     * Verify if the value is equal to blank value
+     * @param value
+     * @return 
+     */
+    public static boolean isProvisionalValue(final String value) {
+        return value.compareTo(STrnConsts.TXT_FIELD_BLANK) == 0;
+    }
+    
+      /**
+     * Verify if shipment data is needed
+     * @return 
+     */
+    public boolean isMissingRequiredShipmentData() {
+        if (validateShipmentDataValue(msDriver, mbDbmsItemGenDataShipDomesticReq)) {
+            return true;
+        }
+        else if (validateShipmentDataValue(msPlate, mbDbmsItemGenDataShipDomesticReq)) {
+            return true;
+        }
+        else if (validateShipmentDataValue(msContainerTank, mbDbmsItemGenDataShipDomesticReq)) {
+            return true;
+        }
+        else if (validateShipmentDataValue(msSealQuality, mbDbmsItemGenDataShipQualityReq)) {
+            return true;
+        }
+        else if (validateShipmentDataValue(msSealSecurity, mbDbmsItemGenDataShipQualityReq)) {
+            return true;
+        }
+        else if (validateShipmentDataValue(msTicket, mbDbmsItemGenDataShipDomesticReq)) {
+            return true;
+        }
+        else if (validateShipmentDataValue(msVgm, mbDbmsItemGenDataShipInternationalReq)) {
+            return true;
+        }
+ 
+        return false;
+    }
+    
+     /**
+     * Verify if shipment data is needed
+     * @return 
+     */
+    public boolean isValueProvisionalShipmentData() {
+        if (mbDbmsItemGenDataShipDomesticReq && isProvisionalValue(msDriver)) {
+            return true;
+        }
+        else if (mbDbmsItemGenDataShipDomesticReq && isProvisionalValue(msPlate)) {
+            return true;
+        }
+        else if (mbDbmsItemGenDataShipDomesticReq && isProvisionalValue(msContainerTank)) {
+            return true;
+        }
+        else if (mbDbmsItemGenDataShipQualityReq && isProvisionalValue(msSealSecurity)) {
+            return true;
+        }
+        else if (mbDbmsItemGenDataShipQualityReq && isProvisionalValue(msSealQuality)) {
+            return true;
+        }
+        else if (mbDbmsItemGenDataShipDomesticReq && isProvisionalValue(msTicket)) {
+            return true;
+        }
+        else if (mbDbmsItemGenDataShipInternationalReq && isProvisionalValue(msVgm)) {
+            return true;
+        }
+ 
+        return false;
     }
 }

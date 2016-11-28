@@ -150,7 +150,7 @@ public abstract class SBpsUtils {
         String sql = "";
         
         sql = "SELECT COUNT(*) AS number FROM erp.bpsu_bank_acc WHERE acc_num = '" + accNum + "' AND fid_bank = " + idBank +
-                (bankAccPk != null ? " AND id_bpb != " + bankAccPk[0] + " AND id_bank_acc != " + bankAccPk[1] : "");
+                (bankAccPk != null ? " AND (id_bpb != " + bankAccPk[0] + " OR id_bank_acc != " + bankAccPk[1] + ")" : "");
         resultSet = client.getSession().getStatement().executeQuery(sql);
 
         if (resultSet.next()) {
@@ -166,7 +166,7 @@ public abstract class SBpsUtils {
         String sql = "";
         
         sql = "SELECT COUNT(*) as number FROM erp.bpsu_bank_acc WHERE acc_num_std = '" + accNumStd + "'" +
-                (bankAccPk != null ? " AND id_bpb != " + bankAccPk[0] + " AND id_bank_acc != " + bankAccPk[1] : "");
+                (bankAccPk != null ? " AND (id_bpb != " + bankAccPk[0] + " OR id_bank_acc != " + bankAccPk[1] + ")" : "");
         resultSet = client.getSession().getStatement().executeQuery(sql);
 
         if (resultSet.next()) {

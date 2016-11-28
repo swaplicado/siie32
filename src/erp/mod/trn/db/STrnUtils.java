@@ -415,7 +415,7 @@ public abstract class STrnUtils {
         
         return amount;
     }
-    
+
     /**
      * Checks if item needs to be added to document from source document.
      */

@@ -460,9 +460,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel40 = new javax.swing.JPanel();
         jcbFkProductionOrderId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkProductionOrderId_n = new javax.swing.JButton();
-        jPanel36 = new javax.swing.JPanel();
-        jlTicket = new javax.swing.JLabel();
-        jtfTicket = new javax.swing.JTextField();
         jpOtherMarketing = new javax.swing.JPanel();
         jPanel46 = new javax.swing.JPanel();
         jPanel60 = new javax.swing.JPanel();
@@ -520,6 +517,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlDriver = new javax.swing.JLabel();
         jcbDriver = new javax.swing.JComboBox();
         jcbPlate = new javax.swing.JComboBox();
+        jPanel36 = new javax.swing.JPanel();
+        jlTicket = new javax.swing.JLabel();
+        jtfTicket = new javax.swing.JTextField();
         jpNotes = new javax.swing.JPanel();
         jpNotesControls = new javax.swing.JPanel();
         jbNotesNew = new javax.swing.JButton();
@@ -1543,18 +1543,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel39.add(jPanel40);
 
-        jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
-
-        jlTicket.setText("Boleto báscula:");
-        jlTicket.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel36.add(jlTicket);
-
-        jtfTicket.setText("TICKET");
-        jtfTicket.setPreferredSize(new java.awt.Dimension(107, 23));
-        jPanel36.add(jtfTicket);
-
-        jPanel39.add(jPanel36);
-
         jpOtherSupply.add(jPanel39, java.awt.BorderLayout.NORTH);
 
         jpMarketing.add(jpOtherSupply, java.awt.BorderLayout.WEST);
@@ -1670,7 +1658,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpOtherLogistics.setPreferredSize(new java.awt.Dimension(375, 10));
         jpOtherLogistics.setLayout(new java.awt.BorderLayout());
 
-        jPanel49.setLayout(new java.awt.GridLayout(9, 1, 0, 1));
+        jPanel49.setLayout(new java.awt.GridLayout(10, 1, 0, 1));
 
         jPanel50.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel50.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
@@ -1810,6 +1798,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel55.add(jcbPlate);
 
         jPanel49.add(jPanel55);
+
+        jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlTicket.setText("Boleto(s) báscula:");
+        jlTicket.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel36.add(jlTicket);
+
+        jtfTicket.setText("TICKET");
+        jtfTicket.setPreferredSize(new java.awt.Dimension(107, 23));
+        jPanel36.add(jtfTicket);
+
+        jPanel49.add(jPanel36);
 
         jpOtherLogistics.add(jPanel49, java.awt.BorderLayout.NORTH);
 
@@ -2209,9 +2209,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldDriver = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, (JTextField) jcbDriver.getEditor().getEditorComponent(), jlDriver);
         moFieldDriver.setLengthMax(50);
         moFieldPlate = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, (JTextField) jcbPlate.getEditor().getEditorComponent(), jlDriver);
-        moFieldPlate.setLengthMax(15);
+        moFieldPlate.setLengthMax(25);
         moFieldTicket = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfTicket, jlTicket);
-        moFieldTicket.setLengthMax(25);
+        moFieldTicket.setLengthMax(50);
         moFieldShipments = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfShipments, jckShipments);
         moFieldPayments = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfPayments, jckPayments);
         moFieldIsLinked = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsLinked);
@@ -5929,6 +5929,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         if (jbEntryViewLinks.isEnabled()) {
             int links = 0;
             int index = moPaneGridEntries.getTable().getSelectedRow();
+            String sourseDps = "";
             SDataDpsEntry entry = null;
 
             if (index != -1) {
@@ -5944,7 +5945,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 links = moDialogShowDocumentLinks.readLinks();
 
                 if (links == 0) {
-                    miClient.showMsgBoxInformation(SLibConstants.MSG_INF_NO_LINK_DPS_ETY);
+                    if (mnFormStatus == SLibConstants.FORM_STATUS_EDIT && entry.hasDpsLinksAsSource()) {
+                        sourseDps = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.TRN_DPS, entry.getDbmsDpsLinksAsSource().elementAt(0).getDbmsSourceDpsKey(), SLibConstants.DESCRIPTION_CODE);
+                        miClient.showMsgBoxInformation("Documento destino: " + sourseDps);
+                    }
+                    else if (mnFormStatus == SLibConstants.FORM_STATUS_EDIT && entry.hasDpsLinksAsDestiny()) {
+                        sourseDps = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.TRN_DPS, entry.getDbmsDpsLinksAsDestiny().elementAt(0).getDbmsSourceDpsKey(), SLibConstants.DESCRIPTION_CODE);
+                        miClient.showMsgBoxInformation("Documento origen: " + sourseDps);
+                    }
+                    else {
+                        miClient.showMsgBoxInformation(SLibConstants.MSG_INF_NO_LINK_DPS_ETY);
+                    }
                 }
                 else {
                     moDialogShowDocumentLinks.setFormVisible(true);
@@ -6573,7 +6584,46 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
         }
     }
+    
+    /**
+     * Verify if shipment data is needed
+     * @return 
+     */
+    private String validateRequiredShipmentData() {
+        String shipmentMessageMissingData = "";
+        
+        for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
+            SDataDpsEntry entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
 
+            if (entry.isMissingRequiredShipmentData()) {
+                shipmentMessageMissingData = "Partida número : " + String.valueOf(i + 1) + " Concepto : " + entry.getConcept() + "\n";
+            }
+        }
+
+        if (!shipmentMessageMissingData.isEmpty()) {
+            shipmentMessageMissingData = ("Tiene valores de embarque faltantes en : \n" + shipmentMessageMissingData);
+        }
+        
+        return shipmentMessageMissingData;
+    }
+    
+    /**
+     *  Verify valid but provisional data in shipmente fields
+     */
+    private String validateProvisionalShipmentData() {
+        String shipmentMessageMissingData = "";
+         
+        for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
+            SDataDpsEntry entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
+
+            if (entry.isValueProvisionalShipmentData()) {
+                shipmentMessageMissingData = "Tiene partidas con valores de embarque provisionales. \n ¿Desea conservarlos?";
+            }
+        }
+        
+        return shipmentMessageMissingData;
+    }
+ 
     public void publicActionDependentNew() {
         if (jTabbedPane.getSelectedIndex() == 0) {
             actionEntryNew();
@@ -7548,7 +7598,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         }
                     }
                 }
-            }
+            }   
             
             if (!validation.getIsError()) {
                 if (mnSalesSupervisorId_n != 0 && mnSalesAgentId_n == 0) {
@@ -7578,6 +7628,23 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         validation.setMessage(e.getMessage());
                         validation.setComponent(moPaneGridEntries);
                         SLibUtilities.printOutException(this, e);
+                    }
+                }
+            }
+            
+            if (!validation.getIsError() && (SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD) || SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC))) {
+                String shipmentMessageMissingData = validateRequiredShipmentData();
+                
+                if (!shipmentMessageMissingData.isEmpty()) {
+                        validation.setMessage(shipmentMessageMissingData);
+                        validation.setComponent(moPaneGridEntries);
+                }
+                else{
+                    String shipmentMessage = validateProvisionalShipmentData();
+                
+                    if (!shipmentMessage.isEmpty() && miClient.showMsgBoxConfirm(shipmentMessage) != JOptionPane.YES_OPTION) {
+                        validation.setMessage("Revise la información de las partidas.");
+                        validation.setComponent(moPaneGridEntries);
                     }
                 }
             }

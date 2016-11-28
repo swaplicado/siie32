@@ -2883,4 +2883,23 @@ public abstract class STrnUtilities {
             }
         }    
     }
+    
+    public static boolean updateDeliveryAddress(final SClientInterface client, final int[] idBranchAddress, final int[] pkTrnDps) {
+        String sql = "";
+        Statement statement = null;
+        boolean updated = false;
+        
+        try {
+            sql = "UPDATE trn_dps SET fid_add = " + idBranchAddress[1] + " WHERE id_year = " + pkTrnDps[0] + " and id_doc = " + pkTrnDps[1] + ";";
+
+            statement = client.getSession().getDatabase().getConnection().createStatement();
+            statement.executeUpdate(sql);
+            updated = true;
+        }
+        catch (Exception e) {
+            SLibUtilities.printOutException(STrnUtilities.class.getName(), e);
+        }
+        
+        return updated;
+    }
 }
