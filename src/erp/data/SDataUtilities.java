@@ -2828,6 +2828,9 @@ public abstract class SDataUtilities {
             case SDataConstantsSys.REP_FIN_BPS_ACC_AGI: // business partner accounts aging
                 name = "reps/fin_bps_acc_agi.jasper";
                 break;
+            case SDataConstantsSys.REP_FIN_BPS_ACC_AGI_CRED: // business partner accounts aging with amounts of insurance and guarantee
+                name = "reps/fin_bps_acc_agi_cred.jasper";
+                break;
             case SDataConstantsSys.REP_FIN_PS_CL_ITEM:
                 name = "reps/fin_ps_item.jasper";
                 break;
