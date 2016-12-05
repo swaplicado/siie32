@@ -25,7 +25,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda
  */
 public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -253,9 +253,10 @@ public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.
 
                 if (miClient.showMsgBoxConfirm("La acción eliminará el vínculo entre los docs. '" + oSrcDps.getDpsNumber() + "' y '" + oDesDps.getDpsNumber() + "', lo cual es irreversible,\n" + SLibConstants.MSG_CNF_MSG_CONT) == JOptionPane.YES_OPTION) {
                     try {
-                        for (SDataDpsEntry entry : oDesDps.getDbmsDpsEntries()) {
+                         for (SDataDpsEntry entry : oDesDps.getDbmsDpsEntries()) {
                             entry.setContractPriceYear(0);
                             entry.setContractPriceMonth(0);
+                            entry.setIsRegistryEdited(true);
                         }
                         SDataUtilities.saveRegistry(miClient, oDesDps);
                             
