@@ -42,7 +42,7 @@ import javax.swing.event.ListSelectionEvent;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda
  */
 public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, javax.swing.event.ListSelectionListener, java.awt.event.ItemListener {
 
@@ -472,6 +472,7 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
             entry = (SDataEntryDpsDpsLink) moTablePane.getTableRow(i);
             entry.setQuantityToLink(0d);
             entry.prepareTableRow();
+            entry.setAuxSGuiDpsEntryPrice(null);
         }
 
         moTablePane.renderTableRows();
@@ -740,11 +741,13 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
                     jlEntryPrice.setEnabled(true);
                     jcbDpsEntryPrices.setEnabled(true);
                     jcbDpsEntryPrices.setFocusable(true);
+                    jbSetEverything.setEnabled(false);
                 }
                 else {
                     jlEntryPrice.setEnabled(false);
                     jcbDpsEntryPrices.setEnabled(false);
                     jcbDpsEntryPrices.setFocusable(false);
+                    jbSetEverything.setEnabled(true);
                 }
                 break;
                 
