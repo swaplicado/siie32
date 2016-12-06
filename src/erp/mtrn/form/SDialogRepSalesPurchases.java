@@ -35,7 +35,7 @@ import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Edwin Carmona
  */
 public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
@@ -199,11 +199,12 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
 
         bgCurrency.add(jrbCurrencyDoc);
-        jrbCurrencyDoc.setText("Moneda documento");
-        jrbCurrencyDoc.setPreferredSize(new java.awt.Dimension(120, 23));
+        jrbCurrencyDoc.setText("Moneda del documento");
+        jrbCurrencyDoc.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel16.add(jrbCurrencyDoc);
 
         jlCurrencyDocWarning.setForeground(new java.awt.Color(255, 0, 0));
+        jlCurrencyDocWarning.setText("NOTA: ¡Solo operaciones en la moneda seleccionada!");
         jlCurrencyDocWarning.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel16.add(jlCurrencyDocWarning);
 
@@ -233,7 +234,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         jlCompanyBranch.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jlCompanyBranch);
 
-        jcbCompanyBranch.setPreferredSize(new java.awt.Dimension(424, 23));
+        jcbCompanyBranch.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel6.add(jcbCompanyBranch);
 
         jPanel9.add(jPanel6, java.awt.BorderLayout.NORTH);
@@ -290,7 +291,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         jlCrossWith.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel11.add(jlCrossWith);
 
-        jcbCrossWith.setPreferredSize(new java.awt.Dimension(424, 23));
+        jcbCrossWith.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel11.add(jcbCrossWith);
 
         jPanel10.add(jPanel11);
@@ -301,7 +302,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         jlItemCategory.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel14.add(jlItemCategory);
 
-        jcbItemCategory.setPreferredSize(new java.awt.Dimension(424, 23));
+        jcbItemCategory.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel14.add(jcbItemCategory);
 
         jPanel10.add(jPanel14);
@@ -325,7 +326,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         jlUnitType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel13.add(jlUnitType);
 
-        jcbUnitType.setPreferredSize(new java.awt.Dimension(424, 23));
+        jcbUnitType.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel13.add(jcbUnitType);
 
         jPanel10.add(jPanel13);
@@ -873,13 +874,13 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
 
     private void itemStateChangedCurrency() {
         if (jrbCurrencyLoc.isSelected()) {
-            jlCurrencyDocWarning.setText("");
+            jlCurrencyDocWarning.setVisible(false);
             jcbCurrency.setEnabled(false);
             moFieldCurrency.setKey(miClient.getSession().getSessionCustom().getLocalCurrencyKey());
             jckIsWithUnits.setEnabled(true);
         }
         else if (jrbCurrencyDoc.isSelected()) {
-            jlCurrencyDocWarning.setText("NOTA: ¡Solo operaciones en esta moneda!");
+            jlCurrencyDocWarning.setVisible(true);
             jcbCurrency.setEnabled(true);
             jcbCurrency.setSelectedIndex(0);
             jckIsWithUnits.setEnabled(false);

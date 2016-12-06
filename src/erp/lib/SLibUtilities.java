@@ -5,11 +5,14 @@
 
 package erp.lib;
 
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormValidation;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,6 +23,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import sa.lib.SLibTimeUtils;
 
 /**
  *
@@ -150,6 +154,31 @@ public abstract class SLibUtilities {
         }
 
         return belongs;
+    }
+
+    public static SFormValidation validateDateRange(final SFormField fieldDateStart, final SFormField fieldDateEnd) {
+        Date dateStart = fieldDateStart.getDate();
+        Date dateEnd = fieldDateEnd.getDate();
+        SFormValidation validation = new SFormValidation();
+
+        if (dateStart == null) {
+            validation.setMessage("No se ha especificado un valor para la fecha inicial.");
+            validation.setComponent(fieldDateStart.getComponent());
+        }
+        else if (dateEnd == null) {
+            validation.setMessage("No se ha especificado un valor para la fecha final.");
+            validation.setComponent(fieldDateEnd.getComponent());
+        }
+        else if (SLibTimeUtils.digestYear(dateStart)[0] != SLibTimeUtils.digestYear(dateEnd)[0]) {
+            validation.setMessage("El año de las fechas inicial y final debe ser el mismo.");
+            validation.setComponent(fieldDateStart.getComponent());
+        }
+        else if (dateEnd.before(dateStart)) {
+            validation.setMessage("La fecha inicial debe ser anterior a la fecha final.");
+            validation.setComponent(fieldDateStart.getComponent());
+        }
+
+        return validation;
     }
 
     public static int parseInt(java.lang.String text) {

@@ -2731,6 +2731,9 @@ public abstract class SDataUtilities {
             case SDataConstantsSys.REP_FIN_BPS_BAL_DPS:
                 name = "reps/fin_bps_bal_dps.jasper";
                 break;
+            case SDataConstantsSys.REP_FIN_BPS_BAL_DPS_EXR:
+                name = "reps/fin_bps_bal_dps_exr.jasper";
+                break;
             case SDataConstantsSys.REP_FIN_BPS_BAL_COLL:
                 name = "reps/fin_bps_bal_coll.jasper";
                 break;

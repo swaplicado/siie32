@@ -1467,10 +1467,11 @@ public abstract class SDataConstantsSys {
     public static final int REP_FIN_REC_CY = 206003;
     public static final int REP_FIN_RECS = 206004;
     public static final int REP_FIN_RECS_CY = 206005;
-    public static final int REP_FIN_BPS_BAL = 206006; // business partner balance (cutoff date)
-    public static final int REP_FIN_BPS_BAL_PER = 206049; // business partner balance (cutoff period)
-    public static final int REP_FIN_BPS_BAL_CRED = 206050; // business partner balance with credit (cutoff date)
-    public static final int REP_FIN_BPS_BAL_DPS = 206007;
+    public static final int REP_FIN_BPS_BAL = 206006;           // business partner balance (cutoff date)
+    public static final int REP_FIN_BPS_BAL_PER = 206049;       // business partner balance (cutoff period)
+    public static final int REP_FIN_BPS_BAL_CRED = 206050;      // business partner balance with credit (cutoff date)
+    public static final int REP_FIN_BPS_BAL_DPS = 206007;       // business partner balance per document (cutoff date)
+    public static final int REP_FIN_BPS_BAL_DPS_EXR = 206063;   // business partner balance per document (cutoff date) with exchange rate for revaluation
     public static final int REP_FIN_BPS_BAL_COLL = 206008;
     public static final int REP_FIN_BPS_BAL_COLL_DPS = 206009;
     public static final int REP_FIN_BPS_MOV = 206010;
@@ -1510,8 +1511,8 @@ public abstract class SDataConstantsSys {
     public static final int REP_FIN_BPS_ACC = 206047; // not used yet, for future use
     public static final int REP_FIN_PS_CL_ITEM = 206051;
     public static final int REP_FIN_PS_CL_ITEM_TOT = 206052;
-    public static final int REP_FIN_BPS_ACC_AGI = 206061; // business partner accounts aging
-    public static final int REP_FIN_BPS_ACC_AGI_CRED = 206062; // business partner accounts aging with credit information (credit days, credit limit, guarantee & insurance)
+    public static final int REP_FIN_BPS_ACC_AGI = 206061;       // business partner accounts aging
+    public static final int REP_FIN_BPS_ACC_AGI_CRED = 206062;  // business partner accounts aging with credit information (credit days, credit limit, guarantee & insurance)
 
     public static final int REP_TRN_DPS_BPS = 207001;
     public static final int REP_TRN_DPS_UNP = 207002;

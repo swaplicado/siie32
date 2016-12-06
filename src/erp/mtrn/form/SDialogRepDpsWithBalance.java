@@ -44,8 +44,8 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
     private erp.client.SClientInterface miClient;
 
     private erp.lib.form.SFormField moFieldDate;
-    private erp.lib.form.SFormField moFieldBizArea;
     private erp.lib.form.SFormField moFieldCompanyBranch;
+    private erp.lib.form.SFormField moFieldBizArea;
     private erp.lib.form.SFormField moFieldBizPartner;
     private erp.lib.form.SFormField moFieldAgent;
     private erp.lib.form.SFormField moFieldRoute;
@@ -71,9 +71,6 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
-        jPanel1 = new javax.swing.JPanel();
-        jbPrint = new javax.swing.JButton();
-        jbExit = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -95,9 +92,13 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
         jPanel9 = new javax.swing.JPanel();
         jlRoute = new javax.swing.JLabel();
         jcbRoute = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel11 = new javax.swing.JPanel();
         jPanel10 = new javax.swing.JPanel();
         jrbByLocalCurrency = new javax.swing.JRadioButton();
         jrbByDpsCurrency = new javax.swing.JRadioButton();
+        jPanel1 = new javax.swing.JPanel();
+        jbPrint = new javax.swing.JButton();
+        jbExit = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Reporte de facturas con saldo de clientes");
@@ -108,31 +109,16 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
             }
         });
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(392, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
-
-        jbPrint.setText("Imprimir");
-        jbPrint.setToolTipText("[Ctrl + Enter]");
-        jbPrint.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel1.add(jbPrint);
-
-        jbExit.setText("Cerrar");
-        jbExit.setToolTipText("[Escape]");
-        jbExit.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel1.add(jbExit);
-
-        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
-
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración del reporte:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtros del reporte:"));
-        jPanel3.setLayout(new java.awt.GridLayout(6, 1, 5, 1));
+        jPanel3.setLayout(new java.awt.GridLayout(6, 1, 5, 5));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDate.setText("Fecha de corte: *");
-        jlDate.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlDate.setText("Fecha corte: *");
+        jlDate.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jlDate);
 
         jftDate.setText("dd/mm/yyyyy");
@@ -149,8 +135,8 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlCompanyBranch.setText("Sucursal de la empresa:");
-        jlCompanyBranch.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlCompanyBranch.setText("Sucursal empresa:");
+        jlCompanyBranch.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jlCompanyBranch);
 
         jcbCompanyBranch.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -161,8 +147,8 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBizArea.setText("Área de negocios:");
-        jlBizArea.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlBizArea.setText("Área negocios:");
+        jlBizArea.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlBizArea);
 
         jcbBizArea.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -173,8 +159,8 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBizPartner.setText("Cliente:");
-        jlBizPartner.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlBizPartner.setText("<Asoc. negocios>:");
+        jlBizPartner.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel7.add(jlBizPartner);
 
         jcbBizPartner.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -186,7 +172,7 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlAgent.setText("Agente:");
-        jlAgent.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlAgent.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.add(jlAgent);
 
         jcbAgent.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -198,7 +184,7 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlRoute.setText("Ruta:");
-        jlRoute.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlRoute.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel9.add(jlRoute);
 
         jcbRoute.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -209,22 +195,41 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
 
         jPanel2.add(jPanel3, java.awt.BorderLayout.NORTH);
 
-        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Moneda del reporte:"));
-        jPanel10.setLayout(new java.awt.GridLayout(2, 1, 0, 1));
+        jPanel11.setBorder(javax.swing.BorderFactory.createTitledBorder("Moneda del reporte:"));
+        jPanel11.setLayout(new java.awt.BorderLayout());
+
+        jPanel10.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
         buttonGroup1.add(jrbByLocalCurrency);
         jrbByLocalCurrency.setText("Moneda local");
         jPanel10.add(jrbByLocalCurrency);
 
         buttonGroup1.add(jrbByDpsCurrency);
-        jrbByDpsCurrency.setText("Moneda documento");
+        jrbByDpsCurrency.setText("Moneda del documento");
         jPanel10.add(jrbByDpsCurrency);
 
-        jPanel2.add(jPanel10, java.awt.BorderLayout.CENTER);
+        jPanel11.add(jPanel10, java.awt.BorderLayout.NORTH);
+
+        jPanel2.add(jPanel11, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        setSize(new java.awt.Dimension(450, 350));
+        jPanel1.setPreferredSize(new java.awt.Dimension(392, 33));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        jbPrint.setText("Imprimir");
+        jbPrint.setToolTipText("[Ctrl + Enter]");
+        jbPrint.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel1.add(jbPrint);
+
+        jbExit.setText("Cerrar");
+        jbExit.setToolTipText("[Escape]");
+        jbExit.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel1.add(jbExit);
+
+        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
+
+        setSize(new java.awt.Dimension(576, 389));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -237,15 +242,15 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
 
         moFieldDate = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDate, jlDate);
         moFieldDate.setPickerButton(jbDate);
-        moFieldBizArea = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbBizArea, jlBizArea);
         moFieldCompanyBranch = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCompanyBranch, jlCompanyBranch);
+        moFieldBizArea = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbBizArea, jlBizArea);
         moFieldBizPartner = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbBizPartner, jlBizPartner);
         moFieldAgent = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbAgent, jlAgent);
         moFieldRoute = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbRoute, jlRoute);
 
         mvFields.add(moFieldDate);
-        mvFields.add(moFieldBizArea);
         mvFields.add(moFieldCompanyBranch);
+        mvFields.add(moFieldBizArea);
         mvFields.add(moFieldBizPartner);
         mvFields.add(moFieldAgent);
         mvFields.add(moFieldRoute);
@@ -267,8 +272,6 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
         };
 
         SFormUtilities.putActionMap(getRootPane(), action, "exit", KeyEvent.VK_ESCAPE, 0);
-
-        setModalityType(ModalityType.MODELESS);
     }
 
     private void windowActivated() {
@@ -363,6 +366,7 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
