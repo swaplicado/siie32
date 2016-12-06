@@ -112,7 +112,7 @@
                         <Property name="text" type="java.lang.String" value="DOMICILIO OPERACI&#xd3;N"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[300, 23]"/>
+                          <Dimension value="[400, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -144,8 +144,9 @@
                             <StringItem index="3" value="Item 4"/>
                           </StringArray>
                         </Property>
+                        <Property name="selectedIndex" type="int" value="-1"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[300, 23]"/>
+                          <Dimension value="[400, 23]"/>
                         </Property>
                       </Properties>
                     </Component>

@@ -23,7 +23,7 @@ import javax.swing.JButton;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Edwin Carmona
  */
 public class SDialogUpdateDpsSalesAgentComms extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -73,7 +73,7 @@ public class SDialogUpdateDpsSalesAgentComms extends javax.swing.JDialog impleme
         jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Referencia comisiones");
+        setTitle("Agente/Supervisor ventas");
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -95,7 +95,7 @@ public class SDialogUpdateDpsSalesAgentComms extends javax.swing.JDialog impleme
         jPanel1.setLayout(new java.awt.GridLayout(6, 1, 0, 1));
 
         jPanel48.setPreferredSize(new java.awt.Dimension(108, 23));
-        jPanel48.setLayout(new java.awt.FlowLayout(0, 2, 0));
+        jPanel48.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlSalesAgent.setText("Agente de ventas del documento:");
         jlSalesAgent.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -116,7 +116,7 @@ public class SDialogUpdateDpsSalesAgentComms extends javax.swing.JDialog impleme
         jPanel1.add(jPanel48);
 
         jPanel56.setPreferredSize(new java.awt.Dimension(108, 23));
-        jPanel56.setLayout(new java.awt.FlowLayout(0, 2, 0));
+        jPanel56.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlSalesSupervisor.setText("Supervisor de ventas del documento:");
         jlSalesSupervisor.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -143,7 +143,7 @@ public class SDialogUpdateDpsSalesAgentComms extends javax.swing.JDialog impleme
         getContentPane().add(jpDps, java.awt.BorderLayout.CENTER);
 
         jpControls.setPreferredSize(new java.awt.Dimension(392, 33));
-        jpControls.setLayout(new java.awt.FlowLayout(2));
+        jpControls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar");
         jbOk.setToolTipText("[Ctrl + Enter]");
@@ -156,8 +156,8 @@ public class SDialogUpdateDpsSalesAgentComms extends javax.swing.JDialog impleme
 
         getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-900)/2, (screenSize.height-500)/2, 900, 500);
+        setSize(new java.awt.Dimension(900, 500));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated

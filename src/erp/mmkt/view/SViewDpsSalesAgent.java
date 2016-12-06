@@ -23,6 +23,7 @@ import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
 import erp.table.STabFilterCompanyBranch;
 import java.awt.Dimension;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import sa.lib.SLibRpnArgument;
@@ -31,7 +32,7 @@ import sa.lib.SLibRpnOperator;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Sergio Flores, Edwin Carmona
  */
 public class SViewDpsSalesAgent extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -58,31 +59,31 @@ public class SViewDpsSalesAgent extends erp.lib.table.STableTab implements java.
 
         mjbClose = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_CLOSE));
         mjbOpen = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_OPEN));
+        mjbChangeAgentSupervisor = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_bp_pay_cash.gif")));
         mjbViewDps = new JButton(miClient.getImageIcon(SLibConstants.ICON_LOOK));
         mjbViewNotes = new JButton(miClient.getImageIcon(SLibConstants.ICON_NOTES));
         mjbViewLinks = new JButton(miClient.getImageIcon(SLibConstants.ICON_LINK));
-        mjbChangeAgentSupervisor = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_DELIVERY));
 
         mjbClose.setPreferredSize(new Dimension(23, 23));
         mjbOpen.setPreferredSize(new Dimension(23, 23));
+        mjbChangeAgentSupervisor.setPreferredSize(new Dimension(23, 23));
         mjbViewDps.setPreferredSize(new Dimension(23, 23));
         mjbViewNotes.setPreferredSize(new Dimension(23, 23));
         mjbViewLinks.setPreferredSize(new Dimension(23, 23));
-        mjbChangeAgentSupervisor.setPreferredSize(new Dimension(23, 23));
 
         mjbClose.addActionListener(this);
         mjbOpen.addActionListener(this);
+        mjbChangeAgentSupervisor.addActionListener(this);
         mjbViewDps.addActionListener(this);
         mjbViewNotes.addActionListener(this);
         mjbViewLinks.addActionListener(this);
-        mjbChangeAgentSupervisor.addActionListener(this);
 
         mjbClose.setToolTipText("Cerrar para pago comisiones");
         mjbOpen.setToolTipText("Abrir para pago comisiones");
+        mjbChangeAgentSupervisor.setToolTipText("Cambiar agente/supervisor");
         mjbViewDps.setToolTipText("Ver documento");
         mjbViewNotes.setToolTipText("Ver notas");
         mjbViewLinks.setToolTipText("Ver vínculos del documento");
-        mjbChangeAgentSupervisor.setToolTipText("Cambiar agente/supervisor");
 
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         
@@ -103,10 +104,11 @@ public class SViewDpsSalesAgent extends erp.lib.table.STableTab implements java.
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterBizPartner);
         addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(mjbChangeAgentSupervisor);
+        addTaskBarUpperSeparator();
         addTaskBarUpperComponent(mjbViewDps);
         addTaskBarUpperComponent(mjbViewNotes);
         addTaskBarUpperComponent(mjbViewLinks);
-        addTaskBarUpperComponent(mjbChangeAgentSupervisor);
 
         mjbClose.setEnabled(true);
         mjbOpen.setEnabled(true);
@@ -250,7 +252,7 @@ public class SViewDpsSalesAgent extends erp.lib.table.STableTab implements java.
         }
     }
 
-    private void actionReferenceCommissions() {
+    private void actionChangeAgentSupervisor() {
         if (mjbChangeAgentSupervisor.isEnabled()) {
             if (moTablePane.getSelectedTableRow() == null) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
@@ -399,6 +401,9 @@ public class SViewDpsSalesAgent extends erp.lib.table.STableTab implements java.
             else if (button == mjbOpen) {
                 actionOpenDoc();
             }
+            else if (button == mjbChangeAgentSupervisor) {
+                actionChangeAgentSupervisor();
+            }
             else if (button == mjbViewDps) {
                 actionViewDps();
             }
@@ -407,9 +412,6 @@ public class SViewDpsSalesAgent extends erp.lib.table.STableTab implements java.
             }
             else if (button == mjbViewLinks) {
                 actionViewLinks();
-            }
-            else if (button == mjbChangeAgentSupervisor) {
-                actionReferenceCommissions();
             }
         }
     }

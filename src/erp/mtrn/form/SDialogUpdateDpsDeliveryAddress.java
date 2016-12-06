@@ -106,7 +106,7 @@ public class SDialogUpdateDpsDeliveryAddress extends javax.swing.JDialog impleme
         jtfCurrentOperationAddress.setEditable(false);
         jtfCurrentOperationAddress.setText("DOMICILIO OPERACIÓN");
         jtfCurrentOperationAddress.setFocusable(false);
-        jtfCurrentOperationAddress.setPreferredSize(new java.awt.Dimension(300, 23));
+        jtfCurrentOperationAddress.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel11.add(jtfCurrentOperationAddress);
 
         jPanel1.add(jPanel11);
@@ -118,7 +118,8 @@ public class SDialogUpdateDpsDeliveryAddress extends javax.swing.JDialog impleme
         jPanel3.add(jlNewOperationAddress);
 
         jcbNewOperationAddress.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbNewOperationAddress.setPreferredSize(new java.awt.Dimension(300, 23));
+        jcbNewOperationAddress.setSelectedIndex(-1);
+        jcbNewOperationAddress.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel3.add(jcbNewOperationAddress);
 
         jPanel1.add(jPanel3);
@@ -216,6 +217,7 @@ public class SDialogUpdateDpsDeliveryAddress extends javax.swing.JDialog impleme
             
             if (primaryKey[0] == moDps.getFkBizPartnerBranchId() && primaryKey[1] == moDps.getFkBizPartnerBranchAddressId()) {
                 jtfCurrentOperationAddress.setText(((SFormComponentItem) jcbNewOperationAddress.getItemAt(i)).getItem());
+                jtfCurrentOperationAddress.setCaretPosition(0);
             }
         }
     }
@@ -266,11 +268,7 @@ public class SDialogUpdateDpsDeliveryAddress extends javax.swing.JDialog impleme
                 validation.setComponent(field.getComponent());
             }
         }
-
-        if (!validation.getIsError()) {
-           
-        }
-
+        
         return validation;
     }
 

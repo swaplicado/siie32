@@ -38,6 +38,7 @@ import erp.mtrn.form.SDialogAnnulCfdi;
 import erp.mtrn.form.SDialogContractAnalysis;
 import erp.mtrn.form.SDialogDpsFinder;
 import erp.mtrn.form.SDialogUpdateDpsDeliveryAddress;
+import erp.mtrn.form.SDialogUpdateDpsSalesAgentComms;
 import erp.mtrn.form.SDialogUpdateDpsLogistics;
 import erp.mtrn.form.SDialogUpdateDpsReferenceComms;
 import erp.musr.data.SDataUser;
@@ -62,7 +63,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Edwin Carmona
  *
  * BUSINESS PARTNER BLOCKING NOTES:
  * Business Partner Blocking applies only to order and document for purchases and sales,
@@ -74,9 +75,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbAnnul;
     private javax.swing.JButton jbImport;
     private javax.swing.JButton jbCopy;
-    private javax.swing.JButton jbDeliveryAddress;
-    private javax.swing.JButton jbDelivery;
-    private javax.swing.JButton jbReferenceCommissions;
+    private javax.swing.JButton jbChangeDeliveryAddress;
+    private javax.swing.JButton jbChangeAgentSupervisor;
+    private javax.swing.JButton jbSetDeliveryDate;
+    private javax.swing.JButton jbSetReferenceCommissions;
     private javax.swing.JButton jbViewNotes;
     private javax.swing.JButton jbViewLinks;
     private javax.swing.JButton jbViewContractAnalysis;
@@ -93,7 +95,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbGetAcknowledgmentCancellation;
     private javax.swing.JButton jbSignXml;
     private javax.swing.JButton jbVerifyCfdi;
-    private javax.swing.JButton jbSend;
+    private javax.swing.JButton jbSendCfdi;
     private javax.swing.JButton jbDiactivateFlags;
     private javax.swing.JButton jbRestoreSignXml;
     private javax.swing.JButton jbRestoreAcknowledgmentCancellation;
@@ -103,6 +105,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private erp.table.STabFilterDocumentNature moTabFilterDocumentNature;
     private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
     private erp.mtrn.form.SDialogUpdateDpsDeliveryAddress moDialogUpdateDpsDlvryAddrss;
+    private erp.mtrn.form.SDialogUpdateDpsSalesAgentComms moDialogUpdateDpsSalesAgentComms;
     private erp.mtrn.form.SDialogUpdateDpsLogistics moDialogUpdateDpsLogistics;
     private erp.mtrn.form.SDialogUpdateDpsReferenceComms moDialogUpdateDpsRefCommissions;
     private erp.mtrn.form.SDialogContractAnalysis moDialogContractAnalysis;
@@ -215,20 +218,25 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbCopy.addActionListener(this);
         jbCopy.setToolTipText("Copiar documento");
         
-        jbDeliveryAddress = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_loc.gif")));
-        jbDeliveryAddress.setPreferredSize(new Dimension(23, 23));
-        jbDeliveryAddress.addActionListener(this);
-        jbDeliveryAddress.setToolTipText("Actualizar domicilio de operación");
+        jbChangeDeliveryAddress = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_loc.gif")));
+        jbChangeDeliveryAddress.setPreferredSize(new Dimension(23, 23));
+        jbChangeDeliveryAddress.addActionListener(this);
+        jbChangeDeliveryAddress.setToolTipText("Cambiar domicilio de la operación");
+                
+        jbChangeAgentSupervisor = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_bp_pay_cash.gif")));
+        jbChangeAgentSupervisor.setPreferredSize(new Dimension(23, 23));
+        jbChangeAgentSupervisor.addActionListener(this);
+        jbChangeAgentSupervisor.setToolTipText("Cambiar agente/supervisor");
 
-        jbDelivery = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_DELIVERY));
-        jbDelivery.setPreferredSize(new Dimension(23, 23));
-        jbDelivery.addActionListener(this);
-        jbDelivery.setToolTipText("Actualizar fechas de entrega del documento");
+        jbSetDeliveryDate = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_DELIVERY));
+        jbSetDeliveryDate.setPreferredSize(new Dimension(23, 23));
+        jbSetDeliveryDate.addActionListener(this);
+        jbSetDeliveryDate.setToolTipText("Actualizar fechas de entrega del documento");
         
-        jbReferenceCommissions = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_money_in.gif")));
-        jbReferenceCommissions.setPreferredSize(new Dimension(23, 23));
-        jbReferenceCommissions.addActionListener(this);
-        jbReferenceCommissions.setToolTipText("Actualizar referencia comisiones");
+        jbSetReferenceCommissions = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_money_in.gif")));
+        jbSetReferenceCommissions.setPreferredSize(new Dimension(23, 23));
+        jbSetReferenceCommissions.addActionListener(this);
+        jbSetReferenceCommissions.setToolTipText("Actualizar referencia comisiones");
 
         jbViewNotes = new JButton(miClient.getImageIcon(SLibConstants.ICON_NOTES));
         jbViewNotes.setPreferredSize(new Dimension(23, 23));
@@ -310,10 +318,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbVerifyCfdi.addActionListener(this);
         jbVerifyCfdi.setToolTipText("Verificar timbrado o cancelación del CFDI");
         
-        jbSend = new JButton(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")));
-        jbSend.setPreferredSize(new Dimension(23, 23));
-        jbSend.addActionListener(this);
-        jbSend.setToolTipText("Enviar comprobante");
+        jbSendCfdi = new JButton(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")));
+        jbSendCfdi.setPreferredSize(new Dimension(23, 23));
+        jbSendCfdi.addActionListener(this);
+        jbSendCfdi.setToolTipText("Enviar comprobante");
 
         jbRestoreSignXml = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_insert.gif")));
         jbRestoreSignXml.setPreferredSize(new Dimension(23, 23));
@@ -339,6 +347,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
         moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC);
         moDialogUpdateDpsDlvryAddrss = new SDialogUpdateDpsDeliveryAddress(miClient);
+        moDialogUpdateDpsSalesAgentComms = new SDialogUpdateDpsSalesAgentComms(miClient);
         moDialogUpdateDpsLogistics = new SDialogUpdateDpsLogistics(miClient);
         moDialogUpdateDpsRefCommissions = new SDialogUpdateDpsReferenceComms(miClient);
         moDialogContractAnalysis = new SDialogContractAnalysis(miClient);
@@ -367,10 +376,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDatePeriod);
         addTaskBarUpperSeparator();
-        addTaskBarUpperComponent(jbDeliveryAddress);
-        addTaskBarUpperComponent(jbDelivery);
+        addTaskBarUpperComponent(jbChangeDeliveryAddress);
+        addTaskBarUpperComponent(jbChangeAgentSupervisor);
+        addTaskBarUpperComponent(jbSetDeliveryDate);
         addTaskBarUpperSeparator();
-        addTaskBarUpperComponent(jbReferenceCommissions);
+        addTaskBarUpperComponent(jbSetReferenceCommissions);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(jbViewNotes);
         addTaskBarUpperComponent(jbViewLinks);
@@ -389,7 +399,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         addTaskBarLowerComponent(jbGetAcknowledgmentCancellation);
         addTaskBarLowerComponent(jbSignXml);
         addTaskBarLowerComponent(jbVerifyCfdi);
-        addTaskBarLowerComponent(jbSend);
+        addTaskBarLowerComponent(jbSendCfdi);
         addTaskBarLowerComponent(jbRestoreSignXml);
         addTaskBarLowerComponent(jbRestoreAcknowledgmentCancellation);
         addTaskBarLowerComponent(jbDiactivateFlags);
@@ -405,9 +415,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbAnnul.setEnabled(mbHasRightAnnul && mbHasRightEdit && (mbIsDoc || mbIsDocAdj));
         jbImport.setEnabled(mbHasRightNew && createImportFinder);
         jbCopy.setEnabled(mbHasRightNew && !mbIsDocAdj);
-        jbDeliveryAddress.setEnabled(mbIsCategorySal && mbIsDoc && mbHasRightLogistics);
-        jbDelivery.setEnabled(mbIsCategorySal && mbIsDoc && mbHasRightLogistics);
-        jbReferenceCommissions.setEnabled(mbIsCategorySal && mbIsDoc && mbHasRightEdit);
+        jbChangeDeliveryAddress.setEnabled(mbIsCategorySal && mbIsDoc && mbHasRightLogistics);
+        jbChangeAgentSupervisor.setEnabled(mbIsCategorySal && mbIsDoc && mbHasRightLogistics);
+        jbSetDeliveryDate.setEnabled(mbIsCategorySal && mbIsDoc && mbHasRightLogistics);
+        jbSetReferenceCommissions.setEnabled(mbIsCategorySal && mbIsDoc && mbHasRightEdit);
         jbViewNotes.setEnabled(true);
         jbViewLinks.setEnabled(true);
         jbViewContractAnalysis.setEnabled(mbIsEstCon);
@@ -424,7 +435,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbGetAcknowledgmentCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbSignXml.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbVerifyCfdi.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
-        jbSend.setEnabled((mbIsCategoryPur && mbIsOrd) || (mbIsCategorySal && (mbIsDoc || mbIsDocAdj)));
+        jbSendCfdi.setEnabled((mbIsCategoryPur && mbIsOrd) || (mbIsCategorySal && (mbIsDoc || mbIsDocAdj)));
         jbRestoreSignXml.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbRestoreAcknowledgmentCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbDiactivateFlags.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
@@ -762,7 +773,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 else {
                     complement = new Object[] { getDpsTypeKey(), moDialogDpsFinder.getValue(SDataConstants.TRN_DPS), adjustmentSubtypeKey, moDialogDpsFinder.getValue(SLibConstants.VALUE_CURRENCY_LOCAL) };
                 }
-
+                
                 miClient.getGuiModule(gui).setFormComplement(complement);   // document type key, reference document and adjustment type (optional)
                 if (miClient.getGuiModule(gui).showForm(mnTabType, null) == SLibConstants.DB_ACTION_SAVE_OK) {
                     miClient.getGuiModule(gui).refreshCatalogues(mnTabType);
@@ -789,8 +800,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
     }
     
-    private void actionDeliveryAddress() {
-        if (jbDeliveryAddress.isEnabled()) {
+    private void actionChangeDeliveryAddress() {
+        if (jbChangeDeliveryAddress.isEnabled()) {
             if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
@@ -802,15 +813,33 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 moDialogUpdateDpsDlvryAddrss.setFormVisible(true);
 
                 if (moDialogUpdateDpsDlvryAddrss.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    miClient.showMsgBoxInformation("El domicilio de operación fue actualizado.");
+                    miClient.getGuiModule(gui).refreshCatalogues(mnTabType);
+                }
+            }
+        }
+    }
+            
+    private void actionChangeAgentSupervisor() {
+        if (jbChangeAgentSupervisor.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                int gui = mbIsCategoryPur ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;    // GUI module
+
+                moDialogUpdateDpsSalesAgentComms.formReset();
+                moDialogUpdateDpsSalesAgentComms.setValue(SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey());
+                moDialogUpdateDpsSalesAgentComms.setFormVisible(true);
+
+                if (moDialogUpdateDpsSalesAgentComms.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                     miClient.getGuiModule(gui).refreshCatalogues(mnTabType);
                 }
             }
         }
     }
 
-    private void actionDelivery() {
-        if (jbDelivery.isEnabled()) {
+    private void actionSetDeliveryDate() {
+        if (jbSetDeliveryDate.isEnabled()) {
             if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
@@ -827,9 +856,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             }
         }
     }
-
-    private void actionReferenceCommissions() {
-        if (jbReferenceCommissions.isEnabled()) {
+    
+    private void actionSetReferenceCommissions() {
+        if (jbSetReferenceCommissions.isEnabled()) {
             if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
@@ -1781,8 +1810,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
     }
 
-    private void actionSend() {
-        if (jbSend.isEnabled()) {
+    private void actionSendCfdi() {
+        if (jbSendCfdi.isEnabled()) {
             if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
@@ -2044,14 +2073,17 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 else if (button == jbCopy) {
                     actionCopy();
                 }
-                else if (button == jbDeliveryAddress) {
-                    actionDeliveryAddress();
+                else if (button == jbChangeDeliveryAddress) {
+                    actionChangeDeliveryAddress();
                 }
-                else if (button == jbDelivery) {
-                    actionDelivery();
+                else if (button == jbChangeAgentSupervisor) {
+                    actionChangeAgentSupervisor();
                 }
-                else if (button == jbReferenceCommissions) {
-                    actionReferenceCommissions();
+                else if (button == jbSetDeliveryDate) {
+                    actionSetDeliveryDate();
+                }
+                else if (button == jbSetReferenceCommissions) {
+                    actionSetReferenceCommissions();
                 }
                 else if (button == jbViewNotes) {
                     actionViewNotes();
@@ -2101,8 +2133,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 else if (button == jbVerifyCfdi) {
                     actionVerifyCfdi();
                 }
-                else if (button == jbSend) {
-                    actionSend();
+                else if (button == jbSendCfdi) {
+                    actionSendCfdi();
                 }
                 else if (button == jbRestoreSignXml) {
                     actionRestoreSignXml();

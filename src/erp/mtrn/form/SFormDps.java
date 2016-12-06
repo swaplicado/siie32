@@ -92,7 +92,7 @@ import sa.lib.srv.SSrvUtils;
 
 /**
  *
- * @author  Sergio Flores
+ * @author  Sergio Flores, Edwin Carmona
  */
 public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, erp.lib.form.SFormExtendedInterface {
 
@@ -102,6 +102,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private boolean mbFirstTime;
     private boolean mbResetingForm;
     private boolean mbUpdatingForm;
+    private boolean mbImportation;
     private java.util.Vector<SFormField> mvFields;
     private erp.client.SClientInterface miClient;
 
@@ -378,11 +379,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel21 = new javax.swing.JPanel();
         jlExchangeRateSystem = new javax.swing.JLabel();
         jtfExchangeRateSystemRo = new javax.swing.JTextField();
-        jbExchangeRateSystem = new javax.swing.JButton();
         jPanel22 = new javax.swing.JPanel();
         jlExchangeRate = new javax.swing.JLabel();
         jtfExchangeRate = new javax.swing.JTextField();
         jbExchangeRate = new javax.swing.JButton();
+        jbComputeTotal = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jlPrepaymentsCy = new javax.swing.JLabel();
         jtfPrepaymentsCy = new javax.swing.JTextField();
@@ -1133,12 +1134,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfExchangeRateSystemRo.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel21.add(jtfExchangeRateSystemRo);
 
-        jbExchangeRateSystem.setText("...");
-        jbExchangeRateSystem.setToolTipText("Seleccionar tipo de cambio");
-        jbExchangeRateSystem.setFocusable(false);
-        jbExchangeRateSystem.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel21.add(jbExchangeRateSystem);
-
         jpCurrency.add(jPanel21);
 
         jPanel22.setPreferredSize(new java.awt.Dimension(23, 23));
@@ -1153,11 +1148,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfExchangeRate.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel22.add(jtfExchangeRate);
 
-        jbExchangeRate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif"))); // NOI18N
-        jbExchangeRate.setToolTipText("Calcular");
+        jbExchangeRate.setText("...");
+        jbExchangeRate.setToolTipText("Seleccionar tipo de cambio");
         jbExchangeRate.setFocusable(false);
         jbExchangeRate.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel22.add(jbExchangeRate);
+
+        jbComputeTotal.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif"))); // NOI18N
+        jbComputeTotal.setToolTipText("Calcular total");
+        jbComputeTotal.setFocusable(false);
+        jbComputeTotal.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel22.add(jbComputeTotal);
 
         jpCurrency.add(jPanel22);
 
@@ -2203,7 +2204,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldDiscountDocPercentage.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat());
         moFieldExchangeRate = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfExchangeRate, jlExchangeRate);
         moFieldExchangeRate.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsExchangeRateFormat());
-        moFieldExchangeRate.setPickerButton(jbExchangeRateSystem);
+        moFieldExchangeRate.setPickerButton(jbExchangeRate);
         moFieldExchangeRateSystem = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfExchangeRateSystemRo, jlExchangeRateSystem);
         moFieldExchangeRateSystem.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsExchangeRateFormat());
         moFieldDriver = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, (JTextField) jcbDriver.getEditor().getEditorComponent(), jlDriver);
@@ -2470,8 +2471,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbRecordManualSelect.addActionListener(this);
         jbRecordManualView.addActionListener(this);
         jbFkCurrencyId.addActionListener(this);
-        jbExchangeRateSystem.addActionListener(this);
         jbExchangeRate.addActionListener(this);
+        jbComputeTotal.addActionListener(this);
         jbPrepayments.addActionListener(this);
         jbEntryNew.addActionListener(this);
         jbEntryEdit.addActionListener(this);
@@ -2557,6 +2558,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         boolean bExists = false;
         SDataDpsNotes dpsNotes = null;
         SDataDpsNotes dpsNotesAux = null;
+        mbImportation = false;
 
         if (mbFirstTime) {
             mbFirstTime = false;
@@ -2642,6 +2644,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                 actionCancel();
                             }
                             else {
+                                mbImportation = true;
+                                
                                 dps = createNewDps(dps);
                                 dps.getDbmsDpsEntries().clear();
 
@@ -2845,7 +2849,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     /**
      * Checks if source order is authorized.
      */
-
     private boolean isDpsAuthorized(final SDataDps dps) {
         boolean authorized = true;
 
@@ -2910,7 +2913,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moPaneGridEntries.getTableRow(i).prepareTableRow();
         }
     }
-
+    
     private void calculateTotal() {
         int i = 0;
         double quantity = 0;
@@ -3758,6 +3761,19 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
 
+    private void setExchangeRate(final int idCurrency, final SFormField field) {
+         double rate = 0;
+
+        try {
+            rate = SDataUtilities.obtainExchangeRate(miClient, idCurrency, moFieldDateDoc.getDate());
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+
+        field.setFieldValue(rate);
+     }
+
     private void updateEditForImportFromDps(boolean enable) {
         if (enable) {
             if (moPaneGridEntries.getTableGuiRowCount() > 0) {
@@ -3871,10 +3887,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
             jcbFkCurrencyId.setEnabled(false);
             jbFkCurrencyId.setEnabled(false);
-            jbExchangeRateSystem.setEnabled(false);
+            jbExchangeRate.setEnabled(false);
             jtfExchangeRate.setEditable(false);
             jtfExchangeRate.setFocusable(false);
-            jbExchangeRate.setEnabled(false);
+            jbComputeTotal.setEnabled(false);
 
             jckIsDiscountDocApplying.setEnabled(false);
             jckIsDiscountDocPercentage.setEnabled(false);
@@ -4950,17 +4966,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         miClient.pickOption(SDataConstants.CFGU_CUR, moFieldFkCurrencyId, null);
     }
 
-    private void actionExchangeRateSystem() {
+    private void actionExchangeRate() {
         double rate = miClient.pickExchangeRate(moFieldFkCurrencyId.getKeyAsIntArray()[0], moFieldDate.getDate());
 
         if (rate != 0d) {
-            moFieldExchangeRateSystem.setFieldValue(rate);
+//            moFieldExchangeRateSystem.setFieldValue(rate);
             moFieldExchangeRate.setFieldValue(rate);
             jtfExchangeRate.requestFocus();
         }
     }
 
-    private void actionExchangeRate() {
+    private void actionComputeTotal() {
         calculateTotal();
     }
 
@@ -6332,8 +6348,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
             jtfExchangeRate.setEditable(false);
             jtfExchangeRate.setFocusable(false);
-            jbExchangeRateSystem.setEnabled(false);
             jbExchangeRate.setEnabled(false);
+            jbComputeTotal.setEnabled(false);
             jbEntryWizard.setEnabled(!mbIsAdj);
 
             moFieldExchangeRateSystem.setFieldValue(1d);
@@ -6344,10 +6360,26 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         else {
             // Document in foreign currency:
 
+            if (moDps != null && moDps.getIsRegistryNew() && !mbImportation) {
+                setExchangeRate(moFieldFkCurrencyId.getKeyAsIntArray()[0], moFieldExchangeRate);
+                setExchangeRate(moFieldFkCurrencyId.getKeyAsIntArray()[0], moFieldExchangeRateSystem);
+            }
+            else if (mbImportation && moParamDpsSource != null) {
+                int [] typeDps = { moDpsType.getPkDpsCategoryId(), moDpsType.getPkDpsClassId(), moDpsType.getPkDpsTypeId() };
+
+                if (!moParamDpsSource.getDate().equals(moDps.getDate()) && moParamDpsSource.getFkCurrencyId() == moDps.getFkCurrencyId() && 
+                        !(SLibUtils.compareKeys(typeDps, SDataConstantsSys.TRNU_TP_DPS_SAL_CN) || SLibUtils.compareKeys(typeDps, SDataConstantsSys.TRNU_TP_DPS_PUR_CN))
+                        ) {
+                    setExchangeRate(moParamDpsSource.getFkCurrencyId(), moFieldExchangeRate);
+                }
+                
+                setExchangeRate(moParamDpsSource.getFkCurrencyId(), moFieldExchangeRateSystem);
+            }
+
             jtfExchangeRate.setEditable(true);
             jtfExchangeRate.setFocusable(true);
-            jbExchangeRateSystem.setEnabled(true);
             jbExchangeRate.setEnabled(true);
+            jbComputeTotal.setEnabled(true);
             jbEntryWizard.setEnabled(false);
 
             jtfCurrencyKeyRo.setText((String) ((SFormComponentItem) jcbFkCurrencyId.getSelectedItem()).getComplement());
@@ -6776,6 +6808,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JTabbedPane jTabbedPane;
     private javax.swing.JButton jbBizPartnerBalance;
     private javax.swing.JButton jbCancel;
+    private javax.swing.JButton jbComputeTotal;
     private javax.swing.JButton jbDate;
     private javax.swing.JButton jbDateDoc;
     private javax.swing.JButton jbDateDocDelivery_n;
@@ -6792,7 +6825,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbEntryViewLinks;
     private javax.swing.JButton jbEntryWizard;
     private javax.swing.JButton jbExchangeRate;
-    private javax.swing.JButton jbExchangeRateSystem;
     private javax.swing.JButton jbFileXml;
     private javax.swing.JButton jbFkCarrierId_n;
     private javax.swing.JButton jbFkCurrencyId;
@@ -7075,6 +7107,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mnFormResult = SLibConstants.UNDEFINED;
         mnFormStatus = SLibConstants.UNDEFINED;
         mbFirstTime = true;
+        mbImportation = false;
 
         moDps = createNewDps(null);
         moGuiDpsLink = null;
@@ -8205,11 +8238,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             else if (button == jbFkCurrencyId) {
                 actionFkCurrencyId();
             }
-            else if (button == jbExchangeRateSystem) {
-                actionExchangeRateSystem();
-            }
             else if (button == jbExchangeRate) {
                 actionExchangeRate();
+            }
+            else if (button == jbComputeTotal) {
+                actionComputeTotal();
             }
             else if (button == jbPrepayments) {
                 actionPrepayments();
