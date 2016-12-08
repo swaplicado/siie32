@@ -34,6 +34,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -50,7 +51,7 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
 
     /** Creates new form SDialogRepProfitLossStatement */
     public SDialogRepProfitLossStatement(erp.client.SClientInterface client) {
-        super(client.getFrame(), true);
+        super(client.getFrame(), false);
         miClient = client;
         initComponents();
         initComponentsExtra();
@@ -65,8 +66,8 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        bgFormat = new javax.swing.ButtonGroup();
         jPanel2 = new javax.swing.JPanel();
-        jPanel5 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jlDateBegin = new javax.swing.JLabel();
@@ -84,7 +85,11 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
         jlExchangeRate = new javax.swing.JLabel();
         jtfExchangeRate = new javax.swing.JTextField();
         jbExchangeRate = new javax.swing.JButton();
-        jPanel9 = new javax.swing.JPanel();
+        jPanel13 = new javax.swing.JPanel();
+        jrbFormatStandard = new javax.swing.JRadioButton();
+        jPanel14 = new javax.swing.JPanel();
+        jrbFormatPeriodAnnual = new javax.swing.JRadioButton();
+        jPanel15 = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
         jckShowEbitda = new javax.swing.JCheckBox();
         jPanel10 = new javax.swing.JPanel();
@@ -102,11 +107,9 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del estado financiero:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel5.setLayout(new java.awt.BorderLayout(0, 5));
+        jPanel6.setLayout(new java.awt.GridLayout(10, 1, 0, 5));
 
-        jPanel6.setLayout(new java.awt.GridLayout(4, 1, 0, 1));
-
-        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateBegin.setText("Fecha inicial: *");
         jlDateBegin.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -129,7 +132,7 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
 
         jPanel6.add(jPanel3);
 
-        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateEnd.setText("Fecha final: *");
         jlDateEnd.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -152,7 +155,7 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
 
         jPanel6.add(jPanel8);
 
-        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCurrencyId.setText("Moneda: *");
         jlCurrencyId.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -170,7 +173,7 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
 
         jPanel6.add(jPanel7);
 
-        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlExchangeRate.setText("Tipo de cambio:");
         jlExchangeRate.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -189,35 +192,53 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
 
         jPanel6.add(jPanel4);
 
-        jPanel5.add(jPanel6, java.awt.BorderLayout.NORTH);
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jPanel2.add(jPanel5, java.awt.BorderLayout.NORTH);
+        bgFormat.add(jrbFormatStandard);
+        jrbFormatStandard.setText("Modalidad convencional");
+        jrbFormatStandard.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel13.add(jrbFormatStandard);
 
-        jPanel9.setLayout(new java.awt.GridLayout(4, 1));
+        jPanel6.add(jPanel13);
+
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        bgFormat.add(jrbFormatPeriodAnnual);
+        jrbFormatPeriodAnnual.setText("Modalidad período y acumulado anual");
+        jrbFormatPeriodAnnual.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel14.add(jrbFormatPeriodAnnual);
+
+        jPanel6.add(jPanel14);
+
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel6.add(jPanel15);
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckShowEbitda.setText("Mostrar EBITDA");
+        jckShowEbitda.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel12.add(jckShowEbitda);
 
-        jPanel9.add(jPanel12);
+        jPanel6.add(jPanel12);
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckShowRecordAdjYearEnd.setText("Incluir ajustes de cierre");
+        jckShowRecordAdjYearEnd.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel10.add(jckShowRecordAdjYearEnd);
 
-        jPanel9.add(jPanel10);
+        jPanel6.add(jPanel10);
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckShowRecordAdjAudit.setText("Incluir ajustes de auditoría");
         jckShowRecordAdjAudit.setOpaque(false);
+        jckShowRecordAdjAudit.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel11.add(jckShowRecordAdjAudit);
 
-        jPanel9.add(jPanel11);
+        jPanel6.add(jPanel11);
 
-        jPanel2.add(jPanel9, java.awt.BorderLayout.CENTER);
+        jPanel2.add(jPanel6, java.awt.BorderLayout.NORTH);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
@@ -245,7 +266,7 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(400, 300));
+        setSize(new java.awt.Dimension(578, 389));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -297,8 +318,8 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
 
         jckShowRecordAdjYearEnd.setSelected(true);
         jckShowRecordAdjAudit.setSelected(true);
-
-        setModalityType(ModalityType.MODELESS);
+        jrbFormatStandard.setSelected(true);
+                
         SFormUtilities.createActionMap(rootPane, this, "actionPrint", "print", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "actionClose", "close", KeyEvent.VK_ESCAPE, 0);
     }
@@ -308,22 +329,30 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
         int[] year = SLibTimeUtilities.digestYear(moFieldDateBegin.getDate());
         double netSales = 0;
         String sql = "";
-        String sqlWhere = "";
+        String sqlFilter = "";
+        String sqlPeriod = "";
         ResultSet resulSet = null;
         String account = miClient.getSessionXXX().getParamsErp().getFormatAccountId().replace('9', '0');
         Vector<Integer> levels = SDataUtilities.getAccountLevels(account);
 
         try {
-            sqlWhere = (!jckShowRecordAdjYearEnd.isSelected() ? " AND r.b_adj_year = 0 " : "") +
-                        (!jckShowRecordAdjAudit.isSelected() ? " AND r.b_adj_audit = 0 " : "");
+            sqlFilter = (jckShowRecordAdjYearEnd.isSelected() ? "" : "AND NOT r.b_adj_year ");
+            sqlFilter += (jckShowRecordAdjAudit.isSelected() ? "" : "AND NOT r.b_adj_audit ");
 
+            if (jrbFormatStandard.isSelected()) {
+                sqlPeriod = "AND r.dt BETWEEN "
+                        + "'" + SLibUtils.DbmsDateFormatDate.format(moFieldDateBegin.getDate()) + "' AND "
+                        + "'" + SLibUtils.DbmsDateFormatDate.format(moFieldDateEnd.getDate()) + "' ";
+            }
+            else {
+                sqlPeriod = "AND r.dt <= "
+                        + "'" + SLibUtils.DbmsDateFormatDate.format(moFieldDateEnd.getDate()) + "' ";
+            }
+            
             sql = "SELECT SUM(re.credit - re.debit) AS f_sal " +
                     "FROM fin_rec AS r " +
                     "INNER JOIN fin_rec_ety AS re ON " +
-                    "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
-                    "r.b_del = 0 AND re.b_del = 0 AND r.id_year = " + year[0] + " AND r.dt BETWEEN " +
-                    "'" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateBegin.getDate()) + "' AND " +
-                    "'" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateEnd.getDate()) + "' " + sqlWhere +
+                    "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num " +
                     "INNER JOIN fin_acc AS am ON " +
                     "CONCAT(LEFT(re.fid_acc, " + (levels.get(1) - 1) + "), '" + account.substring(levels.get(1) - 1) + "') = am.id_acc AND (" +
                     "(am.fid_tp_acc_r = " + SDataConstantsSys.FINS_CLS_ACC_SAL[0] + " AND " +
@@ -331,7 +360,8 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
                     "am.fid_cls_acc_r = " + SDataConstantsSys.FINS_CLS_ACC_SAL[2] + ") OR " +
                     "(am.fid_tp_acc_r = " + SDataConstantsSys.FINS_CLS_ACC_SAL_ADJ[0] + " AND " +
                     "am.fid_cl_acc_r = " + SDataConstantsSys.FINS_CLS_ACC_SAL_ADJ[1] + " AND " +
-                    "am.fid_cls_acc_r = " + SDataConstantsSys.FINS_CLS_ACC_SAL_ADJ[2] + ")) ";
+                    "am.fid_cls_acc_r = " + SDataConstantsSys.FINS_CLS_ACC_SAL_ADJ[2] + ")) " +
+                    "WHERE NOT r.b_del AND NOT re.b_del AND r.id_year = " + year[0] + " " + sqlFilter + sqlPeriod;
 
             resulSet = miClient.getSession().getStatement().executeQuery(sql);
             while (resulSet.next()) {
@@ -346,6 +376,8 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
     }
     
     private void print() {
+        String sqlFilter = "";
+        String sqlPeriod = "";
         Cursor cursor = getCursor();
         Map<String, Object> map = null;
         JasperPrint jasperPrint = null;
@@ -353,6 +385,19 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
         int[] year = SLibTimeUtilities.digestYear(moFieldDateBegin.getDate());
         String account = miClient.getSessionXXX().getParamsErp().getFormatAccountId().replace('9', '0');
         Vector<Integer> levels = SDataUtilities.getAccountLevels(account);
+        
+        sqlFilter = (jckShowRecordAdjYearEnd.isSelected() ? "" : "AND NOT r.b_adj_year ");
+        sqlFilter += (jckShowRecordAdjAudit.isSelected() ? "" : "AND NOT r.b_adj_audit ");
+        
+        if (jrbFormatStandard.isSelected()) {
+                sqlPeriod = "AND r.dt BETWEEN "
+                        + "'" + SLibUtils.DbmsDateFormatDate.format(moFieldDateBegin.getDate()) + "' AND "
+                        + "'" + SLibUtils.DbmsDateFormatDate.format(moFieldDateEnd.getDate()) + "' ";
+        }
+        else {
+            sqlPeriod = "AND r.dt <= "
+                    + "'" + SLibUtils.DbmsDateFormatDate.format(moFieldDateEnd.getDate()) + "' ";
+        }
 
         try {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
@@ -360,6 +405,7 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
             map.put("nYear", year[0]);
             map.put("tDateStart", moFieldDateBegin.getDate());
             map.put("tDateEnd", moFieldDateEnd.getDate());
+            map.put("tDateCurrent", miClient.getSession().getCurrentDate());
             map.put("nLenAccountMajor", levels.get(1) - 1);
             map.put("nLenAccount", levels.get(2) - 1);
             map.put("sCompAccountMajor", account.substring(levels.get(1) - 1));
@@ -367,8 +413,10 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
             map.put("dNetSales", readNetSales());
             map.put("sCurrency", ((SFormComponentItem) jcbCurrencyId.getSelectedItem()).getItem());
             map.put("dExchangeRate", moFieldExchangeRate.getDouble());
-            map.put("sSqlWhere", (!jckShowRecordAdjYearEnd.isSelected() ? " AND b_adj_year = 0 " : "") + (!jckShowRecordAdjAudit.isSelected() ? " AND b_adj_audit = 0 " : ""));
+            map.put("sSqlFilter", sqlFilter);
+            map.put("sSqlDate", sqlPeriod);
             map.put("bEbitda", jckShowEbitda.isSelected());
+            map.put("bStandard", jrbFormatStandard.isSelected());
 
             jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_FIN_STAT_PROF_LOSS, map);
             jasperViewer = new JasperViewer(jasperPrint, false);
@@ -455,18 +503,20 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup bgFormat;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbCurrencyId;
     private javax.swing.JButton jbDateBegin;
     private javax.swing.JButton jbDateEnd;
@@ -483,6 +533,8 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
     private javax.swing.JLabel jlExchangeRate;
     private javax.swing.JButton jpClose;
     private javax.swing.JButton jpPrint;
+    private javax.swing.JRadioButton jrbFormatPeriodAnnual;
+    private javax.swing.JRadioButton jrbFormatStandard;
     private javax.swing.JTextField jtfExchangeRate;
     // End of variables declaration//GEN-END:variables
 

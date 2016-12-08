@@ -48,7 +48,7 @@ public class SDialogRepBalanceSheet extends javax.swing.JDialog implements java.
 
     /** Creates new form SDialogRepBalanceSheet */
     public SDialogRepBalanceSheet(erp.client.SClientInterface client) {
-        super(client.getFrame(), true);
+        super(client.getFrame(), false);
         miClient = client;
         initComponents();
         initComponentsExtra();
@@ -64,7 +64,6 @@ public class SDialogRepBalanceSheet extends javax.swing.JDialog implements java.
     private void initComponents() {
 
         jPanel2 = new javax.swing.JPanel();
-        jPanel5 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jlDate = new javax.swing.JLabel();
@@ -78,7 +77,6 @@ public class SDialogRepBalanceSheet extends javax.swing.JDialog implements java.
         jlExchangeRate = new javax.swing.JLabel();
         jtfExchangeRate = new javax.swing.JTextField();
         jbExchangeRate = new javax.swing.JButton();
-        jPanel9 = new javax.swing.JPanel();
         jPanel10 = new javax.swing.JPanel();
         jckShowRecordAdjYearEnd = new javax.swing.JCheckBox();
         jPanel11 = new javax.swing.JPanel();
@@ -94,11 +92,9 @@ public class SDialogRepBalanceSheet extends javax.swing.JDialog implements java.
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del estado financiero:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel5.setLayout(new java.awt.BorderLayout(0, 5));
+        jPanel6.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
-        jPanel6.setLayout(new java.awt.GridLayout(3, 1, 0, 1));
-
-        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDate.setText("Fecha de corte: *");
         jlDate.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -121,7 +117,7 @@ public class SDialogRepBalanceSheet extends javax.swing.JDialog implements java.
 
         jPanel6.add(jPanel3);
 
-        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCurrencyId.setText("Moneda: *");
         jlCurrencyId.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -139,7 +135,7 @@ public class SDialogRepBalanceSheet extends javax.swing.JDialog implements java.
 
         jPanel6.add(jPanel7);
 
-        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlExchangeRate.setText("Tipo de cambio:");
         jlExchangeRate.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -158,28 +154,24 @@ public class SDialogRepBalanceSheet extends javax.swing.JDialog implements java.
 
         jPanel6.add(jPanel4);
 
-        jPanel5.add(jPanel6, java.awt.BorderLayout.NORTH);
-
-        jPanel2.add(jPanel5, java.awt.BorderLayout.NORTH);
-
-        jPanel9.setLayout(new java.awt.GridLayout(5, 1));
-
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckShowRecordAdjYearEnd.setText("Incluir ajustes de cierre");
+        jckShowRecordAdjYearEnd.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel10.add(jckShowRecordAdjYearEnd);
 
-        jPanel9.add(jPanel10);
+        jPanel6.add(jPanel10);
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckShowRecordAdjAudit.setText("Incluir ajustes de auditoría");
         jckShowRecordAdjAudit.setOpaque(false);
+        jckShowRecordAdjAudit.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel11.add(jckShowRecordAdjAudit);
 
-        jPanel9.add(jPanel11);
+        jPanel6.add(jPanel11);
 
-        jPanel2.add(jPanel9, java.awt.BorderLayout.CENTER);
+        jPanel2.add(jPanel6, java.awt.BorderLayout.NORTH);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
@@ -207,8 +199,8 @@ public class SDialogRepBalanceSheet extends javax.swing.JDialog implements java.
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-400)/2, (screenSize.height-300)/2, 400, 300);
+        setSize(new java.awt.Dimension(400, 300));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jpPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jpPrintActionPerformed
@@ -251,7 +243,6 @@ public class SDialogRepBalanceSheet extends javax.swing.JDialog implements java.
         jckShowRecordAdjYearEnd.setSelected(true);
         jckShowRecordAdjAudit.setSelected(true);
 
-        setModalityType(ModalityType.MODELESS);
         SFormUtilities.createActionMap(rootPane, this, "actionPrint", "print", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "actionClose", "close", KeyEvent.VK_ESCAPE, 0);
     }
@@ -549,10 +540,8 @@ public class SDialogRepBalanceSheet extends javax.swing.JDialog implements java.
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbCurrencyId;
     private javax.swing.JButton jbDate;
     private javax.swing.JButton jbExchangeRate;
