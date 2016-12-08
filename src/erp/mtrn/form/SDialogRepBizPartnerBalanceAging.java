@@ -38,7 +38,7 @@ import sa.lib.SLibTimeUtils;
 
 /**
  *
- * @author  Néstor Ávalos, Sergio Flores
+ * @author  Néstor Ávalos, Sergio Flores, Edwin Carmona
  */
 public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
@@ -303,9 +303,8 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jPanel98.add(jbPickCurrency);
 
         jlCurrencyWarning.setForeground(java.awt.Color.red);
-        jlCurrencyWarning.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlCurrencyWarning.setText("NOTA: ¡Solo saldos en XXX!");
-        jlCurrencyWarning.setPreferredSize(new java.awt.Dimension(170, 23));
+        jlCurrencyWarning.setText("NOTA: ¡Solo saldos en <MON>!");
+        jlCurrencyWarning.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel98.add(jlCurrencyWarning);
 
         jPanel7.add(jPanel98);
@@ -553,7 +552,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
             nameCoBranch = SUtilConsts.ALL_F;
         }
         else {
-            sqlCoBranch = " AND d.fid_cob = " + moFieldCoBranch.getKeyAsIntArray()[0] + " ";
+            sqlCoBranch = "WHERE (d.fid_cob = " + moFieldCoBranch.getKeyAsIntArray()[0] + " OR (re.fid_dps_year_n IS NULL AND r.fid_cob = " + moFieldCoBranch.getKeyAsIntArray()[0] + ")) ";
             nameCoBranch = jcbCoBranch.getSelectedItem().toString();
         }
 
