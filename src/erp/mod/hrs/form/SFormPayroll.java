@@ -59,7 +59,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Néstor Ávalos, Sergio Flores
+ * @author Juan Barajas, Néstor Ávalos, Sergio Flores, Edwin Carmona
  */
 public class SFormPayroll extends SBeanForm implements ActionListener, ItemListener, FocusListener, ChangeListener {
 
@@ -136,6 +136,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel9 = new javax.swing.JPanel();
         jlNumber = new javax.swing.JLabel();
         moIntNumber = new sa.lib.gui.bean.SBeanFieldInteger();
+        jbEditNumber = new javax.swing.JButton();
         jbGetNextNumber = new javax.swing.JButton();
         jPanel10 = new javax.swing.JPanel();
         jlDateStart = new javax.swing.JLabel();
@@ -164,8 +165,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moRadNormal = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel43 = new javax.swing.JPanel();
         moRadSpecial = new sa.lib.gui.bean.SBeanFieldRadio();
-        jPanel34 = new javax.swing.JPanel();
-        moBoolClosed = new sa.lib.gui.bean.SBeanFieldBoolean();
+        jPanel45 = new javax.swing.JPanel();
+        moRadExOrd = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel21 = new javax.swing.JPanel();
         jPanel24 = new javax.swing.JPanel();
         jlTaxComputationType = new javax.swing.JLabel();
@@ -196,6 +197,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel15 = new javax.swing.JPanel();
         jlMwzReferenceWage = new javax.swing.JLabel();
         moDecMwzReferenceWage = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jPanel44 = new javax.swing.JPanel();
+        moBoolClosed = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel20 = new javax.swing.JPanel();
         jPanel38 = new javax.swing.JPanel();
         jPanel28 = new javax.swing.JPanel();
@@ -304,6 +307,11 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         moIntNumber.setPreferredSize(new java.awt.Dimension(103, 23));
         jPanel9.add(moIntNumber);
+
+        jbEditNumber.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
+        jbEditNumber.setToolTipText("Modificar");
+        jbEditNumber.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel9.add(jbEditNumber);
 
         jbGetNextNumber.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif"))); // NOI18N
         jbGetNextNumber.setToolTipText("Obtener número nómina");
@@ -421,14 +429,14 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jPanel6.add(jPanel43);
 
-        jPanel34.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel45.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        moBoolClosed.setText("Es nómina cerrada");
-        moBoolClosed.setEnabled(false);
-        moBoolClosed.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel34.add(moBoolClosed);
+        gpoRadioPayrollType.add(moRadExOrd);
+        moRadExOrd.setText("Es nómina extraordinaria");
+        moRadExOrd.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel45.add(moRadExOrd);
 
-        jPanel6.add(jPanel34);
+        jPanel6.add(jPanel45);
 
         jPanel7.add(jPanel6);
 
@@ -544,6 +552,15 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel15.add(moDecMwzReferenceWage);
 
         jPanel21.add(jPanel15);
+
+        jPanel44.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        moBoolClosed.setText("Es nómina cerrada");
+        moBoolClosed.setEnabled(false);
+        moBoolClosed.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel44.add(moBoolClosed);
+
+        jPanel21.add(jPanel44);
 
         jPanel7.add(jPanel21);
 
@@ -729,7 +746,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JPanel jPanel31;
     private javax.swing.JPanel jPanel32;
     private javax.swing.JPanel jPanel33;
-    private javax.swing.JPanel jPanel34;
     private javax.swing.JPanel jPanel35;
     private javax.swing.JPanel jPanel36;
     private javax.swing.JPanel jPanel37;
@@ -739,6 +755,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JPanel jPanel41;
     private javax.swing.JPanel jPanel42;
     private javax.swing.JPanel jPanel43;
+    private javax.swing.JPanel jPanel44;
+    private javax.swing.JPanel jPanel45;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
@@ -746,6 +764,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbEditDates;
     private javax.swing.JButton jbEditFiscalYear;
+    private javax.swing.JButton jbEditNumber;
     private javax.swing.JButton jbEditPeriod;
     private javax.swing.JButton jbEditPeriodYear;
     private javax.swing.JButton jbEmployeeViewActive;
@@ -813,6 +832,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private sa.lib.gui.bean.SBeanFieldKey moKeyTax;
     private sa.lib.gui.bean.SBeanFieldKey moKeyTaxComputationType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyTaxSubsidy;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadExOrd;
     private sa.lib.gui.bean.SBeanFieldRadio moRadNormal;
     private sa.lib.gui.bean.SBeanFieldRadio moRadSpecial;
     private sa.lib.gui.bean.SBeanFieldText moTextNotes;
@@ -863,9 +883,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moIntPayrollDays.setIntegerSettings(SGuiUtils.getLabelName(jlPayrollDays.getText()), SGuiConsts.GUI_TYPE_INT, true);
         moIntWorkingDays.setIntegerSettings(SGuiUtils.getLabelName(jlWorkingDays.getText()), SGuiConsts.GUI_TYPE_INT, true);
         moTextNotes.setTextSettings(SGuiUtils.getLabelName(jlNotes.getText()), 255, 0);
-        //moBoolNormal.setBooleanSettings(SGuiUtils.getLabelName(moBoolNormal.getText()), false);
         moRadNormal.setBooleanSettings(SGuiUtils.getLabelName(moRadNormal.getText()), false);
         moRadSpecial.setBooleanSettings(SGuiUtils.getLabelName(moRadSpecial.getText()), false);
+        moRadExOrd.setBooleanSettings(SGuiUtils.getLabelName(moRadExOrd.getText()), false);
         moBoolClosed.setBooleanSettings(SGuiUtils.getLabelName(moBoolClosed.getText()), false);
         moKeyTaxComputationType.setKeySettings(miClient, SGuiUtils.getLabelName(jlTaxComputationType.getText()), true);
         moKeyTax.setKeySettings(miClient, SGuiUtils.getLabelName(jlTax.getText()), true);
@@ -893,15 +913,14 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moFields.addField(moDateDateEnd);
         moFields.addField(moIntPeriod);
         moFields.addField(moTextNotes);
-        //moFields.addField(moBoolNormal);
         moFields.addField(moRadNormal);
         moFields.addField(moRadSpecial);
+        moFields.addField(moRadExOrd);
         moFields.addField(moKeyTaxComputationType);
         moFields.addField(moKeyTax);
         moFields.addField(moKeyTaxSubsidy);
         moFields.addField(moKeySsContribution);
         moFields.addField(moBoolSsContribution);
-        //moFields.addField(moTextWithTaxSubsidy);
         moFields.addField(moKeyMwzType);
         moFields.addField(moKeyMwzReferenceType);
         moFields.setFormButton(jbSave);
@@ -1071,31 +1090,65 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private void updateFieldsStatus() {
         moIntPeriodYear.setEditable(false);
         moIntFiscalYear.setEditable(false);
+        moIntNumber.setEditable(false);
         moDateDateStart.setEditable(false);
         moDateDateEnd.setEditable(false);
         moIntPeriod.setEditable(false);
 
         if (moGridPaneEmployeesReceipt.getTable().getRowCount() == 0) {
-            moIntNumber.setEditable(true);
-
             jbEditPeriodYear.setEnabled(true);
             jbEditFiscalYear.setEnabled(true);
+            jbEditNumber.setEnabled(true);
             jbGetNextNumber.setEnabled(true);
             jbEditDates.setEnabled(true);
             jbEditPeriod.setEnabled(true);
             moRadNormal.setEnabled(true);
             moRadSpecial.setEnabled(true);
+            moRadExOrd.setEnabled(true);
         }
         else {
-            moIntNumber.setEditable(mbPayrollCopy);
-
             jbEditPeriodYear.setEnabled(mbPayrollCopy);
             jbEditFiscalYear.setEnabled(mbPayrollCopy);
+            jbEditNumber.setEnabled(mbPayrollCopy);
             jbGetNextNumber.setEnabled(mbPayrollCopy);
             jbEditDates.setEnabled(mbPayrollCopy);
             jbEditPeriod.setEnabled(mbPayrollCopy);
             moRadNormal.setEnabled(mbPayrollCopy);
             moRadSpecial.setEnabled(mbPayrollCopy);
+            moRadExOrd.setEnabled(mbPayrollCopy);
+        }
+    }
+    
+    private int getPaysheetTypeId() {
+        int type = SLibConsts.UNDEFINED;
+        
+        if (moRadNormal.isSelected()) {
+            type = SModSysConsts.HRSS_TP_PAY_SHT_NOR;
+        }
+        else if (moRadSpecial.isSelected()) {
+            type = SModSysConsts.HRSS_TP_PAY_SHT_SPE;
+        }
+        else if (moRadExOrd.isSelected()) {
+            type = SModSysConsts.HRSS_TP_PAY_SHT_EXT;
+        }
+        
+        return type;
+    }
+    
+    private void setPaysheetTypeId(int type) {
+        switch(type) {
+        
+            case SModSysConsts.HRSS_TP_PAY_SHT_NOR:
+                moRadNormal.setSelected(true);
+                break;
+            case SModSysConsts.HRSS_TP_PAY_SHT_SPE:
+                moRadSpecial.setSelected(true);
+                break;
+            case SModSysConsts.HRSS_TP_PAY_SHT_EXT:
+                moRadExOrd.setSelected(true);
+                break;
+            default:
+                moRadNormal.setSelected(true);
         }
     }
     
@@ -1118,8 +1171,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moRegistry.setReceiptDays(moIntPayrollDays.getValue());
         moRegistry.setWorkingDays(moIntWorkingDays.getValue());
         moRegistry.setNotes(moTextNotes.getValue());
-        //moRegistry.setNormal(moBoolNormal.getValue());
-        moRegistry.setNormal(moRadNormal.getValue());
+        moRegistry.setFkPaysheetTypeId(getPaysheetTypeId());
         moRegistry.setClosed(moBoolClosed.getValue());
         moRegistry.setSsContribution(moBoolSsContribution.getValue());
         moRegistry.setTaxSubsidy(mbIsWithTaxSubsidy);
@@ -1161,13 +1213,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     
     private void computeReceipts() {
         try {
-            //computeRegistry();
-            //moHrsPayroll.setPayroll(moRegistry);
-            //moHrsPayroll.computeEmployees(mbPayrollCopy); XXX (jbarajas, 2016-04-01) slowly open payroll
             computePayroll();
             moHrsPayroll.computeReceipts();
 
-            //populateEmployeesReceipt();
             computePayrollValue();
         }
         catch (Exception e) {
@@ -1221,7 +1269,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     }
 
     private void setDefaultNumber(final int year) throws Exception {
-        mnDefaultNumber = SHrsUtils.getPayrollNextNumber(miClient.getSession(), year, mnFormSubtype);
+        mnDefaultNumber = SHrsUtils.getPayrollNextNumber(miClient.getSession(), year, mnFormSubtype, getPaysheetTypeId());
         moIntNumber.setValue(mnDefaultNumber);
 
         setDefaultPeriod(mnDefaultPeriodYear, mnDefaultNumber);
@@ -1317,6 +1365,12 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moIntFiscalYear.setEditable(true);
         moIntFiscalYear.requestFocus();
     }
+    
+    private void actionEditNumber() {
+        jbEditNumber.setEnabled(false);
+        moIntNumber.setEditable(true);
+        moIntNumber.requestFocus();
+    }
 
     private void actionApplyPeriodYear() throws Exception {
         setDefaultPeriodYear(moIntPeriodYear.getValue());
@@ -1370,12 +1424,19 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         }
     }
     
-    private void itemStateNormal() {
-        moBoolSsContribution.setSelected(moRadNormal.isSelected());
+    private void itemStatePaysheetType() {
+        moBoolSsContribution.setSelected(!moRadSpecial.isSelected());
     }
     
-    private void itemStateSpecial() {
-        moBoolSsContribution.setSelected(!moRadSpecial.isSelected());
+    private void changeNumber() {
+        if (jbEditNumber.isEnabled()) {
+            try {
+                setDefaultPeriodYear(moIntPeriodYear.getValue());
+            }
+            catch (Exception ex) {
+                SLibUtils.printException(this, ex);
+            }
+        }
     }
 
     private boolean actionReceiptAdd() {
@@ -1704,6 +1765,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     public void addAllListeners() {
         jbEditPeriodYear.addActionListener(this);
         jbEditFiscalYear.addActionListener(this);
+        jbEditNumber.addActionListener(this);
         jbGetNextNumber.addActionListener(this);
         jbEditDates.addActionListener(this);
         jbEditPeriod.addActionListener(this);
@@ -1720,6 +1782,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         
         moRadNormal.addItemListener(this);
         moRadSpecial.addItemListener(this);
+        moRadExOrd.addItemListener(this);
 
         moKeyMwzType.addItemListener(this);
         moKeyMwzReferenceType.addItemListener(this);
@@ -1742,6 +1805,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     public void removeAllListeners() {
         jbEditPeriodYear.removeActionListener(this);
         jbEditFiscalYear.removeActionListener(this);
+        jbEditNumber.removeActionListener(this);
         jbGetNextNumber.removeActionListener(this);
         jbEditDates.removeActionListener(this);
         jbEditPeriod.removeActionListener(this);
@@ -1758,6 +1822,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         moRadNormal.removeItemListener(this);
         moRadSpecial.removeItemListener(this);
+        moRadExOrd.removeItemListener(this);
         
         moKeyMwzType.removeItemListener(this);
         moKeyMwzReferenceType.removeItemListener(this);
@@ -1795,7 +1860,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         mbIsReadOnly = false;
         mbIsWithTaxSubsidy = true;
         maPayrollReceiptsDelete.clear();
-
+        
         removeAllListeners();
         reloadCatalogues();
 
@@ -1811,7 +1876,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 // Set default values:
 
                 moRegistry.setFkPaymentTypeId(mnFormSubtype);
-                moRegistry.setNormal(true);
+                moRegistry.setFkPaysheetTypeId(SModSysConsts.HRSS_TP_PAY_SHT_NOR);
                 moRegistry.setClosed(false);
                 moRegistry.setSsContribution(true);
                 moRegistry.setTaxSubsidy(mbIsWithTaxSubsidy);
@@ -1836,9 +1901,11 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
             // Set payroll values:
 
+            setPaysheetTypeId(moRegistry.getFkPaysheetTypeId());
+            
             if (moRegistry.getPkPayrollId() == SLibConsts.UNDEFINED && !mbPayrollCopy) {
                 // Set period:
-
+                
                 setDefaultPeriodYear(miClient.getSession().getCurrentYear());
                 moRegistry.setPeriodYear(mnDefaultPeriodYear);
                 moRegistry.setNumber(mnDefaultNumber);
@@ -1877,9 +1944,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             }
 
             moTextNotes.setValue(moRegistry.getNotes());
-            //moBoolNormal.setValue(moRegistry.isNormal());
-            moRadNormal.setValue(moRegistry.isNormal());
-            moRadSpecial.setValue(!moRegistry.isNormal());
             moBoolClosed.setValue(moRegistry.isClosed());
             moBoolSsContribution.setValue(moRegistry.isSsContribution());
             mbIsWithTaxSubsidy = moRegistry.isTaxSubsidy();
@@ -1928,8 +1992,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         registry.setMwzWage(moDecMwzWage.getField().getValue());
         registry.setMwzReferenceWage(moDecMwzReferenceWage.getField().getValue());
         registry.setNotes(moTextNotes.getValue());
-        //registry.setNormal(moBoolNormal.getValue());
-        registry.setNormal(moRadNormal.getValue());
+        registry.setFkPaysheetTypeId(getPaysheetTypeId());
         registry.setSsContribution(moBoolSsContribution.getValue());
         registry.setTaxSubsidy(mbIsWithTaxSubsidy);
         registry.setClosed(moBoolClosed.getValue());
@@ -2046,6 +2109,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 else if (button == jbEditFiscalYear) {
                     actionEditFiscalYear();
                 }
+                else if (button == jbEditNumber) {
+                    actionEditNumber();
+                }
                 else if (button == jbGetNextNumber) {
                     actionGetNextNumber();
                 }
@@ -2130,11 +2196,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 if (evt.getStateChange() == ItemEvent.SELECTED) {
                     SBeanFieldRadio radioButton = (SBeanFieldRadio) evt.getSource();
 
-                    if (radioButton == moRadSpecial) {
-                        itemStateSpecial();
-                    }
-                    else if (radioButton == moRadNormal) {
-                        itemStateNormal();
+                    if (radioButton == moRadSpecial || radioButton == moRadNormal || radioButton == moRadExOrd) {
+                        itemStatePaysheetType();
+                        changeNumber();
                     }
                 }
             }

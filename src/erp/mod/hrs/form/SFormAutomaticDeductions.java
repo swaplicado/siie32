@@ -67,6 +67,7 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jPanel9 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
@@ -89,7 +90,10 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
         moComValue = new sa.lib.gui.bean.SBeanCompoundField();
         moDateDateStart = new sa.lib.gui.bean.SBeanFieldDate();
         moDateDateEnd_n = new sa.lib.gui.bean.SBeanFieldDate();
-        moBoolNormal = new sa.lib.gui.bean.SBeanFieldBoolean();
+        jPanel26 = new javax.swing.JPanel();
+        moRadNormal = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadSpecial = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadExOrd = new sa.lib.gui.bean.SBeanFieldRadio();
         jbAdd = new javax.swing.JButton();
         jpRows = new javax.swing.JPanel();
 
@@ -126,7 +130,7 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
         jpRow.setBorder(javax.swing.BorderFactory.createTitledBorder("Deducciones:"));
         jpRow.setLayout(new java.awt.BorderLayout());
 
-        jPanel25.setLayout(new java.awt.GridLayout(2, 1));
+        jPanel25.setLayout(new java.awt.GridLayout(3, 1));
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
 
@@ -184,14 +188,29 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
         moDateDateEnd_n.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel24.add(moDateDateEnd_n);
 
-        moBoolNormal.setText("Es normal");
-        moBoolNormal.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel24.add(moBoolNormal);
+        jPanel25.add(jPanel24);
+
+        jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
+
+        buttonGroup1.add(moRadNormal);
+        moRadNormal.setText("Es nómina normal");
+        moRadNormal.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel26.add(moRadNormal);
+
+        buttonGroup1.add(moRadSpecial);
+        moRadSpecial.setText("Es nómina especial");
+        moRadSpecial.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel26.add(moRadSpecial);
+
+        buttonGroup1.add(moRadExOrd);
+        moRadExOrd.setText("Es nómina extraordinaria");
+        moRadExOrd.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel26.add(moRadExOrd);
 
         jbAdd.setText("Agregar");
-        jPanel24.add(jbAdd);
+        jPanel26.add(jbAdd);
 
-        jPanel25.add(jPanel24);
+        jPanel25.add(jPanel26);
 
         jpRow.add(jPanel25, java.awt.BorderLayout.NORTH);
 
@@ -212,10 +231,12 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
     }//GEN-LAST:event_moTextCodeFindKeyPressed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel24;
     private javax.swing.JPanel jPanel25;
+    private javax.swing.JPanel jPanel26;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel9;
@@ -229,12 +250,14 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
     private javax.swing.JLabel jlValue;
     private javax.swing.JPanel jpRow;
     private javax.swing.JPanel jpRows;
-    private sa.lib.gui.bean.SBeanFieldBoolean moBoolNormal;
     private sa.lib.gui.bean.SBeanCompoundField moComValue;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd_n;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEmployee;
     private sa.lib.gui.bean.SBeanFieldKey moKeyLoan_n;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadExOrd;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadNormal;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadSpecial;
     private sa.lib.gui.bean.SBeanFieldText moTextCodeFind;
     private sa.lib.gui.bean.SBeanFieldText moTextName;
     // End of variables declaration//GEN-END:variables
@@ -250,8 +273,9 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
         moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart), false);
         moDateDateEnd_n.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd_n), false);
         moKeyLoan_n.setKeySettings(miClient, SGuiUtils.getLabelName(jlLoan_n), false);
-        moBoolNormal.setBooleanSettings(SGuiUtils.getLabelName(moBoolNormal.getText()), false);
-
+        moRadNormal.setBooleanSettings(SGuiUtils.getLabelName(moRadNormal.getText()), false);
+        moRadSpecial.setBooleanSettings(SGuiUtils.getLabelName(moRadSpecial.getText()), false);
+        moRadExOrd.setBooleanSettings(SGuiUtils.getLabelName(moRadExOrd.getText()), false);
 
         moFields.addField(moKeyEmployee);
         moFields.addField(moTextCodeFind);
@@ -260,7 +284,9 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
         moFields.addField(moComValue.getField());
         moFields.addField(moDateDateStart);
         moFields.addField(moDateDateEnd_n);
-        moFields.addField(moBoolNormal);
+        moFields.addField(moRadNormal);
+        moFields.addField(moRadSpecial);
+        moFields.addField(moRadExOrd);
 
         moFields.setFormButton(jbAdd);
 
@@ -281,7 +307,7 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha inicial"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha final"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Crédito/Préstamo"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_M, "Es normal"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Tipo nómina"));
 
                 return gridColumnsForm;
             }
@@ -334,7 +360,7 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
         automaticRow.setAmount_r(automaticRow.getUnits() * automaticRow.getAmountUnitary());
         automaticRow.setDateStart(moDateDateStart.getValue());
         automaticRow.setDateEnd_n(moDateDateEnd_n.getValue());
-        automaticRow.setNormal(moBoolNormal.getValue());
+        automaticRow.setFkPaysheetTypeId(getPaysheetTypeId());
         automaticRow.setFkDeductionTypeId(moDeduction.getFkDeductionTypeId());
         automaticRow.setFkEmployeeId_n(mnFormSubtype != SModSysConsts.HRS_AUT_EMP ? SLibConsts.UNDEFINED : moKeyEmployee.getValue()[0]);
         if (moKeyLoan_n.isEnabled() && moKeyLoan_n.getValue().length > 0) {
@@ -347,6 +373,7 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
             automaticRow.setXtaDeduction((String) miClient.getSession().readField(SModConsts.HRS_DED, new int[] { moDeduction.getPkDeductionId() }, SDbRegistry.FIELD_NAME));
             //automaticRow.setXtaUnit("MXN"); XXX (jbarajas, 2016-04-20) new field for computation type
             automaticRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_DED_COMP, new int[] { moDeduction.getFkDeductionComputationTypeId() }, SDbRegistry.FIELD_CODE));
+            automaticRow.setXtaPaysheetType((String) miClient.getSession().readField(SModConsts.HRSS_TP_PAY_SHT, new int[] { getPaysheetTypeId() }, SDbRegistry.FIELD_NAME));
             if (moKeyLoan_n.isEnabled() && moKeyLoan_n.getValue().length > 0) {
                 loan = new SDbLoan();
 
@@ -378,6 +405,7 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
 
             row.setXtaDeductionCode((String) miClient.getSession().readField(SModConsts.HRS_DED, new int[] { row.getPkDeductionId() }, SDbRegistry.FIELD_CODE));
             row.setXtaDeduction((String) miClient.getSession().readField(SModConsts.HRS_DED, new int[] { row.getPkDeductionId() }, SDbRegistry.FIELD_NAME));
+            row.setXtaPaysheetType((String) miClient.getSession().readField(SModConsts.HRSS_TP_PAY_SHT, new int[] { row.getFkPaysheetTypeId() }, SDbRegistry.FIELD_NAME));
             //row.setXtaUnit("MXN"); XXX (jbarajas, 2016-04-20) new field for computation type
             row.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_DED_COMP, new int[] { deduction.getFkDeductionComputationTypeId() }, SDbRegistry.FIELD_CODE));
             if (row.getFkLoanEmployeeId_n() != SLibConsts.UNDEFINED) {
@@ -416,9 +444,25 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
         moDateDateEnd_n.setValue(null);
         moKeyLoan_n.setSelectedIndex(0);
         moKeyLoan_n.setEnabled(false);
-        moBoolNormal.setValue(true);
+        moRadNormal.setSelected(true);
 
         moTextCodeFind.requestFocus();
+    }
+    
+    private int getPaysheetTypeId() {
+        int type = SLibConsts.UNDEFINED;
+        
+        if (moRadNormal.isSelected()) {
+            type = SModSysConsts.HRSS_TP_PAY_SHT_NOR;
+        }
+        else if (moRadSpecial.isSelected()) {
+            type = SModSysConsts.HRSS_TP_PAY_SHT_SPE;
+        }
+        else if (moRadExOrd.isSelected()) {
+            type = SModSysConsts.HRSS_TP_PAY_SHT_EXT;
+        }
+        
+        return type;
     }
 
     private void actionAdd() {

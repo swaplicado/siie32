@@ -483,16 +483,18 @@ public abstract class SHrsUtils {
      * @param session User GUI session.
      * @param year Payroll year.
      * @param paymentType Payroll payment type (constants defined in class <code>SModSysConsts</code>, HRSS_TP_PAY).
+     * @param tpPaySht Type of paysheet
      * @return Payroll next number of provided payment type.
      */
-    public static int getPayrollNextNumber(final SGuiSession session, final int year, final int paymentType) throws Exception {
+    public static int getPayrollNextNumber(final SGuiSession session, final int year, final int paymentType, final int tpPaySht) throws Exception {
         int nextNumber = 0;
         String sql = "";
         ResultSet resultSet = null;
 
         sql = "SELECT COALESCE(MAX(num), 0) + 1 "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " "
-                + "WHERE per_year = " + year + " AND fk_tp_pay = " + paymentType + " AND b_del = 0;";
+                + "WHERE per_year = " + year + " AND fk_tp_pay = " + paymentType + " AND b_del = 0 "
+                + (tpPaySht != SModSysConsts.HRSS_TP_PAY_SHT_EXT ? "AND fk_tp_pay_sht = " + tpPaySht : "");
 
         resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next()) {

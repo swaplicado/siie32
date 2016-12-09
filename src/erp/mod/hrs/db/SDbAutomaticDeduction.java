@@ -31,9 +31,9 @@ public class SDbAutomaticDeduction extends SDbRegistryUser implements SGridRow {
     protected double mdUnits;
     protected double mdAmountUnitary;
     protected double mdAmount_r;
-    protected boolean mbNormal;
     //protected boolean mbDeleted;
     protected int mnFkDeductionTypeId;
+    protected int mnFkPaysheetTypeId;
     protected int mnFkEmployeeId_n;
     protected int mnFkLoanEmployeeId_n;
     protected int mnFkLoanLoanId_n;
@@ -49,6 +49,7 @@ public class SDbAutomaticDeduction extends SDbRegistryUser implements SGridRow {
     protected String msXtaDeduction;
     protected String msXtaUnit;
     protected String msXtaLoan;
+    protected String msXtaPaysheetType;
     
     public SDbAutomaticDeduction() {
         super(SModConsts.HRS_AUT_DED);
@@ -61,9 +62,9 @@ public class SDbAutomaticDeduction extends SDbRegistryUser implements SGridRow {
     public void setUnits(double d) { mdUnits = d; }
     public void setAmountUnitary(double d) { mdAmountUnitary = d; }
     public void setAmount_r(double d) { mdAmount_r = d; }
-    public void setNormal(boolean b) { mbNormal = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkDeductionTypeId(int n) { mnFkDeductionTypeId = n; }
+    public void setFkPaysheetTypeId(int n) { mnFkPaysheetTypeId = n; }
     public void setFkEmployeeId_n(int n) { mnFkEmployeeId_n = n; }
     public void setFkLoanEmployeeId_n(int n) { mnFkLoanEmployeeId_n = n; }
     public void setFkLoanLoanId_n(int n) { mnFkLoanLoanId_n = n; }
@@ -77,6 +78,7 @@ public class SDbAutomaticDeduction extends SDbRegistryUser implements SGridRow {
     public void setXtaDeduction(String s) { msXtaDeduction = s; }
     public void setXtaUnit(String s) { msXtaUnit = s; }
     public void setXtaLoan(String s) { msXtaLoan = s; }
+    public void setXtaPaysheetType(String s) { msXtaPaysheetType = s; }
 
     public int getPkDeductionId() { return mnPkDeductionId; }
     public int getPkAutomaticId() { return mnPkAutomaticId; }
@@ -85,9 +87,9 @@ public class SDbAutomaticDeduction extends SDbRegistryUser implements SGridRow {
     public double getUnits() { return mdUnits; }
     public double getAmountUnitary() { return mdAmountUnitary; }
     public double getAmount_r() { return mdAmount_r; }
-    public boolean isNormal() { return mbNormal; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkDeductionTypeId() { return mnFkDeductionTypeId; }
+    public int getFkPaysheetTypeId() { return mnFkPaysheetTypeId; }
     public int getFkEmployeeId_n() { return mnFkEmployeeId_n; }
     public int getFkLoanEmployeeId_n() { return mnFkLoanEmployeeId_n; }
     public int getFkLoanLoanId_n() { return mnFkLoanLoanId_n; }
@@ -101,6 +103,7 @@ public class SDbAutomaticDeduction extends SDbRegistryUser implements SGridRow {
     public String getXtaDeduction() { return msXtaDeduction; }
     public String getXtaUnit() { return msXtaUnit; }
     public String getXtaLoan() { return msXtaLoan; }
+    public String getXtaTypeSht() { return msXtaPaysheetType; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -124,9 +127,9 @@ public class SDbAutomaticDeduction extends SDbRegistryUser implements SGridRow {
         mdUnits = 0;
         mdAmountUnitary = 0;
         mdAmount_r = 0;
-        mbNormal = false;
         mbDeleted = false;
         mnFkDeductionTypeId = 0;
+        mnFkPaysheetTypeId = 0;
         mnFkEmployeeId_n = 0;
         mnFkLoanEmployeeId_n = 0;
         mnFkLoanLoanId_n = 0;
@@ -187,9 +190,9 @@ public class SDbAutomaticDeduction extends SDbRegistryUser implements SGridRow {
             mdUnits = resultSet.getDouble("unt");
             mdAmountUnitary = resultSet.getDouble("amt_unt");
             mdAmount_r = resultSet.getDouble("amt_r");
-            mbNormal = resultSet.getBoolean("b_nor");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkDeductionTypeId = resultSet.getInt("fk_tp_ded");
+            mnFkPaysheetTypeId = resultSet.getInt("fk_tp_pay_sht");
             mnFkEmployeeId_n = resultSet.getInt("fk_emp_n");
             mnFkLoanEmployeeId_n = resultSet.getInt("fk_loan_emp_n");
             mnFkLoanLoanId_n = resultSet.getInt("fk_loan_loan_n");
@@ -228,9 +231,9 @@ public class SDbAutomaticDeduction extends SDbRegistryUser implements SGridRow {
                     mdUnits + ", " + 
                     mdAmountUnitary + ", " + 
                     mdAmount_r + ", " + 
-                    (mbNormal ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     mnFkDeductionTypeId + ", " +
+                    mnFkPaysheetTypeId + ", " +
                     (mnFkEmployeeId_n == SLibConsts.UNDEFINED ? "NULL" : mnFkEmployeeId_n) + ", " +
                     (mnFkLoanEmployeeId_n == SLibConsts.UNDEFINED ? "NULL" : mnFkLoanEmployeeId_n) + ", " +
                     (mnFkLoanLoanId_n == SLibConsts.UNDEFINED ? "NULL" : mnFkLoanLoanId_n) + ", " +
@@ -254,9 +257,9 @@ public class SDbAutomaticDeduction extends SDbRegistryUser implements SGridRow {
                     "unt = " + mdUnits + ", " +
                     "amt_unt = " + mdAmountUnitary + ", " +
                     "amt_r = " + mdAmount_r + ", " +
-                    "b_nor = " + (mbNormal ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_tp_ded = " + mnFkDeductionTypeId + ", " +
+                    "fk_tp_pay_sht = " + mnFkPaysheetTypeId + ", " +
                     "fk_emp_n = " + (mnFkEmployeeId_n == SLibConsts.UNDEFINED ? "NULL" : mnFkEmployeeId_n) + ", " +
                     "fk_loan_emp_n = " + (mnFkLoanEmployeeId_n == SLibConsts.UNDEFINED ? "NULL" : mnFkLoanEmployeeId_n) + ", " +
                     "fk_loan_loan_n = " + (mnFkLoanLoanId_n == SLibConsts.UNDEFINED ? "NULL" : mnFkLoanLoanId_n) + ", " +
@@ -284,9 +287,9 @@ public class SDbAutomaticDeduction extends SDbRegistryUser implements SGridRow {
         registry.setUnits(this.getUnits());
         registry.setAmountUnitary(this.getAmountUnitary());
         registry.setAmount_r(this.getAmount_r());
-        registry.setNormal(this.isNormal());
         registry.setDeleted(this.isDeleted());
         registry.setFkDeductionTypeId(this.getFkDeductionTypeId());
+        registry.setFkPaysheetTypeId(this.getFkPaysheetTypeId());
         registry.setFkEmployeeId_n(this.getFkEmployeeId_n());
         registry.setFkLoanEmployeeId_n(this.getFkLoanEmployeeId_n());
         registry.setFkLoanLoanId_n(this.getFkLoanLoanId_n());
@@ -361,7 +364,7 @@ public class SDbAutomaticDeduction extends SDbRegistryUser implements SGridRow {
                 value = msXtaLoan;
                 break;
             case 7:
-                value = mbNormal;
+                value = msXtaPaysheetType;
                 break;
             default:
         }
@@ -394,7 +397,7 @@ public class SDbAutomaticDeduction extends SDbRegistryUser implements SGridRow {
                 msXtaLoan = (String) value;
                 break;
             case 7:
-                mbNormal = (boolean) value;
+                msXtaPaysheetType = (String) value;
                 break;
             default:
         }

@@ -14,7 +14,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Néstor Ávalos, Sergio Flores
+ * @author Juan Barajas, Néstor Ávalos, Sergio Flores, Edwin Carmona
  */
 public class SHrsPayroll {
 
@@ -105,7 +105,7 @@ public class SHrsPayroll {
 
         // Get automatic earnings:
 
-        aAutomaticEarnings = getAutomaticEarnings(employeeId, dateStart, dateEnd, moPayroll.isNormal());
+        aAutomaticEarnings = getAutomaticEarnings(employeeId, dateStart, dateEnd, moPayroll.getFkPaysheetTypeId());
         for (SDbAutomaticEarning automaticEarning : aAutomaticEarnings) {
 
             hrsPayrollReceiptEarning = new SHrsPayrollReceiptEarning();
@@ -380,7 +380,7 @@ public class SHrsPayroll {
 
             // Get automatic deductions:
 
-            aAutomaticDeductions = getAutomaticDeductions(employeeId, dateStart, dateEnd, moPayroll.isNormal());
+            aAutomaticDeductions = getAutomaticDeductions(employeeId, dateStart, dateEnd, moPayroll.getFkPaysheetTypeId());
             for (SDbAutomaticDeduction automaticDeduction : aAutomaticDeductions) {
 
                 hrsPayrollReceiptDeduction = new SHrsPayrollReceiptDeduction();
@@ -409,8 +409,7 @@ public class SHrsPayroll {
                 for (SDbLoan loan : hrsPayrollReceipt.getHrsEmployee().getLoans()) {
                     hrsPayrollReceiptDeduction = new SHrsPayrollReceiptDeduction();
 
-                    if ((SLibTimeUtils.isBelongingToPeriod(dateStart, loan.getDateStart(), loan.getDateEnd_n() == null ? dateEnd : loan.getDateEnd_n()) ||
-                            SLibTimeUtils.isBelongingToPeriod(dateEnd, loan.getDateStart(), loan.getDateEnd_n() == null ? dateEnd : loan.getDateEnd_n()))) {
+                    if (SLibTimeUtils.isBelongingToPeriod(loan.getDateStart(), loan.getDateEnd_n() == null ? dateEnd : loan.getDateEnd_n(), dateStart, dateEnd)) {
                         for (SDbDeduction deduction : maDeductions) {
                             if (deduction.getFkLoanTypeId() == loan.getFkLoanTypeId()) {
                                 hrsPayrollReceiptDeduction.setDeduction(deduction);
@@ -840,15 +839,14 @@ public class SHrsPayroll {
         return employee;
     }
 
-    public ArrayList<SDbAutomaticEarning> getAutomaticEarnings(final int employeeId, final Date dateStart, final Date dateEnd, final boolean normal) {
+    public ArrayList<SDbAutomaticEarning> getAutomaticEarnings(final int employeeId, final Date dateStart, final Date dateEnd, final int paysheetTypeId) {
         ArrayList<SDbAutomaticEarning> aAutomaticEarnings = new ArrayList<SDbAutomaticEarning>();
 
         for (SDbAutomaticEarning automaticEarning : maAutomaticEarnings) {
             if ((automaticEarning.getFkEmployeeId_n() == SLibConsts.UNDEFINED ||
                     automaticEarning.getFkEmployeeId_n() == employeeId) &&
-                    (SLibTimeUtils.isBelongingToPeriod(dateStart, automaticEarning.getDateStart(), automaticEarning.getDateEnd_n() == null ? dateEnd : automaticEarning.getDateEnd_n()) ||
-                    SLibTimeUtils.isBelongingToPeriod(dateEnd, automaticEarning.getDateStart(), automaticEarning.getDateEnd_n() == null ? dateEnd : automaticEarning.getDateEnd_n())) &&
-                    automaticEarning.isNormal() == normal) {
+                    (SLibTimeUtils.isBelongingToPeriod(automaticEarning.getDateStart(), automaticEarning.getDateEnd_n() == null ? dateEnd : automaticEarning.getDateEnd_n(), dateStart, dateEnd)) &&
+                    automaticEarning.getFkPaysheetTypeId() == paysheetTypeId) {
                 aAutomaticEarnings.add(automaticEarning);
             }
         }
@@ -856,15 +854,14 @@ public class SHrsPayroll {
         return aAutomaticEarnings;
     }
 
-    public ArrayList<SDbAutomaticDeduction> getAutomaticDeductions(final int employeeId, final Date dateStart, final Date dateEnd, final boolean normal) {
+    public ArrayList<SDbAutomaticDeduction> getAutomaticDeductions(final int employeeId, final Date dateStart, final Date dateEnd, final int paysheetTypeId) {
         ArrayList<SDbAutomaticDeduction> aAutomaticDeductions = new ArrayList<SDbAutomaticDeduction>();
 
         for (SDbAutomaticDeduction automaticDeduction : maAutomaticDeductions) {
             if ((automaticDeduction.getFkEmployeeId_n() == SLibConsts.UNDEFINED ||
                     automaticDeduction.getFkEmployeeId_n() == employeeId) &&
-                    (SLibTimeUtils.isBelongingToPeriod(dateStart, automaticDeduction.getDateStart(), automaticDeduction.getDateEnd_n() == null ? dateEnd : automaticDeduction.getDateEnd_n()) ||
-                    SLibTimeUtils.isBelongingToPeriod(dateEnd, automaticDeduction.getDateStart(), automaticDeduction.getDateEnd_n() == null ? dateEnd : automaticDeduction.getDateEnd_n())) &&
-                    automaticDeduction.isNormal() == normal) {
+                    (SLibTimeUtils.isBelongingToPeriod(automaticDeduction.getDateStart(), automaticDeduction.getDateEnd_n() == null ? dateEnd : automaticDeduction.getDateEnd_n(), dateStart, dateEnd)) &&
+                    automaticDeduction.getFkPaysheetTypeId() == paysheetTypeId) {
                 aAutomaticDeductions.add(automaticDeduction);
             }
         }
