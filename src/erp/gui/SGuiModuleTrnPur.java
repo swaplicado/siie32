@@ -81,8 +81,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiContractsLinked;
     private javax.swing.JMenuItem jmiContractsLinkedEntry;
     private javax.swing.JMenuItem jmiContractsLinks;
-    private javax.swing.JMenuItem jmiContractsLinkPendEntryPrice;
-    private javax.swing.JMenuItem jmiContractsLinkedEntryPrice;
+    private javax.swing.JMenuItem jmiContractsLinkEntryPricePend;
+    private javax.swing.JMenuItem jmiContractsLinkEntryPrice;
     private javax.swing.JMenu jmOrd;
     private javax.swing.JMenuItem jmiOrders;
     private javax.swing.JMenuItem jmiOrdersLinkPend;
@@ -265,8 +265,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiContractsLinked = new JMenuItem("Contratos procesados");
         jmiContractsLinkedEntry = new JMenuItem("Contratos procesados a detalle");
         jmiContractsLinks = new JMenuItem("Vínculos de contratos como origen");
-        jmiContractsLinkPendEntryPrice = new JMenuItem("Entregas mensuales de contratos por procesar");
-        jmiContractsLinkedEntryPrice = new JMenuItem("Entregas mensuales de contratos procesados");
+        jmiContractsLinkEntryPricePend = new JMenuItem("Entregas mensuales de contratos por procesar");
+        jmiContractsLinkEntryPrice = new JMenuItem("Entregas mensuales de contratos procesados");
         jmCon.add(jmiContracts);
         jmCon.addSeparator();
         jmCon.add(jmiContractsLinkPend);
@@ -277,8 +277,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmCon.addSeparator();
         jmCon.add(jmiContractsLinks);
         jmCon.addSeparator();
-        jmCon.add(jmiContractsLinkPendEntryPrice);
-        jmCon.add(jmiContractsLinkedEntryPrice);
+        jmCon.add(jmiContractsLinkEntryPricePend);
+        jmCon.add(jmiContractsLinkEntryPrice);
 
         jmOrd = new JMenu("Pedidos");
         jmiOrders = new JMenuItem("Pedidos de compras");
@@ -417,8 +417,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepBackorderOrderByItemBizPartnerBra = new JMenuItem("Backorder de pedidos por ítem-proveedor sucursal");
         jmiQryBizPartnerBalance = new JMenuItem("Consulta de saldos de proveedores");
         jmiQryBizPartnerAccountsAging = new JMenuItem("Consulta de antigüedad de saldos de proveedores");
-        jmiRepBizPartnerBalance = new JMenuItem("Saldos proveedores...");
-        jmiRepBizPartnerBalanceDps = new JMenuItem("Saldos proveedores por documento...");
+        jmiRepBizPartnerBalance = new JMenuItem("Saldos de proveedores...");
+        jmiRepBizPartnerBalanceDps = new JMenuItem("Saldos de proveedores por documento...");
         jmiRepBizPartnerBalanceAging = new JMenuItem("Antigüedad de saldos de proveedores...");
         jmiRepAccountStatements = new JMenuItem("Estados de cuenta de proveedores...");
         jmiRepBizPartnerAccountingMoves = new JMenuItem("Movimientos contables de proveedores por documento...");
@@ -537,8 +537,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiContractsLinkPendEntry.addActionListener(this);
         jmiContractsLinkedEntry.addActionListener(this);
         jmiContractsLinks.addActionListener(this);
-        jmiContractsLinkPendEntryPrice.addActionListener(this);
-        jmiContractsLinkedEntryPrice.addActionListener(this);
+        jmiContractsLinkEntryPricePend.addActionListener(this);
+        jmiContractsLinkEntryPrice.addActionListener(this);
         jmiOrders.addActionListener(this);
         jmiOrdersLinkPend.addActionListener(this);
         jmiOrdersLinked.addActionListener(this);
@@ -1308,10 +1308,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiContractsLinks) {
                 showView(SDataConstants.TRNX_DPS_LINKS, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_LINK_EST_CON_SRC);
             }
-            else if (item == jmiContractsLinkPendEntryPrice) {
+            else if (item == jmiContractsLinkEntryPricePend) {
                 miClient.getSession().showView(SModConsts.TRN_DPS_ETY_PRC, SModConsts.MOD_TRN_PUR_N, new SGuiParams(SModConsts.VIEW_ST_PEND));
             }
-            else if (item == jmiContractsLinkedEntryPrice) {
+            else if (item == jmiContractsLinkEntryPrice) {
                 miClient.getSession().showView(SModConsts.TRN_DPS_ETY_PRC, SModConsts.MOD_TRN_PUR_N, new SGuiParams(SModConsts.VIEW_ST_DONE));
             }
             else if (item == jmiOrders) {
