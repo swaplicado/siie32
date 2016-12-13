@@ -504,10 +504,10 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
         int num = 0;
         int fk_tp_pay = 0;
         int wrk_day = 0;
+        int id_tp_pay_sht = 0;
         String dt_sta = "";
         String dt_end = "";
         String nts = "";
-        boolean b_nor = false;
         boolean b_clo = false;
 
         int id_emp = 0;
@@ -551,7 +551,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
         try {
             statement = miClient.getSession().getStatement();
 
-            sql = "SELECT per_year, per, num, fk_tp_pay, nts, dt_sta, dt_end, b_nor, b_clo " +
+            sql = "SELECT per_year, per, num, fk_tp_pay, nts, dt_sta, dt_end, id_tp_pay_sht, b_clo " +
                     "FROM hrs_pay " +
                     "WHERE id_pay = " + mnPayrollId + " ";
 
@@ -569,7 +569,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                 nts = SLibUtilities.textLeft(SLibUtilities.textTrim(resultSet.getString("nts")), 100);
                 dt_sta = resultSet.getString("dt_sta");
                 dt_end = resultSet.getString("dt_end");
-                b_nor = resultSet.getBoolean("b_nor");
+                id_tp_pay_sht = resultSet.getInt("id_tp_pay_sht");
                 b_clo = resultSet.getBoolean("b_clo");
 
                 switch (fk_tp_pay) {
@@ -600,7 +600,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                 moFormerPayroll.setDatePayment(moDateFormat.parse(dt_end));
                 moFormerPayroll.setDebit_r(0);
                 moFormerPayroll.setCredit_r(0);
-                moFormerPayroll.setIsRegular(b_nor);
+                moFormerPayroll.setIsRegular(id_tp_pay_sht  == SModSysConsts.HRSS_TP_PAY_SHT_NOR);
                 moFormerPayroll.setIsClosed(b_clo);
                 moFormerPayroll.setIsDeleted(false);
                 moFormerPayroll.setFkUserNewId(miClient.getSession().getUser().getPkUserId());

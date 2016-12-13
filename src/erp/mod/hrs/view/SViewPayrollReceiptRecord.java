@@ -64,7 +64,8 @@ public class SViewPayrollReceiptRecord extends SGridPaneView {
 
         msSql = "SELECT pe.id_pay, pe.id_emp, p.id_pay, r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num, "
                 + "p.per_year, p.per, p.num, p.fk_tp_pay, p.dt_sta, p.dt_end, " 
-                + "p.b_nor, p.b_clo, p.b_del, r.dt, bkc.code, cob.code, "
+                + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY_SHT) + " WHERE id_tp_pay_sht = v.fk_tp_pay_sht) AS tp_pay_sht, "
+                + "p.b_clo, p.b_del, r.dt, bkc.code, cob.code, "
                 + "CONCAT(r.id_year, '-', erp.lib_fix_int(r.id_per, 2)) as f_per, "
                 + "(SELECT t.name FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS t WHERE p.fk_tp_pay = t.id_tp_pay) AS f_pay_name, "
                 + "(SELECT emp.num FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp WHERE emp.id_emp = pe.id_emp) AS " + SDbConsts.FIELD_CODE + ", "
@@ -94,9 +95,9 @@ public class SViewPayrollReceiptRecord extends SGridPaneView {
                 + "p.fk_usr_upd = uu.id_usr "
                 + "WHERE p.b_del = 0 AND re.b_del = 0 " + (sql.isEmpty() ? "" : " AND " + sql)
                 + "GROUP BY pe.id_pay, pe.id_emp, p.per_year, p.per, f_pay_name, p.num, "
-                + "p.dt_sta, p.dt_end, p.b_nor, p.b_clo, p.b_del, r.dt, bkc.code, cob.code, r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num "
+                + "p.dt_sta, p.dt_end, tp_pay_sht, p.b_clo, p.b_del, r.dt, bkc.code, cob.code, r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num "
                 + "ORDER BY p.per_year, p.per, f_pay_name, p.num, p.dt_sta, p.dt_end, " + SDbConsts.FIELD_NAME + ", pe.id_pay, pe.id_emp, "
-                + "p.b_nor, p.b_clo, p.b_del, r.dt, bkc.code, cob.code, r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num ";
+                + "tp_pay_sht, p.b_clo, p.b_del, r.dt, bkc.code, cob.code, r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num ";
     }
 
     @Override
@@ -111,7 +112,7 @@ public class SViewPayrollReceiptRecord extends SGridPaneView {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "p.dt_end", "F. final"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_BPR, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "p.b_nor", "Es normal"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "tp_pay_sht", "Tipo nómina"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "p.b_clo", "Cerrada"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "p.b_del", "Eliminado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_per", "Período póliza"));

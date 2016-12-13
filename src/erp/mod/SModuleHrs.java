@@ -231,6 +231,13 @@ public class SModuleHrs extends SGuiModule {
                     public String getSqlWhere(int[] pk) { return "WHERE id_tp_pay = " + pk[0] + " "; }
                 };
                 break;
+            case SModConsts.HRSS_TP_PAY_SHT:
+                registry = new SDbRegistrySysFly(type) {
+                    public void initRegistry() { }
+                    public String getSqlTable() { return SModConsts.TablesMap.get(mnRegistryType); }
+                    public String getSqlWhere(int[] pk) { return "WHERE id_tp_pay_sht = " + pk[0] + " "; }
+                };
+                break;
             case SModConsts.HRSS_TP_SAL:
                 registry = new SDbRegistrySysFly(type) {
                     public void initRegistry() { }

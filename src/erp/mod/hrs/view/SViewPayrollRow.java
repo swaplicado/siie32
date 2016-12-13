@@ -539,7 +539,6 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
         msSql = "SELECT "
             + "r.id_pay AS " + SDbConsts.FIELD_ID + "1, "
             + "r.id_emp AS " + SDbConsts.FIELD_ID + "2, "
-            //+ "COALESCE(pei.id_iss, 0) AS " + SDbConsts.FIELD_ID + "3, " XXX (jbarajas, 2016-08-16) slowly open payroll
             + "(SELECT emp.num FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp WHERE emp.id_emp = r.id_emp) AS " + SDbConsts.FIELD_CODE + ", "
             + "(SELECT bp.bp FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp WHERE bp.id_bp = r.id_emp) AS " + SDbConsts.FIELD_NAME + ", "
             + "v.num AS f_num, "
@@ -552,27 +551,10 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
             + "v.mwz_wage, "
             + "v.mwz_ref_wage, "
             + "v.nts, "
-            + "v.b_nor, "
+            + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY_SHT) + " WHERE id_tp_pay_sht = v.fk_tp_pay_sht) AS tp_pay_sht, "
             + "v.b_ssc, "
             + "r.ear_r AS f_debit, "
             + "r.ded_r AS f_credit, "
-            /* XXX (jbarajas, 2016-08-16) slowly open payroll
-            + "CONCAT(pei.num_ser, IF(LENGTH(pei.num_ser) = 0, '', '-'), erp.lib_fix_int(pei.num, " + SDataConstantsSys.NUM_LEN_DPS + ")) AS f_num_cfd, "
-            + "IF(pei.fk_st_rcp = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + SGridConsts.ICON_ANNUL + ", " + SGridConsts.ICON_NULL + ") AS f_ico, "
-            + "pei.dt_iss AS f_dt_iss, "
-            + "pei.dt_pay AS f_dt_pay, "
-            + "(SELECT tp_pay_sys FROM " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_PAY_SYS) + " WHERE id_tp_pay_sys = pei.fk_tp_pay_sys) AS f_tp_pay_sys, "
-            + "IF(c.ts IS NULL OR doc_xml = '', " + SGridConsts.ICON_NULL  + ", " // without icon (not have CFDI associated)
-            + "IF(c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(uuid) = 0, " + SGridConsts.ICON_XML_PEND + ", " // CFDI pending sign
-            + "IF(LENGTH(c.ack_can_xml) = 0 AND c.ack_can_pdf_n IS NULL, " + SGridConsts.ICON_XML_ISSU + ", " // CFDI signed, canceled only SIIE
-            + "IF(LENGTH(c.ack_can_xml) != 0, " + SGridConsts.ICON_XML_ANNUL_XML + ", " // CFDI canceled with cancellation acknowledgment in XML format
-            + "IF(c.ack_can_pdf_n IS NOT NULL, " + SGridConsts.ICON_XML_ANNUL_PDF + ", " // CFDI canceled with cancellation acknowledgment in PDF format
-            + SGridConsts.ICON_XML_ISSU + "" // CFDI signed, canceled only SIIE
-            +"))))) AS f_ico_xml, "
-            + "(SELECT b_prc_ws FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " WHERE fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n AND fid_pay_rcp_emp_n = c.fid_pay_rcp_emp_n ORDER BY id_cfd DESC LIMIT 1) AS f_prc_ws, "
-            + "(SELECT b_prc_sto_xml FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " WHERE fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n AND fid_pay_rcp_emp_n = c.fid_pay_rcp_emp_n ORDER BY id_cfd DESC LIMIT 1) AS f_prc_sto_xml, "
-            + "(SELECT b_prc_sto_pdf FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " WHERE fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n AND fid_pay_rcp_emp_n = c.fid_pay_rcp_emp_n ORDER BY id_cfd DESC LIMIT 1) AS f_prc_sto_pdf, "
-            */
             + "v.b_clo, "
             + "r.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
             + "v.fk_tp_pay, "
@@ -620,15 +602,6 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
             + "v.fk_usr_ins = ui.id_usr "
             + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
             + "v.fk_usr_upd = uu.id_usr "
-            /* XXX (jbarajas, 2016-08-16) slowly open payroll
-            + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
-            + "r.id_pay = pei.id_pay AND r.id_emp = pei.id_emp AND pei.b_del = 0 AND pei.id_iss = (SELECT pei1.id_iss FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei1 WHERE pei1.id_pay = pei.id_pay AND pei1.id_emp = pei.id_emp AND pei1.b_del = 0 ORDER BY pei1.id_iss DESC LIMIT 1) "
-            + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON "
-            + "r.id_pay = c.fid_pay_rcp_pay_n AND r.id_emp = c.fid_pay_rcp_emp_n AND c.fid_pay_rcp_iss_n = pei.id_iss AND NOT (c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND c.b_con = 0) " 
-            + "AND c.id_cfd = (SELECT c1.id_cfd FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c1 WHERE c1.fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n AND c1.fid_pay_rcp_emp_n = c.fid_pay_rcp_emp_n AND c1.fid_pay_rcp_iss_n = c.fid_pay_rcp_iss_n ORDER BY c1.id_cfd DESC LIMIT 1)"
-            + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNS_ST_DPS) + " AS st ON "
-            + "c.fid_st_xml = st.id_st_dps "
-            */
             + (sql.isEmpty() ? "" : "WHERE v.b_del = 0 AND " + sql)
             + "GROUP BY v.num, r.id_pay, r.id_emp "
             + "ORDER BY v.num, v.dt_sta, v.dt_end, " + SDbConsts.FIELD_NAME + ", r.id_pay, r.id_emp ";
@@ -642,13 +615,8 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, "v.f_num", "Número"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_sta", "F inicial"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_end", "F final"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "v.b_nor", "Normal"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "tp_pay_sht", "Tipo nómina"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "v.b_clo", "Cerrada"));
-        /* XXX (jbarajas, 2016-08-16) slowly open payroll
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "f_ico", "Estatus"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "f_ico_xml", "CFD"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_num_cfd", "Folio CFD", 75));
-        */
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_BPR, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "f_debit", "Percepciones $"));
@@ -659,14 +627,6 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
         column.getRpnArguments().add(new SLibRpnArgument("f_credit", SLibRpnArgumentType.OPERAND));
         column.getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.SUBTRACTION, SLibRpnArgumentType.OPERATOR));
         gridColumnsViews.add(column);
-        /* XXX (jbarajas, 2016-08-16) slowly open payroll
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "f_dt_iss", "F emisión"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "f_dt_pay", "F pago"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_tp_pay_sys", "Método pago"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "f_prc_ws", "Incorrectos PAC"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "f_prc_sto_xml", "Incorrectos XML disco"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "f_prc_sto_pdf", "Incorrectos PDF disco"));
-        */
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "f_usr_close", "Usr cierre"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "v.ts_usr_clo", "Usr TS cierre"));
