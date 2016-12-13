@@ -36,6 +36,7 @@ import erp.mfin.data.SDataRecord;
 import erp.mfin.form.SDialogRecordPicker;
 import erp.mfin.form.SPanelRecord;
 import erp.mitm.data.SDataItem;
+import erp.mitm.data.SDataUnit;
 import erp.mmkt.data.SDataCustomerBranchConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -5693,7 +5694,25 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                                 entry.setOriginalPriceUnitarySystemCy(entryAdjustment.getQuantityToReturn() == 0 ? 0 : entryAdjustment.getAmountToReturn() / entryAdjustment.getQuantityToReturn() * subtotalFactor);
                                                 entry.setOriginalDiscountUnitaryCy(0);
                                                 entry.setOriginalDiscountUnitarySystemCy(0);
-
+                                                
+                                                if (dpsSourceEntry.getFkUnitId() != dpsSourceEntry.getFkOriginalUnitId()){
+                                                    SDataUnit origUnit = null;
+                                                    SDataUnit sysUnit = null;
+                                                    
+                                                    sysUnit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int[] { dpsSourceEntry.getFkUnitId() }, SLibConstants.EXEC_MODE_VERBOSE);
+                                                    origUnit  = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int[] { dpsSourceEntry.getFkOriginalUnitId() }, SLibConstants.EXEC_MODE_VERBOSE);
+                                                    
+                                                    if (origUnit.getFkUnitTypeId() != sysUnit.getFkUnitTypeId()){
+                                                        oItem = null;
+                                                        
+                                                        oItem = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { dpsSourceEntry.getFkItemId() }, SLibConstants.EXEC_MODE_VERBOSE);
+                                                        if (oItem.getFkUnitAlternativeTypeId() != SDataConstantsSys.ITMU_TP_UNIT_NA && oItem.getUnitAlternativeBaseEquivalence() == 0) {
+                                                            entry.setAuxPreserveQuantity(true);
+                                                            entry.setQuantity(dpsSourceEntry.getQuantity() * entry.getOriginalQuantity() / dpsSourceEntry.getOriginalQuantity());
+                                                        }
+                                                    }
+                                                }
+                                                
                                                 entry.setLength(dpsSourceEntry.getOriginalQuantity() == 0 ? 0 : dpsSourceEntry.getLength() * entryAdjustment.getQuantityToReturn() / dpsSourceEntry.getOriginalQuantity());
                                                 entry.setSurface(dpsSourceEntry.getOriginalQuantity() == 0 ? 0 : dpsSourceEntry.getSurface() * entryAdjustment.getQuantityToReturn() / dpsSourceEntry.getOriginalQuantity());
                                                 entry.setVolume(dpsSourceEntry.getOriginalQuantity() == 0 ? 0 : dpsSourceEntry.getVolume() * entryAdjustment.getQuantityToReturn() / dpsSourceEntry.getOriginalQuantity());
@@ -5799,7 +5818,25 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                                 entry.setOriginalPriceUnitarySystemCy(entryAdjustment.getAmountToDiscount() * subtotalFactor);
                                                 entry.setOriginalDiscountUnitaryCy(0);
                                                 entry.setOriginalDiscountUnitarySystemCy(0);
-
+                                                
+                                                if (dpsSourceEntry.getFkUnitId() != dpsSourceEntry.getFkOriginalUnitId()) {
+                                                    SDataUnit origUnit = null;
+                                                    SDataUnit sysUnit = null;
+                                                    
+                                                    sysUnit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int[] { dpsSourceEntry.getFkUnitId() }, SLibConstants.EXEC_MODE_VERBOSE);
+                                                    origUnit  = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int[] { dpsSourceEntry.getFkOriginalUnitId() }, SLibConstants.EXEC_MODE_VERBOSE);
+                                                    
+                                                    if (origUnit.getFkUnitTypeId() != sysUnit.getFkUnitTypeId()) {
+                                                        oItem = null;
+                                                        
+                                                        oItem = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { dpsSourceEntry.getFkItemId() }, SLibConstants.EXEC_MODE_VERBOSE);
+                                                        if (oItem.getFkUnitAlternativeTypeId() != SDataConstantsSys.ITMU_TP_UNIT_NA && oItem.getUnitAlternativeBaseEquivalence() == 0) {
+                                                            entry.setAuxPreserveQuantity(true);
+                                                            entry.setQuantity(dpsSourceEntry.getQuantity() * entry.getOriginalQuantity() / dpsSourceEntry.getOriginalQuantity());
+                                                        }
+                                                    }
+                                                }
+                                                
                                                 entry.setLength(0);
                                                 entry.setSurface(0);
                                                 entry.setVolume(0);
