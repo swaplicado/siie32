@@ -81,7 +81,6 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         jPanel27 = new javax.swing.JPanel();
         moRadReportTypeDepartamentEmp = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel29 = new javax.swing.JPanel();
-        moBoolShowDetail = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel23 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jPanel21 = new javax.swing.JPanel();
@@ -101,7 +100,8 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         jtbEmployeeActive = new javax.swing.JToggleButton();
         jPanel28 = new javax.swing.JPanel();
         moRadIsSummary = new sa.lib.gui.bean.SBeanFieldRadio();
-        moRadIsDetail = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadIsDetailPayroll = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadIsDetailEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel7 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -193,10 +193,6 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         jPanel22.add(jPanel27);
 
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        moBoolShowDetail.setText("Mostrar detalle");
-        jPanel29.add(moBoolShowDetail);
-
         jPanel22.add(jPanel29);
 
         jPanel24.add(jPanel22, java.awt.BorderLayout.NORTH);
@@ -270,11 +266,18 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
 
         moGroupSummary.add(moRadIsSummary);
         moRadIsSummary.setText("Resumen");
+        moRadIsSummary.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel28.add(moRadIsSummary);
 
-        moGroupSummary.add(moRadIsDetail);
-        moRadIsDetail.setText("Detalle");
-        jPanel28.add(moRadIsDetail);
+        moGroupSummary.add(moRadIsDetailPayroll);
+        moRadIsDetailPayroll.setText("Detalle nóminas");
+        moRadIsDetailPayroll.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel28.add(moRadIsDetailPayroll);
+
+        moGroupSummary.add(moRadIsDetailEmployee);
+        moRadIsDetailEmployee.setText("Detalle empleados");
+        moRadIsDetailEmployee.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel28.add(moRadIsDetailEmployee);
 
         jPanel5.add(jPanel28);
 
@@ -443,7 +446,6 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
     private javax.swing.JLabel jlYear;
     private javax.swing.JPanel jpFilterStatusPay;
     private javax.swing.JToggleButton jtbEmployeeActive;
-    private sa.lib.gui.bean.SBeanFieldBoolean moBoolShowDetail;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
     private javax.swing.ButtonGroup moGroupFilterDateType;
@@ -462,7 +464,8 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
     private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypeDate;
     private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypeDatePay;
     private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypePeriod;
-    private sa.lib.gui.bean.SBeanFieldRadio moRadIsDetail;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadIsDetailEmployee;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadIsDetailPayroll;
     private sa.lib.gui.bean.SBeanFieldRadio moRadIsSummary;
     private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNameDepartament;
     private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNameEmployee;
@@ -511,6 +514,11 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
                 moPanelHrsFilterPayrollStatus.setSelectedAll();
             }
         }
+    }
+    
+    private void actionEnableFieldDetailEmployee() {
+        moRadIsDetailEmployee.setEnabled(moRadReportTypeEarDed.isSelected());
+        moRadIsSummary.setSelected(moRadIsDetailEmployee.isSelected() && !moRadIsDetailEmployee.isEnabled());
     }
     
     private void actionEnableFieldsEarDed() {
@@ -621,7 +629,7 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
         moKeyEmployee.setKeySettings(miClient, SGuiUtils.getLabelName(jlEmployee.getText()), false);
         moRadIsSummary.setBooleanSettings(SGuiUtils.getLabelName(moRadIsSummary.getText()), true);
-        moRadIsDetail.setBooleanSettings(SGuiUtils.getLabelName(moRadIsDetail.getText()), false);
+        moRadIsDetailPayroll.setBooleanSettings(SGuiUtils.getLabelName(moRadIsDetailPayroll.getText()), false);
         moRadFilterTypePeriod.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypePeriod.getText()), true);
         moRadFilterTypeDate.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypeDate.getText()), false);
         moIntPeriodYear.setCalendarSettings(SGuiUtils.getLabelName(jlYear.getText()));
@@ -651,7 +659,7 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         moFields.addField(moKeyPaymentType);
         moFields.addField(moKeyEmployee);
         moFields.addField(moRadIsSummary);
-        moFields.addField(moRadIsDetail);
+        moFields.addField(moRadIsDetailPayroll);
         moFields.addField(moRadFilterTypePeriod);
         moFields.addField(moRadFilterTypeDate);
         moFields.addField(moIntPeriodYear);
@@ -818,13 +826,32 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
             moParamsMap.put("sSqlWhereEarning", !moKeyEarning.isEnabled() ? " AND ear.id_ear = 0 " : moKeyEarning.getSelectedIndex() > 0 ? " AND ear.id_ear = " + moKeyEarning.getValue()[0] : "");
             moParamsMap.put("sSqlWhereDeduction", !moKeyDeduction.isEnabled() ? " AND ded.id_ded = 0 " : moKeyDeduction.getSelectedIndex() > 0 ? " AND ded.id_ded = " + moKeyDeduction.getValue()[0] : "");
         }
-        moParamsMap.put("sSqlOrderBy", getOrderBy());
+        
+        if (moRadIsDetailPayroll.isSelected()) {
+            mnFormType = SModConsts.HRSR_PAY_EAR_DED;
+            
+            moParamsMap.put("sSqlOrderBy", getOrderBy());
+        }
+        else if (moRadIsDetailEmployee.isSelected()) {
+            mnFormType = SModConsts.HRSR_PAY_AUX_EAR_DED;
+            
+            moParamsMap.put("bIsSummary", false);
+            moParamsMap.put("bShowEmployees", true);
+            moParamsMap.put("sSqlOrderBy", "ORDER BY f_tp_ear_ded, f_ear_ded_id, f_ear_ded, id_dep, f_dep_code, f_dep_name, id_bp, f_emp_num, bp ");
+        }
     }
 
     @Override
     public void stateChanged(ChangeEvent e) {
         if (e.getSource() instanceof SBeanFieldRadio) {
-            if ((SBeanFieldRadio) e.getSource() == moRadFilterTypePeriod ||
+            if ((SBeanFieldRadio) e.getSource() == moRadReportTypeEarDed ||
+                    (SBeanFieldRadio) e.getSource() == moRadReportTypeEmployee ||
+                    (SBeanFieldRadio) e.getSource() == moRadReportTypeEmployeeDep ||
+                    (SBeanFieldRadio) e.getSource() == moRadReportTypeDepartament ||
+                    (SBeanFieldRadio) e.getSource() == moRadReportTypeDepartamentEmp) {
+                actionEnableFieldDetailEmployee();
+            }
+            else if ((SBeanFieldRadio) e.getSource() == moRadFilterTypePeriod ||
                     (SBeanFieldRadio) e.getSource() == moRadFilterTypeDate ||
                     (SBeanFieldRadio) e.getSource() == moRadFilterTypeDatePay) {
                 actionEnableFieldsDates();
