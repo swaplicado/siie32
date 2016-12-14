@@ -78,10 +78,14 @@ public class SDbDpsEntry extends SDbRegistryUser {
     protected double mdContractFuture;
     protected double mdContractFactor;
     protected int mnContractPriceYear;
-    protected int mnContractPriceMonth;    
+    protected int mnContractPriceMonth;  
+    protected String msSealQuality;
+    protected String msSealSecurity;
+    protected String msDriver;
     protected String msPlate;
-    protected String msSecuritySeal;
     protected String msTicket;
+    protected String msContainerTank;
+    protected String msVgm;
     protected int mnUserId;
     protected int mnSortingPosition;
     protected boolean mbIsPrepayment;
@@ -175,9 +179,13 @@ public class SDbDpsEntry extends SDbRegistryUser {
     public void setContractFactor(double d) { mdContractFactor = d; }
     public void setContractPriceYear(int n) { mnContractPriceYear = n; }
     public void setContractPriceMonth(int n) { mnContractPriceMonth = n; }
+    public void setSealQuality(String s) { msSealQuality = s; }
+    public void setSecuritySeal(String s) { msSealSecurity = s; }
+    public void setDriver(String s) { msDriver = s; }
     public void setPlate(String s) { msPlate = s; }
-    public void setSecuritySeal(String s) { msSecuritySeal = s; }
     public void setTicket(String s) { msTicket = s; }
+    public void setContainerTank(String s) { msContainerTank = s; }
+    public void setVgm(String s) { msVgm = s; }
     public void setUserId(int n) { mnUserId = n; }
     public void setSortingPosition(int n) { mnSortingPosition = n; }
     public void setIsPrepayment(boolean b) { mbIsPrepayment = b; }
@@ -261,9 +269,13 @@ public class SDbDpsEntry extends SDbRegistryUser {
     public double getContractFactor() { return mdContractFactor; }
     public int getContractPriceYear() { return mnContractPriceYear; }
     public int getContractPriceMonth() { return mnContractPriceMonth; }
+    public String getSealQuality() { return msSealQuality; }    
+    public String getSecuritySeal() { return msSealSecurity; }
+    public String getDriver() { return msDriver; }
     public String getPlate() { return msPlate; }
-    public String getSecuritySeal() { return msSecuritySeal; }
     public String getTicket() { return msTicket; }
+    public String getContainerTank() { return msContainerTank; }
+    public String getVgm() { return msVgm; }
     public int getUserId() { return mnUserId; }
     public int getSortingPosition() { return mnSortingPosition; }
     public boolean getIsPrepayment() { return mbIsPrepayment; }
@@ -367,9 +379,13 @@ public class SDbDpsEntry extends SDbRegistryUser {
         mdContractFactor = 0;
         mnContractPriceYear = 0;
         mnContractPriceMonth = 0;
+        msSealQuality = "";
+        msSealSecurity = "";
+        msDriver = ""; 
         msPlate = "";
-        msSecuritySeal = "";
         msTicket = "";
+        msContainerTank = ""; 
+        msVgm = "";
         mnUserId = 0;
         mnSortingPosition = 0;
         mbIsPrepayment = false;
@@ -497,9 +513,13 @@ public class SDbDpsEntry extends SDbRegistryUser {
             mdContractFactor = resultSet.getDouble("con_factor");
             mnContractPriceYear = resultSet.getInt("con_prc_year");
             mnContractPriceMonth = resultSet.getInt("con_prc_mon");
+            msSealQuality = resultSet.getString("seal_qlt");
+            msSealSecurity = resultSet.getString("seal_sec");
+            msDriver = resultSet.getString("driver"); 
             msPlate = resultSet.getString("plate");
-            msSecuritySeal = resultSet.getString("sec_seal");
             msTicket = resultSet.getString("ticket");
+            msContainerTank = resultSet.getString("cont_tank"); 
+            msVgm = resultSet.getString("Vgm");
             mnUserId = resultSet.getInt("usr_id");
             mnSortingPosition = resultSet.getInt("sort_pos");
             mbIsPrepayment = resultSet.getBoolean("b_pre_pay");
