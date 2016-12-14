@@ -974,15 +974,17 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         for (SDataDpsEntry entry : mvDbmsDpsEntries) {
             if (!entry.getIsDeleted()) {
                 if (piClient_n != null) {
-                    oSessionItem = ((SSessionCustom) piClient_n.getSession().getSessionCustom()).getSessionItem(entry.getFkItemId());
-                    
-                    if (oSessionItem.getFkUnitAlternativeTypeId() != SDataConstantsSys.ITMU_TP_UNIT_NA && oSessionItem.getUnitAlternativeBaseEquivalence() == 0) {
-                        entry.setAuxPreserveQuantity(true);
+                    if ((entry.getIsRegistryNew() || entry.getIsRegistryEdited())) {
+                        oSessionItem = ((SSessionCustom) piClient_n.getSession().getSessionCustom()).getSessionItem(entry.getFkItemId());
+
+                        if (oSessionItem.getFkUnitAlternativeTypeId() != SDataConstantsSys.ITMU_TP_UNIT_NA && oSessionItem.getUnitAlternativeBaseEquivalence() == 0) {
+                            entry.setAuxPreserveQuantity(true);
+                        }
+
+                        entry.calculateTotal(piClient_n, mtDate,
+                                mnFkTaxIdentityEmisorTypeId, mnFkTaxIdentityReceptorTypeId,
+                                mbIsDiscountDocPercentage, mdDiscountDocPercentage, mdExchangeRate);
                     }
-                    
-                    entry.calculateTotal(piClient_n, mtDate,
-                            mnFkTaxIdentityEmisorTypeId, mnFkTaxIdentityReceptorTypeId,
-                            mbIsDiscountDocPercentage, mdDiscountDocPercentage, mdExchangeRate);
                 }
 
                 if (entry.isAccountable()) {
@@ -4186,6 +4188,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     @Override
     public ArrayList<SCfdDataConcepto> getCfdConceptos() {
+        double price = 0;
         String descripcion = "";
         SCfdDataConcepto conceptoXml = null;
         ArrayList<SCfdDataConcepto> conceptosXml = new ArrayList<SCfdDataConcepto>();
@@ -4200,12 +4203,19 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     }
                 }
                 
+                if (dpsEntry.getSubtotalCy_r() == SLibUtils.round(dpsEntry.getOriginalPriceUnitaryCy() * dpsEntry.getOriginalQuantity(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits())) {
+                    price = dpsEntry.getOriginalPriceUnitaryCy();
+                }
+                else {
+                    price = dpsEntry.getSubtotalCy_r() / dpsEntry.getOriginalQuantity();
+                }
+                
                 conceptoXml = new SCfdDataConcepto();
                 conceptoXml.setNoIdentificacion(dpsEntry.getConceptKey());
                 conceptoXml.setUnidad(dpsEntry.getDbmsOriginalUnitSymbol());
                 conceptoXml.setCantidad(dpsEntry.getOriginalQuantity());
                 conceptoXml.setDescripcion(descripcion);
-                conceptoXml.setValorUnitario(dpsEntry.getSubtotalCy_r() / dpsEntry.getOriginalQuantity());
+                conceptoXml.setValorUnitario(price);
                 conceptoXml.setImporte(dpsEntry.getSubtotalCy_r());
                 conceptosXml.add(conceptoXml);
             }
