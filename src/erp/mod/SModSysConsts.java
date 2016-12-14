@@ -854,6 +854,8 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_REC_SCHE_ASS_SAL = 8;   // Sales representatives
     public static final int HRSS_TP_REC_SCHE_ASS_PRO = 9;   // Professionals
     public static final int HRSS_TP_REC_SCHE_ASS_SHA = 10;  // Shareholders
+    public static final int HRSS_TP_REC_SCHE_ASS_OTH = 11; // Other
+    public static final int HRSS_TP_REC_SCHE_OTH = 99; // Other
 
     public static final int HRSS_TP_POS_RISK_CL1 = 1; // Class I
     public static final int HRSS_TP_POS_RISK_CL2 = 2; // Class II

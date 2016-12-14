@@ -201,7 +201,8 @@ public class SViewDpsEntryContractPrice extends SGridPaneView implements ActionL
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_SUPPLY) + " AS ds ON "
                 + "de.id_year = ds.id_src_year AND de.id_doc = ds.id_src_doc AND de.id_ety = ds.id_src_ety "
                 + "WHERE EXISTS (SELECT * FROM trn_dps_ety_prc AS dep WHERE dep.id_year = de.id_year AND dep.id_doc = de.id_doc AND dep.id_ety = de.id_ety) AND "
-                + "d.fid_ct_dps = " + keyDpsType[0] + " AND d.fid_cl_dps = " + keyDpsType[1] + " AND d.fid_tp_dps = " + keyDpsType[2] + " " + (sql.isEmpty() ? "" : "AND " + sql)
+                + "d.fid_ct_dps = " + keyDpsType[0] + " AND d.fid_cl_dps = " + keyDpsType[1] + " AND d.fid_tp_dps = " + keyDpsType[2] + " AND "
+                + "NOT d.b_del AND NOT de.b_del AND d.fid_st_dps <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " " + (sql.isEmpty() ? "" : "AND " + sql)
                 + "GROUP BY de.id_year, de.id_doc, de.id_ety, d.num_ser, d.num, "
                 + "d.dt, d.num_ref, d.b_link, d.fid_cob, d.fid_bpb, d.fid_bp_r, "
                 + "dt.code, dt.tp_dps, cob.code, cob.bpb, b.bp, bc.bp_key, bb.bpb, "
