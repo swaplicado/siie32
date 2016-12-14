@@ -551,7 +551,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
         try {
             statement = miClient.getSession().getStatement();
 
-            sql = "SELECT per_year, per, num, fk_tp_pay, nts, dt_sta, dt_end, id_tp_pay_sht, b_clo " +
+            sql = "SELECT per_year, per, num, fk_tp_pay, nts, dt_sta, dt_end, fk_tp_pay_sht, b_clo " +
                     "FROM hrs_pay " +
                     "WHERE id_pay = " + mnPayrollId + " ";
 
@@ -569,7 +569,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
                 nts = SLibUtilities.textLeft(SLibUtilities.textTrim(resultSet.getString("nts")), 100);
                 dt_sta = resultSet.getString("dt_sta");
                 dt_end = resultSet.getString("dt_end");
-                id_tp_pay_sht = resultSet.getInt("id_tp_pay_sht");
+                id_tp_pay_sht = resultSet.getInt("fk_tp_pay_sht");
                 b_clo = resultSet.getBoolean("b_clo");
 
                 switch (fk_tp_pay) {

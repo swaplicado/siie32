@@ -1226,17 +1226,17 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         nDecsVal = piClient.getSessionXXX().getParamsErp().getDecimalsValue();
         nDecsValUnit = piClient.getSessionXXX().getParamsErp().getDecimalsValueUnitary();
 
-        if (mbAuxPreserveQuantity) {
-            // Seldom case: quantity must be preserved
-            
-            dFactQty = mdOriginalQuantity == 0 ? 0 : mdQuantity / mdOriginalQuantity;
-            dFactValUnit = dFactQty == 0 ? 0 : 1d / dFactQty;
-        }
-        else {
+        if (!mbAuxPreserveQuantity) {
             // Common case: quantity must be calculated
             
             dFactQty = ((SSessionCustom) piClient.getSession().getSessionCustom()).getUnitsFactorForQuantity(mnFkItemId, mnFkOriginalUnitId, mnFkUnitId);
             dFactValUnit = ((SSessionCustom) piClient.getSession().getSessionCustom()).getUnitsFactorForUnitaryValue(mnFkItemId, mnFkOriginalUnitId, mnFkUnitId);
+        }
+        else {
+            // Seldom case: quantity must be preserved
+            
+            dFactQty = mdOriginalQuantity == 0 ? 0 : mdQuantity / mdOriginalQuantity;
+            dFactValUnit = dFactQty == 0 ? 0 : 1d / dFactQty;
         }
 
         /*
