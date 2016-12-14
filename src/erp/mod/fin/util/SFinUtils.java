@@ -15,6 +15,7 @@ import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mbps.data.SDataBizPartnerBranchBankAccount;
 import erp.mfin.data.SDataAccountCash;
+import erp.mfin.data.SDataBankLayoutType;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SFinUtilities;
 import erp.mod.SModConsts;
@@ -60,6 +61,7 @@ public class SFinUtils {
         SXmlBankLayoutPaymentDoc oLayoutPayDoc = null;
         SLayoutBankXmlRow oXmlRow = null;
         SDbBankLayout oLayout = null;
+        SDataBankLayoutType oTypeLayout = null;
 
         
         try {
@@ -69,6 +71,7 @@ public class SFinUtils {
             
             oLayout.getBankPaymentRows().clear();
             oLayout.getXmlRows().clear();
+            oTypeLayout = (SDataBankLayoutType) SDataUtilities.readRegistry((SClientInterface) client, SDataConstants.FINU_TP_LAY_BANK, new int[] { oLayout.getFkBankLayoutTypeId() }, SLibConstants.EXEC_MODE_SILENT);
             
             for (SXmlElement element : oGridXml.getXmlElements()) {
                 if (element instanceof SXmlBankLayoutPayment) {
@@ -81,7 +84,6 @@ public class SFinUtils {
                     dBalancePayment = (double) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).getValue();
                     
                     oRow = new SLayoutBankPaymentRow(client);
-
 					
                     oRow.setBizPartnerId(oBizPartner.getPkBizPartnerId());
                     oRow.setBizPartnerBranchId(oBranchBankAccount.getPkBizPartnerBranchId());
@@ -91,7 +93,7 @@ public class SFinUtils {
                     oRow.setBalance(dBalancePayment);
                     oRow.setBalanceTot(0);
                     oRow.setCurrencyKey(oBranchBankAccount.getDbmsCurrencyKey());
-                    oRow.setAccountCredit(oLayout.getFkBankLayoutTypeId() != SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? oBranchBankAccount.getBankAccountNumberStd(): oBranchBankAccount.getBankAccountNumber());
+                    oRow.setAccountCredit(oTypeLayout.getFkBankPaymentTypeId() == SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? oBranchBankAccount.getBankAccountNumber() : oBranchBankAccount.getBankAccountNumberStd());
                     oRow.setIsForPayment((boolean) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_APPLIED).getValue());
                     oRow.setIsToPayed((boolean) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_APPLIED).getValue());
                     
