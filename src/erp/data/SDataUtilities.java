@@ -28,6 +28,7 @@ import erp.mcfg.data.SProcLanguageKeyVal;
 import erp.mfin.data.SDataAccount;
 import erp.mfin.data.SDataAccountCash;
 import erp.mfin.data.SDataAccountUserSubclass;
+import erp.mfin.data.SDataBankLayoutType;
 import erp.mfin.data.SDataCheck;
 import erp.mfin.data.SDataCheckPrintingFormat;
 import erp.mfin.data.SDataCheckPrintingFormatGraphic;
@@ -662,6 +663,9 @@ public abstract class SDataUtilities {
                 break;
             case SDataConstants.FINU_CLS_ACC_USR:
                 registry = new SDataAccountUserSubclass();
+                break;
+            case SDataConstants.FINU_TP_LAY_BANK:
+                registry = new SDataBankLayoutType();
                 break;
             case SDataConstants.FINU_CHECK_FMT:
                 registry = new SDataCheckPrintingFormat();
