@@ -560,14 +560,16 @@ public abstract class SModConsts {
     public static final int HRSS_TP_EAR_COMP = 2061031;
     public static final int HRSS_TP_EAR_EXEM = 2061032;
     public static final int HRSS_TP_EAR = 2061036;
+    public static final int HRSS_TP_OTH_PAY = 2061037;
     public static final int HRSS_TP_DED_COMP = 2061041;
     public static final int HRSS_TP_DED = 2061046;
     public static final int HRSS_TP_BEN = 2061051;
     public static final int HRSS_TP_LOAN = 2061061;
     public static final int HRSS_TP_LOAN_PAY = 2061062;
-    public static final int HRSS_TP_REC_SCHE = 2061071;
-    public static final int HRSS_TP_POS_RISK = 2061072;
-    public static final int HRSS_TP_DIS = 2061073;
+    public static final int HRSS_TP_CON = 2061071;
+    public static final int HRSS_TP_REC_SCHE = 2061072;
+    public static final int HRSS_TP_POS_RISK = 2061073;
+    public static final int HRSS_TP_DIS = 2061074;
     public static final int HRSS_TP_DAY = 2061081;
     public static final int HRSS_BANK = 2061091;
 
@@ -1076,11 +1078,13 @@ public abstract class SModConsts {
         TablesMap.put(HRSS_TP_EAR_COMP, "erp.hrss_tp_ear_comp");
         TablesMap.put(HRSS_TP_EAR_EXEM, "erp.hrss_tp_ear_exem");
         TablesMap.put(HRSS_TP_EAR, "erp.hrss_tp_ear");
+        TablesMap.put(HRSS_TP_OTH_PAY, "erp.hrss_tp_oth_pay");
         TablesMap.put(HRSS_TP_DED_COMP, "erp.hrss_tp_ded_comp");
         TablesMap.put(HRSS_TP_DED, "erp.hrss_tp_ded");
         TablesMap.put(HRSS_TP_BEN, "erp.hrss_tp_ben");
         TablesMap.put(HRSS_TP_LOAN, "erp.hrss_tp_loan");
         TablesMap.put(HRSS_TP_LOAN_PAY, "erp.hrss_tp_loan_pay");
+        TablesMap.put(HRSS_TP_CON, "erp.hrss_tp_con");
         TablesMap.put(HRSS_TP_REC_SCHE, "erp.hrss_tp_rec_sche");
         TablesMap.put(HRSS_TP_POS_RISK, "erp.hrss_tp_pos_risk");
         TablesMap.put(HRSS_TP_DIS, "erp.hrss_tp_dis");
