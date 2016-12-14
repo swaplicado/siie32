@@ -313,7 +313,7 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements FocusListen
         moGridPaneEmployeesAvailable.setPaneFormOwner(null);
         jpEmployeesAvailable.add(moGridPaneEmployeesAvailable, BorderLayout.CENTER);
 
-        moGridPaneEmployeesSelected = new SGridPaneForm(miClient, SModConsts.HRSX_PAY_REC_REC, SLibConsts.UNDEFINED, "Recibos de nómina", null) {
+        moGridPaneEmployeesSelected = new SGridPaneForm(miClient, SModConsts.HRSX_PAY_LAY, SLibConsts.UNDEFINED, "Recibos de nómina", null) {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);
