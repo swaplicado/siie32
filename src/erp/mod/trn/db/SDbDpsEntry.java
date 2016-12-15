@@ -540,7 +540,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
             msFkCostCenterId_n = resultSet.getString("fid_cc_n");
             if (resultSet.wasNull()) {
                 msFkCostCenterId_n = "";
-            }
+            }   
             mnFkItemRefId_n = resultSet.getInt("fid_item_ref_n");
             mnFkUserNewId = resultSet.getInt("fid_usr_new");
             mnFkUserEditId = resultSet.getInt("fid_usr_edit");
