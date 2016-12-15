@@ -299,7 +299,7 @@ public class SDialogRepMovsFileCvs extends SBeanFormDialog implements ActionList
                         "u.symbol,  de.price_u_cur AS price_u, " + (mnFormType == SDataConstantsSys.TRNS_CT_DPS_SAL ? "IF(re.credit > 0, re.credit , - re.debit)"  : "IF(re.debit > 0, re.debit , - re.credit)" ) + " as f_amt, " +
                         "SUM(IF(d.fid_cl_dps = 5, 0, de.mass)) AS f_unt, " +
                         " 'kg' AS f_unt_symbol, sa.id_bp AS f_sa_id, sa.bp AS f_sa, sr.id_sal_route, sr.sal_route, " +
-                        "COALESCE(cty.id_cty, 1) AS f_id_cty, COALESCE(cty.cty, 'MÉXICO') AS f_cty, COALESCE(cty.cty_abbr, 'MX') AS f_cty_abbr, bba.state, bba.county, bba.locality, " +
+                        "COALESCE(cty.id_cty, 1) AS f_id_cty, COALESCE(cty.cty, 'MÉXICO') AS f_cty, COALESCE(cty.cty_abbr, '" + miClient.getSession().getSessionCustom().getLocalCountryCode() + "') AS f_cty_abbr, bba.state, bba.county, bba.locality, " +
                         "IF ((COALESCE(re.fid_dps_adj_year_n, 0) = 0) AND (COALESCE(re.fid_dps_adj_doc_n, 0) = 0), '', CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) ) AS f_num_afec " +
                         "FROM fin_rec AS r " +
                         "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year and r.id_per = re.id_per and r.id_bkc = re.id_bkc and r.id_tp_rec=re.id_tp_rec and r.id_num = re.id_num " +
