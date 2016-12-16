@@ -115,6 +115,7 @@ public abstract class SModSysConsts {
     public static final int BPSS_LINK_CUS_MKT_TP = 2;
     public static final int BPSS_LINK_BP_TP = 3;
     public static final int BPSS_LINK_BP = 4;
+    public static final int BPSS_LINK_BPB = 5;
 
     public static final int BPSU_TP_BP_DEF = 1;
     
