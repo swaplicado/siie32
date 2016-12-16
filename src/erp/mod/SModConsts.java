@@ -402,6 +402,7 @@ public abstract class SModConsts {
     public static final int TRNX_STK_DIOG_TP = 2024004;     // stock-document type
     public static final int TRNX_STK_COST = 2024049;        // stock cost
     public static final int TRNX_ORD_LIM_MAX = 2024051;       // operations control
+    public static final int TRNX_BP_BAL_CUR = 2024052;       // operations control
 
     public static final int TRNR_DPS_CON_BP = 2025001;
     public static final int TRNR_CON_STA = 2025002;

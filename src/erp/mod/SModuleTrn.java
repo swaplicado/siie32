@@ -18,6 +18,7 @@ import erp.mod.trn.form.SFormDelivery;
 import erp.mod.trn.form.SFormInventoryValuation;
 import erp.mod.trn.form.SFormItemRequiredDpsConfig;
 import erp.mod.trn.form.SFormMmsConfig;
+import erp.mod.trn.view.SViewCurrencyBalance;
 import erp.mod.trn.view.SViewDelivery;
 import erp.mod.trn.view.SViewDeliveryQuery;
 import erp.mod.trn.view.SViewDpsEntryContractPrice;
@@ -38,6 +39,7 @@ import sa.lib.db.SDbRegistrySysFly;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiCatalogueSettings;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiForm;
 import sa.lib.gui.SGuiModule;
 import sa.lib.gui.SGuiOptionPicker;
@@ -214,6 +216,17 @@ public class SModuleTrn extends SGuiModule {
                     title += params.getType() == SUtilConsts.QRY_SUM ? "" : " (detalle)";
                     view = new SViewDeliveryQuery(miClient, subtype, title, params);
                 }
+                break;
+            case SModConsts.TRNX_BP_BAL_CUR:
+                title = (subtype == SDataConstantsSys.TRNS_CT_DPS_SAL ? "CXC" : "CXP") + " x moneda";
+                if (params == null) {
+                    view = new SViewCurrencyBalance(miClient, subtype, title, new SGuiParams(SDataConstantsSys.UNDEFINED));
+                }
+                else {
+                    title += params.getType() == SGuiConsts.PARAM_BPR ? ("-" + (subtype == SDataConstantsSys.TRNS_CT_DPS_SAL ? "cliente" : "proveedor")) : "";
+                    view = new SViewCurrencyBalance(miClient, subtype, title, params);
+                }
+                
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
