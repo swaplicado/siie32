@@ -70,7 +70,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author  Sergio Flores, Juan Barajas, Irving Sánchez, Gerardo Hernández
+ * @author  Sergio Flores, Juan Barajas, Irving Sánchez, Gerardo Hernández, Uriel Castañeda
  */
 public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, javax.swing.event.CellEditorListener {
     
@@ -2806,7 +2806,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
             try {
                 moParamsItemPriceList = SDataUtilities.obtainItemPrice(miClient,
-                        moParamBizPartner.getPkBizPartnerId(),
+                        moParamBizPartner.getPkBizPartnerId(), moParamDps.getFkBizPartnerBranchId(),
                         (moParamDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL ?
                         moParamBizPartner.getDbmsCategorySettingsCus().getFkBizPartnerCategoryId() :
                         moParamBizPartner.getDbmsCategorySettingsSup().getFkBizPartnerCategoryId()),

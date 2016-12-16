@@ -43,7 +43,7 @@ import javax.swing.JMenuItem;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda
  */
 public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -65,17 +65,19 @@ public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCommisionsQueryAgentType;
     private javax.swing.JMenuItem jmiCommisionsConfigAgent;
 
-    private javax.swing.JMenu jmSalesPriceList;
-    private javax.swing.JMenuItem jmiSalesPriceList;
-    private javax.swing.JMenuItem jmiSalesPriceListCustomer;
-    private javax.swing.JMenuItem jmiSalesPriceListCustomerType;
-    private javax.swing.JMenuItem jmiSalesPriceListItemPrice;
-
     private javax.swing.JMenu jmPurchasesPriceList;
     private javax.swing.JMenuItem jmiPurchasesPriceList;
-    private javax.swing.JMenuItem jmiPurchasesPriceListSupplier;
     private javax.swing.JMenuItem jmiPurchasesPriceListBizPartnerType;
+    private javax.swing.JMenuItem jmiPurchasesPriceListSupplier;
+    private javax.swing.JMenuItem jmiPurchasesPriceListBizPartnerBranch;
     private javax.swing.JMenuItem jmiPurchasesPriceListItemPrice;
+    
+    private javax.swing.JMenu jmSalesPriceList;
+    private javax.swing.JMenuItem jmiSalesPriceList;
+    private javax.swing.JMenuItem jmiSalesPriceListCustomerType;
+    private javax.swing.JMenuItem jmiSalesPriceListCustomer;
+    private javax.swing.JMenuItem jmiSalesPriceListCustomerBranch;
+    private javax.swing.JMenuItem jmiSalesPriceListItemPrice;
 
     private javax.swing.JMenu jmCommissions;
     private javax.swing.JMenuItem jmiCommissions;
@@ -145,14 +147,16 @@ public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.ev
 
         jmPurchasesPriceList = new JMenu("Listas de precios compras");
         jmiPurchasesPriceList = new JMenuItem("Documentos de listas de precios");
-        jmiPurchasesPriceListSupplier = new JMenuItem("Listas de precios por proveedor");
         jmiPurchasesPriceListBizPartnerType = new JMenuItem("Listas de precios por tipo de proveedor");
+        jmiPurchasesPriceListSupplier = new JMenuItem("Listas de precios por proveedor");
+        jmiPurchasesPriceListBizPartnerBranch = new JMenuItem("Listas de precios por sucursal de proveedor");
         jmiPurchasesPriceListItemPrice = new JMenuItem("Precios de ítems");
 
         jmSalesPriceList = new JMenu("Listas de precios ventas");
         jmiSalesPriceList = new JMenuItem("Documentos de listas de precios");
-        jmiSalesPriceListCustomer = new JMenuItem("Listas de precios por cliente");
         jmiSalesPriceListCustomerType = new JMenuItem("Listas de precios por tipo de cliente");
+        jmiSalesPriceListCustomer = new JMenuItem("Listas de precios por cliente");
+        jmiSalesPriceListCustomerBranch = new JMenuItem("Listas de precios por sucursal de cliente");
         jmiSalesPriceListItemPrice = new JMenuItem("Precios de ítems");
 
         jmCommissions = new JMenu("Comisiones ventas");
@@ -186,15 +190,17 @@ public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.ev
 
         jmPurchasesPriceList.add(jmiPurchasesPriceList);
         jmPurchasesPriceList.addSeparator();
-        jmPurchasesPriceList.add(jmiPurchasesPriceListSupplier);
         jmPurchasesPriceList.add(jmiPurchasesPriceListBizPartnerType);
+        jmPurchasesPriceList.add(jmiPurchasesPriceListSupplier);
+        jmPurchasesPriceList.add(jmiPurchasesPriceListBizPartnerBranch);
         jmPurchasesPriceList.addSeparator();
         jmPurchasesPriceList.add(jmiPurchasesPriceListItemPrice);
 
         jmSalesPriceList.add(jmiSalesPriceList);
         jmSalesPriceList.addSeparator();
-        jmSalesPriceList.add(jmiSalesPriceListCustomer);
         jmSalesPriceList.add(jmiSalesPriceListCustomerType);
+        jmSalesPriceList.add(jmiSalesPriceListCustomer);
+        jmSalesPriceList.add(jmiSalesPriceListCustomerBranch);
         jmSalesPriceList.addSeparator();
         jmSalesPriceList.add(jmiSalesPriceListItemPrice);
 
@@ -217,12 +223,14 @@ public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiSalesRoute.addActionListener(this);
         jmiSalesAgent.addActionListener(this);
         jmiSalesPriceList.addActionListener(this);
-        jmiSalesPriceListCustomer.addActionListener(this);
         jmiSalesPriceListCustomerType.addActionListener(this);
+        jmiSalesPriceListCustomer.addActionListener(this);
+        jmiSalesPriceListCustomerBranch.addActionListener(this);
         jmiSalesPriceListItemPrice.addActionListener(this);
         jmiPurchasesPriceList.addActionListener(this);
-        jmiPurchasesPriceListSupplier.addActionListener(this);
         jmiPurchasesPriceListBizPartnerType.addActionListener(this);
+        jmiPurchasesPriceListSupplier.addActionListener(this);
+        jmiPurchasesPriceListBizPartnerBranch.addActionListener(this);
         jmiPurchasesPriceListItemPrice.addActionListener(this);
         jmiCommissions.addActionListener(this);
         jmiCommissionsDetail.addActionListener(this);
@@ -357,7 +365,7 @@ public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.ev
                     if (moFormPriceListCustomer == null) {
                         moFormPriceListCustomer = new SFormPriceListBizPartnerLink(miClient);
                     }
-                    moFormPriceListCustomer.setValue(auxType, auxType);
+                    moFormPriceListCustomer.setValue(SDataConstants.BPSS_LINK, auxType);
                     if (pk != null) {
                         moRegistry = new SDataPriceListBizPartnerLink();
                     }
@@ -421,9 +429,8 @@ public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.ev
 
             switch (formType) {
                 case SDataConstants.MKT_PLIST_CUS:
-
                     if (moFormComplement != null) {
-                        miForm.setValue(5, moFormComplement);
+                        miForm.setValue(SModConsts.BPSS_CT_BP, moFormComplement);
                     }
                     break;
 
@@ -502,7 +509,8 @@ public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.ev
                     sViewTitle = (auxType02 == SDataConstantsSys.BPSS_CT_BP_CUS ? "VTA" : "CPA") +  " - Listas precios " +
                             (auxType01 == SModSysConsts.BPSS_LINK_BP ? (auxType02 == SDataConstantsSys.BPSS_CT_BP_CUS ? "cliente" : "proveedor") :
                             auxType01 == SModSysConsts.BPSS_LINK_CUS_MKT_TP ? "tipo " + (auxType02 == SDataConstantsSys.BPSS_CT_BP_CUS ? "cliente" : "proveedor") :
-                            auxType01 == SModSysConsts.BPSS_LINK_BP_TP ? "tipo asoc. negocios" : "todos");
+                            auxType01 == SModSysConsts.BPSS_LINK_BP_TP ? "tipo asoc. negocios" :
+                            auxType01 == SModSysConsts.BPSS_LINK_BPB ? "sucursal asoc. negocios" : "todos");
                     break;
 
                 case SDataConstants.MKT_PLIST_ITEM:
@@ -662,28 +670,32 @@ public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiSalesAgent) {
                 showView(SDataConstants.MKTX_SAL_AGT);
             }
-
             else if (item == jmiSalesPriceList) {
                 showView(SDataConstants.MKT_PLIST, SDataConstantsSys.TRNS_CT_DPS_SAL);
-            }
-            else if (item == jmiSalesPriceListCustomer) {
-                showView(SDataConstants.MKT_PLIST_CUS, SModSysConsts.BPSS_LINK_BP, SDataConstantsSys.BPSS_CT_BP_CUS);
             }
             else if (item == jmiSalesPriceListCustomerType) {
                 showView(SDataConstants.MKT_PLIST_CUS, SModSysConsts.BPSS_LINK_CUS_MKT_TP, SDataConstantsSys.BPSS_CT_BP_CUS);
             }
+            else if (item == jmiSalesPriceListCustomer) {
+                showView(SDataConstants.MKT_PLIST_CUS, SModSysConsts.BPSS_LINK_BP, SDataConstantsSys.BPSS_CT_BP_CUS);
+            }
+            else if (item == jmiSalesPriceListCustomerBranch) {
+                showView(SDataConstants.MKT_PLIST_CUS, SModSysConsts.BPSS_LINK_BPB, SDataConstantsSys.BPSS_CT_BP_CUS);
+            }
             else if (item == jmiSalesPriceListItemPrice) {
                 showView(SDataConstants.MKT_PLIST_ITEM, SDataConstantsSys.TRNS_CT_DPS_SAL);
             }
-
             else if (item == jmiPurchasesPriceList) {
                 showView(SDataConstants.MKT_PLIST, SDataConstantsSys.TRNS_CT_DPS_PUR);
+            }
+            else if (item == jmiPurchasesPriceListBizPartnerType) {
+                showView(SDataConstants.MKT_PLIST_CUS, SModSysConsts.BPSS_LINK_BP_TP, SDataConstantsSys.BPSS_CT_BP_SUP);
             }
             else if (item == jmiPurchasesPriceListSupplier) {
                 showView(SDataConstants.MKT_PLIST_CUS, SModSysConsts.BPSS_LINK_BP, SDataConstantsSys.BPSS_CT_BP_SUP);
             }
-            else if (item == jmiPurchasesPriceListBizPartnerType) {
-                showView(SDataConstants.MKT_PLIST_CUS, SModSysConsts.BPSS_LINK_BP_TP, SDataConstantsSys.BPSS_CT_BP_SUP);
+            else if (item == jmiPurchasesPriceListBizPartnerBranch) {
+                showView(SDataConstants.MKT_PLIST_CUS, SModSysConsts.BPSS_LINK_BPB, SDataConstantsSys.BPSS_CT_BP_SUP);
             }
             else if (item == jmiPurchasesPriceListItemPrice) {
                 showView(SDataConstants.MKT_PLIST_ITEM, SDataConstantsSys.TRNS_CT_DPS_PUR);

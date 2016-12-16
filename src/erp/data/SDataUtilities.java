@@ -210,7 +210,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda
  */
 public abstract class SDataUtilities {
 
@@ -1666,12 +1666,17 @@ public abstract class SDataUtilities {
      *
      * @param client SClientInterface.
      * @param pnBizPartnerId Biz ID.
-     * @param pnItemId Item ID.
+     * @param pnBizPartnerBranchId Biz partner branch ID.
+     * @param pnBizPartnerCategoryId Biz partener category ID.
+     * @param pnBizPartnerTypeId Biz partner type ID.
+     * @param pnDpsCategoryId Dps category ID.
      * @param ptDateDoc Document date.
-     * @return double array with item price and discount percentage.
+     * @param pnItemId Item ID.
+     * @param pnFkCurrencyId Currency id.
+* @return double array with item price and discount percentage.
      */
     @SuppressWarnings("unchecked")
-    public static SParamsItemPriceList obtainItemPrice(erp.client.SClientInterface client, int pnBizPartnerId, int pnBizPartnerCategoryId, int pnBizPartnerTypeId,
+    public static SParamsItemPriceList obtainItemPrice(erp.client.SClientInterface client, int pnBizPartnerId, int pnBizPartnerBranchId, int pnBizPartnerCategoryId, int pnBizPartnerTypeId,
         int pnDpsCategoryId, java.util.Date ptDateDoc, int pnItemId, int pnFkCurrencyId) throws java.lang.Exception {
 
         String sql = "";
@@ -1679,22 +1684,7 @@ public abstract class SDataUtilities {
 
         SParamsItemPriceList paramsItemPriceList = new SParamsItemPriceList();
 
-        sql = "SELECT 1 AS f_type, lc.id_dt_start AS f_date, " +
-            "CASE WHEN lc.fid_tp_disc_app = " + SDataConstantsSys.MKTS_TP_DISC_APP_PRICE_U + " THEN " +
-            "p.price * (1 - lc.disc_per) ELSE p.price END AS f_price_u, " +
-            "CASE WHEN lc.fid_tp_disc_app = " + SDataConstantsSys.MKTS_TP_DISC_APP_DISC_U + " THEN " +
-            "p.price * lc.disc_per ELSE 0 END AS f_disc_u " +
-            "FROM mkt_plist_bp_link AS lc " +
-            "INNER JOIN mkt_plist AS l ON " +
-            "lc.id_link = " + SModSysConsts.BPSS_LINK_BP + " AND lc.fid_plist = l.id_plist AND lc.b_del = 0 AND l.b_del = 0 AND " +
-            "lc.id_dt_start <= '" + client.getSessionXXX().getFormatters().getDbmsDateFormat().format(ptDateDoc) + "' AND " +
-            "lc.id_ref_1 = " + pnBizPartnerId + " AND l.fid_ct_dps = " + pnDpsCategoryId + " " +
-            "INNER JOIN mkt_plist_price AS p ON " +
-            "l.id_plist = p.id_plist AND p.id_item = " + pnItemId + " " +
-            "INNER JOIN erp.cfgu_cur AS c ON " +
-            "l.fid_cur = c.id_cur AND l.fid_cur = " + pnFkCurrencyId + " " +
-            "UNION " +
-            "SELECT 2 AS f_type, lc.id_dt_start AS f_date, " +
+        sql = "SELECT " + SModSysConsts.BPSS_LINK_CUS_MKT_TP + " AS f_type, lc.id_dt_start AS f_date, l.id_plist, " +
             "CASE WHEN lc.fid_tp_disc_app = " + SDataConstantsSys.MKTS_TP_DISC_APP_PRICE_U + " THEN " +
             "p.price * (1 - lc.disc_per) ELSE p.price END AS f_price_u, " +
             "CASE WHEN lc.fid_tp_disc_app = " + SDataConstantsSys.MKTS_TP_DISC_APP_DISC_U + " THEN " +
@@ -1710,7 +1700,7 @@ public abstract class SDataUtilities {
             "INNER JOIN erp.cfgu_cur AS c ON " +
             "l.fid_cur = c.id_cur AND l.fid_cur = " + pnFkCurrencyId + " " +
             "UNION " +
-            "SELECT 3 AS f_type, lc.id_dt_start AS f_date, " +
+            "SELECT " + SModSysConsts.BPSS_LINK_BP_TP + " AS f_type, lc.id_dt_start AS f_date, l.id_plist, " +
             "CASE WHEN lc.fid_tp_disc_app = " + SDataConstantsSys.MKTS_TP_DISC_APP_PRICE_U + " THEN " +
             "p.price * (1 - lc.disc_per) ELSE p.price END AS f_price_u, " +
             "CASE WHEN lc.fid_tp_disc_app = " + SDataConstantsSys.MKTS_TP_DISC_APP_DISC_U + " THEN " +
@@ -1727,7 +1717,37 @@ public abstract class SDataUtilities {
             "l.id_plist = p.id_plist AND p.id_item = " + pnItemId + " " +
             "INNER JOIN erp.cfgu_cur AS c ON " +
             "l.fid_cur = c.id_cur AND l.fid_cur = " + pnFkCurrencyId + " " +
-            "ORDER BY f_type, f_date DESC; ";
+            "UNION " +  
+            "SELECT " + SModSysConsts.BPSS_LINK_BP + " AS f_type, lc.id_dt_start AS f_date, l.id_plist, " +
+            "CASE WHEN lc.fid_tp_disc_app = " + SDataConstantsSys.MKTS_TP_DISC_APP_PRICE_U + " THEN " +
+            "p.price * (1 - lc.disc_per) ELSE p.price END AS f_price_u, " +
+            "CASE WHEN lc.fid_tp_disc_app = " + SDataConstantsSys.MKTS_TP_DISC_APP_DISC_U + " THEN " +
+            "p.price * lc.disc_per ELSE 0 END AS f_disc_u " +
+            "FROM mkt_plist_bp_link AS lc " +
+            "INNER JOIN mkt_plist AS l ON " +
+            "lc.id_link = " + SModSysConsts.BPSS_LINK_BP + " AND lc.fid_plist = l.id_plist AND lc.b_del = 0 AND l.b_del = 0 AND " +
+            "lc.id_dt_start <= '" + client.getSessionXXX().getFormatters().getDbmsDateFormat().format(ptDateDoc) + "' AND " +
+            "lc.id_ref_1 = " + pnBizPartnerId + " AND l.fid_ct_dps = " + pnDpsCategoryId + " " +
+            "INNER JOIN mkt_plist_price AS p ON " +
+            "l.id_plist = p.id_plist AND p.id_item = " + pnItemId + " " +
+            "INNER JOIN erp.cfgu_cur AS c ON " +
+            "l.fid_cur = c.id_cur AND l.fid_cur = " + pnFkCurrencyId + " " +
+            "UNION " +  
+            "SELECT " + SModSysConsts.BPSS_LINK_BPB + " AS f_type, lc.id_dt_start AS f_date, l.id_plist, " +
+            "CASE WHEN lc.fid_tp_disc_app = " + SDataConstantsSys.MKTS_TP_DISC_APP_PRICE_U + " THEN " +
+            "p.price * (1 - lc.disc_per) ELSE p.price END AS f_price_u, " +
+            "CASE WHEN lc.fid_tp_disc_app = " + SDataConstantsSys.MKTS_TP_DISC_APP_DISC_U + " THEN " +
+            "p.price * lc.disc_per ELSE 0 END AS f_disc_u " +
+            "FROM mkt_plist_bp_link AS lc " +
+            "INNER JOIN mkt_plist AS l ON " +
+            "lc.id_link = " + SModSysConsts.BPSS_LINK_BPB + " AND lc.fid_plist = l.id_plist AND lc.b_del = 0 AND l.b_del = 0 AND " +
+            "lc.id_dt_start <= '" + client.getSessionXXX().getFormatters().getDbmsDateFormat().format(ptDateDoc) + "' AND " +
+            "lc.id_ref_1 = " + pnBizPartnerId + " AND lc.id_ref_2 = " + pnBizPartnerBranchId + " AND l.fid_ct_dps = " + pnDpsCategoryId + " " +
+            "INNER JOIN mkt_plist_price AS p ON " +
+            "l.id_plist = p.id_plist AND p.id_item = " + pnItemId + " " +
+            "INNER JOIN erp.cfgu_cur AS c ON " +
+            "l.fid_cur = c.id_cur AND l.fid_cur = " + pnFkCurrencyId + " " +    
+            "ORDER BY f_type DESC, f_date DESC, id_plist; ";
 
         resultSet = client.getSession().getStatement().executeQuery(sql);
         if (resultSet.next()) {
