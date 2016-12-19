@@ -15,4 +15,6 @@ public abstract class STrnConsts {
     public static final int ACTION_EDIT = 2;
     
     public static final String TXT_FIELD_BLANK = "-";
+    public static final String TXT_TRN_DOM = "NACIONAL";
+    public static final String TXT_TRN_INT = "INTERNACIONAL";
 }
