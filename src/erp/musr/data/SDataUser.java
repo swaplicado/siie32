@@ -613,6 +613,8 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
                     moDbmsUserConfigurationTransaction.setSalesOrderLimit_n(-1);
                     moDbmsUserConfigurationTransaction.setSalesOrderLimitMonthly_n(-1);
                     moDbmsUserConfigurationTransaction.setSalesDocLimit_n(-1);
+                    moDbmsUserConfigurationTransaction.setCapacityVolumeMinPercentage(0);
+                    moDbmsUserConfigurationTransaction.setCapacityMassMinPercentage(0);
                     moDbmsUserConfigurationTransaction.setFkUserNewId(mnFkUserNewId);
                     moDbmsUserConfigurationTransaction.setFkUserEditId(mnFkUserNewId);
                 }
@@ -638,8 +640,9 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
                     resultSet = statement.executeQuery(sql);
 
                     while (resultSet.next()) {
-                        sql = "INSERT INTO " + resultSet.getString("bd") + ".trn_usr_cfg VALUES (" + mnPkUserId +
-                              ", true, 0, 0, true, 0, 0, 0, 0, false, " + mnFkUserNewId + ", 1, 1, NOW(), NOW(), NOW())";
+                        sql = "INSERT INTO " + resultSet.getString("bd") + ".trn_usr_cfg VALUES (" + 
+                                mnPkUserId + ", TRUE, 0, 0, 0, TRUE, 0, 0, 0, 0, 0, FALSE, " + 
+                                mnFkUserNewId + ", 1, 1, NOW(), NOW(), NOW());";
                         statementAux.execute(sql);
                     }
                 }

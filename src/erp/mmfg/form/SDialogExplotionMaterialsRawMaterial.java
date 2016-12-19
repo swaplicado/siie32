@@ -58,7 +58,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author  Néstor Ávalos
+ * @author  Néstor Ávalos, Uriel Castañeda
  */
 public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -1657,7 +1657,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
 
         try {
             paramsItemPriceList = SDataUtilities.obtainItemPrice(miClient,
-                    moBizPartner.getPkBizPartnerId(),
+                    moBizPartner.getPkBizPartnerId(), moDps.getFkBizPartnerBranchId(),
                     (moDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL ?
                     moBizPartner.getDbmsCategorySettingsCus().getFkBizPartnerCategoryId() :
                     moBizPartner.getDbmsCategorySettingsSup().getFkBizPartnerCategoryId()),

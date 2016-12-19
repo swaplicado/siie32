@@ -18,7 +18,7 @@ import javax.swing.JButton;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Uriel Castañeda
  */
 public class SViewPriceListBizPartnerLink extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -30,8 +30,7 @@ public class SViewPriceListBizPartnerLink extends erp.lib.table.STableTab implem
     }
 
     private void initComponents() {
-        int i;
-
+        int i = 0;
         moTabFilterDeleted = new STabFilterDeleted(this);
 
         addTaskBarUpperSeparator();
@@ -41,8 +40,9 @@ public class SViewPriceListBizPartnerLink extends erp.lib.table.STableTab implem
         jbEdit.setEnabled(true);
         jbDelete.setEnabled(false);
 
+        int cols = mnTabTypeAux01 == SModSysConsts.BPSS_LINK_BPB ? 13 : 12;
         STableField[] aoKeyFields = new STableField[4];
-        STableColumn[] aoTableColumns = new STableColumn[12];
+        STableColumn[] aoTableColumns = new STableColumn[cols];    
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "c.id_link");
@@ -55,9 +55,12 @@ public class SViewPriceListBizPartnerLink extends erp.lib.table.STableTab implem
 
         i = 0;
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_link",
-           (mnTabTypeAux01 == SModSysConsts.BPSS_LINK_BP ? (mnTabTypeAux02 == SDataConstantsSys.BPSS_CT_BP_CUS ? "Cliente" : "Proveedor") :
+           (mnTabTypeAux01 == SModSysConsts.BPSS_LINK_BP || mnTabTypeAux01 == SModSysConsts.BPSS_LINK_BPB ? (mnTabTypeAux02 == SDataConstantsSys.BPSS_CT_BP_CUS ? "Cliente" : "Proveedor") :
             mnTabTypeAux01 == SModSysConsts.BPSS_LINK_CUS_MKT_TP ? "Tipo cliente" :
             mnTabTypeAux01 == SModSysConsts.BPSS_LINK_BP_TP ? "Tipo asoc. negocios" : ""), 300);
+        if (mnTabTypeAux01 == SModSysConsts.BPSS_LINK_BPB) {
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb.bpb", "Sucursal asociado", 150);
+        }
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "c.id_dt_start", "Ini. vigencia", STableConstants.WIDTH_DATE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "p.plist", "Lista precios", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tpd.tp_disc_app", "Tipo descuento", 150);
@@ -111,7 +114,7 @@ public class SViewPriceListBizPartnerLink extends erp.lib.table.STableTab implem
 
     @Override
     public void createSqlQuery() {
-        String sqlWhere =  (mnTabTypeAux01 == SModSysConsts.BPSS_LINK_BP ? "bct.id_ct_bp = " + mnTabTypeAux02 + " AND " : "") +
+        String sqlWhere =  (mnTabTypeAux01 == SModSysConsts.BPSS_LINK_BP || mnTabTypeAux01 == SModSysConsts.BPSS_LINK_BPB ? "bct.id_ct_bp = " + mnTabTypeAux02 + " AND " : "") +
                 "c.id_link = " + mnTabTypeAux01 + " ";
         STableSetting setting = null;
 
@@ -123,21 +126,26 @@ public class SViewPriceListBizPartnerLink extends erp.lib.table.STableTab implem
         }
 
         msSql = "SELECT c.*, " + (
-                mnTabTypeAux01 == SModSysConsts.BPSS_LINK_BP ? "bp.bp" :
-                mnTabTypeAux01 == SModSysConsts.BPSS_LINK_CUS_MKT_TP ? "ct.tp_cus" :
-                mnTabTypeAux01 == SModSysConsts.BPSS_LINK_BP_TP ? "tp.tp_bp" : "") + " AS f_link, p.plist, tpd.tp_disc_app, un.usr, ue.usr, ud.usr " +
+                (mnTabTypeAux01 == SModSysConsts.BPSS_LINK_CUS_MKT_TP) ? "ct.tp_cus" :
+                (mnTabTypeAux01 == SModSysConsts.BPSS_LINK_BP_TP) ? "tp.tp_bp" :
+                (mnTabTypeAux01 == SModSysConsts.BPSS_LINK_BP || mnTabTypeAux01 == SModSysConsts.BPSS_LINK_BPB ) ? "bp.bp" : "") + 
+                " AS f_link, " + (mnTabTypeAux01 == SModSysConsts.BPSS_LINK_BPB ? "bpb.bpb, " : "") + "p.plist, tpd.tp_disc_app, un.usr, ue.usr, ud.usr " +
                 "FROM mkt_plist_bp_link AS c " +
-                (mnTabTypeAux01 == SModSysConsts.BPSS_LINK_BP ?
-                "INNER JOIN erp.bpsu_bp AS bp ON " +
-                "c.id_ref_1 = bp.id_bp " +
-                "INNER JOIN erp.bpsu_bp_ct AS bct ON " +
-                "bp.id_bp = bct.id_bp AND bct.id_ct_bp = " + mnTabTypeAux02 + " ":
-                mnTabTypeAux01 == SModSysConsts.BPSS_LINK_CUS_MKT_TP ?
+                (mnTabTypeAux01 == SModSysConsts.BPSS_LINK_CUS_MKT_TP ?
                 "INNER JOIN mktu_tp_cus AS ct ON " +
                 "c.id_ref_1 = ct.id_tp_cus " :
                 mnTabTypeAux01 == SModSysConsts.BPSS_LINK_BP_TP ?
                 "INNER JOIN erp.bpsu_tp_bp AS tp ON " +
-                "c.id_ref_1 = tp.id_ct_bp AND c.id_ref_2 = tp.id_tp_bp " : "") + " " +
+                "c.id_ref_1 = tp.id_ct_bp AND c.id_ref_2 = tp.id_tp_bp " :
+                mnTabTypeAux01 == SModSysConsts.BPSS_LINK_BP ?
+                "INNER JOIN erp.bpsu_bp AS bp ON " +
+                "c.id_ref_1 = bp.id_bp " +
+                "INNER JOIN erp.bpsu_bp_ct AS bct ON " +
+                "bp.id_bp = bct.id_bp AND bct.id_ct_bp = " + mnTabTypeAux02 + " " :
+                mnTabTypeAux01 == SModSysConsts.BPSS_LINK_BPB ? 
+                "INNER JOIN erp.bpsu_bpb AS bpb ON c.id_ref_2 = bpb.id_bpb " +
+                "INNER JOIN erp.bpsu_bp AS bp ON c.id_ref_1 = bp.id_bp " +
+                "INNER JOIN erp.bpsu_bp_ct AS bct ON bp.id_bp = bct.id_bp " : "") + " " +
                 "INNER JOIN mkt_plist AS p ON " +
                 "c.fid_plist = p.id_plist AND p.fid_ct_dps = " + (mnTabTypeAux02 == SDataConstantsSys.BPSS_CT_BP_CUS ? SDataConstantsSys.TRNS_CT_DPS_SAL : SDataConstantsSys.TRNS_CT_DPS_PUR) + " " +
                 "INNER JOIN erp.mkts_tp_disc_app tpd ON " +
@@ -149,7 +157,6 @@ public class SViewPriceListBizPartnerLink extends erp.lib.table.STableTab implem
                 "INNER JOIN erp.usru_usr AS ud ON " +
                 "c.fid_usr_del = ud.id_usr " +
                 (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) +
-
                 "ORDER BY f_link, c.id_dt_start ";
     }
 

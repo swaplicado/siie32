@@ -52,6 +52,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import sa.gui.util.SUtilConsts;
+import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
 
 /**
@@ -81,8 +82,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiContractsLinked;
     private javax.swing.JMenuItem jmiContractsLinkedEntry;
     private javax.swing.JMenuItem jmiContractsLinks;
-    private javax.swing.JMenuItem jmiContractsLinkEntryPricePend;
-    private javax.swing.JMenuItem jmiContractsLinkEntryPrice;
+    private javax.swing.JMenuItem jmiContractsLinkPendEntryPrice;
+    private javax.swing.JMenuItem jmiContractsLinkedEntryPrice;
     private javax.swing.JMenu jmOrd;
     private javax.swing.JMenuItem jmiOrders;
     private javax.swing.JMenuItem jmiOrdersLinkPend;
@@ -155,6 +156,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiRepBackorderOrderByItemBizPartnerBra;
     private javax.swing.JMenuItem jmiQryBizPartnerBalance;
     private javax.swing.JMenuItem jmiQryBizPartnerAccountsAging;
+    private javax.swing.JMenuItem jmiQryCurrencyBalance;
+    private javax.swing.JMenuItem jmiQryCurrencyBalanceBizPartner;
     private javax.swing.JMenuItem jmiRepBizPartnerBalance;
     private javax.swing.JMenuItem jmiRepBizPartnerBalanceDps;
     private javax.swing.JMenuItem jmiRepBizPartnerBalanceAging;
@@ -265,8 +268,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiContractsLinked = new JMenuItem("Contratos procesados");
         jmiContractsLinkedEntry = new JMenuItem("Contratos procesados a detalle");
         jmiContractsLinks = new JMenuItem("Vínculos de contratos como origen");
-        jmiContractsLinkEntryPricePend = new JMenuItem("Entregas mensuales de contratos por procesar");
-        jmiContractsLinkEntryPrice = new JMenuItem("Entregas mensuales de contratos procesados");
+        jmiContractsLinkPendEntryPrice = new JMenuItem("Entregas mensuales de contratos por procesar");
+        jmiContractsLinkedEntryPrice = new JMenuItem("Entregas mensuales de contratos procesados");
         jmCon.add(jmiContracts);
         jmCon.addSeparator();
         jmCon.add(jmiContractsLinkPend);
@@ -277,8 +280,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmCon.addSeparator();
         jmCon.add(jmiContractsLinks);
         jmCon.addSeparator();
-        jmCon.add(jmiContractsLinkEntryPricePend);
-        jmCon.add(jmiContractsLinkEntryPrice);
+        jmCon.add(jmiContractsLinkPendEntryPrice);
+        jmCon.add(jmiContractsLinkedEntryPrice);
 
         jmOrd = new JMenu("Pedidos");
         jmiOrders = new JMenuItem("Pedidos de compras");
@@ -417,8 +420,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepBackorderOrderByItemBizPartnerBra = new JMenuItem("Backorder de pedidos por ítem-proveedor sucursal");
         jmiQryBizPartnerBalance = new JMenuItem("Consulta de saldos de proveedores");
         jmiQryBizPartnerAccountsAging = new JMenuItem("Consulta de antigüedad de saldos de proveedores");
-        jmiRepBizPartnerBalance = new JMenuItem("Saldos de proveedores...");
-        jmiRepBizPartnerBalanceDps = new JMenuItem("Saldos de proveedores por documento...");
+        jmiQryCurrencyBalance =  new JMenuItem("Consulta de cuentas por pagar por moneda");
+        jmiQryCurrencyBalanceBizPartner =  new JMenuItem("Consulta de cuentas por pagar por moneda-proveedor");
+        jmiRepBizPartnerBalance = new JMenuItem("Saldos proveedores...");
+        jmiRepBizPartnerBalanceDps = new JMenuItem("Saldos proveedores por documento...");
         jmiRepBizPartnerBalanceAging = new JMenuItem("Antigüedad de saldos de proveedores...");
         jmiRepAccountStatements = new JMenuItem("Estados de cuenta de proveedores...");
         jmiRepBizPartnerAccountingMoves = new JMenuItem("Movimientos contables de proveedores por documento...");
@@ -467,6 +472,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmRepBackorder.add(jmiRepBackorderOrderByItemBizPartnerBra);
         jmRepQueries.add(jmiQryBizPartnerBalance);
         jmRepQueries.add(jmiQryBizPartnerAccountsAging);
+        jmRepQueries.addSeparator();
+        jmRepQueries.add(jmiQryCurrencyBalance);
+        jmRepQueries.add(jmiQryCurrencyBalanceBizPartner);
 
         jmRep.add(jmRepStats);
         jmRep.add(jmRepBackorder);
@@ -537,8 +545,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiContractsLinkPendEntry.addActionListener(this);
         jmiContractsLinkedEntry.addActionListener(this);
         jmiContractsLinks.addActionListener(this);
-        jmiContractsLinkEntryPricePend.addActionListener(this);
-        jmiContractsLinkEntryPrice.addActionListener(this);
+        jmiContractsLinkPendEntryPrice.addActionListener(this);
+        jmiContractsLinkedEntryPrice.addActionListener(this);
         jmiOrders.addActionListener(this);
         jmiOrdersLinkPend.addActionListener(this);
         jmiOrdersLinked.addActionListener(this);
@@ -602,6 +610,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepBackorderOrderByItemBizPartnerBra.addActionListener(this);
         jmiQryBizPartnerBalance.addActionListener(this);
         jmiQryBizPartnerAccountsAging.addActionListener(this);
+        jmiQryCurrencyBalance.addActionListener(this);
+        jmiQryCurrencyBalanceBizPartner.addActionListener(this);
         jmiRepBizPartnerBalance.addActionListener(this);
         jmiRepBizPartnerBalanceDps.addActionListener(this);
         jmiRepBizPartnerBalanceAging.addActionListener(this);
@@ -1116,7 +1126,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                     oViewClass = erp.mtrn.view.SViewDpsBalanceAging.class;
                     sViewTitle = "Antigüedad saldos proveedores";
                     break;
-
+                    
                 case SDataConstants.TRNX_DPS_PAY_PEND:
                     oViewClass = erp.mtrn.view.SViewDpsPay.class;
                     sViewTitle = "Cuentas x pagar";
@@ -1308,10 +1318,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiContractsLinks) {
                 showView(SDataConstants.TRNX_DPS_LINKS, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_LINK_EST_CON_SRC);
             }
-            else if (item == jmiContractsLinkEntryPricePend) {
+            else if (item == jmiContractsLinkPendEntryPrice) {
                 miClient.getSession().showView(SModConsts.TRN_DPS_ETY_PRC, SModConsts.MOD_TRN_PUR_N, new SGuiParams(SModConsts.VIEW_ST_PEND));
             }
-            else if (item == jmiContractsLinkEntryPrice) {
+            else if (item == jmiContractsLinkedEntryPrice) {
                 miClient.getSession().showView(SModConsts.TRN_DPS_ETY_PRC, SModConsts.MOD_TRN_PUR_N, new SGuiParams(SModConsts.VIEW_ST_DONE));
             }
             else if (item == jmiOrders) {
@@ -1496,6 +1506,12 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiQryBizPartnerAccountsAging) {
                 showView(SDataConstants.TRNX_DPS_BAL_AGING, SDataConstantsSys.TRNS_CT_DPS_PUR);
+            }
+            else if (item == jmiQryCurrencyBalance) {
+                miClient.getSession().showView(SModConsts.TRNX_BP_BAL_CUR, SDataConstantsSys.TRNS_CT_DPS_PUR, new SGuiParams(SDataConstantsSys.UNDEFINED));
+            }
+            else if (item == jmiQryCurrencyBalanceBizPartner) {
+                miClient.getSession().showView(SModConsts.TRNX_BP_BAL_CUR, SDataConstantsSys.TRNS_CT_DPS_PUR, new SGuiParams(SGuiConsts.PARAM_BPR));
             }
             else if (item == jmiRepBizPartnerBalance) {
                 new SDialogRepBizPartnerBalance(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
