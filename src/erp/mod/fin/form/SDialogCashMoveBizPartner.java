@@ -1065,7 +1065,6 @@ public class SDialogCashMoveBizPartner extends SBeanFormDialog implements SDialo
         mnBizPartnerCategoryId = SFinUtils.getBizPartnerCategoryId(manSysMoveTypeKey);
         mnDpsCategoryId = !mbMovePayment ? SLibConsts.UNDEFINED : SFinUtils.getDpsCategoryId(manSysMoveTypeKey);
         jlBizPartner.setText(SBpsUtils.getBizPartnerCategoryName(mnBizPartnerCategoryId, SUtilConsts.NUM_SNG) + ":*");
-        moKeyBizPartner.setFieldName(SGuiUtils.getLabelName(jlBizPartner));
         miClient.getSession().populateCatalogue(moKeyBizPartner, SModConsts.BPSU_BP, mnBizPartnerCategoryId, null);
 
         if (mbCashLocalCurrency) {

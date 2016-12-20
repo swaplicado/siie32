@@ -11,18 +11,17 @@
 
 package erp.mtrn.form;
 
+import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
+import erp.lib.SLibConstants;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
+import erp.mtrn.data.SDataBizPartnerBlocking;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
-
-import erp.data.SDataConstants;
-import erp.data.SDataConstantsSys;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormValidation;
-import erp.lib.form.SFormUtilities;
-import erp.lib.SLibConstants;
-import erp.mtrn.data.SDataBizPartnerBlocking;
 
 /**
  *
@@ -319,7 +318,6 @@ public class SFormBizPartnerBlocking extends javax.swing.JDialog implements erp.
             case 1:
                 mnParamCategoryBpId = (Integer) value;
                 jlFkBizPartnerId.setText((mnParamCategoryBpId == SDataConstantsSys.BPSS_CT_BP_SUP ? "Proveedor: * " : mnParamCategoryBpId == SDataConstantsSys.BPSS_CT_BP_CUS ? "Cliente: * " : ""));
-                moFieldFkBizPartnerId.setFieldName(jlFkBizPartnerId.getText());
                 this.setTitle((mnParamCategoryBpId == SDataConstantsSys.BPSS_CT_BP_SUP ? "Bloqueo de proveedor" : mnParamCategoryBpId == SDataConstantsSys.BPSS_CT_BP_CUS ?  "Bloqueo de cliente" : "" ));
                 jbFkBizPartnerId.setToolTipText((mnParamCategoryBpId == SDataConstantsSys.BPSS_CT_BP_SUP ? "Seleccionar proveedor" : mnParamCategoryBpId == SDataConstantsSys.BPSS_CT_BP_CUS ? "Seleccionar cliente" : ""));
                 break;
