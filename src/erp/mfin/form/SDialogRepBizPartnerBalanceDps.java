@@ -372,19 +372,20 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
             map.put("nSysMoveTypeId", manSysMoveTypeKey[1]);
             map.put("sBizPartnerCat", msBizPartnerCatSng.toUpperCase());
             map.put("sBizPartnerCatPlural", msBizPartnerCatPlr.toUpperCase());
-            map.put("nStDps", SModSysConsts.TRNS_ST_DPS_EMITED);
             map.put("nLocalCurrencyId", miClient.getSession().getSessionCustom().getLocalCurrencyKey()[0]);
             map.put("sLocalCurrencyCode", miClient.getSession().getSessionCustom().getLocalCurrencyCode());
-            map.put("nCurrencyId", moFieldCurrency.getKeyAsIntArray()[0]);
-            map.put("sCurrencyCode", SDataReadDescriptions.getCatalogueDescription((miClient), SDataConstants.CFGU_CUR, moFieldCurrency.getKeyAsIntArray(), SLibConstants.DESCRIPTION_CODE));
-            map.put("sCurrency", jcbCurrency.getSelectedItem().toString());
-            map.put("dExchangeRate", moFieldExRate.getDouble());
+            map.put("sLocalCurrency", miClient.getSession().getSessionCustom().getLocalCurrency());
             map.put("nYear", year);
             map.put("tDate", moFieldDate.getDate());
             map.put("sBizPartner", (jcbBizPartner.getSelectedIndex() <= 0 ? "(TODOS)" : moFieldBizPartner.getString()));
             map.put("sFilterBizPartner", filterBp);
+            map.put("nCurrencyId", moFieldCurrency.getKeyAsIntArray()[0]);
+            map.put("sCurrencyCode", SDataReadDescriptions.getCatalogueDescription((miClient), SDataConstants.CFGU_CUR, moFieldCurrency.getKeyAsIntArray(), SLibConstants.DESCRIPTION_CODE));
+            map.put("sCurrency", jcbCurrency.getSelectedItem().toString());
             map.put("sFilterCurrency", filterCur);
+            map.put("dExchangeRate", moFieldExRate.getDouble());
             map.put("oExcRateFormat", SLibUtils.getDecimalFormatExchangeRate());
+            map.put("nStDps", SModSysConsts.TRNS_ST_DPS_EMITED);
             map.put("bShowDetail", true);
             
             jasperPrint = SDataUtilities.fillReport(miClient, report, map);

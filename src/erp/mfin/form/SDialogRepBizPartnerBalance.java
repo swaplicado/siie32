@@ -458,20 +458,20 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
                 map.put("nSysMoveTypeId", manSysMoveTypeKey[1]);
                 map.put("sBizPartnerCat", msBizPartnerCatSng.toUpperCase());
                 map.put("sBizPartnerCatPlural", msBizPartnerCatPlr.toUpperCase());
-                map.put("nStDps", SModSysConsts.TRNS_ST_DPS_EMITED);
-                map.put("nLocalCurrencyId", miClient.getSessionXXX().getParamsErp().getFkCurrencyId());
+                map.put("nLocalCurrencyId", miClient.getSession().getSessionCustom().getLocalCurrencyKey()[0]);
                 map.put("sLocalCurrencyCode", miClient.getSession().getSessionCustom().getLocalCurrencyCode());
-                map.put("sLocalCurrency", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency());
-                map.put("nCurrencyId", moFieldCurrency.getKeyAsIntArray()[0]); // filter in report's query
-                map.put("sCurrencyCode", SDataReadDescriptions.getCatalogueDescription((miClient), SDataConstants.CFGU_CUR, moFieldCurrency.getKeyAsIntArray(), SLibConstants.DESCRIPTION_CODE));
-                map.put("sCurrency", jcbCurrency.getSelectedItem().toString());
-                map.put("dExchangeRate", moFieldExRate.getDouble());
+                map.put("sLocalCurrency", miClient.getSession().getSessionCustom().getLocalCurrency());
                 map.put("nYear", SLibTimeUtilities.digestYear(moFieldDateCutoff.getDate())[0]);
                 map.put("tDate", moFieldDateCutoff.getDate());
                 map.put("sBizPartner", (jcbBizPartner.getSelectedIndex() <= 0 ? SUtilConsts.ALL : moFieldBizPartner.getString()));
                 map.put("sFilterBizPartner", filterBp);
+                map.put("nCurrencyId", moFieldCurrency.getKeyAsIntArray()[0]);
+                map.put("sCurrencyCode", SDataReadDescriptions.getCatalogueDescription((miClient), SDataConstants.CFGU_CUR, moFieldCurrency.getKeyAsIntArray(), SLibConstants.DESCRIPTION_CODE));
+                map.put("sCurrency", jcbCurrency.getSelectedItem().toString());
                 map.put("sFilterCurrency", filterCur);
+                map.put("dExchangeRate", moFieldExRate.getDouble());
                 map.put("oExcRateFormat", SLibUtils.getDecimalFormatExchangeRate());
+                map.put("nStDps", SModSysConsts.TRNS_ST_DPS_EMITED);
                 map.put("bShowDetail", false);
 
                 jasperPrint = SDataUtilities.fillReport(miClient, report, map);
