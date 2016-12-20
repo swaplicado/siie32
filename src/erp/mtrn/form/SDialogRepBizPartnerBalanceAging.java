@@ -187,7 +187,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
 
         bgType.add(jrbRepTypeDetail);
         jrbRepTypeDetail.setSelected(true);
-        jrbRepTypeDetail.setText("Detallado");
+        jrbRepTypeDetail.setText("Detalle");
         jrbRepTypeDetail.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel101.add(jrbRepTypeDetail);
 

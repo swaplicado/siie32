@@ -17,6 +17,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JList;
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
+import sa.lib.gui.SGuiUtils;
 
 /**
  *
@@ -31,6 +32,7 @@ public class SFormField implements SFormFieldInterface {
 
     private int mnFieldType;
     private int mnOptionPickerType;
+    private javax.swing.JLabel mjLabelName;
     private java.lang.String msFieldName;
     private java.lang.Object moRawValue;
     private java.lang.Object moDefaultValue;
@@ -61,31 +63,41 @@ public class SFormField implements SFormFieldInterface {
     private javax.swing.JTabbedPane mjTabbedPane;
     private javax.swing.JButton mjPickerButton;
 
-    public SFormField(erp.client.SClientInterface client, int dataType, boolean isMandatory, javax.swing.JCheckBox component) {
-        this(client, dataType, isMandatory, component, "", -1);
+    public SFormField(erp.client.SClientInterface client, int dataType, boolean isMandatory, javax.swing.JCheckBox checkBox) {
+        this(client, dataType, isMandatory, checkBox, null, checkBox.getText(), -1);
     }
 
-    public SFormField(erp.client.SClientInterface client, int dataType, boolean isMandatory, javax.swing.JCheckBox component, int tabIndex) {
-        this(client, dataType, isMandatory, component, "", tabIndex);
+    public SFormField(erp.client.SClientInterface client, int dataType, boolean isMandatory, javax.swing.JCheckBox checkBox, int tabIndex) {
+        this(client, dataType, isMandatory, checkBox, null, checkBox.getText(), tabIndex);
     }
 
     public SFormField(erp.client.SClientInterface client, int dataType, boolean isMandatory, javax.swing.JComponent component, javax.swing.JLabel label) {
-        this(client, dataType, isMandatory, component, label.getText(), -1);
+        this(client, dataType, isMandatory, component, label, "", -1);
     }
 
     public SFormField(erp.client.SClientInterface client, int dataType, boolean isMandatory, javax.swing.JComponent component, javax.swing.JLabel label, int tabIndex) {
-        this(client, dataType, isMandatory, component, label.getText(), tabIndex);
+        this(client, dataType, isMandatory, component, label, "", tabIndex);
     }
 
     public SFormField(erp.client.SClientInterface client, int dataType, boolean isMandatory, javax.swing.JComponent component, javax.swing.JCheckBox checkBox) {
-        this(client, dataType, isMandatory, component, checkBox.getText(), -1);
+        this(client, dataType, isMandatory, component, null, checkBox.getText(), -1);
     }
 
     public SFormField(erp.client.SClientInterface client, int dataType, boolean isMandatory, javax.swing.JComponent component, javax.swing.JCheckBox checkBox, int tabIndex) {
-        this(client, dataType, isMandatory, component, checkBox.getText(), tabIndex);
+        this(client, dataType, isMandatory, component, null, checkBox.getText(), tabIndex);
     }
 
-    private SFormField(erp.client.SClientInterface client, int dataType, boolean isMandatory, javax.swing.JComponent component, java.lang.String fieldName, int tabIndex) {
+    /**
+     * 
+     * @param client GUI client.
+     * @param dataType Data type. Valid options defined in SLibConstants.DATA_TYPE_....
+     * @param isMandatory Is field mandatory?
+     * @param component Field's <code>JComponent</code>.
+     * @param label Field's <code>JLabel</code>, if any, otherwise <code>null</code>.
+     * @param fieldName Field's name, if any, otherwise <code>""</code>.
+     * @param tabIndex  Field's tab, if any, otherwise <code>-1</code>.
+     */
+    private SFormField(erp.client.SClientInterface client, int dataType, boolean isMandatory, javax.swing.JComponent component, javax.swing.JLabel label, java.lang.String fieldName, int tabIndex) {
         miClient = client;
         mnDataType = dataType;
         mbIsMandatory = isMandatory;
@@ -93,7 +105,8 @@ public class SFormField implements SFormFieldInterface {
 
         mnFieldType = SLibConstants.UNDEFINED;
         mnOptionPickerType = SLibConstants.UNDEFINED;
-        msFieldName = fieldName;
+        mjLabelName = label;
+        msFieldName = SGuiUtils.getLabelName(fieldName);
         moRawValue = null;
         moDefaultValue = null;
 
@@ -604,41 +617,41 @@ public class SFormField implements SFormFieldInterface {
                 case SLibConstants.DATA_TYPE_INTEGER:
                 case SLibConstants.DATA_TYPE_LONG:
                     if (mbMinInclusive && lValue < mlLongMin) {
-                        sMessage = "El valor para el campo '" + msFieldName + "' no puede ser menor que " + (moDecimalFormat == null ? "" + mlLongMin : moDecimalFormat.format(mlLongMin)) + ".";
+                        sMessage = "El valor para el campo '" + getFieldName() + "' no puede ser menor que " + (moDecimalFormat == null ? "" + mlLongMin : moDecimalFormat.format(mlLongMin)) + ".";
                     }
                     else if (!mbMinInclusive && lValue <= mlLongMin) {
-                        sMessage = "El valor para el campo '" + msFieldName + "' no puede ser menor o igual que " + (moDecimalFormat == null ? "" + mlLongMin : moDecimalFormat.format(mlLongMin)) + ".";
+                        sMessage = "El valor para el campo '" + getFieldName() + "' no puede ser menor o igual que " + (moDecimalFormat == null ? "" + mlLongMin : moDecimalFormat.format(mlLongMin)) + ".";
                     }
                     else if (mbMaxInclusive && lValue > mlLongMax) {
-                        sMessage = "El valor para el campo '" + msFieldName + "' no puede ser mayor que " + (moDecimalFormat == null ? "" + mlLongMax : moDecimalFormat.format(mlLongMax)) + ".";
+                        sMessage = "El valor para el campo '" + getFieldName() + "' no puede ser mayor que " + (moDecimalFormat == null ? "" + mlLongMax : moDecimalFormat.format(mlLongMax)) + ".";
                     }
                     else if (!mbMaxInclusive && lValue >= mlLongMax) {
-                        sMessage = "El valor para el campo '" + msFieldName + "' no puede ser mayor o igual que " + (moDecimalFormat == null ? "" + mlLongMax : moDecimalFormat.format(mlLongMax)) + ".";
+                        sMessage = "El valor para el campo '" + getFieldName() + "' no puede ser mayor o igual que " + (moDecimalFormat == null ? "" + mlLongMax : moDecimalFormat.format(mlLongMax)) + ".";
                     }
                     break;
 
                 case SLibConstants.DATA_TYPE_FLOAT:
                 case SLibConstants.DATA_TYPE_DOUBLE:
                     if (mbMinInclusive && dValue < mdDoubleMin) {
-                        sMessage = "El valor para el campo '" + msFieldName + "' no puede ser menor que " + (moDecimalFormat == null ? "" + mdDoubleMin : moDecimalFormat.format(mdDoubleMin)) + ".";
+                        sMessage = "El valor para el campo '" + getFieldName() + "' no puede ser menor que " + (moDecimalFormat == null ? "" + mdDoubleMin : moDecimalFormat.format(mdDoubleMin)) + ".";
                     }
                     else if (!mbMinInclusive && dValue <= mdDoubleMin) {
-                        sMessage = "El valor para el campo '" + msFieldName + "' no puede ser menor o igual que " + (moDecimalFormat == null ? "" + mdDoubleMin : moDecimalFormat.format(mdDoubleMin)) + ".";
+                        sMessage = "El valor para el campo '" + getFieldName() + "' no puede ser menor o igual que " + (moDecimalFormat == null ? "" + mdDoubleMin : moDecimalFormat.format(mdDoubleMin)) + ".";
                     }
                     else if (mbMaxInclusive && dValue > mdDoubleMax) {
-                        sMessage = "El valor para el campo '" + msFieldName + "' no puede ser mayor que " + (moDecimalFormat == null ? "" + mdDoubleMax : moDecimalFormat.format(mdDoubleMax)) + ".";
+                        sMessage = "El valor para el campo '" + getFieldName() + "' no puede ser mayor que " + (moDecimalFormat == null ? "" + mdDoubleMax : moDecimalFormat.format(mdDoubleMax)) + ".";
                     }
                     else if (!mbMaxInclusive && dValue >= mdDoubleMax) {
-                        sMessage = "El valor para el campo '" + msFieldName + "' no puede ser mayor o igual que " + (moDecimalFormat == null ? "" + mdDoubleMax : moDecimalFormat.format(mdDoubleMax)) + ".";
+                        sMessage = "El valor para el campo '" + getFieldName() + "' no puede ser mayor o igual que " + (moDecimalFormat == null ? "" + mdDoubleMax : moDecimalFormat.format(mdDoubleMax)) + ".";
                     }
                     break;
 
                 case SLibConstants.DATA_TYPE_STRING:
                     if (sValue.length() < mnLengthMin) {
-                        sMessage = "La longitud del valor para el campo '" + msFieldName + "' no puede ser menor que " + mnLengthMin + ".";
+                        sMessage = "La longitud del valor para el campo '" + getFieldName() + "' no puede ser menor que " + mnLengthMin + ".";
                     }
                     else if (sValue.length() > mnLengthMax) {
-                        sMessage = "La longitud del valor para el campo '" + msFieldName + "' no puede ser mayor que " + mnLengthMax + ".";
+                        sMessage = "La longitud del valor para el campo '" + getFieldName() + "' no puede ser mayor que " + mnLengthMax + ".";
                     }
                     break;
 
@@ -662,25 +675,25 @@ public class SFormField implements SFormFieldInterface {
                     }
 
                     if (dateFormat == null) {
-                        sMessage = "No se puede validar la " + period + " para el campo '" + msFieldName + "' porque no existe un objeto de formato adecuado.";
+                        sMessage = "No se puede validar la " + period + " para el campo '" + getFieldName() + "' porque no existe un objeto de formato adecuado.";
                     }
                     else {
                         tValue = dateFormat.parse(((JFormattedTextField) mjComponent).getText(), new ParsePosition(0));
 
                         if (tValue == null) {
-                            sMessage = "La " + period + " para el campo '" + msFieldName + "' se debe expresar con el patrón de formato '" + dateFormat.toPattern() + "'.";
+                            sMessage = "La " + period + " para el campo '" + getFieldName() + "' se debe expresar con el patrón de formato '" + dateFormat.toPattern() + "'.";
                         }
                         else if (mtDateMin != null && mbMinInclusive && tValue.compareTo(mtDateMin) < 0) {
-                            sMessage = "La " + period + " para el campo '" + msFieldName + "' no puede ser menor que " + dateFormat.format(mtDateMin) + ".";
+                            sMessage = "La " + period + " para el campo '" + getFieldName() + "' no puede ser menor que " + dateFormat.format(mtDateMin) + ".";
                         }
                         else if (mtDateMin != null && !mbMinInclusive && tValue.compareTo(mtDateMin) <= 0) {
-                            sMessage = "La " + period + " para el campo '" + msFieldName + "' no puede ser menor o igual que " + dateFormat.format(mtDateMin) + ".";
+                            sMessage = "La " + period + " para el campo '" + getFieldName() + "' no puede ser menor o igual que " + dateFormat.format(mtDateMin) + ".";
                         }
                         else if (mtDateMax != null && mbMaxInclusive && tValue.compareTo(mtDateMax) > 0) {
-                            sMessage = "La " + period + " para el campo '" + msFieldName + "' no puede ser mayor que " + dateFormat.format(mtDateMax) + ".";
+                            sMessage = "La " + period + " para el campo '" + getFieldName() + "' no puede ser mayor que " + dateFormat.format(mtDateMax) + ".";
                         }
                         else if (mtDateMax != null && !mbMaxInclusive && tValue.compareTo(mtDateMax) >= 0) {
-                            sMessage = "La " + period + " para el campo '" + msFieldName + "' no puede ser mayor o igual que " + dateFormat.format(mtDateMax) + ".";
+                            sMessage = "La " + period + " para el campo '" + getFieldName() + "' no puede ser mayor o igual que " + dateFormat.format(mtDateMax) + ".";
                         }
                     }
                     break;
@@ -689,24 +702,24 @@ public class SFormField implements SFormFieldInterface {
                     if (mnFieldType == SLibConstants.FIELD_TYPE_LIST) {
                         if (mnListValidationType == SLibConstants.LIST_VALIDATION_BY_SELECTION) {
                             if (((JList) mjComponent).getSelectedIndex() < 0) {
-                                sMessage = "Se debe seleccionar una opción para el campo '" + msFieldName + "'.";
+                                sMessage = "Se debe seleccionar una opción para el campo '" + getFieldName() + "'.";
                             }
                         }
                         else {
                             if (((JList) mjComponent).getModel().getSize() == 0) {
-                                sMessage = "Se deben agregar opciones para el campo '" + msFieldName + "'.";
+                                sMessage = "Se deben agregar opciones para el campo '" + getFieldName() + "'.";
                             }
                         }
                     }
                     else {
                         if (mbIsSelectionItemApplying) {
                             if (((JComboBox) mjComponent).getSelectedIndex() <= 0) {
-                                sMessage = "Se debe seleccionar una opción para el campo '" + msFieldName + "'.";
+                                sMessage = "Se debe seleccionar una opción para el campo '" + getFieldName() + "'.";
                             }
                         }
                         else {
                             if (((JComboBox) mjComponent).getSelectedIndex() < 0) {
-                                sMessage = "Se debe seleccionar una opción para el campo '" + msFieldName + "'.";
+                                sMessage = "Se debe seleccionar una opción para el campo '" + getFieldName() + "'.";
                             }
                         }
                     }
@@ -770,7 +783,7 @@ public class SFormField implements SFormFieldInterface {
     public javax.swing.JComponent getComponent() { return mjComponent; }
     public int getFieldType() { return mnFieldType; }
     public int getOptionPickerType() { return mnOptionPickerType; }
-    public java.lang.String getFieldName() { return msFieldName; }
+    public java.lang.String getFieldName() { return mjLabelName != null ? SGuiUtils.getLabelName(mjLabelName.getText()) : msFieldName; }
     public java.lang.Object getRawValue() { return moRawValue; }
     public java.lang.Object getDefaultValue() { return moDefaultValue; }
     public long getLongMin() { return mlLongMin; }
