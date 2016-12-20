@@ -506,11 +506,11 @@ public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.ev
                     break;
                 case SDataConstants.MKT_PLIST_CUS:
                     oViewClass = erp.mmkt.view.SViewPriceListBizPartnerLink.class;
-                    sViewTitle = (auxType02 == SDataConstantsSys.BPSS_CT_BP_CUS ? "VTA" : "CPA") +  " - Listas precios " +
+                    sViewTitle = (auxType02 == SDataConstantsSys.BPSS_CT_BP_CUS ? "VTA" : "CPA") +  " - Listas de precios por " +
                             (auxType01 == SModSysConsts.BPSS_LINK_BP ? (auxType02 == SDataConstantsSys.BPSS_CT_BP_CUS ? "cliente" : "proveedor") :
                             auxType01 == SModSysConsts.BPSS_LINK_CUS_MKT_TP ? "tipo " + (auxType02 == SDataConstantsSys.BPSS_CT_BP_CUS ? "cliente" : "proveedor") :
                             auxType01 == SModSysConsts.BPSS_LINK_BP_TP ? "tipo asoc. negocios" :
-                            auxType01 == SModSysConsts.BPSS_LINK_BPB ? "sucursal asoc. negocios" : "todos");
+                            auxType01 == SModSysConsts.BPSS_LINK_BPB ? "sucursal de " + (auxType02 == SDataConstantsSys.BPSS_CT_BP_CUS ? "cliente" : "proveedor") : "todos");
                     break;
 
                 case SDataConstants.MKT_PLIST_ITEM:

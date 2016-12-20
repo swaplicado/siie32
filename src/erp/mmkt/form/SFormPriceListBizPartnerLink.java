@@ -491,10 +491,13 @@ public class SFormPriceListBizPartnerLink extends javax.swing.JDialog implements
                 case SModSysConsts.BPSS_LINK_BP_TP:
                     SFormUtilities.populateComboBox(miClient, jcbPkReferenceId, mnReferenceDataType,mnParamBizPartnerCategory);
                     break;
+                case SModSysConsts.BPSS_LINK_BP:
+                case SModSysConsts.BPSS_LINK_BPB:    
+                    SFormUtilities.populateComboBox(miClient, jcbPkReferenceId, mnReferenceDataType);
                 default:
             }
         }
-        
+               
         SFormUtilities.populateComboBox(miClient, jcbFkPriceListId, SDataConstants.MKT_PLIST, mnParamBizPartnerCategory);
         SFormUtilities.populateComboBox(miClient, jcbFkDiscountApplicationTypeId, SDataConstants.MKTS_TP_DISC_APP);
     }
