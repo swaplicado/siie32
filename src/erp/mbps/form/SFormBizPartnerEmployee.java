@@ -223,6 +223,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlFkWorkerType = new javax.swing.JLabel();
         jcbFkWorkerType = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel12 = new javax.swing.JPanel();
+        jckIsLaborUnion = new javax.swing.JCheckBox();
         jckIsMfgOperator = new javax.swing.JCheckBox();
         jPanel17 = new javax.swing.JPanel();
         jlFkDepartment = new javax.swing.JLabel();
@@ -237,6 +238,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlWorkingHoursDay = new javax.swing.JLabel();
         jtfWorkingHoursDay = new javax.swing.JTextField();
         jPanel27 = new javax.swing.JPanel();
+        jlFkRecruitmentType = new javax.swing.JLabel();
+        jcbFkRecruitmentType = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel33 = new javax.swing.JPanel();
         jlFkRecruitmentSchemeType = new javax.swing.JLabel();
         jcbFkRecruitmentSchemeType = new javax.swing.JComboBox<SFormComponentItem>();
@@ -634,6 +637,10 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
+        jckIsLaborUnion.setText("Es sindicalizado");
+        jckIsLaborUnion.setPreferredSize(new java.awt.Dimension(115, 23));
+        jPanel12.add(jckIsLaborUnion);
+
         jckIsMfgOperator.setText("Es operador");
         jckIsMfgOperator.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel12.add(jckIsMfgOperator);
@@ -693,6 +700,14 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel4.add(jPanel11);
 
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
+
+        jlFkRecruitmentType.setText("Tipo contrato:*");
+        jlFkRecruitmentType.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel27.add(jlFkRecruitmentType);
+
+        jcbFkRecruitmentType.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel27.add(jcbFkRecruitmentType);
+
         jPanel4.add(jPanel27);
 
         jPanel33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
@@ -1015,9 +1030,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldWage.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldDateChangeWage = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateChangeWage, jlWage);
         moFieldDateChangeWage.setTabbedPaneIndex(0, jTabbedPane1);
-        moFieldSalarySscBase = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfSalarySscBase, jlSalarySscBase);
+        moFieldSalarySscBase = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfSalarySscBase, jlSalarySscBase);
         moFieldSalarySscBase.setTabbedPaneIndex(0, jTabbedPane1);
-        moFieldDateChangeSalarySscBase = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateChangeSalarySscBase, jlSalarySscBase);
+        moFieldDateChangeSalarySscBase = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftDateChangeSalarySscBase, jlSalarySscBase);
         moFieldDateChangeSalarySscBase.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldFkEmployeeType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkEmployeeType, jlFkEmployeeType);
         moFieldFkEmployeeType.setTabbedPaneIndex(0, jTabbedPane1);
@@ -1679,6 +1694,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JComboBox<SFormComponentItem> jcbFkPosition;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkPositionRiskType;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkRecruitmentSchemeType;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkRecruitmentType;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkSalaryType;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkShift;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkWorkerType;
@@ -1688,6 +1704,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JCheckBox jckIsActive;
     private javax.swing.JCheckBox jckIsAddress;
     private javax.swing.JCheckBox jckIsDeleted;
+    private javax.swing.JCheckBox jckIsLaborUnion;
     private javax.swing.JCheckBox jckIsMfgOperator;
     private javax.swing.JFormattedTextField jftAlternativeId;
     private javax.swing.JFormattedTextField jftDateBenefits;
@@ -1723,6 +1740,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JLabel jlFkPosition;
     private javax.swing.JLabel jlFkPositionRiskType;
     private javax.swing.JLabel jlFkRecruitmentSchemeType;
+    private javax.swing.JLabel jlFkRecruitmentType;
     private javax.swing.JLabel jlFkSalaryType;
     private javax.swing.JLabel jlFkShift;
     private javax.swing.JLabel jlFkWorkerType;
@@ -1871,9 +1889,19 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                     if (!validation.getIsError()) {
                         if (!SLibUtils.belongsTo(moFieldFkRecruitmentSchemeType.getKeyAsIntArray()[0],
                                 new int[] { SModSysConsts.HRSS_TP_REC_SCHE_ASS_COO, SModSysConsts.HRSS_TP_REC_SCHE_ASS_CIV, SModSysConsts.HRSS_TP_REC_SCHE_ASS_BRD, 
-                                    SModSysConsts.HRSS_TP_REC_SCHE_ASS_SAL, SModSysConsts.HRSS_TP_REC_SCHE_ASS_PRO, SModSysConsts.HRSS_TP_REC_SCHE_ASS_SHA }) && moFieldSocialSecurityNumber.getString().length() < 11) {
-                            validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlSocialSecurityNumber.getText() + "'.");
-                            validation.setComponent(jtfSocialSecurityNumber);
+                                    SModSysConsts.HRSS_TP_REC_SCHE_ASS_SAL, SModSysConsts.HRSS_TP_REC_SCHE_ASS_PRO, SModSysConsts.HRSS_TP_REC_SCHE_ASS_SHA })) {
+                            if (moFieldSocialSecurityNumber.getString().length() < 11) {
+                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlSocialSecurityNumber.getText() + "'.");
+                                validation.setComponent(jtfSocialSecurityNumber);                                
+                            }
+                            else if (moFieldSalarySscBase.getDouble() == 0) {
+                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlSalarySscBase.getText() + "'.");
+                                validation.setComponent(jtfSalarySscBase);                                
+                            }
+                            else if (moFieldDateChangeSalarySscBase.getDate() == null) {
+                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlSalarySscBase.getText() + "' (fecha).");
+                                validation.setComponent(jftDateChangeSalarySscBase);                                
+                            }
                         }
                     }
                     
@@ -2027,8 +2055,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         int paymentType = moFieldFkPaymentType.getKeyAsIntArray()[0];
         String formerBizPartner = "";
         HashSet<Integer> requiredCategories = new HashSet<>();
-        ByteArrayOutputStream byteArrayOSImagePhoto = null;
-        ByteArrayOutputStream byteArrayOSImageSignature = null;
 
         if (moBizPartner == null) {
             moBizPartner = new SDataBizPartner();
@@ -2149,7 +2175,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         }
         
         moEmployee.setSalarySscBase(moFieldSalarySscBase.getDouble());
-        moEmployee.setDateSalarySscBase(moFieldDateChangeSalarySscBase.getDate());
+        moEmployee.setDateSalarySscBase(moFieldDateChangeSalarySscBase.getDate() != null ? miClient.getSession().getCurrentDate() : moFieldDateChangeSalarySscBase.getDate());
         
         moEmployee.setWorkingHoursDay(moFieldWorkingHoursDay.getInteger());
         moEmployee.setBankAccount(moFieldBankAccount.getString());

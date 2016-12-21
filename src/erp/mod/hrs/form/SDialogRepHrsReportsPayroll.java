@@ -343,6 +343,7 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
                         orderBy += "dep.name, dep.id_dep, ";
                     }
                 }
+                
                 if (moRadOrderByNumEmployee.isSelected()) {
                     orderBy += "CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp ";
                 }

@@ -769,6 +769,14 @@
                             <Property name="verticalGap" type="int" value="0"/>
                           </Layout>
                           <SubComponents>
+                            <Component class="javax.swing.JCheckBox" name="jckIsLaborUnion">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Es sindicalizado"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[115, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
                             <Component class="javax.swing.JCheckBox" name="jckIsMfgOperator">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Es operador"/>
@@ -896,6 +904,26 @@
                             <Property name="alignment" type="int" value="3"/>
                             <Property name="verticalGap" type="int" value="0"/>
                           </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlFkRecruitmentType">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Tipo contrato:*"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[125, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JComboBox" name="jcbFkRecruitmentType">
+                              <Properties>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[200, 23]"/>
+                                </Property>
+                              </Properties>
+                              <AuxValues>
+                                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+                              </AuxValues>
+                            </Component>
+                          </SubComponents>
                         </Container>
                         <Container class="javax.swing.JPanel" name="jPanel33">
 

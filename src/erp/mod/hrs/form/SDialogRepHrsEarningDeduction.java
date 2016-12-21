@@ -827,7 +827,7 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
             moParamsMap.put("sSqlWhereDeduction", !moKeyDeduction.isEnabled() ? " AND ded.id_ded = 0 " : moKeyDeduction.getSelectedIndex() > 0 ? " AND ded.id_ded = " + moKeyDeduction.getValue()[0] : "");
         }
         
-        if (moRadIsDetailPayroll.isSelected()) {
+        if (moRadIsSummary.isSelected() || moRadIsDetailPayroll.isSelected()) {
             mnFormType = SModConsts.HRSR_PAY_EAR_DED;
             
             moParamsMap.put("sSqlOrderBy", getOrderBy());

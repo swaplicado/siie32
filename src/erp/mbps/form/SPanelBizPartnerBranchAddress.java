@@ -91,6 +91,7 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         jPanel5 = new javax.swing.JPanel();
         jlState = new javax.swing.JLabel();
         jtfState = new javax.swing.JTextField();
+        jcbFkStateId_n = new javax.swing.JComboBox();
         jPanel6 = new javax.swing.JPanel();
         jlZipCode = new javax.swing.JLabel();
         jtfZipCode = new javax.swing.JTextField();
@@ -181,6 +182,11 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         jtfState.setPreferredSize(new java.awt.Dimension(265, 23));
         jPanel5.add(jtfState);
 
+        jcbFkStateId_n.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbFkStateId_n.setToolTipText("País");
+        jcbFkStateId_n.setPreferredSize(new java.awt.Dimension(265, 23));
+        jPanel5.add(jcbFkStateId_n);
+
         add(jPanel5);
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
@@ -200,6 +206,11 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         jcbFkCountryId_n.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbFkCountryId_n.setToolTipText("País");
         jcbFkCountryId_n.setPreferredSize(new java.awt.Dimension(232, 23));
+        jcbFkCountryId_n.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jcbFkCountryId_nItemStateChanged(evt);
+            }
+        });
         jPanel6.add(jcbFkCountryId_n);
 
         jbFkCountryId_n.setText("...");
@@ -217,6 +228,10 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
 
         add(jPanel6);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jcbFkCountryId_nItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbFkCountryId_nItemStateChanged
+        itemChangedCountry();
+    }//GEN-LAST:event_jcbFkCountryId_nItemStateChanged
 
     private void initComponentsExtra() {
         mvFields = new Vector<SFormField>();
@@ -278,6 +293,28 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         jcbFkCountryId_n.setEnabled(enable);
         jbFkCountryId_n.setEnabled(enable);
     }
+    
+    private void itemChangedCountry() {
+        jtfState.setVisible(true);
+        jcbFkStateId_n.setVisible(false);
+            
+        if (jcbFkCountryId_n.isEnabled()) {
+            if (jcbFkCountryId_n.getSelectedIndex() > 0 && moFieldFkCountryId.getKeyAsIntArray()[0] == miClient.getSessionXXX().getParamsErp().getFkCountryId()) {
+                jtfState.setVisible(false);
+                jcbFkStateId_n.setVisible(true);
+                populateStates(moFieldFkCountryId.getKeyAsIntArray()[0]);
+            }
+        }
+        else {
+            jtfState.setVisible(false);
+            jcbFkStateId_n.setVisible(true);
+        }
+    }
+    
+    private void populateStates(int countryId) {
+        //SFormUtilities.populateComboBox(miClient, jcbFkCountryId_n, SDataConstants.LOCU_CTY, new int[] { countryId });
+        SFormUtilities.populateComboBox(miClient, jcbFkCountryId_n, SDataConstants.LOCU_CTY);
+    }
 
     private void renderAddress() {
         if (mbParamIsInMainWindow) {
@@ -305,6 +342,7 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
     private javax.swing.JButton jbEditCountry;
     private javax.swing.JButton jbFkCountryId_n;
     private javax.swing.JComboBox jcbFkCountryId_n;
+    private javax.swing.JComboBox jcbFkStateId_n;
     private javax.swing.JCheckBox jckIsDefault;
     private javax.swing.JLabel jlAddress;
     private javax.swing.JLabel jlLocality;
@@ -435,6 +473,7 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
 
         renderAddress();
         setCountryEnabled(moBizPartnerBranchAddress.getFkCountryId_n() != SLibConstants.UNDEFINED && moBizPartnerBranchAddress.getFkCountryId_n() != miClient.getSessionXXX().getParamsErp().getFkCountryId());
+        itemChangedCountry();
     }
 
     @Override

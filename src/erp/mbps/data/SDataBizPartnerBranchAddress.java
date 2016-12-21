@@ -40,6 +40,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
     protected boolean mbIsDefault;
     protected boolean mbIsDeleted;
     protected int mnFkAddressTypeId;
+    protected int mnFkStateId_n;
     protected int mnFkCountryId_n;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
@@ -79,6 +80,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
     public void setIsDefault(boolean b) { mbIsDefault = b; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkAddressTypeId(int n) { mnFkAddressTypeId = n; }
+    public void setFkStateId_n(int n) { mnFkStateId_n = n; }
     public void setFkCountryId_n(int n) { mnFkCountryId_n = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
@@ -103,6 +105,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
     public boolean getIsDefault() { return mbIsDefault; }
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkAddressTypeId() { return mnFkAddressTypeId; }
+    public int getFkStateId_n() { return mnFkStateId_n; }
     public int getFkCountryId_n() { return mnFkCountryId_n; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
@@ -157,6 +160,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
         mbIsDefault = false;
         mbIsDeleted = false;
         mnFkAddressTypeId = 0;
+        mnFkStateId_n = 0;
         mnFkCountryId_n = 0;
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
@@ -216,6 +220,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
                 mbIsDefault = resultSet.getBoolean("a.b_def");
                 mbIsDeleted = resultSet.getBoolean("a.b_del");
                 mnFkAddressTypeId = resultSet.getInt("a.fid_tp_add");
+                //mnFkStateId_n = resultSet.getInt("a.fid_sta_n");
                 mnFkCountryId_n = resultSet.getInt("a.fid_cty_n");
                 mnFkUserNewId = resultSet.getInt("a.fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("a.fid_usr_edit");
@@ -232,6 +237,14 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
                 // Read aswell dependant registries:
 
                 moDbmsDataCountry = new SDataCountry();
+                
+                if (mnFkStateId_n != SLibConstants.UNDEFINED) {
+                    sql = "SELECT name FROM erp.locu_sta WHERE id_sta = " + key[0] + " ";
+                    resultSet = statement.executeQuery(sql);
+                    if (resultSet.next()) {
+                        msState = resultSet.getString("name");
+                    }
+                }
                 
                 if (mnFkCountryId_n == SLibConstants.UNDEFINED) {
                     moParamsErp = new SDataParamsErp();
@@ -293,6 +306,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
             callableStatement.setBoolean(nParam++, mbIsDefault);
             callableStatement.setBoolean(nParam++, mbIsDeleted);
             callableStatement.setInt(nParam++, mnFkAddressTypeId);
+            //if (mnFkStateId_n > SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkStateId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
             if (mnFkCountryId_n > 0 && mnFkCountryId_n != mnAuxCountrySysId) callableStatement.setInt(nParam++, mnFkCountryId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);

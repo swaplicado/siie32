@@ -180,74 +180,74 @@ public class SHrsFormerPayroll {
 
             for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
                 if (element.getName().compareTo("nomina:Nomina") == 0) {
-                    payrollReceipt.setRegistroPatronal(((cfd.ver3.DElementNomina) element).getAttRegistroPatronal().getString());
-                    payrollReceipt.setNumEmpleado(((cfd.ver3.DElementNomina) element).getAttNumEmpleado().getString());
-                    payrollReceipt.setCurp(((cfd.ver3.DElementNomina) element).getAttCurp().getString());
-                    payrollReceipt.setTipoRegimen(((cfd.ver3.DElementNomina) element).getAttTipoRegimen().getInteger());
-                    payrollReceipt.setNumSeguridadSocial(((cfd.ver3.DElementNomina) element).getAttNumSeguridadSocial().getString());
-                    payrollReceipt.setFechaPago(((cfd.ver3.DElementNomina) element).getAttFechaPago().getDate());
-                    payrollReceipt.setFechaInicialPago(((cfd.ver3.DElementNomina) element).getAttFechaInicialPago().getDate());
-                    payrollReceipt.setFechaFinalPago(((cfd.ver3.DElementNomina) element).getAttFechaFinalPago().getDate());
-                    payrollReceipt.setNumDiasPagados(((cfd.ver3.DElementNomina) element).getAttNumDiasPagados().getDouble());
-                    payrollReceipt.setDepartamento(((cfd.ver3.DElementNomina) element).getAttDepartamento().getString());
-                    payrollReceipt.setClabe(((cfd.ver3.DElementNomina) element).getAttClabe().getString());
-                    payrollReceipt.setBanco(((cfd.ver3.DElementNomina) element).getAttBanco().getInteger());
-                    payrollReceipt.setFechaInicioRelLaboral(((cfd.ver3.DElementNomina) element).getAttFechaInicioRelLaboral().getDate());
-                    payrollReceipt.setAntiguedad(((cfd.ver3.DElementNomina) element).getAttAntiguedad().getInteger());
-                    payrollReceipt.setPuesto(((cfd.ver3.DElementNomina) element).getAttPuesto().getString());
-                    payrollReceipt.setTipoContrato(((cfd.ver3.DElementNomina) element).getAttTipoContrato().getString());
-                    payrollReceipt.setTipoJornada(((cfd.ver3.DElementNomina) element).getAttTipoJornada().getString());
-                    payrollReceipt.setPeriodicidadPago(((cfd.ver3.DElementNomina) element).getAttPeriodicidadPago().getString());
-                    payrollReceipt.setSalarioBaseCotApor(((cfd.ver3.DElementNomina) element).getAttSalarioBaseCotApor().getDouble());
-                    payrollReceipt.setRiesgoPuesto(((cfd.ver3.DElementNomina) element).getAttRiesgoPuesto().getInteger());
-                    payrollReceipt.setSalarioDiarioIntegrado(((cfd.ver3.DElementNomina) element).getAttSalarioDiarioIntegrado().getDouble());
+                    payrollReceipt.setRegistroPatronal(((cfd.ver3.nom11.DElementNomina) element).getAttRegistroPatronal().getString());
+                    payrollReceipt.setNumEmpleado(((cfd.ver3.nom11.DElementNomina) element).getAttNumEmpleado().getString());
+                    payrollReceipt.setCurp(((cfd.ver3.nom11.DElementNomina) element).getAttCurp().getString());
+                    payrollReceipt.setTipoRegimen(((cfd.ver3.nom11.DElementNomina) element).getAttTipoRegimen().getInteger());
+                    payrollReceipt.setNumSeguridadSocial(((cfd.ver3.nom11.DElementNomina) element).getAttNumSeguridadSocial().getString());
+                    payrollReceipt.setFechaPago(((cfd.ver3.nom11.DElementNomina) element).getAttFechaPago().getDate());
+                    payrollReceipt.setFechaInicialPago(((cfd.ver3.nom11.DElementNomina) element).getAttFechaInicialPago().getDate());
+                    payrollReceipt.setFechaFinalPago(((cfd.ver3.nom11.DElementNomina) element).getAttFechaFinalPago().getDate());
+                    payrollReceipt.setNumDiasPagados(((cfd.ver3.nom11.DElementNomina) element).getAttNumDiasPagados().getDouble());
+                    payrollReceipt.setDepartamento(((cfd.ver3.nom11.DElementNomina) element).getAttDepartamento().getString());
+                    payrollReceipt.setClabe(((cfd.ver3.nom11.DElementNomina) element).getAttClabe().getString());
+                    payrollReceipt.setBanco(((cfd.ver3.nom11.DElementNomina) element).getAttBanco().getInteger());
+                    payrollReceipt.setFechaInicioRelLaboral(((cfd.ver3.nom11.DElementNomina) element).getAttFechaInicioRelLaboral().getDate());
+                    payrollReceipt.setAntiguedad(((cfd.ver3.nom11.DElementNomina) element).getAttAntiguedad().getInteger());
+                    payrollReceipt.setPuesto(((cfd.ver3.nom11.DElementNomina) element).getAttPuesto().getString());
+                    payrollReceipt.setTipoContrato(((cfd.ver3.nom11.DElementNomina) element).getAttTipoContrato().getString());
+                    payrollReceipt.setTipoJornada(((cfd.ver3.nom11.DElementNomina) element).getAttTipoJornada().getString());
+                    payrollReceipt.setPeriodicidadPago(((cfd.ver3.nom11.DElementNomina) element).getAttPeriodicidadPago().getString());
+                    payrollReceipt.setSalarioBaseCotApor(((cfd.ver3.nom11.DElementNomina) element).getAttSalarioBaseCotApor().getDouble());
+                    payrollReceipt.setRiesgoPuesto(((cfd.ver3.nom11.DElementNomina) element).getAttRiesgoPuesto().getInteger());
+                    payrollReceipt.setSalarioDiarioIntegrado(((cfd.ver3.nom11.DElementNomina) element).getAttSalarioDiarioIntegrado().getDouble());
                     payrollReceipt.setMetodoPagoAux(comprobante.getAttMetodoDePago().getString());
                     payrollReceipt.setSerie(comprobante.getAttSerie().getString());
                     payrollReceipt.setMoneda(comprobante.getAttMoneda().getString());
 
                     // Perceptions:
 
-                    if (((cfd.ver3.DElementNomina) element).getEltPercepciones() != null) {
-                        for (int i = 0; i < ((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().size(); i++) {
+                    if (((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones() != null) {
+                        for (int i = 0; i < ((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().size(); i++) {
                             payrollConcept = new SHrsFormerPayrollConcept();
 
                             payrollConcept.setPkTipoConcepto(SCfdConsts.CFDI_PAYROLL_PERCEPTION_PERCEPTION[0]);
                             payrollConcept.setPkSubtipoConcepto(SCfdConsts.CFDI_PAYROLL_PERCEPTION_PERCEPTION[1]);
-                            payrollConcept.setClaveOficial(((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttTipoPercepcion().getInteger());
-                            payrollConcept.setClaveEmpresa("" + SLibUtils.parseInt(((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttClave().getString()));
-                            payrollConcept.setConcepto(((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttConcepto().getString());
-                            payrollConcept.setTotalGravado(((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteGravado().getDouble());
-                            payrollConcept.setTotalExento(((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteExento().getDouble());
+                            payrollConcept.setClaveOficial(((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttTipoPercepcion().getInteger());
+                            payrollConcept.setClaveEmpresa("" + SLibUtils.parseInt(((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttClave().getString()));
+                            payrollConcept.setConcepto(((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttConcepto().getString());
+                            payrollConcept.setTotalGravado(((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteGravado().getDouble());
+                            payrollConcept.setTotalExento(((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteExento().getDouble());
 
-                            dTotalIncome += ((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteGravado().getDouble() +
-                                            ((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteExento().getDouble();
+                            dTotalIncome += ((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteGravado().getDouble() +
+                                            ((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteExento().getDouble();
 
                             payrollReceipt.getChildPayrollConcept().add(payrollConcept);
 
-                            if (((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttTipoPercepcion().getInteger() == SCfdConsts.PER_HRS_EXT) {
+                            if (((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttTipoPercepcion().getInteger() == SCfdConsts.PER_HRS_EXT) {
                                 payrollExtraTime = new SHrsFormerPayrollExtraTime();
 
-                                for (int j = 0; j < ((cfd.ver3.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().size(); j++) {
-                                    if (((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttClave().getString().compareTo(SCfdConsts.PAYROLL_EXTRA_TIME) == 0) {
+                                for (int j = 0; j < ((cfd.ver3.nom11.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().size(); j++) {
+                                    if (((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttClave().getString().compareTo(SCfdConsts.PAYROLL_EXTRA_TIME) == 0) {
                                         payrollConcept.setPkSubtipoConcepto(SCfdConsts.CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_DOUBLE[1]);
                                         payrollConcept.setCantidad(0);
                                         payrollConcept.setHoras_r(0);
                                         payrollExtraTime.setImportePagado(0);
                                     }
-                                    else if (((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttClave().getString().compareTo(SCfdConsts.PAYROLL_EXTRA_TIME_TYPE_DOUBLE) == 0) {
-                                            if (((cfd.ver3.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(j).getAttTipoHoras().getString().compareTo(SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE) == 0) {
+                                    else if (((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttClave().getString().compareTo(SCfdConsts.PAYROLL_EXTRA_TIME_TYPE_DOUBLE) == 0) {
+                                            if (((cfd.ver3.nom11.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(j).getAttTipoHoras().getString().compareTo(SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE) == 0) {
                                                 payrollConcept.setPkSubtipoConcepto(SCfdConsts.CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_DOUBLE[1]);
-                                                payrollConcept.setCantidad(((cfd.ver3.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(j).getAttDias().getInteger());
-                                                payrollConcept.setHoras_r(((cfd.ver3.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(j).getAttHorasExtra().getInteger());
-                                                payrollExtraTime.setImportePagado(((cfd.ver3.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(j).getAttImportePagado().getDouble());
+                                                payrollConcept.setCantidad(((cfd.ver3.nom11.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(j).getAttDias().getInteger());
+                                                payrollConcept.setHoras_r(((cfd.ver3.nom11.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(j).getAttHorasExtra().getInteger());
+                                                payrollExtraTime.setImportePagado(((cfd.ver3.nom11.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(j).getAttImportePagado().getDouble());
                                             }
                                     }
-                                    else if (((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttClave().getString().compareTo(SCfdConsts.PAYROLL_EXTRA_TIME_TYPE_TRIPLE) == 0) {
-                                            if (((cfd.ver3.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(j).getAttTipoHoras().getString().compareTo(SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_TRIPLE) == 0) {
+                                    else if (((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttClave().getString().compareTo(SCfdConsts.PAYROLL_EXTRA_TIME_TYPE_TRIPLE) == 0) {
+                                            if (((cfd.ver3.nom11.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(j).getAttTipoHoras().getString().compareTo(SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_TRIPLE) == 0) {
                                                 payrollConcept.setPkSubtipoConcepto(SCfdConsts.CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_TRIPLE[1]);
-                                                payrollConcept.setCantidad(((cfd.ver3.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(j).getAttDias().getInteger());
-                                                payrollConcept.setHoras_r(((cfd.ver3.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(j).getAttHorasExtra().getInteger());
-                                                payrollExtraTime.setImportePagado(((cfd.ver3.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(j).getAttImportePagado().getDouble());
+                                                payrollConcept.setCantidad(((cfd.ver3.nom11.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(j).getAttDias().getInteger());
+                                                payrollConcept.setHoras_r(((cfd.ver3.nom11.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(j).getAttHorasExtra().getInteger());
+                                                payrollExtraTime.setImportePagado(((cfd.ver3.nom11.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(j).getAttImportePagado().getDouble());
                                             }
                                     }
                                 }
@@ -265,25 +265,25 @@ public class SHrsFormerPayroll {
 
                     // Deductions:
 
-                    if (((cfd.ver3.DElementNomina) element).getEltDeducciones() != null) {
-                        for (int i = 0; i < ((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().size(); i++) {
+                    if (((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones() != null) {
+                        for (int i = 0; i < ((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().size(); i++) {
                             payrollConcept = new SHrsFormerPayrollConcept();
 
                             payrollConcept.setPkTipoConcepto(SCfdConsts.CFDI_PAYROLL_DEDUCTION_DEDUCTION[0]);
                             payrollConcept.setPkSubtipoConcepto(SCfdConsts.CFDI_PAYROLL_DEDUCTION_DEDUCTION[1]);
-                            payrollConcept.setClaveOficial(((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttTipoDeduccion().getInteger());
-                            payrollConcept.setClaveEmpresa("" + SLibUtils.parseInt(((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttClave().getString()));
-                            payrollConcept.setConcepto(((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttConcepto().getString());
-                            payrollConcept.setTotalGravado(((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteGravado().getDouble());
-                            payrollConcept.setTotalExento(((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteExento().getDouble());
+                            payrollConcept.setClaveOficial(((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttTipoDeduccion().getInteger());
+                            payrollConcept.setClaveEmpresa("" + SLibUtils.parseInt(((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttClave().getString()));
+                            payrollConcept.setConcepto(((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttConcepto().getString());
+                            payrollConcept.setTotalGravado(((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteGravado().getDouble());
+                            payrollConcept.setTotalExento(((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteExento().getDouble());
 
-                            dTotalDeductions += ((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteGravado().getDouble() +
-                                            ((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteExento().getDouble();
+                            dTotalDeductions += ((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteGravado().getDouble() +
+                                            ((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteExento().getDouble();
 
                             payrollReceipt.getChildPayrollConcept().add(payrollConcept);
 
-                            if (SLibUtils.belongsTo(((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttTipoDeduccion().getInteger(), new int[] { SCfdConsts.DED_INC, SCfdConsts.DED_AUS })) {
-                                for (int j = 0; j < ((cfd.ver3.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().size(); j++) {
+                            if (SLibUtils.belongsTo(((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttTipoDeduccion().getInteger(), new int[] { SCfdConsts.DED_INC, SCfdConsts.DED_AUS })) {
+                                for (int j = 0; j < ((cfd.ver3.nom11.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().size(); j++) {
                                 }
                             }
                         }

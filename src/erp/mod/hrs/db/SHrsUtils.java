@@ -1987,6 +1987,7 @@ public abstract class SHrsUtils {
                 "emp.dt_hire AS f_emp_alta, p.dt_sta AS f_nom_date_start, p.dt_end AS f_nom_date_end, " +
                 "TIMESTAMPDIFF(DAY, emp.dt_ben, p.dt_end) / " + SHrsConsts.WEEK_DAYS + " AS f_emp_sen, pos.name AS f_emp_pos, " +
                 "'' AS f_emp_cont_tp, '' AS f_emp_jorn_tp, tp.name AS f_emp_pay, rcp.sal_ssc AS f_emp_sal_bc, ris.id_tp_pos_risk AS f_emp_risk, " +
+                "'' AS f_emp_union, " +
                 "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
                 "FROM hrs_pay_rcp AS r " +
                 "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
@@ -2074,6 +2075,7 @@ public abstract class SHrsUtils {
             hrsPayrollReceipt.setPeriodicidadPago(SLibUtilities.textTrim(resultSet.getString("f_emp_pay")));
             hrsPayrollReceipt.setSalarioBaseCotApor(resultSet.getDouble("f_emp_sal_bc"));
             hrsPayrollReceipt.setRiesgoPuesto(resultSet.getInt("f_emp_risk"));
+            hrsPayrollReceipt.setSindicalizado(SLibUtilities.textTrim(resultSet.getString("f_emp_union")));
             hrsPayrollReceipt.setSalarioDiarioIntegrado(hrsPayrollReceipt.getSalarioBaseCotApor());
             /* XXX (2016-08-31) jbarajas It're obtained detail of earnings and deductions.
             hrsPayrollReceipt.setTotalPercepciones(resultSet.getDouble("f_ear"));
@@ -2081,6 +2083,7 @@ public abstract class SHrsUtils {
             hrsPayrollReceipt.setTotalRetenciones(resultSet.getDouble("f_emp_tot_rent_ret"));
             hrsPayrollReceipt.setTotalNeto(resultSet.getDouble("f_emp_tot_net"));
             */
+            hrsPayrollReceipt.setClaveEstado(SLibUtilities.textTrim(resultSetClient.getString("bpb.id_bpb")));
             hrsPayrollReceipt.setFechaEdicion(resultSet.getDate("f_emp_date_edit"));
             hrsPayrollReceipt.setSerie(SLibUtilities.textTrim(resultSet.getString("pei.num_ser")));
             hrsPayrollReceipt.setFolio(resultSet.getInt("pei.num"));
