@@ -2593,7 +2593,7 @@ public abstract class SDataReadTableRows {
 
                 sSql = "SELECT id_plist, plist " +
                         "FROM mkt_plist " +
-                        "WHERE b_del = false " +
+                        "WHERE b_del = false " + (filterKey == null ? "" : "AND fid_ct_dps = " + ((Integer) filterKey == SDataConstantsSys.BPSS_CT_BP_CUS ? SDataConstantsSys.TRNS_CT_DPS_SAL : SDataConstantsSys.TRNS_CT_DPS_PUR)) + " " +
                         "ORDER BY plist; ";
                 break;
 

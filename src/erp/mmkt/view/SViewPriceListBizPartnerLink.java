@@ -59,7 +59,7 @@ public class SViewPriceListBizPartnerLink extends erp.lib.table.STableTab implem
             mnTabTypeAux01 == SModSysConsts.BPSS_LINK_CUS_MKT_TP ? "Tipo cliente" :
             mnTabTypeAux01 == SModSysConsts.BPSS_LINK_BP_TP ? "Tipo asoc. negocios" : ""), 300);
         if (mnTabTypeAux01 == SModSysConsts.BPSS_LINK_BPB) {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb.bpb", "Sucursal asociado", 150);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb.bpb", "Sucursal " + (mnTabTypeAux02 == SDataConstantsSys.BPSS_CT_BP_CUS ? "cliente" : "proveedor"), 150);
         }
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "c.id_dt_start", "Ini. vigencia", STableConstants.WIDTH_DATE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "p.plist", "Lista precios", 200);

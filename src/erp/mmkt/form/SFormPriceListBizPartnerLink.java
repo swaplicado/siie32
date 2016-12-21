@@ -331,15 +331,14 @@ public class SFormPriceListBizPartnerLink extends javax.swing.JDialog implements
             case SModSysConsts.BPSS_LINK_BP:
             case SModSysConsts.BPSS_LINK_BPB:
                 mnReferenceDataType = mnParamBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_CUS ? SDataConstants.BPSX_BP_CUS : SDataConstants.BPSX_BP_SUP;
-                label = (mnParamBizPartnerLinkType == SModSysConsts.BPSS_LINK_BP ? "" : SUtilConsts.TXT_BRANCH + " ") + SBpsUtils.getBizPartnerCategoryName(mnParamBizPartnerCategory, SUtilConsts.NUM_SNG);
+                label = (mnParamBizPartnerLinkType == SModSysConsts.BPSS_LINK_BP ? "" : SUtilConsts.TXT_BRANCH + " ") + SBpsUtils.getBizPartnerCategoryName(mnParamBizPartnerCategory, SUtilConsts.NUM_SNG);        
                 break;
             default:
         }
         
-        jlPkReferenceId.setText(label + ":*");
-        jbPkReferenceId.setToolTipText(SGuiConsts.TXT_BTN_SELECT + " " + label.toLowerCase());
         setTitle("Lista de precios por " + label.toLowerCase());
-        
+        jlPkReferenceId.setText(SBpsUtils.getBizPartnerCategoryName(mnParamBizPartnerCategory, SUtilConsts.NUM_SNG) + ": *");
+        jbPkReferenceId.setToolTipText(SGuiConsts.TXT_BTN_SELECT + " " + SBpsUtils.getBizPartnerCategoryName(mnParamBizPartnerCategory, SUtilConsts.NUM_SNG).toLowerCase());        
         formRefreshCatalogues();
     }
 
@@ -375,8 +374,8 @@ public class SFormPriceListBizPartnerLink extends javax.swing.JDialog implements
         miClient.pickOption(
             mnParamBizPartnerLinkType == SModSysConsts.BPSS_LINK_CUS_MKT_TP ? SDataConstants.MKTU_TP_CUS :
             mnParamBizPartnerLinkType == SModSysConsts.BPSS_LINK_BP_TP ? SDataConstants.BPSU_TP_BP :
-            mnParamBizPartnerLinkType == SModSysConsts.BPSS_LINK_BP ? SDataConstants.BPSX_BP_CUS :
-            mnParamBizPartnerLinkType == SModSysConsts.BPSS_LINK_BPB ? SDataConstants.BPSX_BP_CUS : SLibConstants.UNDEFINED, moFieldPkReferenceId, null);
+            mnParamBizPartnerLinkType == SModSysConsts.BPSS_LINK_BP ? mnParamBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_CUS ? SDataConstants.BPSX_BP_CUS : SDataConstants.BPSX_BP_SUP :
+            mnParamBizPartnerLinkType == SModSysConsts.BPSS_LINK_BPB ? mnParamBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_CUS ? SDataConstants.BPSX_BP_CUS : SDataConstants.BPSX_BP_SUP : SLibConstants.UNDEFINED, moFieldPkReferenceId, null);
     }
     
     private void actionPkBizPartnerBranchId() {
@@ -489,7 +488,7 @@ public class SFormPriceListBizPartnerLink extends javax.swing.JDialog implements
                     SFormUtilities.populateComboBox(miClient, jcbPkReferenceId, mnReferenceDataType);
                     break;
                 case SModSysConsts.BPSS_LINK_BP_TP:
-                    SFormUtilities.populateComboBox(miClient, jcbPkReferenceId, mnReferenceDataType,mnParamBizPartnerCategory);
+                    SFormUtilities.populateComboBox(miClient, jcbPkReferenceId, mnReferenceDataType, mnParamBizPartnerCategory);
                     break;
                 case SModSysConsts.BPSS_LINK_BP:
                 case SModSysConsts.BPSS_LINK_BPB:    
@@ -617,10 +616,10 @@ public class SFormPriceListBizPartnerLink extends javax.swing.JDialog implements
          switch (type) {
             case SDataConstants.BPSS_LINK:
                 mnParamBizPartnerLinkType = (Integer) value;
-                computeBizPartnerLinkType();
                 break;
             case SModConsts.BPSS_CT_BP:
                 mnParamBizPartnerCategory = (Integer) value;
+                computeBizPartnerLinkType();
                 break;
             default:
         }

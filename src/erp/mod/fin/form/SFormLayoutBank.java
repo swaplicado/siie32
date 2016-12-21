@@ -987,8 +987,8 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
             if (moKeyBankLayoutType.getSelectedItem().getPrimaryKey()[0] != SLibConstants.UNDEFINED) {
                 miClient.getSession().populateCatalogue(moKeyAccountDebit, SModConsts.FIN_ACC_CASH, SModConsts.FINX_ACC_CASH_BANK, new SGuiParams( new int[] { moKeyCurrencyBank.getValue()[0], ((int[]) ((SGuiItem) moKeyBankLayoutType.getSelectedItem()).getForeignKey())[1] }));
                 moCurExchangeRate.setCompoundText(SDataReadDescriptions.getCatalogueDescription(((SClientInterface) miClient), SDataConstants.CFGU_CUR, new int[] { moKeyCurrencyBank.getValue()[0] }, SLibConstants.DESCRIPTION_CODE)); 
+                moKeyAccountDebit.setEnabled(true);
             }
-            moKeyAccountDebit.setEnabled(true);
         }
         else {
             moKeyAccountDebit.removeAllItems();
