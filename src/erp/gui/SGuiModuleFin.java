@@ -233,6 +233,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiRepBizPartnerBalCdr;
     private javax.swing.JMenuItem jmiRepBizPartnerBalDpsCus;
     private javax.swing.JMenuItem jmiRepBizPartnerBalDpsSup;
+    private javax.swing.JMenuItem jmiQryCurrencyBalanceCus;
+    private javax.swing.JMenuItem jmiQryCurrencyBalanceBizPartnerCus;
+    private javax.swing.JMenuItem jmiQryCurrencyBalanceSup;
+    private javax.swing.JMenuItem jmiQryCurrencyBalanceBizPartnerSup;
     private javax.swing.JMenu jmRepBizPartnerBalAging;
     private javax.swing.JMenuItem jmiRepBizPartnerBalAgingCus;
     private javax.swing.JMenuItem jmiRepBizPartnerBalAgingSup;
@@ -603,6 +607,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepBizPartnerBalCdr = new JMenuItem("Saldos de acreedores diversos...");
         jmiRepBizPartnerBalDpsCus = new JMenuItem("Saldos de clientes por documento...");
         jmiRepBizPartnerBalDpsSup = new JMenuItem("Saldos de proveedores por documento...");
+        jmiQryCurrencyBalanceCus =  new JMenuItem("Consulta de cuentas por cobrar por moneda");
+        jmiQryCurrencyBalanceBizPartnerCus =  new JMenuItem("Consulta de cuentas por cobrar por moneda-cliente");
+        jmiQryCurrencyBalanceSup =  new JMenuItem("Consulta de cuentas por pagar por moneda");
+        jmiQryCurrencyBalanceBizPartnerSup =  new JMenuItem("Consulta de cuentas por pagar por moneda-proveedor");
         jmRepBizPartnerBalAging = new JMenu("Antigüedad de saldos de asociados de negocios");
         jmiRepBizPartnerBalAgingCus = new JMenuItem("Antigüedad de saldos de clientes...");
         jmiRepBizPartnerBalAgingSup = new JMenuItem("Antigüedad de saldos de proveedores...");
@@ -691,6 +699,11 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRepBizPartnerBal.addSeparator();
         jmRepBizPartnerBal.add(jmiRepBizPartnerBalDpsCus);
         jmRepBizPartnerBal.add(jmiRepBizPartnerBalDpsSup);
+        jmRepBizPartnerBal.addSeparator();
+        jmRepBizPartnerBal.add(jmiQryCurrencyBalanceCus);
+        jmRepBizPartnerBal.add(jmiQryCurrencyBalanceBizPartnerCus);
+        jmRepBizPartnerBal.add(jmiQryCurrencyBalanceSup);
+        jmRepBizPartnerBal.add(jmiQryCurrencyBalanceBizPartnerSup);
         jmRep.add(jmRepBizPartnerBal);
         jmRepBizPartnerBalAging.add(jmiRepBizPartnerBalAgingCus);
         jmRepBizPartnerBalAging.add(jmiRepBizPartnerBalAgingSup);
@@ -857,6 +870,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepBizPartnerBalCdr.addActionListener(this);
         jmiRepBizPartnerBalDpsCus.addActionListener(this);
         jmiRepBizPartnerBalDpsSup.addActionListener(this);
+        jmiQryCurrencyBalanceCus.addActionListener(this);
+        jmiQryCurrencyBalanceBizPartnerCus.addActionListener(this);
+        jmiQryCurrencyBalanceSup.addActionListener(this);
+        jmiQryCurrencyBalanceBizPartnerSup.addActionListener(this);
         jmiRepBizPartnerBalAgingCus.addActionListener(this);
         jmiRepBizPartnerBalAgingSup.addActionListener(this);
         jmiRepBizPartnerStatCus.addActionListener(this);
@@ -2012,6 +2029,18 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiRepBizPartnerBalDpsSup) {
                 new SDialogRepBizPartnerBalanceDps(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
+            }
+            else if (item == jmiQryCurrencyBalanceCus) {
+                miClient.getSession().showView(SModConsts.TRNX_BP_BAL_CUR, SDataConstantsSys.TRNS_CT_DPS_SAL, new SGuiParams(SDataConstantsSys.UNDEFINED));
+            }
+            else if (item == jmiQryCurrencyBalanceBizPartnerCus) {
+                miClient.getSession().showView(SModConsts.TRNX_BP_BAL_CUR, SDataConstantsSys.TRNS_CT_DPS_SAL, new SGuiParams(SGuiConsts.PARAM_BPR));
+            }
+            else if (item == jmiQryCurrencyBalanceSup) {
+                miClient.getSession().showView(SModConsts.TRNX_BP_BAL_CUR, SDataConstantsSys.TRNS_CT_DPS_PUR, new SGuiParams(SDataConstantsSys.UNDEFINED));
+            }
+            else if (item == jmiQryCurrencyBalanceBizPartnerSup) {
+                miClient.getSession().showView(SModConsts.TRNX_BP_BAL_CUR, SDataConstantsSys.TRNS_CT_DPS_PUR, new SGuiParams(SGuiConsts.PARAM_BPR));
             }
             else if (item == jmiRepBizPartnerBalAgingCus) {
                 new SDialogRepBizPartnerBalanceAging(miClient, SDataRepConstants.REP_ACC_AGI + " " + SBpsUtils.getBizPartnerCategoryName(SModSysConsts.BPSS_CT_BP_CUS, SUtilConsts.NUM_PLR).toLowerCase(), SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);

@@ -75,20 +75,20 @@ public class SViewCurrencyBalance extends SGridPaneView {
                 "re.fid_cur AS " + SDbConsts.FIELD_ID + "1, " +
                 "'' AS " + SDbConsts.FIELD_CODE + ", " +
                 "'' AS " + SDbConsts.FIELD_NAME + ", " +
-                "ccur.cur AS _currency, " +
+                "c.cur AS _currency, " +
                 "(IF(ba.fid_cty_n = " + miClient.getSession().getSessionCustom().getLocalCountryKey()[0] + " OR ba.fid_cty_n IS NULL, " +
                 "'" + STrnConsts.TXT_TRN_DOM + "', '" + STrnConsts.TXT_TRN_INT + "')) AS _oper_type, " +
                 "SUM(re.debit - re.credit) AS _bal, " +
                 "SUM(re.debit_cur - re.credit_cur) AS _bal_cur, " +
-                "ccur.cur_key AS _currency_key, " +
+                "c.cur_key AS _currency_key, " +
                 "b.bp, ba.fid_cty_n " +
                 "FROM fin_rec AS r " +
                 "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num " +
+                "INNER JOIN erp.cfgu_cur AS c ON re.fid_cur = c.id_cur " +
+                "INNER JOIN fin_acc AS a ON re.fid_acc = a.id_acc " +
                 "INNER JOIN erp.bpsu_bp AS b ON re.fid_bp_nr = b.id_bp " +
-                "INNER JOIN erp.bpsu_bp_ct AS bct ON re.fid_bp_nr = bct.id_bp AND bct.id_ct_bp = " + (mnGridSubtype == SDataConstantsSys.TRNS_CT_DPS_SAL ? SDataConstantsSys.BPSS_CT_BP_CUS : SDataConstantsSys.BPSS_CT_BP_SUP) + " " +
                 "INNER JOIN erp.bpsu_bpb AS bpb ON b.id_bp = bpb.fid_bp AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " " +
                 "INNER JOIN erp.bpsu_bpb_add ba ON bpb.id_bpb = ba.id_bpb AND ba.fid_tp_add = " + SDataConstantsSys.BPSS_TP_ADD_OFF + " " +
-                "INNER JOIN erp.cfgu_cur AS ccur ON re.fid_cur = ccur.id_cur " +
                 "WHERE r.id_year = " + SLibTimeUtils.digestYear(mtDateCut)[0] + " AND " +
                 "r.dt <= " + dateCut + " AND NOT r.b_del " +
                 "AND NOT re.b_del AND re.fid_ct_sys_mov_xxx = " + (mnGridSubtype == SDataConstantsSys.TRNS_CT_DPS_SAL ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0]) + " " +
