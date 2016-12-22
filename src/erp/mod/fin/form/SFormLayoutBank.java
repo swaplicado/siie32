@@ -836,7 +836,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
     private void enableGeneralFields(boolean enable) {
         jbPickRecord.setEnabled(false);
         moDateDate.setEnabled(true);
-        moKeyCurrencyBank.setEnabled(enable);
+        moKeyCurrencyBank.setEnabled(!enable);
         moKeyLayouId.setEnabled(enable);
         moKeyBankLayoutType.setEnabled(enable);
         jbShowDocs.setEnabled(enable);
@@ -904,10 +904,13 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                     break;
             }
             moIntConsecutiveDay.setEnabled(mnLayout == SFinConsts.LAY_BANK_BANBAJIO);
+            moKeyCurrencyBank.setEnabled(true);
         }
         else {
             moTextConcept.setEnabled(false);
             moIntConsecutiveDay.setEnabled(false);
+            moKeyCurrencyBank.resetField();
+            moKeyCurrencyBank.setEnabled(false);
         }
     }
 
@@ -936,6 +939,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
      * - if the selected currency is the system local currency set´s the exchange rate to 1
      * - if the selected currency isn´t the local currency search for the excahnge rate of the system for the day otherwise is 0
      */
+    
     private void renderCurrencyDoc(){
         double excchangeRate = 0d;
         
@@ -1197,7 +1201,10 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
             moKeyCurrencyBank.resetField();
         }
         else {
+            moKeyBankLayoutType.resetField();
             moKeyBankLayoutType.setEnabled(false);
+            moKeyCurrencyBank.resetField();
+            renderBankLayoutSettings();
         }
     }
     
