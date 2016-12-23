@@ -32,6 +32,7 @@ public class SHrsFormerPayroll {
     protected int mnEmpresaId;
     protected int mnSucursalEmpresaId;
     private String[] masRegimenFiscal;
+    protected int mnFkNominaTipoId;
 
     protected ArrayList<SHrsFormerPayrollReceipt> moChildReceipts;
 
@@ -58,6 +59,7 @@ public class SHrsFormerPayroll {
     }
 
     public void setPkNominaId(int n) { mnPkNominaId = n; }
+    public void setFkNominaTipoId(int n) { mnFkNominaTipoId = n; }
     public void setFecha(Date t) { mtFecha = t; }
     public void setFechaInicial(Date t) { mtFechaIncial = t; }
     public void setFechaFinal(Date t) { mtFechaFinal = t; }
@@ -70,6 +72,7 @@ public class SHrsFormerPayroll {
     public void setRegimenFiscal(String[] s) { masRegimenFiscal = s; }
 
     public int getPkNominaId() { return mnPkNominaId; }
+    public int getFkNominaTipoId() { return mnFkNominaTipoId; }
     public Date getFecha() { return mtFecha; }
     public Date getFechaInicial() { return mtFechaIncial; }
     public Date getFechaFinal() { return mtFechaFinal; }

@@ -53,7 +53,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     protected String msBankAccount;
     protected java.sql.Blob moImagePhoto_n;
     protected java.sql.Blob moImageSignature_n;
-    protected boolean mbLaborUnion;
+    protected boolean mbUnionized;
     protected boolean mbMfgOperator;
     protected boolean mbActive;
     protected boolean mbDeleted;
@@ -66,7 +66,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     protected int mnFkDepartmentId;
     protected int mnFkPositionId;
     protected int mnFkShiftId;
-    protected int mnFkRecruitmentTypeId;
+    protected int mnFkContractTypeId;
     protected int mnFkRecruitmentSchemeTypeId;
     protected int mnFkPositionRiskTypeId;
     protected int mnFkCatalogueSexCategoryId;
@@ -307,7 +307,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public void setBankAccount(String s) { msBankAccount = s; }
     public void setImagePhoto_n(java.sql.Blob o) { moImagePhoto_n = o; }
     public void setImageSignature_n(java.sql.Blob o) { moImageSignature_n = o; }
-    public void setLaborUnion(boolean b) { mbLaborUnion = b; }
+    public void setUnionized(boolean b) { mbUnionized = b; }
     public void setMfgOperator(boolean b) { mbMfgOperator = b; }
     public void setActive(boolean b) { mbActive = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
@@ -320,7 +320,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public void setFkDepartmentId(int n) { mnFkDepartmentId = n; }
     public void setFkPositionId(int n) { mnFkPositionId = n; }
     public void setFkShiftId(int n) { mnFkShiftId = n; }
-    public void setFkRecruitmentTypeId(int n) { mnFkRecruitmentTypeId = n; }
+    public void setFkContractTypeId(int n) { mnFkContractTypeId = n; }
     public void setFkRecruitmentSchemeTypeId(int n) { mnFkRecruitmentSchemeTypeId = n; }
     public void setFkPositionRiskTypeId(int n) { mnFkPositionRiskTypeId = n; }
     public void setFkCatalogueSexCategoryId(int n) { mnFkCatalogueSexCategoryId = n; }
@@ -364,7 +364,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public String getBankAccount() { return msBankAccount; }
     public java.sql.Blob getImagePhoto_n() { return moImagePhoto_n; }
     public java.sql.Blob getImageSignature_n() { return moImageSignature_n; }
-    public boolean isLaborUnion() { return mbLaborUnion; }
+    public boolean isUnionized() { return mbUnionized; }
     public boolean isMfgOperator() { return mbMfgOperator; }
     public boolean isActive() { return mbActive; }
     public boolean isDeleted() { return mbDeleted; }
@@ -377,7 +377,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public int getFkDepartmentId() { return mnFkDepartmentId; }
     public int getFkPositionId() { return mnFkPositionId; }
     public int getFkShiftId() { return mnFkShiftId; }
-    public int getFkRecruitmentTypeId() { return mnFkRecruitmentTypeId; }
+    public int getFkContractTypeId() { return mnFkContractTypeId; }
     public int getFkRecruitmentSchemeTypeId() { return mnFkRecruitmentSchemeTypeId; }
     public int getFkPositionRiskTypeId() { return mnFkPositionRiskTypeId; }
     public int getFkCatalogueSexCategoryId() { return mnFkCatalogueSexCategoryId; }
@@ -435,7 +435,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
         msBankAccount = "";
         moImagePhoto_n = null;
         moImageSignature_n = null;
-        mbLaborUnion = false;
+        mbUnionized = false;
         mbMfgOperator = false;
         mbActive = false;
         mbDeleted = false;
@@ -448,7 +448,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
         mnFkDepartmentId = 0;
         mnFkPositionId = 0;
         mnFkShiftId = 0;
-        mnFkRecruitmentTypeId = 0;
+        mnFkContractTypeId = 0;
         mnFkRecruitmentSchemeTypeId = 0;
         mnFkPositionRiskTypeId = 0;
         mnFkCatalogueSexCategoryId = 0;
@@ -515,7 +515,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 */
                 oPhoto_n = resultSet.getBlob("img_pho_n");
                 oSignature_n = resultSet.getBlob("img_sig_n");
-                //mbLaborUnion = resultSet.getBoolean("b_lab_uni");
+                mbUnionized = resultSet.getBoolean("b_uni");
                 mbMfgOperator = resultSet.getBoolean("b_mfg_ope");
                 mbActive = resultSet.getBoolean("b_act");
                 mbDeleted = resultSet.getBoolean("b_del");
@@ -528,7 +528,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 mnFkDepartmentId = resultSet.getInt("fk_dep");
                 mnFkPositionId = resultSet.getInt("fk_pos");
                 mnFkShiftId = resultSet.getInt("fk_sht");
-                //mnFkRecruitmentTypeId = resultSet.getInt("fk_tp_rec");
+                mnFkContractTypeId = resultSet.getInt("fk_tp_con");
                 mnFkRecruitmentSchemeTypeId = resultSet.getInt("fk_tp_rec_sche");
                 mnFkPositionRiskTypeId = resultSet.getInt("fk_tp_pos_risk");
                 mnFkCatalogueSexCategoryId = resultSet.getInt("fk_cl_cat_sex");
@@ -609,7 +609,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         "'" + msBankAccount + "', " + 
                         "NULL, " +
                         "NULL, " +
-                        //(mbLaborUnion ? 1 : 0) + ", " + 
+                        (mbUnionized ? 1 : 0) + ", " + 
                         (mbMfgOperator ? 1 : 0) + ", " + 
                         (mbActive ? 1 : 0) + ", " +
                         (mbDeleted ? 1 : 0) + ", " +
@@ -622,7 +622,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         mnFkDepartmentId + ", " +
                         mnFkPositionId + ", " +
                         mnFkShiftId + ", " +
-                        //mnFkRecruitmentTypeId + ", " + 
+                        mnFkContractTypeId + ", " + 
                         mnFkRecruitmentSchemeTypeId + ", " +
                         mnFkPositionRiskTypeId + ", " +
                         mnFkCatalogueSexCategoryId + ", " + 
@@ -662,7 +662,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         "img_pho_n = " + (moImagePhoto_n == null ? null : moImagePhoto_n) + ", " +
                         "img_sig_n = " + (moImageSignature_n == null ? null : moImageSignature_n) + ", " +
                         */
-                        //"b_lab_uni = " + (mbLaborUnion ? 1 : 0) + ", " +
+                        "b_uni = " + (mbUnionized ? 1 : 0) + ", " +
                         "b_mfg_ope = " + (mbMfgOperator ? 1 : 0) + ", " +
                         "b_act = " + (mbActive ? 1 : 0) + ", " +
                         "b_del = " + (mbDeleted ? 1 : 0) + ", " +
@@ -675,7 +675,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         "fk_dep = " + mnFkDepartmentId + ", " +
                         "fk_pos = " + mnFkPositionId + ", " +
                         "fk_sht = " + mnFkShiftId + ", " +
-                        //"fk_tp_rec = " + mnFkRecruitmentTypeId + ", " +
+                        "fk_tp_con = " + mnFkContractTypeId + ", " +
                         "fk_tp_rec_sche = " + mnFkRecruitmentSchemeTypeId + ", " +
                         "fk_tp_pos_risk = " + mnFkPositionRiskTypeId + ", " +
                         "fk_cl_cat_sex = " + mnFkCatalogueSexCategoryId + ", " +

@@ -273,11 +273,11 @@ public class SModuleHrs extends SGuiModule {
                     public String getSqlWhere(int[] pk) { return "WHERE id_tp_ear = " + pk[0] + " "; }
                 };
                 break;
-            case SModConsts.HRSS_TP_DED:
+            case SModConsts.HRSS_TP_OTH_PAY:
                 registry = new SDbRegistrySysFly(type) {
                     public void initRegistry() { }
                     public String getSqlTable() { return SModConsts.TablesMap.get(mnRegistryType); }
-                    public String getSqlWhere(int[] pk) { return "WHERE id_tp_ded = " + pk[0] + " "; }
+                    public String getSqlWhere(int[] pk) { return "WHERE id_tp_oth_pay = " + pk[0] + " "; }
                 };
                 break;
             case SModConsts.HRSS_TP_DED_COMP:
@@ -285,6 +285,13 @@ public class SModuleHrs extends SGuiModule {
                     public void initRegistry() { }
                     public String getSqlTable() { return SModConsts.TablesMap.get(mnRegistryType); }
                     public String getSqlWhere(int[] pk) { return "WHERE id_tp_ded_comp = " + pk[0] + " "; }
+                };
+                break;
+            case SModConsts.HRSS_TP_DED:
+                registry = new SDbRegistrySysFly(type) {
+                    public void initRegistry() { }
+                    public String getSqlTable() { return SModConsts.TablesMap.get(mnRegistryType); }
+                    public String getSqlWhere(int[] pk) { return "WHERE id_tp_ded = " + pk[0] + " "; }
                 };
                 break;
             case SModConsts.HRSS_TP_BEN:
@@ -306,6 +313,27 @@ public class SModuleHrs extends SGuiModule {
                     public void initRegistry() { }
                     public String getSqlTable() { return SModConsts.TablesMap.get(mnRegistryType); }
                     public String getSqlWhere(int[] pk) { return "WHERE id_tp_loan_pay = " + pk[0] + " "; }
+                };
+                break;
+            case SModConsts.HRSS_TP_CON:
+                registry = new SDbRegistrySysFly(type) {
+                    public void initRegistry() { }
+                    public String getSqlTable() { return SModConsts.TablesMap.get(mnRegistryType); }
+                    public String getSqlWhere(int[] pk) { return "WHERE id_tp_con = " + pk[0] + " "; }
+                };
+                break;
+            case SModConsts.HRSS_TP_REC_SCHE:
+                registry = new SDbRegistrySysFly(type) {
+                    public void initRegistry() { }
+                    public String getSqlTable() { return SModConsts.TablesMap.get(mnRegistryType); }
+                    public String getSqlWhere(int[] pk) { return "WHERE id_tp_rec_sche = " + pk[0] + " "; }
+                };
+                break;
+            case SModConsts.HRSS_TP_POS_RISK:
+                registry = new SDbRegistrySysFly(type) {
+                    public void initRegistry() { }
+                    public String getSqlTable() { return SModConsts.TablesMap.get(mnRegistryType); }
+                    public String getSqlWhere(int[] pk) { return "WHERE id_tp_pos_risk = " + pk[0] + " "; }
                 };
                 break;
             case SModConsts.HRSS_BANK:

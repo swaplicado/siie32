@@ -173,9 +173,11 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jPanel24 = new javax.swing.JPanel();
         jlFkBizPartnerIdentityTypeId = new javax.swing.JLabel();
         jcbFkBizPartnerIdentityTypeId = new javax.swing.JComboBox<SFormComponentItem>();
+        jckIsDeleted = new javax.swing.JCheckBox();
         jPanel18 = new javax.swing.JPanel();
         jlFkTaxIdentityTypeId = new javax.swing.JLabel();
         jcbFkTaxIdentityTypeId = new javax.swing.JComboBox<SFormComponentItem>();
+        jckIsCategoryDeleted = new javax.swing.JCheckBox();
         jPanel28 = new javax.swing.JPanel();
         jlLastName = new javax.swing.JLabel();
         jtfLastName = new javax.swing.JTextField();
@@ -196,9 +198,6 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jftAlternativeId = new javax.swing.JFormattedTextField();
         jlFiscalFrgId = new javax.swing.JLabel();
         jtfFiscalFrgId = new javax.swing.JTextField();
-        jPanel17 = new javax.swing.JPanel();
-        jckIsAttRelatedParty = new javax.swing.JCheckBox();
-        jckIsDeleted = new javax.swing.JCheckBox();
         jPanel4 = new javax.swing.JPanel();
         jPanel26 = new javax.swing.JPanel();
         jPanel20 = new javax.swing.JPanel();
@@ -222,10 +221,10 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jPanel12 = new javax.swing.JPanel();
         jckIsAttEmployee = new javax.swing.JCheckBox();
         jckIsAttPartnerShareholder = new javax.swing.JCheckBox();
+        jckIsAttRelatedParty = new javax.swing.JCheckBox();
         jPanel6 = new javax.swing.JPanel();
         jlBizArea = new javax.swing.JLabel();
         jcbFkBizArea = new javax.swing.JComboBox();
-        jckIsCategoryDeleted = new javax.swing.JCheckBox();
         jpCategory = new javax.swing.JPanel();
         jPanel44 = new javax.swing.JPanel();
         jPanel45 = new javax.swing.JPanel();
@@ -365,12 +364,14 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         jpBizPartner.setLayout(new java.awt.BorderLayout());
 
+        jPanel19.setPreferredSize(new java.awt.Dimension(1008, 220));
         jPanel19.setLayout(new java.awt.BorderLayout());
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
+        jPanel1.setPreferredSize(new java.awt.Dimension(611, 200));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel13.setLayout(new java.awt.GridLayout(8, 1, 0, 5));
+        jPanel13.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
 
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -386,6 +387,10 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         });
         jPanel24.add(jcbFkBizPartnerIdentityTypeId);
 
+        jckIsDeleted.setText("Asociado de negocios eliminado");
+        jckIsDeleted.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jPanel24.add(jckIsDeleted);
+
         jPanel13.add(jPanel24);
 
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -396,6 +401,10 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         jcbFkTaxIdentityTypeId.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel18.add(jcbFkTaxIdentityTypeId);
+
+        jckIsCategoryDeleted.setText("Categoría eliminada");
+        jckIsCategoryDeleted.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jPanel18.add(jckIsCategoryDeleted);
 
         jPanel13.add(jPanel18);
 
@@ -482,25 +491,16 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         jPanel13.add(jPanel33);
 
-        jPanel17.setLayout(new java.awt.GridLayout(1, 0));
-
-        jckIsAttRelatedParty.setText("Es parte relacionada");
-        jckIsAttRelatedParty.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel17.add(jckIsAttRelatedParty);
-
-        jckIsDeleted.setText("Asociado de negocios eliminado");
-        jckIsDeleted.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jPanel17.add(jckIsDeleted);
-
-        jPanel13.add(jPanel17);
-
         jPanel1.add(jPanel13, java.awt.BorderLayout.NORTH);
 
         jPanel19.add(jPanel1, java.awt.BorderLayout.WEST);
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Categorías:"));
+        jPanel4.setMinimumSize(new java.awt.Dimension(355, 220));
+        jPanel4.setPreferredSize(new java.awt.Dimension(397, 210));
         jPanel4.setLayout(new java.awt.BorderLayout());
 
+        jPanel26.setPreferredSize(new java.awt.Dimension(385, 200));
         jPanel26.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
 
         jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -590,6 +590,10 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jckIsAttPartnerShareholder.setText("Es socio/accionista");
         jPanel12.add(jckIsAttPartnerShareholder);
 
+        jckIsAttRelatedParty.setText("Es parte relacionada");
+        jckIsAttRelatedParty.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel12.add(jckIsAttRelatedParty);
+
         jPanel26.add(jPanel12);
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
@@ -603,10 +607,6 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jPanel6.add(jcbFkBizArea);
 
         jPanel26.add(jPanel6);
-
-        jckIsCategoryDeleted.setText("Categoría eliminada");
-        jckIsCategoryDeleted.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jPanel26.add(jckIsCategoryDeleted);
 
         jPanel4.add(jPanel26, java.awt.BorderLayout.NORTH);
 
@@ -1975,7 +1975,6 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
-    private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;

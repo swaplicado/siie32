@@ -280,6 +280,17 @@ public abstract class SDataReadComponentItems {
                         "ORDER BY " + (paramsErp.getFkSortingLocalityTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "cty_key, cty, " : "cty, cty_key, ") + "id_cty ";
                 text = "país";
                 break;
+            case SDataConstants.LOCU_STA:
+                lenPk = 1;
+                sql = "SELECT id_sta AS f_id_1, " +
+                        (!paramsErp.getIsKeyLocalityApplying() ? "sta" :
+                            (paramsErp.getFkSortingLocalityTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "CONCAT(sta_code, ' - ', sta)" : "CONCAT(sta, ' - ', sta_code)")) +
+                            " AS f_item " +
+                        "FROM erp.locu_sta " +
+                        "WHERE b_del = 0 " + (pk == null ? "" : " AND fid_cty = " + ((int[]) pk)[0] + " ") +
+                        "ORDER BY " + (paramsErp.getFkSortingLocalityTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "sta_code, sta, " : "sta, sta_code, ") + "id_sta ";
+                text = "estado";
+                break;
             default:
                 break;
         }
@@ -1778,6 +1789,12 @@ public abstract class SDataReadComponentItems {
                 sql = "SELECT id_tp_sal AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_SAL) + " WHERE b_del = 0 ORDER BY sort ";
                 text = "tipo salario";
+                break;
+            case SModConsts.HRSS_TP_CON:
+                lenPk = 1;
+                sql = "SELECT id_tp_con AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_CON) + " WHERE b_del = 0 ORDER BY name, id_tp_con ";
+                text = "contrato";
                 break;
             case SModConsts.HRSS_TP_REC_SCHE:
                 lenPk = 1;

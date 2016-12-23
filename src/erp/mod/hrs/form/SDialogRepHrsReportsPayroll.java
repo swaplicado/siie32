@@ -9,6 +9,8 @@ import erp.mbps.data.SDataBizPartner;
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SDbPayroll;
 import java.awt.BorderLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import sa.lib.SLibConsts;
@@ -27,7 +29,7 @@ import sa.lib.gui.bean.SBeanFieldRadio;
  *
  * @author Juan Barajas
  */
-public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements ChangeListener {
+public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements ChangeListener, ItemListener {
     
     protected SDbPayroll moPayroll;
     protected int mnPayrollId;
@@ -57,6 +59,7 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         jbGrpReport = new javax.swing.ButtonGroup();
         moGroupOrderByEmployee = new javax.swing.ButtonGroup();
         moGroupOrderByDepartament = new javax.swing.ButtonGroup();
+        jbGrpReportType = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
@@ -77,12 +80,16 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         jPanel7 = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
         moRadReportPrePayroll = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadReportPayroll = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadReportListEarning = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadReportListDeductions = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadReportPayrollSummary = new sa.lib.gui.bean.SBeanFieldRadio();
+        jPanel16 = new javax.swing.JPanel();
+        moRadReportTypeEmpDep = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadReportTypeDepEmp = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel2 = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
         moRadOrderByNumEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
@@ -168,6 +175,8 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
 
         jPanel13.setLayout(new java.awt.BorderLayout());
 
+        jPanel4.setLayout(new java.awt.BorderLayout());
+
         jPanel12.setBorder(javax.swing.BorderFactory.createTitledBorder("Reporte:"));
         jPanel12.setLayout(new java.awt.GridLayout(5, 1));
 
@@ -197,7 +206,25 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         moRadReportPayrollSummary.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel12.add(moRadReportPayrollSummary);
 
-        jPanel13.add(jPanel12, java.awt.BorderLayout.WEST);
+        jPanel4.add(jPanel12, java.awt.BorderLayout.WEST);
+
+        jPanel16.setBorder(javax.swing.BorderFactory.createTitledBorder("Tipo reporte:"));
+        jPanel16.setLayout(new java.awt.GridLayout(5, 1));
+
+        jbGrpReportType.add(moRadReportTypeEmpDep);
+        moRadReportTypeEmpDep.setSelected(true);
+        moRadReportTypeEmpDep.setText("Por empleado - depto.");
+        moRadReportTypeEmpDep.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel16.add(moRadReportTypeEmpDep);
+
+        jbGrpReportType.add(moRadReportTypeDepEmp);
+        moRadReportTypeDepEmp.setText("Por depto. - empleado");
+        moRadReportTypeDepEmp.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel16.add(moRadReportTypeDepEmp);
+
+        jPanel4.add(jPanel16, java.awt.BorderLayout.CENTER);
+
+        jPanel13.add(jPanel4, java.awt.BorderLayout.WEST);
 
         jPanel2.setLayout(new java.awt.GridLayout(2, 0));
 
@@ -209,6 +236,7 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         jPanel14.add(moRadOrderByNumEmployee);
 
         moGroupOrderByEmployee.add(moRadOrderByNameEmployee);
+        moRadOrderByNameEmployee.setSelected(true);
         moRadOrderByNameEmployee.setText("Nombre del empleado");
         jPanel14.add(moRadOrderByNameEmployee);
 
@@ -224,6 +252,7 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         jPanel15.add(moRadOrderByNumDepartament);
 
         moGroupOrderByDepartament.add(moRadOrderByNameDepartament);
+        moRadOrderByNameDepartament.setSelected(true);
         moRadOrderByNameDepartament.setText("Nombre del departamento");
         jPanel15.add(moRadOrderByNameDepartament);
 
@@ -253,15 +282,18 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.ButtonGroup jbGrpReport;
+    private javax.swing.ButtonGroup jbGrpReportType;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
     private javax.swing.JLabel jlPaymentType;
@@ -281,6 +313,8 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
     private sa.lib.gui.bean.SBeanFieldRadio moRadReportPayroll;
     private sa.lib.gui.bean.SBeanFieldRadio moRadReportPayrollSummary;
     private sa.lib.gui.bean.SBeanFieldRadio moRadReportPrePayroll;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadReportTypeDepEmp;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadReportTypeEmpDep;
     private sa.lib.gui.bean.SBeanFieldText moTextDateEnd;
     private sa.lib.gui.bean.SBeanFieldText moTextDateStart;
     private sa.lib.gui.bean.SBeanFieldText moTextPaymentType;
@@ -300,12 +334,18 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
             moRadOrderByNumDepartament.setEnabled(true);
             moRadOrderByNameDepartament.setEnabled(true);
             moRadOrderByNameDepartament.setSelected(true);
+            
+            moRadReportTypeDepEmp.setEnabled(true);
+            moRadReportTypeEmpDep.setSelected(true);
         }
         else {
             moRadOrderByNumDepartament.setEnabled(false);
             moRadOrderByNameDepartament.setEnabled(false);
             moRadOrderByNameDepartament.setSelected(false);
             moRadOrderByNameEmployee.setSelected(true);
+            
+            moRadReportTypeDepEmp.setEnabled(false);
+            moRadReportTypeEmpDep.setSelected(true);
         }
     }
     
@@ -314,27 +354,38 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         
         switch (reportId) {
             case SModConsts.HRSR_PRE_PAY:
-                orderBy = "ORDER BY ";
-                
-                if (moBoolShowGroupDepartament.isSelected()) {
-                    if (moRadOrderByNumDepartament.isSelected()) {
-                        orderBy += "dep.name, dep.code, dep.id_dep, ";
-                    }
-                    else if (moRadOrderByNameDepartament.isSelected()) {
-                        orderBy += "dep.name, dep.code, dep.id_dep, ";
-                    }
-                }
-                
-                if (moRadOrderByNumEmployee.isSelected()) {
-                    orderBy += "CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp; ";
-                }
-                else if (moRadOrderByNameEmployee.isSelected()) {
-                    orderBy += "bp.bp, bp.id_bp; ";
-                }
-                break;
             case SModConsts.HRSR_PAY:
                 orderBy = "ORDER BY ";
-                
+                break;
+            case SModConsts.HRSR_LIST_EAR:
+                orderBy = "ORDER BY ear.name, ear.code, ear.id_ear, ";
+                break;
+            case SModConsts.HRSR_LIST_DED:
+                orderBy = "ORDER BY ded.name, ded.code, ded.id_ded, ";
+                break;
+            case SModConsts.HRSR_PAY_SUM:
+                break;
+        }
+        
+        if (!orderBy.isEmpty()) {
+            if (moRadReportTypeEmpDep.isSelected()) {
+                if (moRadOrderByNumEmployee.isSelected()) {
+                    orderBy += "CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp, ";
+                }
+                else if (moRadOrderByNameEmployee.isSelected()) {
+                    orderBy += "bp.bp, bp.id_bp, ";
+                }
+
+                if (moBoolShowGroupDepartament.isSelected()) {
+                    if (moRadOrderByNumDepartament.isSelected()) {
+                        orderBy += "dep.code, dep.id_dep ";
+                    }
+                    else if (moRadOrderByNameDepartament.isSelected()) {
+                        orderBy += "dep.name, dep.id_dep ";
+                    }
+                }
+            }
+            else if (moRadReportTypeDepEmp.isSelected()) {
                 if (moBoolShowGroupDepartament.isSelected()) {
                     if (moRadOrderByNumDepartament.isSelected()) {
                         orderBy += "dep.code, dep.id_dep, ";
@@ -343,32 +394,14 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
                         orderBy += "dep.name, dep.id_dep, ";
                     }
                 }
-                
+
                 if (moRadOrderByNumEmployee.isSelected()) {
                     orderBy += "CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp ";
                 }
                 else if (moRadOrderByNameEmployee.isSelected()) {
                     orderBy += "bp.bp, bp.id_bp ";
                 }
-                break;
-            case SModConsts.HRSR_LIST_EAR:
-                if (moRadOrderByNumEmployee.isSelected()) {
-                    orderBy = "ORDER BY ear.name, ear.code, ear.id_ear, CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp; ";
-                }
-                else if (moRadOrderByNameEmployee.isSelected()) {
-                    orderBy = "ORDER BY ear.name, ear.code, ear.id_ear, bp.bp, bp.id_bp; ";
-                }
-                break;
-            case SModConsts.HRSR_LIST_DED:
-                if (moRadOrderByNumEmployee.isSelected()) {
-                    orderBy = "ORDER BY ded.name, ded.code, ded.id_ded, CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp; ";
-                }
-                else if (moRadOrderByNameEmployee.isSelected()) {
-                    orderBy = "ORDER BY ded.name, ded.code, ded.id_ded, bp.bp, bp.id_bp; ";
-                }
-                break;
-            case SModConsts.HRSR_PAY_SUM:
-                break;
+            }
         }
         
         return orderBy;
@@ -393,7 +426,7 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         moRadReportListDeductions.addChangeListener(this);
         moRadReportPayrollSummary.addChangeListener(this);
         
-        moBoolShowGroupDepartament.addChangeListener(this);
+        moBoolShowGroupDepartament.addItemListener(this);
         moBoolShowGroupDepartament.setSelected(true);
         moRadOrderByNameEmployee.setSelected(true);
         moRadOrderByNameDepartament.setSelected(true);
@@ -518,7 +551,11 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
             }
             
         }
-        else if (e.getSource() instanceof SBeanFieldBoolean) {
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof SBeanFieldBoolean) {
             if ((SBeanFieldBoolean) e.getSource() == moBoolShowGroupDepartament) {
                 actionEnableFieldsOrderBy();
             }
