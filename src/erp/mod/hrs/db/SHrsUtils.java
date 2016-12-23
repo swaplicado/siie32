@@ -1878,7 +1878,6 @@ public abstract class SHrsUtils {
         int f_emp_map_bp = 0;
         int f_emp_id = 0;
         int claveOficial = 0;
-        int nState = 0;
         String sql = "";
         String deductionsTaxRetained = "";
         String cia_reg_imss = "";
@@ -2048,8 +2047,8 @@ public abstract class SHrsUtils {
 
             sql = "SELECT bpb.id_bpb, sta.sta_code AS _sta " +
                 "FROM erp.bpsu_bpb AS bpb " +
-                "INNER JOIN erp.bpsu_bpb_add AS add ON bpb.id_bpb = add.id_bpb AND add.fid_tp_add = " + SDataConstantsSys.BPSS_TP_ADD_OFF + " " +
-                "LEFT OUTER JOIN erp.locu_sta AS sta ON add.fid_sta_n = sta.id_sta " +
+                "INNER JOIN erp.bpsu_bpb_add AS bpb_add ON bpb.id_bpb = bpb_add.id_bpb AND bpb_add.fid_tp_add = " + SDataConstantsSys.BPSS_TP_ADD_OFF + " " +
+                "LEFT OUTER JOIN erp.locu_sta AS sta ON bpb_add.fid_sta_n = sta.id_sta " +
                 "WHERE bpb.b_del = 0 AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " AND bpb.fid_bp = " + f_emp_map_bp + " ";
             resultSetClient = statementClient.executeQuery(sql);
 

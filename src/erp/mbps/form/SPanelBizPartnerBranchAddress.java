@@ -324,8 +324,8 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         }
         
         if (country != SLibConstants.UNDEFINED) {
-            jcbFkStateId_n.setEnabled(SLocUtils.hasAssociateStates(miClient.getSession(), country));
             populateStates(country);
+            jcbFkStateId_n.setEnabled(SLocUtils.hasAssociateStates(miClient.getSession(), country));
         }
     }
     
@@ -401,6 +401,7 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         mbParamIsInMainWindow = false;
         mbParamIsCompany = false;
         setCountryEnabled(false);
+        itemChangedCountry();
         renderAddress();
     }
 
@@ -495,11 +496,11 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         moFieldZipCode.setFieldValue(moBizPartnerBranchAddress.getZipCode());
         moFieldIsDefault.setFieldValue(moBizPartnerBranchAddress.getIsDefault());
         moFieldFkCountryId.setFieldValue(new int[] { moBizPartnerBranchAddress.getFkCountryId_n() == miClient.getSessionXXX().getParamsErp().getFkCountryId() ? SLibConstants.UNDEFINED : moBizPartnerBranchAddress.getFkCountryId_n() });
+        setCountryEnabled(moBizPartnerBranchAddress.getFkCountryId_n() != SLibConstants.UNDEFINED && moBizPartnerBranchAddress.getFkCountryId_n() != miClient.getSessionXXX().getParamsErp().getFkCountryId());
         itemChangedCountry();
         moFieldFkStateId.setFieldValue(new int[] { moBizPartnerBranchAddress.getFkStateId_n() });
 
         renderAddress();
-        setCountryEnabled(moBizPartnerBranchAddress.getFkCountryId_n() != SLibConstants.UNDEFINED && moBizPartnerBranchAddress.getFkCountryId_n() != miClient.getSessionXXX().getParamsErp().getFkCountryId());
     }
 
     @Override

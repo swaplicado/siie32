@@ -386,11 +386,11 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
         for (SHrsFormerPayrollConcept concept : moChildPayrollConcept) {
             switch (concept.getPkTipoConcepto()) {
                 case SCfdConsts.CFDI_PAYROLL_PERCEPTION:
-                    dTotalTaxedPerceptions += concept.getTotalGravado();
-                    dTotalExemptPerceptions += concept.getTotalExento();
-                    
                     if (concept.getClaveOficial() != SModSysConsts.HRSS_TP_EAR_TAX_SUB) {
                         cfd.ver3.nom12.DElementPercepcion percepcion = new cfd.ver3.nom12.DElementPercepcion();
+                        
+                        dTotalTaxedPerceptions += concept.getTotalGravado();
+                        dTotalExemptPerceptions += concept.getTotalExento();
 
                         percepcion.getAttTipoPercepcion().setString((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR, new int[] { concept.getClaveOficial() }, SDbRegistry.FIELD_CODE));
                         percepcion.getAttClave().setString(concept.getClaveEmpresa().length() < 3 ? SLibUtils.textRepeat("0", 3 - concept.getClaveEmpresa().length()) + concept.getClaveEmpresa() : concept.getClaveEmpresa());

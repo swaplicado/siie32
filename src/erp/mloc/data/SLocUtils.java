@@ -5,6 +5,7 @@
  */
 package erp.mloc.data;
 
+import erp.mod.SModConsts;
 import java.sql.ResultSet;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
@@ -22,10 +23,10 @@ public abstract class SLocUtils {
         
         try {
             sql = "SELECT count(*) "
-                    + "FROM erp.locu_sta "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.LOCU_STA) + " "
                     + "WHERE fid_cty = " + idCountry + " ";
             resultSet = session.getStatement().executeQuery(sql);
-            if (resultSet.next()) {
+            if (resultSet.next() && resultSet.getInt(1) > 0) {
                 has = true;
             }
         }
