@@ -1878,6 +1878,7 @@ public abstract class SHrsUtils {
         int f_emp_map_bp = 0;
         int f_emp_id = 0;
         int claveOficial = 0;
+        int nState = 0;
         String sql = "";
         String deductionsTaxRetained = "";
         String cia_reg_imss = "";
@@ -1913,7 +1914,7 @@ public abstract class SHrsUtils {
 
         // Obtain payroll header:
 
-        sql = "SELECT p.per_year, p.id_pay, tp.code, p.num, p.id_pay, NOW() AS f_date, p.dt_sta, p.dt_end, " +
+        sql = "SELECT p.per_year, p.id_pay, tp.code, p.num, p.id_pay, NOW() AS f_date, p.dt_sta, p.dt_end, p.fk_tp_pay_sht, " +
                 "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
                 "FROM hrs_pay_rcp AS r " +
                 "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
@@ -1971,6 +1972,7 @@ public abstract class SHrsUtils {
             hrsPayroll.setEmpresaId(resultSetAux.getInt("p.id_co"));
             hrsPayroll.setSucursalEmpresaId(resultSetAux.getInt("bpb.id_bpb"));
             hrsPayroll.setRegimenFiscal(new String[] { SLibUtilities.textTrim(resultSetAux.getString("p.fiscal_settings")) });
+            hrsPayroll.setFkNominaTipoId(resultSet.getInt("p.fk_tp_pay_sht"));
         }
 
         // Obtain employer registry:
@@ -1980,13 +1982,14 @@ public abstract class SHrsUtils {
         // Obtain employee payroll:
 
         sql = "SELECT bp.bp, bp.id_bp AS f_emp_map_bp, emp.id_emp AS f_emp_id, emp.num AS f_emp_num, bp.alt_id AS f_emp_curp, emp.ssn AS f_emp_nss, " +
-                "emp.fk_tp_rec_sche AS f_emp_reg_tp, rcp.day_pad AS f_emp_dias_pag, d.name AS f_emp_dep, d.code AS f_emp_dep_cve, " +
+                "sch.code AS f_emp_reg_tp, rcp.day_pad AS f_emp_dias_pag, d.name AS f_emp_dep, d.code AS f_emp_dep_cve, " +
                 "'' AS f_emp_bank_clabe, " +
                 "pei.dt_pay, pei.num_ser, pei.num, pei.fk_tp_pay_sys, " +
                 "CASE WHEN emp.fk_bank_n IS NOT NULL THEN emp.fk_bank_n ELSE (SELECT fk_bank FROM hrs_cfg WHERE id_cfg = " + SUtilConsts.BPR_CO_ID + ") END AS f_emp_bank, " +
                 "emp.dt_hire AS f_emp_alta, p.dt_sta AS f_nom_date_start, p.dt_end AS f_nom_date_end, " +
                 "TIMESTAMPDIFF(DAY, emp.dt_ben, p.dt_end) / " + SHrsConsts.WEEK_DAYS + " AS f_emp_sen, pos.name AS f_emp_pos, " +
-                "'' AS f_emp_cont_tp, '' AS f_emp_jorn_tp, tp.name AS f_emp_pay, rcp.sal_ssc AS f_emp_sal_bc, ris.id_tp_pos_risk AS f_emp_risk, " +
+                "con.code AS f_emp_cont_tp, '' AS f_emp_jorn_tp, tp.name AS f_emp_pay, rcp.sal_ssc AS f_emp_sal_bc, ris.id_tp_pos_risk AS f_emp_risk, " +
+                "IF(emp.b_uni, 'Si', 'No') AS f_emp_union, " +
                 "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
                 "FROM hrs_pay_rcp AS r " +
                 "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
@@ -2018,6 +2021,8 @@ public abstract class SHrsUtils {
                 "INNER JOIN erp.hrsu_pos AS pos ON pos.id_pos = rcp.fk_pos " +
                 "INNER JOIN erp.hrss_tp_sal AS st ON st.id_tp_sal = rcp.fk_tp_sal " +
                 "INNER JOIN erp.hrsu_tp_emp AS et ON et.id_tp_emp = rcp.fk_tp_emp " +
+                "INNER JOIN erp.hrss_tp_con AS con ON con.id_tp_con = emp.fk_tp_con " +
+                "INNER JOIN erp.hrss_tp_rec_sche AS sch ON sch.id_tp_rec_sche = emp.fk_tp_rec_sche " +
                 "INNER JOIN erp.hrss_tp_pos_risk AS ris ON ris.id_tp_pos_risk = rcp.fk_tp_pos_risk " +
                 "INNER JOIN erp.hrss_tp_pay AS tp ON p.fk_tp_pay = tp.id_tp_pay " +
                 "WHERE rcp.id_pay = " + payrollId + " AND rcp.b_del = 0 AND rcp.id_emp = " + payrollEmployeeId + " " +
@@ -2041,8 +2046,10 @@ public abstract class SHrsUtils {
 
             f_emp_map_bp = resultSet.getInt("f_emp_map_bp");
 
-            sql = "SELECT bpb.id_bpb  " +
+            sql = "SELECT bpb.id_bpb, sta.sta_code AS _sta " +
                 "FROM erp.bpsu_bpb AS bpb " +
+                "INNER JOIN erp.bpsu_bpb_add AS add ON bpb.id_bpb = add.id_bpb AND add.fid_tp_add = " + SDataConstantsSys.BPSS_TP_ADD_OFF + " " +
+                "LEFT OUTER JOIN erp.locu_sta AS sta ON add.fid_sta_n = sta.id_sta " +
                 "WHERE bpb.b_del = 0 AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " AND bpb.fid_bp = " + f_emp_map_bp + " ";
             resultSetClient = statementClient.executeQuery(sql);
 
@@ -2074,6 +2081,7 @@ public abstract class SHrsUtils {
             hrsPayrollReceipt.setPeriodicidadPago(SLibUtilities.textTrim(resultSet.getString("f_emp_pay")));
             hrsPayrollReceipt.setSalarioBaseCotApor(resultSet.getDouble("f_emp_sal_bc"));
             hrsPayrollReceipt.setRiesgoPuesto(resultSet.getInt("f_emp_risk"));
+            hrsPayrollReceipt.setSindicalizado(SLibUtilities.textTrim(resultSet.getString("f_emp_union")));
             hrsPayrollReceipt.setSalarioDiarioIntegrado(hrsPayrollReceipt.getSalarioBaseCotApor());
             /* XXX (2016-08-31) jbarajas It're obtained detail of earnings and deductions.
             hrsPayrollReceipt.setTotalPercepciones(resultSet.getDouble("f_ear"));
@@ -2081,6 +2089,7 @@ public abstract class SHrsUtils {
             hrsPayrollReceipt.setTotalRetenciones(resultSet.getDouble("f_emp_tot_rent_ret"));
             hrsPayrollReceipt.setTotalNeto(resultSet.getDouble("f_emp_tot_net"));
             */
+            hrsPayrollReceipt.setClaveEstado(SLibUtilities.textTrim(resultSetClient.getString("_sta")));
             hrsPayrollReceipt.setFechaEdicion(resultSet.getDate("f_emp_date_edit"));
             hrsPayrollReceipt.setSerie(SLibUtilities.textTrim(resultSet.getString("pei.num_ser")));
             hrsPayrollReceipt.setFolio(resultSet.getInt("pei.num"));

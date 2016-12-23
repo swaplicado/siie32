@@ -968,8 +968,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                 new SDialogRepHrsPayrollTax((SGuiClient) miClient, "Impuesto sobre nóminas").setFormVisible(true);
             }
             else if (item == jmiRepPayrollAux) {
-                //new SDialogRepHrsAux((SGuiClient) miClient, "Auxiliares de nóminas").setFormVisible(true);
-                new SDialogRepHrsAuxPayroll((SGuiClient) miClient, "Auxiliares de nóminas").setFormVisible(true);
+               new SDialogRepHrsAuxPayroll((SGuiClient) miClient, "Auxiliares de nóminas").setFormVisible(true);
             }
             else if (item == jmiRepPayrollWageSalaryFileCsv) {
                 new SDialogRepHrsPayrollWageSalaryFileCsv((SGuiClient) miClient, "Archivo CSV para declaración informativa de sueldos y salarios").setFormVisible(true);

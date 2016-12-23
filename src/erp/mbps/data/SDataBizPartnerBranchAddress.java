@@ -41,6 +41,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
     protected boolean mbIsDeleted;
     protected int mnFkAddressTypeId;
     protected int mnFkCountryId_n;
+    protected int mnFkStateId_n;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
     protected int mnFkUserDeleteId;
@@ -80,6 +81,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkAddressTypeId(int n) { mnFkAddressTypeId = n; }
     public void setFkCountryId_n(int n) { mnFkCountryId_n = n; }
+    public void setFkStateId_n(int n) { mnFkStateId_n = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
     public void setFkUserDeleteId(int n) { mnFkUserDeleteId = n; }
@@ -104,6 +106,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkAddressTypeId() { return mnFkAddressTypeId; }
     public int getFkCountryId_n() { return mnFkCountryId_n; }
+    public int getFkStateId_n() { return mnFkStateId_n; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
     public int getFkUserDeleteId() { return mnFkUserDeleteId; }
@@ -158,6 +161,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
         mbIsDeleted = false;
         mnFkAddressTypeId = 0;
         mnFkCountryId_n = 0;
+        mnFkStateId_n = 0;
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
         mnFkUserDeleteId = 0;
@@ -217,6 +221,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
                 mbIsDeleted = resultSet.getBoolean("a.b_del");
                 mnFkAddressTypeId = resultSet.getInt("a.fid_tp_add");
                 mnFkCountryId_n = resultSet.getInt("a.fid_cty_n");
+                mnFkStateId_n = resultSet.getInt("a.fid_sta_n");
                 mnFkUserNewId = resultSet.getInt("a.fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("a.fid_usr_edit");
                 mnFkUserDeleteId = resultSet.getInt("a.fid_usr_del");
@@ -232,6 +237,14 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
                 // Read aswell dependant registries:
 
                 moDbmsDataCountry = new SDataCountry();
+                
+                if (mnFkStateId_n != SLibConstants.UNDEFINED) {
+                    sql = "SELECT sta FROM erp.locu_sta WHERE id_sta = " + mnFkStateId_n + " ";
+                    resultSet = statement.executeQuery(sql);
+                    if (resultSet.next()) {
+                        msState = resultSet.getString("sta");
+                    }
+                }
                 
                 if (mnFkCountryId_n == SLibConstants.UNDEFINED) {
                     moParamsErp = new SDataParamsErp();
@@ -276,7 +289,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
                     "{ CALL erp.bpsu_bpb_add_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?," +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?) }");
+                    "?, ?) }");
             callableStatement.setInt(nParam++, mnPkBizPartnerBranchId);
             callableStatement.setInt(nParam++, mnPkAddressId);
             callableStatement.setString(nParam++, msAddress);
@@ -294,6 +307,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
             callableStatement.setBoolean(nParam++, mbIsDeleted);
             callableStatement.setInt(nParam++, mnFkAddressTypeId);
             if (mnFkCountryId_n > 0 && mnFkCountryId_n != mnAuxCountrySysId) callableStatement.setInt(nParam++, mnFkCountryId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
+            if (mnFkStateId_n > SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkStateId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);            
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);

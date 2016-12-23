@@ -174,7 +174,7 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         jPanel14.setLayout(new java.awt.BorderLayout());
 
         jpBranch.setBorder(javax.swing.BorderFactory.createTitledBorder("Información de la sucursal:"));
-        jpBranch.setLayout(new java.awt.GridLayout(7, 1));
+        jpBranch.setLayout(new java.awt.GridLayout(8, 1, 0, 2));
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 

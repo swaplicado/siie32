@@ -8,7 +8,7 @@ package erp.print;
 import cfd.DCfdUtils;
 import cfd.DElement;
 import cfd.ver3.DElementComprobante;
-import cfd.ver3.DElementNomina;
+import cfd.ver3.nom11.DElementNomina;
 import cfd.ver3.DElementTimbreFiscalDigital;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SDialogResult;
@@ -261,17 +261,17 @@ public class PrintCfdiThread extends Thread {
                 // Perceptions:
 
                 i = 0;
-                if (((cfd.ver3.DElementNomina) element).getEltPercepciones() != null) {
-                    for (i = 0; i < ((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().size(); i++) {
-                        aPercepciones.add(oFixedFormat.format(((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttTipoPercepcion().getInteger()));
-                        aPercepciones.add(((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttClave().getString());
-                        aPercepciones.add(((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttConcepto().getString());
-                        aPercepciones.add(((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteGravado().getDouble() +
-                                ((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteExento().getDouble());
+                if (((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones() != null) {
+                    for (i = 0; i < ((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().size(); i++) {
+                        aPercepciones.add(oFixedFormat.format(((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttTipoPercepcion().getInteger()));
+                        aPercepciones.add(((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttClave().getString());
+                        aPercepciones.add(((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttConcepto().getString());
+                        aPercepciones.add(((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteGravado().getDouble() +
+                                ((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteExento().getDouble());
                         aPercepciones.add(null); // pending to be used, navalos (2014-03-13)
 
-                        dTotalPercepciones += ((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteGravado().getDouble() +
-                                ((cfd.ver3.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteExento().getDouble();
+                        dTotalPercepciones += ((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteGravado().getDouble() +
+                                ((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteExento().getDouble();
                     }
                 }
 
@@ -286,17 +286,17 @@ public class PrintCfdiThread extends Thread {
                 // ExtraTimes:
 
                 i = 0;
-                if (((cfd.ver3.DElementNomina) element).getEltHorasExtras() != null) {
-                    for (i = 0; i < ((cfd.ver3.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().size(); i++) {
+                if (((cfd.ver3.nom11.DElementNomina) element).getEltHorasExtras() != null) {
+                    for (i = 0; i < ((cfd.ver3.nom11.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().size(); i++) {
 
-                        aTiempoExtra.add(((cfd.ver3.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(i).getAttTipoHoras().getString().compareTo(SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE) == 0 ?
+                        aTiempoExtra.add(((cfd.ver3.nom11.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(i).getAttTipoHoras().getString().compareTo(SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE) == 0 ?
                             SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE : SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_TRIPLE);
-                        aTiempoExtra.add(((cfd.ver3.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(i).getAttDias().getInteger());
-                        aTiempoExtra.add(((cfd.ver3.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(i).getAttHorasExtra().getInteger());
-                        aTiempoExtra.add(((cfd.ver3.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(i).getAttImportePagado().getDouble());
+                        aTiempoExtra.add(((cfd.ver3.nom11.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(i).getAttDias().getInteger());
+                        aTiempoExtra.add(((cfd.ver3.nom11.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(i).getAttHorasExtra().getInteger());
+                        aTiempoExtra.add(((cfd.ver3.nom11.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(i).getAttImportePagado().getDouble());
 
-                        nTotalTiempoExtra += ((cfd.ver3.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(i).getAttHorasExtra().getInteger();
-                        dTotalTiempoExtraPagado += ((cfd.ver3.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(i).getAttImportePagado().getDouble();
+                        nTotalTiempoExtra += ((cfd.ver3.nom11.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(i).getAttHorasExtra().getInteger();
+                        dTotalTiempoExtraPagado += ((cfd.ver3.nom11.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().get(i).getAttImportePagado().getDouble();
                     }
                 }
 
@@ -310,25 +310,25 @@ public class PrintCfdiThread extends Thread {
                 // Deductions:
 
                 i = 0;
-                if (((cfd.ver3.DElementNomina) element).getEltDeducciones() != null) {
-                    for (i = 0; i < ((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().size(); i++) {
+                if (((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones() != null) {
+                    for (i = 0; i < ((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().size(); i++) {
 
-                        aDeducciones.add(oFixedFormat.format(((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttTipoDeduccion().getInteger()));
-                        aDeducciones.add(((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttClave().getString());
-                        aDeducciones.add(((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttConcepto().getString());
-                        aDeducciones.add(((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteGravado().getDouble() +
-                                ((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteExento().getDouble());
+                        aDeducciones.add(oFixedFormat.format(((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttTipoDeduccion().getInteger()));
+                        aDeducciones.add(((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttClave().getString());
+                        aDeducciones.add(((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttConcepto().getString());
+                        aDeducciones.add(((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteGravado().getDouble() +
+                                ((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteExento().getDouble());
                         aDeducciones.add(null); // pending to be used, navalos (2014-03-13)
 
                         // Obtain isr tax
 
-                        if (((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttClave().getString().compareTo(SCfdConsts.PAYROLL_PER_ISR) == 0 &&
-                            ((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttTipoDeduccion().getInteger() == SCfdConsts.DED_ISR) {
-                            dTotalIsr += ((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteGravado().getDouble();
+                        if (((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttClave().getString().compareTo(SCfdConsts.PAYROLL_PER_ISR) == 0 &&
+                            ((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttTipoDeduccion().getInteger() == SCfdConsts.DED_ISR) {
+                            dTotalIsr += ((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteGravado().getDouble();
                         }
 
-                        dTotalDeducciones += ((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteGravado().getDouble() +
-                                ((cfd.ver3.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteExento().getDouble();
+                        dTotalDeducciones += ((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteGravado().getDouble() +
+                                ((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteExento().getDouble();
                     }
                 }
 
@@ -343,14 +343,14 @@ public class PrintCfdiThread extends Thread {
                 // Incapacities:
 
                 i = 0;
-                if (((cfd.ver3.DElementNomina) element).getEltIncapacidades() != null) {
-                    for (i = 0; i < ((cfd.ver3.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().size(); i++) {
+                if (((cfd.ver3.nom11.DElementNomina) element).getEltIncapacidades() != null) {
+                    for (i = 0; i < ((cfd.ver3.nom11.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().size(); i++) {
 
-                        aIncapacidades.add(oFixedFormat.format(((cfd.ver3.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttTipoIncapacidad().getInteger()));
-                        aIncapacidades.add(((cfd.ver3.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttDiasIncapacidad().getDouble());
-                        aIncapacidades.add(((cfd.ver3.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttDescuento().getDouble());
+                        aIncapacidades.add(oFixedFormat.format(((cfd.ver3.nom11.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttTipoIncapacidad().getInteger()));
+                        aIncapacidades.add(((cfd.ver3.nom11.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttDiasIncapacidad().getDouble());
+                        aIncapacidades.add(((cfd.ver3.nom11.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttDescuento().getDouble());
 
-                        dTotalIncapacidades += ((cfd.ver3.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttDescuento().getDouble();
+                        dTotalIncapacidades += ((cfd.ver3.nom11.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttDescuento().getDouble();
                     }
                 }
 

@@ -101,7 +101,8 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         jPanel28 = new javax.swing.JPanel();
         moRadIsSummary = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadIsDetailPayroll = new sa.lib.gui.bean.SBeanFieldRadio();
-        moRadIsDetailEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadIsDetailEmpDep = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadIsDetailDepEmp = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel7 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -266,18 +267,22 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
 
         moGroupSummary.add(moRadIsSummary);
         moRadIsSummary.setText("Resumen");
-        moRadIsSummary.setPreferredSize(new java.awt.Dimension(125, 23));
+        moRadIsSummary.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel28.add(moRadIsSummary);
 
         moGroupSummary.add(moRadIsDetailPayroll);
         moRadIsDetailPayroll.setText("Detalle nóminas");
-        moRadIsDetailPayroll.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel28.add(moRadIsDetailPayroll);
 
-        moGroupSummary.add(moRadIsDetailEmployee);
-        moRadIsDetailEmployee.setText("Detalle empleados");
-        moRadIsDetailEmployee.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel28.add(moRadIsDetailEmployee);
+        moGroupSummary.add(moRadIsDetailEmpDep);
+        moRadIsDetailEmpDep.setText("Detalle empleado - depto.");
+        moRadIsDetailEmpDep.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel28.add(moRadIsDetailEmpDep);
+
+        moGroupSummary.add(moRadIsDetailDepEmp);
+        moRadIsDetailDepEmp.setText("Detalle depto. - empleado");
+        moRadIsDetailDepEmp.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel28.add(moRadIsDetailDepEmp);
 
         jPanel5.add(jPanel28);
 
@@ -464,7 +469,8 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
     private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypeDate;
     private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypeDatePay;
     private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypePeriod;
-    private sa.lib.gui.bean.SBeanFieldRadio moRadIsDetailEmployee;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadIsDetailDepEmp;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadIsDetailEmpDep;
     private sa.lib.gui.bean.SBeanFieldRadio moRadIsDetailPayroll;
     private sa.lib.gui.bean.SBeanFieldRadio moRadIsSummary;
     private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNameDepartament;
@@ -517,8 +523,9 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
     }
     
     private void actionEnableFieldDetailEmployee() {
-        moRadIsDetailEmployee.setEnabled(moRadReportTypeEarDed.isSelected());
-        moRadIsSummary.setSelected(moRadIsDetailEmployee.isSelected() && !moRadIsDetailEmployee.isEnabled());
+        moRadIsDetailEmpDep.setEnabled(moRadReportTypeEarDed.isSelected());
+        moRadIsDetailDepEmp.setEnabled(moRadReportTypeEarDed.isSelected());
+        moRadIsSummary.setSelected((moRadIsDetailEmpDep.isSelected() && !moRadIsDetailEmpDep.isEnabled()) || (moRadIsDetailDepEmp.isSelected() && !moRadIsDetailDepEmp.isEnabled()));
     }
     
     private void actionEnableFieldsEarDed() {
@@ -551,61 +558,96 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
     private String getOrderBy() {
         String orderBy = "ORDER BY ";
         
-        if (moRadReportTypeEarDed.isSelected()) {
-            orderBy += "_g3, f_ear_ded, f_ear_ded_id, ";
+        if (mnFormType == SModConsts.HRSR_PAY_EAR_DED) {
+            if (moRadReportTypeEarDed.isSelected()) {
+                orderBy += "_g3, f_ear_ded, f_ear_ded_id, ";
+            }
+            else if (moRadReportTypeEmployee.isSelected()) {
+                if (moRadOrderByNumEmployee.isSelected()) {
+                    orderBy += "CAST(f_emp_num AS UNSIGNED INTEGER), _g2_name, _g2, ";
+                }
+                else if (moRadOrderByNameEmployee.isSelected()) {
+                    orderBy += "_g2_name, _g2, ";
+                }
+                orderBy += "_g3, f_ear_ded, f_ear_ded_id, ";
+            }
+            else if (moRadReportTypeEmployeeDep.isSelected()) {
+                if (moRadOrderByNumEmployee.isSelected()) {
+                    orderBy += "CAST(f_emp_num AS UNSIGNED INTEGER), _g1_name, _g1, ";
+                }
+                else if (moRadOrderByNameEmployee.isSelected()) {
+                    orderBy += "_g1_name, _g1, ";
+                }
+
+                if (moRadOrderByNumDepartament.isSelected()) {
+                    orderBy += "f_dep_code, _g2_name, _g2, ";
+                }
+                else if (moRadOrderByNameDepartament.isSelected()) {
+                    orderBy += "_g2_name, f_dep_code, _g2, ";
+                }
+                orderBy += "_g3, f_ear_ded, f_ear_ded_id, ";
+            }
+            else if (moRadReportTypeDepartament.isSelected()) {
+                if (moRadOrderByNumDepartament.isSelected()) {
+                    orderBy += "f_dep_code, _g2_name, _g2, ";
+                }
+                else if (moRadOrderByNameDepartament.isSelected()) {
+                    orderBy += "_g2_name, f_dep_code, _g2, ";
+                }
+                orderBy += "_g3, f_ear_ded, f_ear_ded_id, ";
+            }
+            else if (moRadReportTypeDepartamentEmp.isSelected()) {
+                if (moRadOrderByNumDepartament.isSelected()) {
+                    orderBy += "f_dep_code, _g1_name, _g1, ";
+                }
+                else if (moRadOrderByNameDepartament.isSelected()) {
+                    orderBy += "_g1_name, f_dep_code, _g1, ";
+                }
+
+                if (moRadOrderByNumEmployee.isSelected()) {
+                    orderBy += "CAST(f_emp_num AS UNSIGNED INTEGER), _g2_name, _g2, ";
+                }
+                else if (moRadOrderByNameEmployee.isSelected()) {
+                    orderBy += "_g2_name, _g2, ";
+                }
+                orderBy += "_g3, f_ear_ded, f_ear_ded_id, ";
+            }
+            orderBy += "f_tp_pay, f_num_pay, f_pay_id; ";
         }
-        else if (moRadReportTypeEmployee.isSelected()) {
-            if (moRadOrderByNumEmployee.isSelected()) {
-                orderBy += "CAST(f_emp_num AS UNSIGNED INTEGER), _g2_name, _g2, ";
-            }
-            else if (moRadOrderByNameEmployee.isSelected()) {
-                orderBy += "_g2_name, _g2, ";
-            }
-            orderBy += "_g3, f_ear_ded, f_ear_ded_id, ";
-        }
-        else if (moRadReportTypeEmployeeDep.isSelected()) {
-            if (moRadOrderByNumEmployee.isSelected()) {
-                orderBy += "CAST(f_emp_num AS UNSIGNED INTEGER), _g1_name, _g1, ";
-            }
-            else if (moRadOrderByNameEmployee.isSelected()) {
-                orderBy += "_g1_name, _g1, ";
-            }
+        else if (mnFormType == SModConsts.HRSR_PAY_AUX_EAR_DED) {
+            orderBy += "f_tp_ear_ded, f_ear_ded_id, f_ear_ded, ";
             
-            if (moRadOrderByNumDepartament.isSelected()) {
-                orderBy += "f_dep_code, _g2_name, _g2, ";
+            if (moRadIsDetailEmpDep.isSelected()) {
+                if (moRadOrderByNumEmployee.isSelected()) {
+                    orderBy += "CAST(f_emp_num AS UNSIGNED INTEGER), bp, id_bp, ";
+                }
+                else if (moRadOrderByNameEmployee.isSelected()) {
+                    orderBy += "bp, CAST(f_emp_num AS UNSIGNED INTEGER), id_bp, ";
+                }
+                
+                if (moRadOrderByNumDepartament.isSelected()) {
+                    orderBy += "f_dep_code, f_dep_name, id_dep ";
+                }
+                else if (moRadOrderByNameDepartament.isSelected()) {
+                    orderBy += "f_dep_name, f_dep_code, id_dep ";
+                }
             }
-            else if (moRadOrderByNameDepartament.isSelected()) {
-                orderBy += "_g2_name, f_dep_code, _g2, ";
+            else if (moRadIsDetailDepEmp.isSelected()) {
+                if (moRadOrderByNumDepartament.isSelected()) {
+                    orderBy += "f_dep_code, f_dep_name, id_dep, ";
+                }
+                else if (moRadOrderByNameDepartament.isSelected()) {
+                    orderBy += "f_dep_name, f_dep_code, id_dep, ";
+                }
+                
+                if (moRadOrderByNumEmployee.isSelected()) {
+                    orderBy += "CAST(f_emp_num AS UNSIGNED INTEGER), bp, id_bp ";
+                }
+                else if (moRadOrderByNameEmployee.isSelected()) {
+                    orderBy += "bp, CAST(f_emp_num AS UNSIGNED INTEGER), id_bp ";
+                }
             }
-            orderBy += "_g3, f_ear_ded, f_ear_ded_id, ";
         }
-        else if (moRadReportTypeDepartament.isSelected()) {
-            if (moRadOrderByNumDepartament.isSelected()) {
-                orderBy += "f_dep_code, _g2_name, _g2, ";
-            }
-            else if (moRadOrderByNameDepartament.isSelected()) {
-                orderBy += "_g2_name, f_dep_code, _g2, ";
-            }
-            orderBy += "_g3, f_ear_ded, f_ear_ded_id, ";
-        }
-        else if (moRadReportTypeDepartamentEmp.isSelected()) {
-            if (moRadOrderByNumDepartament.isSelected()) {
-                orderBy += "f_dep_code, _g1_name, _g1, ";
-            }
-            else if (moRadOrderByNameDepartament.isSelected()) {
-                orderBy += "_g1_name, f_dep_code, _g1, ";
-            }
-            
-            if (moRadOrderByNumEmployee.isSelected()) {
-                orderBy += "CAST(f_emp_num AS UNSIGNED INTEGER), _g2_name, _g2, ";
-            }
-            else if (moRadOrderByNameEmployee.isSelected()) {
-                orderBy += "_g2_name, _g2, ";
-            }
-            orderBy += "_g3, f_ear_ded, f_ear_ded_id, ";
-        }
-        orderBy += "f_tp_pay, f_num_pay, f_pay_id; ";
-        
         return orderBy;
     }
     
@@ -826,19 +868,15 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
             moParamsMap.put("sSqlWhereEarning", !moKeyEarning.isEnabled() ? " AND ear.id_ear = 0 " : moKeyEarning.getSelectedIndex() > 0 ? " AND ear.id_ear = " + moKeyEarning.getValue()[0] : "");
             moParamsMap.put("sSqlWhereDeduction", !moKeyDeduction.isEnabled() ? " AND ded.id_ded = 0 " : moKeyDeduction.getSelectedIndex() > 0 ? " AND ded.id_ded = " + moKeyDeduction.getValue()[0] : "");
         }
+        mnFormType = SModConsts.HRSR_PAY_EAR_DED;
         
-        if (moRadIsDetailPayroll.isSelected()) {
-            mnFormType = SModConsts.HRSR_PAY_EAR_DED;
-            
-            moParamsMap.put("sSqlOrderBy", getOrderBy());
-        }
-        else if (moRadIsDetailEmployee.isSelected()) {
+        if (moRadIsDetailEmpDep.isSelected() || moRadIsDetailDepEmp.isSelected()) {
             mnFormType = SModConsts.HRSR_PAY_AUX_EAR_DED;
             
             moParamsMap.put("bIsSummary", false);
             moParamsMap.put("bShowEmployees", true);
-            moParamsMap.put("sSqlOrderBy", "ORDER BY f_tp_ear_ded, f_ear_ded_id, f_ear_ded, id_dep, f_dep_code, f_dep_name, id_bp, f_emp_num, bp ");
         }
+        moParamsMap.put("sSqlOrderBy", getOrderBy());
     }
 
     @Override
