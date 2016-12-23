@@ -338,8 +338,8 @@ public class SSessionCustom implements SGuiSessionCustom {
             sql = "SELECT fid_cur, fid_cty, fid_lan FROM " + SModConsts.TablesMap.get(SModConsts.CFG_PARAM_ERP) + " ";
             resultSet = moSession.getStatement().executeQuery(sql);
             if (resultSet.next()) {
-                manLocalCountryKey = new int[] { resultSet.getInt(1) };
-                manLocalCurrencyKey = new int[] { resultSet.getInt(2) };
+                manLocalCurrencyKey = new int[] { resultSet.getInt(1) };
+                manLocalCountryKey = new int[] { resultSet.getInt(2) };
                 keyLanguage = new int[] { resultSet.getInt(3) };
             }
 
