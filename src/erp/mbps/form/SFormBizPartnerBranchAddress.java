@@ -20,10 +20,13 @@ import erp.data.SDataConstants;
 import erp.lib.form.SFormValidation;
 import erp.lib.form.SFormUtilities;
 import erp.lib.SLibConstants;
+import erp.lib.form.SFormField;
+import erp.mbps.data.SDataBizPartnerBranchAddress;
+import java.util.Vector;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores
+ * @author Alfonso Flores, Sergio Flores, Edwin Carmona
  */
 public class SFormBizPartnerBranchAddress extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -34,6 +37,8 @@ public class SFormBizPartnerBranchAddress extends javax.swing.JDialog implements
     private boolean mbResetingForm;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.client.SClientInterface miClient;
+    
+    private erp.lib.form.SFormField moFieldIsDeleted;
 
     private erp.mbps.form.SPanelBizPartnerBranchAddress moPanelBizPartnerBranchAddress;
     
@@ -61,6 +66,8 @@ public class SFormBizPartnerBranchAddress extends javax.swing.JDialog implements
         jbCancel = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jpBranchAddress = new javax.swing.JPanel();
+        jPanel13 = new javax.swing.JPanel();
+        jckIsDeleted = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Domicilio de la sucursal");
@@ -91,10 +98,18 @@ public class SFormBizPartnerBranchAddress extends javax.swing.JDialog implements
         jpBranchAddress.setLayout(new java.awt.BorderLayout());
         jPanel2.add(jpBranchAddress, java.awt.BorderLayout.NORTH);
 
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jckIsDeleted.setText("Registro eliminado");
+        jckIsDeleted.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel13.add(jckIsDeleted);
+
+        jPanel2.add(jPanel13, java.awt.BorderLayout.CENTER);
+
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-576)/2, (screenSize.height-388)/2, 576, 388);
+        setSize(new java.awt.Dimension(576, 388));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -104,6 +119,11 @@ public class SFormBizPartnerBranchAddress extends javax.swing.JDialog implements
     private void initComponentsExtra() {
         moPanelBizPartnerBranchAddress = new SPanelBizPartnerBranchAddress(miClient);
         jpBranchAddress.add(moPanelBizPartnerBranchAddress, BorderLayout.CENTER);
+        
+        moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
+
+        mvFields = new Vector<SFormField>();
+        mvFields.add(moFieldIsDeleted);
 
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
@@ -154,9 +174,11 @@ public class SFormBizPartnerBranchAddress extends javax.swing.JDialog implements
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
+    private javax.swing.JCheckBox jckIsDeleted;
     private javax.swing.JPanel jpBranchAddress;
     // End of variables declaration//GEN-END:variables
 
@@ -169,6 +191,11 @@ public class SFormBizPartnerBranchAddress extends javax.swing.JDialog implements
     public void formReset() {
         mbFirstTime = true;
         mbResetingForm = false;
+        
+        for (int i = 0; i < mvFields.size(); i++) {
+            ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
+        }
+        
         moPanelBizPartnerBranchAddress.formReset();
     }
 
@@ -204,12 +231,16 @@ public class SFormBizPartnerBranchAddress extends javax.swing.JDialog implements
 
     @Override
     public void setRegistry(erp.lib.data.SDataRegistry registry) {
+        moFieldIsDeleted.setFieldValue(((SDataBizPartnerBranchAddress) registry).getIsDeleted());
         moPanelBizPartnerBranchAddress.setRegistry(registry);
     }
 
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
-        return moPanelBizPartnerBranchAddress.getRegistry();
+        SDataBizPartnerBranchAddress bizPartnerBranchAddress = (SDataBizPartnerBranchAddress) moPanelBizPartnerBranchAddress.getRegistry();
+        bizPartnerBranchAddress.setIsDeleted(moFieldIsDeleted.getBoolean());
+        
+        return bizPartnerBranchAddress;
     }
 
     @Override
