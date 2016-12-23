@@ -89,6 +89,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private boolean mbUpdatingForm;
     private java.util.Vector<SFormField> mvFields;
     private erp.client.SClientInterface miClient;
+    private int [] maTypeDps;
 
     private erp.mtrn.data.SDataDpsEntry moDpsEntry;
     private erp.mitm.data.SDataItem moItem;
@@ -2832,7 +2833,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
             enableItemFields();
         }
-
+        
+        enableFieldsAccount();
         renderFieldsStatus();
 
         if (calculate) {
@@ -2990,8 +2992,19 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfSurface.setEnabled(moItem.getDbmsDataItemGeneric().getIsSurfaceApplying() && (moItem.getIsSurfaceVariable() || moItem.getDbmsDataItemGeneric().getIsSurfaceVariable()));
             jtfVolume.setEnabled(moItem.getDbmsDataItemGeneric().getIsVolumeApplying() && (moItem.getIsVolumeVariable() || moItem.getDbmsDataItemGeneric().getIsVolumeVariable()));
             jtfMass.setEnabled(moItem.getDbmsDataItemGeneric().getIsMassApplying() && (moItem.getIsMassVariable() || moItem.getDbmsDataItemGeneric().getIsMassVariable()));
-
+            
             jckIsSurplusPercentageApplying.setEnabled(true);
+        }
+    }
+    
+    private void enableFieldsAccount() {
+        if (moFieldIsPrepayment.getBoolean() && moParamDps.isDocument()) {
+            jradAccCashAccount.setEnabled(true);
+            jradAccAdvanceBilled.setEnabled(true);
+        }
+        else {
+            jradAccCashAccount.setEnabled(false);
+            jradAccAdvanceBilled.setEnabled(false);
         }
     }
 
@@ -3236,8 +3249,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfSecuritySeal.setEditable(true);
             jtfTicket.setEditable(true);
             jtfVgm.setEditable(true);
-            jradAccCashAccount.setEnabled(true);
-            jradAccAdvanceBilled.setEnabled(true);
+            enableFieldsAccount();
             bgAccOptions.clearSelection();
             renderAccOptions();
 
@@ -4744,7 +4756,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 validation.setComponent(jtfDriver);
                 jTabbedPane.setSelectedIndex(TAB_MKT);
             }
-            else if (moItem.getIsPrepayment() && moFieldOriginalQuantity.getDouble() > 0 && !jradAccCashAccount.isSelected() && !jradAccAdvanceBilled.isSelected()) {
+            else if (moItem.getIsPrepayment() && moFieldOriginalQuantity.getDouble() > 0 && !jradAccCashAccount.isSelected() && !jradAccAdvanceBilled.isSelected() && (jradAccAdvanceBilled.isEnabled() || jradAccCashAccount.isEnabled())) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlAccOptions.getText() + "'.");
                 validation.setComponent(jradAccCashAccount);
                 jTabbedPane.setSelectedIndex(TAB_MKT);
@@ -5013,6 +5025,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         renderDpsEntryValue();
         renderFieldsStatus();
+        enableFieldsAccount();
         jckIsDeleted.setEnabled(true);
         
         if (moParamDps.isEstimate()) {
