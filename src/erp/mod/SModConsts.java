@@ -716,6 +716,7 @@ public abstract class SModConsts {
         TablesMap.put(USR_USR_FUNC, "usr_usr_func");
 
         TablesMap.put(LOCU_CTY, "erp.locu_cty");
+        TablesMap.put(LOCU_STA, "erp.locu_sta");
 
         TablesMap.put(BPSS_CT_BP, "erp.bpss_ct_bp");
         TablesMap.put(BPSS_TP_BP_IDY, "erp.bpss_tp_bp_idy");
