@@ -790,16 +790,16 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_ACC_DEP = 2; // Department
     public static final int HRSS_TP_ACC_EMP = 3; // Employee
 
-    public static final int HRSS_TP_TAX_COMP_WOT = 1; // With out tax
-    public static final int HRSS_TP_TAX_COMP_PAY = 2; // Payroll
-    public static final int HRSS_TP_TAX_COMP_ANN = 3; // Annual
+    public static final int HRSS_TP_TAX_COMP_WOT = 1;   // With out tax
+    public static final int HRSS_TP_TAX_COMP_PAY = 2;   // Payroll
+    public static final int HRSS_TP_TAX_COMP_ANN = 3;   // Annual
 
-    public static final int HRSS_TP_EAR_COMP_AMT = 1; // Amount
-    public static final int HRSS_TP_EAR_COMP_DAY = 2; // Days
-    public static final int HRSS_TP_EAR_COMP_HRS = 3; // Hours
-    public static final int HRSS_TP_EAR_COMP_PER_DAY = 12; // % Day
-    public static final int HRSS_TP_EAR_COMP_PER_HRS = 13; // % Hour
-    public static final int HRSS_TP_EAR_COMP_PER_EAR = 21; // % Earnings
+    public static final int HRSS_TP_EAR_COMP_AMT = 1;       // Amount
+    public static final int HRSS_TP_EAR_COMP_DAY = 2;       // Days
+    public static final int HRSS_TP_EAR_COMP_HRS = 3;       // Hours
+    public static final int HRSS_TP_EAR_COMP_PER_DAY = 12;  // % Day
+    public static final int HRSS_TP_EAR_COMP_PER_HRS = 13;  // % Hour
+    public static final int HRSS_TP_EAR_COMP_PER_EAR = 21;  // % Earnings
 
     public static final int HRSS_TP_EAR_EXEM_NON = 1;       // Non applicable
     public static final int HRSS_TP_EAR_EXEM_PER = 11;      // Percentage
@@ -813,19 +813,23 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_EAR_EXEM_WCB_EVT = 42;  // Wage Contribution Base Event
     public static final int HRSS_TP_EAR_EXEM_WCB_SEN = 43;  // Wage Contribution Base Seniority
 
-    public static final int HRSS_TP_EAR_EAR = 1;    // Earnings
+    public static final int HRSS_TP_EAR_EAR = 1;        // Earnings
     public static final int HRSS_TP_EAR_TAX_SUB = 17;   // Tax
     public static final int HRSS_TP_EAR_OVR_TME = 19;   // Overtime
 
-    public static final int HRSS_TP_DED_COMP_AMT = 1;   // Amount
-    public static final int HRSS_TP_DED_COMP_DAY = 2;   // Days
-    public static final int HRSS_TP_DED_COMP_HRS = 3;   // Hours
-    public static final int HRSS_TP_DED_COMP_PER_DAY = 12; // % Day
-    public static final int HRSS_TP_DED_COMP_PER_HRS = 13; // % Hour
-    public static final int HRSS_TP_DED_COMP_PBT = 21;  // Pay Before Tax
-    public static final int HRSS_TP_DED_COMP_PAT = 22;  // Pay After Tax
-    public static final int HRSS_TP_DED_COMP_IBT = 26;  // Income Before Tax
-    public static final int HRSS_TP_DED_COMP_IAT = 27;  // Income After Tax
+    public static final int HRSS_TP_OTH_PAY_TAX_REF = 1; // Tax Refund
+    public static final int HRSS_TP_OTH_PAY_TAX_SUB = 2; // Tax Subsidy
+    public static final int HRSS_TP_OTH_PAY_TRV_EXP = 3; // Travel Expenses
+
+    public static final int HRSS_TP_DED_COMP_AMT = 1;       // Amount
+    public static final int HRSS_TP_DED_COMP_DAY = 2;       // Days
+    public static final int HRSS_TP_DED_COMP_HRS = 3;       // Hours
+    public static final int HRSS_TP_DED_COMP_PER_DAY = 12;  // % Day
+    public static final int HRSS_TP_DED_COMP_PER_HRS = 13;  // % Hour
+    public static final int HRSS_TP_DED_COMP_PBT = 21;      // Pay Before Tax
+    public static final int HRSS_TP_DED_COMP_PAT = 22;      // Pay After Tax
+    public static final int HRSS_TP_DED_COMP_IBT = 26;      // Income Before Tax
+    public static final int HRSS_TP_DED_COMP_IAT = 27;      // Income After Tax
 
     public static final int HRSS_TP_DED_SSC = 1;    // Social Security
     public static final int HRSS_TP_DED_TAX = 2;    // Tax
@@ -846,17 +850,17 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_LOAN_PAY_FIX = 2;   // Fixed
     public static final int HRSS_TP_LOAN_PAY_PER = 3;   // Percentage
 
-    public static final int HRSS_TP_REC_SCHE_WAG = 2;   // Wages & salaries
-    public static final int HRSS_TP_REC_SCHE_RET = 3;   // Retirees
-    public static final int HRSS_TP_REC_SCHE_PEN = 4;   // Pensioners
+    public static final int HRSS_TP_REC_SCHE_WAG = 2;       // Wages & salaries
+    public static final int HRSS_TP_REC_SCHE_RET = 3;       // Retirees
+    public static final int HRSS_TP_REC_SCHE_PEN = 4;       // Pensioners
     public static final int HRSS_TP_REC_SCHE_ASS_COO = 5;   // Cooperative society members
     public static final int HRSS_TP_REC_SCHE_ASS_CIV = 6;   // Civil society & association members
     public static final int HRSS_TP_REC_SCHE_ASS_BRD = 7;   // Board members
     public static final int HRSS_TP_REC_SCHE_ASS_SAL = 8;   // Sales representatives
     public static final int HRSS_TP_REC_SCHE_ASS_PRO = 9;   // Professionals
     public static final int HRSS_TP_REC_SCHE_ASS_SHA = 10;  // Shareholders
-    public static final int HRSS_TP_REC_SCHE_ASS_OTH = 11; // Other
-    public static final int HRSS_TP_REC_SCHE_OTH = 99; // Other
+    public static final int HRSS_TP_REC_SCHE_ASS_OTH = 11;  // Other
+    public static final int HRSS_TP_REC_SCHE_OTH = 99;      // Other
 
     public static final int HRSS_TP_POS_RISK_CL1 = 1; // Class I
     public static final int HRSS_TP_POS_RISK_CL2 = 2; // Class II

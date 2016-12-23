@@ -119,6 +119,7 @@ public abstract class SModConsts {
      */
 
     public static final int LOCU_CTY = 1032001;
+    public static final int LOCU_STA = 1032002;
 
     /*
      * Business partners
