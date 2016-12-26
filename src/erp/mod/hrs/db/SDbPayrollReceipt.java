@@ -80,6 +80,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     protected int mnFkDepartmentId;
     protected int mnFkPositionId;
     protected int mnFkShiftId;
+    protected int mnFkContractTypeId;
     protected int mnFkRecruitmentSchemeTypeId;
     protected int mnFkPositionRiskTypeId;
     /*
@@ -292,6 +293,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public void setFkDepartmentId(int n) { mnFkDepartmentId = n; }
     public void setFkPositionId(int n) { mnFkPositionId = n; }
     public void setFkShiftId(int n) { mnFkShiftId = n; }
+    public void setFkContractTypeId(int n) { mnFkContractTypeId = n; }
     public void setFkRecruitmentSchemeTypeId(int n) { mnFkRecruitmentSchemeTypeId = n; }
     public void setFkPositionRiskTypeId(int n) { mnFkPositionRiskTypeId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
@@ -357,6 +359,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public int getFkDepartmentId() { return mnFkDepartmentId; }
     public int getFkPositionId() { return mnFkPositionId; }
     public int getFkShiftId() { return mnFkShiftId; }
+    public int getFkContractTypeId() { return mnFkContractTypeId; }
     public int getFkRecruitmentSchemeTypeId() { return mnFkRecruitmentSchemeTypeId; }
     public int getFkPositionRiskTypeId() { return mnFkPositionRiskTypeId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
@@ -444,6 +447,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         mnFkDepartmentId = 0;
         mnFkPositionId = 0;
         mnFkShiftId = 0;
+        mnFkContractTypeId = 0;
         mnFkRecruitmentSchemeTypeId = 0;
         mnFkPositionRiskTypeId = 0;
         mnFkUserInsertId = 0;
@@ -553,6 +557,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
             mnFkDepartmentId = resultSet.getInt("fk_dep");
             mnFkPositionId = resultSet.getInt("fk_pos");
             mnFkShiftId = resultSet.getInt("fk_sht");
+            mnFkContractTypeId = resultSet.getInt("fk_tp_con");
             mnFkRecruitmentSchemeTypeId = resultSet.getInt("fk_tp_rec_sche");
             mnFkPositionRiskTypeId = resultSet.getInt("fk_tp_pos_risk");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
@@ -718,6 +723,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
                     mnFkDepartmentId + ", " + 
                     mnFkPositionId + ", " + 
                     mnFkShiftId + ", " + 
+                    mnFkContractTypeId + ", " + 
                     mnFkRecruitmentSchemeTypeId + ", " + 
                     mnFkPositionRiskTypeId + ", " +
                     mnFkUserInsertId + ", " +
@@ -788,6 +794,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
                     "fk_dep = " + mnFkDepartmentId + ", " +
                     "fk_pos = " + mnFkPositionId + ", " +
                     "fk_sht = " + mnFkShiftId + ", " +
+                    "fk_tp_con = " + mnFkContractTypeId + ", " +
                     "fk_tp_rec_sche = " + mnFkRecruitmentSchemeTypeId + ", " +
                     "fk_tp_pos_risk = " + mnFkPositionRiskTypeId + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
@@ -895,6 +902,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         registry.setFkDepartmentId(this.getFkDepartmentId());
         registry.setFkPositionId(this.getFkPositionId());
         registry.setFkShiftId(this.getFkShiftId());
+        registry.setFkContractTypeId(this.getFkContractTypeId());
         registry.setFkRecruitmentSchemeTypeId(this.getFkRecruitmentSchemeTypeId());
         registry.setFkPositionRiskTypeId(this.getFkPositionRiskTypeId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
@@ -990,6 +998,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
             registryDummy.setFkDepartmentId(SModSysConsts.HRSU_DEP_NON);
             registryDummy.setFkPositionId(SModSysConsts.HRSU_POS_NON);
             registryDummy.setFkShiftId(SModSysConsts.HRSU_SHT_NON);
+            registryDummy.setFkContractTypeId(SModSysConsts.HRSS_TP_CON_OTH);
             registryDummy.setFkRecruitmentSchemeTypeId(SModSysConsts.HRSS_TP_REC_SCHE_WAG);
             registryDummy.setFkPositionRiskTypeId(SModSysConsts.HRSS_TP_POS_RISK_CL1);
 
