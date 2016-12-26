@@ -2239,7 +2239,12 @@ public abstract class SCfdUtils implements Serializable {
                             cfdPrint.printCfdi(cfd, printMode, dps);
                             break;
                         case SCfdConsts.CFD_TYPE_PAYROLL:
-                            cfdPrint.printPayrollReceipt(cfd, printMode, copies, subtypeCfd);
+                            if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == 1.1) {
+                                cfdPrint.printPayrollReceipt(cfd, printMode, copies, subtypeCfd);
+                            }
+                            else {
+                                cfdPrint.printPayrollReceipt12(cfd, printMode, copies, subtypeCfd);
+                            }
                             break;
                         default:
                             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -2738,7 +2743,12 @@ public abstract class SCfdUtils implements Serializable {
                                 cfdPrint.printCfdi(cfd, SDataConstantsPrint.PRINT_MODE_PDF, dps);
                                 break;
                             case SCfdConsts.CFD_TYPE_PAYROLL:
-                                cfdPrint.printPayrollReceipt(cfd, SDataConstantsPrint.PRINT_MODE_PDF, subtypeCfd);
+                                if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == 1.1) {
+                                    cfdPrint.printPayrollReceipt(cfd, SDataConstantsPrint.PRINT_MODE_PDF, subtypeCfd);
+                                }
+                                else {
+                                    cfdPrint.printPayrollReceipt12(cfd, SDataConstantsPrint.PRINT_MODE_PDF, subtypeCfd);
+                                }
                                 break;
                             default:
                                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
