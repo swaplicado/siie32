@@ -15,6 +15,12 @@ import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 
+/* IMPORTANT:
+ * Every single change made to the definition of this class' table must be updated also in the following classes:
+ * - erp.mmfg.data.SDataCostClosePeriod
+ * All of them also make raw SQL insertions.
+ */
+
 /**
  *
  * @author Néstor Ávalos

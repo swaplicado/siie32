@@ -26,6 +26,12 @@ import javax.swing.JOptionPane;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 
+/* IMPORTANT:
+ * Every single change made to the definition of this class' table must be updated also in the following classes:
+ * - erp.mod.fin.db.SDbBankLayout
+ * All of them also make raw SQL insertions.
+ */
+
 /**
  *
  * @author Juan Barajas
