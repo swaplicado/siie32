@@ -18,6 +18,13 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.Vector;
 
+/* IMPORTANT:
+ * Every single change made to the definition of this class' table must be updated also in the following classes:
+ * - erp.mod.trn.db.SDbInventoryValuationXXX
+ * - erp.mtrn.data.SDataRawMaterialsConsume
+ * All of them also make raw SQL insertions.
+ */
+
 /**
  *
  * @author Sergio Flores

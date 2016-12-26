@@ -16,6 +16,12 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Vector;
 
+/* IMPORTANT:
+ * Every single change made to the definition of this class' table must be updated also in the following class:
+ * - erp.mfin.data.SDataRecordEntry
+ * All of them also make raw SQL insertions.
+ */
+
 /**
  *
  * @author Juan Barajas

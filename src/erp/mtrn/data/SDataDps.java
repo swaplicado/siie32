@@ -494,7 +494,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         statement.execute(sql);
         sql = "DELETE FROM trn_dps_repl WHERE id_old_year = " + mnPkYearId + " AND id_old_doc = " + mnPkDocId + " ";
         statement.execute(sql);
-        sql = "DELETE FROM trn_dps_repl WHERE id_new_year = " + mnPkYearId + " AND id_new_doc = " + mnPkDocId + " ";
+        sql = "DELETE FROM trn_dps_repl WHERE id_new_year = " + mnPkYearId + " "
+                + "AND id_new_doc = " + mnPkDocId + " ";
         statement.execute(sql);
         sql = "DELETE FROM trn_dps_iog_chg WHERE id_dps_year = " + mnPkYearId + " AND id_dps_doc = " + mnPkDocId + " ";
         statement.execute(sql);

@@ -15,6 +15,12 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+/* IMPORTANT:
+ * Every single change made to the definition of this class' table must be updated also in the following classes:
+ * -  erp.musr.data.SDataUser
+ * All of them also make raw SQL insertions.
+ */
+
 /**
  *
  * @author Alfonso Flores
