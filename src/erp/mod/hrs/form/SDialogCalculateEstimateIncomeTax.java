@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
 import javax.swing.JButton;
+import javax.swing.JSpinner;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
@@ -35,13 +38,15 @@ import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
+import sa.lib.gui.bean.SBeanFieldCalendarYear;
+import sa.lib.gui.bean.SBeanFieldRadio;
 import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
  * @author Juan Barajas
  */
-public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implements ActionListener  {
+public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implements ActionListener, ChangeListener  {
 
     protected SGridPaneForm moGridEmployeesRow;
     protected int mnDaysPeriod;
@@ -65,6 +70,7 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        moGrpTypeDate = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
@@ -75,15 +81,19 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
         jlTax = new javax.swing.JLabel();
         moKeyTax = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel9 = new javax.swing.JPanel();
-        jlDateCut = new javax.swing.JLabel();
-        moDateDateCut = new sa.lib.gui.bean.SBeanFieldDate();
-        jbCalculate = new javax.swing.JButton();
-        jbClean = new javax.swing.JButton();
+        moRadFilterTypeDateCut = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadFilterTypeYear = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel26 = new javax.swing.JPanel();
         jlTaxSubsidy = new javax.swing.JLabel();
         moKeyTaxSubsidy = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel27 = new javax.swing.JPanel();
+        jlDateCut = new javax.swing.JLabel();
+        moDateDateCut = new sa.lib.gui.bean.SBeanFieldDate();
+        jlYear = new javax.swing.JLabel();
+        moCalYear = new sa.lib.gui.bean.SBeanFieldCalendarYear();
         jPanel28 = new javax.swing.JPanel();
+        jbCalculate = new javax.swing.JButton();
+        jbClean = new javax.swing.JButton();
         jpEmployee = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -119,20 +129,16 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateCut.setText("Fecha corte:");
-        jlDateCut.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel9.add(jlDateCut);
-        jPanel9.add(moDateDateCut);
+        moGrpTypeDate.add(moRadFilterTypeDateCut);
+        moRadFilterTypeDateCut.setSelected(true);
+        moRadFilterTypeDateCut.setText("Por fecha de corte");
+        moRadFilterTypeDateCut.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel9.add(moRadFilterTypeDateCut);
 
-        jbCalculate.setText("Calcular");
-        jbCalculate.setMargin(new java.awt.Insets(2, 0, 2, 0));
-        jbCalculate.setPreferredSize(new java.awt.Dimension(115, 23));
-        jPanel9.add(jbCalculate);
-
-        jbClean.setText("Limpiar");
-        jbClean.setMargin(new java.awt.Insets(2, 0, 2, 0));
-        jbClean.setPreferredSize(new java.awt.Dimension(115, 23));
-        jPanel9.add(jbClean);
+        moGrpTypeDate.add(moRadFilterTypeYear);
+        moRadFilterTypeYear.setText("Por ejercicio");
+        moRadFilterTypeYear.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel9.add(moRadFilterTypeYear);
 
         jPanel13.add(jPanel9);
 
@@ -148,9 +154,31 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
         jPanel13.add(jPanel26);
 
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDateCut.setText("Fecha corte:");
+        jlDateCut.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel27.add(jlDateCut);
+        jPanel27.add(moDateDateCut);
+
+        jlYear.setText("Ejercicio:");
+        jlYear.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel27.add(jlYear);
+        jPanel27.add(moCalYear);
+
         jPanel13.add(jPanel27);
 
         jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jbCalculate.setText("Calcular");
+        jbCalculate.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jbCalculate.setPreferredSize(new java.awt.Dimension(115, 23));
+        jPanel28.add(jbCalculate);
+
+        jbClean.setText("Limpiar");
+        jbClean.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jbClean.setPreferredSize(new java.awt.Dimension(115, 23));
+        jPanel28.add(jbClean);
+
         jPanel13.add(jPanel28);
 
         jPanel7.add(jPanel13, java.awt.BorderLayout.PAGE_START);
@@ -182,20 +210,51 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
     private javax.swing.JLabel jlPaymentType;
     private javax.swing.JLabel jlTax;
     private javax.swing.JLabel jlTaxSubsidy;
+    private javax.swing.JLabel jlYear;
     private javax.swing.JPanel jpEmployee;
+    private sa.lib.gui.bean.SBeanFieldCalendarYear moCalYear;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateCut;
+    private javax.swing.ButtonGroup moGrpTypeDate;
     private sa.lib.gui.bean.SBeanFieldKey moKeyPaymentType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyTax;
     private sa.lib.gui.bean.SBeanFieldKey moKeyTaxSubsidy;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypeDateCut;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypeYear;
     // End of variables declaration//GEN-END:variables
 
+    private void enableFields(boolean enable) {
+        moKeyPaymentType.setEnabled(enable);
+        moRadFilterTypeDateCut.setEnabled(enable);
+        moRadFilterTypeYear.setEnabled(enable);
+        moDateDateCut.setEditable(enable);
+        moCalYear.setEditable(enable);
+        jbCalculate.setEnabled(enable);
+        jbClean.setEnabled(!enable);
+    }
+    
+    private void actionEnableFieldsTypeCal() {
+        if (moRadFilterTypeDateCut.isSelected()) {
+            moDateDateCut.setEditable(true);
+            moCalYear.setEditable(true);
+        }
+        else if (moRadFilterTypeYear.isSelected()) {
+            moDateDateCut.setEditable(false);
+            moCalYear.setEditable(true);
+            actionStateChangeYear();
+        }
+    }
+    
+    private void actionStateChangeYear() {
+        moDateDateCut.setValue(SLibTimeUtils.createDate(moCalYear.getValue(), 12, 31));
+    }
+    
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 960, 600);
         
         jbSave.setText("Aceptar");
 
         moDateDateCut.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateCut.getText()), true);
-        moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), true);
+        moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
         
         moFields.addField(moDateDateCut);
         moFields.addField(moKeyPaymentType);
@@ -247,6 +306,7 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
         moGridEmployeesRow.resetSortKeys();
         moGridEmployeesRow.setSelectedGridRow(0);
         
+        moCalYear.setValue(SLibTimeUtils.digestYear(miClient.getSession().getCurrentDate())[0]);
         moDateDateCut.setValue(miClient.getSession().getCurrentDate());
         
         moKeyTax.setEnabled(false);
@@ -255,31 +315,37 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
         enableFields(true);
     }
     
-    private void enableFields(boolean enable) {
-        moDateDateCut.setEditable(enable);
-        jbCalculate.setEnabled(enable);
-        jbClean.setEnabled(!enable);
-        moKeyPaymentType.setEnabled(enable);
-    }
-    
     private void setTablesTax() throws Exception {
         moKeyTax.setValue(new int[] { SHrsUtils.getRecentTaxTable(miClient.getSession(), moDateDateCut.getValue()) });
         moKeyTaxSubsidy.setValue(new int[] { SHrsUtils.getRecentTaxSubsidyTable(miClient.getSession(), moDateDateCut.getValue()) });
     }
     
     private void actionCalculate() {
-        enableFields(false);
-        try {
-            setTablesTax();
-            populateEmployees();
+        SGuiValidation validation = validateForm();
+        
+        if (validation.isValid()) {
+            enableFields(false);
+            try {
+                setTablesTax();
+                populateEmployees();
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
         }
-        catch (Exception e) {
-            SLibUtils.showException(this, e);
+        else {
+            if (validation.getComponent() != null) {
+                validation.getComponent().requestFocus();
+            }
+            if (validation.getMessage().length() > 0) {
+                miClient.showMsgBoxWarning(validation.getMessage());
+            }
         }
     }
     
     private void actionClean() {
         enableFields(true);
+        actionEnableFieldsTypeCal();
     }
     
     private void populateEmployees() {
@@ -316,7 +382,8 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON bp.id_bp = e.id_emp "
                     + "WHERE e.b_act = 1 AND e.id_emp IN(SELECT DISTINCT id_emp FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
-                    + "WHERE per_year = " + SLibTimeUtils.digestYear(moDateDateCut.getValue())[0] + " AND dt_end <= '" + moDateDateCut.getValue() + "' "
+                    + "WHERE " + (moRadFilterTypeDateCut.isSelected() ? " dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateCut.getValue()) + "' AND " : "")
+                    + "per_year = " + moCalYear.getValue() + " " 
                     + (moKeyPaymentType.getSelectedIndex() > 0 ? " AND pr.fk_tp_pay = " +  moKeyPaymentType.getValue()[0] : "") + " "
                     + "ORDER BY id_emp)"
                     + "ORDER BY bp, id_bp ";
@@ -363,12 +430,18 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
     
     @Override
     public void addAllListeners() {
+        moRadFilterTypeDateCut.addChangeListener(this);
+        moRadFilterTypeYear.addChangeListener(this);
+        moCalYear.addChangeListener(this);
         jbCalculate.addActionListener(this);
         jbClean.addActionListener(this);
     }
 
     @Override
     public void removeAllListeners() {
+        moRadFilterTypeDateCut.removeChangeListener(this);
+        moRadFilterTypeYear.removeChangeListener(this);
+        moCalYear.removeChangeListener(this);
         jbCalculate.removeActionListener(this);
         jbClean.removeActionListener(this);
     }
@@ -393,6 +466,13 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
         
+        if (validation.isValid()) {
+            if (Math.abs(moCalYear.getValue() - SLibTimeUtils.digestYear(moDateDateCut.getValue())[0]) > 1) {
+                validation.setMessage("La diferencia entre el año del campo '" + SGuiUtils.getLabelName(jlDateCut) + "' y el campo '" + SGuiUtils.getLabelName(jlYear) + "' no puede ser mayor a 1.");
+                validation.setComponent(moDateDateCut);
+            }
+        }
+        
         return validation;
     }
 
@@ -416,6 +496,24 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
             }
             else if (button == jbClean) {
                 actionClean();
+            }
+        }
+    }
+
+    @Override
+    public void stateChanged(ChangeEvent e) {
+        if (e.getSource() instanceof SBeanFieldRadio) {
+            if ((SBeanFieldRadio) e.getSource() == moRadFilterTypeDateCut ||
+                    (SBeanFieldRadio) e.getSource() == moRadFilterTypeYear) {
+                actionEnableFieldsTypeCal();
+            }
+            
+        }
+        else if (e.getSource() instanceof JSpinner) {
+            SBeanFieldCalendarYear spinner = (SBeanFieldCalendarYear) e.getSource();
+
+            if (spinner == moCalYear) {
+                actionStateChangeYear();
             }
         }
     }
