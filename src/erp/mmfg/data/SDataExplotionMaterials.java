@@ -489,6 +489,7 @@ public class SDataExplotionMaterials extends erp.lib.data.SDataRegistry implemen
                         try {
                             sSql = "DELETE FROM mfg_ord_chg WHERE id_year = " + moProductionOrder.getPkYearId() + " AND id_ord = " + moProductionOrder.getPkOrdId();
                             statement.executeUpdate(sSql);
+                            
                         }
                         catch (java.lang.Exception e) {
                             SLibUtilities.printOutException(this, e);

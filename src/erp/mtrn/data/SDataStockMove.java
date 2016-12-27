@@ -13,6 +13,13 @@ import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.Types;
 
+/* IMPORTANT:
+ * Every single change made to the definition of this class' table must be updated also in the following classes:
+ * - erp.mod.trn.db.SDbInventoryValuationXXX
+ * - erp.mtrn.data.SDataDiog
+ * All of them also make raw SQL insertions.
+ */
+
 /**
  *
  * @author Sergio Flores

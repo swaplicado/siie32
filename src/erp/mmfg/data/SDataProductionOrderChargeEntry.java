@@ -16,6 +16,11 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mtrn.data.STrnStockMove;
 
+/* IMPORTANT:
+ * Every single change made to the definition of this class' table must be updated also in the following classes:
+ * - erp.mmfg.data.SDataExplotionMaterials
+ * All of them also make raw SQL insertions.
+ */
 /**
  *
  * @author Néstor Ávalos
