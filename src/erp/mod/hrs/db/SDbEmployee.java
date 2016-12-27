@@ -22,6 +22,11 @@ import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
+/* IMPORTANT:
+ * Every single change made to the definition of this class' table must be updated also in the following classes:
+ * - erp.mod.hrs.db.SDataEmployee
+ * All of them also make raw SQL insertions.
+ */
 /**
  *
  * @author Juan Barajas
@@ -49,6 +54,7 @@ public class SDbEmployee extends SDbRegistryUser {
     protected String msBankAccount;
     protected java.sql.Blob moImagePhoto_n;
     protected java.sql.Blob moImageSignature_n;
+    protected boolean mbUnionized;
     protected boolean mbMfgOperator;
     protected boolean mbActive;
     /*
@@ -63,6 +69,7 @@ public class SDbEmployee extends SDbRegistryUser {
     protected int mnFkDepartmentId;
     protected int mnFkPositionId;
     protected int mnFkShiftId;
+    protected int mnFkContractTypeId;
     protected int mnFkRecruitmentSchemeTypeId;
     protected int mnFkPositionRiskTypeId;
     protected int mnFkCatalogueSexCategoryId;
@@ -142,6 +149,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public void setBankAccount(String s) { msBankAccount = s; }
     public void setImagePhoto_n(java.sql.Blob o) { moImagePhoto_n = o; }
     public void setImageSignature_n(java.sql.Blob o) { moImageSignature_n = o; }
+    public void setUnionized(boolean b) { mbUnionized = b; }
     public void setMfgOperator(boolean b) { mbMfgOperator = b; }
     public void setActive(boolean b) { mbActive = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
@@ -154,6 +162,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public void setFkDepartmentId(int n) { mnFkDepartmentId = n; }
     public void setFkPositionId(int n) { mnFkPositionId = n; }
     public void setFkShiftId(int n) { mnFkShiftId = n; }
+    public void setFkContractTypeId(int n) { mnFkContractTypeId = n; }
     public void setFkRecruitmentSchemeTypeId(int n) { mnFkRecruitmentSchemeTypeId = n; }
     public void setFkPositionRiskTypeId(int n) { mnFkPositionRiskTypeId = n; }
     public void setFkCatalogueSexCategoryId(int n) { mnFkCatalogueSexCategoryId = n; }
@@ -187,6 +196,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public String getBankAccount() { return msBankAccount; }
     public java.sql.Blob getImagePhoto_n() { return moImagePhoto_n; }
     public java.sql.Blob getImageSignature_n() { return moImageSignature_n; }
+    public boolean isUnionized() { return mbUnionized; }
     public boolean isMfgOperator() { return mbMfgOperator; }
     public boolean isActive() { return mbActive; }
     public boolean isDeleted() { return mbDeleted; }
@@ -199,6 +209,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public int getFkDepartmentId() { return mnFkDepartmentId; }
     public int getFkPositionId() { return mnFkPositionId; }
     public int getFkShiftId() { return mnFkShiftId; }
+    public int getFkContractTypeId() { return mnFkContractTypeId; }
     public int getFkRecruitmentSchemeTypeId() { return mnFkRecruitmentSchemeTypeId; }
     public int getFkPositionRiskTypeId() { return mnFkPositionRiskTypeId; }
     public int getFkCatalogueSexCategoryId() { return mnFkCatalogueSexCategoryId; }
@@ -276,6 +287,7 @@ public class SDbEmployee extends SDbRegistryUser {
         msBankAccount = "";
         moImagePhoto_n = null;
         moImageSignature_n = null;
+        mbUnionized = false;
         mbMfgOperator = false;
         mbActive = false;
         mbDeleted = false;
@@ -288,6 +300,7 @@ public class SDbEmployee extends SDbRegistryUser {
         mnFkDepartmentId = 0;
         mnFkPositionId = 0;
         mnFkShiftId = 0;
+        mnFkContractTypeId = 0;
         mnFkRecruitmentSchemeTypeId = 0;
         mnFkPositionRiskTypeId = 0;
         mnFkCatalogueSexCategoryId = 0;
@@ -377,6 +390,7 @@ public class SDbEmployee extends SDbRegistryUser {
             */
             oPhoto_n = resultSet.getBlob("img_pho_n");
             oSignature_n = resultSet.getBlob("img_sig_n");
+            mbUnionized = resultSet.getBoolean("b_uni");
             mbMfgOperator = resultSet.getBoolean("b_mfg_ope");
             mbActive = resultSet.getBoolean("b_act");
             mbDeleted = resultSet.getBoolean("b_del");
@@ -389,6 +403,7 @@ public class SDbEmployee extends SDbRegistryUser {
             mnFkDepartmentId = resultSet.getInt("fk_dep");
             mnFkPositionId = resultSet.getInt("fk_pos");
             mnFkShiftId = resultSet.getInt("fk_sht");
+            mnFkContractTypeId = resultSet.getInt("fk_tp_con");
             mnFkRecruitmentSchemeTypeId = resultSet.getInt("fk_tp_rec_sche");
             mnFkPositionRiskTypeId = resultSet.getInt("fk_tp_pos_risk");
             mnFkCatalogueSexCategoryId = resultSet.getInt("fk_cl_cat_sex");
@@ -465,6 +480,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     "'" + msBankAccount + "', " + 
                     "NULL, " +
                     "NULL, " +
+                    (mbUnionized ? 1 : 0) + ", " + 
                     (mbMfgOperator ? 1 : 0) + ", " + 
                     (mbActive ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
@@ -477,6 +493,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     mnFkDepartmentId + ", " + 
                     mnFkPositionId + ", " + 
                     mnFkShiftId + ", " + 
+                    mnFkContractTypeId + ", " + 
                     mnFkRecruitmentSchemeTypeId + ", " + 
                     mnFkPositionRiskTypeId + ", " + 
                     mnFkCatalogueSexCategoryId + ", " + 
@@ -519,6 +536,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     "img_pho_n = " + moImagePhoto_n + ", " +
                     "img_sig_n = " + moImageSignature_n + ", " +
                     */
+                    "b_uni = " + (mbUnionized ? 1 : 0) + ", " +
                     "b_mfg_ope = " + (mbMfgOperator ? 1 : 0) + ", " +
                     "b_act = " + (mbActive ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
@@ -531,6 +549,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     "fk_dep = " + mnFkDepartmentId + ", " +
                     "fk_pos = " + mnFkPositionId + ", " +
                     "fk_sht = " + mnFkShiftId + ", " +
+                    "fk_tp_con = " + mnFkContractTypeId + ", " +
                     "fk_tp_rec_sche = " + mnFkRecruitmentSchemeTypeId + ", " +
                     "fk_tp_pos_risk = " + mnFkPositionRiskTypeId + ", " +
                     "fk_cl_cat_sex = " + mnFkCatalogueSexCategoryId + ", " +
@@ -620,6 +639,7 @@ public class SDbEmployee extends SDbRegistryUser {
         registry.setBankAccount(this.getBankAccount());
         registry.setImagePhoto_n(this.getImagePhoto_n());
         registry.setImageSignature_n(this.getImageSignature_n());
+        registry.setUnionized(this.isUnionized());
         registry.setMfgOperator(this.isMfgOperator());
         registry.setActive(this.isActive());
         registry.setDeleted(this.isDeleted());
@@ -632,6 +652,7 @@ public class SDbEmployee extends SDbRegistryUser {
         registry.setFkDepartmentId(this.getFkDepartmentId());
         registry.setFkPositionId(this.getFkPositionId());
         registry.setFkShiftId(this.getFkShiftId());
+        registry.setFkContractTypeId(this.getFkContractTypeId());
         registry.setFkRecruitmentSchemeTypeId(this.getFkRecruitmentSchemeTypeId());
         registry.setFkPositionRiskTypeId(this.getFkPositionRiskTypeId());
         registry.setFkCatalogueSexCategoryId(this.getFkCatalogueSexCategoryId());

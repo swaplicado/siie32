@@ -46,7 +46,7 @@ public class SHrsEmployeeHireLog {
         
         try {
             sql = "SELECT bd FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_CO) + " " +
-                    "WHERE b_mod_hrs = 1; ";
+                    "WHERE b_del = 0 AND b_mod_hrs = 1; ";
 
             if (moConnection != null) {
                 resultSet = moConnection.createStatement().executeQuery(sql);

@@ -15,6 +15,12 @@ import java.util.Date;
 import java.util.Vector;
 import sa.lib.SLibUtils;
 
+/* IMPORTANT:
+ * Every single change made to the definition of this class' table must be updated also in the following classes:
+ * - erp.mtrn.data.SDataCfd
+ * All of them also make raw SQL insertions.
+ */
+
 /**
  *
  * @author Juan Manuel Barajas Cárabes

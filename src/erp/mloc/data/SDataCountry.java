@@ -5,12 +5,11 @@
 
 package erp.mloc.data;
 
-import java.sql.CallableStatement;
-import java.sql.ResultSet;
-
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import java.sql.CallableStatement;
+import java.sql.ResultSet;
 /**
  *
  * @author Alfonso Flores
@@ -20,6 +19,7 @@ public class SDataCountry extends erp.lib.data.SDataRegistry implements java.io.
     protected int mnPkCountryId;
     protected java.lang.String msKey;
     protected java.lang.String msCountry;
+    protected java.lang.String msCountryLan;
     protected java.lang.String msCountryAbbr;
     protected java.lang.String msCountryCode;
     protected boolean mbIsDeleted;
@@ -38,6 +38,7 @@ public class SDataCountry extends erp.lib.data.SDataRegistry implements java.io.
     public void setPkCountryId(int n) { mnPkCountryId = n; }
     public void setKey(java.lang.String s) { msKey = s; }
     public void setCountry(java.lang.String s) { msCountry = s; }
+    public void setCountryLan(java.lang.String s) { msCountryLan = s; }
     public void setCountryAbbr(java.lang.String s) { msCountryAbbr = s; }
     public void setCountryCode(java.lang.String s) { msCountryCode = s; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
@@ -51,6 +52,7 @@ public class SDataCountry extends erp.lib.data.SDataRegistry implements java.io.
     public int getPkCountryId() { return mnPkCountryId; }
     public java.lang.String getKey() { return msKey; }
     public java.lang.String getCountry() { return msCountry; }
+    public java.lang.String getCountryLan() { return msCountryLan; }
     public java.lang.String getCountryAbbr() { return msCountryAbbr; }
     public java.lang.String getCountryCode() { return msCountryCode; }
     public boolean getIsDeleted() { return mbIsDeleted; }
@@ -78,6 +80,7 @@ public class SDataCountry extends erp.lib.data.SDataRegistry implements java.io.
         mnPkCountryId = 0;
         msKey = "";
         msCountry = "";
+        msCountryLan = "";
         msCountryAbbr = "";
         msCountryCode = "";
         mbIsDeleted = false;
@@ -108,6 +111,7 @@ public class SDataCountry extends erp.lib.data.SDataRegistry implements java.io.
                 mnPkCountryId = resultSet.getInt("id_cty");
                 msKey = resultSet.getString("cty_key");
                 msCountry = resultSet.getString("cty");
+                msCountryLan = resultSet.getString("cty_lan");
                 msCountryAbbr = resultSet.getString("cty_abbr");
                 msCountryCode = resultSet.getString("cty_code");
                 mbIsDeleted = resultSet.getBoolean("b_del");
@@ -144,10 +148,12 @@ public class SDataCountry extends erp.lib.data.SDataRegistry implements java.io.
         try {
             callableStatement = connection.prepareCall(
                     "{ CALL erp.locu_cty_save(" +
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                    "?) }");
             callableStatement.setInt(nParam++, mnPkCountryId);
             callableStatement.setString(nParam++, msKey);
             callableStatement.setString(nParam++, msCountry);
+            callableStatement.setString(nParam++, msCountryLan);
             callableStatement.setString(nParam++, msCountryAbbr);
             callableStatement.setString(nParam++, msCountryCode);
             callableStatement.setBoolean(nParam++, mbIsDeleted);

@@ -16,6 +16,7 @@ import cfd.DAttributeOptionImpuestoTraslado;
 import cfd.DCfdUtils;
 import cfd.DElement;
 import cfd.util.DUtilUtils;
+import cfd.ver3.DCfdVer3Consts;
 import cfd.ver3.DElementTimbreFiscalDigital;
 import erp.SClient;
 import erp.cfd.SCfdConsts;
@@ -2239,7 +2240,12 @@ public abstract class SCfdUtils implements Serializable {
                             cfdPrint.printCfdi(cfd, printMode, dps);
                             break;
                         case SCfdConsts.CFD_TYPE_PAYROLL:
-                            cfdPrint.printPayrollReceipt(cfd, printMode, copies, subtypeCfd);
+                            if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_11) {
+                                cfdPrint.printPayrollReceipt(cfd, printMode, copies, subtypeCfd);
+                            }
+                            else if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_12) {
+                                cfdPrint.printPayrollReceipt12(cfd, printMode, copies, subtypeCfd);
+                            }
                             break;
                         default:
                             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -2738,7 +2744,12 @@ public abstract class SCfdUtils implements Serializable {
                                 cfdPrint.printCfdi(cfd, SDataConstantsPrint.PRINT_MODE_PDF, dps);
                                 break;
                             case SCfdConsts.CFD_TYPE_PAYROLL:
-                                cfdPrint.printPayrollReceipt(cfd, SDataConstantsPrint.PRINT_MODE_PDF, subtypeCfd);
+                                if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_11) {
+                                    cfdPrint.printPayrollReceipt(cfd, SDataConstantsPrint.PRINT_MODE_PDF, subtypeCfd);
+                                }
+                                else if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_12) {
+                                    cfdPrint.printPayrollReceipt12(cfd, SDataConstantsPrint.PRINT_MODE_PDF, subtypeCfd);
+                                }
                                 break;
                             default:
                                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

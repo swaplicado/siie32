@@ -19,7 +19,9 @@ import sa.lib.SLibConsts;
 /* IMPORTANT:
  * Every single change made to the definition of this class' table must be updated also in the following classes:
  * - erp.mfin.data.SDataFiscalYearClosing
- * - erp.mfin.data.SDataFiscalYearClosing
+ * - erp.mfin.data.SDataFiscalYearOpening
+ * - erp.mfin.data.SDataRecord
+ * - erp.mod.hrs.db.SHrsFinUtils
  * All of them also make raw SQL insertions.
  */
 

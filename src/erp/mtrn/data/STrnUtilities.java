@@ -1930,8 +1930,9 @@ public abstract class STrnUtilities {
                         if (mbIsCancel) {
                             snd_body += "Cancelación: " +  client.getSessionXXX().getFormatters().getDateFormat().format(cancellationDate) + "\n";
                         }
-
-                        snd_body += "\n" + mms.getTextBody();
+                        else {
+                            snd_body += "\n" + mms.getTextBody();
+                        }
 
                         sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
 
