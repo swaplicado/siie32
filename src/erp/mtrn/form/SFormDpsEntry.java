@@ -64,6 +64,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
@@ -402,7 +403,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jSeparator2 = new javax.swing.JSeparator();
         jtbGridPriceFilter = new javax.swing.JToggleButton();
         jpMarketing = new javax.swing.JPanel();
-        jpExtraDataContract = new javax.swing.JPanel();
+        jpDataShip = new javax.swing.JPanel();
         jPanel38 = new javax.swing.JPanel();
         jPanel41 = new javax.swing.JPanel();
         jlFkVehicleTypeId_n = new javax.swing.JLabel();
@@ -1411,8 +1412,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         jpMarketing.setLayout(new java.awt.BorderLayout());
 
-        jpExtraDataContract.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos embarque:"));
-        jpExtraDataContract.setLayout(new java.awt.BorderLayout());
+        jpDataShip.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos de embarque:"));
+        jpDataShip.setLayout(new java.awt.BorderLayout());
 
         jPanel38.setLayout(new java.awt.GridLayout(8, 1, 0, 1));
 
@@ -1532,9 +1533,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         jPanel38.add(jPanel58);
 
-        jpExtraDataContract.add(jPanel38, java.awt.BorderLayout.NORTH);
+        jpDataShip.add(jPanel38, java.awt.BorderLayout.NORTH);
 
-        jpMarketing.add(jpExtraDataContract, java.awt.BorderLayout.EAST);
+        jpMarketing.add(jpDataShip, java.awt.BorderLayout.EAST);
 
         jpExtraDataUnits.setBorder(javax.swing.BorderFactory.createTitledBorder("Unidades físicas de la partida:"));
         jpExtraDataUnits.setLayout(new java.awt.BorderLayout());
@@ -2326,6 +2327,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         
         jradAccCashAccount.addItemListener(this);
         jradAccAdvanceBilled.addItemListener(this);
+        
+        jckAuxPreserveQuantity.addItemListener(this);
 
         SFormUtilities.createActionMap(rootPane, this, "publicPriceUnitaryCyWizard", "priceUnitaryCyWizard", KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "publicActionNotesNew", "notesNew", KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK);
@@ -2414,6 +2417,34 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         return textField == jtfDiscountUnitaryPercentage || textField == jtfDiscountEntryPercentage ||
                     textField == jtfOriginalQuantity || textField == jtfOriginalPriceUnitaryCy || textField == jtfOriginalDiscountUnitaryCy ||
                     textField == jtfDiscountEntryCy || textField == jtfDiscountDocCy;
+    }
+    
+    private String composeMsgOmittedShipData() {
+        String message = "";
+        
+        if (SDataDpsEntry.isProvisionalValue(moFieldDriver.getString())) {
+            message += moFieldDriver.getFieldName() + "\n";
+        }
+        if (SDataDpsEntry.isProvisionalValue(moFieldPlate.getString())) {
+            message = message +  moFieldPlate.getFieldName() + "\n";
+        }
+        if (SDataDpsEntry.isProvisionalValue(moFieldContainerTank.getString())) {
+            message = message + moFieldContainerTank.getFieldName() + "\n";
+        }
+        if (SDataDpsEntry.isProvisionalValue(moFieldSealQuality.getString())) {
+            message = message + moFieldSealQuality.getFieldName() + "\n";
+        }
+        if (SDataDpsEntry.isProvisionalValue(moFieldSealSecurity.getString())) {
+            message = message + moFieldSealSecurity.getFieldName() + "\n";
+        }
+        if (SDataDpsEntry.isProvisionalValue(moFieldTicket.getString())) {
+            message = message + moFieldTicket.getFieldName() + "\n";
+        }
+        if (SDataDpsEntry.isProvisionalValue(moFieldVgm.getString())) {
+            message = message + moFieldVgm.getFieldName() + "\n";
+        }
+        
+        return message;    
     }
     
     private void calculateTotal() {
@@ -4120,7 +4151,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JPanel jpCommissions;
     private javax.swing.JPanel jpControls;
     private javax.swing.JPanel jpCostCenter;
-    private javax.swing.JPanel jpExtraDataContract;
+    private javax.swing.JPanel jpDataShip;
     private javax.swing.JPanel jpExtraDataOther;
     private javax.swing.JPanel jpExtraDataOtherFillment;
     private javax.swing.JPanel jpExtraDataOtherNorth;
@@ -4607,41 +4638,14 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         mbResetingForm = false;
     }
     
-    public String validateShipmentData() {
-        String message = "";
-        
-        if (SDataDpsEntry.isProvisionalValue(moFieldDriver.getString())) {
-            message += moFieldDriver.getFieldName() + "\n";
-        }
-        if (SDataDpsEntry.isProvisionalValue(moFieldPlate.getString())) {
-            message = message +  moFieldPlate.getFieldName() + "\n";
-        }
-        if (SDataDpsEntry.isProvisionalValue(moFieldContainerTank.getString())) {
-            message = message + moFieldContainerTank.getFieldName() + "\n";
-        }
-        if (SDataDpsEntry.isProvisionalValue(moFieldSealQuality.getString())) {
-            message = message + moFieldSealQuality.getFieldName() + "\n";
-        }
-        if (SDataDpsEntry.isProvisionalValue(moFieldSealSecurity.getString())) {
-            message = message + moFieldSealSecurity.getFieldName() + "\n";
-        }
-        if (SDataDpsEntry.isProvisionalValue(moFieldTicket.getString())) {
-            message = message + moFieldTicket.getFieldName() + "\n";
-        }
-        if (SDataDpsEntry.isProvisionalValue(moFieldVgm.getString())) {
-            message = message + moFieldVgm.getFieldName() + "\n";
-        }
-        
-        return message;    
-    }
-    
+    @Override
     public erp.lib.form.SFormValidation formValidate() {
         double quantity = 0; 
-        boolean reqShipDomesticData = false;
-        boolean reqShipInternationalData = false;
-        boolean reqShipQualityData = false;
-        String message = "";
-        String shipmentMessage = "";
+        boolean isDataShipDomesticReq = false;
+        boolean isDataShipInternationalReq = false;
+        boolean isDataShipQualityReq = false;
+        String msg = "";
+        String msgOmittedShipData = "";
         SFormValidation validation = new SFormValidation();
 
         for (int i = 0; i < mvFields.size(); i++) {
@@ -4652,12 +4656,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             }
         }
         
-        reqShipDomesticData = moItem.getDbmsDataItemGeneric().getIsDataShipDomesticReq();
-        reqShipInternationalData = moItem.getDbmsDataItemGeneric().getIsDataShipInternationalReq();
-        reqShipQualityData = moItem.getDbmsDataItemGeneric().getIsDataQualityReq();
+        isDataShipDomesticReq = moItem.getDbmsDataItemGeneric().getIsDataShipDomesticReq();
+        isDataShipInternationalReq = moItem.getDbmsDataItemGeneric().getIsDataShipInternationalReq();
+        isDataShipQualityReq = moItem.getDbmsDataItemGeneric().getIsDataQualityReq();
         
-        if (reqShipDomesticData || reqShipInternationalData || reqShipQualityData) {
-            shipmentMessage = validateShipmentData();
+        if (isDataShipDomesticReq || isDataShipInternationalReq || isDataShipQualityReq) {
+            msgOmittedShipData = composeMsgOmittedShipData();
         }
         
         if (!validation.getIsError()) {
@@ -4695,64 +4699,66 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 validation.setMessage("El valor para el campo '" + jlOriginalQuantity.getText() + "' debe ser entero.");
                 validation.setComponent(jtfOriginalQuantity);
             }
-            else if (((SLibUtilities.parseDouble(jtfTotalCy_rRo.getText()) == 0d && jtfOriginalPriceUnitaryCy.isEditable()) ||
-                    ((SLibUtilities.parseDouble(jtfTotalCy_rRo.getText()) == 0d && !jtfOriginalPriceUnitaryCy.isEditable()) && moParamsItemPriceList.getItemPriceFound())) &&
+            else if (SLibUtils.parseDouble(jtfQuantityRo.getText()) == 0d) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlQuantity.getText() + "'.");
+                // remember that field jtfQuantityRo is read only!, it cannot gain focus
+            }
+            else if (moFieldOriginalPriceUnitaryCy.getDouble() == 0d &&
                     miClient.showMsgBoxConfirm("¿Está seguro que se desea dejar sin valor al campo '" + jlOriginalPriceUnitaryCy.getText() + "'?") != JOptionPane.YES_OPTION) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlOriginalPriceUnitaryCy.getText() + "'.");
                 validation.setComponent(jtfOriginalPriceUnitaryCy);
             }
-            else if (moFieldOriginalPriceUnitaryCy.getDouble() == 0d && !jtfOriginalPriceUnitaryCy.isEditable() && !moParamsItemPriceList.getItemPriceFound() &&
-                (SLibUtilities.compareKeys(new int[] { moItem.getDbmsDataItemGeneric().getFkItemCategoryId(), moItem.getDbmsDataItemGeneric().getFkItemClassId() }, SDataConstantsSys.ITMS_CL_ITEM_PUR_CON) ||
-                SLibUtilities.compareKeys(new int[] { moItem.getDbmsDataItemGeneric().getFkItemCategoryId(), moItem.getDbmsDataItemGeneric().getFkItemClassId() }, SDataConstantsSys.ITMS_CL_ITEM_SAL_PRO))) {
-                validation.setMessage("El valor para el campo '" + jlOriginalPriceUnitaryCy.getText() + "' debe ser mayor a 0.");
-                validation.setComponent(jtfOriginalPriceUnitaryCy);
+            else if (SLibUtilities.parseDouble(jtfTotalCy_rRo.getText()) == 0d &&
+                    miClient.showMsgBoxConfirm("¿Está seguro que se desea dejar sin valor al campo '" + jlTotal_r.getText() + "'?") != JOptionPane.YES_OPTION) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlTotal_r.getText() + "'.");
+                // remember that field jtfTotalCy_rRo is read only!, it cannot gain focus
             }
             else if (moPanelFkCostCenterId_n.isEmptyAccountId()) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + moPanelFkCostCenterId_n.getFieldAccountLabel().getText() + "'.");
                 validation.setComponent(moPanelFkCostCenterId_n.getFieldAccount().getComponent());
             }
-            else if (jcbFkVehicleTypeId_n.getSelectedIndex() <= 0 && SDataDpsEntry.validateShipmentDataValue(moFieldPlate.getString(), (reqShipDomesticData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+            else if (jcbFkVehicleTypeId_n.getSelectedIndex() <= 0 && SDataDpsEntry.validateShipmentDataValue(moFieldPlate.getString(), (isDataShipDomesticReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkVehicleTypeId_n.getText() + "'.");
                 validation.setComponent(jcbFkVehicleTypeId_n);
                 jTabbedPane.setSelectedIndex(TAB_MKT);
             }
-            else if (SDataDpsEntry.validateShipmentDataValue(moFieldDriver.getString(), (reqShipDomesticData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+            else if (SDataDpsEntry.validateShipmentDataValue(moFieldDriver.getString(), (isDataShipDomesticReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDriver.getText() + "'.");
                 validation.setComponent(jtfDriver);
                 jTabbedPane.setSelectedIndex(TAB_MKT);
             }
-            else if (reqShipDomesticData && jcbFkVehicleTypeId_n.getSelectedIndex() > 0 && SDataDpsEntry.validateShipmentDataValue(moFieldPlate.getString(), (reqShipDomesticData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+            else if (isDataShipDomesticReq && jcbFkVehicleTypeId_n.getSelectedIndex() > 0 && SDataDpsEntry.validateShipmentDataValue(moFieldPlate.getString(), (isDataShipDomesticReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlVehicleNumber.getText() + "'.");
                 validation.setComponent(jtfVehicleNumber);
                 jTabbedPane.setSelectedIndex(TAB_MKT);
             }
-            else if (SDataDpsEntry.validateShipmentDataValue(moFieldContainerTank.getString(), (reqShipDomesticData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+            else if (SDataDpsEntry.validateShipmentDataValue(moFieldContainerTank.getString(), (isDataShipDomesticReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlContainerTank.getText() + "'.");
                 validation.setComponent(jtfContTank);
                 jTabbedPane.setSelectedIndex(TAB_MKT);
             }
-            else if (SDataDpsEntry.validateShipmentDataValue(moFieldSealQuality.getString(), (reqShipQualityData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+            else if (SDataDpsEntry.validateShipmentDataValue(moFieldSealQuality.getString(), (isDataShipQualityReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlQualitySeal.getText() + "'.");
                 validation.setComponent(jtfSealQuality);
                 jTabbedPane.setSelectedIndex(TAB_MKT);
             }
-            else if (SDataDpsEntry.validateShipmentDataValue(moFieldSealSecurity.getString(), (reqShipQualityData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+            else if (SDataDpsEntry.validateShipmentDataValue(moFieldSealSecurity.getString(), (isDataShipQualityReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlSecuritySeal.getText() + "'.");
                 validation.setComponent(jtfSecuritySeal);
                 jTabbedPane.setSelectedIndex(TAB_MKT);
             }
-             else if (SDataDpsEntry.validateShipmentDataValue(moFieldTicket.getString(), (reqShipDomesticData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+             else if (SDataDpsEntry.validateShipmentDataValue(moFieldTicket.getString(), (isDataShipDomesticReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlTicket.getText() + "'.");
                 validation.setComponent(jtfTicket);
                 jTabbedPane.setSelectedIndex(TAB_MKT);
             }
-            else if (SDataDpsEntry.validateShipmentDataValue(moFieldVgm.getString(), (reqShipInternationalData && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+            else if (SDataDpsEntry.validateShipmentDataValue(moFieldVgm.getString(), (isDataShipInternationalReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlVgm.getText() + "'.");
                 validation.setComponent(jtfVgm);
                 jTabbedPane.setSelectedIndex(TAB_MKT);
             } 
-            else if (!shipmentMessage.isEmpty() && miClient.showMsgBoxConfirm("¿Los siguientes campos tienen un valor provisional \n" + shipmentMessage + "\n desea conservarlos?") != JOptionPane.YES_OPTION) {
-                validation.setMessage("Revise la información de embarque.");
+            else if (!msgOmittedShipData.isEmpty() && miClient.showMsgBoxConfirm("¿Los siguientes campos tienen un valor provisional \n" + msgOmittedShipData + "\n desea conservarlos?") != JOptionPane.YES_OPTION) {
+                validation.setMessage("Revisar los valores de '" + ((TitledBorder) jpDataShip.getBorder()).getTitle() + "'.");
                 validation.setComponent(jtfDriver);
                 jTabbedPane.setSelectedIndex(TAB_MKT);
             }
@@ -4767,8 +4773,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 jTabbedPane.setSelectedIndex(TAB_MKT);
             }
             else if (moParamDps.isOrder() && moDpsEntry.getContractPriceYear() != SLibConstants.UNDEFINED && moDpsEntry.getContractPriceMonth() != SLibConstants.UNDEFINED && moFieldOriginalQuantity.getDouble() > mdQuantityPrc) {
-                validation.setMessage("De acuerdo con la entrega mensual actual" + (mbIsLastPrc ? ", considerando el excedente permitido en la partida del documento origen" : "") + ":\nel valor máximo permitido para el campo '" + jlOriginalQuantity.getText() + "' es " +
-                SLibUtils.getDecimalFormatQuantity().format(mdQuantityPrc) + " " + jtfOriginalUnitSymbolRo.getText() + ".");
+                validation.setMessage("De acuerdo con la entrega mensual actual" + (mbIsLastPrc ? ", considerando el excedente permitido en la partida del documento origen" : "") + ":\n" +
+                        "el valor máximo permitido para el campo '" + jlOriginalQuantity.getText() + "' es " + SLibUtils.getDecimalFormatQuantity().format(mdQuantityPrc) + " " + jtfOriginalUnitSymbolRo.getText() + ".");
                 validation.setComponent(jtfOriginalQuantity);
             }
         }
@@ -4788,18 +4794,18 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                         SDataUtilities.validateDpsEtyReference(miClient.getSession(), moParamDps.getDpsClassKey(), moFieldReference.getString(), (int[]) moParamDps.getPrimaryKey());
                     }
                     catch (Exception e) {
-                        validation.setMessage(message = e.getMessage());
+                        validation.setMessage(msg = e.getMessage());
                         validation.setComponent(jtfReference);
                     }
                 }
                 
-                if (message.isEmpty()) {
+                if (msg.isEmpty()) {
                     // Validate cost center:
                     
-                    message = SDataUtilities.validateCostCenter(miClient, moPanelFkCostCenterId_n.getCurrentInputCostCenter(), moParamDps.getDate());
+                    msg = SDataUtilities.validateCostCenter(miClient, moPanelFkCostCenterId_n.getCurrentInputCostCenter(), moParamDps.getDate());
 
-                    if (!message.isEmpty()) {
-                        validation.setMessage(message);
+                    if (!msg.isEmpty()) {
+                        validation.setMessage(msg);
                         validation.setComponent(moPanelFkCostCenterId_n.getFieldAccount().getComponent());
                     }
                 }
@@ -5390,6 +5396,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 }
                 else if (checkBox == jckChangePrice) {
                     enableChangeEntryPrice(checkBox.isSelected());
+                }
+                else if (checkBox == jckAuxPreserveQuantity) {
+                    calculateTotal();
                 }
             }
             else if (e.getSource() instanceof javax.swing.JComboBox && e.getStateChange() == ItemEvent.SELECTED) {
