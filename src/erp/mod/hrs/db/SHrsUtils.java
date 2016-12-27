@@ -563,31 +563,28 @@ public abstract class SHrsUtils {
         Date lastPeriod[] = null;
 
         if (number <= 1) {
-            validNumber = 1;        // 1, 0 or less are set to 1 (please note that payroll number 1, regardless the payment type, does not need to be checked, it is correct by default!)
+            validNumber = 1;        // payroll number equal or less than 1 is set to 1, regardless of payment type
         }
         else {
-            validNumber = number;   // assume by instance that number can be correct
+            validNumber = number;   // assume by instance that number is correct
 
             switch(paymentType) {
                 case SModSysConsts.HRSS_TP_PAY_WEE:
-                    if (number > SHrsConsts.YEAR_WEEKS) {
-                        if (SLibTimeUtils.isSameDate(getFirstDayYear(session, year), SLibTimeUtils.createDate(year - 1, 12, 26))) {
-                            // If FDY is minimum FDY and year is leap-year, then there are up to 54 weeks
-                            // If FDY is minimum FDY and year is ordinary-year, then there are up to 53 weeks
-
-                            validNumber = SHrsConsts.YEAR_WEEKS + (SLibTimeUtils.isLeapYear(year) ? 2 : 1);
+                    if (number >= SHrsConsts.YEAR_WEEKS_EXTENDED) {
+                        if (!SLibTimeUtils.isLeapYear(year)) {
+                            // maximum number of weekly payrolls must be 53 on ordinary years:
+                            validNumber = SHrsConsts.YEAR_WEEKS_EXTENDED - 1;
                         }
                         else {
-                            // If FDY is greater than minimum FDY, check if year has up to 52 or 53 weeks
-
-                            lastPeriod = getPayrollPeriod(session, year, SHrsConsts.YEAR_WEEKS + 1, paymentType);
-                            validNumber = SHrsConsts.YEAR_WEEKS + (SLibTimeUtils.digestYear(lastPeriod[1])[0] == year ? 1 : 0);
+                            // maximum number of weekly payrolls must be 54 on leap years:
+                            validNumber = SHrsConsts.YEAR_WEEKS_EXTENDED;
                         }
                     }
                     break;
 
                 case SModSysConsts.HRSS_TP_PAY_FOR:
                     if (number > SHrsConsts.YEAR_FORNIGHTS) {
+                        // maximum number of fortnightly payrolls must be 24:
                         validNumber = SHrsConsts.YEAR_FORNIGHTS;
                     }
                     break;
