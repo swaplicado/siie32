@@ -12,7 +12,7 @@ import sa.lib.gui.SGuiConfigSystem;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda
  */
 public class SDataParamsErp extends erp.lib.data.SDataRegistry implements java.io.Serializable, SGuiConfigSystem {
 
@@ -53,6 +53,7 @@ public class SDataParamsErp extends erp.lib.data.SDataRegistry implements java.i
     protected int mnCustomerDaysOfDocLapsing_n;
     protected int mnTaxModel;
     protected int mnLotModel;
+    protected int mnDpsFindingModel;
     protected boolean mbIsItemShortApplying;
     protected boolean mbIsItemNameWithVarieties;
     protected boolean mbIsItemNameEditable;
@@ -203,6 +204,7 @@ public class SDataParamsErp extends erp.lib.data.SDataRegistry implements java.i
     public void setCustomerDaysOfDocLapsing_n(int n) { mnCustomerDaysOfDocLapsing_n = n; }
     public void setTaxModel(int n) { mnTaxModel = n; }
     public void setLotModel(int n) { mnLotModel = n; }
+    public void setDpsFindingModel(int n) { mnDpsFindingModel = n; }
     public void setIsItemShortApplying(boolean b) { mbIsItemShortApplying = b; }
     public void setIsItemNameWithVarieties(boolean b) { mbIsItemNameWithVarieties = b; }
     public void setIsItemNameEditable(boolean b) { mbIsItemNameEditable = b; }
@@ -346,6 +348,7 @@ public class SDataParamsErp extends erp.lib.data.SDataRegistry implements java.i
     public int getCustomerDaysOfDocLapsing_n() { return mnCustomerDaysOfDocLapsing_n; }
     public int getTaxModel() { return mnTaxModel; }
     public int getLotModel() { return mnLotModel; }
+    public int getDpsFindingModel() { return mnDpsFindingModel; }
     public boolean getIsItemShortApplying() { return mbIsItemShortApplying; }
     public boolean getIsItemNameWithVarieties() { return mbIsItemNameWithVarieties; }
     public boolean getIsItemNameEditable() { return mbIsItemNameEditable; }
@@ -505,6 +508,7 @@ public class SDataParamsErp extends erp.lib.data.SDataRegistry implements java.i
         mnCustomerDaysOfDocLapsing_n = 0;
         mnTaxModel = 0;
         mnLotModel = 0;
+        mnDpsFindingModel = 0;
         mbIsItemShortApplying = false;
         mbIsItemNameWithVarieties = false;
         mbIsItemNameEditable = false;
@@ -669,6 +673,7 @@ public class SDataParamsErp extends erp.lib.data.SDataRegistry implements java.i
                 if (resultSet.wasNull()) mnCustomerDaysOfDocLapsing_n = -1;
                 mnTaxModel = resultSet.getInt("tax_model");
                 mnLotModel = resultSet.getInt("lot_model");
+                mnDpsFindingModel = resultSet.getInt("dps_fnd_model");
                 mbIsItemShortApplying = resultSet.getBoolean("b_item_short");
                 mbIsItemNameWithVarieties = resultSet.getBoolean("b_item_name_var");
                 mbIsItemNameEditable = resultSet.getBoolean("b_item_name_edit");
@@ -823,7 +828,7 @@ public class SDataParamsErp extends erp.lib.data.SDataRegistry implements java.i
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkErpId);
             callableStatement.setString(nParam++, msErp);
             callableStatement.setInt(nParam++, mnDecimalsValue);
@@ -861,6 +866,7 @@ public class SDataParamsErp extends erp.lib.data.SDataRegistry implements java.i
             if (mnCustomerDaysOfDocLapsing_n >= 0) callableStatement.setInt(nParam++, mnCustomerDaysOfDocLapsing_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
             callableStatement.setInt(nParam++, mnTaxModel);
             callableStatement.setInt(nParam++, mnLotModel);
+            callableStatement.setInt(nParam++, mnDpsFindingModel);
             callableStatement.setBoolean(nParam++, mbIsItemShortApplying);
             callableStatement.setBoolean(nParam++, mbIsItemNameWithVarieties);
             callableStatement.setBoolean(nParam++, mbIsItemNameEditable);
