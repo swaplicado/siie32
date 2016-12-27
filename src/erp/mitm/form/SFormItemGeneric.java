@@ -363,7 +363,6 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         jcbFkTaxableConceptTypeId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkTaxableConceptTypeId = new javax.swing.JButton();
         jpShipment = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jckIsDomesticShipment = new javax.swing.JCheckBox();
@@ -938,7 +937,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
 
         jpProperties12.setLayout(new java.awt.GridLayout(1, 2, 5, 5));
 
-        jpProperties121.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración de dimensiones físicas:"));
+        jpProperties121.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración de dimensiones físicas para documentos:"));
         jpProperties121.setLayout(new java.awt.GridLayout(5, 3, 5, 5));
 
         jpProperties1211.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -1019,7 +1018,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
 
         jpProperties12.add(jpProperties121);
 
-        jpProperties122.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración para comercialización:"));
+        jpProperties122.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración de comercialización para documentos:"));
         jpProperties122.setLayout(new java.awt.BorderLayout());
 
         jpProperties1221.setPreferredSize(new java.awt.Dimension(100, 80));
@@ -1158,7 +1157,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
 
         jpProperties2.add(jpProperties21);
 
-        jpProperties22.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración para contabilización:"));
+        jpProperties22.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración de contabilización en documentos:"));
         jpProperties22.setPreferredSize(new java.awt.Dimension(450, 100));
         jpProperties22.setLayout(new java.awt.BorderLayout());
 
@@ -1231,12 +1230,10 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
 
         jTabbedPane.addTab("Configuración", jpProperties);
 
+        jpShipment.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración de información requerida para embarques en documentos:"));
         jpShipment.setLayout(new java.awt.BorderLayout());
 
-        jPanel3.setLayout(new java.awt.GridLayout(6, 1));
-
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración de embarque"));
-        jPanel4.setLayout(new java.awt.GridLayout(3, 1));
+        jPanel4.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -1262,11 +1259,9 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
 
         jPanel4.add(jPanel8);
 
-        jPanel3.add(jPanel4);
+        jpShipment.add(jPanel4, java.awt.BorderLayout.NORTH);
 
-        jpShipment.add(jPanel3, java.awt.BorderLayout.CENTER);
-
-        jTabbedPane.addTab("Embarque", jpShipment);
+        jTabbedPane.addTab("Embarques", jpShipment);
 
         getContentPane().add(jTabbedPane, java.awt.BorderLayout.CENTER);
 
@@ -2209,7 +2204,6 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel28;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel35;
     private javax.swing.JPanel jPanel36;
     private javax.swing.JPanel jPanel38;
