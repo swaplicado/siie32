@@ -372,7 +372,7 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
             
             mtDateStart = SLibTimeUtils.getBeginOfYear(moDateDateCut.getValue());
             mtDateEnd = moDateDateCut.getValue();
-            periodYear = SLibTimeUtils.digestYear(mtDateEnd)[0];
+            periodYear = moCalYear.getValue();
             
             dbTaxTable = (SDbTaxTable) miClient.getSession().readRegistry(SModConsts.HRS_TAX, new int[] { getRecentTaxTable(miClient.getSession(), mtDateEnd) });
             dbSubsidyTable = (SDbTaxSubsidyTable) miClient.getSession().readRegistry(SModConsts.HRS_TAX_SUB, new int[] { getRecentTaxSubsidyTable(miClient.getSession(), mtDateEnd) });
