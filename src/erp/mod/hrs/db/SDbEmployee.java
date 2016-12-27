@@ -22,6 +22,11 @@ import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
+/* IMPORTANT:
+ * Every single change made to the definition of this class' table must be updated also in the following classes:
+ * - erp.mod.hrs.db.SDataEmployee
+ * All of them also make raw SQL insertions.
+ */
 /**
  *
  * @author Juan Barajas

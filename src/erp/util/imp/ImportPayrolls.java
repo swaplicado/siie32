@@ -123,12 +123,12 @@ public class ImportPayrolls extends javax.swing.JFrame {
         //   2015-10-23
         //moDbMySql.connect("192.168.1.19", "3306", "erp_otsa", "root", "msroot");
         // Edwin
-        moDbMySql.connect("localhost", "3306", "erp_universal", "root", "msroot");
+        moDbMySql.connect("localhost", "3306", "erp_apsa", "root", "msroot");
         moDbSqlServer = new SDataDatabase(SLibConstants.DBMS_SQL_SERVER_2005);
         //moDbSqlServer.connect("localhost\\SQLEXPRESS", "", "GS", "sa", "1120");
         // Brianda
-        moDbSqlServer.connect("localhost\\SQLEXPRESS", "", "UNIVERSAL", "sa", "1120");
-
+        //moDbSqlServer.connect("SERVERLUI\\SQLEXPRESS", "", "APSA", "sa", "1120");
+        moDbSqlServer.connect("BRIANDA-PC\\SQLEXPRESS", "", "APSA", "sa", "1120");
         jftDateImport.setText("31/12/2015");
     }
     

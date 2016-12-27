@@ -10,6 +10,12 @@ import erp.gui.account.SAccountUtils;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 
+/* IMPORTANT:
+ * Every single change made to the definition of this class' table must be updated also in the following classes:
+ * - erp.mod.fin.db.SFiscalAccounts
+ * All of them also make raw SQL insertions.
+ */
+
 /**
  *
  * @author Sergio Flores

@@ -28,11 +28,19 @@ import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.xml.SXmlUtils;
 
+/* IMPORTANT:
+ * Every single change made to the definition of this class' table must be updated also in the following classes:
+ * - erp.mod.hrs.db.SDbFormerPayrollImport
+ * - erp.mtrn.data.SCfdUtils
+ * All of them also make raw SQL insertions.
+ */
+
 /**
  *
  * @author Juan Barajas
  */
-public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+public class SDataCfd
+extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
     public static final int FIELD_ACC_WS = 1;
     public static final int FIELD_ACC_XML_STO = 4;

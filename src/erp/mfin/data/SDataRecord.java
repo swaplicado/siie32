@@ -14,6 +14,15 @@ import java.util.Vector;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 
+/* IMPORTANT:
+ * Every single change made to the definition of this class' table must be updated also in the following classes:
+ * - erp.mfin.data.SDataFiscalYearClosing
+ * - erp.mfin.data.SDataFiscalYearOpening
+ * - erp.util.imp.ImportAccountingRecords
+ * - erp.util.imp.ImportAccountingRecordsMicroSip
+ * All of them also make raw SQL insertions.
+ */
+
 /**
  *
  * @author Sergio Flores
