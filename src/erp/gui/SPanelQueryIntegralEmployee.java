@@ -1170,6 +1170,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
                 "WHERE emp.b_del = 0 AND bp.b_del = 0" + (mnFilterPaymentTypeId != SLibConsts.UNDEFINED ? " AND emp.fk_tp_pay = " + mnFilterPaymentTypeId : "") + " " +
                 (mnFilterDepartamentId != SLibConsts.UNDEFINED ? " AND emp.fk_dep = " + mnFilterDepartamentId : "") + " " +
                 (mnFilterStatusEmployee != SLibConsts.UNDEFINED ? (mnFilterStatusEmployee == SGridFilterPanelEmployee.EMP_STATUS_ACT ? " AND emp.b_act = 1 " : (mnFilterStatusEmployee == SGridFilterPanelEmployee.EMP_STATUS_INA ? " AND emp.b_act = 0 " : "")) : "") + " " +
+                "AND bp.b_att_emp = 1 " +
                 "GROUP BY emp.id_emp " +
                 "ORDER BY bp.bp, emp.id_emp, pay.name ";
 
@@ -1264,6 +1265,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             employee = moBizPartner.getDbmsDataEmployee();
 
             jtfFirstName.setText(moBizPartner.getBizPartner());
+            jtfFirstName.setCaretPosition(0);
             jtfFiscalId.setText(moBizPartner.getFiscalId());
             jtfAlternativeId.setText(moBizPartner.getAlternativeId());
             jtfSocialSecurityNumber.setText(employee.getSocialSecurityNumber());
@@ -1272,6 +1274,9 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             jftDateLastHire.setText(SLibUtils.DateFormatDate.format(employee.getDateLastHire()));
             if (employee.getDateLastDismiss_n() != null) {
                 jftDateLastDismiss_n.setText(SLibUtils.DateFormatDate.format(employee.getDateLastDismiss_n()));
+            }
+            else {
+                jftDateLastDismiss_n.setText(" / / ");
             }
             jtfSalary.setText(SLibUtils.DecimalFormatValue2D.format(employee.getSalary()) + "");
             jftDateChangeSalary.setText(SLibUtils.DateFormatDate.format(employee.getDateSalary()));
@@ -1282,13 +1287,19 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             
             if (employee.getFkBankId_n() != SLibConsts.UNDEFINED) {
                 jtfBank.setText(miClient.getSession().readField(SModConsts.HRSS_BANK, new int[] { employee.getFkBankId_n() }, SDbRegistry.FIELD_NAME) + "");
+                jtfBank.setCaretPosition(0);
             }
             jtfBankAccount.setText(employee.getBankAccount());
+            jtfBankAccount.setCaretPosition(0);
             jtfSex.setText(miClient.getSession().readField(SModConsts.HRSS_TP_HRS_CAT, new int[] { employee.getFkCatalogueSexCategoryId(), employee.getFkCatalogueSexTypeId() }, SDbRegistry.FIELD_NAME) + "");
             jtfMarital.setText(miClient.getSession().readField(SModConsts.HRSS_TP_HRS_CAT, new int[] { employee.getFkCatalogueMaritalStatusCategoryId(), employee.getFkCatalogueMaritalStatusTypeId() }, SDbRegistry.FIELD_NAME) + "");
+            jtfMarital.setCaretPosition(0);
             jtfBloodType.setText(miClient.getSession().readField(SModConsts.HRSS_TP_HRS_CAT, new int[] { employee.getFkCatalogueBloodTypeCategoryId(), employee.getFkCatalogueBloodTypeTypeId() }, SDbRegistry.FIELD_NAME) + "");
+            jtfBloodType.setCaretPosition(0);
             jtfEducationType.setText(miClient.getSession().readField(SModConsts.HRSS_TP_HRS_CAT, new int[] { employee.getFkCatalogueEducationCategoryId(), employee.getFkCatalogueEducationTypeId() }, SDbRegistry.FIELD_NAME) + "");
+            jtfEducationType.setCaretPosition(0);
             jtfMwzType.setText(miClient.getSession().readField(SModConsts.HRSU_TP_MWZ, new int[] { employee.getFkMwzTypeId() }, SDbRegistry.FIELD_NAME) + "");
+            jtfMwzType.setCaretPosition(0);
             jtfWorkingHoursDay.setText(employee.getWorkingHoursDay() + "");
             
             if (employee.getXtaImageIconPhoto_n() != null) {
