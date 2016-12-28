@@ -20,6 +20,8 @@ import erp.lib.SLibUtilities;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
+import erp.mcfg.data.SDataParamsErp;
+import erp.mod.trn.db.STrnConsts;
 import erp.mtrn.data.SDataDps;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -29,7 +31,7 @@ import javax.swing.JTextField;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda
  */
 public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.event.ActionListener, java.awt.event.FocusListener {
 
@@ -243,6 +245,9 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
                     if (jcbSearchBizPartnerId.getSelectedIndex() > 0) {
                         key = SDataUtilities.obtainDpsKeyForBizPartner(miClient, sNumberSeries, sNumber, manParamDpsClassKey, moFieldSearchBizPartnerId.getKeyAsIntArray());
                     }
+                    else if ( !SLibUtilities.compareKeys(manParamDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC)) {
+                        key = SDataUtilities.obtainDpsKey(miClient, sNumberSeries, sNumber, manParamDpsClassKey);
+                    }
                 }
                 else {
                     key = SDataUtilities.obtainDpsKey(miClient, sNumberSeries, sNumber, manParamDpsClassKey);
@@ -250,6 +255,11 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
 
                 if (key != null) {
                     moDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, key, SLibConstants.EXEC_MODE_VERBOSE);
+                    
+                    if (mbIsBizPartnerRequired) {
+                        moFieldSearchBizPartnerId.setFieldValue(new int[] { moDps.getFkBizPartnerId_r() });
+                    }
+                    
                     moPanelDps.setDps(moDps, null);
 
                     if (moExternalMethod != null) {
@@ -466,18 +476,13 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         if (SLibUtilities.compareKeys(manParamDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC)) {
             mnOptionsBizPartnerType = SDataConstants.BPSX_BP_SUP;
             mbIsBizPartnerRequired = true;
-            updateFormBizPartnerStatus();
         }
-        else if (SLibUtilities.compareKeys(manParamDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC)) {
-                mnOptionsBizPartnerType = SDataConstants.BPSX_BP_CUS;
-                mbIsBizPartnerRequired = true;
-                updateFormBizPartnerStatus();
-            }
-            else {
-                mnOptionsBizPartnerType = SLibConstants.UNDEFINED;
-                mbIsBizPartnerRequired = false;
-                updateFormBizPartnerStatus();
-            }
+        else {
+            mnOptionsBizPartnerType = manParamDpsClassKey[0] == SDataConstantsSys.TRNS_CT_DPS_PUR ? SDataConstants.BPSX_BP_SUP : SDataConstants.BPSX_BP_CUS;
+            mbIsBizPartnerRequired = ((SDataParamsErp) miClient.getSession().getConfigSystem()).getDpsFindingModel() == STrnConsts.DPS_FND_MODEL_BP_NUM;
+        }
+        
+        updateFormBizPartnerStatus();
     }
     
     public boolean getIsLocalCurrency() {
