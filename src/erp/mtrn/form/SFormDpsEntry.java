@@ -3037,6 +3037,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jradAccCashAccount.setEnabled(false);
             jradAccAdvanceBilled.setEnabled(false);
         }
+        bgAccOptions.clearSelection();
+        renderAccOptions();
     }
 
     private void renderAddendaData() {
@@ -3140,7 +3142,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     }
     
     private void renderAccOptions() {
-        if (jradAccCashAccount.isSelected()) {
+        if (jradAccCashAccount.isSelected() && jradAccCashAccount.isEnabled() && jradAccAdvanceBilled.isEnabled()) {
             jcbFkCashAccountId_n.setEnabled(true);
         }
         else {
@@ -3281,8 +3283,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfTicket.setEditable(true);
             jtfVgm.setEditable(true);
             enableFieldsAccount();
-            bgAccOptions.clearSelection();
-            renderAccOptions();
 
             jbNotesNew.setEnabled(true);
             jbNotesEdit.setEnabled(true);
