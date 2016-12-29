@@ -2119,7 +2119,10 @@ public abstract class SCfdUtils implements Serializable {
 
         node = SXmlUtils.extractElements(doc, "cfdi:Receptor").item(0);
 
-        if (node != null) {
+        if (node == null) {
+            throw new Exception("No se encontró el nodo 'cfdi:Receptor'");
+        }
+        else {
             // Receptor:
 
             namedNodeMap = node.getAttributes();
