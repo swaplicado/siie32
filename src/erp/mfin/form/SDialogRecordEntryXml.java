@@ -5,9 +5,11 @@
 package erp.mfin.form;
 
 import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
 import erp.lib.table.STableColumnForm;
 import erp.lib.table.STablePane;
 import erp.mfin.data.SDataCfdRecordRow;
+import erp.mtrn.data.SCfdUtils;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -69,7 +71,7 @@ public class SDialogRecordEntryXml extends javax.swing.JDialog implements Action
         jPanel11.setLayout(new java.awt.BorderLayout());
 
         jPanel2.setPreferredSize(new java.awt.Dimension(468, 33));
-        jPanel2.setLayout(new java.awt.FlowLayout(2));
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar");
         jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -83,7 +85,7 @@ public class SDialogRecordEntryXml extends javax.swing.JDialog implements Action
         jpPanel33.setLayout(new java.awt.BorderLayout());
 
         jPanel4.setPreferredSize(new java.awt.Dimension(110, 33));
-        jPanel4.setLayout(new java.awt.FlowLayout(0));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         jbRowAdd.setText("Agregar XML");
         jbRowAdd.setToolTipText("Seleccionar archivo XML...");
@@ -104,8 +106,8 @@ public class SDialogRecordEntryXml extends javax.swing.JDialog implements Action
 
         getContentPane().add(jPanel11, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-416)/2, (screenSize.height-289)/2, 416, 289);
+        setSize(new java.awt.Dimension(416, 289));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void initComponentsExtra () {
@@ -140,12 +142,19 @@ public class SDialogRecordEntryXml extends javax.swing.JDialog implements Action
         miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
         miClient.getFileChooser().setFileFilter(filter);
 
-        if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
-            maRows.add(new SDataCfdRecordRow(maRows.size() + 1, 0, miClient.getFileChooser().getSelectedFile().getName(), miClient.getFileChooser().getSelectedFile().getAbsolutePath()));
-            populateGridRows();
+        try {
+            if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
+                if (SCfdUtils.validateEmisorXmlExpenses(miClient, miClient.getFileChooser().getSelectedFile().getAbsolutePath())) {
+                    maRows.add(new SDataCfdRecordRow(maRows.size() + 1, 0, miClient.getFileChooser().getSelectedFile().getName(), miClient.getFileChooser().getSelectedFile().getAbsolutePath()));
+                    populateGridRows();
+                }
+            }
+            miClient.getFileChooser().resetChoosableFileFilters();
+            miClient.getFileChooser().setAcceptAllFileFilterUsed(true);
         }
-        miClient.getFileChooser().resetChoosableFileFilters();
-        miClient.getFileChooser().setAcceptAllFileFilterUsed(true);
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
     
     }
     

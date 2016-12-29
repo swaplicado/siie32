@@ -27,6 +27,7 @@ import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.data.SDataTax;
 import erp.mitm.data.SDataItem;
 import erp.mod.SModSysConsts;
+import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
 import java.awt.BorderLayout;
@@ -1808,13 +1809,21 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
         miClient.getFileChooser().setFileFilter(filter);
 
-        if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
-            msXmlPath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
-            maCfdRecordRows.add(new SDataCfdRecordRow(maCfdRecordRows.size() + 1, 0, miClient.getFileChooser().getSelectedFile().getName(), miClient.getFileChooser().getSelectedFile().getAbsolutePath()));
+        try {
+            if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
+                msXmlPath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
+
+                if (SCfdUtils.validateEmisorXmlExpenses(miClient, msXmlPath)) {
+                    maCfdRecordRows.add(new SDataCfdRecordRow(maCfdRecordRows.size() + 1, 0, miClient.getFileChooser().getSelectedFile().getName(), miClient.getFileChooser().getSelectedFile().getAbsolutePath()));
+                }
+            }
+            updateFilesXmlInfo();
+            miClient.getFileChooser().resetChoosableFileFilters();
+            miClient.getFileChooser().setAcceptAllFileFilterUsed(true);
         }
-        updateFilesXmlInfo();
-        miClient.getFileChooser().resetChoosableFileFilters();
-        miClient.getFileChooser().setAcceptAllFileFilterUsed(true);
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
     }
 
     private void actionFkDpsRemove() {

@@ -2103,6 +2103,36 @@ public abstract class SCfdUtils implements Serializable {
 
         return valid;
     }
+    
+    public static boolean validateEmisorXmlExpenses(final SClientInterface client, final String fileXml) throws Exception {
+        DocumentBuilder docBuilder = null;
+        Document doc = null;
+        Node node = null;
+        NamedNodeMap namedNodeMap = null;
+        String receptorXml = "";
+        String xml = "";
+
+        xml = DUtilUtils.readXml(fileXml);
+
+        docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        doc = docBuilder.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")));
+
+        node = SXmlUtils.extractElements(doc, "cfdi:Receptor").item(0);
+
+        if (node != null) {
+            // Receptor:
+
+            namedNodeMap = node.getAttributes();
+
+            receptorXml = SXmlUtils.extractAttributeValue(namedNodeMap, "rfc", true);
+
+            if (client.getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId().compareTo(receptorXml) != 0) {
+                throw new Exception("El receptor del archivo XML no es la empresa '" + client.getSessionXXX().getCompany().getDbmsDataCompany().getBizPartner() + "'.");
+            }
+        }
+        
+        return true;
+    }
 
     /*
      * Public static methods:
