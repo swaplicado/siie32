@@ -4847,49 +4847,49 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     jTabbedPane.setSelectedIndex(TAB_CFD); // show CFD Addenda's tab
                 }
             }
-            
-            if (!validation.getIsError() && moParamDps.isEstimate()) {
-                if (jckIsDpsReqMonthDelivery.isSelected()) {
-                    if (moFieldDpsContractBase.getDouble() < 0d) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlDpsContractBase.getText() + "'.");
-                        validation.setComponent(jtfDpsContractBase);
-                    }
-                    else if (moFieldDpsContractFuture.getDouble() < 0d) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlDpsContractFuture.getText() + "'.");
-                        validation.setComponent(jtfDpsContractFuture);
-                    }
-                    else if (moPaneGridPrices.getGridRows().size() <= 0) {
-                        validation.setMessage("La partida tiene seleccionada la opción '" + jckIsDpsReqMonthDelivery.getText() + "', pero no se encontró ningúna entrega mensual programada.");
-                        validation.setComponent(jckIsDpsReqMonthDelivery);
-                    }
-                    else if (!validation.getIsError()) {
-                        for (STableRow row : moPaneGridPrices.getGridRows()) {
-                            if (!((SDataDpsEntryPrice) row.getData()).getIsDeleted()) {
-                                quantity += ((SDataDpsEntryPrice) row.getData()).getOriginalQuantity();
-                            }
-                        }
-
-                        if (quantity != moFieldOriginalQuantity.getDouble()) {
-                            validation.setMessage("La suma de cantidades de '"+ jTabbedPane.getTitleAt(TAB_PRC) + "' (" + miClient.getSessionXXX().getFormatters().getDecimalsSurfaceFormat().format(quantity) + ") debe coincidir con el valor especificado en el campo '" + jlOriginalQuantity.getText() + "' (" + jtfOriginalQuantity.getText() + ") de la partida.");
-                            validation.setComponent(moPaneGridPrices);
-                        }
-                    }
-                }
-                else {
-                    if (moPaneGridPrices.getGridRows().size() > 0) {
-                        if (miClient.showMsgBoxConfirm("¿Está seguro que se desea dejar sin valor al campo '" + jckIsDpsReqMonthDelivery.getText() + "'?") == JOptionPane.NO_OPTION) {
-                            validation.setMessage("La partida no tiene seleccionada la opción '" + jckIsDpsReqMonthDelivery.getText() + "', pero se encontraron entregas mensuales programadas.");
-                            validation.setComponent(jckIsDpsReqMonthDelivery);
-                        }
-                    }
-                }
-                
-                if (validation.getIsError()) {
-                    jTabbedPane.setSelectedIndex(TAB_PRC); // show monthly price's tab
-                }
-            }
         }
 
+        if (!validation.getIsError() && moParamDps.isEstimate()) {
+            if (jckIsDpsReqMonthDelivery.isSelected()) {
+                if (moFieldDpsContractBase.getDouble() < 0d) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlDpsContractBase.getText() + "'.");
+                    validation.setComponent(jtfDpsContractBase);
+                }
+                else if (moFieldDpsContractFuture.getDouble() < 0d) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlDpsContractFuture.getText() + "'.");
+                    validation.setComponent(jtfDpsContractFuture);
+                }
+                else if (moPaneGridPrices.getGridRows().size() <= 0) {
+                    validation.setMessage("La partida tiene seleccionada la opción '" + jckIsDpsReqMonthDelivery.getText() + "', pero no se encontró ningúna entrega mensual programada.");
+                    validation.setComponent(jckIsDpsReqMonthDelivery);
+                }
+                else if (!validation.getIsError()) {
+                    for (STableRow row : moPaneGridPrices.getGridRows()) {
+                        if (!((SDataDpsEntryPrice) row.getData()).getIsDeleted()) {
+                            quantity += ((SDataDpsEntryPrice) row.getData()).getOriginalQuantity();
+                        }
+                    }
+
+                    if (quantity != moFieldOriginalQuantity.getDouble()) {
+                        validation.setMessage("La suma de cantidades de '"+ jTabbedPane.getTitleAt(TAB_PRC) + "' (" + miClient.getSessionXXX().getFormatters().getDecimalsSurfaceFormat().format(quantity) + ") debe coincidir con el valor especificado en el campo '" + jlOriginalQuantity.getText() + "' (" + jtfOriginalQuantity.getText() + ") de la partida.");
+                        validation.setComponent(moPaneGridPrices);
+                    }
+                }
+            }
+            else {
+                if (moPaneGridPrices.getGridRows().size() > 0) {
+                    if (miClient.showMsgBoxConfirm("¿Está seguro que se desea dejar sin valor al campo '" + jckIsDpsReqMonthDelivery.getText() + "'?") == JOptionPane.NO_OPTION) {
+                        validation.setMessage("La partida no tiene seleccionada la opción '" + jckIsDpsReqMonthDelivery.getText() + "', pero se encontraron entregas mensuales programadas.");
+                        validation.setComponent(jckIsDpsReqMonthDelivery);
+                    }
+                }
+            }
+
+            if (validation.getIsError()) {
+                jTabbedPane.setSelectedIndex(TAB_PRC); // show monthly price's tab
+            }
+        }
+        
         if (!validation.getIsError()) {
             // Check if entry item needs to be added to document from source document:
 
