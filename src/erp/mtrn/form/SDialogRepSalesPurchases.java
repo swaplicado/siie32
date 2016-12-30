@@ -77,9 +77,6 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
 
         bgByOptions = new javax.swing.ButtonGroup();
         bgCurrency = new javax.swing.ButtonGroup();
-        jPanel1 = new javax.swing.JPanel();
-        jbPrint = new javax.swing.JButton();
-        jbExit = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -99,16 +96,15 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         jlCurrency = new javax.swing.JLabel();
         jcbCurrency = new javax.swing.JComboBox();
         jPanel9 = new javax.swing.JPanel();
+        jPanel19 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jlCompanyBranch = new javax.swing.JLabel();
         jcbCompanyBranch = new javax.swing.JComboBox<SFormComponentItem>();
-        jPanel7 = new javax.swing.JPanel();
         jrbByBizPartner = new javax.swing.JRadioButton();
         jrbBySalesAgent = new javax.swing.JRadioButton();
         jrbByItemGeneric = new javax.swing.JRadioButton();
         jrbByItem = new javax.swing.JRadioButton();
         jPanel8 = new javax.swing.JPanel();
-        jPanel10 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         jlCrossWith = new javax.swing.JLabel();
         jcbCrossWith = new javax.swing.JComboBox<SFormComponentItem>();
@@ -116,34 +112,27 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         jlItemCategory = new javax.swing.JLabel();
         jcbItemCategory = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel12 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
         jckIsWithUnits = new javax.swing.JCheckBox();
         jPanel13 = new javax.swing.JPanel();
         jlUnitType = new javax.swing.JLabel();
         jcbUnitType = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel17 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jckWithoutRelatedParty = new javax.swing.JCheckBox();
+        jPanel1 = new javax.swing.JPanel();
+        jbPrint = new javax.swing.JButton();
+        jbExit = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Reporte de compras netas por período");
+        setPreferredSize(new java.awt.Dimension(640, 400));
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
                 formWindowActivated(evt);
             }
         });
-
-        jPanel1.setPreferredSize(new java.awt.Dimension(392, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
-
-        jbPrint.setText("Imprimir");
-        jbPrint.setToolTipText("[Ctrl + Enter]");
-        jbPrint.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel1.add(jbPrint);
-
-        jbExit.setText("Cerrar");
-        jbExit.setToolTipText("[Escape]");
-        jbExit.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel1.add(jbExit);
-
-        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración del reporte:"));
         jPanel2.setLayout(new java.awt.BorderLayout(0, 1));
@@ -228,6 +217,8 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         jPanel9.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtros del reporte:"));
         jPanel9.setLayout(new java.awt.BorderLayout(0, 1));
 
+        jPanel19.setLayout(new java.awt.GridLayout(5, 1));
+
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCompanyBranch.setText("Sucursal empresa:");
@@ -237,9 +228,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         jcbCompanyBranch.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel6.add(jcbCompanyBranch);
 
-        jPanel9.add(jPanel6, java.awt.BorderLayout.NORTH);
-
-        jPanel7.setLayout(new java.awt.GridLayout(4, 1));
+        jPanel19.add(jPanel6);
 
         bgByOptions.add(jrbByBizPartner);
         jrbByBizPartner.setText("<Por asociado de negocios>");
@@ -248,7 +237,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
                 jrbByBizPartnerItemStateChanged(evt);
             }
         });
-        jPanel7.add(jrbByBizPartner);
+        jPanel19.add(jrbByBizPartner);
 
         bgByOptions.add(jrbBySalesAgent);
         jrbBySalesAgent.setText("Por agente de ventas");
@@ -257,7 +246,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
                 jrbBySalesAgentItemStateChanged(evt);
             }
         });
-        jPanel7.add(jrbBySalesAgent);
+        jPanel19.add(jrbBySalesAgent);
 
         bgByOptions.add(jrbByItemGeneric);
         jrbByItemGeneric.setText("Por ítem genérico");
@@ -266,7 +255,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
                 jrbByItemGenericItemStateChanged(evt);
             }
         });
-        jPanel7.add(jrbByItemGeneric);
+        jPanel19.add(jrbByItemGeneric);
 
         bgByOptions.add(jrbByItem);
         jrbByItem.setText("Por ítem");
@@ -275,15 +264,12 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
                 jrbByItemItemStateChanged(evt);
             }
         });
-        jPanel7.add(jrbByItem);
+        jPanel19.add(jrbByItem);
 
-        jPanel9.add(jPanel7, java.awt.BorderLayout.CENTER);
+        jPanel9.add(jPanel19, java.awt.BorderLayout.NORTH);
 
         jPanel8.setPreferredSize(new java.awt.Dimension(376, 100));
-        jPanel8.setLayout(new java.awt.BorderLayout());
-
-        jPanel10.setPreferredSize(new java.awt.Dimension(100, 100));
-        jPanel10.setLayout(new java.awt.GridLayout(4, 1, 0, 1));
+        jPanel8.setLayout(new java.awt.GridLayout(5, 1, 0, 1));
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -294,7 +280,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         jcbCrossWith.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel11.add(jcbCrossWith);
 
-        jPanel10.add(jPanel11);
+        jPanel8.add(jPanel11);
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -305,9 +291,12 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         jcbItemCategory.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel14.add(jcbItemCategory);
 
-        jPanel10.add(jPanel14);
+        jPanel8.add(jPanel14);
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jLabel1.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel12.add(jLabel1);
 
         jckIsWithUnits.setText("Reporte con unidades");
         jckIsWithUnits.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -318,7 +307,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         });
         jPanel12.add(jckIsWithUnits);
 
-        jPanel10.add(jPanel12);
+        jPanel8.add(jPanel12);
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -329,17 +318,40 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         jcbUnitType.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel13.add(jcbUnitType);
 
-        jPanel10.add(jPanel13);
+        jPanel8.add(jPanel13);
 
-        jPanel8.add(jPanel10, java.awt.BorderLayout.NORTH);
+        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jPanel9.add(jPanel8, java.awt.BorderLayout.SOUTH);
+        jLabel2.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel17.add(jLabel2);
+
+        jckWithoutRelatedParty.setText("Sin partes relacionadas");
+        jPanel17.add(jckWithoutRelatedParty);
+
+        jPanel8.add(jPanel17);
+
+        jPanel9.add(jPanel8, java.awt.BorderLayout.CENTER);
 
         jPanel2.add(jPanel9, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        setSize(new java.awt.Dimension(600, 470));
+        jPanel1.setPreferredSize(new java.awt.Dimension(392, 33));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        jbPrint.setText("Imprimir");
+        jbPrint.setToolTipText("[Ctrl + Enter]");
+        jbPrint.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel1.add(jbPrint);
+
+        jbExit.setText("Cerrar");
+        jbExit.setToolTipText("[Escape]");
+        jbExit.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel1.add(jbExit);
+
+        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
+
+        setSize(new java.awt.Dimension(816, 539));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -484,6 +496,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
                 map.put("sSqlWhereCompanyBranch", moFieldCompanyBranch.getKeyAsIntArray()[0] == 0 ? "" : " AND doc.fid_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0]);
                 map.put("sSqlWhereCompanyBranchAdjRet", moFieldCompanyBranch.getKeyAsIntArray()[0] == 0 ? "" : " AND r.fid_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0]);
                 map.put("sSqlWhereCompanyBranchAdjDis", moFieldCompanyBranch.getKeyAsIntArray()[0] == 0 ? "" : " AND d.fid_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0]);
+                map.put("sSqlWhereWithoutRelatedParty", jckWithoutRelatedParty.isSelected() ? " AND bp.b_att_rel_pty = 0 " : "");
                 map.put("sTitle", mbParamIsSupplier ? "REPORTE DE COMPRAS NETAS" : "REPORTE DE VENTAS NETAS");
                 map.put("sSumStot", sSumStot);
                 map.put("sCurrency", sCurrency);
@@ -914,21 +927,23 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgByOptions;
     private javax.swing.ButtonGroup bgCurrency;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
+    private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel18;
+    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbDateEnd;
@@ -941,6 +956,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
     private javax.swing.JComboBox<SFormComponentItem> jcbItemCategory;
     private javax.swing.JComboBox<SFormComponentItem> jcbUnitType;
     private javax.swing.JCheckBox jckIsWithUnits;
+    private javax.swing.JCheckBox jckWithoutRelatedParty;
     private javax.swing.JFormattedTextField jftDateEnd;
     private javax.swing.JFormattedTextField jftDateStart;
     private javax.swing.JLabel jlCompanyBranch;
@@ -978,6 +994,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         moFieldDateEnd.setFieldValue(SLibTimeUtilities.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()));
         mbResetingForm = false;
         jckIsWithUnits.setSelected(false);
+        jckWithoutRelatedParty.setSelected(false);
         jcbUnitType.removeAllItems();
         renderComboBoxUnitsType();
     }

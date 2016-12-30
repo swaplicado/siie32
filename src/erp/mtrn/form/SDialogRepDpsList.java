@@ -32,7 +32,7 @@ import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Edwin Carmona
  */
 public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -90,6 +90,9 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
         jPanel9 = new javax.swing.JPanel();
         jlBizPartner = new javax.swing.JLabel();
         jcbBizPartner = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel11 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jckWithoutRelatedParty = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Listado de facturas de clientes");
@@ -163,7 +166,7 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtros del reporte:"));
         jPanel6.setLayout(new java.awt.BorderLayout());
 
-        jPanel7.setLayout(new java.awt.GridLayout(2, 1, 0, 1));
+        jPanel7.setLayout(new java.awt.GridLayout(3, 1, 0, 1));
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -188,6 +191,16 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
         jPanel9.add(jcbBizPartner);
 
         jPanel7.add(jPanel9);
+
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 3, 0));
+
+        jLabel1.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel11.add(jLabel1);
+
+        jckWithoutRelatedParty.setText("Sin partes relacionadas");
+        jPanel11.add(jckWithoutRelatedParty);
+
+        jPanel7.add(jPanel11);
 
         jPanel6.add(jPanel7, java.awt.BorderLayout.NORTH);
 
@@ -284,6 +297,7 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
                 map.put("nFidTpDps", mbParamIsSupplier ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2]);
                 map.put("sSqlWhereCompanyBranch", moFieldCompanyBranch.getKeyAsIntArray()[0] == 0 ? "" : " AND d.fid_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0]);
                 map.put("sSqlWhereBizPartner", moFieldBizPartner.getKeyAsIntArray()[0] == 0 ? "" : " AND d.fid_bp_r = " + moFieldBizPartner.getKeyAsIntArray()[0]);
+                map.put("sSqlWhereWithoutRelatedParty", jckWithoutRelatedParty.isSelected() ? " AND b.b_att_rel_pty = 0 " : "");
                 map.put("sTitle", mbParamIsSupplier ? " DE PROVEEDORES" : " DE CLIENTES");
                 map.put("sLocalCurrency", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency());
                 map.put("sBizPartner", moFieldBizPartner.getKeyAsIntArray()[0] == 0 ? "(TODOS)" : jcbBizPartner.getSelectedItem().toString());
@@ -335,7 +349,9 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -350,6 +366,7 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
     private javax.swing.JButton jbPrint;
     private javax.swing.JComboBox<SFormComponentItem> jcbBizPartner;
     private javax.swing.JComboBox<SFormComponentItem> jcbCompanyBranch;
+    private javax.swing.JCheckBox jckWithoutRelatedParty;
     private javax.swing.JFormattedTextField jftDateEnd;
     private javax.swing.JFormattedTextField jftDateInitial;
     private javax.swing.JLabel jlBizPartner;
@@ -375,6 +392,8 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
 
         moFieldDateInitial.setFieldValue(SLibTimeUtilities.getBeginOfMonth(miClient.getSessionXXX().getWorkingDate()));
         moFieldDateEnd.setFieldValue(SLibTimeUtilities.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()));
+        
+        jckWithoutRelatedParty.setSelected(false);
     }
 
     @Override

@@ -33,7 +33,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Edwin Carmona
  */
 public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -103,6 +103,9 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
         jlBizPartner = new javax.swing.JLabel();
         jcbBizPartner = new javax.swing.JComboBox<SFormComponentItem>();
         jbBizPartner = new javax.swing.JButton();
+        jPanel11 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jckWithoutRelatedParty = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Archivo CSV de compras/ventas netas por período");
@@ -219,6 +222,16 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
         jPanel10.add(jbBizPartner);
 
         jPanel6.add(jPanel10);
+
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jLabel1.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel11.add(jLabel1);
+
+        jckWithoutRelatedParty.setText("Sin partes relacionadas");
+        jPanel11.add(jckWithoutRelatedParty);
+
+        jPanel6.add(jPanel11);
 
         jPanel9.add(jPanel6, java.awt.BorderLayout.PAGE_START);
 
@@ -401,7 +414,7 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
                             "d.fid_ct_dps = " + mnFormType + " AND d.fid_cl_dps IN (" + docClass + ") AND " +
                             "d.dt BETWEEN '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateBegin.getDate()) + "' AND " +
                             "'" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateEnd.getDate()) + "' " +
-                            "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " + ( moFieldBizPartner.getKeyAsIntArray()[0] == 0 ? "" : " AND d.fid_bp_r = " + moFieldBizPartner.getKeyAsIntArray()[0]) + " " +
+                            "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " + ( moFieldBizPartner.getKeyAsIntArray()[0] == 0 ? "" : " AND d.fid_bp_r = " + moFieldBizPartner.getKeyAsIntArray()[0]) + " " + (jckWithoutRelatedParty.isSelected() ? " AND bp.b_att_rel_pty = 0 " : "") +
                             "INNER JOIN erp.bpsu_bpb AS bb ON d.fid_bpb = bb.id_bpb " +
                             "INNER JOIN erp.bpsu_bpb_add AS bba ON d.fid_bpb = bba.id_bpb AND d.fid_add = bba.id_add " +
                             "INNER JOIN erp.bpsu_bp_ct AS cb ON d.fid_bp_r = cb.id_bp AND cb.id_ct_bp = " + mnCategoryId + " " +
@@ -527,8 +540,10 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -545,6 +560,7 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
     private javax.swing.JComboBox<SFormComponentItem> jcbBizPartner;
     private javax.swing.JComboBox jcbDocClass;
     private javax.swing.JComboBox jcbUnitType;
+    private javax.swing.JCheckBox jckWithoutRelatedParty;
     private javax.swing.JFormattedTextField jftDateBegin;
     private javax.swing.JFormattedTextField jftDateEnd;
     private javax.swing.JLabel jlBizPartner;
@@ -576,7 +592,8 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
         jcbUnitType.setSelectedIndex(jcbUnitType.getItemCount() - 1);
         jcbDocClass.setSelectedIndex(1);
         SFormUtilities.populateComboBox(miClient, jcbBizPartner, mnFormType == SDataConstantsSys.TRNS_CT_DPS_PUR ? SDataConstants.BPSX_BP_SUP : SDataConstants.BPSX_BP_CUS);
-
+        jckWithoutRelatedParty.setSelected(false);
+        
         mbResetingForm = false;
     }
 

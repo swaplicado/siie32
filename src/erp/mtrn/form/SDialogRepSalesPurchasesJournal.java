@@ -86,6 +86,9 @@ public class SDialogRepSalesPurchasesJournal extends javax.swing.JDialog impleme
         jPanel8 = new javax.swing.JPanel();
         jlCompanyBranch = new javax.swing.JLabel();
         jcbCompanyBranch = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel12 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jckWithoutRelatedParty = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Reporte diario de ventas");
@@ -157,7 +160,7 @@ public class SDialogRepSalesPurchasesJournal extends javax.swing.JDialog impleme
         jPanel2.add(jPanel3, java.awt.BorderLayout.NORTH);
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtros del reporte:"));
-        jPanel6.setLayout(new java.awt.BorderLayout());
+        jPanel6.setLayout(new java.awt.GridLayout(4, 1));
 
         jPanel7.setLayout(new java.awt.GridLayout(1, 1, 0, 1));
 
@@ -173,7 +176,17 @@ public class SDialogRepSalesPurchasesJournal extends javax.swing.JDialog impleme
 
         jPanel7.add(jPanel8);
 
-        jPanel6.add(jPanel7, java.awt.BorderLayout.NORTH);
+        jPanel6.add(jPanel7);
+
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 3, 0));
+
+        jLabel1.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel12.add(jLabel1);
+
+        jckWithoutRelatedParty.setText("Sin partes relacionadas");
+        jPanel12.add(jckWithoutRelatedParty);
+
+        jPanel6.add(jPanel12);
 
         jPanel2.add(jPanel6, java.awt.BorderLayout.CENTER);
 
@@ -268,6 +281,7 @@ public class SDialogRepSalesPurchasesJournal extends javax.swing.JDialog impleme
                 map.put("nFidStDps", SDataConstantsSys.TRNS_ST_DPS_NEW);
                 map.put("sTpRec", mbParamIsSupplier ? SDataConstantsSys.FINU_TP_REC_PUR : SDataConstantsSys.FINU_TP_REC_SAL);
                 map.put("sSqlWhereCompanyBranch", moFieldCompanyBranch.getKeyAsIntArray()[0] == 0 ? "" : " AND d.fid_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0]);
+                map.put("sSqlWhereWithoutRelatedParty", jckWithoutRelatedParty.isSelected() ? " AND b.b_att_rel_pty = 0 " : "");
                 map.put("bIsPurchases", mbParamIsSupplier);
                 map.put("nFidTpAccMov", mbParamIsSupplier ? SDataConstantsSys.FINS_CLS_ACC_MOV_PUR[0] : SDataConstantsSys.FINS_CLS_ACC_MOV_SAL[0]);
                 map.put("nFidClAccMov", mbParamIsSupplier ? SDataConstantsSys.FINS_CLS_ACC_MOV_PUR[1] : SDataConstantsSys.FINS_CLS_ACC_MOV_SAL[1]);
@@ -324,7 +338,9 @@ public class SDialogRepSalesPurchasesJournal extends javax.swing.JDialog impleme
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -337,6 +353,7 @@ public class SDialogRepSalesPurchasesJournal extends javax.swing.JDialog impleme
     private javax.swing.JButton jbExit;
     private javax.swing.JButton jbPrint;
     private javax.swing.JComboBox<SFormComponentItem> jcbCompanyBranch;
+    private javax.swing.JCheckBox jckWithoutRelatedParty;
     private javax.swing.JFormattedTextField jftDateEnd;
     private javax.swing.JFormattedTextField jftDateInitial;
     private javax.swing.JLabel jlCompanyBranch;
@@ -361,6 +378,8 @@ public class SDialogRepSalesPurchasesJournal extends javax.swing.JDialog impleme
 
         moFieldDateInitial.setFieldValue(SLibTimeUtilities.getBeginOfMonth(miClient.getSessionXXX().getWorkingDate()));
         moFieldDateEnd.setFieldValue(SLibTimeUtilities.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()));
+        
+        jckWithoutRelatedParty.setSelected(false);
     }
 
     @Override

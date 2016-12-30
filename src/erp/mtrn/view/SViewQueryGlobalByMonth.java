@@ -18,11 +18,11 @@ import erp.table.STabFilterUnitType;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import javax.swing.JButton;
+import javax.swing.JToggleButton;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Edwin Carmona
  */
 public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -46,6 +46,8 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab implements 
     protected erp.lib.table.STableColumn[] maoTableColumns;
     protected erp.lib.table.STabFilterYear moFilterYear;
     private erp.table.STabFilterUnitType moTabFilterUnitType;
+    
+    private javax.swing.JToggleButton jtbRelatedParty;
 
     public SViewQueryGlobalByMonth(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
         super(client, tabTitle, SDataConstants.TRNX_DPS_QRY, auxType01);
@@ -59,6 +61,15 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab implements 
         moTabFilterUnitType = new STabFilterUnitType(miClient, this);
         mnYear = miClient.getSessionXXX().getWorkingYear();
         mnType = 0;
+        
+        jtbRelatedParty = new javax.swing.JToggleButton();
+        
+        jtbRelatedParty.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_rel_pty_off.gif")));
+        jtbRelatedParty.setToolTipText("Filtrar partes relacionadas");
+        jtbRelatedParty.setPreferredSize(new java.awt.Dimension(23, 23));
+        jtbRelatedParty.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_rel_pty_on.gif")));
+        
+        jtbRelatedParty.addActionListener(this);
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
@@ -67,6 +78,11 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab implements 
         addTaskBarUpperComponent(moFilterYear);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterUnitType);
+        
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(jtbRelatedParty);
+        
+        jtbRelatedParty.setSelected(true);
 
         renderTableColumns();
         setIsSummaryApplying(true);
@@ -321,7 +337,9 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab implements 
                     "FROM trn_dps AS d " +
                     "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc " +
                     "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " +
+                    "INNER JOIN erp.bpsu_bp AS bp ON d.fid_bp_r = bp.id_bp " +
                     "WHERE d.b_del = 0 AND de.b_del = 0 " + sqlDatePeriod +
+                    (jtbRelatedParty.isSelected() ? "" : " AND bp.b_att_rel_pty = 0 ") +
                     "GROUP BY i.item_key, i.item " +
                     "HAVING f_stot_01 <> 0 OR f_qty_01 <> 0 OR f_stot_02 <> 0 OR f_qty_02 <> 0 OR f_stot_03 <> 0 OR f_qty_03 <> 0 OR f_stot_04 <> 0 OR f_qty_04 <> 0 OR f_stot_05 <> 0 OR f_qty_05 <> 0 OR " +
                     "f_stot_06 <> 0 OR f_qty_06 <> 0 OR f_stot_07 <> 0 OR f_qty_07 <> 0 OR f_stot_08 <> 0 OR f_qty_08 <> 0 OR f_stot_09 <> 0 OR f_qty_09 <> 0 OR f_stot_10 <> 0 OR f_qty_10 <> 0 OR " +
@@ -358,8 +376,12 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab implements 
     public void actionPerformed(java.awt.event.ActionEvent e) {
         super.actionPerformed(e);
 
-        if (e.getSource() instanceof javax.swing.JButton) {
-            JButton button = (JButton) e.getSource();
+        if (e.getSource() instanceof javax.swing.JToggleButton) {
+            JToggleButton toggleButton = (JToggleButton) e.getSource();
+
+            if (toggleButton == jtbRelatedParty) {
+                actionReload();
+            }
         }
     }
 }
