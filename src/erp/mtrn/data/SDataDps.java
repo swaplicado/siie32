@@ -87,6 +87,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public static final String MSG_ERR_FIN_REC_USR = "No se ha especificado la póliza contable de usuario.";
     public static final String MSG_ERR_ACC_UNK_ = "No se encontró la configuración de cuentas contables para el ";
     public static final String MSG_ERR_ACC_EMP_ = "La configuración de cuentas contables está vacía para el ";
+    public static final String MSG_ERR_ITM_CFG_ = "Es incorrecta la configuración del ";
     
     public static final int AUT_AUTHORN_REJ_NA = 0;
     public static final int AUT_AUTHORN_REJ_LIM_USR = 1;
@@ -3099,6 +3100,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         String sql = "";
         String name = "";
         String idAccount = "";
+        String accountFormat = "";
         Statement statement = null;
         ResultSet resultSet = null;
         Vector<SFinAccountConfigEntry> accountConfigs = null;
@@ -3133,6 +3135,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                 // 2. Check purchases or sales:
 
+                accountFormat = SFinAccountUtilities.getConfigAccountFormat(statement);   // current account format is an empty account
+                
                 for (SDataDpsEntry entry : mvDbmsDpsEntries) {
                     if (entry.isAccountable()) {
                         try {
@@ -3140,7 +3144,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 name = entry.getConcept();
                             }
                             else {
-                                sql = "SELECT item FROM erp.itmu_item WHERE id_item = " + entry.getFkItemRefId_n() + " ";
+                                sql = "SELECT item, b_pre_pay FROM erp.itmu_item WHERE id_item = " + entry.getFkItemRefId_n() + " ";
                                 resultSet = statement.executeQuery(sql);
                                 if (!resultSet.next()) {
                                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
@@ -3162,10 +3166,18 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     msDbmsError = MSG_ERR_ACC_EMP_ + "ítem:\n'" + name + "'.";
                                     throw new Exception(msDbmsError);
                                 }
+                                
+                                if (!entry.getIsPrepayment() && SLibUtils.belongsTo(SFinAccountUtilities.getSystemAccountType(connection, SFinAccountUtilities.obtainAccountLedger(config.getAccountId(), accountFormat)), 
+                                        new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_SUP, SDataConstantsSys.FINS_TP_ACC_SYS_CUS, SDataConstantsSys.FINS_TP_ACC_SYS_CDR, SDataConstantsSys.FINS_TP_ACC_SYS_DBR })) {
+                                    msDbmsError = MSG_ERR_ITM_CFG_ + "ítem:\n'" + name + "' (configuración anticipo).";
+                                    throw new Exception(msDbmsError);
+                                }
                             }
                         }
                         catch (Exception e) {
-                            msDbmsError = MSG_ERR_ACC_UNK_ + "ítem:\n'" + name + "'.\n[" + e + "]";
+                            if (msDbmsError.isEmpty()) {
+                                msDbmsError = MSG_ERR_ACC_UNK_ + "ítem:\n'" + name + "'.\n[" + e + "]";
+                            }
                             throw new Exception(msDbmsError);
                         }
 

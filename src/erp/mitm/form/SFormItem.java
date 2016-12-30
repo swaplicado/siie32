@@ -2001,7 +2001,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     }
 
     private void computeItemKey() {
-        String text = "";
+        String key = "";
         SDataBrand brd = null;
         SDataManufacturer mfr = null;
         SDataVariety var = null;
@@ -2013,37 +2013,37 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
                 if (!moItemGeneric.getIsItemLineApplying()) {
                     for (int pos = 1; pos <= SDataConstantsSys.ITMS_KEY_ORD_POS_QTY; pos++) {
-                        text += SLibUtilities.textTrim(getItemKeyAndNameByPosition(brd, mfr, pos, SDataConstantsSys.ITMS_DEF_ITEM_KEY));
+                        key += SLibUtilities.textTrim(getItemKeyAndNameByPosition(brd, mfr, pos, SDataConstantsSys.ITMS_DEF_ITEM_KEY));
                     }
                 }
                 else {
                     for (int pos = 1; pos <= SDataConstantsSys.ITMS_KEY_LINE_POS_QTY; pos++) {
-                        text += SLibUtilities.textTrim(getItemKeyAndNameByPosition(brd, mfr, pos, SDataConstantsSys.ITMS_DEF_ITEM_KEY));
+                        key += SLibUtilities.textTrim(getItemKeyAndNameByPosition(brd, mfr, pos, SDataConstantsSys.ITMS_DEF_ITEM_KEY));
                     }
 
-                    text += moFieldCode.getString();
+                    key += moFieldCode.getString();
 
                     if (jcbFkVariety01Id.getSelectedIndex() > 0 && moFieldFkVariety01Id.getKeyAsIntArray()[0] != SDataConstantsSys.ITMU_VAR_NA) {
                         var = (SDataVariety) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_VAR, moFieldFkVariety01Id.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
-                        text += var.getCode();
+                        key += var.getCode();
                     }
                     if (jcbFkVariety02Id.getSelectedIndex() > 0 && moFieldFkVariety02Id.getKeyAsIntArray()[0] != SDataConstantsSys.ITMU_VAR_NA) {
                         var = (SDataVariety) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_VAR, moFieldFkVariety02Id.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
-                        text += var.getCode();
+                        key += var.getCode();
                     }
                     if (jcbFkVariety03Id.getSelectedIndex() > 0 && moFieldFkVariety03Id.getKeyAsIntArray()[0] != SDataConstantsSys.ITMU_VAR_NA) {
                         var = (SDataVariety) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_VAR, moFieldFkVariety03Id.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
-                        text += var.getCode();
+                        key += var.getCode();
                     }
                 }
-
-                moFieldItemKey.setFieldValue(text);
             }
+            
+            moFieldItemKey.setFieldValue(key);
         }
     }
 
     private void computeItemName() {
-        String text = "";
+        String name = "";
         SDataBrand brd = null;
         SDataManufacturer mfr = null;
         SDataVariety var = null;
@@ -2054,38 +2054,38 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
             if (!moItemGeneric.getIsItemLineApplying()) {
                 for (int pos = 1; pos <= SDataConstantsSys.ITMS_NAM_ORD_POS_QTY; pos++) {
-                    text += (text.length() == 0 ? "" : " ") + SLibUtilities.textTrim(getItemKeyAndNameByPosition(brd, mfr, pos, SDataConstantsSys.ITMS_DEF_ITEM));
+                    name += (name.length() == 0 ? "" : " ") + SLibUtilities.textTrim(getItemKeyAndNameByPosition(brd, mfr, pos, SDataConstantsSys.ITMS_DEF_ITEM));
                 }
             }
             else {
                 for (int pos = 1; pos <= SDataConstantsSys.ITMS_NAM_LINE_POS_QTY; pos++) {
-                    text += (text.length() == 0 ? "" : " ") + SLibUtilities.textTrim(getItemKeyAndNameByPosition(brd, mfr, pos, SDataConstantsSys.ITMS_DEF_ITEM));
+                    name += (name.length() == 0 ? "" : " ") + SLibUtilities.textTrim(getItemKeyAndNameByPosition(brd, mfr, pos, SDataConstantsSys.ITMS_DEF_ITEM));
                 }
 
-                text += (text.length() == 0 ? "" : " ") + moFieldName.getString();
-                text += (text.length() == 0 ? "" : " ") + moFieldPresentation.getString();
+                name += (name.length() == 0 ? "" : " ") + moFieldName.getString();
+                name += (name.length() == 0 ? "" : " ") + moFieldPresentation.getString();
 
                 if (jcbFkVariety01Id.getSelectedIndex() > 0 && moFieldFkVariety01Id.getKeyAsIntArray()[0] != SDataConstantsSys.ITMU_VAR_NA) {
                     var = (SDataVariety) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_VAR, moFieldFkVariety01Id.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
-                    text += (text.length() == 0 ? "" : " ") + var.getVariety();
+                    name += (name.length() == 0 ? "" : " ") + var.getVariety();
                 }
                 if (jcbFkVariety02Id.getSelectedIndex() > 0 && moFieldFkVariety02Id.getKeyAsIntArray()[0] != SDataConstantsSys.ITMU_VAR_NA) {
                     var = (SDataVariety) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_VAR, moFieldFkVariety02Id.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
-                    text += (text.length() == 0 ? "" : " ") + var.getVariety();
+                    name += (name.length() == 0 ? "" : " ") + var.getVariety();
                 }
                 if (jcbFkVariety03Id.getSelectedIndex() > 0 && moFieldFkVariety03Id.getKeyAsIntArray()[0] != SDataConstantsSys.ITMU_VAR_NA) {
                     var = (SDataVariety) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_VAR, moFieldFkVariety03Id.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
-                    text += (text.length() == 0 ? "" : " ") + var.getVariety();
+                    name += (name.length() == 0 ? "" : " ") + var.getVariety();
                 }
             }
 
-            jtfItemNameRo.setText(SLibUtilities.textTrim(text));
+            jtfItemNameRo.setText(SLibUtilities.textTrim(name));
             jtfItemNameRo.setCaretPosition(0);
         }
     }
 
     private void computeItemNameShort() {
-        String text = "";
+        String nameShort = "";
         SDataBrand brd = null;
         SDataManufacturer mfr = null;
         SDataVariety var = null;
@@ -2097,34 +2097,34 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
                 if (!moItemGeneric.getIsItemLineApplying()) {
                     for (int pos = 1; pos <= SDataConstantsSys.ITMS_NAM_ORD_POS_QTY; pos++) {
-                        text += (text.length() == 0 ? "" : " ") + SLibUtilities.textTrim(getItemKeyAndNameByPosition(brd, mfr, pos, SDataConstantsSys.ITMS_DEF_ITEM_SHORT));
+                        nameShort += (nameShort.length() == 0 ? "" : " ") + SLibUtilities.textTrim(getItemKeyAndNameByPosition(brd, mfr, pos, SDataConstantsSys.ITMS_DEF_ITEM_SHORT));
                     }
                 }
                 else {
                     for (int pos = 1; pos <= SDataConstantsSys.ITMS_NAM_LINE_POS_QTY; pos++) {
-                        text += (text.length() == 0 ? "" : " ") + SLibUtilities.textTrim(getItemKeyAndNameByPosition(brd, mfr, pos, SDataConstantsSys.ITMS_DEF_ITEM_SHORT));
+                        nameShort += (nameShort.length() == 0 ? "" : " ") + SLibUtilities.textTrim(getItemKeyAndNameByPosition(brd, mfr, pos, SDataConstantsSys.ITMS_DEF_ITEM_SHORT));
                     }
 
-                    text += (text.length() == 0 ? "" : " ") + moFieldNameShort.getString();
-                    text += (text.length() == 0 ? "" : " ") + moFieldPresentationShort.getString();
+                    nameShort += (nameShort.length() == 0 ? "" : " ") + moFieldNameShort.getString();
+                    nameShort += (nameShort.length() == 0 ? "" : " ") + moFieldPresentationShort.getString();
 
                     if (jcbFkVariety01Id.getSelectedIndex() > 0 && moFieldFkVariety01Id.getKeyAsIntArray()[0] != SDataConstantsSys.ITMU_VAR_NA) {
                         var = (SDataVariety) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_VAR, moFieldFkVariety01Id.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
-                        text += (text.length() == 0 ? "" : " ") + var.getCode();
+                        nameShort += (nameShort.length() == 0 ? "" : " ") + var.getCode();
                     }
                     if (jcbFkVariety02Id.getSelectedIndex() > 0 && moFieldFkVariety02Id.getKeyAsIntArray()[0] != SDataConstantsSys.ITMU_VAR_NA) {
                         var = (SDataVariety) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_VAR, moFieldFkVariety02Id.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
-                        text += (text.length() == 0 ? "" : " ") + var.getCode();
+                        nameShort += (nameShort.length() == 0 ? "" : " ") + var.getCode();
                     }
                     if (jcbFkVariety03Id.getSelectedIndex() > 0 && moFieldFkVariety03Id.getKeyAsIntArray()[0] != SDataConstantsSys.ITMU_VAR_NA) {
                         var = (SDataVariety) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_VAR, moFieldFkVariety03Id.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
-                        text += (text.length() == 0 ? "" : " ") + var.getCode();
+                        nameShort += (nameShort.length() == 0 ? "" : " ") + var.getCode();
                     }
                 }
-
-                jtfItemNameShortRo.setText(SLibUtilities.textTrim(text));
-                jtfItemNameShortRo.setCaretPosition(0);
             }
+            
+            jtfItemNameShortRo.setText(SLibUtilities.textTrim(nameShort));
+            jtfItemNameShortRo.setCaretPosition(0);
         }
     }
 

@@ -321,7 +321,7 @@ public abstract class SAccountUtils {
 
     /**
      * Converts an account code on user-format into standard-format.
-     * @param codeStd Account code on user-format to be converted into standard-format.
+     * @param codeUsr Account code on user-format to be converted into standard-format.
      * @return Converted account code on standard-format.
      */
     public static String convertCodeStd(final String codeUsr) {

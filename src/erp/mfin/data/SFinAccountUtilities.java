@@ -10,8 +10,12 @@ import erp.mitm.data.SDataItem;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
+import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Vector;
+import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.srv.SSrvConsts;
 
@@ -20,6 +24,55 @@ import sa.lib.srv.SSrvConsts;
  * @author Sergio Flores
  */
 public abstract class SFinAccountUtilities {
+    
+    /**
+     * Gets the current account format from ERP configuration.
+     * @param statement Database statement.
+     * @return Current account format (e.g., "0000-0000-0000").
+     * @throws SQLException
+     * @throws Exception 
+     */
+    public static String getConfigAccountFormat(final Statement statement) throws SQLException, Exception {
+        String format = "";
+        ResultSet resultSet = statement.executeQuery("SELECT fmt_id_acc FROM erp.cfg_param_erp WHERE id_erp = 1; ");
+        
+        if (resultSet.next()) {
+            format = resultSet.getString(1).replace('9', '0');
+        }
+        
+        return format;
+    }
+    
+    /**
+     * Obtains the ledger account of provided account.
+     * @param account Provided account from wich its ledger account will be obtained.
+     * @param accountFormat Account format from ERP configuration.
+     * @return Ledger account.
+     */
+    public static String obtainAccountLedger(final String account, final String accountFormat) {
+        int ledgerPos = account.indexOf("-");
+        
+        return ledgerPos == -1 ? "" : account.substring(0, ledgerPos) + accountFormat.substring(ledgerPos);
+    }
+    
+    /**
+     * Gets the system-account type of provided account.
+     * @param connection Database connection.
+     * @param account Provided account from wich its system-account type will be get.
+     * @return System-account type.
+     * @throws SQLException
+     * @throws Exception 
+     */
+    public static int getSystemAccountType(final Connection connection, final String account) throws SQLException, Exception {
+        int type = SLibConsts.UNDEFINED;
+        ResultSet resultSet = connection.createStatement().executeQuery("SELECT fid_tp_acc_sys FROM fin_acc WHERE id_acc = '" + account + "';");
+        
+        if (resultSet.next()) {
+            type = resultSet.getInt(1);
+        }
+        
+        return type;
+    }
 
     /**
      * Obtain account for tax, DPS category and date supplied.
@@ -62,20 +115,11 @@ public abstract class SFinAccountUtilities {
      */
     public static java.lang.String obtainTaxAccountId(
             int[] keyTax, int idDpsCategory, java.util.Date dateStart, int idTaxAccountType, java.sql.Statement statement) throws java.lang.Exception {
-
         String sql = "";
         String field = "";
         String idAccount = "";
-        String idEmptyAccount = "";
+        String emptyAccount = getConfigAccountFormat(statement);   // current account format is an empty account
         ResultSet resultSet = null;
-
-        // Define empty account:
-
-        sql = "SELECT fmt_id_acc FROM erp.cfg_param_erp WHERE id_erp = 1 ";
-        resultSet = statement.executeQuery(sql);
-        if (resultSet.next()) {
-            idEmptyAccount = resultSet.getString("fmt_id_acc").replace('9', '0');
-        }
 
         // Obtain tax account ID:
 
@@ -99,7 +143,7 @@ public abstract class SFinAccountUtilities {
             throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + " (Tax account)");
         }
         else {
-            if (resultSet.getString("f_acc").compareTo(idEmptyAccount) == 0) {
+            if (resultSet.getString("f_acc").compareTo(emptyAccount) == 0) {
                 throw new Exception(SLibConstants.MSG_ERR_GUI_EMPTY_ACC + " (Tax account)");
             }
 
@@ -124,7 +168,6 @@ public abstract class SFinAccountUtilities {
     @SuppressWarnings("unchecked")
     public static java.util.Vector<erp.mfin.data.SFinAccountConfigEntry> obtainBizPartnerAccountConfigs(erp.client.SClientInterface client,
             int idBizPartner, int idBizPartnenrCategory, int idBkc, java.util.Date dateStart, int idBizPartnerAccountType, boolean isDebit) throws java.lang.Exception {
-
         SServerRequest request = null;
         SServerResponse response = null;
         Vector<SFinAccountConfigEntry> accountConfigs = null;
@@ -156,20 +199,11 @@ public abstract class SFinAccountUtilities {
      */
     public static java.util.Vector<erp.mfin.data.SFinAccountConfigEntry> obtainBizPartnerAccountConfigs(
             int idBizPartner, int idBizPartnerCategory, int idBkc, java.util.Date dateStart, int idBizPartnerAccountType, boolean isDebit, java.sql.Statement statement) throws java.lang.Exception {
-
         int idAccount = 0;
         String sql = "";
-        String idEmptyAccount = "";
+        String emptyAccount = getConfigAccountFormat(statement);   // current account format is an empty account
         ResultSet resultSet = null;
         Vector<SFinAccountConfigEntry> accountConfigs = new Vector<SFinAccountConfigEntry>();
-
-        // Define empty account:
-
-        sql = "SELECT fmt_id_acc FROM erp.cfg_param_erp WHERE id_erp = 1 ";
-        resultSet = statement.executeQuery(sql);
-        if (resultSet.next()) {
-            idEmptyAccount = resultSet.getString("fmt_id_acc").replace('9', '0');
-        }
 
         // Check if there is an account for business partner:
 
@@ -216,7 +250,7 @@ public abstract class SFinAccountUtilities {
                     "ORDER BY abe.fid_acc, abe.fid_cc_n, abe.per ";
             resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
-                if (resultSet.getString("abe.fid_acc").compareTo(idEmptyAccount) == 0) {
+                if (resultSet.getString("abe.fid_acc").compareTo(emptyAccount) == 0) {
                     throw new Exception(SLibConstants.MSG_ERR_GUI_EMPTY_ACC + " (Account for business partner for BP: " + idBizPartner + ")");
                 }
                 else {
@@ -246,7 +280,6 @@ public abstract class SFinAccountUtilities {
     @SuppressWarnings("unchecked")
     public static java.util.Vector<erp.mfin.data.SFinAccountConfigEntry> obtainItemAccountConfigs(erp.client.SClientInterface client,
             int idItem, int idBkc, java.util.Date dateStart, int idItemAccountType, boolean isDebit) throws java.lang.Exception {
-
         SServerRequest request = null;
         SServerResponse response = null;
         Vector<SFinAccountConfigEntry> accountConfigs = null;
@@ -277,23 +310,14 @@ public abstract class SFinAccountUtilities {
      */
     public static java.util.Vector<erp.mfin.data.SFinAccountConfigEntry> obtainItemAccountConfigs(
             int idItem, int idBkc, java.util.Date dateStart, int idItemAccountType, boolean isDebit, java.sql.Statement statement) throws java.lang.Exception {
-
         int idAccount = 0;
         int idReference = 0;
         int[] linkTypes = null;
         String sql = "";
-        String idEmptyAccount = "";
+        String emptyAccount = getConfigAccountFormat(statement);   // current account format is an empty account
         ResultSet resultSet = null;
         SDataItem item = new SDataItem();
         Vector<SFinAccountConfigEntry> accountConfigs = new Vector<SFinAccountConfigEntry>();
-
-        // Define empty account:
-
-        sql = "SELECT fmt_id_acc FROM erp.cfg_param_erp WHERE id_erp = 1 ";
-        resultSet = statement.executeQuery(sql);
-        if (resultSet.next()) {
-            idEmptyAccount = resultSet.getString("fmt_id_acc").replace('9', '0');
-        }
 
         // Read item registry:
 
@@ -379,7 +403,7 @@ public abstract class SFinAccountUtilities {
                     "ORDER BY aie.fid_acc_n, aie.fid_cc_n, aie.per ";
             resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
-                if (resultSet.getString("aie.fid_acc_n") == null || resultSet.getString("aie.fid_acc_n").compareTo(idEmptyAccount) == 0) {
+                if (resultSet.getString("aie.fid_acc_n") == null || resultSet.getString("aie.fid_acc_n").compareTo(emptyAccount) == 0) {
                     throw new Exception(SLibConstants.MSG_ERR_GUI_EMPTY_ACC + " (Account for item: " + idItem + ")");
                 }
                 else {
