@@ -77,6 +77,15 @@ public class SDialogRepDpsBizPartner extends javax.swing.JDialog implements erp.
         jbPrint = new javax.swing.JButton();
         jbExit = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
+        jPanel11 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        jlDateInitial = new javax.swing.JLabel();
+        jftDateInitial = new javax.swing.JFormattedTextField();
+        jbDateInitial = new javax.swing.JButton();
+        jPanel5 = new javax.swing.JPanel();
+        jlDateEnd = new javax.swing.JLabel();
+        jftDateEnd = new javax.swing.JFormattedTextField();
+        jbDateEnd = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jlCompanyBranch = new javax.swing.JLabel();
@@ -93,15 +102,9 @@ public class SDialogRepDpsBizPartner extends javax.swing.JDialog implements erp.
         jPanel10 = new javax.swing.JPanel();
         jlSalesRoute = new javax.swing.JLabel();
         jcbSalesRoute = new javax.swing.JComboBox<SFormComponentItem>();
-        jPanel11 = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
-        jlDateInitial = new javax.swing.JLabel();
-        jftDateInitial = new javax.swing.JFormattedTextField();
-        jbDateInitial = new javax.swing.JButton();
-        jPanel5 = new javax.swing.JPanel();
-        jlDateEnd = new javax.swing.JLabel();
-        jftDateEnd = new javax.swing.JFormattedTextField();
-        jbDateEnd = new javax.swing.JButton();
+        jPanel12 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jckWithoutRelatedParty = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Facturas de asociados de negocios");
@@ -130,8 +133,49 @@ public class SDialogRepDpsBizPartner extends javax.swing.JDialog implements erp.
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración del reporte:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
+        jPanel11.setBorder(javax.swing.BorderFactory.createTitledBorder("Período:"));
+        jPanel11.setLayout(new java.awt.GridLayout(2, 1, 0, 1));
+
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDateInitial.setText("Fecha inicial: *");
+        jlDateInitial.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel4.add(jlDateInitial);
+
+        jftDateInitial.setText("dd/mm/yyyy");
+        jftDateInitial.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel4.add(jftDateInitial);
+
+        jbDateInitial.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_date_day.gif"))); // NOI18N
+        jbDateInitial.setToolTipText("Seleccionar fecha inicial");
+        jbDateInitial.setFocusable(false);
+        jbDateInitial.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel4.add(jbDateInitial);
+
+        jPanel11.add(jPanel4);
+
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDateEnd.setText("Fecha final: *");
+        jlDateEnd.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel5.add(jlDateEnd);
+
+        jftDateEnd.setText("dd/mm/yyyy");
+        jftDateEnd.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel5.add(jftDateEnd);
+
+        jbDateEnd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_date_day.gif"))); // NOI18N
+        jbDateEnd.setToolTipText("Seleccionar fecha final");
+        jbDateEnd.setFocusable(false);
+        jbDateEnd.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel5.add(jbDateEnd);
+
+        jPanel11.add(jPanel5);
+
+        jPanel2.add(jPanel11, java.awt.BorderLayout.NORTH);
+
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtros del reporte:"));
-        jPanel3.setLayout(new java.awt.GridLayout(5, 1, 5, 1));
+        jPanel3.setLayout(new java.awt.GridLayout(6, 1, 5, 1));
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -193,52 +237,21 @@ public class SDialogRepDpsBizPartner extends javax.swing.JDialog implements erp.
 
         jPanel3.add(jPanel10);
 
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 3, 0));
+
+        jLabel1.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel12.add(jLabel1);
+
+        jckWithoutRelatedParty.setText("Sin partes relacionadas");
+        jPanel12.add(jckWithoutRelatedParty);
+
+        jPanel3.add(jPanel12);
+
         jPanel2.add(jPanel3, java.awt.BorderLayout.CENTER);
-
-        jPanel11.setBorder(javax.swing.BorderFactory.createTitledBorder("Período:"));
-        jPanel11.setLayout(new java.awt.GridLayout(2, 1, 0, 1));
-
-        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlDateInitial.setText("Fecha inicial: *");
-        jlDateInitial.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel4.add(jlDateInitial);
-
-        jftDateInitial.setText("dd/mm/yyyy");
-        jftDateInitial.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel4.add(jftDateInitial);
-
-        jbDateInitial.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_date_day.gif"))); // NOI18N
-        jbDateInitial.setToolTipText("Seleccionar fecha inicial");
-        jbDateInitial.setFocusable(false);
-        jbDateInitial.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel4.add(jbDateInitial);
-
-        jPanel11.add(jPanel4);
-
-        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlDateEnd.setText("Fecha final: *");
-        jlDateEnd.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel5.add(jlDateEnd);
-
-        jftDateEnd.setText("dd/mm/yyyy");
-        jftDateEnd.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel5.add(jftDateEnd);
-
-        jbDateEnd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_date_day.gif"))); // NOI18N
-        jbDateEnd.setToolTipText("Seleccionar fecha final");
-        jbDateEnd.setFocusable(false);
-        jbDateEnd.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel5.add(jbDateEnd);
-
-        jPanel11.add(jPanel5);
-
-        jPanel2.add(jPanel11, java.awt.BorderLayout.NORTH);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        setSize(new java.awt.Dimension(445, 325));
+        setSize(new java.awt.Dimension(576, 389));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -339,6 +352,7 @@ public class SDialogRepDpsBizPartner extends javax.swing.JDialog implements erp.
                 map.put("sSqlWhereBizPartner", moFieldBizPartner.getKeyAsIntArray()[0] == 0 ? "" : " AND d.fid_bp_r = " + moFieldBizPartner.getKeyAsIntArray()[0]);
                 map.put("sSqlWhereSalesAgent", moFieldSalesAgent.getKeyAsIntArray()[0] == 0 ? "" : " AND d.fid_sal_agt_n = " + moFieldSalesAgent.getKeyAsIntArray()[0]);
                 map.put("sSqlWhereSalesRoute", moFieldSalesRoute.getKeyAsIntArray()[0] == 0 ? "" : " AND rou.fid_sal_route = " + moFieldSalesRoute.getKeyAsIntArray()[0]);
+                map.put("sSqlWhereWithoutRelatedParty", jckWithoutRelatedParty.isSelected() ? " AND b.b_att_rel_pty = 0 " : "");
                 map.put("sTitle", mbParamIsSupplier ? " DE PROVEEDORES" : " DE CLIENTES");
                 map.put("sLocalCurrency", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency());
                 map.put("sBizPartner", moFieldBizPartner.getKeyAsIntArray()[0] == 0 ? "(TODOS)" : jcbBizPartner.getSelectedItem().toString());
@@ -389,9 +403,11 @@ public class SDialogRepDpsBizPartner extends javax.swing.JDialog implements erp.
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -409,6 +425,7 @@ public class SDialogRepDpsBizPartner extends javax.swing.JDialog implements erp.
     private javax.swing.JComboBox<SFormComponentItem> jcbCompanyBranch;
     private javax.swing.JComboBox<SFormComponentItem> jcbSalesAgent;
     private javax.swing.JComboBox<SFormComponentItem> jcbSalesRoute;
+    private javax.swing.JCheckBox jckWithoutRelatedParty;
     private javax.swing.JFormattedTextField jftDateEnd;
     private javax.swing.JFormattedTextField jftDateInitial;
     private javax.swing.JLabel jlBizArea;
@@ -437,6 +454,8 @@ public class SDialogRepDpsBizPartner extends javax.swing.JDialog implements erp.
 
         moFieldDateInitial.setFieldValue(SLibTimeUtilities.getBeginOfMonth(miClient.getSessionXXX().getWorkingDate()));
         moFieldDateEnd.setFieldValue(SLibTimeUtilities.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()));
+        
+        jckWithoutRelatedParty.setSelected(false);
     }
 
     @Override

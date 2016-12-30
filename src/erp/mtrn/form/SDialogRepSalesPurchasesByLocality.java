@@ -20,9 +20,6 @@ import java.util.Vector;
 import javax.swing.AbstractAction;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.view.*;
-import net.sf.jasperreports.view.save.JRPdfSaveContributor.*;
-import net.sf.jasperreports.view.JRViewer.*;
-import net.sf.jasperreports.view.save.JRMultipleSheetsXlsSaveContributor.*;
 
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
@@ -93,9 +90,13 @@ public class SDialogRepSalesPurchasesByLocality extends javax.swing.JDialog impl
         jPanel6 = new javax.swing.JPanel();
         jlCountry = new javax.swing.JLabel();
         jcbCountry = new javax.swing.JComboBox();
+        jPanel12 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jckWithoutRelatedParty = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Reporte de compras netas por zona geográfica");
+        setPreferredSize(new java.awt.Dimension(400, 250));
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -162,6 +163,8 @@ public class SDialogRepSalesPurchasesByLocality extends javax.swing.JDialog impl
 
         jPanel2.add(jPanel3, java.awt.BorderLayout.NORTH);
 
+        jPanel7.setLayout(new java.awt.GridLayout(4, 1));
+
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 2));
 
         jlCountry.setText("Pais:");
@@ -174,12 +177,22 @@ public class SDialogRepSalesPurchasesByLocality extends javax.swing.JDialog impl
 
         jPanel7.add(jPanel6);
 
-        jPanel2.add(jPanel7, java.awt.BorderLayout.PAGE_END);
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 3, 0));
+
+        jLabel1.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel12.add(jLabel1);
+
+        jckWithoutRelatedParty.setText("Sin partes relacionadas");
+        jPanel12.add(jckWithoutRelatedParty);
+
+        jPanel7.add(jPanel12);
+
+        jPanel2.add(jPanel7, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-400)/2, (screenSize.height-198)/2, 400, 198);
+        setSize(new java.awt.Dimension(416, 289));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -276,6 +289,7 @@ public class SDialogRepSalesPurchasesByLocality extends javax.swing.JDialog impl
                 map.put("sLocCountry", miClient.getSession().getSessionCustom().getLocalCountry());
                 // XXX 2011-09
                 map.put("sSqlWhereCountry", moFieldCountry.getKeyAsIntArray()[0] == 0 ? "" : "AND (adr.fid_cty_n = " + moFieldCountry.getKeyAsIntArray()[0] + (!miClient.getSession().getSessionCustom().isLocalCountry(moFieldCountry.getKeyAsIntArray()) ? "" : " OR adr.fid_cty_n IS NULL") + ")");
+                map.put("sSqlWhereWithoutRelatedParty", jckWithoutRelatedParty.isSelected() ? " AND bp.b_att_rel_pty = 0 " : "");
                 /* XXX 2011-10
                 map.put("sSqlWhereState", !jcbState.isEnabled() ? "" : moFieldState.getKeyAsIntArray()[0] == 0 ? "" : " AND ste.id_ste = " + moFieldState.getKeyAsIntArray()[0] + " ");
                 map.put("sSqlWhereCounty", !jcbCounty.isEnabled() ? "" : moFieldCounty.getKeyAsIntArray()[0] == 0 ? "" : " AND cty.id_cty = " + moFieldCounty.getKeyAsIntArray()[0] + " ");
@@ -335,7 +349,9 @@ public class SDialogRepSalesPurchasesByLocality extends javax.swing.JDialog impl
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -347,6 +363,7 @@ public class SDialogRepSalesPurchasesByLocality extends javax.swing.JDialog impl
     private javax.swing.JButton jbDateInitial;
     private javax.swing.JButton jbPrint;
     private javax.swing.JComboBox jcbCountry;
+    private javax.swing.JCheckBox jckWithoutRelatedParty;
     private javax.swing.JFormattedTextField jftDateEnd;
     private javax.swing.JFormattedTextField jftDateInitial;
     private javax.swing.JLabel jlCountry;
@@ -373,6 +390,7 @@ public class SDialogRepSalesPurchasesByLocality extends javax.swing.JDialog impl
         moFieldDateEnd.setFieldValue(SLibTimeUtilities.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()));
 
         jcbCountry.setEnabled(true);
+        jckWithoutRelatedParty.setSelected(false);
         /* XXX 2011-10
         jcbState.setEnabled(true);
         jcbCounty.setEnabled(true);

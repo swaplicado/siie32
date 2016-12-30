@@ -16,11 +16,11 @@ import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
 import erp.table.STabFilterCompanyBranch;
 import erp.table.STabFilterUnitType;
-import javax.swing.JButton;
+import javax.swing.JToggleButton;
 
 /**
  *
- * @author Alfonso Flores, Juan M. Barajas, Sergio Flores
+ * @author Alfonso Flores, Juan M. Barajas, Sergio Flores, Edwin Carmona
  */
 public class SViewQueryTotal extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -30,6 +30,8 @@ public class SViewQueryTotal extends erp.lib.table.STableTab implements java.awt
     private erp.table.STabFilterCompanyBranch moTabCompanyBranch;
     private erp.table.STabFilterUnitType moTabFilterUnitType;
     private erp.table.STabFilterBizPartner moTabFilterBizPartner;
+    
+    private javax.swing.JToggleButton jtbRelatedParty;
 
     public SViewQueryTotal(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
         super(client, tabTitle, SDataConstants.TRNX_DPS_QRY, auxType01);
@@ -44,6 +46,15 @@ public class SViewQueryTotal extends erp.lib.table.STableTab implements java.awt
         moTabCompanyBranch = new STabFilterCompanyBranch(miClient, this);
         moTabFilterUnitType = new STabFilterUnitType(miClient, this);
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, isPurchase() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
+        
+        jtbRelatedParty = new javax.swing.JToggleButton();
+        
+        jtbRelatedParty.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_rel_pty_off.gif")));
+        jtbRelatedParty.setToolTipText("Filtrar partes relacionadas");
+        jtbRelatedParty.setPreferredSize(new java.awt.Dimension(23, 23));
+        jtbRelatedParty.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_rel_pty_on.gif")));
+        
+        jtbRelatedParty.addActionListener(this);
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
@@ -53,6 +64,8 @@ public class SViewQueryTotal extends erp.lib.table.STableTab implements java.awt
         addTaskBarUpperComponent(moTabCompanyBranch);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterUnitType);
+        
+        jtbRelatedParty.setSelected(true);
 
         switch(mnTabTypeAux01) {
             case SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN:
@@ -72,6 +85,9 @@ public class SViewQueryTotal extends erp.lib.table.STableTab implements java.awt
                 break;
             default:
         }
+        
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(jtbRelatedParty);
 
         renderTableColumns();
         setIsSummaryApplying(true);
@@ -568,6 +584,7 @@ public class SViewQueryTotal extends erp.lib.table.STableTab implements java.awt
                 "AND doc.fid_cl_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1]) + " " +
                 "AND doc.fid_tp_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2]) + " " +
                 "AND doc.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND doc.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_EFF + " " +
+                (jtbRelatedParty.isSelected() ? "" : " AND bp.b_att_rel_pty = 0 ") +
                 sqlCompanyBranch + sqlDatePeriod +
                 sqlGroupOrder + ") " +
                 "UNION " +
@@ -604,6 +621,7 @@ public class SViewQueryTotal extends erp.lib.table.STableTab implements java.awt
                 "AND doc.fid_cl_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[1]) + " " +
                 "AND doc.fid_tp_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[2]) + " " +
                 "AND doc.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND doc.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_EFF + " " +
+                (jtbRelatedParty.isSelected() ? "" : " AND bp.b_att_rel_pty = 0 ") +
                 "AND e.fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_RET + " " +
                 sqlCompanyBranch + sqlDatePeriod +
                 sqlGroupOrder + ") " +
@@ -636,11 +654,12 @@ public class SViewQueryTotal extends erp.lib.table.STableTab implements java.awt
                         "INNER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " : "" ) +
                 "INNER JOIN erp.bpsu_bpb AS cob ON " +
                 "doc.fid_cob = cob.id_bpb " +
-                "WHERE e.b_del = FALSE AND doc.b_del = FALSE " +
+                "WHERE e.b_del = FALSE AND doc.b_del = FALSE " +                
                 "AND doc.fid_ct_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[0]) + " " +
                 "AND doc.fid_cl_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[1]) + " " +
                 "AND doc.fid_tp_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[2]) + " " +
                 "AND doc.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND doc.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_EFF + " " +
+                (jtbRelatedParty.isSelected() ? "" : " AND bp.b_att_rel_pty = 0 ") +
                 "AND e.fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_DISC + " " +
                 sqlCompanyBranch + sqlDatePeriod +
                 sqlGroupOrder + ")) " +
@@ -673,8 +692,12 @@ public class SViewQueryTotal extends erp.lib.table.STableTab implements java.awt
     public void actionPerformed(java.awt.event.ActionEvent e) {
         super.actionPerformed(e);
 
-        if (e.getSource() instanceof javax.swing.JButton) {
-            JButton button = (JButton) e.getSource();
+        if (e.getSource() instanceof javax.swing.JToggleButton) {
+            JToggleButton toggleButton = (JToggleButton) e.getSource();
+
+            if (toggleButton == jtbRelatedParty) {
+                actionReload();
+            }
         }
     }
 }

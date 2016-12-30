@@ -69,17 +69,7 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        jbPrint = new javax.swing.JButton();
-        jbExit = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
-        jPanel6 = new javax.swing.JPanel();
-        jlBizPartner = new javax.swing.JLabel();
-        jcbBizPartner = new javax.swing.JComboBox();
-        jPanel7 = new javax.swing.JPanel();
-        jlUnitType = new javax.swing.JLabel();
-        jcbUnitType = new javax.swing.JComboBox();
         jPanel10 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jlDateInitial = new javax.swing.JLabel();
@@ -89,6 +79,19 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
         jlDateEnd = new javax.swing.JLabel();
         jftDateEnd = new javax.swing.JFormattedTextField();
         jbDateEnd = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
+        jlBizPartner = new javax.swing.JLabel();
+        jcbBizPartner = new javax.swing.JComboBox();
+        jPanel7 = new javax.swing.JPanel();
+        jlUnitType = new javax.swing.JLabel();
+        jcbUnitType = new javax.swing.JComboBox();
+        jPanel12 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jckWithoutRelatedParty = new javax.swing.JCheckBox();
+        jPanel1 = new javax.swing.JPanel();
+        jbPrint = new javax.swing.JButton();
+        jbExit = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Reporte de ventas por cliente");
@@ -99,61 +102,8 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
             }
         });
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(392, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
-
-        jbPrint.setText("Imprimir");
-        jbPrint.setToolTipText("[Ctrl + Enter]");
-        jbPrint.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel1.add(jbPrint);
-
-        jbExit.setText("Cerrar");
-        jbExit.setToolTipText("[Escape]");
-        jbExit.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel1.add(jbExit);
-
-        getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
-
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración del reporte:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
-
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtros del reporte:"));
-        jPanel3.setLayout(new java.awt.GridLayout(4, 1, 0, 1));
-
-        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlBizPartner.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel6.add(jlBizPartner);
-
-        jcbBizPartner.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbBizPartner.setPreferredSize(new java.awt.Dimension(250, 23));
-        jcbBizPartner.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jcbBizPartnerItemStateChanged(evt);
-            }
-        });
-        jPanel6.add(jcbBizPartner);
-
-        jPanel3.add(jPanel6);
-
-        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlUnitType.setText("Tipo de unidad:");
-        jlUnitType.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel7.add(jlUnitType);
-
-        jcbUnitType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "(Seleccionar tipo de unidad)", "LONGITUD", "SUPERFICIE", "VOLUMEN", "MASA" }));
-        jcbUnitType.setPreferredSize(new java.awt.Dimension(250, 23));
-        jcbUnitType.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jcbUnitTypeItemStateChanged(evt);
-            }
-        });
-        jPanel7.add(jcbUnitType);
-
-        jPanel3.add(jPanel7);
-
-        jPanel2.add(jPanel3, java.awt.BorderLayout.SOUTH);
 
         jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Período:"));
         jPanel10.setPreferredSize(new java.awt.Dimension(100, 77));
@@ -197,10 +147,73 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
 
         jPanel2.add(jPanel10, java.awt.BorderLayout.NORTH);
 
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtros del reporte:"));
+        jPanel3.setLayout(new java.awt.GridLayout(4, 1, 0, 1));
+
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlBizPartner.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel6.add(jlBizPartner);
+
+        jcbBizPartner.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbBizPartner.setPreferredSize(new java.awt.Dimension(250, 23));
+        jcbBizPartner.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jcbBizPartnerItemStateChanged(evt);
+            }
+        });
+        jPanel6.add(jcbBizPartner);
+
+        jPanel3.add(jPanel6);
+
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlUnitType.setText("Tipo de unidad:");
+        jlUnitType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel7.add(jlUnitType);
+
+        jcbUnitType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "(Seleccionar tipo de unidad)", "LONGITUD", "SUPERFICIE", "VOLUMEN", "MASA" }));
+        jcbUnitType.setPreferredSize(new java.awt.Dimension(250, 23));
+        jcbUnitType.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jcbUnitTypeItemStateChanged(evt);
+            }
+        });
+        jPanel7.add(jcbUnitType);
+
+        jPanel3.add(jPanel7);
+
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 3, 0));
+
+        jLabel1.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel12.add(jLabel1);
+
+        jckWithoutRelatedParty.setText("Sin partes relacionadas");
+        jPanel12.add(jckWithoutRelatedParty);
+
+        jPanel3.add(jPanel12);
+
+        jPanel2.add(jPanel3, java.awt.BorderLayout.SOUTH);
+
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-400)/2, (screenSize.height-300)/2, 400, 300);
+        jPanel1.setPreferredSize(new java.awt.Dimension(392, 33));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        jbPrint.setText("Imprimir");
+        jbPrint.setToolTipText("[Ctrl + Enter]");
+        jbPrint.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel1.add(jbPrint);
+
+        jbExit.setText("Cerrar");
+        jbExit.setToolTipText("[Escape]");
+        jbExit.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel1.add(jbExit);
+
+        getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
+
+        setSize(new java.awt.Dimension(400, 300));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -341,6 +354,7 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
                 map.put("sUnitBase", unitType == null ? "" : unitType.getUnitBase());
                 map.put("sTitle", mbParamIsSupplier ? "DETALLADO DE COMPRAS POR " : "DETALLADO DE VENTAS POR ");
                 map.put("sMark", mbParamIsSupplier ? "" : SDataConstantsSys.TXT_UNSIGNED);
+                map.put("sSqlWhereWithoutRelatedParty", jckWithoutRelatedParty.isSelected() ? " AND bp.b_att_rel_pty = 0 " : "");
 
                 jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_DPS_BPS_DETAIL, map);
                 jasperViewer = new JasperViewer(jasperPrint, false);
@@ -384,8 +398,10 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -398,6 +414,7 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
     private javax.swing.JButton jbPrint;
     private javax.swing.JComboBox jcbBizPartner;
     private javax.swing.JComboBox jcbUnitType;
+    private javax.swing.JCheckBox jckWithoutRelatedParty;
     private javax.swing.JFormattedTextField jftDateEnd;
     private javax.swing.JFormattedTextField jftDateInitial;
     private javax.swing.JLabel jlBizPartner;
@@ -423,6 +440,9 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
 
         moFieldDateInitial.setFieldValue(SLibTimeUtilities.getBeginOfMonth(miClient.getSessionXXX().getWorkingDate()));
         moFieldDateEnd.setFieldValue(SLibTimeUtilities.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()));
+        
+        jckWithoutRelatedParty.setSelected(false);
+        
         mbResetingForm = false;
     }
 

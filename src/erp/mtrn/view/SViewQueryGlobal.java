@@ -14,17 +14,19 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STableSetting;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterUnitType;
-import javax.swing.JButton;
+import javax.swing.JToggleButton;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores
+ * @author Alfonso Flores, Sergio Flores, Edwin Carmona
  */
 public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
     private erp.lib.table.STableColumn[] maoTableColumns;
     private erp.lib.table.STabFilterDatePeriodRange moTabFilterDatePeriodRange;
     private erp.table.STabFilterUnitType moTabFilterUnitType;
+    
+    private javax.swing.JToggleButton jtbRelatedParty;
 
     private int mnType = 0;
 
@@ -38,6 +40,14 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.aw
 
         moTabFilterDatePeriodRange = new STabFilterDatePeriodRange(miClient, this);
         moTabFilterUnitType = new STabFilterUnitType(miClient, this);
+        jtbRelatedParty = new javax.swing.JToggleButton();
+        
+        jtbRelatedParty.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_rel_pty_off.gif")));
+        jtbRelatedParty.setToolTipText("Filtrar partes relacionadas");
+        jtbRelatedParty.setPreferredSize(new java.awt.Dimension(23, 23));
+        jtbRelatedParty.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_rel_pty_on.gif")));
+        
+        jtbRelatedParty.addActionListener(this);
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
@@ -45,6 +55,10 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.aw
         addTaskBarUpperComponent(moTabFilterDatePeriodRange);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterUnitType);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(jtbRelatedParty);
+        
+        jtbRelatedParty.setSelected(true);
 
         renderTableColumns();
         setIsSummaryApplying(true);
@@ -272,6 +286,8 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.aw
                 "FROM trn_dps_ety AS e " +
                 "INNER JOIN trn_dps AS doc ON " +
                 "e.id_year = doc.id_year AND e.id_doc = doc.id_doc " +
+                "INNER JOIN erp.bpsu_bp AS bp ON " +
+                "doc.fid_bp_r = bp.id_bp " +
                 "INNER JOIN erp.bpsu_bpb AS cob ON " +
                 "doc.fid_cob = cob.id_bpb " +
                 "WHERE e.b_del = FALSE AND doc.b_del = FALSE " +
@@ -279,6 +295,7 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.aw
                 "AND doc.fid_cl_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1]) + " " +
                 "AND doc.fid_tp_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2]) + " " +
                 "AND doc.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND doc.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_EFF + " " +
+                (jtbRelatedParty.isSelected() ? "" : " AND bp.b_att_rel_pty = 0 ") +
                 sqlDatePeriod + "GROUP BY cob.bpb HAVING f_stot_net <> 0 OR f_qty_net <> 0 " +
                 "ORDER BY cob.bpb) " +
                 "UNION " +
@@ -293,6 +310,8 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.aw
                 "FROM trn_dps_ety AS e " +
                 "INNER JOIN trn_dps AS doc ON " +
                 "e.id_year = doc.id_year AND e.id_doc = doc.id_doc " +
+                "INNER JOIN erp.bpsu_bp AS bp ON " +
+                "doc.fid_bp_r = bp.id_bp " +
                 "INNER JOIN erp.bpsu_bpb AS cob ON " +
                 "doc.fid_cob = cob.id_bpb " +
                 "INNER JOIN trn_dps_dps_adj AS j ON " +
@@ -306,6 +325,7 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.aw
                 "AND doc.fid_cl_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[1]) + " " +
                 "AND doc.fid_tp_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[2]) + " " +
                 "AND doc.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND doc.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_EFF + " " +
+                (jtbRelatedParty.isSelected() ? "" : " AND bp.b_att_rel_pty = 0 ") +
                 "AND e.fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_RET + " " +
                 sqlDatePeriod + "GROUP BY cob.bpb HAVING f_stot_net <> 0 OR f_qty_net <> 0 " +
                 "ORDER BY cob.bpb) " +
@@ -321,6 +341,8 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.aw
                 "FROM trn_dps_ety AS e " +
                 "INNER JOIN trn_dps AS doc ON " +
                 "e.id_year = doc.id_year AND e.id_doc = doc.id_doc " +
+                "INNER JOIN erp.bpsu_bp AS bp ON " +
+                "doc.fid_bp_r = bp.id_bp " +
                 "INNER JOIN erp.bpsu_bpb AS cob ON " +
                 "doc.fid_cob = cob.id_bpb " +
                 "INNER JOIN trn_dps_dps_adj AS j ON " +
@@ -334,6 +356,7 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.aw
                 "AND doc.fid_cl_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[1]) + " " +
                 "AND doc.fid_tp_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[2]) + " " +
                 "AND doc.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND doc.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_EFF + " " +
+                (jtbRelatedParty.isSelected() ? "" : " AND bp.b_att_rel_pty = 0 ") +
                 "AND e.fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_DISC + " " +
                 sqlDatePeriod + " GROUP BY cob.bpb HAVING f_stot_net <> 0 OR f_qty_net <> 0 " +
                 /*(typeUnitTotal == SDataConstantsSys.TRNX_TP_UNIT_TOT_QTY ? " f_qty_net <> 0 " :
@@ -372,9 +395,12 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.aw
     public void actionPerformed(java.awt.event.ActionEvent e) {
         super.actionPerformed(e);
 
-        if (e.getSource() instanceof javax.swing.JButton) {
-            JButton button = (JButton) e.getSource();
+        if (e.getSource() instanceof javax.swing.JToggleButton) {
+            JToggleButton toggleButton = (JToggleButton) e.getSource();
 
+            if (toggleButton == jtbRelatedParty) {
+                actionReload();
+            }
         }
     }
 }
