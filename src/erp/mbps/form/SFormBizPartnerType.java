@@ -300,7 +300,7 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
             moFieldDaysOfGrace.setInteger(0);
             
         }
-        else if (moFieldFkCreditTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_LIM_NO) {
+        else if (moFieldFkCreditTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_UNLIM) {
             jtfCreditLimit.setEditable(false);
             jtfCreditLimit.setFocusable(false);
             moFieldCreditLimit.setDouble(0d);
@@ -495,7 +495,7 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
                                 validation.setMessage("Se debe ingresar un valor para el campo '" + jlCreditLimit.getText() + "'.");
                         }
             else if ((moFieldPkBizPartnerCategortyId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_CT_BP_SUP || moFieldPkBizPartnerCategortyId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_CT_BP_CUS) &&
-            jcbFkCreditTypeId.isEnabled() && (moFieldFkCreditTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_LIM || moFieldFkCreditTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_LIM_NO) && 
+            jcbFkCreditTypeId.isEnabled() && (moFieldFkCreditTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_LIM || moFieldFkCreditTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_UNLIM) && 
             moFieldDaysOfCredit.getDouble() == 0){
                     validation.setComponent(jtfDaysOfCredit);
                     validation.setMessage("Se debe ingresar un valor para el campo '" + jlDaysOfCredit.getText() + "'.");

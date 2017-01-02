@@ -59,6 +59,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.gui.SGuiClient;
@@ -2342,56 +2343,55 @@ public abstract class STrnUtilities {
     }
 
     /**
-     * Obtain bizPartner expired documents:
-     * @param client ERP Client interface.
-     * @param nBizPartner bizPartner id
-     * @param tDate Document date
-     * @param nYear Year of date
-     * @param nBizPartnerCategory Category of bizPartner
-     * @return true if bizPartnet has expired documents.
+     * Check if business partner has expired documents.
+     * @param client ERP client interface.
+     * @param idBizPartner Business partner ID.
+     * @param idBizPartnerCategory Category of bizPartner
+     * @param cutoffDate Cutoff date.
+     * @param idDocYear Primary key of document to exclude from query.
+     * @param idDocDoc Primary key of document to exclude from query.
+     * @return <code>true</code> if business partner has expired documents.
      */
-    public static boolean bizPartnerExpiredDocuments(final SClientInterface client, final int nBizPartner, final Date tDate, final int nYear,
-            final int nBizPartnerCategory, int nFkYearId, final int nFkDocId, boolean bOpenDoc) {
-        boolean bContinue = true;
-        ResultSet resulSet = null;
+    public static boolean hasBizPartnerExpiredDocs(final SClientInterface client, 
+            final int idBizPartner, final int idBizPartnerCategory, final Date cutoffDate, int idDocYear, final int idDocDoc) {
+        int year = SLibTimeUtils.digestYear(cutoffDate)[0];
+        boolean hasExpiredDocuments = false;
         String sSql = "";
+        ResultSet resulSet = null;
 
         sSql = "SELECT d.id_year, d.id_doc, " +
-            "IF (DATEDIFF('" + SLibUtils.DbmsDateFormatDate.format(tDate) + "', DATE_ADD(d.dt_start_cred, INTERVAL (d.days_cred + " +
-            "IF(ct.b_cred_usr, ct.days_grace, btp.days_grace)) DAY)) > 0, " +
+            "IF(DATEDIFF('" + SLibUtils.DbmsDateFormatDate.format(cutoffDate) + "', " +
+                "DATE_ADD(d.dt_start_cred, INTERVAL(d.days_cred + IF(ct.b_cred_usr, ct.days_grace, btp.days_grace)) DAY)) > 0, " +
             "SUM(IF(re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] + " AND re.fid_tp_sys_mov_xxx = " +
             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] + ", -1, 1) * (re.debit - re.credit)), 0) AS f_def " +
             "FROM fin_rec AS r " +
             "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND " +
-            "r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND r.b_del = FALSE AND re.b_del = FALSE AND r.id_year = " + nYear + " AND " +
-            "r.dt <= '" + SLibUtils.DbmsDateFormatDate.format(tDate) + "' AND re.fid_ct_sys_mov_xxx = " +
-            (nBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_CUS ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0]) + " " +
+            "r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND r.b_del = FALSE AND re.b_del = FALSE AND r.id_year = " + year + " AND " +
+            "r.dt <= '" + SLibUtils.DbmsDateFormatDate.format(cutoffDate) + "' AND re.fid_ct_sys_mov_xxx = " +
+            (idBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_CUS ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0]) + " " +
             " AND re.fid_tp_sys_mov_xxx = " +
-            (nBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_CUS ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1]) + " " +
+            (idBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_CUS ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1]) + " " +
             "INNER JOIN fin_acc AS ac ON LEFT(re.fid_acc, INSTR(re.fid_acc, '-')) = LEFT(ac.id_acc, INSTR(ac.id_acc, '-')) AND ac.lev = 1 " +
             "INNER JOIN erp.bpsu_bp AS bp ON re.fid_bp_nr = bp.id_bp " +
-            "INNER JOIN erp.bpsu_bp_ct AS ct ON bp.id_bp = ct.id_bp AND ct.id_ct_bp = " + nBizPartnerCategory + " " +
-            "INNER JOIN erp.bpsu_tp_bp AS btp ON ct.fid_tp_bp = btp.id_tp_bp AND btp.id_ct_bp = " + nBizPartnerCategory + " " +
+            "INNER JOIN erp.bpsu_bp_ct AS ct ON bp.id_bp = ct.id_bp AND ct.id_ct_bp = " + idBizPartnerCategory + " " +
+            "INNER JOIN erp.bpsu_tp_bp AS btp ON ct.fid_tp_bp = btp.id_tp_bp AND btp.id_ct_bp = " + idBizPartnerCategory + " " +
             "INNER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc AND d.fid_cob = 1 " +
-            "WHERE re.fid_bp_nr = " + nBizPartner + " " + (bOpenDoc ? " AND (re.fid_dps_year_n IS NULL OR NOT (re.fid_dps_year_n = " +
-                nFkYearId + " AND re.fid_dps_doc_n = " + nFkDocId + "))" : "") + " " +
+            "WHERE re.fid_bp_nr = " + idBizPartner + " AND NOT (re.fid_dps_year_n = " + idDocYear + " AND re.fid_dps_doc_n = " + idDocDoc + ") " +
             "GROUP BY d.id_year, d.id_doc, d.fid_bpb " +
             "HAVING f_def <> 0 " +
             "ORDER BY d.id_year, d.id_doc, d.fid_bpb ";
 
         try {
-
             resulSet = client.getSession().getStatement().executeQuery(sSql);
             if (resulSet.next()) {
-
-                bContinue = false;
+                hasExpiredDocuments = true;
             }
         }
         catch (SQLException e) {
             SLibUtilities.printOutException(STrnUtilities.class.getName(), e);
         }
 
-        return bContinue;
+        return hasExpiredDocuments;
     }
 
     /**
