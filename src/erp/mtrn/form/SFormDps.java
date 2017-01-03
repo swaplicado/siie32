@@ -42,6 +42,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SCfdParams;
+import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsDpsAdjustment;
@@ -2669,13 +2670,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             SLibUtilities.renderException(this, e);
                         }
                         finally {
-                            moParamDpsSource = null;            // no longer needed
-                            manParamAdjustmentSubtypeKey = null;   // no longer needed
+                            moParamDpsSource = null;                // no longer needed
+                            manParamAdjustmentSubtypeKey = null;    // no longer needed
                         }
                     }
-
+                    
                     if (moBizPartnerCategory != null) {
-                        if (!bizPartnerCreditRisk(moBizPartnerCategory.getEffectiveRiskTypeId(), true)) {
+                        if (!isCreditRiskOk(moBizPartnerCategory.getEffectiveRiskTypeId(), true)) {
                             mbFormSettingsOk = bContinue = false;
                             actionCancel();
                         }
@@ -2766,67 +2767,63 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private boolean isDocumentApplyCreditRiskPurchases() {
         return
             (SLibUtilities.compareKeys(moDpsType.getPrimaryKey(), SDataConstantsSys.TRNU_TP_DPS_PUR_EST) &&
-                miClient.getSessionXXX().getParamsErp().getIsPurchasesCreditContract())  ||
+            miClient.getSessionXXX().getParamsErp().getIsPurchasesCreditContract())  ||
             (SLibUtilities.compareKeys(moDpsType.getPrimaryKey(), SDataConstantsSys.TRNU_TP_DPS_PUR_CON)&&
-                miClient.getSessionXXX().getParamsErp().getIsPurchasesCreditContract()) ||
+            miClient.getSessionXXX().getParamsErp().getIsPurchasesCreditContract()) ||
             (SLibUtilities.compareKeys(moDpsType.getPrimaryKey(), SDataConstantsSys.TRNU_TP_DPS_PUR_ORD) &&
-                miClient.getSessionXXX().getParamsErp().getIsPurchasesCreditOrder()) ||
+            miClient.getSessionXXX().getParamsErp().getIsPurchasesCreditOrder()) ||
             (SLibUtilities.compareKeys(moDpsType.getPrimaryKey(), SDataConstantsSys.TRNU_TP_DPS_PUR_INV) &&
-                miClient.getSessionXXX().getParamsErp().getIsPurchasesCreditInvoice())
-            ? true : false;
+            miClient.getSessionXXX().getParamsErp().getIsPurchasesCreditInvoice());
     }
 
     private boolean isDocumentApplyCreditRiskSales() {
         return
             (SLibUtilities.compareKeys(moDpsType.getPrimaryKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_EST) &&
-                miClient.getSessionXXX().getParamsErp().getIsSalesCreditContract()) ||
+            miClient.getSessionXXX().getParamsErp().getIsSalesCreditContract()) ||
             (SLibUtilities.compareKeys(moDpsType.getPrimaryKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON) &&
-                miClient.getSessionXXX().getParamsErp().getIsSalesCreditContract()) ||
+            miClient.getSessionXXX().getParamsErp().getIsSalesCreditContract()) ||
             (SLibUtilities.compareKeys(moDpsType.getPrimaryKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_ORD) &&
-                miClient.getSessionXXX().getParamsErp().getIsSalesCreditOrder()) ||
+            miClient.getSessionXXX().getParamsErp().getIsSalesCreditOrder()) ||
             (SLibUtilities.compareKeys(moDpsType.getPrimaryKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_INV) &&
-                miClient.getSessionXXX().getParamsErp().getIsSalesCreditInvoice())
-            ? true : false;
-    }
+            miClient.getSessionXXX().getParamsErp().getIsSalesCreditInvoice());
+}
     
     private boolean isFunctionalAreasApply() {
         return !mbIsSales && mbIsOrd && miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas();
     }
 
-    private boolean bizPartnerCreditRisk(final int nRiskType, final boolean openDoc) {
-        boolean val_LimCredit = false;
-        boolean val_ExpDocs = false;
-        boolean can_OmitLimCredit = false;
-        boolean can_OmitExpDocs = false;
-        boolean bContinue = true;
+    private boolean isCreditRiskOk(final int riskType, final boolean isDocBeingOpened) {
+        boolean validateCreditLimit = false;
+        boolean validateExpiredDocs = false;
+        boolean canOmitCreditLimit = false;
+        boolean canOmitExpiredDocs = false;
+        boolean isCreditRiskOk = true;
 
         if (isDocumentApplyCreditRiskPurchases() || isDocumentApplyCreditRiskSales()) {
-            if (nRiskType == SModSysConsts.BPSS_RISK_D_BLK) {
+            if (riskType == SModSysConsts.BPSS_RISK_D_BLK) {
                 miClient.showMsgBoxWarning(SLibConstants.MSG_INF_BP_BLOCKED);
-                bContinue = false;
+                isCreditRiskOk = false;
             }
-            else if (nRiskType == SModSysConsts.BPSS_RISK_E_TRL) {
+            else if (riskType == SModSysConsts.BPSS_RISK_E_TRL) {
                 miClient.showMsgBoxWarning(SLibConstants.MSG_INF_BP_TRIAL);
-                bContinue = false;
+                isCreditRiskOk = false;
             }
             else {
-                val_LimCredit = (nRiskType == SModSysConsts.BPSS_RISK_B_RSK_M || nRiskType == SModSysConsts.BPSS_RISK_C_RSK_H ? true : false);
-                val_ExpDocs = (nRiskType == SModSysConsts.BPSS_RISK_A_RSK_L || nRiskType == SModSysConsts.BPSS_RISK_B_RSK_M ||
-                        nRiskType == SModSysConsts.BPSS_RISK_C_RSK_H ? true : false);
-                can_OmitLimCredit = (nRiskType == SModSysConsts.BPSS_RISK_B_RSK_M ? true : false);
-                can_OmitExpDocs = (nRiskType == SModSysConsts.BPSS_RISK_A_RSK_L || nRiskType == SModSysConsts.BPSS_RISK_B_RSK_M ? true : false);
+                validateCreditLimit = riskType == SModSysConsts.BPSS_RISK_B_RSK_M || riskType == SModSysConsts.BPSS_RISK_C_RSK_H;
+                validateExpiredDocs = riskType == SModSysConsts.BPSS_RISK_A_RSK_L || riskType == SModSysConsts.BPSS_RISK_B_RSK_M || riskType == SModSysConsts.BPSS_RISK_C_RSK_H;
+                canOmitCreditLimit = riskType == SModSysConsts.BPSS_RISK_B_RSK_M;
+                canOmitExpiredDocs = riskType == SModSysConsts.BPSS_RISK_A_RSK_L || riskType == SModSysConsts.BPSS_RISK_B_RSK_M;
 
-                if (val_LimCredit && !bizPartnerLimitCredit(openDoc, can_OmitLimCredit)) {
-                    bContinue = false;
+                if (validateCreditLimit && !checkBizPartnerCreditLimitOk(canOmitCreditLimit, isDocBeingOpened)) {
+                    isCreditRiskOk = false;
                 }
-
-                if (bContinue && val_ExpDocs && !bizPartnerExpiredDocuments(openDoc, can_OmitExpDocs)) {
-                    bContinue = false;
+                else if (validateExpiredDocs && !checkBizPartnerExpiredDocsOk(canOmitExpiredDocs, isDocBeingOpened)) {
+                    isCreditRiskOk = false;
                 }
             }
         }
 
-        return bContinue;
+        return isCreditRiskOk;
     }
 
     /**
@@ -3137,6 +3134,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         in.add(moDps.getPkYearId());
         in.add(moDps.getPkDocId());
         out = SDataUtilities.callProcedure(miClient, SProcConstants.FIN_GET_BP_BAL, in, SLibConstants.EXEC_MODE_VERBOSE);
+        
         return ((Double) out.get(0)).doubleValue();
     }
 
@@ -4753,6 +4751,95 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         return params;
     }
 
+    private boolean checkBizPartnerCreditLimitOk(final boolean canOmitCreditLimit, final boolean isDocBeingOpened) {
+        boolean confirmOmission = true;
+        boolean isCreditLimitOk = true;
+        String msgCreditLimit = "";
+
+        if (moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CREDIT) {
+            if (moBizPartnerCategory == null) {
+                confirmOmission = false;
+                msgCreditLimit = "No se ha accedido aún a la información de la categoría del asociado de negocios.";
+            }
+            else if (moBizPartnerCategory.getEffectiveCreditTypeId() == SDataConstantsSys.BPSS_TP_CRED_CRED_NO) {
+                confirmOmission = false;
+                msgCreditLimit = "El asociado de negocios no tiene crédito.";
+            }
+        }
+
+        if (msgCreditLimit.isEmpty() && moBizPartnerCategory.getEffectiveCreditTypeId() != SDataConstantsSys.BPSS_TP_CRED_CRED_UNLIM) {
+            double balance = obtainBizPartnerBalance();
+            double balanceTotal = balance;
+            boolean includeCurrentDoc = !isDocBeingOpened && moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CREDIT;
+            
+            if (includeCurrentDoc) {
+                balanceTotal += moDps.getTotal_r();
+            }
+            
+            if (balanceTotal > moBizPartnerCategory.getEffectiveCreditLimit()) {
+                msgCreditLimit = "El saldo actual del asociado de negocios " + SLibUtils.getDecimalFormatAmount().format(balance) + "\n";
+                
+                if (includeCurrentDoc) {
+                    msgCreditLimit += "más el presente documento " + SLibUtils.getDecimalFormatAmount().format(moDps.getTotal_r()) + ", " + 
+                            "igual a " + SLibUtils.getDecimalFormatAmount().format(balanceTotal) + ",\n";
+                }
+                
+                msgCreditLimit +=
+                    "es mayor a su límite de crédito de " + SLibUtils.getDecimalFormatAmount().format(moBizPartnerCategory.getEffectiveCreditLimit()) + " " +
+                    "por " + SLibUtils.getDecimalFormatAmount().format(balanceTotal - moBizPartnerCategory.getEffectiveCreditLimit()) + ".";
+            }
+        }
+        
+        if (!msgCreditLimit.isEmpty()) {
+            if (canOmitCreditLimit && confirmOmission) {
+                if (miClient.showMsgBoxConfirm(msgCreditLimit + "\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                    isCreditLimitOk = false;
+                }
+            }
+            else {
+                miClient.showMsgBoxWarning(msgCreditLimit);
+                isCreditLimitOk = false;
+            }
+        }
+
+        return isCreditLimitOk;
+    }
+
+    private boolean checkBizPartnerExpiredDocsOk(final boolean canOmitExpiredDocs, final boolean isDocBeingOpened) {
+        long expiredDays = 0;
+        boolean isExpiredDocsOk = true;
+        String msgExpiredDocs = "";
+        Date tCurrentDueDate = null;
+
+        if (STrnUtilities.hasBizPartnerExpiredDocs(miClient, moBizPartner.getPkBizPartnerId(), moBizPartnerCategory.getPkBizPartnerCategoryId(), 
+            miClient.getSession().getSystemDate(), moDps.getPkYearId(), moDps.getPkDocId())) {
+            msgExpiredDocs = "El asociado de negocios tiene documentos vencidos.";
+        }
+        
+        if (!isDocBeingOpened) {
+            tCurrentDueDate = SLibTimeUtilities.addDate(moFieldDateStartCredit.getDate(), 0, 0, moFieldDaysOfCredit.getInteger() + moBizPartnerCategory.getEffectiveDaysOfGrace());
+            expiredDays = SLibTimeUtilities.getDaysDiff(miClient.getSession().getSystemDate(), tCurrentDueDate);
+            
+            if (expiredDays > 0) {
+                msgExpiredDocs += (msgExpiredDocs.isEmpty() ? "" : "\n") + "El documento actual está vencido por " + SLibUtils.DecimalFormatInteger.format(expiredDays) + " días.";
+            }
+        }
+        
+        if (!msgExpiredDocs.isEmpty()) {
+            if (canOmitExpiredDocs) {
+                if (miClient.showMsgBoxConfirm(msgExpiredDocs + "\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                    isExpiredDocsOk = false;
+                }
+            }
+            else {
+                miClient.showMsgBoxWarning(msgExpiredDocs);
+                isExpiredDocsOk = false;
+            }
+        }
+
+        return isExpiredDocsOk;
+    }
+
     private void actionDpsType() {
         SFormOptionPickerInterface picker = miClient.getOptionPicker(SDataConstants.TRNU_TP_DPS);
 
@@ -4790,89 +4877,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             key = (int[]) moPickerBizPartner.getSelectedPrimaryKey();
             setBizPartner(new int[] { key[0] }, new int[] { key[1] }, new int[] { key[1], key[2] });
         }
-    }
-
-    private boolean bizPartnerLimitCredit(final boolean openDoc, final boolean can_OmitLimCredit) {
-        boolean ok = true;
-        String sLimitCredit = "";
-        double balance = obtainBizPartnerBalance();
-        double totalBal = 0;
-
-        if (moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CREDIT) {
-            if (moBizPartnerCategory == null) {
-                sLimitCredit = "No se ha accedido aún a la información de la categoría del asociado de negocios.";
-            }
-            else if (moBizPartnerCategory.getEffectiveCreditTypeId() == SDataConstantsSys.BPSS_TP_CRED_CRED_NO) {
-                sLimitCredit = "El asociado de negocios no tiene crédito.";
-            }
-        }
-
-        if (sLimitCredit.isEmpty() && moBizPartnerCategory.getEffectiveCreditTypeId() != SDataConstantsSys.BPSS_TP_CRED_CRED_LIM_NO) {
-            if (openDoc) {
-                if (balance > moBizPartnerCategory.getEffectiveCreditLimit()) {
-                    sLimitCredit =
-                        "El saldo actual del asociado de negocios " +
-                        miClient.getSessionXXX().getFormatters().getDecimalsCurrencyLocalFormat().format(balance) + "\n" +
-                        "es mayor a su límite de crédito de " +
-                        miClient.getSessionXXX().getFormatters().getDecimalsCurrencyLocalFormat().format(moBizPartnerCategory.getEffectiveCreditLimit()) + " " +
-                        "por " +
-                        miClient.getSessionXXX().getFormatters().getDecimalsCurrencyLocalFormat().format(balance - moBizPartnerCategory.getEffectiveCreditLimit()) + "." +
-                        (can_OmitLimCredit ? "\n" + SGuiConsts.MSG_CNF_CONT : "");
-                }
-            }
-            else {
-                totalBal = moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CASH ? balance : balance + moDps.getTotal_r();
-                if ((totalBal) > moBizPartnerCategory.getEffectiveCreditLimit()) {
-                    sLimitCredit =
-                            "La suma del saldo actual del asociado de negocios " +
-                            miClient.getSessionXXX().getFormatters().getDecimalsCurrencyLocalFormat().format(balance) + "\n" +
-                            "más el total del presente documento " +
-                            miClient.getSessionXXX().getFormatters().getDecimalsCurrencyLocalFormat().format(moDps.getTotal_r()) + ", " +
-                            "igual a " +
-                            miClient.getSessionXXX().getFormatters().getDecimalsCurrencyLocalFormat().format(balance + moDps.getTotal_r()) + ",\n" +
-                            "es mayor a su límite de crédito de " +
-                            miClient.getSessionXXX().getFormatters().getDecimalsCurrencyLocalFormat().format(moBizPartnerCategory.getEffectiveCreditLimit()) + " " +
-                            "por " +
-                            miClient.getSessionXXX().getFormatters().getDecimalsCurrencyLocalFormat().format((balance + moDps.getTotal_r()) - moBizPartnerCategory.getEffectiveCreditLimit()) + "." +
-                        (can_OmitLimCredit ? "\n" + SGuiConsts.MSG_CNF_CONT : "");
-                }
-            }
-        }
-        if (!sLimitCredit.isEmpty()) {
-
-            if (can_OmitLimCredit) {
-                if (miClient.showMsgBoxConfirm(sLimitCredit) == JOptionPane.NO_OPTION) {
-                    ok = false;
-                }
-            }
-            else {
-                miClient.showMsgBoxWarning(sLimitCredit);
-                ok = false;
-            }
-        }
-
-        return ok;
-    }
-
-    private boolean bizPartnerExpiredDocuments(final boolean openDoc, final boolean can_OmitExpDocs) {
-        boolean  bContinue = true;
-
-        bContinue = STrnUtilities.bizPartnerExpiredDocuments(miClient, moBizPartner.getPkBizPartnerId(),
-            miClient.getSession().getSystemDate(), SLibTimeUtilities.digestYear(miClient.getSession().getSystemDate())[0],
-            moBizPartnerCategory.getPkBizPartnerCategoryId(), moDps.getPkYearId(), moDps.getPkDocId(), openDoc);
-
-        if (!bContinue) {
-            if (can_OmitExpDocs) {
-                if (miClient.showMsgBoxConfirm("El asociado de negocios tiene documentos vencidos. \n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
-                    bContinue = true;
-                }
-            }
-            else {
-                miClient.showMsgBoxWarning("El asociado de negocios tiene documentos vencidos.");
-            }
-        }
-
-        return bContinue;
     }
 
     private void actionDate() {
@@ -4945,18 +4949,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
             if (moBizPartnerCategory.getEffectiveCreditTypeId() == SDataConstantsSys.BPSS_TP_CRED_CRED_LIM) {
                 limit = moBizPartnerCategory.getEffectiveCreditLimit();
-                credit += "\nLímite de crédito: " + miClient.getSessionXXX().getFormatters().getDecimalsCurrencyLocalFormat().format(limit);
+                credit += "\nLímite de crédito: " + SLibUtils.getDecimalFormatAmount().format(limit);
             }
         }
 
         balance = obtainBizPartnerBalance();
-        credit += "\nSaldo actual (" + moDps.getPkYearId() + "): " + miClient.getSessionXXX().getFormatters().getDecimalsCurrencyLocalFormat().format(balance);
+        credit += "\nSaldo actual (" + moDps.getPkYearId() + "): " + SLibUtils.getDecimalFormatAmount().format(balance);
         if (moBizPartnerCategory.getEffectiveCreditTypeId() == SDataConstantsSys.BPSS_TP_CRED_CRED_LIM) {
             if (balance <= limit) {
-                credit += "\nCrédito libre: " + miClient.getSessionXXX().getFormatters().getDecimalsCurrencyLocalFormat().format(limit - balance);
+                credit += "\nCrédito libre: " + SLibUtils.getDecimalFormatAmount().format(limit - balance);
             }
             else {
-                credit += "\nCrédito excedido: " + miClient.getSessionXXX().getFormatters().getDecimalsCurrencyLocalFormat().format(balance - limit);
+                credit += "\nCrédito excedido: " + SLibUtils.getDecimalFormatAmount().format(balance - limit);
             }
         }
 
@@ -6129,11 +6133,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         miClient.getFileChooser().repaint();
         miClient.getFileChooser().addChoosableFileFilter(filter);
 
-        if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
-            moFieldFileXml.setFieldValue(miClient.getFileChooser().getSelectedFile().getName());
-            msFileXmlPath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
+        try {
+            if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
+                if (SCfdUtils.validateEmisorXmlExpenses(miClient, miClient.getFileChooser().getSelectedFile().getAbsolutePath())) {
+                    moFieldFileXml.setFieldValue(miClient.getFileChooser().getSelectedFile().getName());
+                    msFileXmlPath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
+                }
+            }
+            miClient.getFileChooser().resetChoosableFileFilters();
         }
-        miClient.getFileChooser().resetChoosableFileFilters();
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
     }
     
     private void actionDeleteFileXml() {
@@ -7482,7 +7493,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         }
 
                         if (!validation.getIsError()) {
-                            if (!bizPartnerCreditRisk(moBizPartnerCategory.getEffectiveRiskTypeId(), false)) {
+                            if (!isCreditRiskOk(moBizPartnerCategory.getEffectiveRiskTypeId(), false)) {
                                 validation.setIsError(true);
                                 validation.setComponent(jftDate);
                             }

@@ -421,7 +421,7 @@ public abstract class SDataConstantsSys {
 
     public static final int BPSS_TP_CRED_CRED_NO = 1;
     public static final int BPSS_TP_CRED_CRED_LIM = 2;
-    public static final int BPSS_TP_CRED_CRED_LIM_NO = 3;
+    public static final int BPSS_TP_CRED_CRED_UNLIM = 3;
 
     public static final int BPSS_TP_CFD_ADD_NA = 1;
     public static final int BPSS_TP_CFD_ADD_SORIANA = 2;
