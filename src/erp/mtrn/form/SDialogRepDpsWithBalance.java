@@ -272,6 +272,8 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
         };
 
         SFormUtilities.putActionMap(getRootPane(), action, "exit", KeyEvent.VK_ESCAPE, 0);
+
+        setModalityType(ModalityType.MODELESS);
     }
 
     private void windowActivated() {
