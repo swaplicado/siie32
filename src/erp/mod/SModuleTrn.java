@@ -29,6 +29,7 @@ import erp.mod.trn.view.SViewInventoryMfgCost;
 import erp.mod.trn.view.SViewInventoryValuation;
 import erp.mod.trn.view.SViewItemRequiredDpsConfig;
 import erp.mod.trn.view.SViewMmsConfig;
+import erp.mod.trn.view.SViewOrderSuppliedWhitMovs;
 import erp.mod.trn.view.SViewOrderLimitMonth;
 import javax.swing.JMenu;
 import sa.gui.util.SUtilConsts;
@@ -226,8 +227,12 @@ public class SModuleTrn extends SGuiModule {
                     title += params.getType() == SGuiConsts.PARAM_BPR ? ("-" + (subtype == SDataConstantsSys.TRNS_CT_DPS_SAL ? "cliente" : "proveedor")) : "";
                     view = new SViewCurrencyBalance(miClient, subtype, title, params);
                 }
-                
                 break;
+            case SModConsts.TRNX_DPS_ORDER_SUP:
+                title = "Pedidos ";
+                title += (subtype == SDataConstantsSys.TRNS_CT_DPS_SAL ? "ventas" : "compras") + " con surtidos";
+                view = new SViewOrderSuppliedWhitMovs(miClient, subtype, title, new SGuiParams(SDataConstantsSys.UNDEFINED));
+                break;    
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }

@@ -6,6 +6,7 @@
 package erp.mtrn.data;
 
 import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import java.sql.CallableStatement;
@@ -35,6 +36,7 @@ public class SDataDpsDpsLink extends erp.lib.data.SDataRegistry implements java.
     protected boolean mbDbmsIsSourceEntryDeleted;
     protected boolean mbDbmsIsDestinyDeleted;
     protected boolean mbDbmsIsDestinyEntryDeleted;
+    protected boolean mbDbmsIsSouceOrderSupplied;
 
     /**
      * Overrides java.lang.Object.clone() function.
@@ -76,7 +78,8 @@ public class SDataDpsDpsLink extends erp.lib.data.SDataRegistry implements java.
     public void setDbmsIsSourceEntryDeleted(boolean b) { mbDbmsIsSourceEntryDeleted = b; }
     public void setDbmsIsDestinyDeleted(boolean b) { mbDbmsIsDestinyDeleted = b; }
     public void setDbmsIsDestinyEntryDeleted(boolean b) { mbDbmsIsDestinyEntryDeleted = b; }
-
+    public void setDbmsIsSouceOrderSupplied(boolean b) { mbDbmsIsSouceOrderSupplied = b; }
+    
     public java.util.Date getAuxSourceTimestamp() { return mtAuxSourceTimestamp; }
     public java.util.Date getAuxDestinyTimestamp() { return mtAuxDestinyTimestamp; }
 
@@ -86,6 +89,7 @@ public class SDataDpsDpsLink extends erp.lib.data.SDataRegistry implements java.
     public boolean getDbmsIsSourceEntryDeleted() { return mbDbmsIsSourceEntryDeleted; }
     public boolean getDbmsIsDestinyDeleted() { return mbDbmsIsDestinyDeleted; }
     public boolean getDbmsIsDestinyEntryDeleted() { return mbDbmsIsDestinyEntryDeleted; }
+    public boolean getDbmsIsSourceOrderSupplied() { return mbDbmsIsSouceOrderSupplied; }
     
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -124,6 +128,7 @@ public class SDataDpsDpsLink extends erp.lib.data.SDataRegistry implements java.
         mbDbmsIsSourceEntryDeleted = false;
         mbDbmsIsDestinyDeleted = false;
         mbDbmsIsDestinyEntryDeleted = false;
+        mbDbmsIsSouceOrderSupplied = false;
     }
 
     @Override
@@ -156,7 +161,7 @@ public class SDataDpsDpsLink extends erp.lib.data.SDataRegistry implements java.
 
                 // Read aswell related documents information:
 
-                sql = "SELECT b_del, fid_st_dps FROM trn_dps " +
+                sql = "SELECT b_del, fid_st_dps, fid_ct_dps, fid_cl_dps FROM trn_dps " +
                         "WHERE id_year = " + mnPkSourceYearId + " AND id_doc = " + mnPkSourceDocId + " ";
 
                 resultSet = statement.executeQuery(sql);
@@ -166,6 +171,8 @@ public class SDataDpsDpsLink extends erp.lib.data.SDataRegistry implements java.
                 else {
                     mnDbmsFkSourceStatusId = resultSet.getInt("fid_st_dps");
                     mbDbmsIsSourceDeleted = resultSet.getBoolean("b_del");
+                    mbDbmsIsSouceOrderSupplied = SLibUtilities.compareKeys(new int[] {resultSet.getInt("fid_ct_dps"),resultSet.getInt("fid_cl_dps")}, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD) ||
+                                         SLibUtilities.compareKeys(new int[] {resultSet.getInt("fid_ct_dps"),resultSet.getInt("fid_cl_dps")}, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD) ;
                 }
 
                 sql = "SELECT b_del, fid_st_dps FROM trn_dps " +

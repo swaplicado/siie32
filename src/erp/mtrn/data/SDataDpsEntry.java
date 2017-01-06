@@ -1153,9 +1153,23 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                         link.setPkDestinyYearId(mnPkYearId);
                         link.setPkDestinyDocId(mnPkDocId);
                         link.setPkDestinyEntryId(mnPkEntryId);
-
+                                               
                         if (link.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                        }
+                        
+                        // Redirect DIOG's references
+                        
+                        if (link.getDbmsIsSourceOrderSupplied()) {
+                            aSql = new String[] { "UPDATE trn_diog SET fid_dps_year_n = " + mnPkYearId + ", fid_dps_doc_n = " + mnPkDocId + " " +
+                                                "WHERE fid_dps_year_n = " + link.getPkSourceYearId() + " AND fid_dps_doc_n = " + link.getPkSourceDocId() + " ",
+                                                "UPDATE trn_diog_ety SET fid_dps_year_n = " + mnPkYearId + ", fid_dps_doc_n = " + mnPkDocId + ", fid_dps_ety_n = " + mnPkEntryId + " " +
+                                                "WHERE fid_dps_year_n = " + link.getPkSourceYearId() + " AND fid_dps_doc_n = " + link.getPkSourceDocId() + " " +
+                                                "AND fid_dps_ety_n = " + link.getPkSourceEntryId() + " " };
+
+                            for (String sql : aSql) {
+                               statement.execute(sql);
+                            }
                         }
                     }
 
