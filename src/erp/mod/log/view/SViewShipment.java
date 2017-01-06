@@ -4,12 +4,27 @@
  */
 package erp.mod.log.view;
 
+import erp.client.SClientInterface;
+import erp.data.SDataConstants;
+import erp.data.SDataReadDescriptions;
+import erp.data.SDataUtilities;
+import erp.lib.SLibConstants;
+import erp.mbps.data.SDataBizPartner;
+import erp.mbps.data.SDataEmployee;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.log.db.SDbShipment;
+import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.STrnUtilities;
+import erp.musr.data.SDataUser;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
+import java.awt.Transparency;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,7 +88,19 @@ public class SViewShipment extends SGridPaneView implements ActionListener {
     }
 
     private void actionPrint() {
+        SDataDps oDps = null;
+        SDataDps oDpsOrder = null;
+        SDataUser oUserShip = null;
+        SDataUser oUserAuthoOrd = null;
+        SDataBizPartner bizPartnerUserBuyer = null;
+        SDataBizPartner bizPartnerUserAuthorize = null;
+        SDataEmployee employeeUserShip = null;
+        SDataEmployee employeeUserAuthoOrd = null;
         SDbShipment shipment = null;
+        String sUserShip = "";
+        String sUserAuthorize = "";
+        int userAuthorizeShip = 0;
+        int userAuthorizeOrder = 0;
 
         if (jbPrint.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
@@ -85,20 +112,72 @@ public class SViewShipment extends SGridPaneView implements ActionListener {
 
                     shipment = new SDbShipment();
                     shipment.read(miClient.getSession(), getSelectedGridRow().getRowPrimaryKey());
+                    
                     if (shipment.getFkShipmentAuthorizationStatusId() != SModSysConsts.TRNS_ST_DPS_AUTHORN_AUTHORN) {
                         miClient.showMsgBoxInformation("El embarque no se puede imprimir porque no está autorizado.");
                     }
                     else {
                         map = miClient.createReportParams();
+                        
+                        if (!shipment.getShipmentDestinies().isEmpty() && !shipment.getShipmentDestinies().get(0).getShipmentDestinyEntries().isEmpty()) {
+                            oDps = (SDataDps) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_DPS, shipment.getShipmentDestinies().get(0).getShipmentDestinyEntries().get(0).getDpsEntry().getKeyDps(), SLibConstants.EXEC_MODE_SILENT);
+
+                            oDpsOrder = STrnUtilities.getFirtsLinkOrderType((SClientInterface) miClient, oDps);
+                        }
+                        
+                        userAuthorizeShip = shipment.getFkUserUpdateId() == SUtilConsts.USR_NA_ID ? shipment.getFkUserInsertId() : shipment.getFkUserUpdateId();
+                        userAuthorizeOrder = oDpsOrder != null ? oDpsOrder.getFkUserAuthorizedId() : userAuthorizeShip;
+                        
+                        oUserShip = (SDataUser) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.USRU_USR, new int[] { userAuthorizeShip }, SLibConstants.EXEC_MODE_SILENT);
+                        oUserAuthoOrd = (SDataUser) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.USRU_USR, new int[] { userAuthorizeOrder }, SLibConstants.EXEC_MODE_SILENT);
+                        
+                        sUserShip = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.USRU_USR, new int[] { userAuthorizeShip });
+                        sUserAuthorize = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.USRU_USR, new int[] { userAuthorizeOrder });
+                        
+                        if (oUserShip.getFkBizPartnerId_n() != SLibConstants.UNDEFINED) {
+                            bizPartnerUserBuyer = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.BPSU_BP, new int[] { oUserShip.getFkBizPartnerId_n() }, SLibConstants.EXEC_MODE_SILENT); 
+                            employeeUserShip = bizPartnerUserBuyer.getDbmsDataEmployee();
+                        }
+
+                        if (oUserAuthoOrd.getFkBizPartnerId_n() != SLibConstants.UNDEFINED) {
+                            bizPartnerUserAuthorize = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.BPSU_BP, new int[] { oUserAuthoOrd.getFkBizPartnerId_n() }, SLibConstants.EXEC_MODE_SILENT); 
+                            employeeUserAuthoOrd = bizPartnerUserAuthorize.getDbmsDataEmployee();
+                        }
+                        
+                        map.put("oUserShip", employeeUserShip);
+                        map.put("oUserAuthorize", employeeUserAuthoOrd);
+                        map.put("sUserShip", sUserShip != null ? sUserShip : oUserShip.getUser());
+                        map.put("sUserAuthorize", sUserAuthorize != null ? sUserAuthorize : oUserAuthoOrd.getUser());
+                        
+                        GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+            
+                        if (((SDataEmployee) map.get("oUserShip")) != null && ((SDataEmployee) map.get("oUserShip")).getXtaImageIconSignature_n() != null) {
+                            BufferedImage userBuyer = gc.createCompatibleImage(((SDataEmployee) map.get("oUserShip")).getXtaImageIconSignature_n().getImage().getWidth(null), ((SDataEmployee) map.get("oUserShip")).getXtaImageIconSignature_n().getImage().getHeight(null), Transparency.TRANSLUCENT);                
+                            Graphics gUserBuyer = userBuyer.createGraphics();
+                            gUserBuyer.drawImage(((SDataEmployee) map.get("oUserShip")).getXtaImageIconSignature_n().getImage(), 0, 0, null);
+                            map.put("oUserShipSign", userBuyer);
+                            gUserBuyer.dispose();
+                        }
+
+                        if (((SDataEmployee) map.get("oUserAuthorize")) != null && ((SDataEmployee) map.get("oUserAuthorize")).getXtaImageIconSignature_n() != null) {
+                            BufferedImage userAuthorize = gc.createCompatibleImage(((SDataEmployee) map.get("oUserAuthorize")).getXtaImageIconSignature_n().getImage().getWidth(null), ((SDataEmployee) map.get("oUserAuthorize")).getXtaImageIconSignature_n().getImage().getHeight(null), Transparency.TRANSLUCENT);
+                            Graphics gUserAuthorize = userAuthorize.createGraphics();
+                            gUserAuthorize.drawImage(((SDataEmployee) map.get("oUserAuthorize")).getXtaImageIconSignature_n().getImage(), 0, 0, null);
+                            map.put("oUserAuthorizeSign", userAuthorize);
+                            gUserAuthorize.dispose();
+                        }
+                        
                         map.put("nIdShip", shipment.getPkShipmentId());
                         map.put("nIdCt", SModSysConsts.BPSS_CT_BP_CUS);
                         map.put("sCurCode", miClient.getSession().getSessionCustom().getLocalCurrencyCode());
 
                         miClient.getSession().printReport(SModConsts.LOGR_SHIP, SLibConsts.UNDEFINED, null, map);
                     }
-                } catch (SQLException e) {
+                }
+                catch (SQLException e) {
                     SLibUtils.showException(this, e);
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     SLibUtils.showException(this, e);
                 }
             }

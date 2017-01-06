@@ -2545,6 +2545,29 @@ public abstract class STrnUtilities {
     }
     
     /**
+     * Obtain the firts document the order type lincked.
+     * @param client Interface Client current.
+     * @param dps Document to obtain link.
+     * @return SDataDps order.
+     */
+    public static SDataDps getFirtsLinkOrderType(final SClientInterface client, final SDataDps dps) {
+        SDataDps dpsOrder = null;
+    
+        for (SDataDpsEntry entryDocumento : dps.getDbmsDpsEntries()) {
+            if (entryDocumento.isAccountable()) {
+                for (SDataDpsDpsLink linkPedido : entryDocumento.getDbmsDpsLinksAsDestiny()) {
+                    if (!linkPedido.getDbmsIsSourceDeleted() && !linkPedido.getDbmsIsSourceEntryDeleted()) {
+                        dpsOrder = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, linkPedido.getDbmsSourceDpsKey(), SLibConstants.EXEC_MODE_VERBOSE);
+
+                        break;  // a "pedido" was found
+                    }
+                }
+            }
+        }
+        return dpsOrder;
+    }
+    
+    /**
     * Calculate price using base, future and factor for DPS entry:
     * @param contractBase for calculate price
     * @param contractFuture for calculate price
