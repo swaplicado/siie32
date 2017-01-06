@@ -191,6 +191,9 @@ public abstract class SHrsCfdUtils {
             packet.setCfdId(cfdId);
             packet.setIsConsistent(cfdId == SLibConstants.UNDEFINED ? true : false);
             comprobanteCfdi = (cfd.ver3.DElementComprobante) SCfdUtils.createCfdiRootElement((SClientInterface)session.getClient(), receipt);
+            
+            SCfdUtils.validateConsitentXml(comprobanteCfdi);
+            
             packet.setStringSigned(DUtilUtils.generateOriginalString(comprobanteCfdi));
             packet.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_PAY);
             packet.setFkXmlTypeId(SDataConstantsSys.TRNS_TP_XML_CFDI);
