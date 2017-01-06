@@ -60,6 +60,7 @@ import erp.mtrn.data.SDataEntryDpsDpsAdjustment;
 import erp.mtrn.data.SDataEntryDpsDpsLink;
 import erp.mtrn.data.SGuiDpsEntryPrice;
 import erp.mtrn.data.SGuiDpsLink;
+import erp.mtrn.data.STrnDpsUtilities;
 import erp.mtrn.data.STrnUtilities;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
@@ -4572,6 +4573,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     link.setPkDestinyEntryId(entry.getPkEntryId());
                     link.setQuantity(entry.getQuantity());
                     link.setOriginalQuantity(entry.getOriginalQuantity());
+                    
+                    try{
+                        link.setDbmsIsSouceOrderSupplied(oDpsSource.isOrder() && STrnDpsUtilities.obtainEtyTotalSupplied(miClient, new int[] { dpsSourceEntry.getPkYearId(), dpsSourceEntry.getPkDocId(), dpsSourceEntry.getPkEntryId() }) > 0);
+                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }
+                     
 
                     entry.getDbmsDpsLinksAsDestiny().add(link);
 

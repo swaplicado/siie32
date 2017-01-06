@@ -17,7 +17,7 @@ import erp.mtrn.form.SDialogShowDocumentNotes;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda
  */
 public abstract class SModuleUtilities {
     
@@ -98,6 +98,46 @@ public abstract class SModuleUtilities {
             else {
                 dialog.setFormVisible(true);
             }
+        }
+    }
+    
+     /**
+     * Shows document processing links.
+     * @param client GUI Client.
+     * @param documentType Document type, constans defined in <code>SDataConstants</code>.
+     * @param documentKey Document's primary key.
+     */
+    public static void showDocumentLinks(final SClientInterface client, final int documentType, final Object documentKey) {
+        int links = 0;
+        SDataDps dps = null;
+        SDataDiog diog = null;
+        SDialogShowDocumentLinks dialog = null;
+        
+        switch (documentType) {
+            case SDataConstants.TRN_DPS:
+                dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, documentKey, SLibConstants.EXEC_MODE_VERBOSE);
+               
+                dialog = new SDialogShowDocumentLinks(client);
+                dialog.formReset();
+                dialog.setValue(SDataConstants.TRN_DPS, dps);
+                links = dialog.readLinks();
+                break;
+            case SDataConstants.TRN_DIOG:
+                diog = (SDataDiog) SDataUtilities.readRegistry(client, SDataConstants.TRN_DIOG, documentKey, SLibConstants.EXEC_MODE_VERBOSE);
+               
+                dialog = new SDialogShowDocumentLinks(client);
+                dialog.formReset();
+                dialog.setValue(SDataConstants.TRN_DPS, diog);
+                links = dialog.readLinks();
+                break;
+            default:
+        }
+
+        if (links == 0) {
+            client.showMsgBoxInformation(SLibConstants.MSG_INF_NO_LINK_DPS);
+        }
+        else {
+            dialog.setFormVisible(true);
         }
     }
 }

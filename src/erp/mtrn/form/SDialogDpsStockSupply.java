@@ -805,32 +805,40 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
                 jtfWarehouseCode.setCaretPosition(0);
                 jtfYear.setCaretPosition(0);
 
-                sql = "SELECT de.id_year, de.id_doc, de.id_ety, de.sort_pos, de.fid_item, de.fid_unit, de.fid_orig_unit, d.b_close, " + // 07
-                        "i.item_key, i.item, u.symbol AS f_unit, uo.symbol AS f_orig_unit, " +                                          // 11
-                        "de.qty AS f_qty, " +                                                                                           // 12
-                        "de.orig_qty AS f_orig_qty, " +                                                                                 // 13
+                sql = "SELECT de.id_year, de.id_doc, de.id_ety, de.sort_pos, de.fid_item, de.fid_unit, de.fid_orig_unit, d.b_close, " + 
+                        "i.item_key, i.item, u.symbol AS f_unit, uo.symbol AS f_orig_unit, " +                                          
+                        "de.qty AS f_qty, " +                                                                                           
+                        "de.orig_qty AS f_orig_qty, " +                                                                                 
                         "COALESCE((SELECT SUM(ddd.qty) FROM trn_dps_dps_adj AS ddd, trn_dps_ety AS dae, trn_dps AS da WHERE " +
                         "ddd.id_dps_year = de.id_year AND ddd.id_dps_doc = de.id_doc AND ddd.id_dps_ety = de.id_ety AND " +
                         "ddd.id_adj_year = dae.id_year AND ddd.id_adj_doc = dae.id_doc AND ddd.id_adj_ety = dae.id_ety AND " +
                         "dae.id_year = da.id_year AND dae.id_doc = da.id_doc AND " +
                         "dae.b_del = 0 AND dae.fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_RET + " AND " +
-                        "da.b_del = 0 AND da.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + "), 0) AS f_adj_qty, " +           // 14
+                        "da.b_del = 0 AND da.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + "), 0) AS f_adj_qty, " +           
                         "COALESCE((SELECT SUM(ddd.orig_qty) FROM trn_dps_dps_adj AS ddd, trn_dps_ety AS dae, trn_dps AS da WHERE " +
                         "ddd.id_dps_year = de.id_year AND ddd.id_dps_doc = de.id_doc AND ddd.id_dps_ety = de.id_ety AND " +
                         "ddd.id_adj_year = dae.id_year AND ddd.id_adj_doc = dae.id_doc AND ddd.id_adj_ety = dae.id_ety AND " +
                         "dae.id_year = da.id_year AND dae.id_doc = da.id_doc AND " +
                         "dae.b_del = 0 AND dae.fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_RET + " AND " +
-                        "da.b_del = 0 AND da.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + "), 0) AS f_adj_orig_qty, " +      // 15
+                        "da.b_del = 0 AND da.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + "), 0) AS f_adj_orig_qty, " +      
                         "COALESCE((SELECT SUM(ge.qty * CASE WHEN ge.fid_dps_adj_year_n IS NULL THEN 1 ELSE -1 END) FROM trn_diog_ety AS ge, trn_diog AS g WHERE " +
                         "ge.fid_dps_year_n = de.id_year AND ge.fid_dps_doc_n = de.id_doc AND ge.fid_dps_ety_n = de.id_ety AND " +
                         "ge.id_year = g.id_year AND ge.id_doc = g.id_doc AND " +
                         "ge.b_del = 0 AND g.b_del = 0 AND " +
-                        "NOT (g.id_year = " + moParamDiog.getPkYearId() + " AND g.id_doc = " + moParamDiog.getPkDocId() + ")), 0) AS f_sup_qty, " +     // 16
+                        "NOT (g.id_year = " + moParamDiog.getPkYearId() + " AND g.id_doc = " + moParamDiog.getPkDocId() + ")), 0) AS f_sup_qty, " +     
                         "COALESCE((SELECT SUM(ge.orig_qty * CASE WHEN ge.fid_dps_adj_year_n IS NULL THEN 1 ELSE -1 END) FROM trn_diog_ety AS ge, trn_diog AS g WHERE " +
                         "ge.fid_dps_year_n = de.id_year AND ge.fid_dps_doc_n = de.id_doc AND ge.fid_dps_ety_n = de.id_ety AND " +
                         "ge.id_year = g.id_year AND ge.id_doc = g.id_doc AND " +
                         "ge.b_del = 0 AND g.b_del = 0 AND " +
-                        "NOT (g.id_year = " + moParamDiog.getPkYearId() + " AND g.id_doc = " + moParamDiog.getPkDocId() + ")), 0) AS f_sup_orig_qty " + // 17
+                        "NOT (g.id_year = " + moParamDiog.getPkYearId() + " AND g.id_doc = " + moParamDiog.getPkDocId() + ")), 0) AS f_sup_orig_qty, " + 
+                        "(SELECT COALESCE(SUM(dds.qty), 0) FROM trn_dps_dps_supply AS dds " +
+                        "INNER JOIN trn_dps AS dd ON dds.id_des_year = dd.id_year AND dds.id_des_doc = dd.id_doc AND dd.b_del = false AND dd.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " +
+                        "INNER JOIN trn_dps_ety AS dde ON dds.id_des_year = dde.id_year AND dds.id_des_doc = dde.id_doc AND dds.id_des_ety = dde.id_ety AND dde.b_del = false " +
+                        "WHERE de.id_year = dds.id_src_year AND de.id_doc = dds.id_src_doc AND de.id_ety = dds.id_src_ety) AS f_link_qty, " +
+                        "(SELECT COALESCE(SUM(dds.orig_qty), 0) FROM trn_dps_dps_supply AS dds " +
+                        "INNER JOIN trn_dps AS dd ON dds.id_des_year = dd.id_year AND dds.id_des_doc = dd.id_doc AND dd.b_del = false AND dd.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " +
+                        "INNER JOIN trn_dps_ety AS dde ON dds.id_des_year = dde.id_year AND dds.id_des_doc = dde.id_doc AND dds.id_des_ety = dde.id_ety AND dde.b_del = false " +
+                        "WHERE de.id_year = dds.id_src_year AND de.id_doc = dds.id_src_doc AND de.id_ety = dds.id_src_ety) AS f_orig_link_qty " +
                         "FROM trn_dps AS d " +
                         "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND " +
                         "de.b_del = 0 AND de.b_inv = 1 AND de.qty > 0 AND de.orig_qty > 0 AND " +
@@ -844,26 +852,34 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
                         "ORDER BY de.sort_pos; ";
 
                 resulSet = miClient.getSession().getStatement().executeQuery(sql);
-                while (resulSet.next()) {
-                    STrnDpsStockSupplyRow stockSupplyRow = new STrnDpsStockSupplyRow(new int[] { resulSet.getInt(1), resulSet.getInt(2), resulSet.getInt(3) });
-                    stockSupplyRow.setSortingPosition(resulSet.getInt(4));
-                    stockSupplyRow.setQuantityBase(resulSet.getDouble(13));
-                    stockSupplyRow.setOriginalQuantityBase(resulSet.getDouble(14));
-                    stockSupplyRow.setQuantityAdjusted(resulSet.getDouble(15));
-                    stockSupplyRow.setOriginalQuantityAdjusted(resulSet.getDouble(16));
-                    stockSupplyRow.setQuantitySupplied(resulSet.getDouble(17));
-                    stockSupplyRow.setOriginalQuantitySupplied(resulSet.getDouble(18));
+                while (resulSet.next()) {                                          
+                    STrnDpsStockSupplyRow stockSupplyRow = new STrnDpsStockSupplyRow(new int[] { resulSet.getInt("id_year"), resulSet.getInt("id_doc"), resulSet.getInt("id_ety") });
+                    stockSupplyRow.setSortingPosition(resulSet.getInt("sort_pos"));
+                    stockSupplyRow.setQuantityBase(resulSet.getDouble("f_qty"));
+                    stockSupplyRow.setOriginalQuantityBase(resulSet.getDouble("f_orig_qty"));
+                   
+                    if (dps.isOrder()) {
+                        stockSupplyRow.setQuantityAdjusted(resulSet.getDouble("f_adj_qty") + resulSet.getDouble("f_link_qty"));
+                        stockSupplyRow.setOriginalQuantityAdjusted(resulSet.getDouble("f_adj_orig_qty") + resulSet.getDouble("f_orig_link_qty"));                           
+                    }
+                    else {
+                        stockSupplyRow.setQuantityAdjusted(resulSet.getDouble("f_adj_qty"));
+                        stockSupplyRow.setOriginalQuantityAdjusted(resulSet.getDouble("f_adj_orig_qty"));
+                    }
+                    
+                    stockSupplyRow.setQuantitySupplied(resulSet.getDouble("f_sup_qty"));
+                    stockSupplyRow.setOriginalQuantitySupplied(resulSet.getDouble("f_sup_orig_qty"));
                     stockSupplyRow.setQuantityToSupply(0);
                     stockSupplyRow.setOriginalQuantityToSupply(0);
-                    stockSupplyRow.setFkItemId(resulSet.getInt(5));
-                    stockSupplyRow.setFkUnitId(resulSet.getInt(6));
-                    stockSupplyRow.setFkOriginalUnitId(resulSet.getInt(7));
-                    stockSupplyRow.setAuxItem(resulSet.getString(10));
-                    stockSupplyRow.setAuxItemKey(resulSet.getString(9));
+                    stockSupplyRow.setFkItemId(resulSet.getInt("fid_item"));   
+                    stockSupplyRow.setFkUnitId(resulSet.getInt("fid_unit"));
+                    stockSupplyRow.setFkOriginalUnitId(resulSet.getInt("fid_orig_unit"));
+                    stockSupplyRow.setAuxItem(resulSet.getString("item"));
+                    stockSupplyRow.setAuxItemKey(resulSet.getString("item_key")); 
                     stockSupplyRow.setAuxUnit("");
                     stockSupplyRow.setAuxOriginalUnit("");
-                    stockSupplyRow.setAuxUnitSymbol(resulSet.getString(11));
-                    stockSupplyRow.setAuxOriginalUnitSymbol(resulSet.getString(12));
+                    stockSupplyRow.setAuxUnitSymbol(resulSet.getString("f_unit"));
+                    stockSupplyRow.setAuxOriginalUnitSymbol(resulSet.getString("f_orig_unit"));
 
                     for (SDataDiogEntry diogEntry : moParamDiog.getDbmsEntries()) {
                         if (!diogEntry.getIsDeleted()) {

@@ -28,6 +28,7 @@ import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataEntryDpsDpsLink;
 import erp.mtrn.data.SGuiDpsEntryPrice;
 import erp.mtrn.data.SGuiDpsLink;
+import erp.mtrn.data.STrnDpsUtilities;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -39,6 +40,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JComboBox;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -562,6 +564,23 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
 
                 rows++;
 
+                //The source is order and has supplied quantities
+                
+                if (!validation.getIsError() && moParamDpsSource.isOrder()){
+                    try {
+                        double totalsupplied = STrnDpsUtilities.obtainEtyTotalSupplied(miClient, (int[]) entry.getDpsEntryKey());
+                        if (totalsupplied > entry.getQuantityToLink()) {
+                            validation.setMessage("Para el ítem '" + entry.getConcept() + " (" + entry.getConceptKey() + ")' en la partida # " + entry.getSortingPosition() + "\n" +
+                                    "la cantidad minima a vincular debe ser mayor o igual a " + 
+                                    miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(totalsupplied) + " ya que tiene sutidos previos.");
+                            break;
+                        }
+                    }
+                        catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }
+                }
+                
                 //Need monthly delivery
 
                 if (!validation.getIsError() && isOrder) {

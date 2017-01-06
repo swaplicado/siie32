@@ -35,6 +35,7 @@ import erp.mtrn.form.SFormStockLot;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import sa.lib.gui.SGuiParams;
 
 /**
  *
@@ -54,6 +55,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiDpsPurSupplyPendEty;
     private javax.swing.JMenuItem jmiDpsPurSupplied;
     private javax.swing.JMenuItem jmiDpsPurSuppliedEty;
+    private javax.swing.JMenuItem jmiDpsPurOrderSupplies;
 
     private javax.swing.JMenu jmMenuDpsPurRet;
     private javax.swing.JMenuItem jmiDpsPurReturnPend;
@@ -66,6 +68,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiDpsSalSupplyPendEntry;
     private javax.swing.JMenuItem jmiDpsSalSupplied;
     private javax.swing.JMenuItem jmiDpsSalSuppliedEntry;
+    private javax.swing.JMenuItem jmiDpsSalOrderSupplies;
 
     private javax.swing.JMenu jmMenuDpsSalRet;
     private javax.swing.JMenuItem jmiDpsSalReturnPend;
@@ -191,15 +194,19 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsPurSupplyPendEty = new JMenuItem("Compras por surtir a detalle");
         jmiDpsPurSupplied = new JMenuItem("Compras surtidas");
         jmiDpsPurSuppliedEty = new JMenuItem("Compras surtidas a detalle");
+        jmiDpsPurOrderSupplies = new JMenuItem("Pedidos de compras con surtidos");
         jmMenuDpsPurSup.add(jmiDpsPurSupplyPend);
         jmMenuDpsPurSup.add(jmiDpsPurSupplyPendEty);
         jmMenuDpsPurSup.addSeparator();
         jmMenuDpsPurSup.add(jmiDpsPurSupplied);
         jmMenuDpsPurSup.add(jmiDpsPurSuppliedEty);
+        jmMenuDpsPurSup.addSeparator();
+        jmMenuDpsPurSup.add(jmiDpsPurOrderSupplies);
         jmiDpsPurSupplyPend.addActionListener(this);
         jmiDpsPurSupplyPendEty.addActionListener(this);
         jmiDpsPurSupplied.addActionListener(this);
         jmiDpsPurSuppliedEty.addActionListener(this);
+        jmiDpsPurOrderSupplies.addActionListener(this);
 
         jmMenuDpsPurRet = new JMenu("Devoluciones compras");
         jmiDpsPurReturnPend = new JMenuItem("Compras por devolver");
@@ -221,15 +228,19 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsSalSupplyPendEntry = new JMenuItem("Ventas por surtir a detalle");
         jmiDpsSalSupplied = new JMenuItem("Ventas surtidas");
         jmiDpsSalSuppliedEntry = new JMenuItem("Ventas surtidas a detalle");
+        jmiDpsSalOrderSupplies = new JMenuItem("Pedidos de ventas con surtidos");
         jmMenuDpsSalSup.add(jmiDpsSalSupplyPend);
         jmMenuDpsSalSup.add(jmiDpsSalSupplyPendEntry);
         jmMenuDpsSalSup.addSeparator();
         jmMenuDpsSalSup.add(jmiDpsSalSupplied);
         jmMenuDpsSalSup.add(jmiDpsSalSuppliedEntry);
+        jmMenuDpsSalSup.addSeparator();
+        jmMenuDpsSalSup.add(jmiDpsSalOrderSupplies);
         jmiDpsSalSupplyPend.addActionListener(this);
         jmiDpsSalSupplyPendEntry.addActionListener(this);
         jmiDpsSalSupplied.addActionListener(this);
         jmiDpsSalSuppliedEntry.addActionListener(this);
+        jmiDpsSalOrderSupplies.addActionListener(this);
 
         jmMenuDpsSalRet = new JMenu("Devoluciones ventas");
         jmiDpsSalReturnPend = new JMenuItem("Ventas por devolver");
@@ -1027,6 +1038,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiDpsPurReturnPendEty) {
                 showView(SDataConstants.TRNX_DPS_RETURN_PEND_ETY, SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[0], SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[1]);
             }
+            else if (item == jmiDpsPurOrderSupplies) {
+                miClient.getSession().showView(SModConsts.TRNX_DPS_ORDER_SUP, SDataConstantsSys.TRNS_CT_DPS_PUR, new SGuiParams(SDataConstantsSys.UNDEFINED));
+            }
             else if (item == jmiDpsPurReturned) {
                 showView(SDataConstants.TRNX_DPS_RETURNED, SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[0], SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[1]);
             }
@@ -1044,6 +1058,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiDpsSalSuppliedEntry) {
                 showView(SDataConstants.TRNX_DPS_SUPPLIED_ETY, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC[0], SDataConstantsSys.TRNS_CL_DPS_SAL_DOC[1]);
+            }
+            else if (item == jmiDpsSalOrderSupplies) {
+                miClient.getSession().showView(SModConsts.TRNX_DPS_ORDER_SUP, SDataConstantsSys.TRNS_CT_DPS_SAL, new SGuiParams(SDataConstantsSys.UNDEFINED));
             }
             else if (item == jmiDpsSalReturnPend) {
                 showView(SDataConstants.TRNX_DPS_RETURN_PEND, SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ[0], SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ[1]);
