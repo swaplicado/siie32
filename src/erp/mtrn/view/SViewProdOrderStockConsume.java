@@ -32,6 +32,7 @@ import java.util.Date;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -298,13 +299,13 @@ public class SViewProdOrderStockConsume extends erp.lib.table.STableTab implemen
                 int[] key = null;
                 SDataRawMaterialsConsume rawMaterialsConsume = null;
 
-                if (miClient.showMsgBoxConfirm("¿Está seguro que desea hacer el consumo de MP y P de la OP seleccionada con fecha " + miClient.getSessionXXX().getFormatters().getDateFormat().format(miClient.getSessionXXX().getSystemDate()) + "?") == JOptionPane.YES_OPTION) {
+                if (miClient.showMsgBoxConfirm("¿Está seguro que desea hacer el consumo de MP y P de la OP seleccionada con fecha " + SLibUtils.DateFormatDate.format(miClient.getSessionXXX().getWorkingDate()) + "?") == JOptionPane.YES_OPTION) {
                     try {
                         key = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
                         rawMaterialsConsume = new SDataRawMaterialsConsume();
                         rawMaterialsConsume.setPkYearId(key[0]);
                         rawMaterialsConsume.setPkOrderId(key[1]);
-                        rawMaterialsConsume.setDate(miClient.getSessionXXX().getSystemDate());
+                        rawMaterialsConsume.setDate(miClient.getSessionXXX().getWorkingDate());
                         rawMaterialsConsume.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
                         SDataUtilities.saveRegistry(miClient, rawMaterialsConsume);
 
@@ -351,7 +352,7 @@ public class SViewProdOrderStockConsume extends erp.lib.table.STableTab implemen
                         rawMaterialsConsume = new SDataRawMaterialsConsume();
                         rawMaterialsConsume.setPkYearId(key[0]);
                         rawMaterialsConsume.setPkOrderId(key[1]);
-                        rawMaterialsConsume.setDate(miClient.getSessionXXX().getSystemDate());
+                        rawMaterialsConsume.setDate(miClient.getSessionXXX().getWorkingDate());
                         rawMaterialsConsume.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
                         rawMaterialsConsume.setAuxMode(SDataRawMaterialsConsume.MODE_DELETE);
                         SDataUtilities.saveRegistry(miClient, rawMaterialsConsume);

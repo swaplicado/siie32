@@ -17,14 +17,13 @@ import erp.mitm.data.SDataUnit;
 import erp.mmfg.data.SDataProductionOrder;
 import erp.mtrn.data.SDataRawMaterialsConsume;
 import erp.mtrn.data.SDataStockLot;
-import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
 import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
 import java.util.Vector;
 import javax.swing.JOptionPane;
-import sa.lib.srv.SSrvConsts;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -99,13 +98,13 @@ public class SDialogProdOrderStockConsume extends javax.swing.JDialog implements
         jtfQuantityFinishedRo = new javax.swing.JTextField();
         jtfQuantityFinishedUnitRo = new javax.swing.JTextField();
         jPanel8 = new javax.swing.JPanel();
-        jlAdvanceCurrent = new javax.swing.JLabel();
-        jtfAdvanceCurrentRo = new javax.swing.JTextField();
+        jlCurrentProgress = new javax.swing.JLabel();
+        jtfCurrentProgressRo = new javax.swing.JTextField();
         jPanel5 = new javax.swing.JPanel();
         jlAdvance = new javax.swing.JLabel();
         jsAdvance = new javax.swing.JSpinner();
         jlAdvancePercentage = new javax.swing.JLabel();
-        jbAdvance = new javax.swing.JButton();
+        jbSetCurrentProgress = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -284,16 +283,16 @@ public class SDialogProdOrderStockConsume extends javax.swing.JDialog implements
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlAdvanceCurrent.setText("Avance producción:");
-        jlAdvanceCurrent.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel8.add(jlAdvanceCurrent);
+        jlCurrentProgress.setText("Progreso actual:");
+        jlCurrentProgress.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel8.add(jlCurrentProgress);
 
-        jtfAdvanceCurrentRo.setEditable(false);
-        jtfAdvanceCurrentRo.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfAdvanceCurrentRo.setText("0.00%");
-        jtfAdvanceCurrentRo.setFocusable(false);
-        jtfAdvanceCurrentRo.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel8.add(jtfAdvanceCurrentRo);
+        jtfCurrentProgressRo.setEditable(false);
+        jtfCurrentProgressRo.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfCurrentProgressRo.setText("0.00%");
+        jtfCurrentProgressRo.setFocusable(false);
+        jtfCurrentProgressRo.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel8.add(jtfCurrentProgressRo);
 
         jPanel3.add(jPanel8);
 
@@ -311,11 +310,11 @@ public class SDialogProdOrderStockConsume extends javax.swing.JDialog implements
         jlAdvancePercentage.setPreferredSize(new java.awt.Dimension(20, 23));
         jPanel5.add(jlAdvancePercentage);
 
-        jbAdvance.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_wizard.gif"))); // NOI18N
-        jbAdvance.setToolTipText("Copiar avance producción");
-        jbAdvance.setFocusable(false);
-        jbAdvance.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel5.add(jbAdvance);
+        jbSetCurrentProgress.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_wizard.gif"))); // NOI18N
+        jbSetCurrentProgress.setToolTipText("Copiar progreso actual");
+        jbSetCurrentProgress.setFocusable(false);
+        jbSetCurrentProgress.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel5.add(jbSetCurrentProgress);
 
         jPanel3.add(jPanel5);
 
@@ -341,8 +340,8 @@ public class SDialogProdOrderStockConsume extends javax.swing.JDialog implements
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-640)/2, (screenSize.height-400)/2, 640, 400);
+        setSize(new java.awt.Dimension(640, 400));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -360,7 +359,7 @@ public class SDialogProdOrderStockConsume extends javax.swing.JDialog implements
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
         jbDate.addActionListener(this);
-        jbAdvance.addActionListener(this);
+        jbSetCurrentProgress.addActionListener(this);
 
         SFormUtilities.createActionMap(rootPane, this, "actionOk", "ok", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "actionCancel", "cancel", KeyEvent.VK_ESCAPE, 0);
@@ -373,7 +372,7 @@ public class SDialogProdOrderStockConsume extends javax.swing.JDialog implements
         }
     }
 
-    private double getAdvance() {
+    private double getCurrentProgress() {
         return mdQuantity == 0d ? 0d : mdQuantityFinished >= mdQuantity ? 1d : mdQuantityFinished / mdQuantity;
     }
 
@@ -406,7 +405,7 @@ public class SDialogProdOrderStockConsume extends javax.swing.JDialog implements
                 jtfQuantityCurrentUnitRo.setText("");
                 jtfQuantityFinishedRo.setText("");
                 jtfQuantityFinishedUnitRo.setText("");
-                jtfAdvanceCurrentRo.setText("");
+                jtfCurrentProgressRo.setText("");
             }
             else {
                 item = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { moParamProdOrder.getFkItemId_r() }, SLibConstants.EXEC_MODE_VERBOSE);
@@ -456,26 +455,26 @@ public class SDialogProdOrderStockConsume extends javax.swing.JDialog implements
                 jtfQuantityCurrentUnitRo.setText(unit.getSymbol());
                 jtfQuantityFinishedRo.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(mdQuantityFinished));
                 jtfQuantityFinishedUnitRo.setText(unit.getSymbol());
-                jtfAdvanceCurrentRo.setText(miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(getAdvance()));
+                jtfCurrentProgressRo.setText(miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(getCurrentProgress()));
 
                 jtfQuantityCurrentRo.setCaretPosition(0);
                 jtfQuantityCurrentUnitRo.setCaretPosition(0);
                 jtfQuantityFinishedRo.setCaretPosition(0);
                 jtfQuantityFinishedUnitRo.setCaretPosition(0);
-                jtfAdvanceCurrentRo.setCaretPosition(0);
+                jtfCurrentProgressRo.setCaretPosition(0);
             }
         }
         catch (Exception e) {
             SLibUtilities.renderException(this, e);
         }
         
-        actionAdvance();
+        actionSetCurrentProgress();
     }
 
-    private void actionAdvance() {
+    private void actionSetCurrentProgress() {
         try {
             jsAdvance.commitEdit();
-            jsAdvance.setValue((int) (SLibUtilities.round(getAdvance() * 100d, 0)));
+            jsAdvance.setValue((int) (SLibUtilities.round(getCurrentProgress() * 100d, 0)));
             jsAdvance.getComponent(0).requestFocus();
         }
         catch (Exception e) {
@@ -487,11 +486,11 @@ public class SDialogProdOrderStockConsume extends javax.swing.JDialog implements
         if (!SDataUtilities.isPeriodOpen(miClient, moFieldDate.getDate())) {
             miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_PER_CLOSE + "\nFecha: " + miClient.getSessionXXX().getFormatters().getDateFormat().format(moFieldDate.getDate()) + ".");
         }
+        else if ((Integer) jsAdvance.getValue() > (int) SLibUtilities.round(getCurrentProgress() * 100d, 0)) {
+            miClient.showMsgBoxInformation("El valor del campo '" + jlAdvance.getText() + "' no puede ser mayor a " + (int) SLibUtilities.round(getCurrentProgress() * 100d, 0) + "%.");
+        }
         else if ((Integer) jsAdvance.getValue() > 100) {
             miClient.showMsgBoxInformation("El valor del campo '" + jlAdvance.getText() + "' no puede ser mayor a 100%.");
-        }
-        else if ((Integer) jsAdvance.getValue() > (int) SLibUtilities.round(getAdvance() * 100d, 0)) {
-            miClient.showMsgBoxInformation("El valor del campo '" + jlAdvance.getText() + "' no puede ser mayor a " + (int) SLibUtilities.round(getAdvance() * 100d, 0) + "%.");
         }
         else if ((Integer) jsAdvance.getValue() < 0) {
             miClient.showMsgBoxInformation("El valor del campo '" + jlAdvance.getText() + "' no puede ser menor a 0%.");
@@ -499,7 +498,7 @@ public class SDialogProdOrderStockConsume extends javax.swing.JDialog implements
         else {
             SDataRawMaterialsConsume rawMaterialsConsume = null;
 
-            if (miClient.showMsgBoxConfirm("¿Está seguro que desea hacer el consumo de MP y P de la OP seleccionada con " + (Integer) jsAdvance.getValue() + "% de avance, con fecha " + miClient.getSessionXXX().getFormatters().getDateFormat().format(moFieldDate.getDate()) + "?") == JOptionPane.YES_OPTION) {
+            if (miClient.showMsgBoxConfirm("¿Está seguro que desea hacer el consumo de MP y P de la OP seleccionada con " + (Integer) jsAdvance.getValue() + "% de avance, con fecha " + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + "?") == JOptionPane.YES_OPTION) {
                 try {
                     rawMaterialsConsume = new SDataRawMaterialsConsume();
                     rawMaterialsConsume.setPkYearId(moParamProdOrder.getPkYearId());
@@ -544,14 +543,14 @@ public class SDialogProdOrderStockConsume extends javax.swing.JDialog implements
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
-    private javax.swing.JButton jbAdvance;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbDate;
     private javax.swing.JButton jbOk;
+    private javax.swing.JButton jbSetCurrentProgress;
     private javax.swing.JFormattedTextField jftDate;
     private javax.swing.JLabel jlAdvance;
-    private javax.swing.JLabel jlAdvanceCurrent;
     private javax.swing.JLabel jlAdvancePercentage;
+    private javax.swing.JLabel jlCurrentProgress;
     private javax.swing.JLabel jlDate;
     private javax.swing.JLabel jlItem;
     private javax.swing.JLabel jlProdOrder;
@@ -561,7 +560,7 @@ public class SDialogProdOrderStockConsume extends javax.swing.JDialog implements
     private javax.swing.JLabel jlQuantityFinished;
     private javax.swing.JLabel jlStockLot;
     private javax.swing.JSpinner jsAdvance;
-    private javax.swing.JTextField jtfAdvanceCurrentRo;
+    private javax.swing.JTextField jtfCurrentProgressRo;
     private javax.swing.JTextField jtfItem;
     private javax.swing.JTextField jtfItemCode;
     private javax.swing.JTextField jtfProdOrderDate;
@@ -700,8 +699,8 @@ public class SDialogProdOrderStockConsume extends javax.swing.JDialog implements
             else if (button == jbDate) {
                 actionDate();
             }
-            else if (button == jbAdvance) {
-                actionAdvance();
+            else if (button == jbSetCurrentProgress) {
+                actionSetCurrentProgress();
             }
         }
     }
