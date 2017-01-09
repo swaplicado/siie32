@@ -481,18 +481,18 @@ public abstract class SCfdUtils implements Serializable {
                     receipt.setPayroll(payroll);
                     receipt.setFechaEdicion(client.getSession().getCurrentDate());
                     receipt.setMoneda(client.getSession().getSessionCustom().getLocalCurrencyCode());
+                    
+                    // Generate CFDI:
 
-                    // CFDI generating package to save:
+                    comprobanteCfdi = (cfd.ver3.DElementComprobante) SCfdUtils.createCfdiRootElement(client, receipt);
+                    
+                    // CFDI generating packet to save:
 
                     packet = new SCfdPacket();
                     packet.setDpsYearId(0);
                     packet.setDpsDocId(0);
                     packet.setCfdId(cfdId);
                     packet.setIsConsistent(!isFound || cfdId == SLibConsts.UNDEFINED ? true: isConsistent);
-                    comprobanteCfdi = (cfd.ver3.DElementComprobante) SCfdUtils.createCfdiRootElement(client, receipt);
-                    
-                    validateConsitentXml(comprobanteCfdi);
-                    
                     packet.setStringSigned(DUtilUtils.generateOriginalString(comprobanteCfdi));
                     packet.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_PAY);
                     packet.setFkXmlTypeId(SDataConstantsSys.TRNS_TP_XML_CFDI);
@@ -510,12 +510,15 @@ public abstract class SCfdUtils implements Serializable {
                     packet.setUuid("");
                     packet.setConsumeStamp(false);
                     packet.setGenerateQrCode(false);
+                    
                     packet.setSignature(client.getCfdSignature().sign(packet.getStringSigned(), SLibTimeUtilities.digestYear(payroll.getFecha())[0]));
                     packet.setCertNumber(client.getCfdSignature().getCertNumber());
                     packet.setCertBase64(client.getCfdSignature().getCertBase64());
+                    
                     comprobanteCfdi.getAttSello().setString(packet.getSignature());
                     comprobanteCfdi.getAttNoCertificado().setString(packet.getCertNumber());
                     comprobanteCfdi.getAttCertificado().setString(packet.getCertBase64());
+                    
                     packet.setCfdRootElement(comprobanteCfdi);
 
                     maCfdPackets.add(packet);
@@ -2551,8 +2554,6 @@ public abstract class SCfdUtils implements Serializable {
                     break;
                 case SDataConstantsSys.TRNS_TP_XML_CFDI:
                     comprobanteCfdi = (cfd.ver3.DElementComprobante) createCfdiRootElement(client, dps);
-
-                    validateConsitentXml(comprobanteCfdi);
                     
                     packet.setStringSigned(DUtilUtils.generateOriginalString(comprobanteCfdi));
                     packet.setFkXmlTypeId(SDataConstantsSys.TRNS_TP_XML_CFDI);
@@ -3290,51 +3291,53 @@ public abstract class SCfdUtils implements Serializable {
                 throw new Exception("Error al generar el complemeto nómina o el complemento no existe.");
             }
         }
+        
+        validateCorrectnessXml(comprobante);
 
         return comprobante;
     }
     
     /**
-     * Validate consistency of subtotal, total and taxes in XML
-     * @param comprobante Structur for XML
-     * @return true if it's consistent
+     * Validate correctness of subtotal, total and taxes in XML
+     * @param comprobante Structure for XML
+     * @return true if the XML is correct
      * @throws Exception 
      */
-    public static boolean validateConsitentXml(final cfd.ver3.DElementComprobante comprobante) throws Exception {
-        cfd.ver3.DElementConcepto concepto = null;
-        cfd.ver3.DElementImpuestoTraslado traslado = null;
-        cfd.ver3.DElementImpuestoRetencion retencion = null;
-        double dTotalImptoRetenido = 0;
-        double dTotalImptoTrasladado = 0;
-        double dSubtotalConcepto = 0;
+    public static boolean validateCorrectnessXml(final cfd.ver3.DElementComprobante comprobante) throws Exception {
+        cfd.ver3.DElementConcepto oConcepto = null;
+        cfd.ver3.DElementImpuestoTraslado oTraslado = null;
+        cfd.ver3.DElementImpuestoRetencion oRetencion = null;
+        double dSubtotalImporte = 0;
         double dSubtotalConceptos = 0;
+        double dTotalImptoRetenidos = 0;
+        double dTotalImptoTrasladados = 0;
         double dTotal = 0;
         
         // validate subtotal concepts:
         
         for (int i = 0; i < comprobante.getEltConceptos().getEltHijosConcepto().size(); i++) {
-            concepto = comprobante.getEltConceptos().getEltHijosConcepto().get(i);
+            oConcepto = comprobante.getEltConceptos().getEltHijosConcepto().get(i);
             
-            dSubtotalConcepto = SLibUtils.round(concepto.getAttCantidad().getDouble() * concepto.getAttValorUnitario().getDouble(), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+            dSubtotalImporte = SLibUtils.round(oConcepto.getAttCantidad().getDouble() * oConcepto.getAttValorUnitario().getDouble(), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
             
-            if (SLibUtils.round(concepto.getAttImporte().getDouble(), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()) != dSubtotalConcepto) {
-                throw new Exception("El subtotal del concepto '" + concepto.getAttDescripcion().getString() + "' es incorrecto.");
+            if (Math.abs(oConcepto.getAttImporte().getDouble() - dSubtotalImporte) >= SLibConstants.RES_VAL_DECS) {
+                throw new Exception("El monto del cálculo del importe del concepto '" + oConcepto.getAttDescripcion().getString() + "' es incorrecto.");
             }
             
-            dSubtotalConceptos = SLibUtils.round((dSubtotalConceptos + dSubtotalConcepto), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+            dSubtotalConceptos = SLibUtils.round((dSubtotalConceptos + dSubtotalImporte), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
         }
         
         // validate taxes charged:
         
         if (comprobante.getEltImpuestos().getEltOpcImpuestosTrasladados() != null) {
             for (int i = 0; i < comprobante.getEltImpuestos().getEltOpcImpuestosTrasladados().getEltHijosImpuestoTrasladado().size(); i++) {
-                traslado = comprobante.getEltImpuestos().getEltOpcImpuestosTrasladados().getEltHijosImpuestoTrasladado().get(i);
+                oTraslado = comprobante.getEltImpuestos().getEltOpcImpuestosTrasladados().getEltHijosImpuestoTrasladado().get(i);
 
-                dTotalImptoTrasladado = SLibUtils.round((dTotalImptoTrasladado + traslado.getAttImporte().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                dTotalImptoTrasladados = SLibUtils.round((dTotalImptoTrasladados + oTraslado.getAttImporte().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
             }
 
-            if (SLibUtils.round(comprobante.getEltImpuestos().getAttTotalImpuestosTrasladados().getDouble(), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()) != dTotalImptoTrasladado) {
-                throw new Exception("Los impuestos trasladados son incorrectos.");
+            if (Math.abs(comprobante.getEltImpuestos().getAttTotalImpuestosTrasladados().getDouble() - dTotalImptoTrasladados) >= SLibConstants.RES_VAL_DECS) {
+                throw new Exception("La suma de los impuestos trasladados es incorrecta.");
             }
         }
         
@@ -3342,28 +3345,28 @@ public abstract class SCfdUtils implements Serializable {
         
         if (comprobante.getEltImpuestos().getEltOpcImpuestosRetenidos() != null) {
             for (int i = 0; i < comprobante.getEltImpuestos().getEltOpcImpuestosRetenidos().getEltHijosImpuestoRetenido().size(); i++) {
-                retencion = comprobante.getEltImpuestos().getEltOpcImpuestosRetenidos().getEltHijosImpuestoRetenido().get(i);
+                oRetencion = comprobante.getEltImpuestos().getEltOpcImpuestosRetenidos().getEltHijosImpuestoRetenido().get(i);
 
-                dTotalImptoRetenido = SLibUtils.round((dTotalImptoTrasladado + retencion.getAttImporte().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                dTotalImptoRetenidos = SLibUtils.round((dTotalImptoTrasladados + oRetencion.getAttImporte().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
             }
 
-            if (SLibUtils.round(comprobante.getEltImpuestos().getAttTotalImpuestosRetenidos().getDouble(), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()) != dTotalImptoRetenido) {
-                throw new Exception("Los impuestos retenidos son incorrectos.");
+            if (Math.abs(comprobante.getEltImpuestos().getAttTotalImpuestosRetenidos().getDouble() - dTotalImptoRetenidos) >= SLibConstants.RES_VAL_DECS) {
+                throw new Exception("La suma de los impuestos retenidos es incorrecta.");
             }
         }
         
-        // validate subTotal vs. subtotal concepts:
+        // validate subtotal vs. subtotal concepts:
         
-        if (SLibUtils.round(comprobante.getAttSubTotal().getDouble(), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()) != dSubtotalConceptos) {
-            throw new Exception("El Subtotal es incorrecto.");
+        if (Math.abs(comprobante.getAttSubTotal().getDouble() - dSubtotalConceptos) >= SLibConstants.RES_VAL_DECS) {
+            throw new Exception("La suma de importes de los conceptos es incorrecta.");
         }
         
-        // validate Total:
+        // validate total:
         
-        dTotal = SLibUtils.round((dSubtotalConceptos + dTotalImptoTrasladado - dTotalImptoRetenido - comprobante.getAttDescuento().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+        dTotal = SLibUtils.round((dSubtotalConceptos + dTotalImptoTrasladados - dTotalImptoRetenidos - comprobante.getAttDescuento().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
         
-        if (SLibUtils.round(comprobante.getAttTotal().getDouble(), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()) != dTotal) {
-            throw new Exception("El Total es incorrecto.");
+        if (Math.abs(comprobante.getAttTotal().getDouble() - dTotal) >= SLibConstants.RES_VAL_DECS) {
+            throw new Exception("El monto del cálculo del total es incorrecto.");
         }
         
         return true;

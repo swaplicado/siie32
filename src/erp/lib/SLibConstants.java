@@ -141,6 +141,8 @@ public abstract class SLibConstants {
     public static final int VALUE_INV_NOT = 11;
     public static final int VALUE_INV_ONLY = 12;
     public static final int VALUE_IS_COPY = 13;
+    
+    public static final double RES_VAL_DECS = 0.001;
 
     // GUI constants:
 

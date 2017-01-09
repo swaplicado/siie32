@@ -27,7 +27,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Irving Sánchez
+ * @author Irving Sánchez, Juan Barajas
  */
 public abstract class SHrsCfdUtils {
     
@@ -183,6 +183,11 @@ public abstract class SHrsCfdUtils {
         }
                             
         if (add) {
+            
+            // Generate CFDI:
+
+            comprobanteCfdi = (cfd.ver3.DElementComprobante) SCfdUtils.createCfdiRootElement((SClientInterface)session.getClient(), receipt);
+            
             // CFDI generating package to save:
 
             packet = new SCfdPacket();
@@ -190,10 +195,6 @@ public abstract class SHrsCfdUtils {
             packet.setDpsDocId(0);
             packet.setCfdId(cfdId);
             packet.setIsConsistent(cfdId == SLibConstants.UNDEFINED ? true : false);
-            comprobanteCfdi = (cfd.ver3.DElementComprobante) SCfdUtils.createCfdiRootElement((SClientInterface)session.getClient(), receipt);
-            
-            SCfdUtils.validateConsitentXml(comprobanteCfdi);
-            
             packet.setStringSigned(DUtilUtils.generateOriginalString(comprobanteCfdi));
             packet.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_PAY);
             packet.setFkXmlTypeId(SDataConstantsSys.TRNS_TP_XML_CFDI);
@@ -211,12 +212,15 @@ public abstract class SHrsCfdUtils {
             packet.setUuid("");
             packet.setConsumeStamp(false);
             packet.setGenerateQrCode(false);
+            
             packet.setSignature(((SClientInterface)session.getClient()).getCfdSignature().sign(packet.getStringSigned(), SLibTimeUtilities.digestYear(receipt.getPayroll().getFecha())[0]));
             packet.setCertNumber(((SClientInterface)session.getClient()).getCfdSignature().getCertNumber());
             packet.setCertBase64(((SClientInterface)session.getClient()).getCfdSignature().getCertBase64());
+            
             comprobanteCfdi.getAttSello().setString(packet.getSignature());
             comprobanteCfdi.getAttNoCertificado().setString(packet.getCertNumber());
             comprobanteCfdi.getAttCertificado().setString(packet.getCertBase64());
+            
             packet.setCfdRootElement(comprobanteCfdi);
 
             moCfdPackets.add(packet);
