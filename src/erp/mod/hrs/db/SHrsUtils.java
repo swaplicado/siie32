@@ -166,8 +166,10 @@ public abstract class SHrsUtils {
                         "FROM hrs_pay AS p " +
                         "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
                         "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
+                        "INNER JOIN erp.bpsu_bp bp ON (emp.id_emp = bp.id_bp) " +
                         "WHERE p.b_del = 0 AND rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0 " +
-                        "AND rcp.id_emp IN (" + employeesId + ")";
+                        "AND rcp.id_emp IN (" + employeesId + ") " +
+                        "ORDER BY bp.bp, emp.num;";
                 
                 resultSetDetail = client.getSession().getStatement().executeQuery(sql);
                 while (resultSetDetail.next()) {
