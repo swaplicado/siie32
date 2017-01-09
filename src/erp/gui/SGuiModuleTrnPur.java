@@ -372,7 +372,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkDvySuppliedEntry = new JMenuItem("Compras surtidas a detalle");
         jmiStkDvyDiog = new JMenuItem("Documentos de surtidos de compras");
         jmiStkDvyStatsConsumption = new JMenuItem("Estadísticas de consumo de compras");
-        jmiStkDvyOrderSupplies = new JMenuItem("Pedidos de compras con surtidos");
+        //jmiStkDvyOrderSupplies = new JMenuItem("Pedidos de compras con surtidos");
         jmStkDvy.add(jmiStkDvyPend);
         jmStkDvy.add(jmiStkDvyPendEntry);
         jmStkDvy.addSeparator();
@@ -382,8 +382,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmStkDvy.add(jmiStkDvyDiog);
         jmStkDvy.addSeparator();
         jmStkDvy.add(jmiStkDvyStatsConsumption);
-        jmStkDvy.addSeparator();
-        jmStkDvy.add(jmiStkDvyOrderSupplies);
+        //jmStkDvy.addSeparator();
+        //jmStkDvy.add(jmiStkDvyOrderSupplies);
         
         jmStkRet = new JMenu("Devoluciones");
         jmiStkRetPending = new JMenuItem("Compras por devolver");
@@ -588,7 +588,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkDvySuppliedEntry.addActionListener(this);
         jmiStkDvyDiog.addActionListener(this);
         jmiStkDvyStatsConsumption.addActionListener(this);
-        jmiStkDvyOrderSupplies.addActionListener(this);
+        //jmiStkDvyOrderSupplies.addActionListener(this);
         jmiStkRetPending.addActionListener(this);
         jmiStkRetPendingEntry.addActionListener(this);
         jmiStkRetReturned.addActionListener(this);
@@ -703,7 +703,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkDvySuppliedEntry.setEnabled(hasRightInventoryIn);
         jmiStkDvyDiog.setEnabled(hasRightInventoryIn);
         jmiStkDvyStatsConsumption.setEnabled(hasRightInventoryIn);
-        jmiStkDvyOrderSupplies.setEnabled(hasRightInventoryIn);
+        //jmiStkDvyOrderSupplies.setEnabled(hasRightInventoryIn);
 
         jmStkRet.setEnabled(hasRightInventoryOut);
         jmiStkRetPending.setEnabled(hasRightInventoryOut);

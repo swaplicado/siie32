@@ -194,19 +194,19 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsPurSupplyPendEty = new JMenuItem("Compras por surtir a detalle");
         jmiDpsPurSupplied = new JMenuItem("Compras surtidas");
         jmiDpsPurSuppliedEty = new JMenuItem("Compras surtidas a detalle");
-        jmiDpsPurOrderSupplies = new JMenuItem("Pedidos de compras con surtidos");
+        //jmiDpsPurOrderSupplies = new JMenuItem("Pedidos de compras con surtidos");
         jmMenuDpsPurSup.add(jmiDpsPurSupplyPend);
         jmMenuDpsPurSup.add(jmiDpsPurSupplyPendEty);
         jmMenuDpsPurSup.addSeparator();
         jmMenuDpsPurSup.add(jmiDpsPurSupplied);
         jmMenuDpsPurSup.add(jmiDpsPurSuppliedEty);
         jmMenuDpsPurSup.addSeparator();
-        jmMenuDpsPurSup.add(jmiDpsPurOrderSupplies);
+        //jmMenuDpsPurSup.add(jmiDpsPurOrderSupplies);
         jmiDpsPurSupplyPend.addActionListener(this);
         jmiDpsPurSupplyPendEty.addActionListener(this);
         jmiDpsPurSupplied.addActionListener(this);
         jmiDpsPurSuppliedEty.addActionListener(this);
-        jmiDpsPurOrderSupplies.addActionListener(this);
+        //jmiDpsPurOrderSupplies.addActionListener(this);
 
         jmMenuDpsPurRet = new JMenu("Devoluciones compras");
         jmiDpsPurReturnPend = new JMenuItem("Compras por devolver");
@@ -228,19 +228,19 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsSalSupplyPendEntry = new JMenuItem("Ventas por surtir a detalle");
         jmiDpsSalSupplied = new JMenuItem("Ventas surtidas");
         jmiDpsSalSuppliedEntry = new JMenuItem("Ventas surtidas a detalle");
-        jmiDpsSalOrderSupplies = new JMenuItem("Pedidos de ventas con surtidos");
+        //jmiDpsSalOrderSupplies = new JMenuItem("Pedidos de ventas con surtidos");
         jmMenuDpsSalSup.add(jmiDpsSalSupplyPend);
         jmMenuDpsSalSup.add(jmiDpsSalSupplyPendEntry);
         jmMenuDpsSalSup.addSeparator();
         jmMenuDpsSalSup.add(jmiDpsSalSupplied);
         jmMenuDpsSalSup.add(jmiDpsSalSuppliedEntry);
         jmMenuDpsSalSup.addSeparator();
-        jmMenuDpsSalSup.add(jmiDpsSalOrderSupplies);
+        //jmMenuDpsSalSup.add(jmiDpsSalOrderSupplies);
         jmiDpsSalSupplyPend.addActionListener(this);
         jmiDpsSalSupplyPendEntry.addActionListener(this);
         jmiDpsSalSupplied.addActionListener(this);
         jmiDpsSalSuppliedEntry.addActionListener(this);
-        jmiDpsSalOrderSupplies.addActionListener(this);
+        //jmiDpsSalOrderSupplies.addActionListener(this);
 
         jmMenuDpsSalRet = new JMenu("Devoluciones ventas");
         jmiDpsSalReturnPend = new JMenuItem("Ventas por devolver");
