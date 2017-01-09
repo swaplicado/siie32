@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -81,16 +82,16 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
         jlTax = new javax.swing.JLabel();
         moKeyTax = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel9 = new javax.swing.JPanel();
-        moRadFilterTypeDateCut = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadFilterTypeYear = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadFilterTypeDateCut = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel26 = new javax.swing.JPanel();
         jlTaxSubsidy = new javax.swing.JLabel();
         moKeyTaxSubsidy = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel27 = new javax.swing.JPanel();
-        jlDateCut = new javax.swing.JLabel();
-        moDateDateCut = new sa.lib.gui.bean.SBeanFieldDate();
         jlYear = new javax.swing.JLabel();
         moCalYear = new sa.lib.gui.bean.SBeanFieldCalendarYear();
+        jlDateCut = new javax.swing.JLabel();
+        moDateDateCut = new sa.lib.gui.bean.SBeanFieldDate();
         jPanel28 = new javax.swing.JPanel();
         jbCalculate = new javax.swing.JButton();
         jbClean = new javax.swing.JButton();
@@ -129,16 +130,16 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        moGrpTypeDate.add(moRadFilterTypeDateCut);
-        moRadFilterTypeDateCut.setSelected(true);
-        moRadFilterTypeDateCut.setText("Por fecha de corte");
-        moRadFilterTypeDateCut.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel9.add(moRadFilterTypeDateCut);
-
         moGrpTypeDate.add(moRadFilterTypeYear);
+        moRadFilterTypeYear.setSelected(true);
         moRadFilterTypeYear.setText("Por ejercicio");
         moRadFilterTypeYear.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel9.add(moRadFilterTypeYear);
+
+        moGrpTypeDate.add(moRadFilterTypeDateCut);
+        moRadFilterTypeDateCut.setText("Por fecha de corte");
+        moRadFilterTypeDateCut.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel9.add(moRadFilterTypeDateCut);
 
         jPanel13.add(jPanel9);
 
@@ -155,15 +156,15 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
 
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateCut.setText("Fecha corte:");
-        jlDateCut.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel27.add(jlDateCut);
-        jPanel27.add(moDateDateCut);
-
         jlYear.setText("Ejercicio:");
         jlYear.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel27.add(jlYear);
         jPanel27.add(moCalYear);
+
+        jlDateCut.setText("Fecha corte:");
+        jlDateCut.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel27.add(jlDateCut);
+        jPanel27.add(moDateDateCut);
 
         jPanel13.add(jPanel27);
 
@@ -370,7 +371,7 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
         try {
             statement = miClient.getSession().getDatabase().getConnection().createStatement();
             
-            mtDateStart = SLibTimeUtils.getBeginOfYear(moDateDateCut.getValue());
+            mtDateStart = SLibTimeUtils.createDate(moCalYear.getValue(), 1, 1);
             mtDateEnd = moDateDateCut.getValue();
             periodYear = moCalYear.getValue();
             
@@ -467,9 +468,29 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
         SGuiValidation validation = moFields.validateFields();
         
         if (validation.isValid()) {
-            if (Math.abs(moCalYear.getValue() - SLibTimeUtils.digestYear(moDateDateCut.getValue())[0]) > 1) {
+            if (SLibTimeUtils.digestYear(moDateDateCut.getValue())[0] < moCalYear.getValue()) {
+                validation.setMessage("El año del campo '" + SGuiUtils.getLabelName(jlDateCut) + "' debe ser mayor o igual al campo '" + SGuiUtils.getLabelName(jlYear) + "'.");
+                validation.setComponent(moDateDateCut);
+            }
+            else if (SLibTimeUtils.digestYear(moDateDateCut.getValue())[0] - moCalYear.getValue() > 1) {
                 validation.setMessage("La diferencia entre el año del campo '" + SGuiUtils.getLabelName(jlDateCut) + "' y el campo '" + SGuiUtils.getLabelName(jlYear) + "' no puede ser mayor a 1.");
                 validation.setComponent(moDateDateCut);
+            }
+            
+            if (validation.isValid() && moRadFilterTypeDateCut.isSelected()) {
+                int diffDays = (int) SLibTimeUtils.getDaysDiff(moDateDateCut.getValue(), SLibTimeUtils.createDate(moCalYear.getValue(), 12, 31));
+                
+                if (diffDays > 6) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlDateCut) + "'.");
+                    validation.setComponent(moDateDateCut);
+                }
+                
+                if (validation.isValid() && SLibTimeUtils.digestYear(moDateDateCut.getValue())[0] != moCalYear.getValue()) {
+                    if (miClient.showMsgBoxConfirm("Los días gravables de acuerdo a la fecha de corte son mayores a " + (SLibTimeUtils.isLeapYear(moCalYear.getValue()) ? SHrsConsts.YEAR_DAYS + 1 : SHrsConsts.YEAR_DAYS) + " que tiene el ejercicio especificado, el calculo se verá afectado.\n " + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlDateCut) + "'.");
+                        validation.setComponent(moDateDateCut);
+                    }
+                }
             }
         }
         
