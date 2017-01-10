@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda
  */
 public abstract class SDataConstants {
 
@@ -478,6 +478,7 @@ public abstract class SDataConstants {
     public static final int TRNX_DPS_SUPPLY_PEND_ETY = 207542;
     public static final int TRNX_DPS_SUPPLIED = 207543;
     public static final int TRNX_DPS_SUPPLIED_ETY = 207544;
+    public static final int TRNX_DPS_SUPPLIED_ORDER = 207545; // order whit supplied movements
 
     public static final int TRNX_DPS_RETURN_PEND = 207551;
     public static final int TRNX_DPS_RETURN_PEND_ETY = 207552;
@@ -526,7 +527,7 @@ public abstract class SDataConstants {
     public static final int TRNX_DPS_ACT_ANNUL = 207611;
     public static final int TRNX_DPS_ACT_RISS = 207612;
     public static final int TRNX_DPS_ACT_REPL = 207613;
-    public static final int TRNX_DPS_ACT_VIEW_LINKS = 207614;
+    public static final int TRNX_DPS_ACT_VIEW_LINKS = 207614;   
     // XXX
 
     public static final int TRNX_MFG_ORD = 207620;
@@ -657,6 +658,7 @@ public abstract class SDataConstants {
     public static final java.lang.String MSG_ERR_DATA_NOT_FOUND = "El tipo de registro no existe.";
     
     public static final HashMap<Integer, String> TablesMap = new HashMap<Integer, String>();
+    
 
     static {
         TablesMap.put(CFGS_CT_ENT, "erp.cfgs_ct_ent");

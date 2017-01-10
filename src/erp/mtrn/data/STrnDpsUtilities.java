@@ -15,18 +15,18 @@ import java.sql.ResultSet;
 public abstract class STrnDpsUtilities {
  
     /**
-     * Obtein total amount supplied in DIOG's.
+     * Obtain total quantity supplied for a DPS in inventory.
      * @param client GUI client.
      * @param entryKey Entry key.
-     * @return totalSupplied Total amount supplied in DIOG's.
+     * @return Total quantity supplied in inventory movements
      * @throws Exception
      */
-    public static double obtainEtyTotalSupplied(final SClientInterface client, final int[] entryKey) throws Exception {
+    public static double obtainEntryTotalQuantitySupplied(final SClientInterface client, final int[] entryKey) throws Exception {
         String sql = "";
         ResultSet resulSet = null;
         double totalSupplied = 0;
 
-        sql = "SELECT SUM(orig_qty) as tot_qty_sup FROM trn_diog_ety AS de WHERE fid_dps_year_n = " + entryKey[0] + " AND fid_dps_doc_n = " + entryKey[1] + " AND fid_dps_ety_n = " + entryKey[2] + " ";
+        sql = "SELECT SUM(orig_qty) as tot_qty_sup FROM trn_diog_ety AS de WHERE b_del = 0 AND fid_dps_year_n = " + entryKey[0] + " AND fid_dps_doc_n = " + entryKey[1] + " AND fid_dps_ety_n = " + entryKey[2] + " ";
 
         resulSet = client.getSession().getStatement().executeQuery(sql);
         if (resulSet.next()) {
@@ -34,5 +34,21 @@ public abstract class STrnDpsUtilities {
         }
 
         return totalSupplied;
+    }
+    
+    /**
+     * Verify is a DPS is an order and if it has any inventory document
+     * @param client
+     * @param dps
+     * @param entry
+     * @return 
+     * @throws Exception 
+     */
+    public static boolean IsSourceOrderSupplied(final SClientInterface client, final SDataDps dps, final SDataDpsEntry entry) throws Exception {
+        double totalQtySupplied = 0;    
+        
+        totalQtySupplied = obtainEntryTotalQuantitySupplied(client, new int[] { entry.getPkYearId(), entry.getPkDocId(), entry.getPkEntryId() });
+       
+        return dps.isOrder() && totalQtySupplied > 0;
     }
 }

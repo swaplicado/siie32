@@ -401,7 +401,6 @@ public abstract class SModConsts {
     public static final int TRNX_DPS_CON_SEND = 2024002;    // document send
     public static final int TRNX_STK_WAH = 2024003;         // stock by warehouse
     public static final int TRNX_STK_DIOG_TP = 2024004;     // stock-document type
-    public static final int TRNX_DPS_ORDER_SUP = 2024005;   //order whit supplied movements
     public static final int TRNX_STK_COST = 2024049;        // stock cost
     public static final int TRNX_ORD_LIM_MAX = 2024051;       // operations control
     public static final int TRNX_BP_BAL_CUR = 2024052;       // operations control

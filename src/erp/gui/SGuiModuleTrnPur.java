@@ -57,7 +57,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda
  */
 public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -125,7 +125,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiStkDvySuppliedEntry;
     private javax.swing.JMenuItem jmiStkDvyDiog;
     private javax.swing.JMenuItem jmiStkDvyStatsConsumption;
-    private javax.swing.JMenuItem jmiStkDvyOrderSupplies;
+    private javax.swing.JMenuItem jmiStkDvyOrderSupply;
     private javax.swing.JMenu jmStkRet;
     private javax.swing.JMenuItem jmiStkRetPending;
     private javax.swing.JMenuItem jmiStkRetPendingEntry;
@@ -370,20 +370,20 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkDvyPendEntry = new JMenuItem("Compras por surtir a detalle");
         jmiStkDvySupplied = new JMenuItem("Compras surtidas");
         jmiStkDvySuppliedEntry = new JMenuItem("Compras surtidas a detalle");
+        jmiStkDvyOrderSupply = new JMenuItem("Pedidos de compras con surtidos");
         jmiStkDvyDiog = new JMenuItem("Documentos de surtidos de compras");
         jmiStkDvyStatsConsumption = new JMenuItem("Estadísticas de consumo de compras");
-        //jmiStkDvyOrderSupplies = new JMenuItem("Pedidos de compras con surtidos");
         jmStkDvy.add(jmiStkDvyPend);
         jmStkDvy.add(jmiStkDvyPendEntry);
         jmStkDvy.addSeparator();
         jmStkDvy.add(jmiStkDvySupplied);
         jmStkDvy.add(jmiStkDvySuppliedEntry);
         jmStkDvy.addSeparator();
+        jmStkDvy.add(jmiStkDvyOrderSupply);
+        jmStkDvy.addSeparator();
         jmStkDvy.add(jmiStkDvyDiog);
         jmStkDvy.addSeparator();
         jmStkDvy.add(jmiStkDvyStatsConsumption);
-        //jmStkDvy.addSeparator();
-        //jmStkDvy.add(jmiStkDvyOrderSupplies);
         
         jmStkRet = new JMenu("Devoluciones");
         jmiStkRetPending = new JMenuItem("Compras por devolver");
@@ -588,7 +588,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkDvySuppliedEntry.addActionListener(this);
         jmiStkDvyDiog.addActionListener(this);
         jmiStkDvyStatsConsumption.addActionListener(this);
-        //jmiStkDvyOrderSupplies.addActionListener(this);
+        jmiStkDvyOrderSupply.addActionListener(this);
         jmiStkRetPending.addActionListener(this);
         jmiStkRetPendingEntry.addActionListener(this);
         jmiStkRetReturned.addActionListener(this);
@@ -703,7 +703,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkDvySuppliedEntry.setEnabled(hasRightInventoryIn);
         jmiStkDvyDiog.setEnabled(hasRightInventoryIn);
         jmiStkDvyStatsConsumption.setEnabled(hasRightInventoryIn);
-        //jmiStkDvyOrderSupplies.setEnabled(hasRightInventoryIn);
+        jmiStkDvyOrderSupply.setEnabled(hasRightInventoryIn);
 
         jmStkRet.setEnabled(hasRightInventoryOut);
         jmiStkRetPending.setEnabled(hasRightInventoryOut);
@@ -1435,8 +1435,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiStkDvyStatsConsumption) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_STK_COMSUME, SDataConstantsSys.TRNS_CT_DPS_PUR);
             }
-            else if (item == jmiStkDvyOrderSupplies) {
-                miClient.getSession().showView(SModConsts.TRNX_DPS_ORDER_SUP, SDataConstantsSys.TRNS_CT_DPS_PUR, new SGuiParams(SDataConstantsSys.UNDEFINED));
+            else if (item == jmiStkDvyOrderSupply) {
+                miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_SUPPLIED_ORDER, SDataConstantsSys.TRNS_CT_DPS_PUR);
             }
             else if (item == jmiStkRetPending) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_RETURN_PEND, SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[0], SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[1]);

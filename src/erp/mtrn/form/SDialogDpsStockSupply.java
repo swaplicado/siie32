@@ -37,7 +37,7 @@ import javax.swing.event.ListSelectionListener;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda
  */
 public class SDialogDpsStockSupply extends javax.swing.JDialog implements ActionListener, ListSelectionListener {
 
@@ -831,14 +831,14 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
                         "ge.id_year = g.id_year AND ge.id_doc = g.id_doc AND " +
                         "ge.b_del = 0 AND g.b_del = 0 AND " +
                         "NOT (g.id_year = " + moParamDiog.getPkYearId() + " AND g.id_doc = " + moParamDiog.getPkDocId() + ")), 0) AS f_sup_orig_qty, " + 
-                        "(SELECT COALESCE(SUM(dds.qty), 0) FROM trn_dps_dps_supply AS dds " +
+                        "COALESCE((SELECT SUM(dds.qty) FROM trn_dps_dps_supply AS dds " +
                         "INNER JOIN trn_dps AS dd ON dds.id_des_year = dd.id_year AND dds.id_des_doc = dd.id_doc AND dd.b_del = false AND dd.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " +
                         "INNER JOIN trn_dps_ety AS dde ON dds.id_des_year = dde.id_year AND dds.id_des_doc = dde.id_doc AND dds.id_des_ety = dde.id_ety AND dde.b_del = false " +
-                        "WHERE de.id_year = dds.id_src_year AND de.id_doc = dds.id_src_doc AND de.id_ety = dds.id_src_ety) AS f_link_qty, " +
-                        "(SELECT COALESCE(SUM(dds.orig_qty), 0) FROM trn_dps_dps_supply AS dds " +
+                        "WHERE de.id_year = dds.id_src_year AND de.id_doc = dds.id_src_doc AND de.id_ety = dds.id_src_ety), 0) AS f_link_qty, " +
+                        "COALESCE((SELECT SUM(dds.orig_qty) FROM trn_dps_dps_supply AS dds " +
                         "INNER JOIN trn_dps AS dd ON dds.id_des_year = dd.id_year AND dds.id_des_doc = dd.id_doc AND dd.b_del = false AND dd.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " +
                         "INNER JOIN trn_dps_ety AS dde ON dds.id_des_year = dde.id_year AND dds.id_des_doc = dde.id_doc AND dds.id_des_ety = dde.id_ety AND dde.b_del = false " +
-                        "WHERE de.id_year = dds.id_src_year AND de.id_doc = dds.id_src_doc AND de.id_ety = dds.id_src_ety) AS f_orig_link_qty " +
+                        "WHERE de.id_year = dds.id_src_year AND de.id_doc = dds.id_src_doc AND de.id_ety = dds.id_src_ety), 0)  AS f_orig_link_qty " +
                         "FROM trn_dps AS d " +
                         "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND " +
                         "de.b_del = 0 AND de.b_inv = 1 AND de.qty > 0 AND de.orig_qty > 0 AND " +
