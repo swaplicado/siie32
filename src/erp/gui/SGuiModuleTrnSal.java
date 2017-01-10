@@ -69,7 +69,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda
  */
 public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -155,7 +155,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiStkDvySuppliedEntry;
     private javax.swing.JMenuItem jmiStkDvyDiog;
     private javax.swing.JMenuItem jmiStkDvyStatsConsumption;
-    private javax.swing.JMenuItem jmiStkDvyOrderSupplies;
+    private javax.swing.JMenuItem jmiStkDvyOrderSupply;
     private javax.swing.JMenu jmStkRet;
     private javax.swing.JMenuItem jmiStkRetPending;
     private javax.swing.JMenuItem jmiStkRetPendingEntry;
@@ -445,21 +445,21 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkDvyPendEntry = new JMenuItem("Ventas por surtir a detalle");
         jmiStkDvySupplied = new JMenuItem("Ventas surtidas");
         jmiStkDvySuppliedEntry = new JMenuItem("Ventas surtidas a detalle");
+        jmiStkDvyOrderSupply = new JMenuItem("Pedidos de ventas con surtidos");
         jmiStkDvyDiog = new JMenuItem("Documentos de surtidos de ventas");
-        jmiStkDvyStatsConsumption = new JMenuItem("Estadísticas de consumo de ventas");
-        jmiStkDvyOrderSupplies = new JMenuItem("Pedidos de ventas con surtidos");
+        jmiStkDvyStatsConsumption = new JMenuItem("Estadísticas de consumo de ventas");        
         jmStkDvy.add(jmiStkDvyPend);
         jmStkDvy.add(jmiStkDvyPendEntry);
         jmStkDvy.addSeparator();
         jmStkDvy.add(jmiStkDvySupplied);
         jmStkDvy.add(jmiStkDvySuppliedEntry);
         jmStkDvy.addSeparator();
+        jmStkDvy.add(jmiStkDvyOrderSupply);
+        jmStkDvy.addSeparator();
         jmStkDvy.add(jmiStkDvyDiog);
         jmStkDvy.addSeparator();
         jmStkDvy.add(jmiStkDvyStatsConsumption);
-        jmStkDvy.addSeparator();
-        jmStkDvy.add(jmiStkDvyOrderSupplies);
-
+        
         jmStkRet = new JMenu("Devoluciones");
         jmiStkRetPending = new JMenuItem("Ventas por devolver");
         jmiStkRetPendingEntry = new JMenuItem("Ventas por devolver a detalle");
@@ -684,7 +684,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkDvySuppliedEntry.addActionListener(this);
         jmiStkDvyDiog.addActionListener(this);
         jmiStkDvyStatsConsumption.addActionListener(this);
-        jmiStkDvyOrderSupplies.addActionListener(this);
+        jmiStkDvyOrderSupply.addActionListener(this);
         jmiStkRetPending.addActionListener(this);
         jmiStkRetPendingEntry.addActionListener(this);
         jmiStkRetReturned.addActionListener(this);
@@ -814,7 +814,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkDvySuppliedEntry.setEnabled(hasRightInventoryOut);
         jmiStkDvyDiog.setEnabled(hasRightInventoryOut);
         jmiStkDvyStatsConsumption.setEnabled(hasRightInventoryOut);
-        jmiStkDvyOrderSupplies.setEnabled(hasRightInventoryOut);
+        jmiStkDvyOrderSupply.setEnabled(hasRightInventoryOut);
 
         jmStkRet.setEnabled(hasRightInventoryIn);
         jmiStkRetPending.setEnabled(hasRightInventoryIn);
@@ -1703,8 +1703,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiStkDvyStatsConsumption) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_STK_COMSUME, SDataConstantsSys.TRNS_CT_DPS_SAL);
             }
-            else if (item == jmiStkDvyOrderSupplies) {
-                miClient.getSession().showView(SModConsts.TRNX_DPS_ORDER_SUP, SDataConstantsSys.TRNS_CT_DPS_SAL, new SGuiParams(SDataConstantsSys.UNDEFINED));
+            else if (item == jmiStkDvyOrderSupply) {
+                miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_SUPPLIED_ORDER, SDataConstantsSys.TRNS_CT_DPS_SAL);
             }
             else if (item == jmiStkRetPending) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_RETURN_PEND, SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ[0], SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ[1]);

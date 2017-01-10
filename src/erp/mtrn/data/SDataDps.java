@@ -3144,7 +3144,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 name = entry.getConcept();
                             }
                             else {
-                                sql = "SELECT item, b_pre_pay FROM erp.itmu_item WHERE id_item = " + entry.getFkItemRefId_n() + " ";
+                                sql = "SELECT item FROM erp.itmu_item WHERE id_item = " + entry.getFkItemRefId_n() + " ";
                                 resultSet = statement.executeQuery(sql);
                                 if (!resultSet.next()) {
                                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);

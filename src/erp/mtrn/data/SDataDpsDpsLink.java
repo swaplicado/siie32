@@ -6,7 +6,6 @@
 package erp.mtrn.data;
 
 import erp.data.SDataConstants;
-import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import java.sql.CallableStatement;
@@ -14,7 +13,7 @@ import java.sql.ResultSet;
 
 /**
  *
- * @author Sergio Flores, Alfonso Flores
+ * @author Sergio Flores, Alfonso Flores, Uriel Castañeda
  */
 public class SDataDpsDpsLink extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -34,9 +33,10 @@ public class SDataDpsDpsLink extends erp.lib.data.SDataRegistry implements java.
     protected int mnDbmsFkDestinyStatusId;
     protected boolean mbDbmsIsSourceDeleted;
     protected boolean mbDbmsIsSourceEntryDeleted;
+    protected boolean mbDbmsIsSourceOrderSupplied;
     protected boolean mbDbmsIsDestinyDeleted;
     protected boolean mbDbmsIsDestinyEntryDeleted;
-    protected boolean mbDbmsIsSouceOrderSupplied;
+    protected boolean mbDbmsIsDestinyOrderSupplied;
 
     /**
      * Overrides java.lang.Object.clone() function.
@@ -76,9 +76,10 @@ public class SDataDpsDpsLink extends erp.lib.data.SDataRegistry implements java.
     public void setDbmsFkDestinyStatusId(int n) { mnDbmsFkDestinyStatusId = n; }
     public void setDbmsIsSourceDeleted(boolean b) { mbDbmsIsSourceDeleted = b; }
     public void setDbmsIsSourceEntryDeleted(boolean b) { mbDbmsIsSourceEntryDeleted = b; }
+    public void setDbmsIsSouceOrderSupplied(boolean b) { mbDbmsIsSourceOrderSupplied = b; }
     public void setDbmsIsDestinyDeleted(boolean b) { mbDbmsIsDestinyDeleted = b; }
     public void setDbmsIsDestinyEntryDeleted(boolean b) { mbDbmsIsDestinyEntryDeleted = b; }
-    public void setDbmsIsSouceOrderSupplied(boolean b) { mbDbmsIsSouceOrderSupplied = b; }
+    public void setDbmsIsDestinyOrderSupplied(boolean b) { mbDbmsIsDestinyOrderSupplied = b; }
     
     public java.util.Date getAuxSourceTimestamp() { return mtAuxSourceTimestamp; }
     public java.util.Date getAuxDestinyTimestamp() { return mtAuxDestinyTimestamp; }
@@ -87,9 +88,10 @@ public class SDataDpsDpsLink extends erp.lib.data.SDataRegistry implements java.
     public int getDbmsFkDestinyStatusId() { return mnDbmsFkDestinyStatusId; }
     public boolean getDbmsIsSourceDeleted() { return mbDbmsIsSourceDeleted; }
     public boolean getDbmsIsSourceEntryDeleted() { return mbDbmsIsSourceEntryDeleted; }
+    public boolean getDbmsIsSourceOrderSupplied() { return mbDbmsIsSourceOrderSupplied; }
     public boolean getDbmsIsDestinyDeleted() { return mbDbmsIsDestinyDeleted; }
     public boolean getDbmsIsDestinyEntryDeleted() { return mbDbmsIsDestinyEntryDeleted; }
-    public boolean getDbmsIsSourceOrderSupplied() { return mbDbmsIsSouceOrderSupplied; }
+    public boolean getDbmsIsDestinyOrderSupplied() { return mbDbmsIsDestinyOrderSupplied; }
     
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -128,7 +130,7 @@ public class SDataDpsDpsLink extends erp.lib.data.SDataRegistry implements java.
         mbDbmsIsSourceEntryDeleted = false;
         mbDbmsIsDestinyDeleted = false;
         mbDbmsIsDestinyEntryDeleted = false;
-        mbDbmsIsSouceOrderSupplied = false;
+        mbDbmsIsSourceOrderSupplied = false;
     }
 
     @Override
@@ -161,7 +163,7 @@ public class SDataDpsDpsLink extends erp.lib.data.SDataRegistry implements java.
 
                 // Read aswell related documents information:
 
-                sql = "SELECT b_del, fid_st_dps, fid_ct_dps, fid_cl_dps FROM trn_dps " +
+                sql = "SELECT b_del, fid_st_dps FROM trn_dps " +
                         "WHERE id_year = " + mnPkSourceYearId + " AND id_doc = " + mnPkSourceDocId + " ";
 
                 resultSet = statement.executeQuery(sql);
@@ -171,8 +173,6 @@ public class SDataDpsDpsLink extends erp.lib.data.SDataRegistry implements java.
                 else {
                     mnDbmsFkSourceStatusId = resultSet.getInt("fid_st_dps");
                     mbDbmsIsSourceDeleted = resultSet.getBoolean("b_del");
-                    mbDbmsIsSouceOrderSupplied = SLibUtilities.compareKeys(new int[] {resultSet.getInt("fid_ct_dps"),resultSet.getInt("fid_cl_dps")}, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD) ||
-                                         SLibUtilities.compareKeys(new int[] {resultSet.getInt("fid_ct_dps"),resultSet.getInt("fid_cl_dps")}, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD) ;
                 }
 
                 sql = "SELECT b_del, fid_st_dps FROM trn_dps " +

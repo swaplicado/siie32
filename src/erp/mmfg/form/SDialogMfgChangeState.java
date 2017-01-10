@@ -6,24 +6,22 @@
 
 package erp.mmfg.form;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.Vector;
-import javax.swing.AbstractAction;
-
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.data.SProcConstants;
-import erp.lib.form.SFormComponentItem;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormValidation;
-import erp.lib.form.SFormUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.lib.form.SFormComponentItem;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
 import erp.mmfg.data.SDataProductionOrder;
 import erp.mtrn.data.SDataRawMaterialsConsume;
-import javax.swing.JOptionPane;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.util.Vector;
+import javax.swing.AbstractAction;
 
 /**
  *
@@ -335,7 +333,7 @@ public class SDialogMfgChangeState extends javax.swing.JDialog implements erp.li
                 rawMaterialsConsume = new SDataRawMaterialsConsume();
                 rawMaterialsConsume.setPkYearId(key[0]);
                 rawMaterialsConsume.setPkOrderId(key[1]);
-                rawMaterialsConsume.setDate(miClient.getSessionXXX().getSystemDate());
+                rawMaterialsConsume.setDate(miClient.getSessionXXX().getWorkingDate());
                 rawMaterialsConsume.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
                 SDataUtilities.saveRegistry(miClient, rawMaterialsConsume);
 

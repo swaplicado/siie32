@@ -308,7 +308,8 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         }
 
         if (mnTabTypeAux01 == SDataConstants.BPSX_BP_EMP) {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "e.ssn", "NSS", 100);
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "e.ssn", "NSS", 100);
+            aoTableColumns[i++].setApostropheOnCsvRequired(true);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "e.b_mfg_ope", "Operador", STableConstants.WIDTH_BOOLEAN_2X);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "e.b_act", "Activo", STableConstants.WIDTH_BOOLEAN_2X);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "e.b_uni", "Sindicalizado", STableConstants.WIDTH_BOOLEAN_2X);
@@ -335,7 +336,8 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "risk.name", "Riesgo trabajo", 100);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "mwz.name", "Área geográfica", 100);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bank.name", "Banco", 100);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "e.bank_acc", "Cuenta bancaria", 100);
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "e.bank_acc", "Cuenta bancaria", 100);
+            aoTableColumns[i++].setApostropheOnCsvRequired(true);
         }
 
         if (mnTabTypeAux01 != SDataConstants.BPSU_BP && mnTabTypeAux01 != SDataConstants.BPSX_BP_ATT_SAL_AGT && mnTabTypeAux01 != SDataConstants.BPSX_BP_EMP &&

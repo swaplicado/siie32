@@ -95,7 +95,7 @@ public class SHrsPayrollRowEmployeeAvailable implements SGridRow {
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS hpr ON hp.id_pay = hpr.id_pay " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e ON hpr.id_emp = e.id_emp " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON e.id_emp = bp.id_bp " +
-            "WHERE e.b_del = 0 AND hpr.id_pay = " + idPayroll + "  " +
+            "WHERE e.b_del = 0 AND hpr.b_del = 0 AND hpr.id_pay = " + idPayroll + "  " +
             "ORDER BY bp.bp, e.num ";
 
         resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
