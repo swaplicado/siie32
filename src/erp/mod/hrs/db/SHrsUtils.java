@@ -1986,8 +1986,8 @@ public abstract class SHrsUtils {
                 "CASE WHEN emp.fk_bank_n IS NOT NULL THEN emp.fk_bank_n ELSE (SELECT fk_bank FROM hrs_cfg WHERE id_cfg = " + SUtilConsts.BPR_CO_ID + ") END AS f_emp_bank, " +
                 "emp.dt_hire AS f_emp_alta, p.dt_sta AS f_nom_date_start, p.dt_end AS f_nom_date_end, " +
                 "TIMESTAMPDIFF(DAY, emp.dt_ben, p.dt_end) / " + SHrsConsts.WEEK_DAYS + " AS f_emp_sen, pos.name AS f_emp_pos, " +
-                "con.code AS f_emp_cont_tp, '' AS f_emp_jorn_tp, tp.name AS f_emp_pay, rcp.sal_ssc AS f_emp_sal_bc, ris.id_tp_pos_risk AS f_emp_risk, " +
-                "IF(emp.b_uni, 'Si', 'No') AS f_emp_union, " +
+                "con.code AS f_emp_cont_tp, '' AS f_emp_jorn_tp, tp.code AS f_emp_pay, rcp.sal_ssc AS f_emp_sal_bc, ris.id_tp_pos_risk AS f_emp_risk, " +
+                "IF(emp.b_uni, 'Sí', 'No') AS f_emp_union, " +
                 "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
                 "FROM hrs_pay_rcp AS r " +
                 "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
