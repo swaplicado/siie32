@@ -318,7 +318,7 @@ public class SViewOrderSuppliedWithMovs extends erp.lib.table.STableTab implemen
 
     @Override
     public void actionEdit() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+       actionViewDps();
     }
 
     @Override
