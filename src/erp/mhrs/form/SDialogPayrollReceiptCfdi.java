@@ -521,10 +521,6 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
             miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkPaymentSystemTypeId.getText() + "'.");
             jcbFkPaymentSystemTypeId.requestFocus();
         }
-        else if (jcbFkPaymentSystemTypeId.getSelectedIndex() == 1) {
-            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkPaymentSystemTypeId.getText() + "'.");
-            jcbFkPaymentSystemTypeId.requestFocus();
-        }
         else if (moFieldDate.getDate() == null) {
             miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDate.getText() + "'.");
             jtfDate.requestFocus();
@@ -692,7 +688,8 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
         jtfPayrollNotes.setText("");
 
         SFormUtilities.populateComboBox(miClient, jcbFkPaymentSystemTypeId, SDataConstants.TRNU_TP_PAY_SYS);
-        moFieldFkPaymentSystemTypeId.setFieldValue(new int[] { 0 });
+        moFieldFkPaymentSystemTypeId.setFieldValue(new int[] { SDataConstantsSys.TRNU_TP_PAY_SYS_NA });
+        jcbFkPaymentSystemTypeId.setEnabled(false);
         moFieldDate.setDate(miClient.getSession().getCurrentDate());
         moFieldDatePayment.setDate(null);
 

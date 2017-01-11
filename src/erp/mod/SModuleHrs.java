@@ -336,6 +336,13 @@ public class SModuleHrs extends SGuiModule {
                     public String getSqlWhere(int[] pk) { return "WHERE id_tp_pos_risk = " + pk[0] + " "; }
                 };
                 break;
+            case SModConsts.HRSS_TP_WORK_DAY:
+                registry = new SDbRegistrySysFly(type) {
+                    public void initRegistry() { }
+                    public String getSqlTable() { return SModConsts.TablesMap.get(mnRegistryType); }
+                    public String getSqlWhere(int[] pk) { return "WHERE id_tp_work_day = " + pk[0] + " "; }
+                };
+                break;
             case SModConsts.HRSS_BANK:
                 registry = new SDbRegistrySysFly(type) {
                     public void initRegistry() { }
@@ -577,6 +584,11 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRSS_TP_POS_RISK:
                 settings = new SGuiCatalogueSettings("Riesgo trabajo", 1);
                 sql = "SELECT id_tp_pos_risk AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
+                break;
+            case SModConsts.HRSS_TP_WORK_DAY:
+                settings = new SGuiCatalogueSettings("Tipo jornada", 1);
+                sql = "SELECT id_tp_work_day AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
                 break;
             case SModConsts.HRSS_BANK:

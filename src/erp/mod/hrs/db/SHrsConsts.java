@@ -63,6 +63,8 @@ public class SHrsConsts {
     
     public static final String TXT_UNI_NO = "No";
     public static final String TXT_UNI_YES = "Sí";
+    
+    public static final String TXT_CON_DESC = "Pago de nómina";
 
     public static final String ERR_PERIOD_DATE_INVALID = "Fecha inválida en el período.";
 }

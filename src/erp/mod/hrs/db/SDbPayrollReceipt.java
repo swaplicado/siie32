@@ -22,7 +22,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Juan Barajas
  */
 public class SDbPayrollReceipt extends SDbRegistryUser {
 
@@ -83,6 +83,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     protected int mnFkContractTypeId;
     protected int mnFkRecruitmentSchemeTypeId;
     protected int mnFkPositionRiskTypeId;
+    protected int mnFkWorkingDayTypeId;
     /*
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
@@ -296,6 +297,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public void setFkContractTypeId(int n) { mnFkContractTypeId = n; }
     public void setFkRecruitmentSchemeTypeId(int n) { mnFkRecruitmentSchemeTypeId = n; }
     public void setFkPositionRiskTypeId(int n) { mnFkPositionRiskTypeId = n; }
+    public void setFkWorkingDayTypeId(int n) { mnFkWorkingDayTypeId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
@@ -362,6 +364,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public int getFkContractTypeId() { return mnFkContractTypeId; }
     public int getFkRecruitmentSchemeTypeId() { return mnFkRecruitmentSchemeTypeId; }
     public int getFkPositionRiskTypeId() { return mnFkPositionRiskTypeId; }
+    public int getFkWorkingDayTypeId() { return mnFkWorkingDayTypeId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
@@ -450,6 +453,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         mnFkContractTypeId = 0;
         mnFkRecruitmentSchemeTypeId = 0;
         mnFkPositionRiskTypeId = 0;
+        mnFkWorkingDayTypeId = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
@@ -560,6 +564,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
             mnFkContractTypeId = resultSet.getInt("fk_tp_con");
             mnFkRecruitmentSchemeTypeId = resultSet.getInt("fk_tp_rec_sche");
             mnFkPositionRiskTypeId = resultSet.getInt("fk_tp_pos_risk");
+            mnFkWorkingDayTypeId = resultSet.getInt("fk_tp_work_day");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
@@ -726,6 +731,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
                     mnFkContractTypeId + ", " + 
                     mnFkRecruitmentSchemeTypeId + ", " + 
                     mnFkPositionRiskTypeId + ", " +
+                    mnFkWorkingDayTypeId + ", " + 
                     mnFkUserInsertId + ", " +
                     mnFkUserUpdateId + ", " +
                     "NOW()" + ", " +
@@ -797,6 +803,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
                     "fk_tp_con = " + mnFkContractTypeId + ", " +
                     "fk_tp_rec_sche = " + mnFkRecruitmentSchemeTypeId + ", " +
                     "fk_tp_pos_risk = " + mnFkPositionRiskTypeId + ", " +
+                    "fk_tp_work_day = " + mnFkWorkingDayTypeId + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                     //"ts_usr_ins = " + "NOW()" + ", " +
@@ -905,6 +912,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         registry.setFkContractTypeId(this.getFkContractTypeId());
         registry.setFkRecruitmentSchemeTypeId(this.getFkRecruitmentSchemeTypeId());
         registry.setFkPositionRiskTypeId(this.getFkPositionRiskTypeId());
+        registry.setFkWorkingDayTypeId(this.getFkWorkingDayTypeId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());
@@ -1001,6 +1009,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
             registryDummy.setFkContractTypeId(SModSysConsts.HRSS_TP_CON_OTH);
             registryDummy.setFkRecruitmentSchemeTypeId(SModSysConsts.HRSS_TP_REC_SCHE_WAG);
             registryDummy.setFkPositionRiskTypeId(SModSysConsts.HRSS_TP_POS_RISK_CL1);
+            registryDummy.setFkWorkingDayTypeId(SModSysConsts.HRSS_TP_WORK_DAY_DIU);
 
             registryDummy.save(session);
         }

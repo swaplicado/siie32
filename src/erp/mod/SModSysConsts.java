@@ -814,12 +814,16 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_EAR_EXEM_WCB_SEN = 43;  // Wage Contribution Base Seniority
 
     public static final int HRSS_TP_EAR_EAR = 1;        // Earnings
+    public static final int HRSS_TP_EAR_DIS = 14;       // Disability
     public static final int HRSS_TP_EAR_TAX_SUB = 17;   // Tax
     public static final int HRSS_TP_EAR_OVR_TME = 19;   // Overtime
+    public static final int HRSS_TP_EAR_SEN_BON = 22;   // Seniority bonus 
+    public static final int HRSS_TP_EAR_SET = 23;   // Payment by settlement
+    public static final int HRSS_TP_EAR_CMP = 25;       // Compensation
 
-    public static final int HRSS_TP_OTH_PAY_TAX_REF = 1; // Tax Refund
-    public static final int HRSS_TP_OTH_PAY_TAX_SUB = 2; // Tax Subsidy
-    public static final int HRSS_TP_OTH_PAY_TRV_EXP = 3; // Travel Expenses
+    public static final int HRSS_TP_OTH_PAY_TAX_REF = 1;    // Tax Refund
+    public static final int HRSS_TP_OTH_PAY_TAX_SUB = 2;    // Tax Subsidy
+    public static final int HRSS_TP_OTH_PAY_TRV_EXP = 3;    // Travel Expenses
 
     public static final int HRSS_TP_DED_COMP_AMT = 1;       // Amount
     public static final int HRSS_TP_DED_COMP_DAY = 2;       // Days
@@ -833,6 +837,7 @@ public abstract class SModSysConsts {
 
     public static final int HRSS_TP_DED_SSC = 1;    // Social Security
     public static final int HRSS_TP_DED_TAX = 2;    // Tax
+    public static final int HRSS_TP_DED_DIS = 6;    // Disability
 
     public static final int HRSS_TP_BEN_NON = 1;        // Non applicable
     public static final int HRSS_TP_BEN_ANN_BON = 11;   // Annual bonus
@@ -870,6 +875,8 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_POS_RISK_CL4 = 4; // Class IV
     public static final int HRSS_TP_POS_RISK_CL5 = 5; // Class V
 
+    public static final int HRSS_TP_WORK_DAY_DIU = 1; // Diurnal
+    
     public static final int HRSS_TP_DIS_RSK = 1; // Risk
     public static final int HRSS_TP_DIS_DIS = 2; // Disease
     public static final int HRSS_TP_DIS_MAT = 3; // Maternity

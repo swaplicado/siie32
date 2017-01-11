@@ -1058,7 +1058,7 @@ public class SHrsPayroll {
         payrollReceipt.setFkContractTypeId(hrsEmployee.getEmployee().getFkContractTypeId());
         payrollReceipt.setFkRecruitmentSchemeTypeId(hrsEmployee.getEmployee().getFkRecruitmentSchemeTypeId());
         payrollReceipt.setFkPositionRiskTypeId(hrsEmployee.getEmployee().getFkPositionRiskTypeId());
-        //payrollReceipt.setFkBankId_n(hrsEmployee.getEmployee().getFkBankId_n()); XXX (jbarajas, 2015-10-07) remove by new table
+        payrollReceipt.setFkWorkingDayTypeId(hrsEmployee.getEmployee().getFkWorkingDayTypeId());
         payrollReceipt.setActive(hrsEmployee.getEmployee().isActive());
         hrsEmployee.getHrsPayrollReceipt().setReceipt(payrollReceipt);
         hrsEmployee.getHrsPayrollReceipt().setHrsPayroll(this);

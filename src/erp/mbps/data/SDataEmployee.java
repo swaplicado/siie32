@@ -74,6 +74,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     protected int mnFkContractTypeId;
     protected int mnFkRecruitmentSchemeTypeId;
     protected int mnFkPositionRiskTypeId;
+    protected int mnFkWorkingDayTypeId;
     protected int mnFkCatalogueSexCategoryId;
     protected int mnFkCatalogueSexTypeId;
     protected int mnFkCatalogueBloodTypeCategoryId;
@@ -328,6 +329,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public void setFkContractTypeId(int n) { mnFkContractTypeId = n; }
     public void setFkRecruitmentSchemeTypeId(int n) { mnFkRecruitmentSchemeTypeId = n; }
     public void setFkPositionRiskTypeId(int n) { mnFkPositionRiskTypeId = n; }
+    public void setFkWorkingDayTypeId(int n) { mnFkWorkingDayTypeId = n; }
     public void setFkCatalogueSexCategoryId(int n) { mnFkCatalogueSexCategoryId = n; }
     public void setFkCatalogueSexTypeId(int n) { mnFkCatalogueSexTypeId = n; }
     public void setFkCatalogueBloodTypeCategoryId(int n) { mnFkCatalogueBloodTypeCategoryId = n; }
@@ -385,6 +387,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public int getFkContractTypeId() { return mnFkContractTypeId; }
     public int getFkRecruitmentSchemeTypeId() { return mnFkRecruitmentSchemeTypeId; }
     public int getFkPositionRiskTypeId() { return mnFkPositionRiskTypeId; }
+    public int getFkWorkingDayTypeId() { return mnFkWorkingDayTypeId; }
     public int getFkCatalogueSexCategoryId() { return mnFkCatalogueSexCategoryId; }
     public int getFkCatalogueSexTypeId() { return mnFkCatalogueSexTypeId; }
     public int getFkCatalogueBloodTypeCategoryId() { return mnFkCatalogueBloodTypeCategoryId; }
@@ -456,6 +459,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
         mnFkContractTypeId = 0;
         mnFkRecruitmentSchemeTypeId = 0;
         mnFkPositionRiskTypeId = 0;
+        mnFkWorkingDayTypeId = 0;
         mnFkCatalogueSexCategoryId = 0;
         mnFkCatalogueSexTypeId = 0;
         mnFkCatalogueBloodTypeCategoryId = 0;
@@ -536,6 +540,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 mnFkContractTypeId = resultSet.getInt("fk_tp_con");
                 mnFkRecruitmentSchemeTypeId = resultSet.getInt("fk_tp_rec_sche");
                 mnFkPositionRiskTypeId = resultSet.getInt("fk_tp_pos_risk");
+                mnFkWorkingDayTypeId = resultSet.getInt("fk_tp_work_day");
                 mnFkCatalogueSexCategoryId = resultSet.getInt("fk_cl_cat_sex");
                 mnFkCatalogueSexTypeId = resultSet.getInt("fk_tp_cat_sex");
                 mnFkCatalogueBloodTypeCategoryId = resultSet.getInt("fk_cl_cat_blo");
@@ -630,6 +635,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         mnFkContractTypeId + ", " + 
                         mnFkRecruitmentSchemeTypeId + ", " +
                         mnFkPositionRiskTypeId + ", " +
+                        mnFkWorkingDayTypeId + ", " +
                         mnFkCatalogueSexCategoryId + ", " + 
                         mnFkCatalogueSexTypeId + ", " + 
                         mnFkCatalogueBloodTypeCategoryId + ", " + 
@@ -683,6 +689,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         "fk_tp_con = " + mnFkContractTypeId + ", " +
                         "fk_tp_rec_sche = " + mnFkRecruitmentSchemeTypeId + ", " +
                         "fk_tp_pos_risk = " + mnFkPositionRiskTypeId + ", " +
+                        "fk_tp_work_day = " + mnFkWorkingDayTypeId + ", " +
                         "fk_cl_cat_sex = " + mnFkCatalogueSexCategoryId + ", " +
                         "fk_tp_cat_sex = " + mnFkCatalogueSexTypeId + ", " +
                         "fk_cl_cat_blo = " + mnFkCatalogueBloodTypeCategoryId + ", " +
