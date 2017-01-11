@@ -6,29 +6,28 @@
 
 package erp.mmfg.form;
 
+import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
+import erp.lib.SLibConstants;
+import erp.lib.SLibTimeUtilities;
+import erp.lib.SLibUtilities;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
+import erp.mitm.data.SDataItem;
+import erp.mmfg.data.SDataProductionOrder;
+import erp.mtrn.data.SDataStockLot;
+import erp.mtrn.data.STrnUtilities;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
-import erp.data.SDataConstants;
-import erp.data.SDataConstantsSys;
-import erp.data.SDataUtilities;
-import erp.lib.SLibUtilities;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormValidation;
-import erp.lib.form.SFormUtilities;
-import erp.lib.SLibConstants;
-import erp.lib.SLibTimeUtilities;
-import erp.mitm.data.SDataItem;
-import erp.mmfg.data.SDataProductionOrder;
-import erp.mtrn.data.SDataStockLot;
-import erp.mtrn.data.STrnUtilities;
-
 /**
  *
- * @author  Néstor Ávalos
+ * @author  Néstor Ávalos, Uriel Castañeda
  */
 public class SDialogMfgCreateLot extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -48,7 +47,7 @@ public class SDialogMfgCreateLot extends javax.swing.JDialog implements erp.lib.
 
     private erp.mitm.data.SDataItem moItem;
 
-    /** Creates new form DFormCompany */
+    /** Creates new form SDialogMfgCreateLot */
     public SDialogMfgCreateLot(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
@@ -86,26 +85,27 @@ public class SDialogMfgCreateLot extends javax.swing.JDialog implements erp.lib.
         jlFormula = new javax.swing.JLabel();
         jtfFormula = new javax.swing.JTextField();
         jPanel36 = new javax.swing.JPanel();
+        jlDaysForExpiration = new javax.swing.JLabel();
+        jtfDaysForExpiration = new javax.swing.JTextField();
+        jPanel37 = new javax.swing.JPanel();
         jlQuantity = new javax.swing.JLabel();
         jtfQuantity = new javax.swing.JTextField();
-        jlDummy = new javax.swing.JLabel();
         jtfUnit = new javax.swing.JTextField();
-        jPanel37 = new javax.swing.JPanel();
+        jPanel39 = new javax.swing.JPanel();
         jlDate = new javax.swing.JLabel();
         jtfDate = new javax.swing.JFormattedTextField();
-        jPanel39 = new javax.swing.JPanel();
+        jPanel38 = new javax.swing.JPanel();
         jlNumber = new javax.swing.JLabel();
         jtfNumber = new javax.swing.JTextField();
-        jPanel38 = new javax.swing.JPanel();
+        jPanel41 = new javax.swing.JPanel();
         jlLot = new javax.swing.JLabel();
         jtfLot = new javax.swing.JTextField();
-        jlDummy3 = new javax.swing.JLabel();
-        jtfLotDateExpired = new javax.swing.JFormattedTextField();
-        jlDummy5 = new javax.swing.JLabel();
-        jbDateLotExpired = new javax.swing.JButton();
-        jPanel41 = new javax.swing.JPanel();
-        jlDummy6 = new javax.swing.JLabel();
         jbGenerateLot = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
+        jlLot1 = new javax.swing.JLabel();
+        jtfLotDateExpired = new javax.swing.JFormattedTextField();
+        jbDateLotExpired = new javax.swing.JButton();
+        jbGenerateDateLotExpired = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -125,7 +125,7 @@ public class SDialogMfgCreateLot extends javax.swing.JDialog implements erp.lib.
         jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel8.setLayout(new java.awt.GridLayout(11, 1, 0, 1));
 
-        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlCompanyBranch.setText("Sucursal:");
         jlCompanyBranch.setPreferredSize(new java.awt.Dimension(120, 23));
@@ -140,7 +140,7 @@ public class SDialogMfgCreateLot extends javax.swing.JDialog implements erp.lib.
 
         jPanel8.add(jPanel4);
 
-        jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+        jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlEntity.setText("Planta:");
         jlEntity.setPreferredSize(new java.awt.Dimension(120, 23));
@@ -155,7 +155,7 @@ public class SDialogMfgCreateLot extends javax.swing.JDialog implements erp.lib.
 
         jPanel8.add(jPanel32);
 
-        jPanel33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+        jPanel33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlType.setText("Tipo ord. prod.:");
         jlType.setPreferredSize(new java.awt.Dimension(120, 23));
@@ -170,13 +170,14 @@ public class SDialogMfgCreateLot extends javax.swing.JDialog implements erp.lib.
 
         jPanel8.add(jPanel33);
 
-        jPanel34.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+        jPanel34.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFinishedGood.setText("Producto:");
         jlFinishedGood.setPreferredSize(new java.awt.Dimension(120, 23));
         jPanel34.add(jlFinishedGood);
 
         jtfFinishedGood.setEditable(false);
+        jtfFinishedGood.setHorizontalAlignment(javax.swing.JTextField.LEFT);
         jtfFinishedGood.setText("FINISHED GOOD");
         jtfFinishedGood.setCaretPosition(1);
         jtfFinishedGood.setFocusable(false);
@@ -185,7 +186,7 @@ public class SDialogMfgCreateLot extends javax.swing.JDialog implements erp.lib.
 
         jPanel8.add(jPanel34);
 
-        jPanel35.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+        jPanel35.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFormula.setText("Fórmula:");
         jlFormula.setPreferredSize(new java.awt.Dimension(120, 23));
@@ -200,96 +201,108 @@ public class SDialogMfgCreateLot extends javax.swing.JDialog implements erp.lib.
 
         jPanel8.add(jPanel35);
 
-        jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+        jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlDaysForExpiration.setText("Días anaquel:");
+        jlDaysForExpiration.setPreferredSize(new java.awt.Dimension(120, 23));
+        jPanel36.add(jlDaysForExpiration);
+
+        jtfDaysForExpiration.setEditable(false);
+        jtfDaysForExpiration.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jtfDaysForExpiration.setText("DAYS FOR EXPIRATION");
+        jtfDaysForExpiration.setFocusable(false);
+        jtfDaysForExpiration.setPreferredSize(new java.awt.Dimension(130, 23));
+        jPanel36.add(jtfDaysForExpiration);
+
+        jPanel8.add(jPanel36);
+
+        jPanel37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlQuantity.setText("Cantidad:");
         jlQuantity.setPreferredSize(new java.awt.Dimension(120, 23));
-        jPanel36.add(jlQuantity);
+        jPanel37.add(jlQuantity);
 
         jtfQuantity.setEditable(false);
         jtfQuantity.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jtfQuantity.setText("QUANTITY");
         jtfQuantity.setFocusable(false);
         jtfQuantity.setPreferredSize(new java.awt.Dimension(130, 23));
-        jPanel36.add(jtfQuantity);
-
-        jlDummy.setPreferredSize(new java.awt.Dimension(1, 23));
-        jPanel36.add(jlDummy);
+        jPanel37.add(jtfQuantity);
 
         jtfUnit.setEditable(false);
         jtfUnit.setText("UNIT");
         jtfUnit.setFocusable(false);
         jtfUnit.setPreferredSize(new java.awt.Dimension(40, 23));
-        jPanel36.add(jtfUnit);
+        jPanel37.add(jtfUnit);
 
-        jPanel8.add(jPanel36);
+        jPanel8.add(jPanel37);
 
-        jPanel37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+        jPanel39.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlDate.setText("Fecha ord. prod.:");
         jlDate.setPreferredSize(new java.awt.Dimension(120, 23));
-        jPanel37.add(jlDate);
+        jPanel39.add(jlDate);
 
         jtfDate.setEditable(false);
         jtfDate.setText("DATE");
         jtfDate.setPreferredSize(new java.awt.Dimension(130, 23));
-        jPanel37.add(jtfDate);
+        jPanel39.add(jtfDate);
 
-        jPanel8.add(jPanel37);
+        jPanel8.add(jPanel39);
 
-        jPanel39.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+        jPanel38.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlNumber.setText("Folio:");
         jlNumber.setPreferredSize(new java.awt.Dimension(120, 23));
-        jPanel39.add(jlNumber);
+        jPanel38.add(jlNumber);
 
         jtfNumber.setEditable(false);
         jtfNumber.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jtfNumber.setText("NUMBER");
         jtfNumber.setFocusable(false);
         jtfNumber.setPreferredSize(new java.awt.Dimension(130, 23));
-        jPanel39.add(jtfNumber);
+        jPanel38.add(jtfNumber);
 
-        jPanel8.add(jPanel39);
+        jPanel8.add(jPanel38);
 
-        jPanel38.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+        jPanel41.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlLot.setText("Lote/fecha caducidad: *");
+        jlLot.setText("Lote *");
         jlLot.setPreferredSize(new java.awt.Dimension(120, 23));
-        jPanel38.add(jlLot);
+        jPanel41.add(jlLot);
 
         jtfLot.setText("LOT");
         jtfLot.setPreferredSize(new java.awt.Dimension(130, 23));
-        jPanel38.add(jtfLot);
+        jPanel41.add(jtfLot);
 
-        jlDummy3.setPreferredSize(new java.awt.Dimension(1, 23));
-        jPanel38.add(jlDummy3);
+        jbGenerateLot.setText("Generar lote");
+        jbGenerateLot.setToolTipText("Generar Lote");
+        jbGenerateLot.setPreferredSize(new java.awt.Dimension(103, 23));
+        jPanel41.add(jbGenerateLot);
+
+        jPanel8.add(jPanel41);
+
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlLot1.setText("Fecha caducidad: *");
+        jlLot1.setPreferredSize(new java.awt.Dimension(120, 23));
+        jPanel1.add(jlLot1);
 
         jtfLotDateExpired.setText("DATE EXPIRED");
-        jtfLotDateExpired.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel38.add(jtfLotDateExpired);
-
-        jlDummy5.setPreferredSize(new java.awt.Dimension(1, 23));
-        jPanel38.add(jlDummy5);
+        jtfLotDateExpired.setPreferredSize(new java.awt.Dimension(107, 23));
+        jPanel1.add(jtfLotDateExpired);
 
         jbDateLotExpired.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
         jbDateLotExpired.setToolTipText("Seleccionar fecha de caducidad");
         jbDateLotExpired.setFocusable(false);
         jbDateLotExpired.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel38.add(jbDateLotExpired);
+        jPanel1.add(jbDateLotExpired);
 
-        jPanel8.add(jPanel38);
+        jbGenerateDateLotExpired.setText("Generar fecha");
+        jbGenerateDateLotExpired.setToolTipText("Generar Fecha");
+        jPanel1.add(jbGenerateDateLotExpired);
 
-        jPanel41.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
-
-        jlDummy6.setPreferredSize(new java.awt.Dimension(120, 23));
-        jPanel41.add(jlDummy6);
-
-        jbGenerateLot.setText("Generar Lote");
-        jbGenerateLot.setToolTipText("Generar Lote");
-        jPanel41.add(jbGenerateLot);
-
-        jPanel8.add(jPanel41);
+        jPanel8.add(jPanel1);
 
         jpData.add(jPanel8, java.awt.BorderLayout.CENTER);
 
@@ -309,8 +322,8 @@ public class SDialogMfgCreateLot extends javax.swing.JDialog implements erp.lib.
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-458)/2, (screenSize.height-372)/2, 458, 372);
+        setSize(new java.awt.Dimension(458, 372));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -335,6 +348,7 @@ public class SDialogMfgCreateLot extends javax.swing.JDialog implements erp.lib.
         jbOk.addActionListener(this);
         jbGenerateLot.addActionListener(this);
         jbDateLotExpired.addActionListener(this);
+        jbGenerateDateLotExpired.addActionListener(this);
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -368,41 +382,41 @@ public class SDialogMfgCreateLot extends javax.swing.JDialog implements erp.lib.
             else if (miClient.getSessionXXX().getParamsErp().getLotModel() == SDataConstantsSys.CFGS_LOT_MODEL_CONS_DATE) {
                 moFieldLot.setFieldValue("" + moProductionOrder.getPkOrdId() + "-" + miClient.getSessionXXX().getFormatters().getDateFormat().format(miClient.getSessionXXX().getWorkingDate()));
             }
+            
+            actionGenerateDateForExpiration();
         }
         catch (Exception e) {
             SLibUtilities.printOutException(this,  e);
         }
     }
-
-    private void renderRecord() {
+    
+    private void actionGenerateDateForExpiration(){
+        if (moItem.getDbmsDataItemGeneric().getDaysForExpiration() > 0) {
+            moFieldDateLotExpired.setDate(SLibTimeUtilities.addDate(moFieldDate.getDate(), 0, 0, moItem.getDbmsDataItemGeneric().getDaysForExpiration()));
+        }
+        else {
+            miClient.showMsgBoxInformation("No se puede generar fecha de caducidad ya que el producto no tiene '" + jlDaysForExpiration.getText() + "'.");
+            moFieldDateLotExpired.setDate(null);
+        }
+    }
+    
+    private void renderLot() {
+        moItem = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { moProductionOrder.getFkItemId_r() }, SLibConstants.EXEC_MODE_VERBOSE);
+        
         jtfCompanyBranch.setText(moProductionOrder.getDbmsCompanyBranch());
         jtfEntity.setText(moProductionOrder.getDbmsEntity());
         jtfType.setText(moProductionOrder.getDbmsProductionOrderType());
         jtfFinishedGood.setText(moProductionOrder.getDbmsFinishedGood());
+        jtfFinishedGood.setCaretPosition(0);
         jtfFinishedGood.setToolTipText(moProductionOrder.getDbmsFinishedGood());
-        jtfFormula.setText(moProductionOrder.getDbmsBom());
+        jtfDaysForExpiration.setText(moItem.getDbmsDataItemGeneric().getDaysForExpiration() + "");
         jtfFormula.setText(moProductionOrder.getDbmsBom());
         moFieldQuantity.setFieldValue(moProductionOrder.getQuantity());
         jtfUnit.setText(moProductionOrder.getDbmsBomUnitSymbol());
         moFieldDate.setFieldValue(moProductionOrder.getDate());
         jtfNumber.setText(moProductionOrder.getDbmsNumber());
         moFieldLot.setFieldValue(moProductionOrder.getDbmsLot());
-        moFieldDateLotExpired.setFieldValue(moProductionOrder.getDbmsLotDateExpired() != null ? moProductionOrder.getDbmsLotDateExpired() : miClient.getSessionXXX().getWorkingDate());
-    }
-
-    private void renderLot() {
-        moItem = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { moProductionOrder.getFkItemId_r() }, SLibConstants.EXEC_MODE_VERBOSE);
-
-        if (moProductionOrder.getDbmsLot().length()<=0) {
-            if (moItem.getDbmsDataItemGeneric().getDaysForExpiration() > 0) {
-                moFieldDateLotExpired.setDate(SLibTimeUtilities.addDate(moFieldDateLotExpired.getDate(), 0, 0, moItem.getDbmsDataItemGeneric().getDaysForExpiration()));
-                moFieldDateLotExpired.setIsMandatory(true);
-            }
-            else {
-                moFieldDateLotExpired.setIsMandatory(false);
-                moFieldDateLotExpired.setDate(null);
-            }
-        }
+        moFieldDateLotExpired.setFieldValue(moProductionOrder.getDbmsLotDateExpired() != null ? moProductionOrder.getDbmsLotDateExpired() : null);
     }
 
     private void actionSetDateLotExpired() {
@@ -440,6 +454,7 @@ public class SDialogMfgCreateLot extends javax.swing.JDialog implements erp.lib.
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgCurrency;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel32;
     private javax.swing.JPanel jPanel33;
@@ -454,24 +469,24 @@ public class SDialogMfgCreateLot extends javax.swing.JDialog implements erp.lib.
     private javax.swing.JPanel jPanel8;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbDateLotExpired;
+    private javax.swing.JButton jbGenerateDateLotExpired;
     private javax.swing.JButton jbGenerateLot;
     private javax.swing.JButton jbOk;
     private javax.swing.JLabel jlCompanyBranch;
     private javax.swing.JLabel jlDate;
-    private javax.swing.JLabel jlDummy;
-    private javax.swing.JLabel jlDummy3;
-    private javax.swing.JLabel jlDummy5;
-    private javax.swing.JLabel jlDummy6;
+    private javax.swing.JLabel jlDaysForExpiration;
     private javax.swing.JLabel jlEntity;
     private javax.swing.JLabel jlFinishedGood;
     private javax.swing.JLabel jlFormula;
     private javax.swing.JLabel jlLot;
+    private javax.swing.JLabel jlLot1;
     private javax.swing.JLabel jlNumber;
     private javax.swing.JLabel jlQuantity;
     private javax.swing.JLabel jlType;
     private javax.swing.JPanel jpData;
     private javax.swing.JTextField jtfCompanyBranch;
     private javax.swing.JFormattedTextField jtfDate;
+    private javax.swing.JTextField jtfDaysForExpiration;
     private javax.swing.JTextField jtfEntity;
     private javax.swing.JTextField jtfFinishedGood;
     private javax.swing.JTextField jtfFormula;
@@ -612,7 +627,6 @@ public class SDialogMfgCreateLot extends javax.swing.JDialog implements erp.lib.
         switch (type) {
             case 1:
                 moProductionOrder = (SDataProductionOrder) SDataUtilities.readRegistry(miClient, SDataConstants.MFG_ORD, (int[]) value, SLibConstants.EXEC_MODE_VERBOSE);
-                renderRecord();
                 renderLot();
                 break;
         }
@@ -644,6 +658,9 @@ public class SDialogMfgCreateLot extends javax.swing.JDialog implements erp.lib.
             }
             else if (button == jbGenerateLot) {
                 actionGenerateLot();
+            }
+            else if (button == jbGenerateDateLotExpired) {
+                actionGenerateDateForExpiration();
             }
         }
     }

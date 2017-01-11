@@ -332,6 +332,40 @@ public abstract class STrnUtilities {
     }
 
     /**
+     * Obtain min expiration date lot by ítem:
+     * @param client
+     * @param warehouseKey
+     * @param itemId_n
+     * @param unitId_n
+     * @return
+     * @throws Exception 
+     */
+    @SuppressWarnings("unchecked")
+    public static Date obtainMixExpirationDateLotByItem(final SClientInterface client, final int[] warehouseKey, final int itemId_n, final int unitId_n) throws Exception {
+        Date expDate = null;
+        String sql = "";
+        ResultSet resultSet = null;
+
+        sql = "SELECT COALESCE(l.dt_exp_n, NOW()) AS dt_exp_n, SUM(s.mov_in - s.mov_out) AS f_stk, s.id_lot, l.lot " +
+                "FROM trn_stk AS s " +
+                "INNER JOIN trn_lot AS l ON s.id_item = l.id_item AND s.id_unit = l.id_unit AND s.id_lot = l.id_lot AND l.b_block = 0  " +
+                "INNER JOIN erp.itmu_item AS i ON s.id_item = i.id_item " +
+                "INNER JOIN erp.itmu_unit AS u ON s.id_unit = u.id_unit " +
+                "WHERE s.id_cob = " + warehouseKey[0] + " AND s.id_wh = " + warehouseKey[1] + " AND s.b_del = 0 " +
+                "AND s.id_item = " + itemId_n + " AND s.id_unit = " + unitId_n + " " +
+                "GROUP BY s.id_item, s.id_unit, s.id_lot, l.lot, l.dt_exp_n " +
+                "HAVING f_stk <> 0 " +
+                "ORDER BY l.dt_exp_n, f_stk DESC, l.lot, s.id_lot ";
+
+        resultSet = client.getSession().getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            expDate = resultSet.getDate("dt_exp_n");
+        }
+
+        return expDate;
+    }
+    
+    /**
      * Validate if has stock for a given item.
      * @param client GUI client.
      * @param year Stock year.
