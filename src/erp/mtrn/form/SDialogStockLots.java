@@ -28,6 +28,7 @@ import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
 import erp.mtrn.data.STrnStockLotRow;
 import erp.mtrn.data.STrnStockMove;
+import erp.mtrn.data.STrnUtilities;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -39,6 +40,7 @@ import javax.swing.JOptionPane;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableCellRenderer;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -419,6 +421,7 @@ public class SDialogStockLots extends javax.swing.JDialog implements ActionListe
 
     public void actionPickLot() {
         int index = 0;
+        Date minExpirationDate = null;
         double quantityPicked = 0;
         double quantityCurrent = 0;
         STableRow rowCurrent = null;
@@ -467,8 +470,22 @@ public class SDialogStockLots extends javax.swing.JDialog implements ActionListe
                         }
 
                         moveCurrent.setAuxLot(movePicked.getAuxLot());
+                        
+                        if (mnParamIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_OUT) { 
+                            try {
+                                minExpirationDate = STrnUtilities.obtainMixExpirationDateLotByItem(miClient, movePicked.getWarehouseKey(), movePicked.getPkItemId(), movePicked.getPkUnitId());
+                            
+                                if (movePicked.getAuxLotDateExpiration() != null && minExpirationDate.before(movePicked.getAuxLotDateExpiration())) {
+                                   miClient.showMsgBoxWarning("El pedido selccionado no es el más proximo a caducar");
+                                }
+                            }
+                            catch (Exception e) {
+                               SLibUtils.showException(this, e);
+                            }
+                        }
+                        
                         moveCurrent.setAuxLotDateExpiration(movePicked.getAuxLotDateExpiration());
-
+                                
                         rowCurrent.prepareTableRow();
 
                         index = moPaneLots.getTable().getSelectedRow();
@@ -737,6 +754,9 @@ public class SDialogStockLots extends javax.swing.JDialog implements ActionListe
             else if (stockMove.getQuantity() != 0 && stockMove.getAuxLot().length() == 0) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + moPaneLots.getTableColumn(COL_LOT).getColumnTitle() + "' en la fila " + (i + 1) + ".");
             }
+            else if (stockMove.getAuxLotDateExpiration() == null && stockMove.getAuxLot().length() > 0 && mnParamIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_IN) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + moPaneLots.getTableColumn(COL_DATE_EXP).getColumnTitle() + "' en la fila " + (i + 1) + ".");
+            }
             else if (stockMove.getAuxLotDateExpiration() != null && stockMove.getAuxLot().length() == 0) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + moPaneLots.getTableColumn(COL_LOT).getColumnTitle() + "' en la fila " + (i + 1) + ".");
             }
@@ -750,7 +770,7 @@ public class SDialogStockLots extends javax.swing.JDialog implements ActionListe
                 break;
             }
         }
-
+        
         if (!validation.getIsError()) {
             if (SLibUtilities.round(quantity, decs) != SLibUtilities.round(mdParamQuantity, decs)) {
                 if (mnFormMode == SLibConstants.MODE_QTY_EXT) {

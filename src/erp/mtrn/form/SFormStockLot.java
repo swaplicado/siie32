@@ -173,7 +173,7 @@ public class SFormStockLot extends javax.swing.JDialog implements erp.lib.form.S
 
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateExpiration_n.setText("Caducidad:");
+        jlDateExpiration_n.setText("Caducidad: *");
         jlDateExpiration_n.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel19.add(jlDateExpiration_n);
 
@@ -222,8 +222,8 @@ public class SFormStockLot extends javax.swing.JDialog implements erp.lib.form.S
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-568)/2, (screenSize.height-384)/2, 568, 384);
+        setSize(new java.awt.Dimension(568, 384));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -238,7 +238,7 @@ public class SFormStockLot extends javax.swing.JDialog implements erp.lib.form.S
         moFieldPkUnitId.setPickerButton(jbPkUnitId);
         moFieldLot = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfLot, jlLot);
         moFieldLot.setLengthMax(25);
-        moFieldDateExpiration_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftDateExpiration_n, jlDateExpiration_n);
+        moFieldDateExpiration_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateExpiration_n, jlDateExpiration_n);
         moFieldDateExpiration_n.setPickerButton(jbDateExpiration_n);
 
         mvFields = new Vector<SFormField>();
