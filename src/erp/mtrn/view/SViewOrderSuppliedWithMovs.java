@@ -266,9 +266,9 @@ public class SViewOrderSuppliedWithMovs extends erp.lib.table.STableTab implemen
                 "SUM(f_orig_qty) AS f_orig_qty, " +
                 "COALESCE(SUM(f_sup_qty), 0) AS f_sup_qty, " +
                 "COALESCE(SUM(f_sup_orig_qty), 0) AS f_sup_orig_qty, " +
-                "((COALESCE(SUM(f_sup_orig_qty), 0) * 100 ) / SUM(f_orig_qty)) AS f_per_sup, " +
+                "((COALESCE(SUM(f_sup_orig_qty), 0) * 100 ) / SUM(f_orig_qty))/100 AS f_per_sup, " +
                 "SUM(f_orig_qty)- COALESCE(SUM(f_sup_orig_qty), 0) AS f_sup_orig_qty_pend, " +
-                "(((SUM(f_orig_qty) - COALESCE(SUM(f_sup_orig_qty), 0)) * 100 ) / SUM(f_orig_qty)) AS f_per_pend " +
+                "(((SUM(f_orig_qty) - COALESCE(SUM(f_sup_orig_qty), 0)) * 100 ) / SUM(f_orig_qty))/100 AS f_per_pend " +
                 "FROM (SELECT de.id_year, de.id_doc, de.id_ety, " +
                 "d.dt, d.num_ser, d.num, d.num_ref, d.tot_r, d.tot_cur_r, d.b_close, d.ts_close, uc.usr, c.cur_key, " +
                 "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
