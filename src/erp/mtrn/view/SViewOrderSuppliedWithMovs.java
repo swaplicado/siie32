@@ -117,6 +117,7 @@ public class SViewOrderSuppliedWithMovs extends erp.lib.table.STableTab implemen
         }
 
         mvSuscriptors.add(mnTabType);
+        mvSuscriptors.add(SDataConstants.TRN_DPS);
 
         populateTable();               
     }
