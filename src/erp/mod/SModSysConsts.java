@@ -855,6 +855,8 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_LOAN_PAY_FIX = 2;   // Fixed
     public static final int HRSS_TP_LOAN_PAY_PER = 3;   // Percentage
 
+    public static final int HRSS_TP_CON_TME_DET = 1;    // Contract undetermined time
+    public static final int HRSS_TP_CON_LAB_CMM = 8;        // Contract labor commission
     public static final int HRSS_TP_CON_OTH = 99;       // Other contract
     
     public static final int HRSS_TP_REC_SCHE_WAG = 2;       // Wages & salaries

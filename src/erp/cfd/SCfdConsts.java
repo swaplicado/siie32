@@ -62,6 +62,9 @@ public abstract class SCfdConsts {
 
     public static final String CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE = "Dobles";
     public static final String CFDI_PAYROLL_EXTRA_TIME_TYPE_TRIPLE = "Triples";
+    
+    public static final String CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE_COD = "01";
+    public static final String CFDI_PAYROLL_EXTRA_TIME_TYPE_TRIPLE_COD = "02";
 
     public static final String PAYROLL_PER_ISR = "001";
     public static final String PAYROLL_PER_SUB_EMP = "002";

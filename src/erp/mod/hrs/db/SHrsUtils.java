@@ -1894,13 +1894,16 @@ public abstract class SHrsUtils {
         SHrsFormerPayrollReceipt hrsPayrollReceipt = null;
         SHrsFormerPayrollConcept hrsPayrollConcept = null;
         SHrsFormerPayrollExtraTime hrsPayrollExtraTime = null;
+        SHrsFormerPayrollIncident hrsPayrollIncident = null;
 
         Statement statement = client.getSession().getStatement().getConnection().createStatement();
         Statement statementAux = client.getSession().getStatement().getConnection().createStatement();
+        Statement statementAuxInc = client.getSession().getStatement().getConnection().createStatement();
         Statement statementClient = client.getSession().getStatement().getConnection().createStatement();
 
         ResultSet resultSet = null;
         ResultSet resultSetAux = null;
+        ResultSet resultSetAuxInc = null;
         ResultSet resultSetClient = null;
 
         // Obtain deductions for tax retained:
@@ -1985,7 +1988,7 @@ public abstract class SHrsUtils {
 
         sql = "SELECT bp.bp, bp.id_bp AS f_emp_map_bp, emp.id_emp AS f_emp_id, emp.num AS f_emp_num, bp.alt_id AS f_emp_curp, emp.ssn AS f_emp_nss, " +
                 "sch.code AS f_emp_reg_tp, rcp.day_pad AS f_emp_dias_pag, d.name AS f_emp_dep, d.code AS f_emp_dep_cve, " +
-                "emp.bank_acc AS f_emp_bank_clabe, " +
+                "'' AS f_emp_bank_clabe, " +
                 "pei.dt_pay, pei.num_ser, pei.num, pei.fk_tp_pay_sys, " +
                 "CASE WHEN emp.fk_bank_n IS NOT NULL THEN emp.fk_bank_n ELSE (SELECT fk_bank FROM hrs_cfg WHERE id_cfg = " + SUtilConsts.BPR_CO_ID + ") END AS f_emp_bank, " +
                 "emp.dt_hire AS f_emp_alta, p.dt_sta AS f_nom_date_start, p.dt_end AS f_nom_date_end, " +
@@ -2023,8 +2026,8 @@ public abstract class SHrsUtils {
                 "INNER JOIN erp.hrsu_pos AS pos ON pos.id_pos = rcp.fk_pos " +
                 "INNER JOIN erp.hrss_tp_sal AS st ON st.id_tp_sal = rcp.fk_tp_sal " +
                 "INNER JOIN erp.hrsu_tp_emp AS et ON et.id_tp_emp = rcp.fk_tp_emp " +
-                "INNER JOIN erp.hrss_tp_con AS con ON con.id_tp_con = emp.fk_tp_con " +
-                "INNER JOIN erp.hrss_tp_rec_sche AS sch ON sch.id_tp_rec_sche = emp.fk_tp_rec_sche " +
+                "INNER JOIN erp.hrss_tp_con AS con ON con.id_tp_con = rcp.fk_tp_con " +
+                "INNER JOIN erp.hrss_tp_rec_sche AS sch ON sch.id_tp_rec_sche = rcp.fk_tp_rec_sche " +
                 "INNER JOIN erp.hrss_tp_pos_risk AS ris ON ris.id_tp_pos_risk = rcp.fk_tp_pos_risk " +
                 "INNER JOIN erp.hrss_tp_work_day AS wrktp ON rcp.fk_tp_work_day = wrktp.id_tp_work_day " +
                 "INNER JOIN erp.hrss_tp_pay AS tp ON p.fk_tp_pay = tp.id_tp_pay " +
@@ -2144,7 +2147,7 @@ public abstract class SHrsUtils {
 
                 // Obtain perceptions:
 
-                sql = "SELECT ear.code AS f_conc_cve, ear.name_abbr AS f_conc, ear.fk_tp_ear AS f_conc_cfdi, ear.unt_fac, " +
+                sql = "SELECT ear.code AS f_conc_cve, ear.name_abbr AS f_conc, ear.fk_tp_ear AS f_conc_cfdi, ear.unt_fac, rcp_ear.fk_ear, " +
                         "CASE WHEN ear.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_OVR_TME + " THEN CASE WHEN rcp_ear.unt >= 0 AND rcp_ear.unt < " + SHrsConsts.OVER_TIME_2X_MAX_DAY + " THEN 1 ELSE rcp_ear.unt / " + SHrsConsts.OVER_TIME_2X_MAX_DAY + " END ELSE " +
                         "CASE WHEN rcp_ear.unt >= 0 AND rcp_ear.unt <= 1 THEN 1 ELSE rcp_ear.unt END END AS f_conc_qty, " +
                         "CASE WHEN ear.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_OVR_TME + " THEN " +
@@ -2188,6 +2191,18 @@ public abstract class SHrsUtils {
                         hrsPayrollExtraTime.setImportePagado(hrsPayrollConcept.getTotalGravado() + hrsPayrollConcept.getTotalExento());
 
                         hrsPayrollConcept.setChildPayrollExtraTimes(hrsPayrollExtraTime);
+                    }
+                    else if (claveOficial == SModSysConsts.HRSS_TP_EAR_DIS) {
+                        sql = "SELECT tpd.code " +
+                                "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " AS ear " +
+                                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_ABS) + " AS tpa ON ear.fk_cl_abs_n = tpa.id_cl_abs AND ear.fk_tp_abs_n = tpa.id_tp_abs " +
+                                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_DIS) + " AS tpd ON tpa.fk_tp_dis_n = tpd.id_tp_dis " +
+                                "WHERE ear.id_ear = " + resultSetAux.getInt("rcp_ear.fk_ear") + " ";
+
+                        resultSetAuxInc = statementAuxInc.executeQuery(sql);
+                        if (resultSetAuxInc.next()) {
+                            hrsPayrollConcept.setClaveIncapacidad(resultSetAuxInc.getString("tpd.code"));
+                        }
                     }
 
                     hrsPayrollReceipt.getChildPayrollConcept().add(hrsPayrollConcept);
