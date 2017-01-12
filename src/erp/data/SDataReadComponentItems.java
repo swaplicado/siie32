@@ -1808,6 +1808,12 @@ public abstract class SDataReadComponentItems {
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_POS_RISK) + " WHERE b_del = 0 ORDER BY sort ";
                 text = "riesgo trabajo";
                 break;
+            case SModConsts.HRSS_TP_WORK_DAY:
+                lenPk = 1;
+                sql = "SELECT id_tp_work_day AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_WORK_DAY) + " WHERE b_del = 0 ORDER BY sort ";
+                text = "jornada";
+                break;
             case SModConsts.HRSS_BANK:
                 lenPk = 1;
                 sql = "SELECT id_bank AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "

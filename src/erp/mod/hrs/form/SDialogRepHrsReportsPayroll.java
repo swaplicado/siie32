@@ -369,20 +369,20 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         
         if (!orderBy.isEmpty()) {
             if (moRadReportTypeEmpDep.isSelected()) {
-                if (moRadOrderByNumEmployee.isSelected()) {
-                    orderBy += "CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp, ";
-                }
-                else if (moRadOrderByNameEmployee.isSelected()) {
-                    orderBy += "bp.bp, bp.id_bp, ";
-                }
-
                 if (moBoolShowGroupDepartament.isSelected()) {
                     if (moRadOrderByNumDepartament.isSelected()) {
-                        orderBy += "dep.code, dep.id_dep ";
+                        orderBy += "dep.code, dep.id_dep, ";
                     }
                     else if (moRadOrderByNameDepartament.isSelected()) {
-                        orderBy += "dep.name, dep.id_dep ";
+                        orderBy += "dep.name, dep.id_dep, ";
                     }
+                }
+                
+                if (moRadOrderByNumEmployee.isSelected()) {
+                    orderBy += "CAST(emp.num AS UNSIGNED INTEGER), bp.id_bp ";
+                }
+                else if (moRadOrderByNameEmployee.isSelected()) {
+                    orderBy += "bp.bp, bp.id_bp ";
                 }
             }
             else if (moRadReportTypeDepEmp.isSelected()) {

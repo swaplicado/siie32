@@ -401,7 +401,6 @@ public abstract class SModConsts {
     public static final int TRNX_DPS_CON_SEND = 2024002;    // document send
     public static final int TRNX_STK_WAH = 2024003;         // stock by warehouse
     public static final int TRNX_STK_DIOG_TP = 2024004;     // stock-document type
-    public static final int TRNX_DPS_ORDER_SUP = 2024005;   //order whit supplied movements
     public static final int TRNX_STK_COST = 2024049;        // stock cost
     public static final int TRNX_ORD_LIM_MAX = 2024051;       // operations control
     public static final int TRNX_BP_BAL_CUR = 2024052;       // operations control
@@ -572,7 +571,8 @@ public abstract class SModConsts {
     public static final int HRSS_TP_CON = 2061071;
     public static final int HRSS_TP_REC_SCHE = 2061072;
     public static final int HRSS_TP_POS_RISK = 2061073;
-    public static final int HRSS_TP_DIS = 2061074;
+    public static final int HRSS_TP_WORK_DAY = 2061074;
+    public static final int HRSS_TP_DIS = 2061075;
     public static final int HRSS_TP_DAY = 2061081;
     public static final int HRSS_BANK = 2061091;
 
@@ -1091,6 +1091,7 @@ public abstract class SModConsts {
         TablesMap.put(HRSS_TP_CON, "erp.hrss_tp_con");
         TablesMap.put(HRSS_TP_REC_SCHE, "erp.hrss_tp_rec_sche");
         TablesMap.put(HRSS_TP_POS_RISK, "erp.hrss_tp_pos_risk");
+        TablesMap.put(HRSS_TP_WORK_DAY, "erp.hrss_tp_work_day");
         TablesMap.put(HRSS_TP_DIS, "erp.hrss_tp_dis");
         TablesMap.put(HRSS_TP_DAY, "erp.hrss_tp_day");
         TablesMap.put(HRSS_BANK, "erp.hrss_bank");

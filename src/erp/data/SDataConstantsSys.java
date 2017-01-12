@@ -432,6 +432,11 @@ public abstract class SDataConstantsSys {
     
     public static final int BPSS_STP_CFD_ADD_SORIANA_NOR = 1;
     public static final int BPSS_STP_CFD_ADD_SORIANA_EXT = 2;
+    
+    public static final int BPSS_BPB_BANK_ACC_TEL = 10;
+    public static final int BPSS_BPB_BANK_ACC_NUM = 11;
+    public static final int BPSS_BPB_BANK_ACC_TRJ = 16;
+    public static final int BPSS_BPB_BANK_ACC_CBE = 18;
 
     public static final int BPSU_BA_DEFAULT = 1;
 

@@ -102,6 +102,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private erp.lib.form.SFormField moFieldFkDepartment;
     private erp.lib.form.SFormField moFieldFkPosition;
     private erp.lib.form.SFormField moFieldFkShift;
+    private erp.lib.form.SFormField moFieldFkWorkingDayType;
     private erp.lib.form.SFormField moFieldWorkingHoursDay;
     private erp.lib.form.SFormField moFieldFkContractType;
     private erp.lib.form.SFormField moFieldFkRecruitmentSchemeType;
@@ -169,15 +170,12 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel24 = new javax.swing.JPanel();
         jlFkBank_n = new javax.swing.JLabel();
         jcbFkBank_n = new javax.swing.JComboBox<SFormComponentItem>();
-        jPanel6 = new javax.swing.JPanel();
         jlBankAccount = new javax.swing.JLabel();
         jtfBankAccount = new javax.swing.JTextField();
-        jlDummy1 = new javax.swing.JLabel();
-        jckIsActive = new javax.swing.JCheckBox();
-        jPanel7 = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
         jlEmail = new javax.swing.JLabel();
         jtfEmail = new javax.swing.JTextField();
-        jlDummy2 = new javax.swing.JLabel();
+        jckIsActive = new javax.swing.JCheckBox();
         jckIsDeleted = new javax.swing.JCheckBox();
         jPanel20 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
@@ -236,6 +234,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel21 = new javax.swing.JPanel();
         jlFkShift = new javax.swing.JLabel();
         jcbFkShift = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel44 = new javax.swing.JPanel();
+        jlFkWorkingDayType = new javax.swing.JLabel();
+        jcbFkWorkingDayType = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel11 = new javax.swing.JPanel();
         jlWorkingHoursDay = new javax.swing.JLabel();
         jtfWorkingHoursDay = new javax.swing.JTextField();
@@ -308,7 +309,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel42.setLayout(new java.awt.BorderLayout());
 
         jPanel19.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos personales:"));
-        jPanel19.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
+        jPanel19.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
 
         jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -402,51 +403,41 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jcbFkBank_n.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel24.add(jcbFkBank_n);
 
+        jlBankAccount.setText("Cuenta bancaria:");
+        jlBankAccount.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel24.add(jlBankAccount);
+
+        jtfBankAccount.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel24.add(jtfBankAccount);
+
         jPanel19.add(jPanel24);
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlBankAccount.setText("Cuenta bancaria:");
-        jlBankAccount.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel6.add(jlBankAccount);
+        jlEmail.setText("Cuenta correo-e:");
+        jlEmail.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel6.add(jlEmail);
 
-        jtfBankAccount.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel6.add(jtfBankAccount);
-
-        jlDummy1.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel6.add(jlDummy1);
+        jtfEmail.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel6.add(jtfEmail);
 
         jckIsActive.setText("Empleado activo");
         jckIsActive.setEnabled(false);
         jckIsActive.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel6.add(jckIsActive);
 
-        jPanel19.add(jPanel6);
-
-        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
-
-        jlEmail.setText("Cuenta correo-e:");
-        jlEmail.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel7.add(jlEmail);
-
-        jtfEmail.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel7.add(jtfEmail);
-
-        jlDummy2.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel7.add(jlDummy2);
-
         jckIsDeleted.setText("Asociado de negocios eliminado");
         jckIsDeleted.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel7.add(jckIsDeleted);
+        jPanel6.add(jckIsDeleted);
 
-        jPanel19.add(jPanel7);
+        jPanel19.add(jPanel6);
 
         jPanel42.add(jPanel19, java.awt.BorderLayout.NORTH);
 
         jPanel20.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos laborables:"));
         jPanel20.setLayout(new java.awt.BorderLayout());
 
-        jPanel3.setLayout(new java.awt.GridLayout(11, 1, 0, 5));
+        jPanel3.setLayout(new java.awt.GridLayout(12, 1, 0, 5));
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
@@ -613,7 +604,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         jPanel20.add(jPanel3, java.awt.BorderLayout.WEST);
 
-        jPanel4.setLayout(new java.awt.GridLayout(11, 1, 0, 5));
+        jPanel4.setLayout(new java.awt.GridLayout(12, 1, 0, 5));
 
         jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
@@ -686,6 +677,17 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel21.add(jcbFkShift);
 
         jPanel4.add(jPanel21);
+
+        jPanel44.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
+
+        jlFkWorkingDayType.setText("Tipo jornada:*");
+        jlFkWorkingDayType.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel44.add(jlFkWorkingDayType);
+
+        jcbFkWorkingDayType.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel44.add(jcbFkWorkingDayType);
+
+        jPanel4.add(jPanel44);
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
@@ -1050,6 +1052,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldFkPosition.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldFkShift = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkShift, jlFkShift);
         moFieldFkShift.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldFkWorkingDayType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkWorkingDayType, jlFkWorkingDayType);
+        moFieldFkWorkingDayType.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldWorkingHoursDay = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, true, jtfWorkingHoursDay, jlWorkingHoursDay);
         moFieldWorkingHoursDay.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldFkContractType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkContractType, jlFkContractType);
@@ -1107,6 +1111,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         mvFields.add(moFieldFkDepartment);
         mvFields.add(moFieldFkPosition);
         mvFields.add(moFieldFkShift);
+        mvFields.add(moFieldFkWorkerType);
         mvFields.add(moFieldWorkingHoursDay);
         mvFields.add(moFieldFkContractType);
         mvFields.add(moFieldFkRecruitmentSchemeType);
@@ -1667,11 +1672,11 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JPanel jPanel41;
     private javax.swing.JPanel jPanel42;
     private javax.swing.JPanel jPanel43;
+    private javax.swing.JPanel jPanel44;
     private javax.swing.JPanel jPanel45;
     private javax.swing.JPanel jPanel46;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JTabbedPane jTabbedPane1;
@@ -1706,6 +1711,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JComboBox<SFormComponentItem> jcbFkSalaryType;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkShift;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkWorkerType;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkWorkingDayType;
     private javax.swing.JCheckBox jckChangeSalary;
     private javax.swing.JCheckBox jckChangeSalarySscBase;
     private javax.swing.JCheckBox jckChangeWage;
@@ -1729,8 +1735,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JLabel jlDateBirth;
     private javax.swing.JLabel jlDateLastDismiss_n;
     private javax.swing.JLabel jlDateLastHire;
-    private javax.swing.JLabel jlDummy1;
-    private javax.swing.JLabel jlDummy2;
     private javax.swing.JLabel jlDummy3;
     private javax.swing.JLabel jlDummy4;
     private javax.swing.JLabel jlEmail;
@@ -1752,6 +1756,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JLabel jlFkSalaryType;
     private javax.swing.JLabel jlFkShift;
     private javax.swing.JLabel jlFkWorkerType;
+    private javax.swing.JLabel jlFkWorkingDayType;
     private javax.swing.JLabel jlImagePhoto;
     private javax.swing.JLabel jlImageSignature;
     private javax.swing.JLabel jlLastName;
@@ -1854,6 +1859,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         SFormUtilities.populateComboBox(miClient, jcbFkDepartment, SModConsts.HRSU_DEP);
         //SFormUtilities.populateComboBox(miClient, jcbFkPosition, SModConsts.HRSU_POS);
         SFormUtilities.populateComboBox(miClient, jcbFkShift, SModConsts.HRSU_SHT);
+        SFormUtilities.populateComboBox(miClient, jcbFkWorkingDayType, SModConsts.HRSS_TP_WORK_DAY);
         SFormUtilities.populateComboBox(miClient, jcbFkContractType, SModConsts.HRSS_TP_CON);
         SFormUtilities.populateComboBox(miClient, jcbFkRecruitmentSchemeType, SModConsts.HRSS_TP_REC_SCHE);
         SFormUtilities.populateComboBox(miClient, jcbFkPositionRiskType, SModConsts.HRSS_TP_POS_RISK);
@@ -2029,6 +2035,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             moFieldFkDepartment.setFieldValue(new int[] { moEmployee.getFkDepartmentId() });
             moFieldFkPosition.setFieldValue(new int[] { moEmployee.getFkPositionId() });
             moFieldFkShift.setFieldValue(new int[] { moEmployee.getFkShiftId() });
+            moFieldFkWorkingDayType.setFieldValue(new int[] { moEmployee.getFkWorkingDayTypeId()});
             moFieldWorkingHoursDay.setFieldValue(moEmployee.getWorkingHoursDay());
             moFieldFkContractType.setFieldValue(new int[] { moEmployee.getFkContractTypeId() });
             moFieldFkRecruitmentSchemeType.setFieldValue(new int[] { moEmployee.getFkRecruitmentSchemeTypeId() });
@@ -2222,6 +2229,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moEmployee.setFkDepartmentId(moFieldFkDepartment.getKeyAsIntArray()[0]);
         moEmployee.setFkPositionId(moFieldFkPosition.getKeyAsIntArray()[0]);
         moEmployee.setFkShiftId(moFieldFkShift.getKeyAsIntArray()[0]);
+        moEmployee.setFkWorkingDayTypeId(moFieldFkWorkingDayType.getKeyAsIntArray()[0]);
         moEmployee.setFkContractTypeId(moFieldFkContractType.getKeyAsIntArray()[0]);
         moEmployee.setFkRecruitmentSchemeTypeId(moFieldFkRecruitmentSchemeType.getKeyAsIntArray()[0]);
         moEmployee.setFkPositionRiskTypeId(moFieldFkPositionRiskType.getKeyAsIntArray()[0]);

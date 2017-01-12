@@ -165,14 +165,21 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
 
         stockMove.calculateValue();
 
-        if (move.getPkLotId() == SLibConstants.UNDEFINED) {
-            sql = "SELECT id_lot FROM trn_lot WHERE " +
+       if (move.getPkLotId() == SLibConstants.UNDEFINED) {
+            sql = "SELECT id_lot, dt_exp_n FROM trn_lot WHERE " +
                     "id_item = " + move.getPkItemId() + " AND id_unit = " + move.getPkUnitId() + " AND " +
                     "lot = '" + move.getAuxLot() + "' AND b_del = 0 ";
             resultSet = statement.executeQuery(sql);
 
             if (resultSet.next()) {
                 lotId = resultSet.getInt("id_lot");
+                
+                if (resultSet.getDate("dt_exp_n") != move.getAuxLotDateExpiration()) {
+                   sql = "UPDATE trn_lot SET dt_exp_n = '" + new java.sql.Date(move.getAuxLotDateExpiration().getTime())  + "' WHERE " +
+                    "id_item = " + move.getPkItemId() + " AND id_unit = " + move.getPkUnitId() + " AND " +       
+                    "id_lot = " + lotId + " ";
+                    resultSet = statement.executeQuery(sql);
+                }
             }
             else {
                 stockLot = new SDataStockLot();
@@ -196,6 +203,22 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
 
             stockMove.setPkLotId(lotId);
         }
+       else {
+            sql = "SELECT dt_exp_n FROM trn_lot WHERE " +
+                  "id_item = " + move.getPkItemId() + " AND id_unit = " + move.getPkUnitId() + " AND " + 
+                  "id_lot = " + move.getPkLotId() + " ";
+            resultSet = statement.executeQuery(sql);
+
+            if (resultSet.next()) {
+                
+                if (resultSet.getDate("dt_exp_n") != new java.sql.Date(move.getAuxLotDateExpiration().getTime())) {
+                    sql = "UPDATE trn_lot SET dt_exp_n = '" + new java.sql.Date(move.getAuxLotDateExpiration().getTime())  + "' WHERE " +
+                    "id_item = " + move.getPkItemId() + " AND id_unit = " + move.getPkUnitId() + " AND " +        
+                    "id_lot = " + move.getPkLotId() + " ";
+                    statement.execute(sql);
+                }
+            }
+       }
 
         return stockMove;
     }

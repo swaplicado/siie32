@@ -3184,13 +3184,20 @@ public abstract class SCfdUtils implements Serializable {
             comprobante.getAttFormaDePago().setOption("" + cfdXml.getCfdFormaDePago(), DAttributeOptionFormaPago.CFD_PARCIALIDADES);
         }
 
-        comprobante.getAttCondicionesDePago().setOption(cfdXml.getCfdCondicionesDePago());
+        if (cfdXml.getCfdTipoCfdXml() == SCfdConsts.CFD_TYPE_PAYROLL) {
+            comprobante.getAttCondicionesDePago().setOption("");
+        }
+        else {
+            comprobante.getAttCondicionesDePago().setOption(cfdXml.getCfdCondicionesDePago());
+        }
         comprobante.getAttSubTotal().setDouble(cfdXml.getCfdSubTotal());
         if (cfdXml.getCfdDescuento() != 0) {
             comprobante.getAttDescuento().setDouble(cfdXml.getCfdDescuento());
             comprobante.getAttMotivoDescuento().setString(cfdXml.getCfdMotivoDescuento());
         }
-        comprobante.getAttTipoCambio().setDouble(cfdXml.getCfdTipoCambio());
+        if (cfdXml.getCfdTipoCfdXml() != SCfdConsts.CFD_TYPE_PAYROLL) {
+            comprobante.getAttTipoCambio().setDouble(cfdXml.getCfdTipoCambio());
+        }
         comprobante.getAttMoneda().setString(cfdXml.getCfdMoneda());
         comprobante.getAttTotal().setDouble(cfdXml.getCfdTotal());
 
@@ -3206,6 +3213,7 @@ public abstract class SCfdUtils implements Serializable {
 
         asociadoNegocios = emisor.getBizPartner();
         asociadoNegocios.setIsCfdi(true);
+        asociadoNegocios.setCfdiType(cfdXml.getCfdTipoCfdXml());
 
         comprobante.setEltEmisor((cfd.ver3.DElementEmisor) asociadoNegocios.createRootElementEmisor());
         comprobante.getAttLugarExpedicion().setString(asociadoNegocios.getCfdLugarExpedicion());
@@ -3221,6 +3229,7 @@ public abstract class SCfdUtils implements Serializable {
 
         asociadoNegocios = receptor.getBizPartner();
         asociadoNegocios.setIsCfdi(true);
+        asociadoNegocios.setCfdiType(cfdXml.getCfdTipoCfdXml());
 
         comprobante.setEltReceptor((cfd.ver3.DElementReceptor) asociadoNegocios.createRootElementReceptor());
 
@@ -3229,6 +3238,9 @@ public abstract class SCfdUtils implements Serializable {
 
             concepto.getAttNoIdentificacion().setString(concept.getNoIdentificacion());
             concepto.getAttUnidad().setString(concept.getUnidad());
+            if (cfdXml.getCfdTipoCfdXml() == SCfdConsts.CFD_TYPE_PAYROLL) {
+                concepto.getAttCantidad().setDecimals(0);
+            }
             concepto.getAttCantidad().setDouble(concept.getCantidad());
             concepto.getAttDescripcion().setString(concept.getDescripcion());
             concepto.getAttValorUnitario().setDouble(concept.getValorUnitario());
@@ -3277,8 +3289,10 @@ public abstract class SCfdUtils implements Serializable {
             comprobante.getEltImpuestos().setEltOpcImpuestosTrasladados(impuestosTrasladados);
         }
 
-        if (cfdXml.getCfdElementComplemento() != null) {
-            comprobante.setEltOpcComplemento((cfd.ver3.DElementComplemento) cfdXml.getCfdElementComplemento());
+        cfd.DElement elementComplement = cfdXml.getCfdElementComplemento();
+        
+        if (elementComplement != null) {
+            comprobante.setEltOpcComplemento((cfd.ver3.DElementComplemento) elementComplement);
         }
 
         if (cfdXml.getCfdElementAddenda() != null) {
@@ -3286,9 +3300,9 @@ public abstract class SCfdUtils implements Serializable {
         }
 
         if (cfdXml.getCfdTipoCfdXml() == SCfdConsts.CFD_TYPE_PAYROLL) {
-            if (cfdXml.getCfdElementComplemento() == null || comprobante.getEltOpcComplemento().getElements().isEmpty()) {
+            if (elementComplement == null || comprobante.getEltOpcComplemento().getElements().isEmpty()) {
                 comprobante = null;
-                throw new Exception("Error al generar el complemeto nómina o el complemento no existe.");
+                throw new Exception("Error al generar el complemento nómina o el complemento no existe.");
             }
         }
         
@@ -3347,7 +3361,7 @@ public abstract class SCfdUtils implements Serializable {
             for (int i = 0; i < comprobante.getEltImpuestos().getEltOpcImpuestosRetenidos().getEltHijosImpuestoRetenido().size(); i++) {
                 oRetencion = comprobante.getEltImpuestos().getEltOpcImpuestosRetenidos().getEltHijosImpuestoRetenido().get(i);
 
-                dTotalImptoRetenidos = SLibUtils.round((dTotalImptoTrasladados + oRetencion.getAttImporte().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                dTotalImptoRetenidos = SLibUtils.round((dTotalImptoRetenidos + oRetencion.getAttImporte().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
             }
 
             if (Math.abs(comprobante.getEltImpuestos().getAttTotalImpuestosRetenidos().getDouble() - dTotalImptoRetenidos) >= SLibConstants.RES_VAL_DECS) {

@@ -95,7 +95,7 @@ import sa.lib.srv.SSrvUtils;
 
 /**
  *
- * @author  Sergio Flores, Edwin Carmona
+ * @author  Sergio Flores, Edwin Carmona, Uriel Castañeda
  */
 public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, erp.lib.form.SFormExtendedInterface {
 
@@ -4575,7 +4575,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     link.setOriginalQuantity(entry.getOriginalQuantity());
                     
                     try{
-                        link.setDbmsIsSouceOrderSupplied(oDpsSource.isOrder() && STrnDpsUtilities.obtainEtyTotalSupplied(miClient, new int[] { dpsSourceEntry.getPkYearId(), dpsSourceEntry.getPkDocId(), dpsSourceEntry.getPkEntryId() }) > 0);
+                        link.setDbmsIsSouceOrderSupplied(STrnDpsUtilities.IsSourceOrderSupplied(miClient, oDpsSource, dpsSourceEntry));
                     }
                     catch (Exception e) {
                         SLibUtils.showException(this, e);

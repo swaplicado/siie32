@@ -564,11 +564,11 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
 
                 rows++;
 
-                //The source is order and has supplied quantities
+                // The source is order and has supplied quantities
                 
                 if (!validation.getIsError() && moParamDpsSource.isOrder()){
                     try {
-                        double totalsupplied = STrnDpsUtilities.obtainEtyTotalSupplied(miClient, (int[]) entry.getDpsEntryKey());
+                        double totalsupplied = STrnDpsUtilities.obtainEntryTotalQuantitySupplied(miClient, (int[]) entry.getDpsEntryKey());
                         if (totalsupplied > entry.getQuantityToLink()) {
                             validation.setMessage("Para el ítem '" + entry.getConcept() + " (" + entry.getConceptKey() + ")' en la partida # " + entry.getSortingPosition() + "\n" +
                                     "la cantidad minima a vincular debe ser mayor o igual a " + 
@@ -576,7 +576,7 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
                             break;
                         }
                     }
-                        catch (Exception e) {
+                    catch (Exception e) {
                         SLibUtils.showException(this, e);
                     }
                 }
