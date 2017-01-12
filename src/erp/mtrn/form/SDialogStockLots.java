@@ -476,7 +476,7 @@ public class SDialogStockLots extends javax.swing.JDialog implements ActionListe
                                 minExpirationDate = STrnUtilities.obtainMixExpirationDateLotByItem(miClient, movePicked.getWarehouseKey(), movePicked.getPkItemId(), movePicked.getPkUnitId());
                             
                                 if (movePicked.getAuxLotDateExpiration() != null && minExpirationDate.before(movePicked.getAuxLotDateExpiration())) {
-                                   miClient.showMsgBoxWarning("El pedido selccionado no es el más proximo a caducar");
+                                   miClient.showMsgBoxWarning("El lote seleccionado no es el más próximo a caducar");
                                 }
                             }
                             catch (Exception e) {
