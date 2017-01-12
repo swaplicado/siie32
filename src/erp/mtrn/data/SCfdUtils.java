@@ -3289,8 +3289,10 @@ public abstract class SCfdUtils implements Serializable {
             comprobante.getEltImpuestos().setEltOpcImpuestosTrasladados(impuestosTrasladados);
         }
 
-        if (cfdXml.getCfdElementComplemento() != null) {
-            comprobante.setEltOpcComplemento((cfd.ver3.DElementComplemento) cfdXml.getCfdElementComplemento());
+        cfd.DElement elementComplement = cfdXml.getCfdElementComplemento();
+        
+        if (elementComplement != null) {
+            comprobante.setEltOpcComplemento((cfd.ver3.DElementComplemento) elementComplement);
         }
 
         if (cfdXml.getCfdElementAddenda() != null) {
@@ -3298,7 +3300,7 @@ public abstract class SCfdUtils implements Serializable {
         }
 
         if (cfdXml.getCfdTipoCfdXml() == SCfdConsts.CFD_TYPE_PAYROLL) {
-            if (cfdXml.getCfdElementComplemento() == null || comprobante.getEltOpcComplemento().getElements().isEmpty()) {
+            if (elementComplement == null || comprobante.getEltOpcComplemento().getElements().isEmpty()) {
                 comprobante = null;
                 throw new Exception("Error al generar el complemento nómina o el complemento no existe.");
             }

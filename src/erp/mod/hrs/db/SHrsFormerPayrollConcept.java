@@ -22,6 +22,7 @@ public class SHrsFormerPayrollConcept {
     protected double mdTotalGravado;
     protected double mdTotalExento;
 
+    protected String msClaveIncapacidad;
     protected boolean mbExtIsFound;
 
     protected SHrsFormerPayrollExtraTime moChildExtraTimes;
@@ -38,6 +39,7 @@ public class SHrsFormerPayrollConcept {
         mdTotalGravado = 0;
         mdTotalExento = 0;
 
+        msClaveIncapacidad = "";
         mbExtIsFound = false;
 
         moChildExtraTimes = new SHrsFormerPayrollExtraTime();
@@ -54,6 +56,7 @@ public class SHrsFormerPayrollConcept {
     public void setTotalGravado(double d) { mdTotalGravado = d; }
     public void setTotalExento(double d) { mdTotalExento = d; }
 
+    public void setClaveIncapacidad(String s) { msClaveIncapacidad = s; }
     public void setExtIsFound(boolean b) { mbExtIsFound = b; }
 
     public int getPkTipoConcepto() { return mnPkTipoConcepto; }
@@ -66,6 +69,7 @@ public class SHrsFormerPayrollConcept {
     public double getTotalGravado() { return mdTotalGravado; }
     public double getTotalExento() { return mdTotalExento; }
 
+    public String getClaveIncapacidad() { return msClaveIncapacidad; }
     public boolean getExtIsFound() { return mbExtIsFound; }
 
     public void setChildPayrollExtraTimes(SHrsFormerPayrollExtraTime o) { moChildExtraTimes = o; }

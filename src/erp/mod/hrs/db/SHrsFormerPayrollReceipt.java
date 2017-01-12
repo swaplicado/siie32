@@ -20,6 +20,7 @@ import erp.cfd.SCfdDataConcepto;
 import erp.cfd.SCfdDataImpuesto;
 import erp.cfd.SCfdXml;
 import erp.client.SClientInterface;
+import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import java.util.ArrayList;
@@ -218,7 +219,19 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
 
     public int getAuxEmpleadoId() { return mnAuxEmpleadoId; }
     public double getAuxSueldoMensual() { return mdAuxSueldoMensual; }
-
+    
+    private boolean isTypeContractCommisionLaborLess() {
+        return msTipoContrato.compareTo((String) miClient.getSession().readField(SModConsts.HRSS_TP_CON, new int[] { SModSysConsts.HRSS_TP_CON_TME_DET }, SDbRegistry.FIELD_CODE)) >= 0 &&
+                msTipoContrato.compareTo((String) miClient.getSession().readField(SModConsts.HRSS_TP_CON, new int[] { SModSysConsts.HRSS_TP_CON_LAB_CMM }, SDbRegistry.FIELD_CODE)) <= 0;
+    }
+    
+    private boolean isRecruitmentSchemePensionersLess() {
+        String tipoRegimen = (String) miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { mnTipoRegimen }, SDbRegistry.FIELD_CODE);
+        
+        return tipoRegimen.compareTo((String) miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { SModSysConsts.HRSS_TP_REC_SCHE_WAG }, SDbRegistry.FIELD_CODE)) >= 0 &&
+                tipoRegimen.compareTo((String) miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { SModSysConsts.HRSS_TP_REC_SCHE_PEN }, SDbRegistry.FIELD_CODE)) <= 0;
+    }
+    
     private cfd.ver3.nom12.DElementDeduccion createDeductionNode(final SHrsFormerPayrollConcept concept) {
         cfd.ver3.nom12.DElementDeduccion deduccion = new cfd.ver3.nom12.DElementDeduccion();
 
@@ -246,7 +259,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
         cfd.ver3.nom12.DElementHorasExtra horasExtra = new cfd.ver3.nom12.DElementHorasExtra();
 
         horasExtra.getAttDias().setInteger((int) concept.getCantidad());
-        horasExtra.getAttTipoHoras().setString(concept.getPkSubtipoConcepto() == SCfdConsts.CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_DOUBLE[1] ? SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE : SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_TRIPLE);
+        horasExtra.getAttTipoHoras().setString(concept.getPkSubtipoConcepto() == SCfdConsts.CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_DOUBLE[1] ? SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE_COD : SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_TRIPLE_COD);
         horasExtra.getAttHorasExtra().setInteger(concept.getHoras_r());
         horasExtra.getAttImportePagado().setDouble(concept.getTotalGravado() + concept.getTotalExento());
         
@@ -269,7 +282,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
         cfd.ver3.nom12.DElementIncapacidad incapacidad =  new DElementIncapacidad();
         
         incapacidad.getAttDiasIncapacidad().setInteger((int) concept.getCantidad());
-        incapacidad.getAttTipoIncapacidad().setString(concept.getClaveOficial() + "");
+        incapacidad.getAttTipoIncapacidad().setString(concept.getClaveIncapacidad());
         incapacidad.getAttImporteMonetario().setDouble(concept.getTotalGravado() + concept.getTotalExento());
         
         return incapacidad;
@@ -436,6 +449,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
         }
         else if (SLibUtils.belongsTo(moPayroll.getFkNominaTipoId(), new int[] { SModSysConsts.HRSS_TP_PAY_SHT_EXT } )) {
             sPayrollType = SHrsConsts.TXT_PAY_EXT;
+            msPeriodicidadPago = SHrsConsts.TXT_TP_PAY_OTH;
         }
         
         nomina.getAttTipoNomina().setString(sPayrollType);
@@ -446,26 +460,57 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
         
         // Create node Emisor:
         
-        emisor.getAttRegistroPatronal().setString(msRegistroPatronal);
+        if (isTypeContractCommisionLaborLess()) {
+            emisor.getAttRegistroPatronal().setString(msRegistroPatronal);
+            
+            // Create node Receptor:
+            
+            receptor.getAttNumSeguridadSocial().setString(msNumSeguridadSocial);
+            receptor.getAttFechaInicioRelLaboral().setDate(mtFechaInicioRelLaboral);
+            receptor.getAttAntiguedad().setString("P" + mnAntiguedad + "W");
+            receptor.getAttRiesgoPuesto().setString("" + mnRiesgoPuesto);
+            receptor.getAttSalarioBaseCotApor().setDouble(mdSalarioBaseCotApor);
+        }
         
-        // Create node Receptor:
+        // Complement node Receptor:
         
         receptor.getAttCurp().setString(msCurp);
-        receptor.getAttNumSeguridadSocial().setString(msNumSeguridadSocial);
-        receptor.getAttFechaInicioRelLaboral().setDate(mtFechaInicioRelLaboral);
-        receptor.getAttAntiguedad().setString("P" + mnAntiguedad + "W");
         receptor.getAttTipoContrato().setString(msTipoContrato);
         receptor.getAttSindicalizado().setString(msSindicalizado);
-        receptor.getAttTipoJornada().setString(msTipoJornada);
-        receptor.getAttTipoRegimen().setString((String) miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { mnTipoRegimen }, SDbRegistry.FIELD_CODE));
+        //receptor.getAttTipoJornada().setString(msTipoJornada); // (jbarajas 12-01-2017) Omitted by audit suggestion 
         receptor.getAttNumEmpleado().setString(msNumEmpleado);
         receptor.getAttDepartamento().setString(msDepartamento);
         receptor.getAttPuesto().setString(msPuesto);
-        receptor.getAttRiesgoPuesto().setString("" + mnRiesgoPuesto);
         receptor.getAttPeriodicidadPago().setString(msPeriodicidadPago);
-        receptor.getAttBanco().setString((String) miClient.getSession().readField(SModConsts.HRSS_BANK, new int[] { mnBanco }, SDbRegistry.FIELD_CODE));
-        receptor.getAttCuentaBancaria().setString(msCuentaBancaria);
-        receptor.getAttSalarioBaseCotApor().setDouble(mdSalarioBaseCotApor);
+        
+        // Validate recruitment scheme:
+        
+        if (isTypeContractCommisionLaborLess() &&
+                !isRecruitmentSchemePensionersLess()) {
+            throw new Exception("El tipo régimen no es 02, 03 ó 04.");
+        }
+        
+        if (!isTypeContractCommisionLaborLess() &&
+                isRecruitmentSchemePensionersLess()) {
+            throw new Exception("El tipo régimen no está entre 05 a 99.");
+        }
+        
+        receptor.getAttTipoRegimen().setString((String) miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { mnTipoRegimen }, SDbRegistry.FIELD_CODE));
+        
+        // Validate length the account bank:
+        
+        if (msCuentaBancaria.length() > 0) {
+            if (msCuentaBancaria.length() != SDataConstantsSys.BPSS_BPB_BANK_ACC_TEL && msCuentaBancaria.length() != SDataConstantsSys.BPSS_BPB_BANK_ACC_NUM &&
+                    msCuentaBancaria.length() != SDataConstantsSys.BPSS_BPB_BANK_ACC_TRJ && msCuentaBancaria.length() != SDataConstantsSys.BPSS_BPB_BANK_ACC_CBE) {
+                throw new Exception("La longitud de la cuenta bancaria es incorrecto.");
+            }
+
+            if (msCuentaBancaria.length() != SDataConstantsSys.BPSS_BPB_BANK_ACC_CBE) {
+                receptor.getAttBanco().setString((String) miClient.getSession().readField(SModConsts.HRSS_BANK, new int[] { mnBanco }, SDbRegistry.FIELD_CODE));
+            }
+            receptor.getAttCuentaBancaria().setString(msCuentaBancaria);
+        }
+        
         receptor.getAttSalarioDiarioIntegrado().setDouble(mdSalarioDiarioIntegrado);
         receptor.getAttClaveEntFed().setString(msClaveEstado);
         
@@ -742,22 +787,6 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
 
     @Override
     public ArrayList<SCfdDataImpuesto> getCfdImpuestos() {
-        /*
-        ArrayList<SCfdDataImpuesto> taxes = null
-        SCfdDataImpuesto tax = null;
-
-        taxes = new ArrayList<SCfdDataImpuesto>();
-
-        tax = new SCfdDataImpuesto();
-
-        tax.setImpuesto(DAttributeOptionImpuestoRetencion.CFD_ISR);
-        tax.setImpuestoBasico(SModSysConsts.FINS_TP_TAX_RETAINED);
-        tax.setTasa(1);
-        tax.setImporte(mdTotalRetenciones);
-
-        taxes.add(tax);
-        */
-
         return new ArrayList<SCfdDataImpuesto>();
     }
 }
