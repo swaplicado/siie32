@@ -1992,7 +1992,7 @@ public abstract class SHrsUtils {
                 "pei.dt_pay, pei.num_ser, pei.num, pei.fk_tp_pay_sys, " +
                 "CASE WHEN emp.fk_bank_n IS NOT NULL THEN emp.fk_bank_n ELSE (SELECT fk_bank FROM hrs_cfg WHERE id_cfg = " + SUtilConsts.BPR_CO_ID + ") END AS f_emp_bank, " +
                 "emp.dt_hire AS f_emp_alta, p.dt_sta AS f_nom_date_start, p.dt_end AS f_nom_date_end, " +
-                "TIMESTAMPDIFF(DAY, emp.dt_ben, p.dt_end) / " + SHrsConsts.WEEK_DAYS + " AS f_emp_sen, pos.name AS f_emp_pos, " +
+                "TIMESTAMPDIFF(DAY, emp.dt_hire, p.dt_end) / " + SHrsConsts.WEEK_DAYS + " AS f_emp_sen, pos.name AS f_emp_pos, " +
                 "con.code AS f_emp_cont_tp, wrktp.code AS f_emp_jorn_tp, tp.code AS f_emp_pay, rcp.sal_ssc AS f_emp_sal_bc, rcp.sal, rcp.wage, ris.code AS f_emp_risk, " +
                 "IF(emp.b_uni, '" + SHrsConsts.TXT_UNI_YES + "', '" + SHrsConsts.TXT_UNI_NO + "') AS f_emp_union, " +
                 "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
