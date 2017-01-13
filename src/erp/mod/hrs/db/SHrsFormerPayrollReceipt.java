@@ -325,8 +325,8 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
         cfd.ver3.nom11.DElementIncapacidades incapacidades = new cfd.ver3.nom11.DElementIncapacidades();
         cfd.ver3.nom11.DElementHorasExtras horasExtras = new cfd.ver3.nom11.DElementHorasExtras();
 
-        nomina.getAttRegistroPatronal().setString(DVer3Utils.formatAttributeValueAsKey(msRegistroPatronal));
-        nomina.getAttNumEmpleado().setString(DVer3Utils.formatAttributeValueAsKey(msNumEmpleado));
+        nomina.getAttRegistroPatronal().setString(msRegistroPatronal);
+        nomina.getAttNumEmpleado().setString(msNumEmpleado);
         nomina.getAttCurp().setString(msCurp);
         nomina.getAttTipoRegimen().setInteger(mnTipoRegimen);
         nomina.getAttNumSeguridadSocial().setString(msNumSeguridadSocial);
@@ -334,12 +334,12 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
         nomina.getAttFechaInicialPago().setDate(mtFechaInicialPago);
         nomina.getAttFechaFinalPago().setDate(mtFechaFinalPago);
         nomina.getAttNumDiasPagados().setDouble(mdNumDiasPagados);
-        nomina.getAttDepartamento().setString(DVer3Utils.formatAttributeValueAsText(msDepartamento));
+        nomina.getAttDepartamento().setString(msDepartamento);
         nomina.getAttClabe().setString(msCuentaBancaria);
         nomina.getAttBanco().setInteger(mnBanco);
         nomina.getAttFechaInicioRelLaboral().setDate(mtFechaInicioRelLaboral);
         nomina.getAttAntiguedad().setInteger(mnAntiguedad);
-        nomina.getAttPuesto().setString(DVer3Utils.formatAttributeValueAsText(msPuesto));
+        nomina.getAttPuesto().setString(msPuesto);
         nomina.getAttTipoContrato().setString(msTipoContrato);
         nomina.getAttTipoJornada().setString(msTipoJornada);
         nomina.getAttPeriodicidadPago().setString(msPeriodicidadPago);
@@ -461,7 +461,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
         // Create node Emisor:
         
         if (isTypeContractCommisionLaborLess()) {
-            emisor.getAttRegistroPatronal().setString(msRegistroPatronal);
+            emisor.getAttRegistroPatronal().setString(DVer3Utils.formatAttributeValueAsKey(msRegistroPatronal));
             
             // Create node Receptor:
             
@@ -478,9 +478,9 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
         receptor.getAttTipoContrato().setString(msTipoContrato);
         receptor.getAttSindicalizado().setString(msSindicalizado);
         //receptor.getAttTipoJornada().setString(msTipoJornada); // (jbarajas 12-01-2017) Omitted by audit suggestion 
-        receptor.getAttNumEmpleado().setString(msNumEmpleado);
-        receptor.getAttDepartamento().setString(msDepartamento);
-        receptor.getAttPuesto().setString(msPuesto);
+        receptor.getAttNumEmpleado().setString(DVer3Utils.formatAttributeValueAsKey(msNumEmpleado));
+        receptor.getAttDepartamento().setString(DVer3Utils.formatAttributeValueAsText(msDepartamento));
+        receptor.getAttPuesto().setString(DVer3Utils.formatAttributeValueAsText(msPuesto));
         receptor.getAttPeriodicidadPago().setString(msPeriodicidadPago);
         
         // Validate recruitment scheme:
