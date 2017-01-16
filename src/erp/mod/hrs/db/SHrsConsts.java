@@ -54,6 +54,8 @@ public class SHrsConsts {
     public static final int SAL_REF_SAL_SS = 2;
     public static final int SAL_REF_SAL_FIX = 3;
     
+    public static final double NUM_DAY_PAY_MIN = 0.001;
+    
     public static final String TXT_PAY_ORD = "O";
     public static final String TXT_PAY_EXT = "E";
     

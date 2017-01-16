@@ -8,8 +8,8 @@ package erp.print;
 import cfd.DCfdUtils;
 import cfd.DElement;
 import cfd.ver3.DElementComprobante;
-import cfd.ver3.nom11.DElementNomina;
 import cfd.ver3.DElementTimbreFiscalDigital;
+import cfd.ver3.nom11.DElementNomina;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SDialogResult;
 import erp.client.SClientInterface;
@@ -86,6 +86,7 @@ public class PrintCfdiThread extends Thread {
     
     public void printPayrollReceipt() throws java.lang.Exception {
         int i = 0;
+        int overTime = 0;
         int nTotalTiempoExtra = 0;
         int nPayrollPeriodYear = 0;
         int nPayrollPeriod = 0;
@@ -106,7 +107,6 @@ public class PrintCfdiThread extends Thread {
         SDataFormerPayrollEmp oFormerPayrollEmployee = null;
         SDbPayrollReceipt oPayrollReceipt = null;
         SDataCfd cfd = null;
-        //SDataCurrency cur = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { miClient.getSessionXXX().getParamsErp().getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
         SDataCurrency cur = new SDataCurrency();
 
         cur = miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency();
@@ -351,6 +351,199 @@ public class PrintCfdiThread extends Thread {
                         aIncapacidades.add(((cfd.ver3.nom11.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttDescuento().getDouble());
 
                         dTotalIncapacidades += ((cfd.ver3.nom11.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttDescuento().getDouble();
+                    }
+                }
+
+                for (int j = i; j < 5; j++) {
+                    aIncapacidades.add(null);
+                    aIncapacidades.add(null);
+                    aIncapacidades.add(null);
+                }
+
+                map.put("oPerceptions", aPercepciones);
+                map.put("oDeductions", aDeducciones);
+                map.put("oExtratimes", aTiempoExtra);
+                map.put("oIncapacities", aIncapacidades);
+                map.put("TotalPercepcionesGravado", dTotalPercepciones);
+                map.put("TotalPercepcionesExento", null);
+                map.put("TotalDeduccionesGravado", dTotalDeducciones);
+                map.put("TotalDeduccionesExento", null);
+                map.put("TotalTiempoExtra", nTotalTiempoExtra);
+                map.put("TotalTiempoExtraPagado", dTotalTiempoExtraPagado);
+                map.put("TotalIncapacidades", dTotalIncapacidades);
+                map.put("dCfdTotalIsr", dTotalIsr);
+            }
+            else if (element.getName().compareTo("nomina12:Nomina") == 0) {
+
+                map.put("TipoNomina", ((cfd.ver3.nom12.DElementNomina) element).getAttTipoNomina().getString());
+                map.put("FechaPago", oSimpleDateFormat.format(((cfd.ver3.nom12.DElementNomina) element).getAttFechaPago().getDate()));
+                map.put("FechaInicialPago", oSimpleDateFormat.format(((cfd.ver3.nom12.DElementNomina) element).getAttFechaInicialPago().getDate()));
+                map.put("FechaFinalPago", oSimpleDateFormat.format(((cfd.ver3.nom12.DElementNomina) element).getAttFechaFinalPago().getDate()));
+                map.put("NumDiasPagados", ((cfd.ver3.nom12.DElementNomina) element).getAttNumDiasPagados().getDouble());
+                map.put("NumDiasNoLaborados", mnSubtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getDaysNotWorked() : oPayrollReceipt.getDaysNotWorked_r());
+                map.put("NumDiasLaborados", mnSubtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getDaysWorked() : oPayrollReceipt.getDaysWorked()); // XXX Optional
+                map.put("NumDiasPagar", 0d); // Calculate?, navalos (2014-03-13)
+                
+                // Emisor:
+
+                i = 0;
+                if (((cfd.ver3.nom12.DElementNomina) element).getEltEmisor()!= null) {
+                    map.put("RegistroPatronal", ((cfd.ver3.nom12.DElementNomina) element).getEltEmisor().getAttRegistroPatronal().getString());
+                }
+
+                // Receptor:
+
+                String antigüedad = "";
+                
+                i = 0;
+                if (((cfd.ver3.nom12.DElementNomina) element).getEltReceptor() != null) {
+                    map.put("CURP", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttCurp().getString());
+                    map.put("NumSeguridadSocial", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttNumSeguridadSocial().getString());
+                    
+                    if (((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttFechaInicioRelLaboral().getDate() != null) {
+                        map.put("FechaInicioRelLaboral", oSimpleDateFormat.format(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttFechaInicioRelLaboral().getDate()));
+                    }
+                    
+                    if (!((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttAntiguedad().getString().isEmpty()) {
+                        antigüedad = ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttAntiguedad().getString();
+                        antigüedad = antigüedad.substring(1, antigüedad.length() - 1);
+                    }
+                    
+                    map.put("Antiguedad", SLibUtils.parseInt(antigüedad));
+                    map.put("TipoContrato", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttTipoContrato().getString());
+                    // Sindicalizado 
+                    map.put("TipoJornada", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttTipoJornada().getString());
+                    map.put("TipoRegimen", SCfdConsts.RegimenMap.get(SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttTipoRegimen().getString())));
+                    map.put("NumEmpleado", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttNumEmpleado().getString());
+                    map.put("Departamento", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttDepartamento().getString());
+                    map.put("Puesto", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttPuesto().getString());
+                    map.put("RiesgoPuesto", SCfdConsts.RiesgoMap.get(SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttRiesgoPuesto().getString())));
+                    map.put("PeriodicidadPago", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttPeriodicidadPago().getString());
+                    map.put("Banco", SCfdConsts.BancoMap.get(SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttBanco().getString())));
+                    map.put("CLABE", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttCuentaBancaria().getString());
+                    map.put("SalarioBaseCotApor", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttSalarioBaseCotApor().getDouble());
+                    map.put("SalarioDiarioIntegrado", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttSalarioDiarioIntegrado().getDouble());
+                    map.put("ClaveEstado", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttClaveEntFed().getString());
+                    map.put("TipoPago", mnSubtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? SModSysConsts.HRSS_TP_PAY_FOR : oPayrollReceipt.getFkPaymentTypeId());
+                    map.put("Sueldo", mnSubtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getSalary() : oPayrollReceipt.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? oPayrollReceipt.getSalary() : oPayrollReceipt.getWage());
+                    map.put("TipoEmpleado", mnSubtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getEmployeeType() : miClient.getSession().readField(SModConsts.HRSU_TP_EMP, new int[] { oPayrollReceipt.getFkEmployeeTypeId() }, SDbRegistry.FIELD_CODE));
+                    map.put("Categoria", mnSubtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getEmployeeCategory() : miClient.getSession().readField(SModConsts.HRSU_TP_WRK, new int[] { oPayrollReceipt.getFkWorkerTypeId() }, SDbRegistry.FIELD_CODE));
+                    map.put("TipoSalario", mnSubtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getSalaryType() : miClient.getSession().readField(SModConsts.HRSS_TP_SAL, new int[] { oPayrollReceipt.getFkSalaryTypeId() }, SDbRegistry.FIELD_NAME));
+                    map.put("Ejercicio", mnSubtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? (oFormerPayroll.getYear() + "-" + oFixedFormatAux.format(oFormerPayroll.getPeriod())) : (nPayrollPeriodYear + "-" + oFixedFormatAux.format(nPayrollPeriod)));
+                }
+                
+                aPercepciones = new ArrayList();
+                aDeducciones = new ArrayList();
+                aTiempoExtra = new ArrayList();
+                aIncapacidades = new ArrayList();
+
+                dTotalPercepciones = 0;
+                dTotalDeducciones = 0;
+                nTotalTiempoExtra = 0;
+                dTotalTiempoExtraPagado = 0;
+                dTotalIncapacidades = 0;
+                dTotalIsr = 0;
+
+                // Perceptions:
+
+                i = 0;
+                if (((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones() != null) {
+                    for (i = 0; i < ((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().size(); i++) {
+                        aPercepciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttTipoPercepcion().getString());
+                        aPercepciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttClave().getString());
+                        aPercepciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttConcepto().getString());
+                        aPercepciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteGravado().getDouble() +
+                                ((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteExento().getDouble());
+                        aPercepciones.add(null); // pending to be used, navalos (2014-03-13)
+
+                        dTotalPercepciones += ((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteGravado().getDouble() +
+                                ((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteExento().getDouble();
+                    
+                        // ExtraTimes:
+
+                        overTime = 0;
+                        for (; overTime < ((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getEltHijosHorasExtra().size(); overTime++) {
+                            aTiempoExtra.add(((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getEltHijosHorasExtra().get(overTime).getAttTipoHoras().getString().compareTo(SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE) == 0 ?
+                            SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE : SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_TRIPLE);
+                            aTiempoExtra.add(((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getEltHijosHorasExtra().get(overTime).getAttDias().getInteger());
+                            aTiempoExtra.add(((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getEltHijosHorasExtra().get(overTime).getAttHorasExtra().getInteger());
+                            aTiempoExtra.add(((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getEltHijosHorasExtra().get(overTime).getAttImportePagado().getDouble());
+
+                            nTotalTiempoExtra += ((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getEltHijosHorasExtra().get(overTime).getAttHorasExtra().getInteger();
+                            dTotalTiempoExtraPagado += ((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getEltHijosHorasExtra().get(overTime).getAttImportePagado().getDouble();
+                        }
+                    }
+                }
+
+                // Other payment:
+                
+                if (((cfd.ver3.nom12.DElementNomina) element).getEltOtrosPagos() != null) {
+                    for (i = 0; i < ((cfd.ver3.nom12.DElementNomina) element).getEltOtrosPagos().getEltHijosOtroPago().size(); i++) {
+                        aPercepciones.add(""); // is blank because it is not earning
+                        aPercepciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltOtrosPagos().getEltHijosOtroPago().get(i).getAttClave().getString());
+                        aPercepciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltOtrosPagos().getEltHijosOtroPago().get(i).getAttConcepto().getString());
+                        aPercepciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltOtrosPagos().getEltHijosOtroPago().get(i).getAttImporte().getDouble());
+                        aPercepciones.add(null); // pending to be used, navalos (2014-03-13)
+                    }
+                }
+                
+                for (int j = i; j < 10; j++) {
+                    aPercepciones.add(null);
+                    aPercepciones.add(null);
+                    aPercepciones.add(null);
+                    aPercepciones.add(null);
+                    aPercepciones.add(null);
+                }
+
+                for (int j = overTime; j < 5; j++) {
+                    aTiempoExtra.add(null);
+                    aTiempoExtra.add(null);
+                    aTiempoExtra.add(null);
+                    aTiempoExtra.add(null);
+                }
+
+                // Deductions:
+
+                i = 0;
+                if (((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones() != null) {
+                    for (i = 0; i < ((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().size(); i++) {
+
+                        aDeducciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttTipoDeduccion().getString());
+                        aDeducciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttClave().getString());
+                        aDeducciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttConcepto().getString());
+                        aDeducciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporte().getDouble());
+                        aDeducciones.add(null); // pending to be used, navalos (2014-03-13)
+
+                        // Obtain isr tax
+
+                        if (((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttClave().getString().compareTo(SCfdConsts.PAYROLL_PER_ISR) == 0 &&
+                            SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttTipoDeduccion().getString()) == SCfdConsts.DED_ISR) {
+                            dTotalIsr += ((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporte().getDouble();
+                        }
+
+                        dTotalDeducciones += ((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporte().getDouble();
+                    }
+                }
+
+                for (int j = i; j < 10; j++) {
+                    aDeducciones.add(null);
+                    aDeducciones.add(null);
+                    aDeducciones.add(null);
+                    aDeducciones.add(null);
+                    aDeducciones.add(null);
+                }
+
+                // Incapacities:
+
+                i = 0;
+                if (((cfd.ver3.nom12.DElementNomina) element).getEltIncapacidades() != null) {
+                    for (i = 0; i < ((cfd.ver3.nom12.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().size(); i++) {
+
+                        aIncapacidades.add(oFixedFormat.format(((cfd.ver3.nom12.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttTipoIncapacidad().getString()));
+                        aIncapacidades.add(((cfd.ver3.nom12.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttDiasIncapacidad().getInteger());
+                        aIncapacidades.add(((cfd.ver3.nom12.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttImporteMonetario().getDouble());
+
+                        dTotalIncapacidades += ((cfd.ver3.nom12.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttImporteMonetario().getDouble();
                     }
                 }
 

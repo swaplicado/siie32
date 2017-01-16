@@ -1216,7 +1216,7 @@ public class SCfdPrint {
 
         for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
 
-            if (element.getName().compareTo("nomina:Nomina") == 0) {
+            if (element.getName().compareTo("nomina12:Nomina") == 0) {
 
                 map.put("TipoNomina", ((cfd.ver3.nom12.DElementNomina) element).getAttTipoNomina().getString());
                 map.put("FechaPago", oSimpleDateFormat.format(((cfd.ver3.nom12.DElementNomina) element).getAttFechaPago().getDate()));
@@ -1236,12 +1236,23 @@ public class SCfdPrint {
 
                 // Receptor:
 
+                String antigüedad = "";
+                
                 i = 0;
                 if (((cfd.ver3.nom12.DElementNomina) element).getEltReceptor() != null) {
                     map.put("CURP", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttCurp().getString());
                     map.put("NumSeguridadSocial", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttNumSeguridadSocial().getString());
-                    map.put("FechaInicioRelLaboral", oSimpleDateFormat.format(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttFechaInicioRelLaboral().getDate()));
-                    map.put("Antiguedad", SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttAntiguedad().getString()));
+                    
+                    if (((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttFechaInicioRelLaboral().getDate() != null) {
+                        map.put("FechaInicioRelLaboral", oSimpleDateFormat.format(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttFechaInicioRelLaboral().getDate()));
+                    }
+                    
+                    if (!((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttAntiguedad().getString().isEmpty()) {
+                        antigüedad = ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttAntiguedad().getString();
+                        antigüedad = antigüedad.substring(1, antigüedad.length() - 1);
+                    }
+                    
+                    map.put("Antiguedad", SLibUtils.parseInt(antigüedad));
                     map.put("TipoContrato", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttTipoContrato().getString());
                     // Sindicalizado 
                     map.put("TipoJornada", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttTipoJornada().getString());
