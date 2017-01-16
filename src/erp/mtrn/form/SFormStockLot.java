@@ -178,6 +178,7 @@ public class SFormStockLot extends javax.swing.JDialog implements erp.lib.form.S
         jPanel19.add(jlDateExpiration_n);
 
         jftDateExpiration_n.setText("dd/mm/yyyy");
+        jftDateExpiration_n.setFocusLostBehavior(javax.swing.JFormattedTextField.PERSIST);
         jftDateExpiration_n.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel19.add(jftDateExpiration_n);
 
@@ -238,7 +239,7 @@ public class SFormStockLot extends javax.swing.JDialog implements erp.lib.form.S
         moFieldPkUnitId.setPickerButton(jbPkUnitId);
         moFieldLot = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfLot, jlLot);
         moFieldLot.setLengthMax(25);
-        moFieldDateExpiration_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateExpiration_n, jlDateExpiration_n);
+        moFieldDateExpiration_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftDateExpiration_n, jlDateExpiration_n);
         moFieldDateExpiration_n.setPickerButton(jbDateExpiration_n);
 
         mvFields = new Vector<SFormField>();
@@ -431,6 +432,10 @@ public class SFormStockLot extends javax.swing.JDialog implements erp.lib.form.S
                 if (jckIsDeleted.isSelected() && STrnUtilities.hasStock(miClient, miClient.getSession().getSystemYear(), moStockLot.getPkItemId(), moStockLot.getPkLotId(), SLibTimeUtilities.getEndOfYear(miClient.getSession().getSystemDate()))) {
                     validation.setMessage("El lote '" + jtfLot.getText() + "' no puede ser eliminado\n debido a que tiene existencias en los inventarios.");
                     validation.setComponent(jckIsDeleted);
+                }
+                if (moFieldDateExpiration_n.getDate() == null) {
+                    validation.setMessage("La fecha para el campo '" + jlDateExpiration_n.getText() + "' se debe expresar en el formato dd/mm/yyy.");
+                    validation.setComponent(jbDateExpiration_n);
                 }
             }
         }

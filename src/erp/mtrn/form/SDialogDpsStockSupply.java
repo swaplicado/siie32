@@ -838,7 +838,8 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
                         "COALESCE((SELECT SUM(dds.orig_qty) FROM trn_dps_dps_supply AS dds " +
                         "INNER JOIN trn_dps AS dd ON dds.id_des_year = dd.id_year AND dds.id_des_doc = dd.id_doc AND dd.b_del = false AND dd.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " +
                         "INNER JOIN trn_dps_ety AS dde ON dds.id_des_year = dde.id_year AND dds.id_des_doc = dde.id_doc AND dds.id_des_ety = dde.id_ety AND dde.b_del = false " +
-                        "WHERE de.id_year = dds.id_src_year AND de.id_doc = dds.id_src_doc AND de.id_ety = dds.id_src_ety), 0)  AS f_orig_link_qty " +
+                        "WHERE de.id_year = dds.id_src_year AND de.id_doc = dds.id_src_doc AND de.id_ety = dds.id_src_ety), 0)  AS f_orig_link_qty, " +
+                        "de.surplus_per " +
                         "FROM trn_dps AS d " +
                         "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND " +
                         "de.b_del = 0 AND de.b_inv = 1 AND de.qty > 0 AND de.orig_qty > 0 AND " +
@@ -871,6 +872,7 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
                     stockSupplyRow.setOriginalQuantitySupplied(resulSet.getDouble("f_sup_orig_qty"));
                     stockSupplyRow.setQuantityToSupply(0);
                     stockSupplyRow.setOriginalQuantityToSupply(0);
+                    stockSupplyRow.setSurplusPercentage(resulSet.getDouble("surplus_per"));
                     stockSupplyRow.setFkItemId(resulSet.getInt("fid_item"));   
                     stockSupplyRow.setFkUnitId(resulSet.getInt("fid_unit"));
                     stockSupplyRow.setFkOriginalUnitId(resulSet.getInt("fid_orig_unit"));
@@ -936,6 +938,8 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
 
     public erp.lib.form.SFormValidation formValidate() {
         int supplies = 0;
+        double totalSurplus = 0;
+        double totalLinked = 0;
         STrnDpsStockSupplyRow stockSupplyRow = null;
         SFormValidation validation = new SFormValidation();
 
@@ -944,13 +948,24 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
         for (int row = 0; row < moPaneDpsEntries.getTableModel().getTableRows().size(); row++) {
             stockSupplyRow = (STrnDpsStockSupplyRow) moPaneDpsEntries.getTableRow(row);
 
+            if (moParamDps.isOrder()) {
+                totalSurplus = stockSupplyRow.getOriginalQuantityPending() * (1d + stockSupplyRow.getSurplusPercentage());
+                totalLinked = stockSupplyRow.getOriginalQuantityToSupply(); 
+            }
+            
             if (stockSupplyRow.getOriginalQuantityToSupply() < 0) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + moPaneDpsEntries.getTableColumn(COL_QTY).getColumnTitle() + "' en la fila " + (row + 1) + ".\n" +
                         "El valor no puede ser negativo.");
                 validation.setComponent(moPaneDpsEntries.getTable());
                 break;
             }
-            else if (stockSupplyRow.getOriginalQuantityToSupply() > stockSupplyRow.getOriginalQuantityPending()) {
+            else if (totalLinked > totalSurplus && moParamDps.isOrder()) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + moPaneDpsEntries.getTableColumn(COL_QTY).getColumnTitle() + "' en la fila " + (row + 1) + ".\n" +
+                    "El valor no puede ser mayor a " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(totalSurplus) + ".");
+                validation.setComponent(moPaneDpsEntries.getTable());
+                break;
+            }
+            else if (stockSupplyRow.getOriginalQuantityToSupply() > stockSupplyRow.getOriginalQuantityPending() && !moParamDps.isOrder()) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + moPaneDpsEntries.getTableColumn(COL_QTY).getColumnTitle() + "' en la fila " + (row + 1) + ".\n" +
                         "El valor no puede ser mayor a " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stockSupplyRow.getOriginalQuantityPending()) + ".");
                 validation.setComponent(moPaneDpsEntries.getTable());

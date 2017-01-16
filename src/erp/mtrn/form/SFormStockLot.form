@@ -222,6 +222,7 @@
                     <Component class="javax.swing.JFormattedTextField" name="jftDateExpiration_n">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="dd/mm/yyyy"/>
+                        <Property name="focusLostBehavior" type="int" value="3"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[75, 23]"/>
                         </Property>
