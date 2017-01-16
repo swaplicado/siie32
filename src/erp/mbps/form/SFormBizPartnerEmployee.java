@@ -612,7 +612,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlFkEmployeeType.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel30.add(jlFkEmployeeType);
 
-        jcbFkEmployeeType.setPreferredSize(new java.awt.Dimension(200, 23));
+        jcbFkEmployeeType.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel30.add(jcbFkEmployeeType);
 
         jPanel4.add(jPanel30);
@@ -623,7 +623,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlFkWorkerType.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel15.add(jlFkWorkerType);
 
-        jcbFkWorkerType.setPreferredSize(new java.awt.Dimension(200, 23));
+        jcbFkWorkerType.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel15.add(jcbFkWorkerType);
 
         jPanel4.add(jPanel15);
@@ -646,7 +646,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlFkDepartment.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel17.add(jlFkDepartment);
 
-        jcbFkDepartment.setPreferredSize(new java.awt.Dimension(200, 23));
+        jcbFkDepartment.setPreferredSize(new java.awt.Dimension(350, 23));
         jcbFkDepartment.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jcbFkDepartmentItemStateChanged(evt);
@@ -662,7 +662,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlFkPosition.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel32.add(jlFkPosition);
 
-        jcbFkPosition.setPreferredSize(new java.awt.Dimension(200, 23));
+        jcbFkPosition.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel32.add(jcbFkPosition);
 
         jPanel4.add(jPanel32);
@@ -673,7 +673,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlFkShift.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel21.add(jlFkShift);
 
-        jcbFkShift.setPreferredSize(new java.awt.Dimension(200, 23));
+        jcbFkShift.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel21.add(jcbFkShift);
 
         jPanel4.add(jPanel21);
@@ -684,7 +684,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlFkWorkingDayType.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel44.add(jlFkWorkingDayType);
 
-        jcbFkWorkingDayType.setPreferredSize(new java.awt.Dimension(200, 23));
+        jcbFkWorkingDayType.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel44.add(jcbFkWorkingDayType);
 
         jPanel4.add(jPanel44);
@@ -709,7 +709,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlFkContractType.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel27.add(jlFkContractType);
 
-        jcbFkContractType.setPreferredSize(new java.awt.Dimension(200, 23));
+        jcbFkContractType.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel27.add(jcbFkContractType);
 
         jPanel4.add(jPanel27);
@@ -720,7 +720,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlFkRecruitmentSchemeType.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel33.add(jlFkRecruitmentSchemeType);
 
-        jcbFkRecruitmentSchemeType.setPreferredSize(new java.awt.Dimension(200, 23));
+        jcbFkRecruitmentSchemeType.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel33.add(jcbFkRecruitmentSchemeType);
 
         jPanel4.add(jPanel33);
@@ -731,7 +731,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlFkPositionRiskType.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel23.add(jlFkPositionRiskType);
 
-        jcbFkPositionRiskType.setPreferredSize(new java.awt.Dimension(200, 23));
+        jcbFkPositionRiskType.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel23.add(jcbFkPositionRiskType);
 
         jPanel4.add(jPanel23);
@@ -742,7 +742,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlFkMwzType.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel31.add(jlFkMwzType);
 
-        jcbFkMwzType.setPreferredSize(new java.awt.Dimension(200, 23));
+        jcbFkMwzType.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel31.add(jcbFkMwzType);
 
         jPanel4.add(jPanel31);
@@ -946,7 +946,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         getContentPane().add(jPanel5, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(776, 638));
+        setSize(new java.awt.Dimension(976, 639));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 

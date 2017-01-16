@@ -1242,10 +1242,15 @@ public class SCfdPrint {
                 if (((cfd.ver3.nom12.DElementNomina) element).getEltReceptor() != null) {
                     map.put("CURP", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttCurp().getString());
                     map.put("NumSeguridadSocial", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttNumSeguridadSocial().getString());
-                    map.put("FechaInicioRelLaboral", oSimpleDateFormat.format(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttFechaInicioRelLaboral().getDate()));
                     
-                    antigüedad = ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttAntiguedad().getString();
-                    antigüedad = antigüedad.substring(1, antigüedad.length() - 1);
+                    if (((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttFechaInicioRelLaboral().getDate() != null) {
+                        map.put("FechaInicioRelLaboral", oSimpleDateFormat.format(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttFechaInicioRelLaboral().getDate()));
+                    }
+                    
+                    if (!((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttAntiguedad().getString().isEmpty()) {
+                        antigüedad = ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttAntiguedad().getString();
+                        antigüedad = antigüedad.substring(1, antigüedad.length() - 1);
+                    }
                     
                     map.put("Antiguedad", SLibUtils.parseInt(antigüedad));
                     map.put("TipoContrato", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttTipoContrato().getString());
