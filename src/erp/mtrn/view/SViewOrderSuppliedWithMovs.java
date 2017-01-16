@@ -18,6 +18,7 @@ import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.STrnDiogComplement;
+import erp.mtrn.data.STrnDpsUtilities;
 import erp.mtrn.form.SDialogDpsFinder;
 import java.awt.event.ActionEvent;
 import javax.swing.ImageIcon;
@@ -156,14 +157,16 @@ public class SViewOrderSuppliedWithMovs extends erp.lib.table.STableTab implemen
             if (moDialogDpsFinder.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                 int[] keyIog = isViewForPurchases() ? SDataConstantsSys.TRNS_TP_IOG_IN_PUR_PUR : SDataConstantsSys.TRNS_TP_IOG_OUT_SAL_SAL;
                 SDataDps dps = (SDataDps) moDialogDpsFinder.getValue(SDataConstants.TRN_DPS);
-
-                ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_INV).setFormComplement(new STrnDiogComplement(keyIog, dps));
-                if (((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_INV).showForm(SDataConstants.TRN_DIOG, null) == SLibConstants.DB_ACTION_SAVE_OK) {
-                    ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_INV).refreshCatalogues(SDataConstants.TRN_DIOG);
+                
+                if (STrnDpsUtilities.isDpsAuthorized(miClient, dps)) {
+                    ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_INV).setFormComplement(new STrnDiogComplement(keyIog, dps));
+                    if (((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_INV).showForm(SDataConstants.TRN_DIOG, null) == SLibConstants.DB_ACTION_SAVE_OK) {
+                        ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_INV).refreshCatalogues(SDataConstants.TRN_DIOG);
+                    }
+                
+                    miClient.getGuiModule(SDataConstants.MOD_INV).refreshCatalogues(mnTabType);
                 }
             }
-            
-            miClient.getGuiModule(SDataConstants.MOD_INV).refreshCatalogues(mnTabType);
         }
     }
     

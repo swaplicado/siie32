@@ -571,7 +571,7 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
                         double totalsupplied = STrnDpsUtilities.obtainEntryTotalQuantitySupplied(miClient, (int[]) entry.getDpsEntryKey());
                         if (totalsupplied > entry.getQuantityToLink()) {
                             validation.setMessage("Para el ítem '" + entry.getConcept() + " (" + entry.getConceptKey() + ")' en la partida # " + entry.getSortingPosition() + "\n" +
-                                    "la cantidad minima a vincular debe ser mayor o igual a " + 
+                                    "la cantidad minima a vincular debe ser " + (totalsupplied < entry.getQuantityToBeLinked() ? "mayor o " : "") + "igual a " + 
                                     miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(totalsupplied) + " ya que tiene sutidos previos.");
                             break;
                         }

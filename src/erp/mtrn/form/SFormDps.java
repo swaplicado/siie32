@@ -2642,7 +2642,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         try {
                             SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moParamDpsSource.getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
 
-                            if (!isDpsAuthorized(dps)) {
+                            if (!STrnDpsUtilities.isDpsAuthorized(miClient, dps)) {
                                 mbFormSettingsOk = bContinue = false;
                                 actionCancel();
                             }
@@ -2845,43 +2845,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         return blocked;
     }
 
-    /**
-     * Checks if source order is authorized.
-     */
-    private boolean isDpsAuthorized(final SDataDps dps) {
-        boolean authorized = true;
-
-        if (dps.isOrder()) {
-            if (dps.isOrderPur()) {
-                if (miClient.getSessionXXX().getParamsCompany().getIsAuthorizationPurchasesOrderAutomatic() && dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
-                    authorized = false;
-                    miClient.showMsgBoxWarning(SLibConstants.MSG_INF_NOT_AUTHORN_ORD);
-                }
-            }
-            else {
-                if (miClient.getSessionXXX().getParamsCompany().getIsAuthorizationSalesOrderAutomatic() && dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
-                    authorized = false;
-                    miClient.showMsgBoxWarning(SLibConstants.MSG_INF_NOT_AUTHORN_ORD);
-                }
-            }
-        }
-        else if (dps.isDocument()) {
-            if (dps.isDocumentPur()) {
-                if (miClient.getSessionXXX().getParamsCompany().getIsAuthorizationPurchasesDocAutomatic() && dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
-                    authorized = false;
-                    miClient.showMsgBoxWarning(SLibConstants.MSG_INF_NOT_AUTHORN_DOC);
-                }
-            }
-            else {
-                if (miClient.getSessionXXX().getParamsCompany().getIsAuthorizationSalesDocAutomatic() && dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
-                    authorized = false;
-                    miClient.showMsgBoxWarning(SLibConstants.MSG_INF_NOT_AUTHORN_DOC);
-                }
-            }
-        }
-
-        return authorized;
-    }
 
     private boolean isUpdateEntriesAllNeeded() {
         boolean isUpdateNeeded = false;
@@ -5383,7 +5346,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
 
             if (oDpsSource != null) {
-                if (isDpsAuthorized(oDpsSource)) {
+                if (STrnDpsUtilities.isDpsAuthorized(miClient, oDpsSource)) {
                     if (mbIsOrd || mbIsDoc) {
                         // A.1. Validate that source DPS can be used:
 

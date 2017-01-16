@@ -23,6 +23,7 @@ public class STrnDpsStockSupplyRow extends erp.lib.table.STableRow {
     protected double mdOriginalQuantityAdjusted;
     protected double mdOriginalQuantitySupplied;
     protected double mdOriginalQuantityToSupply;
+    protected double mdSurplusPercentage;
     protected int mnFkItemId;
     protected int mnFkUnitId;
     protected int mnFkOriginalUnitId;
@@ -51,6 +52,7 @@ public class STrnDpsStockSupplyRow extends erp.lib.table.STableRow {
         mdOriginalQuantityAdjusted = 0;
         mdOriginalQuantitySupplied = 0;
         mdOriginalQuantityToSupply = 0;
+        mdSurplusPercentage = 0;
         mnFkItemId = 0;
         mnFkUnitId = 0;
         mnFkOriginalUnitId = 0;
@@ -86,6 +88,7 @@ public class STrnDpsStockSupplyRow extends erp.lib.table.STableRow {
     public void setOriginalQuantityAdjusted(double d) { mdOriginalQuantityAdjusted = d; }
     public void setOriginalQuantitySupplied(double d) { mdOriginalQuantitySupplied = d; }
     public void setOriginalQuantityToSupply(double d) { mdOriginalQuantityToSupply = d; }
+    public void setSurplusPercentage(double d) { mdSurplusPercentage = d; }
     public void setFkItemId(int n) { mnFkItemId = n; }
     public void setFkUnitId(int n) { mnFkUnitId = n; }
     public void setFkOriginalUnitId(int n) { mnFkOriginalUnitId = n; }
@@ -108,6 +111,7 @@ public class STrnDpsStockSupplyRow extends erp.lib.table.STableRow {
     public double getOriginalQuantityAdjusted() { return mdOriginalQuantityAdjusted; }
     public double getOriginalQuantitySupplied() { return mdOriginalQuantitySupplied; }
     public double getOriginalQuantityToSupply() { return mdOriginalQuantityToSupply; }
+    public double getSurplusPercentage() { return mdSurplusPercentage; }
     public int getFkItemId() { return mnFkItemId; }
     public int getFkUnitId() { return mnFkUnitId; }
     public int getFkOriginalUnitId() { return mnFkOriginalUnitId; }
