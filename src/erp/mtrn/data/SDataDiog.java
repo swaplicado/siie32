@@ -174,12 +174,14 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
             if (resultSet.next()) {
                 lotId = resultSet.getInt("id_lot");
                 
-                if (resultSet.getDate("dt_exp_n") != move.getAuxLotDateExpiration()) {
-                   sql = "UPDATE trn_lot SET dt_exp_n = '" + new java.sql.Date(move.getAuxLotDateExpiration().getTime())  + "' WHERE " +
-                    "id_item = " + move.getPkItemId() + " AND id_unit = " + move.getPkUnitId() + " AND " +       
-                    "id_lot = " + lotId + " ";
-                    resultSet = statement.executeQuery(sql);
-                }
+                if (move.getAuxLotDateExpiration() != null) {
+                    if (resultSet.getDate("dt_exp_n") != move.getAuxLotDateExpiration()) {
+                       sql = "UPDATE trn_lot SET dt_exp_n = '" + new java.sql.Date(move.getAuxLotDateExpiration().getTime())  + "' WHERE " +
+                        "id_item = " + move.getPkItemId() + " AND id_unit = " + move.getPkUnitId() + " AND " +       
+                        "id_lot = " + lotId + " ";
+                         statement.execute(sql);
+                    }
+                }    
             }
             else {
                 stockLot = new SDataStockLot();
@@ -204,18 +206,20 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
             stockMove.setPkLotId(lotId);
         }
        else {
-            sql = "SELECT dt_exp_n FROM trn_lot WHERE " +
-                  "id_item = " + move.getPkItemId() + " AND id_unit = " + move.getPkUnitId() + " AND " + 
-                  "id_lot = " + move.getPkLotId() + " ";
-            resultSet = statement.executeQuery(sql);
+            if (move.getAuxLotDateExpiration() != null) {
+                sql = "SELECT dt_exp_n FROM trn_lot WHERE " +
+                      "id_item = " + move.getPkItemId() + " AND id_unit = " + move.getPkUnitId() + " AND " + 
+                      "id_lot = " + move.getPkLotId() + " ";
+                resultSet = statement.executeQuery(sql);
 
-            if (resultSet.next()) {
-                
-                if (resultSet.getDate("dt_exp_n") != new java.sql.Date(move.getAuxLotDateExpiration().getTime())) {
-                    sql = "UPDATE trn_lot SET dt_exp_n = '" + new java.sql.Date(move.getAuxLotDateExpiration().getTime())  + "' WHERE " +
-                    "id_item = " + move.getPkItemId() + " AND id_unit = " + move.getPkUnitId() + " AND " +        
-                    "id_lot = " + move.getPkLotId() + " ";
-                    statement.execute(sql);
+                if (resultSet.next()) {
+
+                    if (resultSet.getDate("dt_exp_n") != new java.sql.Date(move.getAuxLotDateExpiration().getTime())) {
+                        sql = "UPDATE trn_lot SET dt_exp_n = '" + new java.sql.Date(move.getAuxLotDateExpiration().getTime())  + "' WHERE " +
+                        "id_item = " + move.getPkItemId() + " AND id_unit = " + move.getPkUnitId() + " AND " +        
+                        "id_lot = " + move.getPkLotId() + " ";
+                        statement.execute(sql);
+                    }
                 }
             }
        }
