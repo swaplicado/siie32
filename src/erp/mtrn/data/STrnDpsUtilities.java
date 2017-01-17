@@ -56,35 +56,36 @@ public abstract class STrnDpsUtilities {
 
     /**
      * Checks if source order is authorized.
-     * @param client
-     * @param dps
-     * @return 
-    */
+     */
     public static boolean isDpsAuthorized(final SClientInterface client, final SDataDps dps) {
-        boolean isAuthorized = true;
-        boolean isStatuaAuthorized = dps.getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN;
-        
+        boolean authorized = true;
         if (dps.isOrder()) {
             if (dps.isOrderPur()) {
-                isAuthorized = client.getSessionXXX().getParamsCompany().getIsAuthorizationPurchasesOrderAutomatic() && isStatuaAuthorized;
+                if (client.getSessionXXX().getParamsCompany().getIsAuthorizationPurchasesOrderAutomatic() && dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
+                    authorized = false;
+                    client.showMsgBoxWarning(SLibConstants.MSG_INF_NOT_AUTHORN_ORD);
+                }
             } 
             else {
-                isAuthorized = client.getSessionXXX().getParamsCompany().getIsAuthorizationSalesOrderAutomatic() && isStatuaAuthorized;
+                if (client.getSessionXXX().getParamsCompany().getIsAuthorizationSalesOrderAutomatic() && dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
+                    authorized = false;
+                    client.showMsgBoxWarning(SLibConstants.MSG_INF_NOT_AUTHORN_ORD);
+                }
             }
-        } 
-        else if (dps.isDocument()) {
+        } else if (dps.isDocument()) {
             if (dps.isDocumentPur()) {
-                isAuthorized = client.getSessionXXX().getParamsCompany().getIsAuthorizationPurchasesDocAutomatic() && isStatuaAuthorized;
+                if (client.getSessionXXX().getParamsCompany().getIsAuthorizationPurchasesDocAutomatic() && dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
+                    authorized = false;
+                    client.showMsgBoxWarning(SLibConstants.MSG_INF_NOT_AUTHORN_DOC);
+                }
             } 
             else {
-                isAuthorized = client.getSessionXXX().getParamsCompany().getIsAuthorizationSalesDocAutomatic() && isStatuaAuthorized;
+                if (client.getSessionXXX().getParamsCompany().getIsAuthorizationSalesDocAutomatic() && dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
+                    authorized = false;
+                    client.showMsgBoxWarning(SLibConstants.MSG_INF_NOT_AUTHORN_DOC);
+                }
             }
         }
-        
-        if (!isAuthorized) {
-            client.showMsgBoxWarning(SLibConstants.MSG_INF_NOT_AUTHORN_ORD);
-        }
-
-        return isAuthorized;
+        return authorized;
     }
 }
