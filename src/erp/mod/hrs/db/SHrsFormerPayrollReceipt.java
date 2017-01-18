@@ -292,23 +292,38 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
         String otherPaymentKey = "";
 
         cfd.ver3.nom12.DElementOtroPago otroPago = null;
-        cfd.ver3.nom12.DElementSubsidioEmpleo subsidioEmpleo = new cfd.ver3.nom12.DElementSubsidioEmpleo();
+        cfd.ver3.nom12.DElementSubsidioEmpleo subsidioEmpleo = null;
 
         if (concept.getTotalGravado() > 0 || concept.getTotalExento() > 0) {
             otroPago = new cfd.ver3.nom12.DElementOtroPago();
             
-            // Obtain key for other payment type:
-            
-            otherPaymentKey = (String) miClient.getSession().readField(SModConsts.HRSS_TP_OTH_PAY, new int[] { SModSysConsts.HRSS_TP_OTH_PAY_TAX_SUB }, SDbRegistry.FIELD_CODE);
+            if (concept.getClaveOficial() == SModSysConsts.HRSS_TP_EAR_TAX_SUB) {
+                subsidioEmpleo = new cfd.ver3.nom12.DElementSubsidioEmpleo();
+                
+                // Obtain key for other payment type:
 
-            otroPago.getAttTipoOtroPago().setString(otherPaymentKey);
-            otroPago.getAttClave().setString(DVer3Utils.formatAttributeValueAsKey(concept.getClaveEmpresa().length() < 3 ? SLibUtils.textRepeat("0", 3 - concept.getClaveEmpresa().length()) + concept.getClaveEmpresa() : concept.getClaveEmpresa()));
-            otroPago.getAttConcepto().setString(DVer3Utils.formatAttributeValueAsText(concept.getConcepto()));
-            otroPago.getAttImporte().setDouble(concept.getTotalGravado() + concept.getTotalExento());
+                otherPaymentKey = (String) miClient.getSession().readField(SModConsts.HRSS_TP_OTH_PAY, new int[] { SModSysConsts.HRSS_TP_OTH_PAY_TAX_SUB }, SDbRegistry.FIELD_CODE);
 
-            subsidioEmpleo.getAttSubsidioCausado().setDouble(concept.getTotalGravado() + concept.getTotalExento());
+                otroPago.getAttTipoOtroPago().setString(otherPaymentKey);
+                otroPago.getAttClave().setString(DVer3Utils.formatAttributeValueAsKey(concept.getClaveEmpresa().length() < 3 ? SLibUtils.textRepeat("0", 3 - concept.getClaveEmpresa().length()) + concept.getClaveEmpresa() : concept.getClaveEmpresa()));
+                otroPago.getAttConcepto().setString(DVer3Utils.formatAttributeValueAsText(concept.getConcepto()));
+                otroPago.getAttImporte().setDouble(concept.getTotalGravado() + concept.getTotalExento());
 
-            otroPago.setEltSubsidioEmpleo(subsidioEmpleo);
+                subsidioEmpleo.getAttSubsidioCausado().setDouble(concept.getTotalGravado() + concept.getTotalExento());
+
+                otroPago.setEltSubsidioEmpleo(subsidioEmpleo);
+                
+            }
+            else if (concept.getClaveOficial() == SModSysConsts.HRSS_TP_EAR_OTH_PAY) {
+                // Obtain key for other payment type:
+
+                otherPaymentKey = (String) miClient.getSession().readField(SModConsts.HRSS_TP_OTH_PAY, new int[] { SModSysConsts.HRSS_TP_OTH_PAY_OTH_PAY }, SDbRegistry.FIELD_CODE);
+
+                otroPago.getAttTipoOtroPago().setString(otherPaymentKey);
+                otroPago.getAttClave().setString(DVer3Utils.formatAttributeValueAsKey(concept.getClaveEmpresa().length() < 3 ? SLibUtils.textRepeat("0", 3 - concept.getClaveEmpresa().length()) + concept.getClaveEmpresa() : concept.getClaveEmpresa()));
+                otroPago.getAttConcepto().setString(DVer3Utils.formatAttributeValueAsText(concept.getConcepto()));
+                otroPago.getAttImporte().setDouble(concept.getTotalGravado() + concept.getTotalExento());
+            }
         }
         
         return otroPago;
@@ -522,7 +537,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
         for (SHrsFormerPayrollConcept concept : moChildPayrollConcept) {
             switch (concept.getPkTipoConcepto()) {
                 case SCfdConsts.CFDI_PAYROLL_PERCEPTION:
-                    if (concept.getClaveOficial() != SModSysConsts.HRSS_TP_EAR_TAX_SUB) {
+                    if (concept.getClaveOficial() != SModSysConsts.HRSS_TP_EAR_TAX_SUB && concept.getClaveOficial() != SModSysConsts.HRSS_TP_EAR_OTH_PAY) {
                         cfd.ver3.nom12.DElementPercepcion percepcion = createEarningNode(concept);
                         
                         switch (concept.getClaveOficial()) {
@@ -551,7 +566,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
                             percepciones.getEltHijosPercepcion().add(percepcion);
                         }
                     }
-                    else if (concept.getClaveOficial() == SModSysConsts.HRSS_TP_EAR_TAX_SUB) {
+                    else if (concept.getClaveOficial() == SModSysConsts.HRSS_TP_EAR_TAX_SUB || concept.getClaveOficial() == SModSysConsts.HRSS_TP_EAR_OTH_PAY) {
                         cfd.ver3.nom12.DElementOtroPago otroPago = createEarningOtherPayNode(concept);
                         
                         if (otroPago != null) {
