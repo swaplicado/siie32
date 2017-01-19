@@ -538,31 +538,31 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
             switch (concept.getPkTipoConcepto()) {
                 case SCfdConsts.CFDI_PAYROLL_PERCEPTION:
                     if (concept.getClaveOficial() != SModSysConsts.HRSS_TP_EAR_TAX_SUB && concept.getClaveOficial() != SModSysConsts.HRSS_TP_EAR_OTH_PAY) {
-                        cfd.ver3.nom12.DElementPercepcion percepcion = createEarningNode(concept);
-                        
-                        switch (concept.getClaveOficial()) {
-                            case SModSysConsts.HRSS_TP_EAR_OVR_TME:
-                                percepcion.getEltHijosHorasExtra().add(createEarningOverTimeNode(concept));
-                                break;
-                            case SModSysConsts.HRSS_TP_EAR_DIS:
-                                incapacidades.getEltHijosIncapacidad().add(createEarningDisabilityNode(concept));
-                                break;
-                            case SModSysConsts.HRSS_TP_EAR_SEN_BON:
-                            case SModSysConsts.HRSS_TP_EAR_SET:
-                            case SModSysConsts.HRSS_TP_EAR_CMP:
-                                dTotalSeparacionIndemnizacionGravado = SLibUtils.round((dTotalSeparacionIndemnizacionGravado + percepcion.getAttImporteGravado().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-                                dTotalSeparacionIndemnizacionExento = SLibUtils.round((dTotalSeparacionIndemnizacionExento + percepcion.getAttImporteExento().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-                                break;
-                            default:
-                        }
-                        
-                        if (!SLibUtils.belongsTo(concept.getClaveOficial(), new int[] { SModSysConsts.HRSS_TP_EAR_SEN_BON, SModSysConsts.HRSS_TP_EAR_SET, SModSysConsts.HRSS_TP_EAR_CMP })) { 
-                            dTotalSueldos = SLibUtils.round((dTotalSueldos + (percepcion.getAttImporteGravado().getDouble() + percepcion.getAttImporteExento().getDouble())), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-                        }
-                        dTotalGravado = SLibUtils.round((dTotalGravado + percepcion.getAttImporteGravado().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-                        dTotalExento = SLibUtils.round((dTotalExento + percepcion.getAttImporteExento().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-                        
-                        if (dTotalGravado > 0 || dTotalExento > 0) {
+                        if (concept.getTotalGravado() > 0 || concept.getTotalExento() > 0) {
+                            cfd.ver3.nom12.DElementPercepcion percepcion = createEarningNode(concept);
+
+                            switch (concept.getClaveOficial()) {
+                                case SModSysConsts.HRSS_TP_EAR_OVR_TME:
+                                    percepcion.getEltHijosHorasExtra().add(createEarningOverTimeNode(concept));
+                                    break;
+                                case SModSysConsts.HRSS_TP_EAR_DIS:
+                                    incapacidades.getEltHijosIncapacidad().add(createEarningDisabilityNode(concept));
+                                    break;
+                                case SModSysConsts.HRSS_TP_EAR_SEN_BON:
+                                case SModSysConsts.HRSS_TP_EAR_SET:
+                                case SModSysConsts.HRSS_TP_EAR_CMP:
+                                    dTotalSeparacionIndemnizacionGravado = SLibUtils.round((dTotalSeparacionIndemnizacionGravado + percepcion.getAttImporteGravado().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                                    dTotalSeparacionIndemnizacionExento = SLibUtils.round((dTotalSeparacionIndemnizacionExento + percepcion.getAttImporteExento().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                                    break;
+                                default:
+                            }
+
+                            if (!SLibUtils.belongsTo(concept.getClaveOficial(), new int[] { SModSysConsts.HRSS_TP_EAR_SEN_BON, SModSysConsts.HRSS_TP_EAR_SET, SModSysConsts.HRSS_TP_EAR_CMP })) { 
+                                dTotalSueldos = SLibUtils.round((dTotalSueldos + (percepcion.getAttImporteGravado().getDouble() + percepcion.getAttImporteExento().getDouble())), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                            }
+                            dTotalGravado = SLibUtils.round((dTotalGravado + percepcion.getAttImporteGravado().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                            dTotalExento = SLibUtils.round((dTotalExento + percepcion.getAttImporteExento().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+
                             percepciones.getEltHijosPercepcion().add(percepcion);
                         }
                     }
@@ -574,18 +574,18 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
                         }
                     }
                     break;
-                case SCfdConsts.CFDI_PAYROLL_DEDUCTION:                    
-                    if (concept.getClaveOficial() == SModSysConsts.HRSS_TP_DED_TAX) {
-                        dTotalImpuestosRetenidos += concept.getTotalGravado() + concept.getTotalExento();
-                    }
-                    else {
-                        dTotalOtrasDeducciones += concept.getTotalGravado() + concept.getTotalExento();
-                        
-                        if (concept.getClaveOficial() == SModSysConsts.HRSS_TP_DED_DIS) {
-                            incapacidades.getEltHijosIncapacidad().add(createEarningDisabilityNode(concept));
+                case SCfdConsts.CFDI_PAYROLL_DEDUCTION:
+                    if (concept.getTotalGravado() > 0 || concept.getTotalExento() > 0) {
+                        if (concept.getClaveOficial() == SModSysConsts.HRSS_TP_DED_TAX) {
+                            dTotalImpuestosRetenidos += concept.getTotalGravado() + concept.getTotalExento();
                         }
-                    }
-                    if (dTotalImpuestosRetenidos > 0 || dTotalOtrasDeducciones > 0) {
+                        else {
+                            dTotalOtrasDeducciones += concept.getTotalGravado() + concept.getTotalExento();
+
+                            if (concept.getClaveOficial() == SModSysConsts.HRSS_TP_DED_DIS) {
+                                incapacidades.getEltHijosIncapacidad().add(createEarningDisabilityNode(concept));
+                            }
+                        }
                         deducciones.getEltHijosDeduccion().add(createDeductionNode(concept));
                     }
                     break;
