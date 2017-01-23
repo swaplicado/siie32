@@ -2303,6 +2303,14 @@ public abstract class SHrsUtils {
                 break;
             case SModSysConsts.HRSS_TP_LOAN_PAY_FIX:
                 amoutMonth = loan.getPaymentFixed() * hrsReceipt.getHrsPayroll().getPayroll().getMwzReferenceWage() + amoutAdjustment;
+                
+                amoutAux += hrsDaysPrev == null ? 0 : (amoutMonth / hrsDaysPrev.getPeriodDays() * (hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()));
+                amoutAux += amoutMonth / hrsDaysCurr.getPeriodDays() * (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid());
+                amoutAux += hrsDaysNext == null ? 0 : (amoutMonth / hrsDaysNext.getPeriodDays() * (hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()));
+                break;
+            case SModSysConsts.HRSS_TP_LOAN_PAY_UMA:
+                amoutMonth = loan.getPaymentUma() * hrsReceipt.getHrsPayroll().getUma(hrsReceipt.getHrsPayroll().getPayroll().getDateEnd()) + amoutAdjustment;
+                
                 amoutAux += hrsDaysPrev == null ? 0 : (amoutMonth / hrsDaysPrev.getPeriodDays() * (hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()));
                 amoutAux += amoutMonth / hrsDaysCurr.getPeriodDays() * (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid());
                 amoutAux += hrsDaysNext == null ? 0 : (amoutMonth / hrsDaysNext.getPeriodDays() * (hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()));

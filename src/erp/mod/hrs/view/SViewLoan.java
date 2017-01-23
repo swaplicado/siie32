@@ -191,6 +191,7 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
                 + "v.tot_amt, "
                 + "v.pay_amt, "
                 + "v.pay_fix, "
+                + "v.pay_uma, "
                 + "v.pay_per, "
                  + "IF(v.pay_per_ref = " + SHrsConsts.SAL_REF_SAL  + ", '" + SHrsConsts.TXT_SAL_REF_SAL + "',"
                  + "IF(v.pay_per_ref = " + SHrsConsts.SAL_REF_SAL_SS  + ", '" + SHrsConsts.TXT_SAL_REF_SAL_SS + "',"
@@ -241,6 +242,7 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "v.tot_amt", "Total a pagar $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "v.pay_amt", "Monto $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_8D, "v.pay_fix", "Salarios mínimos"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_8D, "v.pay_uma", "UMA"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_4D, "v.pay_per", "Porcentaje de salario base"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_8D, "v.pay_per_amt", "Salarios referencia"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "vt.name", "Tipo crédito/préstamo"));

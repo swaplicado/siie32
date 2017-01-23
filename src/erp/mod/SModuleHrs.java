@@ -45,6 +45,7 @@ import erp.mod.hrs.db.SDbTaxSubsidyTable;
 import erp.mod.hrs.db.SDbTaxSubsidyTableRow;
 import erp.mod.hrs.db.SDbTaxTable;
 import erp.mod.hrs.db.SDbTaxTableRow;
+import erp.mod.hrs.db.SDbUma;
 import erp.mod.hrs.db.SDbWorkerType;
 import erp.mod.hrs.db.SDbWorkerTypeSalary;
 import erp.mod.hrs.db.SDbWorkingDaySettings;
@@ -78,6 +79,7 @@ import erp.mod.hrs.form.SFormShift;
 import erp.mod.hrs.form.SFormSsContributionTable;
 import erp.mod.hrs.form.SFormTaxSubsidyTable;
 import erp.mod.hrs.form.SFormTaxTable;
+import erp.mod.hrs.form.SFormUma;
 import erp.mod.hrs.form.SFormWorkerType;
 import erp.mod.hrs.form.SFormWorkerTypeSalary;
 import erp.mod.hrs.form.SFormWorkingDaySettings;
@@ -122,6 +124,7 @@ import erp.mod.hrs.view.SViewTaxSubsidyTable;
 import erp.mod.hrs.view.SViewTaxSubsidyTableRow;
 import erp.mod.hrs.view.SViewTaxTable;
 import erp.mod.hrs.view.SViewTaxTableRow;
+import erp.mod.hrs.view.SViewUma;
 import erp.mod.hrs.view.SViewWorkerType;
 import erp.mod.hrs.view.SViewWorkerTypeSalary;
 import erp.mod.hrs.view.SViewWorkingDaySettings;
@@ -170,6 +173,7 @@ public class SModuleHrs extends SGuiModule {
     private SFormBenefitTable moFormBenefitTable;
     private SFormWorkerTypeSalary moFormWorkerTypeSalary;
     private SFormMwzTypeWage moFormMwzTypeWage;
+    private SFormUma moFormUma;
     private SFormLoanTypeAdjustment moFormLoanTypeAdjustment;
     private SFormLoan moFormLoan;
     private SFormAbsence moFormAbsence;
@@ -421,6 +425,9 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRS_MWZ_WAGE:
                 registry = new SDbMwzTypeWage();
+                break;
+            case SModConsts.HRS_UMA:
+                registry = new SDbUma();
                 break;
             case SModConsts.HRS_TP_LOAN_ADJ:
                 registry = new SDbLoanTypeAdjustment();
@@ -786,6 +793,9 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_MWZ_WAGE:
                 view = new SViewMwzTypeWage(miClient, "Salarios mínimos área geográfica");
                 break;
+            case SModConsts.HRS_UMA:
+                view = new SViewUma(miClient, "UMA");
+                break;
             case SModConsts.HRS_TP_LOAN_ADJ:
                 view = new SViewLoanTypeAdjustment(miClient, "Ajuste tipo crédito/préstamo");
                 break;
@@ -1055,6 +1065,10 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_MWZ_WAGE:
                 if (moFormMwzTypeWage == null) moFormMwzTypeWage = new SFormMwzTypeWage(miClient, "Salario mínimo por área geográfica");
                 form = moFormMwzTypeWage;
+                break;
+            case SModConsts.HRS_UMA:
+                if (moFormUma == null) moFormUma = new SFormUma(miClient, "UMA");
+                form = moFormUma;
                 break;
             case SModConsts.HRS_TP_LOAN_ADJ:
                 if (moFormLoanTypeAdjustment == null) moFormLoanTypeAdjustment = new SFormLoanTypeAdjustment(miClient, "Ajuste por tipo de crédito/préstamo");

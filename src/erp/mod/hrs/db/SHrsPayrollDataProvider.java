@@ -53,6 +53,26 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         return aAdjustments;
     }
     
+    private ArrayList<SDbUma> getUmas() throws Exception {
+        SDbUma uma = null;
+        ArrayList<SDbUma> aUmas = new ArrayList<SDbUma>();
+        String sql = "";
+        ResultSet resultSet = null;
+
+        sql = "SELECT id_uma "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_UMA) + " "
+                + "ORDER BY dt_sta DESC, id_uma DESC ";
+
+        resultSet = moSession.getDatabase().getConnection().createStatement().executeQuery(sql);
+        while (resultSet.next()) {
+            uma = new SDbUma();
+            uma.read(moSession, new int[] { resultSet.getInt("id_uma") });
+            aUmas.add(uma);
+        }
+
+        return aUmas;
+    }
+    
     private ArrayList<SDbHoliday> getHolidays() throws Exception {
         String sql = "";
         SDbHoliday holiday = null;
@@ -800,6 +820,10 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         // LoanTypeAdjustment:
 
         hrsPayroll.getLoanTypeAdjustment().addAll(getLoanTypeAdjustment());
+
+        // Uma:
+
+        hrsPayroll.getUmas().addAll(getUmas());
         
         // Holidays:
 
