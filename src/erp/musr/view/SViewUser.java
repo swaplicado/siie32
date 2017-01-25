@@ -14,6 +14,7 @@ import erp.lib.table.STabFilterDeleted;
 import erp.lib.table.STableField;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
+import java.awt.Dimension;
 import sa.gui.util.SUtilConsts;
 
 /**
@@ -22,6 +23,8 @@ import sa.gui.util.SUtilConsts;
  */
 public class SViewUser extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
+    private javax.swing.JButton jbCopy;
+    
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
 
     public SViewUser(erp.client.SClientInterface client, java.lang.String tabTitle) {
@@ -35,6 +38,12 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
 
         moTabFilterDeleted = new STabFilterDeleted(this);
 
+        jbCopy = new JButton(miClient.getImageIcon(SLibConstants.ICON_COPY));
+        jbCopy.setPreferredSize(new Dimension(23, 23));
+        jbCopy.addActionListener(this);
+        jbCopy.setToolTipText("Copiar usuario");
+
+        addTaskBarUpperComponent(jbCopy);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
 
@@ -109,6 +118,19 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         }
     }
 
+    private void actionCopy() {
+        if (jbCopy.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                if (miClient.getGuiModule(SDataConstants.GLOBAL_CAT_USR).showFormForCopy(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
+                    miClient.getGuiModule(SDataConstants.GLOBAL_CAT_USR).refreshCatalogues(mnTabType);
+                }
+            }
+        }
+    }
+
     @Override
     public void createSqlQuery() {
         java.lang.String sqlWhere = "";
@@ -140,6 +162,10 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
 
         if (e.getSource() instanceof javax.swing.JButton) {
             JButton button = (JButton) e.getSource();
+            
+            if (button == jbCopy) {
+                actionCopy();
+            }
         }
     }
 }
