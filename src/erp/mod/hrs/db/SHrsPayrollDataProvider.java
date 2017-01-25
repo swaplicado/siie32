@@ -17,7 +17,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Néstor Ávalos, Sergio Flores
+ * @author Néstor Ávalos, Sergio Flores, Juan Barajas
  */
 public class SHrsPayrollDataProvider implements SHrsDataProvider {
 
@@ -53,24 +53,24 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         return aAdjustments;
     }
     
-    private ArrayList<SDbUma> getUmas() throws Exception {
+    private ArrayList<SDbUma> readUmas() throws Exception {
         SDbUma uma = null;
-        ArrayList<SDbUma> aUmas = new ArrayList<SDbUma>();
+        ArrayList<SDbUma> umas = new ArrayList<SDbUma>();
         String sql = "";
         ResultSet resultSet = null;
 
         sql = "SELECT id_uma "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_UMA) + " "
-                + "ORDER BY dt_sta DESC, id_uma DESC ";
+                + "ORDER BY dt_sta DESC, id_uma ";
 
         resultSet = moSession.getDatabase().getConnection().createStatement().executeQuery(sql);
         while (resultSet.next()) {
             uma = new SDbUma();
             uma.read(moSession, new int[] { resultSet.getInt("id_uma") });
-            aUmas.add(uma);
+            umas.add(uma);
         }
 
-        return aUmas;
+        return umas;
     }
     
     private ArrayList<SDbHoliday> getHolidays() throws Exception {
@@ -823,7 +823,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
 
         // Uma:
 
-        hrsPayroll.getUmas().addAll(getUmas());
+        hrsPayroll.getUmas().addAll(readUmas());
         
         // Holidays:
 

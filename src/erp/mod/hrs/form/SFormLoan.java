@@ -247,7 +247,7 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPaymentUma.setText("UMA:");
+        jlPaymentUma.setText("Número UMA:");
         jlPaymentUma.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel16.add(jlPaymentUma);
         jPanel16.add(moDecPaymentUma);
@@ -384,8 +384,8 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
         moFields.addField(moDecTotalAmount);
         moFields.addField(moDecPaymentAmount);
         moFields.addField(moDecPaymentFixed);
-        moFields.addField(moDecPaymentUma);
         moFields.addField(moDecPaymentPercentage);
+        moFields.addField(moDecPaymentUma);
         moFields.addField(moRadSd);
         moFields.addField(moRadSbc);
         moFields.addField(moRadOther);
