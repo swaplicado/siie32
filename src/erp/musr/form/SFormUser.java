@@ -3565,7 +3565,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
     @Override
     public void formClearRegistry() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        moUser.setPkUserId(SLibConstants.UNDEFINED);
     }
 
     @Override

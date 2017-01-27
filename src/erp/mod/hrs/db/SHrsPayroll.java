@@ -24,6 +24,7 @@ public class SHrsPayroll {
     protected SHrsPayrollDataProvider moPayrollDataProvider;
 
     protected ArrayList<SDbLoanTypeAdjustment> maLoanTypeAdjustment;
+    protected ArrayList<SDbUma> maUmas;
     protected ArrayList<SDbHoliday> maHolidays;
     protected ArrayList<SDbTaxTable> maTaxTables;
     protected ArrayList<SDbTaxSubsidyTable> maTaxSubsidyTables;
@@ -47,6 +48,7 @@ public class SHrsPayroll {
         moPayrollDataProvider = null;
 
         maLoanTypeAdjustment = new ArrayList<SDbLoanTypeAdjustment>();
+        maUmas = new ArrayList<SDbUma>();
         maHolidays = new ArrayList<SDbHoliday>();
         maTaxTables = new ArrayList<SDbTaxTable>();
         maTaxSubsidyTables = new ArrayList<SDbTaxSubsidyTable>();
@@ -589,6 +591,7 @@ public class SHrsPayroll {
     public SDbPayroll getPayroll() { return moPayroll; }
 
     public ArrayList<SDbLoanTypeAdjustment> getLoanTypeAdjustment() { return maLoanTypeAdjustment; }
+    public ArrayList<SDbUma> getUmas() { return maUmas; }
     public ArrayList<SDbHoliday> getHolidays() { return maHolidays; }
     public ArrayList<SDbTaxTable> getTaxTables() { return maTaxTables; }
     public ArrayList<SDbTaxSubsidyTable> getTaxSubsidyTables() { return maTaxSubsidyTables; }
@@ -611,6 +614,24 @@ public class SHrsPayroll {
         for (SDbLoanTypeAdjustment adjustment : maLoanTypeAdjustment) {
             if (!date.before(adjustment.getDateStart()) && adjustment.getPkLoanTypeId() == loanType) {
                 amount = adjustment.getAdjustment();
+                break;
+            }
+        }
+
+        return amount;
+    }
+    
+    /**
+     * Obtain amount UMA most appropriate for date indicated.
+     * @param date Date for required UMA.
+     * @return 
+     */
+    public double getUma(final Date date) {
+        double amount = 0;
+
+        for (SDbUma adjustment : maUmas) {
+            if (!date.before(adjustment.getDateStart())) {
+                amount = adjustment.getAmount();
                 break;
             }
         }

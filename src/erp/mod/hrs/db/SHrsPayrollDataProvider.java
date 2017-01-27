@@ -17,7 +17,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Néstor Ávalos, Sergio Flores
+ * @author Néstor Ávalos, Sergio Flores, Juan Barajas
  */
 public class SHrsPayrollDataProvider implements SHrsDataProvider {
 
@@ -51,6 +51,26 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         }
 
         return aAdjustments;
+    }
+    
+    private ArrayList<SDbUma> readUmas() throws Exception {
+        SDbUma uma = null;
+        ArrayList<SDbUma> umas = new ArrayList<SDbUma>();
+        String sql = "";
+        ResultSet resultSet = null;
+
+        sql = "SELECT id_uma "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_UMA) + " "
+                + "ORDER BY dt_sta DESC, id_uma ";
+
+        resultSet = moSession.getDatabase().getConnection().createStatement().executeQuery(sql);
+        while (resultSet.next()) {
+            uma = new SDbUma();
+            uma.read(moSession, new int[] { resultSet.getInt("id_uma") });
+            umas.add(uma);
+        }
+
+        return umas;
     }
     
     private ArrayList<SDbHoliday> getHolidays() throws Exception {
@@ -800,6 +820,10 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         // LoanTypeAdjustment:
 
         hrsPayroll.getLoanTypeAdjustment().addAll(getLoanTypeAdjustment());
+
+        // Uma:
+
+        hrsPayroll.getUmas().addAll(readUmas());
         
         // Holidays:
 

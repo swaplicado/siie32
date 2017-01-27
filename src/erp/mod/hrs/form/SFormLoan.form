@@ -17,7 +17,7 @@
     <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
-    <AuxValue name="designerSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,1,-112,0,0,2,-48"/>
+    <AuxValue name="designerSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,1,-62,0,0,3,32"/>
   </AuxValues>
 
   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
@@ -47,7 +47,7 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
             <Property name="columns" type="int" value="1"/>
-            <Property name="rows" type="int" value="13"/>
+            <Property name="rows" type="int" value="14"/>
             <Property name="verticalGap" type="int" value="5"/>
           </Layout>
           <SubComponents>
@@ -251,7 +251,7 @@
                 </Component>
                 <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecPaymentAmount">
                 </Component>
-                <Component class="javax.swing.JLabel" name="jlExemptionSalaryEqualsMwzPercentageHelp">
+                <Component class="javax.swing.JLabel" name="jlPaymentAmountHelp">
                   <Properties>
                     <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                       <Color blue="6d" green="6d" red="6d" type="rgb"/>
@@ -295,7 +295,7 @@
                 </Component>
                 <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecPaymentFixed">
                 </Component>
-                <Component class="javax.swing.JLabel" name="jlExemptionSalaryEqualsMwzPercentageHelp1">
+                <Component class="javax.swing.JLabel" name="jlPaymentFixedHelp">
                   <Properties>
                     <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                       <Color blue="6d" green="6d" red="6d" type="rgb"/>
@@ -329,7 +329,7 @@
                 </Component>
                 <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecPaymentPercentage">
                 </Component>
-                <Component class="javax.swing.JLabel" name="jlExemptionSalaryEqualsMwzPercentageHelp2">
+                <Component class="javax.swing.JLabel" name="jlPaymentPercentageHelp">
                   <Properties>
                     <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                       <Color blue="6d" green="6d" red="6d" type="rgb"/>
@@ -339,6 +339,40 @@
                       <Image iconType="3" name="/erp/img/icon_view_help.png"/>
                     </Property>
                     <Property name="toolTipText" type="java.lang.String" value="Monto a pagar expresado en porcentaje del salario base de cotizaci&#xf3;n a pagar"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[23, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
+            <Container class="javax.swing.JPanel" name="jPanel16">
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                <Property name="alignment" type="int" value="0"/>
+                <Property name="verticalGap" type="int" value="0"/>
+              </Layout>
+              <SubComponents>
+                <Component class="javax.swing.JLabel" name="jlPaymentUma">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="N&#xfa;mero UMA:"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[125, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecPaymentUma">
+                </Component>
+                <Component class="javax.swing.JLabel" name="jlPaymentUmaHelp">
+                  <Properties>
+                    <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                      <Color blue="6d" green="6d" red="6d" type="rgb"/>
+                    </Property>
+                    <Property name="horizontalAlignment" type="int" value="0"/>
+                    <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                      <Image iconType="3" name="/erp/img/icon_view_help.png"/>
+                    </Property>
+                    <Property name="toolTipText" type="java.lang.String" value="Monto a pagar expresado en UMA"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[23, 23]"/>
                     </Property>

@@ -155,6 +155,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_CAT_LOG = 209001;
     public static final int PRV_CAT_MFG = 210001;
     public static final int PRV_CAT_HRS = 211001;
+    public static final int PRV_CAT_QLT = 212001;
 
     public static final int PRV_CFG_ERP = 101001;
     public static final int PRV_CFG_CO = 101002;
@@ -303,6 +304,9 @@ public abstract class SDataConstantsSys {
     public static final int PRV_HRS_PAY_OC = 109007;
     public static final int PRV_HRS_REP = 109901;
 
+    public static final int PRV_QLT_LOT_APR = 110001;
+    public static final int PRV_QLT_REP = 110901;
+
     public static final int ROL_CAT_CFG = 201000;
     public static final int ROL_CAT_USR = 202000;
     public static final int ROL_CAT_LOC = 203000;
@@ -314,6 +318,7 @@ public abstract class SDataConstantsSys {
     public static final int ROL_CAT_LOG = 209000;
     public static final int ROL_CAT_MFG = 210000;
     public static final int ROL_CAT_HRS = 211000;
+    public static final int ROL_CAT_QLT = 212000;
 
     public static final int ROL_CFG_ADMOR = 101001;
 
@@ -360,10 +365,11 @@ public abstract class SDataConstantsSys {
     public static final int ROL_LOG_ADMOR = 107001;
 
     public static final int ROL_MFG_ADMOR = 108001;
-    public static final int ROL_MFG_ADMOR_BOM = 108002;
 
     public static final int ROL_HRS_ADMOR = 109001;
 
+    public static final int ROL_QLT_ADMOR = 110001;
+    
     public static final int ROL_SPE_SUPER = 300001;
     public static final int ROL_SPE_CONFIG = 300002;
     public static final int ROL_SPE_ADMOR = 300003;
