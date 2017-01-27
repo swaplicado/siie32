@@ -3138,11 +3138,19 @@ public abstract class SDataUtilities {
      * @param catalogue Constants defined in erp.data.SDataConstants and erp.gui.SDataConstants.
      */
     public static boolean isCatalogueHrs(int catalogue) {
-        return catalogue >= SDataConstants.GLOBAL_CAT_HRS && catalogue < SDataConstants.GLOBAL_CAT_XXX ||
-                catalogue >= SDataConstants.MOD_HRS && catalogue < SDataConstants.MOD_XXX ||
+        return catalogue >= SDataConstants.GLOBAL_CAT_HRS && catalogue < SDataConstants.GLOBAL_CAT_QLT ||
+                catalogue >= SDataConstants.MOD_HRS && catalogue < SDataConstants.MOD_QLT ||
                 catalogue >= SModConsts.HRSS_CL_HRS_CAT && catalogue <= SModConsts.HRSX_AUT_DED;
     }
 
+    /**
+     * @param catalogue Constants defined in erp.data.SDataConstants and erp.gui.SDataConstants.
+     */
+    public static boolean isCatalogueQty(int catalogue) {
+        return catalogue >= SDataConstants.GLOBAL_CAT_QLT && catalogue < SDataConstants.GLOBAL_CAT_XXX ||
+                catalogue >= SDataConstants.MOD_QLT && catalogue < SDataConstants.MOD_XXX;
+    }
+    
     /**
      * @param client Client interface.
      * @param account Account to be validated;

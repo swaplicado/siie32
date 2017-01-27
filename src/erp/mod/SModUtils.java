@@ -9,7 +9,7 @@ import sa.lib.gui.SGuiModuleUtils;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda
  */
 public class SModUtils implements SGuiModuleUtils {
 
@@ -51,8 +51,11 @@ public class SModUtils implements SGuiModuleUtils {
         else if (type < SModConsts.HRSS_CL_HRS_CAT) {
             moduleType = SModConsts.MOD_MFG_N;
         }
-        else {
+        else if (type < SModConsts.QTLY_LOT) {
             moduleType = SModConsts.MOD_HRS_N;
+        }
+        else {
+            moduleType = SModConsts.MOD_QLT_N;
         }
 
         return moduleType;

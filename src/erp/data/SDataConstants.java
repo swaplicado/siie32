@@ -24,8 +24,9 @@ public abstract class SDataConstants {
     public static final int MOD_LOG = 107000;
     public static final int MOD_MFG = 108000;
     public static final int MOD_HRS = 109000;
-    public static final int MOD_XXX = 109999;
-
+    public static final int MOD_QLT = 110000;
+    public static final int MOD_XXX = 199999;
+    
     public static final int MOD_CFG_CFG = 101100;
     public static final int MOD_CFG_CFG_CFG = 101110;   // configuration
     public static final int MOD_CFG_CFG_DNS = 101120;   // Document Number Series
@@ -83,7 +84,8 @@ public abstract class SDataConstants {
     public static final int GLOBAL_CAT_LOG = 209000;
     public static final int GLOBAL_CAT_MFG = 210000;
     public static final int GLOBAL_CAT_HRS = 211000;
-    public static final int GLOBAL_CAT_XXX = 211999;
+    public static final int GLOBAL_CAT_QLT = 212000;
+    public static final int GLOBAL_CAT_XXX = 212999;
 
     public static final int CFGS_CT_ENT = 201001;
     public static final int CFGS_TP_ENT = 201002;
@@ -652,7 +654,7 @@ public abstract class SDataConstants {
     public static final int HRS_SIE_PAY = 220001;
     public static final int HRS_SIE_PAY_EMP = 220002;
     public static final int HRS_SIE_PAY_MOV = 220003;
-    
+       
     public static final int MAX_ID = 1000000;
 
     public static final java.lang.String MSG_ERR_DATA_NOT_FOUND = "El tipo de registro no existe.";

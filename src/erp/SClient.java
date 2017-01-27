@@ -23,6 +23,7 @@ import erp.gui.SGuiModuleHrs;
 import erp.gui.SGuiModuleLog;
 import erp.gui.SGuiModuleMfg;
 import erp.gui.SGuiModuleMkt;
+import erp.gui.SGuiModuleQlt;
 import erp.gui.SGuiModuleTrnInv;
 import erp.gui.SGuiModuleTrnPur;
 import erp.gui.SGuiModuleTrnSal;
@@ -47,6 +48,7 @@ import erp.mod.SModuleHrs;
 import erp.mod.SModuleItm;
 import erp.mod.SModuleLog;
 import erp.mod.SModuleMkt;
+import erp.mod.SModuleQlt;
 import erp.mod.SModuleTrn;
 import erp.mod.SModuleUsr;
 import erp.mod.usr.db.SDbUserGui;
@@ -97,7 +99,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author  Sergio Flores
+ * @author  Sergio Flores, Uriel Castañeda
  * @version 3.2
  */
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
@@ -138,6 +140,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     private SGuiModuleMkt moModuleMkt;
     private SGuiModuleLog moModuleLog;
     private SGuiModuleMfg moModuleMfg;
+    private SGuiModuleQlt moModuleQlt;
     private SGuiModuleHrs moModuleHrs;
 
     private SGuiSession moSession;
@@ -204,6 +207,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     private ImageIcon moIconModuleMkt;
     private ImageIcon moIconModuleLog;
     private ImageIcon moIconModuleMfg;
+    private ImageIcon moIconModuleQlt;
     private ImageIcon moIconModuleHrs;
     private ImageIcon moIconCloseActive;
     private ImageIcon moIconCloseInactive;
@@ -235,6 +239,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jtbModuleMkt = new javax.swing.JToggleButton();
         jtbModuleLog = new javax.swing.JToggleButton();
         jtbModuleMfg = new javax.swing.JToggleButton();
+        jtbModuleQty = new javax.swing.JToggleButton();
         jtbModuleHrs = new javax.swing.JToggleButton();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
@@ -273,6 +278,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jmiViewModuleLog = new javax.swing.JMenuItem();
         jmiViewModuleMfg = new javax.swing.JMenuItem();
         jmiViewModuleHrs = new javax.swing.JMenuItem();
+        jmiViewModuleQty = new javax.swing.JMenuItem();
         jmHelp = new javax.swing.JMenu();
         jmiHelpAbout = new javax.swing.JMenuItem();
 
@@ -398,6 +404,19 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jtbModuleMfg.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jtbModuleMfg);
 
+        jButtonGroup.add(jtbModuleQty);
+        jtbModuleQty.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/mod_hrs_bw.png"))); // NOI18N
+        jtbModuleQty.setToolTipText("Recursos humanos [Ctrl+9]");
+        jtbModuleQty.setFocusable(false);
+        jtbModuleQty.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jtbModuleQty.setMaximumSize(new java.awt.Dimension(64, 64));
+        jtbModuleQty.setMinimumSize(new java.awt.Dimension(48, 48));
+        jtbModuleQty.setPreferredSize(new java.awt.Dimension(64, 64));
+        jtbModuleQty.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/mod_hrs.png"))); // NOI18N
+        jtbModuleQty.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/mod_hrs.png"))); // NOI18N
+        jtbModuleQty.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(jtbModuleQty);
+
         jButtonGroup.add(jtbModuleHrs);
         jtbModuleHrs.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/mod_hrs_bw.png"))); // NOI18N
         jtbModuleHrs.setToolTipText("Recursos humanos [Ctrl+9]");
@@ -431,7 +450,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         getContentPane().add(jpToolBars, java.awt.BorderLayout.NORTH);
         getContentPane().add(jTabbedPane, java.awt.BorderLayout.CENTER);
 
-        jpStatus.setLayout(new java.awt.FlowLayout(0, 3, 5));
+        jpStatus.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 3, 5));
 
         jtfSystemDate.setEditable(false);
         jtfSystemDate.setText("01/01/2000");
@@ -584,6 +603,11 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jmiViewModuleHrs.setEnabled(false);
         jmView.add(jmiViewModuleHrs);
 
+        jmiViewModuleQty.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_9, java.awt.event.InputEvent.CTRL_MASK));
+        jmiViewModuleQty.setText("Módulo recursos humanos");
+        jmiViewModuleQty.setEnabled(false);
+        jmView.add(jmiViewModuleQty);
+
         jMenuBar.add(jmView);
 
         jmHelp.setText("Ayuda");
@@ -595,8 +619,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
         setJMenuBar(jMenuBar);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-1000)/2, (screenSize.height-725)/2, 1000, 725);
+        setSize(new java.awt.Dimension(1000, 725));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -676,6 +700,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         moIconModuleMkt = new ImageIcon(getClass().getResource("/erp/img/icon_mod_mkt.png"));
         moIconModuleLog = new ImageIcon(getClass().getResource("/erp/img/icon_mod_log.png"));
         moIconModuleMfg = new ImageIcon(getClass().getResource("/erp/img/icon_mod_mfg.png"));
+        moIconModuleQlt = new ImageIcon(getClass().getResource("/erp/img/icon_mod_hrs.png"));
         moIconModuleHrs = new ImageIcon(getClass().getResource("/erp/img/icon_mod_hrs.png"));
         moIconCloseActive = new ImageIcon(getClass().getResource("/sa/lib/img/gui_close.png"));
         moIconCloseInactive = new ImageIcon(getClass().getResource("/sa/lib/img/gui_close_ina.png"));
@@ -744,6 +769,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jtbModuleMkt.addActionListener(this);
         jtbModuleLog.addActionListener(this);
         jtbModuleMfg.addActionListener(this);
+        jtbModuleQty.addActionListener(this);
         jtbModuleHrs.addActionListener(this);
         jmiFileCurrentDate.addActionListener(this);
         jmiFileSession.addActionListener(this);
@@ -759,6 +785,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jmiViewModuleMkt.addActionListener(this);
         jmiViewModuleLog.addActionListener(this);
         jmiViewModuleMfg.addActionListener(this);
+        jmiViewModuleQty.addActionListener(this);
         jmiViewModuleHrs.addActionListener(this);
         jmiHelpAbout.addActionListener(this);
         jbCurrentDate.addActionListener(this);
@@ -868,6 +895,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             jmiViewModuleMkt.setEnabled(false);
             jmiViewModuleLog.setEnabled(false);
             jmiViewModuleMfg.setEnabled(false);
+            jmiViewModuleQty.setEnabled(false);
             jmiViewModuleHrs.setEnabled(false);
 
             jButtonGroup.clearSelection();
@@ -879,6 +907,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             jtbModuleMkt.setEnabled(false);
             jtbModuleLog.setEnabled(false);
             jtbModuleMfg.setEnabled(false);
+            jtbModuleQty.setEnabled(false);
             jtbModuleHrs.setEnabled(false);
 
             jlLogo.setIcon(null);
@@ -961,6 +990,12 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 jtbModuleMfg.setEnabled(true);
             }
 
+            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_QLT, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
+                    (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_QLT))) {
+                jmiViewModuleQty.setEnabled(true);
+                jtbModuleQty.setEnabled(true);
+            }
+            
             if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_HRS, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
                     (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_HRS))) {
                 jmiViewModuleHrs.setEnabled(true);
@@ -1009,6 +1044,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         moSession.getModules().add(new SModuleTrn(moSession.getClient(), SModConsts.MOD_TRN_PUR_N));
         moSession.getModules().add(new SModuleTrn(moSession.getClient(), SModConsts.MOD_TRN_SAL_N));
         moSession.getModules().add(new SModuleTrn(moSession.getClient(), SModConsts.MOD_TRN_INV_N));
+        moSession.getModules().add(new SModuleQlt(moSession.getClient()));        
         moSession.getModules().add(new SModuleLog(moSession.getClient(), this));
         moSession.getModules().add(new SModuleMkt(moSession.getClient()));
 
@@ -1052,7 +1088,9 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         }
         if (moSession.getUser().hasModuleAccess(SModConsts.MOD_MFG_N)) {
         }
-        if (moSession.getUser().hasModuleAccess(SModConsts.MOD_HRS_N)) {
+        if (moSession.getUser().hasModuleAccess(SModConsts.MOD_QLT_N)) {
+        }
+        if (moSession.getUser().hasModuleAccess(SModConsts.MOD_HRS_N)) {    
 
             /* Functionality not yet implemented (sflores, 2015-09-28)
             modulesAccessed++;
@@ -1128,6 +1166,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             moModuleMkt = null;
             moModuleLog = null;
             moModuleMfg = null;
+            moModuleQlt = null;
             moModuleHrs = null;
 
             prepareGui();
@@ -1233,6 +1272,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 moModuleMkt = new SGuiModuleMkt(this);
                 moModuleLog = new SGuiModuleLog(this);
                 moModuleMfg = new SGuiModuleMfg(this);
+                moModuleQlt = new SGuiModuleQlt(this);                
                 moModuleHrs = new SGuiModuleHrs(this);
             }
         }
@@ -1295,11 +1335,16 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         renderMenues(moModuleMfg.getMenues());
     }
 
+    private void actionModuleQty() {
+        jtbModuleQty.setSelected(true);
+        renderMenues(moModuleQlt.getMenues());
+    }
+
     private void actionModuleHrs() {
         jtbModuleHrs.setSelected(true);
         renderMenues(moModuleHrs.getMenues());
     }
-
+    
     private void actionFileCurrentDate() {
         moGuiDatePicker.formReset();
         moGuiDatePicker.setDate(moSession.getCurrentDate());
@@ -1469,6 +1514,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     private javax.swing.JMenuItem jmiViewModuleMfg;
     private javax.swing.JMenuItem jmiViewModuleMkt;
     private javax.swing.JMenuItem jmiViewModulePur;
+    private javax.swing.JMenuItem jmiViewModuleQty;
     private javax.swing.JMenuItem jmiViewModuleSal;
     private javax.swing.JPanel jpStatus;
     private javax.swing.JPanel jpToolBars;
@@ -1482,6 +1528,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     private javax.swing.JToggleButton jtbModuleMfg;
     private javax.swing.JToggleButton jtbModuleMkt;
     private javax.swing.JToggleButton jtbModulePur;
+    private javax.swing.JToggleButton jtbModuleQty;
     private javax.swing.JToggleButton jtbModuleSal;
     private javax.swing.JTextField jtfCurrentDate;
     private javax.swing.JTextField jtfLoginCompanyBranch;
@@ -1554,10 +1601,13 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             case SDataConstants.MOD_MFG:
                 module = moModuleMfg;
                 break;
+            case SDataConstants.MOD_QLT:
+                module = moModuleQlt;
+                break;
             case SDataConstants.MOD_HRS:
                 module = moModuleHrs;
                 break;
-            default:
+            default:    
         }
 
         return module;
@@ -1621,6 +1671,9 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         else if (SDataUtilities.isCatalogueMfg(optionType)) {
             picker = moModuleMfg.getOptionPicker(optionType);
         }
+        else if (SDataUtilities.isCatalogueQty(optionType)) {
+            picker = moModuleQlt.getOptionPicker(optionType);
+        }        
         else if (SDataUtilities.isCatalogueHrs(optionType)) {
             picker = moModuleHrs.getOptionPicker(optionType);
         }
@@ -1776,6 +1829,9 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             else if (toggleButton == jtbModuleMfg) {
                 actionModuleMfg();
             }
+            else if (toggleButton == jtbModuleQty) {
+                actionModuleQty();
+            }
             else if (toggleButton == jtbModuleHrs) {
                 actionModuleHrs();
             }
@@ -1825,9 +1881,12 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             else if (item == jmiViewModuleMfg) {
                 actionModuleMfg();
             }
+            else if (item == jmiViewModuleQty) {
+                actionModuleQty();
+            }            
             else if (item == jmiViewModuleHrs) {
                 actionModuleHrs();
-            }
+            }            
             else if (item == jmiHelpAbout) {
                 actionHelpAbout();
             }
@@ -2060,10 +2119,14 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             case SModConsts.MOD_MFG_N:
                 imageIcon = moIconModuleMfg;
                 break;
+            case SModConsts.MOD_QLT:
+            case SModConsts.MOD_QLT_N:
+                imageIcon = moIconModuleQlt;
+                break;     
             case SModConsts.MOD_HRS:
             case SModConsts.MOD_HRS_N:
                 imageIcon = moIconModuleHrs;
-                break;
+                break;             
             case SImgConsts.ICO_GUI_CLOSE:
                 imageIcon = moIconCloseActive;
                 break;

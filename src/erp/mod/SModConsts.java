@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda
  */
 public abstract class SModConsts {
 
@@ -33,6 +33,7 @@ public abstract class SModConsts {
     public static final int MOD_LOG = 107000;
     public static final int MOD_MFG = 108000;
     public static final int MOD_HRS = 109000;
+    public static final int MOD_QLT = 109900; // ???
 
     public static final int GLOBAL_CAT_CFG = 201000;
     public static final int GLOBAL_CAT_USR = 202000;
@@ -60,6 +61,7 @@ public abstract class SModConsts {
     public static final int MOD_LOG_N = 240000;
     public static final int MOD_MFG_N = 250000;
     public static final int MOD_HRS_N = 260000;
+    public static final int MOD_QLT_N = 270000;
 
     /*
      * Configuration
@@ -668,6 +670,12 @@ public abstract class SModConsts {
     public static final int HRSR_EAR_DED_CSV = 2065052;
     public static final int HRSR_VAC_CSV = 2065053;
 
+    /*
+     * Quality
+     */
+
+    public static final int QTLY_LOT = 2071001;
+    
     public static final HashMap<Integer, String> TablesMap = new HashMap<Integer, String>();
 
     static {
@@ -1148,5 +1156,7 @@ public abstract class SModConsts {
         TablesMap.put(HRS_ACC_PAY, "hrs_acc_pay");
         TablesMap.put(HRS_ACC_PAY_RCP, "hrs_acc_pay_rcp");
         TablesMap.put(HRS_ADV_SET, "hrs_adv_set");
+        
+        TablesMap.put(QTLY_LOT, "qty_lot");
     }
 }

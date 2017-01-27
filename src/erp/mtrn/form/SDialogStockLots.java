@@ -24,8 +24,11 @@ import erp.lib.table.STableColumnForm;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STablePane;
 import erp.lib.table.STableRow;
+import erp.mcfg.data.SDataParamsCompany;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
+import erp.mod.qty.db.SQltUtils;
+import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.STrnStockLotRow;
 import erp.mtrn.data.STrnStockMove;
 import erp.mtrn.data.STrnUtilities;
@@ -41,6 +44,7 @@ import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiClient;
 
 /**
  *
@@ -71,6 +75,7 @@ public class SDialogStockLots extends javax.swing.JDialog implements ActionListe
     private erp.mitm.data.SDataUnit moParamUnit;
     private erp.mtrn.form.SDialogPickerStockLots moPickerStockLots;
     private erp.lib.table.STableCellEditorDate moTableCellEditorDate;
+    private erp.mtrn.data.SDataDps moParamDps;
 
     /**
      * Creates new form SDialogStockLots
@@ -419,6 +424,20 @@ public class SDialogStockLots extends javax.swing.JDialog implements ActionListe
         }
     }
 
+    private boolean qualityValidationAprove(STrnStockMove stockMove) {
+        boolean isValid = true;
+        
+        if (((SDataParamsCompany) miClient.getSession().getConfigCompany()).getIsLotApprovalRequired()) {
+            if (mnParamIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_IN && moParamDps != null && moParamDps.isForPurchases()) {
+
+                isValid = SQltUtils.existsQualityLot((SGuiClient) miClient, stockMove, moParamDps.getFkBizPartnerId_r());
+
+            }
+        }
+        
+        return isValid;
+    }
+    
     public void actionPickLot() {
         int index = 0;
         Date minExpirationDate = null;
@@ -447,53 +466,59 @@ public class SDialogStockLots extends javax.swing.JDialog implements ActionListe
                         computePaneEdition();   // updates user edition into internal pane data objects
 
                         movePicked = moPickerStockLots.getSelectecStockMove();
-                        moveCurrent = (STrnStockMove) rowCurrent.getData();
-                        quantityCurrent = rowCurrent.getValues().get(COL_QTY) == null ? 0 : (Double) rowCurrent.getValues().get(COL_QTY);
-
-                        if (mnParamIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_IN) {
-                            // Incoming items:
-
-                            quantityPicked = mdParamQuantity - (mdQuantityTotal - quantityCurrent);
+                        
+                        if (!qualityValidationAprove(movePicked)) {
+                            miClient.showMsgBoxInformation("El lote no ha sido autorizado por calidad.");
                         }
                         else {
-                            // Outgoing items:
+                            moveCurrent = (STrnStockMove) rowCurrent.getData();
+                            quantityCurrent = rowCurrent.getValues().get(COL_QTY) == null ? 0 : (Double) rowCurrent.getValues().get(COL_QTY);
 
-                            quantityPicked = movePicked.getQuantity() <= (mdParamQuantity - (mdQuantityTotal - quantityCurrent)) ? movePicked.getQuantity() : (mdParamQuantity - (mdQuantityTotal - quantityCurrent));
-                        }
+                            if (mnParamIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_IN) {
+                                // Incoming items:
 
-                        if (quantityPicked <= 0) {
-                            quantityPicked = 0;
-                        }
+                                quantityPicked = mdParamQuantity - (mdQuantityTotal - quantityCurrent);
+                            }
+                            else {
+                                // Outgoing items:
 
-                        if (quantityCurrent == 0 || quantityCurrent > quantityPicked) {
-                            moveCurrent.setQuantity(quantityPicked);
-                        }
+                                quantityPicked = movePicked.getQuantity() <= (mdParamQuantity - (mdQuantityTotal - quantityCurrent)) ? movePicked.getQuantity() : (mdParamQuantity - (mdQuantityTotal - quantityCurrent));
+                            }
 
-                        moveCurrent.setAuxLot(movePicked.getAuxLot());
-                        
-                        if (mnParamIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_OUT) { 
-                            try {
-                                minExpirationDate = STrnUtilities.obtainMixExpirationDateLotByItem(miClient, movePicked.getWarehouseKey(), movePicked.getPkItemId(), movePicked.getPkUnitId());
-                            
-                                if (movePicked.getAuxLotDateExpiration() != null && minExpirationDate.before(movePicked.getAuxLotDateExpiration())) {
-                                   miClient.showMsgBoxWarning("El lote seleccionado no es el más próximo a caducar.");
+                            if (quantityPicked <= 0) {
+                                quantityPicked = 0;
+                            }
+
+                            if (quantityCurrent == 0 || quantityCurrent > quantityPicked) {
+                                moveCurrent.setQuantity(quantityPicked);
+                            }
+
+                            moveCurrent.setAuxLot(movePicked.getAuxLot());
+
+                            if (mnParamIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_OUT) { 
+                                try {
+                                    minExpirationDate = STrnUtilities.obtainMixExpirationDateLotByItem(miClient, movePicked.getWarehouseKey(), movePicked.getPkItemId(), movePicked.getPkUnitId());
+
+                                    if (movePicked.getAuxLotDateExpiration() != null && minExpirationDate.before(movePicked.getAuxLotDateExpiration())) {
+                                       miClient.showMsgBoxWarning("El lote seleccionado no es el más próximo a caducar.");
+                                    }
+                                }
+                                catch (Exception e) {
+                                   SLibUtils.showException(this, e);
                                 }
                             }
-                            catch (Exception e) {
-                               SLibUtils.showException(this, e);
-                            }
+
+                            moveCurrent.setAuxLotDateExpiration(movePicked.getAuxLotDateExpiration());
+
+                            rowCurrent.prepareTableRow();
+
+                            index = moPaneLots.getTable().getSelectedRow();
+                            moPaneLots.renderTableRows();
+                            moPaneLots.setTableRowSelection(index);
+
+                            computeQuantity();
+                            moPaneLots.getTable().requestFocus();
                         }
-                        
-                        moveCurrent.setAuxLotDateExpiration(movePicked.getAuxLotDateExpiration());
-                                
-                        rowCurrent.prepareTableRow();
-
-                        index = moPaneLots.getTable().getSelectedRow();
-                        moPaneLots.renderTableRows();
-                        moPaneLots.setTableRowSelection(index);
-
-                        computeQuantity();
-                        moPaneLots.getTable().requestFocus();
                     }
                 }
             }
@@ -591,14 +616,21 @@ public class SDialogStockLots extends javax.swing.JDialog implements ActionListe
     // End of variables declaration//GEN-END:variables
 
     public void setFormParams(final int iogCategoryId, final int year, final int itemId, final int unitId, final int[] warehouseKey, final int[] iogKey_n, final double quantity, final int formStatus, int mode) {
+        setFormParams(iogCategoryId, year, itemId, unitId, warehouseKey, iogKey_n, quantity, formStatus, mode, null);
+    }
+    
+    public void setFormParams(final int iogCategoryId, final int year, final int itemId, final int unitId, final int[] warehouseKey, final int[] iogKey_n, final double quantity, final int formStatus, int mode,
+        final SDataDps dps) {
         boolean enable = formStatus == SLibConstants.FORM_STATUS_EDIT;
 
         mnParamYear = year;
         mnParamIogCategoryId = iogCategoryId;
-        manParamWarehouseKey = warehouseKey;
+        manParamWarehouseKey = warehouseKey;        
         manParamIogKey_n = iogKey_n;
         mnFormStatus = formStatus;
         mnFormMode = mode;
+        
+        moParamDps = dps;
 
         jtfDiogCategory.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNS_CT_IOG, new int[] { mnParamIogCategoryId }));
         jtfDiogCategory.setCaretPosition(0);
@@ -747,7 +779,9 @@ public class SDialogStockLots extends javax.swing.JDialog implements ActionListe
 
         for (i = 0; i < ROWS; i++) {
             stockMove = (STrnStockMove) moPaneLots.getTableRow(i).getData();
-
+            stockMove.setPkItemId(moParamItem.getPkItemId());
+            stockMove.setPkUnitId(moParamUnit.getPkUnitId());
+            
             if (stockMove.getQuantity() == 0 && stockMove.getAuxLot().length() > 0) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + moPaneLots.getTableColumn(COL_QTY).getColumnTitle() + "' en la fila " + (i + 1) + ".");
             }
@@ -759,6 +793,9 @@ public class SDialogStockLots extends javax.swing.JDialog implements ActionListe
             }
             else if (stockMove.getAuxLotDateExpiration() != null && stockMove.getAuxLot().length() == 0) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + moPaneLots.getTableColumn(COL_LOT).getColumnTitle() + "' en la fila " + (i + 1) + ".");
+            }
+            else if (stockMove.getQuantity() != 0 && !qualityValidationAprove(stockMove)) {
+                validation.setMessage("El lote no ha sido autorizado por calidad, en la fila " + (i + 1) + ".");
             }
             else {
                 quantity += stockMove.getQuantity();

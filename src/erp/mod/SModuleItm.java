@@ -30,11 +30,12 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Uriel Castañeda
  */
 public class SModuleItm extends SGuiModule {
 
     private SBeanOptionPicker moPickerItem;
+    private SBeanOptionPicker moPickerUnit;
     
     public SModuleItm(SGuiClient client) {
         super(client, SModConsts.MOD_ITM_N, SLibConsts.UNDEFINED);
@@ -156,6 +157,11 @@ public class SModuleItm extends SGuiModule {
                         "ORDER BY " + (!((SDataParamsErp) miClient.getSession().getConfigSystem()).getIsItemKeyApplying() ? "i.item, " :
                         ((SDataParamsErp) miClient.getSession().getConfigSystem()).getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "i.item_key, i.item, " : "i.item, i.item_key, ") + "id_item ";
                 break;
+            case SModConsts.ITMU_UNIT:
+                settings = new SGuiCatalogueSettings("Unidad", 1);
+                sql = "SELECT u.id_unit AS " + SDbConsts.FIELD_ID + "1, " + " CONCAT(u.unit,' (',u.symbol,')') AS " + SDbConsts.FIELD_ITEM + " " + 
+                      "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u WHERE u.b_del = 0 ";
+                break;        
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -180,7 +186,7 @@ public class SModuleItm extends SGuiModule {
         ArrayList<SGridColumnForm> gridColumns = new ArrayList<SGridColumnForm>();
         SGuiOptionPickerSettings settings = null;
         SGuiOptionPicker picker = null;
-
+        
         switch (type) {
             case SModConsts.ITMU_ITEM:
                 sql = "SELECT id_item AS " + SDbConsts.FIELD_ID + "1, "
@@ -198,6 +204,21 @@ public class SModuleItm extends SGuiModule {
                 }
                 picker = moPickerItem;
                 break;
+            case SModConsts.ITMU_UNIT:
+                
+                sql = "SELECT u.id_unit AS " + SDbConsts.FIELD_ID + "1, u.symbol AS " + SDbConsts.FIELD_PICK + "1, u.unit AS " +  SDbConsts.FIELD_PICK + "2 "
+                      + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u "
+                      + "WHERE u.b_del = 0 " + ( subtype != SLibConsts.UNDEFINED ? "" : " ADN fid_tp_unit = " + subtype );
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Clave"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Unidad"));
+                settings = new SGuiOptionPickerSettings("Unidad", sql, gridColumns, 1);
+
+                if (moPickerUnit == null) {
+                    moPickerUnit = new SBeanOptionPicker();
+                    moPickerUnit.setPickerSettings(miClient, type, subtype, settings);
+                }
+                picker = moPickerUnit;
+                break;    
 
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

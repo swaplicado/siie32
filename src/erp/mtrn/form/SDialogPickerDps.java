@@ -33,7 +33,7 @@ import javax.swing.JTextField;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Edwin Carmona
  */
 public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.form.SFormOptionPickerInterface, java.awt.event.ActionListener {
 
@@ -220,10 +220,11 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
                 break;
 
             case SDataConstants.TRNX_DPS_PEND_LINK:
-                tableColumns = new STableColumnForm[11];
+                tableColumns = new STableColumnForm[12];
                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha doc.", STableConstants.WIDTH_DATE);
                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo doc.", STableConstants.WIDTH_CODE_DOC);
                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Folio doc.", STableConstants.WIDTH_DOC_NUM);
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Referencia", STableConstants.WIDTH_DOC_NUM_REF);
                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Asociado negocios", 200);
                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Aplica descto.", STableConstants.WIDTH_BOOLEAN);

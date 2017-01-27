@@ -473,9 +473,9 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
             try {
                 if (jrbCurrencyDoc.isSelected()) {
                     sSumStot = " COALESCE(SUM(e.stot_cur_r),0) ";
-                    sCurrency = jcbCurrency.getSelectedItem().toString();
+                    sCurrency = jcbCurrency.getSelectedIndex() == 0 ? "TODAS" : jcbCurrency.getSelectedItem().toString();
                     nCurrency = moFieldCurrency.getKeyAsIntArray()[0];
-                    sqlCurrency = " doc.fid_cur = " + nCurrency + " AND ";
+                    sqlCurrency = jcbCurrency.getSelectedIndex() == 0 ? "" : " doc.fid_cur = " + nCurrency + " AND ";
                 }
                 else {
                     sSumStot = " COALESCE(SUM(e.stot_r),0) ";
@@ -778,7 +778,11 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
             tpGroup = 4;
             showGroup = true;
         }
-
+        
+        if (jcbCurrency.getSelectedIndex() == 0) {
+            groupBy = groupBy + ", cur_key";
+        }
+        
         return new Object[] { groupBy, orderBy, detailColumn, filter, tpDetail, tpGroup, showGroup };
     }
 
@@ -1025,14 +1029,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
                 validation.setComponent(jftDateEnd);
             }
         }
-        
-        if (!validation.getIsError()) {
-            if (jrbCurrencyDoc.isSelected() && jcbCurrency.getSelectedIndex() == 0) {
-                validation.setMessage("Seleccione moneda");
-                validation.setComponent(jcbCurrency);
-            }
-        }
-
+       
         return validation;
     }
 

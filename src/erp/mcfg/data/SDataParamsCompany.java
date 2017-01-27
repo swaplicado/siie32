@@ -16,7 +16,7 @@ import sa.lib.gui.SGuiConfigCompany;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda
  */
 public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements java.io.Serializable, SGuiConfigCompany {
 
@@ -49,6 +49,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     protected boolean mbIsLastSearchItemPreserved;
     protected boolean mbIsExchangeRatePurPreserved;
     protected boolean mbIsExchangeRateSalPreserved;
+    protected boolean mbIsLotApprovalRequired;
     protected boolean mbIsPaymentMonday;
     protected boolean mbIsPaymentTuesday;
     protected boolean mbIsPaymentWednesday;
@@ -143,6 +144,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public void setIsLastSearchItemPreserved(boolean b) { mbIsLastSearchItemPreserved = b; }
     public void setIsExchangeRatePurPreserved(boolean b) { mbIsExchangeRatePurPreserved = b; }
     public void setIsExchangeRateSalPreserved(boolean b) { mbIsExchangeRateSalPreserved = b; }
+    public void setIsLotApprovalRequired(boolean b) { mbIsLotApprovalRequired = b; }
     public void setIsPaymentMonday(boolean b) { mbIsPaymentMonday = b; }
     public void setIsPaymentTuesday(boolean b) { mbIsPaymentTuesday = b; }
     public void setIsPaymentWednesday(boolean b) { mbIsPaymentWednesday = b; }
@@ -227,6 +229,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public boolean getIsLastSearchItemPreserved() { return mbIsLastSearchItemPreserved; }
     public boolean getIsExchangeRatePurPreserved() { return mbIsExchangeRatePurPreserved; }
     public boolean getIsExchangeRateSalPreserved() { return mbIsExchangeRateSalPreserved; }
+    public boolean getIsLotApprovalRequired() { return mbIsLotApprovalRequired; }    
     public boolean getIsPaymentMonday() { return mbIsPaymentMonday; }
     public boolean getIsPaymentTuesday() { return mbIsPaymentTuesday; }
     public boolean getIsPaymentWednesday() { return mbIsPaymentWednesday; }
@@ -333,6 +336,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
         mbIsLastSearchItemPreserved = false;
         mbIsExchangeRatePurPreserved = false;
         mbIsExchangeRateSalPreserved = false;
+        mbIsLotApprovalRequired = false;
         mbIsPaymentMonday = false;
         mbIsPaymentTuesday = false;
         mbIsPaymentWednesday = false;
@@ -443,6 +447,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                 mbIsLastSearchItemPreserved = resultSet.getBoolean("b_last_search_item");
                 mbIsExchangeRatePurPreserved = resultSet.getBoolean("b_keep_exc_rate_pur");
                 mbIsExchangeRateSalPreserved = resultSet.getBoolean("b_keep_exc_rate_sal");
+                mbIsLotApprovalRequired = resultSet.getBoolean("b_lot_apr");;                
                 mbIsPaymentMonday = resultSet.getBoolean("b_pay_mon");
                 mbIsPaymentTuesday = resultSet.getBoolean("b_pay_tue");
                 mbIsPaymentWednesday = resultSet.getBoolean("b_pay_wed");
@@ -562,7 +567,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
                     //"?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkConfigCoId);
             callableStatement.setInt(nParam++, mnDaysOfGraceSupplier);
@@ -593,6 +598,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
             callableStatement.setBoolean(nParam++, mbIsLastSearchItemPreserved);
             callableStatement.setBoolean(nParam++, mbIsExchangeRatePurPreserved);
             callableStatement.setBoolean(nParam++, mbIsExchangeRateSalPreserved);
+            callableStatement.setBoolean(nParam++, mbIsLotApprovalRequired);
             callableStatement.setBoolean(nParam++, mbIsPaymentMonday);
             callableStatement.setBoolean(nParam++, mbIsPaymentTuesday);
             callableStatement.setBoolean(nParam++, mbIsPaymentWednesday);

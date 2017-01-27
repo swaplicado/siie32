@@ -15,7 +15,7 @@ import java.util.Vector;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda
  */
 public class SDataCompany extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -32,6 +32,7 @@ public class SDataCompany extends erp.lib.data.SDataRegistry implements java.io.
     protected boolean mbIsModuleLog;
     protected boolean mbIsModuleMfg;
     protected boolean mbIsModuleHrs;
+    protected boolean mbIsModuleQlt;
     protected boolean mbIsDeleted;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
@@ -62,6 +63,7 @@ public class SDataCompany extends erp.lib.data.SDataRegistry implements java.io.
     public void setIsModuleLog(boolean b) { mbIsModuleLog = b; }
     public void setIsModuleMfg(boolean b) { mbIsModuleMfg = b; }
     public void setIsModuleHrs(boolean b) { mbIsModuleHrs = b; }
+    public void setIsModuleQty(boolean b) { mbIsModuleQlt = b; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
@@ -83,6 +85,7 @@ public class SDataCompany extends erp.lib.data.SDataRegistry implements java.io.
     public boolean getIsModuleLog() { return mbIsModuleLog; }
     public boolean getIsModuleMfg() { return mbIsModuleMfg; }
     public boolean getIsModuleHrs() { return mbIsModuleHrs; }
+    public boolean getIsModuleQty() { return mbIsModuleQlt; }
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
@@ -123,6 +126,7 @@ public class SDataCompany extends erp.lib.data.SDataRegistry implements java.io.
         mbIsModuleLog = false;
         mbIsModuleMfg = false;
         mbIsModuleHrs = false;
+        mbIsModuleQlt = false;
         mbIsDeleted = false;
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
@@ -165,6 +169,7 @@ public class SDataCompany extends erp.lib.data.SDataRegistry implements java.io.
                 mbIsModuleLog = resultSet.getBoolean("b_mod_log");
                 mbIsModuleMfg = resultSet.getBoolean("b_mod_mfg");
                 mbIsModuleHrs = resultSet.getBoolean("b_mod_hrs");
+                mbIsModuleQlt = resultSet.getBoolean("b_mod_qlt");
                 mbIsDeleted = resultSet.getBoolean("b_del");
                 mnFkUserNewId = resultSet.getInt("fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("fid_usr_edit");
@@ -228,7 +233,7 @@ public class SDataCompany extends erp.lib.data.SDataRegistry implements java.io.
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
         try {
-            callableStatement = connection.prepareCall("{ CALL erp.cfgu_co_save(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
+            callableStatement = connection.prepareCall("{ CALL erp.cfgu_co_save(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkCompanyId);
             callableStatement.setString(nParam++, msKey);
             callableStatement.setString(nParam++, msCompany);
@@ -241,6 +246,7 @@ public class SDataCompany extends erp.lib.data.SDataRegistry implements java.io.
             callableStatement.setBoolean(nParam++, mbIsModuleMkt);
             callableStatement.setBoolean(nParam++, mbIsModuleLog);
             callableStatement.setBoolean(nParam++, mbIsModuleMfg);
+            callableStatement.setBoolean(nParam++, mbIsModuleQlt);
             callableStatement.setBoolean(nParam++, mbIsModuleHrs);
             callableStatement.setBoolean(nParam++, mbIsDeleted);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
