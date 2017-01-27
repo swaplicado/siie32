@@ -2115,10 +2115,11 @@ public abstract class SDataReadTableRows {
                 aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "d.id_doc");
 
                 i = 0;
-                aoQueryFields = new STableField[11];
+                aoQueryFields = new STableField[12];
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DATE, "d.dt");
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "dt.code");
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "f_num");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "d.num_ref");
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "b.bp");
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "cob.code");
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_BOOLEAN, "d.b_disc_doc");
@@ -2130,7 +2131,7 @@ public abstract class SDataReadTableRows {
 
                 sSql = "SELECT DISTINCT d.id_year, d.id_doc, d.dt, dt.code, " +
                         "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
-                        "d.b_disc_doc, d.b_disc_doc_per, d.disc_doc_per, d.tot_cur_r, b.id_bp, b.bp, c.cur_key, cob.code, " +
+                        "d.num_ref, d.b_disc_doc, d.b_disc_doc_per, d.disc_doc_per, d.tot_cur_r, b.id_bp, b.bp, c.cur_key, cob.code, " +
                         "d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + " AS f_aut " +
                         "FROM trn_dps AS d INNER JOIN trn_dps_ety AS de ON " +
                         "d.id_year = de.id_year AND d.id_doc = de.id_doc AND " +

@@ -160,9 +160,7 @@ public class SDbUma extends SDbRegistryUser {
             mnFkUserUpdateId = session.getUser().getPkUserId();
 
             msSql = "UPDATE " + getSqlTable() + " SET " +
-                    /*
-                    "id_uma = " + mnPkUmaId + ", " +
-                    */
+                    //"id_uma = " + mnPkUmaId + ", " +
                     "dt_sta = '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', " +
                     "amt = " + mdAmount + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
