@@ -775,20 +775,20 @@ public abstract class SModSysConsts {
     public static final int[] HRSS_TP_HRS_CAT_MAL = new int[] { 1, 1 }; // Male
     public static final int[] HRSS_TP_HRS_CAT_FEM = new int[] { 1, 2 }; // Female
 
-    public static final int HRSS_TP_PAY_WEE = 1; // Weekly 
-    public static final int HRSS_TP_PAY_FOR = 2; // Fortnightly 
+    public static final int HRSS_TP_PAY_WEE = 1;    // Weekly 
+    public static final int HRSS_TP_PAY_FOR = 2;    // Fortnightly 
 
-    public static final int HRSS_TP_PAY_SHT_NOR = 1; // Normal
-    public static final int HRSS_TP_PAY_SHT_SPE = 2; // Special
-    public static final int HRSS_TP_PAY_SHT_EXT = 3; // Extraordinary
+    public static final int HRSS_TP_PAY_SHT_NOR = 1;    // Normal
+    public static final int HRSS_TP_PAY_SHT_SPE = 2;    // Special
+    public static final int HRSS_TP_PAY_SHT_EXT = 3;    // Extraordinary
 
-    public static final int HRSS_TP_SAL_FIX = 1; // Fixed
-    public static final int HRSS_TP_SAL_VAR = 2; // Variable
-    public static final int HRSS_TP_SAL_MIX = 3; // Mixed
+    public static final int HRSS_TP_SAL_FIX = 1;    // Fixed
+    public static final int HRSS_TP_SAL_VAR = 2;    // Variable
+    public static final int HRSS_TP_SAL_MIX = 3;    // Mixed
 
-    public static final int HRSS_TP_ACC_GBL = 1; // Global
-    public static final int HRSS_TP_ACC_DEP = 2; // Department
-    public static final int HRSS_TP_ACC_EMP = 3; // Employee
+    public static final int HRSS_TP_ACC_GBL = 1;    // Global
+    public static final int HRSS_TP_ACC_DEP = 2;    // Department
+    public static final int HRSS_TP_ACC_EMP = 3;    // Employee
 
     public static final int HRSS_TP_TAX_COMP_WOT = 1;   // With out tax
     public static final int HRSS_TP_TAX_COMP_PAY = 2;   // Payroll
@@ -818,14 +818,15 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_EAR_TAX_SUB = 17;   // Tax
     public static final int HRSS_TP_EAR_OVR_TME = 19;   // Overtime
     public static final int HRSS_TP_EAR_SEN_BON = 22;   // Seniority bonus 
-    public static final int HRSS_TP_EAR_SET = 23;   // Payment by settlement
+    public static final int HRSS_TP_EAR_SET = 23;       // Payment by settlement
     public static final int HRSS_TP_EAR_CMP = 25;       // Compensation
-    public static final int HRSS_TP_EAR_OTH_PAY = 999;   // Other payments diferent the catalogue earnings type the SAT
+    public static final int HRSS_TP_EAR_OTH_PAY = 999;  // Other payments diferent the catalogue earnings type the SAT
 
     public static final int HRSS_TP_OTH_PAY_TAX_REF = 1;    // Tax Refund
     public static final int HRSS_TP_OTH_PAY_TAX_SUB = 2;    // Tax Subsidy
     public static final int HRSS_TP_OTH_PAY_TRV_EXP = 3;    // Travel Expenses
-    public static final int HRSS_TP_OTH_PAY_OTH_PAY = 999;    // Other payments
+    public static final int HRSS_TP_OTH_PAY_TAX_BAL = 4;    // Tax Positive Balance
+    public static final int HRSS_TP_OTH_PAY_OTH_PAY = 999;  // Other payments
 
     public static final int HRSS_TP_DED_COMP_AMT = 1;       // Amount
     public static final int HRSS_TP_DED_COMP_DAY = 2;       // Days
@@ -859,7 +860,7 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_LOAN_PAY_UMA = 4;   // UMA
 
     public static final int HRSS_TP_CON_TME_DET = 1;    // Contract undetermined time
-    public static final int HRSS_TP_CON_LAB_CMM = 8;        // Contract labor commission
+    public static final int HRSS_TP_CON_LAB_CMM = 8;    // Contract labor commission
     public static final int HRSS_TP_CON_OTH = 99;       // Other contract
     
     public static final int HRSS_TP_REC_SCHE_WAG = 2;       // Wages & salaries
@@ -874,29 +875,29 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_REC_SCHE_ASS_OTH = 11;  // Other
     public static final int HRSS_TP_REC_SCHE_OTH = 99;      // Other
 
-    public static final int HRSS_TP_POS_RISK_CL1 = 1; // Class I
-    public static final int HRSS_TP_POS_RISK_CL2 = 2; // Class II
-    public static final int HRSS_TP_POS_RISK_CL3 = 3; // Class III
-    public static final int HRSS_TP_POS_RISK_CL4 = 4; // Class IV
-    public static final int HRSS_TP_POS_RISK_CL5 = 5; // Class V
+    public static final int HRSS_TP_POS_RISK_CL1 = 1;   // Class I
+    public static final int HRSS_TP_POS_RISK_CL2 = 2;   // Class II
+    public static final int HRSS_TP_POS_RISK_CL3 = 3;   // Class III
+    public static final int HRSS_TP_POS_RISK_CL4 = 4;   // Class IV
+    public static final int HRSS_TP_POS_RISK_CL5 = 5;   // Class V
 
-    public static final int HRSS_TP_WORK_DAY_DIU = 1; // Diurnal
+    public static final int HRSS_TP_WORK_DAY_DIU = 1;   // Diurnal
     
-    public static final int HRSS_TP_DIS_RSK = 1; // Risk
-    public static final int HRSS_TP_DIS_DIS = 2; // Disease
-    public static final int HRSS_TP_DIS_MAT = 3; // Maternity
+    public static final int HRSS_TP_DIS_RSK = 1;    // Risk
+    public static final int HRSS_TP_DIS_DIS = 2;    // Disease
+    public static final int HRSS_TP_DIS_MAT = 3;    // Maternity
 
-    public static final int HRSS_TP_DAY_NON = 1; // Non applicable
-    public static final int HRSS_TP_DAY_WRK = 2; // Workday
-    public static final int HRSS_TP_DAY_OFF = 3; // Day off
-    public static final int HRSS_TP_DAY_HOL = 4; // Holiday
-    public static final int HRSS_TP_DAY_ABS = 5; // Absence
+    public static final int HRSS_TP_DAY_NON = 1;    // Non applicable
+    public static final int HRSS_TP_DAY_WRK = 2;    // Workday
+    public static final int HRSS_TP_DAY_OFF = 3;    // Day off
+    public static final int HRSS_TP_DAY_HOL = 4;    // Holiday
+    public static final int HRSS_TP_DAY_ABS = 5;    // Absence
 
-    public static final int HRSS_BANK_X = 2;
+    public static final int HRSS_BANK_NON = 999;    // Non applicable
 
-    public static final int HRSU_CL_ABS_ABS = 1; // Absence
-    public static final int HRSU_CL_ABS_DIS = 2; // Disease
-    public static final int HRSU_CL_ABS_VAC = 3; // Vacation
+    public static final int HRSU_CL_ABS_ABS = 1;    // Absence
+    public static final int HRSU_CL_ABS_DIS = 2;    // Disease
+    public static final int HRSU_CL_ABS_VAC = 3;    // Vacation
 
     public static final int[] HRSU_TP_ABS_ABS = new int[] { 1, 1 };     // Absence
     public static final int[] HRSU_TP_ABS_DIS_RSK = new int[] { 2, 1 }; // Disease, risk
@@ -904,19 +905,19 @@ public abstract class SModSysConsts {
     public static final int[] HRSU_TP_ABS_DIS_MAT = new int[] { 2, 3 }; // Disease, maternity
     public static final int[] HRSU_TP_ABS_VAC = new int[] { 3, 1 };     // Vacation
 
-    public static final int HRSU_TP_EMP_DIS_NON = 1; // Non applicable
+    public static final int HRSU_TP_EMP_DIS_NON = 1;    // Non applicable
 
-    public static final int HRSU_TP_EMP_NON = 1; // Non applicable
+    public static final int HRSU_TP_EMP_NON = 1;    // Non applicable
 
-    public static final int HRSU_TP_WRK_NON = 1; // Non applicable
+    public static final int HRSU_TP_WRK_NON = 1;    // Non applicable
 
-    public static final int HRSU_TP_MWZ_DEF = 1; // Default
+    public static final int HRSU_TP_MWZ_DEF = 1;    // Default
 
-    public static final int HRSU_DEP_NON = 1; // Non applicable
+    public static final int HRSU_DEP_NON = 1;   // Non applicable
 
-    public static final int HRSU_POS_NON = 1; // Non applicable
+    public static final int HRSU_POS_NON = 1;   // Non applicable
 
-    public static final int HRSU_SHT_NON = 1; // Non applicable
+    public static final int HRSU_SHT_NON = 1;   // Non applicable
 
     public static final int HRS_AUT_GBL = 1;
     public static final int HRS_AUT_EMP = 2;
