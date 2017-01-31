@@ -51,7 +51,7 @@ public class SModUtils implements SGuiModuleUtils {
         else if (type < SModConsts.HRSS_CL_HRS_CAT) {
             moduleType = SModConsts.MOD_MFG_N;
         }
-        else if (type < SModConsts.QTLY_LOT) {
+        else if (type < SModConsts.QLT_LOT_APR) {
             moduleType = SModConsts.MOD_HRS_N;
         }
         else {

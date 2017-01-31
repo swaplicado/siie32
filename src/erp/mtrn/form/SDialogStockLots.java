@@ -27,7 +27,7 @@ import erp.lib.table.STableRow;
 import erp.mcfg.data.SDataParamsCompany;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
-import erp.mod.qty.db.SQltUtils;
+import erp.mod.qlt.db.SQltUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.STrnStockLotRow;
 import erp.mtrn.data.STrnStockMove;
@@ -48,7 +48,7 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda
  */
 public class SDialogStockLots extends javax.swing.JDialog implements ActionListener, CellEditorListener {
 
@@ -71,6 +71,7 @@ public class SDialogStockLots extends javax.swing.JDialog implements ActionListe
     private int[] manParamIogKey_n;
     private double mdParamQuantity;
     private double mdQuantityTotal;
+    private Date moMoveDate;
     private erp.mitm.data.SDataItem moParamItem;
     private erp.mitm.data.SDataUnit moParamUnit;
     private erp.mtrn.form.SDialogPickerStockLots moPickerStockLots;
@@ -429,9 +430,7 @@ public class SDialogStockLots extends javax.swing.JDialog implements ActionListe
         
         if (((SDataParamsCompany) miClient.getSession().getConfigCompany()).getIsLotApprovalRequired()) {
             if (mnParamIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_IN && moParamDps != null && moParamDps.isForPurchases()) {
-
-                isValid = SQltUtils.existsQualityLot((SGuiClient) miClient, stockMove, moParamDps.getFkBizPartnerId_r());
-
+                isValid = SQltUtils.checkLotApproved((SGuiClient) miClient, moMoveDate ,moParamDps.getFkBizPartnerId_r(), stockMove);
             }
         }
         
@@ -468,7 +467,7 @@ public class SDialogStockLots extends javax.swing.JDialog implements ActionListe
                         movePicked = moPickerStockLots.getSelectecStockMove();
                         
                         if (!qualityValidationAprove(movePicked)) {
-                            miClient.showMsgBoxInformation("El lote no ha sido autorizado por calidad.");
+                            miClient.showMsgBoxInformation("El lote no está aprobado.");
                         }
                         else {
                             moveCurrent = (STrnStockMove) rowCurrent.getData();
@@ -615,12 +614,13 @@ public class SDialogStockLots extends javax.swing.JDialog implements ActionListe
     private javax.swing.JTextField jtfQuantityUnitSymbol;
     // End of variables declaration//GEN-END:variables
 
-    public void setFormParams(final int iogCategoryId, final int year, final int itemId, final int unitId, final int[] warehouseKey, final int[] iogKey_n, final double quantity, final int formStatus, int mode) {
-        setFormParams(iogCategoryId, year, itemId, unitId, warehouseKey, iogKey_n, quantity, formStatus, mode, null);
+    public void setFormParams(final int iogCategoryId, final int year, final int itemId, final int unitId, 
+            final int[] warehouseKey, final int[] iogKey_n, final double quantity, final int formStatus, int mode) {
+        setFormParams(iogCategoryId, year, itemId, unitId, warehouseKey, iogKey_n, quantity, formStatus, mode, null, null);
     }
     
-    public void setFormParams(final int iogCategoryId, final int year, final int itemId, final int unitId, final int[] warehouseKey, final int[] iogKey_n, final double quantity, final int formStatus, int mode,
-        final SDataDps dps) {
+    public void setFormParams(final int iogCategoryId, final int year, final int itemId, final int unitId, 
+            final int[] warehouseKey, final int[] iogKey_n, final double quantity, final int formStatus, int mode, final SDataDps dps, final Date moveDate) {
         boolean enable = formStatus == SLibConstants.FORM_STATUS_EDIT;
 
         mnParamYear = year;
@@ -631,6 +631,8 @@ public class SDialogStockLots extends javax.swing.JDialog implements ActionListe
         mnFormMode = mode;
         
         moParamDps = dps;
+        
+        moMoveDate = moveDate;
 
         jtfDiogCategory.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNS_CT_IOG, new int[] { mnParamIogCategoryId }));
         jtfDiogCategory.setCaretPosition(0);
@@ -795,7 +797,7 @@ public class SDialogStockLots extends javax.swing.JDialog implements ActionListe
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + moPaneLots.getTableColumn(COL_LOT).getColumnTitle() + "' en la fila " + (i + 1) + ".");
             }
             else if (stockMove.getQuantity() != 0 && !qualityValidationAprove(stockMove)) {
-                validation.setMessage("El lote no ha sido autorizado por calidad, en la fila " + (i + 1) + ".");
+                validation.setMessage("El lote de la fila " + (i + 1) + " no está aprobado.");
             }
             else {
                 quantity += stockMove.getQuantity();

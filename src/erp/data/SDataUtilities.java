@@ -3142,13 +3142,14 @@ public abstract class SDataUtilities {
                 catalogue >= SDataConstants.MOD_HRS && catalogue < SDataConstants.MOD_QLT ||
                 catalogue >= SModConsts.HRSS_CL_HRS_CAT && catalogue <= SModConsts.HRSX_AUT_DED;
     }
-
+    
     /**
      * @param catalogue Constants defined in erp.data.SDataConstants and erp.gui.SDataConstants.
      */
-    public static boolean isCatalogueQty(int catalogue) {
+    public static boolean isCatalogueQlt(int catalogue) {
         return catalogue >= SDataConstants.GLOBAL_CAT_QLT && catalogue < SDataConstants.GLOBAL_CAT_XXX ||
-                catalogue >= SDataConstants.MOD_QLT && catalogue < SDataConstants.MOD_XXX;
+                catalogue >= SDataConstants.MOD_QLT && catalogue < SDataConstants.MOD_XXX ||
+                catalogue >= SModConsts.QLT_LOT_APR && catalogue <= SModConsts.QLT_LOT_APR;
     }
     
     /**

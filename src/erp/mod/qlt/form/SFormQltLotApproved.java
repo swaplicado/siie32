@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mod.qty.form;
+package erp.mod.qlt.form;
 
 import erp.SClient;
 import erp.data.SDataConstants;
@@ -11,7 +11,7 @@ import erp.lib.SLibConstants;
 import erp.mitm.data.SDataItem;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.qty.db.SDbQualityLotApr;
+import erp.mod.qlt.db.SDbLotApproved;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -32,17 +32,17 @@ import sa.lib.gui.bean.SBeanForm;
  *
  * @author Uriel Castañeda
  */
-public class SFormQltLotAprove extends SBeanForm implements ActionListener, ItemListener {
+public class SFormQltLotApproved extends SBeanForm implements ActionListener, ItemListener {
 
-    protected SDbQualityLotApr moRegistry;
+    protected SDbLotApproved moRegistry;
   
     /**
-     * Creates new form SFormQtyLot
+     * Creates new form SFormQltLotApproved
      * @param client
      * @param title
      */
-    public SFormQltLotAprove(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.QTLY_LOT, SLibConsts.UNDEFINED, title);
+    public SFormQltLotApproved(SGuiClient client, String title) {
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.QLT_LOT_APR, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
     }
@@ -60,23 +60,23 @@ public class SFormQltLotAprove extends SBeanForm implements ActionListener, Item
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
-        jlItem = new javax.swing.JLabel();
-        moKeyItem = new sa.lib.gui.bean.SBeanFieldKey();
-        jbItem = new javax.swing.JButton();
+        jlDate = new javax.swing.JLabel();
+        moDate = new sa.lib.gui.bean.SBeanFieldDate();
         jPanel5 = new javax.swing.JPanel();
-        jlUnit = new javax.swing.JLabel();
-        moKeyUnit = new sa.lib.gui.bean.SBeanFieldKey();
-        jbUnit = new javax.swing.JButton();
-        jPanel6 = new javax.swing.JPanel();
         jlBizPartner = new javax.swing.JLabel();
         moKeyBizPartner = new sa.lib.gui.bean.SBeanFieldKey();
         jbBizPartner = new javax.swing.JButton();
+        jPanel6 = new javax.swing.JPanel();
+        jlItem = new javax.swing.JLabel();
+        moKeyItem = new sa.lib.gui.bean.SBeanFieldKey();
+        jbItem = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
+        jlUnit = new javax.swing.JLabel();
+        moKeyUnit = new sa.lib.gui.bean.SBeanFieldKey();
+        jbUnit = new javax.swing.JButton();
+        jPanel8 = new javax.swing.JPanel();
         jlLot = new javax.swing.JLabel();
         moTextLot = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel8 = new javax.swing.JPanel();
-        jlDate = new javax.swing.JLabel();
-        moDate = new sa.lib.gui.bean.SBeanFieldDate();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
@@ -85,72 +85,69 @@ public class SFormQltLotAprove extends SBeanForm implements ActionListener, Item
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlItem.setForeground(new java.awt.Color(0, 0, 255));
-        jlItem.setText("Item:*");
-        jlItem.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel14.add(jlItem);
-
-        moKeyItem.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel14.add(moKeyItem);
-
-        jbItem.setText("...");
-        jbItem.setFocusable(false);
-        jbItem.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel14.add(jbItem);
+        jlDate.setText("Fecha:*");
+        jlDate.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel14.add(jlDate);
+        jPanel14.add(moDate);
 
         jPanel2.add(jPanel14);
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlUnit.setForeground(new java.awt.Color(0, 0, 255));
-        jlUnit.setText("Unidad:*");
-        jlUnit.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel5.add(jlUnit);
+        jlBizPartner.setText("Proveedor:*");
+        jlBizPartner.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel5.add(jlBizPartner);
 
-        moKeyUnit.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel5.add(moKeyUnit);
+        moKeyBizPartner.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel5.add(moKeyBizPartner);
 
-        jbUnit.setText("...");
-        jbUnit.setFocusable(false);
-        jbUnit.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel5.add(jbUnit);
+        jbBizPartner.setText("...");
+        jbBizPartner.setFocusable(false);
+        jbBizPartner.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel5.add(jbBizPartner);
 
         jPanel2.add(jPanel5);
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBizPartner.setForeground(new java.awt.Color(0, 0, 255));
-        jlBizPartner.setText("Proveedor:*");
-        jlBizPartner.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel6.add(jlBizPartner);
+        jlItem.setText("Item:*");
+        jlItem.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel6.add(jlItem);
 
-        moKeyBizPartner.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel6.add(moKeyBizPartner);
+        moKeyItem.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel6.add(moKeyItem);
 
-        jbBizPartner.setText("...");
-        jbBizPartner.setFocusable(false);
-        jbBizPartner.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel6.add(jbBizPartner);
+        jbItem.setText("...");
+        jbItem.setFocusable(false);
+        jbItem.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel6.add(jbItem);
 
         jPanel2.add(jPanel6);
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlLot.setText("Lote:*");
-        jlLot.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel7.add(jlLot);
+        jlUnit.setText("Unidad:*");
+        jlUnit.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel7.add(jlUnit);
 
-        moTextLot.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel7.add(moTextLot);
+        moKeyUnit.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel7.add(moKeyUnit);
+
+        jbUnit.setText("...");
+        jbUnit.setFocusable(false);
+        jbUnit.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel7.add(jbUnit);
 
         jPanel2.add(jPanel7);
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDate.setText("Fecha lote:*");
-        jlDate.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel8.add(jlDate);
-        jPanel8.add(moDate);
+        jlLot.setText("Lote aprobado:*");
+        jlLot.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel8.add(jlLot);
+
+        moTextLot.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel8.add(moTextLot);
 
         jPanel2.add(jPanel8);
 
@@ -190,18 +187,18 @@ public class SFormQltLotAprove extends SBeanForm implements ActionListener, Item
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 480, 300);
                 
+        moDate.setDateSettings(miClient, SGuiUtils.getLabelName(jlDate.getText()), true);
+        moKeyBizPartner.setKeySettings(miClient, SGuiUtils.getLabelName(jlBizPartner.getText()), true);
         moKeyItem.setKeySettings(miClient, SGuiUtils.getLabelName(jlItem.getText()), true);
         moKeyUnit.setKeySettings(miClient, SGuiUtils.getLabelName(jlUnit), true);
-        moKeyBizPartner.setKeySettings(miClient, SGuiUtils.getLabelName(jlBizPartner.getText()), true);
-        moTextLot.setTextSettings(SGuiUtils.getLabelName(jlLot.getText()), 25);
-        moDate.setDateSettings(miClient, SGuiUtils.getLabelName(jlDate.getText()), true);
+        moTextLot.setTextSettings(SGuiUtils.getLabelName(jlLot.getText()), 25);        
 
+        moFields.addField(moDate);
+        moFields.addField(moKeyBizPartner);
         moFields.addField(moKeyItem);
         moFields.addField(moKeyUnit);
-        moFields.addField(moKeyBizPartner);
         moFields.addField(moTextLot);
-        moFields.addField(moDate);
-        
+
         moFields.setFormButton(jbSave);
     }
     
@@ -282,16 +279,8 @@ public class SFormQltLotAprove extends SBeanForm implements ActionListener, Item
     private void enabledFields(boolean enable) {
         moKeyItem.setEnabled(enable);
         jbItem.setEnabled(enable);
-        
-        if (moRegistry.isRegistryNew()) {
-            moKeyUnit.setEnabled(!enable);
-            jbUnit.setEnabled(!enable);
-        }
-        else {
-            moKeyUnit.setEnabled(enable);
-            jbUnit.setEnabled(enable);
-        }
-        
+        moKeyUnit.setEnabled(enable);
+        jbUnit.setEnabled(enable);
         moKeyBizPartner.setEnabled(enable);
         jbBizPartner.setEnabled(enable);
         moTextLot.setEnabled(enable);
@@ -331,7 +320,8 @@ public class SFormQltLotAprove extends SBeanForm implements ActionListener, Item
     @Override
     public void setRegistry(SDbRegistry registry) throws Exception {
 
-
+        moRegistry = (SDbLotApproved) registry;
+        
         mnFormResult = SLibConsts.UNDEFINED;
         mbFirstActivation = true;
         
@@ -345,28 +335,35 @@ public class SFormQltLotAprove extends SBeanForm implements ActionListener, Item
         }
         else {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
+            moRegistry.setRegistryNew(false);
         }
 
-        moKeyItem.setValue(new int[] { moRegistry.getFkItemId() });
-        moKeyUnit.setValue(new int[] { moRegistry.getFkUnitId()});
-        moKeyBizPartner.setValue(new int[] {moRegistry.getFkBizPartnerId() });
-        moTextLot.setValue(moRegistry.getLot());
         moDate.setValue(moRegistry.getDate());
+        moKeyBizPartner.setValue(new int[] {moRegistry.getFkBizPartnerId() });
+        moKeyItem.setValue(new int[] { moRegistry.getFkItemId() });
+       
+        if (moKeyItem.getSelectedIndex() > 0) {
+            itemStateKeyItem();
+        }
+        
+        moKeyUnit.setValue(new int[] { moRegistry.getFkUnitId()});
+        moTextLot.setValue(moRegistry.getLot());
 
         setFormEditable(true);
         
-        enabledFields(moRegistry.isRegistryNew());
+        enabledFields(true);
 
         addAllListeners();
     }
 
     @Override
-    public SDbQualityLotApr getRegistry() throws Exception {
-        SDbQualityLotApr registry = moRegistry.clone();
+    public SDbLotApproved getRegistry() throws Exception {
+        SDbLotApproved registry = moRegistry.clone();
         
-        registry.setFkItemId(moKeyItem.getSelectedItem().getPrimaryKey()[0]);
-        registry.setFkUnitId(moKeyUnit.getSelectedItem().getPrimaryKey()[0]);
+        registry.setDate(moDate.getValue());
         registry.setFkBizPartnerId(moKeyBizPartner.getSelectedItem().getPrimaryKey()[0]);
+        registry.setFkItemId(moKeyItem.getSelectedItem().getPrimaryKey()[0]);
+        registry.setFkUnitId(moKeyUnit.getSelectedItem().getPrimaryKey()[0]);        
         registry.setLot(moTextLot.getText());
         
         return registry;

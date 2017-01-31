@@ -2,12 +2,13 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mod.qty.db;
+package erp.mod.qlt.db;
 
 import erp.mod.SModConsts;
 import erp.mtrn.data.STrnStockMove;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Date;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
 
@@ -18,26 +19,29 @@ import sa.lib.gui.SGuiClient;
 public abstract class SQltUtils {
     
     /**
-     * Verifies if de lot exists in quality for the working date
+     * Verifies if lot exists in quality for the given parameters
      * @param client
-     * @param lot
-     * @param idSuplier
-     * @return 
+     * @param date of quality approval
+     * @param idBizPartner Supplier of the item
+     * @param stockMove move with lot information
+     * @return true if the lot exists
      */
-    public static boolean existsQualityLot(final SGuiClient client, final STrnStockMove lot, final int idSuplier) {
+    public static boolean checkLotApproved(final SGuiClient client, final Date date, final int idBizPartner, final STrnStockMove stockMove) {
         boolean exists = false;        
         String sql = "";
         ResultSet resultSet = null;
         
         try {
+
             Statement statement = client.getSession().getStatement().getConnection().createStatement();
             
             sql = "SELECT id_lot_apr "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.QTLY_LOT) + " "
-                + "WHERE fk_item = " + lot.getPkItemId() + " AND "
-                + "fk_unit = " + lot.getPkUnitId() + " AND "
-                + "fk_bb_n = " + idSuplier + " AND "
-                + "dt = '" + SLibUtils.DbmsDateFormatDate.format(client.getSession().getCurrentDate()) + "' AND lot = '" + lot.getAuxLot() + "' ";
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.QLT_LOT_APR) + " "
+                + "WHERE " + "dt = '" + SLibUtils.DbmsDateFormatDate.format(date) + "' AND "
+                + "fk_bp = " + idBizPartner + " AND "
+                + "fk_item = " + stockMove.getPkItemId() + " AND "
+                + "fk_unit = " + stockMove.getPkUnitId() + " AND "
+                +  "lot = '" + stockMove.getAuxLot() + "' ";
 
             resultSet = statement.executeQuery(sql);
 
@@ -48,7 +52,6 @@ public abstract class SQltUtils {
         catch (Exception e) {
             SLibUtils.showException(SQltUtils.class.getName(), e);
         }
-       
         return exists;
     } 
     

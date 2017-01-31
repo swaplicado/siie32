@@ -1610,7 +1610,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                 moDialogStockLots.formReset();
                                 moDialogStockLots.setFormParams(mnParamIogCategoryId, year, stockSupplyRow.getFkItemId(), stockSupplyRow.getFkUnitId(),
                                         (int[]) moWarehouseSource.getPrimaryKey(), (int[]) (moDiog == null ? null : moDiog.getPrimaryKey()),
-                                        stockSupplyRow.getQuantityToSupply(), SLibConstants.FORM_STATUS_EDIT, mode, moParamDpsSource);
+                                        stockSupplyRow.getQuantityToSupply(), SLibConstants.FORM_STATUS_EDIT, mode, moParamDpsSource, moFieldDate.getDate());
                                 moDialogStockLots.setCurrentEntry(row + 1, stockSupplyRowsAux.size());
                                 moDialogStockLots.setVisible(true);
 
@@ -1723,7 +1723,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                 moDialogStockLots.formReset();
                                 moDialogStockLots.setFormParams(mnParamIogCategoryId, year, stockReturnRow.getFkItemId(), stockReturnRow.getFkUnitId(),
                                         (int[]) moWarehouseSource.getPrimaryKey(), (int[]) (moDiog == null ? null : moDiog.getPrimaryKey()),
-                                        stockReturnRow.getQuantityToReturn(), SLibConstants.FORM_STATUS_EDIT, mode, moParamDpsSource);
+                                        stockReturnRow.getQuantityToReturn(), SLibConstants.FORM_STATUS_EDIT, mode, moParamDpsSource, moFieldDate.getDate());
                                 moDialogStockLots.setCurrentEntry(row + 1, stockReturnRowsAux.size());
                                 moDialogStockLots.setVisible(true);
 
@@ -1970,7 +1970,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                         moDialogStockLotsProdOrder.formReset();
                                         moDialogStockLotsProdOrder.setFormParams(mnParamIogCategoryId, year, stockAssignRow.getFkItemId(), stockAssignRow.getFkUnitId(),
                                                 (int[]) moWarehouseSource.getPrimaryKey(), (int[]) (moDiog == null ? null : moDiog.getPrimaryKey()),
-                                                stockAssignRow.getQuantityToAssign(), SLibConstants.FORM_STATUS_EDIT, mode, moParamDpsSource);
+                                                stockAssignRow.getQuantityToAssign(), SLibConstants.FORM_STATUS_EDIT, mode, moParamDpsSource, moFieldDate.getDate());
                                         moDialogStockLotsProdOrder.setStockMoves(stockMoves);
                                         moDialogStockLotsProdOrder.setCurrentEntry(row + 1, stockAssignRows.size());
                                         moDialogStockLotsProdOrder.setVisible(true);
@@ -2482,7 +2482,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                 dialogStockLots.formReset();
                                 dialogStockLots.setFormParams(mnParamIogCategoryId, year, moEntryItem.getPkItemId(), moEntryItem.getFkUnitId(),
                                         (int[]) moWarehouseSource.getPrimaryKey(), (int[]) (moDiog == null ? null : moDiog.getPrimaryKey()),
-                                        moFieldEntryQuantity.getDouble(), mnFormStatus, mode, moParamDpsSource);
+                                        moFieldEntryQuantity.getDouble(), mnFormStatus, mode, moParamDpsSource, moFieldDate.getDate());
                                 dialogStockLots.setVisible(true);
 
                                 if (dialogStockLots.getFormResult() != SLibConstants.FORM_RESULT_OK) {
@@ -2701,7 +2701,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                         dialogStockLots.formReset();
                         dialogStockLots.setFormParams(mnParamIogCategoryId, year, entry.getFkItemId(), entry.getFkUnitId(),
                                 (int[]) moWarehouseSource.getPrimaryKey(), (int[]) (moDiog == null ? null : moDiog.getPrimaryKey()),
-                                entry.getQuantity(), (canEdit ? mnFormStatus : SLibConstants.FORM_STATUS_READ_ONLY), mode, moParamDpsSource);
+                                entry.getQuantity(), (canEdit ? mnFormStatus : SLibConstants.FORM_STATUS_READ_ONLY), mode, moParamDpsSource, moFieldDate.getDate());
                         dialogStockLots.setStockMoves(entry.getAuxStockMoves());
                         dialogStockLots.setVisible(true);
 

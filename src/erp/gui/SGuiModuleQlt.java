@@ -28,7 +28,7 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
 
     private void initComponents() {
         jmQlt = new JMenu("Calidad");
-        jmiQltLot = new JMenuItem("Lotes calidad");
+        jmiQltLot = new JMenuItem("Lotes aprobados");
         
         jmQlt.add(jmiQltLot);
 
@@ -104,7 +104,7 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
             javax.swing.JMenuItem item = (javax.swing.JMenuItem) e.getSource();
 
             if (item == jmiQltLot) {
-                miClient.getSession().showView(SModConsts.QTLY_LOT, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.QLT_LOT_APR, SLibConsts.UNDEFINED, null);
             }       
         }
     }

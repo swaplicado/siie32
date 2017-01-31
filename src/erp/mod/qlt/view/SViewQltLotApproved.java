@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mod.qty.view;
+package erp.mod.qlt.view;
 
 import erp.mod.SModConsts;
 import java.awt.event.ActionEvent;
@@ -24,12 +24,12 @@ import sa.lib.gui.SGuiDate;
  *
  * @author Uriel Castañeda
  */
-public class SViewQltLotAproval extends SGridPaneView implements ActionListener {
+public class SViewQltLotApproved extends SGridPaneView implements ActionListener {
 
     private SGridFilterDatePeriod moFilterDatePeriod;
    
-    public SViewQltLotAproval(SGuiClient client, String title) {
-        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.QTLY_LOT, SLibConsts.UNDEFINED, title);
+    public SViewQltLotApproved(SGuiClient client, String title) {
+        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.QLT_LOT_APR, SLibConsts.UNDEFINED, title);
         initComponentsCustom();
     }
 
@@ -78,35 +78,35 @@ public class SViewQltLotAproval extends SGridPaneView implements ActionListener 
         msSql = "SELECT ql.id_lot_apr AS " + SDbConsts.FIELD_ID + "1, "
                 + "'' AS " + SDbConsts.FIELD_CODE + ", "
                 + "b.bp AS " + SDbConsts.FIELD_NAME + ", "
-                + "ql.dt, ql.b_del, i.item_key, i.item, u.unit, b.bp, ql.lot, "
+                + "ql.dt,  b.bp, i.item_key, i.item, u.unit, ql.lot, ql.b_del, "
                 + "ql.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "ql.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
                 + "ql.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
                 + "ql.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", "
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
                 + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.QTLY_LOT) + " AS ql "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON ql.fk_id_item = i.id_item " 
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON ql.fk_id_unit = u.id_unit " 
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " b ON ql.fk_id_bb_n = b.id_bp " 
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.QLT_LOT_APR) + " AS ql "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON ql.fk_item = i.id_item " 
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON ql.fk_unit = u.id_unit " 
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " b ON ql.fk_bp = b.id_bp " 
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON " 
                 + "ql.fk_usr_ins = ui.id_usr " 
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON " 
                 + "ql.fk_usr_upd = uu.id_usr " 
                 + (sql.isEmpty() ? "" : "WHERE " + sql) 
-                + "ORDER BY ql.id_lot_apr, ql.dt, i.item_key, i.item, u.unit, b.bp, ql.lot, ql.b_del, ql.fk_usr_ins, ql.fk_usr_upd, ql.ts_usr_ins, ql.ts_usr_upd ";
+                + "ORDER BY ql.id_lot_apr, ql.dt, b.bp, i.item_key, i.item, u.unit, ql.lot, ql.b_del, ql.fk_usr_ins, ql.fk_usr_upd, ql.ts_usr_ins, ql.ts_usr_upd ";
     }
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
 
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "ql.dt", "Fecha lote"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "i.item_key", "Clave item"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "i.item", "Item"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "ql.dt", "Fecha"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "b.bp", "Proveedor")); 
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "i.item_key", "Clave item"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "i.item", "Item"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "u.unit", "Unidad"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "b.bp", "Proveedor"));       
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "ql.lot", "Lote"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "ql.lot", "Lote aprobado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));
@@ -119,7 +119,6 @@ public class SViewQltLotAproval extends SGridPaneView implements ActionListener 
     @Override
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
-        moSuscriptionsSet.add(SModConsts.USRU_USR);
     }
 
     @Override

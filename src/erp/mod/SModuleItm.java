@@ -159,8 +159,9 @@ public class SModuleItm extends SGuiModule {
                 break;
             case SModConsts.ITMU_UNIT:
                 settings = new SGuiCatalogueSettings("Unidad", 1);
-                sql = "SELECT u.id_unit AS " + SDbConsts.FIELD_ID + "1, " + " CONCAT(u.unit,' (',u.symbol,')') AS " + SDbConsts.FIELD_ITEM + " " + 
-                      "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u WHERE u.b_del = 0 ";
+                sql = "SELECT id_unit AS " + SDbConsts.FIELD_ID + "1, " + " CONCAT(unit,' (',symbol,')') AS " + SDbConsts.FIELD_ITEM + " " + 
+                      "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " WHERE b_del = 0 " +
+                      "ORDER BY unit, id_unit" ;
                 break;        
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -193,7 +194,7 @@ public class SModuleItm extends SGuiModule {
                         + "item_key AS " + SDbConsts.FIELD_PICK + "1, item AS " + SDbConsts.FIELD_PICK + "2 "
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " "
                         + "WHERE b_del = 0 "
-                        + "ORDER BY item, id_item ";
+                        + "ORDER BY item_key, item, id_item ";
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Clave"));
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Ítem"));
                 settings = new SGuiOptionPickerSettings("Ítem", sql, gridColumns, 1);
@@ -204,13 +205,14 @@ public class SModuleItm extends SGuiModule {
                 }
                 picker = moPickerItem;
                 break;
-            case SModConsts.ITMU_UNIT:
                 
-                sql = "SELECT u.id_unit AS " + SDbConsts.FIELD_ID + "1, u.symbol AS " + SDbConsts.FIELD_PICK + "1, u.unit AS " +  SDbConsts.FIELD_PICK + "2 "
-                      + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u "
-                      + "WHERE u.b_del = 0 " + ( subtype != SLibConsts.UNDEFINED ? "" : " ADN fid_tp_unit = " + subtype );
-                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Clave"));
-                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Unidad"));
+            case SModConsts.ITMU_UNIT:
+                sql = "SELECT id_unit AS " + SDbConsts.FIELD_ID + "1, symbol AS " + SDbConsts.FIELD_PICK + "1, unit AS " +  SDbConsts.FIELD_PICK + "2 "
+                      + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " "
+                      + "WHERE NOT b_del " + (subtype == SLibConsts.UNDEFINED ? "" : "AND fid_tp_unit = " + subtype + " ")
+                      + "ORDER BY unit, symbol, id_unit ";
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Unidad"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Clave"));
                 settings = new SGuiOptionPickerSettings("Unidad", sql, gridColumns, 1);
 
                 if (moPickerUnit == null) {

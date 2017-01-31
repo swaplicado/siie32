@@ -33,7 +33,7 @@ public abstract class SModConsts {
     public static final int MOD_LOG = 107000;
     public static final int MOD_MFG = 108000;
     public static final int MOD_HRS = 109000;
-    public static final int MOD_QLT = 109900; // ???
+    public static final int MOD_QLT = 109999;   // it should be 110000, but now is not possible due to constants for new-framework modules
 
     public static final int GLOBAL_CAT_CFG = 201000;
     public static final int GLOBAL_CAT_USR = 202000;
@@ -46,6 +46,7 @@ public abstract class SModConsts {
     public static final int GLOBAL_CAT_LOG = 209000;
     public static final int GLOBAL_CAT_MFG = 210000;
     public static final int GLOBAL_CAT_HRS = 211000;
+    public static final int GLOBAL_CAT_QLT = 212000;
 
     public static final int MOD_CFG_N = 110000;
     public static final int MOD_USR_N = 120000;
@@ -675,7 +676,7 @@ public abstract class SModConsts {
      * Quality
      */
 
-    public static final int QTLY_LOT = 2071001;
+    public static final int QLT_LOT_APR = 2073001;
     
     public static final HashMap<Integer, String> TablesMap = new HashMap<Integer, String>();
 
@@ -1159,6 +1160,6 @@ public abstract class SModConsts {
         TablesMap.put(HRS_ACC_PAY_RCP, "hrs_acc_pay_rcp");
         TablesMap.put(HRS_ADV_SET, "hrs_adv_set");
         
-        TablesMap.put(QTLY_LOT, "qty_lot");
+        TablesMap.put(QLT_LOT_APR, "qlt_lot_apr");
     }
 }

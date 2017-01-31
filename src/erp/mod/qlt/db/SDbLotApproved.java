@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package erp.mod.qty.db;
+package erp.mod.qlt.db;
 
 import erp.mod.SModConsts;
 import java.sql.ResultSet;
@@ -19,12 +19,14 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Uriel Castañeda
  */
-public class SDbQualityLotApr extends SDbRegistryUser {
+public class SDbLotApproved extends SDbRegistryUser {
 
     protected int mnPkLotApprovedId;
     protected Date mtDate;
     protected String msLot;
+    /*
     protected boolean mbDeleted;
+    */
     protected int mnFkItemId;
     protected int mnFkUnitId;
     protected int mnFkBizPartnerId;
@@ -35,8 +37,8 @@ public class SDbQualityLotApr extends SDbRegistryUser {
     protected Date mtTsUserUpdate;
     */
 
-    public SDbQualityLotApr() {
-        super(SModConsts.QTLY_LOT);
+    public SDbLotApproved() {
+        super(SModConsts.QLT_LOT_APR);
     }
     
     /*
@@ -50,6 +52,10 @@ public class SDbQualityLotApr extends SDbRegistryUser {
     public void setFkItemId(int n) { mnFkItemId = n; }
     public void setFkUnitId(int n) { mnFkUnitId = n; }
     public void setFkBizPartnerId(int n) { mnFkBizPartnerId = n; }
+    public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
+    public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
+    public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
+    public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
     
     public int getPkLotApprovedId() { return mnPkLotApprovedId; }
     public Date getDate() { return mtDate; }
@@ -58,10 +64,14 @@ public class SDbQualityLotApr extends SDbRegistryUser {
     public int getFkItemId() { return mnFkItemId; }
     public int getFkUnitId() { return mnFkUnitId; }
     public int getFkBizPartnerId() { return mnFkBizPartnerId; }
+    public int getFkUserInsertId() { return mnFkUserInsertId; }
+    public int getFkUserUpdateId() { return mnFkUserUpdateId; }
+    public Date getTsUserInsert() { return mtTsUserInsert; }
+    public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
     @Override
     public void setPrimaryKey(int[] pk) {
-        
+        mnPkLotApprovedId = pk[0];
     }
 
     @Override
@@ -152,10 +162,6 @@ public class SDbQualityLotApr extends SDbRegistryUser {
         mnQueryResultId = SDbConsts.SAVE_ERROR;
 
         if (mbRegistryNew) {
-            verifyRegistryNew(session);
-        }
-
-        if (mbRegistryNew) {
             computePrimaryKey(session);
             mbDeleted = false;
             mnFkUserInsertId = session.getUser().getPkUserId();
@@ -173,7 +179,6 @@ public class SDbQualityLotApr extends SDbRegistryUser {
                     mnFkUserUpdateId + ", " + 
                     "NOW()" + ", " + 
                     "NOW()" + ") ";
-
         }
         else {
             mnFkUserUpdateId = session.getUser().getPkUserId();
@@ -189,7 +194,7 @@ public class SDbQualityLotApr extends SDbRegistryUser {
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                     //"ts_usr_ins = " + "NOW()" + ", " +
-                    "ts_usr_upd = " + "NOW()" + ", " +
+                    "ts_usr_upd = " + "NOW()" + " " +
                     getSqlWhere();
         }
 
@@ -199,8 +204,8 @@ public class SDbQualityLotApr extends SDbRegistryUser {
     }
 
     @Override
-    public SDbQualityLotApr clone() throws CloneNotSupportedException {
-        SDbQualityLotApr registry = new SDbQualityLotApr();
+    public SDbLotApproved clone() throws CloneNotSupportedException {
+        SDbLotApproved registry = new SDbLotApproved();
 
         registry.setPkLotApprovedId(this.getPkLotApprovedId());
         registry.setDate(this.getDate());
@@ -214,6 +219,7 @@ public class SDbQualityLotApr extends SDbRegistryUser {
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
 
+        registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
 

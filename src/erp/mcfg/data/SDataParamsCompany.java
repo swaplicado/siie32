@@ -568,7 +568,6 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
-                    //"?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkConfigCoId);
             callableStatement.setInt(nParam++, mnDaysOfGraceSupplier);
             callableStatement.setInt(nParam++, mnDaysOfGraceCustomer);

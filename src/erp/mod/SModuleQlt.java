@@ -5,9 +5,9 @@
 
 package erp.mod;
 
-import erp.mod.qty.db.SDbQualityLotApr;
-import erp.mod.qty.form.SFormQltLotAprove;
-import erp.mod.qty.view.SViewQltLotAproval;
+import erp.mod.qlt.db.SDbLotApproved;
+import erp.mod.qlt.form.SFormQltLotApproved;
+import erp.mod.qlt.view.SViewQltLotApproved;
 import javax.swing.JMenu;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbRegistry;
@@ -26,7 +26,7 @@ import sa.lib.gui.SGuiReport;
  */
 public class SModuleQlt extends SGuiModule {
     
-    private SFormQltLotAprove moFormQualityLot;
+    private SFormQltLotApproved moFormQualityLot;
 
     public SModuleQlt(SGuiClient client) {
         super(client, SModConsts.MOD_QLT_N, SLibConsts.UNDEFINED);
@@ -43,8 +43,8 @@ public class SModuleQlt extends SGuiModule {
         SDbRegistry registry = null;
 
         switch (type) {
-            case SModConsts.QTLY_LOT:
-                registry = new SDbQualityLotApr();
+            case SModConsts.QLT_LOT_APR:
+                registry = new SDbLotApproved();
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -63,8 +63,8 @@ public class SModuleQlt extends SGuiModule {
         SGridPaneView view = null;
        
         switch (type) {
-            case SModConsts.QTLY_LOT:
-                view = new SViewQltLotAproval(miClient, "Lotes calidad");
+            case SModConsts.QLT_LOT_APR:
+                view = new SViewQltLotApproved(miClient, "Lotes aprobados");
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -84,8 +84,8 @@ public class SModuleQlt extends SGuiModule {
 
         switch (type) {
             
-            case SModConsts.QTLY_LOT:
-                if (moFormQualityLot == null) moFormQualityLot = new SFormQltLotAprove(miClient, "Lotes calidad");
+            case SModConsts.QLT_LOT_APR:
+                if (moFormQualityLot == null) moFormQualityLot = new SFormQltLotApproved(miClient, "Lotes aprobados");
                 form = moFormQualityLot;
                 break;
             

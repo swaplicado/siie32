@@ -233,7 +233,9 @@ public class SDataCompany extends erp.lib.data.SDataRegistry implements java.io.
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
         try {
-            callableStatement = connection.prepareCall("{ CALL erp.cfgu_co_save(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
+            callableStatement = connection.prepareCall("{ CALL erp.cfgu_co_save("
+                    + "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
+                    + "?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkCompanyId);
             callableStatement.setString(nParam++, msKey);
             callableStatement.setString(nParam++, msCompany);
@@ -246,8 +248,8 @@ public class SDataCompany extends erp.lib.data.SDataRegistry implements java.io.
             callableStatement.setBoolean(nParam++, mbIsModuleMkt);
             callableStatement.setBoolean(nParam++, mbIsModuleLog);
             callableStatement.setBoolean(nParam++, mbIsModuleMfg);
-            callableStatement.setBoolean(nParam++, mbIsModuleQlt);
             callableStatement.setBoolean(nParam++, mbIsModuleHrs);
+            callableStatement.setBoolean(nParam++, mbIsModuleQlt);            
             callableStatement.setBoolean(nParam++, mbIsDeleted);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
