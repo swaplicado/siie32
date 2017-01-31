@@ -78,7 +78,7 @@ public class SViewQltLotApproved extends SGridPaneView implements ActionListener
         msSql = "SELECT ql.id_lot_apr AS " + SDbConsts.FIELD_ID + "1, "
                 + "'' AS " + SDbConsts.FIELD_CODE + ", "
                 + "b.bp AS " + SDbConsts.FIELD_NAME + ", "
-                + "ql.dt,  b.bp, i.item_key, i.item, u.unit, ql.lot, ql.b_del, "
+                + "ql.dt,  b.bp, i.item_key, i.item, u.symbol, ql.lot, ql.b_del, "
                 + "ql.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "ql.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
                 + "ql.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
@@ -94,7 +94,7 @@ public class SViewQltLotApproved extends SGridPaneView implements ActionListener
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON " 
                 + "ql.fk_usr_upd = uu.id_usr " 
                 + (sql.isEmpty() ? "" : "WHERE " + sql) 
-                + "ORDER BY ql.id_lot_apr, ql.dt, b.bp, i.item_key, i.item, u.unit, ql.lot, ql.b_del, ql.fk_usr_ins, ql.fk_usr_upd, ql.ts_usr_ins, ql.ts_usr_upd ";
+                + "ORDER BY ql.id_lot_apr, ql.dt, b.bp, i.item_key, i.item, u.symbol, ql.lot, ql.b_del, ql.fk_usr_ins, ql.fk_usr_upd, ql.ts_usr_ins, ql.ts_usr_upd ";
     }
 
     @Override
@@ -105,7 +105,7 @@ public class SViewQltLotApproved extends SGridPaneView implements ActionListener
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "b.bp", "Proveedor")); 
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "i.item_key", "Clave item"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "i.item", "Item"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "u.unit", "Unidad"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "u.symbol", "Unidad"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "ql.lot", "Lote aprobado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
