@@ -69,6 +69,7 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroupCurrency = new javax.swing.ButtonGroup();
         jPanel2 = new javax.swing.JPanel();
         jPanel10 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -86,6 +87,10 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
         jPanel7 = new javax.swing.JPanel();
         jlUnitType = new javax.swing.JLabel();
         jcbUnitType = new javax.swing.JComboBox();
+        jPanel13 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jrbCurrencyLoc = new javax.swing.JRadioButton();
+        jrbCurrencyDoc = new javax.swing.JRadioButton();
         jPanel12 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jckWithoutRelatedParty = new javax.swing.JCheckBox();
@@ -152,6 +157,7 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jlBizPartner.setText("Cliente: *");
         jlBizPartner.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jlBizPartner);
 
@@ -182,6 +188,19 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
         jPanel7.add(jcbUnitType);
 
         jPanel3.add(jPanel7);
+
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 3, 0));
+
+        jLabel2.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel13.add(jLabel2);
+
+        jrbCurrencyLoc.setText("Moneda local");
+        jPanel13.add(jrbCurrencyLoc);
+
+        jrbCurrencyDoc.setText("Moneda del documento");
+        jPanel13.add(jrbCurrencyDoc);
+
+        jPanel3.add(jPanel13);
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 3, 0));
 
@@ -239,7 +258,8 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
         moFieldDateEnd.setPickerButton(jbDateEnd);
         moFieldBizPartner = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbBizPartner, jlBizPartner);
         moFieldUnitType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbUnitType, jlUnitType);
-
+        
+        
         mvFields.add(moFieldDateInitial);
         mvFields.add(moFieldDateEnd);
         mvFields.add(moFieldBizPartner);
@@ -282,6 +302,7 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
                 SFormUtilities.populateComboBox(miClient, jcbBizPartner, SDataConstants.BPSX_BP_CUS);
             }
             jftDateInitial.requestFocus();
+            jrbCurrencyLoc.setSelected(true);
         }
     }
 
@@ -290,6 +311,12 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
         String field = "";
         SDataUnitType unitType = null;
         String sUnit = "";
+        String sCurrency = "";
+        String sPrice = "";
+        String sSTot = "";
+        String sTaxCharged = "";
+        String sTaxRetained = "";
+        String sTot = "";
         SDataBizPartner bizPartner = null;
         SFormValidation validation = formValidate();
         Map<String, Object> map = null;
@@ -333,7 +360,25 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
                         sUnit = "N/A";
                         unitType = null;
                 }
-
+                
+                if (jrbCurrencyLoc.isSelected()) {
+                    sPrice = "de.price_u";
+                    sSTot = "de.stot_r";
+                    sTaxCharged = "de.tax_charged_r";
+                    sTaxRetained = "de.tax_retained_r";
+                    sTot = "de.tot_r";
+                    sCurrency = miClient.getSession().getSessionCustom().getLocalCurrencyCode();
+                }
+                else {
+                    sPrice = "de.price_u_cur";
+                    sSTot = "de.stot_cur_r";
+                    sTaxCharged = "de.tax_charged_cur_r";
+                    sTaxRetained = "de.tax_retained_cur_r";
+                    sTot = "de.tot_cur_r";
+                    sCurrency = "";
+                }
+                    
+                
                 bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, moFieldBizPartner.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
 
                 map = miClient.createReportParams();
@@ -352,6 +397,12 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
                 map.put("sFieldUnit", field);
                 map.put("sUnit", sUnit);
                 map.put("sUnitBase", unitType == null ? "" : unitType.getUnitBase());
+                map.put("sPriceSql", sPrice);
+                map.put("sSStotSql", sSTot);
+                map.put("sTaxChargedql", sTaxCharged);
+                map.put("sTaxRetainedSql", sTaxRetained);
+                map.put("sTotSql", sTot);
+                map.put("sCurrency", sCurrency);
                 map.put("sTitle", mbParamIsSupplier ? "DETALLADO DE COMPRAS POR " : "DETALLADO DE VENTAS POR ");
                 map.put("sMark", mbParamIsSupplier ? "" : SDataConstantsSys.TXT_UNSIGNED);
                 map.put("sSqlWhereWithoutRelatedParty", jckWithoutRelatedParty.isSelected() ? " AND bp.b_att_rel_pty = 0 " : "");
@@ -398,10 +449,13 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup buttonGroupCurrency;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -421,6 +475,8 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateInitial;
     private javax.swing.JLabel jlUnitType;
+    private javax.swing.JRadioButton jrbCurrencyDoc;
+    private javax.swing.JRadioButton jrbCurrencyLoc;
     // End of variables declaration//GEN-END:variables
 
     @Override

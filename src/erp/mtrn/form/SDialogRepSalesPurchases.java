@@ -29,13 +29,14 @@ import java.awt.event.KeyEvent;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.AbstractAction;
+import javax.swing.JComboBox;
 import javax.swing.JRadioButton;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
- * @author Alfonso Flores, Edwin Carmona
+ * @author Alfonso Flores, Edwin Carmona, Uriel Castañeda
  */
 public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
@@ -201,7 +202,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
 
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlCurrency.setText("Moneda:*");
+        jlCurrency.setText("Moneda:");
         jlCurrency.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel18.add(jlCurrency);
 
@@ -414,6 +415,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         jbDateEnd.addActionListener(this);
         jrbCurrencyLoc.addItemListener(this);
         jrbCurrencyDoc.addItemListener(this);
+        jcbCurrency.addItemListener(this);
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -889,22 +891,33 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         return columns;
     }
 
-    private void itemStateChangedCurrency() {
+    private void itemStateChangedCurrencyCheck() {
         if (jrbCurrencyLoc.isSelected()) {
             jlCurrencyDocWarning.setVisible(false);
             jcbCurrency.setEnabled(false);
             moFieldCurrency.setKey(miClient.getSession().getSessionCustom().getLocalCurrencyKey());
             jckIsWithUnits.setEnabled(true);
         }
-        else if (jrbCurrencyDoc.isSelected()) {
-            jlCurrencyDocWarning.setVisible(true);
+        else if (jrbCurrencyDoc.isSelected()) {   
             jcbCurrency.setEnabled(true);
             jcbCurrency.setSelectedIndex(0);
             jckIsWithUnits.setEnabled(false);
+            jlCurrencyDocWarning.setVisible(true);
+            jlCurrencyDocWarning.setText("NOTA: Todas las operaciones.");
         }
         
         jckIsWithUnits.setSelected(false);
         renderComboBoxUnitsType();
+    }
+    
+    private void itemStateChangedCurrency() {
+        if (jcbCurrency.getSelectedIndex() > 0 && !jrbCurrencyLoc.isSelected()) {
+            jlCurrencyDocWarning.setVisible(true);
+            jlCurrencyDocWarning.setText("NOTA: ¡Solo operaciones en la moneda seleccionada!");
+        }
+        else {
+            jlCurrencyDocWarning.setText("NOTA: Todas las operaciones.");
+        }
     }
     
     private void itemStateChangedByBizPartner() {
@@ -1100,14 +1113,22 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
 
     public void setParamIsSupplier(boolean b) { mbParamIsSupplier = b; }
     
+    @Override
     public void itemStateChanged(ItemEvent e) {
         if (e.getSource() instanceof JRadioButton) {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 JRadioButton radioButton = (JRadioButton) e.getSource();
                 
                 if (radioButton == jrbCurrencyDoc || radioButton == jrbCurrencyLoc) {
-                    itemStateChangedCurrency();
+                    itemStateChangedCurrencyCheck();
                 }
+            }
+        }
+        if (e.getSource() instanceof JComboBox) {
+            JComboBox comboBox = (JComboBox) e.getSource();
+            
+            if (comboBox == jcbCurrency) {
+                itemStateChangedCurrency();
             }
         }
     }
