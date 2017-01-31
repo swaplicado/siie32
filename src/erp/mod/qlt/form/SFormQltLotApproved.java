@@ -279,8 +279,15 @@ public class SFormQltLotApproved extends SBeanForm implements ActionListener, It
     private void enabledFields(boolean enable) {
         moKeyItem.setEnabled(enable);
         jbItem.setEnabled(enable);
-        moKeyUnit.setEnabled(enable);
-        jbUnit.setEnabled(enable);
+               
+        if (moRegistry.isRegistryNew()) {
+            moKeyUnit.setEnabled(false);
+            jbUnit.setEnabled(false);
+        }
+        else {
+            moKeyUnit.setEnabled(true);
+            jbUnit.setEnabled(true);
+        }
         moKeyBizPartner.setEnabled(enable);
         jbBizPartner.setEnabled(enable);
         moTextLot.setEnabled(enable);
