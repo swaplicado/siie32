@@ -583,7 +583,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
                 // Item class filter is needed:
 
                 itemClassKey = (int[]) ((SFormComponentItem) jcbItemClass.getSelectedItem()).getPrimaryKey();
-                itemClassIndex = moOptionPane.getTableGuiColumnCount() - 3;
+                itemClassIndex = moOptionPane.getTableGuiColumnCount() - 4;
 
                 if (jckFindExactMatch.isSelected()) {
                     for (int i = 0; i < mvTableRows.size(); i++) {
