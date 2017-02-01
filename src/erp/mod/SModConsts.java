@@ -657,6 +657,7 @@ public abstract class SModConsts {
     public static final int HRSR_PRE_PAY = 2065002;
     public static final int HRSR_PAY_SUM = 2065003;
     public static final int HRSR_PAY_RCP = 2065004;
+    public static final int HRSR_PAY_RCP_PAY = 2065005;
     public static final int HRSR_EAR = 2065011;
     public static final int HRSR_EAR_EMP = 2065012;
     public static final int HRSR_DED = 2065021;

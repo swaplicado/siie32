@@ -379,8 +379,8 @@ public class SHrsPayrollReceipt {
             // Define factor for table adjusting:
 
             if (moHrsPayroll.getPayroll().getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_FOR && moHrsPayroll.getConfig().isFornightStandard()) {
-                dTableFactorPayroll = ((double) SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS_FORNIGHTS_FIXED) * oEmployeeDays.getPayrollTaxableDays_r();
-                dTableFactorAnnull = ((double) SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS_FORNIGHTS_FIXED) * oEmployeeDays.getAnnualTaxableDays_r();
+                dTableFactorPayroll = ((double) SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS_FORTNIGHTS_FIXED) * oEmployeeDays.getPayrollTaxableDays_r();
+                dTableFactorAnnull = ((double) SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS_FORTNIGHTS_FIXED) * oEmployeeDays.getAnnualTaxableDays_r();
             }
             else {
                 dTableFactorPayroll = ((double) SHrsConsts.YEAR_MONTHS / (SHrsConsts.YEAR_DAYS + (SLibTimeUtils.isLeapYear(moHrsPayroll.getPayroll().getFiscalYear()) ? 1d : 0d))) * oEmployeeDays.getPayrollTaxableDays_r();

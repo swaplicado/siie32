@@ -11,7 +11,7 @@ package erp.mod.hrs.db;
 public class SHrsConsts {
     
     public static final int YEAR_DAYS = 365;
-    public static final int YEAR_DAYS_FORNIGHTS_FIXED = 360;
+    public static final int YEAR_DAYS_FORTNIGHTS_FIXED = 360;
     public static final int YEAR_WEEKS = 52;
     public static final int YEAR_WEEKS_EXTENDED = 54;
     public static final int YEAR_FORNIGHTS = 24;

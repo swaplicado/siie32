@@ -84,6 +84,7 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         jPanel12 = new javax.swing.JPanel();
         moRadReportPrePayroll = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadReportPayroll = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadReportPayrollReceipt = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadReportListEarning = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadReportListDeductions = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadReportPayrollSummary = new sa.lib.gui.bean.SBeanFieldRadio();
@@ -178,7 +179,7 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         jPanel4.setLayout(new java.awt.BorderLayout());
 
         jPanel12.setBorder(javax.swing.BorderFactory.createTitledBorder("Reporte:"));
-        jPanel12.setLayout(new java.awt.GridLayout(5, 1));
+        jPanel12.setLayout(new java.awt.GridLayout(6, 1));
 
         jbGrpReport.add(moRadReportPrePayroll);
         moRadReportPrePayroll.setSelected(true);
@@ -190,6 +191,11 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         moRadReportPayroll.setText("Nómina");
         moRadReportPayroll.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel12.add(moRadReportPayroll);
+
+        jbGrpReport.add(moRadReportPayrollReceipt);
+        moRadReportPayrollReceipt.setText("Recibos de nómina ");
+        moRadReportPayrollReceipt.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel12.add(moRadReportPayrollReceipt);
 
         jbGrpReport.add(moRadReportListEarning);
         moRadReportListEarning.setText("Listado de percepciones");
@@ -311,6 +317,7 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
     private sa.lib.gui.bean.SBeanFieldRadio moRadReportListDeductions;
     private sa.lib.gui.bean.SBeanFieldRadio moRadReportListEarning;
     private sa.lib.gui.bean.SBeanFieldRadio moRadReportPayroll;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadReportPayrollReceipt;
     private sa.lib.gui.bean.SBeanFieldRadio moRadReportPayrollSummary;
     private sa.lib.gui.bean.SBeanFieldRadio moRadReportPrePayroll;
     private sa.lib.gui.bean.SBeanFieldRadio moRadReportTypeDepEmp;
@@ -355,6 +362,7 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         switch (reportId) {
             case SModConsts.HRSR_PRE_PAY:
             case SModConsts.HRSR_PAY:
+            case SModConsts.HRSR_PAY_RCP_PAY:
                 orderBy = "ORDER BY ";
                 break;
             case SModConsts.HRSR_LIST_EAR:
@@ -493,6 +501,17 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
                 moParamsMap.put("nYear", moIntPeriodYear.getValue());
                 moParamsMap.put("sSqlOrderBy", getOrderBy(mnFormType));
                 moParamsMap.put("bShowGroupDepartament", moBoolShowGroupDepartament.isSelected());
+            }
+            else if (moRadReportPayrollReceipt.isSelected()) {
+                mnFormType = SModConsts.HRSR_PAY_RCP_PAY;
+                
+                moParamsMap.put("nPayrollId", mnPayrollId);
+                moParamsMap.put("RegistroPatronal", ((SClientInterface) miClient).getSessionXXX().getParamsCompany().getRegistrySs());
+                moParamsMap.put("sEmiRfc", bizPartnerCompany.getFiscalId());
+                moParamsMap.put("tDateStart", moPayroll.getDateStart());
+                moParamsMap.put("tDateEnd", moPayroll.getDateEnd());
+                moParamsMap.put("nYear", moIntPeriodYear.getValue());
+                moParamsMap.put("sSqlOrderBy", getOrderBy(mnFormType));
             }
             else if (moRadReportListEarning.isSelected()) {
                 mnFormType = SModConsts.HRSR_LIST_EAR;

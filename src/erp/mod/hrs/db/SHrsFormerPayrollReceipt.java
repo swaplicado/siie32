@@ -314,10 +314,10 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
                 otroPago.setEltSubsidioEmpleo(subsidioEmpleo);
                 
             }
-            else if (concept.getClaveOficial() == SModSysConsts.HRSS_TP_EAR_OTH_PAY) {
+            else if (concept.getClaveOficial() == SModSysConsts.HRSS_TP_EAR_OTH) {
                 // Obtain key for other payment type:
 
-                otherPaymentKey = (String) miClient.getSession().readField(SModConsts.HRSS_TP_OTH_PAY, new int[] { SModSysConsts.HRSS_TP_OTH_PAY_OTH_PAY }, SDbRegistry.FIELD_CODE);
+                otherPaymentKey = (String) miClient.getSession().readField(SModConsts.HRSS_TP_OTH_PAY, new int[] { SModSysConsts.HRSS_TP_OTH_PAY_OTH }, SDbRegistry.FIELD_CODE);
 
                 otroPago.getAttTipoOtroPago().setString(otherPaymentKey);
                 otroPago.getAttClave().setString(DVer3Utils.formatAttributeValueAsKey(concept.getClaveEmpresa().length() < 3 ? SLibUtils.textRepeat("0", 3 - concept.getClaveEmpresa().length()) + concept.getClaveEmpresa() : concept.getClaveEmpresa()));
@@ -537,7 +537,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
         for (SHrsFormerPayrollConcept concept : moChildPayrollConcept) {
             switch (concept.getPkTipoConcepto()) {
                 case SCfdConsts.CFDI_PAYROLL_PERCEPTION:
-                    if (concept.getClaveOficial() != SModSysConsts.HRSS_TP_EAR_TAX_SUB && concept.getClaveOficial() != SModSysConsts.HRSS_TP_EAR_OTH_PAY) {
+                    if (concept.getClaveOficial() != SModSysConsts.HRSS_TP_EAR_TAX_SUB && concept.getClaveOficial() != SModSysConsts.HRSS_TP_EAR_OTH) {
                         if (concept.getTotalGravado() > 0 || concept.getTotalExento() > 0) {
                             cfd.ver3.nom12.DElementPercepcion percepcion = createEarningNode(concept);
 
@@ -566,7 +566,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
                             percepciones.getEltHijosPercepcion().add(percepcion);
                         }
                     }
-                    else if (concept.getClaveOficial() == SModSysConsts.HRSS_TP_EAR_TAX_SUB || concept.getClaveOficial() == SModSysConsts.HRSS_TP_EAR_OTH_PAY) {
+                    else if (concept.getClaveOficial() == SModSysConsts.HRSS_TP_EAR_TAX_SUB || concept.getClaveOficial() == SModSysConsts.HRSS_TP_EAR_OTH) {
                         cfd.ver3.nom12.DElementOtroPago otroPago = createEarningOtherPayNode(concept);
                         
                         if (otroPago != null) {

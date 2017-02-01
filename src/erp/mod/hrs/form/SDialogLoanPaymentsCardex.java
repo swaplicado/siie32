@@ -11,6 +11,7 @@ import erp.mod.hrs.db.SRowLoanPaymentCardex;
 import java.awt.BorderLayout;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Vector;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
@@ -31,8 +32,10 @@ import sa.lib.gui.bean.SBeanFormDialog;
  * @author Juan Barajas
  */
 public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
+    
     protected SDbLoan moLoan;
     private SGridPaneForm moGridPaymentMoves;
+    private Date mtDateCut;
 
     /**
      * Creates new form SDialogLoanPaymentsCardex
@@ -254,6 +257,7 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
 
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 800, 500);
+        mtDateCut = null;
         
         jbSave.setText("Cerrar");
         jbCancel.setEnabled(false);
@@ -350,7 +354,7 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON rcp_ear.fk_usr_ins = ui.id_usr " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON rcp_ear.fk_usr_upd = uu.id_usr " +
                     "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR_CMP) + " AS rcp_ear_cmp ON rcp_ear_cmp.id_pay = rcp_ear.id_pay AND rcp_ear_cmp.id_emp = rcp_ear.id_emp AND rcp_ear_cmp.id_mov = rcp_ear.id_mov " +
-                    "WHERE (p.id_pay = 0 OR p.b_del = 0) AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND rcp_ear.fk_loan_emp_n = " + moLoan.getPkEmployeeId() + " AND rcp_ear.fk_loan_loan_n = " + moLoan.getPkLoanId() + " " +
+                    "WHERE (p.id_pay = 0 OR p.b_del = 0) AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND rcp_ear.fk_loan_emp_n = " + moLoan.getPkEmployeeId() + " AND rcp_ear.fk_loan_loan_n = " + moLoan.getPkLoanId() + " " + (mtDateCut == null ? "" : " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateCut) + "' ") + " " +
 
                     "UNION " +
 
@@ -365,7 +369,7 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON rcp_ded.fk_usr_ins = ui.id_usr " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON rcp_ded.fk_usr_upd = uu.id_usr " +
                     "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED_CMP) + " AS rcp_ded_cmp ON rcp_ded_cmp.id_pay = rcp_ded.id_pay AND rcp_ded_cmp.id_emp = rcp_ded.id_emp AND rcp_ded_cmp.id_mov = rcp_ded.id_mov " +
-                    "WHERE (p.id_pay = 0 OR p.b_del = 0) AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.fk_loan_emp_n = " + moLoan.getPkEmployeeId() + " AND rcp_ded.fk_loan_loan_n = " + moLoan.getPkLoanId() + " " +
+                    "WHERE (p.id_pay = 0 OR p.b_del = 0) AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.fk_loan_emp_n = " + moLoan.getPkEmployeeId() + " AND rcp_ded.fk_loan_loan_n = " + moLoan.getPkLoanId() + " " + (mtDateCut == null ? "" : " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateCut) + "' ") + " " +
                     "ORDER BY f_dt, per_year, f_period, f_tp_pay, f_num, f_dt_sta, f_dt_end, f_ord, id_pay, id_emp, id_mov ";
 
             resultSet = miClient.getSession().getStatement().executeQuery(sql);
@@ -455,6 +459,9 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
             case SModConsts.HRS_LOAN:
                 moLoan = (SDbLoan) value;
                 initLoan();
+                break;
+            case SGuiConsts.PARAM_DATE_END:
+                mtDateCut = (Date) value;
                 break;
             default:
                 break;

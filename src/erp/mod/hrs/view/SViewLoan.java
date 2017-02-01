@@ -7,6 +7,7 @@ package erp.mod.hrs.view;
 import erp.gui.grid.SGridFilterPanelEmployee;
 import erp.gui.grid.SGridFilterPanelLoan;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbLoan;
 import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.form.SDialogLoanPaymentsCardex;
@@ -14,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -22,6 +24,7 @@ import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
+import sa.lib.grid.SGridFilterDateCutOff;
 import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
@@ -29,6 +32,7 @@ import sa.lib.grid.SGridRowView;
 import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiDate;
 
 /**
  *
@@ -36,12 +40,14 @@ import sa.lib.gui.SGuiConsts;
  */
 public class SViewLoan extends SGridPaneView implements ActionListener {
 
+    private SGridFilterDateCutOff moFilterDateCutOff;
     private SGridFilterPanelEmployee moFilterEmployee;
     private SGridFilterPanelLoan moFilterLoan;
     private JButton jbCloseLoan;
     private JButton jbCardex;
     
     private SDialogLoanPaymentsCardex moDialogLoanPaymentsCardex;
+    private Date mtDateCut;
     
     public SViewLoan(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_LOAN, SLibConsts.UNDEFINED, title);
@@ -50,6 +56,10 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
     
     private void initComponentsCustom() {
         setRowButtonsEnabled(true, true, true, false, true);
+        mtDateCut = null;
+        
+        moFilterDateCutOff = new SGridFilterDateCutOff(miClient, this);
+        moFilterDateCutOff.initFilter((Date) null);
 
         moFilterEmployee = new SGridFilterPanelEmployee(miClient, this, SModConsts.HRSS_TP_PAY, SModConsts.HRSU_DEP);
         moFilterEmployee.initFilter(null);
@@ -62,6 +72,7 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
         
         moDialogLoanPaymentsCardex = new SDialogLoanPaymentsCardex(miClient, "Control de crédito/préstamo");
         
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDateCutOff);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCloseLoan);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCardex);
         getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
@@ -120,6 +131,7 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
                 else {
                     loan = (SDbLoan) miClient.getSession().readRegistry(SModConsts.HRS_LOAN, (int[]) gridRow.getRowPrimaryKey());
                     
+                    moDialogLoanPaymentsCardex.setValue(SGuiConsts.PARAM_DATE_END, mtDateCut);
                     moDialogLoanPaymentsCardex.setValue(SModConsts.HRS_LOAN, loan);
                     moDialogLoanPaymentsCardex.setVisible(true);
                 }
@@ -130,12 +142,21 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
     @Override
     public void prepareSqlQuery() {
         String sql = "";
+        String sqlHaving = "";
         Object filter = null;
+        String dateCut = "";
 
         moPaneSettings = new SGridPaneSettings(2);
         moPaneSettings.setUserInsertApplying(true);
         moPaneSettings.setUserUpdateApplying(true);
 
+        filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE).getValue();
+
+        if (filter != null) {
+            mtDateCut = (SGuiDate) filter;
+            dateCut = " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateCut) + "' ";
+        }
+            
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
         if ((Boolean) filter) {
             sql += (sql.isEmpty() ? "" : "AND ") + "v.b_del = 0 ";
@@ -171,12 +192,13 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
         filter = ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelLoan.LOAN_STATUS))== null ? null : ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelLoan.LOAN_STATUS)).getValue();
         if (filter != null && ((int) filter) != SLibConsts.UNDEFINED) {
             if ((int)filter == SGridFilterPanelLoan.LOAN_STATUS_OPEN) {
-                sql += (sql.isEmpty() ? "" : "AND ") + "v.b_clo = 0 ";
+                sqlHaving = "HAVING (v.b_clo = 0 AND v.fk_tp_loan NOT IN(" + SModSysConsts.HRSS_TP_LOAN_HOM + ", " + SModSysConsts.HRSS_TP_LOAN_CON + ") AND _bal <> 0) OR (v.b_clo = 0 AND v.fk_tp_loan IN(" + SModSysConsts.HRSS_TP_LOAN_HOM + ", " + SModSysConsts.HRSS_TP_LOAN_CON + ")) ";
             }
             else if ((int)filter == SGridFilterPanelLoan.LOAN_STATUS_CLO) {
-                sql += (sql.isEmpty() ? "" : "AND ") + "v.b_clo = 1 ";
+                sqlHaving = "HAVING (_bal = 0 AND v.fk_tp_loan NOT IN(" + SModSysConsts.HRSS_TP_LOAN_HOM + ", " + SModSysConsts.HRSS_TP_LOAN_CON + ")) OR v.b_clo = 1 ";
             }
             else if ((int)filter == SGridFilterPanelLoan.LOAN_STATUS_ALL) {
+                sqlHaving = "";
             }
         }
 
@@ -189,10 +211,29 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
                 + "v.dt_end_n AS " + SDbConsts.FIELD_DATE + "1, "
                 + "v.cap, "
                 + "v.tot_amt, "
+                + "IF(v.fk_tp_loan IN(" + SModSysConsts.HRSS_TP_LOAN_HOM + ", " + SModSysConsts.HRSS_TP_LOAN_CON + "), 0, (v.tot_amt + "
+                + "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) AS f_in "
+                + "FROM hrs_pay AS p "
+                + "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay "
+                + "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp "
+                + "WHERE (p.id_pay = 0 OR p.b_del = 0) AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND rcp_ear.fk_loan_emp_n = v.id_emp AND "
+                + "rcp_ear.fk_loan_loan_n = v.id_loan " + (dateCut.isEmpty() ? "" : dateCut) + ") - "
+                + "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) AS f_out "
+                + "FROM hrs_pay AS p "
+                + "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay "
+                + "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp "
+                + "WHERE (p.id_pay = 0 OR p.b_del = 0) AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.fk_loan_emp_n = v.id_emp AND "
+                + "rcp_ded.fk_loan_loan_n = v.id_loan " + (dateCut.isEmpty() ? "" : dateCut) + "))) AS _bal, "
+                + "(SELECT MAX(p.dt_end) "
+                + "FROM hrs_pay AS p "
+                + "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay "
+                + "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp "
+                + "WHERE (p.id_pay = 0 OR p.b_del = 0) AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.fk_loan_emp_n = v.id_emp AND rcp_ded.fk_loan_loan_n = v.id_loan) AS _dt_max, "
                 + "v.pay_amt, "
                 + "v.pay_fix, "
                 + "v.pay_uma, "
                 + "v.pay_per, "
+                + "v.fk_tp_loan, "
                  + "IF(v.pay_per_ref = " + SHrsConsts.SAL_REF_SAL  + ", '" + SHrsConsts.TXT_SAL_REF_SAL + "',"
                  + "IF(v.pay_per_ref = " + SHrsConsts.SAL_REF_SAL_SS  + ", '" + SHrsConsts.TXT_SAL_REF_SAL_SS + "',"
                  + "IF(v.pay_per_ref = " + SHrsConsts.SAL_REF_SAL_FIX  + ", '" + SHrsConsts.TXT_SAL_REF_SAL_FIX + "', ''))) AS f_sal_ref, "
@@ -226,8 +267,8 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
                 + "v.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
                 + "v.fk_usr_upd = uu.id_usr "
-                + (sql.isEmpty() ? "" : "WHERE " + sql)
-                + "ORDER BY v.num, bp.bp, v.id_emp, v.id_loan  ";
+                + (sql.isEmpty() ? "" : "WHERE " + sql) + sqlHaving
+                + "ORDER BY v.num, bp.bp, v.id_emp, vt.name, vtp.name, v.id_loan ";
     }
 
     @Override
@@ -236,17 +277,19 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
 
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, SDbConsts.FIELD_NAME, "Número"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "bp.bp", "Empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "vt.name", "Tipo crédito/préstamo"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "vtp.name", "Tipo pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, "Fecha inicial"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE + "1", "Fecha final"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "v.cap", "Capital $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "v.tot_amt", "Total a pagar $"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "_bal", "Saldo $"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "_dt_max", "Último pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "v.pay_amt", "Monto $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_8D, "v.pay_fix", "Salarios mínimos"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_4D, "v.pay_per", "Porcentaje de salario base"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_8D, "v.pay_uma", "Número UMA"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_8D, "v.pay_per_amt", "Salarios referencia"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "vt.name", "Tipo crédito/préstamo"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "vtp.name", "Tipo pago"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_8D, "v.pay_per_amt", "Salario referencia"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_sal_ref", "Salario referencia"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "v.b_clo", "Cerrado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));

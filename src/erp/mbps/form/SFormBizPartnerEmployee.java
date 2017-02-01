@@ -287,7 +287,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jpBranchAddress = new javax.swing.JPanel();
         jpOficialAddress = new javax.swing.JPanel();
         jPanel40 = new javax.swing.JPanel();
-        jckIsAddress = new javax.swing.JCheckBox();
         jPanel5 = new javax.swing.JPanel();
         jPanel41 = new javax.swing.JPanel();
         jtfPkBizPartnerId_Ro = new javax.swing.JTextField();
@@ -899,16 +898,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jpBranchAddress.add(jpOficialAddress, java.awt.BorderLayout.CENTER);
 
         jPanel40.setLayout(new java.awt.BorderLayout());
-
-        jckIsAddress.setText("Capturar domicilio");
-        jckIsAddress.setPreferredSize(new java.awt.Dimension(250, 23));
-        jckIsAddress.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jckIsAddressItemStateChanged(evt);
-            }
-        });
-        jPanel40.add(jckIsAddress, java.awt.BorderLayout.CENTER);
-
         jpBranchAddress.add(jPanel40, java.awt.BorderLayout.NORTH);
 
         jPanel35.add(jpBranchAddress, java.awt.BorderLayout.CENTER);
@@ -965,10 +954,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private void jtfLastNameFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jtfLastNameFocusLost
         focusLostLastName();
     }//GEN-LAST:event_jtfLastNameFocusLost
-
-    private void jckIsAddressItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jckIsAddressItemStateChanged
-        itemStateChangedIsAddress();
-    }//GEN-LAST:event_jckIsAddressItemStateChanged
 
     private void jcbFkDepartmentItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbFkDepartmentItemStateChanged
         if (evt.getStateChange() == ItemEvent.SELECTED) {
@@ -1192,10 +1177,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private void computeBizPartner_Ro() {
         jtfBizPartner_Ro.setText(composeName());
         jtfBizPartner_Ro.setCaretPosition(0);
-    }
-
-    private void itemStateChangedIsAddress() {
-        moPanelBizPartnerBranchAddress.setFieldsEnabled(jckIsAddress.isSelected());
     }
 
     private void focusLostFirstName() {
@@ -1716,7 +1697,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JCheckBox jckChangeSalarySscBase;
     private javax.swing.JCheckBox jckChangeWage;
     private javax.swing.JCheckBox jckIsActive;
-    private javax.swing.JCheckBox jckIsAddress;
     private javax.swing.JCheckBox jckIsDeleted;
     private javax.swing.JCheckBox jckIsMfgOperator;
     private javax.swing.JCheckBox jckIsUnionized;
@@ -1819,9 +1799,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moPanelBizPartnerBranchAddress.formReset();
         moPanelBizPartnerBranchAddress.setParamIsInMainWindow(true);
         jTabbedPane1.setSelectedIndex(0);
-        jckIsAddress.setSelected(false);
         jckIsMfgOperator.setSelected(false);
-        itemStateChangedIsAddress();
+        moPanelBizPartnerBranchAddress.setFieldsEnabled(true);
 
         mnPkContactId = 0;
         jckIsDeleted.setEnabled(false);
@@ -1931,8 +1910,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                     }
                 }
 
-                if (!validation.getIsError() && jckIsAddress.isSelected()) {
+                if (!validation.getIsError()) {
                     validation = moPanelBizPartnerBranchAddress.formValidate();
+                    jTabbedPane1.setSelectedIndex(1);
                 }
 
                 if (!validation.getIsError()) {

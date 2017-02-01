@@ -36,7 +36,7 @@ import javax.swing.AbstractAction;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Juan Barajas
  */
 public class SFormCommissionsSalesAgents extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -685,7 +685,7 @@ public class SFormCommissionsSalesAgents extends javax.swing.JDialog implements 
                         oCommissionsSalesAgentType.setPkReferenceId((Integer) ((SFormComponentItem) jcbPkReferenceId.getSelectedItem()).getComplement());
                         break;
                     default:
-                        oCommissionsSalesAgentType.setPkReferenceId(moFieldPkReferenceId.getKeyAsIntArray()[0]);
+                        oCommissionsSalesAgentType.setPkReferenceId(moFieldPkReferenceId.getKeyAsIntArray() == null ? SLibConstants.UNDEFINED : moFieldPkReferenceId.getKeyAsIntArray()[0]);
                 }
 
                 oCommissionsSalesAgentType.setPkDateStartId(moFieldPkDateStartId.getDate());
@@ -725,7 +725,7 @@ public class SFormCommissionsSalesAgents extends javax.swing.JDialog implements 
                     moCommissionsSalesAgents.setPkReferenceId((Integer) ((SFormComponentItem) jcbPkReferenceId.getSelectedItem()).getComplement());
                     break;
                 default:
-                    moCommissionsSalesAgents.setPkReferenceId(moFieldPkReferenceId.getKeyAsIntArray()[0]);
+                    moCommissionsSalesAgents.setPkReferenceId(moFieldPkReferenceId.getKeyAsIntArray() == null ? SLibConstants.UNDEFINED : moFieldPkReferenceId.getKeyAsIntArray()[0]);
             }
 
             moCommissionsSalesAgents.setPkDateStartId(moFieldPkDateStartId.getDate());
@@ -749,7 +749,7 @@ public class SFormCommissionsSalesAgents extends javax.swing.JDialog implements 
                 oCommissionsSalesAgent.setSupervisorValueUnitary(0d);
                 oCommissionsSalesAgent.setSupervisorValue(0d);
                 oCommissionsSalesAgent.setPkLinkTypeId(moFieldPkLinkTypeId.getKeyAsIntArray()[0]);
-                oCommissionsSalesAgent.setPkReferenceId(moFieldPkReferenceId.getKeyAsIntArray()[0]);
+                oCommissionsSalesAgent.setPkReferenceId(moFieldPkReferenceId.getKeyAsIntArray() == null ? SLibConstants.UNDEFINED : moFieldPkReferenceId.getKeyAsIntArray()[0]);
                 oCommissionsSalesAgent.setPkDateStartId(moFieldPkDateStartId.getDate());
                 oCommissionsSalesAgent.setIsDeleted(moFieldIsDeleted.getBoolean());
                 oCommissionsSalesAgent.setFkCommissionsTypeId(SDataConstantsSys.MKTS_TP_COMMS_PER); // XXX

@@ -26,7 +26,7 @@ import javax.swing.AbstractAction;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Juan Barajas
  */
 public class SFormCommissionsSalesAgent extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -764,7 +764,7 @@ public class SFormCommissionsSalesAgent extends javax.swing.JDialog implements e
                     moCommissionsSalesAgentType.setPkReferenceId((Integer) ((SFormComponentItem) jcbPkReferenceId.getSelectedItem()).getComplement());
                     break;
                 default:
-                    moCommissionsSalesAgentType.setPkReferenceId(moFieldPkReferenceId.getKeyAsIntArray()[0]);
+                    moCommissionsSalesAgentType.setPkReferenceId(moFieldPkReferenceId.getKeyAsIntArray() == null ? SLibConstants.UNDEFINED : moFieldPkReferenceId.getKeyAsIntArray()[0]);
             }
 
             moCommissionsSalesAgentType.setPkDateStartId(moFieldPkDateStartId.getDate());
@@ -806,7 +806,7 @@ public class SFormCommissionsSalesAgent extends javax.swing.JDialog implements e
                     moCommissionsSalesAgent.setPkReferenceId((Integer) ((SFormComponentItem) jcbPkReferenceId.getSelectedItem()).getComplement());
                     break;
                 default:
-                    moCommissionsSalesAgent.setPkReferenceId(moFieldPkReferenceId.getKeyAsIntArray()[0]);
+                    moCommissionsSalesAgent.setPkReferenceId(moFieldPkReferenceId.getKeyAsIntArray() == null ? SLibConstants.UNDEFINED : moFieldPkReferenceId.getKeyAsIntArray()[0]);
             }
 
             moCommissionsSalesAgent.setPkDateStartId(moFieldPkDateStartId.getDate());

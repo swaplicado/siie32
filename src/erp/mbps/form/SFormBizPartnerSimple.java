@@ -536,7 +536,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
 
         getContentPane().add(jPanel5, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(972, 535));
+        setSize(new java.awt.Dimension(992, 535));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
