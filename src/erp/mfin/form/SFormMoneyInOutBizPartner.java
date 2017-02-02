@@ -42,7 +42,7 @@ import sa.lib.SLibConsts;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores
+ * @author Alfonso Flores, Sergio Flores, Juan Barajas
  */
 public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.FocusListener {
 
@@ -57,6 +57,8 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
     private erp.mfin.data.SDataCheck moCheck;
     private erp.lib.form.SFormField moFieldConcept;
     private erp.lib.form.SFormField moFieldFkBizPartnerId;
+    private erp.lib.form.SFormField moFieldReference;
+    private erp.lib.form.SFormField moFieldIsReferenceTax;
     private erp.lib.form.SFormField moFieldFkBizPartnerCurrencyId;
     private erp.lib.form.SFormField moFieldValueCy;
     private erp.lib.form.SFormField moFieldExchangeRateSys;
@@ -115,6 +117,11 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
         jPanel13 = new javax.swing.JPanel();
         jlBizPartnerCurrency = new javax.swing.JLabel();
         jtfBizPartnerCurrency = new javax.swing.JTextField();
+        jPanel14 = new javax.swing.JPanel();
+        jlReference = new javax.swing.JLabel();
+        jtfReference = new javax.swing.JTextField();
+        jlDummy01 = new javax.swing.JLabel();
+        jckIsReferenceTax = new javax.swing.JCheckBox();
         jPanel5 = new javax.swing.JPanel();
         jlFkBizPartnerCurrencyId = new javax.swing.JLabel();
         jcbFkBizPartnerCurrencyId = new javax.swing.JComboBox();
@@ -168,7 +175,7 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel3.setLayout(new java.awt.GridLayout(10, 1, 0, 2));
+        jPanel3.setLayout(new java.awt.GridLayout(11, 1, 0, 2));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
@@ -242,6 +249,25 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
         jPanel13.add(jtfBizPartnerCurrency);
 
         jPanel3.add(jPanel13);
+
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlReference.setText("Repositorio contable:");
+        jlReference.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel14.add(jlReference);
+
+        jtfReference.setText("REF");
+        jtfReference.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel14.add(jtfReference);
+
+        jlDummy01.setPreferredSize(new java.awt.Dimension(25, 23));
+        jPanel14.add(jlDummy01);
+
+        jckIsReferenceTax.setText("Aplican impuestos");
+        jckIsReferenceTax.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel14.add(jckIsReferenceTax);
+
+        jPanel3.add(jPanel14);
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
@@ -384,6 +410,9 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
 
         moFieldFkBizPartnerId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkBizPartnerId, jlFkBizPartnerId);
         moFieldFkBizPartnerId.setPickerButton(jbFkBizPartnerId);
+        moFieldReference = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfReference, jlReference);
+        moFieldReference.setLengthMax(15);
+        moFieldIsReferenceTax = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsReferenceTax);
         moFieldFkBizPartnerCurrencyId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkBizPartnerCurrencyId, jlFkBizPartnerCurrencyId);
         moFieldFkBizPartnerCurrencyId.setPickerButton(jbFkBizPartnerCurrencyId);
         moFieldValueCy = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfValueCy, jlValueCy);
@@ -399,6 +428,8 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
         moFieldConcept.setLengthMax(100);
 
         mvFields.add(moFieldFkBizPartnerId);
+        mvFields.add(moFieldReference);
+        mvFields.add(moFieldIsReferenceTax);
         mvFields.add(moFieldFkBizPartnerCurrencyId);
         mvFields.add(moFieldValueCy);
         mvFields.add(moFieldExchangeRateSys);
@@ -759,6 +790,15 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
         oEntry.setFkCurrencyId(moFieldFkBizPartnerCurrencyId.getKeyAsIntArray()[0]);
         oEntry.setFkBizPartnerId_nr(moFieldFkBizPartnerId.getKeyAsIntArray()[0]);
         
+        if (jtfReference.isEnabled()) {
+            oEntry.setReference(moFieldReference.getString());
+            oEntry.setIsReferenceTax(moFieldIsReferenceTax.getBoolean());
+        }
+        else {
+            oEntry.setReference("");
+            oEntry.setIsReferenceTax(false);
+        }
+        
         if (moParamRecord.getDbmsDataAccountCash() == null) {
             oEntry.setFkCompanyBranchId_n(SLibConsts.UNDEFINED);
             oEntry.setFkEntityId_n(SLibConsts.UNDEFINED);
@@ -978,6 +1018,7 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -1000,14 +1041,17 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
     private javax.swing.JComboBox jcbFkBizPartnerId;
     private javax.swing.JComboBox jcbFkCheckId_n;
     private javax.swing.JCheckBox jckCheckApplying;
+    private javax.swing.JCheckBox jckIsReferenceTax;
     private javax.swing.JLabel jlAccountCash;
     private javax.swing.JLabel jlAccountCashCurrency;
     private javax.swing.JLabel jlBizPartnerCurrency;
     private javax.swing.JLabel jlConcept;
+    private javax.swing.JLabel jlDummy01;
     private javax.swing.JLabel jlExchangeRate;
     private javax.swing.JLabel jlExchangeRateSys;
     private javax.swing.JLabel jlFkBizPartnerCurrencyId;
     private javax.swing.JLabel jlFkBizPartnerId;
+    private javax.swing.JLabel jlReference;
     private javax.swing.JLabel jlValue;
     private javax.swing.JLabel jlValueCy;
     private javax.swing.JTextField jtfAccountCash;
@@ -1018,6 +1062,7 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
     private javax.swing.JTextField jtfConcept;
     private javax.swing.JTextField jtfExchangeRate;
     private javax.swing.JTextField jtfExchangeRateSys;
+    private javax.swing.JTextField jtfReference;
     private javax.swing.JTextField jtfValue;
     private javax.swing.JTextField jtfValueCy;
     // End of variables declaration//GEN-END:variables
@@ -1126,6 +1171,8 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
 
         moFieldConcept.setFieldValue(moRecordEntry.getConcept());
         moFieldFkBizPartnerId.setKey(new int[] { moRecordEntry.getFkBizPartnerId_nr() });
+        moFieldReference.setFieldValue(moRecordEntry.getReference());
+        moFieldIsReferenceTax.setFieldValue(moRecordEntry.getIsReferenceTax());
         moFieldValueCy.setFieldValue(moCheck.getValue());
         moFieldValue.setFieldValue(moRecordEntry.getCredit());
         moFieldExchangeRateSys.setFieldValue(moRecordEntry.getExchangeRateSystem());

@@ -143,7 +143,7 @@ public class STrnStockValidator {
                 }
 
                 if (lot == null) {
-                    msg = "El lote '" + entryLot.getDbmsLot() + "' del ítem '" + entryLot.getDbmsItem() + "', clave '" + entryLot.getDbmsItemKey() + "' no existe.";
+                    msg = "El lote '" + entryLot.getDbmsLot() + "' del ítem '" + entryLot.getDbmsItem() + "', clave '" + entryLot.getDbmsItemKey() + "' no existe o está eliminado.";
                     break ENTRY;
                 }
                 else {

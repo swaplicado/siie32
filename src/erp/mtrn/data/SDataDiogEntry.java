@@ -511,7 +511,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
 
                     if (lot == null) {
                         if (shouldValidateOutgoingItems(iogCategoryId, isDocBeingDeleted)) {
-                            msg = "El lote '" + stockMove.getAuxLot() + "' del ítem '" + msDbmsItem + "', clave '" + msDbmsItemKey + "' no existe.";
+                            msg = "El lote '" + stockMove.getAuxLot() + "' del ítem '" + msDbmsItem + "', clave '" + msDbmsItemKey + "' no existe o está eliminado.";
                             break;
                         }
                     }
