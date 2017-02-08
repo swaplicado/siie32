@@ -64,7 +64,7 @@ public class SViewPayrollReceiptRecord extends SGridPaneView {
 
         msSql = "SELECT pe.id_pay, pe.id_emp, p.id_pay, r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num, "
                 + "p.per_year, p.per, p.num, p.fk_tp_pay, p.dt_sta, p.dt_end, " 
-                + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY_SHT) + " WHERE id_tp_pay_sht = v.fk_tp_pay_sht) AS tp_pay_sht, "
+                + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY_SHT) + " WHERE id_tp_pay_sht = p.fk_tp_pay_sht) AS tp_pay_sht, "
                 + "p.b_clo, p.b_del, r.dt, bkc.code, cob.code, "
                 + "CONCAT(r.id_year, '-', erp.lib_fix_int(r.id_per, 2)) as f_per, "
                 + "(SELECT t.name FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS t WHERE p.fk_tp_pay = t.id_tp_pay) AS f_pay_name, "
