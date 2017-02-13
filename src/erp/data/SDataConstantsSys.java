@@ -26,15 +26,16 @@ public abstract class SDataConstantsSys {
 
     public static final int[] CFGS_TP_ENT_CASH_CASH = new int[] { 1, 1 };
     public static final int[] CFGS_TP_ENT_CASH_BANK = new int[] { 1, 2 };
-    public static final int[] CFGS_TP_ENT_WH_SP = new int[] { 2, 1 };
-    public static final int[] CFGS_TP_ENT_WH_MFG_RM = new int[] { 2, 2 };
-    public static final int[] CFGS_TP_ENT_WH_MFG_WP = new int[] { 2, 3 };
-    public static final int[] CFGS_TP_ENT_WH_MFG_FG = new int[] { 2, 4 };
-    public static final int[] CFGS_TP_ENT_WH_GDS = new int[] { 2, 5 };
-    public static final int[] CFGS_TP_ENT_WH_WAR_PUR = new int[] { 2, 6 };
-    public static final int[] CFGS_TP_ENT_WH_WAR_SAL = new int[] { 2, 7 };
-    public static final int[] CFGS_TP_ENT_WH_CSG_PUR = new int[] { 2, 8 };
-    public static final int[] CFGS_TP_ENT_WH_CSG_SAL = new int[] { 2, 9 };
+    public static final int[] CFGS_TP_ENT_WH_SP = new int[] { 2, 11};
+    public static final int[] CFGS_TP_ENT_WH_MFG_RM = new int[] { 2, 21 };
+    public static final int[] CFGS_TP_ENT_WH_MFG_WP = new int[] { 2, 22 };
+    public static final int[] CFGS_TP_ENT_WH_MFG_FG = new int[] { 2, 23 };
+    public static final int[] CFGS_TP_ENT_WH_MFG_MS = new int[] { 2, 24 };
+    public static final int[] CFGS_TP_ENT_WH_GDS = new int[] { 2, 31 };
+    public static final int[] CFGS_TP_ENT_WH_WAR_PUR = new int[] { 2, 41 };
+    public static final int[] CFGS_TP_ENT_WH_WAR_SAL = new int[] { 2, 42 };
+    public static final int[] CFGS_TP_ENT_WH_CSG_PUR = new int[] { 2, 51 };
+    public static final int[] CFGS_TP_ENT_WH_CSG_SAL = new int[] { 2, 52 };
     public static final int[] CFGS_TP_ENT_POS_POS = new int[] { 3, 1 };
     public static final int[] CFGS_TP_ENT_PLT_PLT = new int[] { 4, 1 };
 
@@ -390,20 +391,6 @@ public abstract class SDataConstantsSys {
 
     public static final int BPSS_TP_BPB_HQ = 1;
     public static final int BPSS_TP_BPB_B = 2;
-
-    public static final int BPSS_TP_BPB_WH_SP = 1;
-    public static final int BPSS_TP_BPB_WH_RM = 2;
-    public static final int BPSS_TP_BPB_WH_WP = 3;
-    public static final int BPSS_TP_BPB_WH_GOOD_F = 4;
-    public static final int BPSS_TP_BPB_WH_GOOD = 5;
-    public static final int BPSS_TP_BPB_WH_WAR_PUR = 6;
-    public static final int BPSS_TP_BPB_WH_WAR_SAL = 7;
-    public static final int BPSS_TP_BPB_WH_CON_CO = 8;
-    public static final int BPSS_TP_BPB_WH_CON_BP = 9;
-
-    public static final int BPSS_TP_BPB_POS_POS = 1;
-
-    public static final int BPSS_TP_BPB_PLT_MFG = 1;
 
     public static final int BPSS_TP_ADD_OFF = 1;
     public static final int BPSS_TP_ADD_OFF_NO = 2;
