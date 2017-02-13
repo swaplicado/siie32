@@ -129,7 +129,7 @@ public abstract class STrnUtilities {
         SDataStockLot stockLot = null;
 
         sql = "SELECT id_lot FROM trn_lot " +
-                "WHERE id_item = " + itemId + " AND id_unit = " + unitId + " AND " +
+                "WHERE b_del = 0 AND id_item = " + itemId + " AND id_unit = " + unitId + " AND " +
                 "lot = '" + lot + "' ";
 
         resulSet = client.getSession().getStatement().executeQuery(sql);
