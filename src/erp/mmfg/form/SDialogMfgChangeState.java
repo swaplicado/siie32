@@ -18,6 +18,7 @@ import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mmfg.data.SDataProductionOrder;
 import erp.mtrn.data.SDataRawMaterialsConsume;
+import erp.mtrn.data.STrnStockSegregationUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
@@ -25,7 +26,7 @@ import javax.swing.AbstractAction;
 
 /**
  *
- * @author  Néstor Ávalos
+ * @author  Néstor Ávalos, Edwin Carmona
  */
 public class SDialogMfgChangeState extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -280,6 +281,8 @@ public class SDialogMfgChangeState extends javax.swing.JDialog implements erp.li
                     oProductionOrder = (SDataProductionOrder) SDataUtilities.readRegistry(miClient, SDataConstants.MFG_ORD, new int[] { oProductionOrder.getPkYearId(), oProductionOrder.getPkOrdId() }, SLibConstants.EXEC_MODE_VERBOSE);
                     if (oProductionOrder.getFkOrdStatusId() == SDataConstantsSys.MFGS_ST_ORD_CLS) {
                         rmConsume(new int[] { oProductionOrder.getPkYearId(), oProductionOrder.getPkOrdId() });
+                        
+                        STrnStockSegregationUtils.releaseSegregation(miClient, new int [] { oProductionOrder.getPkOrdId(), oProductionOrder.getPkYearId() }, SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD);
                     }
                 }
             }

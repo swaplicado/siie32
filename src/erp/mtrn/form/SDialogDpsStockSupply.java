@@ -19,6 +19,8 @@ import erp.lib.table.STablePane;
 import erp.lib.table.STableRow;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mcfg.data.SDataCompanyBranchEntity;
+import erp.mtrn.data.STrnStock;
+import erp.mtrn.data.STrnStockSegregationUtils;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.SDataDps;
@@ -37,7 +39,7 @@ import javax.swing.event.ListSelectionListener;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda
+ * @author Sergio Flores, Uriel Castañeda, Edwin Carmona
  */
 public class SDialogDpsStockSupply extends javax.swing.JDialog implements ActionListener, ListSelectionListener {
 
@@ -104,6 +106,8 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
         jlQuantityNet = new javax.swing.JLabel();
         jtfQuantityNet = new javax.swing.JTextField();
         jtfQuantityNetUnit = new javax.swing.JTextField();
+        jPanel10 = new javax.swing.JPanel();
+        label = new javax.swing.JLabel();
         jpDpsEntriesInfo12 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jlQuantityNetAux = new javax.swing.JLabel();
@@ -117,12 +121,18 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
         jlQuantityPending = new javax.swing.JLabel();
         jtfQuantityPending = new javax.swing.JTextField();
         jtfQuantityPendingUnit = new javax.swing.JTextField();
+        jPanel11 = new javax.swing.JPanel();
+        label1 = new javax.swing.JLabel();
         jpDpsEntriesInfo2 = new javax.swing.JPanel();
         jpDpsEntriesInfo21 = new javax.swing.JPanel();
         jlStock = new javax.swing.JLabel();
         jtfStock = new javax.swing.JTextField();
         jtfStockUnit = new javax.swing.JTextField();
         jbViewLots = new javax.swing.JButton();
+        jpDiogEntriesInfo24 = new javax.swing.JPanel();
+        jlSegregated = new javax.swing.JLabel();
+        jtfSegregated = new javax.swing.JTextField();
+        jtfSegregatedUnit = new javax.swing.JTextField();
         jpDpsEntriesInfo22 = new javax.swing.JPanel();
         jlCurrentlyUsed = new javax.swing.JLabel();
         jtfCurrentlyUsed = new javax.swing.JTextField();
@@ -148,7 +158,7 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
             }
         });
 
-        jlPanelDps.setFont(new java.awt.Font("Tahoma", 1, 14));
+        jlPanelDps.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jlPanelDps.setText("[Panel de documento de compras-ventas]");
         jlPanelDps.setPreferredSize(new java.awt.Dimension(100, 200));
         getContentPane().add(jlPanelDps, java.awt.BorderLayout.NORTH);
@@ -214,7 +224,7 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
 
         jpDpsEntriesInfo1.setLayout(new java.awt.GridLayout(1, 2));
 
-        jpDpsEntriesInfo11.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
+        jpDpsEntriesInfo11.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -281,9 +291,16 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
 
         jpDpsEntriesInfo11.add(jPanel6);
 
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        label.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel10.add(label);
+
+        jpDpsEntriesInfo11.add(jPanel10);
+
         jpDpsEntriesInfo1.add(jpDpsEntriesInfo11);
 
-        jpDpsEntriesInfo12.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
+        jpDpsEntriesInfo12.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -350,11 +367,18 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
 
         jpDpsEntriesInfo12.add(jPanel9);
 
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        label1.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel11.add(label1);
+
+        jpDpsEntriesInfo12.add(jPanel11);
+
         jpDpsEntriesInfo1.add(jpDpsEntriesInfo12);
 
         jpDpsEntriesInfo.add(jpDpsEntriesInfo1, java.awt.BorderLayout.WEST);
 
-        jpDpsEntriesInfo2.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
+        jpDpsEntriesInfo2.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
         jpDpsEntriesInfo21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -381,6 +405,27 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
         jpDpsEntriesInfo21.add(jbViewLots);
 
         jpDpsEntriesInfo2.add(jpDpsEntriesInfo21);
+
+        jpDiogEntriesInfo24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlSegregated.setText("– Segregadas:");
+        jlSegregated.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpDiogEntriesInfo24.add(jlSegregated);
+
+        jtfSegregated.setEditable(false);
+        jtfSegregated.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfSegregated.setText("0.00");
+        jtfSegregated.setFocusable(false);
+        jtfSegregated.setPreferredSize(new java.awt.Dimension(120, 23));
+        jpDiogEntriesInfo24.add(jtfSegregated);
+
+        jtfSegregatedUnit.setEditable(false);
+        jtfSegregatedUnit.setText("UNIT");
+        jtfSegregatedUnit.setFocusable(false);
+        jtfSegregatedUnit.setPreferredSize(new java.awt.Dimension(40, 23));
+        jpDiogEntriesInfo24.add(jtfSegregatedUnit);
+
+        jpDpsEntriesInfo2.add(jpDiogEntriesInfo24);
 
         jpDpsEntriesInfo22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -409,8 +454,8 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
         jlAvailable.setPreferredSize(new java.awt.Dimension(75, 23));
         jpDpsEntriesInfo23.add(jlAvailable);
 
-        jtfAvailable.setBackground(new java.awt.Color(153, 204, 255));
         jtfAvailable.setEditable(false);
+        jtfAvailable.setBackground(new java.awt.Color(153, 204, 255));
         jtfAvailable.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfAvailable.setText("0.00");
         jtfAvailable.setFocusable(false);
@@ -465,8 +510,8 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
 
         getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-928)/2, (screenSize.height-609)/2, 928, 609);
+        setSize(new java.awt.Dimension(928, 609));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -550,6 +595,10 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
     private void valueChangedPaneDpsEntries() {
         double stock = 0;
         double used = 0;
+        double segregated = 0;
+        
+        STrnStockMove stockMoveParams = null;
+        STrnStock objStock = null;
         STrnDpsStockSupplyRow stockSupplyRow = (STrnDpsStockSupplyRow) moPaneDpsEntries.getSelectedTableRow();
 
         if (stockSupplyRow == null) {
@@ -594,7 +643,20 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
             // Available stock is processed in inventory units:
 
             try {
-                stock = STrnUtilities.obtainStock(miClient, mnYear, stockSupplyRow.getFkItemId(), stockSupplyRow.getFkUnitId(), SLibConstants.UNDEFINED, manWarehouseKey[0], manWarehouseKey[1], null, (int[]) moParamDiog.getPrimaryKey());
+                stock = STrnUtilities.obtainStock(miClient, mnYear, 
+                        stockSupplyRow.getFkItemId(), stockSupplyRow.getFkUnitId(), SLibConstants.UNDEFINED, 
+                        manWarehouseKey[0], manWarehouseKey[1], null, 
+                        (int[]) moParamDiog.getPrimaryKey());
+                
+                stockMoveParams = new STrnStockMove();
+                stockMoveParams.setPkCompanyBranchId(manWarehouseKey[0]);
+                stockMoveParams.setPkWarehouseId(manWarehouseKey[1]);
+                stockMoveParams.setPkYearId(mnYear); // year of document
+                stockMoveParams.setPkItemId(stockSupplyRow.getFkItemId());
+                stockMoveParams.setPkUnitId(stockSupplyRow.getFkUnitId());
+
+                objStock = STrnStockSegregationUtils.getStkSegregated(miClient, stockMoveParams);
+                segregated = objStock.getSegregatedStock();
             }
             catch (Exception e) {
                 SLibUtilities.printOutException(this, e);
@@ -615,6 +677,8 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
 
             jtfStock.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stock));
             jtfStockUnit.setText(stockSupplyRow.getAuxUnitSymbol());
+            jtfSegregated.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(segregated));
+            jtfSegregatedUnit.setText(stockSupplyRow.getAuxUnitSymbol());
             jtfCurrentlyUsed.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(used));
             jtfCurrentlyUsedUnit.setText(stockSupplyRow.getAuxUnitSymbol());
             jtfAvailable.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stock - used));
@@ -697,6 +761,8 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
@@ -718,10 +784,12 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
     private javax.swing.JLabel jlQuantityNetAux;
     private javax.swing.JLabel jlQuantityPending;
     private javax.swing.JLabel jlQuantitySupplied;
+    private javax.swing.JLabel jlSegregated;
     private javax.swing.JLabel jlStock;
     private javax.swing.JLabel jlWarehouse;
     private javax.swing.JLabel jlYear;
     private javax.swing.JPanel jpControls;
+    private javax.swing.JPanel jpDiogEntriesInfo24;
     private javax.swing.JPanel jpDpsEntries;
     private javax.swing.JPanel jpDpsEntriesControls;
     private javax.swing.JPanel jpDpsEntriesControls1;
@@ -752,11 +820,15 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
     private javax.swing.JTextField jtfQuantityPendingUnit;
     private javax.swing.JTextField jtfQuantitySupplied;
     private javax.swing.JTextField jtfQuantitySuppliedUnit;
+    private javax.swing.JTextField jtfSegregated;
+    private javax.swing.JTextField jtfSegregatedUnit;
     private javax.swing.JTextField jtfStock;
     private javax.swing.JTextField jtfStockUnit;
     private javax.swing.JTextField jtfWarehouse;
     private javax.swing.JTextField jtfWarehouseCode;
     private javax.swing.JTextField jtfYear;
+    private javax.swing.JLabel label;
+    private javax.swing.JLabel label1;
     // End of variables declaration//GEN-END:variables
 
     @SuppressWarnings("unchecked")

@@ -9,7 +9,7 @@ import java.util.Date;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Edwin Carmona
  */
 public class STrnStockMove implements java.io.Serializable {
 
@@ -28,6 +28,16 @@ public class STrnStockMove implements java.io.Serializable {
     protected Date mtAuxLotDateExpiration;
     protected boolean mbAuxIsLotBlocked;
     protected boolean mbAuxIsMoveBeingDeleted;
+    protected int mnSegregationId;
+    protected int[] manSegregationReference; //reference of the origin of segregation. PO = [ productionOrderId, productionOrderYear ].
+    protected int mnSegregationType;
+    protected boolean mbIsCurrentSegExcluded;
+    protected int mnWarehouseType;
+    
+     /**
+     * Creates stock move.
+     */
+    public STrnStockMove() {}
 
     /**
      * Creates stock move.
@@ -98,6 +108,11 @@ public class STrnStockMove implements java.io.Serializable {
     public void setAuxLotDateExpiration(Date t) { mtAuxLotDateExpiration = t; }
     public void setAuxIsLotBlocked(boolean b) { mbAuxIsLotBlocked = b; }
     public void setAuxIsMoveBeingDeleted(boolean b) { mbAuxIsMoveBeingDeleted = b; }
+    public void setSegregationId(int idSeg) { this.mnSegregationId = idSeg; }
+    public void setSegregationReference(int[] o) { this.manSegregationReference = o; }
+    public void setSegregationType(int n) { this.mnSegregationType = n; }
+    public void setIsCurrentSegExcluded(boolean b) { this.mbIsCurrentSegExcluded = b; }
+    public void setWarehouseType(int n) { this.mnWarehouseType = n; }
 
     public int getPkYearId() { return mnPkYearId; }
     public int getPkItemId() { return mnPkItemId; }
@@ -114,6 +129,11 @@ public class STrnStockMove implements java.io.Serializable {
     public Date getAuxLotDateExpiration() { return mtAuxLotDateExpiration; }
     public boolean getAuxIsLotBlocked() { return mbAuxIsLotBlocked; }
     public boolean getAuxIsMoveBeingDeleted() { return mbAuxIsMoveBeingDeleted; }
+    public int getSegregationId() { return mnSegregationId; }
+    public int[] getSegregationReference() { return manSegregationReference; }
+    public int getSegregationType() { return mnSegregationType; }
+    public boolean getIsCurrentSegExcluded() { return mbIsCurrentSegExcluded; }
+    public int getWarehouseType() { return mnWarehouseType; }
 
     public void setLotKey(int[] key) { mnPkItemId = key[0]; mnPkUnitId = key[1]; mnPkLotId = key[2]; }
     public void setWarehouseKey(int[] key) { mnPkCompanyBranchId = key[0]; mnPkWarehouseId = key[1]; }

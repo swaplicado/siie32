@@ -7,6 +7,7 @@ package erp.mtrn.data;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
@@ -28,13 +29,17 @@ public class STrnStockValidator {
     protected int mnYear;
     protected int[] manWarehouseKey;
     protected int[] manDiogKey;
+    protected int[] manReferenceKey;
+    protected int mnSegregationType;
     protected Vector<STrnStockMove> mvStockMoves;
 
-    public STrnStockValidator(erp.client.SClientInterface client, int year, int[] warehouseKey, int[] iogKey) {
+    public STrnStockValidator(erp.client.SClientInterface client, int year, int[] warehouseKey, int[] iogKey, final int[] referenceKey, int segregationType) {
         miClient = client;
         mnYear = year;
         manWarehouseKey = warehouseKey;
         manDiogKey = iogKey;
+	manReferenceKey = referenceKey;
+        mnSegregationType = segregationType;
         mvStockMoves = new Vector<STrnStockMove>();
     }
 
@@ -58,10 +63,12 @@ public class STrnStockValidator {
 
     public java.lang.String validateOutgoingItems(final boolean isDocBeingDeleted, final Date dateCutOff) {
         double stock = 0;
+        double segregated = 0;
         String msg = "";
         SDataItem item = null;
         SDataUnit unit = null;
         SDataStockLot lot = null;
+        STrnStock objStock = null;
 
         try {
             if (mnYear != SLibTimeUtilities.digestYear(dateCutOff)[0]) {
@@ -70,12 +77,21 @@ public class STrnStockValidator {
             }
             else {
                 for (STrnStockMove stockMove : mvStockMoves) {
+                    if (manReferenceKey != null && mnSegregationType != SLibConstants.UNDEFINED) {
+                        stockMove.setSegregationReference(new int[] { manReferenceKey[0], manReferenceKey[1] });
+                        stockMove.setSegregationType(SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD);
+                        stockMove.setIsCurrentSegExcluded(true);
+                    }
+
+                    objStock = STrnStockSegregationUtils.getStkSegregated(miClient, stockMove);
+                    segregated = objStock.getSegregatedStock();
+					
                     stock = STrnUtilities.obtainStock(miClient, stockMove.getPkYearId(),
                             stockMove.getPkItemId(), stockMove.getPkUnitId(), stockMove.getPkLotId(),
                             stockMove.getPkCompanyBranchId(), stockMove.getPkWarehouseId(), dateCutOff,
                             isDocBeingDeleted || stockMove.getAuxIsMoveBeingDeleted() ? null : manDiogKey);
 
-                    if (stock < stockMove.getQuantity()) {
+                    if (stock - segregated < stockMove.getQuantity()) {
                         msg = miClient.getSessionXXX().getFormatters().getDateFormat().format(dateCutOff);
                     }
                     else {
@@ -84,7 +100,7 @@ public class STrnStockValidator {
                                 stockMove.getPkCompanyBranchId(), stockMove.getPkWarehouseId(),
                                 isDocBeingDeleted || stockMove.getAuxIsMoveBeingDeleted() ? null : manDiogKey);
 
-                        if (stock < stockMove.getQuantity()) {
+                        if (stock - segregated < stockMove.getQuantity()) {
                             msg = miClient.getSessionXXX().getFormatters().getDateFormat().format(SLibTimeUtilities.getEndOfYear(dateCutOff));
                         }
                     }
@@ -94,11 +110,13 @@ public class STrnStockValidator {
                         unit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int[] { stockMove.getPkUnitId() }, SLibConstants.EXEC_MODE_VERBOSE);
                         lot = (SDataStockLot) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_LOT, stockMove.getLotKey(), SLibConstants.EXEC_MODE_VERBOSE);
 
-                        msg = "No hay existencias suficientes del ítem '" + item.getItem() + "', clave '" + item.getKey() + "', lote '" + lot.getLot() + "' " +
-                                "(" + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stock) + " " + unit.getSymbol() + "),\n" +
-                                "al " + msg + ", para hacer el movimiento de inventario solicitado " +
+                        msg = "No hay unidades disponibles suficientes del ítem '" + item.getItem() + "', clave '" + item.getKey() + "', lote '" + lot.getLot() + "' al " + msg + ":\n" +
+                                "  " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stock) + " " + unit.getSymbol() + " (en existencia)\n" +
+                                " -" + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(segregated) + " " + unit.getSymbol() + " (segregadas)\n" +
+                                "= " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stock - segregated) + " " + unit.getSymbol() + " (disponibles)\n" +
+                                "para hacer el movimiento solicitado " +
                                 "(" + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stockMove.getQuantity()) + " " + unit.getSymbol() + "), " +
-                                "hacen falta " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stockMove.getQuantity() - stock) + " " + unit.getSymbol() + ".";
+                                "hacen falta " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stockMove.getQuantity() - (stock - segregated)) + " " + unit.getSymbol() + ".";
                         break;
                     }
                 }
@@ -167,8 +185,9 @@ public class STrnStockValidator {
 
     public static java.lang.String validateStockMoves(final erp.client.SClientInterface client,
             final java.util.Vector<erp.mtrn.data.SDataDiogEntry> iogEntries, final int iogCategoryId,
-            final int[] iogKey, final int[] warehouseKey, final boolean isDocBeingDeleted, final Date dateCutOff) throws Exception {
-        STrnStockValidator validator = new STrnStockValidator(client, iogKey[0], warehouseKey, iogKey);
+            final int[] iogKey, final int[] warehouseKey, final boolean isDocBeingDeleted, final Date dateCutOff, final int[] segregationReference, final int segregationType) throws Exception {
+        
+        STrnStockValidator validator = new STrnStockValidator(client, iogKey[0], warehouseKey, iogKey, segregationReference, segregationType);
 
         for (SDataDiogEntry entry : iogEntries) {
             if (entry.shouldValidateStockLots() && entry.shouldValidateOutgoingItems(iogCategoryId, isDocBeingDeleted)) {

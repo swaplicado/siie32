@@ -22,6 +22,8 @@ import erp.mcfg.data.SDataCompanyBranchEntity;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
 import erp.mmfg.data.SDataProductionOrder;
+import erp.mtrn.data.STrnStock;
+import erp.mtrn.data.STrnStockSegregationUtils;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.STrnProdOrderStockAssignRow;
@@ -44,11 +46,12 @@ import javax.swing.event.ListSelectionListener;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Edwin Carmona
  */
 public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements ActionListener, ItemListener, ListSelectionListener {
 
     private static final int COL_QTY = 4;
+    private static final int PERC_POSITION = 3;
 
     private int mnFormResult;
     private int mnFormStatus;
@@ -136,6 +139,8 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
         jpDiogEntriesInfo = new javax.swing.JPanel();
         jpDiogEntriesInfo1 = new javax.swing.JPanel();
         jpDiogEntriesInfo11 = new javax.swing.JPanel();
+        jPanel7 = new javax.swing.JPanel();
+        jlQuantityPending1 = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jlQuantityRequired = new javax.swing.JLabel();
         jtfQuantityRequired = new javax.swing.JTextField();
@@ -151,12 +156,17 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
         jtfQuantityPending = new javax.swing.JTextField();
         jtfQuantityPendingUnit = new javax.swing.JTextField();
         jtfQuantityPendingPerc = new javax.swing.JTextField();
+        jPanel8 = new javax.swing.JPanel();
         jpDiogEntriesInfo2 = new javax.swing.JPanel();
         jpDiogEntriesInfo21 = new javax.swing.JPanel();
         jlStock = new javax.swing.JLabel();
         jtfStock = new javax.swing.JTextField();
         jtfStockUnit = new javax.swing.JTextField();
         jbViewLots = new javax.swing.JButton();
+        jpDiogEntriesInfo24 = new javax.swing.JPanel();
+        jlSegregated = new javax.swing.JLabel();
+        jtfSegregated = new javax.swing.JTextField();
+        jtfSegregatedUnit = new javax.swing.JTextField();
         jpDiogEntriesInfo22 = new javax.swing.JPanel();
         jlCurrentlyUsed = new javax.swing.JLabel();
         jtfCurrentlyUsed = new javax.swing.JTextField();
@@ -167,6 +177,16 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
         jtfAvailableUnit = new javax.swing.JTextField();
         jlYear = new javax.swing.JLabel();
         jtfYear = new javax.swing.JTextField();
+        jPanel9 = new javax.swing.JPanel();
+        jPanel14 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jPanel15 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jPanel16 = new javax.swing.JPanel();
+        jPanel13 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        jtfSurplusStock = new javax.swing.JTextField();
+        jtfSurplusUnit = new javax.swing.JTextField();
         jpControls = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
@@ -314,8 +334,8 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
         jlWarehouseSource.setPreferredSize(new java.awt.Dimension(100, 23));
         jpWarehouseSource.add(jlWarehouseSource);
 
-        jtfCompanyBranchSource.setBackground(java.awt.Color.lightGray);
         jtfCompanyBranchSource.setEditable(false);
+        jtfCompanyBranchSource.setBackground(java.awt.Color.lightGray);
         jtfCompanyBranchSource.setText("TEXT");
         jtfCompanyBranchSource.setFocusable(false);
         jtfCompanyBranchSource.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -328,8 +348,8 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
         jtfCompanyBranchSourceCode.setPreferredSize(new java.awt.Dimension(55, 23));
         jpWarehouseSource.add(jtfCompanyBranchSourceCode);
 
-        jtfWarehouseSource.setBackground(java.awt.Color.lightGray);
         jtfWarehouseSource.setEditable(false);
+        jtfWarehouseSource.setBackground(java.awt.Color.lightGray);
         jtfWarehouseSource.setText("TEXT");
         jtfWarehouseSource.setFocusable(false);
         jtfWarehouseSource.setPreferredSize(new java.awt.Dimension(155, 23));
@@ -402,9 +422,17 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
 
         jpDiogEntriesInfo1.setLayout(new java.awt.GridLayout(1, 2));
 
-        jpDiogEntriesInfo11.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
+        jpDiogEntriesInfo11.setBorder(javax.swing.BorderFactory.createTitledBorder("Estatus partida actual:"));
+        jpDiogEntriesInfo11.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
-        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlQuantityPending1.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel7.add(jlQuantityPending1);
+
+        jpDiogEntriesInfo11.add(jPanel7);
+
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlQuantityRequired.setText("+ Cant. requerida:");
         jlQuantityRequired.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -420,19 +448,19 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
         jtfQuantityRequiredUnit.setEditable(false);
         jtfQuantityRequiredUnit.setText("UNIT");
         jtfQuantityRequiredUnit.setFocusable(false);
-        jtfQuantityRequiredUnit.setPreferredSize(new java.awt.Dimension(40, 23));
+        jtfQuantityRequiredUnit.setPreferredSize(new java.awt.Dimension(35, 23));
         jPanel4.add(jtfQuantityRequiredUnit);
 
         jtfQuantityRequiredPerc.setEditable(false);
         jtfQuantityRequiredPerc.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfQuantityRequiredPerc.setText("0.00%");
         jtfQuantityRequiredPerc.setFocusable(false);
-        jtfQuantityRequiredPerc.setPreferredSize(new java.awt.Dimension(75, 23));
+        jtfQuantityRequiredPerc.setPreferredSize(new java.awt.Dimension(55, 23));
         jPanel4.add(jtfQuantityRequiredPerc);
 
         jpDiogEntriesInfo11.add(jPanel4);
 
-        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlQuantityAssigned.setText("– Cant. asignada:");
         jlQuantityAssigned.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -448,19 +476,19 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
         jtfQuantityAssignedUnit.setEditable(false);
         jtfQuantityAssignedUnit.setText("UNIT");
         jtfQuantityAssignedUnit.setFocusable(false);
-        jtfQuantityAssignedUnit.setPreferredSize(new java.awt.Dimension(40, 23));
+        jtfQuantityAssignedUnit.setPreferredSize(new java.awt.Dimension(35, 23));
         jPanel5.add(jtfQuantityAssignedUnit);
 
         jtfQuantityAssignedPerc.setEditable(false);
         jtfQuantityAssignedPerc.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfQuantityAssignedPerc.setText("0.00%");
         jtfQuantityAssignedPerc.setFocusable(false);
-        jtfQuantityAssignedPerc.setPreferredSize(new java.awt.Dimension(75, 23));
+        jtfQuantityAssignedPerc.setPreferredSize(new java.awt.Dimension(55, 23));
         jPanel5.add(jtfQuantityAssignedPerc);
 
         jpDiogEntriesInfo11.add(jPanel5);
 
-        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlQuantityPending.setText("= Cant. pendiente:");
         jlQuantityPending.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -474,19 +502,19 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
         jtfQuantityPending.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel6.add(jtfQuantityPending);
 
-        jtfQuantityPendingUnit.setBackground(java.awt.Color.pink);
         jtfQuantityPendingUnit.setEditable(false);
+        jtfQuantityPendingUnit.setBackground(java.awt.Color.pink);
         jtfQuantityPendingUnit.setText("UNIT");
         jtfQuantityPendingUnit.setFocusable(false);
-        jtfQuantityPendingUnit.setPreferredSize(new java.awt.Dimension(40, 23));
+        jtfQuantityPendingUnit.setPreferredSize(new java.awt.Dimension(35, 23));
         jPanel6.add(jtfQuantityPendingUnit);
 
-        jtfQuantityPendingPerc.setBackground(java.awt.Color.pink);
         jtfQuantityPendingPerc.setEditable(false);
+        jtfQuantityPendingPerc.setBackground(java.awt.Color.pink);
         jtfQuantityPendingPerc.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfQuantityPendingPerc.setText("0.00%");
         jtfQuantityPendingPerc.setFocusable(false);
-        jtfQuantityPendingPerc.setPreferredSize(new java.awt.Dimension(75, 23));
+        jtfQuantityPendingPerc.setPreferredSize(new java.awt.Dimension(55, 23));
         jPanel6.add(jtfQuantityPendingPerc);
 
         jpDiogEntriesInfo11.add(jPanel6);
@@ -495,12 +523,15 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
 
         jpDiogEntriesInfo.add(jpDiogEntriesInfo1, java.awt.BorderLayout.WEST);
 
-        jpDiogEntriesInfo2.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
+        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Unidades disponibles:"));
+        jPanel8.setLayout(new java.awt.BorderLayout());
 
-        jpDiogEntriesInfo21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpDiogEntriesInfo2.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
-        jlStock.setText("+ Existencias (origen):");
-        jlStock.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpDiogEntriesInfo21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlStock.setText("+ Existencias:");
+        jlStock.setPreferredSize(new java.awt.Dimension(100, 23));
         jpDiogEntriesInfo21.add(jlStock);
 
         jtfStock.setEditable(false);
@@ -513,7 +544,7 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
         jtfStockUnit.setEditable(false);
         jtfStockUnit.setText("UNIT");
         jtfStockUnit.setFocusable(false);
-        jtfStockUnit.setPreferredSize(new java.awt.Dimension(40, 23));
+        jtfStockUnit.setPreferredSize(new java.awt.Dimension(35, 23));
         jpDiogEntriesInfo21.add(jtfStockUnit);
 
         jbViewLots.setText("Ver lotes");
@@ -523,10 +554,31 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
 
         jpDiogEntriesInfo2.add(jpDiogEntriesInfo21);
 
-        jpDiogEntriesInfo22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpDiogEntriesInfo24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlCurrentlyUsed.setText("– Unidades en doc.:");
-        jlCurrentlyUsed.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlSegregated.setText("– Unids. segregds:");
+        jlSegregated.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpDiogEntriesInfo24.add(jlSegregated);
+
+        jtfSegregated.setEditable(false);
+        jtfSegregated.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfSegregated.setText("0.00000000");
+        jtfSegregated.setFocusable(false);
+        jtfSegregated.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpDiogEntriesInfo24.add(jtfSegregated);
+
+        jtfSegregatedUnit.setEditable(false);
+        jtfSegregatedUnit.setText("UNIT");
+        jtfSegregatedUnit.setFocusable(false);
+        jtfSegregatedUnit.setPreferredSize(new java.awt.Dimension(35, 23));
+        jpDiogEntriesInfo24.add(jtfSegregatedUnit);
+
+        jpDiogEntriesInfo2.add(jpDiogEntriesInfo24);
+
+        jpDiogEntriesInfo22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlCurrentlyUsed.setText("– Unids. en docto.:");
+        jlCurrentlyUsed.setPreferredSize(new java.awt.Dimension(100, 23));
         jpDiogEntriesInfo22.add(jlCurrentlyUsed);
 
         jtfCurrentlyUsed.setEditable(false);
@@ -539,15 +591,15 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
         jtfCurrentlyUsedUnit.setEditable(false);
         jtfCurrentlyUsedUnit.setText("UNIT");
         jtfCurrentlyUsedUnit.setFocusable(false);
-        jtfCurrentlyUsedUnit.setPreferredSize(new java.awt.Dimension(40, 23));
+        jtfCurrentlyUsedUnit.setPreferredSize(new java.awt.Dimension(35, 23));
         jpDiogEntriesInfo22.add(jtfCurrentlyUsedUnit);
 
         jpDiogEntriesInfo2.add(jpDiogEntriesInfo22);
 
-        jpDiogEntriesInfo23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpDiogEntriesInfo23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlAvailable.setText("= Unidades disponibles:");
-        jlAvailable.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlAvailable.setText("= Unids. disponibles:");
+        jlAvailable.setPreferredSize(new java.awt.Dimension(100, 23));
         jpDiogEntriesInfo23.add(jlAvailable);
 
         jtfAvailable.setBackground(new java.awt.Color(153, 204, 255));
@@ -558,11 +610,11 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
         jtfAvailable.setPreferredSize(new java.awt.Dimension(125, 23));
         jpDiogEntriesInfo23.add(jtfAvailable);
 
-        jtfAvailableUnit.setBackground(new java.awt.Color(153, 204, 255));
         jtfAvailableUnit.setEditable(false);
+        jtfAvailableUnit.setBackground(new java.awt.Color(153, 204, 255));
         jtfAvailableUnit.setText("UNIT");
         jtfAvailableUnit.setFocusable(false);
-        jtfAvailableUnit.setPreferredSize(new java.awt.Dimension(40, 23));
+        jtfAvailableUnit.setPreferredSize(new java.awt.Dimension(35, 23));
         jpDiogEntriesInfo23.add(jtfAvailableUnit);
 
         jlYear.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -580,7 +632,51 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
 
         jpDiogEntriesInfo2.add(jpDiogEntriesInfo23);
 
-        jpDiogEntriesInfo.add(jpDiogEntriesInfo2, java.awt.BorderLayout.EAST);
+        jPanel8.add(jpDiogEntriesInfo2, java.awt.BorderLayout.EAST);
+
+        jPanel9.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
+
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jLabel1.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel14.add(jLabel1);
+
+        jPanel9.add(jPanel14);
+
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jLabel2.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel15.add(jLabel2);
+
+        jPanel9.add(jPanel15);
+
+        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel9.add(jPanel16);
+
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jLabel3.setText("Un. sobrantes:");
+        jLabel3.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel13.add(jLabel3);
+
+        jtfSurplusStock.setEditable(false);
+        jtfSurplusStock.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfSurplusStock.setText("0.00000000");
+        jtfSurplusStock.setFocusable(false);
+        jtfSurplusStock.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel13.add(jtfSurplusStock);
+
+        jtfSurplusUnit.setEditable(false);
+        jtfSurplusUnit.setText("UNIT");
+        jtfSurplusUnit.setFocusable(false);
+        jtfSurplusUnit.setPreferredSize(new java.awt.Dimension(40, 23));
+        jPanel13.add(jtfSurplusUnit);
+
+        jPanel9.add(jPanel13);
+
+        jPanel8.add(jPanel9, java.awt.BorderLayout.CENTER);
+
+        jpDiogEntriesInfo.add(jPanel8, java.awt.BorderLayout.CENTER);
 
         jpProductionOrderEntries.add(jpDiogEntriesInfo, java.awt.BorderLayout.SOUTH);
 
@@ -606,8 +702,8 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
 
         getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-928)/2, (screenSize.height-609)/2, 928, 609);
+        setSize(new java.awt.Dimension(976, 639));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -829,6 +925,11 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
     private void valueChangedPaneDpsEntries() {
         double stock = 0;
         double used = 0;
+        double segregated = 0;
+        double surplus = 0;
+        
+        STrnStockMove stockMoveParams = null;
+        STrnStock objStock = null;
         STrnProdOrderStockAssignRow stockAssignRow = (STrnProdOrderStockAssignRow) moPaneProdOrderEntries.getSelectedTableRow();
 
         if (stockAssignRow == null) {
@@ -861,15 +962,45 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
             jtfQuantityAssignedUnit.setText(stockAssignRow.getAuxUnitSymbol());
             jtfQuantityPending.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormat().format(stockAssignRow.getQuantityPending()));
             jtfQuantityPendingUnit.setText(stockAssignRow.getAuxUnitSymbol());
-
-            jtfQuantityRequiredPerc.setText(miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(1));
-            jtfQuantityAssignedPerc.setText(miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(stockAssignRow.getQuantityRequired() == 0 ? 0 : stockAssignRow.getQuantityAssigned() / stockAssignRow.getQuantityRequired()));
-            jtfQuantityPendingPerc.setText(miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(stockAssignRow.getQuantityRequired() == 0 ? 0 : stockAssignRow.getQuantityPending() / stockAssignRow.getQuantityRequired()));
+            
+            String percentage1 = miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(1);
+            String percentage2 = miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(stockAssignRow.getQuantityRequired() == 0 ? 0 : stockAssignRow.getQuantityAssigned() / stockAssignRow.getQuantityRequired());
+            String percentage3 = miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(stockAssignRow.getQuantityRequired() == 0 ? 0 : stockAssignRow.getQuantityPending() / stockAssignRow.getQuantityRequired());
+            
+            jtfQuantityRequiredPerc.setText(percentage1.substring(0, percentage1.length() - PERC_POSITION) + "%"); //When cropping text field size
+            jtfQuantityAssignedPerc.setText(percentage2.substring(0, percentage2.length() - PERC_POSITION) + "%");
+            jtfQuantityPendingPerc.setText(percentage3.substring(0, percentage3.length() - PERC_POSITION) + "%");
 
             // Available stock is processed in inventory units:
 
             try {
                 stock = STrnUtilities.obtainStock(miClient, mnYear, stockAssignRow.getFkItemId(), stockAssignRow.getFkUnitId(), SLibConstants.UNDEFINED, manWarehouseSourceKey[0], manWarehouseSourceKey[1], null, (int[]) moParamDiog.getPrimaryKey());
+                
+                stockMoveParams = new STrnStockMove();
+                stockMoveParams.setPkCompanyBranchId(manWarehouseSourceKey[0]);
+                stockMoveParams.setPkWarehouseId(manWarehouseSourceKey[1]);
+                stockMoveParams.setPkYearId(mnYear); // year of document
+                stockMoveParams.setPkItemId(stockAssignRow.getFkItemId());
+                stockMoveParams.setPkUnitId(stockAssignRow.getFkUnitId());
+                
+                if (moParamProdOrder != null) {
+                    stockMoveParams.setSegregationReference( new int[] { moParamProdOrder.getPkOrdId(), moParamProdOrder.getPkYearId() });
+                    stockMoveParams.setSegregationType(SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD);
+                    stockMoveParams.setIsCurrentSegExcluded(true);
+                }
+                
+                objStock = STrnStockSegregationUtils.getStkSegregated(miClient, stockMoveParams);
+                segregated = objStock.getSegregatedStock();
+                
+                stockMoveParams = new STrnStockMove();
+                stockMoveParams.setPkCompanyBranchId(manWarehouseSourceKey[0]);
+                stockMoveParams.setPkYearId(mnYear); // year of document
+                stockMoveParams.setPkItemId(stockAssignRow.getFkItemId());
+                stockMoveParams.setPkUnitId(stockAssignRow.getFkUnitId());
+                stockMoveParams.setWarehouseType(SDataConstantsSys.CFGS_TP_ENT_WH_MFG_MS[1]);
+                
+                objStock = STrnStockSegregationUtils.getStock(miClient, stockMoveParams);
+                surplus = objStock.getAvailableStock();
             }
             catch (Exception e) {
                 SLibUtilities.printOutException(this, e);
@@ -890,11 +1021,15 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
 
             jtfStock.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormat().format(stock));
             jtfStockUnit.setText(stockAssignRow.getAuxUnitSymbol());
+            jtfSegregated.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormat().format(segregated));
+            jtfSegregatedUnit.setText(stockAssignRow.getAuxUnitSymbol());
             jtfCurrentlyUsed.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormat().format(used));
             jtfCurrentlyUsedUnit.setText(stockAssignRow.getAuxUnitSymbol());
-            jtfAvailable.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormat().format(stock - used));
+            jtfAvailable.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormat().format(stock - segregated - used));
             jtfAvailableUnit.setText(stockAssignRow.getAuxUnitSymbol());
-
+            jtfSurplusStock.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormat().format(surplus));
+            jtfSurplusUnit.setText(stockAssignRow.getAuxUnitSymbol());
+            
             jbViewLots.setEnabled(true);
         }
     }
@@ -1018,15 +1153,25 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbAssignAll;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbCleanAll;
@@ -1045,7 +1190,9 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
     private javax.swing.JLabel jlQuantity;
     private javax.swing.JLabel jlQuantityAssigned;
     private javax.swing.JLabel jlQuantityPending;
+    private javax.swing.JLabel jlQuantityPending1;
     private javax.swing.JLabel jlQuantityRequired;
+    private javax.swing.JLabel jlSegregated;
     private javax.swing.JLabel jlStock;
     private javax.swing.JLabel jlWarehouseDestiny;
     private javax.swing.JLabel jlWarehouseSource;
@@ -1058,6 +1205,7 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
     private javax.swing.JPanel jpDiogEntriesInfo21;
     private javax.swing.JPanel jpDiogEntriesInfo22;
     private javax.swing.JPanel jpDiogEntriesInfo23;
+    private javax.swing.JPanel jpDiogEntriesInfo24;
     private javax.swing.JPanel jpDpsEntriesControls1;
     private javax.swing.JPanel jpProductionOrder;
     private javax.swing.JPanel jpProductionOrderEntries;
@@ -1091,8 +1239,12 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
     private javax.swing.JTextField jtfQuantityRequiredPerc;
     private javax.swing.JTextField jtfQuantityRequiredUnit;
     private javax.swing.JTextField jtfQuantityUnit;
+    private javax.swing.JTextField jtfSegregated;
+    private javax.swing.JTextField jtfSegregatedUnit;
     private javax.swing.JTextField jtfStock;
     private javax.swing.JTextField jtfStockUnit;
+    private javax.swing.JTextField jtfSurplusStock;
+    private javax.swing.JTextField jtfSurplusUnit;
     private javax.swing.JTextField jtfWarehouseDestiny;
     private javax.swing.JTextField jtfWarehouseDestinyCode;
     private javax.swing.JTextField jtfWarehouseSource;

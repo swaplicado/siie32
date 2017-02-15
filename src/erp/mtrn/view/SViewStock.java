@@ -17,6 +17,7 @@ import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
 import erp.mod.SModSysConsts;
 import erp.mtrn.form.SDialogStockCardex;
+import erp.mtrn.form.SDialogStockSegregations;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterCompanyBranchEntity;
 import java.awt.Dimension;
@@ -31,7 +32,7 @@ import sa.lib.SLibRpnOperator;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Edwin Carmona
  */
 public class SViewStock extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -42,11 +43,13 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
     private int mnColOut;
     private int mnColStock;
     private javax.swing.JButton jbCardex;
+    private javax.swing.JButton jbSegregations;
     private javax.swing.JToggleButton jtbDecimals;
     private erp.lib.table.STabFilterDate moTabFilterDate;
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.table.STabFilterCompanyBranchEntity moTabFilterCompanyBranchEntity;
     private erp.mtrn.form.SDialogStockCardex moDialogStockCardex;
+    private erp.mtrn.form.SDialogStockSegregations moDialogStockSegregations;
 
     /*
      * @param auxType01 Constants defined in SDataConstats (TRNX_STK_...).
@@ -65,6 +68,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
         moTabFilterDeleted = new STabFilterDeleted(this);
         moTabFilterCompanyBranchEntity = new STabFilterCompanyBranchEntity(miClient, this, SDataConstantsSys.CFGS_CT_ENT_WH);
         moDialogStockCardex = new SDialogStockCardex(miClient);
+        moDialogStockSegregations = new SDialogStockSegregations(miClient);
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
@@ -75,6 +79,14 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
         jbCardex.setToolTipText("Ver tarjeta auxiliar de almacén");
         jbCardex.addActionListener(this);
         addTaskBarUpperComponent(jbCardex);
+        
+        jbSegregations = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")));
+        jbSegregations.setPreferredSize(new Dimension(23, 23));
+        jbSegregations.setToolTipText("Ver unidades segregadas");
+        jbSegregations.addActionListener(this);
+        if (mnTabTypeAux01 == SDataConstants.TRNX_STK_STK || mnTabTypeAux01 == SDataConstants.TRNX_STK_STK_WH) {
+            addTaskBarUpperComponent(jbSegregations);
+        }
 
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDate);
@@ -98,7 +110,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
 
-                aoTableColumns = new STableColumn[8];
+                aoTableColumns = new STableColumn[10];
                 break;
 
             case SDataConstants.TRNX_STK_STK_WH:
@@ -109,7 +121,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_cob");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_wh");
 
-                aoTableColumns = new STableColumn[14];
+                aoTableColumns = new STableColumn[16];
                 break;
 
             case SDataConstants.TRNX_STK_LOT:
@@ -183,6 +195,12 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
         mnColStock = i;
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stk", "Existencias", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        if (mnTabTypeAux01 == SDataConstants.TRNX_STK_STK || mnTabTypeAux01 == SDataConstants.TRNX_STK_STK_WH) {
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stk_seg", "Segregadas", STableConstants.WIDTH_QUANTITY_2X);
+            aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stk_avble", "Disponibles", STableConstants.WIDTH_QUANTITY_2X);
+            aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        }
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_val_u", "Val. u. máx. $", STableConstants.WIDTH_VALUE_UNITARY);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
@@ -257,6 +275,22 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
             }
         }
     }
+    
+    public void actionSegregations() {
+        int mode = jtbDecimals.isSelected() ? SLibConstants.MODE_QTY_EXT : SLibConstants.MODE_QTY;
+        if (jbSegregations.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() != null) {
+                int[] key = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
+                int[] whKey = showWarehouses() ? new int[] { key[key.length - 2], key[key.length - 1] } : moTabFilterCompanyBranchEntity.getCompanyBranchEntityKey();
+                int itemId = key[0];
+                int unitId = key[1];
+
+                moDialogStockSegregations.formReset();
+                moDialogStockSegregations.setFormParams(moTabFilterDate.getDate(), itemId, unitId, whKey, mode);
+                moDialogStockSegregations.setVisible(true);
+            }
+        }
+    }
 
     public void actionDecimals() {
         String toolTipText = !jtbDecimals.isSelected() ? TXT_DEC_INC : TXT_DEC_DEC;
@@ -280,6 +314,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
         int[] key = null;
         Date date = null;
         String sqlWhere = "";
+        String sqlSegWhere = "";
         String sqlHaving = "";
         STableSetting setting = null;
 
@@ -300,12 +335,17 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 if (key != null) {
                     if (key[0] != SLibConstants.UNDEFINED) {
                         sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "s.id_cob = " + key[0] + " ";
+                        sqlSegWhere += "AND swhs.fid_cob = " + key[0] + " ";
                     }
                     if (key[1] != SLibConstants.UNDEFINED) {
                         sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "s.id_wh = " + key[1] + " ";
                     }
                 }
             }
+        }
+        
+        if (showWarehouses()) {
+            sqlSegWhere += "AND wety.id_whs = ent.id_ent ";
         }
 
         msSql = "SELECT s.id_item, s.id_unit, " +
@@ -314,6 +354,14 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 (!showWarehouses() ? "" : "s.id_cob, s.id_wh, bpb.code, ent.code, sc.qty_min, sc.qty_max, sc.rop, " +
                  "IF(SUM(s.mov_in - s.mov_out) <= sc.qty_min, " + STableConstants.ICON_VIEW_LIG_RED + ", IF(sc.qty_min < SUM(s.mov_in - s.mov_out) AND SUM(s.mov_in - s.mov_out) <= sc.rop, "  + STableConstants.ICON_VIEW_LIG_YEL + ", IF(SUM(s.mov_in - s.mov_out) > sc.rop  AND SUM(s.mov_in - s.mov_out) <= sc.qty_max, "  + STableConstants.ICON_VIEW_LIG_GRE + ", IF(SUM(s.mov_in - s.mov_out) > sc.qty_max, " + STableConstants.ICON_WARN + ", " + STableConstants.ICON_VIEW_LIG_WHI + ")))) AS f_ico, ") +
                 "SUM(s.mov_in) AS f_mov_i, SUM(s.mov_out) AS f_mov_o, SUM(s.mov_in - s.mov_out) AS f_stk, " +
+                "(SELECT COALESCE(SUM(wety.qty_inc - wety.qty_dec), 0) " +
+                    "FROM trn_stk_seg_whs swhs " +
+                    "INNER JOIN trn_stk_seg_whs_ety wety ON (swhs.id_stk_seg = wety.id_stk_seg AND swhs.id_whs = wety.id_whs) " +
+                    "WHERE fid_year = " + year + "  AND fid_item = i.id_item AND fid_unit = u.id_unit " + sqlSegWhere +") AS f_stk_seg, " +
+                "(SUM(s.mov_in - s.mov_out) - (SELECT COALESCE(SUM(wety.qty_inc - wety.qty_dec), 0) " +
+                    "FROM trn_stk_seg_whs swhs " +
+                    "INNER JOIN trn_stk_seg_whs_ety wety ON (swhs.id_stk_seg = wety.id_stk_seg AND swhs.id_whs = wety.id_whs) " +
+                    "WHERE fid_year = " + year + "  AND fid_item = i.id_item AND fid_unit = u.id_unit " + sqlSegWhere +")) AS f_stk_avble, " +
                 "(SELECT COALESCE(MAX(sx.cost_u), 0.0) FROM trn_stk AS sx WHERE sx.id_year = " + year + " AND sx.id_item = s.id_item AND sx.id_unit = s.id_unit AND NOT sx.b_del AND " +
                 "sx.fid_ct_iog = " + SModSysConsts.TRNS_CL_IOG_IN_ADJ[0] + " AND sx.fid_cl_iog = " + SModSysConsts.TRNS_CL_IOG_IN_ADJ[1] + ") AS f_val_u " +
                 "FROM trn_stk AS s " +
@@ -344,6 +392,9 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
 
             if (button == jbCardex) {
                 actionCardex();
+            }
+            else if (button == jbSegregations) {
+                actionSegregations();
             }
         }
         else if (e.getSource() instanceof javax.swing.JToggleButton) {

@@ -42,6 +42,9 @@ import erp.mmkt.data.SParamsItemPriceList;
 import erp.mod.SModSysConsts;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
+import erp.mtrn.data.STrnStock;
+import erp.mtrn.data.STrnStockMove;
+import erp.mtrn.data.STrnStockSegregationUtils;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import java.awt.BorderLayout;
@@ -58,7 +61,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author  Néstor Ávalos, Uriel Castañeda
+ * @author  Néstor Ávalos, Uriel Castañeda, Edwin Carmona
  */
 public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -113,6 +116,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
     private int mnOrdIdEnd;
 
     private boolean mbIsCompleteExplotion;
+    private boolean mbIsProgrammed;
     private boolean mbIsForecast;
     private int mnFkCompanyBranchId;
     private ArrayList<int[]> moFkEntityId;
@@ -493,6 +497,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
         double dNetRequeriment = 0;
         double dMinimunAvailable = 0;
         double dSafetyStock = 0;
+        double dSegregated = 0;
         double dProductionOrderQty = 0;
         double dRequerimentQuantityByItem = 0;
         int i = 0;
@@ -523,10 +528,10 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
         SDataProductionOrderChargeEntry oProductionOrderChargesEntry = null;
         SDataItem oItem = null;
         SDataBizPartner oBizPartner = null;
-
+        
         // Validate if explotion of materials record can be created:
 
-        if(validateExplotionMaterialsRecord()) {
+        if (validateExplotionMaterialsRecord()) {
 
             // Get explotion materiarls if exist and get lots by entry:
 
@@ -552,8 +557,8 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
             vParams1.add(mnOrdIdEnd);
             vParams1.add(mbIsForecast);
             vParams1 = SDataUtilities.callProcedure(miClient, SProcConstants.MFG_ORD_ITEM_QRY,  vParams1, SLibConstants.EXEC_MODE_SILENT);
-
-            for (i=0; i<vParams1.size(); i++) {
+            
+            for (i=0; i < vParams1.size(); i++) {
                 oList = (Object[]) vParams1.get(i);
                 oProductionOrder[0] = (Integer) oList[0]; // Id year
                 oProductionOrder[1] = (Integer) oList[1]; // Id ord
@@ -581,15 +586,16 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
 
                 // Add production order:
 
-                if (oProductionOrder[2].toString().length() > 0 ) {
+                if (oProductionOrder[2].toString().length() > 0) {
 
                     // Add production order if formula isn't sub-formula:
 
-                    b=false;
-                    for (k=0; k<mvProductionsOrders.size(); k++) {
+                    b = false;
+                    for (k = 0; k < mvProductionsOrders.size(); k++) {
                         moProductionOrder = mvProductionsOrders.get(k);
+                        
                         if (SLibUtilities.compareKeys(moProductionOrder.getPrimaryKey(), new int[] { (Integer) oProductionOrder[0], (Integer) oProductionOrder[1] })) {
-                            b=true;
+                            b = true;
                             break;
                         }
                     }
@@ -598,7 +604,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                         moProductionOrder = (SDataProductionOrder) SDataUtilities.readRegistry(miClient, SDataConstants.MFG_ORD, new int[] { (Integer) oProductionOrder[0], (Integer) oProductionOrder[1] }, SLibConstants.EXEC_MODE_VERBOSE);
                         mvProductionsOrders.add(moProductionOrder);
                     }
-
+                    
                     // Sum the quantity of production order while is the same unit in all productions orders:
 
                     if (sProductionOrderUnit.length() > 0) {
@@ -658,7 +664,8 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                                 b = false;
                             } XXX  */
                         }
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e) {
                         SLibUtilities.renderException(this, e);
                         vItems.removeAllElements();
                         break;
@@ -667,7 +674,6 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                     // Sum and add items that not are Bill Of Materials (BOM):
 
                     if (b) {
-
                         for (k=0; k < vItems.size(); k++) {
                             oAux = (java.lang.Object[]) vItems.get(k);
 
@@ -687,7 +693,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                 // Create charges:
 
                 moBom = (SDataBom) SDataUtilities.readRegistry(miClient, SDataConstants.MFG_BOM, new int[] { moProductionOrder.getFkBomId() }, SLibConstants.EXEC_MODE_VERBOSE);
-                for (k=0; k<(Integer)oProductionOrder[9]; k++) {
+                for (k = 0; k < (Integer) oProductionOrder[9]; k++) {
 
                     oProductionOrderCharges = new SDataProductionOrderCharge();
                     oProductionOrderCharges.setPrimaryKey(new int[] { (Integer) oProductionOrder[0], (Integer) oProductionOrder[1], 0});
@@ -695,7 +701,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
 
                     // Create charges entries:
 
-                    for (l=0; l<mvExplotionMaterialsEntriesItem.size(); l++) {
+                    for (l = 0; l < mvExplotionMaterialsEntriesItem.size(); l++) {
 
                         oExplotionMaterialsEntryItem = mvExplotionMaterialsEntriesItem.get(l);
 
@@ -719,7 +725,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
 
                     // Create subgoods entries:
 
-                    for (l=0; l<moBom.getDbmsBomSubgoods().size(); l++) {
+                    for (l = 0; l < moBom.getDbmsBomSubgoods().size(); l++) {
 
                         oBomSubgoods = moBom.getDbmsBomSubgoods().get(l);
                         oProductionOrderBomSubgoods = new SDataProductionOrderBomSubgoods();
@@ -765,14 +771,34 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                     }
                 }
             }
-
+            
             // Calculate inventory safety stock, inventory available, purchases order and net requeriment:
-            for (j=0; j < vItems.size(); j++) {
+            STrnStockMove stockMoveParams = null;
+            STrnStock objStock = null;
+
+            for (j = 0; j < vItems.size(); j++) {
                 anLtime = new int[] { 0, 0 };
                 dAvailable = 0;
                 dSafetyStock = 0;
+                dSegregated = 0;
                 dPurchaseOrder = 0;
                 dNetRequeriment = 0;
+                
+                try {
+                    stockMoveParams = new STrnStockMove();
+                
+                    stockMoveParams.setPkYearId(SLibTimeUtilities.digestYear(moFieldDate.getDate())[0]);
+                    stockMoveParams.setPkItemId((Integer) oList[1]);
+                    stockMoveParams.setPkUnitId(oItem.getFkUnitId());
+                    stockMoveParams.setPkCompanyBranchId(mnFkCompanyBranchId);
+                    stockMoveParams.setPkWarehouseId(moFkEntityId != null ? moFkEntityId.size() == 1 ? moFkEntityId.get(0)[1] : 0 : 0);
+                    
+                    objStock = STrnStockSegregationUtils.getStkSegregated(miClient, stockMoveParams);
+                    dSegregated = objStock != null ? objStock.getSegregatedStock() : 0;
+                }
+                catch (Exception ex) {
+                    SLibUtilities.printOutException(this, ex);
+                }
 
                 oList = (java.lang.Object[]) vItems.get(j);
 
@@ -835,7 +861,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                     }
                 }
                 else {
-                    for(int[] fkEntityId : moFkEntityId ) {
+                    for (int[] fkEntityId : moFkEntityId ) {
                         vParams2.removeAllElements();
                         vParams2.add(SLibTimeUtilities.digestYear(moFieldDate.getDate())[0]); // Year
                         vParams2.add(oItem != null ? oItem.getPkItemId() : 0); // Item
@@ -860,14 +886,17 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
 
                         if (vParams2.size() > 0) {
                             dSafetyStock += (Double) vParams2.get(0);
-                        }
+                        }  
                     }
                 }
+                
+                dAvailable -= dSegregated;
 
                 // Get purchase order:
                 try {
                     dPurchaseOrder = SDataUtilities.obtainBackorderItem(miClient, SDataConstantsSys.TRNS_CT_DPS_PUR, 0, (Integer) oList[1], moFieldDate.getDate());
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     SLibUtilities.renderException(this, e);
                     mvExplotionMaterialsEntries.removeAllElements();
                     break;
@@ -884,7 +913,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
 
                 // Check minimun available:
 
-                if (mvProductionsOrders.size()==1) {
+                if (mvProductionsOrders.size() == 1) {
                     if (dAvailable < (Double) oList[2]) {
                         if (((dAvailable / (Double) oList[2]) <= dMinimunAvailable) || dMinimunAvailable == 0) {
                             dMinimunAvailable = (dAvailable / (Double) oList[2]);
@@ -934,7 +963,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                  */
 
                 mvExplotionMaterialsEntries.add(oExplotionMaterialsEntry);
-            }            
+            }
 
             if (!mvExplotionMaterialsEntries.isEmpty()) {
 
@@ -1101,6 +1130,14 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE + (moResponse.getMessage().length() == 0 ? "" : "\n" + moResponse.getMessage()));
                 }
                 else {
+                    if (mvProductionsOrders != null && mbIsProgrammed) {
+                        for (SDataProductionOrder po : mvProductionsOrders) {
+                            if (!po.getIsForecast()) {
+                                po.program(miClient, true);
+                            }
+                        }
+                    }
+                    
                     moExplotionMaterials = (SDataExplotionMaterials) moResponse.getPacket();
                     mnPkExpYearId = moExplotionMaterials.getPkYearId();
                     mnPkExpId = moExplotionMaterials.getPkExpId();
@@ -2041,12 +2078,15 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                 mbIsCompleteExplotion = (Boolean) value;
                 break;
             case 6:
-                moFieldProductionOrderInitial.setString(value.toString());
+                mbIsProgrammed = (Boolean) value;
                 break;
             case 7:
-                moFieldProductionOrderEnd.setString(value.toString());
+                moFieldProductionOrderInitial.setString(value.toString());
                 break;
             case 8:
+                moFieldProductionOrderEnd.setString(value.toString());
+                break;
+            case 9:
                 mnOrdYearIdStart = (Integer) ((int[])value)[0];
                 mnOrdIdStart = (Integer) ((int[])value)[1];
                 mnOrdYearIdEnd = (Integer) ((int[])value)[2];
