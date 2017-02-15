@@ -12,23 +12,25 @@ import erp.lib.table.STabFilterDatePeriodRange;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableSetting;
+import erp.mod.trn.db.STrnConsts;
 import erp.table.SFilterConstants;
+import erp.table.STabFilterCurrency;
+import erp.table.STabFilterRelatedParts;
 import erp.table.STabFilterUnitType;
-import javax.swing.JToggleButton;
 
 /**
  *
  * @author Alfonso Flores, Sergio Flores, Edwin Carmona
  */
-public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
+public class SViewQueryGlobal extends erp.lib.table.STableTab {
 
     private erp.lib.table.STableColumn[] maoTableColumns;
     private erp.lib.table.STabFilterDatePeriodRange moTabFilterDatePeriodRange;
     private erp.table.STabFilterUnitType moTabFilterUnitType;
-    
-    private javax.swing.JToggleButton jtbRelatedParty;
+    private erp.table.STabFilterCurrency moTabFilterCurrency;
+    private erp.table.STabFilterRelatedParts moTabFilterRelatedParts;
 
-    private int mnType = 0;
+    private boolean mbIsLocalCurrency = false;
 
     public SViewQueryGlobal(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
         super(client, tabTitle, SDataConstants.TRNX_DPS_QRY, auxType01);
@@ -37,17 +39,11 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.aw
 
     private void initComponents() {
         maoTableColumns = null;
-
+        
         moTabFilterDatePeriodRange = new STabFilterDatePeriodRange(miClient, this);
         moTabFilterUnitType = new STabFilterUnitType(miClient, this);
-        jtbRelatedParty = new javax.swing.JToggleButton();
-        
-        jtbRelatedParty.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_rel_pty_off.gif")));
-        jtbRelatedParty.setToolTipText("Filtrar partes relacionadas");
-        jtbRelatedParty.setPreferredSize(new java.awt.Dimension(23, 23));
-        jtbRelatedParty.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_rel_pty_on.gif")));
-        
-        jtbRelatedParty.addActionListener(this);
+        moTabFilterCurrency = new STabFilterCurrency(miClient, this);
+        moTabFilterRelatedParts = new STabFilterRelatedParts(miClient, this);
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
@@ -56,17 +52,16 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.aw
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterUnitType);
         addTaskBarUpperSeparator();
-        addTaskBarUpperComponent(jtbRelatedParty);
-        
-        jtbRelatedParty.setSelected(true);
+        addTaskBarUpperComponent(moTabFilterCurrency);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterRelatedParts);        
 
-        renderTableColumns();
         setIsSummaryApplying(true);
 
         populateTable();
     }
 
-    private void renderTableColumns() {
+    public void renderTableColumns() {
         int i = 0;
 
         moTablePane.reset();
@@ -76,16 +71,24 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.aw
         i = 0;
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb", "Sucursal empresa", 150);
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_r", "Total $", STableConstants.WIDTH_VALUE_2X);
-        maoTableColumns[i].setSumApplying(true);
+        if (mbIsLocalCurrency) {
+            maoTableColumns[i].setSumApplying(true);
+        }
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_adj_r", "Devs. $", STableConstants.WIDTH_VALUE_2X);
-        maoTableColumns[i].setSumApplying(true);
+        if (mbIsLocalCurrency) {
+            maoTableColumns[i].setSumApplying(true);
+        }
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_adj_d", "Descs. $", STableConstants.WIDTH_VALUE_2X);
-        maoTableColumns[i].setSumApplying(true);
+        if (mbIsLocalCurrency) {
+            maoTableColumns[i].setSumApplying(true);
+        }
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_net", "Total neto $", STableConstants.WIDTH_VALUE_2X);
-        maoTableColumns[i].setSumApplying(true);
+        if (mbIsLocalCurrency) {
+            maoTableColumns[i].setSumApplying(true);
+        }
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cur_key", "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
 
@@ -121,32 +124,33 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.aw
 
     private java.lang.String createColumnsUnits(int n) {
         String columnsUnit = "";
+        String columnStot = (mbIsLocalCurrency ? "e.stot_r" : "e.stot_cur_r");
 
         switch (n) {
             case SDataConstantsSys.TRNX_TP_UNIT_TOT_QTY:
                 columnsUnit = "COALESCE(SUM(e.qty), 0) AS f_qty, " +
                         "0 AS f_qty_r, COALESCE(SUM(e.qty), 0) AS f_qty_net, " +
-                        "COALESCE(COALESCE(SUM(e.stot_r), 0) / COALESCE(SUM(e.qty), 0), 0) AS f_avg_price ";
+                        "COALESCE(COALESCE(SUM(" + columnStot + "), 0) / COALESCE(SUM(e.qty), 0), 0) AS f_avg_price ";
                 break;
             case SDataConstantsSys.TRNX_TP_UNIT_TOT_LEN:
                 columnsUnit = "COALESCE(SUM(e.len), 0) AS f_qty, " +
                         "0 AS f_qty_r, COALESCE(SUM(e.len), 0) AS f_qty_net, " +
-                        "COALESCE(COALESCE(SUM(e.stot_r), 0) / COALESCE(SUM(e.len), 0), 0) AS f_avg_price ";
+                        "COALESCE(COALESCE(SUM(" + columnStot + "), 0) / COALESCE(SUM(e.len), 0), 0) AS f_avg_price ";
                 break;
             case SDataConstantsSys.TRNX_TP_UNIT_TOT_SURF:
                 columnsUnit = "COALESCE(SUM(e.surf), 0) AS f_qty, " +
                         "0 AS f_qty_r, COALESCE(SUM(e.surf), 0) AS f_qty_net, " +
-                        "COALESCE(COALESCE(SUM(e.stot_r), 0) / COALESCE(SUM(e.surf), 0), 0) AS f_avg_price ";
+                        "COALESCE(COALESCE(SUM(" + columnStot + "), 0) / COALESCE(SUM(e.surf), 0), 0) AS f_avg_price ";
                 break;
             case SDataConstantsSys.TRNX_TP_UNIT_TOT_VOL:
                 columnsUnit = "COALESCE(SUM(e.vol), 0) AS f_qty, " +
                         "0 AS f_qty_r, COALESCE(SUM(e.vol), 0) AS f_qty_net, " +
-                        "COALESCE(COALESCE(SUM(e.stot_r), 0) / COALESCE(SUM(e.vol), 0), 0) AS f_avg_price ";
+                        "COALESCE(COALESCE(SUM(" + columnStot + "), 0) / COALESCE(SUM(e.vol), 0), 0) AS f_avg_price ";
                 break;
             case SDataConstantsSys.TRNX_TP_UNIT_TOT_MASS:
                 columnsUnit = "COALESCE(SUM(e.mass), 0) AS f_qty, " +
                         "0 AS f_qty_r, COALESCE(SUM(e.mass), 0) AS f_qty_net, " +
-                        "COALESCE(COALESCE(SUM(e.stot_r), 0) / COALESCE(SUM(e.mass), 0), 0) AS f_avg_price ";
+                        "COALESCE(COALESCE(SUM(" + columnStot + "), 0) / COALESCE(SUM(e.mass), 0), 0) AS f_avg_price ";
                 break;
             default:
         }
@@ -181,37 +185,38 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.aw
 
     private java.lang.String createColumnsUnitsRet(int n) {
         String columnsUnit = "";
+        String stot = (mbIsLocalCurrency ? "e.stot_r" : "e.stot_cur_r");
 
         switch (n) {
             case SDataConstantsSys.TRNX_TP_UNIT_TOT_QTY:
                 columnsUnit = ", 0 AS f_qty, " +
                         "COALESCE(SUM(e.qty), 0) AS f_qty_r, " +
                         "0 - COALESCE(SUM(e.qty), 0) AS f_qty_net, " +
-                        "COALESCE((0 - COALESCE(SUM(e.stot_r), 0) / 0 - COALESCE(SUM(e.qty), 0)), 0) AS f_avg_price ";
+                        "COALESCE((0 - COALESCE(SUM(" + stot + "), 0) / 0 - COALESCE(SUM(e.qty), 0)), 0) AS f_avg_price ";
                 break;
             case SDataConstantsSys.TRNX_TP_UNIT_TOT_LEN:
                 columnsUnit = ", 0 AS f_qty, " +
                         "COALESCE(SUM(e.len), 0) AS f_qty_r, " +
                         "0 - COALESCE(SUM(e.len), 0) AS f_qty_net, " +
-                        "COALESCE((0 - COALESCE(SUM(e.stot_r), 0) / 0 - COALESCE(SUM(e.len), 0)), 0) AS f_avg_price ";
+                        "COALESCE((0 - COALESCE(SUM(" + stot + "), 0) / 0 - COALESCE(SUM(e.len), 0)), 0) AS f_avg_price ";
                 break;
             case SDataConstantsSys.TRNX_TP_UNIT_TOT_SURF:
                 columnsUnit = ", 0 AS f_qty, " +
                         "COALESCE(SUM(e.surf), 0) AS f_qty_r, " +
                         "0 - COALESCE(SUM(e.surf), 0) AS f_qty_net, " +
-                        "COALESCE((0 - COALESCE(SUM(e.stot_r), 0) / 0 - COALESCE(SUM(e.surf), 0)), 0) AS f_avg_price ";
+                        "COALESCE((0 - COALESCE(SUM(" + stot + "), 0) / 0 - COALESCE(SUM(e.surf), 0)), 0) AS f_avg_price ";
                 break;
             case SDataConstantsSys.TRNX_TP_UNIT_TOT_VOL:
                 columnsUnit = ", 0 AS f_qty, " +
                         "COALESCE(SUM(e.vol), 0) AS f_qty_r, " +
                         "0 - COALESCE(SUM(e.vol), 0) AS f_qty_net, " +
-                        "COALESCE((0 - COALESCE(SUM(e.stot_r), 0) / 0 - COALESCE(SUM(e.vol), 0)), 0) AS f_avg_price ";
+                        "COALESCE((0 - COALESCE(SUM(" + stot + "), 0) / 0 - COALESCE(SUM(e.vol), 0)), 0) AS f_avg_price ";
                 break;
             case SDataConstantsSys.TRNX_TP_UNIT_TOT_MASS:
                 columnsUnit = ", 0 AS f_qty, " +
                         "COALESCE(SUM(e.mass), 0) AS f_qty_r, " +
                         "0 - COALESCE(SUM(e.mass), 0) AS f_qty_net, " +
-                        "COALESCE((0 - COALESCE(SUM(e.stot_r), 0) / 0 - COALESCE(SUM(e.mass), 0)), 0) AS f_avg_price ";
+                        "COALESCE((0 - COALESCE(SUM(" + stot + "), 0) / 0 - COALESCE(SUM(e.mass), 0)), 0) AS f_avg_price ";
                 break;
             default:
         }
@@ -247,12 +252,22 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.aw
     @Override
     public void createSqlQuery() {
         java.util.Date[] range = null;
+        boolean withRelatedParts = false;
         int typeUnitTotal = 0;
         String sqlDatePeriod = "";
         String dateInit = "";
         String dateEnd = "";
         String sqlColumnsUnit = "";
+        String columnStot = "";
+        String sqlCurrency = "";
         STableSetting setting = null;
+
+        for (int i = 0; i < mvTableSettings.size(); i++) {
+           setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
+           if (setting.getType() == SFilterConstants.SETTING_FILTER_CURRENCY) {
+                mbIsLocalCurrency = ((Integer)setting.getSetting()) == STabFilterCurrency.TP_SYSTEM_CURRENCY;
+            }
+        }
 
         for (int i = 0; i < mvTableSettings.size(); i++) {
             setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
@@ -264,25 +279,31 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.aw
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_UNIT_TP) {
                 typeUnitTotal = (Integer)setting.getSetting();
-                mnType = typeUnitTotal;
                 sqlColumnsUnit = createColumnsUnits(typeUnitTotal);
             }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_REL_PARTY) {
+                withRelatedParts = ((Integer)setting.getSetting()) == STrnConsts.TRN_BPS_WITH_REL_PARTY;
+            }
         }
-
-//        renderTableColumns();
+        
+        renderTableColumns();
+        
+        columnStot = (mbIsLocalCurrency ? "e.stot_r" : "e.stot_cur_r");
+        sqlCurrency = (mbIsLocalCurrency ? "" : ", cur_key ");
 
         msSql = "SELECT bpb, SUM(f_stot_r) AS f_stot_r, SUM(f_adj_r) AS f_adj_r, SUM(f_adj_d) AS f_adj_d, SUM(f_stot_net) AS f_stot_net, symbol, cur_key, " +
                 createColumnsUnitsSum(typeUnitTotal) + " FROM (" +
-                "(SELECT cob.bpb, COALESCE(SUM(e.stot_r), 0) AS f_stot_r, " +
+                "(SELECT cob.bpb, COALESCE(SUM(" + columnStot + "), 0) AS f_stot_r, " +
                 "0 AS f_adj_r, 0 AS f_adj_d, " +
-                "COALESCE(SUM(e.stot_r), 0) AS f_stot_net, " +
+                "COALESCE(SUM(" + columnStot + "), 0) AS f_stot_net, " +
                 sqlColumnsUnit + ", (SELECT unit_base FROM erp.itmu_tp_unit WHERE id_tp_unit = " +
                 (typeUnitTotal == SDataConstantsSys.TRNX_TP_UNIT_TOT_QTY ? SDataConstantsSys.ITMU_TP_UNIT_QTY :
                     typeUnitTotal == SDataConstantsSys.TRNX_TP_UNIT_TOT_LEN ? SDataConstantsSys.ITMU_TP_UNIT_LEN :
                         typeUnitTotal == SDataConstantsSys.TRNX_TP_UNIT_TOT_MASS ? SDataConstantsSys.ITMU_TP_UNIT_MASS :
                             typeUnitTotal == SDataConstantsSys.TRNX_TP_UNIT_TOT_SURF ? SDataConstantsSys.ITMU_TP_UNIT_SURF :
                                 SDataConstantsSys.ITMU_TP_UNIT_VOL) +
-                ") AS symbol, (SELECT cur_key FROM erp.cfgu_cur WHERE id_cur = " + miClient.getSessionXXX().getParamsErp().getFkCurrencyId() + ") AS cur_key " +
+                ") AS symbol, " +
+                "(SELECT cur_key FROM erp.cfgu_cur WHERE id_cur = " + (mbIsLocalCurrency ? miClient.getSessionXXX().getParamsErp().getFkCurrencyId() : "doc.fid_cur") + ") AS cur_key " +
                 "FROM trn_dps_ety AS e " +
                 "INNER JOIN trn_dps AS doc ON " +
                 "e.id_year = doc.id_year AND e.id_doc = doc.id_doc " +
@@ -295,18 +316,19 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.aw
                 "AND doc.fid_cl_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1]) + " " +
                 "AND doc.fid_tp_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2]) + " " +
                 "AND doc.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND doc.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_EFF + " " +
-                (jtbRelatedParty.isSelected() ? "" : " AND bp.b_att_rel_pty = 0 ") +
-                sqlDatePeriod + "GROUP BY cob.bpb HAVING f_stot_net <> 0 OR f_qty_net <> 0 " +
-                "ORDER BY cob.bpb) " +
+                (withRelatedParts ? "" : " AND bp.b_att_rel_pty = 0 ") +
+                sqlDatePeriod + "GROUP BY cob.bpb" + sqlCurrency + " HAVING f_stot_net <> 0 OR f_qty_net <> 0 " +
+                "ORDER BY cob.bpb" + sqlCurrency + ") " +
                 "UNION " +
-                "(SELECT cob.bpb, 0 AS f_stot_r, COALESCE(SUM(e.stot_r), 0) AS f_adj_r, 0 AS f_adj_d, 0 - COALESCE(SUM(e.stot_r), 0) AS f_stot_net " +
+                "(SELECT cob.bpb, 0 AS f_stot_r, COALESCE(SUM(" + columnStot + "), 0) AS f_adj_r, 0 AS f_adj_d, 0 - COALESCE(SUM(" + columnStot + "), 0) AS f_stot_net " +
                 createColumnsUnitsRet(typeUnitTotal) + ", (SELECT unit_base FROM erp.itmu_tp_unit WHERE id_tp_unit = " +
                 (typeUnitTotal == SDataConstantsSys.TRNX_TP_UNIT_TOT_QTY ? SDataConstantsSys.ITMU_TP_UNIT_QTY :
                     typeUnitTotal == SDataConstantsSys.TRNX_TP_UNIT_TOT_LEN ? SDataConstantsSys.ITMU_TP_UNIT_LEN :
                         typeUnitTotal == SDataConstantsSys.TRNX_TP_UNIT_TOT_MASS ? SDataConstantsSys.ITMU_TP_UNIT_MASS :
                             typeUnitTotal == SDataConstantsSys.TRNX_TP_UNIT_TOT_SURF ? SDataConstantsSys.ITMU_TP_UNIT_SURF :
                                 SDataConstantsSys.ITMU_TP_UNIT_VOL) +
-                ") AS symbol , (SELECT cur_key FROM erp.cfgu_cur WHERE id_cur = " + miClient.getSessionXXX().getParamsErp().getFkCurrencyId() + ") AS cur_key " +
+                ") AS symbol , " +
+                "(SELECT cur_key FROM erp.cfgu_cur WHERE id_cur = " + (mbIsLocalCurrency ? miClient.getSessionXXX().getParamsErp().getFkCurrencyId() : "doc.fid_cur") + ") AS cur_key " +
                 "FROM trn_dps_ety AS e " +
                 "INNER JOIN trn_dps AS doc ON " +
                 "e.id_year = doc.id_year AND e.id_doc = doc.id_doc " +
@@ -325,19 +347,20 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.aw
                 "AND doc.fid_cl_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[1]) + " " +
                 "AND doc.fid_tp_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[2]) + " " +
                 "AND doc.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND doc.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_EFF + " " +
-                (jtbRelatedParty.isSelected() ? "" : " AND bp.b_att_rel_pty = 0 ") +
+                (withRelatedParts ? "" : " AND bp.b_att_rel_pty = 0 ") +
                 "AND e.fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_RET + " " +
-                sqlDatePeriod + "GROUP BY cob.bpb HAVING f_stot_net <> 0 OR f_qty_net <> 0 " +
-                "ORDER BY cob.bpb) " +
+                sqlDatePeriod + "GROUP BY cob.bpb" + sqlCurrency + " HAVING f_stot_net <> 0 OR f_qty_net <> 0 " +
+                "ORDER BY cob.bpb" + sqlCurrency + ") " +
                 "UNION " +
-                "(SELECT cob.bpb, 0 AS f_stot_r, 0 AS f_adj_r, COALESCE(SUM(e.stot_r), 0) AS f_adj_d, 0 - COALESCE(SUM(e.stot_r), 0) AS f_stot_net " +
+                "(SELECT cob.bpb, 0 AS f_stot_r, 0 AS f_adj_r, COALESCE(SUM(" + columnStot + "), 0) AS f_adj_d, 0 - COALESCE(SUM(" + columnStot + "), 0) AS f_stot_net " +
                 createColumnsUnitsDis(typeUnitTotal) + ", (SELECT unit_base FROM erp.itmu_tp_unit WHERE id_tp_unit = " +
                 (typeUnitTotal == SDataConstantsSys.TRNX_TP_UNIT_TOT_QTY ? SDataConstantsSys.ITMU_TP_UNIT_QTY :
                     typeUnitTotal == SDataConstantsSys.TRNX_TP_UNIT_TOT_LEN ? SDataConstantsSys.ITMU_TP_UNIT_LEN :
                         typeUnitTotal == SDataConstantsSys.TRNX_TP_UNIT_TOT_MASS ? SDataConstantsSys.ITMU_TP_UNIT_MASS :
                             typeUnitTotal == SDataConstantsSys.TRNX_TP_UNIT_TOT_SURF ? SDataConstantsSys.ITMU_TP_UNIT_SURF :
                                 SDataConstantsSys.ITMU_TP_UNIT_VOL) +
-                ") AS symbol , (SELECT cur_key FROM erp.cfgu_cur WHERE id_cur = " + miClient.getSessionXXX().getParamsErp().getFkCurrencyId() + ") AS cur_key " +
+                ") AS symbol, " +
+                "(SELECT cur_key FROM erp.cfgu_cur WHERE id_cur = " + (mbIsLocalCurrency ? miClient.getSessionXXX().getParamsErp().getFkCurrencyId() : "doc.fid_cur") + ") AS cur_key " +
                 "FROM trn_dps_ety AS e " +
                 "INNER JOIN trn_dps AS doc ON " +
                 "e.id_year = doc.id_year AND e.id_doc = doc.id_doc " +
@@ -356,18 +379,18 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.aw
                 "AND doc.fid_cl_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[1]) + " " +
                 "AND doc.fid_tp_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[2]) + " " +
                 "AND doc.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND doc.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_EFF + " " +
-                (jtbRelatedParty.isSelected() ? "" : " AND bp.b_att_rel_pty = 0 ") +
+                (withRelatedParts ? "" : " AND bp.b_att_rel_pty = 0 ") +
                 "AND e.fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_DISC + " " +
-                sqlDatePeriod + " GROUP BY cob.bpb HAVING f_stot_net <> 0 OR f_qty_net <> 0 " +
+                sqlDatePeriod + " GROUP BY cob.bpb" + sqlCurrency + " HAVING f_stot_net <> 0 OR f_qty_net <> 0 " +
                 /*(typeUnitTotal == SDataConstantsSys.TRNX_TP_UNIT_TOT_QTY ? " f_qty_net <> 0 " :
                             typeUnitTotal == SDataConstantsSys.TRNX_TP_UNIT_TOT_LEN ? " f_len_net <> 0 " :
                                 typeUnitTotal == SDataConstantsSys.TRNX_TP_UNIT_TOT_SURF ? " f_surf_net <> 0 " :
                                     typeUnitTotal == SDataConstantsSys.TRNX_TP_UNIT_TOT_VOL ? " f_vol_net <> 0 " :
                                         " f_mass_net <> 0 ") +*/
-                "ORDER BY cob.bpb "  +
+                "ORDER BY cob.bpb" + sqlCurrency +
                 "))" +
                 "AS t " +
-                "GROUP BY bpb ORDER BY bpb ";
+                "GROUP BY bpb" + sqlCurrency + " ORDER BY bpb" + sqlCurrency + ";";
     }
 
     @Override
@@ -388,19 +411,6 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab implements java.aw
     public void actionDelete() {
         if (jbDelete.isEnabled()) {
 
-        }
-    }
-
-    @Override
-    public void actionPerformed(java.awt.event.ActionEvent e) {
-        super.actionPerformed(e);
-
-        if (e.getSource() instanceof javax.swing.JToggleButton) {
-            JToggleButton toggleButton = (JToggleButton) e.getSource();
-
-            if (toggleButton == jtbRelatedParty) {
-                actionReload();
-            }
         }
     }
 }
