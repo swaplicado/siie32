@@ -1082,6 +1082,12 @@ public abstract class SDataConstantsSys {
     public static final int TRNS_TP_CFD_CFD = 1;
     public static final int TRNS_TP_CFD_PAY = 2;
 
+    public static final int TRNS_TP_STK_SEG_SHIP = 1; // Shipment
+    public static final int TRNS_TP_STK_SEG_MFG_ORD = 2; // Manufacturing Order
+
+    public static final int TRNS_TP_STK_SEG_INC = 1; // Increment
+    public static final int TRNS_TP_STK_SEG_DEC = 2; // Decrement
+
     public static final int TRNU_DPS_NAT_DEF = 1;
 
     public static final int[] TRNU_TP_DPS_PUR_EST = { 1, 1, 1 };
