@@ -171,6 +171,9 @@ public abstract class SModConsts {
     public static final int ITMS_TP_ITEM = 1051003;
     public static final int ITMS_TP_SNR = 1051004;
     public static final int ITMS_LINK = 1051005;
+    public static final int ITMS_ST_ITEM = 1051011;
+    public static final int ITMS_CFD_PROD_SERV = 1051201;
+    public static final int ITMS_CFD_UNIT = 1051202;
 
     public static final int ITMU_IFAM = 1052001;
     public static final int ITMU_IGRP = 1052002;
@@ -228,6 +231,7 @@ public abstract class SModConsts {
     public static final int FINS_FISCAL_BANK = 2011107;
     public static final int FINS_FISCAL_PAY_MET = 2011111;
     public static final int FINS_TP_FISCAL_ACC_LINK = 2011121;
+    public static final int FINS_CFD_TAX = 2011201;
 
     public static final int FINU_TAX_REG = 2012001;
     public static final int FINU_TAX_IDY = 2012002;
@@ -326,6 +330,9 @@ public abstract class SModConsts {
     public static final int TRNS_TP_XML_DVY = 2021020;
     public static final int TRNS_ST_XML_DVY = 2021021;
     public static final int TRNS_TP_CFD = 2021022;
+    public static final int TRNS_TP_STK_SEG = 2021031;
+    public static final int TRNS_TP_STK_SEG_MOV = 2021032;
+    public static final int TRNS_CFD_CAT = 2021201;
 
     public static final int TRNU_DPS_NAT = 2022001;
     public static final int TRNU_TP_DPS = 2022002;
@@ -346,6 +353,8 @@ public abstract class SModConsts {
     public static final int TRN_SYS_NTS = 2023010;
     public static final int TRN_DPS = 2023011;
     public static final int TRN_DPS_SND_LOG = 2023012;
+    public static final int TRN_DPS_CFD = 2023201;
+    public static final int TRN_DPS_CFD_ETY = 2023202;
     public static final int TRN_DPS_ADD = 2023013;
     public static final int TRN_DPS_ADD_ETY = 2023014;
     public static final int TRN_DPS_EVT = 2023016;
@@ -381,6 +390,9 @@ public abstract class SModConsts {
     public static final int TRN_STK_CFG_ITEM = 2023045;
     public static final int TRN_STK_CFG_DNS = 2023046;
     public static final int TRN_STK = 2023047;
+    public static final int TRN_STK_SEG = 2023061;
+    public static final int TRN_STK_SEG_WHS = 2023062;
+    public static final int TRN_STK_SEG_WHS_ETY = 2023063;
     public static final int TRN_INV_VAL = 2023048;
     public static final int TRN_INV_MFG_CST = 2023049;
     public static final int TRN_CFD = 2023051;
@@ -765,6 +777,9 @@ public abstract class SModConsts {
         TablesMap.put(ITMS_TP_ITEM, "erp.itms_tp_item");
         TablesMap.put(ITMS_TP_SNR, "erp.itms_tp_snr");
         TablesMap.put(ITMS_LINK, "erp.itms_link");
+        TablesMap.put(ITMS_ST_ITEM, "erp.itms_st_item");
+        TablesMap.put(ITMS_CFD_PROD_SERV, "erp.itms_cfd_prod_serv");
+        TablesMap.put(ITMS_CFD_UNIT, "erp.itms_cfd_unit");
 
         TablesMap.put(ITMU_IFAM, "erp.itmu_ifam");
         TablesMap.put(ITMU_IGRP, "erp.itmu_igrp");
@@ -818,6 +833,7 @@ public abstract class SModConsts {
         TablesMap.put(FINS_FISCAL_BANK, "erp.fins_fiscal_bank");
         TablesMap.put(FINS_FISCAL_PAY_MET, "erp.fins_fiscal_pay_met");
         TablesMap.put(FINS_TP_FISCAL_ACC_LINK, "erp.fins_tp_fiscal_acc_link");
+        TablesMap.put(FINS_CFD_TAX, "erp.fins_cfd_tax");
 
         TablesMap.put(FINU_TAX_REG, "erp.finu_tax_reg");
         TablesMap.put(FINU_TAX_IDY, "erp.finu_tax_idy");
@@ -905,6 +921,9 @@ public abstract class SModConsts {
         TablesMap.put(TRNS_TP_XML_DVY, "erp.trns_tp_xml_dvy");
         TablesMap.put(TRNS_ST_XML_DVY, "erp.trns_st_xml_dvy");
         TablesMap.put(TRNS_TP_CFD, "erp.trns_tp_cfd");
+        TablesMap.put(TRNS_TP_STK_SEG, "erp.trns_tp_stk_seg");
+        TablesMap.put(TRNS_TP_STK_SEG_MOV, "erp.trns_tp_stk_seg_mov");
+        TablesMap.put(TRNS_CFD_CAT, "erp.trns_cfd_cat");
 
         TablesMap.put(TRNU_DPS_NAT, "erp.trnu_dps_nat");
         TablesMap.put(TRNU_TP_DPS, "erp.trnu_tp_dps");
@@ -925,6 +944,8 @@ public abstract class SModConsts {
         TablesMap.put(TRN_SYS_NTS, "trn_sys_nts");
         TablesMap.put(TRN_DPS, "trn_dps");
         TablesMap.put(TRN_DPS_SND_LOG, "trn_dps_snd_log");
+        TablesMap.put(TRN_DPS_CFD, "trn_dps_cfd");
+        TablesMap.put(TRN_DPS_CFD_ETY, "trn_dps_cfd_ety");
         TablesMap.put(TRN_DPS_ADD, "trn_dps_add");
         TablesMap.put(TRN_DPS_ADD_ETY, "trn_dps_add_ety");
         TablesMap.put(TRN_DPS_EVT, "trn_dps_evt");
@@ -960,6 +981,9 @@ public abstract class SModConsts {
         TablesMap.put(TRN_STK_CFG_ITEM, "trn_stk_cfg_item");
         TablesMap.put(TRN_STK_CFG_DNS, "trn_stk_cfg_dns");
         TablesMap.put(TRN_STK, "trn_stk");
+        TablesMap.put(TRN_STK_SEG, "trn_stk_seg");
+        TablesMap.put(TRN_STK_SEG_WHS, "trn_stk_seg_whs");
+        TablesMap.put(TRN_STK_SEG_WHS_ETY, "trn_stk_seg_whs_ety");
         TablesMap.put(TRN_INV_VAL, "trn_inv_val");
         TablesMap.put(TRN_INV_MFG_CST, "trn_inv_mfg_cst");
         TablesMap.put(TRN_CFD, "trn_cfd");
