@@ -1216,7 +1216,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     
                 case SDataConstants.TRNX_DOC_REMISSION:
                     oViewClass = erp.mtrn.view.SViewBol.class;
-                    sViewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02) + " vs remisiones" ;
+                    sViewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_DOC) + " vs remisiones";
                     break;
 
                 case SDataConstants.TRNX_PRICE_HIST:
