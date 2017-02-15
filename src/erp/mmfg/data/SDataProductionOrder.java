@@ -5,6 +5,7 @@
 
 package erp.mmfg.data;
 
+import erp.client.SClientInterface;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -12,14 +13,19 @@ import java.util.Date;
 import java.util.Vector;
 
 import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mtrn.data.SDataStockLot;
+import erp.mtrn.data.STrnStockSegregationUtils;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import sa.lib.SLibUtils;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Edwin Carmona
  */
 public class SDataProductionOrder extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -46,6 +52,7 @@ public class SDataProductionOrder extends erp.lib.data.SDataRegistry implements 
     protected int mnIsCostDone;
     protected boolean mbIsConsume;
     protected boolean mbIsForecast;
+    protected boolean mbIsProgrammed;
     protected boolean mbIsDeleted;
     protected int mnFkOrdTypeId;
     protected int mnFkBomId;
@@ -152,6 +159,7 @@ public class SDataProductionOrder extends erp.lib.data.SDataRegistry implements 
     public void setIsCostDone(int n) { mnIsCostDone = n; }
     public void setIsConsume(boolean b) { mbIsConsume = b; }
     public void setIsForecast(boolean b) { mbIsForecast = b; }
+    public void setIsProgrammed(boolean b) { mbIsProgrammed = b; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkOrdTypeId(int n) { mnFkOrdTypeId = n; }
     public void setFkBomId(int n) { mnFkBomId = n; }
@@ -208,6 +216,7 @@ public class SDataProductionOrder extends erp.lib.data.SDataRegistry implements 
     public int getIsCostDone() { return mnIsCostDone; }
     public boolean getIsConsume() { return mbIsConsume; }
     public boolean getIsForecast() { return mbIsForecast; }
+    public boolean getIsProgrammed() { return mbIsProgrammed; }
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkOrdTypeId() { return mnFkOrdTypeId; }
     public int getFkBomId() { return mnFkBomId; }
@@ -285,6 +294,31 @@ public class SDataProductionOrder extends erp.lib.data.SDataRegistry implements 
     public ArrayList<SDataProductionOrder> getAuxProductionOrdersRelations() { return maAuxProductionOrderRelations; }
 
     public int[] getParentProductionOrderKey() { return new int[] { mnFkOrdYearId_n, mnFkOrdId_n }; }
+    
+    public void program(final SClientInterface client, final boolean isMassProgramming) {
+        try {
+            if (!getIsProgrammed()) {
+                if (isMassProgramming || getDbmsIsExploded()) {
+                    setIsProgrammed(true);
+                    save(client.getSession().getStatement().getConnection());
+                    STrnStockSegregationUtils.segregate(client, new int [] { getPkOrdId(), getPkYearId() }, SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD);
+                }
+                else {
+                    client.showMsgBoxWarning("La orden de producción '" + getDbmsNumber() + " - " + getReference() + "', aún no es explosionada.");
+                }
+            }
+            else {
+                if (!isMassProgramming && client.showMsgBoxConfirm("La orden producción '" + getDbmsNumber() + " - " + getReference() + "' ya está programada,\n¿desea desprogramarla?\n") == JOptionPane.YES_OPTION) {
+                    setIsProgrammed(false);
+                    save(client.getSession().getStatement().getConnection());
+                    STrnStockSegregationUtils.releaseSegregation(client, new int [] { getPkOrdId(), getPkYearId() }, SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD);
+                }
+            }
+        }
+        catch (SQLException ex) {
+            SLibUtils.showException(client, ex);
+        }
+     }
 
     @Override
     public void reset() {
@@ -313,6 +347,7 @@ public class SDataProductionOrder extends erp.lib.data.SDataRegistry implements 
         mnIsCostDone = 0;
         mbIsConsume = false;
         mbIsForecast = false;
+        mbIsProgrammed = false;
         mbIsDeleted = false;
         mnFkOrdTypeId = 0;
         mnFkBomId = 0;
@@ -470,6 +505,7 @@ public class SDataProductionOrder extends erp.lib.data.SDataRegistry implements 
                 mnIsCostDone = resultSet.getInt("o.cst_done");
                 mbIsConsume = resultSet.getBoolean("o.b_con");
                 mbIsForecast = resultSet.getBoolean("o.b_for");
+                mbIsProgrammed = resultSet.getBoolean("o.b_prog");
                 mbIsDeleted = resultSet.getBoolean("o.b_del");
                 mnFkOrdTypeId = resultSet.getInt("o.fid_tp_ord");
                 mnFkBomId = resultSet.getInt("o.fid_bom");
@@ -574,28 +610,29 @@ public class SDataProductionOrder extends erp.lib.data.SDataRegistry implements 
 
                 // Read the explotion materials of this order:
 
-                sql = "SELECT e.id_exp_year, e.id_exp, et.fid_cob, et.fid_cob_n, et.fid_wh_n, bpb.bpb, bpb.code, ent.ent, ent.code " +
-                    "FROM mfg_exp_ord AS e " +
-                    "INNER JOIN mfg_exp_ety AS et ON e.id_exp_year = et.id_year AND e.id_exp = et.id_exp " +
-                    "INNER JOIN erp.bpsu_bpb AS bpb ON et.fid_cob = bpb.id_bpb " +
-                    "LEFT OUTER JOIN erp.cfgu_cob_ent AS ent ON et.fid_cob_n = ent.id_cob AND et.fid_wh_n = ent.id_ent " +
-                    "WHERE e.id_ord_year = " + key[0] + " AND e.id_ord = " + key[1] + " ";
+                sql = "SELECT eo.id_exp_year, eo.id_exp, ee.fid_cob, ee.fid_cob_n, ee.fid_wh_n, bb.bpb, bb.code, cbe.ent, cbe.code " +
+                        "FROM mfg_exp_ord AS eo " +
+                        "INNER JOIN mfg_exp AS e ON eo.id_exp_year = e.id_year AND eo.id_exp = e.id_exp " +
+                        "INNER JOIN mfg_exp_ety AS ee ON e.id_year = ee.id_year AND e.id_exp = ee.id_exp " +
+                        "INNER JOIN erp.bpsu_bpb AS bb ON ee.fid_cob = bb.id_bpb " +
+                        "LEFT OUTER JOIN erp.cfgu_cob_ent AS cbe ON ee.fid_cob_n = cbe.id_cob AND ee.fid_wh_n = cbe.id_ent " +
+                        "WHERE eo.id_ord_year = " + key[0] + " AND eo.id_ord = " + key[1] + " AND NOT e.b_del; ";
                 resultSet = statement.executeQuery(sql);
                 mbDbmsIsExploded = false;
                 if (resultSet.next()) {
                     moDbmsExplotionMaterials = new SDataExplotionMaterials();
-                    if (moDbmsExplotionMaterials.read(new int[] { resultSet.getInt("id_exp_year"), resultSet.getInt("id_exp") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                    if (moDbmsExplotionMaterials.read(new int[] { resultSet.getInt("eo.id_exp_year"), resultSet.getInt("eo.id_exp") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
 
                     msDbmsExplotionMaterialsReference = moDbmsExplotionMaterials.getReference();
-                    mnDbmsFkCompanyBranchId = resultSet.getInt("et.fid_cob_n");
-                    mnDbmsFkWarehouseId = resultSet.getInt("et.fid_wh_n");
-                    msDbmsExplotionCompanyBranch = resultSet.getString("bpb.bpb");
-                    msDbmsExplotionCompanyBranchCode = resultSet.getString("bpb.code");
-                    msDbmsExplotionWarehouse = resultSet.getString("ent.ent");
+                    mnDbmsFkCompanyBranchId = resultSet.getInt("ee.fid_cob_n");
+                    mnDbmsFkWarehouseId = resultSet.getInt("ee.fid_wh_n");
+                    msDbmsExplotionCompanyBranch = resultSet.getString("bb.bpb");
+                    msDbmsExplotionCompanyBranchCode = resultSet.getString("bb.code");
+                    msDbmsExplotionWarehouse = resultSet.getString("cbe.ent");
                     if (resultSet.wasNull()) msDbmsExplotionWarehouse = "(n/a)";
-                    msDbmsExplotionWarehouseCode = resultSet.getString("ent.code");
+                    msDbmsExplotionWarehouseCode = resultSet.getString("cbe.code");
                     if (resultSet.wasNull()) msDbmsExplotionWarehouseCode = "(n/a)";
                     mbDbmsIsExploded = true;
                 }
@@ -679,7 +716,7 @@ public class SDataProductionOrder extends erp.lib.data.SDataRegistry implements 
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?) }");
+                    "?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkOrderId);
             callableStatement.setString(nParam++, msNumber);
@@ -703,6 +740,7 @@ public class SDataProductionOrder extends erp.lib.data.SDataRegistry implements 
             callableStatement.setInt(nParam++, mnIsCostDone);
             callableStatement.setBoolean(nParam++, mbIsConsume);
             callableStatement.setBoolean(nParam++, mbIsForecast);
+            callableStatement.setBoolean(nParam++, mbIsProgrammed);
             callableStatement.setBoolean(nParam++, mbIsDeleted);
             callableStatement.setInt(nParam++, mnFkOrdTypeId);
             callableStatement.setInt(nParam++, mnFkBomId);
@@ -760,7 +798,7 @@ public class SDataProductionOrder extends erp.lib.data.SDataRegistry implements 
                 sSql = "DELETE FROM mfg_ord_chg WHERE id_year = " + mnPkYearId + " AND id_ord = " + mnPkOrderId;
                 statement.executeUpdate(sSql);
                 */
-
+                
                 // Save charges:
 
                 for (i = 0; i < mvDbmsProductionOrderCharges.size(); i++) {

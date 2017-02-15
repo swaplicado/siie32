@@ -27,7 +27,7 @@ import java.util.Vector;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Edwin Carmona
  */
 public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -89,6 +89,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected java.util.Vector<erp.mtrn.data.SDataDiogNotes> mvDbmsDiogNotes;
 
     protected boolean mbAuxIsDbmsDataCounterpartDiog;
+    protected int moAuxSegregationStockId;
 
     public SDataDiog() {
         super(SDataConstants.TRN_DIOG);
@@ -258,6 +259,71 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
             }
         }
     }
+    
+    /**
+     * @param connection
+     * @param segregationStkId id of segregation to release.
+     * @param entries items to be moved.
+     * @param compBranchId id of the company branch.
+     * @param warehouseId id of warehouse origin of movement.
+     * @throws Exception 
+     */
+    private void releaseSegregations(final java.sql.Connection connection, final int segregationStkId, final Vector<SDataDiogEntry> entries, final int compBranchId, final int warehouseId) throws Exception {
+        SDbStockSegregationWarehouseEntry ety = null;
+        double amountToRelease = 0;
+        double amountSegregated = 0;
+        
+        if (!STrnStockSegregationUtils.isValidYear(connection, segregationStkId, mnPkYearId)) {
+            throw new Exception("La segregación es de un año diferente al actual.");
+        }
+        
+        for (SDataDiogEntry diogEty: entries) {
+            ResultSet resSeg = null;
+
+            String sqlStkSeg = "SELECT COALESCE(SUM(wety.qty_inc - wety.qty_dec), 0) AS f_seg_qty " +
+                    "FROM trn_stk_seg_whs swhs " +
+                    "INNER JOIN trn_stk_seg_whs_ety wety ON (swhs.id_stk_seg = wety.id_stk_seg AND swhs.id_whs = wety.id_whs) " +
+                    "WHERE fid_year = " + diogEty.getPkYearId() + " AND fid_item = " + diogEty.getFkItemId() + " AND fid_unit = " + diogEty.getFkOriginalUnitId() + " ";
+
+            if (compBranchId != 0) {
+                sqlStkSeg += "AND swhs.fid_cob = " + compBranchId + " ";
+            }
+
+            if (warehouseId != 0) {
+                sqlStkSeg += "AND swhs.fid_whs = " + warehouseId + " ";
+            }
+
+            if (segregationStkId != 0) {
+                sqlStkSeg += " AND wety.id_stk_seg = " + segregationStkId;
+            }
+
+            resSeg = connection.createStatement().executeQuery(sqlStkSeg);
+
+            if (resSeg.next()) {
+                amountSegregated = resSeg.getDouble("f_seg_qty");
+            
+                if (amountSegregated > 0) {
+                    if (amountSegregated >= diogEty.getQuantity()) {
+                        amountToRelease = diogEty.getQuantity();
+                    }
+                    else {
+                        amountToRelease = amountSegregated;
+                    }
+
+                    ety = new SDbStockSegregationWarehouseEntry();
+                    ety.setPkStockSegregationId(segregationStkId);
+                    ety.setPkWarehouseId(warehouseId);
+                    ety.setQuantityDecrement(amountToRelease);
+                    ety.setFkStockSegregationMovementTypeId(SDataConstantsSys.TRNS_TP_STK_SEG_DEC);
+                    ety.setFkYearId(mnPkYearId);
+                    ety.setFkItemId(diogEty.getFkItemId());
+                    ety.setFkUnitId(diogEty.getFkOriginalUnitId());
+
+                    ety.save(connection);
+                }
+            }
+        }
+    }
 
     /**
      * Verifies that the document (Dps) exists in the detailed inventory(iog) 
@@ -407,8 +473,10 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     public java.util.Vector<erp.mtrn.data.SDataDiogNotes> getDbmsNotes() { return mvDbmsDiogNotes; }
 
     public void setAuxIsDbmsDataCounterpartDiog(boolean b) { mbAuxIsDbmsDataCounterpartDiog = b; }
+    public void setAuxSegregationStockId(int n) { moAuxSegregationStockId = n; }
 
     public boolean getAuxIsDbmsDataCounterpartDiog() { return mbAuxIsDbmsDataCounterpartDiog; }
+    public int getAuxSegregationStockId() { return moAuxSegregationStockId; }
 
     public int[] getDiogCategoryKey() { return new int[] { mnFkDiogCategoryId }; }
     public int[] getDiogClassKey() { return new int[] { mnFkDiogCategoryId, mnFkDiogClassId }; }
@@ -492,6 +560,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         mvDbmsDiogNotes.clear();
 
         mbAuxIsDbmsDataCounterpartDiog = false;
+        moAuxSegregationStockId = 0;
     }
 
     @Override
@@ -795,6 +864,10 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
                 //System.out.println("SDataDiog: 3.4");
                 computeStock(connection);
                 //System.out.println("SDataDiog: 3.5");
+                
+                if (moAuxSegregationStockId != SLibConstants.UNDEFINED && mnFkDiogCategoryId == SDataConstantsSys.TRNS_CT_IOG_OUT) {
+                    releaseSegregations(connection, moAuxSegregationStockId, mvDbmsDiogEntries, mnFkCompanyBranchId, mnFkWarehouseId);
+                }
 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
@@ -939,7 +1012,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     }
 
     public java.lang.String validateStockMoves(final erp.client.SClientInterface client, final boolean isDocBeingDeleted) throws Exception {
-        return STrnStockValidator.validateStockMoves(client, mvDbmsDiogEntries, mnFkDiogCategoryId, (int[]) getPrimaryKey(), getWarehouseKey(), isDocBeingDeleted, mtDate);
+        return STrnStockValidator.validateStockMoves(client, mvDbmsDiogEntries, mnFkDiogCategoryId, (int[]) getPrimaryKey(), getWarehouseKey(), isDocBeingDeleted, mtDate, null, 0);
     }
 
     @Override

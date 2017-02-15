@@ -36,6 +36,7 @@ import erp.mitm.data.SDataUnit;
 import erp.mmfg.data.SDataProductionOrder;
 import erp.mod.SModSysConsts;
 import erp.mod.itm.db.SItmConsts;
+import erp.mtrn.data.STrnStockSegregationUtils;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.SDataDiogEntryRow;
@@ -60,6 +61,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.table.DefaultTableCellRenderer;
+import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
 
 /**
@@ -3227,7 +3229,14 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                         }
 
                         if (!SLibUtilities.belongsTo(manParamIogTypeKey, new int[][] { SDataConstantsSys.TRNS_TP_IOG_OUT_MFG_WP_ASD, SDataConstantsSys.TRNS_TP_IOG_OUT_MFG_FG_ASD })) {
-                            msg = STrnStockValidator.validateStockMoves(miClient, entries, mnParamIogCategoryId, moDiog == null ? new int[] { year, 0 } : (int[]) moDiog.getPrimaryKey(), (int[]) moWarehouseSource.getPrimaryKey(), false, moFieldDate.getDate());
+                            int [] reference = null;
+                            int segregationType = 0;
+                            
+                            if (moProdOrderSource != null) {
+                                reference = new int[] { moProdOrderSource.getPkOrdId(), moProdOrderSource.getPkYearId() };
+                                segregationType = SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD;
+                            }
+                            msg = STrnStockValidator.validateStockMoves(miClient, entries, mnParamIogCategoryId, moDiog == null ? new int[] { year, 0 } : (int[]) moDiog.getPrimaryKey(), (int[]) moWarehouseSource.getPrimaryKey(), false, moFieldDate.getDate(), reference, segregationType);
                             if (msg.length() > 0) {
                                 throw new Exception(msg);
                             }
@@ -3398,17 +3407,23 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         */
 
         if (STrnUtilities.isIogTypeForProdOrder(manParamIogTypeKey)) {
-            if (SLibUtilities.compareKeys(manParamIogTypeKey, SDataConstantsSys.TRNS_TP_IOG_OUT_MFG_WP_RET)) {
-                // Work in progress return moves exchange warehouses:
-
-                moDiog.setFkMfgYearId_n(moProdOrderDestiny.getPkYearId());
-                moDiog.setFkMfgOrderId_n(moProdOrderDestiny.getPkOrdId());
-            }
-            else {
-                // Other moves use warehouses as they were defined:
-
-                moDiog.setFkMfgYearId_n(moProdOrderSource.getPkYearId());
-                moDiog.setFkMfgOrderId_n(moProdOrderSource.getPkOrdId());
+            try {
+                if (SLibUtilities.compareKeys(manParamIogTypeKey, SDataConstantsSys.TRNS_TP_IOG_OUT_MFG_WP_RET)) {
+                    // Work in progress return moves exchange warehouses:
+                    
+                    moDiog.setFkMfgYearId_n(moProdOrderDestiny.getPkYearId());
+                    moDiog.setFkMfgOrderId_n(moProdOrderDestiny.getPkOrdId());
+                }
+                else {
+                    // Other moves use warehouses as they were defined:
+                    
+                    moDiog.setFkMfgYearId_n(moProdOrderSource.getPkYearId());
+                    moDiog.setFkMfgOrderId_n(moProdOrderSource.getPkOrdId());
+                }
+                
+                moDiog.setAuxSegregationStockId(STrnStockSegregationUtils.getIdByReference(miClient.getSession(), new int [] { moProdOrderSource.getPkOrdId(), moProdOrderSource.getPkYearId()}, SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD));
+            } catch (Exception ex) {
+                SLibUtils.printException(this, ex);
             }
         }
 

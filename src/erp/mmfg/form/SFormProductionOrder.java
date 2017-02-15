@@ -33,6 +33,7 @@ import erp.mmfg.data.SDataProductionOrderPeriodRow;
 import erp.mmfg.data.SMfgUtils;
 import erp.mod.SModSysConsts;
 import erp.mod.itm.db.SItmConsts;
+import erp.mtrn.data.STrnStockSegregationUtils;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -42,7 +43,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author  Néstor Ávalos
+ * @author  Néstor Ávalos, Edwin Carmona
  */
 public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -1525,7 +1526,13 @@ public class SFormProductionOrder extends javax.swing.JDialog implements erp.lib
             }
             else {
                 mnFormResult = SLibConstants.FORM_RESULT_OK;
-
+                
+                if (jckIsDeleted.isSelected()) {                    
+                    if (moProductionOrder != null) {
+                        STrnStockSegregationUtils.releaseSegregation(miClient, new int[] { moProductionOrder.getPkOrdId(), moProductionOrder.getPkYearId() }, SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD);
+                    }
+                }
+                
                 if (b) {
                     setVisible(false);
                 }

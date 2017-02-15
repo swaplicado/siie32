@@ -80,9 +80,11 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
         jlFkEntityId = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jliFkEntityId = new javax.swing.JList<SFormComponentItem>();
+        jPanel11 = new javax.swing.JPanel();
+        jPanel12 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
         jPanel21 = new javax.swing.JPanel();
-        jPanel7 = new javax.swing.JPanel();
-        jckIsComplete = new javax.swing.JCheckBox();
+        jPanel10 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         jPanel30 = new javax.swing.JPanel();
         jlDate = new javax.swing.JLabel();
@@ -99,6 +101,10 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
         jcbProdOrdEnd = new javax.swing.JComboBox<SFormComponentItem>();
         jlDummy2 = new javax.swing.JLabel();
         jbProdOrdEnd = new javax.swing.JButton();
+        jPanel7 = new javax.swing.JPanel();
+        jckIsComplete = new javax.swing.JCheckBox();
+        jPanel9 = new javax.swing.JPanel();
+        jckIsProgrammed = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
         jbExplotionMaterials = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -161,16 +167,22 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
 
         jPanel1.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
+        jPanel11.setLayout(new java.awt.BorderLayout());
+
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 0, 0));
+
+        jLabel1.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel12.add(jLabel1);
+
+        jPanel11.add(jPanel12, java.awt.BorderLayout.LINE_START);
+
+        jPanel1.add(jPanel11, java.awt.BorderLayout.PAGE_END);
+
         jpHead.add(jPanel1, java.awt.BorderLayout.CENTER);
 
         jPanel21.setLayout(new java.awt.BorderLayout(0, 3));
 
-        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 3));
-
-        jckIsComplete.setText("Explosionar fórmulas completas [MP, ME, concentrados]  (recomendable para pronósticos)");
-        jPanel7.add(jckIsComplete);
-
-        jPanel21.add(jPanel7, java.awt.BorderLayout.SOUTH);
+        jPanel10.setLayout(new java.awt.BorderLayout());
 
         jPanel8.setLayout(new java.awt.GridLayout(3, 0, 0, 3));
 
@@ -241,7 +253,23 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
 
         jPanel8.add(jPanel6);
 
-        jPanel21.add(jPanel8, java.awt.BorderLayout.NORTH);
+        jPanel10.add(jPanel8, java.awt.BorderLayout.NORTH);
+
+        jPanel7.setLayout(new java.awt.BorderLayout());
+
+        jckIsComplete.setText("Explosionar fórmulas completas [MP, ME, concentrados]  (recomendable para pronósticos)");
+        jPanel7.add(jckIsComplete, java.awt.BorderLayout.CENTER);
+
+        jPanel10.add(jPanel7, java.awt.BorderLayout.CENTER);
+
+        jPanel9.setLayout(new java.awt.BorderLayout());
+
+        jckIsProgrammed.setText("Programar al explosionar");
+        jPanel9.add(jckIsProgrammed, java.awt.BorderLayout.CENTER);
+
+        jPanel10.add(jPanel9, java.awt.BorderLayout.SOUTH);
+
+        jPanel21.add(jPanel10, java.awt.BorderLayout.CENTER);
 
         jpHead.add(jPanel21, java.awt.BorderLayout.SOUTH);
 
@@ -261,7 +289,7 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        setSize(new java.awt.Dimension(667, 314));
+        setSize(new java.awt.Dimension(656, 439));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -430,9 +458,10 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
                 oExplotionMaterials.setValue(3, moFieldDate.getDate());
                 oExplotionMaterials.setValue(4, mbIsForecast);
                 oExplotionMaterials.setValue(5, jckIsComplete.isSelected());
-                oExplotionMaterials.setValue(6, jcbProdOrdStart.getSelectedItem().toString());
-                oExplotionMaterials.setValue(7, jcbProdOrdEnd.getSelectedItem().toString());
-                oExplotionMaterials.setValue(8, new int[] {moFieldProdOrdStart.getKeyAsIntArray()[0], moFieldProdOrdStart.getKeyAsIntArray()[1], moFieldProdOrdEnd.getKeyAsIntArray()[0], moFieldProdOrdEnd.getKeyAsIntArray()[1]});
+                oExplotionMaterials.setValue(6, jckIsProgrammed.isSelected());
+                oExplotionMaterials.setValue(7, jcbProdOrdStart.getSelectedItem().toString());
+                oExplotionMaterials.setValue(8, jcbProdOrdEnd.getSelectedItem().toString());
+                oExplotionMaterials.setValue(9, new int[] {moFieldProdOrdStart.getKeyAsIntArray()[0], moFieldProdOrdStart.getKeyAsIntArray()[1], moFieldProdOrdEnd.getKeyAsIntArray()[0], moFieldProdOrdEnd.getKeyAsIntArray()[1]});
                 oExplotionMaterials.setTitle("Explosión de órdenes de producción");
                 oExplotionMaterials.setVisible(true);
 
@@ -492,7 +521,11 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgSelect;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel21;
     private javax.swing.JPanel jPanel3;
@@ -502,6 +535,7 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbDate;
@@ -513,6 +547,7 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
     private javax.swing.JComboBox<SFormComponentItem> jcbProdOrdEnd;
     private javax.swing.JComboBox<SFormComponentItem> jcbProdOrdStart;
     private javax.swing.JCheckBox jckIsComplete;
+    private javax.swing.JCheckBox jckIsProgrammed;
     private javax.swing.JLabel jlDate;
     private javax.swing.JLabel jlDummy1;
     private javax.swing.JLabel jlDummy14;
@@ -540,6 +575,7 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
         mnFormStatus = SLibConstants.UNDEFINED;
         mbFirstTime = true;
         mbIsExplode = false;
+        jckIsProgrammed.setSelected(true);
 
         moExplotionMaterials = null;
 

@@ -39,7 +39,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Edwin Carmona
  */
 public class SFormProductionOrderCharge extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -741,7 +741,7 @@ public class SFormProductionOrderCharge extends javax.swing.JDialog implements e
     public erp.lib.form.SFormValidation formValidate() {
         String sMsg = "";
         SFormValidation validation = new SFormValidation();
-        STrnStockValidator validator = new STrnStockValidator(miClient, moProductionOrder.getPkYearId(), null , null);
+        STrnStockValidator validator = new STrnStockValidator(miClient, moProductionOrder.getPkYearId(), null , null, null, 0);
 
         for (int i = 0; i < mvFields.size(); i++) {
             if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()) {
