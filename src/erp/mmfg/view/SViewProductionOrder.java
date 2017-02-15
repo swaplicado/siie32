@@ -266,7 +266,7 @@ public class SViewProductionOrder extends erp.lib.table.STableTab implements jav
         }
 
         //aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "st.st", "Estado", 60);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_perc", "Segregado", STableConstants.WIDTH_PERCENTAGE);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_perc", "%Segregado", STableConstants.WIDTH_PERCENTAGE);
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_fid_st_ord", "Estatus", STableConstants.WIDTH_ICON);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", 65);
