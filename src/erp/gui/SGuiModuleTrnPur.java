@@ -132,6 +132,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiStkRetReturned;
     private javax.swing.JMenuItem jmiStkRetReturnedEntry;
     private javax.swing.JMenuItem jmiStkRetDiog;
+    private javax.swing.JMenuItem jmiDpsDocRemission;
     private javax.swing.JMenu jmRep;
     private javax.swing.JMenu jmRepStats;
     private javax.swing.JMenu jmRepBackorder;
@@ -301,6 +302,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiOrdersUsr = new JMenuItem("Control de límite máximo mensual por usuario");
         jmiOrdersMailPending = new JMenuItem("Pedidos por enviar por correo-e");
         jmiOrdersMailSent = new JMenuItem("Pedidos enviados por correo-e");
+        jmiDpsDocRemission = new JMenuItem("Facturas vs. remisiones");
         jmOrd.add(jmiOrders);
         jmOrd.addSeparator();
         jmOrd.add(jmiOrdersLinkPend);
@@ -357,6 +359,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmDps.addSeparator();
         jmDps.add(jmiDpsPrice);
         jmDps.add(jmiDpsPriceHist);
+        jmDps.addSeparator();
+        jmDps.add(jmiDpsDocRemission);
 
         jmDpsAdj = new JMenu("Notas crédito");
         jmiDpsAdjDoc = new JMenuItem("Notas de crédito de compras");
@@ -594,6 +598,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkRetReturned.addActionListener(this);
         jmiStkRetReturnedEntry.addActionListener(this);
         jmiStkRetDiog.addActionListener(this);
+         jmiDpsDocRemission.addActionListener(this);
         jmiRepTrnGlobal.addActionListener(this);
         jmiRepTrnByMonth.addActionListener(this);
         jmiRepTrnByItemGeneric.addActionListener(this);
@@ -711,6 +716,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkRetReturned.setEnabled(hasRightInventoryOut);
         jmiStkRetReturnedEntry.setEnabled(hasRightInventoryOut);
         jmiStkRetDiog.setEnabled(hasRightInventoryOut);
+        jmiDpsDocRemission.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
 
         jmRep.setEnabled(hasRightReports);
         
@@ -1072,6 +1078,11 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                     oViewClass = erp.mtrn.view.SViewPriceHistory.class;
                     sViewTitle = "CPA - Historial precios";
                     break;
+                
+                case SDataConstants.TRNX_DOC_REMISSION:
+                    oViewClass = erp.mtrn.view.SViewBol.class;
+                    sViewTitle = "CPA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02) + " vs remisiones" ;
+                    break;
                     
                 case SDataConstants.MKT_PLIST_ITEM:
                     oViewClass = erp.mmkt.view.SViewPriceListItem.class;
@@ -1431,6 +1442,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiStkDvyDiog) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRN_DIOG, SDataConstantsSys.TRNS_CL_IOG_IN_PUR[0], SDataConstantsSys.TRNS_CL_IOG_IN_PUR[1]);
+            }
+            else if (item == jmiDpsDocRemission) {
+                showView(SDataConstants.TRNX_DOC_REMISSION, SDataConstantsSys.TRNS_CT_DPS_PUR);
             }
             else if (item == jmiStkDvyStatsConsumption) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_STK_COMSUME, SDataConstantsSys.TRNS_CT_DPS_PUR);

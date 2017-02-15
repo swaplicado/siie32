@@ -133,6 +133,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiDpsWsPending;
     private javax.swing.JMenuItem jmiDpsWsApproved;
     private javax.swing.JMenuItem jmiDpsWsReject;
+    private javax.swing.JMenuItem jmiDpsDocRemission;
     private javax.swing.JMenu jmDpsAdj;
     private javax.swing.JMenuItem jmiDpsAdjDoc;
     private javax.swing.JMenuItem jmDpsAdjAnnulled;
@@ -379,6 +380,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsWsPending = new JMenuItem("Facturas por enviar por web-service");
         jmiDpsWsApproved = new JMenuItem("Facturas aceptadas por web-service");
         jmiDpsWsReject = new JMenuItem("Facturas rechazadas por web-service");
+        jmiDpsDocRemission = new JMenuItem("Facturas vs. remisiones");
         jmDps.add(jmiDpsDoc);
         jmDps.add(jmiDpsEntry);
         jmDps.add(jmiDpsEntryRef);
@@ -404,6 +406,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmDps.add(jmiDpsWsPending);
         jmDps.add(jmiDpsWsApproved);
         jmDps.add(jmiDpsWsReject);
+        jmDps.addSeparator();
+        jmDps.add(jmiDpsDocRemission);
 
         jmDpsAdj = new JMenu("Notas crédito");
         jmiDpsAdjDoc = new JMenuItem("Notas de crédito de ventas");
@@ -665,6 +669,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsWsPending.addActionListener(this);
         jmiDpsWsApproved.addActionListener(this);
         jmiDpsWsReject.addActionListener(this);
+        jmiDpsDocRemission.addActionListener(this);
         jmiDpsAdjDoc.addActionListener(this);
         jmDpsAdjAnnulled.addActionListener(this);
         jmiDpsAdjMailPending.addActionListener(this);
@@ -789,6 +794,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsWsPending.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmiDpsWsApproved.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmiDpsWsReject.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
+        jmiDpsDocRemission.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
 
         jmDpsAdj.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjDoc.setEnabled(hasRightDocTransactionAdjust);
@@ -1206,6 +1212,11 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 case SDataConstants.TRNX_DPS_SENT:
                     oViewClass = erp.mtrn.view.SViewDpsSend.class;
                     sViewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02) + " enviad@s x correo-e";
+                    break;
+                    
+                case SDataConstants.TRNX_DOC_REMISSION:
+                    oViewClass = erp.mtrn.view.SViewBol.class;
+                    sViewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02) + " vs remisiones" ;
                     break;
 
                 case SDataConstants.TRNX_PRICE_HIST:
@@ -1645,6 +1656,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiDpsWsReject) {
                 miClient.getSession().showView(SModConsts.TRN_CFD, SModSysConsts.TRNS_ST_XML_DVY_REJECT, new SGuiParams(SDataConstantsSys.TRNX_TP_DPS_DOC));
+            }
+            else if (item == jmiDpsDocRemission) {
+                showView(SDataConstants.TRNX_DOC_REMISSION, SDataConstantsSys.TRNS_CT_DPS_SAL);
             }
             else if (item == jmiDpsAdjDoc) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
