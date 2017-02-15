@@ -7,7 +7,7 @@ package erp.table;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Edwin Carmona
  */
 public abstract class SFilterConstants {
 
@@ -20,4 +20,7 @@ public abstract class SFilterConstants {
     public static final int SETTING_FILTER_DOC_TP = 1007;
     public static final int SETTING_FILTER_MFG_ORD_TP = 1008;
     public static final int SETTING_FILTER_FUNC_ARE = 1009;
+    public static final int SETTING_FILTER_CURRENCY = 1010;
+    public static final int SETTING_FILTER_REL_PARTY = 1011;
+    
 }

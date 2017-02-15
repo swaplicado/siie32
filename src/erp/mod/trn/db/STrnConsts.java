@@ -10,14 +10,20 @@ package erp.mod.trn.db;
  * @author Gerardo Hernández, Uriel Castañeda
  */
 public abstract class STrnConsts {
-
+    
     public static final int ACTION_NEW = 1;
     public static final int ACTION_EDIT = 2;
     
     public static final int DPS_FND_MODEL_NUM = 1;
     public static final int DPS_FND_MODEL_BP_NUM = 2;
-        
+    
+    public static final int TRN_BPS_WITH_REL_PARTY = 1;
+    
     public static final String TXT_FIELD_BLANK = "-";
     public static final String TXT_TRN_DOM = "NACIONAL";
     public static final String TXT_TRN_INT = "INTERNACIONAL";
+    
+    public static final String TRN_TXT_REL_PARTS = "CON PARTES RELACIONADAS";
+    public static final String TRN_TXT_WITHOUT_REL_PARTS = "SIN PARTES RELACIONADAS";
+    
 }

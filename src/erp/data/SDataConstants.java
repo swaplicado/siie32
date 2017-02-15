@@ -501,6 +501,7 @@ public abstract class SDataConstants {
     public static final int TRNX_DPS_AUDITED = 207572;
     public static final int TRNX_DPS_SEND_PEND = 207573;
     public static final int TRNX_DPS_SENT = 207574;
+    public static final int TRNX_DOC_REMISSION = 207575;
 
     public static final int TRNX_STK_STK = 207581;
     public static final int TRNX_STK_STK_WH = 207582;

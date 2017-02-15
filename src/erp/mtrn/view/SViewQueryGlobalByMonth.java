@@ -13,18 +13,20 @@ import erp.lib.table.STabFilterYear;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableSetting;
+import erp.mod.trn.db.STrnConsts;
 import erp.table.SFilterConstants;
+import erp.table.STabFilterCurrency;
+import erp.table.STabFilterRelatedParts;
 import erp.table.STabFilterUnitType;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import javax.swing.JToggleButton;
 
 /**
  *
  * @author Juan Barajas, Edwin Carmona
  */
-public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
+public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab {
 
     protected static final int MONTH_JAN = 1;
     protected static final int MONTH_FEB = 2;
@@ -41,13 +43,14 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab implements 
 
     protected int mnYear;
     protected int mnType;
+    private boolean mbIsLocalCurrency = false;
     protected String msColumnUnit = "";
     protected String msHeaderTitle = "";
     protected erp.lib.table.STableColumn[] maoTableColumns;
     protected erp.lib.table.STabFilterYear moFilterYear;
     private erp.table.STabFilterUnitType moTabFilterUnitType;
-    
-    private javax.swing.JToggleButton jtbRelatedParty;
+    private erp.table.STabFilterCurrency moTabFilterCurrency;
+    private erp.table.STabFilterRelatedParts moTabFilterRelatedParts;
 
     public SViewQueryGlobalByMonth(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
         super(client, tabTitle, SDataConstants.TRNX_DPS_QRY, auxType01);
@@ -59,17 +62,11 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab implements 
 
         moFilterYear = new STabFilterYear(miClient, this);
         moTabFilterUnitType = new STabFilterUnitType(miClient, this);
+        moTabFilterCurrency = new STabFilterCurrency(miClient, this);
+        moTabFilterRelatedParts = new STabFilterRelatedParts(miClient, this);
+        
         mnYear = miClient.getSessionXXX().getWorkingYear();
         mnType = 0;
-        
-        jtbRelatedParty = new javax.swing.JToggleButton();
-        
-        jtbRelatedParty.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_rel_pty_off.gif")));
-        jtbRelatedParty.setToolTipText("Filtrar partes relacionadas");
-        jtbRelatedParty.setPreferredSize(new java.awt.Dimension(23, 23));
-        jtbRelatedParty.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_rel_pty_on.gif")));
-        
-        jtbRelatedParty.addActionListener(this);
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
@@ -78,13 +75,11 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab implements 
         addTaskBarUpperComponent(moFilterYear);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterUnitType);
-        
         addTaskBarUpperSeparator();
-        addTaskBarUpperComponent(jtbRelatedParty);
-        
-        jtbRelatedParty.setSelected(true);
+        addTaskBarUpperComponent(moTabFilterCurrency);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterRelatedParts); 
 
-        renderTableColumns();
         setIsSummaryApplying(true);
 
         populateTable();
@@ -114,73 +109,97 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab implements 
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_01", "Total neto " + asMonths[0] + ". $ ", STableConstants.WIDTH_VALUE_2X);
-        maoTableColumns[i].setSumApplying(true);
+        if (mbIsLocalCurrency) {
+            maoTableColumns[i].setSumApplying(true);
+        }
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_02", msHeaderTitle + asMonths[1] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_02", "Total neto " + asMonths[1] + ". $ ", STableConstants.WIDTH_VALUE_2X);
-        maoTableColumns[i].setSumApplying(true);
+        if (mbIsLocalCurrency) {
+            maoTableColumns[i].setSumApplying(true);
+        }
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_03", msHeaderTitle + asMonths[2] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_03", "Total neto " + asMonths[2] + ". $ ", STableConstants.WIDTH_VALUE_2X);
-        maoTableColumns[i].setSumApplying(true);
+        if (mbIsLocalCurrency) {
+            maoTableColumns[i].setSumApplying(true);
+        }
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_04", msHeaderTitle + asMonths[3] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_04", "Total neto " + asMonths[3] + ". $ ", STableConstants.WIDTH_VALUE_2X);
-        maoTableColumns[i].setSumApplying(true);
+        if (mbIsLocalCurrency) {
+            maoTableColumns[i].setSumApplying(true);
+        }
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_05", msHeaderTitle + asMonths[4] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_05", "Total neto " + asMonths[4] + ". $ ", STableConstants.WIDTH_VALUE_2X);
-        maoTableColumns[i].setSumApplying(true);
+        if (mbIsLocalCurrency) {
+            maoTableColumns[i].setSumApplying(true);
+        }
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_06", msHeaderTitle + asMonths[5] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_06", "Total neto " + asMonths[5] + ". $ ", STableConstants.WIDTH_VALUE_2X);
-        maoTableColumns[i].setSumApplying(true);
+        if (mbIsLocalCurrency) {
+            maoTableColumns[i].setSumApplying(true);
+        }
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_07", msHeaderTitle + asMonths[6] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_07", "Total neto " + asMonths[6] + ". $ ", STableConstants.WIDTH_VALUE_2X);
-        maoTableColumns[i].setSumApplying(true);
+        if (mbIsLocalCurrency) {
+            maoTableColumns[i].setSumApplying(true);
+        }
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_08", msHeaderTitle + asMonths[7] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_08", "Total neto " + asMonths[7] + ". $ ", STableConstants.WIDTH_VALUE_2X);
-        maoTableColumns[i].setSumApplying(true);
+        if (mbIsLocalCurrency) {
+            maoTableColumns[i].setSumApplying(true);
+        }
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_09", msHeaderTitle + asMonths[8] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_09", "Total neto " + asMonths[8] + ". $ ", STableConstants.WIDTH_VALUE_2X);
-        maoTableColumns[i].setSumApplying(true);
+        if (mbIsLocalCurrency) {
+            maoTableColumns[i].setSumApplying(true);
+        }
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_10", msHeaderTitle + asMonths[9] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_10", "Total neto " + asMonths[9] + ". $ ", STableConstants.WIDTH_VALUE_2X);
-        maoTableColumns[i].setSumApplying(true);
+        if (mbIsLocalCurrency) {
+            maoTableColumns[i].setSumApplying(true);
+        }
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_11", msHeaderTitle + asMonths[10] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_11", "Total neto " + asMonths[10] + ". $ ", STableConstants.WIDTH_VALUE_2X);
-        maoTableColumns[i].setSumApplying(true);
+        if (mbIsLocalCurrency) {
+            maoTableColumns[i].setSumApplying(true);
+        }
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_12", msHeaderTitle + asMonths[11] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_12", "Total neto " + asMonths[11] + ". $ ", STableConstants.WIDTH_VALUE_2X);
-        maoTableColumns[i].setSumApplying(true);
+        if (mbIsLocalCurrency) {
+            maoTableColumns[i].setSumApplying(true);
+        }
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
 
         for (i = 0; i < maoTableColumns.length; i++) {
@@ -249,6 +268,7 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab implements 
 
     private String createQueryBalance(int nMonth) {
         String sSql = "";
+        String columnStot = mbIsLocalCurrency ? "de.stot_r" : "de.stot_cur_r";
 
         sSql = "COALESCE(COALESCE(SUM(CASE WHEN (" +
                 "d.fid_ct_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[0]) + " " +
@@ -256,21 +276,21 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab implements 
                 "AND d.fid_tp_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2]) + " " +
                 "AND de.fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_NA + " " +
                 "AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND d.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_EFF +
-                ") AND MONTH(d.dt) = " + nMonth + " THEN de.stot_r ELSE 0 END), 0) - " +
+                ") AND MONTH(d.dt) = " + nMonth + " THEN " + columnStot + " ELSE 0 END), 0) - " +
                 "COALESCE(SUM(CASE WHEN (" +
                 "d.fid_ct_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[0]) + " " +
                 "AND d.fid_cl_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[1]) + " " +
                 "AND d.fid_tp_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[2]) + " " +
                 "AND de.fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_RET + " " +
                 "AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND d.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_EFF +
-                ") AND MONTH(d.dt) = " + nMonth + " THEN de.stot_r ELSE 0 END), 0) - " +
+                ") AND MONTH(d.dt) = " + nMonth + " THEN " + columnStot + " ELSE 0 END), 0) - " +
                 "COALESCE(SUM(CASE WHEN (" +
                 "d.fid_ct_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[0]) + " " +
                 "AND d.fid_cl_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[1]) + " " +
                 "AND d.fid_tp_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[2]) + " " +
                 "AND de.fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_DISC + " " +
                 "AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND d.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_EFF +
-                ") AND MONTH(d.dt) = " + nMonth + " THEN de.stot_r ELSE 0 END), 0), 0) ";
+                ") AND MONTH(d.dt) = " + nMonth + " THEN " + columnStot + " ELSE 0 END), 0), 0) ";
 
         return sSql;
     }
@@ -280,9 +300,17 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab implements 
         STableSetting setting = null;
         Date tDate = null;
         int typeUnitTotal = 0;
+        boolean withRelatedParts = false;
         String sqlDatePeriod = "";
         String dateInit = "";
         String dateEnd = "";
+        
+        for (int i = 0; i < mvTableSettings.size(); i++) {
+           setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
+           if (setting.getType() == SFilterConstants.SETTING_FILTER_CURRENCY) {
+                mbIsLocalCurrency = ((Integer)setting.getSetting()) == STabFilterCurrency.TP_SYSTEM_CURRENCY;
+            } 
+        }
 
         for (int i = 0; i < mvTableSettings.size(); i++) {
             setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
@@ -299,9 +327,12 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab implements 
                 mnType = typeUnitTotal;
                 createColumnUnit(typeUnitTotal);
             }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_REL_PARTY) {
+                withRelatedParts = ((Integer)setting.getSetting()) == STrnConsts.TRN_BPS_WITH_REL_PARTY;
+            }
         }
 
-//        renderTableColumns();
+        renderTableColumns();
 
         msSql = "SELECT de.fid_item, de.fid_unit, i.item_key, i.item, " +
                     createQueryUnit(MONTH_JAN) + " AS f_qty_01, " +
@@ -339,7 +370,7 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab implements 
                     "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " +
                     "INNER JOIN erp.bpsu_bp AS bp ON d.fid_bp_r = bp.id_bp " +
                     "WHERE d.b_del = 0 AND de.b_del = 0 " + sqlDatePeriod +
-                    (jtbRelatedParty.isSelected() ? "" : " AND bp.b_att_rel_pty = 0 ") +
+                    (withRelatedParts ? "" : " AND bp.b_att_rel_pty = 0 ") +
                     "GROUP BY i.item_key, i.item " +
                     "HAVING f_stot_01 <> 0 OR f_qty_01 <> 0 OR f_stot_02 <> 0 OR f_qty_02 <> 0 OR f_stot_03 <> 0 OR f_qty_03 <> 0 OR f_stot_04 <> 0 OR f_qty_04 <> 0 OR f_stot_05 <> 0 OR f_qty_05 <> 0 OR " +
                     "f_stot_06 <> 0 OR f_qty_06 <> 0 OR f_stot_07 <> 0 OR f_qty_07 <> 0 OR f_stot_08 <> 0 OR f_qty_08 <> 0 OR f_stot_09 <> 0 OR f_qty_09 <> 0 OR f_stot_10 <> 0 OR f_qty_10 <> 0 OR " +
@@ -369,19 +400,6 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab implements 
     public void actionDelete() {
         if (jbDelete.isEnabled()) {
 
-        }
-    }
-
-    @Override
-    public void actionPerformed(java.awt.event.ActionEvent e) {
-        super.actionPerformed(e);
-
-        if (e.getSource() instanceof javax.swing.JToggleButton) {
-            JToggleButton toggleButton = (JToggleButton) e.getSource();
-
-            if (toggleButton == jtbRelatedParty) {
-                actionReload();
-            }
         }
     }
 }
