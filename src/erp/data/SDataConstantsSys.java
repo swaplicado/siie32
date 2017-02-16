@@ -1088,6 +1088,9 @@ public abstract class SDataConstantsSys {
     public static final int TRNS_TP_STK_SEG_INC = 1; // Increment
     public static final int TRNS_TP_STK_SEG_DEC = 2; // Decrement
 
+    public static final int TRNS_CFD_CAT_TP_REL = 11; // Type of relation
+    public static final int TRNS_CFD_CAT_CFD_USE = 12; // CFDI use
+
     public static final int TRNU_DPS_NAT_DEF = 1;
 
     public static final int[] TRNU_TP_DPS_PUR_EST = { 1, 1, 1 };
