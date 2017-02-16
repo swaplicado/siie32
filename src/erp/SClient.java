@@ -406,7 +406,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
         jButtonGroup.add(jtbModuleQlt);
         jtbModuleQlt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/mod_qlt_bw.png"))); // NOI18N
-        jtbModuleQlt.setToolTipText("Recursos calidad [Ctrl+0]");
+        jtbModuleQlt.setToolTipText("Calidad [Ctrl+9]");
         jtbModuleQlt.setFocusable(false);
         jtbModuleQlt.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jtbModuleQlt.setMaximumSize(new java.awt.Dimension(64, 64));
@@ -419,7 +419,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
         jButtonGroup.add(jtbModuleHrs);
         jtbModuleHrs.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/mod_hrs_bw.png"))); // NOI18N
-        jtbModuleHrs.setToolTipText("Recursos humanos [Ctrl+9]");
+        jtbModuleHrs.setToolTipText("Recursos humanos [Ctrl+0]");
         jtbModuleHrs.setFocusable(false);
         jtbModuleHrs.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jtbModuleHrs.setMaximumSize(new java.awt.Dimension(64, 64));
