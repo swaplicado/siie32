@@ -414,7 +414,7 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
                             "d.fid_ct_dps = " + mnFormType + " AND d.fid_cl_dps IN (" + docClass + ") AND " +
                             "d.dt BETWEEN '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateBegin.getDate()) + "' AND " +
                             "'" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateEnd.getDate()) + "' " +
-                            "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " + ( moFieldBizPartner.getKeyAsIntArray()[0] == 0 ? "" : " AND d.fid_bp_r = " + moFieldBizPartner.getKeyAsIntArray()[0]) + " " + (jckWithoutRelatedParty.isSelected() ? " AND bp.b_att_rel_pty = 0 " : "") +
+                            "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " + ( moFieldBizPartner.getKeyAsIntArray()[0] == 0 ? "" : " AND d.fid_bp_r = " + moFieldBizPartner.getKeyAsIntArray()[0]) + " " + (jckWithoutRelatedParty.isSelected() ? " AND b.b_att_rel_pty = 0 " : "") +
                             "INNER JOIN erp.bpsu_bpb AS bb ON d.fid_bpb = bb.id_bpb " +
                             "INNER JOIN erp.bpsu_bpb_add AS bba ON d.fid_bpb = bba.id_bpb AND d.fid_add = bba.id_add " +
                             "INNER JOIN erp.bpsu_bp_ct AS cb ON d.fid_bp_r = cb.id_bp AND cb.id_ct_bp = " + mnCategoryId + " " +
