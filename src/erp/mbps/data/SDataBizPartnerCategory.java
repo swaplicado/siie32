@@ -29,6 +29,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     protected double mdInsurance;
     protected java.util.Date mtDateStart;
     protected java.util.Date mtDateEnd_n;
+    protected java.lang.String msPaymentAccount;
     protected boolean mbIsCreditByUser;
     protected boolean mbIsGuaranteeInProcess;
     protected boolean mbIsInsuranceInProcess;
@@ -40,6 +41,8 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     protected int mnFkCfdAddendaTypeId;
     protected int mnFkLanguageId_n;
     protected int mnFkCurrencyId_n;
+    protected int mnFkPaymentSystemTypeId_n;
+    protected int mnFkUserAnalystId_n;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
     protected int mnFkUserDeleteId;
@@ -81,6 +84,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     public void setInsurance(double d) { mdInsurance = d; }
     public void setDateStart(java.util.Date t) { mtDateStart = t; }
     public void setDateEnd_n(java.util.Date t) { mtDateEnd_n = t; }
+    public void setPaymentAccount(java.lang.String s) { msPaymentAccount = s; }
     public void setIsCreditByUser(boolean b) { mbIsCreditByUser = b; }
     public void setIsGuaranteeInProcess(boolean b) { mbIsGuaranteeInProcess = b; }
     public void setIsInsuranceInProcess(boolean b) { mbIsInsuranceInProcess = b; }
@@ -92,6 +96,8 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     public void setFkCfdAddendaTypeId(int n) { mnFkCfdAddendaTypeId = n; }
     public void setFkLanguageId_n(int n) { mnFkLanguageId_n = n; }
     public void setFkCurrencyId_n(int n) { mnFkCurrencyId_n = n; }
+    public void setFkPaymentSystemTypeId_n(int n) { mnFkPaymentSystemTypeId_n = n; }
+    public void setFkUserAnalystId_n(int n) { mnFkUserAnalystId_n = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
     public void setFkUserDeleteId(int n) { mnFkUserDeleteId = n; }
@@ -110,6 +116,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     public double getInsurance() { return mdInsurance; }
     public java.util.Date getDateStart() { return mtDateStart; }
     public java.util.Date getDateEnd_n() { return mtDateEnd_n; }
+    public java.lang.String getPaymentAccount() { return msPaymentAccount; }
     public boolean getIsCreditByUser() { return mbIsCreditByUser; }
     public boolean getIsGuaranteeInProcess() { return mbIsGuaranteeInProcess; }
     public boolean getIsInsuranceInProcess() { return mbIsInsuranceInProcess; }
@@ -121,6 +128,8 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     public int getFkCfdAddendaTypeId() { return mnFkCfdAddendaTypeId; }
     public int getFkLanguageId_n() { return mnFkLanguageId_n; }
     public int getFkCurrencyId_n() { return mnFkCurrencyId_n; }
+    public int getFkPaymentSystemTypeId_n() { return mnFkPaymentSystemTypeId_n; }
+    public int getFkUserAnalystId_n() { return mnFkUserAnalystId_n; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
     public int getFkUserDeleteId() { return mnFkUserDeleteId; }
@@ -184,6 +193,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
         mdInsurance = 0;
         mtDateStart = null;
         mtDateEnd_n = null;
+        msPaymentAccount = "";
         mbIsCreditByUser = false;
         mbIsGuaranteeInProcess = false;
         mbIsInsuranceInProcess = false;
@@ -195,6 +205,8 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
         mnFkCfdAddendaTypeId = 0;
         mnFkLanguageId_n = 0;
         mnFkCurrencyId_n = 0;
+        mnFkPaymentSystemTypeId_n = 0;
+        mnFkUserAnalystId_n = 0;
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
         mnFkUserDeleteId = 0;
@@ -259,6 +271,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
                 mdInsurance = resultSet.getDouble("bp_ct.insur");
                 mtDateStart = resultSet.getDate("bp_ct.dt_start");
                 mtDateEnd_n = resultSet.getDate("bp_ct.dt_end_n");
+                msPaymentAccount = resultSet.getString("pay_account");
                 mbIsCreditByUser = resultSet.getBoolean("b_cred_usr");
                 mbIsGuaranteeInProcess = resultSet.getBoolean("bp_ct.b_garnt_prc");
                 mbIsInsuranceInProcess = resultSet.getBoolean("bp_ct.b_insur_prc");
@@ -274,6 +287,10 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
                 if (resultSet.wasNull()) mnFkLanguageId_n = 0;
                 mnFkCurrencyId_n = resultSet.getInt("bp_ct.fid_cur_n");
                 if (resultSet.wasNull()) mnFkCurrencyId_n = 0;
+                mnFkPaymentSystemTypeId_n = resultSet.getInt("fid_tp_pay_sys_n");
+                if (resultSet.wasNull()) mnFkPaymentSystemTypeId_n = 0;
+                mnFkUserAnalystId_n = resultSet.getInt("bp_ct.fid_usr_ana_n");
+                if (resultSet.wasNull()) mnFkUserAnalystId_n = 0;
                 mnFkUserNewId = resultSet.getInt("bp_ct.fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("bp_ct.fid_usr_edit");
                 mnFkUserDeleteId = resultSet.getInt("bp_ct.fid_usr_del");
@@ -333,7 +350,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
                     "{ CALL erp.bpsu_bp_ct_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?," +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?," +
-                    "?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkBizPartnerId);
             callableStatement.setInt(nParam++, mnPkBizPartnerCategoryId);
             callableStatement.setString(nParam++, msKey);
@@ -345,6 +362,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
             callableStatement.setDouble(nParam++, mdInsurance);
             callableStatement.setDate(nParam++, new java.sql.Date(mtDateStart.getTime()));
             if (mtDateEnd_n != null) callableStatement.setDate(nParam++, new java.sql.Date(mtDateEnd_n.getTime())); else callableStatement.setNull(nParam++, java.sql.Types.DATE);
+            callableStatement.setString(nParam++, msPaymentAccount);
             callableStatement.setBoolean(nParam++, mbIsCreditByUser);
             callableStatement.setBoolean(nParam++, mbIsGuaranteeInProcess);
             callableStatement.setBoolean(nParam++, mbIsInsuranceInProcess);
@@ -356,6 +374,8 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
             callableStatement.setInt(nParam++, mnFkCfdAddendaTypeId);
             if (mnFkLanguageId_n > SLibConsts.UNDEFINED && mnFkLanguageId_n != mnAuxLanguageSysId) callableStatement.setInt(nParam++, mnFkLanguageId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
             if (mnFkCurrencyId_n > SLibConsts.UNDEFINED && mnFkCurrencyId_n != mnAuxCurrencySysId) callableStatement.setInt(nParam++, mnFkCurrencyId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
+            if (mnFkPaymentSystemTypeId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkPaymentSystemTypeId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
+            if (mnFkUserAnalystId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkUserAnalystId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.CHAR);

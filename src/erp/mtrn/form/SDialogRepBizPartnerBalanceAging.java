@@ -57,6 +57,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
     private erp.lib.form.SFormField moFieldCoBranch;
     private erp.lib.form.SFormField moFieldBizPartner;
     private erp.lib.form.SFormField moFieldSalesAgent;
+    private erp.lib.form.SFormField moFieldUserAnalyst;
     private erp.lib.form.SFormField moFieldCurrency;
 
 
@@ -119,6 +120,10 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jlSalesAgent = new javax.swing.JLabel();
         jcbSalesAgent = new javax.swing.JComboBox<SFormComponentItem>();
         jbPickSalesAgent = new javax.swing.JButton();
+        jPanel106 = new javax.swing.JPanel();
+        jlAnalyst = new javax.swing.JLabel();
+        jcbUserAnalyst = new javax.swing.JComboBox<SFormComponentItem>();
+        jbPickUserAnalyst = new javax.swing.JButton();
         jPanel98 = new javax.swing.JPanel();
         jlCurrency = new javax.swing.JLabel();
         jcbCurrency = new javax.swing.JComboBox<SFormComponentItem>();
@@ -142,7 +147,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jpParams.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
         jpParams.setLayout(new java.awt.BorderLayout());
 
-        jPanel7.setLayout(new java.awt.GridLayout(10, 1, 0, 5));
+        jPanel7.setLayout(new java.awt.GridLayout(11, 1, 0, 5));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -287,6 +292,23 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
 
         jPanel7.add(jPanel104);
 
+        jPanel106.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlAnalyst.setText("Analista:");
+        jlAnalyst.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel106.add(jlAnalyst);
+
+        jcbUserAnalyst.setPreferredSize(new java.awt.Dimension(325, 23));
+        jPanel106.add(jcbUserAnalyst);
+
+        jbPickUserAnalyst.setText("...");
+        jbPickUserAnalyst.setToolTipText("Seleccionar moneda");
+        jbPickUserAnalyst.setFocusable(false);
+        jbPickUserAnalyst.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel106.add(jbPickUserAnalyst);
+
+        jPanel7.add(jPanel106);
+
         jPanel98.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCurrency.setText("Moneda: *");
@@ -338,7 +360,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
 
         getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(576, 389));
+        setSize(new java.awt.Dimension(656, 439));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -357,6 +379,8 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         moFieldBizPartner.setPickerButton(jbPickBizPartner);
         moFieldSalesAgent = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbSalesAgent, jlSalesAgent);
         moFieldSalesAgent.setPickerButton(jbPickSalesAgent);
+        moFieldUserAnalyst = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbUserAnalyst, jlAnalyst);
+        moFieldUserAnalyst.setPickerButton(jbPickUserAnalyst);
         moFieldCurrency = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCurrency, jlCurrency);
         moFieldCurrency.setPickerButton(jbPickCurrency);
 
@@ -365,6 +389,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         mvFields.add(moFieldCoBranch);
         mvFields.add(moFieldBizPartner);
         mvFields.add(moFieldSalesAgent);
+        mvFields.add(moFieldUserAnalyst);
         mvFields.add(moFieldCurrency);
 
         jbPrint.addActionListener(this);
@@ -373,6 +398,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jbPickCoBranch.addActionListener(this);
         jbPickBizPartner.addActionListener(this);
         jbPickSalesAgent.addActionListener(this);
+        jbPickUserAnalyst.addActionListener(this);
         jbPickCurrency.addActionListener(this);
         jrbRepTypeDetail.addItemListener(this);
         jrbRepTypeSummary.addItemListener(this);
@@ -426,11 +452,13 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         int idSysAccountClass = SLibConsts.UNDEFINED;
         String txtCoBranch = "";
         String txtBizPartner = "";
-        String txtSalesAgent= "";
+        String txtSalesAgent = "";
+        String txtUserAnalyst = "";
         String txtCurrency = "";
         String sqlFilterCoBranch = "";
         String sqlFilterBizPartner = "";
         String sqlFilterSalesAgent = "";
+        String sqlFilterUserAnalyst = "";
         String sqlFilterCurrency = "";
         String sqlSortBy = "";
         boolean bShowGarntInsur = false;
@@ -461,12 +489,14 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
                 sqlFilterBizPartner = "AND re.fid_bp_nr = " + moFieldBizPartner.getKeyAsIntArray()[0] + " ";
             }
             
-            if (jcbSalesAgent.getSelectedIndex() <= 0) {
-                txtSalesAgent = "";
-            }
-            else {
+            if (jcbSalesAgent.getSelectedIndex() > 0) {
                 txtSalesAgent = SBpsConsts.BPS_ATT_SAL_AGT.toUpperCase() + ": " + jcbSalesAgent.getSelectedItem().toString();
                 sqlFilterSalesAgent = "AND d.fid_sal_agt_n = " + moFieldSalesAgent.getKeyAsIntArray()[0] + " ";
+            }
+            
+            if (jcbUserAnalyst.getSelectedIndex() > 0) {
+                txtUserAnalyst = jcbUserAnalyst.getSelectedItem().toString().toUpperCase();
+                sqlFilterUserAnalyst = " AND bpc.fid_usr_ana_n = " + moFieldUserAnalyst.getKeyAsIntArray()[0] + " ";
             }
             
             txtCurrency = SUtilConsts.TXT_CURRENCY.toUpperCase() + ": " + jcbCurrency.getSelectedItem().toString();
@@ -504,6 +534,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
             map.put("sBizPartner", txtBizPartner);
             map.put("nBizPartnerCategory", mnBizPartnerCategory);
             map.put("sSalesAgent", txtSalesAgent);
+            map.put("sAnalyst", txtUserAnalyst);
             map.put("nLocalCurrencyId", miClient.getSession().getSessionCustom().getLocalCurrencyKey()[0]);
             map.put("nCurrencyId", moFieldCurrency.getKeyAsIntArray()[0]);
             map.put("sCurrency", txtCurrency);
@@ -514,6 +545,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
             map.put("sSqlFilterCoBranch", sqlFilterCoBranch);
             map.put("sSqlFilterBizPartner", sqlFilterBizPartner);
             map.put("sSqlFilterSalesAgent", sqlFilterSalesAgent);
+            map.put("sSqlFilterAnalyst", sqlFilterUserAnalyst);
             map.put("sSqlFilterCurrency", sqlFilterCurrency);
             map.put("sSqlSortBy", sqlSortBy);
             map.put("bShowGarntInsur", bShowGarntInsur);
@@ -536,11 +568,12 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
     @SuppressWarnings("unchecked")
     private void computeReport15_30_45() {
         // Former report style:
-        
+        String txtUserAnalyst = "";
         int nSortBizPartner = 0;
         String nameCoBranch = "";
         String nameBizPartner = "";
         String sqlCoBranch = "";
+        String sqlFilterUserAnalyst = "";
         String sqlBizPartner = "";
         String sqlOrderBy = "";
         Cursor oCursor = getCursor();
@@ -562,6 +595,16 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         else {
             sqlBizPartner = " AND re.fid_bp_nr = " + moFieldBizPartner.getKeyAsIntArray()[0] + " ";
             nameBizPartner = jcbBizPartner.getSelectedItem().toString();
+        }
+        
+        if (jcbUserAnalyst.getSelectedIndex() > 0) {
+            txtUserAnalyst = jcbUserAnalyst.getSelectedItem().toString().toUpperCase();
+            if (sqlCoBranch.isEmpty()) {
+                sqlFilterUserAnalyst = "WHERE ct.fid_usr_ana_n = " + moFieldUserAnalyst.getKeyAsIntArray()[0] + " ";
+            }
+            else {
+                sqlFilterUserAnalyst = "AND ct.fid_usr_ana_n = " + moFieldUserAnalyst.getKeyAsIntArray()[0] + " ";
+            }
         }
 
         if (mnBizPartnerCategory == SModSysConsts.BPSS_CT_BP_SUP) {
@@ -594,6 +637,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
             oMap.put("sReportTitle", getTitle().toUpperCase());
             oMap.put("sCob", nameCoBranch);
             oMap.put("sBp", nameBizPartner);
+            oMap.put("sAnalyst", txtUserAnalyst);
             oMap.put("sCurrency", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency());
             oMap.put("nFkCtBpId", mnBizPartnerCategory);
             oMap.put("nFkCtSysMovSupId", SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0]);
@@ -609,6 +653,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
             oMap.put("nCfgsTpSort", nSortBizPartner);
             oMap.put("sSqlFkBpId", sqlBizPartner);
             oMap.put("sSqlCob", sqlCoBranch);
+            oMap.put("sSqlFilterAnalyst", sqlFilterUserAnalyst);
             oMap.put("sSqlOrderBy", sqlOrderBy);
             oMap.put("nTP_ACC", mnBizPartnerCategory == SModSysConsts.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_CL_ACC_ASSET[0] : SDataConstantsSys.FINS_CL_ACC_LIABTY[0]);
             oMap.put("nCL_ACC", mnBizPartnerCategory == SModSysConsts.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_CL_ACC_ASSET[1] : SDataConstantsSys.FINS_CL_ACC_LIABTY[1]);
@@ -704,6 +749,10 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
     private void actionPickSalesAgent() {
         miClient.pickOption(SDataConstants.BPSX_BP_ATT_SAL_AGT, moFieldSalesAgent, null);
     }
+    
+    private void actionPickUsrAnalyst() {
+        miClient.pickOption(SDataConstants.USRU_USR, moFieldUserAnalyst, null);
+    }
 
     private void actionPickCurrency() {
         miClient.pickOption(SDataConstants.CFGU_CUR, moFieldCurrency, null);
@@ -742,6 +791,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
     private javax.swing.JPanel jPanel103;
     private javax.swing.JPanel jPanel104;
     private javax.swing.JPanel jPanel105;
+    private javax.swing.JPanel jPanel106;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel7;
@@ -753,11 +803,14 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
     private javax.swing.JButton jbPickCurrency;
     private javax.swing.JButton jbPickDateCutoff;
     private javax.swing.JButton jbPickSalesAgent;
+    private javax.swing.JButton jbPickUserAnalyst;
     private javax.swing.JButton jbPrint;
     private javax.swing.JComboBox<SFormComponentItem> jcbBizPartner;
     private javax.swing.JComboBox<SFormComponentItem> jcbCoBranch;
     private javax.swing.JComboBox<SFormComponentItem> jcbCurrency;
     private javax.swing.JComboBox<SFormComponentItem> jcbSalesAgent;
+    private javax.swing.JComboBox<SFormComponentItem> jcbUserAnalyst;
+    private javax.swing.JLabel jlAnalyst;
     private javax.swing.JLabel jlBizPartner;
     private javax.swing.JLabel jlCoBranch;
     private javax.swing.JLabel jlCurrency;
@@ -818,6 +871,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         SFormUtilities.populateComboBox(miClient, jcbCoBranch, SDataConstants.BPSU_BPB, new int[] { miClient.getSessionXXX().getCompany().getPkCompanyId() });
         SFormUtilities.populateComboBox(miClient, jcbBizPartner, mnBizPartnerPicker);
         SFormUtilities.populateComboBox(miClient, jcbSalesAgent, SDataConstants.BPSX_BP_ATT_SAL_AGT);
+        SFormUtilities.populateComboBox(miClient, jcbUserAnalyst, SDataConstants.USRU_USR);
         SFormUtilities.populateComboBox(miClient, jcbCurrency, SDataConstants.CFGU_CUR);
     }
 
@@ -903,6 +957,9 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
             }
             else if (button == jbPickSalesAgent) {
                 actionPickSalesAgent();
+            }
+            else if (button == jbPickUserAnalyst) {
+                actionPickUsrAnalyst();
             }
             else if (button == jbPickCurrency) {
                 actionPickCurrency();
