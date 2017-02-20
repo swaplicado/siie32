@@ -22,7 +22,7 @@ import java.util.Vector;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona
+ * @author Sergio Flores
  */
 public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
