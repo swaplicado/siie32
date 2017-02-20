@@ -30,6 +30,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     protected java.util.Date mtDateStart;
     protected java.util.Date mtDateEnd_n;
     protected java.lang.String msPaymentAccount;
+    protected java.lang.String msNumberExporter;
     protected boolean mbIsCreditByUser;
     protected boolean mbIsGuaranteeInProcess;
     protected boolean mbIsInsuranceInProcess;
@@ -85,6 +86,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     public void setDateStart(java.util.Date t) { mtDateStart = t; }
     public void setDateEnd_n(java.util.Date t) { mtDateEnd_n = t; }
     public void setPaymentAccount(java.lang.String s) { msPaymentAccount = s; }
+    public void setNumberExporter(java.lang.String s) { msNumberExporter = s; }
     public void setIsCreditByUser(boolean b) { mbIsCreditByUser = b; }
     public void setIsGuaranteeInProcess(boolean b) { mbIsGuaranteeInProcess = b; }
     public void setIsInsuranceInProcess(boolean b) { mbIsInsuranceInProcess = b; }
@@ -117,6 +119,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     public java.util.Date getDateStart() { return mtDateStart; }
     public java.util.Date getDateEnd_n() { return mtDateEnd_n; }
     public java.lang.String getPaymentAccount() { return msPaymentAccount; }
+    public java.lang.String getNumberExporter() { return msNumberExporter; }
     public boolean getIsCreditByUser() { return mbIsCreditByUser; }
     public boolean getIsGuaranteeInProcess() { return mbIsGuaranteeInProcess; }
     public boolean getIsInsuranceInProcess() { return mbIsInsuranceInProcess; }
@@ -194,6 +197,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
         mtDateStart = null;
         mtDateEnd_n = null;
         msPaymentAccount = "";
+        msNumberExporter = "";
         mbIsCreditByUser = false;
         mbIsGuaranteeInProcess = false;
         mbIsInsuranceInProcess = false;
@@ -271,8 +275,9 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
                 mdInsurance = resultSet.getDouble("bp_ct.insur");
                 mtDateStart = resultSet.getDate("bp_ct.dt_start");
                 mtDateEnd_n = resultSet.getDate("bp_ct.dt_end_n");
-                msPaymentAccount = resultSet.getString("pay_account");
-                mbIsCreditByUser = resultSet.getBoolean("b_cred_usr");
+                msPaymentAccount = resultSet.getString("bp_ct.pay_account");
+                msNumberExporter = resultSet.getString("bp_ct.num_exporter");
+                mbIsCreditByUser = resultSet.getBoolean("bp_ct.b_cred_usr");
                 mbIsGuaranteeInProcess = resultSet.getBoolean("bp_ct.b_garnt_prc");
                 mbIsInsuranceInProcess = resultSet.getBoolean("bp_ct.b_insur_prc");
                 mbIsDeleted = resultSet.getBoolean("bp_ct.b_del");
@@ -350,7 +355,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
                     "{ CALL erp.bpsu_bp_ct_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?," +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?," +
-                    "?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkBizPartnerId);
             callableStatement.setInt(nParam++, mnPkBizPartnerCategoryId);
             callableStatement.setString(nParam++, msKey);
@@ -363,6 +368,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
             callableStatement.setDate(nParam++, new java.sql.Date(mtDateStart.getTime()));
             if (mtDateEnd_n != null) callableStatement.setDate(nParam++, new java.sql.Date(mtDateEnd_n.getTime())); else callableStatement.setNull(nParam++, java.sql.Types.DATE);
             callableStatement.setString(nParam++, msPaymentAccount);
+            callableStatement.setString(nParam++, msNumberExporter);
             callableStatement.setBoolean(nParam++, mbIsCreditByUser);
             callableStatement.setBoolean(nParam++, mbIsGuaranteeInProcess);
             callableStatement.setBoolean(nParam++, mbIsInsuranceInProcess);
