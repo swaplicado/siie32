@@ -14,7 +14,7 @@ import sa.lib.SLibConsts;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Edwin Carmona
  */
 public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
