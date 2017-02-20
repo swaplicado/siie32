@@ -97,7 +97,7 @@ import sa.lib.srv.SSrvUtils;
 
 /**
  *
- * @author  Sergio Flores, Edwin Carmona, Uriel Castañeda, juan Barajas
+ * @author  Sergio Flores, Edwin Carmona, Uriel Castañeda, Juan Barajas
  */
 public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, erp.lib.form.SFormExtendedInterface {
 
@@ -179,9 +179,20 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.lib.form.SFormField moFieldBulkType;
     private erp.lib.form.SFormField moFieldBulkQty;
     private erp.lib.form.SFormField moFieldFileXml;
+    
     private erp.lib.form.SFormField moFieldFkCfdUseId;
     private erp.lib.form.SFormField moFieldCfdConfirmationNumber;
-
+    
+    private erp.lib.form.SFormField moFieldCfdCceReasonTransfer;
+    private erp.lib.form.SFormField moFieldCfdCceOperationType;
+    private erp.lib.form.SFormField moFieldCfdCceNumberImportRequest;
+    private erp.lib.form.SFormField moFieldCfdCceCertificateOrigin;
+    private erp.lib.form.SFormField moFieldCfdCceNumberCertificateOrigin;
+    private erp.lib.form.SFormField moFieldCfdCceSubdivision;
+    private erp.lib.form.SFormField moFieldCfdCceExchangeRateUSD;
+    private erp.lib.form.SFormField moFieldCfdCceTotalUSD;
+    private erp.lib.form.SFormField moFieldCfdCceNumberReliableExporter;
+    
     private int[] manDpsClassKey;
     private int[] manDpsClassPreviousKey;
     private int[] manParamAdjustmentSubtypeKey;
@@ -493,16 +504,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbFkContactId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jpOtherLogistics = new javax.swing.JPanel();
         jPanel49 = new javax.swing.JPanel();
-        jPanel50 = new javax.swing.JPanel();
-        jlFkIncotermId = new javax.swing.JLabel();
-        jcbFkIncotermId = new javax.swing.JComboBox<SFormComponentItem>();
-        jbFkIncotermId = new javax.swing.JButton();
-        jPanel84 = new javax.swing.JPanel();
-        jlFkSpotSrcId_n = new javax.swing.JLabel();
-        jcbFkSpotSrcId_n = new javax.swing.JComboBox<SFormComponentItem>();
-        jPanel85 = new javax.swing.JPanel();
-        jlFkSpotDesId_n = new javax.swing.JLabel();
-        jcbFkSpotDesId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel51 = new javax.swing.JPanel();
         jlFkModeOfTransportationTypeId = new javax.swing.JLabel();
         jcbFkModeOfTransportationTypeId = new javax.swing.JComboBox<SFormComponentItem>();
@@ -599,6 +600,48 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel94 = new javax.swing.JPanel();
         jlFkCfdConfirmationNum = new javax.swing.JLabel();
         jtfCfdConfirmationNum = new javax.swing.JTextField();
+        jpInternationalTrade = new javax.swing.JPanel();
+        jPanel107 = new javax.swing.JPanel();
+        jPanel105 = new javax.swing.JPanel();
+        jPanel97 = new javax.swing.JPanel();
+        jPanel50 = new javax.swing.JPanel();
+        jlFkIncotermId = new javax.swing.JLabel();
+        jcbFkIncotermId = new javax.swing.JComboBox<SFormComponentItem>();
+        jbFkIncotermId = new javax.swing.JButton();
+        jPanel84 = new javax.swing.JPanel();
+        jlFkSpotSrcId_n = new javax.swing.JLabel();
+        jcbFkSpotSrcId_n = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel85 = new javax.swing.JPanel();
+        jlFkSpotDesId_n = new javax.swing.JLabel();
+        jcbFkSpotDesId_n = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel98 = new javax.swing.JPanel();
+        jlCfdCceReasonTransfer = new javax.swing.JLabel();
+        jcbCfdCceReasonTransfer = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel99 = new javax.swing.JPanel();
+        jlCfdCceOperationType = new javax.swing.JLabel();
+        jcbCfdCceOperationType = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel100 = new javax.swing.JPanel();
+        jlCfdCceNumberImportRequest = new javax.swing.JLabel();
+        jcbCfdCceNumberImportRequest = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel101 = new javax.swing.JPanel();
+        jlCfdCceCertificateOrigin = new javax.swing.JLabel();
+        jtfCfdCceCertificateOrigin = new javax.swing.JTextField();
+        jPanel102 = new javax.swing.JPanel();
+        jlCfdCceNumberCertificateOrigin = new javax.swing.JLabel();
+        jtfCfdCceNumberCertificateOrigin = new javax.swing.JTextField();
+        jPanel108 = new javax.swing.JPanel();
+        jlCfdCceSubdivision = new javax.swing.JLabel();
+        jtfCfdCceSubdivision = new javax.swing.JTextField();
+        jPanel106 = new javax.swing.JPanel();
+        jlCfdCceNumberReliableExporter = new javax.swing.JLabel();
+        jtfCfdCceNumberReliableExporter = new javax.swing.JTextField();
+        jPanel96 = new javax.swing.JPanel();
+        jPanel103 = new javax.swing.JPanel();
+        jlCfdCceExchangeRateUSD = new javax.swing.JLabel();
+        jtfCfdCceExchangeRateUSD = new javax.swing.JTextField();
+        jPanel104 = new javax.swing.JPanel();
+        jlCfdCceTotalUSD = new javax.swing.JLabel();
+        jtfCfdCceTotalUSD = new javax.swing.JTextField();
         jpControls = new javax.swing.JPanel();
         jpControlsRecord = new javax.swing.JPanel();
         jpControlsButtons = new javax.swing.JPanel();
@@ -1674,48 +1717,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel49.setLayout(new java.awt.GridLayout(10, 1, 0, 1));
 
-        jPanel50.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel50.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
-
-        jlFkIncotermId.setText("Incoterm:*");
-        jlFkIncotermId.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel50.add(jlFkIncotermId);
-
-        jcbFkIncotermId.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel50.add(jcbFkIncotermId);
-
-        jbFkIncotermId.setText("...");
-        jbFkIncotermId.setToolTipText("Seleccionar Incoterm");
-        jbFkIncotermId.setFocusable(false);
-        jbFkIncotermId.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel50.add(jbFkIncotermId);
-
-        jPanel49.add(jPanel50);
-
-        jPanel84.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel84.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
-
-        jlFkSpotSrcId_n.setText("Origen:");
-        jlFkSpotSrcId_n.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel84.add(jlFkSpotSrcId_n);
-
-        jcbFkSpotSrcId_n.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel84.add(jcbFkSpotSrcId_n);
-
-        jPanel49.add(jPanel84);
-
-        jPanel85.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel85.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
-
-        jlFkSpotDesId_n.setText("Destino:");
-        jlFkSpotDesId_n.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel85.add(jlFkSpotDesId_n);
-
-        jcbFkSpotDesId_n.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel85.add(jcbFkSpotDesId_n);
-
-        jPanel49.add(jPanel85);
-
         jPanel51.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel51.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
@@ -2144,6 +2145,191 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jTabbedPane.addTab("Datos CFD", jpAddendaData);
 
+        jpInternationalTrade.setLayout(new java.awt.BorderLayout());
+
+        jPanel107.setLayout(new java.awt.GridLayout(1, 2));
+
+        jPanel105.setLayout(new java.awt.GridLayout(1, 2));
+
+        jPanel97.setLayout(new java.awt.GridLayout(10, 1, 0, 2));
+
+        jPanel50.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel50.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlFkIncotermId.setText("Incoterm:*");
+        jlFkIncotermId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel50.add(jlFkIncotermId);
+
+        jcbFkIncotermId.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel50.add(jcbFkIncotermId);
+
+        jbFkIncotermId.setText("...");
+        jbFkIncotermId.setToolTipText("Seleccionar Incoterm");
+        jbFkIncotermId.setFocusable(false);
+        jbFkIncotermId.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel50.add(jbFkIncotermId);
+
+        jPanel97.add(jPanel50);
+
+        jPanel84.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel84.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlFkSpotSrcId_n.setText("Origen:");
+        jlFkSpotSrcId_n.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel84.add(jlFkSpotSrcId_n);
+
+        jcbFkSpotSrcId_n.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel84.add(jcbFkSpotSrcId_n);
+
+        jPanel97.add(jPanel84);
+
+        jPanel85.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel85.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlFkSpotDesId_n.setText("Destino:");
+        jlFkSpotDesId_n.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel85.add(jlFkSpotDesId_n);
+
+        jcbFkSpotDesId_n.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel85.add(jcbFkSpotDesId_n);
+
+        jPanel97.add(jPanel85);
+
+        jPanel98.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel98.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlCfdCceReasonTransfer.setText("Motivo de traslado:");
+        jlCfdCceReasonTransfer.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel98.add(jlCfdCceReasonTransfer);
+
+        jcbCfdCceReasonTransfer.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel98.add(jcbCfdCceReasonTransfer);
+
+        jPanel97.add(jPanel98);
+
+        jPanel99.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel99.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlCfdCceOperationType.setText("Tipo operación:");
+        jlCfdCceOperationType.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel99.add(jlCfdCceOperationType);
+
+        jcbCfdCceOperationType.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel99.add(jcbCfdCceOperationType);
+
+        jPanel97.add(jPanel99);
+
+        jPanel100.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel100.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlCfdCceNumberImportRequest.setText("Clave de pedimento:");
+        jlCfdCceNumberImportRequest.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel100.add(jlCfdCceNumberImportRequest);
+
+        jcbCfdCceNumberImportRequest.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel100.add(jcbCfdCceNumberImportRequest);
+
+        jPanel97.add(jPanel100);
+
+        jPanel101.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel101.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlCfdCceCertificateOrigin.setText("Certificado origen:");
+        jlCfdCceCertificateOrigin.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel101.add(jlCfdCceCertificateOrigin);
+
+        jtfCfdCceCertificateOrigin.setText("ABC000ABC000");
+        jtfCfdCceCertificateOrigin.setToolTipText("Referencia");
+        jtfCfdCceCertificateOrigin.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel101.add(jtfCfdCceCertificateOrigin);
+
+        jPanel97.add(jPanel101);
+
+        jPanel102.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel102.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlCfdCceNumberCertificateOrigin.setText("Número certificado origen:");
+        jlCfdCceNumberCertificateOrigin.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel102.add(jlCfdCceNumberCertificateOrigin);
+
+        jtfCfdCceNumberCertificateOrigin.setText("ABC000ABC000");
+        jtfCfdCceNumberCertificateOrigin.setToolTipText("Referencia");
+        jtfCfdCceNumberCertificateOrigin.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel102.add(jtfCfdCceNumberCertificateOrigin);
+
+        jPanel97.add(jPanel102);
+
+        jPanel108.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel108.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlCfdCceSubdivision.setText("Subdivisión:");
+        jlCfdCceSubdivision.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel108.add(jlCfdCceSubdivision);
+
+        jtfCfdCceSubdivision.setText("ABC000ABC000");
+        jtfCfdCceSubdivision.setToolTipText("Referencia");
+        jtfCfdCceSubdivision.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel108.add(jtfCfdCceSubdivision);
+
+        jPanel97.add(jPanel108);
+
+        jPanel106.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel106.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlCfdCceNumberReliableExporter.setText("Número exportador confiable:");
+        jlCfdCceNumberReliableExporter.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel106.add(jlCfdCceNumberReliableExporter);
+
+        jtfCfdCceNumberReliableExporter.setText("ABC000ABC000");
+        jtfCfdCceNumberReliableExporter.setToolTipText("Referencia");
+        jtfCfdCceNumberReliableExporter.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel106.add(jtfCfdCceNumberReliableExporter);
+
+        jPanel97.add(jPanel106);
+
+        jPanel105.add(jPanel97);
+
+        jPanel96.setLayout(new java.awt.GridLayout(10, 1, 0, 2));
+
+        jPanel103.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel103.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlCfdCceExchangeRateUSD.setText("Tipo de cambio USD:");
+        jlCfdCceExchangeRateUSD.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel103.add(jlCfdCceExchangeRateUSD);
+
+        jtfCfdCceExchangeRateUSD.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfCfdCceExchangeRateUSD.setText("0.0000");
+        jtfCfdCceExchangeRateUSD.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel103.add(jtfCfdCceExchangeRateUSD);
+
+        jPanel96.add(jPanel103);
+
+        jPanel104.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel104.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlCfdCceTotalUSD.setText("Total USD:");
+        jlCfdCceTotalUSD.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel104.add(jlCfdCceTotalUSD);
+
+        jtfCfdCceTotalUSD.setEditable(false);
+        jtfCfdCceTotalUSD.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jtfCfdCceTotalUSD.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfCfdCceTotalUSD.setText("0,000,000,000.00");
+        jtfCfdCceTotalUSD.setFocusable(false);
+        jtfCfdCceTotalUSD.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel104.add(jtfCfdCceTotalUSD);
+
+        jPanel96.add(jPanel104);
+
+        jPanel105.add(jPanel96);
+
+        jPanel107.add(jPanel105);
+
+        jpInternationalTrade.add(jPanel107, java.awt.BorderLayout.NORTH);
+
+        jTabbedPane.addTab("Comercio exterior", jpInternationalTrade);
+
         jpDocument.add(jTabbedPane, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jpDocument, java.awt.BorderLayout.CENTER);
@@ -2322,11 +2508,31 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldNumberNoteIn.setTabbedPaneIndex(3, jTabbedPane);
         moFieldFileXml = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfFileXml, jlFileXml);
         moFieldFileXml.setTabbedPaneIndex(3, jTabbedPane);
+        
         moFieldFkCfdUseId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdUseId, jlCfdUseId);
         moFieldFkCfdUseId.setTabbedPaneIndex(3, jTabbedPane);
         moFieldCfdConfirmationNumber = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCfdConfirmationNum, jlCfdAddendaSubtypeId);
         moFieldCfdConfirmationNumber.setTabbedPaneIndex(3, jTabbedPane);
         moFieldCfdConfirmationNumber.setLengthMax(25);
+        
+        moFieldCfdCceReasonTransfer = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdCceReasonTransfer, jlCfdCceReasonTransfer);
+        moFieldCfdCceReasonTransfer.setTabbedPaneIndex(4, jTabbedPane);
+        moFieldCfdCceOperationType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdCceOperationType, jlCfdCceOperationType);
+        moFieldCfdCceOperationType.setTabbedPaneIndex(4, jTabbedPane);
+        moFieldCfdCceNumberImportRequest = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdCceNumberImportRequest, jlCfdCceNumberImportRequest);
+        moFieldCfdCceNumberImportRequest.setTabbedPaneIndex(4, jTabbedPane);
+        moFieldCfdCceCertificateOrigin = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfCfdCceCertificateOrigin, jlCfdCceCertificateOrigin);
+        moFieldCfdCceCertificateOrigin.setTabbedPaneIndex(4, jTabbedPane);
+        moFieldCfdCceNumberCertificateOrigin = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCfdCceNumberCertificateOrigin, jlCfdCceNumberCertificateOrigin);
+        moFieldCfdCceNumberCertificateOrigin.setTabbedPaneIndex(4, jTabbedPane);
+        moFieldCfdCceSubdivision = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfCfdCceSubdivision, jlCfdCceSubdivision);
+        moFieldCfdCceSubdivision.setTabbedPaneIndex(4, jTabbedPane);
+        moFieldCfdCceNumberReliableExporter = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCfdCceNumberReliableExporter, jlCfdCceNumberReliableExporter);
+        moFieldCfdCceNumberReliableExporter.setTabbedPaneIndex(4, jTabbedPane);
+        moFieldCfdCceExchangeRateUSD = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfCfdCceExchangeRateUSD, jlCfdCceExchangeRateUSD);
+        moFieldCfdCceExchangeRateUSD.setTabbedPaneIndex(4, jTabbedPane);
+        moFieldCfdCceTotalUSD = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfCfdCceTotalUSD, jlCfdCceTotalUSD);
+        moFieldCfdCceTotalUSD.setTabbedPaneIndex(4, jTabbedPane);
 
         mvFields.add(moFieldDate);
         mvFields.add(moFieldNumberSeries);
@@ -2367,9 +2573,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mvFields.add(moFieldFkProductionOrderId_n);
         mvFields.add(moFieldTicket);
         mvFields.add(moFieldFkContactId_n);
-        mvFields.add(moFieldFkIncotermId);
-        mvFields.add(moFieldFkSpotSrcId_n);
-        mvFields.add(moFieldFkSpotDesId_n);
         mvFields.add(moFieldFkModeOfTransportationTypeId);
         mvFields.add(moFieldFkCarrierTypeId);
         mvFields.add(moFieldFkCarrierId_n);
@@ -2395,6 +2598,19 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mvFields.add(moFieldFileXml);
         mvFields.add(moFieldFkCfdUseId);
         mvFields.add(moFieldCfdConfirmationNumber);
+        
+        mvFields.add(moFieldFkIncotermId);
+        mvFields.add(moFieldFkSpotSrcId_n);
+        mvFields.add(moFieldFkSpotDesId_n);
+        mvFields.add(moFieldCfdCceReasonTransfer);
+        mvFields.add(moFieldCfdCceOperationType);
+        mvFields.add(moFieldCfdCceNumberImportRequest);
+        mvFields.add(moFieldCfdCceCertificateOrigin);
+        mvFields.add(moFieldCfdCceNumberCertificateOrigin);
+        mvFields.add(moFieldCfdCceSubdivision);
+        mvFields.add(moFieldCfdCceExchangeRateUSD);
+        mvFields.add(moFieldCfdCceTotalUSD);
+        mvFields.add(moFieldCfdCceNumberReliableExporter);
 
         if (mnFormType == SDataConstantsSys.TRNS_CT_DPS_PUR) {
             moPickerBizPartner = new SFormOptionPickerBizPartner(miClient, SDataConstants.BPSX_BP_SUP);
@@ -2620,6 +2836,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         jTabbedPane.setEnabledAt(3, false);
                         renderAddendaData(false);
                     }
+                    
+                    // Enable TabbedPane for information of international trade:
+                    
+                    if (moBizPartner != null && (mbIsDoc || mbIsAdj) && (!mbIsSales || isCfdNeeded() || isCfdiNeeded()) && 
+                            (moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n() != SLibConstants.UNDEFINED &&
+                            !miClient.getSession().getSessionCustom().isLocalCountry(new int[] { moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n() }))) {
+                        jTabbedPane.setEnabledAt(4, true);
+                    }
+                    else {
+                        jTabbedPane.setEnabledAt(4, true);
+                    }
 
                     jbCancel.requestFocus();
                 }
@@ -2731,6 +2958,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     else {
                         jTabbedPane.setEnabledAt(3, false);
                         renderAddendaData(false);
+                    }
+                    
+                    // Enable TabbedPane for information of international trade:
+                    
+                    if (moBizPartner != null && (mbIsDoc || mbIsAdj) && (!mbIsSales || isCfdNeeded() || isCfdiNeeded()) && 
+                            (moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n() != SLibConstants.UNDEFINED &&
+                            !miClient.getSession().getSessionCustom().isLocalCountry(new int[] { moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n() }))) {
+                        jTabbedPane.setEnabledAt(4, true);
+                    }
+                    else {
+                        jTabbedPane.setEnabledAt(4, true);
                     }
 
                     if (bContinue) {
@@ -3277,9 +3515,24 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
     private void renderCatalogForCfd() {
         try {
+            // Catalog for CFD version 3.3:
+            
             for (SFormComponentItem item : SCatalogXmlUtils.getComponentItems((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, moFieldDate.getDate() == null ? miClient.getSessionXXX().getWorkingDate() : moFieldDate.getDate())) {
                 jcbCfdUseId.addItem(item);
             }
+            
+            // Catalog for internatonal trade complement:
+            
+            for (SFormComponentItem item : SCatalogXmlUtils.getComponentItems((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, moFieldDate.getDate() == null ? miClient.getSessionXXX().getWorkingDate() : moFieldDate.getDate())) {
+                jcbCfdCceReasonTransfer.addItem(item);
+            }
+            for (SFormComponentItem item : SCatalogXmlUtils.getComponentItems((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, moFieldDate.getDate() == null ? miClient.getSessionXXX().getWorkingDate() : moFieldDate.getDate())) {
+                jcbCfdCceOperationType.addItem(item);
+            }
+            for (SFormComponentItem item : SCatalogXmlUtils.getComponentItems((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, moFieldDate.getDate() == null ? miClient.getSessionXXX().getWorkingDate() : moFieldDate.getDate())) {
+                jcbCfdCceNumberImportRequest.addItem(item);
+            }
+            
         }
         catch (Exception e) {
             SLibUtilities.renderException(this, e);
@@ -3441,6 +3694,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 jtfBizPartnerBranchAddress02Ro.setCaretPosition(0);
             }
         }
+        
+        renderBizPartnerPrepaymentsBalance();
     }
 
     private void renderBizPartnerPrepaymentsBalance() {
@@ -4449,9 +4704,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             updateDpsWithBizPartnerSettings();
         }
 
-        adecuatePaymentTypeSettings();
         renderBizPartner();
-        renderBizPartnerPrepaymentsBalance();
     }
 
     private void prepareDpsEntryComplementary(erp.mtrn.data.SDataDpsEntry oDpsEntryAdjustment, erp.mtrn.data.SDataDpsEntry oDpsEntryComplementary) {
@@ -6379,6 +6632,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jTabbedPane.setEnabledAt(3, false);
             renderAddendaData(false);
         }
+        
+        // Enable TabbedPane for information of international trade:
+        
+        if (moBizPartner != null && (mbIsDoc || mbIsAdj) && (!mbIsSales || isCfdNeeded() || isCfdiNeeded()) && 
+                (moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n() != SLibConstants.UNDEFINED &&
+                !miClient.getSession().getSessionCustom().isLocalCountry(new int[] { moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n() }))) {
+            jTabbedPane.setEnabledAt(4, true);
+        }
+        else {
+            jTabbedPane.setEnabledAt(4, true);
+                    }
     }
 
     private void itemChangeFkPaymentTypeId(boolean reset) {
@@ -6803,6 +7067,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel100;
+    private javax.swing.JPanel jPanel101;
+    private javax.swing.JPanel jPanel102;
+    private javax.swing.JPanel jPanel103;
+    private javax.swing.JPanel jPanel104;
+    private javax.swing.JPanel jPanel105;
+    private javax.swing.JPanel jPanel106;
+    private javax.swing.JPanel jPanel107;
+    private javax.swing.JPanel jPanel108;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
@@ -6895,6 +7168,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JPanel jPanel92;
     private javax.swing.JPanel jPanel93;
     private javax.swing.JPanel jPanel94;
+    private javax.swing.JPanel jPanel96;
+    private javax.swing.JPanel jPanel97;
+    private javax.swing.JPanel jPanel98;
+    private javax.swing.JPanel jPanel99;
     private javax.swing.JTabbedPane jTabbedPane;
     private javax.swing.JButton jbBizPartnerBalance;
     private javax.swing.JButton jbCancel;
@@ -6935,6 +7212,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbTaxRegionId;
     private javax.swing.JComboBox<SFormComponentItem> jcbAdjustmentSubtypeId;
     private javax.swing.JComboBox<SFormComponentItem> jcbCfdAddendaSubtypeId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbCfdCceNumberImportRequest;
+    private javax.swing.JComboBox<SFormComponentItem> jcbCfdCceOperationType;
+    private javax.swing.JComboBox<SFormComponentItem> jcbCfdCceReasonTransfer;
     private javax.swing.JComboBox<SFormComponentItem> jcbCfdUseId;
     private javax.swing.JComboBox jcbDriver;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCarrierId_n;
@@ -6994,6 +7274,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlBulkQuantity;
     private javax.swing.JLabel jlBulkType;
     private javax.swing.JLabel jlCfdAddendaSubtypeId;
+    private javax.swing.JLabel jlCfdCceCertificateOrigin;
+    private javax.swing.JLabel jlCfdCceExchangeRateUSD;
+    private javax.swing.JLabel jlCfdCceNumberCertificateOrigin;
+    private javax.swing.JLabel jlCfdCceNumberImportRequest;
+    private javax.swing.JLabel jlCfdCceNumberReliableExporter;
+    private javax.swing.JLabel jlCfdCceOperationType;
+    private javax.swing.JLabel jlCfdCceReasonTransfer;
+    private javax.swing.JLabel jlCfdCceSubdivision;
+    private javax.swing.JLabel jlCfdCceTotalUSD;
     private javax.swing.JLabel jlCfdUseId;
     private javax.swing.JLabel jlCompanyBranch;
     private javax.swing.JLabel jlCurrency;
@@ -7067,6 +7356,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JPanel jpEntriesControlsEast;
     private javax.swing.JPanel jpEntriesControlsWest;
     private javax.swing.JPanel jpHeader;
+    private javax.swing.JPanel jpInternationalTrade;
     private javax.swing.JPanel jpMarketing;
     private javax.swing.JPanel jpNotes;
     private javax.swing.JPanel jpNotesControls;
@@ -7091,6 +7381,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JTextField jtfBizPartnerRo;
     private javax.swing.JTextField jtfBulkQuantity;
     private javax.swing.JTextField jtfBulkType;
+    private javax.swing.JTextField jtfCfdCceCertificateOrigin;
+    private javax.swing.JTextField jtfCfdCceExchangeRateUSD;
+    private javax.swing.JTextField jtfCfdCceNumberCertificateOrigin;
+    private javax.swing.JTextField jtfCfdCceNumberReliableExporter;
+    private javax.swing.JTextField jtfCfdCceSubdivision;
+    private javax.swing.JTextField jtfCfdCceTotalUSD;
     private javax.swing.JTextField jtfCfdConfirmationNum;
     private javax.swing.JTextField jtfCompanyBranchCodeRo;
     private javax.swing.JTextField jtfCompanyBranchRo;
@@ -7284,15 +7580,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
 
         renderBasicSettings();
-        adecuatePaymentTypeSettings();
-
         renderDpsType();
         renderDpsValue();
         renderDpsStatus();
         renderRecordManual();
         renderRecordAutomatic();
+        
         renderBizPartner();
-        renderBizPartnerPrepaymentsBalance();
+        
         renderDateMaturity();
         renderSalesAgentBizPartner(null);
         renderSalesAgent(null);
@@ -7317,6 +7612,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jTabbedPane.setSelectedIndex(0);
         jTabbedPane.setEnabledAt(3, false);
+        jTabbedPane.setEnabledAt(4, false);
 
         updateFormEditStatus(true);
         jbEdit.setEnabled(false);
@@ -7936,7 +8232,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldFkPaymentTypeId.setFieldValue(new int[] { moDps.getFkPaymentTypeId() });
         moFieldFkPaymentSystemTypeId.setFieldValue(new int[] { moDps.getFkPaymentSystemTypeId() });
         renderLastPaymentSettings(moDps.getFkBizPartnerId_r());
-        moFieldCfdConfirmationNumber.setFieldValue(moDps.getXtaCfdConfirmacion());
+        moFieldCfdConfirmationNumber.setFieldValue(moDps.getXtaCfdConfirmation());
         moFieldFkLanguajeId.setFieldValue(new int[] { moDps.getFkLanguajeId() });
         moFieldFkFunctionalAreaId.setFieldValue(new int[] { moDps.getFkFunctionalAreaId() });
         moFieldFkDpsNatureId.setFieldValue(new int[] { moDps.getFkDpsNatureId() });
@@ -7956,7 +8252,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldFkProductionOrderId_n.setFieldValue(new int[] { moDps.getFkMfgYearId_n(), moDps.getFkMfgOrderId_n() });
         
         try {
-            moFieldFkCfdUseId.setFieldValue(SCatalogXmlUtils.getNameEntry((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, moDps.getDate(), moDps.getXtaCfdUsoCfdi()));
+            moFieldFkCfdUseId.setFieldValue(SCatalogXmlUtils.getNameEntry((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, moDps.getDate(), moDps.getXtaCfdUseCfdi()));
         }
         catch (Exception e) {
             SLibUtilities.renderException(this, e);
@@ -7987,13 +8283,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
         }
 
+        renderBasicSettings();
         renderDpsType();
         renderDpsValue();
         renderDpsStatus();
         renderRecordManual();
         renderRecordAutomatic();
+        
         renderBizPartner();
-        renderBizPartnerPrepaymentsBalance();
+
         renderDateMaturity();
         renderSalesAgentBizPartner(moDps.getFkSalesAgentBizPartnerId_n() == 0 ? null : new int[] { moDps.getFkSalesAgentBizPartnerId_n() });
         renderSalesAgent(moDps.getFkSalesAgentId_n() == 0 ? null : new int[] { moDps.getFkSalesAgentId_n() });
@@ -8047,8 +8345,29 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
         }
         
-        if (!mbIsSales && (mbIsDoc || mbIsAdj)) {
-            
+        // Enable TabbedPane for information of international trade:
+        
+        if ((mbIsDoc || mbIsAdj) && (!mbIsSales || isCfdNeeded() || isCfdiNeeded()) && 
+                (moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n() != SLibConstants.UNDEFINED &&
+                !miClient.getSession().getSessionCustom().isLocalCountry(new int[] { moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n() }))) {
+            jTabbedPane.setEnabledAt(4, true);
+        }
+        
+        // Set information of international trade:
+        
+        try {
+            moFieldCfdCceReasonTransfer.setFieldValue(SCatalogXmlUtils.getNameEntry((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, moDps.getDate(), moDps.getXtaCfdCceReasonTransfer()));
+            moFieldCfdCceOperationType.setFieldValue(SCatalogXmlUtils.getNameEntry((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, moDps.getDate(), moDps.getXtaCfdCceOperationType()));
+            moFieldCfdCceNumberImportRequest.setFieldValue(SCatalogXmlUtils.getNameEntry((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, moDps.getDate(), moDps.getXtaCfdCceNumberImportRequest()));
+            moFieldCfdCceCertificateOrigin.setFieldValue(moDps.getXtaCfdCceCertificateOrigin());
+            moFieldCfdCceNumberCertificateOrigin.setFieldValue(moDps.getXtaCfdCceNumberCertificateOrigin());
+            moFieldCfdCceSubdivision.setFieldValue(moDps.getXtaCfdCceSubdivision());
+            moFieldCfdCceNumberReliableExporter.setFieldValue(moDps.getXtaCfdCceNumberReliableExporter());
+            moFieldCfdCceExchangeRateUSD.setFieldValue(moDps.getXtaCfdCceExchangeRateUSD());
+            moFieldCfdCceTotalUSD.setFieldValue(moDps.getXtaCfdCceTotalUSD());
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
         }
 
         mdOrigExchangeRate = moFieldExchangeRate.getDouble();
@@ -8135,7 +8454,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moDps.setFkPaymentSystemTypeId(moFieldFkPaymentSystemTypeId.getKeyAsIntArray()[0] == SLibConstants.UNDEFINED ? SDataConstantsSys.TRNU_TP_PAY_SYS_NA : moFieldFkPaymentSystemTypeId.getKeyAsIntArray()[0]);
         moDps.setPaymentMethod(moFieldFkPaymentSystemTypeId.getString());
         moDps.setPaymentAccount(moFieldPaymentAccount.getString());
-        moDps.setXtaCfdConfirmacion(moFieldCfdConfirmationNumber.getString());
+        moDps.setXtaCfdConfirmation(moFieldCfdConfirmationNumber.getString());
         
         moDps.setFkDpsStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);   // all saved documents have "emited" status
         moDps.setFkDpsNatureId(SDataConstantsSys.TRNU_DPS_NAT_DEF);   // all saved documents have "default" nature
@@ -8189,7 +8508,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moDps.setFkMfgYearId_n(moFieldFkProductionOrderId_n.getKeyAsIntArray()[0]);
         moDps.setFkMfgOrderId_n(moFieldFkProductionOrderId_n.getKeyAsIntArray()[1]);
         //moDps.setFkCfdRelationType(...
-        moDps.setXtaCfdUsoCfdi((String) moFieldFkCfdUseId.getKey());
+        moDps.setXtaCfdUseCfdi((String) moFieldFkCfdUseId.getKey());
 
         // Fields non editable in form (allready set for new documents in formReset() function):
 
@@ -8226,6 +8545,16 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moDps.setDbmsRecordKey(moRecordUserKey);
             moDps.getRegistryComplements().add(moRecordUserLock);
         }
+        
+        moDps.setXtaCfdCceReasonTransfer((String) moFieldCfdCceReasonTransfer.getKey());
+        moDps.setXtaCfdCceOperationType((String) moFieldCfdCceOperationType.getKey());
+        moDps.setXtaCfdCceNumberImportRequest((String) moFieldCfdCceNumberImportRequest.getKey());
+        moDps.setXtaCfdCceCertificateOrigin(moFieldCfdCceCertificateOrigin.getInteger());
+        moDps.setXtaCfdCceNumberCertificateOrigin(moFieldCfdCceNumberCertificateOrigin.getString());
+        moDps.setXtaCfdCceSubdivision(moFieldCfdCceSubdivision.getInteger());
+        moDps.setXtaCfdCceNumberReliableExporter(moFieldCfdCceNumberReliableExporter.getString());
+        moDps.setXtaCfdCceExchangeRateUSD(moFieldCfdCceExchangeRateUSD.getDouble());
+        moDps.setXtaCfdCceTotalUSD(moFieldCfdCceTotalUSD.getDouble());
 
         // Set params for CFD:
 
