@@ -158,8 +158,10 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 aoTableColumns = new STableColumn[33];
                 break;
             case SDataConstants.BPSX_BP_SUP:
-            case SDataConstants.BPSX_BP_CUS:
                 aoTableColumns = new STableColumn[34];
+                break;
+            case SDataConstants.BPSX_BP_CUS:
+                aoTableColumns = new STableColumn[37];
                 break;
             case SDataConstants.BPSX_BP_CDR:
             case SDataConstants.BPSX_BP_DBR:
@@ -362,6 +364,12 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         if (mnTabTypeAux01 == SDataConstants.BPSX_BP_CO || mnTabTypeAux01 == SDataConstants.BPSX_BP_SUP || mnTabTypeAux01 == SDataConstants.BPSX_BP_CUS) {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.cur_key", "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "l.lan_key", "Idioma", 50);
+        }
+        
+        if (mnTabTypeAux01 == SDataConstants.BPSX_BP_CUS) {
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "us.usr", "Usr. analista", 100);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tpy.tp_pay_sys", "Forma de pago", 100);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.pay_account", "Cuenta bancaria", 100);
         }
 
         if (mnTabTypeAux01 != SDataConstants.BPSU_BP && mnTabTypeAux01 != SDataConstants.BPSX_BP_ATT_SAL_AGT && mnTabTypeAux01 != SDataConstants.BPSX_BP_EMP &&
@@ -680,7 +688,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 "tp_bp.tp_bp_idy, tax_tp.tax_idy, bp.b_att_bank, bp.b_att_car, bp.b_att_sal_agt, bp.b_att_emp, bp.b_att_par_shh, bp.b_att_rel_pty, " +
                 (mnTabTypeAux01 == SDataConstants.BPSU_BP || mnTabTypeAux01 == SDataConstants.BPSX_BP_ATT_SAL_AGT || mnTabTypeAux01 == SDataConstants.BPSX_BP_EMP ||
                 mnTabTypeAux01 == SDataConstants.BPSX_BP_ATT_BANK || mnTabTypeAux01 == SDataConstants.BPSX_BP_ATT_CARR ? "" : "bp_ct.b_del, bp_ct.bp_key, bp_ct.co_key, bp_ct.dt_start, bp_ct.dt_end_n, " +
-                "ct.ct_bp, tp.tp_bp, c.cur_key, l.lan_key, ") +
+                "ct.ct_bp, tp.tp_bp, c.cur_key, l.lan_key, us.usr, tpy.tp_pay_sys, bp_ct.pay_account, ") +
                 "(SELECT MAX(dt) FROM trn_dps WHERE b_del = 0 AND fid_bp_r = bp.id_bp AND fid_ct_dps IN(" + SDataConstantsSys.TRNS_CT_DPS_PUR + ", " + SDataConstantsSys.TRNS_CT_DPS_SAL + ") AND " +
                 "fid_cl_dps IN(" + SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1] + ", " + SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[1] + ")) AS f_last_trans, " +
                 (mnTabTypeAux01 != SDataConstants.BPSX_BP_EMP ? "" :
@@ -706,6 +714,8 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 "INNER JOIN erp.bpsu_bp_ct AS bp_ct ON bp.id_bp = bp_ct.id_bp AND bp_ct.fid_ct_bp = " + mnBizPartnerCategory + " " + (sqlCategoryWhere.length() == 0 ? "" : sqlCategoryWhere) +
                 "INNER JOIN erp.bpss_ct_bp AS ct ON bp_ct.fid_ct_bp = ct.id_ct_bp " +
                 "INNER JOIN erp.bpsu_tp_bp AS tp ON bp_ct.fid_ct_bp = tp.id_ct_bp AND bp_ct.fid_tp_bp = tp.id_tp_bp " +
+                "LEFT OUTER JOIN erp.usru_usr AS us ON bp_ct.fid_usr_ana_n = us.id_usr " +
+                "LEFT OUTER JOIN erp.trnu_tp_pay_sys AS tpy ON bp_ct.fid_tp_pay_sys_n = tpy.id_tp_pay_sys " +
                 "LEFT OUTER JOIN erp.cfgu_cur AS c ON bp_ct.fid_cur_n = c.id_cur " +
                 "LEFT OUTER JOIN erp.cfgu_lan AS l ON bp_ct.fid_lan_n = l.id_lan ") +
                 (mnTabTypeAux01 != SDataConstants.BPSX_BP_EMP ? "" :
