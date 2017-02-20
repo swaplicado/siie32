@@ -46,6 +46,7 @@ public class SLayoutBankXmlRow {
     protected int mnRecNumber;
     protected int mnBookkeepingYear;
     protected int mnBookkeepingNumber;
+    protected String msReferenceRecord;
     protected String msObservation;
 
     public SLayoutBankXmlRow() {
@@ -80,6 +81,7 @@ public class SLayoutBankXmlRow {
         mnRecNumber = 0;
         mnBookkeepingYear = 0;
         mnBookkeepingNumber = 0;
+        msReferenceRecord = "";
         msObservation = "";
     }
 
@@ -115,6 +117,7 @@ public class SLayoutBankXmlRow {
     public void setRecNumber(int n) { mnRecNumber = n; }
     public void setBookkeepingYear(int n) { mnBookkeepingYear = n; }
     public void setBookkeepingNumber(int n) { mnBookkeepingNumber = n; }
+    public void setReferenceRecord(String s) { msReferenceRecord = s; }
     public void setObservation(String s) { msObservation = s; }
     
     public int[] getPrimaryKey() {
@@ -162,5 +165,6 @@ public class SLayoutBankXmlRow {
     public int getRecNumber() { return mnRecNumber; }
     public int getBookkeepingYear() { return mnBookkeepingYear; }
     public int getBookkeepingNumber() { return mnBookkeepingNumber; }
+    public String getReferenceRecord() { return msReferenceRecord; }
     public String getObservation() { return msObservation; }
 }

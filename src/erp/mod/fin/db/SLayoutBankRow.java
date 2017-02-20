@@ -76,7 +76,8 @@ public class SLayoutBankRow implements SGridRow {
     protected int mnCf;
     protected int mnApply;
     protected int mnBankKey;
-    protected int mnCurrencyId;    
+    protected int mnCurrencyId;
+    protected String msReferenceRecord;
     protected String msObservation;
     
     protected ArrayList<SDataBizPartnerBranchBankAccount> maBranchBankAccountsCredit;
@@ -141,6 +142,7 @@ public class SLayoutBankRow implements SGridRow {
         mnApply = 0;
         mnBankKey = 0;
         mnCurrencyId = 0;
+        msReferenceRecord = "";
         msObservation = "";
         
         moCodeBankAccountCredit = new HashMap<String, String>();
@@ -194,6 +196,7 @@ public class SLayoutBankRow implements SGridRow {
     public void setApply(int n) { mnApply = n; }
     public void setBankKey(int n) { mnBankKey = n; }
     public void setCurrencyId(int n) { mnCurrencyId = n; }
+    public void setReferenceRecord(String s) { msReferenceRecord = s; }
     public void setObservation(String s) { msObservation = s; }
     public void setAccountCreditArray(ArrayList<SGuiItem> a) { maAccountCredit = a; }
     
@@ -284,6 +287,7 @@ public class SLayoutBankRow implements SGridRow {
     public int getApply() { return mnApply; }
     public int getBankKey() { return mnBankKey; }
     public int getCurrencyId() { return mnCurrencyId; }
+    public String getReferenceRecord() { return msReferenceRecord; }
     public String getObservation() { return msObservation; }
     public ArrayList<SGuiItem> getAccountCreditArray() { return maAccountCredit; }
     public HashMap<String, String> getCodeBankAccountCredit() { return moCodeBankAccountCredit; }
@@ -431,6 +435,9 @@ public class SLayoutBankRow implements SGridRow {
                     value = msBizPartnerCreditFiscalId;
                     break;
                 case 7:
+                    value = msReferenceRecord;
+                    break;
+                case 8:
                     value = msObservation;
                     break;
                 default:
@@ -528,6 +535,9 @@ public class SLayoutBankRow implements SGridRow {
                 case 6:
                     break;
                 case 7:
+                    msReferenceRecord = (String) value;
+                    break;
+                case 8:
                     msObservation = (String) value;
                 default:
                     break;

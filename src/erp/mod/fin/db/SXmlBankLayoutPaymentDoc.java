@@ -21,6 +21,7 @@ public class SXmlBankLayoutPaymentDoc extends SXmlElement {
     public static final String ATT_LAY_ROW_AMT_CY = "AmountCy";
     public static final String ATT_LAY_ROW_CUR = "Currency";
     public static final String ATT_LAY_ROW_EXT_RATE = "ExchangeRate";
+    public static final String ATT_LAY_ROW_REF_REC = "ReferenceRecord";
     public static final String ATT_LAY_ROW_OBS = "Observation";
 
     protected SXmlAttribute moRowDpsYear;
@@ -29,6 +30,7 @@ public class SXmlBankLayoutPaymentDoc extends SXmlElement {
     protected SXmlAttribute moRowAmountCy;
     protected SXmlAttribute moRowCurrency;
     protected SXmlAttribute moRowExchangeRate;
+    protected SXmlAttribute moRowReferenceRecord;
     protected SXmlAttribute moRowObservation;
 
     public SXmlBankLayoutPaymentDoc() {
@@ -40,6 +42,7 @@ public class SXmlBankLayoutPaymentDoc extends SXmlElement {
         moRowAmountCy = new SXmlAttribute(ATT_LAY_ROW_AMT_CY);
         moRowCurrency = new SXmlAttribute(ATT_LAY_ROW_CUR);
         moRowExchangeRate = new SXmlAttribute(ATT_LAY_ROW_EXT_RATE);
+        moRowReferenceRecord = new SXmlAttribute(ATT_LAY_ROW_REF_REC);
         moRowObservation = new SXmlAttribute(ATT_LAY_ROW_OBS);
         
         mvXmlAttributes.add(moRowDpsYear);
@@ -48,6 +51,7 @@ public class SXmlBankLayoutPaymentDoc extends SXmlElement {
         mvXmlAttributes.add(moRowAmountCy);
         mvXmlAttributes.add(moRowCurrency);
         mvXmlAttributes.add(moRowExchangeRate);
+        mvXmlAttributes.add(moRowReferenceRecord);
         mvXmlAttributes.add(moRowObservation);
     }
 }

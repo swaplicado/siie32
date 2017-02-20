@@ -20,6 +20,7 @@ public class SLayoutBankPayment {
     protected int mnFkBookkeepingYearId_n;
     protected int mnFkBookkeepingNumberId_n;
     protected int mnAction;
+    protected String msReferenceRecord;
     
     protected ArrayList<SLayoutBankDps> maLayoutBankDps;
 
@@ -30,6 +31,7 @@ public class SLayoutBankPayment {
         mnBizPartnerBranchBankAccountId = bizPartnerBranchBankAccountId;
         mnFkBookkeepingYearId_n = 0;
         mnFkBookkeepingNumberId_n = 0;
+        msReferenceRecord = "";
         
         maLayoutBankDps = new ArrayList<SLayoutBankDps>();
     }
@@ -42,6 +44,7 @@ public class SLayoutBankPayment {
     public void setFkBookkeepingYearId_n(int n) { mnFkBookkeepingYearId_n = n; }
     public void setFkBookkeepingNumberId_n(int n) { mnFkBookkeepingNumberId_n = n; }
     public void setAction(int n) { mnAction = n; }
+    public void setReferenceRecord(String s) { msReferenceRecord = s; }
     
     public void setLayoutBankDps(ArrayList<SLayoutBankDps> o) { maLayoutBankDps = o; }
 
@@ -53,6 +56,7 @@ public class SLayoutBankPayment {
     public int getFkBookkeepingYearId_n() { return mnFkBookkeepingYearId_n; }
     public int getFkBookkeepingNumberId_n() { return mnFkBookkeepingNumberId_n; }
     public int getAction() { return mnAction; }
+    public String getReferenceRecord() { return msReferenceRecord; }
     
     public ArrayList<SLayoutBankDps> getLayoutBankDps() { return maLayoutBankDps; }
     
@@ -64,6 +68,7 @@ public class SLayoutBankPayment {
         bankPayment.setFkBookkeepingYearId_n(this.getFkBookkeepingYearId_n());
         bankPayment.setFkBookkeepingNumberId_n(this.getFkBookkeepingNumberId_n());
         bankPayment.setAction(this.getAction());
+        bankPayment.setReferenceRecord(this.getReferenceRecord());
         
         for (SLayoutBankDps bankDps : maLayoutBankDps) {
             bankPayment.getLayoutBankDps().add(bankDps);

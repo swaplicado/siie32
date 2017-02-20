@@ -101,7 +101,8 @@ public class SXmlBankLayout extends SXmlDocument {
                     doc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT_CY).setValue((namedNodeMap.getNamedItem(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT_CY) == null ? 0 : SLibUtils.parseDouble(namedNodeMap.getNamedItem(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT_CY).getNodeValue())));
                     doc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_CUR).setValue((namedNodeMap.getNamedItem(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_CUR) == null ? SLibConsts.UNDEFINED : SLibUtils.parseInt(namedNodeMap.getNamedItem(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_CUR).getNodeValue())));
                     doc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EXT_RATE).setValue((namedNodeMap.getNamedItem(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EXT_RATE) == null ? 0 : SLibUtils.parseDouble(namedNodeMap.getNamedItem(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EXT_RATE).getNodeValue())));
-                    doc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_OBS).setValue((namedNodeMap.getNamedItem(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_OBS) == null ? "" :  (namedNodeMap.getNamedItem(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_OBS).getNodeValue())));
+                    doc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_OBS).setValue((namedNodeMap.getNamedItem(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_OBS) == null ? "" : (namedNodeMap.getNamedItem(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_OBS).getNodeValue())));
+                    doc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_REF_REC).setValue((namedNodeMap.getNamedItem(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_REF_REC) == null ? "" : (namedNodeMap.getNamedItem(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_REF_REC).getNodeValue())));
 
                     row.getXmlElements().add(doc);
                 }

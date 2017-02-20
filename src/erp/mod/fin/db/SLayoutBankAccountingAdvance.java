@@ -47,6 +47,7 @@ public class SLayoutBankAccountingAdvance {
     protected int mnBookkeepingCenterId;
     protected Date mtDate;
     protected String msBizPartner;
+    protected String msReferenceRecord;
     
     protected ArrayList<SDataRecordEntry> maRecordEntries;
 
@@ -67,6 +68,7 @@ public class SLayoutBankAccountingAdvance {
         mnBookkeepingCenterId = 0;
         mtDate = null;
         msBizPartner = "";
+        msReferenceRecord = "";
         
         maRecordEntries = new ArrayList<SDataRecordEntry>();
     }
@@ -88,6 +90,7 @@ public class SLayoutBankAccountingAdvance {
     public void setBookkeepingCenterId(int n) { mnBookkeepingCenterId = n; }
     public void setDate(Date t) { mtDate = t; }
     public void setBizPartner(String s) { msBizPartner = s; }
+    public void setReferenceRecord(String s) { msReferenceRecord = s; }
     
     public void setRecordEntries(ArrayList<SDataRecordEntry> o) { maRecordEntries = o; }
 
@@ -108,6 +111,7 @@ public class SLayoutBankAccountingAdvance {
     public int getBookkeepingCenterId() { return mnBookkeepingCenterId; }
     public Date getDate() { return mtDate; }
     public String getBizPartner() { return msBizPartner; }
+    public String getReferenceRecord() { return msReferenceRecord; }
     
     public ArrayList<SDataRecordEntry> getRecordEntries() { return maRecordEntries; }
     
@@ -161,7 +165,7 @@ public class SLayoutBankAccountingAdvance {
         */
         entry.setPkEntryId(SLibConsts.UNDEFINED);
         entry.setConcept("");
-        entry.setReference("");
+        entry.setReference(msReferenceRecord);
         entry.setIsReferenceTax(false);
         entry.setDebit(mdAmount);
         entry.setCredit(0);

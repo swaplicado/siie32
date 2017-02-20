@@ -703,6 +703,9 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                     column.setEditable(true);
                     gridColumnsForm.add(column);
                     gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "RFC", 100));
+                    column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Referencia", 100, moGridPayments.getTable().getDefaultEditor(String.class));
+                    column.setEditable(true);
+                    gridColumnsForm.add(column);
                     column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Observaciones", 100, moGridPayments.getTable().getDefaultEditor(String.class));
                     column.setEditable(true);
                     gridColumnsForm.add(column);
@@ -1496,6 +1499,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                     xmlRow.setRecNumber(SLibConsts.UNDEFINED);
                     xmlRow.setBookkeepingYear(SLibConsts.UNDEFINED);
                     xmlRow.setBookkeepingNumber(SLibConsts.UNDEFINED);
+                    xmlRow.setReferenceRecord(row.getReferenceRecord());
                     xmlRow.setObservation(row.getObservation());
                     
                     if (mvLayoutRows.get(i).getIsForPayment()) {
@@ -1512,6 +1516,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
         double balanceCyDoc = 0;
         double excRate = 0;
         String observation = "";
+        String referenceRecord = "";
         int dpsYearId = 0;
         int dpsDocId = 0;
         int recUserId = 0;
@@ -1598,6 +1603,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                             balanceDoc = (double) layoutPayDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT).getValue();
                             excRate = (double) layoutPayDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EXT_RATE).getValue();
                             observation = (String) layoutPayDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_OBS).getValue();
+                            referenceRecord = (String) layoutPayDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_REF_REC).getValue();
                             
                             if (dps != null) {
                                 moDps = new SLayoutBankDps(dpsYearId, dpsDocId, dps.getFkDpsCategoryId(), dps.getFkDpsClassId(), dps.getFkDpsTypeId(), dps.getFkCurrencyId(), recUserId, balanceDoc, dps.getExchangeRate());
@@ -1612,6 +1618,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                             
                             moPayment.getAmount().setExchangeRate(dps != null ? dps.getExchangeRate() : SLibConsts.UNDEFINED);
                             moPayment.getLayoutBankDps().add(moDps);
+                            moPayment.setReferenceRecord(referenceRecord);
                             
                             xmlRow = new SLayoutBankXmlRow();
 
@@ -1638,6 +1645,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                             xmlRow.setBajioBankCode((String) layoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_BANK_CODE).getValue());
                             xmlRow.setBajioBankNick((String) layoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_NICK).getValue());
                             xmlRow.setBankKey((int) layoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_KEY).getValue());
+                            xmlRow.setReferenceRecord(referenceRecord);
                             xmlRow.setObservation(observation);
                             
                             if (recordLayout != null) {
@@ -1730,6 +1738,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                                     mvLayoutRows.get(i).setBalancePayed((double) layoutDps.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT).getValue());
                                     mvLayoutRows.get(i).setAccountCredit(mvLayoutRows.get(i).getBranchBankAccountCreditNumber(new int[] { (int) layoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BP).getValue(), (int) layoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).getValue() }, mnLayoutType));
                                     mvLayoutRows.get(i).setObservation((String) layoutDps.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_OBS).getValue());
+                                    mvLayoutRows.get(i).setReferenceRecord((String) layoutDps.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_REF_REC).getValue());
                                 }
                             }
                         }

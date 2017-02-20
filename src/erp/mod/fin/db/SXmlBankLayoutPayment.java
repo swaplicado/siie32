@@ -43,6 +43,7 @@ public class SXmlBankLayoutPayment extends SXmlElement {
     public static final String ATT_LAY_PAY_REC_NUM = "PayRecordNumberId";
     public static final String ATT_LAY_PAY_BKK_YEAR = "PayBkkYearId";
     public static final String ATT_LAY_PAY_BKK_NUM = "PayBkkNumberId";
+    public static final String ATT_LAY_ROW_REF_REC = "ReferenceRecord";
 
     protected SXmlAttribute moPayReference;
     protected SXmlAttribute moPayConcept;
@@ -71,6 +72,7 @@ public class SXmlBankLayoutPayment extends SXmlElement {
     protected SXmlAttribute moPayRecordNumberId;
     protected SXmlAttribute moPayBkkYearId;
     protected SXmlAttribute moPayBkkNumberId;
+    protected SXmlAttribute moRowReferenceRecord;
 
     public SXmlBankLayoutPayment() {
         super(NAME);
@@ -102,6 +104,7 @@ public class SXmlBankLayoutPayment extends SXmlElement {
         moPayRecordNumberId = new SXmlAttribute(ATT_LAY_PAY_REC_NUM);
         moPayBkkYearId = new SXmlAttribute(ATT_LAY_PAY_BKK_YEAR);
         moPayBkkNumberId = new SXmlAttribute(ATT_LAY_PAY_BKK_NUM);
+        moRowReferenceRecord = new SXmlAttribute(ATT_LAY_ROW_REF_REC);
 
         mvXmlAttributes.add(moPayReference);
         mvXmlAttributes.add(moPayConcept);
@@ -130,5 +133,6 @@ public class SXmlBankLayoutPayment extends SXmlElement {
         mvXmlAttributes.add(moPayRecordNumberId);
         mvXmlAttributes.add(moPayBkkYearId);
         mvXmlAttributes.add(moPayBkkNumberId);
+        mvXmlAttributes.add(moRowReferenceRecord);
     }
 }

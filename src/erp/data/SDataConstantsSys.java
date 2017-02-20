@@ -1077,7 +1077,8 @@ public abstract class SDataConstantsSys {
 
     public static final int TRNS_TP_XML_NA = 1;
     public static final int TRNS_TP_XML_CFD = 2;
-    public static final int TRNS_TP_XML_CFDI = 3;
+    public static final int TRNS_TP_XML_CFDI_32 = 3;
+    public static final int TRNS_TP_XML_CFDI_33 = 4;
 
     public static final int TRNS_TP_CFD_CFD = 1;
     public static final int TRNS_TP_CFD_PAY = 2;

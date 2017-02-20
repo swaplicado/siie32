@@ -120,6 +120,7 @@ public class SDbBankLayout extends SDbRegistryUser {
             xmlLayoutDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT_CY).setValue(xmlRow.getAmountCy());
             xmlLayoutDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_CUR).setValue(xmlRow.getCurrencyId());
             xmlLayoutDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EXT_RATE).setValue(xmlRow.getExchangeRate());
+            xmlLayoutDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_REF_REC).setValue(xmlRow.getReferenceRecord());
             xmlLayoutDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_OBS).setValue(xmlRow.getObservation());
             
             for (SXmlBankLayoutPayment payment : xmlLayoutPays) {
@@ -166,6 +167,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                 xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_NUM).setValue(xmlRow.getRecNumber());
                 xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_YEAR).setValue(xmlRow.getBookkeepingYear());
                 xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_NUM).setValue(xmlRow.getBookkeepingNumber());
+                xmlLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_ROW_REF_REC).setValue(xmlRow.getReferenceRecord());
                 
                 xmlLayoutPay.getXmlElements().add(xmlLayoutDoc);
                 
@@ -612,6 +614,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                     accountingAdvance.setBookkeepingCenterId(record.getPkBookkeepingCenterId());
                     accountingAdvance.setDate(mtDateLayout);
                     accountingAdvance.setBizPartner(sBizPartner);
+                    accountingAdvance.setReferenceRecord(bankPayment.getReferenceRecord());
                     
                     for (SDataRecordEntry entry : accountingAdvance.getDbmsRecordEntries()) {
                         entry.setSortingPosition(++nSortingPosition);

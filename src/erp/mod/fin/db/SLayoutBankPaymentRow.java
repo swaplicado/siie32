@@ -82,6 +82,7 @@ public class SLayoutBankPaymentRow implements SGridRow {
     public void setRecordCob(String s) { msRecordCob = s; }
     public void setRecordNumber(String s) { msRecordNumber = s; }
     public void setRecordDate(Date t) { mtRecordDate = t; }
+    
     public void setLayoutBankPayment(SLayoutBankPayment o) { moLayoutBankPayment = o; }
     public void setFinRecordLayout(SFinRecordLayout o) { moFinRecordLayout = o; }
     public void setFinRecordLayoutOld(SFinRecordLayout o) { moFinRecordLayoutOld = o; }
@@ -242,6 +243,7 @@ public class SLayoutBankPaymentRow implements SGridRow {
         registry.setRecordCob(this.getRecordCob());
         registry.setRecordNumber(this.getRecordNumber());
         registry.setRecordDate(this.getRecordDate());
+        
         registry.setLayoutBankPayment(this.getLayoutBankPayment());
         registry.setFinRecordLayout(this.getFinRecordLayout());
         registry.setFinRecordLayoutOld(this.getFinRecordLayoutOld());
