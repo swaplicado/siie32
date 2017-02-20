@@ -247,9 +247,19 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected double mdCfdIvaPorcentaje;
     
     protected erp.mtrn.data.SDataDpsCfd moDbmsDataDpsCfd;
-    protected java.lang.String msXtaCfdConfirmacion;
-    protected java.lang.String msXtaCfdTipoRelacion;
-    protected java.lang.String msXtaCfdUsoCfdi;
+    protected java.lang.String msXtaCfdConfirmation;
+    protected java.lang.String msXtaCfdRelationType;
+    protected java.lang.String msXtaCfdUseCfdi;
+    
+    protected java.lang.String msXtaCfdCceReasonTransfer;
+    protected java.lang.String msXtaCfdCceOperationType;
+    protected java.lang.String msXtaCfdCceNumberImportRequest;
+    protected int mnXtaCfdCceCertificateOrigin; 
+    protected java.lang.String msXtaCfdCceNumberCertificateOrigin;
+    protected int mnXtaCfdCceSubdivision;
+    protected double mnXtaCfdCceExchangeRateUSD;
+    protected double mdXtaCfdCceTotalUSD;
+    protected java.lang.String msXtaCfdCceNumberReliableExporter;
 
     public SDataDps() {
         super(SDataConstants.TRN_DPS);
@@ -1671,9 +1681,19 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     
     public void setDbmsDataDpsCfd(erp.mtrn.data.SDataDpsCfd o) { moDbmsDataDpsCfd = o; }
     
-    public void setXtaCfdConfirmacion(String s) { msXtaCfdConfirmacion = s; }
-    public void setXtaCfdTipoRelacion(String s) { msXtaCfdTipoRelacion = s; }
-    public void setXtaCfdUsoCfdi(String s) { msXtaCfdUsoCfdi = s; }
+    public void setXtaCfdConfirmation(String s) { msXtaCfdConfirmation = s; }
+    public void setXtaCfdRelationType(String s) { msXtaCfdRelationType = s; }
+    public void setXtaCfdUseCfdi(String s) { msXtaCfdUseCfdi = s; }
+    
+    public void setXtaCfdCceReasonTransfer(java.lang.String s) { msXtaCfdCceReasonTransfer = s; }
+    public void setXtaCfdCceOperationType(java.lang.String s) { msXtaCfdCceOperationType = s; }
+    public void setXtaCfdCceNumberImportRequest(java.lang.String s) { msXtaCfdCceNumberImportRequest = s; }
+    public void setXtaCfdCceCertificateOrigin(int n) { mnXtaCfdCceCertificateOrigin = n; }
+    public void setXtaCfdCceNumberCertificateOrigin(java.lang.String s) { msXtaCfdCceNumberCertificateOrigin = s; }
+    public void setXtaCfdCceSubdivision(int n) { mnXtaCfdCceSubdivision = n; }
+    public void setXtaCfdCceExchangeRateUSD(double d) { mnXtaCfdCceExchangeRateUSD = d; }
+    public void setXtaCfdCceTotalUSD(double d) { mdXtaCfdCceTotalUSD = d; }
+    public void setXtaCfdCceNumberReliableExporter(java.lang.String s) { msXtaCfdCceNumberReliableExporter = s; }
 
     public java.lang.Object getDbmsRecordKey() { return moDbmsRecordKey; }
     public java.util.Date getDbmsRecordDate() { return mtDbmsRecordDate; }
@@ -1692,9 +1712,19 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     
     public erp.mtrn.data.SDataDpsCfd getDbmsDataDpsCfd() { return moDbmsDataDpsCfd; }
     
-    public java.lang.String getXtaCfdConfirmacion() { return msXtaCfdConfirmacion; }
-    public java.lang.String getXtaCfdTipoRelacion() { return msXtaCfdTipoRelacion; }
-    public java.lang.String getXtaCfdUsoCfdi() { return msXtaCfdUsoCfdi; }
+    public java.lang.String getXtaCfdConfirmation() { return msXtaCfdConfirmation; }
+    public java.lang.String getXtaCfdRelationType() { return msXtaCfdRelationType; }
+    public java.lang.String getXtaCfdUseCfdi() { return msXtaCfdUseCfdi; }
+    
+    public java.lang.String getXtaCfdCceReasonTransfer() { return msXtaCfdCceReasonTransfer; }
+    public java.lang.String getXtaCfdCceOperationType() { return msXtaCfdCceOperationType; }
+    public java.lang.String getXtaCfdCceNumberImportRequest() { return msXtaCfdCceNumberImportRequest; }
+    public int getXtaCfdCceCertificateOrigin() { return mnXtaCfdCceCertificateOrigin; }
+    public java.lang.String getXtaCfdCceNumberCertificateOrigin() { return msXtaCfdCceNumberCertificateOrigin; }
+    public int getXtaCfdCceSubdivision() { return mnXtaCfdCceSubdivision; }
+    public double getXtaCfdCceExchangeRateUSD() { return mnXtaCfdCceExchangeRateUSD; }
+    public double getXtaCfdCceTotalUSD() { return mdXtaCfdCceTotalUSD; }
+    public java.lang.String getXtaCfdCceNumberReliableExporter() { return msXtaCfdCceNumberReliableExporter; }
 
     public erp.mtrn.data.SDataDpsEntry getDbmsDpsEntry(int[] pk) {
         SDataDpsEntry entry = null;
@@ -1875,9 +1905,19 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         
         moDbmsDataDpsCfd = null;
 
-        msXtaCfdConfirmacion = "";
-        msXtaCfdTipoRelacion = "";
-        msXtaCfdUsoCfdi = "";
+        msXtaCfdConfirmation = "";
+        msXtaCfdRelationType = "";
+        msXtaCfdUseCfdi = "";
+        
+        msXtaCfdCceReasonTransfer = "";
+        msXtaCfdCceOperationType = "";
+        msXtaCfdCceNumberImportRequest = "";
+        mnXtaCfdCceCertificateOrigin = 0;
+        msXtaCfdCceNumberCertificateOrigin = "";
+        mnXtaCfdCceSubdivision = 0;
+        mnXtaCfdCceExchangeRateUSD = 0;
+        mdXtaCfdCceTotalUSD = 0;
+        msXtaCfdCceNumberReliableExporter = "";
         
         msCfdExpeditionLocality = "";
         msCfdExpeditionState = "";
@@ -2173,10 +2213,19 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                         }
                         else {
+                            msXtaCfdConfirmation = moDbmsDataDpsCfd.getCfdConfirmacion();
+                            msXtaCfdRelationType = moDbmsDataDpsCfd.getCfdTipoRelacion();
+                            msXtaCfdUseCfdi = moDbmsDataDpsCfd.getCfdUsoCfdi();
                             
-                            msXtaCfdConfirmacion = moDbmsDataDpsCfd.getCfdConfirmacion();
-                            msXtaCfdTipoRelacion = moDbmsDataDpsCfd.getCfdTipoRelacion();
-                            msXtaCfdUsoCfdi = moDbmsDataDpsCfd.getCfdUsoCfdi();
+                            msXtaCfdCceReasonTransfer = moDbmsDataDpsCfd.getCfdCceMotivoTraslado();
+                            msXtaCfdCceOperationType = moDbmsDataDpsCfd.getCfdCceTipoOperacion();
+                            msXtaCfdCceNumberImportRequest = moDbmsDataDpsCfd.getCfdCceClaveDePedimento();
+                            mnXtaCfdCceCertificateOrigin = Integer.parseInt(moDbmsDataDpsCfd.getCfdCceCertificadoOrigen());
+                            msXtaCfdCceNumberCertificateOrigin = moDbmsDataDpsCfd.getCfdCceNumCertificadoOrigen();
+                            mnXtaCfdCceSubdivision = Integer.parseInt(moDbmsDataDpsCfd.getCfdCceSubdivision());
+                            mnXtaCfdCceExchangeRateUSD = Double.parseDouble(moDbmsDataDpsCfd.getCfdCceTipoCambioUSD());
+                            mdXtaCfdCceTotalUSD = Double.parseDouble(moDbmsDataDpsCfd.getCfdCceTotalUSD());
+                            msXtaCfdCceNumberReliableExporter = moDbmsDataDpsCfd.getCfdCceNumExportadorConfiable();
                         }
                     }
                 }
@@ -3120,14 +3169,24 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 
                 // Save XML of purchases when provided:
                 
-                if (!msXtaCfdUsoCfdi.isEmpty()) {
+                if (!msXtaCfdUseCfdi.isEmpty() || !msXtaCfdCceReasonTransfer.isEmpty()) {
                     moDbmsDataDpsCfd = new SDataDpsCfd();
                     
                     moDbmsDataDpsCfd.setPkYearId(mnPkYearId);
                     moDbmsDataDpsCfd.setPkDocId(mnPkDocId);
-                    moDbmsDataDpsCfd.setCfdConfirmacion(msXtaCfdConfirmacion);
-                    moDbmsDataDpsCfd.setCfdTipoRelacion(msXtaCfdTipoRelacion);
-                    moDbmsDataDpsCfd.setCfdUsoCfdi(msXtaCfdUsoCfdi);
+                    moDbmsDataDpsCfd.setCfdConfirmacion(msXtaCfdConfirmation);
+                    moDbmsDataDpsCfd.setCfdTipoRelacion(msXtaCfdRelationType);
+                    moDbmsDataDpsCfd.setCfdUsoCfdi(msXtaCfdUseCfdi);
+                    
+                    moDbmsDataDpsCfd.setCfdCceMotivoTraslado(msXtaCfdCceReasonTransfer);
+                    moDbmsDataDpsCfd.setCfdCceTipoOperacion(msXtaCfdCceOperationType);
+                    moDbmsDataDpsCfd.setCfdCceClaveDePedimento(msXtaCfdCceNumberImportRequest);
+                    moDbmsDataDpsCfd.setCfdCceCertificadoOrigen(mnXtaCfdCceCertificateOrigin + "");
+                    moDbmsDataDpsCfd.setCfdCceNumCertificadoOrigen(msXtaCfdCceNumberCertificateOrigin);
+                    moDbmsDataDpsCfd.setCfdCceSubdivision(mnXtaCfdCceSubdivision + "");
+                    moDbmsDataDpsCfd.setCfdCceTipoCambioUSD(mnXtaCfdCceExchangeRateUSD + "");
+                    moDbmsDataDpsCfd.setCfdCceTotalUSD(mdXtaCfdCceTotalUSD + "");
+                    moDbmsDataDpsCfd.setCfdCceNumExportadorConfiable(msXtaCfdCceNumberReliableExporter) ;
 
                     if (moDbmsDataDpsCfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
@@ -4182,7 +4241,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     @Override
     public String getCfdNumConfirmacion() {
-        return msXtaCfdConfirmacion;
+        return msXtaCfdConfirmation;
     }
     
     @Override
@@ -4223,12 +4282,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     
     @Override
     public String getCfdTipoRelacion() {
-        return msXtaCfdTipoRelacion;        
+        return msXtaCfdRelationType;        
     }
     
     @Override
     public String getCfdUsoCfdi() {
-        return msXtaCfdUsoCfdi;        
+        return msXtaCfdUseCfdi;        
     }
 
     @Override

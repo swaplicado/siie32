@@ -32,9 +32,19 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
     protected java.lang.String msCfdConfirmacion;
     protected java.lang.String msCfdTipoRelacion;
     protected java.lang.String msCfdUsoCfdi;
+    
+    protected java.lang.String msCfdCceMotivoTraslado;
+    protected java.lang.String msCfdCceTipoOperacion;
+    protected java.lang.String msCfdCceClaveDePedimento;
+    protected java.lang.String msCfdCceCertificadoOrigen; 
+    protected java.lang.String msCfdCceNumCertificadoOrigen;
+    protected java.lang.String msCfdCceSubdivision;
+    protected java.lang.String msCfdCceTipoCambioUSD;
+    protected java.lang.String msCfdCceTotalUSD;
+    protected java.lang.String msCfdCceNumExportadorConfiable;
 
     public SDataDpsCfd() {
-        super(SDataConstants.TRN_CTR);
+        super(SDataConstants.TRN_DPS_CFD);
         reset();
     }
 
@@ -45,6 +55,16 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
     public void setCfdConfirmacion(java.lang.String s) { msCfdConfirmacion = s; }
     public void setCfdTipoRelacion(java.lang.String s) { msCfdTipoRelacion = s; }
     public void setCfdUsoCfdi(java.lang.String s) { msCfdUsoCfdi = s; }
+    
+    public void setCfdCceMotivoTraslado(java.lang.String s) { msCfdCceMotivoTraslado = s; }
+    public void setCfdCceTipoOperacion(java.lang.String s) { msCfdCceTipoOperacion = s; }
+    public void setCfdCceClaveDePedimento(java.lang.String s) { msCfdCceClaveDePedimento = s; }
+    public void setCfdCceCertificadoOrigen(java.lang.String s) { msCfdCceCertificadoOrigen = s; }
+    public void setCfdCceNumCertificadoOrigen(java.lang.String s) { msCfdCceNumCertificadoOrigen = s; }
+    public void setCfdCceSubdivision(java.lang.String s) { msCfdCceSubdivision = s; }
+    public void setCfdCceTipoCambioUSD(java.lang.String s) { msCfdCceTipoCambioUSD = s; }
+    public void setCfdCceTotalUSD(java.lang.String s) { msCfdCceTotalUSD = s; }
+    public void setCfdCceNumExportadorConfiable(java.lang.String s) { msCfdCceNumExportadorConfiable = s; }
 
     public int getPkYearId() { return mnPkYearId; }
     public int getPkDocId() { return mnPkDocId; }
@@ -53,6 +73,16 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
     public java.lang.String getCfdConfirmacion() { return msCfdConfirmacion; }
     public java.lang.String getCfdTipoRelacion() { return msCfdTipoRelacion; }
     public java.lang.String getCfdUsoCfdi() { return msCfdUsoCfdi; }
+    
+    public java.lang.String getCfdCceMotivoTraslado() { return msCfdCceMotivoTraslado; }
+    public java.lang.String getCfdCceTipoOperacion() { return msCfdCceTipoOperacion; }
+    public java.lang.String getCfdCceClaveDePedimento() { return msCfdCceClaveDePedimento; }
+    public java.lang.String getCfdCceCertificadoOrigen() { return msCfdCceCertificadoOrigen; }
+    public java.lang.String getCfdCceNumCertificadoOrigen() { return msCfdCceNumCertificadoOrigen; }
+    public java.lang.String getCfdCceSubdivision() { return msCfdCceSubdivision; }
+    public java.lang.String getCfdCceTipoCambioUSD() { return msCfdCceTipoCambioUSD; }
+    public java.lang.String getCfdCceTotalUSD() { return msCfdCceTotalUSD; }
+    public java.lang.String getCfdCceNumExportadorConfiable() { return msCfdCceNumExportadorConfiable; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -76,6 +106,16 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
         msCfdConfirmacion = "";
         msCfdTipoRelacion = "";
         msCfdUsoCfdi = "";
+        
+        msCfdCceMotivoTraslado = "";
+        msCfdCceTipoOperacion = "";
+        msCfdCceClaveDePedimento = "";
+        msCfdCceCertificadoOrigen = "";
+        msCfdCceNumCertificadoOrigen = "";
+        msCfdCceSubdivision = "";
+        msCfdCceTipoCambioUSD = "";
+        msCfdCceTotalUSD = "";
+        msCfdCceNumExportadorConfiable = "";
     }
 
     @Override
@@ -189,6 +229,8 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
         Document doc = docBuilder.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")));
         Node node = null;
         NamedNodeMap namedNodeMap = null;
+        Node nodeChild = null;
+        NamedNodeMap namedNodeMapChild = null;
         
         node = SXmlUtils.extractElements(doc, "Dps").item(0);
         namedNodeMap = node.getAttributes();
@@ -196,5 +238,22 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
         msCfdConfirmacion = SXmlUtils.extractAttributeValue(namedNodeMap, "confirmacion", false);
         msCfdTipoRelacion = SXmlUtils.extractAttributeValue(namedNodeMap, "tipoRelacion", false);
         msCfdUsoCfdi = SXmlUtils.extractAttributeValue(namedNodeMap, "usoCFDI", false);
+        
+        // International Trade:
+
+        if (SXmlUtils.hasChildElement(node, "cce")) {
+            nodeChild = SXmlUtils.extractChildElements(node, "cce").get(0);
+            namedNodeMapChild = nodeChild.getAttributes();
+            
+            msCfdCceMotivoTraslado = SXmlUtils.extractAttributeValue(namedNodeMapChild, "MotivoTraslado", false);
+            msCfdCceTipoOperacion = SXmlUtils.extractAttributeValue(namedNodeMapChild, "TipoOperacion", false);
+            msCfdCceClaveDePedimento = SXmlUtils.extractAttributeValue(namedNodeMapChild, "ClaveDePedimento", false);
+            msCfdCceCertificadoOrigen = SXmlUtils.extractAttributeValue(namedNodeMapChild, "CertificadoOrigen", false);
+            msCfdCceNumCertificadoOrigen = SXmlUtils.extractAttributeValue(namedNodeMapChild, "NumCertificadoOrigen", false);
+            msCfdCceSubdivision = SXmlUtils.extractAttributeValue(namedNodeMapChild, "Subdivision", false);
+            msCfdCceTipoCambioUSD = SXmlUtils.extractAttributeValue(namedNodeMapChild, "TipoCambioUSD", false);
+            msCfdCceTotalUSD = SXmlUtils.extractAttributeValue(namedNodeMapChild, "TotalUSD", false);
+            msCfdCceNumExportadorConfiable = SXmlUtils.extractAttributeValue(namedNodeMapChild, "NumExportadorConfiable", false);
+        }
     }
 }
