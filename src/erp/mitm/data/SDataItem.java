@@ -16,7 +16,7 @@ import java.util.Vector;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores
+ * @author Alfonso Flores, Sergio Flores, Juan Barajas
  */
 public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -81,12 +81,13 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected int mnFkVariety02Id;
     protected int mnFkVariety03Id;
     protected int mnFkAdministrativeConceptTypeId;
-    protected int mnFkTaxableConceptTypeId;
+    protected int mnFkTaxableConceptTypeId_n;
     protected int mnFkAccountEbitdaTypeId;
     protected int mnFkFiscalAccountIncId;
     protected int mnFkFiscalAccountExpId;
     protected int mnFkItemPackageId_n;
     protected int mnFkDefaultItemRefId_n;
+    protected int mnFkCfdProdServId_n;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
     protected int mnFkUserDeleteId;
@@ -167,12 +168,13 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public void setFkVariety02Id(int n) { mnFkVariety02Id = n; }
     public void setFkVariety03Id(int n) { mnFkVariety03Id = n; }
     public void setFkAdministrativeConceptTypeId(int n) { mnFkAdministrativeConceptTypeId = n; }
-    public void setFkTaxableConceptTypeId(int n) { mnFkTaxableConceptTypeId = n; }
+    public void setFkTaxableConceptTypeId(int n) { mnFkTaxableConceptTypeId_n = n; }
     public void setFkAccountEbitdaTypeId(int n) { mnFkAccountEbitdaTypeId = n; }
     public void setFkFiscalAccountIncId(int n) { mnFkFiscalAccountIncId = n; }
     public void setFkFiscalAccountExpId(int n) { mnFkFiscalAccountExpId = n; }
     public void setFkItemPackageId_n(int n) { mnFkItemPackageId_n = n; }
     public void setFkDefaultItemRefId_n(int n) { mnFkDefaultItemRefId_n = n; }
+    public void setFkCfdProdServId_n(int n) { mnFkCfdProdServId_n = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
     public void setFkUserDeleteId(int n) { mnFkUserDeleteId = n; }
@@ -241,12 +243,13 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public int getFkVariety02Id() { return mnFkVariety02Id; }
     public int getFkVariety03Id() { return mnFkVariety03Id; }
     public int getFkAdministrativeConceptTypeId() { return mnFkAdministrativeConceptTypeId; }
-    public int getFkTaxableConceptTypeId() { return mnFkTaxableConceptTypeId; }
+    public int getFkTaxableConceptTypeId() { return mnFkTaxableConceptTypeId_n; }
     public int getFkAccountEbitdaTypeId() { return mnFkAccountEbitdaTypeId; }
     public int getFkFiscalAccountIncId() { return mnFkFiscalAccountIncId; }
     public int getFkFiscalAccountExpId() { return mnFkFiscalAccountExpId; }
     public int getFkItemPackageId_n() { return mnFkItemPackageId_n; }
     public int getFkDefaultItemRefId_n() { return mnFkDefaultItemRefId_n; }
+    public int getFkCfdProdServId_n() { return mnFkCfdProdServId_n; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
     public int getFkUserDeleteId() { return mnFkUserDeleteId; }
@@ -354,12 +357,13 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
         mnFkVariety02Id = 0;
         mnFkVariety03Id = 0;
         mnFkAdministrativeConceptTypeId = 0;
-        mnFkTaxableConceptTypeId = 0;
+        mnFkTaxableConceptTypeId_n = 0;
         mnFkAccountEbitdaTypeId = 0;
         mnFkFiscalAccountIncId = 0;
         mnFkFiscalAccountExpId = 0;
         mnFkItemPackageId_n = 0;
         mnFkDefaultItemRefId_n = 0;
+        mnFkCfdProdServId_n = 0;
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
         mnFkUserDeleteId = 0;
@@ -451,12 +455,13 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                 mnFkVariety02Id = resultSet.getInt("fid_var_02");
                 mnFkVariety03Id = resultSet.getInt("fid_var_03");
                 mnFkAdministrativeConceptTypeId = resultSet.getInt("fid_tp_adm_cpt");
-                mnFkTaxableConceptTypeId = resultSet.getInt("fid_tp_tax_cpt");
+                mnFkTaxableConceptTypeId_n = resultSet.getInt("fid_tp_tax_cpt");
                 mnFkAccountEbitdaTypeId = resultSet.getInt("fid_tp_acc_ebitda");
                 mnFkFiscalAccountIncId = resultSet.getInt("fid_fiscal_acc_inc");
                 mnFkFiscalAccountExpId = resultSet.getInt("fid_fiscal_acc_exp");
                 mnFkItemPackageId_n = resultSet.getInt("fid_item_pack_n");
                 mnFkDefaultItemRefId_n = resultSet.getInt("fid_item_ref_def_n");
+                mnFkCfdProdServId_n = resultSet.getInt("fid_cfd_prod_serv_n");
                 mnFkUserNewId = resultSet.getInt("fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("fid_usr_edit");
                 mnFkUserDeleteId = resultSet.getInt("fid_usr_del");
@@ -544,7 +549,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?) }");
+                    "?, ?) }");
             callableStatement.setInt(nParam++, mnPkItemId);
             callableStatement.setString(nParam++, msKey);
             callableStatement.setString(nParam++, msItem);
@@ -606,12 +611,13 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
             callableStatement.setInt(nParam++, mnFkVariety02Id);
             callableStatement.setInt(nParam++, mnFkVariety03Id);
             callableStatement.setInt(nParam++, mnFkAdministrativeConceptTypeId);
-            callableStatement.setInt(nParam++, mnFkTaxableConceptTypeId);
+            callableStatement.setInt(nParam++, mnFkTaxableConceptTypeId_n);
             callableStatement.setInt(nParam++, mnFkAccountEbitdaTypeId);
             callableStatement.setInt(nParam++, mnFkFiscalAccountIncId);
             callableStatement.setInt(nParam++, mnFkFiscalAccountExpId);
             if (mnFkItemPackageId_n > 0) callableStatement.setInt(nParam++, mnFkItemPackageId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
             if (mnFkDefaultItemRefId_n > 0) callableStatement.setInt(nParam++, mnFkDefaultItemRefId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
+            if (mnFkCfdProdServId_n > 0) callableStatement.setInt(nParam++, mnFkCfdProdServId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.INTEGER);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);

@@ -26,6 +26,7 @@ import erp.lib.form.SFormValidation;
 import erp.mitm.data.SDataItemGeneric;
 import erp.mitm.data.SDataItemGenericBizArea;
 import erp.mitm.data.SDataItemGroup;
+import erp.mod.SModConsts;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
@@ -36,10 +37,13 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import sa.lib.SLibConsts;
+import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiUtils;
 
 /*
  *
- * @author Alfonso Flores, Sergio Flores
+ * @author Alfonso Flores, Sergio Flores, juan Barajas
  */
 public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener {
 
@@ -133,6 +137,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
     private erp.lib.form.SFormField moFieldFkDefaultItemRefeferenceId_n;
     private erp.lib.form.SFormField moFieldFkAdministrativeConceptTypeId;
     private erp.lib.form.SFormField moFieldFkTaxableConceptTypeId;
+    private erp.lib.form.SFormField moFieldFkCfdProdServId;
     private erp.lib.form.SFormField moFieldIsShipDomestic;
     private erp.lib.form.SFormField moFieldIsShipInternational;
     private erp.lib.form.SFormField moFieldIsShipQuality;
@@ -362,6 +367,9 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         jlFkTaxableConceptTypeId = new javax.swing.JLabel();
         jcbFkTaxableConceptTypeId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkTaxableConceptTypeId = new javax.swing.JButton();
+        jPanel48 = new javax.swing.JPanel();
+        jlFkCfdProdServId = new javax.swing.JLabel();
+        moKeyCfdProdServId = new sa.lib.gui.bean.SBeanFieldKey();
         jpShipment = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
@@ -1157,11 +1165,11 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
 
         jpProperties2.add(jpProperties21);
 
-        jpProperties22.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración de contabilización en documentos:"));
+        jpProperties22.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración contable:"));
         jpProperties22.setPreferredSize(new java.awt.Dimension(450, 100));
         jpProperties22.setLayout(new java.awt.BorderLayout());
 
-        jPanel35.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
+        jPanel35.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
         jPanel38.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -1221,6 +1229,18 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         jPanel28.add(jbFkTaxableConceptTypeId);
 
         jPanel35.add(jPanel28);
+
+        jPanel48.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel48.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFkCfdProdServId.setText("Producto-servicio SAT: *");
+        jlFkCfdProdServId.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel48.add(jlFkCfdProdServId);
+
+        moKeyCfdProdServId.setPreferredSize(new java.awt.Dimension(225, 23));
+        jPanel48.add(moKeyCfdProdServId);
+
+        jPanel35.add(jPanel48);
 
         jpProperties22.add(jPanel35, java.awt.BorderLayout.NORTH);
 
@@ -1476,6 +1496,9 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         moFieldFkTaxableConceptTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkTaxableConceptTypeId, jlFkTaxableConceptTypeId);
         moFieldFkTaxableConceptTypeId.setTabbedPaneIndex(1, jTabbedPane);
         moFieldFkTaxableConceptTypeId.setPickerButton(jbFkTaxableConceptTypeId);
+        moFieldFkCfdProdServId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, moKeyCfdProdServId.getComponent(), jlFkCfdProdServId);
+        moFieldFkCfdProdServId.setTabbedPaneIndex(1, jTabbedPane);
+        moKeyCfdProdServId.setKeySettings((SGuiClient) miClient, SGuiUtils.getLabelName(jlFkCfdProdServId.getText()), true);
 
         moFieldIsShipDomestic = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDomesticShipment);
         moFieldIsShipDomestic.setTabbedPaneIndex(2, jTabbedPane);
@@ -1560,6 +1583,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         mvFields.add(moFieldFkDefaultItemRefeferenceId_n);
         mvFields.add(moFieldFkAdministrativeConceptTypeId);
         mvFields.add(moFieldFkTaxableConceptTypeId);
+        mvFields.add(moFieldFkCfdProdServId);
         mvFields.add(moFieldIsShipDomestic);
         mvFields.add(moFieldIsShipInternational);
         mvFields.add(moFieldIsShipQuality);
@@ -2073,6 +2097,10 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
     private void actionFkTaxableConceptTypeId() {
         miClient.pickOption(SDataConstants.FINU_TP_TAX_CPT, moFieldFkTaxableConceptTypeId, moFieldFkTaxableConceptTypeId.getKeyAsIntArray());
     }
+    
+    private void actionFkCfdConcept() {
+        miClient.pickOption(SDataConstants.FINU_TP_TAX_CPT, moFieldFkCfdProdServId, moFieldFkCfdProdServId.getKeyAsIntArray());
+    }
 
     private void actionOk() {
         SFormValidation validation = formValidate();
@@ -2209,6 +2237,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JPanel jPanel38;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel43;
+    private javax.swing.JPanel jPanel48;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel56;
     private javax.swing.JPanel jPanel6;
@@ -2290,6 +2319,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JLabel jlDaysForExpiration;
     private javax.swing.JLabel jlDbmsFkItemFamilyId;
     private javax.swing.JLabel jlFkAdministrativeConceptTypeId;
+    private javax.swing.JLabel jlFkCfdProdServId;
     private javax.swing.JLabel jlFkDefaultItemRefId_n;
     private javax.swing.JLabel jlFkItemCategoryId;
     private javax.swing.JLabel jlFkItemClassId;
@@ -2411,6 +2441,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JTextField jtfSerialNumber;
     private javax.swing.JTextField jtfSerialNumberFormat;
     private javax.swing.JTextField jtfSurplusPercentage;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyCfdProdServId;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -2485,6 +2516,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         SFormUtilities.populateComboBox(miClient, jcbFkDefaultItemRefId_n, SDataConstants.ITMU_ITEM);
         SFormUtilities.populateComboBox(miClient, jcbFkAdministrativeConceptTypeId, SDataConstants.FINU_TP_ADM_CPT);
         SFormUtilities.populateComboBox(miClient, jcbFkTaxableConceptTypeId, SDataConstants.FINU_TP_TAX_CPT);
+        miClient.getSession().populateCatalogue(moKeyCfdProdServId, SModConsts.ITMS_CFD_PROD_SERV, SLibConsts.UNDEFINED, null);
 
         SFormUtilities.populateList(miClient, jltBizAreaAvailable, SDataConstants.BPSU_BA);
     }
@@ -2760,6 +2792,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         moFieldFkDefaultItemRefeferenceId_n.setFieldValue(new int[] { moItemGeneric.getFkDefaultItemRefId_n() });
         moFieldFkAdministrativeConceptTypeId.setFieldValue(new int[] { moItemGeneric.getFkAdministrativeConceptTypeId() });
         moFieldFkTaxableConceptTypeId.setFieldValue(new int[] { moItemGeneric.getFkTaxableConceptTypeId() });
+        moKeyCfdProdServId.setValue(new int[] { moItemGeneric.getFkCfdProdServId() });
 
         if (!moItemGeneric.getIsItemShortApplying()) {
             jtfItemGenericShort.setEnabled(false);
@@ -2887,6 +2920,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         moItemGeneric.setFkDefaultItemRefId_n(moFieldFkDefaultItemRefeferenceId_n.getKeyAsIntArray()[0]);
         moItemGeneric.setFkAdministrativeConceptTypeId(moFieldFkAdministrativeConceptTypeId.getKeyAsIntArray()[0]);
         moItemGeneric.setFkTaxableConceptTypeId(moFieldFkTaxableConceptTypeId.getKeyAsIntArray()[0]);
+        moItemGeneric.setFkCfdProdServId(moKeyCfdProdServId.getValue()[0]);
 
         moItemGeneric.getDbmsBizAreas().clear();
         if ( jltBizAreaAsignated.getModel().getSize() > 0) {

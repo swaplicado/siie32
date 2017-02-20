@@ -158,7 +158,7 @@ public abstract class SHrsCfdUtils {
         String sql;
         SCfdPacket packet = null;
         SDbFormerPayrollImport payrollImport = null;
-        cfd.ver3.DElementComprobante comprobanteCfdi = null;
+        cfd.ver32.DElementComprobante comprobanteCfdi = null;
         ArrayList<SCfdPacket> moCfdPackets = new ArrayList<SCfdPacket>();
         ResultSet resultSet = null;
         
@@ -186,7 +186,7 @@ public abstract class SHrsCfdUtils {
             
             // Generate CFDI:
 
-            comprobanteCfdi = (cfd.ver3.DElementComprobante) SCfdUtils.createCfdiRootElement((SClientInterface)session.getClient(), receipt);
+            comprobanteCfdi = (cfd.ver32.DElementComprobante) SCfdUtils.createCfdi32RootElement((SClientInterface)session.getClient(), receipt);
             
             // CFDI generating package to save:
 
@@ -197,7 +197,7 @@ public abstract class SHrsCfdUtils {
             packet.setIsConsistent(cfdId == SLibConstants.UNDEFINED ? true : false);
             packet.setStringSigned(DUtilUtils.generateOriginalString(comprobanteCfdi));
             packet.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_PAY);
-            packet.setFkXmlTypeId(SDataConstantsSys.TRNS_TP_XML_CFDI);
+            packet.setFkXmlTypeId(SDataConstantsSys.TRNS_TP_XML_CFDI_32);// XXX jbarajas pendiente CFDI 3.3 
             packet.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW);
             packet.setFkXmlDeliveryTypeId(SModSysConsts.TRNS_TP_XML_DVY_NA);
             packet.setFkXmlDeliveryStatusId(SModSysConsts.TRNS_ST_XML_DVY_PENDING);

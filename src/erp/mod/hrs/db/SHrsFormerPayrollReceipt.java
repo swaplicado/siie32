@@ -5,17 +5,18 @@
 package erp.mod.hrs.db;
 
 import cfd.DAttributeOptionCondicionesPago;
-import cfd.DAttributeOptionFormaPago;
+import cfd.DAttributeOptionMetodoPago;
 import cfd.DAttributeOptionTipoComprobante;
 import cfd.DElement;
-import cfd.ver3.DVer3Utils;
 import cfd.ver3.nom11.DElementDeduccion;
 import cfd.ver3.nom11.DElementDeducciones;
 import cfd.ver3.nom11.DElementPercepcion;
 import cfd.ver3.nom11.DElementPercepciones;
 import cfd.ver3.nom12.DElementIncapacidad;
 import cfd.ver3.nom12.DElementSeparacionIndemnizacion;
+import cfd.ver32.DVer3Utils;
 import erp.cfd.SCfdConsts;
+import erp.cfd.SCfdDataCfdiRelacionado;
 import erp.cfd.SCfdDataConcepto;
 import erp.cfd.SCfdDataImpuesto;
 import erp.cfd.SCfdXml;
@@ -668,8 +669,17 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
     }
 
     @Override
-    public int getCfdFormaDePago() {
-        return DAttributeOptionFormaPago.CFD_UNA_EXHIBICION;
+    public String getCfdFormaDePago() {
+        String formaPago = "";
+
+        try {
+            formaPago = SHrsFormerUtils.getPaymentMethodName(miClient, mnMetodoPago);
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+
+        return formaPago;
     }
 
     @Override
@@ -719,21 +729,17 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
      */
     
     @Override
-    public String getCfdMetodoDePago() {
-        String metodoPago = "";
-
-        try {
-            metodoPago = SHrsFormerUtils.getPaymentMethodName(miClient, mnMetodoPago);
-        }
-        catch (Exception e) {
-            SLibUtils.printException(this, e);
-        }
-
-        return metodoPago;
+    public int getCfdMetodoDePago() {
+        return DAttributeOptionMetodoPago.CFD_UNA_EXHIBICION;
     }
 
     @Override
     public String getCfdNumCtaPago() {
+        return "";
+    }
+
+    @Override
+    public String getCfdNumConfirmacion() {
         return "";
     }
 
@@ -763,13 +769,23 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
         DElement regimen = null;
 
         for (int i = 0; i < moPayroll.getRegimenFiscal().length; i++) {
-            regimen = new cfd.ver3.DElementRegimenFiscal();
+            regimen = new cfd.ver32.DElementRegimenFiscal();
 
-            ((cfd.ver3.DElementRegimenFiscal) regimen).getAttRegimen().setString(moPayroll.getRegimenFiscal()[i]);
+            ((cfd.ver32.DElementRegimenFiscal) regimen).getAttRegimen().setString(moPayroll.getRegimenFiscal()[i]);
             regimes.add(regimen);
         }
 
         return regimes;
+    }
+    
+    @Override
+    public String getCfdTipoRelacion() {
+        return "";        
+    }
+    
+    @Override
+    public String getCfdUsoCfdi() {
+        return "";        
     }
 
     @Override
@@ -782,15 +798,22 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
         DElement complemento = null;
 
         try {
-            complemento = new cfd.ver3.DElementComplemento();
+            complemento = new cfd.ver32.DElementComplemento();
 
-            ((cfd.ver3.DElementComplemento) complemento).getElements().add(createCfdiElementNomina12());
+            ((cfd.ver32.DElementComplemento) complemento).getElements().add(createCfdiElementNomina12());
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
         }
 
         return complemento;
+    }
+
+    @Override
+    public ArrayList<SCfdDataCfdiRelacionado> getCfdCfdiRelacionados() {
+        ArrayList<SCfdDataCfdiRelacionado> cfdiRelacinadosXml = new ArrayList<SCfdDataCfdiRelacionado>();
+        
+        return cfdiRelacinadosXml;
     }
 
     @Override

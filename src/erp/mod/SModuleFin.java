@@ -280,6 +280,11 @@ public class SModuleFin extends SGuiModule {
                 sql = "SELECT id_fiscal_pay_met AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY id_fiscal_pay_met ";
                 break;
+            case SModConsts.FINS_CFD_TAX:
+                settings = new SGuiCatalogueSettings("Impuesto SAT", 1);
+                sql = "SELECT id_cfd_tax AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY name, id_cfd_tax ";
+                break;
             case SModConsts.FIN_YEAR:
                 settings = new SGuiCatalogueSettings("Año contable", 1);
                 sql = "SELECT id_year AS " + SDbConsts.FIELD_ID + "1, id_year AS " + SDbConsts.FIELD_ITEM + " "

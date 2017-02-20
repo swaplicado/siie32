@@ -20,15 +20,19 @@ import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mitm.data.SDataUnit;
 import erp.mitm.data.SDataUnitType;
+import erp.mod.SModConsts;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
+import sa.lib.SLibConsts;
+import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Juan Barajas
  */
 public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -42,6 +46,7 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
 
     private erp.mitm.data.SDataUnit moUnit;
     private erp.lib.form.SFormField moFieldFkUnitTypeId;
+    private erp.lib.form.SFormField moFieldFkCfdUnitId;
     private erp.lib.form.SFormField moFieldUnit;
     private erp.lib.form.SFormField moFieldSymbol;
     private erp.lib.form.SFormField moFieldUnitBaseEquivalence;
@@ -73,6 +78,9 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel6 = new javax.swing.JPanel();
         jbFkUnitTypeId = new javax.swing.JButton();
         jcbFkUnitTypeId = new javax.swing.JComboBox();
+        jlFkCfdUnitId = new javax.swing.JLabel();
+        jPanel7 = new javax.swing.JPanel();
+        moKeyCfdUnitId = new sa.lib.gui.bean.SBeanFieldKey();
         jlUnit = new javax.swing.JLabel();
         jtfUnit = new javax.swing.JTextField();
         jlSymbol = new javax.swing.JLabel();
@@ -103,7 +111,7 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
         jpRegistry.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jpRegistry.setLayout(new java.awt.BorderLayout());
 
-        jPanel3.setLayout(new java.awt.GridLayout(6, 2, 5, 5));
+        jPanel3.setLayout(new java.awt.GridLayout(7, 2, 5, 5));
 
         jlFkUnitTypeId.setText("Tipo de unidad: *");
         jPanel3.add(jlFkUnitTypeId);
@@ -125,6 +133,14 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel6.add(jcbFkUnitTypeId, java.awt.BorderLayout.CENTER);
 
         jPanel3.add(jPanel6);
+
+        jlFkCfdUnitId.setText("Unidad SAT: *");
+        jPanel3.add(jlFkCfdUnitId);
+
+        jPanel7.setLayout(new java.awt.BorderLayout(5, 0));
+        jPanel7.add(moKeyCfdUnitId, java.awt.BorderLayout.CENTER);
+
+        jPanel3.add(jPanel7);
 
         jlUnit.setText("Nombre de unidad: *");
         jPanel3.add(jlUnit);
@@ -195,8 +211,8 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
 
         getContentPane().add(jpCommand, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-400)/2, (screenSize.height-260)/2, 400, 260);
+        setSize(new java.awt.Dimension(416, 289));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -216,6 +232,8 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
 
         moFieldFkUnitTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkUnitTypeId, jlFkUnitTypeId);
         moFieldFkUnitTypeId.setPickerButton(jbFkUnitTypeId);
+        moFieldFkCfdUnitId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, moKeyCfdUnitId.getComponent(), jlFkCfdUnitId);
+        moKeyCfdUnitId.setKeySettings((SGuiClient) miClient, SGuiUtils.getLabelName(jlFkCfdUnitId.getText()), true);
         moFieldUnit = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfUnit, jlUnit);
         moFieldUnit.setLengthMax(50);
         moFieldSymbol = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfSymbol, jlSymbol);
@@ -227,6 +245,7 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
 
         mvFields.add(moFieldFkUnitTypeId);
+        mvFields.add(moFieldFkCfdUnitId);
         mvFields.add(moFieldUnit);
         mvFields.add(moFieldSymbol);
         mvFields.add(moFieldUnitBaseEquivalence);
@@ -308,11 +327,13 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbFkUnitTypeId;
     private javax.swing.JButton jbOk;
     private javax.swing.JComboBox jcbFkUnitTypeId;
     private javax.swing.JCheckBox jckIsDeleted;
+    private javax.swing.JLabel jlFkCfdUnitId;
     private javax.swing.JLabel jlFkUnitTypeId;
     private javax.swing.JLabel jlSortingPosition;
     private javax.swing.JLabel jlSymbol;
@@ -325,6 +346,7 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JTextField jtfUnit;
     private javax.swing.JTextField jtfUnitBaseEquivalence;
     private javax.swing.JTextField jtfUnitTypeBase;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyCfdUnitId;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -353,6 +375,7 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
     public void formRefreshCatalogues() {
         mbResetingForm = true;
         SFormUtilities.populateComboBox(miClient, jcbFkUnitTypeId, SDataConstants.ITMU_TP_UNIT);
+        miClient.getSession().populateCatalogue(moKeyCfdUnitId, SModConsts.ITMS_CFD_UNIT, SLibConsts.UNDEFINED, null);
     }
 
     @Override
@@ -404,6 +427,7 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
         moUnit = (SDataUnit) registry;
 
         moFieldFkUnitTypeId.setFieldValue(new int[] { moUnit.getFkUnitTypeId() });
+        moKeyCfdUnitId.setValue(new int[] { moUnit.getFkCfdUnitId() });
         moFieldUnit.setFieldValue(moUnit.getUnit());
         moFieldSymbol.setFieldValue(moUnit.getSymbol());
         moFieldUnitBaseEquivalence.setFieldValue(moUnit.getUnitBaseEquivalence());
@@ -428,6 +452,7 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
         }
 
         moUnit.setFkUnitTypeId(moFieldFkUnitTypeId.getKeyAsIntArray()[0]);
+        moUnit.setFkCfdUnitId(moKeyCfdUnitId.getValue()[0]);
         moUnit.setUnit(moFieldUnit.getString());
         moUnit.setSymbol(moFieldSymbol.getString());
         moUnit.setUnitBaseEquivalence(moFieldUnitBaseEquivalence.getDouble());

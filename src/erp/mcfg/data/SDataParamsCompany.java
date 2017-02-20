@@ -31,6 +31,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     protected java.lang.String msFormerSystemOdbc;
     protected java.lang.String msFormerSystemOdbcUser;
     protected java.lang.String msFormerSystemOdbcUserPassword;
+    protected java.lang.String msTaxRegime;
     protected java.lang.String msFiscalSettings;
     protected java.lang.String msNotesPurchasesOrder;
     protected java.lang.String msPaymentEmail;
@@ -109,6 +110,9 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
 
     protected javax.swing.ImageIcon moExtraLogoImageIcon_n;
     protected erp.mcfg.data.SDataCertificate moDbmsCertificate_n;
+    
+    protected erp.mcfg.data.SDataCfgCfd moDbmsDataCfgCfd;
+    protected java.lang.String msXtaCfdUseCfdi;
 
     public SDataParamsCompany() {
         super(SDataConstants.CFG_PARAM_CO);
@@ -126,6 +130,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public void setFormerSystemOdbc(java.lang.String s) { msFormerSystemOdbc = s; }
     public void setFormerSystemOdbcUser(java.lang.String s) { msFormerSystemOdbcUser = s; }
     public void setFormerSystemOdbcUserPassword(java.lang.String s) { msFormerSystemOdbcUserPassword = s; }
+    public void setTaxRegime(java.lang.String s) { msTaxRegime = s; }
     public void setFiscalSettings(java.lang.String s) { msFiscalSettings = s; }
     public void setNotesPurchasesOrder(java.lang.String s) { msNotesPurchasesOrder = s; }
     public void setPaymentEmail(java.lang.String s) { msPaymentEmail = s; }
@@ -199,6 +204,9 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public void setUserNewTs(java.util.Date t) { mtUserNewTs = t; }
     public void setUserEditTs(java.util.Date t) { mtUserEditTs = t; }
     public void setUserDeleteTs(java.util.Date t) { mtUserDeleteTs = t; }
+    
+    public void setDbmsDataCfgCfd(erp.mcfg.data.SDataCfgCfd o) { moDbmsDataCfgCfd = o; }
+    public void setXtaCfdUseCfdi(java.lang.String s) { msXtaCfdUseCfdi = s; }
 
     public int getPkConfigCoId() { return mnPkConfigCoId; }
     public int getDaysOfGraceSupplier() { return mnDaysOfGraceSupplier; }
@@ -211,6 +219,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public java.lang.String getFormerSystemOdbc() { return msFormerSystemOdbc; }
     public java.lang.String getFormerSystemOdbcUser() { return msFormerSystemOdbcUser; }
     public java.lang.String getFormerSystemOdbcUserPassword() { return msFormerSystemOdbcUserPassword; }
+    public java.lang.String getTaxRegime() { return msTaxRegime; }
     public java.lang.String getFiscalSettings() { return msFiscalSettings; }
     public java.lang.String getNotesPurchasesOrder() { return msNotesPurchasesOrder; }
     public java.lang.String getPaymentEmail() { return msPaymentEmail; }
@@ -292,6 +301,9 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public java.lang.String getDbmsDocNumberSeriesLogistics() { return msDbmsDocNumberSeriesLogistics; }
     public javax.swing.ImageIcon getExtraLogoImageIcon_n() { return moExtraLogoImageIcon_n; }
     public erp.mcfg.data.SDataCertificate getDbmsDataCertificate_n() { return moDbmsCertificate_n; }
+    
+    public erp.mcfg.data.SDataCfgCfd getDbmsDataCfgCfd() { return moDbmsDataCfgCfd; }
+    public java.lang.String getXtaCfdUseCfdi() { return msXtaCfdUseCfdi; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -395,6 +407,9 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
         msDbmsDocNumberSeriesLogistics = "";
         moExtraLogoImageIcon_n = null;
         moDbmsCertificate_n = null;
+        
+        moDbmsDataCfgCfd = null;
+        msXtaCfdUseCfdi = "";
     }
 
     @Override
@@ -429,6 +444,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                 msFormerSystemOdbc = resultSet.getString("former_sys_odbc");
                 msFormerSystemOdbcUser = resultSet.getString("former_sys_odbc_usr");
                 msFormerSystemOdbcUserPassword = resultSet.getString("former_sys_odbc_usr_pswd");
+                msTaxRegime = resultSet.getString("tax_regime");
                 msFiscalSettings = resultSet.getString("fiscal_settings");
                 msNotesPurchasesOrder = resultSet.getString("notes_pur_ord");
                 msPaymentEmail = resultSet.getString("pay_email");
@@ -533,6 +549,16 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                         moDbmsCertificate_n = cert;
                     }
                 }
+                
+                 // Read datas auxiliars for CFD:
+                
+                moDbmsDataCfgCfd = new SDataCfgCfd();
+                if (moDbmsDataCfgCfd.read(key, oStatementAux)!= SLibConstants.DB_ACTION_READ_OK) {
+                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                }
+                else {
+                    msXtaCfdUseCfdi = moDbmsDataCfgCfd.getCfdUsoCfdi();
+                }
 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
@@ -581,6 +607,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
             callableStatement.setString(nParam++, msFormerSystemOdbcUserPassword);
             callableStatement.setString(nParam++, msPaymentEmail);
             callableStatement.setString(nParam++, msRegistrySs);
+            callableStatement.setString(nParam++, msTaxRegime);
             callableStatement.setString(nParam++, msFiscalSettings);
             callableStatement.setString(nParam++, msNotesPurchasesOrder);
             callableStatement.setDouble(nParam++, mdInterestDelayRate);

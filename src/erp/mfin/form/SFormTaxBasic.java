@@ -22,15 +22,19 @@ import erp.lib.table.STablePane;
 import erp.mfin.data.SDataTax;
 import erp.mfin.data.SDataTaxBasic;
 import erp.mfin.data.SDataTaxRow;
+import erp.mod.SModConsts;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
+import sa.lib.SLibConsts;
+import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Sergio Flores, Alfonso Flores
+ * @author Sergio Flores, Alfonso Flores, Juan Barajas
  */
 public class SFormTaxBasic extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -44,6 +48,7 @@ public class SFormTaxBasic extends javax.swing.JDialog implements erp.lib.form.S
 
     private erp.mfin.data.SDataTaxBasic moTaxBasic;
     private erp.lib.form.SFormField moFieldTaxBasic;
+    private erp.lib.form.SFormField moFieldFkCfdTaxId;
     private erp.lib.form.SFormField moFieldIsDeleted;
 
     private erp.lib.table.STablePane moTaxesPane;
@@ -75,6 +80,9 @@ public class SFormTaxBasic extends javax.swing.JDialog implements erp.lib.form.S
         jPanel4 = new javax.swing.JPanel();
         jlTaxBasic = new javax.swing.JLabel();
         jtfTaxBasic = new javax.swing.JTextField();
+        jPanel7 = new javax.swing.JPanel();
+        jlFkCfdTaxId = new javax.swing.JLabel();
+        moKeyCfdTaxId = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel6 = new javax.swing.JPanel();
         jlDummy = new javax.swing.JLabel();
         jckIsDeleted = new javax.swing.JCheckBox();
@@ -109,7 +117,7 @@ public class SFormTaxBasic extends javax.swing.JDialog implements erp.lib.form.S
         jPanel2.setLayout(new java.awt.BorderLayout(0, 5));
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
-        jPanel3.setLayout(new java.awt.GridLayout(2, 1, 5, 1));
+        jPanel3.setLayout(new java.awt.GridLayout(3, 1, 5, 1));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -122,6 +130,17 @@ public class SFormTaxBasic extends javax.swing.JDialog implements erp.lib.form.S
         jPanel4.add(jtfTaxBasic);
 
         jPanel3.add(jPanel4);
+
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFkCfdTaxId.setText("Impuesto SAT: *");
+        jlFkCfdTaxId.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel7.add(jlFkCfdTaxId);
+
+        moKeyCfdTaxId.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel7.add(moKeyCfdTaxId);
+
+        jPanel3.add(jPanel7);
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -158,8 +177,8 @@ public class SFormTaxBasic extends javax.swing.JDialog implements erp.lib.form.S
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-900)/2, (screenSize.height-600)/2, 900, 600);
+        setSize(new java.awt.Dimension(900, 600));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -176,10 +195,13 @@ public class SFormTaxBasic extends javax.swing.JDialog implements erp.lib.form.S
 
         moFieldTaxBasic = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfTaxBasic, jlTaxBasic);
         moFieldTaxBasic.setLengthMax(50);
+        moFieldFkCfdTaxId = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, moKeyCfdTaxId.getComponent(), jlFkCfdTaxId);
+        moKeyCfdTaxId.setKeySettings((SGuiClient) miClient, SGuiUtils.getLabelName(jlFkCfdTaxId.getText()), true);
         moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
 
         mvFields = new Vector<SFormField>();
         mvFields.add(moFieldTaxBasic);
+        mvFields.add(moFieldFkCfdTaxId);
         mvFields.add(moFieldIsDeleted);
 
         i = 0;
@@ -315,15 +337,18 @@ public class SFormTaxBasic extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JButton jbAdd;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbModify;
     private javax.swing.JButton jbOk;
     private javax.swing.JCheckBox jckIsDeleted;
     private javax.swing.JLabel jlDummy;
+    private javax.swing.JLabel jlFkCfdTaxId;
     private javax.swing.JLabel jlTaxBasic;
     private javax.swing.JPanel jpTaxes;
     private javax.swing.JTextField jtfTaxBasic;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyCfdTaxId;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -350,7 +375,7 @@ public class SFormTaxBasic extends javax.swing.JDialog implements erp.lib.form.S
 
     @Override
     public void formRefreshCatalogues() {
-
+        miClient.getSession().populateCatalogue(moKeyCfdTaxId, SModConsts.FINS_CFD_TAX, SLibConsts.UNDEFINED, null);
     }
 
     @Override
@@ -395,6 +420,7 @@ public class SFormTaxBasic extends javax.swing.JDialog implements erp.lib.form.S
         SDataTaxRow taxesRow = null;
 
         moFieldTaxBasic.setFieldValue(moTaxBasic.getTaxBasic());
+        moKeyCfdTaxId.setValue(new int[] { moTaxBasic.getFkCfdTaxId() });
         moFieldIsDeleted.setFieldValue(moTaxBasic.getIsDeleted());
 
         for (i = 0; i < moTaxBasic.getDbmsTaxes().size(); i++) {
@@ -418,6 +444,7 @@ public class SFormTaxBasic extends javax.swing.JDialog implements erp.lib.form.S
         }
 
         moTaxBasic.setTaxBasic(moFieldTaxBasic.getString());
+        moTaxBasic.setFkCfdTaxId(moKeyCfdTaxId.getValue()[0]);
         moTaxBasic.setIsDeleted(moFieldIsDeleted.getBoolean());
 
         moTaxBasic.getDbmsTaxes().clear();

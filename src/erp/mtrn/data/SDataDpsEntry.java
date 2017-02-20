@@ -21,7 +21,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores, Alfonso Flores, Uriel Castañeda
+ * @author Sergio Flores, Alfonso Flores, Uriel Castañeda, Juan Barajas
  */
 public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -130,6 +130,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected java.lang.String msDbmsCostCenterCode;
     protected java.lang.String msDbmsCostCenter_n;
     protected java.lang.String msDbmsItemRef_n;
+    protected java.lang.String msDbmsItemClaveProdServ;
+    protected java.lang.String msDbmsUnidadClave;
     protected int mnDbmsDpsAddBachocoNumberPosition;
     protected java.lang.String msDbmsDpsAddBachocoCenter;
     protected int mnDbmsDpsAddLorealEntryNumber;
@@ -376,6 +378,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setDbmsCostCenterCode(java.lang.String s) { msDbmsCostCenterCode = s; }
     public void setDbmsCostCenter_n(java.lang.String s) { msDbmsCostCenter_n = s; }
     public void setDbmsItemRef_n(java.lang.String s) { msDbmsItemRef_n = s; }
+    public void setDbmsItemClaveProdServ (java.lang.String s) { msDbmsItemClaveProdServ = s; }
+    public void setDbmsUnidadClave(java.lang.String s) { msDbmsUnidadClave = s; }
     public void setDbmsDpsAddBachocoNumberPosition(int n) { mnDbmsDpsAddBachocoNumberPosition = n; }
     public void setDbmsDpsAddBachocoCenter(java.lang.String s) { msDbmsDpsAddBachocoCenter = s; }
     public void setDbmsDpsAddLorealEntryNumber(int n) { mnDbmsDpsAddLorealEntryNumber = n; }
@@ -400,6 +404,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public java.lang.String getDbmsCostCenterCode() { return msDbmsCostCenterCode; }
     public java.lang.String getDbmsCostCenter_n() { return msDbmsCostCenter_n; }
     public java.lang.String getDbmsItemRef_n() { return msDbmsItemRef_n; }
+    public java.lang.String getDbmsItemClaveProdServ() { return msDbmsItemClaveProdServ; }
+    public java.lang.String getDbmsUnidadClave() { return msDbmsUnidadClave; }
     public int getDbmsDpsAddBachocoNumberPosition() { return mnDbmsDpsAddBachocoNumberPosition; }
     public java.lang.String getDbmsDpsAddBachocoCenter() { return msDbmsDpsAddBachocoCenter; }
     public int getDbmsDpsAddLorealEntryNumber() { return mnDbmsDpsAddLorealEntryNumber; }
@@ -561,6 +567,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         msDbmsCostCenterCode = "";
         msDbmsCostCenter_n = "";
         msDbmsItemRef_n = "";
+        msDbmsItemClaveProdServ = "";
+        msDbmsUnidadClave = "";
         mnDbmsDpsAddBachocoNumberPosition = 0;
         msDbmsDpsAddBachocoCenter = "";
         mnDbmsDpsAddLorealEntryNumber = 0;
@@ -594,12 +602,14 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         String sql = "";
         ResultSet resultSet = null;
         Statement statementAux = null;
+        int nCveProdSerItem_n = 0;
+        int nCveProdSerIgen = 0;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         reset();
 
         try {
-            sql = "SELECT de.*, i.item, i.fid_igen, igen.b_ship_dom, igen.b_ship_int, igen.b_ship_qlt, u.symbol, ou.symbol, " +
+            sql = "SELECT de.*, i.item, i.fid_cfd_prod_serv_n, i.fid_igen, igen.b_ship_dom, igen.b_ship_int, igen.b_ship_qlt, igen.fid_cfd_prod_serv, u.symbol, ou.symbol, cu.code, " +
                     "tr.tax_reg, tda.stp_dps_adj, tde.tp_dps_ety, cc.code, cc.cc, ir.item, ade.bac_num_pos, ade.bac_cen, ade.lor_num_ety, ade.sor_cod, " +
                     "ade.ele_ord, ade.ele_barc, ade.ele_cag, ade.ele_cag_price_u, ade.ele_par, ade.ele_par_price_u " +
                     "FROM trn_dps_ety AS de " +
@@ -607,6 +617,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     "INNER JOIN erp.itmu_igen AS igen ON i.fid_igen = igen.id_igen " +
                     "INNER JOIN erp.itmu_unit as u ON de.fid_unit = u.id_unit " +
                     "INNER JOIN erp.itmu_unit as ou ON de.fid_orig_unit = ou.id_unit " +
+                    "INNER JOIN erp.itms_cfd_unit AS cu ON u.fid_cfd_unit = cu.id_cfd_unit " +
                     "INNER JOIN erp.finu_tax_reg AS tr ON de.fid_tax_reg = tr.id_tax_reg " +
                     "INNER JOIN erp.trns_stp_dps_adj AS tda ON de.fid_tp_dps_adj = tda.id_tp_dps_adj AND de.fid_stp_dps_adj = tda.id_stp_dps_adj " +
                     "INNER JOIN erp.trns_tp_dps_ety AS tde ON de.fid_tp_dps_ety = tde.id_tp_dps_ety " +
@@ -715,6 +726,9 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 mtUserEditTs = resultSet.getTimestamp("de.ts_edit");
                 mtUserDeleteTs = resultSet.getTimestamp("de.ts_del");
 
+                nCveProdSerItem_n = resultSet.getInt("i.fid_cfd_prod_serv_n");
+                nCveProdSerIgen = resultSet.getInt("igen.fid_cfd_prod_serv");
+                
                 mnDbmsFkItemGenericId = resultSet.getInt("i.fid_igen");
                 mbDbmsItemGenDataShipDomesticReq = resultSet.getBoolean("igen.b_ship_dom");
                 mbDbmsItemGenDataShipInternationalReq = resultSet.getBoolean("igen.b_ship_int");
@@ -778,6 +792,20 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     mdDbmsDpsAddElektraPartPriceUnitary = 0;
                 }
 
+                msDbmsUnidadClave = resultSet.getString("cu.code");
+                
+                statementAux = statement.getConnection().createStatement();
+
+                // Read aswell entry notes:
+
+                sql = "SELECT code FROM erp.itms_cfd_prod_serv " +
+                        "WHERE id_cfd_prod_serv = " + (nCveProdSerItem_n == SLibConstants.UNDEFINED ? nCveProdSerIgen : nCveProdSerItem_n) + " ";
+                
+                resultSet = statementAux.executeQuery(sql);
+                if (resultSet.next()) {
+                    msDbmsItemClaveProdServ = resultSet.getString("code");
+                }
+                
                 statementAux = statement.getConnection().createStatement();
 
                 // Read aswell entry notes:
@@ -1600,6 +1628,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setDbmsDpsEntryType(msDbmsDpsEntryType);
         clone.setDbmsCostCenter_n(msDbmsCostCenter_n);
         clone.setDbmsItemRef_n(msDbmsItemRef_n);
+        clone.setDbmsItemClaveProdServ(msDbmsItemClaveProdServ);
+        clone.setDbmsUnidadClave(msDbmsUnidadClave);
         clone.setDbmsDpsAddBachocoNumberPosition(mnDbmsDpsAddBachocoNumberPosition);
         clone.setDbmsDpsAddBachocoCenter(msDbmsDpsAddBachocoCenter);
         clone.setDbmsDpsAddLorealEntryNumber(mnDbmsDpsAddLorealEntryNumber);

@@ -99,6 +99,16 @@ public class SModuleItm extends SGuiModule {
                         "id_ct_item AS " + SDbConsts.FIELD_FK + "1, id_cl_item AS " + SDbConsts.FIELD_FK + "2 " +
                         "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY tp_idx ";
                 break;
+            case SModConsts.ITMS_CFD_PROD_SERV:
+                settings = new SGuiCatalogueSettings("Producto-servicio SAT", 1);
+                sql = "SELECT id_cfd_prod_serv AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " " +
+                        "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY name, id_cfd_prod_serv ";
+                break;
+            case SModConsts.ITMS_CFD_UNIT:
+                settings = new SGuiCatalogueSettings("Unidad SAT", 1);
+                sql = "SELECT id_cfd_unit AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " " +
+                        "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY name, id_cfd_unit ";
+                break;
             case SModConsts.ITMU_IFAM:
                 settings = new SGuiCatalogueSettings("Familia de ítem", 1);
                 sql = "SELECT id_ifam AS " + SDbConsts.FIELD_ID + "1, ifam AS " + SDbConsts.FIELD_ITEM + " " +

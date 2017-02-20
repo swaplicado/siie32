@@ -4,6 +4,7 @@
  */
 package erp.cfd;
 
+import cfd.DCfdConsts;
 import cfd.DElement;
 
 /**
@@ -16,6 +17,7 @@ public class SCfdDataAsociadoNegocios {
     protected int mnBizPartnerBranchId;
     protected int mnBizPartnerBranchHqId;
     protected String msBizPartnerRfc;
+    protected String msBizPartnerFiscalForeing;
     protected String msBizPartnerName;
     protected String msBizPartnerStreet;
     protected String msBizPartnerStreetNumberExt;
@@ -27,7 +29,8 @@ public class SCfdDataAsociadoNegocios {
     protected String msBizPartnerState;
     protected String msBizPartnerZipCode;
     protected String msBizPartnerPoBox;
-    protected String msBizPartnerCountry;
+    protected String msBizPartnerCountryCode;
+    protected String msBizPartnerCountryName;
     protected String msBizPartnerExpeditionStreet;
     protected String msBizPartnerExpeditionStreetNumberExt;
     protected String msBizPartnerExpeditionStreetNumberInt;
@@ -38,7 +41,7 @@ public class SCfdDataAsociadoNegocios {
     protected String msBizPartnerExpeditionState;
     protected String msBizPartnerExpeditionZipCode;
     protected String msBizPartnerExpeditionPoBox;
-    protected String msBizPartnerExpeditionCountry;
+    protected String msBizPartnerExpeditionCountryName;
     protected String msBizPartnerFiscalRegime;
     protected boolean mbIsCfdi;
     protected float mfVersion;
@@ -49,6 +52,7 @@ public class SCfdDataAsociadoNegocios {
         mnBizPartnerBranchId = 0;
         mnBizPartnerBranchHqId = 0;
         msBizPartnerRfc = "";
+        msBizPartnerFiscalForeing = "";
         msBizPartnerName = "";
         msBizPartnerStreet = "";
         msBizPartnerStreetNumberExt = "";
@@ -60,7 +64,8 @@ public class SCfdDataAsociadoNegocios {
         msBizPartnerState = "";
         msBizPartnerZipCode = "";
         msBizPartnerPoBox = "";
-        msBizPartnerCountry = "";
+        msBizPartnerCountryCode = "";
+        msBizPartnerCountryName = "";
         msBizPartnerExpeditionStreet = "";
         msBizPartnerExpeditionStreetNumberExt = "";
         msBizPartnerExpeditionStreetNumberInt = "";
@@ -71,7 +76,7 @@ public class SCfdDataAsociadoNegocios {
         msBizPartnerExpeditionState = "";
         msBizPartnerExpeditionZipCode = "";
         msBizPartnerExpeditionPoBox = "";
-        msBizPartnerExpeditionCountry = "";
+        msBizPartnerExpeditionCountryName = "";
         msBizPartnerFiscalRegime = "";
         mbIsCfdi = false;
         mfVersion = 0f;
@@ -82,6 +87,7 @@ public class SCfdDataAsociadoNegocios {
     public void setBizPartnerBranchId(int n) { mnBizPartnerBranchId = n; }
     public void setBizPartnerBranchHqId(int n) { mnBizPartnerBranchHqId = n; }
     public void setBizPartnerRfc(String s) { msBizPartnerRfc = s; }
+    public void setBizPartnerFiscalForeing(String s) { msBizPartnerFiscalForeing = s; }
     public void setBizPartnerName(String s) { msBizPartnerName = s; }
     public void setBizPartnerStreet(String s) { msBizPartnerStreet = s; }
     public void setBizPartnerStreetNumberExt(String s) { msBizPartnerStreetNumberExt = s; }
@@ -93,7 +99,8 @@ public class SCfdDataAsociadoNegocios {
     public void setBizPartnerState(String s) { msBizPartnerState = s; }
     public void setBizPartnerZipCode(String s) { msBizPartnerZipCode = s; }
     public void setBizPartnerPoBox(String s) { msBizPartnerPoBox = s; }
-    public void setBizPartnerCountry(String s) { msBizPartnerCountry = s; }
+    public void setBizPartnerCountryCode(String s) { msBizPartnerCountryCode = s; }
+    public void setBizPartnerCountryName(String s) { msBizPartnerCountryName = s; }
     public void setBizPartnerExpeditionStreet(String s) { msBizPartnerExpeditionStreet = s; }
     public void setBizPartnerExpeditionStreetNumberExt(String s) { msBizPartnerExpeditionStreetNumberExt = s; }
     public void setBizPartnerExpeditionStreetNumberInt(String s) { msBizPartnerExpeditionStreetNumberInt = s; }
@@ -104,7 +111,7 @@ public class SCfdDataAsociadoNegocios {
     public void setBizPartnerExpeditionState(String s) { msBizPartnerExpeditionState = s; }
     public void setBizPartnerExpeditionZipCode(String s) { msBizPartnerExpeditionZipCode = s; }
     public void setBizPartnerExpeditionPoBox(String s) { msBizPartnerExpeditionPoBox = s; }
-    public void setBizPartnerExpeditionCountry(String s) { msBizPartnerExpeditionCountry = s; }
+    public void setBizPartnerExpeditionCountryName(String s) { msBizPartnerExpeditionCountryName = s; }
     public void setBizPartnerFiscalRegime(String s) { msBizPartnerFiscalRegime= s; }
     public void setIsCfdi(boolean b) { mbIsCfdi = b; }
     public void setVersion(float f) { mfVersion = f; }
@@ -114,6 +121,7 @@ public class SCfdDataAsociadoNegocios {
     public int getBizPartnerBranchId() { return mnBizPartnerBranchId; }
     public int getBizPartnerBranchHqId() { return mnBizPartnerBranchHqId; }
     public String getBizPartnerRfc() { return msBizPartnerRfc; }
+    public String getBizPartnerFiscalForeing() { return msBizPartnerFiscalForeing; }
     public String getBizPartnerName() { return msBizPartnerName; }
     public String getBizPartnerStreet() { return msBizPartnerStreet; }
     public String getBizPartnerStreetNumberExt() { return msBizPartnerStreetNumberExt; }
@@ -125,7 +133,8 @@ public class SCfdDataAsociadoNegocios {
     public String getBizPartnerState() { return msBizPartnerState; }
     public String getBizPartnerZipCode() { return msBizPartnerZipCode; }
     public String getBizPartnerPoBox() { return msBizPartnerPoBox; }
-    public String getBizPartnerCountry() { return msBizPartnerCountry; }
+    public String getBizPartnerCountryCode() { return msBizPartnerCountryCode; }
+    public String getBizPartnerCountryName() { return msBizPartnerCountryName; }
     public String getBizPartnerExpeditionStreet() { return msBizPartnerExpeditionStreet; }
     public String getBizPartnerExpeditionStreetNumberExt() { return msBizPartnerExpeditionStreetNumberExt; }
     public String getBizPartnerExpeditionStreetNumberInt() { return msBizPartnerExpeditionStreetNumberInt; }
@@ -136,7 +145,7 @@ public class SCfdDataAsociadoNegocios {
     public String getBizPartnerExpeditionState() { return msBizPartnerExpeditionState; }
     public String getBizPartnerExpeditionZipCode() { return msBizPartnerExpeditionZipCode; }
     public String getBizPartnerExpeditionPoBox() { return msBizPartnerExpeditionPoBox; }
-    public String getBizPartnerExpeditionCountry() { return msBizPartnerExpeditionCountry; }
+    public String getBizPartnerExpeditionCountryName() { return msBizPartnerExpeditionCountryName; }
     public String getBizPartnerFiscalRegime() { return msBizPartnerFiscalRegime; }
     public boolean getIsCfdi() { return mbIsCfdi; }
     public float getVersion() { return mfVersion; }
@@ -144,50 +153,56 @@ public class SCfdDataAsociadoNegocios {
 
     /**
      * Create element root for emisor with expedition spot for the business partner indicated
-     * @param bizPartner business partner the expedition spot
-     * @param bizPartnerBranch business partner branch the expedition spot
-     * @param version version of XML
      * @return cfd.DElement node cfd.DElement for emisor
-     * @throws java.lang.Exception
      * @throws java.lang.Exception
      */
     public cfd.DElement createRootElementEmisor() throws java.lang.Exception {
         DElement emisor = null;
 
         if (mbIsCfdi) {
-            emisor = new cfd.ver3.DElementEmisor();
+            if (mfVersion == DCfdConsts.CFDI_VER_33) {
+                emisor = new cfd.ver33.DElementEmisor();
 
-            ((cfd.ver3.DElementEmisor) emisor).getAttRfc().setString(msBizPartnerRfc);
-            ((cfd.ver3.DElementEmisor) emisor).getAttNombre().setString(msBizPartnerName);
-            
-            if (mnCfdiType == SCfdConsts.CFD_TYPE_PAYROLL) {
-                ((cfd.ver3.DElementEmisor) emisor).clearEltDomicilioFiscal();
+                ((cfd.ver33.DElementEmisor) emisor).getAttRfc().setString(msBizPartnerRfc);
+                ((cfd.ver33.DElementEmisor) emisor).getAttNombre().setString(msBizPartnerName);
+                //((cfd.ver33.DElementEmisor) emisor).getAttRegimenFiscal().setString(msBizPartnerName);
+                
             }
-            else {
-                ((cfd.ver3.DElementEmisor) emisor).getEltDomicilioFiscal().getAttCalle().setString(msBizPartnerStreet);
-                ((cfd.ver3.DElementEmisor) emisor).getEltDomicilioFiscal().getAttNoExterior().setString(msBizPartnerStreetNumberExt);
-                ((cfd.ver3.DElementEmisor) emisor).getEltDomicilioFiscal().getAttNoInterior().setString(msBizPartnerStreetNumberInt);
-                ((cfd.ver3.DElementEmisor) emisor).getEltDomicilioFiscal().getAttColonia().setString(msBizPartnerNeighborhood);
-                ((cfd.ver3.DElementEmisor) emisor).getEltDomicilioFiscal().getAttLocalidad().setString(msBizPartnerLocality);
-                ((cfd.ver3.DElementEmisor) emisor).getEltDomicilioFiscal().getAttReferencia().setString(msBizPartnerReference);
-                ((cfd.ver3.DElementEmisor) emisor).getEltDomicilioFiscal().getAttMunicipio().setString(msBizPartnerCounty);
-                ((cfd.ver3.DElementEmisor) emisor).getEltDomicilioFiscal().getAttEstado().setString(msBizPartnerState);
-                ((cfd.ver3.DElementEmisor) emisor).getEltDomicilioFiscal().getAttCodigoPostal().setString(msBizPartnerZipCode);
-                ((cfd.ver3.DElementEmisor) emisor).getEltDomicilioFiscal().getAttPais().setString(msBizPartnerCountry);
-            }
+            else if (mfVersion == DCfdConsts.CFDI_VER_32) {
+                emisor = new cfd.ver32.DElementEmisor();
 
-            if (mnBizPartnerBranchHqId != mnBizPartnerBranchId && mnCfdiType != SCfdConsts.CFD_TYPE_PAYROLL) {
-                ((cfd.ver3.DElementEmisor) emisor).setEltOpcExpedidoEn(new cfd.ver3.DElementTipoUbicacion("cfdi:ExpedidoEn"));
-                ((cfd.ver3.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttCalle().setString(msBizPartnerExpeditionStreet);
-                ((cfd.ver3.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttNoExterior().setString(msBizPartnerExpeditionStreetNumberExt);
-                ((cfd.ver3.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttNoInterior().setString(msBizPartnerExpeditionStreetNumberInt);
-                ((cfd.ver3.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttColonia().setString(msBizPartnerExpeditionNeighborhood);
-                ((cfd.ver3.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttLocalidad().setString(msBizPartnerExpeditionLocality);
-                ((cfd.ver3.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttReferencia().setString(msBizPartnerExpeditionReference);
-                ((cfd.ver3.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttMunicipio().setString(msBizPartnerExpeditionCounty);
-                ((cfd.ver3.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttEstado().setString(msBizPartnerExpeditionState);
-                ((cfd.ver3.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttCodigoPostal().setString(msBizPartnerExpeditionZipCode);
-                ((cfd.ver3.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttPais().setString(msBizPartnerExpeditionCountry);
+                ((cfd.ver32.DElementEmisor) emisor).getAttRfc().setString(msBizPartnerRfc);
+                ((cfd.ver32.DElementEmisor) emisor).getAttNombre().setString(msBizPartnerName);
+
+                if (mnCfdiType == SCfdConsts.CFD_TYPE_PAYROLL) {
+                    ((cfd.ver32.DElementEmisor) emisor).clearEltDomicilioFiscal();
+                }
+                else {
+                    ((cfd.ver32.DElementEmisor) emisor).getEltDomicilioFiscal().getAttCalle().setString(msBizPartnerStreet);
+                    ((cfd.ver32.DElementEmisor) emisor).getEltDomicilioFiscal().getAttNoExterior().setString(msBizPartnerStreetNumberExt);
+                    ((cfd.ver32.DElementEmisor) emisor).getEltDomicilioFiscal().getAttNoInterior().setString(msBizPartnerStreetNumberInt);
+                    ((cfd.ver32.DElementEmisor) emisor).getEltDomicilioFiscal().getAttColonia().setString(msBizPartnerNeighborhood);
+                    ((cfd.ver32.DElementEmisor) emisor).getEltDomicilioFiscal().getAttLocalidad().setString(msBizPartnerLocality);
+                    ((cfd.ver32.DElementEmisor) emisor).getEltDomicilioFiscal().getAttReferencia().setString(msBizPartnerReference);
+                    ((cfd.ver32.DElementEmisor) emisor).getEltDomicilioFiscal().getAttMunicipio().setString(msBizPartnerCounty);
+                    ((cfd.ver32.DElementEmisor) emisor).getEltDomicilioFiscal().getAttEstado().setString(msBizPartnerState);
+                    ((cfd.ver32.DElementEmisor) emisor).getEltDomicilioFiscal().getAttCodigoPostal().setString(msBizPartnerZipCode);
+                    ((cfd.ver32.DElementEmisor) emisor).getEltDomicilioFiscal().getAttPais().setString(msBizPartnerCountryName);
+                }
+
+                if (mnBizPartnerBranchHqId != mnBizPartnerBranchId && mnCfdiType != SCfdConsts.CFD_TYPE_PAYROLL) {
+                    ((cfd.ver32.DElementEmisor) emisor).setEltOpcExpedidoEn(new cfd.ver32.DElementTipoUbicacion("cfdi:ExpedidoEn"));
+                    ((cfd.ver32.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttCalle().setString(msBizPartnerExpeditionStreet);
+                    ((cfd.ver32.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttNoExterior().setString(msBizPartnerExpeditionStreetNumberExt);
+                    ((cfd.ver32.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttNoInterior().setString(msBizPartnerExpeditionStreetNumberInt);
+                    ((cfd.ver32.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttColonia().setString(msBizPartnerExpeditionNeighborhood);
+                    ((cfd.ver32.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttLocalidad().setString(msBizPartnerExpeditionLocality);
+                    ((cfd.ver32.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttReferencia().setString(msBizPartnerExpeditionReference);
+                    ((cfd.ver32.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttMunicipio().setString(msBizPartnerExpeditionCounty);
+                    ((cfd.ver32.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttEstado().setString(msBizPartnerExpeditionState);
+                    ((cfd.ver32.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttCodigoPostal().setString(msBizPartnerExpeditionZipCode);
+                    ((cfd.ver32.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttPais().setString(msBizPartnerExpeditionCountryName);
+                }
             }
         }
         else {
@@ -204,7 +219,7 @@ public class SCfdDataAsociadoNegocios {
             ((cfd.ver2.DElementEmisor) emisor).getEltDomicilioFiscal().getAttMunicipio().setString(msBizPartnerCounty);
             ((cfd.ver2.DElementEmisor) emisor).getEltDomicilioFiscal().getAttEstado().setString(msBizPartnerState);
             ((cfd.ver2.DElementEmisor) emisor).getEltDomicilioFiscal().getAttCodigoPostal().setString(msBizPartnerZipCode);
-            ((cfd.ver2.DElementEmisor) emisor).getEltDomicilioFiscal().getAttPais().setString(msBizPartnerCountry);
+            ((cfd.ver2.DElementEmisor) emisor).getEltDomicilioFiscal().getAttPais().setString(msBizPartnerCountryName);
 
             if (mnBizPartnerBranchHqId != mnBizPartnerBranchId) {
                 ((cfd.ver2.DElementEmisor) emisor).setEltOpcExpedidoEn(new cfd.ver2.DElementTipoUbicacion("ExpedidoEn"));
@@ -217,7 +232,7 @@ public class SCfdDataAsociadoNegocios {
                 ((cfd.ver2.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttMunicipio().setString(msBizPartnerExpeditionCounty);
                 ((cfd.ver2.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttEstado().setString(msBizPartnerExpeditionState);
                 ((cfd.ver2.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttCodigoPostal().setString(msBizPartnerExpeditionZipCode);
-                ((cfd.ver2.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttPais().setString(msBizPartnerExpeditionCountry);
+                ((cfd.ver2.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttPais().setString(msBizPartnerExpeditionCountryName);
             }
         }
 
@@ -226,36 +241,43 @@ public class SCfdDataAsociadoNegocios {
 
     /**
      * Create element root for receptor with expedition spot for the business partner indicated
-     * @param bizPartner business partner the expedition spot
-     * @param bizPartnerBranch business partner branch the expedition spot
-     * @param version version of XML
      * @return cfd.DElement node cfd.DElement for receptor
-     * @throws java.lang.Exception
      * @throws java.lang.Exception
      */
     public cfd.DElement createRootElementReceptor() throws java.lang.Exception {
         DElement receptor = null;
 
         if (mbIsCfdi) {
-            receptor = new cfd.ver3.DElementReceptor();
+            if (mfVersion == DCfdConsts.CFDI_VER_33) {
+                receptor = new cfd.ver33.DElementReceptor();
 
-            ((cfd.ver3.DElementReceptor) receptor).getAttRfc().setString(msBizPartnerRfc);
-            ((cfd.ver3.DElementReceptor) receptor).getAttNombre().setString(msBizPartnerName);
-            
-            if (mnCfdiType == SCfdConsts.CFD_TYPE_PAYROLL) {
-                ((cfd.ver3.DElementReceptor) receptor).clearEltDomicilio();
+                ((cfd.ver33.DElementReceptor) receptor).getAttRfc().setString(msBizPartnerRfc);
+                ((cfd.ver33.DElementReceptor) receptor).getAttNombre().setString(msBizPartnerName);
+                ((cfd.ver33.DElementReceptor) receptor).getAttResidenciaFiscal().setString(msBizPartnerCountryCode);
+                ((cfd.ver33.DElementReceptor) receptor).getAttNumRegIdTrib().setString(msBizPartnerFiscalForeing);
+                //((cfd.ver33.DElementReceptor) receptor).getAttUsoCFDI().setString(msBizPartnerName); is complete in 
             }
-            else {
-                ((cfd.ver3.DElementReceptor) receptor).getEltDomicilio().getAttCalle().setString(msBizPartnerStreet);
-                ((cfd.ver3.DElementReceptor) receptor).getEltDomicilio().getAttNoExterior().setString(msBizPartnerStreetNumberExt);
-                ((cfd.ver3.DElementReceptor) receptor).getEltDomicilio().getAttNoInterior().setString(msBizPartnerStreetNumberInt);
-                ((cfd.ver3.DElementReceptor) receptor).getEltDomicilio().getAttColonia().setString(msBizPartnerNeighborhood);
-                ((cfd.ver3.DElementReceptor) receptor).getEltDomicilio().getAttLocalidad().setString(msBizPartnerLocality);
-                ((cfd.ver3.DElementReceptor) receptor).getEltDomicilio().getAttReferencia().setString(msBizPartnerReference);
-                ((cfd.ver3.DElementReceptor) receptor).getEltDomicilio().getAttMunicipio().setString(msBizPartnerCounty);
-                ((cfd.ver3.DElementReceptor) receptor).getEltDomicilio().getAttEstado().setString(msBizPartnerState);
-                ((cfd.ver3.DElementReceptor) receptor).getEltDomicilio().getAttCodigoPostal().setString(msBizPartnerZipCode);
-                ((cfd.ver3.DElementReceptor) receptor).getEltDomicilio().getAttPais().setString(msBizPartnerCountry);
+            else if (mfVersion == DCfdConsts.CFDI_VER_32) {
+                receptor = new cfd.ver32.DElementReceptor();
+
+                ((cfd.ver32.DElementReceptor) receptor).getAttRfc().setString(msBizPartnerRfc);
+                ((cfd.ver32.DElementReceptor) receptor).getAttNombre().setString(msBizPartnerName);
+
+                if (mnCfdiType == SCfdConsts.CFD_TYPE_PAYROLL) {
+                    ((cfd.ver32.DElementReceptor) receptor).clearEltDomicilio();
+                }
+                else {
+                    ((cfd.ver32.DElementReceptor) receptor).getEltDomicilio().getAttCalle().setString(msBizPartnerStreet);
+                    ((cfd.ver32.DElementReceptor) receptor).getEltDomicilio().getAttNoExterior().setString(msBizPartnerStreetNumberExt);
+                    ((cfd.ver32.DElementReceptor) receptor).getEltDomicilio().getAttNoInterior().setString(msBizPartnerStreetNumberInt);
+                    ((cfd.ver32.DElementReceptor) receptor).getEltDomicilio().getAttColonia().setString(msBizPartnerNeighborhood);
+                    ((cfd.ver32.DElementReceptor) receptor).getEltDomicilio().getAttLocalidad().setString(msBizPartnerLocality);
+                    ((cfd.ver32.DElementReceptor) receptor).getEltDomicilio().getAttReferencia().setString(msBizPartnerReference);
+                    ((cfd.ver32.DElementReceptor) receptor).getEltDomicilio().getAttMunicipio().setString(msBizPartnerCounty);
+                    ((cfd.ver32.DElementReceptor) receptor).getEltDomicilio().getAttEstado().setString(msBizPartnerState);
+                    ((cfd.ver32.DElementReceptor) receptor).getEltDomicilio().getAttCodigoPostal().setString(msBizPartnerZipCode);
+                    ((cfd.ver32.DElementReceptor) receptor).getEltDomicilio().getAttPais().setString(msBizPartnerCountryName);
+                }
             }
         }
         else {
@@ -272,7 +294,7 @@ public class SCfdDataAsociadoNegocios {
             ((cfd.ver2.DElementReceptor) receptor).getEltDomicilio().getAttMunicipio().setString(msBizPartnerCounty);
             ((cfd.ver2.DElementReceptor) receptor).getEltDomicilio().getAttEstado().setString(msBizPartnerState);
             ((cfd.ver2.DElementReceptor) receptor).getEltDomicilio().getAttCodigoPostal().setString(msBizPartnerZipCode);
-            ((cfd.ver2.DElementReceptor) receptor).getEltDomicilio().getAttPais().setString(msBizPartnerCountry);
+            ((cfd.ver2.DElementReceptor) receptor).getEltDomicilio().getAttPais().setString(msBizPartnerCountryName);
         }
 
         return receptor;
@@ -280,10 +302,10 @@ public class SCfdDataAsociadoNegocios {
     
     public String getCfdLugarExpedicion() {
         if (mnBizPartnerBranchHqId != mnBizPartnerBranchId) {
-            return mnCfdiType != SCfdConsts.CFD_TYPE_PAYROLL ? msBizPartnerExpeditionLocality + ", " + msBizPartnerExpeditionState : msBizPartnerZipCode;
+            return mnCfdiType != SCfdConsts.CFD_TYPE_PAYROLL && mfVersion == DCfdConsts.CFDI_VER_32 ? msBizPartnerExpeditionLocality + ", " + msBizPartnerExpeditionState : msBizPartnerZipCode;
         }
         else {
-            return mnCfdiType != SCfdConsts.CFD_TYPE_PAYROLL ? msBizPartnerLocality + ", " + msBizPartnerState : msBizPartnerZipCode;
+            return mnCfdiType != SCfdConsts.CFD_TYPE_PAYROLL && mfVersion == DCfdConsts.CFDI_VER_32 ? msBizPartnerLocality + ", " + msBizPartnerState : msBizPartnerZipCode;
         }
     }
 }

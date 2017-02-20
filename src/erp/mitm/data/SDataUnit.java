@@ -13,7 +13,7 @@ import java.sql.ResultSet;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Juan Barajas
  */
 public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -26,6 +26,7 @@ public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected boolean mbIsCanDelete;
     protected boolean mbIsDeleted;
     protected int mnFkUnitTypeId;
+    protected int mnFkCfdUnitId;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
     protected int mnFkUserDeleteId;
@@ -47,6 +48,7 @@ public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Ser
     public void setIsCanDelete(boolean b) { mbIsCanDelete = b; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkUnitTypeId(int n) { mnFkUnitTypeId = n; }
+    public void setFkCfdUnitId(int n) { mnFkCfdUnitId = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
     public void setFkUserDeleteId(int n) { mnFkUserDeleteId = n; }
@@ -63,6 +65,7 @@ public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Ser
     public boolean getIsCanDelete() { return mbIsCanDelete; }
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkUnitTypeId() { return mnFkUnitTypeId; }
+    public int getFkCfdUnitId() { return mnFkCfdUnitId; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
     public int getFkUserDeleteId() { return mnFkUserDeleteId; }
@@ -93,6 +96,7 @@ public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Ser
         mbIsCanDelete = false;
         mbIsDeleted = false;
         mnFkUnitTypeId = 0;
+        mnFkCfdUnitId = 0;
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
         mnFkUserDeleteId = 0;
@@ -126,6 +130,7 @@ public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Ser
                 mbIsCanDelete = resultSet.getBoolean("b_can_del");
                 mbIsDeleted = resultSet.getBoolean("b_del");
                 mnFkUnitTypeId = resultSet.getInt("fid_tp_unit");
+                mnFkCfdUnitId = resultSet.getInt("fid_cfd_unit");
                 mnFkUserNewId = resultSet.getInt("fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("fid_usr_edit");
                 mnFkUserDeleteId = resultSet.getInt("fid_usr_del");
@@ -160,7 +165,7 @@ public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Ser
             callableStatement = connection.prepareCall(
                     "{ CALL erp.itmu_unit_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?) }");
+                    "?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkUnitId);
             callableStatement.setString(nParam++, msUnit);
             callableStatement.setString(nParam++, msSymbol);
@@ -170,6 +175,7 @@ public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Ser
             callableStatement.setBoolean(nParam++, mbIsCanDelete);
             callableStatement.setBoolean(nParam++, mbIsDeleted);
             callableStatement.setInt(nParam++, mnFkUnitTypeId);
+            callableStatement.setInt(nParam++, mnFkCfdUnitId);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);

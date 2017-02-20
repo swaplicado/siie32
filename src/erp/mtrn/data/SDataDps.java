@@ -26,6 +26,7 @@ import cfd.ext.soriana.DElementDSCargaRemisionProv;
 import cfd.ext.soriana.DElementFolioNotaEntrada;
 import erp.SClient;
 import erp.cfd.SCfdConsts;
+import erp.cfd.SCfdDataCfdiRelacionado;
 import erp.cfd.SCfdDataConcepto;
 import erp.cfd.SCfdDataImpuesto;
 import erp.client.SClientInterface;
@@ -73,7 +74,7 @@ import sa.lib.db.SDbConsts;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, juan Barajas
  */
 public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Serializable, erp.cfd.SCfdXml {
 
@@ -244,6 +245,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected String msCfdExpeditionLocality;
     protected String msCfdExpeditionState;
     protected double mdCfdIvaPorcentaje;
+    
+    protected erp.mtrn.data.SDataDpsCfd moDbmsDataDpsCfd;
+    protected java.lang.String msXtaCfdConfirmacion;
+    protected java.lang.String msXtaCfdTipoRelacion;
+    protected java.lang.String msXtaCfdUsoCfdi;
 
     public SDataDps() {
         super(SDataConstants.TRN_DPS);
@@ -1662,6 +1668,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setDbmsDataBookkeepingNumber(erp.mfin.data.SDataBookkeepingNumber o) { moDbmsDataBookkeepingNumber = o; }
     public void setDbmsDataCfd(erp.mtrn.data.SDataCfd o) { moDbmsDataCfd = o; }
     public void setDbmsDataAddenda(erp.mtrn.data.SDataDpsAddenda o) { moDbmsDataAddenda = o; }
+    
+    public void setDbmsDataDpsCfd(erp.mtrn.data.SDataDpsCfd o) { moDbmsDataDpsCfd = o; }
+    
+    public void setXtaCfdConfirmacion(String s) { msXtaCfdConfirmacion = s; }
+    public void setXtaCfdTipoRelacion(String s) { msXtaCfdTipoRelacion = s; }
+    public void setXtaCfdUsoCfdi(String s) { msXtaCfdUsoCfdi = s; }
 
     public java.lang.Object getDbmsRecordKey() { return moDbmsRecordKey; }
     public java.util.Date getDbmsRecordDate() { return mtDbmsRecordDate; }
@@ -1677,6 +1689,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public erp.mfin.data.SDataBookkeepingNumber getDbmsDataBookkeepingNumber() { return moDbmsDataBookkeepingNumber; }
     public erp.mtrn.data.SDataCfd getDbmsDataCfd() { return moDbmsDataCfd; }
     public erp.mtrn.data.SDataDpsAddenda getDbmsDataAddenda() { return moDbmsDataAddenda; }
+    
+    public erp.mtrn.data.SDataDpsCfd getDbmsDataDpsCfd() { return moDbmsDataDpsCfd; }
+    
+    public java.lang.String getXtaCfdConfirmacion() { return msXtaCfdConfirmacion; }
+    public java.lang.String getXtaCfdTipoRelacion() { return msXtaCfdTipoRelacion; }
+    public java.lang.String getXtaCfdUsoCfdi() { return msXtaCfdUsoCfdi; }
 
     public erp.mtrn.data.SDataDpsEntry getDbmsDpsEntry(int[] pk) {
         SDataDpsEntry entry = null;
@@ -1854,7 +1872,13 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         moDbmsDataBookkeepingNumber = null;
         moDbmsDataCfd = null;
         moDbmsDataAddenda = null;
+        
+        moDbmsDataDpsCfd = null;
 
+        msXtaCfdConfirmacion = "";
+        msXtaCfdTipoRelacion = "";
+        msXtaCfdUsoCfdi = "";
+        
         msCfdExpeditionLocality = "";
         msCfdExpeditionState = "";
     }
@@ -1921,6 +1945,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnPayments = oResultSet.getInt("d.payments");
                 msPaymentMethod = oResultSet.getString("d.pay_method");
                 msPaymentAccount = oResultSet.getString("d.pay_account");
+                //msCfdConfirmationNumber = oResultSet.getString("d.cfd_conf_num");
                 mnAutomaticAuthorizationRejection = oResultSet.getInt("d.aut_authorn_rej");
                 mbIsPublic = oResultSet.getBoolean("d.b_pub");
                 mbIsLinked = oResultSet.getBoolean("d.b_link");
@@ -1975,6 +2000,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnFkSourceDocId_n = oResultSet.getInt("d.fid_src_doc_n");
                 mnFkMfgYearId_n = oResultSet.getInt("d.fid_mfg_year_n");
                 mnFkMfgOrderId_n = oResultSet.getInt("d.fid_mfg_ord_n");
+                //mnFkCfdRelationType = oResultSet.getInt("d.fid_cfd_tp_rel");
+                //mnFkCfdUse = oResultSet.getInt("d.fid_cfd_use");
                 mnFkUserLinkedId = oResultSet.getInt("d.fid_usr_link");
                 mnFkUserClosedId = oResultSet.getInt("d.fid_usr_close");
                 mnFkUserClosedCommissionsId = oResultSet.getInt("d.fid_usr_close_comms");
@@ -2131,6 +2158,25 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         moDbmsDataAddenda = new SDataDpsAddenda();
                         if (moDbmsDataAddenda.read(anKey, oStatementAux)!= SLibConstants.DB_ACTION_READ_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                        }
+                    }
+                }
+
+                // Read datas auxiliars for CFD:
+
+                sSql = "SELECT COUNT(*) FROM trn_dps_cfd WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";
+                oResultSet = statement.executeQuery(sSql);
+                if (oResultSet.next()) {
+                    if (oResultSet.getInt(1) > 0) {
+                        moDbmsDataDpsCfd = new SDataDpsCfd();
+                        if (moDbmsDataDpsCfd.read(anKey, oStatementAux)!= SLibConstants.DB_ACTION_READ_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                        }
+                        else {
+                            
+                            msXtaCfdConfirmacion = moDbmsDataDpsCfd.getCfdConfirmacion();
+                            msXtaCfdTipoRelacion = moDbmsDataDpsCfd.getCfdTipoRelacion();
+                            msXtaCfdUsoCfdi = moDbmsDataDpsCfd.getCfdUsoCfdi();
                         }
                     }
                 }
@@ -3068,6 +3114,22 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     moDbmsDataCfd.setTimestamp(mtDate);
 
                     if (moDbmsDataCfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                    }
+                }
+                
+                // Save XML of purchases when provided:
+                
+                if (!msXtaCfdUsoCfdi.isEmpty()) {
+                    moDbmsDataDpsCfd = new SDataDpsCfd();
+                    
+                    moDbmsDataDpsCfd.setPkYearId(mnPkYearId);
+                    moDbmsDataDpsCfd.setPkDocId(mnPkDocId);
+                    moDbmsDataDpsCfd.setCfdConfirmacion(msXtaCfdConfirmacion);
+                    moDbmsDataDpsCfd.setCfdTipoRelacion(msXtaCfdTipoRelacion);
+                    moDbmsDataDpsCfd.setCfdUsoCfdi(msXtaCfdUsoCfdi);
+
+                    if (moDbmsDataDpsCfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }
                 }
@@ -4064,8 +4126,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     @Override
-    public int getCfdFormaDePago() {
-        return mnPayments;
+    public String getCfdFormaDePago() {
+        return msPaymentMethod;
     }
 
     @Override
@@ -4109,8 +4171,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     @Override
-    public String getCfdMetodoDePago() {
-        return msPaymentMethod;
+    public int getCfdMetodoDePago() {
+        return mnPayments;
     }
 
     @Override
@@ -4118,6 +4180,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         return msPaymentAccount;
     }
 
+    @Override
+    public String getCfdNumConfirmacion() {
+        return msXtaCfdConfirmacion;
+    }
+    
     @Override
     public int getEmisor() {
         return moAuxCfdParams.getEmisor().getPkBizPartnerId();
@@ -4145,13 +4212,23 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
         for (int i = 0; i < moAuxCfdParams.getRegimenFiscal().length; i++) {
             regimes = new ArrayList<DElement>();
-            regimen = new cfd.ver3.DElementRegimenFiscal();
+            regimen = new cfd.ver32.DElementRegimenFiscal();
 
-            ((cfd.ver3.DElementRegimenFiscal) regimen).getAttRegimen().setString(moAuxCfdParams.getRegimenFiscal()[i]);
+            ((cfd.ver32.DElementRegimenFiscal) regimen).getAttRegimen().setString(moAuxCfdParams.getRegimenFiscal()[i]);
             regimes.add(regimen);
         }
 
         return regimes;
+    }
+    
+    @Override
+    public String getCfdTipoRelacion() {
+        return msXtaCfdTipoRelacion;        
+    }
+    
+    @Override
+    public String getCfdUsoCfdi() {
+        return msXtaCfdUsoCfdi;        
     }
 
     @Override
@@ -4162,24 +4239,24 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
         try {
             if (moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getFkCfdAddendaTypeId() != SDataConstantsSys.BPSS_TP_CFD_ADD_NA) {
-                addenda = new cfd.ver3.DElementAddenda();
+                addenda = new cfd.ver32.DElementAddenda();
 
                 if (isDocumentSal() || isAdjustmentSal()) {
                     switch (moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getFkCfdAddendaTypeId()) {
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA:
-                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaSoriana());
+                            ((cfd.ver32.DElementAddenda) addenda).getElements().add(computeAddendaSoriana());
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_LOREAL:
-                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaLoreal(mdCfdIvaPorcentaje));
+                            ((cfd.ver32.DElementAddenda) addenda).getElements().add(computeAddendaLoreal(mdCfdIvaPorcentaje));
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_BACHOCO:
-                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaBachoco(mdCfdIvaPorcentaje));
+                            ((cfd.ver32.DElementAddenda) addenda).getElements().add(computeAddendaBachoco(mdCfdIvaPorcentaje));
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_MODELO:
-                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaGrupoModelo(mdCfdIvaPorcentaje));
+                            ((cfd.ver32.DElementAddenda) addenda).getElements().add(computeAddendaGrupoModelo(mdCfdIvaPorcentaje));
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_ELEKTRA:
-                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaElektra());
+                            ((cfd.ver32.DElementAddenda) addenda).getElements().add(computeAddendaElektra());
                             break;
                         default:
                             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -4199,6 +4276,19 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         return null;
     }
 
+    @Override
+    public ArrayList<SCfdDataCfdiRelacionado> getCfdCfdiRelacionados() {
+        ArrayList<SCfdDataCfdiRelacionado> cfdiRelacinadosXml = new ArrayList<SCfdDataCfdiRelacionado>();
+        
+        for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
+            for (SDataDpsDpsLink dpsEntryLink : dpsEntry.getDbmsDpsLinksAsDestiny()) {
+                
+            }
+        }
+        
+        return cfdiRelacinadosXml;
+    }
+    
     @Override
     public ArrayList<SCfdDataConcepto> getCfdConceptos() {
         double price = 0;
@@ -4230,13 +4320,18 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 conceptoXml.setDescripcion(descripcion);
                 conceptoXml.setValorUnitario(price);
                 conceptoXml.setImporte(dpsEntry.getSubtotalCy_r());
+                conceptoXml.setClaveProdServ(dpsEntry.getDbmsItemClaveProdServ());
+                conceptoXml.setClaveUnidad(dpsEntry.getDbmsUnidadClave());
+                
+                conceptoXml.computeCfdImpuestosConceptos(dpsEntry);
+                
                 conceptosXml.add(conceptoXml);
             }
         }
 
         return conceptosXml;
     }
-
+    
     @Override
     public ArrayList<SCfdDataImpuesto> getCfdImpuestos() {
         double dImptoTasa = 0;

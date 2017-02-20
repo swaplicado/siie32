@@ -44,6 +44,7 @@ import sa.lib.xml.SXmlElement;
 public class SFinUtils {
     
     public static SDbBankLayout loadPaymentsXml(SGuiClient client, SDbBankLayout layout) {
+        String sReferenceRecord = "";
         String sObservation = "";
         int nDpsYearId = 0;
         int nDpsDocId = 0;
@@ -119,6 +120,7 @@ public class SFinUtils {
                             oLayoutPayDoc = (SXmlBankLayoutPaymentDoc) elementDoc;
                             nDpsYearId = (Integer) oLayoutPayDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_YEAR).getValue();
                             nDpsDocId = (Integer) oLayoutPayDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_DOC).getValue();
+                            sReferenceRecord = (String) oLayoutPayDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_REF_REC).getValue();
                             sObservation = (String) oLayoutPayDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_OBS).getValue();
                             dAmountPayed = (double) oLayoutPayDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT).getValue();
                             dExchangeRate = (double) oLayoutPayDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EXT_RATE).getValue();
@@ -134,6 +136,7 @@ public class SFinUtils {
                             oXmlRow.setConcept((String) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CPT).getValue());
                             oXmlRow.setDescription((String) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_DCRP).getValue());
                             oXmlRow.setBankKey((int) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_KEY).getValue());
+                            oXmlRow.setReferenceRecord(sReferenceRecord);
                             oXmlRow.setObservation(sObservation);
                             
                             if (oRecordLayout != null) {

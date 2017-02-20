@@ -140,7 +140,7 @@ public class SViewCfdXml extends erp.lib.table.STableTab implements java.awt.eve
                  "INNER JOIN erp.bpsu_bpb AS cob ON d.fid_cob = cob.id_bpb " +
                  "INNER JOIN erp.trns_tp_cfd AS tp ON dx.fid_tp_cfd = tp.id_tp_cfd " +
                  "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps " +
-                 "WHERE dx.fid_tp_cfd = " + (isCfdiPayroll() ? SDataConstantsSys.TRNS_TP_CFD_PAY : SDataConstantsSys.TRNS_TP_CFD_CFD) + " AND dx.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFDI + " AND d.b_del = 0 " + 
+                 "WHERE dx.fid_tp_cfd = " + (isCfdiPayroll() ? SDataConstantsSys.TRNS_TP_CFD_PAY : SDataConstantsSys.TRNS_TP_CFD_CFD) + " AND dx.fid_tp_xml IN(" + SDataConstantsSys.TRNS_TP_XML_CFDI_32 + ", " + SDataConstantsSys.TRNS_TP_XML_CFDI_33 + ") AND d.b_del = 0 " + 
                  "AND NOT (dx.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND dx.b_con = 0) " + (isCfdiSignPending() ? " AND LENGTH(dx.uuid) = 0 " : " AND LENGTH(dx.uuid) <> 0 ") + sqlDatePeriod + " " +
                  
                  "UNION " +
@@ -169,7 +169,7 @@ public class SViewCfdXml extends erp.lib.table.STableTab implements java.awt.eve
                  "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS hr ON " +
                  "r.id_pay = hr.id_pay AND r.id_emp = hr.id_emp AND hr.b_del = 0 AND hr.id_iss = dx.fid_pay_rcp_iss_n ") +
                  "INNER JOIN erp.trns_tp_cfd AS tp ON dx.fid_tp_cfd = tp.id_tp_cfd " +
-                 "WHERE dx.fid_tp_cfd = " + (isCfdiPayroll() ? SDataConstantsSys.TRNS_TP_CFD_PAY : SDataConstantsSys.TRNS_TP_CFD_CFD)+ " AND dx.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFDI + " AND hr.b_del = 0 " + 
+                 "WHERE dx.fid_tp_cfd = " + (isCfdiPayroll() ? SDataConstantsSys.TRNS_TP_CFD_PAY : SDataConstantsSys.TRNS_TP_CFD_CFD)+ " AND dx.fid_tp_xml IN(" + SDataConstantsSys.TRNS_TP_XML_CFDI_32 + ", " + SDataConstantsSys.TRNS_TP_XML_CFDI_33 + ") AND hr.b_del = 0 " + 
                  "AND NOT (dx.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND dx.b_con = 0) " + (isCfdiSignPending() ? " AND LENGTH(dx.uuid) = 0 " : " AND LENGTH(dx.uuid) <> 0 ") + sqlDatePeriodPayroll + " " +
                  "ORDER BY tp_cfd, f_tp_doc, f_dt, f_num, f_cob, uuid, f_ico, f_ico_xml";
     }

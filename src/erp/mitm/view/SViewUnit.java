@@ -39,7 +39,7 @@ public class SViewUnit extends erp.lib.table.STableTab implements java.awt.event
         addTaskBarUpperComponent(moTabFilterDeleted);
 
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[15];
+        STableColumn[] aoTableColumns = new STableColumn[16];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "unit.id_unit");
@@ -49,6 +49,7 @@ public class SViewUnit extends erp.lib.table.STableTab implements java.awt.event
 
         i = 0;
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_unit.tp_unit", "Tipo unidad", 150);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_cfd_unit", "Unidad SAT", 150);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "unit.unit", "Unidad", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "unit.symbol", "Símbolo", STableConstants.WIDTH_UNIT_SYMBOL);
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "unit.unit_base_equiv", "Equiv. unidad base", 150);
@@ -127,7 +128,7 @@ public class SViewUnit extends erp.lib.table.STableTab implements java.awt.event
 
         msSql = "SELECT unit.id_unit, unit.unit, unit.symbol, unit.unit_base_equiv, unit.sort_pos, unit.b_can_edit, unit.b_can_del, unit.b_del, " +
                 "unit.b_can_edit AS " + STableConstants.FIELD_IS_EDITABLE + ", " +
-                "tp_unit.tp_unit, tp_unit.unit_base, unit.fid_usr_new, unit.fid_usr_edit, unit.fid_usr_del, unit.ts_new, unit.ts_edit, unit.ts_del, " +
+                "tp_unit.tp_unit, tp_unit.unit_base, cfd_unit.name AS _cfd_unit, unit.fid_usr_new, unit.fid_usr_edit, unit.fid_usr_del, unit.ts_new, unit.ts_edit, unit.ts_del, " +
                 "un.usr, ue.usr, ud.usr " +
                 "FROM erp.itmu_unit AS unit " +
                 "INNER JOIN erp.itmu_tp_unit AS tp_unit ON " +
@@ -138,6 +139,8 @@ public class SViewUnit extends erp.lib.table.STableTab implements java.awt.event
                 "unit.fid_usr_edit = ue.id_usr " +
                 "INNER JOIN erp.usru_usr AS ud ON " +
                 "unit.fid_usr_del = ud.id_usr " +
+                "INNER JOIN erp.itms_cfd_unit AS cfd_unit ON " +
+                "unit.fid_cfd_unit = cfd_unit.id_cfd_unit " +
                 (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) +
                 "ORDER BY tp_unit.tp_unit, tp_unit.id_tp_unit, unit.sort_pos, unit.unit, unit.id_unit ";
     }

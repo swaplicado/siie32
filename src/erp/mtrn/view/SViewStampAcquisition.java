@@ -44,7 +44,8 @@ public class SViewStampAcquisition extends erp.lib.table.STableTab implements ja
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDatePeriod);
 
-        if (miClient.getSessionXXX().getParamsCompany().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI) {
+        if (miClient.getSessionXXX().getParamsCompany().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32 ||
+                miClient.getSessionXXX().getParamsCompany().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
             jbNew.setEnabled(true);
             jbEdit.setEnabled(true);
          }

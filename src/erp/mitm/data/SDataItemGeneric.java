@@ -15,7 +15,7 @@ import java.util.Vector;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores
+ * @author Alfonso Flores, Sergio Flores, Juan Barajas
  */
 public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -97,6 +97,7 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
     protected int mnFkAdministrativeConceptTypeId;
     protected int mnFkTaxableConceptTypeId;
     protected int mnFkDefaultItemRefId_n;
+    protected int mnFkCfdProdServId;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
     protected int mnFkUserDeleteId;
@@ -191,6 +192,7 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
     public void setFkAdministrativeConceptTypeId(int n) { mnFkAdministrativeConceptTypeId = n; }
     public void setFkTaxableConceptTypeId(int n) { mnFkTaxableConceptTypeId = n; }
     public void setFkDefaultItemRefId_n(int n) { mnFkDefaultItemRefId_n = n; }
+    public void setFkCfdProdServId(int n) { mnFkCfdProdServId = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
     public void setFkUserDeleteId(int n) { mnFkUserDeleteId = n; }
@@ -276,6 +278,7 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
     public int getFkAdministrativeConceptTypeId() { return mnFkAdministrativeConceptTypeId; }
     public int getFkTaxableConceptTypeId() { return mnFkTaxableConceptTypeId; }
     public int getFkDefaultItemRefId_n() { return mnFkDefaultItemRefId_n; }
+    public int getFkCfdProdServId() { return mnFkCfdProdServId; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
     public int getFkUserDeleteId() { return mnFkUserDeleteId; }
@@ -384,6 +387,7 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
         mnFkAdministrativeConceptTypeId = 0;
         mnFkTaxableConceptTypeId = 0;
         mnFkDefaultItemRefId_n = 0;
+        mnFkCfdProdServId = 0;
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
         mnFkUserDeleteId = 0;
@@ -494,6 +498,7 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
                 mnFkAdministrativeConceptTypeId = resultSet.getInt("igen.fid_tp_adm_cpt");
                 mnFkTaxableConceptTypeId = resultSet.getInt("igen.fid_tp_tax_cpt");
                 mnFkDefaultItemRefId_n = resultSet.getInt("fid_item_ref_def_n");
+                mnFkCfdProdServId = resultSet.getInt("igen.fid_cfd_prod_serv");
                 if (resultSet.wasNull()) mnFkDefaultItemRefId_n = 0;
                 mnFkUserNewId = resultSet.getInt("igen.fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("igen.fid_usr_edit");
@@ -559,7 +564,7 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ? ) }");
+                    "?, ?, ? ) }");
             callableStatement.setInt(nParam++, mnPkItemGenericId);
             callableStatement.setString(nParam++, msItemGeneric);
             callableStatement.setString(nParam++, msItemGenericShort);
@@ -638,6 +643,7 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
             callableStatement.setInt(nParam++, mnFkAdministrativeConceptTypeId);
             callableStatement.setInt(nParam++, mnFkTaxableConceptTypeId);
             if (mnFkDefaultItemRefId_n > 0) callableStatement.setInt(nParam++, mnFkDefaultItemRefId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
+            callableStatement.setInt(nParam++, mnFkCfdProdServId);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);

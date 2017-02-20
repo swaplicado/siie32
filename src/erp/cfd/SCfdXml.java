@@ -19,7 +19,7 @@ public interface SCfdXml {
     public String getCfdFolio();
     public String getCfdReferencia();
     public Date getCfdFecha();
-    public int getCfdFormaDePago();
+    public String getCfdFormaDePago();
     public int getCfdCondicionesDePago();
     public double getCfdSubTotal();
     public double getCfdDescuento();
@@ -28,16 +28,20 @@ public interface SCfdXml {
     public String getCfdMoneda();
     public double getCfdTotal();
     public int getCfdTipoDeComprobante();
-    public String getCfdMetodoDePago();
+    public int getCfdMetodoDePago();
     public String getCfdNumCtaPago();
+    public String getCfdNumConfirmacion();
     public int getEmisor();
     public int getSucursalEmisor();
     public int getReceptor();
     public int getSucursalReceptor();
     public ArrayList<DElement> getCfdElementRegimenFiscal();
+    public String getCfdTipoRelacion();
+    public String getCfdUsoCfdi();
     public cfd.DElement getCfdElementAddenda();
     public cfd.DElement getCfdElementComplemento();
 
+    public ArrayList<SCfdDataCfdiRelacionado> getCfdCfdiRelacionados();
     public ArrayList<SCfdDataConcepto> getCfdConceptos();
     public ArrayList<SCfdDataImpuesto> getCfdImpuestos();
 }

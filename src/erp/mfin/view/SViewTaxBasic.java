@@ -5,19 +5,18 @@
 
 package erp.mfin.view;
 
-import javax.swing.JButton;
-
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.table.STabFilterDeleted;
-import erp.lib.table.STableField;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
+import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import javax.swing.JButton;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores
+ * @author Alfonso Flores, Sergio Flores, Juan Barajas
  */
 public class SViewTaxBasic extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -41,7 +40,7 @@ public class SViewTaxBasic extends erp.lib.table.STableTab implements java.awt.e
         //jbDelete.setEnabled(false);
 
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[8];
+        STableColumn[] aoTableColumns = new STableColumn[9];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "tb.id_tax_bas");
@@ -51,6 +50,7 @@ public class SViewTaxBasic extends erp.lib.table.STableTab implements java.awt.e
 
         i = 0;
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tb.tax_bas", "Impuesto básico", 200);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_cfd_tax", "Impuesto SAT", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "tb.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usr. creación", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "tb.ts_new", "Creación", STableConstants.WIDTH_DATE_TIME);
@@ -108,8 +108,10 @@ public class SViewTaxBasic extends erp.lib.table.STableTab implements java.awt.e
             }
         }
 
-        msSql = "SELECT tb.*, un.usr, ue.usr, ud.usr " +
+        msSql = "SELECT tb.*, cfd_tax.name AS _cfd_tax, un.usr, ue.usr, ud.usr " +
                 "FROM erp.finu_tax_bas AS tb " +
+                "INNER JOIN erp.fins_cfd_tax AS cfd_tax ON " +
+                "tb.fid_cfd_tax = cfd_tax.id_cfd_tax " +
                 "INNER JOIN erp.usru_usr AS un ON " +
                 "tb.fid_usr_new = un.id_usr " +
                 "INNER JOIN erp.usru_usr AS ue ON " +

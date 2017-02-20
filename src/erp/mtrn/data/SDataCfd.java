@@ -461,7 +461,7 @@ extends erp.lib.data.SDataRegistry implements java.io.Serializable {
                 preparedStatement = connection.prepareStatement(sql);
 
                 if (mbGenerateQrCode) {
-                    bufferedImage = DCfd.createQrCodeBufferedImage(msAuxRfcEmisor, msAuxRfcReceptor, mdAuxTotalCy, msUuid);
+                    bufferedImage = DCfd.createQrCodeBufferedImageCfdi32(msAuxRfcEmisor, msAuxRfcReceptor, mdAuxTotalCy, msUuid);
                     moQrCode_n = converterBufferedImageToByteArray(bufferedImage);
                 }
 
@@ -471,7 +471,7 @@ extends erp.lib.data.SDataRegistry implements java.io.Serializable {
                 preparedStatement.setString(index++, msSignature);
                 preparedStatement.setString(index++, msDocXml);
                 preparedStatement.setString(index++, msDocXmlName);
-                if (mnFkXmlTypeId != SDataConstantsSys.TRNS_TP_XML_CFDI) {
+                if (mnFkXmlTypeId != SDataConstantsSys.TRNS_TP_XML_CFDI_32 || mnFkXmlTypeId != SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
                     preparedStatement.setString(index++, "");
                     preparedStatement.setNull(index++, java.sql.Types.BLOB);
                 }

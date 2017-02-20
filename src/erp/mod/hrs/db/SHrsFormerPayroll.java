@@ -96,11 +96,11 @@ public class SHrsFormerPayroll {
         SCfdDataAsociadoNegocios xmlEmisor = null;
         SCfdDataAsociadoNegocios xmlExpeditionSpot = null;
         SCfdDataAsociadoNegocios xmlReceptor = null;
-        cfd.ver3.DElementComprobante comprobante = null;
+        cfd.ver32.DElementComprobante comprobante = null;
 
         // Comprobante:
 
-        comprobante = cfd.DCfdUtils.getCfdi(pCfd.get(0).getDocXml());
+        comprobante = cfd.DCfdUtils.getCfdi32(pCfd.get(0).getDocXml());
 
         mtFecha = comprobante.getAttFecha().getDatetime();
         mnPkNominaId = subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? pCfd.get(0).getFkPayrollPayrollId_n() : pCfd.get(0).getFkPayrollReceiptPayrollId_n();
@@ -120,7 +120,7 @@ public class SHrsFormerPayroll {
         xmlEmisor.setBizPartnerReference(comprobante.getEltEmisor().getEltDomicilioFiscal().getAttReferencia().getString());
         xmlEmisor.setBizPartnerCounty(comprobante.getEltEmisor().getEltDomicilioFiscal().getAttMunicipio().getString());
         xmlEmisor.setBizPartnerState(comprobante.getEltEmisor().getEltDomicilioFiscal().getAttEstado().getString());
-        xmlEmisor.setBizPartnerCountry(comprobante.getEltEmisor().getEltDomicilioFiscal().getAttPais().getString());
+        xmlEmisor.setBizPartnerCountryName(comprobante.getEltEmisor().getEltDomicilioFiscal().getAttPais().getString());
         xmlEmisor.setBizPartnerZipCode(comprobante.getEltEmisor().getEltDomicilioFiscal().getAttCodigoPostal().getString());
 
         if (!comprobante.getEltEmisor().getEltHijosRegimenFiscal().isEmpty()) {
@@ -142,14 +142,14 @@ public class SHrsFormerPayroll {
             xmlExpeditionSpot.setBizPartnerReference(comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttReferencia().getString());
             xmlExpeditionSpot.setBizPartnerCounty(comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttMunicipio().getString());
             xmlExpeditionSpot.setBizPartnerState(comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttEstado().getString());
-            xmlExpeditionSpot.setBizPartnerCountry(comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttPais().getString());
+            xmlExpeditionSpot.setBizPartnerCountryName(comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttPais().getString());
             xmlExpeditionSpot.setBizPartnerZipCode(comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttCodigoPostal().getString());
         }
 
         // load payroll receipts:
 
         for (SDataCfd cfdReceipt : pCfd) {
-            comprobante = cfd.DCfdUtils.getCfdi(cfdReceipt.getDocXml());
+            comprobante = cfd.DCfdUtils.getCfdi32(cfdReceipt.getDocXml());
             dTotalIncome = 0;
             dTotalDeductions = 0;
             dTotalRentRetained = 0;
@@ -171,7 +171,7 @@ public class SHrsFormerPayroll {
             xmlReceptor.setBizPartnerReference(comprobante.getEltReceptor().getEltDomicilio().getAttReferencia().getString());
             xmlReceptor.setBizPartnerCounty(comprobante.getEltReceptor().getEltDomicilio().getAttMunicipio().getString());
             xmlReceptor.setBizPartnerState(comprobante.getEltReceptor().getEltDomicilio().getAttEstado().getString());
-            xmlReceptor.setBizPartnerCountry(comprobante.getEltReceptor().getEltDomicilio().getAttPais().getString());
+            xmlReceptor.setBizPartnerCountryName(comprobante.getEltReceptor().getEltDomicilio().getAttPais().getString());
             xmlReceptor.setBizPartnerZipCode(comprobante.getEltReceptor().getEltDomicilio().getAttCodigoPostal().getString());
 
             // Payroll:

@@ -5,6 +5,7 @@
 package erp.server;
 
 import cfd.DCfd;
+import cfd.DCfdConsts;
 import erp.cfd.SCfdConsts;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadComponentItems;
@@ -183,8 +184,18 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
          */
 
         if (reportType == SDataConstantsSys.REP_TRN_CFDI || reportType == SDataConstantsSys.REP_TRN_CFDI_PAYROLL) {
-            BufferedImage biQrCode = DCfd.createQrCodeBufferedImage((String) map.get("sEmiRfc"), (String) map.get("sRecRfc"), Double.parseDouble("" + map.get("dCfdTotal")), (String) map.get("sCfdiUuid"));
-            map.put("oCfdiQrCode", biQrCode.getScaledInstance(biQrCode.getWidth(), biQrCode.getHeight(), Image.SCALE_DEFAULT));
+            BufferedImage biQrCode = null;
+            
+            if (Float.parseFloat((String) map.get("sCfdVersion")) == DCfdConsts.CFDI_VER_32) {
+                biQrCode = DCfd.createQrCodeBufferedImageCfdi32((String) map.get("sEmiRfc"), (String) map.get("sRecRfc"), Double.parseDouble("" + map.get("dCfdTotal")), (String) map.get("sCfdiUuid"));
+            }
+            else if (Float.parseFloat((String) map.get("sCfdVersion")) == DCfdConsts.CFDI_VER_33) {
+                biQrCode = DCfd.createQrCodeBufferedImageCfdi33((String) map.get("sUrlCfdi"), (String) map.get("sEmiRfc"), (String) map.get("sRecRfc"), Double.parseDouble("" + map.get("dCfdTotal")), (String) map.get("sCfdiUuid"), (String) map.get("sSelloCfdiUltDig"));
+            }
+            
+            if (biQrCode != null) {
+                map.put("oCfdiQrCode", biQrCode.getScaledInstance(biQrCode.getWidth(), biQrCode.getHeight(), Image.SCALE_DEFAULT));
+            }
         }
         
         if (reportType == SDataConstantsSys.REP_TRN_DPS_ORDER && (boolean) map.get("bIsSupplier")) {
@@ -519,14 +530,23 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                 xmlFileName += moCfd.getDecimalFormat().format(SLibUtils.parseLong(((cfd.ver2.DElementComprobante) packet.getCfdRootElement()).getAttFolio().getString())) + ".xml";
                 dateCfd = ((cfd.ver2.DElementComprobante) packet.getCfdRootElement()).getAttFecha().getDatetime();
             }
-            else if (packet.getCfdRootElement() instanceof cfd.ver3.DElementComprobante) {
-                xmlFile = ((cfd.ver3.DElementComprobante) packet.getCfdRootElement()).getElementForXml();
+            else if (packet.getCfdRootElement() instanceof cfd.ver32.DElementComprobante) {
+                xmlFile = ((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getElementForXml();
 
-                xmlFileName += ((cfd.ver3.DElementComprobante) packet.getCfdRootElement()).getEltEmisor().getAttRfc().getString() + "_";
-                xmlFileName += ((cfd.ver3.DElementComprobante) packet.getCfdRootElement()).getAttTipoDeComprobante().getOption().substring(0, 1).toUpperCase() + "_";
-                xmlFileName += (((cfd.ver3.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString().length() == 0 ? "" : ((cfd.ver3.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString() + "_");
-                xmlFileName += moCfd.getDecimalFormat().format(SLibUtils.parseLong(((cfd.ver3.DElementComprobante) packet.getCfdRootElement()).getAttFolio().getString())) + ".xml";
-                dateCfd = ((cfd.ver3.DElementComprobante) packet.getCfdRootElement()).getAttFecha().getDatetime();
+                xmlFileName += ((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getEltEmisor().getAttRfc().getString() + "_";
+                xmlFileName += ((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getAttTipoDeComprobante().getOption().substring(0, 1).toUpperCase() + "_";
+                xmlFileName += (((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString().length() == 0 ? "" : ((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString() + "_");
+                xmlFileName += moCfd.getDecimalFormat().format(SLibUtils.parseLong(((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getAttFolio().getString())) + ".xml";
+                dateCfd = ((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getAttFecha().getDatetime();
+            }
+            else if (packet.getCfdRootElement() instanceof cfd.ver33.DElementComprobante) {
+                xmlFile = ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getElementForXml();
+
+                xmlFileName += ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getEltEmisor().getAttRfc().getString() + "_";
+                xmlFileName += ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttTipoDeComprobante().getOption().substring(0, 1).toUpperCase() + "_";
+                xmlFileName += (((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString().length() == 0 ? "" : ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString() + "_");
+                xmlFileName += moCfd.getDecimalFormat().format(SLibUtils.parseLong(((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttFolio().getString())) + ".xml";
+                dateCfd = ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttFecha().getDatetime();
             }
             else {
                 throw new Exception("Not supported CFD version!");

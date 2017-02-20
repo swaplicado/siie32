@@ -37,6 +37,7 @@ import erp.mitm.data.SDataManufacturer;
 import erp.mitm.data.SDataUnit;
 import erp.mitm.data.SDataUnitType;
 import erp.mitm.data.SDataVariety;
+import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mtrn.data.STrnUtilities;
 import java.awt.BorderLayout;
@@ -50,10 +51,13 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import sa.lib.SLibConsts;
+import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores
+ * @author Alfonso Flores, Sergio Flores, Juan Barajas
  */
 public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener {
 
@@ -131,6 +135,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.lib.form.SFormField moFieldFkAccountEbitdaTypeId;
     private erp.lib.form.SFormField moFieldFkFiscalAccountIncId;
     private erp.lib.form.SFormField moFieldFkFiscalAccountExpId;
+    private erp.lib.form.SFormField moFieldFkCfdProdServId_n;
 
     private erp.lib.table.STablePane moItemForeignLanguagePane;
     private erp.lib.table.STablePane moItemBarcodePane;
@@ -344,6 +349,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jlFkFiscalAccountExpId = new javax.swing.JLabel();
         jcbFkFiscalAccountExpId = new javax.swing.JComboBox();
         jbFkFiscalAccountExpId = new javax.swing.JButton();
+        jPanel48 = new javax.swing.JPanel();
+        jlFkCfdProdServId_n = new javax.swing.JLabel();
+        moKeyCfdProdServId_n = new sa.lib.gui.bean.SBeanFieldKey();
         jpConfig2 = new javax.swing.JPanel();
         jpConfig2Language = new javax.swing.JPanel();
         jPanel41 = new javax.swing.JPanel();
@@ -992,7 +1000,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jpConfig1.setLayout(new java.awt.BorderLayout());
 
         jPanel39.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración para comercialización:"));
-        jPanel39.setLayout(new java.awt.GridLayout(6, 2, 5, 5));
+        jPanel39.setLayout(new java.awt.GridLayout(7, 2, 5, 5));
 
         jckIsFreeDiscountUnitary.setText("Sin descuento unitario");
         jPanel39.add(jckIsFreeDiscountUnitary);
@@ -1029,8 +1037,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jpConfig1.add(jPanel39, java.awt.BorderLayout.CENTER);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración para contabilización:"));
-        jPanel2.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración contable:"));
+        jPanel2.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
 
         jPanel49.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -1144,6 +1152,18 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel46.add(jbFkFiscalAccountExpId);
 
         jPanel2.add(jPanel46);
+
+        jPanel48.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel48.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFkCfdProdServId_n.setText("Producto-servicio SAT:");
+        jlFkCfdProdServId_n.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel48.add(jlFkCfdProdServId_n);
+
+        moKeyCfdProdServId_n.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel48.add(moKeyCfdProdServId_n);
+
+        jPanel2.add(jPanel48);
 
         jpConfig1.add(jPanel2, java.awt.BorderLayout.EAST);
 
@@ -1416,6 +1436,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldFkFiscalAccountExpId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkFiscalAccountExpId, jlFkFiscalAccountExpId);
         moFieldFkFiscalAccountExpId.setPickerButton(jbFkFiscalAccountExpId);
         moFieldFkFiscalAccountExpId.setTabbedPaneIndex(1, jTabbedPane);
+        moFieldFkCfdProdServId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, moKeyCfdProdServId_n.getComponent(), jlFkCfdProdServId_n);
+        moFieldFkCfdProdServId_n.setTabbedPaneIndex(1, jTabbedPane);
+        moKeyCfdProdServId_n.setKeySettings((SGuiClient) miClient, SGuiUtils.getLabelName(jlFkCfdProdServId_n.getText()), true);
 
         mvFields.add(moFieldFkItemGenericId);
         mvFields.add(moFieldFkItemLineId_n);
@@ -1480,6 +1503,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         mvFields.add(moFieldFkAccountEbitdaTypeId);
         mvFields.add(moFieldFkFiscalAccountIncId);
         mvFields.add(moFieldFkFiscalAccountExpId);
+        mvFields.add(moFieldFkCfdProdServId_n);
 
         moFormItemBarcode = new SFormItemBarcode(miClient);
         moFormItemForeignLanguage = new SFormItemForeignLanguage(miClient);
@@ -2639,6 +2663,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JPanel jPanel45;
     private javax.swing.JPanel jPanel46;
     private javax.swing.JPanel jPanel47;
+    private javax.swing.JPanel jPanel48;
     private javax.swing.JPanel jPanel49;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel50;
@@ -2731,6 +2756,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JLabel jlFkAccountEbitdaTypeId;
     private javax.swing.JLabel jlFkAdministrativeConceptTypeId;
     private javax.swing.JLabel jlFkBrandId;
+    private javax.swing.JLabel jlFkCfdProdServId_n;
     private javax.swing.JLabel jlFkDefaultItemRefId_n;
     private javax.swing.JLabel jlFkElementId;
     private javax.swing.JLabel jlFkFiscalAccountExpId;
@@ -2811,6 +2837,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JTextField jtfVolumeUnitary;
     private javax.swing.JTextField jtfWeightDelivery;
     private javax.swing.JTextField jtfWeightGross;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyCfdProdServId_n;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -2871,6 +2898,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         SFormUtilities.populateComboBox(miClient, jcbFkAccountEbitdaTypeId, SDataConstants.FINU_TP_ACC_EBITDA);
         SFormUtilities.populateComboBox(miClient, jcbFkFiscalAccountIncId, SDataConstants.FINS_FISCAL_ACC);
         SFormUtilities.populateComboBox(miClient, jcbFkFiscalAccountExpId, SDataConstants.FINS_FISCAL_ACC);
+        miClient.getSession().populateCatalogue(moKeyCfdProdServId_n, SModConsts.ITMS_CFD_PROD_SERV, SLibConsts.UNDEFINED, null);
         mbResetingForm = false;
     }
 
@@ -3058,6 +3086,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldFkAccountEbitdaTypeId.setFieldValue(new int[] { moItem.getFkAccountEbitdaTypeId()});
         moFieldFkFiscalAccountIncId.setFieldValue(new int[] { moItem.getFkFiscalAccountIncId() });
         moFieldFkFiscalAccountExpId.setFieldValue(new int[] { moItem.getFkFiscalAccountExpId() });
+        moKeyCfdProdServId_n.setValue(new int[] { moItem.getFkCfdProdServId_n() });
         jtfPkItemId_Ro.setText("" + moItem.getPkItemId());
 
         jckIsDeleted.setEnabled(true);
@@ -3186,6 +3215,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moItem.setFkAccountEbitdaTypeId(moFieldFkAccountEbitdaTypeId.getKeyAsIntArray()[0]);
         moItem.setFkFiscalAccountIncId(moFieldFkFiscalAccountIncId.getKeyAsIntArray()[0]);
         moItem.setFkFiscalAccountExpId(moFieldFkFiscalAccountExpId.getKeyAsIntArray()[0]);
+        moItem.setFkCfdProdServId_n(moKeyCfdProdServId_n.getValue()[0]);
         
         if (jrbStatusActive.isSelected()) {
             moItem.setFkItemStatusId(SModSysConsts.ITMS_ST_ITEM_ACT);

@@ -22,6 +22,7 @@ public class SDataTaxBasic extends erp.lib.data.SDataRegistry implements java.io
     protected int mnPkTaxBasicId;
     protected java.lang.String msTaxBasic;
     protected boolean mbIsDeleted;
+    protected int mnFkCfdTaxId;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
     protected int mnFkUserDeleteId;
@@ -40,6 +41,7 @@ public class SDataTaxBasic extends erp.lib.data.SDataRegistry implements java.io
     public void setPkTaxBasicId(int n) { mnPkTaxBasicId = n; }
     public void setTaxBasic(java.lang.String s) { msTaxBasic = s; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
+    public void setFkCfdTaxId(int n) { mnFkCfdTaxId = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
     public void setFkUserDeleteId(int n) { mnFkUserDeleteId = n; }
@@ -50,6 +52,7 @@ public class SDataTaxBasic extends erp.lib.data.SDataRegistry implements java.io
     public int getPkTaxBasicId() { return mnPkTaxBasicId; }
     public java.lang.String getTaxBasic() { return msTaxBasic; }
     public boolean getIsDeleted() { return mbIsDeleted; }
+    public int getFkCfdTaxId() { return mnFkCfdTaxId; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
     public int getFkUserDeleteId() { return mnFkUserDeleteId; }
@@ -76,6 +79,7 @@ public class SDataTaxBasic extends erp.lib.data.SDataRegistry implements java.io
         mnPkTaxBasicId = 0;
         msTaxBasic = "";
         mbIsDeleted = false;
+        mnFkCfdTaxId = 0;
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
         mnFkUserDeleteId = 0;
@@ -104,6 +108,7 @@ public class SDataTaxBasic extends erp.lib.data.SDataRegistry implements java.io
                 mnPkTaxBasicId = resultSet.getInt("id_tax_bas");
                 msTaxBasic = resultSet.getString("tax_bas");
                 mbIsDeleted = resultSet.getBoolean("b_del");
+                mnFkCfdTaxId = resultSet.getInt("fid_cfd_tax");
                 mnFkUserNewId = resultSet.getInt("fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("fid_usr_edit");
                 mnFkUserDeleteId = resultSet.getInt("fid_usr_del");
@@ -154,10 +159,11 @@ public class SDataTaxBasic extends erp.lib.data.SDataRegistry implements java.io
         try {
             callableStatement = connection.prepareCall(
                     "{ CALL erp.finu_tax_bas_save(" +
-                    "?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkTaxBasicId);
             callableStatement.setString(nParam++, msTaxBasic);
             callableStatement.setBoolean(nParam++, mbIsDeleted);
+            callableStatement.setInt(nParam++, mnFkCfdTaxId);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);

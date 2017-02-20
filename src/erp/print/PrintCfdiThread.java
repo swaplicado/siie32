@@ -7,8 +7,8 @@ package erp.print;
 
 import cfd.DCfdUtils;
 import cfd.DElement;
-import cfd.ver3.DElementComprobante;
-import cfd.ver3.DElementTimbreFiscalDigital;
+import cfd.ver32.DElementComprobante;
+import cfd.ver32.DElementTimbreFiscalDigital;
 import cfd.ver3.nom11.DElementNomina;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SDialogResult;
@@ -173,7 +173,7 @@ public class PrintCfdiThread extends Thread {
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
         
-        comprobante = DCfdUtils.getCfdi(cfd.getDocXml());
+        comprobante = DCfdUtils.getCfdi32(cfd.getDocXml());
         
         map.put("sSql", sSql);
         map.put("sCfdFecha", SLibUtils.DbmsDateFormatDatetime.format(comprobante.getAttFecha().getDatetime()));

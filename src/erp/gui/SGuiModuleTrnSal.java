@@ -1405,7 +1405,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     else {
                         if (((SDataDps) moRegistry).getDbmsDataCfd() != null) {
                             if (((SDataDps) moRegistry).getDbmsDataCfd().getFkDpsYearId_n() != SLibConstants.UNDEFINED) {
-                                if (((SDataDps) moRegistry).getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI && ((SDataDps) moRegistry).getDbmsDataCfd().getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
+                                if ((((SDataDps) moRegistry).getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32 || ((SDataDps) moRegistry).getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) &&
+                                        ((SDataDps) moRegistry).getDbmsDataCfd().getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
                                     // Check if registry can be annuled:
 
                                     request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL);

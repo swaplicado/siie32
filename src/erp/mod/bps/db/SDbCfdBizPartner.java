@@ -92,7 +92,8 @@ public class SDbCfdBizPartner {
                     asociadoNegocios.setBizPartnerState(moBizPartnerBranchAddress.getState());
                     asociadoNegocios.setBizPartnerZipCode(moBizPartnerBranchAddress.getZipCode());
                     asociadoNegocios.setBizPartnerPoBox(moBizPartnerBranchAddress.getPoBox());
-                    asociadoNegocios.setBizPartnerCountry(moBizPartnerBranchAddress.getDbmsDataCountry().getCountry());
+                    asociadoNegocios.setBizPartnerCountryCode(moBizPartnerBranchAddress.getDbmsDataCountry().getCountryCode());
+                    asociadoNegocios.setBizPartnerCountryName(moBizPartnerBranchAddress.getDbmsDataCountry().getCountry());
                     
                     if (mnBizPartnerExpeditionId != SLibConsts.UNDEFINED && mnBizPartnerBranchExpeditionId != SLibConsts.UNDEFINED) {
                         moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { mnBizPartnerExpeditionId }, SLibConstants.EXEC_MODE_SILENT);
@@ -123,7 +124,7 @@ public class SDbCfdBizPartner {
                                 asociadoNegocios.setBizPartnerExpeditionState(moBizPartnerBranchAddress.getState());
                                 asociadoNegocios.setBizPartnerExpeditionZipCode(moBizPartnerBranchAddress.getZipCode());
                                 asociadoNegocios.setBizPartnerExpeditionPoBox(moBizPartnerBranchAddress.getPoBox());
-                                asociadoNegocios.setBizPartnerExpeditionCountry(moBizPartnerBranchAddress.getDbmsDataCountry().getCountry());
+                                asociadoNegocios.setBizPartnerCountryName(moBizPartnerBranchAddress.getDbmsDataCountry().getCountry());
                             }
                         }
                     }

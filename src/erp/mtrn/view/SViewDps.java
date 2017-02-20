@@ -38,9 +38,9 @@ import erp.mtrn.form.SDialogAnnulCfdi;
 import erp.mtrn.form.SDialogContractAnalysis;
 import erp.mtrn.form.SDialogDpsFinder;
 import erp.mtrn.form.SDialogUpdateDpsDeliveryAddress;
-import erp.mtrn.form.SDialogUpdateDpsSalesAgentComms;
 import erp.mtrn.form.SDialogUpdateDpsLogistics;
 import erp.mtrn.form.SDialogUpdateDpsReferenceComms;
+import erp.mtrn.form.SDialogUpdateDpsSalesAgentComms;
 import erp.musr.data.SDataUser;
 import erp.print.SDataConstantsPrint;
 import erp.table.SFilterConstants;
@@ -720,7 +720,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         int gui = mbIsCategoryPur ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;    // GUI module
                         dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
-                        if (dps.getDbmsDataCfd() != null && dps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI) {
+                        if (dps.getDbmsDataCfd() != null && (dps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32 || dps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33)) {
                             annul = false;
                             params = new SGuiParams();
 
@@ -1754,13 +1754,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                 }
                             }
                             break;
-                        case SDataConstantsSys.TRNS_TP_XML_CFDI:
+                        case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
+                        case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
                             try {
-                                /* XXX jbarajas 03/02/2016 sign and sending CFDI
-                                if (SCfdUtils.signCfdi(miClient, dps.getDbmsDataCfd(), SLibConstants.UNDEFINED)) {
-                                    miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
-                                }
-                                */
                                 if (((SClientInterface) miClient).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticSal()) {
                                     if (SCfdUtils.signAndSendCfdi(miClient, dps.getDbmsDataCfd(), SLibConstants.UNDEFINED, true, true)) {
                                         miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);

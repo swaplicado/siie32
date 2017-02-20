@@ -697,7 +697,7 @@
                       <SubComponents>
                         <Component class="javax.swing.JLabel" name="jlFkPaymentSystemTypeId">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="M&#xe9;todo de pago: *"/>
+                            <Property name="text" type="java.lang.String" value="Forma de pago: *"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[100, 23]"/>
                             </Property>
@@ -3287,13 +3287,14 @@
                     <Container class="javax.swing.JPanel" name="jPanel74">
                       <Constraints>
                         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-                          <BorderConstraints direction="Center"/>
+                          <BorderConstraints direction="North"/>
                         </Constraint>
                       </Constraints>
 
                       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
                         <Property name="columns" type="int" value="2"/>
-                        <Property name="rows" type="int" value="1"/>
+                        <Property name="rows" type="int" value="3"/>
+                        <Property name="verticalGap" type="int" value="2"/>
                       </Layout>
                       <SubComponents>
                         <Container class="javax.swing.JPanel" name="jPanel75">
@@ -3312,7 +3313,7 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Archivo XML:"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[75, 23]"/>
+                                  <Dimension value="[100, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -3343,6 +3344,59 @@
                                 <Property name="toolTipText" type="java.lang.String" value="Eliminar archivo XML"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[23, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel93">
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlCfdUseId">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Uso CFDI: *"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[100, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JComboBox" name="jcbCfdUseId">
+                              <Properties>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[245, 23]"/>
+                                </Property>
+                              </Properties>
+                              <AuxValues>
+                                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+                              </AuxValues>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel94">
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlFkCfdConfirmationNum">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="No. confirmaci&#xf3;n:"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[100, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JTextField" name="jtfCfdConfirmationNum">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="00000000"/>
+                                <Property name="toolTipText" type="java.lang.String" value="Folio"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[190, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
