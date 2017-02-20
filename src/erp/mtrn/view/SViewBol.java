@@ -44,7 +44,7 @@ public class SViewBol extends erp.lib.table.STableTab {
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_cob_code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "d.tot_cur_r", "Total mon $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_cur_key", "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "dn.nts", "Numero remisión", STableConstants.WIDTH_ITEM_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "notes", "Numero remisión", STableConstants.WIDTH_ITEM_2X);
         
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);
@@ -94,13 +94,14 @@ public class SViewBol extends erp.lib.table.STableTab {
 
         msSql = "SELECT dt.code, CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, d.num_ref, d.dt, "
                 + "(SELECT cob.code FROM erp.bpsu_bpb AS cob WHERE d.fid_cob = cob.id_bpb) AS f_cob_code, d.tot_cur_r, "
-                + "(SELECT c.cur_key FROM erp.cfgu_cur AS c WHERE d.fid_cur = c.id_cur) AS f_cur_key, dn.nts "
-                + "FROM trn_dps AS d INNER JOIN trn_dps_nts AS dn ON (d.id_year = dn.id_year AND d.id_doc = dn.id_doc) "
+                + "(SELECT c.cur_key FROM erp.cfgu_cur AS c WHERE d.fid_cur = c.id_cur) AS f_cur_key, "
+                + "(SELECT GROUP_CONCAT(nts) FROM trn_dps_nts WHERE id_year = d.id_year AND id_doc = d.id_doc AND NOT b_del) AS notes "
+                + "FROM trn_dps AS d "
                 + "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps "
                 + "WHERE d.fid_ct_dps = " + (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_SAL ? SDataConstantsSys.TRNU_TP_DPS_SAL_INV[0] : SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0]) + " "
                 + "AND d.fid_cl_dps = " + (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_SAL ? SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1] : SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1]) + " "
                 + "AND d.fid_tp_dps = " + (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_SAL ? SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2] : SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2]) + " "
                 + "AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " "
-                + "AND not d.b_del AND NOT dn.b_del AND " + sqlWhere;
+                + "AND NOT d.b_del AND " + sqlWhere;
     }
 }
