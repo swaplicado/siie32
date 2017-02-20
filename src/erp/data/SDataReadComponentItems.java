@@ -363,10 +363,10 @@ public abstract class SDataReadComponentItems {
                 sql = "SELECT id_tp_cfd_add AS f_id_1, tp_cfd_add AS f_item FROM erp.bpss_tp_cfd_add WHERE b_del = 0 ORDER BY id_tp_cfd_add ";
                 text = "tipo de addenda para CFD";
                 break;
-            case SDataConstants.BPSS_TP_RISK:
+            case SDataConstants.BPSS_RISK:
                 lenPk = 1;
                 sql = "SELECT id_risk AS f_id_1, name AS f_item FROM erp.bpss_risk WHERE b_del = 0 ORDER BY id_risk ";
-                text = "tipo de riesgo";
+                text = "riesgo";
                 break;
             case SDataConstants.BPSU_BP:
                 lenPk = 1;

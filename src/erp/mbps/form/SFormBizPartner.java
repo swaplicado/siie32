@@ -264,8 +264,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jlDaysOfGrace = new javax.swing.JLabel();
         jtfDaysOfGrace = new javax.swing.JTextField();
         jPanel50 = new javax.swing.JPanel();
-        jlFkRiskTypeId = new javax.swing.JLabel();
-        jcbFkRiskTypeId = new javax.swing.JComboBox<SFormComponentItem>();
+        jlFkRiskId = new javax.swing.JLabel();
+        jcbFkRiskId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel51 = new javax.swing.JPanel();
         jlGuarantee = new javax.swing.JLabel();
         jtfGuarantee = new javax.swing.JTextField();
@@ -774,12 +774,12 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         jPanel50.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlFkRiskTypeId.setText("Tipo de riesgo: *");
-        jlFkRiskTypeId.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel50.add(jlFkRiskTypeId);
+        jlFkRiskId.setText("Riesgo: *");
+        jlFkRiskId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel50.add(jlFkRiskId);
 
-        jcbFkRiskTypeId.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel50.add(jcbFkRiskTypeId);
+        jcbFkRiskId.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel50.add(jcbFkRiskId);
 
         jPanel45.add(jPanel50);
 
@@ -1240,7 +1240,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private void itemStateChangedIsCreditApplying() {
         boolean enable = jckIsCreditByUser.isSelected();
         jcbFkCreditTypeId_n.setEnabled(enable);
-        jcbFkRiskTypeId.setEnabled(enable);
+        jcbFkRiskId.setEnabled(enable);
         renderBussinesPartnerType();
         renderCreditLimit();
     }
@@ -1368,7 +1368,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moFieldCompanyKey.setLengthMax(25);
         moFieldFkCreditTypeId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkCreditTypeId_n, jlFkCreditTypeId_n);
         moFieldFkCreditTypeId_n.setTabbedPaneIndex(1, jTabbedPane1);
-        moFieldFkRiskTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkRiskTypeId, jlFkRiskTypeId);
+        moFieldFkRiskTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkRiskId, jlFkRiskId);
         moFieldFkRiskTypeId.setTabbedPaneIndex(1, jTabbedPane1);
         moFieldGuaranteeAmount = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfGuarantee, jlGuarantee);
         moFieldGuaranteeAmount.setTabbedPaneIndex(1, jTabbedPane1);
@@ -2121,7 +2121,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JComboBox<SFormComponentItem> jcbFkMarketSegmentId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkMarketSubsegmentId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkPaymentSystemTypeId;
-    private javax.swing.JComboBox<SFormComponentItem> jcbFkRiskTypeId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkRiskId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkSalesAgentId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkSalesRouteId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkSalesSupervisorId_n;
@@ -2175,7 +2175,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JLabel jlFkMarketSegmentId;
     private javax.swing.JLabel jlFkMarketSubsegmentId;
     private javax.swing.JLabel jlFkPaymentSystemTypeId;
-    private javax.swing.JLabel jlFkRiskTypeId;
+    private javax.swing.JLabel jlFkRiskId;
     private javax.swing.JLabel jlFkSalesAgentId_n;
     private javax.swing.JLabel jlFkSalesRouteId;
     private javax.swing.JLabel jlFkSalesSupervisorId_n;
@@ -2282,7 +2282,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             jlCreditLimit.setEnabled(true);
             jlDaysOfCredit.setEnabled(true);
             jlDaysOfGrace.setEnabled(true);
-            jlFkRiskTypeId.setEnabled(true);
+            jlFkRiskId.setEnabled(true);
             jcbFkCreditTypeId_n.setEnabled(true);
             jlFkCfdAddendaTypeId.setEnabled(true);
             jckIsCreditByUser.setEnabled(true);
@@ -2297,7 +2297,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             jlCreditLimit.setEnabled(false);
             jlDaysOfCredit.setEnabled(false);
             jlDaysOfGrace.setEnabled(false);
-            jlFkRiskTypeId.setEnabled(true);
+            jlFkRiskId.setEnabled(true);
             jcbFkCreditTypeId_n.setEnabled(false);
             jlFkCfdAddendaTypeId.setEnabled(false);
             jckIsCreditByUser.setEnabled(false);
@@ -2379,7 +2379,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 moFieldCreditLimit.setFieldValue(moBizPartnerCategory.getCreditLimit());
                 moFieldDaysOfCredit.setFieldValue(moBizPartnerCategory.getDaysOfCredit());
                 moFieldDaysOfGrace.setFieldValue( moBizPartnerCategory.getDaysOfGrace());
-                moFieldFkRiskTypeId.setFieldValue(new int[] { moBizPartnerCategory.getFkRiskTypeId_n()});
+                moFieldFkRiskTypeId.setFieldValue(new int[] { moBizPartnerCategory.getFkRiskId_n()});
                 moFieldGuaranteeAmount.setFieldValue(moBizPartnerCategory.getGuarantee());
                 moFieldInsuranceAmount.setFieldValue(moBizPartnerCategory.getInsurance());
                 moFieldIsInGuarProcess.setFieldValue(moBizPartnerCategory.getIsGuaranteeInProcess());
@@ -2627,7 +2627,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         SFormUtilities.populateComboBox(miClient, jcbFkBizPartnerTypeId, bizCategory);
         SFormUtilities.populateComboBox(miClient, jcbFkCreditTypeId_n, SDataConstants.BPSS_TP_CRED);
-        SFormUtilities.populateComboBox(miClient, jcbFkRiskTypeId, SDataConstants.BPSS_TP_RISK);
+        SFormUtilities.populateComboBox(miClient, jcbFkRiskId, SDataConstants.BPSS_RISK);
         SFormUtilities.populateComboBox(miClient, jcbFkLanguageId_n, SDataConstants.CFGU_LAN);
         SFormUtilities.populateComboBox(miClient, jcbFkCurrencyId_n, SDataConstants.CFGU_CUR);
         SFormUtilities.populateComboBox(miClient, jcbFkCfdAddendaTypeId, SDataConstants.BPSS_TP_CFD_ADD);
@@ -3142,7 +3142,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             moBizPartnerCategory.setFkBizPartnerCategoryId(moFieldFkBizPartnerCategoryId.getKeyAsIntArray()[0]);
             moBizPartnerCategory.setFkBizPartnerTypeId(moFieldFkBizPartnerTypeId.getKeyAsIntArray()[1]);
             moBizPartnerCategory.setFkCreditTypeId_n(!jckIsCreditByUser.isSelected() ? SDataConstantsSys.BPSS_TP_CRED_CRED_NO : moFieldFkCreditTypeId_n.getKeyAsIntArray()[0]);
-            moBizPartnerCategory.setFkRiskTypeId_n(!jckIsCreditByUser.isSelected() ? SModSysConsts.BPSS_RISK_C_RSK_H : moFieldFkRiskTypeId.getKeyAsIntArray()[0]);
+            moBizPartnerCategory.setFkRiskId_n(!jckIsCreditByUser.isSelected() ? SModSysConsts.BPSS_RISK_C_RSK_H : moFieldFkRiskTypeId.getKeyAsIntArray()[0]);
             moBizPartnerCategory.setFkPaymentSystemTypeId_n(moFieldFkPaymentSystemTypeId.getKeyAsIntArray()[0]);
             moBizPartnerCategory.setPaymentAccount(jcbPaymentAccount.getSelectedItem().toString());
             moBizPartnerCategory.setFkCfdAddendaTypeId(moFieldFkCfdAddendaTypeId.getKeyAsIntArray()[0]);

@@ -145,7 +145,8 @@ public abstract class SDataConstants {
     public static final int BPSS_TP_TEL = 204008;
     public static final int BPSS_TP_CRED = 204009;
     public static final int BPSS_TP_CFD_ADD = 204010;
-    public static final int BPSS_TP_RISK = 204011;
+    public static final int BPSS_RISK = 204011;
+    public static final int BPSS_LINK = 204028;
     public static final int BPSU_BP = 204012;
     public static final int BPSU_BP_CT = 204013;
     public static final int BPSU_BP_ATT = 204014;
@@ -162,7 +163,6 @@ public abstract class SDataConstants {
     public static final int BPSU_BANK_ACC_LAY_BANK = 204025;
     public static final int BPSU_TP_BP = 204026;
     public static final int BPSU_BA = 204027;
-    public static final int BPSS_LINK = 204028;
 
     public static final int BPSX_TP_BP_CO = 204501;
     public static final int BPSX_TP_BP_SUP = 204502;
@@ -221,8 +221,6 @@ public abstract class SDataConstants {
     public static final int ITMS_CL_ITEM = 205002;
     public static final int ITMS_TP_ITEM = 205003;
     public static final int ITMS_TP_SNR = 205004;
-    public static final int ITMS_CFD_PROD_SERV = 205025;
-    public static final int ITMS_CFD_UNIT = 205026;
     public static final int ITMU_IFAM = 205005;
     public static final int ITMU_IGRP = 205006;
     public static final int ITMU_IGEN = 205007;
@@ -722,7 +720,7 @@ public abstract class SDataConstants {
         TablesMap.put(BPSS_TP_TEL, "erp.bpss_tp_tel");
         TablesMap.put(BPSS_TP_CRED, "erp.bpss_tp_cred");
         TablesMap.put(BPSS_TP_CFD_ADD, "erp.bpss_tp_cfd_add");
-        TablesMap.put(BPSS_TP_RISK, "erp.bpss_tp_risk");
+        TablesMap.put(BPSS_RISK, "erp.bpss_risk");
         TablesMap.put(BPSS_LINK, "erp.bpss_link");
 
         TablesMap.put(BPSU_BP, "erp.bpsu_bp");

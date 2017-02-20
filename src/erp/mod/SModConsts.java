@@ -138,7 +138,7 @@ public abstract class SModConsts {
     public static final int BPSS_TP_TEL = 1041008;
     public static final int BPSS_TP_CRED = 1041009;
     public static final int BPSS_TP_CFD_ADD = 1041010;
-    public static final int BPSS_TP_RISK = 1041011;
+    public static final int BPSS_RISK = 1041011;
     public static final int BPSS_LINK = 1041012;
 
     public static final int BPSU_BP = 1042001;
@@ -752,7 +752,7 @@ public abstract class SModConsts {
         TablesMap.put(BPSS_TP_TEL, "erp.bpss_tp_tel");
         TablesMap.put(BPSS_TP_CRED, "erp.bpss_tp_cred");
         TablesMap.put(BPSS_TP_CFD_ADD, "erp.bpss_tp_cfd_add");
-        TablesMap.put(BPSS_TP_RISK, "erp.bpss_tp_risk");
+        TablesMap.put(BPSS_RISK, "erp.bpss_risk");
         TablesMap.put(BPSS_LINK, "erp.bpss_link");
 
         TablesMap.put(BPSU_BP, "erp.bpsu_bp");

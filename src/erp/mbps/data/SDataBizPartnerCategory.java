@@ -94,7 +94,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     public void setFkBizPartnerCategoryId(int n) { mnFkBizPartnerCategoryId = n; }
     public void setFkBizPartnerTypeId(int n) { mnFkBizPartnerTypeId = n; }
     public void setFkCreditTypeId_n(int n) { mnFkCreditTypeId_n = n; }
-    public void setFkRiskTypeId_n(int n) { mnFkRiskId_n = n; }
+    public void setFkRiskId_n(int n) { mnFkRiskId_n = n; }
     public void setFkCfdAddendaTypeId(int n) { mnFkCfdAddendaTypeId = n; }
     public void setFkLanguageId_n(int n) { mnFkLanguageId_n = n; }
     public void setFkCurrencyId_n(int n) { mnFkCurrencyId_n = n; }
@@ -127,7 +127,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     public int getFkBizPartnerCategoryId() { return mnFkBizPartnerCategoryId; }
     public int getFkBizPartnerTypeId() { return mnFkBizPartnerTypeId; }
     public int getFkCreditTypeId_n() { return mnFkCreditTypeId_n; }
-    public int getFkRiskTypeId_n() { return mnFkRiskId_n; }
+    public int getFkRiskId_n() { return mnFkRiskId_n; }
     public int getFkCfdAddendaTypeId() { return mnFkCfdAddendaTypeId; }
     public int getFkLanguageId_n() { return mnFkLanguageId_n; }
     public int getFkCurrencyId_n() { return mnFkCurrencyId_n; }

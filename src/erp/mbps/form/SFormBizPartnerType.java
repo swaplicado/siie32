@@ -71,11 +71,8 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        jbOk = new javax.swing.JButton();
-        jbCancel = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
+        jPanel11 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jlPkBizPartnerCategoryId = new javax.swing.JLabel();
         jcbPkBizPartnerCategoryId = new javax.swing.JComboBox();
@@ -96,9 +93,13 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
         jlDaysOfGrace = new javax.swing.JLabel();
         jtfDaysOfGrace = new javax.swing.JTextField();
         jPanel10 = new javax.swing.JPanel();
-        jlFkRiskTypeId = new javax.swing.JLabel();
-        jcbFkRiskTypeId = new javax.swing.JComboBox<SFormComponentItem>();
+        jlFkRiskId = new javax.swing.JLabel();
+        jcbFkRiskId = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel12 = new javax.swing.JPanel();
         jckIsDeleted = new javax.swing.JCheckBox();
+        jPanel1 = new javax.swing.JPanel();
+        jbOk = new javax.swing.JButton();
+        jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Tipo de asociado de negocios");
@@ -109,26 +110,12 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
             }
         });
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(400, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
-
-        jbOk.setText("Aceptar");
-        jbOk.setToolTipText("[Ctrl + Enter]");
-        jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel1.add(jbOk);
-
-        jbCancel.setText("Cancelar");
-        jbCancel.setToolTipText("[Escape]");
-        jPanel1.add(jbCancel);
-
-        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
-
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel3.setLayout(new java.awt.GridLayout(8, 1, 5, 0));
+        jPanel11.setLayout(new java.awt.GridLayout(8, 1, 0, 2));
 
-        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlPkBizPartnerCategoryId.setForeground(java.awt.Color.blue);
         jlPkBizPartnerCategoryId.setText("Categoría de asociado de negocios: *");
@@ -144,9 +131,9 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
         });
         jPanel4.add(jcbPkBizPartnerCategoryId);
 
-        jPanel3.add(jPanel4);
+        jPanel11.add(jPanel4);
 
-        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlBizPartnerType.setText("Tipo de asociado de negocios: *");
         jlBizPartnerType.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -156,9 +143,9 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
         jtfBizPartnerType.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel5.add(jtfBizPartnerType);
 
-        jPanel3.add(jPanel5);
+        jPanel11.add(jPanel5);
 
-        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFkCreditTypeId.setText("Tipo de crédito: *");
         jlFkCreditTypeId.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -172,9 +159,9 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
         });
         jPanel6.add(jcbFkCreditTypeId);
 
-        jPanel3.add(jPanel6);
+        jPanel11.add(jPanel6);
 
-        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlCreditLimit.setText("Límite de crédito: *");
         jlCreditLimit.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -182,7 +169,7 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
 
         jtfCreditLimit.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfCreditLimit.setText("0.00");
-        jtfCreditLimit.setPreferredSize(new java.awt.Dimension(75, 23));
+        jtfCreditLimit.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel7.add(jtfCreditLimit);
 
         jtfCurrencyKey.setEditable(false);
@@ -190,9 +177,9 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
         jtfCurrencyKey.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel7.add(jtfCurrencyKey);
 
-        jPanel3.add(jPanel7);
+        jPanel11.add(jPanel7);
 
-        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlDaysOfCredit.setText("Días de crédito: *");
         jlDaysOfCredit.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -200,12 +187,12 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
 
         jtfDaysOfCredit.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfDaysOfCredit.setText("0");
-        jtfDaysOfCredit.setPreferredSize(new java.awt.Dimension(75, 23));
+        jtfDaysOfCredit.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel8.add(jtfDaysOfCredit);
 
-        jPanel3.add(jPanel8);
+        jPanel11.add(jPanel8);
 
-        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlDaysOfGrace.setText("Días de gracia:");
         jlDaysOfGrace.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -213,33 +200,51 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
 
         jtfDaysOfGrace.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfDaysOfGrace.setText("0");
-        jtfDaysOfGrace.setPreferredSize(new java.awt.Dimension(75, 23));
+        jtfDaysOfGrace.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel9.add(jtfDaysOfGrace);
 
-        jPanel3.add(jPanel9);
+        jPanel11.add(jPanel9);
 
-        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlFkRiskTypeId.setText("Tipo de riesgo: *");
-        jlFkRiskTypeId.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel10.add(jlFkRiskTypeId);
+        jlFkRiskId.setText("Riesgo: *");
+        jlFkRiskId.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel10.add(jlFkRiskId);
 
-        jcbFkRiskTypeId.setPreferredSize(new java.awt.Dimension(200, 23));
-        jcbFkRiskTypeId.addItemListener(new java.awt.event.ItemListener() {
+        jcbFkRiskId.setPreferredSize(new java.awt.Dimension(200, 23));
+        jcbFkRiskId.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jcbFkRiskTypeIdItemStateChanged(evt);
+                jcbFkRiskIdItemStateChanged(evt);
             }
         });
-        jPanel10.add(jcbFkRiskTypeId);
+        jPanel10.add(jcbFkRiskId);
 
-        jPanel3.add(jPanel10);
+        jPanel11.add(jPanel10);
+
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jckIsDeleted.setText("Registro eliminado");
-        jPanel3.add(jckIsDeleted);
+        jPanel12.add(jckIsDeleted);
 
-        jPanel2.add(jPanel3, java.awt.BorderLayout.NORTH);
+        jPanel11.add(jPanel12);
+
+        jPanel2.add(jPanel11, java.awt.BorderLayout.NORTH);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
+
+        jPanel1.setPreferredSize(new java.awt.Dimension(400, 33));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        jbOk.setText("Aceptar");
+        jbOk.setToolTipText("[Ctrl + Enter]");
+        jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel1.add(jbOk);
+
+        jbCancel.setText("Cancelar");
+        jbCancel.setToolTipText("[Escape]");
+        jPanel1.add(jbCancel);
+
+        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
         setSize(new java.awt.Dimension(537, 361));
         setLocationRelativeTo(null);
@@ -261,9 +266,9 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
         }
     }//GEN-LAST:event_jcbPkBizPartnerCategoryIdItemStateChanged
 
-    private void jcbFkRiskTypeIdItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbFkRiskTypeIdItemStateChanged
+    private void jcbFkRiskIdItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbFkRiskIdItemStateChanged
         // TODO add your handling code here:
-    }//GEN-LAST:event_jcbFkRiskTypeIdItemStateChanged
+    }//GEN-LAST:event_jcbFkRiskIdItemStateChanged
 
     private void itemStateChangedCreditLimit() {
         renderCreditLimit();
@@ -326,9 +331,9 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
         jlCreditLimit.setEnabled(enable);
         jlDaysOfCredit.setEnabled(enable);
         jlDaysOfGrace.setEnabled(enable);
-        jlFkRiskTypeId.setEnabled(enable);
+        jlFkRiskId.setEnabled(enable);
         jcbFkCreditTypeId.setEnabled(enable);
-        jcbFkRiskTypeId.setEnabled(enable);
+        jcbFkRiskId.setEnabled(enable);
         jtfCurrencyKey.setEnabled(enable);
         renderTypeCredit();
     }
@@ -340,7 +345,7 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
         moFieldBizPartnerType = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfBizPartnerType, jlBizPartnerType);
         moFieldBizPartnerType.setLengthMax(50);
         moFieldFkCreditTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkCreditTypeId, jlFkCreditTypeId);
-        moFieldFkRiskTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkRiskTypeId, jlFkRiskTypeId);
+        moFieldFkRiskTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkRiskId, jlFkRiskId);
         moFieldCreditLimit = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfCreditLimit, jlCreditLimit);
         moFieldDaysOfCredit = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfDaysOfCredit, jlDaysOfCredit);
         moFieldDaysOfGrace = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfDaysOfGrace, jlDaysOfGrace);
@@ -410,8 +415,9 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
@@ -421,7 +427,7 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCreditTypeId;
-    private javax.swing.JComboBox<SFormComponentItem> jcbFkRiskTypeId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkRiskId;
     private javax.swing.JComboBox jcbPkBizPartnerCategoryId;
     private javax.swing.JCheckBox jckIsDeleted;
     private javax.swing.JLabel jlBizPartnerType;
@@ -429,7 +435,7 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
     private javax.swing.JLabel jlDaysOfCredit;
     private javax.swing.JLabel jlDaysOfGrace;
     private javax.swing.JLabel jlFkCreditTypeId;
-    private javax.swing.JLabel jlFkRiskTypeId;
+    private javax.swing.JLabel jlFkRiskId;
     private javax.swing.JLabel jlPkBizPartnerCategoryId;
     private javax.swing.JTextField jtfBizPartnerType;
     private javax.swing.JTextField jtfCreditLimit;
@@ -466,7 +472,7 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbPkBizPartnerCategoryId, SDataConstants.BPSS_CT_BP);
         SFormUtilities.populateComboBox(miClient, jcbFkCreditTypeId, SDataConstants.BPSS_TP_CRED);
-        SFormUtilities.populateComboBox(miClient, jcbFkRiskTypeId, SDataConstants.BPSS_TP_RISK);
+        SFormUtilities.populateComboBox(miClient, jcbFkRiskId, SDataConstants.BPSS_RISK);
     }
 
     @Override

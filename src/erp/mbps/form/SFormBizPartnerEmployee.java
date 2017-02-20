@@ -1285,7 +1285,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             category.setFkBizPartnerCategoryId(categoryId);
             category.setFkBizPartnerTypeId(SModSysConsts.BPSU_TP_BP_DEF);
             category.setFkCreditTypeId_n(SModSysConsts.BPSS_TP_CRED_CRED_NO);
-            category.setFkRiskTypeId_n(SLibConsts.UNDEFINED);
+            category.setFkRiskId_n(SLibConsts.UNDEFINED);
             category.setFkCfdAddendaTypeId(SModSysConsts.BPSS_TP_CFD_ADD_CFD_ADD_NA);
             category.setFkLanguageId_n(SLibConsts.UNDEFINED);
             category.setFkCurrencyId_n(SLibConsts.UNDEFINED);
