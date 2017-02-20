@@ -1278,9 +1278,15 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             category.setCreditLimit(0);
             category.setDaysOfCredit(0);
             category.setDaysOfGrace(0);
+            category.setGuarantee(0);
+            category.setInsurance(0);
             category.setDateStart(SLibTimeUtilities.getBeginOfYear(miClient.getSession().getCurrentDate()));
             category.setDateEnd_n(null);
+            category.setPaymentAccount("");
+            category.setNumberExporter("");
             category.setIsCreditByUser(true);
+            category.setIsGuaranteeInProcess(true);
+            category.setIsInsuranceInProcess(true);
             category.setIsDeleted(false);
             category.setFkBizPartnerCategoryId(categoryId);
             category.setFkBizPartnerTypeId(SModSysConsts.BPSU_TP_BP_DEF);
@@ -1289,6 +1295,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             category.setFkCfdAddendaTypeId(SModSysConsts.BPSS_TP_CFD_ADD_CFD_ADD_NA);
             category.setFkLanguageId_n(SLibConsts.UNDEFINED);
             category.setFkCurrencyId_n(SLibConsts.UNDEFINED);
+            category.setFkPaymentSystemTypeId_n(SLibConsts.UNDEFINED);
+            category.setFkUserAnalystId_n(SLibConsts.UNDEFINED);
             category.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
         }
 
