@@ -223,6 +223,7 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
         bankLayout = readLayout();
         
         if (bankLayout != null) {
+            bankLayout.setAuxLayoutType(mnGridSubtype == SModSysConsts.FIN_LAY_BANK_DPS ? "TRANSFERENCIAS" : "ANTICIPOS");
             treasuryBankLayoutRequest = new STreasuryBankLayoutRequest(miClient, bankLayout);
             done = treasuryBankLayoutRequest.makeRequestToTreasury();
             

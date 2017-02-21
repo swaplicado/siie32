@@ -49,7 +49,10 @@ public class SFinUtils {
         int nDpsYearId = 0;
         int nDpsDocId = 0;
         double dBalancePayment = 0;
+        double dBalanceLocal = 0;
+        double dBalanceLocalPayment = 0;
         double dAmountPayed = 0;
+        double dAmountPayedCur = 0;
         double dExchangeRate = 0;
         SXmlBankLayout oGridXml = null;
         SXmlBankLayoutPayment oLayoutPay = null;
@@ -92,11 +95,12 @@ public class SFinUtils {
                     oRow.setBizPartner(oBizPartner.getBizPartner());
                     oRow.setBizPartnerKey(oBizPartner.getDbmsCategorySettingsSup().getKey());
                     oRow.setBalance(dBalancePayment);
-                    oRow.setBalanceTot(0);
                     oRow.setCurrencyKey(oBranchBankAccount.getDbmsCurrencyKey());
                     oRow.setAccountCredit(oTypeLayout.getFkBankPaymentTypeId() == SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? oBranchBankAccount.getBankAccountNumber() : oBranchBankAccount.getBankAccountNumberStd());
                     oRow.setIsForPayment((boolean) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_APPLIED).getValue());
                     oRow.setIsToPayed((boolean) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_APPLIED).getValue());
+                    
+                    dBalanceLocalPayment = 0;
                     
                     if ((Integer) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_YEAR).getValue() != 0) {
                         oRecordLayout = new SFinRecordLayout((Integer) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_YEAR).getValue(), (Integer) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_PER).getValue(),
@@ -123,8 +127,12 @@ public class SFinUtils {
                             sReferenceRecord = (String) oLayoutPayDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_REF_REC).getValue();
                             sObservation = (String) oLayoutPayDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_OBS).getValue();
                             dAmountPayed = (double) oLayoutPayDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT).getValue();
+                            dAmountPayedCur = (double) oLayoutPayDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT_CY).getValue();
                             dExchangeRate = (double) oLayoutPayDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EXT_RATE).getValue();
                             oXmlRow = new SLayoutBankXmlRow();
+                            
+                            dBalanceLocal += (dAmountPayedCur);
+                            dBalanceLocalPayment += (dAmountPayedCur);
                             
                             oXmlRow.setDpsYear(nDpsYearId);
                             oXmlRow.setDpsDoc(nDpsDocId);
@@ -158,9 +166,11 @@ public class SFinUtils {
                             oLayout.getXmlRows().add(oXmlRow);
                         }
                     }
+                    oRow.setBalanceTot(dBalanceLocalPayment);
                     oLayout.getBankPaymentRows().add(oRow);
                 }
-            } 
+            }
+            oLayout.setAuxLocalLayoutAmount(dBalanceLocal);
         }
         catch (Exception e) {
             oLayout = null;
@@ -197,9 +207,13 @@ public class SFinUtils {
             parameters.setBankAccount(dataBizPartnerBranchBankAccount.getBankAccountNumber());
             parameters.setTypePayment(SFinUtilities.getNameTypePayLayout(client.getSession(), layout.getPkBankLayoutId()));
             parameters.setCurrency(dataBizPartnerBranchBankAccount.getDbmsCurrencyKey());
-            parameters.setTotal(layout.getAmount());
+            parameters.setCurrencyDps(SDataReadDescriptions.getCatalogueDescription((SClientInterface) client, SDataConstants.CFGU_CUR, new int[] { layout.getFkDocsCur() }, SLibConstants.DESCRIPTION_CODE));
+            parameters.setTotal(layout.getAuxLocalLayoutAmount());
+            parameters.setOriginalTotal(layout.getAmount());
             parameters.setFolio(layout.getPkBankLayoutId() + "");
             parameters.setAuthRequests(layout.getAuthorizationRequests() + "");
+            parameters.setLayoutType(layout.getAuxLayoutType());
+            parameters.setIsDifferentCurrency(dataAccountCash.getFkCurrencyId() != layout.getFkDocsCur());
         }
         catch (Exception e) {
             SLibUtils.showException(SFinUtils.class, e);
@@ -218,13 +232,14 @@ public class SFinUtils {
 
         for (SLayoutBankPaymentRow bankPayment: bankPaymentRows) {
             dataBizPartnerBranchBankAccount = (SDataBizPartnerBranchBankAccount) SDataUtilities.readRegistry((SClientInterface) client, SDataConstants.BPSU_BANK_ACC, 
-                                                new int[] { bankPayment.getBizPartnerBranchId(), bankPayment.getBizPartnerBranchAccountId() }, SLibConstants.EXEC_MODE_SILENT);
+                 new int[] { bankPayment.getBizPartnerBranchId(), bankPayment.getBizPartnerBranchAccountId() }, SLibConstants.EXEC_MODE_SILENT);
             
             payRow = new SDocumentRequestRow();
             payRow.setBank(dataBizPartnerBranchBankAccount.getDbmsBank());
             payRow.setBankAccount(bankPayment.getAccountCredit());
             payRow.setBeneficiary(bankPayment.getBizPartner());
-            payRow.setAmount(bankPayment.getBalance());
+            payRow.setOriginalCurrencyAmount(bankPayment.getBalance());
+            payRow.setCurrencyAmount(bankPayment.getBalanceTot());
             
             observation = "";
             concept = "";

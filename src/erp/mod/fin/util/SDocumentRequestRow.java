@@ -14,25 +14,25 @@ public class SDocumentRequestRow {
     private String msBank;
     private String msBankAccount;
     private String msBeneficiary;
-    private double mdAmount;
+    private double mdCurrencyAmount;
+    private double mdOriginalCurrencyAmount;
     private String msConcept;
     private String msObservation;
 
+    
+    public void setBank(String s) { msBank = s; }
+    public void setBankAccount(String s) { msBankAccount = s; }
+    public void setBeneficiary(String s) { msBeneficiary = s; }
+    public void setCurrencyAmount(double d) { mdCurrencyAmount = d; }
+    public void setOriginalCurrencyAmount(double d) { mdOriginalCurrencyAmount = d; }
+    public void setConcept(String s) { msConcept = s; }
+    public void setObservation(String s) { msObservation = s; }
+    
     public String getBank() { return msBank; }
-    public void setBank(String bank) { msBank = bank; }
-
     public String getBankAccount() { return msBankAccount; }
-    public void setBankAccount(String account) { msBankAccount = account; }
-
     public String getBeneficiary() { return msBeneficiary; }
-    public void setBeneficiary(String beneficiary) { msBeneficiary = beneficiary; }
-
-    public double getAmount() { return mdAmount; }
-    public void setAmount(double amount) { mdAmount = amount; }
-
+    public double getCurrencyAmount() { return mdCurrencyAmount; }
+    public double getOriginalCurrencyAmount() { return mdOriginalCurrencyAmount; }
     public String getConcept() { return msConcept; }
-    public void setConcept(String concept) { msConcept = concept; }
-
     public String getObservation() { return msObservation; }
-    public void setObservation(String oservation) { msObservation = oservation; }
 }
