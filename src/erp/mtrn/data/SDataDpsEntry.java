@@ -803,7 +803,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 statementAux = statement.getConnection().createStatement();
 
                 msDbmsUnidadClave = resultSet.getString("cu.code");
-                msDbmsTariffFraction = resultSet.getString("i.code");
+                msDbmsTariffFraction = resultSet.getString("i.item");
                 msDbmsCustomsUnit = resultSet.getString("cu.code");
                 
                 // Read code SAT item:
