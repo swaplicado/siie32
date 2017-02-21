@@ -799,12 +799,12 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 if (resultSet.wasNull()) {
                     mdDbmsDpsAddElektraPartPriceUnitary = 0;
                 }
-                
-                statementAux = statement.getConnection().createStatement();
 
                 msDbmsUnidadClave = resultSet.getString("cu.code");
                 msDbmsTariffFraction = resultSet.getString("i.item");
                 msDbmsCustomsUnit = resultSet.getString("cu.code");
+                
+                statementAux = statement.getConnection().createStatement();
                 
                 // Read code SAT item:
 
