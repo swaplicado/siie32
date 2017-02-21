@@ -216,10 +216,24 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
     
     private void computeXml() throws Exception {
         SXmlDpsCfd dpsXml = new SXmlDpsCfd();
+        SXmlDpsCfdCce cceXml = new SXmlDpsCfdCce();
         
         dpsXml.getAttribute(SXmlDpsCfd.ATT_CONF).setValue(msCfdConfirmacion);
         dpsXml.getAttribute(SXmlDpsCfd.ATT_TP_REL).setValue(msCfdTipoRelacion);
         dpsXml.getAttribute(SXmlDpsCfd.ATT_USO_CFDI).setValue(msCfdUsoCfdi);
+        
+        // Attributes for international trade:
+        
+        cceXml.getAttribute(SXmlDpsCfdCce.ATT_MOT_TRAS).setValue(msCfdCceMotivoTraslado);
+        cceXml.getAttribute(SXmlDpsCfdCce.ATT_TP_OPE).setValue(msCfdCceTipoOperacion);
+        cceXml.getAttribute(SXmlDpsCfdCce.ATT_CVE_PED).setValue(msCfdCceClaveDePedimento);
+        cceXml.getAttribute(SXmlDpsCfdCce.ATT_CERT_ORIG).setValue(msCfdCceCertificadoOrigen);
+        cceXml.getAttribute(SXmlDpsCfdCce.ATT_NUM_CERT_ORIG).setValue(msCfdCceNumCertificadoOrigen);
+        cceXml.getAttribute(SXmlDpsCfdCce.ATT_NUM_EXP_CONF).setValue(msCfdCceNumExportadorConfiable);
+        cceXml.getAttribute(SXmlDpsCfdCce.ATT_TP_CAMB).setValue(msCfdCceTipoCambioUSD);
+        cceXml.getAttribute(SXmlDpsCfdCce.ATT_TOT_USD).setValue(msCfdCceTotalUSD);
+        
+        dpsXml.getXmlElements().add(cceXml);
         
         msXml = dpsXml.getXmlString();
     }
@@ -241,8 +255,8 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
         
         // International Trade:
 
-        if (SXmlUtils.hasChildElement(node, "cce")) {
-            nodeChild = SXmlUtils.extractChildElements(node, "cce").get(0);
+        if (SXmlUtils.hasChildElement(node, "cce11")) {
+            nodeChild = SXmlUtils.extractChildElements(node, "cce11").get(0);
             namedNodeMapChild = nodeChild.getAttributes();
             
             msCfdCceMotivoTraslado = SXmlUtils.extractAttributeValue(namedNodeMapChild, "MotivoTraslado", false);

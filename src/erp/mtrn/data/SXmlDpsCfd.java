@@ -24,30 +24,10 @@ public class SXmlDpsCfd extends SXmlDocument {
     public static final String ATT_CONF = "confirmacion";
     public static final String ATT_TP_REL = "tipoRelacion";
     public static final String ATT_USO_CFDI = "usoCFDI";
-    
-    public static final String ATT_MOT_TRAS = "MotivoTraslado";
-    public static final String ATT_TP_OPE = "TipoOperacion";
-    public static final String ATT_CVE_PED = "ClaveDePedimento";
-    public static final String ATT_CERT_ORIG = "CertificadoOrigen";
-    public static final String ATT_NUM_CERT_ORIG = "NumCertificadoOrigen";
-    public static final String ATT_SUB = "Subdivision";
-    public static final String ATT_TP_CAMB = "TipoCambioUSD";
-    public static final String ATT_TOT_USD = "TotalUSD";
-    public static final String ATT_NUM_EXP_CONF = "NumExportadorConfiable";
 
     protected SXmlAttribute moConfirmation;
     protected SXmlAttribute moRelationType;
     protected SXmlAttribute moCfdiUse;
-    
-    protected SXmlAttribute moCfdCceMotivoTraslado;
-    protected SXmlAttribute moCfdCceTipoOperacion;
-    protected SXmlAttribute moCfdCceClaveDePedimento;
-    protected SXmlAttribute moCfdCceCertificadoOrigen;
-    protected SXmlAttribute moCfdCceNumCertificadoOrigen;
-    protected SXmlAttribute moCfdCceSubdivision;
-    protected SXmlAttribute moCfdCceTipoCambioUSD;
-    protected SXmlAttribute moCfdCceTotalUSD;
-    protected SXmlAttribute moCfdCceNumExportadorConfiable;
     
     public SXmlDpsCfd() {
         super(NAME);
@@ -55,30 +35,10 @@ public class SXmlDpsCfd extends SXmlDocument {
         moConfirmation = new SXmlAttribute(ATT_CONF);
         moRelationType = new SXmlAttribute(ATT_TP_REL);
         moCfdiUse = new SXmlAttribute(ATT_USO_CFDI);
-        
-        moCfdCceMotivoTraslado = new SXmlAttribute(ATT_MOT_TRAS);
-        moCfdCceTipoOperacion = new SXmlAttribute(ATT_TP_OPE);
-        moCfdCceClaveDePedimento = new SXmlAttribute(ATT_CVE_PED);
-        moCfdCceCertificadoOrigen = new SXmlAttribute(ATT_CERT_ORIG);
-        moCfdCceNumCertificadoOrigen = new SXmlAttribute(ATT_NUM_CERT_ORIG);
-        moCfdCceSubdivision = new SXmlAttribute(ATT_SUB);
-        moCfdCceTipoCambioUSD = new SXmlAttribute(ATT_TP_CAMB);
-        moCfdCceTotalUSD = new SXmlAttribute(ATT_TOT_USD);
-        moCfdCceNumExportadorConfiable = new SXmlAttribute(ATT_NUM_EXP_CONF);
 
         mvXmlAttributes.add(moConfirmation);
         mvXmlAttributes.add(moRelationType);
         mvXmlAttributes.add(moCfdiUse);
-        
-        mvXmlAttributes.add(moCfdCceMotivoTraslado);
-        mvXmlAttributes.add(moCfdCceTipoOperacion);
-        mvXmlAttributes.add(moCfdCceClaveDePedimento);
-        mvXmlAttributes.add(moCfdCceCertificadoOrigen);
-        mvXmlAttributes.add(moCfdCceNumCertificadoOrigen);
-        mvXmlAttributes.add(moCfdCceSubdivision);
-        mvXmlAttributes.add(moCfdCceTipoCambioUSD);
-        mvXmlAttributes.add(moCfdCceTotalUSD);
-        mvXmlAttributes.add(moCfdCceNumExportadorConfiable);
     }
 
     @Override
@@ -103,21 +63,22 @@ public class SXmlDpsCfd extends SXmlDocument {
         mvXmlAttributes.add(moRelationType);
         mvXmlAttributes.add(moCfdiUse);
         
-        childNodes = SXmlUtils.extractChildElements(nodeList.item(0), "cce");
+        childNodes = SXmlUtils.extractChildElements(nodeList.item(0), "cce11");
         for (Node child : childNodes) {
+            SXmlDpsCfdCce row = new SXmlDpsCfdCce();
             namedNodeMap = child.getAttributes();
             
-            moCfdCceMotivoTraslado.setValue(namedNodeMap.getNamedItem(SXmlDpsCfd.ATT_MOT_TRAS).getNodeValue());
-            moCfdCceTipoOperacion.setValue(namedNodeMap.getNamedItem(SXmlDpsCfd.ATT_TP_OPE).getNodeValue());
-            moCfdCceClaveDePedimento.setValue(namedNodeMap.getNamedItem(SXmlDpsCfd.ATT_CVE_PED).getNodeValue());
-            moCfdCceCertificadoOrigen.setValue(namedNodeMap.getNamedItem(SXmlDpsCfd.ATT_CERT_ORIG).getNodeValue());
-            moCfdCceNumCertificadoOrigen.setValue(namedNodeMap.getNamedItem(SXmlDpsCfd.ATT_NUM_CERT_ORIG).getNodeValue());
-            moCfdCceSubdivision.setValue(namedNodeMap.getNamedItem(SXmlDpsCfd.ATT_SUB).getNodeValue());
-            moCfdCceTipoCambioUSD.setValue(namedNodeMap.getNamedItem(SXmlDpsCfd.ATT_TP_CAMB).getNodeValue());
-            moCfdCceTotalUSD.setValue(namedNodeMap.getNamedItem(SXmlDpsCfd.ATT_TOT_USD).getNodeValue());
-            moCfdCceNumExportadorConfiable.setValue(namedNodeMap.getNamedItem(SXmlDpsCfd.ATT_NUM_EXP_CONF).getNodeValue());
+            row.getAttribute(SXmlDpsCfdCce.ATT_MOT_TRAS).setValue(namedNodeMap.getNamedItem(SXmlDpsCfdCce.ATT_MOT_TRAS).getNodeValue());
+            row.getAttribute(SXmlDpsCfdCce.ATT_TP_OPE).setValue(namedNodeMap.getNamedItem(SXmlDpsCfdCce.ATT_TP_OPE).getNodeValue());
+            row.getAttribute(SXmlDpsCfdCce.ATT_CVE_PED).setValue(namedNodeMap.getNamedItem(SXmlDpsCfdCce.ATT_CVE_PED).getNodeValue());
+            row.getAttribute(SXmlDpsCfdCce.ATT_CERT_ORIG).setValue(namedNodeMap.getNamedItem(SXmlDpsCfdCce.ATT_CERT_ORIG).getNodeValue());
+            row.getAttribute(SXmlDpsCfdCce.ATT_NUM_CERT_ORIG).setValue(namedNodeMap.getNamedItem(SXmlDpsCfdCce.ATT_NUM_CERT_ORIG).getNodeValue());
+            row.getAttribute(SXmlDpsCfdCce.ATT_SUB).setValue(namedNodeMap.getNamedItem(SXmlDpsCfdCce.ATT_SUB).getNodeValue());
+            row.getAttribute(SXmlDpsCfdCce.ATT_TP_CAMB).setValue(namedNodeMap.getNamedItem(SXmlDpsCfdCce.ATT_TP_CAMB).getNodeValue());
+            row.getAttribute(SXmlDpsCfdCce.ATT_TOT_USD).setValue(namedNodeMap.getNamedItem(SXmlDpsCfdCce.ATT_TOT_USD).getNodeValue());
+            row.getAttribute(SXmlDpsCfdCce.ATT_NUM_EXP_CONF).setValue(namedNodeMap.getNamedItem(SXmlDpsCfdCce.ATT_NUM_EXP_CONF).getNodeValue());
+            
+            mvXmlElements.add(row);
         }
-        
-        mvXmlAttributes.add(moCfdiUse);
     }
 }
