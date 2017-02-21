@@ -802,7 +802,11 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 
                 statementAux = statement.getConnection().createStatement();
 
-                // Read aswell entry notes:
+                msDbmsUnidadClave = resultSet.getString("cu.code");
+                msDbmsTariffFraction = resultSet.getString("i.code");
+                msDbmsCustomsUnit = resultSet.getString("cu.code");
+                
+                // Read code SAT item:
 
                 sql = "SELECT code FROM erp.itms_cfd_prod_serv " +
                         "WHERE id_cfd_prod_serv = " + (nCveProdSerItem_n == SLibConstants.UNDEFINED ? nCveProdSerIgen : nCveProdSerItem_n) + " ";
@@ -811,10 +815,6 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 if (resultSet.next()) {
                     msDbmsItemClaveProdServ = resultSet.getString("code");
                 }
-
-                msDbmsUnidadClave = resultSet.getString("cu.code");
-                msDbmsTariffFraction = resultSet.getString("i.code");
-                msDbmsCustomsUnit = resultSet.getString("cu.code");
                 
                 statementAux = statement.getConnection().createStatement();
 
