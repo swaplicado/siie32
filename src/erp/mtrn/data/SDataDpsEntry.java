@@ -132,6 +132,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected java.lang.String msDbmsItemRef_n;
     protected java.lang.String msDbmsItemClaveProdServ;
     protected java.lang.String msDbmsUnidadClave;
+    protected java.lang.String msDbmsTariffFraction;
+    protected java.lang.String msDbmsCustomsUnit;
     protected int mnDbmsDpsAddBachocoNumberPosition;
     protected java.lang.String msDbmsDpsAddBachocoCenter;
     protected int mnDbmsDpsAddLorealEntryNumber;
@@ -380,6 +382,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setDbmsItemRef_n(java.lang.String s) { msDbmsItemRef_n = s; }
     public void setDbmsItemClaveProdServ (java.lang.String s) { msDbmsItemClaveProdServ = s; }
     public void setDbmsUnidadClave(java.lang.String s) { msDbmsUnidadClave = s; }
+    public void setDbmsTariffFraction(java.lang.String s) { msDbmsTariffFraction = s; }
+    public void setDbmsCustomsUnit(java.lang.String s) { msDbmsCustomsUnit = s; }
     public void setDbmsDpsAddBachocoNumberPosition(int n) { mnDbmsDpsAddBachocoNumberPosition = n; }
     public void setDbmsDpsAddBachocoCenter(java.lang.String s) { msDbmsDpsAddBachocoCenter = s; }
     public void setDbmsDpsAddLorealEntryNumber(int n) { mnDbmsDpsAddLorealEntryNumber = n; }
@@ -406,6 +410,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public java.lang.String getDbmsItemRef_n() { return msDbmsItemRef_n; }
     public java.lang.String getDbmsItemClaveProdServ() { return msDbmsItemClaveProdServ; }
     public java.lang.String getDbmsUnidadClave() { return msDbmsUnidadClave; }
+    public java.lang.String getDbmsTariffFraction() { return msDbmsTariffFraction; }
+    public java.lang.String getDbmsCustomsUnit() { return msDbmsCustomsUnit; }
     public int getDbmsDpsAddBachocoNumberPosition() { return mnDbmsDpsAddBachocoNumberPosition; }
     public java.lang.String getDbmsDpsAddBachocoCenter() { return msDbmsDpsAddBachocoCenter; }
     public int getDbmsDpsAddLorealEntryNumber() { return mnDbmsDpsAddLorealEntryNumber; }
@@ -569,6 +575,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         msDbmsItemRef_n = "";
         msDbmsItemClaveProdServ = "";
         msDbmsUnidadClave = "";
+        msDbmsTariffFraction = "";
+        msDbmsCustomsUnit = "";
         mnDbmsDpsAddBachocoNumberPosition = 0;
         msDbmsDpsAddBachocoCenter = "";
         mnDbmsDpsAddLorealEntryNumber = 0;
@@ -791,8 +799,6 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 if (resultSet.wasNull()) {
                     mdDbmsDpsAddElektraPartPriceUnitary = 0;
                 }
-
-                msDbmsUnidadClave = resultSet.getString("cu.code");
                 
                 statementAux = statement.getConnection().createStatement();
 
@@ -805,6 +811,10 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 if (resultSet.next()) {
                     msDbmsItemClaveProdServ = resultSet.getString("code");
                 }
+
+                msDbmsUnidadClave = resultSet.getString("cu.code");
+                msDbmsTariffFraction = resultSet.getString("i.code");
+                msDbmsCustomsUnit = resultSet.getString("cu.code");
                 
                 statementAux = statement.getConnection().createStatement();
 
@@ -1630,6 +1640,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setDbmsItemRef_n(msDbmsItemRef_n);
         clone.setDbmsItemClaveProdServ(msDbmsItemClaveProdServ);
         clone.setDbmsUnidadClave(msDbmsUnidadClave);
+        clone.setDbmsCustomsUnit(msDbmsCustomsUnit);
         clone.setDbmsDpsAddBachocoNumberPosition(mnDbmsDpsAddBachocoNumberPosition);
         clone.setDbmsDpsAddBachocoCenter(msDbmsDpsAddBachocoCenter);
         clone.setDbmsDpsAddLorealEntryNumber(mnDbmsDpsAddLorealEntryNumber);
