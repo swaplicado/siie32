@@ -741,6 +741,7 @@ public class SFormProductionOrderCharge extends javax.swing.JDialog implements e
     public erp.lib.form.SFormValidation formValidate() {
         String sMsg = "";
         SFormValidation validation = new SFormValidation();
+        // SClientInterface client, int year, int[] warehouseKey, int[] iogKey, final int[] referenceKey, int segregationType
         STrnStockValidator validator = new STrnStockValidator(miClient, moProductionOrder.getPkYearId(), null , null, null, 0);
 
         for (int i = 0; i < mvFields.size(); i++) {

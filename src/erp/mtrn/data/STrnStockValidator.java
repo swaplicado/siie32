@@ -21,7 +21,7 @@ import java.util.Vector;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Edwin Carmona
  */
 public class STrnStockValidator {
 
@@ -64,6 +64,7 @@ public class STrnStockValidator {
     public java.lang.String validateOutgoingItems(final boolean isDocBeingDeleted, final Date dateCutOff) {
         double stock = 0;
         double segregated = 0;
+        double available = 0;
         String msg = "";
         SDataItem item = null;
         SDataUnit unit = null;
@@ -80,18 +81,21 @@ public class STrnStockValidator {
                     if (manReferenceKey != null && mnSegregationType != SLibConstants.UNDEFINED) {
                         stockMove.setSegregationReference(new int[] { manReferenceKey[0], manReferenceKey[1] });
                         stockMove.setSegregationType(SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD);
-                        stockMove.setIsCurrentSegExcluded(true);
+                        stockMove.setIsCurrentSegregationExcluded(true);
                     }
 
+                    // The STrnStockMove object is sent as parameters for the filter
                     objStock = STrnStockSegregationUtils.getStkSegregated(miClient, stockMove);
                     segregated = objStock.getSegregatedStock();
-					
+                    	
                     stock = STrnUtilities.obtainStock(miClient, stockMove.getPkYearId(),
                             stockMove.getPkItemId(), stockMove.getPkUnitId(), stockMove.getPkLotId(),
                             stockMove.getPkCompanyBranchId(), stockMove.getPkWarehouseId(), dateCutOff,
                             isDocBeingDeleted || stockMove.getAuxIsMoveBeingDeleted() ? null : manDiogKey);
 
-                    if (stock - segregated < stockMove.getQuantity()) {
+                    available = stock - segregated;
+                    
+                    if (available < stockMove.getQuantity()) {
                         msg = miClient.getSessionXXX().getFormatters().getDateFormat().format(dateCutOff);
                     }
                     else {
@@ -100,7 +104,7 @@ public class STrnStockValidator {
                                 stockMove.getPkCompanyBranchId(), stockMove.getPkWarehouseId(),
                                 isDocBeingDeleted || stockMove.getAuxIsMoveBeingDeleted() ? null : manDiogKey);
 
-                        if (stock - segregated < stockMove.getQuantity()) {
+                        if (available < stockMove.getQuantity()) {
                             msg = miClient.getSessionXXX().getFormatters().getDateFormat().format(SLibTimeUtilities.getEndOfYear(dateCutOff));
                         }
                     }
@@ -113,10 +117,10 @@ public class STrnStockValidator {
                         msg = "No hay unidades disponibles suficientes del ítem '" + item.getItem() + "', clave '" + item.getKey() + "', lote '" + lot.getLot() + "' al " + msg + ":\n" +
                                 "  " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stock) + " " + unit.getSymbol() + " (en existencia)\n" +
                                 " -" + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(segregated) + " " + unit.getSymbol() + " (segregadas)\n" +
-                                "= " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stock - segregated) + " " + unit.getSymbol() + " (disponibles)\n" +
+                                "= " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(available) + " " + unit.getSymbol() + " (disponibles)\n" +
                                 "para hacer el movimiento solicitado " +
                                 "(" + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stockMove.getQuantity()) + " " + unit.getSymbol() + "), " +
-                                "hacen falta " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stockMove.getQuantity() - (stock - segregated)) + " " + unit.getSymbol() + ".";
+                                "hacen falta " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stockMove.getQuantity() - (available)) + " " + unit.getSymbol() + ".";
                         break;
                     }
                 }

@@ -17,7 +17,7 @@ import sa.lib.db.SDbConsts;
  *
  * @author Edwin Carmona
  */
-public class SDbStockSegregation extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+public class SDataStockSegregation extends erp.lib.data.SDataRegistry implements java.io.Serializable {
     
     protected int mnPkStockSegregationId;
     protected boolean mbDeleted;
@@ -31,10 +31,9 @@ public class SDbStockSegregation extends erp.lib.data.SDataRegistry implements j
     protected java.util.Date mtUserEditTs;
     protected java.util.Date mtUserDeleteTs;
 
-
-    protected ArrayList<SDbStockSegregationWarehouse> maChildEntries;
+    protected ArrayList<SDataStockSegregationWarehouse> maChildEntries;
     
-    public SDbStockSegregation() {
+    public SDataStockSegregation() {
         super(SDataConstants.TRN_STK_SEG);
         maChildEntries = new ArrayList<>();
         reset();
@@ -64,20 +63,20 @@ public class SDbStockSegregation extends erp.lib.data.SDataRegistry implements j
     public java.util.Date getUserEditTs() { return mtUserEditTs; }
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
 
-
-    public ArrayList<SDbStockSegregationWarehouse> getChildEntries() { return maChildEntries; }
+    public ArrayList<SDataStockSegregationWarehouse> getChildEntries() { return maChildEntries; }
     
-    private ArrayList<SDbStockSegregationWarehouse> readEntries(final Statement statement) throws Exception {
+    private ArrayList<SDataStockSegregationWarehouse> readEntries(final Statement statement) throws Exception {
         String sql;
         ResultSet resultSet = null;
-        ArrayList<SDbStockSegregationWarehouse> entries = new ArrayList<>();
+        ArrayList<SDataStockSegregationWarehouse> entries = new ArrayList<>();
 
-        sql = "SELECT id_whs FROM trn_stk_seg_whs " 
+        sql = "SELECT id_whs "
+                + "FROM trn_stk_seg_whs " 
                 + getSqlWhere()
                 + "ORDER BY id_whs;";
         resultSet = statement.executeQuery(sql);
         while (resultSet.next()) {
-            SDbStockSegregationWarehouse segregationWarehouse = new SDbStockSegregationWarehouse();
+            SDataStockSegregationWarehouse segregationWarehouse = new SDataStockSegregationWarehouse();
             segregationWarehouse.read(new int[] { mnPkStockSegregationId, resultSet.getInt(1) }, statement.getConnection().createStatement());
             entries.add(segregationWarehouse);
         }
@@ -87,20 +86,12 @@ public class SDbStockSegregation extends erp.lib.data.SDataRegistry implements j
     
     private void deleteEntries(final Connection connection) throws Exception {
         if (maChildEntries != null && !maChildEntries.isEmpty()) {
-            for (SDbStockSegregationWarehouse segregationWahrehouse : maChildEntries) {
+            for (SDataStockSegregationWarehouse segregationWahrehouse : maChildEntries) {
                 segregationWahrehouse.setPkStockSegregationId(mnPkStockSegregationId);
                 segregationWahrehouse.delete(connection);
             }
         }
     }
-    
-    /**
-     * Production Order
-     * mnFkReference1Id = Production Order id
-     * mnFkReference2Id = Production Year Id
-     * @return 
-     */
-    public int[] getSourceReference() { return new int[] { mnFkReference1Id, mnFkReference2Id }; }
 
     public String getSqlWhere() {
         return "WHERE id_stk_seg = " + mnPkStockSegregationId + " ";
@@ -110,7 +101,7 @@ public class SDbStockSegregation extends erp.lib.data.SDataRegistry implements j
         return "WHERE id_stk_seg = " + pk[0] + " ";
     }
 
-    public void computePrimaryKey(Connection connection) throws SQLException, Exception {
+    public void computeNewPrimaryKey(Connection connection) throws SQLException, Exception {
         ResultSet resultSet = null;
         String sql;
         
@@ -182,11 +173,9 @@ public class SDbStockSegregation extends erp.lib.data.SDataRegistry implements j
 
 
                 // Read aswell child registries:
-
                 maChildEntries.addAll(readEntries(statement.getConnection().createStatement()));
-
+                
                 // Finish registry reading:
-
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
             }
@@ -212,7 +201,7 @@ public class SDbStockSegregation extends erp.lib.data.SDataRegistry implements j
         
         try {
             if (mnPkStockSegregationId == 0) {
-                computePrimaryKey(connection);
+                computeNewPrimaryKey(connection);
                 mbDeleted = false;
                 mnFkUserEditId = SUtilConsts.USR_NA_ID;
 
@@ -229,6 +218,7 @@ public class SDbStockSegregation extends erp.lib.data.SDataRegistry implements j
                         "NOW()" + ", " +
                         "NOW()" +
                         ")";
+                
             }
             else {
                 sql = "UPDATE trn_stk_seg SET " +
@@ -239,6 +229,7 @@ public class SDbStockSegregation extends erp.lib.data.SDataRegistry implements j
                         "fid_ref_2 = " + mnFkReference2Id + ", " +
                         "fid_usr_edit = " + (mnFkUserEditId == 0 ? 1 : mnFkUserEditId) + ", " +
                         "ts_edit = " + "NOW()";
+                
                         if (mbDeleted) {
                            sql += ", fid_usr_del = " + (mnFkUserDeleteId == 0 ? 1 : mnFkUserDeleteId) + ", " +
                             "ts_del = " + "NOW() " ;
@@ -248,13 +239,11 @@ public class SDbStockSegregation extends erp.lib.data.SDataRegistry implements j
             }
 
             connection.createStatement().execute(sql);
-
             this.deleteEntries(connection);
 
             // d) save new child registries:
-
             if (!mbDeleted) {
-                for (SDbStockSegregationWarehouse child : maChildEntries) {
+                for (SDataStockSegregationWarehouse child : maChildEntries) {
                     child.setPkStockSegregationId(mnPkStockSegregationId);
                     child.setIsRegistryNew(true);
                     child.save(connection);
@@ -274,6 +263,6 @@ public class SDbStockSegregation extends erp.lib.data.SDataRegistry implements j
 
     @Override
     public Date getLastDbUpdate() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return mtUserEditTs;
     }
 }

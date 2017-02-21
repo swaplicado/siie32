@@ -261,17 +261,20 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     }
     
     /**
+     * Releasing segregated stocks when material is assigned to PO.
+     * Only what is segregated is released
+     * 
      * @param connection
      * @param segregationStkId id of segregation to release.
      * @param entries items to be moved.
-     * @param compBranchId id of the company branch.
+     * @param companyBranchId id of the company branch.
      * @param warehouseId id of warehouse origin of movement.
      * @throws Exception 
      */
-    private void releaseSegregations(final java.sql.Connection connection, final int segregationStkId, final Vector<SDataDiogEntry> entries, final int compBranchId, final int warehouseId) throws Exception {
-        SDbStockSegregationWarehouseEntry ety = null;
-        double amountToRelease = 0;
-        double amountSegregated = 0;
+    private void releaseSegregations(final java.sql.Connection connection, final int segregationStkId, final Vector<SDataDiogEntry> entries, final int companyBranchId, final int warehouseId) throws Exception {
+        SDataStockSegregationWarehouseEntry ety = null;
+        double quantityToRelease = 0;
+        double quantitySegregated = 0;
         
         if (!STrnStockSegregationUtils.isValidYear(connection, segregationStkId, mnPkYearId)) {
             throw new Exception("La segregación es de un año diferente al actual.");
@@ -280,40 +283,40 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         for (SDataDiogEntry diogEty: entries) {
             ResultSet resSeg = null;
 
-            String sqlStkSeg = "SELECT COALESCE(SUM(wety.qty_inc - wety.qty_dec), 0) AS f_seg_qty " +
-                    "FROM trn_stk_seg_whs swhs " +
-                    "INNER JOIN trn_stk_seg_whs_ety wety ON (swhs.id_stk_seg = wety.id_stk_seg AND swhs.id_whs = wety.id_whs) " +
+            String sqlStockSegregation = "SELECT COALESCE(SUM(wety.qty_inc - wety.qty_dec), 0) AS f_seg_qty " +
+                    "FROM trn_stk_seg_whs AS swhs " +
+                    "INNER JOIN trn_stk_seg_whs_ety AS wety ON swhs.id_stk_seg = wety.id_stk_seg AND swhs.id_whs = wety.id_whs " +
                     "WHERE fid_year = " + diogEty.getPkYearId() + " AND fid_item = " + diogEty.getFkItemId() + " AND fid_unit = " + diogEty.getFkOriginalUnitId() + " ";
 
-            if (compBranchId != 0) {
-                sqlStkSeg += "AND swhs.fid_cob = " + compBranchId + " ";
+            if (companyBranchId != 0) {
+                sqlStockSegregation += "AND swhs.fid_cob = " + companyBranchId + " ";
             }
 
             if (warehouseId != 0) {
-                sqlStkSeg += "AND swhs.fid_whs = " + warehouseId + " ";
+                sqlStockSegregation += "AND swhs.fid_whs = " + warehouseId + " ";
             }
 
             if (segregationStkId != 0) {
-                sqlStkSeg += " AND wety.id_stk_seg = " + segregationStkId;
+                sqlStockSegregation += " AND wety.id_stk_seg = " + segregationStkId;
             }
 
-            resSeg = connection.createStatement().executeQuery(sqlStkSeg);
+            resSeg = connection.createStatement().executeQuery(sqlStockSegregation);
 
             if (resSeg.next()) {
-                amountSegregated = resSeg.getDouble("f_seg_qty");
+                quantitySegregated = resSeg.getDouble("f_seg_qty");
             
-                if (amountSegregated > 0) {
-                    if (amountSegregated >= diogEty.getQuantity()) {
-                        amountToRelease = diogEty.getQuantity();
+                if (quantitySegregated > 0) {
+                    if (quantitySegregated >= diogEty.getQuantity()) {
+                        quantityToRelease = diogEty.getQuantity();
                     }
                     else {
-                        amountToRelease = amountSegregated;
+                        quantityToRelease = quantitySegregated;
                     }
 
-                    ety = new SDbStockSegregationWarehouseEntry();
+                    ety = new SDataStockSegregationWarehouseEntry();
                     ety.setPkStockSegregationId(segregationStkId);
                     ety.setPkWarehouseId(warehouseId);
-                    ety.setQuantityDecrement(amountToRelease);
+                    ety.setQuantityDecrement(quantityToRelease);
                     ety.setFkStockSegregationMovementTypeId(SDataConstantsSys.TRNS_TP_STK_SEG_DEC);
                     ety.setFkYearId(mnPkYearId);
                     ety.setFkItemId(diogEty.getFkItemId());
@@ -865,6 +868,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
                 computeStock(connection);
                 //System.out.println("SDataDiog: 3.5");
                 
+                // release the stock in segregations
                 if (moAuxSegregationStockId != SLibConstants.UNDEFINED && mnFkDiogCategoryId == SDataConstantsSys.TRNS_CT_IOG_OUT) {
                     releaseSegregations(connection, moAuxSegregationStockId, mvDbmsDiogEntries, mnFkCompanyBranchId, mnFkWarehouseId);
                 }

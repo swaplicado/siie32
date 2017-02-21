@@ -184,7 +184,7 @@ public class SViewProductionOrder extends erp.lib.table.STableTab implements jav
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterBizPartner);
 
-        jbNew.setEnabled(mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_NEW && bPrivilegeOrderCreate ? true : false);
+        jbNew.setEnabled(mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_NEW && bPrivilegeOrderCreate);
         jbEdit.setEnabled(true);
         //jbDelete.setEnabled(false);
         jbProductionOrderPreviousStep.setEnabled(
@@ -203,8 +203,8 @@ public class SViewProductionOrder extends erp.lib.table.STableTab implements jav
                 (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_DLY && bPrivilegeOrderStatusDelay && nLevelOrderStatusDelay >= SUtilConsts.LEV_CAPTURE));  //XXX VALIDATIONS FOR STATUS WHERE CAN NOT BE MOVED FORWARD
         
         jbProgramOrder.setEnabled((mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_NEW));
-        jbAssignLotFinishedGood.setEnabled(mnTabTypeAux02 == SDataConstants.MFGX_ORD_LOT_FG ? true : false);
-        jbPrintPerformance.setEnabled(mnTabTypeAux01 != SDataConstants.MFGX_ORD_FOR ? true : false);
+        jbAssignLotFinishedGood.setEnabled(mnTabTypeAux02 == SDataConstants.MFGX_ORD_LOT_FG);
+        jbPrintPerformance.setEnabled(mnTabTypeAux01 != SDataConstants.MFGX_ORD_FOR);
         jbAssignQuantityRework.setEnabled(bPrivilegeOrderAssignRework && (
                 mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_LOT_ASIG ||
                 mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_PROC));
@@ -221,18 +221,16 @@ public class SViewProductionOrder extends erp.lib.table.STableTab implements jav
 
         switch (mnTabTypeAux01) {
             case SDataConstants.MFGX_ORD_FOR:
-                aoTableColumns = new STableColumn[37];
+                aoTableColumns = new STableColumn[36];
                 break;
-
             case SDataConstantsSys.MFGS_ST_ORD_NEW:
                 aoTableColumns = new STableColumn[37];
                 break;
             case SDataConstantsSys.MFGS_ST_ORD_LOT:
                 aoTableColumns = new STableColumn[36];
                 break;
-
             default:
-                aoTableColumns = new STableColumn[35];
+                aoTableColumns = new STableColumn[34];
                 break;
         }
 
@@ -259,14 +257,15 @@ public class SViewProductionOrder extends erp.lib.table.STableTab implements jav
             case SDataConstantsSys.MFGS_ST_ORD_NEW:
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "f_exp", "Explosión", STableConstants.WIDTH_BOOLEAN);
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "b_prog", "Programada", STableConstants.WIDTH_BOOLEAN);
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_perc", "%Segregado", STableConstants.WIDTH_PERCENTAGE);
                 break;
             case SDataConstantsSys.MFGS_ST_ORD_LOT:
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "f_exp", "Explosión", STableConstants.WIDTH_BOOLEAN);
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_perc", "%Segregado", STableConstants.WIDTH_PERCENTAGE);
                 break;
         }
 
         //aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "st.st", "Estado", 60);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_perc", "%Segregado", STableConstants.WIDTH_PERCENTAGE);
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_fid_st_ord", "Estatus", STableConstants.WIDTH_ICON);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", 65);
@@ -519,9 +518,11 @@ public class SViewProductionOrder extends erp.lib.table.STableTab implements jav
     
     private void actionProgramOrder() {
         if (moTablePane.getSelectedTableRow() != null) {
-            SDataProductionOrder productionOrder = (SDataProductionOrder) SDataUtilities.readRegistry(miClient, SDataConstants.MFG_ORD, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
-            productionOrder.program(miClient, false);
-            actionReload();
+            if (jbProgramOrder.isEnabled()) {
+                SDataProductionOrder productionOrder = (SDataProductionOrder) SDataUtilities.readRegistry(miClient, SDataConstants.MFG_ORD, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
+                productionOrder.programProductionOrder(miClient, false);
+                actionReload();
+            }
         }
     }
 
@@ -662,15 +663,15 @@ public class SViewProductionOrder extends erp.lib.table.STableTab implements jav
 
         msSql = "SELECT o.*, CONCAT(po.id_year, '-',po.num, ' ', po.ref) AS f_ref, CONCAT(o.id_year, '-',o.num) AS f_num, " +
                 "bpb.bpb, bpb.code, ent.ent, ent.code, tp.tp, b.bom, i.item_key, i.item, u.symbol, st.st, l.lot, l.dt_exp_n, un.usr, ue.usr, ud.usr, " +
-                STableConstants.ICON_MFG_ST + " + o.fid_st_ord AS f_fid_st_ord, IF(COALESCE(MAX(exp.id_exp), 0)>0, 1, 0) AS f_exp, MAX(exp.ref) AS f_exp_ref, " +
-                "COALESCE((SELECT COALESCE(SUM(qty_inc) * 100, 0) " +
+                STableConstants.ICON_MFG_ST + " + o.fid_st_ord AS f_fid_st_ord, IF(COALESCE(MAX(exp.id_exp), 0) > 0, 1, 0) AS f_exp, MAX(exp.ref) AS f_exp_ref, " +
+                "COALESCE((SELECT COALESCE(SUM(qty_inc) * 100.0, 0) " +
                 "FROM trn_stk_seg AS seg " +
                 "INNER JOIN trn_stk_seg_whs_ety AS sety ON seg.id_stk_seg = sety.id_stk_seg " +
-                "WHERE seg.fid_ref_1 = o.id_ord AND seg.fid_ref_2 = o.id_year AND NOT seg.b_del) / " +
-                "(SELECT COALESCE(SUM(eti.gross_req) * o.qty_ori, 0) " +
+                "WHERE seg.fid_ref_1 = o.id_year AND seg.fid_ref_2 = o.id_ord AND NOT seg.b_del) / " +
+                "(SELECT COALESCE(SUM(eti.gross_req), 0) " +
                 "FROM  mfg_exp_ord AS meo " +
                 "INNER JOIN mfg_exp AS exp ON meo.id_exp = exp.id_exp AND meo.id_exp_year = exp.id_year " +
-                "INNER JOIN mfg_exp_ety exy ON exp.id_exp = exy.id_exp AND exp.id_year = exy.id_year " +
+                "INNER JOIN mfg_exp_ety AS exy ON exp.id_exp = exy.id_exp AND exp.id_year = exy.id_year " +
                 "INNER JOIN mfg_exp_ety_item AS eti ON exp.id_exp = eti.id_exp AND exp.id_year = eti.id_year AND exy.id_item = eti.id_item AND exy.id_unit = eti.id_unit " +
                 "WHERE meo.id_ord = o.id_ord AND meo.id_ord_year = o.id_year AND NOT exp.b_del), 0) AS f_perc, " +
                 "bp.bp, bpo.bp " +
@@ -719,9 +720,7 @@ public class SViewProductionOrder extends erp.lib.table.STableTab implements jav
                 if (jbProductionOrderNextStep.isEnabled()) actionChangeState(true);
             }
             else if (button == jbProgramOrder) {
-                if (jbProgramOrder.isEnabled()) {
-                    actionProgramOrder();
-                }
+                actionProgramOrder();
             }
             else if (button == jbProductionOrderPreviousStep) {
                 if (jbProductionOrderPreviousStep.isEnabled()) actionChangeState(false);

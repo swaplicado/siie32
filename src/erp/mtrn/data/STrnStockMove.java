@@ -31,7 +31,7 @@ public class STrnStockMove implements java.io.Serializable {
     protected int mnSegregationId;
     protected int[] manSegregationReference; //reference of the origin of segregation. PO = [ productionOrderId, productionOrderYear ].
     protected int mnSegregationType;
-    protected boolean mbIsCurrentSegExcluded;
+    protected boolean mbIsCurrentSegregationExcluded;
     protected int mnWarehouseType;
     
      /**
@@ -108,10 +108,10 @@ public class STrnStockMove implements java.io.Serializable {
     public void setAuxLotDateExpiration(Date t) { mtAuxLotDateExpiration = t; }
     public void setAuxIsLotBlocked(boolean b) { mbAuxIsLotBlocked = b; }
     public void setAuxIsMoveBeingDeleted(boolean b) { mbAuxIsMoveBeingDeleted = b; }
-    public void setSegregationId(int idSeg) { this.mnSegregationId = idSeg; }
+    public void setSegregationId(int n) { this.mnSegregationId = n; }
     public void setSegregationReference(int[] o) { this.manSegregationReference = o; }
     public void setSegregationType(int n) { this.mnSegregationType = n; }
-    public void setIsCurrentSegExcluded(boolean b) { this.mbIsCurrentSegExcluded = b; }
+    public void setIsCurrentSegregationExcluded(boolean b) { this.mbIsCurrentSegregationExcluded = b; }
     public void setWarehouseType(int n) { this.mnWarehouseType = n; }
 
     public int getPkYearId() { return mnPkYearId; }
@@ -132,7 +132,7 @@ public class STrnStockMove implements java.io.Serializable {
     public int getSegregationId() { return mnSegregationId; }
     public int[] getSegregationReference() { return manSegregationReference; }
     public int getSegregationType() { return mnSegregationType; }
-    public boolean getIsCurrentSegExcluded() { return mbIsCurrentSegExcluded; }
+    public boolean getIsCurrentSegregationExcluded() { return mbIsCurrentSegregationExcluded; }
     public int getWarehouseType() { return mnWarehouseType; }
 
     public void setLotKey(int[] key) { mnPkItemId = key[0]; mnPkUnitId = key[1]; mnPkLotId = key[2]; }

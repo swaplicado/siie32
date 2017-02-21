@@ -14,16 +14,16 @@ import sa.lib.db.SDbConsts;
  *
  * @author Edwin Carmona
  */
-public class SDbStockSegregationWarehouse extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+public class SDataStockSegregationWarehouse extends erp.lib.data.SDataRegistry implements java.io.Serializable {
     
     protected int mnPkStockSegregationId;
     protected int mnPkWarehouseId;
     protected int mnFkCompanyBranchId;
     protected int mnFkWarehouseId;
 
-    protected ArrayList<SDbStockSegregationWarehouseEntry> maChildEntries;
+    protected ArrayList<SDataStockSegregationWarehouseEntry> maChildEntries;
     
-    public SDbStockSegregationWarehouse() {
+    public SDataStockSegregationWarehouse() {
         super(SDataConstants.TRN_STK_SEG_WHS);
         maChildEntries = new ArrayList<>();
         reset();
@@ -39,17 +39,17 @@ public class SDbStockSegregationWarehouse extends erp.lib.data.SDataRegistry imp
     public int getFkCompanyBranchId() { return mnFkCompanyBranchId; }
     public int getFkWarehouseId() { return mnFkWarehouseId; }
     
-    private ArrayList<SDbStockSegregationWarehouseEntry> readEntries(final Statement statement) throws Exception {
+    private ArrayList<SDataStockSegregationWarehouseEntry> readEntries(final Statement statement) throws Exception {
         String sql;
         ResultSet resultSet = null;
-        ArrayList<SDbStockSegregationWarehouseEntry> entries = new ArrayList<>();
+        ArrayList<SDataStockSegregationWarehouseEntry> entries = new ArrayList<>();
 
         sql = "SELECT id_ety FROM trn_stk_seg_whs_ety " 
                 + getSqlWhere()
                 + "ORDER BY id_ety; ";
         resultSet = statement.executeQuery(sql);
         while (resultSet.next()) {
-            SDbStockSegregationWarehouseEntry ety = new SDbStockSegregationWarehouseEntry();
+            SDataStockSegregationWarehouseEntry ety = new SDataStockSegregationWarehouseEntry();
             ety.read(new int[] { mnPkStockSegregationId, mnPkWarehouseId, resultSet.getInt(1) }, statement.getConnection().createStatement());
             entries.add(ety);
         }
@@ -64,7 +64,7 @@ public class SDbStockSegregationWarehouse extends erp.lib.data.SDataRegistry imp
         connection.createStatement().execute(sql);
     }
 
-    public ArrayList<SDbStockSegregationWarehouseEntry> getChildEntries() { return maChildEntries; }
+    public ArrayList<SDataStockSegregationWarehouseEntry> getChildEntries() { return maChildEntries; }
 
     public String getSqlWhere() {
         return "WHERE id_stk_seg = " + mnPkStockSegregationId + " AND id_whs = " + mnPkWarehouseId + " ";
@@ -181,7 +181,7 @@ public class SDbStockSegregationWarehouse extends erp.lib.data.SDataRegistry imp
                 this.deleteEntries(connection);
 
                 // d) save new child registries:
-                for (SDbStockSegregationWarehouseEntry ety : maChildEntries) {
+                for (SDataStockSegregationWarehouseEntry ety : maChildEntries) {
                     ety.setPkStockSegregationId(mnPkStockSegregationId);
                     ety.setPkWarehouseId(mnPkWarehouseId);
                     ety.setIsRegistryNew(true);
@@ -206,6 +206,6 @@ public class SDbStockSegregationWarehouse extends erp.lib.data.SDataRegistry imp
 
     @Override
     public Date getLastDbUpdate() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return null;
     }
 }

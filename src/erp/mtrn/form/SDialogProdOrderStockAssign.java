@@ -986,7 +986,7 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
                 if (moParamProdOrder != null) {
                     stockMoveParams.setSegregationReference( new int[] { moParamProdOrder.getPkOrdId(), moParamProdOrder.getPkYearId() });
                     stockMoveParams.setSegregationType(SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD);
-                    stockMoveParams.setIsCurrentSegExcluded(true);
+                    stockMoveParams.setIsCurrentSegregationExcluded(true);
                 }
                 
                 objStock = STrnStockSegregationUtils.getStkSegregated(miClient, stockMoveParams);

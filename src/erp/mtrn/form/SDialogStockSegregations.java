@@ -41,12 +41,10 @@ public class SDialogStockSegregations extends javax.swing.JDialog implements jav
     private erp.lib.table.STablePane moPaneStockMoves;
 
     private int mnParamYear;
-    private Date mtParamDateCutOff;
-    private int[] manWarehouseKey;
     private erp.mitm.data.SDataItem moParamItem;
     private erp.mitm.data.SDataUnit moParamUnit;
 
-    /** Creates new form SDialogAccountingDetail */
+    /** Creates new form SDialogStockSegregations */
     public SDialogStockSegregations(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
@@ -72,8 +70,8 @@ public class SDialogStockSegregations extends javax.swing.JDialog implements jav
         jPanel6 = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
         jlStock = new javax.swing.JLabel();
-        jtfStock = new javax.swing.JTextField();
-        jtfStockUnitSymbol = new javax.swing.JTextField();
+        jtfStockSegregated = new javax.swing.JTextField();
+        jtfStockSegregatedUnitSymbol = new javax.swing.JTextField();
         jpStockMoves = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jtfSeek = new javax.swing.JTextField();
@@ -118,30 +116,30 @@ public class SDialogStockSegregations extends javax.swing.JDialog implements jav
 
         jpParams.add(jPanel4, java.awt.BorderLayout.WEST);
 
-        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Segregadas:"));
+        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Stock"));
         jPanel6.setLayout(new java.awt.GridLayout(1, 1, 0, 5));
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlStock.setText("Unidades segregadas");
+        jlStock.setText("Unidades segregadas:");
         jlStock.setPreferredSize(new java.awt.Dimension(150, 23));
         jlStock.setRequestFocusEnabled(false);
         jPanel13.add(jlStock);
 
-        jtfStock.setBackground(new java.awt.Color(153, 204, 255));
-        jtfStock.setEditable(false);
-        jtfStock.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfStock.setText("0.000");
-        jtfStock.setFocusable(false);
-        jtfStock.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel13.add(jtfStock);
+        jtfStockSegregated.setEditable(false);
+        jtfStockSegregated.setBackground(new java.awt.Color(153, 204, 255));
+        jtfStockSegregated.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfStockSegregated.setText("0.000");
+        jtfStockSegregated.setFocusable(false);
+        jtfStockSegregated.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel13.add(jtfStockSegregated);
 
-        jtfStockUnitSymbol.setBackground(new java.awt.Color(153, 204, 255));
-        jtfStockUnitSymbol.setEditable(false);
-        jtfStockUnitSymbol.setText("CODE");
-        jtfStockUnitSymbol.setFocusable(false);
-        jtfStockUnitSymbol.setPreferredSize(new java.awt.Dimension(35, 23));
-        jPanel13.add(jtfStockUnitSymbol);
+        jtfStockSegregatedUnitSymbol.setEditable(false);
+        jtfStockSegregatedUnitSymbol.setBackground(new java.awt.Color(153, 204, 255));
+        jtfStockSegregatedUnitSymbol.setText("CODE");
+        jtfStockSegregatedUnitSymbol.setFocusable(false);
+        jtfStockSegregatedUnitSymbol.setPreferredSize(new java.awt.Dimension(35, 23));
+        jPanel13.add(jtfStockSegregatedUnitSymbol);
 
         jPanel6.add(jPanel13);
 
@@ -261,11 +259,11 @@ public class SDialogStockSegregations extends javax.swing.JDialog implements jav
                     "seg.fid_tp_stk_seg, tps.tp_stk_seg , COALESCE(SUM(swe.qty_inc - swe.qty_dec)) AS f_seg_qty, uni.symbol, whse.code, " +
                     "seg.ts_new, seg.fid_usr_new, une.usr, seg.fid_usr_edit, uup.usr, seg.ts_edit " +
                     "FROM trn_stk_seg seg " +
-                    "INNER JOIN trn_stk_seg_whs swh ON (seg.id_stk_seg = swh.id_stk_seg) " +
-                    "INNER JOIN trn_stk_seg_whs_ety swe ON (swh.id_stk_seg = swe.id_stk_seg AND swh.id_whs = swe.id_whs) " +
-                    "INNER JOIN mfg_ord ord ON (seg.fid_ref_1 = ord.id_ord AND seg.fid_ref_2 = ord.id_year) " +
-                    "INNER JOIN erp.trns_tp_stk_seg tps ON (seg.fid_tp_stk_seg = tps.id_tp_stk_seg) " +
-                    "INNER JOIN erp.cfgu_cob_ent whse ON (swh.fid_cob = whse.id_cob AND swh.fid_whs = whse.id_ent) " +
+                    "INNER JOIN trn_stk_seg_whs swh ON seg.id_stk_seg = swh.id_stk_seg " +
+                    "INNER JOIN trn_stk_seg_whs_ety swe ON swh.id_stk_seg = swe.id_stk_seg AND swh.id_whs = swe.id_whs " +
+                    "INNER JOIN mfg_ord ord ON seg.fid_ref_1 = ord.id_year AND seg.fid_ref_2 = ord.id_ord " +
+                    "INNER JOIN erp.trns_tp_stk_seg tps ON seg.fid_tp_stk_seg = tps.id_tp_stk_seg " +
+                    "INNER JOIN erp.cfgu_cob_ent whse ON swh.fid_cob = whse.id_cob AND swh.fid_whs = whse.id_ent " +
                     "INNER JOIN erp.itmu_unit AS uni ON swe.fid_unit = uni.id_unit " +
                     "INNER JOIN erp.usru_usr AS une ON seg.fid_usr_new = une.id_usr " +
                     "INNER JOIN erp.usru_usr AS uup ON seg.fid_usr_edit = uup.id_usr " +
@@ -313,7 +311,7 @@ public class SDialogStockSegregations extends javax.swing.JDialog implements jav
             SLibUtilities.renderException(this, e);
         }
 
-        jtfStock.setText((mnFormMode == SLibConstants.MODE_QTY ?
+        jtfStockSegregated.setText((mnFormMode == SLibConstants.MODE_QTY ?
             miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat() :
             miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormat()).format(segQty));
     }
@@ -340,8 +338,8 @@ public class SDialogStockSegregations extends javax.swing.JDialog implements jav
     private javax.swing.JTextField jtfItem;
     private javax.swing.JTextField jtfItemKey;
     private javax.swing.JTextField jtfSeek;
-    private javax.swing.JTextField jtfStock;
-    private javax.swing.JTextField jtfStockUnitSymbol;
+    private javax.swing.JTextField jtfStockSegregated;
+    private javax.swing.JTextField jtfStockSegregatedUnitSymbol;
     // End of variables declaration//GEN-END:variables
 
     public void focusSeek() {
@@ -368,8 +366,6 @@ public class SDialogStockSegregations extends javax.swing.JDialog implements jav
 
     public void setFormParams(final Date dateCutOff, final int itemId, final int unitId, final int[] warehouseKey, int mode) {
         mnParamYear = SLibTimeUtilities.digestYear(dateCutOff)[0];
-        mtParamDateCutOff = dateCutOff;
-        manWarehouseKey = warehouseKey;
         mnFormMode = mode;
 
         if (itemId == SLibConstants.UNDEFINED) {
@@ -378,7 +374,7 @@ public class SDialogStockSegregations extends javax.swing.JDialog implements jav
 
             jtfItem.setText("");
             jtfItemKey.setText("");
-            jtfStockUnitSymbol.setText("");
+            jtfStockSegregatedUnitSymbol.setText("");
         }
         else {
             moParamItem = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { itemId }, SLibConstants.EXEC_MODE_VERBOSE);
@@ -386,11 +382,11 @@ public class SDialogStockSegregations extends javax.swing.JDialog implements jav
 
             jtfItem.setText(moParamItem.getItem());
             jtfItemKey.setText(moParamItem.getKey());
+            jtfStockSegregatedUnitSymbol.setText(moParamUnit.getSymbol());
+            
             jtfItem.setCaretPosition(0);
             jtfItemKey.setCaretPosition(0);
-
-            jtfStockUnitSymbol.setText(moParamUnit.getSymbol());
-            jtfStockUnitSymbol.setCaretPosition(0);
+            jtfStockSegregatedUnitSymbol.setCaretPosition(0);
         }
 
         setDecimals();
