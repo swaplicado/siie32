@@ -2471,40 +2471,40 @@ public abstract class STrnUtilities {
     }
 
    /**
-    * Obtain last payment and last bank account used in the year for business partner and category of DPS specified:
+    * Obtains last method of payment and bank account used in DPS for business partner on provided year and DPS category.
     * @param client ERP Client interface.
-    * @param bizPartnerId Business partner ID.
-    * @param categoryDpsId Category the DPS.
-    * @param yearId Year the DPS
-    * @return String array (wich index 0 is last payment and index 1 last bank account for payment).
+    * @param idBizPartner Business partner ID.
+    * @param year Desired year.
+    * @param idDpsCategory Desired DPS category ID (SDataConstantsSys.TRNS_CT_DPS_...).
+    * @return String array (index 0: last payment method (by name); index 1: last bank account).
     */
-    public static String[] getLastPaymentSettings(final SClientInterface client, final int bizPartnerId, final int categoryDpsId, final int yearId) {
-        String asPaymentInfo[] = new String[2];
+    public static String[] getLastPaymentSettings(final SClientInterface client, final int idBizPartner, final int year, final int idDpsCategory) {
         String sql = "";
+        String[] lastPaymentSettings = new String[2];
         ResultSet resultSet = null;
 
         try {
             sql = "SELECT pay_method, pay_account FROM trn_dps " +
-                    "WHERE fid_bp_r = " + bizPartnerId + " AND id_year = " + yearId + " " +
-                    "AND b_del = FALSE AND fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND fid_ct_dps = " + categoryDpsId + " " +
+                    "WHERE fid_bp_r = " + idBizPartner + " AND id_year = " + year + " " +
+                    "AND NOT b_del AND fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND fid_ct_dps = " + idDpsCategory + " " +
                     "AND (fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_ORD[1] + " || fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_DOC[1] + ") ORDER BY dt DESC " +
                     "LIMIT 1";
 
             resultSet = client.getSession().getStatement().executeQuery(sql);
             if (resultSet.next()) {
-               asPaymentInfo[0] = resultSet.getString("pay_method");    // last payment method type
-               asPaymentInfo[1] = resultSet.getString("pay_account");   // last bank account on payment
+               lastPaymentSettings[0] = resultSet.getString("pay_method");    // last method of payment (by name) used
+               lastPaymentSettings[1] = resultSet.getString("pay_account");   // last bank account used
             }
             else {
-               asPaymentInfo[0] = SUtilConsts.NON_APPLYING;             // default payment method type
-               asPaymentInfo[1] = "";                                   // default bank account on payment
+               lastPaymentSettings[0] = SUtilConsts.NON_APPLYING;             // default method of payment (by name)
+               lastPaymentSettings[1] = "";                                   // default bank account
             }
         }
         catch (Exception e) {
             SLibUtilities.printOutException(STrnUtilities.class.getName(), e);
         }
 
-        return asPaymentInfo;
+        return lastPaymentSettings;
     }
    
     /**

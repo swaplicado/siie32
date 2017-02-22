@@ -254,9 +254,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private double mdOrigDiscountDocPercentage;
     private boolean mbOrigIsDiscountDocApplying;
     private boolean mbIsLocalCurrency;
+    private int mnTypeDelivery;
     private SGuiDpsLink moGuiDpsLink;
 
-    private int mnTypeDelivery;
     private boolean mbHasRightOrderDelay;
     private boolean mbHasRightOmitSourceDoc;
 
@@ -2712,11 +2712,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         manDpsClassPreviousKey = null;
         moDpsType = null;
 
-        mnParamCurrentUserPrivilegeLevel = SDataConstantsSys.UNDEFINED;
+        mnParamCurrentUserPrivilegeLevel = SLibConsts.UNDEFINED;
         mbParamIsReadOnly = false;
         moParamDpsSource = null;
         mbIsLocalCurrency = false;
-        mnTypeDelivery = 0;
+        mnTypeDelivery = SLibConsts.UNDEFINED;
 
         // Action listeners:
 
@@ -2780,12 +2780,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jckIsDiscountDocPercentage.addItemListener(this);
         jcbNumberSeries.addItemListener(this);
         jcbFkPaymentTypeId.addItemListener(this);
-        jcbFkPaymentSystemTypeId.addItemListener(this);
-        jcbFkLanguageId.addItemListener(this);
-        jcbFkDpsNatureId.addItemListener(this);
         jcbFkCurrencyId.addItemListener(this);
         jcbFkIncotermId.addItemListener(this);
         jcbFkCarrierTypeId.addItemListener(this);
+        jcbFkVehicleTypeId_n.addItemListener(this);
         jcbCfdAddendaSubtypeId.addItemListener(this);
 
         SFormUtilities.createActionMap(rootPane, this, "publicActionDependentNew", "dependentNew", KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK);
@@ -2853,14 +2851,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
             else {
                 if (miClient.getSessionXXX().getCurrentCompanyBranchId() == 0) {
-                    // A company branch must be selected:
-
-                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH);
+                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH);   // no company branch selected
                     mbFormSettingsOk = false;
                     actionCancel();
                 }
                 else if (mbIsNumberSeriesRequired && !mbIsNumberSeriesAvailable) {
-                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_CFG_DNS);
+                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_CFG_DNS);  // number series required, but no number series available
                     mbFormSettingsOk = false;
                     actionCancel();
                 }
@@ -2869,7 +2865,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         // New document from scratch:
 
                         if (moDpsType == null) {
-                            actionDpsType();
+                            pickDpsType();    // choose DPS type
                             if (moDpsType == null) {
                                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDpsType.getText() + "'.");
                                 mbFormSettingsOk = false;
@@ -2878,21 +2874,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         }
 
                         if (moBizPartner == null) {
-                            actionBizPartner();
+                            pickBizPartner(); // choose business partner
                             if (moBizPartner == null) {
                                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlBizPartner.getText() + "'.");
                                 mbFormSettingsOk = false;
                                 actionCancel();
                             }
                             else {
-                                renderLastPaymentSettings(moBizPartner.getPkBizPartnerId());
-                                if (isBizPartnerBlocked(moBizPartner.getPkBizPartnerId(), manDpsClassKey[0])) {
+                                if (isBizPartnerBlocked(moBizPartner.getPkBizPartnerId())) {
                                     miClient.showMsgBoxWarning(SLibConstants.MSG_INF_BP_BLOCKED);
                                     mbFormSettingsOk = bContinue = false;
                                     actionCancel();
-                                }
-                                else {
-                                    
                                 }
                             }
                         }
@@ -2900,7 +2892,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     else {
                         // New document from a previous document:
 
-                        if (isBizPartnerBlocked(moParamDpsSource.getFkBizPartnerId_r(), moParamDpsSource.getFkDpsCategoryId())) {
+                        if (isBizPartnerBlocked(moParamDpsSource.getFkBizPartnerId_r())) {
                             miClient.showMsgBoxWarning(SLibConstants.MSG_INF_BP_BLOCKED);
                             mbFormSettingsOk = bContinue = false;
                             moParamDpsSource = null;
@@ -2973,7 +2965,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
                     if (bContinue) {
                         obtainNextNumber();
-                        updateDpsWithDocSettings();
+                        updateDpsWithFormData();
                         updateDateForOrderPrevious();
                         if (jftDate.isEditable()) {
                             jftDate.requestFocus();
@@ -2984,6 +2976,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     }
 
                     // Render system notes:
+                    
                     for (SDataDpsNotesRow row : STrnUtilities.getSystemNotes(miClient, moDpsType.getPkDpsCategoryId(), moDpsType.getPkDpsClassId(), moDpsType.getPkDpsTypeId(), moDps.getFkCurrencyId())) {
                         bExists = false;
                         dpsNotes = (SDataDpsNotes) row.getData();
@@ -3115,12 +3108,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     /**
      * Business Partner Blocking applies only to Orders and Purchases and Sales Documents.
      */
-    private boolean isBizPartnerBlocked(int idBizPartner, int idDpsCategory) {
+    private boolean isBizPartnerBlocked(int idBizPartner) {
         boolean blocked = false;
 
         if (mbIsOrd || mbIsDoc) {
             try {
-                blocked = SDataUtilities.obtainIsBizPartnerBlocked(miClient, idBizPartner, idDpsCategory == SDataConstantsSys.TRNS_CT_DPS_PUR ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
+                blocked = SDataUtilities.obtainIsBizPartnerBlocked(miClient, idBizPartner, STrnUtils.getBizPartnerCategoryId(mnFormType));
             }
             catch (Exception e) {
                 SLibUtilities.printOutException(this, e);
@@ -3129,7 +3122,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         return blocked;
     }
-
 
     private boolean isUpdateEntriesAllNeeded() {
         boolean isUpdateNeeded = false;
@@ -3197,8 +3189,54 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         
         renderDpsValue();
     }
+    
+    /**
+     * Populates combo boxes that depends on current business partner.
+     */
+    private void populateComboBoxesBizPartner() {
+        boolean isAvailable = false;
+        
+        // populate combo box for payment account:
+        
+        SFormUtilities.populateComboBox(miClient, jcbPaymentAccount, SDataConstants.BPSX_BANK_ACC, new int[] { moBizPartner.getPkBizPartnerId(), SLibTimeUtilities.digestYear(moFieldDate.getDate())[0], mnFormType });
+        jcbPaymentAccount.removeItemAt(0);  // remove label item, it is not needed
 
-    private void updateDpsWithDocSettings() {
+        // add, if needed, option item "NO IDENTIFICADO", it must be allways available:
+        
+        for (int item = 0; item < jcbPaymentAccount.getItemCount(); item++) {
+            if (jcbPaymentAccount.getItemAt(item).toString().equalsIgnoreCase(SCfdConsts.UNIDENTIFIED)) {
+                isAvailable = true;
+                break;
+            }
+        }
+
+        if (!isAvailable) {
+            jcbPaymentAccount.addItem(new SFormComponentItem(new int[] { SLibConsts.UNDEFINED }, SCfdConsts.UNIDENTIFIED));
+        }
+        
+        // populate combo box for INCOTERM, set delivery type aswell:
+        
+        mnTypeDelivery = (moBizPartnerBranchAddressMain.getFkCountryId_n() == SLibConstants.UNDEFINED || miClient.getSession().getSessionCustom().isLocalCountry(new int[] { (moBizPartnerBranchAddressMain.getFkCountryId_n()) })) ? SModSysConsts.LOGS_TP_DLY_DOM : SModSysConsts.LOGS_TP_DLY_INT;
+        SFormUtilities.populateComboBox(miClient, jcbFkIncotermId, SModConsts.LOGS_INC, new int[] { mnTypeDelivery });
+        
+        // populate combo box for contacts:
+        
+        if (mnFormType == SDataConstantsSys.TRNS_CT_DPS_SAL) {
+            jcbFkContactId_n.removeAllItems();
+            jcbFkContactId_n.addItem(new SFormComponentItem(new int[2], "(Seleccionar comprador)"));
+
+            for (SDataBizPartnerBranchContact contact : moBizPartnerBranch.getDbmsBizPartnerBranchContacts()) {
+                if (contact.getPkContactId() > 1 && !contact.getIsDeleted()) {  // contact #1 has company branch telephones
+                    jcbFkContactId_n.addItem(new SFormComponentItem(contact.getPrimaryKey(), contact.getContact() + " (" + contact.getDbmsContactType() + ")"));
+                }
+            }
+        }
+    }
+
+    /**
+     * Updates current document with form data, that one needed to recalculate document's total.
+     */
+    private void updateDpsWithFormData() {
         moDps.setDate(moFieldDate.getDate());
         moDps.setFkCurrencyId(moFieldFkCurrencyId.getKeyAsIntArray()[0]);
         moDps.setFkLanguajeId(moFieldFkLanguajeId.getKeyAsIntArray()[0]);
@@ -3219,107 +3257,138 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
 
-    private void updateDpsWithBizPartnerSettings() {
-        int id = -1;
-        int[] key = null;
-        double rate = 0;
+    /**
+     * Updates current document, when new, with business partner default settings.
+     */
+    private void updateDpsNewWithBizPartnerSettings() {
+        if (moDps.getIsRegistryNew()) {
+            // update document properties that cannot be edited by user into GUI:
 
-        mbUpdatingForm = true;
+            moDps.setFkBizPartnerId_r(moBizPartner.getPkBizPartnerId());
+            moDps.setFkBizPartnerBranchId(moBizPartnerBranch.getPkBizPartnerBranchId());
 
-        // Update in moDps object only the fields that cannot be edited in GUI:
+            if (mnFormType == SDataConstantsSys.TRNS_CT_DPS_PUR) {
+                moDps.setFkTaxIdentityEmisorTypeId(moBizPartner.getFkTaxIdentityId());
+                moDps.setFkTaxIdentityReceptorTypeId(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getFkTaxIdentityId());
 
-        moDps.setFkBizPartnerId_r(moBizPartner.getPkBizPartnerId());
-        moDps.setFkBizPartnerBranchId(moBizPartnerBranch.getPkBizPartnerBranchId());
-
-        if (mnFormType == SDataConstantsSys.TRNS_CT_DPS_PUR) {
-            moDps.setFkTaxIdentityEmisorTypeId(moBizPartner.getFkTaxIdentityId());
-            moDps.setFkTaxIdentityReceptorTypeId(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getFkTaxIdentityId());
-
-            mnSalesAgentBizPartnerId_n = 0;
-            mnSalesSupervisorBizPartnerId_n = 0;
-        }
-        else {
-            moDps.setFkTaxIdentityEmisorTypeId(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getFkTaxIdentityId());
-            moDps.setFkTaxIdentityReceptorTypeId(moBizPartner.getFkTaxIdentityId());
-
-            key = (int[]) moBizPartner.getSalesAgentKey((int[]) moBizPartnerBranch.getPrimaryKey());
-            mnSalesAgentBizPartnerId_n = key == null ? 0 : key[0];
-
-            key = (int[]) moBizPartner.getSalesSupervisorKey((int[]) moBizPartnerBranch.getPrimaryKey());
-            mnSalesSupervisorBizPartnerId_n = key == null ? 0 : key[0];
-        }
-
-        if (moDps.getFkSalesAgentId_n() == 0) {
-            mnSalesAgentId_n = mnSalesAgentBizPartnerId_n;
-            moDps.setFkSalesAgentId_n(mnSalesAgentId_n);
-        }
-        moDps.setFkSalesAgentBizPartnerId_n(mnSalesAgentBizPartnerId_n);
-
-        if (moDps.getFkSalesSupervisorId_n() == 0) {
-            mnSalesSupervisorId_n = mnSalesSupervisorBizPartnerId_n;
-            moDps.setFkSalesSupervisorId_n(mnSalesSupervisorId_n);
-        }
-        moDps.setFkSalesSupervisorBizPartnerId_n(mnSalesSupervisorBizPartnerId_n);
-
-        renderSalesAgentBizPartner(moDps.getFkSalesAgentBizPartnerId_n() == 0 ? null : new int[] { moDps.getFkSalesAgentBizPartnerId_n() });
-        renderSalesAgent(moDps.getFkSalesAgentId_n() == 0 ? null : new int[] { moDps.getFkSalesAgentId_n() });
-        renderSalesSupervisorBizPartner(moDps.getFkSalesSupervisorBizPartnerId_n() == 0 ? null : new int[] { moDps.getFkSalesSupervisorBizPartnerId_n() });
-        renderSalesSupervisor(moDps.getFkSalesSupervisorId_n() == 0 ? null : new int[] { moDps.getFkSalesSupervisorId_n() });
-
-        // Document's payment type:
-
-        if (moDps.getFkPaymentTypeId() == 0) {
-            if (mbIsAdj || moBizPartnerCategory.getEffectiveCreditTypeId() == SDataConstantsSys.BPSS_TP_CRED_CRED_NO) {
-                moFieldFkPaymentTypeId.setFieldValue(new int[] { SDataConstantsSys.TRNS_TP_PAY_CASH });
+                mnSalesAgentBizPartnerId_n = SLibConsts.UNDEFINED;
+                mnSalesSupervisorBizPartnerId_n = SLibConsts.UNDEFINED;
             }
             else {
-                moFieldFkPaymentTypeId.setFieldValue(new int[] { SDataConstantsSys.TRNS_TP_PAY_CREDIT });
+                moDps.setFkTaxIdentityEmisorTypeId(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getFkTaxIdentityId());
+                moDps.setFkTaxIdentityReceptorTypeId(moBizPartner.getFkTaxIdentityId());
+
+                int[] keyAgent = (int[]) moBizPartner.getSalesAgentKey((int[]) moBizPartnerBranch.getPrimaryKey());
+                int[] keySuper = (int[]) moBizPartner.getSalesSupervisorKey((int[]) moBizPartnerBranch.getPrimaryKey());
+
+                mnSalesAgentBizPartnerId_n = keyAgent == null ? SLibConsts.UNDEFINED : keyAgent[0];
+                mnSalesSupervisorBizPartnerId_n = keySuper == null ? SLibConsts.UNDEFINED : keySuper[0];
             }
-        }
 
-        // Document's language:
-
-        if (jcbFkLanguageId.getSelectedIndex() <= 0) {
-            id = moBizPartnerCategory.getFkLanguageId_n();
-            if (id == SLibConstants.UNDEFINED) {
-                moFieldFkLanguajeId.setFieldValue(new int[] { miClient.getSessionXXX().getParamsErp().getFkLanguageId() });
+            if (moDps.getFkSalesAgentId_n() == SLibConsts.UNDEFINED) {
+                mnSalesAgentId_n = mnSalesAgentBizPartnerId_n;
+                moDps.setFkSalesAgentId_n(mnSalesAgentId_n);
             }
-            else {
-                moFieldFkLanguajeId.setFieldValue(new int[] { id });
+            moDps.setFkSalesAgentBizPartnerId_n(mnSalesAgentBizPartnerId_n);
+
+            if (moDps.getFkSalesSupervisorId_n() == SLibConsts.UNDEFINED) {
+                mnSalesSupervisorId_n = mnSalesSupervisorBizPartnerId_n;
+                moDps.setFkSalesSupervisorId_n(mnSalesSupervisorId_n);
             }
-        }
+            moDps.setFkSalesSupervisorBizPartnerId_n(mnSalesSupervisorBizPartnerId_n);
 
-        // Document's currency:
+            renderSalesAgentBizPartner(moDps.getFkSalesAgentBizPartnerId_n() == 0 ? null : new int[] { moDps.getFkSalesAgentBizPartnerId_n() });
+            renderSalesAgent(moDps.getFkSalesAgentId_n() == 0 ? null : new int[] { moDps.getFkSalesAgentId_n() });
+            renderSalesSupervisorBizPartner(moDps.getFkSalesSupervisorBizPartnerId_n() == 0 ? null : new int[] { moDps.getFkSalesSupervisorBizPartnerId_n() });
+            renderSalesSupervisor(moDps.getFkSalesSupervisorId_n() == 0 ? null : new int[] { moDps.getFkSalesSupervisorId_n() });
 
-        if (jcbFkCurrencyId.getSelectedIndex() <= 0) {
-            id = moBizPartnerCategory.getFkCurrencyId_n();
+            // set document's payment type:
 
-            if (id == SLibConstants.UNDEFINED) {
-                moFieldFkCurrencyId.setFieldValue(new int[] { miClient.getSessionXXX().getParamsErp().getFkCurrencyId() });
-            }
-            else {
-                moFieldFkCurrencyId.setFieldValue(new int[] { id });
-
-                try {
-                    rate = SDataUtilities.obtainExchangeRate(miClient, id, moDps.getDate());
+            if (moDps.getFkPaymentTypeId() == SLibConsts.UNDEFINED) {
+                if (mbIsAdj || moBizPartnerCategory.getEffectiveCreditTypeId() == SDataConstantsSys.BPSS_TP_CRED_CRED_NO) {
+                    moFieldFkPaymentTypeId.setFieldValue(new int[] { SDataConstantsSys.TRNS_TP_PAY_CASH });
                 }
-                catch (Exception e) {
-                    SLibUtilities.renderException(this, e);
-                }
-
-                if (rate != 0) {
-                    moFieldExchangeRateSystem.setFieldValue(rate);
-                    moFieldExchangeRate.setFieldValue(rate);
+                else {
+                    moFieldFkPaymentTypeId.setFieldValue(new int[] { SDataConstantsSys.TRNS_TP_PAY_CREDIT });
                 }
             }
+
+            // set document's method of payment & bank account:
+
+            int paymentMethod = SLibConsts.UNDEFINED;
+            String paymentAccount = "";
+            String[] lastPaymentSettings = null;    // index 0: payment method; index 1: bank account
+
+            if (moDps.getFkPaymentSystemTypeId() == SLibConsts.UNDEFINED || moDps.getPaymentAccount().isEmpty()) {
+                // obtain default business partner preferences:
+
+                paymentMethod = moBizPartnerCategory.getFkPaymentSystemTypeId_n();
+                paymentAccount = moBizPartnerCategory.getPaymentAccount();
+
+                // if needed, obtain last settings used by business partner:
+
+                if (paymentMethod == SLibConsts.UNDEFINED || paymentAccount.isEmpty()) {
+                    lastPaymentSettings = STrnUtilities.getLastPaymentSettings(miClient, moBizPartner.getPkBizPartnerId(), SLibTimeUtilities.digestYear(moFieldDate.getDate())[0], mnFormType);
+
+                    if (paymentMethod == SLibConsts.UNDEFINED) {
+                        if (SCfdConsts.FormaPagoIdsMap.containsKey(lastPaymentSettings[0])) {
+                            paymentMethod = SCfdConsts.FormaPagoIdsMap.get(lastPaymentSettings[0]);
+                        }
+                        else {
+                            paymentMethod = SDataConstantsSys.TRNU_TP_PAY_SYS_NA;
+                        }
+                    }
+
+                    if (paymentAccount.isEmpty()) {
+                        paymentAccount = lastPaymentSettings[1];
+                    }
+                }
+
+                // set method of payment & bank account:
+
+                if (moDps.getFkPaymentSystemTypeId() == SLibConsts.UNDEFINED) {
+                    moFieldFkPaymentSystemTypeId.setFieldValue(new int[] { paymentMethod });
+                }
+
+                if (moDps.getPaymentAccount().isEmpty()) {
+                    moFieldPaymentAccount.setFieldValue(paymentAccount);
+                }
+            }
+
+            // set document's language:
+
+            if (moDps.getFkLanguajeId() == SLibConsts.UNDEFINED) {
+                moFieldFkLanguajeId.setFieldValue(new int[] { moBizPartnerCategory.getFkLanguageId_n() != SLibConstants.UNDEFINED ? moBizPartnerCategory.getFkLanguageId_n() : miClient.getSessionXXX().getParamsErp().getFkLanguageId() });
+            }
+
+            // set document's currency:
+
+            if (moDps.getFkCurrencyId() == SLibConsts.UNDEFINED) {
+                double exr = 0;
+
+                moFieldFkCurrencyId.setFieldValue(new int[] { moBizPartnerCategory.getFkCurrencyId_n() != SLibConsts.UNDEFINED ? moBizPartnerCategory.getFkCurrencyId_n() : miClient.getSessionXXX().getParamsErp().getFkCurrencyId() });
+
+                if (miClient.getSession().getSessionCustom().isLocalCurrency(moFieldFkCurrencyId.getKeyAsIntArray())) {
+                    exr = 1;
+                }
+                else {
+                    try {
+                        exr = SDataUtilities.obtainExchangeRate(miClient, moFieldFkCurrencyId.getKeyAsIntArray()[0], moDps.getDate());
+                    }
+                    catch (Exception e) {
+                        SLibUtilities.renderException(this, e);
+                    }
+                }
+
+                moFieldExchangeRateSystem.setFieldValue(exr);
+                moFieldExchangeRate.setFieldValue(exr);
+            }
+
+            // emulate item state changed events:
+            
+            itemChangeFkPaymentTypeId(moDps.getFkPaymentTypeId() == SLibConsts.UNDEFINED || mbIsAdj);   // reset days of credit if needed
+            itemChangeFkCurrencyId(false);  // do not calculate document's total
         }
-
-        itemChangeFkPaymentTypeId(moDps.getFkPaymentTypeId() == SLibConsts.UNDEFINED || mbIsAdj);
-        itemChangeFkPaymentSystemTypeId();
-        itemChangeFkLanguageId();
-        itemChangeFkCurrencyId(false);
-
-        mbUpdatingForm = false;
     }
 
     private void updateDateForOrderPrevious() {
@@ -3806,50 +3875,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
 
-    private void renderLastPaymentSettings(int idBizPartner) {
-        int year = SLibTimeUtilities.digestYear(moFieldDate.getDate())[0];
-        int categoryDps = mbIsSales ? SDataConstantsSys.TRNS_CT_DPS_SAL : SDataConstantsSys.TRNS_CT_DPS_PUR;
-        int paymentSystem = SLibConsts.UNDEFINED;
-        boolean available = false;
-        String paymentAccount = "";
-        String[] lastPaymentSettings = null;
-
-        SFormUtilities.populateComboBox(miClient, jcbFkPaymentSystemTypeId, SDataConstants.TRNU_TP_PAY_SYS);
-        SFormUtilities.populateComboBox(miClient, jcbPaymentAccount, SDataConstants.BPSX_BANK_ACC, new int[] { idBizPartner, year, categoryDps }); 
-        jcbPaymentAccount.removeItemAt(0);
-
-        for (int i = 0; i < jcbPaymentAccount.getItemCount(); i++) {
-            if (jcbPaymentAccount.getItemAt(i).toString().equalsIgnoreCase(SCfdConsts.UNIDENTIFIED)) {
-                available = true;
-                break;
-            }
-        }
-
-        if (!available) {
-            jcbPaymentAccount.addItem(new SFormComponentItem(new int[] { SLibConsts.UNDEFINED }, SCfdConsts.UNIDENTIFIED)); // "unidentified" option must be available allways
-        }
-
-        if (moDps.getFkPaymentSystemTypeId() != SLibConstants.UNDEFINED) {
-            paymentSystem = moDps.getFkPaymentSystemTypeId();
-            paymentAccount = moDps.getPaymentAccount();
-        }
-        else {
-            lastPaymentSettings = STrnUtilities.getLastPaymentSettings(miClient, idBizPartner, categoryDps, year);
-            
-            if (SCfdConsts.MetodoPagoIdsMap.containsKey(lastPaymentSettings[0])) {
-                paymentSystem = SCfdConsts.MetodoPagoIdsMap.get(lastPaymentSettings[0]);
-            }
-            else {
-                paymentSystem = SDataConstantsSys.TRNU_TP_PAY_SYS_NA;
-            }
-            
-            paymentAccount = lastPaymentSettings[1];
-        }
-        
-        moFieldFkPaymentSystemTypeId.setFieldValue(new int[] { paymentSystem });
-        jcbPaymentAccount.setSelectedItem(paymentAccount);
-    }
-
     private void renderAddendaData(boolean enable) {
         if (moBizPartner != null) {
             switch(moBizPartnerCategory.getFkCfdAddendaTypeId()) {
@@ -4259,9 +4284,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             //jcbFkLanguageId.setEnabled(true);
             jcbFkDpsNatureId.setEnabled(true);
 
-            itemChangeFkPaymentSystemTypeId();
-            itemChangeFkLanguageId();
-
             jcbFkCurrencyId.setEnabled(moDps.getIsRegistryNew());
             jbFkCurrencyId.setEnabled(moDps.getIsRegistryNew());
             itemChangeFkCurrencyId(false);
@@ -4542,24 +4564,28 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         return msg;
     }
 
-    private void setDpsType(int[] docTypeKey) {
+    private void setDpsType(int[] keyDocType) {
         int index = 0;
         Vector<SFormComponentItem> componentItems = null;
 
         mbResetingForm = true;
+        
         mbIsCon = false;
         mbIsEst = false;
         mbIsOrd = false;
         mbIsDoc = false;
         mbIsAdj = false;
+        
         mbIsSales = false;
+        
         mbIsNumberSeriesRequired = false;
         mbIsNumberSeriesAvailable = false;
-        manDpsClassKey = new int[] { docTypeKey[0], docTypeKey[1] };
-        moDpsType = (SDataDpsType) SDataUtilities.readRegistry(miClient, SDataConstants.TRNU_TP_DPS, docTypeKey, SLibConstants.EXEC_MODE_VERBOSE);
+        
+        manDpsClassKey = new int[] { keyDocType[0], keyDocType[1] };
+        moDpsType = (SDataDpsType) SDataUtilities.readRegistry(miClient, SDataConstants.TRNU_TP_DPS, keyDocType, SLibConstants.EXEC_MODE_VERBOSE);
 
-        mbIsCon = SLibUtilities.compareKeys(SDataConstantsSys.TRNU_TP_DPS_SAL_CON, docTypeKey) ||
-                SLibUtilities.compareKeys(SDataConstantsSys.TRNU_TP_DPS_PUR_CON, docTypeKey);
+        mbIsCon = SLibUtilities.compareKeys(SDataConstantsSys.TRNU_TP_DPS_SAL_CON, keyDocType) ||
+                SLibUtilities.compareKeys(SDataConstantsSys.TRNU_TP_DPS_PUR_CON, keyDocType);
         mbIsEst = SLibUtilities.compareKeys(SDataConstantsSys.TRNS_CL_DPS_PUR_EST, manDpsClassKey) ||
                 SLibUtilities.compareKeys(SDataConstantsSys.TRNS_CL_DPS_SAL_EST, manDpsClassKey);
         mbIsOrd = SLibUtilities.compareKeys(SDataConstantsSys.TRNS_CL_DPS_PUR_ORD, manDpsClassKey) ||
@@ -4568,6 +4594,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 SLibUtilities.compareKeys(SDataConstantsSys.TRNS_CL_DPS_SAL_DOC, manDpsClassKey);
         mbIsAdj = SLibUtilities.compareKeys(SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ, manDpsClassKey) ||
                 SLibUtilities.compareKeys(SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ, manDpsClassKey);
+        
         mbIsSales = SLibUtilities.compareKeys(SDataConstantsSys.TRNS_CL_DPS_SAL_EST, manDpsClassKey) ||
                 SLibUtilities.compareKeys(SDataConstantsSys.TRNS_CL_DPS_SAL_ORD, manDpsClassKey) ||
                 SLibUtilities.compareKeys(SDataConstantsSys.TRNS_CL_DPS_SAL_DOC, manDpsClassKey) ||
@@ -4661,50 +4688,38 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mbResetingForm = false;
     }
 
-    private void setBizPartner(int[] bizPartnerKey, int[] bizPartnerBranchKey, int[] branchAddressKey) {
-        moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, bizPartnerKey, SLibConstants.EXEC_MODE_VERBOSE);
-        moBizPartnerBranch = null;
-        moBizPartnerBranchAddress = null;
-        moBizPartnerBranchAddressMain = null;
-
-        if (bizPartnerBranchKey != null) {
-            moBizPartnerBranch = moBizPartner.getDbmsBizPartnerBranch(bizPartnerBranchKey);
-            moBizPartnerBranchAddressMain = moBizPartnerBranch.getDbmsBizPartnerBranchAddressOfficial();
-
-            mnTypeDelivery = (moBizPartnerBranchAddressMain.getFkCountryId_n() == SLibConstants.UNDEFINED || miClient.getSession().getSessionCustom().isLocalCountry(new int[] { (moBizPartnerBranchAddressMain.getFkCountryId_n()) })) ? SModSysConsts.LOGS_TP_DLY_DOM : SModSysConsts.LOGS_TP_DLY_INT;
-
-            SFormUtilities.populateComboBox(miClient, jcbFkIncotermId, SModConsts.LOGS_INC,
-                    new int[] { mnTypeDelivery });
-
-             moFieldFkIncotermId.setFieldValue(new int[] { SModSysConsts.LOGS_INC_NA });
-        }
-
-        if (moBizPartnerBranch != null && branchAddressKey != null) {
-            moBizPartnerBranchAddress = moBizPartnerBranch.getDbmsBizPartnerBranchAddress(branchAddressKey);
-        }
-
-        jcbFkContactId_n.removeAllItems();
-
+    private void setBizPartner(int[] keyBizPartner, int[] keyBizPartnerBranch, int[] keyBizPartnerBranchAddress) {
+        mbUpdatingForm = true;  // prevent item state change events to be processed
+        
+        // initialize current business partner registry objects:
+        
+        moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, keyBizPartner, SLibConstants.EXEC_MODE_VERBOSE);
+        moBizPartnerBranch = moBizPartner.getDbmsBizPartnerBranch(keyBizPartnerBranch);
+        moBizPartnerBranchAddressMain = moBizPartnerBranch.getDbmsBizPartnerBranchAddressOfficial();
+        moBizPartnerBranchAddress = moBizPartnerBranch.getDbmsBizPartnerBranchAddress(keyBizPartnerBranchAddress);
+        
         if (mnFormType == SDataConstantsSys.TRNS_CT_DPS_PUR) {
             moBizPartnerCategory = moBizPartner.getDbmsCategorySettingsSup();
         }
         else {
             moBizPartnerCategory = moBizPartner.getDbmsCategorySettingsCus();
-
-            jcbFkContactId_n.addItem(new SFormComponentItem(new int[2], "(Seleccionar comprador)"));
-
-            for (SDataBizPartnerBranchContact contact : moBizPartnerBranch.getDbmsBizPartnerBranchContacts()) {
-                if (contact.getPkContactId() > 1 && !contact.getIsDeleted()) {  // contact #1 has company branch telephones
-                    jcbFkContactId_n.addItem(new SFormComponentItem(contact.getPrimaryKey(), contact.getContact() + " (" + contact.getDbmsContactType() + ")"));
-                }
-            }
         }
+        
+        // populate form combo boxes properly for current business partner:
 
+        populateComboBoxesBizPartner();
+        
+        // if needed, set form and document fields with business partner preferences:
+        
         if (moDps.getIsRegistryNew()) {
-            updateDpsWithBizPartnerSettings();
+            updateDpsNewWithBizPartnerSettings();
         }
+        
+        // show current business partner:
 
         renderBizPartner();
+        
+        mbUpdatingForm = false; // allow item state change events to be processed
     }
 
     private void prepareDpsEntryComplementary(erp.mtrn.data.SDataDpsEntry oDpsEntryAdjustment, erp.mtrn.data.SDataDpsEntry oDpsEntryComplementary) {
@@ -5132,7 +5147,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         return isExpiredDocsOk;
     }
 
-    private void actionDpsType() {
+    /**
+     * Allows user to pick document type when current document is being created, is new and no source document is provided.
+     */
+    private void pickDpsType() {
         SFormOptionPickerInterface picker = miClient.getOptionPicker(SDataConstants.TRNU_TP_DPS);
 
         picker.formReset();
@@ -5143,11 +5161,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         if (picker.getFormResult() == SLibConstants.FORM_RESULT_OK) {
             setDpsType((int[]) picker.getSelectedPrimaryKey());
-            updateDpsWithDocSettings();
+            updateDpsWithFormData();
         }
     }
 
-    private void actionBizPartner() {
+    /**
+     * Allows user to pick business partner when current document is being created, is new and no source document is provided.
+     */
+    private void pickBizPartner() {
         int[] key = null;
 
         if (moBizPartner != null) {
@@ -5290,7 +5311,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         if (jbEntryNew.isEnabled() && mnFormStatus == SLibConstants.FORM_STATUS_EDIT) {
             SDataDpsEntry entry = null;
 
-            updateDpsWithDocSettings();
+            updateDpsWithFormData();
 
             moFormEntry.formReset();
             moFormEntry.setValue(SDataConstants.TRN_DPS, moDps);
@@ -5340,7 +5361,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 else {
                     if (mnFormStatus == SLibConstants.FORM_STATUS_EDIT) {
                         canEdit = canEditEntry(entry);
-                        updateDpsWithDocSettings();
+                        updateDpsWithFormData();
                     }
 
                     moFormEntry.formReset();
@@ -5532,7 +5553,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
             // 1. Pick source DPS:
 
-            updateDpsWithDocSettings();
+            updateDpsWithFormData();
             moDialogPickerDps.formReset();
             moDialogPickerDps.setFilterKey(new Object[] { manDpsClassPreviousKey, moBizPartner.getPrimaryKey() });
             moDialogPickerDps.formRefreshOptionPane();
@@ -5552,7 +5573,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             "no puede ser posterior a la fecha de este documento (" + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + ").");
                 }
                 else {
-                    updateDpsWithDocSettings();
+                    updateDpsWithFormData();
 
                     moFormEntry.formReset();
                     moFormEntry.setValue(SDataConstants.TRN_DPS, moDps);
@@ -5650,7 +5671,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             // 1. Pick source DPS:
 
             if (oDpsSource == null) {
-                updateDpsWithDocSettings();
+                updateDpsWithFormData();
                 updateDateForOrderPrevious();
                 moDialogPickerDps.formReset();
                 moDialogPickerDps.setFilterKey(new Object[] { manDpsClassPreviousKey, moBizPartner.getPrimaryKey() });
@@ -5801,7 +5822,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                 if (moDialogDpsLink.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                                     Vector<SDataDpsEntry> dpsSourceEntries = new Vector<SDataDpsEntry>();
 
-                                    updateDpsWithDocSettings();
+                                    updateDpsWithFormData();
                                     updateDateForOrderPrevious();
                                     
                                     jcbFkPaymentTypeId.setEnabled(!(oDpsSource.getIsCopied() || moDps.getIsCopied()));
@@ -6234,7 +6255,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     @SuppressWarnings("unchecked")
     private void actionEntryWizard() {
         if (jbEntryWizard.isEnabled() && mnFormStatus == SLibConstants.FORM_STATUS_EDIT) {
-            updateDpsWithDocSettings();
+            updateDpsWithFormData();
             moFormEntryWizard.formReset();
             moFormEntryWizard.setValue(SDataConstants.TRN_DPS, moDps);
             moFormEntryWizard.setValue(SDataConstants.BPSU_BP, moBizPartner);
@@ -6285,7 +6306,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 entry = ((SDataDpsEntry) moPaneGridEntries.getTableRow(index).getData()).clone();
 
                 if (mnFormStatus == SLibConstants.FORM_STATUS_EDIT) {
-                    updateDpsWithDocSettings();
+                    updateDpsWithFormData();
                 }
 
                 moDialogShowDocumentLinks.formReset();
@@ -6645,7 +6666,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     }
     }
 
-    private void itemChangeFkPaymentTypeId(boolean reset) {
+    private void itemChangeFkPaymentTypeId(boolean resetDaysOfCredit) {
         mbUpdatingForm = true;
 
         if (moFieldFkPaymentTypeId.getKeyAsIntArray()[0] != SDataConstantsSys.TRNS_TP_PAY_CREDIT) {
@@ -6654,7 +6675,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jtfDaysOfCredit.setEditable(false);
             jtfDaysOfCredit.setFocusable(false);
 
-            if (reset) {
+            if (resetDaysOfCredit) {
                 moFieldDaysOfCredit.setFieldValue(0);
             }
         }
@@ -6664,7 +6685,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jtfDaysOfCredit.setEditable(true);      // XXX must be enabled according to user rights
             jtfDaysOfCredit.setFocusable(true);     // XXX must be enabled according to user rights
 
-            if (reset) {
+            if (resetDaysOfCredit) {
                 moFieldDaysOfCredit.setFieldValue(moBizPartnerCategory.getEffectiveDaysOfCredit());
             }
         }
@@ -6686,15 +6707,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mbUpdatingForm = false;
     }
 
-    private void itemChangeFkPaymentSystemTypeId() {
-        // XXX add code here!!!
-    }
-
-    private void itemChangeFkLanguageId() {
-
-    }
-
-    private void itemChangeFkCurrencyId(boolean calculate) {
+    private void itemChangeFkCurrencyId(boolean calculateTotal) {
         if (jcbFkCurrencyId.getSelectedIndex() <= 0 || moFieldFkCurrencyId.getKeyAsIntArray()[0] == miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) {
             // Document in local currency:
 
@@ -6737,7 +6750,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jtfCurrencyKeyRo.setText((String) ((SFormComponentItem) jcbFkCurrencyId.getSelectedItem()).getComplement());
         }
 
-        if (calculate) {
+        if (calculateTotal) {
             calculateTotal();
         }
         
@@ -6836,7 +6849,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private void actionEdit() {
         boolean edit = false;
 
-        if (isBizPartnerBlocked(moBizPartner.getPkBizPartnerId(), manDpsClassKey[0])) {
+        if (isBizPartnerBlocked(moBizPartner.getPkBizPartnerId())) {
             miClient.showMsgBoxWarning(SLibConstants.MSG_INF_BP_BLOCKED);
             jbCancel.requestFocus();
         }
@@ -7447,8 +7460,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         SDataDpsNotes notes = null;
 
         moDps = createNewDps(null);
-        renderRecordAutomatic();
         setBizPartner(keyBp, keyBpb, keyBpbAdd);
+        renderRecordAutomatic();
 
         for (STableRow row : moPaneGridEntries.getGridRows()) {
             entry = (SDataDpsEntry) row.getData();
@@ -7578,7 +7591,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
         }
 
-
         renderBasicSettings();
         renderDpsType();
         renderDpsValue();
@@ -7603,8 +7615,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         itemStateIsDiscountDocPercentage(false);
 
         itemChangeFkPaymentTypeId(true);
-        itemChangeFkPaymentSystemTypeId();
-        itemChangeFkLanguageId();
         itemChangeFkCurrencyId(false);
         itemChangeFkIncotermId();
         itemChangeFkCarrierTypeId();
@@ -7672,13 +7682,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         SFormUtilities.populateComboBox(miClient, jcbFkPaymentTypeId, SDataConstants.TRNS_TP_PAY);
         SFormUtilities.populateComboBox(miClient, jcbFkPaymentSystemTypeId, SDataConstants.TRNU_TP_PAY_SYS);
         SFormUtilities.populateComboBox(miClient, jcbFkLanguageId, SDataConstants.CFGU_LAN);
-        SFormUtilities.populateComboBox(miClient, jcbFkDpsNatureId, SDataConstants.TRNU_DPS_NAT);
         if (!isFunctionalAreasApply()) {
             SFormUtilities.populateComboBox(miClient, jcbFkFunctionalArea, SModConsts.CFGU_FUNC);
         }
         else {
             SFormUtilities.populateComboBox(miClient, jcbFkFunctionalArea, SModConsts.CFGU_FUNC, new int[] { miClient.getSessionXXX().getUser().getPkUserId() });
         }
+        SFormUtilities.populateComboBox(miClient, jcbFkDpsNatureId, SDataConstants.TRNU_DPS_NAT);
         SFormUtilities.populateComboBox(miClient, jcbFkCurrencyId, SDataConstants.CFGU_CUR);
         SFormUtilities.populateComboBox(miClient, jcbAdjustmentSubtypeId, SDataConstants.TRNS_STP_DPS_ADJ);
         SFormUtilities.populateComboBox(miClient, jcbTaxRegionId, SDataConstants.FINU_TAX_REG);
@@ -7689,8 +7699,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         SFormUtilities.populateComboBox(miClient, jcbFkCarrierTypeId, SModConsts.LOGS_TP_CAR);
         SFormUtilities.populateComboBox(miClient, jcbFkCarrierId_n, SDataConstants.BPSX_BP_ATT_CARR);
         SFormUtilities.populateComboBox(miClient, jcbFkVehicleTypeId_n, SModConsts.LOGU_TP_VEH);
-        SFormUtilities.populateComboBox(miClient, jcbFkProductionOrderId_n, SDataConstants.MFG_ORD,
-                new Object[] { "" + SDataConstantsSys.MFGS_ST_ORD_END + ", " + SDataConstantsSys.MFGS_ST_ORD_CLS, SDataConstants.MFGX_ORD_MAIN_NA, false });
+        SFormUtilities.populateComboBox(miClient, jcbFkProductionOrderId_n, SDataConstants.MFG_ORD, new Object[] { "" + SDataConstantsSys.MFGS_ST_ORD_END + ", " + SDataConstantsSys.MFGS_ST_ORD_CLS, SDataConstants.MFGX_ORD_MAIN_NA, false });
         
         renderCatalogForCfd();
 
@@ -8188,6 +8197,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mbResetingForm = true;
 
         moDps = (SDataDps) registry;
+        
+        // set form field values:
 
         moFieldDate.setFieldValue(moDps.getDate());
         moFieldDateDoc.setFieldValue(moDps.getDateDoc());
@@ -8229,15 +8240,40 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldIsCopy.setFieldValue(moDps.getIsCopy());
         moFieldIsSystem.setFieldValue(moDps.getIsSystem());
         moFieldIsDeleted.setFieldValue(moDps.getIsDeleted());
-        moFieldFkPaymentTypeId.setFieldValue(new int[] { moDps.getFkPaymentTypeId() });
-        moFieldFkPaymentSystemTypeId.setFieldValue(new int[] { moDps.getFkPaymentSystemTypeId() });
-        renderLastPaymentSettings(moDps.getFkBizPartnerId_r());
+        
+        // XXX BEGIN
+        // note 2017-02-22 (sflores): please check this section jbarajas.
         moFieldCfdConfirmationNumber.setFieldValue(moDps.getXtaCfdConfirmation());
-        moFieldFkLanguajeId.setFieldValue(new int[] { moDps.getFkLanguajeId() });
-        moFieldFkFunctionalAreaId.setFieldValue(new int[] { moDps.getFkFunctionalAreaId() });
+        // XXX END
+        
+        moFieldFkPaymentTypeId.setFieldValue(new int[] { moDps.getFkPaymentTypeId() });
+        //itemChangeFkPaymentTypeId(resetDaysOfCredit);
         moFieldFkDpsNatureId.setFieldValue(new int[] { moDps.getFkDpsNatureId() });
+        moFieldFkFunctionalAreaId.setFieldValue(new int[] { moDps.getFkFunctionalAreaId() });
+        moFieldFkLanguajeId.setFieldValue(new int[] { moDps.getFkLanguajeId() });
         moFieldFkCurrencyId.setFieldValue(new int[] { !mbIsLocalCurrency ? moDps.getFkCurrencyId() : miClient.getSessionXXX().getParamsErp().getFkCurrencyId()});
+        //itemChangeFkCurrencyId(calculateTotal);
+        
+        // set business partner, set aswell business partner default preferences when document is new:
+        
         setBizPartner(new int[] { moDps.getFkBizPartnerId_r() }, new int[] { moDps.getFkBizPartnerBranchId() }, new int[] { moDps.getFkBizPartnerBranchId(), moDps.getFkBizPartnerBranchAddressId() });
+        
+        // check if method of payment should be taken from document:
+        
+        if (jcbFkPaymentSystemTypeId.getSelectedIndex() <= 0 && moDps.getFkPaymentSystemTypeId() != SLibConsts.UNDEFINED) {
+            moFieldFkPaymentSystemTypeId.setFieldValue(new int[] { moDps.getFkPaymentSystemTypeId() });
+        }
+
+        // check if bank account should be taken from document:
+        
+        // XXX check if combo box being editable and having some value (i.e., a String), current selected index is >= 0
+        
+        if ((jcbPaymentAccount.getSelectedItem() == null || (jcbPaymentAccount.getSelectedItem() != null && jcbPaymentAccount.getSelectedItem().toString().isEmpty())) && !moDps.getPaymentAccount().isEmpty()) {
+            moFieldPaymentAccount.setFieldValue(moDps.getPaymentAccount());
+        }
+        
+        // continue setting form field values:
+        
         moFieldFkIncotermId.setFieldValue(new int[] { moDps.getFkIncotermId() });
         itemChangeFkIncotermId();
         moFieldFkSpotSrcId_n.setFieldValue(new int[] { moDps.getFkSpotSourceId_n() });
@@ -8249,6 +8285,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldFkVehicleTypeId_n.setFieldValue(new int[] { moDps.getFkVehicleTypeId_n() });
         itemChangeFkVehicleTypeId_n();
         moFieldFkVehicleId_n.setFieldValue(new int[] { moDps.getFkVehicleId_n() });
+        
         moFieldFkProductionOrderId_n.setFieldValue(new int[] { moDps.getFkMfgYearId_n(), moDps.getFkMfgOrderId_n() });
         
         try {
@@ -8313,8 +8350,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         itemStateIsDiscountDocPercentage(false);
 
         itemChangeFkPaymentTypeId(false);
-        itemChangeFkPaymentSystemTypeId();
-        itemChangeFkLanguageId();
         itemChangeFkCurrencyId(false);
         itemChangeFkCarrierTypeId();
 
@@ -8847,12 +8882,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     }
                     else if (comboBox == jcbFkPaymentTypeId) {
                         itemChangeFkPaymentTypeId(true);
-                    }
-                    else if (comboBox == jcbFkPaymentSystemTypeId) {
-                        itemChangeFkPaymentSystemTypeId();
-                    }
-                    else if (comboBox == jcbFkLanguageId) {
-                        itemChangeFkLanguageId();
                     }
                     else if (comboBox == jcbFkCurrencyId) {
                         itemChangeFkCurrencyId(true);

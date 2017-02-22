@@ -22,7 +22,7 @@ public abstract class SCfdConsts {
     public static final HashMap<Integer, String> DeduccionMap = new HashMap<Integer, String>();
     public static final HashMap<Integer, String> IncapacidadMap = new HashMap<Integer, String>();
     
-    public static final HashMap<String, Integer> MetodoPagoIdsMap = new HashMap<>();
+    public static final HashMap<String, Integer> FormaPagoIdsMap = new HashMap<>(); // method of payment
 
     public static final int UNDEFINED = 0;
 
@@ -295,19 +295,19 @@ public abstract class SCfdConsts {
         IncapacidadMap.put(INC_ENF, "Enfermedad en general");
         IncapacidadMap.put(INC_MAT, "Maternidad");
         
-        DAttributeOptionFormaPago metodoPago = new DAttributeOptionFormaPago("", false);
+        DAttributeOptionFormaPago formaPago = new DAttributeOptionFormaPago("", false);
         
-        MetodoPagoIdsMap.put(metodoPago.getOptions().get(DAttributeOptionFormaPago.CFD_NO_APLICA), SDataConstantsSys.TRNU_TP_PAY_SYS_NA);
-        MetodoPagoIdsMap.put(metodoPago.getOptions().get(DAttributeOptionFormaPago.CFD_EFECTIVO), SDataConstantsSys.TRNU_TP_PAY_SYS_CASH);
-        MetodoPagoIdsMap.put(metodoPago.getOptions().get(DAttributeOptionFormaPago.CFD_CHEQUE_NOMINATIVO), SDataConstantsSys.TRNU_TP_PAY_SYS_CHECK);
-        MetodoPagoIdsMap.put(metodoPago.getOptions().get(DAttributeOptionFormaPago.CFD_TRANSFERENCIA_ELECTRONICA), SDataConstantsSys.TRNU_TP_PAY_SYS_TRANSF);
-        MetodoPagoIdsMap.put(metodoPago.getOptions().get(DAttributeOptionFormaPago.CFD_TARJETA_DEBITO), SDataConstantsSys.TRNU_TP_PAY_SYS_CARD_DBT);
-        MetodoPagoIdsMap.put(metodoPago.getOptions().get(DAttributeOptionFormaPago.CFD_TARJETA_CREDITO), SDataConstantsSys.TRNU_TP_PAY_SYS_CARD_CDT);
-        MetodoPagoIdsMap.put(metodoPago.getOptions().get(DAttributeOptionFormaPago.CFD_TARJETA_SERVICIO), SDataConstantsSys.TRNU_TP_PAY_SYS_CARD_SRV);
-        MetodoPagoIdsMap.put(metodoPago.getOptions().get(DAttributeOptionFormaPago.CFD_MONEDERO_ELECTRONICO), SDataConstantsSys.TRNU_TP_PAY_SYS_E_PURSE);
-        MetodoPagoIdsMap.put(metodoPago.getOptions().get(DAttributeOptionFormaPago.CFD_DINERO_ELECTRONICO), SDataConstantsSys.TRNU_TP_PAY_SYS_E_MONEY);
-        MetodoPagoIdsMap.put(metodoPago.getOptions().get(DAttributeOptionFormaPago.CFD_VALES_DESPENSA), SDataConstantsSys.TRNU_TP_PAY_SYS_FOOD_STP);
-        MetodoPagoIdsMap.put(metodoPago.getOptions().get(DAttributeOptionFormaPago.CFD_NO_IDENTIFICADO), SDataConstantsSys.TRNU_TP_PAY_SYS_UNDEF);
-        MetodoPagoIdsMap.put(metodoPago.getOptions().get(DAttributeOptionFormaPago.CFD_OTROS), SDataConstantsSys.TRNU_TP_PAY_SYS_OTHER);
+        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_NO_APLICA), SDataConstantsSys.TRNU_TP_PAY_SYS_NA);
+        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_EFECTIVO), SDataConstantsSys.TRNU_TP_PAY_SYS_CASH);
+        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_CHEQUE_NOMINATIVO), SDataConstantsSys.TRNU_TP_PAY_SYS_CHECK);
+        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_TRANSFERENCIA_ELECTRONICA), SDataConstantsSys.TRNU_TP_PAY_SYS_TRANSF);
+        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_TARJETA_DEBITO), SDataConstantsSys.TRNU_TP_PAY_SYS_CARD_DBT);
+        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_TARJETA_CREDITO), SDataConstantsSys.TRNU_TP_PAY_SYS_CARD_CDT);
+        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_TARJETA_SERVICIO), SDataConstantsSys.TRNU_TP_PAY_SYS_CARD_SRV);
+        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_MONEDERO_ELECTRONICO), SDataConstantsSys.TRNU_TP_PAY_SYS_E_PURSE);
+        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_DINERO_ELECTRONICO), SDataConstantsSys.TRNU_TP_PAY_SYS_E_MONEY);
+        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_VALES_DESPENSA), SDataConstantsSys.TRNU_TP_PAY_SYS_FOOD_STP);
+        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_NO_IDENTIFICADO), SDataConstantsSys.TRNU_TP_PAY_SYS_UNDEF);
+        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_OTROS), SDataConstantsSys.TRNU_TP_PAY_SYS_OTHER);
     }
 }
