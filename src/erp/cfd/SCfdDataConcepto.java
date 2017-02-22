@@ -83,32 +83,32 @@ public class SCfdDataConcepto {
                     
                     switch (tax.getFkTaxTypeId()) {
                         case SModSysConsts.FINS_TP_TAX_RETAINED:
-                            switch (tax.getPkTaxBasicId()) {
-                                case 1: // IVA
+                            switch (tax.getDbmsCfdTaxId()) {
+                                case SModSysConsts.FINS_CFD_TAX_IVA: // IVA
                                     impuestoXml.setImpuesto(DAttributeOptionImpuestoRetencion.CFD_IVA);
                                     impuestoXml.setImpuestoBasico(SModSysConsts.FINS_TP_TAX_RETAINED);
                                     break;
-                                case 2: // ISR
+                                case SModSysConsts.FINS_CFD_TAX_ISR: // ISR
                                     impuestoXml.setImpuesto(DAttributeOptionImpuestoRetencion.CFD_ISR);
                                     impuestoXml.setImpuestoBasico(SModSysConsts.FINS_TP_TAX_RETAINED);
                                     break;
                                 default:
-                                    throw new Exception("Todos los impuestos retenidos deben ser conocidos (" + tax.getPkTaxBasicId() + ").");
+                                    throw new Exception("Todos los impuestos retenidos deben ser conocidos (" + tax.getDbmsCfdTaxId() + ").");
                             }
                             break;
 
                         case SModSysConsts.FINS_TP_TAX_CHARGED:
-                            switch (tax.getPkTaxBasicId()) {
-                                case 1: // IVA
+                            switch (tax.getDbmsCfdTaxId()) {
+                                case SModSysConsts.FINS_CFD_TAX_IVA: // IVA
                                     impuestoXml.setImpuesto(DAttributeOptionImpuestoTraslado.CFD_IVA);
                                     impuestoXml.setImpuestoBasico(SModSysConsts.FINS_TP_TAX_CHARGED);
                                     break;
-                                case 3: // IEPS
+                                case SModSysConsts.FINS_CFD_TAX_IEPS: // IEPS
                                     impuestoXml.setImpuesto(DAttributeOptionImpuestoTraslado.CFD_IEPS);
                                     impuestoXml.setImpuestoBasico(SModSysConsts.FINS_TP_TAX_CHARGED);
                                     break;
                                 default:
-                                    throw new Exception("Todos los impuestos trasladados deben ser conocidos (" + tax.getPkTaxBasicId() + ").");
+                                    throw new Exception("Todos los impuestos trasladados deben ser conocidos (" + tax.getDbmsCfdTaxId() + ").");
                             }
                             break;
 

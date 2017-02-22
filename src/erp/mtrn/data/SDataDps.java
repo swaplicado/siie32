@@ -4092,21 +4092,21 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     oTrasladado = new DElementTrasladado();
                     switch (tax.getFkTaxTypeId()) {
                         case SModSysConsts.FINS_TP_TAX_RETAINED:
-                            switch (tax.getPkTaxBasicId()) {
-                                case 1: // IVA
+                            switch (tax.getDbmsCfdTaxId()) {
+                                case SModSysConsts.FINS_CFD_TAX_IVA: // IVA
                                     break;
-                                case 2: // ISR
+                                case SModSysConsts.FINS_CFD_TAX_ISR: // ISR
                                     break;
                                 default:
                             }
                             break;
 
                         case SModSysConsts.FINS_TP_TAX_CHARGED:
-                            switch (tax.getPkTaxBasicId()) {
-                                case 1: // IVA
+                            switch (tax.getDbmsCfdTaxId()) {
+                                case SModSysConsts.FINS_CFD_TAX_IVA: // IVA
                                     oTrasladado.getAttImpuesto().setString("IVA");
                                     break;
-                                case 3: // IEPS
+                                case SModSysConsts.FINS_CFD_TAX_IEPS: // IEPS
                                     oTrasladado.getAttImpuesto().setString("IEPS");
                                     break;
                                 default:
@@ -4486,30 +4486,30 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                             switch (tax.getFkTaxTypeId()) {
                                 case SModSysConsts.FINS_TP_TAX_RETAINED:
-                                    switch (tax.getPkTaxBasicId()) {
-                                        case 1: // IVA
+                                    switch (tax.getDbmsCfdTaxId()) {
+                                        case SModSysConsts.FINS_CFD_TAX_IVA: // IVA
                                             dImptoTasa = 1;   // on CFDI's XML retained taxes have no rate
                                             hmImpto = hmRetenidoIva;
                                             break;
-                                        case 2: // ISR
+                                        case SModSysConsts.FINS_CFD_TAX_ISR: // ISR
                                             dImptoTasa = 1;   // on CFDI's XML retained taxes have no rate
                                             hmImpto = hmRetenidoIsr;
                                             break;
                                         default:
-                                            throw new Exception("Todos los impuestos retenidos deben ser conocidos (" + tax.getPkTaxBasicId() + ").");
+                                            throw new Exception("Todos los impuestos retenidos deben ser conocidos (" + tax.getDbmsCfdTaxId() + ").");
                                     }
                                     break;
 
                                 case SModSysConsts.FINS_TP_TAX_CHARGED:
-                                    switch (tax.getPkTaxBasicId()) {
-                                        case 1: // IVA
+                                    switch (tax.getDbmsCfdTaxId()) {
+                                        case SModSysConsts.FINS_CFD_TAX_IVA: // IVA
                                             hmImpto = hmTrasladadoIva;
                                             break;
-                                        case 3: // IEPS
+                                        case SModSysConsts.FINS_CFD_TAX_IEPS: // IEPS
                                             hmImpto = hmTrasladadoIeps;
                                             break;
                                         default:
-                                            throw new Exception("Todos los impuestos trasladados deben ser conocidos (" + tax.getPkTaxBasicId() + ").");
+                                            throw new Exception("Todos los impuestos trasladados deben ser conocidos (" + tax.getDbmsCfdTaxId() + ").");
                                     }
                                     break;
 

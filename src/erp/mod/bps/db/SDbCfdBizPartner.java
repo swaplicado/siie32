@@ -99,6 +99,7 @@ public class SDbCfdBizPartner {
                     asociadoNegocios.setBizPartnerPoBox(moBizPartnerBranchAddress.getPoBox());
                     asociadoNegocios.setBizPartnerCountryCode(moBizPartnerBranchAddress.getDbmsDataCountry().getCountryCode());
                     asociadoNegocios.setBizPartnerCountryName(moBizPartnerBranchAddress.getDbmsDataCountry().getCountry());
+                    asociadoNegocios.setBizPartnerCountryId(moBizPartnerBranchAddress.getDbmsDataCountry().getPkCountryId());
                     
                     if (mnBizPartnerExpeditionId != SLibConsts.UNDEFINED && mnBizPartnerBranchExpeditionId != SLibConsts.UNDEFINED) {
                         moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { mnBizPartnerExpeditionId }, SLibConstants.EXEC_MODE_SILENT);

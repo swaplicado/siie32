@@ -40,6 +40,7 @@ import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mcfg.data.SDataCertificate;
 import erp.mhrs.data.SDataPayrollReceiptIssue;
+import erp.mloc.data.SLocUtils;
 import erp.mmkt.data.SDataCustomerBranchConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -1790,7 +1791,7 @@ public abstract class SCfdUtils implements Serializable {
             }
 
             if (client.getSessionXXX().getParamsCompany().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32) {
-                if (!dps.getDbmsDataDpsCfd().hasInternationalTradeNode()) {
+                if (dps.getDbmsDataDpsCfd() != null && !dps.getDbmsDataDpsCfd().hasInternationalTradeNode()) {
                     params.setRegimenFiscal(SLibUtilities.textExplode(client.getSessionXXX().getParamsCompany().getFiscalSettings(), ";")); 
                 }
                 else {
@@ -3267,6 +3268,7 @@ public abstract class SCfdUtils implements Serializable {
         asociadoNegocios.setVersion(DCfdConsts.CFDI_VER_32);
         asociadoNegocios.setIsCfdi(true);
         asociadoNegocios.setIsCfdiWithCce(hasInternationalTradeNode);
+        asociadoNegocios.setIsStateCodeAssociate(SLocUtils.hasAssociateStates(client.getSession(), asociadoNegocios.getBizPartnerCountryId()));
         asociadoNegocios.setCfdiType(cfdXml.getCfdTipoCfdXml());
 
         comprobante.setEltEmisor((cfd.ver32.DElementEmisor) asociadoNegocios.createRootElementEmisor());
@@ -3285,6 +3287,7 @@ public abstract class SCfdUtils implements Serializable {
         asociadoNegocios = receptor.getBizPartner();
         asociadoNegocios.setIsCfdi(true);
         asociadoNegocios.setIsCfdiWithCce(hasInternationalTradeNode);
+        asociadoNegocios.setIsStateCodeAssociate(SLocUtils.hasAssociateStates(client.getSession(), asociadoNegocios.getBizPartnerCountryId()));
         asociadoNegocios.setVersion(DCfdConsts.CFDI_VER_32);
         asociadoNegocios.setCfdiType(cfdXml.getCfdTipoCfdXml());
 

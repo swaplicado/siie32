@@ -36,6 +36,7 @@ public class SDataDpsEntryTax extends erp.lib.data.SDataRegistry implements java
     protected java.lang.String msDbmsTaxCalculationType;
     protected java.lang.String msDbmsTaxApplicationType;
     protected java.lang.String msDbmsCfdTax;
+    protected int mnDbmsCfdTaxId;
 
     /**
      * Overrides java.lang.Object.clone() function.
@@ -78,12 +79,14 @@ public class SDataDpsEntryTax extends erp.lib.data.SDataRegistry implements java
     public void setDbmsTaxCalculationType(java.lang.String s) { msDbmsTaxCalculationType = s; }
     public void setDbmsTaxApplicationType(java.lang.String s) { msDbmsTaxApplicationType = s; }
     public void setDbmsCfdTax(java.lang.String s) { msDbmsCfdTax = s; }
+    public void setDbmsCfdTaxId(int n) { mnDbmsCfdTaxId = n; }
 
     public java.lang.String getDbmsTax() { return msDbmsTax; }
     public java.lang.String getDbmsTaxType() { return msDbmsTaxType; }
     public java.lang.String getDbmsTaxCalculationType() { return msDbmsTaxCalculationType; }
     public java.lang.String getDbmsTaxApplicationType() { return msDbmsTaxApplicationType; }
     public java.lang.String getDbmsCfdTax() { return msDbmsCfdTax; }
+    public int getDbmsCfdTaxId() { return mnDbmsCfdTaxId; }
     
     public int[] getKeyDpsEntry() { return new int[] { mnPkYearId, mnPkDocId, mnPkEntryId }; }
     public int[] getKeyTax() { return new int[] { mnPkTaxBasicId, mnPkTaxId }; }
@@ -125,6 +128,7 @@ public class SDataDpsEntryTax extends erp.lib.data.SDataRegistry implements java
         msDbmsTaxCalculationType = "";
         msDbmsTaxApplicationType = "";
         msDbmsCfdTax = "";
+        mnDbmsCfdTaxId = 0;
     }
 
     @Override
@@ -137,7 +141,7 @@ public class SDataDpsEntryTax extends erp.lib.data.SDataRegistry implements java
         reset();
 
         try {
-            sql = "SELECT et.*, t.tax, tt.tp_tax, tc.tp_tax_cal, ta.tp_tax_app, ct.code " +
+            sql = "SELECT et.*, t.tax, tt.tp_tax, tc.tp_tax_cal, ta.tp_tax_app, ct.id_cfd_tax, ct.code " +
                     "FROM trn_dps_ety_tax AS et " +
                     "INNER JOIN erp.finu_tax AS t ON " +
                     "et.id_tax_bas = t.id_tax_bas AND et.id_tax = t.id_tax " +
@@ -177,6 +181,7 @@ public class SDataDpsEntryTax extends erp.lib.data.SDataRegistry implements java
                 msDbmsTaxCalculationType = resultSet.getString("tc.tp_tax_cal");
                 msDbmsTaxApplicationType = resultSet.getString("ta.tp_tax_app");
                 msDbmsCfdTax = resultSet.getString("ct.code");
+                mnDbmsCfdTaxId = resultSet.getInt("ct.id_cfd_tax");
 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
@@ -273,6 +278,7 @@ public class SDataDpsEntryTax extends erp.lib.data.SDataRegistry implements java
         clone.setDbmsTaxCalculationType(msDbmsTaxCalculationType);
         clone.setDbmsTaxApplicationType(msDbmsTaxApplicationType);
         clone.setDbmsCfdTax(msDbmsCfdTax);
+        clone.setDbmsCfdTaxId(mnDbmsCfdTaxId);
 
         return clone;
     }
