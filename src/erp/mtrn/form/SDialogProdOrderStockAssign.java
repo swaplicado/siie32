@@ -984,7 +984,7 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
                 stockMoveParams.setPkUnitId(stockAssignRow.getFkUnitId());
                 
                 if (moParamProdOrder != null) {
-                    stockMoveParams.setSegregationReference( new int[] { moParamProdOrder.getPkOrdId(), moParamProdOrder.getPkYearId() });
+                    stockMoveParams.setSegregationReference( new int[] { moParamProdOrder.getPkYearId(), moParamProdOrder.getPkOrdId() });
                     stockMoveParams.setSegregationType(SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD);
                     stockMoveParams.setIsCurrentSegregationExcluded(true);
                 }
