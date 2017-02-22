@@ -785,13 +785,16 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                 dNetRequeriment = 0;
                 
                 try {
+                    //Obtain the segregated stocks of each item
                     stockMoveParams = new STrnStockMove();
                 
                     stockMoveParams.setPkYearId(SLibTimeUtilities.digestYear(moFieldDate.getDate())[0]);
                     stockMoveParams.setPkItemId((Integer) oList[1]);
                     stockMoveParams.setPkUnitId(oItem.getFkUnitId());
                     stockMoveParams.setPkCompanyBranchId(mnFkCompanyBranchId);
-                    stockMoveParams.setPkWarehouseId(moFkEntityId != null ? moFkEntityId.size() == 1 ? moFkEntityId.get(0)[1] : 0 : 0);
+                    if (moFkEntityId != null && moFkEntityId.size() == 1) {
+                        stockMoveParams.setPkWarehouseId(moFkEntityId.get(0)[1]);
+                    }
                     
                     objStock = STrnStockSegregationUtils.getStkSegregated(miClient, stockMoveParams);
                     dSegregated = objStock != null ? objStock.getSegregatedStock() : 0;
@@ -805,7 +808,6 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                 oBizPartner = null;
 
                 // Get lead time for ítem:
-
                 anLtime = getLeadTime((Integer) oList[1]);
 
                 c = java.util.Calendar.getInstance();
@@ -815,13 +817,11 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                 tTsDly = (Date) oProductionOrder[8];
 
                 // Get biz partner:
-
                 if (anLtime[0] > 0) {
                     oBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { anLtime[0] }, SLibConstants.EXEC_MODE_VERBOSE);
                 }
 
                 // Get unit item:
-
                 oItem = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { (Integer) oList[1] }, SLibConstants.EXEC_MODE_SILENT);
                 if (oItem != null) {
                     unitSymbol = oItem.getDbmsDataUnit().getSymbol();
@@ -912,7 +912,6 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                 }
 
                 // Check minimun available:
-
                 if (mvProductionsOrders.size() == 1) {
                     if (dAvailable < (Double) oList[2]) {
                         if (((dAvailable / (Double) oList[2]) <= dMinimunAvailable) || dMinimunAvailable == 0) {
@@ -968,17 +967,14 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
             if (!mvExplotionMaterialsEntries.isEmpty()) {
 
                 // Assign comment:
-
                 moExplotionMaterials.setComments(sAvailableItem.length() > 0 ?
                     "Por el insumo: '" + sAvailableItem + "' sólo puede producir " + SLibUtilities.round(dRequerimentQuantityByItem, 2) + " " + sProductionOrderUnit :
                     "Ninguno");
 
                 // Save explotion of materials:
-
                 saveExplotionMaterials();
 
                 // Assign quantity and unit of production order to fields:
-
                 moFieldDbmsProductionOrderQuantity.setDouble(dProductionOrderQty);
                 moFieldDbmsProductionOrderUnit.setString(sProductionOrderUnit);
                 moFieldComments.setFieldValue(moExplotionMaterials.getComments());
@@ -1133,7 +1129,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                     if (mvProductionsOrders != null && mbIsProgrammed) {
                         for (SDataProductionOrder po : mvProductionsOrders) {
                             if (!po.getIsForecast()) {
-                                po.program(miClient, true);
+                                po.programProductionOrder(miClient, true);
                             }
                         }
                     }

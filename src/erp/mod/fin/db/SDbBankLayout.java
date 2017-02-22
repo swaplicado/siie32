@@ -97,6 +97,8 @@ public class SDbBankLayout extends SDbRegistryUser {
     
     protected String msAuxTitle;
     protected String msAuxLayoutPath;
+    protected String msAuxLayoutType;
+    protected double mdAuxLocalLayoutAmount;
     
     protected ArrayList<SLayoutBankPaymentRow> maBankPaymentRows;
     protected ArrayList<SLayoutBankRecord> maBankRecords;
@@ -898,6 +900,8 @@ public class SDbBankLayout extends SDbRegistryUser {
 
     public void setAuxTitle(String s) { msAuxTitle = s; }
     public void setAuxLayoutPath(String s) { msAuxLayoutPath = s; }
+    public void setAuxLayoutType(String s) { msAuxLayoutType = s; }
+    public void setAuxLocalLayoutAmount(double d) { mdAuxLocalLayoutAmount = d; }
 
     public int getPkBankLayoutId() { return mnPkBankLayoutId; }
     public Date getDateLayout() { return mtDateLayout; }
@@ -931,6 +935,8 @@ public class SDbBankLayout extends SDbRegistryUser {
 
     public String getAuxTitle() { return msAuxTitle; }
     public String getAuxLayoutPath() { return msAuxLayoutPath; }
+    public String getAuxLayoutType() { return msAuxLayoutType; }
+    public double getAuxLocalLayoutAmount() { return mdAuxLocalLayoutAmount; }
     
     public ArrayList<SLayoutBankPaymentRow> getBankPaymentRows() { return maBankPaymentRows; }
     public ArrayList<SLayoutBankRecord> getBankRecord() { return maBankRecords; }

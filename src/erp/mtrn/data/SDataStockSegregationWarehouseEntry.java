@@ -14,7 +14,7 @@ import sa.lib.db.SDbConsts;
  *
  * @author Edwin Carmona
  */
-public class SDbStockSegregationWarehouseEntry extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+public class SDataStockSegregationWarehouseEntry extends erp.lib.data.SDataRegistry implements java.io.Serializable {
     
     protected int mnPkStockSegregationId;
     protected int mnPkWarehouseId;
@@ -26,8 +26,7 @@ public class SDbStockSegregationWarehouseEntry extends erp.lib.data.SDataRegistr
     protected int mnFkItemId;
     protected int mnFkUnitId;
 
-    
-    public SDbStockSegregationWarehouseEntry() {
+    public SDataStockSegregationWarehouseEntry() {
         super(SDataConstants.TRN_STK_SEG_WHS_ETY);
         reset();
     }
@@ -60,13 +59,14 @@ public class SDbStockSegregationWarehouseEntry extends erp.lib.data.SDataRegistr
         return "WHERE id_stk_seg = " + pk[0] + " AND id_whs = " + pk[1] + " AND id_ety = " + pk[2] + " ";
     }
 
-    public void computePrimaryKey(Connection connection) throws SQLException, Exception {
+    public void computeNewPrimaryKey(Connection connection) throws SQLException, Exception {
         String sql;
         ResultSet resultSet = null;
 
         mnPkEntryId = 0;
 
         sql = "SELECT COALESCE(MAX(id_ety), 0) + 1 FROM trn_stk_seg_whs_ety";
+        
         resultSet = connection.createStatement().executeQuery(sql);
         if (resultSet.next()) {
             mnPkEntryId = resultSet.getInt(1);
@@ -108,6 +108,7 @@ public class SDbStockSegregationWarehouseEntry extends erp.lib.data.SDataRegistr
 
         try {
             sql = "SELECT * FROM trn_stk_seg_whs_ety " + getSqlWhere(key);
+            
             resultSet = statement.getConnection().createStatement().executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
@@ -124,7 +125,6 @@ public class SDbStockSegregationWarehouseEntry extends erp.lib.data.SDataRegistr
                 mnFkUnitId = resultSet.getInt("fid_unit");
 
                 // Finish registry reading:
-
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
             }
@@ -148,7 +148,7 @@ public class SDbStockSegregationWarehouseEntry extends erp.lib.data.SDataRegistr
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         try {
             if (mbIsRegistryNew) {
-                computePrimaryKey(connection);
+                computeNewPrimaryKey(connection);
 
                 sql = "INSERT INTO trn_stk_seg_whs_ety VALUES (" +
                         mnPkStockSegregationId + ", " + 
@@ -161,6 +161,7 @@ public class SDbStockSegregationWarehouseEntry extends erp.lib.data.SDataRegistr
                         mnFkItemId + ", " + 
                         mnFkUnitId +
                         ")";
+                
             }
             else {
                 throw new Exception("El registro no puede modificarse.");
@@ -169,7 +170,6 @@ public class SDbStockSegregationWarehouseEntry extends erp.lib.data.SDataRegistr
             connection.createStatement().execute(sql);
 
             // Finish registry saving:
-
             mbIsRegistryNew = false;
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
         
@@ -184,6 +184,6 @@ public class SDbStockSegregationWarehouseEntry extends erp.lib.data.SDataRegistr
 
     @Override
     public Date getLastDbUpdate() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return null;
     }
 }

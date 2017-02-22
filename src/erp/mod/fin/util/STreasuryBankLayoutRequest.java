@@ -32,18 +32,19 @@ public class STreasuryBankLayoutRequest {
     
     private final SDbBankLayout moBankLayout;
 
-    public STreasuryBankLayoutRequest(SGuiClient oClient, SDbBankLayout layout) {
+    public STreasuryBankLayoutRequest(SGuiClient oClient,final SDbBankLayout layout) {
         miClient = oClient;
         moBankLayout = layout;
     }
     
     public boolean makeRequestToTreasury() {
+        SDbBankLayout oBankLayout = null;
+        SLayoutParameters parameters = null;
+        SDialogComments dialogComments = null;
+        File pdf = null;
+        
         String comment = "";
         boolean done = false;
-        SLayoutParameters parameters = null;
-        File pdf = null;
-        SDialogComments dialogComments = null;
-        STreasuryBankLayoutFile creator = null;
         
         dialogComments = new SDialogComments(miClient, "Comentarios");
         dialogComments.setVisible(true);
@@ -51,22 +52,25 @@ public class STreasuryBankLayoutRequest {
         if (dialogComments.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
             moBankLayout.setAuthorizationRequests(moBankLayout.getAuthorizationRequests() + 1);
             comment = dialogComments.getComment();
-            parameters = SFinUtils.getLayoutParameters(miClient, moBankLayout);
-            creator = new STreasuryBankLayoutFile(miClient, moBankLayout);
-            pdf = creator.createDocument(parameters);
             
-            if (pdf != null) {
-                done = sendMail(parameters, comment, pdf);
-                
-                if (done) {
-                    try {
-                        if (moBankLayout.getLayoutStatus() == SFinConsts.LAY_BANK_NEW_ST) {
-                            SFinUtils.changeLayoutStatus(miClient, moBankLayout, SFinConsts.LAY_BANK_APPROVED_ST);
+            oBankLayout = SFinUtils.loadPaymentsXml(miClient, moBankLayout);
+            if (moBankLayout != null) {
+                parameters = SFinUtils.getLayoutParameters(miClient, oBankLayout);
+                pdf = STreasuryBankLayoutFile.createDocument(miClient, parameters ,SFinUtils.populateRows(miClient, oBankLayout.getBankPaymentRows(), oBankLayout.getXmlRows()));
+
+                if (pdf != null) {
+                    done = sendMail(parameters, comment, pdf);
+
+                    if (done) {
+                        try {
+                            if (oBankLayout.getLayoutStatus() == SFinConsts.LAY_BANK_NEW_ST) {
+                                SFinUtils.changeLayoutStatus(miClient, oBankLayout, SFinConsts.LAY_BANK_APPROVED_ST);
+                            }
+                            SFinUtils.increaseLayoutRequest(miClient, oBankLayout);
                         }
-                        SFinUtils.increaseLayoutRequest(miClient, moBankLayout);
-                    }
-                    catch (Exception e) {
-                        SLibUtils.printException(this, e);
+                        catch (Exception e) {
+                            SLibUtils.printException(this, e);
+                        }
                     }
                 }
             }
@@ -92,7 +96,7 @@ public class STreasuryBankLayoutRequest {
                "Banco: " + parameters.getBank() + "\n" +
                "Cuenta bancaria: " + parameters.getBankAccount() + "\n" +
                "Tipo de pago: " + parameters.getTypePayment() + "\n" +
-               "Total: " + SLibUtils.DecimalFormatValue2D.format( parameters.getTotal()) + " " + parameters.getCurrency() + "\n\n\n" +
+               "Total: " + SLibUtils.DecimalFormatValue2D.format( parameters.getOriginalTotal()) + " " + parameters.getCurrency() + "\n\n\n" +
                comment;
         
         mms = getMms((SClientInterface) miClient, SModSysConsts.CFGS_TP_MMS_FIN_PAY_AUTH_REQ);

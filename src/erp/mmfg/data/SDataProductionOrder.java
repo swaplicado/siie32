@@ -295,23 +295,33 @@ public class SDataProductionOrder extends erp.lib.data.SDataRegistry implements 
 
     public int[] getParentProductionOrderKey() { return new int[] { mnFkOrdYearId_n, mnFkOrdId_n }; }
     
-    public void program(final SClientInterface client, final boolean isMassProgramming) {
+    /**
+     * This function marks the production order as programmed and done this, segregates what it contains
+     * 
+     * @param client
+     * @param isMassProgramming This attribute indicates whether the function call comes from a mass programming
+     */
+    public void programProductionOrder(final SClientInterface client, final boolean isMassProgramming) {
         try {
-            if (!getIsProgrammed()) {
-                if (isMassProgramming || getDbmsIsExploded()) {
-                    setIsProgrammed(true);
+            if (!mbIsProgrammed) {
+                if (isMassProgramming || mbDbmsIsExploded) {
+                    mbIsProgrammed = true;
                     save(client.getSession().getStatement().getConnection());
-                    STrnStockSegregationUtils.segregate(client, new int [] { getPkOrdId(), getPkYearId() }, SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD);
+                    
+                    // segregate items from production order
+                    STrnStockSegregationUtils.segregate(client, new int[] { mnPkYearId, mnPkOrderId }, SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD);
                 }
                 else {
-                    client.showMsgBoxWarning("La orden de producción '" + getDbmsNumber() + " - " + getReference() + "', aún no es explosionada.");
+                    client.showMsgBoxWarning("La orden de producción '" + msDbmsNumber + " - " + msReference + "', aún no es explosionada.");
                 }
             }
             else {
-                if (!isMassProgramming && client.showMsgBoxConfirm("La orden producción '" + getDbmsNumber() + " - " + getReference() + "' ya está programada,\n¿desea desprogramarla?\n") == JOptionPane.YES_OPTION) {
-                    setIsProgrammed(false);
+                if (!isMassProgramming && client.showMsgBoxConfirm("La orden producción '" + msDbmsNumber + " - " + msReference + "' ya está programada,\n¿desea desprogramarla?\n") == JOptionPane.YES_OPTION) {
+                    mbIsProgrammed = false;
                     save(client.getSession().getStatement().getConnection());
-                    STrnStockSegregationUtils.releaseSegregation(client, new int [] { getPkOrdId(), getPkYearId() }, SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD);
+                    
+                    // releasea segregation by production order
+                    STrnStockSegregationUtils.releaseSegregation(client, new int[] { mnPkYearId, mnPkOrderId }, SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD);
                 }
             }
         }

@@ -8,6 +8,8 @@ package erp.mtrn.data;
 /**
  *
  * @author Edwin Carmona
+ * 
+ * Contains the values to have a detail of the existence
  */
 
 public class STrnStock {

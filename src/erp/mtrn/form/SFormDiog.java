@@ -3233,7 +3233,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             int segregationType = 0;
                             
                             if (moProdOrderSource != null) {
-                                reference = new int[] { moProdOrderSource.getPkOrdId(), moProdOrderSource.getPkYearId() };
+                                reference = new int[] { moProdOrderSource.getPkYearId(), moProdOrderSource.getPkOrdId() };
                                 segregationType = SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD;
                             }
                             msg = STrnStockValidator.validateStockMoves(miClient, entries, mnParamIogCategoryId, moDiog == null ? new int[] { year, 0 } : (int[]) moDiog.getPrimaryKey(), (int[]) moWarehouseSource.getPrimaryKey(), false, moFieldDate.getDate(), reference, segregationType);
@@ -3421,7 +3421,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                     moDiog.setFkMfgOrderId_n(moProdOrderSource.getPkOrdId());
                 }
                 
-                moDiog.setAuxSegregationStockId(STrnStockSegregationUtils.getIdByReference(miClient.getSession(), new int [] { moProdOrderSource.getPkOrdId(), moProdOrderSource.getPkYearId()}, SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD));
+                moDiog.setAuxSegregationStockId(STrnStockSegregationUtils.getStockSegregationIdByReference(miClient.getSession(), new int [] { moProdOrderSource.getPkYearId(), moProdOrderSource.getPkOrdId()}, SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD));
             } catch (Exception ex) {
                 SLibUtils.printException(this, ex);
             }
