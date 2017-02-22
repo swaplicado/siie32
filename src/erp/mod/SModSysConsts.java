@@ -489,6 +489,11 @@ public abstract class SModSysConsts {
     public static final int FINS_TP_FISCAL_ACC_LINK_BPS_CUS_ADV = 27;
     public static final int FINS_TP_FISCAL_ACC_LINK_RES_INC = 31;
     public static final int FINS_TP_FISCAL_ACC_LINK_RES_EXP = 32;
+    
+    public static final int FINS_CFD_TAX_NA = 0;
+    public static final int FINS_CFD_TAX_ISR = 1;
+    public static final int FINS_CFD_TAX_IVA = 2;
+    public static final int FINS_CFD_TAX_IEPS = 3;
 
     public static final int FIN_ACC_NA = 1;
     public static final int FIN_CC_NA = 1;
