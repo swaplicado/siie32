@@ -301,8 +301,8 @@ public class SCfdDataAsociadoNegocios {
             else if (mfVersion == DCfdConsts.CFDI_VER_32) {
                 receptor = new cfd.ver32.DElementReceptor();
 
-                if (msBizPartnerRfc.compareTo(SFinConsts.RFC_INT) != 0) {
-                    throw new Exception("El RFC del receptor no cumple con la estructura '" + SFinConsts.RFC_INT + "requerida.");
+                if (mbIsCfdiWithCce && msBizPartnerRfc.compareTo(SFinConsts.RFC_INT) != 0) {
+                    throw new Exception("El RFC del receptor no cumple con la estructura '" + SFinConsts.RFC_INT + " requerida.");
                 }
                 
                 ((cfd.ver32.DElementReceptor) receptor).getAttRfc().setString(msBizPartnerRfc);
