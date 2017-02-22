@@ -3755,10 +3755,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 jtfBizPartnerBranchAddress02Ro.setCaretPosition(0);
             }
         }
-        enableCfdCceFields(moBizPartner != null && (mbIsDoc || mbIsAdj) && (!mbIsSales || isCfdNeeded() || isCfdiNeeded()) && 
-                            (moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n() != SLibConstants.UNDEFINED &&
-                            !miClient.getSession().getSessionCustom().isLocalCountry(new int[] { moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n() })));
-        
         renderBizPartnerPrepaymentsBalance();
     }
 
