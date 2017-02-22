@@ -51,6 +51,8 @@ import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import sa.lib.gui.SGuiConsts;
 import sa.lib.srv.SSrvConsts;
 
 /**
@@ -1524,6 +1526,8 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
     }
 
     public void actionOk() {
+        String msg = "";
+        Boolean compute = true;
         Cursor cursor = null;
 
         if (moTablePaneEmpAvailable.getTableGuiRowCount() > 0) {
@@ -1536,13 +1540,32 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
         }
         else {
             try {
-                cursor = miClient.getFrame().getCursor();
-                miClient.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                if (moCurrentRecord.getPkYearId() != moPayroll.getPeriodYear()) {
+                    msg = "El año de la nómina es diferente al año de la póliza contable.\n";
+                    if (miClient.showMsgBoxConfirm(msg + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                        compute = false;
+                        miClient.showMsgBoxWarning(msg);
+                        moTablePaneEmpAvailable.requestFocus();
+                    }
+                }
+                else if (moCurrentRecord.getPkPeriodId() != moPayroll.getPeriod()) {
+                        msg = "El periodo de la nómina es diferente al periodo de la póliza contable.\n";
+                        if (miClient.showMsgBoxConfirm(msg + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                            compute = false;
+                            miClient.showMsgBoxWarning(msg);
+                            moTablePaneEmpAvailable.requestFocus();
+                        }
+                }
+                
+                if (compute) {
+                    cursor = miClient.getFrame().getCursor();
+                    miClient.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
-                computePayroll();
+                    computePayroll();
 
-                mnFormResult = SLibConstants.FORM_RESULT_OK;
-                setVisible(false);
+                    mnFormResult = SLibConstants.FORM_RESULT_OK;
+                    setVisible(false);
+                }
             }
             catch (Exception e) {
                 SLibUtilities.renderException(this, e);

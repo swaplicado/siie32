@@ -834,7 +834,9 @@ public class SCfdPrint {
 
         map.put("sUrlCfdi", "https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx\n "
                 + "https://prodretencionverificacion.clouda.sat.gob.mx/");
-         map.put("sSelloCfdiUltDig", sSelloEmisor.substring(sSelloEmisor.length()- 8, sSelloEmisor.length()));
+        if (!sSelloEmisor.isEmpty()) { 
+            map.put("sSelloCfdiUltDig", sSelloEmisor.substring(sSelloEmisor.length()- 8, sSelloEmisor.length()));
+        }
         
         // QR Code:
 

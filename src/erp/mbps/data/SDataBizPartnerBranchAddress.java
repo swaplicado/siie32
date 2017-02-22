@@ -11,6 +11,7 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mcfg.data.SDataParamsErp;
 import erp.mloc.data.SDataCountry;
+import erp.mloc.data.SDataState;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 
@@ -57,6 +58,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
     protected int mnAuxCountrySysId;
 
     protected erp.mloc.data.SDataCountry moDbmsDataCountry;
+    protected erp.mloc.data.SDataState moDbmsDataState;
     protected erp.mcfg.data.SDataParamsErp moParamsErp;
 
     public SDataBizPartnerBranchAddress() {
@@ -126,6 +128,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
     public java.lang.String getDbmsUserEdit() { return msDbmsUserEdit; }
     public java.lang.String getDbmsUserDelete() { return msDbmsUserDelete; }
     public erp.mloc.data.SDataCountry getDbmsDataCountry() { return moDbmsDataCountry; }
+    public erp.mloc.data.SDataState getDbmsDataState() { return moDbmsDataState; }
 
     public int getAuxCountrySysId() { return mnAuxCountrySysId; }
     
@@ -174,6 +177,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
         msDbmsUserEdit = "";
         msDbmsUserDelete = "";
         moDbmsDataCountry = null;
+        moDbmsDataState = null;
         
         mnAuxCountrySysId = 0;
     }
@@ -237,13 +241,14 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
                 // Read aswell dependant registries:
 
                 moDbmsDataCountry = new SDataCountry();
+                moDbmsDataState = new SDataState();
                 
                 if (mnFkStateId_n != SLibConstants.UNDEFINED) {
-                    sql = "SELECT sta FROM erp.locu_sta WHERE id_sta = " + mnFkStateId_n + " ";
-                    resultSet = statement.executeQuery(sql);
-                    if (resultSet.next()) {
-                        msState = resultSet.getString("sta");
+                    if (moDbmsDataState.read(new int[] { mnFkStateId_n }, statement) != SLibConstants.DB_ACTION_READ_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
+                    
+                    msState = moDbmsDataState.getState();
                 }
                 
                 if (mnFkCountryId_n == SLibConstants.UNDEFINED) {
@@ -259,10 +264,9 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
                 if (moDbmsDataCountry.read(new int[] { mnFkCountryId_n }, statement) != SLibConstants.DB_ACTION_READ_OK) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                 }
-                else {
-                    mbIsRegistryNew = false;
-                    mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
-                }
+                
+                mbIsRegistryNew = false;
+                mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
             }
         }
         catch (java.sql.SQLException e) {

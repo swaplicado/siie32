@@ -12,6 +12,7 @@ import java.io.ByteArrayInputStream;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Date;
+import java.util.Vector;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
@@ -29,6 +30,10 @@ public class SDataCfgCfd extends erp.lib.data.SDataRegistry implements java.io.S
     protected java.lang.String msXml;
     
     protected java.lang.String msCfdUsoCfdi;
+    
+    protected java.lang.String msCfdCceEmisorColonia;
+    protected java.lang.String msCfdCceEmisorLocalidad;
+    protected java.lang.String msCfdCceEmisorMunicipio;
 
     public SDataCfgCfd() {
         super(SDataConstants.TRN_CTR);
@@ -38,10 +43,18 @@ public class SDataCfgCfd extends erp.lib.data.SDataRegistry implements java.io.S
     public void setXml(java.lang.String s) { msXml = s; }
     
     public void setCfdUsoCfdi(java.lang.String s) { msCfdUsoCfdi = s; }
+    
+    public void setCfdCceEmisorColonia(java.lang.String s) { msCfdCceEmisorColonia = s; }
+    public void setCfdCceEmisorLocalidad(java.lang.String s) { msCfdCceEmisorLocalidad = s; }
+    public void setCfdCceEmisorMunicipio(java.lang.String s) { msCfdCceEmisorMunicipio = s; }
 
     public java.lang.String getXml() { return msXml; }
     
     public java.lang.String getCfdUsoCfdi() { return msCfdUsoCfdi; }
+    
+    public java.lang.String getCfdCceEmisorColonia() { return msCfdCceEmisorColonia; }
+    public java.lang.String getCfdCceEmisorLocalidad() { return msCfdCceEmisorLocalidad; }
+    public java.lang.String getCfdCceEmisorMunicipio() { return msCfdCceEmisorMunicipio; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -61,6 +74,10 @@ public class SDataCfgCfd extends erp.lib.data.SDataRegistry implements java.io.S
         msXml = "";
         
         msCfdUsoCfdi = "";
+        
+        msCfdCceEmisorColonia = "";
+        msCfdCceEmisorLocalidad = "";
+        msCfdCceEmisorMunicipio = "";
     }
 
     @Override
@@ -159,10 +176,33 @@ public class SDataCfgCfd extends erp.lib.data.SDataRegistry implements java.io.S
         Document doc = docBuilder.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")));
         Node node = null;
         NamedNodeMap namedNodeMap = null;
+        Node nodeChild = null;
+        NamedNodeMap namedNodeMapChild = null;
+        Vector<Node> nodeChilds = null;
         
         node = SXmlUtils.extractElements(doc, "CfgCfd").item(0);
         namedNodeMap = node.getAttributes();
 
         msCfdUsoCfdi = SXmlUtils.extractAttributeValue(namedNodeMap, "usoCFDI", false);
+        
+        // Emisor:
+
+        if (SXmlUtils.hasChildElement(node, "cce11:Emisor")) {
+            nodeChild = SXmlUtils.extractChildElements(node, "cce11:Emisor").get(0);
+            
+            // Address emisor:
+            
+            if (SXmlUtils.hasChildElement(nodeChild, "cce11:Domicilio")) {
+                nodeChilds = SXmlUtils.extractChildElements(nodeChild, "cce11:Domicilio");
+
+                for (int i = 0; i < nodeChilds.size(); i++) {
+                    namedNodeMapChild = nodeChilds.get(i).getAttributes();
+                    
+                    msCfdCceEmisorColonia = SXmlUtils.extractAttributeValue(namedNodeMapChild, "colonia", false);
+                    msCfdCceEmisorLocalidad = SXmlUtils.extractAttributeValue(namedNodeMapChild, "localidad", false);
+                    msCfdCceEmisorMunicipio = SXmlUtils.extractAttributeValue(namedNodeMapChild, "municipio", false);
+                }
+            }
+        }
     }
 }

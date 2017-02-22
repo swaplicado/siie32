@@ -191,7 +191,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.lib.form.SFormField moFieldCfdCceSubdivision;
     private erp.lib.form.SFormField moFieldCfdCceExchangeRateUSD;
     private erp.lib.form.SFormField moFieldCfdCceTotalUSD;
-    private erp.lib.form.SFormField moFieldCfdCceNumberReliableExporter;
     
     private int[] manDpsClassKey;
     private int[] manDpsClassPreviousKey;
@@ -633,8 +632,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlCfdCceSubdivision = new javax.swing.JLabel();
         jtfCfdCceSubdivision = new javax.swing.JTextField();
         jPanel106 = new javax.swing.JPanel();
-        jlCfdCceNumberReliableExporter = new javax.swing.JLabel();
-        jtfCfdCceNumberReliableExporter = new javax.swing.JTextField();
         jPanel96 = new javax.swing.JPanel();
         jPanel103 = new javax.swing.JPanel();
         jlCfdCceExchangeRateUSD = new javax.swing.JLabel();
@@ -2275,16 +2272,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel106.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel106.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
-
-        jlCfdCceNumberReliableExporter.setText("Número exportador confiable:");
-        jlCfdCceNumberReliableExporter.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel106.add(jlCfdCceNumberReliableExporter);
-
-        jtfCfdCceNumberReliableExporter.setText("ABC000ABC000");
-        jtfCfdCceNumberReliableExporter.setToolTipText("Referencia");
-        jtfCfdCceNumberReliableExporter.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel106.add(jtfCfdCceNumberReliableExporter);
-
         jPanel97.add(jPanel106);
 
         jPanel105.add(jPanel97);
@@ -2312,11 +2299,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlCfdCceTotalUSD.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel104.add(jlCfdCceTotalUSD);
 
-        jtfCfdCceTotalUSD.setEditable(false);
-        jtfCfdCceTotalUSD.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jtfCfdCceTotalUSD.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfCfdCceTotalUSD.setText("0,000,000,000.00");
-        jtfCfdCceTotalUSD.setFocusable(false);
         jtfCfdCceTotalUSD.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel104.add(jtfCfdCceTotalUSD);
 
@@ -2457,11 +2441,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldFkProductionOrderId_n = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkProductionOrderId_n, jlFkProductionOrderId_n);
         moFieldFkProductionOrderId_n.setPickerButton(jbFkProductionOrderId_n);
         moFieldFkContactId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkContactId_n, jlFkContactId_n);
-        moFieldFkIncotermId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkIncotermId, jlFkIncotermId);
-        moFieldFkIncotermId.setTabbedPaneIndex(1, jTabbedPane);
-        moFieldFkIncotermId.setPickerButton(jbFkIncotermId);
-        moFieldFkSpotSrcId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkSpotSrcId_n, jlFkSpotSrcId_n);
-        moFieldFkSpotDesId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkSpotDesId_n, jlFkSpotDesId_n);
         moFieldFkModeOfTransportationTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkModeOfTransportationTypeId, jlFkModeOfTransportationTypeId);
         moFieldFkModeOfTransportationTypeId.setTabbedPaneIndex(1, jTabbedPane);
         moFieldFkModeOfTransportationTypeId.setPickerButton(jbFkModeOfTransportationTypeId);
@@ -2515,6 +2494,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldCfdConfirmationNumber.setTabbedPaneIndex(3, jTabbedPane);
         moFieldCfdConfirmationNumber.setLengthMax(25);
         
+        moFieldFkIncotermId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkIncotermId, jlFkIncotermId);
+        moFieldFkIncotermId.setTabbedPaneIndex(4, jTabbedPane);
+        moFieldFkIncotermId.setPickerButton(jbFkIncotermId);
+        moFieldFkSpotSrcId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkSpotSrcId_n, jlFkSpotSrcId_n);
+        moFieldFkSpotSrcId_n.setTabbedPaneIndex(4, jTabbedPane);
+        moFieldFkSpotDesId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkSpotDesId_n, jlFkSpotDesId_n);
+        moFieldFkSpotDesId_n.setTabbedPaneIndex(4, jTabbedPane);
         moFieldCfdCceReasonTransfer = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdCceReasonTransfer, jlCfdCceReasonTransfer);
         moFieldCfdCceReasonTransfer.setTabbedPaneIndex(4, jTabbedPane);
         moFieldCfdCceOperationType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdCceOperationType, jlCfdCceOperationType);
@@ -2527,8 +2513,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldCfdCceNumberCertificateOrigin.setTabbedPaneIndex(4, jTabbedPane);
         moFieldCfdCceSubdivision = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfCfdCceSubdivision, jlCfdCceSubdivision);
         moFieldCfdCceSubdivision.setTabbedPaneIndex(4, jTabbedPane);
-        moFieldCfdCceNumberReliableExporter = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCfdCceNumberReliableExporter, jlCfdCceNumberReliableExporter);
-        moFieldCfdCceNumberReliableExporter.setTabbedPaneIndex(4, jTabbedPane);
         moFieldCfdCceExchangeRateUSD = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfCfdCceExchangeRateUSD, jlCfdCceExchangeRateUSD);
         moFieldCfdCceExchangeRateUSD.setTabbedPaneIndex(4, jTabbedPane);
         moFieldCfdCceTotalUSD = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfCfdCceTotalUSD, jlCfdCceTotalUSD);
@@ -2610,7 +2594,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mvFields.add(moFieldCfdCceSubdivision);
         mvFields.add(moFieldCfdCceExchangeRateUSD);
         mvFields.add(moFieldCfdCceTotalUSD);
-        mvFields.add(moFieldCfdCceNumberReliableExporter);
 
         if (mnFormType == SDataConstantsSys.TRNS_CT_DPS_PUR) {
             moPickerBizPartner = new SFormOptionPickerBizPartner(miClient, SDataConstants.BPSX_BP_SUP);
@@ -2834,17 +2817,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         jTabbedPane.setEnabledAt(3, false);
                         renderAddendaData(false);
                     }
-                    
-                    // Enable TabbedPane for information of international trade:
-                    
-                    if (moBizPartner != null && (mbIsDoc || mbIsAdj) && (!mbIsSales || isCfdNeeded() || isCfdiNeeded()) && 
-                            (moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n() != SLibConstants.UNDEFINED &&
-                            !miClient.getSession().getSessionCustom().isLocalCountry(new int[] { moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n() }))) {
-                        jTabbedPane.setEnabledAt(4, true);
-                    }
-                    else {
-                        jTabbedPane.setEnabledAt(4, true);
-                    }
 
                     jbCancel.requestFocus();
                 }
@@ -2999,11 +2971,31 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
     
-    private void setEnebleCfdFields(boolean enable) {
+    private void enableCfdFields(boolean enable) {
         jcbCfdUseId.setEnabled(enable);
         jtfCfdConfirmationNum.setEditable(enable);
     }
 
+    /**
+     * Enabled fields for information international trade.
+     * @param enable 
+     */
+    private void enableCfdCceFields(boolean enable) {
+        jcbCfdCceReasonTransfer.setEnabled(enable);
+        jcbCfdCceOperationType.setEnabled(enable);
+        jcbCfdCceNumberImportRequest.setEnabled(enable);
+        jtfCfdCceCertificateOrigin.setEditable(enable);
+        jtfCfdCceCertificateOrigin.setFocusable(enable);
+        jtfCfdCceNumberCertificateOrigin.setEditable(enable);
+        jtfCfdCceNumberCertificateOrigin.setFocusable(enable);
+        jtfCfdCceSubdivision.setEditable(enable);
+        jtfCfdCceSubdivision.setFocusable(enable);
+        jtfCfdCceExchangeRateUSD.setEditable(enable);
+        jtfCfdCceExchangeRateUSD.setFocusable(enable);
+        jtfCfdCceTotalUSD.setEditable(enable);
+        jtfCfdCceTotalUSD.setFocusable(enable);
+    }
+    
     private boolean isCfdNeeded() {
         boolean isNeeded = false;
 
@@ -3763,6 +3755,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 jtfBizPartnerBranchAddress02Ro.setCaretPosition(0);
             }
         }
+        enableCfdCceFields(moBizPartner != null && (mbIsDoc || mbIsAdj) && (!mbIsSales || isCfdNeeded() || isCfdiNeeded()) && 
+                            (moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n() != SLibConstants.UNDEFINED &&
+                            !miClient.getSession().getSessionCustom().isLocalCountry(new int[] { moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n() })));
         
         renderBizPartnerPrepaymentsBalance();
     }
@@ -4250,7 +4245,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             
             jckIsRebill.setEnabled(false);
             
-            setEnebleCfdFields(false);
+            enableCfdFields(false);
+            enableCfdCceFields(false);
         }
         else {
             mnFormStatus = SLibConstants.FORM_STATUS_EDIT;
@@ -4335,7 +4331,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             updateEditForImportFromDps(true);
             jckIsRebill.setEnabled(mbIsOrd);
             
-            setEnebleCfdFields(mbIsSales && (mbIsDoc || mbIsAdj));
+            enableCfdFields(mbIsSales && (mbIsDoc || mbIsAdj));enableCfdFields(mbIsSales && (mbIsDoc || mbIsAdj));
+            enableCfdCceFields(moBizPartner != null && (mbIsDoc || mbIsAdj) && (!mbIsSales || isCfdNeeded() || isCfdiNeeded()) && 
+                            (moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n() != SLibConstants.UNDEFINED &&
+                            !miClient.getSession().getSessionCustom().isLocalCountry(new int[] { moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n() })));
         }
 
         if (jTabbedPane.isEnabledAt(3)) {
@@ -6653,17 +6652,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jTabbedPane.setEnabledAt(3, false);
             renderAddendaData(false);
         }
-        
-        // Enable TabbedPane for information of international trade:
-        
-        if (moBizPartner != null && (mbIsDoc || mbIsAdj) && (!mbIsSales || isCfdNeeded() || isCfdiNeeded()) && 
-                (moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n() != SLibConstants.UNDEFINED &&
-                !miClient.getSession().getSessionCustom().isLocalCountry(new int[] { moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n() }))) {
-            jTabbedPane.setEnabledAt(4, true);
-        }
-        else {
-            jTabbedPane.setEnabledAt(4, true);
-                    }
     }
 
     private void itemChangeFkPaymentTypeId(boolean resetDaysOfCredit) {
@@ -7291,7 +7279,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlCfdCceExchangeRateUSD;
     private javax.swing.JLabel jlCfdCceNumberCertificateOrigin;
     private javax.swing.JLabel jlCfdCceNumberImportRequest;
-    private javax.swing.JLabel jlCfdCceNumberReliableExporter;
     private javax.swing.JLabel jlCfdCceOperationType;
     private javax.swing.JLabel jlCfdCceReasonTransfer;
     private javax.swing.JLabel jlCfdCceSubdivision;
@@ -7397,7 +7384,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JTextField jtfCfdCceCertificateOrigin;
     private javax.swing.JTextField jtfCfdCceExchangeRateUSD;
     private javax.swing.JTextField jtfCfdCceNumberCertificateOrigin;
-    private javax.swing.JTextField jtfCfdCceNumberReliableExporter;
     private javax.swing.JTextField jtfCfdCceSubdivision;
     private javax.swing.JTextField jtfCfdCceTotalUSD;
     private javax.swing.JTextField jtfCfdConfirmationNum;
@@ -7622,8 +7608,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jTabbedPane.setSelectedIndex(0);
         jTabbedPane.setEnabledAt(3, false);
-        jTabbedPane.setEnabledAt(4, false);
-
+        
         updateFormEditStatus(true);
         jbEdit.setEnabled(false);
         jbEditHelp.setEnabled(false);
@@ -8380,14 +8365,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
         }
         
-        // Enable TabbedPane for information of international trade:
-        
-        if ((mbIsDoc || mbIsAdj) && (!mbIsSales || isCfdNeeded() || isCfdiNeeded()) && 
-                (moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n() != SLibConstants.UNDEFINED &&
-                !miClient.getSession().getSessionCustom().isLocalCountry(new int[] { moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n() }))) {
-            jTabbedPane.setEnabledAt(4, true);
-        }
-        
         // Set information of international trade:
         
         try {
@@ -8397,7 +8374,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moFieldCfdCceCertificateOrigin.setFieldValue(moDps.getXtaCfdCceCertificateOrigin());
             moFieldCfdCceNumberCertificateOrigin.setFieldValue(moDps.getXtaCfdCceNumberCertificateOrigin());
             moFieldCfdCceSubdivision.setFieldValue(moDps.getXtaCfdCceSubdivision());
-            moFieldCfdCceNumberReliableExporter.setFieldValue(moDps.getXtaCfdCceNumberReliableExporter());
             moFieldCfdCceExchangeRateUSD.setFieldValue(moDps.getXtaCfdCceExchangeRateUSD());
             moFieldCfdCceTotalUSD.setFieldValue(moDps.getXtaCfdCceTotalUSD());
         }
@@ -8581,15 +8557,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moDps.getRegistryComplements().add(moRecordUserLock);
         }
         
-        moDps.setXtaCfdCceReasonTransfer((String) moFieldCfdCceReasonTransfer.getKey());
-        moDps.setXtaCfdCceOperationType((String) moFieldCfdCceOperationType.getKey());
-        moDps.setXtaCfdCceNumberImportRequest((String) moFieldCfdCceNumberImportRequest.getKey());
-        moDps.setXtaCfdCceCertificateOrigin(moFieldCfdCceCertificateOrigin.getInteger());
-        moDps.setXtaCfdCceNumberCertificateOrigin(moFieldCfdCceNumberCertificateOrigin.getString());
-        moDps.setXtaCfdCceSubdivision(moFieldCfdCceSubdivision.getInteger());
-        moDps.setXtaCfdCceNumberReliableExporter(moFieldCfdCceNumberReliableExporter.getString());
-        moDps.setXtaCfdCceExchangeRateUSD(moFieldCfdCceExchangeRateUSD.getDouble());
-        moDps.setXtaCfdCceTotalUSD(moFieldCfdCceTotalUSD.getDouble());
+        if (jcbCfdCceReasonTransfer.isEnabled()) { 
+            moDps.setXtaCfdCceReasonTransfer((String) moFieldCfdCceReasonTransfer.getKey());
+            moDps.setXtaCfdCceOperationType((String) moFieldCfdCceOperationType.getKey());
+            moDps.setXtaCfdCceNumberImportRequest((String) moFieldCfdCceNumberImportRequest.getKey());
+            moDps.setXtaCfdCceCertificateOrigin(moFieldCfdCceCertificateOrigin.getInteger());
+            moDps.setXtaCfdCceNumberCertificateOrigin(moFieldCfdCceNumberCertificateOrigin.getString());
+            moDps.setXtaCfdCceSubdivision(moFieldCfdCceSubdivision.getInteger());
+            moDps.setXtaCfdCceNumberReliableExporter(moBizPartnerCategory.getNumberExporter());
+            moDps.setXtaCfdCceExchangeRateUSD(moFieldCfdCceExchangeRateUSD.getDouble());
+            moDps.setXtaCfdCceTotalUSD(moFieldCfdCceTotalUSD.getDouble());
+        }
 
         // Set params for CFD:
 

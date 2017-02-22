@@ -27,21 +27,23 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
 
     protected int mnPkYearId;
     protected int mnPkDocId;
-    protected java.lang.String msXml;
+    protected String msXml;
     
-    protected java.lang.String msCfdConfirmacion;
-    protected java.lang.String msCfdTipoRelacion;
-    protected java.lang.String msCfdUsoCfdi;
+    protected String msCfdConfirmacion;
+    protected String msCfdTipoRelacion;
+    protected String msCfdUsoCfdi;
     
-    protected java.lang.String msCfdCceMotivoTraslado;
-    protected java.lang.String msCfdCceTipoOperacion;
-    protected java.lang.String msCfdCceClaveDePedimento;
-    protected java.lang.String msCfdCceCertificadoOrigen; 
-    protected java.lang.String msCfdCceNumCertificadoOrigen;
-    protected java.lang.String msCfdCceSubdivision;
-    protected java.lang.String msCfdCceTipoCambioUSD;
-    protected java.lang.String msCfdCceTotalUSD;
-    protected java.lang.String msCfdCceNumExportadorConfiable;
+    protected String msCfdCceMotivoTraslado;
+    protected String msCfdCceTipoOperacion;
+    protected String msCfdCceClaveDePedimento;
+    protected String msCfdCceCertificadoOrigen; 
+    protected String msCfdCceNumCertificadoOrigen;
+    protected String msCfdCceSubdivision;
+    protected String msCfdCceTipoCambioUSD;
+    protected String msCfdCceTotalUSD;
+    protected String msCfdCceNumExportadorConfiable;
+    
+    protected boolean mbHasInternationalTradeNode;
 
     public SDataDpsCfd() {
         super(SDataConstants.TRN_DPS_CFD);
@@ -50,48 +52,50 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
 
     public void setPkYearId(int n) { mnPkYearId = n; }
     public void setPkDocId(int n) { mnPkDocId = n; }
-    public void setXml(java.lang.String s) { msXml = s; }
+    public void setXml(String s) { msXml = s; }
     
-    public void setCfdConfirmacion(java.lang.String s) { msCfdConfirmacion = s; }
-    public void setCfdTipoRelacion(java.lang.String s) { msCfdTipoRelacion = s; }
-    public void setCfdUsoCfdi(java.lang.String s) { msCfdUsoCfdi = s; }
+    public void setCfdConfirmacion(String s) { msCfdConfirmacion = s; }
+    public void setCfdTipoRelacion(String s) { msCfdTipoRelacion = s; }
+    public void setCfdUsoCfdi(String s) { msCfdUsoCfdi = s; }
     
-    public void setCfdCceMotivoTraslado(java.lang.String s) { msCfdCceMotivoTraslado = s; }
-    public void setCfdCceTipoOperacion(java.lang.String s) { msCfdCceTipoOperacion = s; }
-    public void setCfdCceClaveDePedimento(java.lang.String s) { msCfdCceClaveDePedimento = s; }
-    public void setCfdCceCertificadoOrigen(java.lang.String s) { msCfdCceCertificadoOrigen = s; }
-    public void setCfdCceNumCertificadoOrigen(java.lang.String s) { msCfdCceNumCertificadoOrigen = s; }
-    public void setCfdCceSubdivision(java.lang.String s) { msCfdCceSubdivision = s; }
-    public void setCfdCceTipoCambioUSD(java.lang.String s) { msCfdCceTipoCambioUSD = s; }
-    public void setCfdCceTotalUSD(java.lang.String s) { msCfdCceTotalUSD = s; }
-    public void setCfdCceNumExportadorConfiable(java.lang.String s) { msCfdCceNumExportadorConfiable = s; }
+    public void setCfdCceMotivoTraslado(String s) { msCfdCceMotivoTraslado = s; }
+    public void setCfdCceTipoOperacion(String s) { msCfdCceTipoOperacion = s; }
+    public void setCfdCceClaveDePedimento(String s) { msCfdCceClaveDePedimento = s; }
+    public void setCfdCceCertificadoOrigen(String s) { msCfdCceCertificadoOrigen = s; }
+    public void setCfdCceNumCertificadoOrigen(String s) { msCfdCceNumCertificadoOrigen = s; }
+    public void setCfdCceSubdivision(String s) { msCfdCceSubdivision = s; }
+    public void setCfdCceTipoCambioUSD(String s) { msCfdCceTipoCambioUSD = s; }
+    public void setCfdCceTotalUSD(String s) { msCfdCceTotalUSD = s; }
+    public void setCfdCceNumExportadorConfiable(String s) { msCfdCceNumExportadorConfiable = s; }
 
     public int getPkYearId() { return mnPkYearId; }
     public int getPkDocId() { return mnPkDocId; }
-    public java.lang.String getXml() { return msXml; }
+    public String getXml() { return msXml; }
     
-    public java.lang.String getCfdConfirmacion() { return msCfdConfirmacion; }
-    public java.lang.String getCfdTipoRelacion() { return msCfdTipoRelacion; }
-    public java.lang.String getCfdUsoCfdi() { return msCfdUsoCfdi; }
+    public String getCfdConfirmacion() { return msCfdConfirmacion; }
+    public String getCfdTipoRelacion() { return msCfdTipoRelacion; }
+    public String getCfdUsoCfdi() { return msCfdUsoCfdi; }
     
-    public java.lang.String getCfdCceMotivoTraslado() { return msCfdCceMotivoTraslado; }
-    public java.lang.String getCfdCceTipoOperacion() { return msCfdCceTipoOperacion; }
-    public java.lang.String getCfdCceClaveDePedimento() { return msCfdCceClaveDePedimento; }
-    public java.lang.String getCfdCceCertificadoOrigen() { return msCfdCceCertificadoOrigen; }
-    public java.lang.String getCfdCceNumCertificadoOrigen() { return msCfdCceNumCertificadoOrigen; }
-    public java.lang.String getCfdCceSubdivision() { return msCfdCceSubdivision; }
-    public java.lang.String getCfdCceTipoCambioUSD() { return msCfdCceTipoCambioUSD; }
-    public java.lang.String getCfdCceTotalUSD() { return msCfdCceTotalUSD; }
-    public java.lang.String getCfdCceNumExportadorConfiable() { return msCfdCceNumExportadorConfiable; }
+    public String getCfdCceMotivoTraslado() { return msCfdCceMotivoTraslado; }
+    public String getCfdCceTipoOperacion() { return msCfdCceTipoOperacion; }
+    public String getCfdCceClaveDePedimento() { return msCfdCceClaveDePedimento; }
+    public String getCfdCceCertificadoOrigen() { return msCfdCceCertificadoOrigen; }
+    public String getCfdCceNumCertificadoOrigen() { return msCfdCceNumCertificadoOrigen; }
+    public String getCfdCceSubdivision() { return msCfdCceSubdivision; }
+    public String getCfdCceTipoCambioUSD() { return msCfdCceTipoCambioUSD; }
+    public String getCfdCceTotalUSD() { return msCfdCceTotalUSD; }
+    public String getCfdCceNumExportadorConfiable() { return msCfdCceNumExportadorConfiable; }
+    
+    public boolean hasInternationalTradeNode() { return mbHasInternationalTradeNode; }
 
     @Override
-    public void setPrimaryKey(java.lang.Object pk) {
+    public void setPrimaryKey(Object pk) {
         mnPkYearId = ((int[]) pk)[0];
         mnPkDocId = ((int[]) pk)[1];
     }
 
     @Override
-    public java.lang.Object getPrimaryKey() {
+    public Object getPrimaryKey() {
         return new int[] { mnPkYearId, mnPkDocId };
     }
 
@@ -116,10 +120,12 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
         msCfdCceTipoCambioUSD = "";
         msCfdCceTotalUSD = "";
         msCfdCceNumExportadorConfiable = "";
+        
+        mbHasInternationalTradeNode = false;
     }
 
     @Override
-    public int read(java.lang.Object pk, Statement statement) {
+    public int read(Object pk, Statement statement) {
         int[] key = (int[]) pk;
         String sql = "";
         ResultSet resultSet = null;
@@ -149,7 +155,7 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
             mnLastDbActionResult = SLibConstants.DB_ACTION_READ_ERROR;
             SLibUtilities.printOutException(this, e);
         }
-        catch (java.lang.Exception e) {
+        catch (Exception e) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_READ_ERROR;
             SLibUtilities.printOutException(this, e);
         }
@@ -201,7 +207,7 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
             SLibUtilities.printOutException(this, e);
         }
-        catch (java.lang.Exception e) {
+        catch (Exception e) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
             SLibUtilities.printOutException(this, e);
         }
@@ -260,6 +266,8 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
         if (SXmlUtils.hasChildElement(node, "cce11")) {
             nodeChild = SXmlUtils.extractChildElements(node, "cce11").get(0);
             namedNodeMapChild = nodeChild.getAttributes();
+            
+            mbHasInternationalTradeNode = true;
             
             msCfdCceMotivoTraslado = SXmlUtils.extractAttributeValue(namedNodeMapChild, "MotivoTraslado", false);
             msCfdCceTipoOperacion = SXmlUtils.extractAttributeValue(namedNodeMapChild, "TipoOperacion", false);

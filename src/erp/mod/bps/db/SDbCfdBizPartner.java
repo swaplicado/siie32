@@ -28,6 +28,7 @@ public class SDbCfdBizPartner {
     protected int mnBizPartnerExpeditionId;
     protected int mnBizPartnerBranchExpeditionId;
     protected boolean mbIsEmisor;
+    protected boolean mbIsEmisorForCce;
     
     public SDbCfdBizPartner(SClientInterface client) {
         miClient = client;
@@ -37,6 +38,7 @@ public class SDbCfdBizPartner {
         mnBizPartnerExpeditionId = 0;
         mnBizPartnerBranchExpeditionId = 0;
         mbIsEmisor = false;
+        mbIsEmisorForCce = false;
     }
     
     public void setBizPartnerId(int n) { mnBizPartnerId = n; }
@@ -44,12 +46,14 @@ public class SDbCfdBizPartner {
     public void setBizPartnerExpeditionId(int n) { mnBizPartnerExpeditionId = n; }
     public void setBizPartnerBranchExpeditionId(int n) { mnBizPartnerBranchExpeditionId = n; }
     public void setIsEmisor(boolean b) { mbIsEmisor = b; }
+    public void setIsEmisorForCce(boolean b) { mbIsEmisorForCce = b; }
     
     public int getBizPartnerId() { return mnBizPartnerId; }
     public int getBizPartnerBranchId() { return mnBizPartnerBranchId; }
     public int getBizPartnerExpeditionId() { return mnBizPartnerExpeditionId; }
     public int getBizPartnerBranchExpeditionId() { return mnBizPartnerBranchExpeditionId; }
     public boolean getIsEmisor() { return mbIsEmisor; }
+    public boolean getIsEmisorForCce() { return mbIsEmisorForCce; }
     
     public SCfdDataAsociadoNegocios getBizPartner() {
         SDataBizPartner moBizPartner = null;
@@ -85,11 +89,12 @@ public class SDbCfdBizPartner {
                     asociadoNegocios.setBizPartnerStreet(moBizPartnerBranchAddress.getStreet());
                     asociadoNegocios.setBizPartnerStreetNumberExt(moBizPartnerBranchAddress.getStreetNumberExt());
                     asociadoNegocios.setBizPartnerStreetNumberInt(moBizPartnerBranchAddress.getStreetNumberInt());
-                    asociadoNegocios.setBizPartnerNeighborhood(moBizPartnerBranchAddress.getNeighborhood());
+                    asociadoNegocios.setBizPartnerNeighborhood(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getNeighborhood() : miClient.getSessionXXX().getParamsCompany().getXtaCfdCceEmisorColonia());
                     asociadoNegocios.setBizPartnerReference(moBizPartnerBranchAddress.getReference());
-                    asociadoNegocios.setBizPartnerLocality(moBizPartnerBranchAddress.getLocality());
-                    asociadoNegocios.setBizPartnerCounty(moBizPartnerBranchAddress.getCounty());
-                    asociadoNegocios.setBizPartnerState(moBizPartnerBranchAddress.getState());
+                    asociadoNegocios.setBizPartnerLocality(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getLocality() : miClient.getSessionXXX().getParamsCompany().getXtaCfdCceEmisorLocalidad());
+                    asociadoNegocios.setBizPartnerCounty(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getCounty() : miClient.getSessionXXX().getParamsCompany().getXtaCfdCceEmisorMunicipio());
+                    asociadoNegocios.setBizPartnerStateCode(moBizPartnerBranchAddress.getDbmsDataState().getStateCode());
+                    asociadoNegocios.setBizPartnerStateName(moBizPartnerBranchAddress.getState());
                     asociadoNegocios.setBizPartnerZipCode(moBizPartnerBranchAddress.getZipCode());
                     asociadoNegocios.setBizPartnerPoBox(moBizPartnerBranchAddress.getPoBox());
                     asociadoNegocios.setBizPartnerCountryCode(moBizPartnerBranchAddress.getDbmsDataCountry().getCountryCode());
@@ -117,14 +122,14 @@ public class SDbCfdBizPartner {
                                 asociadoNegocios.setBizPartnerExpeditionStreet(moBizPartnerBranchAddress.getStreet());
                                 asociadoNegocios.setBizPartnerExpeditionStreetNumberExt(moBizPartnerBranchAddress.getStreetNumberExt());
                                 asociadoNegocios.setBizPartnerExpeditionStreetNumberInt(moBizPartnerBranchAddress.getStreetNumberInt());
-                                asociadoNegocios.setBizPartnerExpeditionNeighborhood(moBizPartnerBranchAddress.getNeighborhood());
+                                asociadoNegocios.setBizPartnerExpeditionNeighborhood(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getNeighborhood() : miClient.getSessionXXX().getParamsCompany().getXtaCfdCceEmisorColonia());
                                 asociadoNegocios.setBizPartnerExpeditionReference(moBizPartnerBranchAddress.getReference());
-                                asociadoNegocios.setBizPartnerExpeditionLocality(moBizPartnerBranchAddress.getLocality());
-                                asociadoNegocios.setBizPartnerExpeditionCounty(moBizPartnerBranchAddress.getCounty());
-                                asociadoNegocios.setBizPartnerExpeditionState(moBizPartnerBranchAddress.getState());
+                                asociadoNegocios.setBizPartnerExpeditionLocality(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getLocality() : miClient.getSessionXXX().getParamsCompany().getXtaCfdCceEmisorLocalidad());
+                                asociadoNegocios.setBizPartnerExpeditionCounty(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getCounty() : miClient.getSessionXXX().getParamsCompany().getXtaCfdCceEmisorMunicipio());
+                                asociadoNegocios.setBizPartnerExpeditionState(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getState() : moBizPartnerBranchAddress.getDbmsDataState().getStateCode());
                                 asociadoNegocios.setBizPartnerExpeditionZipCode(moBizPartnerBranchAddress.getZipCode());
                                 asociadoNegocios.setBizPartnerExpeditionPoBox(moBizPartnerBranchAddress.getPoBox());
-                                asociadoNegocios.setBizPartnerCountryName(moBizPartnerBranchAddress.getDbmsDataCountry().getCountry());
+                                asociadoNegocios.setBizPartnerExpeditionCountryName(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getDbmsDataCountry().getCountry() : moBizPartnerBranchAddress.getDbmsDataState().getStateCode());
                             }
                         }
                     }

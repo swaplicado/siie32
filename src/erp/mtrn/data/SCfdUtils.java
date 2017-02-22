@@ -1790,10 +1790,15 @@ public abstract class SCfdUtils implements Serializable {
             }
 
             if (client.getSessionXXX().getParamsCompany().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32) {
-                params.setRegimenFiscal(SLibUtilities.textExplode(client.getSessionXXX().getParamsCompany().getFiscalSettings(), ";"));            
+                if (!dps.getDbmsDataDpsCfd().hasInternationalTradeNode()) {
+                    params.setRegimenFiscal(SLibUtilities.textExplode(client.getSessionXXX().getParamsCompany().getFiscalSettings(), ";")); 
+                }
+                else {
+                    params.setRegimenFiscal(SLibUtilities.textExplode(client.getSessionXXX().getParamsCompany().getTaxRegime(), ";"));
+                }
             }
             else if (client.getSessionXXX().getParamsCompany().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
-                params.setRegimenFiscal(SLibUtilities.textExplode(client.getSessionXXX().getParamsCompany().getTaxRegime(), ";"));            
+                params.setRegimenFiscal(SLibUtilities.textExplode(client.getSessionXXX().getParamsCompany().getTaxRegime(), ";"));
             }
 
             // Ruta:
@@ -3206,6 +3211,7 @@ public abstract class SCfdUtils implements Serializable {
     public static cfd.DElement createCfdi32RootElement(final SClientInterface client, final SCfdXml cfdXml) throws Exception {
         double dTotalImptoRetenido = 0;
         double dTotalImptoTrasladado = 0;
+        boolean hasInternationalTradeNode = false;
         SDbCfdBizPartner emisor = null;
         SDbCfdBizPartner receptor = null;
         SCfdDataAsociadoNegocios asociadoNegocios = null;
@@ -3243,16 +3249,24 @@ public abstract class SCfdUtils implements Serializable {
         comprobante.getAttTipoDeComprobante().setOption(cfdXml.getCfdTipoDeComprobante());
         comprobante.getAttMetodoDePago().setString(DCfdUtils.getFormaPagoClave(cfdXml.getCfdFormaDePago()));
 
+        cfd.DElement elementComplement = cfdXml.getCfdElementComplemento();
+
+        if (elementComplement != null) {
+            hasInternationalTradeNode = ((cfd.ver32.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior") != null;
+        }
+        
         emisor = new SDbCfdBizPartner(client);
         emisor.setBizPartnerId(cfdXml.getEmisor());
         emisor.setBizPartnerBranchId(cfdXml.getSucursalEmisor());
         emisor.setBizPartnerExpeditionId(cfdXml.getEmisor());
         emisor.setBizPartnerBranchExpeditionId(cfdXml.getSucursalEmisor());
         emisor.setIsEmisor(true);
+        emisor.setIsEmisorForCce(hasInternationalTradeNode);
 
         asociadoNegocios = emisor.getBizPartner();
         asociadoNegocios.setVersion(DCfdConsts.CFDI_VER_32);
         asociadoNegocios.setIsCfdi(true);
+        asociadoNegocios.setIsCfdiWithCce(hasInternationalTradeNode);
         asociadoNegocios.setCfdiType(cfdXml.getCfdTipoCfdXml());
 
         comprobante.setEltEmisor((cfd.ver32.DElementEmisor) asociadoNegocios.createRootElementEmisor());
@@ -3266,9 +3280,11 @@ public abstract class SCfdUtils implements Serializable {
         receptor = new SDbCfdBizPartner(client);
         receptor.setBizPartnerId(cfdXml.getReceptor());
         receptor.setBizPartnerBranchId(cfdXml.getSucursalReceptor());
+        receptor.setIsEmisorForCce(hasInternationalTradeNode);
 
         asociadoNegocios = receptor.getBizPartner();
         asociadoNegocios.setIsCfdi(true);
+        asociadoNegocios.setIsCfdiWithCce(hasInternationalTradeNode);
         asociadoNegocios.setVersion(DCfdConsts.CFDI_VER_32);
         asociadoNegocios.setCfdiType(cfdXml.getCfdTipoCfdXml());
 
@@ -3329,8 +3345,6 @@ public abstract class SCfdUtils implements Serializable {
             comprobante.getEltImpuestos().getAttTotalImpuestosTrasladados().setDouble(dTotalImptoTrasladado);
             comprobante.getEltImpuestos().setEltOpcImpuestosTrasladados(impuestosTrasladados);
         }
-
-        cfd.DElement elementComplement = cfdXml.getCfdElementComplemento();
         
         if (elementComplement != null) {
             comprobante.setEltOpcComplemento((cfd.ver32.DElementComplemento) elementComplement);
@@ -3355,6 +3369,7 @@ public abstract class SCfdUtils implements Serializable {
     public static cfd.DElement createCfdi33RootElement(final SClientInterface client, final SCfdXml cfdXml) throws Exception {
         double dTotalImptoRetenido = 0;
         double dTotalImptoTrasladado = 0;
+        boolean hasInternationalTradeNode = false;
         SDbCfdBizPartner emisor = null;
         SDbCfdBizPartner receptor = null;
         SCfdDataAsociadoNegocios asociadoNegocios = null;
@@ -3402,6 +3417,12 @@ public abstract class SCfdUtils implements Serializable {
             
             comprobante.getEltOpcCfdiRelacionados().getEltCfdiRelacionado().add(cfdiRelacionado);
         }
+
+        cfd.DElement elementComplement = cfdXml.getCfdElementComplemento();
+
+        if (elementComplement != null) {
+            hasInternationalTradeNode = ((cfd.ver32.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior") != null;
+        }
         
         emisor = new SDbCfdBizPartner(client);
         emisor.setBizPartnerId(cfdXml.getEmisor());
@@ -3409,13 +3430,19 @@ public abstract class SCfdUtils implements Serializable {
         emisor.setBizPartnerExpeditionId(cfdXml.getEmisor());
         emisor.setBizPartnerBranchExpeditionId(cfdXml.getSucursalEmisor());
         emisor.setIsEmisor(true);
+        emisor.setIsEmisorForCce(hasInternationalTradeNode);
 
         asociadoNegocios = emisor.getBizPartner();
         asociadoNegocios.setIsCfdi(true);
+        asociadoNegocios.setIsCfdiWithCce(hasInternationalTradeNode);
         asociadoNegocios.setVersion(DCfdConsts.CFDI_VER_33);
         asociadoNegocios.setCfdiType(cfdXml.getCfdTipoCfdXml());
 
         comprobante.setEltEmisor((cfd.ver33.DElementEmisor) asociadoNegocios.createRootElementEmisor());
+        
+        if (elementComplement != null && hasInternationalTradeNode) {
+            ((cfd.ver3.cce11.DElementComercioExterior) ((cfd.ver32.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior")).setEltEmisor((cfd.ver3.cce11.DElementEmisor) asociadoNegocios.createRootElementEmisorCce());
+        }
 
         for (DElement regimen : cfdXml.getCfdElementRegimenFiscal()) {
             comprobante.getEltEmisor().getAttRegimenFiscal().setString(((cfd.ver32.DElementRegimenFiscal) regimen).getAttRegimen().getString() + "");
@@ -3427,15 +3454,21 @@ public abstract class SCfdUtils implements Serializable {
         receptor = new SDbCfdBizPartner(client);
         receptor.setBizPartnerId(cfdXml.getReceptor());
         receptor.setBizPartnerBranchId(cfdXml.getSucursalReceptor());
+        receptor.setIsEmisorForCce(hasInternationalTradeNode);
 
         asociadoNegocios = receptor.getBizPartner();
         asociadoNegocios.setIsCfdi(true);
+        asociadoNegocios.setIsCfdiWithCce(hasInternationalTradeNode);
         asociadoNegocios.setVersion(DCfdConsts.CFDI_VER_33);
         asociadoNegocios.setCfdiType(cfdXml.getCfdTipoCfdXml());
 
         elementReceptor = (cfd.ver33.DElementReceptor) asociadoNegocios.createRootElementReceptor();
         
         elementReceptor.getAttUsoCFDI().setString(cfdXml.getCfdUsoCfdi());
+        
+        if (elementComplement != null && hasInternationalTradeNode) {
+            ((cfd.ver3.cce11.DElementComercioExterior) ((cfd.ver32.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior")).setEltReceptor((cfd.ver3.cce11.DElementReceptor) asociadoNegocios.createRootElementReceptorCce());
+        }
         
         comprobante.setEltReceptor(elementReceptor);
 
@@ -3472,11 +3505,9 @@ public abstract class SCfdUtils implements Serializable {
             comprobante.getEltImpuestos().getAttTotalImpuestosTraslados().setDouble(dTotalImptoTrasladado);
             comprobante.getEltImpuestos().setEltOpcImpuestosTrasladados(impuestosTrasladados);
         }
-
-        cfd.DElement elementComplement = cfdXml.getCfdElementComplemento();
         
         if (elementComplement != null) {
-            comprobante.setEltOpcComplemento((cfd.ver33.DElementComplemento) elementComplement);
+            comprobante.setEltOpcComplemento((cfd.ver32.DElementComplemento) elementComplement);
         }
 
         if (cfdXml.getCfdElementAddenda() != null) {

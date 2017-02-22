@@ -276,7 +276,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
                 mtDateStart = resultSet.getDate("bp_ct.dt_start");
                 mtDateEnd_n = resultSet.getDate("bp_ct.dt_end_n");
                 msPaymentAccount = resultSet.getString("bp_ct.pay_account");
-                msNumberExporter = resultSet.getString("bp_ct.num_exporter");
+                //msNumberExporter = resultSet.getString("bp_ct.num_exporter");
                 mbIsCreditByUser = resultSet.getBoolean("bp_ct.b_cred_usr");
                 mbIsGuaranteeInProcess = resultSet.getBoolean("bp_ct.b_garnt_prc");
                 mbIsInsuranceInProcess = resultSet.getBoolean("bp_ct.b_insur_prc");

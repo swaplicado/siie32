@@ -113,6 +113,9 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     
     protected erp.mcfg.data.SDataCfgCfd moDbmsDataCfgCfd;
     protected java.lang.String msXtaCfdUseCfdi;
+    protected java.lang.String msXtaCfdCceEmisorColonia;
+    protected java.lang.String msXtaCfdCceEmisorLocalidad;
+    protected java.lang.String msXtaCfdCceEmisorMunicipio;
 
     public SDataParamsCompany() {
         super(SDataConstants.CFG_PARAM_CO);
@@ -207,6 +210,9 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     
     public void setDbmsDataCfgCfd(erp.mcfg.data.SDataCfgCfd o) { moDbmsDataCfgCfd = o; }
     public void setXtaCfdUseCfdi(java.lang.String s) { msXtaCfdUseCfdi = s; }
+    public void setXtaCfdCceEmisorColonia(java.lang.String s) { msXtaCfdCceEmisorColonia = s; }
+    public void setXtaCfdCceEmisorLocalidad(java.lang.String s) { msXtaCfdCceEmisorLocalidad = s; }
+    public void setXtaCfdCceEmisorMunicipio(java.lang.String s) { msXtaCfdCceEmisorMunicipio = s; }
 
     public int getPkConfigCoId() { return mnPkConfigCoId; }
     public int getDaysOfGraceSupplier() { return mnDaysOfGraceSupplier; }
@@ -304,6 +310,9 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     
     public erp.mcfg.data.SDataCfgCfd getDbmsDataCfgCfd() { return moDbmsDataCfgCfd; }
     public java.lang.String getXtaCfdUseCfdi() { return msXtaCfdUseCfdi; }
+    public java.lang.String getXtaCfdCceEmisorColonia() { return msXtaCfdCceEmisorColonia; }
+    public java.lang.String getXtaCfdCceEmisorLocalidad() { return msXtaCfdCceEmisorLocalidad; }
+    public java.lang.String getXtaCfdCceEmisorMunicipio() { return msXtaCfdCceEmisorMunicipio; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -410,6 +419,9 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
         
         moDbmsDataCfgCfd = null;
         msXtaCfdUseCfdi = "";
+        msXtaCfdCceEmisorColonia = "";
+        msXtaCfdCceEmisorLocalidad = "";
+        msXtaCfdCceEmisorMunicipio = "";
     }
 
     @Override
@@ -558,6 +570,9 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                 }
                 else {
                     msXtaCfdUseCfdi = moDbmsDataCfgCfd.getCfdUsoCfdi();
+                    msXtaCfdCceEmisorColonia = moDbmsDataCfgCfd.getCfdCceEmisorColonia();
+                    msXtaCfdCceEmisorLocalidad = moDbmsDataCfgCfd.getCfdCceEmisorLocalidad();
+                    msXtaCfdCceEmisorMunicipio = moDbmsDataCfgCfd.getCfdCceEmisorMunicipio();
                 }
 
                 mbIsRegistryNew = false;
