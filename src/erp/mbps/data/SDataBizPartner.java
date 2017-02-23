@@ -198,6 +198,12 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
 
         return hq;
     }
+    
+    public boolean isDomestic(SClientInterface client) {
+        int country = getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n();
+        
+        return country != SLibConstants.UNDEFINED && !client.getSession().getSessionCustom().isLocalCountry(new int[] { country });
+    }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
