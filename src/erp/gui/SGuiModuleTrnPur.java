@@ -52,6 +52,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
 
@@ -887,36 +888,34 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
 
             // Additional configuration, if applies:
 
+            int[] type = null;
+            
             switch (formType) {
                 case SDataConstants.TRN_DPS:
                     miForm.setValue(SDataConstants.USRS_TP_LEV, mnCurrentUserPrivilegeLevel);
 
                     if (moFormComplement != null) {
                         if (moFormComplement instanceof int[]) {
-                            // Complement has document type:
+                            // form complement contains: document type as int[]:
 
-                            miForm.setValue(SLibConstants.VALUE_TYPE, moFormComplement);
-                            miForm.setValue(SLibConstants.VALUE_STATUS, false);     // editable status
-                            miForm.setValue(SLibConstants.VALUE_CURRENCY_LOCAL, false);     // convert local currency DPS
+                            type = (int[]) moFormComplement;
+                            miForm.setValue(SLibConstants.VALUE_TYPE, type);            // document type as int[]
+                            miForm.setValue(SLibConstants.VALUE_STATUS, false);         // editable status
+                            miForm.setValue(SLibConstants.VALUE_CURRENCY_LOCAL, false); // convert local currency DPS
                         }
                         else if (moFormComplement instanceof Object[]) {
-                            // Complement has document type and a reference document to import entries:
+                            // form complement contains: document type and a source document to import entries:
 
-                            miForm.setValue(SLibConstants.VALUE_TYPE, ((Object[]) moFormComplement)[0]);    // int[]
+                            type = (int[]) ((Object[]) moFormComplement)[0];
+                            miForm.setValue(SLibConstants.VALUE_TYPE, type);            // document type as int[]
 
                             if (((Object[]) moFormComplement).length >= 2) {
                                 if (((Object[]) moFormComplement)[1] instanceof Boolean) {
                                     miForm.setValue(SLibConstants.VALUE_STATUS, ((Object[]) moFormComplement)[1]);
                                 }
                                 else if (((Object[]) moFormComplement)[1] instanceof SDataDps) {
-                                    if (SLibUtilities.compareKeys(((Object[]) moFormComplement)[0], SDataConstantsSys.TRNU_TP_DPS_PUR_ORD)) {
-                                        miForm.setValue(SDataConstantsSys.TRNX_TP_DPS_EST, ((Object[]) moFormComplement)[1]);
-                                    }
-                                    else if (SLibUtilities.compareKeys(((Object[]) moFormComplement)[0], SDataConstantsSys.TRNU_TP_DPS_PUR_INV)) {
-                                        miForm.setValue(SDataConstantsSys.TRNX_TP_DPS_ORD, ((Object[]) moFormComplement)[1]);
-                                    }
-                                    else if (SLibUtilities.compareKeys(((Object[]) moFormComplement)[0], SDataConstantsSys.TRNU_TP_DPS_PUR_CN)) {
-                                        miForm.setValue(SDataConstantsSys.TRNX_TP_DPS_DOC, ((Object[]) moFormComplement)[1]);
+                                    if (SLibUtils.belongsTo(type, new int[][] { SDataConstantsSys.TRNU_TP_DPS_PUR_ORD, SDataConstantsSys.TRNU_TP_DPS_PUR_INV, SDataConstantsSys.TRNU_TP_DPS_PUR_CN })) {
+                                        miForm.setValue(SDataConstants.TRN_DPS, ((Object[]) moFormComplement)[1]);
                                     }
                                 }
                             }
