@@ -2118,26 +2118,24 @@ public abstract class SDataUtilities {
     }
 
     /**
-     * Obtain if bizPartner is blocked:
+     * Checks if business partner is blocked.
      *
-     * @param client SClientInterface.
-     * @param pnBizPartnedId BizPartner Id
-     * @param pnBizPartnerCategoryId Category bizPartner Id.
-     * @return boolean if bizPartner is blocked
+     * @param client ERP Client interface.
+     * @param idBizPartner Business partner primary key.
+     * @param idBizPartnerCategory Business partner's category primary key.
+     * @return <code>true</code> if business partner is blocked.
      */
     @SuppressWarnings("unchecked")
-    public static boolean obtainIsBizPartnerBlocked(erp.client.SClientInterface client, int nBizPartnerId, int nBizPartnerCategoryId) throws java.lang.Exception {
+    public static boolean obtainIsBizPartnerBlocked(erp.client.SClientInterface client, int idBizPartner, int idBizPartnerCategory) throws java.lang.Exception {
         boolean blocked = false;
         String sql = "";
         ResultSet resultSet = null;
 
-        sql = "SELECT b_block FROM trn_bp_block WHERE id_bp = " + nBizPartnerId + " AND id_ct_bp = " + nBizPartnerCategoryId + " AND b_del = 0 ";
+        sql = "SELECT b_block FROM trn_bp_block WHERE id_bp = " + idBizPartner + " AND id_ct_bp = " + idBizPartnerCategory + " AND NOT b_del ";
 
         resultSet = client.getSession().getStatement().executeQuery(sql);
         if (resultSet.next()) {
-            if (resultSet.getObject("b_block") != null) {
-                blocked = resultSet.getBoolean("b_block");
-            }
+            blocked = resultSet.getBoolean("b_block");
         }
 
         return blocked;
