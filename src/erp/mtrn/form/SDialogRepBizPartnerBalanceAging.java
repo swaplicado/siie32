@@ -294,7 +294,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
 
         jPanel106.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlAnalyst.setText("Analista asociado negocios:");
+        jlAnalyst.setText("Analista AN:");
         jlAnalyst.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel106.add(jlAnalyst);
 
