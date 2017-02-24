@@ -1394,7 +1394,7 @@ public abstract class SDataReadComponentItems {
                 else {
                     sql += " ORDER BY id_tp_pay_sys  ";
                 }
-                text = "tipo de método de pago";
+                text = "forma de pago";
                 break;
             case SDataConstants.TRNS_TP_LINK:
                 lenPk = 1;

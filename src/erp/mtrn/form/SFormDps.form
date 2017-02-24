@@ -852,33 +852,6 @@
                         </Component>
                       </SubComponents>
                     </Container>
-                    <Container class="javax.swing.JPanel" name="jPanel92">
-
-                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                        <Property name="alignment" type="int" value="0"/>
-                        <Property name="verticalGap" type="int" value="0"/>
-                      </Layout>
-                      <SubComponents>
-                        <Component class="javax.swing.JLabel" name="jlFkFunctionalArea">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" value="&#xc1;rea funcional: *"/>
-                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[100, 23]"/>
-                            </Property>
-                          </Properties>
-                        </Component>
-                        <Component class="javax.swing.JComboBox" name="jcbFkFunctionalArea">
-                          <Properties>
-                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[150, 23]"/>
-                            </Property>
-                          </Properties>
-                          <AuxValues>
-                            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
-                          </AuxValues>
-                        </Component>
-                      </SubComponents>
-                    </Container>
                     <Container class="javax.swing.JPanel" name="jPanel33">
 
                       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
@@ -895,6 +868,33 @@
                           </Properties>
                         </Component>
                         <Component class="javax.swing.JComboBox" name="jcbFkDpsNatureId">
+                          <Properties>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[150, 23]"/>
+                            </Property>
+                          </Properties>
+                          <AuxValues>
+                            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+                          </AuxValues>
+                        </Component>
+                      </SubComponents>
+                    </Container>
+                    <Container class="javax.swing.JPanel" name="jPanel92">
+
+                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                        <Property name="alignment" type="int" value="0"/>
+                        <Property name="verticalGap" type="int" value="0"/>
+                      </Layout>
+                      <SubComponents>
+                        <Component class="javax.swing.JLabel" name="jlFkFunctionalArea">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="&#xc1;rea funcional: *"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[100, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JComboBox" name="jcbFkFunctionalArea">
                           <Properties>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[150, 23]"/>
@@ -2321,6 +2321,115 @@
                         <Property name="verticalGap" type="int" value="1"/>
                       </Layout>
                       <SubComponents>
+                        <Container class="javax.swing.JPanel" name="jPanel50">
+                          <Properties>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[23, 23]"/>
+                            </Property>
+                          </Properties>
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="horizontalGap" type="int" value="2"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlFkIncotermId">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Incoterm: *"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[125, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JComboBox" name="jcbFkIncotermId">
+                              <Properties>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[200, 23]"/>
+                                </Property>
+                              </Properties>
+                              <AuxValues>
+                                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+                              </AuxValues>
+                            </Component>
+                            <Component class="javax.swing.JButton" name="jbFkIncotermId">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="..."/>
+                                <Property name="toolTipText" type="java.lang.String" value="Seleccionar Incoterm"/>
+                                <Property name="focusable" type="boolean" value="false"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[23, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel84">
+                          <Properties>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[23, 23]"/>
+                            </Property>
+                          </Properties>
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="horizontalGap" type="int" value="2"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlFkSpotSrcId_n">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Origen:"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[125, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JComboBox" name="jcbFkSpotSrcId_n">
+                              <Properties>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[200, 23]"/>
+                                </Property>
+                              </Properties>
+                              <AuxValues>
+                                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+                              </AuxValues>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel85">
+                          <Properties>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[23, 23]"/>
+                            </Property>
+                          </Properties>
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="horizontalGap" type="int" value="2"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlFkSpotDesId_n">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Destino:"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[125, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JComboBox" name="jcbFkSpotDesId_n">
+                              <Properties>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[200, 23]"/>
+                                </Property>
+                              </Properties>
+                              <AuxValues>
+                                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+                              </AuxValues>
+                            </Component>
+                          </SubComponents>
+                        </Container>
                         <Container class="javax.swing.JPanel" name="jPanel51">
                           <Properties>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -2336,7 +2445,7 @@
                           <SubComponents>
                             <Component class="javax.swing.JLabel" name="jlFkModeOfTransportationTypeId">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="Tipo modo transp.:*"/>
+                                <Property name="text" type="java.lang.String" value="Tipo modo transp.: *"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[125, 23]"/>
                                 </Property>
@@ -2379,7 +2488,7 @@
                           <SubComponents>
                             <Component class="javax.swing.JLabel" name="jlFkCarrierTypeId">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="Tipo transportista:*"/>
+                                <Property name="text" type="java.lang.String" value="Tipo transportista: *"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[125, 23]"/>
                                 </Property>
@@ -2684,8 +2793,8 @@
             <Container class="javax.swing.JPanel" name="jpAddendaData">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                  <JTabbedPaneConstraints tabName="Datos CFD">
-                    <Property name="tabTitle" type="java.lang.String" value="Datos CFD"/>
+                  <JTabbedPaneConstraints tabName="CFD: addenda y XML">
+                    <Property name="tabTitle" type="java.lang.String" value="CFD: addenda y XML"/>
                   </JTabbedPaneConstraints>
                 </Constraint>
               </Constraints>
@@ -2696,7 +2805,7 @@
                   <Properties>
                     <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                       <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                        <TitledBorder title="Informaci&#xf3;n para addenda:"/>
+                        <TitledBorder title="Addenda:"/>
                       </Border>
                     </Property>
                   </Properties>
@@ -2784,7 +2893,7 @@
                               <SubComponents>
                                 <Component class="javax.swing.JLabel" name="jlCfdAddendaSubtypeId">
                                   <Properties>
-                                    <Property name="text" type="java.lang.String" value="Subtipo addenda:*"/>
+                                    <Property name="text" type="java.lang.String" value="Subtipo addenda: *"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                       <Dimension value="[125, 23]"/>
                                     </Property>
@@ -3136,7 +3245,7 @@
                               <SubComponents>
                                 <Component class="javax.swing.JLabel" name="jlNumberNoteIn">
                                   <Properties>
-                                    <Property name="text" type="java.lang.String" value="Fol. nota entada:*"/>
+                                    <Property name="text" type="java.lang.String" value="Fol. nota entada: *"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                       <Dimension value="[100, 23]"/>
                                     </Property>
@@ -3163,7 +3272,7 @@
                   <Properties>
                     <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                       <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                        <TitledBorder title="Datos XML:"/>
+                        <TitledBorder title="XML:"/>
                       </Border>
                     </Property>
                   </Properties>
@@ -3300,434 +3409,321 @@
               </SubComponents>
             </Container>
             <Container class="javax.swing.JPanel" name="jpInternationalTrade">
+              <Properties>
+                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                  <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                    <TitledBorder title="Comercio exterior:"/>
+                  </Border>
+                </Property>
+              </Properties>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                  <JTabbedPaneConstraints tabName="Comercio exterior">
-                    <Property name="tabTitle" type="java.lang.String" value="Comercio exterior"/>
+                  <JTabbedPaneConstraints tabName="CFD: comercio exterior">
+                    <Property name="tabTitle" type="java.lang.String" value="CFD: comercio exterior"/>
                   </JTabbedPaneConstraints>
                 </Constraint>
               </Constraints>
 
-              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+                <Property name="columns" type="int" value="2"/>
+                <Property name="rows" type="int" value="1"/>
+              </Layout>
               <SubComponents>
-                <Container class="javax.swing.JPanel" name="jPanel107">
-                  <Constraints>
-                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-                      <BorderConstraints direction="North"/>
-                    </Constraint>
-                  </Constraints>
+                <Container class="javax.swing.JPanel" name="jPanel109">
 
-                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
-                    <Property name="columns" type="int" value="2"/>
-                    <Property name="rows" type="int" value="1"/>
-                  </Layout>
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
                   <SubComponents>
-                    <Container class="javax.swing.JPanel" name="jPanel105">
+                    <Container class="javax.swing.JPanel" name="jPanel97">
+                      <Constraints>
+                        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                          <BorderConstraints direction="North"/>
+                        </Constraint>
+                      </Constraints>
 
                       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
-                        <Property name="columns" type="int" value="2"/>
-                        <Property name="rows" type="int" value="1"/>
+                        <Property name="columns" type="int" value="1"/>
+                        <Property name="rows" type="int" value="6"/>
+                        <Property name="verticalGap" type="int" value="2"/>
                       </Layout>
                       <SubComponents>
-                        <Container class="javax.swing.JPanel" name="jPanel97">
+                        <Container class="javax.swing.JPanel" name="jPanel98">
+                          <Properties>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[23, 23]"/>
+                            </Property>
+                          </Properties>
 
-                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
-                            <Property name="columns" type="int" value="1"/>
-                            <Property name="rows" type="int" value="10"/>
-                            <Property name="verticalGap" type="int" value="2"/>
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="horizontalGap" type="int" value="2"/>
+                            <Property name="verticalGap" type="int" value="0"/>
                           </Layout>
                           <SubComponents>
-                            <Container class="javax.swing.JPanel" name="jPanel50">
+                            <Component class="javax.swing.JLabel" name="jlCfdCceReasonTransfer">
                               <Properties>
+                                <Property name="text" type="java.lang.String" value="Motivo de traslado:"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[23, 23]"/>
+                                  <Dimension value="[150, 23]"/>
                                 </Property>
                               </Properties>
-
-                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                                <Property name="alignment" type="int" value="0"/>
-                                <Property name="horizontalGap" type="int" value="2"/>
-                                <Property name="verticalGap" type="int" value="0"/>
-                              </Layout>
-                              <SubComponents>
-                                <Component class="javax.swing.JLabel" name="jlFkIncotermId">
-                                  <Properties>
-                                    <Property name="text" type="java.lang.String" value="Incoterm:*"/>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[150, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                </Component>
-                                <Component class="javax.swing.JComboBox" name="jcbFkIncotermId">
-                                  <Properties>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[200, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                  <AuxValues>
-                                    <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
-                                  </AuxValues>
-                                </Component>
-                                <Component class="javax.swing.JButton" name="jbFkIncotermId">
-                                  <Properties>
-                                    <Property name="text" type="java.lang.String" value="..."/>
-                                    <Property name="toolTipText" type="java.lang.String" value="Seleccionar Incoterm"/>
-                                    <Property name="focusable" type="boolean" value="false"/>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[23, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                </Component>
-                              </SubComponents>
-                            </Container>
-                            <Container class="javax.swing.JPanel" name="jPanel84">
+                            </Component>
+                            <Component class="javax.swing.JComboBox" name="jcbCfdCceReasonTransfer">
                               <Properties>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[23, 23]"/>
+                                  <Dimension value="[200, 23]"/>
                                 </Property>
                               </Properties>
-
-                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                                <Property name="alignment" type="int" value="0"/>
-                                <Property name="horizontalGap" type="int" value="2"/>
-                                <Property name="verticalGap" type="int" value="0"/>
-                              </Layout>
-                              <SubComponents>
-                                <Component class="javax.swing.JLabel" name="jlFkSpotSrcId_n">
-                                  <Properties>
-                                    <Property name="text" type="java.lang.String" value="Origen:"/>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[150, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                </Component>
-                                <Component class="javax.swing.JComboBox" name="jcbFkSpotSrcId_n">
-                                  <Properties>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[200, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                  <AuxValues>
-                                    <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
-                                  </AuxValues>
-                                </Component>
-                              </SubComponents>
-                            </Container>
-                            <Container class="javax.swing.JPanel" name="jPanel85">
-                              <Properties>
-                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[23, 23]"/>
-                                </Property>
-                              </Properties>
-
-                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                                <Property name="alignment" type="int" value="0"/>
-                                <Property name="horizontalGap" type="int" value="2"/>
-                                <Property name="verticalGap" type="int" value="0"/>
-                              </Layout>
-                              <SubComponents>
-                                <Component class="javax.swing.JLabel" name="jlFkSpotDesId_n">
-                                  <Properties>
-                                    <Property name="text" type="java.lang.String" value="Destino:"/>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[150, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                </Component>
-                                <Component class="javax.swing.JComboBox" name="jcbFkSpotDesId_n">
-                                  <Properties>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[200, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                  <AuxValues>
-                                    <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
-                                  </AuxValues>
-                                </Component>
-                              </SubComponents>
-                            </Container>
-                            <Container class="javax.swing.JPanel" name="jPanel98">
-                              <Properties>
-                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[23, 23]"/>
-                                </Property>
-                              </Properties>
-
-                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                                <Property name="alignment" type="int" value="0"/>
-                                <Property name="horizontalGap" type="int" value="2"/>
-                                <Property name="verticalGap" type="int" value="0"/>
-                              </Layout>
-                              <SubComponents>
-                                <Component class="javax.swing.JLabel" name="jlCfdCceReasonTransfer">
-                                  <Properties>
-                                    <Property name="text" type="java.lang.String" value="Motivo de traslado:"/>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[150, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                </Component>
-                                <Component class="javax.swing.JComboBox" name="jcbCfdCceReasonTransfer">
-                                  <Properties>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[200, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                  <AuxValues>
-                                    <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
-                                  </AuxValues>
-                                </Component>
-                              </SubComponents>
-                            </Container>
-                            <Container class="javax.swing.JPanel" name="jPanel99">
-                              <Properties>
-                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[23, 23]"/>
-                                </Property>
-                              </Properties>
-
-                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                                <Property name="alignment" type="int" value="0"/>
-                                <Property name="horizontalGap" type="int" value="2"/>
-                                <Property name="verticalGap" type="int" value="0"/>
-                              </Layout>
-                              <SubComponents>
-                                <Component class="javax.swing.JLabel" name="jlCfdCceOperationType">
-                                  <Properties>
-                                    <Property name="text" type="java.lang.String" value="Tipo operaci&#xf3;n:"/>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[150, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                </Component>
-                                <Component class="javax.swing.JComboBox" name="jcbCfdCceOperationType">
-                                  <Properties>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[200, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                  <AuxValues>
-                                    <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
-                                  </AuxValues>
-                                </Component>
-                              </SubComponents>
-                            </Container>
-                            <Container class="javax.swing.JPanel" name="jPanel100">
-                              <Properties>
-                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[23, 23]"/>
-                                </Property>
-                              </Properties>
-
-                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                                <Property name="alignment" type="int" value="0"/>
-                                <Property name="horizontalGap" type="int" value="2"/>
-                                <Property name="verticalGap" type="int" value="0"/>
-                              </Layout>
-                              <SubComponents>
-                                <Component class="javax.swing.JLabel" name="jlCfdCceNumberImportRequest">
-                                  <Properties>
-                                    <Property name="text" type="java.lang.String" value="Clave de pedimento:"/>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[150, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                </Component>
-                                <Component class="javax.swing.JComboBox" name="jcbCfdCceNumberImportRequest">
-                                  <Properties>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[200, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                  <AuxValues>
-                                    <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
-                                  </AuxValues>
-                                </Component>
-                              </SubComponents>
-                            </Container>
-                            <Container class="javax.swing.JPanel" name="jPanel101">
-                              <Properties>
-                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[23, 23]"/>
-                                </Property>
-                              </Properties>
-
-                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                                <Property name="alignment" type="int" value="0"/>
-                                <Property name="horizontalGap" type="int" value="2"/>
-                                <Property name="verticalGap" type="int" value="0"/>
-                              </Layout>
-                              <SubComponents>
-                                <Component class="javax.swing.JLabel" name="jlCfdCceCertificateOrigin">
-                                  <Properties>
-                                    <Property name="text" type="java.lang.String" value="Certificado origen:"/>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[150, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                </Component>
-                                <Component class="javax.swing.JTextField" name="jtfCfdCceCertificateOrigin">
-                                  <Properties>
-                                    <Property name="text" type="java.lang.String" value="ABC000ABC000"/>
-                                    <Property name="toolTipText" type="java.lang.String" value="Referencia"/>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[125, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                </Component>
-                              </SubComponents>
-                            </Container>
-                            <Container class="javax.swing.JPanel" name="jPanel102">
-                              <Properties>
-                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[23, 23]"/>
-                                </Property>
-                              </Properties>
-
-                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                                <Property name="alignment" type="int" value="0"/>
-                                <Property name="horizontalGap" type="int" value="2"/>
-                                <Property name="verticalGap" type="int" value="0"/>
-                              </Layout>
-                              <SubComponents>
-                                <Component class="javax.swing.JLabel" name="jlCfdCceNumberCertificateOrigin">
-                                  <Properties>
-                                    <Property name="text" type="java.lang.String" value="N&#xfa;mero certificado origen:"/>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[150, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                </Component>
-                                <Component class="javax.swing.JTextField" name="jtfCfdCceNumberCertificateOrigin">
-                                  <Properties>
-                                    <Property name="text" type="java.lang.String" value="ABC000ABC000"/>
-                                    <Property name="toolTipText" type="java.lang.String" value="Referencia"/>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[125, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                </Component>
-                              </SubComponents>
-                            </Container>
-                            <Container class="javax.swing.JPanel" name="jPanel108">
-                              <Properties>
-                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[23, 23]"/>
-                                </Property>
-                              </Properties>
-
-                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                                <Property name="alignment" type="int" value="0"/>
-                                <Property name="horizontalGap" type="int" value="2"/>
-                                <Property name="verticalGap" type="int" value="0"/>
-                              </Layout>
-                              <SubComponents>
-                                <Component class="javax.swing.JLabel" name="jlCfdCceSubdivision">
-                                  <Properties>
-                                    <Property name="text" type="java.lang.String" value="Subdivisi&#xf3;n:"/>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[150, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                </Component>
-                                <Component class="javax.swing.JTextField" name="jtfCfdCceSubdivision">
-                                  <Properties>
-                                    <Property name="text" type="java.lang.String" value="ABC000ABC000"/>
-                                    <Property name="toolTipText" type="java.lang.String" value="Referencia"/>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[125, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                </Component>
-                              </SubComponents>
-                            </Container>
-                            <Container class="javax.swing.JPanel" name="jPanel106">
-                              <Properties>
-                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[23, 23]"/>
-                                </Property>
-                              </Properties>
-
-                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                                <Property name="alignment" type="int" value="0"/>
-                                <Property name="horizontalGap" type="int" value="2"/>
-                                <Property name="verticalGap" type="int" value="0"/>
-                              </Layout>
-                            </Container>
+                              <AuxValues>
+                                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+                              </AuxValues>
+                            </Component>
                           </SubComponents>
                         </Container>
-                        <Container class="javax.swing.JPanel" name="jPanel96">
+                        <Container class="javax.swing.JPanel" name="jPanel99">
+                          <Properties>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[23, 23]"/>
+                            </Property>
+                          </Properties>
 
-                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
-                            <Property name="columns" type="int" value="1"/>
-                            <Property name="rows" type="int" value="10"/>
-                            <Property name="verticalGap" type="int" value="2"/>
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="horizontalGap" type="int" value="2"/>
+                            <Property name="verticalGap" type="int" value="0"/>
                           </Layout>
                           <SubComponents>
-                            <Container class="javax.swing.JPanel" name="jPanel103">
+                            <Component class="javax.swing.JLabel" name="jlCfdCceOperationType">
                               <Properties>
+                                <Property name="text" type="java.lang.String" value="Tipo operaci&#xf3;n:"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[23, 23]"/>
+                                  <Dimension value="[150, 23]"/>
                                 </Property>
                               </Properties>
-
-                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                                <Property name="alignment" type="int" value="0"/>
-                                <Property name="horizontalGap" type="int" value="2"/>
-                                <Property name="verticalGap" type="int" value="0"/>
-                              </Layout>
-                              <SubComponents>
-                                <Component class="javax.swing.JLabel" name="jlCfdCceExchangeRateUSD">
-                                  <Properties>
-                                    <Property name="text" type="java.lang.String" value="Tipo de cambio USD:"/>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[150, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                </Component>
-                                <Component class="javax.swing.JTextField" name="jtfCfdCceExchangeRateUSD">
-                                  <Properties>
-                                    <Property name="horizontalAlignment" type="int" value="11"/>
-                                    <Property name="text" type="java.lang.String" value="0.0000"/>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[125, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                </Component>
-                              </SubComponents>
-                            </Container>
-                            <Container class="javax.swing.JPanel" name="jPanel104">
+                            </Component>
+                            <Component class="javax.swing.JComboBox" name="jcbCfdCceOperationType">
                               <Properties>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[23, 23]"/>
+                                  <Dimension value="[200, 23]"/>
                                 </Property>
                               </Properties>
+                              <AuxValues>
+                                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+                              </AuxValues>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel100">
+                          <Properties>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[23, 23]"/>
+                            </Property>
+                          </Properties>
 
-                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                                <Property name="alignment" type="int" value="0"/>
-                                <Property name="horizontalGap" type="int" value="2"/>
-                                <Property name="verticalGap" type="int" value="0"/>
-                              </Layout>
-                              <SubComponents>
-                                <Component class="javax.swing.JLabel" name="jlCfdCceTotalUSD">
-                                  <Properties>
-                                    <Property name="text" type="java.lang.String" value="Total USD:"/>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[150, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                </Component>
-                                <Component class="javax.swing.JTextField" name="jtfCfdCceTotalUSD">
-                                  <Properties>
-                                    <Property name="horizontalAlignment" type="int" value="11"/>
-                                    <Property name="text" type="java.lang.String" value="0,000,000,000.00"/>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[125, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                </Component>
-                              </SubComponents>
-                            </Container>
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="horizontalGap" type="int" value="2"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlCfdCceNumberImportRequest">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Clave de pedimento:"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[150, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JComboBox" name="jcbCfdCceNumberImportRequest">
+                              <Properties>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[200, 23]"/>
+                                </Property>
+                              </Properties>
+                              <AuxValues>
+                                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+                              </AuxValues>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel101">
+                          <Properties>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[23, 23]"/>
+                            </Property>
+                          </Properties>
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="horizontalGap" type="int" value="2"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlCfdCceCertificateOrigin">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Certificado origen:"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[150, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JTextField" name="jtfCfdCceCertificateOrigin">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="ABC000ABC000"/>
+                                <Property name="toolTipText" type="java.lang.String" value="Referencia"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[125, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel102">
+                          <Properties>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[23, 23]"/>
+                            </Property>
+                          </Properties>
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="horizontalGap" type="int" value="2"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlCfdCceNumberCertificateOrigin">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="N&#xfa;mero certificado origen:"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[150, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JTextField" name="jtfCfdCceNumberCertificateOrigin">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="ABC000ABC000"/>
+                                <Property name="toolTipText" type="java.lang.String" value="Referencia"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[125, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel108">
+                          <Properties>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[23, 23]"/>
+                            </Property>
+                          </Properties>
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="horizontalGap" type="int" value="2"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlCfdCceSubdivision">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Subdivisi&#xf3;n:"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[150, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JTextField" name="jtfCfdCceSubdivision">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="ABC000ABC000"/>
+                                <Property name="toolTipText" type="java.lang.String" value="Referencia"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[125, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                      </SubComponents>
+                    </Container>
+                  </SubComponents>
+                </Container>
+                <Container class="javax.swing.JPanel" name="jPanel110">
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+                  <SubComponents>
+                    <Container class="javax.swing.JPanel" name="jPanel96">
+                      <Constraints>
+                        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                          <BorderConstraints direction="North"/>
+                        </Constraint>
+                      </Constraints>
+
+                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+                        <Property name="columns" type="int" value="1"/>
+                        <Property name="rows" type="int" value="2"/>
+                        <Property name="verticalGap" type="int" value="2"/>
+                      </Layout>
+                      <SubComponents>
+                        <Container class="javax.swing.JPanel" name="jPanel103">
+                          <Properties>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[23, 23]"/>
+                            </Property>
+                          </Properties>
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="horizontalGap" type="int" value="2"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlCfdCceExchangeRateUsd">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Tipo de cambio USD:"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[150, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JTextField" name="jtfCfdCceExchangeRateUsd">
+                              <Properties>
+                                <Property name="horizontalAlignment" type="int" value="11"/>
+                                <Property name="text" type="java.lang.String" value="0.0000"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[125, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel104">
+                          <Properties>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[23, 23]"/>
+                            </Property>
+                          </Properties>
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="horizontalGap" type="int" value="2"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlCfdCceTotalUsd">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Total USD:"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[150, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JTextField" name="jtfCfdCceTotalUsd">
+                              <Properties>
+                                <Property name="horizontalAlignment" type="int" value="11"/>
+                                <Property name="text" type="java.lang.String" value="0,000,000,000.00"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[125, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
                           </SubComponents>
                         </Container>
                       </SubComponents>

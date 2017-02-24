@@ -52,7 +52,7 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
     protected java.util.Vector<erp.mbps.data.SDataBizPartnerBranchBankAccount> mvDbmsBizPartnerBranchBankAccounts;
     protected java.util.Vector<erp.mbps.data.SDataBizPartnerBranchContact> mvDbmsBizPartnerBranchContacts;
     protected java.util.Vector<erp.mbps.data.SDataBizPartnerBranchNote> mvDbmsBizPartnerBranchNotes;
-    protected java.util.Vector<erp.mmkt.data.SDataCustomerBranchConfig> mvDbmsCustomerBranchConfig;
+    protected java.util.Vector<erp.mmkt.data.SDataCustomerBranchConfig> mvDbmsCustomerBranchConfig; // it should be only one configuration registry per branch
     protected java.util.Vector<erp.lib.form.SFormComponentItem> mvDnsForDps;
     protected java.util.Vector<erp.lib.form.SFormComponentItem> mvDnsForDiog;
 
@@ -329,7 +329,6 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
                         "ORDER BY bpb.bpb, bp.bp ";
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
-
                     dataCustomerConfigBranch = new SDataCustomerBranchConfig();
                     if (dataCustomerConfigBranch.read(new int[] { resultSet.getInt("cusb.id_cusb") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
