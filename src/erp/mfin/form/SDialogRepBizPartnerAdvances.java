@@ -317,7 +317,7 @@ public class SDialogRepBizPartnerAdvances extends javax.swing.JDialog implements
             map.put("nYear", year);
             map.put("nPeriod", period);
             map.put("sDate", SLibUtils.DateFormatDate.format(moFieldDate.getDate()));
-            map.put("nBIZ_PARTNER_CUS", SDataConstantsSys.BPSS_CT_BP_CUS);
+            map.put("nBizPartnerCus", SDataConstantsSys.BPSS_CT_BP_CUS);
             map.put("nBizPartnerType", mnBizPartnerCategoryId);
             map.put("sBizPartnerType", mnBizPartnerCategoryId  == SDataConstantsSys.BPSS_CT_BP_CUS ? "CLIENTES" : "PROVEEDORES");
             map.put("nClassSysMovF", mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_CL_SYS_MOV_SAL : SModSysConsts.FINS_CL_SYS_MOV_PUR);
