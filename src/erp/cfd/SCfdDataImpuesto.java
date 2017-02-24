@@ -51,12 +51,16 @@ public class SCfdDataImpuesto {
      * @return Node
      * @throws Exception 
      */
-    public cfd.DElement createRootElementConceptoImpuesto() throws Exception {
+    public cfd.DElement createRootElementConceptoImpuesto33() throws Exception {
         cfd.DElement impuesto = null;
         
         switch (mnImpuestoBasico) {
             case SModSysConsts.FINS_TP_TAX_RETAINED:
                 cfd.ver33.DElementConceptoImpuestoRetencion conceptoImpuestoRetencion = new cfd.ver33.DElementConceptoImpuestoRetencion();
+                
+                if (msTipoFactor.compareTo(msTipoFactor) == 0) {
+                    throw new Exception("Error al generar el nodo impuesto 'retenido' el tipo de factor debe ser distinto de exento.");
+                }
                 
                 conceptoImpuestoRetencion.getAttBase().setDouble(mdBase);
                 conceptoImpuestoRetencion.getAttImpuesto().setString(msImpuestoClave);
@@ -72,8 +76,10 @@ public class SCfdDataImpuesto {
                 conceptoImpuestoTraslado.getAttBase().setDouble(mdBase);
                 conceptoImpuestoTraslado.getAttImpuesto().setString(msImpuestoClave);
                 conceptoImpuestoTraslado.getAttTipoFactor().setString(msTipoFactor);
-                conceptoImpuestoTraslado.getAttTasaOCuota().setDouble(mdTasa);
-                conceptoImpuestoTraslado.getAttImporte().setDouble(mdImporte);
+                if (msTipoFactor.compareTo(msTipoFactor) == 0) {
+                    conceptoImpuestoTraslado.getAttTasaOCuota().setDouble(mdTasa);
+                    conceptoImpuestoTraslado.getAttImporte().setDouble(mdImporte);
+                }
                 
                 impuesto = conceptoImpuestoTraslado;
                 break;
@@ -89,7 +95,7 @@ public class SCfdDataImpuesto {
      * @return Node
      * @throws Exception 
      */
-    public cfd.DElement createRootElementImpuesto() throws Exception {
+    public cfd.DElement createRootElementImpuesto33() throws Exception {
         cfd.DElement impuesto = null;
         
         switch (mnImpuestoBasico) {

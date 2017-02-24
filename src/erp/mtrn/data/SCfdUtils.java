@@ -1117,10 +1117,10 @@ public abstract class SCfdUtils implements Serializable {
                         createSignCancelLog(client, "", !isValidate ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_SEND_RECEIVE, cfd, pac.getPkPacId());
 
                         if (isValidate) {
-                            acuseRecepcionCFDI = port.stamped(sCfdi.getBytes("UTF-8"), "jbarajas@tron.com.mx", "WSfink_2014");
+                            acuseRecepcionCFDI = port.stamped(sCfdi.getBytes("UTF-8"), "jbarajas@swaplicado.com.mx", "WSfink_2017");
                         }
                         else {
-                            acuseRecepcionCFDI = port.stamp(sCfdi.getBytes("UTF-8"), "jbarajas@tron.com.mx", "WSfink_2014");
+                            acuseRecepcionCFDI = port.stamp(sCfdi.getBytes("UTF-8"), "jbarajas@swaplicado.com.mx", "WSfink_2017");
                         }
 
                         maoIncidencias = acuseRecepcionCFDI.getIncidencias();
@@ -3292,6 +3292,10 @@ public abstract class SCfdUtils implements Serializable {
         asociadoNegocios.setCfdiType(cfdXml.getCfdTipoCfdXml());
 
         comprobante.setEltReceptor((cfd.ver32.DElementReceptor) asociadoNegocios.createRootElementReceptor());
+        
+        if (elementComplement != null && hasInternationalTradeNode) {
+            ((cfd.ver3.cce11.DElementComercioExterior) ((cfd.ver32.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior")).setEltReceptor((cfd.ver3.cce11.DElementReceptor) asociadoNegocios.createRootElementReceptorCce());
+        }
 
         for (SCfdDataConcepto concept : cfdXml.getCfdConceptos()) {
             cfd.ver32.DElementConcepto concepto = new cfd.ver32.DElementConcepto();
@@ -3385,6 +3389,8 @@ public abstract class SCfdUtils implements Serializable {
 
         comprobante.getAttFormaPago().setString(DCfdUtils.getFormaPagoClave(cfdXml.getCfdFormaDePago()));
 
+        comprobante.getAttTipoDeComprobante().setOption(cfdXml.getCfdTipoDeComprobante());
+        
         if (cfdXml.getCfdTipoCfdXml() == SCfdConsts.CFD_TYPE_PAYROLL) {
             comprobante.getAttCondicionesDePago().setOption("");
         }
@@ -3402,8 +3408,6 @@ public abstract class SCfdUtils implements Serializable {
             comprobante.getAttTipoCambio().setDouble(cfdXml.getCfdTipoCambio());
         }
         comprobante.getAttTotal().setDouble(cfdXml.getCfdTotal());
-
-        comprobante.getAttTipoDeComprobante().setOption(cfdXml.getCfdTipoDeComprobante());
         
         if (cfdXml.getCfdMetodoDePago() <= 1) {
             comprobante.getAttMetodoPago().setOption(DAttributeOptionMetodoPago.CFD_UNA_EXHIBICION);
@@ -3488,23 +3492,27 @@ public abstract class SCfdUtils implements Serializable {
             switch (tax.getImpuestoBasico()) {
                 case SModSysConsts.FINS_TP_TAX_RETAINED:
                     dTotalImptoRetenido += tax.getImporte();
-                    impuestosRetenidos.getEltHijosImpuestoRetenido().add((cfd.ver33.DElementImpuestoRetencion) tax.createRootElementImpuesto());
+                    impuestosRetenidos.getEltHijosImpuestoRetenido().add((cfd.ver33.DElementImpuestoRetencion) tax.createRootElementImpuesto33());
                     break;
                 case SModSysConsts.FINS_TP_TAX_CHARGED:
                     dTotalImptoTrasladado += tax.getImporte();
-                    impuestosTrasladados.getEltHijosImpuestoTrasladado().add((cfd.ver33.DElementImpuestoTraslado) tax.createRootElementImpuesto());
+                    impuestosTrasladados.getEltHijosImpuestoTrasladado().add((cfd.ver33.DElementImpuestoTraslado) tax.createRootElementImpuesto33());
                     break;
                 default:
                     throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + tax.getImpuestoBasico() + ").");
             }
         }
 
-        if (impuestosRetenidos.getEltHijosImpuestoRetenido().size() > 0) {
+        if (impuestosTrasladados.getEltHijosImpuestoTrasladado().isEmpty() && impuestosRetenidos.getEltHijosImpuestoRetenido().isEmpty()) {
+            throw new Exception("Error al generar el nodo impuestos del CFD el nodo impuestos no existe.");
+        }
+        
+        if (!impuestosRetenidos.getEltHijosImpuestoRetenido().isEmpty()) {
             comprobante.getEltImpuestos().getAttTotalImpuestosRetenidos().setDouble(dTotalImptoRetenido);
             comprobante.getEltImpuestos().setEltOpcImpuestosRetenidos(impuestosRetenidos);
         }
 
-        if (impuestosTrasladados.getEltHijosImpuestoTrasladado().size() > 0) {
+        if (!impuestosTrasladados.getEltHijosImpuestoTrasladado().isEmpty()) {
             comprobante.getEltImpuestos().getAttTotalImpuestosTraslados().setDouble(dTotalImptoTrasladado);
             comprobante.getEltImpuestos().setEltOpcImpuestosTrasladados(impuestosTrasladados);
         }

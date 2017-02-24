@@ -85,6 +85,7 @@ public class SDbCfdBizPartner {
                     asociadoNegocios.setBizPartnerBranchId(mnBizPartnerBranchId);
                     asociadoNegocios.setBizPartnerBranchHqId(moBizPartner.getDbmsHqBranch().getPkBizPartnerBranchId());
                     asociadoNegocios.setBizPartnerRfc(moBizPartner.getFiscalId());
+                    asociadoNegocios.setBizPartnerFiscalForeing(moBizPartner.getFiscalFrgId());
                     asociadoNegocios.setBizPartnerName(moBizPartner.getProperName());
                     asociadoNegocios.setBizPartnerStreet(moBizPartnerBranchAddress.getStreet());
                     asociadoNegocios.setBizPartnerStreetNumberExt(moBizPartnerBranchAddress.getStreetNumberExt());

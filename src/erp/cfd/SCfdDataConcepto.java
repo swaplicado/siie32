@@ -26,6 +26,7 @@ public class SCfdDataConcepto {
     protected String msDescripcion;
     protected double mdValorUnitario;
     protected double mdImporte;
+    protected double mdDescuento;
     
     protected int mnCfdiType;
     
@@ -40,6 +41,7 @@ public class SCfdDataConcepto {
         msDescripcion = "";
         mdValorUnitario = 0;
         mdImporte = 0;
+        mdDescuento = 0;
         mnCfdiType = 0;
         maImpuestosXml = new ArrayList<SCfdDataImpuesto>();
     }
@@ -52,6 +54,7 @@ public class SCfdDataConcepto {
     public void setDescripcion(String s) { msDescripcion = s; }
     public void setValorUnitario(double d) { mdValorUnitario = d; }
     public void setImporte(double d) { mdImporte = d; }
+    public void setDescuento(double d) { mdDescuento = d; }
     public void setCfdiType(int n) { mnCfdiType = n; }
     
     public String getClaveProdServ() { return msClaveProdServ; }
@@ -62,6 +65,7 @@ public class SCfdDataConcepto {
     public String getDescripcion() { return msDescripcion; }
     public double getValorUnitario() { return mdValorUnitario; }
     public double getImporte() { return mdImporte; }
+    public double getDescuento() { return mdDescuento; }
     public int getCfdiType() { return mnCfdiType; }
     
     public ArrayList<SCfdDataImpuesto> getCfdDataImpuestos() { return maImpuestosXml; }
@@ -151,6 +155,10 @@ public class SCfdDataConcepto {
         concepto.getAttValorUnitario().setDouble(mdValorUnitario);
         concepto.getAttImporte().setDouble(mdImporte);
         
+        if (mdDescuento > 0) {
+            concepto.getAttDescuento().setDouble(mdDescuento);
+        }
+        
         // Taxes:
             
         cfd.ver33.DElementConceptoImpuestosRetenidos impuestosRetenidos = new cfd.ver33.DElementConceptoImpuestosRetenidos();
@@ -159,10 +167,10 @@ public class SCfdDataConcepto {
         for (SCfdDataImpuesto impuesto : maImpuestosXml) {
             switch (impuesto.getImpuestoBasico()) {
                 case SModSysConsts.FINS_TP_TAX_RETAINED:
-                    impuestosRetenidos.getEltHijosImpuestoRetenido().add((cfd.ver33.DElementConceptoImpuestoRetencion) impuesto.createRootElementConceptoImpuesto());
+                    impuestosRetenidos.getEltHijosImpuestoRetenido().add((cfd.ver33.DElementConceptoImpuestoRetencion) impuesto.createRootElementConceptoImpuesto33());
                     break;
                 case SModSysConsts.FINS_TP_TAX_CHARGED:
-                    impuestosTrasladados.getEltHijosImpuestoTrasladado().add((cfd.ver33.DElementConceptoImpuestoTraslado) impuesto.createRootElementConceptoImpuesto());
+                    impuestosTrasladados.getEltHijosImpuestoTrasladado().add((cfd.ver33.DElementConceptoImpuestoTraslado) impuesto.createRootElementConceptoImpuesto33());
                     break;
                 default:
             }
@@ -170,6 +178,9 @@ public class SCfdDataConcepto {
         
         if (!impuestosTrasladados.getEltHijosImpuestoTrasladado().isEmpty() || !impuestosRetenidos.getEltHijosImpuestoRetenido().isEmpty()) {
             concepto.setEltOpcConceptoImpuestos(new DElementConceptoImpuestos());
+        }
+        else {
+            throw new Exception("Error al generar el nodo impuestos del concepto '" + msDescripcion + "' el nodo impuestos no existe.");
         }
         
         if (!impuestosTrasladados.getEltHijosImpuestoTrasladado().isEmpty()) {
