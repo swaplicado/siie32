@@ -138,7 +138,7 @@ public class SDialogRepBizPartnerAdvances extends javax.swing.JDialog implements
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         bgCurrency.add(jrbCurrencyDoc);
-        jrbCurrencyDoc.setText("Moneda del documento");
+        jrbCurrencyDoc.setText("Moneda original");
         jrbCurrencyDoc.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel16.add(jrbCurrencyDoc);
 
