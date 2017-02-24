@@ -152,7 +152,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateCutoff.setText("Fecha corte: *");
-        jlDateCutoff.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlDateCutoff.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel4.add(jlDateCutoff);
 
         jtfDateCutoff.setText("dd/mm/yyyy");
@@ -170,7 +170,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCoBranch.setText("Sucursal empresa:");
-        jlCoBranch.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlCoBranch.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel15.add(jlCoBranch);
 
         jcbCoBranch.setPreferredSize(new java.awt.Dimension(325, 23));
@@ -187,7 +187,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jPanel101.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlRepType.setText("Tipo reporte:");
-        jlRepType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlRepType.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel101.add(jlRepType);
 
         bgType.add(jrbRepTypeDetail);
@@ -206,7 +206,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jPanel103.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDueType.setText("Tipo vencimientos:");
-        jlDueType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlDueType.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel103.add(jlDueType);
 
         bgPeriod.add(jrbDueType30_60_90d);
@@ -225,7 +225,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jPanel99.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDocDate.setText("Fecha doctos.:");
-        jlDocDate.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlDocDate.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel99.add(jlDocDate);
 
         bgDate.add(jrbDocDateDueDate);
@@ -243,7 +243,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jPanel100.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDocSort.setText("Orden doctos.:");
-        jlDocSort.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlDocSort.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel100.add(jlDocSort);
 
         bgOrder.add(jrbDocSortDate);
@@ -261,7 +261,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jPanel102.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBizPartner.setText("Asociado negocios: *");
-        jlBizPartner.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlBizPartner.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel102.add(jlBizPartner);
 
         jcbBizPartner.setPreferredSize(new java.awt.Dimension(325, 23));
@@ -278,7 +278,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jPanel104.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlSalesAgent.setText("Agente ventas:");
-        jlSalesAgent.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlSalesAgent.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel104.add(jlSalesAgent);
 
         jcbSalesAgent.setPreferredSize(new java.awt.Dimension(325, 23));
@@ -294,15 +294,15 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
 
         jPanel106.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlAnalyst.setText("Analista:");
-        jlAnalyst.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlAnalyst.setText("Analista AN:");
+        jlAnalyst.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel106.add(jlAnalyst);
 
         jcbUserAnalyst.setPreferredSize(new java.awt.Dimension(325, 23));
         jPanel106.add(jcbUserAnalyst);
 
         jbPickUserAnalyst.setText("...");
-        jbPickUserAnalyst.setToolTipText("Seleccionar moneda");
+        jbPickUserAnalyst.setToolTipText("Seleccionar analista");
         jbPickUserAnalyst.setFocusable(false);
         jbPickUserAnalyst.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel106.add(jbPickUserAnalyst);
@@ -312,7 +312,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jPanel98.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCurrency.setText("Moneda: *");
-        jlCurrency.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel98.add(jlCurrency);
 
         jcbCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -333,7 +333,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
 
         jPanel105.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlShowAmounts.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlShowAmounts.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel105.add(jlShowAmounts);
 
         moBoolShowAmounts.setText("Ver seguro y garantía");
@@ -415,11 +415,13 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
                 mnBizPartnerPicker = SDataConstants.BPSX_BP_SUP;
                 manSysMovementTypeKey = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP;
                 jlSalesAgent.setEnabled(false);
+                jlAnalyst.setEnabled(false);
                 break;
             case SDataConstantsSys.BPSS_CT_BP_CUS:
                 mnBizPartnerPicker = SDataConstants.BPSX_BP_CUS;
                 manSysMovementTypeKey = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS;
                 jlSalesAgent.setEnabled(true); // defined already enabled, just for consistency
+                jlAnalyst.setEnabled(true);
                 break;
             default:
         }
@@ -531,6 +533,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
             map.put("sTitle", getTitle().toUpperCase());
             map.put("bShowDetail", jrbRepTypeDetail.isSelected());
             map.put("sCoBranch", txtCoBranch);
+            map.put("nFkCtBpId", mnBizPartnerCategory);
             map.put("sBizPartner", txtBizPartner);
             map.put("nBizPartnerCategory", mnBizPartnerCategory);
             map.put("sSalesAgent", txtSalesAgent);
@@ -705,12 +708,15 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
 
     private void itemStateChangedDueType() {
         moFieldSalesAgent.resetField();
+        moFieldUserAnalyst.resetField();
         moFieldCurrency.setFieldValue(miClient.getSession().getSessionCustom().getLocalCurrencyKey());
         moBoolShowAmounts.setSelected(false);
                 
         if (jrbDueType30_60_90d.isSelected()) {
             jcbSalesAgent.setEnabled(mnBizPartnerCategory == SModSysConsts.BPSS_CT_BP_CUS);
             jbPickSalesAgent.setEnabled(mnBizPartnerCategory == SModSysConsts.BPSS_CT_BP_CUS);
+            jcbUserAnalyst .setEnabled(mnBizPartnerCategory == SModSysConsts.BPSS_CT_BP_CUS);
+            jbPickUserAnalyst.setEnabled(mnBizPartnerCategory == SModSysConsts.BPSS_CT_BP_CUS);
             jcbCurrency.setEnabled(true);
             jbPickCurrency.setEnabled(true);
             moBoolShowAmounts.setEnabled(true);
@@ -718,6 +724,8 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         else {
             jcbSalesAgent.setEnabled(false);
             jbPickSalesAgent.setEnabled(false);
+            jcbUserAnalyst.setEnabled(mnBizPartnerCategory == SModSysConsts.BPSS_CT_BP_CUS);
+            jbPickUserAnalyst.setEnabled(mnBizPartnerCategory == SModSysConsts.BPSS_CT_BP_CUS);
             jcbCurrency.setEnabled(false);
             jbPickCurrency.setEnabled(false);
             moBoolShowAmounts.setEnabled(false);

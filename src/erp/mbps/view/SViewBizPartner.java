@@ -367,7 +367,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         }
         
         if (mnTabTypeAux01 == SDataConstants.BPSX_BP_CUS) {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "us.usr", "Usr. analista", 100);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "us.usr", "Analista AN", 100);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tpy.tp_pay_sys", "Forma de pago", 100);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.pay_account", "Cuenta bancaria", 100);
         }

@@ -17,6 +17,7 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mfin.data.SDataCostCenterItem;
 import erp.mfin.form.SDialogRepBizPartnerAccountingMoves;
+import erp.mfin.form.SDialogRepBizPartnerAdvances;
 import erp.mfin.form.SDialogRepBizPartnerBalance;
 import erp.mfin.form.SDialogRepBizPartnerBalanceDps;
 import erp.mfin.form.SDialogRepBizPartnerJournal;
@@ -138,6 +139,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenu jmRepStats;
     private javax.swing.JMenu jmRepBackorder;
     private javax.swing.JMenu jmRepQueries;
+    private javax.swing.JMenu jmRepBal;
     private javax.swing.JMenuItem jmiRepTrnGlobal;
     private javax.swing.JMenuItem jmiRepTrnByMonth;
     private javax.swing.JMenuItem jmiRepTrnByItemGeneric;
@@ -164,6 +166,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiRepBizPartnerBalance;
     private javax.swing.JMenuItem jmiRepBizPartnerBalanceDps;
     private javax.swing.JMenuItem jmiRepBizPartnerBalanceAging;
+    private javax.swing.JMenuItem jmiRepBizPartnerBalAdvSup;
     private javax.swing.JMenuItem jmiRepAccountStatements;
     private javax.swing.JMenuItem jmiRepBizPartnerAccountingMoves;
     private javax.swing.JMenuItem jmiRepBizPartnerJournal;
@@ -407,6 +410,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmRep = new JMenu("Reportes");
         jmRepStats = new JMenu("Consultas de estadísticas de compras");
         jmRepQueries = new JMenu("Consultas de saldos de proveedores");
+        jmRepBal = new JMenu("Saldos de proveedores");
         jmiRepTrnGlobal = new JMenuItem("Compras globales");
         jmiRepTrnByMonth = new JMenuItem("Compras globales por mes");
         jmiRepTrnByItemGeneric = new JMenuItem("Compras por ítem genérico");
@@ -434,6 +438,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepBizPartnerBalance = new JMenuItem("Saldos proveedores...");
         jmiRepBizPartnerBalanceDps = new JMenuItem("Saldos proveedores por documento...");
         jmiRepBizPartnerBalanceAging = new JMenuItem("Antigüedad de saldos de proveedores...");
+        jmiRepBizPartnerBalAdvSup = new JMenuItem("Saldos de anticipos de proveedores...");
         jmiRepAccountStatements = new JMenuItem("Estados de cuenta de proveedores...");
         jmiRepBizPartnerAccountingMoves = new JMenuItem("Movimientos contables de proveedores por documento...");
         jmiRepBizPartnerJournal = new JMenuItem("Reporte auxiliar de movimientos contables de proveedores...");
@@ -484,13 +489,15 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmRepQueries.addSeparator();
         jmRepQueries.add(jmiQryCurrencyBalance);
         jmRepQueries.add(jmiQryCurrencyBalanceBizPartner);
-
+        jmRepBal.add(jmiRepBizPartnerBalance);
+        jmRepBal.add(jmiRepBizPartnerBalanceDps);
+        jmRepBal.add(jmiRepBizPartnerBalAdvSup);
+        
         jmRep.add(jmRepStats);
         jmRep.add(jmRepBackorder);
         jmRep.add(jmRepQueries);
         jmRep.addSeparator();
-        jmRep.add(jmiRepBizPartnerBalance);
-        jmRep.add(jmiRepBizPartnerBalanceDps);
+        jmRep.add(jmRepBal);
         jmRep.add(jmiRepBizPartnerBalanceAging);
         jmRep.add(jmiRepAccountStatements);
         jmRep.add(jmiRepBizPartnerAccountingMoves);
@@ -626,6 +633,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepBizPartnerBalance.addActionListener(this);
         jmiRepBizPartnerBalanceDps.addActionListener(this);
         jmiRepBizPartnerBalanceAging.addActionListener(this);
+        jmiRepBizPartnerBalAdvSup.addActionListener(this);
         jmiRepBizPartnerBalanceCollection.addActionListener(this);
         jmiRepBizPartnerBalanceCollectionDps.addActionListener(this);
         jmiRepAccountStatements.addActionListener(this);
@@ -1543,6 +1551,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiRepBizPartnerBalanceAging) {
                 new SDialogRepBizPartnerBalanceAging(miClient, SDataRepConstants.REP_ACC_AGI + " " + SBpsUtils.getBizPartnerCategoryName(SModSysConsts.BPSS_CT_BP_SUP, SUtilConsts.NUM_PLR).toLowerCase(), SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
+            }
+            else if (item == jmiRepBizPartnerBalAdvSup) {
+                new SDialogRepBizPartnerAdvances(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
             }
             else if (item == jmiRepAccountStatements) {
                 new SDialogRepBizPartnerStatement(miClient, SDataRepConstants.REP_STA + " " + SBpsUtils.getBizPartnerCategoryName(SModSysConsts.BPSS_CT_BP_SUP, SUtilConsts.NUM_PLR).toLowerCase(), SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
