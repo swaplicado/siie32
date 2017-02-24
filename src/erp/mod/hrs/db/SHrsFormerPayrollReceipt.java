@@ -719,7 +719,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
 
     @Override
     public int getCfdTipoDeComprobante() {
-        return DAttributeOptionTipoComprobante.CFD_EGRESO;
+        return DAttributeOptionTipoComprobante.CFD_NOMINA;
     }
 
     /**

@@ -260,6 +260,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected double mdXtaCfdCceExchangeRateUSD;
     protected double mdXtaCfdCceTotalUSD;
     protected java.lang.String msXtaCfdCceNumberReliableExporter;
+    protected java.lang.String msXtaCfdCceIncoterm;
 
     public SDataDps() {
         super(SDataConstants.TRN_DPS);
@@ -1694,6 +1695,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setXtaCfdCceExchangeRateUSD(double d) { mdXtaCfdCceExchangeRateUSD = d; }
     public void setXtaCfdCceTotalUSD(double d) { mdXtaCfdCceTotalUSD = d; }
     public void setXtaCfdCceNumberReliableExporter(java.lang.String s) { msXtaCfdCceNumberReliableExporter = s; }
+    public void setXtaCfdCceIncoterm(java.lang.String s) { msXtaCfdCceIncoterm = s; }
 
     public java.lang.Object getDbmsRecordKey() { return moDbmsRecordKey; }
     public java.util.Date getDbmsRecordDate() { return mtDbmsRecordDate; }
@@ -1725,6 +1727,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public double getXtaCfdCceExchangeRateUSD() { return mdXtaCfdCceExchangeRateUSD; }
     public double getXtaCfdCceTotalUSD() { return mdXtaCfdCceTotalUSD; }
     public java.lang.String getXtaCfdCceNumberReliableExporter() { return msXtaCfdCceNumberReliableExporter; }
+    public java.lang.String getXtaCfdCceIncoterm() { return msXtaCfdCceIncoterm; }
 
     public erp.mtrn.data.SDataDpsEntry getDbmsDpsEntry(int[] pk) {
         SDataDpsEntry entry = null;
@@ -1918,6 +1921,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mdXtaCfdCceExchangeRateUSD = 0;
         mdXtaCfdCceTotalUSD = 0;
         msXtaCfdCceNumberReliableExporter = "";
+        msXtaCfdCceIncoterm = "";
         
         msCfdExpeditionLocality = "";
         msCfdExpeditionState = "";
@@ -2200,6 +2204,14 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                         }
                     }
+                }
+                
+                // Read code incoterm:
+
+                sSql = "SELECT code FROM erp.logs_inc WHERE id_inc = " + mnFkIncotermId + " ";
+                oResultSet = statement.executeQuery(sSql);
+                if (oResultSet.next()) {
+                    msXtaCfdCceIncoterm = oResultSet.getString("code");
                 }
 
                 // Read datas auxiliars for CFD:
@@ -4157,17 +4169,18 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         cfd.ver3.cce11.DElementComercioExterior comercioExterior = new cfd.ver3.cce11.DElementComercioExterior();
         cfd.ver3.cce11.DElementMercancia mercancia = null;
         
-        comercioExterior.getAttMotivoTraslado().setString(msXtaCfdCceReasonTransfer);
-        comercioExterior.getAttTipoOperacion().setString(msXtaCfdCceOperationType);
-        comercioExterior.getAttClaveDePedimento().setString(msXtaCfdCceNumberImportRequest);
-        comercioExterior.getAttCertificadoOrigen().setInteger(mnXtaCfdCceCertificateOrigin);
-        comercioExterior.getAttNumCertificadoOrigen().setString(msXtaCfdCceNumberCertificateOrigin);
-        comercioExterior.getAttNumeroExportadorConfiable().setString(msXtaCfdCceNumberReliableExporter);
-        //comercioExterior.getAttIncoterm().setString(); Is complemented in utilities of CFD.
-        comercioExterior.getAttSubdivision().setInteger(mnXtaCfdCceSubdivision);
-        //comercioExterior.getAttObservaciones() Is optional
-        comercioExterior.getAttTipoCambioUSD().setDouble(mdXtaCfdCceExchangeRateUSD);
-        comercioExterior.getAttTotalUSD().setDouble(mdXtaCfdCceTotalUSD);
+        if (msXtaCfdCceOperationType.compareTo("A") != 0) {
+            //comercioExterior.getAttMotivoTraslado().setString(msXtaCfdCceReasonTransfer); // not apply is necessary if comprobant type is "T"
+            comercioExterior.getAttClaveDePedimento().setString(msXtaCfdCceNumberImportRequest);
+            comercioExterior.getAttCertificadoOrigen().setInteger(mnXtaCfdCceCertificateOrigin);
+            comercioExterior.getAttNumCertificadoOrigen().setString(msXtaCfdCceNumberCertificateOrigin);
+            comercioExterior.getAttNumeroExportadorConfiable().setString(msXtaCfdCceNumberReliableExporter);
+            comercioExterior.getAttIncoterm().setString(msXtaCfdCceIncoterm);
+            comercioExterior.getAttSubdivision().setInteger(mnXtaCfdCceSubdivision);
+            //comercioExterior.getAttObservaciones() Is optional
+            comercioExterior.getAttTipoCambioUSD().setDouble(mdXtaCfdCceExchangeRateUSD);
+            comercioExterior.getAttTotalUSD().setDouble(mdXtaCfdCceTotalUSD);
+        }
         
         cfd.ver3.cce11.DElementMercancias mercancias = new cfd.ver3.cce11.DElementMercancias();
         
@@ -4186,6 +4199,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             mercancia.getAttCantidadAduana().setDouble(dpsEntry.getOriginalQuantity());
             mercancia.getAttUnidadAduana().setString(dpsEntry.getDbmsCustomsUnit());
             mercancia.getAttValorUnitarioAduana().setDouble(price);
+            mercancia.getAttValorDolares().setDecimals(3);
             mercancia.getAttValorDolares().setDouble(dpsEntry.getSubtotalCy_r());
 
             mercancias.getEltHijosMercancia().add(mercancia);
