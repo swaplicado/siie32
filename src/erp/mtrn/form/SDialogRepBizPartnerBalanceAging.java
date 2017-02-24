@@ -533,6 +533,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
             map.put("sTitle", getTitle().toUpperCase());
             map.put("bShowDetail", jrbRepTypeDetail.isSelected());
             map.put("sCoBranch", txtCoBranch);
+            map.put("nFkCtBpId", mnBizPartnerCategory);
             map.put("sBizPartner", txtBizPartner);
             map.put("nBizPartnerCategory", mnBizPartnerCategory);
             map.put("sSalesAgent", txtSalesAgent);
