@@ -45,6 +45,7 @@ import erp.mfin.form.SDialogRepAccountConcept;
 import erp.mfin.form.SDialogRepAuxAccounting;
 import erp.mfin.form.SDialogRepBalanceSheet;
 import erp.mfin.form.SDialogRepBizPartnerAccountingMoves;
+import erp.mfin.form.SDialogRepBizPartnerAdvances;
 import erp.mfin.form.SDialogRepBizPartnerBalance;
 import erp.mfin.form.SDialogRepBizPartnerBalanceDps;
 import erp.mfin.form.SDialogRepBizPartnerJournal;
@@ -233,6 +234,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiRepBizPartnerBalCdr;
     private javax.swing.JMenuItem jmiRepBizPartnerBalDpsCus;
     private javax.swing.JMenuItem jmiRepBizPartnerBalDpsSup;
+    private javax.swing.JMenuItem jmiRepBizPartnerBalAdvCus;
+    private javax.swing.JMenuItem jmiRepBizPartnerBalAdvSup;
     private javax.swing.JMenuItem jmiQryCurrencyBalanceCus;
     private javax.swing.JMenuItem jmiQryCurrencyBalanceBizPartnerCus;
     private javax.swing.JMenuItem jmiQryCurrencyBalanceSup;
@@ -607,6 +610,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepBizPartnerBalCdr = new JMenuItem("Saldos de acreedores diversos...");
         jmiRepBizPartnerBalDpsCus = new JMenuItem("Saldos de clientes por documento...");
         jmiRepBizPartnerBalDpsSup = new JMenuItem("Saldos de proveedores por documento...");
+        jmiRepBizPartnerBalAdvCus = new JMenuItem("Saldos de anticipos de clientes...");
+        jmiRepBizPartnerBalAdvSup = new JMenuItem("Saldos de anticipos de proveedores...");
         jmiQryCurrencyBalanceCus =  new JMenuItem("Consulta de cuentas por cobrar por moneda");
         jmiQryCurrencyBalanceBizPartnerCus =  new JMenuItem("Consulta de cuentas por cobrar por moneda-cliente");
         jmiQryCurrencyBalanceSup =  new JMenuItem("Consulta de cuentas por pagar por moneda");
@@ -699,6 +704,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRepBizPartnerBal.addSeparator();
         jmRepBizPartnerBal.add(jmiRepBizPartnerBalDpsCus);
         jmRepBizPartnerBal.add(jmiRepBizPartnerBalDpsSup);
+        jmRepBizPartnerBal.addSeparator();
+        jmRepBizPartnerBal.add(jmiRepBizPartnerBalAdvCus);
+        jmRepBizPartnerBal.add(jmiRepBizPartnerBalAdvSup);
         jmRepBizPartnerBal.addSeparator();
         jmRepBizPartnerBal.add(jmiQryCurrencyBalanceCus);
         jmRepBizPartnerBal.add(jmiQryCurrencyBalanceBizPartnerCus);
@@ -870,6 +878,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepBizPartnerBalCdr.addActionListener(this);
         jmiRepBizPartnerBalDpsCus.addActionListener(this);
         jmiRepBizPartnerBalDpsSup.addActionListener(this);
+        jmiRepBizPartnerBalAdvCus.addActionListener(this);
+        jmiRepBizPartnerBalAdvSup.addActionListener(this);
         jmiQryCurrencyBalanceCus.addActionListener(this);
         jmiQryCurrencyBalanceBizPartnerCus.addActionListener(this);
         jmiQryCurrencyBalanceSup.addActionListener(this);
@@ -2029,6 +2039,12 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiRepBizPartnerBalDpsSup) {
                 new SDialogRepBizPartnerBalanceDps(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
+            }
+            else if (item == jmiRepBizPartnerBalAdvCus) {
+                new SDialogRepBizPartnerAdvances(miClient, SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
+            }
+            else if (item == jmiRepBizPartnerBalAdvSup) {
+                new SDialogRepBizPartnerAdvances(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
             }
             else if (item == jmiQryCurrencyBalanceCus) {
                 miClient.getSession().showView(SModConsts.TRNX_BP_BAL_CUR, SDataConstantsSys.TRNS_CT_DPS_SAL, new SGuiParams(SDataConstantsSys.UNDEFINED));
