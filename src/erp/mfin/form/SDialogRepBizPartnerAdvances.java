@@ -229,7 +229,7 @@ public class SDialogRepBizPartnerAdvances extends javax.swing.JDialog implements
     private void initComponentsExtra() {
         msBizPartnerCatSng = SBpsUtils.getBizPartnerCategoryName(mnBizPartnerCategoryId, SUtilConsts.NUM_SNG);
         
-        setTitle("Saldos de anticipos");
+        setTitle("Saldos de anticipos de " + (mnBizPartnerCategoryId  == SDataConstantsSys.BPSS_CT_BP_CUS ? "clientes" : "proveedores"));
         jlBizPartner.setText(msBizPartnerCatSng + ":");
         jbPickBizPartner.setToolTipText(SUtilConsts.TXT_SELECT + " " + msBizPartnerCatSng.toLowerCase());
         
@@ -303,6 +303,7 @@ public class SDialogRepBizPartnerAdvances extends javax.swing.JDialog implements
         Map<String, Object> map = null;
         JasperPrint jasperPrint = null;
         JasperViewer jasperViewer = null;
+        boolean isCtBpCus = mnBizPartnerCategoryId  == SDataConstantsSys.BPSS_CT_BP_CUS;
         
         try {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
@@ -319,10 +320,12 @@ public class SDialogRepBizPartnerAdvances extends javax.swing.JDialog implements
             map.put("sDate", SLibUtils.DateFormatDate.format(moFieldDate.getDate()));
             map.put("nBizPartnerCus", SDataConstantsSys.BPSS_CT_BP_CUS);
             map.put("nBizPartnerType", mnBizPartnerCategoryId);
-            map.put("sBizPartnerType", mnBizPartnerCategoryId  == SDataConstantsSys.BPSS_CT_BP_CUS ? "CLIENTES" : "PROVEEDORES");
-            map.put("nClassSysMovF", mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_CL_SYS_MOV_SAL : SModSysConsts.FINS_CL_SYS_MOV_PUR);
-            map.put("nClassSysMovNF", mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_CL_SYS_MOV_MI : SModSysConsts.FINS_CL_SYS_MOV_SUP);
-            map.put("nClassSysAcc", mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_CL_SYS_ACC_BPR_CUS : SModSysConsts.FINS_CL_SYS_ACC_BPR_SUP);
+            map.put("sBizPartnerType", isCtBpCus ? "CLIENTES" : "PROVEEDORES");
+            map.put("nClassSysMovF", isCtBpCus ? SModSysConsts.FINS_CL_SYS_MOV_SAL : SModSysConsts.FINS_CL_SYS_MOV_PUR);
+            map.put("nClassSysMovNFT1", isCtBpCus ? SModSysConsts.FINS_CL_SYS_MOV_MI :SModSysConsts.FINS_CL_SYS_MOV_MO);
+            map.put("nClassSysMovNFT2", isCtBpCus ? SModSysConsts.FINS_CL_SYS_MOV_MO : SModSysConsts.FINS_CL_SYS_MOV_MI);
+            map.put("nClassSysMovNFT3", isCtBpCus? SModSysConsts.FINS_CL_SYS_MOV_CUS : SModSysConsts.FINS_CL_SYS_MOV_SUP);
+            map.put("nClassSysAcc", isCtBpCus ? SModSysConsts.FINS_CL_SYS_ACC_BPR_CUS : SModSysConsts.FINS_CL_SYS_ACC_BPR_SUP);
             map.put("sBizPartner", (jcbBizPartner.getSelectedIndex() <= 0 ? "(TODOS)" : moFieldBizPartner.getString()));
             map.put("sFilterBizPartner", filterBp);
             map.put("sFilterCurrency", filterCur);
