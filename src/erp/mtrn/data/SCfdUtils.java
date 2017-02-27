@@ -1801,7 +1801,6 @@ public abstract class SCfdUtils implements Serializable {
                     else {
                         params.setRegimenFiscal(SLibUtilities.textExplode(client.getSessionXXX().getParamsCompany().getTaxRegime(), ";"));
                     }
-                    params.setRegimenFiscal(SLibUtilities.textExplode(client.getSessionXXX().getParamsCompany().getTaxRegime(), ";"));
                 }
             }
             else if (client.getSessionXXX().getParamsCompany().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
