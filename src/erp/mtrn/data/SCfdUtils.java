@@ -1791,10 +1791,16 @@ public abstract class SCfdUtils implements Serializable {
             }
 
             if (client.getSessionXXX().getParamsCompany().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32) {
-                if (dps.getDbmsDataDpsCfd() != null && !dps.getDbmsDataDpsCfd().hasInternationalTradeNode()) {
+                if (dps.getDbmsDataDpsCfd() == null) {
                     params.setRegimenFiscal(SLibUtilities.textExplode(client.getSessionXXX().getParamsCompany().getFiscalSettings(), ";")); 
                 }
                 else {
+                    if (!dps.getDbmsDataDpsCfd().hasInternationalTradeNode()) {
+                        params.setRegimenFiscal(SLibUtilities.textExplode(client.getSessionXXX().getParamsCompany().getFiscalSettings(), ";")); 
+                    }
+                    else {
+                        params.setRegimenFiscal(SLibUtilities.textExplode(client.getSessionXXX().getParamsCompany().getTaxRegime(), ";"));
+                    }
                     params.setRegimenFiscal(SLibUtilities.textExplode(client.getSessionXXX().getParamsCompany().getTaxRegime(), ";"));
                 }
             }
