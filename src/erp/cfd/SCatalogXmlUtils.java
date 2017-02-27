@@ -113,7 +113,7 @@ public abstract class SCatalogXmlUtils {
             aCatalogs = getCatalogs(xmlCatalog, dateStart);
         }
 
-        items.add(new SFormComponentItem("", "Seleccionar una opción"));
+        items.add(new SFormComponentItem("", "(Seleccionar una opción)"));
         for (SCatalogXmlEntry item : aCatalogs) {
             items.add(new SFormComponentItem(item.getCode(), item.getName()));
         }
