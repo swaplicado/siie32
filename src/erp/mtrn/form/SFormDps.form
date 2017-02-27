@@ -3571,7 +3571,7 @@
                                 <Property name="text" type="java.lang.String" value="ABC000ABC000"/>
                                 <Property name="toolTipText" type="java.lang.String" value="Referencia"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[125, 23]"/>
+                                  <Dimension value="[200, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -3603,7 +3603,7 @@
                                 <Property name="text" type="java.lang.String" value="ABC000ABC000"/>
                                 <Property name="toolTipText" type="java.lang.String" value="Referencia"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[125, 23]"/>
+                                  <Dimension value="[200, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -3635,7 +3635,7 @@
                                 <Property name="text" type="java.lang.String" value="ABC000ABC000"/>
                                 <Property name="toolTipText" type="java.lang.String" value="Referencia"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[125, 23]"/>
+                                  <Dimension value="[200, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>

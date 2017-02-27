@@ -202,7 +202,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
     public boolean isDomestic(SClientInterface client) {
         int country = getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n();
         
-        return country != SLibConstants.UNDEFINED && !client.getSession().getSessionCustom().isLocalCountry(new int[] { country });
+        return country == SLibConstants.UNDEFINED || client.getSession().getSessionCustom().isLocalCountry(new int[] { country });
     }
 
     @Override

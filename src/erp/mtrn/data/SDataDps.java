@@ -4199,7 +4199,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             mercancia.getAttCantidadAduana().setDouble(dpsEntry.getOriginalQuantity());
             mercancia.getAttUnidadAduana().setString(dpsEntry.getDbmsCustomsUnit());
             mercancia.getAttValorUnitarioAduana().setDouble(price);
-            mercancia.getAttValorDolares().setDecimals(3);
             mercancia.getAttValorDolares().setDouble(dpsEntry.getSubtotalCy_r());
 
             mercancias.getEltHijosMercancia().add(mercancia);
