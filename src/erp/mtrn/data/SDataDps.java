@@ -3191,6 +3191,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 
                 // Save XML of aux fro CFDI version 3.3 and international trade:
                 
+                sSql = "DELETE FROM trn_dps_cfd WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";
+                oStatement.execute(sSql);
+                
                 if (!msXtaCfdUseCfdi.isEmpty() || !msXtaCfdCceReasonTransfer.isEmpty()) {
                     moDbmsDataDpsCfd = new SDataDpsCfd();
                     

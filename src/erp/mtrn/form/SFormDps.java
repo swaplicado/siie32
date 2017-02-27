@@ -8567,8 +8567,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
         moDps.setXtaCfdUseCfdi(moFieldFkCfdUseId.getKey() == null ? "" : (String) moFieldFkCfdUseId.getKey());
         */
+        moDps.setXtaCfdConfirmation(""); // XXX (2017-02-27) jbarajas is neecesary for update with information of CFDI version 3.3
+        moDps.setXtaCfdUseCfdi(""); // XXX (2017-02-27) jbarajas is neecesary for update with information of CFDI version 3.3
                 
         // Set information for international trade:
+        
+        moDps.setXtaCfdCceReasonTransfer(""); // XXX (2017-02-27) jbarajas is neecesary for update with information of international trade
         
         if (jcbCfdCceReasonTransfer.isEnabled()) { 
             moDps.setXtaCfdCceReasonTransfer(moFieldCfdCceReasonTransfer.getKey() == null ? "" : (String) moFieldCfdCceReasonTransfer.getKey());
