@@ -2954,29 +2954,31 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
      * @param enable Desired status for tabs and fields.
      */
     private void enableCfd(boolean enable) {
-        boolean enableTabsFields = enable && isCfdRequired();
+        boolean enableTabs = isCfdRequired();
         
-        jTabbedPane.setEnabledAt(TAB_CFD, enableTabsFields);
-        jTabbedPane.setEnabledAt(TAB_INT, enableTabsFields && isBizPartnerInt());
+        jTabbedPane.setEnabledAt(TAB_CFD, enableTabs);
+        jTabbedPane.setEnabledAt(TAB_INT, enableTabs && isBizPartnerInt());
         
-        enableCfdXmlFields(enableTabsFields);
-        //enableCfdCceFields(enableTabsFields);// XXX (2017-02-27) jbarajas is neecesary for update with information of international trade 
-        enableCfdCceFields(false);
-        enableCfdAddendaFields(enableTabsFields);
+        enableCfdXmlFields(enable);
+        //enableCfdCceFields(enable);   // XXX (2017-02-27) jbarajas is neecesary for update with information of international trade 
+        enableCfdCceFields(false);      // XXX remove this line!
+        enableCfdAddendaFields(enable);
     }
                     
     /**
      * Enables/disables fields for CFD data.
-     * @param enable Desired status for fields.
+     * @param enableFields Desired status for fields.
      */
     private void enableCfdXmlFields(boolean enable) {
-        jcbCfdUseId.setEnabled(enable);
-        jtfCfdConfirmationNum.setEditable(enable);
-        jtfCfdConfirmationNum.setFocusable(enable);
+        boolean enableFields = enable && isCfdRequired();
         
-        jlFileXml.setEnabled(enable && !mbIsSales);
-        jbFileXml.setEnabled(enable && !mbIsSales);
-        jbDeleteFileXml.setEnabled(enable && !mbIsSales);
+        jlFileXml.setEnabled(enableFields && !mbIsSales);
+        jbFileXml.setEnabled(enableFields && !mbIsSales);
+        jbDeleteFileXml.setEnabled(enableFields && !mbIsSales);
+        
+        jcbCfdUseId.setEnabled(enableFields && false/*XXX remove this last false value!*/);
+        jtfCfdConfirmationNum.setEditable(enableFields && false/*XXX remove this last false value!*/);
+        jtfCfdConfirmationNum.setFocusable(enableFields && false/*XXX remove this last false value!*/);
     }
 
     /**
@@ -2985,7 +2987,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
      */
     private void enableCfdCceFields(boolean enable) {
         boolean enableFields = enable && isBizPartnerInt();
-        boolean isUsd = jcbFkCurrencyId.getSelectedIndex() > 0 && moFieldFkCurrencyId.getKeyAsIntArray()[0] == SModSysConsts.CFGU_CUR_USD;
+        boolean isCurrencyUsd = jcbFkCurrencyId.getSelectedIndex() > 0 && moFieldFkCurrencyId.getKeyAsIntArray()[0] == SModSysConsts.CFGU_CUR_USD;
         
         jcbCfdCceReasonTransfer.setEnabled(enableFields);
         jcbCfdCceOperationType.setEnabled(enableFields);
@@ -2996,17 +2998,19 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfCfdCceNumberCertificateOrigin.setFocusable(enableFields);
         jtfCfdCceSubdivision.setEditable(enableFields);
         jtfCfdCceSubdivision.setFocusable(enableFields);
-        jtfCfdCceExchangeRateUsd.setEditable(enableFields && !isUsd);
-        jtfCfdCceExchangeRateUsd.setFocusable(enableFields && !isUsd);
-        jtfCfdCceTotalUsd.setEditable(enableFields && !isUsd);
-        jtfCfdCceTotalUsd.setFocusable(enableFields && !isUsd);
+        jtfCfdCceExchangeRateUsd.setEditable(enableFields && !isCurrencyUsd);
+        jtfCfdCceExchangeRateUsd.setFocusable(enableFields && !isCurrencyUsd);
+        jtfCfdCceTotalUsd.setEditable(enableFields && !isCurrencyUsd);
+        jtfCfdCceTotalUsd.setFocusable(enableFields && !isCurrencyUsd);
     }
     
     /**
      * XXX Refactor this method! (sflores, 2017-02-23)
-     * @param enable 
+     * @param enableFields 
      */
     private void enableCfdAddendaFields(boolean enable) {
+        boolean enableFields = enable && isCfdRequired();
+        
         if (moBizPartner != null) {
             switch (moBizPartnerCategory.getFkCfdAddendaTypeId()) {
                 case SDataConstantsSys.BPSS_TP_CFD_ADD_NA:
@@ -3014,24 +3018,24 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     break;
                     
                 case SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA:
-                    jlStore.setEnabled(enable);
-                    jtfStore.setEnabled(enable);
-                    jlGoodsDelivery.setEnabled(enable);
-                    jtfGoodsDelivery.setEnabled(enable);
-                    jlRemissionDate.setEnabled(enable);
-                    jftRemissionDate.setEnabled(enable);
-                    jlRemission.setEnabled(enable);
-                    jtfRemission.setEnabled(enable);
-                    jlBulkType.setEnabled(enable);
-                    jtfBulkType.setEnabled(enable);
-                    jlBulkQuantity.setEnabled(enable);
-                    jtfBulkQuantity.setEnabled(enable);
-                    jlSalesOrder.setEnabled(enable);
-                    jtfSalesOrder.setEnabled(enable);
-                    jlCfdAddendaSubtypeId.setEnabled(enable);
-                    jcbCfdAddendaSubtypeId.setEnabled(enable);
-                    jlNumberNoteIn.setEnabled(enable);
-                    jtfNumberNoteIn.setEnabled(enable);
+                    jlStore.setEnabled(enableFields);
+                    jtfStore.setEnabled(enableFields);
+                    jlGoodsDelivery.setEnabled(enableFields);
+                    jtfGoodsDelivery.setEnabled(enableFields);
+                    jlRemissionDate.setEnabled(enableFields);
+                    jftRemissionDate.setEnabled(enableFields);
+                    jlRemission.setEnabled(enableFields);
+                    jtfRemission.setEnabled(enableFields);
+                    jlBulkType.setEnabled(enableFields);
+                    jtfBulkType.setEnabled(enableFields);
+                    jlBulkQuantity.setEnabled(enableFields);
+                    jtfBulkQuantity.setEnabled(enableFields);
+                    jlSalesOrder.setEnabled(enableFields);
+                    jtfSalesOrder.setEnabled(enableFields);
+                    jlCfdAddendaSubtypeId.setEnabled(enableFields);
+                    jcbCfdAddendaSubtypeId.setEnabled(enableFields);
+                    jlNumberNoteIn.setEnabled(enableFields);
+                    jtfNumberNoteIn.setEnabled(enableFields);
                     jtfFkCfdAddendaTypeId.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRN_DPS_ADD, new int[] { SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA }));
                     
                     jcbCfdAddendaSubtypeId.removeAllItems();
@@ -3043,26 +3047,26 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     break;
                     
                 case SDataConstantsSys.BPSS_TP_CFD_ADD_LOREAL:
-                    jlFolioNotaRecepcion.setEnabled(enable);
-                    jtfFolioNotaRecepcion.setEnabled(enable);
+                    jlFolioNotaRecepcion.setEnabled(enableFields);
+                    jtfFolioNotaRecepcion.setEnabled(enableFields);
                     jtfFkCfdAddendaTypeId.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRN_DPS_ADD, new int[] { SDataConstantsSys.BPSS_TP_CFD_ADD_LOREAL }));
                     break;
                     
                 case SDataConstantsSys.BPSS_TP_CFD_ADD_BACHOCO:
-                    jlBachocoSociedad.setEnabled(enable);
-                    jtfBachocoSociedad.setEnabled(enable);
-                    jlBachocoOrganizacion.setEnabled(enable);
-                    jtfBachocoOrganizacion.setEnabled(enable);
-                    jlBachocoDivision.setEnabled(enable);
-                    jtfBachocoDivision.setEnabled(enable);
+                    jlBachocoSociedad.setEnabled(enableFields);
+                    jtfBachocoSociedad.setEnabled(enableFields);
+                    jlBachocoOrganizacion.setEnabled(enableFields);
+                    jtfBachocoOrganizacion.setEnabled(enableFields);
+                    jlBachocoDivision.setEnabled(enableFields);
+                    jtfBachocoDivision.setEnabled(enableFields);
                     jtfFkCfdAddendaTypeId.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRN_DPS_ADD, new int[] { SDataConstantsSys.BPSS_TP_CFD_ADD_BACHOCO }));
                     break;
                     
                 case SDataConstantsSys.BPSS_TP_CFD_ADD_MODELO:
-                    jlBachocoSociedad.setEnabled(enable);
-                    jtfBachocoSociedad.setEnabled(enable);
-                    jlDpsDescripcion.setEnabled(enable);
-                    jtfDpsDescripcion.setEnabled(enable);
+                    jlBachocoSociedad.setEnabled(enableFields);
+                    jtfBachocoSociedad.setEnabled(enableFields);
+                    jlDpsDescripcion.setEnabled(enableFields);
+                    jtfDpsDescripcion.setEnabled(enableFields);
                     jtfFkCfdAddendaTypeId.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRN_DPS_ADD, new int[] { SDataConstantsSys.BPSS_TP_CFD_ADD_MODELO }));
                     break;
                     
@@ -3644,7 +3648,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             mnNumbersApprovalNumber = 0;
         }
         
-        enableCfd(true);    // enable/disable CFD form tabs & fields:
+        enableCfd(true);    // enable/disable CFD form tabs & fields
     }
 
     private double obtainBizPartnerBalance() {
@@ -4275,7 +4279,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jcbFkProductionOrderId_n.setEnabled(false);
             jbFkProductionOrderId_n.setEnabled(false);
             
-            enableCfd(false);   // disable CFD form tabs & fields:
+            enableCfd(false);   // disable CFD form tabs & fields
         }
         else {
             mnFormStatus = SLibConstants.FORM_STATUS_EDIT;
@@ -4389,7 +4393,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jcbFkProductionOrderId_n.setEnabled(mbIsSales);
             jbFkProductionOrderId_n.setEnabled(mbIsSales);
             
-            enableCfd(true);    // enable CFD form tabs & fields:
+            enableCfd(true);    // enable CFD form tabs & fields
         }
     }
 
@@ -6731,9 +6735,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jtfCurrencyKeyRo.setText((String) ((SFormComponentItem) jcbFkCurrencyId.getSelectedItem()).getComplement());
         }
 
-        // XXX (2017-02-27) jbarajas is neecesary for update with information of international trade: 
-        //enableCfdCceFields(isCfdRequired());
-        enableCfdCceFields(false);
+        //enableCfdCceFields(true);     // XXX (2017-02-27) jbarajas is neecesary for update with information of international trade 
+        enableCfdCceFields(false);      // XXX remove this line!
         
         if (calculateTotal) {
             calculateTotal();
