@@ -3189,7 +3189,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     }
                 }
                 
-                // Save XML of purchases when provided:
+                // Save XML of aux fro CFDI version 3.3 and international trade:
                 
                 if (!msXtaCfdUseCfdi.isEmpty() || !msXtaCfdCceReasonTransfer.isEmpty()) {
                     moDbmsDataDpsCfd = new SDataDpsCfd();

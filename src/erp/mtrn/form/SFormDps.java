@@ -2960,7 +2960,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jTabbedPane.setEnabledAt(TAB_INT, enableTabsFields && isBizPartnerInt());
         
         enableCfdXmlFields(enableTabsFields);
-        enableCfdCceFields(enableTabsFields);
+        //enableCfdCceFields(enableTabsFields);// XXX (2017-02-27) jbarajas is neecesary for update with information of international trade 
+        enableCfdCceFields(false);
         enableCfdAddendaFields(enableTabsFields);
     }
                     
@@ -6730,7 +6731,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jtfCurrencyKeyRo.setText((String) ((SFormComponentItem) jcbFkCurrencyId.getSelectedItem()).getComplement());
         }
 
-        enableCfdCceFields(isCfdRequired());
+        // XXX (2017-02-27) jbarajas is neecesary for update with information of international trade: 
+        //enableCfdCceFields(isCfdRequired());
+        enableCfdCceFields(false);
         
         if (calculateTotal) {
             calculateTotal();
@@ -8554,16 +8557,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moDps.getRegistryComplements().add(moRecordUserLock);
         }
         
-        // Get information for CFDI version 3.3:
+        // Set information for CFDI version 3.3:
         
+        /* XXX (2017-02-27) jbarajas is neecesary for update with information of CFDI version 3.3:
         moDps.setXtaCfdConfirmation(moFieldCfdConfirmationNumber.getString());
         
         if (moDps.getDbmsDpsEntries().isEmpty() && mbIsSales && mbIsAdj) {
             moDps.setXtaCfdRelationType(moDps.getDbmsDpsEntries().get(0).getFkDpsAdjustmentTypeId() == SDataConstantsSys.TRNS_TP_DPS_ADJ_RET ? SDataConstantsSys.TRNS_CFD_CAT_TP_REL_RET : SDataConstantsSys.TRNS_CFD_CAT_TP_REL_DISC);
         }
         moDps.setXtaCfdUseCfdi(moFieldFkCfdUseId.getKey() == null ? "" : (String) moFieldFkCfdUseId.getKey());
-        
-        // Get information for international trade:
+        */
+                
+        // Set information for international trade:
         
         if (jcbCfdCceReasonTransfer.isEnabled()) { 
             moDps.setXtaCfdCceReasonTransfer(moFieldCfdCceReasonTransfer.getKey() == null ? "" : (String) moFieldCfdCceReasonTransfer.getKey());
