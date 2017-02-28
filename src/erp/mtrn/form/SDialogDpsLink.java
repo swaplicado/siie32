@@ -143,7 +143,6 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
         jlEntryPrice.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel1.add(jlEntryPrice);
 
-        jcbDpsEntryPrices.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "2015-01; base: 1.12; futuro: 0.87" }));
         jcbDpsEntryPrices.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel1.add(jcbDpsEntryPrices);
 
@@ -581,7 +580,7 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
                     }
                 }
                 
-                //Need monthly delivery
+                // Need monthly delivery:
 
                 if (!validation.getIsError() && isOrder) {
                     if (moGuiDpsLink.pickGuiDpsSourceEntry((int[]) moParamDpsSource.getPrimaryKey(), (int[]) entry.getDpsEntryKey()).getGuiDpsSourceEntryPrices().size() > 0) {
@@ -611,7 +610,7 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
                     if (!validation.getIsError()) {
                         if (entry.getAuxIsEntryPriceNeeded()) {
                             
-                            //Need monthly delivery validation:
+                            // Need monthly delivery validation:
                             
                             if (entry.getQuantityToLink() > entry.getAuxSGuiDpsEntryPrice().obtainQtyAvailable()) {
                                 validation.setMessage("Para el ítem '" + entry.getConcept() + " (" + entry.getConceptKey() + ")' en la partida # " + entry.getSortingPosition() + "\n" +
@@ -624,7 +623,7 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
                         }
                         else {
                             
-                            //Need total qty validation:
+                            // Need total quantity validation:
                             
                             if (entry.getQuantityToLink() > entry.getQuantityToBeLinked()) {
                                 validation.setMessage("Para el ítem '" + entry.getConcept() + " (" + entry.getConceptKey() + ")' en la partida # " + entry.getSortingPosition() + "\n" +
@@ -644,7 +643,7 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
                     if (!validation.getIsError()) {
                         if (entry.getAuxIsEntryPriceNeeded()) {
                             
-                            //Need monthly delivery validation:
+                            // Need monthly delivery validation:
                             
                             Date datePrice = null;
                             Date dateSourceDocLapsing = null;
@@ -652,7 +651,7 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
                             dateSourceDocLapsing = SLibTimeUtilities.createDate(SLibTimeUtilities.digestYearMonth(moParamDpsSource.getDateDocLapsing_n())[0], SLibTimeUtilities.digestYearMonth(moParamDpsSource.getDateDocLapsing_n())[1]);
                             if (datePrice.compareTo(dateSourceDocLapsing) == 0) {
                                 
-                                //Only validate surplus when is the last delivery
+                                // Only validate surplus when is the last delivery
                                 
                                 totalSurplus = entry.getAuxSGuiDpsEntryPrice().obtainQtyAvailable() + (entry.getQuantity() * entry.getSurplusPercentage());
                                 totalLinked = entry.getQuantityToLink();
@@ -666,7 +665,7 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
                             }
                             else {
                                 
-                                //For other deliveries, apply normal validation
+                                // For other deliveries, apply normal validation:
                                 
                                 if (entry.getQuantityToLink() > entry.getAuxSGuiDpsEntryPrice().obtainQtyAvailable()) {
                                     validation.setMessage("Para el ítem '" + entry.getConcept() + " (" + entry.getConceptKey() + ")' en la partida # " + entry.getSortingPosition() + "\n" +
@@ -680,7 +679,7 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
                         }
                         else {
                             
-                            //Need total qty validation:
+                            // Need total quantity validation:
                             
                             totalSurplus = entry.getQuantity() * (1d + entry.getSurplusPercentage());
                             totalLinked = entry.getQuantityLinked() + entry.getQuantityLinkedActual() + entry.getQuantityToLink();

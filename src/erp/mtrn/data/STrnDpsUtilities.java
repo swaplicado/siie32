@@ -28,7 +28,11 @@ public abstract class STrnDpsUtilities {
         ResultSet resulSet = null;
         double totalSupplied = 0;
 
-        sql = "SELECT SUM(orig_qty) as tot_qty_sup FROM trn_diog_ety AS de WHERE b_del = 0 AND fid_dps_year_n = " + entryKey[0] + " AND fid_dps_doc_n = " + entryKey[1] + " AND fid_dps_ety_n = " + entryKey[2] + " ";
+        sql = "SELECT SUM(de.orig_qty) as tot_qty_sup "
+                + "FROM trn_diog AS d "
+                + "INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc "
+                + "WHERE NOT d.b_del AND NOT de.b_del AND "
+                + "de.fid_dps_year_n = " + entryKey[0] + " AND de.fid_dps_doc_n = " + entryKey[1] + " AND de.fid_dps_ety_n = " + entryKey[2] + " ";
 
         resulSet = client.getSession().getStatement().executeQuery(sql);
         if (resulSet.next()) {
