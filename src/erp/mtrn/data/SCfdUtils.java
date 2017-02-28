@@ -2774,7 +2774,7 @@ public abstract class SCfdUtils implements Serializable {
         if (cfd == null) {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
         }
-        else if (cfd.getFkXmlTypeId() != SDataConstantsSys.TRNS_TP_XML_CFDI_32 || cfd.getFkXmlTypeId() != SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
+        else if (cfd.getFkXmlTypeId() != SDataConstantsSys.TRNS_TP_XML_CFDI_32 && cfd.getFkXmlTypeId() != SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
             throw new Exception("No es un CFDI.");
         }
         else {
@@ -2867,7 +2867,7 @@ public abstract class SCfdUtils implements Serializable {
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
         }
-        else if (cfd.getFkXmlTypeId() != SDataConstantsSys.TRNS_TP_XML_CFDI_32 || cfd.getFkXmlTypeId() != SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
+        else if (cfd.getFkXmlTypeId() != SDataConstantsSys.TRNS_TP_XML_CFDI_32 && cfd.getFkXmlTypeId() != SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
             throw new Exception("No es un CFDI.");
         }
         else {
@@ -2914,7 +2914,7 @@ public abstract class SCfdUtils implements Serializable {
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
         }
-        else if (cfd.getFkXmlTypeId() != SDataConstantsSys.TRNS_TP_XML_CFDI_32 || cfd.getFkXmlTypeId() != SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
+        else if (cfd.getFkXmlTypeId() != SDataConstantsSys.TRNS_TP_XML_CFDI_32 && cfd.getFkXmlTypeId() != SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
             throw new Exception("No es un CFDI.");
         }
         else {
