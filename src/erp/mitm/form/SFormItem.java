@@ -3215,7 +3215,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moItem.setFkAccountEbitdaTypeId(moFieldFkAccountEbitdaTypeId.getKeyAsIntArray()[0]);
         moItem.setFkFiscalAccountIncId(moFieldFkFiscalAccountIncId.getKeyAsIntArray()[0]);
         moItem.setFkFiscalAccountExpId(moFieldFkFiscalAccountExpId.getKeyAsIntArray()[0]);
-        moItem.setFkCfdProdServId_n(moKeyCfdProdServId_n.getValue()[0]);
+        moItem.setFkCfdProdServId_n(moKeyCfdProdServId_n.getSelectedIndex() <= 0 ? 0 : moKeyCfdProdServId_n.getValue()[0]);
         
         if (jrbStatusActive.isSelected()) {
             moItem.setFkItemStatusId(SModSysConsts.ITMS_ST_ITEM_ACT);
