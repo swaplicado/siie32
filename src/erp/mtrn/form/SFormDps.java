@@ -2954,10 +2954,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
      * @param enable Desired status for tabs and fields.
      */
     private void enableCfd(boolean enable) {
-        boolean enableTabs = isCfdRequired();
+        boolean isCfdRequired = isCfdRequired();
         
-        jTabbedPane.setEnabledAt(TAB_CFD, enableTabs);
-        jTabbedPane.setEnabledAt(TAB_INT, enableTabs && isBizPartnerInt());
+        jTabbedPane.setEnabledAt(TAB_CFD, isCfdRequired || isCfdXmlRequired());    // enable aswell XML file for expenses documents
+        jTabbedPane.setEnabledAt(TAB_INT, isCfdRequired && isBizPartnerInt());
         
         enableCfdXmlFields(enable);
         //enableCfdCceFields(enable);   // XXX (2017-02-27) jbarajas is neecesary for update with information of international trade 
@@ -2971,10 +2971,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
      */
     private void enableCfdXmlFields(boolean enable) {
         boolean enableFields = enable && isCfdRequired();
+        boolean enableXmlFields = enable && isCfdXmlRequired();
         
-        jlFileXml.setEnabled(enableFields && !mbIsSales);
-        jbFileXml.setEnabled(enableFields && !mbIsSales);
-        jbDeleteFileXml.setEnabled(enableFields && !mbIsSales);
+        jlFileXml.setEnabled(enableXmlFields);
+        jbFileXml.setEnabled(enableXmlFields);
+        jbDeleteFileXml.setEnabled(enableXmlFields);
         
         jcbCfdUseId.setEnabled(enableFields && false/*XXX remove this last false value!*/);
         jtfCfdConfirmationNum.setEditable(enableFields && false/*XXX remove this last false value!*/);
@@ -3215,6 +3216,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         boolean isNumSuitable = mnNumbersApprovalYear != 0 && mnNumbersApprovalNumber != 0;
         
         return isDocSuitable && isXmlSuitable && isNumSuitable;
+    }
+    
+    private boolean isCfdXmlRequired() {
+        return !mbIsSales && mbIsDoc;
     }
     
     private boolean isApplingFunctionalAreas() {
