@@ -3387,7 +3387,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         
         // populate combo box for contacts:
         
-        if (mnFormType == SDataConstantsSys.TRNS_CT_DPS_SAL) {
+        if (mbIsSales) {
             jcbFkContactId_n.removeAllItems();
             jcbFkContactId_n.addItem(new SFormComponentItem(new int[2], "(Seleccionar comprador)"));
 
@@ -8252,15 +8252,22 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         
         setBizPartner(new int[] { moDps.getFkBizPartnerId_r() }, new int[] { moDps.getFkBizPartnerBranchId() }, new int[] { moDps.getFkBizPartnerBranchId(), moDps.getFkBizPartnerBranchAddressId() });
         
-        // check if method of payment should be taken from document:
-        
-        if (moDps.getFkPaymentSystemTypeId() != SLibConsts.UNDEFINED) {
-            moFieldFkPaymentSystemTypeId.setFieldValue(new int[] { moDps.getFkPaymentSystemTypeId() });
-        }
+        if (moDps.getIsRegistryNew()) {
+            // check if method of payment should be taken from document:
+            if (moDps.getFkPaymentSystemTypeId() != SLibConsts.UNDEFINED) {
+                moFieldFkPaymentSystemTypeId.setFieldValue(new int[] { moDps.getFkPaymentSystemTypeId() });
+            }
 
-        // check if bank account should be taken from document:
-        
-        if (!moDps.getPaymentAccount().isEmpty()) {
+            // check if bank account should be taken from document:
+            if (!moDps.getPaymentAccount().isEmpty()) {
+                moFieldPaymentAccount.setFieldValue(moDps.getPaymentAccount());
+            }
+        }
+        else {
+            // method of payment must be taken from document:
+            moFieldFkPaymentSystemTypeId.setFieldValue(new int[] { moDps.getFkPaymentSystemTypeId() });
+
+            // bank account must be taken from document:
             moFieldPaymentAccount.setFieldValue(moDps.getPaymentAccount());
         }
         
