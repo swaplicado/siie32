@@ -50,10 +50,10 @@ public class SViewExplotionMaterialsProductionOrder extends erp.lib.table.STable
 
         switch (mnTabTypeAux01) {
             case SDataConstants.MFGX_ORD_FOR:
-                aoTableColumns = new STableColumn[14];
+                aoTableColumns = new STableColumn[12];
                 break;
             default:
-                aoTableColumns = new STableColumn[13];
+                aoTableColumns = new STableColumn[11];
                 break;
         }
 
