@@ -7,9 +7,9 @@ package erp.print;
 
 import cfd.DCfdUtils;
 import cfd.DElement;
+import cfd.ver3.nom11.DElementNomina;
 import cfd.ver32.DElementComprobante;
 import cfd.ver32.DElementTimbreFiscalDigital;
-import cfd.ver3.nom11.DElementNomina;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SDialogResult;
 import erp.client.SClientInterface;
@@ -202,6 +202,7 @@ public class PrintCfdiThread extends Thread {
         map.put("NominaNumTipo", mnSubtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? (oFormerPayroll.getNumber() + " " + oFormerPayroll.getType()) : (nPayrollNumber + " " + sAuxPaymentType));
         map.put("NominaFolio", comprobante.getAttSerie().getString() + "-" + comprobante.getAttFolio().getString());
         map.put("sXmlBaseDir", miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory());
+        map.put("sCfdVersion", comprobante.getAttVersion().getString());
 
         map.put("dCfdConceptoCantidad", comprobante.getEltConceptos().getEltHijosConcepto().get(0).getAttCantidad().getDouble());
         map.put("sCfdConceptoUnidad", comprobante.getEltConceptos().getEltHijosConcepto().get(0).getAttUnidad().getString());
