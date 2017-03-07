@@ -94,6 +94,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private erp.lib.form.SFormField moFieldFkBizPartnerTypeId;
     private erp.lib.form.SFormField moFieldKey;
     private erp.lib.form.SFormField moFieldCompanyKey;
+    private erp.lib.form.SFormField moFieldNumberExporter;
     private erp.lib.form.SFormField moFieldFkCreditTypeId_n;
     private erp.lib.form.SFormField moFieldFkRiskTypeId;
     private erp.lib.form.SFormField moFieldGuaranteeAmount;
@@ -247,6 +248,9 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jlCompanyKey = new javax.swing.JLabel();
         jtfCompanyKey = new javax.swing.JTextField();
         jlCompanyKey1 = new javax.swing.JLabel();
+        jPanel54 = new javax.swing.JPanel();
+        jlNumberExporter = new javax.swing.JLabel();
+        jtfNumberExporter = new javax.swing.JTextField();
         jPanel39 = new javax.swing.JPanel();
         jlDummy01 = new javax.swing.JLabel();
         jckIsCreditByUser = new javax.swing.JCheckBox();
@@ -636,7 +640,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jPanel44.setLayout(new java.awt.BorderLayout());
 
         jPanel45.setBorder(javax.swing.BorderFactory.createTitledBorder("Categoría y tipo de asociado de negocios e información de crédito:"));
-        jPanel45.setLayout(new java.awt.GridLayout(12, 1, 0, 2));
+        jPanel45.setLayout(new java.awt.GridLayout(13, 1, 0, 2));
 
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
@@ -706,6 +710,17 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jPanel38.add(jlCompanyKey1);
 
         jPanel45.add(jPanel38);
+
+        jPanel54.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlNumberExporter.setText("No. exportador conf.:");
+        jlNumberExporter.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel54.add(jlNumberExporter);
+
+        jtfNumberExporter.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel54.add(jtfNumberExporter);
+
+        jPanel45.add(jPanel54);
 
         jPanel39.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
@@ -1373,6 +1388,9 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moFieldCompanyKey = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCompanyKey, jlCompanyKey);
         moFieldCompanyKey.setTabbedPaneIndex(1, jTabbedPane1);
         moFieldCompanyKey.setLengthMax(25);
+        moFieldNumberExporter = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfNumberExporter, jlNumberExporter);
+        moFieldNumberExporter.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldNumberExporter.setLengthMax(20);
         moFieldFkCreditTypeId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkCreditTypeId_n, jlFkCreditTypeId_n);
         moFieldFkCreditTypeId_n.setTabbedPaneIndex(1, jTabbedPane1);
         moFieldFkRiskTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkRiskId, jlFkRiskId);
@@ -1457,6 +1475,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         mvFieldsCategory.add(moFieldFkBizPartnerTypeId);
         mvFieldsCategory.add(moFieldKey);
         mvFieldsCategory.add(moFieldCompanyKey);
+        mvFieldsCategory.add(moFieldNumberExporter);
         mvFieldsCategory.add(moFieldFkCreditTypeId_n);
         mvFieldsCategory.add(moFieldCreditLimit);
         mvFieldsCategory.add(moFieldDaysOfCredit);
@@ -1708,6 +1727,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moBizPartnerCategory.setPkBizPartnerCategoryId(1);
         moBizPartnerCategory.setKey(moFieldKey.getString());
         moBizPartnerCategory.setCompanyKey(moFieldCompanyKey.getString());
+        moBizPartnerCategory.setNumberExporter(moFieldNumberExporter.getString());
         moBizPartnerCategory.setCreditLimit(0);
         moBizPartnerCategory.setDaysOfCredit(0);
         moBizPartnerCategory.setDaysOfGrace(0);
@@ -2094,6 +2114,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JPanel jPanel51;
     private javax.swing.JPanel jPanel52;
     private javax.swing.JPanel jPanel53;
+    private javax.swing.JPanel jPanel54;
     private javax.swing.JPanel jPanel55;
     private javax.swing.JPanel jPanel56;
     private javax.swing.JPanel jPanel57;
@@ -2214,6 +2235,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JLabel jlKey;
     private javax.swing.JLabel jlLastName;
     private javax.swing.JLabel jlNotes;
+    private javax.swing.JLabel jlNumberExporter;
     private javax.swing.JLabel jlPaymentAccount;
     private javax.swing.JLabel jlWeb;
     private javax.swing.JPanel jpBizPartner;
@@ -2238,6 +2260,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JTextField jtfInsurance;
     private javax.swing.JTextField jtfLastName;
     private javax.swing.JTextField jtfNotes;
+    private javax.swing.JTextField jtfNumberExporter;
     private javax.swing.JTextField jtfPaymentAccount;
     private javax.swing.JTextField jtfPkBizPartnerId_Ro;
     private javax.swing.JTextField jtfWeb;
@@ -2303,6 +2326,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
      private void renderCategorySettings() {
         if (moFieldFkBizPartnerCategoryId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_CT_BP_SUP ||
                 moFieldFkBizPartnerCategoryId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_CT_BP_CUS) {
+            jtfNumberExporter.setEnabled(false);
             jlFkCreditTypeId_n.setEnabled(true);
             jlCreditLimit.setEnabled(true);
             jlDaysOfCredit.setEnabled(true);
@@ -2316,9 +2340,11 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             jbAddBranch.setEnabled(true);
         }
         else if (mnParamBizPartnerType == SDataConstants.BPSX_BP_CO) {
+            jtfNumberExporter.setEnabled(true);
             jbAddBranch.setEnabled(true);
         }
         else {
+            jtfNumberExporter.setEnabled(false);
             jlCreditLimit.setEnabled(false);
             jlDaysOfCredit.setEnabled(false);
             jlDaysOfGrace.setEnabled(false);
@@ -2962,6 +2988,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
             moFieldKey.setFieldValue(moBizPartnerCategory.getKey());
             moFieldCompanyKey.setFieldValue(moBizPartnerCategory.getCompanyKey());
+            moFieldNumberExporter.setFieldValue(moBizPartnerCategory.getNumberExporter());
                     
             if (moBizPartnerCategory.getIsCreditByUser()) {
                 moFieldFkCreditTypeId_n.setFieldValue(new int[] { moBizPartnerCategory.getEffectiveCreditTypeId() });
@@ -3138,6 +3165,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             moBizPartnerCategory.setPkBizPartnerCategoryId(moFieldFkBizPartnerCategoryId.getKeyAsIntArray()[0]);
             moBizPartnerCategory.setKey(moFieldKey.getString());
             moBizPartnerCategory.setCompanyKey(moFieldCompanyKey.getString());
+            moBizPartnerCategory.setNumberExporter(moFieldNumberExporter.getString());
             
             if (!jckIsCreditByUser.isSelected()) {
                 moBizPartnerCategory.setCreditLimit(0);

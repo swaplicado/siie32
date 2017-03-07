@@ -22,6 +22,7 @@ public class SDataCountry extends erp.lib.data.SDataRegistry implements java.io.
     protected java.lang.String msCountryLan;
     protected java.lang.String msCountryAbbr;
     protected java.lang.String msCountryCode;
+    protected java.lang.String msCountryGroup;
     protected boolean mbIsDeleted;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
@@ -41,6 +42,7 @@ public class SDataCountry extends erp.lib.data.SDataRegistry implements java.io.
     public void setCountryLan(java.lang.String s) { msCountryLan = s; }
     public void setCountryAbbr(java.lang.String s) { msCountryAbbr = s; }
     public void setCountryCode(java.lang.String s) { msCountryCode = s; }
+    public void setCountryGroup(java.lang.String s) { msCountryGroup = s; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
@@ -55,6 +57,7 @@ public class SDataCountry extends erp.lib.data.SDataRegistry implements java.io.
     public java.lang.String getCountryLan() { return msCountryLan; }
     public java.lang.String getCountryAbbr() { return msCountryAbbr; }
     public java.lang.String getCountryCode() { return msCountryCode; }
+    public java.lang.String getCountryGroup() { return msCountryGroup; }
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
@@ -83,6 +86,7 @@ public class SDataCountry extends erp.lib.data.SDataRegistry implements java.io.
         msCountryLan = "";
         msCountryAbbr = "";
         msCountryCode = "";
+        msCountryGroup = "";
         mbIsDeleted = false;
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
@@ -114,6 +118,7 @@ public class SDataCountry extends erp.lib.data.SDataRegistry implements java.io.
                 msCountryLan = resultSet.getString("cty_lan");
                 msCountryAbbr = resultSet.getString("cty_abbr");
                 msCountryCode = resultSet.getString("cty_code");
+                msCountryGroup = resultSet.getString("cty_group");
                 mbIsDeleted = resultSet.getBoolean("b_del");
                 mnFkUserNewId = resultSet.getInt("fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("fid_usr_edit");
@@ -149,13 +154,14 @@ public class SDataCountry extends erp.lib.data.SDataRegistry implements java.io.
             callableStatement = connection.prepareCall(
                     "{ CALL erp.locu_cty_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?) }");
+                    "?, ?) }");
             callableStatement.setInt(nParam++, mnPkCountryId);
             callableStatement.setString(nParam++, msKey);
             callableStatement.setString(nParam++, msCountry);
             callableStatement.setString(nParam++, msCountryLan);
             callableStatement.setString(nParam++, msCountryAbbr);
             callableStatement.setString(nParam++, msCountryCode);
+            callableStatement.setString(nParam++, msCountryGroup);
             callableStatement.setBoolean(nParam++, mbIsDeleted);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);

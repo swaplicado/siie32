@@ -21,12 +21,23 @@ import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
+import erp.lib.table.STableColumnForm;
+import erp.lib.table.STableConstants;
+import erp.lib.table.STablePane;
+import erp.mfin.data.SDataAccount;
+import erp.mfin.data.SDataAccountRow;
+import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.AbstractAction;
+import javax.swing.JRadioButton;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
 
@@ -34,7 +45,7 @@ import net.sf.jasperreports.view.JasperViewer;
  *
  * @author Alfonso Flores, Sergio Flores
  */
-public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
+public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener, CellEditorListener {
 
     private int mnFormType;
     private int mnFormResult;
@@ -44,9 +55,17 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.client.SClientInterface miClient;
 
+    private erp.lib.table.STablePane moPaneAccounts;
     private erp.lib.form.SFormField moFieldDateStart;
     private erp.lib.form.SFormField moFieldDateEnd;
     private erp.lib.form.SFormField moFieldCompanyBranch;
+    
+    protected int mnNumberAccountsSelects;
+    protected boolean mbIsSelectedAll;
+    protected String msAccountsSelectedsId;
+    protected String msAccountsSelectedsName;
+
+    private final int COL_SEL = 2;
 
     /** Creates new form SDialogRepPurchasesUnitaryCost */
     public SDialogRepPurchasesUnitaryCost(erp.client.SClientInterface client) {
@@ -66,6 +85,7 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        gbtSelect = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jbPrint = new javax.swing.JButton();
         jbExit = new javax.swing.JButton();
@@ -79,11 +99,21 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
         jlDateEnd = new javax.swing.JLabel();
         jftDateEnd = new javax.swing.JFormattedTextField();
         jbDateEnd = new javax.swing.JButton();
+        jPanel9 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         jlCompanyBranch = new javax.swing.JLabel();
         jcbCompanyBranch = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel12 = new javax.swing.JPanel();
+        jrbAllAccounts = new javax.swing.JRadioButton();
+        jrbSelectAccounts = new javax.swing.JRadioButton();
+        jPanel10 = new javax.swing.JPanel();
+        jPanel11 = new javax.swing.JPanel();
+        jpAccounts = new javax.swing.JPanel();
+        jPanel13 = new javax.swing.JPanel();
+        jbSelectAll = new javax.swing.JButton();
+        jbDeselectAll = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Reporte de costos unitarios de compras");
@@ -154,6 +184,8 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
 
         jPanel2.add(jPanel3, java.awt.BorderLayout.NORTH);
 
+        jPanel9.setLayout(new java.awt.BorderLayout());
+
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtros del reporte:"));
         jPanel4.setLayout(new java.awt.BorderLayout());
 
@@ -174,11 +206,48 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
 
         jPanel4.add(jPanel7, java.awt.BorderLayout.NORTH);
 
-        jPanel2.add(jPanel4, java.awt.BorderLayout.CENTER);
+        jPanel12.setLayout(new java.awt.GridLayout(2, 1));
+
+        gbtSelect.add(jrbAllAccounts);
+        jrbAllAccounts.setSelected(true);
+        jrbAllAccounts.setText("Todas las cuentas contables.");
+        jPanel12.add(jrbAllAccounts);
+
+        gbtSelect.add(jrbSelectAccounts);
+        jrbSelectAccounts.setText("Solo cuentas contables seleccionadas.");
+        jPanel12.add(jrbSelectAccounts);
+
+        jPanel4.add(jPanel12, java.awt.BorderLayout.CENTER);
+
+        jPanel9.add(jPanel4, java.awt.BorderLayout.NORTH);
+
+        jPanel10.setLayout(new java.awt.BorderLayout());
+
+        jPanel11.setLayout(new java.awt.BorderLayout());
+        jPanel10.add(jPanel11, java.awt.BorderLayout.NORTH);
+
+        jpAccounts.setBorder(javax.swing.BorderFactory.createTitledBorder("Cuentas contables de compras:"));
+        jpAccounts.setLayout(new java.awt.BorderLayout());
+
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
+
+        jbSelectAll.setText("Seleccionar todas");
+        jPanel13.add(jbSelectAll);
+
+        jbDeselectAll.setText("Deseleccionar todas");
+        jPanel13.add(jbDeselectAll);
+
+        jpAccounts.add(jPanel13, java.awt.BorderLayout.NORTH);
+
+        jPanel10.add(jpAccounts, java.awt.BorderLayout.CENTER);
+
+        jPanel9.add(jPanel10, java.awt.BorderLayout.CENTER);
+
+        jPanel2.add(jPanel9, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        setSize(new java.awt.Dimension(400, 300));
+        setSize(new java.awt.Dimension(576, 389));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -187,14 +256,40 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
+        int i = 0;
+        STableColumnForm[] columns = null;
         mvFields = new Vector<SFormField>();
-
+        
         moFieldDateStart = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateStart, jlDateStart);
         moFieldDateStart.setPickerButton(jbDateStart);
         moFieldDateEnd = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateEnd, jlDateEnd);
         moFieldDateEnd.setPickerButton(jbDateEnd);
         moFieldCompanyBranch = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCompanyBranch, jlCompanyBranch);
+        
+        moPaneAccounts = new STablePane(miClient);
+        jpAccounts.add(moPaneAccounts, BorderLayout.CENTER);
+        i = 0;
+        columns = new STableColumnForm[3];
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. cuenta contable", 75);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Cuenta contable", 150);
+        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Eliminado", STableConstants.WIDTH_BOOLEAN);
+        columns[i++].setEditable(true);
 
+        for (i = 0; i < columns.length; i++) {
+            moPaneAccounts.addTableColumn(columns[i]);
+        }
+        
+        moPaneAccounts.createTable();
+        moPaneAccounts.getTable().getTableHeader().setReorderingAllowed(false);
+        //moPaneAccounts.getTableModel().getTableRows().addAll(mvTableRows);
+        moPaneAccounts.renderTable();
+        moPaneAccounts.layoutTable();
+
+        moPaneAccounts.setTableRowSelection(0);
+        
+        moPaneAccounts.getTable().getColumnModel().getColumn(COL_SEL).setCellEditor(moPaneAccounts.getTable().getDefaultEditor(Boolean.class));
+        moPaneAccounts.getTable().getColumnModel().getColumn(COL_SEL).getCellEditor().addCellEditorListener(this);
+        
         mvFields.add(moFieldDateStart);
         mvFields.add(moFieldDateEnd);
         mvFields.add(moFieldCompanyBranch);
@@ -203,6 +298,10 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
         jbExit.addActionListener(this);
         jbDateStart.addActionListener(this);
         jbDateEnd.addActionListener(this);
+        jbSelectAll.addActionListener(this);
+        jbDeselectAll.addActionListener(this);
+        jrbAllAccounts.addItemListener(this);
+        jrbSelectAccounts.addItemListener(this);
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -234,7 +333,7 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
         Map<String, Object> map = null;
         JasperPrint jasperPrint = null;
         JasperViewer jasperViewer = null;
-
+        
         if (validation.getIsError()) {
             if (validation.getComponent() != null) {
                 validation.getComponent().requestFocus();
@@ -247,6 +346,8 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
             try {
                 setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
+                getAccounts();
+                
                 map = miClient.createReportParams();
                 map.put("tStart", moFieldDateStart.getDate());
                 map.put("tEnd", moFieldDateEnd.getDate());
@@ -256,6 +357,8 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
                 map.put("nAccMovPurAdjTp", SDataConstantsSys.FINS_CLS_ACC_PUR_ADJ[0]);
                 map.put("nAccMovPurAdjCl", SDataConstantsSys.FINS_CLS_ACC_PUR_ADJ[1]);
                 map.put("nAccMovPurAdjCls", SDataConstantsSys.FINS_CLS_ACC_PUR_ADJ[2]);
+                map.put("sSqlWhereAcc", msAccountsSelectedsId.isEmpty() ? "" : "WHERE fid_acc IN(" + msAccountsSelectedsId + ")");
+                map.put("sAccount", jrbAllAccounts.isSelected() || mbIsSelectedAll ? "(TODAS)" : msAccountsSelectedsName);
 
                 jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_PUR_UNIT_COST, map);
                 jasperViewer = new JasperViewer(jasperPrint, false);
@@ -297,9 +400,90 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
             jftDateEnd.requestFocus();
         }
     }
+    
+    private void loadAccountsPurchases() {
+        ArrayList<SDataAccount> accounts = new ArrayList<SDataAccount>();
+        
+        try {
+            accounts = SDataUtilities.obtainAccountsByType(miClient, SDataConstantsSys.FINS_CLS_ACC_PUR);
+            
+            moPaneAccounts.clearTableRows();
+            for (SDataAccount account : accounts) {
+                moPaneAccounts.addTableRow(new SDataAccountRow(account));
+            }
+            moPaneAccounts.renderTableRows();
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+    }
+    
+    private void getAccounts() {
+        int i = 0;
+        SDataAccountRow payRow = null;
+        msAccountsSelectedsId = "";
+        msAccountsSelectedsName = "";
+        mnNumberAccountsSelects = 0;
+        mbIsSelectedAll = false;
+        
+        for (; i < moPaneAccounts.getTableGuiRowCount(); i++) {
+            payRow = (SDataAccountRow) moPaneAccounts.getTableRow(i);
+            
+            if (payRow.isSelected()) {
+                msAccountsSelectedsId += (msAccountsSelectedsId.length() == 0 ? "'" : ", '") + ((SDataAccount) payRow.getData()).getPkAccountIdXXX() + "'";
+                msAccountsSelectedsName += (msAccountsSelectedsName.length() == 0 ? "" : ", ") + ((SDataAccount) payRow.getData()).getPkAccountIdXXX();
+                mnNumberAccountsSelects++;
+            }
+        }
+        
+        mbIsSelectedAll = mnNumberAccountsSelects == moPaneAccounts.getTableGuiRowCount();
+    }
+    
+    private void actionEntrySelect() {
+        SDataAccountRow payRow = null;
+        int index = moPaneAccounts.getTable().getSelectedRow();
+
+        if (index != -1) {
+            payRow = (SDataAccountRow) moPaneAccounts.getTableRow(index);
+            payRow.setSelected(!payRow.isSelected());
+            
+            payRow.prepareTableRow();
+        }
+    }
+    
+    private void actionSelectAll(boolean selected) {
+        int i = 0;
+        SDataAccountRow payRow = null;
+        
+        for (; i < moPaneAccounts.getTableGuiRowCount(); i++) {
+            payRow = (SDataAccountRow) moPaneAccounts.getTableRow(i);
+            payRow.setSelected(selected);
+            payRow.prepareTableRow();
+        }
+        moPaneAccounts.renderTableRows();
+        moPaneAccounts.setTableRowSelection(0);
+    }
+
+    private void itemStateChangedCurrencyOptions() {
+        if (jrbAllAccounts.isSelected()) {
+            jbSelectAll.setEnabled(false);
+            jbDeselectAll.setEnabled(false);
+            actionSelectAll(false);
+        }
+        else {
+            jbSelectAll.setEnabled(true);
+            jbDeselectAll.setEnabled(true);
+            actionSelectAll(true);
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup gbtSelect;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -307,16 +491,22 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbDateEnd;
     private javax.swing.JButton jbDateStart;
+    private javax.swing.JButton jbDeselectAll;
     private javax.swing.JButton jbExit;
     private javax.swing.JButton jbPrint;
+    private javax.swing.JButton jbSelectAll;
     private javax.swing.JComboBox<SFormComponentItem> jcbCompanyBranch;
     private javax.swing.JFormattedTextField jftDateEnd;
     private javax.swing.JFormattedTextField jftDateStart;
     private javax.swing.JLabel jlCompanyBranch;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
+    private javax.swing.JPanel jpAccounts;
+    private javax.swing.JRadioButton jrbAllAccounts;
+    private javax.swing.JRadioButton jrbSelectAccounts;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -341,6 +531,7 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
     @Override
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbCompanyBranch, SDataConstants.BPSU_BPB, new int[] { miClient.getSessionXXX().getCurrentCompany().getPkCompanyId() });
+        loadAccountsPurchases();
     }
 
     @Override
@@ -427,6 +618,35 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
             else if (button == jbDateEnd) {
                 actionDateEnd();
             }
+            else if (button == jbSelectAll) {
+                actionSelectAll(true);
+            }
+            else if (button == jbDeselectAll) {
+                actionSelectAll(false);
+            }
         }
+    }
+    
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof JRadioButton) {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                JRadioButton radioButton = (JRadioButton) e.getSource();
+
+                if (radioButton == jrbAllAccounts || radioButton == jrbSelectAccounts) {
+                    itemStateChangedCurrencyOptions();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void editingStopped(ChangeEvent e) {
+        actionEntrySelect();
+    }
+
+    @Override
+    public void editingCanceled(ChangeEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

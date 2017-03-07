@@ -64,7 +64,7 @@ public class SViewItem extends erp.lib.table.STableTab implements java.awt.event
         jbDelete.setEnabled(false);
 
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[41];
+        STableColumn[] aoTableColumns = new STableColumn[42];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "i.id_item");
@@ -84,6 +84,7 @@ public class SViewItem extends erp.lib.table.STableTab implements java.awt.event
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ig.igen", "Ítem genérico", 150);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "il.line", "Línea ítems", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_cfd_pro_ser", "Producto-servicio SAT", 100);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_tariff", "Fracción arancelaria", 50);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_bulk", "Granel", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_inv", "Inventariable", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_lot", "Lote", STableConstants.WIDTH_BOOLEAN);
@@ -197,7 +198,7 @@ public class SViewItem extends erp.lib.table.STableTab implements java.awt.event
         msSql = "SELECT i.id_item, i.item, i.item_short, i.item_key, i.b_bulk, i.b_inv, i.b_lot, i.units_cont, " +
                 "i.units_virt, i.prod_time, i.weight_gross, i.weight_delivery, i.surplus_per, i.b_ref, i.b_pre_pay, " +
                 "i.b_free_price, i.b_free_disc, i.b_free_disc_u, i.b_free_disc_ety, i.b_free_disc_doc, i.b_free_comms, i.b_del, i.ts_new, i.ts_edit, i.ts_del, " +
-                "ig.igen, cfd_pro_ser.name AS _cfd_pro_ser, si.name, u.symbol, uc.symbol, uv.symbol, unc.symbol, uncu.symbol, tua.tp_unit, tl.tp_lev, brd.brd, " +
+                "ig.igen, cfd_pro_ser.name AS _cfd_pro_ser, i.tariff AS _tariff, si.name, u.symbol, uc.symbol, uv.symbol, unc.symbol, uncu.symbol, tua.tp_unit, tl.tp_lev, brd.brd, " +
                 "mfr.mfr, emt.emt, un.usr, ue.usr, ud.usr, il.line " +
                 "FROM erp.itmu_item AS i " +
                 "INNER JOIN erp.itmu_igen AS ig ON " +

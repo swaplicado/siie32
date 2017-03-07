@@ -29,7 +29,6 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected java.lang.String msPresentation;
     protected java.lang.String msPresentationShort;
     protected java.lang.String msCode;
-    protected java.lang.String msTariffFraction;
     protected boolean mbIsInventoriable;
     protected boolean mbIsLotApplying;
     protected boolean mbIsBulk;
@@ -56,6 +55,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected double mdWeightDelivery;
     protected double mdUnitAlternativeBaseEquivalence;
     protected double mdSurplusPercentage;
+    protected java.lang.String msTariff;
     protected boolean mbIsReference;
     protected boolean mbIsPrepayment;
     protected boolean mbIsFreePrice;
@@ -117,7 +117,6 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public void setPresentation(java.lang.String s) { msPresentation = s; }
     public void setPresentationShort(java.lang.String s) { msPresentationShort = s; }
     public void setCode(java.lang.String s) { msCode = s; }
-    public void setTariffFraction(java.lang.String s) { msTariffFraction = s; }
     public void setIsInventoriable(boolean b) { mbIsInventoriable = b; }
     public void setIsLotApplying(boolean b) { mbIsLotApplying = b; }
     public void setIsBulk(boolean b) { mbIsBulk = b; }
@@ -144,6 +143,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public void setWeightDelivery(double d) { mdWeightDelivery = d; }
     public void setUnitAlternativeBaseEquivalence(double d) { mdUnitAlternativeBaseEquivalence = d; }
     public void setSurplusPercentage(double d) { mdSurplusPercentage = d; }
+    public void setTariff(java.lang.String s) { msTariff = s; }
     public void setIsReference(boolean b) { mbIsReference = b; }
     public void setIsPrepayment(boolean b) { mbIsPrepayment = b; }
     public void setIsFreePrice(boolean b) { mbIsFreePrice = b; }
@@ -193,7 +193,6 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public java.lang.String getPresentation() { return msPresentation; }
     public java.lang.String getPresentationShort() { return msPresentationShort; }
     public java.lang.String getCode() { return msCode; }
-    public java.lang.String getTariffFraction() { return msTariffFraction; }
     public boolean getIsInventoriable() { return mbIsInventoriable; }
     public boolean getIsLotApplying() { return mbIsLotApplying; }
     public boolean getIsBulk() { return mbIsBulk; }
@@ -220,6 +219,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public double getWeightDelivery() { return mdWeightDelivery; }
     public double getUnitAlternativeBaseEquivalence() { return mdUnitAlternativeBaseEquivalence; }
     public double getSurplusPercentage() { return mdSurplusPercentage; }
+    public java.lang.String getTariff() { return msTariff; }
     public boolean getIsReference() { return mbIsReference; }
     public boolean getIsPrepayment() { return mbIsPrepayment; }
     public boolean getIsFreePrice() { return mbIsFreePrice; }
@@ -308,7 +308,6 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
         msPresentation = "";
         msPresentationShort = "";
         msCode = "";
-        msTariffFraction = "";
         mbIsInventoriable = false;
         mbIsLotApplying = false;
         mbIsBulk = false;
@@ -335,6 +334,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
         mdWeightDelivery = 0;
         mdUnitAlternativeBaseEquivalence = 0;
         mdSurplusPercentage = 0;
+        msTariff = "";
         mbIsReference = false;
         mbIsPrepayment = false;
         mbIsFreePrice = false;
@@ -407,7 +407,6 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                 msPresentation = resultSet.getString("present");
                 msPresentationShort = resultSet.getString("present_short");
                 msCode = resultSet.getString("code");
-                //msTariffFraction = resultSet.getString("code");
                 mbIsInventoriable = resultSet.getBoolean("b_inv");
                 mbIsLotApplying = resultSet.getBoolean("b_lot");
                 mbIsBulk = resultSet.getBoolean("b_bulk");
@@ -434,6 +433,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                 mdWeightDelivery = resultSet.getDouble("weight_delivery");
                 mdUnitAlternativeBaseEquivalence = resultSet.getDouble("unit_alt_base_equiv");
                 mdSurplusPercentage = resultSet.getDouble("surplus_per");
+                msTariff = resultSet.getString("tariff");
                 mbIsReference = resultSet.getBoolean("b_ref");
                 mbIsPrepayment = resultSet.getBoolean("b_pre_pay");
                 mbIsFreePrice = resultSet.getBoolean("b_free_price");
@@ -554,7 +554,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?) }");
+                    "?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkItemId);
             callableStatement.setString(nParam++, msKey);
             callableStatement.setString(nParam++, msItem);
@@ -564,7 +564,6 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
             callableStatement.setString(nParam++, msPresentation);
             callableStatement.setString(nParam++, msPresentationShort);
             callableStatement.setString(nParam++, msCode);
-            //callableStatement.setString(nParam++, msTariffFraction);
             callableStatement.setBoolean(nParam++, mbIsInventoriable);
             callableStatement.setBoolean(nParam++, mbIsLotApplying);
             callableStatement.setBoolean(nParam++, mbIsBulk);
@@ -591,6 +590,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
             callableStatement.setDouble(nParam++, mdWeightDelivery);
             callableStatement.setDouble(nParam++, mdUnitAlternativeBaseEquivalence);
             callableStatement.setDouble(nParam++, mdSurplusPercentage);
+            callableStatement.setString(nParam++, msTariff);
             callableStatement.setBoolean(nParam++, mbIsReference);
             callableStatement.setBoolean(nParam++, mbIsPrepayment);
             callableStatement.setBoolean(nParam++, mbIsFreePrice);

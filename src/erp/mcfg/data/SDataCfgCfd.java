@@ -5,12 +5,14 @@
 
 package erp.mcfg.data;
 
-import erp.data.SDataConstants;
+import erp.cfd.SCceEmisorAddressAux;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.mod.SModConsts;
 import java.io.ByteArrayInputStream;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
 import javax.xml.parsers.DocumentBuilder;
@@ -31,31 +33,23 @@ public class SDataCfgCfd extends erp.lib.data.SDataRegistry implements java.io.S
     
     protected java.lang.String msCfdUsoCfdi;
     
-    protected java.lang.String msCfdCceEmisorColonia;
-    protected java.lang.String msCfdCceEmisorLocalidad;
-    protected java.lang.String msCfdCceEmisorMunicipio;
+    protected ArrayList<SCceEmisorAddressAux> maCceEmisorAddress;
 
     public SDataCfgCfd() {
-        super(SDataConstants.TRN_CTR);
+        super(SModConsts.CFGU_CO);
         reset();
     }
 
     public void setXml(java.lang.String s) { msXml = s; }
     
     public void setCfdUsoCfdi(java.lang.String s) { msCfdUsoCfdi = s; }
-    
-    public void setCfdCceEmisorColonia(java.lang.String s) { msCfdCceEmisorColonia = s; }
-    public void setCfdCceEmisorLocalidad(java.lang.String s) { msCfdCceEmisorLocalidad = s; }
-    public void setCfdCceEmisorMunicipio(java.lang.String s) { msCfdCceEmisorMunicipio = s; }
 
     public java.lang.String getXml() { return msXml; }
     
     public java.lang.String getCfdUsoCfdi() { return msCfdUsoCfdi; }
-    
-    public java.lang.String getCfdCceEmisorColonia() { return msCfdCceEmisorColonia; }
-    public java.lang.String getCfdCceEmisorLocalidad() { return msCfdCceEmisorLocalidad; }
-    public java.lang.String getCfdCceEmisorMunicipio() { return msCfdCceEmisorMunicipio; }
 
+    public ArrayList<SCceEmisorAddressAux> getCceEmisorAddressAux() { return maCceEmisorAddress; }
+    
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
         mnPkCfgId = ((int[]) pk)[0];
@@ -75,9 +69,7 @@ public class SDataCfgCfd extends erp.lib.data.SDataRegistry implements java.io.S
         
         msCfdUsoCfdi = "";
         
-        msCfdCceEmisorColonia = "";
-        msCfdCceEmisorLocalidad = "";
-        msCfdCceEmisorMunicipio = "";
+        maCceEmisorAddress =  new ArrayList<SCceEmisorAddressAux>();
     }
 
     @Override
@@ -179,6 +171,10 @@ public class SDataCfgCfd extends erp.lib.data.SDataRegistry implements java.io.S
         Node nodeChild = null;
         NamedNodeMap namedNodeMapChild = null;
         Vector<Node> nodeChilds = null;
+        String cfdCceEmisorCodigoPostal;
+        String cfdCceEmisorColonia;
+        String cfdCceEmisorLocalidad;
+        String cfdCceEmisorMunicipio;
         
         node = SXmlUtils.extractElements(doc, "CfgCfd").item(0);
         namedNodeMap = node.getAttributes();
@@ -198,9 +194,12 @@ public class SDataCfgCfd extends erp.lib.data.SDataRegistry implements java.io.S
                 for (int i = 0; i < nodeChilds.size(); i++) {
                     namedNodeMapChild = nodeChilds.get(i).getAttributes();
                     
-                    msCfdCceEmisorColonia = SXmlUtils.extractAttributeValue(namedNodeMapChild, "colonia", false);
-                    msCfdCceEmisorLocalidad = SXmlUtils.extractAttributeValue(namedNodeMapChild, "localidad", false);
-                    msCfdCceEmisorMunicipio = SXmlUtils.extractAttributeValue(namedNodeMapChild, "municipio", false);
+                    cfdCceEmisorCodigoPostal = SXmlUtils.extractAttributeValue(namedNodeMapChild, "CodigoPostal", false);
+                    cfdCceEmisorColonia = SXmlUtils.extractAttributeValue(namedNodeMapChild, "Colonia", false);
+                    cfdCceEmisorLocalidad = SXmlUtils.extractAttributeValue(namedNodeMapChild, "Localidad", false);
+                    cfdCceEmisorMunicipio = SXmlUtils.extractAttributeValue(namedNodeMapChild, "Municipio", false);
+                    
+                    maCceEmisorAddress.add(new SCceEmisorAddressAux(cfdCceEmisorCodigoPostal, cfdCceEmisorColonia, cfdCceEmisorLocalidad, cfdCceEmisorMunicipio));
                 }
             }
         }

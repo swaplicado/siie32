@@ -32,8 +32,8 @@ public class SXmlDpsCfdCce extends SXmlElement {
     protected SXmlAttribute moCfdCceCertificadoOrigen;
     protected SXmlAttribute moCfdCceNumCertificadoOrigen;
     protected SXmlAttribute moCfdCceSubdivision;
-    protected SXmlAttribute moCfdCceTipoCambioUSD;
-    protected SXmlAttribute moCfdCceTotalUSD;
+    protected SXmlAttribute moCfdCceTipoCambioUsd;
+    protected SXmlAttribute moCfdCceTotalUsd;
     protected SXmlAttribute moCfdCceNumExportadorConfiable;
     
     public SXmlDpsCfdCce() {
@@ -45,8 +45,8 @@ public class SXmlDpsCfdCce extends SXmlElement {
         moCfdCceCertificadoOrigen = new SXmlAttribute(ATT_CERT_ORIG);
         moCfdCceNumCertificadoOrigen = new SXmlAttribute(ATT_NUM_CERT_ORIG);
         moCfdCceSubdivision = new SXmlAttribute(ATT_SUB);
-        moCfdCceTipoCambioUSD = new SXmlAttribute(ATT_TP_CAMB);
-        moCfdCceTotalUSD = new SXmlAttribute(ATT_TOT_USD);
+        moCfdCceTipoCambioUsd = new SXmlAttribute(ATT_TP_CAMB);
+        moCfdCceTotalUsd = new SXmlAttribute(ATT_TOT_USD);
         moCfdCceNumExportadorConfiable = new SXmlAttribute(ATT_NUM_EXP_CONF);
         
         mvXmlAttributes.add(moCfdCceMotivoTraslado);
@@ -55,8 +55,8 @@ public class SXmlDpsCfdCce extends SXmlElement {
         mvXmlAttributes.add(moCfdCceCertificadoOrigen);
         mvXmlAttributes.add(moCfdCceNumCertificadoOrigen);
         mvXmlAttributes.add(moCfdCceSubdivision);
-        mvXmlAttributes.add(moCfdCceTipoCambioUSD);
-        mvXmlAttributes.add(moCfdCceTotalUSD);
+        mvXmlAttributes.add(moCfdCceTipoCambioUsd);
+        mvXmlAttributes.add(moCfdCceTotalUsd);
         mvXmlAttributes.add(moCfdCceNumExportadorConfiable);
     }
 }

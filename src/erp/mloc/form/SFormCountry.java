@@ -11,23 +11,23 @@
 
 package erp.mloc.form;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.Vector;
-import javax.swing.AbstractAction;
-
 import erp.data.SDataConstants;
 import erp.data.SDataUtilities;
 import erp.data.SProcConstants;
 import erp.lib.SLibConstants;
 import erp.lib.form.SFormField;
-import erp.lib.form.SFormValidation;
 import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
 import erp.mloc.data.SDataCountry;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.util.Vector;
+import javax.swing.AbstractAction;
+import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Juan Barajas
  */
 public class SFormCountry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -44,6 +44,7 @@ public class SFormCountry extends javax.swing.JDialog implements erp.lib.form.SF
     private erp.lib.form.SFormField moFieldCountry;
     private erp.lib.form.SFormField moFieldCountryAbbr;
     private erp.lib.form.SFormField moFieldCountryCode;
+    private erp.lib.form.SFormField moFieldCountryGroup;
     private erp.lib.form.SFormField moFieldIsDeleted;
 
     /** Creates new form Countries */
@@ -75,6 +76,8 @@ public class SFormCountry extends javax.swing.JDialog implements erp.lib.form.SF
         jtfCountryAbbr = new javax.swing.JTextField();
         jlCountryCode = new javax.swing.JLabel();
         jtfCountryCode = new javax.swing.JTextField();
+        jlCountryGroup = new javax.swing.JLabel();
+        moTextCountryGroup = new sa.lib.gui.bean.SBeanFieldText();
         jckIsDeleted = new javax.swing.JCheckBox();
         jPanel1 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
@@ -93,7 +96,7 @@ public class SFormCountry extends javax.swing.JDialog implements erp.lib.form.SF
         jPanel2.setPreferredSize(new java.awt.Dimension(400, 215));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel3.setLayout(new java.awt.GridLayout(6, 2, 5, 5));
+        jPanel3.setLayout(new java.awt.GridLayout(7, 2, 5, 5));
 
         jlKey.setText("Clave: *");
         jPanel3.add(jlKey);
@@ -119,6 +122,12 @@ public class SFormCountry extends javax.swing.JDialog implements erp.lib.form.SF
         jtfCountryCode.setText("CÓDIGO");
         jPanel3.add(jtfCountryCode);
 
+        jlCountryGroup.setText("Código del grupo: *");
+        jPanel3.add(jlCountryGroup);
+
+        moTextCountryGroup.setText("sBeanFieldText1");
+        jPanel3.add(moTextCountryGroup);
+
         jckIsDeleted.setText("Registro eliminado");
         jckIsDeleted.setPreferredSize(new java.awt.Dimension(1000, 23));
         jPanel3.add(jckIsDeleted);
@@ -142,8 +151,8 @@ public class SFormCountry extends javax.swing.JDialog implements erp.lib.form.SF
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-400)/2, (screenSize.height-300)/2, 400, 300);
+        setSize(new java.awt.Dimension(400, 300));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -162,12 +171,16 @@ public class SFormCountry extends javax.swing.JDialog implements erp.lib.form.SF
         moFieldCountryAbbr.setLengthMax(25);
         moFieldCountryCode = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCountryCode, jlCountryCode);
         moFieldCountryCode.setLengthMax(10);
+        moFieldCountryGroup = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, moTextCountryGroup.getComponent(), jlCountryGroup);
+        moFieldCountryGroup.setLengthMax(25);
+        moTextCountryGroup.setTextSettings(SGuiUtils.getLabelName(jlCountryGroup.getText()), 25);
         moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
 
         mvFields.add(moFieldKey);
         mvFields.add(moFieldCountry);
         mvFields.add(moFieldCountryAbbr);
         mvFields.add(moFieldCountryCode);
+        mvFields.add(moFieldCountryGroup);
         mvFields.add(moFieldIsDeleted);
 
         jbOk.addActionListener(this);
@@ -242,10 +255,12 @@ public class SFormCountry extends javax.swing.JDialog implements erp.lib.form.SF
     private javax.swing.JLabel jlCountry;
     private javax.swing.JLabel jlCountryAbbr;
     private javax.swing.JLabel jlCountryCode;
+    private javax.swing.JLabel jlCountryGroup;
     private javax.swing.JLabel jlKey;
     private javax.swing.JTextField jtfCountry;
     private javax.swing.JTextField jtfCountryAbbr;
     private javax.swing.JTextField jtfCountryCode;
+    private sa.lib.gui.bean.SBeanFieldText moTextCountryGroup;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -271,7 +286,6 @@ public class SFormCountry extends javax.swing.JDialog implements erp.lib.form.SF
 
     @Override
     public void formRefreshCatalogues() {
-
     }
 
     @Override
@@ -328,6 +342,7 @@ public class SFormCountry extends javax.swing.JDialog implements erp.lib.form.SF
         moFieldCountry.setFieldValue(moCountry.getCountry());
         moFieldCountryAbbr.setFieldValue(moCountry.getCountryAbbr());
         moFieldCountryCode.setFieldValue(moCountry.getCountryCode());
+        moTextCountryGroup.setValue(moCountry.getCountryGroup());
         moFieldIsDeleted.setFieldValue(moCountry.getIsDeleted());
 
         renderKey();
@@ -348,6 +363,7 @@ public class SFormCountry extends javax.swing.JDialog implements erp.lib.form.SF
         moCountry.setCountry(moFieldCountry.getString());
         moCountry.setCountryAbbr(moFieldCountryAbbr.getString());
         moCountry.setCountryCode(moFieldCountryCode.getString());
+        moCountry.setCountryGroup(moTextCountryGroup.getValue());
         moCountry.setIsDeleted(moFieldIsDeleted.getBoolean());
 
         return moCountry;

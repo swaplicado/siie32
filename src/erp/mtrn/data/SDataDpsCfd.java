@@ -39,8 +39,8 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
     protected String msCfdCceCertificadoOrigen; 
     protected String msCfdCceNumCertificadoOrigen;
     protected String msCfdCceSubdivision;
-    protected String msCfdCceTipoCambioUSD;
-    protected String msCfdCceTotalUSD;
+    protected String msCfdCceTipoCambioUsd;
+    protected String msCfdCceTotalUsd;
     protected String msCfdCceNumExportadorConfiable;
     
     protected boolean mbHasInternationalTradeNode;
@@ -64,8 +64,8 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
     public void setCfdCceCertificadoOrigen(String s) { msCfdCceCertificadoOrigen = s; }
     public void setCfdCceNumCertificadoOrigen(String s) { msCfdCceNumCertificadoOrigen = s; }
     public void setCfdCceSubdivision(String s) { msCfdCceSubdivision = s; }
-    public void setCfdCceTipoCambioUSD(String s) { msCfdCceTipoCambioUSD = s; }
-    public void setCfdCceTotalUSD(String s) { msCfdCceTotalUSD = s; }
+    public void setCfdCceTipoCambioUsd(String s) { msCfdCceTipoCambioUsd = s; }
+    public void setCfdCceTotalUsd(String s) { msCfdCceTotalUsd = s; }
     public void setCfdCceNumExportadorConfiable(String s) { msCfdCceNumExportadorConfiable = s; }
 
     public int getPkYearId() { return mnPkYearId; }
@@ -82,8 +82,8 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
     public String getCfdCceCertificadoOrigen() { return msCfdCceCertificadoOrigen; }
     public String getCfdCceNumCertificadoOrigen() { return msCfdCceNumCertificadoOrigen; }
     public String getCfdCceSubdivision() { return msCfdCceSubdivision; }
-    public String getCfdCceTipoCambioUSD() { return msCfdCceTipoCambioUSD; }
-    public String getCfdCceTotalUSD() { return msCfdCceTotalUSD; }
+    public String getCfdCceTipoCambioUsd() { return msCfdCceTipoCambioUsd; }
+    public String getCfdCceTotalUsd() { return msCfdCceTotalUsd; }
     public String getCfdCceNumExportadorConfiable() { return msCfdCceNumExportadorConfiable; }
     
     public boolean hasInternationalTradeNode() { return mbHasInternationalTradeNode; }
@@ -117,8 +117,8 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
         msCfdCceCertificadoOrigen = "";
         msCfdCceNumCertificadoOrigen = "";
         msCfdCceSubdivision = "";
-        msCfdCceTipoCambioUSD = "";
-        msCfdCceTotalUSD = "";
+        msCfdCceTipoCambioUsd = "";
+        msCfdCceTotalUsd = "";
         msCfdCceNumExportadorConfiable = "";
         
         mbHasInternationalTradeNode = false;
@@ -237,8 +237,8 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
             cceXml.getAttribute(SXmlDpsCfdCce.ATT_CERT_ORIG).setValue(msCfdCceCertificadoOrigen);
             cceXml.getAttribute(SXmlDpsCfdCce.ATT_NUM_CERT_ORIG).setValue(msCfdCceNumCertificadoOrigen);
             cceXml.getAttribute(SXmlDpsCfdCce.ATT_SUB).setValue(msCfdCceSubdivision);
-            cceXml.getAttribute(SXmlDpsCfdCce.ATT_TP_CAMB).setValue(msCfdCceTipoCambioUSD);
-            cceXml.getAttribute(SXmlDpsCfdCce.ATT_TOT_USD).setValue(msCfdCceTotalUSD);
+            cceXml.getAttribute(SXmlDpsCfdCce.ATT_TP_CAMB).setValue(msCfdCceTipoCambioUsd);
+            cceXml.getAttribute(SXmlDpsCfdCce.ATT_TOT_USD).setValue(msCfdCceTotalUsd);
             cceXml.getAttribute(SXmlDpsCfdCce.ATT_NUM_EXP_CONF).setValue(msCfdCceNumExportadorConfiable);
 
             dpsXml.getXmlElements().add(cceXml);
@@ -254,30 +254,30 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
         Node nodeChild = null;
         NamedNodeMap namedNodeMapChild = null;
         
-        node = SXmlUtils.extractElements(doc, "Dps").item(0);
+        node = SXmlUtils.extractElements(doc, SXmlDpsCfd.NAME).item(0);
         namedNodeMap = node.getAttributes();
 
-        msCfdConfirmacion = SXmlUtils.extractAttributeValue(namedNodeMap, "confirmacion", false);
-        msCfdTipoRelacion = SXmlUtils.extractAttributeValue(namedNodeMap, "tipoRelacion", false);
-        msCfdUsoCfdi = SXmlUtils.extractAttributeValue(namedNodeMap, "usoCFDI", false);
+        msCfdConfirmacion = SXmlUtils.extractAttributeValue(namedNodeMap, SXmlDpsCfd.ATT_CONF, false);
+        msCfdTipoRelacion = SXmlUtils.extractAttributeValue(namedNodeMap, SXmlDpsCfd.ATT_TP_REL, false);
+        msCfdUsoCfdi = SXmlUtils.extractAttributeValue(namedNodeMap, SXmlDpsCfd.ATT_USO_CFDI, false);
         
         // International Trade:
 
-        if (SXmlUtils.hasChildElement(node, "cce11")) {
-            nodeChild = SXmlUtils.extractChildElements(node, "cce11").get(0);
+        if (SXmlUtils.hasChildElement(node, SXmlDpsCfdCce.NAME)) {
+            nodeChild = SXmlUtils.extractChildElements(node, SXmlDpsCfdCce.NAME).get(0);
             namedNodeMapChild = nodeChild.getAttributes();
             
             mbHasInternationalTradeNode = true;
             
-            msCfdCceMotivoTraslado = SXmlUtils.extractAttributeValue(namedNodeMapChild, "MotivoTraslado", false);
-            msCfdCceTipoOperacion = SXmlUtils.extractAttributeValue(namedNodeMapChild, "TipoOperacion", false);
-            msCfdCceClaveDePedimento = SXmlUtils.extractAttributeValue(namedNodeMapChild, "ClaveDePedimento", false);
-            msCfdCceCertificadoOrigen = SXmlUtils.extractAttributeValue(namedNodeMapChild, "CertificadoOrigen", false);
-            msCfdCceNumCertificadoOrigen = SXmlUtils.extractAttributeValue(namedNodeMapChild, "NumCertificadoOrigen", false);
-            msCfdCceSubdivision = SXmlUtils.extractAttributeValue(namedNodeMapChild, "Subdivision", false);
-            msCfdCceTipoCambioUSD = SXmlUtils.extractAttributeValue(namedNodeMapChild, "TipoCambioUSD", false);
-            msCfdCceTotalUSD = SXmlUtils.extractAttributeValue(namedNodeMapChild, "TotalUSD", false);
-            msCfdCceNumExportadorConfiable = SXmlUtils.extractAttributeValue(namedNodeMapChild, "NumExportadorConfiable", false);
+            msCfdCceMotivoTraslado = SXmlUtils.extractAttributeValue(namedNodeMapChild, SXmlDpsCfdCce.ATT_MOT_TRAS, false);
+            msCfdCceTipoOperacion = SXmlUtils.extractAttributeValue(namedNodeMapChild, SXmlDpsCfdCce.ATT_TP_OPE, false);
+            msCfdCceClaveDePedimento = SXmlUtils.extractAttributeValue(namedNodeMapChild, SXmlDpsCfdCce.ATT_CVE_PED, false);
+            msCfdCceCertificadoOrigen = SXmlUtils.extractAttributeValue(namedNodeMapChild, SXmlDpsCfdCce.ATT_CERT_ORIG, false);
+            msCfdCceNumCertificadoOrigen = SXmlUtils.extractAttributeValue(namedNodeMapChild, SXmlDpsCfdCce.ATT_NUM_CERT_ORIG, false);
+            msCfdCceSubdivision = SXmlUtils.extractAttributeValue(namedNodeMapChild, SXmlDpsCfdCce.ATT_SUB, false);
+            msCfdCceTipoCambioUsd = SXmlUtils.extractAttributeValue(namedNodeMapChild, SXmlDpsCfdCce.ATT_TP_CAMB, false);
+            msCfdCceTotalUsd = SXmlUtils.extractAttributeValue(namedNodeMapChild, SXmlDpsCfdCce.ATT_TOT_USD, false);
+            msCfdCceNumExportadorConfiable = SXmlUtils.extractAttributeValue(namedNodeMapChild, SXmlDpsCfdCce.ATT_NUM_EXP_CONF, false);
         }
     }
 }

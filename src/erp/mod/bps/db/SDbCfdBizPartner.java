@@ -4,6 +4,7 @@
  */
 package erp.mod.bps.db;
 
+import erp.cfd.SCceEmisorAddressAux;
 import erp.cfd.SCfdDataAsociadoNegocios;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
@@ -80,6 +81,7 @@ public class SDbCfdBizPartner {
                         moBizPartnerBranchAddress = moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial();
                     }
                     asociadoNegocios = new SCfdDataAsociadoNegocios();
+                    SCceEmisorAddressAux emisorAddress = miClient.getSessionXXX().getParamsCompany().getEmisorAddress(moBizPartnerBranchAddress.getZipCode());
 
                     asociadoNegocios.setBizPartnerId(mnBizPartnerId);
                     asociadoNegocios.setBizPartnerBranchId(mnBizPartnerBranchId);
@@ -90,10 +92,10 @@ public class SDbCfdBizPartner {
                     asociadoNegocios.setBizPartnerStreet(moBizPartnerBranchAddress.getStreet());
                     asociadoNegocios.setBizPartnerStreetNumberExt(moBizPartnerBranchAddress.getStreetNumberExt());
                     asociadoNegocios.setBizPartnerStreetNumberInt(moBizPartnerBranchAddress.getStreetNumberInt());
-                    asociadoNegocios.setBizPartnerNeighborhood(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getNeighborhood() : miClient.getSessionXXX().getParamsCompany().getXtaCfdCceEmisorColonia());
+                    asociadoNegocios.setBizPartnerNeighborhood(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getNeighborhood() : emisorAddress.getCfdCceEmisorColonia());
                     asociadoNegocios.setBizPartnerReference(moBizPartnerBranchAddress.getReference());
-                    asociadoNegocios.setBizPartnerLocality(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getLocality() : miClient.getSessionXXX().getParamsCompany().getXtaCfdCceEmisorLocalidad());
-                    asociadoNegocios.setBizPartnerCounty(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getCounty() : miClient.getSessionXXX().getParamsCompany().getXtaCfdCceEmisorMunicipio());
+                    asociadoNegocios.setBizPartnerLocality(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getLocality() : emisorAddress.getCfdCceEmisorLocalidad());
+                    asociadoNegocios.setBizPartnerCounty(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getCounty() : emisorAddress.getCfdCceEmisorMunicipio());
                     asociadoNegocios.setBizPartnerStateCode(moBizPartnerBranchAddress.getDbmsDataState().getStateCode());
                     asociadoNegocios.setBizPartnerStateName(moBizPartnerBranchAddress.getState());
                     asociadoNegocios.setBizPartnerZipCode(moBizPartnerBranchAddress.getZipCode());
@@ -124,10 +126,10 @@ public class SDbCfdBizPartner {
                                 asociadoNegocios.setBizPartnerExpeditionStreet(moBizPartnerBranchAddress.getStreet());
                                 asociadoNegocios.setBizPartnerExpeditionStreetNumberExt(moBizPartnerBranchAddress.getStreetNumberExt());
                                 asociadoNegocios.setBizPartnerExpeditionStreetNumberInt(moBizPartnerBranchAddress.getStreetNumberInt());
-                                asociadoNegocios.setBizPartnerExpeditionNeighborhood(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getNeighborhood() : miClient.getSessionXXX().getParamsCompany().getXtaCfdCceEmisorColonia());
+                                asociadoNegocios.setBizPartnerExpeditionNeighborhood(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getNeighborhood() : emisorAddress.getCfdCceEmisorColonia());
                                 asociadoNegocios.setBizPartnerExpeditionReference(moBizPartnerBranchAddress.getReference());
-                                asociadoNegocios.setBizPartnerExpeditionLocality(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getLocality() : miClient.getSessionXXX().getParamsCompany().getXtaCfdCceEmisorLocalidad());
-                                asociadoNegocios.setBizPartnerExpeditionCounty(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getCounty() : miClient.getSessionXXX().getParamsCompany().getXtaCfdCceEmisorMunicipio());
+                                asociadoNegocios.setBizPartnerExpeditionLocality(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getLocality() : emisorAddress.getCfdCceEmisorLocalidad());
+                                asociadoNegocios.setBizPartnerExpeditionCounty(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getCounty() : emisorAddress.getCfdCceEmisorMunicipio());
                                 asociadoNegocios.setBizPartnerExpeditionState(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getState() : moBizPartnerBranchAddress.getDbmsDataState().getStateCode());
                                 asociadoNegocios.setBizPartnerExpeditionZipCode(moBizPartnerBranchAddress.getZipCode());
                                 asociadoNegocios.setBizPartnerExpeditionPoBox(moBizPartnerBranchAddress.getPoBox());

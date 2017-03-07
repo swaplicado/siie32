@@ -20,7 +20,7 @@ public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected int mnPkUnitId;
     protected java.lang.String msUnit;
     protected java.lang.String msSymbol;
-    protected java.lang.String msCustomsUnit;
+    protected java.lang.String msSymbolCustoms;
     protected double mdUnitBaseEquivalence;
     protected int mnSortingPosition;
     protected boolean mbIsCanEdit;
@@ -43,7 +43,7 @@ public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Ser
     public void setPkUnitId(int n) { mnPkUnitId = n; }
     public void setUnit(java.lang.String s) { msUnit = s; }
     public void setSymbol(java.lang.String s) { msSymbol = s; }
-    public void setCustomsUnit(java.lang.String s) { msCustomsUnit = s; }
+    public void setSymbolCustoms(java.lang.String s) { msSymbolCustoms = s; }
     public void setUnitBaseEquivalence(double d) { mdUnitBaseEquivalence = d; }
     public void setSortingPosition(int n) { mnSortingPosition = n; }
     public void setIsCanEdit(boolean b) { mbIsCanEdit = b; }
@@ -61,7 +61,7 @@ public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Ser
     public int getPkUnitId() { return mnPkUnitId; }
     public java.lang.String getUnit() { return msUnit; }
     public java.lang.String getSymbol() { return msSymbol; }
-    public java.lang.String getCustomsUnit() { return msCustomsUnit; }
+    public java.lang.String getSymbolCustoms() { return msSymbolCustoms; }
     public double getUnitBaseEquivalence() { return mdUnitBaseEquivalence; }
     public int getSortingPosition() { return mnSortingPosition; }
     public boolean getIsCanEdit() { return mbIsCanEdit; }
@@ -93,7 +93,7 @@ public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Ser
         mnPkUnitId = 0;
         msUnit = "";
         msSymbol = "";
-        msCustomsUnit = "";
+        msSymbolCustoms = "";
         mdUnitBaseEquivalence = 0;
         mnSortingPosition = 0;
         mbIsCanEdit = false;
@@ -128,7 +128,7 @@ public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Ser
                 mnPkUnitId = resultSet.getInt("id_unit");
                 msUnit = resultSet.getString("unit");
                 msSymbol = resultSet.getString("symbol");
-                //msCustomsUnit = resultSet.getString("symbol");
+                msSymbolCustoms = resultSet.getString("symbol_custs");
                 mdUnitBaseEquivalence = resultSet.getDouble("unit_base_equiv");
                 mnSortingPosition = resultSet.getInt("sort_pos");
                 mbIsCanEdit = resultSet.getBoolean("b_can_edit");
@@ -170,11 +170,11 @@ public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Ser
             callableStatement = connection.prepareCall(
                     "{ CALL erp.itmu_unit_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkUnitId);
             callableStatement.setString(nParam++, msUnit);
             callableStatement.setString(nParam++, msSymbol);
-            //callableStatement.setString(nParam++, msCustomsUnit);
+            callableStatement.setString(nParam++, msSymbolCustoms);
             callableStatement.setDouble(nParam++, mdUnitBaseEquivalence);
             callableStatement.setInt(nParam++, mnSortingPosition);
             callableStatement.setBoolean(nParam++, mbIsCanEdit);

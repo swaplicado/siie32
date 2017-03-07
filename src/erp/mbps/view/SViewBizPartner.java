@@ -155,7 +155,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
 
         switch(mnTabTypeAux01) {
             case SDataConstants.BPSX_BP_CO:
-                aoTableColumns = new STableColumn[33];
+                aoTableColumns = new STableColumn[34];
                 break;
             case SDataConstants.BPSX_BP_SUP:
                 aoTableColumns = new STableColumn[34];
@@ -197,6 +197,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 msOrderKey = "bp.bp, bp_ct.bp_key, bp.bp_comm, bp.id_bp ";
                 mnBizPartnerCategory = SDataConstantsSys.BPSS_CT_BP_CO;
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.co_key", "Clave empresa", 100);
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.num_exporter", "No. exportador conf.", 50);
                 break;
 
             case SDataConstants.BPSX_BP_SUP:
@@ -687,7 +688,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         msSql = "SELECT bp.id_bp, bp.bp, bp.bp_comm, bp.fiscal_id, bp.alt_id, bp.web, bp.code_bank_san, bp.code_bank_baj, bp.b_sup, bp.b_cus, bp.b_cdr, bp.b_dbr, bp.b_att_emp, bp.b_del, " +
                 "tp_bp.tp_bp_idy, tax_tp.tax_idy, bp.b_att_bank, bp.b_att_car, bp.b_att_sal_agt, bp.b_att_emp, bp.b_att_par_shh, bp.b_att_rel_pty, " +
                 (mnTabTypeAux01 == SDataConstants.BPSU_BP || mnTabTypeAux01 == SDataConstants.BPSX_BP_ATT_SAL_AGT || mnTabTypeAux01 == SDataConstants.BPSX_BP_EMP ||
-                mnTabTypeAux01 == SDataConstants.BPSX_BP_ATT_BANK || mnTabTypeAux01 == SDataConstants.BPSX_BP_ATT_CARR ? "" : "bp_ct.b_del, bp_ct.bp_key, bp_ct.co_key, bp_ct.dt_start, bp_ct.dt_end_n, " +
+                mnTabTypeAux01 == SDataConstants.BPSX_BP_ATT_BANK || mnTabTypeAux01 == SDataConstants.BPSX_BP_ATT_CARR ? "" : "bp_ct.b_del, bp_ct.bp_key, bp_ct.co_key, bp_ct.num_exporter, bp_ct.dt_start, bp_ct.dt_end_n, " +
                 "ct.ct_bp, tp.tp_bp, c.cur_key, l.lan_key, us.usr, tpy.tp_pay_sys, bp_ct.pay_account, ") +
                 "(SELECT MAX(dt) FROM trn_dps WHERE b_del = 0 AND fid_bp_r = bp.id_bp AND fid_ct_dps IN(" + SDataConstantsSys.TRNS_CT_DPS_PUR + ", " + SDataConstantsSys.TRNS_CT_DPS_SAL + ") AND " +
                 "fid_cl_dps IN(" + SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1] + ", " + SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[1] + ")) AS f_last_trans, " +

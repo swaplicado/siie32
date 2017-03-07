@@ -253,13 +253,13 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     
     protected java.lang.String msXtaCfdCceReasonTransfer;
     protected java.lang.String msXtaCfdCceOperationType;
-    protected java.lang.String msXtaCfdCceNumberImportRequest;
+    protected java.lang.String msXtaCfdCceImportRequest;
     protected int mnXtaCfdCceCertificateOrigin; 
-    protected java.lang.String msXtaCfdCceNumberCertificateOrigin;
-    protected int mnXtaCfdCceSubdivision;
-    protected double mdXtaCfdCceExchangeRateUSD;
-    protected double mdXtaCfdCceTotalUSD;
-    protected java.lang.String msXtaCfdCceNumberReliableExporter;
+    protected java.lang.String msXtaCfdCceCertificateOriginNumber;
+    protected int mnXtaCfdCceSubdivisionHas;
+    protected double mdXtaCfdCceExchangeRateUsd;
+    protected double mdXtaCfdCceTotalUsd;
+    protected java.lang.String msXtaCfdCceNumberExporter;
     protected java.lang.String msXtaCfdCceIncoterm;
 
     public SDataDps() {
@@ -1688,13 +1688,13 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     
     public void setXtaCfdCceReasonTransfer(java.lang.String s) { msXtaCfdCceReasonTransfer = s; }
     public void setXtaCfdCceOperationType(java.lang.String s) { msXtaCfdCceOperationType = s; }
-    public void setXtaCfdCceNumberImportRequest(java.lang.String s) { msXtaCfdCceNumberImportRequest = s; }
+    public void setXtaCfdCceImportRequest(java.lang.String s) { msXtaCfdCceImportRequest = s; }
     public void setXtaCfdCceCertificateOrigin(int n) { mnXtaCfdCceCertificateOrigin = n; }
-    public void setXtaCfdCceNumberCertificateOrigin(java.lang.String s) { msXtaCfdCceNumberCertificateOrigin = s; }
-    public void setXtaCfdCceSubdivision(int n) { mnXtaCfdCceSubdivision = n; }
-    public void setXtaCfdCceExchangeRateUSD(double d) { mdXtaCfdCceExchangeRateUSD = d; }
-    public void setXtaCfdCceTotalUSD(double d) { mdXtaCfdCceTotalUSD = d; }
-    public void setXtaCfdCceNumberReliableExporter(java.lang.String s) { msXtaCfdCceNumberReliableExporter = s; }
+    public void setXtaCfdCceCertificateOriginNumber(java.lang.String s) { msXtaCfdCceCertificateOriginNumber = s; }
+    public void setXtaCfdCceSubdivisionHas(int n) { mnXtaCfdCceSubdivisionHas = n; }
+    public void setXtaCfdCceExchangeRateUsd(double d) { mdXtaCfdCceExchangeRateUsd = d; }
+    public void setXtaCfdCceTotalUsd(double d) { mdXtaCfdCceTotalUsd = d; }
+    public void setXtaCfdCceNumberExporter(java.lang.String s) { msXtaCfdCceNumberExporter = s; }
     public void setXtaCfdCceIncoterm(java.lang.String s) { msXtaCfdCceIncoterm = s; }
 
     public java.lang.Object getDbmsRecordKey() { return moDbmsRecordKey; }
@@ -1720,13 +1720,13 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     
     public java.lang.String getXtaCfdCceReasonTransfer() { return msXtaCfdCceReasonTransfer; }
     public java.lang.String getXtaCfdCceOperationType() { return msXtaCfdCceOperationType; }
-    public java.lang.String getXtaCfdCceNumberImportRequest() { return msXtaCfdCceNumberImportRequest; }
+    public java.lang.String getXtaCfdCceImportRequest() { return msXtaCfdCceImportRequest; }
     public int getXtaCfdCceCertificateOrigin() { return mnXtaCfdCceCertificateOrigin; }
-    public java.lang.String getXtaCfdCceNumberCertificateOrigin() { return msXtaCfdCceNumberCertificateOrigin; }
-    public int getXtaCfdCceSubdivision() { return mnXtaCfdCceSubdivision; }
-    public double getXtaCfdCceExchangeRateUSD() { return mdXtaCfdCceExchangeRateUSD; }
-    public double getXtaCfdCceTotalUSD() { return mdXtaCfdCceTotalUSD; }
-    public java.lang.String getXtaCfdCceNumberReliableExporter() { return msXtaCfdCceNumberReliableExporter; }
+    public java.lang.String getXtaCfdCceCertificateOriginNumber() { return msXtaCfdCceCertificateOriginNumber; }
+    public int getXtaCfdCceSubdivisionHas() { return mnXtaCfdCceSubdivisionHas; }
+    public double getXtaCfdCceExchangeRateUsd() { return mdXtaCfdCceExchangeRateUsd; }
+    public double getXtaCfdCceTotalUsd() { return mdXtaCfdCceTotalUsd; }
+    public java.lang.String getXtaCfdCceNumberExporter() { return msXtaCfdCceNumberExporter; }
     public java.lang.String getXtaCfdCceIncoterm() { return msXtaCfdCceIncoterm; }
 
     public erp.mtrn.data.SDataDpsEntry getDbmsDpsEntry(int[] pk) {
@@ -1914,13 +1914,13 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         
         msXtaCfdCceReasonTransfer = "";
         msXtaCfdCceOperationType = "";
-        msXtaCfdCceNumberImportRequest = "";
+        msXtaCfdCceImportRequest = "";
         mnXtaCfdCceCertificateOrigin = 0;
-        msXtaCfdCceNumberCertificateOrigin = "";
-        mnXtaCfdCceSubdivision = 0;
-        mdXtaCfdCceExchangeRateUSD = 0;
-        mdXtaCfdCceTotalUSD = 0;
-        msXtaCfdCceNumberReliableExporter = "";
+        msXtaCfdCceCertificateOriginNumber = "";
+        mnXtaCfdCceSubdivisionHas = 0;
+        mdXtaCfdCceExchangeRateUsd = 0;
+        mdXtaCfdCceTotalUsd = 0;
+        msXtaCfdCceNumberExporter = "";
         msXtaCfdCceIncoterm = "";
         
         msCfdExpeditionLocality = "";
@@ -2231,23 +2231,23 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             
                             msXtaCfdCceReasonTransfer = moDbmsDataDpsCfd.getCfdCceMotivoTraslado();
                             msXtaCfdCceOperationType = moDbmsDataDpsCfd.getCfdCceTipoOperacion();
-                            msXtaCfdCceNumberImportRequest = moDbmsDataDpsCfd.getCfdCceClaveDePedimento();
+                            msXtaCfdCceImportRequest = moDbmsDataDpsCfd.getCfdCceClaveDePedimento();
                             
                             if (!moDbmsDataDpsCfd.getCfdCceCertificadoOrigen().isEmpty()) {
                                 mnXtaCfdCceCertificateOrigin = Integer.parseInt(moDbmsDataDpsCfd.getCfdCceCertificadoOrigen());
                             }
-                            msXtaCfdCceNumberCertificateOrigin = moDbmsDataDpsCfd.getCfdCceNumCertificadoOrigen();
+                            msXtaCfdCceCertificateOriginNumber = moDbmsDataDpsCfd.getCfdCceNumCertificadoOrigen();
                             
                             if (!moDbmsDataDpsCfd.getCfdCceSubdivision().isEmpty()) {
-                                mnXtaCfdCceSubdivision = Integer.parseInt(moDbmsDataDpsCfd.getCfdCceSubdivision());
+                                mnXtaCfdCceSubdivisionHas = Integer.parseInt(moDbmsDataDpsCfd.getCfdCceSubdivision());
                             }
-                            if (!moDbmsDataDpsCfd.getCfdCceTipoCambioUSD().isEmpty()) {
-                                mdXtaCfdCceExchangeRateUSD = Double.parseDouble(moDbmsDataDpsCfd.getCfdCceTipoCambioUSD());
+                            if (!moDbmsDataDpsCfd.getCfdCceTipoCambioUsd().isEmpty()) {
+                                mdXtaCfdCceExchangeRateUsd = Double.parseDouble(moDbmsDataDpsCfd.getCfdCceTipoCambioUsd());
                             }
-                            if (!moDbmsDataDpsCfd.getCfdCceTotalUSD().isEmpty()) {
-                                mdXtaCfdCceTotalUSD = Double.parseDouble(moDbmsDataDpsCfd.getCfdCceTotalUSD());
+                            if (!moDbmsDataDpsCfd.getCfdCceTotalUsd().isEmpty()) {
+                                mdXtaCfdCceTotalUsd = Double.parseDouble(moDbmsDataDpsCfd.getCfdCceTotalUsd());
                             }
-                            msXtaCfdCceNumberReliableExporter = moDbmsDataDpsCfd.getCfdCceNumExportadorConfiable();
+                            msXtaCfdCceNumberExporter = moDbmsDataDpsCfd.getCfdCceNumExportadorConfiable();
                         }
                     }
                 }
@@ -3205,13 +3205,13 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     
                     moDbmsDataDpsCfd.setCfdCceMotivoTraslado(msXtaCfdCceReasonTransfer);
                     moDbmsDataDpsCfd.setCfdCceTipoOperacion(msXtaCfdCceOperationType);
-                    moDbmsDataDpsCfd.setCfdCceClaveDePedimento(msXtaCfdCceNumberImportRequest);
+                    moDbmsDataDpsCfd.setCfdCceClaveDePedimento(msXtaCfdCceImportRequest);
                     moDbmsDataDpsCfd.setCfdCceCertificadoOrigen(mnXtaCfdCceCertificateOrigin + "");
-                    moDbmsDataDpsCfd.setCfdCceNumCertificadoOrigen(msXtaCfdCceNumberCertificateOrigin);
-                    moDbmsDataDpsCfd.setCfdCceSubdivision(mnXtaCfdCceSubdivision + "");
-                    moDbmsDataDpsCfd.setCfdCceTipoCambioUSD(mdXtaCfdCceExchangeRateUSD + "");
-                    moDbmsDataDpsCfd.setCfdCceTotalUSD(mdXtaCfdCceTotalUSD + "");
-                    moDbmsDataDpsCfd.setCfdCceNumExportadorConfiable(msXtaCfdCceNumberReliableExporter) ;
+                    moDbmsDataDpsCfd.setCfdCceNumCertificadoOrigen(msXtaCfdCceCertificateOriginNumber);
+                    moDbmsDataDpsCfd.setCfdCceSubdivision(mnXtaCfdCceSubdivisionHas + "");
+                    moDbmsDataDpsCfd.setCfdCceTipoCambioUsd(mdXtaCfdCceExchangeRateUsd + "");
+                    moDbmsDataDpsCfd.setCfdCceTotalUsd(mdXtaCfdCceTotalUsd + "");
+                    moDbmsDataDpsCfd.setCfdCceNumExportadorConfiable(msXtaCfdCceNumberExporter) ;
 
                     if (moDbmsDataDpsCfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
@@ -4174,15 +4174,16 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         
         if (msXtaCfdCceOperationType.compareTo("A") != 0) {
             //comercioExterior.getAttMotivoTraslado().setString(msXtaCfdCceReasonTransfer); // not apply is necessary if comprobant type is "T"
-            comercioExterior.getAttClaveDePedimento().setString(msXtaCfdCceNumberImportRequest);
+            comercioExterior.getAttTipoOperacion().setString(msXtaCfdCceOperationType);
+            comercioExterior.getAttClaveDePedimento().setString(msXtaCfdCceImportRequest);
             comercioExterior.getAttCertificadoOrigen().setInteger(mnXtaCfdCceCertificateOrigin);
-            comercioExterior.getAttNumCertificadoOrigen().setString(msXtaCfdCceNumberCertificateOrigin);
-            comercioExterior.getAttNumeroExportadorConfiable().setString(msXtaCfdCceNumberReliableExporter);
+            comercioExterior.getAttNumCertificadoOrigen().setString(msXtaCfdCceCertificateOriginNumber);
+            comercioExterior.getAttNumeroExportadorConfiable().setString(msXtaCfdCceNumberExporter);
             comercioExterior.getAttIncoterm().setString(msXtaCfdCceIncoterm);
-            comercioExterior.getAttSubdivision().setInteger(mnXtaCfdCceSubdivision);
+            comercioExterior.getAttSubdivision().setInteger(mnXtaCfdCceSubdivisionHas);
             //comercioExterior.getAttObservaciones() Is optional
-            comercioExterior.getAttTipoCambioUSD().setDouble(mdXtaCfdCceExchangeRateUSD);
-            comercioExterior.getAttTotalUSD().setDouble(mdXtaCfdCceTotalUSD);
+            comercioExterior.getAttTipoCambioUsd().setDouble(mdXtaCfdCceExchangeRateUsd);
+            comercioExterior.getAttTotalUsd().setDouble(mdXtaCfdCceTotalUsd);
         }
         
         cfd.ver3.cce11.DElementMercancias mercancias = new cfd.ver3.cce11.DElementMercancias();

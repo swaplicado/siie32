@@ -617,7 +617,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         reset();
 
         try {
-            sql = "SELECT de.*, i.item, i.fid_cfd_prod_serv_n, i.fid_igen, igen.b_ship_dom, igen.b_ship_int, igen.b_ship_qlt, igen.fid_cfd_prod_serv, u.symbol, ou.symbol, cu.code, " +
+            sql = "SELECT de.*, i.item, i.fid_cfd_prod_serv_n, i.tariff, i.fid_igen, igen.b_ship_dom, igen.b_ship_int, igen.b_ship_qlt, igen.fid_cfd_prod_serv, u.symbol, u.symbol_custs, ou.symbol, cu.code, " +
                     "tr.tax_reg, tda.stp_dps_adj, tde.tp_dps_ety, cc.code, cc.cc, ir.item, ade.bac_num_pos, ade.bac_cen, ade.lor_num_ety, ade.sor_cod, " +
                     "ade.ele_ord, ade.ele_barc, ade.ele_cag, ade.ele_cag_price_u, ade.ele_par, ade.ele_par_price_u " +
                     "FROM trn_dps_ety AS de " +
@@ -801,8 +801,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 }
 
                 msDbmsUnidadClave = resultSet.getString("cu.code");
-                msDbmsTariffFraction = resultSet.getString("i.item");
-                msDbmsCustomsUnit = resultSet.getString("cu.code");
+                msDbmsTariffFraction = resultSet.getString("i.tariff");
+                msDbmsCustomsUnit = resultSet.getString("u.symbol_custs");
                 
                 statementAux = statement.getConnection().createStatement();
                 

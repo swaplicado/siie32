@@ -195,6 +195,7 @@ import java.io.OutputStreamWriter;
 import java.sql.ResultSet;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
 import javax.xml.parsers.DocumentBuilder;
@@ -2248,6 +2249,28 @@ public abstract class SDataUtilities {
         }
 
         return asAccounts;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static ArrayList<SDataAccount> obtainAccountsByType(erp.client.SClientInterface client, int[] pnTypeId) throws java.lang.Exception {
+        java.lang.String[] asAccounts = null;
+        SDataAccount account = null;
+        ArrayList<SDataAccount> dataAccounts = new ArrayList<SDataAccount>();
+        String sql = "";
+        ResultSet resultSet = null;
+
+        sql = "SELECT id_acc "
+                + "FROM fin_acc "
+                + "WHERE fid_tp_acc_r = " + pnTypeId[0] + " AND fid_cl_acc_r = " + pnTypeId[1] + " AND fid_cls_acc_r = " + pnTypeId[2] + " AND b_del = 0; ";
+        
+        resultSet = client.getSession().getStatement().executeQuery(sql);
+        while (resultSet.next()) {
+            account = (SDataAccount) SDataUtilities.readRegistry(client, SDataConstants.FIN_ACC, new Object[] { resultSet.getString("id_acc") }, SLibConstants.EXEC_MODE_SILENT);
+            
+            dataAccounts.add(account);
+        }
+
+        return dataAccounts;
     }
 
     /**
