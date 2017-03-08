@@ -228,7 +228,7 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
         dpsXml.getAttribute(SXmlDpsCfd.ATT_TP_REL).setValue(msCfdTipoRelacion);
         dpsXml.getAttribute(SXmlDpsCfd.ATT_USO_CFDI).setValue(msCfdUsoCfdi);
         
-        if (!msCfdCceMotivoTraslado.isEmpty()) {
+        if (!msCfdCceTipoOperacion.isEmpty()) {
             // Attributes for international trade:
 
             cceXml.getAttribute(SXmlDpsCfdCce.ATT_MOT_TRAS).setValue(msCfdCceMotivoTraslado);
