@@ -214,7 +214,6 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
                 resultSet = statement.executeQuery(sql);
 
                 if (resultSet.next()) {
-
                     if (resultSet.getDate("dt_exp_n") != new java.sql.Date(move.getAuxLotDateExpiration().getTime())) {
                         sql = "UPDATE trn_lot SET dt_exp_n = '" + new java.sql.Date(move.getAuxLotDateExpiration().getTime())  + "' WHERE " +
                         "id_item = " + move.getPkItemId() + " AND id_unit = " + move.getPkUnitId() + " AND " +        

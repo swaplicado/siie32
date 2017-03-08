@@ -363,7 +363,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                     "INNER JOIN trn_stk_seg_whs_ety AS wety ON swhs.id_stk_seg = wety.id_stk_seg AND swhs.id_whs = wety.id_whs " +
                     "WHERE fid_year = " + year + "  AND fid_item = i.id_item AND fid_unit = u.id_unit " + sqlSegWhere +")) AS f_stk_avble, " +
                 "(SELECT COALESCE(MAX(sx.cost_u), 0.0) FROM trn_stk AS sx WHERE sx.id_year = " + year + " AND sx.id_item = s.id_item AND sx.id_unit = s.id_unit AND NOT sx.b_del AND " +
-                "sx.fid_ct_iog = " + SModSysConsts.TRNS_CL_IOG_IN_ADJ[0] + " AND sx.fid_cl_iog = " + SModSysConsts.TRNS_CL_IOG_IN_ADJ[1] + ") AS f_val_u " +
+                "NOT (sx.fid_ct_iog = " + SModSysConsts.TRNS_CL_IOG_IN_ADJ[0] + " AND sx.fid_cl_iog = " + SModSysConsts.TRNS_CL_IOG_IN_ADJ[1] + ")) AS f_val_u " +
                 "FROM trn_stk AS s " +
                 "INNER JOIN erp.itmu_item AS i ON s.id_item = i.id_item " +
                 "INNER JOIN erp.itmu_unit AS u ON s.id_unit = u.id_unit " +
