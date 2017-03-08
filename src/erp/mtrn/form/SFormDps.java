@@ -8609,9 +8609,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 
         // Set information for international trade:
         
-        moDps.setXtaCfdCceReasonTransfer(""); // (2017-02-27) jbarajas is neecesary for update with information of international trade
+        moDps.setXtaCfdCceOperationType(""); // (2017-02-27) jbarajas is neecesary for update with information of international trade
         
-        if (jcbCfdCceReasonTransfer.isEnabled()) { 
+        if (jcbCfdCceOperationType.isEnabled()) { 
             moDps.setXtaCfdCceReasonTransfer(moFieldCfdCceReasonTransfer.getKey() == null ? "" : (String) moFieldCfdCceReasonTransfer.getKey());
             moDps.setXtaCfdCceOperationType(moFieldCfdCceOperationType.getKey() == null ? "" : (String) moFieldCfdCceOperationType.getKey());
             moDps.setXtaCfdCceImportRequest(moFieldCfdCceNumberImportRequest.getKey() == null ? "" : (String) moFieldCfdCceNumberImportRequest.getKey());
