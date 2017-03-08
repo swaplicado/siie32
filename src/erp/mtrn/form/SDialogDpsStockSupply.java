@@ -19,13 +19,13 @@ import erp.lib.table.STablePane;
 import erp.lib.table.STableRow;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mcfg.data.SDataCompanyBranchEntity;
-import erp.mtrn.data.STrnStock;
-import erp.mtrn.data.STrnStockSegregationUtils;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.STrnDpsStockSupplyRow;
+import erp.mtrn.data.STrnStock;
 import erp.mtrn.data.STrnStockMove;
+import erp.mtrn.data.STrnStockSegregationUtils;
 import erp.mtrn.data.STrnUtilities;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -36,10 +36,13 @@ import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import sa.lib.SLibUtils;
 
 /**
  *
  * @author Sergio Flores, Uriel Castañeda, Edwin Carmona
+ * 2017-03-08 (sflores): Fix to form validation when previous supplies exceeds base quantity.
+ *  Addition of column surplus percentage into supply rows grid.
  */
 public class SDialogDpsStockSupply extends javax.swing.JDialog implements ActionListener, ListSelectionListener {
 
@@ -95,9 +98,9 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
         jpDpsEntriesInfo1 = new javax.swing.JPanel();
         jpDpsEntriesInfo11 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
-        jlQuantityBase = new javax.swing.JLabel();
-        jtfQuantityBase = new javax.swing.JTextField();
-        jtfQuantityBaseUnit = new javax.swing.JTextField();
+        jlQuantity = new javax.swing.JLabel();
+        jtfQuantity = new javax.swing.JTextField();
+        jtfQuantityUnit = new javax.swing.JTextField();
         jPanel5 = new javax.swing.JPanel();
         jlQuantityAdjusted = new javax.swing.JLabel();
         jtfQuantityAdjusted = new javax.swing.JTextField();
@@ -118,9 +121,9 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
         jtfQuantitySupplied = new javax.swing.JTextField();
         jtfQuantitySuppliedUnit = new javax.swing.JTextField();
         jPanel9 = new javax.swing.JPanel();
-        jlQuantityPending = new javax.swing.JLabel();
-        jtfQuantityPending = new javax.swing.JTextField();
-        jtfQuantityPendingUnit = new javax.swing.JTextField();
+        jlQuantityPend = new javax.swing.JLabel();
+        jtfQuantityPend = new javax.swing.JTextField();
+        jtfQuantityPendUnit = new javax.swing.JTextField();
         jPanel11 = new javax.swing.JPanel();
         label1 = new javax.swing.JLabel();
         jpDpsEntriesInfo2 = new javax.swing.JPanel();
@@ -228,22 +231,22 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlQuantityBase.setText("+ Cant. original:");
-        jlQuantityBase.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel4.add(jlQuantityBase);
+        jlQuantity.setText("+ Cant. original:");
+        jlQuantity.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel4.add(jlQuantity);
 
-        jtfQuantityBase.setEditable(false);
-        jtfQuantityBase.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfQuantityBase.setText("0.00");
-        jtfQuantityBase.setFocusable(false);
-        jtfQuantityBase.setPreferredSize(new java.awt.Dimension(120, 23));
-        jPanel4.add(jtfQuantityBase);
+        jtfQuantity.setEditable(false);
+        jtfQuantity.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfQuantity.setText("0.00");
+        jtfQuantity.setFocusable(false);
+        jtfQuantity.setPreferredSize(new java.awt.Dimension(120, 23));
+        jPanel4.add(jtfQuantity);
 
-        jtfQuantityBaseUnit.setEditable(false);
-        jtfQuantityBaseUnit.setText("UNIT");
-        jtfQuantityBaseUnit.setFocusable(false);
-        jtfQuantityBaseUnit.setPreferredSize(new java.awt.Dimension(40, 23));
-        jPanel4.add(jtfQuantityBaseUnit);
+        jtfQuantityUnit.setEditable(false);
+        jtfQuantityUnit.setText("UNIT");
+        jtfQuantityUnit.setFocusable(false);
+        jtfQuantityUnit.setPreferredSize(new java.awt.Dimension(40, 23));
+        jPanel4.add(jtfQuantityUnit);
 
         jpDpsEntriesInfo11.add(jPanel4);
 
@@ -346,24 +349,24 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlQuantityPending.setText("= Cant. pendiente:");
-        jlQuantityPending.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel9.add(jlQuantityPending);
+        jlQuantityPend.setText("= Cant. pendiente:");
+        jlQuantityPend.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel9.add(jlQuantityPend);
 
-        jtfQuantityPending.setBackground(java.awt.Color.pink);
-        jtfQuantityPending.setEditable(false);
-        jtfQuantityPending.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfQuantityPending.setText("0.00");
-        jtfQuantityPending.setFocusable(false);
-        jtfQuantityPending.setPreferredSize(new java.awt.Dimension(120, 23));
-        jPanel9.add(jtfQuantityPending);
+        jtfQuantityPend.setEditable(false);
+        jtfQuantityPend.setBackground(java.awt.Color.pink);
+        jtfQuantityPend.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfQuantityPend.setText("0.00");
+        jtfQuantityPend.setFocusable(false);
+        jtfQuantityPend.setPreferredSize(new java.awt.Dimension(120, 23));
+        jPanel9.add(jtfQuantityPend);
 
-        jtfQuantityPendingUnit.setBackground(java.awt.Color.pink);
-        jtfQuantityPendingUnit.setEditable(false);
-        jtfQuantityPendingUnit.setText("UNIT");
-        jtfQuantityPendingUnit.setFocusable(false);
-        jtfQuantityPendingUnit.setPreferredSize(new java.awt.Dimension(40, 23));
-        jPanel9.add(jtfQuantityPendingUnit);
+        jtfQuantityPendUnit.setEditable(false);
+        jtfQuantityPendUnit.setBackground(java.awt.Color.pink);
+        jtfQuantityPendUnit.setText("UNIT");
+        jtfQuantityPendUnit.setFocusable(false);
+        jtfQuantityPendUnit.setPreferredSize(new java.awt.Dimension(40, 23));
+        jPanel9.add(jtfQuantityPendUnit);
 
         jpDpsEntriesInfo12.add(jPanel9);
 
@@ -527,7 +530,7 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
         add(moPanelDps, BorderLayout.NORTH);
 
         col = 0;
-        columns = new STableColumnForm[7];
+        columns = new STableColumnForm[8];
         columns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "#", STableConstants.WIDTH_NUM_TINYINT);
         columns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
         columns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Concepto", STableConstants.WIDTH_ITEM_3X);
@@ -539,6 +542,8 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
         columns[col].setEditable(true);
         columns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         columns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
+        columns[col] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Excedente", STableConstants.WIDTH_PERCENTAGE);
+        columns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererPercentage());
 
         moPaneDpsEntries = new STablePane(miClient);
         jpDpsEntries.add(moPaneDpsEntries, BorderLayout.CENTER);
@@ -581,8 +586,8 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
 
             factor = ((SSessionCustom) miClient.getSession().getSessionCustom()).getUnitsFactorForQuantity(stockSupplyRow.getFkItemId(), stockSupplyRow.getFkOriginalUnitId(), stockSupplyRow.getFkUnitId());
 
-            stockSupplyRow.setOriginalQuantityToSupply((Double) row.getValues().get(COL_QTY));
-            stockSupplyRow.setQuantityToSupply(SLibUtilities.round(factor * stockSupplyRow.getOriginalQuantityToSupply(), decs));
+            stockSupplyRow.setOriginalQuantityAboutToSupply((Double) row.getValues().get(COL_QTY));
+            stockSupplyRow.setQuantityAboutToSupply(SLibUtilities.round(factor * stockSupplyRow.getOriginalQuantityAboutToSupply(), decs));
         }
     }
 
@@ -602,8 +607,8 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
         STrnDpsStockSupplyRow stockSupplyRow = (STrnDpsStockSupplyRow) moPaneDpsEntries.getSelectedTableRow();
 
         if (stockSupplyRow == null) {
-            jtfQuantityBase.setText("");
-            jtfQuantityBaseUnit.setText("");
+            jtfQuantity.setText("");
+            jtfQuantityUnit.setText("");
             jtfQuantityAdjusted.setText("");
             jtfQuantityAdjustedUnit.setText("");
             jtfQuantityNet.setText("");
@@ -612,8 +617,8 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
             jtfQuantityNetAuxUnit.setText("");
             jtfQuantitySupplied.setText("");
             jtfQuantitySuppliedUnit.setText("");
-            jtfQuantityPending.setText("");
-            jtfQuantityPendingUnit.setText("");
+            jtfQuantityPend.setText("");
+            jtfQuantityPendUnit.setText("");
 
             jtfStock.setText("");
             jtfStockUnit.setText("");
@@ -627,18 +632,18 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
         else {
             // Document stock supply is processed in original units:
 
-            jtfQuantityBase.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stockSupplyRow.getOriginalQuantityBase()));
-            jtfQuantityBaseUnit.setText(stockSupplyRow.getAuxOriginalUnitSymbol());
-            jtfQuantityAdjusted.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stockSupplyRow.getOriginalQuantityAdjusted()));
+            jtfQuantity.setText(SLibUtils.getDecimalFormatQuantity().format(stockSupplyRow.getOriginalQuantity()));
+            jtfQuantityUnit.setText(stockSupplyRow.getAuxOriginalUnitSymbol());
+            jtfQuantityAdjusted.setText(SLibUtils.getDecimalFormatQuantity().format(stockSupplyRow.getOriginalQuantityAdjusted()));
             jtfQuantityAdjustedUnit.setText(stockSupplyRow.getAuxOriginalUnitSymbol());
-            jtfQuantityNet.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stockSupplyRow.getOriginalQuantityNet()));
+            jtfQuantityNet.setText(SLibUtils.getDecimalFormatQuantity().format(stockSupplyRow.getOriginalQuantityNet()));
             jtfQuantityNetUnit.setText(stockSupplyRow.getAuxOriginalUnitSymbol());
-            jtfQuantityNetAux.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stockSupplyRow.getOriginalQuantityNet()));
+            jtfQuantityNetAux.setText(SLibUtils.getDecimalFormatQuantity().format(stockSupplyRow.getOriginalQuantityNet()));
             jtfQuantityNetAuxUnit.setText(stockSupplyRow.getAuxOriginalUnitSymbol());
-            jtfQuantitySupplied.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stockSupplyRow.getOriginalQuantitySupplied()));
+            jtfQuantitySupplied.setText(SLibUtils.getDecimalFormatQuantity().format(stockSupplyRow.getOriginalQuantitySupplied()));
             jtfQuantitySuppliedUnit.setText(stockSupplyRow.getAuxOriginalUnitSymbol());
-            jtfQuantityPending.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stockSupplyRow.getOriginalQuantityPending()));
-            jtfQuantityPendingUnit.setText(stockSupplyRow.getAuxOriginalUnitSymbol());
+            jtfQuantityPend.setText(SLibUtils.getDecimalFormatQuantity().format(stockSupplyRow.getOriginalQuantityPend()));
+            jtfQuantityPendUnit.setText(stockSupplyRow.getAuxOriginalUnitSymbol());
 
             // Available stock is processed in inventory units:
 
@@ -675,13 +680,13 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
                 }
             }
 
-            jtfStock.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stock));
+            jtfStock.setText(SLibUtils.getDecimalFormatQuantity().format(stock));
             jtfStockUnit.setText(stockSupplyRow.getAuxUnitSymbol());
-            jtfSegregated.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(segregated));
+            jtfSegregated.setText(SLibUtils.getDecimalFormatQuantity().format(segregated));
             jtfSegregatedUnit.setText(stockSupplyRow.getAuxUnitSymbol());
-            jtfCurrentlyUsed.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(used));
+            jtfCurrentlyUsed.setText(SLibUtils.getDecimalFormatQuantity().format(used));
             jtfCurrentlyUsedUnit.setText(stockSupplyRow.getAuxUnitSymbol());
-            jtfAvailable.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stock - used));
+            jtfAvailable.setText(SLibUtils.getDecimalFormatQuantity().format(stock - used));
             jtfAvailableUnit.setText(stockSupplyRow.getAuxUnitSymbol());
 
             jbViewLots.setEnabled(true);
@@ -696,8 +701,8 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
 
             for (STableRow row : moPaneDpsEntries.getTableModel().getTableRows()) {
                 stockSupplyRow = (STrnDpsStockSupplyRow) row;
-                stockSupplyRow.setQuantityToSupply(stockSupplyRow.getQuantityPending());
-                stockSupplyRow.setOriginalQuantityToSupply(stockSupplyRow.getOriginalQuantityPending());
+                stockSupplyRow.setOriginalQuantityAboutToSupply(stockSupplyRow.getOriginalQuantityPend() <= 0d ? 0d : stockSupplyRow.getOriginalQuantityPend());
+                stockSupplyRow.setQuantityAboutToSupply(stockSupplyRow.getQuantityPend() <= 0d ? 0d : stockSupplyRow.getQuantityPend());
                 stockSupplyRow.prepareTableRow();
             }
 
@@ -714,8 +719,8 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
 
             for (STableRow row : moPaneDpsEntries.getTableModel().getTableRows()) {
                 stockSupplyRow = (STrnDpsStockSupplyRow) row;
-                stockSupplyRow.setQuantityToSupply(0);
-                stockSupplyRow.setOriginalQuantityToSupply(0);
+                stockSupplyRow.setOriginalQuantityAboutToSupply(0d);
+                stockSupplyRow.setQuantityAboutToSupply(0d);
                 stockSupplyRow.prepareTableRow();
             }
 
@@ -778,11 +783,11 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
     private javax.swing.JLabel jlAvailable;
     private javax.swing.JLabel jlCurrentlyUsed;
     private javax.swing.JLabel jlPanelDps;
+    private javax.swing.JLabel jlQuantity;
     private javax.swing.JLabel jlQuantityAdjusted;
-    private javax.swing.JLabel jlQuantityBase;
     private javax.swing.JLabel jlQuantityNet;
     private javax.swing.JLabel jlQuantityNetAux;
-    private javax.swing.JLabel jlQuantityPending;
+    private javax.swing.JLabel jlQuantityPend;
     private javax.swing.JLabel jlQuantitySupplied;
     private javax.swing.JLabel jlSegregated;
     private javax.swing.JLabel jlStock;
@@ -808,18 +813,18 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
     private javax.swing.JTextField jtfCompanyBranchCode;
     private javax.swing.JTextField jtfCurrentlyUsed;
     private javax.swing.JTextField jtfCurrentlyUsedUnit;
+    private javax.swing.JTextField jtfQuantity;
     private javax.swing.JTextField jtfQuantityAdjusted;
     private javax.swing.JTextField jtfQuantityAdjustedUnit;
-    private javax.swing.JTextField jtfQuantityBase;
-    private javax.swing.JTextField jtfQuantityBaseUnit;
     private javax.swing.JTextField jtfQuantityNet;
     private javax.swing.JTextField jtfQuantityNetAux;
     private javax.swing.JTextField jtfQuantityNetAuxUnit;
     private javax.swing.JTextField jtfQuantityNetUnit;
-    private javax.swing.JTextField jtfQuantityPending;
-    private javax.swing.JTextField jtfQuantityPendingUnit;
+    private javax.swing.JTextField jtfQuantityPend;
+    private javax.swing.JTextField jtfQuantityPendUnit;
     private javax.swing.JTextField jtfQuantitySupplied;
     private javax.swing.JTextField jtfQuantitySuppliedUnit;
+    private javax.swing.JTextField jtfQuantityUnit;
     private javax.swing.JTextField jtfSegregated;
     private javax.swing.JTextField jtfSegregatedUnit;
     private javax.swing.JTextField jtfStock;
@@ -927,9 +932,10 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
                 resulSet = miClient.getSession().getStatement().executeQuery(sql);
                 while (resulSet.next()) {                                          
                     STrnDpsStockSupplyRow stockSupplyRow = new STrnDpsStockSupplyRow(new int[] { resulSet.getInt("id_year"), resulSet.getInt("id_doc"), resulSet.getInt("id_ety") });
+                    
                     stockSupplyRow.setSortingPosition(resulSet.getInt("sort_pos"));
-                    stockSupplyRow.setQuantityBase(resulSet.getDouble("f_qty"));
-                    stockSupplyRow.setOriginalQuantityBase(resulSet.getDouble("f_orig_qty"));
+                    stockSupplyRow.setQuantity(resulSet.getDouble("f_qty"));
+                    stockSupplyRow.setOriginalQuantity(resulSet.getDouble("f_orig_qty"));
                    
                     if (dps.isOrder()) {
                         stockSupplyRow.setQuantityAdjusted(resulSet.getDouble("f_adj_qty") + resulSet.getDouble("f_link_qty"));
@@ -942,16 +948,14 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
                     
                     stockSupplyRow.setQuantitySupplied(resulSet.getDouble("f_sup_qty"));
                     stockSupplyRow.setOriginalQuantitySupplied(resulSet.getDouble("f_sup_orig_qty"));
-                    stockSupplyRow.setQuantityToSupply(0);
-                    stockSupplyRow.setOriginalQuantityToSupply(0);
+                    stockSupplyRow.setQuantityAboutToSupply(0d);
+                    stockSupplyRow.setOriginalQuantityAboutToSupply(0d);
                     stockSupplyRow.setSurplusPercentage(resulSet.getDouble("surplus_per"));
                     stockSupplyRow.setFkItemId(resulSet.getInt("fid_item"));   
                     stockSupplyRow.setFkUnitId(resulSet.getInt("fid_unit"));
                     stockSupplyRow.setFkOriginalUnitId(resulSet.getInt("fid_orig_unit"));
                     stockSupplyRow.setAuxItem(resulSet.getString("item"));
                     stockSupplyRow.setAuxItemKey(resulSet.getString("item_key")); 
-                    stockSupplyRow.setAuxUnit("");
-                    stockSupplyRow.setAuxOriginalUnit("");
                     stockSupplyRow.setAuxUnitSymbol(resulSet.getString("f_unit"));
                     stockSupplyRow.setAuxOriginalUnitSymbol(resulSet.getString("f_orig_unit"));
 
@@ -986,7 +990,7 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
         computePaneEdition();   // updates user edition into internal pane data objects
 
         for (STableRow row : moPaneDpsEntries.getTableModel().getTableRows()) {
-            if (((STrnDpsStockSupplyRow) row).getOriginalQuantityToSupply() > 0) {
+            if (((STrnDpsStockSupplyRow) row).getOriginalQuantityAboutToSupply() > 0d) {
                 stockSupplyRows.add((STrnDpsStockSupplyRow) row);
             }
         }
@@ -1010,8 +1014,6 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
 
     public erp.lib.form.SFormValidation formValidate() {
         int supplies = 0;
-        double totalSurplus = 0;
-        double totalLinked = 0;
         STrnDpsStockSupplyRow stockSupplyRow = null;
         SFormValidation validation = new SFormValidation();
 
@@ -1019,44 +1021,35 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
 
         for (int row = 0; row < moPaneDpsEntries.getTableModel().getTableRows().size(); row++) {
             stockSupplyRow = (STrnDpsStockSupplyRow) moPaneDpsEntries.getTableRow(row);
-
-            if (moParamDps.isOrder()) {
-                totalSurplus = stockSupplyRow.getOriginalQuantityPending() * (1d + stockSupplyRow.getSurplusPercentage());
-                totalLinked = stockSupplyRow.getOriginalQuantityToSupply(); 
-            }
             
-            if (stockSupplyRow.getOriginalQuantityToSupply() < 0) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + moPaneDpsEntries.getTableColumn(COL_QTY).getColumnTitle() + "' en la fila " + (row + 1) + ".\n" +
-                        "El valor no puede ser negativo.");
+            if (stockSupplyRow.getOriginalQuantityAboutToSupply() < 0d) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + moPaneDpsEntries.getTableColumn(COL_QTY).getColumnTitle() + "' en la fila " + (row + 1) + ":\n" +
+                        "el valor no puede ser negativo.");
                 validation.setComponent(moPaneDpsEntries.getTable());
                 break;
             }
-            else if (totalLinked > totalSurplus && moParamDps.isOrder()) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + moPaneDpsEntries.getTableColumn(COL_QTY).getColumnTitle() + "' en la fila " + (row + 1) + ".\n" +
-                    "El valor no puede ser mayor a " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(totalSurplus) + ".");
-                validation.setComponent(moPaneDpsEntries.getTable());
-                break;
-            }
-            else if (stockSupplyRow.getOriginalQuantityToSupply() > stockSupplyRow.getOriginalQuantityPending() && !moParamDps.isOrder()) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + moPaneDpsEntries.getTableColumn(COL_QTY).getColumnTitle() + "' en la fila " + (row + 1) + ".\n" +
-                        "El valor no puede ser mayor a " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stockSupplyRow.getOriginalQuantityPending()) + ".");
-                validation.setComponent(moPaneDpsEntries.getTable());
-                break;
-            }
-            else if (stockSupplyRow.getOriginalQuantityToSupply() > 0 && stockSupplyRow.getQuantityToSupply() <= 0) {
-                validation.setMessage("No se pudo calcular la equivalencia en unidades de inventario del valor '" + moPaneDpsEntries.getTableColumn(COL_QTY).getColumnTitle() + "' en la fila " + (row + 1) + ".\n" +
-                        "El valor calculado es " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stockSupplyRow.getQuantityToSupply()) + ".");
-                validation.setComponent(moPaneDpsEntries.getTable());
-                break;
-            }
-            else if (stockSupplyRow.getOriginalQuantityToSupply() > 0) {
-                supplies++;
+            else if (stockSupplyRow.getOriginalQuantityAboutToSupply() > 0d) {
+                if (stockSupplyRow.getOriginalQuantityAboutToSupply() > stockSupplyRow.getOriginalQuantityPendWithSurplus()) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + moPaneDpsEntries.getTableColumn(COL_QTY).getColumnTitle() + "' en la fila " + (row + 1) + ":\n" +
+                            "el valor no puede ser mayor a " + SLibUtils.getDecimalFormatQuantity().format(stockSupplyRow.getOriginalQuantityPendWithSurplus()) + " " + stockSupplyRow.getAuxOriginalUnitSymbol() + ".");
+                    validation.setComponent(moPaneDpsEntries.getTable());
+                    break;
+                }
+                else if (stockSupplyRow.getQuantityAboutToSupply() <= 0d) {
+                    validation.setMessage("Error al calcular las unidades equivalentes del movimiento en la fila " + (row + 1) + ":\n" +
+                            "el valor calculado es " + SLibUtils.getDecimalFormatQuantity().format(stockSupplyRow.getQuantityAboutToSupply()) + " " + stockSupplyRow.getAuxUnitSymbol() + ".");
+                    validation.setComponent(moPaneDpsEntries.getTable());
+                    break;
+                }
+                else {
+                    supplies++;
+                }
             }
         }
 
         if (!validation.getIsError()) {
             if (supplies == 0) {
-                validation.setMessage("No se ha especificado el surtido al menos para una de las partidas.");
+                validation.setMessage("Se debe capturar al menos una partida.");
                 validation.setComponent(moPaneDpsEntries.getTable());
             }
         }

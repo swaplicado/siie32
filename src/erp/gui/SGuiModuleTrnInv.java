@@ -14,6 +14,7 @@ import erp.lib.SLibUtilities;
 import erp.lib.table.STableTabComponent;
 import erp.lib.table.STableTabInterface;
 import erp.mod.SModConsts;
+import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogAdjustmentType;
 import erp.mtrn.data.SDataStockConfig;
@@ -35,6 +36,7 @@ import erp.mtrn.form.SFormStockLot;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import sa.gui.util.SUtilConsts;
 
 /**
  *
@@ -676,150 +678,142 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
 
     @Override
     public void showView(int viewType, int auxType01, int auxType02) {
-        String sViewTitle = "";
-        Class oViewClass = null;
+        String title = "";
+        String dpsCategory = STrnUtils.getDpsCategoryName(auxType01, SUtilConsts.NUM_PLR);
+        Class viewClass = null;
 
         try {
             setFrameWaitCursor();
 
             switch (viewType) {
                 case SDataConstants.TRN_LOT:
-                    oViewClass = erp.mtrn.view.SViewStockLot.class;
-                    sViewTitle = "Lotes";
+                    viewClass = erp.mtrn.view.SViewStockLot.class;
+                    title = "Lotes";
                     break;
                 case SDataConstants.TRN_STK_CFG:
-                    oViewClass = erp.mtrn.view.SViewStockConfig.class;
-                    sViewTitle = "Máximos y mínimos";
+                    viewClass = erp.mtrn.view.SViewStockConfig.class;
+                    title = "Máximos y mínimos";
                     break;
                 case SDataConstants.TRNU_TP_IOG_ADJ:
-                    oViewClass = erp.mtrn.view.SViewDiogAdjustmentType.class;
-                    sViewTitle = "Tipos ajuste inventario";
+                    viewClass = erp.mtrn.view.SViewDiogAdjustmentType.class;
+                    title = "Tipos ajuste inventario";
                     break;
                 case SDataConstants.TRN_STK_CFG_ITEM:
-                    oViewClass = erp.mtrn.view.SViewStockConfigItem.class;
-                    sViewTitle = "Config. ítems x almacén ";
+                    viewClass = erp.mtrn.view.SViewStockConfigItem.class;
+                    title = "Config. ítems x almacén ";
                     break;
                 case SDataConstants.TRN_STK_CFG_DNS:
-                    oViewClass = erp.mtrn.view.SViewStockConfigDns.class;
-                    sViewTitle = "Config. series docs. ventas x almacén ";
+                    viewClass = erp.mtrn.view.SViewStockConfigDns.class;
+                    title = "Config. series docs. ventas x almacén ";
                     break;
                 case SDataConstants.TRN_STK:
-                    oViewClass = erp.mtrn.view.SViewStock.class;
+                    viewClass = erp.mtrn.view.SViewStock.class;
                     switch (auxType01) {
                         case SDataConstants.TRNX_STK_STK:
-                            sViewTitle = "Existencias";
+                            title = "Existencias";
                             break;
                         case SDataConstants.TRNX_STK_STK_WH:
-                            sViewTitle = "Existencias x almacén";
+                            title = "Existencias x almacén";
                             break;
                         case SDataConstants.TRNX_STK_LOT:
-                            sViewTitle = "Existencias x lote";
+                            title = "Existencias x lote";
                             break;
                         case SDataConstants.TRNX_STK_LOT_WH:
-                            sViewTitle = "Existencias x almacén x lote";
+                            title = "Existencias x almacén x lote";
                             break;
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
                     }
                     break;
                 case SDataConstants.TRNX_STK_MOVES:
-                    oViewClass = erp.mtrn.view.SViewStockMoves.class;
-                    sViewTitle = "Movimientos inventarios";
+                    viewClass = erp.mtrn.view.SViewStockMoves.class;
+                    title = "Movimientos inventarios";
                     break;
                 case SDataConstants.TRNX_STK_MOVES_ETY:
-                    oViewClass = erp.mtrn.view.SViewStockMovesEntry.class;
-                    sViewTitle = "Movimientos inventarios (detalle)";
+                    viewClass = erp.mtrn.view.SViewStockMovesEntry.class;
+                    title = "Movimientos inventarios (detalle)";
                     break;
                 case SDataConstants.TRNX_STK_ROTATION:
-                    oViewClass = erp.mtrn.view.SViewStockRotation.class;
+                    viewClass = erp.mtrn.view.SViewStockRotation.class;
                     switch (auxType01) {
                         case SDataConstants.TRNX_STK_STK:
-                            sViewTitle = "Rotación";
+                            title = "Rotación";
                             break;
                         case SDataConstants.TRNX_STK_LOT:
-                            sViewTitle = "Rotación x lote";
+                            title = "Rotación x lote";
                             break;
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
                     }
                     break;
                 case SDataConstants.TRNX_STK_COMSUME:
-                    oViewClass = erp.mtrn.view.SViewDpsStockConsume.class;
-                    switch (auxType01) {
-                        case SDataConstantsSys.TRNS_CT_DPS_PUR:
-                            sViewTitle = "Consumo compras";
-                            break;
-                        case SDataConstantsSys.TRNS_CT_DPS_SAL:
-                            sViewTitle = "Consumo ventas";
-                            break;
-                        default:
-                            throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
-                    }
+                    viewClass = erp.mtrn.view.SViewDpsStockConsume.class;
+                    title = "Consumo " + dpsCategory.toLowerCase();
                     break;
                 case SDataConstants.TRNX_DPS_SUPPLY_PEND:
-                    oViewClass = erp.mtrn.view.SViewDpsStockSupply.class;
-                    sViewTitle = auxType01 == SDataConstantsSys.TRNS_CT_DPS_PUR ? "Compras x surtir" : "Ventas x surtir";
+                    viewClass = erp.mtrn.view.SViewDpsStockSupply.class;
+                    title = dpsCategory + " x surtir";
                     break;
                 case SDataConstants.TRNX_DPS_SUPPLY_PEND_ETY:
-                    oViewClass = erp.mtrn.view.SViewDpsStockSupply.class;
-                    sViewTitle = auxType01 == SDataConstantsSys.TRNS_CT_DPS_PUR ? "Compras x surtir (detalle)" : "Ventas x surtir (detalle)";
+                    viewClass = erp.mtrn.view.SViewDpsStockSupply.class;
+                    title = dpsCategory + " x surtir (detalle)";
                     break;
                 case SDataConstants.TRNX_DPS_SUPPLIED:
-                    oViewClass = erp.mtrn.view.SViewDpsStockSupply.class;
-                    sViewTitle = auxType01 == SDataConstantsSys.TRNS_CT_DPS_PUR ? "Compras surtidas" : "Ventas surtidas";
+                    viewClass = erp.mtrn.view.SViewDpsStockSupply.class;
+                    title = dpsCategory + " surtidas";
                     break;
                 case SDataConstants.TRNX_DPS_SUPPLIED_ETY:
-                    oViewClass = erp.mtrn.view.SViewDpsStockSupply.class;
-                    sViewTitle = auxType01 == SDataConstantsSys.TRNS_CT_DPS_PUR ? "Compras surtidas (detalle)" : "Ventas surtidas (detalle)";
+                    viewClass = erp.mtrn.view.SViewDpsStockSupply.class;
+                    title = dpsCategory + " surtidas (detalle)";
                     break;
                 case SDataConstants.TRNX_DPS_RETURN_PEND:
-                    oViewClass = erp.mtrn.view.SViewDpsStockReturn.class;
-                    sViewTitle = auxType01 == SDataConstantsSys.TRNS_CT_DPS_PUR ? "Compras x devolver" : "Ventas x devolver";
+                    viewClass = erp.mtrn.view.SViewDpsStockReturn.class;
+                    title = dpsCategory + " x devolver";
                     break;
                 case SDataConstants.TRNX_DPS_RETURN_PEND_ETY:
-                    oViewClass = erp.mtrn.view.SViewDpsStockReturn.class;
-                    sViewTitle = auxType01 == SDataConstantsSys.TRNS_CT_DPS_PUR ? "Compras x devolver (detalle)" : "Ventas x devolver (detalle)";
+                    viewClass = erp.mtrn.view.SViewDpsStockReturn.class;
+                    title = dpsCategory + " x devolver (detalle)";
                     break;
                 case SDataConstants.TRNX_DPS_SUPPLIED_ORDER:
-                    oViewClass = erp.mtrn.view.SViewOrderSuppliedWithMovs.class;                    
-                    sViewTitle = "Pedidos " + (auxType01 == SDataConstantsSys.TRNS_CT_DPS_SAL ? "ventas" : "compras") + " con surtidos";
+                    viewClass = erp.mtrn.view.SViewOrderSuppliedWithMovs.class;                    
+                    title = "Pedidos " + dpsCategory.toLowerCase() + " c/surtidos";
                     break;
                 case SDataConstants.TRNX_DPS_RETURNED:
-                    oViewClass = erp.mtrn.view.SViewDpsStockReturn.class;
-                    sViewTitle = auxType01 == SDataConstantsSys.TRNS_CT_DPS_PUR ? "Compras devueltas" : "Ventas devueltas";
+                    viewClass = erp.mtrn.view.SViewDpsStockReturn.class;
+                    title = dpsCategory + " devueltas";
                     break;
                 case SDataConstants.TRNX_DPS_RETURNED_ETY:
-                    oViewClass = erp.mtrn.view.SViewDpsStockReturn.class;
-                    sViewTitle = auxType01 == SDataConstantsSys.TRNS_CT_DPS_PUR ? "Compras devueltas (detalle)" : "Ventas devueltas (detalle)";
+                    viewClass = erp.mtrn.view.SViewDpsStockReturn.class;
+                    title = dpsCategory + " devueltas (detalle)";
                     break;
                 case SDataConstants.TRN_DIOG:
-                    oViewClass = erp.mtrn.view.SViewDiog.class;
-                    sViewTitle = "Docs. inventarios";
+                    viewClass = erp.mtrn.view.SViewDiog.class;
+                    title = "Docs. inventarios";
                     if (auxType01 != SLibConstants.UNDEFINED && auxType02 != SLibConstants.UNDEFINED) {
-                        sViewTitle += " (" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNS_TP_IOG, new int[] { auxType01, auxType02, 1 }, SLibConstants.DESCRIPTION_CODE) + ")";
+                        title += " (" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNS_TP_IOG, new int[] { auxType01, auxType02, 1 }, SLibConstants.DESCRIPTION_CODE) + ")";
                     }
                     switch (auxType01) {
                         case SDataConstants.TRNX_DIOG_AUDIT_PEND:
-                            oViewClass = erp.mtrn.view.SViewDiogAudit.class;
-                            sViewTitle = "Docs. inventarios x auditar";
+                            viewClass = erp.mtrn.view.SViewDiogAudit.class;
+                            title = "Docs. inventarios x auditar";
                             break;
                         case SDataConstants.TRNX_DIOG_AUDITED:
-                            oViewClass = erp.mtrn.view.SViewDiogAudit.class;
-                            sViewTitle = "Docs. inventarios auditad@s";
+                            viewClass = erp.mtrn.view.SViewDiogAudit.class;
+                            title = "Docs. inventarios auditad@s";
                             break;
                     }
                     break;
                 case SDataConstants.TRNX_DIOG_MFG:
-                    oViewClass = erp.mtrn.view.SViewDiogProdOrder.class;
+                    viewClass = erp.mtrn.view.SViewDiogProdOrder.class;
 
                     switch (auxType01) {
                         case SDataConstants.TRNX_DIOG_MFG_RM:
                         case SDataConstants.TRNX_DIOG_MFG_WP:
                         case SDataConstants.TRNX_DIOG_MFG_FG:
-                            sViewTitle = "Docs. " + (auxType02 == SDataConstants.TRNX_DIOG_MFG_MOVE_ASG ? "entrega" : "devolución");
+                            title = "Docs. " + (auxType02 == SDataConstants.TRNX_DIOG_MFG_MOVE_ASG ? "entrega" : "devolución");
                             break;
                         case SDataConstants.TRNX_DIOG_MFG_CON:
-                            sViewTitle = "Docs. " + (auxType02 == SDataConstants.TRNX_DIOG_MFG_MOVE_IN ? "entrada" : "salida");
+                            title = "Docs. " + (auxType02 == SDataConstants.TRNX_DIOG_MFG_MOVE_IN ? "entrada" : "salida");
                             break;
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
@@ -827,16 +821,16 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
 
                     switch (auxType01) {
                         case SDataConstants.TRNX_DIOG_MFG_RM:
-                            sViewTitle += " MP";
+                            title += " MP";
                             break;
                         case SDataConstants.TRNX_DIOG_MFG_WP:
-                            sViewTitle += " PP";
+                            title += " PP";
                             break;
                         case SDataConstants.TRNX_DIOG_MFG_FG:
-                            sViewTitle += " PT";
+                            title += " PT";
                             break;
                         case SDataConstants.TRNX_DIOG_MFG_CON:
-                            sViewTitle += " x consumo";
+                            title += " x consumo";
                             break;
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
@@ -844,71 +838,71 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
 
                     break;
                 case SDataConstants.TRNX_MFG_ORD:
-                    sViewTitle = "Movs. prod. - ";
+                    title = "Movs. prod. - ";
                     switch (auxType01) {
                         case SDataConstants.TRNX_MFG_ORD_ASSIGN_PEND:
-                            oViewClass = erp.mtrn.view.SViewProdOrderStockAssign.class;
-                            sViewTitle += "OP x asignar";
+                            viewClass = erp.mtrn.view.SViewProdOrderStockAssign.class;
+                            title += "OP x asignar";
                             break;
                         case SDataConstants.TRNX_MFG_ORD_ASSIGN_PEND_ETY:
-                            oViewClass = erp.mtrn.view.SViewProdOrderStockAssign.class;
-                            sViewTitle += "OP x asignar (detalle)";
+                            viewClass = erp.mtrn.view.SViewProdOrderStockAssign.class;
+                            title += "OP x asignar (detalle)";
                             break;
                         case SDataConstants.TRNX_MFG_ORD_ASSIGNED:
-                            oViewClass = erp.mtrn.view.SViewProdOrderStockAssign.class;
-                            sViewTitle += "OP asignadas";
+                            viewClass = erp.mtrn.view.SViewProdOrderStockAssign.class;
+                            title += "OP asignadas";
                             break;
                         case SDataConstants.TRNX_MFG_ORD_ASSIGNED_ETY:
-                            oViewClass = erp.mtrn.view.SViewProdOrderStockAssign.class;
-                            sViewTitle += "OP asignadas (detalle)";
+                            viewClass = erp.mtrn.view.SViewProdOrderStockAssign.class;
+                            title += "OP asignadas (detalle)";
                             break;
                         case SDataConstants.TRNX_MFG_ORD_FINISH_PEND:
-                            oViewClass = erp.mtrn.view.SViewProdOrderStockFinish.class;
-                            sViewTitle += "OP x terminar";
+                            viewClass = erp.mtrn.view.SViewProdOrderStockFinish.class;
+                            title += "OP x terminar";
                             break;
                         case SDataConstants.TRNX_MFG_ORD_FINISH_PEND_ETY:
-                            oViewClass = erp.mtrn.view.SViewProdOrderStockFinish.class;
-                            sViewTitle += "OP x terminar (detalle)";
+                            viewClass = erp.mtrn.view.SViewProdOrderStockFinish.class;
+                            title += "OP x terminar (detalle)";
                             break;
                         case SDataConstants.TRNX_MFG_ORD_FINISHED:
-                            oViewClass = erp.mtrn.view.SViewProdOrderStockFinish.class;
-                            sViewTitle += "OP terminadas";
+                            viewClass = erp.mtrn.view.SViewProdOrderStockFinish.class;
+                            title += "OP terminadas";
                             break;
                         case SDataConstants.TRNX_MFG_ORD_FINISHED_ETY:
-                            oViewClass = erp.mtrn.view.SViewProdOrderStockFinish.class;
-                            sViewTitle += "OP terminadas (detalle)";
+                            viewClass = erp.mtrn.view.SViewProdOrderStockFinish.class;
+                            title += "OP terminadas (detalle)";
                             break;
                         case SDataConstants.TRNX_MFG_ORD_CONSUME_PEND:
-                            oViewClass = erp.mtrn.view.SViewProdOrderStockConsume.class;
-                            sViewTitle += "MP & P x consumir";
+                            viewClass = erp.mtrn.view.SViewProdOrderStockConsume.class;
+                            title += "MP & P x consumir";
                             break;
                         case SDataConstants.TRNX_MFG_ORD_CONSUME_PEND_ETY:
-                            oViewClass = erp.mtrn.view.SViewProdOrderStockConsume.class;
-                            sViewTitle += "MP & P x consumir (detalle)";
+                            viewClass = erp.mtrn.view.SViewProdOrderStockConsume.class;
+                            title += "MP & P x consumir (detalle)";
                             break;
                         case SDataConstants.TRNX_MFG_ORD_CONSUMED:
-                            oViewClass = erp.mtrn.view.SViewProdOrderStockConsume.class;
-                            sViewTitle += "MP & P consumidos";
+                            viewClass = erp.mtrn.view.SViewProdOrderStockConsume.class;
+                            title += "MP & P consumidos";
                             break;
                         case SDataConstants.TRNX_MFG_ORD_CONSUMED_ETY:
-                            oViewClass = erp.mtrn.view.SViewProdOrderStockConsume.class;
-                            sViewTitle += "MP & P consumidos (detalle)";
+                            viewClass = erp.mtrn.view.SViewProdOrderStockConsume.class;
+                            title += "MP & P consumidos (detalle)";
                             break;
                         case SDataConstants.TRNX_MFG_ORD_CONSUME_PEND_MASS:
-                            oViewClass = erp.mtrn.view.SViewProdOrderStockConsume.class;
-                            sViewTitle = "Masa MP & P x consumir";
+                            viewClass = erp.mtrn.view.SViewProdOrderStockConsume.class;
+                            title = "Masa MP & P x consumir";
                             break;
                         case SDataConstants.TRNX_MFG_ORD_CONSUME_PEND_ETY_MASS:
-                            oViewClass = erp.mtrn.view.SViewProdOrderStockConsume.class;
-                            sViewTitle = "Masa MP & P x consumir (detalle)";
+                            viewClass = erp.mtrn.view.SViewProdOrderStockConsume.class;
+                            title = "Masa MP & P x consumir (detalle)";
                             break;
                         case SDataConstants.TRNX_MFG_ORD_CONSUMED_MASS:
-                            oViewClass = erp.mtrn.view.SViewProdOrderStockConsume.class;
-                            sViewTitle = "Masa MP & P consumidos";
+                            viewClass = erp.mtrn.view.SViewProdOrderStockConsume.class;
+                            title = "Masa MP & P consumidos";
                             break;
                         case SDataConstants.TRNX_MFG_ORD_CONSUMED_ETY_MASS:
-                            oViewClass = erp.mtrn.view.SViewProdOrderStockConsume.class;
-                            sViewTitle = "Masa MP & P consumidos (detalle)";
+                            viewClass = erp.mtrn.view.SViewProdOrderStockConsume.class;
+                            title = "Masa MP & P consumidos (detalle)";
                             break;
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
@@ -918,7 +912,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                     throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
             }
 
-            processView(oViewClass, sViewTitle, viewType, auxType01, auxType02);
+            processView(viewClass, title, viewType, auxType01, auxType02);
         }
         catch (java.lang.Exception e) {
             SLibUtilities.renderException(this, e);

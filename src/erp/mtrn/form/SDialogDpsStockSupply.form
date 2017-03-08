@@ -220,7 +220,7 @@
                         <Property name="verticalGap" type="int" value="0"/>
                       </Layout>
                       <SubComponents>
-                        <Component class="javax.swing.JLabel" name="jlQuantityBase">
+                        <Component class="javax.swing.JLabel" name="jlQuantity">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="+ Cant. original:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -228,7 +228,7 @@
                             </Property>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JTextField" name="jtfQuantityBase">
+                        <Component class="javax.swing.JTextField" name="jtfQuantity">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
                             <Property name="horizontalAlignment" type="int" value="11"/>
@@ -239,7 +239,7 @@
                             </Property>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JTextField" name="jtfQuantityBaseUnit">
+                        <Component class="javax.swing.JTextField" name="jtfQuantityUnit">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
                             <Property name="text" type="java.lang.String" value="UNIT"/>
@@ -442,7 +442,7 @@
                         <Property name="verticalGap" type="int" value="0"/>
                       </Layout>
                       <SubComponents>
-                        <Component class="javax.swing.JLabel" name="jlQuantityPending">
+                        <Component class="javax.swing.JLabel" name="jlQuantityPend">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="= Cant. pendiente:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -450,12 +450,12 @@
                             </Property>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JTextField" name="jtfQuantityPending">
+                        <Component class="javax.swing.JTextField" name="jtfQuantityPend">
                           <Properties>
+                            <Property name="editable" type="boolean" value="false"/>
                             <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                               <Color blue="af" green="af" id="pink" palette="1" red="ff" type="palette"/>
                             </Property>
-                            <Property name="editable" type="boolean" value="false"/>
                             <Property name="horizontalAlignment" type="int" value="11"/>
                             <Property name="text" type="java.lang.String" value="0.00"/>
                             <Property name="focusable" type="boolean" value="false"/>
@@ -464,12 +464,12 @@
                             </Property>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JTextField" name="jtfQuantityPendingUnit">
+                        <Component class="javax.swing.JTextField" name="jtfQuantityPendUnit">
                           <Properties>
+                            <Property name="editable" type="boolean" value="false"/>
                             <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                               <Color blue="af" green="af" id="pink" palette="1" red="ff" type="palette"/>
                             </Property>
-                            <Property name="editable" type="boolean" value="false"/>
                             <Property name="text" type="java.lang.String" value="UNIT"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">

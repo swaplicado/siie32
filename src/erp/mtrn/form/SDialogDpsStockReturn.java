@@ -773,8 +773,6 @@ public class SDialogDpsStockReturn extends javax.swing.JDialog implements Action
                     stockReturnRow.setFkOriginalUnitId(resulSet.getInt(7));
                     stockReturnRow.setAuxItem(resulSet.getString(10));
                     stockReturnRow.setAuxItemKey(resulSet.getString(9));
-                    stockReturnRow.setAuxUnit("");
-                    stockReturnRow.setAuxOriginalUnit("");
                     stockReturnRow.setAuxUnitSymbol(resulSet.getString(11));
                     stockReturnRow.setAuxOriginalUnitSymbol(resulSet.getString(12));
                     stockReturnRow.setAuxDocNumberSeries(resulSet.getString(17));

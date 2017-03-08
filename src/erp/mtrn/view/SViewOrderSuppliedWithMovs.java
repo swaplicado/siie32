@@ -28,16 +28,17 @@ import sa.lib.grid.SGridUtils;
 
 /**
  *
- * @author Uriel Castañeda
+ * @author Uriel Castañeda, Sergio Flores
+ * 2017-03-08 (sflores): Reordering of command buttons and corresponding action methods.
  */
 public class SViewOrderSuppliedWithMovs extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
-    private erp.lib.table.STabFilterDatePeriod moFilterDatePeriod;
-    private JButton mjbSupplyOrder;
     private JButton mjbImport;
+    private JButton mjbSupply;
     private JButton mjbViewDps;
     private JButton mjbViewNotes;
     private JButton mjbViewLinks;
+    private erp.lib.table.STabFilterDatePeriod moFilterDatePeriod;
     private erp.mtrn.form.SDialogDpsFinder moDialogDpsFinder;
     
     public SViewOrderSuppliedWithMovs(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
@@ -54,29 +55,27 @@ public class SViewOrderSuppliedWithMovs extends erp.lib.table.STableTab implemen
         int columnNumber = 0;
         STableColumn[] aoTableColumns = null;
         
-        moFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
-        
-        mjbSupplyOrder = SGridUtils.createButton(new ImageIcon(getClass().getResource(isViewForPurchases() ? "/erp/img/icon_std_dps_supply.gif" : "/erp/img/icon_std_dps_supply.gif")), "Surtir", this);
         mjbImport = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_IMPORT), "Importar documento", this);
+        mjbSupply = SGridUtils.createButton(new ImageIcon(getClass().getResource(isViewForPurchases() ? "/erp/img/icon_std_dps_supply.gif" : "/erp/img/icon_std_dps_supply.gif")), "Surtir", this);
         
         mjbViewDps = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_LOOK), "Ver documento", this);
         mjbViewNotes = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NOTES), "Ver notas", this);
         mjbViewLinks = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_LINK), "Ver vínculos del documento", this);
         
+        moFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         moDialogDpsFinder = new SDialogDpsFinder((SClientInterface) miClient, SDataConstants.TRNX_DPS_PEND_LINK);
         
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
         removeTaskBarUpperComponent(jbDelete);
-        addTaskBarUpperComponent(mjbSupplyOrder);
         addTaskBarUpperComponent(mjbImport);
+        addTaskBarUpperComponent(mjbSupply);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moFilterDatePeriod);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(mjbViewDps);
         addTaskBarUpperComponent(mjbViewNotes);
         addTaskBarUpperComponent(mjbViewLinks);
-        addTaskBarUpperSeparator();       
         
         STableField[] aoKeyFields = new STableField[2];
         
@@ -127,25 +126,6 @@ public class SViewOrderSuppliedWithMovs extends erp.lib.table.STableTab implemen
         return mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR;
     }
     
-    private void actionSupply() {
-        if (mjbSupplyOrder.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() == null) {
-                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
-            }
-            else {
-                int[] key = isViewForPurchases() ? SDataConstantsSys.TRNS_TP_IOG_IN_PUR_PUR : SDataConstantsSys.TRNS_TP_IOG_OUT_SAL_SAL;
-                SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
-
-                miClient.getGuiModule(SDataConstants.MOD_INV).setFormComplement(new STrnDiogComplement(key, dps));
-                if (miClient.getGuiModule(SDataConstants.MOD_INV).showForm(SDataConstants.TRN_DIOG, null) == SLibConstants.DB_ACTION_SAVE_OK) {
-                    miClient.getGuiModule(SDataConstants.MOD_INV).refreshCatalogues(SDataConstants.TRN_DIOG);
-                }
-            }
-            
-            miClient.getGuiModule(SDataConstants.MOD_INV).refreshCatalogues(mnTabType);
-        }
-    }
-    
     private void actionImport() {
         if (mjbImport.isEnabled()) {
             int[] keyOrder = isViewForPurchases() ?  SDataConstantsSys.TRNS_CL_DPS_PUR_ORD : SDataConstantsSys.TRNS_CL_DPS_SAL_ORD;
@@ -167,6 +147,25 @@ public class SViewOrderSuppliedWithMovs extends erp.lib.table.STableTab implemen
                     miClient.getGuiModule(SDataConstants.MOD_INV).refreshCatalogues(mnTabType);
                 }
             }
+        }
+    }
+    
+    private void actionSupply() {
+        if (mjbSupply.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() == null) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                int[] key = isViewForPurchases() ? SDataConstantsSys.TRNS_TP_IOG_IN_PUR_PUR : SDataConstantsSys.TRNS_TP_IOG_OUT_SAL_SAL;
+                SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
+
+                miClient.getGuiModule(SDataConstants.MOD_INV).setFormComplement(new STrnDiogComplement(key, dps));
+                if (miClient.getGuiModule(SDataConstants.MOD_INV).showForm(SDataConstants.TRN_DIOG, null) == SLibConstants.DB_ACTION_SAVE_OK) {
+                    miClient.getGuiModule(SDataConstants.MOD_INV).refreshCatalogues(SDataConstants.TRN_DIOG);
+                }
+            }
+            
+            miClient.getGuiModule(SDataConstants.MOD_INV).refreshCatalogues(mnTabType);
         }
     }
     
@@ -212,11 +211,11 @@ public class SViewOrderSuppliedWithMovs extends erp.lib.table.STableTab implemen
          if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
 
-            if (button == mjbSupplyOrder) {
-                actionSupply();
-            }
             if (button == mjbImport) {
                 actionImport();
+            }
+            else if (button == mjbSupply) {
+                actionSupply();
             }
             else if (button == mjbViewDps) {
                 actionViewDps();

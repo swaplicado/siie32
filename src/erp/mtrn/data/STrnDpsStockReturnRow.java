@@ -104,9 +104,7 @@ public class STrnDpsStockReturnRow extends erp.lib.table.STableRow {
     public void setFkDpsEntryId(int n) { mnFkDpsEntryId = n; }
     public void setAuxItem(java.lang.String s) { msAuxItem = s; }
     public void setAuxItemKey(java.lang.String s) { msAuxItemKey = s; }
-    public void setAuxUnit(java.lang.String s) { msAuxUnit = s; }
     public void setAuxUnitSymbol(java.lang.String s) { msAuxUnitSymbol = s; }
-    public void setAuxOriginalUnit(java.lang.String s) { msAuxOriginalUnit = s; }
     public void setAuxOriginalUnitSymbol(java.lang.String s) { msAuxOriginalUnitSymbol = s; }
     public void setAuxDocNumberSeries(java.lang.String s) { msAuxDocNumberSeries = s; }
     public void setAuxDocNumber(java.lang.String s) { msAuxDocNumber = s; }
@@ -131,9 +129,7 @@ public class STrnDpsStockReturnRow extends erp.lib.table.STableRow {
     public int getFkDpsEntryId() { return mnFkDpsEntryId; }
     public java.lang.String getAuxItem() { return msAuxItem; }
     public java.lang.String getAuxItemKey() { return msAuxItemKey; }
-    public java.lang.String getAuxUnit() { return msAuxUnit; }
     public java.lang.String getAuxUnitSymbol() { return msAuxUnitSymbol; }
-    public java.lang.String getAuxOriginalUnit() { return msAuxOriginalUnit; }
     public java.lang.String getAuxOriginalUnitSymbol() { return msAuxOriginalUnitSymbol; }
     public java.lang.String getAuxDocNumberSeries() { return msAuxDocNumberSeries; }
     public java.lang.String getAuxDocNumber() { return msAuxDocNumber; }

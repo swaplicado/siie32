@@ -2954,10 +2954,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
      * @param enable Desired status for tabs and fields.
      */
     private void enableCfd(boolean enable) {
-        boolean isCfdRequired = isCfdRequired();
-        
-        jTabbedPane.setEnabledAt(TAB_CFD, isCfdRequired || isCfdXmlRequired());    // enable aswell XML file for expenses documents
-        jTabbedPane.setEnabledAt(TAB_INT, isCfdRequired && isBizPartnerInt());
+        jTabbedPane.setEnabledAt(TAB_CFD, isCfdRequired() || isCfdXmlRequired());   // enable aswell XML file for expenses documents
+        jTabbedPane.setEnabledAt(TAB_INT, isCfdRequired() && isBizPartnerInt());
         
         enableCfdXmlFields(enable);
         enableCfdCceFields(enable);
@@ -2986,7 +2984,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
      * @param enable Desired status for fields.
      */
     private void enableCfdCceFields(boolean enable) {
-        boolean enableFields = enable && isBizPartnerInt();
+        boolean enableFields = enable && isCfdRequired() && isBizPartnerInt();
         boolean isCurrencyUsd = jcbFkCurrencyId.getSelectedIndex() > 0 && moFieldFkCurrencyId.getKeyAsIntArray()[0] == SModSysConsts.CFGU_CUR_USD;
         
         jcbCfdCceReasonTransfer.setEnabled(enableFields);
@@ -8392,7 +8390,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEditHelp.setEnabled(!jbEdit.isEnabled());
         jbOk.setEnabled(false);
 
-        if (isCfdRequired()) {
+        if (isCfdRequired() || isCfdXmlRequired()) {
             setAddendaData();
             
             if (!mbIsSales && moDps.getDbmsDataCfd() != null) {
@@ -8685,7 +8683,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             catch (Exception e) {
                 SLibUtilities.renderException(this, e);
             }            
-            //moDps.setDbmsDataCfd(null);
+            //moDps.setDbmsDataCfd(null);   XXX Can this line be removed? (2017-03-08, sflores)
         }
 
         return moDps;

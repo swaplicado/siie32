@@ -36,7 +36,6 @@ import erp.mitm.data.SDataUnit;
 import erp.mmfg.data.SDataProductionOrder;
 import erp.mod.SModSysConsts;
 import erp.mod.itm.db.SItmConsts;
-import erp.mtrn.data.STrnStockSegregationUtils;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.SDataDiogEntryRow;
@@ -50,6 +49,7 @@ import erp.mtrn.data.STrnItemFound;
 import erp.mtrn.data.STrnProdOrderStockAssignRow;
 import erp.mtrn.data.STrnProdOrderStockFinishRow;
 import erp.mtrn.data.STrnStockMove;
+import erp.mtrn.data.STrnStockSegregationUtils;
 import erp.mtrn.data.STrnStockValidator;
 import erp.mtrn.data.STrnUtilities;
 import java.awt.BorderLayout;
@@ -1612,7 +1612,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                 moDialogStockLots.formReset();
                                 moDialogStockLots.setFormParams(mnParamIogCategoryId, year, stockSupplyRow.getFkItemId(), stockSupplyRow.getFkUnitId(),
                                         (int[]) moWarehouseSource.getPrimaryKey(), (int[]) (moDiog == null ? null : moDiog.getPrimaryKey()),
-                                        stockSupplyRow.getQuantityToSupply(), SLibConstants.FORM_STATUS_EDIT, mode, moParamDpsSource, moFieldDate.getDate());
+                                        stockSupplyRow.getQuantityAboutToSupply(), SLibConstants.FORM_STATUS_EDIT, mode, moParamDpsSource, moFieldDate.getDate());
                                 moDialogStockLots.setCurrentEntry(row + 1, stockSupplyRowsAux.size());
                                 moDialogStockLots.setVisible(true);
 
@@ -1628,11 +1628,11 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             iogEntry.setPkYearId(SLibConstants.UNDEFINED);
                             iogEntry.setPkDocId(SLibConstants.UNDEFINED);
                             iogEntry.setPkEntryId(SLibConstants.UNDEFINED);
-                            iogEntry.setQuantity(stockSupplyRow.getQuantityToSupply());
+                            iogEntry.setQuantity(stockSupplyRow.getQuantityAboutToSupply());
                             iogEntry.setValueUnitary(dpsEntry.getPriceUnitaryReal_r());
-                            iogEntry.setValue(SLibUtilities.round(dpsEntry.getPriceUnitaryReal_r() * stockSupplyRow.getQuantityToSupply(), decsQty));
-                            iogEntry.setOriginalQuantity(stockSupplyRow.getOriginalQuantityToSupply());
-                            iogEntry.setOriginalValueUnitary(iogEntry.getOriginalQuantity() == 0 ? 0 : SLibUtilities.round(iogEntry.getValue() / iogEntry.getOriginalQuantity(), decsValUnit));
+                            iogEntry.setValue(SLibUtilities.round(iogEntry.getValueUnitary() * iogEntry.getQuantity(), decsQty));
+                            iogEntry.setOriginalQuantity(stockSupplyRow.getOriginalQuantityAboutToSupply());
+                            iogEntry.setOriginalValueUnitary(iogEntry.getOriginalQuantity() == 0d ? 0d : SLibUtilities.round(iogEntry.getValue() / iogEntry.getOriginalQuantity(), decsValUnit));
                             iogEntry.setSortingPosition(0);
                             iogEntry.setIsInventoriable(item.getIsInventoriable());
                             iogEntry.setIsDeleted(false);
@@ -1656,9 +1656,9 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 
                             iogEntry.setDbmsItem(stockSupplyRow.getAuxItem());
                             iogEntry.setDbmsItemKey(stockSupplyRow.getAuxItemKey());
-                            iogEntry.setDbmsUnit(stockSupplyRow.getAuxUnit());
+                            iogEntry.setDbmsUnit(stockSupplyRow.getAuxUnitSymbol());    // no unit name available in supply row object
                             iogEntry.setDbmsUnitSymbol(stockSupplyRow.getAuxUnitSymbol());
-                            iogEntry.setDbmsOriginalUnit(stockSupplyRow.getAuxOriginalUnit());
+                            iogEntry.setDbmsOriginalUnit(stockSupplyRow.getAuxOriginalUnitSymbol());    // no original unit name available in supply row object
                             iogEntry.setDbmsOriginalUnitSymbol(stockSupplyRow.getAuxOriginalUnitSymbol());
 
                             if (item.getIsLotApplying()) {
@@ -1743,7 +1743,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             iogEntry.setPkEntryId(SLibConstants.UNDEFINED);
                             iogEntry.setQuantity(stockReturnRow.getQuantityToReturn());
                             iogEntry.setValueUnitary(dpsEntry.getPriceUnitaryReal_r());
-                            iogEntry.setValue(SLibUtilities.round(dpsEntry.getPriceUnitaryReal_r() * stockReturnRow.getQuantityToReturn(), decsQty));
+                            iogEntry.setValue(SLibUtilities.round(iogEntry.getValueUnitary() * iogEntry.getQuantity(), decsQty));
                             iogEntry.setOriginalQuantity(stockReturnRow.getOriginalQuantityToReturn());
                             iogEntry.setOriginalValueUnitary(iogEntry.getOriginalQuantity() == 0 ? 0 : SLibUtilities.round(iogEntry.getValue() / iogEntry.getOriginalQuantity(), decsValUnit));
                             iogEntry.setSortingPosition(0);
@@ -1769,9 +1769,9 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 
                             iogEntry.setDbmsItem(stockReturnRow.getAuxItem());
                             iogEntry.setDbmsItemKey(stockReturnRow.getAuxItemKey());
-                            iogEntry.setDbmsUnit(stockReturnRow.getAuxUnit());
+                            iogEntry.setDbmsUnit(stockReturnRow.getAuxUnitSymbol());    // no unit name available in return row object
                             iogEntry.setDbmsUnitSymbol(stockReturnRow.getAuxUnitSymbol());
-                            iogEntry.setDbmsOriginalUnit(stockReturnRow.getAuxOriginalUnit());
+                            iogEntry.setDbmsOriginalUnit(stockReturnRow.getAuxOriginalUnitSymbol());    // no unit name available in return row object
                             iogEntry.setDbmsOriginalUnitSymbol(stockReturnRow.getAuxOriginalUnitSymbol());
 
                             if (item.getIsLotApplying()) {
