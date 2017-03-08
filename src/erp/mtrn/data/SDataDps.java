@@ -3194,7 +3194,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 sSql = "DELETE FROM trn_dps_cfd WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";
                 oStatement.execute(sSql);
                 
-                if (!msXtaCfdUseCfdi.isEmpty() || !msXtaCfdCceReasonTransfer.isEmpty()) {
+                if (!msXtaCfdUseCfdi.isEmpty() || !msXtaCfdCceOperationType.isEmpty()) {
                     moDbmsDataDpsCfd = new SDataDpsCfd();
                     
                     moDbmsDataDpsCfd.setPkYearId(mnPkYearId);
