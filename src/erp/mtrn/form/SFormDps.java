@@ -3216,7 +3216,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     }
     
     private boolean isCfdXmlRequired() {
-        return !mbIsSales && mbIsDoc;
+        return !mbIsSales && (mbIsDoc || mbIsAdj);
     }
     
     private boolean isApplingFunctionalAreas() {
