@@ -332,17 +332,17 @@ public abstract class STrnUtilities {
     }
 
     /**
-     * Obtain min expiration date lot by ítem:
+     * Obtain older lot:
      * @param client
      * @param warehouseKey
-     * @param itemId_n
-     * @param unitId_n
+     * @param itemId
+     * @param unitId
      * @return
      * @throws Exception 
      */
     @SuppressWarnings("unchecked")
-    public static Date obtainMixExpirationDateLotByItem(final SClientInterface client, final int[] warehouseKey, final int itemId_n, final int unitId_n) throws Exception {
-        Date expDate = null;
+    public static int[] obtainOlderLot(final SClientInterface client, final int[] warehouseKey, final int itemId, final int unitId) throws Exception {
+        int[] lot = new int[3];
         String sql = "";
         ResultSet resultSet = null;
 
@@ -352,17 +352,19 @@ public abstract class STrnUtilities {
                 "INNER JOIN erp.itmu_item AS i ON s.id_item = i.id_item " +
                 "INNER JOIN erp.itmu_unit AS u ON s.id_unit = u.id_unit " +
                 "WHERE s.id_cob = " + warehouseKey[0] + " AND s.id_wh = " + warehouseKey[1] + " AND s.b_del = 0 " +
-                "AND s.id_item = " + itemId_n + " AND s.id_unit = " + unitId_n + " " +
+                "AND s.id_item = " + itemId + " AND s.id_unit = " + unitId + " " +
                 "GROUP BY s.id_item, s.id_unit, s.id_lot, l.lot, l.dt_exp_n " +
                 "HAVING f_stk <> 0 " +
-                "ORDER BY l.dt_exp_n, f_stk DESC, l.lot, s.id_lot ";
+                "ORDER BY l.dt_exp_n, l.lot, s.id_lot ";
 
         resultSet = client.getSession().getStatement().executeQuery(sql);
         if (resultSet.next()) {
-            expDate = resultSet.getDate("dt_exp_n");
+            lot[0] = itemId;
+            lot[1] = unitId;
+            lot[2] = resultSet.getInt("s.id_lot");
         }
 
-        return expDate;
+        return lot;
     }
     
     /**

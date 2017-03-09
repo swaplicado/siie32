@@ -439,7 +439,7 @@ public class SDialogStockLots extends javax.swing.JDialog implements ActionListe
     
     public void actionPickLot() {
         int index = 0;
-        Date minExpirationDate = null;
+        int[] olderLot = null;
         double quantityPicked = 0;
         double quantityCurrent = 0;
         STableRow rowCurrent = null;
@@ -496,9 +496,9 @@ public class SDialogStockLots extends javax.swing.JDialog implements ActionListe
 
                             if (mnParamIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_OUT) { 
                                 try {
-                                    minExpirationDate = STrnUtilities.obtainMixExpirationDateLotByItem(miClient, movePicked.getWarehouseKey(), movePicked.getPkItemId(), movePicked.getPkUnitId());
+                                    olderLot = STrnUtilities.obtainOlderLot(miClient, movePicked.getWarehouseKey(), movePicked.getPkItemId(), movePicked.getPkUnitId());
 
-                                    if (movePicked.getAuxLotDateExpiration() != null && minExpirationDate.before(movePicked.getAuxLotDateExpiration())) {
+                                    if (movePicked.getAuxLotDateExpiration() != null && !SLibUtils.compareKeys(olderLot, movePicked.getLotKey())) {
                                        miClient.showMsgBoxWarning("El lote seleccionado no es el más próximo a caducar.");
                                     }
                                 }
