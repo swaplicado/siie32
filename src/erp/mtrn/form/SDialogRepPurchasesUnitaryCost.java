@@ -345,8 +345,6 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
         else {
             try {
                 setCursor(new Cursor(Cursor.WAIT_CURSOR));
-
-                getAccounts();
                 
                 map = miClient.createReportParams();
                 map.put("tStart", moFieldDateStart.getDate());
@@ -526,6 +524,9 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
 
         moFieldDateStart.setFieldValue(SLibTimeUtilities.getBeginOfMonth(miClient.getSessionXXX().getWorkingDate()));
         moFieldDateEnd.setFieldValue(SLibTimeUtilities.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()));
+        
+        jrbAllAccounts.setSelected(true);
+        itemStateChangedCurrencyOptions();
     }
 
     @Override
@@ -550,6 +551,15 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
             if (moFieldDateEnd.getDate().compareTo(moFieldDateStart.getDate()) < 0) {
                 validation.setMessage("La fecha final debe ser mayor o igual a la fecha inicial.");
                 validation.setComponent(jftDateEnd);
+            }
+        }
+        
+        if (!validation.getIsError()) {
+            getAccounts();
+            
+            if (jrbSelectAccounts.isSelected() && mnNumberAccountsSelects == 0) {
+                validation.setMessage("Se debe al menos especificar una cuenta contable.");
+                validation.setComponent(jrbSelectAccounts);
             }
         }
 
