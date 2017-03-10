@@ -678,9 +678,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
             
             jtfDpsValueCyCurKeyRo.setText(miClient.getSession().getSessionCustom().getCurrencyCode(new int[] { moDps.getFkCurrencyId() }));
             
-            if (moFieldConcept.getString().isEmpty()) {
-                actionPerformedConcept();
-            }
+            actionPerformedConcept();
         }
     }
 
