@@ -308,6 +308,10 @@ public class SCfdDataAsociadoNegocios {
             if (mfVersion == DCfdConsts.CFDI_VER_33) {
                 receptor = new cfd.ver33.DElementReceptor();
 
+                if (mbIsCfdiWithCce && msBizPartnerRfc.compareTo(SFinConsts.RFC_INT) != 0) {
+                    throw new Exception("El RFC debe ser '" + SFinConsts.RFC_INT + "'.");
+                }
+                
                 ((cfd.ver33.DElementReceptor) receptor).getAttRfc().setString(msBizPartnerRfc);
                 ((cfd.ver33.DElementReceptor) receptor).getAttNombre().setString(msBizPartnerName);
                 

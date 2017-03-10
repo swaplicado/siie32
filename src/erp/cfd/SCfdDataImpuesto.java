@@ -58,7 +58,7 @@ public class SCfdDataImpuesto {
             case SModSysConsts.FINS_TP_TAX_RETAINED:
                 cfd.ver33.DElementConceptoImpuestoRetencion conceptoImpuestoRetencion = new cfd.ver33.DElementConceptoImpuestoRetencion();
                 
-                if (msTipoFactor.compareTo(msTipoFactor) == 0) {
+                if (msTipoFactor.compareTo(msTipoFactor) == 0) { // XXX jbarajas falta las constantes para comparar contra tipo exento
                     throw new Exception("Error al generar el nodo impuesto 'retenido' el tipo de factor debe ser distinto de exento.");
                 }
                 
@@ -76,7 +76,7 @@ public class SCfdDataImpuesto {
                 conceptoImpuestoTraslado.getAttBase().setDouble(mdBase);
                 conceptoImpuestoTraslado.getAttImpuesto().setString(msImpuestoClave);
                 conceptoImpuestoTraslado.getAttTipoFactor().setString(msTipoFactor);
-                if (msTipoFactor.compareTo(msTipoFactor) == 0) {
+                if (msTipoFactor.compareTo(msTipoFactor) == 0) { // XXX jbarajas falta las constantes para comparar contra tipo exento
                     conceptoImpuestoTraslado.getAttTasaOCuota().setDouble(mdTasa);
                     conceptoImpuestoTraslado.getAttImporte().setDouble(mdImporte);
                 }

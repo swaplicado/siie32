@@ -3490,36 +3490,38 @@ public abstract class SCfdUtils implements Serializable {
 
         // Taxes:
 
-        cfd.ver33.DElementImpuestosRetenidos impuestosRetenidos = new cfd.ver33.DElementImpuestosRetenidos();
-        cfd.ver33.DElementImpuestosTraslados impuestosTrasladados = new cfd.ver33.DElementImpuestosTraslados();
+        if (cfdXml.getCfdTipoCfdXml() != SCfdConsts.CFD_TYPE_PAYROLL) {
+            cfd.ver33.DElementImpuestosRetenidos impuestosRetenidos = new cfd.ver33.DElementImpuestosRetenidos();
+            cfd.ver33.DElementImpuestosTraslados impuestosTrasladados = new cfd.ver33.DElementImpuestosTraslados();
 
-        for (SCfdDataImpuesto tax : cfdXml.getCfdImpuestos()) {
-            switch (tax.getImpuestoBasico()) {
-                case SModSysConsts.FINS_TP_TAX_RETAINED:
-                    dTotalImptoRetenido += tax.getImporte();
-                    impuestosRetenidos.getEltHijosImpuestoRetenido().add((cfd.ver33.DElementImpuestoRetencion) tax.createRootElementImpuesto33());
-                    break;
-                case SModSysConsts.FINS_TP_TAX_CHARGED:
-                    dTotalImptoTrasladado += tax.getImporte();
-                    impuestosTrasladados.getEltHijosImpuestoTrasladado().add((cfd.ver33.DElementImpuestoTraslado) tax.createRootElementImpuesto33());
-                    break;
-                default:
-                    throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + tax.getImpuestoBasico() + ").");
+            for (SCfdDataImpuesto tax : cfdXml.getCfdImpuestos()) {
+                switch (tax.getImpuestoBasico()) {
+                    case SModSysConsts.FINS_TP_TAX_RETAINED:
+                        dTotalImptoRetenido += tax.getImporte();
+                        impuestosRetenidos.getEltHijosImpuestoRetenido().add((cfd.ver33.DElementImpuestoRetencion) tax.createRootElementImpuesto33());
+                        break;
+                    case SModSysConsts.FINS_TP_TAX_CHARGED:
+                        dTotalImptoTrasladado += tax.getImporte();
+                        impuestosTrasladados.getEltHijosImpuestoTrasladado().add((cfd.ver33.DElementImpuestoTraslado) tax.createRootElementImpuesto33());
+                        break;
+                    default:
+                        throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + tax.getImpuestoBasico() + ").");
+                }
             }
-        }
 
-        if (impuestosTrasladados.getEltHijosImpuestoTrasladado().isEmpty() && impuestosRetenidos.getEltHijosImpuestoRetenido().isEmpty()) {
-            throw new Exception("Error al generar el nodo impuestos del CFD el nodo impuestos no existe.");
-        }
-        
-        if (!impuestosRetenidos.getEltHijosImpuestoRetenido().isEmpty()) {
-            comprobante.getEltImpuestos().getAttTotalImpuestosRetenidos().setDouble(dTotalImptoRetenido);
-            comprobante.getEltImpuestos().setEltOpcImpuestosRetenidos(impuestosRetenidos);
-        }
+            if (impuestosTrasladados.getEltHijosImpuestoTrasladado().isEmpty() && impuestosRetenidos.getEltHijosImpuestoRetenido().isEmpty()) {
+                throw new Exception("Error al generar el nodo impuestos del CFD el nodo impuestos no existe.");
+            }
 
-        if (!impuestosTrasladados.getEltHijosImpuestoTrasladado().isEmpty()) {
-            comprobante.getEltImpuestos().getAttTotalImpuestosTraslados().setDouble(dTotalImptoTrasladado);
-            comprobante.getEltImpuestos().setEltOpcImpuestosTrasladados(impuestosTrasladados);
+            if (!impuestosRetenidos.getEltHijosImpuestoRetenido().isEmpty()) {
+                comprobante.getEltImpuestos().getAttTotalImpuestosRetenidos().setDouble(dTotalImptoRetenido);
+                comprobante.getEltImpuestos().setEltOpcImpuestosRetenidos(impuestosRetenidos);
+            }
+
+            if (!impuestosTrasladados.getEltHijosImpuestoTrasladado().isEmpty()) {
+                comprobante.getEltImpuestos().getAttTotalImpuestosTraslados().setDouble(dTotalImptoTrasladado);
+                comprobante.getEltImpuestos().setEltOpcImpuestosTrasladados(impuestosTrasladados);
+            }
         }
         
         if (elementComplement != null) {
