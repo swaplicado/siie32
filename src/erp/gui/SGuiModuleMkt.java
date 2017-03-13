@@ -82,10 +82,10 @@ public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenu jmCommissions;
     private javax.swing.JMenuItem jmiCommissions;
     private javax.swing.JMenuItem jmiCommissionsDetail;
-    private javax.swing.JMenuItem jmiCommissionsRecord;
     private javax.swing.JMenuItem jmiCommissionsPayment;
     private javax.swing.JMenuItem jmiCommissionsPaymentDetail;
     private javax.swing.JMenuItem jmiCommissionsDpsSalesAgent;
+    private javax.swing.JMenuItem jmiCommissionsMoneyFlow;
 
     private javax.swing.JMenu jmReports;
     private javax.swing.JMenuItem jmiReportsCommisionsDps;
@@ -163,10 +163,10 @@ public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCommissions = new JMenu("Comisiones ventas");
         jmiCommissions = new JMenuItem("Comisiones");
         jmiCommissionsDetail = new JMenuItem("Comisiones a detalle");
-        jmiCommissionsRecord = new JMenuItem("Comisiones desde pólizas");
         jmiCommissionsPayment = new JMenuItem("Pagos comisiones");
         jmiCommissionsPaymentDetail = new JMenuItem("Pagos comisiones a detalle");
         jmiCommissionsDpsSalesAgent = new JMenuItem("Facturas por agente ventas");
+        jmiCommissionsMoneyFlow = new JMenuItem("Comisiones por flujo de dinero");
 
         jmReports = new JMenu("Reportes");
         jmiReportsCommisionsDps = new JMenuItem("Reporte de comisiones y pagos");
@@ -208,12 +208,13 @@ public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.ev
 
         jmCommissions.add(jmiCommissions);
         jmCommissions.add(jmiCommissionsDetail);
-        jmCommissions.add(jmiCommissionsRecord);
         jmCommissions.addSeparator();
         jmCommissions.add(jmiCommissionsPayment);
         jmCommissions.add(jmiCommissionsPaymentDetail);
         jmCommissions.addSeparator();
         jmCommissions.add(jmiCommissionsDpsSalesAgent);
+        jmCommissions.addSeparator();
+        jmCommissions.add(jmiCommissionsMoneyFlow);
 
         // jmReports.add(jmiReportsCommisionsItems); XXX pending with new format and version
         jmReports.add(jmiReportsCommisionsDps);
@@ -237,10 +238,10 @@ public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPurchasesPriceListItemPrice.addActionListener(this);
         jmiCommissions.addActionListener(this);
         jmiCommissionsDetail.addActionListener(this);
-        jmiCommissionsRecord.addActionListener(this);
         jmiCommissionsPayment.addActionListener(this);
         jmiCommissionsPaymentDetail.addActionListener(this);
         jmiCommissionsDpsSalesAgent.addActionListener(this);
+        jmiCommissionsMoneyFlow.addActionListener(this);
         jmiCommisionsAgents.addActionListener(this);
         jmiCommisionsAgentTypes.addActionListener(this);
         jmiCommisionsAgent.addActionListener(this);
@@ -710,9 +711,6 @@ public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiCommissionsDetail) {
                 showView(SDataConstants.MKT_COMMS, SDataConstants.MKTX_COMMS_DET);
             }
-            else if (item == jmiCommissionsRecord) {
-                miClient.getSession().showView(SModConsts.MKT_COMMS_PAY_REC, SModConsts.VIEW_SC_SUM, null);
-            }
             else if (item == jmiCommissionsPayment) {
                 miClient.getSession().showView(SModConsts.MKT_COMMS_PAY, SModConsts.VIEW_SC_SUM, null);
             }
@@ -721,6 +719,9 @@ public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiCommissionsDpsSalesAgent) {
                 showView(SDataConstants.MKTX_COMMS_DPS_SAL_AGT, SDataConstantsSys.TRNX_TP_DPS_DOC);
+            }
+            else if (item == jmiCommissionsMoneyFlow) {
+                miClient.getSession().showView(SModConsts.MKTX_COMMS_PAY_REC, SDataConstants.UNDEFINED, null);
             }
             else if (item == jmiCommisionsAgentTypes) {
                 showView(SDataConstants.MKTX_COMMS_SAL_AGTS, SDataConstants.MKTX_COMMS_SAL_AGT_TPS);
