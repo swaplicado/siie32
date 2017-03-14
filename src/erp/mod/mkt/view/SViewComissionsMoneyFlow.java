@@ -84,18 +84,18 @@ public class SViewComissionsMoneyFlow extends SGridPaneView {
             "CONCAT(rec.id_year, '-', erp.lib_fix_int(rec.id_per, 2)) AS f_rper, CONCAT(rec.id_tp_rec, '-', erp.lib_fix_int(rec.id_num, " + SDataConstantsSys.NUM_LEN_FIN_REC + ")) AS f_rnum, " +
             "ety.debit, " +
             "bpa.id_bp AS _id_sal_agt, bpa.bp AS _sal_agt, " +
-            "COALESCE(IF((SELECT agt_per FROM mkt_comms_sal_agt WHERE id_tp_link = " + SModSysConsts.ITMS_LINK_ALL + " AND " +
+            "COALESCE(IF((SELECT agt_per FROM mkt_comms_sal_agt WHERE id_tp_link = " + SModSysConsts.ITMS_LINK_ALL + " AND NOT b_del AND " +
             "id_sal_agt = IF(cb.fid_sal_agt_n IS NOT NULL, cb.fid_sal_agt_n, ccus.fid_sal_agt_n)) IS NOT NULL, " +
-            "(SELECT agt_per FROM mkt_comms_sal_agt WHERE id_tp_link = " + SModSysConsts.ITMS_LINK_ALL + " AND id_sal_agt = IF(cb.fid_sal_agt_n IS NOT NULL, cb.fid_sal_agt_n, ccus.fid_sal_agt_n)), " +
+            "(SELECT agt_per FROM mkt_comms_sal_agt WHERE id_tp_link = " + SModSysConsts.ITMS_LINK_ALL + " AND NOT b_del AND id_sal_agt = IF(cb.fid_sal_agt_n IS NOT NULL, cb.fid_sal_agt_n, ccus.fid_sal_agt_n)), " +
             "(SELECT agt_per FROM mkt_cfg_sal_agt AS cfa LEFT OUTER JOIN mkt_comms_sal_agt_tp AS atp ON cfa.fid_tp_sal_agt = atp.id_tp_sal_agt " +
-            "WHERE id_tp_link = " + SModSysConsts.ITMS_LINK_ALL + " AND id_sal_agt = IF(cb.fid_sal_agt_n IS NOT NULL, cb.fid_sal_agt_n, ccus.fid_sal_agt_n))), 0) AS _com_perc " +
+            "WHERE id_tp_link = " + SModSysConsts.ITMS_LINK_ALL + " AND NOT atp.b_del AND NOT cfa.b_del AND id_sal_agt = IF(cb.fid_sal_agt_n IS NOT NULL, cb.fid_sal_agt_n, ccus.fid_sal_agt_n))), 0) AS _com_perc " +
             "FROM fin_rec AS rec " +
             "INNER JOIN fin_rec_ety AS ety ON rec.id_year = ety.id_year AND rec.id_per = ety.id_per AND rec.id_tp_rec = ety.id_tp_rec AND rec.id_num = ety.id_num " +
             "INNER JOIN erp.bpsu_bp AS bp ON ety.fid_bp_nr = bp.id_bp " +
             "INNER JOIN mkt_cfg_cusb AS cb ON cb.id_cusb = bp.id_bp " +
             "INNER JOIN mkt_cfg_cus AS ccus ON ccus.id_cus = bp.id_bp " +
             "LEFT OUTER JOIN erp.bpsu_bp AS bpa ON IF(cb.fid_sal_agt_n IS NOT NULL, cb.fid_sal_agt_n, ccus.fid_sal_agt_n) = bpa.id_bp " +
-            "WHERE NOT ety.b_del AND NOT bp.b_del AND NOT ccus.b_del AND fid_cl_sys_acc = " + SModSysConsts.FINS_CL_SYS_ACC_BPR_CUS + " " +
+            "WHERE NOT ety.b_del AND NOT bp.b_del AND NOT ccus.b_del AND NOT cb.b_del AND fid_cl_sys_acc = " + SModSysConsts.FINS_CL_SYS_ACC_BPR_CUS + " " +
             "AND fid_bp_nr IS NOT NULL AND (ety.debit <> 0 OR ety.debit_cur <> 0) AND rec.id_tp_rec = '" + SModSysConsts.FINU_TP_REC_CASH_BANK + "' " +
             filterSql +
             "ORDER BY bp.bp, bp.id_bp, f_date, _sal_agt, _com_perc; ";
