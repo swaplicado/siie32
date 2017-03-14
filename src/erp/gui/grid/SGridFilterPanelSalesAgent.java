@@ -26,20 +26,28 @@ import sa.lib.gui.SGuiUtils;
 /**
  *
  * @author Edwin Carmona
+ * 
+ * This class generates a generic filter that loads sales agents into a combo box
+ * 
  */
 public class SGridFilterPanelSalesAgent extends JPanel implements SGridFilter, ActionListener, ItemListener {
 
     private SGuiClient miClient;
     private SGridPaneView moPaneView;
-    private int mnFilterType1;
+    private int mnFilter;
     
     /**
-     * Creates new form SGridFilterPanelSalesAgent
+     * Sales Agents Filter
+     * 
+     * @param client
+     * @param paneView
+     * @param filter This parameter can receive the constants:
+     *  @SModConsts.BPSX_BP_X_SAL_AGT
      */
-    public SGridFilterPanelSalesAgent(SGuiClient client, SGridPaneView paneView, int type1) {
+    public SGridFilterPanelSalesAgent(SGuiClient client, SGridPaneView paneView, int filter) {
         miClient = client;
         moPaneView = paneView;
-        mnFilterType1 = type1;
+        mnFilter = filter;
         initComponents();
         initComponentsCustom();
     }
@@ -53,26 +61,24 @@ public class SGridFilterPanelSalesAgent extends JPanel implements SGridFilter, A
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        gpbFilter = new javax.swing.ButtonGroup();
-        moKeyFilter1 = new sa.lib.gui.bean.SBeanFieldKey();
-        jbClearFilter1 = new javax.swing.JButton();
+        moKeyFilter = new sa.lib.gui.bean.SBeanFieldKey();
+        jbClearFilter = new javax.swing.JButton();
 
         setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        moKeyFilter1.setPreferredSize(new java.awt.Dimension(200, 23));
-        add(moKeyFilter1);
+        moKeyFilter.setPreferredSize(new java.awt.Dimension(200, 23));
+        add(moKeyFilter);
 
-        jbClearFilter1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_delete_tmp.gif"))); // NOI18N
-        jbClearFilter1.setToolTipText("Quitar filtro");
-        jbClearFilter1.setPreferredSize(new java.awt.Dimension(23, 23));
-        add(jbClearFilter1);
+        jbClearFilter.setIcon(new javax.swing.ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_delete_tmp.gif"))); // NOI18N
+        jbClearFilter.setToolTipText("Quitar filtro");
+        jbClearFilter.setPreferredSize(new java.awt.Dimension(23, 23));
+        add(jbClearFilter);
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup gpbFilter;
-    private javax.swing.JButton jbClearFilter1;
-    private sa.lib.gui.bean.SBeanFieldKey moKeyFilter1;
+    private javax.swing.JButton jbClearFilter;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyFilter;
     // End of variables declaration//GEN-END:variables
 
     /*
@@ -80,35 +86,27 @@ public class SGridFilterPanelSalesAgent extends JPanel implements SGridFilter, A
      */
     
     private void initComponentsCustom() {
-        jbClearFilter1.addActionListener(this);
-        updateOptions();
+        jbClearFilter.addActionListener(this);
+        moKeyFilter.removeItemListener(this);
+        
+        miClient.getSession().populateCatalogue(moKeyFilter, mnFilter, SLibConsts.UNDEFINED, new SGuiParams(SDbRegistry.FIELD_CODE));
+        
+        actionClearFilter();
+        moKeyFilter.addItemListener(this);
     }
     
-    private void actionClearFilter1() {
-        jbClearFilter1.setEnabled(false);
+    private void actionClearFilter() {
+        jbClearFilter.setEnabled(false);
         
-        if (moKeyFilter1.getSelectedIndex() > 0) {
-            moKeyFilter1.setSelectedIndex(0);
-            moKeyFilter1.requestFocus();
+        if (moKeyFilter.getSelectedIndex() > 0) {
+            moKeyFilter.setSelectedIndex(0);
+            moKeyFilter.requestFocus();
         }
     }
     
-    private void itemStateChangedFilter1() {
-        moPaneView.putFilter(mnFilterType1, new SGridFilterValue(mnFilterType1, SGridConsts.FILTER_DATA_TYPE_INT_ARRAY, ((SGuiItem) moKeyFilter1.getSelectedItem()).getPrimaryKey()));
-        jbClearFilter1.setEnabled(moKeyFilter1.getSelectedIndex() > 0);
-    }
-    
-    /*
-     * Public methods
-     */
-    
-    public void updateOptions() {
-        moKeyFilter1.removeItemListener(this);
-        
-        miClient.getSession().populateCatalogue(moKeyFilter1, mnFilterType1, SLibConsts.UNDEFINED, new SGuiParams(SDbRegistry.FIELD_CODE));
-        
-        actionClearFilter1();
-        moKeyFilter1.addItemListener(this);
+    private void itemStateChangedFilter() {
+        moPaneView.putFilter(mnFilter, new SGridFilterValue(mnFilter, SGridConsts.FILTER_DATA_TYPE_INT_ARRAY, ((SGuiItem) moKeyFilter.getSelectedItem()).getPrimaryKey()));
+        jbClearFilter.setEnabled(moKeyFilter.getSelectedIndex() > 0);
     }
     
     /*
@@ -119,14 +117,14 @@ public class SGridFilterPanelSalesAgent extends JPanel implements SGridFilter, A
     public void initFilter(Object value) {
         int[] key = null;
         
-        moKeyFilter1.removeItemListener(this);
+        moKeyFilter.removeItemListener(this);
         
         key = value == null ? null : new int[] { ((int[]) value)[0] };
-        SGuiUtils.locateItem(moKeyFilter1, key);
-        jbClearFilter1.setEnabled(moKeyFilter1.getSelectedIndex() > 0);
-        moPaneView.getFiltersMap().put(mnFilterType1, new SGridFilterValue(mnFilterType1, SGridConsts.FILTER_DATA_TYPE_INT_ARRAY, moKeyFilter1.getSelectedIndex() <= 0 ? null : key));
+        SGuiUtils.locateItem(moKeyFilter, key);
+        jbClearFilter.setEnabled(moKeyFilter.getSelectedIndex() > 0);
+        moPaneView.getFiltersMap().put(mnFilter, new SGridFilterValue(mnFilter, SGridConsts.FILTER_DATA_TYPE_INT_ARRAY, moKeyFilter.getSelectedIndex() <= 0 ? null : key));
         
-        moKeyFilter1.addItemListener(this);
+        moKeyFilter.addItemListener(this);
     }
 
     @Override
@@ -134,8 +132,8 @@ public class SGridFilterPanelSalesAgent extends JPanel implements SGridFilter, A
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
             
-            if (button == jbClearFilter1) {
-                actionClearFilter1();
+            if (button == jbClearFilter) {
+                actionClearFilter();
             }
         }
     }
@@ -146,8 +144,8 @@ public class SGridFilterPanelSalesAgent extends JPanel implements SGridFilter, A
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 JComboBox comboBox = (JComboBox) e.getSource();
 
-                if (comboBox == moKeyFilter1) {
-                    itemStateChangedFilter1();
+                if (comboBox == moKeyFilter) {
+                    itemStateChangedFilter();
                 }
             }
         }

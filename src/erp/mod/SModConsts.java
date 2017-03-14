@@ -464,7 +464,6 @@ public abstract class SModConsts {
     public static final int MKT_COMMS = 2033032;
     public static final int MKT_COMMS_PAY = 2033033;
     public static final int MKT_COMMS_PAY_ETY = 2033034;
-    public static final int MKT_COMMS_PAY_REC = 2033035;
 
     public static final int MKTU_TP_CUS = 2033501;
     public static final int MKTU_TP_SAL_AGT = 2033502;
@@ -479,6 +478,7 @@ public abstract class SModConsts {
     public static final int MKTX_COMMS_PAID_ETY = 2034004;
     public static final int MKTX_COMMS_CONS = 2034005;
     public static final int MKTX_COMMS_CALC = 2034006;
+    public static final int MKTX_COMMS_PAY_REC = 2033035;
 
     public static final int MKTR_COMMS_PAY = 2035001;
 

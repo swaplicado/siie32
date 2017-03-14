@@ -8,7 +8,7 @@ package erp.mod;
 import erp.mod.mkt.db.SDbCommission;
 import erp.mod.mkt.db.SDbCommissionPayment;
 import erp.mod.mkt.db.SDbCommissionPaymentEntry;
-import erp.mod.mkt.view.SViewComissionsFromRecords;
+import erp.mod.mkt.view.SViewComissionsMoneyFlow;
 import erp.mod.mkt.view.SViewCommissionPayment;
 import javax.swing.JMenu;
 import sa.lib.SLibConsts;
@@ -24,7 +24,7 @@ import sa.lib.gui.SGuiReport;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Edwin Carmona
  */
 public class SModuleMkt extends SGuiModule {
 
@@ -85,8 +85,8 @@ public class SModuleMkt extends SGuiModule {
             case SModConsts.MKT_COMMS_PAY:
                 view = new SViewCommissionPayment(miClient, subtype, "Pagos comisiones " + (subtype == SModConsts.VIEW_SC_SUM ? "" : " (detalle)"), params);
                 break;
-            case SModConsts.MKT_COMMS_PAY_REC:
-                view = new SViewComissionsFromRecords(miClient, "Comisiones desde pólizas");
+            case SModConsts.MKTX_COMMS_PAY_REC:
+                view = new SViewComissionsMoneyFlow(miClient, "Comisiones por flujo de dinero");
                 break;   
         default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
