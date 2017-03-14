@@ -2518,9 +2518,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldCfdCceOperationType.setTabbedPaneIndex(TAB_INT, jTabbedPane);
         moFieldCfdCceNumberImportRequest = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbCfdCceNumberImportRequest, jlCfdCceNumberImportRequest);
         moFieldCfdCceNumberImportRequest.setTabbedPaneIndex(TAB_INT, jTabbedPane);
-        moFieldCfdCceCertificateOrigin = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, true, jtfCfdCceCertificateOrigin, jlCfdCceCertificateOrigin);
+        moFieldCfdCceCertificateOrigin = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfCfdCceCertificateOrigin, jlCfdCceCertificateOrigin);
         moFieldCfdCceCertificateOrigin.setTabbedPaneIndex(TAB_INT, jTabbedPane);
-        moFieldCfdCceNumberCertificateOrigin = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfCfdCceNumberCertificateOrigin, jlCfdCceNumberCertificateOrigin);
+        moFieldCfdCceNumberCertificateOrigin = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCfdCceNumberCertificateOrigin, jlCfdCceNumberCertificateOrigin);
         moFieldCfdCceNumberCertificateOrigin.setTabbedPaneIndex(TAB_INT, jTabbedPane);
         moFieldCfdCceSubdivision = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfCfdCceSubdivision, jlCfdCceSubdivision);
         moFieldCfdCceSubdivision.setTabbedPaneIndex(TAB_INT, jTabbedPane);
@@ -8003,10 +8003,23 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
 
             if (!validation.getIsError()) {
-                if (isCfdRequired() && jcbCfdCceReasonTransfer.isEnabled() && moBizPartnerBranchAddress.getDbmsDataCountry().getCountryGroup().compareTo(SDataConstantsSys.TRNS_CFD_CTY_GRP_UE) != 0 &&
-                        miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsCategorySettingsCo().getNumberExporter().isEmpty()) {
-                    validation.setMessage("No se han especificado el número de exportador confiable\n" +
-                                "en el catálogo de empresas, campo: 'Número de exportador confiable:'.");
+                if (isCfdRequired() && jcbCfdCceReasonTransfer.isEnabled()) {
+                    if (moFieldCfdCceCertificateOrigin.getInteger() == 1 && moFieldCfdCceNumberCertificateOrigin.getString().isEmpty()) {
+                         validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCfdCceNumberCertificateOrigin.getText() + "'.");
+                        jTabbedPane.setSelectedIndex(TAB_INT);
+                        validation.setComponent(jtfCfdCceNumberCertificateOrigin);
+                         
+                    }
+                    else if (moFieldCfdCceCertificateOrigin.getInteger() == 0 && !moFieldCfdCceNumberCertificateOrigin.getString().isEmpty()) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_NOT_REQ + "'" + jlCfdCceNumberCertificateOrigin.getText() + "'.");
+                        jTabbedPane.setSelectedIndex(TAB_INT);
+                        validation.setComponent(jtfCfdCceNumberCertificateOrigin);
+                    }
+                    else if (moBizPartnerBranchAddress.getDbmsDataCountry().getCountryGroup().compareTo(SDataConstantsSys.TRNS_CFD_CTY_GRP_UE) != 0 &&
+                            miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsCategorySettingsCo().getNumberExporter().isEmpty()) {
+                        validation.setMessage("No se han especificado el número de exportador confiable\n" +
+                                    "en el catálogo de empresas, campo: 'Número de exportador confiable:'.");
+                    }
                 }
             }
             
