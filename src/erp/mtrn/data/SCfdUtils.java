@@ -21,7 +21,7 @@ import cfd.ver32.DCfdVer3Consts;
 import cfd.ver32.DElementTimbreFiscalDigital;
 import erp.SClient;
 import erp.cfd.SCfdConsts;
-import erp.cfd.SCfdDataAsociadoNegocios;
+import erp.cfd.SCfdDataBizPartner;
 import erp.cfd.SCfdDataCfdiRelacionado;
 import erp.cfd.SCfdDataConcepto;
 import erp.cfd.SCfdDataImpuesto;
@@ -3101,7 +3101,7 @@ public abstract class SCfdUtils implements Serializable {
         float fVersion = 0;
         SDbCfdBizPartner emisor = null;
         SDbCfdBizPartner receptor = null;
-        SCfdDataAsociadoNegocios asociadoNegocios = null;
+        SCfdDataBizPartner asociadoNegocios = null;
 
         if (SLibTimeUtilities.digestYear(cfdXml.getCfdFecha())[0] <= 2011) {
             fVersion = DCfdConsts.CFD_VER_20;
@@ -3220,7 +3220,8 @@ public abstract class SCfdUtils implements Serializable {
         boolean hasInternationalTradeNode = false;
         SDbCfdBizPartner emisor = null;
         SDbCfdBizPartner receptor = null;
-        SCfdDataAsociadoNegocios asociadoNegocios = null;
+        SCfdDataBizPartner asociadoNegocios = null;
+        cfd.DElement elementComplement = null;
 
         cfd.ver32.DElementComprobante comprobante = new cfd.ver32.DElementComprobante();
 
@@ -3255,7 +3256,7 @@ public abstract class SCfdUtils implements Serializable {
         comprobante.getAttTipoDeComprobante().setOption(cfdXml.getCfdTipoDeComprobante());
         comprobante.getAttMetodoDePago().setString(DCfdUtils.getFormaPagoClave(cfdXml.getCfdFormaDePago()));
 
-        cfd.DElement elementComplement = cfdXml.getCfdElementComplemento();
+        elementComplement = cfdXml.getCfdElementComplemento();
 
         if (elementComplement != null) {
             hasInternationalTradeNode = ((cfd.ver32.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior") != null;
@@ -3384,7 +3385,7 @@ public abstract class SCfdUtils implements Serializable {
         boolean hasInternationalTradeNode = false;
         SDbCfdBizPartner emisor = null;
         SDbCfdBizPartner receptor = null;
-        SCfdDataAsociadoNegocios asociadoNegocios = null;
+        SCfdDataBizPartner asociadoNegocios = null;
 
         cfd.ver33.DElementComprobante comprobante = new cfd.ver33.DElementComprobante();
 

@@ -5,7 +5,6 @@
 package erp.mtrn.form;
 
 import cfd.util.DUtilUtils;
-import erp.cfd.SCatalogXmlUtils;
 import erp.cfd.SCfdConsts;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
@@ -3807,7 +3806,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         try {
             // Catalog for CFD version 3.3:
             
-            items = SCatalogXmlUtils.getComponentItems((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, miClient.getSession().getSystemDate());
+            items = ((SSessionCustom) miClient.getSession().getSessionCustom()).getXmlCatalog().getComponentItems((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, miClient.getSession().getSystemDate());
             jcbCfdUseId.removeAllItems();
             for (SFormComponentItem item : items) {
                 jcbCfdUseId.addItem(item);
@@ -3815,19 +3814,19 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             
             // Catalog for internatonal trade complement:
             
-            items = SCatalogXmlUtils.getComponentItems((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CCE_CAT_TRA_REA, miClient.getSession().getSystemDate());
+            items = ((SSessionCustom) miClient.getSession().getSessionCustom()).getXmlCatalog().getComponentItems((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CCE_CAT_TRA_REA, miClient.getSession().getSystemDate());
             jcbCfdCceReasonTransfer.removeAllItems();
             for (SFormComponentItem item : items) {
                 jcbCfdCceReasonTransfer.addItem(item);
             }
             
-            items = SCatalogXmlUtils.getComponentItems((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CCE_CAT_TP_OPE, miClient.getSession().getSystemDate());
+            items = ((SSessionCustom) miClient.getSession().getSessionCustom()).getXmlCatalog().getComponentItems((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CCE_CAT_TP_OPE, miClient.getSession().getSystemDate());
             jcbCfdCceOperationType.removeAllItems();
             for (SFormComponentItem item : items) {
                 jcbCfdCceOperationType.addItem(item);
             }
             
-            items = SCatalogXmlUtils.getComponentItems((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CCE_CAT_IMP_REQ, miClient.getSession().getSystemDate());
+            items = ((SSessionCustom) miClient.getSession().getSessionCustom()).getXmlCatalog().getComponentItems((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CCE_CAT_IMP_REQ, miClient.getSession().getSystemDate());
             jcbCfdCceNumberImportRequest.removeAllItems();
             for (SFormComponentItem item : items) {
                 jcbCfdCceNumberImportRequest.addItem(item);
@@ -7588,7 +7587,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         // Check if this code should be here: (sflores, 2017-02-24)
         if (mbIsSales && (mbIsDoc || mbIsAdj)) {
             try {
-                moFieldFkCfdUseId.setFieldValue(SCatalogXmlUtils.getNameEntry((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, moDps.getDate(), miClient.getSessionXXX().getParamsCompany().getXtaCfdUseCfdi()));
+                moFieldFkCfdUseId.setFieldValue(((SSessionCustom) miClient.getSession().getSessionCustom()).getXmlCatalog().getCatalogOptionName((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, moDps.getDate(), miClient.getSessionXXX().getParamsCompany().getXtaCfdUseCfdi()));
             }
             catch (Exception e) {
                 SLibUtilities.renderException(this, e);
@@ -8402,18 +8401,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             // Set information of cfdi VERSION 3.3:
             
             moFieldCfdConfirmationNumber.setFieldValue(moDps.getXtaCfdConfirmation());
-            moFieldFkCfdUseId.setFieldValue(SCatalogXmlUtils.getNameEntry((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, moDps.getDate(), moDps.getXtaCfdUseCfdi()));
+            moFieldFkCfdUseId.setFieldValue(((SSessionCustom) miClient.getSession().getSessionCustom()).getXmlCatalog().getCatalogOptionName((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, moDps.getDate(), moDps.getXtaCfdUseCfdi()));
             
             // Set information of international trade:
             
-            moFieldCfdCceReasonTransfer.setFieldValue(SCatalogXmlUtils.getNameEntry((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CCE_CAT_TRA_REA, moDps.getDate(), moDps.getXtaCfdCceReasonTransfer()));
-            moFieldCfdCceOperationType.setFieldValue(SCatalogXmlUtils.getNameEntry((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CCE_CAT_TP_OPE, moDps.getDate(), moDps.getXtaCfdCceOperationType()));
-            moFieldCfdCceNumberImportRequest.setFieldValue(SCatalogXmlUtils.getNameEntry((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CCE_CAT_IMP_REQ, moDps.getDate(), moDps.getXtaCfdCceImportRequest()));
+            moFieldCfdCceReasonTransfer.setFieldValue(((SSessionCustom) miClient.getSession().getSessionCustom()).getXmlCatalog().getCatalogOptionName((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CCE_CAT_TRA_REA, moDps.getDate(), moDps.getXtaCfdCceReasonTransfer()));
+            moFieldCfdCceOperationType.setFieldValue(((SSessionCustom) miClient.getSession().getSessionCustom()).getXmlCatalog().getCatalogOptionName((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CCE_CAT_TP_OPE, moDps.getDate(), moDps.getXtaCfdCceOperationType()));
+            moFieldCfdCceNumberImportRequest.setFieldValue(((SSessionCustom) miClient.getSession().getSessionCustom()).getXmlCatalog().getCatalogOptionName((SGuiClient) miClient, SDataConstantsSys.TRNS_CFD_CCE_CAT_IMP_REQ, moDps.getDate(), moDps.getXtaCfdCceImportRequest()));
             moFieldCfdCceCertificateOrigin.setFieldValue(moDps.getXtaCfdCceCertificateOrigin());
             moFieldCfdCceNumberCertificateOrigin.setFieldValue(moDps.getXtaCfdCceCertificateOriginNumber());
             moFieldCfdCceSubdivision.setFieldValue(moDps.getXtaCfdCceSubdivisionHas());
-            moFieldCfdCceExchangeRateUsd.setFieldValue(moDps.getXtaCfdCceExchangeRateUsd());
-            moFieldCfdCceTotalUsd.setFieldValue(moDps.getXtaCfdCceTotalUsd());
+            moFieldCfdCceExchangeRateUsd.setFieldValue(moDps.getXtaCfdCceExchangeRateUSD());
+            moFieldCfdCceTotalUsd.setFieldValue(moDps.getXtaCfdCceTotalUSD());
         }
         catch (Exception e) {
             SLibUtilities.renderException(this, e);
@@ -8621,8 +8620,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             if (moBizPartnerBranchAddress.getDbmsDataCountry().getCountryGroup().compareTo(SDataConstantsSys.TRNS_CFD_CTY_GRP_UE) != 0) {
                 moDps.setXtaCfdCceNumberExporter(moBizPartnerCategory.getNumberExporter());
             }
-            moDps.setXtaCfdCceExchangeRateUsd(jtfCfdCceExchangeRateUsd.isEnabled()? moFieldCfdCceExchangeRateUsd.getDouble() : moFieldExchangeRate.getDouble());
-            moDps.setXtaCfdCceTotalUsd(jtfCfdCceTotalUsd.isEnabled() ? moFieldCfdCceTotalUsd.getDouble() : moDps.getSubtotalCy_r());
+            moDps.setXtaCfdCceExchangeRateUSD(jtfCfdCceExchangeRateUsd.isEnabled() ? moFieldCfdCceExchangeRateUsd.getDouble() : moFieldExchangeRate.getDouble());
+            moDps.setXtaCfdCceTotalUSD(jtfCfdCceTotalUsd.isEnabled() ? moFieldCfdCceTotalUsd.getDouble() : moDps.getSubtotalCy_r());
         }
 
         // Set params for CFD:

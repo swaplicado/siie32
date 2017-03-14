@@ -5,7 +5,7 @@
 package erp.mod.bps.db;
 
 import erp.cfd.SCceEmisorAddressAux;
-import erp.cfd.SCfdDataAsociadoNegocios;
+import erp.cfd.SCfdDataBizPartner;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataUtilities;
@@ -56,11 +56,11 @@ public class SDbCfdBizPartner {
     public boolean getIsEmisor() { return mbIsEmisor; }
     public boolean getIsEmisorForCce() { return mbIsEmisorForCce; }
     
-    public SCfdDataAsociadoNegocios getBizPartner() {
+    public SCfdDataBizPartner getBizPartner() {
         SDataBizPartner moBizPartner = null;
         SDataBizPartnerBranch moBizPartnerBranch = null;
         SDataBizPartnerBranchAddress moBizPartnerBranchAddress = null;
-        SCfdDataAsociadoNegocios asociadoNegocios = null;
+        SCfdDataBizPartner asociadoNegocios = null;
         
         try {
             moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { mnBizPartnerId }, SLibConstants.EXEC_MODE_SILENT);
@@ -80,7 +80,7 @@ public class SDbCfdBizPartner {
                     else {
                         moBizPartnerBranchAddress = moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial();
                     }
-                    asociadoNegocios = new SCfdDataAsociadoNegocios();
+                    asociadoNegocios = new SCfdDataBizPartner();
                     SCceEmisorAddressAux emisorAddress = miClient.getSessionXXX().getParamsCompany().getEmisorAddress(moBizPartnerBranchAddress.getZipCode());
 
                     asociadoNegocios.setBizPartnerId(mnBizPartnerId);

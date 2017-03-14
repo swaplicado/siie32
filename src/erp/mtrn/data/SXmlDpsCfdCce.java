@@ -9,7 +9,7 @@ import sa.lib.xml.SXmlAttribute;
 import sa.lib.xml.SXmlElement;
 
 /**
- *
+ * Class for handling international trade information for the CFDI in XML format
  * @author Juan Barajas
  */
 public class SXmlDpsCfdCce extends SXmlElement {

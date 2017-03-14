@@ -15,7 +15,7 @@ import sa.lib.xml.SXmlDocument;
 import sa.lib.xml.SXmlUtils;
 
 /**
- *
+ * Class for handling additional information for the CFDI in XML format.
  * @author Juan Barajas
  */
 public class SXmlDpsCfd extends SXmlDocument {
@@ -63,7 +63,7 @@ public class SXmlDpsCfd extends SXmlDocument {
         mvXmlAttributes.add(moRelationType);
         mvXmlAttributes.add(moCfdiUse);
         
-        childNodes = SXmlUtils.extractChildElements(nodeList.item(0), "cce11");
+        childNodes = SXmlUtils.extractChildElements(nodeList.item(0), SXmlDpsCfdCce.NAME);
         for (Node child : childNodes) {
             SXmlDpsCfdCce row = new SXmlDpsCfdCce();
             namedNodeMap = child.getAttributes();

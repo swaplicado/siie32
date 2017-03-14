@@ -4,6 +4,7 @@
  */
 package erp.gui.session;
 
+import erp.cfd.SXmlCatalog;
 import erp.gui.account.SAccount;
 import erp.gui.account.SAccountConsts;
 import erp.gui.account.SAccountLedger;
@@ -73,6 +74,8 @@ public class SSessionCustom implements SGuiSessionCustom {
     private HashMap<Integer, SDbAbpItem> moAbpItemsMap;
     private ArrayList<SDbAbpItemLink> maAbpItemsLinksArray;
     private ArrayList<SDbAbpTax> maAbpTaxesArray;
+    
+    private SXmlCatalog moXmlCatalog;
 
     /**
      * Creates new SSessionCustom object.
@@ -95,6 +98,8 @@ public class SSessionCustom implements SGuiSessionCustom {
         moAbpItemsMap = new HashMap<Integer, SDbAbpItem>();
         maAbpItemsLinksArray = new ArrayList<SDbAbpItemLink>();
         maAbpTaxesArray = new ArrayList<SDbAbpTax>();
+        
+        moXmlCatalog = null;
     }
 
     /*
@@ -229,6 +234,8 @@ public class SSessionCustom implements SGuiSessionCustom {
 
     public ArrayList<SAccountLedger> getAccountLedgers() { return maAccountLedgers; }
     public ArrayList<SAccountLedger> getCostCenterLedgers() { return maCostCenterLedgers; }
+    
+    public SXmlCatalog getXmlCatalog() { return moXmlCatalog; }
 
     @Override
     public int[] getLocalCountryKey() {
@@ -611,6 +618,8 @@ public class SSessionCustom implements SGuiSessionCustom {
                 abpTax.read(moSession, new int[] { resultSetAux.getInt(1) });
                 maAbpTaxesArray.add(abpTax);
             }
+            
+            moXmlCatalog = new SXmlCatalog(moSession);
         }
         catch (SQLException e) {
             SLibUtils.showException(this, e);

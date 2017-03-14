@@ -6,7 +6,7 @@ package erp.mod.hrs.db;
 
 import cfd.DElement;
 import erp.cfd.SCfdConsts;
-import erp.cfd.SCfdDataAsociadoNegocios;
+import erp.cfd.SCfdDataBizPartner;
 import erp.client.SClientInterface;
 import erp.mtrn.data.SDataCfd;
 import java.util.ArrayList;
@@ -93,9 +93,9 @@ public class SHrsFormerPayroll {
         SHrsFormerPayrollReceipt payrollReceipt = null;
         SHrsFormerPayrollConcept payrollConcept = null;
         SHrsFormerPayrollExtraTime payrollExtraTime = null;
-        SCfdDataAsociadoNegocios xmlEmisor = null;
-        SCfdDataAsociadoNegocios xmlExpeditionSpot = null;
-        SCfdDataAsociadoNegocios xmlReceptor = null;
+        SCfdDataBizPartner xmlEmisor = null;
+        SCfdDataBizPartner xmlExpeditionSpot = null;
+        SCfdDataBizPartner xmlReceptor = null;
         cfd.ver32.DElementComprobante comprobante = null;
 
         // Comprobante:
@@ -107,7 +107,7 @@ public class SHrsFormerPayroll {
 
         // Emisor:
 
-        xmlEmisor = new SCfdDataAsociadoNegocios();
+        xmlEmisor = new SCfdDataBizPartner();
 
         xmlEmisor.setBizPartnerRfc(comprobante.getEltEmisor().getAttRfc().getString());
         xmlEmisor.setBizPartnerName(comprobante.getEltEmisor().getAttNombre().getString());
@@ -132,7 +132,7 @@ public class SHrsFormerPayroll {
         }
 
         if (comprobante.getEltEmisor().getEltOpcExpedidoEn() != null) {
-            xmlExpeditionSpot = new SCfdDataAsociadoNegocios();
+            xmlExpeditionSpot = new SCfdDataBizPartner();
 
             xmlExpeditionSpot.setBizPartnerStreet(comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttCalle().getString());
             xmlExpeditionSpot.setBizPartnerStreetNumberExt(comprobante.getEltEmisor().getEltOpcExpedidoEn().getAttNoExterior().getString());
@@ -156,7 +156,7 @@ public class SHrsFormerPayroll {
 
             payrollReceipt = new SHrsFormerPayrollReceipt(this, miClient);
 
-            xmlReceptor = new SCfdDataAsociadoNegocios();
+            xmlReceptor = new SCfdDataBizPartner();
 
             // Receptor:
 

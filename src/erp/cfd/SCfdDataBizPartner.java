@@ -12,7 +12,7 @@ import erp.mod.fin.db.SFinConsts;
  *
  * @author Juan Barajas
  */
-public class SCfdDataAsociadoNegocios {
+public class SCfdDataBizPartner {
 
     protected int mnBizPartnerId;
     protected int mnBizPartnerBranchId;
@@ -53,7 +53,7 @@ public class SCfdDataAsociadoNegocios {
     protected float mfVersion;
     protected int mnCfdiType;
 
-    public SCfdDataAsociadoNegocios() {
+    public SCfdDataBizPartner() {
         mnBizPartnerId = 0;
         mnBizPartnerBranchId = 0;
         mnBizPartnerBranchHqId = 0;
@@ -259,6 +259,11 @@ public class SCfdDataAsociadoNegocios {
         return emisor;
     }
     
+    /**
+     * Create element root for emisor international trade for the business partner indicated
+     * @return cfd.DElement node cfd.DElement for emisor for international trade
+     * @throws java.lang.Exception 
+     */
     public cfd.DElement createRootElementEmisorCce() throws java.lang.Exception {
         DElement emisor = null;
         
@@ -377,6 +382,11 @@ public class SCfdDataAsociadoNegocios {
         return receptor;
     }
     
+     /**
+     * Create element root for receptor international trade for the business partner indicated
+     * @return cfd.DElement node cfd.DElement for receptor for international trade
+     * @throws java.lang.Exception 
+     */
     public cfd.DElement createRootElementReceptorCce() throws java.lang.Exception {
         DElement receptor = null;
 

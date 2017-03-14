@@ -5,7 +5,7 @@
 package erp.cfd;
 
 /**
- *
+ * Class from management of address form company.
  * @author Juan Barajas
  */
 public class SCceEmisorAddressAux implements java.io.Serializable {
@@ -16,10 +16,7 @@ public class SCceEmisorAddressAux implements java.io.Serializable {
     protected java.lang.String msCfdCceEmisorMunicipio;
 
     public SCceEmisorAddressAux() {
-        msCfdCceEmisorCodigoPostal = "";
-        msCfdCceEmisorColonia = "";
-        msCfdCceEmisorLocalidad = "";
-        msCfdCceEmisorMunicipio = "";
+        this("", "", "", "");
     }
     
     public SCceEmisorAddressAux(String codigoPostal, String colonia, String localidad, String municipio) {

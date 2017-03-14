@@ -23,28 +23,28 @@ import sa.lib.gui.SGuiClient;
 import sa.lib.xml.SXmlUtils;
 
 /**
- *
+ * Class from management of catalogs from SAT.
  * @author Juan Barajas
  */
 public abstract class SCatalogXmlUtils {
     
     /**
-     * Return XML for catalog indicated 
+     * Return XML for catalog indicated.
      * @param client SGuiClient
-     * @param catalogId catalog to process
-     * @param dateStart
-     * @return
+     * @param catalogId catalog to process (i.e. TRNS_CFD_CAT_ .. or TRNS_CFD_CCE_CAT_)
+     * @param dateStart date start of validity.
+     * @return catalog indicated in XML format
      * @throws Exception 
      */
     private static String getCatalogXml(final SGuiClient client, final int catalogId, final Date dateStart) throws Exception {
-        ResultSet resultSet = null;
-        String sql = "";
         String xml = "";
+        String sql = "";
+        ResultSet resultSet = null;
 
         sql = "SELECT xml " +
                "FROM " + SModConsts.TablesMap.get(SModConsts.TRNS_CFD_CAT) + " " +
                "WHERE id_cfd_cat = " + catalogId + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(dateStart) + "' " + 
-                "ORDER BY dt_sta DESC ";
+               "ORDER BY dt_sta DESC ";
 
         resultSet = client.getSession().getStatement().executeQuery(sql);
         if (resultSet.next()) {
@@ -55,21 +55,21 @@ public abstract class SCatalogXmlUtils {
     }
     
     /**
-     * Obtain entries all for catalog indicated.
-     * @param xml 
-     * @param dateStart
-     * @return
+     * Obtain options all for catalog indicated.
+     * @param xml Catalog in XML format.
+     * @param dateStart date start of validity.
+     * @return options all for catalog.
      * @throws Exception 
      */
-    public static ArrayList<SCatalogXmlEntry> getCatalogs(final String xml, final Date dateStart) throws Exception {
-        DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document doc = docBuilder.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")));
+    public static ArrayList<SCatalogXmlEntry> getCatalogOptions(final String xml, final Date dateStart) throws Exception {
+        SCatalogXmlEntry catalog = null;
         Node node = null;
         Node nodeChild = null;
         Vector<Node> nodeChilds = null;
         NamedNodeMap namedNodeMapChild = null;
-        ArrayList<SCatalogXmlEntry> aCatalogues = new ArrayList<SCatalogXmlEntry>();
-        SCatalogXmlEntry catalogue = null;
+        DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        Document doc = docBuilder.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")));
+        ArrayList<SCatalogXmlEntry> catalogs = new ArrayList<SCatalogXmlEntry>();
         
         // Catalog:
 
@@ -77,44 +77,44 @@ public abstract class SCatalogXmlUtils {
         nodeChilds = SXmlUtils.extractChildElements(node, "Entry");
 
         for (int i = 0; i < nodeChilds.size(); i++) {
-            catalogue = new SCatalogXmlEntry();
+            catalog = new SCatalogXmlEntry();
             
             nodeChild = nodeChilds.get(i);
             namedNodeMapChild = nodeChild.getAttributes();
 
-            catalogue.setCode(SXmlUtils.extractAttributeValue(namedNodeMapChild, "code", true));
-            catalogue.setName(SXmlUtils.extractAttributeValue(namedNodeMapChild, "name", true));
-            catalogue.setDateStart(DUtilUtils.DbmsDateFormatDate.parse(SXmlUtils.extractAttributeValue(namedNodeMapChild, "dt_sta", true)));
+            catalog.setCode(SXmlUtils.extractAttributeValue(namedNodeMapChild, "code", true));
+            catalog.setName(SXmlUtils.extractAttributeValue(namedNodeMapChild, "name", true));
+            catalog.setDateStart(DUtilUtils.DbmsDateFormatDate.parse(SXmlUtils.extractAttributeValue(namedNodeMapChild, "dt_sta", true)));
             
-            if (catalogue.getDateStart().compareTo(dateStart) <= 0) {
-                aCatalogues.add(catalogue);
+            if (catalog.getDateStart().compareTo(dateStart) <= 0) {
+                catalogs.add(catalog);
             }
         }
         
-        return aCatalogues;
+        return catalogs;
     }
     
     /**
      * Get all the entries for the given catalog, as an array of type SFormComponentItem to be added to a comboBox.
      * @param client SGuiClient.
-     * @param catalogId catalog ID.
+     * @param catalogId catalog ID to process (i.e. TRNS_CFD_CAT_ .. or TRNS_CFD_CCE_CAT_)
      * @param dateStart date start of validity.
-     * @return
+     * @return options from catalog as a vector.
      * @throws Exception 
      */
     public static Vector<SFormComponentItem> getComponentItems(final SGuiClient client, final int catalogId, final Date dateStart) throws Exception {
         String xmlCatalog = "";
         Vector<SFormComponentItem> items = new Vector<SFormComponentItem>();
-        ArrayList<SCatalogXmlEntry> aCatalogs = new ArrayList<SCatalogXmlEntry>();
+        ArrayList<SCatalogXmlEntry> catalogs = new ArrayList<SCatalogXmlEntry>();
 
         xmlCatalog = getCatalogXml(client, catalogId, dateStart);
 
         if (!xmlCatalog.isEmpty()) {
-            aCatalogs = getCatalogs(xmlCatalog, dateStart);
+            catalogs = getCatalogOptions(xmlCatalog, dateStart);
         }
 
         items.add(new SFormComponentItem("", "(Seleccionar una opción)"));
-        for (SCatalogXmlEntry item : aCatalogs) {
+        for (SCatalogXmlEntry item : catalogs) {
             items.add(new SFormComponentItem(item.getCode(), item.getName()));
         }
         
@@ -124,29 +124,29 @@ public abstract class SCatalogXmlUtils {
     /**
      * Get the name for the indicated code of a certain catalog.
      * @param client SGuiClient.
-     * @param catalogId catalog ID.
+     * @param catalogId catalog ID to process (i.e. TRNS_CFD_CAT_ .. or TRNS_CFD_CCE_CAT_)
      * @param dateStart date start of validity.
      * @param code code to search.
      * @return
      * @throws Exception 
      */
-    public static String getNameEntry(final SGuiClient client, final int catalogId, final Date dateStart, final String code) throws Exception {
-        ArrayList<SCatalogXmlEntry> aCatalogs = new ArrayList<SCatalogXmlEntry>();
-        String name = "";
+    public static String getCatalogOptionName(final SGuiClient client, final int catalogId, final Date dateStart, final String code) throws Exception {
+        String optionName = "";
         String xmlCatalog = "";
+        ArrayList<SCatalogXmlEntry> catalogs = new ArrayList<SCatalogXmlEntry>();
         
         xmlCatalog = getCatalogXml(client, catalogId, dateStart);
 
         if (!xmlCatalog.isEmpty()) {
-            aCatalogs = getCatalogs(xmlCatalog, dateStart);
+            catalogs = getCatalogOptions(xmlCatalog, dateStart);
         }
         
-        for (SCatalogXmlEntry item : aCatalogs) {
+        for (SCatalogXmlEntry item : catalogs) {
             if (item.getCode().compareTo(code) == 0) {
-                name = item.getName();
+                optionName = item.getName();
             }
         }
         
-        return name;
+        return optionName;
     }
 }
