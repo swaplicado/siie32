@@ -41,6 +41,9 @@ public class SFinConsts {
 
     public static final String RFC_DOM = "XAXX010101000";
     public static final String RFC_INT = "XEXX010101000";
+    
+    public static final int RFC_PF = 13;
+    public static final int RFC_PM = 12;
 
     public static final String MSG_ERR_ABP_ENT_NOT_FOUND = "No se encontró un paquete de configuración contable para la entidad: ";
     public static final String MSG_ERR_ABP_BPS_NOT_FOUND = "No se encontró un paquete de configuración contable para el asociado de negocios: ";

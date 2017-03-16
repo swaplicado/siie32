@@ -3346,6 +3346,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfQuantityTotal.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(quantity));
 
         try {
+            if (jcbCfdCceOperationType.isEnabled() && !jtfCfdCceExchangeRateUsd.isEnabled()) {
+                moFieldCfdCceExchangeRateUsd.setFieldValue(moFieldExchangeRate.getDouble());
+                moDps.setXtaCfdCceExchangeRateUSD(moFieldCfdCceExchangeRateUsd.getDouble());
+            }
+
             moDps.calculateTotal(miClient);
         }
         catch (Exception e) {
@@ -8015,7 +8020,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         jTabbedPane.setSelectedIndex(TAB_INT);
                         validation.setComponent(jtfCfdCceNumberCertificateOrigin);
                     }
-                    else if (moBizPartnerBranchAddress.getDbmsDataCountry().getCountryGroup().compareTo(SDataConstantsSys.TRNS_CFD_CTY_GRP_UE) != 0 &&
+                    else if (moBizPartnerBranchAddress.getDbmsDataCountry().getCountryGroup().compareTo(SDataConstantsSys.TRNS_CFD_CTY_GRP_UE) == 0 &&
                             miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsCategorySettingsCo().getNumberExporter().isEmpty()) {
                         validation.setMessage("No se han especificado el número de exportador confiable\n" +
                                     "en el catálogo de empresas, campo: 'Número de exportador confiable:'.");
@@ -8630,11 +8635,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moDps.setXtaCfdCceCertificateOrigin(moFieldCfdCceCertificateOrigin.getInteger());
             moDps.setXtaCfdCceCertificateOriginNumber(moFieldCfdCceNumberCertificateOrigin.getString());
             moDps.setXtaCfdCceSubdivisionHas(moFieldCfdCceSubdivision.getInteger());
-            if (moBizPartnerBranchAddress.getDbmsDataCountry().getCountryGroup().compareTo(SDataConstantsSys.TRNS_CFD_CTY_GRP_UE) != 0) {
+            if (moBizPartnerBranchAddress.getDbmsDataCountry().getCountryGroup().compareTo(SDataConstantsSys.TRNS_CFD_CTY_GRP_UE) == 0) {
                 moDps.setXtaCfdCceNumberExporter(moBizPartnerCategory.getNumberExporter());
             }
-            moDps.setXtaCfdCceExchangeRateUSD(jtfCfdCceExchangeRateUsd.isEnabled() ? moFieldCfdCceExchangeRateUsd.getDouble() : moFieldExchangeRate.getDouble());
-            moDps.setXtaCfdCceTotalUSD(jtfCfdCceTotalUsd.isEnabled() ? moFieldCfdCceTotalUsd.getDouble() : moDps.getSubtotalCy_r());
+            moDps.setXtaCfdCceExchangeRateUSD(moFieldCfdCceExchangeRateUsd.getDouble());
+            //moDps.setXtaCfdCceTotalUSD(jtfCfdCceTotalUsd.isEnabled() ? moFieldCfdCceTotalUsd.getDouble() : moDps.getSubtotalCy_r()); // is calculate
         }
 
         // Set params for CFD:

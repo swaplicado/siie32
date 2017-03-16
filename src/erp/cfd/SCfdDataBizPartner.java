@@ -270,7 +270,7 @@ public class SCfdDataBizPartner {
         if (mfVersion == DCfdConsts.CFDI_VER_33) {
             emisor = new cfd.ver3.cce11.DElementEmisor();
 
-            if (msBizPartnerRfc.length() == 13) {
+            if (msBizPartnerRfc.length() == SFinConsts.RFC_PF) {
                 ((cfd.ver3.cce11.DElementEmisor) emisor).getAttCurp().setString(msBizPartnerCurp);
             }
             
@@ -293,7 +293,7 @@ public class SCfdDataBizPartner {
         else if (mfVersion == DCfdConsts.CFDI_VER_32) {
             emisor = new cfd.ver3.cce11.DElementEmisor();
 
-            if (msBizPartnerRfc.length() == 13) {
+            if (msBizPartnerRfc.length() == SFinConsts.RFC_PF) {
                 ((cfd.ver3.cce11.DElementEmisor) emisor).getAttCurp().setString(msBizPartnerCurp);
             }
         }
@@ -423,7 +423,7 @@ public class SCfdDataBizPartner {
     
     public String getCfdLugarExpedicion() {
         if (mnBizPartnerBranchHqId != mnBizPartnerBranchId) {
-            return mnCfdiType != SCfdConsts.CFD_TYPE_PAYROLL && mfVersion == DCfdConsts.CFDI_VER_32 && !mbIsCfdiWithCce ? msBizPartnerExpeditionLocality + ", " + msBizPartnerExpeditionState : msBizPartnerZipCode;
+            return mnCfdiType != SCfdConsts.CFD_TYPE_PAYROLL && mfVersion == DCfdConsts.CFDI_VER_32 && !mbIsCfdiWithCce ? msBizPartnerExpeditionLocality + ", " + msBizPartnerExpeditionState : msBizPartnerExpeditionZipCode;
         }
         else {
             return mnCfdiType != SCfdConsts.CFD_TYPE_PAYROLL && mfVersion == DCfdConsts.CFDI_VER_32 && !mbIsCfdiWithCce ? msBizPartnerLocality + ", " + msBizPartnerStateName : msBizPartnerZipCode;

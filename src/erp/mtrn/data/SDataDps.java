@@ -964,6 +964,18 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     }
 
+    private void calculateCceTotal() throws SQLException, Exception {
+        double valueMxn = 0;
+        double valueUsdEty = 0;
+        mdXtaCfdCceTotalUSD = 0;
+        
+        for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
+            valueMxn = SLibUtils.round((dpsEntry.getSubtotalCy_r() * mdExchangeRate), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+            valueUsdEty = SLibUtils.round((valueMxn / mdXtaCfdCceExchangeRateUSD), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+            mdXtaCfdCceTotalUSD = SLibUtils.round((mdXtaCfdCceTotalUSD + valueUsdEty), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+        }
+    }
+    
     private void calculateDpsTotal(erp.client.SClientInterface piClient_n, int pnDecs) throws SQLException, Exception {
         double dSubtotalProvisional = 0;
         double dDiscountDoc = 0;
@@ -3582,10 +3594,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     /**
      * Calculates DPS value.
+     * Exchange rates of document and international trade must be set already.
      * @param client ERP Client. Can be null, and each DPS entry is not calculated, original values remains as the original ones.
      */
     public void calculateTotal(erp.client.SClientInterface client) throws SQLException, Exception {
         calculateDpsTotal(client, 0);
+        calculateCceTotal();
     }
 
     /**
@@ -4173,6 +4187,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     
     public cfd.DElement createCfdiElementComercioExterior11() throws java.lang.Exception {
         double price = 0;
+        double valueMxn = 0;
+        double valueUsdEty = 0;
         cfd.ver3.cce11.DElementComercioExterior comercioExterior = new cfd.ver3.cce11.DElementComercioExterior();
         cfd.ver3.cce11.DElementMercancia mercancia = null;
         
@@ -4207,10 +4223,17 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             mercancia.getAttCantidadAduana().setDouble(dpsEntry.getOriginalQuantity());
             mercancia.getAttUnidadAduana().setString(dpsEntry.getDbmsCustomsUnit());
             mercancia.getAttValorUnitarioAduana().setDouble(price);
-            mercancia.getAttValorDolares().setDouble(dpsEntry.getSubtotalCy_r());
+            
+            valueMxn = SLibUtils.round((dpsEntry.getSubtotalCy_r() * mdExchangeRate), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+            valueUsdEty = SLibUtils.round((valueMxn / mdXtaCfdCceExchangeRateUSD), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+            
+            mercancia.getAttValorDolares().setDouble(valueUsdEty);
 
-            mercancias.getEltHijosMercancia().add(mercancia);
+            mercancias.addEltHijosMercancia(mercancia);
+            
+            //mercancias.getEltHijosMercancia().add(mercancia);
         }
+        
         comercioExterior.setEltMercancias(mercancias);
         
         return comercioExterior;
