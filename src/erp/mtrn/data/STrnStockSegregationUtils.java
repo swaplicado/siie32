@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package erp.mtrn.data;
 
 import erp.client.SClientInterface;
@@ -37,7 +32,9 @@ public abstract class STrnStockSegregationUtils {
     private static final int IDX_QTY = 2;
     private static final int IDX_B_EXP = 6;
     
-    private static final int IDX_ID_BOM = 0;    
+    private static final int IDX_ID_BOM = 0;
+    
+    public static boolean mbStockRestriction = false;  // XXX this needs to be replaced by system configuration parameter (2017-03-16, ecarmona)
     
     /**
      * Depart from stock the units needed for the production order
@@ -45,8 +42,9 @@ public abstract class STrnStockSegregationUtils {
      * @param client
      * @param reference of the origin of segregation PO = [ productionOrderId, productionOrderYear ].
      * @param segregationType type of the origin of segregation.
+     * @throws erp.mtrn.data.StockException throw the StockException when there are not enough available stock
      */
-    public static void segregate(final SClientInterface client, final int [] reference, final int segregationType) {
+    public static void segregate(final SClientInterface client, final int [] reference, final int segregationType) throws StockException {
         SDataStockSegregation segregation = null;
         SServerRequest request = null;
         SServerResponse response = null;
@@ -75,8 +73,11 @@ public abstract class STrnStockSegregationUtils {
                 }
             }
         }
-        catch (Exception ex) {
-            SLibUtils.printException(client, ex);
+        catch (StockException se) {
+            throw se;
+        }
+        catch (Exception e) {
+            SLibUtils.showException(client, e);
         }
     }
     
@@ -360,9 +361,10 @@ public abstract class STrnStockSegregationUtils {
      * @param client
      * @param segregation object with the amounts to evaluate
      * @return the SDataStockSegregation object with de values to be segregated
+     * @throws erp.mtrn.data.StockException throw the StockException when there are not enough available stock
      * @throws Exception 
      */
-    public static SDataStockSegregation validateStock(final SClientInterface client, final SDataStockSegregation segregation) throws Exception {
+    public static SDataStockSegregation validateStock(final SClientInterface client, final SDataStockSegregation segregation) throws StockException, Exception {
         STrnStockMove stockMoveParams = null;
         STrnStock stock = null;
         SDataStockSegregation currentSegregation = segregation;
@@ -382,7 +384,12 @@ public abstract class STrnStockSegregationUtils {
                     stock = STrnStockSegregationUtils.getAllStock(client, stockMoveParams);
                     
                     if (stock.getAvailableStock() < warehouseEntry.getQuantityIncrement()) {
-                        warehouseEntry.setQuantityIncrement(stock.getAvailableStock());
+                        if (mbStockRestriction) {
+                            throw new StockException("No hay existencias disponibles suficientes para realizar la segregación.");
+                        }
+                        else {
+                            warehouseEntry.setQuantityIncrement(stock.getAvailableStock());
+                        }
                     }
                 }
             }

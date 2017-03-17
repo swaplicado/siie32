@@ -18,6 +18,7 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mtrn.data.SDataStockLot;
 import erp.mtrn.data.STrnStockSegregationUtils;
+import erp.mtrn.data.StockException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
@@ -299,28 +300,32 @@ public class SDataProductionOrder extends erp.lib.data.SDataRegistry implements 
      * This function marks the production order as programmed and done this, segregates what it contains
      * 
      * @param client
-     * @param isMassProgramming This attribute indicates whether the function call comes from a mass programming
+     * @param isMassProgramming Indicates that the function call comes from a mass programming     
+     * @param isShownMessage Indicates that messages will be shown to the user
+     * @throws erp.mtrn.data.StockException is thrown when there are not enough available stock
      */
-    public void programProductionOrder(final SClientInterface client, final boolean isMassProgramming) {
+    public void programProductionOrder(final SClientInterface client, final boolean isMassProgramming, final boolean isShownMessage) throws StockException {
         try {
             if (!mbIsProgrammed) {
-                if (isMassProgramming || mbDbmsIsExploded) {
+                if (mbDbmsIsExploded || isMassProgramming) {
                     mbIsProgrammed = true;
-                    save(client.getSession().getStatement().getConnection());
-                    
+
                     // segregate items from production order
                     STrnStockSegregationUtils.segregate(client, new int[] { mnPkYearId, mnPkOrderId }, SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD);
+                    save(client.getSession().getStatement().getConnection());
                 }
                 else {
-                    client.showMsgBoxWarning("La orden de producción '" + msDbmsNumber + " - " + msReference + "', aún no es explosionada.");
+                    if (isShownMessage) {
+                        client.showMsgBoxWarning("La orden de producción '" + msDbmsNumber + " - " + msReference + "', aún no es explosionada.");
+                    }
                 }
             }
             else {
-                if (!isMassProgramming && client.showMsgBoxConfirm("La orden producción '" + msDbmsNumber + " - " + msReference + "' ya está programada,\n¿desea desprogramarla?\n") == JOptionPane.YES_OPTION) {
+                if (!isMassProgramming && isShownMessage && client.showMsgBoxConfirm("La orden producción '" + msDbmsNumber + " - " + msReference + "' ya está programada,\n¿desea desprogramarla?\n") == JOptionPane.YES_OPTION) {
                     mbIsProgrammed = false;
                     save(client.getSession().getStatement().getConnection());
                     
-                    // releasea segregation by production order
+                    // release segregation by production order
                     STrnStockSegregationUtils.releaseSegregation(client, new int[] { mnPkYearId, mnPkOrderId }, SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD);
                 }
             }

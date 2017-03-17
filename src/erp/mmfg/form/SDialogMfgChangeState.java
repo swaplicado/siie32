@@ -263,7 +263,6 @@ public class SDialogMfgChangeState extends javax.swing.JDialog implements erp.li
                 }
 
                 if (oProductionOrder != null) {
-
                     vParams.removeAllElements();
                     vParams.add(oProductionOrder.getPkYearId());
                     vParams.add(oProductionOrder.getPkOrdId());
@@ -279,10 +278,12 @@ public class SDialogMfgChangeState extends javax.swing.JDialog implements erp.li
                     // Consume raw material if production order state is close:
 
                     oProductionOrder = (SDataProductionOrder) SDataUtilities.readRegistry(miClient, SDataConstants.MFG_ORD, new int[] { oProductionOrder.getPkYearId(), oProductionOrder.getPkOrdId() }, SLibConstants.EXEC_MODE_VERBOSE);
-                    if (oProductionOrder.getFkOrdStatusId() == SDataConstantsSys.MFGS_ST_ORD_CLS) {
+                    if (oProductionOrder.getFkOrdStatusId() == SDataConstantsSys.MFGS_ST_ORD_CLS || oProductionOrder.getFkOrdStatusId() == SDataConstantsSys.MFGS_ST_ORD_FIN) {
                         rmConsume(new int[] { oProductionOrder.getPkYearId(), oProductionOrder.getPkOrdId() });
                         
-                        STrnStockSegregationUtils.releaseSegregation(miClient, new int [] { oProductionOrder.getPkOrdId(), oProductionOrder.getPkYearId() }, SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD);
+                        if (oProductionOrder.getFkOrdStatusId() == SDataConstantsSys.MFGS_ST_ORD_CLS) {
+                            STrnStockSegregationUtils.releaseSegregation(miClient, new int [] { oProductionOrder.getPkYearId(), oProductionOrder.getPkOrdId() }, SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD);
+                        }
                     }
                 }
             }
