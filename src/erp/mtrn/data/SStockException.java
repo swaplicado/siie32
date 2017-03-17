@@ -11,9 +11,9 @@ package erp.mtrn.data;
  * This class is a specific type of exception that is 
  * thrown when there is some error with stock validations.
  */
-public class StockException extends Exception {
+public class SStockException extends Exception {
     
-    public StockException(String message){
+    public SStockException(String message){
         super(message);
     }
     

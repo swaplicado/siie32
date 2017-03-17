@@ -23,7 +23,7 @@ import erp.mmfg.form.SDialogMfgAssignDate;
 import erp.mmfg.form.SDialogMfgAssignRework;
 import erp.mmfg.form.SDialogMfgChangeState;
 import erp.mmfg.form.SDialogMfgCreateLot;
-import erp.mtrn.data.StockException;
+import erp.mtrn.data.SStockException;
 import erp.mtrn.form.SDialogStockCardexProdOrder;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
@@ -525,7 +525,7 @@ public class SViewProductionOrder extends erp.lib.table.STableTab implements jav
                 try {
                     productionOrder.programProductionOrder(miClient, false, true);
                 }
-                catch (StockException ex) {
+                catch (SStockException ex) {
                     SLibUtils.showException(this, ex);
                 }
                 actionReload();

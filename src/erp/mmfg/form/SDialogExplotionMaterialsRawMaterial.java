@@ -45,7 +45,7 @@ import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.STrnStock;
 import erp.mtrn.data.STrnStockMove;
 import erp.mtrn.data.STrnStockSegregationUtils;
-import erp.mtrn.data.StockException;
+import erp.mtrn.data.SStockException;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import java.awt.BorderLayout;
@@ -1159,7 +1159,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                                 try {
                                     po.programProductionOrder(miClient, true, false);
                                 }
-                                catch(StockException se) {
+                                catch(SStockException se) {
                                     noProgrammed++;
                                 }
                             }

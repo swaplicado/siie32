@@ -42,9 +42,9 @@ public abstract class STrnStockSegregationUtils {
      * @param client
      * @param reference of the origin of segregation PO = [ productionOrderId, productionOrderYear ].
      * @param segregationType type of the origin of segregation.
-     * @throws erp.mtrn.data.StockException throw the StockException when there are not enough available stock
+     * @throws erp.mtrn.data.SStockException throw the SStockException when there are not enough available stock
      */
-    public static void segregate(final SClientInterface client, final int [] reference, final int segregationType) throws StockException {
+    public static void segregate(final SClientInterface client, final int [] reference, final int segregationType) throws SStockException {
         SDataStockSegregation segregation = null;
         SServerRequest request = null;
         SServerResponse response = null;
@@ -73,7 +73,7 @@ public abstract class STrnStockSegregationUtils {
                 }
             }
         }
-        catch (StockException se) {
+        catch (SStockException se) {
             throw se;
         }
         catch (Exception e) {
@@ -361,10 +361,10 @@ public abstract class STrnStockSegregationUtils {
      * @param client
      * @param segregation object with the amounts to evaluate
      * @return the SDataStockSegregation object with de values to be segregated
-     * @throws erp.mtrn.data.StockException throw the StockException when there are not enough available stock
+     * @throws erp.mtrn.data.SStockException throw the SStockException when there are not enough available stock
      * @throws Exception 
      */
-    public static SDataStockSegregation validateStock(final SClientInterface client, final SDataStockSegregation segregation) throws StockException, Exception {
+    public static SDataStockSegregation validateStock(final SClientInterface client, final SDataStockSegregation segregation) throws SStockException, Exception {
         STrnStockMove stockMoveParams = null;
         STrnStock stock = null;
         SDataStockSegregation currentSegregation = segregation;
@@ -385,7 +385,7 @@ public abstract class STrnStockSegregationUtils {
                     
                     if (stock.getAvailableStock() < warehouseEntry.getQuantityIncrement()) {
                         if (mbStockRestriction) {
-                            throw new StockException("No hay existencias disponibles suficientes para realizar la segregación.");
+                            throw new SStockException("No hay existencias disponibles suficientes para realizar la segregación.");
                         }
                         else {
                             warehouseEntry.setQuantityIncrement(stock.getAvailableStock());

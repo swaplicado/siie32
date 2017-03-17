@@ -18,7 +18,7 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mtrn.data.SDataStockLot;
 import erp.mtrn.data.STrnStockSegregationUtils;
-import erp.mtrn.data.StockException;
+import erp.mtrn.data.SStockException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
@@ -302,9 +302,9 @@ public class SDataProductionOrder extends erp.lib.data.SDataRegistry implements 
      * @param client
      * @param isMassProgramming Indicates that the function call comes from a mass programming     
      * @param isShownMessage Indicates that messages will be shown to the user
-     * @throws erp.mtrn.data.StockException is thrown when there are not enough available stock
+     * @throws erp.mtrn.data.SStockException is thrown when there are not enough available stock
      */
-    public void programProductionOrder(final SClientInterface client, final boolean isMassProgramming, final boolean isShownMessage) throws StockException {
+    public void programProductionOrder(final SClientInterface client, final boolean isMassProgramming, final boolean isShownMessage) throws SStockException {
         try {
             if (!mbIsProgrammed) {
                 if (mbDbmsIsExploded || isMassProgramming) {
