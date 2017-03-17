@@ -34,7 +34,7 @@ public abstract class STrnStockSegregationUtils {
     
     private static final int IDX_ID_BOM = 0;
     
-    public static boolean mbStockRestriction = false;  // XXX this needs to be replaced by system configuration parameter (2017-03-16, ecarmona)
+    public static boolean mbStockRestriction = true;  // XXX this needs to be replaced by system configuration parameter (2017-03-16, ecarmona)
     
     /**
      * Depart from stock the units needed for the production order
