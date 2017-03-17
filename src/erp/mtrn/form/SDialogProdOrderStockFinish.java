@@ -1426,10 +1426,14 @@ public class SDialogProdOrderStockFinish extends javax.swing.JDialog implements 
             validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_NOT_REQ + "'" + jlQuantityToFinish.getText() + "'.");
         }
         else if (mnFormMode == SLibConstants.MODE_STK_ASD && mdQuantityPending > 0 && moFieldQuantityToFinish.getDouble() > mdQuantityPending &&
-                miClient.showMsgBoxConfirm("El valor del campo '" + jlQuantityToFinish.getText() + "' es mayor al del campo '" + jlQuantityPending.getText() + "'.\n" +
-                "Por ello el movimiento actual ocasionará un excedente en las entregas.\n" + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
+                miClient.showMsgBoxConfirm("El valor del campo " +
+                "'" + jlQuantityToFinish.getText() + "', " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(moFieldQuantityToFinish.getDouble()) + ", " +
+                "de la ord. prod. destino es mayor al del campo " +
+                "'" + jlQuantityPending.getText() + "', " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(mdQuantityPending) + ", " +
+                "de la ord. prod. origen.\n" +
+                "No está permitido que el movimiento actual genere un excedente en las entregas.\n" + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
             validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlQuantityToFinish.getText() + "', " +
-                    "el valor debe ser menor a (" + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(mdQuantityPending) + ")");
+                "el valor debe ser menor o igual a " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(mdQuantityPending) + ".");
         }
         else if (mnFormMode == SLibConstants.MODE_STK_RET && mdQuantityFinished <= 0 &&
                 miClient.showMsgBoxConfirm("No hay cantidad pendiente por devolver.\n" +
@@ -1437,10 +1441,14 @@ public class SDialogProdOrderStockFinish extends javax.swing.JDialog implements 
             validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_NOT_REQ + "'" + jlQuantityToFinish.getText() + "'.");
         }
         else if (mnFormMode == SLibConstants.MODE_STK_RET && mdQuantityFinished > 0 && moFieldQuantityToFinish.getDouble() > mdQuantityFinished &&
-                miClient.showMsgBoxConfirm("El valor del campo '" + jlQuantityToFinish.getText() + "' es mayor al del campo '" + jlQuantityFinished.getText() + "'.\n" +
-                "Por ello el movimiento actual ocasionará un excedente en las devoluciones.\n" + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
+                miClient.showMsgBoxConfirm("El valor del campo " +
+                "'" + jlQuantityToFinish.getText() + "', " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(moFieldQuantityToFinish.getDouble()) + " " +
+                "de la ord. prod. destino es mayor al del campo " +
+                "'" + jlQuantityFinished.getText() + "' " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(mdQuantityFinished) + ", " +
+                "de la ord. prod. origen.\n" +
+                "No está permitido que el movimiento actual genere un excedente en las devoluciones.\n" + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
             validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlQuantityToFinish.getText() + "', " +
-                    "el valor debe ser menor a (" + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(mdQuantityFinished) + ")");
+                    "el valor debe ser menor o igual a " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(mdQuantityFinished) + ".");
         }
 
         if (validation.getIsError()) {

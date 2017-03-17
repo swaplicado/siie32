@@ -45,6 +45,7 @@ import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.STrnStock;
 import erp.mtrn.data.STrnStockMove;
 import erp.mtrn.data.STrnStockSegregationUtils;
+import erp.mtrn.data.StockException;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import java.awt.BorderLayout;
@@ -78,6 +79,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
     private erp.lib.form.SFormField moFieldProductionOrderEnd;
     private erp.lib.form.SFormField moFieldReference;
     private erp.lib.form.SFormField moFieldComments;
+    private erp.lib.form.SFormField moFieldCommentsProdOrd;
     private erp.lib.form.SFormField moFieldDbmsProductionOrderQuantity;
     private erp.lib.form.SFormField moFieldDbmsProductionOrderUnit;
 
@@ -114,6 +116,8 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
     private int mnOrdIdStart;
     private int mnOrdYearIdEnd;
     private int mnOrdIdEnd;
+    
+    private String msProgrammingMessage;
 
     private boolean mbIsCompleteExplotion;
     private boolean mbIsProgrammed;
@@ -166,6 +170,9 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
         jPanel9 = new javax.swing.JPanel();
         jlComments = new javax.swing.JLabel();
         jtfComments = new javax.swing.JTextField();
+        jPanel10 = new javax.swing.JPanel();
+        jlCommentsOrdProd = new javax.swing.JLabel();
+        jtfCommentsOrdProd = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbDelete = new javax.swing.JButton();
@@ -190,7 +197,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
         getContentPane().setLayout(new java.awt.BorderLayout(5, 5));
 
         jpHead.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
-        jpHead.setLayout(new java.awt.GridLayout(7, 1, 0, 2));
+        jpHead.setLayout(new java.awt.GridLayout(8, 1, 0, 2));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -331,6 +338,20 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
 
         jpHead.add(jPanel9);
 
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlCommentsOrdProd.setPreferredSize(new java.awt.Dimension(140, 23));
+        jPanel10.add(jlCommentsOrdProd);
+
+        jtfCommentsOrdProd.setEditable(false);
+        jtfCommentsOrdProd.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        jtfCommentsOrdProd.setText("COMMENTS");
+        jtfCommentsOrdProd.setFocusable(false);
+        jtfCommentsOrdProd.setPreferredSize(new java.awt.Dimension(600, 23));
+        jPanel10.add(jtfCommentsOrdProd);
+
+        jpHead.add(jPanel10);
+
         getContentPane().add(jpHead, java.awt.BorderLayout.PAGE_START);
 
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
@@ -353,6 +374,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
         jpItems.setBorder(javax.swing.BorderFactory.createTitledBorder("Ítems:"));
+        jpItems.setPreferredSize(new java.awt.Dimension(737, 46));
         jpItems.setLayout(new java.awt.BorderLayout());
 
         jpNotesAction.setPreferredSize(new java.awt.Dimension(771, 23));
@@ -395,8 +417,8 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
 
         getContentPane().add(jpItems, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-998)/2, (screenSize.height-634)/2, 998, 634);
+        setSize(new java.awt.Dimension(998, 634));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -422,6 +444,8 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
         moFieldReference.setLengthMax(15);
         moFieldComments = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfComments, jlComments);
         moFieldComments.setLengthMax(255);
+        moFieldCommentsProdOrd = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCommentsOrdProd, jlComments);
+        moFieldCommentsProdOrd.setLengthMax(255);
         moFieldDbmsProductionOrderQuantity = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfDbmsProductionOrderQuantity, jlDbmsProductionOrderQuantity);
         moFieldDbmsProductionOrderUnit = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfDbmsProductionOrderUnit, jlDbmsProductionOrderQuantity);
 
@@ -430,6 +454,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
         mvFields.add(moFieldProductionOrderEnd);
         mvFields.add(moFieldReference);
         mvFields.add(moFieldComments);
+        mvFields.add(moFieldCommentsProdOrd);
         mvFields.add(moFieldDbmsProductionOrderQuantity);
         mvFields.add(moFieldDbmsProductionOrderUnit);
 
@@ -978,6 +1003,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                 moFieldDbmsProductionOrderQuantity.setDouble(dProductionOrderQty);
                 moFieldDbmsProductionOrderUnit.setString(sProductionOrderUnit);
                 moFieldComments.setFieldValue(moExplotionMaterials.getComments());
+                moFieldCommentsProdOrd.setFieldValue(msProgrammingMessage);
             }
         }
     }
@@ -1106,12 +1132,13 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
             miClient.showMsgBoxInformation(oRes[0].toString());
         }
 
-        return oRes[0].toString().length() > 0 ? false : true;
+        return oRes[0].toString().length() <= 0;
     }
 
     private void saveExplotionMaterials() {
-
         // Save explotion of materials:
+        msProgrammingMessage = "Ord. prod. explosionadas: " + mvProductionsOrders.size() + ".";
+        int noProgrammed = 0;
 
         try {
             moRequest = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
@@ -1129,8 +1156,16 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                     if (mvProductionsOrders != null && mbIsProgrammed) {
                         for (SDataProductionOrder po : mvProductionsOrders) {
                             if (!po.getIsForecast()) {
-                                po.programProductionOrder(miClient, true);
+                                try {
+                                    po.programProductionOrder(miClient, true, false);
+                                }
+                                catch(StockException se) {
+                                    noProgrammed++;
+                                }
                             }
+                        }
+                        if (noProgrammed > 0 && mbIsProgrammed){
+                            msProgrammingMessage +=" No se pudieron programar: " + noProgrammed + ".";
                         }
                     }
                     
@@ -1882,6 +1917,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel24;
@@ -1898,6 +1934,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
     private javax.swing.JButton jbRefresh;
     private javax.swing.JButton jbSeek;
     private javax.swing.JLabel jlComments;
+    private javax.swing.JLabel jlCommentsOrdProd;
     private javax.swing.JLabel jlDate;
     private javax.swing.JLabel jlDbmsProductionOrderQuantity;
     private javax.swing.JLabel jlProductionOrderEnd;
@@ -1908,6 +1945,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
     private javax.swing.JPanel jpItems;
     private javax.swing.JPanel jpNotesAction;
     private javax.swing.JTextField jtfComments;
+    private javax.swing.JTextField jtfCommentsOrdProd;
     private javax.swing.JTextField jtfCompanyBranch;
     private javax.swing.JTextField jtfCompanyBranchCode;
     private javax.swing.JFormattedTextField jtfDate;

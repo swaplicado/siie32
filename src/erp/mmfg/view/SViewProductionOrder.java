@@ -23,6 +23,7 @@ import erp.mmfg.form.SDialogMfgAssignDate;
 import erp.mmfg.form.SDialogMfgAssignRework;
 import erp.mmfg.form.SDialogMfgChangeState;
 import erp.mmfg.form.SDialogMfgCreateLot;
+import erp.mtrn.data.StockException;
 import erp.mtrn.form.SDialogStockCardexProdOrder;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
@@ -38,6 +39,7 @@ import javax.swing.JButton;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -520,7 +522,12 @@ public class SViewProductionOrder extends erp.lib.table.STableTab implements jav
         if (moTablePane.getSelectedTableRow() != null) {
             if (jbProgramOrder.isEnabled()) {
                 SDataProductionOrder productionOrder = (SDataProductionOrder) SDataUtilities.readRegistry(miClient, SDataConstants.MFG_ORD, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
-                productionOrder.programProductionOrder(miClient, false);
+                try {
+                    productionOrder.programProductionOrder(miClient, false, true);
+                }
+                catch (StockException ex) {
+                    SLibUtils.showException(this, ex);
+                }
                 actionReload();
             }
         }

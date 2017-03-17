@@ -316,6 +316,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
         String sqlWhere = "";
         String sqlSegWhere = "";
         String sqlHaving = "";
+        String segregationQuery = "";
         STableSetting setting = null;
 
         for (int i = 0; i < mvTableSettings.size(); i++) {
@@ -347,21 +348,23 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
         if (showWarehouses()) {
             sqlSegWhere += "AND wety.id_whs = ent.id_ent ";
         }
+        
+        segregationQuery = "(SELECT COALESCE(SUM(wety.qty_inc - wety.qty_dec), 0) " +
+                "FROM trn_stk_seg_whs AS swhs " +
+                "INNER JOIN trn_stk_seg_whs_ety AS wety ON swhs.id_stk_seg = wety.id_stk_seg AND swhs.id_whs = wety.id_whs " +
+                "WHERE fid_year = " + year + "  AND fid_item = i.id_item AND fid_unit = u.id_unit " + sqlSegWhere + ")";
 
         msSql = "SELECT s.id_item, s.id_unit, " +
                 "i.item_key, i.item, u.symbol, " +
                 (!showLots() ? "" : "s.id_lot, l.lot, l.dt_exp_n, l.b_block, ") +
                 (!showWarehouses() ? "" : "s.id_cob, s.id_wh, bpb.code, ent.code, sc.qty_min, sc.qty_max, sc.rop, " +
-                 "IF(SUM(s.mov_in - s.mov_out) <= sc.qty_min, " + STableConstants.ICON_VIEW_LIG_RED + ", IF(sc.qty_min < SUM(s.mov_in - s.mov_out) AND SUM(s.mov_in - s.mov_out) <= sc.rop, "  + STableConstants.ICON_VIEW_LIG_YEL + ", IF(SUM(s.mov_in - s.mov_out) > sc.rop  AND SUM(s.mov_in - s.mov_out) <= sc.qty_max, "  + STableConstants.ICON_VIEW_LIG_GRE + ", IF(SUM(s.mov_in - s.mov_out) > sc.qty_max, " + STableConstants.ICON_WARN + ", " + STableConstants.ICON_VIEW_LIG_WHI + ")))) AS f_ico, ") +
+                 "IF((SUM(s.mov_in - s.mov_out) - " + segregationQuery + ") <= sc.qty_min, " + STableConstants.ICON_VIEW_LIG_RED + ", "
+                + "IF(sc.qty_min < (SUM(s.mov_in - s.mov_out) - " + segregationQuery + ") AND (SUM(s.mov_in - s.mov_out) - " + segregationQuery + ") <= sc.rop, "  + STableConstants.ICON_VIEW_LIG_YEL + ", "
+                + "IF((SUM(s.mov_in - s.mov_out) - " + segregationQuery + ") > sc.rop  AND (SUM(s.mov_in - s.mov_out) - " + segregationQuery + ") <= sc.qty_max, "  + STableConstants.ICON_VIEW_LIG_GRE + ", "
+                + "IF((SUM(s.mov_in - s.mov_out) - " + segregationQuery + ") > sc.qty_max, " + STableConstants.ICON_WARN + ", " + STableConstants.ICON_VIEW_LIG_WHI + ")))) AS f_ico, ") +
                 "SUM(s.mov_in) AS f_mov_i, SUM(s.mov_out) AS f_mov_o, SUM(s.mov_in - s.mov_out) AS f_stk, " +
-                "(SELECT COALESCE(SUM(wety.qty_inc - wety.qty_dec), 0) " +
-                    "FROM trn_stk_seg_whs AS swhs " +
-                    "INNER JOIN trn_stk_seg_whs_ety AS wety ON swhs.id_stk_seg = wety.id_stk_seg AND swhs.id_whs = wety.id_whs " +
-                    "WHERE fid_year = " + year + "  AND fid_item = i.id_item AND fid_unit = u.id_unit " + sqlSegWhere +") AS f_stk_seg, " +
-                "(SUM(s.mov_in - s.mov_out) - (SELECT COALESCE(SUM(wety.qty_inc - wety.qty_dec), 0) " +
-                    "FROM trn_stk_seg_whs AS swhs " +
-                    "INNER JOIN trn_stk_seg_whs_ety AS wety ON swhs.id_stk_seg = wety.id_stk_seg AND swhs.id_whs = wety.id_whs " +
-                    "WHERE fid_year = " + year + "  AND fid_item = i.id_item AND fid_unit = u.id_unit " + sqlSegWhere +")) AS f_stk_avble, " +
+                segregationQuery + " AS f_stk_seg, " +
+                "(SUM(s.mov_in - s.mov_out) - " + segregationQuery + ") AS f_stk_avble, " +
                 "(SELECT COALESCE(MAX(sx.cost_u), 0.0) FROM trn_stk AS sx WHERE sx.id_year = " + year + " AND sx.id_item = s.id_item AND sx.id_unit = s.id_unit AND NOT sx.b_del AND " +
                 "NOT (sx.fid_ct_iog = " + SModSysConsts.TRNS_CL_IOG_IN_ADJ[0] + " AND sx.fid_cl_iog = " + SModSysConsts.TRNS_CL_IOG_IN_ADJ[1] + ")) AS f_val_u " +
                 "FROM trn_stk AS s " +
