@@ -1165,7 +1165,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                             }
                         }
                         if (noProgrammed > 0 && mbIsProgrammed){
-                            msProgrammingMessage +=" No se pudieron programar: " + noProgrammed + ".";
+                            msProgrammingMessage +=" No se pudieron programar: " + noProgrammed + " (existencia disponible insuficiente).";
                         }
                     }
                     
