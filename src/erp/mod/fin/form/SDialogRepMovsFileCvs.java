@@ -269,7 +269,8 @@ public class SDialogRepMovsFileCvs extends SBeanFormDialog implements ActionList
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    public void actionSave(){
+    public void actionSave() {
+        int countryLocalId = 0;
         String sql = "";
         ResultSet resulSet = null;
         String buffer = "";
@@ -291,27 +292,33 @@ public class SDialogRepMovsFileCvs extends SBeanFormDialog implements ActionList
                         "\"ID PAÍS\",\"PAÍS\",\"PAÍS ABR\",\"ESTADO\",\"MUNICIPIO\",\"LOCALIDAD\"";
 
                     bw.write(SLibUtilities.textToAscii(buffer));
+                    
+                    sql = "SELECT id_cty FROM erp.locu_cty";
+
+                    resulSet = miClient.getSession().getStatement().getConnection().createStatement().executeQuery(sql);
+
+                    if (resulSet.next()) {
+                        countryLocalId = resulSet.getInt("id_cty");
+                    }
                  
-                    sql += "SELECT YEAR(r.dt) AS f_year, MONTH(r.dt) AS f_month, cb.bp_key, b.bp, bb.bpb, bba.street, bba.street_num_ext, bba.neighborhood, bba.zip_code, " +
+                    sql = "SELECT YEAR(r.dt) AS f_year, MONTH(r.dt) AS f_month, cb.bp_key, b.bp, bb.bpb, bba.street, bba.street_num_ext, bba.neighborhood, bba.zip_code, " +
                         "bba.locality, bba.state  , ds.id_dist_chan, ds.dist_chan, mss.id_mkt_segm, ms.mkt_segm, mss.id_mkt_sub, mss.mkt_segm_sub, r.dt, d.dt_doc_delivery_n, " +
                         "IF ((COALESCE(re.fid_dps_adj_year_n, 0) = 0) AND (COALESCE(re.fid_dps_adj_doc_n, 0) = 0), CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num), " +
                         "CONCAT(dd.num_ser, IF(length(dd.num_ser) = 0, '', '-'), dd.num) ) AS f_num, d.num_ref, re.sort_pos, ig.code, ig.igen, i.item_key, i.item, de.orig_qty AS f_qty, " +
                         "u.symbol,  de.price_u_cur AS price_u, " + (mnFormType == SDataConstantsSys.TRNS_CT_DPS_SAL ? "IF(re.credit > 0, re.credit , - re.debit)"  : "IF(re.debit > 0, re.debit , - re.credit)" ) + " as f_amt, " +
-                        "SUM(IF(d.fid_cl_dps = 5, 0, de.mass)) AS f_unt, " +
+                        "SUM(IF(d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ[1] + ", 0, de.mass)) AS f_unt, " +
                         " 'kg' AS f_unt_symbol, sa.id_bp AS f_sa_id, sa.bp AS f_sa, sr.id_sal_route, sr.sal_route, " +
-                        "COALESCE(cty.id_cty, 1) AS f_id_cty, COALESCE(cty.cty, 'MÉXICO') AS f_cty, COALESCE(cty.cty_abbr, '" + miClient.getSession().getSessionCustom().getLocalCountryCode() + "') AS f_cty_abbr, bba.state, bba.county, bba.locality, " +
+                        "COALESCE(cty.id_cty, " + countryLocalId + ") AS f_id_cty, cty.cty AS f_cty, cty.cty_abbr AS f_cty_abbr, bba.state, bba.county, bba.locality, " +
                         "IF ((COALESCE(re.fid_dps_adj_year_n, 0) = 0) AND (COALESCE(re.fid_dps_adj_doc_n, 0) = 0), '', CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) ) AS f_num_afec " +
                         "FROM fin_rec AS r " +
                         "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year and r.id_per = re.id_per and r.id_bkc = re.id_bkc and r.id_tp_rec=re.id_tp_rec and r.id_num = re.id_num " +
                         "INNER JOIN fin_acc AS a ON a.pk_acc = re.fk_acc " +
                         "LEFT OUTER JOIN erp.bpsu_bp AS b ON re.fid_bp_nr = b.id_bp " +
                         "LEFT OUTER JOIN erp.bpsu_bpb AS bb ON re.fid_bpb_n = bb.id_bpb " +
-                        "LEFT OUTER JOIN erp.bpsu_bpb_add AS bba ON re.fid_bpb_n = bba.id_bpb " +
-                        "LEFT OUTER JOIN erp.bpsu_bp_ct AS cb ON re.fid_bp_nr = cb.id_bp " +
+                        "LEFT OUTER JOIN erp.bpsu_bp_ct AS cb ON re.fid_bp_nr = cb.id_bp AND cb.id_ct_bp = " + (mnFormType == SDataConstantsSys.TRNS_CT_DPS_SAL ? SDataConstantsSys.BPSS_CT_BP_CUS : SDataConstantsSys.BPSS_CT_BP_SUP) + " " +
                         "LEFT OUTER JOIN erp.itmu_item AS i ON re.fid_item_n = i.id_item " +
                         "LEFT OUTER JOIN erp.itmu_unit AS u ON re.fid_unit_n = u.id_unit " +
                         "LEFT OUTER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " +
-                        "LEFT OUTER JOIN erp.locu_cty AS cty ON bba.fid_cty_n = cty.id_cty " +
                         "LEFT OUTER JOIN mkt_cfg_cus AS cc ON b.id_bp = cc.id_cus " +
                         "LEFT OUTER JOIN mkt_cfg_cusb AS ccb ON bb.id_bpb = ccb.id_cusb " +
                         "LEFT OUTER JOIN mktu_tp_cus AS tc ON cc.fid_tp_cus = tc.id_tp_cus " +
@@ -323,6 +330,8 @@ public class SDialogRepMovsFileCvs extends SBeanFormDialog implements ActionList
                         "LEFT OUTER JOIN trn_dps AS d ON d.id_year = re.fid_dps_year_n and d.id_doc = re.fid_dps_doc_n " +
                         "LEFT OUTER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc " +
                         "LEFT OUTER JOIN trn_dps AS dd ON dd.id_year = re.fid_dps_adj_year_n AND dd.id_doc = re.fid_dps_adj_doc_n " +
+                        "LEFT OUTER JOIN erp.bpsu_bpb_add AS bba ON re.fid_bpb_n = bba.id_bpb AND bba.id_add = (IF(re.fid_dps_year_n IS NOT NULL, d.fid_add, IF(re.fid_dps_adj_year_n IS NOT NULL, dD.fid_add, 1))) " +
+                        "LEFT OUTER JOIN erp.locu_cty AS cty ON IF(bba.fid_cty_n IS NULL, " + countryLocalId + ",  bba.fid_cty_n) = cty.id_cty " +
                         "WHERE r.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moDateStartDate.getValue()) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(moDateEndDate.getValue()) + "' AND r.b_del = 0 AND re.b_del = 0 AND " +
                         "a.code >= '" + moPanelStartAccount.getSelectedAccount().getCodeStd() + "' AND " +
                         "a.code <= '" + moPanelEndAccount.getSelectedAccount().getCodeStd() + "' " +    
