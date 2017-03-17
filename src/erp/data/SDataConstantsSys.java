@@ -1089,18 +1089,21 @@ public abstract class SDataConstantsSys {
     public static final int TRNS_TP_STK_SEG_INC = 1; // Increment
     public static final int TRNS_TP_STK_SEG_DEC = 2; // Decrement
 
-    public static final int TRNS_CFD_CAT_TP_REL = 11; // type of relation
-    public static final int TRNS_CFD_CAT_CFD_USE = 12; // CFDI use
+    public static final int TRNS_CFD_CAT_TP_REL = 11;   // type of relation
+    public static final int TRNS_CFD_CAT_CFD_USE = 12;  // CFDI use
     
-    public static final int TRNS_CFD_CCE_CAT_TP_OPE = 21; // type of operation
-    public static final int TRNS_CFD_CCE_CAT_TRA_REA = 22; // transfer reason
-    public static final int TRNS_CFD_CCE_CAT_IMP_REQ = 23; // number of import request
+    public static final int TRNS_CFD_CCE_CAT_TP_OPE = 21;   // type of operation
+    public static final int TRNS_CFD_CCE_CAT_TRA_REA = 22;  // transfer reason
+    public static final int TRNS_CFD_CCE_CAT_IMP_REQ = 23;  // number of import request
 
     public static final String TRNS_CFD_CAT_TP_REL_DISC = "01"; // type of relation for discount
-    public static final String TRNS_CFD_CAT_TP_REL_RET = "03"; // type of relation for return
+    public static final String TRNS_CFD_CAT_TP_REL_RET = "03";  // type of relation for return
     
-    public static final String TRNS_CFD_CTY_GRP_UE = "Unión Europea"; // European Union
-    public static final String TRNS_CFD_CTY_GRP_TLCAN = "TLCAN"; // TLCAN
+    public static final String TRNS_CFD_CTY_GRP_UE = "Unión Europea";   // European Union
+    public static final String TRNS_CFD_CTY_GRP_TLCAN = "TLCAN";        // TLCAN
+    
+    public static final String TRNS_CFD_CCE_CAT_TP_OPE_EXP = "2";   // type of opetation two
+    public static final String TRNS_CFD_CCE_CAT_TP_OPE_A = "A";     // type of operation 'A'
     
     public static final int TRNU_DPS_NAT_DEF = 1;
 

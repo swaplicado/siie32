@@ -215,9 +215,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfIndemnificationDicL = new javax.swing.JTextField();
         jlDicL = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
-        jPanel8 = new javax.swing.JPanel();
         jlPhoto = new javax.swing.JLabel();
-        jPanel2 = new javax.swing.JPanel();
         jlSignature = new javax.swing.JLabel();
 
         setLayout(new java.awt.BorderLayout());
@@ -818,25 +816,18 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
 
         jPanel5.add(jPanel12, java.awt.BorderLayout.CENTER);
 
-        jPanel6.setLayout(new java.awt.BorderLayout());
-
-        jPanel8.setLayout(new java.awt.BorderLayout());
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         jlPhoto.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlPhoto.setText("FTOGRAFÍA");
-        jlPhoto.setPreferredSize(new java.awt.Dimension(150, 100));
-        jPanel8.add(jlPhoto, java.awt.BorderLayout.CENTER);
-
-        jPanel6.add(jPanel8, java.awt.BorderLayout.WEST);
-
-        jPanel2.setLayout(new java.awt.BorderLayout());
+        jlPhoto.setText("FOTOGRAFÍA");
+        jlPhoto.setPreferredSize(new java.awt.Dimension(100, 100));
+        jPanel6.add(jlPhoto);
+        jlPhoto.getAccessibleContext().setAccessibleName("FOTOGRAFÍA");
 
         jlSignature.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlSignature.setText("FIRMA");
-        jlSignature.setPreferredSize(new java.awt.Dimension(100, 100));
-        jPanel2.add(jlSignature, java.awt.BorderLayout.SOUTH);
-
-        jPanel6.add(jPanel2, java.awt.BorderLayout.CENTER);
+        jlSignature.setPreferredSize(new java.awt.Dimension(250, 100));
+        jPanel6.add(jlSignature);
 
         jPanel5.add(jPanel6, java.awt.BorderLayout.SOUTH);
 
@@ -861,7 +852,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel19;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel20;
     private javax.swing.JPanel jPanel21;
     private javax.swing.JPanel jPanel22;
@@ -875,7 +865,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbClearFilterPaymentType;
     private javax.swing.JComboBox jcbFilterPaymentType;

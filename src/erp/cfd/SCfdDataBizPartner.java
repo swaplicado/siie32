@@ -270,7 +270,7 @@ public class SCfdDataBizPartner {
         if (mfVersion == DCfdConsts.CFDI_VER_33) {
             emisor = new cfd.ver3.cce11.DElementEmisor();
 
-            if (msBizPartnerRfc.length() == SFinConsts.RFC_PF) {
+            if (msBizPartnerRfc.length() == SFinConsts.RFC_PER) {
                 ((cfd.ver3.cce11.DElementEmisor) emisor).getAttCurp().setString(msBizPartnerCurp);
             }
             
@@ -293,7 +293,7 @@ public class SCfdDataBizPartner {
         else if (mfVersion == DCfdConsts.CFDI_VER_32) {
             emisor = new cfd.ver3.cce11.DElementEmisor();
 
-            if (msBizPartnerRfc.length() == SFinConsts.RFC_PF) {
+            if (msBizPartnerRfc.length() == SFinConsts.RFC_PER) {
                 ((cfd.ver3.cce11.DElementEmisor) emisor).getAttCurp().setString(msBizPartnerCurp);
             }
         }

@@ -4192,8 +4192,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         cfd.ver3.cce11.DElementComercioExterior comercioExterior = new cfd.ver3.cce11.DElementComercioExterior();
         cfd.ver3.cce11.DElementMercancia mercancia = null;
         
-        if (msXtaCfdCceOperationType.compareTo("A") != 0) {
-            //comercioExterior.getAttMotivoTraslado().setString(msXtaCfdCceReasonTransfer); // not apply is necessary if comprobant type is "T"
+        if (msXtaCfdCceOperationType.compareTo(SDataConstantsSys.TRNS_CFD_CCE_CAT_TP_OPE_A) != 0) {
+            //comercioExterior.getAttMotivoTraslado().setString(msXtaCfdCceReasonTransfer); // not apply is necessary if comprobant type is "T" or "transfer"
             comercioExterior.getAttTipoOperacion().setString(msXtaCfdCceOperationType);
             comercioExterior.getAttClaveDePedimento().setString(msXtaCfdCceImportRequest);
             comercioExterior.getAttCertificadoOrigen().setInteger(mnXtaCfdCceCertificateOrigin);

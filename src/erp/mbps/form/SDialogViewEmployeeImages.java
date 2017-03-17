@@ -69,7 +69,7 @@ public class SDialogViewEmployeeImages extends javax.swing.JDialog implements ja
 
         getContentPane().add(jpImage, java.awt.BorderLayout.CENTER);
 
-        setSize(new java.awt.Dimension(488, 334));
+        setSize(new java.awt.Dimension(656, 439));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
