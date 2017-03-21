@@ -4230,8 +4230,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             mercancia.getAttValorDolares().setDouble(valueUsdEty);
 
             mercancias.addEltHijosMercancia(mercancia);
-            
-            //mercancias.getEltHijosMercancia().add(mercancia);
         }
         
         comercioExterior.setEltMercancias(mercancias);
