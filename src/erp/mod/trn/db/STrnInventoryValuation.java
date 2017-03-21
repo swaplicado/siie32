@@ -13,7 +13,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Sergio flores
+ * @author Sergio Flores
  */
 public class STrnInventoryValuation {
     
@@ -249,8 +249,8 @@ public class STrnInventoryValuation {
      * Must be called after saving inventory valuation registry.
      */
     public void computeValuation(final int idInventoryValuation) throws Exception {
-        int iClass = 0;
-        int iClassStep = 0;
+        int idMovClass = 0;
+        int idMovClassStep = 0;
         int idItem = 0;
         int idUnit = 0;
         double qtyWip = 0;
@@ -274,19 +274,21 @@ public class STrnInventoryValuation {
         
         createInventoryMfgCosts();
         
-        iClass = SModSysConsts.TRNS_CL_IOG_OUT_MFG[1]; // 6
-        iClassStep = STEP_RM; // first step
+        // Iterate starting from last class ID of real stock movements:
         
-        while (iClass >= SModSysConsts.TRNS_CL_IOG_OUT_PUR[1]) {
+        idMovClass = SModSysConsts.TRNS_CL_IOG_OUT_MFG[1]; // class ID is #6
+        idMovClassStep = STEP_RM; // first step
+        
+        while (idMovClass >= SModSysConsts.TRNS_CL_IOG_OUT_PUR[1]) {
             
-            System.out.println("Inventory Valuation. Current IOG class = " + iClass + (iClass == SModSysConsts.TRNS_CL_IOG_OUT_MFG[1] ? "; current IOG class step = " + iClassStep : "") + "...");
+            System.out.println("Inventory Valuation. Current IOG class = " + idMovClass + (idMovClass == SModSysConsts.TRNS_CL_IOG_OUT_MFG[1] ? "; current IOG class step = " + idMovClassStep : "") + "...");
             
             // Process outgoing stock movements:
             
-            sql = "AND d.fid_cl_iog=" + iClass + " ";
+            sql = "AND d.fid_cl_iog = " + idMovClass + " ";
             
-            if (iClass == SModSysConsts.TRNS_CL_IOG_OUT_MFG[1]) {
-                switch (iClassStep) {
+            if (idMovClass == SModSysConsts.TRNS_CL_IOG_OUT_MFG[1]) {
+                switch (idMovClassStep) {
                     case STEP_RM: // raw materials
                         sql += "AND d.fid_tp_iog IN (" + SModSysConsts.TRNS_TP_IOG_OUT_MFG_RM_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_RM_RET[2] + ") ";
                         break;
@@ -326,10 +328,10 @@ public class STrnInventoryValuation {
                     acumStock = 0;
                     acumCosts = 0;
                     
-                    isStandard = !(iClass == SModSysConsts.TRNS_CL_IOG_OUT_MFG[1] && SLibUtils.belongsTo(iClassStep, new int[] { STEP_WP, STEP_FG }));
+                    isStandard = !(idMovClass == SModSysConsts.TRNS_CL_IOG_OUT_MFG[1] && SLibUtils.belongsTo(idMovClassStep, new int[] { STEP_WP, STEP_FG }));
                     
                     if (isStandard) {
-                        // Standard valuation:
+                        // Standard valuation, items valued directly:
                         
                         sql = "SELECT SUM(s.mov_in - s.mov_out) AS _stk, SUM(s.debit - s.credit) AS _bal "
                                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "
@@ -345,7 +347,7 @@ public class STrnInventoryValuation {
                         }
                     }
                     else {
-                        // Concentrated valuation, items transformation implicated through job order (MFG WP & FG only):
+                        // Concentrated valuation, items valued indirectly through job order (MFG WP & FG only):
                         
                         sql = "SELECT SUM(s.debit-s.credit) AS _bal "
                                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "
@@ -414,7 +416,7 @@ public class STrnInventoryValuation {
                 
                 // Update cost of corresponding incoming stock movement (MFG and other internal stock movements only):
                 
-                if (SLibUtils.belongsTo(iClass, new int[] { SModSysConsts.TRNS_CL_IOG_OUT_MFG[1], SModSysConsts.TRNS_CL_IOG_OUT_INT[1] })) {
+                if (SLibUtils.belongsTo(idMovClass, new int[] { SModSysConsts.TRNS_CL_IOG_OUT_MFG[1], SModSysConsts.TRNS_CL_IOG_OUT_INT[1] })) {
                     if (!isStandard) {
                         auxCost = auxValue; // revaluate cost properly
                     }
@@ -429,16 +431,16 @@ public class STrnInventoryValuation {
             
             // Continue with other stock movement types, while necessary:
 
-            if (iClass == SModSysConsts.TRNS_CL_IOG_OUT_MFG[1]) {
-                if (iClassStep < STEP_FG) {
-                    iClassStep++;
+            if (idMovClass == SModSysConsts.TRNS_CL_IOG_OUT_MFG[1]) {
+                if (idMovClassStep < STEP_FG) {
+                    idMovClassStep++;
                 }
                 else {
-                    iClass--;
+                    idMovClass--;
                 }
             }
             else {
-                iClass--;
+                idMovClass--;
             }
         }
         
