@@ -119,7 +119,7 @@ public abstract class SFiscalUtils {
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " AS a ON re.fid_acc = a.id_acc "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " AS al ON al.code = CONCAT(LEFT(a.code, 6), REPEAT('0', 42)) AND "
                 + "al.fid_tp_acc_r = " + SModSysConsts.FINS_TP_ACC_RES + " "
-                + "WHERE re.fid_item_n = " + itemId + " AND " + (moveType == DEBIT ? "re.debit" : "re.credit") + " <> 0.0; " ;
+                + "WHERE re.fid_item_n = " + itemId + " AND " + (moveType == DEBIT ? "(re.debit <> 0.0 OR (re.debit = 0 AND re.credit = 0))" : "(re.credit <> 0.0)") + "; " ;
 
         resultSet = statement.executeQuery(sql);
         if (resultSet.next()) {
@@ -395,7 +395,6 @@ public abstract class SFiscalUtils {
 
         resultSet = statement.executeQuery(sql);
         while (resultSet.next()) {
-
             // Check if Fiscal Account provided by SAT was set on current account:
 
             accountNature = "";
@@ -659,6 +658,10 @@ public abstract class SFiscalUtils {
                             break;
 
                         case SModSysConsts.FINS_TP_ACC_RES:
+                            if (accountId.contains("4100-0000-0000")) {
+                                System.out.println("Ventas!");
+                            }
+                            
                             if (accountCode.isEmpty()) {
                                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nCódigo de cuenta desconocido para la "
                                         + "cuenta contable " + accountId + ":\n'" + accountName + "' (" + accountCode + ").");
@@ -675,8 +678,11 @@ public abstract class SFiscalUtils {
                                 fiscalAccountCode = resultSet.getString("f_itm_fis_acc_inc");
 
                                 if (SLibUtils.parseDouble(fiscalAccountCode) == 0d) {
-                                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nCódigo agrupador del SAT (ingresos) no asignado a la "
-                                            + "cuenta contable " + accountId + ":\n'" + accountName + "' (" + accountCode + ").");
+                                    fiscalAccountCode = resultSet.getString("f_itm_fis_acc_exp");
+                                    if (SLibUtils.parseDouble(fiscalAccountCode) == 0d) {
+                                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nCódigo agrupador del SAT (ingresos) no asignado a la "
+                                                + "cuenta contable " + accountId + ":\n'" + accountName + "' (" + accountCode + ").");
+                                    }
                                 }
 
                                 fiscalAccountLinkDetails.add(createFiscalAccountLinkDetail(accountPk, linkType, referenceKey, fiscalAccountCode, accountId, parentAccountId, accountName, accountNature, level));
@@ -689,8 +695,11 @@ public abstract class SFiscalUtils {
                                 fiscalAccountCode = resultSet.getString("f_itm_fis_acc_exp");
 
                                 if (SLibUtils.parseDouble(fiscalAccountCode) == 0d) {
-                                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nCódigo agrupador del SAT (egresos) no asignado a la "
-                                            + "cuenta contable " + accountId + ":\n'" + accountName + "' (" + accountCode + ").");
+                                    fiscalAccountCode = resultSet.getString("f_itm_fis_acc_inc");
+                                    if (SLibUtils.parseDouble(fiscalAccountCode) == 0d) {
+                                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nCódigo agrupador del SAT (egresos) no asignado a la "
+                                                + "cuenta contable " + accountId + ":\n'" + accountName + "' (" + accountCode + ").");
+                                    }
                                 }
 
                                 fiscalAccountLinkDetails.add(createFiscalAccountLinkDetail(accountPk, linkType, referenceKey, fiscalAccountCode, accountId, parentAccountId, accountName, accountNature, level));
@@ -1039,7 +1048,7 @@ public abstract class SFiscalUtils {
 
         element.getXmlAttributes().add(new SXmlAttribute("NumUnIdenPol", numUnIdenPol));
         element.getXmlAttributes().add(new SXmlAttribute("Fecha", DateFormatFecha.format(fecha)));
-        element.getXmlAttributes().add(new SXmlAttribute("Concepto", concepto));
+        element.getXmlAttributes().add(new SXmlAttribute("Concepto", SLibUtils.textToXml(concepto)));
 
         return element;
     }
@@ -1049,7 +1058,7 @@ public abstract class SFiscalUtils {
 
         element.getXmlAttributes().add(new SXmlAttribute("NumCta", numCta));
         element.getXmlAttributes().add(new SXmlAttribute("DesCta", desCta));
-        element.getXmlAttributes().add(new SXmlAttribute("Concepto", concepto));
+        element.getXmlAttributes().add(new SXmlAttribute("Concepto", SLibUtils.textToXml(concepto)));
         element.getXmlAttributes().add(new SXmlAttribute("Debe", DecimalFormatImporte.format(debe)));
         element.getXmlAttributes().add(new SXmlAttribute("Haber", DecimalFormatImporte.format(haber)));
 
@@ -1060,6 +1069,27 @@ public abstract class SFiscalUtils {
         SXmlElement element = new SXmlElement("PLZ:CompNal");
 
         element.getXmlAttributes().add(new SXmlAttribute("UUID_CFDI", UUID_CFDI));
+
+        element.getXmlAttributes().add(new SXmlAttribute("RFC", RFC));
+
+        element.getXmlAttributes().add(new SXmlAttribute("MontoTotal", DecimalFormatImporte.format(montoTotal)));
+
+        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN_NAME) != 0) {
+            element.getXmlAttributes().add(new SXmlAttribute("Moneda", moneda));
+            element.getXmlAttributes().add(new SXmlAttribute("TipCamb", DecimalFormatTipCamb.format(tipCamb)));
+        }
+
+        return element;
+    }
+
+    private static SXmlElement createElementPolizas11CompNalOtr(final String CFD_CBB_Serie, final String CFD_CBB_NumFol, final String RFC, final double montoTotal, final String moneda, final Double tipCamb) {
+        SXmlElement element = new SXmlElement("PLZ:CompNalOtr");
+
+        if (!CFD_CBB_Serie.isEmpty()) {
+            element.getXmlAttributes().add(new SXmlAttribute("CFD_CBB_Serie", CFD_CBB_Serie));
+        }
+        
+        element.getXmlAttributes().add(new SXmlAttribute("CFD_CBB_NumFol", CFD_CBB_NumFol));
 
         element.getXmlAttributes().add(new SXmlAttribute("RFC", RFC));
 
@@ -1211,7 +1241,7 @@ public abstract class SFiscalUtils {
                     + "fald3.id_ref_1 AS f_ld3_ref1, fald3.id_ref_2 AS f_ld3_ref2, fald3.acc_code, fald3.acc_name, "
                     + "fald4.id_ref_1 AS f_ld4_ref1, fald4.id_ref_2 AS f_ld4_ref2, fald4.acc_code, fald4.acc_name, "
                     + "re.fid_dps_year_n, re.fid_dps_doc_n, doc.num_ser, doc.num, doc.dt, doc.tot_r, doc.exc_rate, doc_cur.id_cur, doc_fcur.id_fiscal_cur, doc_fcur.code, "
-                    + "@pos := INSTR(cfd.doc_xml, 'UUID=\"') AS f_cfd_pos, UPPER(IF(@pos = 0, '', MID(cfd.doc_xml, @pos + 6, 36))) AS f_cfd_uuid, doc_bp.fiscal_id, doc_bp.fiscal_frg_id, "
+                    + "@pos := INSTR(cfd.doc_xml, 'UUID=') AS f_cfd_pos, UPPER(IF(@pos = 0, '', MID(cfd.doc_xml, @pos + 6, 36))) AS f_cfd_uuid, doc_bp.fiscal_id, doc_bp.fiscal_frg_id, "
                     + "re.fid_check_wal_n, re.fid_check_n, acsh_bnk.acc_num, fbnk.id_fiscal_bank, fbnk.code, bnk_fcur.id_fiscal_cur, bnk_fcur.code, chk.num, chk.dt, chk.val, chk.benef, chk_bp.bp, chk_bp.fiscal_id "
                     + ""
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re "
@@ -1296,19 +1326,27 @@ public abstract class SFiscalUtils {
                                 resultSetRecEty.getString("doc_fcur.code"),
                                 resultSetRecEty.getDouble("doc.exc_rate"));
                     }
-                    else if (resultSetRecEty.getString("f_cfd_uuid") == null) {
-                        throw new Exception("El documento con folio '" + (resultSetRecEty.getString("doc.num_ser").isEmpty() ? "" : resultSetRecEty.getString("doc.num_ser") + "-") + resultSetRecEty.getString("doc.num")
-                                + "', fecha '" + SLibUtils.DateFormatDate.format(resultSetRecEty.getDate("doc.dt"))
-                                + " y rfc '"+resultSetRecEty.getString("doc_bp.fiscal_id")+"' no cuenta con UUID.");
-                    }
-                    else if (!resultSetRecEty.getString("f_cfd_uuid").isEmpty()) {
+                    else {
                         // Domestic document:
-                        xmlComp = createElementPolizas11CompNal(
-                                resultSetRecEty.getString("f_cfd_uuid"),
-                                resultSetRecEty.getString("doc_bp.fiscal_id"), 
-                                resultSetRecEty.getDouble("doc.tot_r"),
-                                resultSetRecEty.getString("doc_fcur.code"),
-                                resultSetRecEty.getDouble("doc.exc_rate"));
+                        if (!resultSetRecEty.getString("f_cfd_uuid").isEmpty()) {
+                            // CFDI:
+                            xmlComp = createElementPolizas11CompNal(
+                                    resultSetRecEty.getString("f_cfd_uuid"),
+                                    resultSetRecEty.getString("doc_bp.fiscal_id"), 
+                                    resultSetRecEty.getDouble("doc.tot_r"),
+                                    resultSetRecEty.getString("doc_fcur.code"),
+                                    resultSetRecEty.getDouble("doc.exc_rate"));
+                        }
+                        else if (resultSetRecEty.getString("f_cfd_uuid").isEmpty()) {
+                            // Other:
+                            xmlComp = createElementPolizas11CompNalOtr(
+                                    resultSetRecEty.getString("doc.num_ser"),
+                                    resultSetRecEty.getString("doc.num"),
+                                    resultSetRecEty.getString("doc_bp.fiscal_id"), 
+                                    resultSetRecEty.getDouble("doc.tot_r"),
+                                    resultSetRecEty.getString("doc_fcur.code"),
+                                    resultSetRecEty.getDouble("doc.exc_rate"));
+                        }
                     }
 
                     if (xmlComp != null) {
@@ -1467,7 +1505,7 @@ public abstract class SFiscalUtils {
 
         element.getXmlAttributes().add(new SXmlAttribute("Fecha", DateFormatFecha.format(fecha)));
         element.getXmlAttributes().add(new SXmlAttribute("NumUnIdenPol", numUnIdenPol));
-        element.getXmlAttributes().add(new SXmlAttribute("Concepto", concepto));
+        element.getXmlAttributes().add(new SXmlAttribute("Concepto", SLibUtils.textToXml(concepto)));
         element.getXmlAttributes().add(new SXmlAttribute("Debe", DecimalFormatImporte.format(debe)));
         element.getXmlAttributes().add(new SXmlAttribute("Haber", DecimalFormatImporte.format(haber)));
 

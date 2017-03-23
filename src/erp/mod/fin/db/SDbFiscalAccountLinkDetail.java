@@ -9,6 +9,7 @@ import erp.mod.SModConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
@@ -180,7 +181,7 @@ public class SDbFiscalAccountLinkDetail extends SDbRegistryUser {
                     "'" + msFiscalAccount + "', " +
                     "'" + msAccountCode + "', " +
                     "'" + msAccountCodeParent + "', " +
-                    "'" + msAccountName + "', " +
+                    "'" + SLibUtils.textToSql(msAccountName) + "', " +
                     "'" + msNature + "', " +
                     mnLevel + " " +
                     ")";
@@ -198,7 +199,7 @@ public class SDbFiscalAccountLinkDetail extends SDbRegistryUser {
                     "fiscal_acc = '" + msFiscalAccount + "', " +
                     "acc_code = '" + msAccountCode + "', " +
                     "acc_code_par = '" + msAccountCodeParent + "', " +
-                    "acc_name = '" + msAccountName + "', " +
+                    "acc_name = '" + SLibUtils.textToSql(msAccountName) + "', " +
                     "nat = '" + msNature + "', " +
                     "lev = " + mnLevel + " " +
                     getSqlWhere();
