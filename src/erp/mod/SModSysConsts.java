@@ -886,6 +886,7 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_POS_RISK_CL4 = 4;   // Class IV
     public static final int HRSS_TP_POS_RISK_CL5 = 5;   // Class V
 
+    public static final int HRSS_TP_WORK_DAY_NON = 0; // Non applicable
     public static final int HRSS_TP_WORK_DAY_DIU = 1;   // Diurnal
     
     public static final int HRSS_TP_DIS_RSK = 1;    // Risk
