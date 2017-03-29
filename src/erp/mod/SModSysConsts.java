@@ -21,15 +21,16 @@ public abstract class SModSysConsts {
 
     public static final int[] CFGS_TP_ENT_CASH_CASH = new int[] { 1, 1 };
     public static final int[] CFGS_TP_ENT_CASH_BANK = new int[] { 1, 2 };
-    public static final int[] CFGS_TP_ENT_WH_SP = new int[] { 2, 1 };
-    public static final int[] CFGS_TP_ENT_WH_MFG_RM = new int[] { 2, 2 };
-    public static final int[] CFGS_TP_ENT_WH_MFG_WP = new int[] { 2, 3 };
-    public static final int[] CFGS_TP_ENT_WH_MFG_FG = new int[] { 2, 4 };
-    public static final int[] CFGS_TP_ENT_WH_GDS = new int[] { 2, 5 };
-    public static final int[] CFGS_TP_ENT_WH_WAR_PUR = new int[] { 2, 6 };
-    public static final int[] CFGS_TP_ENT_WH_WAR_SAL = new int[] { 2, 7 };
-    public static final int[] CFGS_TP_ENT_WH_CSG_PUR = new int[] { 2, 8 };
-    public static final int[] CFGS_TP_ENT_WH_CSG_SAL = new int[] { 2, 9 };
+    public static final int[] CFGS_TP_ENT_WH_SP = new int[] { 2, 11 };
+    public static final int[] CFGS_TP_ENT_WH_MFG_RM = new int[] { 2, 21 };
+    public static final int[] CFGS_TP_ENT_WH_MFG_WP = new int[] { 2, 22 };
+    public static final int[] CFGS_TP_ENT_WH_MFG_FG = new int[] { 2, 23 };
+    public static final int[] CFGS_TP_ENT_WH_MFG_MS = new int[] { 2, 24 };
+    public static final int[] CFGS_TP_ENT_WH_GDS = new int[] { 2, 31 };
+    public static final int[] CFGS_TP_ENT_WH_WAR_PUR = new int[] { 2, 41 };
+    public static final int[] CFGS_TP_ENT_WH_WAR_SAL = new int[] { 2, 42 };
+    public static final int[] CFGS_TP_ENT_WH_CSG_PUR = new int[] { 2, 51 };
+    public static final int[] CFGS_TP_ENT_WH_CSG_SAL = new int[] { 2, 52 };
     public static final int[] CFGS_TP_ENT_POS_POS = new int[] { 3, 1 };
     public static final int[] CFGS_TP_ENT_PLT_PLT = new int[] { 4, 1 };
 
@@ -886,7 +887,7 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_POS_RISK_CL4 = 4;   // Class IV
     public static final int HRSS_TP_POS_RISK_CL5 = 5;   // Class V
 
-    public static final int HRSS_TP_WORK_DAY_NON = 0; // Non applicable
+    public static final int HRSS_TP_WORK_DAY_NON = 0;   // Non applicable
     public static final int HRSS_TP_WORK_DAY_DIU = 1;   // Diurnal
     
     public static final int HRSS_TP_DIS_RSK = 1;    // Risk
