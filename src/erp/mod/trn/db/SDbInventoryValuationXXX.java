@@ -80,6 +80,7 @@ public class SDbInventoryValuationXXX extends SDbRegistryUser {
         diog.setDate(date);
         diog.setNumberSeries("");
         diog.setNumber("0");
+        diog.setReference("");
         diog.setValue_r(SLibUtils.round(value, SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
         diog.setIsSystem(true);
         diog.setFkCompanyBranchId(keyWarehouse[0]);

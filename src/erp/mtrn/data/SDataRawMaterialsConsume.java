@@ -234,6 +234,7 @@ public class SDataRawMaterialsConsume extends erp.lib.data.SDataRegistry impleme
                             iog.setDate(mtDate);
                             iog.setNumberSeries(dnsForDiog.get(0).toString());
                             iog.setNumber("");
+                            iog.setReference("");
                             iog.setValue_r(0);
                             iog.setCostAsigned(0);
                             iog.setCostTransferred(0);
