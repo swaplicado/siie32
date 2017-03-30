@@ -36,6 +36,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected java.util.Date mtDate;
     protected java.lang.String msNumberSeries;
     protected java.lang.String msNumber;
+    protected java.lang.String msReference;
     protected double mdValue_r;
     protected int mnCostAsigned;
     protected int mnCostTransferred;
@@ -368,6 +369,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     public void setDate(java.util.Date t) { mtDate = t; }
     public void setNumberSeries(java.lang.String s) { msNumberSeries = s; }
     public void setNumber(java.lang.String s) { msNumber = s; }
+    public void setReference(java.lang.String s) { msReference = s; }
     public void setValue_r(double d) { mdValue_r = d; }
     public void setCostAsigned(int n) { mnCostAsigned = n; }
     public void setCostTransferred(int n) { mnCostTransferred = n; }
@@ -410,6 +412,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     public java.util.Date getDate() { return mtDate; }
     public java.lang.String getNumberSeries() { return msNumberSeries; }
     public java.lang.String getNumber() { return msNumber; }
+    public java.lang.String getReference() { return msReference; }
     public double getValue_r() { return mdValue_r; }
     public int getCostAsigned() { return mnCostAsigned; }
     public int getCostTransferred() { return mnCostTransferred; }
@@ -509,6 +512,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         mtDate = null;
         msNumberSeries = "";
         msNumber = "";
+        msReference = "";
         mdValue_r = 0;
         mnCostAsigned = 0;
         mnCostTransferred = 0;
@@ -594,6 +598,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
                 mtDate = resultSet.getDate("iog.dt");
                 msNumberSeries = resultSet.getString("iog.num_ser");
                 msNumber = resultSet.getString("iog.num");
+                msReference = resultSet.getString("iog.ref");
                 mdValue_r = resultSet.getDouble("iog.val_r");
                 mnCostAsigned = resultSet.getInt("iog.cst_asig");
                 mnCostTransferred = resultSet.getInt("iog.cst_tran");
@@ -770,12 +775,13 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkDocId);
             callableStatement.setDate(nParam++, new java.sql.Date(mtDate.getTime()));
             callableStatement.setString(nParam++, msNumberSeries);
             callableStatement.setString(nParam++, msNumber);
+            callableStatement.setString(nParam++, msReference);
             callableStatement.setDouble(nParam++, mdValue_r);
             callableStatement.setInt(nParam++, mnCostAsigned);
             callableStatement.setInt(nParam++, mnCostTransferred);
