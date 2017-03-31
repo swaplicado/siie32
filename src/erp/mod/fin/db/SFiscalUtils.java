@@ -658,10 +658,6 @@ public abstract class SFiscalUtils {
                             break;
 
                         case SModSysConsts.FINS_TP_ACC_RES:
-                            if (accountId.contains("4100-0000-0000")) {
-                                System.out.println("Ventas!");
-                            }
-                            
                             if (accountCode.isEmpty()) {
                                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nCódigo de cuenta desconocido para la "
                                         + "cuenta contable " + accountId + ":\n'" + accountName + "' (" + accountCode + ").");
@@ -1328,7 +1324,7 @@ public abstract class SFiscalUtils {
                     }
                     else {
                         // Domestic document:
-                        if (!resultSetRecEty.getString("f_cfd_uuid").isEmpty()) {
+                        if (resultSetRecEty.getString("f_cfd_uuid") != null && !resultSetRecEty.getString("f_cfd_uuid").isEmpty()) {
                             // CFDI:
                             xmlComp = createElementPolizas11CompNal(
                                     resultSetRecEty.getString("f_cfd_uuid"),
@@ -1337,7 +1333,7 @@ public abstract class SFiscalUtils {
                                     resultSetRecEty.getString("doc_fcur.code"),
                                     resultSetRecEty.getDouble("doc.exc_rate"));
                         }
-                        else if (resultSetRecEty.getString("f_cfd_uuid").isEmpty()) {
+                        else {
                             // Other:
                             xmlComp = createElementPolizas11CompNalOtr(
                                     resultSetRecEty.getString("doc.num_ser"),
@@ -1399,10 +1395,10 @@ public abstract class SFiscalUtils {
                             moneda = "";
                             
                             switch (xmlMoneda) {
-                                case SModSysConsts.FINS_FISCAL_CUR_MXN_NAME:
-                                case SModSysConsts.FINS_FISCAL_CUR_USD_NAME:
-                                case SModSysConsts.FINS_FISCAL_CUR_EUR_NAME:
-                                case SModSysConsts.FINS_FISCAL_CUR_JPY_NAME:
+                                case SModSysConsts.FINS_FISCAL_CUR_MXN_NAME:    // MXN
+                                case SModSysConsts.FINS_FISCAL_CUR_USD_NAME:    // USD
+                                case SModSysConsts.FINS_FISCAL_CUR_EUR_NAME:    // EUR
+                                case SModSysConsts.FINS_FISCAL_CUR_JPY_NAME:    // JPY
                                     // Currency identified:
                                     moneda = xmlMoneda;
                                     break;
@@ -1422,11 +1418,11 @@ public abstract class SFiscalUtils {
                                         case "DLL":
                                         case "DLS":
                                         case "DOL":
+                                        case "DÓL":
                                         case "USA":
                                             moneda = SModSysConsts.FINS_FISCAL_CUR_USD_NAME;
                                             break;
                                         case "3":
-                                        //case "EUR":
                                             moneda = SModSysConsts.FINS_FISCAL_CUR_EUR_NAME;
                                             break;
                                         case "JAP":
