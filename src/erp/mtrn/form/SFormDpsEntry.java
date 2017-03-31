@@ -4647,6 +4647,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         boolean isDataShipDomesticReq = false;
         boolean isDataShipInternationalReq = false;
         boolean isDataShipQualityReq = false;
+        String msgErrorPriceMonthlyOrder = "";
         String msg = "";
         String msgOmittedShipData = "";
         SFormValidation validation = new SFormValidation();
@@ -4779,6 +4780,18 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 validation.setMessage("De acuerdo con la entrega mensual actual" + (mbIsLastPrc ? ", considerando el excedente permitido en la partida del documento origen" : "") + ":\n" +
                         "el valor máximo permitido para el campo '" + jlOriginalQuantity.getText() + "' es " + SLibUtils.getDecimalFormatQuantity().format(mdQuantityPrc) + " " + jtfOriginalUnitSymbolRo.getText() + ".");
                 validation.setComponent(jtfOriginalQuantity);
+            }
+            else {
+                // Validate unitary price vs unitary month price in monthly order:
+                
+                for (int i = 0; i < moPaneGridPrices.getGridRows().size(); i++) {
+                    if (((SDataDpsEntryPrice) moPaneGridPrices.getGridRows().get(i).getData()).getOriginalPriceUnitaryCy() != SLibUtilities.parseDouble(jtfOriginalPriceUnitaryCy.getText())) {
+                        msgErrorPriceMonthlyOrder += ("Los valores del campo '" + jlOriginalPriceUnitaryCy.getText() + "' no coinciden con valor '" + jlPriceOriginalPriceUnitaryCy.getText() + "' de la entrega mensual '" + ((SDataDpsEntryPrice) moPaneGridPrices.getGridRows().get(i).getData()).getReferenceNumber() + "'.\n");
+                    }       
+                }
+                if (!msgErrorPriceMonthlyOrder.isEmpty()) {
+                    validation.setMessage(msgErrorPriceMonthlyOrder);
+                }
             }
         }
         
