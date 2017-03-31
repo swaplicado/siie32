@@ -440,7 +440,7 @@ public abstract class STrnUtils {
         String[] addressComMain = SBpsUtils.getAddress(client.getSession(), new int[] { bizPartnerCom.getRegHeadquarters().getPkBizPartnerBranchId(), 1 });
         String[] addressComAlt = bizPartnerCom.getRegHeadquarters().getPkBizPartnerBranchId() == dps.getFkCompanyBranchId() ? 
                 new String[] { "(MISMO DOMICILIO)" } :
-                SBpsUtils.getAddress(null, new int[] { dps.getFkCompanyBranchId(), 1 });
+                SBpsUtils.getAddress(client.getSession(), new int[] { dps.getFkCompanyBranchId(), 1 });
         
         String[] addressBprMain = SBpsUtils.getAddress(client.getSession(), dps.getKeyBizPartnerBranchAddress());
         String[] addressBprAlt = SLibUtils.compareKeys(dps.getKeyBizPartnerBranchAddress(), dps.getKeyBizPartnerBranchAddressAlt()) ? 
