@@ -679,7 +679,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         jPanel44.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlFkWorkingDayType.setText("Tipo jornada:*");
+        jlFkWorkingDayType.setText("Tipo jornada:");
         jlFkWorkingDayType.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel44.add(jlFkWorkingDayType);
 
@@ -1037,7 +1037,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldFkPosition.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldFkShift = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkShift, jlFkShift);
         moFieldFkShift.setTabbedPaneIndex(0, jTabbedPane1);
-        moFieldFkWorkingDayType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkWorkingDayType, jlFkWorkingDayType);
+        moFieldFkWorkingDayType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkWorkingDayType, jlFkWorkingDayType);
         moFieldFkWorkingDayType.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldWorkingHoursDay = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, true, jtfWorkingHoursDay, jlWorkingHoursDay);
         moFieldWorkingHoursDay.setTabbedPaneIndex(0, jTabbedPane1);

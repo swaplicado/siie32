@@ -498,7 +498,11 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
         receptor.getAttCurp().setString(msCurp);
         receptor.getAttTipoContrato().setString(msTipoContrato);
         receptor.getAttSindicalizado().setString(msSindicalizado);
-        //receptor.getAttTipoJornada().setString(msTipoJornada); // (jbarajas 12-01-2017) Omitted by audit suggestion 
+        
+        if (Integer.parseInt(msTipoJornada) != SModSysConsts.HRSS_TP_WORK_DAY_NON) {
+            receptor.getAttTipoJornada().setString(msTipoJornada);
+        }
+        
         receptor.getAttNumEmpleado().setString(DVer3Utils.formatAttributeValueAsKey(msNumEmpleado));
         receptor.getAttDepartamento().setString(DVer3Utils.formatAttributeValueAsText(msDepartamento));
         receptor.getAttPuesto().setString(DVer3Utils.formatAttributeValueAsText(msPuesto));

@@ -294,7 +294,7 @@ public class SViewOrderSuppliedWithMovs extends erp.lib.table.STableTab implemen
                 "INNER JOIN erp.usru_usr AS uc ON d.fid_usr_close = uc.id_usr " +
                 "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND " +
                 "de.b_del = 0 AND de.b_inv = 1 AND de.qty > 0 AND de.orig_qty > 0 " +
-                "INNER JOIN trn_diog_ety AS ge ON ge.fid_dps_year_n = de.id_year AND ge.fid_dps_doc_n = de.id_doc AND ge.fid_dps_ety_n = de.id_ety " +
+                "INNER JOIN trn_diog_ety AS ge ON ge.fid_dps_year_n = de.id_year AND ge.fid_dps_doc_n = de.id_doc " +
                 "INNER JOIN trn_diog AS g ON ge.id_year = g.id_year AND ge.id_doc = g.id_doc " +
                 "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " +
                 "INNER JOIN erp.itmu_unit AS u ON de.fid_unit = u.id_unit " +

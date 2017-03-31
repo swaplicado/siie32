@@ -593,7 +593,6 @@ public class SViewProductionOrder extends erp.lib.table.STableTab implements jav
             moDialogMfgAssignDate.setValue(1, moTablePane.getSelectedTableRow().getPrimaryKey());
             moDialogMfgAssignDate.setVisible(true);
             if (moDialogMfgAssignDate.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-
                 moProductionOrder = (SDataProductionOrder) moDialogMfgAssignDate.getRegistry();
                 if (moProductionOrder != null) {
                     try {
