@@ -4,7 +4,9 @@
  */
 package erp.mod.hrs.db;
 
+import erp.SClient;
 import erp.cfd.SCfdConsts;
+import erp.cfd.SDialogResult;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -17,6 +19,8 @@ import erp.mfin.data.SFinUtilities;
 import erp.mhrs.data.SDataPayrollReceiptIssue;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.fin.util.STreasuryBankLayoutFile;
+import erp.mod.fin.util.STreasuryBankLayoutRequest;
 import erp.print.SDataConstantsPrint;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -34,6 +38,11 @@ import java.util.Date;
 import java.util.HashMap;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.util.JRLoader;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
@@ -45,7 +54,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Alfredo Perez
  */
 public abstract class SHrsUtils {
     
@@ -1138,14 +1147,7 @@ public abstract class SHrsUtils {
         return wage;
     }
 
-    /**
-     * Print payrroll receipt
-     * @param client Interface Client
-     * @param pnPrintMode print mode (e.g. SDataConstantsPrint.PRINT_MODE_)
-     * @param payrollKey payrroll key
-     * @throws java.lang.Exception
-     */
-    public static void printPayrollReceipt(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws java.lang.Exception {
+    public static HashMap<String, Object> getMapPayrollReceipt(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws java.lang.Exception {
         double dTotalPercepciones = 0;
         double dTotalDeducciones = 0;
         SDbLoan loan = null;
@@ -1160,7 +1162,7 @@ public abstract class SHrsUtils {
 
         payroll = new SDbPayroll();
         payroll.read(client.getSession(), new int[] { payrollKey[0] });
-
+        
         for (SDbPayrollReceipt receipt : payroll.getChildPayrollReceipts()) {
             if (SLibUtils.compareKeys(receipt.getPrimaryKey(), new int[] { payrollKey[0], payrollKey[1] })) {
                 payrollReceipt = receipt;
@@ -1293,7 +1295,21 @@ public abstract class SHrsUtils {
         map.put("TotalPercepcionesGravado", dTotalPercepciones);
         map.put("TotalDeduccionesGravado", dTotalDeducciones);
         map.put("TotalNeto", dTotalPercepciones - dTotalDeducciones);
-
+        
+        return map;
+    }
+    
+    /**
+     * Print payrroll receipt
+     * @param client Interface Client
+     * @param pnPrintMode print mode (e.g. SDataConstantsPrint.PRINT_MODE_)
+     * @param payrollKey payrroll key
+     * @throws java.lang.Exception
+     */
+    public static void printPayrollReceipt(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws java.lang.Exception {
+        HashMap<String, Object> map = new HashMap<>();
+        map = getMapPayrollReceipt(client,pnPrintMode,payrollKey);
+        
         switch (pnPrintMode) {
             case SDataConstantsPrint.PRINT_MODE_VIEWER:
                 client.getSession().printReport(SModConsts.HRSR_PAY_RCP, SLibConsts.UNDEFINED, null, map);
@@ -1305,6 +1321,86 @@ public abstract class SHrsUtils {
             default:
                 throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
         }
+    }
+    
+    public static void SendPayrollReceipt(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws java.lang.Exception {
+        boolean isSent = false;
+        HashMap<String, Object> map = new HashMap<>();
+        File pdf = null;
+        STreasuryBankLayoutRequest layoutRequest = new STreasuryBankLayoutRequest(client, null);
+        
+        map = getMapPayrollReceipt(client, pnPrintMode, payrollKey);
+        pdf = createPayrollReceipt(map, client);
+        
+        SDataBizPartner bizPartner  = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) client, SDataConstants.BPSU_BP, new int[] { (Integer)map.get("nEmployeeId") }, SLibConstants.EXEC_MODE_SILENT);
+        String mail = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01();
+            
+        if (pdf != null) {
+            isSent = layoutRequest.sendMail(null, "", pdf, STreasuryBankLayoutRequest.SND_TP_PAY_RCP, mail);
+            if (isSent) {
+                client.showMsgBoxInformation("El recibo de nómina ha sido enviado correctamente.\n");
+            }
+            else {
+                client.showMsgBoxInformation("El recibo de nómina no ha sido enviado.\n");
+            }
+        }
+    }
+    
+    public static void SendPayrollReceipts(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws java.lang.Exception {
+        SDbPayroll payroll = null;
+        SDialogResult dialogResult = null;
+        
+        payroll = new SDbPayroll();
+        payroll.read(client.getSession(), new int[] { payrollKey[0] });
+        ArrayList<SDbPayrollReceipt> actives = new ArrayList<SDbPayrollReceipt>();
+        
+        for (SDbPayrollReceipt receipt : payroll.getChildPayrollReceipts()) {
+            if (!receipt.isDeleted()) {
+                actives.add(receipt);
+            }
+        }
+        
+        dialogResult = new SDialogResult((SClient) client, "Resultados de envío", SCfdConsts.PROC_REQ_SND_RCP);
+        dialogResult.setFormParams((SClientInterface) client, null, null, pnPrintMode, null, true, pnPrintMode, pnPrintMode);
+        dialogResult.setReceipts(actives);
+        dialogResult.setVisible(true);
+    }
+    
+    /**
+     * Create a object File in PDF format payroll receipt
+     * @param map Obj HashMap with all information about payroll receipt
+     * @param client interface Client
+     * @return Object file payroll receipt
+     */
+    public static File createPayrollReceipt(HashMap<String, Object> map, SGuiClient client) {
+        JasperPrint jasperPrint = null;
+        byte[] reportBytes = null;
+        File file = null;
+        File fileTemporal = null;
+        FileOutputStream fos = null;
+        JasperReport reporte = null;
+        
+        try {
+            fileTemporal = new File("reps/hrs_pay_rcp.jasper");
+            reporte = (JasperReport) JRLoader.loadObject(fileTemporal);
+            
+            jasperPrint = JasperFillManager.fillReport(reporte, map,client.getSession().getDatabase().getConnection());
+            reportBytes = JasperExportManager.exportReportToPdf(jasperPrint);
+            fileTemporal = File.createTempFile("document", ".pdf");
+            fos = new FileOutputStream(fileTemporal);
+            fos.write(reportBytes);
+            fos.close();
+
+            file = new File(fileTemporal.getParentFile() + "\\"+ "Recibo de nomina.pdf");
+            fos = new FileOutputStream(file);
+            fos.write(reportBytes);
+            fos.close();
+        }
+        catch (Exception e) {
+            SLibUtils.showException(STreasuryBankLayoutFile.class, e);
+        }
+        
+        return file;  
     }
     
     public static void printPrePayroll(final SGuiClient client, final int payrollKey) throws java.lang.Exception {

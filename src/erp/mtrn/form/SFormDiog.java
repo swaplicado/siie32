@@ -56,6 +56,8 @@ import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -88,6 +90,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.lib.form.SFormField moFieldProdOrderSource;
     private erp.lib.form.SFormField moFieldProdOrderDestiny;
     private erp.lib.form.SFormField moFieldNotes;
+    private erp.lib.form.SFormField moFieldReference;
     private erp.lib.form.SFormField moFieldEntryQuantity;
     private erp.lib.form.SFormField moFieldEntryValueUnitary;
     private erp.lib.form.SFormField moFieldEntryValue;
@@ -210,6 +213,9 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfQuantityDestiny = new javax.swing.JTextField();
         jtfUnitSymbolDestiny = new javax.swing.JTextField();
         jPanel27 = new javax.swing.JPanel();
+        jlRef = new javax.swing.JLabel();
+        jtfReference = new javax.swing.JTextField();
+        jPanel28 = new javax.swing.JPanel();
         jlNotes = new javax.swing.JLabel();
         jtfNotes = new javax.swing.JTextField();
         jPanel4 = new javax.swing.JPanel();
@@ -263,7 +269,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
             }
         });
 
-        jPanel2.setLayout(new java.awt.BorderLayout(0, 5));
+        jPanel2.setLayout(new java.awt.BorderLayout(0, 6));
 
         jPanel21.setLayout(new java.awt.BorderLayout(5, 0));
 
@@ -375,8 +381,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfCompanyBranchSourceCode.setPreferredSize(new java.awt.Dimension(50, 23));
         jpWarehouseSource.add(jtfCompanyBranchSourceCode);
 
-        jtfWarehouseSource.setBackground(java.awt.Color.lightGray);
         jtfWarehouseSource.setEditable(false);
+        jtfWarehouseSource.setBackground(java.awt.Color.lightGray);
         jtfWarehouseSource.setText("WAREHOUSE");
         jtfWarehouseSource.setFocusable(false);
         jtfWarehouseSource.setPreferredSize(new java.awt.Dimension(135, 23));
@@ -442,7 +448,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel21.add(jPanel8, java.awt.BorderLayout.WEST);
 
         jPanel22.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos adicionales:"));
-        jPanel22.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+        jPanel22.setLayout(new java.awt.GridLayout(6, 1, 0, 6));
 
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -567,15 +573,37 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jlRef.setText("Referencia:");
+        jlRef.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel27.add(jlRef);
+
+        jtfReference.setText("TEXT");
+        jtfReference.setPreferredSize(new java.awt.Dimension(135, 23));
+        jtfReference.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtfReferenceActionPerformed(evt);
+            }
+        });
+        jPanel27.add(jtfReference);
+
+        jPanel22.add(jPanel27);
+
+        jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
         jlNotes.setText("Comentarios:");
         jlNotes.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel27.add(jlNotes);
+        jPanel28.add(jlNotes);
 
         jtfNotes.setText("TEXT");
         jtfNotes.setPreferredSize(new java.awt.Dimension(400, 23));
-        jPanel27.add(jtfNotes);
+        jtfNotes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtfNotesActionPerformed(evt);
+            }
+        });
+        jPanel28.add(jtfNotes);
 
-        jPanel22.add(jPanel27);
+        jPanel22.add(jPanel28);
 
         jPanel21.add(jPanel22, java.awt.BorderLayout.CENTER);
 
@@ -769,8 +797,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-1041)/2, (screenSize.height-634)/2, 1041, 634);
+        setSize(new java.awt.Dimension(1041, 634));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -803,6 +831,14 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         actionCancel();
     }//GEN-LAST:event_formWindowClosing
 
+    private void jtfNotesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfNotesActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jtfNotesActionPerformed
+
+    private void jtfReferenceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfReferenceActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jtfReferenceActionPerformed
+
     private void initComponentsExtra() {
         int i = 0;
         STableColumnForm tableColumnsEntry[];
@@ -830,6 +866,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldProdOrderDestiny.setPickerButton(jbProdOrderDestiny);
         moFieldNotes = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfNotes, jlNotes);
         moFieldNotes.setLengthMax(255);
+        moFieldReference = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfReference, jlRef);
+        moFieldReference.setLengthMax(15);
         moFieldEntryQuantity = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfEntryQuantity, jlEntryQuantity);
         moFieldEntryQuantity.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat());
         moFieldEntryValueUnitary = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfEntryValueUnitary, jlEntryValueUnitary);
@@ -844,6 +882,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         mvFields.add(moFieldProdOrderSource);
         mvFields.add(moFieldProdOrderDestiny);
         mvFields.add(moFieldNotes);
+        mvFields.add(moFieldReference);
         mvFields.add(moFieldEntryQuantity);
         mvFields.add(moFieldEntryValueUnitary);
         mvFields.add(moFieldEntryValue);
@@ -1192,6 +1231,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 
             jtfNotes.setEditable(false);
             jtfNotes.setFocusable(false);
+            jtfReference.setEditable(false);
+            jtfReference.setFocusable(false);
 
             jtfEntryTextToFind.setEditable(false);
             jtfEntryTextToFind.setFocusable(false);
@@ -1223,6 +1264,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 
             jtfNotes.setEditable(true);
             jtfNotes.setFocusable(true);
+            jtfReference.setEditable(true);
+            jtfReference.setFocusable(true);
 
             jtfEntryTextToFind.setEditable(enable);
             jtfEntryTextToFind.setFocusable(enable);
@@ -2895,6 +2938,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JPanel jPanel24;
     private javax.swing.JPanel jPanel25;
     private javax.swing.JPanel jPanel27;
+    private javax.swing.JPanel jPanel28;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
@@ -2939,6 +2983,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JLabel jlNotes;
     private javax.swing.JLabel jlProdOrderDestiny;
     private javax.swing.JLabel jlProdOrderSource;
+    private javax.swing.JLabel jlRef;
     private javax.swing.JLabel jlSeries;
     private javax.swing.JLabel jlValue;
     private javax.swing.JLabel jlWarehouseDestiny;
@@ -2977,6 +3022,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JTextField jtfNumber;
     private javax.swing.JTextField jtfQuantityDestiny;
     private javax.swing.JTextField jtfQuantitySource;
+    private javax.swing.JTextField jtfReference;
     private javax.swing.JTextField jtfUnitSymbolDestiny;
     private javax.swing.JTextField jtfUnitSymbolSource;
     private javax.swing.JTextField jtfValue;
@@ -3300,6 +3346,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldSeries.setFieldValue(moDiog.getNumberSeries());
         jckIsShipmentRequired.setSelected(moDiog.getIsShipmentRequired());
         jtfNumber.setText(moDiog.getNumber());
+        jtfReference.setText(moDiog.getReference());
         jckIsSystem.setSelected(moDiog.getIsSystem());
         jckIsDeleted.setSelected(moDiog.getIsDeleted());
 
@@ -3327,7 +3374,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
             }
         }
 
-        // Document entries:
+        // Document entries
 
         for (SDataDiogEntry entry : moDiog.getDbmsEntries()) {
             if (!entry.getIsDeleted()) {
@@ -3361,7 +3408,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
             moDiog.setPkDocId(0);
             moDiog.setNumberSeries(jcbSeries.getSelectedItem().toString());
             moDiog.setNumber("");   // number will be set in store procedure
-
+            
             moDiog.setFkDiogCategoryId(manParamIogTypeKey[0]);
             moDiog.setFkDiogClassId(manParamIogTypeKey[1]);
             moDiog.setFkDiogTypeId(manParamIogTypeKey[2]);
@@ -3370,6 +3417,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
             moDiog.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
         }
 
+        moDiog.setReference(moFieldReference.getString());
         moDiog.setDate(moFieldDate.getDate());
         moDiog.setIsShipmentRequired(jckIsShipmentRequired.isSelected());
 
@@ -3511,12 +3559,15 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                     iogCounterpart.setPkDocId(0);
                     iogCounterpart.setNumberSeries(items.size() == 0 ? moDiog.getNumberSeries() : items.get(0).getItem());
                     iogCounterpart.setNumber("");   // number will be set in store procedure
+                    iogCounterpart.setReference(moFieldReference.getString());
                 }
                 else {
                     iogCounterpart.setPkYearId(moDiog.getDbmsDataCounterpartDiog().getPkYearId());
                     iogCounterpart.setPkDocId(moDiog.getDbmsDataCounterpartDiog().getPkDocId());
                     iogCounterpart.setNumberSeries(moDiog.getDbmsDataCounterpartDiog().getNumberSeries());
                     iogCounterpart.setNumber(moDiog.getDbmsDataCounterpartDiog().getNumber());
+                    iogCounterpart.setReference(moFieldReference.getString());
+                    
 
                     for (SDataDiogEntry entry : iogCounterpart.getDbmsEntries()) {
                         entry.setPkYearId(moDiog.getDbmsDataCounterpartDiog().getPkYearId());
@@ -3537,7 +3588,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             }
                         }
                     }
-                }
+                } 
 
                 iogCounterpart.setDbmsDataCounterpartDiog(null);
                 iogCounterpart.setAuxIsDbmsDataCounterpartDiog(true);

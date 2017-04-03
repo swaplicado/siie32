@@ -110,7 +110,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
 
-                aoTableColumns = new STableColumn[10];
+                aoTableColumns = new STableColumn[8];
                 break;
 
             case SDataConstants.TRNX_STK_STK_WH:
@@ -121,7 +121,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_cob");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_wh");
 
-                aoTableColumns = new STableColumn[16];
+                aoTableColumns = new STableColumn[14];
                 break;
 
             case SDataConstants.TRNX_STK_LOT:
@@ -131,7 +131,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_lot");
 
-                aoTableColumns = new STableColumn[11];
+                aoTableColumns = new STableColumn[9];
                 break;
 
             case SDataConstants.TRNX_STK_LOT_WH:
@@ -143,7 +143,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_cob");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_wh");
 
-                aoTableColumns = new STableColumn[13];
+                aoTableColumns = new STableColumn[11];
                 break;
 
             default:
@@ -202,13 +202,13 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         }
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_val_u", "Val. u. entradas máx. $", STableConstants.WIDTH_QUANTITY_2X);
+        /*aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_val_u", "Val. u. entradas máx. $", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "", "Val. máx. $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_stk", SLibRpnArgumentType.OPERAND));
         aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_val_u", SLibRpnArgumentType.OPERAND));
-        aoTableColumns[i++].getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.MULTIPLICATION, SLibRpnArgumentType.OPERATOR));
+        aoTableColumns[i++].getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.MULTIPLICATION, SLibRpnArgumentType.OPERATOR));*/
 
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);

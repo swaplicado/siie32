@@ -2259,9 +2259,10 @@ public abstract class SDataUtilities {
         String sql = "";
         ResultSet resultSet = null;
 
-        sql = "SELECT id_acc "
-                + "FROM fin_acc "
-                + "WHERE fid_tp_acc_r = " + pnTypeId[0] + " AND fid_cl_acc_r = " + pnTypeId[1] + " AND fid_cls_acc_r = " + pnTypeId[2] + " AND b_del = 0; ";
+        sql = "SELECT am.id_acc "
+                + "FROM fin_acc AS a "
+                + "INNER JOIN fin_acc AS am ON a.id_acc = CONCAT(LEFT(am.id_acc, 4), '-0000-0000') "
+                + "WHERE a.fid_tp_acc_r = " + pnTypeId[0] + " AND a.fid_cl_acc_r = " + pnTypeId[1] + " AND a.fid_cls_acc_r = " + pnTypeId[2] + " AND a.b_del = 0 AND am.b_del = 0; ";
         
         resultSet = client.getSession().getStatement().executeQuery(sql);
         while (resultSet.next()) {

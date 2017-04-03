@@ -748,6 +748,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
 
             if (moDbmsDataCounterpartDiog != null) {
                 moDbmsDataCounterpartDiog.setIsDeleted(mbIsDeleted);
+                moDbmsDataCounterpartDiog.setReference(msNumber);
                 moDbmsDataCounterpartDiog.setIsShipmentRequired(mbIsShipmentRequired);
                 moDbmsDataCounterpartDiog.setIsShipped(mbIsShipped);
                 moDbmsDataCounterpartDiog.setIsAudited(mbIsAudited);
@@ -1046,6 +1047,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         registry.setDate(this.getDate());
         registry.setNumberSeries(this.getNumberSeries());
         registry.setNumber(this.getNumber());
+        registry.setReference(this.getReference());
         registry.setValue_r(this.getValue_r());
         registry.setCostAsigned(this.getCostAsigned());
         registry.setCostTransferred(this.getCostTransferred());

@@ -272,7 +272,7 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
         columns = new STableColumnForm[3];
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. cuenta contable", 75);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Cuenta contable", 150);
-        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Eliminado", STableConstants.WIDTH_BOOLEAN);
+        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Seleccionada", STableConstants.WIDTH_BOOLEAN);
         columns[i++].setEditable(true);
 
         for (i = 0; i < columns.length; i++) {

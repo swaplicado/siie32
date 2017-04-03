@@ -8,21 +8,26 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
+import erp.mbps.data.SDataBizPartner;
 import erp.mhrs.data.SDataFormerPayrollEmp;
 import erp.mod.SModConsts;
+import erp.mod.fin.util.STreasuryBankLayoutRequest;
 import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SHrsCfdUtils;
 import erp.mod.hrs.db.SHrsUtils;
+import static erp.mod.hrs.db.SHrsUtils.getMapPayrollReceipt;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
 import erp.print.PrintCfdiThread;
 import erp.print.SDataConstantsPrint;
 import java.awt.Cursor;
+import java.io.File;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -42,6 +47,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
     
     protected ArrayList<SDataCfd> maCfds;
     protected ArrayList<int[]> maPayrollReceiptsIds;
+    protected ArrayList<SDbPayrollReceipt> maPayrollReceipts;
     protected int mnTotalStamps;
     protected Date mtCancellationDate;
     protected boolean mbValidateStamp;
@@ -317,11 +323,17 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
     private void process() throws Exception {
         miClient.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
         
-        if (maPayrollReceiptsIds != null) {
-            processPayroll();
+        if (mnFormSubtype == SCfdConsts.PROC_REQ_SND_RCP) {
+            processReceipts();
+            miClient.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
-        else if (maCfds != null) {
-            processCfd();            
+        else {
+            if (maPayrollReceiptsIds != null) {
+                processPayroll();
+            }
+            else if (maCfds != null) {
+                processCfd();            
+            }
         }
     }
     
@@ -378,13 +390,61 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
             miClient.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
     }
+    
+    private void processReceipts() throws Exception {
+        boolean isSent = false;
+        int cfdsProcessed = 0;
+        int cfdsCorrect = 0;
+        int cfdsIncorrect = 0;
+        String detailMessage = "";
+        String mail = "";
+        
+        STreasuryBankLayoutRequest layoutRequest = null;
+        SDataBizPartner bizPartner  = null;
+        HashMap<String, Object> map = new HashMap<>();
+        File pdf = null;
+        
+        moIntTotalToProcess.setValue(maPayrollReceipts.size());
+        
+        for (SDbPayrollReceipt receipt : maPayrollReceipts) {
+            
+            bizPartner  = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { receipt.getPkEmployeeId() }, SLibConstants.EXEC_MODE_SILENT);
+            mail = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01();
+            
+            map = getMapPayrollReceipt((SGuiClient) miClient, SDataConstantsPrint.PRINT_MODE_PDF, receipt.getPrimaryKey());
+            pdf = SHrsUtils.createPayrollReceipt(map, (SGuiClient) miClient);
+            cfdsProcessed++;
+        
+            if (pdf != null) {
+                isSent = false;
+                layoutRequest = new STreasuryBankLayoutRequest((SGuiClient) miClient, null);
+                isSent = layoutRequest.sendMail(null, "", pdf, STreasuryBankLayoutRequest.SND_TP_PAY_RCP, mail);
+                    
+                if (isSent) {
+                    cfdsCorrect++;
+                    detailMessage += "Recibo enviado\n";
+                }
+                else {
+                    cfdsIncorrect++;
+                    detailMessage += "No se ha enviado\n";
+                }
+            }
+            else {
+                cfdsIncorrect++;
+                detailMessage += "No se creo el PDF\n";
+            }
+            updateForm(cfdsProcessed, cfdsCorrect, cfdsIncorrect, detailMessage);
+            update(getGraphics());
+            jScrollPane1.getVerticalScrollBar().setValue(jScrollPane1.getVerticalScrollBar().getMaximum());
+        }
+        jScrollPane1.getVerticalScrollBar().setValue(jScrollPane1.getVerticalScrollBar().getMaximum());
+    }
 
     public void processCfd() throws Exception {
         int cfdsProcessed = 0;
         int cfdsCorrect = 0;
         int cfdsIncorrect = 0;
         SDataFormerPayrollEmp payrollEmp = null;
-        SDbPayrollReceipt payrollReceipt = null;
         SDbPayrollReceiptIssue payrollReceiptIssue = null;
         SDataDps dps = null;
         String detailMessage = "";
@@ -560,6 +620,10 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
         mbValidateStamp = validateStamp;
         mnSubtypeCfd = subtypeCfd;
         mnTpDpsAnn = tpDpsAnn;
+    }
+    
+    public void setReceipts(ArrayList<SDbPayrollReceipt> actives) {
+       maPayrollReceipts = actives;
     }
     
     public void setNumberCopies(final int numCopies) {
