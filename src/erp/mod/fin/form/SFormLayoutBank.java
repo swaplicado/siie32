@@ -435,7 +435,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
 
         jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jbShowDocs.setText("Mostar documentos");
+        jbShowDocs.setText("Mostrar documentos");
         jbShowDocs.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jbShowDocs.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel21.add(jbShowDocs);
@@ -954,9 +954,16 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                 jbActualExR.setEnabled(false);
                 jbRefreshExR.setEnabled(false);
             }
-            else {  
+            else if (moKeyCurrencyDoc.getValue()[0] == moKeyCurrencyBank.getValue()[0]) {
+                excchangeRate = SDataConstantsSys.FINX_EXC_RATE_CUR_SYS;
+                moCurExchangeRate.setEnabled(false);
+                jbExchangeRateSystemOrigin.setEnabled(false);
+                jbActualExR.setEnabled(false);
+                jbRefreshExR.setEnabled(false);
+            }
+            else {
                 try {
-                    excchangeRate = SDataUtilities.obtainExchangeRate((SClientInterface) miClient, moKeyCurrencyDoc.getValue()[0], moDateDate.getValue());
+                    excchangeRate = SDataUtilities.obtainExchangeRate((SClientInterface) miClient, moKeyCurrencyDoc.getValue()[0], moDateDate.getValue());       
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -966,7 +973,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                 jbExchangeRateSystemOrigin.setEnabled(true);
                 jbActualExR.setEnabled(true);
                 jbRefreshExR.setEnabled(true);
-            }
+            }  
         }
         
         if (excchangeRate != 0d) {
@@ -991,10 +998,11 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
 
         if (moKeyCurrencyBank.getValue().length != SLibConstants.UNDEFINED) {
             moKeyCurrencyDoc.setValue(moKeyCurrencyBank.getValue());
-            if (moKeyBankLayoutType.getSelectedItem().getPrimaryKey()[0] != SLibConstants.UNDEFINED) {
+            if ((moKeyBankLayoutType.getSelectedItem().getPrimaryKey()[0] != SLibConstants.UNDEFINED) && (moKeyCurrencyDoc.getValue()[0] == moKeyCurrencyBank.getValue()[0])) {
                 miClient.getSession().populateCatalogue(moKeyAccountDebit, SModConsts.FIN_ACC_CASH, SModConsts.FINX_ACC_CASH_BANK, new SGuiParams( new int[] { moKeyCurrencyBank.getValue()[0], ((int[]) ((SGuiItem) moKeyBankLayoutType.getSelectedItem()).getForeignKey())[1] }));
                 moCurExchangeRate.setCompoundText(SDataReadDescriptions.getCatalogueDescription(((SClientInterface) miClient), SDataConstants.CFGU_CUR, new int[] { moKeyCurrencyBank.getValue()[0] }, SLibConstants.DESCRIPTION_CODE)); 
-                moKeyAccountDebit.setEnabled(true);
+                moKeyAccountDebit.setEnabled(true);                               
+                renderCurrencyDoc();
             }
         }
         else {
@@ -2133,7 +2141,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                 moRow.setTaxRetained(resulSet.getDouble("f_ret_cur"));
                 moRow.setTotal(resulSet.getDouble("f_tot_cur"));
                 moRow.setBalance(new SMoney(resulSet.getDouble("f_bal_cur"), resulSet.getInt("f_id_cur"), resulSet.getDouble("f_ext_rate"),((int []) miClient.getSession().getSessionCustom().getLocalCurrencyKey())[0] ));
-                moRow.setBalanceTot(new SMoney(0, resulSet.getInt("f_id_cur"), 0, ((int []) miClient.getSession().getSessionCustom().getLocalCurrencyKey())[0] ));
+                moRow.setBalanceTot(new SMoney(0, resulSet.getInt("f_id_cur"), moKeyCurrencyBank.getValue()[0] == moKeyCurrencyDoc.getValue()[0] ? 1 : 0, ((int []) miClient.getSession().getSessionCustom().getLocalCurrencyKey())[0] ));
                 moRow.setBalanceTotByBizPartner(0);
                 moRow.setCurrencyKey((moKeyCurrencyBank.getValue().length == 0 ? SDataReadDescriptions.getCatalogueDescription(((SClientInterface) miClient), SDataConstants.CFGU_CUR, miClient.getSession().getSessionCustom().getLocalCurrencyKey(), SLibConstants.DESCRIPTION_CODE) : SDataReadDescriptions.getCatalogueDescription(((SClientInterface) miClient), SDataConstants.CFGU_CUR, moKeyCurrencyBank.getValue(), SLibConstants.DESCRIPTION_CODE)));
                 moRow.setCurrencyKeyCy(resulSet.getString("cur_key"));
@@ -2173,6 +2181,10 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
             moGridPayments.getTable().getTableHeader().setResizingAllowed(true);
             moGridPayments.getTable().setRowSorter(new TableRowSorter<AbstractTableModel>(moGridPayments.getModel()));
             moGridPayments.getTable().getColumnModel().getColumn(COL_APP_PAY_BANK).setCellEditor(null);
+            
+            if (moKeyCurrencyBank.getValue().length > 0 && moKeyCurrencyDoc.getValue().length > 0) {
+                ((SGridColumnForm) moGridPayments.getGridColumn(COL_TC)).setEditable(moKeyCurrencyBank.getValue()[0] != moKeyCurrencyDoc.getValue()[0]);
+            }
             
             if (moGridPayments.getTable().getRowCount() > 0) {
                 moGridPayments.renderGridRows();
@@ -2601,13 +2613,8 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
             case COL_BAL:
                 processEditingStoppedBalance();
                 break;
-            case COL_TC:    
-                if (moKeyCurrencyBank.getValue()[0] == moKeyCurrencyDoc.getValue()[0]) {
-                    miClient.showMsgBoxWarning("No se puede modificar el campo 'Tipo de cambio', el banco y documento tienen la misma moneda.");
-                }
-                else {
+            case COL_TC:
                     processEditingStoppedBalance();
-                }
                 break;
             default:
                 break;

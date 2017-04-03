@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.Vector;
+import sa.lib.SLibUtils;
 
 /* IMPORTANT:
  * Every single change made to the definition of this class' table must be updated also in the following classes:
@@ -747,6 +748,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
 
             if (moDbmsDataCounterpartDiog != null) {
                 moDbmsDataCounterpartDiog.setIsDeleted(mbIsDeleted);
+                moDbmsDataCounterpartDiog.setReference(msNumber);
                 moDbmsDataCounterpartDiog.setIsShipmentRequired(mbIsShipmentRequired);
                 moDbmsDataCounterpartDiog.setIsShipped(mbIsShipped);
                 moDbmsDataCounterpartDiog.setIsAudited(mbIsAudited);
@@ -769,6 +771,8 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
                 }
             }
 
+            calculateTotal();
+            
             //System.out.println("SDataDiog: 1b");
             callableStatement = connection.prepareCall(
                     "{ CALL trn_diog_save(" +
@@ -897,6 +901,16 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     @Override
     public java.util.Date getLastDbUpdate() {
         return mtUserEditTs;
+    }
+    
+    public void calculateTotal() {
+        for (SDataDiogEntry entry : mvDbmsDiogEntries) {
+            if (!entry.getIsDeleted()) {
+                entry.calculateTotal();
+                
+                mdValue_r = SLibUtilities.round(mdValue_r + entry.getValue(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+            }
+        }
     }
 
     @Override
@@ -1033,6 +1047,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         registry.setDate(this.getDate());
         registry.setNumberSeries(this.getNumberSeries());
         registry.setNumber(this.getNumber());
+        registry.setReference(this.getReference());
         registry.setValue_r(this.getValue_r());
         registry.setCostAsigned(this.getCostAsigned());
         registry.setCostTransferred(this.getCostTransferred());
