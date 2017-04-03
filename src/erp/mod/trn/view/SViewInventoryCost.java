@@ -6,6 +6,7 @@
 package erp.mod.trn.view;
 
 import erp.data.SDataConstants;
+import erp.gui.grid.SGridFilterPanelCompound;
 import erp.mcfg.data.SDataParamsErp;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -16,6 +17,7 @@ import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridFilterDateCutOff;
+import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiClient;
@@ -29,6 +31,7 @@ import sa.lib.gui.SGuiDate;
 public class SViewInventoryCost extends SGridPaneView {
 
     private SGridFilterDateCutOff moFilterDateCutOff;
+    private SGridFilterPanelCompound moFilterWarehouse;
 
     public SViewInventoryCost(SGuiClient client, int subtype, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRNX_STK_COST, subtype, title, null);
@@ -37,10 +40,15 @@ public class SViewInventoryCost extends SGridPaneView {
 
     private void initComponentsCustom() {
         setRowButtonsEnabled(false, false, false, false, false);
-
+        
         moFilterDateCutOff = new SGridFilterDateCutOff(miClient, this);
         moFilterDateCutOff.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_DATE, SLibTimeUtils.getEndOfYear(miClient.getSession().getCurrentDate()).getTime()));
+        
+        moFilterWarehouse = new SGridFilterPanelCompound(miClient, this, SGridFilterPanelCompound.PNL_TP_COB_ENT, SModConsts.BPSU_BPB, SModConsts.CFGU_COB_ENT);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterWarehouse);
+        
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDateCutOff);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterWarehouse);
     }
 
     @Override
@@ -54,6 +62,16 @@ public class SViewInventoryCost extends SGridPaneView {
         if (filter != null) {
             sql += (sql.isEmpty() ? "" : "AND ") + "s.id_year = " + SLibTimeUtils.digestYear((SGuiDate) filter)[0] + " AND " +
                         "s.dt <= '" + SLibUtils.DbmsDateFormatDate.format((SGuiDate) filter) + "' ";
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.BPSU_BPB)).getValue();
+        if (filter != null && ((int[]) filter).length == 1) {
+            sql += (sql.isEmpty() ? "" : "AND ") + "s.id_cob = " + ((int[]) filter)[0] + " ";
+        }
+
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.CFGU_COB_ENT)).getValue();
+        if (filter != null && ((int[]) filter).length == 2) {
+            sql += (sql.isEmpty() ? "" : "AND ") + "s.id_cob = " + ((int[]) filter)[0] + " AND s.id_wh = " + ((int[]) filter)[1] + " ";
         }
 
         switch (mnGridSubtype) {
@@ -95,6 +113,10 @@ public class SViewInventoryCost extends SGridPaneView {
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON s.id_item = i.id_item "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON s.id_unit = u.id_unit "
                         + "WHERE s.b_del = 0 AND " + sql + " "
+                        /*
+                        + "s.id_cob = " + ((SClientInterface) miClient).getSessionXXX().getCurrentCompanyBranchEntityKey(SDataConstantsSys.CFGS_CT_ENT_WH)[0] + " AND "
+                        + "s.id_wh = " + ((SClientInterface) miClient).getSessionXXX().getCurrentCompanyBranchEntityKey(SDataConstantsSys.CFGS_CT_ENT_WH)[1] + " "
+                        */
                         + "GROUP BY s.id_item, s.id_unit "
                         + "HAVING _stk <> 0 OR _cst <> 0 "
                         + "ORDER BY "

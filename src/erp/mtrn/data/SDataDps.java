@@ -100,6 +100,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public static final String TXT_AUT_AUTHORN_REJ_LIM_USR_MON = "Tope mensual usuario";
     public static final String TXT_AUT_AUTHORN_REJ_LIM_FUNC_MON = "Tope mensual área funcional";
     
+    public static final int AMT_PRE_PAY = 1;
+    public static final int AMT_PRE_PAY_CY = 2;
+    
     public static final HashMap<Integer, String> AutAuthornRejMap = new HashMap<Integer, String>();
     
     static {
@@ -659,12 +662,30 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
         return entry;
     }
+    
+    private double obtainAmountPrepayments(final int amountPrepaymentType) {
+        double taxAmount = 0;
+        double amountPrepayment = 0;
+        
+        for (SDataDpsEntry entry : mvDbmsDpsEntries) {
+            if (!entry.getIsDeleted() && entry.getIsPrepayment()) {
+                for (SDataDpsEntryTax entryTax : entry.getDbmsEntryTaxes()) {
+                    taxAmount = SLibUtilities.round(taxAmount + (amountPrepaymentType == AMT_PRE_PAY_CY ? entryTax.getTaxCy() : entryTax.getTax()), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+                }
+                amountPrepayment = SLibUtilities.round((amountPrepayment + (amountPrepaymentType == AMT_PRE_PAY_CY ? entry.getSubtotalCy_r() : entry.getSubtotal_r()) + taxAmount), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+            }
+        }
+        
+        return amountPrepayment;
+    }
 
     private boolean testDeletion(java.sql.Connection poConnection, java.lang.String psMsg, int pnAction) throws java.sql.SQLException, java.lang.Exception {
         int i = 0;
         int[] anPeriodKey = null;
         double dBalance;
         double dBalanceCy;
+        double dAuxTotal = 0;
+        double dAuxTotalCy = 0;
         String sSql = "";
         String sMsg = psMsg;
         String sMsgAux = "";
@@ -768,17 +789,22 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     dBalanceCy *= -1d;
                 }
 
-                if (dBalance != mdTotal_r) {
+                // Subtract amount prepayment the total and subtract amount prepayment currency the total currency:
+                
+                dAuxTotal = SLibUtilities.round(mdTotal_r - obtainAmountPrepayments(AMT_PRE_PAY), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+                dAuxTotalCy = SLibUtilities.round(mdTotalCy_r - obtainAmountPrepayments(AMT_PRE_PAY_CY), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+                
+                if (dBalance != dAuxTotal) {
                     mnDbmsErrorId = 101;
                     msDbmsError = sMsg + "¡El saldo del documento en la moneda local, " + oDecimalFormat.format(dBalance) + ", " +
-                            "es distinto al total del mismo, " + oDecimalFormat.format(mdTotal_r) + "!";
+                            "es distinto al total del mismo, " + oDecimalFormat.format(dAuxTotal) + "!";
                     throw new Exception(msDbmsError);
                 }
 
-                if (dBalanceCy != mdTotalCy_r) {
+                if (dBalanceCy != dAuxTotalCy) {
                     mnDbmsErrorId = 101;
                     msDbmsError = sMsg + "¡El saldo del documento en la moneda del documento, " + oDecimalFormat.format(dBalanceCy) + ", " +
-                            "es distinto al total del mismo, " + oDecimalFormat.format(mdTotalCy_r) + "!";
+                            "es distinto al total del mismo, " + oDecimalFormat.format(dAuxTotalCy) + "!";
                     throw new Exception(msDbmsError);
                 }
             }

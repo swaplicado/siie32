@@ -23,7 +23,6 @@ import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Vector;
-import sa.gui.util.SUtilConsts;
 
 /**
  *
@@ -263,6 +262,11 @@ public class SDialogUtilStockClosing extends javax.swing.JDialog {
 
                 stockMoves = STrnUtilities.obtainStockWarehouse(miClient, (mnPkYearId - 1), SLibTimeUtilities.createDate(mnPkYearId - 1, 12, 31), new int[] { mnFkCompanyBranchId, mnFkWarehouseId });
 
+                iog = STrnUtilities.createDataDiogSystem(miClient, mnPkYearId, SLibTimeUtilities.createDate(mnPkYearId, 1, 1), mnFkCompanyBranchId, mnFkWarehouseId, SDataConstantsSys.TRNS_TP_IOG_IN_ADJ_INV, "EA", stockMoves);
+                
+                mvDbmsDiog.add(iog);
+                
+                /*
                 iogEntries.clear();
                 for (STrnStockMove stockMove : stockMoves) {
                     iogEntries.add(processStockEntries(stockMove));
@@ -299,6 +303,7 @@ public class SDialogUtilStockClosing extends javax.swing.JDialog {
                 iog.getDbmsEntries().addAll(iogEntries);
 
                 mvDbmsDiog.add(iog);
+                */
             }
         }
         catch (java.sql.SQLException e) {
