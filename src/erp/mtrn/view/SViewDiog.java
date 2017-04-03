@@ -153,7 +153,7 @@ public class SViewDiog extends erp.lib.table.STableTab implements java.awt.event
         jbPrint.setEnabled(true);
 
         STableField[] aoKeyFields = new STableField[2];
-        STableColumn[] aoTableColumns = new STableColumn[35];
+        STableColumn[] aoTableColumns = new STableColumn[36];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "iog.id_year");
@@ -180,6 +180,7 @@ public class SViewDiog extends erp.lib.table.STableTab implements java.awt.event
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "dps.dt", "Fecha doc. CV", STableConstants.WIDTH_DATE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_mfg", "Ord. prod.", STableConstants.WIDTH_DOC_NUM);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_rec", "Folio póliza", STableConstants.WIDTH_RECORD_NUM);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "iog.ref", "Referencia", STableConstants.WIDTH_RECORD_NUM);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "iog.b_audit", "Auditado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ua.usr", "Usr. auditoría", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "iog.ts_audit", "Auditoría", STableConstants.WIDTH_DATE_TIME);
@@ -313,7 +314,7 @@ public class SViewDiog extends erp.lib.table.STableTab implements java.awt.event
             }
         }
 
-        msSql = "SELECT iog.id_year, iog.id_doc, iog.dt, iog.val_r, iog.b_ship_req, iog.b_ship, iog.b_audit, iog.b_authorn, iog.b_sys, iog.b_del, " +
+        msSql = "SELECT iog.id_year, iog.id_doc, iog.dt, iog.val_r, iog.b_ship_req, iog.b_ship, iog.ref, iog.b_audit, iog.b_authorn, iog.b_sys, iog.b_del, " +
                 "CONCAT(iog.num_ser, IF(LENGTH(iog.num_ser) = 0, '', '-'), erp.lib_fix_int(iog.num, " + SDataConstantsSys.NUM_LEN_IOG + ")) AS f_num, " +
                 "tp_iog.tp_iog, tp_iog.code, bpb.code, ent.code, " +
                 "CONCAT(iog_cp.num_ser, IF(LENGTH(iog_cp.num_ser) = 0, '', '-'), erp.lib_fix_int(iog_cp.num, " + SDataConstantsSys.NUM_LEN_IOG + ")) AS f_num_cp, " +

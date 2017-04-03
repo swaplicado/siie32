@@ -275,6 +275,7 @@ public class SDialogUtilStockClosing extends javax.swing.JDialog {
                 iog.setDate(SLibTimeUtilities.createDate(mnPkYearId, 1, 1));
                 iog.setNumberSeries("EA");
                 iog.setNumber("");
+                iog.setReference("");
                 iog.setValue_r(0d);
                 iog.setCostAsigned(0);
                 iog.setCostTransferred(0);

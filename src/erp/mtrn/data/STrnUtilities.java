@@ -520,6 +520,7 @@ public abstract class STrnUtilities {
                     iog.setDate(date);
                     iog.setNumberSeries(series);
                     iog.setNumber("");
+                    iog.setReference("");
                     iog.setIsAudited(false);
                     iog.setIsAuthorized(false);
                     iog.setIsRecordAutomatic(false);

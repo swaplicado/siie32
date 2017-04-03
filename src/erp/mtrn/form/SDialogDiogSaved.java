@@ -59,9 +59,11 @@ public class SDialogDiogSaved extends javax.swing.JDialog implements java.awt.ev
         jpDocDate = new javax.swing.JPanel();
         jlDate = new javax.swing.JLabel();
         jtfDate = new javax.swing.JTextField();
-        jpDocNumber = new javax.swing.JPanel();
         jlSeries = new javax.swing.JLabel();
         jtfNumber = new javax.swing.JTextField();
+        jpDocNumber = new javax.swing.JPanel();
+        jRef = new javax.swing.JLabel();
+        jtfRef = new javax.swing.JTextField();
         jpWarehouseSource = new javax.swing.JPanel();
         jlWarehouseSource = new javax.swing.JLabel();
         jtfCompanyBranchSource = new javax.swing.JTextField();
@@ -101,13 +103,13 @@ public class SDialogDiogSaved extends javax.swing.JDialog implements java.awt.ev
 
         jpDocType.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDiogType.setFont(new java.awt.Font("Tahoma", 1, 11));
+        jlDiogType.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jlDiogType.setText("Tipo documento:");
         jlDiogType.setPreferredSize(new java.awt.Dimension(100, 23));
         jpDocType.add(jlDiogType);
 
         jtfDiogType.setEditable(false);
-        jtfDiogType.setFont(new java.awt.Font("Tahoma", 1, 11));
+        jtfDiogType.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jtfDiogType.setText("DOCUMENT TYPE");
         jtfDiogType.setFocusable(false);
         jtfDiogType.setPreferredSize(new java.awt.Dimension(325, 23));
@@ -127,21 +129,31 @@ public class SDialogDiogSaved extends javax.swing.JDialog implements java.awt.ev
         jtfDate.setPreferredSize(new java.awt.Dimension(75, 23));
         jpDocDate.add(jtfDate);
 
-        jPanel3.add(jpDocDate);
-
-        jpDocNumber.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
         jlSeries.setText("Serie y folio:");
         jlSeries.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpDocNumber.add(jlSeries);
+        jpDocDate.add(jlSeries);
 
-        jtfNumber.setBackground(new java.awt.Color(255, 204, 51));
         jtfNumber.setEditable(false);
+        jtfNumber.setBackground(new java.awt.Color(255, 204, 51));
         jtfNumber.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jtfNumber.setText("NUMBER");
         jtfNumber.setFocusable(false);
         jtfNumber.setPreferredSize(new java.awt.Dimension(130, 23));
-        jpDocNumber.add(jtfNumber);
+        jpDocDate.add(jtfNumber);
+
+        jPanel3.add(jpDocDate);
+
+        jpDocNumber.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jRef.setText("Referencia:");
+        jRef.setPreferredSize(new java.awt.Dimension(100, 14));
+        jpDocNumber.add(jRef);
+
+        jtfRef.setText(" ");
+        jtfRef.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jtfRef.setEnabled(false);
+        jtfRef.setPreferredSize(new java.awt.Dimension(135, 23));
+        jpDocNumber.add(jtfRef);
 
         jPanel3.add(jpDocNumber);
 
@@ -233,8 +245,8 @@ public class SDialogDiogSaved extends javax.swing.JDialog implements java.awt.ev
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-488)/2, (screenSize.height-244)/2, 488, 244);
+        setSize(new java.awt.Dimension(488, 244));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -270,6 +282,7 @@ public class SDialogDiogSaved extends javax.swing.JDialog implements java.awt.ev
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JLabel jRef;
     private javax.swing.JButton jbClose;
     private javax.swing.JButton jbPrintClose;
     private javax.swing.JLabel jlDate;
@@ -289,6 +302,7 @@ public class SDialogDiogSaved extends javax.swing.JDialog implements java.awt.ev
     private javax.swing.JTextField jtfDate;
     private javax.swing.JTextField jtfDiogType;
     private javax.swing.JTextField jtfNumber;
+    private javax.swing.JTextField jtfRef;
     private javax.swing.JTextField jtfWarehouseDestiny;
     private javax.swing.JTextField jtfWarehouseDestinyCode;
     private javax.swing.JTextField jtfWarehouseSource;
@@ -302,7 +316,7 @@ public class SDialogDiogSaved extends javax.swing.JDialog implements java.awt.ev
         jtfDate.setText(miClient.getSessionXXX().getFormatters().getDateFormat().format(moDiog.getDate()));
         jtfNumber.setText((moDiog.getNumberSeries().length() == 0 ? "" : moDiog.getNumberSeries() + "-") +
                 (moDiog.getNumber().length() >= SDataConstantsSys.NUM_LEN_IOG ? "" : SLibUtilities.textRepeat("0", SDataConstantsSys.NUM_LEN_IOG - moDiog.getNumber().length())) + moDiog.getNumber());
-
+        jtfRef.setText(moDiog.getReference());
         jtfCompanyBranchSource.setText(moDiog.getDbmsCompanyBranch());
         jtfCompanyBranchSourceCode.setText(moDiog.getDbmsCompanyBranchCode());
         jtfWarehouseSource.setText(moDiog.getDbmsWarehouse());
