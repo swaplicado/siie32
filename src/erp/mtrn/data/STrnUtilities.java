@@ -25,6 +25,7 @@ import erp.mbps.data.SDataEmployee;
 import erp.mcfg.data.SDataCompanyBranchEntity;
 import erp.mhrs.data.SDataFormerPayroll;
 import erp.mhrs.data.SDataFormerPayrollEmp;
+import erp.mitm.data.SDataItem;
 import erp.mmfg.data.SDataProductionOrder;
 import erp.mmfg.data.SDataProductionOrderCharge;
 import erp.mmfg.data.SDataProductionOrderChargeEntry;
@@ -2962,5 +2963,115 @@ public abstract class STrnUtilities {
         }
         
         return updated;
+    }
+    
+    /**
+     * Processes a stock move and generates a entry for a diog
+     * @param client ERP Client interface.
+     * @param stockMove object STrnStockMove type
+     * @return object SDataDiogEntry type
+     * @throws java.lang.Exception 
+     */
+    private static SDataDiogEntry processStockEntries(final SClientInterface client, STrnStockMove stockMove) throws java.lang.Exception {
+        SDataDiogEntry diogEntry = null;
+        SDataItem item = null;
+
+        item = (SDataItem) SDataUtilities.readRegistry(client, SDataConstants.ITMU_ITEM, new int[] { stockMove.getPkItemId() }, SLibConstants.EXEC_MODE_VERBOSE);
+
+        diogEntry = new SDataDiogEntry();
+        diogEntry.setPkYearId(SLibConstants.UNDEFINED);
+        diogEntry.setPkDocId(SLibConstants.UNDEFINED);
+        diogEntry.setPkEntryId(SLibConstants.UNDEFINED);
+        diogEntry.setQuantity(stockMove.getQuantity());
+        diogEntry.setValueUnitary(0);
+        diogEntry.setValue(0);
+        diogEntry.setOriginalQuantity(stockMove.getQuantity());
+        diogEntry.setOriginalValueUnitary(0);
+        diogEntry.setSortingPosition(0);
+        diogEntry.setIsInventoriable(true);
+        diogEntry.setIsDeleted(false);
+        diogEntry.setFkItemId(item.getPkItemId());
+        diogEntry.setFkUnitId(item.getFkUnitId());
+        diogEntry.setFkOriginalUnitId(item.getFkUnitId());
+
+        diogEntry.setFkDpsYearId_n(SLibConstants.UNDEFINED);
+        diogEntry.setFkDpsDocId_n(SLibConstants.UNDEFINED);
+        diogEntry.setFkDpsEntryId_n(SLibConstants.UNDEFINED);
+        diogEntry.setFkDpsAdjustmentYearId_n(SLibConstants.UNDEFINED);
+        diogEntry.setFkDpsAdjustmentDocId_n(SLibConstants.UNDEFINED);
+        diogEntry.setFkDpsAdjustmentEntryId_n(SLibConstants.UNDEFINED);
+        diogEntry.setFkMfgYearId_n(SLibConstants.UNDEFINED);
+        diogEntry.setFkMfgOrderId_n(SLibConstants.UNDEFINED);
+        diogEntry.setFkMfgChargeId_n(SLibConstants.UNDEFINED);
+
+        diogEntry.setFkUserNewId(client.getSession().getUser().getPkUserId());
+        diogEntry.setFkUserEditId(client.getSession().getUser().getPkUserId());
+        diogEntry.setFkUserDeleteId(client.getSession().getUser().getPkUserId());
+
+        diogEntry.setDbmsItem(item.getItem());
+        diogEntry.setDbmsItemKey(item.getKey());
+        diogEntry.setDbmsUnit(item.getDbmsDataUnit().getUnit());
+        diogEntry.setDbmsUnitSymbol(item.getDbmsDataUnit().getSymbol());
+        diogEntry.setDbmsOriginalUnit(item.getDbmsDataUnit().getUnit());
+        diogEntry.setDbmsOriginalUnitSymbol(item.getDbmsDataUnit().getSymbol());
+
+        diogEntry.getAuxStockMoves().add(stockMove);
+
+        return diogEntry;
+    }
+    
+    /**
+     * 
+     * @param client client ERP Client interface.
+     * @param year year for Diog
+     * @param date date for Diog
+     * @param companyBranch company branch for Diog
+     * @param warehouse warehouse for Diog
+     * @param diogtype Diog type SModSysConsts.TRNS_TP_IOG_IN_ ...
+     * @param numberSerie number serie for Diog
+     * @param stockMoves array list stock moves to process
+     * @return object SDataDiog type
+     * @throws java.lang.Exception 
+     */
+    public static SDataDiog createDataDiogSystem(final SClientInterface client, final int year, final Date date, final int companyBranch, final int warehouse, final int[] diogtype, final String numberSerie, final Vector<STrnStockMove> stockMoves) throws java.lang.Exception {
+        Vector<SDataDiogEntry> iogEntries = new Vector<>();
+        SDataDiog iog = null;
+        
+        iogEntries.clear();
+        for (STrnStockMove stockMove : stockMoves) {
+            iogEntries.add(processStockEntries(client, stockMove));
+        }
+        
+        iog = new SDataDiog();
+
+        iog.setPkYearId(year);
+        iog.setPkDocId(0);
+        iog.setDate(date);
+        iog.setNumberSeries(numberSerie);
+        iog.setNumber("");
+        iog.setValue_r(0d);
+        iog.setCostAsigned(0);
+        iog.setCostTransferred(0);
+        iog.setIsShipmentRequired(false);
+        iog.setIsShipped(false);
+        iog.setIsAudited(false);
+        iog.setIsAuthorized(false);
+        iog.setIsRecordAutomatic(false);
+        iog.setIsSystem(true);
+        iog.setIsDeleted(false);
+        iog.setFkDiogCategoryId(diogtype[0]);
+        iog.setFkDiogClassId(diogtype[1]);
+        iog.setFkDiogTypeId(diogtype[2]);
+        iog.setFkDiogAdjustmentTypeId(SModSysConsts.TRNU_TP_IOG_ADJ_NA);
+        iog.setFkCompanyBranchId(companyBranch);
+        iog.setFkWarehouseId(warehouse);
+        iog.setFkUserShippedId(SUtilConsts.USR_NA_ID);
+        iog.setFkUserAuditedId(SUtilConsts.USR_NA_ID);
+        iog.setFkUserAuthorizedId(SUtilConsts.USR_NA_ID);
+        iog.setFkUserNewId(client.getSession().getUser().getPkUserId());
+        iog.getDbmsEntries().clear();
+        iog.getDbmsEntries().addAll(iogEntries);
+                
+        return iog;
     }
 }

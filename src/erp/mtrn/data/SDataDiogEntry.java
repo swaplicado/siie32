@@ -14,6 +14,7 @@ import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.Types;
 import java.util.Vector;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -437,6 +438,15 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     @Override
     public java.util.Date getLastDbUpdate() {
         return mtUserEditTs;
+    }
+    
+    public void calculateTotal() {
+        if (mdQuantity == 0) {
+            mdValue = SLibUtilities.round(mdValueUnitary, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+        }
+        else {
+            mdValue = SLibUtilities.round(mdQuantity * mdValueUnitary, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+        }
     }
 
     private boolean isEntryAlreadyDeleted() {
