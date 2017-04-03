@@ -26,6 +26,7 @@ import erp.mod.hrs.form.SDialogRepHrsReportsPayroll;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.form.SDialogAnnulCfdi;
+import erp.print.SDataConstantsPrint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Néstor Ávalos, Juan Barajas
+ * @author Néstor Ávalos, Juan Barajas, Alfredo Perez
  */
 public class SViewPayroll extends SGridPaneView implements ActionListener {
 
@@ -64,6 +65,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
     private JButton jbPrint;
     private JButton jbPrintAcknowledgmentCancellation;
     private JButton jbSend;
+    private JButton jbSendPayrollReceipts;
     private JButton jbClosePayroll;
     private JButton jbPrintReportsPayroll;
     private JButton jbLayout;
@@ -93,6 +95,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir nómina", this);
         jbPrintAcknowledgmentCancellation = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT_ACK_CAN), "Imprimir acuse de cancelación", this);
         jbSend = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")), "Enviar nómina", this);
+        jbSendPayrollReceipts = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")), "Enviar recibos de nómina", this);
         jbClosePayroll = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")), "Cerrar/abrir nómina", this);
         jbPrintReportsPayroll = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Reportes de nómina", this);
         jbLayout = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout pago de nóminas", this);
@@ -122,6 +125,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbClosePayroll);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrintReportsPayroll);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayout);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSendPayrollReceipts);
     }
 
     @Override
@@ -522,7 +526,30 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
             }
         }
     }
+    
+    private void actionSendPayrollReceipts() {
+        if (jbSendPayrollReceipts.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
 
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else {
+                    try {
+                        SHrsUtils.SendPayrollReceipts(miClient, SDataConstantsPrint.PRINT_MODE_PDF,  gridRow.getRowPrimaryKey());
+                    } 
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }
+                }
+            }
+        }
+    }
+ 
     private void actionLayout() {
         SHrsPayrollRowEmployeeAvailable receipt = null;
         
@@ -730,6 +757,9 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
             }
             else if (button == jbLayout) {
                 actionLayout();
+            }
+            else if (button == jbSendPayrollReceipts) {
+                actionSendPayrollReceipts();
             }
         }
     }

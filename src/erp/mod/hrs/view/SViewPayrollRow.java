@@ -44,7 +44,7 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Néstor Ávalos, Juan Barajas
+ * @author Néstor Ávalos, Juan Barajas, Alfredo Perez
  */
 public class SViewPayrollRow extends SGridPaneView implements ActionListener {
 
@@ -58,6 +58,7 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
     private JButton jbPrint;
     private JButton jbPrintAcknowledgmentCancellation;
     private JButton jbSend;
+    private JButton jbSendPayrollReceipt;
     private JButton jbVerifyCfdi;
     private JButton jbDiactivatePac;
 
@@ -86,6 +87,7 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
         jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir CFDI recibo nómina", this);
         jbPrintAcknowledgmentCancellation = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT_ACK_CAN), "Imprimir acuse de cancelación", this);
         jbSend = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")), "Enviar comprobante", this);
+        jbSendPayrollReceipt = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")), "Enviar recibo de nómina", this);
         jbVerifyCfdi = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_ok.gif")), "Verificar timbrado o cancelación del CFDI", this);
         jbDiactivatePac = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif")), "Limpiar inconsistencias de timbrado o cancelación del CFDI", this);
         
@@ -105,6 +107,7 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrintReceipt);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSendPayrollReceipt);
         /* XXX (jbarajas, 2016-08-16) slowly open payroll
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSignXml);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAnnul);
@@ -135,9 +138,9 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
-
                         SHrsUtils.printPayrollReceipt(miClient, SDataConstantsPrint.PRINT_MODE_VIEWER,  gridRow.getRowPrimaryKey());
-                    } catch (Exception e) {
+                    } 
+                    catch (Exception e) {
                         SLibUtils.showException(this, e);
                     }
                 }
@@ -189,7 +192,7 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
                             }
                             else {
                                 /* XXX jbarajas 04/02/2016 sign and sending CFDI
-                                needUpdate = SCfdUtils.signCfdi((SClientInterface) miClient, cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR);
+                                    needUpdate = SCfdUtils.signCfdi((SClientInterface) miClient, cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR);
                                 */
                                 if (((SClientInterface) miClient).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
                                     needUpdate = SCfdUtils.signAndSendCfdi((SClientInterface) miClient, cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, true, true);
@@ -514,7 +517,30 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
             }
         }
     }
+    
+    private void actionSendPayrollReceipt() {
+        if (jbSendPayrollReceipt.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
 
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else {
+                    try {
+                        SHrsUtils.SendPayrollReceipt(miClient, SDataConstantsPrint.PRINT_MODE_PDF, gridRow.getRowPrimaryKey());
+                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }
+                }
+            }
+        }
+    }
+    
     /*
      * Public methods
      */
@@ -683,6 +709,9 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
             }
             else if (button == jbDiactivatePac) {
                 actionCfdiDiactivateFlags();
+            }
+            else if (button == jbSendPayrollReceipt) {
+                actionSendPayrollReceipt();
             }
         }
     }
