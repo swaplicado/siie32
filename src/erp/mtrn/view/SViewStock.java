@@ -15,7 +15,6 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
-import erp.mod.SModSysConsts;
 import erp.mtrn.form.SDialogStockCardex;
 import erp.mtrn.form.SDialogStockSegregations;
 import erp.table.SFilterConstants;
@@ -26,13 +25,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JToggleButton;
 import javax.swing.table.DefaultTableCellRenderer;
-import sa.lib.SLibRpnArgument;
-import sa.lib.SLibRpnArgumentType;
-import sa.lib.SLibRpnOperator;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona
+ * @author Sergio Flores, Edwin Carmona, Alfredo Perez.
  */
 public class SViewStock extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -202,13 +198,6 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         }
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
-        /*aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_val_u", "Val. u. entradas máx. $", STableConstants.WIDTH_QUANTITY_2X);
-        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "", "Val. máx. $", STableConstants.WIDTH_VALUE);
-        aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_stk", SLibRpnArgumentType.OPERAND));
-        aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_val_u", SLibRpnArgumentType.OPERAND));
-        aoTableColumns[i++].getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.MULTIPLICATION, SLibRpnArgumentType.OPERATOR));*/
 
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);
