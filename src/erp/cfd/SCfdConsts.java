@@ -80,7 +80,7 @@ public abstract class SCfdConsts {
 
     public static final int CER_EXP_DAYS_WARN = 30;     // days before certificate expiration to show warning message
 
-    public static final int CFDI_STAMP_DELAY_DAYS = 2;  // maximum dealy days to CFDI stamping
+    public static final int CFDI_STAMP_DELAY_DAYS = 3;  // maximum delay days for CFDI stamping
 
     public static final int CFDI_FILE_XML = 1;
     public static final int CFDI_FILE_PDF = 2;

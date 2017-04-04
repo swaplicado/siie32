@@ -73,7 +73,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import javax.mail.MessagingException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -223,15 +225,21 @@ public abstract class SCfdUtils implements Serializable {
             else if (!isValidate) {
                 if (SLibTimeUtils.convertToDateOnly(cfd.getTimestamp()).after(client.getSessionXXX().getSystemDate())) {
                     can = client.showMsgBoxConfirm("La fecha del documento " +
-                            "(" + client.getSessionXXX().getFormatters().getDateFormat().format(cfd.getTimestamp()) + ") es posterior a la fecha del sistema " +
-                            "(" + client.getSessionXXX().getFormatters().getDateFormat().format(client.getSessionXXX().getSystemDate()) + ").\n" +
+                            "(" + SLibUtils.DateFormatDate.format(cfd.getTimestamp()) + ") es posterior a la fecha del sistema " +
+                            "(" + SLibUtils.DateFormatDate.format(client.getSessionXXX().getSystemDate()) + ").\n" +
                             "¿Está seguro que desea timbrar el documento?") == JOptionPane.YES_OPTION;
                 }
-                else if (SLibTimeUtilities.getDaysDiff(client.getSessionXXX().getSystemDate(), SLibTimeUtils.convertToDateOnly(cfd.getTimestamp())) > SCfdConsts.CFDI_STAMP_DELAY_DAYS) {
-                    throw new Exception("La fecha del documento " +
-                            "(" + client.getSessionXXX().getFormatters().getDateFormat().format(cfd.getTimestamp()) + ") es anterior a la fecha del sistema por más de 2 días " +
-                            "(" + client.getSessionXXX().getFormatters().getDateFormat().format(client.getSessionXXX().getSystemDate()) + ").\n" +
-                            "No se puede timbrar el documento.");
+                else {
+                    int[] today = SLibTimeUtils.digestDate(client.getSessionXXX().getSystemDate());
+                    GregorianCalendar now = new GregorianCalendar();
+                    GregorianCalendar limit = new GregorianCalendar(today[0], today[1] - 1, today[2], now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), now.get(Calendar.SECOND));   // mix ofsystem's date + current time
+                    
+                    if (SLibTimeUtilities.getDaysDiff(limit.getTime(), cfd.getTimestamp()) > SCfdConsts.CFDI_STAMP_DELAY_DAYS) {
+                        throw new Exception("La fecha-hora del documento " +
+                                "(" + SLibUtils.DateFormatDatetime.format(cfd.getTimestamp()) + ") es anterior a la fecha-hora del sistema por más de " + SCfdConsts.CFDI_STAMP_DELAY_DAYS + " días " +
+                                "(" + SLibUtils.DateFormatDatetime.format(limit.getTime()) + ").\n" +
+                                "No se puede timbrar el documento.");
+                    }
                 }
             }
         }

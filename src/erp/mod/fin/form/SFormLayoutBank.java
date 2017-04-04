@@ -839,7 +839,6 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
     private void enableGeneralFields(boolean enable) {
         jbPickRecord.setEnabled(false);
         moDateDate.setEnabled(true);
-        moKeyCurrencyBank.setEnabled(!enable);
         moKeyLayouId.setEnabled(enable);
         moKeyBankLayoutType.setEnabled(enable);
         jbShowDocs.setEnabled(enable);
@@ -907,13 +906,11 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                     break;
             }
             moIntConsecutiveDay.setEnabled(mnLayout == SFinConsts.LAY_BANK_BANBAJIO);
-            moKeyCurrencyBank.setEnabled(true);
         }
         else {
             moTextConcept.setEnabled(false);
             moIntConsecutiveDay.setEnabled(false);
             moKeyCurrencyBank.resetField();
-            moKeyCurrencyBank.setEnabled(false);
         }
     }
 
@@ -924,8 +921,6 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
             moDataBizPartnerBranchBankAccount = (SDataBizPartnerBranchBankAccount) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.BPSU_BANK_ACC, new int[] { moDataAccountCash.getFkBizPartnerBranchId_n(), moDataAccountCash.getFkBankAccountId_n() }, SLibConstants.EXEC_MODE_SILENT);
             mnCurrencyId = moDataBizPartnerBranchBankAccount.getFkCurrencyId();
             msAccountDebit = moDataBizPartnerBranchBankAccount.getBankAccountNumber();
-            
-            moKeyCurrencyBank.setEnabled(true);
           
             moParamsMap = new HashMap<Integer, Object>();
             moParamsMap.put(SDataConstants.FIN_ACC_COB_ENT, moDataAccountCash.getPkCompanyBranchId());
@@ -2420,7 +2415,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
         setFormEditable(true);
         
         enableGeneralFields(moRegistry.isRegistryNew());
-
+        moKeyCurrencyBank.setEnabled(moRegistry.isRegistryNew());
         moTextConcept.setEnabled(false);
         moKeyAccountDebit.setEnabled(false);
         moKeyBankLayoutType.setEnabled(false);
