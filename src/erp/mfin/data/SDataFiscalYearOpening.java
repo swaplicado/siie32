@@ -251,7 +251,7 @@ public class SDataFiscalYearOpening extends erp.lib.data.SDataRegistry implement
                                 "re.fid_item_n, re.fid_unit_n, re.fid_item_aux_n, re.fid_tax_bas_n, re.fid_tax_n, '' AS f_ref, 0 AS b_ref_tax, " +
                                 "re.fid_bp_nr, re.fid_bpb_n, NULL AS fid_cob_n, NULL AS fid_ent_n, " +
                                 "NULL AS fid_dps_year_n, NULL AS fid_dps_doc_n, NULL AS fid_year_n, ";
-                        sGroup = "re.fid_acc, re.fk_acc, re.fid_cc_n, re.fk_cc_n, re.fid_cur, " +
+                        sGroup = "re.fid_acc, re.fk_acc, re.fid_cur, " +
                                 "re.fid_cl_sys_acc, re.fid_tp_sys_acc, re.fid_ct_sys_mov_xxx, re.fid_tp_sys_mov_xxx, " +
                                 "re.fid_item_n, re.fid_unit_n, re.fid_item_aux_n, re.fid_tax_bas_n, re.fid_tax_n ";
                         break;
@@ -261,7 +261,7 @@ public class SDataFiscalYearOpening extends erp.lib.data.SDataRegistry implement
                                 "re.fid_item_n, re.fid_unit_n, re.fid_item_aux_n, re.fid_tax_bas_n, re.fid_tax_n, '' AS f_ref, 0 AS b_ref_tax, " +
                                 "NULL AS fid_bp_nr, NULL AS fid_bpb_n, re.fid_cob_n, re.fid_ent_n, " +
                                 "NULL AS fid_dps_year_n, NULL AS fid_dps_doc_n, NULL AS fid_year_n, ";
-                        sGroup = "re.fid_acc, re.fk_acc, re.fid_cc_n, re.fk_cc_n, re.fid_cur, " +
+                        sGroup = "re.fid_acc, re.fk_acc, re.fid_cur, " +
                                 "re.fid_cl_sys_acc, re.fid_tp_sys_acc, re.fid_ct_sys_mov_xxx, re.fid_tp_sys_mov_xxx, " +
                                 "re.fid_item_n, re.fid_unit_n, re.fid_item_aux_n, re.fid_tax_bas_n, re.fid_tax_n, " +
                                 "re.fid_cob_n, re.fid_ent_n ";
@@ -272,9 +272,8 @@ public class SDataFiscalYearOpening extends erp.lib.data.SDataRegistry implement
                                 "re.fid_item_n, re.fid_unit_n, re.fid_item_aux_n, re.fid_tax_bas_n, re.fid_tax_n, re.ref AS f_ref, re.b_ref_tax, " +
                                 "NULL AS fid_bp_nr, NULL AS fid_bpb_n, re.fid_cob_n, re.fid_ent_n, " +
                                 "NULL AS fid_dps_year_n, NULL AS fid_dps_doc_n, NULL AS fid_year_n, ";
-                        sGroup = "re.fid_acc, re.fk_acc, re.fid_cc_n, re.fk_cc_n, re.fid_cur, " +
+                        sGroup = "re.fid_acc, re.fk_acc, re.fid_cur, " +
                                 "re.fid_cl_sys_acc, re.fid_tp_sys_acc, re.fid_ct_sys_mov_xxx, re.fid_tp_sys_mov_xxx, " +
-                                "re.fid_item_n, re.fid_unit_n, re.fid_item_aux_n, re.fid_tax_bas_n, re.fid_tax_n, " +
                                 "f_ref, re.b_ref_tax, re.fid_cob_n, re.fid_ent_n ";
                         break;
                     case SDataConstantsSys.FINS_CT_SYS_MOV_BPS:
@@ -283,7 +282,7 @@ public class SDataFiscalYearOpening extends erp.lib.data.SDataRegistry implement
                                 "NULL AS fid_item_n, NULL AS fid_unit_n, NULL AS fid_item_aux_n, NULL AS fid_tax_bas_n, NULL AS fid_tax_n, IF(re.fid_dps_year_n IS NOT NULL, '', re.ref) AS f_ref, re.b_ref_tax, " +
                                 "re.fid_bp_nr, re.fid_bpb_n, NULL AS fid_cob_n, NULL AS fid_ent_n, " +
                                 "re.fid_dps_year_n, re.fid_dps_doc_n, NULL AS fid_year_n, ";
-                        sGroup = "re.fid_acc, re.fk_acc, re.fid_cc_n, re.fk_cc_n, re.fid_cur, " +
+                        sGroup = "re.fid_acc, re.fk_acc, re.fid_cur, " +
                                 "re.fid_cl_sys_acc, re.fid_tp_sys_acc, re.fid_ct_sys_mov_xxx, re.fid_tp_sys_mov_xxx, " +
                                 "f_ref, re.b_ref_tax, re.fid_bp_nr, re.fid_bpb_n, re.fid_dps_year_n, re.fid_dps_doc_n ";
                         break;
@@ -293,7 +292,7 @@ public class SDataFiscalYearOpening extends erp.lib.data.SDataRegistry implement
                                 "re.fid_item_n, re.fid_unit_n, re.fid_item_aux_n, re.fid_tax_bas_n, re.fid_tax_n, '' AS f_ref, 0 AS b_ref_tax, " +
                                 "NULL AS fid_bp_nr, NULL AS fid_bpb_n, NULL AS fid_cob_n, NULL AS fid_ent_n, " +
                                 "NULL AS fid_dps_year_n, NULL AS fid_dps_doc_n, NULL AS fid_year_n, ";
-                        sGroup = "re.fid_acc, re.fk_acc, re.fid_cc_n, re.fk_cc_n, re.fid_cur, " +
+                        sGroup = "re.fid_acc, re.fk_acc, re.fid_cur, " +
                                 "re.fid_cl_sys_acc, re.fid_tp_sys_acc, re.fid_ct_sys_mov_xxx, re.fid_tp_sys_mov_xxx, " +
                                 "re.fid_item_n, re.fid_unit_n, re.fid_item_aux_n, re.fid_tax_bas_n, re.fid_tax_n ";
                         break;

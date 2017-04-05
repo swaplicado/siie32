@@ -1011,6 +1011,22 @@ public abstract class SHrsUtils {
         return benefitTable;
     }
     
+    public static String getDisabilityName(final SGuiClient client, final String codeToFind) throws Exception {
+        String disabilityName = null;
+        String sql = "";
+        ResultSet resultSet = null;
+
+        sql = "SELECT name " +
+                "FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_DIS) + " " +
+                "WHERE code = '" + codeToFind + "' ORDER BY code, id_tp_dis LIMIT 1 ";
+        resultSet = client.getSession().getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            disabilityName = resultSet.getString("name");
+        }
+
+        return disabilityName;
+    }
+    
     public static ArrayList<SHrsBenefitTableByAnniversary> getBenefitTablesAnniversarys(ArrayList<SDbBenefitTable> benefitTables) throws Exception {
         int i = 0;
         ArrayList<SHrsBenefitTableByAnniversary> aBenefitTableByAnniversary = new ArrayList<SHrsBenefitTableByAnniversary>();
