@@ -6477,8 +6477,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     msFileXmlPath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
                     }
                 }
-                
-                miClient.showMsgBoxInformation("El archivo solo puede ser XML");
+                else{
+                    miClient.showMsgBoxInformation("El archivo solo puede ser XML");
+                }
             }
             miClient.getFileChooser().resetChoosableFileFilters();
         }
