@@ -2144,12 +2144,17 @@ public abstract class SCfdUtils implements Serializable {
         NamedNodeMap namedNodeMap = null;
         String receptorXml = "";
         String xml = "";
-
-        xml = DUtilUtils.readXml(fileXml);
-
+        
+        try {
+            xml = DUtilUtils.readXml(fileXml);
+        } 
+        catch(Exception e) {
+            throw new Exception("El XML no es válido");
+        }
+        
         docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         doc = docBuilder.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")));
-
+        
         node = SXmlUtils.extractElements(doc, "cfdi:Receptor").item(0);
 
         if (node == null) {
