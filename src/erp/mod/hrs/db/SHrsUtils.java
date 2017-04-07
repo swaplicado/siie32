@@ -1990,6 +1990,7 @@ public abstract class SHrsUtils {
         int f_emp_id = 0;
         int claveOficial = 0;
         int nPaymentType = 0;
+        boolean bBankAccountUse = false;
         String sql = "";
         String deductionsTaxRetained = "";
         String cia_reg_imss = "";
@@ -2018,6 +2019,15 @@ public abstract class SHrsUtils {
         ResultSet resultSetAuxInc = null;
         ResultSet resultSetClient = null;
 
+        // Settings module human resource:
+        
+        sql = "SELECT b_bank_acc_use FROM hrs_cfg WHERE id_cfg = " + SUtilConsts.BPR_CO_ID + "";
+        
+        resultSet = statement.executeQuery(sql);
+        if (resultSet.next()) {
+            bBankAccountUse = resultSet.getBoolean("b_bank_acc_use");
+        }
+        
         // Obtain deductions for tax retained:
         
         sql = "SELECT id_ded FROM hrs_ded WHERE fk_tp_ded = " + SModSysConsts.HRSS_TP_DED_TAX + "";
@@ -2100,7 +2110,7 @@ public abstract class SHrsUtils {
 
         sql = "SELECT bp.bp, bp.id_bp AS f_emp_map_bp, emp.id_emp AS f_emp_id, emp.num AS f_emp_num, bp.alt_id AS f_emp_curp, emp.ssn AS f_emp_nss, " +
                 "sch.code AS f_emp_reg_tp, rcp.day_pad AS f_emp_dias_pag, d.name AS f_emp_dep, d.code AS f_emp_dep_cve, " +
-                "'' AS f_emp_bank_clabe, " +
+                (bBankAccountUse ? "emp.bank_acc" : "''") + " AS f_emp_bank_clabe, " +
                 "pei.dt_pay, pei.num_ser, pei.num, pei.fk_tp_pay_sys, " +
                 "CASE WHEN emp.fk_bank_n IS NOT NULL THEN emp.fk_bank_n ELSE (SELECT fk_bank FROM hrs_cfg WHERE id_cfg = " + SUtilConsts.BPR_CO_ID + ") END AS f_emp_bank, " +
                 "emp.dt_hire AS f_emp_alta, p.dt_sta AS f_nom_date_start, p.dt_end AS f_nom_date_end, " +
@@ -2216,26 +2226,6 @@ public abstract class SHrsUtils {
             
             dAmountMonth = nPaymentType == SModSysConsts.HRSS_TP_PAY_WEE ? (resultSet.getDouble("rcp.sal") * SHrsConsts.MONTH_DAYS_FIXED) : resultSet.getDouble("rcp.wage");
             hrsPayrollReceipt.setAuxSueldoMensual(dAmountMonth);
-
-            /*
-            // Obtain 'num_ser', 'num', 'fid_tp_pay_sys' from 'hrs_sie_pay_emp' table:
-
-            sql = "SELECT pe.num_ser, pe.num, pe.fid_tp_pay_sys " +
-                "FROM hrs_sie_pay AS p " +
-                "INNER JOIN hrs_sie_pay_emp AS pe ON " +
-                "p.id_pay = pe.id_pay AND pe.b_del = FALSE " +
-                "WHERE pe.id_pay = " + payrollId + " AND pe.id_emp = " + f_emp_id + "";
-            resultSetClient = statementClient.executeQuery(sql);
-
-            if (!resultSetClient.next()) {
-                throw new Exception("No se encontró el folio del empleado '" + SLibUtilities.textTrim(resultSet.getString("f_emp_num")) + "'.");
-            }
-            else {
-                hrsPayrollReceipt.setSerie(SLibUtilities.textTrim(resultSetClient.getString("pe.num_ser")));
-                hrsPayrollReceipt.setFolio(resultSetClient.getInt("pe.num"));
-                hrsPayrollReceipt.setMetodoPago(resultSetClient.getInt("pe.fid_tp_pay_sys"));
-            }
-            */
 
             // Obtain currency key from ERP parameters:
 

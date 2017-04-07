@@ -530,7 +530,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
                 throw new Exception("La longitud de la cuenta bancaria es incorrecto.");
             }
 
-            if (msCuentaBancaria.length() != SDataConstantsSys.BPSS_BPB_BANK_ACC_CBE) {
+            if (msCuentaBancaria.length() == SDataConstantsSys.BPSS_BPB_BANK_ACC_CBE) {
                 receptor.getAttBanco().setString((String) miClient.getSession().readField(SModConsts.HRSS_BANK, new int[] { mnBanco }, SDbRegistry.FIELD_CODE));
             }
             receptor.getAttCuentaBancaria().setString(msCuentaBancaria);
