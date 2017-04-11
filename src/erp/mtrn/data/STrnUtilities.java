@@ -2557,7 +2557,10 @@ public abstract class STrnUtilities {
         ResultSet resultSet = null;
 
         try {
-            sql = "SELECT COALESCE(SUM(de.orig_qty), 0) AS orig_qty_proc "
+            sql = "SELECT COALESCE(SUM(de.orig_qty * ("
+                    + "IF((d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CN[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CN[1] + " AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CN[2] + ") OR "
+                    + "(d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CN[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] + " AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CN[2] + ") "
+                    + ", -1, 1))), 0) AS orig_qty_proc "
                     + "FROM trn_dps_ety_prc AS dep "
                     + "LEFT OUTER JOIN trn_dps_dps_supply AS dps_sup ON dps_sup.id_src_year = dep.id_year AND dps_sup.id_src_doc = dep.id_doc AND dps_sup.id_src_ety = dep.id_ety "
                     + "LEFT OUTER JOIN trn_dps AS d ON d.id_year = dps_sup.id_des_year AND d.id_doc = dps_sup.id_des_doc "
