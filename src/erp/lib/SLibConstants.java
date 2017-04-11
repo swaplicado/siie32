@@ -53,7 +53,7 @@ public abstract class SLibConstants {
     public static final int DESCRIPTION_NAME_ABBR = 3;
 
     public static final int FIELD_DEL = 1;
-
+    
     public static final int LAN_SPANISH = 1;
     public static final int LAN_ENGLISH = 2;
 

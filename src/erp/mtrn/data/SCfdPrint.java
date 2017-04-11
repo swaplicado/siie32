@@ -55,7 +55,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Alfredo Pérez
  */
 public class SCfdPrint {
 
@@ -670,6 +670,9 @@ public class SCfdPrint {
                 break;
             case SDataConstantsPrint.PRINT_MODE_PDF:
                 JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
+                break;
+            case SDataConstantsPrint.PRINT_MODE_STREAM:
+                JasperPrintManager.printReport(jasperPrint, false);
                 break;
             default:
                 throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
