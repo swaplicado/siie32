@@ -37,6 +37,7 @@ import erp.mtrn.data.STrnUtilities;
 import erp.mtrn.form.SDialogAnnulCfdi;
 import erp.mtrn.form.SDialogContractAnalysis;
 import erp.mtrn.form.SDialogDpsFinder;
+import erp.mtrn.form.SDialogPrintCfdiMasive;
 import erp.mtrn.form.SDialogUpdateDpsDeliveryAddress;
 import erp.mtrn.form.SDialogUpdateDpsLogistics;
 import erp.mtrn.form.SDialogUpdateDpsReferenceComms;
@@ -63,7 +64,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona
+ * @author Sergio Flores, Edwin Carmona, Alfredo Pérez
  *
  * BUSINESS PARTNER BLOCKING NOTES:
  * Business Partner Blocking applies only to order and document for purchases and sales,
@@ -86,6 +87,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbViewAccountingDetailsDps;
     private javax.swing.JButton jbViewAccountingDetailsBizPartner;
     private javax.swing.JButton jbPrint;
+    private javax.swing.JButton jbPrintByRange;
     private javax.swing.JButton jbPrintAcknowledgmentCancellation;
     private javax.swing.JButton jbPrintPhotoInvoice;
     private javax.swing.JButton jbPrintContract;
@@ -272,6 +274,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbPrint.setPreferredSize(new Dimension(23, 23));
         jbPrint.addActionListener(this);
         jbPrint.setToolTipText("Imprimir documento");
+        
+        jbPrintByRange = new JButton(miClient.getImageIcon(SLibConstants.ICON_PRINT));
+        jbPrintByRange.setPreferredSize(new Dimension(23, 23));
+        jbPrintByRange.addActionListener(this);
+        jbPrintByRange.setToolTipText("Imprimir varios documentos");
 
         jbPrintAcknowledgmentCancellation = new JButton(miClient.getImageIcon(SLibConstants.ICON_PRINT_ACK_CAN));
         jbPrintAcknowledgmentCancellation.setPreferredSize(new Dimension(23, 23));
@@ -390,6 +397,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         addTaskBarUpperComponent(jbViewAccountingDetailsDps);
         addTaskBarUpperComponent(jbViewAccountingDetailsBizPartner);
         addTaskBarLowerComponent(jbPrint);
+        addTaskBarLowerComponent(jbPrintByRange);
         addTaskBarLowerComponent(jbPrintAcknowledgmentCancellation);
         addTaskBarLowerComponent(jbPrintPhotoInvoice);
         addTaskBarLowerComponent(jbPrintContract);
@@ -426,6 +434,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbViewAccountingDetailsDps.setEnabled(mbIsDoc);
         jbViewAccountingDetailsBizPartner.setEnabled(mbIsDoc);
         jbPrint.setEnabled(mbIsOrd || mbIsCategorySal && (mbIsEstEst || mbIsEstCon || mbIsDoc || mbIsDocAdj) || (mbIsCategoryPur && mbIsEstCon));
+        jbPrintByRange.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbPrintAcknowledgmentCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbPrintPhotoInvoice.setEnabled(mbIsCategorySal && mbIsDoc);
         jbPrintContract.setEnabled((mbIsCategorySal || mbIsCategoryPur) && mbIsEstCon);
@@ -970,6 +979,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
     }
 
+    private void actionPrintByRange() throws Exception {
+        new SDialogPrintCfdiMasive(miClient, getDpsTypeKey()).setVisible(true);
+    }
+    
     private void actionPrint() {
         if (jbPrint.isEnabled()) {
             int i = 0;
@@ -1905,7 +1918,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     public void publicActionPrint() {
         actionPrint();
     }
-
+    
     @Override
     public void createSqlQuery() {
         String sqlWhere = "";
@@ -2101,6 +2114,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 }
                 else if (button == jbPrint) {
                     actionPrint();
+                }
+                else if (button == jbPrintByRange) {
+                    actionPrintByRange();
                 }
                 else if (button == jbPrintContract) {
                     actionPrintContract();

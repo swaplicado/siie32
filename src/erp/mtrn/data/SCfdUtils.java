@@ -110,7 +110,7 @@ import stamp.StampSOAP;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores, Edwin Carmona
+ * @author Juan Barajas, Sergio Flores, Edwin Carmona, Alfredo Pérez
  */
 public abstract class SCfdUtils implements Serializable {
 
@@ -4393,6 +4393,18 @@ public abstract class SCfdUtils implements Serializable {
         }
 
         return cfd;
+    }
+    
+    public static ArrayList<SDataCfd> getCfds(final SClientInterface client, final int typeCfd, final int subtypeCfd, ArrayList<int[]> keysDps) throws java.lang.Exception {
+        ArrayList<SDataCfd> cfds ;
+        
+        cfds = new ArrayList<>();
+        if (!keysDps.isEmpty()){
+            for (int x = 0; x < keysDps.size(); x++) {
+                cfds.add(getCfd(client, typeCfd, subtypeCfd, keysDps.get(x)));
+            }
+        }
+        return cfds;
     }
 
     public static InputStream getAcknowledgmentCancellationPdf(final SClientInterface client, final SDataCfd cfd) {
