@@ -9,7 +9,7 @@
   </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="2"/>
-    <Property name="title" type="java.lang.String" value="Impresi&#xf3;n de p&#xf3;lizas contables"/>
+    <Property name="title" type="java.lang.String" value="Impresi&#xf3;n masiva de CFDI"/>
     <Property name="modalExclusionType" type="java.awt.Dialog$ModalExclusionType" editor="org.netbeans.modules.form.editors.EnumEditor">
       <Value id="APPLICATION_EXCLUDE"/>
     </Property>

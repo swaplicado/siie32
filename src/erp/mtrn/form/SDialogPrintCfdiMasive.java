@@ -90,7 +90,7 @@ public class SDialogPrintCfdiMasive extends javax.swing.JDialog implements erp.l
         jtfNumberEnd = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Impresión de pólizas contables");
+        setTitle("Impresión masiva de CFDI");
         setModalExclusionType(java.awt.Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
         setModalityType(java.awt.Dialog.ModalityType.APPLICATION_MODAL);
         setResizable(false);
