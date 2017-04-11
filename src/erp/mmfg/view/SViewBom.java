@@ -23,7 +23,7 @@ import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Cesar Orozco  
  */
 public class SViewBom extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -56,7 +56,7 @@ public class SViewBom extends erp.lib.table.STableTab implements java.awt.event.
         //jbDelete.setEnabled(false);
 
         erp.lib.table.STableField[] aoKeyFields = new STableField[1];
-        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[16];
+        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[17];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "b.id_bom");
@@ -73,6 +73,7 @@ public class SViewBom extends erp.lib.table.STableTab implements java.awt.event.
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "b.cost_per", "Cto. asig.", STableConstants.WIDTH_PERCENTAGE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererPercentage());
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "si.name", "Estatus", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "b.ts_start", "Ini. vigencia", STableConstants.WIDTH_DATE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "b.ts_end_n", "Fin. vigencia", STableConstants.WIDTH_DATE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "b.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
@@ -133,9 +134,11 @@ public class SViewBom extends erp.lib.table.STableTab implements java.awt.event.
             }
         }
 
-        msSql = "SELECT b.*, i.item_key, i.item, u.symbol, bpb.bpb, un.usr, ue.usr, ud.usr " +
+        msSql = "SELECT b.*, i.item_key, i.item, u.symbol, bpb.bpb, un.usr, ue.usr, ud.usr, si.name " +
                 "FROM mfg_bom as b " +
                 "INNER JOIN erp.itmu_item AS i ON b.fid_item = i.id_item " +
+                "INNER JOIN erp.itms_st_item AS si ON " +
+                "i.fid_st_item = si.id_st_item " +
                 "INNER JOIN erp.bpsu_bpb AS bpb ON b.fid_cob = bpb.id_bpb " +
                 "INNER JOIN erp.itmu_unit AS u ON b.fid_unit = u.id_unit " +
                 "INNER JOIN erp.usru_usr AS un ON b.fid_usr_new = un.id_usr " +

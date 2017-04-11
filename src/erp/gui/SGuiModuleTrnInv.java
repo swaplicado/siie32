@@ -40,7 +40,7 @@ import sa.gui.util.SUtilConsts;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda
+ * @author Sergio Flores, Uriel Castañeda, Cesar Orozco
  */
 public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -110,6 +110,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiIogStockValueByItem;
     private javax.swing.JMenuItem jmiIogStockValueByDiogType;
     private javax.swing.JMenuItem jmiIogStockClosing;
+    private javax.swing.JMenuItem jmiIogTheoricalCost;
 
     private javax.swing.JMenu jmMenuStk;
     private javax.swing.JMenuItem jmiStkStock;
@@ -323,6 +324,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogStockValueByItem = new JMenuItem("Valor de inventarios por ítem");
         jmiIogStockValueByDiogType = new JMenuItem("Valor de inventarios por tipo movimiento");
         jmiIogStockClosing = new JMenuItem("Generación de inventarios iniciales...");
+        jmiIogTheoricalCost = new JMenuItem("Valor valuación vs. valor teórico");
         jmMenuIog.add(jmiIogStock);
         jmMenuIog.addSeparator();
         jmMenuIog.add(jmiIogMfgRmAssign);
@@ -344,6 +346,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuIog.add(jmiIogInventoryMfgCost);
         jmMenuIog.add(jmiIogStockValueByWarehouse);
         jmMenuIog.add(jmiIogStockValueByItem);
+        jmMenuIog.add(jmiIogTheoricalCost);
         //jmMenuIog.add(jmiIogStockValueByDiogType); sflores, 2016-03-09, evaluating to remove it
         jmMenuIog.addSeparator();
         jmMenuIog.add(jmiIogStockClosing);
@@ -365,7 +368,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogStockValueByItem.addActionListener(this);
         jmiIogStockValueByDiogType.addActionListener(this);
         jmiIogStockClosing.addActionListener(this);
-
+        jmiIogTheoricalCost.addActionListener(this);
         jmMenuStk = new JMenu("Inventarios");
         jmiStkStock = new JMenuItem("Existencias");
         jmiStkStockLot = new JMenuItem("Existencias por lote");
@@ -420,7 +423,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepStatsMfgConsumePendEntryMass.addActionListener(this);
         jmiRepStatsMfgConsumedMass.addActionListener(this);
         jmiRepStatsMfgConsumedEntryMass.addActionListener(this);
-
+        
         jmMenuRep.addSeparator();
         jmMenuRep.add(jmMenuRepStats);
 
@@ -1206,6 +1209,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiReportStockTrackingLot) {
                 menuRepStockTrackingLot();
+            }
+            else if (item == jmiIogTheoricalCost) {
+                miClient.getSession().showView(SModConsts.TRNX_INV_VAL_COST, SLibConstants.UNDEFINED, null);
             }
         }
     }

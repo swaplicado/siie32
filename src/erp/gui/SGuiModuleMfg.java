@@ -23,7 +23,7 @@ import javax.swing.JSeparator;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Cesar Orozco
  */
 public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -78,6 +78,7 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenu jmReports;
     private javax.swing.JMenuItem jmiReportProductionOrderProgramMonitoring;
     private javax.swing.JMenuItem jmiReportBomItems;
+    private javax.swing.JMenuItem jmiBomCost;
     private javax.swing.JMenuItem jmiReportProductionOrderPerformance;
 
     private erp.mmfg.form.SFormBom moFormBom;
@@ -229,6 +230,7 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmReports = new JMenu("Reportes");
         jmiReportProductionOrderProgramMonitoring = new JMenuItem("Órdenes prod. seguimiento programa");
         jmiReportBomItems = new JMenuItem("Productos por insumo");
+        jmiBomCost = new JMenuItem("Costo teórico de fórmulas");
         jmiReportProductionOrderPerformance = new JMenuItem("Rendimiento de órdenes prod.");
 
         jmReportsStatiticsManufacturing.add(jmiReportProductionByItem);
@@ -239,6 +241,8 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmReports.add(jmReportsStatiticsManufacturing);
         jmReports.add(new JSeparator());
         jmReports.add(jmiReportBomItems);
+        jmReports.add(new JSeparator());
+        jmReports.add(jmiBomCost);
         jmReports.add(new JSeparator());
         jmReports.add(jmiReportProductionOrderPerformance);
 
@@ -274,6 +278,7 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiManufacturingClosePeriod.addActionListener(this);
         jmiReportProductionOrderProgramMonitoring.addActionListener(this);
         jmiReportBomItems.addActionListener(this);
+        jmiBomCost.addActionListener(this);
         jmiReportProductionOrderPerformance.addActionListener(this);
         jmiReportProductionByItem.addActionListener(this);
         jmiReportProductionByItemGeneric.addActionListener(this);
@@ -590,7 +595,10 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
                     sViewTitle = "Productos por insumo";
                     oViewClass = erp.mmfg.view.SViewBomItems.class;
                     break;
-
+                case SDataConstants.MFGX_BOM_COST:
+                    sViewTitle = "Costo teórico fórmulas";
+                    oViewClass = erp.mmfg.view.SViewTheoricalCost.class;
+                    break;
                 case SDataConstants.MFG_EXP:
                     if (auxType01 == SDataConstants.MFGX_EXP_FOR) {
                         sViewTitle = "Prod. docs. explosión materiales pronósticos";
@@ -868,6 +876,9 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiReportBomItems) {
                 showView(SDataConstants.MFGX_BOM_ITEMS);
+            }
+            else if (item == jmiBomCost) {
+                showView(SDataConstants.MFGX_BOM_COST);
             }
             else if (item == jmiReportProductionOrderPerformance) {
                 moDialogRepProductionOrderPerformance.formReset();
