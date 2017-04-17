@@ -635,6 +635,7 @@ public abstract class SDataConstants {
 
     public static final int MFGX_BOM_ITEMS = 210200;
     public static final int MFGX_BOM_LEV = 210201;
+    public static final int MFGX_BOM_COST = 210231;
     public static final int MFGX_COST_CLS_PER = 210202;
     public static final int MFGX_COST_DIR = 210203;
     public static final int MFGX_COST_EMP = 210204;

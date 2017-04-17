@@ -5,12 +5,11 @@
 
 package erp.mtrn.data;
 
-import java.sql.CallableStatement;
-import java.sql.ResultSet;
-
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import java.sql.CallableStatement;
+import java.sql.ResultSet;
 
 /**
  *
@@ -44,7 +43,7 @@ public class SDataDpsDpsAdjustment extends erp.lib.data.SDataRegistry implements
      * Overrides java.lang.Object.clone() function.
      */
     public SDataDpsDpsAdjustment() {
-        super(SDataConstants.TRN_DPS_DPS_SUPPLY);
+        super(SDataConstants.TRN_DPS_DPS_ADJ);
         reset();
     }
 

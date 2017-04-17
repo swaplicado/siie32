@@ -25,6 +25,7 @@ import erp.mod.trn.view.SViewDpsEntryContractPrice;
 import erp.mod.trn.view.SViewDpsSendWebService;
 import erp.mod.trn.view.SViewInventoryCost;
 import erp.mod.trn.view.SViewInventoryCostByDiogType;
+import erp.mod.trn.view.SViewValCost;
 import erp.mod.trn.view.SViewInventoryMfgCost;
 import erp.mod.trn.view.SViewInventoryValuation;
 import erp.mod.trn.view.SViewItemRequiredDpsConfig;
@@ -48,7 +49,7 @@ import sa.lib.gui.SGuiReport;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda
+ * @author Sergio Flores, Uriel Castañeda, Cesar Orozco
  */
 public class SModuleTrn extends SGuiModule {
 
@@ -194,6 +195,9 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_STK_COST:
                 view = new SViewInventoryCost(miClient, subtype, "Valor inventarios " + (subtype == SModConsts.CFGU_COB_ENT ? "x almacén" : "x ítem"));
+                break;
+            case SModConsts.TRNX_INV_VAL_COST:
+                view = new SViewValCost(miClient, subtype, "Valor valuación vs. valor teórico");
                 break;
             case SModConsts.TRNX_STK_DIOG_TP:
                 view = new SViewInventoryCostByDiogType(miClient, subtype, "Costo inv. por tipo mov.", params);

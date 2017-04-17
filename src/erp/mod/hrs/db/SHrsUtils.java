@@ -2020,7 +2020,7 @@ public abstract class SHrsUtils {
         ResultSet resultSetClient = null;
 
         // Settings module human resource:
-        
+
         sql = "SELECT b_bank_acc_use FROM hrs_cfg WHERE id_cfg = " + SUtilConsts.BPR_CO_ID + "";
         
         resultSet = statement.executeQuery(sql);
@@ -2271,7 +2271,7 @@ public abstract class SHrsUtils {
                     hrsPayrollConcept = new SHrsFormerPayrollConcept();
                     dAmountEarTax = resultSetAux.getDouble("f_conc_mont_grav");
                     dAmountEarExe = resultSetAux.getDouble("f_conc_mont_ext");
-                    dTotalEar += (dAmountEarTax + dAmountEarExe);
+                    dTotalEar = SLibUtils.round((dTotalEar + dAmountEarTax + dAmountEarExe), SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits());
 
                     hrsPayrollConcept.setClaveEmpresa(SLibUtilities.textTrim(resultSetAux.getString("f_conc_cve")));
                     hrsPayrollConcept.setConcepto(SLibUtilities.textTrim(resultSetAux.getString("f_conc")));
@@ -2331,10 +2331,10 @@ public abstract class SHrsUtils {
                     hrsPayrollConcept = new SHrsFormerPayrollConcept();
                     dAmountDedTax = resultSetAux.getDouble("f_conc_mont_grav");
                     dAmountDedExe = resultSetAux.getDouble("f_conc_mont_ext");
-                    dTotalDed += (dAmountDedTax + dAmountDedExe);
+                    dTotalDed = SLibUtils.round((dTotalDed + dAmountDedTax + dAmountDedExe), SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits());
                     
                     if (resultSetAux.getInt("ded.fk_tp_ded") == SModSysConsts.HRSS_TP_DED_TAX) {
-                        dTotalDedRet += (dAmountDedTax + dAmountDedExe);
+                        dTotalDedRet = SLibUtils.round((dTotalDedRet + dAmountDedTax + dAmountDedExe), SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits());
                     }
 
                     hrsPayrollConcept.setClaveEmpresa(SLibUtilities.textTrim(resultSetAux.getString("f_conc_cve")));

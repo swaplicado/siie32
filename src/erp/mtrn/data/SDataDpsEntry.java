@@ -161,7 +161,63 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected boolean mbAuxPreserveQuantity; // preserve customized quantity
 
     protected boolean mbFlagReadLinksAswell; // Read aswell links and adjustments
+    
+    protected int mnXtaPkDpsYearConId; // DPS for adjustment DPS in contract
+    protected int mnXtaPkDpsDocConId; // DPS for adjustment DPS in contract
+    protected int mnXtaPkDpsDocEtyConId; // DPS for adjustment DPS in contract
 
+    private void setXtaPkDpsCon(java.sql.Connection connection, SDataDpsDpsAdjustment dpsAdjustment) {
+        int nPkDpsYearOrdId = 0;
+        int nPkDpsDocOrdId = 0;
+        int nPkDpsDocEtyOrdId = 0;
+        String sSql = "";
+        Statement oStatement = null;
+        ResultSet oResultSet = null;
+        
+        try {
+            oStatement = connection.createStatement();
+            
+            // Read aswell DPS links as a destiny:
+
+            sSql = "SELECT id_src_year, id_src_doc, id_src_ety FROM trn_dps_dps_supply " +
+                    "WHERE id_des_year = " + dpsAdjustment.getPkDpsYearId() + " AND id_des_doc = " + dpsAdjustment.getPkDpsDocId() + " AND id_des_ety = " + dpsAdjustment.getPkDpsEntryId() + " ";
+            
+            oResultSet = oStatement.executeQuery(sSql);
+            if (oResultSet.next()) {
+                nPkDpsYearOrdId = oResultSet.getInt("id_src_year");
+                nPkDpsDocOrdId = oResultSet.getInt("id_src_doc");
+                nPkDpsDocEtyOrdId = oResultSet.getInt("id_src_ety");
+            }
+            
+            // Read aswell DPS links as a destiny:
+
+            sSql = "SELECT con_prc_year, con_prc_mon FROM trn_dps_ety " +
+                    "WHERE id_year = " + nPkDpsYearOrdId + " AND id_doc = " + nPkDpsDocOrdId + " AND id_ety = " + nPkDpsDocEtyOrdId + " ";
+            
+            oResultSet = oStatement.executeQuery(sSql);
+            if (oResultSet.next()) {
+                mnContractPriceYear = oResultSet.getInt("con_prc_year");
+                mnContractPriceMonth = oResultSet.getInt("con_prc_mon");
+            }
+            
+            // Read aswell DPS links as a destiny:
+
+            sSql = "SELECT id_src_year, id_src_doc, id_src_ety FROM trn_dps_dps_supply " +
+                    "WHERE id_des_year = " + nPkDpsYearOrdId + " AND id_des_doc = " + nPkDpsDocOrdId + " AND id_des_ety = " + nPkDpsDocEtyOrdId + " ";
+            
+            oResultSet = oStatement.executeQuery(sSql);
+            if (oResultSet.next()) {
+                mnXtaPkDpsYearConId = oResultSet.getInt("id_src_year");
+                mnXtaPkDpsDocConId = oResultSet.getInt("id_src_doc");
+                mnXtaPkDpsDocEtyConId = oResultSet.getInt("id_src_ety");
+            }
+        }
+        catch (Exception exception) {
+            mnLastDbActionResult = SLibConstants.DB_ACTION_ANNUL_ERROR;
+            SLibUtilities.printOutException(this, exception);
+        }
+    }
+    
     /**
      * Overrides java.lang.Object.clone() function.
      */
@@ -602,6 +658,10 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mnAuxPkDpsDocId = 0;
         manAuxPkDpsEntryPrice = null;
         mbAuxPreserveQuantity = false;
+        
+        mnXtaPkDpsYearConId = 0;
+        mnXtaPkDpsDocConId = 0;
+        mnXtaPkDpsDocEtyConId = 0;
     }
 
     @Override
@@ -985,6 +1045,10 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         CallableStatement callableStatement = null;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
+        
+        if (!mvDbmsDpsAdjustmentsAsAdjustment.isEmpty()) {
+            setXtaPkDpsCon(connection, mvDbmsDpsAdjustmentsAsAdjustment.get(0));
+        }
 
         try {
             callableStatement = connection.prepareCall(
@@ -1232,6 +1296,24 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                         adjustment.setPkDpsAdjustmentEntryId(mnPkEntryId);
 
                         if (adjustment.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                        }
+                    }
+                    
+                    if (!mvDbmsDpsAdjustmentsAsAdjustment.isEmpty()) {
+                        SDataDpsDpsLink link = new SDataDpsDpsLink();
+
+                        link.setPkSourceYearId(mnXtaPkDpsYearConId);
+                        link.setPkSourceDocId(mnXtaPkDpsDocConId);
+                        link.setPkSourceEntryId(mnXtaPkDpsDocEtyConId);
+                        link.setPkDestinyYearId(mnPkYearId);
+                        link.setPkDestinyDocId(mnPkDocId);
+                        link.setPkDestinyEntryId(mnPkEntryId);
+
+                        link.setOriginalQuantity(mvDbmsDpsAdjustmentsAsAdjustment.get(0).getOriginalQuantity() * -1);
+                        link.setQuantity(mvDbmsDpsAdjustmentsAsAdjustment.get(0).getQuantity() * -1);
+
+                        if (link.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                         }
                     }

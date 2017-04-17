@@ -57,7 +57,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores, Juan Barajas
+ * @author Alfonso Flores, Sergio Flores, Juan Barajas, Cesar Orozco
  */
 public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener {
 
@@ -102,6 +102,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.lib.form.SFormField moFieldUnitsPackage;
     private erp.lib.form.SFormField moFieldFkItemPackageId_n;
     private erp.lib.form.SFormField moFieldProductionTime;
+    private erp.lib.form.SFormField moFieldProductionCost;
     private erp.lib.form.SFormField moFieldWeightGross;
     private erp.lib.form.SFormField moFieldWeightDelivery;
     private erp.lib.form.SFormField moFieldLength;
@@ -262,19 +263,23 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfNetContent = new javax.swing.JTextField();
         jcbFkUnitNetContentId = new javax.swing.JComboBox<SFormComponentItem>();
         jckIsNetContentVariable = new javax.swing.JCheckBox();
-        jPanel28 = new javax.swing.JPanel();
-        jlFkUnitNetContentUnitaryId = new javax.swing.JLabel();
-        jtfNetContentUnitary = new javax.swing.JTextField();
-        jcbFkUnitNetContentUnitaryId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel30 = new javax.swing.JPanel();
         jlFkItemPackageId_n = new javax.swing.JLabel();
         jtfUnitsPackage = new javax.swing.JTextField();
         jcbFkItemPackageId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkItemPackageId_n = new javax.swing.JButton();
+        jPanel28 = new javax.swing.JPanel();
+        jlFkUnitNetContentUnitaryId = new javax.swing.JLabel();
+        jtfNetContentUnitary = new javax.swing.JTextField();
+        jcbFkUnitNetContentUnitaryId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel8 = new javax.swing.JPanel();
         jlProductionTime = new javax.swing.JLabel();
         jtfProductionTime = new javax.swing.JTextField();
         jtfProductionTimeUnitRo = new javax.swing.JTextField();
+        jPanel15 = new javax.swing.JPanel();
+        jlProductionCost = new javax.swing.JLabel();
+        jtfProductionCost = new javax.swing.JTextField();
+        jtfProductionCostUnit = new javax.swing.JTextField();
         jPanel11 = new javax.swing.JPanel();
         jPanel31 = new javax.swing.JPanel();
         jlWeightGross = new javax.swing.JLabel();
@@ -771,22 +776,6 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel10.add(jPanel27);
 
-        jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlFkUnitNetContentUnitaryId.setText("Cont. neto unit.: *");
-        jlFkUnitNetContentUnitaryId.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel28.add(jlFkUnitNetContentUnitaryId);
-
-        jtfNetContentUnitary.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfNetContentUnitary.setText("0.0000");
-        jtfNetContentUnitary.setPreferredSize(new java.awt.Dimension(115, 23));
-        jPanel28.add(jtfNetContentUnitary);
-
-        jcbFkUnitNetContentUnitaryId.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel28.add(jcbFkUnitNetContentUnitaryId);
-
-        jPanel10.add(jPanel28);
-
         jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkItemPackageId_n.setText("Unids. conversión:");
@@ -806,6 +795,22 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jbFkItemPackageId_n.setFocusable(false);
         jbFkItemPackageId_n.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel30.add(jbFkItemPackageId_n);
+
+        jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFkUnitNetContentUnitaryId.setText("Cont. neto unit.: *");
+        jlFkUnitNetContentUnitaryId.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel28.add(jlFkUnitNetContentUnitaryId);
+
+        jtfNetContentUnitary.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfNetContentUnitary.setText("0.0000");
+        jtfNetContentUnitary.setPreferredSize(new java.awt.Dimension(115, 23));
+        jPanel28.add(jtfNetContentUnitary);
+
+        jcbFkUnitNetContentUnitaryId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel28.add(jcbFkUnitNetContentUnitaryId);
+
+        jPanel30.add(jPanel28);
 
         jPanel10.add(jPanel30);
 
@@ -827,6 +832,29 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel8.add(jtfProductionTimeUnitRo);
 
         jPanel10.add(jPanel8);
+
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlProductionCost.setText("Costo producción:");
+        jlProductionCost.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel15.add(jlProductionCost);
+
+        jtfProductionCost.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfProductionCost.setText("0.0000");
+        jtfProductionCost.setPreferredSize(new java.awt.Dimension(115, 23));
+        jPanel15.add(jtfProductionCost);
+
+        jtfProductionCostUnit.setEditable(false);
+        jtfProductionCostUnit.setFocusable(false);
+        jtfProductionCostUnit.setPreferredSize(new java.awt.Dimension(75, 23));
+        jtfProductionCostUnit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtfProductionCostUnitActionPerformed(evt);
+            }
+        });
+        jPanel15.add(jtfProductionCostUnit);
+
+        jPanel10.add(jPanel15);
 
         jPanel14.add(jPanel10);
 
@@ -1267,13 +1295,17 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         getContentPane().add(jpCommand, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(976, 639));
+        setSize(new java.awt.Dimension(976, 647));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
+
+    private void jtfProductionCostUnitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfProductionCostUnitActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jtfProductionCostUnitActionPerformed
 
     /*
      * Private methods:
@@ -1368,6 +1400,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldProductionTime = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfProductionTime, jlProductionTime);
         moFieldProductionTime.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
         moFieldProductionTime.setTabbedPaneIndex(0, jTabbedPane);
+        moFieldProductionCost = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfProductionCost, jlProductionCost);
+        moFieldProductionTime.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
+        moFieldProductionCost.setTabbedPaneIndex(0, jTabbedPane);
         moFieldWeightGross = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfWeightGross, jlWeightGross);
         moFieldWeightGross.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsWeigthGrossFormat());
         moFieldWeightGross.setTabbedPaneIndex(0, jTabbedPane);
@@ -1458,7 +1493,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldTariff = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, moTextTariff.getComponent(), jlTariff);
         moFieldTariff.setLengthMax(10);
         moTextTariff.setTextSettings(SGuiUtils.getLabelName(jlTariff.getText()), 10);
-
+        
         mvFields.add(moFieldFkItemGenericId);
         mvFields.add(moFieldFkItemLineId_n);
         mvFields.add(moFieldName);
@@ -1489,6 +1524,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         mvFields.add(moFieldUnitsPackage);
         mvFields.add(moFieldFkItemPackageId_n);
         mvFields.add(moFieldProductionTime);
+        mvFields.add(moFieldProductionCost);
         mvFields.add(moFieldWeightGross);
         mvFields.add(moFieldWeightDelivery);
         mvFields.add(moFieldLength);
@@ -1549,7 +1585,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jbFkAccountEbitdaTypeId.addActionListener(this);
         jbFkFiscalAccountIncId.addActionListener(this);
         jbFkFiscalAccountExpId.addActionListener(this);
-
+        
+        jtfProductionCostUnit.setText(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
         jtfName.addFocusListener(this);
         jtfNameShort.addFocusListener(this);
         jtfPresentation.addFocusListener(this);
@@ -1698,6 +1735,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
             jtfWeightGross.setEnabled(false);
             moFieldProductionTime.setFieldValue(0d);
+            moFieldProductionCost.setFieldValue(0d);
             moFieldWeightGross.setFieldValue(0d);
 
             jtfWeightDelivery.setEnabled(false);
@@ -1762,6 +1800,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
             moFieldFkDefaultItemRefId_n.setFieldValue(null);
 
             jtfProductionTime.setEnabled(false);
+            jtfProductionCost.setEnabled(false);
         }
         else {
             moItemGeneric = (SDataItemGeneric) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_IGEN, moFieldFkItemGenericId.getKey(), SLibConstants.EXEC_MODE_SILENT);
@@ -1881,6 +1920,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
             }
 
             moFieldProductionTime.setFieldValue(0d);
+            moFieldProductionCost.setFieldValue(0d);
+            
             jtfWeightGross.setEnabled(moItemGeneric.getIsWeightGrossApplying());
             if (!moItemGeneric.getIsWeightGrossApplying()) {
                 moFieldWeightGross.setFieldValue(0d);
@@ -1970,9 +2011,11 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
             }
             if (SLibUtilities.belongsTo(new int[] { moItemGeneric.getFkItemCategoryId(), moItemGeneric.getFkItemClassId(), moItemGeneric.getFkItemTypeId()}, new int[][] { SDataConstantsSys.ITMS_TP_ITEM_SAL_PRO_FG, SDataConstantsSys.ITMS_TP_ITEM_SAL_PRO_WP})) {
                 jtfProductionTime.setEnabled(true);
+                jtfProductionCost.setEnabled(true);
             }
             else {
                 jtfProductionTime.setEnabled(false);
+                jtfProductionCost.setEnabled(true);
             }
         }
 
@@ -2663,6 +2706,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel27;
     private javax.swing.JPanel jPanel28;
@@ -2809,6 +2853,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JLabel jlNameShort;
     private javax.swing.JLabel jlPresent;
     private javax.swing.JLabel jlPresentShort;
+    private javax.swing.JLabel jlProductionCost;
     private javax.swing.JLabel jlProductionTime;
     private javax.swing.JLabel jlSurface;
     private javax.swing.JLabel jlSurfaceUnitary;
@@ -2845,6 +2890,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JTextField jtfPkItemId_Ro;
     private javax.swing.JTextField jtfPresentation;
     private javax.swing.JTextField jtfPresentationShort;
+    private javax.swing.JTextField jtfProductionCost;
+    private javax.swing.JTextField jtfProductionCostUnit;
     private javax.swing.JTextField jtfProductionTime;
     private javax.swing.JTextField jtfProductionTimeUnitRo;
     private javax.swing.JTextField jtfSurface;
@@ -3076,6 +3123,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldUnitsPackage.setFieldValue(moItem.getUnitsPackage());
         moFieldFkItemPackageId_n.setFieldValue(new int[] { moItem.getFkItemPackageId_n() });
         moFieldProductionTime.setFieldValue(moItem.getProductionTime());
+        moFieldProductionCost.setFieldValue(moItem.getProductionCost());
         moFieldWeightGross.setFieldValue(moItem.getWeightGross());
         moFieldWeightDelivery.setFieldValue(moItem.getWeightDelivery());
         moFieldLength.setFieldValue(moItem.getLength());
@@ -3206,6 +3254,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moItem.setUnitsPackage(moFieldUnitsPackage.getDouble());
         moItem.setFkItemPackageId_n(jcbFkItemPackageId_n.getSelectedIndex() <= 0 ? 0 : moFieldFkItemPackageId_n.getKeyAsIntArray()[0]);
         moItem.setProductionTime(moFieldProductionTime.getDouble());
+        moItem.setProductionCost(moFieldProductionCost.getDouble());
         moItem.setWeightGross(moFieldWeightGross.getDouble());
         moItem.setWeightDelivery(moFieldWeightDelivery.getDouble());
         moItem.setLength(moFieldLength.getDouble());
