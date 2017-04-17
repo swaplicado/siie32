@@ -6466,13 +6466,19 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private void actionLoadFileXml() {
         FileFilter filter = new FileNameExtensionFilter("XML file", "xml");
         miClient.getFileChooser().repaint();
-        miClient.getFileChooser().addChoosableFileFilter(filter);
-
+        miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
+        miClient.getFileChooser().setFileFilter(filter);
+       
         try {
-            if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
-                if (SCfdUtils.validateEmisorXmlExpenses(miClient, miClient.getFileChooser().getSelectedFile().getAbsolutePath())) {
+            if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
+                if (miClient.getFileChooser().getSelectedFile().getName().contains(".xml")) {
+                    if (SCfdUtils.validateEmisorXmlExpenses(miClient, miClient.getFileChooser().getSelectedFile().getAbsolutePath())) {
                     moFieldFileXml.setFieldValue(miClient.getFileChooser().getSelectedFile().getName());
                     msFileXmlPath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
+                    }
+                }
+                else{
+                    miClient.showMsgBoxInformation("El archivo solo puede ser XML");
                 }
             }
             miClient.getFileChooser().resetChoosableFileFilters();

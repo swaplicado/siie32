@@ -110,7 +110,7 @@ import stamp.StampSOAP;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores, Edwin Carmona
+ * @author Juan Barajas, Sergio Flores, Edwin Carmona, Alfredo Pérez
  */
 public abstract class SCfdUtils implements Serializable {
 
@@ -2144,12 +2144,17 @@ public abstract class SCfdUtils implements Serializable {
         NamedNodeMap namedNodeMap = null;
         String receptorXml = "";
         String xml = "";
-
-        xml = DUtilUtils.readXml(fileXml);
-
+        
+        try {
+            xml = DUtilUtils.readXml(fileXml);
+        } 
+        catch(Exception e) {
+            throw new Exception("El XML no es válido");
+        }
+        
         docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         doc = docBuilder.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")));
-
+        
         node = SXmlUtils.extractElements(doc, "cfdi:Receptor").item(0);
 
         if (node == null) {
@@ -4388,6 +4393,18 @@ public abstract class SCfdUtils implements Serializable {
         }
 
         return cfd;
+    }
+    
+    public static ArrayList<SDataCfd> getCfds(final SClientInterface client, final int typeCfd, final int subtypeCfd, ArrayList<int[]> keysDps) throws java.lang.Exception {
+        ArrayList<SDataCfd> cfds ;
+        
+        cfds = new ArrayList<>();
+        if (!keysDps.isEmpty()){
+            for (int x = 0; x < keysDps.size(); x++) {
+                cfds.add(getCfd(client, typeCfd, subtypeCfd, keysDps.get(x)));
+            }
+        }
+        return cfds;
     }
 
     public static InputStream getAcknowledgmentCancellationPdf(final SClientInterface client, final SDataCfd cfd) {

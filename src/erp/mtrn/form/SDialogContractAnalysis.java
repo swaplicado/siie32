@@ -936,7 +936,12 @@ public class SDialogContractAnalysis extends javax.swing.JDialog implements erp.
 
         try {
             sql = "SELECT dp.id_year, dp.id_doc, dep.id_ety, dp.dt, dtp.code, CONCAT(dp.num_ser, IF(length(dp.num_ser) = 0, '', '-'), dp.num) AS f_ped, " +
-                    "dep.sort_pos, cobp.code, dep.orig_qty, u.symbol, un.symbol " +
+                    "dep.sort_pos, cobp.code, " +
+                    "(dep.orig_qty * " +
+                    "IF((dp.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CN[0] + " AND dp.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CN[1] + " AND dp.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CN[2] + ") OR " +
+                    "(dp.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CN[0] + " AND dp.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] + " AND dp.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CN[2] + ") " +
+                    ", -1, 1)) AS orig_qty_proc, " +
+                    "u.symbol, un.symbol " +
                     "FROM trn_dps AS d " +
                     "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc " +
                     "INNER JOIN erp.itmu_unit as un ON de.fid_orig_unit = un.id_unit " +

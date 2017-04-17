@@ -39,7 +39,7 @@ import sa.lib.gui.SGuiValidation;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Alfredo Pérez
  */
 public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
 
@@ -290,6 +290,9 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
             catch (Exception e) {
                 SLibUtils.printException(this, e);
             }
+            finally {
+                miClient.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
         }
     }
     
@@ -327,7 +330,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
             processReceipts();
             miClient.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
-        else {
+        else { 
             if (maPayrollReceiptsIds != null) {
                 processPayroll();
             }
@@ -437,9 +440,8 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
             update(getGraphics());
             jScrollPane1.getVerticalScrollBar().setValue(jScrollPane1.getVerticalScrollBar().getMaximum());
         }
-        jScrollPane1.getVerticalScrollBar().setValue(jScrollPane1.getVerticalScrollBar().getMaximum());
     }
-
+    
     public void processCfd() throws Exception {
         int cfdsProcessed = 0;
         int cfdsCorrect = 0;
@@ -528,6 +530,10 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                             //SCfdUtils.printCfd(miClient, cfd.getFkCfdTypeId(), cfd, SDataConstantsPrint.PRINT_MODE_STREAM, mnNumCopies, mnSubtypeCfd, false);
                             detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Impreso.\n";
                             break;
+                        case SCfdConsts.PROC_PRT_DOCS:
+                            SCfdUtils.printCfd(miClient, cfd.getFkCfdTypeId(), cfd, SDataConstantsPrint.PRINT_MODE_STREAM, mnNumCopies, mnSubtypeCfd, false);
+                            detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Impreso.\n";
+                            break;
                         case SCfdConsts.PROC_PRT_ACK_ANNUL:
                             SCfdUtils.printAcknowledgmentCancellationCfd(miClient, cfd, SDataConstantsPrint.PRINT_MODE_STREAM, mnSubtypeCfd);
                             detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Impreso.\n";
@@ -575,6 +581,11 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                 }
                 update(getGraphics());
                 jScrollPane1.getVerticalScrollBar().setValue(jScrollPane1.getVerticalScrollBar().getMaximum());
+            }
+            
+            if (maCfds.isEmpty() && mnFormSubtype == SCfdConsts.PROC_PRT_DOCS ) {
+                detailMessage += "No se encontro ningún documento a imprimir para la fecha y folios indicados.\n";
+                updateForm(cfdsProcessed, cfdsCorrect, cfdsIncorrect, detailMessage);
             }
             
             warningMessage = SCfdUtils.verifyCertificateExpiration(miClient);

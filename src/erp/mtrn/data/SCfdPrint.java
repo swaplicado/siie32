@@ -29,6 +29,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceipt;
+import erp.mod.hrs.db.SHrsUtils;
 import erp.print.SDataConstantsPrint;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -49,11 +50,12 @@ import org.w3c.dom.Node;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
+import sa.lib.gui.SGuiClient;
 import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Alfredo Pérez
  */
 public class SCfdPrint {
 
@@ -668,6 +670,9 @@ public class SCfdPrint {
                 break;
             case SDataConstantsPrint.PRINT_MODE_PDF:
                 JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
+                break;
+            case SDataConstantsPrint.PRINT_MODE_STREAM:
+                JasperPrintManager.printReport(jasperPrint, false);
                 break;
             default:
                 throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
@@ -1321,6 +1326,7 @@ public class SCfdPrint {
         double dTotalIncapacidades = 0;
         double dTotalIsr = 0;
 
+        String sCodeDisability = "";
         String sPdfFileName = "";
         String sSql = "";
 
@@ -1575,8 +1581,10 @@ public class SCfdPrint {
                 i = 0;
                 if (((cfd.ver3.nom12.DElementNomina) element).getEltIncapacidades() != null) {
                     for (i = 0; i < ((cfd.ver3.nom12.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().size(); i++) {
+                        sCodeDisability = ((cfd.ver3.nom12.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttTipoIncapacidad().getString();
 
-                        aIncapacidades.add(((cfd.ver3.nom12.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttTipoIncapacidad().getString());
+                        aIncapacidades.add(sCodeDisability);
+                        aIncapacidades.add(SHrsUtils.getDisabilityName((SGuiClient) miClient, sCodeDisability));
                         aIncapacidades.add(((cfd.ver3.nom12.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttDiasIncapacidad().getInteger());
                         aIncapacidades.add(((cfd.ver3.nom12.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttImporteMonetario().getDouble());
 
@@ -1585,6 +1593,7 @@ public class SCfdPrint {
                 }
 
                 for (int j = i; j < 5; j++) {
+                    aIncapacidades.add(null);
                     aIncapacidades.add(null);
                     aIncapacidades.add(null);
                     aIncapacidades.add(null);

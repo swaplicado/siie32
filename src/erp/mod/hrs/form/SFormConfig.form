@@ -64,7 +64,7 @@
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
                 <Property name="columns" type="int" value="1"/>
-                <Property name="rows" type="int" value="8"/>
+                <Property name="rows" type="int" value="9"/>
                 <Property name="verticalGap" type="int" value="5"/>
               </Layout>
               <SubComponents>
@@ -207,9 +207,9 @@
                   <SubComponents>
                     <Component class="sa.lib.gui.bean.SBeanFieldBoolean" name="moBoolFornightStandard">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Quincenas fijas de 15 d&#xed;as"/>
+                        <Property name="text" type="java.lang.String" value="Utilizar quincenas fijas de 15 d&#xed;as"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[205, 23]"/>
+                          <Dimension value="[250, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -224,9 +224,9 @@
                   <SubComponents>
                     <Component class="sa.lib.gui.bean.SBeanFieldBoolean" name="moBoolTaxSubsidyEarning">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Subsidio impuesto es percepci&#xf3;n"/>
+                        <Property name="text" type="java.lang.String" value="Utilizar subsidio impuesto como percepci&#xf3;n"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[205, 23]"/>
+                          <Dimension value="[250, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -241,9 +241,26 @@
                   <SubComponents>
                     <Component class="sa.lib.gui.bean.SBeanFieldBoolean" name="moBoolTaxNet">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Impuesto neto"/>
+                        <Property name="text" type="java.lang.String" value="Mostrar impuesto neto"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[205, 23]"/>
+                          <Dimension value="[250, 23]"/>
+                        </Property>
+                      </Properties>
+                    </Component>
+                  </SubComponents>
+                </Container>
+                <Container class="javax.swing.JPanel" name="jPanel32">
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                    <Property name="alignment" type="int" value="0"/>
+                    <Property name="verticalGap" type="int" value="0"/>
+                  </Layout>
+                  <SubComponents>
+                    <Component class="sa.lib.gui.bean.SBeanFieldBoolean" name="moBoolBankAccountUse">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Agregar cuenta bancaria en XML del CFDI"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[250, 23]"/>
                         </Property>
                       </Properties>
                     </Component>

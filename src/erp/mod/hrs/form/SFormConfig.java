@@ -71,6 +71,8 @@ public class SFormConfig extends SBeanForm {
         moBoolTaxSubsidyEarning = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel31 = new javax.swing.JPanel();
         moBoolTaxNet = new sa.lib.gui.bean.SBeanFieldBoolean();
+        jPanel32 = new javax.swing.JPanel();
+        moBoolBankAccountUse = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel13 = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
         jPanel15 = new javax.swing.JPanel();
@@ -130,7 +132,7 @@ public class SFormConfig extends SBeanForm {
         jPanel2.setLayout(new java.awt.GridLayout(1, 2));
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración general:"));
-        jPanel6.setLayout(new java.awt.GridLayout(8, 1, 0, 5));
+        jPanel6.setLayout(new java.awt.GridLayout(9, 1, 0, 5));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -195,27 +197,35 @@ public class SFormConfig extends SBeanForm {
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        moBoolFornightStandard.setText("Quincenas fijas de 15 días");
-        moBoolFornightStandard.setPreferredSize(new java.awt.Dimension(205, 23));
+        moBoolFornightStandard.setText("Utilizar quincenas fijas de 15 días");
+        moBoolFornightStandard.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel11.add(moBoolFornightStandard);
 
         jPanel6.add(jPanel11);
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        moBoolTaxSubsidyEarning.setText("Subsidio impuesto es percepción");
-        moBoolTaxSubsidyEarning.setPreferredSize(new java.awt.Dimension(205, 23));
+        moBoolTaxSubsidyEarning.setText("Utilizar subsidio impuesto como percepción");
+        moBoolTaxSubsidyEarning.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel12.add(moBoolTaxSubsidyEarning);
 
         jPanel6.add(jPanel12);
 
         jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        moBoolTaxNet.setText("Impuesto neto");
-        moBoolTaxNet.setPreferredSize(new java.awt.Dimension(205, 23));
+        moBoolTaxNet.setText("Mostrar impuesto neto");
+        moBoolTaxNet.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel31.add(moBoolTaxNet);
 
         jPanel6.add(jPanel31);
+
+        jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        moBoolBankAccountUse.setText("Agregar cuenta bancaria en XML del CFDI");
+        moBoolBankAccountUse.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel32.add(moBoolBankAccountUse);
+
+        jPanel6.add(jPanel32);
 
         jPanel2.add(jPanel6);
 
@@ -458,6 +468,7 @@ public class SFormConfig extends SBeanForm {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel30;
     private javax.swing.JPanel jPanel31;
+    private javax.swing.JPanel jPanel32;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel9;
@@ -492,6 +503,7 @@ public class SFormConfig extends SBeanForm {
     private javax.swing.JLabel jlPayrollTaxRate;
     private javax.swing.JLabel jlTaxComputationType;
     private javax.swing.JLabel jlTaxComputationTypeHelp;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolBankAccountUse;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolFornightStandard;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolTaxNet;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolTaxSubsidyEarning;
@@ -529,6 +541,7 @@ public class SFormConfig extends SBeanForm {
         moBoolFornightStandard.setBooleanSettings(SGuiUtils.getLabelName(moBoolFornightStandard.getText()), true);
         moBoolTaxSubsidyEarning.setBooleanSettings(SGuiUtils.getLabelName(moBoolTaxSubsidyEarning.getText()), true);
         moBoolTaxNet.setBooleanSettings(SGuiUtils.getLabelName(moBoolTaxNet.getText()), false);
+        moBoolBankAccountUse.setBooleanSettings(SGuiUtils.getLabelName(moBoolBankAccountUse.getText()), false);
         moKeyMwzType.setKeySettings(miClient, SGuiUtils.getLabelName(jlMwzType), true);
         moKeyMwzReferenceType.setKeySettings(miClient, SGuiUtils.getLabelName(jlMwzReferenceType), true);
         moKeyTaxComputationType.setKeySettings(miClient, SGuiUtils.getLabelName(jlTaxComputationType), true);
@@ -550,6 +563,7 @@ public class SFormConfig extends SBeanForm {
         moFields.addField(moBoolFornightStandard);
         moFields.addField(moBoolTaxSubsidyEarning);
         moFields.addField(moBoolTaxNet);
+        moFields.addField(moBoolBankAccountUse);
         moFields.addField(moKeyMwzType);
         moFields.addField(moKeyMwzReferenceType);
         moFields.addField(moKeyTaxComputationType);
@@ -619,6 +633,7 @@ public class SFormConfig extends SBeanForm {
         moBoolFornightStandard.setValue(moRegistry.isFornightStandard());
         moBoolTaxSubsidyEarning.setValue(moRegistry.isTaxSubsidyEarning());
         moBoolTaxNet.setValue(moRegistry.isTaxNet());
+        moBoolBankAccountUse.setValue(moRegistry.isBankAccountUse());
         moKeyMwzType.setValue(new int[] { moRegistry.getFkMwzTypeId() });
         moKeyMwzReferenceType.setValue(new int[] { moRegistry.getFkMwzReferenceTypeId() });
         moKeyTaxComputationType.setValue(new int[] { moRegistry.getFkTaxComputationTypeId() });
@@ -657,6 +672,7 @@ public class SFormConfig extends SBeanForm {
         registry.setFornightStandard(moBoolFornightStandard.getValue());
         registry.setTaxSubsidyEarning(moBoolTaxSubsidyEarning.getValue());
         registry.setTaxNet(moBoolTaxNet.getValue());
+        registry.setBankAccountUse(moBoolBankAccountUse.getValue());
         registry.setFkMwzTypeId(moKeyMwzType.getValue()[0]);
         registry.setFkMwzReferenceTypeId(moKeyMwzReferenceType.getValue()[0]);
         registry.setFkTaxComputationTypeId(moKeyTaxComputationType.getValue()[0]);

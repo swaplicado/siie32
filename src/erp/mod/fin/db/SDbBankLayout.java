@@ -529,7 +529,7 @@ public class SDbBankLayout extends SDbRegistryUser {
 
                         oDsmEntry.setPkYearId(session.getCurrentYear());
                         oDsmEntry.setFkUserNewId(session.getUser().getPkUserId());
-
+                        
                         oDsmEntry.setSourceReference("");
                         oDsmEntry.setFkSourceCurrencyId(dps.getFkCurrencyId());
                         oDsmEntry.setSourceValueCy(bankDps.getDpsAmount());
@@ -824,6 +824,30 @@ public class SDbBankLayout extends SDbRegistryUser {
         }
     }
 
+    private boolean validateDocumentsStatus(final SGuiSession session) throws Exception {
+        SDataDps dps = null;
+        SLayoutBankPayment bankPayment = null;
+        
+        for (SLayoutBankPaymentRow paymentRow : maBankPaymentRows) {
+            bankPayment = paymentRow.getLayoutBankPayment();
+            
+            if (bankPayment.getLayoutPaymentType() == SModSysConsts.FIN_LAY_BANK_DPS) {
+                for (SLayoutBankDps bankDps : bankPayment.getLayoutBankDps()) {
+                    dps = new SDataDps();
+                    
+                    if (dps.read(new int[] { bankDps.getPkYearId(), bankDps.getPkDocId() }, session.getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                    }
+                    if (dps.getIsDeleted()) {
+                        throw new Exception("El documento '" + dps.getDpsNumber() + "' está eliminado.");
+                    }
+                }
+            }
+        }
+        
+        return true;
+    }
+    
     private boolean validatePeriodRecordLayout(final SGuiSession session) throws Exception {
         SDataRecord record = null;
         int i = 0;
@@ -1237,6 +1261,10 @@ public class SDbBankLayout extends SDbRegistryUser {
         boolean can = super.canSave(session);
         
         can = validatePeriodRecordLayout(session);
+        
+        if (can) {
+            can = validateDocumentsStatus(session);
+        }
         
         return can;
     }

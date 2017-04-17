@@ -1,4 +1,4 @@
-/*
+ /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -16,7 +16,7 @@ import java.util.Vector;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores, Juan Barajas
+ * @author Alfonso Flores, Sergio Flores, Juan Barajas, Cesar Orozco
  */
 public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -51,6 +51,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected double mdMassUnitary;
     protected boolean mbIsMassVariable;
     protected double mdProductionTime;
+    protected double mdProductionCost;
     protected double mdWeightGross;
     protected double mdWeightDelivery;
     protected double mdUnitAlternativeBaseEquivalence;
@@ -139,6 +140,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public void setMassUnitary(double d) { mdMassUnitary = d; }
     public void setIsMassVariable(boolean b) { mbIsMassVariable = b; }
     public void setProductionTime(double d) { mdProductionTime = d; }
+    public void setProductionCost(double d) { mdProductionCost = d; }
     public void setWeightGross(double d) { mdWeightGross = d; }
     public void setWeightDelivery(double d) { mdWeightDelivery = d; }
     public void setUnitAlternativeBaseEquivalence(double d) { mdUnitAlternativeBaseEquivalence = d; }
@@ -215,6 +217,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public double getMassUnitary() { return mdMassUnitary; }
     public boolean getIsMassVariable() { return mbIsMassVariable; }
     public double getProductionTime() { return mdProductionTime; }
+    public double getProductionCost() { return mdProductionCost; }
     public double getWeightGross() { return mdWeightGross; }
     public double getWeightDelivery() { return mdWeightDelivery; }
     public double getUnitAlternativeBaseEquivalence() { return mdUnitAlternativeBaseEquivalence; }
@@ -330,6 +333,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
         mdMassUnitary = 0;
         mbIsMassVariable = false;
         mdProductionTime = 0;
+        mdProductionCost = 0;
         mdWeightGross = 0;
         mdWeightDelivery = 0;
         mdUnitAlternativeBaseEquivalence = 0;
@@ -429,6 +433,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                 mdMassUnitary = resultSet.getDouble("mass_cu");
                 mbIsMassVariable = resultSet.getBoolean("b_mass_variable");
                 mdProductionTime = resultSet.getDouble("prod_time");
+                mdProductionCost = resultSet.getDouble("prod_cost");
                 mdWeightGross = resultSet.getDouble("weight_gross");
                 mdWeightDelivery = resultSet.getDouble("weight_delivery");
                 mdUnitAlternativeBaseEquivalence = resultSet.getDouble("unit_alt_base_equiv");
@@ -554,7 +559,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?) }");
+                    "?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkItemId);
             callableStatement.setString(nParam++, msKey);
             callableStatement.setString(nParam++, msItem);
@@ -586,6 +591,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
             callableStatement.setDouble(nParam++, mdMassUnitary);
             callableStatement.setBoolean(nParam++, mbIsMassVariable);
             callableStatement.setDouble(nParam++, mdProductionTime);
+            callableStatement.setDouble(nParam++, mdProductionCost);
             callableStatement.setDouble(nParam++, mdWeightGross);
             callableStatement.setDouble(nParam++, mdWeightDelivery);
             callableStatement.setDouble(nParam++, mdUnitAlternativeBaseEquivalence);

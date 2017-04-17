@@ -4,6 +4,7 @@
  */
 package erp.data;
 
+import erp.client.SClientInterface;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
@@ -1640,7 +1641,55 @@ public abstract class SDataUtilities {
     public static int[] obtainDpsKey(erp.client.SClientInterface client, java.lang.String series, java.lang.String number, java.lang.Object docClassTypeKey) throws java.lang.Exception {
         return obtainDpsKeyForBizPartner(client, series, number, docClassTypeKey, null);
     }
+/**
+ * 
+ * @param client
+ * @param serieIni Initial range value for Serial document (String)
+ * @param serieEnd Final range value for serial document (String)
+ * @param folioIni Initial 
+ * @param folioEnd
+ * @param date
+ * @param docClassTypeKey
+ * @return
+ * @throws Exception 
+ */
+    public static ArrayList<int[]> obtainDpsIds(final SClientInterface client, String serieIni, String serieEnd, String folioIni, String folioEnd, Date date, java.lang.Object docClassTypeKey) throws Exception {
+        int[] pk = new int[2];
+        String sql = "";
+        ResultSet resultSet = null;
+        ArrayList<int[]> key = null;
+        
+        key = new ArrayList<>();
+        
+        if (!serieIni.isEmpty() && !serieEnd.isEmpty() && !folioIni.isEmpty() && !folioEnd.isEmpty()) {
+            sql = "SELECT id_year, id_doc "
+                + "FROM trn_dps WHERE NOT b_del "
+                + "AND num_ser >= '" + serieIni + "' AND num_ser <= '" + serieEnd + "' " 
+                + "AND num >= '" + folioIni + "' "
+                + "AND num <= '" + folioEnd + "' AND fid_ct_dps = " + ((int[]) docClassTypeKey)[0] + " AND fid_cl_dps = " + ((int[]) docClassTypeKey)[1] + " AND " +
+                (((int[]) docClassTypeKey).length <= 2 ? "" : "fid_tp_dps = " + ((int[]) docClassTypeKey)[2] + " ") 
+                + "AND dt = '" + SLibUtils.DbmsDateFormatDate.format(date) + "';";
+        }
+        else if (serieIni.compareTo("") == 0 && serieEnd.compareTo("") == 0) {
+            sql = "SELECT id_year, id_doc "
+                + "FROM trn_dps WHERE NOT b_del "
+                + "AND num >= '" + folioIni + "' "
+                + "AND num <= '" + folioEnd + "' AND fid_ct_dps = " + ((int[]) docClassTypeKey)[0] + " AND fid_cl_dps = " + ((int[]) docClassTypeKey)[1] + " AND " +
+                (((int[]) docClassTypeKey).length <= 2 ? "" : "fid_tp_dps = " + ((int[]) docClassTypeKey)[2] + " ") 
+                + "AND dt = '" + SLibUtils.DbmsDateFormatDate.format(date) + "';";
+        }
 
+        resultSet = client.getSession().getStatement().executeQuery(sql);
+        
+        while (resultSet.next()) {
+            pk = new int[2];
+            pk[0] = resultSet.getInt("id_year");
+            pk[1] = resultSet.getInt("id_doc");
+            key.add(pk);
+        }
+        return key;
+    }
+        
     @SuppressWarnings("unchecked")
     public static int[] obtainDpsKeyForBizPartner(erp.client.SClientInterface client, java.lang.String series, java.lang.String number, java.lang.Object docClassTypeKey, java.lang.Object bizPartnerKey_n) throws java.lang.Exception {
         int[] key = null;
