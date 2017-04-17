@@ -4708,7 +4708,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 // remember that field jtfQuantityRo is read only!, it cannot gain focus
             }
             else if (moFieldOriginalPriceUnitaryCy.getDouble() == 0d &&
-                    miClient.showMsgBoxConfirm("¿Está seguro que se desea dejar sin valor al campo '" + jlOriginalPriceUnitaryCy.getText() + "'?") != JOptionPane.YES_OPTION) {
+                miClient.showMsgBoxConfirm("¿Está seguro que se desea dejar sin valor al campo '" + jlOriginalPriceUnitaryCy.getText() + "'?") != JOptionPane.YES_OPTION) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlOriginalPriceUnitaryCy.getText() + "'.");
                 validation.setComponent(jtfOriginalPriceUnitaryCy);
             }
@@ -4785,9 +4785,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 // Validate unitary price vs unitary month price in monthly order:
                 
                 for (int i = 0; i < moPaneGridPrices.getGridRows().size(); i++) {
-                    if (((SDataDpsEntryPrice) moPaneGridPrices.getGridRows().get(i).getData()).getOriginalPriceUnitaryCy() != SLibUtilities.parseDouble(jtfOriginalPriceUnitaryCy.getText())) {
-                        msgErrorPriceMonthlyOrder += ("Los valores del campo '" + jlOriginalPriceUnitaryCy.getText() + "' no coinciden con valor '" + jlPriceOriginalPriceUnitaryCy.getText() + "' de la entrega mensual '" + ((SDataDpsEntryPrice) moPaneGridPrices.getGridRows().get(i).getData()).getReferenceNumber() + "'.\n");
-                    }       
+//                    if (((SDataDpsEntryPrice) moPaneGridPrices.getGridRows().get(i).getData()).getOriginalPriceUnitaryCy() != SLibUtilities.parseDouble(jtfOriginalPriceUnitaryCy.getText())) {
+//                        msgErrorPriceMonthlyOrder += ("Los valores del campo '" + jlOriginalPriceUnitaryCy.getText() + "' no coinciden con valor '" + jlPriceOriginalPriceUnitaryCy.getText() + "' de la entrega mensual '" + ((SDataDpsEntryPrice) moPaneGridPrices.getGridRows().get(i).getData()).getReferenceNumber() + "'.\n");
+//                        System.out.println("Los valores del campo '\" + jlOriginalPriceUnitaryCy.getText() + \"' no coinciden con valor '\" + jlPriceOriginalPriceUnitaryCy.getText() + \"' de la entrega mensual '\" + ((SDataDpsEntryPrice) moPaneGridPrices.getGridRows().get(i).getData()).getReferenceNumber() + \"'.\\n");
+//                    }       
                 }
                 if (!msgErrorPriceMonthlyOrder.isEmpty()) {
                     validation.setMessage(msgErrorPriceMonthlyOrder);
