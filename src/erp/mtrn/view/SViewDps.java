@@ -275,7 +275,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbPrint.addActionListener(this);
         jbPrint.setToolTipText("Imprimir documento");
         
-        jbPrintByRange = new JButton(miClient.getImageIcon(SLibConstants.ICON_PRINT));
+        jbPrintByRange = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_print_many.gif")));
         jbPrintByRange.setPreferredSize(new Dimension(23, 23));
         jbPrintByRange.addActionListener(this);
         jbPrintByRange.setToolTipText("Imprimir varios documentos");
