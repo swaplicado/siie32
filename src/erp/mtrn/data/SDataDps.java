@@ -684,8 +684,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         int[] anPeriodKey = null;
         double dBalance;
         double dBalanceCy;
-        double dAuxTotal = 0;
-        double dAuxTotalCy = 0;
+        double dAuxBalance = 0;
+        double dAuxBalanceCy = 0;
         String sSql = "";
         String sMsg = psMsg;
         String sMsgAux = "";
@@ -791,20 +791,20 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                 // Subtract amount prepayment the total and subtract amount prepayment currency the total currency:
                 
-                dAuxTotal = SLibUtilities.round(mdTotal_r - obtainAmountPrepayments(AMT_PRE_PAY), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-                dAuxTotalCy = SLibUtilities.round(mdTotalCy_r - obtainAmountPrepayments(AMT_PRE_PAY_CY), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+                dAuxBalance = SLibUtilities.round(dBalance + obtainAmountPrepayments(AMT_PRE_PAY), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+                dAuxBalanceCy = SLibUtilities.round(dBalanceCy + obtainAmountPrepayments(AMT_PRE_PAY_CY), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
                 
-                if (dBalance != dAuxTotal) {
+                if (dAuxBalance != mdTotal_r) {
                     mnDbmsErrorId = 101;
-                    msDbmsError = sMsg + "¡El saldo del documento en la moneda local, " + oDecimalFormat.format(dBalance) + ", " +
-                            "es distinto al total del mismo, " + oDecimalFormat.format(dAuxTotal) + "!";
+                    msDbmsError = sMsg + "¡El saldo del documento en la moneda local, " + oDecimalFormat.format(dAuxBalance) + ", " +
+                            "es distinto al total del mismo, " + oDecimalFormat.format(mdTotal_r) + "!";
                     throw new Exception(msDbmsError);
                 }
 
-                if (dBalanceCy != dAuxTotalCy) {
+                if (dAuxBalanceCy != mdTotalCy_r) {
                     mnDbmsErrorId = 101;
-                    msDbmsError = sMsg + "¡El saldo del documento en la moneda del documento, " + oDecimalFormat.format(dBalanceCy) + ", " +
-                            "es distinto al total del mismo, " + oDecimalFormat.format(dAuxTotalCy) + "!";
+                    msDbmsError = sMsg + "¡El saldo del documento en la moneda del documento, " + oDecimalFormat.format(dAuxBalanceCy) + ", " +
+                            "es distinto al total del mismo, " + oDecimalFormat.format(mdTotalCy_r) + "!";
                     throw new Exception(msDbmsError);
                 }
             }
@@ -922,7 +922,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     "FROM fin_rec AS r INNER JOIN fin_rec_ety AS re ON " +
                                     "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
                                     "r.b_del = 0 AND re.b_del = 0 AND re.fid_dps_year_n = " + mnPkYearId + " AND re.fid_dps_doc_n = " + mnPkDocId + " AND " +
-                                    "re.fid_tp_acc_mov <> " + getAccMvtSubclassKeyBizPartner()[0] + " ";
+                                    "re.fid_tp_acc_mov <> " + getAccMvtSubclassKeyBizPartner()[0] + " AND " +
+                                    "re.fid_tp_acc_mov <> " + getAccMvtSubclassKeyAccountCash()[0] + " ";
                             sMsgAux = "¡El documento está en uso por pólizas contables como documento!";
                         }
                         else {

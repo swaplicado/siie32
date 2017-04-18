@@ -1300,7 +1300,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                         }
                     }
                     
-                    if (!mvDbmsDpsAdjustmentsAsAdjustment.isEmpty()) {
+                    if (!mvDbmsDpsAdjustmentsAsAdjustment.isEmpty() && mnFkDpsAdjustmentTypeId == SDataConstantsSys.TRNS_TP_DPS_ADJ_RET &&
+                            (mnXtaPkDpsYearConId != SLibConsts.UNDEFINED && mnXtaPkDpsDocConId != SLibConsts.UNDEFINED && mnXtaPkDpsDocEtyConId != SLibConsts.UNDEFINED)) {
                         SDataDpsDpsLink link = new SDataDpsDpsLink();
 
                         link.setPkSourceYearId(mnXtaPkDpsYearConId);
