@@ -99,7 +99,7 @@ public class SViewItem extends erp.lib.table.STableTab implements java.awt.event
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tl.tp_lev", "Tipo nivel", 75);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "si.name", "Estatus", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "i.prod_time", "Tiempo producción", STableConstants.WIDTH_QUANTITY);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "i.prod_cost", "Costo producción", STableConstants.WIDTH_QUANTITY);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "i.prod_cost", "Costo producción $", STableConstants.WIDTH_QUANTITY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "i.weight_gross", "Peso bruto", STableConstants.WIDTH_QUANTITY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "i.weight_delivery", "Peso flete", STableConstants.WIDTH_QUANTITY);
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "i.surplus_per", "Excedente predeterminado", STableConstants.WIDTH_PERCENTAGE);
