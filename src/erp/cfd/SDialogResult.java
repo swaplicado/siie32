@@ -584,7 +584,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
             }
             
             if (maCfds.isEmpty() && mnFormSubtype == SCfdConsts.PROC_PRT_DOCS ) {
-                detailMessage += "No se encontro ningún documento a imprimir para la fecha y folios indicados.\n";
+                detailMessage += "No se encontró ningún documento a imprimir para la fecha y folios indicados.\n";
                 updateForm(cfdsProcessed, cfdsCorrect, cfdsIncorrect, detailMessage);
             }
             

@@ -520,10 +520,11 @@ public abstract class SModSysConsts {
     public static final String FINU_TP_REC_JOURNAL = "Dr";
     public static final String FINU_TP_REC_CASH_BANK = "CB";
     
-    public static final int FIN_LAY_BANK_REC = 1;
-    public static final int FIN_LAY_BANK_DPS = 2;
-    public static final int FIN_LAY_BANK_ADV = 3;
-    public static final int FIN_LAY_BANK_QRY = 4;
+    public static final int FIN_LAY_BANK_REC = 1;   // not yet used!
+    public static final int FIN_LAY_BANK_DPS = 2;   // layout for payable accounts
+    public static final int FIN_LAY_BANK_ADV = 3;   // layout for advance payments
+    public static final int FIN_LAY_BANK_OWN = 11;  // layout for own transfers
+    public static final int FIN_LAY_BANK_QRY = 21;  // used only as grid identifier!
 
     /*
      * Transactions

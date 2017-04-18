@@ -40,7 +40,7 @@ public class SViewTheoricalCost extends erp.lib.table.STableTab implements java.
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Producto", 250);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.bom", "Referencia", 200);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "cost_prod", "Costo teórico formula $", STableConstants.WIDTH_QUANTITY);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "cost_prod", "Costo teórico fórmula $", STableConstants.WIDTH_QUANTITY);
          for (i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);
         }
