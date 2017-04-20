@@ -27,11 +27,19 @@ import erp.mod.fin.db.SXmlBankLayout;
 import erp.mod.fin.db.SXmlBankLayoutPayment;
 import erp.mod.fin.db.SXmlBankLayoutPaymentDoc;
 import erp.mtrn.data.SDataDps;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiSession;
 import sa.lib.srv.SSrvConsts;
 import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
@@ -333,5 +341,94 @@ public class SFinUtils {
         }
         
         return done;
+    }
+    
+    /**
+     * Gets two strings, date and time, returning a formed date object
+     * 
+     * @param date String of date format: yyyy-mm-dd
+     * @param hour String of format: HH.mm.ss
+     * @return Date with de values
+     * @throws Exception 
+     */
+    public static Date stringToDateTime(String date, String hour) {
+        String[] times = null;
+        
+        Calendar cal = Calendar.getInstance();
+        int day = Integer.parseInt(date.substring(8));
+        int month = Integer.parseInt(date.substring(5,7));
+        int year = Integer.parseInt(date.substring(0, 4));
+        
+        if (hour != null && !hour.isEmpty() && hour.contains(".")) {
+            cal.set(year, month, day, SLibUtils.parseInt(hour.substring(0,2)), SLibUtils.parseInt(hour.substring(3,5)), SLibUtils.parseInt(hour.substring(6)));
+        }
+        else {
+            cal.set(year, month, day, SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, SLibConsts.UNDEFINED);
+        }
+
+        return cal.getTime();
+    }
+    
+    public static Date stringToDateTime(String date) {
+        String sDate = date.substring(0, date.indexOf(" "));
+        String sHour = date.substring(date.indexOf(" "));
+        
+        return stringToDateTime(sDate, sHour.replace(":", "."));
+    }
+    
+    /**
+     * Reads a file in the specified path and returns an File object
+     * 
+     * @param filePath
+     * @return File object
+     * @throws FileNotFoundException
+     * @throws IOException 
+     */
+    public static ArrayList<String> readImportFile(String filePath) throws FileNotFoundException, IOException {
+        BufferedReader bufferedReader = null;
+        ArrayList<String> lines = new ArrayList<>();
+        String fileLine = "";
+        
+        bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "utf-8"));  
+        
+        while((fileLine = bufferedReader.readLine()) != null) {
+            lines.add(fileLine);
+        }
+        
+        bufferedReader.close();
+        
+        return lines;
+    }
+    
+    /**
+     * Return the key of the corresponding account
+     * 
+     * @param session
+     * @param bankAccount bank account, field acc_num of bank_acc table
+     * @return key of account with lenght 2.
+     */
+    public static int[] getAccCashKeyByAccount(final SGuiSession session, final String bankAccount) {
+        String sql = "";
+        ResultSet resultSet = null;
+        int key[] = null;
+
+        try {
+            sql = "SELECT id_cob, id_acc_cash " +
+            "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_ACC_CASH) + " AS ac " +
+            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BANK_ACC) + " AS ba ON ac.fid_bpb_n = ba.id_bpb AND ac.fid_bank_acc_n = ba.id_bank_acc " +
+            "WHERE ba.acc_num = '" + bankAccount + "';";
+            
+            resultSet = session.getStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                key = new int[2];
+                key[0] = resultSet.getInt("id_cob");
+                key[1] = resultSet.getInt("id_acc_cash");
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.printException(SFinUtils.class.getName(), e);
+        }
+
+        return key;
     }
 }

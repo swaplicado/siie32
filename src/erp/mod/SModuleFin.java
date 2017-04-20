@@ -18,6 +18,8 @@ import erp.mod.fin.db.SDbAccountItemLink;
 import erp.mod.fin.db.SDbBankLayout;
 import erp.mod.fin.db.SDbCheckWallet;
 import erp.mod.fin.db.SDbCostCenter;
+import erp.mod.fin.db.SDbBankLayoutDeposits;
+import erp.mod.fin.db.SDbBankLayoutDepositsAnalyst;
 import erp.mod.fin.db.SDbTaxItemLink;
 import erp.mod.fin.form.SFormAbpBizPartner;
 import erp.mod.fin.form.SFormAbpBizPartnerLink;
@@ -27,6 +29,7 @@ import erp.mod.fin.form.SFormAbpItem;
 import erp.mod.fin.form.SFormAbpItemLink;
 import erp.mod.fin.form.SFormAbpTax;
 import erp.mod.fin.form.SFormAccountItemLink;
+import erp.mod.fin.form.SFormImportPayments;
 import erp.mod.fin.form.SFormLayoutBank;
 import erp.mod.fin.form.SFormTaxItemLink;
 import erp.mod.fin.view.SViewAbpBizPartner;
@@ -39,6 +42,7 @@ import erp.mod.fin.view.SViewAbpTax;
 import erp.mod.fin.view.SViewAccountItemLink;
 import erp.mod.fin.view.SViewBankLayout;
 import erp.mod.fin.view.SViewBankLayoutPayments;
+import erp.mod.fin.view.SViewImportFile;
 import erp.mod.fin.view.SViewTaxItemLink;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -66,7 +70,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Edwin Carmona
  */
 public class SModuleFin extends SGuiModule {
 
@@ -86,6 +90,7 @@ public class SModuleFin extends SGuiModule {
     private SFormLayoutBank moFormBankLayout;
     private SFormLayoutBank moFormBankLayoutAdvances;
     private SFormLayoutBank moFormBankLayoutPayment;
+    private SFormImportPayments moFormImportPayments;
 
     private SBeanOptionPicker moPickerExchangeRateMxn;
     private SBeanOptionPicker moPickerExchangeRateUsd;
@@ -243,6 +248,12 @@ public class SModuleFin extends SGuiModule {
                 break;
             case SModConsts.FIN_LAY_BANK:
                 registry = new SDbBankLayout();
+                break;
+            case SModConsts.FIN_LAY_BANK_DEP:
+                registry = new SDbBankLayoutDeposits();
+                break;
+            case SModConsts.FIN_LAY_BANK_DEP_ANA:
+                registry = new SDbBankLayoutDepositsAnalyst();
                 break;
             case SModConsts.FIN_CHECK_WAL:
                 registry = new SDbCheckWallet();
@@ -476,6 +487,9 @@ public class SModuleFin extends SGuiModule {
                     }
                 }
                 break;
+            case SModConsts.FIN_LAY_BANK_DEP:
+                view = new SViewImportFile(miClient, subtype, "Importación de archivos");
+                break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -637,6 +651,10 @@ public class SModuleFin extends SGuiModule {
                     default:
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
+                break;
+            case SModConsts.FIN_LAY_BANK_DEP:
+                moFormImportPayments = new SFormImportPayments(miClient, subtype, "Importación de pagos por analista");
+                form = moFormImportPayments;
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

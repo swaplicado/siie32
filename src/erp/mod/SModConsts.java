@@ -294,6 +294,8 @@ public abstract class SModConsts {
     public static final int FIN_FISCAL_ACC_LINK = 2013451;
     public static final int FIN_FISCAL_ACC_LINK_DET = 2013452;
     public static final int FIN_LAY_BANK = 2013461;
+    public static final int FIN_LAY_BANK_DEP = 2013462;
+    public static final int FIN_LAY_BANK_DEP_ANA = 2013463;
 
     public static final int FIN_BKC = 2013501;
 
@@ -898,6 +900,8 @@ public abstract class SModConsts {
         TablesMap.put(FIN_FISCAL_ACC_LINK, "fin_fiscal_acc_link");
         TablesMap.put(FIN_FISCAL_ACC_LINK_DET, "fin_fiscal_acc_link_det");
         TablesMap.put(FIN_LAY_BANK, "fin_lay_bank");
+        TablesMap.put(FIN_LAY_BANK_DEP, "fin_lay_bank_dep");
+        TablesMap.put(FIN_LAY_BANK_DEP_ANA, "fin_lay_bank_dep_ana");
 
         TablesMap.put(FIN_BKC, "fin_bkc");
 

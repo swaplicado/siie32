@@ -6,7 +6,7 @@ package erp.mod.fin.db;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Edwin Carmona
  */
 public class SFinConsts {
 
@@ -29,6 +29,8 @@ public class SFinConsts {
     
     public static final int LAY_BANK_NEW_ST = 0;
     public static final int LAY_BANK_APPROVED_ST = 1;
+    
+    public static final int LAY_TP_BANK_DEP_CIE = 11;
     
     public static final String LAY_BANK_NEW_TEXT_ST = "NUEVO";
     public static final String LAY_BANK_APPROVED_TEXT_ST = "APROBADO";
