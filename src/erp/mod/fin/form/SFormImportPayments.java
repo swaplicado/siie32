@@ -19,8 +19,6 @@ import erp.mod.fin.db.SAnalystDepositRow;
 import erp.mod.fin.db.SDbBankLayoutDeposits;
 import erp.mod.fin.db.SDbBankLayoutDepositsAnalyst;
 import erp.mod.fin.db.SFinConsts;
-import erp.mod.fin.db.SXmlAnalystImportation;
-import erp.mod.fin.db.SXmlImportFile;
 import erp.mod.fin.util.SFinUtils;
 import erp.mod.fin.util.SImportPayments;
 import java.awt.BorderLayout;
@@ -40,8 +38,6 @@ import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableRowSorter;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -689,6 +685,9 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
                 jckCurrentAnalyst.setEnabled(false);
                 jbEdit.setEnabled(false);
                 jbSave.setEnabled(false);
+                
+                moGridPayments.getTable().setEnabled(false);
+                moGridPayments.getTable().getTableHeader().setEnabled(false);
                 break;
             case ST_SELECT_LAY:
                 jbLayoutPath.setEnabled(true);
@@ -702,6 +701,9 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
                 jckCurrentAnalyst.setEnabled(true);
                 jbEdit.setEnabled(false);
                 jbSave.setEnabled(jckCurrentAnalyst.isSelected() && moGridPayments.getModel().getGridRows().size() > 0);
+                
+                moGridPayments.getTable().setEnabled(true);
+                moGridPayments.getTable().getTableHeader().setEnabled(true);
                 break;
             case ST_OPEN_REGISTRY:
                 jbLayoutPath.setEnabled(false);
@@ -718,10 +720,7 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
                 
                 jckCurrentAnalyst.setSelected(true);
                 
-                moGridPayments.getTable().setColumnSelectionAllowed(false);
-                moGridPayments.getTable().getTableHeader().setReorderingAllowed(false);
-                moGridPayments.getTable().getTableHeader().setResizingAllowed(true);
-                moGridPayments.getTable().setRowSorter(new TableRowSorter<AbstractTableModel>(moGridPayments.getModel()));
+                moGridPayments.getTable().setEnabled(false);
                 moGridPayments.getTable().getTableHeader().setEnabled(false);
                 break;
             case ST_MOD_REGISTRY:
@@ -737,6 +736,9 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
                 jbSave.setEnabled(jckCurrentAnalyst.isSelected() && moGridPayments.getModel().getGridRows().size() > 0);
                 
                 jckCurrentAnalyst.setEnabled(true);
+                
+                moGridPayments.getTable().setEnabled(true);
+                moGridPayments.getTable().getTableHeader().setEnabled(true);
                 break;
         }
     }
@@ -1048,6 +1050,7 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
 
     private void processEditing() {
         mnIndexPayment = moGridPayments.getTable().getSelectedRow();
+        SAnalystDepositRow anaRow = ((SAnalystDepositRow) moGridPayments.getGridRow(mnIndexPayment));
         double exRate = 0.0;
         boolean valid = false;
                 
@@ -1060,31 +1063,30 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
         
         if (mnOptionEdit == COL_APPLICATION) {
             if (moCurrentRecord != null) {
-                ((SAnalystDepositRow) moGridPayments.getGridRow(mnIndexPayment)).setRecord(moCurrentRecord);
+                if (anaRow.getImported()) {
+                    anaRow.setRecord(moCurrentRecord);
+                }
                 valid = true;
             }
             else {
-                if (((SAnalystDepositRow) moGridPayments.getGridRow(mnIndexPayment)).getImported()){
+                if (anaRow.getImported()){
                     miClient.showMsgBoxWarning("¡Debe seleccionar una póliza contable!");
-                    ((SAnalystDepositRow) moGridPayments.getGridRow(mnIndexPayment)).setImported(false);
-                }
-                else {
-                    ((SAnalystDepositRow) moGridPayments.getGridRow(mnIndexPayment)).setRecord(null);
+                    anaRow.setImported(false);
                 }
             }
             if (valid) {
                 if (mnCurrencyId != miClient.getSession().getSessionCustom().getLocalCurrencyKey()[0]) {
-                    ((SAnalystDepositRow) moGridPayments.getGridRow(mnIndexPayment)).setExchangeRate(exRate);
+                    anaRow.setExchangeRate(exRate);
                 }
                 else {
-                    ((SAnalystDepositRow) moGridPayments.getGridRow(mnIndexPayment)).setExchangeRate(1.0);
+                    anaRow.setExchangeRate(1.0);
                 }
             }
         }
         else if (mnOptionEdit == COL_EXCH_RATE) {
             if (mnCurrencyId == miClient.getSession().getSessionCustom().getLocalCurrencyKey()[0]) {
                 miClient.showMsgBoxError("¡No se puede modificar el tipo de cambio!");
-                ((SAnalystDepositRow) moGridPayments.getGridRow(mnIndexPayment)).setExchangeRate(1.0);
+                anaRow.setExchangeRate(1.0);
             }
         }
         
@@ -1229,26 +1231,19 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
         getRecordLocks();
         
         moImportation.populateAccounts(maAllDeposits);
-        moGridPayments.getModel().getGridRows().clear();
-        moGridPayments.getModel().getGridRows().addAll(maAllDeposits);
-        SXmlImportFile xmlFile = moImportation.populateXmlImportFile(moGridPayments.getModel().getGridRows(), maAccountKey[1], moBankAccount.getValue(), mnCurrencyId, moCurrency.getValue());
-        registry.setXmlObject(xmlFile);
-        registry.setDepositsXml(xmlFile.getXmlString());
         registry.getDepositsRows().clear();
         registry.getDepositsRows().addAll(maAllDeposits);
         
-        SXmlAnalystImportation xmlImportation = moImportation.populateAnalystImportation(moGridPayments.getModel().getGridRows(), miClient.getSession().getUser().getPkUserId());
-        
         childRegistry.setPkBankLayoutDepositsId(registry.getPkBankLayoutDepositsId());
         childRegistry.setPkUserAnalystId(miClient.getSession().getUser().getPkUserId());
-        childRegistry.setXmlObject(xmlImportation);
-        childRegistry.setUserAnalystXml(xmlImportation.getXmlString());
         childRegistry.setSourceMovements(moAnalystPayments.getValue());
         childRegistry.setSourceAmount(moAmountAnalyst.getValue());
         childRegistry.setImportedMovements(moImportedPayments.getValue());
         childRegistry.setImportedAmount(moAmountImported.getValue());
         childRegistry.setDeleted(moDeleted.getValue());
-
+        childRegistry.getDepositsRows().clear();
+        childRegistry.getDepositsRows().addAll(maAllDeposits);
+        
         registry.getAnalystImportations().put(miClient.getSession().getUser().getPkUserId(), childRegistry);
 
         if (!maLocks.isEmpty()) {

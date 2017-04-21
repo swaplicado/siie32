@@ -28,7 +28,6 @@ import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
-import sa.lib.xml.SXmlElement;
 
 /**
  *
@@ -117,14 +116,26 @@ public class SDbBankLayoutDeposits extends SDbRegistryUser {
         SDataRecord record = null;
         if (maDepositsRows != null) {
             for (SAnalystDepositRow deposit : maDepositsRows) {
-                if (deposit.getRecord() != null && deposit.getPkAnalystId() != SLibConstants.UNDEFINED && deposit.getBizPartnerAccountId() != null && !deposit.getBizPartnerAccountId().isEmpty()) {
-                    record = processRecord(session, deposit.getRecord().getPrimaryKey(), session.getUser().getPkUserId(), deposit);
-
-                    if (record.save(session.getStatement().getConnection()) != SLibConstants.DB_ACTION_SAVE_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                if (deposit.getPkAnalystId() != SLibConstants.UNDEFINED && deposit.getBizPartnerAccountId() != null && !deposit.getBizPartnerAccountId().isEmpty()) {
+                    record = null;
+                    if (deposit.getRecord() != null) {
+                        if (deposit.getBkcYear() == SLibConstants.UNDEFINED && deposit.getBkcNum() == SLibConstants.UNDEFINED) {
+                            record = processRecord(session, deposit.getRecord().getPrimaryKey(), session.getUser().getPkUserId(), deposit, false);
+                        }
+                        else {
+                            if (!deposit.getImported()) {
+                            record = processRecord(session, deposit.getRecord().getPrimaryKey(), session.getUser().getPkUserId(), deposit, true);
+                            }
+                        }
                     }
-                    if (record.read(deposit.getRecord().getPrimaryKey(), session.getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                    
+                    if (record != null) {
+                        if (record.save(session.getStatement().getConnection()) != SLibConstants.DB_ACTION_SAVE_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                        }
+                        if (record.read(deposit.getRecord().getPrimaryKey(), session.getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                        }
                     }
                 }
             }
@@ -141,9 +152,10 @@ public class SDbBankLayoutDeposits extends SDbRegistryUser {
      * @return
      * @throws Exception 
      */
-    private SDataRecord processRecord(final SGuiSession session, final Object recordKey, final int pkAnalystId, SAnalystDepositRow deposit) throws Exception {
+    private SDataRecord processRecord(final SGuiSession session, final Object recordKey, final int pkAnalystId, SAnalystDepositRow deposit, final boolean toDelete) throws Exception {
         int nBookkeepingYear = 0;
         int nBookkeepingNum = 0;
+        int nSortPosition = 0;
         Statement statementAux = null;
         SDataRecord record = null;
         ArrayList<SDataRecordEntry> recordEntriesToProcess = null;
@@ -172,9 +184,22 @@ public class SDbBankLayoutDeposits extends SDbRegistryUser {
                 nBookkeepingNum = bookkeepingNumber.getPkNumberId();
             }
 
-            // Settings of document:
-            recordEntrys.add(0, createRecordEntryAdvances(session, nBookkeepingYear, nBookkeepingNum, deposit));
-            recordEntrys.add(0, createRecordEntryAccountCash(session, nBookkeepingYear, nBookkeepingNum, deposit));
+            if (toDelete) {
+                for (SDataRecordEntry entry : record.getDbmsRecordEntries()) {
+                    if (SLibUtils.compareKeys(new int[] { entry.getFkBookkeepingYearId_n(), entry.getFkBookkeepingNumberId_n() }, new int[] { deposit.getBkcYear(),deposit.getBkcNum() }) /*&&
+                            SLibUtils.belongsTo(new int[] { entry.getFkSystemMoveCategoryIdXXX(), entry.getFkSystemMoveTypeIdXXX() },  new int[][] { SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH })*/) {
+                        entry.setIsDeleted(true);
+                        entry.setIsRegistryEdited(true);
+                        recordEntriesToProcess.add(entry);
+                    }
+                }
+            }
+            else {
+                recordEntrys.add(0, createRecordEntryAdvances(session, nBookkeepingYear, nBookkeepingNum, deposit));
+                recordEntrys.add(0, createRecordEntryAccountCash(session, nBookkeepingYear, nBookkeepingNum, deposit));
+                deposit.setBkcYear(nBookkeepingYear);
+                deposit.setBkcNum(nBookkeepingNum);
+            }
         }
         
         for (SDataRecordEntry entry : recordEntrys) {
@@ -189,9 +214,14 @@ public class SDbBankLayoutDeposits extends SDbRegistryUser {
             if (entry.getFkSystemMoveCategoryIdXXX() == SDataConstantsSys.FINS_CT_SYS_MOV_BPS) {
                 entry.setDbmsAccountComplement(deposit.getBizPartnerName());
             }
-            record.getDbmsRecordEntries().add(entry);
+            recordEntriesToProcess.add(entry);
         }
-        recordEntriesToProcess.addAll(recordEntrys);
+        
+        record.getDbmsRecordEntries().addAll(recordEntriesToProcess);
+        
+        for (SDataRecordEntry entry : record.getDbmsRecordEntries()) {
+            entry.setSortingPosition(++nSortPosition);
+        }
         
         return record;
     }
@@ -412,13 +442,42 @@ public class SDbBankLayoutDeposits extends SDbRegistryUser {
         }
     }
     
-    public void readXml() throws Exception {
-        moXmlObject.processXml(msDepositsXml);
-        maXmlRows = new ArrayList<>();
+/**
+     * Puts the values of the import form in the xml file
+     * 
+     * @param rows Lines of the import form
+     * @param accountId Id of bank account
+     * @param account Receiving bank account
+     * @param currencyId Currency id of the file and the bank account
+     * @param currencyCode Currency code of the file and the bank account
+     * @return The resulting xml object
+     */
+    public SXmlImportFile populateXmlImportFile(ArrayList <SAnalystDepositRow> rows, int accountId, String account, int currencyId, String currencyCode) {
+        SXmlImportFile xmlFile = new SXmlImportFile();
+        SXmlImportFilePayment xmlFilePayment = null;
+
+        xmlFile.getAttribute(SXmlImportFile.ATT_ACC).setValue(account);
+        xmlFile.getAttribute(SXmlImportFile.ATT_ACC_ID).setValue(accountId);
+        xmlFile.getAttribute(SXmlImportFile.ATT_CUR_CODE).setValue(currencyCode);
+        xmlFile.getAttribute(SXmlImportFile.ATT_CUR_ID).setValue(currencyId);
         
-        for (SXmlElement element: moXmlObject.getXmlElements()) {
-            maXmlRows.add((SXmlImportFilePayment) element);
+        for (SAnalystDepositRow row : rows) {
+            xmlFilePayment = new SXmlImportFilePayment();
+            
+            xmlFilePayment.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_ID).setValue(row.getPkDepositId());
+            xmlFilePayment.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_TIME_STAMP).setValue(SLibUtils.DbmsDateFormatDatetime.format(row.getDateDeposit()));
+            xmlFilePayment.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_CUSTOMER_ID).setValue(row.getBizPartnerId());
+            xmlFilePayment.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_ANALYST_ID).setValue(row.getPkAnalystId());
+            xmlFilePayment.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_REFERENCE).setValue(row.getReference());
+            xmlFilePayment.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_CONCEPT).setValue(row.getConcept());
+            xmlFilePayment.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_NUMBER_TX).setValue(row.getNumberTx());
+            xmlFilePayment.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_TYPE).setValue(row.getPaymentType());
+            xmlFilePayment.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_AMOUNT).setValue(row.getAmountOrigCurrency());
+            
+            xmlFile.getXmlElements().add(xmlFilePayment);
         }
+        
+        return xmlFile;
     }
     
     public void updateData() {
@@ -556,6 +615,8 @@ public class SDbBankLayoutDeposits extends SDbRegistryUser {
         }
         
         computeRecord(session);
+        moXmlObject = populateXmlImportFile(maDepositsRows, mnFkBankAccountCashId, "", mnFkCurrencyId, "");
+        msDepositsXml = moXmlObject.getXmlString();
 
         if (mbRegistryNew) {
             mbDeleted = false;

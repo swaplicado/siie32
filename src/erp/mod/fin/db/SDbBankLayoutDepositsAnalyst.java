@@ -5,6 +5,7 @@
 
 package erp.mod.fin.db;
 
+import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,7 +15,6 @@ import java.util.Date;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
-import sa.lib.xml.SXmlElement;
 
 /**
  *
@@ -40,6 +40,7 @@ public class SDbBankLayoutDepositsAnalyst extends SDbRegistryUser {
     
     protected SXmlAnalystImportation moXmlObject;
     protected ArrayList<SXmlAnalystImportationPayment> maXmlRows;
+    protected ArrayList<SAnalystDepositRow> maDepositsRows;
 
     public void setPkBankLayoutDepositsId(int n) { mnPkBankLayoutDepositsId = n; }
     public void setPkUserAnalystId(int n) { mnPkUserAnalystId = n; }
@@ -71,16 +72,47 @@ public class SDbBankLayoutDepositsAnalyst extends SDbRegistryUser {
 
     public SXmlAnalystImportation getXmlObject() { return moXmlObject; }
     public ArrayList<SXmlAnalystImportationPayment> getXmlRows() { return maXmlRows; }
+    public ArrayList<SAnalystDepositRow> getDepositsRows() { return maDepositsRows; }
     
-    public void readXml() throws Exception {
-        SXmlAnalystImportation moXmlObject = new SXmlAnalystImportation();
-        moXmlObject.processXml(msUserAnalystXml);
-        maXmlRows = new ArrayList<>();
+    /**
+     * Puts the values of the import form in the xml file
+     * 
+     * @param rows Lines of the import form
+     * @param analystId
+     * @param userId
+     * @return The resulting xml object
+     */
+    public SXmlAnalystImportation populateAnalystImportation(ArrayList <SAnalystDepositRow> rows, int analystId, int userId) {
+        SXmlAnalystImportation xmlImport = new SXmlAnalystImportation();
+        SXmlAnalystImportationPayment xmlImportPayment = null;        
         
-        for (SXmlElement element: moXmlObject.getXmlElements()) {
-            maXmlRows.add((SXmlAnalystImportationPayment) element);
+        xmlImport.getAttribute(SXmlAnalystImportation.ATT_ANALYST_ID).setValue(analystId);
+        
+        for (SAnalystDepositRow row : rows) {
+            if(row.getPkAnalystId() == userId) {
+                xmlImportPayment = new SXmlAnalystImportationPayment();
+
+                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAYMENT_ID).setValue(row.getPkDepositId());
+                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAYMENT_IMPORTED).setValue(row.getImported());
+                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_ACC_REF).setValue(row.getReferenceAdv());
+                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_AMOUNT_CY).setValue(row.getAmountOrigCurrency());
+                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_EXCH_RATE).setValue(row.getExchangeRate());
+                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_AMOUNT).setValue(row.getAmountLocal());
+                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_REC_YEAR_ID).setValue(row.getRecord() != null ? row.getRecord().getPkYearId() : SLibConstants.UNDEFINED);
+                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_REC_PER_ID).setValue(row.getRecord() != null ? row.getRecord().getPkPeriodId() : SLibConstants.UNDEFINED);
+                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_REC_BKC_ID).setValue(row.getRecord() != null ? row.getRecord().getPkBookkeepingCenterId() : SLibConstants.UNDEFINED);
+                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_REC_TP_ID).setValue(row.getRecord() != null ? row.getRecord().getPkRecordTypeId() : "");
+                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_REC_NUM_ID).setValue(row.getRecord() != null ? row.getRecord().getPkNumberId() : SLibConstants.UNDEFINED);
+                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_BKC_YEAR).setValue(row.getBkcYear());
+                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_BKC_NUM).setValue(row.getBkcNum());
+
+                xmlImport.getXmlElements().add(xmlImportPayment);
+            }
         }
+        
+        return xmlImport;
     }
+    
     
     public SDbBankLayoutDepositsAnalyst() {
         super(SModConsts.FIN_LAY_BANK_DEP_ANA);
@@ -113,6 +145,8 @@ public class SDbBankLayoutDepositsAnalyst extends SDbRegistryUser {
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
+        
+        maDepositsRows = new ArrayList<>();
     }
 
     @Override
@@ -181,6 +215,9 @@ public class SDbBankLayoutDepositsAnalyst extends SDbRegistryUser {
         if (mbRegistryNew) {
             computePrimaryKey(session);
         }
+        
+        moXmlObject = populateAnalystImportation(maDepositsRows, mnPkUserAnalystId, session.getUser().getPkUserId());
+        msUserAnalystXml = moXmlObject.getXmlString();
 
         if (mbRegistryNew) {
             mbDeleted = false;

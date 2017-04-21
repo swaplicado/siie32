@@ -69,6 +69,8 @@ public class SXmlAnalystImportation extends SXmlDocument {
             row.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_REC_BKC_ID).setValue(SLibUtils.parseInt(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlAnalystImportationPayment.ATT_PAY_ANA_REC_BKC_ID, true)));
             row.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_REC_TP_ID).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlAnalystImportationPayment.ATT_PAY_ANA_REC_TP_ID, true));
             row.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_REC_NUM_ID).setValue(SLibUtils.parseInt(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlAnalystImportationPayment.ATT_PAY_ANA_REC_NUM_ID, true)));
+            row.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_BKC_YEAR).setValue(SLibUtils.parseInt(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlAnalystImportationPayment.ATT_PAY_ANA_BKC_YEAR, true)));
+            row.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_BKC_NUM).setValue(SLibUtils.parseInt(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlAnalystImportationPayment.ATT_PAY_ANA_BKC_NUM, true)));
             
             mvXmlElements.add(row);
         }

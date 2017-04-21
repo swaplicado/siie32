@@ -29,8 +29,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
+
 import sa.lib.SLibUtils;
-import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiClient;
 import sa.lib.xml.SXmlElement;
 
@@ -224,6 +224,8 @@ public class SImportPayments {
             }
             row.setAmountLocal(row.getAmountOrigCurrency() * row.getExchangeRate());
             row.setRecord(null);
+            row.setBkcYear(SLibConstants.UNDEFINED);
+            row.setBkcNum(SLibConstants.UNDEFINED);
             
             mdAmountFile += row.getAmountOrigCurrency();
             deposits.add(row);
@@ -233,85 +235,6 @@ public class SImportPayments {
         mnPaymentsFile = deposits.size();
         
         return deposits;
-    }
-    
-    /**
-     * Puts the values of the import form in the xml file
-     * 
-     * @param rows Lines of the import form
-     * @param accountId Id of bank account
-     * @param account Receiving bank account
-     * @param currencyId Currency id of the file and the bank account
-     * @param currencyCode Currency code of the file and the bank account
-     * @return The resulting xml object
-     */
-    public SXmlImportFile populateXmlImportFile(Vector <SGridRow> rows, int accountId, String account, int currencyId, String currencyCode) {
-        SXmlImportFile xmlFile = new SXmlImportFile();
-        SXmlImportFilePayment xmlFilePayment = null;
-        SAnalystDepositRow row = null;
-
-        xmlFile.getAttribute(SXmlImportFile.ATT_ACC).setValue(account);
-        xmlFile.getAttribute(SXmlImportFile.ATT_ACC_ID).setValue(accountId);
-        xmlFile.getAttribute(SXmlImportFile.ATT_CUR_CODE).setValue(currencyCode);
-        xmlFile.getAttribute(SXmlImportFile.ATT_CUR_ID).setValue(currencyId);
-        
-        for (SGridRow gridRow : rows) {
-            xmlFilePayment = new SXmlImportFilePayment();
-            row = (SAnalystDepositRow) gridRow;
-            
-            xmlFilePayment.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_ID).setValue(row.getPkDepositId());
-            xmlFilePayment.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_TIME_STAMP).setValue(SLibUtils.DbmsDateFormatDatetime.format(row.getDateDeposit()));
-            xmlFilePayment.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_CUSTOMER_ID).setValue(row.getBizPartnerId());
-            xmlFilePayment.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_ANALYST_ID).setValue(row.getPkAnalystId());
-            xmlFilePayment.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_REFERENCE).setValue(row.getReference());
-            xmlFilePayment.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_CONCEPT).setValue(row.getConcept());
-            xmlFilePayment.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_NUMBER_TX).setValue(row.getNumberTx());
-            xmlFilePayment.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_TYPE).setValue(row.getPaymentType());
-            xmlFilePayment.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_AMOUNT).setValue(row.getAmountOrigCurrency());
-            
-            xmlFile.getXmlElements().add(xmlFilePayment);
-        }
-        
-        return xmlFile;
-    }
-    
-    /**
-     * Puts the values of the import form in the xml file
-     * 
-     * @param rows Lines of the import form
-     * @param analystId
-     * @return The resulting xml object
-     */
-    public SXmlAnalystImportation populateAnalystImportation(Vector <SGridRow> rows, int analystId) {
-        SXmlAnalystImportation xmlImport = new SXmlAnalystImportation();
-        SXmlAnalystImportationPayment xmlImportPayment = null;
-        SAnalystDepositRow row = null;
-        
-        xmlImport.getAttribute(SXmlAnalystImportation.ATT_ANALYST_ID).setValue(analystId);
-        
-        for (SGridRow gridRow : rows) {
-            row = (SAnalystDepositRow) gridRow;
-            
-            if(row.getPkAnalystId() == miClient.getSession().getUser().getPkUserId()) {
-                xmlImportPayment = new SXmlAnalystImportationPayment();
-
-                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAYMENT_ID).setValue(row.getPkDepositId());
-                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAYMENT_IMPORTED).setValue(row.getImported());
-                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_ACC_REF).setValue(row.getReferenceAdv());
-                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_AMOUNT_CY).setValue(row.getAmountOrigCurrency());
-                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_EXCH_RATE).setValue(row.getExchangeRate());
-                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_AMOUNT).setValue(row.getAmountLocal());
-                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_REC_YEAR_ID).setValue(row.getRecord() != null ? row.getRecord().getPkYearId() : SLibConstants.UNDEFINED);
-                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_REC_PER_ID).setValue(row.getRecord() != null ? row.getRecord().getPkPeriodId() : SLibConstants.UNDEFINED);
-                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_REC_BKC_ID).setValue(row.getRecord() != null ? row.getRecord().getPkBookkeepingCenterId() : SLibConstants.UNDEFINED);
-                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_REC_TP_ID).setValue(row.getRecord() != null ? row.getRecord().getPkRecordTypeId() : "");
-                xmlImportPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_REC_NUM_ID).setValue(row.getRecord() != null ? row.getRecord().getPkNumberId() : SLibConstants.UNDEFINED);
-
-                xmlImport.getXmlElements().add(xmlImportPayment);
-            }
-        }
-        
-        return xmlImport;
     }
     
     /**
@@ -401,6 +324,8 @@ public class SImportPayments {
                                 row.setReferenceAdv((String) xmlImportationPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_ACC_REF).getValue());                                
                                 row.setExchangeRate((double) xmlImportationPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_EXCH_RATE).getValue());
                                 row.setAmountLocal((double) xmlImportationPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_AMOUNT).getValue());
+                                row.setBkcYear((int) xmlImportationPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_BKC_YEAR).getValue());
+                                row.setBkcNum((int) xmlImportationPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_BKC_NUM).getValue());
 
                                 recordKey = new Object[5];
                                 recordKey[0] = (int) xmlImportationPayment.getAttribute(SXmlAnalystImportationPayment.ATT_PAY_ANA_REC_YEAR_ID).getValue();

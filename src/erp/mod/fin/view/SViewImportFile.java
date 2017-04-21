@@ -4,6 +4,7 @@
  */
 package erp.mod.fin.view;
 
+import erp.data.SDataConstants;
 import erp.mod.SModConsts;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
@@ -117,7 +118,7 @@ public class SViewImportFile extends SGridPaneView {
 
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
         if ((Boolean) filter) {
-            sql += "AND " + "lbd.b_del = 0 ";
+            sql += "AND " + "lbda.b_del = 0 ";
         }
         
         filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
@@ -139,7 +140,7 @@ public class SViewImportFile extends SGridPaneView {
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON (lbda.fk_usr_ins = ui.id_usr) "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON (lbda.fk_usr_upd = uu.id_usr) "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON (lbd.fk_cur = c.id_cur) "
-                + "WHERE NOT lbd.b_del AND NOT lbda.b_del AND NOT ba.b_del " + sql + " ;";
+                + "WHERE NOT lbd.b_del AND NOT ba.b_del " + sql + " ;";
     }
 
     @Override
@@ -170,6 +171,7 @@ public class SViewImportFile extends SGridPaneView {
     @Override
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
+        moSuscriptionsSet.add(SDataConstants.FIN_REC);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
     }
     

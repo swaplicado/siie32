@@ -43,7 +43,9 @@ public class SAnalystDepositRow implements SGridRow {
     protected java.lang.String msRecordBranch;
     protected java.lang.String msRecordNumber;
     protected java.lang.String msRecordConcept;
-    protected java.lang.String msBizPartnerAccountId; 
+    protected java.lang.String msBizPartnerAccountId;
+    protected int mnBkcYear;
+    protected int mnBkcNum;
     
     protected SDataBizPartner moBizPartner;
     protected SDataRecord moRecord;
@@ -78,6 +80,8 @@ public class SAnalystDepositRow implements SGridRow {
         msRecordNumber = "";
         msRecordConcept = "";
         msBizPartnerAccountId = "";
+        mnBkcYear = 0;
+        mnBkcNum = 0;
     }
 
     public void setPkDepositId(int n) { mnPkDepositId = n; }
@@ -97,6 +101,8 @@ public class SAnalystDepositRow implements SGridRow {
     public void setExchangeRate(double d) { mdExhangeRate = d; }
     public void setAmountLocal(double d) { mdAmountLocal = d; }
     public void setBizPartnerAccountId(String s) { msBizPartnerAccountId = s; }
+    public void setBkcYear(int n) { mnBkcYear = n; }
+    public void setBkcNum(int n) { mnBkcNum = n; }
     
     public void setRecord(SDataRecord o) { moRecord = o; }
     public void setBizPartner(SDataBizPartner o) { moBizPartner = o; }
@@ -125,6 +131,8 @@ public class SAnalystDepositRow implements SGridRow {
     public String getRecordNumber() { return moRecord.getRecordNumber(); }
     public String getRecordConcept() { return moRecord.getConcept(); }
     public String getBizPartnerAccountId() { return msBizPartnerAccountId; }
+    public int getBkcYear() { return mnBkcYear; }
+    public int getBkcNum() { return mnBkcNum; }
     
     public SDataRecord getRecord() { return moRecord; }
     public SDataBizPartner getBizPartner() { return moBizPartner; }

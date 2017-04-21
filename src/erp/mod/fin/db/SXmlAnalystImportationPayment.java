@@ -26,6 +26,8 @@ public class SXmlAnalystImportationPayment extends SXmlElement {
     public static final String ATT_PAY_ANA_REC_BKC_ID = "RecordBkcId";
     public static final String ATT_PAY_ANA_REC_TP_ID = "RecordTpRecId";
     public static final String ATT_PAY_ANA_REC_NUM_ID = "RecordNumId";
+    public static final String ATT_PAY_ANA_BKC_YEAR = "BkcYearId";
+    public static final String ATT_PAY_ANA_BKC_NUM = "BkcNum";
 
     protected SXmlAttribute moPaymentId;
     protected SXmlAttribute moPaymentImported;
@@ -38,6 +40,8 @@ public class SXmlAnalystImportationPayment extends SXmlElement {
     protected SXmlAttribute moPaymentRecBkcId;
     protected SXmlAttribute moPaymentRecTypeId;
     protected SXmlAttribute moPaymentRecNumberId;
+    protected SXmlAttribute moPaymentBkcYear;
+    protected SXmlAttribute moPaymentBkcNum;
 
     public SXmlAnalystImportationPayment() {
         super(NAME);
@@ -53,6 +57,8 @@ public class SXmlAnalystImportationPayment extends SXmlElement {
         moPaymentRecBkcId = new SXmlAttribute(ATT_PAY_ANA_REC_BKC_ID);
         moPaymentRecTypeId = new SXmlAttribute(ATT_PAY_ANA_REC_TP_ID);
         moPaymentRecNumberId = new SXmlAttribute(ATT_PAY_ANA_REC_NUM_ID);
+        moPaymentBkcYear = new SXmlAttribute(ATT_PAY_ANA_BKC_YEAR);
+        moPaymentBkcNum = new SXmlAttribute(ATT_PAY_ANA_BKC_NUM);
 
         mvXmlAttributes.add(moPaymentId);
         mvXmlAttributes.add(moPaymentImported);
@@ -65,5 +71,7 @@ public class SXmlAnalystImportationPayment extends SXmlElement {
         mvXmlAttributes.add(moPaymentRecBkcId);
         mvXmlAttributes.add(moPaymentRecTypeId);
         mvXmlAttributes.add(moPaymentRecNumberId);
+        mvXmlAttributes.add(moPaymentBkcYear);
+        mvXmlAttributes.add(moPaymentBkcNum);
     }
 }
