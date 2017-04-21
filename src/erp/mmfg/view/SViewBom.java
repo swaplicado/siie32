@@ -10,6 +10,7 @@ import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.table.STabFilterDeleted;
+import erp.lib.table.STabFilterStatus;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
@@ -28,6 +29,7 @@ import net.sf.jasperreports.view.JasperViewer;
 public class SViewBom extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
+    private erp.lib.table.STabFilterStatus moTabFilterStatus;
 
     private javax.swing.JButton jbPrint;
 
@@ -40,7 +42,7 @@ public class SViewBom extends erp.lib.table.STableTab implements java.awt.event.
         int i;
 
         moTabFilterDeleted = new STabFilterDeleted(this);
-
+        moTabFilterStatus = new STabFilterStatus(this, miClient);
         jbPrint = new JButton(miClient.getImageIcon(SLibConstants.ICON_PRINT));
         jbPrint.setPreferredSize(new Dimension(23, 23));
         jbPrint.addActionListener(this);
@@ -48,6 +50,8 @@ public class SViewBom extends erp.lib.table.STableTab implements java.awt.event.
 
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterStatus);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(jbPrint);
 
@@ -131,6 +135,15 @@ public class SViewBom extends erp.lib.table.STableTab implements java.awt.event.
             setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
             if (setting.getType() == STableConstants.SETTING_FILTER_DELETED && setting.getStatus() == STableConstants.STATUS_ON) {
                 sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "b.b_del = FALSE ";
+            }
+            if (setting.getType() == STableConstants.SETTING_FILTER_STATUS && setting.getStatus() == STableConstants.STATUS_ON && setting.getSetting().equals("ACTIVO") ){
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "si.name = 'ACTIVO' ";
+            }
+            if (setting.getType() == STableConstants.SETTING_FILTER_STATUS && setting.getStatus() == STableConstants.STATUS_ON && setting.getSetting().equals("RESTRINGIDO") ){
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "si.name = 'RESTRINGIDO' ";
+            }
+            if (setting.getType() == STableConstants.SETTING_FILTER_STATUS && setting.getStatus() == STableConstants.STATUS_ON && setting.getSetting().equals("INACTIVO") ){
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "si.name = 'INACTIVO' ";
             }
         }
 

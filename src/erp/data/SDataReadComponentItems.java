@@ -648,9 +648,13 @@ public abstract class SDataReadComponentItems {
                 break;
             case SDataConstants.ITMS_TP_SNR:
                 lenPk = 1;
-                sql = "SELECT id_tp_snr AS f_id_1, tp_snr AS f_item FROM erp.itms_tp_snr WHERE b_del = 0 " +
-                        "ORDER BY id_tp_snr ";
+                sql = "SELECT id_tp_snr AS f_id_1, tp_snr AS f_item FROM erp.itms_tp_snr WHERE b_del = 0 ORDER BY id_tp_snr ";
                 text = "tipo de número de serie";
+                break;
+            case SDataConstants.ITMS_ST_ITEM:
+                lenPk = 1;
+                sql = "SELECT id_st_item AS f_id_1, name AS f_item FROM erp.itms_st_item WHERE b_del = 0 ORDER BY sort ";
+                text = "estatus de ítem";
                 break;
             case SDataConstants.ITMU_IFAM:
                 lenPk = 1;
@@ -1534,7 +1538,6 @@ public abstract class SDataReadComponentItems {
                 sql = "SELECT id_tp_sal_agt AS f_id_1, tp_sal_agt AS f_item FROM mktu_tp_sal_agt WHERE b_del = 0 ORDER BY tp_sal_agt ";
                 text = "tipo de agente ventas";
                 break;
-
             default:
         }
 
@@ -1741,7 +1744,6 @@ public abstract class SDataReadComponentItems {
                         "ORDER BY line ";
                 text = "línea";
                 break;
-
             default:
                 break;
         }

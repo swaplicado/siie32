@@ -27,7 +27,7 @@ import javax.swing.AbstractAction;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Cesar Orozco
  */
 public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -865,20 +865,20 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
                 validation.setComponent(jtfTelNumber03);
                 validation.setMessage("Se debe ingresar un valor para el campo '" + jlTelNumber03.getText() + "'.");
             }
-            else if (moFieldFkTelephoneType01Id.getKeyAsIntArray()[0] > SDataConstantsSys.BPSS_TP_TEL_NA && jtfTelNumber01.getText().length() == 0 &&
-                    (jtfTelAreaCode01.getText().length() > 0 || jtfTelExt01.getText().length() > 0)) {
-                validation.setComponent(jtfTelNumber01);
-                validation.setMessage("Se debe ingresar un valor para el campo '" + jlTelNumber03.getText() + "'.");
+            else if ((jtfTelAreaCode01.getText().length() > 0 || jtfTelNumber01.getText().length() > 0 || jtfTelExt01.getText().length() > 0) &&
+                    moFieldFkTelephoneType01Id.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_TEL_NA) {
+                validation.setComponent(jcbFkTelephoneType01Id);
+                validation.setMessage("Se debe seleccionar un tipo de teléfono para el campo '" + jlTelNumber01.getText() + "'.");
             }
-            else if (moFieldFkTelephoneType02Id.getKeyAsIntArray()[0] > SDataConstantsSys.BPSS_TP_TEL_NA && jtfTelNumber02.getText().length() == 0 &&
-                    (jtfTelAreaCode02.getText().length() > 0 || jtfTelExt02.getText().length() > 0)) {
-                validation.setComponent(jtfTelNumber02);
-                validation.setMessage("Se debe ingresar un valor para el campo '" + jlTelNumber02.getText() + "'.");
+            else if ((jtfTelAreaCode02.getText().length() > 0 || jtfTelNumber02.getText().length() > 0 || jtfTelExt02.getText().length() > 0) &&
+                    moFieldFkTelephoneType02Id.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_TEL_NA) {
+                validation.setComponent(jcbFkTelephoneType02Id);
+                validation.setMessage("Se debe seleccionar un tipo de teléfono para el campo '" + jlTelNumber02.getText() + "'.");
             }
-            else if (moFieldFkTelephoneType03Id.getKeyAsIntArray()[0] > SDataConstantsSys.BPSS_TP_TEL_NA && jtfTelNumber03.getText().length() == 0 &&
-                    (jtfTelAreaCode03.getText().length() > 0 || jtfTelExt03.getText().length() > 0)) {
-                validation.setComponent(jtfTelNumber03);
-                validation.setMessage("Se debe ingresar un valor para el campo '" + jlTelNumber03.getText() + "'.");
+            else if ((jtfTelAreaCode03.getText().length() > 0 || jtfTelNumber03.getText().length() > 0 || jtfTelExt03.getText().length() > 0) &&
+                    moFieldFkTelephoneType03Id.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_TEL_NA) {
+                validation.setComponent(jcbFkTelephoneType03Id);
+                validation.setMessage("Se debe seleccionar un tipo de teléfono para el campo '" + jlTelNumber03.getText() + "'.");
             }
         }
 

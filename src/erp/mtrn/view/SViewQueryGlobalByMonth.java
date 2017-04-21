@@ -108,7 +108,7 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab {
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_01", msHeaderTitle + asMonths[0] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_01", "Total neto " + asMonths[0] + ". $ ", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_01", "Total neto " + asMonths[0] + ". $", STableConstants.WIDTH_VALUE_2X);
         if (mbIsLocalCurrency) {
             maoTableColumns[i].setSumApplying(true);
         }
@@ -116,7 +116,7 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab {
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_02", msHeaderTitle + asMonths[1] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_02", "Total neto " + asMonths[1] + ". $ ", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_02", "Total neto " + asMonths[1] + ". $", STableConstants.WIDTH_VALUE_2X);
         if (mbIsLocalCurrency) {
             maoTableColumns[i].setSumApplying(true);
         }
@@ -124,7 +124,7 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab {
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_03", msHeaderTitle + asMonths[2] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_03", "Total neto " + asMonths[2] + ". $ ", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_03", "Total neto " + asMonths[2] + ". $", STableConstants.WIDTH_VALUE_2X);
         if (mbIsLocalCurrency) {
             maoTableColumns[i].setSumApplying(true);
         }
@@ -132,7 +132,7 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab {
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_04", msHeaderTitle + asMonths[3] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_04", "Total neto " + asMonths[3] + ". $ ", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_04", "Total neto " + asMonths[3] + ". $", STableConstants.WIDTH_VALUE_2X);
         if (mbIsLocalCurrency) {
             maoTableColumns[i].setSumApplying(true);
         }
@@ -140,7 +140,7 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab {
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_05", msHeaderTitle + asMonths[4] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_05", "Total neto " + asMonths[4] + ". $ ", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_05", "Total neto " + asMonths[4] + ". $", STableConstants.WIDTH_VALUE_2X);
         if (mbIsLocalCurrency) {
             maoTableColumns[i].setSumApplying(true);
         }
@@ -148,7 +148,7 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab {
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_06", msHeaderTitle + asMonths[5] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_06", "Total neto " + asMonths[5] + ". $ ", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_06", "Total neto " + asMonths[5] + ". $", STableConstants.WIDTH_VALUE_2X);
         if (mbIsLocalCurrency) {
             maoTableColumns[i].setSumApplying(true);
         }
@@ -156,7 +156,7 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab {
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_07", msHeaderTitle + asMonths[6] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_07", "Total neto " + asMonths[6] + ". $ ", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_07", "Total neto " + asMonths[6] + ". $", STableConstants.WIDTH_VALUE_2X);
         if (mbIsLocalCurrency) {
             maoTableColumns[i].setSumApplying(true);
         }
@@ -164,7 +164,7 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab {
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_08", msHeaderTitle + asMonths[7] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_08", "Total neto " + asMonths[7] + ". $ ", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_08", "Total neto " + asMonths[7] + ". $", STableConstants.WIDTH_VALUE_2X);
         if (mbIsLocalCurrency) {
             maoTableColumns[i].setSumApplying(true);
         }
@@ -172,7 +172,7 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab {
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_09", msHeaderTitle + asMonths[8] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_09", "Total neto " + asMonths[8] + ". $ ", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_09", "Total neto " + asMonths[8] + ". $", STableConstants.WIDTH_VALUE_2X);
         if (mbIsLocalCurrency) {
             maoTableColumns[i].setSumApplying(true);
         }
@@ -180,7 +180,7 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab {
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_10", msHeaderTitle + asMonths[9] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_10", "Total neto " + asMonths[9] + ". $ ", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_10", "Total neto " + asMonths[9] + ". $", STableConstants.WIDTH_VALUE_2X);
         if (mbIsLocalCurrency) {
             maoTableColumns[i].setSumApplying(true);
         }
@@ -188,7 +188,7 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab {
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_11", msHeaderTitle + asMonths[10] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_11", "Total neto " + asMonths[10] + ". $ ", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_11", "Total neto " + asMonths[10] + ". $", STableConstants.WIDTH_VALUE_2X);
         if (mbIsLocalCurrency) {
             maoTableColumns[i].setSumApplying(true);
         }
@@ -196,7 +196,7 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab {
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_qty_12", msHeaderTitle + asMonths[11] + ".", STableConstants.WIDTH_VALUE_2X);
         maoTableColumns[i].setSumApplying(true);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_12", "Total neto " + asMonths[11] + ". $ ", STableConstants.WIDTH_VALUE_2X);
+        maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot_12", "Total neto " + asMonths[11] + ". $", STableConstants.WIDTH_VALUE_2X);
         if (mbIsLocalCurrency) {
             maoTableColumns[i].setSumApplying(true);
         }

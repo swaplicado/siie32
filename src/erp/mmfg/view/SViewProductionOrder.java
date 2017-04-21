@@ -43,7 +43,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Néstor Ávalos, Edwin Carmona
+ * @author Néstor Ávalos, Edwin Carmona, Cesar Orozco   
  */
 
 public class SViewProductionOrder extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
@@ -223,17 +223,22 @@ public class SViewProductionOrder extends erp.lib.table.STableTab implements jav
 
         switch (mnTabTypeAux01) {
             case SDataConstants.MFGX_ORD_FOR:
-                aoTableColumns = new STableColumn[36];
-                break;
-            case SDataConstantsSys.MFGS_ST_ORD_NEW:
                 aoTableColumns = new STableColumn[37];
                 break;
+            case SDataConstantsSys.MFGS_ST_ORD_NEW:
+                aoTableColumns = new STableColumn[38];
+                break;
             case SDataConstantsSys.MFGS_ST_ORD_LOT:
-                aoTableColumns = new STableColumn[36];
+                aoTableColumns = new STableColumn[37];
+                break;
+            case SDataConstantsSys.MFGS_ST_ORD_LOT_ASIG:
+            case SDataConstantsSys.MFGS_ST_ORD_PROC:
+            case SDataConstantsSys.MFGS_ST_ORD_END:
+            case SDataConstantsSys.MFGS_ST_ORD_DLY:
+                aoTableColumns = new STableColumn[35];
                 break;
             default:
                 aoTableColumns = new STableColumn[34];
-                break;
         }
 
         i = 0;
@@ -254,17 +259,29 @@ public class SViewProductionOrder extends erp.lib.table.STableTab implements jav
             case SDataConstants.MFGX_ORD_FOR:
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "o.b_for", "Pronóstico", STableConstants.WIDTH_BOOLEAN);
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "f_exp", "Explosión", STableConstants.WIDTH_BOOLEAN);
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_day", "Días mismo estado", 150);
                 break;
 
             case SDataConstantsSys.MFGS_ST_ORD_NEW:
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "f_exp", "Explosión", STableConstants.WIDTH_BOOLEAN);
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "b_prog", "Programada", STableConstants.WIDTH_BOOLEAN);
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_perc", "%Segregado", STableConstants.WIDTH_PERCENTAGE);
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_day", "Días mismo estado", 150);
                 break;
             case SDataConstantsSys.MFGS_ST_ORD_LOT:
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "f_exp", "Explosión", STableConstants.WIDTH_BOOLEAN);
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_perc", "%Segregado", STableConstants.WIDTH_PERCENTAGE);
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_day", "Días mismo estado", 150);
                 break;
+            case SDataConstantsSys.MFGS_ST_ORD_LOT_ASIG:
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_day", "Días mismo estado", 150);
+                break;
+            case SDataConstantsSys.MFGS_ST_ORD_PROC:
+            case SDataConstantsSys.MFGS_ST_ORD_END:
+            case SDataConstantsSys.MFGS_ST_ORD_DLY:
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_day", "Días mismo estado", 150);
+                break;
+            default:
         }
 
         //aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "st.st", "Estado", 60);
@@ -272,7 +289,7 @@ public class SViewProductionOrder extends erp.lib.table.STableTab implements jav
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", 65);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Producto", 150);
-
+        
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "o.qty_ori", "Cantidad original", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "o.qty_rew", "Cantidad reproceso", STableConstants.WIDTH_QUANTITY_2X);
@@ -667,7 +684,7 @@ public class SViewProductionOrder extends erp.lib.table.STableTab implements jav
             }
         }
 
-        msSql = "SELECT o.*, CONCAT(po.id_year, '-',po.num, ' ', po.ref) AS f_ref, CONCAT(o.id_year, '-',o.num) AS f_num, " +
+        msSql = "SELECT o.*, DATEDIFF(CURDATE(),o.dt) AS f_day, CONCAT(po.id_year, '-',po.num, ' ', po.ref) AS f_ref, CONCAT(o.id_year, '-',o.num) AS f_num, " +
                 "bpb.bpb, bpb.code, ent.ent, ent.code, tp.tp, b.bom, i.item_key, i.item, u.symbol, st.st, l.lot, l.dt_exp_n, un.usr, ue.usr, ud.usr, " +
                 STableConstants.ICON_MFG_ST + " + o.fid_st_ord AS f_fid_st_ord, IF(COALESCE(MAX(exp.id_exp), 0) > 0, 1, 0) AS f_exp, MAX(exp.ref) AS f_exp_ref, " +
                 "COALESCE((SELECT COALESCE(SUM(qty_inc) * 100.0, 0) " +

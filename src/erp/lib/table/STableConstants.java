@@ -73,6 +73,7 @@ public abstract class STableConstants {
     public static final int SETTING_FILTER_FIN_REC_TYPE = 16;
     public static final int SETTING_FILTER_YEAR = 17;
     public static final int SETTING_FILTER_ACCOUNT = 18;
+    public static final int SETTING_FILTER_STATUS = 19;
 
     public static final int SETTING_OPTION_TAXES = 101;
     public static final int SETTING_OPTION_CURRENCY_LOCAL = 102;

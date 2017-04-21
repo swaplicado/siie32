@@ -382,8 +382,8 @@ public abstract class STableTab extends javax.swing.JPanel implements erp.lib.ta
         }
 
         // Check if customized columns are equivalent to default columns:
-
-        if (maDefaultTableColumns.size() != moTablePane.getTableModelColumnCount()) {
+        
+        if (maDefaultTableColumns.size() != moTablePane.getTableModelColumnCount() && !maDefaultTableColumns.isEmpty()) {
             mbClearSettingsNeeded = true;
         }
         else {

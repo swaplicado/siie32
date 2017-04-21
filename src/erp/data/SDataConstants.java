@@ -221,6 +221,8 @@ public abstract class SDataConstants {
     public static final int ITMS_CL_ITEM = 205002;
     public static final int ITMS_TP_ITEM = 205003;
     public static final int ITMS_TP_SNR = 205004;
+    public static final int ITMS_LINK = 205025;
+    public static final int ITMS_ST_ITEM = 205026;
     public static final int ITMU_IFAM = 205005;
     public static final int ITMU_IGRP = 205006;
     public static final int ITMU_IGEN = 205007;

@@ -199,6 +199,11 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
                 jcbFkItemIdFocusLost(evt);
             }
         });
+        jcbFkItemId.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jcbFkItemIdActionPerformed(evt);
+            }
+        });
         jPanel17.add(jcbFkItemId);
 
         jbFkItemId.setText("...");
@@ -441,6 +446,10 @@ public class SFormBom extends javax.swing.JDialog  implements erp.lib.form.SForm
     private void jcbFkItemIdFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jcbFkItemIdFocusLost
         itemStateChangedFkItemId();
     }//GEN-LAST:event_jcbFkItemIdFocusLost
+
+    private void jcbFkItemIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbFkItemIdActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jcbFkItemIdActionPerformed
 
     private void initComponentsExtra() {
         int i;
