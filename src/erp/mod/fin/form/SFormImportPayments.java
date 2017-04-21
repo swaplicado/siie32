@@ -700,7 +700,7 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
                 jbCleanAll.setEnabled(true);
                 jckCurrentAnalyst.setEnabled(true);
                 jbEdit.setEnabled(false);
-                jbSave.setEnabled(jckCurrentAnalyst.isSelected());
+                jbSave.setEnabled(jckCurrentAnalyst.isSelected() && moGridPayments.getModel().getGridRows().size() > 0);
                 break;
             case ST_OPEN_REGISTRY:
                 jbLayoutPath.setEnabled(false);
@@ -733,7 +733,7 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
                 jbSelectAll.setEnabled(true);
                 jbCleanAll.setEnabled(true);
                 jbEdit.setEnabled(false);
-                jbSave.setEnabled(jckCurrentAnalyst.isSelected());
+                jbSave.setEnabled(jckCurrentAnalyst.isSelected() && moGridPayments.getModel().getGridRows().size() > 0);
                 
                 jckCurrentAnalyst.setEnabled(true);
                 break;
@@ -860,7 +860,9 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
         
         enableGeneralFields();
         
-        moGridPayments.getTable().setRowSelectionInterval(mnIndexPayment, mnIndexPayment);
+        if (moGridPayments.getModel().getGridRows().size() > 0) {
+            moGridPayments.getTable().setRowSelectionInterval(mnIndexPayment, mnIndexPayment);
+        }
         moGridPayments.renderGridRows();
     }
 

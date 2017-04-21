@@ -70,6 +70,7 @@ public class SViewImportFile extends SGridPaneView {
                     params.setKey(gridRow.getRowPrimaryKey());
 
                     miClient.getSession().getModule(mnModuleType, mnModuleSubtype).showForm(mnGridType, mnGridSubtype, params);
+                    miClient.getSession().notifySuscriptors(mnGridType);
                     moFormParams = null;
                 }
             }
@@ -96,7 +97,7 @@ public class SViewImportFile extends SGridPaneView {
                         miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_DELETABLE);
                     }
                     else {
-                        if (miClient.getSession().getModule(mnModuleType, mnModuleSubtype).deleteRegistry(mnGridType, gridRow.getRowPrimaryKey()) == SDbConsts.SAVE_OK) {
+                        if (miClient.getSession().getModule(mnModuleType, mnModuleSubtype).deleteRegistry(SModConsts.FIN_LAY_BANK_DEP_ANA, gridRow.getRowPrimaryKey()) == SDbConsts.SAVE_OK) {
                             miClient.getSession().notifySuscriptors(mnGridType);
                         }
                     }
@@ -116,11 +117,11 @@ public class SViewImportFile extends SGridPaneView {
 
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
         if ((Boolean) filter) {
-            sql += (sql.isEmpty() ? "" : "AND ") + "lbd.b_del = 0 ";
+            sql += "AND " + "lbd.b_del = 0 ";
         }
         
         filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
-        sql += (sql.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("lbd.dep_dt", (SGuiDate) filter);
+        sql += "AND " + SGridUtils.getSqlFilterDate("lbd.dep_dt", (SGuiDate) filter);
         
         msSql = "SELECT "
                 + "lbd.id_lay_bank_dep AS " + SDbConsts.FIELD_ID + "1, "
@@ -138,7 +139,7 @@ public class SViewImportFile extends SGridPaneView {
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON (lbda.fk_usr_ins = ui.id_usr) "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON (lbda.fk_usr_upd = uu.id_usr) "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON (lbd.fk_cur = c.id_cur) "
-                + "WHERE NOT lbd.b_del AND NOT lbda.b_del AND NOT ba.b_del;";
+                + "WHERE NOT lbd.b_del AND NOT lbda.b_del AND NOT ba.b_del " + sql + " ;";
     }
 
     @Override
