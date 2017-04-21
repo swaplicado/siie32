@@ -677,6 +677,7 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
     private void enableGeneralFields() {
         switch (renderOption) {
             case ST_REGISTRY_NEW:
+                moTextLayoutPath.setValue("Seleccione archivo...");
                 jbLayoutPath.setEnabled(true);
                 moDepositsDate.setEnabled(false);
                 jbPickRecord.setEnabled(false);
