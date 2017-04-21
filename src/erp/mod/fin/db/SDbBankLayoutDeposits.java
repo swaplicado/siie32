@@ -173,6 +173,7 @@ public class SDbBankLayoutDeposits extends SDbRegistryUser {
             }
 
             // Settings of document:
+            recordEntrys.add(0, createRecordEntryAdvances(session, nBookkeepingYear, nBookkeepingNum, deposit));
             recordEntrys.add(0, createRecordEntryAccountCash(session, nBookkeepingYear, nBookkeepingNum, deposit));
         }
         
@@ -205,7 +206,7 @@ public class SDbBankLayoutDeposits extends SDbRegistryUser {
      * @return
      * @throws Exception 
      */
-    private erp.mfin.data.SDataRecordEntry createRecordEntryAccountCash(final SGuiSession session, final int bookkeepingYear, final int bookkeepingNum, SAnalystDepositRow deposit) throws Exception {
+    private erp.mfin.data.SDataRecordEntry createRecordEntryAdvances(final SGuiSession session, final int bookkeepingYear, final int bookkeepingNum, SAnalystDepositRow deposit) throws Exception {
         int[] keySystemMoveType = null;
         int[] keySystemMoveTypeXXX = null;
         SDataAccountCash accountCash = null;
@@ -274,6 +275,100 @@ public class SDbBankLayoutDeposits extends SDbRegistryUser {
 
         entry.setFkCompanyBranchId_n(accountCash.getPkCompanyBranchId());
         entry.setFkEntityId_n(0);
+        entry.setUnits(0d);
+        entry.setFkItemId_n(0);
+        entry.setFkItemAuxId_n(0);
+        entry.setFkYearId_n(0);
+        entry.setFkDpsYearId_n(0);
+        entry.setFkDpsDocId_n(0);
+        entry.setFkDpsAdjustmentYearId_n(0);
+        entry.setFkDpsAdjustmentDocId_n(0);
+        entry.setFkBookkeepingYearId_n(bookkeepingYear);
+        entry.setFkBookkeepingNumberId_n(bookkeepingNum);
+
+        return entry;
+    }
+    
+     /**
+     * Creates the record entry
+     * 
+     * @param session
+     * @param bookkeepingYear
+     * @param bookkeepingNum
+     * @param deposit Deposit line
+     * @return
+     * @throws Exception 
+     */
+    private erp.mfin.data.SDataRecordEntry createRecordEntryAccountCash(final SGuiSession session, final int bookkeepingYear, final int bookkeepingNum, SAnalystDepositRow deposit) throws Exception {
+        int[] keySystemMoveType = null;
+        int[] keySystemMoveTypeXXX = null;
+        SDataAccountCash accountCash = null;
+        SDataRecordEntry entry = new SDataRecordEntry();
+        
+        accountCash = new SDataAccountCash();
+        if (accountCash.read(new int[] { mnFkBankCompanyBranchId, mnFkBankAccountCashId }, session.getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+        }
+
+        if (accountCash.getFkAccountCashCategoryId() == SDataConstantsSys.FINS_CT_ACC_CASH_CASH) {
+            keySystemMoveTypeXXX = SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH;
+        }
+        else {
+            keySystemMoveTypeXXX = SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK;
+        }
+
+        entry.setFkAccountingMoveTypeId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[0]);
+        entry.setFkAccountingMoveClassId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[1]);
+        entry.setFkAccountingMoveSubclassId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[2]);
+        entry.setFkUserNewId(session.getUser().getPkUserId());
+        entry.setDbmsAccountingMoveSubclass(session.readField(SModConsts.FINS_CLS_ACC_MOV, SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL, SDbRegistry.FIELD_NAME) + "");
+        entry.setConcept(deposit.getConcept());
+
+        entry.setDebit(SLibUtils.round(deposit.getAmountLocal(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits()));
+        entry.setCredit(0);
+        entry.setExchangeRate(deposit.getExchangeRate());
+        entry.setExchangeRateSystem(deposit.getExchangeRate());
+        entry.setDebitCy(SLibUtils.round(deposit.getAmountOrigCurrency(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits()));
+        entry.setCreditCy(0);
+        keySystemMoveType = SModSysConsts.FINS_TP_SYS_MOV_MO_CUS_ADV;
+
+        entry.setFkCurrencyId(accountCash.getFkCurrencyId());
+        entry.setFkAccountIdXXX(accountCash.getFkAccountId());
+        entry.setFkCostCenterIdXXX_n("");
+        entry.setIsExchangeDifference(false);
+        entry.setIsSystem(true);
+        entry.setIsDeleted(false);
+
+        entry.setFkSystemMoveClassId(keySystemMoveType[0]);
+        entry.setFkSystemMoveTypeId(keySystemMoveType[1]);
+
+        if (accountCash.getFkAccountCashCategoryId() == SDataConstantsSys.FINS_CT_ACC_CASH_CASH) {
+            entry.setFkSystemAccountClassId(SModSysConsts.FINS_TP_SYS_ACC_ENT_CSH_CSH[0]);
+            entry.setFkSystemAccountTypeId(SModSysConsts.FINS_TP_SYS_ACC_ENT_CSH_CSH[1]);
+        }
+        else {
+            entry.setFkSystemAccountClassId(SModSysConsts.FINS_TP_SYS_ACC_ENT_CSH_BNK[0]);
+            entry.setFkSystemAccountTypeId(SModSysConsts.FINS_TP_SYS_ACC_ENT_CSH_BNK[1]);
+        }
+
+        entry.setFkSystemMoveCategoryIdXXX(keySystemMoveTypeXXX[0]);
+        entry.setFkSystemMoveTypeIdXXX(keySystemMoveTypeXXX[1]);
+
+        entry.setDbmsAccount(SDataReadDescriptions.getCatalogueDescription((SClientInterface) session.getClient(), SDataConstants.FIN_ACC, new Object[] { accountCash.getFkAccountId() }));
+        entry.setDbmsAccountComplement(accountCash.getDbmsCompanyBranchEntity().getEntity());
+        entry.setDbmsCostCenter_n("");
+        entry.setDbmsCurrencyKey(session.getSessionCustom().getCurrencyCode(new int[] { accountCash.getFkCurrencyId() }));
+
+        entry.setReference("");
+        entry.setIsReferenceTax(false);
+        entry.setFkTaxBasicId_n(0);
+        entry.setFkTaxId_n(0);
+
+        entry.setFkBizPartnerId_nr(deposit.getBizPartner().getPkBizPartnerId());
+        entry.setFkBizPartnerBranchId_n(deposit.getBizPartner().getDbmsHqBranch().getPkBizPartnerBranchId());
+
+        entry.setFkCompanyBranchId_n(accountCash.getPkCompanyBranchId());
+        entry.setFkEntityId_n(accountCash.getPkAccountCashId());
         entry.setUnits(0d);
         entry.setFkItemId_n(0);
         entry.setFkItemAuxId_n(0);
