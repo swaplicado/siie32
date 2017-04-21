@@ -98,6 +98,36 @@ public abstract class SBpsUtils {
 
         return index;
     }
+    
+    /**
+     * Get the bizparter id by fiscal id and category
+     * 
+     * @param session
+     * @param fiscalId String
+     * @param bizPartnerCategory int
+     * @return 
+     */
+    public static int getBizParterIdByFiscalId(final SGuiSession session, final String fiscalId, final int bizPartnerCategory) {
+        String sql = "";
+        ResultSet resultSet = null;
+        int bizPartnerId = 0;
+
+        try {
+            sql = "SELECT b.id_bp FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b "
+                  + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_CT) + " AS bc ON b.id_bp = bc.id_bp "  
+                  + "WHERE b.fiscal_id = '" + fiscalId + "' AND bc.id_ct_bp = " + bizPartnerCategory + " ";
+            
+            resultSet = session.getStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                bizPartnerId = resultSet.getInt(1);
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.printException(SBpsUtils.class.getName(), e);
+        }
+
+        return bizPartnerId;
+    }
 
     public static int getHeadquartersId(SGuiSession session, int idBizPartner) {
         int idHeadquarters = SLibConsts.UNDEFINED;

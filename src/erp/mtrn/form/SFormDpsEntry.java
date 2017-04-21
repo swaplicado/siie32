@@ -4647,6 +4647,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         boolean isDataShipDomesticReq = false;
         boolean isDataShipInternationalReq = false;
         boolean isDataShipQualityReq = false;
+        boolean dist = false;
         String msgErrorPriceMonthlyOrder = "";
         String msg = "";
         String msgOmittedShipData = "";
@@ -4783,13 +4784,15 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             }
             else {
                 // Validate unitary price vs unitary month price in monthly order:
-                
                 for (int i = 0; i < moPaneGridPrices.getGridRows().size(); i++) {
-//                    if (((SDataDpsEntryPrice) moPaneGridPrices.getGridRows().get(i).getData()).getOriginalPriceUnitaryCy() != SLibUtilities.parseDouble(jtfOriginalPriceUnitaryCy.getText())) {
-//                        msgErrorPriceMonthlyOrder += ("Los valores del campo '" + jlOriginalPriceUnitaryCy.getText() + "' no coinciden con valor '" + jlPriceOriginalPriceUnitaryCy.getText() + "' de la entrega mensual '" + ((SDataDpsEntryPrice) moPaneGridPrices.getGridRows().get(i).getData()).getReferenceNumber() + "'.\n");
-//                        System.out.println("Los valores del campo '\" + jlOriginalPriceUnitaryCy.getText() + \"' no coinciden con valor '\" + jlPriceOriginalPriceUnitaryCy.getText() + \"' de la entrega mensual '\" + ((SDataDpsEntryPrice) moPaneGridPrices.getGridRows().get(i).getData()).getReferenceNumber() + \"'.\\n");
-//                    }       
+                    if (((SDataDpsEntryPrice) moPaneGridPrices.getGridRows().get(i).getData()).getOriginalPriceUnitaryCy() != SLibUtilities.parseDouble(jtfOriginalPriceUnitaryCy.getText()) && moFieldOriginalPriceUnitaryCy.getDouble() != 0d) {
+                        dist = true;
+                    }       
                 }
+                if (dist && miClient.showMsgBoxConfirm("El valor del campo " + jlOriginalPriceUnitaryCy.getText() + " de la partida es diferente al de las entregas mensuales.\n¿Deseas continuar?") == JOptionPane.NO_OPTION) {
+                    validation.setMessage("");
+                }
+                
                 if (!msgErrorPriceMonthlyOrder.isEmpty()) {
                     validation.setMessage(msgErrorPriceMonthlyOrder);
                 }

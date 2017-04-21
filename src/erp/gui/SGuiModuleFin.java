@@ -208,6 +208,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiFinLayoutBankAdvances;
     private javax.swing.JMenuItem jmiFinLayoutBankPendingAdvances;
     private javax.swing.JMenuItem jmiFinLayoutBankDoneAdvances;
+    private javax.swing.JMenuItem jmiFinImportPayments;
 
     private javax.swing.JMenu jmRep;
     private javax.swing.JMenu jmRepTrialBal;
@@ -566,6 +567,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinLayoutBankAdvances = new JMenuItem("Layouts de anticipos");
         jmiFinLayoutBankPendingAdvances = new JMenuItem("Layouts de anticipos por pagar");
         jmiFinLayoutBankDoneAdvances = new JMenuItem("Layouts de anticipos pagados");
+        jmiFinImportPayments = new JMenuItem("Importación de pagos BBVA");
 
         jmFin.add(jmiFinExchangeRate);
         jmFin.add(jmiFinExchangeRateAdjusment);
@@ -581,6 +583,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFin.add(jmiFinLayoutBankAdvances);
         jmFin.add(jmiFinLayoutBankPendingAdvances);
         jmFin.add(jmiFinLayoutBankDoneAdvances);
+        jmFin.addSeparator();
+        jmFin.add(jmiFinImportPayments);
 
         jmRep = new JMenu("Reportes");
 
@@ -844,6 +848,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinLayoutBankAdvances.addActionListener(this);
         jmiFinLayoutBankPendingAdvances.addActionListener(this);
         jmiFinLayoutBankDoneAdvances.addActionListener(this);
+        jmiFinImportPayments.addActionListener(this);
 
         jmiCfgAbpEntityCash.addActionListener(this);
         jmiCfgAbpEntityWarehouse.addActionListener(this);
@@ -1039,6 +1044,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinLayoutBankAdvances.setEnabled(hasMoveAccCash);
         jmiFinLayoutBankPendingAdvances.setEnabled(hasMoveAccCash);
         jmiFinLayoutBankDoneAdvances.setEnabled(hasMoveAccCash);
+        jmiFinImportPayments.setEnabled(hasMoveAccCash);
 
         jmRep.setEnabled(hasRepRight || hasRepFinRateRight || hasRepStatementRight);
         jmRepFinStat.setEnabled(hasRepStatementRight);
@@ -1964,7 +1970,6 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiFinCashCounterReceipt) {
                 showView(SDataConstants.TRN_CTR);
             }
-
             else if (item == jmiFinLayoutBank) {
                 miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FIN_LAY_BANK_DPS, null);
             }
@@ -1982,6 +1987,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiFinLayoutBankDoneAdvances) {
                 miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FIN_LAY_BANK_ADV, new SGuiParams(SModConsts.VIEW_ST_DONE));
+            }
+            else if (item == jmiFinImportPayments) {
+                miClient.getSession().showView(SModConsts.FIN_LAY_BANK_DEP, SModSysConsts.FIN_LAY_BANK_DPS, null);
             }
             else if (item == jmiRepTrialBalStandard) {
                 new SDialogRepTrialBalanceDual(miClient, SDataConstants.FIN_ACC, false).setVisible(true);
