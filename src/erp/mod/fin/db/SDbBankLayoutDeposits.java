@@ -124,7 +124,7 @@ public class SDbBankLayoutDeposits extends SDbRegistryUser {
                         }
                         else {
                             if (!deposit.getImported()) {
-                            record = processRecord(session, deposit.getRecord().getPrimaryKey(), session.getUser().getPkUserId(), deposit, true);
+                                record = processRecord(session, deposit.getRecord().getPrimaryKey(), session.getUser().getPkUserId(), deposit, true);
                             }
                         }
                     }

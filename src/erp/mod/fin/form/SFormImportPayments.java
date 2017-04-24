@@ -19,7 +19,6 @@ import erp.mod.fin.db.SAnalystDepositRow;
 import erp.mod.fin.db.SDbBankLayoutDeposits;
 import erp.mod.fin.db.SDbBankLayoutDepositsAnalyst;
 import erp.mod.fin.db.SFinConsts;
-import erp.mod.fin.util.SFinUtils;
 import erp.mod.fin.util.SImportPayments;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -828,7 +827,7 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
             moCurImported.setValue(moImportation.getCurrency());
         }
         
-        maAccountKey = SFinUtils.getAccCashKeyByAccount(miClient.getSession(), moBankAccount.getValue());
+        maAccountKey = SImportPayments.getAccCashKeyByAccount(miClient.getSession(), moBankAccount.getValue());
         if (maAccountKey != null) {
             accCash = (SDataAccountCash) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_ACC_CASH, maAccountKey, SLibConstants.EXEC_MODE_VERBOSE);
         }
