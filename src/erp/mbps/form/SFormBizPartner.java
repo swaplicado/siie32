@@ -854,7 +854,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         jPanel44.add(jPanel45, java.awt.BorderLayout.WEST);
 
-        jPanel46.setBorder(javax.swing.BorderFactory.createTitledBorder("Información adicional"));
+        jPanel46.setBorder(javax.swing.BorderFactory.createTitledBorder("Información adicional:"));
         jPanel46.setLayout(new java.awt.GridLayout(12, 1, 0, 2));
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));

@@ -5,6 +5,7 @@
 
 package erp.mod.fin.db;
 
+import erp.mod.fin.util.SImportPayments;
 import java.util.Vector;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -77,7 +78,7 @@ public class SXmlImportFile extends SXmlDocument {
             namedNodeMap = child.getAttributes();
             
             row.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_ID).setValue(SLibUtils.parseInt(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlImportFilePayment.ATT_PAYMENT_ID, true)));
-            row.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_TIME_STAMP).setValue(erp.mod.fin.util.SFinUtils.stringToDateTime(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlImportFilePayment.ATT_PAYMENT_TIME_STAMP, false)));
+            row.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_TIME_STAMP).setValue(SImportPayments.stringToDateTime(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlImportFilePayment.ATT_PAYMENT_TIME_STAMP, false)));
             row.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_CUSTOMER_ID).setValue(SLibUtils.parseInt(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlImportFilePayment.ATT_PAYMENT_CUSTOMER_ID, false)));
             row.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_ANALYST_ID).setValue(SLibUtils.parseInt(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlImportFilePayment.ATT_PAYMENT_ANALYST_ID, true)));
             row.getAttribute(SXmlImportFilePayment.ATT_PAYMENT_REFERENCE).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlImportFilePayment.ATT_PAYMENT_REFERENCE, true));
