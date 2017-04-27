@@ -16,10 +16,10 @@ import erp.mod.fin.db.SDbAbpTax;
 import erp.mod.fin.db.SDbAccount;
 import erp.mod.fin.db.SDbAccountItemLink;
 import erp.mod.fin.db.SDbBankLayout;
-import erp.mod.fin.db.SDbCheckWallet;
-import erp.mod.fin.db.SDbCostCenter;
 import erp.mod.fin.db.SDbBankLayoutDeposits;
 import erp.mod.fin.db.SDbBankLayoutDepositsAnalyst;
+import erp.mod.fin.db.SDbCheckWallet;
+import erp.mod.fin.db.SDbCostCenter;
 import erp.mod.fin.db.SDbTaxItemLink;
 import erp.mod.fin.form.SFormAbpBizPartner;
 import erp.mod.fin.form.SFormAbpBizPartnerLink;
@@ -87,9 +87,9 @@ public class SModuleFin extends SGuiModule {
     private SFormAbpItem moFormAbpItem;
     private SFormAbpItemLink moFormAbpItemLink;
     private SFormAbpTax moFormAbpTax;
-    private SFormLayoutBank moFormBankLayout;
-    private SFormLayoutBank moFormBankLayoutAdvances;
-    private SFormLayoutBank moFormBankLayoutPayment;
+    private SFormLayoutBank moFormBankLayoutAccounting;
+    private SFormLayoutBank moFormBankLayoutDps;
+    private SFormLayoutBank moFormBankLayoutAdvance;
     private SFormImportPayments moFormImportPayments;
 
     private SBeanOptionPicker moPickerExchangeRateMxn;
@@ -637,16 +637,16 @@ public class SModuleFin extends SGuiModule {
             case SModConsts.FIN_LAY_BANK:
                 switch (subtype) {
                     case SModConsts.FIN_REC:
-                        if (moFormBankLayoutPayment == null) moFormBankLayoutPayment = new SFormLayoutBank(miClient, subtype, "Aplicación de pagos mediante layout");
-                        form = moFormBankLayoutPayment;
+                        if (moFormBankLayoutAccounting == null) moFormBankLayoutAccounting = new SFormLayoutBank(miClient, subtype, "Aplicación de pagos de layout bancario");
+                        form = moFormBankLayoutAccounting;
                         break;
                     case SModSysConsts.FIN_LAY_BANK_DPS:
-                        if (moFormBankLayout == null) moFormBankLayout = new SFormLayoutBank(miClient, subtype, "Layout de transferencias");
-                        form = moFormBankLayout;
+                        if (moFormBankLayoutDps == null) moFormBankLayoutDps = new SFormLayoutBank(miClient, subtype, "Layout de transferencias");
+                        form = moFormBankLayoutDps;
                         break;
                     case SModSysConsts.FIN_LAY_BANK_ADV:
-                        if (moFormBankLayoutAdvances == null) moFormBankLayoutAdvances = new SFormLayoutBank(miClient, subtype, "Layout de anticipos");
-                        form = moFormBankLayoutAdvances;
+                        if (moFormBankLayoutAdvance == null) moFormBankLayoutAdvance = new SFormLayoutBank(miClient, subtype, "Layout de anticipos");
+                        form = moFormBankLayoutAdvance;
                         break;
                     default:
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
