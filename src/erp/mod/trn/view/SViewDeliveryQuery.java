@@ -152,10 +152,10 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
                 break;
             case SUtilConsts.PROC_PEND:
                 if (isSummary()) {
-                    having = "(SUM(t2._net_qty) - _prc_qty_rem <> 0 OR SUM(t2._net_orig_qty) - _prc_orig_qty_rem <> 0) AND d.b_link = 0 ";
+                    having = "(SUM(t2._net_qty) - _prc_qty <> 0 OR SUM(t2._net_orig_qty) - _prc_orig_qty <> 0) AND d.b_link = 0 ";
                 }
                 else {
-                    having = "(t2._net_qty - _prc_qty_rem <> 0 OR t2._net_orig_qty - _prc_orig_qty_rem <> 0) AND d.b_link = 0 ";
+                    having = "(t2._net_qty - _prc_qty <> 0 OR t2._net_orig_qty - _prc_orig_qty <> 0) AND d.b_link = 0 ";
                 }
                 break;
             default:
