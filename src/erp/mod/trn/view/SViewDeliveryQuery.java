@@ -144,18 +144,18 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
         switch (mnGridSubtype) {
             case SUtilConsts.PROC:
                 if (isSummary()) {
-                    having = "(SUM(t2._net_qty) - COALESCE(SUM(dds.qty), 0.0) = 0 AND SUM(t2._net_orig_qty) - COALESCE(SUM(dds.orig_qty), 0.0) = 0) OR d.b_link = 1 ";
+                    having = "(SUM(t2._net_qty) - _prc_qty_rem = 0 AND SUM(t2._net_orig_qty) - _prc_orig_qty_rem = 0) OR d.b_link = 1 ";
                 }
                 else {
-                    having = "(t2._net_qty - COALESCE(SUM(dds.qty), 0.0) = 0 AND t2._net_orig_qty - COALESCE(SUM(dds.orig_qty), 0.0) = 0) OR d.b_link = 1 ";
+                    having = "(t2._net_qty - _prc_qty_rem = 0 AND t2._net_orig_qty - _prc_orig_qty_rem = 0) OR d.b_link = 1 ";
                 }
                 break;
             case SUtilConsts.PROC_PEND:
                 if (isSummary()) {
-                    having = "(SUM(t2._net_qty) - COALESCE(SUM(dds.qty), 0.0) <> 0 OR SUM(t2._net_orig_qty) - COALESCE(SUM(dds.orig_qty), 0.0) <> 0) AND d.b_link = 0 ";
+                    having = "(SUM(t2._net_qty) - _prc_qty_rem <> 0 OR SUM(t2._net_orig_qty) - _prc_orig_qty_rem <> 0) AND d.b_link = 0 ";
                 }
                 else {
-                    having = "(t2._net_qty - COALESCE(SUM(dds.qty), 0.0) <> 0 OR t2._net_orig_qty - COALESCE(SUM(dds.orig_qty), 0.0) <> 0) AND d.b_link = 0 ";
+                    having = "(t2._net_qty - _prc_qty_rem <> 0 OR t2._net_orig_qty - _prc_orig_qty_rem <> 0) AND d.b_link = 0 ";
                 }
                 break;
             default:
@@ -165,25 +165,23 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
                 + (isSummary() ? "" : "de.id_ety AS " + SDbConsts.FIELD_ID + "3, de.sort_pos, ")
                 + "CONCAT(d.num_ser, IF(d.num_ser = '', '', '-'), d.num) AS " + SDbConsts.FIELD_CODE + ", "
                 + "CONCAT(d.num_ser, IF(d.num_ser = '', '', '-'), d.num) AS " + SDbConsts.FIELD_NAME + ", "
-                + "d.num_ser, d.num, d.num_ref, d.dt, d.b_link, d.ts_link, dt.code, b.bp, c.cur_key, ul.usr, "
+                + "d.num_ser, d.num, d.num_ref, d.dt, d.b_link, d.ts_link, dt.code, b.bp, i.item, "
                 + (isSummary() ? "" : "i.item, i.item_key, u.symbol, ou.symbol, ")
                 
                 + (isSummary() ?
                     "SUM(t2._net_qty) AS _net_qty, SUM(t2._net_orig_qty) AS _net_orig_qty, " : 
                     "t2._net_qty, t2._net_orig_qty, ")
                 
-                + "COALESCE(SUM(dds.qty), 0.0) AS _prc_qty, COALESCE(SUM(dds.orig_qty), 0.0) AS _prc_orig_qty, "
+                + "COALESCE((SELECT SUM(dds.qty) FROM trn_dps_dps_supply AS dds WHERE de.id_year = dds.id_des_year AND de.id_doc = dds.id_des_doc ), 0.0) AS _prc_qty, COALESCE((SELECT SUM(dds.orig_qty) FROM trn_dps_dps_supply AS dds WHERE de.id_year = dds.id_des_year AND de.id_doc = dds.id_des_doc), 0.0) AS _prc_orig_qty, "
                 
                 + (isSummary() ? 
-                    "SUM(t2._net_qty) - COALESCE(SUM(dds.qty), 0.0) AS _prc_qty_rem, SUM(t2._net_orig_qty) - COALESCE(SUM(dds.orig_qty), 0.0) AS _prc_orig_qty_rem " : 
-                    "t2._net_qty - COALESCE(SUM(dds.qty), 0.0) AS _prc_qty_rem, t2._net_orig_qty - COALESCE(SUM(dds.orig_qty), 0.0) AS _prc_orig_qty_rem ")
+                    "SUM(t2._net_qty) - COALESCE((SELECT SUM(dds.qty) FROM trn_dps_dps_supply AS dds WHERE de.id_year = dds.id_des_year AND de.id_doc = dds.id_des_doc), 0.0) AS _prc_qty_rem, SUM(t2._net_orig_qty) - COALESCE((SELECT SUM(dds.orig_qty) FROM trn_dps_dps_supply AS dds WHERE de.id_year = dds.id_des_year AND de.id_doc = dds.id_des_doc), 0.0) AS _prc_orig_qty_rem " : 
+                    "t2._net_qty - COALESCE((SELECT SUM(dds.qty) FROM trn_dps_dps_supply AS dds WHERE de.id_year = dds.id_des_year AND de.id_doc = dds.id_des_doc), 0.0) AS _prc_qty_rem, t2._net_orig_qty - COALESCE((SELECT SUM(dds.orig_qty) FROM trn_dps_dps_supply AS dds WHERE de.id_year = dds.id_des_year AND de.id_doc = dds.id_des_doc), 0.0) AS _prc_orig_qty_rem ")
                 
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_DPS) + " AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON d.fid_bp_r = b.id_bp "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON d.fid_cur = c.id_cur "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ul ON d.fid_usr_link = ul.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON de.fid_item = i.id_item "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON de.fid_unit = u.id_unit "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS ou ON de.fid_orig_unit = ou.id_unit "
@@ -195,7 +193,7 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
                 + "      de.qty, de.orig_qty "
                 + "      FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
                 + "      INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc "
-                + "      WHERE d.fid_ct_dps = " + SModSysConsts.TRNS_CL_DPS_SAL_DOC[0] + " AND d.fid_cl_dps = " + SModSysConsts.TRNS_CL_DPS_SAL_DOC[1] + " AND "
+                + "      WHERE d.fid_ct_dps = " + SModSysConsts.TRNS_CL_DPS_SAL_DOC[0] + " AND d.fid_cl_dps = " + SModSysConsts.TRNS_CL_DPS_SAL_DOC[1] + " AND d.fid_st_dps = " + SModSysConsts.TRNS_ST_DPS_EMITED + " AND "
                 + "      d.b_del = 0 AND de.b_del = 0 "
                 + "      UNION "
                 + "      SELECT dda.id_dps_year AS id_year, dda.id_dps_doc AS id_doc, dda.id_dps_ety AS id_ety, "
@@ -203,16 +201,15 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
                 + "      FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
                 + "      INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc "
                 + "      INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_ADJ) + " AS dda ON de.id_year = dda.id_dps_year AND de.id_doc = dda.id_dps_doc AND de.id_ety = dda.id_dps_ety "
-                + "      WHERE d.fid_ct_dps = " + SModSysConsts.TRNS_CL_DPS_SAL_DOC[0] + " AND d.fid_cl_dps = " + SModSysConsts.TRNS_CL_DPS_SAL_DOC[1] + " AND "
+                + "      WHERE d.fid_ct_dps = " + SModSysConsts.TRNS_CL_DPS_SAL_DOC[0] + " AND d.fid_cl_dps = " + SModSysConsts.TRNS_CL_DPS_SAL_DOC[1] + " AND d.fid_st_dps = " + SModSysConsts.TRNS_ST_DPS_EMITED + " AND "
                 + "      d.b_del = 0 AND de.b_del = 0 "
                 + "      ORDER BY id_year, id_doc, id_ety) AS t1 "
                 + "  GROUP BY t1.id_year, t1.id_doc, t1.id_ety "
                 + "  ORDER BY t1.id_year, t1.id_doc, t1.id_ety) AS t2 ON de.id_year = t2.id_year AND de.id_doc = t2.id_doc AND de.id_ety = t2.id_ety "
-                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_SUPPLY) + " AS dds ON de.id_year = dds.id_des_year AND de.id_doc = dds.id_des_doc AND de.id_ety = dds.id_des_ety "
                 + (where.isEmpty() ? "" : "WHERE " + where)
                 + "GROUP BY de.id_year, de.id_doc, "
                 + (isSummary() ? "" : "de.id_ety, de.sort_pos, ")
-                + "d.num_ser, d.num, d.num_ref, d.dt, d.ts_link, dt.code, b.bp, c.cur_key, ul.usr "
+                + "d.num_ser, d.num, d.num_ref, d.dt, d.ts_link, dt.code "
                 + (isSummary() ? "" : ", i.item, i.item_key, u.symbol, ou.symbol, ")
                 + (isSummary() ? "" : "t2._net_qty, t2._net_orig_qty ")
                 + (having.isEmpty() ? "" : "HAVING " + having)
@@ -255,7 +252,6 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
         }
         
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "d.b_link", "Cerrado"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "ul.usr", "Usr. cierre"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "d.ts_link", "Cierre"));
         
         return gridColumnsViews;

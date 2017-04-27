@@ -344,18 +344,18 @@ public class SDbDeliveryEntry extends SDbRegistryUser implements SGridRow {
         mnQueryResultId = SDbConsts.SAVE_ERROR;
         
         msSql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_SUPPLY) + " SET "
-                + "qty = ("
+                + "qty = (qty -("
                 + "SELECT COALESCE(SUM(qty), 0.0) "
                 + "FROM " + getSqlTable() + " "
                 + "WHERE fk_dps_year = " + mnFkDpsYearId + " AND fk_dps_doc = " + mnFkDpsDocId + " AND fk_dps_ety = " + mnFkDpsEntryId + " AND "
                 + "fk_ord_year = " + mnFkOrderYearId + " AND fk_ord_doc = " + mnFkOrderDocId + " AND fk_ord_ety = " + mnFkOrderEntryId + " AND "
-                + "NOT (id_dvy = " + mnPkDeliveryId + ")), "
-                + "orig_qty = ("
+                + "(id_dvy = " + mnPkDeliveryId + "))), "
+                + "orig_qty = (orig_qty -("
                 + "SELECT COALESCE(SUM(orig_qty), 0.0) "
                 + "FROM " + getSqlTable() + " "
                 + "WHERE fk_dps_year = " + mnFkDpsYearId + " AND fk_dps_doc = " + mnFkDpsDocId + " AND fk_dps_ety = " + mnFkDpsEntryId + " AND "
                 + "fk_ord_year = " + mnFkOrderYearId + " AND fk_ord_doc = " + mnFkOrderDocId + " AND fk_ord_ety = " + mnFkOrderEntryId + " AND "
-                + "NOT (id_dvy = " + mnPkDeliveryId + ")) "
+                + "(id_dvy = " + mnPkDeliveryId + "))) "
                 + "WHERE id_src_year = " + mnFkOrderYearId + " AND id_src_doc = " + mnFkOrderDocId + " AND id_src_ety = " + mnFkOrderEntryId + " AND "
                 + "id_des_year = " + mnFkDpsYearId + " AND id_des_doc = " + mnFkDpsDocId + " AND id_des_ety =  " + mnFkDpsEntryId + "; ";
         session.getStatement().execute(msSql);
