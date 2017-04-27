@@ -15,6 +15,8 @@ import erp.gui.mod.cfg.SCfgMenuSectionSeparator;
 import erp.gui.mod.cfg.SCfgModule;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.lib.table.STableTabComponent;
+import erp.lib.table.STableTabInterface;
 import erp.mfin.data.SDataCostCenterItem;
 import erp.mfin.form.SDialogRepBizPartnerAccountingMoves;
 import erp.mfin.form.SDialogRepBizPartnerAdvances;
@@ -49,6 +51,7 @@ import erp.mtrn.form.SDialogRepSalesPurchasesPriceUnitary;
 import erp.mtrn.form.SFormBizPartnerBlocking;
 import erp.mtrn.form.SFormDncDocumentNumberSeries;
 import erp.mtrn.form.SFormDps;
+import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -67,6 +70,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiCatDpsDncDocumentNumberSeries;
     private javax.swing.JMenuItem jmiCatDiogDncDocumentNumberSeries;
     private javax.swing.JMenuItem jmiCatBizPartnerBlocking;
+    private javax.swing.JMenuItem jmiCatViewIntegralSuppliers;
     private javax.swing.JMenu jmCatCfg;
     private javax.swing.JMenuItem jmiCatCfgCostCenterItem;
     private javax.swing.JMenuItem jmiCatSendingDpsLog;
@@ -237,6 +241,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatDpsDncDocumentNumberSeries = new JMenuItem("Folios de docs. de compras");
         jmiCatDiogDncDocumentNumberSeries = new JMenuItem("Folios de docs. de inventarios");
         jmiCatBizPartnerBlocking = new JMenuItem("Bloqueo de proveedores");
+        jmiCatViewIntegralSuppliers = new JMenuItem("Vista integral proveedores");
         jmCatCfg = new JMenu("Contabilización automática");
         jmiCatCfgCostCenterItem = new JMenuItem("Configuración de centros de costo vs. ítems");
         jmiCatSendingDpsLog = new JMenuItem("Bitácora de envíos de docs.");
@@ -245,6 +250,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmCat.add(jmiCatDiogDncDocumentNumberSeries);
         jmCat.addSeparator();
         jmCat.add(jmiCatBizPartnerBlocking);
+        jmCat.add(jmiCatViewIntegralSuppliers);
         jmCat.addSeparator();
         jmCat.add(jmCatCfg);
         jmCat.addSeparator();
@@ -547,6 +553,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatDpsDncDocumentNumberSeries.addActionListener(this);
         jmiCatDiogDncDocumentNumberSeries.addActionListener(this);
         jmiCatBizPartnerBlocking.addActionListener(this);
+        jmiCatViewIntegralSuppliers.addActionListener(this);
         jmiCatCfgCostCenterItem.addActionListener(this);
         jmiCatSendingDpsLog.addActionListener(this);
         jmiEstimates.addActionListener(this);
@@ -680,6 +687,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatDpsDncDocumentNumberSeries.setEnabled(hasRightDnsDps);
         jmiCatDiogDncDocumentNumberSeries.setEnabled(hasRightDnsDiog);
         jmiCatBizPartnerBlocking.setEnabled(hasRightBizPartnerBlocking);
+        jmiCatViewIntegralSuppliers.setEnabled(hasRightBizPartnerBlocking);
         jmCatCfg.setEnabled(hasRightItemConfig);
         jmiCatSendingDpsLog.setEnabled(hasRightDocOrder);
         jmEst.setEnabled(hasRightDocEstimate);
@@ -761,6 +769,46 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             module.getChildMenus().add(menu);
             
             ((erp.SClient) miClient).getCfgProcesor().processModule(module);
+        }
+    }
+    
+    private void showPanelQueryIntegralBizPartner(int panelType) {
+        int index = 0;
+        int count = 0;
+        boolean exists = false;
+        String title = "";
+        STableTabInterface tableTab = null;
+
+        count = miClient.getTabbedPane().getTabCount();
+        for (index = 0; index < count; index++) {
+            if (miClient.getTabbedPane().getComponentAt(index) instanceof STableTabInterface) {
+                tableTab = (STableTabInterface) miClient.getTabbedPane().getComponentAt(index);
+                if (tableTab.getTabType() == panelType && tableTab.getTabTypeAux01() == SLibConstants.UNDEFINED && tableTab.getTabTypeAux02() == SLibConstants.UNDEFINED) {
+                    exists = true;
+                    break;
+                }
+            }
+        }
+
+        if (exists) {
+            miClient.getTabbedPane().setSelectedIndex(index);
+        }
+        else {
+            switch (panelType) {
+                case SModConsts.TRNX_INT_SUP_QRY:
+                    title = "Consulta integral proveedores";
+                    tableTab = new SPanelQueryIntegralBizPartner(miClient, SModConsts.TRNX_INT_SUP_QRY,SDataConstantsSys.BPSS_CT_BP_SUP);
+                    break;
+                default:
+                    tableTab = null;
+                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
+            }
+
+            if (tableTab != null) {
+                miClient.getTabbedPane().addTab(title, (JComponent) tableTab);
+                miClient.getTabbedPane().setTabComponentAt(count, new STableTabComponent(miClient.getTabbedPane(), miClient.getImageIcon(mnModuleType)));
+                miClient.getTabbedPane().setSelectedIndex(count);
+            }
         }
     }
 
@@ -1299,6 +1347,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiCatBizPartnerBlocking) {
                 showView(SDataConstants.TRN_BP_BLOCK, SDataConstantsSys.BPSS_CT_BP_SUP);
+            }
+            else if (item == jmiCatViewIntegralSuppliers) {
+                showPanelQueryIntegralBizPartner(SModConsts.TRNX_INT_SUP_QRY);
             }
             else if (item == jmiCatCfgCostCenterItem) {
                 showView(SDataConstants.FIN_CC_ITEM);

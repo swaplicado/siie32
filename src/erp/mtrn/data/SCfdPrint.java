@@ -29,6 +29,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceipt;
+import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsUtils;
 import erp.print.SDataConstantsPrint;
 import java.awt.image.BufferedImage;
@@ -1320,6 +1321,8 @@ public class SCfdPrint {
         int overTime = 0;
         int nTotalTiempoExtra = 0;
 
+        double dIngresoAux = 0;
+        double dIngresoDiario = 0;
         double dTotalPercepciones = 0;
         double dTotalDeducciones = 0;
         double dTotalTiempoExtraPagado = 0;
@@ -1473,8 +1476,14 @@ public class SCfdPrint {
                     map.put("Categoria", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getEmployeeCategory() : miClient.getSession().readField(SModConsts.HRSU_TP_WRK, new int[] { payrollReceipt.getFkWorkerTypeId() }, SDbRegistry.FIELD_CODE));
                     map.put("TipoSalario", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getSalaryType() : miClient.getSession().readField(SModConsts.HRSS_TP_SAL, new int[] { payrollReceipt.getFkSalaryTypeId() }, SDbRegistry.FIELD_NAME));
                     map.put("Ejercicio", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? (oFormerPayroll.getYear() + "-" + oFixedFormatAux.format(oFormerPayroll.getPeriod())) : (payroll.getPeriodYear() + "-" + oFixedFormatAux.format(payroll.getPeriod())));
+                    
+                    if (payrollReceipt.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_FOR) {
+                        dIngresoAux = subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getSalary() : payrollReceipt.getWage();
+                        dIngresoDiario = dIngresoAux * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
+                        map.put("IngresoDiario", SLibUtils.round(dIngresoDiario, SLibConsts.DATA_TYPE_DEC));
+                    }
                 }
-                
+
                 aPercepciones = new ArrayList();
                 aDeducciones = new ArrayList();
                 aTiempoExtra = new ArrayList();
