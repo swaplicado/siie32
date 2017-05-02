@@ -10,6 +10,8 @@ import cfd.DAttributeOptionImpuestoRetencion;
 import cfd.DAttributeOptionImpuestoTraslado;
 import cfd.DAttributeOptionMoneda;
 import cfd.DAttributeOptionTipoComprobante;
+import cfd.DCfdTax;
+import cfd.DCfdTaxes;
 import cfd.DElement;
 import cfd.ext.bachoco.DElementLineItem;
 import cfd.ext.bachoco.DElementPayment;
@@ -997,9 +999,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mdXtaCfdCceTotalUSD = 0;
         
         for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
-            valueMxn = SLibUtils.round((dpsEntry.getSubtotalCy_r() * mdExchangeRate), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-            valueUsdEty = SLibUtils.round((valueMxn / mdXtaCfdCceExchangeRateUSD), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-            mdXtaCfdCceTotalUSD = SLibUtils.round((mdXtaCfdCceTotalUSD + valueUsdEty), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+            if (dpsEntry.isAccountable()) {
+                valueMxn = SLibUtils.round((dpsEntry.getSubtotalCy_r() * mdExchangeRate), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+                valueUsdEty = SLibUtils.round((valueMxn / mdXtaCfdCceExchangeRateUSD), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+                
+                mdXtaCfdCceTotalUSD = SLibUtils.round(mdXtaCfdCceTotalUSD + valueUsdEty, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+            }
         }
     }
     
@@ -4236,32 +4241,278 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         cfd.ver3.cce11.DElementMercancias mercancias = new cfd.ver3.cce11.DElementMercancias();
         
         for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
-            if (dpsEntry.getSubtotalCy_r() == SLibUtils.round(dpsEntry.getOriginalPriceUnitaryCy() * dpsEntry.getOriginalQuantity(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits())) {
-                price = dpsEntry.getOriginalPriceUnitaryCy();
+            if (dpsEntry.isAccountable()) {
+                if (dpsEntry.getSubtotalCy_r() == SLibUtils.round(dpsEntry.getOriginalPriceUnitaryCy() * dpsEntry.getOriginalQuantity(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits())) {
+                    price = SLibUtils.round(dpsEntry.getOriginalPriceUnitaryCy(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+                }
+                else {
+                    price = SLibUtils.round(dpsEntry.getSubtotalCy_r() / dpsEntry.getOriginalQuantity(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+                }
+
+                mercancia = new cfd.ver3.cce11.DElementMercancia();
+
+                mercancia.getAttNoIdentificacion().setString(dpsEntry.getConceptKey());
+                mercancia.getAttFraccionArancelaria().setString(dpsEntry.getDbmsTariffFraction());
+                mercancia.getAttCantidadAduana().setDouble(dpsEntry.getOriginalQuantity());
+                mercancia.getAttUnidadAduana().setString(dpsEntry.getDbmsCustomsUnit());
+                mercancia.getAttValorUnitarioAduana().setDouble(price);
+
+                valueMxn = SLibUtils.round((dpsEntry.getSubtotalCy_r() * mdExchangeRate), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+                valueUsdEty = SLibUtils.round((valueMxn / mdXtaCfdCceExchangeRateUSD), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+
+                mercancia.getAttValorDolares().setDouble(valueUsdEty);
+
+                mercancias.addMercancia(mercancia);
             }
-            else {
-                price = dpsEntry.getSubtotalCy_r() / dpsEntry.getOriginalQuantity();
-            }
-
-            mercancia = new cfd.ver3.cce11.DElementMercancia();
-
-            mercancia.getAttNoIdentificacion().setString(dpsEntry.getConceptKey());
-            mercancia.getAttFraccionArancelaria().setString(dpsEntry.getDbmsTariffFraction());
-            mercancia.getAttCantidadAduana().setDouble(dpsEntry.getOriginalQuantity());
-            mercancia.getAttUnidadAduana().setString(dpsEntry.getDbmsCustomsUnit());
-            mercancia.getAttValorUnitarioAduana().setDouble(price);
-            
-            valueMxn = SLibUtils.round((dpsEntry.getSubtotalCy_r() * mdExchangeRate), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-            valueUsdEty = SLibUtils.round((valueMxn / mdXtaCfdCceExchangeRateUSD), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-            
-            mercancia.getAttValorDolares().setDouble(valueUsdEty);
-
-            mercancias.addMercancia(mercancia);
         }
         
         comercioExterior.setEltMercancias(mercancias);
         
         return comercioExterior;
+    }
+
+    private ArrayList<SCfdDataImpuesto> createTaxesCfd32() {
+        double dImptoTasa = 0;
+        double dImpto = 0;
+        Double oValue = null;
+        Set<Double> setKeyImptos = null;
+        HashMap<Double, Double> hmImpto = null;
+        HashMap<Double, Double> hmRetenidoIva = new HashMap<Double, Double>();
+        HashMap<Double, Double> hmRetenidoIsr = new HashMap<Double, Double>();
+        HashMap<Double, Double> hmTrasladadoIva = new HashMap<Double, Double>();
+        HashMap<Double, Double> hmTrasladadoIeps = new HashMap<Double, Double>();
+        ArrayList<SCfdDataImpuesto> impuestosXml = null;
+        SCfdDataImpuesto impuestoXml = null;
+
+        impuestosXml = new ArrayList<SCfdDataImpuesto>();
+
+        try {
+            for (SDataDpsEntry entry : mvDbmsDpsEntries) {
+                if (entry.isAccountable()) {
+                    for (SDataDpsEntryTax tax : entry.getDbmsEntryTaxes()) {
+                        if (tax.getFkTaxCalculationTypeId() != SModSysConsts.FINS_TP_TAX_CAL_RATE) {
+                            throw new Exception("Todos los impuestos deben ser en base a una tasa (" + tax.getFkTaxCalculationTypeId() + ").");
+                        }
+                        else {
+                            hmImpto = null;
+                            dImptoTasa = 0;
+                            
+                            switch (tax.getFkTaxTypeId()) {
+                                case SModSysConsts.FINS_TP_TAX_RETAINED:
+                                    switch (tax.getDbmsCfdTaxId()) {
+                                        case SModSysConsts.FINS_CFD_TAX_IVA: // IVA
+                                            dImptoTasa = 1;   // on CFDI's XML retained taxes have no rate
+                                            hmImpto = hmRetenidoIva;
+                                            break;
+                                        case SModSysConsts.FINS_CFD_TAX_ISR: // ISR
+                                            dImptoTasa = 1;   // on CFDI's XML retained taxes have no rate
+                                            hmImpto = hmRetenidoIsr;
+                                            break;
+                                        default:
+                                            throw new Exception("Todos los impuestos retenidos deben ser conocidos (" + tax.getDbmsCfdTaxId() + ").");
+                                    }
+                                    break;
+
+                                case SModSysConsts.FINS_TP_TAX_CHARGED:
+                                    switch (tax.getDbmsCfdTaxId()) {
+                                        case SModSysConsts.FINS_CFD_TAX_IVA: // IVA
+                                            hmImpto = hmTrasladadoIva;
+                                            break;
+                                        case SModSysConsts.FINS_CFD_TAX_IEPS: // IEPS
+                                            hmImpto = hmTrasladadoIeps;
+                                            break;
+                                        default:
+                                            throw new Exception("Todos los impuestos trasladados deben ser conocidos (" + tax.getDbmsCfdTaxId() + ").");
+                                    }
+                                    break;
+
+                                default:
+                                    throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + tax.getFkTaxTypeId() + ").");
+                            }
+
+                            if (dImptoTasa == 0) {
+                                dImptoTasa = tax.getPercentage();
+                            }
+
+                            oValue = hmImpto.get(dImptoTasa);
+                            dImpto = oValue == null ? 0 : oValue.doubleValue();
+                            hmImpto.put(dImptoTasa, dImpto + tax.getTaxCy());
+                        }
+                    }
+                }
+            }
+
+            // Retained taxes:
+
+            hmImpto = hmRetenidoIva;
+            if (!hmImpto.isEmpty()) {
+                setKeyImptos = hmImpto.keySet();
+                for (Double key : setKeyImptos) {
+                    dImpto = hmImpto.get(key);
+                    if (dImpto != 0) {
+                        impuestoXml = new SCfdDataImpuesto();
+
+                        impuestoXml.setImpuesto(DAttributeOptionImpuestoRetencion.CFD_IVA);
+                        impuestoXml.setImpuestoBasico(SModSysConsts.FINS_TP_TAX_RETAINED);
+                        impuestoXml.setTasa(1);
+                        impuestoXml.setImporte(dImpto);
+
+                        impuestosXml.add(impuestoXml);
+                    }
+                }
+            }
+
+            hmImpto = hmRetenidoIsr;
+            if (!hmImpto.isEmpty()) {
+                setKeyImptos = hmImpto.keySet();
+                for (Double key : setKeyImptos) {
+                    dImpto = hmImpto.get(key);
+
+                    if (dImpto != 0) {
+                        impuestoXml = new SCfdDataImpuesto();
+
+                        impuestoXml.setImpuesto(DAttributeOptionImpuestoRetencion.CFD_ISR);
+                        impuestoXml.setImpuestoBasico(SModSysConsts.FINS_TP_TAX_RETAINED);
+                        impuestoXml.setTasa(1);
+                        impuestoXml.setImporte(dImpto);
+
+                        impuestosXml.add(impuestoXml);
+                    }
+                }
+            }
+
+            // Charged taxes:
+
+            hmImpto = hmTrasladadoIva;
+            if (!hmImpto.isEmpty()) {
+                setKeyImptos = hmImpto.keySet();
+                for (Double key : setKeyImptos) {
+                    dImpto = hmImpto.get(key);
+
+                    impuestoXml = new SCfdDataImpuesto();
+                    impuestoXml.setImpuesto(DAttributeOptionImpuestoTraslado.CFD_IVA);
+                    impuestoXml.setImpuestoBasico(SModSysConsts.FINS_TP_TAX_CHARGED);
+                    impuestoXml.setTasa(key * 100.0);
+                    impuestoXml.setImporte(dImpto);
+                    mdCfdIvaPorcentaje = (key * 100.0);
+
+                    impuestosXml.add(impuestoXml);
+                }
+            }
+
+            hmImpto = hmTrasladadoIeps;
+            if (!hmImpto.isEmpty()) {
+                setKeyImptos = hmImpto.keySet();
+                for (Double key : setKeyImptos) {
+                    dImpto = hmImpto.get(key);
+
+                    impuestoXml = new SCfdDataImpuesto();
+                    impuestoXml.setImpuesto(DAttributeOptionImpuestoTraslado.CFD_IEPS);
+                    impuestoXml.setImpuestoBasico(SModSysConsts.FINS_TP_TAX_CHARGED);
+                    impuestoXml.setTasa(key * 100.0);
+                    impuestoXml.setImporte(dImpto);
+
+                    impuestosXml.add(impuestoXml);
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+        return impuestosXml;
+    }
+      
+    private ArrayList<SCfdDataImpuesto> createTaxesCfd33() {
+        double dImptoTasa = 0;
+        ArrayList<SCfdDataImpuesto> impuestosXml = null;
+        SCfdDataImpuesto impuestoXml = null;
+        DCfdTaxes cfdTaxes = null;
+
+        impuestosXml = new ArrayList<SCfdDataImpuesto>();
+        cfdTaxes = new DCfdTaxes();
+        
+        try {
+            for (SDataDpsEntry entry : mvDbmsDpsEntries) {
+                if (entry.isAccountable()) {
+                    for (SDataDpsEntryTax tax : entry.getDbmsEntryTaxes()) {
+                        if (tax.getFkTaxCalculationTypeId() != SModSysConsts.FINS_TP_TAX_CAL_RATE) {
+                            throw new Exception("Todos los impuestos deben ser en base a una tasa (" + tax.getFkTaxCalculationTypeId() + ").");
+                        }
+                        else {
+                            impuestoXml = new SCfdDataImpuesto();
+                            dImptoTasa = 0;
+                    
+                            switch (tax.getFkTaxTypeId()) {
+                                case SModSysConsts.FINS_TP_TAX_RETAINED:
+                                    switch (tax.getDbmsCfdTaxId()) {
+                                        case SModSysConsts.FINS_CFD_TAX_IVA: // IVA
+                                            impuestoXml.setImpuesto(DAttributeOptionImpuestoRetencion.CFD_IVA);
+                                            impuestoXml.setImpuestoBasico(SModSysConsts.FINS_TP_TAX_RETAINED);
+                                            
+                                            dImptoTasa = 1;   // on CFDI's XML retained taxes have no rate
+                                            break;
+                                        case SModSysConsts.FINS_CFD_TAX_ISR: // ISR
+                                            impuestoXml.setImpuesto(DAttributeOptionImpuestoRetencion.CFD_ISR);
+                                            impuestoXml.setImpuestoBasico(SModSysConsts.FINS_TP_TAX_RETAINED);
+                                            
+                                            dImptoTasa = 1;   // on CFDI's XML retained taxes have no rate
+                                            break;
+                                        default:
+                                            throw new Exception("Todos los impuestos retenidos deben ser conocidos (" + tax.getDbmsCfdTaxId() + ").");
+                                    }
+                                    break;
+
+                                case SModSysConsts.FINS_TP_TAX_CHARGED:
+                                    switch (tax.getDbmsCfdTaxId()) {
+                                        case SModSysConsts.FINS_CFD_TAX_IVA: // IVA
+                                            impuestoXml.setImpuesto(DAttributeOptionImpuestoRetencion.CFD_IVA);
+                                            impuestoXml.setImpuestoBasico(SModSysConsts.FINS_TP_TAX_CHARGED);
+                                            
+                                            dImptoTasa = tax.getPercentage();
+                                            break;
+                                        case SModSysConsts.FINS_CFD_TAX_IEPS: // IEPS
+                                            impuestoXml.setImpuesto(DAttributeOptionImpuestoRetencion.CFD_NO_DEFINIDO);
+                                            impuestoXml.setImpuestoBasico(SModSysConsts.FINS_TP_TAX_CHARGED);
+                                            
+                                            dImptoTasa = tax.getPercentage();
+                                            break;
+                                        default:
+                                            throw new Exception("Todos los impuestos trasladados deben ser conocidos (" + tax.getDbmsCfdTaxId() + ").");
+                                    }
+                                    break;
+
+                                default:
+                                    throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + tax.getFkTaxTypeId() + ").");
+                            }
+                            impuestoXml.setBase(entry.getSubtotalCy_r());
+                            impuestoXml.setImpuestoClave(tax.getDbmsCfdTax());
+                            impuestoXml.setTasa(dImptoTasa);
+                            impuestoXml.setImporte(tax.getTaxCy());
+                            impuestoXml.setTipoFactor(tax.getDbmsTaxCalculationType());
+                            
+                            if (tax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) {
+                                cfdTaxes.addTaxCharged(impuestoXml);
+                            }
+                            else if (tax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_RETAINED) {
+                                cfdTaxes.addTaxRetained(impuestoXml);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            for (DCfdTax tax : cfdTaxes.getTaxCharged()) {
+                impuestosXml.add((SCfdDataImpuesto) tax);
+            }
+            
+            for (DCfdTax tax : cfdTaxes.getTaxRetained()) {
+                impuestosXml.add((SCfdDataImpuesto) tax);
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+        return impuestosXml;
     }
 
     @Override
@@ -4385,7 +4636,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public int getSucursalReceptor() {
         return mnFkBizPartnerBranchId;
     }
-
+    
     @Override
     public ArrayList<DElement> getCfdElementRegimenFiscal() {
         ArrayList<DElement> regimes = null;
@@ -4528,154 +4779,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     
     @Override
     public ArrayList<SCfdDataImpuesto> getCfdImpuestos() {
-        double dImptoTasa = 0;
-        double dImpto = 0;
-        Double oValue = null;
-        Set<Double> setKeyImptos = null;
-        HashMap<Double, Double> hmImpto = null;
-        HashMap<Double, Double> hmRetenidoIva = new HashMap<Double, Double>();
-        HashMap<Double, Double> hmRetenidoIsr = new HashMap<Double, Double>();
-        HashMap<Double, Double> hmTrasladadoIva = new HashMap<Double, Double>();
-        HashMap<Double, Double> hmTrasladadoIeps = new HashMap<Double, Double>();
-        ArrayList<SCfdDataImpuesto> impuestosXml = null;
-        SCfdDataImpuesto impuestoXml = null;
-
-        impuestosXml = new ArrayList<SCfdDataImpuesto>();
-
-        try {
-            for (SDataDpsEntry entry : mvDbmsDpsEntries) {
-                if (entry.isAccountable()) {
-                    for (SDataDpsEntryTax tax : entry.getDbmsEntryTaxes()) {
-                        if (tax.getFkTaxCalculationTypeId() != SModSysConsts.FINS_TP_TAX_CAL_RATE) {
-                            throw new Exception("Todos los impuestos deben ser en base a una tasa (" + tax.getFkTaxCalculationTypeId() + ").");
-                        }
-                        else {
-                            hmImpto = null;
-                            dImptoTasa = 0;
-
-                            switch (tax.getFkTaxTypeId()) {
-                                case SModSysConsts.FINS_TP_TAX_RETAINED:
-                                    switch (tax.getDbmsCfdTaxId()) {
-                                        case SModSysConsts.FINS_CFD_TAX_IVA: // IVA
-                                            dImptoTasa = 1;   // on CFDI's XML retained taxes have no rate
-                                            hmImpto = hmRetenidoIva;
-                                            break;
-                                        case SModSysConsts.FINS_CFD_TAX_ISR: // ISR
-                                            dImptoTasa = 1;   // on CFDI's XML retained taxes have no rate
-                                            hmImpto = hmRetenidoIsr;
-                                            break;
-                                        default:
-                                            throw new Exception("Todos los impuestos retenidos deben ser conocidos (" + tax.getDbmsCfdTaxId() + ").");
-                                    }
-                                    break;
-
-                                case SModSysConsts.FINS_TP_TAX_CHARGED:
-                                    switch (tax.getDbmsCfdTaxId()) {
-                                        case SModSysConsts.FINS_CFD_TAX_IVA: // IVA
-                                            hmImpto = hmTrasladadoIva;
-                                            break;
-                                        case SModSysConsts.FINS_CFD_TAX_IEPS: // IEPS
-                                            hmImpto = hmTrasladadoIeps;
-                                            break;
-                                        default:
-                                            throw new Exception("Todos los impuestos trasladados deben ser conocidos (" + tax.getDbmsCfdTaxId() + ").");
-                                    }
-                                    break;
-
-                                default:
-                                    throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + tax.getFkTaxTypeId() + ").");
-                            }
-
-                            if (dImptoTasa == 0) {
-                                dImptoTasa = tax.getPercentage();
-                            }
-
-                            oValue = hmImpto.get(dImptoTasa);
-                            dImpto = oValue == null ? 0 : oValue.doubleValue();
-                            hmImpto.put(dImptoTasa, dImpto + tax.getTaxCy());
-                        }
-                    }
-                }
-            }
-
-            // Retained taxes:
-
-            hmImpto = hmRetenidoIva;
-            if (!hmImpto.isEmpty()) {
-                setKeyImptos = hmImpto.keySet();
-                for (Double key : setKeyImptos) {
-                    dImpto = hmImpto.get(key);
-                    if (dImpto != 0) {
-                        impuestoXml = new SCfdDataImpuesto();
-
-                        impuestoXml.setImpuesto(DAttributeOptionImpuestoRetencion.CFD_IVA);
-                        impuestoXml.setImpuestoBasico(SModSysConsts.FINS_TP_TAX_RETAINED);
-                        impuestoXml.setTasa(1);
-                        impuestoXml.setImporte(dImpto);
-
-                        impuestosXml.add(impuestoXml);
-                    }
-                }
-            }
-
-            hmImpto = hmRetenidoIsr;
-            if (!hmImpto.isEmpty()) {
-                setKeyImptos = hmImpto.keySet();
-                for (Double key : setKeyImptos) {
-                    dImpto = hmImpto.get(key);
-
-                    if (dImpto != 0) {
-                        impuestoXml = new SCfdDataImpuesto();
-
-                        impuestoXml.setImpuesto(DAttributeOptionImpuestoRetencion.CFD_ISR);
-                        impuestoXml.setImpuestoBasico(SModSysConsts.FINS_TP_TAX_RETAINED);
-                        impuestoXml.setTasa(1);
-                        impuestoXml.setImporte(dImpto);
-
-                        impuestosXml.add(impuestoXml);
-                    }
-                }
-            }
-
-            // Charged taxes:
-
-            hmImpto = hmTrasladadoIva;
-            if (!hmImpto.isEmpty()) {
-                setKeyImptos = hmImpto.keySet();
-                for (Double key : setKeyImptos) {
-                    dImpto = hmImpto.get(key);
-
-                    impuestoXml = new SCfdDataImpuesto();
-                    impuestoXml.setImpuesto(DAttributeOptionImpuestoTraslado.CFD_IVA);
-                    impuestoXml.setImpuestoBasico(SModSysConsts.FINS_TP_TAX_CHARGED);
-                    impuestoXml.setTasa(key * 100.0);
-                    impuestoXml.setImporte(dImpto);
-                    mdCfdIvaPorcentaje = (key * 100.0);
-
-                    impuestosXml.add(impuestoXml);
-                }
-            }
-
-            hmImpto = hmTrasladadoIeps;
-            if (!hmImpto.isEmpty()) {
-                setKeyImptos = hmImpto.keySet();
-                for (Double key : setKeyImptos) {
-                    dImpto = hmImpto.get(key);
-
-                    impuestoXml = new SCfdDataImpuesto();
-                    impuestoXml.setImpuesto(DAttributeOptionImpuestoTraslado.CFD_IEPS);
-                    impuestoXml.setImpuestoBasico(SModSysConsts.FINS_TP_TAX_CHARGED);
-                    impuestoXml.setTasa(key * 100.0);
-                    impuestoXml.setImporte(dImpto);
-
-                    impuestosXml.add(impuestoXml);
-                }
-            }
-        }
-        catch (Exception e) {
-            SLibUtils.showException(this, e);
-        }
-        return impuestosXml;
+        return createTaxesCfd32();
     }
 
     public void saveField(java.sql.Connection connection, final int[] pk, final int field, final Object value) throws Exception {

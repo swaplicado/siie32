@@ -2504,11 +2504,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldNumberNoteIn.setTabbedPaneIndex(TAB_CFD, jTabbedPane);
         moFieldFileXml = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfFileXml, jlFileXml);
         moFieldFileXml.setTabbedPaneIndex(TAB_CFD, jTabbedPane);
-        moFieldFkCfdUseId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdUseId, jlCfdUseId);
+        moFieldFkCfdUseId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbCfdUseId, jlCfdUseId);
         moFieldFkCfdUseId.setTabbedPaneIndex(TAB_CFD, jTabbedPane);
         moFieldCfdConfirmationNumber = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCfdConfirmationNum, jlCfdAddendaSubtypeId);
         moFieldCfdConfirmationNumber.setTabbedPaneIndex(TAB_CFD, jTabbedPane);
-        moFieldCfdConfirmationNumber.setLengthMax(25);
+        moFieldCfdConfirmationNumber.setLengthMax(5);
         
         // international commerce fields:
         
@@ -2968,14 +2968,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private void enableCfdXmlFields(boolean enable) {
         boolean enableFields = enable && isCfdRequired();
         boolean enableXmlFields = enable && isCfdXmlRequired();
+        boolean isCfdiVer33 = miClient.getSessionXXX().getParamsCompany().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33;
         
         jlFileXml.setEnabled(enableXmlFields);
         jbFileXml.setEnabled(enableXmlFields);
         jbDeleteFileXml.setEnabled(enableXmlFields);
         
-        jcbCfdUseId.setEnabled(enableFields && false/*XXX remove this last false value!*/);
-        jtfCfdConfirmationNum.setEnabled(enableFields && false/*XXX remove this last false value!*/);
-        jtfCfdConfirmationNum.setFocusable(enableFields && false/*XXX remove this last false value!*/);
+        jcbCfdUseId.setEnabled(enableFields && isCfdiVer33);
+        jtfCfdConfirmationNum.setEnabled(enableFields && isCfdiVer33);
+        jtfCfdConfirmationNum.setFocusable(enableFields && isCfdiVer33);
     }
 
     /**
@@ -7810,6 +7811,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkPaymentSystemTypeId.getText() + "'.");
                         validation.setComponent(jcbFkPaymentSystemTypeId);
                     }
+                    else if (mbIsSales && (mbIsDoc || mbIsAdj) && miClient.getSessionXXX().getParamsCompany().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33 && moFieldFkPaymentSystemTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNU_TP_PAY_SYS_NA) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkPaymentSystemTypeId.getText() + "'.");
+                        validation.setComponent(jcbFkPaymentSystemTypeId);
+                    }
                     else if (moBizPartnerCategory.getDateStart().after(moFieldDate.getDate())) {
                         validation.setMessage("La fecha inicial de operaciones del asociado de negocios (" + SLibUtils.DateFormatDate.format(moBizPartnerCategory.getDateStart()) + ") " +
                                 "no puede ser posterior a la fecha del campo '" + jlDate.getText() + "'.");
@@ -8082,7 +8087,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         jTabbedPane.setSelectedIndex(1);
                     }
                 }
-            }   
+            }
+            
+            if (!validation.getIsError()) {
+                if (mbIsSales && (mbIsDoc || mbIsAdj) && miClient.getSessionXXX().getParamsCompany().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33 && !moFieldCfdConfirmationNumber.getString().isEmpty() && moFieldCfdConfirmationNumber.getString().length() < 5) {
+                    validation.setMessage("La longitud mínima para el campo '" + jlFkCfdConfirmationNum.getText() + "'. es 5.");
+                    validation.setComponent(jtfCfdConfirmationNum);
+                    jTabbedPane.setSelectedIndex(TAB_CFD);
+                }
+            }
             
             if (!validation.getIsError()) {
                 if (mnSalesSupervisorId_n != 0 && mnSalesAgentId_n == 0) {
@@ -8619,16 +8632,16 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         
         // Set information for CFDI version 3.3:
         
-        /* XXX (2017-02-27) jbarajas is neecesary for update with information of CFDI version 3.3:
-        moDps.setXtaCfdConfirmation(moFieldCfdConfirmationNumber.getString());
+        moDps.setXtaCfdUseCfdi("");
         
-        if (moDps.getDbmsDpsEntries().isEmpty() && mbIsSales && mbIsAdj) {
-            moDps.setXtaCfdRelationType(moDps.getDbmsDpsEntries().get(0).getFkDpsAdjustmentTypeId() == SDataConstantsSys.TRNS_TP_DPS_ADJ_RET ? SDataConstantsSys.TRNS_CFD_CAT_TP_REL_RET : SDataConstantsSys.TRNS_CFD_CAT_TP_REL_DISC);
+        if (miClient.getSessionXXX().getParamsCompany().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
+            moDps.setXtaCfdConfirmation(moFieldCfdConfirmationNumber.getString());
+            
+            if (moDps.getDbmsDpsEntries().isEmpty() && mbIsSales && mbIsAdj) {
+                moDps.setXtaCfdRelationType(moDps.getDbmsDpsEntries().get(0).getFkDpsAdjustmentTypeId() == SDataConstantsSys.TRNS_TP_DPS_ADJ_RET ? SDataConstantsSys.TRNS_CFD_CAT_TP_REL_RET : SDataConstantsSys.TRNS_CFD_CAT_TP_REL_DISC);
+            }
+            moDps.setXtaCfdUseCfdi(moFieldFkCfdUseId.getKey() == null ? "" : (String) moFieldFkCfdUseId.getKey());
         }
-        moDps.setXtaCfdUseCfdi(moFieldFkCfdUseId.getKey() == null ? "" : (String) moFieldFkCfdUseId.getKey());
-        */
-        moDps.setXtaCfdConfirmation(""); // XXX (2017-02-27) jbarajas is neecesary for update with information of CFDI version 3.3
-        moDps.setXtaCfdUseCfdi(""); // XXX (2017-02-27) jbarajas is neecesary for update with information of CFDI version 3.3
                 
         // Set information for international trade:
         

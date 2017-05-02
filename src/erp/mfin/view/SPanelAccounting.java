@@ -863,7 +863,7 @@ public class SPanelAccounting extends javax.swing.JPanel implements erp.lib.tabl
                             sSql += "AND re.fid_tp_sys_mov_xxx in (" +
                                     SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT[1] + ", " +
                                     SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT_PEND[1] + ", " +
-                                    SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT_PEND_ADV[1] + ") ";
+                                    SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT_PEND_ADV[1] + ") ";
                             break;
                         case SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT:
                             sSql += "AND re.fid_tp_sys_mov_xxx in (" +
