@@ -4,13 +4,19 @@
  */
 package erp.cfd;
 
+import cfd.DCfdTax;
 import erp.mod.SModSysConsts;
+import sa.lib.SLibUtils;
 
 /**
  *
  * @author Juan Barajas
  */
-public class SCfdDataImpuesto {
+public class SCfdDataImpuesto implements DCfdTax {
+    
+    protected final String FACT_TP_TASA = "Tasa";
+    protected final String FACT_TP_CUOTA = "Cuota";
+    protected final String FACT_TP_EXENTO = "Excento";
     
     protected int mnImpuestoBasico;
     protected int mnImpuesto;
@@ -19,6 +25,25 @@ public class SCfdDataImpuesto {
     protected double mdTasa;
     protected double mdImporte;
     protected String msTipoFactor;
+    
+    private String getFactorTypeSat(String factor) throws Exception {
+        String factorType = "";
+        
+        if (factor.compareToIgnoreCase(FACT_TP_TASA) == 0) {
+            factorType = FACT_TP_TASA;
+        }
+        else if (factor.compareToIgnoreCase(FACT_TP_CUOTA) == 0) {
+            factorType = FACT_TP_CUOTA;
+        }
+        else if (factor.compareToIgnoreCase(FACT_TP_EXENTO) == 0) {
+            factorType = FACT_TP_EXENTO;
+        }
+        else {
+            throw new Exception("El tipo de factor (" + factor + ") no es válido.");
+        }
+        
+        return factorType;
+    }
     
     public SCfdDataImpuesto() {
         mnImpuestoBasico = 0;
@@ -32,19 +57,39 @@ public class SCfdDataImpuesto {
     
     public void setImpuestoBasico(int n) { mnImpuestoBasico = n; }
     public void setImpuesto(int n) { mnImpuesto = n; }
+    @Override
     public void setImpuestoClave(String s) { msImpuestoClave = s; }
     public void setBase(double d) { mdBase = d; }
+    @Override
     public void setTasa(double d) { mdTasa = d; }
     public void setImporte(double d) { mdImporte = d; }
+    @Override
     public void setTipoFactor(String s) { msTipoFactor = s; }
     
     public int getImpuestoBasico() { return mnImpuestoBasico; }
     public int getImpuesto() { return mnImpuesto; }
+    @Override
     public String getImpuestoClave() { return msImpuestoClave; }
+    @Override
     public double getBase() { return mdBase; }
+    @Override
     public double getTasa() { return mdTasa; }
+    @Override
     public double getImporte() { return mdImporte; }
+    @Override
     public String getTipopFactor() { return msTipoFactor; }
+
+    @Override
+    public void clearBaseImporte() {
+        mdBase = 0;
+        mdImporte = 0;
+    }
+
+    @Override
+    public void addBaseImporte(double base, double importe) {
+        mdBase = SLibUtils.round(mdBase + base, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+        mdImporte = SLibUtils.round(mdImporte + importe, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+    }
     
     /**
      * Create node for taxes in concepts.
@@ -58,13 +103,13 @@ public class SCfdDataImpuesto {
             case SModSysConsts.FINS_TP_TAX_RETAINED:
                 cfd.ver33.DElementConceptoImpuestoRetencion conceptoImpuestoRetencion = new cfd.ver33.DElementConceptoImpuestoRetencion();
                 
-                if (msTipoFactor.compareTo(msTipoFactor) == 0) { // XXX jbarajas falta las constantes para comparar contra tipo exento
+                if (msTipoFactor.compareToIgnoreCase(FACT_TP_EXENTO) == 0) { // XXX jbarajas falta las constantes para comparar contra tipo exento
                     throw new Exception("Error al generar el nodo impuesto 'retenido' el tipo de factor debe ser distinto de exento.");
                 }
                 
                 conceptoImpuestoRetencion.getAttBase().setDouble(mdBase);
                 conceptoImpuestoRetencion.getAttImpuesto().setString(msImpuestoClave);
-                conceptoImpuestoRetencion.getAttTipoFactor().setString(msTipoFactor);
+                conceptoImpuestoRetencion.getAttTipoFactor().setString(getFactorTypeSat(msTipoFactor));
                 conceptoImpuestoRetencion.getAttTasaOCuota().setDouble(mdTasa);
                 conceptoImpuestoRetencion.getAttImporte().setDouble(mdImporte);
                 
@@ -75,12 +120,11 @@ public class SCfdDataImpuesto {
                 
                 conceptoImpuestoTraslado.getAttBase().setDouble(mdBase);
                 conceptoImpuestoTraslado.getAttImpuesto().setString(msImpuestoClave);
-                conceptoImpuestoTraslado.getAttTipoFactor().setString(msTipoFactor);
-                if (msTipoFactor.compareTo(msTipoFactor) == 0) { // XXX jbarajas falta las constantes para comparar contra tipo exento
+                conceptoImpuestoTraslado.getAttTipoFactor().setString(getFactorTypeSat(msTipoFactor));
+                if (msTipoFactor.compareTo(FACT_TP_EXENTO) != 0) {
                     conceptoImpuestoTraslado.getAttTasaOCuota().setDouble(mdTasa);
                     conceptoImpuestoTraslado.getAttImporte().setDouble(mdImporte);
                 }
-                
                 impuesto = conceptoImpuestoTraslado;
                 break;
             default:
@@ -111,7 +155,7 @@ public class SCfdDataImpuesto {
                 cfd.ver33.DElementImpuestoTraslado impuestoTraslado = new cfd.ver33.DElementImpuestoTraslado();
                 
                 impuestoTraslado.getAttImpuesto().setString(msImpuestoClave);
-                impuestoTraslado.getAttTipoFactor().setString(msTipoFactor);
+                impuestoTraslado.getAttTipoFactor().setString(getFactorTypeSat(msTipoFactor));
                 impuestoTraslado.getAttTasaOCuota().setDouble(mdTasa);
                 impuestoTraslado.getAttImporte().setDouble(mdImporte);
                 

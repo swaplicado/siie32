@@ -179,9 +179,6 @@ public class SCfdDataConcepto {
         if (!impuestosTrasladados.getEltHijosImpuestoTrasladado().isEmpty() || !impuestosRetenidos.getEltHijosImpuestoRetenido().isEmpty()) {
             concepto.setEltOpcConceptoImpuestos(new DElementConceptoImpuestos());
         }
-        else {
-            throw new Exception("Error al generar el nodo impuestos del concepto '" + msDescripcion + "' el nodo impuestos no existe.");
-        }
         
         if (!impuestosTrasladados.getEltHijosImpuestoTrasladado().isEmpty()) {
             concepto.getEltImpuestos().setEltOpcImpuestosTrasladados(impuestosTrasladados);
