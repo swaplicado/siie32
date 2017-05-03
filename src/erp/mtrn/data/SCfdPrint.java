@@ -1023,6 +1023,8 @@ public class SCfdPrint {
         int i = 0;
         int nTotalTiempoExtra = 0;
 
+        double dIngresoAux = 0;
+        double dIngresoDiario = 0;
         double dTotalPercepciones = 0;
         double dTotalDeducciones = 0;
         double dTotalTiempoExtraPagado = 0;
@@ -1107,6 +1109,7 @@ public class SCfdPrint {
         map.put("NominaNumTipo", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? (oFormerPayroll.getNumber() + " " + oFormerPayroll.getType()) : (payroll.getNumber() + " " + payroll.getAuxPaymentType()));
         map.put("NominaFolio", comprobante.getAttSerie().getString() + "-" + comprobante.getAttFolio().getString());
         map.put("sXmlBaseDir", miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory());
+        map.put("sCfdVersion", comprobante.getAttVersion().getString());
 
         map.put("dCfdConceptoCantidad", comprobante.getEltConceptos().getEltHijosConcepto().get(0).getAttCantidad().getDouble());
         map.put("sCfdConceptoUnidad", comprobante.getEltConceptos().getEltHijosConcepto().get(0).getAttUnidad().getString());
@@ -1145,6 +1148,12 @@ public class SCfdPrint {
                 map.put("Sueldo", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getSalary() : payrollReceipt.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? payrollReceipt.getSalary() : payrollReceipt.getWage());
                 map.put("SalarioBaseCotApor", ((DElementNomina) element).getAttSalarioBaseCotApor().getDouble());
                 map.put("SalarioDiarioIntegrado", ((DElementNomina) element).getAttSalarioDiarioIntegrado().getDouble());
+                
+                if (payrollReceipt.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_FOR) {
+                    dIngresoAux = subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getSalary() : payrollReceipt.getWage();
+                    dIngresoDiario = dIngresoAux * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
+                    map.put("IngresoDiario", SLibUtils.round(dIngresoDiario, SLibConsts.DATA_TYPE_DEC));
+                }
 
                 map.put("TipoEmpleado", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getEmployeeType() : miClient.getSession().readField(SModConsts.HRSU_TP_EMP, new int[] { payrollReceipt.getFkEmployeeTypeId() }, SDbRegistry.FIELD_CODE));
                 map.put("Categoria", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getEmployeeCategory() : miClient.getSession().readField(SModConsts.HRSU_TP_WRK, new int[] { payrollReceipt.getFkWorkerTypeId() }, SDbRegistry.FIELD_CODE));
@@ -1251,6 +1260,7 @@ public class SCfdPrint {
                 if (((cfd.ver3.nom11.DElementNomina) element).getEltIncapacidades() != null) {
                     for (i = 0; i < ((cfd.ver3.nom11.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().size(); i++) {
 
+                        aIncapacidades.add("");
                         aIncapacidades.add(oFixedFormat.format(((cfd.ver3.nom11.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttTipoIncapacidad().getInteger()));
                         aIncapacidades.add(((cfd.ver3.nom11.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttDiasIncapacidad().getDouble());
                         aIncapacidades.add(((cfd.ver3.nom11.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttDescuento().getDouble());
@@ -1260,6 +1270,7 @@ public class SCfdPrint {
                 }
 
                 for (int j = i; j < 5; j++) {
+                    aIncapacidades.add(null);
                     aIncapacidades.add(null);
                     aIncapacidades.add(null);
                     aIncapacidades.add(null);
