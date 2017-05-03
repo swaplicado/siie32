@@ -645,10 +645,11 @@ public class SDbPayroll extends SDbRegistryUser {
             registryDummy.setDateStart(SLibTimeUtils.createDate(2000, 1, 1));
             registryDummy.setDateEnd(SLibTimeUtils.createDate(2000, 1, 1));
             registryDummy.setDeleted(true);
-            registryDummy.setFkPaymentTypeId(1);
+            registryDummy.setFkPaymentTypeId(SModSysConsts.HRSS_TP_PAY_WEE);
+            registryDummy.setFkPaysheetTypeId(SModSysConsts.HRSS_TP_PAY_SHT_NOR);
             registryDummy.setFkMwzTypeId(1);
             registryDummy.setFkMwzReferenceTypeId(1);
-            registryDummy.setFkTaxComputationTypeId(1);
+            registryDummy.setFkTaxComputationTypeId(SModSysConsts.HRSS_TP_TAX_COMP_WOT);
             registryDummy.setFkTaxId(1);
             registryDummy.setFkTaxSubsidyId(1);
             registryDummy.setFkSsContributionId(1);
