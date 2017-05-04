@@ -450,10 +450,49 @@
 
                   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
                     <Property name="columns" type="int" value="1"/>
-                    <Property name="rows" type="int" value="5"/>
+                    <Property name="rows" type="int" value="6"/>
                     <Property name="verticalGap" type="int" value="5"/>
                   </Layout>
                   <SubComponents>
+                    <Container class="javax.swing.JPanel" name="jPanel48">
+
+                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                        <Property name="alignment" type="int" value="0"/>
+                        <Property name="verticalGap" type="int" value="0"/>
+                      </Layout>
+                      <SubComponents>
+                        <Component class="javax.swing.JLabel" name="jlBizSaldo">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Saldo final:"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[100, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JTextField" name="jtfSaldo">
+                          <Properties>
+                            <Property name="editable" type="boolean" value="false"/>
+                            <Property name="horizontalAlignment" type="int" value="11"/>
+                            <Property name="text" type="java.lang.String" value="0.00"/>
+                            <Property name="focusable" type="boolean" value="false"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[100, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JTextField" name="jtfMoney1">
+                          <Properties>
+                            <Property name="editable" type="boolean" value="false"/>
+                            <Property name="horizontalAlignment" type="int" value="0"/>
+                            <Property name="text" type="java.lang.String" value="MXN"/>
+                            <Property name="focusable" type="boolean" value="false"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[35, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                      </SubComponents>
+                    </Container>
                     <Container class="javax.swing.JPanel" name="jPanel43">
 
                       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">

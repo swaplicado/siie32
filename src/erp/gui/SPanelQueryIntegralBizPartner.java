@@ -19,6 +19,7 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STableSetting;
 import erp.lib.table.STableTabInterface;
 import erp.mbps.data.SDataBizPartner;
+import erp.mfin.data.SFinUtilities;
 import erp.mod.SModConsts;
 import erp.mod.trn.view.SViewInvoice;
 import erp.mod.trn.view.SViewInvoicePending;
@@ -137,6 +138,10 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
         jtfCountry = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
         jPanel42 = new javax.swing.JPanel();
+        jPanel48 = new javax.swing.JPanel();
+        jlBizSaldo = new javax.swing.JLabel();
+        jtfSaldo = new javax.swing.JTextField();
+        jtfMoney1 = new javax.swing.JTextField();
         jPanel43 = new javax.swing.JPanel();
         jlBizPartnerLimCre = new javax.swing.JLabel();
         jtfLimCre = new javax.swing.JTextField();
@@ -340,7 +345,29 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
         jPanel1.setLayout(new java.awt.BorderLayout());
 
         jPanel42.setOpaque(false);
-        jPanel42.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+        jPanel42.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
+
+        jPanel48.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlBizSaldo.setText("Saldo final:");
+        jlBizSaldo.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel48.add(jlBizSaldo);
+
+        jtfSaldo.setEditable(false);
+        jtfSaldo.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfSaldo.setText("0.00");
+        jtfSaldo.setFocusable(false);
+        jtfSaldo.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel48.add(jtfSaldo);
+
+        jtfMoney1.setEditable(false);
+        jtfMoney1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jtfMoney1.setText("MXN");
+        jtfMoney1.setFocusable(false);
+        jtfMoney1.setPreferredSize(new java.awt.Dimension(35, 23));
+        jPanel48.add(jtfMoney1);
+
+        jPanel42.add(jPanel48);
 
         jPanel43.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -473,6 +500,7 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
     private javax.swing.JPanel jPanel45;
     private javax.swing.JPanel jPanel46;
     private javax.swing.JPanel jPanel47;
+    private javax.swing.JPanel jPanel48;
     private javax.swing.JPanel jPanel8;
     private javax.swing.ButtonGroup jbgPeriods;
     private javax.swing.JComboBox jcbBizPartner;
@@ -487,6 +515,7 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
     private javax.swing.JLabel jlBizPartnerLimCre;
     private javax.swing.JLabel jlBizPartnerLocality;
     private javax.swing.JLabel jlBizPartnerrName;
+    private javax.swing.JLabel jlBizSaldo;
     private javax.swing.JPanel jpData;
     private javax.swing.JPanel jpDataBizPartner;
     private javax.swing.JPanel jpFilter;
@@ -519,6 +548,8 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
     private javax.swing.JTextField jtfLimCre;
     private javax.swing.JTextField jtfLocality;
     private javax.swing.JTextField jtfMoney;
+    private javax.swing.JTextField jtfMoney1;
+    private javax.swing.JTextField jtfSaldo;
     private javax.swing.JTextField jtfYearPeriod;
     private javax.swing.JTextField jtfrName;
     private javax.swing.JTabbedPane jtpDataViews;
@@ -646,6 +677,7 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
     }
     
     public void resetBizPartnerCategory() {
+        jtfSaldo.setText("");
         jtfLimCre.setText(0.0 + "");
         jtfMoney.setText("MXN");
         jtfDayCre.setText(0 + "");
@@ -671,6 +703,7 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
                 jtfCountry.setText(moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getCountry());
 
                 if (moBizPartnerCategory != null) {
+                    jtfSaldo.setText(SLibUtils.DecimalFormatValue2D.format(SFinUtilities.getBizPartnerBalance(miClient, moBizPartner.getPkBizPartnerId(), mnBizPartnerCategory, null)));
                     jtfLimCre.setText(SLibUtils.DecimalFormatValue2D.format(moBizPartnerCategory.getCreditLimit()) + "");
                     jtfMoney.setText(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
                     jtfDayCre.setText(SLibUtils.DecimalFormatValue0D.format(moBizPartnerCategory.getDaysOfCredit()) + "");

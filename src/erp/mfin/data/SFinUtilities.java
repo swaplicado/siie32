@@ -7,6 +7,7 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
+import erp.data.SProcConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mod.SModSysConsts;
@@ -1391,5 +1392,27 @@ public abstract class SFinUtilities {
             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS, 
             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CDR, 
             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR });
+    }
+    
+    /**
+     * Gets business partner balance in local currency.
+     * @param client
+     * @param idBizPartner ID of business partner.
+     * @param idBizPartnerCategory ID of business partner category.
+     * @param keyDpsToExclude PK of document to exclude from query if necessary, can be null.
+     * @return Business partner balance in local currency.
+     */
+    public static double getBizPartnerBalance(final SClientInterface client, final int idBizPartner, final int idBizPartnerCategory, final int[] keyDpsToExclude) {
+        Vector<Object> in = null;
+        Vector<Object> out = null;
+
+        in = new Vector<Object>();
+        in.add(idBizPartner);
+        in.add(idBizPartnerCategory);
+        in.add(keyDpsToExclude == null ? client.getSession().getCurrentYear() : keyDpsToExclude[0]);
+        in.add(keyDpsToExclude == null ? 0 : keyDpsToExclude[1]);
+        out = SDataUtilities.callProcedure(client, SProcConstants.FIN_GET_BP_BAL, in, SLibConstants.EXEC_MODE_VERBOSE);
+        
+        return ((Double) out.get(0));
     }
 }
