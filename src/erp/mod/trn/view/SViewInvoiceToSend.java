@@ -44,18 +44,27 @@ public class SViewInvoiceToSend extends SGridPaneView {
         createGridColumns();
     }
 
-    /*
-     * Public methods
-     */
-
-    public void renderView(final Date dateStart, final Date dateFinal, final int year, final int idBizPartner ) {
+     private void setParamsView(final Date dateStart, final Date dateFinal, final int year, final int idBizPartner ) {
         mtDateStart = dateStart;
         mtDateFinal = dateFinal;
         mnYearId = year;
         mnBizPartberId = idBizPartner;
+    }
+    
+    private void renderView() {
         createGridColumns();
         populateGrid(SGridConsts.REFRESH_MODE_RELOAD);
     }
+
+    /*
+     * Public methods
+     */
+    
+    public void initView(final Date dateStart, final Date dateFinal, final int year, final int idBizPartner) {
+        setParamsView(dateStart, dateFinal, year, idBizPartner);
+        renderView();
+    }
+    
     
     /*
      * Overriden methods
@@ -63,9 +72,6 @@ public class SViewInvoiceToSend extends SGridPaneView {
     
     @Override
     public void prepareSqlQuery() {
-        String sqlDate = "'" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' ";
-        String sqlDateF = "'" + SLibUtils.DbmsDateFormatDate.format(mtDateFinal) + "' ";
-
         
         moPaneSettings = new SGridPaneSettings(2);
         msSql= "SELECT id_year " + SDbConsts.FIELD_ID + "1, " +
@@ -87,7 +93,7 @@ public class SViewInvoiceToSend extends SGridPaneView {
                     msSql += "AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1] + " AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] + " ";
                 }
                 
-                msSql += "AND d.id_year = " + mnYearId + " AND d.dt >= " + sqlDate + " AND d.dt <= " + sqlDateF + " AND d.fid_cob = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " AND d.fid_bp_r = " + mnBizPartberId +  
+                msSql += "AND d.id_year = " + mnYearId + " AND d.dt >= '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND d.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateFinal) + "' AND d.fid_cob = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " AND d.fid_bp_r = " + mnBizPartberId +  
                 " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON d.fid_cur = c.id_cur INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_CT) + " AS bc ON b.id_bp = bc.id_bp AND bc.id_ct_bp = " + mnGridMode + " " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS cb ON d.fid_cob = cb.id_bpb " +
@@ -115,5 +121,10 @@ public class SViewInvoiceToSend extends SGridPaneView {
     @Override
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
+        moSuscriptionsSet.add(SModConsts.CFGU_CUR);
+        moSuscriptionsSet.add(SModConsts.BPSU_BP_CT);
+        moSuscriptionsSet.add(SModConsts.BPSU_BPB);
+        moSuscriptionsSet.add(SModConsts.USRU_USR);
+        moSuscriptionsSet.add(SModConsts.TRN_CFD);
     }
 }

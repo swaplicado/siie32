@@ -275,7 +275,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatDpsDncDocumentNumberSeries = new JMenuItem("Folios de docs. de ventas");
         jmiCatDiogDncDocumentNumberSeries = new JMenuItem("Folios de docs. de inventarios");
         jmiCatBizPartnerBlocking = new JMenuItem("Bloqueo de clientes");
-        jmiCatViewIntegralCustomers = new JMenuItem("Vista integral clientes");
+        jmiCatViewIntegralCustomers = new JMenuItem("Vista integral de clientes");
         jmCatCfg = new JMenu("Contabilización automática");
         jmiCatCfgCostCenterItem = new JMenuItem("Configuración de centros de costo vs. ítems");
         jmCatCfg.add(jmiCatCfgCostCenterItem);
@@ -784,7 +784,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatDpsDncDocumentNumberSeries.setEnabled(hasRightDnsDps);
         jmiCatDiogDncDocumentNumberSeries.setEnabled(hasRightDnsDiog);
         jmiCatBizPartnerBlocking.setEnabled(hasRightBizPartnerBlocking);
-        jmiCatViewIntegralCustomers.setEnabled(hasRightBizPartnerBlocking);
+        jmiCatViewIntegralCustomers.setEnabled(true);
         jmCatCfg.setEnabled(hasRightItemConfig);
 
         jmEst.setEnabled(hasRightDocEstimate);
@@ -886,7 +886,6 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             ((erp.SClient) miClient).getCfgProcesor().processModule(module);
         }
     }
-    
     
     private void showPanelQueryIntegralBizPartner(int panelType) {
         int index = 0;

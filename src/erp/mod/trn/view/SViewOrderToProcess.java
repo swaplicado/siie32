@@ -4,6 +4,7 @@
  */
 package erp.mod.trn.view;
 
+import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,14 +24,14 @@ import sa.lib.gui.SGuiParams;
  *
  * @author Claudio Peña
  */
-public class SViewOrderForProcessing extends SGridPaneView {
+public class SViewOrderToProcess extends SGridPaneView {
     
     private Date mtDateStart;
     private Date mtDateFinal;
     private int mnYearId;
     private int mnBizPartberId;
     
-    public SViewOrderForProcessing(SGuiClient client, int gridType, int gridSubtype, String title, SGuiParams params) {
+    public SViewOrderToProcess(SGuiClient client, int gridType, int gridSubtype, String title, SGuiParams params) {
         super(client, SGridConsts.GRID_PANE_VIEW, gridType, gridSubtype, title, params);
         initComponentsCustom();
     }
@@ -46,18 +47,27 @@ public class SViewOrderForProcessing extends SGridPaneView {
         createGridColumns();
     }
 
-    /*
-     * Public methods
-     */
-    
-    public void renderView(final Date dateStart, final Date dateFinal, final int year, final int idBizPartner ) {
+    private void setParamsView(final Date dateStart, final Date dateFinal, final int year, final int idBizPartner ) {
         mtDateStart = dateStart;
         mtDateFinal = dateFinal;
         mnYearId = year;
         mnBizPartberId = idBizPartner;
+    }
+    
+    private void renderView() {
         createGridColumns();
         populateGrid(SGridConsts.REFRESH_MODE_RELOAD);
     }
+
+    /*
+     * Public methods
+     */
+    
+    public void initView(final Date dateStart, final Date dateFinal, final int year, final int idBizPartner) {
+        setParamsView(dateStart, dateFinal, year, idBizPartner);
+        renderView();
+    }
+    
     
     /*
      * Overriden methods
@@ -65,11 +75,8 @@ public class SViewOrderForProcessing extends SGridPaneView {
     
     @Override
     public void prepareSqlQuery() {
-        String sqlDate = "'" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' ";
-        String sqlDateF = "'" + SLibUtils.DbmsDateFormatDate.format(mtDateFinal) + "' ";
-
+        
         moPaneSettings = new SGridPaneSettings(2);
-
         msSql = "SELECT id_year " + SDbConsts.FIELD_ID + "1, " +
                 "id_doc " + SDbConsts.FIELD_ID + "2, " + 
                 "'' AS " + SDbConsts.FIELD_CODE + ", " +
@@ -82,19 +89,25 @@ public class SViewOrderForProcessing extends SGridPaneView {
                 "CASE WHEN de.orig_qty = 0 THEN 0 ELSE de.stot_cur_r / de.orig_qty END AS f_orig_price_u, i.item_key, i.item, ig.igen, u.symbol AS f_unit, uo.symbol AS f_orig_unit, " +
                 "COALESCE((SELECT SUM(ds.qty) FROM trn_dps_dps_supply AS ds, trn_dps_ety AS xde, trn_dps AS xd WHERE ds.id_src_year = de.id_year AND ds.id_src_doc = de.id_doc AND ds.id_src_ety = de.id_ety " +
                 "AND ds.id_des_year = xde.id_year AND ds.id_des_doc = xde.id_doc AND ds.id_des_ety = xde.id_ety AND xde.id_year = xd.id_year AND xde.id_doc = xd.id_doc AND xde.b_del = 0 AND xd.b_del = 0 " +
-                "AND xd.fid_st_dps = 2), 0) AS f_link_qty, COALESCE((SELECT SUM(ds.orig_qty) FROM trn_dps_dps_supply AS ds, trn_dps_ety AS xde, trn_dps AS xd WHERE ds.id_src_year = de.id_year " +
+                "AND xd.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + "), 0) AS f_link_qty, COALESCE((SELECT SUM(ds.orig_qty) FROM trn_dps_dps_supply AS ds, trn_dps_ety AS xde, trn_dps AS xd WHERE ds.id_src_year = de.id_year " +
                 "AND ds.id_src_doc = de.id_doc AND ds.id_src_ety = de.id_ety AND ds.id_des_year = xde.id_year AND ds.id_des_doc = xde.id_doc AND ds.id_des_ety = xde.id_ety AND xde.id_year = xd.id_year " +
                 "AND xde.id_doc = xd.id_doc AND xde."
-                + "b_del = 0 AND xd.b_del = 0 AND xd.fid_st_dps = 2), 0) AS f_link_orig_qty " +
+                + "b_del = 0 AND xd.b_del = 0 AND xd.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + "), 0) AS f_link_orig_qty " +
                 "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS de ON d.id_year = de.id_year " +
-                "AND d.id_doc = de.id_doc AND d.b_del = 0 AND de.b_del = 0 AND d.fid_st_dps = 2 AND d.fid_ct_dps = 2 AND d.fid_cl_dps = 2 AND d.fid_tp_dps = 1 " +
-                "AND d.id_year <= " + mnYearId + " AND d.dt >= " + sqlDate + " AND d.dt <= " + sqlDateF + " AND d.fid_cob = 1 AND d.fid_bp_r = " + mnBizPartberId + 
+                "AND d.id_doc = de.id_doc AND d.b_del = 0 AND de.b_del = 0 AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " ; 
+                if (mnGridMode == SDataConstantsSys.BPSS_CT_BP_CUS) {
+                    msSql += "AND d.fid_ct_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND d.fid_tp_dps = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " ";
+                }
+                else {
+                    msSql += "AND d.fid_ct_dps = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND d.fid_tp_dps = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " ";
+                }                
+                msSql += " AND d.id_year <= " + mnYearId + " AND d.dt >= '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND d.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateFinal) + "' AND d.fid_cob = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND d.fid_bp_r = " + mnBizPartberId + 
                 " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_DPS) + " AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_DPS_NAT) + " AS dn ON d.fid_dps_nat = dn.id_dps_nat " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS cob ON d.fid_cob = cob.id_bpb " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bb ON d.fid_bpb = bb.id_bpb " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON d.fid_bp_r = b.id_bp " +
-                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_CT) + " AS bc ON d.fid_bp_r = bc.id_bp AND bc.id_ct_bp = 3 " +
+                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_CT) + " AS bc ON d.fid_bp_r = bc.id_bp AND bc.id_ct_bp = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON d.fid_cur = c.id_cur " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ul ON d.fid_usr_link = ul.id_usr " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON de.fid_item = i.id_item " +
@@ -131,5 +144,15 @@ public class SViewOrderForProcessing extends SGridPaneView {
     @Override
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
+        moSuscriptionsSet.add(SModConsts.TRNU_TP_DPS);
+        moSuscriptionsSet.add(SModConsts.TRNU_DPS_NAT);
+        moSuscriptionsSet.add(SModConsts.BPSU_BPB);
+        moSuscriptionsSet.add(SModConsts.BPSU_BP);
+        moSuscriptionsSet.add(SModConsts.BPSU_BP_CT);
+        moSuscriptionsSet.add(SModConsts.CFGU_CUR);
+        moSuscriptionsSet.add(SModConsts.USRU_USR);
+        moSuscriptionsSet.add(SModConsts.ITMU_ITEM);
+        moSuscriptionsSet.add(SModConsts.ITMU_IGEN);
+        moSuscriptionsSet.add(SModConsts.ITMU_UNIT);
     }
 }

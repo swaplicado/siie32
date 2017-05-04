@@ -8,7 +8,6 @@ import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import java.util.ArrayList;
 import java.util.Date;
-import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
@@ -44,25 +43,33 @@ public class SViewInvoice extends SGridPaneView {
         createGridColumns();
     }
 
-    /*
-     * Public methods
-     */
-   public void renderView(final Date dateStart, final Date dateFinal, final int year, final int idBizPartner ) {
+    private void setParamsView(final Date dateStart, final Date dateFinal, final int year, final int idBizPartner ) {
         mtDateStart = dateStart;
         mtDateFinal = dateFinal;
         mnYearId = year;
         mnBizPartberId = idBizPartner;
+    }
+    
+    private void renderView() {
         createGridColumns();
         populateGrid(SGridConsts.REFRESH_MODE_RELOAD);
     }
+
+    /*
+     * Public methods
+     */
+    
+    public void initView(final Date dateStart, final Date dateFinal, final int year, final int idBizPartner) {
+        setParamsView(dateStart, dateFinal, year, idBizPartner);
+        renderView();
+    }
+    
     /*
      * Overriden methods
      */
     
     @Override
     public void prepareSqlQuery() {
-        String sqlDate = "'" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' ";
-        String sqlDateF = "'" + SLibUtils.DbmsDateFormatDate.format(mtDateFinal) + "' ";
         
         moPaneSettings = new SGridPaneSettings(2);
 
@@ -73,8 +80,8 @@ public class SViewInvoice extends SGridPaneView {
                 " d.dt, d.exc_rate, d.stot_r, d.tax_charged_r, d.tax_retained_r, d.tot_r, d.stot_cur_r, d.tax_charged_cur_r, d.tax_retained_cur_r, d.tot_cur_r, dt.code, " +
                 "(SELECT dn.code FROM erp.trnu_dps_nat AS dn WHERE d.fid_dps_nat = dn.id_dps_nat) AS f_dn_code, " +
                 "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, bp.bp, bpb.bpb, " +
-                "(SELECT c.cur_key FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c WHERE d.fid_cur = c.id_cur) AS f_cur_key, 'MXN' AS f_cur_key_local, " +
-                "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, 6)) as f_rnum FROM trn_dps AS d " +
+                "(SELECT c.cur_key FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c WHERE d.fid_cur = c.id_cur) AS f_cur_key, '" + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + "' AS f_cur_key_local, " +
+                "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, " + SDataConstantsSys.NUM_LEN_FIN_REC + ")) as f_rnum FROM trn_dps AS d " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + "  AS bp ON d.fid_bp_r = bp.id_bp " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_CT) + " AS bpc ON bp.id_bp = bpc.id_bp AND bpc.id_ct_bp = " + mnGridMode + " " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bpb ON d.fid_bpb = bpb.id_bpb " +
@@ -94,7 +101,7 @@ public class SViewInvoice extends SGridPaneView {
                 "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_REC) + " AS dr ON d.id_year = dr.id_dps_year AND d.id_doc = dr.id_dps_doc " +
                 "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc " +
                 "AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num " +
-                "WHERE bp.id_bp = " + mnBizPartberId + " AND d.id_year = " + mnYearId + " AND d.dt >= " + sqlDate + " AND d.dt <= " + sqlDateF ;
+                "WHERE bp.id_bp = " + mnBizPartberId + " AND d.id_year = " + mnYearId ;
         }
 
     @Override
@@ -116,5 +123,9 @@ public class SViewInvoice extends SGridPaneView {
     @Override
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
+        moSuscriptionsSet.add(SModConsts.USRU_USR);
+        moSuscriptionsSet.add(SModConsts.TRN_CFD);
+        moSuscriptionsSet.add(SModConsts.TRN_DPS_REC);
+        moSuscriptionsSet.add(SModConsts.FIN_REC);
     }
 }

@@ -21,14 +21,14 @@ import sa.lib.gui.SGuiParams;
  *
  * @author Claudio Peña
  */
-public class SViewInvoiceToAuthorize extends SGridPaneView {
+public class SViewInvoicePending extends SGridPaneView {
 
     private Date mtDateStart;
     private Date mtDateFinal;
     private int mnYearId;
     private int mnBizPartberId;
     
-    public SViewInvoiceToAuthorize(SGuiClient client, int gridType, int gridSubtype, String title, SGuiParams params) {
+    public SViewInvoicePending(SGuiClient client, int gridType, int gridSubtype, String title, SGuiParams params) {
         super(client, SGridConsts.GRID_PANE_VIEW, gridType, gridSubtype, title, params);
         initComponentsCustom();
     }
@@ -44,18 +44,27 @@ public class SViewInvoiceToAuthorize extends SGridPaneView {
         createGridColumns();
     }
 
-    /*
-     * Public methods
-     */
-
-    public void renderView(final Date dateStart, final Date dateFinal, final int year, final int idBizPartner ) {
+    private void setParamsView(final Date dateStart, final Date dateFinal, final int year, final int idBizPartner ) {
         mtDateStart = dateStart;
         mtDateFinal = dateFinal;
         mnYearId = year;
         mnBizPartberId = idBizPartner;
+    }
+    
+    private void renderView() {
         createGridColumns();
         populateGrid(SGridConsts.REFRESH_MODE_RELOAD);
     }
+
+    /*
+     * Public methods
+     */
+    
+    public void initView(final Date dateStart, final Date dateFinal, final int year, final int idBizPartner) {
+        setParamsView(dateStart, dateFinal, year, idBizPartner);
+        renderView();
+    }
+    
     
     /*
      * Overriden methods
@@ -63,17 +72,13 @@ public class SViewInvoiceToAuthorize extends SGridPaneView {
     
     @Override
     public void prepareSqlQuery() {
-        String sqlDate = "'" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' ";
-        String sqlDateF = "'" + SLibUtils.DbmsDateFormatDate.format(mtDateFinal) + "' ";
-
-        
         moPaneSettings = new SGridPaneSettings(2);
         msSql= "SELECT d.id_year " + SDbConsts.FIELD_ID + "1, " +
                 "d.id_doc " + SDbConsts.FIELD_ID + "2, " + 
                 "'' AS " + SDbConsts.FIELD_CODE + ", " +
                 "'' AS " + SDbConsts.FIELD_NAME + ", " + 
                 "d.dt, d.dt_doc_delivery_n, d.num_ref, d.b_close, d.b_del, d.ts_close, CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
-                "IF(d.aut_authorn_rej = 1, 'Tope evento usuario', IF(d.aut_authorn_rej = 2, 'Tope mensual usuario', IF(d.aut_authorn_rej = 3, 'Tope mensual área funcional', 'No aplica'))) " +
+                "IF(d.aut_authorn_rej = " + SDataConstantsSys.TRNS_ST_DPS_NEW + ", 'Tope evento usuario', IF(d.aut_authorn_rej = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + ", 'Tope mensual usuario', IF(d.aut_authorn_rej = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", 'Tope mensual área funcional', 'No aplica'))) " +
                 "AS _aut_auth_rej, d.ts_authorn, d.tot_cur_r, dt.code, c.cur_key, b.id_bp, b.bp, bc.bp_key, bb.id_bpb, bb.bpb, cb.code, sa.st_dps_authorn, ua.usr FROM  " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d " +
                 "INNER JOIN  " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_DPS) + " AS dt ON d.fid_ct_dps = dt.id_ct_dps " ;
                  if (mnGridMode == SDataConstantsSys.BPSS_CT_BP_CUS) {
@@ -90,7 +95,7 @@ public class SViewInvoiceToAuthorize extends SGridPaneView {
                 "INNER JOIN  " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS cb ON d.fid_cob = cb.id_bpb " +
                 "INNER JOIN  " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bb ON d.fid_bpb = bb.id_bpb " +
                 "INNER JOIN  " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ua ON d.fid_usr_authorn = ua.id_usr " +
-                "INNER JOIN  " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS un ON d.fid_usr_new = un.id_usr WHERE d.b_del = 0 AND d.fid_st_dps_authorn IN (1, 2) AND d.id_year = " + mnYearId + " AND d.dt >= " + sqlDate + " AND d.dt <= " + sqlDateF + "  AND d.fid_cob = + " + SDataConstantsSys.BPSS_TP_BPB_HQ + " AND d.fid_bp_r = " + mnBizPartberId + 
+                "INNER JOIN  " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS un ON d.fid_usr_new = un.id_usr WHERE d.b_del = 0 AND d.fid_st_dps_authorn IN (1, 2) AND d.id_year = " + mnYearId + " AND d.dt >= '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND d.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateFinal) + "'  AND d.fid_cob = + " + SDataConstantsSys.BPSS_TP_BPB_HQ + " AND d.fid_bp_r = " + mnBizPartberId + 
                 " ORDER BY dt.code, d.num_ser, d.num, d.dt, b.bp, b.id_bp, bb.bpb, bb.id_bpb ";  
         }
 
@@ -111,5 +116,10 @@ public class SViewInvoiceToAuthorize extends SGridPaneView {
     @Override
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
+        moSuscriptionsSet.add(SModConsts.CFGU_CUR);
+        moSuscriptionsSet.add(SModConsts.BPSU_BP);
+        moSuscriptionsSet.add(SModConsts.BPSU_BP_CT);
+        moSuscriptionsSet.add(SModConsts.BPSU_BPB);
+        moSuscriptionsSet.add(SModConsts.USRU_USR);
     }
 }

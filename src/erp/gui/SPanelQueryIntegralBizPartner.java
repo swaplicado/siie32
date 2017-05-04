@@ -11,21 +11,19 @@
 package erp.gui;
 
 import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
-import erp.lib.SLibTimeUtilities;
-import erp.lib.SLibUtilities;
 import erp.lib.table.STabFilterYear;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableSetting;
 import erp.lib.table.STableTabInterface;
 import erp.mbps.data.SDataBizPartner;
-import erp.mloc.data.SDataCountry;
 import erp.mod.SModConsts;
 import erp.mod.trn.view.SViewInvoice;
-import erp.mod.trn.view.SViewInvoiceToAuthorize;
+import erp.mod.trn.view.SViewInvoicePending;
 import erp.mod.trn.view.SViewInvoiceToSend;
-import erp.mod.trn.view.SViewOrderForProcessing;
+import erp.mod.trn.view.SViewOrderToProcess;
 import erp.mod.trn.view.SViewOrders;
 import erp.mod.trn.view.SViewSalesByStock;
 import java.awt.event.ActionEvent;
@@ -36,6 +34,8 @@ import java.util.Vector;
 import javax.swing.JComboBox;
 import javax.swing.JToggleButton;
 import javax.swing.event.ListSelectionEvent;
+import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiItem;
@@ -47,54 +47,47 @@ import sa.lib.gui.SGuiParams;
  */
 public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements STableTabInterface, javax.swing.event.ListSelectionListener, java.awt.event.ActionListener, java.awt.event.ItemListener {
    
-    private static final int VIEW_1 = 1;
-    private static final int VIEW_2 = 2;
-    private static final int VIEW_3 = 3;
-    private static final int VIEW_4 = 4;
-    private static final int VIEW_5 = 5;
-    private static final int VIEW_6 = 6;
+    private static final int VIEW_1 = 1;    // View Orders
+    private static final int VIEW_2 = 2;    // View Order To Process
+    private static final int VIEW_3 = 3;    // View Invoice
+    private static final int VIEW_4 = 4;    // View Sales By Stock
+    private static final int VIEW_5 = 5;    // View Invoice To Authorize
+    private static final int VIEW_6 = 6;    // View Invoice To Send
     
     private int mnViewType;
-    private int mnCtBizPartner;
+    private int mnBizPartnerCategory;
     private erp.client.SClientInterface miClient;
-    private boolean mbHasRightEmpWage;
     
-    protected java.util.Vector<erp.lib.table.STableSetting> mvTableSettings;
-    protected erp.lib.table.STabFilterYear moFilterYear;
+    private java.util.Vector<erp.lib.table.STableSetting> mvTableSettings;
+    private erp.lib.table.STabFilterYear moFilterYear;
 
     private SDataBizPartner moBizPartner;
     private erp.mbps.data.SDataBizPartnerCategory moBizPartnerCategory;
     
     private SViewOrders moOrders;
-    private SViewOrderForProcessing moOrderforprocessing;
+    private SViewOrderToProcess moOrderforprocessing;
     private SViewInvoice moInvoice;
     private SViewSalesByStock moSalesByStock;
-    private SViewInvoiceToAuthorize moInvoiceToAuthorize;
+    private SViewInvoicePending moInvoiceToAuthorize;
     private SViewInvoiceToSend moInvoiceToSend;
     
-    protected int mnYear;
-    protected java.util.Date mtDateStart;
-    protected java.util.Date mtDateEnd;
-    protected javax.swing.JToggleButton[] majtbPeriods;
-    
-    private boolean mbFirstTime;
+    private int mnYear;
+    private java.util.Date mtDateStart;
+    private java.util.Date mtDateEnd;
+    private javax.swing.JToggleButton[] majtbMonths;
      
-    /** Creates new form SPanelQueryIntegralEmployee
+    /** Creates new form SPanelQueryIntegralBizPartner
      * @param client 
      * @param viewType 
+     * @param bizPartnerCategory
      */
-    public SPanelQueryIntegralBizPartner(erp.client.SClientInterface client, final int viewType, final int ctBp) {
-        try {
-            miClient = client;
-            mnViewType = viewType;
-            mnCtBizPartner = ctBp;
-            
-            initComponents();
-            initComponentsExtra();
-        }
-        catch (Exception ex) {
-            SLibUtilities.printOutException(this, ex);
-        }
+    public SPanelQueryIntegralBizPartner(erp.client.SClientInterface client, final int viewType, final int bizPartnerCategory) {
+        miClient = client;
+        mnViewType = viewType;
+        mnBizPartnerCategory = bizPartnerCategory;
+
+        initComponents();
+        initComponentsExtra();
     }
 
     /** This method is called from within the constructor to
@@ -107,14 +100,9 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
     private void initComponents() {
 
         jbgPeriods = new javax.swing.ButtonGroup();
-        jPanel1 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
         jpFilter = new javax.swing.JPanel();
         jlBizPartner = new javax.swing.JLabel();
         jcbBizPartner = new javax.swing.JComboBox();
-        jSeparator3 = new javax.swing.JSeparator();
-        jpFilterYear = new javax.swing.JPanel();
-        jpPeriods = new javax.swing.JPanel();
         jtbPeriod01 = new javax.swing.JToggleButton();
         jtbPeriod02 = new javax.swing.JToggleButton();
         jtbPeriod03 = new javax.swing.JToggleButton();
@@ -128,20 +116,13 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
         jtbPeriod11 = new javax.swing.JToggleButton();
         jtbPeriod12 = new javax.swing.JToggleButton();
         jtbPeriodAll = new javax.swing.JToggleButton();
-        jSeparator4 = new javax.swing.JSeparator();
-        jtfYearPeri = new javax.swing.JFormattedTextField();
-        jPanel4 = new javax.swing.JPanel();
-        jpDataCustomer = new javax.swing.JPanel();
+        jtfYearPeriod = new javax.swing.JTextField();
+        jpData = new javax.swing.JPanel();
+        jpDataBizPartner = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         jlBizPartnerrName = new javax.swing.JLabel();
         jtfrName = new javax.swing.JTextField();
-        jPanel14 = new javax.swing.JPanel();
-        jlBizPartnerWeb = new javax.swing.JLabel();
-        jtfWeb = new javax.swing.JTextField();
-        jPanel17 = new javax.swing.JPanel();
-        jlBizPartnerBranch = new javax.swing.JLabel();
-        jtfBranch = new javax.swing.JTextField();
         jPanel23 = new javax.swing.JPanel();
         jlBizPartnerAddress = new javax.swing.JLabel();
         jtfAddress = new javax.swing.JTextField();
@@ -154,10 +135,12 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
         jPanel26 = new javax.swing.JPanel();
         jlBizPartnerCountry = new javax.swing.JLabel();
         jtfCountry = new javax.swing.JTextField();
+        jPanel1 = new javax.swing.JPanel();
         jPanel42 = new javax.swing.JPanel();
         jPanel43 = new javax.swing.JPanel();
         jlBizPartnerLimCre = new javax.swing.JLabel();
         jtfLimCre = new javax.swing.JTextField();
+        jtfMoney = new javax.swing.JTextField();
         jPanel44 = new javax.swing.JPanel();
         jlBizPartnerDayCre = new javax.swing.JLabel();
         jtfDayCre = new javax.swing.JTextField();
@@ -170,8 +153,7 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
         jPanel47 = new javax.swing.JPanel();
         jlBizPartnerCreditType = new javax.swing.JLabel();
         jtfCreditType = new javax.swing.JTextField();
-        jPanel25 = new javax.swing.JPanel();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jtpDataViews = new javax.swing.JTabbedPane();
         jpOrder = new javax.swing.JPanel();
         jpOrderForProce = new javax.swing.JPanel();
         jpInvoice = new javax.swing.JPanel();
@@ -179,11 +161,7 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
         jpInvoiceToAuthorize = new javax.swing.JPanel();
         jpInvoiceToSend = new javax.swing.JPanel();
 
-        setLayout(new java.awt.BorderLayout());
-
-        jPanel1.setLayout(new java.awt.BorderLayout());
-
-        jPanel3.setLayout(new java.awt.BorderLayout());
+        setLayout(new java.awt.BorderLayout(0, 5));
 
         jpFilter.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -191,172 +169,126 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
         jlBizPartner.setPreferredSize(new java.awt.Dimension(100, 23));
         jpFilter.add(jlBizPartner);
 
-        jcbBizPartner.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbBizPartner.setPreferredSize(new java.awt.Dimension(250, 23));
         jpFilter.add(jcbBizPartner);
-
-        jSeparator3.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        jSeparator3.setPreferredSize(new java.awt.Dimension(3, 23));
-        jpFilter.add(jSeparator3);
-        jpFilter.add(jpFilterYear);
-
-        jpPeriods.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 3, 0));
 
         jbgPeriods.add(jtbPeriod01);
         jtbPeriod01.setText("01");
         jtbPeriod01.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jtbPeriod01.setPreferredSize(new java.awt.Dimension(40, 23));
-        jpPeriods.add(jtbPeriod01);
+        jpFilter.add(jtbPeriod01);
 
         jbgPeriods.add(jtbPeriod02);
         jtbPeriod02.setText("02");
         jtbPeriod02.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jtbPeriod02.setPreferredSize(new java.awt.Dimension(40, 23));
-        jpPeriods.add(jtbPeriod02);
+        jpFilter.add(jtbPeriod02);
 
         jbgPeriods.add(jtbPeriod03);
         jtbPeriod03.setText("03");
         jtbPeriod03.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jtbPeriod03.setPreferredSize(new java.awt.Dimension(40, 23));
-        jpPeriods.add(jtbPeriod03);
+        jpFilter.add(jtbPeriod03);
 
         jbgPeriods.add(jtbPeriod04);
         jtbPeriod04.setText("04");
         jtbPeriod04.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jtbPeriod04.setPreferredSize(new java.awt.Dimension(40, 23));
-        jpPeriods.add(jtbPeriod04);
+        jpFilter.add(jtbPeriod04);
 
         jbgPeriods.add(jtbPeriod05);
         jtbPeriod05.setText("05");
         jtbPeriod05.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jtbPeriod05.setPreferredSize(new java.awt.Dimension(40, 23));
-        jpPeriods.add(jtbPeriod05);
+        jpFilter.add(jtbPeriod05);
 
         jbgPeriods.add(jtbPeriod06);
         jtbPeriod06.setText("06");
         jtbPeriod06.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jtbPeriod06.setPreferredSize(new java.awt.Dimension(40, 23));
-        jpPeriods.add(jtbPeriod06);
+        jpFilter.add(jtbPeriod06);
 
         jbgPeriods.add(jtbPeriod07);
         jtbPeriod07.setText("07");
         jtbPeriod07.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jtbPeriod07.setPreferredSize(new java.awt.Dimension(40, 23));
-        jpPeriods.add(jtbPeriod07);
+        jpFilter.add(jtbPeriod07);
 
         jbgPeriods.add(jtbPeriod08);
         jtbPeriod08.setText("08");
         jtbPeriod08.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jtbPeriod08.setPreferredSize(new java.awt.Dimension(40, 23));
-        jpPeriods.add(jtbPeriod08);
+        jpFilter.add(jtbPeriod08);
 
         jbgPeriods.add(jtbPeriod09);
         jtbPeriod09.setText("09");
         jtbPeriod09.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jtbPeriod09.setPreferredSize(new java.awt.Dimension(40, 23));
-        jpPeriods.add(jtbPeriod09);
+        jpFilter.add(jtbPeriod09);
 
         jbgPeriods.add(jtbPeriod10);
         jtbPeriod10.setText("10");
         jtbPeriod10.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jtbPeriod10.setPreferredSize(new java.awt.Dimension(40, 23));
-        jpPeriods.add(jtbPeriod10);
+        jpFilter.add(jtbPeriod10);
 
         jbgPeriods.add(jtbPeriod11);
         jtbPeriod11.setText("11");
         jtbPeriod11.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jtbPeriod11.setPreferredSize(new java.awt.Dimension(40, 23));
-        jpPeriods.add(jtbPeriod11);
+        jpFilter.add(jtbPeriod11);
 
         jbgPeriods.add(jtbPeriod12);
         jtbPeriod12.setText("12");
         jtbPeriod12.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jtbPeriod12.setPreferredSize(new java.awt.Dimension(40, 23));
-        jpPeriods.add(jtbPeriod12);
+        jpFilter.add(jtbPeriod12);
 
         jbgPeriods.add(jtbPeriodAll);
         jtbPeriodAll.setText("Año");
+        jtbPeriodAll.setToolTipText("Ver todo el año");
         jtbPeriodAll.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jtbPeriodAll.setPreferredSize(new java.awt.Dimension(40, 23));
-        jpPeriods.add(jtbPeriodAll);
+        jpFilter.add(jtbPeriodAll);
 
-        jSeparator4.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        jSeparator4.setPreferredSize(new java.awt.Dimension(3, 23));
-        jpPeriods.add(jSeparator4);
+        jtfYearPeriod.setEditable(false);
+        jtfYearPeriod.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jtfYearPeriod.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jtfYearPeriod.setText("2001-01");
+        jtfYearPeriod.setToolTipText("Período actual");
+        jtfYearPeriod.setFocusable(false);
+        jtfYearPeriod.setPreferredSize(new java.awt.Dimension(60, 23));
+        jpFilter.add(jtfYearPeriod);
 
-        jpFilter.add(jpPeriods);
+        add(jpFilter, java.awt.BorderLayout.NORTH);
 
-        jtfYearPeri.setEditable(false);
-        jtfYearPeri.setText("yyyy/mm/dd");
-        jtfYearPeri.setFocusable(false);
-        jtfYearPeri.setPreferredSize(new java.awt.Dimension(50, 23));
-        jpFilter.add(jtfYearPeri);
+        jpData.setLayout(new java.awt.BorderLayout());
 
-        jPanel3.add(jpFilter, java.awt.BorderLayout.NORTH);
+        jpDataBizPartner.setLayout(new java.awt.BorderLayout());
 
-        jPanel1.add(jPanel3, java.awt.BorderLayout.NORTH);
-
-        jPanel4.setLayout(new java.awt.BorderLayout());
-
-        jpDataCustomer.setLayout(new java.awt.GridLayout(3, 1));
-
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos :"));
-        jPanel2.setLayout(new java.awt.GridLayout(7, 1, 5, 0));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos generales:"));
+        jPanel2.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBizPartnerrName.setText("Nombre:");
-        jlBizPartnerrName.setPreferredSize(new java.awt.Dimension(50, 23));
+        jlBizPartnerrName.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.add(jlBizPartnerrName);
 
         jtfrName.setEditable(false);
-        jtfrName.setText("X");
-        jtfrName.setToolTipText("");
         jtfrName.setFocusable(false);
         jtfrName.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel8.add(jtfrName);
 
         jPanel2.add(jPanel8);
 
-        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlBizPartnerWeb.setText("Web:");
-        jlBizPartnerWeb.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel14.add(jlBizPartnerWeb);
-
-        jtfWeb.setEditable(false);
-        jtfWeb.setText("X");
-        jtfWeb.setToolTipText("");
-        jtfWeb.setFocusable(false);
-        jtfWeb.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel14.add(jtfWeb);
-
-        jPanel2.add(jPanel14);
-
-        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlBizPartnerBranch.setText("Matriz:");
-        jlBizPartnerBranch.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel17.add(jlBizPartnerBranch);
-
-        jtfBranch.setEditable(false);
-        jtfBranch.setText("X");
-        jtfBranch.setToolTipText("");
-        jtfBranch.setFocusable(false);
-        jtfBranch.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel17.add(jtfBranch);
-
-        jPanel2.add(jPanel17);
-
         jPanel23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBizPartnerAddress.setText("Dirección:");
-        jlBizPartnerAddress.setPreferredSize(new java.awt.Dimension(50, 23));
+        jlBizPartnerAddress.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel23.add(jlBizPartnerAddress);
 
         jtfAddress.setEditable(false);
-        jtfAddress.setText("X");
-        jtfAddress.setToolTipText("");
         jtfAddress.setFocusable(false);
         jtfAddress.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel23.add(jtfAddress);
@@ -366,12 +298,10 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBizPartnerLocality.setText("Localidad:");
-        jlBizPartnerLocality.setPreferredSize(new java.awt.Dimension(50, 23));
+        jlBizPartnerLocality.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel24.add(jlBizPartnerLocality);
 
         jtfLocality.setEditable(false);
-        jtfLocality.setText("X");
-        jtfLocality.setToolTipText("");
         jtfLocality.setFocusable(false);
         jtfLocality.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel24.add(jtfLocality);
@@ -381,12 +311,10 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBizPartnerCP.setText("CP:");
-        jlBizPartnerCP.setPreferredSize(new java.awt.Dimension(50, 23));
+        jlBizPartnerCP.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel27.add(jlBizPartnerCP);
 
         jtfCP.setEditable(false);
-        jtfCP.setText("X");
-        jtfCP.setToolTipText("");
         jtfCP.setFocusable(false);
         jtfCP.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel27.add(jtfCP);
@@ -396,23 +324,23 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
         jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBizPartnerCountry.setText("País:");
-        jlBizPartnerCountry.setPreferredSize(new java.awt.Dimension(50, 23));
+        jlBizPartnerCountry.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel26.add(jlBizPartnerCountry);
 
         jtfCountry.setEditable(false);
-        jtfCountry.setText("X");
-        jtfCountry.setToolTipText("");
         jtfCountry.setFocusable(false);
         jtfCountry.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel26.add(jtfCountry);
 
         jPanel2.add(jPanel26);
 
-        jpDataCustomer.add(jPanel2);
+        jpDataBizPartner.add(jPanel2, java.awt.BorderLayout.NORTH);
 
-        jPanel42.setBorder(javax.swing.BorderFactory.createTitledBorder("Saldo cliente:"));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Saldo del asociado de negocios:"));
+        jPanel1.setLayout(new java.awt.BorderLayout());
+
         jPanel42.setOpaque(false);
-        jPanel42.setLayout(new java.awt.GridLayout(5, 1, 5, 0));
+        jPanel42.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
         jPanel43.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -422,11 +350,17 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
 
         jtfLimCre.setEditable(false);
         jtfLimCre.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfLimCre.setText("0.0000");
-        jtfLimCre.setToolTipText("");
+        jtfLimCre.setText("0.00");
         jtfLimCre.setFocusable(false);
-        jtfLimCre.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtfLimCre.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel43.add(jtfLimCre);
+
+        jtfMoney.setEditable(false);
+        jtfMoney.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jtfMoney.setText("MXN");
+        jtfMoney.setFocusable(false);
+        jtfMoney.setPreferredSize(new java.awt.Dimension(35, 23));
+        jPanel43.add(jtfMoney);
 
         jPanel42.add(jPanel43);
 
@@ -439,9 +373,8 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
         jtfDayCre.setEditable(false);
         jtfDayCre.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfDayCre.setText("0");
-        jtfDayCre.setToolTipText("");
         jtfDayCre.setFocusable(false);
-        jtfDayCre.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtfDayCre.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel44.add(jtfDayCre);
 
         jPanel42.add(jPanel44);
@@ -455,9 +388,8 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
         jtfDayGra.setEditable(false);
         jtfDayGra.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfDayGra.setText("0");
-        jtfDayGra.setToolTipText("");
         jtfDayGra.setFocusable(false);
-        jtfDayGra.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtfDayGra.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel45.add(jtfDayGra);
 
         jPanel42.add(jPanel45);
@@ -471,7 +403,7 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
         jtfDateStartOpe.setEditable(false);
         jtfDateStartOpe.setText("yyyy/mm/dd");
         jtfDateStartOpe.setFocusable(false);
-        jtfDateStartOpe.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtfDateStartOpe.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel46.add(jtfDateStartOpe);
 
         jPanel42.add(jPanel46);
@@ -486,64 +418,55 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
         jtfCreditType.setText("X");
         jtfCreditType.setToolTipText("");
         jtfCreditType.setFocusable(false);
-        jtfCreditType.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtfCreditType.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel47.add(jtfCreditType);
 
         jPanel42.add(jPanel47);
 
-        jpDataCustomer.add(jPanel42);
+        jPanel1.add(jPanel42, java.awt.BorderLayout.NORTH);
 
-        jPanel25.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
-        jPanel25.setLayout(new java.awt.GridLayout(6, 1, 5, 0));
-        jpDataCustomer.add(jPanel25);
+        jpDataBizPartner.add(jPanel1, java.awt.BorderLayout.CENTER);
 
-        jPanel4.add(jpDataCustomer, java.awt.BorderLayout.WEST);
-        jpDataCustomer.getAccessibleContext().setAccessibleName("Datos del Cliente");
+        jpData.add(jpDataBizPartner, java.awt.BorderLayout.WEST);
+        jpDataBizPartner.getAccessibleContext().setAccessibleName("Datos del Cliente");
 
         jpOrder.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         jpOrder.setLayout(new java.awt.BorderLayout());
-        jTabbedPane1.addTab("Pedidos", jpOrder);
+        jtpDataViews.addTab("Pedidos", jpOrder);
 
         jpOrderForProce.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         jpOrderForProce.setLayout(new java.awt.BorderLayout());
-        jTabbedPane1.addTab("Pedidos x procesar", jpOrderForProce);
+        jtpDataViews.addTab("Pedidos x procesar", jpOrderForProce);
 
         jpInvoice.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         jpInvoice.setLayout(new java.awt.BorderLayout());
-        jTabbedPane1.addTab("Facturas", jpInvoice);
+        jtpDataViews.addTab("Facturas", jpInvoice);
 
         jpSalesByStock.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         jpSalesByStock.setLayout(new java.awt.BorderLayout());
-        jTabbedPane1.addTab("Ventas x surtir", jpSalesByStock);
+        jtpDataViews.addTab("Facturas x surtir", jpSalesByStock);
 
         jpInvoiceToAuthorize.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         jpInvoiceToAuthorize.setLayout(new java.awt.BorderLayout());
-        jTabbedPane1.addTab("Facturas x autorizar", jpInvoiceToAuthorize);
+        jtpDataViews.addTab("Facturas x autorizar", jpInvoiceToAuthorize);
 
         jpInvoiceToSend.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         jpInvoiceToSend.setLayout(new java.awt.BorderLayout());
-        jTabbedPane1.addTab("Facturas x enviar", jpInvoiceToSend);
+        jtpDataViews.addTab("Facturas x enviar", jpInvoiceToSend);
 
-        jPanel4.add(jTabbedPane1, java.awt.BorderLayout.CENTER);
+        jpData.add(jtpDataViews, java.awt.BorderLayout.CENTER);
 
-        jPanel1.add(jPanel4, java.awt.BorderLayout.CENTER);
-
-        add(jPanel1, java.awt.BorderLayout.CENTER);
+        add(jpData, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel14;
-    private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel23;
     private javax.swing.JPanel jPanel24;
-    private javax.swing.JPanel jPanel25;
     private javax.swing.JPanel jPanel26;
     private javax.swing.JPanel jPanel27;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel42;
     private javax.swing.JPanel jPanel43;
     private javax.swing.JPanel jPanel44;
@@ -551,14 +474,10 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
     private javax.swing.JPanel jPanel46;
     private javax.swing.JPanel jPanel47;
     private javax.swing.JPanel jPanel8;
-    private javax.swing.JSeparator jSeparator3;
-    private javax.swing.JSeparator jSeparator4;
-    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.ButtonGroup jbgPeriods;
     private javax.swing.JComboBox jcbBizPartner;
     private javax.swing.JLabel jlBizPartner;
     private javax.swing.JLabel jlBizPartnerAddress;
-    private javax.swing.JLabel jlBizPartnerBranch;
     private javax.swing.JLabel jlBizPartnerCP;
     private javax.swing.JLabel jlBizPartnerCountry;
     private javax.swing.JLabel jlBizPartnerCreditType;
@@ -567,17 +486,15 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
     private javax.swing.JLabel jlBizPartnerDayGra;
     private javax.swing.JLabel jlBizPartnerLimCre;
     private javax.swing.JLabel jlBizPartnerLocality;
-    private javax.swing.JLabel jlBizPartnerWeb;
     private javax.swing.JLabel jlBizPartnerrName;
-    private javax.swing.JPanel jpDataCustomer;
+    private javax.swing.JPanel jpData;
+    private javax.swing.JPanel jpDataBizPartner;
     private javax.swing.JPanel jpFilter;
-    private javax.swing.JPanel jpFilterYear;
     private javax.swing.JPanel jpInvoice;
     private javax.swing.JPanel jpInvoiceToAuthorize;
     private javax.swing.JPanel jpInvoiceToSend;
     private javax.swing.JPanel jpOrder;
     private javax.swing.JPanel jpOrderForProce;
-    private javax.swing.JPanel jpPeriods;
     private javax.swing.JPanel jpSalesByStock;
     private javax.swing.JToggleButton jtbPeriod01;
     private javax.swing.JToggleButton jtbPeriod02;
@@ -593,7 +510,6 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
     private javax.swing.JToggleButton jtbPeriod12;
     private javax.swing.JToggleButton jtbPeriodAll;
     private javax.swing.JTextField jtfAddress;
-    private javax.swing.JTextField jtfBranch;
     private javax.swing.JTextField jtfCP;
     private javax.swing.JTextField jtfCountry;
     private javax.swing.JTextField jtfCreditType;
@@ -602,31 +518,31 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
     private javax.swing.JTextField jtfDayGra;
     private javax.swing.JTextField jtfLimCre;
     private javax.swing.JTextField jtfLocality;
-    private javax.swing.JTextField jtfWeb;
-    private javax.swing.JFormattedTextField jtfYearPeri;
+    private javax.swing.JTextField jtfMoney;
+    private javax.swing.JTextField jtfYearPeriod;
     private javax.swing.JTextField jtfrName;
+    private javax.swing.JTabbedPane jtpDataViews;
     // End of variables declaration//GEN-END:variables
 
     /*
      * Private methods
      */
 
-    private void initComponentsExtra() throws Exception {
-        int period = SLibTimeUtilities.digestYearMonth(miClient.getSessionXXX().getWorkingDate())[1];
-        String[] months = SLibTimeUtilities.createMonthsOfYear(Locale.getDefault(), Calendar.LONG);
-        SGuiParams params = new SGuiParams();
-        params.setType(mnCtBizPartner);
-        
+    private void initComponentsExtra() {
+        int month = SLibTimeUtils.digestMonth(miClient.getSessionXXX().getWorkingDate())[1];
+        String[] months = SLibTimeUtils.createMonthsOfYear(Locale.getDefault(), Calendar.LONG);
+        SGuiParams params = new SGuiParams(mnBizPartnerCategory);
+
         mvTableSettings = new Vector<STableSetting>();
         moFilterYear = new STabFilterYear(miClient, this);
         jcbBizPartner.removeItemListener(this);
-        miClient.getSession().populateCatalogue(jcbBizPartner, SModConsts.BPSU_BP, mnCtBizPartner, null);
+        miClient.getSession().populateCatalogue(jcbBizPartner, SModConsts.BPSU_BP, mnBizPartnerCategory, null);
         jcbBizPartner.addItemListener(this);
         
         moOrders = new SViewOrders((SGuiClient) miClient, mnViewType, VIEW_1 , "Pedidos", params);
         jpOrder.add(moOrders);
         
-        moOrderforprocessing = new SViewOrderForProcessing((SGuiClient) miClient, mnViewType, VIEW_2 , "Pedidos x procesar", params);
+        moOrderforprocessing = new SViewOrderToProcess((SGuiClient) miClient, mnViewType, VIEW_2 , "Pedidos x procesar", params);
         jpOrderForProce.add(moOrderforprocessing);
         
         moInvoice = new SViewInvoice((SGuiClient) miClient, mnViewType, VIEW_3 , "Facturas", params);
@@ -635,126 +551,141 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
         moSalesByStock = new SViewSalesByStock((SGuiClient) miClient, mnViewType, VIEW_4 , "Facturas", params);
         jpSalesByStock.add(moSalesByStock);
         
-        moInvoiceToAuthorize = new SViewInvoiceToAuthorize((SGuiClient) miClient, mnViewType, VIEW_5 , "Facturas", params);
+        moInvoiceToAuthorize = new SViewInvoicePending((SGuiClient) miClient, mnViewType, VIEW_5 , "Facturas", params);
         jpInvoiceToAuthorize.add(moInvoiceToAuthorize);
   
         moInvoiceToSend = new SViewInvoiceToSend((SGuiClient) miClient, mnViewType, VIEW_6 , "Facturas", params);
         jpInvoiceToSend.add(moInvoiceToSend);
         
-        jpFilterYear.add(moFilterYear);
+        jpFilter.add(moFilterYear, 2);
         mnYear = miClient.getSessionXXX().getWorkingYear();
-        setPeriod(period);
+        setMonth(month);
         
-        mbFirstTime = true;
-        
-        majtbPeriods = new JToggleButton[12];
-        majtbPeriods[0] = jtbPeriod01;
-        majtbPeriods[1] = jtbPeriod02;
-        majtbPeriods[2] = jtbPeriod03;
-        majtbPeriods[3] = jtbPeriod04;
-        majtbPeriods[4] = jtbPeriod05;
-        majtbPeriods[5] = jtbPeriod06;
-        majtbPeriods[6] = jtbPeriod07;
-        majtbPeriods[7] = jtbPeriod08;
-        majtbPeriods[8] = jtbPeriod09;
-        majtbPeriods[9] = jtbPeriod10;
-        majtbPeriods[10] = jtbPeriod11;
-        majtbPeriods[11] = jtbPeriod12;
+        resetBizPartner();
+        resetBizPartnerCategory();
+                
+        majtbMonths = new JToggleButton[12];
+        majtbMonths[0] = jtbPeriod01;
+        majtbMonths[1] = jtbPeriod02;
+        majtbMonths[2] = jtbPeriod03;
+        majtbMonths[3] = jtbPeriod04;
+        majtbMonths[4] = jtbPeriod05;
+        majtbMonths[5] = jtbPeriod06;
+        majtbMonths[6] = jtbPeriod07;
+        majtbMonths[7] = jtbPeriod08;
+        majtbMonths[8] = jtbPeriod09;
+        majtbMonths[9] = jtbPeriod10;
+        majtbMonths[10] = jtbPeriod11;
+        majtbMonths[11] = jtbPeriod12;
 
-        for (int i = 0; i < majtbPeriods.length; i++) {
-            majtbPeriods[i].setToolTipText("Ver " + months[i]);
-            majtbPeriods[i].addActionListener(this);
+        for (int i = 0; i < majtbMonths.length; i++) {
+            majtbMonths[i].setToolTipText("Ver " + months[i]);
+            majtbMonths[i].addActionListener(this);
         }
         
         jtbPeriodAll.addActionListener(this);
-        jbgPeriods.setSelected(majtbPeriods[period - 1].getModel(), true);
+        jbgPeriods.setSelected(majtbMonths[month - 1].getModel(), true);
     }
      
-    private void initViewData(int idBizPartner) throws Exception {
-        moOrders.renderView(mtDateStart, mtDateEnd, mnYear, idBizPartner);
-        moOrderforprocessing.renderView(mtDateStart, mtDateEnd, mnYear, idBizPartner);
-        moInvoice.renderView(mtDateStart, mtDateEnd, mnYear, idBizPartner);
-        moInvoiceToAuthorize.renderView(mtDateStart, mtDateEnd, mnYear, idBizPartner);
-        moInvoiceToSend.renderView(mtDateStart, mtDateEnd, mnYear, idBizPartner);
-        moSalesByStock.renderView(mtDateStart, mtDateEnd, mnYear, idBizPartner);
+    private void initViewData(final int idBizPartner) {
+        moOrders.initView(mtDateStart, mtDateEnd, mnYear, idBizPartner);
+        moOrderforprocessing.initView(mtDateStart, mtDateEnd, mnYear, idBizPartner);
+        moInvoice.initView(mtDateStart, mtDateEnd, mnYear, idBizPartner);
+        moInvoiceToAuthorize.initView(mtDateStart, mtDateEnd, mnYear, idBizPartner);
+        moInvoiceToSend.initView(mtDateStart, mtDateEnd, mnYear, idBizPartner);
+        moSalesByStock.initView(mtDateStart, mtDateEnd, mnYear, idBizPartner);
     }
     
-    private void setYear(int year) {
-        int period = 0;
+    private void setYear(final int year) {
+        int month = 0;
         mnYear = year;
         
         if (jtbPeriodAll.isSelected()) {
             setAllPeriods();
         }
         else {
-            for (int i = 0; i < majtbPeriods.length; i++) {
-                if (majtbPeriods[i].isSelected()) {
-                    period = i + 1;
+            for (int i = 0; i < majtbMonths.length; i++) {
+                if (majtbMonths[i].isSelected()) {
+                    month = i + 1;
                     break;
                 }
             }
-            setPeriod(period);
+            setMonth(month);
         }
     }
     
-    private void setPeriod(int period) {
-        mtDateStart = SLibTimeUtilities.getBeginOfMonth(SLibTimeUtilities.createDate(mnYear, period));
-        mtDateEnd = SLibTimeUtilities.getEndOfMonth(SLibTimeUtilities.createDate(mnYear, period));
-        jtfYearPeri.setText(mnYear + "/" + (period < 10 ? "0" + period : period));
+    private void setMonth(int month) {
+        mtDateStart = SLibTimeUtils.getBeginOfMonth(SLibTimeUtils.createDate(mnYear, month));
+        mtDateEnd = SLibTimeUtils.getEndOfMonth(SLibTimeUtils.createDate(mnYear, month));
+        jtfYearPeriod.setText(SLibUtils.DecimalFormatCalendarYear.format(mnYear) + "-" + SLibUtils.DecimalFormatCalendarMonth.format(month));
     }
     
     private void setAllPeriods() {
-        mtDateStart = SLibTimeUtilities.getBeginOfMonth(SLibTimeUtilities.createDate(mnYear, 1));
-        mtDateEnd = SLibTimeUtilities.getEndOfMonth(SLibTimeUtilities.createDate(mnYear, 12));
-        jtfYearPeri.setText("" + mnYear);
+        mtDateStart = SLibTimeUtils.getBeginOfMonth(SLibTimeUtils.createDate(mnYear, 1));
+        mtDateEnd = SLibTimeUtils.getEndOfMonth(SLibTimeUtils.createDate(mnYear, 12));
+        jtfYearPeriod.setText(SLibUtils.DecimalFormatCalendarYear.format(mnYear));
     }
-        
-    public void resetCustomer() {
+    
+    private void setperiod(JToggleButton toggleButton) {
+        for (int i = 0; i < majtbMonths.length; i++) {
+            if (toggleButton == majtbMonths[i]) {
+                setMonth(i + 1);
+                initViewData(moBizPartner.getPkBizPartnerId()); 
+                break;
+            }
+        }
+    }
+    
+    public void resetBizPartner() {
         jtfrName.setText("");
-        jtfWeb.setText("");
-        jtfBranch.setText("");
         jtfAddress.setText("");
         jtfLocality.setText("");
+        jtfCP.setText("");
+        jtfCountry.setText("");
         moBizPartner = null;
     }
     
+    public void resetBizPartnerCategory() {
+        jtfLimCre.setText(0.0 + "");
+        jtfMoney.setText("MXN");
+        jtfDayCre.setText(0 + "");
+        jtfDayGra.setText(0 + "");
+        jtfDateStartOpe.setText("");
+        jtfCreditType.setText("");
+    }
+    
     private void renderCustomer() {
-        SDataCountry country = new SDataCountry();
         try {
-            moBizPartnerCategory = moBizPartner.getDbmsCategorySettingsCus();
-
-            jtfrName.setText(moBizPartner.getBizPartner());
-            jtfWeb.setText(moBizPartner.getWeb());
-            jtfBranch.setText(moBizPartner.getDbmsHqBranch().getDbmsBizPartner());
-            jtfAddress.setText(moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getStreet() + " #" +moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getStreetNumberExt());
-            jtfLocality.setText(moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getLocality());
-            if (moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n() != 0) {
-                country.read(new int[] { moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n() }, miClient.getSession().getStatement());
-                jtfCountry.setText(country.getCountry().toUpperCase());
-            }
-            else {
-                jtfCountry.setText(miClient.getSession().getSessionCustom().getLocalCountry());
-            }
-            jtfCP.setText(moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getZipCode());
-
-            if (moBizPartnerCategory != null) {
-                jtfLimCre.setText(SLibUtils.DecimalFormatValue2D.format(moBizPartnerCategory.getCreditLimit()) + "");
-                jtfDayCre.setText(SLibUtils.DecimalFormatValue0D.format(moBizPartnerCategory.getDaysOfCredit()) + "");
-                jtfDayGra.setText(SLibUtils.DecimalFormatValue0D.format(moBizPartnerCategory.getDaysOfGrace()) + "");
-                jtfDateStartOpe.setText(SLibUtils.DateFormatDate.format(moBizPartnerCategory.getDateStart()));
-                jtfCreditType.setText(moBizPartnerCategory.getDbmsCreditType() == null ? "" : moBizPartnerCategory.getDbmsCreditType());
-            }
-            else {
-                jtfLimCre.setText(0.0 + "");
-                jtfDayCre.setText(0 + "");
-                jtfDayGra.setText(0 + "");
-                jtfDateStartOpe.setText("");
-                jtfCreditType.setText("");
-            }
+            int[] pk = (int[]) (((SGuiItem) jcbBizPartner.getSelectedItem()).getPrimaryKey());
+            moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, pk, SLibConstants.EXEC_MODE_SILENT);
             
-            initViewData(moBizPartner.getPkBizPartnerId());
-  
-            if (!mbHasRightEmpWage) {
+            if (moBizPartner != null) {
+                moBizPartnerCategory = mnBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_CUS ? moBizPartner.getDbmsCategorySettingsCus() : moBizPartner.getDbmsCategorySettingsSup();
+
+                jtfrName.setText(moBizPartner.getBizPartner());
+                jtfAddress.setText(moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getStreet()           
+                        + " " + moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getStreetNumberExt()
+                        + " " + moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getStreetNumberInt());
+                jtfLocality.setText(moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getLocality());
+                jtfCP.setText(moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getZipCode());
+                jtfCountry.setText(moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getCountry());
+
+                if (moBizPartnerCategory != null) {
+                    jtfLimCre.setText(SLibUtils.DecimalFormatValue2D.format(moBizPartnerCategory.getCreditLimit()) + "");
+                    jtfMoney.setText(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
+                    jtfDayCre.setText(SLibUtils.DecimalFormatValue0D.format(moBizPartnerCategory.getDaysOfCredit()) + "");
+                    jtfDayGra.setText(SLibUtils.DecimalFormatValue0D.format(moBizPartnerCategory.getDaysOfGrace()) + "");
+                    jtfDateStartOpe.setText(SLibUtils.DateFormatDate.format(moBizPartnerCategory.getDateStart()));
+                    jtfCreditType.setText(moBizPartnerCategory.getDbmsCreditType() == null ? "" : moBizPartnerCategory.getDbmsCreditType());
+                }
+                else {
+                    resetBizPartnerCategory();
+                } 
+                initViewData(moBizPartner.getPkBizPartnerId());
+            }
+            else {
+                resetBizPartner();
+                resetBizPartnerCategory();
             }
         }
         catch (Exception e) {
@@ -769,13 +700,14 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
     
     @Override
     public int getTabTypeAux01() {
-        return SLibConstants.UNDEFINED;
+        return SLibConsts.UNDEFINED;
     }
 
     @Override
     public int getTabTypeAux02() {
-        return SLibConstants.UNDEFINED;
+        return SLibConsts.UNDEFINED;
     }
+    
     @Override
     public void addSetting(STableSetting setting) {
         boolean add = true;
@@ -825,29 +757,13 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof javax.swing.JToggleButton) {
             JToggleButton toggleButton = (JToggleButton) e.getSource();
-
-            if (toggleButton == jtbPeriodAll ) {
-                try {
-                    setAllPeriods();
-                    initViewData(moBizPartner.getPkBizPartnerId());
-                } 
-                catch (Exception ex) {
-                    SLibUtils.printException(this, ex);
-                }
+            
+            if (toggleButton == jtbPeriodAll) {
+                setAllPeriods();
+                initViewData(moBizPartner.getPkBizPartnerId());
             }
             else {
-                for (int i = 0; i < majtbPeriods.length; i++) {
-                    if (toggleButton == majtbPeriods[i]) {
-                        try {
-                            setPeriod(i + 1);
-                            initViewData(moBizPartner.getPkBizPartnerId());
-                        }
-                        catch (Exception ex) {
-                            SLibUtils.printException(this, ex);
-                        }
-                        break;
-                    }
-                }
+                setperiod(toggleButton);
             }
         }
     }
@@ -865,11 +781,7 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
     }
 
     private void actionChangeCustomer() {
-        int[] pk = (int[]) (((SGuiItem) jcbBizPartner.getSelectedItem()).getPrimaryKey());
-        moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, pk, SLibConstants.EXEC_MODE_SILENT);
-        if (moBizPartner != null) {
-            renderCustomer();
-        }
+        renderCustomer();
     }
 
     @Override
@@ -881,5 +793,4 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
     public Vector<STableSetting> getTableSettings() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
 }

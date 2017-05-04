@@ -44,18 +44,27 @@ public class SViewSalesByStock extends SGridPaneView {
         createGridColumns();
     }
 
-    /*
-     * Public methods
-     */
-
-    public void renderView(final Date dateStart, final Date dateFinal, final int year, final int idBizPartner ) {
+    private void setParamsView(final Date dateStart, final Date dateFinal, final int year, final int idBizPartner ) {
         mtDateStart = dateStart;
         mtDateFinal = dateFinal;
         mnYearId = year;
         mnBizPartberId = idBizPartner;
+    }
+    
+    private void renderView() {
         createGridColumns();
         populateGrid(SGridConsts.REFRESH_MODE_RELOAD);
     }
+
+    /*
+     * Public methods
+     */
+    
+    public void initView(final Date dateStart, final Date dateFinal, final int year, final int idBizPartner) {
+        setParamsView(dateStart, dateFinal, year, idBizPartner);
+        renderView();
+    }
+    
     
     /*
      * Overriden methods
@@ -63,8 +72,6 @@ public class SViewSalesByStock extends SGridPaneView {
     
     @Override
     public void prepareSqlQuery() {
-        String sqlDate = "'" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' ";
-        String sqlDateF = "'" + SLibUtils.DbmsDateFormatDate.format(mtDateFinal) + "' ";
         
         moPaneSettings = new SGridPaneSettings(2);
         msSql= "SELECT id_year " + SDbConsts.FIELD_ID + "1, " +
@@ -85,10 +92,10 @@ public class SViewSalesByStock extends SGridPaneView {
                 "AND dae.id_doc = da.id_doc AND dae.b_del = 0 AND dae.fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_RET + " AND da.b_del = 0 AND da.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + "), 0) AS f_adj_orig_qty, " +
                 "COALESCE((SELECT SUM(ge.qty * CASE WHEN ge.fid_dps_adj_year_n IS NULL THEN 1 ELSE -1 END) FROM trn_diog_ety AS ge, trn_diog AS g WHERE ge.fid_dps_year_n = de.id_year " +
                 "AND ge.fid_dps_doc_n = de.id_doc AND ge.fid_dps_ety_n = de.id_ety AND ge.id_year = g.id_year AND ge.id_doc = g.id_doc " +
-                "AND d.id_year = " + mnYearId + " AND d.dt >= " + sqlDate + " AND d.dt <= " + sqlDateF + " AND ge.b_del = 0 AND g.b_del = 0), 0) AS f_sup_qty, " +
+                "AND d.id_year = " + mnYearId + " AND d.dt >= '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND d.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateFinal) + "' AND ge.b_del = 0 AND g.b_del = 0), 0) AS f_sup_qty, " +
                 "COALESCE((SELECT SUM(ge.orig_qty * CASE WHEN ge.fid_dps_adj_year_n IS NULL THEN 1 ELSE -1 END) FROM trn_diog_ety AS ge, trn_diog AS g " +
                 "WHERE ge.fid_dps_year_n = de.id_year AND ge.fid_dps_doc_n = de.id_doc AND ge.fid_dps_ety_n = de.id_ety AND ge.id_year = g.id_year AND ge.id_doc = g.id_doc " +
-                "AND d.id_year = " + mnYearId + " AND d.dt >= " + sqlDate + " AND d.dt <= " + sqlDateF + " AND ge.b_del = 0 AND g.b_del = 0), 0) AS f_sup_orig_qty FROM trn_dps AS d " +
+                "AND d.id_year = " + mnYearId + " AND d.dt >= '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND d.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateFinal) + "' AND ge.b_del = 0 AND g.b_del = 0), 0) AS f_sup_orig_qty FROM trn_dps AS d " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_DPS) + " AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps AND d.b_del = 0 AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " ";
                 if (mnGridMode == SDataConstantsSys.BPSS_CT_BP_CUS) {
                     msSql += "AND d.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_DOC[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_DOC[1] + " ";
@@ -132,5 +139,13 @@ public class SViewSalesByStock extends SGridPaneView {
     @Override
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
+        moSuscriptionsSet.add(SModConsts.CFGU_CUR);
+        moSuscriptionsSet.add(SModConsts.BPSU_BPB);
+        moSuscriptionsSet.add(SModConsts.BPSU_BP);
+        moSuscriptionsSet.add(SModConsts.BPSU_BP_CT);
+        moSuscriptionsSet.add(SModConsts.USRU_USR);
+        moSuscriptionsSet.add(SModConsts.TRN_DPS_ETY);
+        moSuscriptionsSet.add(SModConsts.ITMU_ITEM);
+        moSuscriptionsSet.add(SModConsts.ITMU_UNIT);       
     }
 }

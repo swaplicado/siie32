@@ -241,7 +241,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatDpsDncDocumentNumberSeries = new JMenuItem("Folios de docs. de compras");
         jmiCatDiogDncDocumentNumberSeries = new JMenuItem("Folios de docs. de inventarios");
         jmiCatBizPartnerBlocking = new JMenuItem("Bloqueo de proveedores");
-        jmiCatViewIntegralSuppliers = new JMenuItem("Vista integral proveedores");
+        jmiCatViewIntegralSuppliers = new JMenuItem("Vista integral de proveedores");
         jmCatCfg = new JMenu("Contabilización automática");
         jmiCatCfgCostCenterItem = new JMenuItem("Configuración de centros de costo vs. ítems");
         jmiCatSendingDpsLog = new JMenuItem("Bitácora de envíos de docs.");
@@ -687,7 +687,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatDpsDncDocumentNumberSeries.setEnabled(hasRightDnsDps);
         jmiCatDiogDncDocumentNumberSeries.setEnabled(hasRightDnsDiog);
         jmiCatBizPartnerBlocking.setEnabled(hasRightBizPartnerBlocking);
-        jmiCatViewIntegralSuppliers.setEnabled(hasRightBizPartnerBlocking);
+        jmiCatViewIntegralSuppliers.setEnabled(true);
         jmCatCfg.setEnabled(hasRightItemConfig);
         jmiCatSendingDpsLog.setEnabled(hasRightDocOrder);
         jmEst.setEnabled(hasRightDocEstimate);
