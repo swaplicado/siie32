@@ -4,9 +4,9 @@
  */
 
 /*
- * SDialogRepProductionOrderAdvance.java
+ * SDialogRepProductionOrder.java
  *
- * Created on 18/04/2012
+ * Modified 04/05/2017
  */
 
 package erp.mmfg.form;
@@ -32,10 +32,12 @@ import net.sf.jasperreports.view.*;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Edwin Carmona
  */
-public class SDialogRepProductionOrderPerformance extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
+public class SDialogRepProductionOrder extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
+    private int mnFormType;
+    
     private int mnFormResult;
     private int mnFormStatus;
     private boolean mbFirstTime;
@@ -46,10 +48,20 @@ public class SDialogRepProductionOrderPerformance extends javax.swing.JDialog im
     private erp.lib.form.SFormField moFieldDateInitial;
     private erp.lib.form.SFormField moFieldDateEnd;
 
-    /** Creates new form SDialogRepDpsMoves */
-    public SDialogRepProductionOrderPerformance(erp.client.SClientInterface client) {
+    /**
+     * Creates new form SDialogRepDpsMoves
+     * 
+     * @param client
+     * @param sTitle title of dialog
+     * @param formType SDataConstantsSys.REP_MFG_FINISHED_GOODS_EFFICIENCY, 
+     *                 SDataConstantsSys.REP_MFG_ORD_PERFORMANCE, 
+     *                 SDataConstantsSys.REP_MFG_RAW_MATERIALS_EFFICIENCY
+     */
+    public SDialogRepProductionOrder(erp.client.SClientInterface client, final String sTitle, final int formType) {
         super(client.getFrame(), true);
         miClient =  client;
+        this.setTitle(sTitle);
+        mnFormType = formType;
 
         initComponents();
         initComponentsExtra();
@@ -80,7 +92,6 @@ public class SDialogRepProductionOrderPerformance extends javax.swing.JDialog im
         jPanel3 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Rendimiento de orden de producción");
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -153,8 +164,8 @@ public class SDialogRepProductionOrderPerformance extends javax.swing.JDialog im
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-400)/2, (screenSize.height-249)/2, 400, 249);
+        setSize(new java.awt.Dimension(400, 249));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -207,6 +218,9 @@ public class SDialogRepProductionOrderPerformance extends javax.swing.JDialog im
         JasperPrint jasperPrint = null;
         JasperViewer jasperViewer = null;
         SFormValidation validation = formValidate();
+        String titleReport = "";
+        String sqlGroupBy = "";
+        String sqlOrderBy = "";
 
         if (validation.getIsError()) {
             if (validation.getComponent() != null) {
@@ -250,10 +264,44 @@ public class SDialogRepProductionOrderPerformance extends javax.swing.JDialog im
                 map.put("Ct_In_Mfg_Fg_Ret", SDataConstantsSys.TRNS_TP_IOG_IN_MFG_FG_RET[0]);
                 map.put("Cl_In_Mfg_Fg_Ret", SDataConstantsSys.TRNS_TP_IOG_IN_MFG_FG_RET[1]);
                 map.put("Tp_In_Mfg_Fg_Ret", SDataConstantsSys.TRNS_TP_IOG_IN_MFG_FG_RET[2]);
+                
+                switch (mnFormType) {
+                    case SDataConstantsSys.REP_MFG_FINISHED_GOODS_EFFICIENCY:
+                    case SDataConstantsSys.REP_MFG_RAW_MATERIALS_EFFICIENCY:
+                        map.put("Ct_In_Mfg_Fg_Asd", SDataConstantsSys.TRNS_TP_IOG_IN_MFG_FG_ASD[0]);
+                        map.put("Cl_In_Mfg_Fg_Asd", SDataConstantsSys.TRNS_TP_IOG_IN_MFG_FG_ASD[1]);
+                        map.put("Tp_In_Mfg_Fg_Asd", SDataConstantsSys.TRNS_TP_IOG_IN_MFG_FG_ASD[2]);
+                        map.put("Ct_Out_Mfg_Fg_Ret", SDataConstantsSys.TRNS_TP_IOG_OUT_MFG_FG_RET[0]);
+                        map.put("Cl_Out_Mfg_Fg_Ret", SDataConstantsSys.TRNS_TP_IOG_OUT_MFG_FG_RET[1]);
+                        map.put("Tp_Out_Mfg_Fg_Ret", SDataConstantsSys.TRNS_TP_IOG_OUT_MFG_FG_RET[2]);
+                        map.put("Rep_Finished_Goods_Efficiency", SDataConstantsSys.REP_MFG_FINISHED_GOODS_EFFICIENCY);
+                        map.put("Rep_Raw_Materials_Efficiency", SDataConstantsSys.REP_MFG_RAW_MATERIALS_EFFICIENCY);
+                        map.put("nReport", mnFormType);
+                        
+                        if (mnFormType == SDataConstantsSys.REP_MFG_FINISHED_GOODS_EFFICIENCY) {
+                            sqlGroupBy = "GROUP BY o.fid_bom, i.id_item ";
+                            sqlOrderBy = "ORDER BY o.id_year, o.id_ord DESC, o.num, o.ref, o.fid_bom, st.st, o.dt ";
+                            map.put("sTitle", "EFICIENCIA GLOBAL DE PRODUCTOS TERMINADOS");
+                            titleReport = "Eficiencia global de productos terminados";
+                        }
+                        else {
+                            sqlGroupBy = "GROUP BY i.id_item ";
+                            sqlOrderBy = "ORDER BY i.item_key, i.id_item, o.id_year, o.id_ord, o.num ";
+                            map.put("sTitle", "EFICIENCIA GLOBAL DE MATERIAS PRIMAS");
+                            titleReport = "Eficiencia global de insumos";
+                        }
+                        
+                        map.put("sGroupBy", sqlGroupBy);
+                        map.put("sOrderBy", sqlOrderBy);
+                        break;
+                    case SDataConstantsSys.REP_MFG_ORD_PERFORMANCE:
+                        titleReport = "Rendimiento de orden de producción";
+                        break;
+                }
 
-                jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_MFG_ORD_PERFORMANCE, map);
+                jasperPrint = SDataUtilities.fillReport(miClient, mnFormType, map);
                 jasperViewer = new JasperViewer(jasperPrint, false);
-                jasperViewer.setTitle("Rendimiento de orden de producción");
+                jasperViewer.setTitle(titleReport);
                 jasperViewer.setVisible(true);
             }
             catch(Exception e) {

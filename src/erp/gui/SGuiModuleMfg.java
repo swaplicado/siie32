@@ -80,6 +80,8 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiReportBomItems;
     private javax.swing.JMenuItem jmiBomCost;
     private javax.swing.JMenuItem jmiReportProductionOrderPerformance;
+    private javax.swing.JMenuItem jmiReportFinishedGoodsEfficiency;
+    private javax.swing.JMenuItem jmiReportRawMaterialsEfficiency;
 
     private erp.mmfg.form.SFormBom moFormBom;
     private erp.mmfg.form.SFormManufacturingLine moFormManufacturingLine;
@@ -93,7 +95,7 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
     private erp.mmfg.form.SFormProductionOrderCharge moFormProductionOrderCharges;
     private erp.mmfg.form.SFormRequisition moFormRequisition;
     private erp.mmfg.form.SDialogMfgClosePeriod moDialogMfgClosePeriod;
-    private erp.mmfg.form.SDialogRepProductionOrderPerformance moDialogRepProductionOrderPerformance;
+    private erp.mmfg.form.SDialogRepProductionOrder moDialogRepProductionOrderPerformance;
     private erp.mmfg.form.SDialogProductionOrderSaved moDialogProductionOrderSaved;
     private erp.mmfg.form.SDialogExplotionMaterials moDialogExplotionMaterials;
 
@@ -232,6 +234,8 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiReportBomItems = new JMenuItem("Productos por insumo");
         jmiBomCost = new JMenuItem("Costo teórico de fórmulas");
         jmiReportProductionOrderPerformance = new JMenuItem("Rendimiento de órdenes prod.");
+        jmiReportFinishedGoodsEfficiency = new JMenuItem("Eficiencia global de productos terminados");
+        jmiReportRawMaterialsEfficiency = new JMenuItem("Eficiencia global de insumos");
 
         jmReportsStatiticsManufacturing.add(jmiReportProductionByItem);
         jmReportsStatiticsManufacturing.add(jmiReportProductionByItemGeneric);
@@ -245,6 +249,8 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmReports.add(jmiBomCost);
         jmReports.add(new JSeparator());
         jmReports.add(jmiReportProductionOrderPerformance);
+        jmReports.add(jmiReportFinishedGoodsEfficiency);
+        jmReports.add(jmiReportRawMaterialsEfficiency);
 
         jmiBom.addActionListener(this);
         jmiManufacturingLine.addActionListener(this);
@@ -280,13 +286,14 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiReportBomItems.addActionListener(this);
         jmiBomCost.addActionListener(this);
         jmiReportProductionOrderPerformance.addActionListener(this);
+        jmiReportFinishedGoodsEfficiency.addActionListener(this);
+        jmiReportRawMaterialsEfficiency.addActionListener(this);
         jmiReportProductionByItem.addActionListener(this);
         jmiReportProductionByItemGeneric.addActionListener(this);
         jmiReportProductionByBizPartnetItem.addActionListener(this);
         jmiReportProductionByItemBizPartner.addActionListener(this);
 
-        moDialogExplotionMaterials = new SDialogExplotionMaterials(miClient);
-        moDialogRepProductionOrderPerformance = new SDialogRepProductionOrderPerformance(miClient);
+        moDialogExplotionMaterials = new SDialogExplotionMaterials(miClient);        
         moDialogProductionOrderSaved = new SDialogProductionOrderSaved(miClient);
 
         hasRightBom = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_BOM).HasRight;
@@ -881,6 +888,17 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
                 showView(SDataConstants.MFGX_BOM_COST);
             }
             else if (item == jmiReportProductionOrderPerformance) {
+                moDialogRepProductionOrderPerformance = new SDialogRepProductionOrder(miClient, "Rendimiento de orden de producción", SDataConstantsSys.REP_MFG_ORD_PERFORMANCE);
+                moDialogRepProductionOrderPerformance.formReset();
+                moDialogRepProductionOrderPerformance.setFormVisible(true);
+            }
+            else if (item == jmiReportFinishedGoodsEfficiency) {
+                moDialogRepProductionOrderPerformance = new SDialogRepProductionOrder(miClient, "Eficiencia global de productos terminados", SDataConstantsSys.REP_MFG_FINISHED_GOODS_EFFICIENCY);
+                moDialogRepProductionOrderPerformance.formReset();
+                moDialogRepProductionOrderPerformance.setFormVisible(true);
+            }
+            else if (item == jmiReportRawMaterialsEfficiency) {
+                moDialogRepProductionOrderPerformance = new SDialogRepProductionOrder(miClient, "Eficiencia global de insumos", SDataConstantsSys.REP_MFG_RAW_MATERIALS_EFFICIENCY);
                 moDialogRepProductionOrderPerformance.formReset();
                 moDialogRepProductionOrderPerformance.setFormVisible(true);
             }

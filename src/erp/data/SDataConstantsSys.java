@@ -1581,6 +1581,8 @@ public abstract class SDataConstantsSys {
     public static final int REP_MFG_ORD_PERFORMANCE = 208003;
     public static final int REP_MFG_BOM = 208004;
     public static final int REP_MFG_PROD = 208005;
+    public static final int REP_MFG_FINISHED_GOODS_EFFICIENCY = 208006;
+    public static final int REP_MFG_RAW_MATERIALS_EFFICIENCY = 208007;
 
     public static final int REPX_BAL_SHEET_ASSET = 1;
     public static final int REPX_BAL_SHEET_LIABTY_EQUITY = 2;

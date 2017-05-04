@@ -3064,6 +3064,12 @@ public abstract class SDataUtilities {
             case SDataConstantsSys.REP_MFG_ORD_PERFORMANCE:
                 name = "reps/mfg_ord_performance.jasper";
                 break;
+            case SDataConstantsSys.REP_MFG_FINISHED_GOODS_EFFICIENCY:
+                name = "reps/mfg_finished_goods_efficiency.jasper";
+                break;
+            case SDataConstantsSys.REP_MFG_RAW_MATERIALS_EFFICIENCY:
+                name = "reps/mfg_finished_goods_efficiency.jasper";
+                break;
             default:
                 throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
         }
