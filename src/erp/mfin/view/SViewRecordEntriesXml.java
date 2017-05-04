@@ -36,10 +36,6 @@ public class SViewRecordEntriesXml extends erp.lib.table.STableTab implements ja
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     private erp.mfin.view.SPanelFilterRecordType moPanelFilterRecordType;
     private erp.lib.table.STabFilterSwitch moTabFilterSwitch;
-    
-    private final static int DATA_TYPE_TEXT = 1;
-    private final static int DATA_TYPE_NUMBER = 2;
-    private final static int DATA_TYPE_DATE = 3;
 
     public SViewRecordEntriesXml(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
         super(client, tabTitle, SDataConstants.FIN_REC_ETY, auxType01);
@@ -76,7 +72,7 @@ public class SViewRecordEntriesXml extends erp.lib.table.STableTab implements ja
         jbGetXml.setEnabled(true);
 
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[29];
+        STableColumn[] aoTableColumns = new STableColumn[27];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "id_cfd");
@@ -100,9 +96,7 @@ public class SViewRecordEntriesXml extends erp.lib.table.STableTab implements ja
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "debit_cur", "Debe mon $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "credit_cur", "Haber mon $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cur_key", "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_xml_emisor", "XML emisor", STableConstants.WIDTH_ITEM_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_xml_emisor_rfc", "XML RFC emisor", STableConstants.WIDTH_ITEM);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_xml_receptor", "XML receptor", STableConstants.WIDTH_ITEM_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_xml_receptor_rfc", "XML RFC receptor", STableConstants.WIDTH_ITEM);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_xml_total", "XML total $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_xml_moneda", "XML moneda", STableConstants.WIDTH_CURRENCY_KEY);
@@ -198,14 +192,12 @@ public class SViewRecordEntriesXml extends erp.lib.table.STableTab implements ja
                 "CONCAT(re.id_year, '-', erp.lib_fix_int(re.id_per, 2)) as _per, " +
                 "CONCAT(re.id_tp_rec, '-', erp.lib_fix_int(re.id_num, 6)) as _num, " +
                 "un.usr AS _usr_new, ue.usr AS _usr_edit, ud.usr AS _usr_del, re.ts_new, re.ts_edit, re.ts_del, " +
-                "erp.f_get_xml_atr('cfdi:Emisor', 'nombre=', cfd.doc_xml, " + DATA_TYPE_TEXT + ") AS _xml_emisor, " +
-                "erp.f_get_xml_atr('cfdi:Emisor', 'rfc=', cfd.doc_xml, " + DATA_TYPE_TEXT + ") AS _xml_emisor_rfc, " +
-                "erp.f_get_xml_atr('cfdi:Receptor', 'nombre=', cfd.doc_xml, " + DATA_TYPE_TEXT + ") AS _xml_receptor, " +
-                "erp.f_get_xml_atr('cfdi:Receptor', 'rfc=', cfd.doc_xml, " + DATA_TYPE_TEXT + ") AS _xml_receptor_rfc, " +
-                "erp.f_get_xml_atr('cfdi:Comprobante', 'total=', cfd.doc_xml, " + DATA_TYPE_NUMBER + ") AS _xml_total, " +
-                "erp.f_get_xml_atr('cfdi:Comprobante', 'moneda=', cfd.doc_xml, " + DATA_TYPE_TEXT + ") AS _xml_moneda, " +
-                "CAST(REPLACE(erp.f_get_xml_atr('cfdi:Complemento', 'FechaTimbrado=', cfd.doc_xml, " + DATA_TYPE_DATE + "), 'T', ' ') AS DATETIME) AS _xml_timbrado, " +
-                "erp.f_get_xml_atr('cfdi:Complemento', 'UUID=', cfd.doc_xml, " + DATA_TYPE_TEXT + ") AS _xml_uuid " +
+                "cfd.xml_rfc_emi AS _xml_emisor_rfc, " +
+                "cfd.xml_rfc_rec AS _xml_receptor_rfc, " +
+                "cfd.xml_tot AS _xml_total, " +
+                "cfd.xml_mon AS _xml_moneda, " +
+                "cfd.xml_sign_n AS _xml_timbrado, " +
+                "cfd.uuid AS _xml_uuid " +
                 "FROM trn_cfd AS cfd ";
         
         sql2 = "INNER JOIN fin_rec AS r ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num " +
@@ -225,8 +217,8 @@ public class SViewRecordEntriesXml extends erp.lib.table.STableTab implements ja
                 sql2 +
                 "AND " +
                 (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR ? 
-                "erp.f_get_xml_atr('cfdi:Emisor', 'rfc=', cfd.doc_xml, " + DATA_TYPE_TEXT + ") <> '" + miClient.getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId() + "' " :
-                "erp.f_get_xml_atr('cfdi:Emisor', 'rfc=', cfd.doc_xml, " + DATA_TYPE_TEXT + ") = '" + miClient.getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId() + "' ") +
+                "cfd.xml_rfc_emi <> '" + miClient.getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId() + "' " :
+                "cfd.xml_rfc_emi = '" + miClient.getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId() + "' ") +
                 "UNION " +
                 sql1 + 
                 "INNER JOIN trn_dps AS dps ON cfd.fid_dps_year_n = dps.id_year AND cfd.fid_dps_doc_n = dps.id_doc " +

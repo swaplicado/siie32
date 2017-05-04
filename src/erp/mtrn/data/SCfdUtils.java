@@ -13,6 +13,7 @@ import cancel.StringArray;
 import cancel.UUIDS;
 import cfd.DAttributeOptionImpuestoTraslado;
 import cfd.DAttributeOptionMetodoPago;
+import cfd.DAttributeOptionMetodoPagoClave;
 import cfd.DCfdConsts;
 import cfd.DCfdUtils;
 import cfd.DElement;
@@ -3429,10 +3430,10 @@ public abstract class SCfdUtils implements Serializable {
         comprobante.getAttTotal().setDouble(cfdXml.getCfdTotal());
         
         if (cfdXml.getCfdMetodoDePago() <= 1) {
-            comprobante.getAttMetodoPago().setOption(DAttributeOptionMetodoPago.CFD_UNA_EXHIBICION);
+            comprobante.getAttMetodoPago().setOption(DAttributeOptionMetodoPagoClave.CFD_UNA_EXHIBICION);
         }
         else {
-            comprobante.getAttMetodoPago().setOption("" + cfdXml.getCfdFormaDePago(), DAttributeOptionMetodoPago.CFD_PARCIALIDADES);
+            comprobante.getAttMetodoPago().setOption("" + cfdXml.getCfdFormaDePago(), DAttributeOptionMetodoPagoClave.CFD_PARCIALIDADES);
         }
         comprobante.getAttConfirmacion().setString(cfdXml.getCfdNumConfirmacion());
 
@@ -3521,10 +3522,6 @@ public abstract class SCfdUtils implements Serializable {
                     default:
                         throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + tax.getImpuestoBasico() + ").");
                 }
-            }
-
-            if (impuestosTrasladados.getEltHijosImpuestoTrasladado().isEmpty() && impuestosRetenidos.getEltHijosImpuestoRetenido().isEmpty()) {
-                throw new Exception("Error al generar el nodo impuestos del CFD el nodo impuestos no existe.");
             }
 
             if (!impuestosRetenidos.getEltHijosImpuestoRetenido().isEmpty()) {

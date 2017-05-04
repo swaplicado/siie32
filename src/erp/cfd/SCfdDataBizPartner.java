@@ -6,6 +6,7 @@ package erp.cfd;
 
 import cfd.DCfdConsts;
 import cfd.DElement;
+import cfd.ver32.DVer3Utils;
 import erp.mod.fin.db.SFinConsts;
 
 /**
@@ -185,7 +186,7 @@ public class SCfdDataBizPartner {
                 emisor = new cfd.ver33.DElementEmisor();
 
                 ((cfd.ver33.DElementEmisor) emisor).getAttRfc().setString(msBizPartnerRfc);
-                ((cfd.ver33.DElementEmisor) emisor).getAttNombre().setString(msBizPartnerName);
+                ((cfd.ver33.DElementEmisor) emisor).getAttNombre().setString(DVer3Utils.formatAttributeValueAsText(msBizPartnerName));
                 //((cfd.ver33.DElementEmisor) emisor).getAttRegimenFiscal().setString(msBizPartnerName);
             }
             else if (mfVersion == DCfdConsts.CFDI_VER_32) {
@@ -318,7 +319,7 @@ public class SCfdDataBizPartner {
                 }
                 
                 ((cfd.ver33.DElementReceptor) receptor).getAttRfc().setString(msBizPartnerRfc);
-                ((cfd.ver33.DElementReceptor) receptor).getAttNombre().setString(msBizPartnerName);
+                ((cfd.ver33.DElementReceptor) receptor).getAttNombre().setString(DVer3Utils.formatAttributeValueAsText(msBizPartnerName));
                 
                 if (mbIsCfdiWithCce && msBizPartnerRfc.compareTo(SFinConsts.RFC_INT) == 0) {
                     

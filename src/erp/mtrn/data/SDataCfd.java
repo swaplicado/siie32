@@ -16,6 +16,8 @@ import erp.mod.trn.db.STrnUtils;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.sql.Blob;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,6 +27,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.xml.SXmlUtils;
 
@@ -39,8 +42,7 @@ import sa.lib.xml.SXmlUtils;
  *
  * @author Juan Barajas
  */
-public class SDataCfd
-extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
     public static final int FIELD_ACC_WS = 1;
     public static final int FIELD_ACC_XML_STO = 4;
@@ -52,14 +54,25 @@ extends erp.lib.data.SDataRegistry implements java.io.Serializable {
     public static final int FIELD_ST_XML_DVY = 10;
     public static final int FIELD_USR_DVY = 11;
     public static final int FIELD_B_CON = 12;
+
+    private final static int DATA_TYPE_TEXT = 1;
+    private final static int DATA_TYPE_NUMBER = 2;
+    private final static int DATA_TYPE_DATE = 3;
     
     protected int mnPkCfdId;
     protected java.util.Date mtTimestamp;
     protected java.lang.String msCertNumber;
     protected java.lang.String msStringSigned;
     protected java.lang.String msSignature;
+    protected java.sql.Blob moDocXml_n;
     protected java.lang.String msDocXml;
     protected java.lang.String msDocXmlName;
+    protected java.lang.String msDocXmlRfcEmi;
+    protected java.lang.String msDocXmlRfcRec;
+    protected double mdDocXmlTot;
+    protected java.lang.String msDocXmlMon;
+    protected double mdDocXmlTc;
+    protected java.util.Date mtDocXmlSign_n;
     protected java.lang.String msUuid;
     protected byte[] moQrCode_n;
     protected java.lang.String msAcknowledgmentCancellationXml;
@@ -100,6 +113,8 @@ extends erp.lib.data.SDataRegistry implements java.io.Serializable {
     protected double mdAuxTotalCy;
     protected boolean mbAuxIsSign;
     protected boolean mbAuxIsValidate;
+    
+    protected byte[] mayExtraPrivateDocXml_ns;
 
     public String getCfdNumber() {
         String numberSer = "";
@@ -120,6 +135,62 @@ extends erp.lib.data.SDataRegistry implements java.io.Serializable {
             SLibUtilities.printOutException(this, e);
         }
         return STrnUtils.formatDocNumber(numberSer, number);
+    }
+    
+    private void processObtainXmlValues(final Connection connection, final String xml) throws java.lang.Exception {
+        boolean isCfdi = false;
+        String sql = "";
+        ResultSet resultSet = null;
+        
+        // is CFDI:
+        
+        sql = "SELECT " +
+                "erp.f_get_xml_atr('cfdi:Emisor', 'rfc=', '" + xml + "', " + DATA_TYPE_TEXT + ") AS _xml_emisor_rfc, " +
+                "erp.f_get_xml_atr('cfdi:Receptor', 'rfc=', '" + xml + "', " + DATA_TYPE_TEXT + ") AS _xml_receptor_rfc, " +
+                "erp.f_get_xml_atr('cfdi:Comprobante', 'Total=', '" + xml + "', " + DATA_TYPE_NUMBER + ") AS _xml_total, " +
+                "erp.f_get_xml_atr('cfdi:Comprobante', 'TipoCambio=', '" + xml + "', " + DATA_TYPE_NUMBER + ") AS _xml_tc, " +
+                "erp.f_get_xml_atr('cfdi:Comprobante', 'Moneda=', '" + xml + "', " + DATA_TYPE_TEXT + ") AS _xml_moneda, " +
+                "CAST(REPLACE(erp.f_get_xml_atr('cfdi:Complemento', 'FechaTimbrado=', '" + xml + "', " + DATA_TYPE_DATE + "), 'T', ' ') AS DATETIME) AS _xml_timbrado, " +
+                "erp.f_get_xml_atr('cfdi:Complemento', 'UUID=', '" + xml + "', " + DATA_TYPE_TEXT + ") AS _xml_uuid ";
+
+        resultSet = connection.createStatement().executeQuery(sql);
+                
+        if (resultSet.next()) {
+            msDocXmlRfcEmi = resultSet.getString("_xml_emisor_rfc");
+            msDocXmlRfcRec = resultSet.getString("_xml_receptor_rfc");
+            mdDocXmlTot = resultSet.getDouble("_xml_total");
+            msDocXmlMon = resultSet.getString("_xml_moneda");
+            mdDocXmlTc = resultSet.getDouble("_xml_tc");
+            mtDocXmlSign_n = resultSet.getTimestamp("_xml_timbrado");
+            msUuid = resultSet.getString("_xml_uuid");
+            
+            isCfdi = !msDocXmlRfcEmi.isEmpty();
+        }
+
+        // is CFD:
+        
+        if (!isCfdi) {
+            sql = "SELECT " +
+                "erp.f_get_xml_atr('Emisor', 'rfc=', '" + xml + "', " + DATA_TYPE_TEXT + ") AS _xml_emisor_rfc, " +
+                "erp.f_get_xml_atr('Receptor', 'rfc=', '" + xml + "', " + DATA_TYPE_TEXT + ") AS _xml_receptor_rfc, " +
+                "erp.f_get_xml_atr('Comprobante', 'Total=', '" + xml + "', " + DATA_TYPE_NUMBER + ") AS _xml_total, " +
+                "erp.f_get_xml_atr('Comprobante', 'TipoCambio=', '" + xml + "', " + DATA_TYPE_NUMBER + ") AS _xml_tc, " +
+                "erp.f_get_xml_atr('Comprobante', 'Moneda=', '" + xml + "', " + DATA_TYPE_TEXT + ") AS _xml_moneda, " +
+                "NULL AS _xml_timbrado, " +
+                "'' AS _xml_uuid ";
+
+            resultSet = connection.createStatement().executeQuery(sql);
+            
+            if (resultSet.next()) {
+                msDocXmlRfcEmi = resultSet.getString("_xml_emisor_rfc");
+                msDocXmlRfcRec = resultSet.getString("_xml_receptor_rfc");
+                mdDocXmlTot = resultSet.getDouble("_xml_total");
+                msDocXmlMon = resultSet.getString("_xml_moneda");
+                mdDocXmlTc = resultSet.getDouble("_xml_tc");
+                mtDocXmlSign_n = resultSet.getTimestamp("_xml_timbrado");
+                msUuid = resultSet.getString("_xml_uuid");
+            }
+        }
     }
     
     private boolean testDeletion(java.lang.String psMsg, int nAction) throws java.lang.Exception {
@@ -174,8 +245,15 @@ extends erp.lib.data.SDataRegistry implements java.io.Serializable {
     public void setCertNumber(java.lang.String s) { msCertNumber = s; }
     public void setStringSigned(java.lang.String s) { msStringSigned = s; }
     public void setSignature(java.lang.String s) { msSignature = s; }
+    public void setDocXml_n(java.sql.Blob o) { moDocXml_n = o; }
     public void setDocXml(java.lang.String s) { msDocXml = s; }
     public void setDocXmlName(java.lang.String s) { msDocXmlName = s; }
+    public void setDocXmlRfcEmi(java.lang.String s) { msDocXmlRfcEmi = s; }
+    public void setDocXmlRfcRec(java.lang.String s) { msDocXmlRfcRec = s; }
+    public void setDocXmlTot(double d) { mdDocXmlTot = d; }
+    public void setDocXmlMon(java.lang.String s) { msDocXmlMon = s; }
+    public void setDocXmlTc(double d) { mdDocXmlTc = d; }
+    public void setDocXmlSign_n(java.util.Date t) { mtDocXmlSign_n = t; }
     public void setUuid(java.lang.String s) { msUuid = s; }
     public void setQrCode_n(byte[] o) { moQrCode_n = o; }
     public void setAcknowledgmentCancellationXml(java.lang.String s) { msAcknowledgmentCancellationXml = s; }
@@ -215,15 +293,22 @@ extends erp.lib.data.SDataRegistry implements java.io.Serializable {
     public void setAuxRfcReceptor(java.lang.String s) { msAuxRfcReceptor = s; }
     public void setAuxTotalCy(double d) { mdAuxTotalCy = d; }
     public void setAuxIsSign(boolean b) { mbAuxIsSign = b; }
-    public void setAuxIsValidate(boolean b) { mbAuxIsValidate = b; }
+    public void setAuxIsValidate(boolean b) { mbAuxIsValidate = b; }    
 
     public int getPkCfdId() { return mnPkCfdId; }
     public java.util.Date getTimestamp() { return mtTimestamp; }
     public java.lang.String getCertNumber() { return msCertNumber; }
     public java.lang.String getStringSigned() { return msStringSigned; }
     public java.lang.String getSignature() { return msSignature; }
+    public java.sql.Blob getDocXml_n() { return moDocXml_n; }
     public java.lang.String getDocXml() { return msDocXml; }
     public java.lang.String getDocXmlName() { return msDocXmlName; }
+    public java.lang.String getDocXmlRfcEmi() { return msDocXmlRfcEmi; }
+    public java.lang.String getDocXmlRfcRec() { return msDocXmlRfcRec; }
+    public double getDocXmlTot() { return mdDocXmlTot; }
+    public java.lang.String getDocXmlMon() { return msDocXmlMon; }
+    public double getDocXmlTc() { return mdDocXmlTc; }
+    public java.util.Date getDocXmlSign_n() { return mtDocXmlSign_n; }
     public java.lang.String getUuid() { return msUuid; }
     public byte[] getQrCode_n() { return moQrCode_n; }
     public java.lang.String getAcknowledgmentCancellation() { return msAcknowledgmentCancellationXml; }
@@ -284,8 +369,15 @@ extends erp.lib.data.SDataRegistry implements java.io.Serializable {
         msCertNumber = "";
         msStringSigned = "";
         msSignature = "";
+        moDocXml_n = null;
         msDocXml = "";
         msDocXmlName = "";
+        msDocXmlRfcEmi = "";
+        msDocXmlRfcRec = "";
+        mdDocXmlTot = 0;
+        msDocXmlMon = "";
+        mdDocXmlTc = 0;
+        mtDocXmlSign_n = null;
         msUuid = "";
         moQrCode_n = null;
         msAcknowledgmentCancellationXml = "";
@@ -326,6 +418,8 @@ extends erp.lib.data.SDataRegistry implements java.io.Serializable {
         mdAuxTotalCy = 0;
         mbAuxIsSign = false;
         mbAuxIsValidate = false;
+        
+        mayExtraPrivateDocXml_ns = null;
     }
 
     @Override
@@ -333,6 +427,7 @@ extends erp.lib.data.SDataRegistry implements java.io.Serializable {
         int[] key = (int[]) pk;
         String sql = "";
         ResultSet resultSet = null;
+        Blob oDocXml_ns = null;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         reset();
@@ -349,8 +444,14 @@ extends erp.lib.data.SDataRegistry implements java.io.Serializable {
                 msCertNumber = resultSet.getString("cert_num");
                 msStringSigned = resultSet.getString("str_signed");
                 msSignature = resultSet.getString("signature");
-                msDocXml = resultSet.getString("doc_xml");
+                oDocXml_ns = resultSet.getBlob("doc_xml_n");
                 msDocXmlName = resultSet.getString("doc_xml_name");
+                msDocXmlRfcEmi = resultSet.getString("xml_rfc_emi");
+                msDocXmlRfcRec = resultSet.getString("xml_rfc_rec");
+                mdDocXmlTot = resultSet.getDouble("xml_tot");
+                msDocXmlMon = resultSet.getString("xml_mon");
+                mdDocXmlTc = resultSet.getDouble("xml_tc");
+                mtDocXmlSign_n = resultSet.getTimestamp("xml_sign_n");
                 msUuid = resultSet.getString("uuid");
                 //moQrCode_n = resultSet.getBlob("qrc_n"); it's cannot read a object blob (2014-03-10, jbarajas)
                 msAcknowledgmentCancellationXml = resultSet.getString("ack_can_xml");
@@ -385,6 +486,14 @@ extends erp.lib.data.SDataRegistry implements java.io.Serializable {
                 mtUserProcessingTs = resultSet.getTimestamp("ts_prc");
                 mtUserDeliveryTs = resultSet.getTimestamp("ts_dvy");
                 
+                if (oDocXml_ns != null) {
+                    mayExtraPrivateDocXml_ns = SLibUtilities.convertBlobToBytes(oDocXml_ns);
+                    msDocXml = SLibUtils.unzip(mayExtraPrivateDocXml_ns);
+                }
+                else {
+                    msDocXml = resultSet.getString("doc_xml");
+                }
+                
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
             }
@@ -403,10 +512,11 @@ extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
     @Override
     public int save(java.sql.Connection connection) {
-        BufferedImage bufferedImage = null;
         int index = 1;
         boolean bIsUpd = false;
         String sql = "";
+        byte[] moDocXml_ns = null;
+        BufferedImage bufferedImage = null;
         ResultSet resultSet = null;
         Statement statement = null;
         PreparedStatement preparedStatement = null;
@@ -431,129 +541,144 @@ extends erp.lib.data.SDataRegistry implements java.io.Serializable {
                 statement.execute(sql);
 
                 sql = "INSERT INTO trn_cfd (id_cfd, " +
-                        "ts, cert_num, str_signed, signature, doc_xml, doc_xml_name, uuid, qrc_n, ack_can_xml, ack_can_pdf_n, ack_dvy, msg_dvy, b_prc_ws, b_prc_sto_xml, b_prc_sto_pdf, b_con, fid_tp_cfd, fid_tp_xml, fid_st_xml, " +
+                        "ts, cert_num, str_signed, signature, doc_xml_n, doc_xml, doc_xml_name, xml_rfc_emi, xml_rfc_rec, xml_tot, xml_mon, xml_tc, xml_sign_n, uuid, qrc_n, ack_can_xml, ack_can_pdf_n, ack_dvy, msg_dvy, b_prc_ws, b_prc_sto_xml, b_prc_sto_pdf, b_con, fid_tp_cfd, fid_tp_xml, fid_st_xml, " +
                         "fid_tp_xml_dvy, fid_st_xml_dvy, fid_dps_year_n, fid_dps_doc_n, fid_rec_year_n, fid_rec_per_n, fid_rec_bkc_n, fid_rec_tp_rec_n, fid_rec_num_n, fid_rec_ety_n, fid_pay_pay_n, fid_pay_emp_n, fid_pay_bpr_n, fid_pay_rcp_pay_n, fid_pay_rcp_emp_n, fid_pay_rcp_iss_n, fid_usr_prc, fid_usr_dvy, ts_prc, ts_dvy) " +
                         "VALUES (" + mnPkCfdId + ", " +
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                        "?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
+                        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                        "?, ?, ?, ?, NOW(), NOW())";
             }
             else {
                 bIsUpd = true;
                 
-                //if (mbIsConsistent) {
-                //    sql = "UPDATE trn_cfd SET b_con = " + mbIsConsistent + " " +
-                //            "WHERE id_cfd = " + mnPkCfdId + " ";
-                //    statement.execute(sql);
-                //    sql = "";
-                //}
-                //else {
-                //    mbIsConsistent = true;
-                    sql = "UPDATE trn_cfd SET ts = ?, cert_num = ?, str_signed = ?, signature = ?, " +
-                            "doc_xml = ?, doc_xml_name = ?, uuid = ?, " + (mnFkXmlStatusId != SDataConstantsSys.TRNS_ST_DPS_ANNULED ? "qrc_n = ?," : "") + " ack_can_xml = ?, ack_dvy = ?, msg_dvy = ?, b_con = ?, fid_tp_cfd = ?, " +
-                            "fid_tp_xml = ?, fid_st_xml = ?, fid_tp_xml_dvy = ?, fid_st_xml_dvy = ?, fid_dps_year_n = ?, fid_dps_doc_n = ?, fid_rec_year_n = ?, fid_rec_per_n = ?, fid_rec_bkc_n = ?, fid_rec_tp_rec_n = ?, fid_rec_num_n = ?, fid_rec_ety_n = ?, fid_pay_pay_n = ?, fid_pay_emp_n = ?, fid_pay_bpr_n = ?, fid_pay_rcp_pay_n = ?, fid_pay_rcp_emp_n = ?, fid_pay_rcp_iss_n = ?, fid_usr_dvy = ?, ts_dvy = NOW() " +
-                            "WHERE id_cfd = " + mnPkCfdId + " ";
-                //}
+                sql = "UPDATE trn_cfd SET ts = ?, cert_num = ?, str_signed = ?, signature = ?, doc_xml_n = ?, " +
+                        "doc_xml = ?, doc_xml_name = ?, xml_rfc_emi = ?, xml_rfc_rec = ?, xml_tot = ?, xml_mon = ?, xml_tc = ?, xml_sign_n = ?, " +
+                        "uuid = ?, " + (mnFkXmlStatusId != SDataConstantsSys.TRNS_ST_DPS_ANNULED ? "qrc_n = ?," : "") + " ack_can_xml = ?, ack_dvy = ?, msg_dvy = ?, b_con = ?, fid_tp_cfd = ?, " +
+                        "fid_tp_xml = ?, fid_st_xml = ?, fid_tp_xml_dvy = ?, fid_st_xml_dvy = ?, fid_dps_year_n = ?, fid_dps_doc_n = ?, fid_rec_year_n = ?, fid_rec_per_n = ?, fid_rec_bkc_n = ?, fid_rec_tp_rec_n = ?, fid_rec_num_n = ?, fid_rec_ety_n = ?, fid_pay_pay_n = ?, fid_pay_emp_n = ?, fid_pay_bpr_n = ?, fid_pay_rcp_pay_n = ?, fid_pay_rcp_emp_n = ?, fid_pay_rcp_iss_n = ?, fid_usr_dvy = ?, ts_dvy = NOW() " +
+                        "WHERE id_cfd = " + mnPkCfdId + " ";
             }
             
-            //if (!sql.isEmpty()) {
-                preparedStatement = connection.prepareStatement(sql);
+            preparedStatement = connection.prepareStatement(sql);
 
-                if (mbGenerateQrCode) {
-                    bufferedImage = DCfd.createQrCodeBufferedImageCfdi32(msAuxRfcEmisor, msAuxRfcReceptor, mdAuxTotalCy, msUuid);
-                    moQrCode_n = converterBufferedImageToByteArray(bufferedImage);
-                }
+            if (mbGenerateQrCode) {
+                bufferedImage = DCfd.createQrCodeBufferedImageCfdi32(msAuxRfcEmisor, msAuxRfcReceptor, mdAuxTotalCy, msUuid);
+                moQrCode_n = converterBufferedImageToByteArray(bufferedImage);
+            }
 
-                preparedStatement.setTimestamp(index++, new java.sql.Timestamp(mtTimestamp.getTime()));
-                preparedStatement.setString(index++, msCertNumber);
-                preparedStatement.setString(index++, msStringSigned);
-                preparedStatement.setString(index++, msSignature);
-                preparedStatement.setString(index++, msDocXml);
-                preparedStatement.setString(index++, msDocXmlName);
-                if (mnFkXmlTypeId != SDataConstantsSys.TRNS_TP_XML_CFDI_32 && mnFkXmlTypeId != SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
-                    preparedStatement.setString(index++, "");
-                    preparedStatement.setNull(index++, java.sql.Types.BLOB);
-                }
-                else {
-                    preparedStatement.setString(index++, msUuid);
+            preparedStatement.setTimestamp(index++, new java.sql.Timestamp(mtTimestamp.getTime()));
+            preparedStatement.setString(index++, msCertNumber);
+            preparedStatement.setString(index++, msStringSigned);
+            preparedStatement.setString(index++, msSignature);
+                
+            processObtainXmlValues(connection, msDocXml);
+            moDocXml_ns = SLibUtils.zip(msDocXml);
+            
+            if (moDocXml_ns.length == 0) {
+                preparedStatement.setNull(index++, java.sql.Types.BLOB);
+            }
+            else {
+                preparedStatement.setBytes(index++, moDocXml_ns);
+            }
+            
+            preparedStatement.setString(index++, msDocXml);
+            preparedStatement.setString(index++, msDocXmlName);
+        
+            preparedStatement.setString(index++, msDocXmlRfcEmi);
+            preparedStatement.setString(index++, msDocXmlRfcRec);
+            preparedStatement.setDouble(index++, mdDocXmlTot);
+            preparedStatement.setString(index++, msDocXmlMon);
+            preparedStatement.setDouble(index++, mdDocXmlTc);
+            
+            if (mtDocXmlSign_n == null) {
+                preparedStatement.setNull(index++, java.sql.Types.DATE);
+            }
+            else {
+                preparedStatement.setTimestamp(index++, new java.sql.Timestamp(mtDocXmlSign_n.getTime()));
+            }
+            preparedStatement.setString(index++, msUuid);
 
-                    if (mnFkXmlStatusId != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
-                        if (moQrCode_n == null) {
-                            preparedStatement.setNull(index++, java.sql.Types.BLOB);
-                        }
-                        else {
-                            preparedStatement.setBytes(index++, moQrCode_n);
-                        }
+            if (mnFkXmlTypeId != SDataConstantsSys.TRNS_TP_XML_CFDI_32 && mnFkXmlTypeId != SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
+                preparedStatement.setNull(index++, java.sql.Types.BLOB);
+            }
+            else {
+                if (mnFkXmlStatusId != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
+                    if (moQrCode_n == null) {
+                        preparedStatement.setNull(index++, java.sql.Types.BLOB);
+                    }
+                    else {
+                        preparedStatement.setBytes(index++, moQrCode_n);
                     }
                 }
-                preparedStatement.setString(index++, msAcknowledgmentCancellationXml);
-                if (!bIsUpd) {
-                    preparedStatement.setNull(index++, java.sql.Types.BLOB); // it's cannot updated a object blob (2014-09-01, jbarajas)
-                }
-                preparedStatement.setString(index++, msAcknowledgmentDelivery);
-                preparedStatement.setString(index++, msMessageDelivery);
-                if (!bIsUpd) {
-                    preparedStatement.setBoolean(index++, mbIsProcessingWebService);
-                    preparedStatement.setBoolean(index++, mbIsProcessingStorageXml);
-                    preparedStatement.setBoolean(index++, mbIsProcessingStoragePdf);
-                }
-                preparedStatement.setBoolean(index++, mbIsConsistent);
-                preparedStatement.setInt(index++, mnFkCfdTypeId);
-                preparedStatement.setInt(index++, mnFkXmlTypeId);
-                preparedStatement.setInt(index++, mnFkXmlStatusId);
-                preparedStatement.setInt(index++, mnFkXmlDeliveryTypeId);
-                preparedStatement.setInt(index++, mnFkXmlDeliveryStatusId);
-                if (mnFkDpsYearId_n == SLibConsts.UNDEFINED) {
-                    preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
-                    preparedStatement.setNull(index++, java.sql.Types.INTEGER);
-                }
-                else {
-                    preparedStatement.setInt(index++, mnFkDpsYearId_n);
-                    preparedStatement.setInt(index++, mnFkDpsDocId_n);
-                }
-                if (mnFkRecordYearId_n == SLibConsts.UNDEFINED) {
-                    preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
-                    preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
-                    preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
-                    preparedStatement.setNull(index++, java.sql.Types.CHAR);
-                    preparedStatement.setNull(index++, java.sql.Types.INTEGER);
-                    preparedStatement.setNull(index++, java.sql.Types.INTEGER);
-                }
-                else {
-                    preparedStatement.setInt(index++, mnFkRecordYearId_n);
-                    preparedStatement.setInt(index++, mnFkRecordPeriodId_n);
-                    preparedStatement.setInt(index++, mnFkRecordBookkeepingCenterId_n);
-                    preparedStatement.setString(index++, msFkRecordRecordTypeId_n);
-                    preparedStatement.setInt(index++, mnFkRecordNumberId_n);
-                    preparedStatement.setInt(index++, mnFkRecordEntryId_n);
-                }
-                if (mnFkPayrollPayrollId_n == SLibConsts.UNDEFINED) {
-                    preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
-                    preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
-                    preparedStatement.setNull(index++, java.sql.Types.INTEGER);
-                }
-                else {
-                    preparedStatement.setInt(index++, mnFkPayrollPayrollId_n);
-                    preparedStatement.setInt(index++, mnFkPayrollEmployeeId_n);
-                    preparedStatement.setInt(index++, mnFkPayrollBizPartnerId_n);
-                }
-                if (mnFkPayrollReceiptPayrollId_n == SLibConsts.UNDEFINED) {
-                    preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
-                    preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
-                    preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
-                }
-                else {
-                    preparedStatement.setInt(index++, mnFkPayrollReceiptPayrollId_n);
-                    preparedStatement.setInt(index++, mnFkPayrollReceiptEmployeeId_n);
-                    preparedStatement.setInt(index++, mnFkPayrollReceiptIssueId_n);
-                }
-                if (!bIsUpd) {
-                    preparedStatement.setInt(index++, mnFkUserProcessingId);
-                }
-                preparedStatement.setInt(index++, mnFkUserDeliveryId);
-                preparedStatement.execute();
-            //}
+            }
+
+            preparedStatement.setString(index++, msAcknowledgmentCancellationXml);
+            if (!bIsUpd) {
+                preparedStatement.setNull(index++, java.sql.Types.BLOB); // it's cannot updated a object blob (2014-09-01, jbarajas)
+            }
+            preparedStatement.setString(index++, msAcknowledgmentDelivery);
+            preparedStatement.setString(index++, msMessageDelivery);
+            if (!bIsUpd) {
+                preparedStatement.setBoolean(index++, mbIsProcessingWebService);
+                preparedStatement.setBoolean(index++, mbIsProcessingStorageXml);
+                preparedStatement.setBoolean(index++, mbIsProcessingStoragePdf);
+            }
+            preparedStatement.setBoolean(index++, mbIsConsistent);
+            preparedStatement.setInt(index++, mnFkCfdTypeId);
+            preparedStatement.setInt(index++, mnFkXmlTypeId);
+            preparedStatement.setInt(index++, mnFkXmlStatusId);
+            preparedStatement.setInt(index++, mnFkXmlDeliveryTypeId);
+            preparedStatement.setInt(index++, mnFkXmlDeliveryStatusId);
+            if (mnFkDpsYearId_n == SLibConsts.UNDEFINED) {
+                preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
+                preparedStatement.setNull(index++, java.sql.Types.INTEGER);
+            }
+            else {
+                preparedStatement.setInt(index++, mnFkDpsYearId_n);
+                preparedStatement.setInt(index++, mnFkDpsDocId_n);
+            }
+            if (mnFkRecordYearId_n == SLibConsts.UNDEFINED) {
+                preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
+                preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
+                preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
+                preparedStatement.setNull(index++, java.sql.Types.CHAR);
+                preparedStatement.setNull(index++, java.sql.Types.INTEGER);
+                preparedStatement.setNull(index++, java.sql.Types.INTEGER);
+            }
+            else {
+                preparedStatement.setInt(index++, mnFkRecordYearId_n);
+                preparedStatement.setInt(index++, mnFkRecordPeriodId_n);
+                preparedStatement.setInt(index++, mnFkRecordBookkeepingCenterId_n);
+                preparedStatement.setString(index++, msFkRecordRecordTypeId_n);
+                preparedStatement.setInt(index++, mnFkRecordNumberId_n);
+                preparedStatement.setInt(index++, mnFkRecordEntryId_n);
+            }
+            if (mnFkPayrollPayrollId_n == SLibConsts.UNDEFINED) {
+                preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
+                preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
+                preparedStatement.setNull(index++, java.sql.Types.INTEGER);
+            }
+            else {
+                preparedStatement.setInt(index++, mnFkPayrollPayrollId_n);
+                preparedStatement.setInt(index++, mnFkPayrollEmployeeId_n);
+                preparedStatement.setInt(index++, mnFkPayrollBizPartnerId_n);
+            }
+            if (mnFkPayrollReceiptPayrollId_n == SLibConsts.UNDEFINED) {
+                preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
+                preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
+                preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
+            }
+            else {
+                preparedStatement.setInt(index++, mnFkPayrollReceiptPayrollId_n);
+                preparedStatement.setInt(index++, mnFkPayrollReceiptEmployeeId_n);
+                preparedStatement.setInt(index++, mnFkPayrollReceiptIssueId_n);
+            }
+            if (!bIsUpd) {
+                preparedStatement.setInt(index++, mnFkUserProcessingId);
+            }
+            preparedStatement.setInt(index++, mnFkUserDeliveryId);
+            preparedStatement.execute();
             
             mnDbmsErrorId = 0;
             msDbmsError = "";
@@ -653,7 +778,7 @@ extends erp.lib.data.SDataRegistry implements java.io.Serializable {
     }
     
     public boolean isStamped() {
-        return !msUuid.isEmpty();
+        return mnFkXmlTypeId != SDataConstantsSys.TRNS_TP_XML_CFDI_32 && mnFkXmlTypeId != SDataConstantsSys.TRNS_TP_XML_CFDI_33 && !msUuid.isEmpty();
     }
     
     public void saveField(java.sql.Connection connection, final int[] pk, final int field, final Object value) throws Exception {

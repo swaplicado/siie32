@@ -193,7 +193,7 @@ public class STrnInventoryValuation {
                     + "INNER JOIN trn_diog AS d ON s.fid_diog_year = d.id_year AND s.fid_diog_doc = d.id_doc "
                     + "LEFT OUTER JOIN mfg_ord AS o ON d.fid_mfg_year_n = o.id_year AND d.fid_mfg_ord_n = o.id_ord "
                     + "WHERE d.b_del = 0 AND s.b_del = 0 AND "
-                    + "s.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
+                    + "s.id_year = " + mnYear + " AND s.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
                     + "d.fid_mfg_year_n = " + productionOrderYear + " AND d.fid_mfg_ord_n = " + productionOrderDoc + " "
                     + "ORDER BY S.dt DESC, s.id_mov DESC; ";
             
