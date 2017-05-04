@@ -7,7 +7,6 @@ package erp.mtrn.data;
 
 import cfd.DCfdUtils;
 import cfd.DElement;
-import cfd.ver3.nom11.DElementNomina;
 import cfd.ver32.DElementComprobante;
 import cfd.ver32.DElementTimbreFiscalDigital;
 import erp.cfd.SCfdConsts;
@@ -1122,32 +1121,37 @@ public class SCfdPrint {
 
             if (element.getName().compareTo("nomina:Nomina") == 0) {
 
-                map.put("RegistroPatronal", ((DElementNomina) element).getAttRegistroPatronal().getString());
-                map.put("NumEmpleado", ((DElementNomina) element).getAttNumEmpleado().getString());
-                map.put("CURP", ((DElementNomina) element).getAttCurp().getString());
-                map.put("TipoRegimen", SCfdConsts.RegimenMap.get(((DElementNomina) element).getAttTipoRegimen().getInteger()));
-                map.put("NumSeguridadSocial", ((DElementNomina) element).getAttNumSeguridadSocial().getString());
-                map.put("FechaPago", oSimpleDateFormat.format(((DElementNomina) element).getAttFechaPago().getDate()));
-                map.put("FechaInicialPago", oSimpleDateFormat.format(((DElementNomina) element).getAttFechaInicialPago().getDate()));
-                map.put("FechaFinalPago", oSimpleDateFormat.format(((DElementNomina) element).getAttFechaFinalPago().getDate()));
+                map.put("RegistroPatronal", ((cfd.ver3.nom11.DElementNomina) element).getAttRegistroPatronal().getString());
+                map.put("NumEmpleado", ((cfd.ver3.nom11.DElementNomina) element).getAttNumEmpleado().getString());
+                map.put("CURP", ((cfd.ver3.nom11.DElementNomina) element).getAttCurp().getString());
+                //map.put("TipoRegimen", SCfdConsts.RegimenMap.get(((cfd.ver3.nom11.DElementNomina) element).getAttTipoRegimen().getInteger()));
+                map.put("TipoRegimen", miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { ((cfd.ver3.nom11.DElementNomina) element).getAttTipoRegimen().getInteger() }, SDbRegistry.FIELD_NAME));
+                map.put("NumSeguridadSocial", ((cfd.ver3.nom11.DElementNomina) element).getAttNumSeguridadSocial().getString());
+                map.put("FechaPago", oSimpleDateFormat.format(((cfd.ver3.nom11.DElementNomina) element).getAttFechaPago().getDate()));
+                map.put("FechaInicialPago", oSimpleDateFormat.format(((cfd.ver3.nom11.DElementNomina) element).getAttFechaInicialPago().getDate()));
+                map.put("FechaFinalPago", oSimpleDateFormat.format(((cfd.ver3.nom11.DElementNomina) element).getAttFechaFinalPago().getDate()));
                 map.put("NumDiasNoLaborados", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getDaysNotWorked() : payrollReceipt.getDaysNotWorked_r());
                 map.put("NumDiasLaborados", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getDaysWorked() : payrollReceipt.getDaysWorked()); // XXX Optional
                 map.put("NumDiasPagar", 0d); // Calculate?, navalos (2014-03-13)
-                map.put("NumDiasPagados", ((DElementNomina) element).getAttNumDiasPagados().getDouble());
-                map.put("Departamento", ((DElementNomina) element).getAttDepartamento().getString());
-                map.put("CLABE", ((DElementNomina) element).getAttClabe().getString());
-                map.put("Banco", SCfdConsts.BancoMap.get(((DElementNomina) element).getAttBanco().getInteger()));
-                map.put("FechaInicioRelLaboral", oSimpleDateFormat.format(((DElementNomina) element).getAttFechaInicioRelLaboral().getDate()));
-                map.put("Antiguedad", ((DElementNomina) element).getAttAntiguedad().getInteger());
-                map.put("Puesto", ((DElementNomina) element).getAttPuesto().getString());
-                map.put("TipoContrato", ((DElementNomina) element).getAttTipoContrato().getString());
-                map.put("TipoJornada", ((DElementNomina) element).getAttTipoJornada().getString());
-                map.put("PeriodicidadPago", ((DElementNomina) element).getAttPeriodicidadPago().getString());
-                map.put("RiesgoPuesto", SCfdConsts.RiesgoMap.get(((DElementNomina) element).getAttRiesgoPuesto().getInteger()));
+                map.put("NumDiasPagados", ((cfd.ver3.nom11.DElementNomina) element).getAttNumDiasPagados().getDouble());
+                map.put("Departamento", ((cfd.ver3.nom11.DElementNomina) element).getAttDepartamento().getString());
+                map.put("CLABE", ((cfd.ver3.nom11.DElementNomina) element).getAttClabe().getString());
+                //map.put("Banco", SCfdConsts.BancoMap.get(((cfd.ver3.nom11.DElementNomina) element).getAttBanco().getInteger()));
+                if (((cfd.ver3.nom11.DElementNomina) element).getAttBanco().getInteger() > 0) {
+                    map.put("Banco", miClient.getSession().readField(SModConsts.HRSS_BANK, new int[] { ((cfd.ver3.nom11.DElementNomina) element).getAttBanco().getInteger() }, SDbRegistry.FIELD_NAME));
+                }
+                map.put("FechaInicioRelLaboral", oSimpleDateFormat.format(((cfd.ver3.nom11.DElementNomina) element).getAttFechaInicioRelLaboral().getDate()));
+                map.put("Antiguedad", ((cfd.ver3.nom11.DElementNomina) element).getAttAntiguedad().getInteger());
+                map.put("Puesto", ((cfd.ver3.nom11.DElementNomina) element).getAttPuesto().getString());
+                map.put("TipoContrato", ((cfd.ver3.nom11.DElementNomina) element).getAttTipoContrato().getString());
+                map.put("TipoJornada", ((cfd.ver3.nom11.DElementNomina) element).getAttTipoJornada().getString());
+                map.put("PeriodicidadPago", ((cfd.ver3.nom11.DElementNomina) element).getAttPeriodicidadPago().getString());
+                //map.put("RiesgoPuesto", SCfdConsts.RiesgoMap.get(((cfd.ver3.nom11.DElementNomina) element).getAttRiesgoPuesto().getInteger()));
+                map.put("RiesgoPuesto", miClient.getSession().readField(SModConsts.HRSS_TP_POS_RISK, new int[] { ((cfd.ver3.nom11.DElementNomina) element).getAttRiesgoPuesto().getInteger() }, SDbRegistry.FIELD_NAME));
                 map.put("TipoPago", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? SModSysConsts.HRSS_TP_PAY_FOR : payrollReceipt.getFkPaymentTypeId());
                 map.put("Sueldo", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getSalary() : payrollReceipt.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? payrollReceipt.getSalary() : payrollReceipt.getWage());
-                map.put("SalarioBaseCotApor", ((DElementNomina) element).getAttSalarioBaseCotApor().getDouble());
-                map.put("SalarioDiarioIntegrado", ((DElementNomina) element).getAttSalarioDiarioIntegrado().getDouble());
+                map.put("SalarioBaseCotApor", ((cfd.ver3.nom11.DElementNomina) element).getAttSalarioBaseCotApor().getDouble());
+                map.put("SalarioDiarioIntegrado", ((cfd.ver3.nom11.DElementNomina) element).getAttSalarioDiarioIntegrado().getDouble());
                 
                 if (payrollReceipt.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_FOR) {
                     dIngresoAux = subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getSalary() : payrollReceipt.getWage();
@@ -1237,7 +1241,7 @@ public class SCfdPrint {
                         // Obtain isr tax
 
                         if (((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttClave().getString().compareTo(SCfdConsts.PAYROLL_PER_ISR) == 0 &&
-                            ((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttTipoDeduccion().getInteger() == SCfdConsts.DED_ISR) {
+                            ((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttTipoDeduccion().getInteger() == SModSysConsts.HRSS_TP_DED_TAX) {
                             dTotalIsr += ((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteGravado().getDouble();
                         }
 
@@ -1470,13 +1474,18 @@ public class SCfdPrint {
                     map.put("TipoContrato", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttTipoContrato().getString());
                     // Sindicalizado 
                     map.put("TipoJornada", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttTipoJornada().getString());
-                    map.put("TipoRegimen", SCfdConsts.RegimenMap.get(SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttTipoRegimen().getString())));
+                    //map.put("TipoRegimen", SCfdConsts.RegimenMap.get(SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttTipoRegimen().getString())));
+                    map.put("TipoRegimen", miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttTipoRegimen().getString()) }, SDbRegistry.FIELD_NAME));
                     map.put("NumEmpleado", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttNumEmpleado().getString());
                     map.put("Departamento", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttDepartamento().getString());
                     map.put("Puesto", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttPuesto().getString());
-                    map.put("RiesgoPuesto", SCfdConsts.RiesgoMap.get(SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttRiesgoPuesto().getString())));
+                    //map.put("RiesgoPuesto", SCfdConsts.RiesgoMap.get(SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttRiesgoPuesto().getString())));
+                    map.put("RiesgoPuesto", miClient.getSession().readField(SModConsts.HRSS_TP_POS_RISK, new int[] { SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttRiesgoPuesto().getString()) }, SDbRegistry.FIELD_NAME));
                     map.put("PeriodicidadPago", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttPeriodicidadPago().getString());
-                    map.put("Banco", SCfdConsts.BancoMap.get(SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttBanco().getString())));
+                    //map.put("Banco", SCfdConsts.BancoMap.get(SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttBanco().getString())));
+                    if (!((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttBanco().getString().isEmpty()) {
+                        map.put("Banco", miClient.getSession().readField(SModConsts.HRSS_BANK, new int[] { SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttBanco().getString()) }, SDbRegistry.FIELD_NAME));
+                    }
                     map.put("CLABE", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttCuentaBancaria().getString());
                     map.put("SalarioBaseCotApor", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttSalarioBaseCotApor().getDouble());
                     map.put("SalarioDiarioIntegrado", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttSalarioDiarioIntegrado().getDouble());
@@ -1580,7 +1589,7 @@ public class SCfdPrint {
                         // Obtain isr tax
 
                         if (((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttClave().getString().compareTo(SCfdConsts.PAYROLL_PER_ISR) == 0 &&
-                            SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttTipoDeduccion().getString()) == SCfdConsts.DED_ISR) {
+                            SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttTipoDeduccion().getString()) == SModSysConsts.HRSS_TP_DED_TAX) {
                             dTotalIsr += ((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporte().getDouble();
                         }
 

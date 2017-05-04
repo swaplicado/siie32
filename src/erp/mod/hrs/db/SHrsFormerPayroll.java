@@ -8,6 +8,7 @@ import cfd.DElement;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdDataBizPartner;
 import erp.client.SClientInterface;
+import erp.mod.SModSysConsts;
 import erp.mtrn.data.SDataCfd;
 import java.util.ArrayList;
 import java.util.Date;
@@ -227,7 +228,7 @@ public class SHrsFormerPayroll {
 
                             payrollReceipt.getChildPayrollConcept().add(payrollConcept);
 
-                            if (((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttTipoPercepcion().getInteger() == SCfdConsts.PER_HRS_EXT) {
+                            if (((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttTipoPercepcion().getInteger() == SModSysConsts.HRSS_TP_EAR_OVR_TME) {
                                 payrollExtraTime = new SHrsFormerPayrollExtraTime();
 
                                 for (int j = 0; j < ((cfd.ver3.nom11.DElementNomina) element).getEltHorasExtras().getEltHijosHorasExtra().size(); j++) {
@@ -285,7 +286,7 @@ public class SHrsFormerPayroll {
 
                             payrollReceipt.getChildPayrollConcept().add(payrollConcept);
 
-                            if (SLibUtils.belongsTo(((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttTipoDeduccion().getInteger(), new int[] { SCfdConsts.DED_INC, SCfdConsts.DED_AUS })) {
+                            if (SLibUtils.belongsTo(((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttTipoDeduccion().getInteger(), new int[] { SModSysConsts.HRSS_TP_DED_DIS, SModSysConsts.HRSS_TP_DED_ABS })) {
                                 for (int j = 0; j < ((cfd.ver3.nom11.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().size(); j++) {
                                 }
                             }

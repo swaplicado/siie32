@@ -848,6 +848,7 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_DED_SSC = 1;    // Social Security
     public static final int HRSS_TP_DED_TAX = 2;    // Tax
     public static final int HRSS_TP_DED_DIS = 6;    // Disability
+    public static final int HRSS_TP_DED_ABS = 20;    // Absenteeism
 
     public static final int HRSS_TP_BEN_NON = 1;        // Non applicable
     public static final int HRSS_TP_BEN_ANN_BON = 11;   // Annual bonus
