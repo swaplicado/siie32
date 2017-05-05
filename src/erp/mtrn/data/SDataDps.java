@@ -4779,13 +4779,13 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
     
     @Override
-    public ArrayList<SCfdDataImpuesto> getCfdImpuestos(float xmlVersion) {
+    public ArrayList<SCfdDataImpuesto> getCfdImpuestos(float cfdiVersion) {
         ArrayList<SCfdDataImpuesto> cfdDataImpuestos = null;
         
-        if (xmlVersion == DCfdConsts.CFDI_VER_32) {
+        if (cfdiVersion == DCfdConsts.CFDI_VER_32) {
             cfdDataImpuestos = createTaxesCfd32();
         }
-        else if (xmlVersion == DCfdConsts.CFDI_VER_33) {
+        else if (cfdiVersion == DCfdConsts.CFDI_VER_33) {
             cfdDataImpuestos = createTaxesCfd33();
         }
         

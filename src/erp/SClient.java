@@ -840,7 +840,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
     private void createCfdSignatures() {
         int nXmlType = 0;
-        float cfdVersion = 0;
+        float cfdiVersion = 0;
         DCfdSignature cfdSignature = null;
         SDataCertificate companyCertificate = null;
 
@@ -855,23 +855,23 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             switch (nXmlType) {
                 case SDataConstantsSys.TRNS_TP_XML_CFD:
                 case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
-                    cfdVersion = DCfdConsts.CFDI_VER_32;
+                    cfdiVersion = DCfdConsts.CFDI_VER_32;
                     break;
                 case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
-                    cfdVersion = DCfdConsts.CFDI_VER_33;
+                    cfdiVersion = DCfdConsts.CFDI_VER_33;
                     break;
                 default:
                     throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
             }
 
             if (companyCertificate != null && companyCertificate.getExtraPrivateKeyBytes_n() != null && companyCertificate.getExtraPublicKeyBytes_n() != null) {
-                moCfdSignature = new DCfdSignature(companyCertificate.getExtraPrivateKeyBytes_n(), companyCertificate.getExtraPublicKeyBytes_n(), companyCertificate.getNumber(), cfdVersion);
+                moCfdSignature = new DCfdSignature(companyCertificate.getExtraPrivateKeyBytes_n(), companyCertificate.getExtraPublicKeyBytes_n(), companyCertificate.getNumber(), cfdiVersion);
                 moCfdSignature.setDate(companyCertificate.getDate());
                 moCfdSignature.setExpirationDate(companyCertificate.getExpirationDate());
 
                 for (SDataCertificate certificate : moSessionXXX.getDbmsCertificates()) {
                     if (certificate != null && certificate.getExtraPrivateKeyBytes_n() != null && certificate.getExtraPublicKeyBytes_n() != null) {
-                        cfdSignature = new DCfdSignature(certificate.getExtraPrivateKeyBytes_n(), certificate.getExtraPublicKeyBytes_n(), certificate.getNumber(), cfdVersion);
+                        cfdSignature = new DCfdSignature(certificate.getExtraPrivateKeyBytes_n(), certificate.getExtraPublicKeyBytes_n(), certificate.getNumber(), cfdiVersion);
                         cfdSignature.setDate(certificate.getDate());
                         cfdSignature.setExpirationDate(certificate.getExpirationDate());
                         mvCfdSignatures.add(cfdSignature);
