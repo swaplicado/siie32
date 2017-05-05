@@ -100,7 +100,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author  Sergio Flores, Uriel Castañeda
+ * @author  Sergio Flores, Uriel Castañeda, Juan Barajas
  * @version 3.2
  */
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
