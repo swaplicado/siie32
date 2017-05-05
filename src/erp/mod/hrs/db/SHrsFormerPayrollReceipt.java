@@ -789,7 +789,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
     
     @Override
     public String getCfdUsoCfdi() {
-        return "";        
+        return "P01";// XXX jbarajas pendiente CFDI 3.3
     }
 
     @Override
@@ -823,25 +823,27 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
     @Override
     public ArrayList<SCfdDataConcepto> getCfdConceptos() {
         ArrayList<SCfdDataConcepto> concepts = null;
-        SCfdDataConcepto concept = null;
+        SCfdDataConcepto conceptoXml = null;
 
         concepts = new ArrayList<SCfdDataConcepto>();
-        concept = new SCfdDataConcepto();
+        conceptoXml = new SCfdDataConcepto();
 
-        concept.setNoIdentificacion("");
-        concept.setUnidad("ACT");
-        concept.setCantidad(1);
-        concept.setDescripcion(moPayroll.getDescripcion());
-        concept.setValorUnitario(mdTotalPercepciones);
-        concept.setImporte(mdTotalPercepciones);
+        conceptoXml.setNoIdentificacion("");
+        conceptoXml.setUnidad("ACT");
+        conceptoXml.setCantidad(1);
+        conceptoXml.setDescripcion(moPayroll.getDescripcion());
+        conceptoXml.setValorUnitario(mdTotalPercepciones);
+        conceptoXml.setImporte(mdTotalPercepciones);
+        conceptoXml.setClaveProdServ("84111505");
+        conceptoXml.setClaveUnidad("ACT");
 
-        concepts.add(concept);
+        concepts.add(conceptoXml);
 
         return concepts;
     }
 
     @Override
-    public ArrayList<SCfdDataImpuesto> getCfdImpuestos() {
+    public ArrayList<SCfdDataImpuesto> getCfdImpuestos(float xmlVersion) {
         return new ArrayList<SCfdDataImpuesto>();
     }
 }

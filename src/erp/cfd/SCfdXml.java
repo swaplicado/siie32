@@ -43,5 +43,5 @@ public interface SCfdXml {
 
     public ArrayList<SCfdDataCfdiRelacionado> getCfdCfdiRelacionados();
     public ArrayList<SCfdDataConcepto> getCfdConceptos();
-    public ArrayList<SCfdDataImpuesto> getCfdImpuestos();
+    public ArrayList<SCfdDataImpuesto> getCfdImpuestos(float xmlVersion);
 }

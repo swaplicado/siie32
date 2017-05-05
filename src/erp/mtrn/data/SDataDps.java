@@ -10,6 +10,7 @@ import cfd.DAttributeOptionImpuestoRetencion;
 import cfd.DAttributeOptionImpuestoTraslado;
 import cfd.DAttributeOptionMoneda;
 import cfd.DAttributeOptionTipoComprobante;
+import cfd.DCfdConsts;
 import cfd.DCfdTax;
 import cfd.DCfdTaxes;
 import cfd.DElement;
@@ -4778,8 +4779,17 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
     
     @Override
-    public ArrayList<SCfdDataImpuesto> getCfdImpuestos() {
-        return createTaxesCfd32();
+    public ArrayList<SCfdDataImpuesto> getCfdImpuestos(float xmlVersion) {
+        ArrayList<SCfdDataImpuesto> cfdDataImpuestos = null;
+        
+        if (xmlVersion == DCfdConsts.CFDI_VER_32) {
+            cfdDataImpuestos = createTaxesCfd32();
+        }
+        else if (xmlVersion == DCfdConsts.CFDI_VER_33) {
+            cfdDataImpuestos = createTaxesCfd33();
+        }
+        
+        return cfdDataImpuestos;
     }
 
     public void saveField(java.sql.Connection connection, final int[] pk, final int field, final Object value) throws Exception {

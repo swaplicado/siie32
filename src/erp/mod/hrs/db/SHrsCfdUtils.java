@@ -154,11 +154,13 @@ public abstract class SHrsCfdUtils {
     }
     
     public static SDataCfd computeCfdi(final SGuiSession session, final SHrsFormerPayrollReceipt receipt, final int receiptIssue, final boolean cfdiPendingSigned) throws Exception {
+        int nXmlType = 0;
         boolean add = true;
         String sql;
         SCfdPacket packet = null;
         SDbFormerPayrollImport payrollImport = null;
-        cfd.ver32.DElementComprobante comprobanteCfdi = null;
+        cfd.ver32.DElementComprobante comprobanteCfdi32 = null;
+        cfd.ver33.DElementComprobante comprobanteCfdi33 = null;
         ArrayList<SCfdPacket> moCfdPackets = new ArrayList<SCfdPacket>();
         ResultSet resultSet = null;
         
@@ -183,21 +185,37 @@ public abstract class SHrsCfdUtils {
         }
                             
         if (add) {
-            
             // Generate CFDI:
-
-            comprobanteCfdi = (cfd.ver32.DElementComprobante) SCfdUtils.createCfdi32RootElement((SClientInterface)session.getClient(), receipt);
-            
-            // CFDI generating package to save:
 
             packet = new SCfdPacket();
             packet.setDpsYearId(0);
             packet.setDpsDocId(0);
             packet.setCfdId(cfdId);
-            packet.setIsConsistent(cfdId == SLibConstants.UNDEFINED ? true : false);
-            packet.setStringSigned(DUtilUtils.generateOriginalString(comprobanteCfdi));
+            packet.setIsConsistent(cfdId == SLibConstants.UNDEFINED);
+            
+            nXmlType = ((SClientInterface) session.getClient()).getSessionXXX().getParamsCompany().getFkXmlTypeId();
+            
+            switch (nXmlType) {
+                case SDataConstantsSys.TRNS_TP_XML_CFD:
+                    break;
+                    case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
+                        comprobanteCfdi32 = (cfd.ver32.DElementComprobante) SCfdUtils.createCfdi32RootElement((SClientInterface)session.getClient(), receipt);
+                        
+                        packet.setStringSigned(DUtilUtils.generateOriginalString(comprobanteCfdi32));
+                    break;
+                case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                        comprobanteCfdi33 = (cfd.ver33.DElementComprobante) SCfdUtils.createCfdi33RootElement((SClientInterface) session.getClient(), receipt);
+                        
+                        comprobanteCfdi33.getAttNoCertificado().setString(((SClientInterface) session.getClient()).getCfdSignature().getCertNumber());
+                        
+                        packet.setStringSigned(DUtilUtils.generateOriginalString(comprobanteCfdi33));
+                    break;
+                default:
+                    throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
+            }
+            
             packet.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_PAY);
-            packet.setFkXmlTypeId(SDataConstantsSys.TRNS_TP_XML_CFDI_32);// XXX jbarajas pendiente CFDI 3.3 
+            packet.setFkXmlTypeId(nXmlType);
             packet.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW);
             packet.setFkXmlDeliveryTypeId(SModSysConsts.TRNS_TP_XML_DVY_NA);
             packet.setFkXmlDeliveryStatusId(SModSysConsts.TRNS_ST_XML_DVY_PENDING);
@@ -217,11 +235,23 @@ public abstract class SHrsCfdUtils {
             packet.setCertNumber(((SClientInterface)session.getClient()).getCfdSignature().getCertNumber());
             packet.setCertBase64(((SClientInterface)session.getClient()).getCfdSignature().getCertBase64());
             
-            comprobanteCfdi.getAttSello().setString(packet.getSignature());
-            comprobanteCfdi.getAttNoCertificado().setString(packet.getCertNumber());
-            comprobanteCfdi.getAttCertificado().setString(packet.getCertBase64());
-            
-            packet.setCfdRootElement(comprobanteCfdi);
+            switch (nXmlType) {
+                case SDataConstantsSys.TRNS_TP_XML_CFD:
+                    break;
+                case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
+                    comprobanteCfdi32.getAttSello().setString(packet.getSignature());
+                    comprobanteCfdi32.getAttNoCertificado().setString(packet.getCertNumber());
+                    comprobanteCfdi32.getAttCertificado().setString(packet.getCertBase64());
+                    packet.setCfdRootElement(comprobanteCfdi32);
+                    break;
+                case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                    comprobanteCfdi33.getAttSello().setString(packet.getSignature());
+                    comprobanteCfdi33.getAttCertificado().setString(packet.getCertBase64());
+                    packet.setCfdRootElement(comprobanteCfdi33);
+                    break;
+                default:
+                    throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
+            }
 
             moCfdPackets.add(packet);
 

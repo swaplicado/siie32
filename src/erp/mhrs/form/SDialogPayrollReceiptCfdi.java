@@ -679,6 +679,7 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
     // End of variables declaration//GEN-END:variables
 
     public void resetForm() {
+        int nXmlType = 0;
         mnFormResult = SLibConstants.UNDEFINED;
         mbFirstTime = true;
 
@@ -687,8 +688,16 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
         jtfPayrollDates.setText("");
         jtfPayrollNotes.setText("");
 
+        nXmlType = miClient.getSessionXXX().getParamsCompany().getFkXmlTypeId();
+        
         SFormUtilities.populateComboBox(miClient, jcbFkPaymentSystemTypeId, SDataConstants.TRNU_TP_PAY_SYS);
-        moFieldFkPaymentSystemTypeId.setFieldValue(new int[] { SDataConstantsSys.TRNU_TP_PAY_SYS_NA });
+        
+        if (nXmlType == SDataConstantsSys.TRNS_TP_XML_CFDI_32) {
+            moFieldFkPaymentSystemTypeId.setFieldValue(new int[] { SDataConstantsSys.TRNU_TP_PAY_SYS_NA });
+        }
+        else if (nXmlType == SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
+            moFieldFkPaymentSystemTypeId.setFieldValue(new int[] { SDataConstantsSys.TRNU_TP_PAY_SYS_OTHER });
+        }
         jcbFkPaymentSystemTypeId.setEnabled(false);
         moFieldDate.setDate(miClient.getSession().getCurrentDate());
         moFieldDatePayment.setDate(null);

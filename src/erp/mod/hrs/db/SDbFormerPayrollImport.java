@@ -94,16 +94,28 @@ public class SDbFormerPayrollImport extends SDataRegistry implements Serializabl
                     cfd.saveField(connection, new int[] { packet.getCfdId() }, SDataCfd.FIELD_B_CON, packet.getIsConsistent());
                 }
                 else {
-                    xmlFile = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?>\n";
-                    xmlFile += ((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getElementForXml();
+                    if (packet.getCfdRootElement() instanceof cfd.ver32.DElementComprobante) {
+                        xmlFile = ((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getElementForXml();
 
-                    xmlFileName = "";
-                    xmlFileName += ((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getEltEmisor().getAttRfc().getString() + "_";
-                    xmlFileName += ((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getAttTipoDeComprobante().getOption().substring(0, 1).toUpperCase() + "_";
-                    xmlFileName += (((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString().length() == 0 ? "" : ((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString() + "_");
-                    xmlFileName += decimalFormat.format(SLibUtils.parseLong(((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getAttFolio().getString())) + ".xml";
-                    dateCfd = ((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getAttFecha().getDatetime();
+                        xmlFileName += ((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getEltEmisor().getAttRfc().getString() + "_";
+                        xmlFileName += ((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getAttTipoDeComprobante().getOption().substring(0, 1).toUpperCase() + "_";
+                        xmlFileName += (((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString().length() == 0 ? "" : ((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString() + "_");
+                        xmlFileName += decimalFormat.format(SLibUtils.parseLong(((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getAttFolio().getString())) + ".xml";
+                        dateCfd = ((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getAttFecha().getDatetime();
+                    }
+                    else if (packet.getCfdRootElement() instanceof cfd.ver33.DElementComprobante) {
+                        xmlFile = ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getElementForXml();
 
+                        xmlFileName += ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getEltEmisor().getAttRfc().getString() + "_";
+                        xmlFileName += ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttTipoDeComprobante().getOption().substring(0, 1).toUpperCase() + "_";
+                        xmlFileName += (((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString().length() == 0 ? "" : ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString() + "_");
+                        xmlFileName += decimalFormat.format(SLibUtils.parseLong(((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttFolio().getString())) + ".xml";
+                        dateCfd = ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttFecha().getDatetime();
+                    }
+                    else {
+                        throw new Exception("Not supported CFD version!");
+                    }
+                    
                     cfd.setPkCfdId(packet.getCfdId());
                     cfd.setTimestamp(dateCfd);
                     cfd.setCertNumber(packet.getCertNumber());
