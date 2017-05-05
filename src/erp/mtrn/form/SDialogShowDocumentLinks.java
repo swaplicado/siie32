@@ -607,6 +607,12 @@ public class SDialogShowDocumentLinks extends javax.swing.JDialog implements erp
                         "WHERE fid_dps_adj_year_n = " + moParamDps.getPkYearId() + " AND fid_dps_adj_doc_n = " + moParamDps.getPkDocId() + " AND re.b_del = FALSE AND r.b_del = FALSE " +
                         (anSubclassKey == null ? "" : "AND NOT (fid_tp_acc_mov = " + anSubclassKey[0] + " AND fid_cl_acc_mov = " + anSubclassKey[1] + " AND fid_cls_acc_mov = " + anSubclassKey[2] + ") ") +
                         (anSubclassKeyForAdjs == null ? "" : "AND NOT (fid_tp_acc_mov = " + anSubclassKeyForAdjs[0] + " AND fid_cl_acc_mov = " + anSubclassKeyForAdjs[1] + " AND fid_cls_acc_mov = " + anSubclassKeyForAdjs[2] + ") ") +
+                        "UNION " +
+                        "SELECT DISTINCT 21 AS f_id_type, 'VÍNCULO COMO ORIGEN' AS f_type, d.dt, 'ENT' AS f_code, d.num, 0.0 AS f_tot, 0.0 AS f_tot_cur, '' AS f_cur, '' AS f_cob " +
+                        "FROM trn_dvy AS d " +
+                        "INNER JOIN trn_dvy_ety AS de ON d.id_dvy = de.id_dvy " +
+                        "WHERE NOT d.b_del AND ((de.fk_dps_year =  " + moParamDps.getPkYearId() + " AND de.fk_dps_doc =  " + moParamDps.getPkDocId() + ") " +
+                        "OR (de.fk_ord_year =  " + moParamDps.getPkYearId() + " AND de.fk_ord_doc =  " + moParamDps.getPkDocId() + ")) "+
                         "ORDER BY f_id_type, f_code, f_num ";
 
                 oRequest = new SServerRequest(SServerConstants.REQ_DB_QUERY_SIMPLE, sSql);
