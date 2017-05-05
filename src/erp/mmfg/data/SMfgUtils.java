@@ -48,4 +48,28 @@ public abstract class SMfgUtils {
             throw new Exception("La explosión de materiales tiene " + SLibUtils.DecimalFormatInteger.format(resultSet.getInt(1)) + " subproducto(s) restringido(s) o inactivo(s).");
         }
     }
+    
+    /**
+     * round the number to the next integer.
+     * Example.
+     * From 1.5, returns 2.
+     * From 1.1, returns 2.
+     * From 10,125.02 returns 10,126.0
+     * 
+     * @param number to round
+     * @return rounded number
+     */
+    public static double roundToNextInteger(final double number) {
+        double roundedNumber = 0;
+        int integerPart = (int) number;
+        
+        if (number - integerPart > 0) {
+            roundedNumber = number + (1 - (number - integerPart));
+        }
+        else {
+            roundedNumber = number;
+        }
+        
+        return roundedNumber;
+    }
 }

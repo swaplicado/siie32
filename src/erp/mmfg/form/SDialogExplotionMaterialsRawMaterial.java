@@ -38,6 +38,7 @@ import erp.mmfg.data.SDataProductionOrderChargeEntry;
 import erp.mmfg.data.SDataRequisition;
 import erp.mmfg.data.SDataRequisitionEntry;
 import erp.mmfg.data.SDataRequisitionPurchaseOrder;
+import erp.mmfg.data.SMfgUtils;
 import erp.mmkt.data.SParamsItemPriceList;
 import erp.mod.SModSysConsts;
 import erp.mtrn.data.SDataDps;
@@ -519,6 +520,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
         boolean b = false;
         double dAvailable = 0;
         double dPurchaseOrder = 0;
+        double dGrossRequirement = 0;
         double dNetRequeriment = 0;
         double dMinimunAvailable = 0;
         double dSafetyStock = 0;
@@ -926,11 +928,17 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                     mvExplotionMaterialsEntries.removeAllElements();
                     break;
                 }
+                
+                dGrossRequirement = (Double) oList[2];
 
+                // Rounding the gross requirement of the explosion of materials to the next integer
+                if (oItem != null && !oItem.getIsBulk()) {
+                    dGrossRequirement = SMfgUtils.roundToNextInteger(dGrossRequirement);
+                }
+                
                 // Get net requeriments:
-
-                if ((((Double) oList[2]) + dSafetyStock) >= (dAvailable + dPurchaseOrder)) {
-                    dNetRequeriment = (((Double) oList[2]) + dSafetyStock) - (dAvailable + dPurchaseOrder);
+                if (((dGrossRequirement) + dSafetyStock) >= (dAvailable + dPurchaseOrder)) {
+                    dNetRequeriment = ((dGrossRequirement) + dSafetyStock) - (dAvailable + dPurchaseOrder);
                 }
                 else {
                     dNetRequeriment = 0;
@@ -938,15 +946,20 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
 
                 // Check minimun available:
                 if (mvProductionsOrders.size() == 1) {
-                    if (dAvailable < (Double) oList[2]) {
-                        if (((dAvailable / (Double) oList[2]) <= dMinimunAvailable) || dMinimunAvailable == 0) {
-                            dMinimunAvailable = (dAvailable / (Double) oList[2]);
-                            dRequerimentQuantityByItem = (dAvailable / ((Double) oList[2] / dProductionOrderQty));
+                    if (dAvailable < dGrossRequirement) {
+                        if (((dAvailable / dGrossRequirement) <= dMinimunAvailable) || dMinimunAvailable == 0) {
+                            dMinimunAvailable = (dAvailable / dGrossRequirement);
+                            dRequerimentQuantityByItem = (dAvailable / (dGrossRequirement / dProductionOrderQty));
                             sAvailableItem = key + " - " + SLibUtilities.textTrim(oList[0].toString()) + " " + unitSymbol;
                         }
                     }
                 }
 
+                // Rounding the net requirement of the explosion of materials to the next integer
+                if (oItem != null && !oItem.getIsBulk()) {
+                   dNetRequeriment = SMfgUtils.roundToNextInteger(dNetRequeriment);
+                }
+                
                 oExplotionMaterialsEntry = new SDataExplotionMaterialsEntry();
                 oExplotionMaterialsEntry.setPkExpId(0);
                 oExplotionMaterialsEntry.setPkItemId((Integer) oList[1]);
@@ -955,7 +968,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                 oExplotionMaterialsEntry.setDbmsItem(SLibUtilities.textTrim(oList[0].toString()));
                 oExplotionMaterialsEntry.setDbmsBizPartner(oBizPartner != null ? oBizPartner.getBizPartner() : "?");
                 oExplotionMaterialsEntry.setDbmsItemUnitSymbol(unitSymbol);
-                oExplotionMaterialsEntry.setGrossReq((Double) oList[2]);
+                oExplotionMaterialsEntry.setGrossReq(dGrossRequirement);
                 oExplotionMaterialsEntry.setSafetyStock(dSafetyStock);
                 oExplotionMaterialsEntry.setAvailable(dAvailable);
                 oExplotionMaterialsEntry.setBackorder(dPurchaseOrder);
