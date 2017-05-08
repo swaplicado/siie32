@@ -112,6 +112,16 @@ public abstract class SAccountUtils {
 
         return levels;
     }
+    
+    /**
+     * Composes a new account mask based on provided original account mask up to desired level limit.
+     * @param mask Original account mask.
+     * @param levelLimit Desired level limit of new account mask.
+     * @return New account mask.
+     */
+    public static int composeMask(final int mask, final int levelLimit) {
+        return SLibUtils.parseInt(SLibUtils.textLeft("" + mask, levelLimit) + SLibUtils.textRepeat("0", SAccountConsts.LEVELS - levelLimit));
+    }
 
     /**
      * Finds an account only on top level provided array list of account objects (children accounts excluded), searching it by account code-level on standard-format.
