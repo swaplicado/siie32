@@ -1,4 +1,4 @@
-# Git Ignore Settings
+﻿# Git Ignore Settings
 # Author: Sergio Abraham Flores Guti�rrez
 # Date: 2015-05-28
 
@@ -23,7 +23,6 @@ hs_err_pid*
 build/
 dist/
 nbproject/
-test/
 /cfd/
 /reps/img/
 build.xml
