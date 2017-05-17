@@ -106,7 +106,7 @@ import sa.lib.xml.SXmlUtils;
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 097.01";
+    public static final String APP_RELEASE = "3.2 097.02";
     public static final String APP_COPYRIGHT = "2007-2017";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
@@ -960,61 +960,61 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 moCfgProcessor = new SCfgProcessor(moXmlConfig, moSessionXXX.getCompany().getPkCompanyId(), moSessionXXX.getUser().getPkUserId());
             }
 
-            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_CFG, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
+            if (moSessionXXX.getCompany().getIsModuleCfg() && moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_CFG, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
                     (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_CFG))) {
                 jmiViewModuleCfg.setEnabled(true);
                 jtbModuleCfg.setEnabled(true);
             }
 
-            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_FIN, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
+            if (moSessionXXX.getCompany().getIsModuleFin() && moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_FIN, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
                     (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_FIN))) {
                 jmiViewModuleFin.setEnabled(true);
                 jtbModuleFin.setEnabled(true);
             }
 
-            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_PUR, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
+            if (moSessionXXX.getCompany().getIsModulePur() && moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_PUR, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
                     (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_PUR))) {
                 jmiViewModulePur.setEnabled(true);
                 jtbModulePur.setEnabled(true);
             }
 
-            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_SAL, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
+            if (moSessionXXX.getCompany().getIsModuleSal() && moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_SAL, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
                     (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_SAL))) {
                 jmiViewModuleSal.setEnabled(true);
                 jtbModuleSal.setEnabled(true);
             }
 
-            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_INV, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
+            if (moSessionXXX.getCompany().getIsModuleInv() && moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_INV, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
                     (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_INV))) {
                 jmiViewModuleInv.setEnabled(true);
                 jtbModuleInv.setEnabled(true);
             }
 
-            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_MKT, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
+            if (moSessionXXX.getCompany().getIsModuleMkt() && moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_MKT, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
                     (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_MKT))) {
                 jmiViewModuleMkt.setEnabled(true);
                 jtbModuleMkt.setEnabled(true);
             }
 
-            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_LOG, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
+            if (moSessionXXX.getCompany().getIsModuleLog() && moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_LOG, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
                     (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_LOG))) {
                 jmiViewModuleLog.setEnabled(true);
                 jtbModuleLog.setEnabled(true);
             }
 
-            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_MFG, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
+            if (moSessionXXX.getCompany().getIsModuleMfg() && moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_MFG, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
                     (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_MFG))) {
                 jmiViewModuleMfg.setEnabled(true);
                 jtbModuleMfg.setEnabled(true);
             }
             
-            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_HRS, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
+            if (moSessionXXX.getCompany().getIsModuleHrs() && moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_HRS, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
                     (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_HRS))) {
                 jmiViewModuleHrs.setEnabled(true);
                 jtbModuleHrs.setEnabled(true);
             }
 
-            if (moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_QLT, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
+            if (moSessionXXX.getCompany().getIsModuleQty() && moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_QLT, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
                     (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_QLT))) {
                 jmiViewModuleQlt.setEnabled(true);
                 jtbModuleQlt.setEnabled(true);
