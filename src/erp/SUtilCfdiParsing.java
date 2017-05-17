@@ -25,7 +25,7 @@ import sa.lib.gui.SGuiUtils;
  *
  * @author Juan Barajas
  */
-public class SUtilXmlToByteArray extends javax.swing.JFrame {
+public class SUtilCfdiParsing extends javax.swing.JFrame {
 
     private final static int DATA_TYPE_TEXT = 1;
     private final static int DATA_TYPE_NUMBER = 2;
@@ -34,7 +34,7 @@ public class SUtilXmlToByteArray extends javax.swing.JFrame {
     protected ArrayList<String> masCompanies;
     private erp.lib.data.SDataDatabase moDbMySql;
     
-    public SUtilXmlToByteArray() {
+    public SUtilCfdiParsing() {
         initComponents();
         initComponentsCustom();
     }
@@ -200,7 +200,7 @@ public class SUtilXmlToByteArray extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new SUtilXmlToByteArray().setVisible(true);
+                new SUtilCfdiParsing().setVisible(true);
             }
         });
     }
@@ -263,7 +263,6 @@ public class SUtilXmlToByteArray extends javax.swing.JFrame {
     private void process() throws Exception {
         int index = 1;
         boolean isCfdi = false;
-        byte[] moDocXml_ns = null;
         String sXmlDoc = "";
         String sXmlUuid = "";
         String sXmlEmisorRfc = "";
@@ -288,7 +287,6 @@ public class SUtilXmlToByteArray extends javax.swing.JFrame {
             resultSet = moDbMySql.getConnection().createStatement().executeQuery(sql);
             while (resultSet.next()) {
                 index = 1;
-                moDocXml_ns = null;
                 sXmlDoc = "";
                 sXmlEmisorRfc = "";
                 sXmlReceptorRfc = "";
@@ -352,20 +350,11 @@ public class SUtilXmlToByteArray extends javax.swing.JFrame {
                     }
                 }
                 
-                sql = "UPDATE " + tableName + ".trn_cfd SET doc_xml_n = ?, " +
+                sql = "UPDATE " + tableName + ".trn_cfd SET " +
                         "xml_rfc_emi = ?, xml_rfc_rec = ?, xml_tot = ?, xml_mon = ?, xml_tc = ?, xml_sign_n = ?, uuid = ? " +
                         "WHERE id_cfd = " + resultSet.getInt("id_cfd") + " ";
                 
                 preparedStatement = moDbMySql.getConnection().prepareStatement(sql);
-                
-                moDocXml_ns = SLibUtils.zip(sXmlDoc);
-                
-                if (moDocXml_ns.length == 0) {
-                    preparedStatement.setNull(index++, java.sql.Types.BLOB);
-                }
-                else {
-                    preparedStatement.setBytes(index++, moDocXml_ns);
-                }
                 
                 preparedStatement.setString(index++, sXmlEmisorRfc);
                 preparedStatement.setString(index++, sXmlReceptorRfc);
@@ -379,12 +368,12 @@ public class SUtilXmlToByteArray extends javax.swing.JFrame {
                 else {
                     preparedStatement.setTimestamp(index++, new java.sql.Timestamp(tXmlDateSigned.getTime()));
                 }
+                
                 preparedStatement.setString(index++, sXmlUuid);
 
                 preparedStatement.execute();
             }
         }
-        
     }
 
     private void windowActivated() {

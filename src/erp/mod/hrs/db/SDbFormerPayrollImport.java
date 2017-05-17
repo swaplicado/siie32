@@ -150,7 +150,6 @@ public class SDbFormerPayrollImport extends SDataRegistry implements Serializabl
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }
                 }
-                
             }
             if (mbRegenerateOnlyNonStampedCfdi) {
                 sSql = "UPDATE trn_cfd AS c " +
@@ -174,5 +173,4 @@ public class SDbFormerPayrollImport extends SDataRegistry implements Serializabl
     public Date getLastDbUpdate() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-
 }
