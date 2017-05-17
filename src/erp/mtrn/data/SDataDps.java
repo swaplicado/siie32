@@ -2034,7 +2034,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnPayments = oResultSet.getInt("d.payments");
                 msPaymentMethod = oResultSet.getString("d.pay_method");
                 msPaymentAccount = oResultSet.getString("d.pay_account");
-                //msCfdConfirmationNumber = oResultSet.getString("d.cfd_conf_num");
                 mnAutomaticAuthorizationRejection = oResultSet.getInt("d.aut_authorn_rej");
                 mbIsPublic = oResultSet.getBoolean("d.b_pub");
                 mbIsLinked = oResultSet.getBoolean("d.b_link");
@@ -2089,8 +2088,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnFkSourceDocId_n = oResultSet.getInt("d.fid_src_doc_n");
                 mnFkMfgYearId_n = oResultSet.getInt("d.fid_mfg_year_n");
                 mnFkMfgOrderId_n = oResultSet.getInt("d.fid_mfg_ord_n");
-                //mnFkCfdRelationType = oResultSet.getInt("d.fid_cfd_tp_rel");
-                //mnFkCfdUse = oResultSet.getInt("d.fid_cfd_use");
                 mnFkUserLinkedId = oResultSet.getInt("d.fid_usr_link");
                 mnFkUserClosedId = oResultSet.getInt("d.fid_usr_close");
                 mnFkUserClosedCommissionsId = oResultSet.getInt("d.fid_usr_close_comms");
