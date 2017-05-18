@@ -774,8 +774,12 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         return mnLastDbActionResult;
     }
     
+    public boolean hasUuidWhenStamped() {
+        return mnFkXmlTypeId == SDataConstantsSys.TRNS_TP_XML_CFDI_32 || mnFkXmlTypeId == SDataConstantsSys.TRNS_TP_XML_CFDI_33;
+    }
+    
     public boolean isStamped() {
-        return mnFkXmlTypeId != SDataConstantsSys.TRNS_TP_XML_CFDI_32 && mnFkXmlTypeId != SDataConstantsSys.TRNS_TP_XML_CFDI_33 && !msUuid.isEmpty();
+        return !hasUuidWhenStamped() || (hasUuidWhenStamped() && !msUuid.isEmpty());
     }
     
     public void saveField(java.sql.Connection connection, final int[] pk, final int field, final Object value) throws Exception {
