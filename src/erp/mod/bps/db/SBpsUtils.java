@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
-import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiSession;
 
 /**
@@ -149,13 +148,13 @@ public abstract class SBpsUtils {
         return idHeadquarters;
     }
     
-    public static String bankAccountNumberFormat(final String bankAccountNumber) {
+    public static String formatBankAccountNumber(final String accountNumber) {
         int index = 0;
         int len = 0;
         String bankAccountNumberFormat = "";
         ArrayList<String> abankAccountNumberFormat = new ArrayList<String>();
         
-        index = bankAccountNumber.length();
+        index = accountNumber.length();
         while (index > 0) {
             if (index > 4) {
                 len = 4;
@@ -163,7 +162,7 @@ public abstract class SBpsUtils {
             else {
                 len = index;
             }
-            abankAccountNumberFormat.add(bankAccountNumber.substring(index - len, index));
+            abankAccountNumberFormat.add(accountNumber.substring(index - len, index));
             index -= len;
         }
         
@@ -174,52 +173,100 @@ public abstract class SBpsUtils {
         return bankAccountNumberFormat;
     }
     
-    public static int bankAccountOcurrences(final SGuiClient client, final String accNum, final int idBank, final int[] bankAccPk) throws Exception {
-        ResultSet resultSet = null;
-        int occurrences = 0;
-        String sql = "";
-        
-        sql = "SELECT COUNT(*) AS number FROM erp.bpsu_bank_acc WHERE acc_num = '" + accNum + "' AND fid_bank = " + idBank +
-                (bankAccPk != null ? " AND (id_bpb != " + bankAccPk[0] + " OR id_bank_acc != " + bankAccPk[1] + ")" : "");
-        resultSet = client.getSession().getStatement().executeQuery(sql);
-
-        if (resultSet.next()) {
-            occurrences = resultSet.getInt("number");
-        }
-        
-        return occurrences;
-    }
-    
-    public static int stdBankAccountOcurrences(final SGuiClient client, final String accNumStd, final int[] bankAccPk) throws Exception {
-        ResultSet resultSet = null;
-        int occurrences = 0;
-        String sql = "";
-        
-        sql = "SELECT COUNT(*) as number FROM erp.bpsu_bank_acc WHERE acc_num_std = '" + accNumStd + "'" +
-                (bankAccPk != null ? " AND (id_bpb != " + bankAccPk[0] + " OR id_bank_acc != " + bankAccPk[1] + ")" : "");
-        resultSet = client.getSession().getStatement().executeQuery(sql);
-
-        if (resultSet.next()) {
-            occurrences = resultSet.getInt("number");
-        }
-        
-        return occurrences;
-    }
-    
-    public static String bankAccountClaBeFormat(final String bankAccountClaBe) {
+    public static String formatBankAccountNumberStd(final String accountNumberStd) {
         String bankAccountClaBeFormat = "";
         
-        if (bankAccountClaBe.length() == 18) {
-            bankAccountClaBeFormat = bankAccountClaBe.substring(0, 3) + " " + bankAccountClaBe.substring(3, 6) + " " + bankAccountClaBe.substring(6, 9) + " " +
-                     bankAccountClaBe.substring(9, 13) + " " + bankAccountClaBe.substring(13, 17) + " " + bankAccountClaBe.substring(17);
+        if (accountNumberStd.length() == 18) {
+            bankAccountClaBeFormat = accountNumberStd.substring(0, 3) + " " + accountNumberStd.substring(3, 6) + " " + accountNumberStd.substring(6, 9) + " " +
+                     accountNumberStd.substring(9, 13) + " " + accountNumberStd.substring(13, 17) + " " + accountNumberStd.substring(17);
         }
         else {
-            bankAccountClaBeFormat = bankAccountClaBe.isEmpty() ? "" : "(ClaBE inválida)";
+            bankAccountClaBeFormat = accountNumberStd.isEmpty() ? "" : "(ClaBE inválida)";
         }
         
         return bankAccountClaBeFormat;
     }
     
+    /**
+     * Counts ocurrences of account number for provided bank.
+     * @param session GUI session.
+     * @param idBank Bank's business partner ID to check into.
+     * @param accountNumber Account number to check for occurrences.
+     * @param keyBankAccountToExclude Bank account's ID to exclude.
+     * @return Number of ocurrences found, excluding provided bank account, if any.
+     * @throws Exception 
+     */
+    public static int countOcurrencesBankAccount(final SGuiSession session, final int idBank, final String accountNumber, final int[] keyBankAccountToExclude) throws Exception {
+        int count = 0;
+        String sql = "";
+        ResultSet resultSet = null;
+        
+        sql = "SELECT COUNT(*) "
+                + "FROM erp.bpsu_bank_acc "
+                + "WHERE NOT b_del AND fid_bank = " + idBank + " AND acc_num = '" + accountNumber + "' " +
+                (keyBankAccountToExclude == null ? "" : "AND NOT (id_bpb = " + keyBankAccountToExclude[0] + " AND id_bank_acc = " + keyBankAccountToExclude[1] + ")");
+        
+        resultSet = session.getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            count = resultSet.getInt(1);
+        }
+        
+        return count;
+    }
+    
+    /**
+     * Counts ocurrences of standardized account number.
+     * @param session GUI session.
+     * @param accountNumberStd Standardized account number to check for occurrences.
+     * @param keyBankAccountToExclude Bank account's ID to exclude.
+     * @return Number of ocurrences found, excluding provided bank account, if any.
+     * @throws Exception 
+     */
+    public static int countOcurrencesBankAccountStd(final SGuiSession session, final String accountNumberStd, final int[] keyBankAccountToExclude) throws Exception {
+        int count = 0;
+        String sql = "";
+        ResultSet resultSet = null;
+        
+        sql = "SELECT COUNT(*) "
+                + "FROM erp.bpsu_bank_acc "
+                + "WHERE NOT b_del AND acc_num_std = '" + accountNumberStd + "' " +
+                (keyBankAccountToExclude == null ? "" : "AND NOT (id_bpb = " + keyBankAccountToExclude[0] + " AND id_bank_acc = " + keyBankAccountToExclude[1] + ")");
+        
+        resultSet = session.getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            count = resultSet.getInt(1);
+        }
+        
+        return count;
+    }
+
+    /*
+     * Gets the number of ocurrences of agreement in bank excluding agreements of business partner branch.
+     * @param session GUI session.
+     * @param idBank Bank's business partner ID to check into.
+     * @param agreement Agreement to check for occurrences.
+     * @param keyBankAccountToExclude Bank account's ID to exclude.
+     * @return Number of ocurrences.
+     * @throws Exception 
+     */
+    public static int countOcurrencesBankAgreement(final SGuiSession session, final int idBank, final String agreement, final int[] keyBankAccountToExclude) throws Exception {
+        int count = 0;
+        String sql = "";
+        ResultSet resultSet = null; 
+        
+        sql = "SELECT COUNT(*) "
+                + "FROM erp.bpsu_bank_acc "
+                + "WHERE NOT b_del AND fid_bank = " + idBank + " AND agree = '" + agreement + "' " +
+                (keyBankAccountToExclude == null ? "" : "AND NOT (id_bpb = " + keyBankAccountToExclude[0] + " AND id_bank_acc = " + keyBankAccountToExclude[1] + ")");
+        
+        resultSet = session.getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            count = resultSet.getInt(1);
+        }
+        
+        return count;
+    }
+   
     public static String[] getAddress(final SGuiSession session, int[] keyAddress) throws Exception {
         String sql = "";
         String[] address = null;

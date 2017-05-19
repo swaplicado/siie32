@@ -789,12 +789,12 @@ public abstract class SDataConstantsSys {
     public static final int FINS_CT_ACC_CASH_CASH = 1;
     public static final int FINS_CT_ACC_CASH_BANK = 2;
 
-    public static final int[] FINS_TP_ACC_CASH_NA = { 1, 1 };
-    public static final int[] FINS_TP_ACC_CASH_ACC_CASH = { 2, 1 };
-    public static final int[] FINS_TP_ACC_CASH_AC_CASH_PETTY = { 2, 2 };
-    public static final int[] FINS_TP_ACC_CASH_SAV = { 3, 1 };
-    public static final int[] FINS_TP_ACC_CASH_DEB = { 3, 2 };
-    public static final int[] FINS_TP_ACC_CASH_CRE = { 3, 3 };
+    public static final int[] FINS_TP_ACC_CASH_CASH_CASH = { 1, 1 };
+    public static final int[] FINS_TP_ACC_CASH_CASH_CASH_PETTY = { 1, 2 };
+    public static final int[] FINS_TP_ACC_CASH_BANK_SAV = { 2, 1 };
+    public static final int[] FINS_TP_ACC_CASH_BANK_DBT = { 2, 2 };
+    public static final int[] FINS_TP_ACC_CASH_BANK_CDT = { 2, 3 };
+    public static final int[] FINS_TP_ACC_CASH_BANK_AGR = { 2, 4 };
 
     public static final int FINS_TP_ACC_BP_OP = 1;
     public static final int FINS_TP_ACC_BP_PAY = 2;
@@ -837,6 +837,7 @@ public abstract class SDataConstantsSys {
     public static final int FINS_TP_PAY_BANK_TEF = 11;
     public static final int FINS_TP_PAY_BANK_SPEI_FD_N = 21;
     public static final int FINS_TP_PAY_BANK_SPEI_FD_Y = 22;
+    public static final int FINS_TP_PAY_BANK_AGREE = 31;
 
     public static final int FINS_ST_FIN_MOV_AVLB = 1;
     public static final int FINS_ST_FIN_MOV_TRANSIT = 2;

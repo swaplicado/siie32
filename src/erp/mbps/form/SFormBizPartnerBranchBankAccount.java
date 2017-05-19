@@ -25,33 +25,36 @@ import erp.mbps.data.SDataBizPartnerBranchBankAccountCard;
 import erp.mbps.data.SDataBizPartnerBranchBankAccountCardRow;
 import erp.mbps.data.SDataBizPartnerBranchBankAccountLayoutBank;
 import erp.mbps.data.SDataBizPartnerBranchBankAccountLayoutRow;
-import erp.mcfg.data.SDataCurrency;
 import erp.mod.bps.db.SBpsUtils;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
 import java.util.Vector;
 import javax.swing.AbstractAction;
-import sa.lib.gui.SGuiClient;
+import sa.lib.SLibUtils;
 
 /**
  *
  * @author Alfonso Flores, Edwin Carmona
  */
-public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
+public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.FocusListener {
+    
+    private static final int MODE_BANK_ACC = 1;
+    private static final int MODE_BANK_AGR = 2;
 
     private int mnFormType;
     private int mnFormResult;
     private int mnFormStatus;
+    private int mnAccountCashMode;
     private boolean mbFirstTime;
     private boolean mbResetingForm;
     private boolean mbParamIsCompany;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.client.SClientInterface miClient;
 
-    private erp.mbps.data.SDataBizPartner moBizPartner;
     private erp.mbps.data.SDataBizPartnerBranchBankAccount moBizPartnerBranchBankAccount;
     private erp.lib.form.SFormComboBoxGroup moComboBoxGroupBizPartnerBranch;
     private erp.lib.form.SFormComboBoxGroup moComboBoxGroupCategoryTypeCashAccount;
@@ -65,7 +68,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
     private erp.lib.form.SFormField moFieldBankAccountBranchNumber;
     private erp.lib.form.SFormField moFieldBankAccountNumber;
     private erp.lib.form.SFormField moFieldBankAccountNumberStd;
-    private erp.lib.form.SFormField moFieldAgree;
+    private erp.lib.form.SFormField moFieldAgreement;
     private erp.lib.form.SFormField moFieldReference;
     private erp.lib.form.SFormField moFieldCode;
     private erp.lib.form.SFormField moFieldCodeAba;
@@ -116,8 +119,8 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         jPanel8 = new javax.swing.JPanel();
         jpBankAccountCard = new javax.swing.JPanel();
         jPanel18 = new javax.swing.JPanel();
-        jbAddCard = new javax.swing.JButton();
-        jbModifyCard = new javax.swing.JButton();
+        jbCardAdd = new javax.swing.JButton();
+        jbCardModify = new javax.swing.JButton();
         jpBankAccountLayout = new javax.swing.JPanel();
         jPanel21 = new javax.swing.JPanel();
         jPanel17 = new javax.swing.JPanel();
@@ -163,8 +166,8 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         jtfBankAccountNumberStd = new javax.swing.JTextField();
         jlFormatBankAccountNumberStd = new javax.swing.JLabel();
         jlFormatBankAccountNumberStdData = new javax.swing.JLabel();
-        jlAgree = new javax.swing.JLabel();
-        jtfAgree = new javax.swing.JTextField();
+        jlAgreement = new javax.swing.JLabel();
+        jtfAgreement = new javax.swing.JTextField();
         jlReference = new javax.swing.JLabel();
         jtfReference = new javax.swing.JTextField();
         jlCodeAba = new javax.swing.JLabel();
@@ -211,15 +214,15 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         jPanel18.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 1, 0));
 
-        jbAddCard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_new.gif"))); // NOI18N
-        jbAddCard.setToolTipText("Crear [Ctrl+N]");
-        jbAddCard.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel18.add(jbAddCard);
+        jbCardAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_new.gif"))); // NOI18N
+        jbCardAdd.setToolTipText("Crear [Ctrl+N]");
+        jbCardAdd.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel18.add(jbCardAdd);
 
-        jbModifyCard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
-        jbModifyCard.setToolTipText("Modificar [Ctrl+M]");
-        jbModifyCard.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel18.add(jbModifyCard);
+        jbCardModify.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
+        jbCardModify.setToolTipText("Modificar [Ctrl+M]");
+        jbCardModify.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel18.add(jbCardModify);
 
         jpBankAccountCard.add(jPanel18, java.awt.BorderLayout.NORTH);
 
@@ -256,16 +259,6 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         jPanel4.add(jbDbmsFkBizPartnerId, java.awt.BorderLayout.EAST);
 
         jcbDbmsFkBizPartnerId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbDbmsFkBizPartnerId.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jcbDbmsFkBizPartnerIdItemStateChanged(evt);
-            }
-        });
-        jcbDbmsFkBizPartnerId.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jcbDbmsFkBizPartnerIdFocusLost(evt);
-            }
-        });
         jPanel4.add(jcbDbmsFkBizPartnerId, java.awt.BorderLayout.CENTER);
 
         jPanel3.add(jPanel4);
@@ -287,13 +280,13 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
 
         jPanel3.add(jPanel5);
 
-        jlFkAccountCashCategoryId.setText("Categoría de cuenta de efectivo: *");
+        jlFkAccountCashCategoryId.setText("Categoría de cuenta de dinero: *");
         jPanel3.add(jlFkAccountCashCategoryId);
 
         jcbFkAccountCashCategoryId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jPanel3.add(jcbFkAccountCashCategoryId);
 
-        jlFkAccountCashTypeId.setText("Tipo de cuenta de efectivo: *");
+        jlFkAccountCashTypeId.setText("Tipo de cuenta de dinero: *");
         jPanel3.add(jlFkAccountCashTypeId);
 
         jcbFkAccountCashTypeId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -338,11 +331,6 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         jPanel3.add(jtfBankAccount);
 
         jckIsCardAppliyng.setText("Aplica tarjeta");
-        jckIsCardAppliyng.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jckIsCardAppliyngItemStateChanged(evt);
-            }
-        });
         jPanel3.add(jckIsCardAppliyng);
         jPanel3.add(jLabel1);
 
@@ -388,11 +376,6 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
 
         jtfBankAccountNumber.setText("NUM CTA");
         jtfBankAccountNumber.setPreferredSize(new java.awt.Dimension(150, 23));
-        jtfBankAccountNumber.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jtfBankAccountNumberFocusLost(evt);
-            }
-        });
         jPanel20.add(jtfBankAccountNumber);
 
         jlFormatBankAccountNumber.setPreferredSize(new java.awt.Dimension(150, 20));
@@ -403,17 +386,12 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         jlFormatBankAccountNumberData.setPreferredSize(new java.awt.Dimension(150, 20));
         jPanel20.add(jlFormatBankAccountNumberData);
 
-        jlBankAccountNumberStd.setText("ClaBE:");
+        jlBankAccountNumberStd.setText("ClaBE: *");
         jlBankAccountNumberStd.setPreferredSize(new java.awt.Dimension(150, 20));
         jPanel20.add(jlBankAccountNumberStd);
 
         jtfBankAccountNumberStd.setText("NUM STD");
         jtfBankAccountNumberStd.setPreferredSize(new java.awt.Dimension(150, 23));
-        jtfBankAccountNumberStd.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jtfBankAccountNumberStdFocusLost(evt);
-            }
-        });
         jPanel20.add(jtfBankAccountNumberStd);
 
         jlFormatBankAccountNumberStd.setPreferredSize(new java.awt.Dimension(150, 20));
@@ -424,20 +402,19 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         jlFormatBankAccountNumberStdData.setPreferredSize(new java.awt.Dimension(150, 20));
         jPanel20.add(jlFormatBankAccountNumberStdData);
 
-        jlAgree.setText("Convenio: ");
-        jlAgree.setPreferredSize(new java.awt.Dimension(150, 20));
-        jPanel20.add(jlAgree);
+        jlAgreement.setText("Convenio: *");
+        jlAgreement.setPreferredSize(new java.awt.Dimension(150, 20));
+        jPanel20.add(jlAgreement);
 
-        jtfAgree.setText("CONVENIO");
-        jtfAgree.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel20.add(jtfAgree);
+        jtfAgreement.setText("AGREEMENT");
+        jtfAgreement.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel20.add(jtfAgreement);
 
         jlReference.setText("Referencia:");
         jlReference.setPreferredSize(new java.awt.Dimension(150, 20));
         jPanel20.add(jlReference);
 
         jtfReference.setText("REF");
-        jtfReference.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel20.add(jtfReference);
 
         jlCodeAba.setText("Código ABA:");
@@ -486,39 +463,6 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         windowActivate();
     }//GEN-LAST:event_formWindowActivated
 
-    private void jckIsCardAppliyngItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jckIsCardAppliyngItemStateChanged
-        itemStateChangedIsCardApplying();
-    }//GEN-LAST:event_jckIsCardAppliyngItemStateChanged
-
-    private void jcbDbmsFkBizPartnerIdItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbDbmsFkBizPartnerIdItemStateChanged
-        if (evt.getStateChange() == ItemEvent.SELECTED) {
-            itemStateChangedBizPartner();
-        }
-    }//GEN-LAST:event_jcbDbmsFkBizPartnerIdItemStateChanged
-
-    private void jcbDbmsFkBizPartnerIdFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jcbDbmsFkBizPartnerIdFocusLost
-        readBizPartner();
-        
-        if (moBizPartner != null) {
-            if (moBizPartner.getIsCompany()) {
-                if (msMsgError.isEmpty()) {
-                    miClient.showMsgBoxWarning(msMsgError = "No se pueden dar de alta cuentas bancarias para empresas.");
-                }
-            }
-            else {
-                msMsgError = "";
-            }
-        }
-    }//GEN-LAST:event_jcbDbmsFkBizPartnerIdFocusLost
-
-    private void jtfBankAccountNumberStdFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jtfBankAccountNumberStdFocusLost
-        jlFormatBankAccountNumberStdData.setText(SBpsUtils.bankAccountClaBeFormat(jtfBankAccountNumberStd.getText()));
-    }//GEN-LAST:event_jtfBankAccountNumberStdFocusLost
-
-    private void jtfBankAccountNumberFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jtfBankAccountNumberFocusLost
-        jlFormatBankAccountNumberData.setText(SBpsUtils.bankAccountNumberFormat(jtfBankAccountNumber.getText()));
-    }//GEN-LAST:event_jtfBankAccountNumberFocusLost
-
     private void initComponentsExtra() {
         int i = 0;
         mvFields = new Vector<>();
@@ -527,7 +471,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         erp.lib.table.STableColumnForm tableColumnsBankAccountLayoutType[];
 
         moBankAccountCardPane = new STablePane(miClient);
-        moBankAccountCardPane.setDoubleClickAction(this, "publicActionModifyCard");
+        moBankAccountCardPane.setDoubleClickAction(this, "publicActionCardModify");
         jpBankAccountCard.add(moBankAccountCardPane, BorderLayout.CENTER);
 
         moBankAccountLayoutPane = new STablePane(miClient);
@@ -536,9 +480,9 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         moComboBoxGroupBizPartnerBranch = new SFormComboBoxGroup(miClient);
         moComboBoxGroupCategoryTypeCashAccount = new SFormComboBoxGroup(miClient);
 
-        moFieldDbmsPkBizPartnerId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbDbmsFkBizPartnerId, jlDbmsFkBizPartnerId);
+        moFieldDbmsPkBizPartnerId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbDbmsFkBizPartnerId, jlDbmsFkBizPartnerId);
         moFieldDbmsPkBizPartnerId.setPickerButton(jbDbmsFkBizPartnerId);
-        moFieldPkBizPartnerBranchId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbPkBizPartnerBranchId, jlPkBizPartnerBranchId);
+        moFieldPkBizPartnerBranchId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbPkBizPartnerBranchId, jlPkBizPartnerBranchId);
         moFieldPkBizPartnerBranchId.setPickerButton(jbPkBizPartnerBranchId);
         moFieldFkAccountCashCategoryId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkAccountCashCategoryId, jlFkAccountCashCategoryId);
         moFieldFkAccountCashTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkAccountCashTypeId, jlFkAccountCashTypeId);
@@ -552,11 +496,11 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         moFieldBankAccountBranchNumber.setLengthMax(25);
         moFieldBankAccountNumber = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfBankAccountNumber, jlBankAccountNumber);
         moFieldBankAccountNumber.setLengthMax(25);
-        moFieldBankAccountNumberStd = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfBankAccountNumberStd, jlBankAccountNumberStd);
+        moFieldBankAccountNumberStd = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfBankAccountNumberStd, jlBankAccountNumberStd);
         moFieldBankAccountNumberStd.setLengthMin(18);
         moFieldBankAccountNumberStd.setLengthMax(18);
-        moFieldAgree = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfAgree, jlAgree);
-        moFieldAgree.setLengthMax(25);
+        moFieldAgreement = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfAgreement, jlAgreement);
+        moFieldAgreement.setLengthMax(25);
         moFieldReference = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfReference, jlReference);
         moFieldReference.setLengthMax(25);
         moFieldCode = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCode, jlCode);
@@ -583,7 +527,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         mvFields.add(moFieldBankAccountBranchNumber);
         mvFields.add(moFieldBankAccountNumber);
         mvFields.add(moFieldBankAccountNumberStd);
-        mvFields.add(moFieldAgree);
+        mvFields.add(moFieldAgreement);
         mvFields.add(moFieldReference);
         mvFields.add(moFieldCode);
         mvFields.add(moFieldCodeAba);
@@ -598,13 +542,16 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
 
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
-        jbAddCard.addActionListener(this);
-        jbModifyCard.addActionListener(this);
+        jbCardAdd.addActionListener(this);
+        jbCardModify.addActionListener(this);
         jbDbmsFkBizPartnerId.addActionListener(this);
         jbPkBizPartnerBranchId.addActionListener(this);
         jbFkBankId.addActionListener(this);
         jbFkCurrencyId.addActionListener(this);
         jbFkCardIssuerId.addActionListener(this);
+        jcbFkAccountCashTypeId.addItemListener(this);
+        jtfBankAccountNumber.addFocusListener(this);
+        jtfBankAccountNumberStd.addFocusListener(this);
 
         i = 0;
         tableColumnsBankAccountCards = new STableColumnForm[5];
@@ -629,8 +576,8 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
             moBankAccountLayoutPane.addTableColumn(tableColumnsBankAccountLayoutType[i]);
         }
 
-        SFormUtilities.createActionMap(rootPane, this, "publicActionAdd", "add", KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK);
-        SFormUtilities.createActionMap(rootPane, this, "publicActionModify", "modify", KeyEvent.VK_M, KeyEvent.CTRL_DOWN_MASK);
+        SFormUtilities.createActionMap(rootPane, this, "publicActionCardAdd", "add", KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK);
+        SFormUtilities.createActionMap(rootPane, this, "publicActionCardModify", "modify", KeyEvent.VK_M, KeyEvent.CTRL_DOWN_MASK);
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -658,44 +605,64 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
             }
         }
     }
-
-    private void actionOk() {
-        SFormValidation validation = formValidate();
-
-        if (validation.getIsError()) {
-            if (validation.getComponent() != null) {
-                validation.getComponent().requestFocus();
-            }
-            if (validation.getMessage().length() > 0) {
-                miClient.showMsgBoxWarning(validation.getMessage());
-            }
+    
+    private void readBizPartner() {
+        if (jcbDbmsFkBizPartnerId.getSelectedIndex() <= 0) {
+            mbParamIsCompany = false;
         }
         else {
-            mnFormResult = SLibConstants.FORM_RESULT_OK;
-            setVisible(false);
+            erp.mbps.data.SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, moFieldDbmsPkBizPartnerId.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
+            mbParamIsCompany = bizPartner.getIsCompany();
         }
     }
-
-    private void actionCancel() {
-        mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
-        setVisible(false);
-    }
-
-    private void renderBankAccountCardSettings() {
-        if (jckIsCardAppliyng.isSelected()) {
-            jbFkCardIssuerId.setEnabled(true);
-            jcbFkCardIssuerId.setEnabled(true);
-            jbAddCard.setEnabled(true);
-            jcbFkCardIssuerId.setFocusable(true);
-            jbModifyCard.setEnabled(true);
+    
+    private void readBizPartnerBranches() {
+        if (jcbDbmsFkBizPartnerId.getSelectedIndex() <= 0) {
+            jcbPkBizPartnerBranchId.setEnabled(false);
+            jbPkBizPartnerBranchId.setEnabled(false);
+            jcbPkBizPartnerBranchId.removeAllItems();
         }
         else {
-            jbFkCardIssuerId.setEnabled(false);
-            jcbFkCardIssuerId.setEnabled(false);
-            jcbFkCardIssuerId.setFocusable(false);
-            jbAddCard.setEnabled(false);
-            jbModifyCard.setEnabled(false);
-            moFieldFkCardIssuerId.setKey(new int[] { SDataConstantsSys.NA });
+            SFormUtilities.populateComboBox(miClient, jcbPkBizPartnerBranchId, SDataConstants.BPSU_BPB, moFieldDbmsPkBizPartnerId.getKeyAsIntArray());
+            jcbPkBizPartnerBranchId.setEnabled(true);
+            jbPkBizPartnerBranchId.setEnabled(true);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void readLayoutTypes() {
+        String sql = "";
+        ResultSet resulSet = null;
+        SDataBizPartnerBranchBankAccountLayoutRow row = null;
+
+        moBankAccountLayoutPane.clearTableRows();
+
+        try {
+            sql = "SELECT l.id_tp_lay_bank, l.tp_lay_bank, l.fid_tp_pay_bank, l.fid_bank, bp.bp " +
+                    "FROM erp.finu_tp_lay_bank AS l " +
+                    "INNER JOIN erp.bpsu_bp AS bp ON l.fid_bank = bp.id_bp " +
+                    "WHERE l.b_del = 0 " +
+                    "ORDER BY bp.bp, l.fid_bank, l.tp_lay_bank, l.id_tp_lay_bank ";
+
+            resulSet = miClient.getSession().getStatement().executeQuery(sql);
+            while (resulSet.next()) {
+                row = new SDataBizPartnerBranchBankAccountLayoutRow();
+
+                row.setFkTypePaymentBankId(resulSet.getInt("l.fid_tp_pay_bank"));
+                row.setFkBankId(resulSet.getInt("l.fid_bank"));
+                row.setPkTypeLayoutBankId(resulSet.getInt("l.id_tp_lay_bank"));
+                row.setBank(resulSet.getString("bp.bp"));
+                row.setLayoutType(resulSet.getString("l.tp_lay_bank"));
+                row.setIsSelected(false);
+
+                row.prepareTableRow();
+                moBankAccountLayoutPane.addTableRow(row);
+            }
+            moBankAccountLayoutPane.renderTableRows();
+            moBankAccountLayoutPane.setTableRowSelection(0);
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
         }
     }
 
@@ -726,9 +693,49 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
 
         }
     }
+   
+    private void renderBankAccountCardSettings() {
+        if (jckIsCardAppliyng.isSelected()) {
+            jbFkCardIssuerId.setEnabled(true);
+            jcbFkCardIssuerId.setEnabled(true);
+            jbCardAdd.setEnabled(true);
+            jcbFkCardIssuerId.setFocusable(true);
+            jbCardModify.setEnabled(true);
+        }
+        else {
+            jbFkCardIssuerId.setEnabled(false);
+            jcbFkCardIssuerId.setEnabled(false);
+            jcbFkCardIssuerId.setFocusable(false);
+            jbCardAdd.setEnabled(false);
+            jbCardModify.setEnabled(false);
+            moFieldFkCardIssuerId.setKey(new int[] { SDataConstantsSys.NA });
+        }
+    }
+ 
+    private void actionOk() {
+        SFormValidation validation = formValidate();
 
-    private void actionAddCard() {
-        if (jbAddCard.isEnabled()) {
+        if (validation.getIsError()) {
+            if (validation.getComponent() != null) {
+                validation.getComponent().requestFocus();
+            }
+            if (validation.getMessage().length() > 0) {
+                miClient.showMsgBoxWarning(validation.getMessage());
+            }
+        }
+        else {
+            mnFormResult = SLibConstants.FORM_RESULT_OK;
+            setVisible(false);
+        }
+    }
+
+    private void actionCancel() {
+        mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
+        setVisible(false);
+    }
+    
+    private void actionCardAdd() {
+        if (jbCardAdd.isEnabled()) {
             moFormBizPartnerBranchBankAccountCard.formRefreshCatalogues();
             moFormBizPartnerBranchBankAccountCard.formReset();
             moFormBizPartnerBranchBankAccountCard.setVisible(true);
@@ -741,10 +748,10 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         }
     }
 
-    private void actionModifyCard() {
+    private void actionCardModify() {
         int index = moBankAccountCardPane.getTable().getSelectedRow();
 
-        if (jbModifyCard.isEnabled()) {
+        if (jbCardModify.isEnabled()) {
             if (index != -1) {
                 moFormBizPartnerBranchBankAccountCard.formRefreshCatalogues();
                 moFormBizPartnerBranchBankAccountCard.formReset();
@@ -760,7 +767,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         }
     }
 
-    private void actionFkBizPartnerId() {
+    private void actionDbmsFkBizPartnerId() {
         int nBpCategory = 0;
 
         switch (mnParamBizPartnerType) {
@@ -797,93 +804,106 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
     private void actionFkCardIssuerId() {
         miClient.pickOption(SDataConstants.FINU_CARD_ISS, moFieldFkCardIssuerId, null);
     }
-
-    private void readBizPartner() {
-        if (moFieldDbmsPkBizPartnerId.getKeyAsIntArray()[0] > 0) {
-            moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, moFieldDbmsPkBizPartnerId.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
-            mbParamIsCompany = moBizPartner.getIsCompany();
-        } 
-    }
     
-    private void readBizPartnerBranches() {
-        if (moFieldDbmsPkBizPartnerId.getKeyAsIntArray()[0] > 0) {
-            SFormUtilities.populateComboBox(miClient, jcbPkBizPartnerBranchId, SDataConstants.BPSU_BPB, moFieldDbmsPkBizPartnerId.getKeyAsIntArray());
-            jcbPkBizPartnerBranchId.setEnabled(true);
-            jbPkBizPartnerBranchId.setEnabled(true);
-        }
-        else {
-            jcbPkBizPartnerBranchId.removeAllItems();
-            jcbPkBizPartnerBranchId.setEnabled(false);
-            jbPkBizPartnerBranchId.setEnabled(false);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private void readLayoutTypes() {
-        String sql = "";
-        ResultSet resulSet = null;
-        SDataBizPartnerBranchBankAccountLayoutRow row = null;
-
-        moBankAccountLayoutPane.clearTableRows();
-
-        try {
-            sql = "SELECT l.id_tp_lay_bank, l.tp_lay_bank, l.fid_tp_pay_bank, l.fid_bank, bp.bp " +
-                    "FROM erp.finu_tp_lay_bank AS l " +
-                    "INNER JOIN erp.bpsu_bp AS bp ON l.fid_bank = bp.id_bp " +
-                    "WHERE l.b_del = 0 " +
-                    "ORDER BY bp.bp, l.fid_bank, l.tp_lay_bank, l.id_tp_lay_bank ";
-
-            resulSet = miClient.getSession().getStatement().executeQuery(sql);
-            while (resulSet.next()) {
-                row = new SDataBizPartnerBranchBankAccountLayoutRow();
-
-                row.setFkTypePaymentBankId(resulSet.getInt("l.fid_tp_pay_bank"));
-                row.setFkBankId(resulSet.getInt("l.fid_bank"));
-                row.setPkTypeLayoutBankId(resulSet.getInt("l.id_tp_lay_bank"));
-                row.setBank(resulSet.getString("bp.bp"));
-                row.setLayoutType(resulSet.getString("l.tp_lay_bank"));
-                row.setIsPayment(false);
-
-                row.prepareTableRow();
-                moBankAccountLayoutPane.addTableRow(row);
-            }
-            moBankAccountLayoutPane.renderTableRows();
-            moBankAccountLayoutPane.setTableRowSelection(0);
-        }
-        catch (Exception e) {
-            SLibUtilities.renderException(this, e);
-        }
-    }
-
-    private void itemStateChangedBizPartner() {
+    private void itemStateChangedDbmsFkBizPartnerId() {
+        readBizPartner();
         readBizPartnerBranches();
     }
+
+    private void itemStateChangedFkAccountCashTypeId() {
+        if (jcbFkAccountCashTypeId.getSelectedIndex() <= 0) {
+            mnAccountCashMode = SLibConstants.UNDEFINED;
+        }
+        else {
+            if (SLibUtils.belongsTo(moFieldFkAccountCashTypeId.getKeyAsIntArray(), new int[][] { SDataConstantsSys.FINS_TP_ACC_CASH_BANK_SAV, SDataConstantsSys.FINS_TP_ACC_CASH_BANK_DBT, SDataConstantsSys.FINS_TP_ACC_CASH_BANK_CDT })) {
+                mnAccountCashMode = MODE_BANK_ACC;
+            }
+            else if (SLibUtils.compareKeys(moFieldFkAccountCashTypeId.getKeyAsIntArray(), SDataConstantsSys.FINS_TP_ACC_CASH_BANK_AGR )) {
+                mnAccountCashMode = MODE_BANK_AGR;
+            }
+            else {
+                mnAccountCashMode = SLibConstants.UNDEFINED;
+            }
+        }
+        
+        boolean enableAcc = false;
+        boolean enableAgr = false;
+        
+        switch (mnAccountCashMode) {
+            case MODE_BANK_ACC:
+                enableAcc = true;
+                enableAgr = false;
+                break;
+            case MODE_BANK_AGR:
+                enableAcc = false;
+                enableAgr = true;
+                break;
+            default:
+                enableAcc = false;
+                enableAgr = false;
+                jlFormatBankAccountNumberData.setText("");
+                jlFormatBankAccountNumberStdData.setText("");
+        }
+        
+        jtfBankAccountBranchNumber.setText("");
+        jtfBankAccountNumber.setText("");
+        jtfBankAccountNumberStd.setText("");
+        jtfAgreement.setText("");
+        jtfReference.setText("");
+        jtfCodeAba.setText("");
+        jtfCodeSwift.setText("");
+        jtfCode.setText("");
+        jtfAliasBajio.setText("");
+        jtfReference.setText("");
+        
+        jlFormatBankAccountNumberData.setText("");
+        jlFormatBankAccountNumberStdData.setText("");
+        
+        jtfBankAccountBranchNumber.setEditable(enableAcc);
+        jtfBankAccountBranchNumber.setFocusable(enableAcc);
+        //jtfBankAccountNumber.setEditable(enableAcc);
+        //jtfBankAccountNumber.setFocusable(enableAcc);
+        jtfBankAccountNumber.setEnabled(enableAcc);         // to omit validation when field is not requiered (and empty) because it was set mandatory
+        //jtfBankAccountNumberStd.setEditable(enableAcc);
+        //jtfBankAccountNumberStd.setFocusable(enableAcc);
+        jtfBankAccountNumberStd.setEnabled(enableAcc);      // to omit validation when field is not requiered (and empty) because it was set mandatory
+        //jtfAgreement.setEditable(enableAgr);
+        //jtfAgreement.setFocusable(enableAgr);
+        jtfAgreement.setEnabled(enableAgr);                 // to omit validation when field is not requiered (and empty) because it was set mandatory
+        //jtfReference.setEditable(enableAgr);
+        //jtfReference.setFocusable(enableAgr);
+        jtfReference.setEnabled(enableAgr);                 // just for consistence with other previous cases, this is not needed at all, because field was not set mandatory
+        jtfCodeAba.setEditable(enableAcc);
+        jtfCodeAba.setFocusable(enableAcc);
+        jtfCodeSwift.setEditable(enableAcc);
+        jtfCodeSwift.setFocusable(enableAcc);
+        jtfCode.setEditable(enableAcc);
+        jtfCode.setFocusable(enableAcc);
+        jtfAliasBajio.setEditable(enableAcc || enableAgr);
+        jtfAliasBajio.setFocusable(enableAcc || enableAgr);
+     }
 
     private void itemStateChangedIsCardApplying() {
         renderBankAccountCardSettings();
     }
-
-    private java.lang.String getCurrencyKey(int key) {
-        SDataCurrency oCurrency = null;
-
-        oCurrency = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { key }, SLibConstants.EXEC_MODE_SILENT);
-
-        return oCurrency.getKey();
+    
+    private void focusLostBankAccountNumber() {
+        jlFormatBankAccountNumberData.setText(SBpsUtils.formatBankAccountNumber(jtfBankAccountNumber.getText()));
     }
-
-    public void publicActionModifyCard() {
-        actionModifyCard();
+    
+    private void focusLostBankAccountNumberStd() {
+        jlFormatBankAccountNumberStdData.setText(SBpsUtils.formatBankAccountNumberStd(jtfBankAccountNumberStd.getText()));
     }
-
-    public void publicActionAdd() {
-        if (jbAddCard.isEnabled()) {
-            actionAddCard();
+    
+    public void publicActionCardAdd() {
+        if (jbCardAdd.isEnabled()) {
+            actionCardAdd();
         }
     }
 
-    public void publicActionModify() {
-        if (jbModifyCard.isEnabled()) {
-            actionModifyCard();
+    public void publicActionCardModify() {
+        if (jbCardModify.isEnabled()) {
+            actionCardModify();
         }
     }
 
@@ -902,13 +922,13 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
-    private javax.swing.JButton jbAddCard;
     private javax.swing.JButton jbCancel;
+    private javax.swing.JButton jbCardAdd;
+    private javax.swing.JButton jbCardModify;
     private javax.swing.JButton jbDbmsFkBizPartnerId;
     private javax.swing.JButton jbFkBankId;
     private javax.swing.JButton jbFkCardIssuerId;
     private javax.swing.JButton jbFkCurrencyId;
-    private javax.swing.JButton jbModifyCard;
     private javax.swing.JButton jbOk;
     private javax.swing.JButton jbPkBizPartnerBranchId;
     private javax.swing.JComboBox jcbDbmsFkBizPartnerId;
@@ -921,7 +941,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
     private javax.swing.JCheckBox jckIsCardAppliyng;
     private javax.swing.JCheckBox jckIsDefault;
     private javax.swing.JCheckBox jckIsDeleted;
-    private javax.swing.JLabel jlAgree;
+    private javax.swing.JLabel jlAgreement;
     private javax.swing.JLabel jlAliasBajio;
     private javax.swing.JLabel jlBankAccount;
     private javax.swing.JLabel jlBankAccountBranchNumber;
@@ -944,7 +964,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
     private javax.swing.JLabel jlReference;
     private javax.swing.JPanel jpBankAccountCard;
     private javax.swing.JPanel jpBankAccountLayout;
-    private javax.swing.JTextField jtfAgree;
+    private javax.swing.JTextField jtfAgreement;
     private javax.swing.JTextField jtfAliasBajio;
     private javax.swing.JTextField jtfBankAccount;
     private javax.swing.JTextField jtfBankAccountBranchNumber;
@@ -955,6 +975,12 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
     private javax.swing.JTextField jtfCodeSwift;
     private javax.swing.JTextField jtfReference;
     // End of variables declaration//GEN-END:variables
+   
+    public void setParamIsInMainWindow(boolean b) { mbParamIsInMainWindow = b; }
+    
+    public void setParamBizPartnerDescription(java.lang.String s) { msParamBizPartnerDescription = s; }
+    
+    public void setParamBizPartnerBranchDescription(java.lang.String s) { msParamBizPartnerBranchDescription = s; }
 
     @Override
     public void formClearRegistry() {
@@ -965,10 +991,10 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
     public void formReset() {
         mnFormResult = SLibConstants.UNDEFINED;
         mnFormStatus = SLibConstants.UNDEFINED;
+        mnAccountCashMode = SLibConstants.UNDEFINED;
         mbFirstTime = true;
-        mbParamIsCompany = true;
+        mbParamIsCompany = false;
 
-        moBizPartner = null;
         moBizPartnerBranchBankAccount = null;
 
         for (int i = 0; i < mvFields.size(); i++) {
@@ -1019,7 +1045,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
     @Override
     public erp.lib.form.SFormValidation formValidate() {
         SFormValidation validation = new SFormValidation();
-
+        
         for (int i = 0; i < mvFields.size(); i++) {
             if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()) {
                 validation.setIsError(true);
@@ -1027,67 +1053,88 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
                 break;
             }
         }
+        
         if (!validation.getIsError()) {
-            if (!mbParamIsInMainWindow) {
-                if (moFieldDbmsPkBizPartnerId.getKeyAsIntArray()[0] == 0) {
-                    validation.setComponent(jcbDbmsFkBizPartnerId);
-                    validation.setMessage("Se debe selecccionar una opción para el campo: '" + jlDbmsFkBizPartnerId.getText() + "'.");
-                }
-                else if (!msMsgError.isEmpty()) {
-                    validation.setComponent(jcbDbmsFkBizPartnerId);
-                    validation.setMessage(msMsgError);
-                }
-                else if (moFieldPkBizPartnerBranchId.getKeyAsIntArray()[0] == 0) {
-                    validation.setComponent(jcbPkBizPartnerBranchId);
-                    validation.setMessage("Se debe selecccionar una opción para el campo: '" + jlPkBizPartnerBranchId.getText() + "'.");
-                }
+            if (mbParamIsCompany) {
+                validation.setMessage("El asociado de negocios es empresa del ERP, no se le pueden crear ni modificar cuentas bancarias desde esta forma de captura.");
             }
-        }
+            else {
+                // check that this account's bank is correct for selected bank layouts:
+                
+                int idBank = moFieldFkBankId.getKeyAsIntArray()[0];
+                
+                LAYOUT:
+                for (STableRow row : moBankAccountLayoutPane.getTableModel().getTableRows()) {
+                    SDataBizPartnerBranchBankAccountLayoutRow layoutRow = (SDataBizPartnerBranchBankAccountLayoutRow) row;
+                    
+                    if (layoutRow.getIsSelected()) {
+                        switch (layoutRow.getFkTypePaymentBankId()) {
+                            case SDataConstantsSys.FINS_TP_PAY_BANK_THIRD:
+                            case SDataConstantsSys.FINS_TP_PAY_BANK_AGREE:
+                                if (idBank != layoutRow.getFkBankId()) {
+                                    validation.setComponent(jpBankAccountLayout);
+                                    validation.setMessage("Esta cuenta bancaria no puede ser utilizada para '" + layoutRow.getLayoutType() + "'.");
+                                    break LAYOUT;
+                                }
+                                break;
+                            case SDataConstantsSys.FINS_TP_PAY_BANK_TEF:
+                            case SDataConstantsSys.FINS_TP_PAY_BANK_SPEI_FD_N:
+                            case SDataConstantsSys.FINS_TP_PAY_BANK_SPEI_FD_Y:
+                                if (idBank == layoutRow.getFkBankId()) {
+                                    validation.setComponent(jpBankAccountLayout);
+                                    validation.setMessage("Esta cuenta bancaria no puede ser utilizada para '" + layoutRow.getLayoutType() + "'.");
+                                    break LAYOUT;
+                                }
+                                else if(moFieldBankAccountNumberStd.getString().isEmpty()) {
+                                    validation.setComponent(jtfBankAccountNumberStd);
+                                    validation.setMessage("La longitud del valor para el campo '" + jlBankAccountNumberStd.getText() + "' no puede ser menor a 1, para " + layoutRow.getLayoutType() + "'.");
+                                    break LAYOUT;
+                                }
+                                break;
+                            default:
+                        }
+                    }
+                }
 
-        if (!validation.getIsError()) {
-            for (STableRow row : moBankAccountLayoutPane.getTableModel().getTableRows()) {
-                if (((Boolean) row.getValues().get(2))) {
-                    if (moFieldFkBankId.getKeyAsIntArray()[0] == ((SDataBizPartnerBranchBankAccountLayoutRow) row).getFkBankId() && ((SDataBizPartnerBranchBankAccountLayoutRow) row).getFkTypePaymentBankId() != SDataConstantsSys.FINS_TP_PAY_BANK_THIRD) {
-                        validation.setComponent(jpBankAccountLayout);
-                        validation.setMessage("La cuenta bancaria no puede ser utilizada para '" + ((SDataBizPartnerBranchBankAccountLayoutRow) row).getLayoutType() + "'.");
-                        break;
+                // check that account number or agreement is not repeated for the same bank in other bank accounts:
+                
+                if (!validation.getIsError()) {
+                    int count = 0;
+                    
+                    try {
+                        switch (mnAccountCashMode) {
+                            case MODE_BANK_ACC:
+                                count = SBpsUtils.countOcurrencesBankAccount(miClient.getSession(), idBank, moFieldBankAccountNumber.getString(), moBizPartnerBranchBankAccount == null ? null : (int[]) moBizPartnerBranchBankAccount.getPrimaryKey());
+                                if (count > 0) {
+                                    validation.setMessage("El valor del campo '" + jlBankAccountNumber.getText() + "' ya existe en otras cuentas bancarias (" + count + ").");
+                                    validation.setComponent(jtfBankAccountNumber);
+                                }
+                                else {
+                                    count = SBpsUtils.countOcurrencesBankAccountStd(miClient.getSession(), moFieldBankAccountNumberStd.getString(), moBizPartnerBranchBankAccount == null ? null : (int[]) moBizPartnerBranchBankAccount.getPrimaryKey());
+                                    if (count > 0) {
+                                        validation.setMessage("El valor del campo '" + jlBankAccountNumberStd.getText() + "' ya existe en otras cuentas bancarias (" + count + ").");
+                                        validation.setComponent(jtfBankAccountNumberStd);
+                                    }
+                                }
+                                break;
+                            case MODE_BANK_AGR:
+                                count = SBpsUtils.countOcurrencesBankAgreement(miClient.getSession(), idBank, moFieldAgreement.getString(), moBizPartnerBranchBankAccount == null ? null : (int[]) moBizPartnerBranchBankAccount.getPrimaryKey());
+                                if (count > 0) {
+                                    validation.setMessage("El valor del campo '" + jlAgreement.getText() + "' ya existe en otras cuentas bancarias (" + count + ").");
+                                    validation.setComponent(jtfAgreement);
+                                }                        
+                                break;
+                            default:
+                        }
                     }
-                    else if (moFieldFkBankId.getKeyAsIntArray()[0] != ((SDataBizPartnerBranchBankAccountLayoutRow) row).getFkBankId() && ((SDataBizPartnerBranchBankAccountLayoutRow) row).getFkTypePaymentBankId() == SDataConstantsSys.FINS_TP_PAY_BANK_THIRD) {
-                        validation.setComponent(jpBankAccountLayout);
-                        validation.setMessage("La cuenta bancaria no puede ser utilizada para '" + ((SDataBizPartnerBranchBankAccountLayoutRow) row).getLayoutType() + "'.");
-                        break;
-                    }
-                    else if(moFieldFkBankId.getKeyAsIntArray()[0] != ((SDataBizPartnerBranchBankAccountLayoutRow) row).getFkBankId() && moFieldBankAccountNumberStd.getString().length() == 0) {
-                        validation.setComponent(jtfBankAccountNumberStd);
-                        validation.setMessage("La longitud del valor para el campo '" + jlBankAccountNumberStd.getText() + "' no puede ser menor a 1, para " + ((SDataBizPartnerBranchBankAccountLayoutRow) row).getLayoutType() + "'.");
-                        break;
+                    catch (Exception e) {
+                        validation.setIsError(true);
+                        SLibUtilities.renderException(this, e);
                     }
                 }
             }
         }
         
-        if (!validation.getIsError()) {
-            try {
-                if (SBpsUtils.bankAccountOcurrences((SGuiClient) miClient, moFieldBankAccountNumber.getString(), moFieldFkBankId.getKeyAsIntArray()[0],
-                        moBizPartnerBranchBankAccount == null ? null : (int []) moBizPartnerBranchBankAccount.getPrimaryKey()) > 0) {
-                    validation.setMessage("El campo " + jlBankAccountNumber.getText() + " ya existe.");
-                    validation.setComponent(jtfBankAccountNumber);
-                }
-
-                if (!validation.getIsError()) {
-                    if (SBpsUtils.stdBankAccountOcurrences((SGuiClient) miClient, moFieldBankAccountNumberStd.getString(),
-                            moBizPartnerBranchBankAccount == null ? null : (int []) moBizPartnerBranchBankAccount.getPrimaryKey()) > 0) {
-                        validation.setMessage("El campo '" + jlBankAccountNumberStd.getText() + "' ya existe.");
-                        validation.setComponent(jtfBankAccountNumberStd);
-                    }
-                }
-            }
-            catch (Exception e) {
-                validation.setIsError(true);
-                SLibUtilities.renderException(this, e);
-            }
-        }
-
         return validation;
     }
 
@@ -1131,9 +1178,9 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         moFieldBankAccountBranchNumber.setFieldValue(moBizPartnerBranchBankAccount.getBankAccountBranchNumber());
         moFieldBankAccountNumber.setFieldValue(moBizPartnerBranchBankAccount.getBankAccountNumber());
         moFieldBankAccountNumberStd.setFieldValue(moBizPartnerBranchBankAccount.getBankAccountNumberStd());        
-        jlFormatBankAccountNumberData.setText(SBpsUtils.bankAccountNumberFormat(moBizPartnerBranchBankAccount.getBankAccountNumber()));        
-        jlFormatBankAccountNumberStdData.setText(SBpsUtils.bankAccountClaBeFormat(moBizPartnerBranchBankAccount.getBankAccountNumberStd()));        
-        moFieldAgree.setFieldValue(moBizPartnerBranchBankAccount.getAgree());
+        jlFormatBankAccountNumberData.setText(SBpsUtils.formatBankAccountNumber(moBizPartnerBranchBankAccount.getBankAccountNumber()));        
+        jlFormatBankAccountNumberStdData.setText(SBpsUtils.formatBankAccountNumberStd(moBizPartnerBranchBankAccount.getBankAccountNumberStd()));        
+        moFieldAgreement.setFieldValue(moBizPartnerBranchBankAccount.getAgree());
         moFieldReference.setFieldValue(moBizPartnerBranchBankAccount.getReference());
         moFieldCode.setFieldValue(moBizPartnerBranchBankAccount.getCode());
         moFieldCodeAba.setFieldValue(moBizPartnerBranchBankAccount.getCodeAba());
@@ -1167,8 +1214,6 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         renderBizPartnerSettings();
         renderBankAccountCardSettings();
         
-        readBizPartner();
-       
         jckIsDeleted.setEnabled(!mbParamIsCompany);
         jbDbmsFkBizPartnerId.setEnabled(false);
         jbPkBizPartnerBranchId.setEnabled(false);
@@ -1196,7 +1241,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         moBizPartnerBranchBankAccount.setBankAccountBranchNumber(moFieldBankAccountBranchNumber.getString());
         moBizPartnerBranchBankAccount.setBankAccountNumber(moFieldBankAccountNumber.getString());
         moBizPartnerBranchBankAccount.setBankAccountNumberStd(moFieldBankAccountNumberStd.getString());
-        moBizPartnerBranchBankAccount.setAgree(moFieldAgree.getString());
+        moBizPartnerBranchBankAccount.setAgree(moFieldAgreement.getString());
         moBizPartnerBranchBankAccount.setReference(moFieldReference.getString());
         moBizPartnerBranchBankAccount.setCode(moFieldCode.getString());
         moBizPartnerBranchBankAccount.setCodeAba(moFieldCodeAba.getString());
@@ -1208,7 +1253,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         moBizPartnerBranchBankAccount.setIsDeleted(moFieldIsDeleted.getBoolean());
         moBizPartnerBranchBankAccount.setDbmsAccountCashType(jcbFkAccountCashTypeId.getSelectedItem().toString());
         moBizPartnerBranchBankAccount.setDbmsBank(jcbFkBankId.getSelectedItem().toString());
-        moBizPartnerBranchBankAccount.setDbmsCurrencyKey(getCurrencyKey(moFieldFkCurrencyId.getKeyAsIntArray()[0]));
+        moBizPartnerBranchBankAccount.setDbmsCurrencyKey(miClient.getSession().getSessionCustom().getCurrencyCode(moFieldFkCurrencyId.getKeyAsIntArray()));
         moBizPartnerBranchBankAccount.setDbmsCardIssuer(jcbFkCardIssuerId.getSelectedItem().toString());
 
         moBizPartnerBranchBankAccount.getDbmsBankAccountCards().removeAllElements();
@@ -1270,7 +1315,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
     public javax.swing.JLabel getTimeoutLabel() {
         return null;
     }
-
+    
     @Override
     public void actionPerformed(java.awt.event.ActionEvent e) {
         if (e.getSource() instanceof javax.swing.JButton) {
@@ -1282,14 +1327,14 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
             else if (button == jbCancel) {
                 actionCancel();
             }
-            else if (button == jbAddCard) {
-                actionAddCard();
+            else if (button == jbCardAdd) {
+                actionCardAdd();
             }
-            else if (button == jbModifyCard) {
-                actionModifyCard();
+            else if (button == jbCardModify) {
+                actionCardModify();
             }
             else if (button == jbDbmsFkBizPartnerId) {
-                actionFkBizPartnerId();
+                actionDbmsFkBizPartnerId();
             }
             else if (button == jbPkBizPartnerBranchId) {
                 actionPkBizPartnerBranchId();
@@ -1306,7 +1351,45 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         }
     }
 
-    public void setParamIsInMainWindow(boolean b) { mbParamIsInMainWindow = b; }
-    public void setParamBizPartnerDescription(java.lang.String s) { msParamBizPartnerDescription = s; }
-    public void setParamBizPartnerBranchDescription(java.lang.String s) { msParamBizPartnerBranchDescription = s; }
+    @Override    
+    public void itemStateChanged(java.awt.event.ItemEvent e) {
+        if (e.getSource() instanceof javax.swing.JComboBox) {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                javax.swing.JComboBox comboBox = (javax.swing.JComboBox) e.getSource();
+                
+                if (comboBox == jcbDbmsFkBizPartnerId) {
+                    itemStateChangedDbmsFkBizPartnerId();
+                }
+                else if (comboBox == jcbFkAccountCashTypeId) {
+                    itemStateChangedFkAccountCashTypeId();
+                }
+            }
+        }
+        else if (e.getSource() instanceof javax.swing.JCheckBox) {
+            javax.swing.JCheckBox checkBox = (javax.swing.JCheckBox) e.getSource();
+            
+            if (checkBox == jckIsCardAppliyng) {
+                itemStateChangedIsCardApplying();
+            }
+        }
+     }
+
+    @Override
+    public void focusGained(FocusEvent e) {
+        
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+        if (e.getSource() instanceof javax.swing.JTextField) {
+            javax.swing.JTextField textField = (javax.swing.JTextField) e.getSource();
+            
+            if (textField == jtfBankAccountNumber) {
+                focusLostBankAccountNumber();
+            }
+            else if (textField == jtfBankAccountNumberStd) {
+                focusLostBankAccountNumberStd();
+            }
+        }
+    }
 }

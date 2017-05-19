@@ -16,7 +16,7 @@ public final class SDataBizPartnerBranchBankAccountLayoutRow extends erp.lib.tab
     protected int mnPkTypeLayoutBankId;
     protected java.lang.String msBank;
     protected java.lang.String msLayoutType;
-    protected boolean mbIsPayment;
+    protected boolean mbIsSelected;
     
     public SDataBizPartnerBranchBankAccountLayoutRow() {        
         reset();
@@ -28,7 +28,7 @@ public final class SDataBizPartnerBranchBankAccountLayoutRow extends erp.lib.tab
         mnPkTypeLayoutBankId = 0;      
         msBank = "";
         msLayoutType = "";
-        mbIsPayment = false;
+        mbIsSelected = false;
     }
 
     public void setFkTypePaymentBankId(int n) { mFkTypePaymentBankId = n; }
@@ -36,20 +36,20 @@ public final class SDataBizPartnerBranchBankAccountLayoutRow extends erp.lib.tab
     public void setPkTypeLayoutBankId(int n) { mnPkTypeLayoutBankId = n; }
     public void setBank(String s) { msBank = s; }
     public void setLayoutType(String s) { msLayoutType = s; }
-    public void setIsPayment(boolean b) { mbIsPayment = b; }
+    public void setIsSelected(boolean b) { mbIsSelected = b; }
     
     public int getFkTypePaymentBankId() { return mFkTypePaymentBankId; }
     public int getFkBankId() { return mnFkBankId; }
     public int getPkTypeLayoutBankId() { return mnPkTypeLayoutBankId; }
     public java.lang.String getBank() { return msBank; }
     public java.lang.String getLayoutType() { return msLayoutType; }
-    public boolean getIsPayment() { return mbIsPayment; }
+    public boolean getIsSelected() { return mbIsSelected; }
     
     @Override
     public void prepareTableRow() {
         mvValues.clear();
         mvValues.add(msBank);
         mvValues.add(msLayoutType);
-        mvValues.add(mbIsPayment);
+        mvValues.add(mbIsSelected);
     }
 }

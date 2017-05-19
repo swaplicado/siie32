@@ -29,7 +29,7 @@ public class SDataBizPartnerBranchBankAccountRow extends erp.lib.table.STableRow
         mvValues.add(bankAccountRow.getDbmsCurrencyKey());
         mvValues.add(bankAccountRow.getBankAccountBranchNumber());
         mvValues.add(bankAccountRow.getBankAccountNumber());
-        mvValues.add(SBpsUtils.bankAccountClaBeFormat(bankAccountRow.getBankAccountNumberStd()));
+        mvValues.add(SBpsUtils.formatBankAccountNumberStd(bankAccountRow.getBankAccountNumberStd()));
         mvValues.add(bankAccountRow.getCode());
         mvValues.add(bankAccountRow.getReference());
         mvValues.add(bankAccountRow.getCodeAba());

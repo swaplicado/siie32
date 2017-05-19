@@ -472,7 +472,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
     @SuppressWarnings("unchecked")
     public void createSqlQuery() {
         int[] dpsTypeKey = getDpsTypeKey();
-        String sqlDpsType = "";
+        String sqlDpsType = ""; 
         String sqlDatePeriod = "";
         String sqlCompanyBranch = "";
         String sqlBizPartner = "";
@@ -490,7 +490,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
                     sqlDatePeriod = setting.getSetting() == null ? "" : "AND d.dt <= '" + (new java.sql.Date(((java.util.Date) setting.getSetting()).getTime())) + "' ";
                 }
             }
-            else if (setting.getType() == SFilterConstants.SETTING_FILTER_COB) {
+             else if (setting.getType() == SFilterConstants.SETTING_FILTER_COB) {
                 sqlCompanyBranch = ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND d.fid_cob = " + (Integer) setting.getSetting() + " ");
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_BP) {
@@ -509,9 +509,10 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
             msSql = "";
         }
         else {
-            msSql = "SELECT id_year, id_doc, dt, dt_doc_delivery_n, dt_doc_lapsing_n, num_ref, b_link, ts_link, " +
-                    "f_num, fid_cob, fid_bpb, fid_bp_r, fid_usr_link, " +
-                    "f_dt_code, f_dn_code, f_cob_code, bpb, bp, bp_key, usr, " +
+            msSql = "SELECT id_year, id_doc, dt, dt_doc_delivery_n, dt_doc_lapsing_n, " +
+                    "num_ref, b_link, ts_link, f_num, fid_cob, " +
+                    "fid_bpb, fid_bp_r, fid_usr_link, f_dt_code, f_dn_code, " +
+                    "f_cob_code, bpb, bp, bp_key, cur_key, usr, " +
                     "SUM(f_qty) AS f_qty, SUM(f_orig_qty) AS f_orig_qty, " +
                     "SUM(f_link_qty) AS f_link_qty, SUM(f_link_orig_qty) AS f_link_orig_qty, " +
                     "COUNT(*) AS f_count, " +
@@ -519,7 +520,8 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
                     "FROM (";
         }
 
-        msSql += "SELECT de.id_year, de.id_doc, d.dt, d.dt_doc_delivery_n, d.dt_doc_lapsing_n, d.num_ref, d.b_link, d.ts_link, " +
+        msSql += "SELECT de.id_year, de.id_doc, de.id_ety, " +
+                "d.dt, d.dt_doc_delivery_n, d.dt_doc_lapsing_n, d.num_ref, d.b_link, d.ts_link, " +
                 "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
                 "d.fid_cob, d.fid_bpb, d.fid_bp_r, d.fid_usr_link, " +
                 "dt.code AS f_dt_code, dn.code AS f_dn_code, cob.code AS f_cob_code, bb.bpb, b.bp, bc.bp_key, c.cur_key, ul.usr, " +
@@ -556,12 +558,15 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
                 "INNER JOIN erp.itmu_unit AS u ON de.fid_unit = u.id_unit " +
                 "INNER JOIN erp.itmu_unit AS uo ON de.fid_orig_unit = uo.id_unit " +
                 (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) +
-                "GROUP BY de.id_year, de.id_doc, d.dt, d.dt_doc_delivery_n, d.num_ref, d.b_link, d.ts_link, " +
-                "d.num_ser, d.num, d.fid_cob, d.fid_bpb, d.fid_bp_r, d.fid_usr_link, " +
-                "dt.code, cob.code, bb.bpb, b.bp, bc.bp_key, c.cur_key, ul.usr, " +
+                "GROUP BY de.id_year, de.id_doc, de.id_ety, " +
+                "d.dt, d.dt_doc_delivery_n, d.dt_doc_lapsing_n, d.num_ref, d.b_link, d.ts_link, " +
+                "d.num_ser, d.num, " +
+                "d.fid_cob, d.fid_bpb, d.fid_bp_r, d.fid_usr_link, " +
+                "dt.code, dn.code, cob.code, bb.bpb, b.bp, bc.bp_key, c.cur_key, ul.usr, " +
                 "de.fid_item, de.fid_unit, de.fid_orig_unit, de.surplus_per, " +
-                "de.qty, de.orig_qty, de.stot_cur_r, " +
-                "i.item_key, i.item, u.symbol, uo.symbol ";
+                "de.qty, de.orig_qty, " +
+                "de.stot_cur_r, " +
+                "i.item_key, i.item, ig.igen, u.symbol, uo.symbol ";
 
         if (isViewForDocEntries()) {
             if (isViewForDocLinked()) {
