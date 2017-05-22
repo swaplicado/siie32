@@ -583,8 +583,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFin.add(jmiFinLayoutBankAdvances);
         jmFin.add(jmiFinLayoutBankPendingAdvances);
         jmFin.add(jmiFinLayoutBankDoneAdvances);
-        jmFin.addSeparator();
-        jmFin.add(jmiFinImportPayments);
+//        jmFin.addSeparator();
+//        jmFin.add(jmiFinImportPayments);
 
         jmRep = new JMenu("Reportes");
 
