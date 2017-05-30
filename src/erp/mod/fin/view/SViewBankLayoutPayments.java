@@ -31,7 +31,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Juan Barajas, Uriel Castañeda
+ * @author Juan Barajas, Uriel Castañeda, Alfredo Pérez
  */
 public class SViewBankLayoutPayments extends SGridPaneView implements ActionListener {
 
@@ -76,7 +76,7 @@ public class SViewBankLayoutPayments extends SGridPaneView implements ActionList
                     miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
                 }
                 else {
-                    miClient.getSession().getModule(mnModuleType, mnModuleSubtype).showForm(mnGridType, SModConsts.FIN_REC, new SGuiParams(gridRow.getRowPrimaryKey()));
+                    miClient.getSession().getModule(mnModuleType, mnModuleSubtype).showForm(mnGridType, SModSysConsts.FIN_LAY_BANK_ACC, new SGuiParams(gridRow.getRowPrimaryKey()));
                 }
             }
         }
@@ -183,7 +183,7 @@ public class SViewBankLayoutPayments extends SGridPaneView implements ActionList
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
-        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
+        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
         
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "l.dt_lay", "Pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, SDbConsts.FIELD_ID + "1", "Folio", 50));

@@ -11,7 +11,7 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Alfredo Pérez
  */
 public class SLayoutBankPaymentRow implements SGridRow {
 
@@ -20,6 +20,7 @@ public class SLayoutBankPaymentRow implements SGridRow {
     protected int mnBizPartnerId;
     protected int mnBizPartnerBranchId;
     protected int mnBizPartnerBranchBankAccountId;
+    protected int mnLayoutRowSubType;
     protected String msBizPartner;
     protected String msBizPartnerKey;
     protected boolean mbIsForPayment;
@@ -28,6 +29,9 @@ public class SLayoutBankPaymentRow implements SGridRow {
     protected double mdBalanceTot;
     protected String msCurrencyKey;
     protected String msAccountCredit;
+    protected String msAgreement;
+    protected String msAgreementReference;
+    protected String msAgreementConcept;
     protected String msRecordPeriod;
     protected String msRecordBkc;
     protected String msRecordCob;
@@ -47,6 +51,7 @@ public class SLayoutBankPaymentRow implements SGridRow {
         mnBizPartnerId = 0;
         mnBizPartnerBranchId = 0;
         mnBizPartnerBranchBankAccountId = 0;
+        mnLayoutRowSubType = 0;
         msBizPartner = "";
         msBizPartnerKey = "";
         mbIsForPayment = false;
@@ -55,6 +60,9 @@ public class SLayoutBankPaymentRow implements SGridRow {
         mdBalanceTot = 0;
         msCurrencyKey = "";
         msAccountCredit = "";
+        msAgreement = "";
+        msAgreementReference = "";
+        msAgreementConcept = "";
         msRecordPeriod = "";
         msRecordBkc = "";
         msRecordCob = "";
@@ -69,6 +77,7 @@ public class SLayoutBankPaymentRow implements SGridRow {
     public void setBizPartnerId(int n) { mnBizPartnerId = n; }
     public void setBizPartnerBranchId(int n) { mnBizPartnerBranchId = n; }
     public void setBizPartnerBranchAccountId(int n) { mnBizPartnerBranchBankAccountId = n; }
+    public void setLayoutRowSubType(int n) { mnLayoutRowSubType = n; }
     public void setBizPartner(String s) { msBizPartner = s; }
     public void setBizPartnerKey(String s) { msBizPartnerKey = s; }
     public void setIsForPayment(boolean b) { mbIsForPayment = b; }
@@ -77,6 +86,9 @@ public class SLayoutBankPaymentRow implements SGridRow {
     public void setBalanceTot(double d) { mdBalanceTot = d; }
     public void setCurrencyKey(String s) { msCurrencyKey = s; }
     public void setAccountCredit(String s) { msAccountCredit = s; }
+    public void setAgreement(String s) { msAgreement = s; }
+    public void setAgreementReference(String s) { msAgreementReference = s; }
+    public void setAgreementConcept(String s) { msAgreementConcept = s; }
     public void setRecordPeriod(String s) { msRecordPeriod = s; }
     public void setRecordBkc(String s) { msRecordBkc = s; }
     public void setRecordCob(String s) { msRecordCob = s; }
@@ -96,6 +108,7 @@ public class SLayoutBankPaymentRow implements SGridRow {
     public int getBizPartnerId() { return mnBizPartnerId; }
     public int getBizPartnerBranchId() { return mnBizPartnerBranchId; }
     public int getBizPartnerBranchAccountId() { return mnBizPartnerBranchBankAccountId; }
+    public int getLayoutRowSubType() { return mnLayoutRowSubType; }
     public String getBizPartner() { return msBizPartner; }
     public String getBizPartnerKey() { return msBizPartnerKey; }
     public boolean getIsForPayment() { return mbIsForPayment; }
@@ -104,6 +117,9 @@ public class SLayoutBankPaymentRow implements SGridRow {
     public double getBalanceTot() { return mdBalanceTot; }
     public String getCurrencyKey() { return msCurrencyKey; }
     public String getAccountCredit() { return msAccountCredit; }
+    public String getAgreement() { return msAgreement; }
+    public String getAgreementReference() { return msAgreementReference; }
+    public String getAgreementConcept() { return msAgreementConcept; }
     public String getRecordPeriod() { return msRecordPeriod; }
     public String getRecordBkc() { return msRecordBkc; }
     public String getRecordCob() { return msRecordCob; }
@@ -170,26 +186,36 @@ public class SLayoutBankPaymentRow implements SGridRow {
                 value = msCurrencyKey;
                 break;
             case 5:
-                value = msAccountCredit;
+                if (msAgreement == null || msAgreement.isEmpty()) {
+                    value = msAccountCredit;
+                }
+                else {
+                    value = msAgreement;
+                }
                 break;
             case 6:
-                value = msRecordPeriod;
+                value = msAgreementReference;
                 break;
             case 7:
-                value = msRecordBkc;
+                value = msAgreementConcept;
                 break;
             case 8:
-                value = msRecordCob;
+                value = msRecordPeriod;
                 break;
             case 9:
-                value = msRecordNumber;
+                value = msRecordBkc;
                 break;
             case 10:
+                value = msRecordCob;
+                break;
+            case 11:
+                value = msRecordNumber;
+                break;
+            case 12:
                 value = mtRecordDate;
                 break;
             default:
         }
-
         return value;
     }
 
@@ -207,8 +233,8 @@ public class SLayoutBankPaymentRow implements SGridRow {
                 break;
             case 4:
                 break;
-            case 5:
-                break;
+            case 5:   
+                break;    
             case 6:
                 break;
             case 7:
@@ -219,11 +245,16 @@ public class SLayoutBankPaymentRow implements SGridRow {
                 break;
             case 10:
                 break;
+            case 11:
+                break;
+            case 12:
+                break;
             default:
                 break;
         }
     }
     
+    @Override
     public SLayoutBankPaymentRow clone() throws CloneNotSupportedException {
         SLayoutBankPaymentRow registry = new SLayoutBankPaymentRow(miClient);
         
@@ -238,6 +269,9 @@ public class SLayoutBankPaymentRow implements SGridRow {
         registry.setBalanceTot(this.getBalanceTot());
         registry.setCurrencyKey(this.getCurrencyKey());
         registry.setAccountCredit(this.getAccountCredit());
+        registry.setAgreement(this.getAgreement());
+        registry.setAgreementReference(this.getAgreementReference());
+        registry.setAgreementConcept(this.getAgreementConcept());
         registry.setRecordPeriod(this.getRecordPeriod());
         registry.setRecordBkc(this.getRecordBkc());
         registry.setRecordCob(this.getRecordCob());

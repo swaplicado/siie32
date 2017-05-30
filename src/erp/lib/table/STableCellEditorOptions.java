@@ -19,47 +19,62 @@ import sa.lib.gui.SGuiItem;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Alfredo Pérez
  */
 public class STableCellEditorOptions extends AbstractCellEditor implements TableCellEditor, KeyListener {
 
     private JComboBox mjcbOptions;
-    List<ArrayList<SGuiItem>> mltAccountmltAccount = null;
+    public List<ArrayList<SGuiItem>> mlElementsmltElements = null;
 
     public STableCellEditorOptions(erp.client.SClientInterface client) {
-        mjcbOptions = new JComboBox();
+        this(client, false);
     }
     
-    public void setAccounts(List<ArrayList<SGuiItem>> ltAccount) {        
-        this.mltAccountmltAccount = ltAccount;
+    public STableCellEditorOptions(erp.client.SClientInterface client, boolean edit) {
+        mjcbOptions = new JComboBox();
+        mjcbOptions.setEditable(edit);
+    }
+    
+    public void setElements(List<ArrayList<SGuiItem>> ltAccount) {        
+        this.mlElementsmltElements = ltAccount;
     }
     
     @Override
     public Object getCellEditorValue() {
         return mjcbOptions.getSelectedItem();
     }
-
+    
     @SuppressWarnings("unchecked")
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int col) {
-        ArrayList<SGuiItem> items = mltAccountmltAccount.get(row);
-
-        mjcbOptions.removeAllItems();
-        for (SGuiItem item : items) {
-            mjcbOptions.addItem(item);
-        }
-        
-        mjcbOptions.setSelectedItem(value);
-
-        if (table.isCellEditable(row, col)) {
-            mjcbOptions.setForeground(STableConstants.FOREGROUND_EDIT);
-            mjcbOptions.setBackground(STableConstants.BACKGROUND_PLAIN_EDIT);
+        if ( mlElementsmltElements == null || mlElementsmltElements.isEmpty() || mlElementsmltElements.size() < 1){
+            System.out.println("'mlElementsmltElements':Esta nulo, vacio o con size <= 0.");
         }
         else {
-            mjcbOptions.setForeground(STableConstants.FOREGROUND_READ);
-            mjcbOptions.setBackground(STableConstants.BACKGROUND_PLAIN_READ);
-        }
+            if (mlElementsmltElements.get(row)== null){
+                ArrayList<SGuiItem> empty = new ArrayList<>();
+                empty.add(new SGuiItem(""));
+                mlElementsmltElements.set(row, empty);
+            }
+            ArrayList<SGuiItem> items = mlElementsmltElements.get(row);
+            mjcbOptions.removeAllItems();
 
+            for (SGuiItem item : items) {
+                mjcbOptions.addItem(item);
+            }
+
+            mjcbOptions.setSelectedItem(value);
+
+            if (table.isCellEditable(row, col)) {
+                mjcbOptions.setForeground(STableConstants.FOREGROUND_EDIT);
+                mjcbOptions.setBackground(STableConstants.BACKGROUND_PLAIN_EDIT);
+            }
+            else {
+                mjcbOptions.setForeground(STableConstants.FOREGROUND_READ);
+                mjcbOptions.setBackground(STableConstants.BACKGROUND_PLAIN_READ);
+            }
+        }
+        
         return mjcbOptions;
     }
     

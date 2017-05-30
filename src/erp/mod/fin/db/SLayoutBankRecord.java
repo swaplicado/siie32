@@ -9,7 +9,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Alfredo Pérez
  */
 public class SLayoutBankRecord {
 
@@ -18,12 +18,13 @@ public class SLayoutBankRecord {
 
     public SLayoutBankRecord(SFinRecordLayout recordLayout) {
         moFinRecordLayout = recordLayout;
-        maLayoutBankPayments = new ArrayList<SLayoutBankPayment>();
+        maLayoutBankPayments = new ArrayList<>();
     }
 
     public void setFinRecordLayout(SFinRecordLayout n) { moFinRecordLayout = n; }
 
     public SFinRecordLayout getFinRecordLayout() { return moFinRecordLayout; }
+    
     public ArrayList<SLayoutBankPayment> getLayoutBankPayments() { return maLayoutBankPayments; }
     
     public SLayoutBankPayment obtainLayoutBankPayment(int bizPartner, int bizPartnerBranch, int bizPartnerAccBank) { 
@@ -50,5 +51,16 @@ public class SLayoutBankRecord {
         }
         
         maLayoutBankPayments.remove(layoutBankPaymentRemove);
+    }
+    
+    @Override
+    public SLayoutBankRecord clone() {
+        SLayoutBankRecord layoutBankRecord = new SLayoutBankRecord(moFinRecordLayout);
+        
+        for (SLayoutBankPayment payment : maLayoutBankPayments) {
+            layoutBankRecord.getLayoutBankPayments().add(payment.clone());
+        }
+        
+        return layoutBankRecord;
     }
 }

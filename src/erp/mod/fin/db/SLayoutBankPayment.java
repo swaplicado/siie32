@@ -8,9 +8,12 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Alfredo Pérez
  */
 public class SLayoutBankPayment {
+    
+    public static final int ACTION_PAY_APPLY = 1;
+    public static final int ACTION_PAY_REMOVE = 2;
 
     protected int mnLayoutPaymentType;
     protected int mnBizPartnerId;
@@ -29,8 +32,10 @@ public class SLayoutBankPayment {
         mnBizPartnerId = bizPartnerId;
         mnBizPartnerBranchId = bizPartnerBranchId;
         mnBizPartnerBranchBankAccountId = bizPartnerBranchBankAccountId;
+        moAmount = null;
         mnFkBookkeepingYearId_n = 0;
         mnFkBookkeepingNumberId_n = 0;
+        mnAction = 0;
         msReferenceRecord = "";
         
         maLayoutBankDps = new ArrayList<SLayoutBankDps>();
@@ -46,8 +51,6 @@ public class SLayoutBankPayment {
     public void setAction(int n) { mnAction = n; }
     public void setReferenceRecord(String s) { msReferenceRecord = s; }
     
-    public void setLayoutBankDps(ArrayList<SLayoutBankDps> o) { maLayoutBankDps = o; }
-
     public int getLayoutPaymentType() { return mnLayoutPaymentType; }
     public int getBizPartnerId() { return mnBizPartnerId; }
     public int getBizPartnerBranchId() { return mnBizPartnerBranchId; }
@@ -61,7 +64,7 @@ public class SLayoutBankPayment {
     public ArrayList<SLayoutBankDps> getLayoutBankDps() { return maLayoutBankDps; }
     
     @Override
-     public SLayoutBankPayment clone() throws CloneNotSupportedException {
+    public SLayoutBankPayment clone() {
         SLayoutBankPayment bankPayment = new SLayoutBankPayment(this.getLayoutPaymentType(), this.getBizPartnerId(), this.getBizPartnerBranchId(), this.getBizPartnerBranchAccountId());
         
         bankPayment.setAmount(this.getAmount());
@@ -71,7 +74,9 @@ public class SLayoutBankPayment {
         bankPayment.setReferenceRecord(this.getReferenceRecord());
         
         for (SLayoutBankDps bankDps : maLayoutBankDps) {
-            bankPayment.getLayoutBankDps().add(bankDps);
+            if (bankDps != null) {
+                bankPayment.getLayoutBankDps().add(bankDps.clone());
+            }
         }
         
         return bankPayment;

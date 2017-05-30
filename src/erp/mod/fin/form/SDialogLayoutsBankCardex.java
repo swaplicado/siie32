@@ -6,6 +6,7 @@ package erp.mod.fin.form;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
@@ -40,7 +41,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Uriel Castañeda
+ * @author Uriel Castañeda, Alfredo Pérez
  */
 public class SDialogLayoutsBankCardex extends SBeanFormDialog implements ListSelectionListener {
     
@@ -248,7 +249,7 @@ public class SDialogLayoutsBankCardex extends SBeanFormDialog implements ListSel
 
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
-                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<SGridColumnForm>();
+                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
                 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Proveedor", 200));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Clave proveedor", 50));
@@ -259,7 +260,9 @@ public class SDialogLayoutsBankCardex extends SBeanFormDialog implements ListSel
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Pago mon cta $", STableConstants.WIDTH_VALUE_2X));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda cta"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_EXC_RATE, "TC", 50));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "No. cuenta", 125));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "No. Cuenta/Convenio", 125));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Referencia", 125));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Concepto", 100));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_PER, "Período póliza"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CO, "Centro contable"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CO, "Sucursal empresa"));
@@ -288,9 +291,10 @@ public class SDialogLayoutsBankCardex extends SBeanFormDialog implements ListSel
     private void loadLayout() {
         int numberDocs = 0;
         double total = 0d; 
+        boolean found = false;
         SDbBankLayout layout = null;
         SLayoutBankCardextRow auxRow = new SLayoutBankCardextRow(miClient);
-        Vector<SGridRow> rows = new Vector<SGridRow>();
+        ArrayList<SGridRow> rows = new ArrayList<>();
         SDataDps dps = null;
         
         jtfRows.setText("0/0");
@@ -311,6 +315,9 @@ public class SDialogLayoutsBankCardex extends SBeanFormDialog implements ListSel
             auxRow.setBizPartnerBranchAccountId(row.getBizPartnerBranchAccount());
             auxRow.setPkYearId(row.getDpsYear());
             auxRow.setPkDocId(row.getDpsDoc());
+            auxRow.setAgreement(row.getAgreement());
+            auxRow.setAgreementReference(row.getAgreementReference());
+            auxRow.setConceptCie(row.getConceptCie());
             
             dps = (SDataDps) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_DPS, new int[] {row.getDpsYear(), row.getDpsDoc() }, SLibConstants.EXEC_MODE_SILENT);
             
@@ -319,16 +326,29 @@ public class SDialogLayoutsBankCardex extends SBeanFormDialog implements ListSel
             auxRow.setNumberSer(dps.getDpsNumber());
             auxRow.setDate(dps.getDate());
             auxRow.setBalanceTot(new SMoney(row.getAmountPayed(), row.getCurrencyId(), row.getExchangeRate(), row.getCurrencyId()));
-            auxRow.setObservation(row.getObservation());
+            auxRow.setObservation(row.getObservations());
             
             total = total + auxRow.getBalanceTot().getAmountOriginal();
-            
             for (SLayoutBankPaymentRow rowPay : layout.getBankPaymentRows()) {
-                if (auxRow.getBizPartnerId() == rowPay.getBizPartnerId() ) {
+                found = false;
+                if (moBankLayout.getXtaBankPaymentType() == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) {
+                    if (auxRow.getAgreement().equals(rowPay.getAgreement()) && auxRow.getAgreementRefernce().equals(rowPay.getAgreementReference())) {
+                        found = true;
+                    }
+                }
+                else {
+                    if (auxRow.getBizPartnerId() == rowPay.getBizPartnerId()) {
+                        found = true;
+                    }
+                }
+                if(found) {
                     auxRow.setBizPartner(rowPay.getBizPartner());
                     auxRow.setBizPartnerKey(rowPay.getBizPartnerKey());
                     auxRow.setCurrencyKey(rowPay.getCurrencyKey());
                     auxRow.setAccountCredit(rowPay.getAccountCredit());
+                    auxRow.setAgreement(rowPay.getAgreement());
+                    auxRow.setAgreementReference(rowPay.getAgreementReference());
+                    auxRow.setConceptCie(rowPay.getAgreementConcept());
                     auxRow.setRecordPeriod(rowPay.getRecordPeriod());
                     auxRow.setRecordBkc(rowPay.getRecordBkc());
                     auxRow.setRecordCob(rowPay.getRecordCob());
@@ -344,7 +364,7 @@ public class SDialogLayoutsBankCardex extends SBeanFormDialog implements ListSel
                
         moDecBalanceTot.setValue(total);
         
-        moGridPayments.populateGrid(rows);
+        moGridPayments.populateGrid(new Vector<SGridRow>(rows));
         moGridPayments.createGridColumns();
         
         jtfRows.setText(SLibUtils.DecimalFormatInteger.format(numberDocs) + "/" + SLibUtils.DecimalFormatInteger.format(moGridPayments.getModel().getRowCount()));

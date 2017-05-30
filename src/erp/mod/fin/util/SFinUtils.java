@@ -27,11 +27,14 @@ import erp.mod.fin.db.SXmlBankLayout;
 import erp.mod.fin.db.SXmlBankLayoutPayment;
 import erp.mod.fin.db.SXmlBankLayoutPaymentDoc;
 import erp.mtrn.data.SDataDps;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiItem;
 import sa.lib.srv.SSrvConsts;
 import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
@@ -39,7 +42,7 @@ import sa.lib.xml.SXmlElement;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Alfredo Pérez
  */
 public class SFinUtils {
     
@@ -66,7 +69,6 @@ public class SFinUtils {
         SLayoutBankXmlRow oXmlRow = null;
         SDbBankLayout oLayout = null;
         SDataBankLayoutType oTypeLayout = null;
-
         
         try {
             oLayout = layout;
@@ -97,6 +99,9 @@ public class SFinUtils {
                     oRow.setBalance(dBalancePayment);
                     oRow.setCurrencyKey(oBranchBankAccount.getDbmsCurrencyKey());
                     oRow.setAccountCredit(oTypeLayout.getFkBankPaymentTypeId() == SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? oBranchBankAccount.getBankAccountNumber() : oBranchBankAccount.getBankAccountNumberStd());
+                    oRow.setAgreement((String) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE).getValue());
+                    oRow.setAgreementReference((String) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_REF).getValue());
+                    oRow.setAgreementConcept((String) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_CON).getValue());
                     oRow.setIsForPayment((boolean) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_APPLIED).getValue());
                     oRow.setIsToPayed((boolean) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_APPLIED).getValue());
                     
@@ -104,7 +109,7 @@ public class SFinUtils {
                     
                     if ((Integer) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_YEAR).getValue() != 0) {
                         oRecordLayout = new SFinRecordLayout((Integer) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_YEAR).getValue(), (Integer) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_PER).getValue(),
-                            (Integer) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_BKC).getValue(), (String) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_REC_TP).getValue(), (Integer) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_NUM).getValue());
+                        (Integer) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_BKC).getValue(), (String) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_REC_TP).getValue(), (Integer) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_NUM).getValue());
                         oRow.setFinRecordLayout(oRecordLayout);
                         oRow.setFinRecordLayoutOld(oRecordLayout);
                        
@@ -129,6 +134,7 @@ public class SFinUtils {
                             dAmountPayed = (double) oLayoutPayDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT).getValue();
                             dAmountPayedCur = (double) oLayoutPayDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT_CY).getValue();
                             dExchangeRate = (double) oLayoutPayDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EXT_RATE).getValue();
+                            
                             oXmlRow = new SLayoutBankXmlRow();
                             
                             dBalanceLocal += (dAmountPayedCur);
@@ -141,11 +147,14 @@ public class SFinUtils {
                             oXmlRow.setBizPartner(oBizPartner.getPkBizPartnerId());
                             oXmlRow.setBizPartnerBranch(oBranchBankAccount.getPkBizPartnerBranchId());
                             oXmlRow.setBizPartnerBranchAccount(oBranchBankAccount.getPkBankAccountId());
+                            oXmlRow.setAgreement(oRow.getAgreement());
+                            oXmlRow.setAgreementReference(oRow.getAgreementReference());
+                            oXmlRow.setConceptCie(oRow.getAgreementConcept());
                             oXmlRow.setConcept((String) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CPT).getValue());
                             oXmlRow.setDescription((String) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_DCRP).getValue());
                             oXmlRow.setBankKey((int) oLayoutPay.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_KEY).getValue());
                             oXmlRow.setReferenceRecord(sReferenceRecord);
-                            oXmlRow.setObservation(sObservation);
+                            oXmlRow.setObservations(sObservation);
                             
                             if (oRecordLayout != null) {
                                 oXmlRow.setRecYear(oRecordLayout.getPkYearId());
@@ -207,13 +216,13 @@ public class SFinUtils {
             parameters.setBankAccount(dataBizPartnerBranchBankAccount.getBankAccountNumber());
             parameters.setTypePayment(SFinUtilities.getNameTypePayLayout(client.getSession(), layout.getPkBankLayoutId()));
             parameters.setCurrency(dataBizPartnerBranchBankAccount.getDbmsCurrencyKey());
-            parameters.setCurrencyDps(SDataReadDescriptions.getCatalogueDescription((SClientInterface) client, SDataConstants.CFGU_CUR, new int[] { layout.getFkDocsCur() }, SLibConstants.DESCRIPTION_CODE));
+            parameters.setCurrencyDps(SDataReadDescriptions.getCatalogueDescription((SClientInterface) client, SDataConstants.CFGU_CUR, new int[] { layout.getFkDpsCurrencyId()}, SLibConstants.DESCRIPTION_CODE));
             parameters.setTotal(layout.getAuxLocalLayoutAmount());
             parameters.setOriginalTotal(layout.getAmount());
             parameters.setFolio(layout.getPkBankLayoutId() + "");
             parameters.setAuthRequests(layout.getAuthorizationRequests() + "");
             parameters.setLayoutType(layout.getAuxLayoutType());
-            parameters.setIsDifferentCurrency(dataAccountCash.getFkCurrencyId() != layout.getFkDocsCur());
+            parameters.setIsDifferentCurrency(dataAccountCash.getFkCurrencyId() != layout.getFkDpsCurrencyId());
         }
         catch (Exception e) {
             SLibUtils.showException(SFinUtils.class, e);
@@ -222,13 +231,13 @@ public class SFinUtils {
         return parameters;
     }
     
-    public static ArrayList<SDocumentRequestRow> populateRows(SGuiClient client, ArrayList<SLayoutBankPaymentRow> bankPaymentRows, ArrayList<SLayoutBankXmlRow> xmlRows) {
+    public static ArrayList<SDocumentRequestRow> populateRows(SGuiClient client, ArrayList<SLayoutBankPaymentRow> bankPaymentRows, ArrayList<SLayoutBankXmlRow> xmlRows, final int layoutType) {
         String observation = "";
         String concept = "";
         SDataDps dps = null;
         SDataBizPartnerBranchBankAccount dataBizPartnerBranchBankAccount = null;
         SDocumentRequestRow payRow = null;
-        ArrayList<SDocumentRequestRow> payments = new ArrayList<SDocumentRequestRow>();
+        ArrayList<SDocumentRequestRow> payments = new ArrayList<>();
 
         for (SLayoutBankPaymentRow bankPayment: bankPaymentRows) {
             dataBizPartnerBranchBankAccount = (SDataBizPartnerBranchBankAccount) SDataUtilities.readRegistry((SClientInterface) client, SDataConstants.BPSU_BANK_ACC, 
@@ -236,7 +245,12 @@ public class SFinUtils {
             
             payRow = new SDocumentRequestRow();
             payRow.setBank(dataBizPartnerBranchBankAccount.getDbmsBank());
-            payRow.setBankAccount(bankPayment.getAccountCredit());
+            if (layoutType == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) {
+                payRow.setBankAccount(bankPayment.getAgreement() + "/" + bankPayment.getAgreementReference());
+            }
+            else {
+                payRow.setBankAccount(bankPayment.getAccountCredit());
+            }
             payRow.setBeneficiary(bankPayment.getBizPartner());
             payRow.setOriginalCurrencyAmount(bankPayment.getBalance());
             payRow.setCurrencyAmount(bankPayment.getBalanceTot());
@@ -245,10 +259,10 @@ public class SFinUtils {
             concept = "";
             for (SLayoutBankXmlRow xmlRow: xmlRows) {
                 if(xmlRow.getBizPartner() == bankPayment.getBizPartnerId()) {
-                   if (xmlRow.getObservation() != null && !xmlRow.getObservation().isEmpty()) {
-                       observation += xmlRow.getObservation();
+                   if (xmlRow.getObservations() != null && !xmlRow.getObservations().isEmpty()) {
+                       observation += xmlRow.getObservations();
                        
-                       if (xmlRow.getObservation().charAt(xmlRow.getObservation().length()-1) == '.') {
+                       if (xmlRow.getObservations().charAt(xmlRow.getObservations().length()-1) == '.') {
                                 observation +=  "\n";
                             }
                             else {
@@ -333,5 +347,26 @@ public class SFinUtils {
         }
         
         return done;
+    }
+    
+    public static ArrayList<SGuiItem> getAgreementReferences(final SGuiClient client, final int idBpbp, final String agreement) {
+        String sql = "";
+        ResultSet result = null;
+        ArrayList<SGuiItem> references = new ArrayList<>();
+        
+        sql = "SELECT ref FROM erp.BPSU_BANK_ACC WHERE NOT b_del AND id_bpb = " + idBpbp + " AND agree = '" + agreement + "';";
+        
+        try {
+            result = client.getSession().getStatement().getConnection().createStatement().executeQuery(sql);
+            
+            while(result.next()) {
+                references.add(new SGuiItem(result.getString("ref")));
+            }
+        }
+        catch (SQLException ex) {
+            SLibUtils.printException(client, ex);
+        }
+        
+        return references;
     }
 }

@@ -10,7 +10,7 @@ import sa.lib.xml.SXmlElement;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Alfredo Pérez
  */
 public class SXmlBankLayoutPayment extends SXmlElement {
 
@@ -19,6 +19,9 @@ public class SXmlBankLayoutPayment extends SXmlElement {
     public static final String ATT_LAY_PAY_AMT_CY = "PayAmountCy";
     public static final String ATT_LAY_PAY_REF_ALP = "PayReferenceAlpha";
     public static final String ATT_LAY_PAY_CUR = "PayCurrency";
+    public static final String ATT_LAY_PAY_AGREE = "Agreement";
+    public static final String ATT_LAY_PAY_AGREE_REF = "AgreementReference";
+    public static final String ATT_LAY_PAY_AGREE_CON = "ConceptCie";
     public static final String ATT_LAY_PAY_EXT_RATE = "PayExchangeRate";
     public static final String ATT_LAY_PAY_REF = "PayReference";
     public static final String ATT_LAY_PAY_CPT = "PayConcept";
@@ -50,6 +53,9 @@ public class SXmlBankLayoutPayment extends SXmlElement {
     protected SXmlAttribute moPayAmount;
     protected SXmlAttribute moPayAmountCy;
     protected SXmlAttribute moPayCurrency;
+    protected SXmlAttribute moAgreement;
+    protected SXmlAttribute moAgreementReference;
+    protected SXmlAttribute moConceptCie;
     protected SXmlAttribute moPayExchangeRate;
     protected SXmlAttribute moPayHsbcFiscalVoucher;
     protected SXmlAttribute moPayHsbcAccountType;
@@ -80,6 +86,9 @@ public class SXmlBankLayoutPayment extends SXmlElement {
         moPayAmount = new SXmlAttribute(ATT_LAY_PAY_AMT);
         moPayAmountCy = new SXmlAttribute(ATT_LAY_PAY_AMT_CY);
         moPayCurrency = new SXmlAttribute(ATT_LAY_PAY_CUR);
+        moAgreement = new SXmlAttribute(ATT_LAY_PAY_AGREE);
+        moAgreementReference = new SXmlAttribute(ATT_LAY_PAY_AGREE_REF);
+        moConceptCie = new SXmlAttribute(ATT_LAY_PAY_AGREE_CON);
         moPayExchangeRate = new SXmlAttribute(ATT_LAY_PAY_EXT_RATE);
         moPayReference = new SXmlAttribute(ATT_LAY_PAY_REF_ALP);
         moPayConcept = new SXmlAttribute(ATT_LAY_PAY_CPT);
@@ -111,6 +120,9 @@ public class SXmlBankLayoutPayment extends SXmlElement {
         mvXmlAttributes.add(moPayAmount);
         mvXmlAttributes.add(moPayAmountCy);
         mvXmlAttributes.add(moPayCurrency);
+        mvXmlAttributes.add(moAgreement);
+        mvXmlAttributes.add(moAgreementReference);
+        mvXmlAttributes.add(moConceptCie);
         mvXmlAttributes.add(moPayExchangeRate);
         mvXmlAttributes.add(moPayHsbcFiscalVoucher);
         mvXmlAttributes.add(moPayHsbcAccountType);

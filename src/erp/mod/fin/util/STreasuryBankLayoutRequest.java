@@ -57,7 +57,7 @@ public class STreasuryBankLayoutRequest {
             oBankLayout = SFinUtils.loadPaymentsXml(miClient, moBankLayout);
             if (moBankLayout != null) {
                 parameters = SFinUtils.getLayoutParameters(miClient, oBankLayout);
-                pdf = STreasuryBankLayoutFile.createDocument(miClient, parameters ,SFinUtils.populateRows(miClient, oBankLayout.getBankPaymentRows(), oBankLayout.getXmlRows()));
+                pdf = STreasuryBankLayoutFile.createDocument(miClient, parameters ,SFinUtils.populateRows(miClient, oBankLayout.getBankPaymentRows(), oBankLayout.getXmlRows(), oBankLayout.getXtaBankPaymentType()));
 
                 if (pdf != null) {
                     isSent = sendMail(parameters, comment, pdf, null);

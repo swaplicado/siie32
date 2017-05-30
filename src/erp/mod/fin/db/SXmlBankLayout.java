@@ -18,7 +18,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Alfredo Pérez
  */
 public class SXmlBankLayout extends SXmlDocument {
 
@@ -86,6 +86,9 @@ public class SXmlBankLayout extends SXmlDocument {
             row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_NUM).setValue(SLibUtils.parseInt(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_REC_NUM, true)));
             row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_YEAR).setValue(SLibUtils.parseInt(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_YEAR, true)));
             row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_NUM).setValue(SLibUtils.parseInt(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_NUM, true)));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE, false));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_REF).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_REF, false));
+            row.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_CON).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_CON, false));
             
             // Documents:
             

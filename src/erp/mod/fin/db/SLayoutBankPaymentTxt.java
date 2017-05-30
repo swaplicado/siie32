@@ -6,7 +6,7 @@ package erp.mod.fin.db;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Alfredo Pérez
  */
 public class SLayoutBankPaymentTxt {
 
@@ -21,6 +21,9 @@ public class SLayoutBankPaymentTxt {
     protected String msAccountDebit;
     protected String msAccountBranchDebit;
     protected int mnCurrencyId;
+    protected String msAgreement;
+    protected String msAgreementReference;
+    protected String msConceptCie;
     protected int mnHsbcFiscalVoucher;
     protected int mnHsbcBankCode;
     protected String msHsbcFiscalIdDebit;
@@ -43,6 +46,9 @@ public class SLayoutBankPaymentTxt {
         msAccountDebit = "";
         msAccountBranchDebit = "";
         mnCurrencyId = 0;
+        msAgreement = "";
+        msAgreementReference = "";
+        msConceptCie = "";
         mnHsbcFiscalVoucher = 0;
         mnHsbcBankCode = 0;
         msHsbcAccountType = "";
@@ -65,6 +71,9 @@ public class SLayoutBankPaymentTxt {
     public void setAccountDebit(String s) { msAccountDebit = s; }
     public void setAccountBranchDebit(String s) { msAccountBranchDebit = s; }
     public void setCurrencyId(int n) { mnCurrencyId = n; }
+    public void setAgreement(String s) { msAgreement = s; }
+    public void setAgreementReference(String s) { msAgreementReference = s; }
+    public void setConceptCie(String s) { msConceptCie = s; }
     public void setHsbcFiscalVoucher(int n) { mnHsbcFiscalVoucher = n; }
     public void setHsbcBankCode(int n) { mnHsbcBankCode = n; }
     public void setHsbcAccountType(String s) { msHsbcAccountType = s; }
@@ -86,6 +95,9 @@ public class SLayoutBankPaymentTxt {
     public String getAccountDebit() { return msAccountDebit; }
     public String getAccountBranchDebit() { return msAccountBranchDebit; }
     public int getCurrencyId() { return mnCurrencyId; }
+    public String getAgreement() { return msAgreement; }
+    public String getAgreementReference() { return msAgreementReference; }
+    public String getConceptCie() { return msConceptCie; }
     public int getHsbcFiscalVoucher() { return mnHsbcFiscalVoucher; }
     public int getHsbcBankCode() { return mnHsbcBankCode; }
     public String getHsbcAccountType() { return msHsbcAccountType; }

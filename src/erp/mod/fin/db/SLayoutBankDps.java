@@ -6,7 +6,7 @@ package erp.mod.fin.db;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Alfredo Pérez
  */
 public class SLayoutBankDps {
 
@@ -19,7 +19,7 @@ public class SLayoutBankDps {
     protected double mdDpsAmount;
     protected double mdDpsExcRate;
 
-    public SLayoutBankDps(int dpsYear, int dpsDoc, int dpsCategory, int dpsClass, int dpsType, int dpsCur, int userId, double dpsAmount, double dpsExcRate) {
+    public SLayoutBankDps(int dpsYear, int dpsDoc, int dpsCategory, int dpsClass, int dpsType, int dpsCur, double dpsAmount, double dpsExcRate) {
         mnPkYearId = dpsYear;
         mnPkDocId = dpsDoc;
         mnDpsCategoryId = dpsCategory;
@@ -47,4 +47,9 @@ public class SLayoutBankDps {
     public int getDpsCurId() { return mnDpsCurId; }
     public double getDpsAmount() { return mdDpsAmount; }
     public double getDpsExcRate() { return mdDpsExcRate; }
+    
+    @Override
+    public SLayoutBankDps clone() {
+        return new SLayoutBankDps(mnPkYearId, mnPkDocId, mnDpsCategoryId, mnDpsClassId, mnDpsTypeId, mnDpsCurId, mdDpsAmount, mdDpsExcRate);
+    }
 }

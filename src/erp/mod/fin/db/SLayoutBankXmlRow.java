@@ -10,7 +10,7 @@ import sa.lib.SLibConsts;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Alfredo Pérez
  */
 public class SLayoutBankXmlRow {
     
@@ -29,12 +29,15 @@ public class SLayoutBankXmlRow {
     protected int mnBizPartnerBranchBankAccount;
     protected int mnHsbcFiscalVoucher;
     protected int mnHsbcBankCode;
+    protected String msHsbcAccountType;
     protected String msHsbcFiscalIdDebit;
     protected String msHsbcFiscalIdCredit;
-    protected String msHsbcAccountType;
     protected String msConcept;
     protected String msDescription;
     protected String msReference;
+    protected String msAgreement;
+    protected String msAgreementReference;
+    protected String msConceptCie;
     protected String msSantanderBankCode;
     protected String msBajioBankCode;
     protected String msBajioBankNick;
@@ -47,7 +50,7 @@ public class SLayoutBankXmlRow {
     protected int mnBookkeepingYear;
     protected int mnBookkeepingNumber;
     protected String msReferenceRecord;
-    protected String msObservation;
+    protected String msObservations;
 
     public SLayoutBankXmlRow() {
         mnLayoutXmlRowType = 0;
@@ -70,6 +73,9 @@ public class SLayoutBankXmlRow {
         msConcept = "";
         msDescription = "";
         msReference = "";
+        msAgreement = "";
+        msAgreementReference = "";
+        msConceptCie = "";
         msSantanderBankCode = "";
         msBajioBankCode = "";
         msBajioBankNick = "";
@@ -82,7 +88,7 @@ public class SLayoutBankXmlRow {
         mnBookkeepingYear = 0;
         mnBookkeepingNumber = 0;
         msReferenceRecord = "";
-        msObservation = "";
+        msObservations = "";
     }
 
     public void setLayoutXmlRowType(int n) { mnLayoutXmlRowType = n; }
@@ -93,19 +99,22 @@ public class SLayoutBankXmlRow {
     public void setAmountPayed(double d) { mdAmountPayed = d; }
     public void setAmountPayedCy(double d) { mdAmountPayedCy = d; }
     public void setExchangeRate(double d) { mdExchangeRate = d; }
+    public void setCurrencyId(int n) { mnCurrencyId = n; }
     public void setIsToPayed(boolean b) { mbIsToPayed = b; }
-    public void setCurrencyId(int i) { mnCurrencyId = i; }
     public void setBizPartner(int n) { mnBizPartner = n; }
     public void setBizPartnerBranch(int n) { mnBizPartnerBranch = n; }
     public void setBizPartnerBranchAccount(int n) { mnBizPartnerBranchBankAccount = n; }
     public void setHsbcFiscalVoucher(int n) { mnHsbcFiscalVoucher = n; }
     public void setHsbcBankCode(int n) { mnHsbcBankCode = n; }
-    public void setHsbcAccountType(String s) { msHsbcAccountType = s; }
     public void setHsbcFiscalIdDebit(String s) { msHsbcFiscalIdDebit = s; }
     public void setHsbcFiscalIdCredit(String s) { msHsbcFiscalIdCredit = s; }
+    public void setHsbcAccountType(String s) { msHsbcAccountType = s; }
     public void setConcept(String s) { msConcept = s; }
     public void setDescription(String s) { msDescription = s; }
     public void setReference(String s) { msReference = s; }
+    public void setAgreement(String s) { msAgreement = s; }
+    public void setAgreementReference(String s) { msAgreementReference = s; }
+    public void setConceptCie(String s) { msConceptCie = s; }
     public void setSantanderBankCode(String s) { msSantanderBankCode = s; }
     public void setBajioBankCode(String s) { msBajioBankCode = s; }
     public void setBajioBankNick(String s) { msBajioBankNick = s; }
@@ -118,7 +127,7 @@ public class SLayoutBankXmlRow {
     public void setBookkeepingYear(int n) { mnBookkeepingYear = n; }
     public void setBookkeepingNumber(int n) { mnBookkeepingNumber = n; }
     public void setReferenceRecord(String s) { msReferenceRecord = s; }
-    public void setObservation(String s) { msObservation = s; }
+    public void setObservations(String s) { msObservations = s; }
     
     public int[] getPrimaryKey() {
         int[] key = new int[] { SLibConsts.UNDEFINED };
@@ -154,6 +163,9 @@ public class SLayoutBankXmlRow {
     public String getConcept() { return msConcept; }
     public String getDescription() { return msDescription; }
     public String getReference() { return msReference; }
+    public String getAgreement() { return msAgreement; }
+    public String getAgreementReference() { return msAgreementReference; }
+    public String getConceptCie() { return msConceptCie; }
     public String getSantanderBankCode() { return msSantanderBankCode; }
     public String getBajioBankCode() { return msBajioBankCode; }
     public String getBajioBankNick() { return msBajioBankNick; }
@@ -166,5 +178,49 @@ public class SLayoutBankXmlRow {
     public int getBookkeepingYear() { return mnBookkeepingYear; }
     public int getBookkeepingNumber() { return mnBookkeepingNumber; }
     public String getReferenceRecord() { return msReferenceRecord; }
-    public String getObservation() { return msObservation; }
+    public String getObservations() { return msObservations; }
+    
+    public SLayoutBankXmlRow clone() {
+        SLayoutBankXmlRow layoutBankXmlRow = new SLayoutBankXmlRow();
+        
+        layoutBankXmlRow.setLayoutXmlRowType(this.getLayoutXmlRowType());
+        layoutBankXmlRow.setDpsYear(this.getDpsYear());
+        layoutBankXmlRow.setDpsDoc(this.getDpsDoc());
+        layoutBankXmlRow.setAmount(this.getAmount());
+        layoutBankXmlRow.setAmountCy(this.getAmountCy());
+        layoutBankXmlRow.setAmountPayed(this.getAmountPayed());
+        layoutBankXmlRow.setAmountPayedCy(this.getAmountPayedCy());
+        layoutBankXmlRow.setExchangeRate(this.getExchangeRate());
+        layoutBankXmlRow.setCurrencyId(this.getCurrencyId());
+        layoutBankXmlRow.setIsToPayed(this.getIsToPayed());
+        layoutBankXmlRow.setBizPartner(this.getBizPartner());
+        layoutBankXmlRow.setBizPartnerBranch(this.getBizPartnerBranch());
+        layoutBankXmlRow.setBizPartnerBranchAccount(this.getBizPartnerBranchAccount());
+        layoutBankXmlRow.setHsbcFiscalVoucher(this.getHsbcFiscalVoucher());
+        layoutBankXmlRow.setHsbcBankCode(this.getHsbcBankCode());
+        layoutBankXmlRow.setHsbcFiscalIdDebit(this.getHsbcFiscalIdDebit());
+        layoutBankXmlRow.setHsbcFiscalIdCredit(this.getHsbcFiscalIdCredit());
+        layoutBankXmlRow.setHsbcAccountType(this.getHsbcAccountType());
+        layoutBankXmlRow.setConcept(this.getConcept());
+        layoutBankXmlRow.setDescription(this.getDescription());
+        layoutBankXmlRow.setReference(this.getReference());
+        layoutBankXmlRow.setAgreement(this.getAgreement());
+        layoutBankXmlRow.setAgreementReference(this.getAgreementReference());
+        layoutBankXmlRow.setConceptCie(this.getConceptCie());
+        layoutBankXmlRow.setSantanderBankCode(this.getSantanderBankCode());
+        layoutBankXmlRow.setBajioBankCode(this.getBajioBankCode());
+        layoutBankXmlRow.setBajioBankNick(this.getBajioBankNick());
+        layoutBankXmlRow.setBankKey(this.getBankKey());
+        layoutBankXmlRow.setRecYear(this.getRecYear());
+        layoutBankXmlRow.setRecPeriod(this.getRecPeriod());
+        layoutBankXmlRow.setRecBookkeepingCenter(this.getRecBookkeepingCenter());
+        layoutBankXmlRow.setRecRecordType(this.getRecRecordType());
+        layoutBankXmlRow.setRecNumber(this.getRecNumber());
+        layoutBankXmlRow.setBookkeepingYear(this.getBookkeepingYear());
+        layoutBankXmlRow.setBookkeepingNumber(this.getBookkeepingNumber());
+        layoutBankXmlRow.setReferenceRecord(this.getReferenceRecord());
+        layoutBankXmlRow.setObservations(this.getObservations());
+        
+        return layoutBankXmlRow;
+    }
 }

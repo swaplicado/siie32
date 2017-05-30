@@ -6,7 +6,7 @@ package erp.mod.fin.db;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Alfredo Pérez
  */
 public class SFinRecordLayout {
 
@@ -39,4 +39,8 @@ public class SFinRecordLayout {
     public int getPkBookkeepingCenterId() { return mnPkBookkeepingCenterId; }
     public java.lang.String getPkRecordTypeId() { return msPkRecordTypeId; }
     public int getPkNumberId() { return mnPkNumberId; }
+    
+    public SFinRecordLayout clone() {
+        return new SFinRecordLayout(mnPkYearId, mnPkPeriodId, mnPkBookkeepingCenterId, msPkRecordTypeId, mnPkNumberId);
+    }
 }

@@ -18,13 +18,16 @@ import sa.lib.gui.SGuiItem;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Alfredo Pérez
  */
 public class SLayoutBankRow implements SGridRow {
+    
+    public static final int LENGTH_MAX_REF = 20;
 
     protected SGuiClient miClient;
     
     protected int mnLayoutRowType;
+    protected int mnLayoutRowSubType;
     protected int mnPkYearId;
     protected int mnPkDocId;
     protected int mnBizPartnerId;
@@ -44,8 +47,8 @@ public class SLayoutBankRow implements SGridRow {
     protected boolean mbIsForPayment;
     protected boolean mbIsToPayed;
     protected double mdBalance;
-    protected SMoney moBalance;   //amount in local currency
-    protected SMoney moBalanceCy; //Amout in origial currency
+    protected SMoney moBalance;     // amount in local currency
+    protected SMoney moBalanceCy;   // amout in origial currency
     protected SMoney moBalanceTot;
     protected double mdExchangeRate;
     protected double mdBalanceCy;
@@ -72,19 +75,23 @@ public class SLayoutBankRow implements SGridRow {
     protected java.lang.String msConcept;
     protected java.lang.String msDescription;
     protected java.lang.String msReference;
+    protected java.lang.String msAgreement;
+    protected java.lang.String msAgreementReference;
+    protected java.lang.String msConceptCie;
     protected int mnReferenceNumber;
     protected int mnCf;
     protected int mnApply;
     protected int mnBankKey;
     protected int mnCurrencyId;
     protected String msReferenceRecord;
-    protected String msObservation;
+    protected String msObservations;
     
-    protected ArrayList<SDataBizPartnerBranchBankAccount> maBranchBankAccountsCredit;
-    protected ArrayList<SGuiItem> maAccountCredit;
-    protected HashMap<String, String> moCodeBankAccountCredit;
-    protected HashMap<String, String> moAliasBankAccountCredit;
-
+    protected ArrayList<SDataBizPartnerBranchBankAccount> maBranchBankAccountCredits;
+    protected ArrayList<SGuiItem> maAccountCredits;
+    protected ArrayList<SGuiItem> maAgreementReferences;
+    protected HashMap<String, String> moCodeBankAccountCredits;
+    protected HashMap<String, String> moAliasBankAccountCredits;
+    
     public SLayoutBankRow(SGuiClient client) {
         miClient = client;
         reset();
@@ -92,6 +99,7 @@ public class SLayoutBankRow implements SGridRow {
 
     public void reset() {
         mnLayoutRowType = 0;
+        mnLayoutRowSubType = 0;
         mnPkYearId = 0;
         mnPkDocId = 0;
         mnBizPartnerId = 0;
@@ -118,7 +126,7 @@ public class SLayoutBankRow implements SGridRow {
         mdBalanceCy = 0;
         mdBalanceTotCy = 0;
         mdBalanceAccountDebit = 0;
-        mdBalanceAccountDebitTot = 0;       
+        mdBalanceAccountDebitTot = 0;
         mdBalanceTotByBizPartner = 0;
         mdBalancePayed = 0;
         msCurrencyKey = "";
@@ -130,27 +138,33 @@ public class SLayoutBankRow implements SGridRow {
         mdTaxCharged = 0;
         mdTaxRetained = 0;
         mdTotal = 0;
-        mdTotalVat = 0;        
+        mdTotalVat = 0;
         msAccountDebit = "";
         msBizPartnerDebitFiscalId = "";
         msAccountType = "";
         msConcept = "";
         msDescription = "";
         msReference = "";
+        msAgreement = "";
+        msAgreementReference = "";
+        msConceptCie = "";
         mnReferenceNumber = 0;
         mnCf = 0;
         mnApply = 0;
         mnBankKey = 0;
         mnCurrencyId = 0;
         msReferenceRecord = "";
-        msObservation = "";
+        msObservations = "";
         
-        moCodeBankAccountCredit = new HashMap<String, String>();
-        moAliasBankAccountCredit = new HashMap<String, String>();        
-        maBranchBankAccountsCredit = new ArrayList<SDataBizPartnerBranchBankAccount>();
+        maBranchBankAccountCredits = new ArrayList<>();
+        maAccountCredits = new ArrayList<>();
+        maAgreementReferences = new ArrayList<>();
+        moCodeBankAccountCredits = new HashMap<>();
+        moAliasBankAccountCredits = new HashMap<>();
     }
 
     public void setLayoutRowType(int n) { mnLayoutRowType = n; }
+    public void setLayoutRowSubType(int n) { mnLayoutRowSubType = n; }
     public void setPkYearId(int n) { mnPkYearId = n; }
     public void setPkDocId(int n) { mnPkDocId = n; }
     public void setBizPartnerId(int n) { mnBizPartnerId = n; }
@@ -177,6 +191,9 @@ public class SLayoutBankRow implements SGridRow {
     public void setCurrencyKey(java.lang.String s) { msCurrencyKey = s; }
     public void setCurrencyKeyCy(java.lang.String s) { msCurrencyKeyCy = s; }
     public void setAccountCredit(java.lang.String s) { msAccountCredit = s; }
+    public void setAgreement(java.lang.String s) { msAgreement= s; }
+    public void setAgreementReference(java.lang.String s) { msAgreementReference= s; }
+    public void setConceptCie(java.lang.String s) { msConceptCie = s; }
     public void setEmail(java.lang.String s) { msEmail = s; }
     public void setBizPartnerCreditFiscalId(String s) { msBizPartnerCreditFiscalId = s; }
     public void setSubTotal(double d) { mdSubTotal = d; }
@@ -197,51 +214,14 @@ public class SLayoutBankRow implements SGridRow {
     public void setBankKey(int n) { mnBankKey = n; }
     public void setCurrencyId(int n) { mnCurrencyId = n; }
     public void setReferenceRecord(String s) { msReferenceRecord = s; }
-    public void setObservation(String s) { msObservation = s; }
-    public void setAccountCreditArray(ArrayList<SGuiItem> a) { maAccountCredit = a; }
+    public void setObservations(String s) { msObservations = s; }
     
-    public void setBranchBankAccountCreditArray(ArrayList<SDataBizPartnerBranchBankAccount> a) { maBranchBankAccountsCredit = a; }
-    
-    public String getBranchBankAccountCreditNumber(int[] pk, int typeLayout) {
-        String account = "";
-        
-        for (SDataBizPartnerBranchBankAccount bankAccount : maBranchBankAccountsCredit) {
-            if (SLibUtils.compareKeys(pk, (int[]) bankAccount.getPrimaryKey())) {
-                account = typeLayout == SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? bankAccount.getBankAccountNumber() : bankAccount.getBankAccountNumberStd();
-                break;
-            }
-        }
-        
-        return account;
-    }
-    
-    public int[] getBranchBankAccountCreditId(String account, int typeLayout) {
-        int[] pk = null;
-        
-        for (SDataBizPartnerBranchBankAccount bankAccount : maBranchBankAccountsCredit) {
-            if (account.compareTo(typeLayout == SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? bankAccount.getBankAccountNumber() : bankAccount.getBankAccountNumberStd()) == 0) {
-                pk = (int[]) bankAccount.getPrimaryKey();
-                break;
-            }
-        }
-        
-        return pk;
-    }
-    
-    public void setPrimaryKey(int[] pk) {
-        int[] key = new int[] { SLibConsts.UNDEFINED };
-        
-        if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_DPS) {
-            mnPkYearId = pk[0];
-            mnPkDocId = pk[1];
-        }
-        else if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_ADV) {
-            mnBizPartnerId = pk[0];
-        }
-        
-    }
+    public void setAccountCreditArray(ArrayList<SGuiItem> a) { maAccountCredits = a; }
+    public void setAgreementsReferencesArray(ArrayList<SGuiItem> a) { maAgreementReferences = a; }
+    public void setBranchBankAccountCreditArray(ArrayList<SDataBizPartnerBranchBankAccount> a) { maBranchBankAccountCredits = a; }
     
     public int getLayoutRowType() { return mnLayoutRowType; }
+    public int getLayoutRowSubType() { return mnLayoutRowSubType; }
     public int getPkYearId() { return mnPkYearId; }
     public int getPkDocId() { return mnPkDocId; }
     public int getBizPartnerId() { return mnBizPartnerId; }
@@ -268,6 +248,9 @@ public class SLayoutBankRow implements SGridRow {
     public java.lang.String getCurrencyKey() { return msCurrencyKey; }
     public java.lang.String getCurrencyKeyCy() { return msCurrencyKeyCy; }
     public java.lang.String getAccountCredit() { return msAccountCredit; }
+    public java.lang.String getAgreement() { return msAgreement; }
+    public java.lang.String getAgreementReference() { return msAgreementReference; }
+    public java.lang.String getConceptCie() { return msConceptCie; }
     public java.lang.String getEmail() { return msEmail; }
     public java.lang.String getBizPartnerCreditFiscalId() { return msBizPartnerCreditFiscalId; }
     public double getSubTotal() { return mdSubTotal; }
@@ -288,22 +271,52 @@ public class SLayoutBankRow implements SGridRow {
     public int getBankKey() { return mnBankKey; }
     public int getCurrencyId() { return mnCurrencyId; }
     public String getReferenceRecord() { return msReferenceRecord; }
-    public String getObservation() { return msObservation; }
-    public ArrayList<SGuiItem> getAccountCreditArray() { return maAccountCredit; }
-    public HashMap<String, String> getCodeBankAccountCredit() { return moCodeBankAccountCredit; }
-    public HashMap<String, String> getAliasBankAccountCredit() { return moAliasBankAccountCredit; }
+    public String getObservations() { return msObservations; }
     
-    public ArrayList<SDataBizPartnerBranchBankAccount> getBranchBankAccountCreditArray() { return maBranchBankAccountsCredit; }
+    public ArrayList<SDataBizPartnerBranchBankAccount> getBranchBankAccountCredits() { return maBranchBankAccountCredits; }
+    public ArrayList<SGuiItem> getAccountCredits() { return maAccountCredits; }
+    public ArrayList<SGuiItem> getAgreementsReferences() { return maAgreementReferences; }
+    public HashMap<String, String> getCodeBankAccountCredits() { return moCodeBankAccountCredits; }
+    public HashMap<String, String> getAliasBankAccountCredits() { return moAliasBankAccountCredits; }
 
+    public String getBranchBankAccountCreditNumber(int[] pk, int typeLayout) {
+        String account = "";
+        
+        for (SDataBizPartnerBranchBankAccount bankAccount : maBranchBankAccountCredits) {
+            if (SLibUtils.compareKeys(pk, (int[]) bankAccount.getPrimaryKey())) {
+                account = typeLayout == SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? bankAccount.getBankAccountNumber() : bankAccount.getBankAccountNumberStd();
+                break;
+            }
+        }
+        
+        return account;
+    }
+    
+    public int[] getBranchBankAccountCreditId(String account, int typeLayout) {
+        int[] pk = null;
+        
+        for (SDataBizPartnerBranchBankAccount bankAccount : maBranchBankAccountCredits) {
+            if (account.compareTo(typeLayout == SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? bankAccount.getBankAccountNumber() : bankAccount.getBankAccountNumberStd()) == 0) {
+                pk = (int[]) bankAccount.getPrimaryKey();
+                break;
+            }
+        }
+        
+        return pk;
+    }
+ 
     @Override
     public int[] getRowPrimaryKey() {
         int[] key = new int[] { SLibConsts.UNDEFINED };
         
-        if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_DPS) {
-            key = new int[] { mnPkYearId, mnPkDocId };
-        }
-        else if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_ADV) {
-            key = new int[] { mnBizPartnerId };
+        switch (mnLayoutRowType) {
+            case SModSysConsts.FIN_LAY_BANK_DPS:
+                key = new int[] { mnPkYearId, mnPkDocId };
+                break;
+            case SModSysConsts.FIN_LAY_BANK_ADV:
+                key = new int[] { mnBizPartnerId };
+                break;
+            default:
         }
         
         return key;
@@ -342,8 +355,9 @@ public class SLayoutBankRow implements SGridRow {
     @Override
     public Object getRowValueAt(int col) {
         Object value = null;
-
-        if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_DPS) {
+        
+        switch (mnLayoutRowType) {
+            case SModSysConsts.FIN_LAY_BANK_DPS:
                 switch (col) {
                     case 0:
                         value = msBizPartner;
@@ -367,7 +381,7 @@ public class SLayoutBankRow implements SGridRow {
                         value = moBalance.getAmountOriginal();
                         break;
                     case 7:
-                        value = moBalanceTot.getAmountOriginal(); ///amount to pay
+                        value = moBalanceTot.getAmountOriginal();               // amount to pay
                         break;
                     case 8:
                         value = msCurrencyKeyCy;
@@ -376,172 +390,276 @@ public class SLayoutBankRow implements SGridRow {
                         value = moBalanceTot.getExchangeRate();
                         break;
                     case 10:
-                        value = moBalanceTot.getAmountLocal(); ///amount to pay in banck currency
+                        value = moBalanceTot.getAmountLocal();                  // amount to pay in bank's currency
                         break;
                     case 11:
-                        value = msCurrencyKey; // bank key currency
+                        value = msCurrencyKey;                                  // bank key currency
                         break;    
                     case 12:
-                        value = msAccountCredit;
+                        if (!msAgreement.isEmpty()) { //if (mnLayoutRowSubType == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) { alphalapz
+                            value = msAgreement;
+                        }
+                        else {
+                            value = msAccountCredit;
+                        }
                         break;
                     case 13:
-                        value = msEmail;
+                        if (msAgreementReference == null) {
+                            value = "";
+                        }
+                        else {
+                            value = msAgreementReference;
+                        }
                         break;
                     case 14:
-                        value = msBizPartnerCreditFiscalId;
+                        value = msConceptCie;                                   // reference agreement CIE
                         break;
                     case 15:
-                        value = mdSubTotal;
+                        value = msEmail;                            
                         break;
                     case 16:
-                        value = mdTaxCharged;
+                        value = msBizPartnerCreditFiscalId;
                         break;
                     case 17:
-                        value = mdTaxRetained;
+                        value = mdSubTotal;
                         break;
                     case 18:
-                        value = mdTotal;
+                        value = mdTaxCharged;
                         break;
                     case 19:
-                        value = mtDateMaturityRo;
+                        value = mdTaxRetained;
                         break;
                     case 20:
-                        value = msObservation;
+                        value = mdTotal;
                         break;
-                   default:
-            }
+                    case 21:
+                        value = mtDateMaturityRo;
+                        break;
+                    case 22:
+                        value = msObservations;
+                        break;
+                    default:
+                }
+                break;
+                
+            case SModSysConsts.FIN_LAY_BANK_ADV:
+                switch (col) {
+                    case 0:
+                        value = msBizPartner;
+                        break;
+                    case 1:
+                        value = msBizPartnerKey;
+                        break;
+                    case 2:
+                        value = moBalanceTot.getAmountOriginal();   // amount to pay
+                        break;
+                    case 3:
+                        value = msCurrencyKey;
+                        break;
+                    case 4:
+                        if (!msAgreement.isEmpty()) { //if (mnLayoutRowSubType == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) { alphalapz
+                            value = msAgreement;
+                        }
+                        else {
+                            value = msAccountCredit;
+                        }
+                        break;
+                    case 5:
+                        if (msAgreementReference == null) {
+                            value = "";
+                        }
+                        else {
+                            value = msAgreementReference;
+                        }
+                        break;
+                    case 6:
+                        value = msConceptCie;                                   // reference agreement CIE
+                        break;
+                    case 7:
+                        value = msEmail;
+                        break;
+                    case 8:
+                        value = msBizPartnerCreditFiscalId;
+                        break;
+                    case 9:
+                        value = msReferenceRecord;
+                        break;
+                    case 10:
+                        value = msObservations;
+                        break;
+                    default:
+                }
+                break;
+            default:
         }
-        else if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_ADV) {
-            switch (col) {
-                case 0:
-                    value = msBizPartner;
-                    break;
-                case 1:
-                    value = msBizPartnerKey;
-                    break;
-                case 2:
-                    value = moBalanceTot.getAmountOriginal();
-                    break;
-                case 3:
-                    value = msCurrencyKey;
-                    break;
-                case 4:
-                    value = msAccountCredit;
-                    break;
-                case 5:
-                    value = msEmail;
-                    break;
-                case 6:
-                    value = msBizPartnerCreditFiscalId;
-                    break;
-                case 7:
-                    value = msReferenceRecord;
-                    break;
-                case 8:
-                    value = msObservation;
-                    break;
-                default:
-            }
-        }
-        
+
         return value;
     }
 
     @Override
     public void setRowValueAt(Object value, int row) {
-        if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_DPS) {
-            switch (row) {
-                case 0:
-                    break;
-                case 1:
-                    break;
-                case 2:
-                    break;
-                case 3:
-                    break;
-                case 4:
-                    break;
-                case 5:
-                    mbIsForPayment = (boolean) value;
-                    break;
-                case 6:
-                    break;
-                case 7:
-                    moBalanceTot.setAmountOriginal((double) value);
-                    break;
-                case 8:
-                    break;
-                case 9:
-                    if (moBalance.getCurrencyLocalId() != moBalanceTot.getCurrencyOriginalId()) { 
-                        moBalanceTot.setExchangeRate((double) value);
-                    }   
-                    break;
-                case 10:
-                    break;
-                case 11:
-                    break;    
-                case 12:
-                    if (value == null) {
-                        msAccountCredit = "";
+        switch (mnLayoutRowType) {
+            case SModSysConsts.FIN_LAY_BANK_DPS:
+                switch (row) {
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                        break;
+                    case 5:
+                        mbIsForPayment = (boolean) value;
+                        break;
+                    case 6:
+                        break;
+                    case 7:
+                        moBalanceTot.setAmountOriginal((double) value);
+                        break;
+                    case 8:
+                        break;
+                    case 9:
+                        if (moBalance.getCurrencyLocalId() != moBalanceTot.getCurrencyOriginalId()) {
+                            moBalanceTot.setExchangeRate((double) value);
+                        }   
+                        break;
+                    case 10:
+                        break;
+                    case 11:
+                        break;
+                    case 12:   
+                        //Cuenta/Convenio
+                        if (value == null) {
+                            msAgreement = "";
+                        }
+                        else {
+                            if (mnLayoutRowSubType == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) {
+                                if ( value instanceof String) {
+                                    msAgreement =  (String) value;
+                                }
+                                else {
+                                    msAgreement = ((SGuiItem) value).getItem();
+                                }
+                            }
+                            else {
+                                msAccountCredit = ((SGuiItem) value).getItem();
+                            }
+                        }
+                        break;    
+                    case 13:
+                        if (value == null) {
+                            msAgreementReference = "";
+                        }
+                        else {
+                            if ( value instanceof String) {
+                                msAgreementReference =  (String) value;
+                            }
+                            else {
+                                msAgreementReference = ((SGuiItem) value).getItem();
+                            }
+                        }
+                        break;
+                    case 14:
+                        if (value == null) {
+                            msConceptCie = "";
+                        }
+                        else {
+                            if ( value instanceof String) {
+                                msConceptCie =  (String) value;
+                            }
+                            else {
+                                msConceptCie = ((SGuiItem) value).getItem();
+                            }
+                        }
+                        break;
+                    case 15:
+                        msEmail = (String) value;
+                        break;
+                    case 16:
+                    case 17:
+                    case 18:
+                    case 19:
+                    case 20:
+                    case 21:
+                        break;
+                    case 22:
+                        msObservations = (String) value;
+                        break;
+                    default:
+                        break;
                     }
-                    else {
-                        msAccountCredit = ((SGuiItem) value).getItem();
-                    }
                     break;
-                case 13:
-                    msEmail = (String) value;
-                    break;
-                case 14:
-                    break;
-                case 15:
-                    break;
-                case 16:
-                    break;
-                case 17:
-                    break;
-                case 18:
-                    break;
-                case 19:
-                    break;
-                case 20:
-                    msObservation = (String) value;
-                    break;
-                default:
-                    break;
-            }
-        }
-        else if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_ADV) {
-            switch (row) {
-                case 0:
-                    break;
-                case 1:
-                    break;
-                case 2:
-                     moBalanceTot.setAmountOriginal((double) value);
-                    break;
-                case 3:
-                    break;
-                case 4:
-                    if (value == null) {
-                        msAccountCredit = "";
-                    }
-                    else {
-                        msAccountCredit = ((SGuiItem) value).getItem();
-                    }
-                    break;
-                case 5:
-                    msEmail = (String) value;
-                    break;
-                case 6:
-                    break;
-                case 7:
-                    msReferenceRecord = (String) value;
-                    break;
-                case 8:
-                    msObservation = (String) value;
-                default:
-                    break;
-            }
+            case SModSysConsts.FIN_LAY_BANK_ADV:
+                switch (row) {
+                    case 0:
+                    case 1:
+                        break;
+                    case 2:
+                         moBalanceTot.setAmountOriginal((double) value);
+                        break;
+                    case 3:
+                        break;
+                    case 4:   
+                        //Cuenta/Convenio
+                        if (value == null) {
+                            msAgreement = "";
+                            msAccountCredit = "";
+                        }
+                        else {
+//                            if (mnLayoutRowSubType == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) {
+                            if (!msAgreement.isEmpty()) {
+                                if ( value instanceof String) {
+                                    msAgreement =  (String) value;
+                                }
+                                else {
+                                    msAgreement = ((SGuiItem) value).getItem();
+                                }
+                            }
+                            else {
+                                msAccountCredit = ((SGuiItem) value).getItem();
+                            }
+                        }
+                        break;    
+                    case 5:
+                        if (value == null) {
+                            msAgreementReference = "";
+                        }
+                        else {
+                            if ( value instanceof String) {
+                                msAgreementReference =  (String) value;
+                            }
+                            else {
+                                msAgreementReference = ((SGuiItem) value).getItem();
+                            }
+                        }
+                        break;
+                    case 6:
+                        if (value == null) {
+                            msConceptCie = "";
+                        }
+                        else {
+                            if ( value instanceof String) {
+                                msConceptCie =  (String) value;
+                            }
+                            else {
+                                msConceptCie = ((SGuiItem) value).getItem();
+                            }
+                        }
+                        break;
+                    case 7:
+                        msEmail = (String) value;
+                        break;
+                    case 8:
+                        break;
+                    case 9:
+                        msReferenceRecord = (String) value;
+                        break;
+                    case 10:
+                        msObservations = (String) value;
+                        break;
+                    default:
+                }
+                break;
+            default:
         }
     }
 }

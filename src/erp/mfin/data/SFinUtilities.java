@@ -1,5 +1,6 @@
 /*
  * Copyright © Software Aplicado SA de CV. All rights reserverd.
+ * SFinUtilities.java
  */
 package erp.mfin.data;
 
@@ -29,10 +30,12 @@ import java.util.Vector;
 import javax.swing.JFileChooser;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
+import sa.lib.prt.SPrtConsts;
+import sa.lib.prt.SPrtUtils;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Alfredo Pérez
  */
 public abstract class SFinUtilities {
     
@@ -187,6 +190,10 @@ public abstract class SFinUtilities {
         }
         return bizPartner;
     }
+    
+    /*
+     * HSBC
+     */
     
     public static java.lang.String createLayoutHsbcThirdOld(erp.client.SClientInterface client, Vector<SLayoutBankRow> vRows, java.lang.String title) {
         int nMoveNum = 1;
@@ -591,6 +598,10 @@ public abstract class SFinUtilities {
         return layout;
     }
 
+    /*
+     * Santander
+     */
+    
     public static java.lang.String createLayoutSantanderThirdOld(erp.client.SClientInterface client, Vector<SLayoutBankRow> vRows, java.lang.String title) {
         int nBizPartnerId = 0;
         java.lang.String sAccountDebit = "";
@@ -789,6 +800,10 @@ public abstract class SFinUtilities {
         return createLayoutSantanderSpeiFdN(payments, title);
     }
     
+    /*
+     * BanBajío
+     */
+    
     public static java.lang.String createLayoutBanBajioOld(erp.client.SClientInterface client, Vector<SLayoutBankRow> vRows, java.lang.String title, Date date, Date dateApplication, int consecutiveDay, String typeLay, String typeAccountCredit) {
         int nMoveNum = 2;
         int nMoveNumTotal = 0;
@@ -871,7 +886,7 @@ public abstract class SFinUtilities {
                 layout += "09";
                 layout += SLibUtilities.textRepeat("0", 7 - n).concat(nMoveNum + "");
                 layout += SLibUtilities.textRepeat("0", 7 - m).concat(nMoveNumTotal + "");
-                layout += formatDescTotal.format(mdBalanceTotal).replace(".", "");;
+                layout += formatDescTotal.format(mdBalanceTotal).replace(".", "");
             }
             layout += "\r\n";
         }
@@ -949,7 +964,7 @@ public abstract class SFinUtilities {
                 layout += "09";
                 layout += SLibUtilities.textRepeat("0", 7 - n).concat(nMoveNum + "");
                 layout += SLibUtilities.textRepeat("0", 7 - m).concat(nMoveNumTotal + "");
-                layout += formatDescTotal.format(mdBalanceTotal).replace(".", "");;
+                layout += formatDescTotal.format(mdBalanceTotal).replace(".", "");
             }
             layout += "\r\n";
         }
@@ -983,38 +998,9 @@ public abstract class SFinUtilities {
         return createLayoutBanBajio(payments, title, date, date, consecutiveDay, TXT_TYPE_LAY_BANBAJIO_SPEI, TXT_TYPE_ACCOUNT_CLABE);
     }
     
-    public static java.lang.String createLayoutBbvaThird(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
-        java.lang.String sReference = "";
-        java.lang.String sAccountDebit = "";
-        java.lang.String sAccountCredit = "";
-        java.lang.String layout = "";
-        DecimalFormat formatDesc = new DecimalFormat("0000000000000.00");
-        mdBalanceTot = 0;
-        mdTaxChargedTot = 0;
-        mbIsRepeated = false;
-
-        try {
-            for (SLayoutBankPaymentTxt payment : payments) {
-
-                sReference = SLibUtilities.textToAlphanumeric(payment.getReference());
-                sAccountDebit = SLibUtilities.textTrim(payment.getAccountDebit());
-                sAccountCredit = SLibUtilities.textTrim(payment.getAccountCredit());
-                mdBalanceTot = payment.getTotalAmount();
-
-                layout += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 18 ? 0 : 18 - sAccountCredit.length())).concat(SLibUtilities.textLeft(sAccountCredit, 18)); // Credit acccount
-                layout += SLibUtilities.textRepeat("0", (sAccountDebit.length() >= 18 ? 0 : 18 - sAccountDebit.length())).concat(SLibUtilities.textLeft(sAccountDebit, 18)); // Debit acccount
-                layout += (payment.getCurrencyId() == 1 ? TXT_TYPE_CUR_MXP_BBVA : (payment.getCurrencyId() == 2 ? TXT_TYPE_CUR_USD_BBVA : TXT_TYPE_CUR_EUR_BBVA)); // badge
-                layout += formatDesc.format(mdBalanceTot); // Total amount
-                layout += (sReference.length() > 30 ? SLibUtilities.textLeft(sReference, 30) : sReference).concat(SLibUtilities.textRepeat(" ", (30 - sReference.length()))); // Reason Payment
-                
-                layout += "\r\n";
-            }
-        }
-        catch (java.lang.Exception e) {
-            SLibUtilities.renderException(SFinUtilities.class.getName(), e);
-        }
-        return layout;
-    }
+    /*
+     * BBVA Bancomer
+     */
     
     private static java.lang.String createLayoutBbvaInterbank(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title, String availability) {
         int n = 0;
@@ -1057,6 +1043,39 @@ public abstract class SFinUtilities {
         return layout;
     }
     
+    public static java.lang.String createLayoutBbvaThird(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
+        java.lang.String sReference = "";
+        java.lang.String sAccountDebit = "";
+        java.lang.String sAccountCredit = "";
+        java.lang.String layout = "";
+        DecimalFormat formatDesc = new DecimalFormat("0000000000000.00");
+        mdBalanceTot = 0;
+        mdTaxChargedTot = 0;
+        mbIsRepeated = false;
+
+        try {
+            for (SLayoutBankPaymentTxt payment : payments) {
+
+                sReference = SLibUtilities.textToAlphanumeric(payment.getReference());
+                sAccountDebit = SLibUtilities.textTrim(payment.getAccountDebit());
+                sAccountCredit = SLibUtilities.textTrim(payment.getAccountCredit());
+                mdBalanceTot = payment.getTotalAmount();
+
+                layout += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 18 ? 0 : 18 - sAccountCredit.length())).concat(SLibUtilities.textLeft(sAccountCredit, 18)); // Credit acccount
+                layout += SLibUtilities.textRepeat("0", (sAccountDebit.length() >= 18 ? 0 : 18 - sAccountDebit.length())).concat(SLibUtilities.textLeft(sAccountDebit, 18)); // Debit acccount
+                layout += (payment.getCurrencyId() == 1 ? TXT_TYPE_CUR_MXP_BBVA : (payment.getCurrencyId() == 2 ? TXT_TYPE_CUR_USD_BBVA : TXT_TYPE_CUR_EUR_BBVA)); // badge
+                layout += formatDesc.format(mdBalanceTot); // Total amount
+                layout += (sReference.length() > 30 ? SLibUtilities.textLeft(sReference, 30) : sReference).concat(SLibUtilities.textRepeat(" ", (30 - sReference.length()))); // Reason Payment
+                
+                layout += "\r\n";
+            }
+        }
+        catch (java.lang.Exception e) {
+            SLibUtilities.renderException(SFinUtilities.class.getName(), e);
+        }
+        return layout;
+    }
+    
     public static java.lang.String createLayoutBbvaTef(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
         return createLayoutBbvaInterbank(payments, title, TXT_TYPE_LAY_BBVA_TEF);
     }
@@ -1064,6 +1083,46 @@ public abstract class SFinUtilities {
     public static java.lang.String createLayoutBbvaSpei(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
         return createLayoutBbvaInterbank(payments, title, TXT_TYPE_LAY_BBVA_SPEI);
     }
+    
+    public static java.lang.String createLayoutBbvaCie(final ArrayList<SLayoutBankPaymentTxt> payments) {
+        double dImporte = 0;
+        java.lang.String sConceptoCie = "";
+        java.lang.String sConvenioCie = "";
+        java.lang.String sAsuntoOrdenante = "";                                                     // in fact, beneficiary's bank account
+        java.lang.String sReferenciaCie = "";
+        java.lang.String sLayout = "";
+        
+        DecimalFormat oFormatConvenioCie = new DecimalFormat(SLibUtils.textRepeat("0", 7));         // fixed length defined in layout specification
+        DecimalFormat oFormatAsuntoOrdenante = new DecimalFormat(SLibUtils.textRepeat("0", 18));    // fixed length defined in layout specification
+        DecimalFormat oFormatImporte = new DecimalFormat(SLibUtils.textRepeat("0", 13) + "." + SLibUtils.textRepeat("0", 2));   // fixed length defined in layout specification
+        
+        try {
+            for (SLayoutBankPaymentTxt payment : payments) {
+                sConceptoCie = SLibUtilities.textTrim(payment.getConceptCie());
+                sConvenioCie = SLibUtilities.textToAlphanumeric(payment.getAgreement());
+                sAsuntoOrdenante = SLibUtilities.textTrim(payment.getAccountDebit());
+                dImporte = payment.getTotalAmount();
+                sReferenciaCie = SLibUtilities.textToAlphanumeric(payment.getAgreementReference());
+                
+                sLayout += SPrtUtils.formatText(sConceptoCie, 30, SPrtConsts.ALIGN_LEFT, SPrtConsts.TRUNC_TRUNC);   // fixed length defined in layout specification
+                sLayout += oFormatConvenioCie.format(SLibUtils.parseLong(sConvenioCie));
+                sLayout += oFormatAsuntoOrdenante.format(SLibUtils.parseLong(sAsuntoOrdenante));
+                sLayout += oFormatImporte.format(dImporte);
+                sLayout += SPrtUtils.formatText(sConceptoCie, 30, SPrtConsts.ALIGN_LEFT, SPrtConsts.TRUNC_TRUNC);   // fixed length defined in layout specification, same text as Concepto CIE
+                sLayout += SPrtUtils.formatText(sReferenciaCie, 20, SPrtConsts.ALIGN_LEFT, SPrtConsts.TRUNC_TRUNC); // fixed length defined in layout specification
+                sLayout += "\r\n";
+            }
+        }
+        catch (java.lang.Exception e) {
+            SLibUtilities.renderException(SFinUtilities.class.getName(), e);
+        }
+        
+        return sLayout;
+    }
+    
+    /*
+     * Citibanamex
+     */
     
     public static java.lang.String createLayoutBanamexThird(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
         java.lang.String sReference = "";
@@ -1193,7 +1252,7 @@ public abstract class SFinUtilities {
 
         resulSet = client.getSession().getStatement().executeQuery(sql);
         while (resulSet.next()) {
-            maDataBase = new ArrayList<String>();
+            maDataBase = new ArrayList<>();
             maDataBase.add(resulSet.getString("bd"));
         }
         
@@ -1406,7 +1465,7 @@ public abstract class SFinUtilities {
         Vector<Object> in = null;
         Vector<Object> out = null;
 
-        in = new Vector<Object>();
+        in = new Vector<>();
         in.add(idBizPartner);
         in.add(idBizPartnerCategory);
         in.add(keyDpsToExclude == null ? client.getSession().getCurrentYear() : keyDpsToExclude[0]);

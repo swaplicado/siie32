@@ -50,7 +50,7 @@ public abstract class STreasuryBankLayoutFile {
             map.put("dOriginalTotal", parameters.getOriginalTotal());
             map.put("bIsDifferentCurrency", parameters.getIsDifferentCurrency());
             map.put("sCurrencyDps", parameters.getCurrencyDps());
-
+            
             fileTemporal = new File("reps/fin_lay_bank.jasper");
             reporte = (JasperReport) JRLoader.loadObject(fileTemporal);
             jasperPrint = JasperFillManager.fillReport(reporte, map, new JRBeanCollectionDataSource(bankPayments));

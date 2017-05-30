@@ -6,6 +6,7 @@ package erp.mod.fin.view;
 
 import erp.cfd.SCfdConsts;
 import erp.client.SClientInterface;
+import erp.mfin.data.SDataBankLayoutType;
 import erp.mfin.data.SFinUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -38,12 +39,11 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Juan Barajas, Uriel Castañeda
+ * @author Juan Barajas, Uriel Castañeda, Alfredo Pérez
  */
 public class SViewBankLayout extends SGridPaneView implements ActionListener {
 
     private SGridFilterDatePeriod moFilterDatePeriod;
-    private JButton jbPayment;
     private JButton jbGetLayout;
     private JButton jbSend;
     private JButton jbBackToNew;
@@ -61,15 +61,13 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
         
         jbGetLayout = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Obtener layout", this);
-        jbPayment = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_money.gif")), "Aplicar pagos", this);
         jbSend = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")), "Enviar solicitud de autorización", this);
         jbBackToNew = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_left.gif")), "Regresar a estatus anterior", this);
-	jbCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver movimientos", this);
+	jbCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver detalles de pago", this);
         moDialogLayoutsCardex = new SDialogLayoutsBankCardex(miClient, mnGridSubtype, "Detalle del layout");
     
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGetLayout);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPayment);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSend);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbBackToNew);
 	
@@ -155,20 +153,6 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
         }
     }
     
-    private void actionApplyPayments() {
-        if (jbPayment.isEnabled()) {
-            if (validateRow()) {
-                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-                if (!gridRow.isUpdatable()) {
-                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
-                }
-                else {
-                    miClient.getSession().getModule(mnModuleType, mnModuleSubtype).showForm(mnGridType, SModConsts.FIN_REC, new SGuiParams(gridRow.getRowPrimaryKey()));
-                }
-            }     
-        }
-    }
-    
     private boolean validateRow() {
         boolean valid = true;
        
@@ -219,7 +203,7 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
         boolean done = false;
         SDbBankLayout bankLayout = null;
         STreasuryBankLayoutRequest treasuryBankLayoutRequest = null;
-        
+        SDataBankLayoutType typeLayout = null;
         bankLayout = readLayout();
         
         if (bankLayout != null) {
@@ -335,7 +319,7 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
-        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
+        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
         
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "l.dt_lay", "Pago"));
 	gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, SDbConsts.FIELD_ID + "1", "Folio", 50));
@@ -378,9 +362,6 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
 
             if (button == jbGetLayout) {
                 actionGetLayout();
-            }
-            else if (button == jbPayment) {
-                actionApplyPayments();
             }
             else if (button == jbSend) {
                 actionSend();

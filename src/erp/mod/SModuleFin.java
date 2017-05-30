@@ -70,7 +70,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Juan Barajas, Edwin Carmona
+ * @author Juan Barajas, Edwin Carmona, Alfredo Pérez
  */
 public class SModuleFin extends SGuiModule {
 
@@ -500,7 +500,7 @@ public class SModuleFin extends SGuiModule {
     @Override
     public SGuiOptionPicker getOptionPicker(final int type, final int subtype, final SGuiParams params) {
         String sql = "";
-        ArrayList<SGridColumnForm> gridColumns = new ArrayList<SGridColumnForm>();
+        ArrayList<SGridColumnForm> gridColumns = new ArrayList<>();
         SGuiOptionPickerSettings settings = null;
         SGuiOptionPicker picker = null;
 
@@ -636,7 +636,7 @@ public class SModuleFin extends SGuiModule {
                 break;
             case SModConsts.FIN_LAY_BANK:
                 switch (subtype) {
-                    case SModConsts.FIN_REC:
+                    case SModSysConsts.FIN_LAY_BANK_ACC:
                         if (moFormBankLayoutAccounting == null) moFormBankLayoutAccounting = new SFormLayoutBank(miClient, subtype, "Aplicación de pagos de layout bancario");
                         form = moFormBankLayoutAccounting;
                         break;

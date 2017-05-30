@@ -13,7 +13,7 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Uriel Castañeda
+ * @author Uriel Castañeda, Alfredo Pérez
  */
 public class SLayoutBankCardextRow implements SGridRow {
 
@@ -39,6 +39,9 @@ public class SLayoutBankCardextRow implements SGridRow {
     protected java.lang.String msCurrencyKey;
     protected java.lang.String msCurrencyKeyCy;
     protected java.lang.String msAccountCredit;
+    protected java.lang.String msAgreement;
+    protected java.lang.String msAgreementReference;
+    protected java.lang.String msConceptCie;
     protected String msObservation;
     protected String msRecordPeriod;
     protected String msRecordBkc;
@@ -73,6 +76,9 @@ public class SLayoutBankCardextRow implements SGridRow {
         msCurrencyKey = "";
         msCurrencyKeyCy = "";
         msAccountCredit = "";
+        msAgreement = "";
+        msAgreementReference = "";
+        msConceptCie = "";
         msObservation = "";
         msRecordPeriod = "";
         msRecordBkc = "";
@@ -102,6 +108,9 @@ public class SLayoutBankCardextRow implements SGridRow {
     public void setCurrencyKey(java.lang.String s) { msCurrencyKey = s; }
     public void setCurrencyKeyCy(java.lang.String s) { msCurrencyKeyCy = s; }
     public void setAccountCredit(java.lang.String s) { msAccountCredit = s; }
+    public void setAgreement(java.lang.String s) { msAgreement = s; }
+    public void setAgreementReference(java.lang.String s) { msAgreementReference = s; }
+    public void setConceptCie(java.lang.String s) { msConceptCie = s; }
     public void setExchangeRate(double d) { moBalanceTot.setExchangeRate(d); }
     public void setObservation(String s) { msObservation = s; }
     public void setRecordPeriod(String s) { msRecordPeriod = s; }
@@ -142,6 +151,9 @@ public class SLayoutBankCardextRow implements SGridRow {
     public java.lang.String getCurrencyKey() { return msCurrencyKey; }
     public java.lang.String getCurrencyKeyCy() { return msCurrencyKeyCy; }
     public java.lang.String getAccountCredit() { return msAccountCredit; }
+    public java.lang.String getAgreement() { return msAgreement; }
+    public java.lang.String getAgreementRefernce() { return msAgreementReference; }
+    public java.lang.String getConceptCie() { return msConceptCie; }
     public String getObservation() { return msObservation; }
     public String getRecordPeriod() { return msRecordPeriod; }
     public String getRecordBkc() { return msRecordBkc; }
@@ -193,7 +205,7 @@ public class SLayoutBankCardextRow implements SGridRow {
     @Override
     public Object getRowValueAt(int col) {
         Object value = null;
-
+        
         switch (col) {
             case 0:
                 value = msBizPartner;
@@ -214,44 +226,58 @@ public class SLayoutBankCardextRow implements SGridRow {
                 value = msBizPartnerBranchCob;
                 break;
             case 6:
-                value = moBalanceTot.getAmountOriginal(); 
+                value = moBalanceTot.getAmountOriginal();
                 break;
             case 7:
                 value =  msCurrencyKey;
-                break;    
+                break;
             case 8:
-                value = moBalanceTot.getExchangeRate(); 
-                break;     
+                value = moBalanceTot.getExchangeRate();
+                break;
             case 9:
-                value = msAccountCredit; 
+                if (!msAgreement.isEmpty()) {
+                    value = msAgreement;
+                }
+                else {
+                    value = msAccountCredit;
+                }
                 break;
             case 10:
-                value = msRecordPeriod;
+                value = msAgreementReference;
                 break;
             case 11:
-                value = msRecordBkc;
+                if (msConceptCie == null) {
+                    value = "";
+                }
+                else{
+                    value = msConceptCie;
+                }
                 break;
             case 12:
-                value = msRecordCob;
+                value = msRecordPeriod;
                 break;
             case 13:
-                value = msRecordNumber;
+                value = msRecordBkc;
                 break;
             case 14:
-                value = mtRecordDate;
+                value = msRecordCob;
                 break;
             case 15:
+                value = msRecordNumber;
+                break;
+            case 16:
+                value = mtRecordDate;
+                break;
+            case 17:
                 value = msObservation;
-                break;    
-           default:
+                break;
+            default:
         }
-        return value;
-    }
+    return value;
+}
 
     @Override
     public void setRowValueAt(Object value, int row) {
          throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-       
-    
 }
