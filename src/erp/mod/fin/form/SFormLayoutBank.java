@@ -1471,8 +1471,8 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                     break;
                 case SModSysConsts.FIN_LAY_BANK_ADV:
                     populateGridRowsWithBeneficiaries(true);
-                    jckShowOnlyDocsDateDue.setEnabled(true);
-                    jckShowOnlyBenefsWithAccounts.setEnabled(false);
+                    jckShowOnlyDocsDateDue.setEnabled(false);
+                    jckShowOnlyBenefsWithAccounts.setEnabled(true);
                     break;
                 default:
             }
