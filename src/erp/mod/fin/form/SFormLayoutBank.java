@@ -1466,9 +1466,13 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
             switch (mnFormSubtype) {
                 case SModSysConsts.FIN_LAY_BANK_DPS:
                     populateGridRowsWithDps(true);
+                    jckShowOnlyDocsDateDue.setSelected(true);
+                    jckShowOnlyBenefsWithAccounts.setSelected(true);
                     break;
                 case SModSysConsts.FIN_LAY_BANK_ADV:
                     populateGridRowsWithBeneficiaries(true);
+                    jckShowOnlyDocsDateDue.setEnabled(true);
+                    jckShowOnlyBenefsWithAccounts.setEnabled(false);
                     break;
                 default:
             }
