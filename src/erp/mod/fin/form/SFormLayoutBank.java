@@ -2432,8 +2432,14 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                 if (moDateDateDue.getValue().equals(resulSet.getDate("dt_mat")) && maBranchBankAccountsCredit.size() > 0) {
                     rows.add(moRow);
                     mltAccountCredit.add(maAccountCredit);
+                }
+                if (moDateDateDue.getValue().equals(resulSet.getDate("dt_mat")) && !maAgreements.isEmpty()) {
                     mltAgreementReference.add(maAgreementsReference);
                 }
+                if (!maAgreements.isEmpty()) {
+                    mltAgreementReference.add(mhAgreeAgreeRef.get(msAgreement));
+                }
+                
                 mvLayoutRows.add(moRow);
             }
             moGridPayments.populateGrid(rows);
@@ -2517,10 +2523,12 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                 moRow.setAgreementsReferencesArray(maAgreementsReference);
                 moRow.setBranchBankAccountCreditArray(maBranchBankAccountsCredit);
                 moRow.setObservations("");
-                if (maBranchBankAccountsCredit.size() > 0) {
+                if (!maBranchBankAccountsCredit.isEmpty()) {
                     rows.add(moRow);
                     mltAccountCredit.add(maAccountCredit);
-                    mltAgreementReference.add(maAgreementsReference);
+                }
+                if (!maAgreements.isEmpty()) {
+                    mltAgreementReference.add(mhAgreeAgreeRef.get(msAgreement));
                 }
                 
                 mvLayoutRows.add(moRow);
