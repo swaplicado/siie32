@@ -161,13 +161,11 @@ public class STrnInventoryValuation {
     }
     
     private void validateConsumeProductionOrder() throws Exception {
-        int productionOrderYear = 0;
-        int productionOrderDoc = 0;
-        String msgProductionOrders = "";
         String sql = "";
-        Statement stProduct = moSession.getStatement().getConnection().createStatement();
+        String msgJobOrders = "";
+        Statement stJobOrder = moSession.getStatement().getConnection().createStatement();
         Statement stStockMove = moSession.getStatement().getConnection().createStatement();
-        ResultSet rsProductionOrder = null;
+        ResultSet rsJobOrder = null;
         ResultSet rsStockMove = null;
         
         // Integrate a list of products (PP / PT) that received inputs in the period evaluated:
@@ -183,33 +181,28 @@ public class STrnInventoryValuation {
                 + SModSysConsts.TRNS_TP_IOG_OUT_MFG_WP_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_WP_RET[2] + ") "
                 + "ORDER BY o.fid_item_r, o.fid_unit_r; ";
 
-        rsProductionOrder = stProduct.executeQuery(sql);
-        while (rsProductionOrder.next()) {
-            productionOrderYear = rsProductionOrder.getInt("o.id_year");
-            productionOrderDoc = rsProductionOrder.getInt("o.id_ord");
-            
-            sql = "SELECT s.dt, d.fid_ct_iog, d.fid_cl_iog, d.fid_tp_iog, CONCAT(o.id_year, '-', o.num) AS _op "
+        rsJobOrder = stJobOrder.executeQuery(sql);
+        while (rsJobOrder.next()) {
+            sql = "SELECT d.dt, d.id_year, d.id_doc, d.fid_ct_iog, d.fid_cl_iog, d.fid_tp_iog, CONCAT(o.id_year, '-', o.num) AS _ord "
                     + "FROM trn_stk AS s "
                     + "INNER JOIN trn_diog AS d ON s.fid_diog_year = d.id_year AND s.fid_diog_doc = d.id_doc "
-                    + "LEFT OUTER JOIN mfg_ord AS o ON d.fid_mfg_year_n = o.id_year AND d.fid_mfg_ord_n = o.id_ord "
-                    + "WHERE d.b_del = 0 AND s.b_del = 0 AND "
+                    + "INNER JOIN mfg_ord AS o ON d.fid_mfg_year_n = o.id_year AND d.fid_mfg_ord_n = o.id_ord "
+                    + "WHERE NOT d.b_del AND NOT s.b_del AND "
                     + "s.id_year = " + mnYear + " AND s.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
-                    + "d.fid_mfg_year_n = " + productionOrderYear + " AND d.fid_mfg_ord_n = " + productionOrderDoc + " "
-                    + "ORDER BY S.dt DESC, s.id_mov DESC; ";
+                    + "d.fid_mfg_year_n = " + rsJobOrder.getInt("o.id_year") + " AND d.fid_mfg_ord_n = " + rsJobOrder.getInt("o.id_ord") + " "
+                    + "ORDER BY  d.dt DESC, d.id_year DESC, d.id_doc DESC; ";
             
             rsStockMove = stStockMove.executeQuery(sql);
             if (rsStockMove.next()) {
-                if (!(rsStockMove.getInt("d.fid_ct_iog") == SModSysConsts.TRNS_TP_IOG_IN_MFG_CON[0] && rsStockMove.getInt("d.fid_cl_iog") == SModSysConsts.TRNS_TP_IOG_IN_MFG_CON[1] && 
-                        rsStockMove.getInt("d.fid_tp_iog") == SModSysConsts.TRNS_TP_IOG_IN_MFG_CON[2]) &&
-                        !(rsStockMove.getInt("d.fid_ct_iog") == SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[0] && rsStockMove.getInt("d.fid_cl_iog") == SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[1] && 
-                        rsStockMove.getInt("d.fid_tp_iog") == SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[2])) {
-                    msgProductionOrders += ("El último movimiento de la OP '" + rsStockMove.getString("_op") + "' no es el consumo de MP y P.\n");
+                int[] key = new int[] { rsStockMove.getInt("d.fid_ct_iog") , rsStockMove.getInt("d.fid_cl_iog"), rsStockMove.getInt("d.fid_tp_iog") };
+                if (!SLibUtils.belongsTo(key, new int[][] { SModSysConsts.TRNS_TP_IOG_IN_MFG_CON, SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON })) {
+                    msgJobOrders += (msgJobOrders.isEmpty() ? "" : "\n") + "El último movimiento de la OP '" + rsStockMove.getString("_ord") + "' no es el consumo de MP y P.";
                 }
             }
         }
         
-        if (!msgProductionOrders.isEmpty()) {
-            throw new Exception(msgProductionOrders);
+        if (!msgJobOrders.isEmpty()) {
+            throw new Exception(msgJobOrders);
         }
     }
     
