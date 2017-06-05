@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda
+ * @author Sergio Flores, Uriel Castañeda, Claudio Peña
  */
 public abstract class SDataConstants {
 
@@ -104,7 +104,8 @@ public abstract class SDataConstants {
     public static final int CFG_PARAM_ERP = 201015;
     public static final int CFG_PARAM_CO = 201016;
     public static final int CFGU_CERT = 201017;
-
+    public static final int CFGU_SHIFT = 201018;
+    
     public static final int CFGX_COB_ENT_CASH = 201501;
     public static final int CFGX_COB_ENT_WH = 201502;
     public static final int CFGX_COB_ENT_POS = 201503;

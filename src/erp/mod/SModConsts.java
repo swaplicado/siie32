@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Edwin Carmona
+ * @author Sergio Flores, Uriel Castañeda, Edwin Carmona, Claudio Peña
  */
 public abstract class SModConsts {
 
@@ -721,7 +721,7 @@ public abstract class SModConsts {
         
         TablesMap.put(CFGU_CERT, "erp.cfgu_cert");
         TablesMap.put(CFGU_FUNC, "erp.cfgu_func");
-        TablesMap.put(CFGU_SHIFT, "erp.cfgu_shift");
+        TablesMap.put(CFGU_SHIFT, "cfgu_shift");
 
         TablesMap.put(CFG_MMS, "cfg_mms");
         TablesMap.put(CFG_PARAM_CO, "cfg_param_co");

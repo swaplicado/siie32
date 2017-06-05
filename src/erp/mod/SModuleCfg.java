@@ -10,6 +10,7 @@ import erp.mod.cfg.db.SDbCountry;
 import erp.mod.cfg.db.SDbCurrency;
 import erp.mod.cfg.db.SDbFunctionalArea;
 import erp.mod.cfg.db.SDbLanguage;
+import erp.mod.cfg.db.SDbShift;
 import erp.mod.cfg.form.SFormFunctionalsAreas;
 import erp.mod.cfg.view.SViewFunctionalsAreas;
 import javax.swing.JMenu;
@@ -27,7 +28,7 @@ import sa.lib.gui.SGuiReport;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores, Claudio Peña
  */
 public class SModuleCfg extends SGuiModule {
 
@@ -59,6 +60,9 @@ public class SModuleCfg extends SGuiModule {
                 break;
             case SModConsts.CFGU_FUNC:
                 registry = new SDbFunctionalArea();
+                break;
+            case SModConsts.CFGU_SHIFT:
+                registry = new SDbShift();
                 break;
             case SModConsts.LOCU_CTY:
                 registry = new SDbCountry();

@@ -18,7 +18,7 @@ import sa.lib.db.SDbConsts;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Claudio Peña
  */
 public abstract class SDataReadComponentItems {
 
@@ -115,7 +115,11 @@ public abstract class SDataReadComponentItems {
                 sql = "SELECT id_lan AS f_id_1, lan AS f_item FROM erp.cfgu_lan WHERE b_del = 0 ORDER BY lan, id_lan ";
                 text = "idioma";
                 break;
-
+            case SDataConstants.CFGU_SHIFT:
+                lenPk = 1;
+                sql = "SELECT id_shift AS f_id_1, CONCAT(code, ' - ', name, ': ', time_sta, ' - ', time_end) AS f_item FROM cfgu_shift WHERE b_del = 0 ORDER BY code, id_shift ";
+                text = "turno";
+                break;
             case SDataConstants.CFGX_COB_ENT_CASH:
             case SDataConstants.CFGX_COB_ENT_WH:
             case SDataConstants.CFGX_COB_ENT_POS:

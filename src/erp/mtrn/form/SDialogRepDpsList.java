@@ -21,6 +21,8 @@ import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
+import erp.mod.SModConsts;
+import erp.mod.cfg.db.SDbShift;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -29,10 +31,11 @@ import java.util.Vector;
 import javax.swing.AbstractAction;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
+import sa.lib.SLibUtils;
 
 /**
  *
- * @author Alfonso Flores, Edwin Carmona
+ * @author Alfonso Flores, Edwin Carmona, Claudio Peña
  */
 public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -48,6 +51,7 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
     private erp.lib.form.SFormField moFieldDateEnd;
     private erp.lib.form.SFormField moFieldCompanyBranch;
     private erp.lib.form.SFormField moFieldBizPartner;
+    private erp.lib.form.SFormField moFieldShift;
 
     private boolean mbParamIsSupplier;
 
@@ -90,6 +94,9 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
         jPanel9 = new javax.swing.JPanel();
         jlBizPartner = new javax.swing.JLabel();
         jcbBizPartner = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel10 = new javax.swing.JPanel();
+        jlShift = new javax.swing.JLabel();
+        jcbShift = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel11 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jckWithoutRelatedParty = new javax.swing.JCheckBox();
@@ -166,7 +173,7 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtros del reporte:"));
         jPanel6.setLayout(new java.awt.BorderLayout());
 
-        jPanel7.setLayout(new java.awt.GridLayout(3, 1, 0, 1));
+        jPanel7.setLayout(new java.awt.GridLayout(4, 1, 0, 1));
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -191,6 +198,18 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
         jPanel9.add(jcbBizPartner);
 
         jPanel7.add(jPanel9);
+
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlShift.setText("Turno:");
+        jlShift.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel10.add(jlShift);
+
+        jcbShift.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbShift.setPreferredSize(new java.awt.Dimension(225, 23));
+        jPanel10.add(jcbShift);
+
+        jPanel7.add(jPanel10);
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 3, 0));
 
@@ -225,11 +244,13 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
         moFieldDateEnd.setPickerButton(jbDateEnd);
         moFieldCompanyBranch = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCompanyBranch, jlCompanyBranch);
         moFieldBizPartner = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbBizPartner, jlBizPartner);
+        moFieldShift = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbShift, jlShift);
 
         mvFields.add(moFieldDateInitial);
         mvFields.add(moFieldDateEnd);
         mvFields.add(moFieldCompanyBranch);
         mvFields.add(moFieldBizPartner);
+        mvFields.add(moFieldShift);
 
         jbPrint.addActionListener(this);
         jbExit.addActionListener(this);
@@ -305,7 +326,19 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
                 map.put("nFidStDpsVal", SDataConstantsSys.TRNS_ST_DPS_VAL_EFF);
                 map.put("nIdCurrencyLocal", miClient.getSessionXXX().getParamsErp().getFkCurrencyId());
                 map.put("sMark", mbParamIsSupplier ? "" : SDataConstantsSys.TXT_UNSIGNED);
-
+                
+                String sqlWhereTurn = "";
+                if (jcbShift.getSelectedIndex() > 0) {
+                    SDbShift shift = (SDbShift) miClient.getSession().readRegistry(SModConsts.CFGU_SHIFT, moFieldShift.getKeyAsIntArray());
+                    if (shift.getTimeStart().before(shift.getTimeEnd())) {
+                        sqlWhereTurn += "AND TIME(d.ts_new) BETWEEN '" + SLibUtils.DbmsDateFormatTime.format(shift.getTimeStart()) + "' AND '" + SLibUtils.DbmsDateFormatTime.format(shift.getTimeEnd()) + "' ";
+                    }
+                    else {
+                        sqlWhereTurn += "AND ((TIME(d.ts_new) >= '" + SLibUtils.DbmsDateFormatTime.format(shift.getTimeStart()) + "') OR (TIME(d.ts_new) <= '" + SLibUtils.DbmsDateFormatTime.format(shift.getTimeEnd()) + "')) ";
+                    }
+                }
+                map.put("sTurn", jcbShift.getSelectedIndex() <= 0 ? "" : jcbShift.getSelectedItem().toString());
+                map.put("sSqlWhereTurn", sqlWhereTurn);
 
                 jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_DPS_LIST, map);
                 jasperViewer = new JasperViewer(jasperPrint, false);
@@ -351,6 +384,7 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -366,6 +400,7 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
     private javax.swing.JButton jbPrint;
     private javax.swing.JComboBox<SFormComponentItem> jcbBizPartner;
     private javax.swing.JComboBox<SFormComponentItem> jcbCompanyBranch;
+    private javax.swing.JComboBox<SFormComponentItem> jcbShift;
     private javax.swing.JCheckBox jckWithoutRelatedParty;
     private javax.swing.JFormattedTextField jftDateEnd;
     private javax.swing.JFormattedTextField jftDateInitial;
@@ -373,6 +408,7 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
     private javax.swing.JLabel jlCompanyBranch;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateInitial;
+    private javax.swing.JLabel jlShift;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -400,6 +436,7 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbCompanyBranch, SDataConstants.BPSU_BPB, new int[] { miClient.getSessionXXX().getCurrentCompany().getPkCompanyId() });
         SFormUtilities.populateComboBox(miClient, jcbBizPartner, mbParamIsSupplier ? SDataConstants.BPSX_BP_SUP : SDataConstants.BPSX_BP_CUS);
+        SFormUtilities.populateComboBox(miClient, jcbShift, SDataConstants.CFGU_SHIFT);
     }
 
     @Override
