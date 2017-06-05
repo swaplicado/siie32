@@ -88,6 +88,7 @@ public abstract class SModConsts {
     
     public static final int CFGU_CERT = 1013001;
     public static final int CFGU_FUNC = 1013011;
+    public static final int CFGU_SHIFT = 1013021;
 
     public static final int CFG_MMS = 1013501;
     public static final int CFG_PARAM_CO = 1013502;
@@ -719,7 +720,8 @@ public abstract class SModConsts {
         TablesMap.put(CFG_PARAM_ERP, "erp.cfg_param_erp");
         
         TablesMap.put(CFGU_CERT, "erp.cfgu_cert");
-        TablesMap.put(CFGU_FUNC, "cfgu_func");
+        TablesMap.put(CFGU_FUNC, "erp.cfgu_func");
+        TablesMap.put(CFGU_SHIFT, "erp.cfgu_shift");
 
         TablesMap.put(CFG_MMS, "cfg_mms");
         TablesMap.put(CFG_PARAM_CO, "cfg_param_co");
