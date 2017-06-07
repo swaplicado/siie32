@@ -657,8 +657,10 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                         gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Monto a pagar $"));
                         gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda"));
                         column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Cuenta/Convenio", 120);
+                        column.setApostropheOnCsvRequired(true);
                         gridColumnsForm.add(column);
                         column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Referencia", 120);
+                        column.setApostropheOnCsvRequired(true);
                         gridColumnsForm.add(column);
                         column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Concepto", 120);
                         gridColumnsForm.add(column);
@@ -690,9 +692,11 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                         gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda cta"));
                         column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Cuenta/Convenio", 120, moTableCellEditorOptions);
                         column.setEditable(true);
+                        column.setApostropheOnCsvRequired(true);
                         gridColumnsForm.add(column);
                         column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Referencia", 120, moTableCellAgreementReference);
                         column.setEditable(isEditableGridReferenceConcept());
+                        column.setApostropheOnCsvRequired(true);
                         gridColumnsForm.add(column);
                         column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Concepto", 120, moGridPayments.getTable().getDefaultEditor(String.class));
                         column.setEditable(isEditableGridReferenceConcept());
@@ -720,9 +724,11 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                         gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda"));
                         column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Cuenta/Convenio", 120, moTableCellEditorOptions);
                         column.setEditable(true);
+                        column.setApostropheOnCsvRequired(true);
                         gridColumnsForm.add(column);
                         column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Referencia", 120, moTableCellAgreementReference);
                         column.setEditable(isEditableGridReferenceConcept());
+                        column.setApostropheOnCsvRequired(true);
                         gridColumnsForm.add(column);
                         column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Concepto", 120, moGridPayments.getTable().getDefaultEditor(String.class));
                         column.setEditable(isEditableGridReferenceConcept());
@@ -923,7 +929,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
     private void enableFieldsForm(boolean enable) {
         switch (mnFormSubtype){
             case SModSysConsts.FIN_LAY_BANK_ACC:
-                moDateDateLayout.setEditable(false);
+                moDateDateLayout.setEditable(true);
                 moKeyLayoutBank.setEnabled(false);
                 moKeyBankLayoutType.setEnabled(false);
                 moKeyBankCurrency.setEnabled(false);
@@ -943,7 +949,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                 
             case SModSysConsts.FIN_LAY_BANK_DPS:
             case SModSysConsts.FIN_LAY_BANK_ADV:
-                moDateDateLayout.setEditable(enable);
+                moDateDateLayout.setEditable(true);
                 moKeyLayoutBank.setEnabled(enable);
                 moKeyBankLayoutType.setEnabled(enable && moKeyLayoutBank.getSelectedIndex() > 0);
                 moKeyBankCurrency.setEnabled(enable && moKeyBankLayoutType.getSelectedIndex() > 0);
