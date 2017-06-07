@@ -722,7 +722,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             msDbmsError = sMsg + "¡El documento está autorizado!";
             throw new Exception(msDbmsError);
         }
-        else if (pnAction == SDbConsts.ACTION_DELETE && moDbmsDataCfd != null && moDbmsDataCfd.isStamped()) {
+        else if (pnAction == SDbConsts.ACTION_DELETE && moDbmsDataCfd != null && (moDbmsDataCfd.isStamped() && mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_SAL)) {
             mnDbmsErrorId = 21;
             msDbmsError = sMsg + "¡El documento está timbrado!";
             throw new Exception(msDbmsError);
