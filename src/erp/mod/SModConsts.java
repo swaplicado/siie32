@@ -719,8 +719,8 @@ public abstract class SModConsts {
         TablesMap.put(CFGU_LAN, "erp.cfgu_lan");
         TablesMap.put(CFG_PARAM_ERP, "erp.cfg_param_erp");
         
-        TablesMap.put(CFGU_CERT, "erp.cfgu_cert");
-        TablesMap.put(CFGU_FUNC, "erp.cfgu_func");
+        TablesMap.put(CFGU_CERT, "cfgu_cert");
+        TablesMap.put(CFGU_FUNC, "cfgu_func");
         TablesMap.put(CFGU_SHIFT, "cfgu_shift");
 
         TablesMap.put(CFG_MMS, "cfg_mms");
