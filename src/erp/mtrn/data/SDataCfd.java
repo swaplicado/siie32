@@ -26,6 +26,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.xml.SXmlUtils;
 
@@ -137,6 +138,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     private void parseCfdiAttributes(final Connection connection, final String xml) throws java.lang.Exception {
         boolean isCfdi = false;
         String sql = "";
+        String xmlSafe = SLibUtils.textToSql(xml);
         ResultSet resultSet = null;
         
         msDocXmlRfcEmi = "";
@@ -150,13 +152,13 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         // is CFDI:
         
         sql = "SELECT " +
-                "erp.f_get_xml_atr('cfdi:Emisor', 'rfc=', '" + xml + "', " + DATA_TYPE_TEXT + ") AS _xml_emisor_rfc, " +
-                "erp.f_get_xml_atr('cfdi:Receptor', 'rfc=', '" + xml + "', " + DATA_TYPE_TEXT + ") AS _xml_receptor_rfc, " +
-                "erp.f_get_xml_atr('cfdi:Comprobante', 'Total=', '" + xml + "', " + DATA_TYPE_NUMBER + ") AS _xml_total, " +
-                "erp.f_get_xml_atr('cfdi:Comprobante', 'TipoCambio=', '" + xml + "', " + DATA_TYPE_NUMBER + ") AS _xml_tc, " +
-                "erp.f_get_xml_atr('cfdi:Comprobante', 'Moneda=', '" + xml + "', " + DATA_TYPE_TEXT + ") AS _xml_moneda, " +
-                "CAST(REPLACE(erp.f_get_xml_atr('cfdi:Complemento', 'FechaTimbrado=', '" + xml + "', " + DATA_TYPE_DATE + "), 'T', ' ') AS DATETIME) AS _xml_timbrado, " +
-                "erp.f_get_xml_atr('cfdi:Complemento', 'UUID=', '" + xml + "', " + DATA_TYPE_TEXT + ") AS _xml_uuid ";
+                "erp.f_get_xml_atr('cfdi:Emisor', 'rfc=', '" + xmlSafe + "', " + DATA_TYPE_TEXT + ") AS _xml_emisor_rfc, " +
+                "erp.f_get_xml_atr('cfdi:Receptor', 'rfc=', '" + xmlSafe + "', " + DATA_TYPE_TEXT + ") AS _xml_receptor_rfc, " +
+                "erp.f_get_xml_atr('cfdi:Comprobante', 'Total=', '" + xmlSafe + "', " + DATA_TYPE_NUMBER + ") AS _xml_total, " +
+                "erp.f_get_xml_atr('cfdi:Comprobante', 'TipoCambio=', '" + xmlSafe + "', " + DATA_TYPE_NUMBER + ") AS _xml_tc, " +
+                "erp.f_get_xml_atr('cfdi:Comprobante', 'Moneda=', '" + xmlSafe + "', " + DATA_TYPE_TEXT + ") AS _xml_moneda, " +
+                "CAST(REPLACE(erp.f_get_xml_atr('cfdi:Complemento', 'FechaTimbrado=', '" + xmlSafe + "', " + DATA_TYPE_DATE + "), 'T', ' ') AS DATETIME) AS _xml_timbrado, " +
+                "erp.f_get_xml_atr('cfdi:Complemento', 'UUID=', '" + xmlSafe + "', " + DATA_TYPE_TEXT + ") AS _xml_uuid ";
 
         resultSet = connection.createStatement().executeQuery(sql);
                 
@@ -176,11 +178,11 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         
         if (!isCfdi) {
             sql = "SELECT " +
-                "erp.f_get_xml_atr('Emisor', 'rfc=', '" + xml + "', " + DATA_TYPE_TEXT + ") AS _xml_emisor_rfc, " +
-                "erp.f_get_xml_atr('Receptor', 'rfc=', '" + xml + "', " + DATA_TYPE_TEXT + ") AS _xml_receptor_rfc, " +
-                "erp.f_get_xml_atr('Comprobante', 'Total=', '" + xml + "', " + DATA_TYPE_NUMBER + ") AS _xml_total, " +
-                "erp.f_get_xml_atr('Comprobante', 'TipoCambio=', '" + xml + "', " + DATA_TYPE_NUMBER + ") AS _xml_tc, " +
-                "erp.f_get_xml_atr('Comprobante', 'Moneda=', '" + xml + "', " + DATA_TYPE_TEXT + ") AS _xml_moneda, " +
+                "erp.f_get_xml_atr('Emisor', 'rfc=', '" + xmlSafe + "', " + DATA_TYPE_TEXT + ") AS _xml_emisor_rfc, " +
+                "erp.f_get_xml_atr('Receptor', 'rfc=', '" + xmlSafe + "', " + DATA_TYPE_TEXT + ") AS _xml_receptor_rfc, " +
+                "erp.f_get_xml_atr('Comprobante', 'Total=', '" + xmlSafe + "', " + DATA_TYPE_NUMBER + ") AS _xml_total, " +
+                "erp.f_get_xml_atr('Comprobante', 'TipoCambio=', '" + xmlSafe + "', " + DATA_TYPE_NUMBER + ") AS _xml_tc, " +
+                "erp.f_get_xml_atr('Comprobante', 'Moneda=', '" + xmlSafe + "', " + DATA_TYPE_TEXT + ") AS _xml_moneda, " +
                 "NULL AS _xml_timbrado, " +
                 "'' AS _xml_uuid ";
 
@@ -568,8 +570,8 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             preparedStatement.setString(index++, msCertNumber);
             preparedStatement.setString(index++, msStringSigned);
             preparedStatement.setString(index++, msSignature);
-            preparedStatement.setString(index++, msDocXml);
-            preparedStatement.setString(index++, msDocXmlName);
+            preparedStatement.setString(index++, SLibUtils.textToSql(msDocXml));
+            preparedStatement.setString(index++, SLibUtils.textToSql(msDocXmlName));
             preparedStatement.setString(index++, msDocXmlRfcEmi);
             preparedStatement.setString(index++, msDocXmlRfcRec);
             preparedStatement.setDouble(index++, mdDocXmlTot);
