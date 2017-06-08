@@ -977,7 +977,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
         jckShowOnlyDocsDateDue.setEnabled(enable);
         jckShowOnlyBenefsWithAccounts.setEnabled(enable);
         jbGridRowsCheckAll.setEnabled(enable);
-        
+        jbGridRowsUncheckAll.setEnabled(enable);
         jbExchangeRateReset.setEnabled(enable && !isExchangeRateNotRequired());
         jbExchangeRateRefresh.setEnabled(enable && !isExchangeRateNotRequired());
     }
@@ -1057,7 +1057,8 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                     if (resultSet.getInt("f_tp_pay") == mnBankPaymentType && resultSet.getInt("f_tp_lay") == mnBankLayoutType) {
                         oAccountCreditAux.add(accountCredit);
                     }
-                    moRow.getCodeBankAccountCredits().put(mnBankPaymentType != SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? resultSet.getString("b.acc_num_std") : resultSet.getString("b.acc_num"), mnLayoutBank == SFinConsts.LAY_BANK_BANBAJIO ? resultSet.getString(10) : resultSet.getString(9));
+                    moRow.getCodeBankAccountCredits().put(mnBankPaymentType != SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? resultSet.getString("b.acc_num_std") : resultSet.getString("b.acc_num"),
+                                                    mnLayoutBank == SFinConsts.LAY_BANK_BANBAJIO ? resultSet.getString("bp.code_bank_baj") : resultSet.getString("bp.code_bank_san"));
                     moRow.getAliasBankAccountCredits().put(mnBankPaymentType != SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? resultSet.getString("b.acc_num_std") : resultSet.getString("b.acc_num"), resultSet.getString("b.alias_baj"));
 
                     bizPartnerBranchBankAccount = (SDataBizPartnerBranchBankAccount) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.BPSU_BANK_ACC, new int[] { idBpb, idBpbBankAcc }, SLibConstants.EXEC_MODE_SILENT); 
