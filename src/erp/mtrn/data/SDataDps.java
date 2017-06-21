@@ -793,9 +793,13 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 }
 
                 // Subtract amount prepayment the total and subtract amount prepayment currency the total currency:
-                
+
+                /* Check if this is necessary, all evidence indicates that is no longer needed to subtract prepayments (Sergio Flores, 2017-06-21):
                 dAuxBalance = SLibUtilities.round(dBalance + obtainAmountPrepayments(AMT_PRE_PAY), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
                 dAuxBalanceCy = SLibUtilities.round(dBalanceCy + obtainAmountPrepayments(AMT_PRE_PAY_CY), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+                */
+                dAuxBalance = SLibUtilities.round(dBalance/* + obtainAmountPrepayments(AMT_PRE_PAY)*/, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+                dAuxBalanceCy = SLibUtilities.round(dBalanceCy/* + obtainAmountPrepayments(AMT_PRE_PAY_CY)*/, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
                 
                 if (dAuxBalance != mdTotal_r) {
                     mnDbmsErrorId = 101;
@@ -4899,7 +4903,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     dpsDestNumber = "N/D";
                                 }
 
-                                msg += STrnUtilities.computeMailItem(client, entry.getFkItemId(), entry.getFkOriginalUnitId(), entry.getConceptKey(), entry.getConcept(), dpsDestNumber, msNumberSeries, msNumber, dpsReference, entry.getOriginalQuantity(), entry.getDbmsUnitSymbol(), getDate(), getDate(), getDpsTypeKey(), isEdited, mbIsRebill);
+                                msg += STrnUtilities.computeMailItem(client, entry.getFkItemId(), entry.getFkOriginalUnitId(), entry.getConceptKey(), entry.getConcept(), dpsDestNumber, msNumberSeries, msNumber, dpsReference, entry.getOriginalQuantity(), entry.getDbmsUnitSymbol(), getDate(), getDpsTypeKey(), isEdited, mbIsRebill);
                             }
                         }
                     }

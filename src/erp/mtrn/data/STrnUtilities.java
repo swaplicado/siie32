@@ -2776,33 +2776,37 @@ public abstract class STrnUtilities {
             + "<p>Folio: <span id=\"num\">" + dpsNumber + "</span>; Fecha: <b>" + SLibUtils.DateFormatDate.format(dpsDate) + "</b>" + (isRebill ? SLibUtils.textToHtml("; Refacturación!") : "") + "</p>"
             + "<p><span>" + SLibUtils.textToHtml(bpName) + "</span></p>"
             + "<table><tr> "
-            + "<th>Doc. origen</th> "
-            + "<th>Referencia</th> "
-            + "<th id=\"number\">Cantidad </th> "
-            + "<th id=\"number\"> Acum. " + SLibUtils.textToHtml("día") + "</th> "
+            + "<th>" + SLibUtils.textToHtml("Doc. origen") + "</th> "
+            + "<th>" + SLibUtils.textToHtml("Referencia") + "</th> "
+            + "<th id=\"number\">" + SLibUtils.textToHtml("Cantidad") + "</th> "
+            + "<th id=\"number\">" + SLibUtils.textToHtml("Acum. día") + "</th> "
+            + "<th id=\"number\">" + SLibUtils.textToHtml("Acum. mes") + "</th> "
             + "</tr> ";
         
         return mail;
     }
     
-    public static String computeMailItem(final SClientInterface client, final int itemId, final int unitId, final String code, final String name, final String folio, final String numberSerie, final String number, final String reference, final double qty, final String unitMeasure, final Date start, final Date end, final int[] dpsTypeKey, final boolean isEdited, final boolean isRebill) {
+    public static String computeMailItem(final SClientInterface client, final int itemId, final int unitId, final String itemCode, final String itemName, final String contract, final String numberSeries, final String number, final String reference, final double qty, final String unitMeasure, final Date date, final int[] dpsTypeKey, final boolean isEdited, final boolean isRebill) {
         String mail = null;
-        double accum = computeAcumulatedItem(client, itemId, unitId, dpsTypeKey, start, end, unitMeasure, isEdited, isRebill, numberSerie, number);
+        double accumDay = computeAccumulatedItem(client, itemId, unitId, dpsTypeKey, date, date, unitMeasure, isEdited, isRebill, numberSeries, number);
+        double accumMonth = computeAccumulatedItem(client, itemId, unitId, dpsTypeKey, SLibTimeUtils.getBeginOfMonth(date), date, unitMeasure, isEdited, isRebill, numberSeries, number);
         
         mail = "<tr> "        
-            + "<td> " + code // item code
+            + "<td> " + itemCode
             + "</td> " 
-            + "<td colspan = \"3\"> " + SLibUtils.textToHtml(name) // item name
+            + "<td colspan = \"4\"> " + SLibUtils.textToHtml(itemName)
             + "</td> "
             + "</tr> "
             + "<tr> " 
-            + "<td> " + folio       // contract number
+            + "<td> " + contract    // contract number
             + "</td> "
             + "<td> " + reference   // contract reference
             + "</td> "
-            + "<td id=\"number\"> " + SLibUtils.DecimalFormatValue2D.format(qty) + " " + unitMeasure                    // quantity the order 
+            + "<td id=\"number\"> " + SLibUtils.DecimalFormatValue2D.format(qty) + " " + unitMeasure                                // quantity the order 
             + "</td> "
-            + "<td id=\"number\"> " + (isRebill ? "N/A" : SLibUtils.DecimalFormatValue2D.format(accum) + " " + unitMeasure)   // accumulated quantity
+            + "<td id=\"number\"> " + (isRebill ? "N/A" : SLibUtils.DecimalFormatValue2D.format(accumDay) + " " + unitMeasure)      // accumulated quantity
+            + "</td> "
+            + "<td id=\"number\"> " + (isRebill ? "N/A" : SLibUtils.DecimalFormatValue2D.format(accumMonth) + " " + unitMeasure)    // accumulated quantity
             + "</td> "
             + "</tr> ";
         
@@ -2834,7 +2838,7 @@ public abstract class STrnUtilities {
         return mail;
     }
     
-    public static double computeAcumulatedItem (final SClientInterface client, final int itemId, final int unitId, final int[] dpsTypeKey, final Date start, final Date end, final String unitMeasureOrigin, final boolean isEdited, final boolean isRebill, final String numberSerie, final String number) {
+    private static double computeAccumulatedItem(final SClientInterface client, final int itemId, final int unitId, final int[] dpsTypeKey, final Date start, final Date end, final String unitMeasureOrigin, final boolean isEdited, final boolean isRebill, final String numberSeries, final String number) {
         String sql = "";
         double total = 0;
         ResultSet resultSet = null;
@@ -2847,7 +2851,7 @@ public abstract class STrnUtilities {
                     + "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc "
                     + "WHERE d.b_del = 0 AND de.b_del = 0 AND d.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(start) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(end)+ "' AND "
                     + "de.fid_item = " + itemId + " AND de.fid_unit = " + unitId + " AND fid_ct_dps = " + dpsTypeKey[0] + " AND fid_cl_dps = " + dpsTypeKey[1] + " AND fid_tp_dps = " + dpsTypeKey[2] + " AND d.b_rebill = 0 "
-                    + "AND d.num_ser = '" + numberSerie + "' and d.num <= '" + number+ "' ";
+                    + "AND d.num_ser = '" + numberSeries + "' and d.num <= '" + number + "' ";
                 
                 statement = client.getSession().getDatabase().getConnection().createStatement();
                 resultSet = statement.executeQuery(sql);
