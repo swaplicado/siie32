@@ -904,6 +904,8 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     }
     
     public void calculateTotal() {
+        mdValue_r = 0;
+        
         for (SDataDiogEntry entry : mvDbmsDiogEntries) {
             if (!entry.getIsDeleted()) {
                 entry.calculateTotal();
