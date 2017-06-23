@@ -121,6 +121,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiDpsAnnulled;
     private javax.swing.JMenuItem jmiDpsPrice;
     private javax.swing.JMenuItem jmiDpsPriceHist;
+    private javax.swing.JMenuItem jmiDpsDocRemission;
     private javax.swing.JMenu jmDpsAdj;
     private javax.swing.JMenuItem jmiDpsAdjDoc;
     private javax.swing.JMenuItem jmiDpsAdjDocAnn;
@@ -138,7 +139,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiStkRetReturned;
     private javax.swing.JMenuItem jmiStkRetReturnedEntry;
     private javax.swing.JMenuItem jmiStkRetDiog;
-    private javax.swing.JMenuItem jmiDpsDocRemission;
+    private javax.swing.JMenu jmAccPend;
+    private javax.swing.JMenuItem jmiAccPend;
     private javax.swing.JMenu jmRep;
     private javax.swing.JMenu jmRepStats;
     private javax.swing.JMenu jmRepBackorder;
@@ -312,7 +314,6 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiOrdersUsr = new JMenuItem("Control de límite máximo mensual por usuario");
         jmiOrdersMailPending = new JMenuItem("Pedidos por enviar por correo-e");
         jmiOrdersMailSent = new JMenuItem("Pedidos enviados por correo-e");
-        jmiDpsDocRemission = new JMenuItem("Facturas vs. remisiones");
         jmOrd.add(jmiOrders);
         jmOrd.addSeparator();
         jmOrd.add(jmiOrdersLinkPend);
@@ -351,6 +352,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsAnnulled = new JMenuItem("Facturas anuladas");
         jmiDpsPrice = new JMenuItem("Precios de compras");
         jmiDpsPriceHist = new JMenuItem("Historial de precios de compras");
+        jmiDpsDocRemission = new JMenuItem("Facturas vs. remisiones");
         jmDps.add(jmiDpsDoc);
         jmDps.add(jmiDpsEntry);
         jmDps.add(jmiDpsEntryRef);
@@ -412,6 +414,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmStkRet.add(jmiStkRetReturnedEntry);
         jmStkRet.addSeparator();
         jmStkRet.add(jmiStkRetDiog);
+
+        jmAccPend = new JMenu("CXP");
+        jmiAccPend = new JMenuItem("Cuentas por pagar");
+        jmAccPend.add(jmiAccPend);
 
         jmRep = new JMenu("Reportes");
         jmRepStats = new JMenu("Consultas de estadísticas de compras");
@@ -599,6 +605,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsAnnulled.addActionListener(this);
         jmiDpsPrice.addActionListener(this);
         jmiDpsPriceHist.addActionListener(this);
+        jmiDpsDocRemission.addActionListener(this);
         jmiDpsAdjDoc.addActionListener(this);
         jmiDpsAdjDocAnn.addActionListener(this);
         jmiStkDvyPend.addActionListener(this);
@@ -613,7 +620,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkRetReturned.addActionListener(this);
         jmiStkRetReturnedEntry.addActionListener(this);
         jmiStkRetDiog.addActionListener(this);
-         jmiDpsDocRemission.addActionListener(this);
+        jmiAccPend.addActionListener(this);
         jmiRepTrnGlobal.addActionListener(this);
         jmiRepTrnByMonth.addActionListener(this);
         jmiRepTrnByItemGeneric.addActionListener(this);
@@ -713,6 +720,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsAnnulled.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
         jmiDpsPrice.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmiDpsPriceHist.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
+        jmiDpsDocRemission.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
 
         jmDpsAdj.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjDoc.setEnabled(hasRightDocTransactionAdjust);
@@ -733,7 +741,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkRetReturned.setEnabled(hasRightInventoryOut);
         jmiStkRetReturnedEntry.setEnabled(hasRightInventoryOut);
         jmiStkRetDiog.setEnabled(hasRightInventoryOut);
-        jmiDpsDocRemission.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
+
+        jmAccPend.setEnabled(hasRightDocTransaction || hasRightReports);
 
         jmRep.setEnabled(hasRightReports);
         
@@ -1326,7 +1335,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
 
     @Override
     public javax.swing.JMenu[] getMenues() {
-        return new JMenu[] { jmCat, jmEst, jmCon, jmOrd, jmDps, jmDpsAdj, jmStkDvy, jmStkRet, jmRep };
+        return new JMenu[] { jmCat, jmEst, jmCon, jmOrd, jmDps, jmDpsAdj, jmStkDvy, jmStkRet, jmAccPend, jmRep };
     }
 
     @Override
@@ -1474,6 +1483,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiDpsPriceHist || item == jmiOrdersPriceHist) {
                 showView(SDataConstants.TRNX_PRICE_HIST, SDataConstantsSys.TRNS_CT_DPS_PUR);
             }
+            else if (item == jmiDpsDocRemission) {
+                showView(SDataConstants.TRNX_DOC_REMISSION, SDataConstantsSys.TRNS_CT_DPS_PUR);
+            }
             else if (item == jmiOrdersFunctionalArea) {
                  miClient.getSession().showView(SModConsts.TRNX_ORD_LIM_MAX, SModConsts.CFGU_FUNC, new SGuiParams(SModSysConsts.TRNS_CT_DPS_PUR));
             }
@@ -1501,9 +1513,6 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiStkDvyDiog) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRN_DIOG, SDataConstantsSys.TRNS_CL_IOG_IN_PUR[0], SDataConstantsSys.TRNS_CL_IOG_IN_PUR[1]);
             }
-            else if (item == jmiDpsDocRemission) {
-                showView(SDataConstants.TRNX_DOC_REMISSION, SDataConstantsSys.TRNS_CT_DPS_PUR);
-            }
             else if (item == jmiStkDvyStatsConsumption) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_STK_COMSUME, SDataConstantsSys.TRNS_CT_DPS_PUR);
             }
@@ -1524,6 +1533,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiStkRetDiog) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRN_DIOG, SDataConstantsSys.TRNS_CL_IOG_OUT_PUR[0], SDataConstantsSys.TRNS_CL_IOG_OUT_PUR[1]);
+            }
+            else if (item == jmiAccPend) {
+                miClient.getSession().showView(SModConsts.TRNX_ACC_PEND, SModSysConsts.BPSS_CT_BP_SUP, null);
             }
             else if (item == jmiRepTrnGlobal) {
                 showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_PUR_TOT);
