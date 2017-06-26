@@ -14,27 +14,32 @@ package erp.mtrn.form;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
+import erp.gui.SGuiUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
+import erp.lib.form.SFormComboBoxGroup;
 import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.AbstractAction;
+import javax.swing.JRadioButton;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
+import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Daniel López
  */
-public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
+public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
     private int mnFormType;
     private int mnFormResult;
@@ -44,15 +49,20 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.client.SClientInterface miClient;
 
-    private erp.lib.form.SFormField moFieldDateInitial;
+    private erp.lib.form.SFormField moFieldDateStart;
     private erp.lib.form.SFormField moFieldDateEnd;
     private erp.lib.form.SFormField moFieldCompanyBranch;
     private erp.lib.form.SFormField moFieldWarehouse;
     private erp.lib.form.SFormField moFieldItemGeneric;
+    private erp.lib.form.SFormField moFieldMovementCategory;
+    private erp.lib.form.SFormField moFieldMovementClass;
+    private erp.lib.form.SFormField moFieldMovementType;
+    private erp.lib.form.SFormComboBoxGroup moGroupMovement;
+    private erp.lib.form.SFormComboBoxGroup moGroupCompanyBranch;
 
     /** Creates new form SDialogRepStockMoves */
     public SDialogRepStockMoves(erp.client.SClientInterface client) {
-        super(client.getFrame(), true);
+        super(client.getFrame(), false);
         miClient =  client;
 
         initComponents();
@@ -68,21 +78,33 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        jbPrint = new javax.swing.JButton();
-        jbExit = new javax.swing.JButton();
+        jbgReportType = new javax.swing.ButtonGroup();
         jPanel2 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
+        jPanel12 = new javax.swing.JPanel();
+        jPanel18 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
-        jlDateInitial = new javax.swing.JLabel();
-        jftDateInitial = new javax.swing.JFormattedTextField();
-        jbDateInitial = new javax.swing.JButton();
+        jlDateStart = new javax.swing.JLabel();
+        jftDateStart = new javax.swing.JFormattedTextField();
+        jbPickDateStart = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jlDateEnd = new javax.swing.JLabel();
         jftDateEnd = new javax.swing.JFormattedTextField();
-        jbDateEnd = new javax.swing.JButton();
-        jPanel6 = new javax.swing.JPanel();
-        jPanel7 = new javax.swing.JPanel();
+        jbPickDateEnd = new javax.swing.JButton();
+        jPanel17 = new javax.swing.JPanel();
+        jlReportType = new javax.swing.JLabel();
+        jrbReportTypeDetailed = new javax.swing.JRadioButton();
+        jrbReportTypeSummary = new javax.swing.JRadioButton();
+        jPanel19 = new javax.swing.JPanel();
+        jPanel14 = new javax.swing.JPanel();
+        jlMovementCategory = new javax.swing.JLabel();
+        jcbMovementCategory = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel15 = new javax.swing.JPanel();
+        jlMovementClass = new javax.swing.JLabel();
+        jcbMovementClass = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel16 = new javax.swing.JPanel();
+        jlMovementType = new javax.swing.JLabel();
+        jcbMovementType = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel20 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         jlCompanyBranch = new javax.swing.JLabel();
         jcbCompanyBranch = new javax.swing.JComboBox<SFormComponentItem>();
@@ -92,15 +114,178 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
         jPanel10 = new javax.swing.JPanel();
         jlItemGeneric = new javax.swing.JLabel();
         jcbItemGeneric = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel1 = new javax.swing.JPanel();
+        jbPrint = new javax.swing.JButton();
+        jbExit = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Listado de movimientos de inventarios");
+        setPreferredSize(new java.awt.Dimension(400, 250));
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
                 formWindowActivated(evt);
             }
         });
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración del reporte:"));
+        jPanel2.setLayout(new java.awt.BorderLayout());
+
+        jPanel12.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
+
+        jPanel18.setBorder(javax.swing.BorderFactory.createTitledBorder("Período y tipo de reporte:"));
+        jPanel18.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
+
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDateStart.setText("Fecha inicial: *");
+        jlDateStart.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel4.add(jlDateStart);
+
+        jftDateStart.setText("dd/mm/yyyy");
+        jftDateStart.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel4.add(jftDateStart);
+
+        jbPickDateStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_date_day.gif"))); // NOI18N
+        jbPickDateStart.setToolTipText("Seleccionar fecha inicial");
+        jbPickDateStart.setFocusable(false);
+        jbPickDateStart.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel4.add(jbPickDateStart);
+
+        jPanel18.add(jPanel4);
+
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDateEnd.setText("Fecha final: *");
+        jlDateEnd.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel5.add(jlDateEnd);
+
+        jftDateEnd.setText("dd/mm/yyyy");
+        jftDateEnd.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel5.add(jftDateEnd);
+
+        jbPickDateEnd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_date_day.gif"))); // NOI18N
+        jbPickDateEnd.setToolTipText("Seleccionar fecha final");
+        jbPickDateEnd.setFocusable(false);
+        jbPickDateEnd.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel5.add(jbPickDateEnd);
+
+        jPanel18.add(jPanel5);
+
+        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlReportType.setText("Tipo reporte: *");
+        jlReportType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel17.add(jlReportType);
+
+        jbgReportType.add(jrbReportTypeDetailed);
+        jrbReportTypeDetailed.setText("Detalle");
+        jrbReportTypeDetailed.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel17.add(jrbReportTypeDetailed);
+
+        jbgReportType.add(jrbReportTypeSummary);
+        jrbReportTypeSummary.setText("Resumen");
+        jrbReportTypeSummary.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel17.add(jrbReportTypeSummary);
+
+        jPanel18.add(jPanel17);
+
+        jPanel12.add(jPanel18);
+
+        jPanel19.setBorder(javax.swing.BorderFactory.createTitledBorder("Movimiento de almacén:"));
+        jPanel19.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
+
+        jPanel14.setMinimumSize(new java.awt.Dimension(185, 20));
+        jPanel14.setPreferredSize(new java.awt.Dimension(390, 23));
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlMovementCategory.setText("Categoría: *");
+        jlMovementCategory.setMaximumSize(new java.awt.Dimension(114, 14));
+        jlMovementCategory.setMinimumSize(new java.awt.Dimension(114, 14));
+        jlMovementCategory.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel14.add(jlMovementCategory);
+
+        jcbMovementCategory.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbMovementCategory.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel14.add(jcbMovementCategory);
+
+        jPanel19.add(jPanel14);
+
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlMovementClass.setText("Clase:");
+        jlMovementClass.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jlMovementClass.setMaximumSize(new java.awt.Dimension(114, 14));
+        jlMovementClass.setMinimumSize(new java.awt.Dimension(114, 14));
+        jlMovementClass.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel15.add(jlMovementClass);
+
+        jcbMovementClass.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbMovementClass.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel15.add(jcbMovementClass);
+
+        jPanel19.add(jPanel15);
+
+        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlMovementType.setText("Tipo:");
+        jlMovementType.setMaximumSize(new java.awt.Dimension(114, 14));
+        jlMovementType.setMinimumSize(new java.awt.Dimension(114, 14));
+        jlMovementType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel16.add(jlMovementType);
+
+        jcbMovementType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbMovementType.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel16.add(jcbMovementType);
+
+        jPanel19.add(jPanel16);
+
+        jPanel12.add(jPanel19);
+
+        jPanel20.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtros del reporte:"));
+        jPanel20.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
+
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlCompanyBranch.setText("Sucursal:");
+        jlCompanyBranch.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel8.add(jlCompanyBranch);
+
+        jcbCompanyBranch.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbCompanyBranch.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel8.add(jcbCompanyBranch);
+
+        jPanel20.add(jPanel8);
+
+        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlWarehouse.setText("Almacén:");
+        jlWarehouse.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel9.add(jlWarehouse);
+
+        jcbWarehouse.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbWarehouse.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel9.add(jcbWarehouse);
+
+        jPanel20.add(jPanel9);
+
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlItemGeneric.setText("Ítem genérico:");
+        jlItemGeneric.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel10.add(jlItemGeneric);
+
+        jcbItemGeneric.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbItemGeneric.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel10.add(jcbItemGeneric);
+
+        jPanel20.add(jPanel10);
+
+        jPanel12.add(jPanel20);
+
+        jPanel2.add(jPanel12, java.awt.BorderLayout.NORTH);
+
+        getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
         jPanel1.setPreferredSize(new java.awt.Dimension(392, 33));
         jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
@@ -117,103 +302,7 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración del reporte:"));
-        jPanel2.setLayout(new java.awt.BorderLayout());
-
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Período:"));
-        jPanel3.setLayout(new java.awt.GridLayout(2, 1, 0, 1));
-
-        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlDateInitial.setText("Fecha inicial: *");
-        jlDateInitial.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel4.add(jlDateInitial);
-
-        jftDateInitial.setText("dd/mm/yyyy");
-        jftDateInitial.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel4.add(jftDateInitial);
-
-        jbDateInitial.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_date_day.gif"))); // NOI18N
-        jbDateInitial.setToolTipText("Seleccionar fecha inicial");
-        jbDateInitial.setFocusable(false);
-        jbDateInitial.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel4.add(jbDateInitial);
-
-        jPanel3.add(jPanel4);
-
-        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlDateEnd.setText("Fecha final: *");
-        jlDateEnd.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel5.add(jlDateEnd);
-
-        jftDateEnd.setText("dd/mm/yyyy");
-        jftDateEnd.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel5.add(jftDateEnd);
-
-        jbDateEnd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_date_day.gif"))); // NOI18N
-        jbDateEnd.setToolTipText("Seleccionar fecha final");
-        jbDateEnd.setFocusable(false);
-        jbDateEnd.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel5.add(jbDateEnd);
-
-        jPanel3.add(jPanel5);
-
-        jPanel2.add(jPanel3, java.awt.BorderLayout.NORTH);
-
-        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtros del reporte:"));
-        jPanel6.setLayout(new java.awt.BorderLayout());
-
-        jPanel7.setLayout(new java.awt.GridLayout(3, 1, 0, 1));
-
-        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlCompanyBranch.setText("Sucursal de la empresa:");
-        jlCompanyBranch.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel8.add(jlCompanyBranch);
-
-        jcbCompanyBranch.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbCompanyBranch.setPreferredSize(new java.awt.Dimension(250, 23));
-        jcbCompanyBranch.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jcbCompanyBranchItemStateChanged(evt);
-            }
-        });
-        jPanel8.add(jcbCompanyBranch);
-
-        jPanel7.add(jPanel8);
-
-        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlWarehouse.setText("Almacén:");
-        jlWarehouse.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel9.add(jlWarehouse);
-
-        jcbWarehouse.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbWarehouse.setPreferredSize(new java.awt.Dimension(250, 23));
-        jPanel9.add(jcbWarehouse);
-
-        jPanel7.add(jPanel9);
-
-        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlItemGeneric.setText("Ítem genérico:");
-        jlItemGeneric.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel10.add(jlItemGeneric);
-
-        jcbItemGeneric.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbItemGeneric.setPreferredSize(new java.awt.Dimension(250, 23));
-        jPanel10.add(jcbItemGeneric);
-
-        jPanel7.add(jPanel10);
-
-        jPanel6.add(jPanel7, java.awt.BorderLayout.NORTH);
-
-        jPanel2.add(jPanel6, java.awt.BorderLayout.CENTER);
-
-        getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
-
-        setSize(new java.awt.Dimension(430, 300));
+        setSize(new java.awt.Dimension(656, 439));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -221,31 +310,38 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
-    private void jcbCompanyBranchItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbCompanyBranchItemStateChanged
-        itemStateChangedCompanyBranch();
-    }//GEN-LAST:event_jcbCompanyBranchItemStateChanged
-
     private void initComponentsExtra() {
         mvFields = new Vector<SFormField>();
 
-        moFieldDateInitial = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateInitial, jlDateInitial);
-        moFieldDateInitial.setPickerButton(jbDateInitial);
+        moFieldDateStart = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateStart, jlDateStart);
+        moFieldDateStart.setPickerButton(jbPickDateStart);
         moFieldDateEnd = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateEnd, jlDateEnd);
-        moFieldDateEnd.setPickerButton(jbDateEnd);
+        moFieldDateEnd.setPickerButton(jbPickDateEnd);
+        moFieldMovementCategory = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbMovementCategory, jlMovementCategory);
+        moFieldMovementClass = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbMovementClass, jlMovementClass);
+        moFieldMovementType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbMovementType, jlMovementType);
         moFieldCompanyBranch = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCompanyBranch, jlCompanyBranch);
         moFieldWarehouse = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbWarehouse, jlWarehouse);
         moFieldItemGeneric = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbItemGeneric, jlItemGeneric);
 
-        mvFields.add(moFieldDateInitial);
+        mvFields.add(moFieldDateStart);
         mvFields.add(moFieldDateEnd);
+        mvFields.add(moFieldMovementCategory);
+        mvFields.add(moFieldMovementClass);
+        mvFields.add(moFieldMovementType);
         mvFields.add(moFieldCompanyBranch);
         mvFields.add(moFieldWarehouse);
         mvFields.add(moFieldItemGeneric);
 
         jbPrint.addActionListener(this);
         jbExit.addActionListener(this);
-        jbDateInitial.addActionListener(this);
-        jbDateEnd.addActionListener(this);
+        jbPickDateStart.addActionListener(this);
+        jbPickDateEnd.addActionListener(this);
+        jrbReportTypeDetailed.addItemListener(this);
+        jrbReportTypeSummary.addItemListener(this);
+        
+        moGroupMovement = new SFormComboBoxGroup(miClient);
+        moGroupCompanyBranch = new SFormComboBoxGroup(miClient);
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -256,22 +352,20 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
 
         AbstractAction action = new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) { actionClose(); }
+            public void actionPerformed(ActionEvent e) { actionExit(); }
         };
 
         SFormUtilities.putActionMap(getRootPane(), action, "exit", KeyEvent.VK_ESCAPE, 0);
-
-        setModalityType(ModalityType.MODELESS);
     }
 
     private void windowActivated() {
         if (mbFirstTime) {
             mbFirstTime = false;
-            jftDateInitial.requestFocus();
+            jftDateStart.requestFocus();
         }
     }
 
-    private void actionPrint() {
+    private void printReportDetailed(){
         Cursor cursor = getCursor();
         SFormValidation validation = formValidate();
         Map<String, Object> map = null;
@@ -291,7 +385,7 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
                 setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
                 map = miClient.createReportParams();
-                map.put("tDtInitial", moFieldDateInitial.getDate());
+                map.put("tDtInitial", moFieldDateStart.getDate());
                 map.put("tDtEnd", moFieldDateEnd.getDate());
                 map.put("nWorkingYear", SLibTimeUtilities.digestYear(moFieldDateEnd.getDate())[0]);
                 map.put("sCompanyBranch", moFieldCompanyBranch.getKeyAsIntArray()[0] == 0 ? "(TODAS)" : jcbCompanyBranch.getSelectedItem().toString());
@@ -300,14 +394,84 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
                 map.put("sSqlWhereCompanyBranch", moFieldCompanyBranch.getKeyAsIntArray()[0] == 0 ? "" : " AND stk.id_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0]);
                 map.put("sSqlWhereWarehouse", jcbWarehouse.isEnabled() ? moFieldWarehouse.getKeyAsIntArray()[0] == 0 ? "" : " AND stk.id_wh = " + moFieldWarehouse.getKeyAsIntArray()[1] : "");
                 map.put("sSqlWhereItemGeneric", moFieldItemGeneric.getKeyAsIntArray()[0] == 0 ? "" : " AND i.fid_igen = " + moFieldItemGeneric.getKeyAsIntArray()[0]);
-                map.put("sSqlWhere", " WHERE stk.b_del = FALSE AND stk.dt BETWEEN '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateInitial.getDate()) + "' AND '" +
+                map.put("sSqlWhere", " WHERE stk.b_del = FALSE AND stk.dt BETWEEN '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateStart.getDate()) + "' AND '" +
                         miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format( moFieldDateEnd.getDate()) + "' ");
                 map.put("nFidCtEnt", SDataConstantsSys.CFGS_CT_ENT_WH);
                 map.put("bSortItemByKey", miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? true : false);
 
                 jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_STK_MOV, map);
                 jasperViewer = new JasperViewer(jasperPrint, false);
-                jasperViewer.setTitle("Listado de movimientos de inventarios");
+                jasperViewer.setTitle("Reporte de movimientos de inventarios");
+                jasperViewer.setVisible(true);
+            }
+            catch(Exception e) {
+                SLibUtilities.renderException(this, e);
+            }
+            finally {
+                setCursor(cursor);
+            }
+        }
+    }
+    
+    private void printReportSummary(){
+        Cursor cursor = getCursor();
+        SFormValidation validation = formValidate();
+        Map<String, Object> map = null;
+        JasperPrint jasperPrint = null;
+        JasperViewer jasperViewer = null;
+
+        if (validation.getIsError()) {
+            if (validation.getComponent() != null) {
+                validation.getComponent().requestFocus();
+            }
+            if (validation.getMessage().length() > 0) {
+                miClient.showMsgBoxWarning(validation.getMessage());
+            }
+        }
+        else {
+            try {
+                setCursor(new Cursor(Cursor.WAIT_CURSOR));
+
+                String sqlWhere = "";
+                
+                if (jcbMovementType.getSelectedIndex() > 0) {
+                    sqlWhere += "AND s.fid_ct_iog = " + moFieldMovementType.getKeyAsIntArray()[0] + " "
+                            + "AND s.fid_cl_iog = " + moFieldMovementType.getKeyAsIntArray()[1] + " "
+                            + "AND s.fid_tp_iog = " + moFieldMovementType.getKeyAsIntArray()[2] + " ";
+                }
+                else if (jcbMovementClass.getSelectedIndex() > 0) {
+                    sqlWhere += "AND s.fid_ct_iog = " + moFieldMovementClass.getKeyAsIntArray()[0] + " "
+                            + "AND s.fid_cl_iog = " + moFieldMovementClass.getKeyAsIntArray()[1] + " ";
+                }
+                else {
+                    sqlWhere += "AND s.fid_ct_iog = " + moFieldMovementCategory.getKeyAsIntArray()[0] + " ";
+                }
+                
+                if (jcbCompanyBranch.getSelectedIndex() > 0) {
+                    sqlWhere += "AND s.id_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0] + " ";
+                    
+                    if (jcbWarehouse.getSelectedIndex() > 0) {
+                        sqlWhere += "AND s.id_wh = " + moFieldWarehouse.getKeyAsIntArray()[1] + " ";
+                    }
+                }
+                
+                if (jcbItemGeneric.getSelectedIndex() > 0) {
+                    sqlWhere += "AND i.fid_igen = " + moFieldItemGeneric.getKeyAsIntArray()[0] + " ";
+                }
+                
+                map = miClient.createReportParams();
+                map.put("tDateStart", moFieldDateStart.getDate());
+                map.put("tDateEnd", moFieldDateEnd.getDate());
+                map.put("nYear", SLibTimeUtilities.digestYear(moFieldDateStart.getDate())[0]);
+                map.put("sCompanyBranch", jcbCompanyBranch.getSelectedIndex() <= 0 ? "(TODAS)" : jcbCompanyBranch.getSelectedItem().toString());
+                map.put("sWarehouse", jcbWarehouse.isEnabled() ? (moFieldWarehouse.getKeyAsIntArray()[0] == 0 ? "(TODOS)" : jcbWarehouse.getSelectedItem().toString().substring(jcbWarehouse.getSelectedItem().toString().indexOf("-") + 1)) : "(TODOS)");
+                map.put("sItemGeneric", moFieldItemGeneric.getKeyAsIntArray()[0] == 0 ? "(TODOS)" : jcbItemGeneric.getSelectedItem().toString().substring(0, jcbItemGeneric.getSelectedItem().toString().indexOf("(") - 1));
+                map.put("sMovement", jcbMovementType.getSelectedIndex() > 0 ? jcbMovementType.getSelectedItem().toString() : jcbMovementClass.getSelectedIndex() > 0 ? jcbMovementClass.getSelectedItem().toString() : jcbMovementCategory.getSelectedItem().toString());
+                map.put("sSqlWhere", sqlWhere);
+                
+                jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_STK_MOV_SUM, map);
+                jasperViewer = new JasperViewer(jasperPrint, false);
+                jasperViewer.setTitle("Reporte de movimientos de inventarios (resumen)");
                 jasperViewer.setVisible(true);
             }
             catch(Exception e) {
@@ -319,83 +483,76 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
         }
     }
 
-    private void actionClose() {
-        mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
-        setVisible(false);
-    }
-
-    private void actionDateInitial() {
-        miClient.getGuiDatePickerXXX().formReset();
-        miClient.getGuiDatePickerXXX().setDate(moFieldDateInitial.getDate());
-        miClient.getGuiDatePickerXXX().setVisible(true);
-
-        if (miClient.getGuiDatePickerXXX().getFormResult() == SLibConstants.FORM_RESULT_OK) {
-            moFieldDateInitial.setFieldValue(miClient.getGuiDatePickerXXX().getGuiDate());
-            jftDateInitial.requestFocus();
+    private void actionPrint() {
+        if (jrbReportTypeDetailed.isSelected()) {
+            printReportDetailed();
         }
+        else if (jrbReportTypeSummary.isSelected()) {
+            printReportSummary();
+        }
+    }
+    
+    private void actionExit() {
+        dispose();
+    }
+    
+    private void actionDateStart() {
+        miClient.getGuiDatePeriodPickerXXX().pickDate(moFieldDateStart.getDate(), moFieldDateStart);
     }
 
     private void actionDateEnd() {
-        miClient.getGuiDatePickerXXX().formReset();
-        miClient.getGuiDatePickerXXX().setDate(moFieldDateEnd.getDate());
-        miClient.getGuiDatePickerXXX().setVisible(true);
-
-        if (miClient.getGuiDatePickerXXX().getFormResult() == SLibConstants.FORM_RESULT_OK) {
-            moFieldDateEnd.setFieldValue(miClient.getGuiDatePickerXXX().getGuiDate());
-            jftDateEnd.requestFocus();
-        }
+        miClient.getGuiDatePeriodPickerXXX().pickDate(moFieldDateEnd.getDate(), moFieldDateEnd);
+    }
+    
+    private void itemStateChangedReportTypeDetailed() {
+        moGroupMovement.reset();
+        jcbMovementCategory.setEnabled(false);
     }
 
-    private void renderComboBoxWarehouse() {
-        if (moFieldCompanyBranch.getKeyAsIntArray()[0] <= 0) {
-            jcbWarehouse.setEnabled(false);
-        }
-        else {
-            jcbWarehouse.setEnabled(true);
-        }
-    }
-
-    private void populateComboBoxWarehouse() {
-        jcbWarehouse.removeAllItems();
-
-        if (moFieldCompanyBranch.getKeyAsIntArray()[0] > 0) {
-            SFormUtilities.populateComboBox(miClient, jcbWarehouse, SDataConstants.CFGX_COB_ENT_WH, new int[] { moFieldCompanyBranch.getKeyAsIntArray()[0] });
-        }
-
-        renderComboBoxWarehouse();
-    }
-
-    private void itemStateChangedCompanyBranch() {
-        if (!mbResetingForm) {
-            populateComboBoxWarehouse();
-        }
+    private void itemStateChangedReportTypeSummary() {
+        jcbMovementCategory.setEnabled(true);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
+    private javax.swing.JPanel jPanel17;
+    private javax.swing.JPanel jPanel18;
+    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel20;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
-    private javax.swing.JButton jbDateEnd;
-    private javax.swing.JButton jbDateInitial;
     private javax.swing.JButton jbExit;
+    private javax.swing.JButton jbPickDateEnd;
+    private javax.swing.JButton jbPickDateStart;
     private javax.swing.JButton jbPrint;
+    private javax.swing.ButtonGroup jbgReportType;
     private javax.swing.JComboBox<SFormComponentItem> jcbCompanyBranch;
     private javax.swing.JComboBox<SFormComponentItem> jcbItemGeneric;
+    private javax.swing.JComboBox<SFormComponentItem> jcbMovementCategory;
+    private javax.swing.JComboBox<SFormComponentItem> jcbMovementClass;
+    private javax.swing.JComboBox<SFormComponentItem> jcbMovementType;
     private javax.swing.JComboBox<SFormComponentItem> jcbWarehouse;
     private javax.swing.JFormattedTextField jftDateEnd;
-    private javax.swing.JFormattedTextField jftDateInitial;
+    private javax.swing.JFormattedTextField jftDateStart;
     private javax.swing.JLabel jlCompanyBranch;
     private javax.swing.JLabel jlDateEnd;
-    private javax.swing.JLabel jlDateInitial;
+    private javax.swing.JLabel jlDateStart;
     private javax.swing.JLabel jlItemGeneric;
+    private javax.swing.JLabel jlMovementCategory;
+    private javax.swing.JLabel jlMovementClass;
+    private javax.swing.JLabel jlMovementType;
+    private javax.swing.JLabel jlReportType;
     private javax.swing.JLabel jlWarehouse;
+    private javax.swing.JRadioButton jrbReportTypeDetailed;
+    private javax.swing.JRadioButton jrbReportTypeSummary;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -408,23 +565,36 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
         mnFormResult = SLibConstants.UNDEFINED;
         mnFormStatus = SLibConstants.UNDEFINED;
         mbFirstTime = true;
+        mbResetingForm = false;
 
         for (int i = 0; i < mvFields.size(); i++) {
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
         }
 
-        moFieldDateInitial.setFieldValue(SLibTimeUtilities.getBeginOfMonth(miClient.getSessionXXX().getWorkingDate()));
+        moFieldDateStart.setFieldValue(SLibTimeUtilities.getBeginOfMonth(miClient.getSessionXXX().getWorkingDate()));
         moFieldDateEnd.setFieldValue(SLibTimeUtilities.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()));
-        jcbWarehouse.removeAllItems();
-        renderComboBoxWarehouse();
-        mbResetingForm = false;
+        jrbReportTypeDetailed.setSelected(true);
+        itemStateChangedReportTypeDetailed();
+        moGroupMovement.reset();
+        moGroupCompanyBranch.reset();
     }
 
     @Override
     public void formRefreshCatalogues() {
         mbResetingForm = true;
-        SFormUtilities.populateComboBox(miClient, jcbCompanyBranch, SDataConstants.BPSU_BPB, new int[] { miClient.getSessionXXX().getCurrentCompany().getPkCompanyId() });
+        
+        moGroupMovement.clear();
+        moGroupMovement.addComboBox(SDataConstants.TRNS_CT_IOG, jcbMovementCategory);
+        moGroupMovement.addComboBox(SDataConstants.TRNS_CL_IOG, jcbMovementClass);
+        moGroupMovement.addComboBox(SDataConstants.TRNS_TP_IOG, jcbMovementType);
+        
+        moGroupCompanyBranch.clear();
+        moGroupCompanyBranch.addComboBox(SDataConstants.BPSU_BPB, jcbCompanyBranch, new int[] { miClient.getSessionXXX().getCurrentCompany().getPkCompanyId() });
+        moGroupCompanyBranch.addComboBox(SDataConstants.CFGU_COB_ENT, jcbWarehouse, new int[] { SDataConstantsSys.CFGS_CT_ENT_WH });
+        
         SFormUtilities.populateComboBox(miClient, jcbItemGeneric, SDataConstants.ITMU_IGEN);
+        
+        mbResetingForm = false;
     }
 
     @Override
@@ -440,9 +610,10 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
         }
 
         if (!validation.getIsError()) {
-            if (moFieldDateEnd.getDate().compareTo(moFieldDateInitial.getDate()) < 0) {
-                validation.setMessage("La fecha final debe ser mayor o igual a la fecha inicial.");
-                validation.setComponent(jftDateEnd);
+            String msg = SGuiUtilities.validateDateRange(moFieldDateStart.getDate(), moFieldDateEnd.getDate());
+            if (!msg.isEmpty()) {
+                validation.setMessage(msg);
+                validation.setComponent(jftDateStart);
             }
         }
 
@@ -503,13 +674,28 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
                 actionPrint();
             }
             else if (button == jbExit) {
-                actionClose();
+                actionExit();
             }
-            else if (button == jbDateInitial) {
-                actionDateInitial();
+            else if (button == jbPickDateStart) {
+                actionDateStart();
             }
-            else if (button == jbDateEnd) {
+            else if (button == jbPickDateEnd) {
                 actionDateEnd();
+            }
+        }
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof JRadioButton) {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                JRadioButton radioButton = (JRadioButton) e.getSource();
+                if (radioButton == jrbReportTypeDetailed) {
+                    itemStateChangedReportTypeDetailed();
+                }
+                else if (radioButton == jrbReportTypeSummary) {
+                    itemStateChangedReportTypeSummary();
+                }
             }
         }
     }

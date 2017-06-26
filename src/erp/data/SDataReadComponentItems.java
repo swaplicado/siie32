@@ -103,10 +103,25 @@ public abstract class SDataReadComponentItems {
                 break;
             case SDataConstants.CFGU_COB_ENT:
                 lenPk = 2;
-                sql = "SELECT id_cob AS f_id_1, id_ent AS f_id_2, ent AS f_item " +
+                lenFk = 1;
+                
+                if (pk != null && pk instanceof int[]) {
+                    switch (((int[]) pk).length) {
+                        case 1:
+                            // entity category:
+                            sql = "AND fid_ct_ent = " + ((int[]) pk)[0] + " ";
+                            break;
+                        case 2:
+                            // filter company branch and entity category:
+                            sql = "AND id_cob = " + ((int[]) pk)[0] + " AND fid_ct_ent = " + ((int[]) pk)[1] + " ";
+                            break;
+                        default:
+                    }
+                }
+                
+                sql = "SELECT id_cob AS f_id_1, id_ent AS f_id_2, ent AS f_item, id_cob AS f_fid_1 " +
                         "FROM erp.cfgu_cob_ent " +
-                        "WHERE b_del = 0 " +
-                        (pk == null ? "" : "AND id_cob = " + ((int[]) pk)[0] + " AND fid_ct_ent = " + ((int[]) pk)[1] + " ") +
+                        "WHERE b_del = 0 " + sql +
                         "ORDER BY id_cob, ent, id_ent ";
                 text = "entidad";
                 break;
@@ -1307,6 +1322,29 @@ public abstract class SDataReadComponentItems {
                         "FROM erp.trns_cl_iog ORDER BY id_ct_iog, id_cl_iog ";
                 text = "clase de doc. inventarios";
                 break;
+            case SDataConstants.TRNS_TP_IOG:
+                lenPk = 3;
+                lenFk = 2;
+                if (pk != null) {
+                    switch (((int[]) pk).length) {
+                        case 1:
+                            filter = "id_ct_iog = " + ((int[]) pk)[0] + " ";
+                            break;
+                        case 2:
+                            filter = "id_ct_iog = " + ((int[]) pk)[0] + " AND id_cl_iog = " + ((int[]) pk)[1] + " ";
+                            break;
+                        case 3:
+                            filter = "id_ct_iog = " + ((int[]) pk)[0] + " AND id_cl_iog = " + ((int[]) pk)[1] + " AND id_tp_iog = " + ((int[]) pk)[2] + " ";
+                            break;
+                        default:
+                    }
+                }
+                sql = "SELECT id_ct_iog f_id_1, id_cl_iog AS f_id_2, id_tp_iog AS f_id_3, CONCAT(tp_iog, ' (', code, ')') AS f_item, id_ct_iog AS f_fid_1, id_cl_iog AS f_fid_2 " +
+                        "FROM erp.trns_tp_iog " +
+                        "WHERE b_del = 0 " + (filter.length() == 0 ? "" : "AND " + filter) +
+                        "ORDER BY id_ct_iog, id_cl_iog, id_tp_iog ";
+                text = "tipo de doc. inventarios";
+                break;
             case SDataConstants.TRNU_DPS_NAT:
                 lenPk = 1;
                 sql = "SELECT id_dps_nat f_id_1, dps_nat AS f_item " +
@@ -1353,29 +1391,6 @@ public abstract class SDataReadComponentItems {
                         "WHERE b_del = 0 AND b_pre_pay = 1 " +
                         "ORDER BY id_pac ";
                 text = "pac";
-                break;
-            case SDataConstants.TRNS_TP_IOG:
-                lenPk = 3;
-                lenFk = 2;
-                if (pk != null) {
-                    switch (((int[]) pk).length) {
-                        case 1:
-                            filter = "id_ct_iog = " + ((int[]) pk)[0] + " ";
-                            break;
-                        case 2:
-                            filter = "id_ct_iog = " + ((int[]) pk)[0] + " AND id_cl_iog = " + ((int[]) pk)[1] + " ";
-                            break;
-                        case 3:
-                            filter = "id_ct_iog = " + ((int[]) pk)[0] + " AND id_cl_iog = " + ((int[]) pk)[1] + " AND id_tp_iog = " + ((int[]) pk)[2] + " ";
-                            break;
-                        default:
-                    }
-                }
-                sql = "SELECT id_ct_iog f_id_1, id_cl_iog AS f_id_2, id_tp_iog AS f_id_3, CONCAT(tp_iog, ' (', code, ')') AS f_item, id_ct_iog AS f_fid_1, id_cl_iog AS f_fid_2 " +
-                        "FROM erp.trns_tp_iog " +
-                        "WHERE b_del = 0 " + (filter.length() == 0 ? "" : "AND " + filter) +
-                        "ORDER BY id_ct_iog, id_cl_iog, id_tp_iog ";
-                text = "tipo de doc. inventarios";
                 break;
             case SDataConstants.TRNS_TP_PAY:
                 lenPk = 1;

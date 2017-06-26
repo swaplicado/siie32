@@ -1541,7 +1541,6 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_DPS_UNP = 207002;
     public static final int REP_TRN_DPS_UNP_CY = 207003;
     public static final int REP_TRN_STK = 207004;
-    public static final int REP_TRN_STK_MOV = 207005;
     public static final int REP_TRN_PS = 207006;
     public static final int REP_TRN_PS_UNIT = 207007;
     public static final int REP_TRN_PS_CON = 207008;
@@ -1565,6 +1564,9 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_PS_ITEM_UNIT_PRICE = 207026;
     public static final int REP_TRN_DPS_BPS_DETAIL = 207027;
     public static final int REP_TRN_DPS_MOV = 207028;
+    public static final int REP_TRN_STK_MOV = 207031;       // stock movements detailed
+    public static final int REP_TRN_STK_MOV_SUM = 207032;   // stock movements summary
+    
     public static final int REP_TRN_CFD = 207101;
     public static final int REP_TRN_CFDI = 207102;
     public static final int REP_TRN_CFDI_ACK_CAN = 207103;
