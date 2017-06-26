@@ -142,7 +142,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiDpsDocRemission;
     private javax.swing.JMenu jmDpsAdj;
     private javax.swing.JMenuItem jmiDpsAdjDoc;
-    private javax.swing.JMenuItem jmDpsAdjAnnulled;
+    private javax.swing.JMenuItem jmiDpsAdjDocAnn;
     private javax.swing.JMenuItem jmiDpsAdjMailPending;
     private javax.swing.JMenuItem jmiDpsAdjMailSent;
     private javax.swing.JMenuItem jmiDpsAdjWsPending;
@@ -169,6 +169,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiStkRetReturned;
     private javax.swing.JMenuItem jmiStkRetReturnedEntry;
     private javax.swing.JMenuItem jmiStkRetDiog;
+    private javax.swing.JMenu jmAccPend;
+    private javax.swing.JMenuItem jmiAccPend;
     private javax.swing.JMenu jmRep;
     private javax.swing.JMenu jmRepStats;
     private javax.swing.JMenu jmRepBackorder;
@@ -421,7 +423,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
 
         jmDpsAdj = new JMenu("Notas crédito");
         jmiDpsAdjDoc = new JMenuItem("Notas de crédito de ventas");
-        jmDpsAdjAnnulled = new JMenuItem("Notas de crédito anuladas");
+        jmiDpsAdjDocAnn = new JMenuItem("Notas de crédito anuladas");
         jmiDpsAdjMailPending = new JMenuItem("Notas de crédito por enviar por correo-e");
         jmiDpsAdjMailSent = new JMenuItem("Notas de crédito enviadas por correo-e");
         jmiDpsAdjWsPending = new JMenuItem("Notas de crédito por enviar por web-service");
@@ -429,7 +431,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsAdjWsRejected = new JMenuItem("Notas de crédito rechazadas por web-service");
         jmDpsAdj.add(jmiDpsAdjDoc);
         jmDpsAdj.addSeparator();
-        jmDpsAdj.add(jmDpsAdjAnnulled);
+        jmDpsAdj.add(jmiDpsAdjDocAnn);
         jmDpsAdj.addSeparator();
         jmDpsAdj.add(jmiDpsAdjMailPending);
         jmDpsAdj.add(jmiDpsAdjMailSent);
@@ -487,6 +489,10 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmStkRet.add(jmiStkRetReturnedEntry);
         jmStkRet.addSeparator();
         jmStkRet.add(jmiStkRetDiog);
+
+        jmAccPend = new JMenu("CXC");
+        jmiAccPend = new JMenuItem("Cuentas por cobrar");
+        jmAccPend.add(jmiAccPend);
 
         jmRep = new JMenu("Reportes");
         jmRepStats = new JMenu("Consultas de estadísticas de ventas");
@@ -686,7 +692,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsWsReject.addActionListener(this);
         jmiDpsDocRemission.addActionListener(this);
         jmiDpsAdjDoc.addActionListener(this);
-        jmDpsAdjAnnulled.addActionListener(this);
+        jmiDpsAdjDocAnn.addActionListener(this);
         jmiDpsAdjMailPending.addActionListener(this);
         jmiDpsAdjMailSent.addActionListener(this);
         jmiDpsAdjWsPending.addActionListener(this);
@@ -710,6 +716,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkRetReturned.addActionListener(this);
         jmiStkRetReturnedEntry.addActionListener(this);
         jmiStkRetDiog.addActionListener(this);
+        jmiAccPend.addActionListener(this);
         jmiRepTrnGlobal.addActionListener(this);
         jmiRepTrnByMonth.addActionListener(this);
         jmiRepTrnByItemGeneric.addActionListener(this);
@@ -815,7 +822,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
 
         jmDpsAdj.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjDoc.setEnabled(hasRightDocTransactionAdjust);
-        jmDpsAdjAnnulled.setEnabled(hasRightDocTransactionAdjust);
+        jmiDpsAdjDocAnn.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjMailPending.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjMailSent.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjWsPending.setEnabled(hasRightDocTransactionAdjust);
@@ -845,6 +852,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkRetReturned.setEnabled(hasRightInventoryIn);
         jmiStkRetReturnedEntry.setEnabled(hasRightInventoryIn);
         jmiStkRetDiog.setEnabled(hasRightInventoryIn);
+        
+        jmAccPend.setEnabled(hasRightDocTransaction || hasRightReports);
 
         jmRep.setEnabled(hasRightReports);
         
@@ -1547,7 +1556,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
 
     @Override
     public javax.swing.JMenu[] getMenues() {
-        return new JMenu[] { jmCat, jmEst, jmCon, jmOrd, jmDps, jmDpsAdj, jmDpsDvy, jmStkDvy, jmStkRet, jmRep };
+        return new JMenu[] { jmCat, jmEst, jmCon, jmOrd, jmDps, jmDpsAdj, jmDpsDvy, jmStkDvy, jmStkRet, jmAccPend, jmRep };
     }
 
     @Override
@@ -1722,7 +1731,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiDpsAdjDoc) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
             }
-            else if (item == jmDpsAdjAnnulled) {
+            else if (item == jmiDpsAdjDocAnn) {
                 showView(SDataConstants.TRNU_TP_DPS_ANN, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
             }
             else if (item == jmiDpsAdjMailPending) {
@@ -1793,6 +1802,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiStkRetDiog) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRN_DIOG, SDataConstantsSys.TRNS_CL_IOG_IN_SAL[0], SDataConstantsSys.TRNS_CL_IOG_IN_SAL[1]);
+            }
+            else if (item == jmiAccPend) {
+                miClient.getSession().showView(SModConsts.TRNX_ACC_PEND, SModSysConsts.BPSS_CT_BP_CUS, null);
             }
             else if (item == jmiRepTrnGlobal) {
                 showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_TOT);
