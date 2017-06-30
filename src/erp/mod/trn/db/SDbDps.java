@@ -20,7 +20,7 @@ import sa.lib.gui.SGuiSession;
 
 /* IMPORTANT:
  * Every single change made to the definition of this class' table must be updated also in the following classes:
- * - erp.mtrn.data.STrnUtilities
+ * - erp.mtrn.data.SDataDps
  * All of them also make raw SQL insertions.
  */
 
@@ -74,11 +74,13 @@ public class SDbDps extends SDbRegistryUser {
     protected int mnPayments;
     protected String msPaymentMethod;
     protected String msPaymentAccount;
+    protected int mnAutomaticAuthorizationRejection;
     protected boolean mbIsPublic;
     protected boolean mbIsLinked;
     protected boolean mbIsClosed;
     protected boolean mbIsClosedCommissions;
     protected boolean mbIsShipped;
+    protected boolean mbIsDpsDeliveryAck;
     protected boolean mbIsRebill;
     protected boolean mbIsAudited;
     protected boolean mbIsAuthorized;
@@ -95,8 +97,10 @@ public class SDbDps extends SDbRegistryUser {
     protected int mnFkDpsStatusId;
     protected int mnFkDpsValidityStatusId;
     protected int mnFkDpsAuthorizationStatusId;
+    protected int mnFkDpsAnnulationTypeId;
     protected int mnFkDpsNatureId;
     protected int mnFkCompanyBranchId;
+    protected int mnFkFunctionalAreaId;
     protected int mnFkBizPartnerId_r;
     protected int mnFkBizPartnerBranchId;
     protected int mnFkBizPartnerBranchAddressId;
@@ -129,6 +133,7 @@ public class SDbDps extends SDbRegistryUser {
     protected int mnFkUserClosedId;
     protected int mnFkUserClosedCommissionsId;
     protected int mnFkUserShippedId;
+    protected int mnFkUserUserDeliveryAckId;
     protected int mnFkUserAuditedId;
     protected int mnFkUserAuthorizedId;
     protected int mnFkUserNewId;
@@ -138,6 +143,7 @@ public class SDbDps extends SDbRegistryUser {
     protected Date mtUserClosedTs;
     protected Date mtUserClosedCommissionsTs;
     protected Date mtUserShippedTs;
+    protected Date mtUserDpsDeliveryAckTs;
     protected Date mtUserAuditedTs;
     protected Date mtUserAuthorizedTs;
     protected Date mtUserNewTs;
@@ -196,11 +202,13 @@ public class SDbDps extends SDbRegistryUser {
     public void setPayments(int n) { mnPayments = n; }
     public void setPaymentMethod(String s) { msPaymentMethod = s; }
     public void setPaymentAccount(String s) { msPaymentAccount = s; }
+    public void setAutomaticAuthorizationRejection(int n) { mnAutomaticAuthorizationRejection = n; }
     public void setIsPublic(boolean b) { mbIsPublic = b; }
     public void setIsLinked(boolean b) { mbIsLinked = b; }
     public void setIsClosed(boolean b) { mbIsClosed = b; }
     public void setIsClosedCommissions(boolean b) { mbIsClosedCommissions = b; }
     public void setIsShipped(boolean b) { mbIsShipped = b; }
+    public void setIsDpsDeliveryAck(boolean b) { mbIsDpsDeliveryAck = b; }
     public void setIsRebill(boolean b) { mbIsRebill = b; }
     public void setIsAudited(boolean b) { mbIsAudited = b; }
     public void setIsAuthorized(boolean b) { mbIsAuthorized = b; }
@@ -217,8 +225,10 @@ public class SDbDps extends SDbRegistryUser {
     public void setFkDpsStatusId(int n) { mnFkDpsStatusId = n; }
     public void setFkDpsValidityStatusId(int n) { mnFkDpsValidityStatusId = n; }
     public void setFkDpsAuthorizationStatusId(int n) { mnFkDpsAuthorizationStatusId = n; }
+    public void setFkDpsAnnulationTypeId(int n) { mnFkDpsAnnulationTypeId = n; }
     public void setFkDpsNatureId(int n) { mnFkDpsNatureId = n; }
     public void setFkCompanyBranchId(int n) { mnFkCompanyBranchId = n; }
+    public void setFkFunctionalAreaId(int n) { mnFkFunctionalAreaId = n; }
     public void setFkBizPartnerId_r(int n) { mnFkBizPartnerId_r = n; }
     public void setFkBizPartnerBranchId(int n) { mnFkBizPartnerBranchId = n; }
     public void setFkBizPartnerBranchAddressId(int n) { mnFkBizPartnerBranchAddressId = n; }
@@ -251,6 +261,7 @@ public class SDbDps extends SDbRegistryUser {
     public void setFkUserClosedId(int n) { mnFkUserClosedId = n; }
     public void setFkUserClosedCommissionsId(int n) { mnFkUserClosedCommissionsId = n; }
     public void setFkUserShippedId(int n) { mnFkUserShippedId = n; }
+    public void setFkUserUserDeliveryAckId(int n) { mnFkUserUserDeliveryAckId = n; }
     public void setFkUserAuditedId(int n) { mnFkUserAuditedId = n; }
     public void setFkUserAuthorizedId(int n) { mnFkUserAuthorizedId = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
@@ -260,6 +271,7 @@ public class SDbDps extends SDbRegistryUser {
     public void setUserClosedTs(Date t) { mtUserClosedTs = t; }
     public void setUserClosedCommissionsTs(Date t) { mtUserClosedCommissionsTs = t; }
     public void setUserShippedTs(Date t) { mtUserShippedTs = t; }
+    public void setUserDpsDeliveryAckTs(Date t) { mtUserDpsDeliveryAckTs = t; }
     public void setUserAuditedTs(Date t) { mtUserAuditedTs = t; }
     public void setUserAuthorizedTs(Date t) { mtUserAuthorizedTs = t; }
     public void setUserNewTs(Date t) { mtUserNewTs = t; }
@@ -308,11 +320,13 @@ public class SDbDps extends SDbRegistryUser {
     public int getPayments() { return mnPayments; }
     public String getPaymentMethod() { return msPaymentMethod; }
     public String getPaymentAccount() { return msPaymentAccount; }
+    public int getAutomaticAuthorizationRejection() { return mnAutomaticAuthorizationRejection; }
     public boolean getIsPublic() { return mbIsPublic; }
     public boolean getIsLinked() { return mbIsLinked; }
     public boolean getIsClosed() { return mbIsClosed; }
     public boolean getIsClosedCommissions() { return mbIsClosedCommissions; }
     public boolean getIsShipped() { return mbIsShipped; }
+    public boolean getIsDpsDeliveryAck() { return mbIsDpsDeliveryAck; }
     public boolean getIsRebill() { return mbIsRebill; }
     public boolean getIsAudited() { return mbIsAudited; }
     public boolean getIsAuthorized() { return mbIsAuthorized; }
@@ -329,8 +343,10 @@ public class SDbDps extends SDbRegistryUser {
     public int getFkDpsStatusId() { return mnFkDpsStatusId; }
     public int getFkDpsValidityStatusId() { return mnFkDpsValidityStatusId; }
     public int getFkDpsAuthorizationStatusId() { return mnFkDpsAuthorizationStatusId; }
+    public int getFkDpsAnnulationTypeId() { return mnFkDpsAnnulationTypeId; }
     public int getFkDpsNatureId() { return mnFkDpsNatureId; }
     public int getFkCompanyBranchId() { return mnFkCompanyBranchId; }
+    public int getFkFunctionalAreaId() { return mnFkFunctionalAreaId; }
     public int getFkBizPartnerId_r() { return mnFkBizPartnerId_r; }
     public int getFkBizPartnerBranchId() { return mnFkBizPartnerBranchId; }
     public int getFkBizPartnerBranchAddressId() { return mnFkBizPartnerBranchAddressId; }
@@ -363,6 +379,7 @@ public class SDbDps extends SDbRegistryUser {
     public int getFkUserClosedId() { return mnFkUserClosedId; }
     public int getFkUserClosedCommissionsId() { return mnFkUserClosedCommissionsId; }
     public int getFkUserShippedId() { return mnFkUserShippedId; }
+    public int getFkUserUserDeliveryAckId() { return mnFkUserUserDeliveryAckId; }
     public int getFkUserAuditedId() { return mnFkUserAuditedId; }
     public int getFkUserAuthorizedId() { return mnFkUserAuthorizedId; }
     public int getFkUserNewId() { return mnFkUserNewId; }
@@ -372,6 +389,7 @@ public class SDbDps extends SDbRegistryUser {
     public Date getUserClosedTs() { return mtUserClosedTs; }
     public Date getUserClosedCommissionsTs() { return mtUserClosedCommissionsTs; }
     public Date getUserShippedTs() { return mtUserShippedTs; }
+    public Date getUserDpsDeliveryAckTs() { return mtUserDpsDeliveryAckTs; }
     public Date getUserAuditedTs() { return mtUserAuditedTs; }
     public Date getUserAuthorizedTs() { return mtUserAuthorizedTs; }
     public Date getUserNewTs() { return mtUserNewTs; }
@@ -446,11 +464,13 @@ public class SDbDps extends SDbRegistryUser {
         mnPayments = 0;
         msPaymentMethod = "";
         msPaymentAccount = "";
+        mnAutomaticAuthorizationRejection = 0;
         mbIsPublic = false;
         mbIsLinked = false;
         mbIsClosed = false;
         mbIsClosedCommissions = false;
         mbIsShipped = false;
+        mbIsDpsDeliveryAck = false;
         mbIsRebill = false;
         mbIsAudited = false;
         mbIsAuthorized = false;
@@ -467,8 +487,10 @@ public class SDbDps extends SDbRegistryUser {
         mnFkDpsStatusId = 0;
         mnFkDpsValidityStatusId = 0;
         mnFkDpsAuthorizationStatusId = 0;
+        mnFkDpsAnnulationTypeId = 0;
         mnFkDpsNatureId = 0;
         mnFkCompanyBranchId = 0;
+        mnFkFunctionalAreaId = 0;
         mnFkBizPartnerId_r = 0;
         mnFkBizPartnerBranchId = 0;
         mnFkBizPartnerBranchAddressId = 0;
@@ -501,6 +523,7 @@ public class SDbDps extends SDbRegistryUser {
         mnFkUserClosedId = 0;
         mnFkUserClosedCommissionsId = 0;
         mnFkUserShippedId = 0;
+        mnFkUserUserDeliveryAckId = 0;
         mnFkUserAuditedId = 0;
         mnFkUserAuthorizedId = 0;
         mnFkUserNewId = 0;
@@ -510,6 +533,7 @@ public class SDbDps extends SDbRegistryUser {
         mtUserClosedTs = null;
         mtUserClosedCommissionsTs = null;
         mtUserShippedTs = null;
+        mtUserDpsDeliveryAckTs = null;
         mtUserAuditedTs = null;
         mtUserAuthorizedTs = null;
         mtUserNewTs = null;
@@ -599,11 +623,13 @@ public class SDbDps extends SDbRegistryUser {
             mnPayments = resultSet.getInt("payments");
             msPaymentMethod = resultSet.getString("pay_method");
             msPaymentAccount = resultSet.getString("pay_account");
+            mnAutomaticAuthorizationRejection = resultSet.getInt("aut_authorn_rej");
             mbIsPublic = resultSet.getBoolean("b_pub");
             mbIsLinked = resultSet.getBoolean("b_link");
             mbIsClosed = resultSet.getBoolean("b_close");
             mbIsClosedCommissions = resultSet.getBoolean("b_close_comms");
             mbIsShipped = resultSet.getBoolean("b_ship");
+            mbIsDpsDeliveryAck = resultSet.getBoolean("b_dps_ack");
             mbIsRebill = resultSet.getBoolean("b_rebill");
             mbIsAudited = resultSet.getBoolean("b_audit");
             mbIsAuthorized = resultSet.getBoolean("b_authorn");
@@ -620,8 +646,10 @@ public class SDbDps extends SDbRegistryUser {
             mnFkDpsStatusId = resultSet.getInt("fid_st_dps");
             mnFkDpsValidityStatusId = resultSet.getInt("fid_st_dps_val");
             mnFkDpsAuthorizationStatusId = resultSet.getInt("fid_st_dps_authorn");
+            mnFkDpsAnnulationTypeId = resultSet.getInt("fid_tp_dps_ann");
             mnFkDpsNatureId = resultSet.getInt("fid_dps_nat");
             mnFkCompanyBranchId = resultSet.getInt("fid_cob");
+            mnFkFunctionalAreaId = resultSet.getInt("fid_func");
             mnFkBizPartnerId_r = resultSet.getInt("fid_bp_r");
             mnFkBizPartnerBranchId = resultSet.getInt("fid_bpb");
             mnFkBizPartnerBranchAddressId = resultSet.getInt("fid_add");
@@ -654,6 +682,7 @@ public class SDbDps extends SDbRegistryUser {
             mnFkUserClosedId = resultSet.getInt("fid_usr_close");
             mnFkUserClosedCommissionsId = resultSet.getInt("fid_usr_close_comms");
             mnFkUserShippedId = resultSet.getInt("fid_usr_ship");
+            mnFkUserUserDeliveryAckId = resultSet.getInt("fid_usr_dps_ack");
             mnFkUserAuditedId = resultSet.getInt("fid_usr_audit");
             mnFkUserAuthorizedId = resultSet.getInt("fid_usr_authorn");
             mnFkUserNewId = resultSet.getInt("fid_usr_new");
@@ -663,6 +692,7 @@ public class SDbDps extends SDbRegistryUser {
             mtUserClosedTs = resultSet.getTimestamp("ts_close");
             mtUserClosedCommissionsTs = resultSet.getTimestamp("ts_close_comms");
             mtUserShippedTs = resultSet.getTimestamp("ts_ship");
+            mtUserDpsDeliveryAckTs = resultSet.getTimestamp("ts_dps_ack");
             mtUserAuditedTs = resultSet.getTimestamp("ts_audit");
             mtUserAuthorizedTs = resultSet.getTimestamp("ts_authorn");
             mtUserNewTs = resultSet.getTimestamp("ts_new");
