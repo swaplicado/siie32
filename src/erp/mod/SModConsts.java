@@ -362,6 +362,7 @@ public abstract class SModConsts {
     public static final int TRN_DPS_ADD_ETY = 2023014;
     public static final int TRN_DPS_EVT = 2023016;
     public static final int TRN_DPS_NTS = 2023017;
+    public static final int TRN_DPS_ACK = 2023061;
     public static final int TRN_DPS_ETY = 2023018;
     public static final int TRN_DPS_ETY_NTS = 2023019;
     public static final int TRN_DPS_ETY_PRC = 2023015;

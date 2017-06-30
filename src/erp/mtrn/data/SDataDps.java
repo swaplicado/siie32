@@ -75,9 +75,15 @@ import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 
+/* IMPORTANT:
+ * Every single change made to the definition of this class' table must be updated also in the following classes:
+ * - erp.mod.trn.db.SDbDps
+ * All of them also make raw SQL insertions.
+ */
+
 /**
  *
- * @author Sergio Flores, juan Barajas
+ * @author Sergio Flores, Juan Barajas
  */
 public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Serializable, erp.cfd.SCfdXml {
 
@@ -163,6 +169,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected boolean mbIsClosed;
     protected boolean mbIsClosedCommissions;
     protected boolean mbIsShipped;
+    protected boolean mbIsDpsDeliveryAck;
     protected boolean mbIsRebill;
     protected boolean mbIsAudited;
     protected boolean mbIsAuthorized;
@@ -215,6 +222,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected int mnFkUserClosedId;
     protected int mnFkUserClosedCommissionsId;
     protected int mnFkUserShippedId;
+    protected int mnFkUserDpsDeliveryAckId;
     protected int mnFkUserAuditedId;
     protected int mnFkUserAuthorizedId;
     protected int mnFkUserNewId;
@@ -224,6 +232,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected java.util.Date mtUserClosedTs;
     protected java.util.Date mtUserClosedCommissionsTs;
     protected java.util.Date mtUserShippedTs;
+    protected java.util.Date mtUserDpsDeliveryAckTs;
     protected java.util.Date mtUserAuditedTs;
     protected java.util.Date mtUserAuthorizedTs;
     protected java.util.Date mtUserNewTs;
@@ -750,6 +759,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         else if (mbIsShipped) {
             mnDbmsErrorId = 51;
             msDbmsError = sMsg + "¡El documento está embarcado!";
+            throw new Exception(msDbmsError);
+        }
+        else if (mbIsDpsDeliveryAck) {
+            mnDbmsErrorId = 61;
+            msDbmsError = sMsg + "¡El documento tiene capturados sus acuses de entrega!";
             throw new Exception(msDbmsError);
         }
         else {
@@ -1529,6 +1543,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setIsClosed(boolean b) { mbIsClosed = b; }
     public void setIsClosedCommissions(boolean b) { mbIsClosedCommissions = b; }
     public void setIsShipped(boolean b) { mbIsShipped = b; }
+    public void setIsDpsDeliveryAck(boolean b) { mbIsDpsDeliveryAck = b; }
     public void setIsRebill(boolean b) { mbIsRebill = b; }
     public void setIsAudited(boolean b) { mbIsAudited = b; }
     public void setIsAuthorized(boolean b) { mbIsAuthorized = b; }
@@ -1581,6 +1596,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setFkUserClosedId(int n) { mnFkUserClosedId = n; }
     public void setFkUserClosedCommissionsId(int n) { mnFkUserClosedCommissionsId = n; }
     public void setFkUserShippedId(int n) { mnFkUserShippedId = n; }
+    public void setFkUserDpsDeliveryAckId(int n) { mnFkUserDpsDeliveryAckId = n; }
     public void setFkUserAuditedId(int n) { mnFkUserAuditedId = n; }
     public void setFkUserAuthorizedId(int n) { mnFkUserAuthorizedId = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
@@ -1590,6 +1606,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setUserClosedTs(java.util.Date t) { mtUserClosedTs = t; }
     public void setUserClosedCommissionsTs(java.util.Date t) { mtUserClosedCommissionsTs = t; }
     public void setUserShippedTs(java.util.Date t) { mtUserShippedTs = t; }
+    public void setUserDpsDeliveryAckTs(java.util.Date t) { mtUserDpsDeliveryAckTs = t; }
     public void setUserAuditedTs(java.util.Date t) { mtUserAuditedTs = t; }
     public void setUserAuthorizedTs(java.util.Date t) { mtUserAuthorizedTs = t; }
     public void setUserNewTs(java.util.Date t) { mtUserNewTs = t; }
@@ -1644,6 +1661,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public boolean getIsClosed() { return mbIsClosed; }
     public boolean getIsClosedCommissions() { return mbIsClosedCommissions; }
     public boolean getIsShipped() { return mbIsShipped; }
+    public boolean getIsDpsDeliveryAck() { return mbIsDpsDeliveryAck; }
     public boolean getIsRebill() { return mbIsRebill; }
     public boolean getIsAudited() { return mbIsAudited; }
     public boolean getIsAuthorized() { return mbIsAuthorized; }
@@ -1696,6 +1714,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public int getFkUserClosedId() { return mnFkUserClosedId; }
     public int getFkUserClosedCommissionsId() { return mnFkUserClosedCommissionsId; }
     public int getFkUserShippedId() { return mnFkUserShippedId; }
+    public int getFkUserDpsDeliveryAckId() { return mnFkUserDpsDeliveryAckId; }
     public int getFkUserAuditedId() { return mnFkUserAuditedId; }
     public int getFkUserAuthorizedId() { return mnFkUserAuthorizedId; }
     public int getFkUserNewId() { return mnFkUserNewId; }
@@ -1705,6 +1724,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public java.util.Date getUserClosedTs() { return mtUserClosedTs; }
     public java.util.Date getUserClosedCommissionsTs() { return mtUserClosedCommissionsTs; }
     public java.util.Date getUserShippedTs() { return mtUserShippedTs; }
+    public java.util.Date getUserDpsDeliveryAckTs() { return mtUserDpsDeliveryAckTs; }
     public java.util.Date getUserAuditedTs() { return mtUserAuditedTs; }
     public java.util.Date getUserAuthorizedTs() { return mtUserAuthorizedTs; }
     public java.util.Date getUserNewTs() { return mtUserNewTs; }
@@ -1871,6 +1891,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mbIsClosed = false;
         mbIsClosedCommissions = false;
         mbIsShipped = false;
+        mbIsDpsDeliveryAck = false;
         mbIsRebill = false;
         mbIsAudited = false;
         mbIsAuthorized = false;
@@ -1923,6 +1944,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnFkUserClosedId = 0;
         mnFkUserClosedCommissionsId = 0;
         mnFkUserShippedId = 0;
+        mnFkUserDpsDeliveryAckId = 0;
         mnFkUserAuditedId = 0;
         mnFkUserAuthorizedId = 0;
         mnFkUserNewId = 0;
@@ -1932,6 +1954,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mtUserClosedTs = null;
         mtUserClosedCommissionsTs = null;
         mtUserShippedTs = null;
+        mtUserDpsDeliveryAckTs = null;
         mtUserAuditedTs = null;
         mtUserAuthorizedTs = null;
         mtUserNewTs = null;
@@ -2044,6 +2067,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mbIsClosed = oResultSet.getBoolean("d.b_close");
                 mbIsClosedCommissions = oResultSet.getBoolean("d.b_close_comms");
                 mbIsShipped = oResultSet.getBoolean("d.b_ship");
+                mbIsDpsDeliveryAck = oResultSet.getBoolean("d.b_dps_ack");
                 mbIsRebill = oResultSet.getBoolean("b_rebill");
                 mbIsAudited = oResultSet.getBoolean("d.b_audit");
                 mbIsAuthorized = oResultSet.getBoolean("d.b_authorn");
@@ -2096,6 +2120,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnFkUserClosedId = oResultSet.getInt("d.fid_usr_close");
                 mnFkUserClosedCommissionsId = oResultSet.getInt("d.fid_usr_close_comms");
                 mnFkUserShippedId = oResultSet.getInt("d.fid_usr_ship");
+                mnFkUserDpsDeliveryAckId = oResultSet.getInt("d.fid_usr_dps_ack");
                 mnFkUserAuditedId = oResultSet.getInt("d.fid_usr_audit");
                 mnFkUserAuthorizedId = oResultSet.getInt("d.fid_usr_authorn");
                 mnFkUserNewId = oResultSet.getInt("d.fid_usr_new");
@@ -2105,6 +2130,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mtUserClosedTs = oResultSet.getTimestamp("d.ts_close");
                 mtUserClosedCommissionsTs = oResultSet.getTimestamp("d.ts_close_comms");
                 mtUserShippedTs = oResultSet.getTimestamp("d.ts_ship");
+                mtUserDpsDeliveryAckTs = oResultSet.getTimestamp("d.ts_dps_ack");
                 mtUserAuditedTs = oResultSet.getTimestamp("d.ts_audit");
                 mtUserAuthorizedTs = oResultSet.getTimestamp("d.ts_authorn");
                 mtUserNewTs = oResultSet.getTimestamp("d.ts_new");
@@ -2382,7 +2408,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?) }");
             oCallableStatement.setInt(nParam++, mnPkYearId);
             oCallableStatement.setInt(nParam++, mnPkDocId);
             oCallableStatement.setDate(nParam++, new java.sql.Date(mtDate.getTime()));
@@ -2431,6 +2457,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             oCallableStatement.setBoolean(nParam++, mbIsClosed);
             oCallableStatement.setBoolean(nParam++, mbIsClosedCommissions);
             oCallableStatement.setBoolean(nParam++, mbIsShipped);
+            oCallableStatement.setBoolean(nParam++, mbIsDpsDeliveryAck);
             oCallableStatement.setBoolean(nParam++, mbIsRebill);
             oCallableStatement.setBoolean(nParam++, mbIsAudited);
             oCallableStatement.setBoolean(nParam++, mbIsAuthorized);
@@ -2483,6 +2510,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             oCallableStatement.setInt(nParam++, mnFkUserClosedId);
             oCallableStatement.setInt(nParam++, mnFkUserClosedCommissionsId);
             oCallableStatement.setInt(nParam++, mnFkUserShippedId);
+            oCallableStatement.setInt(nParam++, mnFkUserDpsDeliveryAckId);
             oCallableStatement.setInt(nParam++, mnFkUserAuditedId);
             oCallableStatement.setInt(nParam++, mnFkUserAuthorizedId);
             oCallableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);

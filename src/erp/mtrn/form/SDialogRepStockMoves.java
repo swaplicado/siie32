@@ -33,7 +33,6 @@ import javax.swing.AbstractAction;
 import javax.swing.JRadioButton;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
-import sa.lib.gui.SGuiUtils;
 
 /**
  *
@@ -497,11 +496,11 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
     }
     
     private void actionDateStart() {
-        miClient.getGuiDatePeriodPickerXXX().pickDate(moFieldDateStart.getDate(), moFieldDateStart);
+        miClient.getGuiDatePickerXXX().pickDate(moFieldDateStart.getDate(), moFieldDateStart);
     }
 
     private void actionDateEnd() {
-        miClient.getGuiDatePeriodPickerXXX().pickDate(moFieldDateEnd.getDate(), moFieldDateEnd);
+        miClient.getGuiDatePickerXXX().pickDate(moFieldDateEnd.getDate(), moFieldDateEnd);
     }
     
     private void itemStateChangedReportTypeDetailed() {
