@@ -119,7 +119,7 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
         jbExit = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Listado de movimientos de inventarios");
+        setTitle("Reporte de movimientos de inventarios");
         setPreferredSize(new java.awt.Dimension(400, 250));
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
