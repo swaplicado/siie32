@@ -598,14 +598,14 @@ public abstract class SModSysConsts {
     public static final int[] TRNS_CL_IOG_IN_EXT = { 1, 4 };    // other external
     public static final int[] TRNS_CL_IOG_IN_INT = { 1, 5 };    // other internal
     public static final int[] TRNS_CL_IOG_IN_MFG = { 1, 6 };    // manufacturing
-    public static final int[] TRNS_CL_IOG_IN_EXP = { 1, 7 };    // expenses
+    public static final int[] TRNS_CL_IOG_IN_EXP = { 1, 9 };    // expenses
     public static final int[] TRNS_CL_IOG_OUT_PUR = { 2, 1 };   // purchases
     public static final int[] TRNS_CL_IOG_OUT_SAL = { 2, 2 };   // sales
     public static final int[] TRNS_CL_IOG_OUT_ADJ = { 2, 3 };   // adjustments
     public static final int[] TRNS_CL_IOG_OUT_EXT = { 2, 4 };   // other external
     public static final int[] TRNS_CL_IOG_OUT_INT = { 2, 5 };   // other internal
     public static final int[] TRNS_CL_IOG_OUT_MFG = { 2, 6 };   // manufacturing
-    public static final int[] TRNS_CL_IOG_OUT_EXP = { 2, 7 };   // expenses
+    public static final int[] TRNS_CL_IOG_OUT_EXP = { 2, 9 };   // expenses
 
     public static final int[] TRNS_TP_IOG_IN_PUR_PUR = { 1, 1, 1 };
     public static final int[] TRNS_TP_IOG_IN_SAL_SAL = { 1, 2, 1 };

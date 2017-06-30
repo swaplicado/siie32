@@ -31,6 +31,7 @@ import java.util.Vector;
 import javax.swing.AbstractAction;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 
 /**
@@ -331,10 +332,14 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
                 if (jcbShift.getSelectedIndex() > 0) {
                     SDbShift shift = (SDbShift) miClient.getSession().readRegistry(SModConsts.CFGU_SHIFT, moFieldShift.getKeyAsIntArray());
                     if (shift.getTimeStart().before(shift.getTimeEnd())) {
-                        sqlWhereTurn += "AND TIME(d.ts_new) BETWEEN '" + SLibUtils.DbmsDateFormatTime.format(shift.getTimeStart()) + "' AND '" + SLibUtils.DbmsDateFormatTime.format(shift.getTimeEnd()) + "' ";
+                        sqlWhereTurn += "AND (TIME(d.ts_new) BETWEEN '" + SLibUtils.DbmsDateFormatTime.format(shift.getTimeStart()) + "' AND '" + SLibUtils.DbmsDateFormatTime.format(shift.getTimeEnd()) + "') ";
                     }
                     else {
-                        sqlWhereTurn += "AND ((TIME(d.ts_new) >= '" + SLibUtils.DbmsDateFormatTime.format(shift.getTimeStart()) + "') OR (TIME(d.ts_new) <= '" + SLibUtils.DbmsDateFormatTime.format(shift.getTimeEnd()) + "')) ";
+                        sqlWhereTurn += "AND ("
+                                + "(d.dt = '" + SLibUtils.DbmsDateFormatDate.format(moFieldDateInitial.getDate()) + "' AND TIME(d.ts_new) >= '" + SLibUtils.DbmsDateFormatTime.format(shift.getTimeStart()) + "') OR "
+                                + "(d.dt = '" + SLibUtils.DbmsDateFormatDate.format(moFieldDateEnd.getDate()) + "' AND TIME(d.ts_new) <= '" + SLibUtils.DbmsDateFormatTime.format(shift.getTimeEnd()) + "') OR "
+                                + "(d.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(SLibTimeUtils.addDate(moFieldDateInitial.getDate(), 0, 0, 1)) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(SLibTimeUtils.addDate(moFieldDateEnd.getDate(), 0, 0, -1)) + "' AND ("
+                                + "TIME(d.ts_new) >= '" + SLibUtils.DbmsDateFormatTime.format(shift.getTimeStart()) + "' OR TIME(d.ts_new) <= '" + SLibUtils.DbmsDateFormatTime.format(shift.getTimeEnd()) + "'))) ";
                     }
                 }
                 map.put("sTurn", jcbShift.getSelectedIndex() <= 0 ? "" : jcbShift.getSelectedItem().toString());
