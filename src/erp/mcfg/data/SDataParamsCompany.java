@@ -20,6 +20,8 @@ import sa.lib.gui.SGuiConfigCompany;
  * @author Sergio Flores, Uriel Castañeda
  */
 public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements java.io.Serializable, SGuiConfigCompany {
+    
+    public static final String FILES_DIR = "files";
 
     protected int mnPkConfigCoId;
     protected int mnDaysOfGraceSupplier;
