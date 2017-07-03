@@ -6472,7 +6472,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
        
         try {
             if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
-                if (miClient.getFileChooser().getSelectedFile().getName().contains(".xml")) {
+                if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains(".xml")) {
                     if (SCfdUtils.validateEmisorXmlExpenses(miClient, miClient.getFileChooser().getSelectedFile().getAbsolutePath())) {
                     moFieldFileXml.setFieldValue(miClient.getFileChooser().getSelectedFile().getName());
                     msFileXmlPath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
