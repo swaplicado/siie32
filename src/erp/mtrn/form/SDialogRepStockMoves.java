@@ -33,6 +33,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JRadioButton;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
+import sa.lib.SLibConsts;
 
 /**
  *
@@ -91,7 +92,8 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
         jbPickDateEnd = new javax.swing.JButton();
         jPanel17 = new javax.swing.JPanel();
         jlReportType = new javax.swing.JLabel();
-        jrbReportTypeDetailed = new javax.swing.JRadioButton();
+        jrbReportTypeDetailedItem = new javax.swing.JRadioButton();
+        jrbReportTypeDetailedMove = new javax.swing.JRadioButton();
         jrbReportTypeSummary = new javax.swing.JRadioButton();
         jPanel19 = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
@@ -177,14 +179,19 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
         jlReportType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel17.add(jlReportType);
 
-        jbgReportType.add(jrbReportTypeDetailed);
-        jrbReportTypeDetailed.setText("Detalle");
-        jrbReportTypeDetailed.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel17.add(jrbReportTypeDetailed);
+        jbgReportType.add(jrbReportTypeDetailedItem);
+        jrbReportTypeDetailedItem.setText("Detalle por producto");
+        jrbReportTypeDetailedItem.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel17.add(jrbReportTypeDetailedItem);
+
+        jbgReportType.add(jrbReportTypeDetailedMove);
+        jrbReportTypeDetailedMove.setText("Detalle por documento");
+        jrbReportTypeDetailedMove.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel17.add(jrbReportTypeDetailedMove);
 
         jbgReportType.add(jrbReportTypeSummary);
-        jrbReportTypeSummary.setText("Resumen");
-        jrbReportTypeSummary.setPreferredSize(new java.awt.Dimension(100, 23));
+        jrbReportTypeSummary.setText("Resumen por producto");
+        jrbReportTypeSummary.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel17.add(jrbReportTypeSummary);
 
         jPanel18.add(jPanel17);
@@ -336,7 +343,8 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
         jbExit.addActionListener(this);
         jbPickDateStart.addActionListener(this);
         jbPickDateEnd.addActionListener(this);
-        jrbReportTypeDetailed.addItemListener(this);
+        jrbReportTypeDetailedItem.addItemListener(this);
+        jrbReportTypeDetailedMove.addItemListener(this);
         jrbReportTypeSummary.addItemListener(this);
         
         moGroupMovement = new SFormComboBoxGroup(miClient);
@@ -364,7 +372,7 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
         }
     }
 
-    private void printReportDetailed(){
+    private void printReportDetailedItem(){
         Cursor cursor = getCursor();
         SFormValidation validation = formValidate();
         Map<String, Object> map = null;
@@ -400,7 +408,7 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
 
                 jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_STK_MOV, map);
                 jasperViewer = new JasperViewer(jasperPrint, false);
-                jasperViewer.setTitle("Reporte de movimientos de inventarios");
+                jasperViewer.setTitle(getTitle());
                 jasperViewer.setVisible(true);
             }
             catch(Exception e) {
@@ -412,7 +420,7 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
         }
     }
     
-    private void printReportSummary(){
+    private void printReportMovements() {
         Cursor cursor = getCursor();
         SFormValidation validation = formValidate();
         Map<String, Object> map = null;
@@ -431,26 +439,37 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
             try {
                 setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
+                int report = SLibConsts.UNDEFINED;
+                String alias = "";
                 String sqlWhere = "";
                 
+                if (jrbReportTypeDetailedMove.isSelected()) {
+                    report = SDataConstantsSys.REP_TRN_STK_MOV_MOV;
+                    alias = "d";
+                }
+                else if (jrbReportTypeSummary.isSelected()) {
+                    report = SDataConstantsSys.REP_TRN_STK_MOV_SUM;
+                    alias = "s";
+                }
+                
                 if (jcbMovementType.getSelectedIndex() > 0) {
-                    sqlWhere += "AND s.fid_ct_iog = " + moFieldMovementType.getKeyAsIntArray()[0] + " "
-                            + "AND s.fid_cl_iog = " + moFieldMovementType.getKeyAsIntArray()[1] + " "
-                            + "AND s.fid_tp_iog = " + moFieldMovementType.getKeyAsIntArray()[2] + " ";
+                    sqlWhere += "AND " + alias + ".fid_ct_iog = " + moFieldMovementType.getKeyAsIntArray()[0] + " "
+                            + "AND " + alias + ".fid_cl_iog = " + moFieldMovementType.getKeyAsIntArray()[1] + " "
+                            + "AND " + alias + ".fid_tp_iog = " + moFieldMovementType.getKeyAsIntArray()[2] + " ";
                 }
                 else if (jcbMovementClass.getSelectedIndex() > 0) {
-                    sqlWhere += "AND s.fid_ct_iog = " + moFieldMovementClass.getKeyAsIntArray()[0] + " "
-                            + "AND s.fid_cl_iog = " + moFieldMovementClass.getKeyAsIntArray()[1] + " ";
+                    sqlWhere += "AND " + alias + ".fid_ct_iog = " + moFieldMovementClass.getKeyAsIntArray()[0] + " "
+                            + "AND " + alias + ".fid_cl_iog = " + moFieldMovementClass.getKeyAsIntArray()[1] + " ";
                 }
                 else {
-                    sqlWhere += "AND s.fid_ct_iog = " + moFieldMovementCategory.getKeyAsIntArray()[0] + " ";
+                    sqlWhere += "AND " + alias + ".fid_ct_iog = " + moFieldMovementCategory.getKeyAsIntArray()[0] + " ";
                 }
                 
                 if (jcbCompanyBranch.getSelectedIndex() > 0) {
-                    sqlWhere += "AND s.id_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0] + " ";
+                    sqlWhere += "AND " + alias + ".id_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0] + " ";
                     
                     if (jcbWarehouse.getSelectedIndex() > 0) {
-                        sqlWhere += "AND s.id_wh = " + moFieldWarehouse.getKeyAsIntArray()[1] + " ";
+                        sqlWhere += "AND " + alias + ".id_wh = " + moFieldWarehouse.getKeyAsIntArray()[1] + " ";
                     }
                 }
                 
@@ -468,9 +487,9 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
                 map.put("sMovement", jcbMovementType.getSelectedIndex() > 0 ? jcbMovementType.getSelectedItem().toString() : jcbMovementClass.getSelectedIndex() > 0 ? jcbMovementClass.getSelectedItem().toString() : jcbMovementCategory.getSelectedItem().toString());
                 map.put("sSqlWhere", sqlWhere);
                 
-                jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_STK_MOV_SUM, map);
+                jasperPrint = SDataUtilities.fillReport(miClient, report, map);
                 jasperViewer = new JasperViewer(jasperPrint, false);
-                jasperViewer.setTitle("Reporte de movimientos de inventarios (resumen)");
+                jasperViewer.setTitle(getTitle());
                 jasperViewer.setVisible(true);
             }
             catch(Exception e) {
@@ -483,11 +502,14 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
     }
 
     private void actionPrint() {
-        if (jrbReportTypeDetailed.isSelected()) {
-            printReportDetailed();
+        if (jrbReportTypeDetailedItem.isSelected()) {
+            printReportDetailedItem();
+        }
+        if (jrbReportTypeDetailedMove.isSelected()) {
+            printReportMovements();
         }
         else if (jrbReportTypeSummary.isSelected()) {
-            printReportSummary();
+            printReportMovements();
         }
     }
     
@@ -503,9 +525,13 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
         miClient.getGuiDatePickerXXX().pickDate(moFieldDateEnd.getDate(), moFieldDateEnd);
     }
     
-    private void itemStateChangedReportTypeDetailed() {
+    private void itemStateChangedReportTypeDetailedItem() {
         moGroupMovement.reset();
         jcbMovementCategory.setEnabled(false);
+    }
+
+    private void itemStateChangedReportTypeDetailedMove() {
+        jcbMovementCategory.setEnabled(true);
     }
 
     private void itemStateChangedReportTypeSummary() {
@@ -550,7 +576,8 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
     private javax.swing.JLabel jlMovementType;
     private javax.swing.JLabel jlReportType;
     private javax.swing.JLabel jlWarehouse;
-    private javax.swing.JRadioButton jrbReportTypeDetailed;
+    private javax.swing.JRadioButton jrbReportTypeDetailedItem;
+    private javax.swing.JRadioButton jrbReportTypeDetailedMove;
     private javax.swing.JRadioButton jrbReportTypeSummary;
     // End of variables declaration//GEN-END:variables
 
@@ -572,8 +599,8 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
 
         moFieldDateStart.setFieldValue(SLibTimeUtilities.getBeginOfMonth(miClient.getSessionXXX().getWorkingDate()));
         moFieldDateEnd.setFieldValue(SLibTimeUtilities.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()));
-        jrbReportTypeDetailed.setSelected(true);
-        itemStateChangedReportTypeDetailed();
+        jrbReportTypeDetailedItem.setSelected(true);
+        itemStateChangedReportTypeDetailedItem();
         moGroupMovement.reset();
         moGroupCompanyBranch.reset();
     }
@@ -689,8 +716,11 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
         if (e.getSource() instanceof JRadioButton) {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 JRadioButton radioButton = (JRadioButton) e.getSource();
-                if (radioButton == jrbReportTypeDetailed) {
-                    itemStateChangedReportTypeDetailed();
+                if (radioButton == jrbReportTypeDetailedItem) {
+                    itemStateChangedReportTypeDetailedItem();
+                }
+                else if (radioButton == jrbReportTypeDetailedMove) {
+                    itemStateChangedReportTypeDetailedMove();
                 }
                 else if (radioButton == jrbReportTypeSummary) {
                     itemStateChangedReportTypeSummary();

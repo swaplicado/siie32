@@ -2956,6 +2956,9 @@ public abstract class SDataUtilities {
             case SDataConstantsSys.REP_TRN_STK_MOV:
                 name = "reps/trn_stk_mov.jasper";
                 break;
+            case SDataConstantsSys.REP_TRN_STK_MOV_MOV:
+                name = "reps/trn_stk_mov_mov.jasper";
+                break;
             case SDataConstantsSys.REP_TRN_STK_MOV_SUM:
                 name = "reps/trn_stk_mov_sum.jasper";
                 break;
