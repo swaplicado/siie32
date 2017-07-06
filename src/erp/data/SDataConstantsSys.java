@@ -1564,8 +1564,9 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_PS_ITEM_UNIT_PRICE = 207026;
     public static final int REP_TRN_DPS_BPS_DETAIL = 207027;
     public static final int REP_TRN_DPS_MOV = 207028;
-    public static final int REP_TRN_STK_MOV = 207031;       // stock movements detailed
-    public static final int REP_TRN_STK_MOV_SUM = 207032;   // stock movements summary
+    public static final int REP_TRN_STK_MOV = 207031;       // stock movements detailed per item
+    public static final int REP_TRN_STK_MOV_MOV = 207032;   // stock movements detailed per movement
+    public static final int REP_TRN_STK_MOV_SUM = 207033;   // stock movements summary
     
     public static final int REP_TRN_CFD = 207101;
     public static final int REP_TRN_CFDI = 207102;
@@ -1606,15 +1607,17 @@ public abstract class SDataConstantsSys {
     public static final int NUM_LEN_MFG_ORD = 6;
     public static final int NUM_LEN_MFG_CHG = 3;
 
-    public static final int UPD_DPS_FL_LINK = 1;    // set field
-    public static final int UPD_DPS_FL_CLOSE = 2;   // set field
-    public static final int UPD_DPS_FL_AUDIT = 3;   // set field
-    public static final int UPD_DPS_FL_AUTHORN = 4; // set field
-    public static final int UPD_DPS_FL_SHIP = 5;    // set field
+    public static final int UPD_DPS_FL_LINK = 1;        // set field
+    public static final int UPD_DPS_FL_CLOSE = 2;       // set field
+    public static final int UPD_DPS_FL_CLOSE_COMMS = 3; // set field
+    public static final int UPD_DPS_FL_SHIP = 4;        // set field
+    public static final int UPD_DPS_FL_DPS_ACK = 5;     // set field
+    public static final int UPD_DPS_FL_AUDIT = 6;       // set field
+    public static final int UPD_DPS_FL_AUTHORN = 7;     // set field
 
-    public static final int UPD_DIOG_FL_SHIP = 1;   // set field
-    public static final int UPD_DIOG_FL_AUDIT = 2;   // set field
-    public static final int UPD_DIOG_FL_AUTHORN = 3; // set field
+    public static final int UPD_DIOG_FL_SHIP = 1;       // set field
+    public static final int UPD_DIOG_FL_AUDIT = 2;      // set field
+    public static final int UPD_DIOG_FL_AUTHORN = 3;    // set field
 
     public static final java.lang.String[] DB_SETTINGS = new java.lang.String[] {
         "SET @CFGS_TP_SORT_KEY_NAME = " + CFGS_TP_SORT_KEY_NAME,
@@ -1670,9 +1673,11 @@ public abstract class SDataConstantsSys {
         "SET @MKTS_TP_COMMS_PER = " + MKTS_TP_COMMS_PER,
         "SET @UPD_DPS_FL_LINK = " + UPD_DPS_FL_LINK,
         "SET @UPD_DPS_FL_CLOSE = " + UPD_DPS_FL_CLOSE,
+        "SET @UPD_DPS_FL_CLOSE_COMMS = " + UPD_DPS_FL_CLOSE_COMMS,
+        "SET @UPD_DPS_FL_SHIP = " + UPD_DPS_FL_SHIP,
+        "SET @UPD_DPS_FL_DPS_ACK = " + UPD_DPS_FL_DPS_ACK,
         "SET @UPD_DPS_FL_AUDIT = " + UPD_DPS_FL_AUDIT,
         "SET @UPD_DPS_FL_AUTHORN = " + UPD_DPS_FL_AUTHORN,
-        "SET @UPD_DPS_FL_SHIPMENT = " + UPD_DPS_FL_SHIP,    // XXX Fix name of DB user session variable! (sflores, 2013-07-02)
         "SET @UPD_DIOG_FL_SHIP = " + UPD_DIOG_FL_SHIP,
         "SET @UPD_DIOG_FL_AUDIT = " + UPD_DIOG_FL_AUDIT,
         "SET @UPD_DIOG_FL_AUTHORN = " + UPD_DIOG_FL_AUTHORN,
