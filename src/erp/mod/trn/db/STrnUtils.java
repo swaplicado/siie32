@@ -332,7 +332,7 @@ public abstract class STrnUtils {
                 + "WHERE d.fid_bp_r = " + idBizPartner + " AND de.b_pre_pay = 1 AND "
                 + "NOT (d.id_year = " + keyDps[0] + " AND d.id_doc = " + keyDps[1] + ") AND "
                 + (idCurrency == SLibConsts.UNDEFINED ? "" : "d.fid_cur = " + idCurrency + " AND ")
-                + "NOT d.b_del AND NOT de.b_del; ";
+                + "NOT d.b_del AND NOT de.b_del AND d.fid_st_dps = " + SModSysConsts.TRNS_ST_DPS_EMITED + "; ";
         resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next()) {
             balance = resultSet.getDouble(1);
