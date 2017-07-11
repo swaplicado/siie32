@@ -140,7 +140,7 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
         }
 
         aoKeyFields = new STableField[2];
-        aoTableColumns = new STableColumn[10];
+        aoTableColumns = new STableColumn[11];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "id_year");
@@ -154,9 +154,10 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_num", "Folio doc.", STableConstants.WIDTH_DOC_NUM);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "dps.num_ref", "Referencia doc.", STableConstants.WIDTH_DOC_NUM_REF);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "dps.dt", "Fecha doc.", STableConstants.WIDTH_DATE);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb.code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Cliente", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.id_bp", "Clave cliente", 50);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb.bpb", "Sucursal cliente", 75);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bb.bpb", "Sucursal cliente", 75);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_FLOAT, "dps.tot_cur_r", "Total mon $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cur.cur_key", "Moneda", 50);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_count_ack", "Acuses adjuntos", 50);
@@ -300,6 +301,8 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
                 }
             } else  if (setting.getType() == SFilterConstants.SETTING_FILTER_COB) {
                 sqlWhere += ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND dps.fid_cob = " + (Integer) setting.getSetting() + " ");
+            }else if (setting.getType() == SFilterConstants.SETTING_FILTER_COB) {
+                sqlWhere += ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND dps.fid_cob = " + (Integer) setting.getSetting() + " ");
             }
         }
 
@@ -307,16 +310,18 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
                 + "CONCAT(dps.num_ser, IF(length(dps.num_ser) = 0, '', '-'), dps.num) AS _num, "
                 + "dps.num_ref, "
                 + "dps.dt, "
+                + "bpb.code, "
                 + "bp.bp, "
                 + "bp.id_bp, "
-                + "bpb.bpb, "
+                + "bb.bpb, "
                 + "dps.tot_cur_r, "
                 + "cur.cur_key, "
                 + "(SELECT COUNT(*) FROM trn_dps_ack AS ack WHERE ack.fid_year = dps.id_year AND ack.fid_doc = dps.id_doc AND NOT ack.b_del) AS _count_ack "
                 + "FROM trn_dps as dps "
                 + "INNER JOIN erp.trnu_tp_dps AS tp ON dps.fid_ct_dps = tp.id_ct_dps AND dps.fid_cl_dps = tp.id_cl_dps AND dps.fid_tp_dps = tp.id_tp_dps "
                 + "INNER JOIN erp.bpsu_bp AS bp ON dps.fid_bp_r = bp.id_bp "
-                + "INNER JOIN erp.bpsu_bpb AS bpb ON dps.fid_bpb = bpb.id_bpb "
+                + "INNER JOIN erp.bpsu_bpb AS bpb ON dps.fid_cob = bpb.id_bpb "
+                + "INNER JOIN erp.bpsu_bpb AS bb ON dps.fid_bpb = bb.id_bpb "
                 + "INNER JOIN erp.cfgu_cur AS cur ON dps.fid_cur = cur.id_cur "
                 + "LEFT OUTER JOIN trn_dps_ack AS ack ON dps.id_year = ack.fid_year AND dps.id_doc = ack.fid_doc "
                 + "WHERE dps.b_del = 0 AND fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " + sqlWhere
