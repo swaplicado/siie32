@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Claudio Peña
+ * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Daniel López
  */
 public abstract class SDataConstants {
 

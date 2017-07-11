@@ -38,6 +38,7 @@ import erp.mtrn.data.SDataDiogDncDocumentNumberSeries;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsDncDocumentNumberSeries;
 import erp.mtrn.data.SDataSign;
+import erp.mtrn.form.SDialogDpsDeliveryAck;
 import erp.mtrn.form.SDialogRepBizPartnerBalanceAging;
 import erp.mtrn.form.SDialogRepContractStock;
 import erp.mtrn.form.SDialogRepDpsBizPartner;
@@ -74,7 +75,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda
+ * @author Sergio Flores, Uriel Castañeda, Daniel López
  */
 public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -140,6 +141,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiDpsWsApproved;
     private javax.swing.JMenuItem jmiDpsWsReject;
     private javax.swing.JMenuItem jmiDpsDocRemission;
+    private javax.swing.JMenu jmDpsDelAck;
+    private javax.swing.JMenuItem jmiDpsDelAckPend;
+    private javax.swing.JMenuItem jmiDpsDelAckOk;
     private javax.swing.JMenu jmDpsAdj;
     private javax.swing.JMenuItem jmiDpsAdjDoc;
     private javax.swing.JMenuItem jmiDpsAdjDocAnn;
@@ -251,6 +255,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private erp.mtrn.form.SDialogRepDpsShipmentItem moDialogRepDpsShipmentItem;
     private erp.mtrn.form.SDialogRepDpsMoves moDialogRepDpsMoves;
     private erp.mtrn.form.SFormStamp moFormStamp;
+    private erp.mtrn.form.SDialogDpsDeliveryAck moDialogDpsDeliveryAck;
 
     public SGuiModuleTrnSal(erp.client.SClientInterface client) {
         super(client, SDataConstants.MOD_SAL);
@@ -393,6 +398,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsWsApproved = new JMenuItem("Facturas aceptadas por web-service");
         jmiDpsWsReject = new JMenuItem("Facturas rechazadas por web-service");
         jmiDpsDocRemission = new JMenuItem("Facturas vs. remisiones");
+        jmDpsDelAck = new JMenu("Acuses de entrega de facturas");
+        jmiDpsDelAckPend = new JMenuItem("Acuses de entrega de facturas pendientes");
+        jmiDpsDelAckOk = new JMenuItem("Acuses de entrega de facturas listos");
         jmDps.add(jmiDpsDoc);
         jmDps.add(jmiDpsEntry);
         jmDps.add(jmiDpsEntryRef);
@@ -420,6 +428,10 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmDps.add(jmiDpsWsReject);
         jmDps.addSeparator();
         jmDps.add(jmiDpsDocRemission);
+        jmDps.addSeparator();
+        jmDpsDelAck.add(jmiDpsDelAckPend);
+        jmDpsDelAck.add(jmiDpsDelAckOk);
+        jmDps.add(jmDpsDelAck);
 
         jmDpsAdj = new JMenu("Notas crédito");
         jmiDpsAdjDoc = new JMenuItem("Notas de crédito de ventas");
@@ -691,6 +703,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsWsApproved.addActionListener(this);
         jmiDpsWsReject.addActionListener(this);
         jmiDpsDocRemission.addActionListener(this);
+        jmiDpsDelAckPend.addActionListener(this);
+        jmiDpsDelAckOk.addActionListener(this);
         jmiDpsAdjDoc.addActionListener(this);
         jmiDpsAdjDocAnn.addActionListener(this);
         jmiDpsAdjMailPending.addActionListener(this);
@@ -703,7 +717,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsDvyPendEntry.addActionListener(this);
         jmiDpsDvyDeliveredEntry.addActionListener(this);
         jmiDpsDvyDoc.addActionListener(this);
-        jmiDpsDvyEntry.addActionListener(this);
+        jmiDpsDvyEntry.addActionListener(this);        
         jmiStkDvyPend.addActionListener(this);
         jmiStkDvySupplied.addActionListener(this);
         jmiStkDvyPendEntry.addActionListener(this);
@@ -819,6 +833,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsWsApproved.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmiDpsWsReject.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmiDpsDocRemission.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
+        jmDpsDelAck.setEnabled(hasRightDnsDps);
 
         jmDpsAdj.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjDoc.setEnabled(hasRightDocTransactionAdjust);
@@ -1071,6 +1086,17 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     }
                     miForm = moFormStamp;
                     break;
+                    
+                case SDataConstants.TRN_DPS_ACK:
+                    if(moDialogDpsDeliveryAck == null) {
+                        moDialogDpsDeliveryAck = new SDialogDpsDeliveryAck(miClient);
+                    }
+                    if (pk != null) {
+                        moRegistry = new SDataDps();
+                    }
+                    miForm = moDialogDpsDeliveryAck;
+                    break;
+                    
                 default:
                     throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_FORM);
             }
@@ -1282,7 +1308,22 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     oViewClass = erp.mtrn.view.SViewBol.class;
                     sViewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_DOC) + " vs remisiones";
                     break;
-
+                    
+                case SDataConstants.TRN_DPS_ACK:
+                    oViewClass = erp.mtrn.view.SViewDpsDeliveryAck.class;
+                    sViewTitle = "VTA - Acuses " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_DOC).toLowerCase() + " ";
+                    switch (auxType02) {
+                        case SUtilConsts.PROC_PEND:
+                            sViewTitle += "pendientes";
+                            break;
+                        case SUtilConsts.PROC:
+                            sViewTitle += "listos";
+                            break;
+                        default:
+                            throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
+                    }
+                    break;
+                    
                 case SDataConstants.TRNX_PRICE_HIST:
                     oViewClass = erp.mtrn.view.SViewPriceHistory.class;
                     sViewTitle = "VTA - Historial precios";
@@ -1727,6 +1768,12 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiDpsDocRemission) {
                 showView(SDataConstants.TRNX_DOC_REMISSION, SDataConstantsSys.TRNS_CT_DPS_SAL);
+            }
+            else if(item == jmiDpsDelAckPend){
+                showView(SDataConstants.TRN_DPS_ACK, SDataConstantsSys.TRNS_CT_DPS_SAL, SUtilConsts.PROC_PEND);
+            }
+            else if(item == jmiDpsDelAckOk){
+                showView(SDataConstants.TRN_DPS_ACK, SDataConstantsSys.TRNS_CT_DPS_SAL, SUtilConsts.PROC);
             }
             else if (item == jmiDpsAdjDoc) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
