@@ -72,7 +72,7 @@ public class SDialogDpsDeliveryAck extends javax.swing.JDialog implements erp.li
         jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Agregar acuse de entrega.");
+        setTitle("Agregar acuse de entrega");
         setMinimumSize(new java.awt.Dimension(357, 186));
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
