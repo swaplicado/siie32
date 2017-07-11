@@ -3765,6 +3765,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         dps.setFkUserClosedId(SDataConstantsSys.USRX_USER_NA);
         dps.setFkUserClosedCommissionsId(SDataConstantsSys.USRX_USER_NA);
         dps.setFkUserShippedId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserDpsDeliveryAckId(SDataConstantsSys.USRX_USER_NA);
         dps.setFkUserAuditedId(SDataConstantsSys.USRX_USER_NA);
         dps.setFkUserAuthorizedId(SDataConstantsSys.USRX_USER_NA);
         dps.setFkCompanyBranchId(miClient.getSessionXXX().getCurrentCompanyBranchId());

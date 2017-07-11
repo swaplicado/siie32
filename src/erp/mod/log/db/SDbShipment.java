@@ -194,9 +194,11 @@ public class SDbShipment extends SDbRegistryUser {
         moDpsOrder.setFkDpsNatureId(miClient_xxx.getSessionXXX().getParamsCompany().getFkDpsNatureLogisticsId());
         moDpsOrder.setFkUserLinkedId(SDataConstantsSys.USRX_USER_NA);
         moDpsOrder.setFkUserClosedId(SDataConstantsSys.USRX_USER_NA);
+        moDpsOrder.setFkUserClosedCommissionsId(SDataConstantsSys.USRX_USER_NA);
+        moDpsOrder.setFkUserShippedId(SDataConstantsSys.USRX_USER_NA);
+        moDpsOrder.setFkUserDpsDeliveryAckId(SDataConstantsSys.USRX_USER_NA);
         moDpsOrder.setFkUserAuditedId(SDataConstantsSys.USRX_USER_NA);
         moDpsOrder.setFkUserAuthorizedId(SDataConstantsSys.USRX_USER_NA);
-        moDpsOrder.setFkUserShippedId(SDataConstantsSys.USRX_USER_NA);
         moDpsOrder.setFkUserNewId(session.getUser().getPkUserId());
         moDpsOrder.setFkUserEditId(SDataConstantsSys.USRX_USER_NA);
         moDpsOrder.setFkUserDeleteId(SDataConstantsSys.USRX_USER_NA);
