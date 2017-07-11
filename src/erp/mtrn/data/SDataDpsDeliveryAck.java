@@ -2,14 +2,23 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package erp.mtrn.data;
 
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
-import java.sql.CallableStatement;
+import erp.mcfg.data.SDataParamsCompany;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.ResultSet;
+import java.sql.Statement;
+import java.text.DecimalFormat;
+import java.util.Date;
+import sa.lib.SLibUtils;
+import sa.lib.db.SDbConsts;
 
 /**
  *
@@ -17,13 +26,14 @@ import java.sql.ResultSet;
  */
 public class SDataDpsDeliveryAck extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
-    protected int mnPkYearId;
-    protected int mnPkDocId;
-    protected int mnPkNotesId;
-    protected java.lang.String msNotes;
-    protected boolean mbIsAllDocs;
-    protected boolean mbIsPrintable;
+    private static final int ID_LEN = 10;
+
+    protected int mnPkDpsDeliveryAckId;
+    protected String msNameUser;
+    protected String msNameSystem;
     protected boolean mbIsDeleted;
+    protected int mnFkYearId;
+    protected int mnFkDocId;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
     protected int mnFkUserDeleteId;
@@ -31,74 +41,189 @@ public class SDataDpsDeliveryAck extends erp.lib.data.SDataRegistry implements j
     protected java.util.Date mtUserEditTs;
     protected java.util.Date mtUserDeleteTs;
 
-    protected java.lang.String msDbmsUserNew;
-    protected java.lang.String msDbmsUserEdit;
-    protected java.lang.String msDbmsUserDelete;
+    protected java.io.File moAuxFile;
+    protected java.lang.String msAuxPrefix;
 
     public SDataDpsDeliveryAck() {
         super(SDataConstants.TRN_DPS_ACK);
         reset();
     }
 
-    public void setPkYearId(int n) { mnPkYearId = n; }
-    public void setPkDocId(int n) { mnPkDocId = n; }
-    public void setPkNotesId(int n) { mnPkNotesId = n; }
-    public void setNotes(java.lang.String s) { msNotes = s; }
-    public void setIsAllDocs(boolean b) { mbIsAllDocs = b; }
-    public void setIsPrintable(boolean b) { mbIsPrintable = b; }
-    public void setIsDeleted(boolean b) { mbIsDeleted = b; }
-    public void setFkUserNewId(int n) { mnFkUserNewId = n; }
-    public void setFkUserEditId(int n) { mnFkUserEditId = n; }
-    public void setFkUserDeleteId(int n) { mnFkUserDeleteId = n; }
-    public void setUserNewTs(java.util.Date t) { mtUserNewTs = t; }
-    public void setUserEditTs(java.util.Date t) { mtUserEditTs = t; }
-    public void setUserDeleteTs(java.util.Date t) { mtUserDeleteTs = t; }
+    /*
+     * Private methods
+     */
+    
+    private void composeFileName() {
+        DecimalFormat format = new DecimalFormat(SLibUtils.textRepeat("0", ID_LEN));
+        msNameUser = moAuxFile.getName();
+        msNameSystem = msAuxPrefix + "_" + format.format(mnPkDpsDeliveryAckId) + "_" + msNameUser;
+    }
+    
+    private void saveFile(final String path, final String fileName) throws Exception {
+        if (moAuxFile == null) {
+            throw new Exception("El archivo no ha sido proporcionado.");
+        }
+        else {
+            int length = 0;
+            byte[] buffer = new byte[1024];
+            InputStream is = new FileInputStream(moAuxFile);
+            OutputStream os = new FileOutputStream(path + "/" + fileName); 
+            while ((length = is.read(buffer)) > 0) {
+                os.write(buffer, 0, length);
+            }
+            
+            is.close();
+            os.close();
+        }
+    }
+    
+    /*
+     * Public methods
+     */
+    
+    public void setPkDpsDeliveryAckId(int n) { mnPkDpsDeliveryAckId = n; }
 
-    public int getPkYearId() { return mnPkYearId; }
-    public int getPkDocId() { return mnPkDocId; }
-    public int getPkNotesId() { return mnPkNotesId; }
-    public java.lang.String getNotes() { return msNotes; }
-    public boolean getIsAllDocs() { return mbIsAllDocs; }
-    public boolean getIsPrintable() { return mbIsPrintable; }
-    public boolean getIsDeleted() { return mbIsDeleted; }
-    public int getFkUserNewId() { return mnFkUserNewId; }
-    public int getFkUserEditId() { return mnFkUserEditId; }
-    public int getFkUserDeleteId() { return mnFkUserDeleteId; }
-    public java.util.Date getUserNewTs() { return mtUserNewTs; }
-    public java.util.Date getUserEditTs() { return mtUserEditTs; }
-    public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
+    public void setNameUser(java.lang.String s) {
+        msNameUser = s;
+    }
 
-    public void setDbmsUserNew(java.lang.String s) { msDbmsUserNew = s; }
-    public void setDbmsUserEdit(java.lang.String s) { msDbmsUserEdit = s; }
-    public void setDbmsUserDelete(java.lang.String s) { msDbmsUserDelete = s; }
+    public void setNameSystem(java.lang.String s) {
+        msNameSystem = s;
+    }
 
-    public java.lang.String getDbmsUserNew() { return msDbmsUserNew; }
-    public java.lang.String getDbmsUserEdit() { return msDbmsUserEdit; }
-    public java.lang.String getDbmsUserDelete() { return msDbmsUserDelete; }
+    public void setIsDeleted(boolean b) {
+        mbIsDeleted = b;
+    }
+
+    public void setFkYearId(int n) {
+        mnFkYearId = n;
+    }
+
+    public void setFkDocId(int n) {
+        mnFkDocId = n;
+    }
+
+    public void setFkUserNewId(int n) {
+        mnFkUserNewId = n;
+    }
+
+    public void setFkUserEditId(int n) {
+        mnFkUserEditId = n;
+    }
+
+    public void setFkUserDeleteId(int n) {
+        mnFkUserDeleteId = n;
+    }
+
+    public void setUserNewTs(java.util.Date t) {
+        mtUserNewTs = t;
+    }
+
+    public void setUserEditTs(java.util.Date t) {
+        mtUserEditTs = t;
+    }
+
+    public void setUserDeleteTs(java.util.Date t) {
+        mtUserDeleteTs = t;
+    }
+
+    public int getPkDpsDeliveryAckId() {
+        return mnPkDpsDeliveryAckId;
+    }
+
+    public java.lang.String getNameUser() {
+        return msNameUser;
+    }
+
+    public java.lang.String getNameSystem() {
+        return msNameSystem;
+    }
+
+    public boolean getIsDeleted() {
+        return mbIsDeleted;
+    }
+
+    public int getFkYearId() {
+        return mnFkYearId;
+    }
+
+    public int getFkDocId() {
+        return mnFkDocId;
+    }
+
+    public int getFkUserNewId() {
+        return mnFkUserNewId;
+    }
+
+    public int getFkUserEditId() {
+        return mnFkUserEditId;
+    }
+
+    public int getFkUserDeleteId() {
+        return mnFkUserDeleteId;
+    }
+
+    public java.util.Date getUserNewTs() {
+        return mtUserNewTs;
+    }
+
+    public java.util.Date getUserEditTs() {
+        return mtUserEditTs;
+    }
+
+    public java.util.Date getUserDeleteTs() {
+        return mtUserDeleteTs;
+    }
+
+    public void setAuxFile(File o) {
+        moAuxFile = o;
+    }
+
+    public void setAuxPrefix(java.lang.String s) {
+        msAuxPrefix = s;
+    }
+
+    public File getAuxFile() {
+        return moAuxFile;
+    }
+
+    public java.lang.String getAuxPrefix() {
+        return msAuxPrefix;
+    }
+
+    public void saveFileSystemPath() throws Exception {
+        composeFileName();
+        saveFile(SDataParamsCompany.FILES_DIR + "/", msNameSystem);
+    }
+    
+    public void saveFileCustomPath(final String customPath) throws Exception {
+        saveFile(customPath, msNameUser);
+    }
+    
+    public File createFileFromSystemPath() {
+        return new File(SDataParamsCompany.FILES_DIR + "/", msNameSystem);
+    }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
-        mnPkYearId = ((int[]) pk)[0];
-        mnPkDocId = ((int[]) pk)[1];
-        mnPkNotesId = ((int[]) pk)[2];
+        mnPkDpsDeliveryAckId = ((int[]) pk)[0];
     }
 
     @Override
     public java.lang.Object getPrimaryKey() {
-        return new int[] { mnPkYearId, mnPkDocId, mnPkNotesId };
+        return new int[] { mnPkDpsDeliveryAckId };
     }
 
     @Override
     public void reset() {
         super.resetRegistry();
 
-        mnPkYearId = 0;
-        mnPkDocId = 0;
-        mnPkNotesId = 0;
-        msNotes = "";
-        mbIsAllDocs = false;
-        mbIsPrintable = false;
+        mnPkDpsDeliveryAckId = 0;
+        msNameUser = "";
+        msNameSystem = "";
         mbIsDeleted = false;
+        mnFkYearId = 0;
+        mnFkDocId = 0;
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
         mnFkUserDeleteId = 0;
@@ -106,9 +231,8 @@ public class SDataDpsDeliveryAck extends erp.lib.data.SDataRegistry implements j
         mtUserEditTs = null;
         mtUserDeleteTs = null;
 
-        msDbmsUserNew = "";
-        msDbmsUserEdit = "";
-        msDbmsUserDelete = "";
+        moAuxFile = null;
+        msAuxPrefix = "";
     }
 
     @Override
@@ -121,47 +245,33 @@ public class SDataDpsDeliveryAck extends erp.lib.data.SDataRegistry implements j
         reset();
 
         try {
-            sql = "SELECT n.*, un.usr, ue.usr, ud.usr " +
-                    "FROM trn_dps_nts AS n " +
-                    "INNER JOIN erp.usru_usr AS un ON " +
-                    "n.fid_usr_new = un.id_usr " +
-                    "INNER JOIN erp.usru_usr AS ue ON " +
-                    "n.fid_usr_new = ue.id_usr " +
-                    "INNER JOIN erp.usru_usr AS ud ON " +
-                    "n.fid_usr_new = ud.id_usr " +
-                    "WHERE n.id_year = " + key[0] + " AND n.id_doc = " + key[1] + " AND n.id_nts = " + key[2] +  " ";
+            sql = "SELECT * "
+                    + "FROM trn_dps_ack "
+                    + "WHERE id_dps_ack = " + key[0] + " ";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
             }
             else {
-                mnPkYearId = resultSet.getInt("n.id_year");
-                mnPkDocId = resultSet.getInt("n.id_doc");
-                mnPkNotesId = resultSet.getInt("n.id_nts");
-                msNotes = resultSet.getString("n.nts");
-                mbIsAllDocs = resultSet.getBoolean("n.b_all");
-                mbIsPrintable = resultSet.getBoolean("n.b_prt");
-                mbIsDeleted = resultSet.getBoolean("n.b_del");
-                mnFkUserNewId = resultSet.getInt("n.fid_usr_new");
-                mnFkUserEditId = resultSet.getInt("n.fid_usr_edit");
-                mnFkUserDeleteId = resultSet.getInt("n.fid_usr_del");
-                mtUserNewTs = resultSet.getTimestamp("n.ts_new");
-                mtUserEditTs = resultSet.getTimestamp("n.ts_edit");
-                mtUserDeleteTs = resultSet.getTimestamp("n.ts_del");
+                mnPkDpsDeliveryAckId = resultSet.getInt("id_dps_ack");
+                mnFkYearId = resultSet.getInt("fid_year");
+                mnFkDocId = resultSet.getInt("fid_doc");
+                msNameUser = resultSet.getString("name_usr");
+                msNameSystem = resultSet.getString("name_sys");
+                mbIsDeleted = resultSet.getBoolean("b_del");
+                mnFkUserNewId = resultSet.getInt("fid_usr_new");
+                mnFkUserEditId = resultSet.getInt("fid_usr_edit");
+                mnFkUserDeleteId = resultSet.getInt("fid_usr_del");
+                mtUserNewTs = resultSet.getTimestamp("ts_new");
+                mtUserEditTs = resultSet.getTimestamp("ts_edit");
+                mtUserDeleteTs = resultSet.getTimestamp("ts_del");
 
-                msDbmsUserNew = resultSet.getString("un.usr");
-                msDbmsUserEdit = resultSet.getString("ue.usr");
-                msDbmsUserDelete = resultSet.getString("ud.usr");
-
-                mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
             }
-        }
-        catch (java.sql.SQLException e) {
+        } catch (java.sql.SQLException e) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_READ_ERROR;
             SLibUtilities.printOutException(this, e);
-        }
-        catch (java.lang.Exception e) {
+        } catch (java.lang.Exception e) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_READ_ERROR;
             SLibUtilities.printOutException(this, e);
         }
@@ -171,41 +281,47 @@ public class SDataDpsDeliveryAck extends erp.lib.data.SDataRegistry implements j
 
     @Override
     public int save(java.sql.Connection connection) {
-        int nParam = 1;
-        CallableStatement callableStatement = null;
+        String sql = "";
+        Statement statement = null;
+        ResultSet resultSet = null;
 
-        mnLastDbActionResult = SLibConstants.UNDEFINED;
+        mnLastDbActionResult = SDbConsts.SAVE_ERROR;
 
         try {
-            callableStatement = connection.prepareCall(
-                    "{ CALL trn_dps_nts_save(" +
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
-            callableStatement.setInt(nParam++, mnPkYearId);
-            callableStatement.setInt(nParam++, mnPkDocId);
-            callableStatement.setInt(nParam++, mnPkNotesId);
-            callableStatement.setString(nParam++, msNotes);
-            callableStatement.setBoolean(nParam++, mbIsAllDocs);
-            callableStatement.setBoolean(nParam++, mbIsPrintable);
-            callableStatement.setBoolean(nParam++, mbIsDeleted);
-            callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
-            callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
-            callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
-            callableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);
-            callableStatement.execute();
+            statement = connection.createStatement();
 
-            mnPkNotesId = callableStatement.getInt(nParam - 3);
-            mnDbmsErrorId = callableStatement.getInt(nParam - 2);
-            msDbmsError = callableStatement.getString(nParam - 1);
+                mnPkDpsDeliveryAckId = 0;
+                mbIsDeleted = false;
+                mnFkUserEditId = 1;
+                mnFkUserDeleteId = 1;
 
-            if (mnDbmsErrorId != 0) {
-                throw new Exception(msDbmsError);
-            }
-            else {
-                mbIsRegistryNew = false;
-                mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
-            }
-        }
-        catch (java.lang.Exception e) {
+                sql = "SELECT COALESCE(MAX(id_dps_ack), 0) + 1 FROM trn_dps_ack ";
+                resultSet = statement.executeQuery(sql);
+                if (resultSet.next()) {
+                    mnPkDpsDeliveryAckId = resultSet.getInt(1);
+                }
+
+                saveFileSystemPath();
+
+                sql = "INSERT INTO trn_dps_ack VALUES ("
+                        + mnPkDpsDeliveryAckId + ", "
+                        + "'" + msNameUser + "', "
+                        + "'" + msNameSystem + "', "
+                        + mbIsDeleted + ", "
+                        + mnFkYearId + ", "
+                        + mnFkDocId + ", "
+                        + mnFkUserNewId + ", "
+                        + mnFkUserEditId + ", "
+                        + mnFkUserDeleteId + ", "
+                        + "NOW(), "
+                        + "NOW(), "
+                        + "NOW()"
+                        + ")";
+
+            statement.execute(sql);
+
+            mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
+        } catch (java.lang.Exception e) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
             SLibUtilities.printOutException(this, e);
         }
@@ -214,7 +330,7 @@ public class SDataDpsDeliveryAck extends erp.lib.data.SDataRegistry implements j
     }
 
     @Override
-    public java.util.Date getLastDbUpdate() {
+    public Date getLastDbUpdate() {
         return mtUserEditTs;
     }
 }
