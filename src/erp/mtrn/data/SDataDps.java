@@ -251,6 +251,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected java.lang.Object moAuxFormerRecordKey;
     protected erp.mtrn.data.SCfdParams moAuxCfdParams;
     protected boolean mbAuxIsNeedCfd;
+    protected boolean mbAuxIsNeedCfdCce;
     protected boolean mbAuxIsValidate;
 
     protected erp.mfin.data.SDataBookkeepingNumber moDbmsDataBookkeepingNumber;
@@ -1743,6 +1744,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxFormerRecordKey(java.lang.Object o) { moAuxFormerRecordKey = o; }
     public void setAuxCfdParams(erp.mtrn.data.SCfdParams o) { moAuxCfdParams = o; }
     public void setAuxIsNeedCfd(boolean b) { mbAuxIsNeedCfd = b; }
+    public void setAuxIsNeedCfdCce(boolean b) { mbAuxIsNeedCfdCce = b; }
     public void setAuxIsValidate(boolean b) { mbAuxIsValidate = b; }
 
     public void setDbmsDataBookkeepingNumber(erp.mfin.data.SDataBookkeepingNumber o) { moDbmsDataBookkeepingNumber = o; }
@@ -1775,6 +1777,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public java.lang.Object getAuxFormerRecordKey() { return moAuxFormerRecordKey; }
     public erp.mtrn.data.SCfdParams getAuxCfdParams() { return moAuxCfdParams; }
     public boolean getAuxIsNeedCfd() { return mbAuxIsNeedCfd; }
+    public boolean getAuxIsNeedCfdCce() { return mbAuxIsNeedCfdCce; }
     public boolean getAuxIsValidate() { return mbAuxIsValidate; }
 
     public erp.mfin.data.SDataBookkeepingNumber getDbmsDataBookkeepingNumber() { return moDbmsDataBookkeepingNumber; }
@@ -1973,6 +1976,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         moAuxFormerRecordKey = null;
         moAuxCfdParams = null;
         mbAuxIsNeedCfd = false;
+        mbAuxIsNeedCfdCce = false;
 
         moDbmsDataBookkeepingNumber = null;
         moDbmsDataCfd = null;
@@ -4738,7 +4742,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         DElement complemento = null;
         
         try {
-            if (!msXtaCfdCceOperationType.isEmpty()) {
+            if (mbAuxIsNeedCfdCce && !msXtaCfdCceOperationType.isEmpty()) {
                 complemento = new cfd.ver32.DElementComplemento();
                 
                 ((cfd.ver32.DElementComplemento) complemento).getElements().add(createCfdiElementComercioExterior11());

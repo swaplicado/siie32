@@ -187,6 +187,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.lib.form.SFormField moFieldFileXml;
     private erp.lib.form.SFormField moFieldFkCfdUseId;
     private erp.lib.form.SFormField moFieldCfdConfirmationNumber;
+    private erp.lib.form.SFormField moFieldCfdCceApplies;
     private erp.lib.form.SFormField moFieldCfdCceReasonTransfer;
     private erp.lib.form.SFormField moFieldCfdCceOperationType;
     private erp.lib.form.SFormField moFieldCfdCceNumberImportRequest;
@@ -610,6 +611,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpInternationalTrade = new javax.swing.JPanel();
         jPanel109 = new javax.swing.JPanel();
         jPanel97 = new javax.swing.JPanel();
+        jPanel111 = new javax.swing.JPanel();
+        jckCfdCceApplies = new javax.swing.JCheckBox();
         jPanel98 = new javax.swing.JPanel();
         jlCfdCceReasonTransfer = new javax.swing.JLabel();
         jcbCfdCceReasonTransfer = new javax.swing.JComboBox<SFormComponentItem>();
@@ -2186,7 +2189,16 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel109.setLayout(new java.awt.BorderLayout());
 
-        jPanel97.setLayout(new java.awt.GridLayout(6, 1, 0, 2));
+        jPanel97.setLayout(new java.awt.GridLayout(7, 1, 0, 2));
+
+        jPanel111.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel111.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jckCfdCceApplies.setText("Incorporar complemento comercio exterior");
+        jckCfdCceApplies.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel111.add(jckCfdCceApplies);
+
+        jPanel97.add(jPanel111);
 
         jPanel98.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel98.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
@@ -2512,6 +2524,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         
         // international commerce fields:
         
+        moFieldCfdCceApplies = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckCfdCceApplies);
+        moFieldCfdCceApplies.setTabbedPaneIndex(TAB_INT, jTabbedPane);
         moFieldCfdCceReasonTransfer = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdCceReasonTransfer, jlCfdCceReasonTransfer);
         moFieldCfdCceReasonTransfer.setTabbedPaneIndex(TAB_INT, jTabbedPane);
         moFieldCfdCceOperationType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbCfdCceOperationType, jlCfdCceOperationType);
@@ -2987,6 +3001,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         boolean enableFields = enable && isCfdRequired() && isBizPartnerInt();
         boolean isCurrencyUsd = jcbFkCurrencyId.getSelectedIndex() > 0 && moFieldFkCurrencyId.getKeyAsIntArray()[0] == SModSysConsts.CFGU_CUR_USD;
         
+        jckCfdCceApplies.setEnabled(enableFields);
+        jckCfdCceApplies.setSelected(enableFields); // selection does not belongs to here, please move this to other better place ASAP!!!
         jcbCfdCceReasonTransfer.setEnabled(enableFields);
         jcbCfdCceOperationType.setEnabled(enableFields);
         jcbCfdCceNumberImportRequest.setEnabled(enableFields);
@@ -7102,6 +7118,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JPanel jPanel109;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel110;
+    private javax.swing.JPanel jPanel111;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
@@ -7262,6 +7279,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JComboBox<SFormComponentItem> jcbPaymentAccount;
     private javax.swing.JComboBox jcbPlate;
     private javax.swing.JComboBox<SFormComponentItem> jcbTaxRegionId;
+    private javax.swing.JCheckBox jckCfdCceApplies;
     private javax.swing.JCheckBox jckDateDoc;
     private javax.swing.JCheckBox jckDateStartCredit;
     private javax.swing.JCheckBox jckIsAudited;
@@ -8020,7 +8038,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
 
             if (!validation.getIsError()) {
-                if (isCfdRequired() && jcbCfdCceReasonTransfer.isEnabled()) {
+                if (isCfdRequired() && jcbCfdCceOperationType.isEnabled()) {
                     if (moFieldCfdCceCertificateOrigin.getInteger() == 1 && moFieldCfdCceNumberCertificateOrigin.getString().isEmpty()) {
                          validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCfdCceNumberCertificateOrigin.getText() + "'.");
                         jTabbedPane.setSelectedIndex(TAB_INT);
@@ -8041,7 +8059,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
             
             if (!validation.getIsError()) {
-                if (moFieldFkIncotermId.getKeyAsIntArray()[0] != SModSysConsts.LOGS_INC_NA) {
+                if (moFieldFkIncotermId.getKeyAsIntArray()[0] == SModSysConsts.LOGS_INC_NA) {
+                    if (jcbCfdCceOperationType.isEnabled()) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkIncotermId.getText() + "'.");
+                        validation.setComponent(jcbFkIncotermId);
+                        jTabbedPane.setSelectedIndex(1);
+                    }
+                }
+                else {
                     if (jcbFkSpotSrcId_n.getSelectedIndex() <= 0) {
                         validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkSpotSrcId_n.getText() + "'.");
                         validation.setComponent(jcbFkSpotSrcId_n);
@@ -8079,13 +8104,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                 break;
                             default:
                         }
-                    }
-                }
-                else {
-                    if (jcbCfdCceReasonTransfer.isEnabled()) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkIncotermId.getText() + "'.");
-                        validation.setComponent(jcbFkIncotermId);
-                        jTabbedPane.setSelectedIndex(1);
                     }
                 }
             }
@@ -8671,6 +8689,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
         else {
             moDps.setAuxIsNeedCfd(true);
+            moDps.setAuxIsNeedCfdCce(jckCfdCceApplies.isSelected());
             moDps.setApprovalYear(mnNumbersApprovalYear);
             moDps.setApprovalNumber(mnNumbersApprovalNumber);
             moDps.setAuxCfdParams(createCfdParams());
