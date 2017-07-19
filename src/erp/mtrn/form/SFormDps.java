@@ -6084,7 +6084,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
                                                 entry.setSurplusPercentage(0);
                                                 entry.setSortingPosition(0);
+                                                entry.setIsPrepayment(dpsSourceEntry.getIsPrepayment());
                                                 entry.setIsTaxesAutomaticApplying(true);
+                                                //entry.setIsPriceVariable(...);
+                                                //entry.setIsPriceConfirm(...);
                                                 entry.setIsInventoriable(dpsSourceEntry.getIsInventoriable());
                                                 entry.setIsDeleted(false);
                                                 entry.setFkItemId(dpsSourceEntry.getFkItemId());
@@ -8206,7 +8209,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
                    for (SDataDpsEntryPrice price : ((SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData()).getDbmsEntryPrices()) {
                         if (!price.getIsDeleted()) {
-                            totalDeliveryMonths ++;
+                            totalDeliveryMonths++;
                         }
                    }
                    if (totalDeliveryMonths != months) {
