@@ -121,7 +121,6 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
     private erp.lib.table.STableCellEditorOptions moTableCellEditorOptions;
     private erp.lib.table.STableCellEditorOptions moTableCellAgreementReference;
 
-    private SLayoutBankRow moRow;
     private Vector<SLayoutBankRow> mvLayoutRows;
     private ArrayList<SGuiItem> maBankLayoutTypes;
     private JButton jbExchangeRateReset;
@@ -137,7 +136,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
     private erp.mfin.data.SDataAccountCash moDataAccountCash;
     private erp.mfin.form.SDialogRecordPicker moDialogRecordPicker;
     private erp.mfin.data.SDataRecord moCurrentRecord;
-    protected ArrayList<SLayoutBankRecord> maBankRecords;
+    private ArrayList<SLayoutBankRecord> maBankRecords;
     private SGridPaneForm moGridPayments;
     
     private HashMap<Integer, Object> moParamsMap;
@@ -478,7 +477,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
         jtfLayoutPath.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel17.add(jtfLayoutPath);
 
-        jbPickLayoutPath.setIcon(new javax.swing.ImageIcon("C:\\Users\\USER\\Documents\\NetBeansProjects\\siie32\\src\\erp\\img\\icon_std_save.gif")); // NOI18N
+        jbPickLayoutPath.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif"))); // NOI18N
         jbPickLayoutPath.setToolTipText("Seleccionar ruta de archivo layout...");
         jbPickLayoutPath.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel17.add(jbPickLayoutPath);
@@ -983,7 +982,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
     }
 
     @SuppressWarnings("unchecked")
-    private void renderBankAccountCredit(int nBizPartnerBranch, int nBankId) {
+    private void renderBankAccountCredit(SLayoutBankRow oRow, int nBizPartnerBranch, int nBankId) {
         String sql = "";
         ResultSet resultSet = null;
         Statement statementAux;
@@ -1057,9 +1056,9 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                     if (resultSet.getInt("f_tp_pay") == mnBankPaymentType && resultSet.getInt("f_tp_lay") == mnBankLayoutType) {
                         oAccountCreditAux.add(accountCredit);
                     }
-                    moRow.getCodeBankAccountCredits().put(mnBankPaymentType != SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? resultSet.getString("b.acc_num_std") : resultSet.getString("b.acc_num"),
+                    oRow.getCodeBankAccountCredits().put(mnBankPaymentType != SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? resultSet.getString("b.acc_num_std") : resultSet.getString("b.acc_num"),
                                                     mnLayoutBank == SFinConsts.LAY_BANK_BANBAJIO ? resultSet.getString("bp.code_bank_baj") : resultSet.getString("bp.code_bank_san"));
-                    moRow.getAliasBankAccountCredits().put(mnBankPaymentType != SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? resultSet.getString("b.acc_num_std") : resultSet.getString("b.acc_num"), resultSet.getString("b.alias_baj"));
+                    oRow.getAliasBankAccountCredits().put(mnBankPaymentType != SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? resultSet.getString("b.acc_num_std") : resultSet.getString("b.acc_num"), resultSet.getString("b.alias_baj"));
 
                     bizPartnerBranchBankAccount = (SDataBizPartnerBranchBankAccount) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.BPSU_BANK_ACC, new int[] { idBpb, idBpbBankAcc }, SLibConstants.EXEC_MODE_SILENT); 
 
@@ -2388,56 +2387,56 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
             sql = createSqlQuery();
             resulSet = miClient.getSession().getStatement().executeQuery(sql);
             while (resulSet.next()) {
-                moRow = new SLayoutBankRow(miClient);
-                moRow.setLayoutRowType(SModSysConsts.FIN_LAY_BANK_DPS);
-                moRow.setLayoutRowSubType(mnBankPaymentType);
-                moRow.setPkYearId(resulSet.getInt("id_year"));
-                moRow.setPkDocId(resulSet.getInt("id_doc"));
-                moRow.setBizPartnerId(resulSet.getInt("id_bp"));
-                moRow.setBizPartner(resulSet.getString("bp"));
-                moRow.setBizPartnerCreditFiscalId(resulSet.getString("fiscal_id"));
-                moRow.setBizPartnerBranch(resulSet.getString("bpb"));
-                moRow.setTypeDps(resulSet.getString("code"));
-                moRow.setNumberSer(resulSet.getString("f_num"));
-                moRow.setDate(resulSet.getDate("dt"));
-                moRow.setBizPartnerBranchCob(resulSet.getString("cob_code"));
-                moRow.setSubTotal(resulSet.getDouble("f_stot_cur"));
-                moRow.setTaxCharged(resulSet.getDouble("f_tax_cur"));
-                moRow.setTaxRetained(resulSet.getDouble("f_ret_cur"));
-                moRow.setTotal(resulSet.getDouble("f_tot_cur"));
-                moRow.setBalance(new SMoney(resulSet.getDouble("f_bal_cur"), resulSet.getInt("f_id_cur"), resulSet.getDouble("f_ext_rate"),((int []) miClient.getSession().getSessionCustom().getLocalCurrencyKey())[0] ));
-                moRow.setBalanceTot(new SMoney(0, resulSet.getInt("f_id_cur"), moKeyBankCurrency.getValue()[0] == moKeyDpsCurrency.getValue()[0] ? 1 : 0, ((int []) miClient.getSession().getSessionCustom().getLocalCurrencyKey())[0] ));
-                moRow.setBalanceTotByBizPartner(0);
-                moRow.setCurrencyKey((moKeyBankCurrency.getValue().length == 0 ? SDataReadDescriptions.getCatalogueDescription(((SClientInterface) miClient), SDataConstants.CFGU_CUR, miClient.getSession().getSessionCustom().getLocalCurrencyKey(), SLibConstants.DESCRIPTION_CODE) : SDataReadDescriptions.getCatalogueDescription(((SClientInterface) miClient), SDataConstants.CFGU_CUR, moKeyBankCurrency.getValue(), SLibConstants.DESCRIPTION_CODE)));
-                moRow.setCurrencyKeyCy(resulSet.getString("cur_key"));
-                moRow.setTotalVat(resulSet.getDouble("f_iva_cur"));
-                moRow.setDateMaturityRo(resulSet.getDate("dt_mat"));
-                moRow.setCurrencyId(mnDpsCurrency);
-                renderBankAccountCredit(resulSet.getInt("fid_bpb"), mnBizPartnerBank);
+                SLayoutBankRow oRow = new SLayoutBankRow(miClient);
+                oRow.setLayoutRowType(SModSysConsts.FIN_LAY_BANK_DPS);
+                oRow.setLayoutRowSubType(mnBankPaymentType);
+                oRow.setPkYearId(resulSet.getInt("id_year"));
+                oRow.setPkDocId(resulSet.getInt("id_doc"));
+                oRow.setBizPartnerId(resulSet.getInt("id_bp"));
+                oRow.setBizPartner(resulSet.getString("bp"));
+                oRow.setBizPartnerCreditFiscalId(resulSet.getString("fiscal_id"));
+                oRow.setBizPartnerBranch(resulSet.getString("bpb"));
+                oRow.setTypeDps(resulSet.getString("code"));
+                oRow.setNumberSer(resulSet.getString("f_num"));
+                oRow.setDate(resulSet.getDate("dt"));
+                oRow.setBizPartnerBranchCob(resulSet.getString("cob_code"));
+                oRow.setSubTotal(resulSet.getDouble("f_stot_cur"));
+                oRow.setTaxCharged(resulSet.getDouble("f_tax_cur"));
+                oRow.setTaxRetained(resulSet.getDouble("f_ret_cur"));
+                oRow.setTotal(resulSet.getDouble("f_tot_cur"));
+                oRow.setBalance(new SMoney(resulSet.getDouble("f_bal_cur"), resulSet.getInt("f_id_cur"), resulSet.getDouble("f_ext_rate"),((int []) miClient.getSession().getSessionCustom().getLocalCurrencyKey())[0] ));
+                oRow.setBalanceTot(new SMoney(0, resulSet.getInt("f_id_cur"), moKeyBankCurrency.getValue()[0] == moKeyDpsCurrency.getValue()[0] ? 1 : 0, ((int []) miClient.getSession().getSessionCustom().getLocalCurrencyKey())[0] ));
+                oRow.setBalanceTotByBizPartner(0);
+                oRow.setCurrencyKey((moKeyBankCurrency.getValue().length == 0 ? SDataReadDescriptions.getCatalogueDescription(((SClientInterface) miClient), SDataConstants.CFGU_CUR, miClient.getSession().getSessionCustom().getLocalCurrencyKey(), SLibConstants.DESCRIPTION_CODE) : SDataReadDescriptions.getCatalogueDescription(((SClientInterface) miClient), SDataConstants.CFGU_CUR, moKeyBankCurrency.getValue(), SLibConstants.DESCRIPTION_CODE)));
+                oRow.setCurrencyKeyCy(resulSet.getString("cur_key"));
+                oRow.setTotalVat(resulSet.getDouble("f_iva_cur"));
+                oRow.setDateMaturityRo(resulSet.getDate("dt_mat"));
+                oRow.setCurrencyId(mnDpsCurrency);
+                renderBankAccountCredit(oRow, resulSet.getInt("fid_bpb"), mnBizPartnerBank);
                 renderBizPartner(miClient.getSession().getConfigCompany().getCompanyId());
-                moRow.setAccountCredit(msAccountCredit);
-                moRow.setAgreement(msAgreement);
-                moRow.setAgreementReference(msAgreementReference);
-                moRow.setConceptCie(msConceptCie);
-                moRow.setEmail(resulSet.getString("email_01"));
-                moRow.setCf(0);
-                moRow.setApply(1);
-                moRow.setAccountDebit(moDataBizPartnerBranchBankAccount.getBankAccountNumber());
-                moRow.setBizPartnerDebitFiscalId(msDebitFiscalId);
-                moRow.setIsForPayment(false);
-                moRow.setIsToPayed(false);
-                moRow.setReference(resulSet.getString("f_num"));
-                moRow.setAccType("CLA");
-                moRow.setConcept(moTextConcept.getValue());
-                moRow.setDescription(moTextConcept.getValue());
-                moRow.setObservations("");
+                oRow.setAccountCredit(msAccountCredit);
+                oRow.setAgreement(msAgreement);
+                oRow.setAgreementReference(msAgreementReference);
+                oRow.setConceptCie(msConceptCie);
+                oRow.setEmail(resulSet.getString("email_01"));
+                oRow.setCf(0);
+                oRow.setApply(1);
+                oRow.setAccountDebit(moDataBizPartnerBranchBankAccount.getBankAccountNumber());
+                oRow.setBizPartnerDebitFiscalId(msDebitFiscalId);
+                oRow.setIsForPayment(false);
+                oRow.setIsToPayed(false);
+                oRow.setReference(resulSet.getString("f_num"));//Alpha
+                oRow.setAccType("CLA");
+                oRow.setConcept(moTextConcept.getValue());
+                oRow.setDescription(moTextConcept.getValue());
+                oRow.setObservations("");
                 
-                moRow.getAccountCredits().addAll(maAccountCredit);
-                moRow.getAgreementsReferences().addAll(maAgreementsReference);
-                moRow.getBranchBankAccountCredits().addAll(maBranchBankAccountsCredit);
+                oRow.getAccountCredits().addAll(maAccountCredit);
+                oRow.getAgreementsReferences().addAll(maAgreementsReference);
+                oRow.getBranchBankAccountCredits().addAll(maBranchBankAccountsCredit);
                 
                 if (moDateDateDue.getValue().equals(resulSet.getDate("dt_mat")) && maBranchBankAccountsCredit.size() > 0) {
-                    rows.add(moRow);
+                    rows.add(oRow);
                     mltAccountCredit.add(maAccountCredit);
                 }
                 if (moDateDateDue.getValue().equals(resulSet.getDate("dt_mat")) && !maAgreements.isEmpty()) {
@@ -2447,7 +2446,7 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
                     mltAgreementReference.add(mhAgreeAgreeRef.get(msAgreement));
                 }
                 
-                mvLayoutRows.add(moRow);
+                mvLayoutRows.add(oRow);
             }
             moGridPayments.populateGrid(rows);
             moGridPayments.createGridColumns();
@@ -2498,47 +2497,47 @@ public class SFormLayoutBank extends SBeanForm implements ActionListener, ItemLi
 
             resulSet = miClient.getSession().getStatement().executeQuery(sql);
             while (resulSet.next()) {
-                moRow = new SLayoutBankRow(miClient);
+                SLayoutBankRow oRow = new SLayoutBankRow(miClient);
 
-                moRow.setLayoutRowType(SModSysConsts.FIN_LAY_BANK_ADV);
-                moRow.setBizPartnerId(resulSet.getInt("id_bp"));
-                moRow.setBizPartner(resulSet.getString("bp"));
-                moRow.setBizPartnerKey(resulSet.getString("bp_key"));
-                moRow.setBizPartnerCreditFiscalId(resulSet.getString("fiscal_id"));
-                moRow.setBalanceTot(new SMoney(0d, 0));
-                moRow.setBalanceTotByBizPartner(0);
-                moRow.setCurrencyKey(resulSet.getString("_cur"));
-                moRow.setCurrencyId(mnDpsCurrency);
+                oRow.setLayoutRowType(SModSysConsts.FIN_LAY_BANK_ADV);
+                oRow.setBizPartnerId(resulSet.getInt("id_bp"));
+                oRow.setBizPartner(resulSet.getString("bp"));
+                oRow.setBizPartnerKey(resulSet.getString("bp_key"));
+                oRow.setBizPartnerCreditFiscalId(resulSet.getString("fiscal_id"));
+                oRow.setBalanceTot(new SMoney(0d, 0));
+                oRow.setBalanceTotByBizPartner(0);
+                oRow.setCurrencyKey(resulSet.getString("_cur"));
+                oRow.setCurrencyId(mnDpsCurrency);
                 renderBizPartner(miClient.getSession().getConfigCompany().getCompanyId());
-                renderBankAccountCredit(resulSet.getInt("id_bpb"), mnBizPartnerBank);
-                moRow.setAgreement(msAgreement);
-                moRow.setAgreementReference(msAgreementReference);
-                moRow.setConceptCie(msConceptCie);
-                moRow.setEmail(resulSet.getString("email_01"));
+                renderBankAccountCredit(oRow, resulSet.getInt("id_bpb"), mnBizPartnerBank);
+                oRow.setAgreement(msAgreement);
+                oRow.setAgreementReference(msAgreementReference);
+                oRow.setConceptCie(msConceptCie);
+                oRow.setEmail(resulSet.getString("email_01"));
 
-                moRow.setCf(0);
-                moRow.setApply(1);
-                moRow.setAccountDebit(moDataBizPartnerBranchBankAccount.getBankAccountNumber());
-                moRow.setBizPartnerDebitFiscalId(msDebitFiscalId);
-                moRow.setIsForPayment(false);
-                moRow.setIsToPayed(false);
-                //moRow.setReference(?);
-                moRow.setAccType("CLA");
-                moRow.setConcept(moTextConcept.getValue());
-                moRow.setDescription(moTextConcept.getValue());
-                moRow.setAccountCreditArray(maAccountCredit);
-                moRow.setAgreementsReferencesArray(maAgreementsReference);
-                moRow.setBranchBankAccountCreditArray(maBranchBankAccountsCredit);
-                moRow.setObservations("");
+                oRow.setCf(0);
+                oRow.setApply(1);
+                oRow.setAccountDebit(moDataBizPartnerBranchBankAccount.getBankAccountNumber());
+                oRow.setBizPartnerDebitFiscalId(msDebitFiscalId);
+                oRow.setIsForPayment(false);
+                oRow.setIsToPayed(false);
+                oRow.setReference(resulSet.getString(7));
+                oRow.setAccType("CLA");
+                oRow.setConcept(moTextConcept.getValue());
+                oRow.setDescription(moTextConcept.getValue());
+                oRow.setAccountCreditArray(maAccountCredit);
+                oRow.setAgreementsReferencesArray(maAgreementsReference);
+                oRow.setBranchBankAccountCreditArray(maBranchBankAccountsCredit);
+                oRow.setObservations("");
                 if (!maBranchBankAccountsCredit.isEmpty()) {
-                    rows.add(moRow);
+                    rows.add(oRow);
                     mltAccountCredit.add(maAccountCredit);
                 }
                 if (!maAgreements.isEmpty()) {
                     mltAgreementReference.add(mhAgreeAgreeRef.get(msAgreement));
                 }
                 
-                mvLayoutRows.add(moRow);
+                mvLayoutRows.add(oRow);
             }
             moGridPayments.populateGrid(rows);
             moGridPayments.createGridColumns();
