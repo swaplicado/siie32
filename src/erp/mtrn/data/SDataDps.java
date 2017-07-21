@@ -760,11 +760,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             msDbmsError = sMsg + "¡El documento está embarcado!";
             throw new Exception(msDbmsError);
         }
-        else if (mbIsDpsDeliveryAck) {
-            mnDbmsErrorId = 61;
-            msDbmsError = sMsg + "¡El documento tiene capturados sus acuses de entrega!";
-            throw new Exception(msDbmsError);
-        }
         else {
 
             // Check that document's date belongs to an open period:
