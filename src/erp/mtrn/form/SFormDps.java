@@ -2253,7 +2253,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel102.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel102.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlCfdCceNumberCertificateOrigin.setText("Número certificado origen: *");
+        jlCfdCceNumberCertificateOrigin.setText("Número certificado origen:");
         jlCfdCceNumberCertificateOrigin.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel102.add(jlCfdCceNumberCertificateOrigin);
 
@@ -8053,11 +8053,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         jTabbedPane.setSelectedIndex(TAB_INT);
                         validation.setComponent(jtfCfdCceNumberCertificateOrigin);
                     }
+                    /* XXX (Sergio Flores, 2017-07-26: it seems that this reliable exporter number is not really required.)
                     else if (moBizPartnerBranchAddress.getDbmsDataCountry().getCountryGroup().compareTo(SDataConstantsSys.TRNS_CFD_CTY_GRP_UE) == 0 &&
                             miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsCategorySettingsCo().getNumberExporter().isEmpty()) {
                         validation.setMessage("No se han especificado el número de exportador confiable\n" +
                                     "en el catálogo de empresas, campo: 'Número de exportador confiable:'.");
                     }
+                    */
                 }
             }
             
@@ -8677,16 +8679,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moDps.setXtaCfdCceCertificateOriginNumber(moFieldCfdCceNumberCertificateOrigin.getString());
             moDps.setXtaCfdCceSubdivisionHas(moFieldCfdCceSubdivision.getInteger());
             if (moBizPartnerBranchAddress.getDbmsDataCountry().getCountryGroup().compareTo(SDataConstantsSys.TRNS_CFD_CTY_GRP_UE) == 0) {
-                moDps.setXtaCfdCceNumberExporter(moBizPartnerCategory.getNumberExporter());
+                moDps.setXtaCfdCceNumberExporter(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsCategorySettingsCo().getNumberExporter());
             }
             moDps.setXtaCfdCceExchangeRateUSD(moFieldCfdCceExchangeRateUsd.getDouble());
-            //moDps.setXtaCfdCceTotalUSD(jtfCfdCceTotalUsd.isEnabled() ? moFieldCfdCceTotalUsd.getDouble() : moDps.getSubtotalCy_r()); // is calculate
+            //moDps.setXtaCfdCceTotalUSD(jtfCfdCceTotalUsd.isEnabled() ? moFieldCfdCceTotalUsd.getDouble() : moDps.getSubtotalCy_r());  // it will be calculated
         }
 
         // Set params for CFD:
 
         if (!isCfdRequired()) {
             moDps.setAuxIsNeedCfd(false);
+            moDps.setAuxIsNeedCfdCce(false);
             moDps.setApprovalYear(0);
             moDps.setApprovalNumber(0);
         }
@@ -8742,7 +8745,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             catch (Exception e) {
                 SLibUtilities.renderException(this, e);
             }            
-            //moDps.setDbmsDataCfd(null);   XXX Can this line be removed? (2017-03-08, sflores)
         }
 
         return moDps;
@@ -9019,7 +9021,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
         
         if (sendMail) {
-            
             if (mmsType != SLibConstants.UNDEFINED) {
                 try {                    
                     method = new SLibMethod(dps, dps.getClass().getMethod("sendMail", new Class[] { SClientInterface.class, Object.class, int.class }), new Object[] { miClient, dps.getPrimaryKey(), mmsType });

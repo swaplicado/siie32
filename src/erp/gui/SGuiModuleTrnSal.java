@@ -1167,6 +1167,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                         if (((SDataDps) moRegistry).getAuxIsNeedCfd()) {
                             try {
                                 dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moRegistry.getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE); // get brand new information stored in DBMS (e.g. edition timestamp)
+                                dps.setAuxIsNeedCfd(true);
+                                dps.setAuxIsNeedCfdCce(((SDataDps) moRegistry).getAuxIsNeedCfdCce());
 
                                 SCfdUtils.computeCfd(miClient, dps, miClient.getSessionXXX().getParamsCompany().getFkXmlTypeId());
                             }

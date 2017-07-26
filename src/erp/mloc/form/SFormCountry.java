@@ -122,7 +122,7 @@ public class SFormCountry extends javax.swing.JDialog implements erp.lib.form.SF
         jtfCountryCode.setText("CÓDIGO");
         jPanel3.add(jtfCountryCode);
 
-        jlCountryGroup.setText("Código del grupo: *");
+        jlCountryGroup.setText("Código del grupo:");
         jPanel3.add(jlCountryGroup);
 
         moTextCountryGroup.setText("sBeanFieldText1");

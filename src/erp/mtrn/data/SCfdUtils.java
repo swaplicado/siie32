@@ -3347,7 +3347,7 @@ public abstract class SCfdUtils implements Serializable {
         receptor = new SDbCfdBizPartner(client);
         receptor.setBizPartnerId(cfdXml.getReceptor());
         receptor.setBizPartnerBranchId(cfdXml.getSucursalReceptor());
-        receptor.setIsEmisorForCce(hasInternationalTradeNode);
+        receptor.setIsEmisorForCce(false);
 
         asociadoNegocios = receptor.getBizPartner();
         asociadoNegocios.setIsCfdi(true);
@@ -3526,7 +3526,7 @@ public abstract class SCfdUtils implements Serializable {
         receptor = new SDbCfdBizPartner(client);
         receptor.setBizPartnerId(cfdXml.getReceptor());
         receptor.setBizPartnerBranchId(cfdXml.getSucursalReceptor());
-        receptor.setIsEmisorForCce(hasInternationalTradeNode);
+        receptor.setIsEmisorForCce(false);
 
         asociadoNegocios = receptor.getBizPartner();
         asociadoNegocios.setIsCfdi(true);

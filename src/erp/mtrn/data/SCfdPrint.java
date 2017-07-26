@@ -562,7 +562,7 @@ public class SCfdPrint {
         map.put("sRecRfc", comprobante.getEltReceptor().getAttRfc().getString());
         map.put("sRecNombreOpc", comprobante.getEltReceptor().getAttNombre().getString());
 
-        receptor = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB,new int[] { dps.getFkBizPartnerBranchId(), dps.getFkBizPartnerBranchAddressId() } , SLibConstants.EXEC_MODE_SILENT);
+        receptor = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { dps.getFkBizPartnerBranchId(), dps.getFkBizPartnerBranchAddressId() } , SLibConstants.EXEC_MODE_SILENT);
 
         if (receptor.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
             nFkRecAddressFormatTypeId_n = receptor.getFkAddressFormatTypeId_n();
@@ -578,9 +578,12 @@ public class SCfdPrint {
         map.put("sRecDomLocalidadOpc", comprobante.getEltReceptor().getEltDomicilio().getAttLocalidad().getString());
         map.put("sRecDomReferenciaOpc", comprobante.getEltReceptor().getEltDomicilio().getAttReferencia().getString());
         map.put("sRecDomMunicipioOpc", comprobante.getEltReceptor().getEltDomicilio().getAttMunicipio().getString());
-        map.put("sRecDomEstadoOpc", comprobante.getEltReceptor().getEltDomicilio().getAttEstado().getString());
-        map.put("sRecDomPais", comprobante.getEltReceptor().getEltDomicilio().getAttPais().getString());
-        map.put("sRecDomCodigoPostalOpc", comprobante.getEltReceptor().getEltDomicilio().getAttCodigoPostal().getString());
+        //map.put("sRecDomEstadoOpc", comprobante.getEltReceptor().getEltDomicilio().getAttEstado().getString());
+        map.put("sRecDomEstadoOpc", "");
+        String recDomPais = comprobante.getEltReceptor().getEltDomicilio().getAttPais().getString();
+        map.put("sRecDomPais", recDomPais.length() != 3 ? recDomPais : SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.LOCU_CTY, recDomPais, SLibConstants.DESCRIPTION_NAME_LAN).toUpperCase());
+        //map.put("sRecDomCodigoPostalOpc", comprobante.getEltReceptor().getEltDomicilio().getAttCodigoPostal().getString());
+        map.put("sRecDomCodigoPostalOpc", "");
         map.put("nFkRecAddressFormatTypeId_n", nFkRecAddressFormatTypeId_n);
         map.put("sFiscalId", bizPartner.getFiscalFrgId());
 
@@ -594,7 +597,8 @@ public class SCfdPrint {
             map.put("sRecEntReferenciaOpc", address.getReference());
             map.put("sRecEntMunicipioOpc", address.getCounty());
             map.put("sRecEntEstadoOpc", address.getState());
-            map.put("sRecEntPais", address.getDbmsDataCountry().getCountry());
+            String recEntPais = address.getDbmsDataCountry().getCountry();
+            map.put("sRecEntPais", recEntPais.length() != 3 ? recEntPais : SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.LOCU_CTY, recEntPais, SLibConstants.DESCRIPTION_NAME_LAN).toUpperCase());
             map.put("sRecEntCodigoPostalOpc", address.getZipCode());
         }
 

@@ -4269,7 +4269,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         cfd.ver3.cce11.DElementMercancia mercancia = null;
         
         if (msXtaCfdCceOperationType.compareTo(SDataConstantsSys.TRNS_CFD_CCE_CAT_TP_OPE_A) != 0) {
-            //comercioExterior.getAttMotivoTraslado().setString(msXtaCfdCceReasonTransfer); // not apply is necessary if comprobant type is "T" or "transfer"
+            //comercioExterior.getAttMotivoTraslado().setString(msXtaCfdCceReasonTransfer); // required only if comprobant type is "T" (traslado)
             comercioExterior.getAttTipoOperacion().setString(msXtaCfdCceOperationType);
             comercioExterior.getAttClaveDePedimento().setString(msXtaCfdCceImportRequest);
             comercioExterior.getAttCertificadoOrigen().setInteger(mnXtaCfdCceCertificateOrigin);
@@ -4277,7 +4277,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             comercioExterior.getAttNumeroExportadorConfiable().setString(msXtaCfdCceNumberExporter);
             comercioExterior.getAttIncoterm().setString(msXtaCfdCceIncoterm);
             comercioExterior.getAttSubdivision().setInteger(mnXtaCfdCceSubdivisionHas);
-            //comercioExterior.getAttObservaciones() // Is optional, not apply in this version
+            //comercioExterior.getAttObservaciones()    // optional, not implemented
             comercioExterior.getAttTipoCambioUSD().setDouble(mdXtaCfdCceExchangeRateUSD);
             comercioExterior.getAttTotalUSD().setDouble(mdXtaCfdCceTotalUSD);
         }

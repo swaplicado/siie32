@@ -104,7 +104,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="jlCountryGroup">
               <Properties>
-                <Property name="text" type="java.lang.String" value="C&#xf3;digo del grupo: *"/>
+                <Property name="text" type="java.lang.String" value="C&#xf3;digo del grupo:"/>
               </Properties>
             </Component>
             <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextCountryGroup">

@@ -73,6 +73,26 @@ public abstract class SDataReadDescriptions {
             case SDataConstants.CFGU_COB_ENT:
                 sql = "SELECT " + (descriptionType == SLibConstants.DESCRIPTION_CODE ? "code" : "ent") + " AS descrip FROM erp.cfgu_cob_ent WHERE id_cob = " + ((int[]) pk)[0] + " AND id_ent = " + ((int[]) pk)[1] + " ";
                 break;
+            case SDataConstants.LOCU_CTY:
+                switch (descriptionType) {
+                    case SLibConstants.DESCRIPTION_CODE:
+                        sql = "cty_code";
+                        break;
+                    case SLibConstants.DESCRIPTION_NAME:
+                        sql = "cty";
+                        break;
+                    case SLibConstants.DESCRIPTION_NAME_ABBR:
+                        sql = "cty_abbr";
+                        break;
+                    case SLibConstants.DESCRIPTION_NAME_LAN:
+                        sql = "cty_lan";
+                        break;
+                    default:
+                        sql = "cty";
+                }
+                    
+                sql = "SELECT " + sql + " AS descrip FROM erp.locu_cty WHERE " + (pk instanceof int[] ? "id_cty = " + ((int[]) pk)[0] : "cty_code = '" + ((String) pk) + "'") + " ";
+                break;
             case SDataConstants.BPSS_CT_BP:
                 sql = "SELECT " + (descriptionType == SLibConstants.DESCRIPTION_CODE ? "code" : "ct_bp") + " AS descrip FROM erp.bpss_ct_bp WHERE id_ct_bp = " + ((int[]) pk)[0] + " ";
                 break;
