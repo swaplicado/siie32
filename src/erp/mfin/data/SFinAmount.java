@@ -20,6 +20,8 @@ public class SFinAmount {
 
     public SFinAmount(SFinAmount amount) {
         this(amount.Amount, amount.AmountCy, amount.IsPrepayment, amount.AmountType, amount.Movement);
+        KeyRefDocument = amount.KeyRefDocument;
+        KeyRefCashAccount = amount.KeyRefCashAccount;
     }
 
     public SFinAmount(double amount, double amountCy) {

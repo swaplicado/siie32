@@ -111,7 +111,7 @@ import stamp.StampSOAP;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores, Edwin Carmona, Alfredo Pérez
+ * @author Juan Barajas, Sergio Flores, Edwin Carmona, Alfredo Pérez, Claudio Peña
  */
 public abstract class SCfdUtils implements Serializable {
 
@@ -2197,8 +2197,22 @@ public abstract class SCfdUtils implements Serializable {
 
             namedNodeMap = node.getAttributes();
 
-            receptorXml = SXmlUtils.extractAttributeValue(namedNodeMap, "rfc", true);
+            try {
+                receptorXml = SXmlUtils.extractAttributeValue(namedNodeMap, "rfc", true);
+            }
+            catch(Exception e) {
+                
+            }
+            
+            if (receptorXml.isEmpty()) {
+                try {
+                    receptorXml = SXmlUtils.extractAttributeValue(namedNodeMap, "Rfc", true);
+                }
+                catch(Exception e) {
 
+                }
+            }
+                          
             if (client.getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId().compareTo(receptorXml) != 0) {
                 throw new Exception("El receptor del archivo XML no es la empresa '" + client.getSessionXXX().getCompany().getDbmsDataCompany().getBizPartner() + "'.");
             }
@@ -4473,5 +4487,9 @@ public abstract class SCfdUtils implements Serializable {
         client.getSession().getStatement().execute(sql);
 
         return true;
+    }
+
+    private static String toLowerCase(String rfc) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

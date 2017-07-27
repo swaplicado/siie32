@@ -401,6 +401,10 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmDpsDelAck = new JMenu("Acuses de entrega de facturas");
         jmiDpsDelAckPend = new JMenuItem("Acuses de entrega de facturas pendientes");
         jmiDpsDelAckOk = new JMenuItem("Acuses de entrega de facturas listos");
+        
+        jmDpsDelAck.add(jmiDpsDelAckPend);
+        jmDpsDelAck.add(jmiDpsDelAckOk);
+        
         jmDps.add(jmiDpsDoc);
         jmDps.add(jmiDpsEntry);
         jmDps.add(jmiDpsEntryRef);
@@ -429,8 +433,6 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmDps.addSeparator();
         jmDps.add(jmiDpsDocRemission);
         jmDps.addSeparator();
-        jmDpsDelAck.add(jmiDpsDelAckPend);
-        jmDpsDelAck.add(jmiDpsDelAckOk);
         jmDps.add(jmDpsDelAck);
 
         jmDpsAdj = new JMenu("Notas crédito");
@@ -832,7 +834,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsWsPending.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmiDpsWsApproved.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmiDpsWsReject.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
-        jmiDpsDocRemission.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
+        jmiDpsDocRemission.setEnabled(hasRightDocTransaction);
         jmDpsDelAck.setEnabled(hasRightDocTransaction);
 
         jmDpsAdj.setEnabled(hasRightDocTransactionAdjust);

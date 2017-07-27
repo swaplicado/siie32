@@ -441,15 +441,18 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
 
                 int report = SLibConsts.UNDEFINED;
                 String alias = "";
+                String prefix = "";
                 String sqlWhere = "";
                 
                 if (jrbReportTypeDetailedMove.isSelected()) {
                     report = SDataConstantsSys.REP_TRN_STK_MOV_MOV;
                     alias = "d";
+                    prefix = "f";
                 }
                 else if (jrbReportTypeSummary.isSelected()) {
                     report = SDataConstantsSys.REP_TRN_STK_MOV_SUM;
                     alias = "s";
+                    prefix = "";
                 }
                 
                 if (jcbMovementType.getSelectedIndex() > 0) {
@@ -466,10 +469,10 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
                 }
                 
                 if (jcbCompanyBranch.getSelectedIndex() > 0) {
-                    sqlWhere += "AND " + alias + ".id_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0] + " ";
+                    sqlWhere += "AND " + alias + "." + prefix + "id_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0] + " ";
                     
                     if (jcbWarehouse.getSelectedIndex() > 0) {
-                        sqlWhere += "AND " + alias + ".id_wh = " + moFieldWarehouse.getKeyAsIntArray()[1] + " ";
+                        sqlWhere += "AND " + alias + "." + prefix + "id_wh = " + moFieldWarehouse.getKeyAsIntArray()[1] + " ";
                     }
                 }
                 

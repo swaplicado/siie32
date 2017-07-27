@@ -251,6 +251,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected java.lang.Object moAuxFormerRecordKey;
     protected erp.mtrn.data.SCfdParams moAuxCfdParams;
     protected boolean mbAuxIsNeedCfd;
+    protected boolean mbAuxIsNeedCfdCce;
     protected boolean mbAuxIsValidate;
 
     protected erp.mfin.data.SDataBookkeepingNumber moDbmsDataBookkeepingNumber;
@@ -694,8 +695,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     private boolean testDeletion(java.sql.Connection poConnection, java.lang.String psMsg, int pnAction) throws java.sql.SQLException, java.lang.Exception {
         int i = 0;
         int[] anPeriodKey = null;
-        double dBalance;
-        double dBalanceCy;
         double dAuxBalance = 0;
         double dAuxBalanceCy = 0;
         String sSql = "";
@@ -761,11 +760,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             msDbmsError = sMsg + "¡El documento está embarcado!";
             throw new Exception(msDbmsError);
         }
-        else if (mbIsDpsDeliveryAck) {
-            mnDbmsErrorId = 61;
-            msDbmsError = sMsg + "¡El documento tiene capturados sus acuses de entrega!";
-            throw new Exception(msDbmsError);
-        }
         else {
 
             // Check that document's date belongs to an open period:
@@ -798,22 +792,21 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 oCallableStatement.registerOutParameter(i++, java.sql.Types.SMALLINT);
                 oCallableStatement.execute();
 
-                dBalance = oCallableStatement.getDouble(i - 3);
-                dBalanceCy = oCallableStatement.getDouble(i - 2);
+                double dBalance = oCallableStatement.getDouble(i - 3);
+                double dBalanceCy = oCallableStatement.getDouble(i - 2);
 
                 if (isDocumentPur()) {
                     dBalance *= -1d;
                     dBalanceCy *= -1d;
                 }
 
-                // Subtract amount prepayment the total and subtract amount prepayment currency the total currency:
+                // Add prepayments, when positive, to document balance obtained from system (when negative, it means that prepayments are applied to document, and document balance must remain as obtained):
+                
+                double dPrepayments = obtainAmountPrepayments(AMT_PRE_PAY);
+                double dPrepaymentsCy = obtainAmountPrepayments(AMT_PRE_PAY_CY);
 
-                /* Check if this is necessary, all evidence indicates that is no longer needed to subtract prepayments (Sergio Flores, 2017-06-21):
-                dAuxBalance = SLibUtilities.round(dBalance + obtainAmountPrepayments(AMT_PRE_PAY), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-                dAuxBalanceCy = SLibUtilities.round(dBalanceCy + obtainAmountPrepayments(AMT_PRE_PAY_CY), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-                */
-                dAuxBalance = SLibUtilities.round(dBalance/* + obtainAmountPrepayments(AMT_PRE_PAY)*/, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-                dAuxBalanceCy = SLibUtilities.round(dBalanceCy/* + obtainAmountPrepayments(AMT_PRE_PAY_CY)*/, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+                dAuxBalance = SLibUtilities.round(dBalance + (dPrepayments <= 0 ? 0 : dPrepayments), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+                dAuxBalanceCy = SLibUtilities.round(dBalanceCy + (dPrepaymentsCy <= 0 ? 0 : dPrepaymentsCy), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
                 
                 if (dAuxBalance != mdTotal_r) {
                     mnDbmsErrorId = 101;
@@ -1743,6 +1736,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxFormerRecordKey(java.lang.Object o) { moAuxFormerRecordKey = o; }
     public void setAuxCfdParams(erp.mtrn.data.SCfdParams o) { moAuxCfdParams = o; }
     public void setAuxIsNeedCfd(boolean b) { mbAuxIsNeedCfd = b; }
+    public void setAuxIsNeedCfdCce(boolean b) { mbAuxIsNeedCfdCce = b; }
     public void setAuxIsValidate(boolean b) { mbAuxIsValidate = b; }
 
     public void setDbmsDataBookkeepingNumber(erp.mfin.data.SDataBookkeepingNumber o) { moDbmsDataBookkeepingNumber = o; }
@@ -1775,6 +1769,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public java.lang.Object getAuxFormerRecordKey() { return moAuxFormerRecordKey; }
     public erp.mtrn.data.SCfdParams getAuxCfdParams() { return moAuxCfdParams; }
     public boolean getAuxIsNeedCfd() { return mbAuxIsNeedCfd; }
+    public boolean getAuxIsNeedCfdCce() { return mbAuxIsNeedCfdCce; }
     public boolean getAuxIsValidate() { return mbAuxIsValidate; }
 
     public erp.mfin.data.SDataBookkeepingNumber getDbmsDataBookkeepingNumber() { return moDbmsDataBookkeepingNumber; }
@@ -1973,6 +1968,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         moAuxFormerRecordKey = null;
         moAuxCfdParams = null;
         mbAuxIsNeedCfd = false;
+        mbAuxIsNeedCfdCce = false;
 
         moDbmsDataBookkeepingNumber = null;
         moDbmsDataCfd = null;
@@ -2721,49 +2717,67 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         
                         // Add values:
                         
+                        SFinAmount finAmount = null;
+                        
                         for (SDataDpsEntry entry : mvDbmsDpsEntries) {
                             if (entry.isAccountable()) {
-                                if (isDocument()) { // document is an invoice
-                                    if (entry.getIsPrepayment()) {
-                                        appliesPrepayment = true;
-                                        
-                                        if (entry.getQuantity() >= 0) {
-                                            if (entry.getKeyCashAccount_n() != null) {
-                                                // Increment cash account's balance:
-                                                
-                                                oAmounts.addAmountForCashAccount(entry.getKeyCashAccount_n(), new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), true, SFinAmountType.CASH_ACCOUNT, SFinMovement.INCREMENT)); // add grouping by referenced cash account
+                                if (entry.getIsPrepayment()) {
+                                    appliesPrepayment = true;
+
+                                    if (entry.getQuantity() >= 0) {
+                                        if (entry.getKeyCashAccount_n() != null) {
+                                            // Increment (invoice) or decrement (credit note) cash account's balance:
+
+                                            finAmount = new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), true, SFinAmountType.CASH_ACCOUNT, isDocument() ? SFinMovement.INCREMENT : SFinMovement.DECREMENT);
+                                            if (isAdjustment()) {
+                                                finAmount.KeyRefDocument = entry.getKeyAuxDps();
                                             }
-                                            else {
-                                                // Increment advance billed's balance:
-                                                
-                                                appliesAdvanceBilled = true;
-                                                oAmounts.addAmountForAdvanceBilled(new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), true, SFinAmountType.ADVANCE_BILLED, SFinMovement.INCREMENT)); // add into lonely group
-                                            }
+                                            oAmounts.addAmountForCashAccount(entry.getKeyCashAccount_n(), finAmount); // add grouping by referenced cash account
                                         }
                                         else {
-                                            // Decrement business partner's balance:
-                                            
-                                            if (oAmountBprPay == null) {
-                                                oAmounts.getAmounts().add(oAmountBprPay = new SFinAmount(0, 0, true, SFinAmountType.UNDEFINED, SFinMovement.DECREMENT)); // in-line instantiation!
-                                            }
+                                            // Increment (invoice) or decrement (credit note) advance billed's balance:
 
-                                            oAmountBprPay.addAmount(-entry.getTotal_r(), -entry.getTotalCy_r()); // only one amount per business partner
+                                            appliesAdvanceBilled = true;
+                                            
+                                            finAmount = new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), true, SFinAmountType.ADVANCE_BILLED, isDocument() ? SFinMovement.INCREMENT : SFinMovement.DECREMENT);
+                                            if (isAdjustment()) {
+                                                finAmount.KeyRefDocument = entry.getKeyAuxDps();
+                                            }
+                                            oAmounts.addAmountForAdvanceBilled(finAmount); // add into lonely group
                                         }
                                     }
                                     else {
-                                        // Increment business partner's balance:
-                                        
-                                        if (oAmountBprBal == null) {
-                                            oAmounts.getAmounts().add(oAmountBprBal = new SFinAmount(0, 0)); // in-line instantiation!
+                                        // Increment (credit note) or decrement (invoice) business partner's balance:
+
+                                        if (oAmountBprPay == null) {
+                                            oAmountBprPay = new SFinAmount(0, 0, true, SFinAmountType.UNDEFINED, isDocument() ? SFinMovement.DECREMENT : SFinMovement.INCREMENT);
+                                            if (isAdjustment()) {
+                                                oAmountBprPay.KeyRefDocument = entry.getKeyAuxDps();
+                                            }
+                                            oAmounts.getAmounts().add(oAmountBprPay);
                                         }
-                                        
-                                        oAmountBprBal.addAmount(entry.getTotal_r(), entry.getTotalCy_r()); // only one amount per business partner
+
+                                        oAmountBprPay.addAmount(-entry.getTotal_r(), -entry.getTotalCy_r()); // only one amount per business partner
                                     }
                                 }
-                                else { // document is a credit note
-                                    // Decrement a business partner document's balance:
+                                else {
+                                    if (isDocument()) {
+                                        // document is an ordinary invoice, so
+                                        // increment business partner's balance:
 
-                                    oAmounts.addAmountForDocument(entry.getKeyAuxDps(), new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r())); // add grouping by referenced invoice
+                                        if (oAmountBprBal == null) {
+                                            oAmountBprBal = new SFinAmount(0, 0);
+                                            oAmounts.getAmounts().add(oAmountBprBal);
+                                        }
+
+                                        oAmountBprBal.addAmount(entry.getTotal_r(), entry.getTotalCy_r()); // only one amount per business partner
+                                    }
+                                    else {
+                                        // document is a credit note, so
+                                        // decrement business partner document's balance:
+
+                                        oAmounts.addAmountForDocument(entry.getKeyAuxDps(), new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), entry.getIsPrepayment(), SFinAmountType.UNDEFINED, SFinMovement.DECREMENT)); // add grouping by referenced invoice
+                                    }
                                 }
                             }
                         }
@@ -2789,7 +2803,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         anSysMvtTypeKeyBprXXX = getSysMvtTypeKeyBizPartnerXXX();
                         
                         for (SFinAmount amount : oAmounts.getAmounts()) {
-                            if (amount.IsPrepayment && amount.Movement == SFinMovement.INCREMENT) {
+                            if (amount.IsPrepayment && (isDocument() && amount.Movement == SFinMovement.INCREMENT || !isDocument() && amount.Movement == SFinMovement.DECREMENT)) {
                                 switch (amount.AmountType) {
                                     case CASH_ACCOUNT: // user requested prepayment accounting into a cash account
                                         oAccountCash = new SDataAccountCash();
@@ -2799,7 +2813,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                                 oAccountCash.getFkAccountId(),
                                                 "",
                                                 getAccMvtSubclassKeyAccountCash(), getSysAccTypeKeyAccountCash(oAccountCash), getSysMvtTypeKeyAccountCash(), getSysMvtTypeKeyAccountCashXXX(oAccountCash),
-                                                null, amount.KeyRefCashAccount);
+                                                isAdjustment() ? amount.KeyRefDocument : null, amount.KeyRefCashAccount);
 
                                         if (isDebitForBizPartner()) {
                                             oRecordEntry.setDebit(amount.Amount);
@@ -2828,7 +2842,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                                     oConfigBprAdvBill.getAccountConfigEntries().get(i).getAccountId(),
                                                     oConfigBprAdvBill.getAccountConfigEntries().get(i).getCostCenterId(),
                                                     anAccMvtSubclassKey, SModSysConsts.FINS_TP_SYS_ACC_NA_NA, anSysMvtTypeKeyBpr, SDataConstantsSys.FINS_TP_SYS_MOV_NA,
-                                                    null, null);
+                                                    isAdjustment() ? amount.KeyRefDocument : null, null);
                                             
                                             if (isDebitForBizPartner()) {
                                                 oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
@@ -2927,7 +2941,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                                 oConfigBprOp.getAccountConfigEntries().get(i).getAccountId(),
                                                 oConfigBprOp.getAccountConfigEntries().get(i).getCostCenterId(),
                                                 anAccMvtSubclassKey, anSysAccTypeKeyBpr, anSysMvtTypeKeyBpr, anSysMvtTypeKeyBprXXX,
-                                                null, null);
+                                                isAdjustment() ? entry.getKeyAuxDps() : null, null);
 
                                         oRecordEntry.setFkDpsYearId_n(SLibConsts.UNDEFINED);
                                         oRecordEntry.setFkDpsDocId_n(SLibConsts.UNDEFINED);
@@ -4738,7 +4752,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         DElement complemento = null;
         
         try {
-            if (!msXtaCfdCceOperationType.isEmpty()) {
+            if (mbAuxIsNeedCfdCce && !msXtaCfdCceOperationType.isEmpty()) {
                 complemento = new cfd.ver32.DElementComplemento();
                 
                 ((cfd.ver32.DElementComplemento) complemento).getElements().add(createCfdiElementComercioExterior11());
