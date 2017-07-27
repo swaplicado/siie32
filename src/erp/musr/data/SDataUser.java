@@ -38,6 +38,7 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
     protected int mnPkUserId;
     protected java.lang.String msUser;
     protected java.lang.String msUserPassword;
+    protected java.lang.String msEmail;
     protected boolean mbIsUniversal;
     protected boolean mbIsCanEdit;
     protected boolean mbIsCanDelete;
@@ -99,6 +100,7 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
     public void setPkUserId(int n) { mnPkUserId = n; }
     public void setUser(java.lang.String s) { msUser = s; }
     public void setUserPassword(java.lang.String s) { msUserPassword = s; }
+    public void setEmail(java.lang.String s) { msEmail = s; }
     public void setIsUniversal(boolean b) { mbIsUniversal = b; }
     public void setIsCanEdit(boolean b) { mbIsCanEdit = b; }
     public void setIsCanDelete(boolean b) { mbIsCanDelete = b; }
@@ -117,6 +119,7 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
     public int getPkUserId() { return mnPkUserId; }
     public java.lang.String getUser() { return msUser; }
     public java.lang.String getUserPassword() { return msUserPassword; }
+    public java.lang.String getEmail() { return msEmail; }
     public boolean getIsUniversal() { return mbIsUniversal; }
     public boolean getIsCanEdit() { return mbIsCanEdit; }
     public boolean getIsCanDelete() { return mbIsCanDelete; }
@@ -169,6 +172,7 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
         mnPkUserId = 0;
         msUser = "";
         msUserPassword = "";
+        msEmail = "";
         mbIsUniversal = false;
         mbIsCanEdit = false;
         mbIsCanDelete = false;
@@ -226,6 +230,7 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
                 mnPkUserId = resultSet.getInt("id_usr");
                 msUser = resultSet.getString("usr");
                 msUserPassword = "";    // password is encrypted in DBMS, so is not usefull here
+                msEmail = resultSet.getString("email");
                 mbIsUniversal = resultSet.getBoolean("b_univ");
                 mbIsCanEdit = resultSet.getBoolean("b_can_edit");
                 mbIsCanDelete = resultSet.getBoolean("b_can_del");
@@ -422,10 +427,11 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
             callableStatement = connection.prepareCall(
                     "{ CALL erp.usru_usr_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkUserId);
             callableStatement.setString(nParam++, msUser);
             callableStatement.setString(nParam++, msUserPassword);
+            callableStatement.setString(nParam++, msEmail);
             callableStatement.setBoolean(nParam++, mbIsUniversal);
             callableStatement.setBoolean(nParam++, mbIsCanEdit);
             callableStatement.setBoolean(nParam++, mbIsCanDelete);

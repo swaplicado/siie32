@@ -38,7 +38,6 @@ import erp.mtrn.data.SDataDiogDncDocumentNumberSeries;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsDncDocumentNumberSeries;
 import erp.mtrn.data.SDataSign;
-import erp.mtrn.form.SDialogDpsDeliveryAck;
 import erp.mtrn.form.SDialogRepBizPartnerBalanceAging;
 import erp.mtrn.form.SDialogRepContractStock;
 import erp.mtrn.form.SDialogRepDpsBizPartner;
@@ -58,6 +57,7 @@ import erp.mtrn.form.SDialogRepSalesPurchasesPriceUnitary;
 import erp.mtrn.form.SFormBizPartnerBlocking;
 import erp.mtrn.form.SFormDncDocumentNumberSeries;
 import erp.mtrn.form.SFormDps;
+import erp.mtrn.form.SFormDpsDeliveryAck;
 import erp.mtrn.form.SFormStamp;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
@@ -255,7 +255,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private erp.mtrn.form.SDialogRepDpsShipmentItem moDialogRepDpsShipmentItem;
     private erp.mtrn.form.SDialogRepDpsMoves moDialogRepDpsMoves;
     private erp.mtrn.form.SFormStamp moFormStamp;
-    private erp.mtrn.form.SDialogDpsDeliveryAck moDialogDpsDeliveryAck;
+    private erp.mtrn.form.SFormDpsDeliveryAck moFormDpsDeliveryAck;
 
     public SGuiModuleTrnSal(erp.client.SClientInterface client) {
         super(client, SDataConstants.MOD_SAL);
@@ -1088,17 +1088,15 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     }
                     miForm = moFormStamp;
                     break;
-                    
                 case SDataConstants.TRN_DPS_ACK:
-                    if(moDialogDpsDeliveryAck == null) {
-                        moDialogDpsDeliveryAck = new SDialogDpsDeliveryAck(miClient);
+                    if(moFormDpsDeliveryAck == null) {
+                        moFormDpsDeliveryAck = new SFormDpsDeliveryAck(miClient);
                     }
                     if (pk != null) {
                         moRegistry = new SDataDps();
                     }
-                    miForm = moDialogDpsDeliveryAck;
+                    miForm = moFormDpsDeliveryAck;
                     break;
-                    
                 default:
                     throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_FORM);
             }

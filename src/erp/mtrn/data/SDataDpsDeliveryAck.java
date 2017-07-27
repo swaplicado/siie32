@@ -9,10 +9,10 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mcfg.data.SDataParamsCompany;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.DecimalFormat;
@@ -62,18 +62,18 @@ public class SDataDpsDeliveryAck extends erp.lib.data.SDataRegistry implements j
     private void saveFile(final String path, final String fileName) throws Exception {
         if (moAuxFile == null) {
             throw new Exception("El archivo no ha sido proporcionado.");
-        }
+        }    
         else {
-            int length = 0;
-            byte[] buffer = new byte[1024];
-            InputStream is = new FileInputStream(moAuxFile);
-            OutputStream os = new FileOutputStream(path + "/" + fileName); 
-            while ((length = is.read(buffer)) > 0) {
-                os.write(buffer, 0, length);
+            try {
+                CopyOption[] options = new CopyOption[] {   //Options for the  new file
+                    StandardCopyOption.REPLACE_EXISTING,     //REPLACE_EXISTING: replace the file if exists.
+                    StandardCopyOption.COPY_ATTRIBUTES       //COPY_ATTRIBUTES like last_modified, etc.
+                };
+                Files.copy(Paths.get(moAuxFile.getAbsolutePath()), Paths.get(path + "/" + fileName), options);
+            } 
+            catch (Exception ex) {
+                SLibUtilities.renderException(this, ex);
             }
-            
-            is.close();
-            os.close();
         }
     }
     
@@ -83,113 +83,59 @@ public class SDataDpsDeliveryAck extends erp.lib.data.SDataRegistry implements j
     
     public void setPkDpsDeliveryAckId(int n) { mnPkDpsDeliveryAckId = n; }
 
-    public void setNameUser(java.lang.String s) {
-        msNameUser = s;
-    }
+    public void setNameUser(java.lang.String s) { msNameUser = s; }
 
-    public void setNameSystem(java.lang.String s) {
-        msNameSystem = s;
-    }
+    public void setNameSystem(java.lang.String s) { msNameSystem = s;}
 
-    public void setIsDeleted(boolean b) {
-        mbIsDeleted = b;
-    }
+    public void setIsDeleted(boolean b) { mbIsDeleted = b; }
 
-    public void setFkYearId(int n) {
-        mnFkYearId = n;
-    }
+    public void setFkYearId(int n) { mnFkYearId = n; }
 
-    public void setFkDocId(int n) {
-        mnFkDocId = n;
-    }
+    public void setFkDocId(int n) { mnFkDocId = n; }
 
-    public void setFkUserNewId(int n) {
-        mnFkUserNewId = n;
-    }
+    public void setFkUserNewId(int n) { mnFkUserNewId = n; }
 
-    public void setFkUserEditId(int n) {
-        mnFkUserEditId = n;
-    }
+    public void setFkUserEditId(int n) { mnFkUserEditId = n; }
 
-    public void setFkUserDeleteId(int n) {
-        mnFkUserDeleteId = n;
-    }
+    public void setFkUserDeleteId(int n) { mnFkUserDeleteId = n; }
 
-    public void setUserNewTs(java.util.Date t) {
-        mtUserNewTs = t;
-    }
+    public void setUserNewTs(java.util.Date t) { mtUserNewTs = t; }
 
-    public void setUserEditTs(java.util.Date t) {
-        mtUserEditTs = t;
-    }
+    public void setUserEditTs(java.util.Date t) { mtUserEditTs = t; }
 
-    public void setUserDeleteTs(java.util.Date t) {
-        mtUserDeleteTs = t;
-    }
+    public void setUserDeleteTs(java.util.Date t) { mtUserDeleteTs = t; }
 
-    public int getPkDpsDeliveryAckId() {
-        return mnPkDpsDeliveryAckId;
-    }
+    public int getPkDpsDeliveryAckId() { return mnPkDpsDeliveryAckId; }
 
-    public java.lang.String getNameUser() {
-        return msNameUser;
-    }
+    public java.lang.String getNameUser() { return msNameUser; }
 
-    public java.lang.String getNameSystem() {
-        return msNameSystem;
-    }
+    public java.lang.String getNameSystem() { return msNameSystem; }
 
-    public boolean getIsDeleted() {
-        return mbIsDeleted;
-    }
+    public boolean getIsDeleted() { return mbIsDeleted; }
 
-    public int getFkYearId() {
-        return mnFkYearId;
-    }
+    public int getFkYearId() { return mnFkYearId; }
 
-    public int getFkDocId() {
-        return mnFkDocId;
-    }
+    public int getFkDocId() { return mnFkDocId; }
 
-    public int getFkUserNewId() {
-        return mnFkUserNewId;
-    }
+    public int getFkUserNewId() { return mnFkUserNewId; }
 
-    public int getFkUserEditId() {
-        return mnFkUserEditId;
-    }
+    public int getFkUserEditId() { return mnFkUserEditId; }
 
-    public int getFkUserDeleteId() {
-        return mnFkUserDeleteId;
-    }
+    public int getFkUserDeleteId() { return mnFkUserDeleteId; }
 
-    public java.util.Date getUserNewTs() {
-        return mtUserNewTs;
-    }
+    public java.util.Date getUserNewTs() { return mtUserNewTs; }
 
-    public java.util.Date getUserEditTs() {
-        return mtUserEditTs;
-    }
+    public java.util.Date getUserEditTs() { return mtUserEditTs; }
 
-    public java.util.Date getUserDeleteTs() {
-        return mtUserDeleteTs;
-    }
+    public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
 
-    public void setAuxFile(File o) {
-        moAuxFile = o;
-    }
+    public void setAuxFile(File o) { moAuxFile = o; }
 
-    public void setAuxPrefix(java.lang.String s) {
-        msAuxPrefix = s;
-    }
+    public void setAuxPrefix(java.lang.String s) { msAuxPrefix = s; }
 
-    public File getAuxFile() {
-        return moAuxFile;
-    }
+    public File getAuxFile() { return moAuxFile; }
 
-    public java.lang.String getAuxPrefix() {
-        return msAuxPrefix;
-    }
+    public java.lang.String getAuxPrefix() { return msAuxPrefix; }
 
     public void saveFileSystemPath() throws Exception {
         composeFileName();

@@ -5,16 +5,15 @@
 
 package erp.musr.view;
 
-import javax.swing.JButton;
-
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.table.STabFilterDeleted;
-import erp.lib.table.STableField;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
+import erp.lib.table.STableField;
 import java.awt.Dimension;
+import javax.swing.JButton;
 import sa.gui.util.SUtilConsts;
 
 /**
@@ -50,7 +49,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         //jbDelete.setEnabled(false);
 
         erp.lib.table.STableField[] aoKeyFields = new STableField[1];
-        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[12];
+        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[13];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "u.id_usr");
@@ -60,6 +59,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
 
         i = 0;
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.usr", "Usuario", STableConstants.WIDTH_USER);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.email", "Email", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "u.b_univ", "Acceso universal", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "u.b_can_edit", "Modificable", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "u.b_can_del", "Eliminable", STableConstants.WIDTH_BOOLEAN_2X);
@@ -143,7 +143,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
             }
         }
 
-        msSql = "SELECT u.id_usr, u.usr, u.b_univ, u.b_can_edit, u.b_can_del, u.b_act, u.b_del, u.b_can_edit AS " + STableConstants.FIELD_IS_EDITABLE + ", " +
+        msSql = "SELECT u.id_usr, u.email, u.usr, u.b_univ, u.b_can_edit, u.b_can_del, u.b_act, u.b_del, u.b_can_edit AS " + STableConstants.FIELD_IS_EDITABLE + ", " +
                 "u.ts_new, u.ts_edit, u.ts_del, un.usr, ue.usr, ud.usr " +
                 "FROM erp.usru_usr AS u " +
                 "INNER JOIN erp.usru_usr AS un ON " +

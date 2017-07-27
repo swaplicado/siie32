@@ -8,12 +8,16 @@ package erp.mtrn.form;
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.data.SDataRegistry;
+import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsDeliveryAck;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -26,6 +30,8 @@ import sa.lib.gui.SGuiUtils;
  */
 public class SFormDpsDeliveryAck extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
+    public static final int FILE_LOAD = 1;
+    
     private int mnFormType;
     private int mnFormResult;
     private int mnFormStatus;
@@ -72,7 +78,7 @@ public class SFormDpsDeliveryAck extends javax.swing.JDialog implements erp.lib.
         jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Agregar acuse de entrega.");
+        setTitle("Agregar acuse de entrega");
         setMinimumSize(new java.awt.Dimension(357, 186));
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -147,23 +153,41 @@ public class SFormDpsDeliveryAck extends javax.swing.JDialog implements erp.lib.
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        moPanelDps = new SPanelDps(miClient, "de origen");
+        moPanelDps = new SPanelDps(miClient);
         jpDps.remove(jlPanelDps);
         jpDps.add(moPanelDps, BorderLayout.NORTH);
 
         jbPickFile.addActionListener(this);
         jbSave.addActionListener(this);
         jbCancel.addActionListener(this);
+        
+        SFormUtilities.createActionMap(rootPane, this, "publicActionSave", "save", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
+        SFormUtilities.createActionMap(rootPane, this, "publicActionCancel", "cancel", KeyEvent.VK_ESCAPE, 0);
     }
-
-    /**
-     * @param args the command line arguments
-     */
+    
+    private void windowActivated() {
+        if (mbFirstTime) {
+            mbFirstTime = false;
+            jbPickFile.requestFocus();
+        }
+    }
+    
     private void actionPickFile() {
         miClient.getFileChooser().setFileSelectionMode(JFileChooser.FILES_ONLY);
         if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
             moFile = new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath());
-            jtfFile.setText(moFile.getAbsolutePath());
+            
+            Pattern pattern = Pattern.compile("[a-zA-Z0-9ÑñàèìòùáéíóúäëïöüÀÈÌÒÙÁÉÍÓÚÄËÏÖÜ\\s\\.\\_\\-\\{\\}\\%\\#\\@\\;\\(\\)\\+\\~\\&]+");
+            Matcher matcher = pattern.matcher(moFile.getName());
+
+            if (matcher.matches()) {
+                jtfFile.setText(moFile.getAbsolutePath());
+            }
+            else {
+                miClient.showMsgBoxInformation("El nombre del archivo seleccionado no es válido\n"
+                        + "Debe cumplir con la expresión regular:\n"
+                        + "\"" + pattern.pattern() + "\".");
+            }
         }
     }
 
@@ -182,10 +206,7 @@ public class SFormDpsDeliveryAck extends javax.swing.JDialog implements erp.lib.
         mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
         setVisible(false);
     }
-    
-        private void windowActivated() {
-        if (mbFirstTime) {mbFirstTime = false;}
-    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jFile;
     private javax.swing.JPanel jPanel1;
@@ -199,6 +220,14 @@ public class SFormDpsDeliveryAck extends javax.swing.JDialog implements erp.lib.
     private javax.swing.JTextField jtfFile;
     // End of variables declaration//GEN-END:variables
 
+    public void publicActionSave() {
+        actionSave();
+    }
+    
+    public void publicActionCancel() {
+        actionCancel();
+    }
+    
     @Override
     public void formClearRegistry() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -213,14 +242,11 @@ public class SFormDpsDeliveryAck extends javax.swing.JDialog implements erp.lib.
         moFile = null;
         moDpsDeliveryAck = null;
         jtfFile.setText("");
-//        for (int i = 0; i < mvFields.size(); i++) {
-//            ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
-//        }
     }
 
     @Override
     public void formRefreshCatalogues() {
-
+        
     }
 
     @Override
