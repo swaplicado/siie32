@@ -38,7 +38,7 @@ import sa.lib.SLibTimeUtils;
 
 /**
  *
- * @author  Néstor Ávalos, Sergio Flores, Edwin Carmona
+ * @author  Néstor Ávalos, Sergio Flores, Edwin Carmona, Daniel López
  */
 public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
@@ -493,7 +493,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
             
             if (jcbSalesAgent.getSelectedIndex() > 0) {
                 txtSalesAgent = SBpsConsts.BPS_ATT_SAL_AGT.toUpperCase() + ": " + jcbSalesAgent.getSelectedItem().toString();
-                sqlFilterSalesAgent = "AND d.fid_sal_agt_n = " + moFieldSalesAgent.getKeyAsIntArray()[0] + " ";
+                sqlFilterSalesAgent = "AND (d.fid_sal_agt_n = " + moFieldSalesAgent.getKeyAsIntArray()[0] + " OR re.fid_dps_year_n IS NULL) ";
             }
             
             if (jcbUserAnalyst.getSelectedIndex() > 0) {

@@ -6,17 +6,20 @@
 package erp.mtrn.form;
 
 import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.data.SDataRegistry;
+import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mtrn.data.SDataDps;
-import erp.mtrn.data.SDataDpsDeliveryAck;
+import erp.mtrn.data.STrnDeliveryAckUtilities;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.io.File;
+import java.awt.event.KeyEvent;
+import java.sql.SQLException;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 
@@ -24,28 +27,25 @@ import sa.lib.gui.SGuiUtils;
  *
  * @author Daniel López
  */
-public class SDialogDpsDeliveryAck extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
-
-    private int mnFormType;
+public class SDialogDpsDeliveryAckReasign extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
+    
     private int mnFormResult;
     private int mnFormStatus;
     private boolean mbFirstTime;
-    private boolean mbResetingForm;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.client.SClientInterface miClient;
 
-    private java.io.File moFile;
-    private erp.mtrn.data.SDataDpsDeliveryAck moDpsDeliveryAck;
     private erp.mtrn.form.SPanelDps moPanelDps;
-    private erp.mtrn.data.SDataDps moParamDps;
-
+    private erp.mtrn.form.SDialogPickerDps moDialogPickerDps;
+    private erp.mtrn.data.SDataDps moParamDpsOrigin;
+    private erp.mtrn.data.SDataDps moDpsDestiny;
+    
     /**
-     * Creates new form SDialogDpsDeliveryAck
+     * Creates new form SDialogDpsDeliveryAckReasign
      */
-    public SDialogDpsDeliveryAck(erp.client.SClientInterface client) {
+    public SDialogDpsDeliveryAckReasign(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
-        mnFormType = SDataConstants.TRN_DPS_ACK;
         
         initComponents();
         initComponentsExtra();
@@ -64,15 +64,15 @@ public class SDialogDpsDeliveryAck extends javax.swing.JDialog implements erp.li
         jlPanelDps = new javax.swing.JLabel();
         jpPicker = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
-        jFile = new javax.swing.JLabel();
-        jtfFile = new javax.swing.JTextField();
-        jbPickFile = new javax.swing.JButton();
+        jlDps = new javax.swing.JLabel();
+        jtfDps = new javax.swing.JTextField();
+        jbPickDps = new javax.swing.JButton();
         jpControls = new javax.swing.JPanel();
         jbSave = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Agregar acuse de entrega");
+        setTitle("Reasignar acuse(s) de entrega");
         setMinimumSize(new java.awt.Dimension(357, 186));
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -92,32 +92,32 @@ public class SDialogDpsDeliveryAck extends javax.swing.JDialog implements erp.li
         jlPanelDps.setPreferredSize(new java.awt.Dimension(100, 200));
         jpDps.add(jlPanelDps, java.awt.BorderLayout.NORTH);
 
-        jpPicker.setBorder(javax.swing.BorderFactory.createTitledBorder("Seleccionar archivo:"));
+        jpPicker.setBorder(javax.swing.BorderFactory.createTitledBorder("Seleccionar factura:"));
         jpPicker.setMaximumSize(new java.awt.Dimension(2147483647, 2147483647));
         jpPicker.setMinimumSize(new java.awt.Dimension(345, 113));
         jpPicker.setLayout(new java.awt.BorderLayout());
 
         jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
 
-        jFile.setText("Ruta archivo:*");
-        jFile.setMaximumSize(new java.awt.Dimension(84, 14));
-        jFile.setMinimumSize(new java.awt.Dimension(84, 14));
-        jFile.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel1.add(jFile);
+        jlDps.setText("Factura destino:*");
+        jlDps.setMaximumSize(new java.awt.Dimension(84, 14));
+        jlDps.setMinimumSize(new java.awt.Dimension(84, 14));
+        jlDps.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel1.add(jlDps);
 
-        jtfFile.setEditable(false);
-        jtfFile.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        jtfFile.setToolTipText("Ruta del archivo seleccionado.");
-        jtfFile.setEnabled(false);
-        jtfFile.setPreferredSize(new java.awt.Dimension(600, 23));
-        jtfFile.setSelectionEnd(6);
-        jtfFile.setSelectionStart(6);
-        jPanel1.add(jtfFile);
+        jtfDps.setEditable(false);
+        jtfDps.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        jtfDps.setToolTipText("Factura seleccionada...");
+        jtfDps.setEnabled(false);
+        jtfDps.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtfDps.setSelectionEnd(6);
+        jtfDps.setSelectionStart(6);
+        jPanel1.add(jtfDps);
 
-        jbPickFile.setText("...");
-        jbPickFile.setToolTipText("Seleccionar archivo...");
-        jbPickFile.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel1.add(jbPickFile);
+        jbPickDps.setText("...");
+        jbPickDps.setToolTipText("Seleccionar factura destino...");
+        jbPickDps.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel1.add(jbPickDps);
 
         jpPicker.add(jPanel1, java.awt.BorderLayout.NORTH);
 
@@ -147,32 +147,62 @@ public class SDialogDpsDeliveryAck extends javax.swing.JDialog implements erp.li
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        moPanelDps = new SPanelDps(miClient, "de origen");
+        moPanelDps = new SPanelDps(miClient);
         jpDps.remove(jlPanelDps);
         jpDps.add(moPanelDps, BorderLayout.NORTH);
 
-        jbPickFile.addActionListener(this);
+        moDialogPickerDps = new SDialogPickerDps(miClient, SDataConstants.TRN_DPS_ACK);
+        
+        jbPickDps.addActionListener(this);
         jbSave.addActionListener(this);
         jbCancel.addActionListener(this);
+        
+        SFormUtilities.createActionMap(rootPane, this, "publicActionSave", "save", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
+        SFormUtilities.createActionMap(rootPane, this, "publicActionCancel", "cancel", KeyEvent.VK_ESCAPE, 0);
     }
 
     /**
      * @param args the command line arguments
      */
-    private void actionPickFile() {
-        miClient.getFileChooser().setFileSelectionMode(JFileChooser.FILES_ONLY);
-        if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
-            moFile = new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath());
-            jtfFile.setText(moFile.getAbsolutePath());
+    private void actionPickDps() {
+        Object[] filterKey = new Object[] { SDataConstantsSys.TRNS_CL_DPS_SAL_DOC, new int[] {moParamDpsOrigin.getFkBizPartnerAltId_r()} };
+        
+        moDialogPickerDps.formReset();
+        moDialogPickerDps.setFilterKey(filterKey);
+        moDialogPickerDps.formRefreshOptionPane();
+        moDialogPickerDps.setFormVisible(true);
+        
+        if (moDialogPickerDps.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+            try {
+                moDpsDestiny = new SDataDps();
+                if (moDpsDestiny.read(moDialogPickerDps.getSelectedPrimaryKey(), miClient.getSession().getDatabase().getConnection().createStatement()) == SLibConstants.DB_ACTION_READ_OK){
+                    if (SLibUtils.compareKeys(moParamDpsOrigin.getPrimaryKey(), moDpsDestiny.getPrimaryKey())) {
+                        moDpsDestiny = null;
+                        miClient.showMsgBoxInformation("No se puede reasignar los acuses de entrega a la misma factura.");
+                    }
+                }
+            }
+            catch (SQLException ex) {
+                SLibUtils.showException(this, ex);
+            }
+            
+            jtfDps.setText(moDpsDestiny == null ? "" : moDpsDestiny.getDpsNumber());
         }
     }
 
     private void actionSave() {
-        if (jtfFile.getText().equals("")) {
-            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
-            jbPickFile.requestFocus();
+        if (moDpsDestiny == null) {
+            miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlDps) + "'.");
+            jbPickDps.requestFocus();
         }
         else {
+            try {
+                STrnDeliveryAckUtilities.reasignFiles(miClient, (int[]) moParamDpsOrigin.getPrimaryKey(), (int[]) moDpsDestiny.getPrimaryKey());
+            } 
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
+            
             mnFormResult = SLibConstants.FORM_RESULT_OK;
             setVisible(false);
         }
@@ -184,21 +214,32 @@ public class SDialogDpsDeliveryAck extends javax.swing.JDialog implements erp.li
     }
     
         private void windowActivated() {
-        if (mbFirstTime) {mbFirstTime = false;}
+        if (mbFirstTime) {
+            mbFirstTime = false;
+        }
     }
+        
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jFile;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JButton jbCancel;
-    private javax.swing.JButton jbPickFile;
+    private javax.swing.JButton jbPickDps;
     private javax.swing.JButton jbSave;
+    private javax.swing.JLabel jlDps;
     private javax.swing.JLabel jlPanelDps;
     private javax.swing.JPanel jpControls;
     private javax.swing.JPanel jpDps;
     private javax.swing.JPanel jpPicker;
-    private javax.swing.JTextField jtfFile;
+    private javax.swing.JTextField jtfDps;
     // End of variables declaration//GEN-END:variables
 
+    public void publicActionSave() {
+        actionSave();
+    }
+    
+    public void publicActionCancel() {
+        actionCancel();
+    }
+    
     @Override
     public void formClearRegistry() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -210,39 +251,19 @@ public class SDialogDpsDeliveryAck extends javax.swing.JDialog implements erp.li
         mnFormStatus = SLibConstants.UNDEFINED;
         mbFirstTime = true;
 
-        moFile = null;
-        moDpsDeliveryAck = null;
-        jtfFile.setText("");
-//        for (int i = 0; i < mvFields.size(); i++) {
-//            ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
-//        }
+        moParamDpsOrigin = null;
+        moDpsDestiny = null;
+        jtfDps.setText("");
     }
 
     @Override
     public void formRefreshCatalogues() {
-
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public SFormValidation formValidate() {
-        SFormValidation validation = new SFormValidation();
-
-        for (int i = 0; i < mvFields.size(); i++) {
-            if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()) {
-                validation.setIsError(true);
-                validation.setComponent(((erp.lib.form.SFormField) mvFields.get(i)).getComponent());
-                break;
-            }
-        }
-
-        if (!validation.getIsError()) {
-            if (moFile == null) {
-                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jFile) + "'.");
-                validation.setComponent(jbPickFile);
-            }
-        }
-
-        return validation;
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -267,43 +288,18 @@ public class SDialogDpsDeliveryAck extends javax.swing.JDialog implements erp.li
 
     @Override
     public void setRegistry(SDataRegistry registry) {
-        moParamDps = (SDataDps) registry;
-        moPanelDps.setDps(moParamDps, null);
+        moParamDpsOrigin = (SDataDps) registry;
+        moPanelDps.setDps(moParamDpsOrigin, null);
     }
 
     @Override
     public SDataRegistry getRegistry() {
-        if (moDpsDeliveryAck == null) {
-            moDpsDeliveryAck = new SDataDpsDeliveryAck();
-            moDpsDeliveryAck.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
-        }
-        else {
-            moDpsDeliveryAck.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
-        }
-
-        //moDpsDeliveryAck.setPkDpsDeliveryAckId(...);
-        //moDpsDeliveryAck.setNameUser(...);
-        //moDpsDeliveryAck.setNameSystem(...);
-        //moDpsDeliveryAck.setIsDeleted(...);
-        moDpsDeliveryAck.setFkYearId(moParamDps.getPkYearId());
-        moDpsDeliveryAck.setFkDocId(moParamDps.getPkDocId());
-        //moDpsDeliveryAck.setFkUserNewId(...);
-        //moDpsDeliveryAck.setFkUserEditId(...);
-        //moDpsDeliveryAck.setFkUserDeleteId(...);
-        //moDpsDeliveryAck.setUserNewTs(...);
-        //moDpsDeliveryAck.setUserEditTs(...);
-        //moDpsDeliveryAck.setUserDeleteTs(...);
-                
-        moDpsDeliveryAck.setAuxFile(moFile);
-        
-        moDpsDeliveryAck.setAuxPrefix(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId());
-
-        return moDpsDeliveryAck;
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public void setValue(int type, Object value) {
-        
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -320,8 +316,8 @@ public class SDialogDpsDeliveryAck extends javax.swing.JDialog implements erp.li
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof javax.swing.JButton) {
             JButton button = (javax.swing.JButton) e.getSource();
-            if (button == jbPickFile) {
-                actionPickFile();
+            if (button == jbPickDps) {
+                actionPickDps();
             }
             else if (button == jbSave) {
                 actionSave();

@@ -53,6 +53,7 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
      * a) SDataConstants.TRNX_DPS_PAY_PEND
      * b) SDataConstants.TRNX_DPS_PEND_LINK
      * c) SDataConstants.TRNX_DPS_PEND_ADJ
+     * d) SDataConstatnts.TRN_DPS_ACK
      */
     public SDialogPickerDps(erp.client.SClientInterface client, int optionType) {
         super(client.getFrame(), true);
@@ -266,6 +267,19 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
                 break;
 
+             case SDataConstants.TRN_DPS_ACK:
+                 tableColumns = new STableColumnForm[9];
+                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo doc.", STableConstants.WIDTH_CODE_DOC);
+                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Folio doc.", 50);
+                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Referencia doc.", STableConstants.WIDTH_CODE_DOC);
+                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha doc.", STableConstants.WIDTH_DATE);
+                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
+                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Sucursal cliente", 75);
+                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_FLOAT, "Total mon $", STableConstants.WIDTH_VALUE_2X);
+                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Moneda", 50);
+                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Acuses adjuntos", 50);
+                 break;
+                 
             default:
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
         }
@@ -462,6 +476,7 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
 
             case SDataConstants.TRNX_DPS_PEND_LINK:
             case SDataConstants.TRNX_DPS_PEND_ADJ:
+            case SDataConstants.TRN_DPS_ACK:
                 switch (((Object[]) moFilterKey).length) {
                     case 1:
                         manDpsClassPk = (int[]) ((Object[]) moFilterKey)[0];

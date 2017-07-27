@@ -57,6 +57,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
     private erp.musr.data.SDataUser moUser;
     private erp.lib.form.SFormField moFieldUser;
+    private erp.lib.form.SFormField moFieldEmail;
     private erp.lib.form.SFormField moFieldIsUniversalCompanies;
     private erp.lib.form.SFormField moFieldIsDeleted;
     private erp.lib.form.SFormField moFieldIsActive;
@@ -123,6 +124,9 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel80 = new javax.swing.JPanel();
         jlUserPasswordConfirm = new javax.swing.JLabel();
         jpfUserPasswordConfirm = new javax.swing.JPasswordField();
+        jPanel1 = new javax.swing.JPanel();
+        jlEmail = new javax.swing.JLabel();
+        jtfEmail = new javax.swing.JTextField();
         jPanel81 = new javax.swing.JPanel();
         jlBizPartner = new javax.swing.JLabel();
         jcbFkBizPartnerId = new javax.swing.JComboBox<SFormComponentItem>();
@@ -306,7 +310,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel3.setLayout(new java.awt.BorderLayout());
 
-        jPanel13.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
+        jPanel13.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
 
         jPanel78.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -357,6 +361,18 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel80.add(jpfUserPasswordConfirm);
 
         jPanel13.add(jPanel80);
+
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlEmail.setText("Cuenta correo-e:");
+        jlEmail.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel1.add(jlEmail);
+
+        jtfEmail.setText("email");
+        jtfEmail.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel1.add(jtfEmail);
+
+        jPanel13.add(jPanel1);
 
         jPanel81.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -1229,6 +1245,8 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldUser.setLengthMax(16);
         moFieldUser.setAutoCaseType(SLibConstants.CASE_LOWER);
         moFieldUser.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldEmail = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfEmail, jlEmail);
+        moFieldEmail.setAutoCaseType(SLibConstants.CASE_LOWER);
         moFieldIsUniversalCompanies = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsUniversal);
         moFieldIsUniversalCompanies.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldIsDeleted = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
@@ -1271,6 +1289,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldUserPlant.setTabbedPaneIndex(3, jTabbedPane1);
 
         mvFields.add(moFieldUser);
+        mvFields.add(moFieldEmail);
         mvFields.add(moFieldIsUniversalCompanies);
         mvFields.add(moFieldIsDeleted);
 
@@ -3386,6 +3405,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
@@ -3535,6 +3555,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JLabel jlCompanyEntity;
     private javax.swing.JLabel jlCompanySystem;
     private javax.swing.JLabel jlCompanyUser;
+    private javax.swing.JLabel jlEmail;
     private javax.swing.JLabel jlUser;
     private javax.swing.JLabel jlUserCashAccount;
     private javax.swing.JLabel jlUserPassword;
@@ -3559,6 +3580,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JPanel jpUserCompanyBranches;
     private javax.swing.JPasswordField jpfUserPassword;
     private javax.swing.JPasswordField jpfUserPasswordConfirm;
+    private javax.swing.JTextField jtfEmail;
     private javax.swing.JTextField jtfPkUserId_Ro;
     private javax.swing.JTextField jtfUser;
     // End of variables declaration//GEN-END:variables
@@ -3720,6 +3742,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         int j;
 
         moFieldUser.setFieldValue(moUser.getUser());
+        moFieldEmail.setFieldValue(moUser.getEmail());
         moFieldIsUniversalCompanies.setFieldValue(moUser.getIsUniversal());
         moFieldIsActive.setFieldValue(moUser.getIsActive());
         moFieldIsDeleted.setFieldValue(moUser.getIsDeleted());
@@ -3878,6 +3901,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         }
 
         moUser.setUser(moFieldUser.getString());
+        moUser.setEmail(moFieldEmail.getString());
         moUser.setIsUniversal(moFieldIsUniversalCompanies.getBoolean());
         moUser.setIsDeleted(moFieldIsDeleted.getBoolean());
         moUser.setFkBizPartnerId_n(moFieldFkBizPartnerId.getKeyAsIntArray()[0] == 0 ? -1 : moFieldFkBizPartnerId.getKeyAsIntArray()[0]);

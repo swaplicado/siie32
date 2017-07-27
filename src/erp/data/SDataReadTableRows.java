@@ -2523,6 +2523,46 @@ public abstract class SDataReadTableRows {
                     " (id_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_ORD[0] + " AND id_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_ORD[1] + " AND id_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_ORD[2] + " OR " +
                     " id_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[0] + " AND id_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1] + " AND id_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2] + ") ");
                 break;
+                
+            case SDataConstants.TRN_DPS_ACK:
+                aoPkFields = new STableField[2];
+                aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "dps.id_year");
+                aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "dps.id_doc");
+                
+                i = 0;
+                aoQueryFields = new STableField[9];
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "tp.code");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "_num");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "dps.num_ref");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DATE, "dps.dt");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "cob.code");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "bpb.bpb");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_FLOAT, "dps.tot_cur_r");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "cur.cur_key");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "_count_ack");
+                
+                sSql = "SELECT dps.id_year, dps.id_doc, "
+                        + "tp.code, "
+                        + "CONCAT(dps.num_ser, IF(length(dps.num_ser) = 0, '', '-'), dps.num) AS _num, "
+                        + "dps.num_ref, "
+                        + "dps.dt, "
+                        + "cob.code, "
+                        + "bpb.bpb, "
+                        + "dps.tot_cur_r, "
+                        + "cur.cur_key, "
+                        + "(SELECT COUNT(*) FROM trn_dps_ack AS ack WHERE ack.fid_year = dps.id_year AND ack.fid_doc = dps.id_doc AND NOT ack.b_del) AS _count_ack "
+                        + "FROM trn_dps AS dps "
+                        + "INNER JOIN erp.trnu_tp_dps AS tp ON dps.fid_ct_dps = tp.id_ct_dps AND dps.fid_cl_dps = tp.id_cl_dps AND dps.fid_tp_dps = tp.id_tp_dps "
+                        + "INNER JOIN erp.bpsu_bp AS bp ON dps.fid_bp_r = bp.id_bp "
+                        + "INNER JOIN erp.bpsu_bpb AS cob ON dps.fid_cob = cob.id_bpb "
+                        + "INNER JOIN erp.bpsu_bpb AS bpb ON dps.fid_bpb = bpb.id_bpb "
+                        + "INNER JOIN erp.cfgu_cur AS cur ON dps.fid_cur = cur.id_cur "
+                        + "WHERE dps.fid_ct_dps = " + ((int[]) ((Object[]) filterKey)[0])[0] + " AND dps.fid_cl_dps = " + ((int[]) ((Object[]) filterKey)[0])[1] + " "
+                        + "AND dps.b_del = 0 AND fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND dps.b_dps_ack = 0 "
+                        + "AND bp.id_bp = " + ((int[]) ((Object[]) filterKey)[1])[0] + " "
+                        + "GROUP BY dps.id_year, dps.id_doc "
+                        + "ORDER BY tp.code, _num, dps.dt, dps.id_year, dps.id_doc ";
+                break;
 
             default:
                 piClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);

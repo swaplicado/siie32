@@ -21,6 +21,9 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
 import erp.mtrn.data.STrnDeliveryAckUtilities;
+import erp.mtrn.form.SDialogDpsDeliveryAckReasign;
+import erp.mtrn.form.SDialogDpsDeliveryAckSend;
+import erp.mtrn.form.SDialogDpsDeliveryAckViewer;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterCompanyBranch;
 import java.awt.Dimension;
@@ -41,18 +44,27 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
     private javax.swing.JButton mjbDownloadFiles;
     private javax.swing.JButton mjbDeleteFiles;
     private javax.swing.JButton mjbReasignFiles;
+    private javax.swing.JButton mjbViewFiles;
+    private javax.swing.JButton mjbSendFiles;
     private erp.table.STabFilterCompanyBranch moTabFilterCompanyBranch;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     private erp.lib.table.STabFilterDateCutOff moTabFilterDateCutOff;
+
+    private erp.mtrn.form.SDialogDpsDeliveryAckReasign moDialogDpsDeliveryAckReasign;
+    private erp.mtrn.form.SDialogDpsDeliveryAckViewer moDialogDpsDeliveryViewer;
+    private erp.mtrn.form.SDialogDpsDeliveryAckSend moDialogDpsDeliveryAckSend;
 
     private boolean mbIsPending;
 
     /**
      * Creates new view for DPS delivery acknowledgments.
+     *
      * @param client GUI client.
      * @param tabTitle View tab title.
-     * @param dpsCategory DPS category. Can be SDataConstantsSys.TRNS_CT_DPS_PUR or SDataConstantsSys.TRNS_CT_DPS_SAL.
-     * @param dpsAckStatus  DPS delivery acknowledgment status. Can be SUtilConsts.PROC or SUtilConsts.PROC_PEND.
+     * @param dpsCategory DPS category. Can be SDataConstantsSys.TRNS_CT_DPS_PUR
+     * or SDataConstantsSys.TRNS_CT_DPS_SAL.
+     * @param dpsAckStatus DPS delivery acknowledgment status. Can be
+     * SUtilConsts.PROC or SUtilConsts.PROC_PEND.
      */
     public SViewDpsDeliveryAck(SClientInterface client, String tabTitle, int dpsCategory, int dpsAckStatus) {
         super(client, tabTitle, SDataConstants.TRN_DPS_ACK, dpsCategory, dpsAckStatus);
@@ -72,7 +84,7 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
                 break;
             case SUtilConsts.PROC:
                 mbIsPending = false;
-                moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_DATE);
+                moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
                 break;
             default:
         }
@@ -80,9 +92,11 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
         mjbDeliveryAckClose = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_CLOSE));
         mjbDeliveryAckOpen = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_OPEN));
         mjbUploadFile = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_ADD));
-        mjbDownloadFiles = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_IMPORT));
+        mjbDownloadFiles = new JButton(miClient.getImageIcon(SLibConstants.ICON_ARROW_DOWN));
         mjbDeleteFiles = new JButton(miClient.getImageIcon(SLibConstants.ICON_DELETE));
         mjbReasignFiles = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_DELIVERY));
+        mjbViewFiles = new JButton(miClient.getImageIcon(SLibConstants.ICON_LOOK));
+        mjbSendFiles = new JButton(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")));
 
         mjbDeliveryAckClose.setPreferredSize(new Dimension(23, 23));
         mjbDeliveryAckOpen.setPreferredSize(new Dimension(23, 23));
@@ -90,6 +104,8 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
         mjbDownloadFiles.setPreferredSize(new Dimension(23, 23));
         mjbDeleteFiles.setPreferredSize(new Dimension(23, 23));
         mjbReasignFiles.setPreferredSize(new Dimension(23, 23));
+        mjbViewFiles.setPreferredSize(new Dimension(23, 23));
+        mjbSendFiles.setPreferredSize(new Dimension(23, 23));
 
         mjbDeliveryAckClose.addActionListener(this);
         mjbDeliveryAckOpen.addActionListener(this);
@@ -97,6 +113,8 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
         mjbDownloadFiles.addActionListener(this);
         mjbDeleteFiles.addActionListener(this);
         mjbReasignFiles.addActionListener(this);
+        mjbViewFiles.addActionListener(this);
+        mjbSendFiles.addActionListener(this);
 
         mjbDeliveryAckClose.setToolTipText("Cerrar factura");
         mjbDeliveryAckOpen.setToolTipText("Abrir factura");
@@ -104,6 +122,8 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
         mjbDownloadFiles.setToolTipText("Descargar acuses");
         mjbDeleteFiles.setToolTipText("Eliminar acuses");
         mjbReasignFiles.setToolTipText("Reasignar acuses");
+        mjbViewFiles.setToolTipText("Ver acuses");
+        mjbSendFiles.setToolTipText("Enviar acuses");
 
         moTabFilterCompanyBranch = new STabFilterCompanyBranch(miClient, this);
 
@@ -121,6 +141,8 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
         addTaskBarUpperComponent(mjbDownloadFiles);
         addTaskBarUpperComponent(mjbDeleteFiles);
         addTaskBarUpperComponent(mjbReasignFiles);
+        addTaskBarUpperComponent(mjbViewFiles);
+        addTaskBarUpperComponent(mjbSendFiles);
 
         if (!mbIsPending) {
             mjbDeliveryAckOpen.setEnabled(true);
@@ -129,14 +151,18 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
             mjbUploadFile.setEnabled(false);
             mjbDownloadFiles.setEnabled(true);
             mjbDeleteFiles.setEnabled(false);
+            mjbViewFiles.setEnabled(true);
+            mjbSendFiles.setEnabled(true);
         }
         else {
             mjbDeliveryAckOpen.setEnabled(false);
             mjbDeliveryAckClose.setEnabled(true);
-            mjbReasignFiles.setEnabled(false);  // XXX must be true when implemented!
+            mjbReasignFiles.setEnabled(true);
             mjbUploadFile.setEnabled(true);
             mjbDownloadFiles.setEnabled(true);
             mjbDeleteFiles.setEnabled(true);
+            mjbViewFiles.setEnabled(true);
+            mjbSendFiles.setEnabled(false);
         }
 
         aoKeyFields = new STableField[2];
@@ -176,35 +202,34 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
         populateTable();
     }
 
-    private void actionDeliveryAckDocStatus(boolean isClosing){
+    private void actionDeliveryAckDocStatus(boolean close) {
         Vector<Object> params = null;
         int[] pk = null;
-        
-        if(mjbDeliveryAckClose.isEnabled() || mjbDeliveryAckOpen.isEnabled()){
-            if(moTablePane.getSelectedTableRow() == null) {
+
+        if (mjbDeliveryAckClose.isEnabled() || mjbDeliveryAckOpen.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() == null) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
-            else
-            {
-                if(miClient.showMsgBoxConfirm("El documento quedará "+(isClosing ? "cerrado" : "abierto") + " para agregar acuses de entrega. "+ SLibConstants.MSG_CNF_MSG_CONT) == JOptionPane.YES_OPTION) {
+            else {
+                if (miClient.showMsgBoxConfirm("La factura quedará " + (close ? "cerrada" : "abierta") + " para agregar acuses de entrega.\n" + SLibConstants.MSG_CNF_MSG_CONT) == JOptionPane.YES_OPTION) {
                     params = new Vector<Object>();
 
                     /*
-                    *Parameters for procedure:
-                    *id_year
-                    *id_doc
-                    *Dps acknowledgement flag (for procedure differentiation)
-                    *value to update in field b_dps_ack, table trn_dps
-                    *Id of the user modifying
-                    */
+                     *Parameters for procedure:
+                     *id_year
+                     *id_doc
+                     *Dps acknowledgement flag (for procedure differentiation)
+                     *value to update in field b_dps_ack, table trn_dps
+                     *Id of the user modifying
+                     */
                     pk = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
                     params.add(pk[0]);
                     params.add(pk[1]);
                     params.add(SDataConstantsSys.UPD_DPS_FL_DPS_ACK);
-                    params.add(isClosing ? 1 : 0);
+                    params.add(close ? 1 : 0);
                     params.add(miClient.getSession().getUser().getPkUserId());
-                    params = SDataUtilities.callProcedure((SClientInterface) miClient, SProcConstants.TRN_DPS_UPD, params, SLibConstants.EXEC_MODE_SILENT);      
-                    
+                    params = SDataUtilities.callProcedure((SClientInterface) miClient, SProcConstants.TRN_DPS_UPD, params, SLibConstants.EXEC_MODE_SILENT);
+
                     miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
                 }
             }
@@ -216,7 +241,7 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
             if (moTablePane.getSelectedTableRow() == null) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
-            else if (miClient.getGuiModule(SDataConstants.MOD_SAL).showForm(mnTabType, SLibConstants.UNDEFINED, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
+            else if (miClient.getGuiModule(SDataConstants.MOD_SAL).showForm(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
                 miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
             }
         }
@@ -228,16 +253,16 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
             else {
-                try{
+                try {
                     STrnDeliveryAckUtilities.downloadFiles(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
                     miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
-                }catch (Exception e){
+                } catch (Exception e) {
                     SLibUtilities.renderException(this, e);
                 }
             }
         }
     }
-    
+
     private void actionDeleteFiles() {
         if (mjbDeleteFiles.isEnabled()) {
             if (moTablePane.getSelectedTableRow() == null) {
@@ -255,18 +280,54 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
     }
 
     private void actionReasignFiles() {
-        int[] destinyDoc = null;
         if (mjbReasignFiles.isEnabled()) {
             if (moTablePane.getSelectedTableRow() == null) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
             else {
-                try{
-                    STrnDeliveryAckUtilities.reasignFiles(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey(), destinyDoc);
-                    miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
-                } catch (Exception e) {
-                    
+                if (moDialogDpsDeliveryAckReasign == null) {
+                    moDialogDpsDeliveryAckReasign = new SDialogDpsDeliveryAckReasign(miClient);
                 }
+
+                moDialogDpsDeliveryAckReasign.formReset();
+                moDialogDpsDeliveryAckReasign.setRegistry(SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE));
+                moDialogDpsDeliveryAckReasign.setFormVisible(true);
+
+                miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
+            }
+        }
+    }
+
+    private void actionViewFiles() {
+        if (mjbViewFiles.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() == null) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                if (moDialogDpsDeliveryViewer == null) {
+                    moDialogDpsDeliveryViewer = new SDialogDpsDeliveryAckViewer(miClient);
+                }
+
+                moDialogDpsDeliveryViewer.formReset();
+                moDialogDpsDeliveryViewer.setRegistry(SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE));
+                moDialogDpsDeliveryViewer.setFormVisible(true);
+            }
+        }
+    }
+
+    private void actionSendFiles() {
+        if (mjbSendFiles.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() == null) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                if (moDialogDpsDeliveryAckSend == null) {
+                    moDialogDpsDeliveryAckSend = new SDialogDpsDeliveryAckSend(miClient);
+                }
+
+                moDialogDpsDeliveryAckSend.formReset();
+                moDialogDpsDeliveryAckSend.setRegistry(SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE));
+                moDialogDpsDeliveryAckSend.setFormVisible(true);
             }
         }
     }
@@ -286,7 +347,7 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
                 break;
             default:
         }
-       
+
         sqlWhere += "AND dps.fid_ct_dps = " + keyDpsType[0] + " AND dps.fid_cl_dps = " + keyDpsType[1] + " AND dps.fid_tp_dps = " + keyDpsType[2] + " ";
         sqlWhere += "AND dps.b_dps_ack = " + (mbIsPending ? "0" : "1") + " ";   // opened or closed DPS for appending delivery acknowledgment files
 
@@ -299,9 +360,11 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
                 else {
                     sqlWhere += "AND " + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "dps.dt") + " ";
                 }
-            } else  if (setting.getType() == SFilterConstants.SETTING_FILTER_COB) {
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_COB) {
                 sqlWhere += ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND dps.fid_cob = " + (Integer) setting.getSetting() + " ");
-            }else if (setting.getType() == SFilterConstants.SETTING_FILTER_COB) {
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_COB) {
                 sqlWhere += ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND dps.fid_cob = " + (Integer) setting.getSetting() + " ");
             }
         }
@@ -331,16 +394,17 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
 
     @Override
     public void actionNew() {
-        
+
     }
 
     @Override
     public void actionEdit() {
-        
+
     }
 
     @Override
     public void actionDelete() {
+        
     }
 
     @Override
@@ -367,6 +431,12 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
             }
             else if (button == mjbReasignFiles) {
                 actionReasignFiles();
+            }
+            else if (button == mjbViewFiles) {
+                actionViewFiles();
+            }
+            else if (button == mjbSendFiles) {
+                actionSendFiles();
             }
         }
     }
