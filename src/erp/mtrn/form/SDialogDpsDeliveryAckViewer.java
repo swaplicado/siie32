@@ -201,7 +201,7 @@ public class SDialogDpsDeliveryAckViewer extends javax.swing.JDialog implements 
             
             deliveryAck.read(moPaneDeliveryAck.getSelectedTableRow().getRowPrimaryKey(), miClient.getSession().getStatement());
 
-            File fileNameSystem = new File(SDataParamsCompany.FILES_DIR + "/" + deliveryAck.getNameSystem());
+            File fileNameSystem = new File(SDataParamsCompany.FILES_DIR + "\\" + deliveryAck.getNameSystem());
             
             try {
                 Desktop.getDesktop().open(fileNameSystem);
