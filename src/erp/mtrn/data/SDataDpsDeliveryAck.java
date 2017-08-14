@@ -69,7 +69,7 @@ public class SDataDpsDeliveryAck extends erp.lib.data.SDataRegistry implements j
                     StandardCopyOption.REPLACE_EXISTING,     //REPLACE_EXISTING: replace the file if exists.
                     StandardCopyOption.COPY_ATTRIBUTES       //COPY_ATTRIBUTES like last_modified, etc.
                 };
-                Files.copy(Paths.get(moAuxFile.getAbsolutePath()), Paths.get(path + "/" + fileName), options);
+                Files.copy(Paths.get(moAuxFile.getAbsolutePath()), Paths.get(path + "\\" + fileName), options);
             } 
             catch (Exception ex) {
                 SLibUtilities.renderException(this, ex);
@@ -139,7 +139,7 @@ public class SDataDpsDeliveryAck extends erp.lib.data.SDataRegistry implements j
 
     public void saveFileSystemPath() throws Exception {
         composeFileName();
-        saveFile(SDataParamsCompany.FILES_DIR + "/", msNameSystem);
+        saveFile(SDataParamsCompany.FILES_DIR, msNameSystem);
     }
     
     public void saveFileCustomPath(final String customPath) throws Exception {
@@ -147,7 +147,7 @@ public class SDataDpsDeliveryAck extends erp.lib.data.SDataRegistry implements j
     }
     
     public File createFileFromSystemPath() {
-        return new File(SDataParamsCompany.FILES_DIR + "/", msNameSystem);
+        return new File(SDataParamsCompany.FILES_DIR, msNameSystem);
     }
 
     @Override

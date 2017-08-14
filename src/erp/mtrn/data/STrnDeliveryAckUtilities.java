@@ -75,7 +75,7 @@ public abstract class STrnDeliveryAckUtilities {
         while(resultSet.next()) {
              files.add(new File[] { 
                  new File(resultSet.getString("name_usr")),
-                 new File(SDataParamsCompany.FILES_DIR + "/" + resultSet.getString("name_sys"))
+                 new File(SDataParamsCompany.FILES_DIR + "\\" + resultSet.getString("name_sys"))
              });
         }
         
@@ -132,7 +132,7 @@ public abstract class STrnDeliveryAckUtilities {
             }
             else {
                 for (SDataDpsDeliveryAck deliveryAck : dpsDeliveryAcks) {
-                    File filePath = new File(SDataParamsCompany.FILES_DIR + "/" + deliveryAck.getNameSystem());
+                    File filePath = new File(SDataParamsCompany.FILES_DIR + "\\" + deliveryAck.getNameSystem());
                     
                     filePath.delete();   //eliminar archivo en el directorio de destino
                                         
