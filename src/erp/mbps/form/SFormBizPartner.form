@@ -1220,33 +1220,6 @@
                         </Component>
                       </SubComponents>
                     </Container>
-                    <Container class="javax.swing.JPanel" name="jPanel35">
-
-                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                        <Property name="alignment" type="int" value="0"/>
-                        <Property name="verticalGap" type="int" value="0"/>
-                      </Layout>
-                      <SubComponents>
-                        <Component class="javax.swing.JLabel" name="jlFkUserAnalyst">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" value="Analista del AN:"/>
-                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[175, 23]"/>
-                            </Property>
-                          </Properties>
-                        </Component>
-                        <Component class="javax.swing.JComboBox" name="jcbFkUserAnalystId">
-                          <Properties>
-                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[200, 23]"/>
-                            </Property>
-                          </Properties>
-                          <AuxValues>
-                            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
-                          </AuxValues>
-                        </Component>
-                      </SubComponents>
-                    </Container>
                     <Container class="javax.swing.JPanel" name="jPanel9">
 
                       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
@@ -1335,7 +1308,7 @@
                         <Property name="verticalGap" type="int" value="0"/>
                       </Layout>
                       <SubComponents>
-                        <Component class="javax.swing.JLabel" name="jlFkPaymentSystemTypeId">
+                        <Component class="javax.swing.JLabel" name="jlCfdiPaymentWay">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Forma de pago predeterminada:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -1343,10 +1316,10 @@
                             </Property>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JComboBox" name="jcbFkPaymentSystemTypeId">
+                        <Component class="javax.swing.JComboBox" name="jcbCfdiPaymentWay">
                           <Properties>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[200, 23]"/>
+                              <Dimension value="[400, 23]"/>
                             </Property>
                           </Properties>
                           <AuxValues>
@@ -1362,20 +1335,23 @@
                         <Property name="verticalGap" type="int" value="0"/>
                       </Layout>
                       <SubComponents>
-                        <Component class="javax.swing.JLabel" name="jlPaymentAccount">
+                        <Component class="javax.swing.JLabel" name="jlCfdiCfdiUsage">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="No. cuenta pago predeterminada:"/>
+                            <Property name="text" type="java.lang.String" value="Uso CFDI predeterminado:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[175, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JTextField" name="jtfPaymentAccount">
+                        <Component class="javax.swing.JComboBox" name="jcbCfdiCfdiUsage">
                           <Properties>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[200, 23]"/>
+                              <Dimension value="[400, 23]"/>
                             </Property>
                           </Properties>
+                          <AuxValues>
+                            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+                          </AuxValues>
                         </Component>
                       </SubComponents>
                     </Container>
@@ -1397,7 +1373,34 @@
                         <Component class="javax.swing.JComboBox" name="jcbFkCfdAddendaTypeId">
                           <Properties>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[200, 23]"/>
+                              <Dimension value="[300, 23]"/>
+                            </Property>
+                          </Properties>
+                          <AuxValues>
+                            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+                          </AuxValues>
+                        </Component>
+                      </SubComponents>
+                    </Container>
+                    <Container class="javax.swing.JPanel" name="jPanel35">
+
+                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                        <Property name="alignment" type="int" value="0"/>
+                        <Property name="verticalGap" type="int" value="0"/>
+                      </Layout>
+                      <SubComponents>
+                        <Component class="javax.swing.JLabel" name="jlFkUserAnalyst">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Analista del AN:"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[175, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JComboBox" name="jcbFkUserAnalystId">
+                          <Properties>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[300, 23]"/>
                             </Property>
                           </Properties>
                           <AuxValues>
@@ -1424,7 +1427,7 @@
                         <Component class="javax.swing.JTextField" name="jtfWeb">
                           <Properties>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[340, 23]"/>
+                              <Dimension value="[300, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -1448,7 +1451,7 @@
                         <Component class="javax.swing.JTextField" name="jtfNotes">
                           <Properties>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[340, 23]"/>
+                              <Dimension value="[300, 23]"/>
                             </Property>
                           </Properties>
                         </Component>

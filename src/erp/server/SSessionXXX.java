@@ -38,7 +38,7 @@ public class SSessionXXX implements java.io.Serializable {
 
     private java.util.Vector<erp.mcfg.data.SDataSysEntityCategory> mvEntityCategories;
     private java.util.Vector<erp.mcfg.data.SDataCompanyBranchEntity> mvCurrentCompanyBranchEntities;
-    private java.util.Vector<erp.mcfg.data.SDataCertificate> mvDbmsCertificates;
+//    private java.util.Vector<erp.mcfg.data.SDataCertificate> mvDbmsCertificates;
 
     public SSessionXXX() {
         mnSessionId = 0;
@@ -58,7 +58,7 @@ public class SSessionXXX implements java.io.Serializable {
 
         mvEntityCategories = new Vector<>();
         mvCurrentCompanyBranchEntities = new Vector<>();
-        mvDbmsCertificates = new Vector<>();
+//        mvDbmsCertificates = new Vector<>();
     }
 
     public void setSessionId(int n) { mnSessionId = n; }
@@ -91,7 +91,7 @@ public class SSessionXXX implements java.io.Serializable {
 
     public java.util.Vector<erp.mcfg.data.SDataSysEntityCategory> getEntityCategories() { return mvEntityCategories; }
     public java.util.Vector<erp.mcfg.data.SDataCompanyBranchEntity> getCurrentCompanyBranchEntities() { return mvCurrentCompanyBranchEntities; }
-    public java.util.Vector<erp.mcfg.data.SDataCertificate> getDbmsCertificates() { return mvDbmsCertificates; }
+//    public java.util.Vector<erp.mcfg.data.SDataCertificate> getDbmsCertificates() { return mvDbmsCertificates; }
 
     public int getLanguage() { return moParamsErp == null ? SLibConstants.LAN_SPANISH : moParamsErp.getFkLanguageId(); }
 

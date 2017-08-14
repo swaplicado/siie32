@@ -3,14 +3,14 @@
  * and open the template in the editor.
  */
 
-package erp.mtrn.data;
+package erp.cfd;
 
 import sa.lib.xml.SXmlAttribute;
 import sa.lib.xml.SXmlElement;
 
 /**
- * Class for handling international trade information for the CFDI in XML format
- * @author Juan Barajas
+ * Class for handling Internationa Commerce information for the CFDI in XML format
+ * @author Juan Barajas, Sergio Flores
  */
 public class SXmlDpsCfdCce extends SXmlElement {
 
@@ -25,6 +25,7 @@ public class SXmlDpsCfdCce extends SXmlElement {
     public static final String ATT_TP_CAMB = "TipoCambioUSD";
     public static final String ATT_TOT_USD = "TotalUSD";
     public static final String ATT_NUM_EXP_CONF = "NumExportadorConfiable";
+    public static final String ATT_INCOTERM = "Incoterm";
     
     protected SXmlAttribute moCfdCceMotivoTraslado;
     protected SXmlAttribute moCfdCceTipoOperacion;

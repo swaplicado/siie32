@@ -10,10 +10,12 @@ import cfd.DElement;
 import cfd.ver32.DElementComprobante;
 import cfd.ver32.DElementTimbreFiscalDigital;
 import erp.cfd.SCfdConsts;
+import erp.cfd.SCfdXmlCatalogs;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
+import erp.gui.session.SSessionCustom;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
@@ -63,10 +65,6 @@ public class SCfdPrint {
 
     public SCfdPrint(erp.client.SClientInterface client) {
         miClient = client;
-    }
-
-    public void printCfd(erp.mtrn.data.SDataCfd cfd, SDataDps dps) throws java.lang.Exception {
-        printCfd(cfd, SDataConstantsPrint.PRINT_MODE_VIEWER, dps);
     }
 
     public void printCfd(erp.mtrn.data.SDataCfd cfd, int pnPrintMode, SDataDps dps) throws java.lang.Exception {
@@ -443,7 +441,7 @@ public class SCfdPrint {
         sDocType = SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNU_TP_DPS, new int[] { dps.getFkDpsCategoryId(), dps.getFkDpsClassId(), dps.getFkDpsTypeId() });
         sDocValueText = SLibUtilities.translateValueToText(dTotalCy, miClient.getSessionXXX().getParamsErp().getDecimalsValue(), dps.getFkLanguajeId(), cur.getTextSingular(), cur.getTextPlural(), cur.getTextPrefix(), cur.getTextSuffix());
 
-        if (sDocType.indexOf("CTE.") != -1) {
+        if (sDocType.contains("CTE.")) {
             sDocType = SLibUtilities.textTrim(sDocType.substring(0, sDocType.indexOf("CTE.")));
         }
 
@@ -491,6 +489,7 @@ public class SCfdPrint {
 
         // Comprobante:
 
+        SCfdXmlCatalogs catalogs = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdXmlCatalogs();
         comprobante = DCfdUtils.getCfdi32(cfd.getDocXml());
 
         map.put("sCfdVersion", comprobante.getAttVersion().getString());
@@ -503,13 +502,14 @@ public class SCfdPrint {
         map.put("sCfdCondicionesDePagoOpc", comprobante.getAttCondicionesDePago().getOption());
         map.put("dCfdSubTotal", comprobante.getAttSubTotal().getDouble());
         map.put("dCfdTotal", comprobante.getAttTotal().getDouble());
-        if (comprobante.getAttMetodoDePago().getString().length() != 2) {
-            map.put("sCfdMetodoDePagoOpc", comprobante.getAttMetodoDePago().getString());
+        
+        if (comprobante.getAttMetodoDePago().getString().length() == 2) {
+            map.put("sCfdMetodoDePagoOpc", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY, comprobante.getAttMetodoDePago().getString()));
         }
         else {
-            nPaymentMethodCode = SLibUtils.parseInt(comprobante.getAttMetodoDePago().getString());
-            map.put("sCfdMetodoDePagoOpc", nPaymentMethodCode == 0 ? comprobante.getAttMetodoDePago().getString() : DCfdUtils.composeFormaPago(comprobante.getAttMetodoDePago().getString()));
+            map.put("sCfdMetodoDePagoOpc", comprobante.getAttMetodoDePago().getString());
         }
+        
         map.put("sExpedidoEn", comprobante.getAttLugarExpedicion().getString());
         map.put("sCfdTipoDeComprobante", comprobante.getAttTipoDeComprobante().getOption());
         map.put("sCfdNoCuentaPago", comprobante.getAttNumCtaPago().getString());
@@ -773,28 +773,22 @@ public class SCfdPrint {
 
         // Comprobante:
 
+        SCfdXmlCatalogs catalogs = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdXmlCatalogs();
         comprobante = DCfdUtils.getCfdi33(cfd.getDocXml());
 
-        map.put("sCfdVersion", comprobante.getAttVersion().getString());
+        map.put("sCfdVersion", "" + comprobante.getVersion());
         map.put("sCfdSerieOpc", comprobante.getAttSerie().getString());
         map.put("sCfdFolio", comprobante.getAttFolio().getString());
         map.put("sCfdFecha", SLibUtils.DbmsDateFormatDatetime.format(comprobante.getAttFecha().getDatetime()));
         map.put("sCfdSello", comprobante.getAttSello().getString());
-        if (comprobante.getAttFormaPago().getString().length() != 2) {
-            map.put("sCfdFormaDePago", comprobante.getAttFormaPago().getString());
-        }
-        else {
-            nPaymentMethodCode = SLibUtils.parseInt(comprobante.getAttFormaPago().getString());
-            map.put("sCfdFormaDePago", nPaymentMethodCode == 0 ? comprobante.getAttFormaPago().getString() : DCfdUtils.composeFormaPago(comprobante.getAttFormaPago().getString()));
-        }
+        map.put("sCfdFormaDePago", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY, comprobante.getAttFormaPago().getString()));
         map.put("sCfdNoCertificado", comprobante.getAttNoCertificado().getString());
-        map.put("sCfdCondicionesDePagoOpc", comprobante.getAttCondicionesDePago().getOption());
+        map.put("sCfdCondicionesDePagoOpc", comprobante.getAttCondicionesDePago().getString());
         map.put("dCfdSubTotal", comprobante.getAttSubTotal().getDouble());
         map.put("dCfdTotal", comprobante.getAttTotal().getDouble());
-        map.put("sCfdMetodoDePagoOpc", comprobante.getAttMetodoPago().getOption());
+        map.put("sCfdMetodoDePagoOpc", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_PAY_MET, comprobante.getAttMetodoPago().getString()));
         map.put("sExpedidoEn", comprobante.getAttLugarExpedicion().getString());
-        map.put("sCfdTipoDeComprobante", comprobante.getAttTipoDeComprobante().getOption());
-        //map.put("sCfdNoCuentaPago", comprobante.getAttNumCtaPago().getString());
+        map.put("sCfdTipoDeComprobante", comprobante.getAttTipoDeComprobante().getString());
 
         // Emisor:
 
@@ -841,10 +835,9 @@ public class SCfdPrint {
             }
         }
 
-        map.put("sUrlCfdi", "https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx\n "
-                + "https://prodretencionverificacion.clouda.sat.gob.mx/");
+        map.put("sUrlCfdi", "https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx");
         if (!sSelloEmisor.isEmpty()) { 
-            map.put("sSelloCfdiUltDig", sSelloEmisor.substring(sSelloEmisor.length()- 8, sSelloEmisor.length()));
+            map.put("sSelloCfdiUltDig", sSelloEmisor.substring(sSelloEmisor.length() - 8, sSelloEmisor.length()));
         }
         
         // QR Code:
@@ -925,10 +918,10 @@ public class SCfdPrint {
         String sPdfFileName = "";
 
         switch (cfd.getFkCfdTypeId()) {
-            case SCfdConsts.CFD_TYPE_DPS:
+            case SDataConstantsSys.TRNS_TP_CFD_INV:
                 dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
                 break;
-            case SCfdConsts.CFD_TYPE_PAYROLL:
+            case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
                 switch (subtypeCfd) {
                     case SCfdConsts.CFDI_PAYROLL_VER_OLD:
                         payrollEmp = (SDataFormerPayrollEmp) SDataUtilities.readRegistry(miClient, SDataConstants.HRS_SIE_PAY_EMP, new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, SLibConstants.EXEC_MODE_SILENT);
@@ -1083,6 +1076,7 @@ public class SCfdPrint {
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
 
+        SCfdXmlCatalogs catalogs = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdXmlCatalogs();
         comprobante = DCfdUtils.getCfdi32(cfd.getDocXml());
         
         map.put("sSql", sSql);
@@ -1093,7 +1087,7 @@ public class SCfdPrint {
         map.put("dCfdSubtotal", comprobante.getAttSubTotal().getDouble());
         map.put("dCfdDescuento", comprobante.getAttDescuento().getDouble());
         map.put("dCfdTotal", comprobante.getAttTotal().getDouble());
-        map.put("sCfdMetodoDePagoOpc", DCfdUtils.composeFormaPago(comprobante.getAttMetodoDePago().getString()));
+        map.put("sCfdMetodoDePagoOpc", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY, comprobante.getAttMetodoDePago().getString()));
         map.put("sExpedidoEn", comprobante.getAttLugarExpedicion().getString());
         map.put("sCfdTipoComprobante", comprobante.getAttTipoDeComprobante().getOption());
         map.put("sCfdNoCuentaPago", comprobante.getAttNumCtaPago().getString());
@@ -1398,6 +1392,7 @@ public class SCfdPrint {
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
 
+        SCfdXmlCatalogs catalogs = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdXmlCatalogs();
         comprobante = DCfdUtils.getCfdi32(cfd.getDocXml());
         
         map.put("sSql", sSql);
@@ -1408,7 +1403,7 @@ public class SCfdPrint {
         map.put("dCfdSubtotal", comprobante.getAttSubTotal().getDouble());
         map.put("dCfdDescuento", comprobante.getAttDescuento().getDouble());
         map.put("dCfdTotal", comprobante.getAttTotal().getDouble());
-        map.put("sCfdMetodoDePagoOpc", DCfdUtils.composeFormaPago(comprobante.getAttMetodoDePago().getString()));
+        map.put("sCfdMetodoDePagoOpc", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY, comprobante.getAttMetodoDePago().getString()));
         map.put("sExpedidoEn", comprobante.getAttLugarExpedicion().getString());
         map.put("sCfdTipoComprobante", comprobante.getAttTipoDeComprobante().getOption());
         map.put("sCfdNoCuentaPago", comprobante.getAttNumCtaPago().getString());

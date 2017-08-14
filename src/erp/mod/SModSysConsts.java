@@ -740,6 +740,10 @@ public abstract class SModSysConsts {
     public static final int LOGS_INC_FOB = 10;
     public static final int LOGS_INC_CFR = 11;
     public static final int LOGS_INC_CIF = 12;
+    public static final int LOGS_INC_DAF = 21;
+    public static final int LOGS_INC_DDU = 22;
+    public static final int LOGS_INC_DES = 23;
+    public static final int LOGS_INC_DEQ = 24;
     public static final int LOGS_INC_LAB = 101;
 
     public static final int FIELD_MONTH_JANUARY = 1;

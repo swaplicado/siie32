@@ -2068,24 +2068,7 @@ public abstract class SHrsUtils {
             throw new Exception("No se encontró la nómina.");
         }
         else {
-
-            // Obtain company parameters (id_co, id_bpb, fiscal_settings):
-
-            sql = "SELECT p.id_co, bpb.id_bpb, p.tax_regime AS _fis_sett " +
-                "FROM cfg_param_co AS p " +
-                "INNER JOIN erp.bpsu_bp AS b ON " +
-                "p.id_co = b.id_bp " +
-                "INNER JOIN erp.bpsu_bpb AS bpb ON " +
-                "b.id_bp = bpb.fid_bp " +
-                "WHERE p.b_del = 0 AND p.id_co = " + client.getSession().getConfigCompany().getCompanyId() + " AND b.b_co = " + SUtilConsts.BPR_CO_ID + " ";
-            resultSetAux = statementClient.executeQuery(sql);
-
-            if (!resultSetAux.next()) {
-                throw new Exception("No se encontró la configuración de la empresa.");
-            }
-
             hrsPayroll = new SHrsFormerPayroll(client);
-
             hrsPayroll.setPkNominaId(resultSet.getInt("id_pay"));
             hrsPayroll.setFecha(resultSet.getDate("pei.dt_iss"));
             hrsPayroll.setFechaInicial(resultSet.getDate("dt_sta"));
@@ -2094,9 +2077,9 @@ public abstract class SHrsUtils {
             hrsPayroll.setTotalDeducciones(resultSet.getDouble("f_ded"));
             hrsPayroll.setTotalRetenciones(resultSet.getDouble("f_rent_ret"));
             hrsPayroll.setDescripcion(SLibUtilities.textLeft(SLibUtilities.textTrim(resultSet.getString("f_descrip")), 100)); // 100 = pay_note column width
-            hrsPayroll.setEmpresaId(resultSetAux.getInt("p.id_co"));
-            hrsPayroll.setSucursalEmpresaId(resultSetAux.getInt("bpb.id_bpb"));
-            hrsPayroll.setRegimenFiscal(new String[] { SLibUtilities.textTrim(resultSetAux.getString("_fis_sett")) });
+            hrsPayroll.setEmpresaId(client.getSession().getConfigCompany().getCompanyId());
+            hrsPayroll.setSucursalEmpresaId(client.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getPkBizPartnerBranchId());
+            hrsPayroll.setRegimenFiscal(new String[] { client.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal() });
             hrsPayroll.setFkNominaTipoId(resultSet.getInt("p.fk_tp_pay_sht"));
             
             nPaymentType = resultSet.getInt("p.fk_tp_pay");

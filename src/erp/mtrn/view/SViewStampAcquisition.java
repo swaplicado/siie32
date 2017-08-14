@@ -19,7 +19,7 @@ import javax.swing.JButton;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SViewStampAcquisition extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -44,11 +44,8 @@ public class SViewStampAcquisition extends erp.lib.table.STableTab implements ja
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDatePeriod);
 
-        if (miClient.getSessionXXX().getParamsCompany().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32 ||
-                miClient.getSessionXXX().getParamsCompany().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
-            jbNew.setEnabled(true);
-            jbEdit.setEnabled(true);
-         }
+        jbNew.setEnabled(true);
+        jbEdit.setEnabled(true);
 
         aoKeyFields = new STableField[3];
         aoTableColumns = new STableColumn[5];

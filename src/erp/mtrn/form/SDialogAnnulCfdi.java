@@ -1,6 +1,6 @@
 package erp.mtrn.form;
 
-import erp.cfd.SCfdConsts;
+import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
@@ -192,7 +192,7 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
     }
 
     private void enableFieldDpsAnnulationType() {
-        moKeyDpsAnnulationType.setEnabled(mnCfdiType == SCfdConsts.CFD_TYPE_DPS);
+        moKeyDpsAnnulationType.setEnabled(mnCfdiType == SDataConstantsSys.TRNS_TP_CFD_INV);
     }
 
     private void windowActivated() {
@@ -274,7 +274,7 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
     }
     
     public int getDpsAnnulationType() {
-        return mnCfdiType != SCfdConsts.CFD_TYPE_DPS ? SModSysConsts.TRNU_TP_DPS_ANN_NA : moKeyDpsAnnulationType.getValue()[0];
+        return mnCfdiType != SDataConstantsSys.TRNS_TP_CFD_INV ? SModSysConsts.TRNU_TP_DPS_ANN_NA : moKeyDpsAnnulationType.getValue()[0];
     }
     
     @Override

@@ -44,7 +44,7 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Néstor Ávalos, Juan Barajas, Alfredo Perez
+ * @author Néstor Ávalos, Juan Barajas, Alfredo Perez, Sergio Flores
  */
 public class SViewPayrollRow extends SGridPaneView implements ActionListener {
 
@@ -384,7 +384,7 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
-                        SCfdUtils.printCfd((SClientInterface) miClient, SCfdConsts.CFD_TYPE_PAYROLL, SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_CUR);
+                        SCfdUtils.printCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_PAYROLL, SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_CUR);
                     }
                     catch (Exception e) {
                         SLibUtils.showException(this, e);
@@ -442,7 +442,7 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
-                        SCfdUtils.sendCfd((SClientInterface) miClient, SCfdConsts.CFD_TYPE_PAYROLL, SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_CUR, false, false);
+                        SCfdUtils.sendCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_PAYROLL, SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_CUR, false, false);
                     }
                     catch (Exception e) {
                         SLibUtils.showException(this, e);

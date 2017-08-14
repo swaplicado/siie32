@@ -298,8 +298,8 @@ public class SDialogStampDetail extends javax.swing.JDialog implements java.awt.
 
         try {
             sql = "SELECT xs.dt, xs.id_mov, tp.tp_xml, xs.mov_in, xs.mov_out, IF(dx.fid_tp_cfd = 1, dt.code, '') AS f_tp_doc, vt.pac, tc.tp_cfd, " +
-                    "IF(dx.fid_tp_cfd = " + SDataConstantsSys.TRNS_TP_CFD_CFD + ", CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num), " +
-                    "CONCAT(hr.num_ser, IF(length(hr.num_ser) = 0, '', '-'), hr.num)) AS f_num, IF(dx.fid_tp_cfd = " + SDataConstantsSys.TRNS_TP_CFD_CFD + ", cob.code, '') AS f_cob, dx.uuid " +
+                    "IF(dx.fid_tp_cfd = " + SDataConstantsSys.TRNS_TP_CFD_INV + ", CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num), " +
+                    "CONCAT(hr.num_ser, IF(length(hr.num_ser) = 0, '', '-'), hr.num)) AS f_num, IF(dx.fid_tp_cfd = " + SDataConstantsSys.TRNS_TP_CFD_INV + ", cob.code, '') AS f_cob, dx.uuid " +
                     "FROM trn_sign AS xs " +
                     "INNER JOIN erp.trns_tp_sign AS tp ON xs.fid_ct_sign = tp.id_ct_sign  AND xs.fid_tp_sign = tp.id_tp_sign " +
                     "LEFT OUTER JOIN trn_pac AS vt ON xs.id_pac = vt.id_pac " +

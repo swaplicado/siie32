@@ -22,7 +22,7 @@ import javax.swing.JButton;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SViewCfdSendingLog extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -169,7 +169,7 @@ public class SViewCfdSendingLog extends erp.lib.table.STableTab implements java.
                     "INNER JOIN erp.bpsu_bp AS b ON " + (isCfdiPayrollVersionOld() ? "pe.fid_bpr_n = b.id_bp " : "pe.id_emp = b.id_bp ") +
                     "INNER JOIN erp.trns_tp_cfd AS tp ON dx.fid_tp_cfd = tp.id_tp_cfd " +
                     "INNER JOIN erp.usru_usr AS us ON snd.fid_usr = us.id_usr " +
-                    "WHERE pe.b_del = 0 AND dx.fid_tp_cfd = " + (isCfdiPayroll() ? SDataConstantsSys.TRNS_TP_CFD_PAY : SDataConstantsSys.TRNS_TP_CFD_CFD) + " " + sqlDatePeriod + sqlBizPartner +
+                    "WHERE pe.b_del = 0 AND dx.fid_tp_cfd = " + (isCfdiPayroll() ? SDataConstantsSys.TRNS_TP_CFD_PAYROLL : SDataConstantsSys.TRNS_TP_CFD_INV) + " " + sqlDatePeriod + sqlBizPartner +
                     "GROUP BY id_cfd, tp.tp_cfd, " + (isCfdiPayrollVersionOld() ? "pe.num_ser, pe.num, " : "pes.num_ser, pes.num, ") + "p.dt_end, b.bp, " + (isCfdiPayrollVersionOld() ? "pe.fid_bpr_n, " : "pe.id_emp, ") + " snd.id_snd " +
                     "HAVING id_cfd <> 0 " +
                     "ORDER BY id_cfd, tp.tp_cfd, " + (isCfdiPayrollVersionOld() ? "pe.num_ser, pe.num, " : "pes.num_ser, pes.num, ") + "p.dt_end, b.bp, " + (isCfdiPayrollVersionOld() ? "pe.fid_bpr_n, " : "pe.id_emp, ") + " snd.id_snd ";
@@ -191,7 +191,7 @@ public class SViewCfdSendingLog extends erp.lib.table.STableTab implements java.
                     "INNER JOIN erp.usru_usr AS ua ON d.fid_usr_audit = ua.id_usr " +
                     "INNER JOIN erp.trns_tp_cfd AS tp ON dx.fid_tp_cfd = tp.id_tp_cfd " +
                     "INNER JOIN erp.usru_usr AS us ON snd.fid_usr = us.id_usr " +
-                    "WHERE d.b_del = 0 AND dx.fid_tp_cfd = " + (isCfdiPayroll() ? SDataConstantsSys.TRNS_TP_CFD_PAY : SDataConstantsSys.TRNS_TP_CFD_CFD) + " " + sqlDatePeriod + sqlCompanyBranch + sqlBizPartner +
+                    "WHERE d.b_del = 0 AND dx.fid_tp_cfd = " + (isCfdiPayroll() ? SDataConstantsSys.TRNS_TP_CFD_PAYROLL : SDataConstantsSys.TRNS_TP_CFD_INV) + " " + sqlDatePeriod + sqlCompanyBranch + sqlBizPartner +
                     "HAVING id_cfd <> 0 " +
                     "ORDER BY tp.tp_cfd, d.num_ser, CAST(d.num AS UNSIGNED INTEGER), d.num, d.dt, b.bp, bc.bp_key, b.id_bp, bb.bpb, bb.id_bpb, snd.id_snd ";
         }

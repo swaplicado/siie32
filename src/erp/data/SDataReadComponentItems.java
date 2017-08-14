@@ -611,17 +611,6 @@ public abstract class SDataReadComponentItems {
                         "ORDER BY b.bp, b.id_bp ";
                 text = "transportista";
                 break;
-            case SDataConstants.BPSX_BANK_ACC:
-                lenPk = 1;
-                sql = "(SELECT fid_bp_r AS f_id_1, pay_account AS f_item FROM trn_dps " +
-                        "WHERE b_del = 0 AND pay_account <> '' AND fid_bp_r = " + ((int[]) pk)[0] + " AND id_year = " + ((int[]) pk)[1] + " " +
-                        "AND fid_ct_dps = " + ((int[]) pk)[2] + ") " +
-                        "UNION " +
-                        "(SELECT bp.id_bp AS f_id_1, acc_num AS f_item FROM erp.bpsu_bp AS bp " +
-                        "INNER JOIN erp.bpsu_bpb AS bpb ON bp.id_bp = bpb.fid_bp " +
-                        "INNER JOIN erp.bpsu_bank_acc AS bpa ON bpb.id_bpb = bpa.id_bpb " +
-                        "WHERE bp.id_bp = " + ((int[]) pk)[0] + ") ORDER BY f_item ";
-                break;
             default:
         }
 
@@ -1586,15 +1575,12 @@ public abstract class SDataReadComponentItems {
                 break;
             case SModConsts.LOGS_INC:
                 lenPk = 1;
-                sql = "SELECT id_inc AS f_id_1, CONCAT(name, ' (', code, ')') AS f_item, sort " +
+                sql = "SELECT id_inc AS f_id_1, CONCAT(code, ' - ', name) AS f_item, code AS f_comp, sort " +
                         "FROM " + SModConsts.TablesMap.get(catalogue) +  " " +
-                        "WHERE b_del = 0 AND id_inc =  " + SModSysConsts.LOGS_INC_NA + " " +
-                        "UNION " +
-                        "SELECT id_inc AS f_id_1, CONCAT(name, ' (', code, ')') AS f_item, sort " +
-                        "FROM " + SModConsts.TablesMap.get(catalogue) +  " " +
-                        "WHERE b_del = 0 " + (pk == null ? "" : " AND fid_tp_dly = " + ((int[]) pk)[0] + " ") +
+                        "WHERE b_del = 0 AND (id_inc =  " + SModSysConsts.LOGS_INC_NA + (pk == null ? "" : " OR fid_tp_dly = " + ((int[]) pk)[0]) + ") " +
                         "ORDER BY sort ";
-                text = "incoterm";
+                text = "INCOTERM";
+                isComplementApplying = true;
                 break;
             case SModConsts.LOGU_TP_VEH:
                 lenPk = 1;

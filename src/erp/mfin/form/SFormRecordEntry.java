@@ -5,7 +5,6 @@
 
 package erp.mfin.form;
 
-import cfd.util.DUtilUtils;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
@@ -49,6 +48,7 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import sa.lib.xml.SXmlUtils;
 
 /**
  *
@@ -2814,13 +2814,13 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                     if (cfd == null) {
                         cfd = new SDataCfd();
                     
-                        sFileXml = DUtilUtils.readXml(row.getPathXml());
+                        sFileXml = SXmlUtils.readXml(row.getPathXml());
                         cfd.setCertNumber("");
                         cfd.setStringSigned("");
                         cfd.setSignature("");
                         cfd.setDocXml(sFileXml);
                         cfd.setDocXmlName(row.getNameXml());
-                        cfd.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_CFD);
+                        cfd.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_INV);
                         cfd.setFkXmlTypeId(SDataConstantsSys.TRNS_TP_XML_NA);
                         cfd.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);
                         cfd.setFkXmlDeliveryTypeId(SModSysConsts.TRNS_TP_XML_DVY_NA);

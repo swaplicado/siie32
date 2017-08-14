@@ -98,7 +98,7 @@ public abstract class SLibUtilities {
         if (paoKeyA.getClass() == int[].class && paoKeyB.getClass() == int[].class) {
             return compareKeys((int[]) paoKeyA, (int[]) paoKeyB);
         }
-        else if (paoKeyA.getClass() == Object[].class && paoKeyB.getClass() == Object[].class ) {
+        if (paoKeyA.getClass() == Object[].class && paoKeyB.getClass() == Object[].class ) {
             aoKeyA = (Object[]) paoKeyA;
             aoKeyB = (Object[]) paoKeyB;
 
@@ -125,6 +125,9 @@ public abstract class SLibUtilities {
                 }
                 return true;
             }
+        }
+        if (paoKeyA.getClass() == String.class && paoKeyB.getClass() == String.class) {
+            return paoKeyA.toString().compareTo(paoKeyB.toString()) == 0;
         }
 
         return false;
