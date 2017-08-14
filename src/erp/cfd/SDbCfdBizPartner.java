@@ -2,10 +2,8 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mod.bps.db;
+package erp.cfd;
 
-import erp.cfd.SCceEmisorAddressAux;
-import erp.cfd.SCfdDataBizPartner;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataUtilities;
@@ -18,11 +16,11 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDbCfdBizPartner {
 
-    SClientInterface miClient;
+    private SClientInterface miClient;
     
     protected int mnBizPartnerId;
     protected int mnBizPartnerBranchId;
@@ -60,7 +58,7 @@ public class SDbCfdBizPartner {
         SDataBizPartner moBizPartner = null;
         SDataBizPartnerBranch moBizPartnerBranch = null;
         SDataBizPartnerBranchAddress moBizPartnerBranchAddress = null;
-        SCfdDataBizPartner asociadoNegocios = null;
+        SCfdDataBizPartner dataBizPartner = null;
         
         try {
             moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { mnBizPartnerId }, SLibConstants.EXEC_MODE_SILENT);
@@ -80,29 +78,29 @@ public class SDbCfdBizPartner {
                     else {
                         moBizPartnerBranchAddress = moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial();
                     }
-                    asociadoNegocios = new SCfdDataBizPartner();
+                    dataBizPartner = new SCfdDataBizPartner();
                     SCceEmisorAddressAux emisorAddress = miClient.getSessionXXX().getParamsCompany().getEmisorAddress(moBizPartnerBranchAddress.getZipCode());
 
-                    asociadoNegocios.setBizPartnerId(mnBizPartnerId);
-                    asociadoNegocios.setBizPartnerBranchId(mnBizPartnerBranchId);
-                    asociadoNegocios.setBizPartnerBranchHqId(moBizPartner.getDbmsHqBranch().getPkBizPartnerBranchId());
-                    asociadoNegocios.setBizPartnerRfc(moBizPartner.getFiscalId());
-                    asociadoNegocios.setBizPartnerFiscalForeing(moBizPartner.getFiscalFrgId());
-                    asociadoNegocios.setBizPartnerName(moBizPartner.getProperName());
-                    asociadoNegocios.setBizPartnerStreet(moBizPartnerBranchAddress.getStreet());
-                    asociadoNegocios.setBizPartnerStreetNumberExt(moBizPartnerBranchAddress.getStreetNumberExt());
-                    asociadoNegocios.setBizPartnerStreetNumberInt(moBizPartnerBranchAddress.getStreetNumberInt());
-                    asociadoNegocios.setBizPartnerNeighborhood(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getNeighborhood() : emisorAddress.getCfdCceEmisorColonia());
-                    asociadoNegocios.setBizPartnerReference(moBizPartnerBranchAddress.getReference());
-                    asociadoNegocios.setBizPartnerLocality(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getLocality() : emisorAddress.getCfdCceEmisorLocalidad());
-                    asociadoNegocios.setBizPartnerCounty(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getCounty() : emisorAddress.getCfdCceEmisorMunicipio());
-                    asociadoNegocios.setBizPartnerStateCode(moBizPartnerBranchAddress.getDbmsDataState().getStateCode());
-                    asociadoNegocios.setBizPartnerStateName(moBizPartnerBranchAddress.getState());
-                    asociadoNegocios.setBizPartnerZipCode(moBizPartnerBranchAddress.getZipCode());
-                    asociadoNegocios.setBizPartnerPoBox(moBizPartnerBranchAddress.getPoBox());
-                    asociadoNegocios.setBizPartnerCountryCode(moBizPartnerBranchAddress.getDbmsDataCountry().getCountryCode());
-                    asociadoNegocios.setBizPartnerCountryName(moBizPartnerBranchAddress.getDbmsDataCountry().getCountry());
-                    asociadoNegocios.setBizPartnerCountryId(moBizPartnerBranchAddress.getDbmsDataCountry().getPkCountryId());
+                    dataBizPartner.setBizPartnerId(mnBizPartnerId);
+                    dataBizPartner.setBizPartnerBranchId(mnBizPartnerBranchId);
+                    dataBizPartner.setBizPartnerBranchHqId(moBizPartner.getDbmsHqBranch().getPkBizPartnerBranchId());
+                    dataBizPartner.setBizPartnerRfc(moBizPartner.getFiscalId());
+                    dataBizPartner.setBizPartnerFiscalForeing(moBizPartner.getFiscalFrgId());
+                    dataBizPartner.setBizPartnerName(moBizPartner.getProperName());
+                    dataBizPartner.setBizPartnerStreet(moBizPartnerBranchAddress.getStreet());
+                    dataBizPartner.setBizPartnerStreetNumberExt(moBizPartnerBranchAddress.getStreetNumberExt());
+                    dataBizPartner.setBizPartnerStreetNumberInt(moBizPartnerBranchAddress.getStreetNumberInt());
+                    dataBizPartner.setBizPartnerNeighborhood(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getNeighborhood() : emisorAddress.getCfdCceEmisorColonia());
+                    dataBizPartner.setBizPartnerReference(moBizPartnerBranchAddress.getReference());
+                    dataBizPartner.setBizPartnerLocality(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getLocality() : emisorAddress.getCfdCceEmisorLocalidad());
+                    dataBizPartner.setBizPartnerCounty(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getCounty() : emisorAddress.getCfdCceEmisorMunicipio());
+                    dataBizPartner.setBizPartnerStateCode(moBizPartnerBranchAddress.getDbmsDataState().getStateCode());
+                    dataBizPartner.setBizPartnerStateName(moBizPartnerBranchAddress.getState());
+                    dataBizPartner.setBizPartnerZipCode(moBizPartnerBranchAddress.getZipCode());
+                    dataBizPartner.setBizPartnerPoBox(moBizPartnerBranchAddress.getPoBox());
+                    dataBizPartner.setBizPartnerCountryCode(moBizPartnerBranchAddress.getDbmsDataCountry().getCountryCode());
+                    dataBizPartner.setBizPartnerCountryName(moBizPartnerBranchAddress.getDbmsDataCountry().getCountry());
+                    dataBizPartner.setBizPartnerCountryId(moBizPartnerBranchAddress.getDbmsDataCountry().getPkCountryId());
                     
                     if (mnBizPartnerExpeditionId != SLibConsts.UNDEFINED && mnBizPartnerBranchExpeditionId != SLibConsts.UNDEFINED) {
                         moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { mnBizPartnerExpeditionId }, SLibConstants.EXEC_MODE_SILENT);
@@ -124,17 +122,17 @@ public class SDbCfdBizPartner {
                                 }
                                 emisorAddress = miClient.getSessionXXX().getParamsCompany().getEmisorAddress(moBizPartnerBranchAddress.getZipCode());
                                 
-                                asociadoNegocios.setBizPartnerExpeditionStreet(moBizPartnerBranchAddress.getStreet());
-                                asociadoNegocios.setBizPartnerExpeditionStreetNumberExt(moBizPartnerBranchAddress.getStreetNumberExt());
-                                asociadoNegocios.setBizPartnerExpeditionStreetNumberInt(moBizPartnerBranchAddress.getStreetNumberInt());
-                                asociadoNegocios.setBizPartnerExpeditionNeighborhood(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getNeighborhood() : emisorAddress.getCfdCceEmisorColonia());
-                                asociadoNegocios.setBizPartnerExpeditionReference(moBizPartnerBranchAddress.getReference());
-                                asociadoNegocios.setBizPartnerExpeditionLocality(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getLocality() : emisorAddress.getCfdCceEmisorLocalidad());
-                                asociadoNegocios.setBizPartnerExpeditionCounty(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getCounty() : emisorAddress.getCfdCceEmisorMunicipio());
-                                asociadoNegocios.setBizPartnerExpeditionState(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getState() : moBizPartnerBranchAddress.getDbmsDataState().getStateCode());
-                                asociadoNegocios.setBizPartnerExpeditionZipCode(moBizPartnerBranchAddress.getZipCode());
-                                asociadoNegocios.setBizPartnerExpeditionPoBox(moBizPartnerBranchAddress.getPoBox());
-                                asociadoNegocios.setBizPartnerExpeditionCountryName(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getDbmsDataCountry().getCountry() : moBizPartnerBranchAddress.getDbmsDataCountry().getCountryCode());
+                                dataBizPartner.setBizPartnerExpeditionStreet(moBizPartnerBranchAddress.getStreet());
+                                dataBizPartner.setBizPartnerExpeditionStreetNumberExt(moBizPartnerBranchAddress.getStreetNumberExt());
+                                dataBizPartner.setBizPartnerExpeditionStreetNumberInt(moBizPartnerBranchAddress.getStreetNumberInt());
+                                dataBizPartner.setBizPartnerExpeditionNeighborhood(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getNeighborhood() : emisorAddress.getCfdCceEmisorColonia());
+                                dataBizPartner.setBizPartnerExpeditionReference(moBizPartnerBranchAddress.getReference());
+                                dataBizPartner.setBizPartnerExpeditionLocality(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getLocality() : emisorAddress.getCfdCceEmisorLocalidad());
+                                dataBizPartner.setBizPartnerExpeditionCounty(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getCounty() : emisorAddress.getCfdCceEmisorMunicipio());
+                                dataBizPartner.setBizPartnerExpeditionState(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getState() : moBizPartnerBranchAddress.getDbmsDataState().getStateCode());
+                                dataBizPartner.setBizPartnerExpeditionZipCode(moBizPartnerBranchAddress.getZipCode());
+                                dataBizPartner.setBizPartnerExpeditionPoBox(moBizPartnerBranchAddress.getPoBox());
+                                dataBizPartner.setBizPartnerExpeditionCountryName(!mbIsEmisorForCce ? moBizPartnerBranchAddress.getDbmsDataCountry().getCountry() : moBizPartnerBranchAddress.getDbmsDataCountry().getCountryCode());
                             }
                         }
                     }
@@ -144,6 +142,6 @@ public class SDbCfdBizPartner {
         catch (Exception e) {
             SLibUtils.showException(this, e);
         }
-        return asociadoNegocios;
+        return dataBizPartner;
     }
 }

@@ -4,7 +4,7 @@
  */
 package erp.gui.session;
 
-import erp.cfd.SXmlCatalog;
+import erp.cfd.SCfdXmlCatalogs;
 import erp.gui.account.SAccount;
 import erp.gui.account.SAccountConsts;
 import erp.gui.account.SAccountLedger;
@@ -75,7 +75,8 @@ public class SSessionCustom implements SGuiSessionCustom {
     private ArrayList<SDbAbpItemLink> maAbpItemsLinksArray;
     private ArrayList<SDbAbpTax> maAbpTaxesArray;
     
-    private SXmlCatalog moXmlCatalog;
+    private SCfdXmlCatalogs moCfdXmlCatalogs;
+    private HashMap<Integer, Integer> mhmCfdTypeXmlTypes;  // CFDI type, XML type (version)
 
     /**
      * Creates new SSessionCustom object.
@@ -99,7 +100,8 @@ public class SSessionCustom implements SGuiSessionCustom {
         maAbpItemsLinksArray = new ArrayList<SDbAbpItemLink>();
         maAbpTaxesArray = new ArrayList<SDbAbpTax>();
         
-        moXmlCatalog = null;
+        moCfdXmlCatalogs = null;
+        mhmCfdTypeXmlTypes = null;
     }
 
     /*
@@ -235,7 +237,13 @@ public class SSessionCustom implements SGuiSessionCustom {
     public ArrayList<SAccountLedger> getAccountLedgers() { return maAccountLedgers; }
     public ArrayList<SAccountLedger> getCostCenterLedgers() { return maCostCenterLedgers; }
     
-    public SXmlCatalog getXmlCatalog() { return moXmlCatalog; }
+    public SCfdXmlCatalogs getCfdXmlCatalogs() { return moCfdXmlCatalogs; }
+    
+    /**
+     * Hash map of CFD type's XML types (versions).
+     * @return 
+     */
+    public HashMap<Integer, Integer> getCfdTypeXmlTypes() { return mhmCfdTypeXmlTypes; }
 
     @Override
     public int[] getLocalCountryKey() {
@@ -619,7 +627,19 @@ public class SSessionCustom implements SGuiSessionCustom {
                 maAbpTaxesArray.add(abpTax);
             }
             
-            moXmlCatalog = new SXmlCatalog(moSession);
+            // read all CFD XML catalogs:
+            moCfdXmlCatalogs = new SCfdXmlCatalogs(moSession);
+            
+            // read CFD type's XML types:
+            mhmCfdTypeXmlTypes = new HashMap<>();
+            sql = "SELECT id_tp_cfd, fid_tp_xml "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.TRNS_TP_CFD) + " "
+                    + "WHERE NOT b_del "
+                    + "ORDER BY id_tp_cfd ";
+            resultSetAux = statementAux.executeQuery(sql);
+            while (resultSetAux.next()) {
+                mhmCfdTypeXmlTypes.put(resultSetAux.getInt("id_tp_cfd"), resultSetAux.getInt("fid_tp_xml"));
+            }
         }
         catch (SQLException e) {
             SLibUtils.showException(this, e);

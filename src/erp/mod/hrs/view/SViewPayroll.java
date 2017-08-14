@@ -52,7 +52,7 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Néstor Ávalos, Juan Barajas, Alfredo Perez
+ * @author Néstor Ávalos, Juan Barajas, Alfredo Perez, Sergio Flores
  */
 public class SViewPayroll extends SGridPaneView implements ActionListener {
 
@@ -168,7 +168,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                         if (receiptCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                                 // XXX jbarajas 04/02/2016 sign and sending CFDI
                                 dialogResult = new SDialogResult(miClient, "Resultados de timbrado y envío", SCfdConsts.PROC_REQ_STAMP);
-                                mnTotalStamps = SCfdUtils.getStampsAvailable((SClientInterface) miClient, SCfdConsts.CFD_TYPE_PAYROLL, miClient.getSession().getCurrentDate(), 0);
+                                mnTotalStamps = SCfdUtils.getStampsAvailable((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_PAYROLL, miClient.getSession().getCurrentDate(), 0);
                                 dialogResult.setFormParams((SClientInterface) miClient, null, receiptCfdi.manPayrollEmployeeReceipts, mnTotalStamps, null, false, SCfdConsts.CFDI_PAYROLL_VER_CUR, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                                 dialogResult.setVisible(true);
                         }

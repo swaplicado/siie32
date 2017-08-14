@@ -543,7 +543,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                 xmlFile = ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getElementForXml();
 
                 xmlFileName += ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getEltEmisor().getAttRfc().getString() + "_";
-                xmlFileName += ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttTipoDeComprobante().getOption().substring(0, 1).toUpperCase() + "_";
+                xmlFileName += ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttTipoDeComprobante().getString() + "_";
                 xmlFileName += (((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString().length() == 0 ? "" : ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString() + "_");
                 xmlFileName += moCfd.getDecimalFormat().format(SLibUtils.parseLong(((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttFolio().getString())) + ".xml";
                 dateCfd = ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttFecha().getDatetime();
@@ -642,7 +642,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
 
                 if (result == SLibConstants.DB_CFD_OK) {
                     if (packet.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
-                        if (packet.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_CFD && packet.getDps() != null) {
+                        if (packet.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_INV && packet.getDps() != null) {
                            // Annul DPS registry:
 
                             result = ((SDataRegistry) packet.getDps()).canAnnul(moCompanyDatabase.getConnection());
@@ -655,7 +655,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                                 }
                             } 
                         }
-                        else if (packet.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_PAY && packet.getPayrollReceiptIssue() != null) {
+                        else if (packet.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_PAYROLL && packet.getPayrollReceiptIssue() != null) {
                             result = ((SDataRegistry) packet.getPayrollReceiptIssue()).canAnnul(moCompanyDatabase.getConnection());
 
                             if (result == SLibConstants.DB_CAN_ANNUL_YES) {

@@ -7,11 +7,12 @@ package erp.cfd;
 import cfd.DCfdConsts;
 import cfd.DElement;
 import cfd.ver32.DVer3Utils;
+import erp.data.SDataConstantsSys;
 import erp.mod.fin.db.SFinConsts;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SCfdDataBizPartner {
 
@@ -195,7 +196,7 @@ public class SCfdDataBizPartner {
                 ((cfd.ver32.DElementEmisor) emisor).getAttRfc().setString(msBizPartnerRfc);
                 ((cfd.ver32.DElementEmisor) emisor).getAttNombre().setString(msBizPartnerName);
 
-                if (mnCfdiType == SCfdConsts.CFD_TYPE_PAYROLL) {
+                if (mnCfdiType == SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
                     ((cfd.ver32.DElementEmisor) emisor).clearEltDomicilioFiscal();
                 }
                 else {
@@ -211,7 +212,7 @@ public class SCfdDataBizPartner {
                     ((cfd.ver32.DElementEmisor) emisor).getEltDomicilioFiscal().getAttPais().setString(mbIsCfdiWithCce ? msBizPartnerCountryCode : msBizPartnerCountryName);
                 }
 
-                if (mnBizPartnerBranchHqId != mnBizPartnerBranchId && mnCfdiType != SCfdConsts.CFD_TYPE_PAYROLL) {
+                if (mnBizPartnerBranchHqId != mnBizPartnerBranchId && mnCfdiType != SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
                     ((cfd.ver32.DElementEmisor) emisor).setEltOpcExpedidoEn(new cfd.ver32.DElementTipoUbicacion("cfdi:ExpedidoEn"));
                     ((cfd.ver32.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttCalle().setString(msBizPartnerExpeditionStreet);
                     ((cfd.ver32.DElementEmisor) emisor).getEltOpcExpedidoEn().getAttNoExterior().setString(msBizPartnerExpeditionStreetNumberExt);
@@ -261,8 +262,8 @@ public class SCfdDataBizPartner {
     }
     
     /**
-     * Create element root for emisor international trade for the business partner indicated
-     * @return cfd.DElement node cfd.DElement for emisor for international trade
+     * Create element root for International Commerce emisor for the business partner indicated
+     * @return cfd.DElement node cfd.DElement for International Commerce emisor.
      * @throws java.lang.Exception 
      */
     public cfd.DElement createRootElementEmisorCce() throws java.lang.Exception {
@@ -275,7 +276,7 @@ public class SCfdDataBizPartner {
                 ((cfd.ver3.cce11.DElementEmisor) emisor).getAttCurp().setString(msBizPartnerCurp);
             }
             
-            if (mnCfdiType == SCfdConsts.CFD_TYPE_PAYROLL) {
+            if (mnCfdiType == SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
                 ((cfd.ver32.DElementEmisor) emisor).clearEltDomicilioFiscal();
             }
             else {
@@ -346,7 +347,7 @@ public class SCfdDataBizPartner {
                 ((cfd.ver32.DElementReceptor) receptor).getAttRfc().setString(msBizPartnerRfc);
                 ((cfd.ver32.DElementReceptor) receptor).getAttNombre().setString(msBizPartnerName);
 
-                if (mnCfdiType == SCfdConsts.CFD_TYPE_PAYROLL) {
+                if (mnCfdiType == SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
                     ((cfd.ver32.DElementReceptor) receptor).clearEltDomicilio();
                 }
                 else {
@@ -384,8 +385,8 @@ public class SCfdDataBizPartner {
     }
     
      /**
-     * Create element root for receptor international trade for the business partner indicated
-     * @return cfd.DElement node cfd.DElement for receptor for international trade
+     * Create element root for International Commerce receptor for the business partner indicated.
+     * @return cfd.DElement node cfd.DElement for International Commerce receptor.
      * @throws java.lang.Exception 
      */
     public cfd.DElement createRootElementReceptorCce() throws java.lang.Exception {
@@ -394,7 +395,7 @@ public class SCfdDataBizPartner {
         if (mfVersion == DCfdConsts.CFDI_VER_33) {
             receptor = new cfd.ver3.cce11.DElementReceptor();
             
-            if (mnCfdiType == SCfdConsts.CFD_TYPE_PAYROLL) {
+            if (mnCfdiType == SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
                 ((cfd.ver32.DElementReceptor) receptor).clearEltDomicilio();
             }
             else {
@@ -424,10 +425,10 @@ public class SCfdDataBizPartner {
     
     public String getCfdLugarExpedicion() {
         if (mnBizPartnerBranchHqId != mnBizPartnerBranchId) {
-            return mnCfdiType != SCfdConsts.CFD_TYPE_PAYROLL && mfVersion == DCfdConsts.CFDI_VER_32 && !mbIsCfdiWithCce ? msBizPartnerExpeditionLocality + ", " + msBizPartnerExpeditionState : msBizPartnerExpeditionZipCode;
+            return mnCfdiType != SDataConstantsSys.TRNS_TP_CFD_PAYROLL && mfVersion == DCfdConsts.CFDI_VER_32 && !mbIsCfdiWithCce ? msBizPartnerExpeditionLocality + ", " + msBizPartnerExpeditionState : msBizPartnerExpeditionZipCode;
         }
         else {
-            return mnCfdiType != SCfdConsts.CFD_TYPE_PAYROLL && mfVersion == DCfdConsts.CFDI_VER_32 && !mbIsCfdiWithCce ? msBizPartnerLocality + ", " + msBizPartnerStateName : msBizPartnerZipCode;
+            return mnCfdiType != SDataConstantsSys.TRNS_TP_CFD_PAYROLL && mfVersion == DCfdConsts.CFDI_VER_32 && !mbIsCfdiWithCce ? msBizPartnerLocality + ", " + msBizPartnerStateName : msBizPartnerZipCode;
         }
     }
 }

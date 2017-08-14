@@ -31,6 +31,8 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     protected java.util.Date mtDateEnd_n;
     protected java.lang.String msPaymentAccount;
     protected java.lang.String msNumberExporter;
+    protected java.lang.String msCfdiPaymentWay;
+    protected java.lang.String msCfdiCfdiUsage;
     protected boolean mbIsCreditByUser;
     protected boolean mbIsGuaranteeInProcess;
     protected boolean mbIsInsuranceInProcess;
@@ -87,6 +89,8 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     public void setDateEnd_n(java.util.Date t) { mtDateEnd_n = t; }
     public void setPaymentAccount(java.lang.String s) { msPaymentAccount = s; }
     public void setNumberExporter(java.lang.String s) { msNumberExporter = s; }
+    public void setCfdiPaymentWay(java.lang.String s) { msCfdiPaymentWay = s; }
+    public void setCfdiCfdiUsage(java.lang.String s) { msCfdiCfdiUsage = s; }
     public void setIsCreditByUser(boolean b) { mbIsCreditByUser = b; }
     public void setIsGuaranteeInProcess(boolean b) { mbIsGuaranteeInProcess = b; }
     public void setIsInsuranceInProcess(boolean b) { mbIsInsuranceInProcess = b; }
@@ -120,6 +124,8 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     public java.util.Date getDateEnd_n() { return mtDateEnd_n; }
     public java.lang.String getPaymentAccount() { return msPaymentAccount; }
     public java.lang.String getNumberExporter() { return msNumberExporter; }
+    public java.lang.String getCfdiPaymentWay() { return msCfdiPaymentWay; }
+    public java.lang.String getCfdiCfdiUsage() { return msCfdiCfdiUsage; }
     public boolean getIsCreditByUser() { return mbIsCreditByUser; }
     public boolean getIsGuaranteeInProcess() { return mbIsGuaranteeInProcess; }
     public boolean getIsInsuranceInProcess() { return mbIsInsuranceInProcess; }
@@ -198,6 +204,8 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
         mtDateEnd_n = null;
         msPaymentAccount = "";
         msNumberExporter = "";
+        msCfdiPaymentWay = "";
+        msCfdiCfdiUsage = "";
         mbIsCreditByUser = false;
         mbIsGuaranteeInProcess = false;
         mbIsInsuranceInProcess = false;
@@ -277,6 +285,8 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
                 mtDateEnd_n = resultSet.getDate("bp_ct.dt_end_n");
                 msPaymentAccount = resultSet.getString("bp_ct.pay_account");
                 msNumberExporter = resultSet.getString("bp_ct.num_exporter");
+                msCfdiPaymentWay = resultSet.getString("bp_ct.cfdi_pay_way");
+                msCfdiCfdiUsage = resultSet.getString("bp_ct.cfdi_cfd_use");
                 mbIsCreditByUser = resultSet.getBoolean("bp_ct.b_cred_usr");
                 mbIsGuaranteeInProcess = resultSet.getBoolean("bp_ct.b_garnt_prc");
                 mbIsInsuranceInProcess = resultSet.getBoolean("bp_ct.b_insur_prc");
@@ -353,9 +363,10 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
         try {
             callableStatement = connection.prepareCall(
                     "{ CALL erp.bpsu_bp_ct_save(" +
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?," +
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?," +
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                    "?) }");
             callableStatement.setInt(nParam++, mnPkBizPartnerId);
             callableStatement.setInt(nParam++, mnPkBizPartnerCategoryId);
             callableStatement.setString(nParam++, msKey);
@@ -369,6 +380,8 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
             if (mtDateEnd_n != null) callableStatement.setDate(nParam++, new java.sql.Date(mtDateEnd_n.getTime())); else callableStatement.setNull(nParam++, java.sql.Types.DATE);
             callableStatement.setString(nParam++, msPaymentAccount);
             callableStatement.setString(nParam++, msNumberExporter);
+            callableStatement.setString(nParam++, msCfdiPaymentWay);
+            callableStatement.setString(nParam++, msCfdiCfdiUsage);
             callableStatement.setBoolean(nParam++, mbIsCreditByUser);
             callableStatement.setBoolean(nParam++, mbIsGuaranteeInProcess);
             callableStatement.setBoolean(nParam++, mbIsInsuranceInProcess);

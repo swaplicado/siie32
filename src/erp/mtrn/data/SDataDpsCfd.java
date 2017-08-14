@@ -5,33 +5,41 @@
 
 package erp.mtrn.data;
 
+import cfd.DElement;
+import cfd.ver33.DElementCfdiRelacionado;
+import cfd.ver33.DElementCfdiRelacionados;
+import erp.cfd.SXmlDpsCfd;
+import erp.cfd.SXmlDpsCfdCce;
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
-import java.io.ByteArrayInputStream;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Date;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import sa.lib.xml.SXmlUtils;
+import sa.lib.xml.SXmlElement;
 
 /**
-* Class for handling additional information for the CFDI.
-* @author Juan Barajas
+ * Handling additional information for CFDI.
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
     protected int mnPkYearId;
     protected int mnPkDocId;
+    protected java.lang.String msVersion;
+    protected java.lang.String msCfdiType;
+    protected java.lang.String msPaymentWay;
+    protected java.lang.String msPaymentMethod;
+    protected java.lang.String msPaymentConditions;
+    protected java.lang.String msZipIssue;
+    protected java.lang.String msConfirmation;
+    protected java.lang.String msTaxRegime;
+    protected java.lang.String msCfdiUsage;
     protected String msXml;
     
-    protected String msCfdConfirmacion;
-    protected String msCfdTipoRelacion;
-    protected String msCfdUsoCfdi;
+    protected String msCfdiRelacionadosTipoRelacion;
+    protected ArrayList<String> maCfdiRelacionados;
     
     protected String msCfdCceMotivoTraslado;
     protected String msCfdCceTipoOperacion;
@@ -41,22 +49,28 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
     protected String msCfdCceSubdivision;
     protected String msCfdCceTipoCambioUSD;
     protected String msCfdCceTotalUSD;
-    protected String msCfdCceNumExportadorConfiable;
+    protected String msCfdCceNumeroExportadorConfiable;
+    protected String msCfdCceIncoterm;
     
-    protected boolean mbHasInternationalTradeNode;
-
     public SDataDpsCfd() {
         super(SDataConstants.TRN_DPS_CFD);
+        maCfdiRelacionados = new ArrayList<>();
         reset();
     }
 
     public void setPkYearId(int n) { mnPkYearId = n; }
     public void setPkDocId(int n) { mnPkDocId = n; }
-    public void setXml(String s) { msXml = s; }
+    public void setVersion(java.lang.String s) { msVersion = s; }
+    public void setCfdiType(java.lang.String s) { msCfdiType = s; }
+    public void setPaymentWay(java.lang.String s) { msPaymentWay = s; }
+    public void setPaymentMethod(java.lang.String s) { msPaymentMethod = s; }
+    public void setPaymentConditions(java.lang.String s) { msPaymentConditions = s; }
+    public void setZipIssue(java.lang.String s) { msZipIssue = s; }
+    public void setConfirmation(java.lang.String s) { msConfirmation = s; }
+    public void setTaxRegime(java.lang.String s) { msTaxRegime = s; }
+    public void setCfdiUsage(java.lang.String s) { msCfdiUsage = s; }
     
-    public void setCfdConfirmacion(String s) { msCfdConfirmacion = s; }
-    public void setCfdTipoRelacion(String s) { msCfdTipoRelacion = s; }
-    public void setCfdUsoCfdi(String s) { msCfdUsoCfdi = s; }
+    public void setCfdiRelacionadosTipoRelacion(java.lang.String s) { msCfdiRelacionadosTipoRelacion = s; }
     
     public void setCfdCceMotivoTraslado(String s) { msCfdCceMotivoTraslado = s; }
     public void setCfdCceTipoOperacion(String s) { msCfdCceTipoOperacion = s; }
@@ -66,15 +80,24 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
     public void setCfdCceSubdivision(String s) { msCfdCceSubdivision = s; }
     public void setCfdCceTipoCambioUSD(String s) { msCfdCceTipoCambioUSD = s; }
     public void setCfdCceTotalUSD(String s) { msCfdCceTotalUSD = s; }
-    public void setCfdCceNumExportadorConfiable(String s) { msCfdCceNumExportadorConfiable = s; }
+    public void setCfdCceNumeroExportadorConfiable(String s) { msCfdCceNumeroExportadorConfiable = s; }
+    public void setCfdCceIncoterm(String s) { msCfdCceIncoterm = s; }
 
     public int getPkYearId() { return mnPkYearId; }
     public int getPkDocId() { return mnPkDocId; }
+    public java.lang.String getVersion() { return msVersion; }
+    public java.lang.String getCfdiType() { return msCfdiType; }
+    public java.lang.String getPaymentWay() { return msPaymentWay; }
+    public java.lang.String getPaymentMethod() { return msPaymentMethod; }
+    public java.lang.String getPaymentConditions() { return msPaymentConditions; }
+    public java.lang.String getZipIssue() { return msZipIssue; }
+    public java.lang.String getConfirmation() { return msConfirmation; }
+    public java.lang.String getTaxRegime() { return msTaxRegime; }
+    public java.lang.String getCfdiUsage() { return msCfdiUsage; }
     public String getXml() { return msXml; }
     
-    public String getCfdConfirmacion() { return msCfdConfirmacion; }
-    public String getCfdTipoRelacion() { return msCfdTipoRelacion; }
-    public String getCfdUsoCfdi() { return msCfdUsoCfdi; }
+    public String getCfdiRelacionadosTipoRelacion() { return msCfdiRelacionadosTipoRelacion; }
+    public ArrayList<String> getCfdiRelacionados() { return maCfdiRelacionados; }
     
     public String getCfdCceMotivoTraslado() { return msCfdCceMotivoTraslado; }
     public String getCfdCceTipoOperacion() { return msCfdCceTipoOperacion; }
@@ -84,38 +107,49 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
     public String getCfdCceSubdivision() { return msCfdCceSubdivision; }
     public String getCfdCceTipoCambioUSD() { return msCfdCceTipoCambioUSD; }
     public String getCfdCceTotalUSD() { return msCfdCceTotalUSD; }
-    public String getCfdCceNumExportadorConfiable() { return msCfdCceNumExportadorConfiable; }
+    public String getCfdCceNumeroExportadorConfiable() { return msCfdCceNumeroExportadorConfiable; }
+    public String getCfdCceIncoterm() { return msCfdCceIncoterm; }
     
-    public boolean hasInternationalTradeNode() { return mbHasInternationalTradeNode; }
+    public boolean hasInternationalCommerce() { return !msCfdCceMotivoTraslado.isEmpty(); }
 
     /**
      * Generate the XML with infromation aditional for CFDI.
      * @throws Exception 
      */
     private void computeXml() throws Exception {
-        SXmlDpsCfd dpsXml = new SXmlDpsCfd();
-        SXmlDpsCfdCce cceXml = new SXmlDpsCfdCce();
+        SXmlDpsCfd dpsCfd = new SXmlDpsCfd();
         
-        dpsXml.getAttribute(SXmlDpsCfd.ATT_CONF).setValue(msCfdConfirmacion);
-        dpsXml.getAttribute(SXmlDpsCfd.ATT_TP_REL).setValue(msCfdTipoRelacion);
-        dpsXml.getAttribute(SXmlDpsCfd.ATT_USO_CFDI).setValue(msCfdUsoCfdi);
-        
-        if (!msCfdCceTipoOperacion.isEmpty()) {
-            // Attributes for international trade:
-
-            cceXml.getAttribute(SXmlDpsCfdCce.ATT_MOT_TRAS).setValue(msCfdCceMotivoTraslado);
-            cceXml.getAttribute(SXmlDpsCfdCce.ATT_TP_OPE).setValue(msCfdCceTipoOperacion);
-            cceXml.getAttribute(SXmlDpsCfdCce.ATT_CVE_PED).setValue(msCfdCceClaveDePedimento);
-            cceXml.getAttribute(SXmlDpsCfdCce.ATT_CERT_ORIG).setValue(msCfdCceCertificadoOrigen);
-            cceXml.getAttribute(SXmlDpsCfdCce.ATT_NUM_CERT_ORIG).setValue(msCfdCceNumCertificadoOrigen);
-            cceXml.getAttribute(SXmlDpsCfdCce.ATT_SUB).setValue(msCfdCceSubdivision);
-            cceXml.getAttribute(SXmlDpsCfdCce.ATT_TP_CAMB).setValue(msCfdCceTipoCambioUSD);
-            cceXml.getAttribute(SXmlDpsCfdCce.ATT_TOT_USD).setValue(msCfdCceTotalUSD);
-            cceXml.getAttribute(SXmlDpsCfdCce.ATT_NUM_EXP_CONF).setValue(msCfdCceNumExportadorConfiable);
-
-            dpsXml.getXmlElements().add(cceXml);
+        if (!maCfdiRelacionados.isEmpty()) {
+            DElementCfdiRelacionados cfdiRelacionados = new DElementCfdiRelacionados();
+            cfdiRelacionados.getAttTipoRelacion().setString(msCfdiRelacionadosTipoRelacion);
+            
+            for (String uuid : maCfdiRelacionados) {
+                DElementCfdiRelacionado cfdiRelacionado = new DElementCfdiRelacionado();
+                cfdiRelacionado.getAttUuid().setString(uuid);
+                cfdiRelacionados.getEltCfdiRelacionados().add(cfdiRelacionado);
+            }
+            
+            dpsCfd.getElements().add(cfdiRelacionados);
         }
-        msXml = dpsXml.getXmlString();
+        
+        if (!msCfdCceMotivoTraslado.isEmpty()) {
+            // attributes for international commerce:
+            SXmlDpsCfdCce cfdCce = new SXmlDpsCfdCce();
+            cfdCce.getAttribute(SXmlDpsCfdCce.ATT_MOT_TRAS).setValue(msCfdCceMotivoTraslado);
+            cfdCce.getAttribute(SXmlDpsCfdCce.ATT_TP_OPE).setValue(msCfdCceTipoOperacion);
+            cfdCce.getAttribute(SXmlDpsCfdCce.ATT_CVE_PED).setValue(msCfdCceClaveDePedimento);
+            cfdCce.getAttribute(SXmlDpsCfdCce.ATT_CERT_ORIG).setValue(msCfdCceCertificadoOrigen);
+            cfdCce.getAttribute(SXmlDpsCfdCce.ATT_NUM_CERT_ORIG).setValue(msCfdCceNumCertificadoOrigen);
+            cfdCce.getAttribute(SXmlDpsCfdCce.ATT_SUB).setValue(msCfdCceSubdivision);
+            cfdCce.getAttribute(SXmlDpsCfdCce.ATT_TP_CAMB).setValue(msCfdCceTipoCambioUSD);
+            cfdCce.getAttribute(SXmlDpsCfdCce.ATT_TOT_USD).setValue(msCfdCceTotalUSD);
+            cfdCce.getAttribute(SXmlDpsCfdCce.ATT_NUM_EXP_CONF).setValue(msCfdCceNumeroExportadorConfiable);
+            cfdCce.getAttribute(SXmlDpsCfdCce.ATT_INCOTERM).setValue(msCfdCceIncoterm);
+
+            dpsCfd.getXmlElements().add(cfdCce);
+        }
+        
+        msXml = dpsCfd.getXmlString();
     }
     
     /**
@@ -123,37 +157,39 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
      * @throws Exception 
      */
     private void processXml(final String xml) throws Exception {
-        Node node = null;
-        NamedNodeMap namedNodeMap = null;
-        Node nodeChild = null;
-        NamedNodeMap namedNodeMapChild = null;
-        DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document doc = docBuilder.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")));
+        SXmlDpsCfd dpsCfd = new SXmlDpsCfd();
+        dpsCfd.processXml(xml);
         
-        node = SXmlUtils.extractElements(doc, SXmlDpsCfd.NAME).item(0);
-        namedNodeMap = node.getAttributes();
-
-        msCfdConfirmacion = SXmlUtils.extractAttributeValue(namedNodeMap, SXmlDpsCfd.ATT_CONF, false);
-        msCfdTipoRelacion = SXmlUtils.extractAttributeValue(namedNodeMap, SXmlDpsCfd.ATT_TP_REL, false);
-        msCfdUsoCfdi = SXmlUtils.extractAttributeValue(namedNodeMap, SXmlDpsCfd.ATT_USO_CFDI, false);
+        if (dpsCfd.isAvailableCfdiRelacionados()) {
+            for (DElement element : dpsCfd.getElements()) {
+                if (element instanceof DElementCfdiRelacionados) {
+                    DElementCfdiRelacionados cfdiRelacionados = (DElementCfdiRelacionados) element;
+                    msCfdiRelacionadosTipoRelacion = cfdiRelacionados.getAttTipoRelacion().getString();
+                    for (DElementCfdiRelacionado cfdiRelacionado : cfdiRelacionados.getEltCfdiRelacionados()) {
+                        maCfdiRelacionados.add(cfdiRelacionado.getAttUuid().getString());
+                    }
+                    break;
+                }
+            }
+        }
         
-        // International Trade:
-
-        if (SXmlUtils.hasChildElement(node, SXmlDpsCfdCce.NAME)) {
-            nodeChild = SXmlUtils.extractChildElements(node, SXmlDpsCfdCce.NAME).get(0);
-            namedNodeMapChild = nodeChild.getAttributes();
-            
-            mbHasInternationalTradeNode = true;
-            
-            msCfdCceMotivoTraslado = SXmlUtils.extractAttributeValue(namedNodeMapChild, SXmlDpsCfdCce.ATT_MOT_TRAS, false);
-            msCfdCceTipoOperacion = SXmlUtils.extractAttributeValue(namedNodeMapChild, SXmlDpsCfdCce.ATT_TP_OPE, false);
-            msCfdCceClaveDePedimento = SXmlUtils.extractAttributeValue(namedNodeMapChild, SXmlDpsCfdCce.ATT_CVE_PED, false);
-            msCfdCceCertificadoOrigen = SXmlUtils.extractAttributeValue(namedNodeMapChild, SXmlDpsCfdCce.ATT_CERT_ORIG, false);
-            msCfdCceNumCertificadoOrigen = SXmlUtils.extractAttributeValue(namedNodeMapChild, SXmlDpsCfdCce.ATT_NUM_CERT_ORIG, false);
-            msCfdCceSubdivision = SXmlUtils.extractAttributeValue(namedNodeMapChild, SXmlDpsCfdCce.ATT_SUB, false);
-            msCfdCceTipoCambioUSD = SXmlUtils.extractAttributeValue(namedNodeMapChild, SXmlDpsCfdCce.ATT_TP_CAMB, false);
-            msCfdCceTotalUSD = SXmlUtils.extractAttributeValue(namedNodeMapChild, SXmlDpsCfdCce.ATT_TOT_USD, false);
-            msCfdCceNumExportadorConfiable = SXmlUtils.extractAttributeValue(namedNodeMapChild, SXmlDpsCfdCce.ATT_NUM_EXP_CONF, false);
+        if (dpsCfd.isAvailableCce()) {
+            for (SXmlElement element : dpsCfd.getXmlElements()) {
+                if (element instanceof SXmlDpsCfdCce) {
+                    SXmlDpsCfdCce dpsCfdCce = (SXmlDpsCfdCce) element;
+                    msCfdCceMotivoTraslado = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_MOT_TRAS).getValue().toString();
+                    msCfdCceTipoOperacion = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_TP_OPE).getValue().toString();
+                    msCfdCceClaveDePedimento = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_CVE_PED).getValue().toString();
+                    msCfdCceCertificadoOrigen = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_CERT_ORIG).getValue().toString();
+                    msCfdCceNumCertificadoOrigen = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_NUM_CERT_ORIG).getValue().toString();
+                    msCfdCceSubdivision = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_SUB).getValue().toString();
+                    msCfdCceTipoCambioUSD = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_TP_CAMB).getValue().toString();
+                    msCfdCceTotalUSD = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_TOT_USD).getValue().toString();
+                    msCfdCceNumeroExportadorConfiable = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_NUM_EXP_CONF).getValue().toString();
+                    msCfdCceIncoterm = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_INCOTERM).getValue().toString();
+                    break;
+                }
+            }
         }
     }
     
@@ -174,11 +210,19 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
 
         mnPkYearId = 0;
         mnPkDocId = 0;
+        msVersion = "";
+        msCfdiType = "";
+        msPaymentWay = "";
+        msPaymentMethod = "";
+        msPaymentConditions = "";
+        msZipIssue = "";
+        msConfirmation = "";
+        msTaxRegime = "";
+        msCfdiUsage = "";
         msXml = "";
         
-        msCfdConfirmacion = "";
-        msCfdTipoRelacion = "";
-        msCfdUsoCfdi = "";
+        msCfdiRelacionadosTipoRelacion = "";
+        maCfdiRelacionados.clear();
         
         msCfdCceMotivoTraslado = "";
         msCfdCceTipoOperacion = "";
@@ -188,9 +232,8 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
         msCfdCceSubdivision = "";
         msCfdCceTipoCambioUSD = "";
         msCfdCceTotalUSD = "";
-        msCfdCceNumExportadorConfiable = "";
-        
-        mbHasInternationalTradeNode = false;
+        msCfdCceNumeroExportadorConfiable = "";
+        msCfdCceIncoterm = "";
     }
 
     @Override
@@ -212,6 +255,15 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
             else {
                 mnPkYearId = resultSet.getInt("id_year");
                 mnPkDocId = resultSet.getInt("id_doc");
+                msVersion = resultSet.getString("ver");
+                msCfdiType = resultSet.getString("cfd_tp");
+                msPaymentWay = resultSet.getString("pay_way");
+                msPaymentMethod = resultSet.getString("pay_met");
+                msPaymentConditions = resultSet.getString("pay_cond");
+                msZipIssue = resultSet.getString("zip_iss");
+                msConfirmation = resultSet.getString("conf");
+                msTaxRegime = resultSet.getString("tax_reg");
+                msCfdiUsage = resultSet.getString("cfd_use");
                 msXml = resultSet.getString("xml");
                 
                 processXml(msXml);
@@ -255,14 +307,31 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
                 sql = "INSERT INTO trn_dps_cfd VALUES (" +
                         mnPkYearId + ", " +
                         mnPkDocId + ", " +
+                        "'" + msVersion + "', " +
+                        "'" + msCfdiType + "', " +
+                        "'" + msPaymentWay + "', " +
+                        "'" + msPaymentMethod + "', " +
+                        "'" + msPaymentConditions + "', " +
+                        "'" + msZipIssue + "', " +
+                        "'" + msConfirmation + "', " +
+                        "'" + msTaxRegime + "', " +
+                        "'" + msCfdiUsage + "', " +
                         "'" + msXml + "' " +
                         ")";
             }
             else {
-
                 sql = "UPDATE trn_dps_cfd SET " +
                         //"id_year = " + mnPkYearId + ", " +
                         //"id_doc = " + mnPkDocId + ", " +
+                        "ver = '" + msVersion + "', " +
+                        "cfd_tp = '" + msCfdiType + "', " +
+                        "pay_way = '" + msPaymentWay + "', " +
+                        "pay_met = '" + msPaymentMethod + "', " +
+                        "pay_cond = '" + msPaymentConditions + "', " +
+                        "zip_iss = '" + msZipIssue + "', " +
+                        "conf = '" + msConfirmation + "', " +
+                        "tax_reg = '" + msTaxRegime + "', " +
+                        "cfd_use = '" + msCfdiUsage + "', " +
                         "xml = '" + msXml + "' " +
                         "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";
             }
@@ -286,6 +355,6 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
 
     @Override
     public java.util.Date getLastDbUpdate() {
-        return new Date();
+        return new Date();  // XXX check this! (Sergio Flores, 2017-08-08)
     }
 }

@@ -6,6 +6,7 @@ package erp.cfd;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.mbps.data.SDataBizPartner;
@@ -39,7 +40,7 @@ import sa.lib.gui.SGuiValidation;
 
 /**
  *
- * @author Juan Barajas, Alfredo Pérez
+ * @author Juan Barajas, Alfredo Pérez, Sergio Flores
  */
 public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
 
@@ -464,13 +465,13 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                 cfdsProcessed++;
 
                 switch (cfd.getFkCfdTypeId()) {
-                    case SCfdConsts.CFD_TYPE_DPS:
+                    case SDataConstantsSys.TRNS_TP_CFD_INV:
                         dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
 
                         numberSeries = dps.getNumberSeries();
                         number = dps.getNumber();
                         break;
-                    case SCfdConsts.CFD_TYPE_PAYROLL:
+                    case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
                         switch (mnSubtypeCfd) {
                             case SCfdConsts.CFDI_PAYROLL_VER_OLD:
                                 payrollEmp = (SDataFormerPayrollEmp) SDataUtilities.readRegistry(miClient, SDataConstants.HRS_SIE_PAY_EMP, new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, SLibConstants.EXEC_MODE_SILENT);

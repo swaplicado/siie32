@@ -4,7 +4,6 @@
  */
 package erp.gui;
 
-import erp.cfd.SCfdConsts;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataRepConstants;
@@ -14,6 +13,7 @@ import erp.gui.mod.cfg.SCfgMenuSection;
 import erp.gui.mod.cfg.SCfgMenuSectionItem;
 import erp.gui.mod.cfg.SCfgMenuSectionSeparator;
 import erp.gui.mod.cfg.SCfgModule;
+import erp.gui.session.SSessionCustom;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.table.STableTabComponent;
@@ -1168,7 +1168,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                                 dps.setAuxIsNeedCfd(true);
                                 dps.setAuxIsNeedCfdCce(((SDataDps) moRegistry).getAuxIsNeedCfdCce());
 
-                                SCfdUtils.computeCfd(miClient, dps, miClient.getSessionXXX().getParamsCompany().getFkXmlTypeId());
+                                SCfdUtils.computeCfd(miClient, dps, ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV));
                             }
                             catch (java.lang.Exception e) {
                                 throw new Exception("Ha ocurrido una excepción al generar el CFD: " + e);
@@ -1631,13 +1631,13 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 miClient.getGuiModule(SDataConstants.MOD_CFG).showView(SDataConstants.TRNX_STAMP_AVL);
             }
             else if (item == jmiCatCfdiStampSign) {
-                showView(SDataConstants.TRN_CFD, SDataConstants.TRNX_STAMP_SIGN, SCfdConsts.CFD_TYPE_DPS);
+                showView(SDataConstants.TRN_CFD, SDataConstants.TRNX_STAMP_SIGN, SDataConstantsSys.TRNS_TP_CFD_INV);
             }
             else if (item == jmiCatCfdiStampSignPending) {
-                showView(SDataConstants.TRN_CFD, SDataConstants.TRNX_STAMP_SIGN_PEND, SCfdConsts.CFD_TYPE_DPS);
+                showView(SDataConstants.TRN_CFD, SDataConstants.TRNX_STAMP_SIGN_PEND, SDataConstantsSys.TRNS_TP_CFD_INV);
             }
             else if (item == jmiCatCfdiSendingLog) {
-                showView(SDataConstants.TRN_CFD_SND_LOG, SCfdConsts.CFD_TYPE_DPS);
+                showView(SDataConstants.TRN_CFD_SND_LOG, SDataConstantsSys.TRNS_TP_CFD_INV);
             }
             else if (item == jmiEstimates) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_EST_EST);

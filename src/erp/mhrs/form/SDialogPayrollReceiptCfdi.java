@@ -7,6 +7,7 @@ package erp.mhrs.form;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
+import erp.gui.session.SSessionCustom;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormField;
@@ -679,7 +680,6 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
     // End of variables declaration//GEN-END:variables
 
     public void resetForm() {
-        int nXmlType = 0;
         mnFormResult = SLibConstants.UNDEFINED;
         mbFirstTime = true;
 
@@ -688,7 +688,7 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
         jtfPayrollDates.setText("");
         jtfPayrollNotes.setText("");
 
-        nXmlType = miClient.getSessionXXX().getParamsCompany().getFkXmlTypeId();
+        int nXmlType = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_PAYROLL);
         
         SFormUtilities.populateComboBox(miClient, jcbFkPaymentSystemTypeId, SDataConstants.TRNU_TP_PAY_SYS);
         

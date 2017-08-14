@@ -10,7 +10,6 @@ import erp.cfd.SCfdConsts;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
-import erp.lib.xml.SXmlUtilities;
 import erp.mod.SModConsts;
 import erp.mod.trn.db.STrnUtils;
 import java.awt.image.BufferedImage;
@@ -119,15 +118,15 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         String number = "";
         
         try {
-            Document doc = SXmlUtilities.parseDocument(msDocXml);
+            Document doc = SXmlUtils.parseDocument(msDocXml);
             Node node = null;
             NamedNodeMap namedNodeMap = null;
 
             node = SXmlUtils.extractElements(doc, mnFkXmlTypeId == SDataConstantsSys.TRNS_TP_XML_CFD ? "Comprobante" : "cfdi:Comprobante").item(0);
             namedNodeMap = node.getAttributes();
 
-            numberSer = SXmlUtilities.extractAttributeValue(namedNodeMap, "serie", false);
-            number = SXmlUtilities.extractAttributeValue(namedNodeMap, "folio", false);
+            numberSer = SXmlUtils.extractAttributeValue(namedNodeMap, "serie", false);
+            number = SXmlUtils.extractAttributeValue(namedNodeMap, "folio", false);
         }
         catch (Exception e) {
             SLibUtilities.printOutException(this, e);
@@ -200,28 +199,28 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
     }
     
-    private boolean testDeletion(java.lang.String psMsg, int nAction) throws java.lang.Exception {
+    private boolean testDeletion(java.lang.String psMsg, int action) throws java.lang.Exception {
         String sMsg = psMsg;
         
-        if (nAction == SDbConsts.ACTION_ANNUL) {
-            if (mnFkXmlStatusId == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
-                msDbmsError = sMsg + "¡El documento está anulado!";
-                throw new Exception(msDbmsError);
-            }
-            if (mnFkCfdTypeId == SDataConstantsSys.TRNS_TP_CFD_PAY && mnFkXmlStatusId == SDataConstantsSys.TRNS_ST_DPS_NEW) {
-                msDbmsError = sMsg + "¡El documento no está timbrado!";
-                throw new Exception(msDbmsError);
-            }
+        if (mnFkXmlStatusId == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
+            msDbmsError = sMsg + "¡El documento está anulado!";
+            throw new Exception(msDbmsError);
         }
-        else {
-            if (mnFkXmlStatusId == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
-                msDbmsError = sMsg + "¡El documento está timbrado!";
-                throw new Exception(msDbmsError);
-            }
-            if (mnFkXmlStatusId == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
-                msDbmsError = sMsg + "¡El documento está anulado!";
-                throw new Exception(msDbmsError);
-            }
+        
+        switch (action) {
+            case SDbConsts.ACTION_DELETE:
+                if (mnFkXmlStatusId == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
+                    msDbmsError = sMsg + "¡El documento está timbrado!";
+                    throw new Exception(msDbmsError);
+                }
+                break;
+            case SDbConsts.ACTION_ANNUL:
+                if (mnFkXmlStatusId != SDataConstantsSys.TRNS_ST_DPS_EMITED) {
+                    msDbmsError = sMsg + "¡El documento no está timbrado!";
+                    throw new Exception(msDbmsError);
+                }
+                break;
+            default:
         }
         
         if (!mbAuxIsValidate) {
@@ -229,11 +228,11 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESSING_WEB_SERVICE + "!";
                 throw new Exception(msDbmsError);
             }
-            if (nAction != SDbConsts.ACTION_ANNUL && mbIsProcessingStorageXml) {
+            if (action != SDbConsts.ACTION_ANNUL && mbIsProcessingStorageXml) {
                 msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESSING_XML_STORAGE + "!";
                 throw new Exception(msDbmsError);
             }
-            if (nAction != SDbConsts.ACTION_ANNUL && mbIsProcessingStoragePdf) {
+            if (action != SDbConsts.ACTION_ANNUL && mbIsProcessingStoragePdf) {
                 msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESSING_PDF_STORAGE + "!";
                 throw new Exception(msDbmsError);
             }
@@ -746,7 +745,6 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     @Override
     public int annul(java.sql.Connection connection) {
         String sSql = "";
-        String sMsg = "No se puede anular el documento: ";
         Statement oStatement = null;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
@@ -756,7 +754,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             
             // Set CFD as annuled:
 
-            if (testDeletion(sMsg, SDbConsts.ACTION_ANNUL)) {
+            if (testDeletion("No se puede anular el documento: ", SDbConsts.ACTION_ANNUL)) {
                 sSql = "UPDATE trn_cfd SET fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " " +
                         "WHERE id_cfd = " + mnPkCfdId + " ";
                 oStatement.execute(sSql);

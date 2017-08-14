@@ -7,6 +7,7 @@ package erp.cfd;
 import cfd.DAttributeOptionImpuestoRetencion;
 import cfd.DAttributeOptionImpuestoTraslado;
 import cfd.ver33.DElementConceptoImpuestos;
+import erp.data.SDataConstantsSys;
 import erp.mod.SModSysConsts;
 import erp.mtrn.data.SDataDpsEntryTax;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SCfdDataConcepto {
     
@@ -147,7 +148,7 @@ public class SCfdDataConcepto {
         concepto.getAttUnidad().setString(msUnidad);
         concepto.getAttClaveUnidad().setString(msClaveUnidad);
         
-        if (mnCfdiType == SCfdConsts.CFD_TYPE_PAYROLL) {
+        if (mnCfdiType == SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
             concepto.getAttCantidad().setDecimals(0);
         }
         concepto.getAttCantidad().setDouble(mdCantidad);
@@ -161,30 +162,30 @@ public class SCfdDataConcepto {
         
         // Taxes:
             
-        cfd.ver33.DElementConceptoImpuestosRetenidos impuestosRetenidos = new cfd.ver33.DElementConceptoImpuestosRetenidos();
+        cfd.ver33.DElementConceptoImpuestosRetenciones impuestosRetenciones = new cfd.ver33.DElementConceptoImpuestosRetenciones();
         cfd.ver33.DElementConceptoImpuestosTraslados impuestosTrasladados = new cfd.ver33.DElementConceptoImpuestosTraslados();
         
         for (SCfdDataImpuesto impuesto : maImpuestosXml) {
             switch (impuesto.getImpuestoBasico()) {
                 case SModSysConsts.FINS_TP_TAX_RETAINED:
-                    impuestosRetenidos.getEltHijosImpuestoRetenido().add((cfd.ver33.DElementConceptoImpuestoRetencion) impuesto.createRootElementConceptoImpuesto33());
+                    impuestosRetenciones.getEltImpuestoRetenciones().add((cfd.ver33.DElementConceptoImpuestoRetencion) impuesto.createRootElementConceptoImpuesto33());
                     break;
                 case SModSysConsts.FINS_TP_TAX_CHARGED:
-                    impuestosTrasladados.getEltHijosImpuestoTrasladado().add((cfd.ver33.DElementConceptoImpuestoTraslado) impuesto.createRootElementConceptoImpuesto33());
+                    impuestosTrasladados.getEltImpuestoTrasladados().add((cfd.ver33.DElementConceptoImpuestoTraslado) impuesto.createRootElementConceptoImpuesto33());
                     break;
                 default:
             }
         }
         
-        if (!impuestosTrasladados.getEltHijosImpuestoTrasladado().isEmpty() || !impuestosRetenidos.getEltHijosImpuestoRetenido().isEmpty()) {
+        if (!impuestosTrasladados.getEltImpuestoTrasladados().isEmpty() || !impuestosRetenciones.getEltImpuestoRetenciones().isEmpty()) {
             concepto.setEltOpcConceptoImpuestos(new DElementConceptoImpuestos());
         }
         
-        if (!impuestosTrasladados.getEltHijosImpuestoTrasladado().isEmpty()) {
-            concepto.getEltImpuestos().setEltOpcImpuestosTrasladados(impuestosTrasladados);
+        if (!impuestosTrasladados.getEltImpuestoTrasladados().isEmpty()) {
+            concepto.getEltOpcConceptoImpuestos().setEltOpcImpuestosTrasladados(impuestosTrasladados);
         }
-        if (!impuestosRetenidos.getEltHijosImpuestoRetenido().isEmpty()) {
-            concepto.getEltImpuestos().setEltOpcImpuestosRetenidos(impuestosRetenidos);
+        if (!impuestosRetenciones.getEltImpuestoRetenciones().isEmpty()) {
+            concepto.getEltOpcConceptoImpuestos().setEltOpcImpuestosRetenciones(impuestosRetenciones);
         }
         
         return concepto;
