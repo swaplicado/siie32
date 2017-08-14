@@ -1099,12 +1099,6 @@ public abstract class SDataConstantsSys {
     public static final String TRNS_CFD_CAT_PAY_MET_PUE = "PUE";    // Pago en una sola exhibición
     public static final String TRNS_CFD_CAT_PAY_MET_PPD = "PPD";    // Pago en parcialidades o diferido
     
-    public static final String TRNS_CFD_CAT_CFD_TP_I = "I";     // Ingreso
-    public static final String TRNS_CFD_CAT_CFD_TP_E = "E";     // Egreso
-    public static final String TRNS_CFD_CAT_CFD_TP_T = "T";     // Traslado
-    public static final String TRNS_CFD_CAT_CFD_TP_N = "N";     // Nómina
-    public static final String TRNS_CFD_CAT_CFD_TP_P = "P";     // Pago
-
     public static final String TRNS_CFD_CAT_TP_REL_CDT = "01";  // credit note
     
     public static final String TRNS_CFD_CAT_CTY_GRP_UE = "Unión Europea";   // European Union

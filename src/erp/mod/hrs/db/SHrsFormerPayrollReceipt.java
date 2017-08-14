@@ -16,6 +16,7 @@ import cfd.ver3.nom11.DElementPercepciones;
 import cfd.ver3.nom12.DElementIncapacidad;
 import cfd.ver3.nom12.DElementSeparacionIndemnizacion;
 import cfd.ver32.DVer3Utils;
+import cfd.ver33.DCfdi33Consts;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdDataConcepto;
 import erp.cfd.SCfdDataImpuesto;
@@ -739,7 +740,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
 
     @Override
     public String getComprobanteTipoComprobante() { // CFDI 3.3
-        return SDataConstantsSys.TRNS_CFD_CAT_CFD_TP_N;
+        return DCfdi33Consts.CFD_TP_N;
     }
 
     @Override

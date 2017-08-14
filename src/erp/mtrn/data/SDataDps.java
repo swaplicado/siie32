@@ -28,6 +28,7 @@ import cfd.ext.soriana.DElementArticulos;
 import cfd.ext.soriana.DElementDSCargaRemisionProv;
 import cfd.ext.soriana.DElementFolioNotaEntrada;
 import cfd.ver2.DAttributeOptionTipoDeComprobante;
+import cfd.ver33.DCfdi33Consts;
 import erp.SClient;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdDataConcepto;
@@ -4696,7 +4697,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     @Override
     public String getComprobanteTipoComprobante() { // CFDI 3.3
-        return isDocument() ? SDataConstantsSys.TRNS_CFD_CAT_CFD_TP_I : SDataConstantsSys.TRNS_CFD_CAT_CFD_TP_E;
+        return isDocument() ? DCfdi33Consts.CFD_TP_I : DCfdi33Consts.CFD_TP_E;
     }
 
     @Override
