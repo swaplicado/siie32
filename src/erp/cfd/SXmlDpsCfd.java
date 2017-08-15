@@ -27,25 +27,25 @@ public class SXmlDpsCfd extends SXmlDocument {
     public static final String NAME = "Dps";
     
     private boolean mbAvailableCfdiRelacionados;
-    private boolean mbAvailableCce;
+    private boolean mbAvailableIntCommerce;
     private final ArrayList<DElement> maElements;
 
     public SXmlDpsCfd() {
         super(NAME);
         mbAvailableCfdiRelacionados = false;
-        mbAvailableCce = false;
+        mbAvailableIntCommerce = false;
         maElements = new ArrayList<>();
     }
 
     public boolean isAvailableCfdiRelacionados() { return mbAvailableCfdiRelacionados; }
-    public boolean isAvailableCce() { return mbAvailableCce; }
+    public boolean isAvailableIntCommerce() { return mbAvailableIntCommerce; }
     public ArrayList<DElement> getElements() { return maElements; }
     
     @Override
     public void processXml(String xml) throws Exception {
         clear();
         mbAvailableCfdiRelacionados = false;
-        mbAvailableCce = false;
+        mbAvailableIntCommerce = false;
         maElements.clear();
 
         // start parsing document:
@@ -60,7 +60,7 @@ public class SXmlDpsCfd extends SXmlDocument {
             NamedNodeMap cfdiRelacionadosNodesMap = cfdiRelacionadosNodes.get(0).getAttributes();
 
             DElementCfdiRelacionados cfdiRelacionados = new DElementCfdiRelacionados();
-            cfdiRelacionados.getAttTipoRelacion().setString(cfdiRelacionadosNodesMap.getNamedItem("TipoRelacion").getNodeValue());
+            cfdiRelacionados.getAttTipoRelacion().setString(SXmlUtils.extractAttributeValue(cfdiRelacionadosNodesMap, "TipoRelacion", true));
             
             String cfdiRelacionadoName = new DElementCfdiRelacionado().getName();
             if (SXmlUtils.hasChildElement(cfdiRelacionadosNodes.get(0), cfdiRelacionadoName)) {
@@ -70,7 +70,7 @@ public class SXmlDpsCfd extends SXmlDocument {
                     NamedNodeMap cfdiRelacionadoNodesMap = cfdiRelacionadoNode.getAttributes();
 
                     DElementCfdiRelacionado cfdiRelacionado = new DElementCfdiRelacionado();
-                    cfdiRelacionado.getAttUuid().setString(cfdiRelacionadoNodesMap.getNamedItem("UUID").getNodeValue());
+                    cfdiRelacionado.getAttUuid().setString(SXmlUtils.extractAttributeValue(cfdiRelacionadoNodesMap, "UUID", true));
                     
                     cfdiRelacionados.getEltCfdiRelacionados().add(cfdiRelacionado);
                 }
@@ -87,18 +87,19 @@ public class SXmlDpsCfd extends SXmlDocument {
             NamedNodeMap namedNodeMap = childNodes.get(0).getAttributes();
 
             SXmlDpsCfdCce dpsCfdCce = new SXmlDpsCfdCce();
-            dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_MOT_TRAS).setValue(namedNodeMap.getNamedItem(SXmlDpsCfdCce.ATT_MOT_TRAS).getNodeValue());
-            dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_TP_OPE).setValue(namedNodeMap.getNamedItem(SXmlDpsCfdCce.ATT_TP_OPE).getNodeValue());
-            dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_CVE_PED).setValue(namedNodeMap.getNamedItem(SXmlDpsCfdCce.ATT_CVE_PED).getNodeValue());
-            dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_CERT_ORIG).setValue(namedNodeMap.getNamedItem(SXmlDpsCfdCce.ATT_CERT_ORIG).getNodeValue());
-            dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_NUM_CERT_ORIG).setValue(namedNodeMap.getNamedItem(SXmlDpsCfdCce.ATT_NUM_CERT_ORIG).getNodeValue());
-            dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_SUB).setValue(namedNodeMap.getNamedItem(SXmlDpsCfdCce.ATT_SUB).getNodeValue());
-            dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_TP_CAMB).setValue(namedNodeMap.getNamedItem(SXmlDpsCfdCce.ATT_TP_CAMB).getNodeValue());
-            dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_TOT_USD).setValue(namedNodeMap.getNamedItem(SXmlDpsCfdCce.ATT_TOT_USD).getNodeValue());
-            dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_NUM_EXP_CONF).setValue(namedNodeMap.getNamedItem(SXmlDpsCfdCce.ATT_NUM_EXP_CONF).getNodeValue());
+            dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_MOT_TRAS).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlDpsCfdCce.ATT_MOT_TRAS, true));
+            dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_TP_OPE).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlDpsCfdCce.ATT_TP_OPE, true));
+            dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_CVE_PED).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlDpsCfdCce.ATT_CVE_PED, true));
+            dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_CERT_ORIG).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlDpsCfdCce.ATT_CERT_ORIG, true));
+            dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_NUM_CERT_ORIG).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlDpsCfdCce.ATT_NUM_CERT_ORIG, true));
+            dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_SUB).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlDpsCfdCce.ATT_SUB, true));
+            dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_TP_CAMB).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlDpsCfdCce.ATT_TP_CAMB, true));
+            dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_TOT_USD).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlDpsCfdCce.ATT_TOT_USD, true));
+            dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_NUM_EXP_CONF).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlDpsCfdCce.ATT_NUM_EXP_CONF, true));
+            dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_INCOTERM).setValue(SXmlUtils.extractAttributeValue(namedNodeMap, SXmlDpsCfdCce.ATT_INCOTERM, true));
 
             mvXmlElements.add(dpsCfdCce);
-            mbAvailableCce = true;
+            mbAvailableIntCommerce = true;
         }
     }
     

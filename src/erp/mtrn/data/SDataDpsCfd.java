@@ -110,7 +110,7 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
     public String getCfdCceNumeroExportadorConfiable() { return msCfdCceNumeroExportadorConfiable; }
     public String getCfdCceIncoterm() { return msCfdCceIncoterm; }
     
-    public boolean hasInternationalCommerce() { return !msCfdCceMotivoTraslado.isEmpty(); }
+    public boolean hasInternationalCommerce() { return !msCfdCceTipoOperacion.isEmpty(); }
 
     /**
      * Generate the XML with infromation aditional for CFDI.
@@ -132,7 +132,7 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
             dpsCfd.getElements().add(cfdiRelacionados);
         }
         
-        if (!msCfdCceMotivoTraslado.isEmpty()) {
+        if (hasInternationalCommerce()) {
             // attributes for international commerce:
             SXmlDpsCfdCce cfdCce = new SXmlDpsCfdCce();
             cfdCce.getAttribute(SXmlDpsCfdCce.ATT_MOT_TRAS).setValue(msCfdCceMotivoTraslado);
@@ -173,7 +173,7 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
             }
         }
         
-        if (dpsCfd.isAvailableCce()) {
+        if (dpsCfd.isAvailableIntCommerce()) {
             for (SXmlElement element : dpsCfd.getXmlElements()) {
                 if (element instanceof SXmlDpsCfdCce) {
                     SXmlDpsCfdCce dpsCfdCce = (SXmlDpsCfdCce) element;

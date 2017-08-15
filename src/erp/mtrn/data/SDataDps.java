@@ -1113,9 +1113,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
     }
 
-    private void calculateCceTotal() {
+    private void calculateIntCommerceTotal() {
         if (moDbmsDataDpsCfd != null) {
-            int decs = SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits();
+            int decs = DCfdUtils.AmountFormat.getMaximumFractionDigits();
             double exr = SLibUtils.round(SLibUtils.parseDouble(moDbmsDataDpsCfd.getCfdCceTipoCambioUSD()), decs);
             double valueMxn = 0;
             double valueUsd = 0;
@@ -3477,6 +3477,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     // 3. Recalculate DPS value:
 
                     calculateDpsTotal(null, nDecs);
+                    calculateIntCommerceTotal();
 
                     // 4. Save DPS again (this will re-create accounting record again):
 
@@ -3568,8 +3569,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
      * @param client ERP Client. Can be null, and each DPS entry is not calculated, original values remains as the original ones.
      */
     public void calculateTotal(erp.client.SClientInterface client) throws SQLException, Exception {
-        calculateDpsTotal(client, 0);
-        calculateCceTotal();
+        calculateDpsTotal(client, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+        calculateIntCommerceTotal();
     }
 
     /**

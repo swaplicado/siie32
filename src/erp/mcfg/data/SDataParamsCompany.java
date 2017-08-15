@@ -299,7 +299,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public erp.mcfg.data.SDataCfgCfd getDbmsDataCfgCfd() { return moDbmsDataCfgCfd; }
     
     public SCceEmisorAddressAux getEmisorAddress(String zipCode) {
-        SCceEmisorAddressAux emisorAddress = new SCceEmisorAddressAux();
+        SCceEmisorAddressAux emisorAddress = null;
         
         for (SCceEmisorAddressAux emisor : moDbmsDataCfgCfd.getCceEmisorAddressAux()) {
             if (emisor.getCfdCceEmisorCodigoPostal().compareTo(zipCode) == 0) {

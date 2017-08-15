@@ -3269,7 +3269,7 @@ public abstract class SCfdUtils implements Serializable {
     public static cfd.DElement createCfdi32RootElement(final SClientInterface client, final SCfdXmlCfdi32 xmlCfdi) throws Exception {
         double dTotalImptoRetenido = 0;
         double dTotalImptoTrasladado = 0;
-        boolean hasInternationalTradeNode = false;
+        boolean hasIntCommerceNode = false;
         SDbCfdBizPartner emisor = null;
         SDbCfdBizPartner receptor = null;
         SCfdDataBizPartner asociadoNegocios = null;
@@ -3313,7 +3313,7 @@ public abstract class SCfdUtils implements Serializable {
         elementComplement = xmlCfdi.getElementComplemento();
 
         if (elementComplement != null) {
-            hasInternationalTradeNode = ((cfd.ver32.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior") != null;
+            hasIntCommerceNode = ((cfd.ver32.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior") != null;
         }
         
         emisor = new SDbCfdBizPartner(client);
@@ -3322,11 +3322,10 @@ public abstract class SCfdUtils implements Serializable {
         emisor.setBizPartnerExpeditionId(xmlCfdi.getEmisorId());
         emisor.setBizPartnerBranchExpeditionId(xmlCfdi.getEmisorSucursalId());
         emisor.setIsEmisor(true);
-        emisor.setIsEmisorForCce(hasInternationalTradeNode);
+        emisor.setIsEmisorForIntCommerce(hasIntCommerceNode);
 
         asociadoNegocios = emisor.getBizPartner();
-        asociadoNegocios.setIsCfdi(true);
-        asociadoNegocios.setIsCfdiWithCce(hasInternationalTradeNode);
+        asociadoNegocios.setIsCfdiWithIntCommerce(hasIntCommerceNode);
         asociadoNegocios.setVersion(DCfdConsts.CFDI_VER_32);
         asociadoNegocios.setCfdiType(xmlCfdi.getCfdType());
         asociadoNegocios.setIsStateCodeAssociate(SLocUtils.hasAssociateStates(client.getSession(), asociadoNegocios.getBizPartnerCountryId()));
@@ -3342,19 +3341,17 @@ public abstract class SCfdUtils implements Serializable {
         receptor = new SDbCfdBizPartner(client);
         receptor.setBizPartnerId(xmlCfdi.getReceptorId());
         receptor.setBizPartnerBranchId(xmlCfdi.getReceptorSucursalId());
-        receptor.setIsEmisorForCce(false);
 
         asociadoNegocios = receptor.getBizPartner();
-        asociadoNegocios.setIsCfdi(true);
-        asociadoNegocios.setIsCfdiWithCce(hasInternationalTradeNode);
-        asociadoNegocios.setIsStateCodeAssociate(SLocUtils.hasAssociateStates(client.getSession(), asociadoNegocios.getBizPartnerCountryId()));
+        asociadoNegocios.setIsCfdiWithIntCommerce(hasIntCommerceNode);
         asociadoNegocios.setVersion(DCfdConsts.CFDI_VER_32);
         asociadoNegocios.setCfdiType(xmlCfdi.getCfdType());
+        asociadoNegocios.setIsStateCodeAssociate(SLocUtils.hasAssociateStates(client.getSession(), asociadoNegocios.getBizPartnerCountryId()));
 
         comprobante.setEltReceptor((cfd.ver32.DElementReceptor) asociadoNegocios.createRootElementReceptor());
         
-        if (elementComplement != null && hasInternationalTradeNode) {
-            ((cfd.ver3.cce11.DElementComercioExterior) ((cfd.ver32.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior")).setEltReceptor((cfd.ver3.cce11.DElementReceptor) asociadoNegocios.createRootElementReceptorCce());
+        if (elementComplement != null && hasIntCommerceNode) {
+            ((cfd.ver3.cce11.DElementComercioExterior) ((cfd.ver32.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior")).setEltReceptor(asociadoNegocios.createRootElementReceptorIntCommerce());
         }
 
         for (SCfdDataConcepto concept : xmlCfdi.getElementsConcepto()) {
@@ -3490,19 +3487,19 @@ public abstract class SCfdUtils implements Serializable {
         emisor.setBizPartnerExpeditionId(xmlCfdi.getEmisorId());
         emisor.setBizPartnerBranchExpeditionId(xmlCfdi.getEmisorSucursalId());
         emisor.setIsEmisor(true);
-        emisor.setIsEmisorForCce(hasIntCommerceNode);
+        emisor.setIsEmisorForIntCommerce(hasIntCommerceNode);
 
         asociadoNegocios = emisor.getBizPartner();
-        asociadoNegocios.setIsCfdi(true);
-        asociadoNegocios.setIsCfdiWithCce(hasIntCommerceNode);
+        asociadoNegocios.setIsCfdiWithIntCommerce(hasIntCommerceNode);
         asociadoNegocios.setVersion(DCfdConsts.CFDI_VER_33);
         asociadoNegocios.setCfdiType(xmlCfdi.getCfdType());
 
         cfd.ver33.DElementEmisor elementEmisor = (cfd.ver33.DElementEmisor) asociadoNegocios.createRootElementEmisor();
+        
         elementEmisor.getAttRegimenFiscal().setString(xmlCfdi.getEmisorRegimenFiscal());
         
         if (elementComplement != null && hasIntCommerceNode) {
-            ((cfd.ver3.cce11.DElementComercioExterior) ((cfd.ver32.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior")).setEltEmisor((cfd.ver3.cce11.DElementEmisor) asociadoNegocios.createRootElementEmisorCce());
+            ((cfd.ver3.cce11.DElementComercioExterior) ((cfd.ver32.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior")).setEltEmisor(asociadoNegocios.createRootElementEmisorIntCommerce());
         }
 
         comprobante.setEltEmisor(elementEmisor);
@@ -3510,19 +3507,18 @@ public abstract class SCfdUtils implements Serializable {
         receptor = new SDbCfdBizPartner(client);
         receptor.setBizPartnerId(xmlCfdi.getReceptorId());
         receptor.setBizPartnerBranchId(xmlCfdi.getReceptorSucursalId());
-        receptor.setIsEmisorForCce(false);
 
         asociadoNegocios = receptor.getBizPartner();
-        asociadoNegocios.setIsCfdi(true);
-        asociadoNegocios.setIsCfdiWithCce(hasIntCommerceNode);
+        asociadoNegocios.setIsCfdiWithIntCommerce(hasIntCommerceNode);
         asociadoNegocios.setVersion(DCfdConsts.CFDI_VER_33);
         asociadoNegocios.setCfdiType(xmlCfdi.getCfdType());
 
         cfd.ver33.DElementReceptor elementReceptor = (cfd.ver33.DElementReceptor) asociadoNegocios.createRootElementReceptor();
+        
         elementReceptor.getAttUsoCFDI().setString(xmlCfdi.getReceptorUsoCFDI());
         
         if (elementComplement != null && hasIntCommerceNode) {
-            ((cfd.ver3.cce11.DElementComercioExterior) ((cfd.ver32.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior")).setEltReceptor((cfd.ver3.cce11.DElementReceptor) asociadoNegocios.createRootElementReceptorCce());
+            ((cfd.ver3.cce11.DElementComercioExterior) ((cfd.ver32.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior")).setEltReceptor(asociadoNegocios.createRootElementReceptorIntCommerce());
         }
         
         comprobante.setEltReceptor(elementReceptor);
@@ -3680,8 +3676,7 @@ public abstract class SCfdUtils implements Serializable {
         double dTotalImptoTrasladados = 0;
         double dTotal = 0;
         
-        // validate subtotal concepts:
-        
+        // validate concepts' ubtotal:
         for (int i = 0; i < comprobante.getEltConceptos().getEltConceptos().size(); i++) {
             oConcepto = comprobante.getEltConceptos().getEltConceptos().get(i);
             
@@ -3694,44 +3689,41 @@ public abstract class SCfdUtils implements Serializable {
             dSubtotalConceptos = SLibUtils.round((dSubtotalConceptos + dSubtotalImporte), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
         }
         
-        // validate taxes charged:
-        
-        if (comprobante.getEltOpcImpuestos().getEltOpcImpuestosTraslados() != null) {
-            for (int i = 0; i < comprobante.getEltOpcImpuestos().getEltOpcImpuestosTraslados().getEltImpuestoTrasladados().size(); i++) {
-                oTraslado = comprobante.getEltOpcImpuestos().getEltOpcImpuestosTraslados().getEltImpuestoTrasladados().get(i);
+        if (comprobante.getEltOpcImpuestos() != null) {
+            // validate taxes charged:
+            if (comprobante.getEltOpcImpuestos().getEltOpcImpuestosTraslados() != null) {
+                for (int i = 0; i < comprobante.getEltOpcImpuestos().getEltOpcImpuestosTraslados().getEltImpuestoTrasladados().size(); i++) {
+                    oTraslado = comprobante.getEltOpcImpuestos().getEltOpcImpuestosTraslados().getEltImpuestoTrasladados().get(i);
 
-                dTotalImptoTrasladados = SLibUtils.round((dTotalImptoTrasladados + oTraslado.getAttImporte().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                    dTotalImptoTrasladados = SLibUtils.round((dTotalImptoTrasladados + oTraslado.getAttImporte().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                }
+
+                if (Math.abs(comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().getDouble() - dTotalImptoTrasladados) >= SLibConstants.RES_VAL_DECS) {
+                    throw new Exception("La suma de los impuestos trasladados es incorrecta.");
+                }
             }
 
-            if (Math.abs(comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().getDouble() - dTotalImptoTrasladados) >= SLibConstants.RES_VAL_DECS) {
-                throw new Exception("La suma de los impuestos trasladados es incorrecta.");
-            }
-        }
-        
-        // validate taxes retained:
-        
-        if (comprobante.getEltOpcImpuestos().getEltOpcImpuestosRetenidos() != null) {
-            for (int i = 0; i < comprobante.getEltOpcImpuestos().getEltOpcImpuestosRetenidos().getEltImpuestoRetenciones().size(); i++) {
-                oRetencion = comprobante.getEltOpcImpuestos().getEltOpcImpuestosRetenidos().getEltImpuestoRetenciones().get(i);
+            // validate taxes retained:
+            if (comprobante.getEltOpcImpuestos().getEltOpcImpuestosRetenidos() != null) {
+                for (int i = 0; i < comprobante.getEltOpcImpuestos().getEltOpcImpuestosRetenidos().getEltImpuestoRetenciones().size(); i++) {
+                    oRetencion = comprobante.getEltOpcImpuestos().getEltOpcImpuestosRetenidos().getEltImpuestoRetenciones().get(i);
 
-                dTotalImptoRetenidos = SLibUtils.round((dTotalImptoRetenidos + oRetencion.getAttImporte().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-            }
+                    dTotalImptoRetenidos = SLibUtils.round((dTotalImptoRetenidos + oRetencion.getAttImporte().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                }
 
-            if (Math.abs(comprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos().getDouble() - dTotalImptoRetenidos) >= SLibConstants.RES_VAL_DECS) {
-                throw new Exception("La suma de los impuestos retenidos es incorrecta.");
+                if (Math.abs(comprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos().getDouble() - dTotalImptoRetenidos) >= SLibConstants.RES_VAL_DECS) {
+                    throw new Exception("La suma de los impuestos retenidos es incorrecta.");
+                }
             }
         }
         
         // validate subtotal vs. subtotal concepts:
-        
         if (Math.abs(comprobante.getAttSubTotal().getDouble() - dSubtotalConceptos) >= SLibConstants.RES_VAL_DECS) {
             throw new Exception("La suma de importes de los conceptos es incorrecta.");
         }
         
         // validate total:
-        
         dTotal = SLibUtils.round((dSubtotalConceptos + dTotalImptoTrasladados - dTotalImptoRetenidos - comprobante.getAttDescuento().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-        
         if (Math.abs(comprobante.getAttTotal().getDouble() - dTotal) >= SLibConstants.RES_VAL_DECS) {
             throw new Exception("El monto del cálculo del total es incorrecto.");
         }

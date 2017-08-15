@@ -36,6 +36,7 @@ public class SXmlDpsCfdCce extends SXmlElement {
     protected SXmlAttribute moCfdCceTipoCambioUsd;
     protected SXmlAttribute moCfdCceTotalUsd;
     protected SXmlAttribute moCfdCceNumExportadorConfiable;
+    protected SXmlAttribute moCfdCceIncoterm;
     
     public SXmlDpsCfdCce() {
         super(NAME);
@@ -49,6 +50,7 @@ public class SXmlDpsCfdCce extends SXmlElement {
         moCfdCceTipoCambioUsd = new SXmlAttribute(ATT_TP_CAMB);
         moCfdCceTotalUsd = new SXmlAttribute(ATT_TOT_USD);
         moCfdCceNumExportadorConfiable = new SXmlAttribute(ATT_NUM_EXP_CONF);
+        moCfdCceIncoterm = new SXmlAttribute(ATT_INCOTERM);
         
         mvXmlAttributes.add(moCfdCceMotivoTraslado);
         mvXmlAttributes.add(moCfdCceTipoOperacion);
@@ -59,5 +61,6 @@ public class SXmlDpsCfdCce extends SXmlElement {
         mvXmlAttributes.add(moCfdCceTipoCambioUsd);
         mvXmlAttributes.add(moCfdCceTotalUsd);
         mvXmlAttributes.add(moCfdCceNumExportadorConfiable);
+        mvXmlAttributes.add(moCfdCceIncoterm);
     }
 }
