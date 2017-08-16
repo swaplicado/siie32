@@ -43,8 +43,8 @@ public interface SCfdXmlCfdi33 {
     public String getReceptorResidenciaFiscal();    // Receptor/RegimentFiscal
     public String getReceptorNumRegIdTrib();        // Receptor/NumRegIdTrib
     public String getReceptorUsoCFDI();             // Receptor/UsoCFDI
-    public ArrayList<SCfdDataConcepto> getElementsConcepto();
+    public ArrayList<SCfdDataConcepto> getElementsConcepto() throws Exception;
     public ArrayList<SCfdDataImpuesto> getElementsImpuestos(float cfdiVersion);
-    public cfd.DElement getElementComplemento();
+    public cfd.DElement getElementComplemento() throws Exception;
     public cfd.DElement getElementAddenda();
 }

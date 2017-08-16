@@ -2442,10 +2442,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldDiscountDocPercentage.setIsPercent(true);
         moFieldDiscountDocPercentage.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat());
         moFieldExchangeRate = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfExchangeRate, jlExchangeRate);
-        moFieldExchangeRate.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsExchangeRateFormat());
+        moFieldExchangeRate.setDecimalFormat(SLibUtils.getDecimalFormatExchangeRate());
         moFieldExchangeRate.setPickerButton(jbExchangeRate);
         moFieldExchangeRateSystem = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfExchangeRateSystemRo, jlExchangeRateSystem);
-        moFieldExchangeRateSystem.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsExchangeRateFormat());
+        moFieldExchangeRateSystem.setDecimalFormat(SLibUtils.getDecimalFormatExchangeRate());
         
         // marketing fields:
         
@@ -2549,6 +2549,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldCfdCceSubdivision = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfCfdCceSubdivision, jlCfdCceSubdivision);
         moFieldCfdCceSubdivision.setTabbedPaneIndex(TAB_CFD_INT, jTabbedPane);
         moFieldCfdCceExchangeRateUsd = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfCfdCceExchangeRateUsd, jlCfdCceExchangeRateUsd);
+        moFieldCfdCceExchangeRateUsd.setDecimalFormat(SLibUtils.getDecimalFormatExchangeRate());
         moFieldCfdCceExchangeRateUsd.setTabbedPaneIndex(TAB_CFD_INT, jTabbedPane);
         moFieldCfdCceTotalUsd = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfCfdCceTotalUsd, jlCfdCceTotalUsd);
         moFieldCfdCceTotalUsd.setTabbedPaneIndex(TAB_CFD_INT, jTabbedPane);
@@ -3369,17 +3370,16 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         double quantity = 0;
         SDataDpsEntry entry = null;
 
+        // update DPS data required to calculate document's value:
         moDps.setFkLanguajeId(moFieldFkLanguajeId.getKeyAsIntArray()[0]);
         moDps.setFkCurrencyId(moFieldFkCurrencyId.getKeyAsIntArray()[0]);
         moDps.setExchangeRateSystem(moFieldExchangeRateSystem.getDouble());
         moDps.setExchangeRate(moFieldExchangeRate.getDouble());
-
         moDps.setIsDiscountDocApplying(moFieldIsDiscountDocApplying.getBoolean());
         moDps.setIsDiscountDocPercentage(moFieldIsDiscountDocPercentage.getBoolean());
         moDps.setDiscountDocPercentage(moFieldDiscountDocPercentage.getDouble());
 
-        // In order to calculate document's value, all entries must be in moDps object:
-
+        // to calculate document's value, all entries must be added to DPS object:
         moDps.getDbmsDpsEntries().clear();
         for (i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
             entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
@@ -3387,25 +3387,28 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moDps.getDbmsDpsEntries().add(entry);
         }
 
-        // Calculate and render document's value:
+        // display total quantity:
+        jtfQuantityTotal.setText(SLibUtils.getDecimalFormatQuantity().format(quantity));
 
-        jtfQuantityTotal.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(quantity));
-
-        try {
-            if (isCfdIntCommerceRequired()) {
-                if (isCurrencyUsd()) {
-                    moFieldCfdCceExchangeRateUsd.setFieldValue(SLibUtils.round(moFieldExchangeRate.getDouble(), DCfdUtils.AmountFormat.getMaximumFractionDigits()));
-                }
-                moDps.getDbmsDataDpsCfd().setCfdCceTipoCambioUSD(moFieldCfdCceExchangeRateUsd.getString());
+        // update International Commerce data required (if applies) to calculate document's value:
+        if (isCfdIntCommerceRequired()) {
+            if (isCurrencyUsd()) {
+                //moFieldCfdCceExchangeRateUsd.setFieldValue(SLibUtils.round(moFieldExchangeRate.getDouble(), DCfdUtils.AmountFormat.getMaximumFractionDigits()));  XXX needs to be removed?
+                moFieldCfdCceExchangeRateUsd.setFieldValue(moFieldExchangeRate.getDouble());
             }
-
+            moDps.getDbmsDataDpsCfd().setCfdCceTipoCambioUSD(SLibUtils.getDecimalFormatExchangeRate().format(moFieldCfdCceExchangeRateUsd.getDouble()));
+        }
+        
+        // calculate and display document's value:
+        try {
             moDps.calculateTotal(miClient);
         }
         catch (Exception e) {
             SLibUtilities.renderException(this, e);
         }
-        
-        renderDpsValue();
+        finally {
+            renderDpsValue();
+        }
     }
     
     /**
@@ -3500,9 +3503,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     moFieldCfdiTaxRegime.setFieldValue(miClient.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal());
                 }
                 if (moDps.getDbmsDataDpsCfd().getCfdiUsage().isEmpty()) {
-                    moFieldCfdiCfdiUsage.setFieldValue(moBizPartnerCategory.getCfdiCfdiUsage());
-                    if (jcbCfdiCfdiUsage.getSelectedIndex() <= 0) {
-                        moFieldCfdiCfdiUsage.setFieldValue(miClient.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdUsoCFDI());
+                    if (isCfdIntCommerceRequired()) {
+                        moFieldCfdiCfdiUsage.setFieldValue(SDataConstantsSys.TRNS_CFD_CAT_CFD_USE_P01);
+                    }
+                    else {
+                        moFieldCfdiCfdiUsage.setFieldValue(moBizPartnerCategory.getCfdiCfdiUsage());
+                        if (jcbCfdiCfdiUsage.getSelectedIndex() <= 0) {
+                            moFieldCfdiCfdiUsage.setFieldValue(miClient.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdUsoCFDI());
+                        }
                     }
                 }
                 moFieldCfdiConfirmation.setFieldValue("");  // confirmation is unique, cannot be copied when document is being created
@@ -8008,7 +8016,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
             if (!validation.getIsError()) {
                 if (isCfdIntCommerceRequired()) {
-                    if (moFieldCfdCceCertificateOrigin.getInteger() == 1 && moFieldCfdCceNumberCertificateOrigin.getString().isEmpty()) {
+                    if (moFieldCfdiCfdiUsage.getFieldValue().toString().compareTo(SDataConstantsSys.TRNS_CFD_CAT_CFD_USE_P01) != 0) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiCfdiUsage.getText() + "': <" + SDataConstantsSys.TRNS_CFD_CAT_CFD_USE_P01 + ">.");
+                        jTabbedPane.setSelectedIndex(TAB_CFD_XML);
+                        validation.setComponent(jcbCfdiCfdiUsage);
+                    }
+                    else if (moFieldCfdCceCertificateOrigin.getInteger() == 1 && moFieldCfdCceNumberCertificateOrigin.getString().isEmpty()) {
                          validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCfdCceNumberCertificateOrigin.getText() + "'.");
                         jTabbedPane.setSelectedIndex(TAB_CFD_INT);
                         validation.setComponent(jtfCfdCceNumberCertificateOrigin);
@@ -8614,7 +8627,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 dpsCfd.setCfdCceCertificadoOrigen("" + moFieldCfdCceCertificateOrigin.getInteger());
                 dpsCfd.setCfdCceNumCertificadoOrigen(moFieldCfdCceNumberCertificateOrigin.getString());
                 dpsCfd.setCfdCceSubdivision("" + moFieldCfdCceSubdivision.getInteger());
-                dpsCfd.setCfdCceTipoCambioUSD(DCfdUtils.AmountFormat.format(moFieldCfdCceExchangeRateUsd.getDouble()));
+                dpsCfd.setCfdCceTipoCambioUSD(SLibUtils.getDecimalFormatExchangeRate().format(moFieldCfdCceExchangeRateUsd.getDouble()));
                 dpsCfd.setCfdCceTotalUSD(DCfdUtils.AmountFormat.format(moFieldCfdCceTotalUsd.getDouble()));
                 if (moBizPartnerBranchAddress.getDbmsDataCountry().getCountryGroup().compareTo(SDataConstantsSys.TRNS_CFD_CAT_CTY_GRP_UE) == 0) {
                     dpsCfd.setCfdCceNumeroExportadorConfiable(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsCategorySettingsCo().getNumberExporter());

@@ -877,17 +877,10 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     }
     
     @Override
-    public DElement getElementComplemento() {
-        DElement complemento = null;
+    public DElement getElementComplemento() throws Exception {
+        DElement complemento = new cfd.ver32.DElementComplemento();
 
-        try {
-            complemento = new cfd.ver32.DElementComplemento();
-
-            ((cfd.ver32.DElementComplemento) complemento).getElements().add(createCfdiElementNomina12());
-        }
-        catch (Exception e) {
-            SLibUtils.showException(this, e);
-        }
+        ((cfd.ver32.DElementComplemento) complemento).getElements().add(createCfdiElementNomina12());
 
         return complemento;
     }

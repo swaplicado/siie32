@@ -1116,7 +1116,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     private void calculateIntCommerceTotal() {
         if (moDbmsDataDpsCfd != null) {
             int decs = DCfdUtils.AmountFormat.getMaximumFractionDigits();
-            double exr = SLibUtils.round(SLibUtils.parseDouble(moDbmsDataDpsCfd.getCfdCceTipoCambioUSD()), decs);
+            int decsExr = SLibUtils.getDecimalFormatExchangeRate().getMaximumFractionDigits();
+            double exr = SLibUtils.round(SLibUtils.parseDouble(moDbmsDataDpsCfd.getCfdCceTipoCambioUSD()), decsExr);
             double valueMxn = 0;
             double valueUsd = 0;
 
@@ -1129,6 +1130,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             
             moDbmsDataDpsCfd.setCfdCceTotalUSD(DCfdUtils.AmountFormat.format(valueUsd));
         }
+    }
+    
+    private boolean generateIntCommerceComplement() {
+        return mbAuxIsNeedCfdCce && moDbmsDataDpsCfd != null && !moDbmsDataDpsCfd.getCfdCceTipoOperacion().isEmpty();
     }
     
     private int getAccSysTypeIdBizPartnerXXX() {
@@ -4310,11 +4315,16 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             comercioExterior.getAttTotalUSD().setDouble(DCfdUtils.AmountFormat.parse(moDbmsDataDpsCfd.getCfdCceTotalUSD()).doubleValue());
             comercioExterior.setEltMercancias(new cfd.ver3.cce11.DElementMercancias());
 
-            int decs = SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits();
-            double exr = SLibUtils.round(SLibUtils.parseDouble(moDbmsDataDpsCfd.getCfdCceTipoCambioUSD()), decs);
+            int decs = DCfdUtils.AmountFormat.getMaximumFractionDigits();
+            int decsExr = SLibUtils.getDecimalFormatExchangeRate().getMaximumFractionDigits();
+            double exr = SLibUtils.round(SLibUtils.parseDouble(moDbmsDataDpsCfd.getCfdCceTipoCambioUSD()), decsExr);
             
             for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
                 if (dpsEntry.isAccountable()) {
+                    if (dpsEntry.getDbmsCustomsUnitSymbol().isEmpty()) {
+                        throw new Exception("La unidad '" + dpsEntry.getDbmsUnitSymbol() + "' no tiene 'código' para aduana.");
+                    }
+                    
                     double price = 0;
                     double valueMxn = 0;
                     double valueUsd = 0;
@@ -4333,7 +4343,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     mercancia.getAttNoIdentificacion().setString(dpsEntry.getConceptKey());
                     mercancia.getAttFraccionArancelaria().setString(dpsEntry.getDbmsTariffFraction());
                     mercancia.getAttCantidadAduana().setDouble(dpsEntry.getOriginalQuantity());
-                    mercancia.getAttUnidadAduana().setString(dpsEntry.getDbmsCustomsUnit());
+                    mercancia.getAttUnidadAduana().setString(dpsEntry.getDbmsCustomsUnitSymbol());
                     mercancia.getAttValorUnitarioAduana().setDouble(price);
                     mercancia.getAttValorDolares().setDouble(valueUsd);
 
@@ -4795,14 +4805,18 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     @Override
-    public ArrayList<SCfdDataConcepto> getElementsConcepto() {
+    public ArrayList<SCfdDataConcepto> getElementsConcepto() throws Exception {
         double price = 0;
         String descripcion = "";
-        SCfdDataConcepto conceptoXml = null;
-        ArrayList<SCfdDataConcepto> conceptosXml = new ArrayList<SCfdDataConcepto>();
+        SCfdDataConcepto concepto = null;
+        ArrayList<SCfdDataConcepto> conceptos = new ArrayList<SCfdDataConcepto>();
         
         for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
             if (dpsEntry.isAccountable()) {
+                if (generateIntCommerceComplement() && dpsEntry.getDbmsCustomsUnit().isEmpty()) {
+                    throw new Exception("La unidad '" + dpsEntry.getDbmsUnitSymbol() + "' no tiene 'nombre' para aduana.");
+                }
+                    
                 descripcion = dpsEntry.getConcept();
                 
                 for (SDataDpsEntryNotes dpsEntryNotes : dpsEntry.getDbmsEntryNotes()) {
@@ -4818,23 +4832,23 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     price = dpsEntry.getSubtotalCy_r() / dpsEntry.getOriginalQuantity();
                 }
                 
-                conceptoXml = new SCfdDataConcepto();
-                conceptoXml.setNoIdentificacion(dpsEntry.getConceptKey());
-                conceptoXml.setUnidad(dpsEntry.getDbmsOriginalUnitSymbol());
-                conceptoXml.setCantidad(dpsEntry.getOriginalQuantity());
-                conceptoXml.setDescripcion(descripcion);
-                conceptoXml.setValorUnitario(price);
-                conceptoXml.setImporte(dpsEntry.getSubtotalCy_r());
-                conceptoXml.setClaveProdServ(dpsEntry.getDbmsItemClaveProdServ());
-                conceptoXml.setClaveUnidad(dpsEntry.getDbmsUnidadClave());
+                concepto = new SCfdDataConcepto();
+                concepto.setNoIdentificacion(dpsEntry.getConceptKey());
+                concepto.setUnidad(generateIntCommerceComplement() ? dpsEntry.getDbmsCustomsUnit() : dpsEntry.getDbmsOriginalUnitSymbol());
+                concepto.setCantidad(dpsEntry.getOriginalQuantity());
+                concepto.setDescripcion(descripcion);
+                concepto.setValorUnitario(price);
+                concepto.setImporte(dpsEntry.getSubtotalCy_r());
+                concepto.setClaveProdServ(dpsEntry.getDbmsItemClaveProdServ());
+                concepto.setClaveUnidad(dpsEntry.getDbmsUnidadClave());
                 
-                conceptoXml.computeCfdImpuestosConceptos(dpsEntry);
+                concepto.computeCfdImpuestosConceptos(dpsEntry);
                 
-                conceptosXml.add(conceptoXml);
+                conceptos.add(concepto);
             }
         }
 
-        return conceptosXml;
+        return conceptos;
     }
     
     @Override
@@ -4852,17 +4866,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     @Override
-    public DElement getElementComplemento() {
+    public DElement getElementComplemento() throws Exception {
         DElement complemento = null;
         
-        try {
-            if (mbAuxIsNeedCfdCce && moDbmsDataDpsCfd != null && !moDbmsDataDpsCfd.getCfdCceTipoOperacion().isEmpty()) {
-                complemento = new cfd.ver32.DElementComplemento();
-                ((cfd.ver32.DElementComplemento) complemento).getElements().add(createCfdiNodeComplementoComercioExterior11());
-            }
-        }
-        catch (Exception e) {
-            SLibUtils.showException(this, e);
+        if (generateIntCommerceComplement()) {
+            complemento = new cfd.ver32.DElementComplemento();
+            ((cfd.ver32.DElementComplemento) complemento).getElements().add(createCfdiNodeComplementoComercioExterior11());
         }
         
         return complemento;

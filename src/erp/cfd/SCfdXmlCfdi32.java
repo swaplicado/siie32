@@ -43,8 +43,8 @@ public interface SCfdXmlCfdi32 {
     public ArrayList<DElement> getElementsEmisorRegimenFiscal();
     public int getReceptorId();
     public int getReceptorSucursalId();
-    public ArrayList<SCfdDataConcepto> getElementsConcepto();
+    public ArrayList<SCfdDataConcepto> getElementsConcepto() throws Exception;
     public ArrayList<SCfdDataImpuesto> getElementsImpuestos(float cfdiVersion);
-    public cfd.DElement getElementComplemento();
+    public cfd.DElement getElementComplemento() throws Exception;
     public cfd.DElement getElementAddenda();
 }

@@ -1070,6 +1070,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jpConfig1.add(jPanel39, java.awt.BorderLayout.CENTER);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración contable:"));
+        jPanel2.setPreferredSize(new java.awt.Dimension(550, 242));
         jPanel2.setLayout(new java.awt.GridLayout(8, 1, 0, 5));
 
         jPanel49.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -1192,7 +1193,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jlFkCfdProdServId_n.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel48.add(jlFkCfdProdServId_n);
 
-        moKeyCfdProdServId_n.setPreferredSize(new java.awt.Dimension(250, 23));
+        moKeyCfdProdServId_n.setMaximumRowCount(20);
+        moKeyCfdProdServId_n.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel48.add(moKeyCfdProdServId_n);
 
         jPanel2.add(jPanel48);

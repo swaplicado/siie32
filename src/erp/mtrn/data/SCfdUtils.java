@@ -3457,6 +3457,7 @@ public abstract class SCfdUtils implements Serializable {
         }
         comprobante.getAttTotal().setDouble(xmlCfdi.getComprobanteTotal());
         comprobante.getAttTipoDeComprobante().setString(xmlCfdi.getComprobanteTipoComprobante());
+        comprobante.getAttMetodoPago().setString(xmlCfdi.getComprobanteMetodoPago());
         comprobante.getAttLugarExpedicion().setString(xmlCfdi.getComprobanteLugarExpedicion());
         comprobante.getAttConfirmacion().setString(xmlCfdi.getComprobanteConfirmacion());
         

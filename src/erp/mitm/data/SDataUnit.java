@@ -13,12 +13,13 @@ import java.sql.ResultSet;
 
 /**
  *
- * @author Alfonso Flores, Juan Barajas
+ * @author Alfonso Flores, Juan Barajas, Sergio Flores
  */
 public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
     protected int mnPkUnitId;
     protected java.lang.String msUnit;
+    protected java.lang.String msUnitCustoms;
     protected java.lang.String msSymbol;
     protected java.lang.String msSymbolCustoms;
     protected double mdUnitBaseEquivalence;
@@ -42,6 +43,7 @@ public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Ser
 
     public void setPkUnitId(int n) { mnPkUnitId = n; }
     public void setUnit(java.lang.String s) { msUnit = s; }
+    public void setUnitCustoms(java.lang.String s) { msUnitCustoms = s; }
     public void setSymbol(java.lang.String s) { msSymbol = s; }
     public void setSymbolCustoms(java.lang.String s) { msSymbolCustoms = s; }
     public void setUnitBaseEquivalence(double d) { mdUnitBaseEquivalence = d; }
@@ -60,6 +62,7 @@ public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Ser
 
     public int getPkUnitId() { return mnPkUnitId; }
     public java.lang.String getUnit() { return msUnit; }
+    public java.lang.String getUnitCustoms() { return msUnitCustoms; }
     public java.lang.String getSymbol() { return msSymbol; }
     public java.lang.String getSymbolCustoms() { return msSymbolCustoms; }
     public double getUnitBaseEquivalence() { return mdUnitBaseEquivalence; }
@@ -92,6 +95,7 @@ public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Ser
 
         mnPkUnitId = 0;
         msUnit = "";
+        msUnitCustoms = "";
         msSymbol = "";
         msSymbolCustoms = "";
         mdUnitBaseEquivalence = 0;
@@ -127,6 +131,7 @@ public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Ser
             else {
                 mnPkUnitId = resultSet.getInt("id_unit");
                 msUnit = resultSet.getString("unit");
+                msUnitCustoms = resultSet.getString("unit_custs");
                 msSymbol = resultSet.getString("symbol");
                 msSymbolCustoms = resultSet.getString("symbol_custs");
                 mdUnitBaseEquivalence = resultSet.getDouble("unit_base_equiv");
@@ -170,9 +175,10 @@ public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Ser
             callableStatement = connection.prepareCall(
                     "{ CALL erp.itmu_unit_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkUnitId);
             callableStatement.setString(nParam++, msUnit);
+            callableStatement.setString(nParam++, msUnitCustoms);
             callableStatement.setString(nParam++, msSymbol);
             callableStatement.setString(nParam++, msSymbolCustoms);
             callableStatement.setDouble(nParam++, mdUnitBaseEquivalence);
