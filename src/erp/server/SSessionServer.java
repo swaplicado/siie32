@@ -190,7 +190,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                 biQrCode = DCfd.createQrCodeBufferedImageCfdi32((String) map.get("sEmiRfc"), (String) map.get("sRecRfc"), Double.parseDouble("" + map.get("dCfdTotal")), (String) map.get("sCfdiUuid"));
             }
             else if (Float.parseFloat((String) map.get("sCfdVersion")) == DCfdConsts.CFDI_VER_33) {
-                biQrCode = DCfd.createQrCodeBufferedImageCfdi33((String) map.get("sUrlCfdi"), (String) map.get("sEmiRfc"), (String) map.get("sRecRfc"), Double.parseDouble("" + map.get("dCfdTotal")), (String) map.get("sCfdiUuid"), (String) map.get("sSelloCfdiUltDig"));
+                biQrCode = DCfd.createQrCodeBufferedImageCfdi33((String) map.get("sUrlCfdi"), (String) map.get("sCfdiUuid"), (String) map.get("sEmiRfc"), (String) map.get("sRecRfc"), Double.parseDouble("" + map.get("dCfdTotal")), (String) map.get("sSelloCfdiUltDig"));
             }
             
             if (biQrCode != null) {
