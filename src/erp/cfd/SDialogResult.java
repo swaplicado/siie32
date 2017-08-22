@@ -342,35 +342,36 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
     }
     
     public void processPayroll() {
-        int number = 0;
         int cfdsProcessed = 0;
         int cfdsCorrect = 0;
         int cfdsIncorrect = 0;
         String detailMessage = "";
         String warningMessage = "";
-        SDbPayrollReceiptIssue receiptIssue = null;
         
         if (maPayrollReceiptsIds != null) {
-            receiptIssue = new SDbPayrollReceiptIssue();
             for (int[] key : maPayrollReceiptsIds) {
-                cfdsProcessed ++;
+                int number = 0;
+                cfdsProcessed++;
                 try {
                     switch (mnFormSubtype) {
                         case SCfdConsts.PROC_REQ_STAMP:
-                                receiptIssue.read(miClient.getSession(), new int[] { key[0], key[1], key[2] });
-                                
-                                if (receiptIssue.getPkIssueId() != SLibConsts.UNDEFINED) {
-                                    number = SHrsUtils.getPayrollReceiptNextNumber(miClient.getSession(), receiptIssue.getNumberSeries());
+                            SDbPayrollReceiptIssue receiptIssue = (SDbPayrollReceiptIssue) miClient.getSession().readRegistry(SModConsts.HRS_PAY_RCP_ISS, key);
 
-                                    if (receiptIssue.getNumber() == SLibConsts.UNDEFINED) {
-                                        receiptIssue.saveField(miClient.getSession().getStatement(), new int[] { key[0], key[1], key[2] }, SDbPayrollReceiptIssue.FIELD_NUMBER, number);
-                                    }
+                            if (receiptIssue.getPkIssueId() != SLibConsts.UNDEFINED) {
+                                if (receiptIssue.getNumber() != 0) {
+                                    number = receiptIssue.getNumber();
                                 }
-                                
-                                SHrsCfdUtils.computeSignCfdi(miClient.getSession(), new int[] { key[0], key[1], key[2] });
-                                detailMessage += (receiptIssue.getNumberSeries().length() > 0 ? receiptIssue.getNumberSeries() + "-" : "") + number + "   Timbrado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
-                                cfdsCorrect ++;
+                                else {
+                                    number = SHrsUtils.getPayrollReceiptNextNumber(miClient.getSession(), receiptIssue.getNumberSeries());
+                                    receiptIssue.saveField(miClient.getSession().getStatement(), key, SDbPayrollReceiptIssue.FIELD_NUMBER, number);
+                                }
+                            }
+
+                            SHrsCfdUtils.computeSignCfdi(miClient.getSession(), key);
+                            detailMessage += (receiptIssue.getNumberSeries().length() > 0 ? receiptIssue.getNumberSeries() + "-" : "") + number + "   Timbrado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
+                            cfdsCorrect++;
                             break;
+                        default:
                     }
                 }
                 catch(Exception e) {

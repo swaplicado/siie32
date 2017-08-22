@@ -7754,11 +7754,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 validation.setMessage("La longitud máxima para el campo 'Serie' es 15.");
                 validation.setComponent(jcbNumberSeries);
             }
-            else if (mbIsSales && jcbCfdiPaymentWay.getSelectedIndex() <= 0) {
+            else if (isCfdEmissionRequired() && jcbCfdiPaymentWay.getSelectedIndex() <= 0) {
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + jlCfdiPaymentWay.getText() + "'.");
                 validation.setComponent(jcbCfdiPaymentWay);
             }
-            else if (mbIsSales && jcbCfdiPaymentMethod.getSelectedIndex() <= 0) {
+            else if (isCfdEmissionRequired() && jcbCfdiPaymentMethod.getSelectedIndex() <= 0) {
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + jlCfdiPaymentMethod.getText() + "'.");
                 validation.setComponent(jcbCfdiPaymentMethod);
             }
@@ -8603,7 +8603,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             dpsCfd.setPaymentWay(moFieldCfdiPaymentWay.getFieldValue().toString());
             dpsCfd.setPaymentMethod(moFieldCfdiPaymentMethod.getFieldValue().toString());
             dpsCfd.setPaymentConditions(moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CASH ? "CONTADO" : "CRÉDITO " + moFieldDaysOfCredit.getInteger() + " DÍAS");
-            dpsCfd.setZipIssue(miClient.getSessionXXX().getCurrentCompanyBranch().getDbmsBizPartnerBranchAddressOfficial().getZipCode());
+            dpsCfd.setZipIssue(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranch(new int[] { moDps.getFkCompanyBranchId() }).getDbmsBizPartnerBranchAddressOfficial().getZipCode());
             dpsCfd.setConfirmation(moFieldCfdiConfirmation.getFieldValue().toString());
             dpsCfd.setTaxRegime(moFieldCfdiTaxRegime.getFieldValue().toString());
             dpsCfd.setCfdiUsage(moFieldCfdiCfdiUsage.getFieldValue().toString());

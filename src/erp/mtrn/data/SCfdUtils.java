@@ -1824,7 +1824,7 @@ public abstract class SCfdUtils implements Serializable {
                 params.setCfdAddendaSubtype(dps.getDbmsDataAddenda().getCfdAddendaSubtype());
             }
 
-            int xmlType = ((SSessionCustom) client.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV);
+            int xmlType = dps.getDbmsDataCfd() != null ? dps.getDbmsDataCfd().getFkXmlTypeId() : ((SSessionCustom) client.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV);
             switch (xmlType) {
                 case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
                     if (dps.getDbmsDataDpsCfd() != null && dps.getDbmsDataDpsCfd().hasInternationalCommerce()) {
@@ -2034,11 +2034,20 @@ public abstract class SCfdUtils implements Serializable {
         DocumentBuilder docBuilder = null;
         Document doc = null;
         SCfdiSignature cfdiSign = null;
+        
+        // XXX Improve this!!!
 
         try {
             docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             doc = docBuilder.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")));
-            cfdiSign = new SCfdiSignature();
+            
+            NodeList comprobante = SXmlUtils.extractElements(doc, "cfdi:Comprobante");
+            String version = "";
+            
+            version = SXmlUtils.extractAttributeValue(comprobante.item(0).getAttributes(), "version", false);
+            if (version.isEmpty()) {
+                version = SXmlUtils.extractAttributeValue(comprobante.item(0).getAttributes(), "Version", false);
+            }
 
             NodeList nodeList = doc.getElementsByTagName("cfdi:Complemento");
 
@@ -2063,41 +2072,76 @@ public abstract class SCfdUtils implements Serializable {
                 }
             }
 
+            cfdiSign = new SCfdiSignature();    // XXX refactor this, return null if no signature exist!, now allways an object, even empty, is returned!
+            
             if (nodeChild == null) {
                 throw new Exception("XML element '" + "tfd:TimbreFiscalDigital" + "' does not exists!");
             }
             else {
                 namedNodeMap = nodeChild.getAttributes();
+                
+                if (version.compareTo("" + DCfdConsts.CFDI_VER_32) == 0) {
+                    node = namedNodeMap.getNamedItem("UUID");
+                    cfdiSign.setUuid(node.getNodeValue());
 
-                node = namedNodeMap.getNamedItem("UUID");
-                cfdiSign.setUuid(node.getNodeValue());
+                    node = namedNodeMap.getNamedItem("FechaTimbrado");
+                    cfdiSign.setFechaTimbrado(node.getNodeValue());
 
-                node = namedNodeMap.getNamedItem("FechaTimbrado");
-                cfdiSign.setFechaTimbrado(node.getNodeValue());
+                    node = namedNodeMap.getNamedItem("selloCFD");
+                    cfdiSign.setSelloCFD(node.getNodeValue());
 
-                node = namedNodeMap.getNamedItem("selloCFD");
-                cfdiSign.setSelloCFD(node.getNodeValue());
+                    node = namedNodeMap.getNamedItem("noCertificadoSAT");
+                    cfdiSign.setNoCertificadoSAT(node.getNodeValue());
 
-                node = namedNodeMap.getNamedItem("noCertificadoSAT");
-                cfdiSign.setNoCertificadoSAT(node.getNodeValue());
+                    node = namedNodeMap.getNamedItem("selloSAT");
+                    cfdiSign.setSelloSAT(node.getNodeValue());
 
-                node = namedNodeMap.getNamedItem("selloSAT");
-                cfdiSign.setSelloSAT(node.getNodeValue());
+                    node = SXmlUtils.extractElements(doc, "cfdi:Emisor").item(0);
+                    namedNodeMap = node.getAttributes();
+                    node = namedNodeMap.getNamedItem("rfc");
+                    cfdiSign.setRfcEmisor(node.getNodeValue());
 
-                node = SXmlUtils.extractElements(doc, "cfdi:Emisor").item(0);
-                namedNodeMap = node.getAttributes();
-                node = namedNodeMap.getNamedItem("rfc");
-                cfdiSign.setRfcEmisor(node.getNodeValue());
+                    node = SXmlUtils.extractElements(doc, "cfdi:Receptor").item(0);
+                    namedNodeMap = node.getAttributes();
+                    node = namedNodeMap.getNamedItem("rfc");
+                    cfdiSign.setRfcReceptor(node.getNodeValue());
 
-                node = SXmlUtils.extractElements(doc, "cfdi:Receptor").item(0);
-                namedNodeMap = node.getAttributes();
-                node = namedNodeMap.getNamedItem("rfc");
-                cfdiSign.setRfcReceptor(node.getNodeValue());
+                    node = SXmlUtils.extractElements(doc, "cfdi:Comprobante").item(0);
+                    namedNodeMap = node.getAttributes();
+                    node = namedNodeMap.getNamedItem("total");
+                    cfdiSign.setTotalCy(Double.parseDouble(node.getNodeValue()));
+                }
+                else if ((version.compareTo("" + DCfdConsts.CFDI_VER_33) == 0)) {
+                    node = namedNodeMap.getNamedItem("UUID");
+                    cfdiSign.setUuid(node.getNodeValue());
 
-                node = SXmlUtils.extractElements(doc, "cfdi:Comprobante").item(0);
-                namedNodeMap = node.getAttributes();
-                node = namedNodeMap.getNamedItem("total");
-                cfdiSign.setTotalCy(Double.parseDouble(node.getNodeValue()));
+                    node = namedNodeMap.getNamedItem("FechaTimbrado");
+                    cfdiSign.setFechaTimbrado(node.getNodeValue());
+
+                    node = namedNodeMap.getNamedItem("SelloCFD");
+                    cfdiSign.setSelloCFD(node.getNodeValue());
+
+                    node = namedNodeMap.getNamedItem("NoCertificadoSAT");
+                    cfdiSign.setNoCertificadoSAT(node.getNodeValue());
+
+                    node = namedNodeMap.getNamedItem("SelloSAT");
+                    cfdiSign.setSelloSAT(node.getNodeValue());
+
+                    node = SXmlUtils.extractElements(doc, "cfdi:Emisor").item(0);
+                    namedNodeMap = node.getAttributes();
+                    node = namedNodeMap.getNamedItem("Rfc");
+                    cfdiSign.setRfcEmisor(node.getNodeValue());
+
+                    node = SXmlUtils.extractElements(doc, "cfdi:Receptor").item(0);
+                    namedNodeMap = node.getAttributes();
+                    node = namedNodeMap.getNamedItem("Rfc");
+                    cfdiSign.setRfcReceptor(node.getNodeValue());
+
+                    node = SXmlUtils.extractElements(doc, "cfdi:Comprobante").item(0);
+                    namedNodeMap = node.getAttributes();
+                    node = namedNodeMap.getNamedItem("Total");
+                    cfdiSign.setTotalCy(Double.parseDouble(node.getNodeValue()));
+                }
             }
         }
         catch (Exception e) {
@@ -2665,8 +2709,11 @@ public abstract class SCfdUtils implements Serializable {
             packet.setFkXmlDeliveryTypeId(params.getTipoAddenda() != SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA ? SModSysConsts.TRNS_TP_XML_DVY_NA : SModSysConsts.TRNS_TP_XML_DVY_WS_SOR);
             packet.setFkXmlDeliveryStatusId(SModSysConsts.TRNS_ST_XML_DVY_PENDING);
             packet.setFkUserDeliveryId(client.getSession().getUser().getPkUserId());
-
+            
+            System.out.println("Original string: <" + packet.getStringSigned() + ">");
             packet.setSignature(client.getCfdSignature(cfdVersion).sign(packet.getStringSigned(), SLibTimeUtilities.digestYear(dps.getDate())[0]));
+            System.out.println("Digital signature: <" + packet.getSignature()+ ">");
+            
             packet.setCertNumber(client.getCfdSignature(cfdVersion).getCertNumber());
             packet.setCertBase64(client.getCfdSignature(cfdVersion).getCertBase64());
 
@@ -3372,42 +3419,46 @@ public abstract class SCfdUtils implements Serializable {
 
         // Taxes:
 
-        cfd.ver32.DElementImpuestosRetenidos impuestosRetenidos = new cfd.ver32.DElementImpuestosRetenidos();
-        cfd.ver32.DElementImpuestosTrasladados impuestosTrasladados = new cfd.ver32.DElementImpuestosTrasladados();
+        ArrayList<SCfdDataImpuesto> taxes = xmlCfdi.getElementsImpuestos(DCfdConsts.CFDI_VER_32);
+        
+        if (taxes != null) {
+            cfd.ver32.DElementImpuestosRetenidos impuestosRetenidos = new cfd.ver32.DElementImpuestosRetenidos();
+            cfd.ver32.DElementImpuestosTrasladados impuestosTrasladados = new cfd.ver32.DElementImpuestosTrasladados();
 
-        for (SCfdDataImpuesto tax : xmlCfdi.getElementsImpuestos(DCfdConsts.CFDI_VER_32)) {
-            cfd.ver32.DElementImpuestoRetencion impuestoRetencion = new cfd.ver32.DElementImpuestoRetencion();
-            cfd.ver32.DElementImpuestoTraslado impuestoTraslado = new cfd.ver32.DElementImpuestoTraslado();
+            for (SCfdDataImpuesto tax : taxes) {
+                cfd.ver32.DElementImpuestoRetencion impuestoRetencion = new cfd.ver32.DElementImpuestoRetencion();
+                cfd.ver32.DElementImpuestoTraslado impuestoTraslado = new cfd.ver32.DElementImpuestoTraslado();
 
-            switch (tax.getImpuestoBasico()) {
-                case SModSysConsts.FINS_TP_TAX_RETAINED:
-                    dTotalImptoRetenido += tax.getImporte();
-                    impuestoRetencion.getAttImpuesto().setOption(tax.getImpuesto());
-                    impuestoRetencion.getAttImporte().setDouble(tax.getImporte());
+                switch (tax.getImpuestoBasico()) {
+                    case SModSysConsts.FINS_TP_TAX_RETAINED:
+                        dTotalImptoRetenido += tax.getImporte();
+                        impuestoRetencion.getAttImpuesto().setOption(tax.getImpuesto());
+                        impuestoRetencion.getAttImporte().setDouble(tax.getImporte());
 
-                    impuestosRetenidos.getEltHijosImpuestoRetenido().add(impuestoRetencion);
-                    break;
-                case SModSysConsts.FINS_TP_TAX_CHARGED:
-                    dTotalImptoTrasladado += tax.getImporte();
-                    impuestoTraslado.getAttImpuesto().setOption(tax.getImpuesto());
-                    impuestoTraslado.getAttTasa().setDouble(tax.getTasa());
-                    impuestoTraslado.getAttImporte().setDouble(tax.getImporte());
+                        impuestosRetenidos.getEltHijosImpuestoRetenido().add(impuestoRetencion);
+                        break;
+                    case SModSysConsts.FINS_TP_TAX_CHARGED:
+                        dTotalImptoTrasladado += tax.getImporte();
+                        impuestoTraslado.getAttImpuesto().setOption(tax.getImpuesto());
+                        impuestoTraslado.getAttTasa().setDouble(tax.getTasa());
+                        impuestoTraslado.getAttImporte().setDouble(tax.getImporte());
 
-                    impuestosTrasladados.getEltHijosImpuestoTrasladado().add(impuestoTraslado);
-                    break;
-                default:
-                    throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + tax.getImpuestoBasico() + ").");
+                        impuestosTrasladados.getEltHijosImpuestoTrasladado().add(impuestoTraslado);
+                        break;
+                    default:
+                        throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + tax.getImpuestoBasico() + ").");
+                }
             }
-        }
 
-        if (impuestosRetenidos.getEltHijosImpuestoRetenido().size() > 0) {
-            comprobante.getEltImpuestos().getAttTotalImpuestosRetenidos().setDouble(dTotalImptoRetenido);
-            comprobante.getEltImpuestos().setEltOpcImpuestosRetenidos(impuestosRetenidos);
-        }
+            if (impuestosRetenidos.getEltHijosImpuestoRetenido().size() > 0) {
+                comprobante.getEltImpuestos().getAttTotalImpuestosRetenidos().setDouble(dTotalImptoRetenido);
+                comprobante.getEltImpuestos().setEltOpcImpuestosRetenidos(impuestosRetenidos);
+            }
 
-        if (impuestosTrasladados.getEltHijosImpuestoTrasladado().size() > 0) {
-            comprobante.getEltImpuestos().getAttTotalImpuestosTrasladados().setDouble(dTotalImptoTrasladado);
-            comprobante.getEltImpuestos().setEltOpcImpuestosTrasladados(impuestosTrasladados);
+            if (impuestosTrasladados.getEltHijosImpuestoTrasladado().size() > 0) {
+                comprobante.getEltImpuestos().getAttTotalImpuestosTrasladados().setDouble(dTotalImptoTrasladado);
+                comprobante.getEltImpuestos().setEltOpcImpuestosTrasladados(impuestosTrasladados);
+            }
         }
         
         if (elementComplement != null) {
@@ -3677,7 +3728,7 @@ public abstract class SCfdUtils implements Serializable {
         double dTotalImptoTrasladados = 0;
         double dTotal = 0;
         
-        // validate concepts' ubtotal:
+        // validate concepts' subtotal:
         for (int i = 0; i < comprobante.getEltConceptos().getEltConceptos().size(); i++) {
             oConcepto = comprobante.getEltConceptos().getEltConceptos().get(i);
             

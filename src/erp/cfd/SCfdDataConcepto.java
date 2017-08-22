@@ -184,6 +184,7 @@ public class SCfdDataConcepto {
         if (!impuestosTrasladados.getEltImpuestoTrasladados().isEmpty()) {
             concepto.getEltOpcConceptoImpuestos().setEltOpcImpuestosTrasladados(impuestosTrasladados);
         }
+        
         if (!impuestosRetenciones.getEltImpuestoRetenciones().isEmpty()) {
             concepto.getEltOpcConceptoImpuestos().setEltOpcImpuestosRetenciones(impuestosRetenciones);
         }

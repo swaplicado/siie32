@@ -831,6 +831,7 @@ public class SCfdPrint {
         paramsMap.put("sRecRfc", comprobante.getEltReceptor().getAttRfc().getString());
         paramsMap.put("sRecNombreOpc", comprobante.getEltReceptor().getAttNombre().getString());
         paramsMap.put("sFiscalId", comprobante.getEltReceptor().getAttNumRegIdTrib().getString());
+        paramsMap.put("sCfdUsoCFDI", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, comprobante.getEltReceptor().getAttUsoCFDI().getString()));
 
         // Stamp:
 

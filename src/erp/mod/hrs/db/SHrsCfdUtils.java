@@ -167,7 +167,8 @@ public abstract class SHrsCfdUtils {
         int cfdId = SLibConsts.UNDEFINED;
         
         sql = "SELECT id_cfd, fid_st_xml " 
-                + "FROM trn_cfd WHERE fid_pay_rcp_pay_n = " + receipt.getPayroll().getPkNominaId() + " AND fid_pay_rcp_emp_n = " + receipt.getPkEmpleadoId() + " AND fid_pay_rcp_iss_n = " + receiptIssue + " "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " "
+                + "WHERE fid_pay_rcp_pay_n = " + receipt.getPayroll().getPkNominaId() + " AND fid_pay_rcp_emp_n = " + receipt.getPkEmpleadoId() + " AND fid_pay_rcp_iss_n = " + receiptIssue + " "
                 + "ORDER BY id_cfd ";
 
         resultSet = session.getStatement().executeQuery(sql);

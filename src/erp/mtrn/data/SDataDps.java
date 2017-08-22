@@ -4821,8 +4821,14 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 
                 for (SDataDpsEntryNotes dpsEntryNotes : dpsEntry.getDbmsEntryNotes()) {
                     if (dpsEntryNotes.getIsCfd()) {
-                        descripcion += "\n- " + dpsEntryNotes.getNotes();
+                        descripcion += " - " + dpsEntryNotes.getNotes();
                     }
+                }
+                
+                // XXX refactor this, this validation does not belong to here!:
+                descripcion = descripcion.replaceAll("\n", " ");
+                if (descripcion.length() > 1000) {
+                    descripcion = descripcion.substring(0, 1000);
                 }
                 
                 if (dpsEntry.getSubtotalCy_r() == SLibUtils.round(dpsEntry.getOriginalPriceUnitaryCy() * dpsEntry.getOriginalQuantity(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits())) {
