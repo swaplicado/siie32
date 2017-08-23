@@ -4522,7 +4522,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         if (tax.getFkTaxCalculationTypeId() != SModSysConsts.FINS_TP_TAX_CAL_RATE) {
                             throw new Exception("Todos los impuestos deben ser en base a una tasa (" + tax.getFkTaxCalculationTypeId() + ").");
                         }
-                        else {
+                        else if (tax.getTaxCy() != 0) {
                             impuestoXml = new SCfdDataImpuesto();
                             dImptoTasa = 0;
                     
@@ -4678,7 +4678,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     @Override
     public String getComprobanteMotivoDescuento() { // CFDI 3.2
-        return "";
+        return getComprobanteDescuento() == 0 ? "" : "DESCUENTO";
     }
 
     @Override
@@ -4687,12 +4687,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     @Override
-    public double getComprobanteTipoDeCambio() {    // CFDI 3.2
-        return mdExchangeRate;
-    }
-
-    @Override
-    public double getComprobanteTipoCambio() {  // CFDI 3.3
+    public double getComprobanteTipoCambio() {
         return mdExchangeRate;
     }
 
@@ -4831,22 +4826,23 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     descripcion = descripcion.substring(0, 1000);
                 }
                 
-                if (dpsEntry.getSubtotalCy_r() == SLibUtils.round(dpsEntry.getOriginalPriceUnitaryCy() * dpsEntry.getOriginalQuantity(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits())) {
+                if (dpsEntry.getSubtotalProvisionalCy_r() == SLibUtils.round(dpsEntry.getOriginalPriceUnitaryCy() * dpsEntry.getOriginalQuantity(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits())) {
                     price = dpsEntry.getOriginalPriceUnitaryCy();
                 }
                 else {
-                    price = dpsEntry.getSubtotalCy_r() / dpsEntry.getOriginalQuantity();
+                    price = dpsEntry.getSubtotalProvisionalCy_r() / dpsEntry.getOriginalQuantity();
                 }
                 
                 concepto = new SCfdDataConcepto();
+                concepto.setClaveProdServ(dpsEntry.getDbmsItemClaveProdServ());
                 concepto.setNoIdentificacion(dpsEntry.getConceptKey());
-                concepto.setUnidad(generateIntCommerceComplement() ? dpsEntry.getDbmsCustomsUnit() : dpsEntry.getDbmsOriginalUnitSymbol());
                 concepto.setCantidad(dpsEntry.getOriginalQuantity());
+                concepto.setClaveUnidad(dpsEntry.getDbmsUnidadClave());
+                concepto.setUnidad(generateIntCommerceComplement() ? dpsEntry.getDbmsCustomsUnit() : dpsEntry.getDbmsOriginalUnitSymbol());
                 concepto.setDescripcion(descripcion);
                 concepto.setValorUnitario(price);
-                concepto.setImporte(dpsEntry.getSubtotalCy_r());
-                concepto.setClaveProdServ(dpsEntry.getDbmsItemClaveProdServ());
-                concepto.setClaveUnidad(dpsEntry.getDbmsUnidadClave());
+                concepto.setImporte(dpsEntry.getSubtotalProvisionalCy_r());
+                concepto.setDescuento(dpsEntry.getDiscountDocCy());
                 
                 concepto.computeCfdImpuestosConceptos(dpsEntry);
                 

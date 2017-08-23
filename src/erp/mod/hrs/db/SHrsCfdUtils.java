@@ -199,7 +199,7 @@ public abstract class SHrsCfdUtils {
             switch (xmlType) {
                 case SDataConstantsSys.TRNS_TP_XML_CFD:
                     break;
-                    case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
+                case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
                         comprobanteCfdi32 = (cfd.ver32.DElementComprobante) SCfdUtils.createCfdi32RootElement((SClientInterface)session.getClient(), receipt);
                         cfdVersion = comprobanteCfdi32.getVersion();
                         
