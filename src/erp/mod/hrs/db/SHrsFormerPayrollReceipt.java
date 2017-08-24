@@ -495,7 +495,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
             
             receptor.getAttNumSeguridadSocial().setString(msNumSeguridadSocial);
             receptor.getAttFechaInicioRelLaboral().setDate(mtFechaInicioRelLaboral);
-            receptor.getAttAntiguedad().setString("P" + mnAntiguedad + "W");
+            receptor.getAttAntiguedad().setString("P" + (mnAntiguedad < 0 ? 0 : mnAntiguedad) + "W");
             receptor.getAttRiesgoPuesto().setString("" + mnRiesgoPuesto);
             receptor.getAttSalarioBaseCotApor().setDouble(mdSalarioBaseCotApor);
         }
@@ -719,12 +719,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     }
 
     @Override
-    public double getComprobanteTipoDeCambio() {    // CFDI 3.2
-        return 1d;
-    }
-
-    @Override
-    public double getComprobanteTipoCambio() {  // CFDI 3.2
+    public double getComprobanteTipoCambio() {
         throw new UnsupportedOperationException("Not supported yet.");  // not required in payroll
     }
 

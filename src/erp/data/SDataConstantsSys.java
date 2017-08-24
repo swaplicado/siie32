@@ -1104,6 +1104,7 @@ public abstract class SDataConstantsSys {
     public static final String TRNS_CFD_CAT_CTY_GRP_UE = "Unión Europea";   // European Union
     public static final String TRNS_CFD_CAT_CTY_GRP_TLCAN = "TLCAN";        // TLCAN
     
+    public static final String TRNS_CFD_CAT_CFD_USE_G02 = "G02";    // Devoluciones, descuentos o bonificaciones
     public static final String TRNS_CFD_CAT_CFD_USE_P01 = "P01";    // Por definir
     
     public static final int TRNU_DPS_NAT_DEF = 1;
