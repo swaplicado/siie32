@@ -64,16 +64,12 @@ public class SDataDpsDeliveryAck extends erp.lib.data.SDataRegistry implements j
             throw new Exception("El archivo no ha sido proporcionado.");
         }    
         else {
-            try {
-                CopyOption[] options = new CopyOption[] {   //Options for the  new file
-                    StandardCopyOption.REPLACE_EXISTING,     //REPLACE_EXISTING: replace the file if exists.
-                    StandardCopyOption.COPY_ATTRIBUTES       //COPY_ATTRIBUTES like last_modified, etc.
-                };
-                Files.copy(Paths.get(moAuxFile.getAbsolutePath()), Paths.get(path + "\\" + fileName), options);
-            } 
-            catch (Exception ex) {
-                SLibUtilities.renderException(this, ex);
-            }
+            CopyOption[] options = new CopyOption[] {   // options for new file
+                StandardCopyOption.REPLACE_EXISTING,    // REPLACE_EXISTING: replace the file if exists.
+                StandardCopyOption.COPY_ATTRIBUTES      // COPY_ATTRIBUTES like last_modified, etc.
+            };
+            
+            Files.copy(Paths.get(moAuxFile.getAbsolutePath()), Paths.get(path + "\\" + fileName), options);
         }
     }
     

@@ -12,7 +12,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Daniel López
  */
 public class SDbDeliveryEntry extends SDbRegistryUser implements SGridRow {
     
@@ -394,7 +394,9 @@ public class SDbDeliveryEntry extends SDbRegistryUser implements SGridRow {
             msSql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_SUPPLY) + " SET "
                     + "qty = qty + " + mdQuantity + ", orig_qty = orig_qty + " + mdOriginalQuantity + " "
                     + "WHERE id_src_year = " + mnFkOrderYearId + " AND id_src_doc = " + mnFkOrderDocId + " AND id_src_ety = " + mnFkOrderEntryId + " AND "
-                    + "id_des_year = " + mnFkDpsYearId + " AND id_des_doc = " + mnFkDpsDocId + " AND id_des_ety =  " + mnFkDpsEntryId + "; ";
+                    + "id_des_year = " + mnFkDpsYearId + " AND id_des_doc = " + mnFkDpsDocId + " AND id_des_ety =  " + mnFkDpsEntryId + " AND "
+                    + "qty > 0 AND "
+                    + "orig_qty > 0; ";
         }
         
         session.getStatement().execute(msSql);
