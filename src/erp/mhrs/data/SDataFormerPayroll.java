@@ -13,11 +13,8 @@ import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Date;
 import java.util.Vector;
-import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
-import sa.lib.db.SDbConsts;
 
 /**
  *

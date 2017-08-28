@@ -885,7 +885,11 @@ public class SFormField implements SFormFieldInterface {
             }
             else {
                 if (moRawValue instanceof java.lang.String) {
-                    SFormUtilities.locateComboBoxItem(comboBox, (String) moRawValue);
+                    SFormUtilities.locateComboBoxItem(comboBox, (String) moRawValue);   // lookup by item name
+                    
+                    if (comboBox.getSelectedIndex() <= 0) {
+                        SFormUtilities.locateComboBoxItem(comboBox, moRawValue);    // lookop by item key
+                    }
                 }
                 else {
                     SFormUtilities.locateComboBoxItem(comboBox, moRawValue);

@@ -37,6 +37,7 @@ import erp.mod.hrs.db.SDbMwzTypeWage;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceiptDeduction;
 import erp.mod.hrs.db.SDbPayrollReceiptEarning;
+import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SDbPosition;
 import erp.mod.hrs.db.SDbShift;
 import erp.mod.hrs.db.SDbSsContributionTable;
@@ -476,6 +477,9 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRS_PAY:
                 registry = new SDbPayroll();
+                break;
+            case SModConsts.HRS_PAY_RCP_ISS:
+                registry = new SDbPayrollReceiptIssue();
                 break;
             case SModConsts.HRS_PAY_RCP_EAR:
                 registry = new SDbPayrollReceiptEarning();

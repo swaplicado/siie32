@@ -32,7 +32,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Alfonso Flores, Juan Barajas
+ * @author Alfonso Flores, Juan Barajas, Sergio Flores
  */
 public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -46,10 +46,11 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
 
     private erp.mitm.data.SDataUnit moUnit;
     private erp.lib.form.SFormField moFieldFkUnitTypeId;
-    private erp.lib.form.SFormField moFieldFkCfdUnitId;
-    private erp.lib.form.SFormField moFieldSymbolCustoms;
     private erp.lib.form.SFormField moFieldUnit;
     private erp.lib.form.SFormField moFieldSymbol;
+    private erp.lib.form.SFormField moFieldFkCfdUnitId;
+    private erp.lib.form.SFormField moFieldUnitCustoms;
+    private erp.lib.form.SFormField moFieldSymbolCustoms;
     private erp.lib.form.SFormField moFieldUnitBaseEquivalence;
     private erp.lib.form.SFormField moFieldSortingPosition;
     private erp.lib.form.SFormField moFieldIsDeleted;
@@ -74,29 +75,34 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
     private void initComponents() {
 
         jpRegistry = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
         jlFkUnitTypeId = new javax.swing.JLabel();
-        jPanel6 = new javax.swing.JPanel();
-        jbFkUnitTypeId = new javax.swing.JButton();
         jcbFkUnitTypeId = new javax.swing.JComboBox();
-        jlFkCfdUnitId = new javax.swing.JLabel();
-        jPanel7 = new javax.swing.JPanel();
-        moKeyCfdUnitId = new sa.lib.gui.bean.SBeanFieldKey();
-        jlSymbolCustoms = new javax.swing.JLabel();
-        moTextSymbolCustoms = new sa.lib.gui.bean.SBeanFieldText();
+        jbFkUnitTypeId = new javax.swing.JButton();
+        jPanel10 = new javax.swing.JPanel();
         jlUnit = new javax.swing.JLabel();
         jtfUnit = new javax.swing.JTextField();
+        jPanel11 = new javax.swing.JPanel();
         jlSymbol = new javax.swing.JLabel();
         jtfSymbol = new javax.swing.JTextField();
+        jPanel8 = new javax.swing.JPanel();
+        jlFkCfdUnitId = new javax.swing.JLabel();
+        moKeyCfdUnitId = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel15 = new javax.swing.JPanel();
+        jlUnitCustoms = new javax.swing.JLabel();
+        moTextUnitCustoms = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel9 = new javax.swing.JPanel();
+        jlSymbolCustoms = new javax.swing.JLabel();
+        moTextSymbolCustoms = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel12 = new javax.swing.JPanel();
         jlUnitBaseEquivalence = new javax.swing.JLabel();
-        jPanel4 = new javax.swing.JPanel();
         jtfUnitBaseEquivalence = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
         jtfUnitTypeBase = new javax.swing.JTextField();
+        jPanel13 = new javax.swing.JPanel();
         jlSortingPosition = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
         jtfSortingPosition = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
+        jPanel14 = new javax.swing.JPanel();
         jckIsDeleted = new javax.swing.JCheckBox();
         jpCommand = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
@@ -114,95 +120,132 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
         jpRegistry.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jpRegistry.setLayout(new java.awt.BorderLayout());
 
-        jPanel3.setLayout(new java.awt.GridLayout(8, 2, 5, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(9, 1, 0, 5));
+
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkUnitTypeId.setText("Tipo de unidad: *");
-        jPanel3.add(jlFkUnitTypeId);
-
-        jPanel6.setLayout(new java.awt.BorderLayout(5, 0));
-
-        jbFkUnitTypeId.setText("jButton1");
-        jbFkUnitTypeId.setToolTipText("Seleccionar tipo de unidad");
-        jbFkUnitTypeId.setFocusable(false);
-        jbFkUnitTypeId.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel6.add(jbFkUnitTypeId, java.awt.BorderLayout.EAST);
+        jlFkUnitTypeId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel5.add(jlFkUnitTypeId);
 
         jcbFkUnitTypeId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbFkUnitTypeId.setPreferredSize(new java.awt.Dimension(300, 23));
         jcbFkUnitTypeId.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jcbFkUnitTypeIdItemStateChanged(evt);
             }
         });
-        jPanel6.add(jcbFkUnitTypeId, java.awt.BorderLayout.CENTER);
+        jPanel5.add(jcbFkUnitTypeId);
 
-        jPanel3.add(jPanel6);
+        jbFkUnitTypeId.setText("jButton1");
+        jbFkUnitTypeId.setToolTipText("Seleccionar tipo de unidad");
+        jbFkUnitTypeId.setFocusable(false);
+        jbFkUnitTypeId.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel5.add(jbFkUnitTypeId);
 
-        jlFkCfdUnitId.setText("Unidad SAT: *");
-        jPanel3.add(jlFkCfdUnitId);
+        jPanel2.add(jPanel5);
 
-        jPanel7.setLayout(new java.awt.BorderLayout(5, 0));
-        jPanel7.add(moKeyCfdUnitId, java.awt.BorderLayout.CENTER);
-
-        jPanel3.add(jPanel7);
-
-        jlSymbolCustoms.setText("Unidad aduana:");
-        jPanel3.add(jlSymbolCustoms);
-
-        moTextSymbolCustoms.setText("sBeanFieldText1");
-        jPanel3.add(moTextSymbolCustoms);
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlUnit.setText("Nombre de unidad: *");
-        jPanel3.add(jlUnit);
+        jlUnit.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel10.add(jlUnit);
 
         jtfUnit.setText("TEXT");
-        jPanel3.add(jtfUnit);
+        jtfUnit.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel10.add(jtfUnit);
+
+        jPanel2.add(jPanel10);
+
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlSymbol.setText("Símbolo de unidad: *");
-        jPanel3.add(jlSymbol);
+        jlSymbol.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel11.add(jlSymbol);
 
         jtfSymbol.setText("TEXT");
-        jPanel3.add(jtfSymbol);
+        jtfSymbol.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel11.add(jtfSymbol);
 
-        jlUnitBaseEquivalence.setText("Equivalencia en la unidad base: *");
-        jPanel3.add(jlUnitBaseEquivalence);
+        jPanel2.add(jPanel11);
 
-        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFkCfdUnitId.setText("Unidad SAT: *");
+        jlFkCfdUnitId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel8.add(jlFkCfdUnitId);
+
+        moKeyCfdUnitId.setMaximumRowCount(16);
+        moKeyCfdUnitId.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel8.add(moKeyCfdUnitId);
+
+        jPanel2.add(jPanel8);
+
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlUnitCustoms.setText("Nombre de unidad aduana:");
+        jlUnitCustoms.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel15.add(jlUnitCustoms);
+
+        moTextUnitCustoms.setText("TEXT");
+        moTextUnitCustoms.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel15.add(moTextUnitCustoms);
+
+        jPanel2.add(jPanel15);
+
+        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlSymbolCustoms.setText("Código de unidad aduana:");
+        jlSymbolCustoms.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel9.add(jlSymbolCustoms);
+
+        moTextSymbolCustoms.setText("TEXT");
+        jPanel9.add(moTextSymbolCustoms);
+
+        jPanel2.add(jPanel9);
+
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlUnitBaseEquivalence.setText("Equivalencia unidad base: *");
+        jlUnitBaseEquivalence.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel12.add(jlUnitBaseEquivalence);
 
         jtfUnitBaseEquivalence.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfUnitBaseEquivalence.setText("0.0000");
         jtfUnitBaseEquivalence.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel4.add(jtfUnitBaseEquivalence);
-
-        jLabel1.setPreferredSize(new java.awt.Dimension(5, 23));
-        jLabel1.setRequestFocusEnabled(false);
-        jPanel4.add(jLabel1);
+        jPanel12.add(jtfUnitBaseEquivalence);
 
         jtfUnitTypeBase.setEditable(false);
         jtfUnitTypeBase.setText("TEXT");
         jtfUnitTypeBase.setFocusable(false);
         jtfUnitTypeBase.setPreferredSize(new java.awt.Dimension(35, 23));
-        jPanel4.add(jtfUnitTypeBase);
+        jPanel12.add(jtfUnitTypeBase);
 
-        jPanel3.add(jPanel4);
+        jPanel2.add(jPanel12);
+
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlSortingPosition.setText("Posición de ordenamiento: *");
-        jPanel3.add(jlSortingPosition);
-
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+        jlSortingPosition.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel13.add(jlSortingPosition);
 
         jtfSortingPosition.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfSortingPosition.setText("0");
-        jtfSortingPosition.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel1.add(jtfSortingPosition);
+        jtfSortingPosition.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel13.add(jtfSortingPosition);
 
-        jPanel3.add(jPanel1);
-        jPanel3.add(jLabel2);
+        jPanel2.add(jPanel13);
+
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckIsDeleted.setForeground(java.awt.Color.red);
         jckIsDeleted.setText("Registro eliminado");
-        jPanel3.add(jckIsDeleted);
+        jckIsDeleted.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel14.add(jckIsDeleted);
 
-        jpRegistry.add(jPanel3, java.awt.BorderLayout.NORTH);
+        jPanel2.add(jPanel14);
+
+        jpRegistry.add(jPanel2, java.awt.BorderLayout.NORTH);
 
         getContentPane().add(jpRegistry, java.awt.BorderLayout.CENTER);
 
@@ -220,7 +263,7 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
 
         getContentPane().add(jpCommand, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(496, 339));
+        setSize(new java.awt.Dimension(576, 389));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -241,26 +284,30 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
 
         moFieldFkUnitTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkUnitTypeId, jlFkUnitTypeId);
         moFieldFkUnitTypeId.setPickerButton(jbFkUnitTypeId);
-        moFieldFkCfdUnitId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, moKeyCfdUnitId.getComponent(), jlFkCfdUnitId);
-        moKeyCfdUnitId.setKeySettings((SGuiClient) miClient, SGuiUtils.getLabelName(jlFkCfdUnitId.getText()), true);
-        moFieldSymbolCustoms = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, moTextSymbolCustoms.getComponent(), jlSymbolCustoms);
-        moFieldSymbolCustoms.setLengthMax(5);
-        moTextSymbolCustoms.setTextSettings(SGuiUtils.getLabelName(jlSymbolCustoms.getText()), 5);
         moFieldUnit = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfUnit, jlUnit);
         moFieldUnit.setLengthMax(50);
         moFieldSymbol = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfSymbol, jlSymbol);
         moFieldSymbol.setLengthMax(10);
         moFieldSymbol.setAutoCaseType(SLibConstants.UNDEFINED);
+        moFieldFkCfdUnitId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, moKeyCfdUnitId.getComponent(), jlFkCfdUnitId);
+        moKeyCfdUnitId.setKeySettings((SGuiClient) miClient, SGuiUtils.getLabelName(jlFkCfdUnitId.getText()), true);
+        moFieldUnitCustoms = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, moTextUnitCustoms.getComponent(), jlUnitCustoms);
+        moFieldUnitCustoms.setLengthMax(25);
+        moTextUnitCustoms.setTextSettings(SGuiUtils.getLabelName(jlUnitCustoms.getText()), 25);
+        moFieldSymbolCustoms = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, moTextSymbolCustoms.getComponent(), jlSymbolCustoms);
+        moFieldSymbolCustoms.setLengthMax(5);
+        moTextSymbolCustoms.setTextSettings(SGuiUtils.getLabelName(jlSymbolCustoms.getText()), 5);
         moFieldUnitBaseEquivalence = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfUnitBaseEquivalence, jlUnitBaseEquivalence);
         moFieldUnitBaseEquivalence.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsBaseEquivalenceFormat());
         moFieldSortingPosition = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, true, jtfSortingPosition, jlSortingPosition);
         moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
 
         mvFields.add(moFieldFkUnitTypeId);
-        mvFields.add(moFieldFkCfdUnitId);
-        mvFields.add(moFieldSymbolCustoms);
         mvFields.add(moFieldUnit);
         mvFields.add(moFieldSymbol);
+        mvFields.add(moFieldFkCfdUnitId);
+        mvFields.add(moFieldUnitCustoms);
+        mvFields.add(moFieldSymbolCustoms);
         mvFields.add(moFieldUnitBaseEquivalence);
         mvFields.add(moFieldSortingPosition);
         mvFields.add(moFieldIsDeleted);
@@ -334,13 +381,16 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbFkUnitTypeId;
     private javax.swing.JButton jbOk;
@@ -353,6 +403,7 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JLabel jlSymbolCustoms;
     private javax.swing.JLabel jlUnit;
     private javax.swing.JLabel jlUnitBaseEquivalence;
+    private javax.swing.JLabel jlUnitCustoms;
     private javax.swing.JPanel jpCommand;
     private javax.swing.JPanel jpRegistry;
     private javax.swing.JTextField jtfSortingPosition;
@@ -362,6 +413,7 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JTextField jtfUnitTypeBase;
     private sa.lib.gui.bean.SBeanFieldKey moKeyCfdUnitId;
     private sa.lib.gui.bean.SBeanFieldText moTextSymbolCustoms;
+    private sa.lib.gui.bean.SBeanFieldText moTextUnitCustoms;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -442,10 +494,11 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
         moUnit = (SDataUnit) registry;
 
         moFieldFkUnitTypeId.setFieldValue(new int[] { moUnit.getFkUnitTypeId() });
-        moKeyCfdUnitId.setValue(new int[] { moUnit.getFkCfdUnitId() });
-        moTextSymbolCustoms.setValue(moUnit.getSymbolCustoms());
         moFieldUnit.setFieldValue(moUnit.getUnit());
         moFieldSymbol.setFieldValue(moUnit.getSymbol());
+        moKeyCfdUnitId.setValue(new int[] { moUnit.getFkCfdUnitId() });
+        moTextUnitCustoms.setValue(moUnit.getUnitCustoms());
+        moTextSymbolCustoms.setValue(moUnit.getSymbolCustoms());
         moFieldUnitBaseEquivalence.setFieldValue(moUnit.getUnitBaseEquivalence());
         moFieldSortingPosition.setFieldValue(moUnit.getSortingPosition());
         moFieldIsDeleted.setFieldValue(moUnit.getIsDeleted());
@@ -469,9 +522,10 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
 
         moUnit.setFkUnitTypeId(moFieldFkUnitTypeId.getKeyAsIntArray()[0]);
         moUnit.setFkCfdUnitId(moKeyCfdUnitId.getValue()[0]);
-        moUnit.setSymbolCustoms(moTextSymbolCustoms.getValue());
         moUnit.setUnit(moFieldUnit.getString());
+        moUnit.setUnitCustoms(moTextUnitCustoms.getValue());
         moUnit.setSymbol(moFieldSymbol.getString());
+        moUnit.setSymbolCustoms(moTextSymbolCustoms.getValue());
         moUnit.setUnitBaseEquivalence(moFieldUnitBaseEquivalence.getDouble());
         moUnit.setSortingPosition(moFieldSortingPosition.getInteger());
         moUnit.setUnit(moFieldUnit.getString());

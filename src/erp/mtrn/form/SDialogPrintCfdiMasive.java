@@ -15,6 +15,7 @@ import erp.SClient;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SDialogResult;
 import erp.client.SClientInterface;
+import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
@@ -272,7 +273,7 @@ public class SDialogPrintCfdiMasive extends javax.swing.JDialog implements erp.l
             }
             try {
                 keysDps = SDataUtilities.obtainDpsIds(miClient, serieIni, serieEnd, folioIni, folioEnd, moFieldDateStart.getDate(), manKey);
-                cfds = SCfdUtils.getCfds(miClient,SCfdConsts.CFD_TYPE_DPS, SLibConstants.UNDEFINED, keysDps);
+                cfds = SCfdUtils.getCfds(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, SLibConstants.UNDEFINED, keysDps);
             }
             catch(Exception e) {
                 SLibUtilities.renderException(this, e);

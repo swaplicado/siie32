@@ -21,7 +21,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDbFormerPayrollImport extends SDataRegistry implements Serializable {
 
@@ -107,7 +107,7 @@ public class SDbFormerPayrollImport extends SDataRegistry implements Serializabl
                         xmlFile = ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getElementForXml();
 
                         xmlFileName += ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getEltEmisor().getAttRfc().getString() + "_";
-                        xmlFileName += ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttTipoDeComprobante().getOption().substring(0, 1).toUpperCase() + "_";
+                        xmlFileName += ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttTipoDeComprobante().getString() + "_";
                         xmlFileName += (((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString().length() == 0 ? "" : ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString() + "_");
                         xmlFileName += decimalFormat.format(SLibUtils.parseLong(((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttFolio().getString())) + ".xml";
                         dateCfd = ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttFecha().getDatetime();

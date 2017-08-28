@@ -36,7 +36,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Sergio Flores
  */
 public class SDbShipment extends SDbRegistryUser {
 

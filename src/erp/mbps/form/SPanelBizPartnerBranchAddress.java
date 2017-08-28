@@ -23,7 +23,6 @@ import erp.mod.SModSysConsts;
 import java.awt.event.ItemEvent;
 import java.util.Vector;
 import javax.swing.JComboBox;
-import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
 
 /**
@@ -83,7 +82,7 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         jcbFkCountryId_n = new javax.swing.JComboBox();
         jbFkCountryId_n = new javax.swing.JButton();
         jbEditCountry = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
+        jlZipCode = new javax.swing.JLabel();
         jtfZipCode = new javax.swing.JTextField();
         jPanel5 = new javax.swing.JPanel();
         jlState = new javax.swing.JLabel();
@@ -154,13 +153,13 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         jbEditCountry.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel6.add(jbEditCountry);
 
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("C.P.:");
-        jLabel1.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel6.add(jLabel1);
+        jlZipCode.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlZipCode.setText("C.P.:");
+        jlZipCode.setPreferredSize(new java.awt.Dimension(78, 23));
+        jPanel6.add(jlZipCode);
 
         jtfZipCode.setToolTipText("Código postal");
-        jtfZipCode.setPreferredSize(new java.awt.Dimension(70, 23));
+        jtfZipCode.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jtfZipCode);
 
         add(jPanel6);
@@ -217,7 +216,7 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         jPanel3.add(jtfNeighborhood);
 
         jtfReference.setToolTipText("Referencia");
-        jtfReference.setPreferredSize(new java.awt.Dimension(133, 23));
+        jtfReference.setPreferredSize(new java.awt.Dimension(230, 23));
         jPanel3.add(jtfReference);
 
         add(jPanel3);
@@ -233,11 +232,11 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         jPanel2.add(jtfStreet);
 
         jtfStreetNumberExt.setToolTipText("Número exterior");
-        jtfStreetNumberExt.setPreferredSize(new java.awt.Dimension(65, 23));
+        jtfStreetNumberExt.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel2.add(jtfStreetNumberExt);
 
         jtfStreetNumberInt.setToolTipText("Número interior");
-        jtfStreetNumberInt.setPreferredSize(new java.awt.Dimension(65, 23));
+        jtfStreetNumberInt.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel2.add(jtfStreetNumberInt);
 
         add(jPanel2);
@@ -255,12 +254,11 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         moFieldIsDefault = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsDefault);
         moFieldFkCountryId = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkCountryId_n, jlCountry);
         moFieldFkCountryId.setPickerButton(jbFkCountryId_n);
-        moFieldZipCode = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfZipCode, jlCountry);
+        moFieldZipCode = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfZipCode, jlZipCode);
         moFieldZipCode.setLengthMax(15);
         moFieldState = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfState, jlState);
         moFieldState.setLengthMax(50);
         moFieldFkStateId = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkStateId_n, jlState);
-        //moFieldFkStateId.setPickerButton(jbFkCountryId_n);
         moFieldCounty = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCounty, jlLocality);
         moFieldCounty.setLengthMax(50);
         moFieldLocality = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfLocality, jlLocality);
@@ -350,7 +348,6 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -370,6 +367,7 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
     private javax.swing.JLabel jlNeighbordhood;
     private javax.swing.JLabel jlState;
     private javax.swing.JLabel jlStreet;
+    private javax.swing.JLabel jlZipCode;
     private javax.swing.JTextField jtfAddress;
     private javax.swing.JTextField jtfCounty;
     private javax.swing.JTextField jtfLocality;
@@ -423,36 +421,22 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
             }
         }
 
-        if (!validation.getIsError()) {
-            if (mbParamIsCompany && jtfCounty.getText().toString().trim().length() == 0) {
-                validation.setComponent(jtfCounty);
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jtfCounty.getToolTipText() + "'.");
-            }
+        if (mbParamIsCompany && moFieldCounty.getString().length() == 0) {
+            validation.setComponent(jtfCounty);
+            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jtfCounty.getToolTipText() + "'.");
         }
-
-        if (!validation.getIsError()) {
-            if (jcbFkCountryId_n.isEnabled() && jcbFkCountryId_n.getSelectedIndex() == SDataConstants.UNDEFINED) {
-                validation.setComponent(jcbFkCountryId_n);
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jcbFkCountryId_n.getToolTipText() + "'.");
-            }
+        else if (jcbFkCountryId_n.isEnabled() && jcbFkCountryId_n.getSelectedIndex() <= 0) {
+            validation.setComponent(jcbFkCountryId_n);
+            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jcbFkCountryId_n.getToolTipText() + "'.");
         }
-        
-        if (!validation.getIsError()) {
-            if (jcbFkStateId_n.isEnabled() && jcbFkStateId_n.getSelectedIndex() == SDataConstants.UNDEFINED) {
-                validation.setComponent(jcbFkStateId_n);
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jcbFkStateId_n.getToolTipText() + "'.");
-            }
+        else if (jcbFkStateId_n.isEnabled() && jcbFkStateId_n.getSelectedIndex() <= 0) {
+            validation.setComponent(jcbFkStateId_n);
+            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jcbFkStateId_n.getToolTipText() + "'.");
         }
-
-        if (!validation.getIsError()) {
-            if (jtfZipCode.getText().toString().trim().length() > 0) {
-                if (jtfZipCode.getText().toString().trim().length() != 5) {
-                    validation.setComponent(jtfZipCode);
-                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + jtfZipCode.getToolTipText() + "'" + SGuiConsts.ERR_MSG_FIELD_VAL_EQUAL + "5.");
-                }
-                else if (SLibUtils.parseInt(jtfZipCode.getText().toString().trim()) == 0) {
-                    validation.setComponent(jtfZipCode);
-                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + jtfZipCode.getToolTipText() + "' debe ser numérico.");
+        else {
+            if (!jcbFkCountryId_n.isEnabled() || miClient.getSession().getSessionCustom().isLocalCountry(moFieldFkCountryId.getKeyAsIntArray())) {
+                if (moFieldZipCode.getString().length() != 5) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + jtfZipCode.getToolTipText() + "' debe tener una longitud de 5 dígitos.");
                 }
             }
         }
@@ -495,8 +479,8 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         moFieldState.setFieldValue(moBizPartnerBranchAddress.getState());
         moFieldZipCode.setFieldValue(moBizPartnerBranchAddress.getZipCode());
         moFieldIsDefault.setFieldValue(moBizPartnerBranchAddress.getIsDefault());
-        moFieldFkCountryId.setFieldValue(new int[] { moBizPartnerBranchAddress.getFkCountryId_n() == miClient.getSessionXXX().getParamsErp().getFkCountryId() ? SLibConstants.UNDEFINED : moBizPartnerBranchAddress.getFkCountryId_n() });
-        setCountryEnabled(moBizPartnerBranchAddress.getFkCountryId_n() != SLibConstants.UNDEFINED && moBizPartnerBranchAddress.getFkCountryId_n() != miClient.getSessionXXX().getParamsErp().getFkCountryId());
+        moFieldFkCountryId.setFieldValue(new int[] { miClient.getSession().getSessionCustom().isLocalCountry(new int[] { moBizPartnerBranchAddress.getFkCountryId_n() }) ? SLibConstants.UNDEFINED : moBizPartnerBranchAddress.getFkCountryId_n() });
+        setCountryEnabled(moBizPartnerBranchAddress.getFkCountryId_n() != SLibConstants.UNDEFINED && !miClient.getSession().getSessionCustom().isLocalCountry(new int[] { moBizPartnerBranchAddress.getFkCountryId_n() }));
         itemChangedCountry();
         moFieldFkStateId.setFieldValue(new int[] { moBizPartnerBranchAddress.getFkStateId_n() });
 
@@ -524,7 +508,6 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         moBizPartnerBranchAddress.setCounty(moFieldCounty.getString());
         moBizPartnerBranchAddress.setState(moFieldState.getString());
         moBizPartnerBranchAddress.setZipCode(moFieldZipCode.getString());
-        //moBizPartnerBranchAddress.setPoBox(moFieldPoBox.getString());
         moBizPartnerBranchAddress.setIsDefault(moFieldIsDefault.getBoolean());
         moBizPartnerBranchAddress.setFkCountryId_n(moFieldFkCountryId.getKeyAsIntArray()[0]);
         moBizPartnerBranchAddress.setFkStateId_n(moFieldFkStateId.getKeyAsIntArray()[0]);

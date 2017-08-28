@@ -493,7 +493,9 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
             
             if (jcbSalesAgent.getSelectedIndex() > 0) {
                 txtSalesAgent = SBpsConsts.BPS_ATT_SAL_AGT.toUpperCase() + ": " + jcbSalesAgent.getSelectedItem().toString();
-                sqlFilterSalesAgent = "AND (d.fid_sal_agt_n = " + moFieldSalesAgent.getKeyAsIntArray()[0] + " OR re.fid_dps_year_n IS NULL) ";
+                sqlFilterSalesAgent = "AND (IF(d.fid_sal_agt_n IS NULL, "
+                                                        + "IF(mcc.fid_sal_agt_n IS NULL, false, mcc.fid_sal_agt_n = " + moFieldSalesAgent.getKeyAsIntArray()[0] + "), "
+                                                        + "d.fid_sal_agt_n = " + moFieldSalesAgent.getKeyAsIntArray()[0] + "))" + " ";
             }
             
             if (jcbUserAnalyst.getSelectedIndex() > 0) {

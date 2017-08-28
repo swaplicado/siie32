@@ -34,7 +34,6 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     protected java.lang.String msFormerSystemOdbc;
     protected java.lang.String msFormerSystemOdbcUser;
     protected java.lang.String msFormerSystemOdbcUserPassword;
-    protected java.lang.String msTaxRegime;
     protected java.lang.String msFiscalSettings;
     protected java.lang.String msNotesPurchasesOrder;
     protected java.lang.String msPaymentEmail;
@@ -101,7 +100,6 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     protected int mnFkBasicTaxRetained02Id_n;
     protected int mnFkMfgCostUnitTypeId;
     protected int mnFkCertificateId_n;
-    protected int mnFkXmlTypeId;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
     protected int mnFkUserDeleteId;
@@ -113,9 +111,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
 
     protected javax.swing.ImageIcon moExtraLogoImageIcon_n;
     protected erp.mcfg.data.SDataCertificate moDbmsCertificate_n;
-    
     protected erp.mcfg.data.SDataCfgCfd moDbmsDataCfgCfd;
-    protected java.lang.String msXtaCfdUseCfdi;
 
     public SDataParamsCompany() {
         super(SDataConstants.CFG_PARAM_CO);
@@ -133,7 +129,6 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public void setFormerSystemOdbc(java.lang.String s) { msFormerSystemOdbc = s; }
     public void setFormerSystemOdbcUser(java.lang.String s) { msFormerSystemOdbcUser = s; }
     public void setFormerSystemOdbcUserPassword(java.lang.String s) { msFormerSystemOdbcUserPassword = s; }
-    public void setTaxRegime(java.lang.String s) { msTaxRegime = s; }
     public void setFiscalSettings(java.lang.String s) { msFiscalSettings = s; }
     public void setNotesPurchasesOrder(java.lang.String s) { msNotesPurchasesOrder = s; }
     public void setPaymentEmail(java.lang.String s) { msPaymentEmail = s; }
@@ -200,7 +195,6 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public void setFkBasicTaxRetained02Id_n(int n) { mnFkBasicTaxRetained02Id_n = n; }
     public void setFkMfgCostUnitTypeId(int n) { mnFkMfgCostUnitTypeId = n; }
     public void setFkCertificateId_n(int n) { mnFkCertificateId_n = n; }
-    public void setFkXmlTypeId(int n) { mnFkXmlTypeId = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
     public void setFkUserDeleteId(int n) { mnFkUserDeleteId = n; }
@@ -209,7 +203,6 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public void setUserDeleteTs(java.util.Date t) { mtUserDeleteTs = t; }
     
     public void setDbmsDataCfgCfd(erp.mcfg.data.SDataCfgCfd o) { moDbmsDataCfgCfd = o; }
-    public void setXtaCfdUseCfdi(java.lang.String s) { msXtaCfdUseCfdi = s; }
 
     public int getPkConfigCoId() { return mnPkConfigCoId; }
     public int getDaysOfGraceSupplier() { return mnDaysOfGraceSupplier; }
@@ -222,7 +215,6 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public java.lang.String getFormerSystemOdbc() { return msFormerSystemOdbc; }
     public java.lang.String getFormerSystemOdbcUser() { return msFormerSystemOdbcUser; }
     public java.lang.String getFormerSystemOdbcUserPassword() { return msFormerSystemOdbcUserPassword; }
-    public java.lang.String getTaxRegime() { return msTaxRegime; }
     public java.lang.String getFiscalSettings() { return msFiscalSettings; }
     public java.lang.String getNotesPurchasesOrder() { return msNotesPurchasesOrder; }
     public java.lang.String getPaymentEmail() { return msPaymentEmail; }
@@ -289,7 +281,6 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public int getFkBasicTaxRetained02Id_n() { return mnFkBasicTaxRetained02Id_n; }
     public int getFkMfgCostUnitTypeId() { return mnFkMfgCostUnitTypeId; }
     public int getFkCertificateId_n() { return mnFkCertificateId_n; }
-    public int getFkXmlTypeId() { return mnFkXmlTypeId; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
     public int getFkUserDeleteId() { return mnFkUserDeleteId; }
@@ -306,10 +297,9 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public erp.mcfg.data.SDataCertificate getDbmsDataCertificate_n() { return moDbmsCertificate_n; }
     
     public erp.mcfg.data.SDataCfgCfd getDbmsDataCfgCfd() { return moDbmsDataCfgCfd; }
-    public java.lang.String getXtaCfdUseCfdi() { return msXtaCfdUseCfdi; }
     
     public SCceEmisorAddressAux getEmisorAddress(String zipCode) {
-        SCceEmisorAddressAux emisorAddress = new SCceEmisorAddressAux();
+        SCceEmisorAddressAux emisorAddress = null;
         
         for (SCceEmisorAddressAux emisor : moDbmsDataCfgCfd.getCceEmisorAddressAux()) {
             if (emisor.getCfdCceEmisorCodigoPostal().compareTo(zipCode) == 0) {
@@ -412,7 +402,6 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
         mnFkBasicTaxRetained02Id_n = 0;
         mnFkMfgCostUnitTypeId = 0;
         mnFkCertificateId_n = 0;
-        mnFkXmlTypeId = 0;
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
         mnFkUserDeleteId = 0;
@@ -425,7 +414,6 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
         moDbmsCertificate_n = null;
         
         moDbmsDataCfgCfd = null;
-        msXtaCfdUseCfdi = "";
     }
 
     @Override
@@ -460,7 +448,6 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                 msFormerSystemOdbc = resultSet.getString("former_sys_odbc");
                 msFormerSystemOdbcUser = resultSet.getString("former_sys_odbc_usr");
                 msFormerSystemOdbcUserPassword = resultSet.getString("former_sys_odbc_usr_pswd");
-                msTaxRegime = resultSet.getString("tax_regime");
                 msFiscalSettings = resultSet.getString("fiscal_settings");
                 msNotesPurchasesOrder = resultSet.getString("notes_pur_ord");
                 msPaymentEmail = resultSet.getString("pay_email");
@@ -539,7 +526,6 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                 mnFkBasicTaxRetained02Id_n = resultSet.getInt("p.fid_tax_bas_retained_02_n");
                 mnFkMfgCostUnitTypeId = resultSet.getInt("fid_mfg_cost_tp_unit");
                 mnFkCertificateId_n = resultSet.getInt("fid_cert_n");
-                mnFkXmlTypeId = resultSet.getInt("p.fid_tp_xml");
                 mnFkUserNewId = resultSet.getInt("p.fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("p.fid_usr_edit");
                 mnFkUserDeleteId = resultSet.getInt("p.fid_usr_del");
@@ -556,7 +542,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                 oStatementAux = statement.getConnection().createStatement();
 
                 if (mnFkCertificateId_n != 0) {
-                    // Read aswell certificate of company:
+                    // Read aswell current company's certificate:
                     SDataCertificate cert = new SDataCertificate();
                     if (cert.read(new int[] { mnFkCertificateId_n }, oStatementAux) != SLibConstants.DB_ACTION_READ_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
@@ -566,14 +552,10 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                     }
                 }
                 
-                 // Read datas auxiliars for CFD:
-                
+                // Read CFD default configuration information:
                 moDbmsDataCfgCfd = new SDataCfgCfd();
-                if (moDbmsDataCfgCfd.read(key, oStatementAux)!= SLibConstants.DB_ACTION_READ_OK) {
+                if (moDbmsDataCfgCfd.read(key, oStatementAux) != SLibConstants.DB_ACTION_READ_OK) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                }
-                else {
-                    msXtaCfdUseCfdi = moDbmsDataCfgCfd.getCfdUsoCfdi();
                 }
 
                 mbIsRegistryNew = false;
@@ -609,7 +591,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkConfigCoId);
             callableStatement.setInt(nParam++, mnDaysOfGraceSupplier);
             callableStatement.setInt(nParam++, mnDaysOfGraceCustomer);
@@ -623,7 +605,6 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
             callableStatement.setString(nParam++, msFormerSystemOdbcUserPassword);
             callableStatement.setString(nParam++, msPaymentEmail);
             callableStatement.setString(nParam++, msRegistrySs);
-            callableStatement.setString(nParam++, msTaxRegime);
             callableStatement.setString(nParam++, msFiscalSettings);
             callableStatement.setString(nParam++, msNotesPurchasesOrder);
             callableStatement.setDouble(nParam++, mdInterestDelayRate);
@@ -688,7 +669,6 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
             if (mnFkBasicTaxRetained02Id_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkBasicTaxRetained02Id_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
             callableStatement.setInt(nParam++, mnFkMfgCostUnitTypeId);
             if (mnFkCertificateId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkCertificateId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
-            callableStatement.setInt(nParam++, mnFkXmlTypeId);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.CHAR);

@@ -210,7 +210,6 @@ public abstract class SDataConstants {
     public static final int BPSX_BPB_ADD_EMP = 204541;
 
     public static final int BPSX_BANK_ACC_CHECK = 204544;
-    public static final int BPSX_BANK_ACC = 204545;
 
     public static final int BPSX_BP_ATT_BANK = 204551;
     public static final int BPSX_BP_ATT_CARR = 204552;

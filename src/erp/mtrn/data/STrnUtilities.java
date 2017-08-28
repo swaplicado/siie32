@@ -1887,7 +1887,7 @@ public abstract class STrnUtilities {
                 }
                 else {
                     switch (cfd.getFkCfdTypeId()) {
-                        case SCfdConsts.CFD_TYPE_DPS:
+                        case SDataConstantsSys.TRNS_TP_CFD_INV:
                             dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
                             msNumberDoc = (dps.getNumberSeries().length() > 0 ? dps.getNumberSeries() + "-" : "") + dps.getNumber();
                             mbIsCancel = dps.getFkDpsStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
@@ -1902,7 +1902,7 @@ public abstract class STrnUtilities {
                             snd_subject = mms.getTextSubject() + " " + msNumberDoc;
                             break;
                             
-                        case SCfdConsts.CFD_TYPE_PAYROLL:
+                        case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
                             switch (subtypeCfd) {
                                 case SCfdConsts.CFDI_PAYROLL_VER_OLD:
                                     payrollFormer = (SDataFormerPayroll) SDataUtilities.readRegistry(client, SDataConstants.HRS_SIE_PAY, new int[] { cfd.getFkPayrollPayrollId_n() }, SLibConstants.EXEC_MODE_SILENT);
@@ -2552,43 +2552,6 @@ public abstract class STrnUtilities {
         return exists;
     }
 
-   /**
-    * Obtains last method of payment and bank account used in DPS for business partner on provided year and DPS category.
-    * @param client ERP Client interface.
-    * @param idBizPartner Business partner ID.
-    * @param year Desired year.
-    * @param idDpsCategory Desired DPS category ID (SDataConstantsSys.TRNS_CT_DPS_...).
-    * @return String array (index 0: last payment method (by name); index 1: last bank account).
-    */
-    public static String[] getLastPaymentSettings(final SClientInterface client, final int idBizPartner, final int year, final int idDpsCategory) {
-        String sql = "";
-        String[] lastPaymentSettings = new String[2];
-        ResultSet resultSet = null;
-
-        try {
-            sql = "SELECT pay_method, pay_account FROM trn_dps " +
-                    "WHERE fid_bp_r = " + idBizPartner + " AND id_year = " + year + " " +
-                    "AND NOT b_del AND fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND fid_ct_dps = " + idDpsCategory + " " +
-                    "AND (fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_ORD[1] + " || fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_DOC[1] + ") ORDER BY dt DESC " +
-                    "LIMIT 1";
-
-            resultSet = client.getSession().getStatement().executeQuery(sql);
-            if (resultSet.next()) {
-               lastPaymentSettings[0] = resultSet.getString("pay_method");    // last method of payment (by name) used
-               lastPaymentSettings[1] = resultSet.getString("pay_account");   // last bank account used
-            }
-            else {
-               lastPaymentSettings[0] = SUtilConsts.NON_APPLYING;             // default method of payment (by name)
-               lastPaymentSettings[1] = "";                                   // default bank account
-            }
-        }
-        catch (Exception e) {
-            SLibUtilities.printOutException(STrnUtilities.class.getName(), e);
-        }
-
-        return lastPaymentSettings;
-    }
-   
     /**
     * Obtain last price used from the DPS entry specified:
     * @param client ERP Client interface.

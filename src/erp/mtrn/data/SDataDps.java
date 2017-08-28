@@ -9,10 +9,10 @@ import cfd.DAttributeOptionCondicionesPago;
 import cfd.DAttributeOptionImpuestoRetencion;
 import cfd.DAttributeOptionImpuestoTraslado;
 import cfd.DAttributeOptionMoneda;
-import cfd.DAttributeOptionTipoComprobante;
 import cfd.DCfdConsts;
 import cfd.DCfdTax;
 import cfd.DCfdTaxes;
+import cfd.DCfdUtils;
 import cfd.DElement;
 import cfd.ext.bachoco.DElementLineItem;
 import cfd.ext.bachoco.DElementPayment;
@@ -27,9 +27,10 @@ import cfd.ext.interfactura.DElementFacturaInterfactura;
 import cfd.ext.soriana.DElementArticulos;
 import cfd.ext.soriana.DElementDSCargaRemisionProv;
 import cfd.ext.soriana.DElementFolioNotaEntrada;
+import cfd.ver2.DAttributeOptionTipoDeComprobante;
+import cfd.ver33.DCfdi33Consts;
 import erp.SClient;
 import erp.cfd.SCfdConsts;
-import erp.cfd.SCfdDataCfdiRelacionado;
 import erp.cfd.SCfdDataConcepto;
 import erp.cfd.SCfdDataImpuesto;
 import erp.client.SClientInterface;
@@ -85,7 +86,7 @@ import sa.lib.db.SDbConsts;
  *
  * @author Sergio Flores, Juan Barajas, Daniel López
  */
-public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Serializable, erp.cfd.SCfdXml {
+public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Serializable, erp.cfd.SCfdXmlCfdi32, erp.cfd.SCfdXmlCfdi33 {
 
     public static final int FIELD_REF_BKR = 1;
     public static final int FIELD_SAL_AGT = 2;
@@ -263,20 +264,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected double mdCfdIvaPorcentaje;
     
     protected erp.mtrn.data.SDataDpsCfd moDbmsDataDpsCfd;
-    protected java.lang.String msXtaCfdConfirmation;
-    protected java.lang.String msXtaCfdRelationType;
-    protected java.lang.String msXtaCfdUseCfdi;
-    
-    protected java.lang.String msXtaCfdCceReasonTransfer;
-    protected java.lang.String msXtaCfdCceOperationType;
-    protected java.lang.String msXtaCfdCceImportRequest;
-    protected int mnXtaCfdCceCertificateOrigin; 
-    protected java.lang.String msXtaCfdCceCertificateOriginNumber;
-    protected int mnXtaCfdCceSubdivisionHas;
-    protected double mdXtaCfdCceExchangeRateUSD;
-    protected double mdXtaCfdCceTotalUSD;
-    protected java.lang.String msXtaCfdCceNumberExporter;
-    protected java.lang.String msXtaCfdCceIncoterm;
 
     public SDataDps() {
         super(SDataConstants.TRN_DPS);
@@ -1073,21 +1060,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     }
 
-    private void calculateCceTotal() throws SQLException, Exception {
-        double valueMxn = 0;
-        double valueUsdEty = 0;
-        mdXtaCfdCceTotalUSD = 0;
-        
-        for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
-            if (dpsEntry.isAccountable()) {
-                valueMxn = SLibUtils.round((dpsEntry.getSubtotalCy_r() * mdExchangeRate), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-                valueUsdEty = SLibUtils.round((valueMxn / mdXtaCfdCceExchangeRateUSD), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-                
-                mdXtaCfdCceTotalUSD = SLibUtils.round(mdXtaCfdCceTotalUSD + valueUsdEty, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-            }
-        }
-    }
-    
     private void calculateDpsTotal(erp.client.SClientInterface piClient_n, int pnDecs) throws SQLException, Exception {
         double dSubtotalProvisional = 0;
         double dDiscountDoc = 0;
@@ -1209,6 +1181,29 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
     }
 
+    private void calculateIntCommerceTotal() {
+        if (moDbmsDataDpsCfd != null) {
+            int decs = DCfdUtils.AmountFormat.getMaximumFractionDigits();
+            int decsExr = SLibUtils.getDecimalFormatExchangeRate().getMaximumFractionDigits();
+            double exr = SLibUtils.round(SLibUtils.parseDouble(moDbmsDataDpsCfd.getCfdCceTipoCambioUSD()), decsExr);
+            double valueMxn = 0;
+            double valueUsd = 0;
+
+            for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
+                if (dpsEntry.isAccountable()) {
+                    valueMxn = SLibUtils.round((dpsEntry.getSubtotalCy_r() * mdExchangeRate), decs);
+                    valueUsd = SLibUtils.round(valueUsd + SLibUtils.round((valueMxn / exr), decs), decs);
+                }
+            }
+            
+            moDbmsDataDpsCfd.setCfdCceTotalUSD(DCfdUtils.AmountFormat.format(valueUsd));
+        }
+    }
+    
+    private boolean generateIntCommerceComplement() {
+        return mbAuxIsNeedCfdCce && moDbmsDataDpsCfd != null && !moDbmsDataDpsCfd.getCfdCceTipoOperacion().isEmpty();
+    }
+    
     private int getAccSysTypeIdBizPartnerXXX() {
         int id = SLibConsts.UNDEFINED;
 
@@ -1813,21 +1808,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     
     public void setDbmsDataDpsCfd(erp.mtrn.data.SDataDpsCfd o) { moDbmsDataDpsCfd = o; }
     
-    public void setXtaCfdConfirmation(String s) { msXtaCfdConfirmation = s; }
-    public void setXtaCfdRelationType(String s) { msXtaCfdRelationType = s; }
-    public void setXtaCfdUseCfdi(String s) { msXtaCfdUseCfdi = s; }
-    
-    public void setXtaCfdCceReasonTransfer(java.lang.String s) { msXtaCfdCceReasonTransfer = s; }
-    public void setXtaCfdCceOperationType(java.lang.String s) { msXtaCfdCceOperationType = s; }
-    public void setXtaCfdCceImportRequest(java.lang.String s) { msXtaCfdCceImportRequest = s; }
-    public void setXtaCfdCceCertificateOrigin(int n) { mnXtaCfdCceCertificateOrigin = n; }
-    public void setXtaCfdCceCertificateOriginNumber(java.lang.String s) { msXtaCfdCceCertificateOriginNumber = s; }
-    public void setXtaCfdCceSubdivisionHas(int n) { mnXtaCfdCceSubdivisionHas = n; }
-    public void setXtaCfdCceExchangeRateUSD(double d) { mdXtaCfdCceExchangeRateUSD = d; }
-    public void setXtaCfdCceTotalUSD(double d) { mdXtaCfdCceTotalUSD = d; }
-    public void setXtaCfdCceNumberExporter(java.lang.String s) { msXtaCfdCceNumberExporter = s; }
-    public void setXtaCfdCceIncoterm(java.lang.String s) { msXtaCfdCceIncoterm = s; }
-
     public java.lang.Object getDbmsRecordKey() { return moDbmsRecordKey; }
     public java.util.Date getDbmsRecordDate() { return mtDbmsRecordDate; }
     public java.lang.String getDbmsCurrency() { return msDbmsCurrency; }
@@ -1846,21 +1826,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     
     public erp.mtrn.data.SDataDpsCfd getDbmsDataDpsCfd() { return moDbmsDataDpsCfd; }
     
-    public java.lang.String getXtaCfdConfirmation() { return msXtaCfdConfirmation; }
-    public java.lang.String getXtaCfdRelationType() { return msXtaCfdRelationType; }
-    public java.lang.String getXtaCfdUseCfdi() { return msXtaCfdUseCfdi; }
-    
-    public java.lang.String getXtaCfdCceReasonTransfer() { return msXtaCfdCceReasonTransfer; }
-    public java.lang.String getXtaCfdCceOperationType() { return msXtaCfdCceOperationType; }
-    public java.lang.String getXtaCfdCceImportRequest() { return msXtaCfdCceImportRequest; }
-    public int getXtaCfdCceCertificateOrigin() { return mnXtaCfdCceCertificateOrigin; }
-    public java.lang.String getXtaCfdCceCertificateOriginNumber() { return msXtaCfdCceCertificateOriginNumber; }
-    public int getXtaCfdCceSubdivisionHas() { return mnXtaCfdCceSubdivisionHas; }
-    public double getXtaCfdCceExchangeRateUSD() { return mdXtaCfdCceExchangeRateUSD; }
-    public double getXtaCfdCceTotalUSD() { return mdXtaCfdCceTotalUSD; }
-    public java.lang.String getXtaCfdCceNumberExporter() { return msXtaCfdCceNumberExporter; }
-    public java.lang.String getXtaCfdCceIncoterm() { return msXtaCfdCceIncoterm; }
-
     public erp.mtrn.data.SDataDpsEntry getDbmsDpsEntry(int[] pk) {
         SDataDpsEntry entry = null;
 
@@ -2044,21 +2009,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         
         moDbmsDataDpsCfd = null;
 
-        msXtaCfdConfirmation = "";
-        msXtaCfdRelationType = "";
-        msXtaCfdUseCfdi = "";
-        
-        msXtaCfdCceReasonTransfer = "";
-        msXtaCfdCceOperationType = "";
-        msXtaCfdCceImportRequest = "";
-        mnXtaCfdCceCertificateOrigin = 0;
-        msXtaCfdCceCertificateOriginNumber = "";
-        mnXtaCfdCceSubdivisionHas = 0;
-        mdXtaCfdCceExchangeRateUSD = 0;
-        mdXtaCfdCceTotalUSD = 0;
-        msXtaCfdCceNumberExporter = "";
-        msXtaCfdCceIncoterm = "";
-        
         msCfdExpeditionLocality = "";
         msCfdExpeditionState = "";
     }
@@ -2342,15 +2292,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     }
                 }
                 
-                // Read code incoterm:
-
-                sSql = "SELECT code FROM erp.logs_inc WHERE id_inc = " + mnFkIncotermId + " ";
-                oResultSet = statement.executeQuery(sSql);
-                if (oResultSet.next()) {
-                    msXtaCfdCceIncoterm = oResultSet.getString("code");
-                }
-
-                // Read datas auxiliars for CFD:
+                // Read data for CFD:
 
                 sSql = "SELECT COUNT(*) FROM trn_dps_cfd WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";
                 oResultSet = statement.executeQuery(sSql);
@@ -2359,31 +2301,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         moDbmsDataDpsCfd = new SDataDpsCfd();
                         if (moDbmsDataDpsCfd.read(anKey, oStatementAux)!= SLibConstants.DB_ACTION_READ_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                        }
-                        else {
-                            msXtaCfdConfirmation = moDbmsDataDpsCfd.getCfdConfirmacion();
-                            msXtaCfdRelationType = moDbmsDataDpsCfd.getCfdTipoRelacion();
-                            msXtaCfdUseCfdi = moDbmsDataDpsCfd.getCfdUsoCfdi();
-                            
-                            msXtaCfdCceReasonTransfer = moDbmsDataDpsCfd.getCfdCceMotivoTraslado();
-                            msXtaCfdCceOperationType = moDbmsDataDpsCfd.getCfdCceTipoOperacion();
-                            msXtaCfdCceImportRequest = moDbmsDataDpsCfd.getCfdCceClaveDePedimento();
-                            
-                            if (!moDbmsDataDpsCfd.getCfdCceCertificadoOrigen().isEmpty()) {
-                                mnXtaCfdCceCertificateOrigin = Integer.parseInt(moDbmsDataDpsCfd.getCfdCceCertificadoOrigen());
-                            }
-                            msXtaCfdCceCertificateOriginNumber = moDbmsDataDpsCfd.getCfdCceNumCertificadoOrigen();
-                            
-                            if (!moDbmsDataDpsCfd.getCfdCceSubdivision().isEmpty()) {
-                                mnXtaCfdCceSubdivisionHas = Integer.parseInt(moDbmsDataDpsCfd.getCfdCceSubdivision());
-                            }
-                            if (!moDbmsDataDpsCfd.getCfdCceTipoCambioUSD().isEmpty()) {
-                                mdXtaCfdCceExchangeRateUSD = Double.parseDouble(moDbmsDataDpsCfd.getCfdCceTipoCambioUSD());
-                            }
-                            if (!moDbmsDataDpsCfd.getCfdCceTotalUSD().isEmpty()) {
-                                mdXtaCfdCceTotalUSD = Double.parseDouble(moDbmsDataDpsCfd.getCfdCceTotalUSD());
-                            }
-                            msXtaCfdCceNumberExporter = moDbmsDataDpsCfd.getCfdCceNumExportadorConfiable();
                         }
                     }
                 }
@@ -3350,34 +3267,16 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     }
                 }
                 
-                // Save XML auxiliar from CFDI version 3.3 or international trade:
+                // Save XML auxiliar from CFDI version 3.3 or International Commerce:
                 
                 sSql = "DELETE FROM trn_dps_cfd WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";
                 oStatement.execute(sSql);
                 
-                /** save registry dependent for management of information additional for CFDI
-                 * if msXtaCfdUseCfdi not empty, if is CFDI version 3.3 or
-                 * if msXtaCfdCceOperationType not empty, if is CFDI with international trade node
-                */
-                if (!msXtaCfdUseCfdi.isEmpty() || !msXtaCfdCceOperationType.isEmpty()) {  
-                    moDbmsDataDpsCfd = new SDataDpsCfd();
-                    
+                if (moDbmsDataDpsCfd != null) {
                     moDbmsDataDpsCfd.setPkYearId(mnPkYearId);
                     moDbmsDataDpsCfd.setPkDocId(mnPkDocId);
-                    moDbmsDataDpsCfd.setCfdConfirmacion(msXtaCfdConfirmation);
-                    moDbmsDataDpsCfd.setCfdTipoRelacion(msXtaCfdRelationType);
-                    moDbmsDataDpsCfd.setCfdUsoCfdi(msXtaCfdUseCfdi);
+                    moDbmsDataDpsCfd.setVersion(getComprobanteVersion());
                     
-                    moDbmsDataDpsCfd.setCfdCceMotivoTraslado(msXtaCfdCceReasonTransfer);
-                    moDbmsDataDpsCfd.setCfdCceTipoOperacion(msXtaCfdCceOperationType);
-                    moDbmsDataDpsCfd.setCfdCceClaveDePedimento(msXtaCfdCceImportRequest);
-                    moDbmsDataDpsCfd.setCfdCceCertificadoOrigen(mnXtaCfdCceCertificateOrigin + "");
-                    moDbmsDataDpsCfd.setCfdCceNumCertificadoOrigen(msXtaCfdCceCertificateOriginNumber);
-                    moDbmsDataDpsCfd.setCfdCceSubdivision(mnXtaCfdCceSubdivisionHas + "");
-                    moDbmsDataDpsCfd.setCfdCceTipoCambioUSD(mdXtaCfdCceExchangeRateUSD + "");
-                    moDbmsDataDpsCfd.setCfdCceTotalUSD(mdXtaCfdCceTotalUSD + "");
-                    moDbmsDataDpsCfd.setCfdCceNumExportadorConfiable(msXtaCfdCceNumberExporter) ;
-
                     if (moDbmsDataDpsCfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }
@@ -3656,6 +3555,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     // 3. Recalculate DPS value:
 
                     calculateDpsTotal(null, nDecs);
+                    calculateIntCommerceTotal();
 
                     // 4. Save DPS again (this will re-create accounting record again):
 
@@ -3743,12 +3643,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     /**
      * Calculates DPS value.
-     * Exchange rates of document and international trade must be set already.
+     * Exchange rates of document and International Commerce must be set already.
      * @param client ERP Client. Can be null, and each DPS entry is not calculated, original values remains as the original ones.
      */
     public void calculateTotal(erp.client.SClientInterface client) throws SQLException, Exception {
-        calculateDpsTotal(client, 0);
-        calculateCceTotal();
+        calculateDpsTotal(client, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+        calculateIntCommerceTotal();
     }
 
     /**
@@ -3762,6 +3662,142 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         moDbmsDataBookkeepingNumber = null;
     }
 
+    /*
+     * Other public methods
+     */
+    
+    public void saveField(java.sql.Connection connection, final int[] pk, final int field, final Object value) throws Exception {
+        String sSql = "";
+
+        mnLastDbActionResult = SLibConsts.UNDEFINED;
+
+        sSql = "UPDATE trn_dps SET ";
+
+        switch (field) {
+            case FIELD_REF_BKR:
+                sSql += "comms_ref = '" + value + "' ";
+                break;
+            case FIELD_SAL_AGT:
+                sSql += "fid_sal_agt_n = " + value + " ";
+                break;
+            case FIELD_SAL_AGT_SUP:
+                sSql += "fid_sal_sup_n = " + value + " ";
+                break;
+            case FIELD_CLO_COMMS:
+                sSql += "b_close_comms = " + value + " ";
+                break;
+            case FIELD_CLO_COMMS_USR:
+                sSql += "fid_usr_close_comms = " + value + ", ts_close_comms = NOW() ";
+            case FIELD_USR:
+                sSql += "fid_usr_edit = " + value + ", ts_edit = NOW() ";
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+
+        sSql += "WHERE id_year = " + pk[0] + " AND id_doc = " + pk[1];
+
+        connection.createStatement().execute(sSql);
+
+        mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
+    }
+    
+    public void sendMail(SClientInterface client, Object dpsKey, int mmsType) {
+        int[] mmsConfigKey = null;
+        String msg = "";
+        String companyName = "";
+        String bpName = "";
+        String dpsDestNumber = "";
+        String dpsReference = "";
+        ArrayList<String> toRecipients = null;
+        HashSet<String> setCfgEmail = new HashSet<>();
+        SDbMmsConfig mmsConfig = null;
+        SDataDpsType moDpsType = null;
+        SDataDps dpsDest = null;
+        boolean isEdited = false;
+        boolean send = true;
+        
+        read(dpsKey, client.getSession().getStatement());
+        
+        isEdited = mtUserNewTs.compareTo(mtUserEditTs) != 0;
+        
+        companyName = client.getSessionXXX().getCompany().getCompany();
+        bpName = SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.BPSU_BP, new int[] { mnFkBizPartnerId_r }, SLibConstants.DESCRIPTION_NAME);
+        moDpsType = (SDataDpsType) SDataUtilities.readRegistry(client, SDataConstants.TRNU_TP_DPS, getDpsTypeKey(), SLibConstants.EXEC_MODE_VERBOSE);
+        dpsReference = !getNumberReference().isEmpty() ? getNumberReference() : "N/D";
+        toRecipients = new ArrayList<>();
+        
+        for (SDataDpsEntry entry : mvDbmsDpsEntries) {
+            try {
+                mmsConfigKey = STrnUtilities.readMmsConfigurationByLinkType(client, mmsType, entry.getFkItemId());
+                
+                if (mmsConfigKey[0] != SLibConsts.UNDEFINED) {
+                    mmsConfig = new SDbMmsConfig();
+                    mmsConfig.read(client.getSession(), mmsConfigKey);
+                    
+                    setCfgEmail.add(mmsConfig.getEmail());
+                }
+            }
+            catch (java.lang.Exception e) {
+                SLibUtilities.renderException(this, e);
+            }
+        }
+        
+        if (!setCfgEmail.isEmpty()) {
+            msg = "Se enviará correo-e de notificación a los siguientes destinatarios:";
+            
+            for (String email : setCfgEmail) {
+                msg += "\n" + email;
+            }
+            client.showMsgBoxInformation(msg);
+        }
+        else {
+            send = false;
+        }
+        
+        if (send) {
+            for (String cfgEmail : setCfgEmail) {
+                try {
+                    msg = STrnUtilities.computeMailHeaderBeginTable(companyName, moDpsType.getDpsType(), getDpsNumber(), bpName, mtDate, (isEdited ? mtUserEditTs : mtUserNewTs), isEdited, mbIsRebill);
+
+                    for (SDataDpsEntry entry : mvDbmsDpsEntries) {
+                        mmsConfigKey = STrnUtilities.readMmsConfigurationByLinkType(client, mmsType, entry.getFkItemId());
+
+                        if (mmsConfigKey[0] != SLibConsts.UNDEFINED) {
+                            mmsConfig = new SDbMmsConfig();
+                            mmsConfig.read(client.getSession(), mmsConfigKey);
+
+                            if (cfgEmail.compareTo(mmsConfig.getEmail()) == 0) {
+                                if (entry.getDbmsDpsLinksAsDestiny()!= null && !entry.getDbmsDpsLinksAsDestiny().isEmpty()) {
+                                    dpsDest = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, entry.getDbmsDpsLinksAsDestiny().get(0).getDbmsSourceDpsKey(), SLibConstants.EXEC_MODE_STEALTH);
+                                    dpsDestNumber = dpsDest.getDpsNumber();
+                                }
+                                else {
+                                    dpsDestNumber = "N/D";
+                                }
+
+                                msg += STrnUtilities.computeMailItem(client, entry.getFkItemId(), entry.getFkOriginalUnitId(), entry.getConceptKey(), entry.getConcept(), dpsDestNumber, msNumberSeries, msNumber, dpsReference, entry.getOriginalQuantity(), entry.getDbmsUnitSymbol(), getDate(), getDpsTypeKey(), isEdited, mbIsRebill);
+                            }
+                        }
+                    }
+
+                    msg += STrnUtilities.computeMailFooterEndTable(SClient.APP_NAME , SClient.APP_COPYRIGHT, SClient.APP_PROVIDER, SClient.VENDOR_WEBSITE , SClient.APP_RELEASE);
+                    toRecipients.add(cfgEmail);
+
+                    STrnUtilities.sendMail(client, mmsType, toRecipients, null, null, msg);
+                    toRecipients.clear();
+                }
+                catch (java.lang.Exception e) {
+                    SLibUtilities.printOutException(this, e);
+                }
+            }
+        }
+    }
+    
+    /*
+     * CFD and CFDI methods:
+     */
+    
     /**
      * Create addenda for Soriana
      * @return Addenda
@@ -3844,7 +3880,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         addendaSoriana.getEltPedido().getEltTienda().setValue("" + moAuxCfdParams.getSorianaTienda()); // Catálogo de tiendas de SORIANA
         addendaSoriana.getEltPedido().getEltCantArticulos().setValue("" + totalItems); // Total de artículos
         
-        if (moAuxCfdParams.getCfdAddendaSubtype() == SDataConstantsSys.BPSS_STP_CFD_ADD_SORIANA_EXT) {
+        if (moAuxCfdParams.getCfdAddendaSubtype() == SCfdConsts.ADD_SORIANA_EXT) {
             cfd.ext.soriana.DElementPedidoEmitidoProveedor pedidoEmitidoProveedor = new cfd.ext.soriana.DElementPedidoEmitidoProveedor("SI");
             cfd.ext.soriana.DElementFolioNotaEntrada folioNotaEntrada = new DElementFolioNotaEntrada(moAuxCfdParams.getSorianaNotaEntradaFolio());
             
@@ -4334,61 +4370,65 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         return addendaElektra;
     }
     
-    public cfd.DElement createCfdiElementComercioExterior11() throws java.lang.Exception {
-        double price = 0;
-        double valueMxn = 0;
-        double valueUsdEty = 0;
-        cfd.ver3.cce11.DElementComercioExterior comercioExterior = new cfd.ver3.cce11.DElementComercioExterior();
-        cfd.ver3.cce11.DElementMercancia mercancia = null;
+    private cfd.DElement createCfdiNodeComplementoComercioExterior11() throws java.lang.Exception {
+        cfd.ver3.cce11.DElementComercioExterior comercioExterior = null;
         
-        if (msXtaCfdCceOperationType.compareTo(SDataConstantsSys.TRNS_CFD_CCE_CAT_TP_OPE_A) != 0) {
-            //comercioExterior.getAttMotivoTraslado().setString(msXtaCfdCceReasonTransfer); // required only if comprobant type is "T" (traslado)
-            comercioExterior.getAttTipoOperacion().setString(msXtaCfdCceOperationType);
-            comercioExterior.getAttClaveDePedimento().setString(msXtaCfdCceImportRequest);
-            comercioExterior.getAttCertificadoOrigen().setInteger(mnXtaCfdCceCertificateOrigin);
-            comercioExterior.getAttNumCertificadoOrigen().setString(msXtaCfdCceCertificateOriginNumber);
-            comercioExterior.getAttNumeroExportadorConfiable().setString(msXtaCfdCceNumberExporter);
-            comercioExterior.getAttIncoterm().setString(msXtaCfdCceIncoterm);
-            comercioExterior.getAttSubdivision().setInteger(mnXtaCfdCceSubdivisionHas);
-            //comercioExterior.getAttObservaciones()    // optional, not implemented
-            comercioExterior.getAttTipoCambioUSD().setDouble(mdXtaCfdCceExchangeRateUSD);
-            comercioExterior.getAttTotalUSD().setDouble(mdXtaCfdCceTotalUSD);
-        }
-        
-        cfd.ver3.cce11.DElementMercancias mercancias = new cfd.ver3.cce11.DElementMercancias();
-        
-        for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
-            if (dpsEntry.isAccountable()) {
-                if (dpsEntry.getSubtotalCy_r() == SLibUtils.round(dpsEntry.getOriginalPriceUnitaryCy() * dpsEntry.getOriginalQuantity(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits())) {
-                    price = SLibUtils.round(dpsEntry.getOriginalPriceUnitaryCy(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+        if (moDbmsDataDpsCfd != null) {
+            comercioExterior = new cfd.ver3.cce11.DElementComercioExterior();
+            //comercioExterior.getAttMotivoTraslado().setString(...);   // required only if comprobant type is "T" (traslado)
+            comercioExterior.getAttTipoOperacion().setString(moDbmsDataDpsCfd.getCfdCceTipoOperacion());
+            comercioExterior.getAttClaveDePedimento().setString(moDbmsDataDpsCfd.getCfdCceClaveDePedimento());
+            comercioExterior.getAttCertificadoOrigen().setInteger(SLibUtils.parseInt(moDbmsDataDpsCfd.getCfdCceCertificadoOrigen()));
+            comercioExterior.getAttNumCertificadoOrigen().setString(moDbmsDataDpsCfd.getCfdCceNumCertificadoOrigen());
+            comercioExterior.getAttNumeroExportadorConfiable().setString(moDbmsDataDpsCfd.getCfdCceNumeroExportadorConfiable());
+            comercioExterior.getAttIncoterm().setString(moDbmsDataDpsCfd.getCfdCceIncoterm());
+            comercioExterior.getAttSubdivision().setInteger(SLibUtils.parseInt(moDbmsDataDpsCfd.getCfdCceSubdivision()));
+            //comercioExterior.getAttObservaciones(...);    // optional, not implemented
+            comercioExterior.getAttTipoCambioUSD().setDouble(DCfdUtils.AmountFormat.parse(moDbmsDataDpsCfd.getCfdCceTipoCambioUSD()).doubleValue());
+            comercioExterior.getAttTotalUSD().setDouble(DCfdUtils.AmountFormat.parse(moDbmsDataDpsCfd.getCfdCceTotalUSD()).doubleValue());
+            comercioExterior.setEltMercancias(new cfd.ver3.cce11.DElementMercancias());
+
+            int decs = DCfdUtils.AmountFormat.getMaximumFractionDigits();
+            int decsExr = SLibUtils.getDecimalFormatExchangeRate().getMaximumFractionDigits();
+            double exr = SLibUtils.round(SLibUtils.parseDouble(moDbmsDataDpsCfd.getCfdCceTipoCambioUSD()), decsExr);
+            
+            for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
+                if (dpsEntry.isAccountable()) {
+                    if (dpsEntry.getDbmsCustomsUnitSymbol().isEmpty()) {
+                        throw new Exception("La unidad '" + dpsEntry.getDbmsUnitSymbol() + "' no tiene 'código' para aduana.");
+                    }
+                    
+                    double price = 0;
+                    double valueMxn = 0;
+                    double valueUsd = 0;
+                    
+                    if (dpsEntry.getSubtotalCy_r() == SLibUtils.round(dpsEntry.getOriginalPriceUnitaryCy() * dpsEntry.getOriginalQuantity(), decs)) {
+                        price = SLibUtils.round(dpsEntry.getOriginalPriceUnitaryCy(), decs);
+                    }
+                    else {
+                        price = SLibUtils.round(dpsEntry.getSubtotalCy_r() / dpsEntry.getOriginalQuantity(), decs);
+                    }
+
+                    valueMxn = SLibUtils.round((dpsEntry.getSubtotalCy_r() * mdExchangeRate), decs);
+                    valueUsd = SLibUtils.round((valueMxn / exr), decs);
+
+                    cfd.ver3.cce11.DElementMercancia mercancia = new cfd.ver3.cce11.DElementMercancia();
+                    mercancia.getAttNoIdentificacion().setString(dpsEntry.getConceptKey());
+                    mercancia.getAttFraccionArancelaria().setString(dpsEntry.getDbmsTariffFraction());
+                    mercancia.getAttCantidadAduana().setDouble(dpsEntry.getOriginalQuantity());
+                    mercancia.getAttUnidadAduana().setString(dpsEntry.getDbmsCustomsUnitSymbol());
+                    mercancia.getAttValorUnitarioAduana().setDouble(price);
+                    mercancia.getAttValorDolares().setDouble(valueUsd);
+
+                    comercioExterior.getEltMercancias().addMercancia(mercancia);
                 }
-                else {
-                    price = SLibUtils.round(dpsEntry.getSubtotalCy_r() / dpsEntry.getOriginalQuantity(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-                }
-
-                mercancia = new cfd.ver3.cce11.DElementMercancia();
-
-                mercancia.getAttNoIdentificacion().setString(dpsEntry.getConceptKey());
-                mercancia.getAttFraccionArancelaria().setString(dpsEntry.getDbmsTariffFraction());
-                mercancia.getAttCantidadAduana().setDouble(dpsEntry.getOriginalQuantity());
-                mercancia.getAttUnidadAduana().setString(dpsEntry.getDbmsCustomsUnit());
-                mercancia.getAttValorUnitarioAduana().setDouble(price);
-
-                valueMxn = SLibUtils.round((dpsEntry.getSubtotalCy_r() * mdExchangeRate), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-                valueUsdEty = SLibUtils.round((valueMxn / mdXtaCfdCceExchangeRateUSD), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-
-                mercancia.getAttValorDolares().setDouble(valueUsdEty);
-
-                mercancias.addMercancia(mercancia);
             }
         }
-        
-        comercioExterior.setEltMercancias(mercancias);
         
         return comercioExterior;
     }
 
-    private ArrayList<SCfdDataImpuesto> createTaxesCfd32() {
+    private ArrayList<SCfdDataImpuesto> createCfdiNodeImpuestos32() {
         double dImptoTasa = 0;
         double dImpto = 0;
         Double oValue = null;
@@ -4539,7 +4579,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         return impuestosXml;
     }
       
-    private ArrayList<SCfdDataImpuesto> createTaxesCfd33() {
+    private ArrayList<SCfdDataImpuesto> createCfdiNodeImpuestos33() {
         double dImptoTasa = 0;
         ArrayList<SCfdDataImpuesto> impuestosXml = null;
         SCfdDataImpuesto impuestoXml = null;
@@ -4555,7 +4595,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         if (tax.getFkTaxCalculationTypeId() != SModSysConsts.FINS_TP_TAX_CAL_RATE) {
                             throw new Exception("Todos los impuestos deben ser en base a una tasa (" + tax.getFkTaxCalculationTypeId() + ").");
                         }
-                        else {
+                        else if (tax.getTaxCy() != 0) {
                             impuestoXml = new SCfdDataImpuesto();
                             dImptoTasa = 0;
                     
@@ -4631,131 +4671,161 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
         return impuestosXml;
     }
+    
+    /*
+     * Implementation of SCfdXmlCfdi32 and SCfdXmlCfdi33:
+     */
 
     @Override
-    public int getCfdTipoCfdXml() {
-        return SCfdConsts.CFD_TYPE_DPS;
+    public int getCfdType() {
+        return SDataConstantsSys.TRNS_TP_CFD_INV;
     }
 
     @Override
-    public String getCfdSerie() {
+    public String getComprobanteVersion() { // CFDI 3.3
+        return "" + DCfdConsts.CFDI_VER_33;
+    }
+
+    @Override
+    public String getComprobanteSerie() {
         return msNumberSeries;
     }
 
     @Override
-    public String getCfdFolio() {
+    public String getComprobanteFolio() {
         return msNumber;
     }
 
     @Override
-    public String getCfdReferencia() {
-        return msNumberReference;
-    }
+    public Date getComprobanteFecha() {
+        int[] creation = SLibTimeUtilities.digestDate(mtDate);
+        int[] modification = SLibTimeUtilities.digestDate(mtUserEditTs);
+        java.util.Date date = null;
 
-    @Override
-    public Date getCfdFecha() {
-        int[] anDateDps = SLibTimeUtilities.digestDate(mtDate);
-        int[] anDateEdit = SLibTimeUtilities.digestDate(mtUserEditTs);
-        java.util.Date tDate = null;
-        GregorianCalendar oGregorianCalendar = null;
-
-        if (SLibUtilities.compareKeys(anDateDps, anDateEdit)) {
-            tDate = mtUserEditTs;
+        if (SLibUtilities.compareKeys(creation, modification)) {
+            // when modification done the same day as creation, set the former's datetime as document's datetime:
+            date = mtUserEditTs;
         }
         else {
-            oGregorianCalendar = new GregorianCalendar();
-            oGregorianCalendar.setTime(mtUserEditTs);
-            oGregorianCalendar.set(GregorianCalendar.YEAR, anDateDps[0]);
-            oGregorianCalendar.set(GregorianCalendar.MONTH, anDateDps[1] - 1);  // January is month 0
-            oGregorianCalendar.set(GregorianCalendar.DATE, anDateDps[2]);
-            tDate = oGregorianCalendar.getTime();
+            // when modification done other day as creation, mix the former's date and current time as document's datetime:
+            GregorianCalendar calendar = new GregorianCalendar();
+            calendar.setTime(mtUserEditTs);
+            calendar.set(GregorianCalendar.YEAR, creation[0]);
+            calendar.set(GregorianCalendar.MONTH, creation[1] - 1);  // January is month 0
+            calendar.set(GregorianCalendar.DATE, creation[2]);
+            date = calendar.getTime();
         }
 
-        return tDate;
+        return date;
     }
 
     @Override
-    public String getCfdFormaDePago() {
-        return msPaymentMethod;
-    }
-
-    @Override
-    public int getCfdCondicionesDePago() {
-        return mnFkPaymentTypeId == SDataConstantsSys.TRNS_TP_PAY_CASH ? DAttributeOptionCondicionesPago.CFD_CONTADO : DAttributeOptionCondicionesPago.CFD_CREDITO;
-    }
-
-    @Override
-    public double getCfdSubTotal() {
-        return mdSubtotalProvisionalCy_r;
-    }
-
-    @Override
-    public double getCfdDescuento() {
-        return 0;
-    }
-
-    @Override
-    public String getCfdMotivoDescuento() {
-        return "";
-    }
-
-    @Override
-    public double getCfdTipoCambio() {
-        return mdExchangeRate;
-    }
-
-    @Override
-    public String getCfdMoneda() {
-        return msDbmsCurrencyKey;
-    }
-
-    @Override
-    public double getCfdTotal() {
-        return mdTotalCy_r;
-    }
-
-    @Override
-    public int getCfdTipoDeComprobante() {
-        return isDocument() ? DAttributeOptionTipoComprobante.CFD_INGRESO : DAttributeOptionTipoComprobante.CFD_EGRESO;
-    }
-
-    @Override
-    public int getCfdMetodoDePago() {
+    public int getComprobanteFormaDePagoPagos() {   // CFDI 3.2
         return mnPayments;
     }
 
     @Override
-    public String getCfdNumCtaPago() {
+    public String getComprobanteFormaPago() {   // CFDI 3.3
+        return moDbmsDataDpsCfd.getPaymentWay();
+    }
+
+    @Override
+    public int getComprobanteCondicionesDePago() {  // CFDI 3.2
+        return mnFkPaymentTypeId == SDataConstantsSys.TRNS_TP_PAY_CASH ? DAttributeOptionCondicionesPago.CFD_CONTADO : DAttributeOptionCondicionesPago.CFD_CREDITO;
+    }
+
+    @Override
+    public String getComprobanteCondicionesPago() { // CFDI 3.3
+        return moDbmsDataDpsCfd.getPaymentConditions();
+    }
+
+    @Override
+    public double getComprobanteSubtotal() {
+        return mdSubtotalProvisionalCy_r;
+    }
+
+    @Override
+    public double getComprobanteDescuento() {
+        return mdDiscountDocCy_r;
+    }
+
+    @Override
+    public String getComprobanteMotivoDescuento() { // CFDI 3.2
+        return getComprobanteDescuento() == 0 ? "" : "DESCUENTO";
+    }
+
+    @Override
+    public String getComprobanteMoneda() {
+        return msDbmsCurrencyKey;
+    }
+
+    @Override
+    public double getComprobanteTipoCambio() {
+        return mdExchangeRate;
+    }
+
+    @Override
+    public double getComprobanteTotal() {
+        return mdTotalCy_r;
+    }
+
+    @Override
+    public int getComprobanteTipoDeComprobante() {  // CFDI 3.2
+        return isDocument() ? DAttributeOptionTipoDeComprobante.CFD_INGRESO : DAttributeOptionTipoDeComprobante.CFD_EGRESO;
+    }
+
+    @Override
+    public String getComprobanteTipoComprobante() { // CFDI 3.3
+        return isDocument() ? DCfdi33Consts.CFD_TP_I : DCfdi33Consts.CFD_TP_E;
+    }
+
+    @Override
+    public String getComprobanteMetodoDePago() { // CFDI 3.2
+        return msPaymentMethod;
+    }
+
+    @Override
+    public String getComprobanteMetodoPago() {  // CFDI 3.3
+        return moDbmsDataDpsCfd.getPaymentMethod();
+    }
+
+    @Override
+    public String getComprobanteNumCtaPago() {  // CFDI 3.2
         return msPaymentAccount;
     }
 
     @Override
-    public String getCfdNumConfirmacion() {
-        return msXtaCfdConfirmation;
+    public String getComprobanteLugarExpedicion() { // CFDI 3.3
+        return moDbmsDataDpsCfd.getZipIssue();
+    }
+
+    @Override
+    public String getComprobanteConfirmacion() {    // CFDI 3.3
+        return moDbmsDataDpsCfd.getConfirmation();
+    }
+
+    @Override
+    public String getCfdiRelacionadosTipoRelacion() {   // CFDI 3.3
+        return moDbmsDataDpsCfd.getCfdiRelacionadosTipoRelacion();
     }
     
     @Override
-    public int getEmisor() {
+    public ArrayList<String> getCfdiRelacionados() {    // CFDI 3.3
+        return moDbmsDataDpsCfd.getCfdiRelacionados();
+    }
+
+    @Override
+    public int getEmisorId() {
         return moAuxCfdParams.getEmisor().getPkBizPartnerId();
     }
 
     @Override
-    public int getSucursalEmisor() {
+    public int getEmisorSucursalId() {
         return mnFkCompanyBranchId;
     }
 
     @Override
-    public int getReceptor() {
-        return mnFkBizPartnerId_r;
-    }
-
-    @Override
-    public int getSucursalReceptor() {
-        return mnFkBizPartnerBranchId;
-    }
-    
-    @Override
-    public ArrayList<DElement> getCfdElementRegimenFiscal() {
+    public ArrayList<DElement> getElementsEmisorRegimenFiscal() {   // CFDI 3.2
         ArrayList<DElement> regimes = null;
         DElement regimen = null;
 
@@ -4771,17 +4841,119 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
     
     @Override
-    public String getCfdTipoRelacion() {
-        return msXtaCfdRelationType;        
-    }
-    
-    @Override
-    public String getCfdUsoCfdi() {
-        return msXtaCfdUseCfdi;        
+    public String getEmisorRegimenFiscal() {    // CFDI 3.3
+        return moDbmsDataDpsCfd.getTaxRegime();
     }
 
     @Override
-    public DElement getCfdElementAddenda() {
+    public int getReceptorId() {
+        return mnFkBizPartnerId_r;
+    }
+
+    @Override
+    public int getReceptorSucursalId() {
+        return mnFkBizPartnerBranchId;
+    }
+    
+    @Override
+    public String getReceptorResidenciaFiscal() {   // CFDI 3.3
+        // Implement ASAP! (Sergio Flores, 2017-08-10)
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getReceptorNumRegIdTrib() {   // CFDI 3.3
+        // Implement ASAP! (Sergio Flores, 2017-08-10)
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getReceptorUsoCFDI() {    // CFDI 3.3
+        return moDbmsDataDpsCfd.getCfdiUsage();
+    }
+
+    @Override
+    public ArrayList<SCfdDataConcepto> getElementsConcepto() throws Exception {
+        double price = 0;
+        String descripcion = "";
+        SCfdDataConcepto concepto = null;
+        ArrayList<SCfdDataConcepto> conceptos = new ArrayList<SCfdDataConcepto>();
+        
+        for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
+            if (dpsEntry.isAccountable()) {
+                if (generateIntCommerceComplement() && dpsEntry.getDbmsCustomsUnit().isEmpty()) {
+                    throw new Exception("La unidad '" + dpsEntry.getDbmsUnitSymbol() + "' no tiene 'nombre' para aduana.");
+                }
+                    
+                descripcion = dpsEntry.getConcept();
+                
+                for (SDataDpsEntryNotes dpsEntryNotes : dpsEntry.getDbmsEntryNotes()) {
+                    if (dpsEntryNotes.getIsCfd()) {
+                        descripcion += " - " + dpsEntryNotes.getNotes();
+                    }
+                }
+                
+                // XXX refactor this, this validation does not belong to here!:
+                descripcion = descripcion.replaceAll("\n", " ");
+                if (descripcion.length() > 1000) {
+                    descripcion = descripcion.substring(0, 1000);
+                }
+                
+                if (dpsEntry.getSubtotalProvisionalCy_r() == SLibUtils.round(dpsEntry.getOriginalPriceUnitaryCy() * dpsEntry.getOriginalQuantity(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits())) {
+                    price = dpsEntry.getOriginalPriceUnitaryCy();
+                }
+                else {
+                    price = dpsEntry.getSubtotalProvisionalCy_r() / dpsEntry.getOriginalQuantity();
+                }
+                
+                concepto = new SCfdDataConcepto();
+                concepto.setClaveProdServ(dpsEntry.getDbmsItemClaveProdServ());
+                concepto.setNoIdentificacion(dpsEntry.getConceptKey());
+                concepto.setCantidad(dpsEntry.getOriginalQuantity());
+                concepto.setClaveUnidad(dpsEntry.getDbmsUnidadClave());
+                concepto.setUnidad(generateIntCommerceComplement() ? dpsEntry.getDbmsCustomsUnit() : dpsEntry.getDbmsOriginalUnitSymbol());
+                concepto.setDescripcion(descripcion);
+                concepto.setValorUnitario(price);
+                concepto.setImporte(dpsEntry.getSubtotalProvisionalCy_r());
+                concepto.setDescuento(dpsEntry.getDiscountDocCy());
+                
+                concepto.computeCfdImpuestosConceptos(dpsEntry);
+                
+                conceptos.add(concepto);
+            }
+        }
+
+        return conceptos;
+    }
+    
+    @Override
+    public ArrayList<SCfdDataImpuesto> getElementsImpuestos(float cfdiVersion) {
+        ArrayList<SCfdDataImpuesto> cfdDataImpuestos = null;
+        
+        if (cfdiVersion == DCfdConsts.CFDI_VER_32) {
+            cfdDataImpuestos = createCfdiNodeImpuestos32();
+        }
+        else if (cfdiVersion == DCfdConsts.CFDI_VER_33) {
+            cfdDataImpuestos = createCfdiNodeImpuestos33();
+        }
+        
+        return cfdDataImpuestos;
+    }
+
+    @Override
+    public DElement getElementComplemento() throws Exception {
+        DElement complemento = null;
+        
+        if (generateIntCommerceComplement()) {
+            complemento = new cfd.ver32.DElementComplemento();
+            ((cfd.ver32.DElementComplemento) complemento).getElements().add(createCfdiNodeComplementoComercioExterior11());
+        }
+        
+        return complemento;
+    }
+    
+    @Override
+    public DElement getElementAddenda() {
         DElement addenda = null;
 
         // Create custom addendas when needed:
@@ -4818,221 +4990,5 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
 
         return addenda;
-    }
-
-    @Override
-    public DElement getCfdElementComplemento() {
-        DElement complemento = null;
-        
-        try {
-            if (mbAuxIsNeedCfdCce && !msXtaCfdCceOperationType.isEmpty()) {
-                complemento = new cfd.ver32.DElementComplemento();
-                
-                ((cfd.ver32.DElementComplemento) complemento).getElements().add(createCfdiElementComercioExterior11());
-            }
-        }
-        catch (Exception e) {
-            SLibUtils.showException(this, e);
-        }
-        
-        return complemento;
-    }
-
-    @Override
-    public ArrayList<SCfdDataCfdiRelacionado> getCfdCfdiRelacionados() {
-        ArrayList<SCfdDataCfdiRelacionado> cfdiRelacinadosXml = new ArrayList<SCfdDataCfdiRelacionado>();
-        
-        for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
-            for (SDataDpsDpsLink dpsEntryLink : dpsEntry.getDbmsDpsLinksAsDestiny()) {
-                
-            }
-        }
-        
-        return cfdiRelacinadosXml;
-    }
-    
-    @Override
-    public ArrayList<SCfdDataConcepto> getCfdConceptos() {
-        double price = 0;
-        String descripcion = "";
-        SCfdDataConcepto conceptoXml = null;
-        ArrayList<SCfdDataConcepto> conceptosXml = new ArrayList<SCfdDataConcepto>();
-        
-        for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
-            if (dpsEntry.isAccountable()) {
-                descripcion = dpsEntry.getConcept();
-                
-                for (SDataDpsEntryNotes dpsEntryNotes : dpsEntry.getDbmsEntryNotes()) {
-                    if (dpsEntryNotes.getIsCfd()) {
-                        descripcion += "\n- " + dpsEntryNotes.getNotes();
-                    }
-                }
-                
-                if (dpsEntry.getSubtotalCy_r() == SLibUtils.round(dpsEntry.getOriginalPriceUnitaryCy() * dpsEntry.getOriginalQuantity(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits())) {
-                    price = dpsEntry.getOriginalPriceUnitaryCy();
-                }
-                else {
-                    price = dpsEntry.getSubtotalCy_r() / dpsEntry.getOriginalQuantity();
-                }
-                
-                conceptoXml = new SCfdDataConcepto();
-                conceptoXml.setNoIdentificacion(dpsEntry.getConceptKey());
-                conceptoXml.setUnidad(dpsEntry.getDbmsOriginalUnitSymbol());
-                conceptoXml.setCantidad(dpsEntry.getOriginalQuantity());
-                conceptoXml.setDescripcion(descripcion);
-                conceptoXml.setValorUnitario(price);
-                conceptoXml.setImporte(dpsEntry.getSubtotalCy_r());
-                conceptoXml.setClaveProdServ(dpsEntry.getDbmsItemClaveProdServ());
-                conceptoXml.setClaveUnidad(dpsEntry.getDbmsUnidadClave());
-                
-                conceptoXml.computeCfdImpuestosConceptos(dpsEntry);
-                
-                conceptosXml.add(conceptoXml);
-            }
-        }
-
-        return conceptosXml;
-    }
-    
-    @Override
-    public ArrayList<SCfdDataImpuesto> getCfdImpuestos(float cfdiVersion) {
-        ArrayList<SCfdDataImpuesto> cfdDataImpuestos = null;
-        
-        if (cfdiVersion == DCfdConsts.CFDI_VER_32) {
-            cfdDataImpuestos = createTaxesCfd32();
-        }
-        else if (cfdiVersion == DCfdConsts.CFDI_VER_33) {
-            cfdDataImpuestos = createTaxesCfd33();
-        }
-        
-        return cfdDataImpuestos;
-    }
-
-    public void saveField(java.sql.Connection connection, final int[] pk, final int field, final Object value) throws Exception {
-        String sSql = "";
-
-        mnLastDbActionResult = SLibConsts.UNDEFINED;
-
-        sSql = "UPDATE trn_dps SET ";
-
-        switch (field) {
-            case FIELD_REF_BKR:
-                sSql += "comms_ref = '" + value + "' ";
-                break;
-            case FIELD_SAL_AGT:
-                sSql += "fid_sal_agt_n = " + value + " ";
-                break;
-            case FIELD_SAL_AGT_SUP:
-                sSql += "fid_sal_sup_n = " + value + " ";
-                break;
-            case FIELD_CLO_COMMS:
-                sSql += "b_close_comms = " + value + " ";
-                break;
-            case FIELD_CLO_COMMS_USR:
-                sSql += "fid_usr_close_comms = " + value + ", ts_close_comms = NOW() ";
-            case FIELD_USR:
-                sSql += "fid_usr_edit = " + value + ", ts_edit = NOW() ";
-                break;
-            default:
-                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-        }
-
-        sSql += "WHERE id_year = " + pk[0] + " AND id_doc = " + pk[1];
-
-        connection.createStatement().execute(sSql);
-
-        mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
-    }
-    
-    public void sendMail(SClientInterface client, Object dpsKey, int mmsType) {
-        int[] mmsConfigKey = null;
-        String msg = "";
-        String companyName = "";
-        String bpName = "";
-        String dpsDestNumber = "";
-        String dpsReference = "";
-        ArrayList<String> toRecipients = null;
-        HashSet<String> setCfgEmail = new HashSet<>();
-        SDbMmsConfig mmsConfig = null;
-        SDataDpsType moDpsType = null;
-        SDataDps dpsDest = null;
-        boolean isEdited = false;
-        boolean send = true;
-        
-        read(dpsKey, client.getSession().getStatement());
-        
-        isEdited = mtUserNewTs.compareTo(mtUserEditTs) != 0;
-        
-        companyName = client.getSessionXXX().getCompany().getCompany();
-        bpName = SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.BPSU_BP, new int[] { mnFkBizPartnerId_r }, SLibConstants.DESCRIPTION_NAME);
-        moDpsType = (SDataDpsType) SDataUtilities.readRegistry(client, SDataConstants.TRNU_TP_DPS, getDpsTypeKey(), SLibConstants.EXEC_MODE_VERBOSE);
-        dpsReference = !getNumberReference().isEmpty() ? getNumberReference() : "N/D";
-        toRecipients = new ArrayList<>();
-        
-        for (SDataDpsEntry entry : mvDbmsDpsEntries) {
-            try {
-                mmsConfigKey = STrnUtilities.readMmsConfigurationByLinkType(client, mmsType, entry.getFkItemId());
-                
-                if (mmsConfigKey[0] != SLibConsts.UNDEFINED) {
-                    mmsConfig = new SDbMmsConfig();
-                    mmsConfig.read(client.getSession(), mmsConfigKey);
-                    
-                    setCfgEmail.add(mmsConfig.getEmail());
-                }
-            }
-            catch (java.lang.Exception e) {
-                SLibUtilities.renderException(this, e);
-            }
-        }
-        
-        if (!setCfgEmail.isEmpty()) {
-            msg = "Se enviará correo-e de notificación a los siguientes destinatarios:";
-            
-            for (String email : setCfgEmail) {
-                msg += "\n" + email;
-            }
-            client.showMsgBoxInformation(msg);
-        }
-        else {
-            send = false;
-        }
-        
-        if (send) {
-            for (String cfgEmail : setCfgEmail) {
-                try {
-                    msg = STrnUtilities.computeMailHeaderBeginTable(companyName, moDpsType.getDpsType(), getDpsNumber(), bpName, mtDate, (isEdited ? mtUserEditTs : mtUserNewTs), isEdited, mbIsRebill);
-
-                    for (SDataDpsEntry entry : mvDbmsDpsEntries) {
-                        mmsConfigKey = STrnUtilities.readMmsConfigurationByLinkType(client, mmsType, entry.getFkItemId());
-
-                        if (mmsConfigKey[0] != SLibConsts.UNDEFINED) {
-                            mmsConfig = new SDbMmsConfig();
-                            mmsConfig.read(client.getSession(), mmsConfigKey);
-
-                            if (cfgEmail.compareTo(mmsConfig.getEmail()) == 0) {
-                                if (entry.getDbmsDpsLinksAsDestiny()!= null && !entry.getDbmsDpsLinksAsDestiny().isEmpty()) {
-                                    dpsDest = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, entry.getDbmsDpsLinksAsDestiny().get(0).getDbmsSourceDpsKey(), SLibConstants.EXEC_MODE_STEALTH);
-                                    dpsDestNumber = dpsDest.getDpsNumber();
-                                }
-                                else {
-                                    dpsDestNumber = "N/D";
-                                }
-
-                                msg += STrnUtilities.computeMailItem(client, entry.getFkItemId(), entry.getFkOriginalUnitId(), entry.getConceptKey(), entry.getConcept(), dpsDestNumber, msNumberSeries, msNumber, dpsReference, entry.getOriginalQuantity(), entry.getDbmsUnitSymbol(), getDate(), getDpsTypeKey(), isEdited, mbIsRebill);
-                            }
-                        }
-                    }
-
-                    msg += STrnUtilities.computeMailFooterEndTable(SClient.APP_NAME , SClient.APP_COPYRIGHT, SClient.APP_PROVIDER, SClient.VENDOR_WEBSITE , SClient.APP_RELEASE);
-                    toRecipients.add(cfgEmail);
-
-                    STrnUtilities.sendMail(client, mmsType, toRecipients, null, null, msg);
-                    toRecipients.clear();
-                }
-                catch (java.lang.Exception e) {
-                    SLibUtilities.printOutException(this, e);
-                }
-            }
-        }
     }
 }

@@ -438,7 +438,8 @@ public class PrintCfdiThread extends Thread {
                     map.put("Departamento", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttDepartamento().getString());
                     map.put("Puesto", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttPuesto().getString());
                     //map.put("RiesgoPuesto", SCfdConsts.RiesgoMap.get(SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttRiesgoPuesto().getString())));
-                    map.put("RiesgoPuesto", miClient.getSession().readField(SModConsts.HRSS_TP_POS_RISK, new int[] { SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttRiesgoPuesto().getString()) }, SDbRegistry.FIELD_NAME));
+                    String riesgoPuesto = ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttRiesgoPuesto().getString();
+                    map.put("RiesgoPuesto", riesgoPuesto.isEmpty() ? "No aplica" : miClient.getSession().readField(SModConsts.HRSS_TP_POS_RISK, new int[] { SLibUtils.parseInt(riesgoPuesto) }, SDbRegistry.FIELD_NAME));
                     map.put("PeriodicidadPago", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttPeriodicidadPago().getString());
                     //map.put("Banco", SCfdConsts.BancoMap.get(SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttBanco().getString())));
                     if (!((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttBanco().getString().isEmpty()) {

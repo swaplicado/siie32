@@ -5,11 +5,7 @@
 
 package erp.server;
 
-import erp.data.SDataConstants;
-import erp.data.SDataReadRegistries;
 import erp.lib.SLibConstants;
-import erp.lib.data.SDataRegistry;
-import erp.mcfg.data.SDataCertificate;
 import erp.mcfg.data.SDataCompany;
 import erp.mcfg.data.SDataParamsCompany;
 import erp.mcfg.data.SDataSysEntityCategory;
@@ -154,7 +150,7 @@ public class SServiceSessions extends UnicastRemoteObject {
         String pswd = "";
         ResultSet resultSet = null;
         SSessionXXX session = null;
-        Vector<SDataRegistry> registries = null;
+//        Vector<SDataRegistry> registries = null;
 
         try {
             moServer.renderMessageLn(msService + "Login attempt for user [" + request.getUserName() + "]");
@@ -237,11 +233,11 @@ public class SServiceSessions extends UnicastRemoteObject {
                     session.getEntityCategories().addAll(mvEntityCategories);
                     session.prepareAccess();
 
-                    registries = SDataReadRegistries.readRegistries(sessionServer.getStatement(), SDataConstants.CFGU_CERT, null);
-                    for (i = 0; i < registries.size(); i++) {
-                        session.getDbmsCertificates().add((SDataCertificate) registries.get(i));
-                    }
-
+//                    registries = SDataReadRegistries.readRegistries(sessionServer.getStatement(), SDataConstants.CFGU_CERT, null);
+//                    for (i = 0; i < registries.size(); i++) {
+//                        session.getDbmsCertificates().add((SDataCertificate) registries.get(i));
+//                    }
+//
                     responseType = SLibConstants.LOGIN_OK;
 
                     moServer.renderMessageLn(msService + "Login attempt for user [" + request.getUserName() + "] gained!");

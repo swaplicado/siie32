@@ -54,7 +54,7 @@ import sa.lib.gui.SGuiValidation;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Sergio Flores
  */
 public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPaneFormOwner, ActionListener, ItemListener, FocusListener {
 
@@ -1385,7 +1385,6 @@ public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPan
                         moDecTariff.setEditable(false);
 
                         if (moKeyShipmentType.getValue()[0] == SModSysConsts.LOGS_TP_SHIP_REC) {
-
                             miClient.getSession().populateCatalogue(moKeySpotSource, SModConsts.LOGU_SPOT, moKeyDeliveryType.getValue()[0],
                                     new SGuiParams(new int[] { SModSysConsts.LOGS_TP_SPOT_PLA }));
                         }
@@ -1411,7 +1410,6 @@ public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPan
                         moDecTariff.setEditable(false);
 
                         if (moKeyShipmentType.getValue()[0] == SModSysConsts.LOGS_TP_SHIP_REC) {
-
                             miClient.getSession().populateCatalogue(moKeySpotSource, SModConsts.LOGU_SPOT, moKeyDeliveryType.getValue()[0],
                                     new SGuiParams(new int[] { SModSysConsts.LOGS_TP_SPOT_PLA }));
                         }
@@ -1446,12 +1444,10 @@ public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPan
 
                         if (moKeyShipmentType.getValue()[0] == SModSysConsts.LOGS_TP_SHIP_SHI) {
                             if (moKeyIncoterm.getValue()[0] != SModSysConsts.LOGS_INC_DAT) {
-
                                 miClient.getSession().populateCatalogue(moKeySpotDestiny, SModConsts.LOGU_SPOT, moKeyDeliveryType.getValue()[0],
                                     new SGuiParams(new int[] { SModSysConsts.LOGS_TP_SPOT_PLA }));
                             }
                             else {
-
                                 miClient.getSession().populateCatalogue(moKeySpotDestiny, SModConsts.LOGU_SPOT, moKeyDeliveryType.getValue()[0],
                                     new SGuiParams(new int[] { SModSysConsts.LOGS_TP_SPOT_PLA, SModSysConsts.LOGS_TP_SPOT_TER }));
                             }
@@ -1459,6 +1455,7 @@ public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPan
                         break;
 
                     case SModSysConsts.LOGS_INC_DAP:
+                    case SModSysConsts.LOGS_INC_DAF:
 
                         moDecExportDeclaration.setEditable(true);
                         moDecCarriageExportFreight.setEditable(true);
@@ -1477,12 +1474,12 @@ public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPan
                         moDecTariff.setEditable(false);
 
                         if (moKeyShipmentType.getValue()[0] == SModSysConsts.LOGS_TP_SHIP_SHI) {
-
                             miClient.getSession().populateCatalogue(moKeySpotDestiny, SModConsts.LOGU_SPOT, moKeyDeliveryType.getValue()[0],
                                     new SGuiParams(new int[] { SModSysConsts.LOGS_TP_SPOT_PLA }));
                         }
                         break;
 
+                    case SModSysConsts.LOGS_INC_DDU:
                     case SModSysConsts.LOGS_INC_DDP:
 
                         moDecExportDeclaration.setEditable(true);
@@ -1502,7 +1499,6 @@ public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPan
                         moDecTariff.setEditable(true);
 
                         if (moKeyShipmentType.getValue()[0] == SModSysConsts.LOGS_TP_SHIP_SHI) {
-
                             miClient.getSession().populateCatalogue(moKeySpotDestiny, SModConsts.LOGU_SPOT, moKeyDeliveryType.getValue()[0],
                                     new SGuiParams(new int[] { SModSysConsts.LOGS_TP_SPOT_PLA }));
                         }
@@ -1527,12 +1523,10 @@ public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPan
                         moDecTariff.setEditable(false);
 
                         if (moKeyShipmentType.getValue()[0] == SModSysConsts.LOGS_TP_SHIP_SHI) {
-
                             miClient.getSession().populateCatalogue(moKeySpotDestiny, SModConsts.LOGU_SPOT, moKeyDeliveryType.getValue()[0],
                                     new SGuiParams(new int[] { SModSysConsts.LOGS_TP_SPOT_POR }));
                         }
                         else if (moKeyShipmentType.getValue()[0] == SModSysConsts.LOGS_TP_SHIP_REC) {
-
                             miClient.getSession().populateCatalogue(moKeySpotSource, SModConsts.LOGU_SPOT, moKeyDeliveryType.getValue()[0],
                                     new SGuiParams(new int[] { SModSysConsts.LOGS_TP_SPOT_POR }));
                         }
@@ -1542,6 +1536,8 @@ public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPan
                         break;
 
                     case SModSysConsts.LOGS_INC_FOB:
+                    case SModSysConsts.LOGS_INC_DES:
+                    case SModSysConsts.LOGS_INC_DEQ:
 
                         moDecExportDeclaration.setEditable(true);
                         moDecCarriageExportFreight.setEditable(true);
@@ -1560,12 +1556,10 @@ public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPan
                         moDecTariff.setEditable(false);
 
                         if (moKeyShipmentType.getValue()[0] == SModSysConsts.LOGS_TP_SHIP_SHI) {
-
                             miClient.getSession().populateCatalogue(moKeySpotDestiny, SModConsts.LOGU_SPOT, moKeyDeliveryType.getValue()[0],
                                     new SGuiParams(new int[] { SModSysConsts.LOGS_TP_SPOT_POR }));
                         }
                         else if (moKeyShipmentType.getValue()[0] == SModSysConsts.LOGS_TP_SHIP_REC) {
-
                             miClient.getSession().populateCatalogue(moKeySpotSource, SModConsts.LOGU_SPOT, moKeyDeliveryType.getValue()[0],
                                     new SGuiParams(new int[] { SModSysConsts.LOGS_TP_SPOT_POR }));
                         }
@@ -1593,12 +1587,10 @@ public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPan
                         moDecTariff.setEditable(false);
 
                         if (moKeyShipmentType.getValue()[0] == SModSysConsts.LOGS_TP_SHIP_SHI) {
-
                             miClient.getSession().populateCatalogue(moKeySpotDestiny, SModConsts.LOGU_SPOT, moKeyDeliveryType.getValue()[0],
                                     new SGuiParams(new int[] { SModSysConsts.LOGS_TP_SPOT_POR }));
                         }
                         else if (moKeyShipmentType.getValue()[0] == SModSysConsts.LOGS_TP_SHIP_REC) {
-
                             miClient.getSession().populateCatalogue(moKeySpotSource, SModConsts.LOGU_SPOT, moKeyDeliveryType.getValue()[0],
                                     new SGuiParams(new int[] { SModSysConsts.LOGS_TP_SPOT_POR }));
                         }
@@ -1626,12 +1618,10 @@ public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPan
                         moDecTariff.setEditable(false);
 
                         if (moKeyShipmentType.getValue()[0] == SModSysConsts.LOGS_TP_SHIP_SHI) {
-
                             miClient.getSession().populateCatalogue(moKeySpotDestiny, SModConsts.LOGU_SPOT, moKeyDeliveryType.getValue()[0],
                                     new SGuiParams(new int[] { SModSysConsts.LOGS_TP_SPOT_POR }));
                         }
                         else if (moKeyShipmentType.getValue()[0] == SModSysConsts.LOGS_TP_SHIP_REC) {
-
                             miClient.getSession().populateCatalogue(moKeySpotSource, SModConsts.LOGU_SPOT, moKeyDeliveryType.getValue()[0],
                                     new SGuiParams(new int[] { SModSysConsts.LOGS_TP_SPOT_POR }));
                         }
@@ -2708,6 +2698,8 @@ public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPan
                 moKeyIncoterm.getValue()[0] == SModSysConsts.LOGS_INC_CIP ||
                 moKeyIncoterm.getValue()[0] == SModSysConsts.LOGS_INC_DAT ||
                 moKeyIncoterm.getValue()[0] == SModSysConsts.LOGS_INC_DAP ||
+                moKeyIncoterm.getValue()[0] == SModSysConsts.LOGS_INC_DAF ||
+                moKeyIncoterm.getValue()[0] == SModSysConsts.LOGS_INC_DDU ||
                 moKeyIncoterm.getValue()[0] == SModSysConsts.LOGS_INC_DDP)) {
 
             validation.setMessage("El '" + SGuiUtils.getLabelName(jlModeOfTransportationType.getText()) +

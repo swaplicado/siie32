@@ -5,9 +5,10 @@
 package erp.mod.hrs.db;
 
 import cfd.DAttributeOptionCondicionesPago;
-import cfd.DAttributeOptionMetodoPago;
-import cfd.DAttributeOptionTipoComprobante;
+import cfd.DCfdConsts;
 import cfd.DElement;
+import cfd.ver2.DAttributeOptionFormaDePago;
+import cfd.ver2.DAttributeOptionTipoDeComprobante;
 import cfd.ver3.nom11.DElementDeduccion;
 import cfd.ver3.nom11.DElementDeducciones;
 import cfd.ver3.nom11.DElementPercepcion;
@@ -15,11 +16,12 @@ import cfd.ver3.nom11.DElementPercepciones;
 import cfd.ver3.nom12.DElementIncapacidad;
 import cfd.ver3.nom12.DElementSeparacionIndemnizacion;
 import cfd.ver32.DVer3Utils;
+import cfd.ver33.DCfdi33Consts;
 import erp.cfd.SCfdConsts;
-import erp.cfd.SCfdDataCfdiRelacionado;
 import erp.cfd.SCfdDataConcepto;
 import erp.cfd.SCfdDataImpuesto;
-import erp.cfd.SCfdXml;
+import erp.cfd.SCfdXmlCfdi32;
+import erp.cfd.SCfdXmlCfdi33;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
@@ -32,14 +34,14 @@ import sa.lib.db.SDbRegistry;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  * 
  * Maintenance Log
  * 2016-07-11, Sergio Flores:
  *  Deletion of obsolete import sentences.
  * 
  */
-public class SHrsFormerPayrollReceipt implements SCfdXml {
+public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
 
     protected SClientInterface miClient;
 
@@ -221,6 +223,13 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
     public int getAuxEmpleadoId() { return mnAuxEmpleadoId; }
     public double getAuxSueldoMensual() { return mdAuxSueldoMensual; }
     
+    public SHrsFormerPayroll getPayroll() { return moPayroll; }
+    public ArrayList<SHrsFormerPayrollConcept> getChildPayrollConcept() { return moChildPayrollConcept; }
+
+    /*
+     * CFDI methods:
+     */
+    
     private boolean isTypeContractCommisionLaborLess() {
         return msTipoContrato.compareTo((String) miClient.getSession().readField(SModConsts.HRSS_TP_CON, new int[] { SModSysConsts.HRSS_TP_CON_TME_DET }, SDbRegistry.FIELD_CODE)) >= 0 &&
                 msTipoContrato.compareTo((String) miClient.getSession().readField(SModConsts.HRSS_TP_CON, new int[] { SModSysConsts.HRSS_TP_CON_LAB_CMM }, SDbRegistry.FIELD_CODE)) <= 0;
@@ -330,10 +339,8 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
         return otroPago;
     }
     
-    public SHrsFormerPayroll getPayroll() { return moPayroll; }
-    public ArrayList<SHrsFormerPayrollConcept> getChildPayrollConcept() { return moChildPayrollConcept; }
-
-    public cfd.DElement createCfdiElementNomina11() throws java.lang.Exception {
+    @Deprecated
+    private cfd.DElement createCfdiElementNomina11() throws java.lang.Exception {
         double dTotalTaxedPerceptions = 0;
         double dTotalExemptPerceptions = 0;
         double dTotalTaxedDeductions = 0;
@@ -447,7 +454,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
         return nomina;
     }
     
-    public cfd.DElement createCfdiElementNomina12() throws java.lang.Exception {
+    private cfd.DElement createCfdiElementNomina12() throws java.lang.Exception {
         String sPayrollType = "";
         double dTotalGravado = 0;
         double dTotalExento = 0;
@@ -488,7 +495,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
             
             receptor.getAttNumSeguridadSocial().setString(msNumSeguridadSocial);
             receptor.getAttFechaInicioRelLaboral().setDate(mtFechaInicioRelLaboral);
-            receptor.getAttAntiguedad().setString("P" + mnAntiguedad + "W");
+            receptor.getAttAntiguedad().setString("P" + (mnAntiguedad < 0 ? 0 : mnAntiguedad) + "W");
             receptor.getAttRiesgoPuesto().setString("" + mnRiesgoPuesto);
             receptor.getAttSalarioBaseCotApor().setDouble(mdSalarioBaseCotApor);
         }
@@ -636,44 +643,103 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
         return nomina;
     }
 
+    /*
+     * Implementation of SCfdXmlCfdi32 and SCfdXmlCfdi33:
+     */
+
     @Override
-    public int getCfdTipoCfdXml() {
-        return SCfdConsts.CFD_TYPE_PAYROLL;
+    public int getCfdType() {
+        return SDataConstantsSys.TRNS_TP_CFD_PAYROLL;
     }
 
     @Override
-    public String getCfdSerie() {
+    public String getComprobanteVersion() { // CFDI 3.3
+        return "" + DCfdConsts.CFDI_VER_33;
+    }
+
+    @Override
+    public String getComprobanteSerie() {
         return msSerie;
     }
 
     @Override
-    public String getCfdFolio() {
+    public String getComprobanteFolio() {
         return "" + mnFolio;
     }
 
     @Override
-    public String getCfdReferencia() {
+    public Date getComprobanteFecha() {
+        Date datetime = new Date();
+        long ellapsedMilliseconds = datetime.getTime() - SLibTimeUtils.convertToDateOnly(datetime).getTime();
+
+        Date date = new Date();
+        date.setTime(moPayroll.getFecha().getTime() + ellapsedMilliseconds);
+
+        return date;
+    }
+
+    @Override
+    public int getComprobanteFormaDePagoPagos() {   // CFDI 3.2
+        return DAttributeOptionFormaDePago.CFD_UNA_EXHIBICION;
+    }
+
+    @Override
+    public String getComprobanteFormaPago() {   // CFDI 3.3
+        return SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY_99;
+    }
+
+    @Override
+    public int getComprobanteCondicionesDePago() {  // CFDI 3.2
+        return DAttributeOptionCondicionesPago.CFD_CONTADO;
+    }
+
+    @Override
+    public String getComprobanteCondicionesPago() { // CFDI 3.3
+        throw new UnsupportedOperationException("Not supported yet.");  // not required in payroll
+    }
+
+    @Override
+    public double getComprobanteSubtotal() {
+        return mdTotalPercepciones;
+    }
+
+    @Override
+    public double getComprobanteDescuento() {
+        return mdTotalDeducciones;
+    }
+
+    @Override
+    public String getComprobanteMotivoDescuento() { // CFDI 3.2
         return "";
     }
 
     @Override
-    public Date getCfdFecha() {
-        Date tDate = null;
-        Date tDateTime = null;
-        long lTimes = 0;
-
-        tDate = new Date();
-        tDateTime = new Date();
-
-        lTimes = tDateTime.getTime() - SLibTimeUtils.convertToDateOnly(tDateTime).getTime();
-
-        tDate.setTime(moPayroll.getFecha().getTime() + lTimes);
-
-        return tDate;
+    public String getComprobanteMoneda() {
+        return msMoneda;
     }
 
     @Override
-    public String getCfdFormaDePago() {
+    public double getComprobanteTipoCambio() {
+        throw new UnsupportedOperationException("Not supported yet.");  // not required in payroll
+    }
+
+    @Override
+    public double getComprobanteTotal() {
+        return mdTotalNeto;
+    }
+
+    @Override
+    public int getComprobanteTipoDeComprobante() {  // CFDI 3.2
+        return DAttributeOptionTipoDeComprobante.CFD_NOMINA;
+    }
+
+    @Override
+    public String getComprobanteTipoComprobante() { // CFDI 3.3
+        return DCfdi33Consts.CFD_TP_N;
+    }
+
+    @Override
+    public String getComprobanteMetodoDePago() { // CFDI 3.2
         String formaPago = "";
 
         try {
@@ -687,88 +753,51 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
     }
 
     @Override
-    public int getCfdCondicionesDePago() {
-        return DAttributeOptionCondicionesPago.CFD_CONTADO;
+    public String getComprobanteMetodoPago() {  // CFDI 3.3
+        return SDataConstantsSys.TRNS_CFD_CAT_PAY_MET_PUE;
     }
 
     @Override
-    public double getCfdSubTotal() {
-        return mdTotalPercepciones;
-    }
-
-    @Override
-    public double getCfdDescuento() {
-        return mdTotalDeducciones;
-    }
-
-    @Override
-    public String getCfdMotivoDescuento() {
+    public String getComprobanteNumCtaPago() {  // CFDI 3.2
         return "";
     }
 
     @Override
-    public double getCfdTipoCambio() {
-        return 1;
+    public String getComprobanteLugarExpedicion() { // CFDI 3.3
+        // Implement ASAP! (Sergio Flores, 2017-08-10)
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public String getCfdMoneda() {
-        return msMoneda;
+    public String getComprobanteConfirmacion() {    // CFDI 3.3
+        // Implement ASAP! (Sergio Flores, 2017-08-10)
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public double getCfdTotal() {
-        return mdTotalNeto;
+    public String getCfdiRelacionadosTipoRelacion() {   // CFDI 3.3
+        // Implement ASAP! (Sergio Flores, 2017-08-10)
+        throw new UnsupportedOperationException("Not supported yet.");
     }
-
-    @Override
-    public int getCfdTipoDeComprobante() {
-        return DAttributeOptionTipoComprobante.CFD_NOMINA;
-    }
-
-    /**
-     * Maintenance Log:
-     * 
-     * 2016-07-14, Sergio Flores: implementation of new payment method catalogue (erp.TRNU_TP_PAY_SYS DB table).
-     */
     
     @Override
-    public int getCfdMetodoDePago() {
-        return DAttributeOptionMetodoPago.CFD_UNA_EXHIBICION;
+    public ArrayList<String> getCfdiRelacionados() {    // CFDI 3.3
+        // Implement ASAP! (Sergio Flores, 2017-08-10)
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public String getCfdNumCtaPago() {
-        return "";
-    }
-
-    @Override
-    public String getCfdNumConfirmacion() {
-        return "";
-    }
-
-    @Override
-    public int getEmisor() {
+    public int getEmisorId() {
         return moPayroll.getEmpresaId();
     }
 
     @Override
-    public int getSucursalEmisor() {
+    public int getEmisorSucursalId() {
         return moPayroll.getSucursalEmpresaId();
     }
 
     @Override
-    public int getReceptor() {
-        return mnPkEmpleadoId;
-    }
-
-    @Override
-    public int getSucursalReceptor() {
-        return mnPkSucursalEmpleadoId;
-    }
-
-    @Override
-    public ArrayList<DElement> getCfdElementRegimenFiscal() {
+    public ArrayList<DElement> getElementsEmisorRegimenFiscal() {   // CFDI 3.2
         ArrayList<DElement> regimes = new ArrayList<DElement>();
         DElement regimen = null;
 
@@ -781,47 +810,42 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
 
         return regimes;
     }
-    
+
     @Override
-    public String getCfdTipoRelacion() {
-        return "";        
-    }
-    
-    @Override
-    public String getCfdUsoCfdi() {
-        return "P01";// XXX jbarajas pendiente CFDI 3.3
+    public String getEmisorRegimenFiscal() {    // CFDI 3.3
+        // Implement ASAP! (Sergio Flores, 2017-08-10)
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public DElement getCfdElementAddenda() {
-        return null;
+    public int getReceptorId() {
+        return mnPkEmpleadoId;
     }
 
     @Override
-    public DElement getCfdElementComplemento() {
-        DElement complemento = null;
-
-        try {
-            complemento = new cfd.ver32.DElementComplemento();
-
-            ((cfd.ver32.DElementComplemento) complemento).getElements().add(createCfdiElementNomina12());
-        }
-        catch (Exception e) {
-            SLibUtils.showException(this, e);
-        }
-
-        return complemento;
+    public int getReceptorSucursalId() {
+        return mnPkSucursalEmpleadoId;
     }
 
     @Override
-    public ArrayList<SCfdDataCfdiRelacionado> getCfdCfdiRelacionados() {
-        ArrayList<SCfdDataCfdiRelacionado> cfdiRelacinadosXml = new ArrayList<SCfdDataCfdiRelacionado>();
-        
-        return cfdiRelacinadosXml;
+    public String getReceptorResidenciaFiscal() {   // CFDI 3.3
+        // Implement ASAP! (Sergio Flores, 2017-08-10)
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public ArrayList<SCfdDataConcepto> getCfdConceptos() {
+    public String getReceptorNumRegIdTrib() {   // CFDI 3.3
+        // Implement ASAP! (Sergio Flores, 2017-08-10)
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public String getReceptorUsoCFDI() {    // CFDI 3.3
+        return SDataConstantsSys.TRNS_CFD_CAT_CFD_USE_P01;
+    }
+
+    @Override
+    public ArrayList<SCfdDataConcepto> getElementsConcepto() {
         ArrayList<SCfdDataConcepto> concepts = null;
         SCfdDataConcepto conceptoXml = null;
 
@@ -843,7 +867,21 @@ public class SHrsFormerPayrollReceipt implements SCfdXml {
     }
 
     @Override
-    public ArrayList<SCfdDataImpuesto> getCfdImpuestos(float xmlVersion) {
-        return new ArrayList<SCfdDataImpuesto>();
+    public ArrayList<SCfdDataImpuesto> getElementsImpuestos(float xmlVersion) {
+        return null;
+    }
+    
+    @Override
+    public DElement getElementComplemento() throws Exception {
+        DElement complemento = new cfd.ver32.DElementComplemento();
+
+        ((cfd.ver32.DElementComplemento) complemento).getElements().add(createCfdiElementNomina12());
+
+        return complemento;
+    }
+
+    @Override
+    public DElement getElementAddenda() {
+        return null;
     }
 }

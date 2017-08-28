@@ -10,10 +10,12 @@ import cfd.DElement;
 import cfd.ver32.DElementComprobante;
 import cfd.ver32.DElementTimbreFiscalDigital;
 import erp.cfd.SCfdConsts;
+import erp.cfd.SCfdXmlCatalogs;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
+import erp.gui.session.SSessionCustom;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
@@ -31,7 +33,6 @@ import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsUtils;
 import erp.print.SDataConstantsPrint;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -63,10 +64,6 @@ public class SCfdPrint {
 
     public SCfdPrint(erp.client.SClientInterface client) {
         miClient = client;
-    }
-
-    public void printCfd(erp.mtrn.data.SDataCfd cfd, SDataDps dps) throws java.lang.Exception {
-        printCfd(cfd, SDataConstantsPrint.PRINT_MODE_VIEWER, dps);
     }
 
     public void printCfd(erp.mtrn.data.SDataCfd cfd, int pnPrintMode, SDataDps dps) throws java.lang.Exception {
@@ -204,7 +201,7 @@ public class SCfdPrint {
 
         emisor = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB,new int[] { dps.getFkCompanyBranchId(), dps.getFkCompanyBranchId() } , SLibConstants.EXEC_MODE_SILENT);
 
-        if(emisor.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
+        if(emisor.getFkAddressFormatTypeId_n() != SLibConsts.UNDEFINED) {
             nFkEmiAddressFormatTypeId_n = emisor.getFkAddressFormatTypeId_n();
         }
         else {
@@ -261,7 +258,7 @@ public class SCfdPrint {
 
         receptor = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB,new int[] { dps.getFkBizPartnerBranchId(), dps.getFkBizPartnerBranchAddressId() } , SLibConstants.EXEC_MODE_SILENT);
 
-        if(receptor.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
+        if(receptor.getFkAddressFormatTypeId_n() != SLibConsts.UNDEFINED) {
             nFkRecAddressFormatTypeId_n = receptor.getFkAddressFormatTypeId_n();
         }
         else {
@@ -422,9 +419,7 @@ public class SCfdPrint {
         String sTelsEmiDom = "";
         String sTelsEmiExp = "";
         String sPdfFileName = "";
-        BufferedImage biQrCode = null;  // cannot be really used, because is not serializable
         cfd.ver32.DElementComprobante comprobante = null;
-        int nPaymentMethodCode = 0;
 
         if (dps.getFkBizPartnerBranchAddressId() != 1) {
             address = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB_ADD,
@@ -443,7 +438,7 @@ public class SCfdPrint {
         sDocType = SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNU_TP_DPS, new int[] { dps.getFkDpsCategoryId(), dps.getFkDpsClassId(), dps.getFkDpsTypeId() });
         sDocValueText = SLibUtilities.translateValueToText(dTotalCy, miClient.getSessionXXX().getParamsErp().getDecimalsValue(), dps.getFkLanguajeId(), cur.getTextSingular(), cur.getTextPlural(), cur.getTextPrefix(), cur.getTextSuffix());
 
-        if (sDocType.indexOf("CTE.") != -1) {
+        if (sDocType.contains("CTE.")) {
             sDocType = SLibUtilities.textTrim(sDocType.substring(0, sDocType.indexOf("CTE.")));
         }
 
@@ -491,6 +486,7 @@ public class SCfdPrint {
 
         // Comprobante:
 
+        SCfdXmlCatalogs catalogs = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdXmlCatalogs();
         comprobante = DCfdUtils.getCfdi32(cfd.getDocXml());
 
         map.put("sCfdVersion", comprobante.getAttVersion().getString());
@@ -503,13 +499,14 @@ public class SCfdPrint {
         map.put("sCfdCondicionesDePagoOpc", comprobante.getAttCondicionesDePago().getOption());
         map.put("dCfdSubTotal", comprobante.getAttSubTotal().getDouble());
         map.put("dCfdTotal", comprobante.getAttTotal().getDouble());
-        if (comprobante.getAttMetodoDePago().getString().length() != 2) {
-            map.put("sCfdMetodoDePagoOpc", comprobante.getAttMetodoDePago().getString());
+        
+        if (comprobante.getAttMetodoDePago().getString().length() == 2) {
+            map.put("sCfdMetodoDePagoOpc", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY, comprobante.getAttMetodoDePago().getString()));
         }
         else {
-            nPaymentMethodCode = SLibUtils.parseInt(comprobante.getAttMetodoDePago().getString());
-            map.put("sCfdMetodoDePagoOpc", nPaymentMethodCode == 0 ? comprobante.getAttMetodoDePago().getString() : DCfdUtils.composeFormaPago(comprobante.getAttMetodoDePago().getString()));
+            map.put("sCfdMetodoDePagoOpc", comprobante.getAttMetodoDePago().getString());
         }
+        
         map.put("sExpedidoEn", comprobante.getAttLugarExpedicion().getString());
         map.put("sCfdTipoDeComprobante", comprobante.getAttTipoDeComprobante().getOption());
         map.put("sCfdNoCuentaPago", comprobante.getAttNumCtaPago().getString());
@@ -521,7 +518,7 @@ public class SCfdPrint {
 
         emisor = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { dps.getFkCompanyBranchId(), dps.getFkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
 
-        if (emisor.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
+        if (emisor.getFkAddressFormatTypeId_n() != SLibConsts.UNDEFINED) {
             nFkEmiAddressFormatTypeId_n = emisor.getFkAddressFormatTypeId_n();
         }
         else {
@@ -564,7 +561,7 @@ public class SCfdPrint {
 
         receptor = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { dps.getFkBizPartnerBranchId(), dps.getFkBizPartnerBranchAddressId() } , SLibConstants.EXEC_MODE_SILENT);
 
-        if (receptor.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
+        if (receptor.getFkAddressFormatTypeId_n() != SLibConsts.UNDEFINED) {
             nFkRecAddressFormatTypeId_n = receptor.getFkAddressFormatTypeId_n();
         }
         else {
@@ -578,12 +575,10 @@ public class SCfdPrint {
         map.put("sRecDomLocalidadOpc", comprobante.getEltReceptor().getEltDomicilio().getAttLocalidad().getString());
         map.put("sRecDomReferenciaOpc", comprobante.getEltReceptor().getEltDomicilio().getAttReferencia().getString());
         map.put("sRecDomMunicipioOpc", comprobante.getEltReceptor().getEltDomicilio().getAttMunicipio().getString());
-        //map.put("sRecDomEstadoOpc", comprobante.getEltReceptor().getEltDomicilio().getAttEstado().getString());
-        map.put("sRecDomEstadoOpc", "");
+        map.put("sRecDomEstadoOpc", comprobante.getEltReceptor().getEltDomicilio().getAttEstado().getString());
         String recDomPais = comprobante.getEltReceptor().getEltDomicilio().getAttPais().getString();
         map.put("sRecDomPais", recDomPais.length() != 3 ? recDomPais : SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.LOCU_CTY, recDomPais, SLibConstants.DESCRIPTION_NAME_LAN).toUpperCase());
-        //map.put("sRecDomCodigoPostalOpc", comprobante.getEltReceptor().getEltDomicilio().getAttCodigoPostal().getString());
-        map.put("sRecDomCodigoPostalOpc", "");
+        map.put("sRecDomCodigoPostalOpc", comprobante.getEltReceptor().getEltDomicilio().getAttCodigoPostal().getString());
         map.put("nFkRecAddressFormatTypeId_n", nFkRecAddressFormatTypeId_n);
         map.put("sFiscalId", bizPartner.getFiscalFrgId());
 
@@ -622,7 +617,7 @@ public class SCfdPrint {
         /* IMPORTANT (sflores, 2014-01-15):
          * BufferedImage is not serializable, therefore it cannot be send to Server through RMI. QR Code is generated and put into in SSessionServer.requestFillReport().
          *
-         * biQrCode = DCfd.createQrCodeBufferedImage((String) map.get("sEmiRfc"), (String) map.get("sRecRfc"), Double.parseDouble("" + map.get("dCfdTotal")), (String) map.get("sCfdiUuid"));
+         * BufferedImage biQrCode = DCfd.createQrCodeBufferedImage((String) map.get("sEmiRfc"), (String) map.get("sRecRfc"), Double.parseDouble("" + map.get("dCfdTotal")), (String) map.get("sCfdiUuid"));
          * map.put("oCfdiQrCode", biQrCode.getScaledInstance(biQrCode.getWidth(), biQrCode.getHeight(), Image.SCALE_DEFAULT));
          */
 
@@ -684,168 +679,179 @@ public class SCfdPrint {
     }
     
     public void printCfdi33(erp.mtrn.data.SDataCfd cfd, int pnPrintMode, SDataDps dps) throws java.lang.Exception {
-        double dSubtotalProvisionalCy = 0;
-        double dDiscountDocCy = 0;
-        double dSubtotalCy = 0;
-        double dTotalCy = 0;
-        double dTotalPesoBruto = 0;
-        double dTotalPesoNeto = 0;
-        Map<String, Object> map = null;
-        JasperPrint jasperPrint = null;
-        JasperViewer jasperViewer = null;
-        SDataCurrency cur = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { dps.getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
-        SDataBizPartnerBranchAddress address = null;
-        SDataBizPartnerBranchContact contact = null;
-        SDataBizPartnerBranch emisor = null;
-        SDataBizPartnerBranch receptor = null;
-        SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { dps.getFkBizPartnerId_r() }, SLibConstants.EXEC_MODE_SILENT);
-        String sDocType = "";
-        String sDocValueText = "";
-        String sTelsEmiDom = "";
-        String sTelsEmiExp = "";
-        String sPdfFileName = "";
-        String sSelloEmisor = "";
-        cfd.ver33.DElementComprobante comprobante = null;
-        int nPaymentMethodCode = 0;
-
-        if (dps.getFkBizPartnerBranchAddressId() != 1) {
-            address = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB_ADD,
-                    new int[] { dps.getFkBizPartnerBranchId(), dps.getFkBizPartnerBranchAddressId() }, SLibConstants.EXEC_MODE_SILENT);
-        }
-
-        for (SDataDpsEntry entry : dps.getDbmsDpsEntries()) {
-            if (entry.isAccountable()) {
-                dSubtotalProvisionalCy += entry.getSubtotalProvisionalCy_r();
-                dDiscountDocCy += entry.getDiscountDocCy();
-                dSubtotalCy += entry.getSubtotalCy_r();
-                dTotalCy += entry.getTotalCy_r();
-            }
-        }
-
-        sDocType = SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNU_TP_DPS, new int[] { dps.getFkDpsCategoryId(), dps.getFkDpsClassId(), dps.getFkDpsTypeId() });
-        sDocValueText = SLibUtilities.translateValueToText(dTotalCy, miClient.getSessionXXX().getParamsErp().getDecimalsValue(), dps.getFkLanguajeId(), cur.getTextSingular(), cur.getTextPlural(), cur.getTextPrefix(), cur.getTextSuffix());
-
-        if (sDocType.indexOf("CTE.") != -1) {
+        // CFDI's header:
+        
+        SDataCurrency currency = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { dps.getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
+        String sDocTotal = SLibUtilities.translateValueToText(dps.getTotalCy_r(), miClient.getSessionXXX().getParamsErp().getDecimalsValue(), dps.getFkLanguajeId(), currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix());
+        String sDocType = SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNU_TP_DPS, dps.getDpsTypeKey());
+        
+        if (sDocType.contains("CTE.")) {
             sDocType = SLibUtilities.textTrim(sDocType.substring(0, sDocType.indexOf("CTE.")));
         }
 
-        map = miClient.createReportParams();
+        Map<String, Object> paramsMap = miClient.createReportParams();
 
-        map.put("sXmlBaseDir", miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory());
-        map.put("nPkYearId", cfd.getFkDpsYearId_n());
-        map.put("nPkDocId", cfd.getFkDpsDocId_n());
-        map.put("sDocTipo", sDocType);
-        map.put("bDocEsMonedaLocal", miClient.getSessionXXX().getParamsErp().getFkCurrencyId() == dps.getFkCurrencyId());
-        map.put("dDocSubtotalProvisional", dSubtotalProvisionalCy);
-        map.put("dDocDescuento", dDiscountDocCy);
-        map.put("dDocSubtotal", dSubtotalCy);
-        map.put("dDocTotal", dTotalCy);
-        map.put("sDocTotalConLetra", sDocValueText);
-        map.put("sDocCadenaOriginal", cfd.getStringSigned());
-        map.put("bIsAnnulled", dps.getFkDpsStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED);
-        map.put("bIsDeleted", dps.getIsDeleted());
+        paramsMap.put("sXmlBaseDir", miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory());
+        paramsMap.put("nPkYearId", cfd.getFkDpsYearId_n());
+        paramsMap.put("nPkDocId", cfd.getFkDpsDocId_n());
+        paramsMap.put("sDocTipo", sDocType);
+        paramsMap.put("bDocEsMonedaLocal", miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { dps.getFkCurrencyId() }));
+        paramsMap.put("dDocSubtotalProvisional", dps.getSubtotalProvisionalCy_r());
+        paramsMap.put("dDocDescuento", dps.getDiscountDocCy_r());
+        paramsMap.put("dDocSubtotal", dps.getSubtotalCy_r());
+        paramsMap.put("dDocTotal", dps.getTotalCy_r());
+        paramsMap.put("sDocTotalConLetra", sDocTotal);
+        paramsMap.put("sDocCadenaOriginal", cfd.getStringSigned());
+        paramsMap.put("bIsAnnulled", dps.getFkDpsStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED);
+        paramsMap.put("bIsDeleted", dps.getIsDeleted());
+        
+        // CFDI's emisor:
 
-        if (miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().size() > 0) {
-            contact = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0);
+        SDataBizPartner emisor = miClient.getSessionXXX().getCompany().getDbmsDataCompany();
+        SDataBizPartnerBranch emisorBranch = emisor.getDbmsHqBranch();
+        SDataBizPartnerBranchAddress emisorBranchAddress = emisorBranch.getDbmsBizPartnerBranchAddressOfficial();
+        SDataBizPartnerBranch emisorBranchIssue = dps.getFkCompanyBranchId() == emisorBranch.getPkBizPartnerBranchId() ? null : emisor.getDbmsBizPartnerBranch(new int[] { dps.getFkCompanyBranchId() });
+        SDataBizPartnerBranchAddress emisorBranchAddressIssue = dps.getFkCompanyBranchId() == emisorBranch.getPkBizPartnerBranchId() ? null : emisorBranchIssue.getDbmsBizPartnerBranchAddressOfficial();
+        
+        paramsMap.put("sEmiDomCalle", emisorBranchAddress.getStreet());
+        paramsMap.put("sEmiDomNoExteriorOpc", emisorBranchAddress.getStreetNumberExt());
+        paramsMap.put("sEmiDomNoInteriorOpc", emisorBranchAddress.getStreetNumberInt());
+        paramsMap.put("sEmiDomColoniaOpc", emisorBranchAddress.getNeighborhood().toUpperCase());
+        paramsMap.put("sEmiDomLocalidadOpc", emisorBranchAddress.getLocality().toUpperCase());
+        paramsMap.put("sEmiDomReferenciaOpc", emisorBranchAddress.getReference());
+        paramsMap.put("sEmiDomMunicipio", emisorBranchAddress.getCounty().toUpperCase());
+        paramsMap.put("sEmiDomEstado", emisorBranchAddress.getState().toUpperCase());
+        paramsMap.put("sEmiDomPais", emisorBranchAddress.getDbmsDataCountry().getCountry().toUpperCase());
+        paramsMap.put("sEmiDomCodigoPostal", emisorBranchAddress.getZipCode());
+        paramsMap.put("nFkEmiAddressFormatTypeId_n", emisorBranch.getFkAddressFormatTypeId_n() != SLibConsts.UNDEFINED ? emisorBranch.getFkAddressFormatTypeId_n() : miClient.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n());
+        
+        String sTelsEmiDom = "";
+        
+        if (emisorBranch.getDbmsBizPartnerBranchContacts().size() > 0) {
+            SDataBizPartnerBranchContact contact = emisorBranch.getDbmsBizPartnerBranchContacts().get(0);
             sTelsEmiDom += (sTelsEmiDom.length() == 0 || contact.getAuxTelephone01().length() == 0 ? "" : ", ") + contact.getAuxTelephone01();
             sTelsEmiDom += (sTelsEmiDom.length() == 0 || contact.getAuxTelephone02().length() == 0 ? "" : ", ") + contact.getAuxTelephone02();
             sTelsEmiDom += (sTelsEmiDom.length() == 0 || contact.getAuxTelephone03().length() == 0 ? "" : ", ") + contact.getAuxTelephone03();
             sTelsEmiDom += (sTelsEmiDom.length() == 0 || contact.getEmail01().length() == 0 ? "" : ", ") + contact.getEmail01();
         }
+        
+        paramsMap.put("sTelEmiDom", sTelsEmiDom);
+        paramsMap.put("sWeb", emisor.getWeb());
 
-        map.put("sTelEmiDom", sTelsEmiDom);
-        map.put("sWeb", miClient.getSessionXXX().getCompany().getDbmsDataCompany().getWeb() == null ? "" : miClient.getSessionXXX().getCompany().getDbmsDataCompany().getWeb());
+        if (emisorBranchIssue != null) {
+            paramsMap.put("sEmiExpCalleOpc", emisorBranchAddressIssue.getStreet());
+            paramsMap.put("sEmiExpNoExteriorOpc", emisorBranchAddressIssue.getStreetNumberExt());
+            paramsMap.put("sEmiExpNoInteriorOpc", emisorBranchAddressIssue.getStreetNumberInt());
+            paramsMap.put("sEmiExpColoniaOpc", emisorBranchAddressIssue.getNeighborhood().toUpperCase());
+            paramsMap.put("sEmiExpLocalidadOpc", emisorBranchAddressIssue.getLocality().toUpperCase());
+            paramsMap.put("sEmiExpReferenciaOpc", emisorBranchAddressIssue.getReference());
+            paramsMap.put("sEmiExpMunicipioOpc", emisorBranchAddressIssue.getCounty().toUpperCase());
+            paramsMap.put("sEmiExpEstadoOpc", emisorBranchAddressIssue.getState().toUpperCase());
+            paramsMap.put("sEmiExpPais", emisorBranchAddressIssue.getDbmsDataCountry().getCountry().toUpperCase());
+            paramsMap.put("sEmiExpCodigoPostalOpc", emisorBranchAddressIssue.getZipCode());
+            
+            String sTelsEmiExp = "";
 
-        if (miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranch(new int[]{dps.getFkCompanyBranchId()}).getDbmsBizPartnerBranchContacts().size() > 0) {
-            contact = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranch(new int[]{dps.getFkCompanyBranchId()}).getDbmsBizPartnerBranchContacts().get(0);
-            sTelsEmiExp += (sTelsEmiExp.length() == 0 || contact.getAuxTelephone01().length() == 0 ? "" : ", ") + contact.getAuxTelephone01();
-            sTelsEmiExp += (sTelsEmiExp.length() == 0 || contact.getAuxTelephone02().length() == 0 ? "" : ", ") + contact.getAuxTelephone02();
-            sTelsEmiExp += (sTelsEmiExp.length() == 0 || contact.getAuxTelephone03().length() == 0 ? "" : ", ") + contact.getAuxTelephone03();
-            sTelsEmiExp += (sTelsEmiExp.length() == 0 || contact.getEmail01().length() == 0 ? "" : ", ") + contact.getEmail01();
+            if (emisorBranchIssue.getDbmsBizPartnerBranchContacts().size() > 0) {
+                SDataBizPartnerBranchContact contact = emisorBranchIssue.getDbmsBizPartnerBranchContacts().get(0);
+                sTelsEmiExp += (sTelsEmiExp.length() == 0 || contact.getAuxTelephone01().length() == 0 ? "" : ", ") + contact.getAuxTelephone01();
+                sTelsEmiExp += (sTelsEmiExp.length() == 0 || contact.getAuxTelephone02().length() == 0 ? "" : ", ") + contact.getAuxTelephone02();
+                sTelsEmiExp += (sTelsEmiExp.length() == 0 || contact.getAuxTelephone03().length() == 0 ? "" : ", ") + contact.getAuxTelephone03();
+                sTelsEmiExp += (sTelsEmiExp.length() == 0 || contact.getEmail01().length() == 0 ? "" : ", ") + contact.getEmail01();
+            }
+
+            paramsMap.put("sTelEmiExp", sTelsEmiExp);
         }
 
-        map.put("sTelEmiExp", sTelsEmiExp);
+        SDataBizPartnerBranchContact contact = emisorBranch.getDbmsBizPartnerBranchContacts().size() <= 1 ? null : emisorBranch.getDbmsBizPartnerBranchContacts().get(1);
 
-        contact = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().size() <= 1 ? null :
-                miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(1);
+        paramsMap.put("sManagerFinance", contact == null ? "" : SLibUtilities.textTrim(contact.getContactPrefix() + " " + contact.getFirstname() + " " + contact.getLastname()));
+        
+        // CFDI's receptor:
 
-        map.put("sManagerFinance", contact == null ? "" : SLibUtilities.textTrim(contact.getContactPrefix() + " " + contact.getFirstname() + " " + contact.getLastname()));
-
+        SDataBizPartner receptor = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { dps.getFkBizPartnerId_r() }, SLibConstants.EXEC_MODE_SILENT);
+        SDataBizPartnerBranch receptorBranch = receptor.getDbmsBizPartnerBranch(new int[] { dps.getFkBizPartnerBranchId() });
+        SDataBizPartnerBranchAddress receptorBranchAddress = receptorBranch.getDbmsBizPartnerBranchAddressOfficial();
+        SDataBizPartnerBranchAddress receptorBranchAddressDelivery = dps.getFkBizPartnerBranchAddressId() == 1 ? null : receptorBranch.getDbmsBizPartnerBranchAddress(new int[] { dps.getFkBizPartnerBranchId(), dps.getFkBizPartnerBranchAddressId() });
+        boolean isLocalLan = dps.getFkLanguajeId() == miClient.getSessionXXX().getParamsErp().getFkLanguageId();
+        
+        paramsMap.put("sRecDomCalleOpc", receptorBranchAddress.getStreet());
+        paramsMap.put("sRecDomNoExteriorOpc", receptorBranchAddress.getStreetNumberExt());
+        paramsMap.put("sRecDomNoInteriorOpc", receptorBranchAddress.getStreetNumberInt());
+        paramsMap.put("sRecDomColoniaOpc", receptorBranchAddress.getNeighborhood());
+        paramsMap.put("sRecDomLocalidadOpc", receptorBranchAddress.getLocality());
+        paramsMap.put("sRecDomReferenciaOpc", receptorBranchAddress.getReference());
+        paramsMap.put("sRecDomMunicipioOpc", receptorBranchAddress.getCounty());
+        paramsMap.put("sRecDomEstadoOpc", receptorBranchAddress.getState().toUpperCase());
+        paramsMap.put("sRecDomPais", (isLocalLan ? receptorBranchAddress.getDbmsDataCountry().getCountry() : receptorBranchAddress.getDbmsDataCountry().getCountryLan()).toUpperCase());
+        paramsMap.put("sRecDomCodigoPostalOpc", receptorBranchAddress.getZipCode());
+        paramsMap.put("nFkRecAddressFormatTypeId_n", receptorBranch.getFkAddressFormatTypeId_n() != SLibConsts.UNDEFINED ? receptorBranch.getFkAddressFormatTypeId_n() : miClient.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n());
+        
+        if (receptorBranchAddressDelivery != null) {
+            paramsMap.put("sRecEnt", receptorBranchAddressDelivery.getAddress());
+            paramsMap.put("sRecEntCalleOpc", receptorBranchAddressDelivery.getStreet());
+            paramsMap.put("sRecEntNoExteriorOpc", receptorBranchAddressDelivery.getStreetNumberExt());
+            paramsMap.put("sRecEntNoInteriorOpc", receptorBranchAddressDelivery.getStreetNumberInt());
+            paramsMap.put("sRecEntColoniaOpc", receptorBranchAddressDelivery.getNeighborhood());
+            paramsMap.put("sRecEntLocalidadOpc", receptorBranchAddressDelivery.getLocality());
+            paramsMap.put("sRecEntReferenciaOpc", receptorBranchAddressDelivery.getReference());
+            paramsMap.put("sRecEntMunicipioOpc", receptorBranchAddressDelivery.getCounty());
+            paramsMap.put("sRecEntEstadoOpc", receptorBranchAddressDelivery.getState().toUpperCase());
+            paramsMap.put("sRecEntPais", (isLocalLan ? receptorBranchAddressDelivery.getDbmsDataCountry().getCountry() : receptorBranchAddressDelivery.getDbmsDataCountry().getCountryLan()).toUpperCase());
+            paramsMap.put("sRecEntCodigoPostalOpc", receptorBranchAddressDelivery.getZipCode());
+        }
+        
         // Comprobante:
 
-        comprobante = DCfdUtils.getCfdi33(cfd.getDocXml());
+        SCfdXmlCatalogs catalogs = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdXmlCatalogs();
+        cfd.ver33.DElementComprobante comprobante = DCfdUtils.getCfdi33(cfd.getDocXml());
 
-        map.put("sCfdVersion", comprobante.getAttVersion().getString());
-        map.put("sCfdSerieOpc", comprobante.getAttSerie().getString());
-        map.put("sCfdFolio", comprobante.getAttFolio().getString());
-        map.put("sCfdFecha", SLibUtils.DbmsDateFormatDatetime.format(comprobante.getAttFecha().getDatetime()));
-        map.put("sCfdSello", comprobante.getAttSello().getString());
-        if (comprobante.getAttFormaPago().getString().length() != 2) {
-            map.put("sCfdFormaDePago", comprobante.getAttFormaPago().getString());
-        }
-        else {
-            nPaymentMethodCode = SLibUtils.parseInt(comprobante.getAttFormaPago().getString());
-            map.put("sCfdFormaDePago", nPaymentMethodCode == 0 ? comprobante.getAttFormaPago().getString() : DCfdUtils.composeFormaPago(comprobante.getAttFormaPago().getString()));
-        }
-        map.put("sCfdNoCertificado", comprobante.getAttNoCertificado().getString());
-        map.put("sCfdCondicionesDePagoOpc", comprobante.getAttCondicionesDePago().getOption());
-        map.put("dCfdSubTotal", comprobante.getAttSubTotal().getDouble());
-        map.put("dCfdTotal", comprobante.getAttTotal().getDouble());
-        map.put("sCfdMetodoDePagoOpc", comprobante.getAttMetodoPago().getOption());
-        map.put("sExpedidoEn", comprobante.getAttLugarExpedicion().getString());
-        map.put("sCfdTipoDeComprobante", comprobante.getAttTipoDeComprobante().getOption());
-        //map.put("sCfdNoCuentaPago", comprobante.getAttNumCtaPago().getString());
+        paramsMap.put("sCfdVersion", "" + comprobante.getVersion());
+        paramsMap.put("sCfdSerieOpc", comprobante.getAttSerie().getString());
+        paramsMap.put("sCfdFolio", comprobante.getAttFolio().getString());
+        paramsMap.put("sCfdFecha", SLibUtils.DbmsDateFormatDatetime.format(comprobante.getAttFecha().getDatetime()));
+        paramsMap.put("sCfdSello", comprobante.getAttSello().getString());
+        paramsMap.put("sCfdFormaDePago", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY, comprobante.getAttFormaPago().getString()));
+        paramsMap.put("sCfdNoCertificado", comprobante.getAttNoCertificado().getString());
+        paramsMap.put("sCfdCondicionesDePagoOpc", comprobante.getAttCondicionesDePago().getString());
+        paramsMap.put("dCfdSubTotal", comprobante.getAttSubTotal().getDouble());
+        paramsMap.put("dCfdTotal", comprobante.getAttTotal().getDouble());
+        paramsMap.put("sCfdMetodoDePagoOpc", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_PAY_MET, comprobante.getAttMetodoPago().getString()));
+        paramsMap.put("sExpedidoEn", comprobante.getAttLugarExpedicion().getString());
+        paramsMap.put("sCfdTipoDeComprobante", comprobante.getAttTipoDeComprobante().getString());
 
         // Emisor:
 
-        map.put("sEmiRfc", comprobante.getEltEmisor().getAttRfc().getString());
-        map.put("sEmiNombre", comprobante.getEltEmisor().getAttNombre().getString());
-
-        emisor = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { dps.getFkCompanyBranchId(), dps.getFkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
-        
-        map.put("sEmiRegimenFiscal", comprobante.getEltEmisor().getAttRegimenFiscal().getString());
+        paramsMap.put("sEmiRfc", comprobante.getEltEmisor().getAttRfc().getString());
+        paramsMap.put("sEmiNombre", comprobante.getEltEmisor().getAttNombre().getString());
+        paramsMap.put("sEmiRegimenFiscal", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, comprobante.getEltEmisor().getAttRegimenFiscal().getString()));
 
         // Receptor:
 
-        map.put("sRecRfc", comprobante.getEltReceptor().getAttRfc().getString());
-        map.put("sRecNombreOpc", comprobante.getEltReceptor().getAttNombre().getString());
-
-        receptor = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB,new int[] { dps.getFkBizPartnerBranchId(), dps.getFkBizPartnerBranchAddressId() } , SLibConstants.EXEC_MODE_SILENT);
-
-        if (address != null) {
-            map.put("sRecEnt", address.getAddress());
-            map.put("sRecEntCalleOpc", address.getStreet());
-            map.put("sRecEntNoExteriorOpc", address.getStreetNumberExt());
-            map.put("sRecEntNoInteriorOpc", address.getStreetNumberInt());
-            map.put("sRecEntColoniaOpc", address.getNeighborhood());
-            map.put("sRecEntLocalidadOpc", address.getLocality());
-            map.put("sRecEntReferenciaOpc", address.getReference());
-            map.put("sRecEntMunicipioOpc", address.getCounty());
-            map.put("sRecEntEstadoOpc", address.getState());
-            map.put("sRecEntPais", address.getDbmsDataCountry().getCountry());
-            map.put("sRecEntCodigoPostalOpc", address.getZipCode());
-        }
+        paramsMap.put("sRecRfc", comprobante.getEltReceptor().getAttRfc().getString());
+        paramsMap.put("sRecNombreOpc", comprobante.getEltReceptor().getAttNombre().getString());
+        paramsMap.put("sFiscalId", comprobante.getEltReceptor().getAttNumRegIdTrib().getString());
+        paramsMap.put("sCfdUsoCFDI", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, comprobante.getEltReceptor().getAttUsoCFDI().getString()));
 
         // Stamp:
 
+        String sSelloEmisor = "";
+        
         if (comprobante.getEltOpcComplemento() != null) {
             for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
                 if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
-                    map.put("sCfdiVersion", ((DElementTimbreFiscalDigital) element).getAttVersion().getString());
-                    map.put("sCfdiUuid", ((DElementTimbreFiscalDigital) element).getAttUuid().getString());
-                    map.put("sCfdiSelloCFD", sSelloEmisor = ((DElementTimbreFiscalDigital) element).getAttSelloCfd().getString());
-                    map.put("sCfdiSelloSAT", ((DElementTimbreFiscalDigital) element).getAttSelloSAT().getString());
-                    map.put("sCfdiNoCertificadoSAT", ((DElementTimbreFiscalDigital) element).getAttNoCertificadoSAT().getString());
-                    map.put("sCfdiFechaTimbre", ((DElementTimbreFiscalDigital) element).getAttFechaTimbrado().getString());
+                    paramsMap.put("sCfdiVersion", ((DElementTimbreFiscalDigital) element).getAttVersion().getString());
+                    paramsMap.put("sCfdiUuid", ((DElementTimbreFiscalDigital) element).getAttUuid().getString());
+                    paramsMap.put("sCfdiSelloCFD", sSelloEmisor = ((DElementTimbreFiscalDigital) element).getAttSelloCfd().getString());
+                    paramsMap.put("sCfdiSelloSAT", ((DElementTimbreFiscalDigital) element).getAttSelloSAT().getString());
+                    paramsMap.put("sCfdiNoCertificadoSAT", ((DElementTimbreFiscalDigital) element).getAttNoCertificadoSAT().getString());
+                    paramsMap.put("sCfdiFechaTimbre", ((DElementTimbreFiscalDigital) element).getAttFechaTimbrado().getString());
                 }
             }
         }
 
-        map.put("sUrlCfdi", "https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx\n "
-                + "https://prodretencionverificacion.clouda.sat.gob.mx/");
-        if (!sSelloEmisor.isEmpty()) { 
-            map.put("sSelloCfdiUltDig", sSelloEmisor.substring(sSelloEmisor.length()- 8, sSelloEmisor.length()));
-        }
+        paramsMap.put("sUrlCfdi", "https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx");
+        paramsMap.put("sSelloCfdiUltDig", sSelloEmisor.isEmpty() ? SLibUtils.textRepeat("0", 8) : sSelloEmisor.substring(sSelloEmisor.length() - 8, sSelloEmisor.length()));
         
         // QR Code:
 
@@ -858,6 +864,9 @@ public class SCfdPrint {
 
         // Addenda:
 
+        double dTotalPesoBruto = 0;
+        double dTotalPesoNeto = 0;
+        
         for (SDataDpsEntry entry : dps.getDbmsDpsEntries()) {
             if (entry.isAccountable()) {
                 dTotalPesoBruto += entry.getWeightGross();
@@ -865,40 +874,40 @@ public class SCfdPrint {
             }
         }
 
-        map.put("sAddClaveMoneda", dps.getDbmsCurrencyKey());
-        map.put("dAddTipoDeCambio", dps.getExchangeRate());
-        map.put("nAddDiasDeCredito", dps.getDaysOfCredit());
-        map.put("sAddEmbarque", "");
-        map.put("sAddOrdenDeEmbarque", "");
-        map.put("sAddOrdenDeCompra", dps.getNumberReference());
-        map.put("sAddContrato", dps.getAuxCfdParams().getContrato());
-        map.put("sAddPedido", dps.getAuxCfdParams().getPedido());
-        map.put("sAddFactura", dps.getAuxCfdParams().getFactura());
-        map.put("sAddCliente", dps.getAuxCfdParams().getReceptor().getDbmsCategorySettingsCus().getKey());
-        map.put("sAddSucursal", dps.getFkCompanyBranchId());
-        map.put("sAddAgente",  dps.getFkSalesAgentId_n());
-        map.put("sAddRuta", dps.getAuxCfdParams().getRuta());
-        map.put("sAddChofer", dps.getDriver());
-        map.put("sAddPlacas", dps.getPlate());
-        map.put("sAddBoleto", dps.getTicket());
-        map.put("dAddPesoBruto", dTotalPesoBruto);
-        map.put("dAddPesoNeto", dTotalPesoNeto);
-        map.put("sAddUnidadPesoBruto", dps.getAuxCfdParams().getUnidadPesoBruto());
-        map.put("sAddUnidadPesoNeto", dps.getAuxCfdParams().getUnidadPesoBruto());
+        paramsMap.put("sAddClaveMoneda", dps.getDbmsCurrencyKey());
+        paramsMap.put("dAddTipoDeCambio", dps.getExchangeRate());
+        paramsMap.put("nAddDiasDeCredito", dps.getDaysOfCredit());
+        paramsMap.put("sAddEmbarque", "");
+        paramsMap.put("sAddOrdenDeEmbarque", "");
+        paramsMap.put("sAddOrdenDeCompra", dps.getNumberReference());
+        paramsMap.put("sAddContrato", dps.getAuxCfdParams().getContrato());
+        paramsMap.put("sAddPedido", dps.getAuxCfdParams().getPedido());
+        paramsMap.put("sAddFactura", dps.getAuxCfdParams().getFactura());
+        paramsMap.put("sAddCliente", dps.getAuxCfdParams().getReceptor().getDbmsCategorySettingsCus().getKey());
+        paramsMap.put("sAddSucursal", dps.getFkCompanyBranchId());
+        paramsMap.put("sAddAgente",  dps.getFkSalesAgentId_n());
+        paramsMap.put("sAddRuta", dps.getAuxCfdParams().getRuta());
+        paramsMap.put("sAddChofer", dps.getDriver());
+        paramsMap.put("sAddPlacas", dps.getPlate());
+        paramsMap.put("sAddBoleto", dps.getTicket());
+        paramsMap.put("dAddPesoBruto", dTotalPesoBruto);
+        paramsMap.put("dAddPesoNeto", dTotalPesoNeto);
+        paramsMap.put("sAddUnidadPesoBruto", dps.getAuxCfdParams().getUnidadPesoBruto());
+        paramsMap.put("sAddUnidadPesoNeto", dps.getAuxCfdParams().getUnidadPesoBruto());
 
-        map.put("sAddPagFecha", miClient.getSessionXXX().getFormatters().getDateTextFormat().format(dps.getDate()).toUpperCase());
-        map.put("sAddPagFechaDeVencimiento", miClient.getSessionXXX().getFormatters().getDateTextFormat().format(SLibTimeUtilities.addDate(dps.getDateStartCredit(), 0, 0, dps.getDaysOfCredit())).toUpperCase());
-        map.put("dAddPagImporte", dps.getTotalCy_r());
-        map.put("sAddPagClaveMoneda", dps.getDbmsCurrencyKey());
-        map.put("dAddPagInteresMoratorio", dps.getAuxCfdParams().getInterestDelayRate());
+        paramsMap.put("sAddPagFecha", miClient.getSessionXXX().getFormatters().getDateTextFormat().format(dps.getDate()).toUpperCase());
+        paramsMap.put("sAddPagFechaDeVencimiento", miClient.getSessionXXX().getFormatters().getDateTextFormat().format(SLibTimeUtilities.addDate(dps.getDateStartCredit(), 0, 0, dps.getDaysOfCredit())).toUpperCase());
+        paramsMap.put("dAddPagImporte", dps.getTotalCy_r());
+        paramsMap.put("sAddPagClaveMoneda", dps.getDbmsCurrencyKey());
+        paramsMap.put("dAddPagInteresMoratorio", dps.getAuxCfdParams().getInterestDelayRate());
 
-        jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_CFDI, map);
-        sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
+        JasperPrint jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_CFDI, paramsMap);
+        String sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
         sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
 
         switch (pnPrintMode) {
             case SDataConstantsPrint.PRINT_MODE_VIEWER:
-                jasperViewer = new JasperViewer(jasperPrint, false);
+                JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
                 jasperViewer.setTitle("Comprobante Fiscal Digital por Internet");
                 jasperViewer.setVisible(true);
                 break;
@@ -925,10 +934,10 @@ public class SCfdPrint {
         String sPdfFileName = "";
 
         switch (cfd.getFkCfdTypeId()) {
-            case SCfdConsts.CFD_TYPE_DPS:
+            case SDataConstantsSys.TRNS_TP_CFD_INV:
                 dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
                 break;
-            case SCfdConsts.CFD_TYPE_PAYROLL:
+            case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
                 switch (subtypeCfd) {
                     case SCfdConsts.CFDI_PAYROLL_VER_OLD:
                         payrollEmp = (SDataFormerPayrollEmp) SDataUtilities.readRegistry(miClient, SDataConstants.HRS_SIE_PAY_EMP, new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, SLibConstants.EXEC_MODE_SILENT);
@@ -1083,6 +1092,7 @@ public class SCfdPrint {
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
 
+        SCfdXmlCatalogs catalogs = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdXmlCatalogs();
         comprobante = DCfdUtils.getCfdi32(cfd.getDocXml());
         
         map.put("sSql", sSql);
@@ -1093,7 +1103,7 @@ public class SCfdPrint {
         map.put("dCfdSubtotal", comprobante.getAttSubTotal().getDouble());
         map.put("dCfdDescuento", comprobante.getAttDescuento().getDouble());
         map.put("dCfdTotal", comprobante.getAttTotal().getDouble());
-        map.put("sCfdMetodoDePagoOpc", DCfdUtils.composeFormaPago(comprobante.getAttMetodoDePago().getString()));
+        map.put("sCfdMetodoDePagoOpc", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY, comprobante.getAttMetodoDePago().getString()));
         map.put("sExpedidoEn", comprobante.getAttLugarExpedicion().getString());
         map.put("sCfdTipoComprobante", comprobante.getAttTipoDeComprobante().getOption());
         map.put("sCfdNoCuentaPago", comprobante.getAttNumCtaPago().getString());
@@ -1398,6 +1408,7 @@ public class SCfdPrint {
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
 
+        SCfdXmlCatalogs catalogs = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdXmlCatalogs();
         comprobante = DCfdUtils.getCfdi32(cfd.getDocXml());
         
         map.put("sSql", sSql);
@@ -1408,7 +1419,7 @@ public class SCfdPrint {
         map.put("dCfdSubtotal", comprobante.getAttSubTotal().getDouble());
         map.put("dCfdDescuento", comprobante.getAttDescuento().getDouble());
         map.put("dCfdTotal", comprobante.getAttTotal().getDouble());
-        map.put("sCfdMetodoDePagoOpc", DCfdUtils.composeFormaPago(comprobante.getAttMetodoDePago().getString()));
+        map.put("sCfdMetodoDePagoOpc", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY, comprobante.getAttMetodoDePago().getString()));
         map.put("sExpedidoEn", comprobante.getAttLugarExpedicion().getString());
         map.put("sCfdTipoComprobante", comprobante.getAttTipoDeComprobante().getOption());
         map.put("sCfdNoCuentaPago", comprobante.getAttNumCtaPago().getString());

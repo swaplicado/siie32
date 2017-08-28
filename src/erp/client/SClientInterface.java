@@ -21,19 +21,21 @@ public interface SClientInterface {
 
     /**
      * @param iconType Constants defined in erp.lib.SLibConstants
+     * @return 
      */
     public javax.swing.ImageIcon getImageIcon(int iconType);
 
     /**
      * @param moduleType Constant defined in erp.data.SDataConstants.
+     * @return 
      */
     public erp.lib.gui.SGuiModule getGuiModule(int moduleType);
     public erp.lib.gui.SGuiDatePicker getGuiDatePickerXXX();
     public erp.lib.gui.SGuiDatePicker getGuiDatePeriodPickerXXX();
     public erp.lib.gui.SGuiDateRangePicker getGuiDateRangePickerXXX();
     public erp.lib.form.SFormOptionPickerInterface getOptionPicker(int optionType);
-    public cfd.DCfdSignature getCfdSignature();
-    public cfd.DCfdSignature getCfdSignature(java.util.Date cfdDate);
+    public cfd.DCfdSignature getCfdSignature(float cfdVersion);
+//    public cfd.DCfdSignature getCfdSignature(java.util.Date cfdDate);
     public javax.swing.JFileChooser getFileChooser();
     public int pickOption(int optionType, erp.lib.form.SFormFieldInterface field, java.lang.Object filterKey);
     public int pickOption(int optionType, erp.form.SFormFieldAccount field, java.lang.Object filterKey);

@@ -106,7 +106,7 @@ import sa.lib.xml.SXmlUtils;
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 102.01";
+    public static final String APP_RELEASE = "3.2 104.01";
     public static final String APP_COPYRIGHT = "2007-2017";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
@@ -125,8 +125,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     private erp.lib.gui.SGuiDatePicker moGuiDatePicker;
     private erp.lib.gui.SGuiDatePicker moGuiDatePeriodPicker;
     private erp.lib.gui.SGuiDateRangePicker moGuiDateRangePicker;
-    private DCfdSignature moCfdSignature;
-    private Vector<DCfdSignature> mvCfdSignatures;
+    private HashMap<Float, DCfdSignature> mhmCfdSignatures;
     private JFileChooser moFileChooser;
     private SGuiGlobalCataloguesUsr moGlobalCataloguesUsr;
     private SGuiGlobalCataloguesLoc moGlobalCataloguesLoc;
@@ -834,48 +833,21 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     }
 
     private void destroyCfdSignatures() {
-        moCfdSignature = null;
-        mvCfdSignatures = new Vector<>();
+        mhmCfdSignatures = null;
     }
 
     private void createCfdSignatures() {
-        int nXmlType = 0;
-        float cfdiVersion = 0;
-        DCfdSignature cfdSignature = null;
-        SDataCertificate companyCertificate = null;
-
-        moCfdSignature = null;
-        mvCfdSignatures = new Vector<>();
+        mhmCfdSignatures = new HashMap<>();
 
         try {
-            companyCertificate = moSessionXXX.getParamsCompany().getDbmsDataCertificate_n();
-            
-            nXmlType = this.getSessionXXX().getParamsCompany().getFkXmlTypeId();
-            
-            switch (nXmlType) {
-                case SDataConstantsSys.TRNS_TP_XML_CFD:
-                case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
-                    cfdiVersion = DCfdConsts.CFDI_VER_32;
-                    break;
-                case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
-                    cfdiVersion = DCfdConsts.CFDI_VER_33;
-                    break;
-                default:
-                    throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
-            }
-
-            if (companyCertificate != null && companyCertificate.getExtraPrivateKeyBytes_n() != null && companyCertificate.getExtraPublicKeyBytes_n() != null) {
-                moCfdSignature = new DCfdSignature(companyCertificate.getExtraPrivateKeyBytes_n(), companyCertificate.getExtraPublicKeyBytes_n(), companyCertificate.getNumber(), cfdiVersion);
-                moCfdSignature.setDate(companyCertificate.getDate());
-                moCfdSignature.setExpirationDate(companyCertificate.getExpirationDate());
-
-                for (SDataCertificate certificate : moSessionXXX.getDbmsCertificates()) {
-                    if (certificate != null && certificate.getExtraPrivateKeyBytes_n() != null && certificate.getExtraPublicKeyBytes_n() != null) {
-                        cfdSignature = new DCfdSignature(certificate.getExtraPrivateKeyBytes_n(), certificate.getExtraPublicKeyBytes_n(), certificate.getNumber(), cfdiVersion);
-                        cfdSignature.setDate(certificate.getDate());
-                        cfdSignature.setExpirationDate(certificate.getExpirationDate());
-                        mvCfdSignatures.add(cfdSignature);
-                    }
+            SDataCertificate certificate = moSessionXXX.getParamsCompany().getDbmsDataCertificate_n();
+            if (certificate != null && certificate.getExtraPrivateKeyBytes_n() != null && certificate.getExtraPublicKeyBytes_n() != null) {
+                float[] cfdVersions = new float[] { DCfdConsts.CFDI_VER_32, DCfdConsts.CFDI_VER_33 };
+                for (float cfdVersion : cfdVersions) {
+                    DCfdSignature signature = new DCfdSignature(certificate.getExtraPrivateKeyBytes_n(), certificate.getExtraPublicKeyBytes_n(), certificate.getNumber(), cfdVersion);
+                    signature.setDate(certificate.getDate());
+                    signature.setExpirationDate(certificate.getExpirationDate());
+                    mhmCfdSignatures.put(cfdVersion, signature);
                 }
             }
         }
@@ -1699,22 +1671,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     }
 
     @Override
-    public cfd.DCfdSignature getCfdSignature() {
-        return moCfdSignature;
-    }
-
-    @Override
-    public cfd.DCfdSignature getCfdSignature(java.util.Date cfdDate) {
-        DCfdSignature properSignature = null;
-
-        for (DCfdSignature signature : mvCfdSignatures) {
-            if (signature.getDate().getTime() <= cfdDate.getTime() && signature.getExpirationDate().getTime() >= cfdDate.getTime()) {
-                properSignature = signature;
-                break;
-            }
-        }
-
-        return properSignature;
+    public cfd.DCfdSignature getCfdSignature(float cfdVersion) {
+        return mhmCfdSignatures.get(cfdVersion);
     }
 
     @Override

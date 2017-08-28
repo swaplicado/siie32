@@ -134,6 +134,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected java.lang.String msDbmsUnidadClave;
     protected java.lang.String msDbmsTariffFraction;
     protected java.lang.String msDbmsCustomsUnit;
+    protected java.lang.String msDbmsCustomsUnitSymbol;
     protected int mnDbmsDpsAddBachocoNumberPosition;
     protected java.lang.String msDbmsDpsAddBachocoCenter;
     protected int mnDbmsDpsAddLorealEntryNumber;
@@ -390,6 +391,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setDbmsUnidadClave(java.lang.String s) { msDbmsUnidadClave = s; }
     public void setDbmsTariffFraction(java.lang.String s) { msDbmsTariffFraction = s; }
     public void setDbmsCustomsUnit(java.lang.String s) { msDbmsCustomsUnit = s; }
+    public void setDbmsCustomsUnitSymbol(java.lang.String s) { msDbmsCustomsUnitSymbol = s; }
     public void setDbmsDpsAddBachocoNumberPosition(int n) { mnDbmsDpsAddBachocoNumberPosition = n; }
     public void setDbmsDpsAddBachocoCenter(java.lang.String s) { msDbmsDpsAddBachocoCenter = s; }
     public void setDbmsDpsAddLorealEntryNumber(int n) { mnDbmsDpsAddLorealEntryNumber = n; }
@@ -418,6 +420,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public java.lang.String getDbmsUnidadClave() { return msDbmsUnidadClave; }
     public java.lang.String getDbmsTariffFraction() { return msDbmsTariffFraction; }
     public java.lang.String getDbmsCustomsUnit() { return msDbmsCustomsUnit; }
+    public java.lang.String getDbmsCustomsUnitSymbol() { return msDbmsCustomsUnitSymbol; }
     public int getDbmsDpsAddBachocoNumberPosition() { return mnDbmsDpsAddBachocoNumberPosition; }
     public java.lang.String getDbmsDpsAddBachocoCenter() { return msDbmsDpsAddBachocoCenter; }
     public int getDbmsDpsAddLorealEntryNumber() { return mnDbmsDpsAddLorealEntryNumber; }
@@ -583,6 +586,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         msDbmsUnidadClave = "";
         msDbmsTariffFraction = "";
         msDbmsCustomsUnit = "";
+        msDbmsCustomsUnitSymbol = "";
         mnDbmsDpsAddBachocoNumberPosition = 0;
         msDbmsDpsAddBachocoCenter = "";
         mnDbmsDpsAddLorealEntryNumber = 0;
@@ -627,7 +631,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         reset();
 
         try {
-            sql = "SELECT de.*, i.item, i.fid_cfd_prod_serv_n, i.tariff, i.fid_igen, igen.b_ship_dom, igen.b_ship_int, igen.b_ship_qlt, igen.fid_cfd_prod_serv, u.symbol, u.symbol_custs, ou.symbol, cu.code, " +
+            sql = "SELECT de.*, i.item, i.fid_cfd_prod_serv_n, i.tariff, i.fid_igen, igen.b_ship_dom, igen.b_ship_int, igen.b_ship_qlt, igen.fid_cfd_prod_serv, u.symbol, ou.symbol, ou.symbol_custs, ou.unit_custs, cu.code, " +
                     "tr.tax_reg, tda.stp_dps_adj, tde.tp_dps_ety, cc.code, cc.cc, ir.item, ade.bac_num_pos, ade.bac_cen, ade.lor_num_ety, ade.sor_cod, " +
                     "ade.ele_ord, ade.ele_barc, ade.ele_cag, ade.ele_cag_price_u, ade.ele_par, ade.ele_par_price_u " +
                     "FROM trn_dps_ety AS de " +
@@ -812,7 +816,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
 
                 msDbmsUnidadClave = resultSet.getString("cu.code");
                 msDbmsTariffFraction = resultSet.getString("i.tariff");
-                msDbmsCustomsUnit = resultSet.getString("u.symbol_custs");
+                msDbmsCustomsUnit = resultSet.getString("ou.unit_custs");
+                msDbmsCustomsUnitSymbol = resultSet.getString("ou.symbol_custs");
                 
                 statementAux = statement.getConnection().createStatement();
                 
@@ -1651,6 +1656,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setDbmsItemClaveProdServ(msDbmsItemClaveProdServ);
         clone.setDbmsUnidadClave(msDbmsUnidadClave);
         clone.setDbmsCustomsUnit(msDbmsCustomsUnit);
+        clone.setDbmsCustomsUnitSymbol(msDbmsCustomsUnitSymbol);
         clone.setDbmsDpsAddBachocoNumberPosition(mnDbmsDpsAddBachocoNumberPosition);
         clone.setDbmsDpsAddBachocoCenter(msDbmsDpsAddBachocoCenter);
         clone.setDbmsDpsAddLorealEntryNumber(mnDbmsDpsAddLorealEntryNumber);

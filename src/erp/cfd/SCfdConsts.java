@@ -5,18 +5,12 @@
 
 package erp.cfd;
 
-import cfd.DAttributeOptionFormaPago;
-import erp.data.SDataConstantsSys;
-import java.util.HashMap;
-
 /**
  *
  * @author Juan Barajas, Sergio Flores, Alfredo Pérez
  */
 public abstract class SCfdConsts {
-
-    public static final HashMap<String, Integer> FormaPagoIdsMap = new HashMap<>(); // method of payment
-
+    
     public static final int UNDEFINED = 0;
 
     public static final String UNIDENTIFIED = "NO IDENTIFICADO";
@@ -37,10 +31,6 @@ public abstract class SCfdConsts {
     public static final int PROC_REQ_SND_RCP = 9;
     public static final int PROC_PRT_DOCS = 10;
     
-    public static final int CFD_TYPE_DPS = 1;
-    public static final int CFD_TYPE_PAYROLL = 2;
-    public static final int CFD_TYPE_RECORD = 3;
-
     public static final int CFDI_PAYROLL_PERCEPTION = 1;
     public static final int CFDI_PAYROLL_DEDUCTION = 2;
 
@@ -79,6 +69,9 @@ public abstract class SCfdConsts {
     public static final int CFDI_FILE_XML = 1;
     public static final int CFDI_FILE_PDF = 2;
 
+    public static final int ADD_SORIANA_NOR = 1;
+    public static final int ADD_SORIANA_EXT = 2;
+    
     public static final int ACTION_SIGN = 1;
     public static final int ACTION_ANNUL = 2;
     public static final int ACTION_RESTORE_SIGN = 3;
@@ -108,21 +101,4 @@ public abstract class SCfdConsts {
     public static final String STATUS_MSG_SAVE = "Guardado registro de CFDI timbrado/cancelado.";
     public static final String STATUS_MSG_DIACTIVATE_PAC = "Desactivación bandera 'pendiente PAC'.";
     public static final String STATUS_MSG_CONSUME_STAMP = "Consumo timbre.";
-
-    static {
-        DAttributeOptionFormaPago formaPago = new DAttributeOptionFormaPago("", false);
-        
-        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_NO_APLICA), SDataConstantsSys.TRNU_TP_PAY_SYS_NA);
-        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_EFECTIVO), SDataConstantsSys.TRNU_TP_PAY_SYS_CASH);
-        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_CHEQUE_NOMINATIVO), SDataConstantsSys.TRNU_TP_PAY_SYS_CHECK);
-        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_TRANSFERENCIA_ELECTRONICA), SDataConstantsSys.TRNU_TP_PAY_SYS_TRANSF);
-        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_TARJETA_DEBITO), SDataConstantsSys.TRNU_TP_PAY_SYS_CARD_DBT);
-        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_TARJETA_CREDITO), SDataConstantsSys.TRNU_TP_PAY_SYS_CARD_CDT);
-        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_TARJETA_SERVICIO), SDataConstantsSys.TRNU_TP_PAY_SYS_CARD_SRV);
-        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_MONEDERO_ELECTRONICO), SDataConstantsSys.TRNU_TP_PAY_SYS_E_PURSE);
-        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_DINERO_ELECTRONICO), SDataConstantsSys.TRNU_TP_PAY_SYS_E_MONEY);
-        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_VALES_DESPENSA), SDataConstantsSys.TRNU_TP_PAY_SYS_FOOD_STP);
-        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_NO_IDENTIFICADO), SDataConstantsSys.TRNU_TP_PAY_SYS_UNDEF);
-        FormaPagoIdsMap.put(formaPago.getOptions().get(DAttributeOptionFormaPago.CFD_OTROS), SDataConstantsSys.TRNU_TP_PAY_SYS_OTHER);
-    }
 }

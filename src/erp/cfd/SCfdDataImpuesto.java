@@ -77,7 +77,7 @@ public class SCfdDataImpuesto implements DCfdTax {
     @Override
     public double getImporte() { return mdImporte; }
     @Override
-    public String getTipopFactor() { return msTipoFactor; }
+    public String getTipoFactor() { return msTipoFactor; }
 
     @Override
     public void clearBaseImporte() {

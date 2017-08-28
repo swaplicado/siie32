@@ -423,9 +423,6 @@ public abstract class SDataConstantsSys {
     public static final int BPSS_TP_CFD_ADD_MODELO = 5;
     public static final int BPSS_TP_CFD_ADD_ELEKTRA = 6;
     
-    public static final int BPSS_STP_CFD_ADD_SORIANA_NOR = 1;
-    public static final int BPSS_STP_CFD_ADD_SORIANA_EXT = 2;
-    
     public static final int BPSS_BPB_BANK_ACC_TEL = 10;
     public static final int BPSS_BPB_BANK_ACC_NUM = 11;
     public static final int BPSS_BPB_BANK_ACC_TRJ = 16;
@@ -1017,13 +1014,6 @@ public abstract class SDataConstantsSys {
     public static final int TRNS_TP_PAY_CASH = 1;
     public static final int TRNS_TP_PAY_CREDIT = 2;
 
-    public static final int TRNS_TP_PAY_WAY_CASH = 1;
-    public static final int TRNS_TP_PAY_WAY_CHECK = 2;
-    public static final int TRNS_TP_PAY_WAY_DEP_TRANSF = 3;
-    public static final int TRNS_TP_PAY_WAY_CARD_DEBIT = 4;
-    public static final int TRNS_TP_PAY_WAY_CARD_CREDIT = 5;
-    public static final int TRNS_TP_PAY_WAY_BONUS = 6;
-
     public static final int TRNS_TP_LINK_ALL = 1;
     public static final int TRNS_TP_LINK_CT_ITEM = 2;
     public static final int TRNS_TP_LINK_CL_ITEM = 3;
@@ -1081,30 +1071,41 @@ public abstract class SDataConstantsSys {
     public static final int TRNS_TP_XML_CFDI_32 = 3;
     public static final int TRNS_TP_XML_CFDI_33 = 4;
 
-    public static final int TRNS_TP_CFD_CFD = 1;
-    public static final int TRNS_TP_CFD_PAY = 2;
+    public static final int TRNS_TP_CFD_INV = 1;        // invoice
+    public static final int TRNS_TP_CFD_PAY_REC = 6;    // payment receipt
+    public static final int TRNS_TP_CFD_PAYROLL = 11;   // payroll
 
-    public static final int TRNS_TP_STK_SEG_SHIP = 1; // Shipment
-    public static final int TRNS_TP_STK_SEG_MFG_ORD = 2; // Manufacturing Order
+    public static final int TRNS_TP_STK_SEG_SHIP = 1;       // shipment
+    public static final int TRNS_TP_STK_SEG_MFG_ORD = 2;    // manufacturing order
 
-    public static final int TRNS_TP_STK_SEG_INC = 1; // Increment
-    public static final int TRNS_TP_STK_SEG_DEC = 2; // Decrement
+    public static final int TRNS_TP_STK_SEG_INC = 1;    // increment
+    public static final int TRNS_TP_STK_SEG_DEC = 2;    // decrement
 
-    public static final int TRNS_CFD_CAT_TP_REL = 11;   // type of relation
-    public static final int TRNS_CFD_CAT_CFD_USE = 12;  // CFDI use
+    public static final int TRNS_CFD_CAT_PAY_WAY = 11;  // payment way
+    public static final int TRNS_CFD_CAT_PAY_MET = 12;  // payment method
+    public static final int TRNS_CFD_CAT_CUR = 13;      // currency
+    public static final int TRNS_CFD_CAT_CFD_TP = 14;   // CFDI type
+    public static final int TRNS_CFD_CAT_ZIP = 15;      // zip code
+    public static final int TRNS_CFD_CAT_REL_TP = 16;   // relation type
+    public static final int TRNS_CFD_CAT_TAX_REG = 17;  // tax regime
+    public static final int TRNS_CFD_CAT_CTY = 18;      // country
+    public static final int TRNS_CFD_CAT_CFD_USE = 19;  // CFDI use
+    public static final int TRNS_CFD_CAT_INT_MOV_REA = 21;  // International Commerce: move reason
+    public static final int TRNS_CFD_CAT_INT_OPN_TP = 22;   // International Commerce: operation type
+    public static final int TRNS_CFD_CAT_INT_REQ_KEY = 23;  // International Commerce: request keys
     
-    public static final int TRNS_CFD_CCE_CAT_TP_OPE = 21;   // type of operation
-    public static final int TRNS_CFD_CCE_CAT_TRA_REA = 22;  // transfer reason
-    public static final int TRNS_CFD_CCE_CAT_IMP_REQ = 23;  // number of import request
-
-    public static final String TRNS_CFD_CAT_TP_REL_DISC = "01"; // type of relation for discount
-    public static final String TRNS_CFD_CAT_TP_REL_RET = "03";  // type of relation for return
+    public static final String TRNS_CFD_CAT_PAY_WAY_99 = "99";  // Por definir
     
-    public static final String TRNS_CFD_CTY_GRP_UE = "Unión Europea";   // European Union
-    public static final String TRNS_CFD_CTY_GRP_TLCAN = "TLCAN";        // TLCAN
+    public static final String TRNS_CFD_CAT_PAY_MET_PUE = "PUE";    // Pago en una sola exhibición
+    public static final String TRNS_CFD_CAT_PAY_MET_PPD = "PPD";    // Pago en parcialidades o diferido
     
-    public static final String TRNS_CFD_CCE_CAT_TP_OPE_EXP = "2";   // type of opetation two
-    public static final String TRNS_CFD_CCE_CAT_TP_OPE_A = "A";     // type of operation 'A'
+    public static final String TRNS_CFD_CAT_TP_REL_CDT = "01";  // credit note
+    
+    public static final String TRNS_CFD_CAT_CTY_GRP_UE = "Unión Europea";   // European Union
+    public static final String TRNS_CFD_CAT_CTY_GRP_TLCAN = "TLCAN";        // TLCAN
+    
+    public static final String TRNS_CFD_CAT_CFD_USE_G02 = "G02";    // Devoluciones, descuentos o bonificaciones
+    public static final String TRNS_CFD_CAT_CFD_USE_P01 = "P01";    // Por definir
     
     public static final int TRNU_DPS_NAT_DEF = 1;
 

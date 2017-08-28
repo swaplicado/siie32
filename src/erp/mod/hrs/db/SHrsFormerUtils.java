@@ -383,6 +383,7 @@ public abstract class SHrsFormerUtils {
         return hrsPayroll;
     }
 
+    // XXX improve this!, this method should not exist, use instead other technique, such as erp.data.SDataReadDescriptions (Sergio Flores, 2017-08-10).
     public static String getPaymentMethodName(final SClientInterface client, final int paymentMethodId) throws Exception {
         String paymentMethod = "";
         String sql = "";

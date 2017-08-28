@@ -2068,24 +2068,7 @@ public abstract class SHrsUtils {
             throw new Exception("No se encontró la nómina.");
         }
         else {
-
-            // Obtain company parameters (id_co, id_bpb, fiscal_settings):
-
-            sql = "SELECT p.id_co, bpb.id_bpb, p.tax_regime AS _fis_sett " +
-                "FROM cfg_param_co AS p " +
-                "INNER JOIN erp.bpsu_bp AS b ON " +
-                "p.id_co = b.id_bp " +
-                "INNER JOIN erp.bpsu_bpb AS bpb ON " +
-                "b.id_bp = bpb.fid_bp " +
-                "WHERE p.b_del = 0 AND p.id_co = " + client.getSession().getConfigCompany().getCompanyId() + " AND b.b_co = " + SUtilConsts.BPR_CO_ID + " ";
-            resultSetAux = statementClient.executeQuery(sql);
-
-            if (!resultSetAux.next()) {
-                throw new Exception("No se encontró la configuración de la empresa.");
-            }
-
             hrsPayroll = new SHrsFormerPayroll(client);
-
             hrsPayroll.setPkNominaId(resultSet.getInt("id_pay"));
             hrsPayroll.setFecha(resultSet.getDate("pei.dt_iss"));
             hrsPayroll.setFechaInicial(resultSet.getDate("dt_sta"));
@@ -2094,9 +2077,9 @@ public abstract class SHrsUtils {
             hrsPayroll.setTotalDeducciones(resultSet.getDouble("f_ded"));
             hrsPayroll.setTotalRetenciones(resultSet.getDouble("f_rent_ret"));
             hrsPayroll.setDescripcion(SLibUtilities.textLeft(SLibUtilities.textTrim(resultSet.getString("f_descrip")), 100)); // 100 = pay_note column width
-            hrsPayroll.setEmpresaId(resultSetAux.getInt("p.id_co"));
-            hrsPayroll.setSucursalEmpresaId(resultSetAux.getInt("bpb.id_bpb"));
-            hrsPayroll.setRegimenFiscal(new String[] { SLibUtilities.textTrim(resultSetAux.getString("_fis_sett")) });
+            hrsPayroll.setEmpresaId(client.getSession().getConfigCompany().getCompanyId());
+            hrsPayroll.setSucursalEmpresaId(client.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getPkBizPartnerBranchId());
+            hrsPayroll.setRegimenFiscal(new String[] { client.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal() });
             hrsPayroll.setFkNominaTipoId(resultSet.getInt("p.fk_tp_pay_sht"));
             
             nPaymentType = resultSet.getInt("p.fk_tp_pay");
@@ -2113,7 +2096,7 @@ public abstract class SHrsUtils {
                 (bBankAccountUse ? "emp.bank_acc" : "''") + " AS f_emp_bank_clabe, " +
                 "pei.dt_pay, pei.num_ser, pei.num, pei.fk_tp_pay_sys, " +
                 "CASE WHEN emp.fk_bank_n IS NOT NULL THEN emp.fk_bank_n ELSE (SELECT fk_bank FROM hrs_cfg WHERE id_cfg = " + SUtilConsts.BPR_CO_ID + ") END AS f_emp_bank, " +
-                "emp.dt_hire AS f_emp_alta, p.dt_sta AS f_nom_date_start, p.dt_end AS f_nom_date_end, " +
+                "rcp.dt_hire AS f_emp_alta, p.dt_sta AS f_nom_date_start, p.dt_end AS f_nom_date_end, " +
                 "TIMESTAMPDIFF(DAY, emp.dt_hire, p.dt_end) / " + SHrsConsts.WEEK_DAYS + " AS f_emp_sen, pos.name AS f_emp_pos, " +
                 "con.code AS f_emp_cont_tp, wrktp.code AS f_emp_jorn_tp, tp.code AS f_emp_pay, rcp.sal_ssc AS f_emp_sal_bc, rcp.sal, rcp.wage, ris.code AS f_emp_risk, " +
                 "IF(emp.b_uni, '" + SHrsConsts.TXT_UNI_YES + "', '" + SHrsConsts.TXT_UNI_NO + "') AS f_emp_union, " +
