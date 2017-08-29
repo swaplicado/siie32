@@ -408,8 +408,8 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
             map.put("tDateCurrent", miClient.getSession().getCurrentDate());
             map.put("nLenAccountMajor", levels.get(1) - 1);
             map.put("nLenAccount", levels.get(2) - 1);
-            map.put("sCompAccountMajor", account.substring(levels.get(1) - 1));
-            map.put("sCompAccount", account.substring(levels.get(2) - 1));
+            map.put("sCompAccountMajor", account.substring(levels.get(1) - 1)); // complement to compose a ledger (level 1) account
+            map.put("sCompAccount", account.substring(levels.get(2) - 1));      // complement to compose a level 2 subaccount
             map.put("dNetSales", readNetSales());
             map.put("sCurrency", ((SFormComponentItem) jcbCurrencyId.getSelectedItem()).getItem());
             map.put("dExchangeRate", moFieldExchangeRate.getDouble());

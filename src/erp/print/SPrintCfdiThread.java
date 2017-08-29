@@ -44,7 +44,7 @@ import sa.lib.gui.SGuiClient;
  *
  * @author JBarajas
  */
-public class PrintCfdiThread extends Thread {
+public class SPrintCfdiThread extends Thread {
 
     protected SClientInterface miClient;
     protected int mnCfdId;
@@ -54,7 +54,7 @@ public class PrintCfdiThread extends Thread {
     
     protected SDialogResult moDialogResult;
     
-    public PrintCfdiThread(final SClientInterface client, final int cfdId, final int pnPrintMode, final int pnNumCopies, final int pnSubtypeCfd, final SDialogResult dialogResult) {
+    public SPrintCfdiThread(final SClientInterface client, final int cfdId, final int pnPrintMode, final int pnNumCopies, final int pnSubtypeCfd, final SDialogResult dialogResult) {
         miClient = client;
         mnCfdId = cfdId;
         mnPrintMode = pnPrintMode;

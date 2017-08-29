@@ -8622,7 +8622,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             dpsCfd.setCfdiType(mbIsDoc ? DCfdi33Consts.CFD_TP_I : DCfdi33Consts.CFD_TP_E);
             dpsCfd.setPaymentWay(moFieldCfdiPaymentWay.getFieldValue().toString());
             dpsCfd.setPaymentMethod(moFieldCfdiPaymentMethod.getFieldValue().toString());
-            dpsCfd.setPaymentConditions(moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CASH ? "CONTADO" : "CRÉDITO " + moFieldDaysOfCredit.getInteger() + " DÍAS");
+            dpsCfd.setPaymentConditions(moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CASH ? "CONTADO" : "CRÉDITO " + moFieldDaysOfCredit.getInteger() + " DÍAS");  // XXX: implement method!
             dpsCfd.setZipIssue(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranch(new int[] { moDps.getFkCompanyBranchId() }).getDbmsBizPartnerBranchAddressOfficial().getZipCode());
             dpsCfd.setConfirmation(moFieldCfdiConfirmation.getFieldValue().toString());
             dpsCfd.setTaxRegime(moFieldCfdiTaxRegime.getFieldValue().toString());
@@ -8978,22 +8978,22 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         boolean sendMail = false;
         SLibMethod method = null;
         SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, registry.getPrimaryKey(), SLibConstants.EXEC_MODE_STEALTH);
-        
+
         sendMail = (SLibUtilities.compareKeys(SDataConstantsSys.TRNU_TP_DPS_SAL_CON, dps.getDpsTypeKey()) ||
                         SLibUtilities.compareKeys(SDataConstantsSys.TRNU_TP_DPS_SAL_ORD, dps.getDpsTypeKey()));
-        
+
         if (SLibUtilities.compareKeys(SDataConstantsSys.TRNU_TP_DPS_SAL_CON, dps.getDpsTypeKey())) {
             mmsType = SModSysConsts.CFGS_TP_MMS_CON;
         }
         else if (SLibUtilities.compareKeys(SDataConstantsSys.TRNU_TP_DPS_SAL_ORD, dps.getDpsTypeKey())) {
             mmsType = SModSysConsts.CFGS_TP_MMS_ORD_SAL;
         }
-        
+
         if (sendMail) {
             if (mmsType != SLibConstants.UNDEFINED) {
-                try {                    
+                try {
                     method = new SLibMethod(dps, dps.getClass().getMethod("sendMail", new Class[] { SClientInterface.class, Object.class, int.class }), new Object[] { miClient, dps.getPrimaryKey(), mmsType });
-                } 
+                }
                 catch (NoSuchMethodException | SecurityException e) {
                     SLibUtilities.printOutException(this, e);
                 }
@@ -9002,7 +9002,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 SLibUtilities.printOutException(this, new UnsupportedOperationException("Not supported yet."));
             }
         }
-        
+
         return method;
     }
 }
