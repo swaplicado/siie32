@@ -411,7 +411,7 @@ public class SCfdDataBizPartner {
             receptor.getEltDomicilio().getAttLocalidad().setString(msBizPartnerLocality);
             receptor.getEltDomicilio().getAttReferencia().setString(msBizPartnerReference);
             receptor.getEltDomicilio().getAttMunicipio().setString(msBizPartnerCounty);
-            receptor.getEltDomicilio().getAttEstado().setString(msBizPartnerStateName);
+            receptor.getEltDomicilio().getAttEstado().setString(!msBizPartnerStateCode.isEmpty() ? msBizPartnerStateCode : msBizPartnerStateName);
             receptor.getEltDomicilio().getAttCodigoPostal().setString(msBizPartnerZipCode);
             receptor.getEltDomicilio().getAttPais().setString(msBizPartnerCountryCode);
         }
