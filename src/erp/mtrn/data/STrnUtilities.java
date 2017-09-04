@@ -2399,8 +2399,8 @@ public abstract class STrnUtilities {
     public static double[] getQuantitiesReturned(final Statement statement, final int dpsYear, final int dpsDoc, final int dpsEntry) throws SQLException {
         double returned[] = null; 
         
-            String sql = "SELECT COALESCE(SUM(qty), 0.0), "
-                    + "COALESCE(SUM(orig_qty), 0.0) "
+            String sql = "SELECT COALESCE(SUM(qty), 0.0) AS totQty, "
+                    + "COALESCE(SUM(orig_qty), 0.0) AS totOrigQty "
                     + "FROM trn_dps_dps_adj" + " "
                     + "WHERE id_dps_year = " + dpsYear + " "
                     + "AND id_dps_doc = " + dpsDoc + " "
@@ -2409,7 +2409,7 @@ public abstract class STrnUtilities {
             ResultSet resultSet = statement.executeQuery(sql);
             
             if (resultSet.next()) {
-                returned = new double[] { resultSet.getDouble(0), resultSet.getDouble(1) };
+                returned = new double[] { resultSet.getDouble("totQty"), resultSet.getDouble("totOrigQty") };
             }
         
         return returned;
@@ -2426,7 +2426,7 @@ public abstract class STrnUtilities {
     public static double[] getQuantitiesOfSuppliedEntries (final Statement statement, final int dpsYear, final int dpsDoc, final int dpsEntry) throws SQLException {
         double totalSupplied[] = null;
 
-            String sql = "SELECT SUM(qty), SUM(orig_qty) "
+            String sql = "SELECT SUM(qty) AS totQty, SUM(orig_qty) AS totOrigQty "
                         + "FROM trn_dps_dps_supply "
                         + "WHERE id_des_year = " + dpsYear + " "
                         + "AND id_des_doc = " + dpsDoc + " "
@@ -2435,7 +2435,7 @@ public abstract class STrnUtilities {
             ResultSet resultSet = statement.executeQuery(sql);
             
             if (resultSet.next()) {
-                totalSupplied = new double[] { resultSet.getDouble(0), resultSet.getDouble(1) };
+                totalSupplied = new double[] { resultSet.getDouble("totQty"), resultSet.getDouble("totOrigQty") };
             }
         
         return totalSupplied;
