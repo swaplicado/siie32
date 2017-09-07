@@ -4910,7 +4910,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 concepto.setClaveProdServ(dpsEntry.getDbmsItemClaveProdServ());
                 concepto.setNoIdentificacion(dpsEntry.getConceptKey());
                 concepto.setCantidad(dpsEntry.getOriginalQuantity());
-                concepto.setClaveUnidad(dpsEntry.getDbmsUnidadClave());
+                concepto.setClaveUnidad(dpsEntry.getDbmsOriginalUnidadClave());
                 concepto.setUnidad(generateIntCommerceComplement() ? dpsEntry.getDbmsCustomsUnit() : dpsEntry.getDbmsOriginalUnitSymbol());
                 concepto.setDescripcion(descripcion);
                 concepto.setValorUnitario(price);

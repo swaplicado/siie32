@@ -7,15 +7,21 @@ package erp.mtrn.form;
 
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
 import erp.lib.data.SDataRegistry;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
+import erp.mcfg.data.SDataParamsCompany;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsDeliveryAck;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JButton;
@@ -190,7 +196,25 @@ public class SFormDpsDeliveryAck extends javax.swing.JDialog implements erp.lib.
             }
         }
     }
+    
+    public void copyFile() throws Exception{
+        if(moFile == null) {
+            throw new Exception("El archivo no ha sido proporcionado.");
+        }
+        else {
+            CopyOption[] options = new CopyOption[] {       // options for new file
+                    StandardCopyOption.REPLACE_EXISTING,    // REPLACE_EXISTING: replace the file if exists.
+                    StandardCopyOption.COPY_ATTRIBUTES      // COPY_ATTRIBUTES like last_modified, etc.
+                };
 
+            Files.copy(Paths.get(moFile.getAbsolutePath()), Paths.get(SDataParamsCompany.FILES_DIR + "\\" + tempFileName()), options);
+        }
+    }
+    
+    public String tempFileName() {
+        return miClient.getSessionXXX().getSessionId() + "_" + moFile.getName();
+    }
+    
     private void actionSave() {
         if (jtfFile.getText().equals("")) {
             miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
@@ -321,8 +345,17 @@ public class SFormDpsDeliveryAck extends javax.swing.JDialog implements erp.lib.
         //moDpsDeliveryAck.setUserDeleteTs(...);
                 
         moDpsDeliveryAck.setAuxFile(moFile);
+        moDpsDeliveryAck.setNameUser(moFile.getName());
         
         moDpsDeliveryAck.setAuxPrefix(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId());
+       
+        try {
+            copyFile();
+        } catch (Exception ex) {
+            SLibUtilities.renderException(this, ex);
+        }
+        
+         moDpsDeliveryAck.setTempFileName(tempFileName());
 
         return moDpsDeliveryAck;
     }
