@@ -905,12 +905,12 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 if (mbFlagReadLinksAswell) {
                     // Read aswell DPS links as a source:
 
-                    sql = "SELECT id_des_year, id_des_doc, id_des_ety FROM trn_dps_dps_supply " +
+                    sql = "SELECT id_des_year, id_des_doc, id_des_ety, qty FROM trn_dps_dps_supply " +
                             "WHERE id_src_year = " + mnPkYearId + " AND id_src_doc = " + mnPkDocId + " AND id_src_ety = " + mnPkEntryId + " ";
                     resultSet = statement.executeQuery(sql);
                     while (resultSet.next()) {
                         SDataDpsDpsLink link = new SDataDpsDpsLink();
-                        if (link.read(new int[] { mnPkYearId, mnPkDocId, mnPkEntryId, resultSet.getInt("id_des_year"), resultSet.getInt("id_des_doc"), resultSet.getInt("id_des_ety") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                        if (link.read(new Object[] { mnPkYearId, mnPkDocId, mnPkEntryId, resultSet.getInt("id_des_year"), resultSet.getInt("id_des_doc"), resultSet.getInt("id_des_ety"), resultSet.getDouble("qty") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                         }
                         else {
@@ -920,12 +920,12 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
 
                     // Read aswell DPS links as a destiny:
 
-                    sql = "SELECT id_src_year, id_src_doc, id_src_ety FROM trn_dps_dps_supply " +
+                    sql = "SELECT id_src_year, id_src_doc, id_src_ety, qty FROM trn_dps_dps_supply " +
                             "WHERE id_des_year = " + mnPkYearId + " AND id_des_doc = " + mnPkDocId + " AND id_des_ety = " + mnPkEntryId + " ";
                     resultSet = statement.executeQuery(sql);
                     while (resultSet.next()) {
                         SDataDpsDpsLink link = new SDataDpsDpsLink();
-                        if (link.read(new int[] { resultSet.getInt("id_src_year"), resultSet.getInt("id_src_doc"), resultSet.getInt("id_src_ety"), mnPkYearId, mnPkDocId, mnPkEntryId }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                        if (link.read(new Object[] { resultSet.getInt("id_src_year"), resultSet.getInt("id_src_doc"), resultSet.getInt("id_src_ety"), mnPkYearId, mnPkDocId, mnPkEntryId, resultSet.getDouble("qty") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                         }
                         else {

@@ -10,6 +10,7 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -135,7 +136,17 @@ public class SDataDpsDpsLink extends erp.lib.data.SDataRegistry implements java.
 
     @Override
     public int read(java.lang.Object pk, java.sql.Statement statement) {
-        int[] key = (int[]) pk;
+        int[] key = new int[6];
+        double quantity;
+        
+        // pk from index 0 to 5 contains main PK to read:
+        for (int i = 0; i < key.length; i++) {
+            key[i] = (int) ((Object[]) pk)[i];
+        }
+        
+        // pk at index 6 contains quantity of DPS link, needed to read desired registry as well:
+        quantity = (double) ((Object[]) pk)[6];
+        
         String sql = "";
         ResultSet resultSet = null;
 
@@ -145,7 +156,7 @@ public class SDataDpsDpsLink extends erp.lib.data.SDataRegistry implements java.
         try {
             sql = "SELECT * FROM trn_dps_dps_supply " +
                     "WHERE id_src_year = " + key[0] + " AND id_src_doc = " + key[1] + " AND id_src_ety = " + key[2] +  " AND " +
-                    "id_des_year = " + key[3] + " AND id_des_doc = " + key[4] + " AND id_des_ety = " + key[5] +  " ";
+                    "id_des_year = " + key[3] + " AND id_des_doc = " + key[4] + " AND id_des_ety = " + key[5] +  " AND ROUND(qty) = " + SLibUtils.round(quantity, 0) + " ";
 
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
