@@ -7817,8 +7817,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         validation.setComponent(jcbCfdiPaymentMethod);
                     }
                     else if (mbIsSales && (mbIsDoc || mbIsAdj) && moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CREDIT && moFieldCfdiPaymentMethod.getKey().toString().compareTo(SDataConstantsSys.TRNS_CFD_CAT_PAY_MET_PUE) == 0) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiPaymentMethod.getText() + "'.");
-                        validation.setComponent(jcbCfdiPaymentMethod);
+                        if (miClient.showMsgBoxConfirm(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + jlCfdiPaymentMethod.getText() + "' \"" + moFieldCfdiPaymentMethod.getFieldValue() + "\", en ventas a crédito, no está permitido según las disposiciones fiscales.\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiPaymentMethod.getText() + "'.");
+                            validation.setComponent(jcbCfdiPaymentMethod);
+                        }
                     }
                     else if (moBizPartnerCategory.getDateStart().after(moFieldDate.getDate())) {
                         validation.setMessage("La fecha inicial de operaciones del asociado de negocios (" + SLibUtils.DateFormatDate.format(moBizPartnerCategory.getDateStart()) + ") " +
@@ -8130,7 +8132,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
             }
             
-            if (!validation.getIsError() && (SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD) || SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC))) {
+            if (!validation.getIsError() && mbIsSales && (mbIsOrd || mbIsDoc)) {
                 String shipmentMessageMissingData = validateRequiredShipmentData();
                 
                 if (!shipmentMessageMissingData.isEmpty()) {
@@ -8157,17 +8159,19 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         }
                     }
                     
-                    if (prepaymentsCy == 0) {
-                        if (miClient.showMsgBoxConfirm("'" + moBizPartner.getBizPartner() + "' tiene anticipos,\n"
-                                + "¿está seguro que no desea aplicarlos en este documento?") != JOptionPane.YES_OPTION) {
-                            validation.setMessage("Se debe aplicar anticipos en este documento.");
+                    if (mbIsSales && mbIsDoc) {
+                        if (prepaymentsCy == 0) {
+                            if (miClient.showMsgBoxConfirm("'" + moBizPartner.getBizPartner() + "' tiene anticipos,\n"
+                                    + "¿está seguro que no desea aplicarlos en este documento?") != JOptionPane.YES_OPTION) {
+                                validation.setMessage("Se debe aplicar anticipos en este documento.");
+                                validation.setComponent(moPaneGridEntries);
+                            }
+                        }
+                        else if (mdPrepaymentsCy + prepaymentsCy < 0) {
+                            validation.setMessage("La aplicación total de anticipos $ " + SLibUtils.getDecimalFormatAmount().format(-prepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + " "
+                                    + "no puede ser mayor al saldo actual de anticipos $ " + SLibUtils.getDecimalFormatAmount().format(mdPrepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + ".");
                             validation.setComponent(moPaneGridEntries);
                         }
-                    }
-                    else if (mdPrepaymentsCy + prepaymentsCy < 0) {
-                        validation.setMessage("La aplicación total de anticipos $ " + SLibUtils.getDecimalFormatAmount().format(-prepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + " "
-                                + "no puede ser mayor al saldo actual de anticipos $ " + SLibUtils.getDecimalFormatAmount().format(mdPrepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + ".");
-                        validation.setComponent(moPaneGridEntries);
                     }
                 }
             }
