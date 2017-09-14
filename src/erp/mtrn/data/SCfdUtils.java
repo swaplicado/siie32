@@ -351,7 +351,6 @@ public abstract class SCfdUtils implements Serializable {
         return true;
     }
     
-    
     private static boolean existsCfdiEmitInconsist(final SClientInterface client, final ArrayList<SDataCfd> cfds) throws Exception {
         if (cfds != null) {
             for (SDataCfd cfd : cfds) {
