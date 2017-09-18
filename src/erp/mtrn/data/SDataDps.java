@@ -4595,7 +4595,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         if (tax.getFkTaxCalculationTypeId() != SModSysConsts.FINS_TP_TAX_CAL_RATE) {
                             throw new Exception("Todos los impuestos deben ser en base a una tasa (" + tax.getFkTaxCalculationTypeId() + ").");
                         }
-                        else if (tax.getTaxCy() != 0) {
+                        else {
                             impuestoXml = new SCfdDataImpuesto();
                             dImptoTasa = 0;
                     
