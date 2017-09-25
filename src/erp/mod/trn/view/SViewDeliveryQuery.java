@@ -6,6 +6,7 @@ package erp.mod.trn.view;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
+import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SDbDps;
@@ -19,7 +20,6 @@ import sa.gui.util.SUtilConsts;
 import sa.lib.SLibRpnArgument;
 import sa.lib.SLibRpnArgumentType;
 import sa.lib.SLibRpnOperator;
-import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
@@ -86,7 +86,7 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
             miClient.getSession().notifySuscriptors(mnGridType);
         }
         catch (Exception e) {
-            SLibUtils.showException(this, e);
+            SLibUtilities.printOutException(this, e);
         }
     }
 
@@ -144,10 +144,10 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
         switch (mnGridSubtype) {
             case SUtilConsts.PROC:
                 if (isSummary()) {
-                    having = "(SUM(t2._net_qty) - _prc_qty_rem = 0 AND SUM(t2._net_orig_qty) - _prc_orig_qty_rem = 0) OR d.b_link = 1 ";
+                    having = "(SUM(t2._net_qty) - _prc_qty = 0 AND SUM(t2._net_orig_qty) - _prc_orig_qty = 0) OR d.b_link = 1 ";
                 }
                 else {
-                    having = "(t2._net_qty - _prc_qty_rem = 0 AND t2._net_orig_qty - _prc_orig_qty_rem = 0) OR d.b_link = 1 ";
+                    having = "(t2._net_qty - _prc_qty = 0 AND t2._net_orig_qty - _prc_orig_qty = 0) OR d.b_link = 1 ";
                 }
                 break;
             case SUtilConsts.PROC_PEND:

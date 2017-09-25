@@ -1571,6 +1571,7 @@ public abstract class SDataConstantsSys {
     
     public static final int REP_TRN_CFD = 207101;
     public static final int REP_TRN_CFDI = 207102;
+    public static final int REP_TRN_CFDI_33 = 207112;
     public static final int REP_TRN_CFDI_ACK_CAN = 207103;
     public static final int REP_TRN_SHIP = 207104;
     public static final int REP_TRN_COMMS_ITEM = 207105;
