@@ -183,7 +183,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
          * BufferedImage is not serializable, therefore it cannot be send to Server through RMI. QR Code is generated and put into in SSessionServer.requestFillReport().
          */
 
-        if (reportType == SDataConstantsSys.REP_TRN_CFDI || reportType == SDataConstantsSys.REP_TRN_CFDI_PAYROLL) {
+        if (reportType == SDataConstantsSys.REP_TRN_CFDI || reportType == SDataConstantsSys.REP_TRN_CFDI_33 || reportType == SDataConstantsSys.REP_TRN_CFDI_PAYROLL) {
             BufferedImage biQrCode = null;
             
             if (Float.parseFloat((String) map.get("sCfdVersion")) == DCfdConsts.CFDI_VER_32) {
