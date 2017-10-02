@@ -3776,7 +3776,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     dpsDestNumber = "N/D";
                                 }
 
-                                msg += STrnUtilities.computeMailItem(client, entry.getFkItemId(), entry.getFkOriginalUnitId(), entry.getConceptKey(), entry.getConcept(), dpsDestNumber, msNumberSeries, msNumber, dpsReference, entry.getOriginalQuantity(), entry.getDbmsUnitSymbol(), getDate(), getDpsTypeKey(), isEdited, mbIsRebill);
+                                msg += STrnUtilities.computeMailItem(client, entry.getFkItemId(), entry.getFkOriginalUnitId(), entry.getConceptKey(), entry.getConcept(), dpsDestNumber, msNumberSeries, msNumber, dpsReference, entry.getOriginalQuantity(), entry.getDbmsOriginalUnitSymbol(), getDate(), getDpsTypeKey(), isEdited, mbIsRebill);
                             }
                         }
                     }
