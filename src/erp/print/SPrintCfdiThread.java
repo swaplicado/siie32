@@ -44,7 +44,7 @@ import sa.lib.gui.SGuiClient;
  *
  * @author JBarajas
  */
-public class PrintCfdiThread extends Thread {
+public class SPrintCfdiThread extends Thread {
 
     protected SClientInterface miClient;
     protected int mnCfdId;
@@ -54,7 +54,7 @@ public class PrintCfdiThread extends Thread {
     
     protected SDialogResult moDialogResult;
     
-    public PrintCfdiThread(final SClientInterface client, final int cfdId, final int pnPrintMode, final int pnNumCopies, final int pnSubtypeCfd, final SDialogResult dialogResult) {
+    public SPrintCfdiThread(final SClientInterface client, final int cfdId, final int pnPrintMode, final int pnNumCopies, final int pnSubtypeCfd, final SDialogResult dialogResult) {
         miClient = client;
         mnCfdId = cfdId;
         mnPrintMode = pnPrintMode;
@@ -438,7 +438,8 @@ public class PrintCfdiThread extends Thread {
                     map.put("Departamento", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttDepartamento().getString());
                     map.put("Puesto", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttPuesto().getString());
                     //map.put("RiesgoPuesto", SCfdConsts.RiesgoMap.get(SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttRiesgoPuesto().getString())));
-                    map.put("RiesgoPuesto", miClient.getSession().readField(SModConsts.HRSS_TP_POS_RISK, new int[] { SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttRiesgoPuesto().getString()) }, SDbRegistry.FIELD_NAME));
+                    String riesgoPuesto = ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttRiesgoPuesto().getString();
+                    map.put("RiesgoPuesto", riesgoPuesto.isEmpty() ? "No aplica" : miClient.getSession().readField(SModConsts.HRSS_TP_POS_RISK, new int[] { SLibUtils.parseInt(riesgoPuesto) }, SDbRegistry.FIELD_NAME));
                     map.put("PeriodicidadPago", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttPeriodicidadPago().getString());
                     //map.put("Banco", SCfdConsts.BancoMap.get(SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttBanco().getString())));
                     if (!((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttBanco().getString().isEmpty()) {

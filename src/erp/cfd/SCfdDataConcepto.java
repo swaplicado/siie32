@@ -83,7 +83,7 @@ public class SCfdDataConcepto {
                 if (tax.getFkTaxCalculationTypeId() != SModSysConsts.FINS_TP_TAX_CAL_RATE) {
                     throw new Exception("Todos los impuestos deben ser en base a una tasa (" + tax.getFkTaxCalculationTypeId() + ").");
                 }
-                else {
+                else if (tax.getTaxCy() != 0) {
                     impuestoXml = new SCfdDataImpuesto();
                     
                     switch (tax.getFkTaxTypeId()) {

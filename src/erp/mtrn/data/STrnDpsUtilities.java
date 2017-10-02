@@ -76,7 +76,8 @@ public abstract class STrnDpsUtilities {
                     client.showMsgBoxWarning(SLibConstants.MSG_INF_NOT_AUTHORN_ORD);
                 }
             }
-        } else if (dps.isDocument()) {
+        }
+        else if (dps.isDocument()) {
             if (dps.isDocumentPur()) {
                 if (client.getSessionXXX().getParamsCompany().getIsAuthorizationPurchasesDocAutomatic() && dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
                     authorized = false;

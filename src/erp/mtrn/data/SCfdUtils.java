@@ -143,22 +143,34 @@ public abstract class SCfdUtils implements Serializable {
     private static boolean canCfdiCancelWebService(final SClientInterface client, final SDataCfd cfd, final int pacId) throws Exception {
         SDataCfdPacType cfdPacType = null;
         SDataPac pac = null;
-        cfd.ver32.DElementComprobante comprobante = null;
         String certSAT = "";
         String msg = "";
         boolean can = true;
 
         if (cfd.isStamped()) {
-            comprobante = DCfdUtils.getCfdi32(cfd.getDocXml());
+            switch (cfd.getFkXmlTypeId()) {
+                case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
+                    cfd.ver32.DElementComprobante comprobante32 = DCfdUtils.getCfdi32(cfd.getDocXml());
+                    for (DElement element : comprobante32.getEltOpcComplemento().getElements()) {
+                        if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
+                            certSAT = ((DElementTimbreFiscalDigital) element).getAttNoCertificadoSAT().getString();
+                            break;
+                        }
+                    }
+                    break;
+                case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                    cfd.ver33.DElementComprobante comprobante33 = DCfdUtils.getCfdi33(cfd.getDocXml());
+                    for (DElement element : comprobante33.getEltOpcComplemento().getElements()) {
+                        if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
+                            certSAT = ((DElementTimbreFiscalDigital) element).getAttNoCertificadoSAT().getString();
+                            break;
+                        }
+                    }
+                    break;
+                default:
+            }
 
             cfdPacType = getPacConfiguration(client, cfd.getFkCfdTypeId());
-
-            for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
-                if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
-                    certSAT = ((DElementTimbreFiscalDigital) element).getAttNoCertificadoSAT().getString();
-                    break;
-                }
-            }
 
             if (cfdPacType != null) {
                 pac = (SDataPac) SDataUtilities.readRegistry(client, SDataConstants.TRN_PAC, new int[] { pacId == 0 ? cfdPacType.getFkPacId() : pacId }, SLibConstants.EXEC_MODE_SILENT);
@@ -249,7 +261,7 @@ public abstract class SCfdUtils implements Serializable {
         return can;
     }
 
-    private static boolean canObtainXml(final SClientInterface client, final SDataCfd cfd) throws Exception {
+    private static boolean canObtainXml(final SDataCfd cfd) throws Exception {
         if ((cfd.getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32 || cfd.getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) && !cfd.isStamped()) {
             throw new Exception("El documento no ha sido emitido.");
         }
@@ -338,7 +350,6 @@ public abstract class SCfdUtils implements Serializable {
         }
         return true;
     }
-    
     
     private static boolean existsCfdiEmitInconsist(final SClientInterface client, final ArrayList<SDataCfd> cfds) throws Exception {
         if (cfds != null) {
@@ -2710,6 +2721,10 @@ public abstract class SCfdUtils implements Serializable {
             packet.setFkXmlDeliveryStatusId(SModSysConsts.TRNS_ST_XML_DVY_PENDING);
             packet.setFkUserDeliveryId(client.getSession().getUser().getPkUserId());
             
+            if (packet.getStringSigned().isEmpty()) {
+                throw new Exception("No fue posible generar la cadena original del comprobante.");
+            }
+            
             System.out.println("Original string: <" + packet.getStringSigned() + ">");
             packet.setSignature(client.getCfdSignature(cfdVersion).sign(packet.getStringSigned(), SLibTimeUtilities.digestYear(dps.getDate())[0]));
             System.out.println("Digital signature: <" + packet.getSignature()+ ">");
@@ -3222,7 +3237,7 @@ public abstract class SCfdUtils implements Serializable {
 
         comprobante.getAttCondicionesDePago().setOption(xmlCfd.getComprobanteCondicionesDePago());
         comprobante.getAttSubTotal().setDouble(xmlCfd.getComprobanteSubtotal());
-        comprobante.getAttTipoCambio().setDouble(xmlCfd.getComprobanteTipoDeCambio());
+        comprobante.getAttTipoCambio().setDouble(xmlCfd.getComprobanteTipoCambio());
         comprobante.getAttMoneda().setString(xmlCfd.getComprobanteMoneda());
         comprobante.getAttTotal().setDouble(xmlCfd.getComprobanteTotal());
 
@@ -3349,13 +3364,14 @@ public abstract class SCfdUtils implements Serializable {
             comprobante.getAttMotivoDescuento().setString(xmlCfdi.getComprobanteMotivoDescuento());
         }
         if (xmlCfdi.getCfdType() != SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
-            comprobante.getAttTipoCambio().setDouble(xmlCfdi.getComprobanteTipoDeCambio());
+            comprobante.getAttTipoCambio().setDouble(xmlCfdi.getComprobanteTipoCambio());
         }
         comprobante.getAttMoneda().setString(xmlCfdi.getComprobanteMoneda());
         comprobante.getAttTotal().setDouble(xmlCfdi.getComprobanteTotal());
 
         comprobante.getAttTipoDeComprobante().setOption(xmlCfdi.getComprobanteTipoDeComprobante());
-        comprobante.getAttMetodoDePago().setString(((SSessionCustom) client.getSession().getSessionCustom()).getCfdXmlCatalogs().getEntryCode(SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY, xmlCfdi.getComprobanteMetodoDePago()));
+        String metodoDePago = ((SSessionCustom) client.getSession().getSessionCustom()).getCfdXmlCatalogs().getEntryCode(SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY, xmlCfdi.getComprobanteMetodoDePago());
+        comprobante.getAttMetodoDePago().setString(metodoDePago.isEmpty() ? "NA" : metodoDePago);
 
         elementComplement = xmlCfdi.getElementComplemento();
 
@@ -4179,7 +4195,7 @@ public abstract class SCfdUtils implements Serializable {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
         }
         else {
-            if (canObtainXml(client, cfd)) {
+            if (canObtainXml(cfd)) {
                 client.getFileChooser().setSelectedFile(new File(cfd.getDocXmlName()));
                 if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
                     file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
@@ -4220,7 +4236,7 @@ public abstract class SCfdUtils implements Serializable {
                 fileAux = client.getFileChooser().getSelectedFile();
                 client.getFileChooser().setFileSelectionMode(JFileChooser.FILES_ONLY);
                 for(SDataCfd cfd : cfdsAux) {
-                    if (canObtainXml(client, cfd)) {
+                    if (canObtainXml(cfd)) {
                         client.getFileChooser().setSelectedFile(new File(fileAux, cfd.getDocXmlName()));
                         file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
                         writeXmlToDisk(file, cfd, SDataConstantsSys.TRNS_ST_DPS_EMITED);

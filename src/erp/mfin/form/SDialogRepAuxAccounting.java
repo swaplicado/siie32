@@ -596,6 +596,8 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
             map.put("nMaskCc", mnMaskCc);
             if (moPanelCostCenterStart.getSelectedAccount() != null && moPanelCostCenterEnd.getSelectedAccount() != null) {
                 map.put("sSqlWhereCc", " AND re.fid_cc_n >= '" + SAccountUtils.convertCodeUsr(mnMaskCc, msCodeCcMin) + "' AND re.fid_cc_n <= '" + SAccountUtils.convertCodeUsr(mnMaskCc, msCodeCcMax) + "' ");
+                map.put("sSqlCcStart", SAccountUtils.convertCodeUsr(mnMaskCc, msCodeCcMin));
+                map.put("sSqlCcEnd", SAccountUtils.convertCodeUsr(mnMaskCc, msCodeCcMax));
             }
             map.put("sSqlCob", moFieldEntity.getKeyAsIntArray()[0] == 0 ? "" : " AND re.fid_cob_n = " + moFieldEntity.getKeyAsIntArray()[0] + " ");
             map.put("sSqlEntity", moFieldEntity.getKeyAsIntArray()[0] == 0 ? "" : " AND re.fid_ent_n = " + moFieldEntity.getKeyAsIntArray()[1] + " ");

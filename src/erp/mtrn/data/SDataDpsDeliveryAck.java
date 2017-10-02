@@ -43,6 +43,7 @@ public class SDataDpsDeliveryAck extends erp.lib.data.SDataRegistry implements j
 
     protected java.io.File moAuxFile;
     protected java.lang.String msAuxPrefix;
+    protected String msTempFileName;
 
     public SDataDpsDeliveryAck() {
         super(SDataConstants.TRN_DPS_ACK);
@@ -53,26 +54,18 @@ public class SDataDpsDeliveryAck extends erp.lib.data.SDataRegistry implements j
      * Private methods
      */
     
-    private void composeFileName() {
+    private void renameFile() {
         DecimalFormat format = new DecimalFormat(SLibUtils.textRepeat("0", ID_LEN));
-        msNameUser = moAuxFile.getName();
-        msNameSystem = msAuxPrefix + "_" + format.format(mnPkDpsDeliveryAckId) + "_" + msNameUser;
-    }
-    
-    private void saveFile(final String path, final String fileName) throws Exception {
-        if (moAuxFile == null) {
-            throw new Exception("El archivo no ha sido proporcionado.");
-        }    
-        else {
-            try {
-                CopyOption[] options = new CopyOption[] {   //Options for the  new file
-                    StandardCopyOption.REPLACE_EXISTING,     //REPLACE_EXISTING: replace the file if exists.
-                    StandardCopyOption.COPY_ATTRIBUTES       //COPY_ATTRIBUTES like last_modified, etc.
-                };
-                Files.copy(Paths.get(moAuxFile.getAbsolutePath()), Paths.get(path + "\\" + fileName), options);
-            } 
-            catch (Exception ex) {
-                SLibUtilities.renderException(this, ex);
+        File directory = new File(SDataParamsCompany.FILES_DIR);
+        File[] docs = directory.listFiles();
+        
+        if (docs != null) {
+            for (File file : docs) {
+                if (msTempFileName.equalsIgnoreCase(file.getName())) {
+                    msNameSystem = msAuxPrefix + "_" + format.format(mnPkDpsDeliveryAckId) + "_" + msNameUser;
+                    
+                    file.renameTo(new File(SDataParamsCompany.FILES_DIR + "\\" + msNameSystem));
+                }
             }
         }
     }
@@ -136,14 +129,22 @@ public class SDataDpsDeliveryAck extends erp.lib.data.SDataRegistry implements j
     public File getAuxFile() { return moAuxFile; }
 
     public java.lang.String getAuxPrefix() { return msAuxPrefix; }
+    
+    public void setTempFileName(String s) { msTempFileName = s; }
+    
+    public String getTempFileName() { return msTempFileName; }
 
     public void saveFileSystemPath() throws Exception {
-        composeFileName();
-        saveFile(SDataParamsCompany.FILES_DIR, msNameSystem);
+        renameFile();
     }
     
-    public void saveFileCustomPath(final String customPath) throws Exception {
-        saveFile(customPath, msNameUser);
+    public void saveFileCustomPath(final String customPath) throws Exception {        
+        CopyOption[] options = new CopyOption[] {       // options for new file
+                    StandardCopyOption.REPLACE_EXISTING,    // REPLACE_EXISTING: replace the file if exists.
+                    StandardCopyOption.COPY_ATTRIBUTES      // COPY_ATTRIBUTES like last_modified, etc.
+                };
+
+            Files.copy(Paths.get(moAuxFile.getAbsolutePath()), Paths.get(customPath + "\\" + msNameUser), options);
     }
     
     public File createFileFromSystemPath() {
@@ -248,7 +249,7 @@ public class SDataDpsDeliveryAck extends erp.lib.data.SDataRegistry implements j
                 }
 
                 saveFileSystemPath();
-
+                
                 sql = "INSERT INTO trn_dps_ack VALUES ("
                         + mnPkDpsDeliveryAckId + ", "
                         + "'" + msNameUser + "', "
@@ -274,7 +275,7 @@ public class SDataDpsDeliveryAck extends erp.lib.data.SDataRegistry implements j
 
         return mnLastDbActionResult;
     }
-
+    
     @Override
     public Date getLastDbUpdate() {
         return mtUserEditTs;

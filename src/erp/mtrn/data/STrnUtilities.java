@@ -74,7 +74,7 @@ import sor.utils.SSorianaUtils;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Daniel López
  */
 public abstract class STrnUtilities {
 
@@ -2363,6 +2363,84 @@ public abstract class STrnUtilities {
         return notesRow;
     }
 
+     /**
+     * Gets link between order and an invoice.
+     * @param statement Database statement.
+     * @param desYearId Invoice year ID.
+     * @param desDocId Invoice document ID.
+     * @param desEntryId Invoice entry ID.
+     * @return Array with link key (0: order year ID, 1: order document ID, 2: order entry ID).
+     */
+    public static int[] getSourceLink(final Statement statement, final int desYearId, final int desDocId, final int desEntryId) throws SQLException {
+        int[] sourceLinkKey = null;
+        
+        String sql = "SELECT id_src_year, id_src_doc, id_src_ety "
+                    + "FROM trn_dps_dps_supply "
+                    + "WHERE id_des_year = " + desYearId +" "
+                    + "AND id_des_doc = " + desDocId + " "
+                    + "AND id_des_ety = " + desEntryId;
+            
+        ResultSet resultSet = statement.executeQuery(sql);
+        if (resultSet.next()) {
+            sourceLinkKey = new int[] { resultSet.getInt("id_src_year"), resultSet.getInt("id_src_doc"), resultSet.getInt("id_src_ety") };
+        }
+        
+        return sourceLinkKey;
+    }
+    
+    /**
+     * Gets quantity to return in an invoice credit note.
+     * @param statement Database statement.
+     * @param dpsYear Invoice year ID.
+     * @param dpsDoc Invoice document ID.
+     * @param dpsEntry Invoice entry ID.
+     * @return Array with returned quantities in an invoice credit note (0: quantity, 1: original quantity).
+     */
+    public static double[] getQuantitiesReturned(final Statement statement, final int dpsYear, final int dpsDoc, final int dpsEntry) throws SQLException {
+        double returned[] = null; 
+        
+            String sql = "SELECT COALESCE(SUM(qty), 0.0) AS totQty, "
+                    + "COALESCE(SUM(orig_qty), 0.0) AS totOrigQty "
+                    + "FROM trn_dps_dps_adj" + " "
+                    + "WHERE id_dps_year = " + dpsYear + " "
+                    + "AND id_dps_doc = " + dpsDoc + " "
+                    + "AND id_dps_ety = " + dpsEntry;
+            
+            ResultSet resultSet = statement.executeQuery(sql);
+            
+            if (resultSet.next()) {
+                returned = new double[] { resultSet.getDouble("totQty"), resultSet.getDouble("totOrigQty") };
+            }
+        
+        return returned;
+    }
+    
+    /**
+     * Gets quantity of supplied entries in an invoice.
+     * @param statement Database statement.
+     * @param dpsYear Invoice year ID.
+     * @param dpsDoc Invoice document ID.
+     * @param dpsEntry Invoice entry ID.
+     * @return Array with quantities of supplied entries in an invoice (0: quantity, 1: original quantity).
+     */
+    public static double[] getQuantitiesOfSuppliedEntries (final Statement statement, final int dpsYear, final int dpsDoc, final int dpsEntry) throws SQLException {
+        double totalSupplied[] = null;
+
+            String sql = "SELECT SUM(qty) AS totQty, SUM(orig_qty) AS totOrigQty "
+                        + "FROM trn_dps_dps_supply "
+                        + "WHERE id_des_year = " + dpsYear + " "
+                        + "AND id_des_doc = " + dpsDoc + " "
+                        + "AND id_des_ety = " + dpsEntry;
+            
+            ResultSet resultSet = statement.executeQuery(sql);
+            
+            if (resultSet.next()) {
+                totalSupplied = new double[] { resultSet.getDouble("totQty"), resultSet.getDouble("totOrigQty") };
+            }
+        
+        return totalSupplied;
+    }
+    
     public static void deleteLink(final SClientInterface client, final int srcYearId, final int srcDocId, final int desYearId, final int desDocId) {
         String sql = "";
 

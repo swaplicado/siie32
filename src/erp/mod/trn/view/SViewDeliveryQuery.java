@@ -6,6 +6,7 @@ package erp.mod.trn.view;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
+import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SDbDps;
@@ -19,7 +20,6 @@ import sa.gui.util.SUtilConsts;
 import sa.lib.SLibRpnArgument;
 import sa.lib.SLibRpnArgumentType;
 import sa.lib.SLibRpnOperator;
-import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
@@ -35,7 +35,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Daniel López
  */
 public class SViewDeliveryQuery extends SGridPaneView implements ActionListener {
 
@@ -86,7 +86,7 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
             miClient.getSession().notifySuscriptors(mnGridType);
         }
         catch (Exception e) {
-            SLibUtils.showException(this, e);
+            SLibUtilities.printOutException(this, e);
         }
     }
 
@@ -144,10 +144,10 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
         switch (mnGridSubtype) {
             case SUtilConsts.PROC:
                 if (isSummary()) {
-                    having = "(SUM(t2._net_qty) - _prc_qty_rem = 0 AND SUM(t2._net_orig_qty) - _prc_orig_qty_rem = 0) OR d.b_link = 1 ";
+                    having = "(SUM(t2._net_qty) - _prc_qty = 0 AND SUM(t2._net_orig_qty) - _prc_orig_qty = 0) OR d.b_link = 1 ";
                 }
                 else {
-                    having = "(t2._net_qty - _prc_qty_rem = 0 AND t2._net_orig_qty - _prc_orig_qty_rem = 0) OR d.b_link = 1 ";
+                    having = "(t2._net_qty - _prc_qty = 0 AND t2._net_orig_qty - _prc_orig_qty = 0) OR d.b_link = 1 ";
                 }
                 break;
             case SUtilConsts.PROC_PEND:
@@ -172,11 +172,14 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
                     "SUM(t2._net_qty) AS _net_qty, SUM(t2._net_orig_qty) AS _net_orig_qty, " : 
                     "t2._net_qty, t2._net_orig_qty, ")
                 
-                + "COALESCE((SELECT SUM(dds.qty) FROM trn_dps_dps_supply AS dds WHERE de.id_year = dds.id_des_year AND de.id_doc = dds.id_des_doc ), 0.0) AS _prc_qty, COALESCE((SELECT SUM(dds.orig_qty) FROM trn_dps_dps_supply AS dds WHERE de.id_year = dds.id_des_year AND de.id_doc = dds.id_des_doc), 0.0) AS _prc_orig_qty, "
+                + "COALESCE((SELECT SUM(dds.qty) FROM trn_dps_dps_supply AS dds WHERE de.id_year = dds.id_des_year AND de.id_doc = dds.id_des_doc " + (isSummary() ? "" : "AND de.id_ety = dds.id_des_ety ") + "), 0.0) AS _prc_qty, "
+                + "COALESCE((SELECT SUM(dds.orig_qty) FROM trn_dps_dps_supply AS dds WHERE de.id_year = dds.id_des_year AND de.id_doc = dds.id_des_doc " + (isSummary() ? "" : "AND de.id_ety = dds.id_des_ety ") + "), 0.0) AS _prc_orig_qty, "
                 
-                + (isSummary() ? 
-                    "SUM(t2._net_qty) - COALESCE((SELECT SUM(dds.qty) FROM trn_dps_dps_supply AS dds WHERE de.id_year = dds.id_des_year AND de.id_doc = dds.id_des_doc), 0.0) AS _prc_qty_rem, SUM(t2._net_orig_qty) - COALESCE((SELECT SUM(dds.orig_qty) FROM trn_dps_dps_supply AS dds WHERE de.id_year = dds.id_des_year AND de.id_doc = dds.id_des_doc), 0.0) AS _prc_orig_qty_rem " : 
-                    "t2._net_qty - COALESCE((SELECT SUM(dds.qty) FROM trn_dps_dps_supply AS dds WHERE de.id_year = dds.id_des_year AND de.id_doc = dds.id_des_doc), 0.0) AS _prc_qty_rem, t2._net_orig_qty - COALESCE((SELECT SUM(dds.orig_qty) FROM trn_dps_dps_supply AS dds WHERE de.id_year = dds.id_des_year AND de.id_doc = dds.id_des_doc), 0.0) AS _prc_orig_qty_rem ")
+                + (isSummary() ? "SUM(t2._net_qty) " : "t2._net_qty ")
+                + "- COALESCE((SELECT SUM(dds.qty) FROM trn_dps_dps_supply AS dds WHERE de.id_year = dds.id_des_year AND de.id_doc = dds.id_des_doc " + (isSummary() ? "" : "AND de.id_ety = dds.id_des_ety ") + "), 0.0) AS _prc_qty_rem, "
+                    
+                + (isSummary() ? "SUM(t2._net_orig_qty) " : "t2._net_orig_qty ") 
+                + "- COALESCE((SELECT SUM(dds.orig_qty) FROM trn_dps_dps_supply AS dds WHERE de.id_year = dds.id_des_year AND de.id_doc = dds.id_des_doc " + (isSummary() ? "" : "AND de.id_ety = dds.id_des_ety ") + "), 0.0) AS _prc_orig_qty_rem "
                 
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc "

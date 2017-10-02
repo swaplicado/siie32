@@ -900,8 +900,16 @@ public class SCfdPrint {
         paramsMap.put("dAddPagImporte", dps.getTotalCy_r());
         paramsMap.put("sAddPagClaveMoneda", dps.getDbmsCurrencyKey());
         paramsMap.put("dAddPagInteresMoratorio", dps.getAuxCfdParams().getInterestDelayRate());
+        
+        //Adds related CFDI's        
+        paramsMap.put("sCfdiTipoRelacion", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_REL_TP, dps.getCfdiRelacionadosTipoRelacion()));
+        String uuidRelated = "";
+        for (String uuid : dps.getCfdiRelacionados()) {
+            uuidRelated += (uuidRelated.isEmpty() ? "" : ", ") + uuid;
+        }
+        paramsMap.put("sCfdiUUIDsRelacionados", uuidRelated);
 
-        JasperPrint jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_CFDI, paramsMap);
+        JasperPrint jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_CFDI_33, paramsMap);
         String sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
         sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
 
@@ -913,6 +921,9 @@ public class SCfdPrint {
                 break;
             case SDataConstantsPrint.PRINT_MODE_PDF:
                 JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
+                break;
+            case SDataConstantsPrint.PRINT_MODE_STREAM:
+                JasperPrintManager.printReport(jasperPrint, false);
                 break;
             default:
                 throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);

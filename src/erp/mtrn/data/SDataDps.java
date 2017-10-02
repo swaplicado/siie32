@@ -84,7 +84,7 @@ import sa.lib.db.SDbConsts;
 
 /**
  *
- * @author Sergio Flores, Juan Barajas
+ * @author Sergio Flores, Juan Barajas, Daniel López
  */
 public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Serializable, erp.cfd.SCfdXmlCfdi32, erp.cfd.SCfdXmlCfdi33 {
 
@@ -530,6 +530,74 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         statement.execute(sql);
         sql = "DELETE FROM mkt_comms WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";
         statement.execute(sql);
+        
+        // recalculate rows in DPS vs DPS Supply when a credit note is deleted.
+        for(SDataDpsEntry entry : mvDbmsDpsEntries) {
+            if (entry.getFkDpsAdjustmentTypeId() == SDataConstantsSys.TRNS_TP_DPS_ADJ_RET) {
+                recalculateSuppliedInvoices(statement, entry);
+            }
+        }
+    }
+    
+    /**
+     * Adjusts negative quantities in document links.
+     * 1) Deletes current negative link.
+     * 2) Inserts recalculated quantity.
+     * @param statement
+     * @param entry
+     * @throws SQLException 
+     */
+    private void recalculateSuppliedInvoices(java.sql.Statement statement, SDataDpsEntry entry) throws SQLException {
+        if (entry.getIsDeleted()) { // deletes a specific entry from a credit note.
+            String sql = "DELETE FROM trn_dps_dps_supply "
+                    + "WHERE id_des_year = " + entry.getAuxPkDpsYearId() +" "
+                    + "AND id_des_doc = " + entry.getAuxPkDpsDocId()+ " "
+                    + "AND id_des_ety = " + entry.getPkEntryId() + " "
+                    + "AND qty < 0";
+            
+            statement.execute(sql);
+        }
+        
+        for (SDataDpsDpsAdjustment adjustment : entry.getDbmsDpsAdjustmentsAsAdjustment()) {
+            String sql = "DELETE FROM trn_dps_dps_supply "
+                    + "WHERE id_des_year = " + adjustment.getPkDpsYearId() + " "
+                    + "AND id_des_doc = " + adjustment.getPkDpsDocId() + " "
+                    + "AND id_des_ety = " + adjustment.getPkDpsEntryId() + " "
+                    + "AND qty < 0";
+
+            statement.execute(sql);
+            
+            // get link between order and invoice.
+            int[] sourceOrderKey = STrnUtilities.getSourceLink(statement, adjustment.getPkDpsYearId(), adjustment.getPkDpsDocId(), adjustment.getPkDpsEntryId());
+
+            if (sourceOrderKey != null) {
+                // calculate data.
+                double[] quantitiesReturned = STrnUtilities.getQuantitiesReturned(statement, adjustment.getPkDpsYearId(), adjustment.getPkDpsDocId(), adjustment.getPkDpsEntryId());
+                double[] quantitiesOfSuppliedEntries = STrnUtilities.getQuantitiesOfSuppliedEntries(statement, adjustment.getPkDpsYearId(), adjustment.getPkDpsDocId(), adjustment.getPkDpsEntryId());
+                
+                if (quantitiesReturned[0] > 0) {  // when deleting, doesn't insert a row with zeros.     
+                    SDataDpsDpsLink link = new SDataDpsDpsLink();
+
+                    link.setPkSourceYearId(sourceOrderKey[0]);
+                    link.setPkSourceDocId(sourceOrderKey[1]);
+                    link.setPkSourceEntryId(sourceOrderKey[2]);
+                    link.setPkDestinyYearId(adjustment.getPkDpsYearId());
+                    link.setPkDestinyDocId(adjustment.getPkDpsDocId());
+                    link.setPkDestinyEntryId(adjustment.getPkDpsEntryId());
+
+                    if (quantitiesReturned[0] > quantitiesOfSuppliedEntries[0]) {   // insert only up to the maximum supplied quantity.
+                        link.setQuantity(quantitiesOfSuppliedEntries[0] * -1);
+                        link.setOriginalQuantity(quantitiesOfSuppliedEntries[1] * -1);
+                    }
+                    else {
+                        link.setQuantity(quantitiesReturned[0] * -1);
+                        link.setOriginalQuantity(quantitiesReturned[1] * -1);
+                    }
+
+                    link.save(statement.getConnection());
+                }
+            }
+        }
     }
     
     private void clearEntryDeliveryReferences(java.sql.Statement statement) throws java.sql.SQLException {
@@ -2455,7 +2523,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                 nSortingPosition = 0;
 
-                for (SDataDpsEntry entry : mvDbmsDpsEntries) {
+                for (SDataDpsEntry entry : mvDbmsDpsEntries) {                    
                     if (entry.getIsRegistryNew() || entry.getIsRegistryEdited()) {
                         entry.setPkYearId(mnPkYearId);
                         entry.setPkDocId(mnPkDocId);
@@ -2469,6 +2537,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                         if (entry.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                        }
+                        
+                        // if the adjustment is a devolution, saves negative quantities in DPS vs DPS Supply.
+                        if (entry.getFkDpsAdjustmentTypeId() == SDataConstantsSys.TRNS_TP_DPS_ADJ_RET) {
+                            recalculateSuppliedInvoices(oStatement, entry);
                         }
                     }
                 }
@@ -3208,7 +3281,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }
                 }
-
+                        
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
             }
@@ -4522,7 +4595,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         if (tax.getFkTaxCalculationTypeId() != SModSysConsts.FINS_TP_TAX_CAL_RATE) {
                             throw new Exception("Todos los impuestos deben ser en base a una tasa (" + tax.getFkTaxCalculationTypeId() + ").");
                         }
-                        else {
+                        else if (tax.getTaxCy() != 0) {
                             impuestoXml = new SCfdDataImpuesto();
                             dImptoTasa = 0;
                     
@@ -4678,7 +4751,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     @Override
     public String getComprobanteMotivoDescuento() { // CFDI 3.2
-        return "";
+        return getComprobanteDescuento() == 0 ? "" : "DESCUENTO";
     }
 
     @Override
@@ -4687,12 +4760,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     @Override
-    public double getComprobanteTipoDeCambio() {    // CFDI 3.2
-        return mdExchangeRate;
-    }
-
-    @Override
-    public double getComprobanteTipoCambio() {  // CFDI 3.3
+    public double getComprobanteTipoCambio() {
         return mdExchangeRate;
     }
 
@@ -4831,22 +4899,23 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     descripcion = descripcion.substring(0, 1000);
                 }
                 
-                if (dpsEntry.getSubtotalCy_r() == SLibUtils.round(dpsEntry.getOriginalPriceUnitaryCy() * dpsEntry.getOriginalQuantity(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits())) {
+                if (dpsEntry.getSubtotalProvisionalCy_r() == SLibUtils.round(dpsEntry.getOriginalPriceUnitaryCy() * dpsEntry.getOriginalQuantity(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits())) {
                     price = dpsEntry.getOriginalPriceUnitaryCy();
                 }
                 else {
-                    price = dpsEntry.getSubtotalCy_r() / dpsEntry.getOriginalQuantity();
+                    price = dpsEntry.getSubtotalProvisionalCy_r() / dpsEntry.getOriginalQuantity();
                 }
                 
                 concepto = new SCfdDataConcepto();
+                concepto.setClaveProdServ(dpsEntry.getDbmsItemClaveProdServ());
                 concepto.setNoIdentificacion(dpsEntry.getConceptKey());
-                concepto.setUnidad(generateIntCommerceComplement() ? dpsEntry.getDbmsCustomsUnit() : dpsEntry.getDbmsOriginalUnitSymbol());
                 concepto.setCantidad(dpsEntry.getOriginalQuantity());
+                concepto.setClaveUnidad(dpsEntry.getDbmsOriginalUnidadClave());
+                concepto.setUnidad(generateIntCommerceComplement() ? dpsEntry.getDbmsCustomsUnit() : dpsEntry.getDbmsOriginalUnitSymbol());
                 concepto.setDescripcion(descripcion);
                 concepto.setValorUnitario(price);
-                concepto.setImporte(dpsEntry.getSubtotalCy_r());
-                concepto.setClaveProdServ(dpsEntry.getDbmsItemClaveProdServ());
-                concepto.setClaveUnidad(dpsEntry.getDbmsUnidadClave());
+                concepto.setImporte(dpsEntry.getSubtotalProvisionalCy_r());
+                concepto.setDescuento(dpsEntry.getDiscountDocCy());
                 
                 concepto.computeCfdImpuestosConceptos(dpsEntry);
                 

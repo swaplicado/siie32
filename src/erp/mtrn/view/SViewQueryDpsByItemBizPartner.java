@@ -118,7 +118,7 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "it.item", "Ítem", 300);
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "de.orig_qty", "Cantidad", STableConstants.WIDTH_QUANTITY);
         maoTableColumns[i++].setSumApplying(true);
-        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_CODE_COB);
+        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uo.symbol", "Unidad", STableConstants.WIDTH_CODE_COB);
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "de.price_u_cur", "Precio unitario mon $", STableConstants.WIDTH_VALUE_UNITARY);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "de.stot_cur_r", "Subtotal mon $", STableConstants.WIDTH_VALUE_2X);
@@ -236,7 +236,7 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
 
 //        renderTableColumns();
 
-        msSql = "SELECT de.id_year, de.id_doc, de.id_ety, d.dt, dt.code, CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS folio, cob.code, bp.bp, bpc.bp_key, bpb.bpb, de.concept_key, it.item, de.orig_qty, u.symbol, de.price_u_cur, de.stot_cur_r, de.tax_charged_cur_r, de.tax_retained_cur_r,  de.tot_cur_r, c.cur_key, " +
+        msSql = "SELECT de.id_year, de.id_doc, de.id_ety, d.dt, dt.code, CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS folio, cob.code, bp.bp, bpc.bp_key, bpb.bpb, de.concept_key, it.item, de.orig_qty, uo.symbol, de.price_u_cur, de.stot_cur_r, de.tax_charged_cur_r, de.tax_retained_cur_r,  de.tot_cur_r, c.cur_key, " +
                 "de.price_u, de.stot_r, de.tax_charged_r, de.tax_retained_r,  de.tot_r, '"  + miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey() + "' AS f_cur_key, " +
                 "de.id_ety , rbc.code, rcb.code, CONCAT(r.id_year, '-', erp.lib_fix_int(r.id_per, 2)) as f_rper, " +
                 "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, " + SDataConstantsSys.NUM_LEN_FIN_REC + ")) as f_rnum " +
@@ -247,7 +247,7 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
                 "INNER JOIN erp.bpsu_bp_ct AS bpc ON bp.id_bp = bpc.id_bp AND bpc.id_ct_bp = " + (isPurchase() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS) + " " +
                 "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps " +
                 "INNER JOIN erp.itmu_item AS it ON de.fid_item = it.id_item " +
-                "INNER JOIN erp.itmu_unit AS u ON u.id_unit = de.fid_unit " +
+                "INNER JOIN erp.itmu_unit AS uo ON uo.id_unit = de.fid_orig_unit " +
                 "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
                 "INNER JOIN erp.bpsu_bpb AS cob ON d.fid_cob = cob.id_bpb " +
                 "LEFT OUTER JOIN trn_dps_rec AS dr ON d.id_year = dr.id_dps_year AND d.id_doc = dr.id_dps_doc " +

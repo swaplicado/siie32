@@ -21,7 +21,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores, Alfonso Flores, Uriel Castañeda, Juan Barajas
+ * @author Sergio Flores, Alfonso Flores, Uriel Castañeda, Juan Barajas, Daniel López
  */
 public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -132,6 +132,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected java.lang.String msDbmsItemRef_n;
     protected java.lang.String msDbmsItemClaveProdServ;
     protected java.lang.String msDbmsUnidadClave;
+    protected java.lang.String msDbmsOriginalUnidadClave;
     protected java.lang.String msDbmsTariffFraction;
     protected java.lang.String msDbmsCustomsUnit;
     protected java.lang.String msDbmsCustomsUnitSymbol;
@@ -167,57 +168,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected int mnXtaPkDpsDocConId; // DPS for adjustment DPS in contract
     protected int mnXtaPkDpsDocEtyConId; // DPS for adjustment DPS in contract
 
-    private void setXtaPkDpsCon(java.sql.Connection connection, SDataDpsDpsAdjustment dpsAdjustment) {
-        int nPkDpsYearOrdId = 0;
-        int nPkDpsDocOrdId = 0;
-        int nPkDpsDocEtyOrdId = 0;
-        String sSql = "";
-        Statement oStatement = null;
-        ResultSet oResultSet = null;
-        
-        try {
-            oStatement = connection.createStatement();
-            
-            // Read aswell DPS links as a destiny:
 
-            sSql = "SELECT id_src_year, id_src_doc, id_src_ety FROM trn_dps_dps_supply " +
-                    "WHERE id_des_year = " + dpsAdjustment.getPkDpsYearId() + " AND id_des_doc = " + dpsAdjustment.getPkDpsDocId() + " AND id_des_ety = " + dpsAdjustment.getPkDpsEntryId() + " ";
-            
-            oResultSet = oStatement.executeQuery(sSql);
-            if (oResultSet.next()) {
-                nPkDpsYearOrdId = oResultSet.getInt("id_src_year");
-                nPkDpsDocOrdId = oResultSet.getInt("id_src_doc");
-                nPkDpsDocEtyOrdId = oResultSet.getInt("id_src_ety");
-            }
-            
-            // Read aswell DPS links as a destiny:
-
-            sSql = "SELECT con_prc_year, con_prc_mon FROM trn_dps_ety " +
-                    "WHERE id_year = " + nPkDpsYearOrdId + " AND id_doc = " + nPkDpsDocOrdId + " AND id_ety = " + nPkDpsDocEtyOrdId + " ";
-            
-            oResultSet = oStatement.executeQuery(sSql);
-            if (oResultSet.next()) {
-                mnContractPriceYear = oResultSet.getInt("con_prc_year");
-                mnContractPriceMonth = oResultSet.getInt("con_prc_mon");
-            }
-            
-            // Read aswell DPS links as a destiny:
-
-            sSql = "SELECT id_src_year, id_src_doc, id_src_ety FROM trn_dps_dps_supply " +
-                    "WHERE id_des_year = " + nPkDpsYearOrdId + " AND id_des_doc = " + nPkDpsDocOrdId + " AND id_des_ety = " + nPkDpsDocEtyOrdId + " ";
-            
-            oResultSet = oStatement.executeQuery(sSql);
-            if (oResultSet.next()) {
-                mnXtaPkDpsYearConId = oResultSet.getInt("id_src_year");
-                mnXtaPkDpsDocConId = oResultSet.getInt("id_src_doc");
-                mnXtaPkDpsDocEtyConId = oResultSet.getInt("id_src_ety");
-            }
-        }
-        catch (Exception exception) {
-            mnLastDbActionResult = SLibConstants.DB_ACTION_ANNUL_ERROR;
-            SLibUtilities.printOutException(this, exception);
-        }
-    }
     
     /**
      * Overrides java.lang.Object.clone() function.
@@ -439,6 +390,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setDbmsItemRef_n(java.lang.String s) { msDbmsItemRef_n = s; }
     public void setDbmsItemClaveProdServ (java.lang.String s) { msDbmsItemClaveProdServ = s; }
     public void setDbmsUnidadClave(java.lang.String s) { msDbmsUnidadClave = s; }
+    public void setDbmsOriginalUnidadClave(java.lang.String s) { msDbmsOriginalUnidadClave = s; }
     public void setDbmsTariffFraction(java.lang.String s) { msDbmsTariffFraction = s; }
     public void setDbmsCustomsUnit(java.lang.String s) { msDbmsCustomsUnit = s; }
     public void setDbmsCustomsUnitSymbol(java.lang.String s) { msDbmsCustomsUnitSymbol = s; }
@@ -468,6 +420,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public java.lang.String getDbmsItemRef_n() { return msDbmsItemRef_n; }
     public java.lang.String getDbmsItemClaveProdServ() { return msDbmsItemClaveProdServ; }
     public java.lang.String getDbmsUnidadClave() { return msDbmsUnidadClave; }
+    public java.lang.String getDbmsOriginalUnidadClave() { return msDbmsOriginalUnidadClave; }
     public java.lang.String getDbmsTariffFraction() { return msDbmsTariffFraction; }
     public java.lang.String getDbmsCustomsUnit() { return msDbmsCustomsUnit; }
     public java.lang.String getDbmsCustomsUnitSymbol() { return msDbmsCustomsUnitSymbol; }
@@ -634,6 +587,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         msDbmsItemRef_n = "";
         msDbmsItemClaveProdServ = "";
         msDbmsUnidadClave = "";
+        msDbmsOriginalUnidadClave = "";
         msDbmsTariffFraction = "";
         msDbmsCustomsUnit = "";
         msDbmsCustomsUnitSymbol = "";
@@ -681,7 +635,10 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         reset();
 
         try {
-            sql = "SELECT de.*, i.item, i.fid_cfd_prod_serv_n, i.tariff, i.fid_igen, igen.b_ship_dom, igen.b_ship_int, igen.b_ship_qlt, igen.fid_cfd_prod_serv, u.symbol, ou.symbol, ou.symbol_custs, ou.unit_custs, cu.code, " +
+            sql = "SELECT de.*, " +
+                    "i.item, i.fid_cfd_prod_serv_n, i.tariff, i.fid_igen, " +
+                    "igen.b_ship_dom, igen.b_ship_int, igen.b_ship_qlt, igen.fid_cfd_prod_serv, " +
+                    "u.symbol, ou.symbol, ou.symbol_custs, ou.unit_custs, cu.code, ocu.code, " +
                     "tr.tax_reg, tda.stp_dps_adj, tde.tp_dps_ety, cc.code, cc.cc, ir.item, ade.bac_num_pos, ade.bac_cen, ade.lor_num_ety, ade.sor_cod, " +
                     "ade.ele_ord, ade.ele_barc, ade.ele_cag, ade.ele_cag_price_u, ade.ele_par, ade.ele_par_price_u " +
                     "FROM trn_dps_ety AS de " +
@@ -690,6 +647,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     "INNER JOIN erp.itmu_unit as u ON de.fid_unit = u.id_unit " +
                     "INNER JOIN erp.itmu_unit as ou ON de.fid_orig_unit = ou.id_unit " +
                     "INNER JOIN erp.itms_cfd_unit AS cu ON u.fid_cfd_unit = cu.id_cfd_unit " +
+                    "INNER JOIN erp.itms_cfd_unit AS ocu ON ou.fid_cfd_unit = ocu.id_cfd_unit " +
                     "INNER JOIN erp.finu_tax_reg AS tr ON de.fid_tax_reg = tr.id_tax_reg " +
                     "INNER JOIN erp.trns_stp_dps_adj AS tda ON de.fid_tp_dps_adj = tda.id_tp_dps_adj AND de.fid_stp_dps_adj = tda.id_stp_dps_adj " +
                     "INNER JOIN erp.trns_tp_dps_ety AS tde ON de.fid_tp_dps_ety = tde.id_tp_dps_ety " +
@@ -865,6 +823,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 }
 
                 msDbmsUnidadClave = resultSet.getString("cu.code");
+                msDbmsOriginalUnidadClave = resultSet.getString("ocu.code");
                 msDbmsTariffFraction = resultSet.getString("i.tariff");
                 msDbmsCustomsUnit = resultSet.getString("ou.unit_custs");
                 msDbmsCustomsUnitSymbol = resultSet.getString("ou.symbol_custs");
@@ -946,12 +905,12 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 if (mbFlagReadLinksAswell) {
                     // Read aswell DPS links as a source:
 
-                    sql = "SELECT id_des_year, id_des_doc, id_des_ety FROM trn_dps_dps_supply " +
+                    sql = "SELECT id_des_year, id_des_doc, id_des_ety, qty FROM trn_dps_dps_supply " +
                             "WHERE id_src_year = " + mnPkYearId + " AND id_src_doc = " + mnPkDocId + " AND id_src_ety = " + mnPkEntryId + " ";
                     resultSet = statement.executeQuery(sql);
                     while (resultSet.next()) {
                         SDataDpsDpsLink link = new SDataDpsDpsLink();
-                        if (link.read(new int[] { mnPkYearId, mnPkDocId, mnPkEntryId, resultSet.getInt("id_des_year"), resultSet.getInt("id_des_doc"), resultSet.getInt("id_des_ety") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                        if (link.read(new Object[] { mnPkYearId, mnPkDocId, mnPkEntryId, resultSet.getInt("id_des_year"), resultSet.getInt("id_des_doc"), resultSet.getInt("id_des_ety"), resultSet.getDouble("qty") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                         }
                         else {
@@ -961,12 +920,12 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
 
                     // Read aswell DPS links as a destiny:
 
-                    sql = "SELECT id_src_year, id_src_doc, id_src_ety FROM trn_dps_dps_supply " +
+                    sql = "SELECT id_src_year, id_src_doc, id_src_ety, qty FROM trn_dps_dps_supply " +
                             "WHERE id_des_year = " + mnPkYearId + " AND id_des_doc = " + mnPkDocId + " AND id_des_ety = " + mnPkEntryId + " ";
                     resultSet = statement.executeQuery(sql);
                     while (resultSet.next()) {
                         SDataDpsDpsLink link = new SDataDpsDpsLink();
-                        if (link.read(new int[] { resultSet.getInt("id_src_year"), resultSet.getInt("id_src_doc"), resultSet.getInt("id_src_ety"), mnPkYearId, mnPkDocId, mnPkEntryId }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                        if (link.read(new Object[] { resultSet.getInt("id_src_year"), resultSet.getInt("id_src_doc"), resultSet.getInt("id_src_ety"), mnPkYearId, mnPkDocId, mnPkEntryId, resultSet.getDouble("qty") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                         }
                         else {
@@ -1051,10 +1010,6 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         
-        if (!mvDbmsDpsAdjustmentsAsAdjustment.isEmpty()) {
-            setXtaPkDpsCon(connection, mvDbmsDpsAdjustmentsAsAdjustment.get(0));
-        }
-
         try {
             callableStatement = connection.prepareCall(
                     "{ CALL trn_dps_ety_save(" +
@@ -1291,7 +1246,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                         if (adjustment.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                         }
-                     }
+                    }
 
                     // Save aswell document adjustment links as document adjustment:
 
@@ -1301,25 +1256,6 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                         adjustment.setPkDpsAdjustmentEntryId(mnPkEntryId);
 
                         if (adjustment.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
-                        }
-                    }
-                    
-                    if (!mvDbmsDpsAdjustmentsAsAdjustment.isEmpty() && mnFkDpsAdjustmentTypeId == SDataConstantsSys.TRNS_TP_DPS_ADJ_RET &&
-                            (mnXtaPkDpsYearConId != SLibConsts.UNDEFINED && mnXtaPkDpsDocConId != SLibConsts.UNDEFINED && mnXtaPkDpsDocEtyConId != SLibConsts.UNDEFINED)) {
-                        SDataDpsDpsLink link = new SDataDpsDpsLink();
-
-                        link.setPkSourceYearId(mnXtaPkDpsYearConId);
-                        link.setPkSourceDocId(mnXtaPkDpsDocConId);
-                        link.setPkSourceEntryId(mnXtaPkDpsDocEtyConId);
-                        link.setPkDestinyYearId(mnPkYearId);
-                        link.setPkDestinyDocId(mnPkDocId);
-                        link.setPkDestinyEntryId(mnPkEntryId);
-
-                        link.setOriginalQuantity(mvDbmsDpsAdjustmentsAsAdjustment.get(0).getOriginalQuantity() * -1);
-                        link.setQuantity(mvDbmsDpsAdjustmentsAsAdjustment.get(0).getQuantity() * -1);
-
-                        if (link.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                         }
                     }
@@ -1728,6 +1664,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setDbmsItemRef_n(msDbmsItemRef_n);
         clone.setDbmsItemClaveProdServ(msDbmsItemClaveProdServ);
         clone.setDbmsUnidadClave(msDbmsUnidadClave);
+        clone.setDbmsOriginalUnidadClave(msDbmsOriginalUnidadClave);
         clone.setDbmsCustomsUnit(msDbmsCustomsUnit);
         clone.setDbmsCustomsUnitSymbol(msDbmsCustomsUnitSymbol);
         clone.setDbmsDpsAddBachocoNumberPosition(mnDbmsDpsAddBachocoNumberPosition);

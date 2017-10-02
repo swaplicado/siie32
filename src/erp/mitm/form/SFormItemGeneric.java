@@ -1234,10 +1234,11 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         jPanel48.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkCfdProdServId.setText("Producto-servicio SAT: *");
-        jlFkCfdProdServId.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlFkCfdProdServId.setPreferredSize(new java.awt.Dimension(127, 23));
         jPanel48.add(jlFkCfdProdServId);
 
-        moKeyCfdProdServId.setPreferredSize(new java.awt.Dimension(225, 23));
+        moKeyCfdProdServId.setMaximumRowCount(12);
+        moKeyCfdProdServId.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel48.add(moKeyCfdProdServId);
 
         jPanel35.add(jPanel48);

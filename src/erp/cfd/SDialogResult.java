@@ -21,8 +21,8 @@ import static erp.mod.hrs.db.SHrsUtils.getMapPayrollReceipt;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
-import erp.print.PrintCfdiThread;
 import erp.print.SDataConstantsPrint;
+import erp.print.SPrintCfdiThread;
 import java.awt.Cursor;
 import java.io.File;
 import java.sql.ResultSet;
@@ -457,7 +457,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
         String sSql = "";
         String warningMessage = "";
         ResultSet resultSet = null;
-        PrintCfdiThread print = null; 
+        SPrintCfdiThread thread = null; 
         
         moIntTotalToProcess.setValue(maCfds.size());
         
@@ -525,10 +525,10 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                             detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Anulado.\n";
                             break;
                         case SCfdConsts.PROC_PRT_DOC:
-                            print = new PrintCfdiThread(miClient, cfd.getPkCfdId(), SDataConstantsPrint.PRINT_MODE_STREAM, mnNumCopies, mnSubtypeCfd, this);
+                            thread = new SPrintCfdiThread(miClient, cfd.getPkCfdId(), SDataConstantsPrint.PRINT_MODE_STREAM, mnNumCopies, mnSubtypeCfd, this);
                             
-                            print.startThread();
-                            print.join();
+                            thread.startThread();
+                            thread.join();
                             //SCfdUtils.printCfd(miClient, cfd.getFkCfdTypeId(), cfd, SDataConstantsPrint.PRINT_MODE_STREAM, mnNumCopies, mnSubtypeCfd, false);
                             detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Impreso.\n";
                             break;

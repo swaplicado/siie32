@@ -27,7 +27,7 @@ public interface SCfdXmlCfdi32 {
     public double getComprobanteSubtotal();         // Subtotal
     public double getComprobanteDescuento();        // Descuento
     public String getComprobanteMotivoDescuento();  // MotivoDescuento
-    public double getComprobanteTipoDeCambio();     // TipoCambio
+    public double getComprobanteTipoCambio();     // TipoCambio
     public String getComprobanteMoneda();           // Moneda
     public double getComprobanteTotal();            // Total
     public int getComprobanteTipoDeComprobante();   // TipoDeComprobante
