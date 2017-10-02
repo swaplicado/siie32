@@ -769,6 +769,8 @@ public abstract class SFinUtilities {
                 sAccountCredit = SLibUtilities.textTrim(payment.getAccountCredit());
                 sConcept = SLibUtilities.textToAlphanumeric(payment.getConcept());
                 sReference = SLibUtilities.textToAlphanumeric(payment.getReference());
+                // Changes for layout, Andrea need: erase all leters and replace for " " (blank). 
+                sReference = sReference.replaceAll("[A-Za-z\\u00C0-\\u017F]", " ");
                 mdBalanceTot = payment.getTotalAmount();
 
                 layout += (sAccountDebit.length() > 16 ? SLibUtilities.textLeft(sAccountDebit, 16) : sAccountDebit).concat(SLibUtilities.textRepeat(" ", (16 - sAccountDebit.length()))); // Debit acccount
