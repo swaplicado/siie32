@@ -2829,8 +2829,8 @@ public abstract class STrnUtilities {
     
     public static String computeMailItem(final SClientInterface client, final int itemId, final int unitId, final String itemCode, final String itemName, final String contract, final String numberSeries, final String number, final String reference, final double qty, final String unitMeasure, final Date date, final int[] dpsTypeKey, final boolean isEdited, final boolean isRebill) {
         String mail = null;
-        double accumDay = computeAccumulatedItem(client, itemId, unitId, dpsTypeKey, date, date, unitMeasure, isEdited, isRebill, numberSeries, number);
-        double accumMonth = computeAccumulatedItem(client, itemId, unitId, dpsTypeKey, SLibTimeUtils.getBeginOfMonth(date), date, unitMeasure, isEdited, isRebill, numberSeries, number);
+        double accumDay = computeAccumulatedItem(client, itemId, unitId, dpsTypeKey, date, date, isRebill, numberSeries, number);
+        double accumMonth = computeAccumulatedItem(client, itemId, unitId, dpsTypeKey, SLibTimeUtils.getBeginOfMonth(date), date, isRebill, numberSeries, number);
         
         mail = "<tr> "        
             + "<td> " + itemCode
@@ -2879,7 +2879,7 @@ public abstract class STrnUtilities {
         return mail;
     }
     
-    private static double computeAccumulatedItem(final SClientInterface client, final int itemId, final int unitId, final int[] dpsTypeKey, final Date start, final Date end, final String unitMeasureOrigin, final boolean isEdited, final boolean isRebill, final String numberSeries, final String number) {
+    private static double computeAccumulatedItem(final SClientInterface client, final int itemId, final int unitId, final int[] dpsTypeKey, final Date start, final Date end, final boolean isRebill, final String numberSeries, final String number) {
         String sql = "";
         double total = 0;
         ResultSet resultSet = null;
