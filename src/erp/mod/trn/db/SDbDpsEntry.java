@@ -559,8 +559,9 @@ public class SDbDpsEntry extends SDbRegistryUser {
 
             statement = session.getStatement().getConnection().createStatement();
             
-            msSql = "SELECT id_prc FROM trn_dps_ety_prc " +
-                    "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " AND id_ety = " + mnPkEntryId + " AND b_del = 0 ORDER BY con_prc_mon";
+            msSql = "SELECT id_prc FROM trn_dps_ety_prc "
+                    + "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " AND id_ety = " + mnPkEntryId + " AND b_del = 0 "
+                    + "ORDER BY con_prc_year, con_prc_mon ";
             
             resultSet = statement.executeQuery(msSql);
             while (resultSet.next()) {

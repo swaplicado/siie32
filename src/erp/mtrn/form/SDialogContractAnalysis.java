@@ -42,7 +42,7 @@ import javax.swing.event.ListSelectionEvent;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDialogContractAnalysis extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, javax.swing.event.ListSelectionListener {
 
@@ -823,7 +823,8 @@ public class SDialogContractAnalysis extends javax.swing.JDialog implements erp.
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Folio ped.", STableConstants.WIDTH_DOC_NUM);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Sucursal ped.", STableConstants.WIDTH_CODE_COB);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Partida ped.", STableConstants.WIDTH_NUM_TINYINT);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cantidad ped.", STableConstants.WIDTH_QUANTITY);
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cantidad ped.", STableConstants.WIDTH_QUANTITY);
+        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha fac.", STableConstants.WIDTH_DATE);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo fac.", STableConstants.WIDTH_CODE_DOC);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Folio fac.", STableConstants.WIDTH_DOC_NUM);
@@ -832,7 +833,8 @@ public class SDialogContractAnalysis extends javax.swing.JDialog implements erp.
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total fac. $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Saldo fac. $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Partida fac.", STableConstants.WIDTH_NUM_TINYINT);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cantidad fac.", STableConstants.WIDTH_QUANTITY);
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cantidad fac.", STableConstants.WIDTH_QUANTITY);
+        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha NC", STableConstants.WIDTH_DATE);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo NC", STableConstants.WIDTH_CODE_DOC);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Folio NC", STableConstants.WIDTH_DOC_NUM);
@@ -935,12 +937,12 @@ public class SDialogContractAnalysis extends javax.swing.JDialog implements erp.
         moTablePane.clearTableRows();
 
         try {
-            sql = "SELECT dp.id_year, dp.id_doc, dep.id_ety, dp.dt, dtp.code, CONCAT(dp.num_ser, IF(length(dp.num_ser) = 0, '', '-'), dp.num) AS f_ped, " +
+            sql = "SELECT dp.id_year, dp.id_doc, dep.id_ety, dp.dt, dtp.code, CONCAT(dp.num_ser, IF(length(dp.num_ser) = 0, '', '-'), dp.num) AS _ord, " +
                     "dep.sort_pos, cobp.code, " +
                     "(dep.orig_qty * " +
                     "IF((dp.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CN[0] + " AND dp.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CN[1] + " AND dp.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CN[2] + ") OR " +
                     "(dp.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CN[0] + " AND dp.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] + " AND dp.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CN[2] + ") " +
-                    ", -1, 1)) AS orig_qty_proc, " +
+                    ", -1.0, 1.0)) AS _orig_qty_proc, " +
                     "u.symbol, un.symbol " +
                     "FROM trn_dps AS d " +
                     "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc " +
@@ -964,18 +966,18 @@ public class SDialogContractAnalysis extends javax.swing.JDialog implements erp.
             while (resulSet.next()) {
                 mbIsAdd = true;
                 oRow = new SDataContractAnalysisRow(miClient);
-                oRow.setDateOrd(resulSet.getDate(4));
-                oRow.setTypeOrd(resulSet.getString(5));
-                oRow.setNumberOrd(resulSet.getString(6));
-                oRow.setBranchOrd(resulSet.getString(8));
-                oRow.setSortPosOrd(resulSet.getInt(7));
-                oRow.setQtyOrd(resulSet.getDouble(9));
+                oRow.setDateOrd(resulSet.getDate("dp.dt"));
+                oRow.setTypeOrd(resulSet.getString("dtp.code"));
+                oRow.setNumberOrd(resulSet.getString("_ord"));
+                oRow.setBranchOrd(resulSet.getString("cobp.code"));
+                oRow.setSortPosOrd(resulSet.getInt("dep.sort_pos"));
+                oRow.setQtyOrd(resulSet.getDouble("_orig_qty_proc"));
 
-                mdQtyOrd += resulSet.getDouble(9);
-                msOrigUnit = resulSet.getString(11);
-                msUnitOrd = resulSet.getString(10);
+                mdQtyOrd += resulSet.getDouble("_orig_qty_proc");
+                msOrigUnit = resulSet.getString("un.symbol");
+                msUnitOrd = resulSet.getString("u.symbol");
 
-                renderDps(resulSet.getInt(1), resulSet.getInt(2), resulSet.getInt(3));
+                renderDps(resulSet.getInt("dp.id_year"), resulSet.getInt("dp.id_doc"), resulSet.getInt("dep.id_ety"));
             }
 
             if (moTablePane.getTableGuiRowCount() > 0) {
@@ -1036,7 +1038,7 @@ public class SDialogContractAnalysis extends javax.swing.JDialog implements erp.
                 oRow.setCommissionsReference(resulSet.getString(13));
                 oRow.setBranchDoc(resulSet.getString(8));
                 oRow.setSortPosDoc(resulSet.getInt(7));
-                oRow.setQtyDoc(resulSet.getInt(9));
+                oRow.setQtyDoc(resulSet.getDouble(9));
                 oRow.setTotalDoc(resulSet.getDouble(11));
                 oRow.setBalance(resulSet.getDouble(12));
 
