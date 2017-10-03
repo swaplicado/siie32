@@ -144,7 +144,8 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
         String sql = "";
         String sqlHaving = "";
         Object filter = null;
-        String dateCut = "";
+        String dateCutForPayroll = "";
+        String dateCutForLoan = "";
 
         moPaneSettings = new SGridPaneSettings(2);
         moPaneSettings.setUserInsertApplying(true);
@@ -154,7 +155,8 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
 
         if (filter != null) {
             mtDateCut = (SGuiDate) filter;
-            dateCut = " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateCut) + "' ";
+            dateCutForPayroll = " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateCut) + "' ";
+            dateCutForLoan = " AND v.dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateCut) + "' ";
         }
             
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
@@ -211,33 +213,21 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
                 + "v.dt_end_n AS " + SDbConsts.FIELD_DATE + "1, "
                 + "v.cap, "
                 + "v.tot_amt, "
+                + "COALESCE(incs._inc, 0.0) AS _inc, "
+                + "COALESCE(decs._dec, 0.0) AS _dec, "
+                + "decs._last_move, "
                 + "IF(v.fk_tp_loan IN(" + SModSysConsts.HRSS_TP_LOAN_HOM + ", " + SModSysConsts.HRSS_TP_LOAN_CON + "), 0, (v.tot_amt + "
-                + "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) AS f_in "
-                + "FROM hrs_pay AS p "
-                + "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay "
-                + "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp "
-                + "WHERE (p.id_pay = 0 OR p.b_del = 0) AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND rcp_ear.fk_loan_emp_n = v.id_emp AND "
-                + "rcp_ear.fk_loan_loan_n = v.id_loan " + (dateCut.isEmpty() ? "" : dateCut) + ") - "
-                + "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) AS f_out "
-                + "FROM hrs_pay AS p "
-                + "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay "
-                + "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp "
-                + "WHERE (p.id_pay = 0 OR p.b_del = 0) AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.fk_loan_emp_n = v.id_emp AND "
-                + "rcp_ded.fk_loan_loan_n = v.id_loan " + (dateCut.isEmpty() ? "" : dateCut) + "))) AS _bal, "
-                + "(SELECT MAX(p.dt_end) "
-                + "FROM hrs_pay AS p "
-                + "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay "
-                + "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp "
-                + "WHERE (p.id_pay = 0 OR p.b_del = 0) AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.fk_loan_emp_n = v.id_emp AND rcp_ded.fk_loan_loan_n = v.id_loan) AS _dt_max, "
+                + "COALESCE(incs._inc, 0.0) - COALESCE(decs._dec, 0.0))) AS _bal, "
                 + "v.pay_amt, "
                 + "v.pay_fix, "
                 + "v.pay_uma, "
-                + "v.pay_per, "
                 + "v.fk_tp_loan, "
                  + "IF(v.pay_per_ref = " + SHrsConsts.SAL_REF_SAL  + ", '" + SHrsConsts.TXT_SAL_REF_SAL + "',"
                  + "IF(v.pay_per_ref = " + SHrsConsts.SAL_REF_SAL_SS  + ", '" + SHrsConsts.TXT_SAL_REF_SAL_SS + "',"
                  + "IF(v.pay_per_ref = " + SHrsConsts.SAL_REF_SAL_FIX  + ", '" + SHrsConsts.TXT_SAL_REF_SAL_FIX + "', ''))) AS f_sal_ref, "
+                + "v.pay_per, "
                 + "v.pay_per_amt, "
+                + "v.fk_tp_loan, "
                 + "bp.bp, "
                 + "vt.name, "
                 + "vtp.name, "
@@ -267,7 +257,25 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
                 + "v.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
                 + "v.fk_usr_upd = uu.id_usr "
-                + (sql.isEmpty() ? "" : "WHERE " + sql) + sqlHaving
+                + "LEFT OUTER JOIN (SELECT pre.fk_loan_emp_n AS _id_emp, pre.fk_loan_loan_n AS _id_loan, COALESCE(SUM(pre.amt_r), 0) AS _inc "
+                + "FROM hrs_pay AS p "
+                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                + "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                + "WHERE (p.id_pay = 0 OR NOT p.b_del) AND NOT pr.b_del AND NOT pre.b_del AND pre.fk_loan_emp_n IS NOT NULL "
+                + (dateCutForPayroll.isEmpty() ? "" : dateCutForPayroll)
+                + "GROUP BY pre.fk_loan_emp_n, pre.fk_loan_loan_n "
+                + "ORDER BY pre.fk_loan_emp_n, pre.fk_loan_loan_n) "
+                + "AS incs ON incs._id_emp = v.id_emp AND incs._id_loan = v.id_loan "
+                + "LEFT OUTER JOIN (SELECT prd.fk_loan_emp_n AS _id_emp, prd.fk_loan_loan_n AS _id_loan, COALESCE(SUM(prd.amt_r), 0) AS _dec, MAX(p.dt_end) AS _last_move "
+                + "FROM hrs_pay AS p "
+                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                + "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
+                + "WHERE (p.id_pay = 0 OR NOT p.b_del) AND NOT PR.b_del AND NOT prd.b_del AND prd.fk_loan_emp_n IS NOT NULL "
+                + (dateCutForPayroll.isEmpty() ? "" : dateCutForPayroll)
+                + "GROUP BY prd.fk_loan_emp_n, prd.fk_loan_loan_n "
+                + "ORDER BY prd.fk_loan_emp_n, prd.fk_loan_loan_n) "
+                + "AS decs ON decs._id_emp = v.id_emp AND decs._id_loan = v.id_loan "
+                + (sql.isEmpty() ? "" : "WHERE " + sql + dateCutForLoan) + sqlHaving
                 + "ORDER BY v.num, bp.bp, v.id_emp, vt.name, vtp.name, v.id_loan ";
     }
 
@@ -284,7 +292,7 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "v.cap", "Capital $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "v.tot_amt", "Total a pagar $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "_bal", "Saldo $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "_dt_max", "Último pago"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "_last_move", "Último pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "v.pay_amt", "Monto $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_8D, "v.pay_fix", "Salarios mínimos"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_4D, "v.pay_per", "Porcentaje de salario base"));
