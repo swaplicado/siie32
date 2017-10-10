@@ -400,10 +400,9 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
     }
     
     private void loadAccountsPurchases() {
-        ArrayList<SDataAccount> accounts = new ArrayList<SDataAccount>();
-        
         try {
-            accounts = SDataUtilities.obtainAccountsByType(miClient, SDataConstantsSys.FINS_CLS_ACC_PUR);
+            ArrayList<SDataAccount> accounts = SDataUtilities.obtainAccountsByType(miClient, SDataConstantsSys.FINS_CLS_ACC_PUR);
+            accounts.addAll(SDataUtilities.obtainAccountsByType(miClient, SDataConstantsSys.FINS_CLS_ACC_PUR_ADJ));
             
             moPaneAccounts.clearTableRows();
             for (SDataAccount account : accounts) {

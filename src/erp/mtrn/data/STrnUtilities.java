@@ -70,7 +70,6 @@ import sa.lib.mail.SMailSender;
 import sa.lib.srv.SSrvConsts;
 import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
-import sor.utils.SSorianaUtils;
 
 /**
  *
@@ -2012,15 +2011,17 @@ public abstract class STrnUtilities {
         Cursor cursor = null;
         SDataCfd cfd = null;
         SDataDps dps = null;
-        SSorianaUtils sorianaUtils;
+        //sor.utils.SSorianaUtils sorianaUtils;
+        soriana.utils.SSorianaUtils sorianaUtilsParalelo;
         int statusId = 0;
         String status = "";
 
         cursor = client.getFrame().getCursor();
         dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, dpsKey, SLibConstants.EXEC_MODE_SILENT);
         cfd = dps.getDbmsDataCfd();
-
-        sorianaUtils = new SSorianaUtils();
+        
+        /*
+        sorianaUtils = new sor.utils.SSorianaUtils();
         sorianaUtils.sendDocumentWs(SCfdUtils.removeNode(dps.getDbmsDataCfd().getDocXml(), "myadd:Addenda1"));
 
         if (sorianaUtils.getAcknowledgmentStatus().compareTo(SModSysConsts.TXT_ST_XML_DVY_REJECT) == 0) {
@@ -2035,16 +2036,36 @@ public abstract class STrnUtilities {
             statusId = SModSysConsts.TRNS_ST_XML_DVY_PENDING;
             status = "PENDIENTE.";
         }
-
+        
         cfd.saveField(client.getSession().getStatement().getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_ACK_DVY, sorianaUtils.getAcknowledgment().replaceAll("'", "\""));
         cfd.saveField(client.getSession().getStatement().getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_MSJ_DVY, sorianaUtils.getAcknowledgmentMsg().replaceAll("'", "\""));
+        */
+
+        sorianaUtilsParalelo = new soriana.utils.SSorianaUtils();
+        sorianaUtilsParalelo.sendDocumentWs(SCfdUtils.removeNode(dps.getDbmsDataCfd().getDocXml(), "myadd:Addenda1"));
+
+        if (sorianaUtilsParalelo.getAcknowledgmentStatus().compareTo(SModSysConsts.TXT_ST_XML_DVY_REJECT) == 0) {
+            statusId = SModSysConsts.TRNS_ST_XML_DVY_REJECT;
+            status = "RECHAZADO:\n" + "- " + sorianaUtilsParalelo.getAcknowledgmentMsg() + ".";
+        }
+        else if (sorianaUtilsParalelo.getAcknowledgmentStatus().compareTo(SModSysConsts.TXT_ST_XML_DVY_APPROVED) == 0) {
+            statusId = SModSysConsts.TRNS_ST_XML_DVY_APPROVED;
+            status = "ACEPTADO.";
+        }
+        else {
+            statusId = SModSysConsts.TRNS_ST_XML_DVY_PENDING;
+            status = "PENDIENTE.";
+        }
+
+        cfd.saveField(client.getSession().getStatement().getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_ACK_DVY, sorianaUtilsParalelo.getAcknowledgment().replaceAll("'", "\""));
+        cfd.saveField(client.getSession().getStatement().getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_MSJ_DVY, sorianaUtilsParalelo.getAcknowledgmentMsg().replaceAll("'", "\""));
+
         cfd.saveField(client.getSession().getStatement().getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_TP_XML_DVY, SModSysConsts.TRNS_TP_XML_DVY_WS_SOR);
         cfd.saveField(client.getSession().getStatement().getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_ST_XML_DVY, statusId);
         cfd.saveField(client.getSession().getStatement().getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_USR_DVY, client.getSession().getUser().getPkUserId());
 
         client.getFrame().setCursor(cursor);
         client.showMsgBoxInformation("El documento '" + dps.getNumberSeries() + (dps.getNumberSeries().length() > 0 ? "-" : "") + dps.getNumber() + (statusId == SModSysConsts.TRNS_ST_XML_DVY_PENDING ? "' sigue " : "' fue ") + status);
-        
     }
 
     /**

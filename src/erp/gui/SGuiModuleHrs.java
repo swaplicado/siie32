@@ -482,7 +482,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgBkkDeductionEmployee.setEnabled(true);
         jmCfg.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CFG).HasRight);
         
-        jmCat.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT).HasRight ||
+        jmCat.setEnabled(
+                miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT).HasRight ||
                 miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP).HasRight ||
                 miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).HasRight);
         jmiCatEmployee.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP).HasRight);
@@ -508,23 +509,29 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatAbsenceClass.setEnabled(true);
         jmiPayAbsence.setEnabled(true);
         
-        jmPay.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PAY).HasRight);
-        jmiPayPayrollWeekly.setEnabled(true);
-        jmiPayPayrollWeeklyRec.setEnabled(true);
-        jmiPayPayrollFortnightly.setEnabled(true);
-        jmiPayPayrollFortnightlyRowRec.setEnabled(true);
-        jmiPayPayrollBkkRecord.setEnabled(true);
-        jmiPayCfdiPayroll.setEnabled(true);
-        jmiPayCfdiPayrollRec.setEnabled(true);
-        jmiPayCfdiStampSign.setEnabled(true);
-        jmiPayCfdiStampSignPending.setEnabled(true);
-        jmiPayCfdiSendingLog.setEnabled(true);
-        jmiPayAutoEarningsGlobal.setEnabled(true);
-        jmiPayAutoEarningsByEmployee.setEnabled(true);
-        jmiPayAutoDeductionsGlobal.setEnabled(true);
-        jmiPayAutoDeductionsByEmployee.setEnabled(true);
-        jmiPayCalculatedAmountMonth.setEnabled(true);
-        jmiPayCalculatedEstimateIncomeTax.setEnabled(true);
+        boolean isPermissionPay = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PAY).HasRight;
+        boolean isPermissionPayWee = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PAY_WEE).HasRight;
+        boolean isPermissionPayFor = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PAY_FOR).HasRight;
+        
+        jmPay.setEnabled(isPermissionPay || isPermissionPayWee || isPermissionPayFor);
+        jmPayCfdi.setEnabled(isPermissionPay);
+        jmiPayPayrollWeekly.setEnabled(isPermissionPay || isPermissionPayWee);
+        jmiPayPayrollWeeklyRec.setEnabled(isPermissionPay || isPermissionPayWee);
+        jmiPayPayrollFortnightly.setEnabled(isPermissionPay || isPermissionPayFor);
+        jmiPayPayrollFortnightlyRowRec.setEnabled(isPermissionPay || isPermissionPayFor);
+        jmiPayAbsence.setEnabled(isPermissionPay);
+        jmiPayPayrollBkkRecord.setEnabled(isPermissionPay);
+        jmiPayCfdiPayroll.setEnabled(isPermissionPay);
+        jmiPayCfdiPayrollRec.setEnabled(isPermissionPay);
+        jmiPayCfdiStampSign.setEnabled(isPermissionPay);
+        jmiPayCfdiStampSignPending.setEnabled(isPermissionPay);
+        jmiPayCfdiSendingLog.setEnabled(isPermissionPay);
+        jmiPayAutoEarningsGlobal.setEnabled(isPermissionPay);
+        jmiPayAutoEarningsByEmployee.setEnabled(isPermissionPay);
+        jmiPayAutoDeductionsGlobal.setEnabled(isPermissionPay);
+        jmiPayAutoDeductionsByEmployee.setEnabled(isPermissionPay);
+        jmiPayCalculatedAmountMonth.setEnabled(isPermissionPay);
+        jmiPayCalculatedEstimateIncomeTax.setEnabled(isPermissionPay);
         
         jmBenefit.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PAY).HasRight);
         jmiBenefitBenefitVac.setEnabled(true);

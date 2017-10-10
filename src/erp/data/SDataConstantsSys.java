@@ -303,6 +303,8 @@ public abstract class SDataConstantsSys {
     public static final int PRV_HRS_CAT_EMP_WAGE = 109005;
     public static final int PRV_HRS_PAY = 109006;
     public static final int PRV_HRS_PAY_OC = 109007;
+    public static final int PRV_HRS_PAY_WEE = 109011;
+    public static final int PRV_HRS_PAY_FOR = 109012;
     public static final int PRV_HRS_REP = 109901;
 
     public static final int PRV_QLT_LOT_APR = 110001;
