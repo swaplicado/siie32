@@ -9,6 +9,7 @@ import cfd.DCfdUtils;
 import cfd.DElement;
 import cfd.ver32.DElementComprobante;
 import cfd.ver32.DElementTimbreFiscalDigital;
+import cfd.ver33.DElementConcepto;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdXmlCatalogs;
 import erp.data.SDataConstants;
@@ -908,7 +909,18 @@ public class SCfdPrint {
             uuidRelated += (uuidRelated.isEmpty() ? "" : ", ") + uuid;
         }
         paramsMap.put("sCfdiUUIDsRelacionados", uuidRelated);
-
+        
+        //Adds product/service and unit keys from XML.
+        ArrayList<String> productKeys = new ArrayList<>();
+        ArrayList<String> unitKeys = new ArrayList<>();
+        for (DElementConcepto clave : comprobante.getEltConceptos().getEltConceptos()) {
+            productKeys.add(clave.getAttClaveProdServ().getString());
+            unitKeys.add(clave.getAttClaveUnidad().getString());
+        }
+        
+        paramsMap.put("sCfdiProductKeys", productKeys);
+        paramsMap.put("sCfdiUnitKeys",  unitKeys);
+        
         JasperPrint jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_CFDI_33, paramsMap);
         String sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
         sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
