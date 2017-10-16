@@ -1820,7 +1820,7 @@ public abstract class STrnUtilities {
                     + "<th id=\"number\" style=\"min-width: 10em; max-width: 10em;\">Saldo</th> "
                     + "</tr> "
                     + mail + computeMailFooterEndTable(SClient.APP_NAME , SClient.APP_COPYRIGHT, SClient.APP_PROVIDER, SClient.VENDOR_WEBSITE , SClient.APP_RELEASE);
-                sendMail(client, 2, recipientsTo, recipientsCc, recipientsBcc, mail);
+                sendMail(client, SModSysConsts.CFGS_TP_MMS_CON, recipientsTo, recipientsCc, recipientsBcc, mail);
             }
             else {
                 throw new Exception("No existe información para el periodo seleccionado.");
@@ -2847,29 +2847,24 @@ public abstract class STrnUtilities {
         return mail;
     }
     
-    public static String computeMailItem(final SClientInterface client, final int itemId, final int unitId, final String itemCode, final String itemName, final String contract, final String numberSeries, final String number, final String reference, final double qty, final String unitMeasure, final Date date, final int[] dpsTypeKey, final boolean isEdited, final boolean isRebill) {
+    public static String computeMailItem(final SClientInterface client, final int idItem, final int idUnit, final String itemCode, final String itemName, 
+            final String contract, final String numberSeries, final String number, final String reference, final double quantity, final String unitOfMeasure, final Date date, 
+            final int[] keyDpsType, final boolean isEdited, final boolean isRebill) {
         String mail = null;
-        double accumDay = computeAccumulatedItem(client, itemId, unitId, dpsTypeKey, date, date, isRebill, numberSeries, number);
-        double accumMonth = computeAccumulatedItem(client, itemId, unitId, dpsTypeKey, SLibTimeUtils.getBeginOfMonth(date), date, isRebill, numberSeries, number);
+        double accumDay = computeAccumulatedItem(client, idItem, idUnit, keyDpsType, date, date, isRebill, numberSeries, number);
+        double accumMonth = computeAccumulatedItem(client, idItem, idUnit, keyDpsType, SLibTimeUtils.getBeginOfMonth(date), date, isRebill, numberSeries, number);
         
-        mail = "<tr> "        
-            + "<td> " + itemCode
-            + "</td> " 
-            + "<td colspan = \"4\"> " + SLibUtils.textToHtml(itemName)
-            + "</td> "
-            + "</tr> "
-            + "<tr> " 
-            + "<td> " + contract    // contract number
-            + "</td> "
-            + "<td> " + reference   // contract reference
-            + "</td> "
-            + "<td id=\"number\"> " + SLibUtils.DecimalFormatValue2D.format(qty) + " " + unitMeasure                                // quantity the order 
-            + "</td> "
-            + "<td id=\"number\"> " + (isRebill ? "N/A" : SLibUtils.DecimalFormatValue2D.format(accumDay) + " " + unitMeasure)      // accumulated quantity
-            + "</td> "
-            + "<td id=\"number\"> " + (isRebill ? "N/A" : SLibUtils.DecimalFormatValue2D.format(accumMonth) + " " + unitMeasure)    // accumulated quantity
-            + "</td> "
-            + "</tr> ";
+        mail = "<tr>"        
+            + "<td>" + itemCode + "</td>" 
+            + "<td colspan = \"4\">" + SLibUtils.textToHtml(itemName) + "</td>"
+            + "</tr>"
+            + "<tr>" 
+            + "<td>" + contract + "</td>"   // contract number
+            + "<td>" + reference + "</td>"  // contract reference
+            + "<td id=\"number\">" + SLibUtils.DecimalFormatValue2D.format(quantity) + " " + unitOfMeasure + "</td>"// quantity the order 
+            + "<td id=\"number\">" + (isRebill ? "N/A" : SLibUtils.DecimalFormatValue2D.format(accumDay) + " " + unitOfMeasure) + "</td>"   // accumulated quantity
+            + "<td id=\"number\">" + (isRebill ? "N/A" : SLibUtils.DecimalFormatValue2D.format(accumMonth) + " " + unitOfMeasure) + "</td>" // accumulated quantity
+            + "</tr>";
         
         return mail;
     }
@@ -2899,7 +2894,8 @@ public abstract class STrnUtilities {
         return mail;
     }
     
-    private static double computeAccumulatedItem(final SClientInterface client, final int itemId, final int unitId, final int[] dpsTypeKey, final Date start, final Date end, final boolean isRebill, final String numberSeries, final String number) {
+    private static double computeAccumulatedItem(final SClientInterface client, final int idItem, final int idOriginalUnit, 
+            final int[] keyDpsType, final Date start, final Date end, final boolean isRebill, final String numberSeries, final String number) {
         String sql = "";
         double total = 0;
         ResultSet resultSet = null;
@@ -2907,11 +2903,11 @@ public abstract class STrnUtilities {
         
         try {
             if (!isRebill) {
-                sql = "SELECT COALESCE(SUM(qty), 0) "
+                sql = "SELECT COALESCE(SUM(de.orig_qty), 0) "
                     + "FROM trn_dps AS d "
                     + "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc "
                     + "WHERE d.b_del = 0 AND de.b_del = 0 AND d.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(start) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(end)+ "' AND "
-                    + "de.fid_item = " + itemId + " AND de.fid_unit = " + unitId + " AND fid_ct_dps = " + dpsTypeKey[0] + " AND fid_cl_dps = " + dpsTypeKey[1] + " AND fid_tp_dps = " + dpsTypeKey[2] + " AND d.b_rebill = 0 "
+                    + "de.fid_item = " + idItem + " AND de.fid_orig_unit = " + idOriginalUnit + " AND fid_ct_dps = " + keyDpsType[0] + " AND fid_cl_dps = " + keyDpsType[1] + " AND fid_tp_dps = " + keyDpsType[2] + " AND d.b_rebill = 0 "
                     + "AND d.num_ser = '" + numberSeries + "' and d.num <= '" + number + "' ";
                 
                 statement = client.getSession().getDatabase().getConnection().createStatement();
@@ -2948,7 +2944,7 @@ public abstract class STrnUtilities {
         
         client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
         mms = getMms(client, mmsTypeId);
-
+        
         if (mms.getQueryResultId() != SDbConsts.READ_OK) {
             throw new Exception("No existe ningún correo-e configurado para envío de movimientos de pedidos.");
         }
@@ -2991,7 +2987,7 @@ public abstract class STrnUtilities {
             }
             try {
                 sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
-
+                
                 if (ccRecipients.isEmpty() && bccRecipients.isEmpty()) {
                     mail = new SMail(sender, mms.getTextSubject(), message, toRecipients);
                 }
@@ -3001,7 +2997,7 @@ public abstract class STrnUtilities {
                 else {
                     mail = new SMail(sender, mms.getTextSubject(), message, toRecipients, ccRecipients, bccRecipients);
                 }
-
+                
                 mail.setContentType(SMailConsts.CONT_TP_TEXT_HTML);
                 mail.send();
             } 
