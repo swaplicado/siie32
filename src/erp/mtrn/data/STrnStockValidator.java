@@ -7,7 +7,6 @@ package erp.mtrn.data;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
-import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
@@ -18,6 +17,8 @@ import erp.mmfg.data.SDataProductionOrderChargeEntry;
 import erp.mmfg.data.SDataProductionOrderChargeEntryLot;
 import java.util.Date;
 import java.util.Vector;
+import sa.lib.SLibTimeUtils;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -29,17 +30,17 @@ public class STrnStockValidator {
     protected int mnYear;
     protected int[] manWarehouseKey;
     protected int[] manDiogKey;
-    protected int[] manReferenceKey;
     protected int mnSegregationType;
+    protected int[] manSegregationReferenceKey;
     protected Vector<STrnStockMove> mvStockMoves;
 
-    public STrnStockValidator(erp.client.SClientInterface client, int year, int[] warehouseKey, int[] iogKey, final int[] referenceKey, int segregationType) {
+    public STrnStockValidator(erp.client.SClientInterface client, int year, int[] warehouseKey, int[] iogKey, int segregationType, final int[] segregationReferenceKey) {
         miClient = client;
         mnYear = year;
         manWarehouseKey = warehouseKey;
         manDiogKey = iogKey;
-	manReferenceKey = referenceKey;
         mnSegregationType = segregationType;
+	manSegregationReferenceKey = segregationReferenceKey;
         mvStockMoves = new Vector<STrnStockMove>();
     }
 
@@ -61,81 +62,98 @@ public class STrnStockValidator {
         }
     }
 
+    /**
+     * Validates that pretending outgoing items are available in stock.
+     * @param isDocBeingDeleted
+     * @param dateCutOff
+     * @return 
+     */
     public java.lang.String validateOutgoingItems(final boolean isDocBeingDeleted, final Date dateCutOff) {
-        double stock = 0;
-        double segregated = 0;
-        double totalStock = 0;
-        double totalAvailable = 0;
         String msg = "";
-        String msgSegregation = "";
-        SDataItem item = null;
-        SDataUnit unit = null;
-        SDataStockLot lot = null;
-        STrnStockMove parameters = null;
-
+        String msgDate = "";
+        
         try {
             if (mnYear != SLibTimeUtilities.digestYear(dateCutOff)[0]) {
-                msg = "La fecha de corte " + miClient.getSessionXXX().getFormatters().getDateFormat().format(dateCutOff) + " " +
-                        "no pertenece al ejercicio " + mnYear + ".";
+                msgDate = SLibUtils.DateFormatDate.format(dateCutOff);
+                msg = "La fecha de corte " + msgDate + " no pertenece al ejercicio " + mnYear + ".";
             }
             else {
                 for (STrnStockMove stockMove : mvStockMoves) {
-                    if (manReferenceKey != null && mnSegregationType != SLibConstants.UNDEFINED) {
-                        stockMove.setSegregationReference(new int[] { manReferenceKey[0], manReferenceKey[1] });
-                        stockMove.setSegregationType(SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD);
-                        stockMove.setIsCurrentSegregationExcluded(true);
-                    }
-
-                    // The STrnStockMove object is sent as parameter for the filter
-                    segregated = STrnStockSegregationUtils.getStkSegregated(miClient, stockMove).getSegregatedStock();
-                    parameters = stockMove.clone();
-                    parameters.setPkLotId(0);
-                    totalStock = STrnStockSegregationUtils.getStock(miClient, parameters).getStock();
-                    	
+                    // Validate each stock move:
+                    
+                    double stock = 0;
+                    double stockSegregated = 0;
+                    double stockTotal = 0;
+                    double stockAvailable = 0;
+                    boolean isStockInsufficient = false;
+                    boolean isStockAvailableInsufficient = false;
+                    STrnStockMove stockMoveSegregation = null;
+                    
+                    // 1. Check stock to cutoff date:
+                    
                     stock = STrnUtilities.obtainStock(miClient, stockMove.getPkYearId(),
                             stockMove.getPkItemId(), stockMove.getPkUnitId(), stockMove.getPkLotId(),
                             stockMove.getPkCompanyBranchId(), stockMove.getPkWarehouseId(), dateCutOff,
                             isDocBeingDeleted || stockMove.getAuxIsMoveBeingDeleted() ? null : manDiogKey);
-
-                    totalAvailable = totalStock - segregated;
                     
                     if (stock < stockMove.getQuantity()) {
-                        msg = miClient.getSessionXXX().getFormatters().getDateFormat().format(dateCutOff);
+                        isStockInsufficient = true;
+                        msgDate = SLibUtils.DateFormatDate.format(dateCutOff);  // cutoff date
                     }
                     else {
+                        // 2. Check stock to end of year of cutoff date:
+                        
                         stock = STrnUtilities.obtainStock(miClient, stockMove.getPkYearId(),
                                 stockMove.getPkItemId(), stockMove.getPkUnitId(), stockMove.getPkLotId(),
                                 stockMove.getPkCompanyBranchId(), stockMove.getPkWarehouseId(),
                                 isDocBeingDeleted || stockMove.getAuxIsMoveBeingDeleted() ? null : manDiogKey);
 
                         if (stock < stockMove.getQuantity()) {
-                            msg = miClient.getSessionXXX().getFormatters().getDateFormat().format(SLibTimeUtilities.getEndOfYear(dateCutOff));
+                            isStockInsufficient = true;
+                            msgDate = SLibUtils.DateFormatDate.format(SLibTimeUtils.getEndOfYear(dateCutOff));  // end of year of cutoff date
                         }
-                        else if(totalAvailable < stockMove.getQuantity()) {
-                            msgSegregation = miClient.getSessionXXX().getFormatters().getDateFormat().format(SLibTimeUtilities.getEndOfYear(dateCutOff));
+                        else {
+                            // 3. Check available stock omitting segregated stock:
+
+                            if (mnSegregationType != SLibConstants.UNDEFINED && manSegregationReferenceKey != null) {
+                                stockMove.setSegregationReference(new int[] { manSegregationReferenceKey[0], manSegregationReferenceKey[1] });
+                                stockMove.setSegregationType(mnSegregationType);
+                                stockMove.setIsCurrentSegregationExcluded(true);
+                            }
+
+                            stockSegregated = STrnStockSegregationUtils.getStockSegregated(miClient, stockMove).getSegregatedStock();
+                            
+                            stockMoveSegregation = stockMove.clone();
+                            stockMoveSegregation.setPkLotId(0);
+                            stockTotal = STrnStockSegregationUtils.getStock(miClient, stockMoveSegregation).getStock();
+                            
+                            stockAvailable = stockTotal - stockSegregated;
+                            
+                            if (stockAvailable < stockMove.getQuantity()) {
+                                isStockAvailableInsufficient = true;
+                                msgDate = SLibUtils.DateFormatDate.format(SLibTimeUtils.getEndOfYear(dateCutOff));  // end of year of cutoff date
+                            }
                         }
                     }
 
-                    if (!msg.isEmpty() || !msgSegregation.isEmpty()) {
-                        item = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { stockMove.getPkItemId() }, SLibConstants.EXEC_MODE_VERBOSE);
-                        unit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int[] { stockMove.getPkUnitId() }, SLibConstants.EXEC_MODE_VERBOSE);
-                        lot = (SDataStockLot) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_LOT, stockMove.getLotKey(), SLibConstants.EXEC_MODE_VERBOSE);
+                    if (isStockInsufficient || isStockAvailableInsufficient) {
+                        SDataItem item = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { stockMove.getPkItemId() }, SLibConstants.EXEC_MODE_VERBOSE);
+                        SDataUnit unit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int[] { stockMove.getPkUnitId() }, SLibConstants.EXEC_MODE_VERBOSE);
+                        SDataStockLot lot = (SDataStockLot) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_LOT, stockMove.getLotKey(), SLibConstants.EXEC_MODE_VERBOSE);
                         
-                        if (!msg.isEmpty()) {
-                            msg = "No hay unidades disponibles suficientes del ítem '" + item.getItem() + "', clave '" + item.getKey() + "', lote '" + lot.getLot() + "' al " + msg + ":\n" +
-                                    "  " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stock) + " " + unit.getSymbol() + " (en existencia)\n" +
-                                    "para hacer el movimiento solicitado, " +
-                                    "" + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stockMove.getQuantity()) + " " + unit.getSymbol() + ", " +
-                                    "hacen falta " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stockMove.getQuantity() - (stock)) + " " + unit.getSymbol() + ".";
+                        if (isStockInsufficient) {
+                            msg = "No hay unidades en existencia suficientes del ítem '" + item.getItem() + " (" + item.getKey() + ")', lote '" + lot.getLot() + "', al " + msgDate + ":\n" +
+                                    "en existencia: " + SLibUtils.getDecimalFormatQuantity().format(stock) + " " + unit.getSymbol() + ".\n" +
+                                    "Para hacer el movimiento solicitado de " + SLibUtils.getDecimalFormatQuantity().format(stockMove.getQuantity()) + " " + unit.getSymbol() + ", " +
+                                    "faltan " + SLibUtils.getDecimalFormatQuantity().format(stockMove.getQuantity() - (stock)) + " " + unit.getSymbol() + ".";
                         }
-                        else {
-                            msg = "No hay unidades disponibles suficientes del ítem '" + item.getItem() + "', clave '" + item.getKey() + "' al " + msg + ":\n" +
-                                    "  " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(totalStock) + " " + unit.getSymbol() + " (en existencia)\n" +
-                                    " -" + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(segregated) + " " + unit.getSymbol() + " (segregadas)\n" +
-                                    "= " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(totalAvailable) + " " + unit.getSymbol() + " (disponibles)\n" +
-                                    "para hacer el movimiento solicitado, " +
-                                    "" + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stockMove.getQuantity()) + " " + unit.getSymbol() + ", " +
-                                    "hacen falta " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stockMove.getQuantity() - (totalAvailable)) + " " + unit.getSymbol() + ".";
+                        else {  // isStockAvailableInsufficient:
+                            msg = "No hay unidades disponibles suficientes del ítem '" + item.getItem() + " (" + item.getKey() + ")', al " + msgDate + ":\n" +
+                                    "en existencia: " + SLibUtils.getDecimalFormatQuantity().format(stockTotal) + " " + unit.getSymbol() + "\n" +
+                                    "- segregadas: " + SLibUtils.getDecimalFormatQuantity().format(stockSegregated) + " " + unit.getSymbol() + "\n" +
+                                    "= disponibles: " + SLibUtils.getDecimalFormatQuantity().format(stockAvailable) + " " + unit.getSymbol() + ".\n" +
+                                    "Para hacer el movimiento solicitado de " + SLibUtils.getDecimalFormatQuantity().format(stockMove.getQuantity()) + " " + unit.getSymbol() + ", " +
+                                    "faltan " + SLibUtils.getDecimalFormatQuantity().format(stockMove.getQuantity() - stockAvailable) + " " + unit.getSymbol() + ".";
                         }
                         
                         break;
@@ -206,9 +224,10 @@ public class STrnStockValidator {
 
     public static java.lang.String validateStockMoves(final erp.client.SClientInterface client,
             final java.util.Vector<erp.mtrn.data.SDataDiogEntry> iogEntries, final int iogCategoryId,
-            final int[] iogKey, final int[] warehouseKey, final boolean isDocBeingDeleted, final Date dateCutOff, final int[] segregationReference, final int segregationType) throws Exception {
+            final int[] iogKey, final int[] warehouseKey, final boolean isDocBeingDeleted, final Date dateCutOff,
+            final int segregationType, final int[] segregationReferenceKey) throws Exception {
         
-        STrnStockValidator validator = new STrnStockValidator(client, iogKey[0], warehouseKey, iogKey, segregationReference, segregationType);
+        STrnStockValidator validator = new STrnStockValidator(client, iogKey[0], warehouseKey, iogKey, segregationType, segregationReferenceKey);
 
         for (SDataDiogEntry entry : iogEntries) {
             if (entry.shouldValidateStockLots() && entry.shouldValidateOutgoingItems(iogCategoryId, isDocBeingDeleted)) {

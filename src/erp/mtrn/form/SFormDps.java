@@ -8978,32 +8978,27 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
     @Override
     public SLibMethod getPostSaveMethod(SDataRegistry registry) {
-        int mmsType = SLibConstants.UNDEFINED;
-        boolean sendMail = false;
         SLibMethod method = null;
         SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, registry.getPrimaryKey(), SLibConstants.EXEC_MODE_STEALTH);
 
-        sendMail = (SLibUtilities.compareKeys(SDataConstantsSys.TRNU_TP_DPS_SAL_CON, dps.getDpsTypeKey()) ||
-                        SLibUtilities.compareKeys(SDataConstantsSys.TRNU_TP_DPS_SAL_ORD, dps.getDpsTypeKey()));
+        boolean isMailReq = false;
+        int typeMms = SLibConstants.UNDEFINED;
 
         if (SLibUtilities.compareKeys(SDataConstantsSys.TRNU_TP_DPS_SAL_CON, dps.getDpsTypeKey())) {
-            mmsType = SModSysConsts.CFGS_TP_MMS_CON;
+            isMailReq = true;
+            typeMms = SModSysConsts.CFGS_TP_MMS_CON;
         }
         else if (SLibUtilities.compareKeys(SDataConstantsSys.TRNU_TP_DPS_SAL_ORD, dps.getDpsTypeKey())) {
-            mmsType = SModSysConsts.CFGS_TP_MMS_ORD_SAL;
+            isMailReq = true;
+            typeMms = SModSysConsts.CFGS_TP_MMS_ORD_SAL;
         }
 
-        if (sendMail) {
-            if (mmsType != SLibConstants.UNDEFINED) {
-                try {
-                    method = new SLibMethod(dps, dps.getClass().getMethod("sendMail", new Class[] { SClientInterface.class, Object.class, int.class }), new Object[] { miClient, dps.getPrimaryKey(), mmsType });
-                }
-                catch (NoSuchMethodException | SecurityException e) {
-                    SLibUtilities.printOutException(this, e);
-                }
+        if (isMailReq) {
+            try {
+                method = new SLibMethod(dps, dps.getClass().getMethod("sendMail", new Class[] { SClientInterface.class, Object.class, int.class }), new Object[] { miClient, dps.getPrimaryKey(), typeMms });
             }
-            else {
-                SLibUtilities.printOutException(this, new UnsupportedOperationException("Not supported yet."));
+            catch (NoSuchMethodException | SecurityException e) {
+                SLibUtilities.printOutException(this, e);
             }
         }
 

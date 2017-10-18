@@ -823,7 +823,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                         stockMoveParams.setPkWarehouseId(moFkEntityId.get(0)[1]);
                     }
                     
-                    objStock = STrnStockSegregationUtils.getStkSegregated(miClient, stockMoveParams);
+                    objStock = STrnStockSegregationUtils.getStockSegregated(miClient, stockMoveParams);
                     dSegregated = objStock != null ? objStock.getSegregatedStock() : 0;
                 }
                 catch (Exception ex) {
