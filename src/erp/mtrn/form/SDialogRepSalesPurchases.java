@@ -39,6 +39,11 @@ import net.sf.jasperreports.view.JasperViewer;
  * @author Alfonso Flores, Edwin Carmona, Uriel Castañeda
  */
 public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
+    
+    private static final int BY_OPTION_BP = 0;
+    private static final int BY_OPTION_AGT = 1;
+    private static final int BY_OPTION_GEN = 2;
+    private static final int BY_OPTION_ITM = 3;
 
     private int mnFormType;
     private int mnFormResult;
@@ -474,13 +479,13 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         else {
             try {
                 if (jrbCurrencyDoc.isSelected()) {
-                    sSumStot = " COALESCE(SUM(e.stot_cur_r),0) ";
+                    sSumStot = " COALESCE(SUM(e.stot_cur_r), 0.0) ";
                     sCurrency = jcbCurrency.getSelectedIndex() == 0 ? "TODAS" : jcbCurrency.getSelectedItem().toString();
                     nCurrency = moFieldCurrency.getKeyAsIntArray()[0];
                     sqlCurrency = jcbCurrency.getSelectedIndex() == 0 ? "" : " doc.fid_cur = " + nCurrency + " AND ";
                 }
                 else {
-                    sSumStot = " COALESCE(SUM(e.stot_r),0) ";
+                    sSumStot = " COALESCE(SUM(e.stot_r), 0.0) ";
                     sCurrency = miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency();
                     nCurrency = miClient.getSession().getSessionCustom().getLocalCurrencyKey()[0];
                     sqlCurrency = "";
@@ -491,13 +496,13 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
                 map = miClient.createReportParams();
                 map.put("tDtInitial", moFieldDateStart.getDate());
                 map.put("tDtEnd", moFieldDateEnd.getDate());
-                map.put("sCompanyBranch", moFieldCompanyBranch.getKeyAsIntArray()[0] == 0 ? "(TODAS)" : jcbCompanyBranch.getSelectedItem().toString());
+                map.put("sCompanyBranch", jcbCompanyBranch.getSelectedIndex() <= 0 ? "(TODAS)" : jcbCompanyBranch.getSelectedItem().toString());
                 map.put("nFidCtDps", mbParamIsSupplier ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[0]);
                 map.put("nFidClDps", mbParamIsSupplier ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1]);
                 map.put("nFidTpDps", mbParamIsSupplier ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2]);
-                map.put("sSqlWhereCompanyBranch", moFieldCompanyBranch.getKeyAsIntArray()[0] == 0 ? "" : " AND doc.fid_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0]);
-                map.put("sSqlWhereCompanyBranchAdjRet", moFieldCompanyBranch.getKeyAsIntArray()[0] == 0 ? "" : " AND r.fid_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0]);
-                map.put("sSqlWhereCompanyBranchAdjDis", moFieldCompanyBranch.getKeyAsIntArray()[0] == 0 ? "" : " AND d.fid_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0]);
+                map.put("sSqlWhereCompanyBranch", jcbCompanyBranch.getSelectedIndex() <= 0 ? "" : " AND doc.fid_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0]);
+                map.put("sSqlWhereCompanyBranchAdjRet", jcbCompanyBranch.getSelectedIndex() <= 0 ? "" : " AND r.fid_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0]);
+                map.put("sSqlWhereCompanyBranchAdjDis", jcbCompanyBranch.getSelectedIndex() <= 0 ? "" : " AND d.fid_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0]);
                 map.put("sSqlWhereWithoutRelatedParty", jckWithoutRelatedParty.isSelected() ? " AND bp.b_att_rel_pty = 0 " : "");
                 map.put("sTitle", mbParamIsSupplier ? "REPORTE DE COMPRAS NETAS" : "REPORTE DE VENTAS NETAS");
                 map.put("sSumStot", sSumStot);
@@ -625,27 +630,42 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
     }
 
     private java.lang.Object[] createQuerySentenceValues() {
-        String orderBy = "";
         String groupBy = "";
-        String detailColumn = "";
+        String orderBy = "";
+        String detailCol = "";
         String filter = "";
         int tpDetail = 0;
         int tpGroup = 0;
         boolean showGroup = false;
+        
+        if (jrbByBizPartner.isSelected()) {
+            
+        }
+        else if (jrbBySalesAgent.isSelected()) {
+            
+        }
+        else if (jrbByItemGeneric.isSelected()) {
+            
+        }
+        else if (jrbByItem.isSelected()) {
+            
+        }
 
-        // BizPartner options:
+        // Business partner options:
+        
+        
 
         if (jrbByBizPartner.isSelected() && moFieldCrossWith.getKeyAsIntArray()[0] == 0) {
             groupBy = " GROUP BY tp_bp, bp ";
             orderBy = " ORDER BY tp_bp, bp ";
-            detailColumn = mbParamIsSupplier ? "PROVEEDOR" : "CLIENTE";
+            detailCol = mbParamIsSupplier ? "PROVEEDOR" : "CLIENTE";
             filter = "POR " + (mbParamIsSupplier ? "PROVEEDOR" : "CLIENTE");
             tpDetail = 1;
         }
         else if (jrbByBizPartner.isSelected() && moFieldCrossWith.getKeyAsIntArray()[0] == 2) {
             groupBy = " GROUP BY tp_bp, bp, agt ";
             orderBy = " ORDER BY tp_bp, bp, agt ";
-            detailColumn = "AGENTE";
+            detailCol = "AGENTE";
             filter = mbParamIsSupplier ? "POR PROVEEDOR - AGENTE" : "POR CLIENTE - AGENTE";
             tpDetail = 2;
             tpGroup = 1;
@@ -654,7 +674,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         else if (jrbByBizPartner.isSelected() && moFieldCrossWith.getKeyAsIntArray()[0] == 3) {
             groupBy = " GROUP BY tp_bp, bp, igen ";
             orderBy = " ORDER BY tp_bp, bp, igen ";
-            detailColumn = "ÍTEM GENÉRICO";
+            detailCol = "ÍTEM GENÉRICO";
             filter = mbParamIsSupplier ? "POR PROVEEDOR - ÍTEM GENÉRICO" : "POR CLIENTE - ÍTEM GENÉRICO";
             tpDetail = 3;
             tpGroup = 1;
@@ -663,7 +683,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         else if (jrbByBizPartner.isSelected() && moFieldCrossWith.getKeyAsIntArray()[0] == 4) {
             groupBy = " GROUP BY tp_bp, bp, item ";
             orderBy = " ORDER BY tp_bp, bp, item ";
-            detailColumn = "ÍTEM";
+            detailCol = "ÍTEM";
             filter = mbParamIsSupplier ? "POR PROVEEDOR - ÍTEM" : "POR CLIENTE - ÍTEM";
             tpDetail = 4;
             tpGroup = 1;
@@ -675,14 +695,14 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         else if (jrbBySalesAgent.isSelected() && moFieldCrossWith.getKeyAsIntArray()[0] == 0) {
             groupBy = " GROUP BY agt ";
             orderBy = " ORDER BY agt ";
-            detailColumn = "AGENTE";
+            detailCol = "AGENTE";
             filter = "POR AGENTE";
             tpDetail = 2;
         }
         else if (jrbBySalesAgent.isSelected() && moFieldCrossWith.getKeyAsIntArray()[0] == 1) {
             groupBy = " GROUP BY agt, bp ";
             orderBy = " ORDER BY agt, bp ";
-            detailColumn = mbParamIsSupplier ? "PROVEEDOR" : "CLIENTE";
+            detailCol = mbParamIsSupplier ? "PROVEEDOR" : "CLIENTE";
             filter = "POR AGENTE - " + (mbParamIsSupplier ? "PROVEEDOR" : "CLIENTE");
             tpDetail = 1;
             tpGroup = 2;
@@ -691,7 +711,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         else if (jrbBySalesAgent.isSelected() && moFieldCrossWith.getKeyAsIntArray()[0] == 3) {
             groupBy = " GROUP BY agt, igen ";
             orderBy = " ORDER BY agt, igen ";
-            detailColumn = "ÍTEM GENÉRICO";
+            detailCol = "ÍTEM GENÉRICO";
             filter = "POR AGENTE - ÍTEM GENÉRICO";
             tpDetail = 3;
             tpGroup = 2;
@@ -700,7 +720,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         else if (jrbBySalesAgent.isSelected() && moFieldCrossWith.getKeyAsIntArray()[0] == 4) {
             groupBy = " GROUP BY agt, item ";
             orderBy = " ORDER BY agt, item ";
-            detailColumn = "ÍTEM";
+            detailCol = "ÍTEM";
             filter = "POR AGENTE - ÍTEM";
             tpDetail = 4;
             tpGroup = 2;
@@ -712,14 +732,14 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         else if (jrbByItemGeneric.isSelected() && moFieldCrossWith.getKeyAsIntArray()[0] == 0) {
             groupBy = " GROUP BY igen ";
             orderBy = " ORDER BY igen ";
-            detailColumn = "ÍTEM GENÉRICO";
+            detailCol = "ÍTEM GENÉRICO";
             filter = "POR ÍTEM GENÉRICO";
             tpDetail = 3;
         }
         else if (jrbByItemGeneric.isSelected() && moFieldCrossWith.getKeyAsIntArray()[0] == 1) {
             groupBy = " GROUP BY igen, bp ";
             orderBy = " ORDER BY igen, bp ";
-            detailColumn = mbParamIsSupplier ? "PROVEEDOR" : "CLIENTE";
+            detailCol = mbParamIsSupplier ? "PROVEEDOR" : "CLIENTE";
             filter = "POR ÍTEM GENÉRICO - " + (mbParamIsSupplier ? "PROVEEDOR" : "CLIENTE");
             tpDetail = 1;
             tpGroup = 3;
@@ -728,7 +748,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         else if (jrbByItemGeneric.isSelected() && moFieldCrossWith.getKeyAsIntArray()[0] == 2) {
             groupBy = " GROUP BY igen, agt ";
             orderBy = " ORDER BY igen, agt ";
-            detailColumn = "AGENTE";
+            detailCol = "AGENTE";
             filter = "POR ÍTEM GENÉRICO - AGENTE";
             tpDetail = 2;
             tpGroup = 3;
@@ -737,7 +757,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         else if (jrbByItemGeneric.isSelected() && moFieldCrossWith.getKeyAsIntArray()[0] == 4) {
             groupBy = " GROUP BY igen, item ";
             orderBy = " ORDER BY igen, item ";
-            detailColumn = "ÍTEM";
+            detailCol = "ÍTEM";
             filter = "POR ÍTEM GENÉRICO - ÍTEM";
             tpDetail = 4;
             tpGroup = 3;
@@ -749,14 +769,14 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         else if (jrbByItem.isSelected() && moFieldCrossWith.getKeyAsIntArray()[0] == 0) {
             groupBy = " GROUP BY item ";
             orderBy = " ORDER BY item ";
-            detailColumn = "ÍTEM";
+            detailCol = "ÍTEM";
             filter = "POR ÍTEM";
             tpDetail = 4;
         }
         else if (jrbByItem.isSelected() && moFieldCrossWith.getKeyAsIntArray()[0] == 1) {
             groupBy = " GROUP BY item, bp ";
             orderBy = " ORDER BY item, bp ";
-            detailColumn = mbParamIsSupplier ? "PROVEEDOR" : "CLIENTE";
+            detailCol = mbParamIsSupplier ? "PROVEEDOR" : "CLIENTE";
             filter = "POR ÍTEM - " + (mbParamIsSupplier ? "PROVEEDOR" : "CLIENTE");
             tpDetail = 1;
             tpGroup = 4;
@@ -765,7 +785,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         else if (jrbByItem.isSelected() && moFieldCrossWith.getKeyAsIntArray()[0] == 2) {
             groupBy = " GROUP BY item, agt ";
             orderBy = " ORDER BY item, agt ";
-            detailColumn = "AGENTE";
+            detailCol = "AGENTE";
             filter = "POR ÍTEM - AGENTE";
             tpDetail = 2;
             tpGroup = 4;
@@ -774,7 +794,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         else if (jrbByItem.isSelected() && moFieldCrossWith.getKeyAsIntArray()[0] == 3) {
             groupBy = " GROUP BY item, igen ";
             orderBy = " ORDER BY item, igen ";
-            detailColumn = "ÍTEM GENÉRICO";
+            detailCol = "ÍTEM GENÉRICO";
             filter = "POR ÍTEM - ÍTEM GENÉRICO";
             tpDetail = 3;
             tpGroup = 4;
@@ -782,10 +802,11 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         }
         
         if (jcbCurrency.getSelectedIndex() == 0) {
-            groupBy = groupBy + ", cur_key";
+            groupBy = groupBy + ", cur_key ";
+            orderBy = orderBy + ", cur_key ";
         }
         
-        return new Object[] { groupBy, orderBy, detailColumn, filter, tpDetail, tpGroup, showGroup };
+        return new Object[] { groupBy, orderBy, detailCol, filter, tpDetail, tpGroup, showGroup };
     }
 
     private java.lang.String getUnitBase(int n) {
