@@ -305,7 +305,7 @@ public abstract class STrnStockSegregationUtils {
      * @return STrnStock object with the values of segregated stock.
      * @throws Exception 
      */
-    public static STrnStock getStkSegregatedByReference(final SClientInterface client, final STrnStockMove stockMoveParams) throws Exception {
+    public static STrnStock getStockSegregatedByReference(final SClientInterface client, final STrnStockMove stockMoveParams) throws Exception {
         stockMoveParams.setIsCurrentSegregationExcluded(false);
         
         return getStockSegregated(client, stockMoveParams);
