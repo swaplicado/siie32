@@ -30,9 +30,11 @@ public class STrnInventoryValuation {
     private static final int STEP_RM = 1; // IOG type raw materials
     private static final int STEP_WP = 2; // IOG type work in progress
     private static final int STEP_FG = 3; // IOG type finished goods
+    private static final String ERR_MSG_WIP = "No se encontró ningún almacén predeterminado de tipo 'producción en proceso'.";
     
     protected int mnYear;
     protected int mnPeriod;
+    protected int[] manDefaultWarehouseWip; // default warehouse of work in progress
     protected Date mtPeriodBegin;
     protected Date mtPeriodEnd;
     protected SGuiSession moSession;
@@ -41,6 +43,7 @@ public class STrnInventoryValuation {
         moSession = session;
         mnYear = year;
         mnPeriod = period;
+        manDefaultWarehouseWip = null;
         mtPeriodBegin = SLibTimeUtils.createDate(mnYear, mnPeriod, 1);
         mtPeriodEnd = SLibTimeUtils.getEndOfMonth(mtPeriodBegin);
     }
@@ -122,33 +125,34 @@ public class STrnInventoryValuation {
             /*
             US: units started
             UF: units finished
+            Cases:
                US UF
             a) 0 = 0:   0%
             b) 0 < n: 100%
             c) n > 0:   0%
             d) n = n: 100%
             e) n < m: 100%
-            f) m > n: m/n or 100% if all job orders are closed
+            f) m > n: m/n or 100% if all job orders of current period are closed
             */
             
             if (qtyUnitsSta == 0) {
                 qtyUnitsWip = 0;
-                perUnitsFinEffective = perUnitsFin = qtyUnitsFin == 0 ? 0 : 1; // a) & b)
+                perUnitsFinEffective = perUnitsFin = qtyUnitsFin == 0 ? 0 : 1; // cases a) & b)
             }
             else {
                 perUnitsFin = qtyUnitsFin / qtyUnitsSta;
                 
                 if (qtyUnitsFin == 0) {
                     qtyUnitsWip = qtyUnitsSta;
-                    perUnitsFinEffective = 0; // c)
+                    perUnitsFinEffective = 0; // case c)
                 }
                 else if (qtyUnitsSta <= qtyUnitsFin) {
                     qtyUnitsWip = 0;
-                    perUnitsFinEffective = 1; // d) & e)
+                    perUnitsFinEffective = 1; // cases d) & e)
                 }
                 else {
                     qtyUnitsWip = numOrdersSta == numOrdersFin ? 0 : qtyUnitsSta - qtyUnitsFin;
-                    perUnitsFinEffective = numOrdersSta == numOrdersFin ? 1 : qtyUnitsFin / qtyUnitsSta; // f)
+                    perUnitsFinEffective = numOrdersSta == numOrdersFin ? 1 : qtyUnitsFin / qtyUnitsSta; // case f)
                 }
             }
             
@@ -160,7 +164,36 @@ public class STrnInventoryValuation {
         }
     }
     
-    private void validateConsumeProductionOrder() throws Exception {
+    /**
+     * Checks if a default warehouse of work in progress has been set.
+     * @throws Exception 
+     */
+    private void validateDefaultWarehouseWip() throws Exception {
+        String sql = "";
+        Statement stProduct = moSession.getStatement().getConnection().createStatement();
+        ResultSet rsProduct = null;
+        
+        manDefaultWarehouseWip = null;
+        
+        sql = "SELECT id_cob, id_ent "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_COB_ENT) + " "
+                + "WHERE fid_ct_ent = " + SModSysConsts.CFGS_TP_ENT_WH_MFG_WP[0] + " AND fid_tp_ent = " + SModSysConsts.CFGS_TP_ENT_WH_MFG_WP[1] + " AND "
+                + "NOT b_del AND b_def ";
+
+        rsProduct = stProduct.executeQuery(sql);
+        if (!rsProduct.next()) {
+            throw new Exception(ERR_MSG_WIP);
+        }
+        else {
+            manDefaultWarehouseWip = new int[] { rsProduct.getInt(1), rsProduct.getInt(2) };
+        }
+    }
+    
+    /**
+     * Checks if all production orders belonging to current period have properly consume its assigned materials.
+     * @throws Exception 
+     */
+    private void validateConsumptionProductionOrder() throws Exception {
         String sql = "";
         String msgJobOrders = "";
         Statement stJobOrder = moSession.getStatement().getConnection().createStatement();
@@ -168,7 +201,7 @@ public class STrnInventoryValuation {
         ResultSet rsJobOrder = null;
         ResultSet rsStockMove = null;
         
-        // Integrate a list of products (PP / PT) that received inputs in the period evaluated:
+        // Get a list of all production orders belonging to current period to check if have had properly consume its assigned materials:
             
         sql = "SELECT DISTINCT o.id_year, o.id_ord "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "
@@ -206,26 +239,17 @@ public class STrnInventoryValuation {
         }
     }
     
-    private void canValidate() throws Exception {
-        String sql = "";
-        Statement stProduct = moSession.getStatement().getConnection().createStatement();
-        ResultSet rsProduct = null;
-        
+    /**
+     * Checks if a new inventory valuation can be computed.
+     * @throws Exception 
+     */
+    private void validateValuation() throws Exception {
         if (!SDataUtilities.isPeriodOpen((SClientInterface) moSession.getClient(), new int[] { mnYear, mnPeriod })) {
             throw new Exception(SLibConstants.MSG_ERR_GUI_PER_CLOSE + "\nPeríodo cerrado: " + mnYear + "-" + mnPeriod);
         }
         
-        sql = "SELECT id_cob, id_ent "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_COB_ENT) + " "
-                + "WHERE fid_ct_ent = " + SModSysConsts.CFGS_TP_ENT_WH_MFG_WP[0] + " AND fid_tp_ent = " + SModSysConsts.CFGS_TP_ENT_WH_MFG_WP[1] + " AND "
-                + "b_del = 0 AND b_def = 1 AND id_cob = " + ((SClientInterface) moSession.getClient()).getSessionXXX().getCurrentCompanyBranch().getPkBizPartnerBranchId();
-
-        rsProduct = stProduct.executeQuery(sql);
-        if (!rsProduct.next()) {
-            throw new Exception("No se encontró ningún almacén predeterminado de tipo 'Productos en Proceso'.");
-        }
-        
-        validateConsumeProductionOrder();
+        validateDefaultWarehouseWip();
+        validateConsumptionProductionOrder();
     }
     
     /**
@@ -235,7 +259,7 @@ public class STrnInventoryValuation {
      * @param cost cost of raw materials
      * @throws Exception 
      */
-    private void prorationCostRawMaterialProduct(final int idProduct, final int idUnitProduct, final double cost) throws Exception {
+    private void prorateCostRawMaterialsProduct(final int idProduct, final int idUnitProduct, final double cost) throws Exception {
         double qtyProduced = 0;
         double qtyProducedAcumm = 0;
         String sql = "";
@@ -264,30 +288,26 @@ public class STrnInventoryValuation {
             if (qtyProduced > 0) {
                 qtyProducedAcumm += qtyProduced;
                 
-                stockMoves.add(new STrnStockMove(new int[] { mnYear, idProduct, idUnitProduct, 0,
-                    rsProduct.getInt("s.id_cob"), rsProduct.getInt("s.id_wh") }, qtyProduced));
+                stockMoves.add(new STrnStockMove(
+                        new int[] { mnYear, idProduct, idUnitProduct, 0, rsProduct.getInt("s.id_cob"), rsProduct.getInt("s.id_wh") }, 
+                        qtyProduced));
             }
         }
         
         // create stock move for default warehouse production:
         
         if (stockMoves.isEmpty()) {
-            sql = "SELECT id_cob, id_ent "
-                    + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_COB_ENT) + " "
-                    + "WHERE fid_ct_ent = " + SModSysConsts.CFGS_TP_ENT_WH_MFG_WP[0] + " AND fid_tp_ent = " + SModSysConsts.CFGS_TP_ENT_WH_MFG_WP[1] + " AND "
-                    + "b_del = 0 AND b_def = 1 AND id_cob = " + ((SClientInterface) moSession.getClient()).getSessionXXX().getCurrentCompanyBranch().getPkBizPartnerBranchId();
-            
-            rsProduct = stProduct.executeQuery(sql);
-            if (rsProduct.next()) {
-                stockMoves.add(new STrnStockMove(new int[] { mnYear, idProduct, idUnitProduct, 0,
-                rsProduct.getInt("id_cob"), rsProduct.getInt("id_ent") }, 0));
+            if (manDefaultWarehouseWip == null) {
+                throw new Exception(ERR_MSG_WIP);
             }
             else {
-                throw new Exception("No se encontró ningún almacén de producción predeterminado.");
+                stockMoves.add(new STrnStockMove(
+                        new int[] { mnYear, idProduct, idUnitProduct, 0, manDefaultWarehouseWip[0], manDefaultWarehouseWip[1] }, 
+                        0.0));
             }
         }
         
-        // proration cost:
+        // cost proration:
         
         proration = new SLibValueProration();
         
@@ -357,7 +377,7 @@ public class STrnInventoryValuation {
         sql = "SELECT DISTINCT o.fid_item_r, o.fid_unit_r "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS d ON s.fid_diog_year = d.id_year AND s.fid_diog_doc = d.id_doc "
-                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.MFG_ORD) + " AS o ON d.fid_mfg_year_n = o.id_year AND d.fid_mfg_ord_n = o.id_ord "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.MFG_ORD) + " AS o ON d.fid_mfg_year_n = o.id_year AND d.fid_mfg_ord_n = o.id_ord "
                 + "WHERE d.b_del = 0 AND s.b_del = 0 AND s.id_year = " + mnYear + " AND "
                 + "s.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
                 + "d.fid_ct_iog = " + SModSysConsts.TRNS_CL_IOG_OUT_MFG[0] + " AND d.fid_cl_iog = " + SModSysConsts.TRNS_CL_IOG_OUT_MFG[1] + " AND "
@@ -369,7 +389,7 @@ public class STrnInventoryValuation {
         while (rsProduct.next()) {
             // For each product that has received inputs do the following:
             
-            if (idProduct != rsProduct.getInt("o.fid_item_r") || idUnitProduct != rsProduct.getInt("o.fid_unit_r")) {
+            if (idProduct != rsProduct.getInt("o.fid_item_r") || idUnitProduct != rsProduct.getInt("o.fid_unit_r")) { // check if a different item-unit is available
                 idProduct = rsProduct.getInt("o.fid_item_r");
                 idUnitProduct = rsProduct.getInt("o.fid_unit_r");
                 
@@ -383,11 +403,10 @@ public class STrnInventoryValuation {
                         + "o.id_year, o.id_ord, o.fid_item_r, o.fid_unit_r "
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS d ON s.fid_diog_year = d.id_year AND s.fid_diog_doc = d.id_doc "
-                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.MFG_ORD) + " AS o ON d.fid_mfg_year_n = o.id_year AND d.fid_mfg_ord_n = o.id_ord "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.MFG_ORD) + " AS o ON d.fid_mfg_year_n = o.id_year AND d.fid_mfg_ord_n = o.id_ord "
                         + "WHERE d.b_del = 0 AND s.b_del = 0 AND s.id_year = " + mnYear + " AND "
                         + "s.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
-                        + "d.fid_ct_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[0] + " AND d.fid_cl_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[1] + " AND "
-                        + "d.fid_tp_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[2] + " AND "
+                        + "d.fid_ct_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[0] + " AND d.fid_cl_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[1] + " AND d.fid_tp_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[2] + " AND "
                         + "o.fid_item_r = " + idProduct + " AND o.fid_unit_r = " + idUnitProduct + " "
                         + "ORDER BY s.id_item, s.id_unit, s.dt, s.fid_ct_iog, s.fid_cl_iog, s.fid_tp_iog, s.id_lot, s.id_cob, s.id_wh, s.id_mov; ";
 
@@ -439,7 +458,7 @@ public class STrnInventoryValuation {
                     or in default to the predetermined store of production in process: */
               
                 if (acumCostByProduct > 0) {
-                    prorationCostRawMaterialProduct(idProduct, idUnitProduct, acumCostByProduct);
+                    prorateCostRawMaterialsProduct(idProduct, idUnitProduct, acumCostByProduct);
                 }
             }
         }
@@ -496,13 +515,13 @@ public class STrnInventoryValuation {
     public int getPeriod() { return mnPeriod; }
     
     /**
-     * Must be called before saving inventory valuation registry.
+     * Must be called before saving inventory valuation registry, first sentences in method SDbInventoryValuation.save().
      */
     public void prepareValuation() throws Exception {
         String sql = "";
         Statement statement = moSession.getStatement().getConnection().createStatement();
         
-        canValidate();
+        validateValuation();
         
         // Soft delete inventory valuation former registries:
         
@@ -541,6 +560,13 @@ public class STrnInventoryValuation {
                 + "fid_cl_iog = " + SModSysConsts.TRNS_CL_IOG_IN_EXP[1] + "; ";
         statement.execute(sql);
         
+        sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " "
+                + "SET b_del = 1 "
+                + "WHERE b_del = 0 AND id_year = " + mnYear + " AND dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
+                + "fid_cl_iog = " + SModSysConsts.TRNS_CL_IOG_IN_EXP[1] + "; ";
+        statement.execute(sql);
+        
+        /* XXX check if it is still valid!
         // Soft delete materials cost consume stock movements of current period:
         
         sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " "
@@ -553,11 +579,11 @@ public class STrnInventoryValuation {
                 + "SET b_del = 1 "
                 + "WHERE b_del = 0 AND id_year = " + mnYear + " AND dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
                 + "fid_ct_iog = " + SModSysConsts.TRNS_TP_IOG_IN_CST_RM[0] + " AND fid_cl_iog = " + SModSysConsts.TRNS_TP_IOG_IN_CST_RM[1] + " AND fid_tp_iog = " + SModSysConsts.TRNS_TP_IOG_IN_CST_RM[2] + " ; ";
-        statement.execute(sql);
+        statement.execute(sql);*/
     }
     
     /**
-     * Must be called after saving inventory valuation registry.
+     * Must be called after saving inventory valuation registry, last sentences in method SDbInventoryValuation.save().
      */
     public void computeValuation(final int idInventoryValuation) throws Exception {
         int idMovClass = 0;
@@ -613,8 +639,9 @@ public class STrnInventoryValuation {
                 }
             }
             
-            idItem = 0; // not supposed to be necessary, just in case
-            idUnit = 0; // not supposed to be necessary, just in case
+            idItem = 0;         // not supposed to be necessary, just in case
+            idUnit = 0;         // not supposed to be necessary, just in case
+            isStandard = false; // not supposed to be necessary, just in case
 
             sql = "SELECT s.id_item, s.id_unit, s.dt, s.fid_ct_iog, s.fid_cl_iog, s.fid_tp_iog, s.id_lot, s.id_cob, s.id_wh, s.id_mov, "
                     + "s.mov_in, s.mov_out, s.cost_u, s.cost, s.debit, s.credit, "
@@ -630,7 +657,7 @@ public class STrnInventoryValuation {
                     + "ORDER BY s.id_item, s.id_unit, s.dt, s.fid_ct_iog, s.fid_cl_iog, s.fid_tp_iog, s.id_lot, s.id_cob, s.id_wh, s.id_mov; ";
             rsMain = stMain.executeQuery(sql);
             while (rsMain.next()) {
-                if (idItem != rsMain.getInt("s.id_item") || idUnit != rsMain.getInt("s.id_unit")) {
+                if (idItem != rsMain.getInt("s.id_item") || idUnit != rsMain.getInt("s.id_unit")) { // check if a different item-unit is available
                     idItem = rsMain.getInt("s.id_item");
                     idUnit = rsMain.getInt("s.id_unit");
                     
@@ -701,7 +728,7 @@ public class STrnInventoryValuation {
                                     + "WHERE id_year = " + mnYear + " AND id_per = " + mnPeriod + " AND id_item = " + idItem + " AND id_unit = " + idUnit + "; ";
                             stUpdates.execute(sql);
                             
-                            createStockMoveCostRawMaterials(new int[] { mnYear, idItem, idUnit, 1, 1, 1, 0 }, acumCosts);
+                            createStockMoveCostRawMaterials(new int[] { mnYear, idItem, idUnit, 1, manDefaultWarehouseWip[0], manDefaultWarehouseWip[1], 0 }, acumCosts);
                         }
                     }
                 }
@@ -727,7 +754,7 @@ public class STrnInventoryValuation {
                 
                 // Update cost of corresponding incoming stock movement (MFG and other internal stock movements only):
                 
-                if (SLibUtils.belongsTo(idMovClass, new int[] { SModSysConsts.TRNS_CL_IOG_OUT_MFG[1], SModSysConsts.TRNS_CL_IOG_OUT_INT[1] })) {
+                if (SLibUtils.belongsTo(idMovClass, new int[] { SModSysConsts.TRNS_CL_IOG_OUT_INT[1], SModSysConsts.TRNS_CL_IOG_OUT_MFG[1] })) {
                     if (!isStandard) {
                         auxCost = auxValue; // revaluate cost properly
                     }

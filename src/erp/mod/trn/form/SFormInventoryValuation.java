@@ -169,10 +169,7 @@ public class SFormInventoryValuation extends SBeanForm {
     public void actionSave() {
         String[] months = SLibTimeUtils.createMonthsOfYearStd(Calendar.LONG);
         
-        if (miClient.showMsgBoxConfirm("Se realizará la valuación para:\n" + 
-                SGuiUtils.getLabelName(jlYear) + ": " + moCalYear.getValue() + "\n" +
-                SGuiUtils.getLabelName(jlPeriod) + ": " + months[moCalPeriod.getValue() - 1] + "\n" +
-                SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+        if (miClient.showMsgBoxConfirm("Se realizará la valuación de inventarios para " + months[moCalPeriod.getValue() - 1] + " de " + moCalYear.getValue() + ".\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
             super.actionSave();
         }
     }
