@@ -7,7 +7,7 @@ package erp.mtrn.data;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Claudio Peña
  */
 public class STrnDpsStockReturnRow extends erp.lib.table.STableRow {
 
@@ -21,12 +21,13 @@ public class STrnDpsStockReturnRow extends erp.lib.table.STableRow {
     protected double mdOriginalQuantityBase;
     protected double mdOriginalQuantityReturned;
     protected double mdOriginalQuantityToReturn;
+    protected double mdPriceUnitary;
     protected int mnFkItemId;
     protected int mnFkUnitId;
     protected int mnFkOriginalUnitId;
     protected int mnFkDpsYearId;
     protected int mnFkDpsDocId;
-    protected int mnFkDpsEntryId;
+    public int mnFkDpsEntryId;
     protected java.lang.String msAuxItem;
     protected java.lang.String msAuxItemKey;
     protected java.lang.String msAuxUnit;
@@ -70,6 +71,7 @@ public class STrnDpsStockReturnRow extends erp.lib.table.STableRow {
         msAuxDocNumber = "";
         msAuxDocType = "";
         mtAuxDocDate = null;
+        mdPriceUnitary = 0;
     }
 
     @Override
@@ -84,6 +86,7 @@ public class STrnDpsStockReturnRow extends erp.lib.table.STableRow {
         mvValues.add(msAuxDocType);
         mvValues.add((msAuxDocNumberSeries.length() == 0 ? "" : msAuxDocNumberSeries + "-") + msAuxDocNumber);
         mvValues.add(mtAuxDocDate);
+        mvValues.add(mdPriceUnitary);
     }
 
     public void setPkDpsAdjustmentYearId(int n) { mnPkDpsAdjustmentYearId = n; }
@@ -110,7 +113,8 @@ public class STrnDpsStockReturnRow extends erp.lib.table.STableRow {
     public void setAuxDocNumber(java.lang.String s) { msAuxDocNumber = s; }
     public void setAuxDocType(java.lang.String s) { msAuxDocType = s; }
     public void setAuxDocDate(java.util.Date t) { mtAuxDocDate = t; }
-
+    public void setPriceUnitary(double d) { mdPriceUnitary = d; }
+    
     public int getPkDpsAdjustmentYearId() { return mnPkDpsAdjustmentYearId; }
     public int getPkDpsAdjustmentDocId() { return mnPkDpsAdjustmentDocId; }
     public int getPkDpsAdjustmentEntryId() { return mnPkDpsAdjustmentEntryId; }
@@ -135,6 +139,7 @@ public class STrnDpsStockReturnRow extends erp.lib.table.STableRow {
     public java.lang.String getAuxDocNumber() { return msAuxDocNumber; }
     public java.lang.String getAuxDocType() { return msAuxDocType; }
     public java.util.Date getAuxDocDate() { return mtAuxDocDate; }
+    public double getPriceUnitary() { return mdPriceUnitary; }
 
     public int[] getDpsAdjustmentEntryKey() { return new int[] { mnPkDpsAdjustmentYearId, mnPkDpsAdjustmentDocId, mnPkDpsAdjustmentEntryId }; }
     public int[] getDpsEntryKey() { return new int[] { mnFkDpsYearId, mnFkDpsDocId, mnFkDpsEntryId }; }

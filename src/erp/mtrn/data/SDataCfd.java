@@ -38,7 +38,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Claudio Peña
  */
 public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -507,6 +507,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     @Override
     public int save(java.sql.Connection connection) {
         int index = 1;
+        final int LENGTH_CURRENCY = 15;
         boolean bIsUpd = false;
         String sql = "";
         BufferedImage bufferedImage = null;
@@ -574,7 +575,12 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             preparedStatement.setString(index++, msDocXmlRfcEmi);
             preparedStatement.setString(index++, msDocXmlRfcRec);
             preparedStatement.setDouble(index++, mdDocXmlTot);
-            preparedStatement.setString(index++, msDocXmlMon);
+            if (msDocXmlMon.length() >= LENGTH_CURRENCY) {
+                preparedStatement.setString(index++, msDocXmlMon.substring(0, 14)); //Valid value size
+            } 
+            else {
+                preparedStatement.setString(index++, msDocXmlMon);
+            }
             preparedStatement.setDouble(index++, mdDocXmlTc);
             
             if (mtDocXmlSign_n == null) {

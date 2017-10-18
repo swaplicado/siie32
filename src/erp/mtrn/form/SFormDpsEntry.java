@@ -71,7 +71,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author  Sergio Flores, Juan Barajas, Irving Sánchez, Gerardo Hernández, Uriel Castañeda
+ * @author  Sergio Flores, Juan Barajas, Irving Sánchez, Gerardo Hernández, Uriel Castañeda, Claudio Peña
  */
 public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, javax.swing.event.CellEditorListener {
     
@@ -2834,28 +2834,59 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 moFieldDiscountDocCy.setFieldValue(0d);
             }
 
-            // Obtain item price with discount included or with discount separate:
+            // Obtain item price and discount from prices lists:
 
             try {
-                moParamsItemPriceList = SDataUtilities.obtainItemPrice(miClient,
-                        moParamBizPartner.getPkBizPartnerId(), moParamDps.getFkBizPartnerBranchId(),
-                        (moParamDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL ?
-                        moParamBizPartner.getDbmsCategorySettingsCus().getFkBizPartnerCategoryId() :
-                        moParamBizPartner.getDbmsCategorySettingsSup().getFkBizPartnerCategoryId()),
-                        (moParamDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL ?
-                        moParamBizPartner.getDbmsCategorySettingsCus().getFkBizPartnerTypeId() :
-                        moParamBizPartner.getDbmsCategorySettingsSup().getFkBizPartnerTypeId()),
+                moParamsItemPriceList = SDataUtilities.obtainItemPrice(
+                        miClient, moParamBizPartner.getPkBizPartnerId(), moParamDps.getFkBizPartnerBranchId(),
+                        (moParamDps.isForSales() ? moParamBizPartner.getDbmsCategorySettingsCus().getFkBizPartnerCategoryId() : moParamBizPartner.getDbmsCategorySettingsSup().getFkBizPartnerCategoryId()),
+                        (moParamDps.isForSales() ? moParamBizPartner.getDbmsCategorySettingsCus().getFkBizPartnerTypeId() : moParamBizPartner.getDbmsCategorySettingsSup().getFkBizPartnerTypeId()),
                         moParamDps.getFkDpsCategoryId(), moParamDps.getDateDoc(), moItem.getPkItemId(), moParamDps.getFkCurrencyId());
-
-                // Check document currency:
-
-                if (moParamDps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) {
+                
+                if (!moParamsItemPriceList.isItemPriceFound() && !miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { moParamDps.getFkCurrencyId() })) {
+                    // if price was not found and document currency is not local currency:
+                    moParamsItemPriceList = SDataUtilities.obtainItemPrice(
+                            miClient, moParamBizPartner.getPkBizPartnerId(), moParamDps.getFkBizPartnerBranchId(),
+                            (moParamDps.isForSales() ? moParamBizPartner.getDbmsCategorySettingsCus().getFkBizPartnerCategoryId() : moParamBizPartner.getDbmsCategorySettingsSup().getFkBizPartnerCategoryId()),
+                            (moParamDps.isForSales() ? moParamBizPartner.getDbmsCategorySettingsCus().getFkBizPartnerTypeId() : moParamBizPartner.getDbmsCategorySettingsSup().getFkBizPartnerTypeId()),
+                            moParamDps.getFkDpsCategoryId(), moParamDps.getDateDoc(), moItem.getPkItemId(), miClient.getSession().getSessionCustom().getLocalCurrencyKey()[0]);
+                }
+                /*
+                 Check document currency:
+                 Is document and list is local, the value is the same
+                 Is document and list is foreign and equals, the value is the same
+                 Is document is foreign and list is local, the value divides
+                 Is document is and list they are not the same, the value is 0
+                 Is document is local and list is foreign, the value is 0  
+                */
+                if (moParamDps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) { // Currency local and document they are equals
                     moFieldOriginalPriceUnitaryCy.setDouble(moParamsItemPriceList.getItemPrice());
                     moFieldOriginalDiscountUnitaryCy.setDouble(moParamsItemPriceList.getItemDiscount());
                 }
+                else if (moParamDps.getFkCurrencyId() != miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) { 
+                    if (moParamDps.getFkCurrencyId() == moParamsItemPriceList.getCurrencyId()) {// Is document and list is foreign and equals, the value is the same
+                        moFieldOriginalPriceUnitaryCy.setDouble(moParamsItemPriceList.getItemPrice());
+                        moFieldOriginalDiscountUnitaryCy.setDouble(moParamsItemPriceList.getItemDiscount());
+                    }
+                    else if (moParamDps.getFkCurrencyId() != miClient.getSessionXXX().getParamsErp().getFkCurrencyId() && 
+                            moParamsItemPriceList.getCurrencyId() == miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) { // Is document is foreign and list is local, the value divides
+                        moFieldOriginalPriceUnitaryCy.setDouble(moParamDps.getExchangeRate() == 0 ? 0 : moParamsItemPriceList.getItemPrice() / moParamDps.getExchangeRate());
+                        moFieldOriginalDiscountUnitaryCy.setDouble(moParamDps.getExchangeRate() == 0 ? 0 : moParamsItemPriceList.getItemDiscount() / moParamDps.getExchangeRate());
+                    }
+                    else if (moParamDps.getFkCurrencyId() != miClient.getSessionXXX().getParamsErp().getFkCurrencyId() &&  // Is document is foreign and list is local, the value divides 
+                            moParamsItemPriceList.getCurrencyId() != miClient.getSessionXXX().getParamsErp().getFkCurrencyId() &&
+                            moParamsItemPriceList.getCurrencyId() != moParamDps.getFkCurrencyId()) {
+                        moFieldOriginalPriceUnitaryCy.setDouble(0d);
+                        moFieldOriginalDiscountUnitaryCy.setDouble(0d);
+                    }
+                    else {
+                        moFieldOriginalPriceUnitaryCy.setDouble(0d);
+                        moFieldOriginalDiscountUnitaryCy.setDouble(0d);
+                    }
+                }
                 else {
-                    moFieldOriginalPriceUnitaryCy.setDouble(moParamDps.getExchangeRate() == 0 ? 0 : moParamsItemPriceList.getItemPrice() / moParamDps.getExchangeRate());
-                    moFieldOriginalDiscountUnitaryCy.setDouble(moParamDps.getExchangeRate() == 0 ? 0 : moParamsItemPriceList.getItemDiscount() / moParamDps.getExchangeRate());
+                    moFieldOriginalPriceUnitaryCy.setDouble(moParamDps.getExchangeRate() == 0 ? 0 : moParamsItemPriceList.getItemPrice() * moParamDps.getExchangeRate());
+                    moFieldOriginalDiscountUnitaryCy.setDouble(moParamDps.getExchangeRate() == 0 ? 0 : moParamsItemPriceList.getItemDiscount() * moParamDps.getExchangeRate());
                 }
             }
             catch (Exception e) {
@@ -2930,7 +2961,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jbPriceUnitaryCyWizard.setEnabled(true);
             jbPriceHistory.setEnabled(true);
 
-            if ((moParamsItemPriceList != null && moParamsItemPriceList.getItemPriceFound()) ||
+            if ((moParamsItemPriceList != null && moParamsItemPriceList.isItemPriceFound()) ||
                     (moDpsEntry.getContractPriceMonth() != SLibConstants.UNDEFINED && moDpsEntry.getContractPriceMonth() != SLibConstants.UNDEFINED)) {
                 if ((moParamDps.isForSales() &&
                     mnPricePolicyForSales > 0 &&

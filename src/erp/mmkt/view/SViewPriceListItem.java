@@ -17,7 +17,7 @@ import javax.swing.JButton;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Claudio Peña
  */
 public class SViewPriceListItem extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -40,7 +40,7 @@ public class SViewPriceListItem extends erp.lib.table.STableTab implements java.
         jbDelete.setEnabled(false);
 
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[4];
+        STableColumn[] aoTableColumns = new STableColumn[5];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "p.id_plist");
@@ -61,6 +61,7 @@ public class SViewPriceListItem extends erp.lib.table.STableTab implements java.
         }
 
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "pr.price", "Precio", STableConstants.WIDTH_VALUE);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.cur_key", "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);
         }
@@ -108,10 +109,11 @@ public class SViewPriceListItem extends erp.lib.table.STableTab implements java.
             }
         }
 
-        msSql = "SELECT p.id_plist, p.plist, pr.id_plist, pr.id_item, pr.price, i.item_key, i.item " +
+        msSql = "SELECT p.id_plist, p.plist, pr.id_plist, pr.id_item, pr.price, i.item_key, i.item, c.cur_key " +
                 "FROM mkt_plist AS p " +
                 "INNER JOIN mkt_plist_price AS pr ON p.id_plist = pr.id_plist " +
                 "INNER JOIN erp.itmu_item AS i ON pr.id_item = i.id_item " +
+                "INNER JOIN erp.cfgu_cur AS c ON p.fid_cur = c.id_cur " +
                 (sqlWhere.length() > 0 ? "WHERE " + sqlWhere : "") + " " +
                 "ORDER BY p.plist, " +
                 (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? " i.item_key, i.item " : " i.item, i.item_key ");

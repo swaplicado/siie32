@@ -14,10 +14,12 @@ import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.form.SDialogShowDocumentLinks;
 import erp.mtrn.form.SDialogShowDocumentNotes;
+import sa.lib.grid.SGridRow;
+import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda
+ * @author Sergio Flores, Uriel Castañeda, Claudio Peña
  */
 public abstract class SModuleUtilities {
     
@@ -74,18 +76,18 @@ public abstract class SModuleUtilities {
     /**
      * Shows document processing links.
      * @param client GUI Client.
-     * @param tableRow View's selected table row.
+     * @param dpsKey Primary key of desired document.
      */
-    public static void showDocumentLinks(final SClientInterface client, final STableRow tableRow) {
+    public static void showDocumentLinks(final SClientInterface client, final Object dpsKey) {
         int links = 0;
         SDataDps dps = null;
         SDialogShowDocumentLinks dialog = null;
 
-        if (tableRow == null) {
-            client.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+        if (dpsKey == null) {
+            client.showMsgBoxInformation(SGuiConsts.ERR_MSG_UNDEF_REG);
         }
         else {
-            dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, tableRow.getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
+            dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, dpsKey, SLibConstants.EXEC_MODE_VERBOSE);
 
             dialog = new SDialogShowDocumentLinks(client);
             dialog.formReset();
@@ -98,6 +100,34 @@ public abstract class SModuleUtilities {
             else {
                 dialog.setFormVisible(true);
             }
+        }
+    }
+    
+    /**
+     * Shows document processing links.
+     * @param client GUI Client.
+     * @param tableRow View's selected table row.
+     */
+    public static void showDocumentLinks(final SClientInterface client, final STableRow tableRow) {
+        if (tableRow == null) {
+            client.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+        }
+        else {
+            showDocumentLinks(client, tableRow.getPrimaryKey());
+        }
+    }
+    
+    /**
+     * Shows document processing links.
+     * @param client GUI Client.
+     * @param gridRow View's selected grid table row.
+     */
+    public static void showDocumentLinks(final SClientInterface client, final SGridRow gridRow) {
+        if (gridRow == null) {
+            client.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+        }
+        else {
+            showDocumentLinks(client, gridRow.getRowPrimaryKey());
         }
     }
 }
