@@ -660,7 +660,7 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
                 stockMoveParams.setPkItemId(stockSupplyRow.getFkItemId());
                 stockMoveParams.setPkUnitId(stockSupplyRow.getFkUnitId());
 
-                objStock = STrnStockSegregationUtils.getStkSegregated(miClient, stockMoveParams);
+                objStock = STrnStockSegregationUtils.getStockSegregated(miClient, stockMoveParams);
                 segregated = objStock.getSegregatedStock();
             }
             catch (Exception e) {

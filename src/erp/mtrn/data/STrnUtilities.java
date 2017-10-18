@@ -193,8 +193,8 @@ public abstract class STrnUtilities {
      * @param itemId Lot item ID (primary key).
      * @param unitId Lot unit ID (primary key).
      * @param lotId_n Lot ID (primary key), can be 0 meaning undefined.
-     * @param cobId_n Company branch ID (primary key), can be 0 meaning undefined.
-     * @param whId_n Warehouse ID (primary key), can be 0 meaning undefined.
+     * @param companyBranchId_n Company branch ID (primary key), can be 0 meaning undefined.
+     * @param warehouseId_n Warehouse ID (primary key), can be 0 meaning undefined.
      * @param dateCutOff_n Cut off date.
      * @param iogKey_n Primary key of IOG being edited.
      * @returns Available stock for provided params.
@@ -244,7 +244,8 @@ public abstract class STrnUtilities {
                 "INNER JOIN erp.itmu_unit AS u ON s.id_unit = u.id_unit " +
                 "INNER JOIN trn_lot AS l ON s.id_item = l.id_item AND s.id_unit = l.id_unit AND s.id_lot = l.id_lot " +
                 "WHERE s.b_del = 0 AND s.id_year = " + year + " AND s.dt <= '" + client.getSessionXXX().getFormatters().getDbmsDateFormat().format(dateCutOff_n) + "' AND s.id_cob = " + warehouseKey[0] + " AND s.id_wh = " + warehouseKey[1] + " " +
-                "GROUP BY s.id_year, s.id_item, s.id_unit, s.id_lot, s.id_wh, l.lot, l.dt_exp_n, l.b_block, i.item_key, i.item, u.symbol HAVING f_stk <> 0 " +
+                "GROUP BY s.id_year, s.id_item, s.id_unit, s.id_lot, s.id_wh, l.lot, l.dt_exp_n, l.b_block, i.item_key, i.item, u.symbol " +
+                "HAVING f_stk <> 0 OR f_bal <> 0 " +
                 "ORDER BY " + (client.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "i.item_key, i.item, " : "i.item, i.item_key, ") +
                 "s.id_item, u.symbol, s.id_unit, l.lot, l.dt_exp_n, l.b_block, s.id_lot ";
 

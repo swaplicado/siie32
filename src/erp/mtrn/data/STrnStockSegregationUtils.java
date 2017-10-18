@@ -243,7 +243,7 @@ public abstract class STrnStockSegregationUtils {
         
         stock = getStock(client, stockMoveParams);
         
-        segregatedStock = getStkSegregated(client, stockMoveParams);
+        segregatedStock = getStockSegregated(client, stockMoveParams);
         stock.setSegregationIncreases(segregatedStock.getSegregationIncreases());
         stock.setSegregationDecreases(segregatedStock.getSegregationDecreases());
             
@@ -308,7 +308,7 @@ public abstract class STrnStockSegregationUtils {
     public static STrnStock getStkSegregatedByReference(final SClientInterface client, final STrnStockMove stockMoveParams) throws Exception {
         stockMoveParams.setIsCurrentSegregationExcluded(false);
         
-        return getStkSegregated(client, stockMoveParams);
+        return getStockSegregated(client, stockMoveParams);
     }
     
     /**
@@ -320,7 +320,7 @@ public abstract class STrnStockSegregationUtils {
      * @return STrnStock object with the values of segregated stock.
      * @throws Exception
      */
-    public static STrnStock getStkSegregated(final SClientInterface client, final STrnStockMove stockMoveParams) throws Exception {
+    public static STrnStock getStockSegregated(final SClientInterface client, final STrnStockMove stockMoveParams) throws Exception {
         STrnStock segregatedStock = new STrnStock(); 
         ResultSet result = null;
         

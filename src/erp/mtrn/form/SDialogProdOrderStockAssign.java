@@ -989,7 +989,7 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
                     stockMoveParams.setIsCurrentSegregationExcluded(true);
                 }
                 
-                objStock = STrnStockSegregationUtils.getStkSegregated(miClient, stockMoveParams);
+                objStock = STrnStockSegregationUtils.getStockSegregated(miClient, stockMoveParams);
                 segregated = objStock.getSegregatedStock();
                 
                 stockMoveParams = new STrnStockMove();

@@ -385,17 +385,21 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
         return null;
     }
 
-    public void calculateValue() {
+    public void computeValue() {
         if (!SLibUtilities.belongsTo(getDiogClassKey(), new int[][] { SDataConstantsSys.TRNS_CL_IOG_IN_EXP, SDataConstantsSys.TRNS_CL_IOG_OUT_EXP })) {
             // Ordinary stock move:
 
             if (mnFkDiogCategoryId == SDataConstantsSys.TRNS_CT_IOG_IN) {
-                mdDebit = SLibUtilities.round(mdMoveIn * mdCostUnitary, 2);
+                if (mdCostUnitary != 0.0 && SLibUtilities.round(mdDebit, 2) != SLibUtilities.round(mdMoveIn * mdCostUnitary, 2)) {
+                    mdDebit = SLibUtilities.round(mdMoveIn * mdCostUnitary, 2);
+                }
                 mdCredit = 0;
             }
             else {
                 mdDebit = 0;
-                mdCredit = SLibUtilities.round(mdMoveOut * mdCostUnitary, 2);
+                if (mdCostUnitary != 0.0 && SLibUtilities.round(mdCredit, 2) != SLibUtilities.round(mdMoveOut * mdCostUnitary, 2)) {
+                    mdCredit = SLibUtilities.round(mdMoveOut * mdCostUnitary, 2);
+                }
             }
         }
         else {

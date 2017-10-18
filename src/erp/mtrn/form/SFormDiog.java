@@ -56,8 +56,6 @@ import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -2261,10 +2259,10 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                 iogEntry.setPkDocId(SLibConstants.UNDEFINED);
                 iogEntry.setPkEntryId(SLibConstants.UNDEFINED);
                 iogEntry.setQuantity(stockMove.getQuantity());
-                iogEntry.setValueUnitary(0);
-                iogEntry.setValue(0);
+                iogEntry.setValueUnitary(stockMove.getQuantity() == 0 ? 0 : SLibUtils.round(stockMove.getValue() / stockMove.getQuantity(), SLibUtils.getDecimalFormatAmountUnitary().getMaximumFractionDigits()));
+                iogEntry.setValue(stockMove.getValue());
                 iogEntry.setOriginalQuantity(stockMove.getQuantity());
-                iogEntry.setOriginalValueUnitary(0);
+                iogEntry.setOriginalValueUnitary(stockMove.getValue());
                 iogEntry.setSortingPosition(0);
                 iogEntry.setIsInventoriable(true);
                 iogEntry.setIsDeleted(false);
@@ -2699,14 +2697,14 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                 importFromProdOrder();
             }
             else if (SLibUtilities.compareKeys(manParamIogTypeKey, SDataConstantsSys.TRNS_TP_IOG_OUT_ADJ_INV)) {
-                if (miClient.showMsgBoxConfirm("El almacén '" + moWarehouseSource.getEntity() + "', código '" + moWarehouseSource.getCode() + "' quedará sin existencias al '" + miClient.getSessionXXX().getFormatters().getDateFormat().format(moFieldDate.getDate()) + "'.\n ¿Desea continuar?") == JOptionPane.YES_OPTION) {
+                if (miClient.showMsgBoxConfirm("El almacén '" + moWarehouseSource.getEntity() + " (" + moWarehouseSource.getCode() + ")' quedará sin existencias al '" + miClient.getSessionXXX().getFormatters().getDateFormat().format(moFieldDate.getDate()) + "'.\n ¿Desea continuar?") == JOptionPane.YES_OPTION) {
                     try {
-                        if (STrnUtilities.canStockWarehouseBeCancel(miClient, moFieldDate.getDate(), new int[] { moWarehouseSource.getPkCompanyBranchId(), moWarehouseSource.getPkEntityId() })) {
+                        boolean canCancel = STrnUtilities.canStockWarehouseBeCancel(miClient, moFieldDate.getDate(), new int[] { moWarehouseSource.getPkCompanyBranchId(), moWarehouseSource.getPkEntityId() });
+                        if (canCancel || miClient.showMsgBoxConfirm("No se deberían cancelar las existencias del almacén '" + moWarehouseSource.getEntity() + " (" + moWarehouseSource.getCode() + ")' porque existen movimientos de salida de inventario\n con fecha igual o posterior al '" + miClient.getSessionXXX().getFormatters().getDateFormat().format(moFieldDate.getDate()) + "'.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                             importStockWarehouse();
                             jbEntryImport.setEnabled(moPaneDiogEntries.getTableGuiRowCount() == 0);
                         }
                         else {
-                            miClient.showMsgBoxWarning("No se pueden cancelar las existencias en el almacén '" + moWarehouseSource.getEntity() + "', código '" + moWarehouseSource.getCode() + "' debido a que existen movimientos de salida de inventario\n con fecha igual o posterior al '" + miClient.getSessionXXX().getFormatters().getDateFormat().format(moFieldDate.getDate()) + "'.");
                             jftDate.requestFocus();
                         }
                     }
@@ -3273,16 +3271,17 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                         if (msg.length() > 0) {
                             throw new Exception(msg);
                         }
-
-                        if (!SLibUtilities.belongsTo(manParamIogTypeKey, new int[][] { SDataConstantsSys.TRNS_TP_IOG_OUT_MFG_WP_ASD, SDataConstantsSys.TRNS_TP_IOG_OUT_MFG_FG_ASD })) {
-                            int [] reference = null;
-                            int segregationType = 0;
+                        
+                        if (!SLibUtilities.belongsTo(manParamIogTypeKey, new int[][] { SDataConstantsSys.TRNS_TP_IOG_OUT_MFG_WP_ASD, SDataConstantsSys.TRNS_TP_IOG_OUT_MFG_FG_ASD, SDataConstantsSys.TRNS_TP_IOG_OUT_ADJ_INV })) {
+                            int segregationType = SLibConstants.UNDEFINED;
+                            int[] segregationReferenceKey = null;
                             
                             if (moProdOrderSource != null) {
-                                reference = new int[] { moProdOrderSource.getPkYearId(), moProdOrderSource.getPkOrdId() };
                                 segregationType = SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD;
+                                segregationReferenceKey = new int[] { moProdOrderSource.getPkYearId(), moProdOrderSource.getPkOrdId() };
                             }
-                            msg = STrnStockValidator.validateStockMoves(miClient, entries, mnParamIogCategoryId, moDiog == null ? new int[] { year, 0 } : (int[]) moDiog.getPrimaryKey(), (int[]) moWarehouseSource.getPrimaryKey(), false, moFieldDate.getDate(), reference, segregationType);
+                            
+                            msg = STrnStockValidator.validateStockMoves(miClient, entries, mnParamIogCategoryId, moDiog == null ? new int[] { year, 0 } : (int[]) moDiog.getPrimaryKey(), (int[]) moWarehouseSource.getPrimaryKey(), false, moFieldDate.getDate(), segregationType, segregationReferenceKey);
                             if (msg.length() > 0) {
                                 throw new Exception(msg);
                             }

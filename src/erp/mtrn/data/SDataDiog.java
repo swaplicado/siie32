@@ -135,16 +135,18 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         if (mnFkDiogCategoryId == SDataConstantsSys.TRNS_CT_IOG_IN) {
             stockMove.setMoveIn(move.getQuantity());
             stockMove.setMoveOut(0);
+            stockMove.setDebit(move.getValue());    // can be set by SDataStockMove.computeValue()
+            stockMove.setCredit(0);                 // can be set by SDataStockMove.computeValue()
         }
         else {
             stockMove.setMoveIn(0);
             stockMove.setMoveOut(move.getQuantity());
+            stockMove.setDebit(0);                  // can be set by SDataStockMove.computeValue()
+            stockMove.setCredit(move.getValue());   // can be set by SDataStockMove.computeValue()
         }
 
         stockMove.setCostUnitary(iogEntry.getValueUnitary());
         stockMove.setCost(0);
-        stockMove.setDebit(0);      // set by SDataStockMove.computeValue()
-        stockMove.setCredit(0);     // set by SDataStockMove.computeValue()
         stockMove.setIsDeleted(false);
         stockMove.setFkDiogCategoryId(mnFkDiogCategoryId);
         stockMove.setFkDiogClassId(mnFkDiogClassId);
@@ -166,7 +168,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         stockMove.setFkBookkeepingNumberId_n(mnFkBookkeepingNumberId_n);
         stockMove.setAuxValue(iogEntry.getValue());
 
-        stockMove.calculateValue();
+        stockMove.computeValue();
 
        if (move.getPkLotId() == SLibConstants.UNDEFINED) {
             sql = "SELECT id_lot, dt_exp_n FROM trn_lot WHERE " +
@@ -1037,7 +1039,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     }
 
     public java.lang.String validateStockMoves(final erp.client.SClientInterface client, final boolean isDocBeingDeleted) throws Exception {
-        return STrnStockValidator.validateStockMoves(client, mvDbmsDiogEntries, mnFkDiogCategoryId, (int[]) getPrimaryKey(), getWarehouseKey(), isDocBeingDeleted, mtDate, null, 0);
+        return STrnStockValidator.validateStockMoves(client, mvDbmsDiogEntries, mnFkDiogCategoryId, (int[]) getPrimaryKey(), getWarehouseKey(), isDocBeingDeleted, mtDate, SLibConstants.UNDEFINED, null);
     }
 
     @Override
