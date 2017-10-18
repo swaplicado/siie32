@@ -7,7 +7,7 @@ package erp.data;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Claudio Peña
  * 
  * Maintenance Log:
  * 
@@ -1544,6 +1544,7 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_DPS_UNP = 207002;
     public static final int REP_TRN_DPS_UNP_CY = 207003;
     public static final int REP_TRN_STK = 207004;
+    public static final int REP_TRN_STK_PERIOD = 207005;
     public static final int REP_TRN_PS = 207006;
     public static final int REP_TRN_PS_UNIT = 207007;
     public static final int REP_TRN_PS_CON = 207008;

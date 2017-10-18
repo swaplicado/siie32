@@ -439,6 +439,7 @@ public abstract class SDataConstants {
     public static final int TRN_STK_CFG_ITEM = 207082;
     public static final int TRN_STK_CFG_DNS = 207083;
     public static final int TRN_STK = 207084;
+    public static final int TRN_STK_PERIOD = 207085;
     public static final int TRN_STK_SEG = 207101;
     public static final int TRN_STK_SEG_WHS = 207102;
     public static final int TRN_STK_SEG_WHS_ETY = 207103;
@@ -523,6 +524,7 @@ public abstract class SDataConstants {
     public static final int TRNX_DIOG_MFG_MOVE_OUT = 207595;
     public static final int TRNX_DIOG_MFG_MOVE_ASG = 207596;
     public static final int TRNX_DIOG_MFG_MOVE_RET = 207597;
+    public static final int TRNX_STK_PERIOD = 207598;
 
     public static final int TRNX_DIOG_AUDIT_PEND = 207599;
     public static final int TRNX_DIOG_AUDITED = 207600;

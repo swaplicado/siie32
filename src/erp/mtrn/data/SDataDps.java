@@ -3702,7 +3702,14 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
     }
     
-    public void sendMail(SClientInterface client, Object dpsKey, int mmsType) {
+    /**
+     * Send this document by mail.
+     * This method is invoked indirectly by getClass().getMethod() in SFormDps.getPostSaveMethod().
+     * @param client GUI client.
+     * @param keyDps Type of Document of Purchases & Sales (DPS).
+     * @param typeMms Type of Mail Messaging Service (MMS).
+     */
+    public void sendMail(SClientInterface client, Object keyDps, int typeMms) {
         int[] mmsConfigKey = null;
         String msg = "";
         String companyName = "";
@@ -3717,7 +3724,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         boolean isEdited = false;
         boolean send = true;
         
-        read(dpsKey, client.getSession().getStatement());
+        read(keyDps, client.getSession().getStatement());
         
         isEdited = mtUserNewTs.compareTo(mtUserEditTs) != 0;
         
@@ -3729,7 +3736,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         
         for (SDataDpsEntry entry : mvDbmsDpsEntries) {
             try {
-                mmsConfigKey = STrnUtilities.readMmsConfigurationByLinkType(client, mmsType, entry.getFkItemId());
+                mmsConfigKey = STrnUtilities.readMmsConfigurationByLinkType(client, typeMms, entry.getFkItemId());
                 
                 if (mmsConfigKey[0] != SLibConsts.UNDEFINED) {
                     mmsConfig = new SDbMmsConfig();
@@ -3761,7 +3768,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     msg = STrnUtilities.computeMailHeaderBeginTable(companyName, moDpsType.getDpsType(), getDpsNumber(), bpName, mtDate, (isEdited ? mtUserEditTs : mtUserNewTs), isEdited, mbIsRebill);
 
                     for (SDataDpsEntry entry : mvDbmsDpsEntries) {
-                        mmsConfigKey = STrnUtilities.readMmsConfigurationByLinkType(client, mmsType, entry.getFkItemId());
+                        mmsConfigKey = STrnUtilities.readMmsConfigurationByLinkType(client, typeMms, entry.getFkItemId());
 
                         if (mmsConfigKey[0] != SLibConsts.UNDEFINED) {
                             mmsConfig = new SDbMmsConfig();
@@ -3776,7 +3783,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     dpsDestNumber = "N/D";
                                 }
 
-                                msg += STrnUtilities.computeMailItem(client, entry.getFkItemId(), entry.getFkOriginalUnitId(), entry.getConceptKey(), entry.getConcept(), dpsDestNumber, msNumberSeries, msNumber, dpsReference, entry.getOriginalQuantity(), entry.getDbmsOriginalUnitSymbol(), getDate(), getDpsTypeKey(), isEdited, mbIsRebill);
+                                msg += STrnUtilities.computeMailItem(client, entry.getFkItemId(), entry.getFkOriginalUnitId(), entry.getConceptKey(), entry.getConcept(), 
+                                        dpsDestNumber, msNumberSeries, msNumber, dpsReference, entry.getOriginalQuantity(), entry.getDbmsOriginalUnitSymbol(), mtDate, 
+                                        getDpsTypeKey(), isEdited, mbIsRebill);
                             }
                         }
                     }
@@ -3784,7 +3793,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     msg += STrnUtilities.computeMailFooterEndTable(SClient.APP_NAME , SClient.APP_COPYRIGHT, SClient.APP_PROVIDER, SClient.VENDOR_WEBSITE , SClient.APP_RELEASE);
                     toRecipients.add(cfgEmail);
 
-                    STrnUtilities.sendMail(client, mmsType, toRecipients, null, null, msg);
+                    STrnUtilities.sendMail(client, typeMms, toRecipients, null, null, msg);
                     toRecipients.clear();
                 }
                 catch (java.lang.Exception e) {

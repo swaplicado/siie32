@@ -212,7 +212,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda
+ * @author Sergio Flores, Uriel Castañeda, Claudio Peña
  */
 public abstract class SDataUtilities {
 
@@ -1738,7 +1738,7 @@ public abstract class SDataUtilities {
             "CASE WHEN lc.fid_tp_disc_app = " + SDataConstantsSys.MKTS_TP_DISC_APP_PRICE_U + " THEN " +
             "p.price * (1 - lc.disc_per) ELSE p.price END AS f_price_u, " +
             "CASE WHEN lc.fid_tp_disc_app = " + SDataConstantsSys.MKTS_TP_DISC_APP_DISC_U + " THEN " +
-            "p.price * lc.disc_per ELSE 0 END AS f_disc_u " +
+            "p.price * lc.disc_per ELSE 0 END AS f_disc_u, l.fid_cur " +
             "FROM mkt_plist_bp_link AS lc " +
             "INNER JOIN mkt_plist AS l ON " +
             "lc.id_link = " + SModSysConsts.BPSS_LINK_CUS_MKT_TP + " AND lc.fid_plist = l.id_plist AND lc.b_del = 0 AND l.b_del = 0 AND " +
@@ -1754,7 +1754,7 @@ public abstract class SDataUtilities {
             "CASE WHEN lc.fid_tp_disc_app = " + SDataConstantsSys.MKTS_TP_DISC_APP_PRICE_U + " THEN " +
             "p.price * (1 - lc.disc_per) ELSE p.price END AS f_price_u, " +
             "CASE WHEN lc.fid_tp_disc_app = " + SDataConstantsSys.MKTS_TP_DISC_APP_DISC_U + " THEN " +
-            "p.price * lc.disc_per ELSE 0 END AS f_disc_u " +
+            "p.price * lc.disc_per ELSE 0 END AS f_disc_u, l.fid_cur " +
             "FROM mkt_plist_bp_link AS lc " +
             "INNER JOIN mkt_plist AS l ON " +
             "lc.id_link = " + SModSysConsts.BPSS_LINK_BP_TP + " AND lc.id_ref_1 = " + pnBizPartnerCategoryId + " AND lc.id_ref_2 = " + pnBizPartnerTypeId + " AND " +
@@ -1772,7 +1772,7 @@ public abstract class SDataUtilities {
             "CASE WHEN lc.fid_tp_disc_app = " + SDataConstantsSys.MKTS_TP_DISC_APP_PRICE_U + " THEN " +
             "p.price * (1 - lc.disc_per) ELSE p.price END AS f_price_u, " +
             "CASE WHEN lc.fid_tp_disc_app = " + SDataConstantsSys.MKTS_TP_DISC_APP_DISC_U + " THEN " +
-            "p.price * lc.disc_per ELSE 0 END AS f_disc_u " +
+            "p.price * lc.disc_per ELSE 0 END AS f_disc_u, l.fid_cur " +
             "FROM mkt_plist_bp_link AS lc " +
             "INNER JOIN mkt_plist AS l ON " +
             "lc.id_link = " + SModSysConsts.BPSS_LINK_BP + " AND lc.fid_plist = l.id_plist AND lc.b_del = 0 AND l.b_del = 0 AND " +
@@ -1787,7 +1787,7 @@ public abstract class SDataUtilities {
             "CASE WHEN lc.fid_tp_disc_app = " + SDataConstantsSys.MKTS_TP_DISC_APP_PRICE_U + " THEN " +
             "p.price * (1 - lc.disc_per) ELSE p.price END AS f_price_u, " +
             "CASE WHEN lc.fid_tp_disc_app = " + SDataConstantsSys.MKTS_TP_DISC_APP_DISC_U + " THEN " +
-            "p.price * lc.disc_per ELSE 0 END AS f_disc_u " +
+            "p.price * lc.disc_per ELSE 0 END AS f_disc_u, l.fid_cur " +
             "FROM mkt_plist_bp_link AS lc " +
             "INNER JOIN mkt_plist AS l ON " +
             "lc.id_link = " + SModSysConsts.BPSS_LINK_BPB + " AND lc.fid_plist = l.id_plist AND lc.b_del = 0 AND l.b_del = 0 AND " +
@@ -1804,11 +1804,7 @@ public abstract class SDataUtilities {
             paramsItemPriceList.setItemPriceFound(true);
             paramsItemPriceList.setItemPrice(resultSet.getObject("f_price_u") == null ? 0 : resultSet.getDouble("f_price_u"));
             paramsItemPriceList.setItemDiscount(resultSet.getObject("f_disc_u") == null ? 0 : resultSet.getDouble("f_disc_u"));
-        }
-        else {
-            paramsItemPriceList.setItemPriceFound(false);
-            paramsItemPriceList.setItemPrice(0d);
-            paramsItemPriceList.setItemDiscount(0d);
+            paramsItemPriceList.setCurrencyId(resultSet.getObject("fid_cur") == null ? 0 : resultSet.getInt("fid_cur"));
         }
 
         return paramsItemPriceList;
@@ -2952,7 +2948,10 @@ public abstract class SDataUtilities {
                 break;
             case SDataConstantsSys.REP_TRN_STK:
                 name = "reps/trn_stk.jasper";
-                break;
+                break;   
+            case SDataConstantsSys.REP_TRN_STK_PERIOD:
+                name = "reps/trn_stk_period.jasper";
+                break; 
             case SDataConstantsSys.REP_TRN_STK_MOV:
                 name = "reps/trn_stk_mov.jasper";
                 break;
@@ -3092,7 +3091,7 @@ public abstract class SDataUtilities {
      * @param reportType Constant defined in erp.data.SDataConstantsSys.
      * @param map Report parameters.
      */
-    public static net.sf.jasperreports.engine.JasperPrint fillReport(erp.client.SClientInterface client, int reportType, java.util.Map<java.lang.String, java.lang.Object> map) throws java.lang.Exception {
+public static net.sf.jasperreports.engine.JasperPrint fillReport(erp.client.SClientInterface client, int reportType, java.util.Map<java.lang.String, java.lang.Object> map) throws java.lang.Exception {
         SServerRequest request = null;
         SServerResponse response = null;
 
@@ -3100,7 +3099,10 @@ public abstract class SDataUtilities {
         request.setRegistryType(reportType);
         request.setPacket(map);
         response = client.getSessionXXX().request(request);
-
+        
+        response = client.getSessionXXX().request(request);
+        response = client.getSessionXXX().request(request);
+        
         if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
             throw new Exception(response.getMessage());
         }

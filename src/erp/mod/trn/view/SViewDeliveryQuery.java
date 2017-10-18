@@ -6,10 +6,14 @@ package erp.mod.trn.view;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
+import erp.data.SDataUtilities;
+import erp.gui.SModuleUtilities;
+import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SDbDps;
+import erp.mtrn.data.SDataDps;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -35,12 +39,15 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Daniel López
+ * @author Sergio Flores, Daniel López, Claudio Peña
  */
 public class SViewDeliveryQuery extends SGridPaneView implements ActionListener {
 
     private JButton mjDpsClose;
     private JButton mjDpsOpen;
+    private JButton mjDpsView;
+    private JButton mjDpsNotes;
+    private JButton mjDpsLinks;
     private SGridFilterDatePeriod moFilterDatePeriod;
     
     /**
@@ -61,6 +68,18 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
         mjDpsOpen = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_open.gif")), SUtilConsts.TXT_OPEN, this);
         mjDpsOpen.setEnabled(isProcessed());
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjDpsOpen);
+        
+        mjDpsView = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")), SUtilConsts.TXT_CLOSE, this);
+        mjDpsView.setEnabled(!isProcessed());
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjDpsView);
+        
+        mjDpsNotes = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_notes.gif")), SUtilConsts.TXT_CLOSE, this);
+        mjDpsNotes.setEnabled(!isProcessed());
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjDpsNotes);
+        
+        mjDpsLinks = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_link.gif")), SUtilConsts.TXT_CLOSE, this);
+        mjDpsLinks.setEnabled(!isProcessed());
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjDpsLinks);
         
         if (isProcessed()) { // processed...
             moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
@@ -107,7 +126,7 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
             }
         }
     }
-    
+
     private void actionPerformedDpsOpen() {
         if (mjDpsOpen.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
@@ -125,7 +144,42 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
             }
         }
     }
-
+    
+    private void actionPerformedDpsView() {
+        if (mjDpsView.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+                int gui = SDataConstants.MOD_SAL;
+                SDataDps dps = (SDataDps) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_DPS, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
+               
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else if (dps != null) {
+                    ((SClientInterface)miClient).getGuiModule(gui).setFormComplement(dps.getDpsTypeKey());
+                    ((SClientInterface)miClient).getGuiModule(gui).showForm(SDataConstants.TRNX_DPS_RO, dps.getPrimaryKey());
+                }
+            }
+            
+        }
+    }
+    
+    private void actionPerformedDpsNotes() {
+        if (mjDpsNotes.isEnabled()) {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+            SModuleUtilities.showDocumentNotes((SClientInterface) miClient, SDataConstants.TRN_DPS, gridRow.getRowPrimaryKey());
+        }
+    }
+   
+    private void actionPerformedDpsLinks() {
+        if (mjDpsLinks.isEnabled()) {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+            SModuleUtilities.showDocumentLinks((SClientInterface) miClient,  gridRow.getRowPrimaryKey());
+        }
+    }
     @Override
     public void prepareSqlQuery() {
         String where = "";
@@ -304,6 +358,15 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
             }
             else if (button == mjDpsOpen) {
                 actionPerformedDpsOpen();
+            }
+            else if (button == mjDpsView) {
+                actionPerformedDpsView();
+            }
+            else if (button == mjDpsNotes) {
+                actionPerformedDpsNotes();
+            }
+            else if (button == mjDpsLinks) {
+                actionPerformedDpsLinks();
             }
         }
     }

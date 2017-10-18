@@ -37,11 +37,12 @@ import javax.swing.event.ListSelectionListener;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Claudio Peña
  */
 public class SDialogDpsStockReturn extends javax.swing.JDialog implements ActionListener, ListSelectionListener {
 
     private static final int COL_QTY = 4;
+    private static final int COL_PRI = 9;
 
     private int mnFormResult;
     private int mnFormStatus;
@@ -139,7 +140,7 @@ public class SDialogDpsStockReturn extends javax.swing.JDialog implements Action
             }
         });
 
-        jlPanelDps.setFont(new java.awt.Font("Tahoma", 1, 14));
+        jlPanelDps.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jlPanelDps.setText("[Panel de documento de compras-ventas]");
         jlPanelDps.setPreferredSize(new java.awt.Dimension(100, 200));
         getContentPane().add(jlPanelDps, java.awt.BorderLayout.NORTH);
@@ -263,8 +264,8 @@ public class SDialogDpsStockReturn extends javax.swing.JDialog implements Action
         jtfQuantityPending.setPreferredSize(new java.awt.Dimension(120, 23));
         jPanel6.add(jtfQuantityPending);
 
-        jtfQuantityPendingUnit.setBackground(java.awt.Color.pink);
         jtfQuantityPendingUnit.setEditable(false);
+        jtfQuantityPendingUnit.setBackground(java.awt.Color.pink);
         jtfQuantityPendingUnit.setText("UNIT");
         jtfQuantityPendingUnit.setFocusable(false);
         jtfQuantityPendingUnit.setPreferredSize(new java.awt.Dimension(40, 23));
@@ -400,8 +401,8 @@ public class SDialogDpsStockReturn extends javax.swing.JDialog implements Action
 
         getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-928)/2, (screenSize.height-609)/2, 928, 609);
+        setSize(new java.awt.Dimension(928, 609));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -417,7 +418,7 @@ public class SDialogDpsStockReturn extends javax.swing.JDialog implements Action
         add(moPanelDps, BorderLayout.NORTH);
 
         col = 0;
-        columns = new STableColumnForm[9];
+        columns = new STableColumnForm[10];
         columns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "#", STableConstants.WIDTH_NUM_TINYINT);
         columns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
         columns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Concepto", STableConstants.WIDTH_ITEM_3X);
@@ -429,7 +430,9 @@ public class SDialogDpsStockReturn extends javax.swing.JDialog implements Action
         columns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
         columns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo doc.", STableConstants.WIDTH_CODE_DOC);
         columns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Folio doc.", STableConstants.WIDTH_DOC_NUM);
-        columns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha doc.", STableConstants.WIDTH_DATE);
+        columns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha doc.", STableConstants.WIDTH_DATE);   
+        columns[col] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Precio Unitario", STableConstants.WIDTH_QUANTITY_2X);
+        columns[col].setEditable(true);
 
         moPaneDpsEntries = new STablePane(miClient);
         jpDpsEntries.add(moPaneDpsEntries, BorderLayout.CENTER);
@@ -473,6 +476,7 @@ public class SDialogDpsStockReturn extends javax.swing.JDialog implements Action
             factor = ((SSessionCustom) miClient.getSession().getSessionCustom()).getUnitsFactorForQuantity(stockReturnRow.getFkItemId(), stockReturnRow.getFkOriginalUnitId(), stockReturnRow.getFkUnitId());
 
             stockReturnRow.setOriginalQuantityToReturn((Double) row.getValues().get(COL_QTY));
+            stockReturnRow.setPriceUnitary((Double) row.getValues().get(COL_PRI));
             stockReturnRow.setQuantityToReturn(SLibUtilities.round(factor * stockReturnRow.getOriginalQuantityToReturn(), decs));
         }
     }
@@ -495,7 +499,7 @@ public class SDialogDpsStockReturn extends javax.swing.JDialog implements Action
             jtfQuantityReturnedUnit.setText("");
             jtfQuantityPending.setText("");
             jtfQuantityPendingUnit.setText("");
-
+          
             jtfStock.setText("");
             jtfStockUnit.setText("");
             jtfCurrentlyUsed.setText("");
@@ -507,14 +511,14 @@ public class SDialogDpsStockReturn extends javax.swing.JDialog implements Action
         }
         else {
             // Document stock return is processed in original units:
-
+        
             jtfQuantityBase.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stockReturnRow.getOriginalQuantityBase()));
             jtfQuantityBaseUnit.setText(stockReturnRow.getAuxOriginalUnitSymbol());
             jtfQuantityReturned.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stockReturnRow.getOriginalQuantityReturned()));
             jtfQuantityReturnedUnit.setText(stockReturnRow.getAuxOriginalUnitSymbol());
             jtfQuantityPending.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stockReturnRow.getOriginalQuantityPending()));
             jtfQuantityPendingUnit.setText(stockReturnRow.getAuxOriginalUnitSymbol());
-
+            
             // Available stock is processed in inventory units:
 
             try {
@@ -536,7 +540,7 @@ public class SDialogDpsStockReturn extends javax.swing.JDialog implements Action
                     }
                 }
             }
-
+           
             jtfStock.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(stock));
             jtfStockUnit.setText(stockReturnRow.getAuxUnitSymbol());
             jtfCurrentlyUsed.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(used));
@@ -557,6 +561,8 @@ public class SDialogDpsStockReturn extends javax.swing.JDialog implements Action
             for (STableRow row : moPaneDpsEntries.getTableModel().getTableRows()) {
                 stockReturnRow = (STrnDpsStockReturnRow) row;
                 stockReturnRow.setQuantityToReturn(stockReturnRow.getQuantityPending());
+                stockReturnRow.setPriceUnitary(stockReturnRow.getPriceUnitary());
+                
                 stockReturnRow.setOriginalQuantityToReturn(stockReturnRow.getOriginalQuantityPending());
                 stockReturnRow.prepareTableRow();
             }
@@ -779,7 +785,8 @@ public class SDialogDpsStockReturn extends javax.swing.JDialog implements Action
                     stockReturnRow.setAuxDocNumber(resulSet.getString(18));
                     stockReturnRow.setAuxDocType(resulSet.getString(20));
                     stockReturnRow.setAuxDocDate(resulSet.getDate(19));
-
+                    stockReturnRow.setPriceUnitary(0);                    
+                    
                     for (SDataDiogEntry diogEntry : moParamDiog.getDbmsEntries()) {
                         if (!diogEntry.getIsDeleted()) {
                             if (SLibUtilities.compareKeys(stockReturnRow.getDpsAdjustmentEntryKey(), diogEntry.getLinkedDpsAdjustmentEntryKey_n())) {

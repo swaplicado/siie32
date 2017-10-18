@@ -26,6 +26,7 @@ import erp.mtrn.form.SDialogDiogSaved;
 import erp.mtrn.form.SDialogRepStock;
 import erp.mtrn.form.SDialogRepStockMoves;
 import erp.mtrn.form.SDialogRepStockTrackingLot;
+import erp.mtrn.form.SDialogRepStockPeriod;
 import erp.mtrn.form.SDialogUtilStockClosing;
 import erp.mtrn.form.SFormDiog;
 import erp.mtrn.form.SFormDiogAdjustmentType;
@@ -40,7 +41,7 @@ import sa.gui.util.SUtilConsts;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Cesar Orozco
+ * @author Sergio Flores, Uriel Castañeda, Cesar Orozco, Claudio Peña
  */
 public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -124,6 +125,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
 
     private javax.swing.JMenu jmMenuRep;
     private javax.swing.JMenuItem jmiReportStock;
+    private javax.swing.JMenuItem jmiReportStockPeriod;
     private javax.swing.JMenuItem jmiReportStockMoves;
     private javax.swing.JMenuItem jmiReportStockTrackingLot;
     private javax.swing.JMenu jmMenuRepStats;
@@ -134,6 +136,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
 
     private erp.mtrn.form.SDialogDiogSaved moDialogDiogSaved;
     private erp.mtrn.form.SDialogRepStock moDialogRepStock;
+    private erp.mtrn.form.SDialogRepStockPeriod moDialogRepStockPeriod;
     private erp.mtrn.form.SDialogRepStockMoves moDialogRepStockMoves;
     private erp.mtrn.form.SDialogRepStockTrackingLot moDialogRepStockTrackingLot;
     private erp.mtrn.form.SFormDiog moFormDiog;
@@ -400,12 +403,15 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
 
         jmMenuRep = new JMenu("Reportes");
         jmiReportStock = new JMenuItem("Reporte de existencias...");
+        jmiReportStockPeriod = new JMenuItem("Reporte de existencias por periodo...");
         jmiReportStockMoves = new JMenuItem("Reporte de movimientos de inventarios...");
         jmiReportStockTrackingLot = new JMenuItem("Reporte de rastreo de lotes...");
         jmMenuRep.add(jmiReportStock);
+        jmMenuRep.add(jmiReportStockPeriod);
         jmMenuRep.add(jmiReportStockMoves);
         jmMenuRep.add(jmiReportStockTrackingLot);
         jmiReportStock.addActionListener(this);
+        jmiReportStockPeriod.addActionListener(this);
         jmiReportStockMoves.addActionListener(this);
         jmiReportStockTrackingLot.addActionListener(this);
 
@@ -505,6 +511,16 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         moDialogRepStock.formRefreshCatalogues();
         moDialogRepStock.formReset();
         moDialogRepStock.setFormVisible(true);
+    }
+    
+    private void menuRepStockPeriod() {
+        if (moDialogRepStockPeriod == null) {
+            moDialogRepStockPeriod = new SDialogRepStockPeriod(miClient);
+        }
+
+        moDialogRepStockPeriod.formRefreshCatalogues();
+        moDialogRepStockPeriod.formReset();
+        moDialogRepStockPeriod.setFormVisible(true);
     }
 
     private void menuRepStockMoves() {
@@ -1180,6 +1196,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiStkStock) {
                 showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_STK);
+            }
+            else if (item == jmiReportStockPeriod) {
+                menuRepStockPeriod();
             }
             else if (item == jmiStkStockLot) {
                 showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_LOT);

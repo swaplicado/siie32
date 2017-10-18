@@ -75,7 +75,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Daniel López
+ * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Daniel López
  */
 public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
