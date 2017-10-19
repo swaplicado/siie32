@@ -1680,7 +1680,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
             jtfPresentationShort.setText("");
             jtfItemNameShortRo.setText("");
 
-            jtfCode.setEnabled(false);
+            jtfCode.setEditable(false);
+            jtfCode.setFocusable(false);
             jbComputeNewCode.setEnabled(false);
             jtfItemKey.setEditable(false);
             jtfItemKey.setFocusable(false);
@@ -1835,32 +1836,35 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
                 jtfItemNameShortRo.setText("");
             }
 
-            if (moItemGeneric.getIsItemKeyApplying()) {
+            if (!moItemGeneric.getIsItemKeyApplying()) {
+                jtfCode.setEditable(false);
+                jtfCode.setFocusable(false);
+                jbComputeNewCode.setEnabled(false);
+                jtfItemKey.setEditable(false);
+                jtfItemKey.setFocusable(false);
+            }
+            else {
                 if (moItemGeneric.getIsItemKeyAutomatic()) {
-                    jtfCode.setEnabled(true);
+                    jtfCode.setEditable(true);
+                    jtfCode.setFocusable(true);
                     jbComputeNewCode.setEnabled(true);
                     jtfItemKey.setEditable(false);
                     jtfItemKey.setFocusable(false);
                 }
                 else {
-                    jtfCode.setEnabled(false);
+                    jtfCode.setEditable(false);
+                    jtfCode.setFocusable(false);
                     jbComputeNewCode.setEnabled(false);
                     jtfItemKey.setEditable(true);
                     jtfItemKey.setFocusable(true);
                 }
             }
-            else {
-                jtfCode.setEnabled(false);
-                jbComputeNewCode.setEnabled(false);
-                jtfItemKey.setEditable(false);
-                jtfItemKey.setFocusable(false);
-            }
 
-            if (!jtfCode.isEnabled()) {
+            if (!jtfCode.isEditable()) {
                 jtfCode.setText("");
             }
 
-            if (!jtfItemKey.isEnabled()) {
+            if (!jtfItemKey.isEditable()) {
                 jtfItemKey.setText("");
             }
 
@@ -2125,9 +2129,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
                         key += var.getCode();
                     }
                 }
+                
+                moFieldItemKey.setFieldValue(key);
             }
-            
-            moFieldItemKey.setFieldValue(key);
         }
     }
 
