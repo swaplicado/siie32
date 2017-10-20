@@ -1543,6 +1543,10 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     public SCfgProcessor getCfgProcesor() {
         return moCfgProcessor;
     }
+    
+    public SParamsApp getParamsApp() {
+        return moParamsApp;
+    }
 
     @Override
     public SSessionXXX getSessionXXX() {
