@@ -58,7 +58,7 @@ public class SViewItemGeneric extends erp.lib.table.STableTab implements java.aw
         jbDelete.setEnabled(false);
 
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[42];
+        STableColumn[] aoTableColumns = new STableColumn[43];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "ig.id_igen");
@@ -74,7 +74,8 @@ public class SViewItemGeneric extends erp.lib.table.STableTab implements java.aw
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ict.ct_item", "Categoría ítem", 75);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "icl.cl_item", "Clase ítem", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "itp.tp_item", "Tipo ítem", 100);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_cfd_pro_ser", "Producto-servicio SAT", 100);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_cfdps_code", "ClaveProdServ SAT", 75);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_cfdps_name", "ProdServ SAT", 150);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_bulk", "Granel", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_inv", "Inventariable", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_lot", "Lote", STableConstants.WIDTH_BOOLEAN);
@@ -174,7 +175,7 @@ public class SViewItemGeneric extends erp.lib.table.STableTab implements java.aw
         msSql = "SELECT ig.id_igen, igen,igen, ig.igen_short, ig.code, ig.b_line, ig.b_item_short, ig.b_item_name_edit, ig.b_item_key_edit, " +
                 "ig.b_inv, ig.b_lot, ig.b_bulk, ig.days_exp, ig.b_weight_gross, ig.b_weight_delivery, " +
                 "ig.b_free_price, ig.b_free_disc, ig.b_free_disc_u, ig.b_free_disc_ety, ig.b_free_disc_doc, ig.b_free_comms, ig.b_ship_dom, ig.b_ship_int, ig.b_ship_qlt, ig.b_del, ig.surplus_per, " +
-                "ict.ct_item, icl.cl_item, itp.tp_item, igrp.igrp, ifam.ifam, cfd_pro_ser.name AS _cfd_pro_ser, tu.tp_unit, tuc.tp_unit, tuv.tp_unit, tunc.tp_unit, tuncu.tp_unit, snr.tp_snr, " +
+                "ict.ct_item, icl.cl_item, itp.tp_item, igrp.igrp, ifam.ifam, cfdps.code AS _cfdps_code, cfdps.name AS _cfdps_name, tu.tp_unit, tuc.tp_unit, tuv.tp_unit, tunc.tp_unit, tuncu.tp_unit, snr.tp_snr, " +
                 "ig.ts_new, ig.ts_edit, ig.ts_del, un.usr, ue.usr, ud.usr " +
                 "FROM erp.itmu_igen AS ig " +
                 "INNER JOIN erp.itms_ct_item AS ict ON " +
@@ -199,8 +200,8 @@ public class SViewItemGeneric extends erp.lib.table.STableTab implements java.aw
                 "ig.fid_tp_unit_net_cont_u = tuncu.id_tp_unit " +
                 "INNER JOIN erp.itms_tp_snr AS snr ON " +
                 "ig.fid_tp_snr = snr.id_tp_snr " +
-                "INNER JOIN erp.itms_cfd_prod_serv AS cfd_pro_ser ON " +
-                "ig.fid_cfd_prod_serv = cfd_pro_ser.id_cfd_prod_serv " +
+                "INNER JOIN erp.itms_cfd_prod_serv AS cfdps ON " +
+                "ig.fid_cfd_prod_serv = cfdps.id_cfd_prod_serv " +
                 "INNER JOIN erp.usru_usr AS un ON " +
                 "ig.fid_usr_new = un.id_usr " +
                 "INNER JOIN erp.usru_usr AS ue ON " +

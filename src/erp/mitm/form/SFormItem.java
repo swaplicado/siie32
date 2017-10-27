@@ -443,7 +443,6 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jlName.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel54.add(jlName);
 
-        jtfName.setText("NOMBRE");
         jtfName.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel54.add(jtfName);
 
@@ -455,7 +454,6 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jlNameShort.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel60.add(jlNameShort);
 
-        jtfNameShort.setText("NOMBRE CORTO");
         jtfNameShort.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel60.add(jtfNameShort);
 
@@ -473,7 +471,6 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jlPresent.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel55.add(jlPresent);
 
-        jtfPresentation.setText("PRESENTACIÓN");
         jtfPresentation.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel55.add(jtfPresentation);
 
@@ -485,7 +482,6 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jlPresentShort.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel61.add(jlPresentShort);
 
-        jtfPresentationShort.setText("PRESENTACIÓN CORTA");
         jtfPresentationShort.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel61.add(jtfPresentationShort);
 
@@ -503,7 +499,6 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jlCode.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel56.add(jlCode);
 
-        jtfCode.setText("CÓDIGO");
         jtfCode.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel56.add(jtfCode);
 
@@ -521,7 +516,6 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jlItemKey.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel57.add(jlItemKey);
 
-        jtfItemKey.setText("KEY");
         jtfItemKey.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel57.add(jtfItemKey);
 
@@ -1189,24 +1183,21 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel48.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel48.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkCfdProdServId_n.setText("Producto-servicio SAT:");
-        jlFkCfdProdServId_n.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlFkCfdProdServId_n.setText("ProdServ SAT:");
+        jlFkCfdProdServId_n.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel48.add(jlFkCfdProdServId_n);
 
         moKeyCfdProdServId_n.setMaximumRowCount(20);
-        moKeyCfdProdServId_n.setPreferredSize(new java.awt.Dimension(300, 23));
+        moKeyCfdProdServId_n.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel48.add(moKeyCfdProdServId_n);
 
         jPanel2.add(jPanel48);
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTariff.setText("Fracción arancelaria:");
-        jlTariff.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlTariff.setText("Fracc. arancelaria:");
+        jlTariff.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel7.add(jlTariff);
-
-        moTextTariff.setText("sBeanFieldText1");
-        moTextTariff.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel7.add(moTextTariff);
 
         jPanel2.add(jPanel7);
@@ -2961,6 +2952,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     @Override
     public void formRefreshCatalogues() {
         mbResetingForm = true;
+        
         SFormUtilities.populateComboBox(miClient, jcbFkItemGenericId, SDataConstants.ITMU_IGEN);
         SFormUtilities.populateComboBox(miClient, jcbFkBrandId, SDataConstants.ITMU_BRD);
         SFormUtilities.populateComboBox(miClient, jcbFkManufacturerId, SDataConstants.ITMU_MFR);
@@ -2975,6 +2967,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         SFormUtilities.populateComboBox(miClient, jcbFkFiscalAccountIncId, SDataConstants.FINS_FISCAL_ACC);
         SFormUtilities.populateComboBox(miClient, jcbFkFiscalAccountExpId, SDataConstants.FINS_FISCAL_ACC);
         miClient.getSession().populateCatalogue(moKeyCfdProdServId_n, SModConsts.ITMS_CFD_PROD_SERV, SLibConsts.UNDEFINED, null);
+        
         mbResetingForm = false;
     }
 

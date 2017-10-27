@@ -27,6 +27,7 @@ import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataItemGeneric;
 import erp.mitm.data.SDataManufacturer;
 import erp.mitm.data.SDataVariety;
+import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mtrn.data.STrnUtilities;
 import java.awt.event.ActionEvent;
@@ -38,6 +39,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import sa.lib.SLibConsts;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 
@@ -139,6 +141,12 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         jcbFkFiscalAccountExpId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkFiscalAccountExpId = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
+        jPanel48 = new javax.swing.JPanel();
+        jlFkCfdProdServId_n = new javax.swing.JLabel();
+        moKeyCfdProdServId_n = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel7 = new javax.swing.JPanel();
+        jlTariff = new javax.swing.JLabel();
+        moTextTariff = new sa.lib.gui.bean.SBeanFieldText();
         jPanel8 = new javax.swing.JPanel();
         jckIsDeleted = new javax.swing.JCheckBox();
         jPanel1 = new javax.swing.JPanel();
@@ -160,7 +168,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel4.setLayout(new java.awt.GridLayout(13, 1, 0, 5));
+        jPanel4.setLayout(new java.awt.GridLayout(15, 1, 0, 5));
 
         jPanel52.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -193,7 +201,6 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         jlName.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel54.add(jlName);
 
-        jtfName.setText("NOMBRE");
         jtfName.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel54.add(jtfName);
 
@@ -205,7 +212,6 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         jlNameShort.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel60.add(jlNameShort);
 
-        jtfNameShort.setText("NOMBRE CORTO");
         jtfNameShort.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel60.add(jtfNameShort);
 
@@ -223,7 +229,6 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         jlCode.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel56.add(jlCode);
 
-        jtfCode.setText("CÓDIGO");
         jtfCode.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel56.add(jtfCode);
 
@@ -241,7 +246,6 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         jlItemKey.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel57.add(jlItemKey);
 
-        jtfItemKey.setText("KEY");
         jtfItemKey.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel57.add(jtfItemKey);
 
@@ -254,7 +258,6 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         jPanel58.add(jlItem);
 
         jtfItemNameRo.setEditable(false);
-        jtfItemNameRo.setText("ITEM");
         jtfItemNameRo.setFocusable(false);
         jtfItemNameRo.setMinimumSize(new java.awt.Dimension(6, 23));
         jtfItemNameRo.setPreferredSize(new java.awt.Dimension(400, 23));
@@ -269,7 +272,6 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         jPanel59.add(jlItemShort);
 
         jtfItemNameShortRo.setEditable(false);
-        jtfItemNameShortRo.setText("ITEM CORTO");
         jtfItemNameShortRo.setFocusable(false);
         jtfItemNameShortRo.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel59.add(jtfItemNameShortRo);
@@ -314,7 +316,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         jPanel47.add(jlFkAccountEbitdaTypeId);
 
         jcbFkAccountEbitdaTypeId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkAccountEbitdaTypeId.setPreferredSize(new java.awt.Dimension(300, 23));
+        jcbFkAccountEbitdaTypeId.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel47.add(jcbFkAccountEbitdaTypeId);
 
         jbFkAccountEbitdaTypeId.setText("...");
@@ -333,7 +335,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         jPanel45.add(jlFkFiscalAccountIncId);
 
         jcbFkFiscalAccountIncId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkFiscalAccountIncId.setPreferredSize(new java.awt.Dimension(300, 23));
+        jcbFkFiscalAccountIncId.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel45.add(jcbFkFiscalAccountIncId);
 
         jbFkFiscalAccountIncId.setText("jButton1");
@@ -357,7 +359,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         jPanel46.add(jlFkFiscalAccountExpId);
 
         jcbFkFiscalAccountExpId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkFiscalAccountExpId.setPreferredSize(new java.awt.Dimension(300, 23));
+        jcbFkFiscalAccountExpId.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel46.add(jcbFkFiscalAccountExpId);
 
         jbFkFiscalAccountExpId.setText("jButton1");
@@ -372,6 +374,28 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         jPanel46.add(jLabel2);
 
         jPanel4.add(jPanel46);
+
+        jPanel48.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel48.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFkCfdProdServId_n.setText("ProdServ SAT:");
+        jlFkCfdProdServId_n.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel48.add(jlFkCfdProdServId_n);
+
+        moKeyCfdProdServId_n.setMaximumRowCount(20);
+        moKeyCfdProdServId_n.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel48.add(moKeyCfdProdServId_n);
+
+        jPanel4.add(jPanel48);
+
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlTariff.setText("Fracc. arancelaria:");
+        jlTariff.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel7.add(jlTariff);
+        jPanel7.add(moTextTariff);
+
+        jPanel4.add(jPanel7);
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 0, 0));
 
@@ -417,7 +441,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(736, 489));
+        setSize(new java.awt.Dimension(816, 539));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -897,6 +921,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
     private javax.swing.JPanel jPanel45;
     private javax.swing.JPanel jPanel46;
     private javax.swing.JPanel jPanel47;
+    private javax.swing.JPanel jPanel48;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel52;
     private javax.swing.JPanel jPanel54;
@@ -906,6 +931,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
     private javax.swing.JPanel jPanel59;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel60;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbCancel;
@@ -928,6 +954,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
     private javax.swing.JCheckBox jckIsReference;
     private javax.swing.JLabel jlCode;
     private javax.swing.JLabel jlFkAccountEbitdaTypeId;
+    private javax.swing.JLabel jlFkCfdProdServId_n;
     private javax.swing.JLabel jlFkFiscalAccountExpId;
     private javax.swing.JLabel jlFkFiscalAccountIncId;
     private javax.swing.JLabel jlFkItemGenericId;
@@ -937,6 +964,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
     private javax.swing.JLabel jlItemShort;
     private javax.swing.JLabel jlName;
     private javax.swing.JLabel jlNameShort;
+    private javax.swing.JLabel jlTariff;
     private javax.swing.JTextField jtfCode;
     private javax.swing.JTextField jtfItemKey;
     private javax.swing.JTextField jtfItemNameRo;
@@ -944,6 +972,8 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
     private javax.swing.JTextField jtfName;
     private javax.swing.JTextField jtfNameShort;
     private javax.swing.JTextField jtfPkItemId_Ro;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyCfdProdServId_n;
+    private sa.lib.gui.bean.SBeanFieldText moTextTariff;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -982,11 +1012,16 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
 
     @Override
     public void formRefreshCatalogues() {
+        mbResetingForm = true;
+        
         SFormUtilities.populateComboBox(miClient, jcbFkItemGenericId, SDataConstants.ITMU_IGEN, manItemClassKey);
         SFormUtilities.populateComboBox(miClient, jcbFkUnitId, SDataConstants.ITMU_UNIT);
         SFormUtilities.populateComboBox(miClient, jcbFkAccountEbitdaTypeId, SDataConstants.FINU_TP_ACC_EBITDA);
         SFormUtilities.populateComboBox(miClient, jcbFkFiscalAccountIncId, SDataConstants.FINS_FISCAL_ACC);
         SFormUtilities.populateComboBox(miClient, jcbFkFiscalAccountExpId, SDataConstants.FINS_FISCAL_ACC);
+        miClient.getSession().populateCatalogue(moKeyCfdProdServId_n, SModConsts.ITMS_CFD_PROD_SERV, SLibConsts.UNDEFINED, null);
+        
+        mbResetingForm = false;
     }
 
     @Override
@@ -1049,11 +1084,13 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         moFieldItemKey.setFieldValue(moItem.getKey());
         moFieldCode.setFieldValue(moItem.getCode());
         moFieldFkUnitId.setFieldValue(new int[] { moItem.getFkUnitId() });
+        moFieldIsReference.setFieldValue(moItem.getIsReference());
+        moFieldIsPrepayment.setFieldValue(moItem.getIsPrepayment());
         moFieldFkAccountEbitdaTypeId.setFieldValue(new int[] { moItem.getFkAccountEbitdaTypeId() });
         moFieldFkFiscalAccountIncId.setFieldValue(new int[] { moItem.getFkFiscalAccountIncId() });
         moFieldFkFiscalAccountExpId.setFieldValue(new int[] { moItem.getFkFiscalAccountExpId() });
-        moFieldIsReference.setFieldValue(moItem.getIsReference());
-        moFieldIsPrepayment.setFieldValue(moItem.getIsPrepayment());
+        moKeyCfdProdServId_n.setValue(new int[] { moItem.getFkCfdProdServId_n() });
+        moTextTariff.setValue(moItem.getTariff());
         moFieldIsDeleted.setFieldValue(moItem.getIsDeleted());
 
         if (moItem.getIsRegistryNew()) {
@@ -1115,13 +1152,15 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         moItem.setItemShort(jtfItemNameShortRo.getText());
         moItem.setName(moFieldName.getString());
         moItem.setCode(moFieldCode.getString());
+        moItem.setIsReference(moFieldIsReference.getBoolean());
+        moItem.setIsPrepayment(moFieldIsPrepayment.getBoolean());
+        moItem.setIsDeleted(moFieldIsDeleted.getBoolean());
         moItem.setFkUnitId(moFieldFkUnitId.getKeyAsIntArray()[0]);
         moItem.setFkAccountEbitdaTypeId(moFieldFkAccountEbitdaTypeId.getKeyAsIntArray()[0]);
         moItem.setFkFiscalAccountIncId(moFieldFkFiscalAccountIncId.getKeyAsIntArray()[0]);
         moItem.setFkFiscalAccountExpId(moFieldFkFiscalAccountExpId.getKeyAsIntArray()[0]);
-        moItem.setIsReference(moFieldIsReference.getBoolean());
-        moItem.setIsPrepayment(moFieldIsPrepayment.getBoolean());
-        moItem.setIsDeleted(moFieldIsDeleted.getBoolean());
+        moItem.setFkCfdProdServId_n(moKeyCfdProdServId_n.getSelectedIndex() <= 0 ? 0 : moKeyCfdProdServId_n.getValue()[0]);
+        moItem.setTariff(moTextTariff.getValue());
 
         return moItem;
     }

@@ -175,7 +175,7 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
         jlFkCfdUnitId.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel8.add(jlFkCfdUnitId);
 
-        moKeyCfdUnitId.setMaximumRowCount(16);
+        moKeyCfdUnitId.setMaximumRowCount(20);
         moKeyCfdUnitId.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel8.add(moKeyCfdUnitId);
 

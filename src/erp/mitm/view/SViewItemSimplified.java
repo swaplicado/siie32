@@ -96,7 +96,7 @@ public class SViewItemSimplified extends erp.lib.table.STableTab implements java
         jbDelete.setEnabled(false);
 
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[17];
+        STableColumn[] aoTableColumns = new STableColumn[21];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "i.id_item");
@@ -114,12 +114,16 @@ public class SViewItemSimplified extends erp.lib.table.STableTab implements java
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
         }
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ig.igen", "Ítem genérico", 150);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "il.line", "Línea ítems", 75);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_ref", "Referencia", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_pre_pay", "Anticipo", STableConstants.WIDTH_BOOLEAN);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ae.tp_acc_ebitda", "Cuenta EBITDA", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_fiscal_acc_inc", "Código agrupador SAT (ingresos)", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_fiscal_acc_exp", "Código agrupador SAT (egresos)", 200);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ae.tp_acc_ebitda", "Cuenta EBITDA", 100);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_cfdps_code", "ClaveProdServ SAT", 75);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_cfdps_name", "ProdServ SAT", 150);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.tariff", "Fracc. arancelaria", 55);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "si.name", "Estatus", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usr. creación", STableConstants.WIDTH_USER);
@@ -197,9 +201,9 @@ public class SViewItemSimplified extends erp.lib.table.STableTab implements java
             }
         }
 
-        msSql = "SELECT i.id_item, i.item, i.item_key, i.b_ref, i.b_pre_pay, i.b_del, i.ts_new, i.ts_edit, i.ts_del, " +
+        msSql = "SELECT i.id_item, i.item, i.item_key, i.b_ref, i.b_pre_pay, i.tariff, i.b_del, i.ts_new, i.ts_edit, i.ts_del, " +
                 "ig.igen, si.name, u.symbol, ae.tp_acc_ebitda, CONCAT(fai.code, ' - ', fai.name) AS f_fiscal_acc_inc, CONCAT(fae.code, ' - ', fae.name) AS f_fiscal_acc_exp, " +
-                "un.usr, ue.usr, ud.usr, il.line " +
+                "un.usr, ue.usr, ud.usr, il.line, cfdps.code AS _cfdps_code, cfdps.name AS _cfdps_name " +
                 "FROM erp.itmu_item AS i " +
                 "INNER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " +
                 "INNER JOIN erp.itms_st_item AS si ON i.fid_st_item = si.id_st_item " +
@@ -211,6 +215,8 @@ public class SViewItemSimplified extends erp.lib.table.STableTab implements java
                 "INNER JOIN erp.usru_usr AS ue ON i.fid_usr_edit = ue.id_usr " +
                 "INNER JOIN erp.usru_usr AS ud ON i.fid_usr_del = ud.id_usr " +
                 "LEFT OUTER JOIN erp.itmu_line AS il ON i.fid_line_n = il.id_line " +
+                "LEFT OUTER JOIN erp.itms_cfd_prod_serv AS cfdps ON " +
+                "i.fid_cfd_prod_serv_n = cfdps.id_cfd_prod_serv " +
                 "WHERE ig.fid_ct_item = " + manItemClassKey[0] + " AND ig.fid_cl_item = " + manItemClassKey[1] + " " +
                 (sqlWhere.isEmpty() ? "" : " AND " + sqlWhere) + " " +
                 "ORDER BY " + (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ?

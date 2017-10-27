@@ -1233,12 +1233,12 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         jPanel48.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel48.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkCfdProdServId.setText("Producto-servicio SAT: *");
-        jlFkCfdProdServId.setPreferredSize(new java.awt.Dimension(127, 23));
+        jlFkCfdProdServId.setText("ProdServ SAT: *");
+        jlFkCfdProdServId.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel48.add(jlFkCfdProdServId);
 
-        moKeyCfdProdServId.setMaximumRowCount(12);
-        moKeyCfdProdServId.setPreferredSize(new java.awt.Dimension(300, 23));
+        moKeyCfdProdServId.setMaximumRowCount(20);
+        moKeyCfdProdServId.setPreferredSize(new java.awt.Dimension(335, 23));
         jPanel48.add(moKeyCfdProdServId);
 
         jPanel35.add(jPanel48);
