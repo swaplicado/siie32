@@ -98,6 +98,7 @@ import erp.mod.fin.db.SFiscalAccounts;
 import erp.mod.fin.form.SDialogDpsExchangeDif;
 import erp.mod.fin.form.SDialogFiscalAccountsConfig;
 import erp.mod.fin.form.SDialogFiscalXmlFile;
+import erp.mod.fin.form.SDialogRepFinStatements;
 import erp.mod.fin.form.SDialogRepCashFlowExpected;
 import erp.mod.fin.form.SDialogRepMovsFileCvs;
 import erp.mod.fin.form.SDialogRepMovsIncExp;
@@ -111,6 +112,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
 
@@ -289,6 +291,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiRepFiscalXmlFiles;
     private javax.swing.JMenuItem jmiRepFiscalMonthRepCfd;
     private javax.swing.JMenuItem jmiRepFiscalMonthRepCf;
+    private javax.swing.JMenuItem jmiRepBI;
 
     private erp.mfin.form.SFormRecord moFormRecord;
     private erp.mfin.form.SFormRecord moFormRecordRo;
@@ -593,10 +596,13 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepTrialBalCostCenter = new JMenuItem("Balanza de comprobación de centros de costo...");
         jmiRepTrialBalCostCenterItem = new JMenuItem("Balanza de comprobación de centros de costo e ítems...");
         jmiRepTrialBalItemType = new JMenuItem("Balanza de comprobación por tipo de ítems...");
+
         jmRepFinStat = new JMenu("Estados financieros");
         jmiRepFinStatBalanceSheet = new JMenuItem("Balance general...");
         jmiRepFinStatProfitLossStat = new JMenuItem("Estado de resultados...");
-        
+
+        jmiRepBI = new JMenuItem("Estados Financieros Personalizados...");
+
         jmRepCashAccBal = new JMenu("Saldos de cuentas de dinero");
         jmiRepCashAccBalCash = new JMenuItem("Saldos de cajas...");
         jmiRepCashAccBalBank = new JMenuItem("Saldos de cuentas bancarias...");
@@ -683,8 +689,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRep.add(jmRepTrialBal);
         jmRepFinStat.add(jmiRepFinStatBalanceSheet);
         jmRepFinStat.add(jmiRepFinStatProfitLossStat);
+        jmRepFinStat.addSeparator();
+        jmRepFinStat.add(jmiRepBI);
         jmRep.add(jmRepFinStat);
-        
+            
         jmRep.addSeparator();
 
         jmRepCashAccBal.add(jmiRepCashAccBalCash);
@@ -785,7 +793,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRepFiscal.add(jmiRepFiscalMonthRepCfd);
         jmRepFiscal.add(jmiRepFiscalMonthRepCf);
         jmRep.add(jmRepFiscal);
-
+        
         jmiCatAccount.addActionListener(this);
         jmiCatFiscalAccount.addActionListener(this);
         jmiCatCostCenter.addActionListener(this);
@@ -929,6 +937,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepFiscalXmlFiles.addActionListener(this);
         jmiRepFiscalMonthRepCfd.addActionListener(this);
         jmiRepFiscalMonthRepCf.addActionListener(this);
+        jmiRepBI.addActionListener(this);
 
         // User rights:
 
@@ -2182,6 +2191,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiRepFiscalMonthRepCf) {
                 new SDialogRepDpsMonthReport(miClient, SDialogRepDpsMonthReport.CF).setVisible(true);
+            }
+            else if (item == jmiRepBI) {
+                new SDialogRepFinStatements((SGuiClient) miClient, SDataRepConstants.REP_XLS).setVisible(true);
             }
             else if (item == jmiCfgAbpEntityCash) {
                 miClient.getSession().showView(SModConsts.FIN_ABP_ENT, SModSysConsts.CFGS_CT_ENT_CASH, null);
