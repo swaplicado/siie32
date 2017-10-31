@@ -59,7 +59,10 @@ public class SViewInventoryCost extends SGridPaneView {
         moPaneSettings = new SGridPaneSettings(2);
 
         filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE).getValue();
-        if (filter != null) {
+        if (filter == null) {
+            sql += (sql.isEmpty() ? "" : "AND ") + "s.id_year = " + miClient.getSession().getCurrentYear() + " ";
+        }
+        else {
             sql += (sql.isEmpty() ? "" : "AND ") + "s.id_year = " + SLibTimeUtils.digestYear((SGuiDate) filter)[0] + " AND " +
                         "s.dt <= '" + SLibUtils.DbmsDateFormatDate.format((SGuiDate) filter) + "' ";
         }
@@ -89,7 +92,7 @@ public class SViewInventoryCost extends SGridPaneView {
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bpb ON s.id_cob = bpb.id_bpb "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_COB_ENT) + " AS ent ON s.id_cob = ent.id_cob AND s.id_wh = ent.id_ent "
-                        + "WHERE s.b_del = 0 AND " + sql + " "
+                        + "WHERE s.b_del = 0 " + (sql.isEmpty() ? "" : "AND " + sql) + " "
                         + "GROUP BY s.id_cob, s.id_wh "
                         + "HAVING _cst <> 0 "
                         + "ORDER BY bpb.bpb, bpb.code, ent.ent, ent.code, s.id_cob, s.id_wh ";

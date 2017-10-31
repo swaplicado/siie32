@@ -14,7 +14,7 @@ import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridFilterValue;
-import sa.lib.grid.SGridFilterYear;
+import sa.lib.grid.SGridFilterYearMonth;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiClient;
@@ -26,15 +26,15 @@ import sa.lib.gui.SGuiConsts;
  */
 public class SViewInventoryMfgCost extends SGridPaneView {
     
-    private SGridFilterYear moFilterYear;
+    private SGridFilterYearMonth moFilterYearMonth;
     
     public SViewInventoryMfgCost(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRN_INV_MFG_CST, SLibConsts.UNDEFINED, title);
         initComponentsCustom();
         
-        moFilterYear = new SGridFilterYear(client, this);
-        moFilterYear.initFilter(SLibTimeUtils.digestYear(miClient.getSession().getCurrentDate()));
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterYear);
+        moFilterYearMonth = new SGridFilterYearMonth(client, this);
+        moFilterYearMonth.initFilter(SLibTimeUtils.digestMonth(miClient.getSession().getCurrentDate()));
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterYearMonth);
     }
     
     private void initComponentsCustom() {
@@ -56,9 +56,17 @@ public class SViewInventoryMfgCost extends SGridPaneView {
             sql += (sql.isEmpty() ? "" : "AND ") + "v.b_del = 0 ";
         }
 
-        filter = ((SGridFilterValue) moFiltersMap.get(SGridConsts.FILTER_YEAR)).getValue();
-        if (filter != null && ((int[]) filter).length == 1) {
-            sql += (sql.isEmpty() ? "" : "AND ") + "v.id_year = " + ((int[]) filter)[0] + " ";
+        filter = ((SGridFilterValue) moFiltersMap.get(SGridConsts.FILTER_YEAR_MONTH)).getValue();
+        if (filter != null) {
+            switch (((int[]) filter).length) {
+                case 1:
+                    sql += (sql.isEmpty() ? "" : "AND ") + "v.id_year = " + ((int[]) filter)[0] + " ";
+                    break;
+                case 2:
+                    sql += (sql.isEmpty() ? "" : "AND ") + "v.id_year = " + ((int[]) filter)[0] + " AND v.id_per = " + ((int[]) filter)[1] + " ";
+                    break;
+                default:
+            }
         }
 
         msSql = "SELECT "
@@ -82,6 +90,10 @@ public class SViewInventoryMfgCost extends SGridPaneView {
                 + "v.cst_fin, "
                 + "v.cst_u_wip, "
                 + "v.cst_u_fin, "
+                + "i.mass AS _mass, "
+                + "i.mass * v.qty_sta AS _mass_sta, "
+                + "i.mass * v.qty_fin AS _mass_fin, "
+                + "v.cst_fin / (i.mass * v.qty_fin) AS _mass_cst_u_fin, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
@@ -133,6 +145,11 @@ public class SViewInventoryMfgCost extends SGridPaneView {
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "v.cst_u_wip", "Cto u producto en proceso $"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "v.cst_fin", "Ctos terminados $"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "v.cst_u_fin", "Cto u producto terminado $"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "u.symbol", "Unidad"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "_mass", "Masa u kg"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "_mass_sta", "Masa iniciada kg"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "_mass_fin", "Masa terminada kg"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "_mass_cst_u_fin", "Cto u masa u producto terminado $/kg"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));

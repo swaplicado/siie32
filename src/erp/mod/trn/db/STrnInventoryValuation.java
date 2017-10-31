@@ -8,7 +8,6 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
-import erp.mtrn.data.SDataStockMove;
 import erp.mtrn.data.STrnStockMove;
 import erp.mtrn.data.STrnUtilities;
 import java.sql.ResultSet;
@@ -171,6 +170,12 @@ public class STrnInventoryValuation {
         
         // Retrieve manufacturing job orders and product units started and finished of current period:
         
+        /*
+        Consider:
+        a) units finished as stock input (+)
+        b) units returned as stock output (-)
+         */
+        
         sql = "SELECT de.fid_item, de.fid_unit, i.item, i.item_key, u.symbol, "
                 + "o._ord, o._ord_sta, o._ord_fin, o._unt_sta, "
                 + "SUM((CASE WHEN d.fid_ct_iog = " + SModSysConsts.TRNS_CT_IOG_IN + " THEN 1 ELSE -1 END) * de.qty) AS _unt_fin "
@@ -188,10 +193,13 @@ public class STrnInventoryValuation {
                 + "GROUP BY o.fid_item_r, o.fid_unit_r "
                 + "ORDER BY o.fid_item_r, o.fid_unit_r) AS o ON de.fid_item = o.fid_item_r AND de.fid_unit = o.fid_unit_r "
                 + "WHERE d.b_del = 0 AND de.b_del = 0 AND "
-                + "d.id_year = " + mnYear + " AND d.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
+                + "d.id_year = " + mnYear + " AND d.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND (("
+                + "d.fid_ct_iog = " + SModSysConsts.TRNS_CL_IOG_IN_MFG[0] + " AND "
                 + "d.fid_cl_iog = " + SModSysConsts.TRNS_CL_IOG_IN_MFG[1] + " AND "
-                + "d.fid_tp_iog IN (" + SModSysConsts.TRNS_TP_IOG_IN_MFG_WP_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_IN_MFG_WP_RET[2] + ", " + 
-                SModSysConsts.TRNS_TP_IOG_IN_MFG_FG_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_IN_MFG_FG_RET[2] + ") "
+                + "d.fid_tp_iog IN (" + SModSysConsts.TRNS_TP_IOG_IN_MFG_WP_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_IN_MFG_FG_ASD[2] + ")) OR ("
+                + "d.fid_ct_iog = " + SModSysConsts.TRNS_CL_IOG_OUT_MFG[0] + " AND "
+                + "d.fid_cl_iog = " + SModSysConsts.TRNS_CL_IOG_OUT_MFG[1] + " AND "
+                + "d.fid_tp_iog IN (" + SModSysConsts.TRNS_TP_IOG_OUT_MFG_WP_RET[2] + ", " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_FG_RET[2] + "))) "
                 + "GROUP BY de.fid_item, de.fid_unit, i.item, i.item_key, u.symbol "
                 + "ORDER BY de.fid_item, de.fid_unit, i.item, i.item_key, u.symbol; ";
         
@@ -366,7 +374,7 @@ public class STrnInventoryValuation {
         // save stock movements of prorated values:
         
         for (STrnStockMove stockMove : stockMoves) {
-            Vector<STrnStockMove> moves = new Vector();
+            Vector<STrnStockMove> moves = new Vector<>();
             moves.add(stockMove);
             SDataDiog diog = STrnUtilities.createDataDiogSystem((SClientInterface) moSession.getClient(), 
                     mnYear, mtPeriodEnd, stockMove.getPkCompanyBranchId(), stockMove.getPkWarehouseId(), SModSysConsts.TRNS_TP_IOG_IN_CST_RM, SERIES_CST_RM, moves);
@@ -400,96 +408,116 @@ public class STrnInventoryValuation {
         double costUnit = 0;
         double cost = 0;
         String sql = "";
+        Statement stOrderType = moSession.getStatement().getConnection().createStatement();
         Statement stProduct = moSession.getStatement().getConnection().createStatement();
         Statement stStockMove = moSession.getStatement().getConnection().createStatement();
         Statement stStockCosts = moSession.getStatement().getConnection().createStatement();
         Statement stUpdates = moSession.getStatement().getConnection().createStatement();
+        ResultSet rsOrderType = null;
         ResultSet rsProduct = null;
         ResultSet rsStockMove = null;
         ResultSet rsStockCosts = null;
         
-        // Integrate a list of products (PP / PT) that received inputs in the period evaluated:
+        // Compute costs orderly by tpye of manufacturing order:
+        
+        sql = "SELECT DISTINCT o.fid_tp_ord "
+                + "FROM trn_stk AS s "
+                + "INNER JOIN trn_diog AS d ON s.fid_diog_year = d.id_year AND s.fid_diog_doc = d.id_doc "
+                + "INNER JOIN mfg_ord AS o ON d.fid_mfg_year_n = o.id_year AND d.fid_mfg_ord_n = o.id_ord "
+                + "WHERE NOT s.b_del AND NOT d.b_del AND "
+                + "s.id_year = " + mnYear + " AND s.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' "
+                + "ORDER BY o.fid_tp_ord ";
+        rsOrderType = stOrderType.executeQuery(sql);
+        while (rsOrderType.next()) {
+            // Integrate a list of products (MFG WP & FG) that received inputs in period evaluated in current type of manufacturing order:
+
+            System.out.println("- Costs Computation. Current MFG order type = " + rsOrderType.getInt("o.fid_tp_ord") + "...");
             
-        sql = "SELECT DISTINCT o.fid_item_r, o.fid_unit_r "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS d ON s.fid_diog_year = d.id_year AND s.fid_diog_doc = d.id_doc "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.MFG_ORD) + " AS o ON d.fid_mfg_year_n = o.id_year AND d.fid_mfg_ord_n = o.id_ord "
-                + "WHERE s.b_del = 0 AND d.b_del = 0 AND "
-                + "s.id_year = " + mnYear + " AND s.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
-                + "s.fid_ct_iog = " + SModSysConsts.TRNS_CL_IOG_OUT_MFG[0] + " AND "
-                + "s.fid_cl_iog = " + SModSysConsts.TRNS_CL_IOG_OUT_MFG[1] + " AND "
-                + "s.fid_tp_iog IN (" + SModSysConsts.TRNS_TP_IOG_OUT_MFG_RM_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_RM_RET[2] + ", "
-                + SModSysConsts.TRNS_TP_IOG_OUT_MFG_WP_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_WP_RET[2] + ") "
-                + "ORDER BY o.fid_item_r, o.fid_unit_r; ";
-
-        rsProduct = stProduct.executeQuery(sql);
-        while (rsProduct.next()) {
-            // For each product that has received inputs do the following:
-            
-            idProduct = rsProduct.getInt("o.fid_item_r");
-            idProductUnit = rsProduct.getInt("o.fid_unit_r");
-            costByProduct = 0;
-
-            // Obtain all warehouse movements that are of type consumption in valued period:
-
-            sql = "SELECT s.id_item, s.id_unit, s.id_lot, s.id_cob, s.id_wh, s.id_mov, s.dt, "
-                    + "s.mov_in, s.mov_out, "
-                    + "o.id_year, o.id_ord "
+            sql = "SELECT DISTINCT o.fid_item_r, o.fid_unit_r "
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS d ON s.fid_diog_year = d.id_year AND s.fid_diog_doc = d.id_doc "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.MFG_ORD) + " AS o ON d.fid_mfg_year_n = o.id_year AND d.fid_mfg_ord_n = o.id_ord "
                     + "WHERE s.b_del = 0 AND d.b_del = 0 AND "
-                    + "s.id_year = " + mnYear + " AND s.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
-                    + "s.fid_ct_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[0] + " AND "
-                    + "s.fid_cl_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[1] + " AND "
-                    + "s.fid_tp_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[2] + " AND "
-                    + "o.fid_item_r = " + idProduct + " AND o.fid_unit_r = " + idProductUnit + " "
-                    + "ORDER BY s.id_item, s.id_unit, s.dt, s.fid_ct_iog, s.fid_cl_iog, s.fid_tp_iog, s.id_lot, s.id_cob, s.id_wh, s.id_mov; ";
-            rsStockMove = stStockMove.executeQuery(sql);
-            while (rsStockMove.next()) {
-                idMaterial = rsStockMove.getInt("s.id_item");
-                idMaterialUnit = rsStockMove.getInt("s.id_unit");
+                    + "s.id_year = " + mnYear + " AND s.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND (("
+                    + "s.fid_ct_iog = " + SModSysConsts.TRNS_CL_IOG_IN_MFG[0] + " AND "
+                    + "s.fid_cl_iog = " + SModSysConsts.TRNS_CL_IOG_IN_MFG[1] + " AND "
+                    + "s.fid_tp_iog IN (" + SModSysConsts.TRNS_TP_IOG_IN_MFG_RM_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_IN_MFG_WP_ASD[2] + ")) OR ("
+                    + "s.fid_ct_iog = " + SModSysConsts.TRNS_CL_IOG_OUT_MFG[0] + " AND "
+                    + "s.fid_cl_iog = " + SModSysConsts.TRNS_CL_IOG_OUT_MFG[1] + " AND "
+                    + "s.fid_tp_iog IN (" + SModSysConsts.TRNS_TP_IOG_OUT_MFG_RM_RET[2] + ", " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_WP_RET[2] + "))) AND "
+                    + "o.fid_tp_ord = " + rsOrderType.getInt("o.fid_tp_ord") + " "
+                    + "ORDER BY o.fid_item_r, o.fid_unit_r; ";
+            rsProduct = stProduct.executeQuery(sql);
+            while (rsProduct.next()) {
+                // For each product that has received inputs do the following:
 
-                stockAcum = 0;
-                costAcum = 0;
+                idProduct = rsProduct.getInt("o.fid_item_r");
+                idProductUnit = rsProduct.getInt("o.fid_unit_r");
+                costByProduct = 0;
 
-                sql = "SELECT SUM(mov_in - mov_out) AS _stk, SUM(debit - credit) AS _bal "
-                        + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " "
-                        + "WHERE b_del = 0 AND "
-                        + "id_year = " + mnYear + " AND ("
-                        + "dt " + (mnPeriod == 1 ? "<=" : "<") + " '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "' OR ("
-                        + "dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
-                        + "fid_ct_iog = " + SModSysConsts.TRNS_CL_IOG_IN_INT[0] + " AND "
-                        + "fid_cl_iog < " + SModSysConsts.TRNS_CL_IOG_IN_INT[1] + ")) AND "
-                        + "id_item = " + idMaterial + " AND id_unit = " + idMaterialUnit + "; ";
-                rsStockCosts = stStockCosts.executeQuery(sql);
-                if (rsStockCosts.next()) {
-                    stockAcum = rsStockCosts.getDouble("_stk");
-                    costAcum = rsStockCosts.getDouble("_bal");
+                System.out.println("- * product = " + idProduct +  "; unit = " + idProductUnit + "...");
+                    
+                // Obtain all warehouse movements that are of type consumption in valued period:
+
+                sql = "SELECT s.id_item, s.id_unit, s.id_lot, s.id_cob, s.id_wh, s.id_mov, s.dt, "
+                        + "s.mov_in, s.mov_out, "
+                        + "o.id_year, o.id_ord "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS d ON s.fid_diog_year = d.id_year AND s.fid_diog_doc = d.id_doc "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.MFG_ORD) + " AS o ON d.fid_mfg_year_n = o.id_year AND d.fid_mfg_ord_n = o.id_ord "
+                        + "WHERE s.b_del = 0 AND d.b_del = 0 AND "
+                        + "s.id_year = " + mnYear + " AND s.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
+                        + "s.fid_ct_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[0] + " AND "
+                        + "s.fid_cl_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[1] + " AND "
+                        + "s.fid_tp_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[2] + " AND "
+                        + "o.fid_item_r = " + idProduct + " AND o.fid_unit_r = " + idProductUnit + " "
+                        + "ORDER BY s.id_item, s.id_unit, s.dt, s.fid_ct_iog, s.fid_cl_iog, s.fid_tp_iog, s.id_lot, s.id_cob, s.id_wh, s.id_mov; ";
+                rsStockMove = stStockMove.executeQuery(sql);
+                while (rsStockMove.next()) {
+                    idMaterial = rsStockMove.getInt("s.id_item");
+                    idMaterialUnit = rsStockMove.getInt("s.id_unit");
+
+                    stockAcum = 0;
+                    costAcum = 0;
+
+                    sql = "SELECT SUM(mov_in - mov_out) AS _stk, SUM(debit - credit) AS _bal "
+                            + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " "
+                            + "WHERE b_del = 0 AND "
+                            + "id_year = " + mnYear + " AND ("
+                            + "dt " + (mnPeriod == 1 ? "<=" : "<") + " '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "' OR ("
+                            + "dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
+                            + "fid_ct_iog = " + SModSysConsts.TRNS_CL_IOG_IN_INT[0] + " AND "
+                            + "fid_cl_iog < " + SModSysConsts.TRNS_CL_IOG_IN_INT[1] + ")) AND "
+                            + "id_item = " + idMaterial + " AND id_unit = " + idMaterialUnit + "; ";
+                    rsStockCosts = stStockCosts.executeQuery(sql);
+                    if (rsStockCosts.next()) {
+                        stockAcum = rsStockCosts.getDouble("_stk");
+                        costAcum = rsStockCosts.getDouble("_bal");
+                    }
+
+                    costUnit = SLibUtils.round(stockAcum == 0 ? 0 : costAcum / stockAcum, amtUnitDecs);
+
+                    cost = SLibUtils.round(costUnit * rsStockMove.getDouble("s.mov_out"), amtDecs);
+
+                    // Update cost of current outgoing stock movement:
+
+                    sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " "
+                            + "SET used = 0, cost_u = " + costUnit + ", cost = 0, debit = 0, credit = " + cost + " "
+                            + "WHERE id_year = " + mnYear + " AND id_item = " + idMaterial + " AND id_unit = " + idMaterialUnit + " AND id_lot = " + rsStockMove.getInt("s.id_lot") + " AND "
+                            + "id_cob = " + rsStockMove.getInt("s.id_cob") + " AND id_wh = " + rsStockMove.getInt("s.id_wh") + " AND id_mov = " + rsStockMove.getInt("s.id_mov") + "; ";
+                    stUpdates.execute(sql);
+
+                    // Totalize cost by product:
+
+                    costByProduct = SLibUtils.round(costByProduct + cost, amtDecs);
                 }
 
-                costUnit = SLibUtils.round(stockAcum == 0 ? 0 : costAcum / stockAcum, amtUnitDecs);
+                /* Prorate the value obtained in the previous step between the warehouses in which there was production as a function of the net production volume, 
+                    or in default to the predetermined store of production in process: */
 
-                cost = SLibUtils.round(costUnit * rsStockMove.getDouble("s.mov_out"), amtDecs);
-
-                // Update cost of current outgoing stock movement:
-
-                sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " "
-                        + "SET used = 0, cost_u = " + costUnit + ", cost = 0, debit = 0, credit = " + cost + " "
-                        + "WHERE id_year = " + mnYear + " AND id_item = " + idMaterial + " AND id_unit = " + idMaterialUnit + " AND id_lot = " + rsStockMove.getInt("s.id_lot") + " AND "
-                        + "id_cob = " + rsStockMove.getInt("s.id_cob") + " AND id_wh = " + rsStockMove.getInt("s.id_wh") + " AND id_mov = " + rsStockMove.getInt("s.id_mov") + "; ";
-                stUpdates.execute(sql);
-                
-                // Totalize cost by product:
-                
-                costByProduct = SLibUtils.round(costByProduct + cost, amtDecs);
-            }
-
-            /* Prorate the value obtained in the previous step between the warehouses in which there was production as a function of the net production volume, 
-                or in default to the predetermined store of production in process: */
-
-            if (costByProduct != 0) {
-                prorateRawMaterialsCosts(idProduct, idProductUnit, costByProduct);
+                if (costByProduct != 0) {
+                    prorateRawMaterialsCosts(idProduct, idProductUnit, costByProduct);
+                }
             }
         }
     }
@@ -500,6 +528,7 @@ public class STrnInventoryValuation {
      * @param cost
      * @throws Exception 
      */
+    /* XXX
     private void createRawMaterialsCostsStockEntries(final int[] key, final double cost) throws Exception {
         SDataStockMove stockMove = new SDataStockMove();
         
@@ -542,6 +571,7 @@ public class STrnInventoryValuation {
         
         stockMove.save(moSession.getStatement().getConnection());
     }
+    */
     
     /*
      * Public methods
@@ -627,6 +657,7 @@ public class STrnInventoryValuation {
         boolean isValuationStd = false;
         String sql = "";
         String where = "";
+        String whereMfg = "";
         Statement stMain = moSession.getStatement().getConnection().createStatement();
         Statement stStockCosts = moSession.getStatement().getConnection().createStatement();
         Statement stUpdates = moSession.getStatement().getConnection().createStatement();
@@ -636,10 +667,12 @@ public class STrnInventoryValuation {
         
         createInventoryMfgCosts();  // create manufacturing costs
         
-        // Compute all output stock movements.
+        // Compute all (yes, all!) output stock movements in current period.
         
-        // Iterate in descending order starting from last class ID of real stock movements (i.e., expenses movements are excluded):
-        // Then, for each movement class, iterate from RM, to WP and FG.
+        /*
+        Iterate in descending order starting from last class ID of real stock movements (i.e., expenses movements are excluded):
+        Then, for each movement class, iterate from RM, to WP and FG.
+        */
         
         idMovClass = MOV_CLASS_MFG; // first class of movements to compute
         idMovClassStep = STEP_RM;   // first step
@@ -648,23 +681,25 @@ public class STrnInventoryValuation {
             
             System.out.println("Inventory Valuation. Current IOG class = " + idMovClass + (idMovClass == MOV_CLASS_MFG ? "; current IOG class step = " + idMovClassStep : "") + "...");
             
-            // Process outgoing stock movements:
+            // Process specific output stock movements at a time:
             
-            where = "AND d.fid_cl_iog = " + idMovClass + " ";
+            where = "AND s.fid_cl_iog = " + idMovClass + " ";
             
             if (idMovClass == MOV_CLASS_MFG) {
                 switch (idMovClassStep) {
                     case STEP_RM: // raw materials
-                        where += "AND d.fid_tp_iog IN (" + SModSysConsts.TRNS_TP_IOG_OUT_MFG_RM_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_RM_RET[2] + ") ";
+                        whereMfg = "" + SModSysConsts.TRNS_TP_IOG_OUT_MFG_RM_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_RM_RET[2];
                         break;
                     case STEP_WP: // work in progress
-                        where += "AND d.fid_tp_iog IN (" + SModSysConsts.TRNS_TP_IOG_OUT_MFG_WP_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_WP_RET[2] + ") ";
+                        whereMfg = "" + SModSysConsts.TRNS_TP_IOG_OUT_MFG_WP_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_WP_RET[2];
                         break;
                     case STEP_FG: // finished goods
-                        where += "AND d.fid_tp_iog IN (" + SModSysConsts.TRNS_TP_IOG_OUT_MFG_FG_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_FG_RET[2] + ") ";
+                        whereMfg = "" + SModSysConsts.TRNS_TP_IOG_OUT_MFG_FG_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_FG_RET[2];
                         break;
                     default:
                 }
+                
+                where += "AND s.fid_tp_iog IN (" + whereMfg + ") ";
             }
             
             idItem = 0;         // not supposed to be necessary, just in case
@@ -674,7 +709,7 @@ public class STrnInventoryValuation {
             sql = "SELECT s.id_item, s.id_unit, s.dt, s.fid_ct_iog, s.fid_cl_iog, s.fid_tp_iog, s.id_lot, s.id_cob, s.id_wh, s.id_mov, "
                     + "s.mov_in, s.mov_out, s.cost_u, s.cost, s.debit, s.credit, "
                     + "s.fid_diog_year, s.fid_diog_doc, s.fid_diog_ety, d.fid_diog_year_n, d.fid_diog_doc_n, "
-                    + "o.id_year, o.id_ord, o.fid_item_r, o.fid_unit_r "
+                    + "o.id_year, o.id_ord, o.fid_item_r, o.fid_unit_r "    // columns preserved in query for debugging purposes
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS d ON s.fid_diog_year = d.id_year AND s.fid_diog_doc = d.id_doc "
                     + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.MFG_ORD) + " AS o ON d.fid_mfg_year_n = o.id_year AND d.fid_mfg_ord_n = o.id_ord "
@@ -691,26 +726,9 @@ public class STrnInventoryValuation {
                     
                     System.out.println("* item = " + idItem +  "; unit = " + idItemUnit + "...");
                     
-                    // Available stock:
-                    
-                    stockAcum = 0;
-                    
-                    sql = "SELECT SUM(mov_in - mov_out) AS _stk "
-                            + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " "
-                            + "WHERE b_del = 0 AND "
-                            + "id_year = " + mnYear + " AND ("
-                            + "dt " + (mnPeriod == 1 ? "<=" : "<") + " '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "' OR ("
-                            + "dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
-                            + "fid_ct_iog = " + SModSysConsts.TRNS_CL_IOG_IN_INT[0] + " AND "
-                            + "fid_cl_iog < " + SModSysConsts.TRNS_CL_IOG_IN_INT[1] + ")) AND "
-                            + "id_item = " + idItem + " AND id_unit = " + idItemUnit + "; ";
-                    rsStockCosts = stStockCosts.executeQuery(sql);
-                    if (rsStockCosts.next()) {
-                        stockAcum = rsStockCosts.getDouble("_stk");
-                    }
-                    
-                    // Total cost:
+                    // Available stock and total cost:
                         
+                    stockAcum = 0;
                     costAcum = 0;
                     
                     // Manufacturing of goods finished (work in progress inclusive) needs a specific kind of value calculation, a "concentrated valuation".
@@ -721,7 +739,9 @@ public class STrnInventoryValuation {
                     if (isValuationStd) {
                         // "Standard valuation", items valued directly:
                         
-                        sql = "SELECT SUM(debit - credit) AS _bal "
+                        // retriebe stock and cost (stock movements' balance):
+                        
+                        sql = "SELECT SUM(mov_in - mov_out) AS _stk, SUM(debit - credit) AS _bal "
                                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " "
                                 + "WHERE b_del = 0 AND "
                                 + "id_year = " + mnYear + " AND ("
@@ -732,13 +752,37 @@ public class STrnInventoryValuation {
                                 + "id_item = " + idItem + " AND id_unit = " + idItemUnit + "; ";
                         rsStockCosts = stStockCosts.executeQuery(sql);
                         if (rsStockCosts.next()) {
+                            stockAcum = rsStockCosts.getDouble("_stk");
                             costAcum = rsStockCosts.getDouble("_bal");
                         }
                     }
                     else {
                         // "Concentrated valuation", items valued indirectly through manufacturing job order (MFG WP & FG only):
                         
-                        // XXX no falta incluir también entregas y devoluciones de PP?, puesto que también fungen como insumos para el PT???:
+                        // retriebe stock:
+                        /*
+                        Consider only internal MFG stock movements related to WP or FG (just as corresponds on each iteration).
+                        */
+                        
+                        sql = "SELECT SUM(mov_in - mov_out) AS _stk "
+                                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " "
+                                + "WHERE b_del = 0 AND "
+                                + "id_year = " + mnYear + " AND ("
+                                + "dt " + (mnPeriod == 1 ? "<=" : "<") + " '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "' OR ("
+                                + "dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
+                                + "fid_ct_iog = " + SModSysConsts.TRNS_CL_IOG_IN_MFG[0] + " AND "
+                                + "fid_cl_iog = " + SModSysConsts.TRNS_CL_IOG_IN_MFG[1] + " AND "
+                                + "fid_tp_iog IN (" + whereMfg + "))) AND "
+                                + "id_item = " + idItem + " AND id_unit = " + idItemUnit + "; ";
+                        rsStockCosts = stStockCosts.executeQuery(sql);
+                        if (rsStockCosts.next()) {
+                            stockAcum = rsStockCosts.getDouble("_stk");
+                        }
+                        
+                        // retriebe cost (stock movements' balance):
+                        /*
+                        Consider all RM and WP stock movements asigned to and returned from current item.
+                        */
                         
                         sql = "SELECT SUM(s.debit-s.credit) AS _bal "
                                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "
@@ -748,8 +792,9 @@ public class STrnInventoryValuation {
                                 + "s.id_year = " + mnYear + " AND ("
                                 + "s.dt " + (mnPeriod == 1 ? "<=" : "<") + " '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "' OR ("
                                 + "s.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
+                                + "s.fid_ct_iog = " + SModSysConsts.TRNS_CL_IOG_IN_MFG[0] + " AND "
                                 + "s.fid_cl_iog = " + SModSysConsts.TRNS_CL_IOG_IN_MFG[1] + " AND "
-                                + "s.fid_tp_iog = IN (" + SModSysConsts.TRNS_TP_IOG_IN_MFG_RM_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_IN_MFG_RM_RET[2] + ", "
+                                + "s.fid_tp_iog IN (" + SModSysConsts.TRNS_TP_IOG_IN_MFG_RM_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_IN_MFG_RM_RET[2] + ", "
                                 + SModSysConsts.TRNS_TP_IOG_IN_MFG_WP_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_IN_MFG_WP_RET[2] + "))) AND "
                                 + "o.fid_item_r = " + idItem + " AND o.fid_unit_r = " + idItemUnit + "; ";
                         rsStockCosts = stStockCosts.executeQuery(sql);
@@ -797,8 +842,9 @@ public class STrnInventoryValuation {
                                     + "WHERE id_year = " + mnYear + " AND id_per = " + mnPeriod + " AND id_item = " + idItem + " AND id_unit = " + idItemUnit + "; ";
                             stUpdates.execute(sql);
                             
-                            // XXX qué hace esto???:
-                            createRawMaterialsCostsStockEntries(new int[] { mnYear, idItem, idItemUnit, 1, manDefaultWarehouseWip[0], manDefaultWarehouseWip[1], 0 }, costAcum);
+                            // Create stock cost entries:
+                            // XXX maybe this call duplicates cost registration in stock!:
+                            //createRawMaterialsCostsStockEntries(new int[] { mnYear, idItem, idItemUnit, 1, manDefaultWarehouseWip[0], manDefaultWarehouseWip[1], 0 }, costAcum);
                         }
                     }
                 }
@@ -813,6 +859,9 @@ public class STrnInventoryValuation {
                 costAcum = SLibUtils.round(costAcum - cost, amtDecs);   // credit
                 
                 // Update cost of current outgoing stock movement:
+                /*
+                Registry to be updated is localized straight by PK of stock movement.
+                */
                 
                 sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " "
                         + "SET used = 0, cost_u = " + costUnit + ", cost = 0, debit = 0, credit = " + cost + " "
@@ -821,13 +870,14 @@ public class STrnInventoryValuation {
                 stUpdates.execute(sql);
                 
                 // Update cost of corresponding incoming stock movement (MFG and other internal stock movements only):
+                /*
+                Registry to be updated is localized indirectly by PK of mirror stock movement.
+                Remember that when inner stock movements are saved:
+                1. input stock movement (mirror one) is created as system registry with no references to its corresponding original registry;
+                2. output stock movement is created (original one) is then created as user registry referencing its corresponding mirror registry.
+                */
                 
                 if (SLibUtils.belongsTo(idMovClass, new int[] { SModSysConsts.TRNS_CL_IOG_OUT_INT[1], SModSysConsts.TRNS_CL_IOG_OUT_MFG[1] })) {
-                    /* XXX check if this is needed!
-                    if (!isStandard) {
-                        cost = auxValue; // revaluate cost properly
-                    }
-                    */
                     sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " "
                             + "SET used = 0, cost_u = " + costUnit + ", cost = 0, debit = " + cost + ", credit = 0 "
                             + "WHERE id_year = " + mnYear + " AND id_item = " + idItem + " AND id_unit = " + idItemUnit + " AND id_lot = " + rsMain.getInt("s.id_lot") + " AND "
@@ -839,11 +889,8 @@ public class STrnInventoryValuation {
             // Continue with other stock movement types, while necessary:
 
             if (idMovClass == MOV_CLASS_MFG) {
-                if (idMovClassStep < STEP_FG) {
-                    idMovClassStep++;
-                    computeConsumptions();   // work-in-progress step is about to finish, so compute values of consumption movements
-                }
-                else {
+                if (++idMovClassStep > STEP_FG) {
+                    //computeConsumptions();   // work-in-progress step is about to finish, so compute values of consumption movements
                     idMovClass--;
                 }
             }
