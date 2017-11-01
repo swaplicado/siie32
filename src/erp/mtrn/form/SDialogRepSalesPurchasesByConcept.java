@@ -360,7 +360,7 @@ public class SDialogRepSalesPurchasesByConcept extends javax.swing.JDialog imple
                 map.put("sSqlOrderBy", (String) querySentenceValues[1]);
                 map.put("sTitle", mbParamIsSupplier ? "REPORTE DE COMPRAS NETAS" : "REPORTE DE VENTAS NETAS");
                 map.put("sDetailConcept", (String) querySentenceValues[2]);
-                map.put("sLocalCurrency", miClient.getSession().getSessionCustom().getLocalCurrencyKey()[0]);
+                map.put("sLocalCurrency", miClient.getSession().getSessionCustom().getLocalCurrencyCode());
                 map.put("nLocalCountry", miClient.getSession().getSessionCustom().getLocalCountryKey()[0]);
                 map.put("sFilter", (String) querySentenceValues[3]);
                 map.put("nTpDetail", (Integer) querySentenceValues[4]);
