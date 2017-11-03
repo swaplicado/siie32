@@ -25,7 +25,6 @@ import erp.mod.trn.view.SViewDeliveryQuery;
 import erp.mod.trn.view.SViewDpsEntryContractPrice;
 import erp.mod.trn.view.SViewDpsSendWebService;
 import erp.mod.trn.view.SViewInventoryCost;
-import erp.mod.trn.view.SViewInventoryCostByDiogType;
 import erp.mod.trn.view.SViewInventoryMfgCost;
 import erp.mod.trn.view.SViewInventoryValuation;
 import erp.mod.trn.view.SViewItemRequiredDpsConfig;
@@ -199,9 +198,6 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_INV_VAL_COST:
                 view = new SViewValCost(miClient, subtype, "Valor valuación vs. valor teórico");
-                break;
-            case SModConsts.TRNX_STK_DIOG_TP:
-                view = new SViewInventoryCostByDiogType(miClient, subtype, "Costo inv. por tipo mov.", params);
                 break;
             case SModConsts.TRNX_ORD_LIM_MAX:
                 view = new SViewOrderLimitMonth(miClient, "Límite máx. mensual " + (subtype == SModConsts.USRU_USR ? "x usuario" : "x área funcional"), subtype, params);

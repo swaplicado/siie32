@@ -854,13 +854,15 @@ public class STrnInventoryValuation {
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS d ON s.fid_diog_year = d.id_year AND s.fid_diog_doc = d.id_doc "
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.MFG_ORD) + " AS o ON d.fid_mfg_year_n = o.id_year AND d.fid_mfg_ord_n = o.id_ord "
                                 + "WHERE s.b_del = 0 AND "
-                                + "s.id_year = " + mnYear + " AND ("
-                                + "s.dt " + (mnPeriod == 1 ? "<=" : "<") + " '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "' OR ("
-                                + "s.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
+                                + "s.id_year = " + mnYear + " AND (("
+                                + "s.dt " + (mnPeriod == 1 ? "<=" : "<") + " '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "') OR ("
+                                + "s.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND (("
                                 + "s.fid_ct_iog = " + SModSysConsts.TRNS_CL_IOG_IN_MFG[0] + " AND "
                                 + "s.fid_cl_iog = " + SModSysConsts.TRNS_CL_IOG_IN_MFG[1] + " AND "
-                                + "s.fid_tp_iog IN (" + SModSysConsts.TRNS_TP_IOG_IN_MFG_RM_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_IN_MFG_RM_RET[2] + ", "
-                                + SModSysConsts.TRNS_TP_IOG_IN_MFG_WP_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_IN_MFG_WP_RET[2] + "))) AND "
+                                + "s.fid_tp_iog IN (" + SModSysConsts.TRNS_TP_IOG_IN_MFG_RM_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_IN_MFG_WP_ASD[2] + ")) OR ("
+                                + "s.fid_ct_iog = " + SModSysConsts.TRNS_CL_IOG_OUT_MFG[0] + " AND "
+                                + "s.fid_cl_iog = " + SModSysConsts.TRNS_CL_IOG_OUT_MFG[1] + " AND "
+                                + "s.fid_tp_iog IN (" + SModSysConsts.TRNS_TP_IOG_OUT_MFG_RM_RET[2] + ", " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_WP_RET[2] + "))))) AND "
                                 + "o.fid_item_r = " + idItem + " AND o.fid_unit_r = " + idItemUnit + "; ";
                         rsStockCosts = stStockCosts.executeQuery(sql);
                         if (rsStockCosts.next()) {
@@ -959,7 +961,7 @@ public class STrnInventoryValuation {
             // Continue with other stock movement types, while necessary:
 
             if (idMovClass == MOV_CLASS_MFG) {
-                computeConsumptionMovements(itemUnits);
+                // XXX computeConsumptionMovements(itemUnits);
                 
                 if (++idMovClassStep > STEP_FG) {
                     //computeConsumptions();   // work-in-progress step is about to finish, so compute values of consumption movements

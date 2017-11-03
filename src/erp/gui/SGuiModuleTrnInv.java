@@ -25,8 +25,8 @@ import erp.mtrn.data.STrnDiogComplement;
 import erp.mtrn.form.SDialogDiogSaved;
 import erp.mtrn.form.SDialogRepStock;
 import erp.mtrn.form.SDialogRepStockMoves;
-import erp.mtrn.form.SDialogRepStockTrackingLot;
 import erp.mtrn.form.SDialogRepStockPeriod;
+import erp.mtrn.form.SDialogRepStockTrackingLot;
 import erp.mtrn.form.SDialogUtilStockClosing;
 import erp.mtrn.form.SFormDiog;
 import erp.mtrn.form.SFormDiogAdjustmentType;
@@ -109,7 +109,6 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiIogInventoryMfgCost;
     private javax.swing.JMenuItem jmiIogStockValueByWarehouse;
     private javax.swing.JMenuItem jmiIogStockValueByItem;
-    private javax.swing.JMenuItem jmiIogStockValueByDiogType;
     private javax.swing.JMenuItem jmiIogStockTheoricalCost;
     private javax.swing.JMenuItem jmiIogStockClosing;
 
@@ -325,7 +324,6 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogInventoryMfgCost = new JMenuItem("Costos de producción por producto");
         jmiIogStockValueByWarehouse = new JMenuItem("Valor de inventarios por almacén");
         jmiIogStockValueByItem = new JMenuItem("Valor de inventarios por ítem");
-        jmiIogStockValueByDiogType = new JMenuItem("Valor de inventarios por tipo movimiento");
         jmiIogStockTheoricalCost = new JMenuItem("Valor valuación vs. valor teórico");
         jmiIogStockClosing = new JMenuItem("Generación de inventarios iniciales...");
         jmMenuIog.add(jmiIogStock);
@@ -368,7 +366,6 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogInventoryMfgCost.addActionListener(this);
         jmiIogStockValueByWarehouse.addActionListener(this);
         jmiIogStockValueByItem.addActionListener(this);
-        jmiIogStockValueByDiogType.addActionListener(this);
         jmiIogStockTheoricalCost.addActionListener(this);
         jmiIogStockClosing.addActionListener(this);
         
@@ -476,7 +473,6 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogInventoryMfgCost.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiIogStockValueByWarehouse.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiIogStockValueByItem.setEnabled(hasRightInAdj || hasRightOutAdj);
-        jmiIogStockValueByDiogType.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiIogStockTheoricalCost.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiIogStockClosing.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmMenuMfg.setEnabled(hasRightMfgRmAsg || hasRightMfgRmDev || hasRightMfgWpAsg || hasRightMfgWpDev || hasRightMfgFgAsg || hasRightMfgFgDev);
@@ -1186,9 +1182,6 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiIogStockValueByItem) {
                 miClient.getSession().showView(SModConsts.TRNX_STK_COST, SModConsts.ITMU_ITEM, null);
-            }
-            else if (item == jmiIogStockValueByDiogType) {
-                miClient.getSession().showView(SModConsts.TRNX_STK_DIOG_TP, SModConsts.TRNX_STK_WAH, null);
             }
             else if (item == jmiIogStockClosing) {
                 moDialogUtilStockClosing.resetForm();

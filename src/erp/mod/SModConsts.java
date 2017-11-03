@@ -419,7 +419,6 @@ public abstract class SModConsts {
     public static final int TRNX_DPS_BAL = 2024001;         // document balance
     public static final int TRNX_DPS_CON_SEND = 2024002;    // document send
     public static final int TRNX_STK_WAH = 2024003;         // stock by warehouse
-    public static final int TRNX_STK_DIOG_TP = 2024004;     // stock-document type
     public static final int TRNX_STK_COST = 2024049;        // stock cost
     public static final int TRNX_INV_VAL_COST = 2024061;    // inventory valuation vs. cost
     public static final int TRNX_ORD_LIM_MAX = 2024051;     // operations control
