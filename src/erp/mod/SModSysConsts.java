@@ -38,7 +38,7 @@ public abstract class SModSysConsts {
     public static final int CFGS_TP_SORT_NAME_KEY = 2;
     
     public static final int CFGS_TP_MMS_CFD = 1;
-    public static final int CFGS_TP_MMS_CON = 2;
+    public static final int CFGS_TP_MMS_CON_SAL = 2;
     public static final int CFGS_TP_MMS_ORD_SAL = 3;
     public static final int CFGS_TP_MMS_ORD_PUR = 4;
     public static final int CFGS_TP_MMS_FIN_PAY_AUTH_REQ = 11;

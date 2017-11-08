@@ -276,7 +276,7 @@ public class SDialogSendMailContract extends sa.lib.gui.bean.SBeanFormDialog imp
         moFields.setFormButton(jbSave);
         
         resetForm();
-        mms = STrnUtilities.getMms(miClient_XXX, SModSysConsts.CFGS_TP_MMS_CON);
+        mms = STrnUtilities.getMms(miClient_XXX, SModSysConsts.CFGS_TP_MMS_CON_SAL);
         
         moTextRecipientsTo.setValue(mms.getRecipientTo());
         moTextRecipientsCc.setValue(mms.getRecipientCarbonCopy());
