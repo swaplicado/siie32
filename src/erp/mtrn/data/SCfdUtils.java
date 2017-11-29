@@ -16,7 +16,7 @@ import cfd.DCfdConsts;
 import cfd.DCfdUtils;
 import cfd.DElement;
 import cfd.ver2.DAttributeOptionFormaDePago;
-import cfd.ver32.DCfdVer3Consts;
+import cfd.ver3.DCfdVer3Consts;
 import cfd.ver32.DElementTimbreFiscalDigital;
 import cfd.ver33.DElementCfdiRelacionados;
 import cfd.ver33.DElementImpuestos;
@@ -3546,7 +3546,7 @@ public abstract class SCfdUtils implements Serializable {
         cfd.DElement elementComplement = xmlCfdi.getElementComplemento();
 
         if (elementComplement != null) {
-            hasIntCommerceNode = ((cfd.ver32.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior") != null;
+            hasIntCommerceNode = ((cfd.ver33.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior") != null;
         }
         
         emisor = new SDbCfdBizPartner(client);
@@ -3567,7 +3567,7 @@ public abstract class SCfdUtils implements Serializable {
         elementEmisor.getAttRegimenFiscal().setString(xmlCfdi.getEmisorRegimenFiscal());
         
         if (elementComplement != null && hasIntCommerceNode) {
-            ((cfd.ver3.cce11.DElementComercioExterior) ((cfd.ver32.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior")).setEltEmisor(asociadoNegocios.createRootElementEmisorIntCommerce());
+            ((cfd.ver3.cce11.DElementComercioExterior) ((cfd.ver33.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior")).setEltEmisor(asociadoNegocios.createRootElementEmisorIntCommerce());
         }
 
         comprobante.setEltEmisor(elementEmisor);
@@ -3586,7 +3586,7 @@ public abstract class SCfdUtils implements Serializable {
         elementReceptor.getAttUsoCFDI().setString(xmlCfdi.getReceptorUsoCFDI());
         
         if (elementComplement != null && hasIntCommerceNode) {
-            ((cfd.ver3.cce11.DElementComercioExterior) ((cfd.ver32.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior")).setEltReceptor(asociadoNegocios.createRootElementReceptorIntCommerce());
+            ((cfd.ver3.cce11.DElementComercioExterior) ((cfd.ver33.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior")).setEltReceptor(asociadoNegocios.createRootElementReceptorIntCommerce());
         }
         
         comprobante.setEltReceptor(elementReceptor);
@@ -3621,7 +3621,7 @@ public abstract class SCfdUtils implements Serializable {
                     comprobante.setEltOpcImpuestos(new DElementImpuestos(comprobante));
                 }
                 comprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos().setDouble(dTotalImptoRetenido);
-                comprobante.getEltOpcImpuestos().setEltOpcImpuestosRetenidos(impuestosRetenciones);
+                comprobante.getEltOpcImpuestos().setEltOpcImpuestosRetenciones(impuestosRetenciones);
             }
 
             if (!impuestosTrasladados.getEltImpuestoTrasladados().isEmpty()) {
@@ -3634,11 +3634,11 @@ public abstract class SCfdUtils implements Serializable {
         }
         
         if (elementComplement != null) {
-            comprobante.setEltOpcComplemento((cfd.ver32.DElementComplemento) elementComplement);
+            comprobante.setEltOpcComplemento((cfd.ver33.DElementComplemento) elementComplement);
         }
 
         if (xmlCfdi.getElementAddenda() != null) {
-            comprobante.setEltOpcAddenda((cfd.ver32.DElementAddenda) xmlCfdi.getElementAddenda());
+            comprobante.setEltOpcAddenda((cfd.ver33.DElementAddenda) xmlCfdi.getElementAddenda());
         }
 
         if (xmlCfdi.getCfdType() == SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
@@ -3772,9 +3772,9 @@ public abstract class SCfdUtils implements Serializable {
             }
 
             // validate taxes retained:
-            if (comprobante.getEltOpcImpuestos().getEltOpcImpuestosRetenidos() != null) {
-                for (int i = 0; i < comprobante.getEltOpcImpuestos().getEltOpcImpuestosRetenidos().getEltImpuestoRetenciones().size(); i++) {
-                    oRetencion = comprobante.getEltOpcImpuestos().getEltOpcImpuestosRetenidos().getEltImpuestoRetenciones().get(i);
+            if (comprobante.getEltOpcImpuestos().getEltOpcImpuestosRetenciones() != null) {
+                for (int i = 0; i < comprobante.getEltOpcImpuestos().getEltOpcImpuestosRetenciones().getEltImpuestoRetenciones().size(); i++) {
+                    oRetencion = comprobante.getEltOpcImpuestos().getEltOpcImpuestosRetenciones().getEltImpuestoRetenciones().get(i);
 
                     dTotalImptoRetenidos = SLibUtils.round((dTotalImptoRetenidos + oRetencion.getAttImporte().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
                 }
