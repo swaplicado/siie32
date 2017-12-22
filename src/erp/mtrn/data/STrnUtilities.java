@@ -1674,7 +1674,7 @@ public abstract class STrnUtilities {
 
         try {
             client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
-            mms = getMms(client, SModSysConsts.CFGS_TP_MMS_CON);
+            mms = getMms(client, SModSysConsts.CFGS_TP_MMS_CON_SAL);
 
             if (mms.getQueryResultId() != SDbConsts.READ_OK) {
                 client.showMsgBoxWarning("No existe ningún correo-e configurado para envío de movimientos de contratos.");
@@ -1728,8 +1728,8 @@ public abstract class STrnUtilities {
                         }
                         mail.send();
 
-                        sql = "INSERT INTO trn_mms_log SELECT " + SModSysConsts.CFGS_TP_MMS_CON + ", COALESCE(MAX(id_log + 1), 1), "
-                               + client.getSession().getUser().getPkUserId() + ", NOW() FROM trn_mms_log WHERE id_mms = " + SModSysConsts.CFGS_TP_MMS_CON + " ";
+                        sql = "INSERT INTO trn_mms_log SELECT " + SModSysConsts.CFGS_TP_MMS_CON_SAL + ", COALESCE(MAX(id_log + 1), 1), "
+                               + client.getSession().getUser().getPkUserId() + ", NOW() FROM trn_mms_log WHERE id_mms = " + SModSysConsts.CFGS_TP_MMS_CON_SAL + " ";
 
                         if (!client.getSession().getStatement().execute(sql)) {
                         }
@@ -1821,7 +1821,7 @@ public abstract class STrnUtilities {
                     + "<th id=\"number\" style=\"min-width: 10em; max-width: 10em;\">Saldo</th> "
                     + "</tr> "
                     + mail + computeMailFooterEndTable(SClient.APP_NAME , SClient.APP_COPYRIGHT, SClient.APP_PROVIDER, SClient.VENDOR_WEBSITE , SClient.APP_RELEASE);
-                sendMail(client, SModSysConsts.CFGS_TP_MMS_CON, recipientsTo, recipientsCc, recipientsBcc, mail);
+                sendMail(client, SModSysConsts.CFGS_TP_MMS_CON_SAL, recipientsTo, recipientsCc, recipientsBcc, mail);
             }
             else {
                 throw new Exception("No existe información para el periodo seleccionado.");

@@ -53,28 +53,31 @@ public class SViewInventoryCost extends SGridPaneView {
 
     @Override
     public void prepareSqlQuery() {
-        String sql = "";
+        String where = "";
+        String whereDps = "";
         Object filter = null;
 
         moPaneSettings = new SGridPaneSettings(2);
 
         filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE).getValue();
         if (filter == null) {
-            sql += (sql.isEmpty() ? "" : "AND ") + "s.id_year = " + miClient.getSession().getCurrentYear() + " ";
+            where += (where.isEmpty() ? "" : "AND ") + "s.id_year = " + miClient.getSession().getCurrentYear() + " ";
+            whereDps += (whereDps.isEmpty() ? "" : "AND ") + "d.id_year = " + miClient.getSession().getCurrentYear() + " ";
         }
         else {
-            sql += (sql.isEmpty() ? "" : "AND ") + "s.id_year = " + SLibTimeUtils.digestYear((SGuiDate) filter)[0] + " AND " +
+            where += (where.isEmpty() ? "" : "AND ") + "s.id_year = " + SLibTimeUtils.digestYear((SGuiDate) filter)[0] + " AND " +
                         "s.dt <= '" + SLibUtils.DbmsDateFormatDate.format((SGuiDate) filter) + "' ";
+            whereDps += (whereDps.isEmpty() ? "" : "AND ") + "d.dt <= '" + SLibUtils.DbmsDateFormatDate.format((SGuiDate) filter) + "' ";
         }
         
         filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.BPSU_BPB)).getValue();
         if (filter != null && ((int[]) filter).length == 1) {
-            sql += (sql.isEmpty() ? "" : "AND ") + "s.id_cob = " + ((int[]) filter)[0] + " ";
+            where += (where.isEmpty() ? "" : "AND ") + "s.id_cob = " + ((int[]) filter)[0] + " ";
         }
 
         filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.CFGU_COB_ENT)).getValue();
         if (filter != null && ((int[]) filter).length == 2) {
-            sql += (sql.isEmpty() ? "" : "AND ") + "s.id_cob = " + ((int[]) filter)[0] + " AND s.id_wh = " + ((int[]) filter)[1] + " ";
+            where += (where.isEmpty() ? "" : "AND ") + "s.id_cob = " + ((int[]) filter)[0] + " AND s.id_wh = " + ((int[]) filter)[1] + " ";
         }
 
         switch (mnGridSubtype) {
@@ -88,13 +91,13 @@ public class SViewInventoryCost extends SGridPaneView {
                         + "bpb.bpb, "
                         + "SUM(s.debit) AS _dbt, "
                         + "SUM(s.credit) AS _cdt, "
-                        + "SUM(s.debit - s.credit) AS _cst "
+                        + "SUM(s.debit - s.credit) AS _bal "
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bpb ON s.id_cob = bpb.id_bpb "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_COB_ENT) + " AS ent ON s.id_cob = ent.id_cob AND s.id_wh = ent.id_ent "
-                        + "WHERE s.b_del = 0 " + (sql.isEmpty() ? "" : "AND " + sql) + " "
+                        + "WHERE NOT s.b_del " + (where.isEmpty() ? "" : "AND " + where)
                         + "GROUP BY s.id_cob, s.id_wh "
-                        + "HAVING _cst <> 0 "
+                        + "HAVING _bal <> 0 "
                         + "ORDER BY bpb.bpb, bpb.code, ent.ent, ent.code, s.id_cob, s.id_wh ";
                 break;
                 
@@ -106,24 +109,39 @@ public class SViewInventoryCost extends SGridPaneView {
                         + "i.item AS " + SDbConsts.FIELD_NAME + ", "
                         + "u.symbol, "
                         + "u.unit, "
+                        + "t._price_u, "
+                        + "t._last_pur, "
                         + "SUM(s.mov_in) AS _mov_in, "
                         + "SUM(s.mov_out) AS _mov_out, "
                         + "SUM(s.mov_in - s.mov_out) AS _stk, "
                         + "SUM(s.debit) AS _dbt, "
                         + "SUM(s.credit) AS _cdt, "
-                        + "SUM(s.debit - s.credit) AS _cst "
+                        + "SUM(s.debit - s.credit) AS _bal, "
+                        + "SUM(s.debit - s.credit) / SUM(s.mov_in - s.mov_out) AS _avg_cst "
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON s.id_item = i.id_item "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON s.id_unit = u.id_unit "
-                        + "WHERE s.b_del = 0 AND " + sql + " "
-                        /*
-                        + "s.id_cob = " + ((SClientInterface) miClient).getSessionXXX().getCurrentCompanyBranchEntityKey(SDataConstantsSys.CFGS_CT_ENT_WH)[0] + " AND "
-                        + "s.id_wh = " + ((SClientInterface) miClient).getSessionXXX().getCurrentCompanyBranchEntityKey(SDataConstantsSys.CFGS_CT_ENT_WH)[1] + " "
-                        */
+                        + "LEFT OUTER JOIN ("
+                        + "SELECT de.fid_item, de.fid_unit, t._last_pur, MAX(de.price_u_real_r) AS _price_u "
+                        + "FROM trn_dps AS d "
+                        + "INNER JOIN trn_dps_ety AS de ON de.id_year = d.id_year AND de.id_doc = d.id_doc "
+                        + "INNER JOIN ("
+                        + "  SELECT de.fid_item, de.fid_unit, MAX(d.dt) AS _last_pur "
+                        + "  FROM trn_dps AS d "
+                        + "  INNER JOIN trn_dps_ety AS de ON de.id_year = d.id_year AND de.id_doc = d.id_doc "
+                        + "  WHERE NOT d.b_del AND NOT de.b_del AND "
+                        + "  d.fid_ct_dps = " + SModSysConsts.TRNS_CL_DPS_PUR_DOC[0] + " AND d.fid_cl_dps = " + SModSysConsts.TRNS_CL_DPS_PUR_DOC[1] + " " + (whereDps.isEmpty() ? "" : "AND " + whereDps)
+                        + "  GROUP BY de.fid_item, de.fid_unit "
+                        + "  ORDER BY de.fid_item, de.fid_unit) AS t ON t.Fid_item = de.fid_item AND t.fid_unit = de.fid_unit AND t._last_pur = d.dt "
+                        + "WHERE NOT d.b_del AND NOT de.b_del AND "
+                        + "d.fid_ct_dps = " + SModSysConsts.TRNS_CL_DPS_PUR_DOC[0] + " AND d.fid_cl_dps = " + SModSysConsts.TRNS_CL_DPS_PUR_DOC[1] + " " + (whereDps.isEmpty() ? "" : "AND " + whereDps)
+                        + "GROUP BY de.fid_item, de.fid_unit "
+                        + "ORDER BY de.fid_item, de.fid_unit) AS t ON t.fid_item = s.id_item AND t.fid_unit = s.id_unit "
+                        + "WHERE NOT s.b_del " + (where.isEmpty() ? "" : "AND " + where)
                         + "GROUP BY s.id_item, s.id_unit "
-                        + "HAVING _stk <> 0 OR _cst <> 0 "
+                        + "HAVING _stk <> 0 OR _bal <> 0 "
                         + "ORDER BY "
-                        + (((SDataParamsErp) miClient.getSession().getConfigSystem()).getFkSortingItemTypeId() == SModSysConsts.CFGS_TP_SORT_KEY_NAME ? "i.item, i.item_key, " : "i.item_key, i.item, ")
+                        + (((SDataParamsErp) miClient.getSession().getConfigSystem()).getFkSortingItemTypeId() == SModSysConsts.CFGS_TP_SORT_NAME_KEY ? "i.item, i.item_key, " : "i.item_key, i.item, ")
                         + "s.id_item, u.symbol, s.id_unit ";
                 break;
                 
@@ -145,7 +163,7 @@ public class SViewInventoryCost extends SGridPaneView {
                 break;
                 
             case SModConsts.ITMU_ITEM:
-                if (((SDataParamsErp) miClient.getSession().getConfigSystem()).getFkSortingItemTypeId() == SModSysConsts.CFGS_TP_SORT_KEY_NAME) {
+                if (((SDataParamsErp) miClient.getSession().getConfigSystem()).getFkSortingItemTypeId() == SModSysConsts.CFGS_TP_SORT_NAME_KEY) {
                     columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME + " ítem"));
                     columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE + " ítem"));
                 }
@@ -169,9 +187,18 @@ public class SViewInventoryCost extends SGridPaneView {
         column = new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_cdt", "Abonos $");
         column.setSumApplying(true);
         columns.add(column);
-        column = new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_cst", "Saldo $");
+        column = new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_bal", "Saldo $");
         column.setSumApplying(true);
         columns.add(column);
+        
+        if (mnGridSubtype == SModConsts.ITMU_ITEM) {
+            column = new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "_avg_cst", "Costo prom $");
+            columns.add(column);
+            column = new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "_price_u", "Último precio u compra $");
+            columns.add(column);
+            column = new SGridColumnView(SGridConsts.COL_TYPE_DATE, "_last_pur", "Última compra");
+            columns.add(column);
+        }
 
         return columns;
     }
@@ -180,7 +207,6 @@ public class SViewInventoryCost extends SGridPaneView {
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
         moSuscriptionsSet.add(SModConsts.TRN_INV_VAL);
-        moSuscriptionsSet.add(SModConsts.TRNX_STK_DIOG_TP);
         moSuscriptionsSet.add(SDataConstants.ITMU_ITEM);
         moSuscriptionsSet.add(SDataConstants.ITMU_UNIT);
         moSuscriptionsSet.add(SDataConstants.TRN_LOT);

@@ -12,6 +12,7 @@ import erp.mtrn.data.STrnStockMove;
 import erp.mtrn.data.STrnUtilities;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
 import sa.lib.SLibTimeUtils;
@@ -573,6 +574,60 @@ public class STrnInventoryValuation {
     }
     */
     
+    /**
+     * Computes consumption stock movements of each provided item-unit.
+     * @param itemUnits Item-units for computing its consumption stock movements.
+     * @throws Exception 
+     */
+    private void computeConsumptionMovements(ArrayList<ItemUnit> itemUnits) throws Exception {
+        String sql;
+        int amtDecs = SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits();
+        int amtUnitDecs = SLibUtils.getDecimalFormatAmountUnitary().getMaximumFractionDigits();
+        double stockAcum;
+        double costAcum;
+        double costUnit;
+        double cost;
+        Statement st = moSession.getStatement().getConnection().createStatement();
+        Statement stUpd = moSession.getStatement().getConnection().createStatement();
+        ResultSet rs;
+        
+        for (ItemUnit itemUnit : itemUnits) {
+            stockAcum = itemUnit.Stock;
+            costAcum = itemUnit.Value;
+            
+            sql = "SELECT id_item, id_unit, dt, fid_ct_iog, fid_cl_iog, fid_tp_iog, id_lot, id_cob, id_wh, id_mov, "
+                    + "s.mov_in, mov_out, cost_u, cost, debit, credit "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "
+                    + "WHERE b_del = 0 AND "
+                    + "s.id_year = " + mnYear + " AND dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
+                    + "s.fid_ct_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[0] + " AND "
+                    + "s.fid_cl_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[1] + " AND "
+                    + "s.fid_tp_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[2] + " AND "
+                    + "s.id_item = " + itemUnit.ItemId + " AND id_unit = " + itemUnit.UnitId + " "
+                    + "ORDER BY id_item, id_unit, dt, fid_ct_iog, fid_cl_iog, fid_tp_iog, id_lot, id_cob, id_wh, id_mov; ";
+            rs = st.executeQuery(sql);
+            while (rs.next()) {
+                costUnit = SLibUtils.round(stockAcum == 0 ? 0 : costAcum / stockAcum, amtUnitDecs);
+                
+                cost = SLibUtils.round(costUnit * rs.getDouble("mov_out"), amtDecs);
+                
+                stockAcum = SLibUtils.round(stockAcum - rs.getDouble("mov_out"), amtUnitDecs);
+                costAcum = SLibUtils.round(costAcum - cost, amtDecs);   // credit
+                
+                // Update cost of current outgoing stock movement:
+                /*
+                Registry to be updated is localized straight by PK of stock movement.
+                */
+                
+                sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " "
+                        + "SET used = 0, cost_u = " + costUnit + ", cost = 0, debit = 0, credit = " + cost + " "
+                        + "WHERE id_year = " + mnYear + " AND id_item = " + itemUnit.ItemId + " AND id_unit = " + itemUnit.UnitId + " AND id_lot = " + rs.getInt("id_lot") + " AND "
+                        + "id_cob = " + rs.getInt("id_cob") + " AND id_wh = " + rs.getInt("id_wh") + " AND id_mov = " + rs.getInt("id_mov") + "; ";
+                stUpd.execute(sql);
+            }
+        }
+    }
+    
     /*
      * Public methods
      */
@@ -664,6 +719,8 @@ public class STrnInventoryValuation {
         ResultSet rsMain = null;
         ResultSet rsStockCosts = null;
         ResultSet rsUpdates = null;
+        ItemUnit itemUnit = null;
+        ArrayList<ItemUnit> itemUnits = new ArrayList<>();
         
         createInventoryMfgCosts();  // create manufacturing costs
         
@@ -686,6 +743,8 @@ public class STrnInventoryValuation {
             where = "AND s.fid_cl_iog = " + idMovClass + " ";
             
             if (idMovClass == MOV_CLASS_MFG) {
+                itemUnits.clear();
+                
                 switch (idMovClassStep) {
                     case STEP_RM: // raw materials
                         whereMfg = "" + SModSysConsts.TRNS_TP_IOG_OUT_MFG_RM_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_RM_RET[2];
@@ -708,7 +767,8 @@ public class STrnInventoryValuation {
 
             sql = "SELECT s.id_item, s.id_unit, s.dt, s.fid_ct_iog, s.fid_cl_iog, s.fid_tp_iog, s.id_lot, s.id_cob, s.id_wh, s.id_mov, "
                     + "s.mov_in, s.mov_out, s.cost_u, s.cost, s.debit, s.credit, "
-                    + "s.fid_diog_year, s.fid_diog_doc, s.fid_diog_ety, d.fid_diog_year_n, d.fid_diog_doc_n, "
+                    + "s.fid_diog_year, s.fid_diog_doc, s.fid_diog_ety, "   // original stock movement
+                    + "d.fid_diog_year_n, d.fid_diog_doc_n, "               // mirror stock movement
                     + "o.id_year, o.id_ord, o.fid_item_r, o.fid_unit_r "    // columns preserved in query for debugging purposes
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS d ON s.fid_diog_year = d.id_year AND s.fid_diog_doc = d.id_doc "
@@ -727,9 +787,14 @@ public class STrnInventoryValuation {
                     System.out.println("* item = " + idItem +  "; unit = " + idItemUnit + "...");
                     
                     // Available stock and total cost:
-                        
+                    
                     stockAcum = 0;
                     costAcum = 0;
+                    
+                    if (idMovClass == MOV_CLASS_MFG) {
+                        itemUnit = new ItemUnit(idItem, idItemUnit, 0, 0);
+                        itemUnits.add(itemUnit);
+                    }
                     
                     // Manufacturing of goods finished (work in progress inclusive) needs a specific kind of value calculation, a "concentrated valuation".
                     // Check if current movement class requires standard valuation, i.e., check if it is not one of manufacturing as well as if current step is not of goods finished:
@@ -744,8 +809,8 @@ public class STrnInventoryValuation {
                         sql = "SELECT SUM(mov_in - mov_out) AS _stk, SUM(debit - credit) AS _bal "
                                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " "
                                 + "WHERE b_del = 0 AND "
-                                + "id_year = " + mnYear + " AND ("
-                                + "dt " + (mnPeriod == 1 ? "<=" : "<") + " '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "' OR ("
+                                + "id_year = " + mnYear + " AND (("
+                                + "dt " + (mnPeriod == 1 ? "<=" : "<") + " '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "') OR ("
                                 + "dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
                                 + "fid_ct_iog = " + SModSysConsts.TRNS_CL_IOG_IN_INT[0] + " AND "
                                 + "fid_cl_iog < " + SModSysConsts.TRNS_CL_IOG_IN_INT[1] + ")) AND "
@@ -767,8 +832,8 @@ public class STrnInventoryValuation {
                         sql = "SELECT SUM(mov_in - mov_out) AS _stk "
                                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " "
                                 + "WHERE b_del = 0 AND "
-                                + "id_year = " + mnYear + " AND ("
-                                + "dt " + (mnPeriod == 1 ? "<=" : "<") + " '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "' OR ("
+                                + "id_year = " + mnYear + " AND (("
+                                + "dt " + (mnPeriod == 1 ? "<=" : "<") + " '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "') OR ("
                                 + "dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
                                 + "fid_ct_iog = " + SModSysConsts.TRNS_CL_IOG_IN_MFG[0] + " AND "
                                 + "fid_cl_iog = " + SModSysConsts.TRNS_CL_IOG_IN_MFG[1] + " AND "
@@ -789,13 +854,15 @@ public class STrnInventoryValuation {
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS d ON s.fid_diog_year = d.id_year AND s.fid_diog_doc = d.id_doc "
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.MFG_ORD) + " AS o ON d.fid_mfg_year_n = o.id_year AND d.fid_mfg_ord_n = o.id_ord "
                                 + "WHERE s.b_del = 0 AND "
-                                + "s.id_year = " + mnYear + " AND ("
-                                + "s.dt " + (mnPeriod == 1 ? "<=" : "<") + " '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "' OR ("
-                                + "s.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
+                                + "s.id_year = " + mnYear + " AND (("
+                                + "s.dt " + (mnPeriod == 1 ? "<=" : "<") + " '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "') OR ("
+                                + "s.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND (("
                                 + "s.fid_ct_iog = " + SModSysConsts.TRNS_CL_IOG_IN_MFG[0] + " AND "
                                 + "s.fid_cl_iog = " + SModSysConsts.TRNS_CL_IOG_IN_MFG[1] + " AND "
-                                + "s.fid_tp_iog IN (" + SModSysConsts.TRNS_TP_IOG_IN_MFG_RM_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_IN_MFG_RM_RET[2] + ", "
-                                + SModSysConsts.TRNS_TP_IOG_IN_MFG_WP_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_IN_MFG_WP_RET[2] + "))) AND "
+                                + "s.fid_tp_iog IN (" + SModSysConsts.TRNS_TP_IOG_IN_MFG_RM_ASD[2] + ", " + SModSysConsts.TRNS_TP_IOG_IN_MFG_WP_ASD[2] + ")) OR ("
+                                + "s.fid_ct_iog = " + SModSysConsts.TRNS_CL_IOG_OUT_MFG[0] + " AND "
+                                + "s.fid_cl_iog = " + SModSysConsts.TRNS_CL_IOG_OUT_MFG[1] + " AND "
+                                + "s.fid_tp_iog IN (" + SModSysConsts.TRNS_TP_IOG_OUT_MFG_RM_RET[2] + ", " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_WP_RET[2] + "))))) AND "
                                 + "o.fid_item_r = " + idItem + " AND o.fid_unit_r = " + idItemUnit + "; ";
                         rsStockCosts = stStockCosts.executeQuery(sql);
                         if (rsStockCosts.next()) {
@@ -858,6 +925,11 @@ public class STrnInventoryValuation {
                 stockAcum = SLibUtils.round(stockAcum - rsMain.getDouble("s.mov_out"), amtUnitDecs);
                 costAcum = SLibUtils.round(costAcum - cost, amtDecs);   // credit
                 
+                if (idMovClass == MOV_CLASS_MFG) {
+                    itemUnit.Stock = stockAcum;
+                    itemUnit.Value = costAcum;
+                }
+                
                 // Update cost of current outgoing stock movement:
                 /*
                 Registry to be updated is localized straight by PK of stock movement.
@@ -889,6 +961,8 @@ public class STrnInventoryValuation {
             // Continue with other stock movement types, while necessary:
 
             if (idMovClass == MOV_CLASS_MFG) {
+                // XXX computeConsumptionMovements(itemUnits);
+                
                 if (++idMovClassStep > STEP_FG) {
                     //computeConsumptions();   // work-in-progress step is about to finish, so compute values of consumption movements
                     idMovClass--;
@@ -905,5 +979,22 @@ public class STrnInventoryValuation {
                 + "SET b_fin = 1, fk_usr_upd = " + moSession.getUser().getPkUserId() + ", ts_usr_upd = NOW() "
                 + "WHERE id_inv_val = " + idInventoryValuation + "; ";
         stUpdates.execute(sql);
+    }
+    
+    /**
+     * Class to preserve processed item-units, to compute its corresponding consumption moves when finished.
+     */
+    private class ItemUnit {
+        int ItemId;
+        int UnitId;
+        double Stock;
+        double Value;
+        
+        public ItemUnit(int itemId, int unitId, double stock, double value) {
+            ItemId = itemId;
+            UnitId = unitId;
+            Stock = stock;
+            Value = value;
+        }
     }
 }

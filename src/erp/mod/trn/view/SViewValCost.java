@@ -140,5 +140,4 @@ public class SViewValCost extends SGridPaneView {
          columns.add(column);
          return columns;
     }
-    
 }

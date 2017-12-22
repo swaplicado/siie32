@@ -112,7 +112,7 @@ public class SViewInventoryMfgCost extends SGridPaneView {
                 + "v.fk_usr_upd = uu.id_usr "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
                 + "ORDER BY v.id_year, v.id_per, "
-                + (((SDataParamsErp) miClient.getSession().getConfigSystem()).getFkSortingItemTypeId() == SModSysConsts.CFGS_TP_SORT_KEY_NAME ? "i.item, i.item_key, " : "i.item_key, i.item, ")
+                + (((SDataParamsErp) miClient.getSession().getConfigSystem()).getFkSortingItemTypeId() == SModSysConsts.CFGS_TP_SORT_NAME_KEY ? "i.item, i.item_key, " : "i.item_key, i.item, ")
                 + "v.id_item, u.unit, u.id_unit ";
     }
 
@@ -123,7 +123,7 @@ public class SViewInventoryMfgCost extends SGridPaneView {
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_CAL_YEAR, SDbConsts.FIELD_ID + "1", "Año"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_CAL_MONTH, SDbConsts.FIELD_ID + "2", "Mes"));
         
-        if (((SDataParamsErp) miClient.getSession().getConfigSystem()).getFkSortingItemTypeId() == SModSysConsts.CFGS_TP_SORT_KEY_NAME) {
+        if (((SDataParamsErp) miClient.getSession().getConfigSystem()).getFkSortingItemTypeId() == SModSysConsts.CFGS_TP_SORT_NAME_KEY) {
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME + " producto"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE + " producto"));
         }
@@ -132,23 +132,41 @@ public class SViewInventoryMfgCost extends SGridPaneView {
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME + " producto"));
         }
         
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "v.ord", "Órds"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "v.ord_sta", "Órds iniciadas"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "v.ord_fin", "Órds terminadas"));
+        SGridColumnView column;
+                
+        column = new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "v.ord", "Órds");
+        column.setSumApplying(true);
+        columns.add(column);
+        column = new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "v.ord_sta", "Órds iniciadas");
+        column.setSumApplying(true);
+        columns.add(column);
+        column = new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "v.ord_fin", "Órds terminadas");
+        column.setSumApplying(true);
+        columns.add(column);
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "v.qty_sta", "Unids iniciadas"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "v.qty_fin", "Unids terminadas"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "u.symbol", "Unidad"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_4D, "v.qty_fin_per", "% unids terminadas"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_4D, "v.qty_fin_eff_per", "% efvo unids terminadas"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "v.cst", "Ctos asignados totales $"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "v.cst_wip", "Ctos en proceso $"));
+        column = new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "v.cst", "Ctos asignados totales $");
+        column.setSumApplying(true);
+        columns.add(column);
+        column = new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "v.cst_wip", "Ctos en proceso $");
+        column.setSumApplying(true);
+        columns.add(column);
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "v.cst_u_wip", "Cto u producto en proceso $"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "v.cst_fin", "Ctos terminados $"));
+        column = new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "v.cst_fin", "Ctos terminados $");
+        column.setSumApplying(true);
+        columns.add(column);
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "v.cst_u_fin", "Cto u producto terminado $"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "u.symbol", "Unidad"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "_mass", "Masa u kg"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "_mass_sta", "Masa iniciada kg"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "_mass_fin", "Masa terminada kg"));
+        column = new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "_mass_sta", "Masa iniciada kg");
+        column.setSumApplying(true);
+        columns.add(column);
+        column = new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "_mass_fin", "Masa terminada kg");
+        column.setSumApplying(true);
+        columns.add(column);
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "_mass_cst_u_fin", "Cto u masa u producto terminado $/kg"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));

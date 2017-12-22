@@ -27,8 +27,8 @@ import java.awt.event.KeyEvent;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.AbstractAction;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.view.*;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -36,6 +36,11 @@ import net.sf.jasperreports.view.*;
  */
 public class SDialogRepSalesPurchasesByConcept extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
+    private static final int CPT_BRA = 1;       // by branch
+    private static final int CPT_CSH_CDT = 2;   // by cash or credit
+    private static final int CPT_DOM_INT = 3;   // by domestic or international
+    private static final int CPT_TAX = 4;       // by tax
+    
     private int mnFormType;
     private int mnFormResult;
     private int mnFormStatus;
@@ -335,6 +340,8 @@ public class SDialogRepSalesPurchasesByConcept extends javax.swing.JDialog imple
         else {
             try {
                 setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                
+                Object[] querySentenceValues = createQuerySentenceValues();
 
                 map = miClient.createReportParams();
                 map.put("tDtInitial", moFieldDateInitial.getDate());
@@ -349,15 +356,16 @@ public class SDialogRepSalesPurchasesByConcept extends javax.swing.JDialog imple
                 map.put("sSqlWhereCompanyBranchAdjRet", moFieldCompanyBranch.getKeyAsIntArray()[0] == 0 ? "" : " AND r.fid_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0]);
                 map.put("sSqlWhereCompanyBranchAdjDis", moFieldCompanyBranch.getKeyAsIntArray()[0] == 0 ? "" : " AND d.fid_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0]);
                 map.put("sSqlWhereWithoutRelatedParty", jckWithoutRelatedParty.isSelected() ? " AND bp.b_att_rel_pty = 0 " : "");
-                map.put("sSqlGroupBy", (String) createQuerySentenceValues()[0]);
-                map.put("sSqlOrderBy", (String) createQuerySentenceValues()[1]);
+                map.put("sSqlGroupBy", (String) querySentenceValues[0]);
+                map.put("sSqlOrderBy", (String) querySentenceValues[1]);
                 map.put("sTitle", mbParamIsSupplier ? "REPORTE DE COMPRAS NETAS" : "REPORTE DE VENTAS NETAS");
-                map.put("sDetailConcept", (String) createQuerySentenceValues()[2]);
-                map.put("sLocalCurrency", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency());
-                map.put("sFilter", (String) createQuerySentenceValues()[3]);
-                map.put("nTpGroup", (Integer) createQuerySentenceValues()[5]);
-                map.put("nTpDetail", (Integer) createQuerySentenceValues()[4]);
-                map.put("bShowGroup", (Boolean) createQuerySentenceValues()[6]);
+                map.put("sDetailConcept", (String) querySentenceValues[2]);
+                map.put("sLocalCurrency", miClient.getSession().getSessionCustom().getLocalCurrencyCode());
+                map.put("nLocalCountry", miClient.getSession().getSessionCustom().getLocalCountryKey()[0]);
+                map.put("sFilter", (String) querySentenceValues[3]);
+                map.put("nTpDetail", (Integer) querySentenceValues[4]);
+                map.put("nTpGroup", (Integer) querySentenceValues[5]);
+                map.put("bShowGroup", (Boolean) querySentenceValues[6]);
                 map.put("nFidCtDpsAdj", mbParamIsSupplier ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[0]);
                 map.put("nFidClDpsAdj", mbParamIsSupplier ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[1]);
                 map.put("nFidTpDpsAdj", mbParamIsSupplier ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[2]);
@@ -407,50 +415,50 @@ public class SDialogRepSalesPurchasesByConcept extends javax.swing.JDialog imple
     }
 
     private void populateComboBoxConcept() {
-        SFormComponentItem companyBranch = new SFormComponentItem(new int[] { 1 }, "Sucursal de la empresa");
-        SFormComponentItem cashCredit = new SFormComponentItem(new int[] { 2 },  "Contado/Crédito");
-        SFormComponentItem nationalForeigner = new SFormComponentItem(new int[] { 3 },  "Nacional/Extranjero");
-        SFormComponentItem tax = new SFormComponentItem(new int[] { 4 },  "Impuesto");
+        SFormComponentItem itemBra = new SFormComponentItem(new int[] { CPT_BRA }, "Sucursal empresa");
+        SFormComponentItem itemCshCdt = new SFormComponentItem(new int[] { CPT_CSH_CDT },  "Contado/Crédito");
+        SFormComponentItem itemDomInt = new SFormComponentItem(new int[] { CPT_DOM_INT },  "Nacional/Extranjero");
+        SFormComponentItem itemTax = new SFormComponentItem(new int[] { CPT_TAX },  "Impuesto");
 
         jcbConcept.removeAllItems();
-        jcbConcept.addItem(companyBranch);
-        jcbConcept.addItem(cashCredit);
-        jcbConcept.addItem(nationalForeigner);
-        jcbConcept.addItem(tax);
+        jcbConcept.addItem(itemBra);
+        jcbConcept.addItem(itemCshCdt);
+        jcbConcept.addItem(itemDomInt);
+        jcbConcept.addItem(itemTax);
 
-        moFieldConcept.setFieldValue(new int[] { 1 });
+        moFieldConcept.setFieldValue(new int[] { CPT_BRA });
         populateComboBoxCrossWith();
     }
 
     private void populateComboBoxCrossWith() {
-        SFormComponentItem companyBranch = new SFormComponentItem(new int[] { 1 }, "Sucursal de la empresa");
-        SFormComponentItem cashCredit = new SFormComponentItem(new int[] { 2 },  "Contado/Crédito");
-        SFormComponentItem nationalForeigner = new SFormComponentItem(new int[] { 3 },  "Nacional/Extranjero");
-        SFormComponentItem tax = new SFormComponentItem(new int[] { 4 },  "Impuesto");
+        SFormComponentItem itemBra = new SFormComponentItem(new int[] { CPT_BRA }, "Sucursal empresa");
+        SFormComponentItem itemCshCdt = new SFormComponentItem(new int[] { CPT_CSH_CDT },  "Contado/Crédito");
+        SFormComponentItem itemDomInt = new SFormComponentItem(new int[] { CPT_DOM_INT },  "Nacional/Extranjero");
+        SFormComponentItem itemTax = new SFormComponentItem(new int[] { CPT_TAX },  "Impuesto");
 
         mbResetingComboBixCrossWith = true;
         jcbCrossWith.removeAllItems();
         jcbCrossWith.addItem(new SFormComponentItem(new int[] { 0 }, "(Seleccionar una opción)"));
 
-        if (moFieldConcept.getKeyAsIntArray()[0] == 1) {
-            jcbCrossWith.addItem(cashCredit);
-            jcbCrossWith.addItem(nationalForeigner);
-            jcbCrossWith.addItem(tax);
+        if (moFieldConcept.getKeyAsIntArray()[0] == CPT_BRA) {
+            jcbCrossWith.addItem(itemCshCdt);
+            jcbCrossWith.addItem(itemDomInt);
+            jcbCrossWith.addItem(itemTax);
         }
-        else if (moFieldConcept.getKeyAsIntArray()[0] == 2) {
-            jcbCrossWith.addItem(companyBranch);
-            jcbCrossWith.addItem(nationalForeigner);
-            jcbCrossWith.addItem(tax);
+        else if (moFieldConcept.getKeyAsIntArray()[0] == CPT_CSH_CDT) {
+            jcbCrossWith.addItem(itemBra);
+            jcbCrossWith.addItem(itemDomInt);
+            jcbCrossWith.addItem(itemTax);
         }
-        else if (moFieldConcept.getKeyAsIntArray()[0] == 3) {
-            jcbCrossWith.addItem(companyBranch);
-            jcbCrossWith.addItem(cashCredit);
-            jcbCrossWith.addItem(tax);
+        else if (moFieldConcept.getKeyAsIntArray()[0] == CPT_DOM_INT) {
+            jcbCrossWith.addItem(itemBra);
+            jcbCrossWith.addItem(itemCshCdt);
+            jcbCrossWith.addItem(itemTax);
         }
-        else if (moFieldConcept.getKeyAsIntArray()[0] == 4) {
-            jcbCrossWith.addItem(companyBranch);
-            jcbCrossWith.addItem(cashCredit);
-            jcbCrossWith.addItem(nationalForeigner);
+        else if (moFieldConcept.getKeyAsIntArray()[0] == CPT_TAX) {
+            jcbCrossWith.addItem(itemBra);
+            jcbCrossWith.addItem(itemCshCdt);
+            jcbCrossWith.addItem(itemDomInt);
         }
 
         mbResetingComboBixCrossWith = false;
@@ -465,151 +473,151 @@ public class SDialogRepSalesPurchasesByConcept extends javax.swing.JDialog imple
         int tpGroup = 0;
         boolean showGroup = false;
 
-        // Company branch options:
+        // By branch options:
 
-        if (moFieldConcept.getKeyAsIntArray()[0] == 1 && moFieldCrossWith.getKeyAsIntArray()[0] == 0) {
+        if (moFieldConcept.getKeyAsIntArray()[0] == CPT_BRA && moFieldCrossWith.getKeyAsIntArray()[0] == 0) {
             groupBy = " GROUP BY bpb ";
             orderBy = " ORDER BY bpb ";
             detailColumn = "SUCURSAL EMPRESA";
             filter = "POR SUCURSAL EMPRESA";
-            tpDetail = 1;
+            tpDetail = CPT_BRA;
         }
-        else if (moFieldConcept.getKeyAsIntArray()[0] == 1 && moFieldCrossWith.getKeyAsIntArray()[0] == 2) {
+        else if (moFieldConcept.getKeyAsIntArray()[0] == CPT_BRA && moFieldCrossWith.getKeyAsIntArray()[0] == CPT_CSH_CDT) {
             groupBy = " GROUP BY bpb, tp_pay ";
             orderBy = " ORDER BY bpb, tp_pay ";
             detailColumn = "TIPO DE PAGO";
-            filter = "POR SUCURSAL EMPRESA - TIPO DE PAGO";
-            tpDetail = 2;
-            tpGroup = 1;
+            filter = "POR SUCURSAL EMPRESA / TIPO DE PAGO";
+            tpDetail = CPT_CSH_CDT;
+            tpGroup = CPT_BRA;
             showGroup = true;
         }
-        else if (moFieldConcept.getKeyAsIntArray()[0] == 1 && moFieldCrossWith.getKeyAsIntArray()[0] == 3) {
+        else if (moFieldConcept.getKeyAsIntArray()[0] == CPT_BRA && moFieldCrossWith.getKeyAsIntArray()[0] == CPT_DOM_INT) {
             groupBy = " GROUP BY bpb, f_dest ";
             orderBy = " ORDER BY bpb, f_dest ";
             detailColumn = "PAÍS";
-            filter = "POR SUCURSAL EMPRESA - DESTINO";
-            tpDetail = 3;
-            tpGroup = 1;
+            filter = "POR SUCURSAL EMPRESA / DESTINO";
+            tpDetail = CPT_DOM_INT;
+            tpGroup = CPT_BRA;
             showGroup = true;
         }
-        else if (moFieldConcept.getKeyAsIntArray()[0] == 1 && moFieldCrossWith.getKeyAsIntArray()[0] == 4) {
+        else if (moFieldConcept.getKeyAsIntArray()[0] == CPT_BRA && moFieldCrossWith.getKeyAsIntArray()[0] == CPT_TAX) {
             groupBy = " GROUP BY bpb, tax ";
             orderBy = " ORDER BY bpb, tax ";
             detailColumn = "IMPUESTO";
-            filter = "POR SUCURSAL EMPRESA - IMPUESTO";
-            tpDetail = 4;
-            tpGroup = 1;
+            filter = "POR SUCURSAL EMPRESA / IMPUESTO";
+            tpDetail = CPT_TAX;
+            tpGroup = CPT_BRA;
             showGroup = true;
         }
 
-        // Type of payment options:
+        // By cash or credit options:
 
-        else if (moFieldConcept.getKeyAsIntArray()[0] == 2 && moFieldCrossWith.getKeyAsIntArray()[0] == 0) {
+        else if (moFieldConcept.getKeyAsIntArray()[0] == CPT_CSH_CDT && moFieldCrossWith.getKeyAsIntArray()[0] == 0) {
             groupBy = " GROUP BY tp_pay ";
             orderBy = " ORDER BY tp_pay ";
             detailColumn = "TIPO DE PAGO";
             filter = "POR TIPO DE PAGO";
-            tpDetail = 2;
+            tpDetail = CPT_CSH_CDT;
         }
-        else if (moFieldConcept.getKeyAsIntArray()[0] == 2 && moFieldCrossWith.getKeyAsIntArray()[0] == 1) {
+        else if (moFieldConcept.getKeyAsIntArray()[0] == CPT_CSH_CDT && moFieldCrossWith.getKeyAsIntArray()[0] == CPT_BRA) {
             groupBy = " GROUP BY tp_pay, bpb ";
             orderBy = " ORDER BY tp_pay, bpb ";
             detailColumn = "SUCURSAL EMPRESA";
-            filter = "POR TIPO DE PAGO - SUCURSAL EMPRESA";
-            tpDetail = 1;
-            tpGroup = 2;
+            filter = "POR TIPO DE PAGO / SUCURSAL EMPRESA";
+            tpDetail = CPT_BRA;
+            tpGroup = CPT_CSH_CDT;
             showGroup = true;
         }
-        else if (moFieldConcept.getKeyAsIntArray()[0] == 2 && moFieldCrossWith.getKeyAsIntArray()[0] == 3) {
+        else if (moFieldConcept.getKeyAsIntArray()[0] == CPT_CSH_CDT && moFieldCrossWith.getKeyAsIntArray()[0] == CPT_DOM_INT) {
             groupBy = " GROUP BY tp_pay, f_dest ";
             orderBy = " ORDER BY tp_pay, f_dest ";
             detailColumn = "PAÍS";
-            filter = "POR TIPO DE PAGO - DESTINO";
-            tpDetail = 3;
-            tpGroup = 2;
+            filter = "POR TIPO DE PAGO / DESTINO";
+            tpDetail = CPT_DOM_INT;
+            tpGroup = CPT_CSH_CDT;
             showGroup = true;
         }
-        else if (moFieldConcept.getKeyAsIntArray()[0] == 2 && moFieldCrossWith.getKeyAsIntArray()[0] == 4) {
+        else if (moFieldConcept.getKeyAsIntArray()[0] == CPT_CSH_CDT && moFieldCrossWith.getKeyAsIntArray()[0] == CPT_TAX) {
             groupBy = " GROUP BY tp_pay, tax ";
             orderBy = " ORDER BY tp_pay, tax ";
             detailColumn = "IMPUESTO";
-            filter = "POR TIPO DE PAGO - IMPUESTO";
-            tpDetail = 4;
-            tpGroup = 2;
+            filter = "POR TIPO DE PAGO / IMPUESTO";
+            tpDetail = CPT_TAX;
+            tpGroup = CPT_CSH_CDT;
             showGroup = true;
         }
 
-        // Country options:
+        // By domestic or international options:
 
-        else if (moFieldConcept.getKeyAsIntArray()[0] == 3 && moFieldCrossWith.getKeyAsIntArray()[0] == 0) {
+        else if (moFieldConcept.getKeyAsIntArray()[0] == CPT_DOM_INT && moFieldCrossWith.getKeyAsIntArray()[0] == 0) {
             groupBy = " GROUP BY f_dest ";
             orderBy = " ORDER BY f_dest ";
-            detailColumn = "PAÍS";
-            filter = "POR PAÍS";
-            tpDetail = 3;
+            detailColumn = "DESTINO";
+            filter = "POR DESTINO";
+            tpDetail = CPT_DOM_INT;
         }
-        else if (moFieldConcept.getKeyAsIntArray()[0] == 3 && moFieldCrossWith.getKeyAsIntArray()[0] == 1) {
+        else if (moFieldConcept.getKeyAsIntArray()[0] == CPT_DOM_INT && moFieldCrossWith.getKeyAsIntArray()[0] == CPT_BRA) {
             groupBy = " GROUP BY f_dest, bpb ";
             orderBy = " ORDER BY f_dest, bpb ";
             detailColumn = "SUCURSAL EMPRESA";
-            filter = "POR DESTINO - SUCURSAL EMPRESA";
-            tpDetail = 1;
-            tpGroup = 3;
+            filter = "POR DESTINO / SUCURSAL EMPRESA";
+            tpDetail = CPT_BRA;
+            tpGroup = CPT_DOM_INT;
             showGroup = true;
         }
-        else if (moFieldConcept.getKeyAsIntArray()[0] == 3 && moFieldCrossWith.getKeyAsIntArray()[0] == 2) {
+        else if (moFieldConcept.getKeyAsIntArray()[0] == CPT_DOM_INT && moFieldCrossWith.getKeyAsIntArray()[0] == CPT_CSH_CDT) {
             groupBy = " GROUP BY f_dest, tp_pay ";
             orderBy = " ORDER BY f_dest, tp_pay ";
             detailColumn = "TIPO DE PAGO";
-            filter = "POR DESTINO - TIPO DE PAGO";
-            tpDetail = 2;
-            tpGroup = 3;
+            filter = "POR DESTINO / TIPO DE PAGO";
+            tpDetail = CPT_CSH_CDT;
+            tpGroup = CPT_DOM_INT;
             showGroup = true;
         }
-        else if (moFieldConcept.getKeyAsIntArray()[0] == 3 && moFieldCrossWith.getKeyAsIntArray()[0] == 4) {
+        else if (moFieldConcept.getKeyAsIntArray()[0] == CPT_DOM_INT && moFieldCrossWith.getKeyAsIntArray()[0] == CPT_TAX) {
             groupBy = " GROUP BY f_dest, tax ";
             orderBy = " ORDER BY f_dest, tax ";
             detailColumn = "IMPUESTO";
-            filter = "POR DESTINO - IMPUESTO";
-            tpDetail = 4;
-            tpGroup = 3;
+            filter = "POR DESTINO / IMPUESTO";
+            tpDetail = CPT_TAX;
+            tpGroup = CPT_DOM_INT;
             showGroup = true;
         }
 
-        // Tax options:
+        // By tax options:
 
-        else if (moFieldConcept.getKeyAsIntArray()[0] == 4 && moFieldCrossWith.getKeyAsIntArray()[0] == 0) {
+        else if (moFieldConcept.getKeyAsIntArray()[0] == CPT_TAX && moFieldCrossWith.getKeyAsIntArray()[0] == 0) {
             groupBy = " GROUP BY tax ";
             orderBy = " ORDER BY tax ";
             detailColumn = "IMPUESTO";
             filter = "POR IMPUESTO";
-            tpDetail = 4;
+            tpDetail = CPT_TAX;
         }
-        else if (moFieldConcept.getKeyAsIntArray()[0] == 4 && moFieldCrossWith.getKeyAsIntArray()[0] == 1) {
+        else if (moFieldConcept.getKeyAsIntArray()[0] == CPT_TAX && moFieldCrossWith.getKeyAsIntArray()[0] == CPT_BRA) {
             groupBy = " GROUP BY tax, bpb ";
             orderBy = " ORDER BY tax, bpb ";
             detailColumn = "SUCURSAL EMPRESA";
-            filter = "POR IMPUESTO - SUCURSAL EMPRESA";
-            tpDetail = 1;
-            tpGroup = 4;
+            filter = "POR IMPUESTO / SUCURSAL EMPRESA";
+            tpDetail = CPT_BRA;
+            tpGroup = CPT_TAX;
             showGroup = true;
         }
-        else if (moFieldConcept.getKeyAsIntArray()[0] == 4 && moFieldCrossWith.getKeyAsIntArray()[0] == 2) {
+        else if (moFieldConcept.getKeyAsIntArray()[0] == CPT_TAX && moFieldCrossWith.getKeyAsIntArray()[0] == CPT_CSH_CDT) {
             groupBy = " GROUP BY tax, tp_pay ";
             orderBy = " ORDER BY tax, tp_pay ";
             detailColumn = "TIPO DE PAGO";
-            filter = "POR IMPUESTO - TIPO DE PAGO";
-            tpDetail = 2;
-            tpGroup = 4;
+            filter = "POR IMPUESTO / TIPO DE PAGO";
+            tpDetail = CPT_CSH_CDT;
+            tpGroup = CPT_TAX;
             showGroup = true;
         }
-        else if (moFieldConcept.getKeyAsIntArray()[0] == 4 && moFieldCrossWith.getKeyAsIntArray()[0] == 3) {
+        else if (moFieldConcept.getKeyAsIntArray()[0] == CPT_TAX && moFieldCrossWith.getKeyAsIntArray()[0] == CPT_DOM_INT) {
             groupBy = " GROUP BY tax, f_dest ";
             orderBy = " ORDER BY tax, f_dest ";
             detailColumn = "PAÍS";
-            filter = "POR IMPUESTO - DESTINO";
-            tpDetail = 3;
-            tpGroup = 4;
+            filter = "POR IMPUESTO / DESTINO";
+            tpDetail = CPT_DOM_INT;
+            tpGroup = CPT_TAX;
             showGroup = true;
         }
 
@@ -617,7 +625,7 @@ public class SDialogRepSalesPurchasesByConcept extends javax.swing.JDialog imple
     }
 
     private void renderComboBoxTax() {
-        if (moFieldConcept.getKeyAsIntArray()[0] == 4 || (!mbResetingComboBixCrossWith && moFieldCrossWith.getKeyAsIntArray()[0] == 4)) {
+        if (moFieldConcept.getKeyAsIntArray()[0] == CPT_TAX || (!mbResetingComboBixCrossWith && moFieldCrossWith.getKeyAsIntArray()[0] == CPT_TAX)) {
             jcbTaxBase.setEnabled(true);
         }
         else {
@@ -713,7 +721,7 @@ public class SDialogRepSalesPurchasesByConcept extends javax.swing.JDialog imple
                 validation.setMessage("La fecha final debe ser mayor o igual a la fecha inicial.");
                 validation.setComponent(jftDateEnd);
             }
-            else if ((moFieldConcept.getKeyAsIntArray()[0] == 4 || moFieldCrossWith.getKeyAsIntArray()[0] == 4) && moFieldTaxBase.getKeyAsIntArray()[0] == 0) {
+            else if ((moFieldConcept.getKeyAsIntArray()[0] == CPT_TAX || moFieldCrossWith.getKeyAsIntArray()[0] == CPT_TAX) && moFieldTaxBase.getKeyAsIntArray()[0] == 0) {
                 validation.setMessage("Se debe seleccionar una opción para el campo '" + jlTaxBase.getText() + "'.");
                 validation.setComponent(jcbTaxBase);
             }
