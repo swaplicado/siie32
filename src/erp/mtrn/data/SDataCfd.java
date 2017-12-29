@@ -6,6 +6,7 @@
 package erp.mtrn.data;
 
 import cfd.DCfd;
+import cfd.DCfdUtils;
 import erp.cfd.SCfdConsts;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
@@ -38,7 +39,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Juan Barajas, Claudio Peña
+ * @author Juan Barajas, Claudio Peña, Sergio Flores
  */
 public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -162,8 +163,8 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         resultSet = connection.createStatement().executeQuery(sql);
                 
         if (resultSet.next()) {
-            msDocXmlRfcEmi = resultSet.getString("_xml_emisor_rfc");
-            msDocXmlRfcRec = resultSet.getString("_xml_receptor_rfc");
+            msDocXmlRfcEmi = DCfdUtils.cleanXmlEntities(resultSet.getString("_xml_emisor_rfc"));
+            msDocXmlRfcRec = DCfdUtils.cleanXmlEntities(resultSet.getString("_xml_receptor_rfc"));
             mdDocXmlTot = resultSet.getDouble("_xml_total");
             msDocXmlMon = resultSet.getString("_xml_moneda");
             mdDocXmlTc = resultSet.getDouble("_xml_tc");
@@ -188,8 +189,8 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             resultSet = connection.createStatement().executeQuery(sql);
             
             if (resultSet.next()) {
-                msDocXmlRfcEmi = resultSet.getString("_xml_emisor_rfc");
-                msDocXmlRfcRec = resultSet.getString("_xml_receptor_rfc");
+                msDocXmlRfcEmi = DCfdUtils.cleanXmlEntities(resultSet.getString("_xml_emisor_rfc"));
+                msDocXmlRfcRec = DCfdUtils.cleanXmlEntities(resultSet.getString("_xml_receptor_rfc"));
                 mdDocXmlTot = resultSet.getDouble("_xml_total");
                 msDocXmlMon = resultSet.getString("_xml_moneda");
                 mdDocXmlTc = resultSet.getDouble("_xml_tc");

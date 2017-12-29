@@ -8,7 +8,6 @@ package erp.mtrn.data;
 import cfd.DCfdUtils;
 import cfd.DElement;
 import cfd.ver32.DElementComprobante;
-import cfd.ver32.DElementTimbreFiscalDigital;
 import cfd.ver33.DElementConcepto;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdXmlCatalogs;
@@ -603,12 +602,13 @@ public class SCfdPrint {
         if (comprobante.getEltOpcComplemento() != null) {
             for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
                 if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
-                    map.put("sCfdiVersion", ((DElementTimbreFiscalDigital) element).getAttVersion().getString());
-                    map.put("sCfdiUuid", ((DElementTimbreFiscalDigital) element).getAttUuid().getString());
-                    map.put("sCfdiSelloCFD", ((DElementTimbreFiscalDigital) element).getAttSelloCfd().getString());
-                    map.put("sCfdiSelloSAT", ((DElementTimbreFiscalDigital) element).getAttSelloSAT().getString());
-                    map.put("sCfdiNoCertificadoSAT", ((DElementTimbreFiscalDigital) element).getAttNoCertificadoSAT().getString());
-                    map.put("sCfdiFechaTimbre", ((DElementTimbreFiscalDigital) element).getAttFechaTimbrado().getString());
+                    cfd.ver32.DElementTimbreFiscalDigital tfd = (cfd.ver32.DElementTimbreFiscalDigital) element;
+                    map.put("sCfdiVersion", tfd.getAttVersion().getString());
+                    map.put("sCfdiUuid", tfd.getAttUUID().getString());
+                    map.put("sCfdiSelloCFD", tfd.getAttSelloCFD().getString());
+                    map.put("sCfdiSelloSAT", tfd.getAttSelloSAT().getString());
+                    map.put("sCfdiNoCertificadoSAT", tfd.getAttNoCertificadoSAT().getString());
+                    map.put("sCfdiFechaTimbre", tfd.getAttFechaTimbrado().getString());
                 }
             }
         }
@@ -841,12 +841,15 @@ public class SCfdPrint {
         if (comprobante.getEltOpcComplemento() != null) {
             for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
                 if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
-                    paramsMap.put("sCfdiVersion", ((DElementTimbreFiscalDigital) element).getAttVersion().getString());
-                    paramsMap.put("sCfdiUuid", ((DElementTimbreFiscalDigital) element).getAttUuid().getString());
-                    paramsMap.put("sCfdiSelloCFD", sSelloEmisor = ((DElementTimbreFiscalDigital) element).getAttSelloCfd().getString());
-                    paramsMap.put("sCfdiSelloSAT", ((DElementTimbreFiscalDigital) element).getAttSelloSAT().getString());
-                    paramsMap.put("sCfdiNoCertificadoSAT", ((DElementTimbreFiscalDigital) element).getAttNoCertificadoSAT().getString());
-                    paramsMap.put("sCfdiFechaTimbre", ((DElementTimbreFiscalDigital) element).getAttFechaTimbrado().getString());
+                    cfd.ver33.DElementTimbreFiscalDigital tfd = (cfd.ver33.DElementTimbreFiscalDigital) element;
+                    paramsMap.put("sCfdiVersion", tfd.getAttVersion().getString());
+                    paramsMap.put("sCfdiUuid", tfd.getAttUUID().getString());
+                    paramsMap.put("sCfdiSelloCFD", sSelloEmisor = tfd.getAttSelloCFD().getString());
+                    paramsMap.put("sCfdiSelloSAT", tfd.getAttSelloSAT().getString());
+                    paramsMap.put("sCfdiNoCertificadoSAT", tfd.getAttNoCertificadoSAT().getString());
+                    paramsMap.put("sCfdiFechaTimbre", tfd.getAttFechaTimbrado().getString());
+                    paramsMap.put("sCfdiRfcProvCertif", tfd.getAttRfcProvCertif().getString());
+                    paramsMap.put("sCfdiLeyenda", tfd.getAttLeyenda().getString());
                 }
             }
         }
@@ -1331,13 +1334,13 @@ public class SCfdPrint {
                 map.put("dCfdTotalIsr", dTotalIsr);
             }
             else if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
-
-                map.put("sCfdiVersion", ((DElementTimbreFiscalDigital) element).getAttVersion().getString());
-                map.put("sCfdiUuid", ((DElementTimbreFiscalDigital) element).getAttUuid().getString());
-                map.put("sCfdiSelloCFD", ((DElementTimbreFiscalDigital) element).getAttSelloCfd().getString());
-                map.put("sCfdiSelloSAT", ((DElementTimbreFiscalDigital) element).getAttSelloSAT().getString());
-                map.put("sCfdiNoCertificadoSAT", ((DElementTimbreFiscalDigital) element).getAttNoCertificadoSAT().getString());
-                map.put("sCfdiFechaTimbre", ((DElementTimbreFiscalDigital) element).getAttFechaTimbrado().getString());
+                cfd.ver32.DElementTimbreFiscalDigital tfd = (cfd.ver32.DElementTimbreFiscalDigital) element;
+                map.put("sCfdiVersion", tfd.getAttVersion().getString());
+                map.put("sCfdiUuid", tfd.getAttUUID().getString());
+                map.put("sCfdiSelloCFD", tfd.getAttSelloCFD().getString());
+                map.put("sCfdiSelloSAT", tfd.getAttSelloSAT().getString());
+                map.put("sCfdiNoCertificadoSAT", tfd.getAttNoCertificadoSAT().getString());
+                map.put("sCfdiFechaTimbre", tfd.getAttFechaTimbrado().getString());
             }
         }
 
@@ -1682,13 +1685,13 @@ public class SCfdPrint {
                 map.put("dCfdTotalIsr", dTotalIsr);
             }
             else if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
-
-                map.put("sCfdiVersion", ((DElementTimbreFiscalDigital) element).getAttVersion().getString());
-                map.put("sCfdiUuid", ((DElementTimbreFiscalDigital) element).getAttUuid().getString());
-                map.put("sCfdiSelloCFD", ((DElementTimbreFiscalDigital) element).getAttSelloCfd().getString());
-                map.put("sCfdiSelloSAT", ((DElementTimbreFiscalDigital) element).getAttSelloSAT().getString());
-                map.put("sCfdiNoCertificadoSAT", ((DElementTimbreFiscalDigital) element).getAttNoCertificadoSAT().getString());
-                map.put("sCfdiFechaTimbre", ((DElementTimbreFiscalDigital) element).getAttFechaTimbrado().getString());
+                cfd.ver32.DElementTimbreFiscalDigital tfd = (cfd.ver32.DElementTimbreFiscalDigital) element;
+                map.put("sCfdiVersion", tfd.getAttVersion().getString());
+                map.put("sCfdiUuid", tfd.getAttUUID().getString());
+                map.put("sCfdiSelloCFD", tfd.getAttSelloCFD().getString());
+                map.put("sCfdiSelloSAT", tfd.getAttSelloSAT().getString());
+                map.put("sCfdiNoCertificadoSAT", tfd.getAttNoCertificadoSAT().getString());
+                map.put("sCfdiFechaTimbre", tfd.getAttFechaTimbrado().getString());
             }
         }
 

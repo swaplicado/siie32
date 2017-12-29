@@ -1970,11 +1970,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldFkOriginalUnitId.setPickerButton(jbFkOriginalUnitId);
         moFieldIsDiscountDocApplying = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsDiscountDocApplying);
         moFieldIsDiscountUnitaryPercentage = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsDiscountUnitaryPercentage);
-        moFieldDiscountUnitaryPercentage = new SFormField(miClient, SLibConstants.DATA_TYPE_FLOAT, false, jtfDiscountUnitaryPercentage, jckIsDiscountUnitaryPercentage);
+        moFieldDiscountUnitaryPercentage = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfDiscountUnitaryPercentage, jckIsDiscountUnitaryPercentage);
         moFieldDiscountUnitaryPercentage.setIsPercent(true);
         moFieldDiscountUnitaryPercentage.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat());
         moFieldIsDiscountEntryPercentage = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsDiscountEntryPercentage);
-        moFieldDiscountEntryPercentage = new SFormField(miClient, SLibConstants.DATA_TYPE_FLOAT, false, jtfDiscountEntryPercentage, jckIsDiscountEntryPercentage);
+        moFieldDiscountEntryPercentage = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfDiscountEntryPercentage, jckIsDiscountEntryPercentage);
         moFieldDiscountEntryPercentage.setIsPercent(true);
         moFieldDiscountEntryPercentage.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat());
         moFieldOriginalQuantity = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfOriginalQuantity, jlOriginalQuantity);
@@ -1985,20 +1985,22 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldOriginalPriceUnitaryCy.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormat());
         moFieldOriginalDiscountUnitaryCy = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfOriginalDiscountUnitaryCy, jlOriginalDiscountUnitaryCy);
         moFieldOriginalDiscountUnitaryCy.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormat());
-        moFieldDiscountEntryCy = new SFormField(miClient, SLibConstants.DATA_TYPE_FLOAT, false, jtfDiscountEntryCy, jlDiscountEntry);
-        moFieldDiscountDocCy = new SFormField(miClient, SLibConstants.DATA_TYPE_FLOAT, false, jtfDiscountDocCy, jlDiscountDoc);
-        moFieldSurplusPercentage = new SFormField(miClient, SLibConstants.DATA_TYPE_FLOAT, false, jtfSurplusPercentage, jckIsSurplusPercentageApplying);
+        moFieldDiscountEntryCy = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfDiscountEntryCy, jlDiscountEntry);
+        moFieldDiscountEntryCy.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
+        moFieldDiscountDocCy = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfDiscountDocCy, jlDiscountDoc);
+        moFieldDiscountDocCy.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
+        moFieldSurplusPercentage = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfSurplusPercentage, jckIsSurplusPercentageApplying);
         moFieldSurplusPercentage.setIsPercent(true);
         moFieldSurplusPercentage.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat());
         
         moFieldIsDpsPriceVariable = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDpsReqMonthDelivery);
         moFieldIsDpsPriceVariable.setBoolean(true);
         
-        moFieldDpsContractBase = new SFormField(miClient, SLibConstants.DATA_TYPE_FLOAT, false, jtfDpsContractBase, jlDpsContractBase);
+        moFieldDpsContractBase = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfDpsContractBase, jlDpsContractBase);
         moFieldDpsContractBase.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
-        moFieldDpsContractFuture = new SFormField(miClient, SLibConstants.DATA_TYPE_FLOAT, false, jtfDpsContractFuture, jlDpsContractFuture);
+        moFieldDpsContractFuture = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfDpsContractFuture, jlDpsContractFuture);
         moFieldDpsContractFuture.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
-        moFieldDpsContractFactor = new SFormField(miClient, SLibConstants.DATA_TYPE_FLOAT, false, jtfDpsContractFactor, jlDpsContractFactor);
+        moFieldDpsContractFactor = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfDpsContractFactor, jlDpsContractFactor);
         moFieldDpsContractFactor.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
         moFieldDpsContractFactor.setDefaultValue(0.10d);
         moFieldContractPriceReferenceNumbrer = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfContractPriceNumbrerReference, jlContractPriceNumbrerReference);
@@ -2012,15 +2014,15 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldContractPriceMonth.setDefaultValue(SLibTimeUtilities.digestYearMonth(miClient.getSession().getCurrentDate())[1]);
         moFieldContractPriceMonth.setIntegerMin(1);
         moFieldContractPriceMonth.setIntegerMax(12);
-        moFieldPriceOriginalQuantity = new SFormField(miClient, SLibConstants.DATA_TYPE_FLOAT, false, jtfPriceOriginalQuantity, jlPriceOriginalQuantity);
+        moFieldPriceOriginalQuantity = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfPriceOriginalQuantity, jlPriceOriginalQuantity);
         moFieldPriceOriginalQuantity.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat());
         moFieldPriceOriginalPriceUnitaryCy = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfPriceOriginalPriceUnitaryCy, jlPriceOriginalPriceUnitaryCy);
         moFieldPriceOriginalPriceUnitaryCy.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormat());
-        moFieldContractBase = new SFormField(miClient, SLibConstants.DATA_TYPE_FLOAT, false, jtfContractBase, jlContractBase);
+        moFieldContractBase = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfContractBase, jlContractBase);
         moFieldContractBase.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
-        moFieldContractFuture = new SFormField(miClient, SLibConstants.DATA_TYPE_FLOAT, false, jtfContractFuture, jlContractFuture);
+        moFieldContractFuture = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfContractFuture, jlContractFuture);
         moFieldContractFuture.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
-        moFieldContractFactor = new SFormField(miClient, SLibConstants.DATA_TYPE_FLOAT, false, jtfContractFactor, jlContractFactor);
+        moFieldContractFactor = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfContractFactor, jlContractFactor);
         moFieldContractFactor.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
                 
         moFieldFkVehicleTypeId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkVehicleTypeId_n, jlFkVehicleTypeId_n);

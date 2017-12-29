@@ -18,6 +18,7 @@ import cfd.DElement;
 import cfd.ver2.DAttributeOptionFormaDePago;
 import cfd.ver3.DCfdVer3Consts;
 import cfd.ver32.DElementTimbreFiscalDigital;
+import cfd.ver33.DCfdi33Catalogs;
 import cfd.ver33.DElementCfdiRelacionados;
 import cfd.ver33.DElementImpuestos;
 import erp.SClient;
@@ -3290,7 +3291,7 @@ public abstract class SCfdUtils implements Serializable {
         cfd.ver2.DElementImpuestoTraslado impuestoTraslado = new cfd.ver2.DElementImpuestoTraslado();
 
         for (SCfdDataImpuesto tax : xmlCfd.getElementsImpuestos(fVersion)) {
-            switch (tax.getImpuestoBasico()) {
+            switch (tax.getImpuestoTipo()) {
                 case SModSysConsts.FINS_TP_TAX_RETAINED:
                     dTotalImptoRetenido += tax.getImporte();
                     impuestoRetencion.getAttImpuesto().setOption(tax.getImpuesto());
@@ -3307,7 +3308,7 @@ public abstract class SCfdUtils implements Serializable {
                     impuestosTrasladados.getEltHijosImpuestoTrasladado().add(impuestoTraslado);
                     break;
                 default:
-                    throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + tax.getImpuestoBasico() + ").");
+                    throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + tax.getImpuestoTipo() + ").");
             }
         }
 
@@ -3445,7 +3446,7 @@ public abstract class SCfdUtils implements Serializable {
                 cfd.ver32.DElementImpuestoRetencion impuestoRetencion = new cfd.ver32.DElementImpuestoRetencion();
                 cfd.ver32.DElementImpuestoTraslado impuestoTraslado = new cfd.ver32.DElementImpuestoTraslado();
 
-                switch (tax.getImpuestoBasico()) {
+                switch (tax.getImpuestoTipo()) {
                     case SModSysConsts.FINS_TP_TAX_RETAINED:
                         dTotalImptoRetenido += tax.getImporte();
                         impuestoRetencion.getAttImpuesto().setOption(tax.getImpuesto());
@@ -3462,7 +3463,7 @@ public abstract class SCfdUtils implements Serializable {
                         impuestosTrasladados.getEltHijosImpuestoTrasladado().add(impuestoTraslado);
                         break;
                     default:
-                        throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + tax.getImpuestoBasico() + ").");
+                        throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + tax.getImpuestoTipo() + ").");
                 }
             }
 
@@ -3498,8 +3499,6 @@ public abstract class SCfdUtils implements Serializable {
     }
     
     public static cfd.DElement createCfdi33RootElement(final SClientInterface client, final SCfdXmlCfdi33 xmlCfdi) throws Exception {
-        double dTotalImptoRetenido = 0;
-        double dTotalImptoTrasladado = 0;
         SDbCfdBizPartner emisor = null;
         SDbCfdBizPartner receptor = null;
         SCfdDataBizPartner asociadoNegocios = null;
@@ -3598,21 +3597,29 @@ public abstract class SCfdUtils implements Serializable {
         // Taxes:
 
         if (xmlCfdi.getCfdType() != SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
+            boolean exemptTaxesAvailable = false;
+            double dTotalImptoRetenido = 0;
+            double dTotalImptoTrasladado = 0;
             cfd.ver33.DElementImpuestosRetenciones impuestosRetenciones = new cfd.ver33.DElementImpuestosRetenciones();
             cfd.ver33.DElementImpuestosTraslados impuestosTrasladados = new cfd.ver33.DElementImpuestosTraslados();
 
-            for (SCfdDataImpuesto tax : xmlCfdi.getElementsImpuestos(DCfdConsts.CFDI_VER_33)) {
-                switch (tax.getImpuestoBasico()) {
+            for (SCfdDataImpuesto impuesto : xmlCfdi.getElementsImpuestos(DCfdConsts.CFDI_VER_33)) {
+                switch (impuesto.getImpuestoTipo()) {
                     case SModSysConsts.FINS_TP_TAX_RETAINED:
-                        dTotalImptoRetenido += tax.getImporte();
-                        impuestosRetenciones.getEltImpuestoRetenciones().add((cfd.ver33.DElementImpuestoRetencion) tax.createRootElementImpuesto33());
+                        dTotalImptoRetenido += impuesto.getImporte();
+                        impuestosRetenciones.getEltImpuestoRetenciones().add((cfd.ver33.DElementImpuestoRetencion) impuesto.createRootElementImpuesto33());
                         break;
                     case SModSysConsts.FINS_TP_TAX_CHARGED:
-                        dTotalImptoTrasladado += tax.getImporte();
-                        impuestosTrasladados.getEltImpuestoTrasladados().add((cfd.ver33.DElementImpuestoTraslado) tax.createRootElementImpuesto33());
+                        if (impuesto.getTipoFactor().compareToIgnoreCase(DCfdi33Catalogs.FAC_TP_EXENTO) == 0) {
+                            exemptTaxesAvailable = true;
+                        }
+                        else {
+                            dTotalImptoTrasladado += impuesto.getImporte();
+                            impuestosTrasladados.getEltImpuestoTrasladados().add((cfd.ver33.DElementImpuestoTraslado) impuesto.createRootElementImpuesto33());
+                        }
                         break;
                     default:
-                        throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + tax.getImpuestoBasico() + ").");
+                        throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + impuesto.getImpuestoTipo() + ").");
                 }
             }
 
@@ -3620,16 +3627,25 @@ public abstract class SCfdUtils implements Serializable {
                 if (comprobante.getEltOpcImpuestos() == null) {
                     comprobante.setEltOpcImpuestos(new DElementImpuestos(comprobante));
                 }
+                
                 comprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos().setDouble(dTotalImptoRetenido);
+                
                 comprobante.getEltOpcImpuestos().setEltOpcImpuestosRetenciones(impuestosRetenciones);
             }
 
-            if (!impuestosTrasladados.getEltImpuestoTrasladados().isEmpty()) {
+            if (!impuestosTrasladados.getEltImpuestoTrasladados().isEmpty() || exemptTaxesAvailable) {
                 if (comprobante.getEltOpcImpuestos() == null) {
                     comprobante.setEltOpcImpuestos(new DElementImpuestos(comprobante));
                 }
+                
                 comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().setDouble(dTotalImptoTrasladado);
-                comprobante.getEltOpcImpuestos().setEltOpcImpuestosTrasladados(impuestosTrasladados);
+                if (exemptTaxesAvailable) {
+                    comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().setCanBeZero(true);
+                }
+                
+                if (!impuestosTrasladados.getEltImpuestoTrasladados().isEmpty()) {
+                    comprobante.getEltOpcImpuestos().setEltOpcImpuestosTrasladados(impuestosTrasladados);
+                }
             }
         }
         

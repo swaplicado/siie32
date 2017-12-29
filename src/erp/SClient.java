@@ -106,7 +106,7 @@ import sa.lib.xml.SXmlUtils;
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 105.06";
+    public static final String APP_RELEASE = "3.2 105.08";
     public static final String APP_COPYRIGHT = "2007-2017";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
@@ -1178,7 +1178,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         try {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
-            moServer = (SServerRemote) Naming.lookup("//" + moParamsApp.getErpHost() + ":" + moParamsApp.getErpRmiRegistryPort() + "/" + moParamsApp.getErpInstance());
+            moServer = (SServerRemote) Naming.lookup("rmi://" + moParamsApp.getErpHost() + ":" + moParamsApp.getErpRmiRegistryPort() + "/" + moParamsApp.getErpInstance());
             lookup = true;
 
             moLogin.setCompanies(readCompanies());
