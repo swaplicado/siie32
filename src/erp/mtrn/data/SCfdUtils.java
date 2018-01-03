@@ -2399,52 +2399,53 @@ public abstract class SCfdUtils implements Serializable {
         else {
             if (canPrint(cfd, isSaving)) {
                 cfdPrint = new SCfdPrint(client);
-
-                if (typeCfd != SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
-                    dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
-                    params = createCfdParams(client, dps);
-                    dps.setAuxCfdParams(params);
-                }
-
-                if (cfd.getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFD) {
-                    cfdPrint.printCfd(cfd, printMode, dps);
-                }
-                else if (cfd.getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32) {
-                    switch (typeCfd) {
-                        case SDataConstantsSys.TRNS_TP_CFD_INV:
-                            cfdPrint.printCfdi32(cfd, printMode, dps);
-                            break;
-                        case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
-                            if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_11) {
-                                cfdPrint.printPayrollReceipt(cfd, printMode, copies, subtypeCfd);
-                            }
-                            else if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_12) {
-                                cfdPrint.printPayrollReceipt32_12(cfd, printMode, copies, subtypeCfd);
-                            }
-                            break;
-                        default:
-                            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-                    }
-                }
-                else if (cfd.getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
-                    switch (typeCfd) {
-                        case SDataConstantsSys.TRNS_TP_CFD_INV:
-                            cfdPrint.printCfdi33(cfd, printMode, dps);
-                            break;
-                        case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
-                            if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_11) {
-                                cfdPrint.printPayrollReceipt(cfd, printMode, copies, subtypeCfd);
-                            }
-                            else if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_12) {
-                                //cfdPrint.printPayrollReceipt33_12(cfd, printMode, copies, subtypeCfd); XXX jbarajas pendiente CFDI 3.3
-                            }
-                            break;
-                        default:
-                            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-                    }
-                }
-                else {
-                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                
+                switch (typeCfd) {
+                    case SDataConstantsSys.TRNS_TP_CFD_INV:
+                        dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
+                        params = createCfdParams(client, dps);
+                        dps.setAuxCfdParams(params);
+                        
+                        switch (cfd.getFkXmlTypeId()) {
+                            case SDataConstantsSys.TRNS_TP_XML_CFD:
+                                cfdPrint.printCfd(cfd, printMode, dps);
+                                break;
+                            case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
+                                cfdPrint.printCfdi32(cfd, printMode, dps);
+                                break;
+                            case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                                cfdPrint.printCfdi33(cfd, printMode, dps);
+                                break;
+                            default:
+                                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                        }
+                        break;
+                        
+                    case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
+                        switch (cfd.getFkXmlTypeId()) {
+                            case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
+                                if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_11) {
+                                    cfdPrint.printPayrollReceipt32_11(cfd, printMode, copies, subtypeCfd);
+                                }
+                                else if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_12) {
+                                    cfdPrint.printPayrollReceipt32_12(cfd, printMode, copies, subtypeCfd);
+                                }
+                                break;
+                            case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                                if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_11) {
+                                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                                }
+                                else if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_12) {
+                                    cfdPrint.printPayrollReceipt33_12(cfd, printMode, copies, subtypeCfd);
+                                }
+                                break;
+                            default:
+                                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                        }
+                        break;
+                        
+                    default:
+                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
             }
         }
@@ -2950,20 +2951,50 @@ public abstract class SCfdUtils implements Serializable {
                                 dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
                                 params = createCfdParams(client, dps);
                                 dps.setAuxCfdParams(params);
-                                cfdPrint.printCfdi32(cfd, SDataConstantsPrint.PRINT_MODE_PDF, dps);
+                                
+                                switch (cfd.getFkXmlTypeId()) {
+                                    case SDataConstantsSys.TRNS_TP_XML_CFD:
+                                        cfdPrint.printCfd(cfd, SDataConstantsPrint.PRINT_MODE_PDF, dps);
+                                        break;
+                                    case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
+                                        cfdPrint.printCfdi32(cfd, SDataConstantsPrint.PRINT_MODE_PDF, dps);
+                                        break;
+                                    case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                                        cfdPrint.printCfdi33(cfd, SDataConstantsPrint.PRINT_MODE_PDF, dps);
+                                        break;
+                                    default:
+                                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                                }
                                 break;
+                                
                             case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
-                                if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_11) {
-                                    cfdPrint.printPayrollReceipt(cfd, SDataConstantsPrint.PRINT_MODE_PDF, subtypeCfd);
-                                }
-                                else if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_12) {
-                                    cfdPrint.printPayrollReceipt32_12(cfd, SDataConstantsPrint.PRINT_MODE_PDF, subtypeCfd);
+                                switch (cfd.getFkXmlTypeId()) {
+                                    case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
+                                        if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_11) {
+                                            cfdPrint.printPayrollReceipt32_11(cfd, SDataConstantsPrint.PRINT_MODE_PDF, SDataConstantsPrint.PRINT_A_COPY, subtypeCfd);
+                                        }
+                                        else if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_12) {
+                                            cfdPrint.printPayrollReceipt32_12(cfd, SDataConstantsPrint.PRINT_MODE_PDF, SDataConstantsPrint.PRINT_A_COPY, subtypeCfd);
+                                        }
+                                        break;
+                                    case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                                        if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_11) {
+                                            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                                        }
+                                        else if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_12) {
+                                            cfdPrint.printPayrollReceipt33_12(cfd, SDataConstantsPrint.PRINT_MODE_PDF, SDataConstantsPrint.PRINT_A_COPY, subtypeCfd);
+                                        }
+                                        break;
+                                    default:
+                                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                                 }
                                 break;
+                                
                             default:
                                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                         }
                     }
+                    
                     updateProcessCfd(client, cfd, false);
                     client.showMsgBoxInformation(SLibConsts.MSG_PROCESS_FINISHED);
                 }
