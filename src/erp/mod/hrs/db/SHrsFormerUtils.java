@@ -20,9 +20,26 @@ import sa.lib.SLibUtils;
 /**
  *
  * @author Sergio Flores
+ * 
+ * Maintenance Log:
+ * 2018-01-02, Sergio Flores:
+ *  Implementation of payroll into CFDI 3.3.
  */
 public abstract class SHrsFormerUtils {
 
+    /**
+     * Read payroll from database of former system (SIIE 1.0, a.k.a., Magic)
+     * @param client
+     * @param statementClient
+     * @param payrollId
+     * @param nPkCompanyId
+     * @param tPayrollDate
+     * @param tPayrollDatePayment
+     * @return
+     * @throws SQLException
+     * @throws Exception 
+     */
+    @Deprecated
     public static SHrsFormerPayroll readFormerPayroll(final SClientInterface client, final Statement statementClient, final int payrollId, final int nPkCompanyId, final java.util.Date tPayrollDate, final java.util.Date tPayrollDatePayment) throws SQLException, Exception {
         int f_emp_map_bp = 0;
         int f_emp_id = 0;
@@ -384,6 +401,7 @@ public abstract class SHrsFormerUtils {
     }
 
     // XXX improve this!, this method should not exist, use instead other technique, such as erp.data.SDataReadDescriptions (Sergio Flores, 2017-08-10).
+    @Deprecated
     public static String getPaymentMethodName(final SClientInterface client, final int paymentMethodId) throws Exception {
         String paymentMethod = "";
         String sql = "";
@@ -401,6 +419,7 @@ public abstract class SHrsFormerUtils {
         return paymentMethod;
     }
     
+    @Deprecated
     public static String getPaymentMethodCode(final SClientInterface client, final int paymentMethodId) throws Exception {
         String paymentMethod = "";
         String sql = "";
@@ -418,6 +437,7 @@ public abstract class SHrsFormerUtils {
         return paymentMethod;
     }
 
+    @Deprecated
     public static Connection getConnectionOdbc(final SClientInterface client) throws Exception {
         Properties properties = null;
         Connection connectionOdbc;

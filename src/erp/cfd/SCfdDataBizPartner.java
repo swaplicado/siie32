@@ -6,9 +6,9 @@ package erp.cfd;
 
 import cfd.DCfdConsts;
 import cfd.DElement;
+import cfd.ver3.DCfdVer3Utils;
 import cfd.ver3.cce11.DElementTipoDomicilioInt;
 import cfd.ver3.cce11.DElementTipoDomicilioNac;
-import cfd.ver32.DVer3Utils;
 import erp.data.SDataConstantsSys;
 import erp.mod.fin.db.SFinConsts;
 
@@ -184,7 +184,7 @@ public class SCfdDataBizPartner {
             cfd.ver33.DElementEmisor emisor = new cfd.ver33.DElementEmisor();
 
             emisor.getAttRfc().setString(msBizPartnerRfc);
-            emisor.getAttNombre().setString(DVer3Utils.formatAttributeValueAsText(msBizPartnerName));
+            emisor.getAttNombre().setString(DCfdVer3Utils.formatAttributeValueAsText(msBizPartnerName));
             //emisor.getAttRegimenFiscal().setString(...
             
             element = emisor;
@@ -329,7 +329,7 @@ public class SCfdDataBizPartner {
             cfd.ver33.DElementReceptor receptor = new cfd.ver33.DElementReceptor();
 
             receptor.getAttRfc().setString(msBizPartnerRfc);
-            receptor.getAttNombre().setString(DVer3Utils.formatAttributeValueAsText(msBizPartnerName));
+            receptor.getAttNombre().setString(DCfdVer3Utils.formatAttributeValueAsText(msBizPartnerName));
 
             if (mbIsCfdiWithIntCommerce) {
                 receptor.getAttResidenciaFiscal().setString(msBizPartnerCountryCode);

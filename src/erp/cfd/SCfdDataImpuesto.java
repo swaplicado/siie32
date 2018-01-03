@@ -5,20 +5,22 @@
 package erp.cfd;
 
 import cfd.DCfdTax;
+import cfd.ver33.DCfdi33Catalogs;
 import erp.mod.SModSysConsts;
 import sa.lib.SLibUtils;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SCfdDataImpuesto implements DCfdTax {
     
-    protected final String FACT_TP_TASA = "Tasa";
-    protected final String FACT_TP_CUOTA = "Cuota";
-    protected final String FACT_TP_EXENTO = "Excento";
+    /*
+     * NOTE:
+     * The trick identifing taxes is that its text is equal (ignoring case) to the corresponding tax description in SIIE taxes catalog!, WTF!
+     */
     
-    protected int mnImpuestoBasico;
+    protected int mnImpuestoTipo;
     protected int mnImpuesto;
     protected String msImpuestoClave;
     protected double mdBase;
@@ -29,14 +31,14 @@ public class SCfdDataImpuesto implements DCfdTax {
     private String getFactorTypeSat(String factor) throws Exception {
         String factorType = "";
         
-        if (factor.compareToIgnoreCase(FACT_TP_TASA) == 0) {
-            factorType = FACT_TP_TASA;
+        if (factor.compareToIgnoreCase(DCfdi33Catalogs.FAC_TP_TASA) == 0) {
+            factorType = DCfdi33Catalogs.FAC_TP_TASA;
         }
-        else if (factor.compareToIgnoreCase(FACT_TP_CUOTA) == 0) {
-            factorType = FACT_TP_CUOTA;
+        else if (factor.compareToIgnoreCase(DCfdi33Catalogs.FAC_TP_CUOTA) == 0) {
+            factorType = DCfdi33Catalogs.FAC_TP_CUOTA;
         }
-        else if (factor.compareToIgnoreCase(FACT_TP_EXENTO) == 0) {
-            factorType = FACT_TP_EXENTO;
+        else if (factor.compareToIgnoreCase(DCfdi33Catalogs.FAC_TP_EXENTO) == 0) {
+            factorType = DCfdi33Catalogs.FAC_TP_EXENTO;
         }
         else {
             throw new Exception("El tipo de factor (" + factor + ") no es válido.");
@@ -46,7 +48,7 @@ public class SCfdDataImpuesto implements DCfdTax {
     }
     
     public SCfdDataImpuesto() {
-        mnImpuestoBasico = 0;
+        mnImpuestoTipo = 0;
         mnImpuesto = 0;
         msImpuestoClave = "";
         mdBase = 0;
@@ -55,7 +57,7 @@ public class SCfdDataImpuesto implements DCfdTax {
         msTipoFactor = "";
     }
     
-    public void setImpuestoBasico(int n) { mnImpuestoBasico = n; }
+    public void setImpuestoTipo(int n) { mnImpuestoTipo = n; }
     public void setImpuesto(int n) { mnImpuesto = n; }
     @Override
     public void setImpuestoClave(String s) { msImpuestoClave = s; }
@@ -66,7 +68,7 @@ public class SCfdDataImpuesto implements DCfdTax {
     @Override
     public void setTipoFactor(String s) { msTipoFactor = s; }
     
-    public int getImpuestoBasico() { return mnImpuestoBasico; }
+    public int getImpuestoTipo() { return mnImpuestoTipo; }
     public int getImpuesto() { return mnImpuesto; }
     @Override
     public String getImpuestoClave() { return msImpuestoClave; }
@@ -99,36 +101,41 @@ public class SCfdDataImpuesto implements DCfdTax {
     public cfd.DElement createRootElementConceptoImpuesto33() throws Exception {
         cfd.DElement impuesto = null;
         
-        switch (mnImpuestoBasico) {
+        switch (mnImpuestoTipo) {
             case SModSysConsts.FINS_TP_TAX_RETAINED:
                 cfd.ver33.DElementConceptoImpuestoRetencion conceptoImpuestoRetencion = new cfd.ver33.DElementConceptoImpuestoRetencion();
                 
-                if (msTipoFactor.compareToIgnoreCase(FACT_TP_EXENTO) == 0) { // XXX jbarajas falta las constantes para comparar contra tipo exento
+                if (msTipoFactor.compareToIgnoreCase(DCfdi33Catalogs.FAC_TP_EXENTO) == 0) { // XXX jbarajas falta las constantes para comparar contra tipo exento
                     throw new Exception("Error al generar el nodo impuesto 'retenido' el tipo de factor debe ser distinto de exento.");
                 }
                 
                 conceptoImpuestoRetencion.getAttBase().setDouble(mdBase);
                 conceptoImpuestoRetencion.getAttImpuesto().setString(msImpuestoClave);
                 conceptoImpuestoRetencion.getAttTipoFactor().setString(getFactorTypeSat(msTipoFactor));
+                
                 conceptoImpuestoRetencion.getAttTasaOCuota().setDouble(mdTasa);
                 conceptoImpuestoRetencion.getAttImporte().setDouble(mdImporte);
                 
                 impuesto = conceptoImpuestoRetencion;
                 break;
+                
             case SModSysConsts.FINS_TP_TAX_CHARGED:
                 cfd.ver33.DElementConceptoImpuestoTraslado conceptoImpuestoTraslado = new cfd.ver33.DElementConceptoImpuestoTraslado();
                 
                 conceptoImpuestoTraslado.getAttBase().setDouble(mdBase);
                 conceptoImpuestoTraslado.getAttImpuesto().setString(msImpuestoClave);
                 conceptoImpuestoTraslado.getAttTipoFactor().setString(getFactorTypeSat(msTipoFactor));
-                if (msTipoFactor.compareTo(FACT_TP_EXENTO) != 0) {
+                
+                if (msTipoFactor.compareToIgnoreCase(DCfdi33Catalogs.FAC_TP_EXENTO) != 0) {
                     conceptoImpuestoTraslado.getAttTasaOCuota().setDouble(mdTasa);
                     conceptoImpuestoTraslado.getAttImporte().setDouble(mdImporte);
                 }
+                
                 impuesto = conceptoImpuestoTraslado;
                 break;
+                
             default:
-                throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + mnImpuestoBasico + ").");
+                throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + mnImpuestoTipo + ").");
         }
         
         return impuesto;
@@ -142,7 +149,7 @@ public class SCfdDataImpuesto implements DCfdTax {
     public cfd.DElement createRootElementImpuesto33() throws Exception {
         cfd.DElement impuesto = null;
         
-        switch (mnImpuestoBasico) {
+        switch (mnImpuestoTipo) {
             case SModSysConsts.FINS_TP_TAX_RETAINED:
                 cfd.ver33.DElementImpuestoRetencion impuestoRetencion = new cfd.ver33.DElementImpuestoRetencion();
                 
@@ -162,7 +169,7 @@ public class SCfdDataImpuesto implements DCfdTax {
                 impuesto = impuestoTraslado;
                 break;
             default:
-                throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + mnImpuestoBasico + ").");
+                throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + mnImpuestoTipo + ").");
         }
         
         return impuesto;
