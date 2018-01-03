@@ -8,6 +8,7 @@ package erp.mtrn.data;
 import cfd.DCfdUtils;
 import cfd.DElement;
 import cfd.ver32.DElementComprobante;
+import cfd.ver33.DElementCfdiRelacionado;
 import cfd.ver33.DElementConcepto;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdXmlCatalogs;
@@ -905,17 +906,21 @@ public class SCfdPrint {
         paramsMap.put("sAddPagClaveMoneda", dps.getDbmsCurrencyKey());
         paramsMap.put("dAddPagInteresMoratorio", dps.getAuxCfdParams().getInterestDelayRate());
         
-        //Adds related CFDI's        
-        paramsMap.put("sCfdiTipoRelacion", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_REL_TP, dps.getCfdiRelacionadosTipoRelacion()));
-        String uuidRelated = "";
-        for (String uuid : dps.getCfdiRelacionados()) {
-            uuidRelated += (uuidRelated.isEmpty() ? "" : ", ") + uuid;
+        // adds related CFDI's:
+        if (comprobante.getEltOpcCfdiRelacionados() != null) {
+            paramsMap.put("sCfdiTipoRelacion", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_REL_TP, comprobante.getEltOpcCfdiRelacionados().getAttTipoRelacion().getString()));
+            
+            String uuids = "";
+            for (DElementCfdiRelacionado cfdiRelacionado : comprobante.getEltOpcCfdiRelacionados().getEltCfdiRelacionados()) {
+                uuids += (uuids.isEmpty() ? "" : "\n") + cfdiRelacionado.getAttUuid().getString();
+            }
+            paramsMap.put("sCfdiUUIDsRelacionados", uuids);
         }
-        paramsMap.put("sCfdiUUIDsRelacionados", uuidRelated);
         
-        //Adds product/service and unit keys from XML.
+        // adds product/service and unit keys from XML:
         ArrayList<String> productKeys = new ArrayList<>();
         ArrayList<String> unitKeys = new ArrayList<>();
+        
         for (DElementConcepto clave : comprobante.getEltConceptos().getEltConceptos()) {
             productKeys.add(clave.getAttClaveProdServ().getString());
             unitKeys.add(clave.getAttClaveUnidad().getString());

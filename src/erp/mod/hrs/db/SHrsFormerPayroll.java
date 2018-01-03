@@ -16,7 +16,11 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
+ * 
+ * Maintenance Log:
+ * 2018-01-02, Sergio Flores:
+ *  Implementation of payroll into CFDI 3.3.
  */
 public class SHrsFormerPayroll {
 
@@ -87,7 +91,7 @@ public class SHrsFormerPayroll {
 
     public ArrayList<SHrsFormerPayrollReceipt> getChildPayrollReceipts() { return moChildReceipts; }
 
-    public void renderPayroll(ArrayList<SDataCfd> pCfd, int subtypeCfd) throws java.lang.Exception {
+    public void renderPayroll(ArrayList<SDataCfd> pCfd) throws java.lang.Exception {
         double dTotalIncome = 0;
         double dTotalDeductions = 0;
         double dTotalRentRetained = 0;
@@ -104,7 +108,7 @@ public class SHrsFormerPayroll {
         comprobante = cfd.DCfdUtils.getCfdi32(pCfd.get(0).getDocXml());
 
         mtFecha = comprobante.getAttFecha().getDatetime();
-        mnPkNominaId = subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? pCfd.get(0).getFkPayrollPayrollId_n() : pCfd.get(0).getFkPayrollReceiptPayrollId_n();
+        mnPkNominaId = pCfd.get(0).getFkPayrollPayrollId_n();   // only old payroll version supported!
 
         // Emisor:
 

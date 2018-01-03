@@ -114,6 +114,10 @@ import stamp.StampSOAP;
 /**
  *
  * @author Juan Barajas, Sergio Flores, Edwin Carmona, Alfredo Pérez, Claudio Peña
+ * 
+ * Maintenance Log:
+ * 2018-01-02, Sergio Flores:
+ *  Implementation of payroll into CFDI 3.3.
  */
 public abstract class SCfdUtils implements Serializable {
 
@@ -448,7 +452,7 @@ public abstract class SCfdUtils implements Serializable {
         else {
             maCfdPackets = new ArrayList<SCfdPacket>();
 
-            for (SHrsFormerPayrollReceipt receipt: payroll.getChildPayrollReceipts()) {
+            for (SHrsFormerPayrollReceipt payrollReceipt: payroll.getChildPayrollReceipts()) {
                 isFound = false;
                 isConsistent = false;
                 add = true;
@@ -456,31 +460,31 @@ public abstract class SCfdUtils implements Serializable {
 
                 if (payrollXml != null) {
                     for (SHrsFormerPayrollReceipt receiptXml: payrollXml.getChildPayrollReceipts()) {
-                        if (receipt.getAuxEmpleadoId() == receiptXml.getAuxEmpleadoId() && receipt.getPkEmpleadoId() == receiptXml.getPkEmpleadoId()) {
+                        if (payrollReceipt.getAuxEmpleadoId() == receiptXml.getAuxEmpleadoId() && payrollReceipt.getPkEmpleadoId() == receiptXml.getPkEmpleadoId()) {
                             isFound = true;
-                            isConsistent = validateReceiptsConcepts(receipt, receiptXml) && receipt.getBanco() == receiptXml.getBanco() &&
-                                    SLibTimeUtils.convertToDateOnly(receipt.getPayroll().getFecha()).compareTo(SLibTimeUtils.convertToDateOnly(receiptXml.getPayroll().getFecha())) == 0 &&
-                                    receipt.getClabe().compareTo(receiptXml.getClabe()) == 0 && receipt.getTipoContrato().compareTo(receiptXml.getTipoContrato()) == 0 &&
-                                    receipt.getFechaPago().compareTo(receiptXml.getFechaPago()) == 0 && receipt.getFechaFinalPago().compareTo(receiptXml.getFechaFinalPago()) == 0 &&
-                                    receipt.getFechaInicialPago().compareTo(receiptXml.getFechaInicialPago()) == 0 && receipt.getFechaInicioRelLaboral().compareTo(receiptXml.getFechaInicioRelLaboral()) == 0 &&
-                                    receipt.getNumDiasPagados() == receiptXml.getNumDiasPagados() && receipt.getCurp().compareTo(receiptXml.getCurp()) == 0 &&
-                                    receipt.getTipoRegimen() == receiptXml.getTipoRegimen() && receipt.getNumSeguridadSocial().compareTo(receiptXml.getNumSeguridadSocial()) == 0 &&
-                                    receipt.getNumEmpleado().compareTo(receiptXml.getNumEmpleado()) == 0 && receipt.getRegistroPatronal().compareTo(receiptXml.getRegistroPatronal()) == 0 &&
-                                    receipt.getPuesto().compareTo(receiptXml.getPuesto()) == 0 && receipt.getRiesgoPuesto() == receiptXml.getRiesgoPuesto() &&
-                                    receipt.getDepartamento().compareTo(receiptXml.getDepartamento()) == 0 && receipt.getPeriodicidadPago().compareTo(receiptXml.getPeriodicidadPago()) == 0 &&
-                                    receipt.getSalarioBaseCotApor() == receiptXml.getSalarioBaseCotApor() && receipt.getSalarioDiarioIntegrado() == receiptXml.getSalarioDiarioIntegrado() &&
-                                    receipt.getAntiguedad() == receiptXml.getAntiguedad() && receipt.getTotalDeducciones() == receiptXml.getTotalDeducciones() &&
-                                    receipt.getTotalNeto() == receiptXml.getTotalNeto() && receipt.getTotalPercepciones() == receiptXml.getTotalPercepciones() &&
-                                    receipt.getTotalRetenciones() == receiptXml.getTotalRetenciones() && receipt.getTipoJornada().compareTo(receiptXml.getTipoJornada()) == 0 &&
-                                    (SLibTimeUtils.convertToDateOnly(receipt.getPayroll().getFecha()).compareTo(SLibTimeUtils.convertToDateOnly(SLibTimeUtils.createDate(2016, 7, 15))) > 0 ?
-                                    SHrsFormerUtils.getPaymentMethodCode(client, receipt.getMetodoPago()).compareTo(receiptXml.getMetodoPagoAux()) == 0 : 
-                                    SHrsFormerUtils.getPaymentMethodName(client, receipt.getMetodoPago()).compareTo(receiptXml.getMetodoPagoAux()) == 0);
+                            isConsistent = validateReceiptsConcepts(payrollReceipt, receiptXml) && payrollReceipt.getBanco() == receiptXml.getBanco() &&
+                                    SLibTimeUtils.convertToDateOnly(payrollReceipt.getPayroll().getFecha()).compareTo(SLibTimeUtils.convertToDateOnly(receiptXml.getPayroll().getFecha())) == 0 &&
+                                    payrollReceipt.getClabe().compareTo(receiptXml.getClabe()) == 0 && payrollReceipt.getTipoContrato().compareTo(receiptXml.getTipoContrato()) == 0 &&
+                                    payrollReceipt.getFechaPago().compareTo(receiptXml.getFechaPago()) == 0 && payrollReceipt.getFechaFinalPago().compareTo(receiptXml.getFechaFinalPago()) == 0 &&
+                                    payrollReceipt.getFechaInicialPago().compareTo(receiptXml.getFechaInicialPago()) == 0 && payrollReceipt.getFechaInicioRelLaboral().compareTo(receiptXml.getFechaInicioRelLaboral()) == 0 &&
+                                    payrollReceipt.getNumDiasPagados() == receiptXml.getNumDiasPagados() && payrollReceipt.getCurp().compareTo(receiptXml.getCurp()) == 0 &&
+                                    payrollReceipt.getTipoRegimen() == receiptXml.getTipoRegimen() && payrollReceipt.getNumSeguridadSocial().compareTo(receiptXml.getNumSeguridadSocial()) == 0 &&
+                                    payrollReceipt.getNumEmpleado().compareTo(receiptXml.getNumEmpleado()) == 0 && payrollReceipt.getRegistroPatronal().compareTo(receiptXml.getRegistroPatronal()) == 0 &&
+                                    payrollReceipt.getPuesto().compareTo(receiptXml.getPuesto()) == 0 && payrollReceipt.getRiesgoPuesto() == receiptXml.getRiesgoPuesto() &&
+                                    payrollReceipt.getDepartamento().compareTo(receiptXml.getDepartamento()) == 0 && payrollReceipt.getPeriodicidadPago().compareTo(receiptXml.getPeriodicidadPago()) == 0 &&
+                                    payrollReceipt.getSalarioBaseCotApor() == receiptXml.getSalarioBaseCotApor() && payrollReceipt.getSalarioDiarioIntegrado() == receiptXml.getSalarioDiarioIntegrado() &&
+                                    payrollReceipt.getAntiguedad() == receiptXml.getAntiguedad() && payrollReceipt.getTotalDeducciones() == receiptXml.getTotalDeducciones() &&
+                                    payrollReceipt.getTotalNeto() == receiptXml.getTotalNeto() && payrollReceipt.getTotalPercepciones() == receiptXml.getTotalPercepciones() &&
+                                    payrollReceipt.getTotalRetenciones() == receiptXml.getTotalRetenciones() && payrollReceipt.getTipoJornada().compareTo(receiptXml.getTipoJornada()) == 0 &&
+                                    (SLibTimeUtils.convertToDateOnly(payrollReceipt.getPayroll().getFecha()).compareTo(SLibTimeUtils.convertToDateOnly(SLibTimeUtils.createDate(2016, 7, 15))) > 0 ?
+                                    SHrsFormerUtils.getPaymentMethodCode(client, payrollReceipt.getMetodoPago()).compareTo(receiptXml.getMetodoPagoAux()) == 0 : 
+                                    SHrsFormerUtils.getPaymentMethodName(client, payrollReceipt.getMetodoPago()).compareTo(receiptXml.getMetodoPagoAux()) == 0);
                         }
 
                         if (isFound) {
                             sql = "SELECT id_cfd, fid_st_xml " +
-                                    "FROM trn_cfd WHERE fid_pay_pay_n = " + payroll.getPkNominaId() + " AND fid_pay_emp_n = " + receipt.getAuxEmpleadoId() +
-                                    " AND fid_pay_bpr_n = " + receipt.getPkEmpleadoId() + " ORDER BY id_cfd ";
+                                    "FROM trn_cfd WHERE fid_pay_pay_n = " + payroll.getPkNominaId() + " AND fid_pay_emp_n = " + payrollReceipt.getAuxEmpleadoId() +
+                                    " AND fid_pay_bpr_n = " + payrollReceipt.getPkEmpleadoId() + " ORDER BY id_cfd ";
 
                             resultSet = client.getSession().getStatement().executeQuery(sql);
                             while (resultSet.next()) {
@@ -504,9 +508,13 @@ public abstract class SCfdUtils implements Serializable {
                 if (add) {
                     // Add missing fields to receipt:
                     
-                    receipt.setPayroll(payroll);
-                    receipt.setFechaEdicion(client.getSession().getCurrentDate());
-                    receipt.setMoneda(client.getSession().getSessionCustom().getLocalCurrencyCode());
+                    payrollReceipt.setPayroll(payroll);
+                    payrollReceipt.setFechaEdicion(client.getSession().getCurrentDate());
+                    payrollReceipt.setMoneda(client.getSession().getSessionCustom().getLocalCurrencyCode());
+                    payrollReceipt.setLugarExpedicion(client.getSessionXXX().getCurrentCompanyBranch().getDbmsBizPartnerBranchAddressOfficial().getZipCode());
+                    payrollReceipt.setConfirmacion("");
+                    payrollReceipt.setRegimenFiscal(client.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal());
+                    payrollReceipt.setCfdiRelacionadosTipoRelacion("");
                     
                     // Generate CFDI:
 
@@ -520,14 +528,14 @@ public abstract class SCfdUtils implements Serializable {
                     float cfdVersion = SLibConsts.UNDEFINED;
                     switch (xmlType) {
                         case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
-                            comprobanteCfdi32 = (cfd.ver32.DElementComprobante) createCfdi32RootElement(client, receipt);
+                            comprobanteCfdi32 = (cfd.ver32.DElementComprobante) createCfdi32RootElement(client, payrollReceipt);
                             cfdVersion = comprobanteCfdi32.getVersion();
                             
                             packet.setStringSigned(DCfdUtils.generateOriginalString(comprobanteCfdi32));
                             packet.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW); // after stamping changes to emitted
                             break;
                         case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
-                            comprobanteCfdi33 = (cfd.ver33.DElementComprobante) createCfdi33RootElement(client, receipt);
+                            comprobanteCfdi33 = (cfd.ver33.DElementComprobante) createCfdi33RootElement(client, payrollReceipt);
                             cfdVersion = comprobanteCfdi33.getVersion();
                             
                             packet.setStringSigned(DCfdUtils.generateOriginalString(comprobanteCfdi33));
@@ -543,8 +551,8 @@ public abstract class SCfdUtils implements Serializable {
                     packet.setFkXmlDeliveryStatusId(SModSysConsts.TRNS_ST_XML_DVY_PENDING);
                     packet.setFkUserDeliveryId(client.getSession().getUser().getPkUserId());
                     packet.setPayrollPayrollId(payroll.getPkNominaId());
-                    packet.setPayrollEmployeeId(receipt.getAuxEmpleadoId());
-                    packet.setPayrollBizPartnerId(receipt.getPkEmpleadoId());
+                    packet.setPayrollEmployeeId(payrollReceipt.getAuxEmpleadoId());
+                    packet.setPayrollBizPartnerId(payrollReceipt.getPkEmpleadoId());
                     packet.setRfcEmisor("");
                     packet.setRfcReceptor("");
                     packet.setTotalCy(0);
@@ -2379,7 +2387,7 @@ public abstract class SCfdUtils implements Serializable {
     public static void printCfd(final SClientInterface client, final int typeCfd, final SDataCfd cfd, int printMode, final int subtypeCfd, boolean isSaving) throws Exception {
         printCfd(client, typeCfd, cfd, printMode, SDataConstantsPrint.PRINT_A_COPY, subtypeCfd, isSaving);
     }
-    
+
     public static void printCfd(final SClientInterface client, final int typeCfd, final SDataCfd cfd, int printMode, int copies, final int subtypeCfd, boolean isSaving) throws Exception {
         SCfdPrint cfdPrint = null;
         SDataDps dps = null;
@@ -2779,7 +2787,7 @@ public abstract class SCfdUtils implements Serializable {
                 formerPayrollDummy.setPkNominaId(formerPayrollCfdsEmited.get(0).getFkPayrollPayrollId_n());
                 formerPayrollDummy.setFecha(formerPayrollCfdsEmited.get(0).getTimestamp());
 
-                formerPayrollDummy.renderPayroll(formerPayrollCfdsEmited, SCfdConsts.CFDI_PAYROLL_VER_OLD);
+                formerPayrollDummy.renderPayroll(formerPayrollCfdsEmited);
             }
 
             validateReceiptsConsistent(client, formerPayroll, formerPayrollDummy, isRegenerateOnlyNonStampedCfdi);
@@ -3503,7 +3511,7 @@ public abstract class SCfdUtils implements Serializable {
         SDbCfdBizPartner receptor = null;
         SCfdDataBizPartner asociadoNegocios = null;
         
-        boolean isPayroll = xmlCfdi.getCfdType() == SDataConstantsSys.TRNS_TP_CFD_PAYROLL;
+        //boolean isPayroll = xmlCfdi.getCfdType() == SDataConstantsSys.TRNS_TP_CFD_PAYROLL;
 
         cfd.ver33.DElementComprobante comprobante = new cfd.ver33.DElementComprobante();
 
@@ -3514,12 +3522,12 @@ public abstract class SCfdUtils implements Serializable {
         comprobante.getAttFormaPago().setString(xmlCfdi.getComprobanteFormaPago());
         comprobante.getAttNoCertificado().setString(client.getCfdSignature(DCfdConsts.CFDI_VER_33).getCertNumber());
         comprobante.getAttCertificado().setString(client.getCfdSignature(DCfdConsts.CFDI_VER_33).getCertBase64());
-        comprobante.getAttCondicionesDePago().setString(isPayroll ? "" : xmlCfdi.getComprobanteCondicionesPago());
+        comprobante.getAttCondicionesDePago().setString(xmlCfdi.getComprobanteCondicionesPago());
         comprobante.getAttSubTotal().setDouble(xmlCfdi.getComprobanteSubtotal());
-        comprobante.getAttDescuento().setDouble(isPayroll ? 0d : xmlCfdi.getComprobanteDescuento());
+        comprobante.getAttDescuento().setDouble(xmlCfdi.getComprobanteDescuento());
         comprobante.getAttMoneda().setString(xmlCfdi.getComprobanteMoneda());
         if (xmlCfdi.getComprobanteMoneda().compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN_NAME) != 0 && xmlCfdi.getComprobanteMoneda().compareTo(SModSysConsts.FINS_FISCAL_CUR_XXX_NAME) != 0) {
-            comprobante.getAttTipoCambio().setDouble(isPayroll ? 0d : xmlCfdi.getComprobanteTipoCambio());
+            comprobante.getAttTipoCambio().setDouble(xmlCfdi.getComprobanteTipoCambio());
         }
         comprobante.getAttTotal().setDouble(xmlCfdi.getComprobanteTotal());
         comprobante.getAttTipoDeComprobante().setString(xmlCfdi.getComprobanteTipoComprobante());
@@ -3541,7 +3549,7 @@ public abstract class SCfdUtils implements Serializable {
             comprobante.setEltOpcCfdiRelacionados(cfdiRelacionados);
         }
         
-        boolean hasIntCommerceNode = false;
+        boolean hasIntCommerceNode = false; // this info is required at this point to properly set data of nodes Emisor and Receptor
         cfd.DElement elementComplement = xmlCfdi.getElementComplemento();
 
         if (elementComplement != null) {
@@ -3565,7 +3573,7 @@ public abstract class SCfdUtils implements Serializable {
         
         elementEmisor.getAttRegimenFiscal().setString(xmlCfdi.getEmisorRegimenFiscal());
         
-        if (elementComplement != null && hasIntCommerceNode) {
+        if (hasIntCommerceNode) {
             ((cfd.ver3.cce11.DElementComercioExterior) ((cfd.ver33.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior")).setEltEmisor(asociadoNegocios.createRootElementEmisorIntCommerce());
         }
 
@@ -3584,7 +3592,7 @@ public abstract class SCfdUtils implements Serializable {
         
         elementReceptor.getAttUsoCFDI().setString(xmlCfdi.getReceptorUsoCFDI());
         
-        if (elementComplement != null && hasIntCommerceNode) {
+        if (hasIntCommerceNode) {
             ((cfd.ver3.cce11.DElementComercioExterior) ((cfd.ver33.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior")).setEltReceptor(asociadoNegocios.createRootElementReceptorIntCommerce());
         }
         
@@ -3649,6 +3657,13 @@ public abstract class SCfdUtils implements Serializable {
             }
         }
         
+        if (xmlCfdi.getCfdType() == SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
+            if (elementComplement == null || comprobante.getEltOpcComplemento().getElements().isEmpty()) {
+                comprobante = null;
+                throw new Exception("Error al generar el complemento nómina o el complemento no existe.");
+            }
+        }
+        
         if (elementComplement != null) {
             comprobante.setEltOpcComplemento((cfd.ver33.DElementComplemento) elementComplement);
         }
@@ -3657,13 +3672,6 @@ public abstract class SCfdUtils implements Serializable {
             comprobante.setEltOpcAddenda((cfd.ver33.DElementAddenda) xmlCfdi.getElementAddenda());
         }
 
-        if (xmlCfdi.getCfdType() == SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
-            if (elementComplement == null || comprobante.getEltOpcComplemento().getElements().isEmpty()) {
-                comprobante = null;
-                throw new Exception("Error al generar el complemento nómina o el complemento no existe.");
-            }
-        }
-        
         validateCorrectnessXml(comprobante);
 
         return comprobante;
