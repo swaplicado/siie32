@@ -7,8 +7,7 @@ package erp.mtrn.data;
 
 import cfd.DCfdUtils;
 import cfd.DElement;
-import cfd.ver32.DElementComprobante;
-import cfd.ver32.DElementTimbreFiscalDigital;
+import cfd.ver33.DElementCfdiRelacionado;
 import cfd.ver33.DElementConcepto;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdXmlCatalogs;
@@ -603,12 +602,13 @@ public class SCfdPrint {
         if (comprobante.getEltOpcComplemento() != null) {
             for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
                 if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
-                    map.put("sCfdiVersion", ((DElementTimbreFiscalDigital) element).getAttVersion().getString());
-                    map.put("sCfdiUuid", ((DElementTimbreFiscalDigital) element).getAttUuid().getString());
-                    map.put("sCfdiSelloCFD", ((DElementTimbreFiscalDigital) element).getAttSelloCfd().getString());
-                    map.put("sCfdiSelloSAT", ((DElementTimbreFiscalDigital) element).getAttSelloSAT().getString());
-                    map.put("sCfdiNoCertificadoSAT", ((DElementTimbreFiscalDigital) element).getAttNoCertificadoSAT().getString());
-                    map.put("sCfdiFechaTimbre", ((DElementTimbreFiscalDigital) element).getAttFechaTimbrado().getString());
+                    cfd.ver32.DElementTimbreFiscalDigital tfd = (cfd.ver32.DElementTimbreFiscalDigital) element;
+                    map.put("sCfdiVersion", tfd.getAttVersion().getString());
+                    map.put("sCfdiUuid", tfd.getAttUUID().getString());
+                    map.put("sCfdiSelloCFD", tfd.getAttSelloCFD().getString());
+                    map.put("sCfdiSelloSAT", tfd.getAttSelloSAT().getString());
+                    map.put("sCfdiNoCertificadoSAT", tfd.getAttNoCertificadoSAT().getString());
+                    map.put("sCfdiFechaTimbre", tfd.getAttFechaTimbrado().getString());
                 }
             }
         }
@@ -841,12 +841,15 @@ public class SCfdPrint {
         if (comprobante.getEltOpcComplemento() != null) {
             for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
                 if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
-                    paramsMap.put("sCfdiVersion", ((DElementTimbreFiscalDigital) element).getAttVersion().getString());
-                    paramsMap.put("sCfdiUuid", ((DElementTimbreFiscalDigital) element).getAttUuid().getString());
-                    paramsMap.put("sCfdiSelloCFD", sSelloEmisor = ((DElementTimbreFiscalDigital) element).getAttSelloCfd().getString());
-                    paramsMap.put("sCfdiSelloSAT", ((DElementTimbreFiscalDigital) element).getAttSelloSAT().getString());
-                    paramsMap.put("sCfdiNoCertificadoSAT", ((DElementTimbreFiscalDigital) element).getAttNoCertificadoSAT().getString());
-                    paramsMap.put("sCfdiFechaTimbre", ((DElementTimbreFiscalDigital) element).getAttFechaTimbrado().getString());
+                    cfd.ver33.DElementTimbreFiscalDigital tfd = (cfd.ver33.DElementTimbreFiscalDigital) element;
+                    paramsMap.put("sCfdiVersion", tfd.getAttVersion().getString());
+                    paramsMap.put("sCfdiUuid", tfd.getAttUUID().getString());
+                    paramsMap.put("sCfdiSelloCFD", sSelloEmisor = tfd.getAttSelloCFD().getString());
+                    paramsMap.put("sCfdiSelloSAT", tfd.getAttSelloSAT().getString());
+                    paramsMap.put("sCfdiNoCertificadoSAT", tfd.getAttNoCertificadoSAT().getString());
+                    paramsMap.put("sCfdiFechaTimbre", tfd.getAttFechaTimbrado().getString());
+                    paramsMap.put("sCfdiRfcProvCertif", tfd.getAttRfcProvCertif().getString());
+                    paramsMap.put("sCfdiLeyenda", tfd.getAttLeyenda().getString());
                 }
             }
         }
@@ -902,17 +905,21 @@ public class SCfdPrint {
         paramsMap.put("sAddPagClaveMoneda", dps.getDbmsCurrencyKey());
         paramsMap.put("dAddPagInteresMoratorio", dps.getAuxCfdParams().getInterestDelayRate());
         
-        //Adds related CFDI's        
-        paramsMap.put("sCfdiTipoRelacion", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_REL_TP, dps.getCfdiRelacionadosTipoRelacion()));
-        String uuidRelated = "";
-        for (String uuid : dps.getCfdiRelacionados()) {
-            uuidRelated += (uuidRelated.isEmpty() ? "" : ", ") + uuid;
+        // adds related CFDI's:
+        if (comprobante.getEltOpcCfdiRelacionados() != null) {
+            paramsMap.put("sCfdiTipoRelacion", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_REL_TP, comprobante.getEltOpcCfdiRelacionados().getAttTipoRelacion().getString()));
+            
+            String uuids = "";
+            for (DElementCfdiRelacionado cfdiRelacionado : comprobante.getEltOpcCfdiRelacionados().getEltCfdiRelacionados()) {
+                uuids += (uuids.isEmpty() ? "" : "\n") + cfdiRelacionado.getAttUuid().getString();
+            }
+            paramsMap.put("sCfdiUUIDsRelacionados", uuids);
         }
-        paramsMap.put("sCfdiUUIDsRelacionados", uuidRelated);
         
-        //Adds product/service and unit keys from XML.
+        // adds product/service and unit keys from XML:
         ArrayList<String> productKeys = new ArrayList<>();
         ArrayList<String> unitKeys = new ArrayList<>();
+        
         for (DElementConcepto clave : comprobante.getEltConceptos().getEltConceptos()) {
             productKeys.add(clave.getAttClaveProdServ().getString());
             unitKeys.add(clave.getAttClaveUnidad().getString());
@@ -1050,11 +1057,7 @@ public class SCfdPrint {
         }
     }
     
-    public void printPayrollReceipt(final SDataCfd cfd, final int pnPrintMode, final int subtypeCfd) throws java.lang.Exception {
-        printPayrollReceipt(cfd, pnPrintMode, SDataConstantsPrint.PRINT_A_COPY, subtypeCfd);
-    }
-    
-    public void printPayrollReceipt(final SDataCfd cfd, final int pnPrintMode, final int pnNumCopies, final int subtypeCfd) throws java.lang.Exception {
+    public void printPayrollReceipt32_11(final SDataCfd cfd, final int pnPrintMode, final int pnNumCopies, final int subtypeCfd) throws java.lang.Exception {
         int i = 0;
         int nTotalTiempoExtra = 0;
 
@@ -1075,7 +1078,7 @@ public class SCfdPrint {
         SDbPayrollReceipt payrollReceipt = null;
         SDataCurrency cur = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { miClient.getSessionXXX().getParamsErp().getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
 
-        DElementComprobante comprobante = null;
+        cfd.ver32.DElementComprobante comprobante = null;
         HashMap<String, Object> map = null;
         JasperPrint jasperPrint = null;
         JasperViewer jasperViewer = null;
@@ -1331,13 +1334,13 @@ public class SCfdPrint {
                 map.put("dCfdTotalIsr", dTotalIsr);
             }
             else if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
-
-                map.put("sCfdiVersion", ((DElementTimbreFiscalDigital) element).getAttVersion().getString());
-                map.put("sCfdiUuid", ((DElementTimbreFiscalDigital) element).getAttUuid().getString());
-                map.put("sCfdiSelloCFD", ((DElementTimbreFiscalDigital) element).getAttSelloCfd().getString());
-                map.put("sCfdiSelloSAT", ((DElementTimbreFiscalDigital) element).getAttSelloSAT().getString());
-                map.put("sCfdiNoCertificadoSAT", ((DElementTimbreFiscalDigital) element).getAttNoCertificadoSAT().getString());
-                map.put("sCfdiFechaTimbre", ((DElementTimbreFiscalDigital) element).getAttFechaTimbrado().getString());
+                cfd.ver32.DElementTimbreFiscalDigital tfd = (cfd.ver32.DElementTimbreFiscalDigital) element;
+                map.put("sCfdiVersion", tfd.getAttVersion().getString());
+                map.put("sCfdiUuid", tfd.getAttUUID().getString());
+                map.put("sCfdiSelloCFD", tfd.getAttSelloCFD().getString());
+                map.put("sCfdiSelloSAT", tfd.getAttSelloSAT().getString());
+                map.put("sCfdiNoCertificadoSAT", tfd.getAttNoCertificadoSAT().getString());
+                map.put("sCfdiFechaTimbre", tfd.getAttFechaTimbrado().getString());
             }
         }
 
@@ -1364,10 +1367,6 @@ public class SCfdPrint {
         }
     }
     
-    public void printPayrollReceipt32_12(final SDataCfd cfd, final int pnPrintMode, final int subtypeCfd) throws java.lang.Exception {
-        printPayrollReceipt32_12(cfd, pnPrintMode, SDataConstantsPrint.PRINT_A_COPY, subtypeCfd);
-    }
-    
     public void printPayrollReceipt32_12(final SDataCfd cfd, final int pnPrintMode, final int pnNumCopies, final int subtypeCfd) throws java.lang.Exception {
         int i = 0;
         int overTime = 0;
@@ -1391,7 +1390,7 @@ public class SCfdPrint {
         SDbPayrollReceipt payrollReceipt = null;
         SDataCurrency cur = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { miClient.getSessionXXX().getParamsErp().getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
 
-        DElementComprobante comprobante = null;
+        cfd.ver32.DElementComprobante comprobante = null;
         HashMap<String, Object> map = null;
         JasperPrint jasperPrint = null;
         JasperViewer jasperViewer = null;
@@ -1682,13 +1681,358 @@ public class SCfdPrint {
                 map.put("dCfdTotalIsr", dTotalIsr);
             }
             else if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
+                cfd.ver32.DElementTimbreFiscalDigital tfd = (cfd.ver32.DElementTimbreFiscalDigital) element;
+                map.put("sCfdiVersion", tfd.getAttVersion().getString());
+                map.put("sCfdiUuid", tfd.getAttUUID().getString());
+                map.put("sCfdiSelloCFD", tfd.getAttSelloCFD().getString());
+                map.put("sCfdiSelloSAT", tfd.getAttSelloSAT().getString());
+                map.put("sCfdiNoCertificadoSAT", tfd.getAttNoCertificadoSAT().getString());
+                map.put("sCfdiFechaTimbre", tfd.getAttFechaTimbrado().getString());
+            }
+        }
 
-                map.put("sCfdiVersion", ((DElementTimbreFiscalDigital) element).getAttVersion().getString());
-                map.put("sCfdiUuid", ((DElementTimbreFiscalDigital) element).getAttUuid().getString());
-                map.put("sCfdiSelloCFD", ((DElementTimbreFiscalDigital) element).getAttSelloCfd().getString());
-                map.put("sCfdiSelloSAT", ((DElementTimbreFiscalDigital) element).getAttSelloSAT().getString());
-                map.put("sCfdiNoCertificadoSAT", ((DElementTimbreFiscalDigital) element).getAttNoCertificadoSAT().getString());
-                map.put("sCfdiFechaTimbre", ((DElementTimbreFiscalDigital) element).getAttFechaTimbrado().getString());
+        jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_CFDI_PAYROLL, map);
+        sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
+        sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
+
+        switch (pnPrintMode) {
+            case SDataConstantsPrint.PRINT_MODE_VIEWER:
+                jasperViewer = new JasperViewer(jasperPrint, false);
+                jasperViewer.setTitle("Comprobante Fiscal Digital por Internet");
+                jasperViewer.setVisible(true);
+                break;
+            case SDataConstantsPrint.PRINT_MODE_PDF:
+                JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
+                break;
+            case SDataConstantsPrint.PRINT_MODE_STREAM:
+                for (int j = 0; j < pnNumCopies; j++) {
+                    JasperPrintManager.printReport(jasperPrint, false);                    
+                }
+                break;
+            default:
+                throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
+        }
+    }
+    
+    public void printPayrollReceipt33_12(final SDataCfd cfd, final int pnPrintMode, final int pnNumCopies, final int subtypeCfd) throws java.lang.Exception {
+        int i = 0;
+        int overTime = 0;
+        int nTotalTiempoExtra = 0;
+
+        double dIngresoAux = 0;
+        double dIngresoDiario = 0;
+        double dTotalPercepciones = 0;
+        double dTotalDeducciones = 0;
+        double dTotalTiempoExtraPagado = 0;
+        double dTotalIncapacidades = 0;
+        double dTotalIsr = 0;
+
+        String sCodeDisability = "";
+        String sPdfFileName = "";
+        String sSql = "";
+
+        SDataFormerPayroll oFormerPayroll = null;
+        SDataFormerPayrollEmp oFormerPayrollEmployee = null;
+        SDbPayroll payroll = null;
+        SDbPayrollReceipt payrollReceipt = null;
+        SDataCurrency cur = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { miClient.getSessionXXX().getParamsErp().getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
+
+        cfd.ver33.DElementComprobante comprobante = null;
+        HashMap<String, Object> map = null;
+        JasperPrint jasperPrint = null;
+        JasperViewer jasperViewer = null;
+
+        ArrayList aPercepciones = null;
+        ArrayList aDeducciones = null;
+        ArrayList aTiempoExtra = null;
+        ArrayList aIncapacidades = null;
+
+        DecimalFormat oFixedFormat = new DecimalFormat(SLibUtils.textRepeat("0", 3));
+        DecimalFormat oFixedFormatAux = new DecimalFormat(SLibUtils.textRepeat("0", 2));
+
+        map = miClient.createReportParams();
+
+        SimpleDateFormat oSimpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+        switch (subtypeCfd) {
+            case SCfdConsts.CFDI_PAYROLL_VER_OLD:
+                oFormerPayroll = new SDataFormerPayroll();
+                oFormerPayroll.read(new int[] { cfd.getFkPayrollPayrollId_n() }, miClient.getSession().getStatement());
+                
+                oFormerPayrollEmployee = new SDataFormerPayrollEmp();
+                oFormerPayrollEmployee.read(new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, miClient.getSession().getStatement());
+                
+                sSql = "SELECT id_pay, pay_note AS f_pay_nts FROM hrs_sie_pay WHERE id_pay = " + oFormerPayroll.getPkPayrollId();
+                break;
+            case SCfdConsts.CFDI_PAYROLL_VER_CUR:
+                payroll = new SDbPayroll();
+                payroll.read(miClient.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n() });
+                
+                payrollReceipt = new SDbPayrollReceipt();
+                payrollReceipt.read(miClient.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
+                
+                sSql = "SELECT id_pay, nts AS f_pay_nts FROM hrs_pay WHERE id_pay = " + payroll.getPkPayrollId();
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+
+        SCfdXmlCatalogs catalogs = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdXmlCatalogs();
+        comprobante = DCfdUtils.getCfdi33(cfd.getDocXml());
+        
+        map.put("sSql", sSql);
+        map.put("sCfdFecha", SLibUtils.DbmsDateFormatDatetime.format(comprobante.getAttFecha().getDatetime()));
+        map.put("sCfdFormaDePago", comprobante.getAttMetodoPago().getString());
+        map.put("sCfdNoCuentaPago", ""/*comprobante.getAttNumCtaPago().getString()*/);
+        map.put("sCfdCondicionesDePagoOpc", comprobante.getAttCondicionesDePago().getString());
+        map.put("dCfdSubtotal", comprobante.getAttSubTotal().getDouble());
+        map.put("dCfdDescuento", comprobante.getAttDescuento().getDouble());
+        map.put("dCfdTotal", comprobante.getAttTotal().getDouble());
+        map.put("sCfdMetodoDePagoOpc", comprobante.getAttFormaPago().getString());
+        map.put("sExpedidoEn", comprobante.getAttLugarExpedicion().getString());
+        map.put("sCfdTipoComprobante", comprobante.getAttTipoDeComprobante().getString());
+        //map.put("sCfdNoCuentaPago", comprobante.getAttNumCtaPago().getString());
+        map.put("sCfdNoCertificado", comprobante.getAttNoCertificado().getString());
+        map.put("sEmiRegimenFiscal", comprobante.getEltEmisor().getAttRegimenFiscal().getString());
+        map.put("sEmiRfc", comprobante.getEltEmisor().getAttRfc().getString());
+        map.put("sRecRfc", comprobante.getEltReceptor().getAttRfc().getString());
+        map.put("dCfdTotal", comprobante.getAttTotal().getDouble());
+        map.put("sDocTotalConLetra", SLibUtilities.translateValueToText(comprobante.getAttTotal().getDouble(), miClient.getSessionXXX().getParamsErp().getDecimalsValue(), miClient.getSessionXXX().getParamsErp().getFkCurrencyId(),
+                cur.getTextSingular(), cur.getTextPlural(), cur.getTextPrefix(), cur.getTextSuffix()));
+        map.put("sCfdMoneda", comprobante.getAttMoneda().getString());
+        map.put("dCfdTipoCambio", comprobante.getAttTipoCambio().getDouble());
+        map.put("ReceptorNombre", comprobante.getEltReceptor().getAttNombre().getString());
+        map.put("bIsAnnulled", cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED);
+        map.put("nPkPayrollId", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayroll.getPkPayrollId() : payroll.getPkPayrollId());
+        map.put("NominaNumTipo", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? (oFormerPayroll.getNumber() + " " + oFormerPayroll.getType()) : (payroll.getNumber() + " " + payroll.getAuxPaymentType()));
+        map.put("NominaFolio", comprobante.getAttSerie().getString() + "-" + comprobante.getAttFolio().getString());
+        map.put("sXmlBaseDir", miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory());
+        map.put("sCfdVersion", "" + comprobante.getVersion());
+
+        map.put("dCfdConceptoCantidad", comprobante.getEltConceptos().getEltConceptos().get(0).getAttCantidad().getDouble());
+        map.put("sCfdConceptoUnidad", comprobante.getEltConceptos().getEltConceptos().get(0).getAttUnidad().getString());
+        map.put("sCfdConceptoNoIdentifiacion", comprobante.getEltConceptos().getEltConceptos().get(0).getAttNoIdentificacion().getString());
+        map.put("sCfdConceptoDescripcion", comprobante.getEltConceptos().getEltConceptos().get(0).getAttDescripcion().getString());
+        map.put("dCfdConceptoValorUnitario", comprobante.getEltConceptos().getEltConceptos().get(0).getAttValorUnitario().getDouble());
+        map.put("dCfdConceptoImporte", comprobante.getEltConceptos().getEltConceptos().get(0).getAttImporte().getDouble());
+
+        for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
+            if (element.getName().compareTo("nomina12:Nomina") == 0) {
+                map.put("TipoNomina", ((cfd.ver3.nom12.DElementNomina) element).getAttTipoNomina().getString());
+                map.put("FechaPago", oSimpleDateFormat.format(((cfd.ver3.nom12.DElementNomina) element).getAttFechaPago().getDate()));
+                map.put("FechaInicialPago", oSimpleDateFormat.format(((cfd.ver3.nom12.DElementNomina) element).getAttFechaInicialPago().getDate()));
+                map.put("FechaFinalPago", oSimpleDateFormat.format(((cfd.ver3.nom12.DElementNomina) element).getAttFechaFinalPago().getDate()));
+                map.put("NumDiasPagados", ((cfd.ver3.nom12.DElementNomina) element).getAttNumDiasPagados().getDouble());
+                map.put("NumDiasNoLaborados", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getDaysNotWorked() : payrollReceipt.getDaysNotWorked_r());
+                map.put("NumDiasLaborados", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getDaysWorked() : payrollReceipt.getDaysWorked()); // XXX Optional
+                map.put("NumDiasPagar", 0d); // Calculate?, navalos (2014-03-13)
+                
+                // Emisor:
+
+                i = 0;
+                if (((cfd.ver3.nom12.DElementNomina) element).getEltEmisor()!= null) {
+                    map.put("RegistroPatronal", ((cfd.ver3.nom12.DElementNomina) element).getEltEmisor().getAttRegistroPatronal().getString());
+                }
+
+                // Receptor:
+
+                String antigüedad = "";
+                
+                i = 0;
+                if (((cfd.ver3.nom12.DElementNomina) element).getEltReceptor() != null) {
+                    map.put("CURP", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttCurp().getString());
+                    map.put("NumSeguridadSocial", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttNumSeguridadSocial().getString());
+                    
+                    if (((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttFechaInicioRelLaboral().getDate() != null) {
+                        map.put("FechaInicioRelLaboral", oSimpleDateFormat.format(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttFechaInicioRelLaboral().getDate()));
+                    }
+                    
+                    if (!((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttAntiguedad().getString().isEmpty()) {
+                        antigüedad = ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttAntiguedad().getString();
+                        antigüedad = antigüedad.substring(1, antigüedad.length() - 1);
+                    }
+                    
+                    map.put("Antiguedad", SLibUtils.parseInt(antigüedad));
+                    map.put("TipoContrato", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttTipoContrato().getString());
+                    // Sindicalizado 
+                    map.put("TipoJornada", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttTipoJornada().getString());
+                    //map.put("TipoRegimen", SCfdConsts.RegimenMap.get(SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttTipoRegimen().getString())));
+                    map.put("TipoRegimen", miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttTipoRegimen().getString()) }, SDbRegistry.FIELD_NAME));
+                    map.put("NumEmpleado", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttNumEmpleado().getString());
+                    map.put("Departamento", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttDepartamento().getString());
+                    map.put("Puesto", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttPuesto().getString());
+                    //map.put("RiesgoPuesto", SCfdConsts.RiesgoMap.get(SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttRiesgoPuesto().getString())));
+                    if (!((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttRiesgoPuesto().getString().isEmpty()) {
+                        map.put("RiesgoPuesto", miClient.getSession().readField(SModConsts.HRSS_TP_POS_RISK, new int[] { SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttRiesgoPuesto().getString()) }, SDbRegistry.FIELD_NAME));
+                    }
+                    map.put("PeriodicidadPago", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttPeriodicidadPago().getString());
+                    //map.put("Banco", SCfdConsts.BancoMap.get(SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttBanco().getString())));
+                    if (!((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttBanco().getString().isEmpty()) {
+                        map.put("Banco", miClient.getSession().readField(SModConsts.HRSS_BANK, new int[] { SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttBanco().getString()) }, SDbRegistry.FIELD_NAME));
+                    }
+                    map.put("CLABE", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttCuentaBancaria().getString());
+                    map.put("SalarioBaseCotApor", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttSalarioBaseCotApor().getDouble());
+                    map.put("SalarioDiarioIntegrado", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttSalarioDiarioIntegrado().getDouble());
+                    map.put("ClaveEstado", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttClaveEntFed().getString());
+                    map.put("TipoPago", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? SModSysConsts.HRSS_TP_PAY_FOR : payrollReceipt.getFkPaymentTypeId());
+                    map.put("Sueldo", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getSalary() : payrollReceipt.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? payrollReceipt.getSalary() : payrollReceipt.getWage());
+                    map.put("TipoEmpleado", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getEmployeeType() : miClient.getSession().readField(SModConsts.HRSU_TP_EMP, new int[] { payrollReceipt.getFkEmployeeTypeId() }, SDbRegistry.FIELD_CODE));
+                    map.put("Categoria", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getEmployeeCategory() : miClient.getSession().readField(SModConsts.HRSU_TP_WRK, new int[] { payrollReceipt.getFkWorkerTypeId() }, SDbRegistry.FIELD_CODE));
+                    map.put("TipoSalario", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getSalaryType() : miClient.getSession().readField(SModConsts.HRSS_TP_SAL, new int[] { payrollReceipt.getFkSalaryTypeId() }, SDbRegistry.FIELD_NAME));
+                    map.put("Ejercicio", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? (oFormerPayroll.getYear() + "-" + oFixedFormatAux.format(oFormerPayroll.getPeriod())) : (payroll.getPeriodYear() + "-" + oFixedFormatAux.format(payroll.getPeriod())));
+                    
+                    if (payrollReceipt.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_FOR) {
+                        dIngresoAux = subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getSalary() : payrollReceipt.getWage();
+                        dIngresoDiario = dIngresoAux * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
+                        map.put("IngresoDiario", SLibUtils.round(dIngresoDiario, SLibConsts.DATA_TYPE_DEC));
+                    }
+                }
+
+                aPercepciones = new ArrayList();
+                aDeducciones = new ArrayList();
+                aTiempoExtra = new ArrayList();
+                aIncapacidades = new ArrayList();
+
+                dTotalPercepciones = 0;
+                dTotalDeducciones = 0;
+                nTotalTiempoExtra = 0;
+                dTotalTiempoExtraPagado = 0;
+                dTotalIncapacidades = 0;
+                dTotalIsr = 0;
+
+                // Perceptions:
+
+                i = 0;
+                if (((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones() != null) {
+                    for (i = 0; i < ((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().size(); i++) {
+                        aPercepciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttTipoPercepcion().getString());
+                        aPercepciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttClave().getString());
+                        aPercepciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttConcepto().getString());
+                        aPercepciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteGravado().getDouble() +
+                                ((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteExento().getDouble());
+                        aPercepciones.add(null); // pending to be used, navalos (2014-03-13)
+
+                        dTotalPercepciones += ((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteGravado().getDouble() +
+                                ((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteExento().getDouble();
+                    
+                        // ExtraTimes:
+
+                        overTime = 0;
+                        for (; overTime < ((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getEltHijosHorasExtra().size(); overTime++) {
+                            aTiempoExtra.add(((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getEltHijosHorasExtra().get(overTime).getAttTipoHoras().getString().compareTo(SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE_COD) == 0 ?
+                            SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE : SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_TRIPLE);
+                            aTiempoExtra.add(((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getEltHijosHorasExtra().get(overTime).getAttDias().getInteger());
+                            aTiempoExtra.add(((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getEltHijosHorasExtra().get(overTime).getAttHorasExtra().getInteger());
+                            aTiempoExtra.add(((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getEltHijosHorasExtra().get(overTime).getAttImportePagado().getDouble());
+
+                            nTotalTiempoExtra += ((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getEltHijosHorasExtra().get(overTime).getAttHorasExtra().getInteger();
+                            dTotalTiempoExtraPagado += ((cfd.ver3.nom12.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getEltHijosHorasExtra().get(overTime).getAttImportePagado().getDouble();
+                        }
+                    }
+                }
+
+                // Other payment:
+                
+                if (((cfd.ver3.nom12.DElementNomina) element).getEltOtrosPagos() != null) {
+                    for (i = 0; i < ((cfd.ver3.nom12.DElementNomina) element).getEltOtrosPagos().getEltHijosOtroPago().size(); i++) {
+                        aPercepciones.add(""); // is blank because it is not earning
+                        aPercepciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltOtrosPagos().getEltHijosOtroPago().get(i).getAttClave().getString());
+                        aPercepciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltOtrosPagos().getEltHijosOtroPago().get(i).getAttConcepto().getString());
+                        aPercepciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltOtrosPagos().getEltHijosOtroPago().get(i).getAttImporte().getDouble());
+                        aPercepciones.add(null); // pending to be used, navalos (2014-03-13)
+                    }
+                }
+                
+                for (int j = i; j < 10; j++) {
+                    aPercepciones.add(null);
+                    aPercepciones.add(null);
+                    aPercepciones.add(null);
+                    aPercepciones.add(null);
+                    aPercepciones.add(null);
+                }
+
+                for (int j = overTime; j < 5; j++) {
+                    aTiempoExtra.add(null);
+                    aTiempoExtra.add(null);
+                    aTiempoExtra.add(null);
+                    aTiempoExtra.add(null);
+                }
+
+                // Deductions:
+
+                i = 0;
+                if (((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones() != null) {
+                    for (i = 0; i < ((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().size(); i++) {
+                        aDeducciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttTipoDeduccion().getString());
+                        aDeducciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttClave().getString());
+                        aDeducciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttConcepto().getString());
+                        aDeducciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporte().getDouble());
+                        aDeducciones.add(null); // pending to be used, navalos (2014-03-13)
+
+                        // Obtain isr tax
+
+                        if (((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttClave().getString().compareTo(SCfdConsts.PAYROLL_PER_ISR) == 0 &&
+                            SLibUtils.parseInt(((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttTipoDeduccion().getString()) == SModSysConsts.HRSS_TP_DED_TAX) {
+                            dTotalIsr += ((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporte().getDouble();
+                        }
+
+                        dTotalDeducciones += ((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporte().getDouble();
+                    }
+                }
+
+                for (int j = i; j < 10; j++) {
+                    aDeducciones.add(null);
+                    aDeducciones.add(null);
+                    aDeducciones.add(null);
+                    aDeducciones.add(null);
+                    aDeducciones.add(null);
+                }
+
+                // Incapacities:
+
+                i = 0;
+                if (((cfd.ver3.nom12.DElementNomina) element).getEltIncapacidades() != null) {
+                    for (i = 0; i < ((cfd.ver3.nom12.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().size(); i++) {
+                        sCodeDisability = ((cfd.ver3.nom12.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttTipoIncapacidad().getString();
+
+                        aIncapacidades.add(sCodeDisability);
+                        aIncapacidades.add(SHrsUtils.getDisabilityName((SGuiClient) miClient, sCodeDisability));
+                        aIncapacidades.add(((cfd.ver3.nom12.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttDiasIncapacidad().getInteger());
+                        aIncapacidades.add(((cfd.ver3.nom12.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttImporteMonetario().getDouble());
+
+                        dTotalIncapacidades += ((cfd.ver3.nom12.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().get(i).getAttImporteMonetario().getDouble();
+                    }
+                }
+
+                for (int j = i; j < 5; j++) {
+                    aIncapacidades.add(null);
+                    aIncapacidades.add(null);
+                    aIncapacidades.add(null);
+                    aIncapacidades.add(null);
+                }
+
+                map.put("oPerceptions", aPercepciones);
+                map.put("oDeductions", aDeducciones);
+                map.put("oExtratimes", aTiempoExtra);
+                map.put("oIncapacities", aIncapacidades);
+                map.put("TotalPercepcionesGravado", dTotalPercepciones);
+                map.put("TotalPercepcionesExento", null);
+                map.put("TotalDeduccionesGravado", dTotalDeducciones);
+                map.put("TotalDeduccionesExento", null);
+                map.put("TotalTiempoExtra", nTotalTiempoExtra);
+                map.put("TotalTiempoExtraPagado", dTotalTiempoExtraPagado);
+                map.put("TotalIncapacidades", dTotalIncapacidades);
+                map.put("dCfdTotalIsr", dTotalIsr);
+            }
+            else if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
+                cfd.ver33.DElementTimbreFiscalDigital tfd = (cfd.ver33.DElementTimbreFiscalDigital) element;
+                map.put("sCfdiVersion", tfd.getAttVersion().getString());
+                map.put("sCfdiUuid", tfd.getAttUUID().getString());
+                map.put("sCfdiSelloCFD", tfd.getAttSelloCFD().getString());
+                map.put("sCfdiSelloSAT", tfd.getAttSelloSAT().getString());
+                map.put("sCfdiNoCertificadoSAT", tfd.getAttNoCertificadoSAT().getString());
+                map.put("sCfdiFechaTimbre", tfd.getAttFechaTimbrado().getString());
+                map.put("sCfdiRfcProvCertif", tfd.getAttRfcProvCertif().getString());
             }
         }
 

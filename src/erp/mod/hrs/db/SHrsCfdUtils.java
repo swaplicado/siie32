@@ -29,6 +29,10 @@ import sa.lib.srv.SSrvConsts;
 /**
  *
  * @author Irving Sánchez, Juan Barajas, Sergio Flores
+ * 
+ * Maintenance Log:
+ * 2018-01-02, Sergio Flores:
+ *  Implementation of payroll into CFDI 3.3.
  */
 public abstract class SHrsCfdUtils {
     
@@ -172,7 +176,7 @@ public abstract class SHrsCfdUtils {
                 + "ORDER BY id_cfd ";
 
         resultSet = session.getStatement().executeQuery(sql);
-        while (resultSet.next()) {
+        if (resultSet.next()) {
             if (resultSet.getInt("fid_st_xml") != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
                 if (resultSet.getInt("fid_st_xml") == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
                     add = !cfdiPendingSigned;
@@ -186,7 +190,7 @@ public abstract class SHrsCfdUtils {
         }
                             
         if (add) {
-            // Generate CFDI:
+            // generate CFDI:
 
             packet = new SCfdPacket();
             packet.setDpsYearId(0);
@@ -200,7 +204,7 @@ public abstract class SHrsCfdUtils {
                 case SDataConstantsSys.TRNS_TP_XML_CFD:
                     break;
                 case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
-                        comprobanteCfdi32 = (cfd.ver32.DElementComprobante) SCfdUtils.createCfdi32RootElement((SClientInterface)session.getClient(), receipt);
+                        comprobanteCfdi32 = (cfd.ver32.DElementComprobante) SCfdUtils.createCfdi32RootElement((SClientInterface) session.getClient(), receipt);
                         cfdVersion = comprobanteCfdi32.getVersion();
                         
                         packet.setStringSigned(DCfdUtils.generateOriginalString(comprobanteCfdi32));
@@ -254,7 +258,8 @@ public abstract class SHrsCfdUtils {
 
             moCfdPackets.add(packet);
 
-            // end generate cfd process
+            // end of Generate CFDI
+            
             payrollImport = new SDbFormerPayrollImport();
             
             payrollImport.setPayrollId(receipt.getPayroll().getPkNominaId());
@@ -274,27 +279,30 @@ public abstract class SHrsCfdUtils {
                 }
             }
         }
+        
         return SCfdUtils.getPayrollReceiptLastCfd((SClientInterface)session.getClient(), SCfdConsts.CFDI_PAYROLL_VER_CUR, new int[] { receipt.getPayroll().getPkNominaId(), receipt.getPkEmpleadoId(), receiptIssue });
     }
         
     public static void computeSignCfdi(final SGuiSession session, int[] keyReceipt) throws Exception {
         SDataCfd cfd = null;
-        SHrsFormerPayroll hrsFormerPayroll = null;
-        SHrsFormerPayrollReceipt hrsFormerPayrollReceipt = null;
+        SHrsFormerPayroll payroll = null;
+        SHrsFormerPayrollReceipt payrollReceipt = null;
         
-        hrsFormerPayroll = SHrsUtils.readPayroll((SClientInterface) session.getClient(), keyReceipt[0], keyReceipt[1], keyReceipt[2]);
-        hrsFormerPayrollReceipt = hrsFormerPayroll.getChildPayrollReceipts().get(0);
-        hrsFormerPayrollReceipt.setPayroll(hrsFormerPayroll);
-        hrsFormerPayrollReceipt.setFechaEdicion(session.getCurrentDate());
-        hrsFormerPayrollReceipt.setMoneda(session.getSessionCustom().getLocalCurrencyCode()); 
+        payroll = SHrsUtils.readPayroll((SClientInterface) session.getClient(), keyReceipt);
+        payrollReceipt = payroll.getChildPayrollReceipts().get(0);
+        payrollReceipt.setPayroll(payroll);
+        payrollReceipt.setFechaEdicion(session.getCurrentDate());
+        payrollReceipt.setMoneda(session.getSessionCustom().getLocalCurrencyCode()); 
+        payrollReceipt.setLugarExpedicion(((SClientInterface) session.getClient()).getSessionXXX().getCurrentCompanyBranch().getDbmsBizPartnerBranchAddressOfficial().getZipCode());
+        payrollReceipt.setConfirmacion("");
+        payrollReceipt.setRegimenFiscal(((SClientInterface) session.getClient()).getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal());
+        payrollReceipt.setCfdiRelacionadosTipoRelacion("");
         
-        cfd = computeCfdi(session, hrsFormerPayrollReceipt, keyReceipt[2], false);
+        cfd = computeCfdi(session, payrollReceipt, keyReceipt[2], false);
         if (cfd == null) {
             throw new Exception("Error al leer el CFD, no se encontró el registro.");
         }
-        /* XXX jbarajas 04/02/2016 sign and sending CFDI
-        SCfdUtils.signCfdi((SClientInterface) session.getClient(), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, false);
-        */
+
         if (((SClientInterface) session.getClient()).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
             SCfdUtils.signAndSendCfdi((SClientInterface) session.getClient(), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, false, false);
         }

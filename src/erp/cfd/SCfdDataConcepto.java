@@ -80,22 +80,22 @@ public class SCfdDataConcepto {
 
         try {
             for (SDataDpsEntryTax tax : entry.getDbmsEntryTaxes()) {
-                if (tax.getFkTaxCalculationTypeId() != SModSysConsts.FINS_TP_TAX_CAL_RATE) {
-                    throw new Exception("Todos los impuestos deben ser en base a una tasa (" + tax.getFkTaxCalculationTypeId() + ").");
+                if (!SLibUtils.belongsTo(tax.getFkTaxCalculationTypeId(), new int[] { SModSysConsts.FINS_TP_TAX_CAL_RATE, SModSysConsts.FINS_TP_TAX_CAL_EXEMPT })) {
+                    throw new Exception("El tipo de cálculo '" + tax.getDbmsTaxCalculationType() + "' del impuesto '" + tax.getDbmsTax() + "' no está soportado.");
                 }
-                else /*if (tax.getTaxCy() != 0)*/ {
+                else {
                     impuestoXml = new SCfdDataImpuesto();
                     
                     switch (tax.getFkTaxTypeId()) {
                         case SModSysConsts.FINS_TP_TAX_RETAINED:
                             switch (tax.getDbmsCfdTaxId()) {
-                                case SModSysConsts.FINS_CFD_TAX_IVA: // IVA
+                                case SModSysConsts.FINS_CFD_TAX_IVA:
+                                    impuestoXml.setImpuestoTipo(SModSysConsts.FINS_TP_TAX_RETAINED);
                                     impuestoXml.setImpuesto(DAttributeOptionImpuestoRetencion.CFD_IVA);
-                                    impuestoXml.setImpuestoBasico(SModSysConsts.FINS_TP_TAX_RETAINED);
                                     break;
-                                case SModSysConsts.FINS_CFD_TAX_ISR: // ISR
+                                case SModSysConsts.FINS_CFD_TAX_ISR:
+                                    impuestoXml.setImpuestoTipo(SModSysConsts.FINS_TP_TAX_RETAINED);
                                     impuestoXml.setImpuesto(DAttributeOptionImpuestoRetencion.CFD_ISR);
-                                    impuestoXml.setImpuestoBasico(SModSysConsts.FINS_TP_TAX_RETAINED);
                                     break;
                                 default:
                                     throw new Exception("Todos los impuestos retenidos deben ser conocidos (" + tax.getDbmsCfdTaxId() + ").");
@@ -104,13 +104,13 @@ public class SCfdDataConcepto {
 
                         case SModSysConsts.FINS_TP_TAX_CHARGED:
                             switch (tax.getDbmsCfdTaxId()) {
-                                case SModSysConsts.FINS_CFD_TAX_IVA: // IVA
+                                case SModSysConsts.FINS_CFD_TAX_IVA:
+                                    impuestoXml.setImpuestoTipo(SModSysConsts.FINS_TP_TAX_CHARGED);
                                     impuestoXml.setImpuesto(DAttributeOptionImpuestoTraslado.CFD_IVA);
-                                    impuestoXml.setImpuestoBasico(SModSysConsts.FINS_TP_TAX_CHARGED);
                                     break;
-                                case SModSysConsts.FINS_CFD_TAX_IEPS: // IEPS
+                                case SModSysConsts.FINS_CFD_TAX_IEPS:
+                                    impuestoXml.setImpuestoTipo(SModSysConsts.FINS_TP_TAX_CHARGED);
                                     impuestoXml.setImpuesto(DAttributeOptionImpuestoTraslado.CFD_IEPS);
-                                    impuestoXml.setImpuestoBasico(SModSysConsts.FINS_TP_TAX_CHARGED);
                                     break;
                                 default:
                                     throw new Exception("Todos los impuestos trasladados deben ser conocidos (" + tax.getDbmsCfdTaxId() + ").");
@@ -120,6 +120,7 @@ public class SCfdDataConcepto {
                         default:
                             throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + tax.getFkTaxTypeId() + ").");
                     }
+                    
                     impuestoXml.setBase(entry.getSubtotalCy_r());
                     impuestoXml.setImpuestoClave(tax.getDbmsCfdTax());
                     impuestoXml.setTasa(tax.getPercentage());
@@ -148,10 +149,11 @@ public class SCfdDataConcepto {
         concepto.getAttUnidad().setString(msUnidad);
         concepto.getAttClaveUnidad().setString(msClaveUnidad);
         
+        concepto.getAttCantidad().setDouble(mdCantidad);
         if (mnCfdiType == SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
             concepto.getAttCantidad().setDecimals(0);
         }
-        concepto.getAttCantidad().setDouble(mdCantidad);
+        
         concepto.getAttDescripcion().setString(msDescripcion);
         concepto.getAttValorUnitario().setDouble(mdValorUnitario);
         concepto.getAttImporte().setDouble(mdImporte);
@@ -166,7 +168,7 @@ public class SCfdDataConcepto {
         cfd.ver33.DElementConceptoImpuestosTraslados impuestosTrasladados = new cfd.ver33.DElementConceptoImpuestosTraslados();
         
         for (SCfdDataImpuesto impuesto : maImpuestosXml) {
-            switch (impuesto.getImpuestoBasico()) {
+            switch (impuesto.getImpuestoTipo()) {
                 case SModSysConsts.FINS_TP_TAX_RETAINED:
                     impuestosRetenciones.getEltImpuestoRetenciones().add((cfd.ver33.DElementConceptoImpuestoRetencion) impuesto.createRootElementConceptoImpuesto33());
                     break;

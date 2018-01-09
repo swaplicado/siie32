@@ -5,7 +5,7 @@
 package erp.mtrn.form;
 
 import cfd.DCfdUtils;
-import cfd.ver33.DCfdi33Consts;
+import cfd.ver33.DCfdi33Catalogs;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdXmlCatalogs;
 import erp.client.SClientInterface;
@@ -8623,7 +8623,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             //dpsCfd.setPkYearId(...    // set when DPS saved!
             //dpsCfd.setPkDocId(...     // set when DPS saved!
             //dpsCfd.setVersion(...     // set when DPS saved!
-            dpsCfd.setCfdiType(mbIsDoc ? DCfdi33Consts.CFD_TP_I : DCfdi33Consts.CFD_TP_E);
+            dpsCfd.setCfdiType(mbIsDoc ? DCfdi33Catalogs.CFD_TP_I : DCfdi33Catalogs.CFD_TP_E);
             dpsCfd.setPaymentWay(moFieldCfdiPaymentWay.getFieldValue().toString());
             dpsCfd.setPaymentMethod(moFieldCfdiPaymentMethod.getFieldValue().toString());
             dpsCfd.setPaymentConditions(moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CASH ? "CONTADO" : "CRÉDITO " + moFieldDaysOfCredit.getInteger() + " DÍAS");  // XXX: implement method!

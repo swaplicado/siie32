@@ -438,7 +438,9 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                 cfdsIncorrect++;
                 detailMessage += "No se creo el PDF\n";
             }
+            
             updateForm(cfdsProcessed, cfdsCorrect, cfdsIncorrect, detailMessage);
+            
             update(getGraphics());
             jScrollPane1.getVerticalScrollBar().setValue(jScrollPane1.getVerticalScrollBar().getMaximum());
         }
@@ -499,10 +501,9 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
 
                                 resultSet = miClient.getSession().getDatabase().getConnection().createStatement().executeQuery(sSql);
                                 if (resultSet.next()) {
-                                    payrollReceiptIssue = new SDbPayrollReceiptIssue();
-                                    
-                                    numberSeries = (String) payrollReceiptIssue.readField(miClient.getSession().getDatabase().getConnection().createStatement(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), resultSet.getInt("id_iss") }, SDbPayrollReceiptIssue.FIELD_NUMBER_SERIES);
-                                    number = "" + (int) payrollReceiptIssue.readField(miClient.getSession().getDatabase().getConnection().createStatement(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), resultSet.getInt("id_iss") }, SDbPayrollReceiptIssue.FIELD_NUMBER);
+                                    payrollReceiptIssue = (SDbPayrollReceiptIssue) miClient.getSession().readRegistry(SModConsts.HRS_PAY_RCP_ISS, new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), resultSet.getInt("id_iss") });
+                                    numberSeries = payrollReceiptIssue.getNumberSeries();
+                                    number = "" + payrollReceiptIssue.getNumber();
                                 }
                                 break;
                             default:
@@ -563,7 +564,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                             detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Anulado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
                             break;
                         case SCfdConsts.PROC_REQ_VERIFY:
-                            SCfdUtils.verifyCfdi(miClient, cfd, mnSubtypeCfd);
+                            SCfdUtils.verifyCfdi(miClient, cfd, mnSubtypeCfd, false);
                             detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Enviado.\n";
                             break;
                         default:
@@ -581,6 +582,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                 else {
                     updateForm(cfdsProcessed, cfdsCorrect, cfdsIncorrect, detailMessage);
                 }
+                
                 update(getGraphics());
                 jScrollPane1.getVerticalScrollBar().setValue(jScrollPane1.getVerticalScrollBar().getMaximum());
             }

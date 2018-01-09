@@ -456,6 +456,7 @@ public abstract class SModSysConsts {
     public static final int FINS_TP_TAX_CAL_AMT_FIX_U = 2;
     public static final int FINS_TP_TAX_CAL_AMT_FIX = 3;
     public static final int FINS_TP_TAX_CAL_AMT = 4;
+    public static final int FINS_TP_TAX_CAL_EXEMPT = 9;
 
     public static final int FINS_TP_TAX_APP_ACCR = 1;
     public static final int FINS_TP_TAX_APP_CASH = 2;
