@@ -27,7 +27,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores, Juan Barajas
+ * @author Alfonso Flores, Sergio Flores, Juan Barajas, Daniel López
  */
 public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
@@ -86,8 +86,8 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         jtfZipCode = new javax.swing.JTextField();
         jPanel5 = new javax.swing.JPanel();
         jlState = new javax.swing.JLabel();
-        jtfState = new javax.swing.JTextField();
         jcbFkStateId_n = new javax.swing.JComboBox();
+        jtfState = new javax.swing.JTextField();
         jPanel7 = new javax.swing.JPanel();
         jlCounty = new javax.swing.JLabel();
         jtfCounty = new javax.swing.JTextField();
@@ -170,14 +170,14 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         jlState.setPreferredSize(new java.awt.Dimension(85, 23));
         jPanel5.add(jlState);
 
-        jtfState.setToolTipText("Estado");
-        jtfState.setPreferredSize(new java.awt.Dimension(230, 23));
-        jPanel5.add(jtfState);
-
         jcbFkStateId_n.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbFkStateId_n.setToolTipText("Estado");
         jcbFkStateId_n.setPreferredSize(new java.awt.Dimension(230, 23));
         jPanel5.add(jcbFkStateId_n);
+
+        jtfState.setToolTipText("Estado");
+        jtfState.setPreferredSize(new java.awt.Dimension(230, 23));
+        jPanel5.add(jtfState);
 
         add(jPanel5);
 
@@ -306,6 +306,8 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         jbEditCountry.setEnabled(!enable);
         jcbFkCountryId_n.setEnabled(enable);
         jbFkCountryId_n.setEnabled(enable);
+        jtfState.setEditable(!enable);
+        jtfState.setFocusable(!enable);
     }
     
     private void itemChangedCountry() {
@@ -318,12 +320,22 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
             }
             else {
                 country = SLibConstants.UNDEFINED;
+                jtfState.setEditable(false);
+                jtfState.setFocusable(false);
             }
         }
         
         if (country != SLibConstants.UNDEFINED) {
             populateStates(country);
             jcbFkStateId_n.setEnabled(SLocUtils.hasAssociateStates(miClient.getSession(), country));
+            if (SLocUtils.hasAssociateStates(miClient.getSession(), country)) {
+                jtfState.setEditable(false);
+                jtfState.setFocusable(false);
+            }
+            else {
+                jtfState.setEditable(true);
+                jtfState.setFocusable(true);
+            }
         }
     }
     
@@ -506,7 +518,12 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         moBizPartnerBranchAddress.setReference(moFieldReference.getString());
         moBizPartnerBranchAddress.setLocality(moFieldLocality.getString());
         moBizPartnerBranchAddress.setCounty(moFieldCounty.getString());
-        moBizPartnerBranchAddress.setState(moFieldState.getString());
+        if (jcbFkStateId_n.isEnabled()) {
+            moBizPartnerBranchAddress.setState("");
+        }
+        else {
+            moBizPartnerBranchAddress.setState(moFieldState.getString());
+        }
         moBizPartnerBranchAddress.setZipCode(moFieldZipCode.getString());
         moBizPartnerBranchAddress.setIsDefault(moFieldIsDefault.getBoolean());
         moBizPartnerBranchAddress.setFkCountryId_n(moFieldFkCountryId.getKeyAsIntArray()[0]);
