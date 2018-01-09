@@ -20,6 +20,7 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mitm.form.SPanelFilterItemGeneric;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.STrnUtilities;
 import erp.mtrn.form.SDialogContractAnalysis;
@@ -40,7 +41,7 @@ import sa.lib.SLibRpnOperator;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Daniel López
  */
 public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -53,6 +54,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
     private javax.swing.JButton mjbPrintContractMoves;
     private erp.table.STabFilterCompanyBranch moTabFilterCompanyBranch;
     private erp.table.STabFilterBizPartner moTabFilterBizPartner;
+    private erp.mitm.form.SPanelFilterItemGeneric moPanelFilterItemGeneric;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     private erp.lib.table.STabFilterDateCutOff moTabFilterDateCutOff;
     private erp.mtrn.form.SDialogContractAnalysis moDialogContractAnalysis;
@@ -144,6 +146,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
 
         moTabFilterCompanyBranch = new STabFilterCompanyBranch(miClient, this);
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, isViewForCategoryPur() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
+        moPanelFilterItemGeneric = new SPanelFilterItemGeneric(miClient, this);
         moDialogContractAnalysis = new SDialogContractAnalysis(miClient);
 
         if (isViewForDocLinked()) {
@@ -171,6 +174,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
         addTaskBarUpperComponent(moTabFilterCompanyBranch);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterBizPartner);
+        addTaskBarUpperComponent(moPanelFilterItemGeneric);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(mjbViewDps);
         addTaskBarUpperComponent(mjbViewNotes);
@@ -476,6 +480,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
         String sqlDatePeriod = "";
         String sqlCompanyBranch = "";
         String sqlBizPartner = "";
+        String sqlItemGeneric = "";
         String sqlWhere = "";
         STableSetting setting = null;
 
@@ -495,6 +500,11 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_BP) {
                 sqlBizPartner = ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND d.fid_bp_r = " + (Integer) setting.getSetting() + " ");
+            }
+            else if (setting.getType() == STableConstants.SETTING_FILTER_ITM_ITEM_GENERIC) {
+                if (((int[]) setting.getSetting())[0] != SLibConstants.UNDEFINED) {
+                    sqlItemGeneric = "AND i.fid_igen = " + ((int[]) setting.getSetting())[0] + " ";
+                }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_DOC_NAT) {
                 if (((Integer) setting.getSetting()) != SLibConstants.UNDEFINED) {
@@ -553,7 +563,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
                 (isViewForCategoryPur() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS) + " " +
                 "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
                 "INNER JOIN erp.usru_usr AS ul ON d.fid_usr_link = ul.id_usr " + (mbHasRightAuthor ? " AND d.fid_usr_new = " + miClient.getSession().getUser().getPkUserId() + " " : "") +
-                "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " +
+                "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " + sqlItemGeneric +
                 "INNER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " +
                 "INNER JOIN erp.itmu_unit AS u ON de.fid_unit = u.id_unit " +
                 "INNER JOIN erp.itmu_unit AS uo ON de.fid_orig_unit = uo.id_unit " +
