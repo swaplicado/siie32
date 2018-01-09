@@ -35,7 +35,7 @@ import sa.lib.prt.SPrtUtils;
 
 /**
  *
- * @author Juan Barajas, Alfredo Pérez
+ * @author Juan Barajas, Alfredo Pérez, Daniel López
  */
 public abstract class SFinUtilities {
     
@@ -1374,7 +1374,8 @@ public abstract class SFinUtilities {
                 "FROM trn_dps_rec AS dr " +
                 "INNER JOIN fin_rec AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num " +
                 "INNER JOIN fin_rec_ety AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num " +
-                "WHERE dr.id_dps_year = " + dpsEntryPk[0] + " AND dr.id_dps_doc = " + dpsEntryPk[1] + " AND re.b_del = 0 AND re.fid_item_n = " + entry.getFkItemId();
+                "WHERE dr.id_dps_year = " + dpsEntryPk[0] + " AND dr.id_dps_doc = " + dpsEntryPk[1] + " AND re.b_del = 0 AND re.fid_item_n = " + entry.getFkItemId() + " AND " +
+                "re.units = " + entry.getQuantity() + " AND (re.credit = " + entry.getSubtotal_r() + " OR re.debit = " + entry.getSubtotal_r() + ") " ;
         resultSet = client.getSession().getStatement().executeQuery(sql);
         
         while (resultSet.next()) {
@@ -1384,9 +1385,10 @@ public abstract class SFinUtilities {
         return costCenter;
     }
     
-    public static boolean updateAccountCostCenterForDpsEntry(final SClientInterface client, int[] dpsEntryPk, String account, String costCenter) throws Exception {
+    public static boolean updateAccountCostCenterForDpsEntry(final SClientInterface client, int[] dpsEntryPk, String account, String costCenter, double quantity, double total) throws Exception {
         int accountPk = 0;
         int costCenterPk = 0;
+        int numberOfRows = 0;
         ResultSet resultSet = null;
         String sql = "";
         Object[] key = null;
@@ -1396,15 +1398,16 @@ public abstract class SFinUtilities {
         accountPk = SFinUtils.getAccountId(client.getSession(), account);
         costCenterPk = SFinUtils.getCostCenterId(client.getSession(), costCenter);
         
-        sql = "SELECT re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety " +
+        sql = "SELECT re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety, re.units, re.credit, re.debit, COUNT(*) AS n_rows " +
                 "FROM trn_dps_rec AS dr " +
                 "INNER JOIN fin_rec AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num " +
                 "INNER JOIN fin_rec_ety AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num " +
-                "WHERE dr.id_dps_year = " + dpsEntryPk[0] + " AND dr.id_dps_doc = " + dpsEntryPk[1] + " AND re.b_del = 0 AND re.fid_item_n = " + entry.getFkItemId();
+                "WHERE dr.id_dps_year = " + dpsEntryPk[0] + " AND dr.id_dps_doc = " + dpsEntryPk[1] + " AND re.b_del = 0 AND re.fid_item_n = " + entry.getFkItemId() + " AND " + 
+                "re.units = " + quantity + " AND (re.credit = " + total + " OR re.debit = " + total + ") ";
         resultSet = client.getSession().getStatement().executeQuery(sql);
         
         while (resultSet.next()) {
-            key = new Object[6];
+            key = new Object[8];
             
             key[0] = resultSet.getInt("re.id_year");
             key[1] = resultSet.getInt("re.id_per"); 
@@ -1412,19 +1415,29 @@ public abstract class SFinUtilities {
             key[3] = resultSet.getString("re.id_tp_rec"); 
             key[4] = resultSet.getInt("re.id_num"); 
             key[5] = resultSet.getInt("re.id_ety");
+            key[6] = resultSet.getDouble("re.units"); //added to filter the query
+            key[7] = resultSet.getDouble("re.credit") != 0 ? resultSet.getDouble("re.credit") : resultSet.getDouble("re.debit"); //added to filter the query
+            
+            numberOfRows = resultSet.getInt("n_rows"); //If n_rows is > 1, then doesn't update because there are 2 or more identical entries
         }
         
-        sql = "UPDATE fin_rec_ety SET fid_acc = '" + account + "', fk_acc = " + accountPk + ", " +
-                (costCenter.isEmpty() ? "fid_cc_n = NULL, fk_cc_n = 0" : "fid_cc_n = '" + costCenter + "', fk_cc_n = " + costCenterPk) + ", " +
-                "fid_usr_edit = " + client.getSession().getUser().getPkUserId() + ", ts_edit = NOW() " +
-                "WHERE id_year = " + key[0] + " AND id_per = " + key[1] + " AND id_bkc = " + key[2] + " AND id_tp_rec = '" + key[3] + "' AND id_num = " + key[4] + " AND " +
-                "id_ety = " + key[5] + ";";
-        client.getSession().getStatement().execute(sql);
-        
-        sql = "UPDATE trn_dps_ety " +
-                "SET " + (costCenter.isEmpty() ? "fid_cc_n = NULL " : "fid_cc_n = '" + costCenter + "' ") +
-                "WHERE id_year = " + dpsEntryPk[0] + " AND id_doc = " + dpsEntryPk[1] + " AND id_ety = " + dpsEntryPk[2] + ";";
-        client.getSession().getStatement().execute(sql);
+        if (numberOfRows == 1) { //if there's only 1 entry whith same cost center, unit, item, and credit
+             sql = "UPDATE fin_rec_ety SET fid_acc = '" + account + "', fk_acc = " + accountPk + ", " + 
+                    (costCenter.isEmpty() ? "fid_cc_n = NULL, fk_cc_n = 0" : "fid_cc_n = '" + costCenter + "', fk_cc_n = " + costCenterPk) + ", " +
+                    "fid_usr_edit = " + client.getSession().getUser().getPkUserId() + ", ts_edit = NOW() " +
+                    "WHERE id_year = " + key[0] + " AND id_per = " + key[1] + " AND id_bkc = " + key[2] + " AND id_tp_rec = '" + key[3] + "' AND id_num = " + key[4] + " AND " +
+                    "id_ety = " + key[5] + " AND units = " + key[6] + " AND (credit = " + key[7] + " OR debit = " + key[7] +");";
+            client.getSession().getStatement().execute(sql);
+
+            sql = "UPDATE trn_dps_ety " +
+                    "SET " + (costCenter.isEmpty() ? "fid_cc_n = NULL " : "fid_cc_n = '" + costCenter + "' ") + ", " +
+                    "fid_usr_edit = " + client.getSession().getUser().getPkUserId() + ", " + "ts_edit = NOW() " +
+                    "WHERE id_year = " + dpsEntryPk[0] + " AND id_doc = " + dpsEntryPk[1] + " AND id_ety = " + dpsEntryPk[2] + ";";
+            client.getSession().getStatement().execute(sql);
+        }
+        else {
+            throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_MANY);
+        }
         
         return true;
     }
