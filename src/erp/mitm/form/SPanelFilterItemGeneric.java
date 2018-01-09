@@ -60,7 +60,7 @@ public class SPanelFilterItemGeneric extends javax.swing.JPanel {
         jtfItemGeneric.setPreferredSize(new java.awt.Dimension(200, 23));
         add(jtfItemGeneric);
 
-        jbItemGeneric.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif"))); // NOI18N
+        jbItemGeneric.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_filter_unit.gif"))); // NOI18N
         jbItemGeneric.setToolTipText("Seleccionar ítem genérico");
         jbItemGeneric.setPreferredSize(new java.awt.Dimension(23, 23));
         jbItemGeneric.addActionListener(new java.awt.event.ActionListener() {
