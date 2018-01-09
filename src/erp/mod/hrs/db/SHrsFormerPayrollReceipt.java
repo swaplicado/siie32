@@ -861,12 +861,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
 
     @Override
     public ArrayList<SCfdDataConcepto> getElementsConcepto() {
-        ArrayList<SCfdDataConcepto> concepts = null;
-        SCfdDataConcepto conceptoXml = null;
-
-        concepts = new ArrayList<SCfdDataConcepto>();
-        conceptoXml = new SCfdDataConcepto();
-
+        SCfdDataConcepto conceptoXml = new SCfdDataConcepto();
         conceptoXml.setClaveProdServ("84111505");
         conceptoXml.setNoIdentificacion("");
         conceptoXml.setCantidad(1);
@@ -876,7 +871,9 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         conceptoXml.setValorUnitario(mdTotalPercepciones);
         conceptoXml.setImporte(mdTotalPercepciones);
         conceptoXml.setDescuento(mdTotalDeducciones);
+        conceptoXml.setCfdiType(SDataConstantsSys.TRNS_TP_CFD_PAYROLL);
 
+        ArrayList<SCfdDataConcepto> concepts = new ArrayList<SCfdDataConcepto>();
         concepts.add(conceptoXml);
 
         return concepts;

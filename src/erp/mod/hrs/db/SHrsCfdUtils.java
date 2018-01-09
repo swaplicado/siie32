@@ -176,7 +176,7 @@ public abstract class SHrsCfdUtils {
                 + "ORDER BY id_cfd ";
 
         resultSet = session.getStatement().executeQuery(sql);
-        while (resultSet.next()) {
+        if (resultSet.next()) {
             if (resultSet.getInt("fid_st_xml") != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
                 if (resultSet.getInt("fid_st_xml") == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
                     add = !cfdiPendingSigned;
@@ -279,6 +279,7 @@ public abstract class SHrsCfdUtils {
                 }
             }
         }
+        
         return SCfdUtils.getPayrollReceiptLastCfd((SClientInterface)session.getClient(), SCfdConsts.CFDI_PAYROLL_VER_CUR, new int[] { receipt.getPayroll().getPkNominaId(), receipt.getPkEmpleadoId(), receiptIssue });
     }
         

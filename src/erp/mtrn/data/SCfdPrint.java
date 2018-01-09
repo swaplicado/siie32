@@ -1782,18 +1782,18 @@ public class SCfdPrint {
         
         map.put("sSql", sSql);
         map.put("sCfdFecha", SLibUtils.DbmsDateFormatDatetime.format(comprobante.getAttFecha().getDatetime()));
-        map.put("sCfdFormaDePago", comprobante.getAttMetodoPago());
+        map.put("sCfdFormaDePago", comprobante.getAttMetodoPago().getString());
         map.put("sCfdNoCuentaPago", ""/*comprobante.getAttNumCtaPago().getString()*/);
-        map.put("sCfdCondicionesDePagoOpc", comprobante.getAttCondicionesDePago());
+        map.put("sCfdCondicionesDePagoOpc", comprobante.getAttCondicionesDePago().getString());
         map.put("dCfdSubtotal", comprobante.getAttSubTotal().getDouble());
         map.put("dCfdDescuento", comprobante.getAttDescuento().getDouble());
         map.put("dCfdTotal", comprobante.getAttTotal().getDouble());
-        map.put("sCfdMetodoDePagoOpc", comprobante.getAttFormaPago());
+        map.put("sCfdMetodoDePagoOpc", comprobante.getAttFormaPago().getString());
         map.put("sExpedidoEn", comprobante.getAttLugarExpedicion().getString());
-        map.put("sCfdTipoComprobante", comprobante.getAttTipoDeComprobante());
+        map.put("sCfdTipoComprobante", comprobante.getAttTipoDeComprobante().getString());
         //map.put("sCfdNoCuentaPago", comprobante.getAttNumCtaPago().getString());
         map.put("sCfdNoCertificado", comprobante.getAttNoCertificado().getString());
-        map.put("sEmiRegimenFiscal", comprobante.getEltEmisor().getAttRegimenFiscal());
+        map.put("sEmiRegimenFiscal", comprobante.getEltEmisor().getAttRegimenFiscal().getString());
         map.put("sEmiRfc", comprobante.getEltEmisor().getAttRfc().getString());
         map.put("sRecRfc", comprobante.getEltReceptor().getAttRfc().getString());
         map.put("dCfdTotal", comprobante.getAttTotal().getDouble());
@@ -1963,7 +1963,6 @@ public class SCfdPrint {
                 i = 0;
                 if (((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones() != null) {
                     for (i = 0; i < ((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().size(); i++) {
-
                         aDeducciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttTipoDeduccion().getString());
                         aDeducciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttClave().getString());
                         aDeducciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttConcepto().getString());
@@ -2026,13 +2025,14 @@ public class SCfdPrint {
                 map.put("dCfdTotalIsr", dTotalIsr);
             }
             else if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
-                cfd.ver32.DElementTimbreFiscalDigital tfd = (cfd.ver32.DElementTimbreFiscalDigital) element;
+                cfd.ver33.DElementTimbreFiscalDigital tfd = (cfd.ver33.DElementTimbreFiscalDigital) element;
                 map.put("sCfdiVersion", tfd.getAttVersion().getString());
                 map.put("sCfdiUuid", tfd.getAttUUID().getString());
                 map.put("sCfdiSelloCFD", tfd.getAttSelloCFD().getString());
                 map.put("sCfdiSelloSAT", tfd.getAttSelloSAT().getString());
                 map.put("sCfdiNoCertificadoSAT", tfd.getAttNoCertificadoSAT().getString());
                 map.put("sCfdiFechaTimbre", tfd.getAttFechaTimbrado().getString());
+                map.put("sCfdiRfcProvCertif", tfd.getAttRfcProvCertif().getString());
             }
         }
 

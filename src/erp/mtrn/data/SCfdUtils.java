@@ -2864,11 +2864,12 @@ public abstract class SCfdUtils implements Serializable {
             client.showMsgBoxInformation("No existen documentos para validar.");
         }
         else {
-            for(SDataCfd cfd : cfds) {
+            for (SDataCfd cfd : cfds) {
+                // XXX 2018-01-08, Sergio Flores: Check this for statement, CFD are being added twice when if statement evaluates to true!:
                 if (cfd.getIsProcessingWebService() || cfd.getIsProcessingStorageXml() || cfd.getIsProcessingStoragePdf()) {
                     cfdsValidate.add(cfd);
                 }
-                cfdsValidate.add(cfd);
+                //cfdsValidate.add(cfd);
             }
 
             stampAvailables = getStampsAvailable(client, cfdsValidate.get(0).getFkCfdTypeId(), cfdsValidate.get(0).getTimestamp(), 0);
@@ -2883,7 +2884,7 @@ public abstract class SCfdUtils implements Serializable {
         return valid;
     }
 
-    public static boolean verifyCfdi(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd) throws Exception {
+    public static boolean verifyCfdi(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd, final boolean showFinalMessage) throws Exception {
         boolean valid = false;
         SCfdPrint cfdPrint = null;
         SDataDps dps = null;
@@ -2996,8 +2997,12 @@ public abstract class SCfdUtils implements Serializable {
                     }
                     
                     updateProcessCfd(client, cfd, false);
-                    client.showMsgBoxInformation(SLibConsts.MSG_PROCESS_FINISHED);
+                    
+                    if (showFinalMessage) {
+                        client.showMsgBoxInformation(SLibConsts.MSG_PROCESS_FINISHED);
+                    }
                 }
+                
                 client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
             else {
@@ -3689,8 +3694,7 @@ public abstract class SCfdUtils implements Serializable {
         }
         
         if (xmlCfdi.getCfdType() == SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
-            if (elementComplement == null || comprobante.getEltOpcComplemento().getElements().isEmpty()) {
-                comprobante = null;
+            if (elementComplement == null) {
                 throw new Exception("Error al generar el complemento nómina o el complemento no existe.");
             }
         }

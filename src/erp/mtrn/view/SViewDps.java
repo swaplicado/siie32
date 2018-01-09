@@ -1810,7 +1810,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento '" + dps.getDpsNumber() + "'.");
                 }
                 else {
-                    if (SCfdUtils.verifyCfdi(miClient, dps.getDbmsDataCfd(), SLibConstants.UNDEFINED)) {
+                    if (SCfdUtils.verifyCfdi(miClient, dps.getDbmsDataCfd(), SLibConstants.UNDEFINED, true)) {
                         miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
                     }
                 }

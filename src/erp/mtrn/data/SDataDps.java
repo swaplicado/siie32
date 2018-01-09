@@ -4424,9 +4424,24 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     cfd.ver3.cce11.DElementMercancia mercancia = new cfd.ver3.cce11.DElementMercancia();
                     mercancia.getAttNoIdentificacion().setString(dpsEntry.getConceptKey());
                     mercancia.getAttFraccionArancelaria().setString(dpsEntry.getDbmsTariffFraction());
-                    mercancia.getAttCantidadAduana().setDouble(dpsEntry.getOriginalQuantity());
-                    mercancia.getAttUnidadAduana().setString(dpsEntry.getDbmsCustomsUnitSymbol());
-                    mercancia.getAttValorUnitarioAduana().setDouble(price);
+                    
+                    /* XXX 2018-01-08, Sergio Flores: This must be improved! By now, due to development time convenience, it is improperly assumed that all cases of TON must be converted to KG!*/
+                    double conversion;
+                    String customsUnit;
+                    
+                    if (dpsEntry.getDbmsCustomsUnitSymbol().compareTo("14") == 0) { //ton
+                        conversion = 1000;
+                        customsUnit = "01"; //kg
+                    }
+                    else {
+                        conversion = 1;
+                        customsUnit = dpsEntry.getDbmsCustomsUnitSymbol();
+                    }
+                    /* XXX */
+                    
+                    mercancia.getAttCantidadAduana().setDouble(SLibUtils.round(dpsEntry.getOriginalQuantity() * conversion, mercancia.getAttCantidadAduana().getDecimals()));
+                    mercancia.getAttUnidadAduana().setString(customsUnit);
+                    mercancia.getAttValorUnitarioAduana().setDouble(SLibUtils.round(price / conversion, mercancia.getAttValorUnitarioAduana().getDecimals()));
                     mercancia.getAttValorDolares().setDouble(valueUsd);
 
                     comercioExterior.getEltMercancias().addMercancia(mercancia);
@@ -4900,6 +4915,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 if (descripcion.length() > 1000) {
                     descripcion = descripcion.substring(0, 1000);
                 }
+                // XXX
                 
                 if (dpsEntry.getSubtotalProvisionalCy_r() == SLibUtils.round(dpsEntry.getOriginalPriceUnitaryCy() * dpsEntry.getOriginalQuantity(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits())) {
                     price = dpsEntry.getOriginalPriceUnitaryCy();
