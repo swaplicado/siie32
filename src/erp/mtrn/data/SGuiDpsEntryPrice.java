@@ -6,10 +6,11 @@
 package erp.mtrn.data;
 
 import java.util.ArrayList;
+import sa.lib.SLibUtils;
 
 /**
  *
- * @author Irving Sánchez
+ * @author Irving Sánchez, Daniel López
  */
 public class SGuiDpsEntryPrice {
     private double mdQtyUsedOther;
@@ -33,12 +34,12 @@ public class SGuiDpsEntryPrice {
 
     public double obtainQtyAvailable() {
         updateQtyOwn();
-        return moDataDpsSourceEntryPrice.getOriginalQuantity() - mdQtyUsedOther - mdQtyUsedOwn;
+        return SLibUtils.round(moDataDpsSourceEntryPrice.getOriginalQuantity() - mdQtyUsedOther - mdQtyUsedOwn, SLibUtils.getDecimalFormatAmountUnitary().getMaximumFractionDigits());
     }
     
     public double obtainQtyAvailable(SDataDpsEntry dataDpsDestinyEntry) {
         updateQtyOwn();
-        return obtainQtyAvailable() + dataDpsDestinyEntry.getOriginalQuantity();
+        return SLibUtils.round(obtainQtyAvailable() + dataDpsDestinyEntry.getOriginalQuantity(), SLibUtils.getDecimalFormatAmountUnitary().getMaximumFractionDigits());
     }
 
     public void updateQtyOwn() {
