@@ -28,7 +28,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Daniel López
  */
 public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -300,12 +300,13 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
                 if (miClient.showMsgBoxConfirm("¿Esta seguro que desea modificar la contabilización actual de la partida?") == JOptionPane.OK_OPTION) {
                     mnFormResult = SLibConstants.FORM_RESULT_OK;
                     
-                    SFinUtilities.updateAccountCostCenterForDpsEntry(miClient, (int[]) moDpsEntry.getPrimaryKey(), moAccountNew.getPkAccountIdXXX(), (moCostCenterNew == null ? "" : moCostCenterNew.getPkCostCenterIdXXX()));
+                    //Parameters added: original quantity and subtotal to use as filter in the query:
+                    SFinUtilities.updateAccountCostCenterForDpsEntry(miClient, (int[]) moDpsEntry.getPrimaryKey(), moAccountNew.getPkAccountIdXXX(), (moCostCenterNew == null ? "" : moCostCenterNew.getPkCostCenterIdXXX()), moDpsEntry.getOriginalQuantity(), moDpsEntry.getSubtotal_r());
                 }
                 this.setVisible(false);
             }
             catch (Exception e) {
-                SLibUtilities.printOutException(this, e);
+                SLibUtilities.renderException(this, e); //print out exception was changed to render Exception, to show message to user
             }
         }
     }
