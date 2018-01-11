@@ -15,6 +15,7 @@ import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
 import erp.data.SProcConstants;
 import erp.form.SFormOptionPickerBizPartner;
+import erp.gui.SGuiUtilities;
 import erp.gui.session.SSessionCustom;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
@@ -89,7 +90,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibMethod;
-import sa.lib.SLibTimeConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.srv.SSrvConsts;
@@ -8179,42 +8179,41 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             if (!validation.getIsError() && mbIsCon) {
                 // Validate contract:
                 
-                int months = 0;
-                int totalDeliveryMonths = 0;
-                int[] dateStart = null;
-                int[] dateEnd = null;
-                            
-                dateStart = SLibTimeUtilities.digestYearMonth(moFieldDateDocDelivery_n.getDate());
-                dateEnd = SLibTimeUtilities.digestYearMonth(moFieldDateDocLapsing_n.getDate());
-                
-                months = (dateEnd[0] - dateStart[0]) * SLibTimeConsts.MONTH_MAX + dateEnd[1] - dateStart[1] + 1;
-
-                for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
-                   for (SDataDpsEntryPrice price : ((SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData()).getDbmsEntryPrices()) {
-                        if (!price.getIsDeleted()) {
-                            totalDeliveryMonths++;
-                        }
-                   }
-                   if (totalDeliveryMonths != months) {
-                        validation.setMessage("El número de entregas mensuales capturadas en la partida número '" + (i + 1) + "' no coinciden con periodo de entrega del documento, en total deben ser " + months + ".");
-                        validation.setComponent(moPaneGridEntries);
-                        jTabbedPane.setSelectedIndex(0);
-                        break;
-                    }
+                try {
+                    int deliveryMonths;
+                    int periodMonths = SGuiUtilities.getPeriodMonths(moFieldDateDocDelivery_n.getDate(), moFieldDateDocLapsing_n.getDate());
                     
-                    for (SDataDpsEntryPrice price : ((SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData()).getDbmsEntryPrices()) {
-                        if (!price.getIsDeleted()) {
-                            totalDeliveryMonths ++;
-                            if (!SLibTimeUtilities.isBelongingToPeriod(SLibTimeUtilities.createDate(price.getContractPriceYear(), price.getContractPriceMonth()), SLibTimeUtilities.getBeginOfMonth(moFieldDateDocDelivery_n.getDate()), SLibTimeUtilities.getEndOfMonth(moFieldDateDocLapsing_n.getDate()))) {
-                                validation.setMessage("La entrega mensual '" + miClient.getSessionXXX().getFormatters().getDateYearMonthFormat().format(SLibTimeUtilities.createDate(price.getContractPriceYear(), price.getContractPriceMonth())) + "' de la partida '" + (i + 1) + "' no se encuentra dentro del periodo de entrega del documento.");
-                                validation.setComponent(moPaneGridEntries);
-                                jTabbedPane.setSelectedIndex(0);
-                                break;
+                    for (int row = 0; row < moPaneGridEntries.getTableGuiRowCount(); row++) {
+                        deliveryMonths = 0;
+                        
+                        for (SDataDpsEntryPrice price : ((SDataDpsEntry) moPaneGridEntries.getTableRow(row).getData()).getDbmsEntryPrices()) {
+                             if (!price.getIsDeleted()) {
+                                 deliveryMonths++;
+                             }
+                        }
+
+                        if (deliveryMonths != periodMonths) {
+                            validation.setMessage("El número de entregas mensuales capturadas en la partida número '" + (row + 1) + "' no coinciden con periodo de entrega del documento, en total deben ser " + periodMonths + ".");
+                            validation.setComponent(moPaneGridEntries);
+                            jTabbedPane.setSelectedIndex(0);
+                            break;
+                        }
+
+                        for (SDataDpsEntryPrice price : ((SDataDpsEntry) moPaneGridEntries.getTableRow(row).getData()).getDbmsEntryPrices()) {
+                            if (!price.getIsDeleted()) {
+                                deliveryMonths ++;
+                                if (!SLibTimeUtilities.isBelongingToPeriod(SLibTimeUtilities.createDate(price.getContractPriceYear(), price.getContractPriceMonth()), SLibTimeUtilities.getBeginOfMonth(moFieldDateDocDelivery_n.getDate()), SLibTimeUtilities.getEndOfMonth(moFieldDateDocLapsing_n.getDate()))) {
+                                    validation.setMessage("La entrega mensual '" + miClient.getSessionXXX().getFormatters().getDateYearMonthFormat().format(SLibTimeUtilities.createDate(price.getContractPriceYear(), price.getContractPriceMonth())) + "' de la partida '" + (row + 1) + "' no se encuentra dentro del periodo de entrega del documento.");
+                                    validation.setComponent(moPaneGridEntries);
+                                    jTabbedPane.setSelectedIndex(0);
+                                    break;
+                                }
                             }
                         }
                     }
-                    
-                    totalDeliveryMonths = 0;
+                }
+                catch (Exception e) {
+                    validation.setMessage(e.toString());
                 }
             }
             
