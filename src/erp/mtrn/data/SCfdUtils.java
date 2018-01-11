@@ -17,7 +17,6 @@ import cfd.DCfdUtils;
 import cfd.DElement;
 import cfd.ver2.DAttributeOptionFormaDePago;
 import cfd.ver3.DCfdVer3Consts;
-import cfd.ver32.DElementTimbreFiscalDigital;
 import cfd.ver33.DCfdi33Catalogs;
 import cfd.ver33.DElementCfdiRelacionados;
 import cfd.ver33.DElementImpuestos;
@@ -158,7 +157,7 @@ public abstract class SCfdUtils implements Serializable {
                     cfd.ver32.DElementComprobante comprobante32 = DCfdUtils.getCfdi32(cfd.getDocXml());
                     for (DElement element : comprobante32.getEltOpcComplemento().getElements()) {
                         if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
-                            certSAT = ((DElementTimbreFiscalDigital) element).getAttNoCertificadoSAT().getString();
+                            certSAT = ((cfd.ver32.DElementTimbreFiscalDigital) element).getAttNoCertificadoSAT().getString();
                             break;
                         }
                     }
@@ -167,7 +166,7 @@ public abstract class SCfdUtils implements Serializable {
                     cfd.ver33.DElementComprobante comprobante33 = DCfdUtils.getCfdi33(cfd.getDocXml());
                     for (DElement element : comprobante33.getEltOpcComplemento().getElements()) {
                         if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
-                            certSAT = ((DElementTimbreFiscalDigital) element).getAttNoCertificadoSAT().getString();
+                            certSAT = ((cfd.ver33.DElementTimbreFiscalDigital) element).getAttNoCertificadoSAT().getString();
                             break;
                         }
                     }
