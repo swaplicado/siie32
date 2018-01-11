@@ -78,8 +78,8 @@ public class SViewOrders extends SGridPaneView {
         
          msSql = "SELECT d.id_year " + SDbConsts.FIELD_ID + "1, " +
                 "d.id_doc " + SDbConsts.FIELD_ID + "2, " + 
-                "'' AS " + SDbConsts.FIELD_CODE + ", " +
-                "'' AS " + SDbConsts.FIELD_NAME + ", " + 
+                "'1' AS " + SDbConsts.FIELD_CODE + ", " +
+                "'2' AS " + SDbConsts.FIELD_NAME + ", " + 
                 "d.dt, d.exc_rate, d.stot_r, d.tax_charged_r, d.tax_retained_r, d.tot_r, d.stot_cur_r, d.tax_charged_cur_r, d.tax_retained_cur_r, d.tot_cur_r, d.ts_close, " +
                 "CONCAT(d.num_ser, IF(length(d.num_ser) = " + SModSysConsts.FINS_CFD_TAX_NA + ", '', '-'), d.num) AS f_num, " +
                 "(SELECT c.cur_key FROM erp.cfgu_cur AS c WHERE d.fid_cur = c.id_cur) AS f_cur_key, '" + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + "' AS f_cur_key_local, " +
@@ -110,12 +110,10 @@ public class SViewOrders extends SGridPaneView {
         
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
 
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "code", "Tipo doc", STableConstants.WIDTH_CODE_DOC));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "f_code", "Tipo doc", STableConstants.WIDTH_CODE_DOC));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "f_num", "Folio doc", STableConstants.WIDTH_DOC_NUM));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "num_ref", "Refencia", STableConstants.WIDTH_DOC_NUM_REF));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt", "Fecha doc", STableConstants.WIDTH_DATE));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_rcb_code", "Sucursal", STableConstants.WIDTH_CODE_COB));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_doc_delivery_n", "Entrega programada", STableConstants.WIDTH_DATE));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_cob_code", "Sucursal", STableConstants.WIDTH_CODE_COB));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "stot_r", "Subtotal mon $", STableConstants.WIDTH_VALUE_2X));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "tax_charged_r", "Imp tras mon $", STableConstants.WIDTH_VALUE_2X));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "tot_r", "Total mon $", STableConstants.WIDTH_VALUE_2X));
