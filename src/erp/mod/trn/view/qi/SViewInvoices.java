@@ -2,12 +2,15 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mod.trn.view;
+package erp.mod.trn.view.qi;
 
 import erp.data.SDataConstantsSys;
+import erp.lib.table.STableConstants;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import java.util.ArrayList;
 import java.util.Date;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
@@ -20,14 +23,14 @@ import sa.lib.gui.SGuiParams;
  *
  * @author Claudio Peña
  */
-public class SViewInvoice extends SGridPaneView {
+public class SViewInvoices extends SGridPaneView {
 
     private Date mtDateStart;
     private Date mtDateFinal;
     private int mnYearId;
-    private int mnBizPartberId;
+    private int mnBizPartherId;
    
-    public SViewInvoice(SGuiClient client, int gridType, int gridSubtype, String title, SGuiParams params) {
+    public SViewInvoices(SGuiClient client, int gridType, int gridSubtype, String title, SGuiParams params) {
         super(client, SGridConsts.GRID_PANE_VIEW, gridType, gridSubtype, title, params);
         initComponentsCustom();
     }
@@ -39,7 +42,7 @@ public class SViewInvoice extends SGridPaneView {
     private void initComponentsCustom() {
         setRowButtonsEnabled(false);
         mtDateStart = null;
-        mnBizPartberId = 0;
+        mnBizPartherId = 0;
         createGridColumns();
     }
 
@@ -47,7 +50,7 @@ public class SViewInvoice extends SGridPaneView {
         mtDateStart = dateStart;
         mtDateFinal = dateFinal;
         mnYearId = year;
-        mnBizPartberId = idBizPartner;
+        mnBizPartherId = idBizPartner;
     }
     
     private void renderView() {
@@ -77,10 +80,12 @@ public class SViewInvoice extends SGridPaneView {
                 "d.id_doc " + SDbConsts.FIELD_ID + "2, " + 
                 "'' AS " + SDbConsts.FIELD_CODE + ", " +
                 "'' AS " + SDbConsts.FIELD_NAME + ", " + 
-                " d.dt, d.exc_rate, d.stot_r, d.tax_charged_r, d.tax_retained_r, d.tot_r, d.stot_cur_r, d.tax_charged_cur_r, d.tax_retained_cur_r, d.tot_cur_r, dt.code, " +
+                " d.dt, d.dt_doc_delivery_n, d.num_ref, d.comms_ref, d.exc_rate, d.stot_r, d.tax_charged_r, d.tax_retained_r, d.tot_r, d.stot_cur_r," +
+                "d.tax_charged_cur_r, d.tax_retained_cur_r, d.tot_cur_r, d.b_copy, d.b_link, d.b_close, d.b_audit, d.b_del, d.ts_link, d.ts_close, d.ts_new, d.ts_edit, d.ts_del, dt.code, " +
                 "(SELECT dn.code FROM erp.trnu_dps_nat AS dn WHERE d.fid_dps_nat = dn.id_dps_nat) AS f_dn_code, " +
-                "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, bp.bp, bpb.bpb, " +
+                "CONCAT(d.num_ser, IF(length(d.num_ser) = " + SModSysConsts.FINS_CFD_TAX_NA + ", '', '-'), d.num) AS f_num, bp.bp, bpb.bpb, " +
                 "(SELECT c.cur_key FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c WHERE d.fid_cur = c.id_cur) AS f_cur_key, '" + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + "' AS f_cur_key_local, " +
+                "(SELECT rcb.code FROM erp.bpsu_bpb AS rcb WHERE r.fid_cob = rcb.id_bpb) AS f_rcb_code, CONCAT(r.id_year, '-', erp.lib_fix_int(r.id_per, 2)) as f_rper, " +
                 "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, " + SDataConstantsSys.NUM_LEN_FIN_REC + ")) as f_rnum FROM trn_dps AS d " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + "  AS bp ON d.fid_bp_r = bp.id_bp " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_CT) + " AS bpc ON bp.id_bp = bpc.id_bp AND bpc.id_ct_bp = " + mnGridMode + " " +
@@ -101,7 +106,7 @@ public class SViewInvoice extends SGridPaneView {
                 "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_REC) + " AS dr ON d.id_year = dr.id_dps_year AND d.id_doc = dr.id_dps_doc " +
                 "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc " +
                 "AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num " +
-                "WHERE bp.id_bp = " + mnBizPartberId + " AND d.id_year = " + mnYearId ;
+                "WHERE bp.id_bp = " + mnBizPartherId + " AND d.id_year = " + mnYearId + " AND d.dt >= '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND d.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateFinal) + "' AND NOT d.b_del" ;
         }
 
     @Override
@@ -109,14 +114,18 @@ public class SViewInvoice extends SGridPaneView {
         SGridColumnView column = null;
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
        
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "f_num", "Folio doc"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt", "Fecha doc"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "stot_r", "Subtotal mon $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "tax_charged_r", "Imp tras mon $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "tax_retained_r", "Imp ret mon $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "tot_r", "Total mon $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "exc_rate", "T cambio"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "tot_cur_r", "Total $"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "code", "Tipo doc", STableConstants.WIDTH_CODE_DOC));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "f_num", "Folio doc", STableConstants.WIDTH_DOC_NUM));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "num_ref", "Refencia", STableConstants.WIDTH_DOC_NUM_REF));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt", "Fecha doc", STableConstants.WIDTH_DATE));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_rcb_code", "Sucursal", STableConstants.WIDTH_CODE_COB));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_doc_delivery_n", "Entrega programada", STableConstants.WIDTH_DATE));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "stot_r", "Subtotal mon $", STableConstants.WIDTH_VALUE_2X));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "tax_charged_r", "Imp tras mon $", STableConstants.WIDTH_VALUE_2X));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "tot_r", "Total mon $", STableConstants.WIDTH_VALUE_2X));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "f_cur_key", "Moneda", STableConstants.WIDTH_CURRENCY_KEY));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "tot_cur_r", "Total", STableConstants.WIDTH_VALUE_2X));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "f_cur_key_local", "Moneda", STableConstants.WIDTH_CURRENCY_KEY));
         return gridColumnsViews;
     }
 

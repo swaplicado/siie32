@@ -2,10 +2,12 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mod.trn.view;
+package erp.mod.trn.view.qi;
 
 import erp.data.SDataConstantsSys;
+import erp.lib.table.STableConstants;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import java.util.ArrayList;
 import java.util.Date;
 import sa.lib.SLibUtils;
@@ -26,7 +28,7 @@ public class SViewOrders extends SGridPaneView {
     private Date mtDateStart;
     private Date mtDateFinal;
     private int mnYearId;
-    private int mnBizPartberId;
+    private int mnBizPartherId;
     
     public SViewOrders(SGuiClient client, int gridType, int gridSubtype, String title, SGuiParams params) {
         super(client, SGridConsts.GRID_PANE_VIEW, gridType, gridSubtype, title, params);
@@ -40,7 +42,7 @@ public class SViewOrders extends SGridPaneView {
     private void initComponentsCustom() {
         setRowButtonsEnabled(false);
         mtDateStart = null;
-        mnBizPartberId = 0;
+        mnBizPartherId = 0;
         createGridColumns();
     }
     
@@ -48,7 +50,7 @@ public class SViewOrders extends SGridPaneView {
         mtDateStart = dateStart;
         mtDateFinal = dateFinal;
         mnYearId = year;
-        mnBizPartberId = idBizPartner;
+        mnBizPartherId = idBizPartner;
     }
     
     private void renderView() {
@@ -76,10 +78,10 @@ public class SViewOrders extends SGridPaneView {
         
          msSql = "SELECT d.id_year " + SDbConsts.FIELD_ID + "1, " +
                 "d.id_doc " + SDbConsts.FIELD_ID + "2, " + 
-                "'' AS " + SDbConsts.FIELD_CODE + ", " +
-                "'' AS " + SDbConsts.FIELD_NAME + ", " + 
+                "'1' AS " + SDbConsts.FIELD_CODE + ", " +
+                "'2' AS " + SDbConsts.FIELD_NAME + ", " + 
                 "d.dt, d.exc_rate, d.stot_r, d.tax_charged_r, d.tax_retained_r, d.tot_r, d.stot_cur_r, d.tax_charged_cur_r, d.tax_retained_cur_r, d.tot_cur_r, d.ts_close, " +
-                "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
+                "CONCAT(d.num_ser, IF(length(d.num_ser) = " + SModSysConsts.FINS_CFD_TAX_NA + ", '', '-'), d.num) AS f_num, " +
                 "(SELECT c.cur_key FROM erp.cfgu_cur AS c WHERE d.fid_cur = c.id_cur) AS f_cur_key, '" + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + "' AS f_cur_key_local, " +
                 "(SELECT cob.code FROM erp.bpsu_bpb AS cob WHERE d.fid_cob = cob.id_bpb) AS f_cob_code " + 
                 "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d " + 
@@ -99,7 +101,7 @@ public class SViewOrders extends SGridPaneView {
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ue ON d.fid_usr_edit = ue.id_usr " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ud ON d.fid_usr_del = ud.id_usr " +
                 "LEFT OUTER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n AND d.id_doc = x.fid_dps_doc_n WHERE NOT d.b_del " +
-                "AND d.id_year = " + mnYearId + " AND d.dt >= '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND d.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateFinal) + "' AND  bp.id_bp = " + mnBizPartberId;
+                "AND d.id_year = " + mnYearId + " AND d.dt >= '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND d.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateFinal) + "' AND  bp.id_bp = " + mnBizPartherId;
     }
           
 
@@ -108,19 +110,16 @@ public class SViewOrders extends SGridPaneView {
         
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
 
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "f_num", "Folio doc"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt", "Fecha doc"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "stot_cur_r", "Subtotal mon $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "tax_charged_r", "Imp tras mon $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "tax_retained_r", "Imp ret mon $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "tot_cur_r", "Total mon $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "f_cur_key", "Moneda "));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "exc_rate", "Tipo de cambio"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "d.tax_charged_r", "Imp tras $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "tax_retained_r","Imp ret $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "tot_r", "Total $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "tot_cur_r", "Total mon $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "f_cur_key_local", "Moneda local"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "f_code", "Tipo doc", STableConstants.WIDTH_CODE_DOC));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "f_num", "Folio doc", STableConstants.WIDTH_DOC_NUM));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt", "Fecha doc", STableConstants.WIDTH_DATE));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_cob_code", "Sucursal", STableConstants.WIDTH_CODE_COB));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "stot_r", "Subtotal mon $", STableConstants.WIDTH_VALUE_2X));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "tax_charged_r", "Imp tras mon $", STableConstants.WIDTH_VALUE_2X));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "tot_r", "Total mon $", STableConstants.WIDTH_VALUE_2X));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "f_cur_key", "Moneda", STableConstants.WIDTH_CURRENCY_KEY));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "tot_cur_r", "Total", STableConstants.WIDTH_VALUE_2X));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "f_cur_key_local", "Moneda", STableConstants.WIDTH_CURRENCY_KEY));
         return gridColumnsViews;
     }
 
