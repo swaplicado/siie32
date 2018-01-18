@@ -145,7 +145,6 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
     }
     
     private void actionImportPayroll() {
-        int mnTotalStamps = 0;
         SDbPayroll payroll = null;
         SDialogPayrollReceiptCfdi receiptCfdi = null;
         SDialogResult dialogResult = null;
@@ -166,10 +165,9 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                         receiptCfdi.setVisible(true);
 
                         if (receiptCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                                // XXX jbarajas 04/02/2016 sign and sending CFDI
+                                int stampsAvailable = SCfdUtils.getStampsAvailable((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_PAYROLL, miClient.getSession().getCurrentDate(), SLibConsts.UNDEFINED);
                                 dialogResult = new SDialogResult(miClient, "Resultados de timbrado y envío", SCfdConsts.PROC_REQ_STAMP);
-                                mnTotalStamps = SCfdUtils.getStampsAvailable((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_PAYROLL, miClient.getSession().getCurrentDate(), 0);
-                                dialogResult.setFormParams((SClientInterface) miClient, null, receiptCfdi.manPayrollEmployeeReceipts, mnTotalStamps, null, false, SCfdConsts.CFDI_PAYROLL_VER_CUR, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                                dialogResult.setFormParams((SClientInterface) miClient, null, receiptCfdi.manPayrollEmployeeReceipts, stampsAvailable, null, false, SCfdConsts.CFDI_PAYROLL_VER_CUR, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                                 dialogResult.setVisible(true);
                         }
                     }
@@ -318,10 +316,6 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
     }
 
     private void actionPrint() {
-        SDialogPrintOrderPayroll dialogPrintOrderPayroll = null;
-        int orderBy = 0;
-        int copiesNum = 0;
-        
         if (jbPrint.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
@@ -340,15 +334,14 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
-                        dialogPrintOrderPayroll = new SDialogPrintOrderPayroll(miClient, "Ordenamiento de impresión");
-                        
+                        SDialogPrintOrderPayroll dialogPrintOrderPayroll = new SDialogPrintOrderPayroll(miClient, "Ordenamiento de impresión");
                         dialogPrintOrderPayroll.setVisible(true);
                         
                         if (dialogPrintOrderPayroll.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                            orderBy = (int) dialogPrintOrderPayroll.getValue(SGuiConsts.PARAM_KEY);
-                            copiesNum = (int) dialogPrintOrderPayroll.getValue(SLibConsts.UNDEFINED);
+                            int orderBy = (int) dialogPrintOrderPayroll.getValue(SGuiConsts.PARAM_KEY);
+                            int numberCopies = (int) dialogPrintOrderPayroll.getValue(SLibConsts.UNDEFINED); // XXX 2018-01-12 (Sergio Flores): Fix this! WTF!
                             
-                            SCfdUtils.printCfd((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey(), orderBy), copiesNum, SCfdConsts.CFDI_PAYROLL_VER_CUR);
+                            SCfdUtils.printCfds((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey(), orderBy), numberCopies, SCfdConsts.CFDI_PAYROLL_VER_CUR);
                         }
                     }
                     catch (Exception e) {
@@ -540,7 +533,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
-                        SHrsUtils.SendPayrollReceipts(miClient, SDataConstantsPrint.PRINT_MODE_PDF,  gridRow.getRowPrimaryKey());
+                        SHrsUtils.sendPayrollReceipts(miClient, SDataConstantsPrint.PRINT_MODE_PDF_FILE, gridRow.getRowPrimaryKey());
                     } 
                     catch (Exception e) {
                         SLibUtils.showException(this, e);
@@ -716,10 +709,10 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
     @Override
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
-        moSuscriptionsSet.add(mnGridSubtype);
-        moSuscriptionsSet.add(SModConsts.HRS_PAY_RCP_EAR);
-        moSuscriptionsSet.add(SModConsts.HRS_PAY_RCP_DED);
+        moSuscriptionsSet.add(SModConsts.HRS_PAY_RCP);
+        moSuscriptionsSet.add(SModConsts.HRS_PAY_RCP_ISS);
         moSuscriptionsSet.add(SModConsts.HRS_SIE_PAY);
+        moSuscriptionsSet.add(SModConsts.TRN_CFD);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
     }
 

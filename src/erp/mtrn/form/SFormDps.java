@@ -5948,8 +5948,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             miClient.showMsgBoxWarning("La fecha del documento origen (" + SLibUtils.DateFormatDate.format(oDpsSource.getDate()) + ") " +
                                     "no puede ser posterior a la fecha de este documento (" + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + ").");
                         }
-                        else if (isCfdCfdiRelatedRequired() && (oDpsSource.getDbmsDataCfd() == null || oDpsSource.getDbmsDataCfd().getUuid().isEmpty())) {
-                            miClient.showMsgBoxWarning("El documento origen no tiene UUID.");
+                        else if (isCfdCfdiRelatedRequired() && (oDpsSource.getIsDeleted() || oDpsSource.getFkDpsStatusId() != SDataConstantsSys.TRNS_ST_DPS_EMITED)) {
+                            miClient.showMsgBoxWarning("El documento origen debe estar emitido.");
                         }
                         else {
                             // B.2. Remove from just picked source DPS all adjustment registries linked to current DPS:
@@ -8125,9 +8125,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         }
                     }
                     catch (Exception e) {
+                        SLibUtilities.printOutException(this, e);
                         validation.setMessage(e.getMessage());
                         validation.setComponent(moPaneGridEntries);
-                        SLibUtilities.printOutException(this, e);
+                        jTabbedPane.setSelectedIndex(0);
                     }
                 }
             }
@@ -8138,6 +8139,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 if (!shipmentMessageMissingData.isEmpty()) {
                         validation.setMessage(shipmentMessageMissingData);
                         validation.setComponent(moPaneGridEntries);
+                        jTabbedPane.setSelectedIndex(0);
                 }
                 else{
                     String shipmentMessage = validateProvisionalShipmentData();
@@ -8145,6 +8147,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     if (!shipmentMessage.isEmpty() && miClient.showMsgBoxConfirm(shipmentMessage) != JOptionPane.YES_OPTION) {
                         validation.setMessage("Revise la información de las partidas.");
                         validation.setComponent(moPaneGridEntries);
+                        jTabbedPane.setSelectedIndex(0);
                     }
                 }
             }
@@ -8165,19 +8168,21 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                     + "¿está seguro que no desea aplicarlos en este documento?") != JOptionPane.YES_OPTION) {
                                 validation.setMessage("Se debe aplicar anticipos en este documento.");
                                 validation.setComponent(moPaneGridEntries);
+                                jTabbedPane.setSelectedIndex(0);
                             }
                         }
                         else if (mdPrepaymentsCy + prepaymentsCy < 0) {
                             validation.setMessage("La aplicación total de anticipos $ " + SLibUtils.getDecimalFormatAmount().format(-prepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + " "
                                     + "no puede ser mayor al saldo actual de anticipos $ " + SLibUtils.getDecimalFormatAmount().format(mdPrepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + ".");
                             validation.setComponent(moPaneGridEntries);
+                            jTabbedPane.setSelectedIndex(0);
                         }
                     }
                 }
             }
             
             if (!validation.getIsError() && mbIsCon) {
-                // Validate contract:
+                //validate contract's calendar of monthly deliveries:
                 
                 try {
                     int deliveryMonths;
@@ -8185,6 +8190,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     
                     for (int row = 0; row < moPaneGridEntries.getTableGuiRowCount(); row++) {
                         deliveryMonths = 0;
+                        
+                        //validate number of monthly deliveries on each document row, it must match the number of months of the delivery period of this document:
                         
                         for (SDataDpsEntryPrice price : ((SDataDpsEntry) moPaneGridEntries.getTableRow(row).getData()).getDbmsEntryPrices()) {
                              if (!price.getIsDeleted()) {
@@ -8199,9 +8206,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             break;
                         }
 
+                        //validate that all monthly delivery really belongs to delivery period of this document:
+                        
                         for (SDataDpsEntryPrice price : ((SDataDpsEntry) moPaneGridEntries.getTableRow(row).getData()).getDbmsEntryPrices()) {
                             if (!price.getIsDeleted()) {
-                                deliveryMonths ++;
                                 if (!SLibTimeUtilities.isBelongingToPeriod(SLibTimeUtilities.createDate(price.getContractPriceYear(), price.getContractPriceMonth()), SLibTimeUtilities.getBeginOfMonth(moFieldDateDocDelivery_n.getDate()), SLibTimeUtilities.getEndOfMonth(moFieldDateDocLapsing_n.getDate()))) {
                                     validation.setMessage("La entrega mensual '" + miClient.getSessionXXX().getFormatters().getDateYearMonthFormat().format(SLibTimeUtilities.createDate(price.getContractPriceYear(), price.getContractPriceMonth())) + "' de la partida '" + (row + 1) + "' no se encuentra dentro del periodo de entrega del documento.");
                                     validation.setComponent(moPaneGridEntries);
@@ -8213,7 +8221,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     }
                 }
                 catch (Exception e) {
+                    SLibUtilities.printOutException(this, e);
                     validation.setMessage(e.toString());
+                    validation.setComponent(moPaneGridEntries);
+                    jTabbedPane.setSelectedIndex(0);
                 }
             }
             
@@ -8637,7 +8648,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 for (SDataDpsEntry dpsEntry : moDps.getDbmsDpsEntries()) {
                     for (SDataDpsDpsAdjustment dpsAdjustment : dpsEntry.getDbmsDpsAdjustmentsAsAdjustment()) {
                         SDataDps invoice = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, dpsAdjustment.getDbmsDpsKey(), SLibConstants.EXEC_MODE_VERBOSE);
-                        dpsCfd.getCfdiRelacionados().add(invoice.getDbmsDataCfd().getUuid());
+                        if (invoice.getDbmsDataCfd() != null && !invoice.getDbmsDataCfd().getUuid().isEmpty()) {
+                            dpsCfd.getCfdiRelacionados().add(invoice.getDbmsDataCfd().getUuid());
+                        }
                     }
                 }
             }

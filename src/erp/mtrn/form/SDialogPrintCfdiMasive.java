@@ -32,7 +32,7 @@ import javax.swing.AbstractAction;
 
 /**
  *
- * @author Alfredo Pérez
+ * @author Alfredo Pérez, Sergio Flores
  */
 public class SDialogPrintCfdiMasive extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -235,7 +235,6 @@ public class SDialogPrintCfdiMasive extends javax.swing.JDialog implements erp.l
         String folioIni = "";
         String folioEnd = "";
         ArrayList<int[]> keysDps = null;
-        SDialogResult dialogResult = null;
         SFormValidation validation = formValidate();
         ArrayList<SDataCfd> cfds ;
         
@@ -271,16 +270,19 @@ public class SDialogPrintCfdiMasive extends javax.swing.JDialog implements erp.l
                 serieEnd = "";
                 folioEnd = asNumberDpsEnd[0];
             }
+            
             try {
                 keysDps = SDataUtilities.obtainDpsIds(miClient, serieIni, serieEnd, folioIni, folioEnd, moFieldDateStart.getDate(), manKey);
                 cfds = SCfdUtils.getCfds(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, SLibConstants.UNDEFINED, keysDps);
             }
-            catch(Exception e) {
+            catch (Exception e) {
                 SLibUtilities.renderException(this, e);
             }
+
             actionClose();
-            dialogResult = new SDialogResult((SClient) miClient, "Resultados de impresión.", SCfdConsts.PROC_PRT_DOCS);
-            dialogResult.setFormParams((SClientInterface) miClient, cfds, null, SLibConstants.UNDEFINED, null, true, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED);
+            
+            SDialogResult dialogResult = new SDialogResult((SClient) miClient, "Resultados de impresión.", SCfdConsts.PROC_PRT_DOCS);
+            dialogResult.setFormParams((SClientInterface) miClient, cfds, null, 0, null, true, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED);
             dialogResult.setVisible(true);
         }
     }

@@ -1021,7 +1021,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
                 if (oDps.getDbmsDataCfd() != null) {
                     try {
-                        SCfdUtils.printCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, oDps.getDbmsDataCfd(), SDataConstantsPrint.PRINT_MODE_VIEWER, SLibConstants.UNDEFINED, false);
+                        SCfdUtils.printCfd(miClient, oDps.getDbmsDataCfd(), SLibConstants.UNDEFINED, SDataConstantsPrint.PRINT_MODE_VIEWER, 1, false);
                     }
                     catch (Exception e) {
                         SLibUtilities.renderException(this, e);
@@ -1601,7 +1601,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
                 if (oDps.getDbmsDataCfd() != null) {
                     try {
-                        SCfdUtils.printCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, oDps.getDbmsDataCfd(), SDataConstantsPrint.PRINT_MODE_VIEWER, SLibConstants.UNDEFINED, false);
+                        SCfdUtils.printCfd(miClient, oDps.getDbmsDataCfd(), SLibConstants.UNDEFINED, SDataConstantsPrint.PRINT_MODE_VIEWER, 1, false);
                     }
                     catch (Exception e) {
                         SLibUtilities.renderException(this, e);

@@ -54,7 +54,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas, Alfredo Perez
+ * @author Juan Barajas, Alfredo Perez, Sergio Flores
  */
 public abstract class SHrsUtils {
     
@@ -1330,9 +1330,9 @@ public abstract class SHrsUtils {
             case SDataConstantsPrint.PRINT_MODE_VIEWER:
                 client.getSession().printReport(SModConsts.HRSR_PAY_RCP, SLibConsts.UNDEFINED, null, map);
                 break;
-            case SDataConstantsPrint.PRINT_MODE_PDF:
+            case SDataConstantsPrint.PRINT_MODE_PDF_FILE:
                 break;
-            case SDataConstantsPrint.PRINT_MODE_STREAM:
+            case SDataConstantsPrint.PRINT_MODE_PRINT:
                 break;
             default:
                 throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
@@ -1362,13 +1362,10 @@ public abstract class SHrsUtils {
         }
     }
     
-    public static void SendPayrollReceipts(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws java.lang.Exception {
-        SDbPayroll payroll = null;
-        SDialogResult dialogResult = null;
-        
-        payroll = new SDbPayroll();
-        payroll.read(client.getSession(), new int[] { payrollKey[0] });
+    public static void sendPayrollReceipts(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws java.lang.Exception {
         ArrayList<SDbPayrollReceipt> actives = new ArrayList<SDbPayrollReceipt>();
+        SDbPayroll payroll = new SDbPayroll();
+        payroll.read(client.getSession(), new int[] { payrollKey[0] });
         
         for (SDbPayrollReceipt receipt : payroll.getChildPayrollReceipts()) {
             if (!receipt.isDeleted()) {
@@ -1376,8 +1373,8 @@ public abstract class SHrsUtils {
             }
         }
         
-        dialogResult = new SDialogResult((SClient) client, "Resultados de envío", SCfdConsts.PROC_REQ_SND_RCP);
-        dialogResult.setFormParams((SClientInterface) client, null, null, pnPrintMode, null, true, pnPrintMode, pnPrintMode);
+        SDialogResult dialogResult = new SDialogResult((SClient) client, "Resultados de envío", SCfdConsts.PROC_REQ_SND_RCP);
+        dialogResult.setFormParams((SClientInterface) client, null, null, 0, null, true, SLibConsts.UNDEFINED, SModSysConsts.TRNU_TP_DPS_ANN_NA);
         dialogResult.setReceipts(actives);
         dialogResult.setVisible(true);
     }

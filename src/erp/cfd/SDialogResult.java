@@ -17,15 +17,13 @@ import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SHrsCfdUtils;
 import erp.mod.hrs.db.SHrsUtils;
-import static erp.mod.hrs.db.SHrsUtils.getMapPayrollReceipt;
+import erp.mtrn.data.SCfdPrintThread;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
 import erp.print.SDataConstantsPrint;
-import erp.print.SPrintCfdiThread;
 import java.awt.Cursor;
 import java.io.File;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -34,7 +32,6 @@ import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
-import sa.lib.gui.SGuiSession;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 
@@ -47,22 +44,22 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
     protected SClientInterface miClient;
     
     protected ArrayList<SDataCfd> maCfds;
-    protected ArrayList<int[]> maPayrollReceiptsIds;
+    protected ArrayList<int[]> maPayrollReceiptIds;
     protected ArrayList<SDbPayrollReceipt> maPayrollReceipts;
-    protected int mnTotalStamps;
-    protected Date mtCancellationDate;
+    protected int mnStampsAvailable;
+    protected Date mtAnnulmentDate;
     protected boolean mbValidateStamp;
     
     protected boolean mbFirstTime;
     protected int mnSubtypeCfd;
-    protected int mnNumCopies;
-    protected int mnTpDpsAnn;
+    protected int mnNumberCopies;
+    protected int mnDpsAnnulmentType;
     
     /**
      * Creates new form SDialogResult
      */
-    public SDialogResult(SGuiClient client, String title, int subType) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_CFD, subType, title);
+    public SDialogResult(SGuiClient client, String title, int subtype) {
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_CFD, subtype, title);
         initComponents();
         initComponentsCustom();
     }
@@ -81,33 +78,33 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
         jpInformation = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
-        jlTotalToProcess = new javax.swing.JLabel();
-        moIntTotalToProcess = new sa.lib.gui.bean.SBeanFieldInteger();
+        jlCfdToProcess = new javax.swing.JLabel();
+        moIntCfdToProcess = new sa.lib.gui.bean.SBeanFieldInteger();
         jPanel21 = new javax.swing.JPanel();
-        jlTotalCorrect = new javax.swing.JLabel();
-        moIntTotalCorrect = new sa.lib.gui.bean.SBeanFieldInteger();
+        jlCfdProcessedOk = new javax.swing.JLabel();
+        moIntCfdProcessedOk = new sa.lib.gui.bean.SBeanFieldInteger();
         jPanel22 = new javax.swing.JPanel();
-        jlTotalIncorrect = new javax.swing.JLabel();
-        moIntTotalIncorrect = new sa.lib.gui.bean.SBeanFieldInteger();
+        jlCfdProcessedWrong = new javax.swing.JLabel();
+        moIntCfdProcessedWrong = new sa.lib.gui.bean.SBeanFieldInteger();
         jPanel4 = new javax.swing.JPanel();
-        jlTotalProcess = new javax.swing.JLabel();
-        moIntTotalProcess = new sa.lib.gui.bean.SBeanFieldInteger();
+        jlCfdProcessed = new javax.swing.JLabel();
+        moIntCfdProcessed = new sa.lib.gui.bean.SBeanFieldInteger();
         jpStampInfo = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
-        jlTotalStamps = new javax.swing.JLabel();
-        moIntTotalStamp = new sa.lib.gui.bean.SBeanFieldInteger();
+        jlStampsAvailable = new javax.swing.JLabel();
+        moIntStampsAvailable = new sa.lib.gui.bean.SBeanFieldInteger();
         jPanel24 = new javax.swing.JPanel();
-        jlTotalConsumed = new javax.swing.JLabel();
-        moIntTotalConsumed = new sa.lib.gui.bean.SBeanFieldInteger();
+        jlStampsConsumed = new javax.swing.JLabel();
+        moIntStampsConsumed = new sa.lib.gui.bean.SBeanFieldInteger();
         jPanel25 = new javax.swing.JPanel();
-        jlTotalAvailables = new javax.swing.JLabel();
-        moIntTotalAvailables = new sa.lib.gui.bean.SBeanFieldInteger();
+        jlStampsRemaining = new javax.swing.JLabel();
+        moIntStampsRemaining = new sa.lib.gui.bean.SBeanFieldInteger();
         jPanel8 = new javax.swing.JPanel();
-        jlWarningMesage = new javax.swing.JLabel();
+        jtfWarningMessage = new javax.swing.JTextField();
         jpDetail = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jtaMessage = new javax.swing.JTextArea();
+        jspMessages = new javax.swing.JScrollPane();
+        jtaMessages = new javax.swing.JTextArea();
 
         setModal(true);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -125,45 +122,45 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTotalToProcess.setText("CFDI a procesar:");
-        jlTotalToProcess.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel6.add(jlTotalToProcess);
+        jlCfdToProcess.setText("CFDI a procesar:");
+        jlCfdToProcess.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel6.add(jlCfdToProcess);
 
-        moIntTotalToProcess.setEditable(false);
-        jPanel6.add(moIntTotalToProcess);
+        moIntCfdToProcess.setEditable(false);
+        jPanel6.add(moIntCfdToProcess);
 
         jPanel5.add(jPanel6);
 
         jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTotalCorrect.setText("Procesados correctamente:");
-        jlTotalCorrect.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel21.add(jlTotalCorrect);
+        jlCfdProcessedOk.setText("Procesados correctamente:");
+        jlCfdProcessedOk.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel21.add(jlCfdProcessedOk);
 
-        moIntTotalCorrect.setEditable(false);
-        jPanel21.add(moIntTotalCorrect);
+        moIntCfdProcessedOk.setEditable(false);
+        jPanel21.add(moIntCfdProcessedOk);
 
         jPanel5.add(jPanel21);
 
         jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTotalIncorrect.setText("Procesados incorrectamente:");
-        jlTotalIncorrect.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel22.add(jlTotalIncorrect);
+        jlCfdProcessedWrong.setText("Procesados incorrectamente:");
+        jlCfdProcessedWrong.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel22.add(jlCfdProcessedWrong);
 
-        moIntTotalIncorrect.setEditable(false);
-        jPanel22.add(moIntTotalIncorrect);
+        moIntCfdProcessedWrong.setEditable(false);
+        jPanel22.add(moIntCfdProcessedWrong);
 
         jPanel5.add(jPanel22);
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTotalProcess.setText("CFDI procesados:");
-        jlTotalProcess.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel4.add(jlTotalProcess);
+        jlCfdProcessed.setText("CFDI procesados:");
+        jlCfdProcessed.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel4.add(jlCfdProcessed);
 
-        moIntTotalProcess.setEditable(false);
-        jPanel4.add(moIntTotalProcess);
+        moIntCfdProcessed.setEditable(false);
+        jPanel4.add(moIntCfdProcessed);
 
         jPanel5.add(jPanel4);
 
@@ -173,43 +170,42 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTotalStamps.setText("Timbres disponibles:");
-        jlTotalStamps.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel7.add(jlTotalStamps);
+        jlStampsAvailable.setText("Timbres disponibles:");
+        jlStampsAvailable.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel7.add(jlStampsAvailable);
 
-        moIntTotalStamp.setEditable(false);
-        jPanel7.add(moIntTotalStamp);
+        moIntStampsAvailable.setEditable(false);
+        jPanel7.add(moIntStampsAvailable);
 
         jpStampInfo.add(jPanel7);
 
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTotalConsumed.setText("Timbres consumidos:");
-        jlTotalConsumed.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel24.add(jlTotalConsumed);
+        jlStampsConsumed.setText("Timbres consumidos:");
+        jlStampsConsumed.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel24.add(jlStampsConsumed);
 
-        moIntTotalConsumed.setEditable(false);
-        jPanel24.add(moIntTotalConsumed);
+        moIntStampsConsumed.setEditable(false);
+        jPanel24.add(moIntStampsConsumed);
 
         jpStampInfo.add(jPanel24);
 
         jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTotalAvailables.setText("Timbres restantes:");
-        jlTotalAvailables.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel25.add(jlTotalAvailables);
+        jlStampsRemaining.setText("Timbres restantes:");
+        jlStampsRemaining.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel25.add(jlStampsRemaining);
 
-        moIntTotalAvailables.setEditable(false);
-        jPanel25.add(moIntTotalAvailables);
+        moIntStampsRemaining.setEditable(false);
+        jPanel25.add(moIntStampsRemaining);
 
         jpStampInfo.add(jPanel25);
 
         jPanel8.setLayout(new java.awt.GridLayout(1, 0));
 
-        jlWarningMesage.setToolTipText("");
-        jlWarningMesage.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-        jlWarningMesage.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
-        jPanel8.add(jlWarningMesage);
+        jtfWarningMessage.setEditable(false);
+        jtfWarningMessage.setFocusable(false);
+        jPanel8.add(jtfWarningMessage);
 
         jpStampInfo.add(jPanel8);
 
@@ -222,18 +218,18 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
 
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        jScrollPane1.setAutoscrolls(true);
+        jspMessages.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        jspMessages.setAutoscrolls(true);
 
-        jtaMessage.setEditable(false);
-        jtaMessage.setColumns(20);
-        jtaMessage.setFont(new java.awt.Font("Monospaced", 0, 11)); // NOI18N
-        jtaMessage.setRows(5);
-        jtaMessage.setFocusable(false);
-        jtaMessage.setOpaque(false);
-        jScrollPane1.setViewportView(jtaMessage);
+        jtaMessages.setEditable(false);
+        jtaMessages.setColumns(20);
+        jtaMessages.setFont(new java.awt.Font("Monospaced", 0, 11)); // NOI18N
+        jtaMessages.setRows(5);
+        jtaMessages.setFocusable(false);
+        jtaMessages.setOpaque(false);
+        jspMessages.setViewportView(jtaMessages);
 
-        jPanel2.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+        jPanel2.add(jspMessages, java.awt.BorderLayout.CENTER);
 
         jpDetail.add(jPanel2, java.awt.BorderLayout.CENTER);
 
@@ -259,33 +255,38 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JLabel jlTotalAvailables;
-    private javax.swing.JLabel jlTotalConsumed;
-    private javax.swing.JLabel jlTotalCorrect;
-    private javax.swing.JLabel jlTotalIncorrect;
-    private javax.swing.JLabel jlTotalProcess;
-    private javax.swing.JLabel jlTotalStamps;
-    private javax.swing.JLabel jlTotalToProcess;
-    private javax.swing.JLabel jlWarningMesage;
+    private javax.swing.JLabel jlCfdProcessed;
+    private javax.swing.JLabel jlCfdProcessedOk;
+    private javax.swing.JLabel jlCfdProcessedWrong;
+    private javax.swing.JLabel jlCfdToProcess;
+    private javax.swing.JLabel jlStampsAvailable;
+    private javax.swing.JLabel jlStampsConsumed;
+    private javax.swing.JLabel jlStampsRemaining;
     private javax.swing.JPanel jpDetail;
     private javax.swing.JPanel jpInformation;
     private javax.swing.JPanel jpStampInfo;
-    private javax.swing.JTextArea jtaMessage;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntTotalAvailables;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntTotalConsumed;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntTotalCorrect;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntTotalIncorrect;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntTotalProcess;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntTotalStamp;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntTotalToProcess;
+    private javax.swing.JScrollPane jspMessages;
+    private javax.swing.JTextArea jtaMessages;
+    private javax.swing.JTextField jtfWarningMessage;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntCfdProcessed;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntCfdProcessedOk;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntCfdProcessedWrong;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntCfdToProcess;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntStampsAvailable;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntStampsConsumed;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntStampsRemaining;
     // End of variables declaration//GEN-END:variables
 
+    /*
+     * Private methods:
+     */
+    
     private void windowsActivated() {
         if (mbFirstTime) {
             mbFirstTime = false;
             
             try {
+                miClient.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
                 process();
             }
             catch (Exception e) {
@@ -303,36 +304,33 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
         jbSave.setEnabled(false);
         jbCancel.setText("Aceptar");
         
-        jlWarningMesage.setText("");
-        
-        moIntTotalToProcess.setIntegerSettings(SGuiUtils.getLabelName(jlTotalToProcess), SGuiConsts.GUI_TYPE_INT, true);
-        moIntTotalProcess.setIntegerSettings(SGuiUtils.getLabelName(jlTotalProcess), SGuiConsts.GUI_TYPE_INT, true);
-        moIntTotalCorrect.setIntegerSettings(SGuiUtils.getLabelName(jlTotalCorrect), SGuiConsts.GUI_TYPE_INT, true);
-        moIntTotalIncorrect.setIntegerSettings(SGuiUtils.getLabelName(jlTotalIncorrect), SGuiConsts.GUI_TYPE_INT, true);
-        moIntTotalStamp.setIntegerSettings(SGuiUtils.getLabelName(jlTotalStamps), SGuiConsts.GUI_TYPE_INT, true);
-        moIntTotalConsumed.setIntegerSettings(SGuiUtils.getLabelName(jlTotalConsumed), SGuiConsts.GUI_TYPE_INT, true);
-        moIntTotalAvailables.setIntegerSettings(SGuiUtils.getLabelName(jlTotalAvailables), SGuiConsts.GUI_TYPE_INT, true);
+        moIntCfdToProcess.setIntegerSettings(SGuiUtils.getLabelName(jlCfdToProcess), SGuiConsts.GUI_TYPE_INT, true);
+        moIntCfdProcessedOk.setIntegerSettings(SGuiUtils.getLabelName(jlCfdProcessedOk), SGuiConsts.GUI_TYPE_INT, true);
+        moIntCfdProcessedWrong.setIntegerSettings(SGuiUtils.getLabelName(jlCfdProcessedWrong), SGuiConsts.GUI_TYPE_INT, true);
+        moIntCfdProcessed.setIntegerSettings(SGuiUtils.getLabelName(jlCfdProcessed), SGuiConsts.GUI_TYPE_INT, true);
+        moIntStampsAvailable.setIntegerSettings(SGuiUtils.getLabelName(jlStampsAvailable), SGuiConsts.GUI_TYPE_INT, true);
+        moIntStampsConsumed.setIntegerSettings(SGuiUtils.getLabelName(jlStampsConsumed), SGuiConsts.GUI_TYPE_INT, true);
+        moIntStampsRemaining.setIntegerSettings(SGuiUtils.getLabelName(jlStampsRemaining), SGuiConsts.GUI_TYPE_INT, true);
 
-        moFields.addField(moIntTotalToProcess);
-        moFields.addField(moIntTotalProcess);
-        moFields.addField(moIntTotalCorrect);
-        moFields.addField(moIntTotalIncorrect);
-        moFields.addField(moIntTotalStamp);
-        moFields.addField(moIntTotalConsumed);
-        moFields.addField(moIntTotalAvailables);
+        moFields.addField(moIntCfdToProcess);
+        moFields.addField(moIntCfdProcessedOk);
+        moFields.addField(moIntCfdProcessedWrong);
+        moFields.addField(moIntCfdProcessed);
+        moFields.addField(moIntStampsAvailable);
+        moFields.addField(moIntStampsConsumed);
+        moFields.addField(moIntStampsRemaining);
 
         moFields.setFormButton(jbSave);
     }
     
     private void process() throws Exception {
-        miClient.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+        jtfWarningMessage.setText("");
         
         if (mnFormSubtype == SCfdConsts.PROC_REQ_SND_RCP) {
             processReceipts();
-            miClient.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
         else { 
-            if (maPayrollReceiptsIds != null) {
+            if (maPayrollReceiptIds != null) {
                 processPayroll();
             }
             else if (maCfds != null) {
@@ -341,17 +339,63 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
         }
     }
     
-    public void processPayroll() {
-        int cfdsProcessed = 0;
-        int cfdsCorrect = 0;
-        int cfdsIncorrect = 0;
+    private void processReceipts() throws Exception {
+        boolean isSent = false;
+        int cfdProcessed = 0;
+        int cfdProcessedOk = 0;
+        int cfdProcessedWrong = 0;
+        String detailMessage = "";
+        String mail = "";
+        
+        STreasuryBankLayoutRequest layoutRequest = null;
+        SDataBizPartner bizPartner  = null;
+        HashMap<String, Object> map = new HashMap<>();
+        File pdf = null;
+        
+        moIntCfdToProcess.setValue(maPayrollReceipts.size());
+        
+        for (SDbPayrollReceipt receipt : maPayrollReceipts) {
+            bizPartner  = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { receipt.getPkEmployeeId() }, SLibConstants.EXEC_MODE_SILENT);
+            mail = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01();
+            
+            map = SHrsUtils.getMapPayrollReceipt((SGuiClient) miClient, SDataConstantsPrint.PRINT_MODE_PDF_FILE, receipt.getPrimaryKey());
+            pdf = SHrsUtils.createPayrollReceipt(map, (SGuiClient) miClient);
+            cfdProcessed++;
+        
+            if (pdf != null) {
+                layoutRequest = new STreasuryBankLayoutRequest((SGuiClient) miClient, null);
+                isSent = layoutRequest.sendMail(null, "", pdf, STreasuryBankLayoutRequest.SND_TP_PAY_RCP, mail);
+                    
+                if (isSent) {
+                    cfdProcessedOk++;
+                    detailMessage += "Recibo enviado.\n";
+                }
+                else {
+                    cfdProcessedWrong++;
+                    detailMessage += "No se ha enviado.\n";
+                }
+            }
+            else {
+                cfdProcessedWrong++;
+                detailMessage += "No se creó el archivo PDF.\n";
+            }
+            
+            updateForm(cfdProcessed, cfdProcessedOk, cfdProcessedWrong, detailMessage);
+        }
+    }
+    
+    private void processPayroll() {
+        int cfdProcessed = 0;
+        int cfdProcessedOk = 0;
+        int cfdProcessedWrong = 0;
         String detailMessage = "";
         String warningMessage = "";
         
-        if (maPayrollReceiptsIds != null) {
-            for (int[] key : maPayrollReceiptsIds) {
+        if (maPayrollReceiptIds != null) {
+            for (int[] key : maPayrollReceiptIds) {
                 int number = 0;
-                cfdsProcessed++;
+                cfdProcessed++;
+                
                 try {
                     switch (mnFormSubtype) {
                         case SCfdConsts.PROC_REQ_STAMP:
@@ -369,148 +413,77 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
 
                             SHrsCfdUtils.computeSignCfdi(miClient.getSession(), key);
                             detailMessage += (receiptIssue.getNumberSeries().length() > 0 ? receiptIssue.getNumberSeries() + "-" : "") + number + "   Timbrado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
-                            cfdsCorrect++;
+                            cfdProcessedOk++;
                             break;
                         default:
                     }
                 }
                 catch(Exception e) {
-                    detailMessage += "NOM-" + number + "   " + e.getMessage() + "\n";
-                    cfdsIncorrect++;
+                    detailMessage += "" + number + ": " + e.getMessage() + "\n";
+                    cfdProcessedWrong++;
                 }
-
-                if (mnTotalStamps > 0) {
-                    updateForm(cfdsProcessed, cfdsCorrect, cfdsIncorrect, detailMessage, mnTotalStamps);
-                }
-                else {
-                    updateForm(cfdsProcessed, cfdsCorrect, cfdsIncorrect, detailMessage);
-                }
-                update(getGraphics());
-                jScrollPane1.getVerticalScrollBar().setValue(jScrollPane1.getVerticalScrollBar().getMaximum());
+                
+                updateForm(cfdProcessed, cfdProcessedOk, cfdProcessedWrong, detailMessage);
             }
             
             warningMessage = SCfdUtils.verifyCertificateExpiration(miClient);
-            jlWarningMesage.setText(warningMessage);
+            jtfWarningMessage.setText(warningMessage);
             
-            miClient.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            if (cfdProcessedOk > 0) {
+                miClient.getSession().notifySuscriptors(SModConsts.HRS_PAY);
+            }
         }
     }
     
-    private void processReceipts() throws Exception {
-        boolean isSent = false;
-        int cfdsProcessed = 0;
-        int cfdsCorrect = 0;
-        int cfdsIncorrect = 0;
-        String detailMessage = "";
-        String mail = "";
-        
-        STreasuryBankLayoutRequest layoutRequest = null;
-        SDataBizPartner bizPartner  = null;
-        HashMap<String, Object> map = new HashMap<>();
-        File pdf = null;
-        
-        moIntTotalToProcess.setValue(maPayrollReceipts.size());
-        
-        for (SDbPayrollReceipt receipt : maPayrollReceipts) {
-            
-            bizPartner  = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { receipt.getPkEmployeeId() }, SLibConstants.EXEC_MODE_SILENT);
-            mail = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01();
-            
-            map = getMapPayrollReceipt((SGuiClient) miClient, SDataConstantsPrint.PRINT_MODE_PDF, receipt.getPrimaryKey());
-            pdf = SHrsUtils.createPayrollReceipt(map, (SGuiClient) miClient);
-            cfdsProcessed++;
-        
-            if (pdf != null) {
-                isSent = false;
-                layoutRequest = new STreasuryBankLayoutRequest((SGuiClient) miClient, null);
-                isSent = layoutRequest.sendMail(null, "", pdf, STreasuryBankLayoutRequest.SND_TP_PAY_RCP, mail);
-                    
-                if (isSent) {
-                    cfdsCorrect++;
-                    detailMessage += "Recibo enviado\n";
-                }
-                else {
-                    cfdsIncorrect++;
-                    detailMessage += "No se ha enviado\n";
-                }
-            }
-            else {
-                cfdsIncorrect++;
-                detailMessage += "No se creo el PDF\n";
-            }
-            
-            updateForm(cfdsProcessed, cfdsCorrect, cfdsIncorrect, detailMessage);
-            
-            update(getGraphics());
-            jScrollPane1.getVerticalScrollBar().setValue(jScrollPane1.getVerticalScrollBar().getMaximum());
-        }
-    }
-    
-    public void processCfd() throws Exception {
-        int cfdsProcessed = 0;
-        int cfdsCorrect = 0;
-        int cfdsIncorrect = 0;
-        SDataFormerPayrollEmp payrollEmp = null;
-        SDbPayrollReceiptIssue payrollReceiptIssue = null;
+    private void processCfd() throws Exception {
+        int cfdProcessed = 0;
+        int cfdProcessedOk = 0;
+        int cfdProcessedWrong = 0;
+        int registryType = SLibConsts.UNDEFINED;
         SDataDps dps = null;
-        String detailMessage = "";
-        String numberSeries = "";
+        SDataFormerPayrollEmp formerPayrollEmp = null;
+        SDbPayrollReceiptIssue payrollReceiptIssue = null;
+        String series = "";
         String number = "";
-        String sSql = "";
+        String detailMessage = "";
         String warningMessage = "";
-        ResultSet resultSet = null;
-        SPrintCfdiThread thread = null; 
         
-        moIntTotalToProcess.setValue(maCfds.size());
+        moIntCfdToProcess.setValue(maCfds.size());
         
         if (maCfds != null) {
-            for(SDataCfd cfd : maCfds) {
-                cfdsProcessed++;
+            for (SDataCfd cfd : maCfds) {
+                cfdProcessed++;
 
                 switch (cfd.getFkCfdTypeId()) {
                     case SDataConstantsSys.TRNS_TP_CFD_INV:
                         dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
-
-                        numberSeries = dps.getNumberSeries();
+                        series = dps.getNumberSeries();
                         number = dps.getNumber();
+                        
+                        registryType = SModConsts.TRN_DPS;
                         break;
+                        
                     case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
                         switch (mnSubtypeCfd) {
                             case SCfdConsts.CFDI_PAYROLL_VER_OLD:
-                                payrollEmp = (SDataFormerPayrollEmp) SDataUtilities.readRegistry(miClient, SDataConstants.HRS_SIE_PAY_EMP, new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, SLibConstants.EXEC_MODE_SILENT);
-
-                                numberSeries = payrollEmp.getNumberSeries();
-                                number = "" + payrollEmp.getNumber();
+                                formerPayrollEmp = (SDataFormerPayrollEmp) SDataUtilities.readRegistry(miClient, SDataConstants.HRS_SIE_PAY_EMP, new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, SLibConstants.EXEC_MODE_SILENT);
+                                series = formerPayrollEmp.getNumberSeries();
+                                number = "" + formerPayrollEmp.getNumber();
                                 break;
-                            case SCfdConsts.CFDI_PAYROLL_VER_CUR:
-                                /*
-                                payrollReceipt = new SDbPayrollReceipt();
-                                payrollReceipt.read(miClient.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
                                 
-                                if (payrollReceipt.getPayrollReceiptIssues() != null) {
-                                    numberSeries = payrollReceipt.getPayrollReceiptIssues().getNumberSeries();
-                                    number = "" + payrollReceipt.getPayrollReceiptIssues().getNumber();
-                                }
-                                */
-                                // Read Issue last:
-
-                                sSql = "SELECT id_iss "
-                                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " "
-                                        + "WHERE id_pay = " + cfd.getFkPayrollReceiptPayrollId_n() + " AND id_emp = " + cfd.getFkPayrollReceiptEmployeeId_n() + " "
-                                        + "ORDER BY id_iss DESC LIMIT 1";
-
-                                resultSet = miClient.getSession().getDatabase().getConnection().createStatement().executeQuery(sSql);
-                                if (resultSet.next()) {
-                                    payrollReceiptIssue = (SDbPayrollReceiptIssue) miClient.getSession().readRegistry(SModConsts.HRS_PAY_RCP_ISS, new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), resultSet.getInt("id_iss") });
-                                    numberSeries = payrollReceiptIssue.getNumberSeries();
-                                    number = "" + payrollReceiptIssue.getNumber();
-                                }
+                            case SCfdConsts.CFDI_PAYROLL_VER_CUR:
+                                payrollReceiptIssue = (SDbPayrollReceiptIssue) miClient.getSession().readRegistry(SModConsts.HRS_PAY_RCP_ISS, new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() });
+                                series = payrollReceiptIssue.getNumberSeries();
+                                number = "" + payrollReceiptIssue.getNumber();
                                 break;
+                                
                             default:
                                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                         }
-
+                        
+                        registryType = SModConsts.HRS_PAY;
                         break;
+                        
                     default:
                         throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
@@ -519,32 +492,36 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                     switch (mnFormSubtype) {
                         case SCfdConsts.PROC_REQ_STAMP:
                             SCfdUtils.signCfdi(miClient, cfd, mnSubtypeCfd, false, false);
-                            detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Timbrado.\n";
+                            detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Timbrado.\n";
                             break;
-                        case SCfdConsts.PROC_REQ_ANNUL:
-                            SCfdUtils.cancelCfdi(miClient, cfd, mnSubtypeCfd, mtCancellationDate, mbValidateStamp, false, mnTpDpsAnn);
-                            detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Anulado.\n";
-                            break;
-                        case SCfdConsts.PROC_PRT_DOC:
-                            thread = new SPrintCfdiThread(miClient, cfd.getPkCfdId(), SDataConstantsPrint.PRINT_MODE_STREAM, mnNumCopies, mnSubtypeCfd, this);
                             
+                        case SCfdConsts.PROC_REQ_ANNUL:
+                            SCfdUtils.cancelCfdi(miClient, cfd, mnSubtypeCfd, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
+                            detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Anulado.\n";
+                            break;
+                            
+                        case SCfdConsts.PROC_PRT_DOC:
+                            SCfdPrintThread thread = new SCfdPrintThread(miClient, cfd, mnSubtypeCfd, SDataConstantsPrint.PRINT_MODE_PRINT, mnNumberCopies, this);
                             thread.startThread();
                             thread.join();
-                            //SCfdUtils.printCfd(miClient, cfd.getFkCfdTypeId(), cfd, SDataConstantsPrint.PRINT_MODE_STREAM, mnNumCopies, mnSubtypeCfd, false);
-                            detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Impreso.\n";
+                            detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Impreso.\n";
                             break;
+                            
                         case SCfdConsts.PROC_PRT_DOCS:
-                            SCfdUtils.printCfd(miClient, cfd.getFkCfdTypeId(), cfd, SDataConstantsPrint.PRINT_MODE_STREAM, mnNumCopies, mnSubtypeCfd, false);
-                            detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Impreso.\n";
+                            SCfdUtils.printCfd(miClient, cfd, mnSubtypeCfd, SDataConstantsPrint.PRINT_MODE_PRINT, mnNumberCopies, false);
+                            detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Impreso.\n";
                             break;
+                            
                         case SCfdConsts.PROC_PRT_ACK_ANNUL:
-                            SCfdUtils.printAcknowledgmentCancellationCfd(miClient, cfd, SDataConstantsPrint.PRINT_MODE_STREAM, mnSubtypeCfd);
-                            detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Impreso.\n";
+                            SCfdUtils.printAcknowledgmentCancellationCfd(miClient, cfd, SDataConstantsPrint.PRINT_MODE_PRINT, mnSubtypeCfd);
+                            detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Impreso.\n";
                             break;
+                            
                         case SCfdConsts.PROC_SND_DOC:
                             SCfdUtils.sendCfd(miClient, cfd.getFkCfdTypeId(), cfd, mnSubtypeCfd, false, false, true);
-                            detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Enviado.\n";
+                            detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Enviado.\n";
                             break;
+                            
                         case SCfdConsts.PROC_REQ_STAMP_AND_SND:
                             if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
                                 SCfdUtils.signAndSendCfdi(miClient, cfd, mnSubtypeCfd, false, false);
@@ -552,97 +529,96 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                             else {
                                 SCfdUtils.signCfdi(miClient, cfd, mnSubtypeCfd, false, false);
                             }
-                            detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "Timbrado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
+                            detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Timbrado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
                             break;
+                            
                         case SCfdConsts.PROC_REQ_ANNUL_AND_SND:
                             if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
-                                SCfdUtils.cancelAndSendCfdi(miClient, cfd, mnSubtypeCfd, mtCancellationDate, mbValidateStamp, false, mnTpDpsAnn);
+                                SCfdUtils.cancelAndSendCfdi(miClient, cfd, mnSubtypeCfd, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
                             }
                             else {
-                                SCfdUtils.cancelCfdi(miClient, cfd, mnSubtypeCfd, mtCancellationDate, mbValidateStamp, false, mnTpDpsAnn);
+                                SCfdUtils.cancelCfdi(miClient, cfd, mnSubtypeCfd, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
                             }
-                            detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Anulado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
+                            detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Anulado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
                             break;
+                            
                         case SCfdConsts.PROC_REQ_VERIFY:
                             SCfdUtils.verifyCfdi(miClient, cfd, mnSubtypeCfd, false);
-                            detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   Enviado.\n";
+                            detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Verificado.\n";
                             break;
+                            
                         default:
                     }
-                    cfdsCorrect++;
+                    
+                    cfdProcessedOk++;
                 }
                 catch (Exception e) {
-                    detailMessage += (numberSeries.length() > 0 ? numberSeries + "-" : "") + number + "   " + e.getMessage() + "\n";
-                    cfdsIncorrect++;
+                    detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": " + e.getMessage() + "\n";
+                    cfdProcessedWrong++;
                 }
 
-                if (mnTotalStamps > 0) {
-                    updateForm(cfdsProcessed, cfdsCorrect, cfdsIncorrect, detailMessage, mnTotalStamps);
-                }
-                else {
-                    updateForm(cfdsProcessed, cfdsCorrect, cfdsIncorrect, detailMessage);
-                }
-                
-                update(getGraphics());
-                jScrollPane1.getVerticalScrollBar().setValue(jScrollPane1.getVerticalScrollBar().getMaximum());
+                updateForm(cfdProcessed, cfdProcessedOk, cfdProcessedWrong, detailMessage);
             }
             
-            if (maCfds.isEmpty() && mnFormSubtype == SCfdConsts.PROC_PRT_DOCS ) {
-                detailMessage += "No se encontró ningún documento a imprimir para la fecha y folios indicados.\n";
-                updateForm(cfdsProcessed, cfdsCorrect, cfdsIncorrect, detailMessage);
+            if (maCfds.isEmpty()) {
+                detailMessage += "No se encontraron CFD para ser procesados.\n";
+                updateForm(cfdProcessed, cfdProcessedOk, cfdProcessedWrong, detailMessage);
             }
             
             warningMessage = SCfdUtils.verifyCertificateExpiration(miClient);
-            jlWarningMesage.setText(warningMessage);
-           
-            miClient.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            jtfWarningMessage.setText(warningMessage);
+            
+            if (cfdProcessedOk > 0 && registryType != SLibConsts.UNDEFINED) {
+                miClient.getSession().notifySuscriptors(registryType);
+            }
         }
     }
 
-    public synchronized SGuiSession getSession() {
-        return miClient.getSession();
-    }
-    
-    private void updateForm(final int totalProcess, final int totalCorrect, final int totalIncorrect, final String message, final int totalStamp) {
-        moIntTotalProcess.setValue(totalProcess);
-        moIntTotalCorrect.setValue(totalCorrect);
-        moIntTotalIncorrect.setValue(totalIncorrect);
-        moIntTotalStamp.setValue(totalStamp);
-        moIntTotalConsumed.setValue(totalCorrect);
-        moIntTotalAvailables.setValue(totalStamp - totalCorrect);
+    private void updateForm(final int cfdProcessed, final int cfdProcessedOk, final int cfdProcessedWrong, final String messages) {
+        moIntCfdProcessed.setValue(cfdProcessed);
+        moIntCfdProcessedOk.setValue(cfdProcessedOk);
+        moIntCfdProcessedWrong.setValue(cfdProcessedWrong);
         
-        jtaMessage.setText(message);
-    }
-    
-    public void updateForm(final int totalProcess, final int totalCorrect, final int totalIncorrect, final String message) {
-        moIntTotalProcess.setValue(totalProcess);
-        moIntTotalCorrect.setValue(totalCorrect);
-        moIntTotalIncorrect.setValue(totalIncorrect);
-        moIntTotalStamp.setValue(0);
-        moIntTotalConsumed.setValue(0);
-        moIntTotalAvailables.setValue(0);
+        if (mnStampsAvailable == 0) {
+            moIntStampsAvailable.setValue(0);
+            moIntStampsConsumed.setValue(0);
+            moIntStampsRemaining.setValue(0);
+        }
+        else {
+            moIntStampsAvailable.setValue(mnStampsAvailable);
+            moIntStampsConsumed.setValue(cfdProcessedOk);
+            moIntStampsRemaining.setValue(mnStampsAvailable - cfdProcessedOk);
+        }
         
-        jtaMessage.setText(message);
+        jtaMessages.setText(messages);
+        
+        update(getGraphics());
+        jspMessages.getVerticalScrollBar().setValue(jspMessages.getVerticalScrollBar().getMaximum());
     }
     
-    public void setFormParams(final SClientInterface client, final ArrayList<SDataCfd> cfds, final ArrayList<int[]> payrollReceipts, final int totalStamp, Date cancellationDate, final boolean validateStamp, final int subtypeCfd, final int tpDpsAnn) {
+    /*
+     * Public methods:
+     */
+    
+    public void setFormParams(final SClientInterface client, final ArrayList<SDataCfd> cfds, final ArrayList<int[]> payrollReceiptIds, final int stampsAvailable, Date annulmentDate, final boolean validateStamp, final int cfdSubtype, final int dpsAnnulmentType) {
         mbFirstTime = true;
+        
         miClient = client;
         maCfds = cfds;
-        maPayrollReceiptsIds = payrollReceipts;
-        mnTotalStamps = totalStamp;
-        mtCancellationDate = cancellationDate;
+        maPayrollReceiptIds = payrollReceiptIds;
+        mnStampsAvailable = stampsAvailable;
+        mtAnnulmentDate = annulmentDate;
         mbValidateStamp = validateStamp;
-        mnSubtypeCfd = subtypeCfd;
-        mnTpDpsAnn = tpDpsAnn;
+        mnSubtypeCfd = cfdSubtype;
+        mnDpsAnnulmentType = dpsAnnulmentType;
     }
     
-    public void setReceipts(ArrayList<SDbPayrollReceipt> actives) {
+    public void setReceipts(final ArrayList<SDbPayrollReceipt> actives) {
        maPayrollReceipts = actives;
     }
     
-    public void setNumberCopies(final int numCopies) {
-        mnNumCopies = numCopies;
+    public void setNumberCopies(final int numberCopies) {
+        mnNumberCopies = numberCopies;
     }
 
     @Override
@@ -657,6 +633,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
 
     @Override
     public void reloadCatalogues() {
+        
     }
 
     @Override

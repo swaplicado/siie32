@@ -329,8 +329,8 @@ public abstract class SCfdUtils implements Serializable {
         return true;
     }
 
-    private static boolean canPrint(final SDataCfd cfd, final boolean isSaving) throws Exception {
-        if (!isSaving) {
+    private static boolean canPrint(final SDataCfd cfd, final boolean isSaveInProcess) throws Exception {
+        if (!isSaveInProcess) {
             if (cfd.getIsProcessingWebService()) {
                 throw new Exception(SCfdConsts.ERR_MSG_PROCESSING_WEB_SERVICE);
             }
@@ -669,11 +669,11 @@ public abstract class SCfdUtils implements Serializable {
         return isConsistent;
     }
 
-    private static boolean managementCfdi(final SClientInterface client, final SDataCfd cfd, final int status, final Date date, final boolean isSingle, final boolean isValidate, final int pacId, final int subtypeCfd) throws Exception {
-        return managementCfdi(client, cfd, status, date, isSingle, isValidate, pacId, subtypeCfd, "", false);
+    private static boolean managementCfdi(final SClientInterface client, final SDataCfd cfd, final int status, final Date date, final boolean isSingle, final boolean isValidate, final int pacId, final int cfdSubtype) throws Exception {
+        return managementCfdi(client, cfd, status, date, isSingle, isValidate, pacId, cfdSubtype, "", false);
     }
 
-    private static boolean managementCfdi(final SClientInterface client, final SDataCfd cfd, final int status, final Date date, final boolean isSingle, final boolean isValidate, final int pacId, final int subtypeCfd, final String xmlSigned, final boolean isUpdateAckPdf) throws Exception {
+    private static boolean managementCfdi(final SClientInterface client, final SDataCfd cfd, final int status, final Date date, final boolean isSingle, final boolean isValidate, final int pacId, final int cfdSubtype, final String xmlSigned, final boolean isUpdateAckPdf) throws Exception {
         SCfdiSignature cfdiSign = null;
         SCfdPacket packet = null;
         SDataDps dps = null;
@@ -697,7 +697,7 @@ public abstract class SCfdUtils implements Serializable {
                     lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, dps.getPrimaryKey(), 1000 * 60); // 1 minute timeout
                     break;
                 case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
-                    if (subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_CUR) {
+                    if (cfdSubtype == SCfdConsts.CFDI_PAYROLL_VER_CUR) {
                         receiptIssue = new SDataPayrollReceiptIssue();
 
                         if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, client.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
@@ -820,7 +820,7 @@ public abstract class SCfdUtils implements Serializable {
 
                         cfdAuxPrint = (SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, cfd.getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
-                        printCfd(client, cfdAuxPrint.getFkCfdTypeId(), cfdAuxPrint, SDataConstantsPrint.PRINT_MODE_PDF, subtypeCfd, true);
+                        printCfd(client, cfdAuxPrint, cfdSubtype, SDataConstantsPrint.PRINT_MODE_PDF_FILE, 1, true);
 
                         // Set flag PDF as correct:
 
@@ -2383,11 +2383,7 @@ public abstract class SCfdUtils implements Serializable {
         return canceled;
     }
 
-    public static void printCfd(final SClientInterface client, final int typeCfd, final SDataCfd cfd, int printMode, final int subtypeCfd, boolean isSaving) throws Exception {
-        printCfd(client, typeCfd, cfd, printMode, SDataConstantsPrint.PRINT_A_COPY, subtypeCfd, isSaving);
-    }
-
-    public static void printCfd(final SClientInterface client, final int typeCfd, final SDataCfd cfd, int printMode, int copies, final int subtypeCfd, boolean isSaving) throws Exception {
+    public static void printCfd(final SClientInterface client, final SDataCfd cfd, final int cfdSubtype, int printMode, int numberCopies, boolean isSaveInProcess) throws Exception {
         SCfdPrint cfdPrint = null;
         SDataDps dps = null;
         SCfdParams params = null;
@@ -2396,10 +2392,10 @@ public abstract class SCfdUtils implements Serializable {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
         }
         else {
-            if (canPrint(cfd, isSaving)) {
+            if (canPrint(cfd, isSaveInProcess)) {
                 cfdPrint = new SCfdPrint(client);
                 
-                switch (typeCfd) {
+                switch (cfd.getFkCfdTypeId()) {
                     case SDataConstantsSys.TRNS_TP_CFD_INV:
                         dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
                         params = createCfdParams(client, dps);
@@ -2424,10 +2420,10 @@ public abstract class SCfdUtils implements Serializable {
                         switch (cfd.getFkXmlTypeId()) {
                             case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
                                 if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_11) {
-                                    cfdPrint.printPayrollReceipt32_11(cfd, printMode, copies, subtypeCfd);
+                                    cfdPrint.printPayrollReceipt32_11(cfd, printMode, numberCopies, cfdSubtype);
                                 }
                                 else if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_12) {
-                                    cfdPrint.printPayrollReceipt32_12(cfd, printMode, copies, subtypeCfd);
+                                    cfdPrint.printPayrollReceipt32_12(cfd, printMode, numberCopies, cfdSubtype);
                                 }
                                 break;
                             case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
@@ -2435,7 +2431,7 @@ public abstract class SCfdUtils implements Serializable {
                                     throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                                 }
                                 else if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_12) {
-                                    cfdPrint.printPayrollReceipt33_12(cfd, printMode, copies, subtypeCfd);
+                                    cfdPrint.printPayrollReceipt33_12(cfd, printMode, numberCopies, cfdSubtype);
                                 }
                                 break;
                             default:
@@ -2446,6 +2442,28 @@ public abstract class SCfdUtils implements Serializable {
                     default:
                         throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
+            }
+        }
+    }
+
+    public static void printCfds(final SClientInterface client, final ArrayList<SDataCfd> cfds, int numberCopies, final int subtypeCfd) throws Exception {
+        ArrayList<SDataCfd> cfdsPrintable = new ArrayList<SDataCfd>();
+
+        for (SDataCfd cfd : cfds) {
+            if (cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
+                cfdsPrintable.add(cfd);
+            }
+        }
+
+        if (cfdsPrintable.isEmpty()) {
+            client.showMsgBoxInformation("No hay documentos para imprimir.");
+        }
+        else {
+            if (client.showMsgBoxConfirm("¿Está seguro que desea imprimir " + cfdsPrintable.size() + " documentos?") == JOptionPane.YES_OPTION) {
+                SDialogResult dialogResult = new SDialogResult((SClient) client, "Resultados de impresión", SCfdConsts.PROC_PRT_DOC);
+                dialogResult.setFormParams(client, cfdsPrintable, null, 0, null, false, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                dialogResult.setNumberCopies(numberCopies);
+                dialogResult.setVisible(true);
             }
         }
     }
@@ -2853,7 +2871,6 @@ public abstract class SCfdUtils implements Serializable {
 
     public static boolean verifyCfdi(final SClientInterface client, final ArrayList<SDataCfd> cfds, final int subtypeCfd) throws Exception {
         boolean valid = false;
-        int stampAvailables = 0;
         ArrayList<SDataCfd> cfdsValidate = null;
         SDialogResult dialogResult = null;
         
@@ -2871,11 +2888,10 @@ public abstract class SCfdUtils implements Serializable {
                 //cfdsValidate.add(cfd);
             }
 
-            stampAvailables = getStampsAvailable(client, cfdsValidate.get(0).getFkCfdTypeId(), cfdsValidate.get(0).getTimestamp(), 0);
             if (existsCfdiEmitInconsist(client, cfdsValidate)) {
+                int stampsAvailable = getStampsAvailable(client, cfdsValidate.get(0).getFkCfdTypeId(), cfdsValidate.get(0).getTimestamp(), 0);
                 dialogResult = new SDialogResult((SClient) client, "Resultados de verificación", SCfdConsts.PROC_REQ_VERIFY);
-
-                dialogResult.setFormParams(client, cfdsValidate, null, stampAvailables, null, false, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                dialogResult.setFormParams(client, cfdsValidate, null, stampsAvailable, null, false, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                 dialogResult.setVisible(true);
             }
         }
@@ -2954,13 +2970,13 @@ public abstract class SCfdUtils implements Serializable {
                                 
                                 switch (cfd.getFkXmlTypeId()) {
                                     case SDataConstantsSys.TRNS_TP_XML_CFD:
-                                        cfdPrint.printCfd(cfd, SDataConstantsPrint.PRINT_MODE_PDF, dps);
+                                        cfdPrint.printCfd(cfd, SDataConstantsPrint.PRINT_MODE_PDF_FILE, dps);
                                         break;
                                     case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
-                                        cfdPrint.printCfdi32(cfd, SDataConstantsPrint.PRINT_MODE_PDF, dps);
+                                        cfdPrint.printCfdi32(cfd, SDataConstantsPrint.PRINT_MODE_PDF_FILE, dps);
                                         break;
                                     case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
-                                        cfdPrint.printCfdi33(cfd, SDataConstantsPrint.PRINT_MODE_PDF, dps);
+                                        cfdPrint.printCfdi33(cfd, SDataConstantsPrint.PRINT_MODE_PDF_FILE, dps);
                                         break;
                                     default:
                                         throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -2971,10 +2987,10 @@ public abstract class SCfdUtils implements Serializable {
                                 switch (cfd.getFkXmlTypeId()) {
                                     case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
                                         if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_11) {
-                                            cfdPrint.printPayrollReceipt32_11(cfd, SDataConstantsPrint.PRINT_MODE_PDF, SDataConstantsPrint.PRINT_A_COPY, subtypeCfd);
+                                            cfdPrint.printPayrollReceipt32_11(cfd, SDataConstantsPrint.PRINT_MODE_PDF_FILE, 1, subtypeCfd);
                                         }
                                         else if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_12) {
-                                            cfdPrint.printPayrollReceipt32_12(cfd, SDataConstantsPrint.PRINT_MODE_PDF, SDataConstantsPrint.PRINT_A_COPY, subtypeCfd);
+                                            cfdPrint.printPayrollReceipt32_12(cfd, SDataConstantsPrint.PRINT_MODE_PDF_FILE, 1, subtypeCfd);
                                         }
                                         break;
                                     case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
@@ -2982,7 +2998,7 @@ public abstract class SCfdUtils implements Serializable {
                                             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                                         }
                                         else if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_12) {
-                                            cfdPrint.printPayrollReceipt33_12(cfd, SDataConstantsPrint.PRINT_MODE_PDF, SDataConstantsPrint.PRINT_A_COPY, subtypeCfd);
+                                            cfdPrint.printPayrollReceipt33_12(cfd, SDataConstantsPrint.PRINT_MODE_PDF_FILE, 1, subtypeCfd);
                                         }
                                         break;
                                     default:
@@ -3195,7 +3211,7 @@ public abstract class SCfdUtils implements Serializable {
      * @param dps DPS registry.
      * @return Available stamps.
      */
-    public static int getStampsAvailable(final SClientInterface client, final int cfdTypeId, final Date date, final int pacId)  {
+    public static int getStampsAvailable(final SClientInterface client, final int cfdType, final Date date, final int pacId)  {
         SDataCfdPacType cfdPacType = null;
         SDataPac pac = null;
         String sql = "";
@@ -3203,7 +3219,7 @@ public abstract class SCfdUtils implements Serializable {
         int nStampsAvailable = 0;
 
         try {
-            cfdPacType = getPacConfiguration(client, cfdTypeId);
+            cfdPacType = getPacConfiguration(client, cfdType);
 
             if (cfdPacType != null || pacId != 0) {
                 pac = (SDataPac) SDataUtilities.readRegistry(client, SDataConstants.TRN_PAC, new int[] { pacId == 0 ? cfdPacType.getFkPacId() : pacId }, SLibConstants.EXEC_MODE_SILENT);
@@ -3570,9 +3586,8 @@ public abstract class SCfdUtils implements Serializable {
         comprobante.getAttLugarExpedicion().setString(xmlCfdi.getComprobanteLugarExpedicion());
         comprobante.getAttConfirmacion().setString(xmlCfdi.getComprobanteConfirmacion());
         
-        if (!xmlCfdi.getCfdiRelacionados().isEmpty()) {
+        if (!xmlCfdi.getCfdiRelacionadosTipoRelacion().isEmpty() && !xmlCfdi.getCfdiRelacionados().isEmpty()) {
             cfd.ver33.DElementCfdiRelacionados cfdiRelacionados = new DElementCfdiRelacionados();
-            
             cfdiRelacionados.getAttTipoRelacion().setString(xmlCfdi.getCfdiRelacionadosTipoRelacion());
             
             for (String uuid : xmlCfdi.getCfdiRelacionados()) {
@@ -3958,11 +3973,10 @@ public abstract class SCfdUtils implements Serializable {
 
     public static boolean signCfdi(final SClientInterface client, final ArrayList<SDataCfd> cfds, final int subtypeCfd) throws Exception {
         boolean signed = false;
-        int stampAvailables = 0;
+        boolean signNeeded = false;
         ArrayList<SDataCfd> cfdsValidate = null;
         ArrayList<SDataCfd> cfdsAux = null;
         SDialogResult dialogResult = null;
-        boolean needSign = false;
 
         cfdsValidate = new ArrayList<SDataCfd>();
         cfdsAux = new ArrayList<SDataCfd>();
@@ -3982,23 +3996,21 @@ public abstract class SCfdUtils implements Serializable {
         }
         else {
             if (client.showMsgBoxConfirm("¿Está seguro que desea timbrar " + cfdsAux.size() + " documentos?") == JOptionPane.YES_OPTION) {
-                signed = true;
-                stampAvailables = getStampsAvailable(client, cfdsAux.get(0).getFkCfdTypeId(), cfdsAux.get(0).getTimestamp(), 0);
-                needSign = isNeedStamps(client, cfdsAux.get(0), SDbConsts.ACTION_SAVE, 0);
+                int stampsAvailable = getStampsAvailable(client, cfdsAux.get(0).getFkCfdTypeId(), cfdsAux.get(0).getTimestamp(), 0);
+                signNeeded = isNeedStamps(client, cfdsAux.get(0), SDbConsts.ACTION_SAVE, 0);
 
-                if (needSign && stampAvailables == 0) {
+                if (signNeeded && stampsAvailable == 0) {
                     client.showMsgBoxWarning("No existen timbres disponibles.");
                 }
                 else {
-                    if (needSign && cfdsAux.size() > stampAvailables) {
-                        signed = client.showMsgBoxConfirm("Timbres insuficientes:\n -Solo existen '" + stampAvailables + "' timbres disponibles.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION;
+                    if (signNeeded && cfdsAux.size() > stampsAvailable) {
+                        signed = client.showMsgBoxConfirm("Timbres insuficientes:\n -Solo existen '" + stampsAvailable + "' timbres disponibles.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION;
                     }
 
                     if (existsCfdiEmitInconsist(client, cfdsValidate)) {
                         if (signed) {
                             dialogResult = new SDialogResult((SClient) client, "Resultados de timbrado", SCfdConsts.PROC_REQ_STAMP);
-
-                            dialogResult.setFormParams(client, cfdsAux, null, stampAvailables, null, needSign, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                            dialogResult.setFormParams(client, cfdsAux, null, stampsAvailable, null, signNeeded, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                             dialogResult.setVisible(true);
                         }
                     }
@@ -4011,7 +4023,7 @@ public abstract class SCfdUtils implements Serializable {
     
     public static boolean signAndSendCfdi(final SClientInterface client, final ArrayList<SDataCfd> cfds, final int subtypeCfd) throws Exception {
         boolean signedSent = false;
-        int stampAvailables = 0;
+        int stampsAvailable = 0;
         ArrayList<SDataCfd> cfdsValidate = null;
         ArrayList<SDataCfd> cfdsAux = null;
         SDialogResult dialogResult = null;
@@ -4036,22 +4048,22 @@ public abstract class SCfdUtils implements Serializable {
         else {
             if (client.showMsgBoxConfirm("¿Está seguro que desea timbrar y enviar " + cfdsAux.size() + " documentos?") == JOptionPane.YES_OPTION) {
                 signedSent = true;
-                stampAvailables = getStampsAvailable(client, cfdsAux.get(0).getFkCfdTypeId(), cfdsAux.get(0).getTimestamp(), 0);
+                stampsAvailable = getStampsAvailable(client, cfdsAux.get(0).getFkCfdTypeId(), cfdsAux.get(0).getTimestamp(), 0);
                 needSign = isNeedStamps(client, cfdsAux.get(0), SDbConsts.ACTION_SAVE, 0);
 
-                if (needSign && stampAvailables == 0) {
+                if (needSign && stampsAvailable == 0) {
                     client.showMsgBoxWarning("No existen timbres disponibles.");
                 }
                 else {
-                    if (needSign && cfdsAux.size() > stampAvailables) {
-                        signedSent = client.showMsgBoxConfirm("Timbres insuficientes:\n -Solo existen '" + stampAvailables + "' timbres disponibles.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION;
+                    if (needSign && cfdsAux.size() > stampsAvailable) {
+                        signedSent = client.showMsgBoxConfirm("Timbres insuficientes:\n -Solo existen '" + stampsAvailable + "' timbres disponibles.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION;
                     }
 
                     if (existsCfdiEmitInconsist(client, cfdsValidate)) {
                         if (signedSent) {
                             dialogResult = new SDialogResult((SClient) client, "Resultados de timbrado y enviado", SCfdConsts.PROC_REQ_STAMP_AND_SND);
 
-                            dialogResult.setFormParams(client, cfdsAux, null, stampAvailables, null, needSign, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                            dialogResult.setFormParams(client, cfdsAux, null, stampsAvailable, null, needSign, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                             dialogResult.setVisible(true);
                         }
                     }
@@ -4068,7 +4080,7 @@ public abstract class SCfdUtils implements Serializable {
 
     public static boolean cancelCfdi(final SClientInterface client, final ArrayList<SDataCfd> cfds, final int subtypeCfd, final Date cancellationDate, boolean validateStamp, int tpDpsAnn) throws Exception {
         boolean cancel = false;
-        int stampAvailables = 0;
+        int stampsAvailable = 0;
         ArrayList<SDataCfd> cfdsAux = null;
         SDialogResult dialogResult = null;
         boolean needSign = false;
@@ -4087,21 +4099,21 @@ public abstract class SCfdUtils implements Serializable {
         else {
             if (client.showMsgBoxConfirm("¿Está seguro que desea anular " + cfdsAux.size() + " documentos?") == JOptionPane.YES_OPTION) {
                 cancel = true;
-                stampAvailables = getStampsAvailable(client, cfdsAux.get(0).getFkCfdTypeId(), cfdsAux.get(0).getTimestamp(), 0);
+                stampsAvailable = getStampsAvailable(client, cfdsAux.get(0).getFkCfdTypeId(), cfdsAux.get(0).getTimestamp(), 0);
                 needSign = isNeedStamps(client, cfdsAux.get(0), SDbConsts.ACTION_SAVE, 0);
 
-                if (needSign && stampAvailables == 0) {
+                if (needSign && stampsAvailable == 0) {
                     client.showMsgBoxWarning("No existen timbres disponibles.");
                 }
                 else {
-                    if (needSign && cfdsAux.size() > stampAvailables) {
-                        cancel = client.showMsgBoxConfirm("Timbres insuficientes:\n -Solo existen '" + stampAvailables + "' timbres disponibles.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION;
+                    if (needSign && cfdsAux.size() > stampsAvailable) {
+                        cancel = client.showMsgBoxConfirm("Timbres insuficientes:\n -Solo existen '" + stampsAvailable + "' timbres disponibles.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION;
                     }
 
                     if (cancel && client.showMsgBoxConfirm("La anulación de un CFDI no puede revertirse.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                         dialogResult = new SDialogResult((SClient) client, "Resultados de anulación", SCfdConsts.PROC_REQ_ANNUL);
 
-                        dialogResult.setFormParams(client, cfdsAux, null, 0, cancellationDate, validateStamp, subtypeCfd, tpDpsAnn);
+                        dialogResult.setFormParams(client, cfdsAux, null, stampsAvailable, cancellationDate, validateStamp, subtypeCfd, tpDpsAnn);
                         dialogResult.setVisible(true);
                     }
                 }
@@ -4113,7 +4125,7 @@ public abstract class SCfdUtils implements Serializable {
     
     public static boolean cancelAndSendCfdi(final SClientInterface client, final ArrayList<SDataCfd> cfds, final int subtypeCfd, final Date cancellationDate, boolean validateStamp, int tpDpsAnn) throws Exception {
         boolean cancel = false;
-        int stampAvailables = 0;
+        int stampsAvailable = 0;
         ArrayList<SDataCfd> cfdsAux = null;
         SDialogResult dialogResult = null;
         boolean needSign = false;
@@ -4132,21 +4144,21 @@ public abstract class SCfdUtils implements Serializable {
         else {
             if (client.showMsgBoxConfirm("¿Está seguro que desea anular " + cfdsAux.size() + " documentos?") == JOptionPane.YES_OPTION) {
                 cancel = true;
-                stampAvailables = getStampsAvailable(client, cfdsAux.get(0).getFkCfdTypeId(), cfdsAux.get(0).getTimestamp(), 0);
+                stampsAvailable = getStampsAvailable(client, cfdsAux.get(0).getFkCfdTypeId(), cfdsAux.get(0).getTimestamp(), 0);
                 needSign = isNeedStamps(client, cfdsAux.get(0), SDbConsts.ACTION_SAVE, 0);
 
-                if (needSign && stampAvailables == 0) {
+                if (needSign && stampsAvailable == 0) {
                     client.showMsgBoxWarning("No existen timbres disponibles.");
                 }
                 else {
-                    if (needSign && cfdsAux.size() > stampAvailables) {
-                        cancel = client.showMsgBoxConfirm("Timbres insuficientes:\n -Solo existen '" + stampAvailables + "' timbres disponibles.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION;
+                    if (needSign && cfdsAux.size() > stampsAvailable) {
+                        cancel = client.showMsgBoxConfirm("Timbres insuficientes:\n -Solo existen '" + stampsAvailable + "' timbres disponibles.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION;
                     }
 
                     if (cancel && client.showMsgBoxConfirm("La anulación de un CFDI no puede revertirse.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                         dialogResult = new SDialogResult((SClient) client, "Resultados de anulación y envío", SCfdConsts.PROC_REQ_ANNUL_AND_SND);
 
-                        dialogResult.setFormParams(client, cfdsAux, null, 0, cancellationDate, validateStamp, subtypeCfd, tpDpsAnn);
+                        dialogResult.setFormParams(client, cfdsAux, null, stampsAvailable, cancellationDate, validateStamp, subtypeCfd, tpDpsAnn);
                         dialogResult.setVisible(true);
                     }
                 }
@@ -4154,41 +4166,6 @@ public abstract class SCfdUtils implements Serializable {
         }
 
         return cancel;
-    }
-
-    public static void printCfd(final SClientInterface client, final int typeCfd, final SDataCfd cfd, final int subtypeCfd) throws Exception {
-        if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
-        }
-        else {
-            printCfd(client, typeCfd, cfd, SDataConstantsPrint.PRINT_MODE_VIEWER, subtypeCfd, false);
-        }
-    }
-
-    public static void printCfd(final SClientInterface client, final ArrayList<SDataCfd> cfds, int copies, final int subtypeCfd) throws Exception {
-        ArrayList<SDataCfd> cfdsAux = null;
-        SDialogResult dialogResult = null;
-
-        cfdsAux = new ArrayList<SDataCfd>();
-
-        for(SDataCfd cfd : cfds) {
-            if (cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
-                cfdsAux.add(cfd);
-            }
-        }
-
-        if (cfdsAux.isEmpty()) {
-            client.showMsgBoxInformation("No existen documentos para imprimir.");
-        }
-        else {
-            if (client.showMsgBoxConfirm("¿Está seguro que desea imprimir " + cfdsAux.size() + " documentos?") == JOptionPane.YES_OPTION) {
-                dialogResult = new SDialogResult((SClient) client, "Resultados de impresión", SCfdConsts.PROC_PRT_DOC);
-
-                dialogResult.setFormParams(client, cfdsAux, null, 0, null, false, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
-                dialogResult.setNumberCopies(copies);
-                dialogResult.setVisible(true);
-            }
-        }
     }
 
     public static void printAcknowledgmentCancellationCfd(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd) throws Exception {
@@ -4218,7 +4195,6 @@ public abstract class SCfdUtils implements Serializable {
         else {
             if (client.showMsgBoxConfirm("¿Está seguro que desea imprimir " + cfdsAux.size() + " acuses de cancelación?") == JOptionPane.YES_OPTION) {
                 dialogResult = new SDialogResult((SClient) client, "Resultados de impresión de acuses de cancelación", SCfdConsts.PROC_PRT_ACK_ANNUL);
-
                 dialogResult.setFormParams(client, cfdsAux, null, 0, null, false, subtypeCfd, subtypeCfd);
                 dialogResult.setVisible(true);
             }
@@ -4390,7 +4366,6 @@ public abstract class SCfdUtils implements Serializable {
         else {
             if (client.showMsgBoxConfirm("¿Está seguro que desea enviar por correo-e " + cfdsAux.size() + " documentos?") == JOptionPane.YES_OPTION) {
                 dialogResult = new SDialogResult((SClient) client, "Resultados de envío", SCfdConsts.PROC_SND_DOC);
-
                 dialogResult.setFormParams(client, cfdsAux, null, 0, null, false, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                 dialogResult.setVisible(true);
             }

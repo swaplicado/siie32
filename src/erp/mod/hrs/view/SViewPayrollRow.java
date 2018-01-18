@@ -384,7 +384,8 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
-                        SCfdUtils.printCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_PAYROLL, SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_CUR);
+                        SDataCfd cfd = SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey());
+                        SCfdUtils.printCfd((SClientInterface) miClient, cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, SDataConstantsPrint.PRINT_MODE_VIEWER, 1, false);
                     }
                     catch (Exception e) {
                         SLibUtils.showException(this, e);
@@ -531,7 +532,7 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
-                        SHrsUtils.SendPayrollReceipt(miClient, SDataConstantsPrint.PRINT_MODE_PDF, gridRow.getRowPrimaryKey());
+                        SHrsUtils.SendPayrollReceipt(miClient, SDataConstantsPrint.PRINT_MODE_PDF_FILE, gridRow.getRowPrimaryKey());
                     }
                     catch (Exception e) {
                         SLibUtils.showException(this, e);
@@ -667,11 +668,10 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
     @Override
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
-        moSuscriptionsSet.add(mnGridSubtype);
         moSuscriptionsSet.add(SModConsts.HRS_PAY);
-        moSuscriptionsSet.add(SModConsts.HRS_PAY_RCP_EAR);
-        moSuscriptionsSet.add(SModConsts.HRS_PAY_RCP_DED);
+        moSuscriptionsSet.add(SModConsts.HRS_PAY_RCP_ISS);
         moSuscriptionsSet.add(SModConsts.HRS_SIE_PAY);
+        moSuscriptionsSet.add(SModConsts.TRN_CFD);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
     }
 

@@ -7,15 +7,13 @@ package erp.print;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public abstract class SDataConstantsPrint {
 
     public static final int UNDEFINED = 0;
 
     public static final int PRINT_MODE_VIEWER = 1;
-    public static final int PRINT_MODE_PDF = 2;
-    public static final int PRINT_MODE_STREAM = 3;
-    
-    public static final int PRINT_A_COPY = 1;
+    public static final int PRINT_MODE_PDF_FILE = 2;
+    public static final int PRINT_MODE_PRINT = 3;
 }

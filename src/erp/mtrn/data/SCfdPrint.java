@@ -66,7 +66,15 @@ public class SCfdPrint {
         miClient = client;
     }
 
-    public void printCfd(erp.mtrn.data.SDataCfd cfd, int pnPrintMode, SDataDps dps) throws java.lang.Exception {
+    /**
+     * Prints CFD.
+     * @param cfd CFD
+     * @param printMode Constants defined in SDataConstantsPrint.PRINT_MODE_...
+     * @param dps DPS
+     * @throws java.lang.Exception
+     * XXX 2018-01-12 (Sergio Flores): normalize these parameters because CFD is contained in DPS! WTF!
+     */
+    public void printCfd(final erp.mtrn.data.SDataCfd cfd, final int printMode, final erp.mtrn.data.SDataDps dps) throws java.lang.Exception {
         int nFkEmiAddressFormatTypeId_n = 0;
         int nFkRecAddressFormatTypeId_n = 0;
         double dSubtotalProvisionalCy = 0;
@@ -382,13 +390,13 @@ public class SCfdPrint {
         sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
         sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
 
-        switch (pnPrintMode) {
+        switch (printMode) {
             case SDataConstantsPrint.PRINT_MODE_VIEWER:
                 jasperViewer = new JasperViewer(jasperPrint, false);
                 jasperViewer.setTitle("Comprobante Fiscal Digital");
                 jasperViewer.setVisible(true);
                 break;
-            case SDataConstantsPrint.PRINT_MODE_PDF:
+            case SDataConstantsPrint.PRINT_MODE_PDF_FILE:
                 JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
                 break;
             default:
@@ -396,7 +404,15 @@ public class SCfdPrint {
         }
     }
 
-    public void printCfdi32(erp.mtrn.data.SDataCfd cfd, int pnPrintMode, SDataDps dps) throws java.lang.Exception {
+    /**
+     * Prints CFDI 3.2.
+     * @param cfd CFD
+     * @param printMode Constants defined in SDataConstantsPrint.PRINT_MODE_...
+     * @param dps DPS
+     * @throws java.lang.Exception
+     * XXX 2018-01-12 (Sergio Flores): normalize these parameters because CFD is contained in DPS! WTF!
+     */
+    public void printCfdi32(final erp.mtrn.data.SDataCfd cfd, final int printMode, final erp.mtrn.data.SDataDps dps) throws java.lang.Exception {
         int nFkEmiAddressFormatTypeId_n = 0;
         int nFkRecAddressFormatTypeId_n = 0;
         double dSubtotalProvisionalCy = 0;
@@ -662,16 +678,16 @@ public class SCfdPrint {
         sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
         sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
 
-        switch (pnPrintMode) {
+        switch (printMode) {
             case SDataConstantsPrint.PRINT_MODE_VIEWER:
                 jasperViewer = new JasperViewer(jasperPrint, false);
                 jasperViewer.setTitle("Comprobante Fiscal Digital por Internet");
                 jasperViewer.setVisible(true);
                 break;
-            case SDataConstantsPrint.PRINT_MODE_PDF:
+            case SDataConstantsPrint.PRINT_MODE_PDF_FILE:
                 JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
                 break;
-            case SDataConstantsPrint.PRINT_MODE_STREAM:
+            case SDataConstantsPrint.PRINT_MODE_PRINT:
                 JasperPrintManager.printReport(jasperPrint, false);
                 break;
             default:
@@ -679,7 +695,15 @@ public class SCfdPrint {
         }
     }
     
-    public void printCfdi33(erp.mtrn.data.SDataCfd cfd, int pnPrintMode, SDataDps dps) throws java.lang.Exception {
+    /**
+     * Prints CFDI 3.3.
+     * @param cfd CFD
+     * @param printMode Constants defined in SDataConstantsPrint.PRINT_MODE_...
+     * @param dps DPS
+     * @throws java.lang.Exception
+     * XXX 2018-01-12 (Sergio Flores): normalize these parameters because CFD is contained in DPS! WTF!
+     */
+    public void printCfdi33(final erp.mtrn.data.SDataCfd cfd, final int printMode, final erp.mtrn.data.SDataDps dps) throws java.lang.Exception {
         // CFDI's header:
         
         SDataCurrency currency = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { dps.getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
@@ -932,16 +956,16 @@ public class SCfdPrint {
         String sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
         sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
 
-        switch (pnPrintMode) {
+        switch (printMode) {
             case SDataConstantsPrint.PRINT_MODE_VIEWER:
                 JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
                 jasperViewer.setTitle("Comprobante Fiscal Digital por Internet");
                 jasperViewer.setVisible(true);
                 break;
-            case SDataConstantsPrint.PRINT_MODE_PDF:
+            case SDataConstantsPrint.PRINT_MODE_PDF_FILE:
                 JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
                 break;
-            case SDataConstantsPrint.PRINT_MODE_STREAM:
+            case SDataConstantsPrint.PRINT_MODE_PRINT:
                 JasperPrintManager.printReport(jasperPrint, false);
                 break;
             default:
@@ -949,7 +973,14 @@ public class SCfdPrint {
         }
     }
 
-    public void printAcknowledgment(erp.mtrn.data.SDataCfd cfd, int pnPrintMode, final int subtypeCfd) throws java.lang.Exception {
+    /**
+     * 
+     * @param cfd
+     * @param printMode
+     * @param subtypeCfd
+     * @throws java.lang.Exception 
+     */
+    public void printAcknowledgment(final erp.mtrn.data.SDataCfd cfd, final int printMode, final int subtypeCfd) throws java.lang.Exception {
         Map<String, Object> map = null;
         JasperPrint jasperPrint = null;
         JasperViewer jasperViewer = null;
@@ -1040,16 +1071,16 @@ public class SCfdPrint {
         sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
         sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
 
-        switch (pnPrintMode) {
+        switch (printMode) {
             case SDataConstantsPrint.PRINT_MODE_VIEWER:
                 jasperViewer = new JasperViewer(jasperPrint, false);
                 jasperViewer.setTitle("Acuse de cancelación de CFDI");
                 jasperViewer.setVisible(true);
                 break;
-            case SDataConstantsPrint.PRINT_MODE_PDF:
+            case SDataConstantsPrint.PRINT_MODE_PDF_FILE:
                 JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
                 break;
-            case SDataConstantsPrint.PRINT_MODE_STREAM:
+            case SDataConstantsPrint.PRINT_MODE_PRINT:
                 JasperPrintManager.printReport(jasperPrint, false);
                 break;
             default:
@@ -1057,7 +1088,15 @@ public class SCfdPrint {
         }
     }
     
-    public void printPayrollReceipt32_11(final SDataCfd cfd, final int pnPrintMode, final int pnNumCopies, final int subtypeCfd) throws java.lang.Exception {
+    /**
+     * Prints payroll CFDI 3.2 with complement 1.1.
+     * @param cfd
+     * @param printMode
+     * @param numCopies
+     * @param subtypeCfd
+     * @throws java.lang.Exception 
+     */
+    public void printPayrollReceipt32_11(final SDataCfd cfd, final int printMode, final int numCopies, final int subtypeCfd) throws java.lang.Exception {
         int i = 0;
         int nTotalTiempoExtra = 0;
 
@@ -1348,17 +1387,17 @@ public class SCfdPrint {
         sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
         sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
 
-        switch (pnPrintMode) {
+        switch (printMode) {
             case SDataConstantsPrint.PRINT_MODE_VIEWER:
                 jasperViewer = new JasperViewer(jasperPrint, false);
                 jasperViewer.setTitle("Comprobante Fiscal Digital por Internet");
                 jasperViewer.setVisible(true);
                 break;
-            case SDataConstantsPrint.PRINT_MODE_PDF:
+            case SDataConstantsPrint.PRINT_MODE_PDF_FILE:
                 JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
                 break;
-            case SDataConstantsPrint.PRINT_MODE_STREAM:
-                for (int j = 0; j < pnNumCopies; j++) {
+            case SDataConstantsPrint.PRINT_MODE_PRINT:
+                for (int j = 0; j < numCopies; j++) {
                     JasperPrintManager.printReport(jasperPrint, false);                    
                 }
                 break;
@@ -1367,7 +1406,15 @@ public class SCfdPrint {
         }
     }
     
-    public void printPayrollReceipt32_12(final SDataCfd cfd, final int pnPrintMode, final int pnNumCopies, final int subtypeCfd) throws java.lang.Exception {
+    /**
+     * Prints payroll CFDI 3.2 with complement 1.2.
+     * @param cfd
+     * @param printMode
+     * @param numCopies
+     * @param subtypeCfd
+     * @throws java.lang.Exception 
+     */
+    public void printPayrollReceipt32_12(final SDataCfd cfd, final int printMode, final int numCopies, final int subtypeCfd) throws java.lang.Exception {
         int i = 0;
         int overTime = 0;
         int nTotalTiempoExtra = 0;
@@ -1695,17 +1742,17 @@ public class SCfdPrint {
         sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
         sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
 
-        switch (pnPrintMode) {
+        switch (printMode) {
             case SDataConstantsPrint.PRINT_MODE_VIEWER:
                 jasperViewer = new JasperViewer(jasperPrint, false);
                 jasperViewer.setTitle("Comprobante Fiscal Digital por Internet");
                 jasperViewer.setVisible(true);
                 break;
-            case SDataConstantsPrint.PRINT_MODE_PDF:
+            case SDataConstantsPrint.PRINT_MODE_PDF_FILE:
                 JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
                 break;
-            case SDataConstantsPrint.PRINT_MODE_STREAM:
-                for (int j = 0; j < pnNumCopies; j++) {
+            case SDataConstantsPrint.PRINT_MODE_PRINT:
+                for (int j = 0; j < numCopies; j++) {
                     JasperPrintManager.printReport(jasperPrint, false);                    
                 }
                 break;
@@ -1714,7 +1761,15 @@ public class SCfdPrint {
         }
     }
     
-    public void printPayrollReceipt33_12(final SDataCfd cfd, final int pnPrintMode, final int pnNumCopies, final int subtypeCfd) throws java.lang.Exception {
+    /**
+     * Prints payroll CFDI 3.3 with complement 1.2.
+     * @param cfd
+     * @param printMode
+     * @param numCopies
+     * @param subtypeCfd
+     * @throws java.lang.Exception 
+     */
+    public void printPayrollReceipt33_12(final SDataCfd cfd, final int printMode, final int numCopies, final int subtypeCfd) throws java.lang.Exception {
         int i = 0;
         int overTime = 0;
         int nTotalTiempoExtra = 0;
@@ -2040,17 +2095,17 @@ public class SCfdPrint {
         sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
         sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
 
-        switch (pnPrintMode) {
+        switch (printMode) {
             case SDataConstantsPrint.PRINT_MODE_VIEWER:
                 jasperViewer = new JasperViewer(jasperPrint, false);
                 jasperViewer.setTitle("Comprobante Fiscal Digital por Internet");
                 jasperViewer.setVisible(true);
                 break;
-            case SDataConstantsPrint.PRINT_MODE_PDF:
+            case SDataConstantsPrint.PRINT_MODE_PDF_FILE:
                 JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
                 break;
-            case SDataConstantsPrint.PRINT_MODE_STREAM:
-                for (int j = 0; j < pnNumCopies; j++) {
+            case SDataConstantsPrint.PRINT_MODE_PRINT:
+                for (int j = 0; j < numCopies; j++) {
                     JasperPrintManager.printReport(jasperPrint, false);                    
                 }
                 break;

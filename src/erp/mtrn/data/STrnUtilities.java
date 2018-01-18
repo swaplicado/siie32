@@ -1625,7 +1625,7 @@ public abstract class STrnUtilities {
                 if (canSend) {
                     pdf = new File("temp", oDps.getNumberSeries() + (oDps.getNumberSeries().isEmpty() ? "" : "_") + oDps.getNumber() + ".pdf");
 
-                    createReportOrder(client, pdf, oDps, SDataConstantsPrint.PRINT_MODE_PDF);
+                    createReportOrder(client, pdf, oDps, SDataConstantsPrint.PRINT_MODE_PDF_FILE);
 
                     mail.getAttachments().add(pdf);
                     mail.send();
@@ -2280,7 +2280,7 @@ public abstract class STrnUtilities {
                     jasperViewer.setTitle("Impresión de pedido");
                     jasperViewer.setVisible(true);
                     break;
-                case SDataConstantsPrint.PRINT_MODE_PDF:
+                case SDataConstantsPrint.PRINT_MODE_PDF_FILE:
                     outputStreamPdf = new FileOutputStream(file);
 
                     JasperExportManager.exportReportToPdfStream(jasperPrint, outputStreamPdf);
