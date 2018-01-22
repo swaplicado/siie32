@@ -3542,7 +3542,7 @@ public abstract class SCfdUtils implements Serializable {
         }
 
         if (xmlCfdi.getElementAddenda() != null) {
-            comprobante.setEltOpcAddenda((cfd.ver32.DElementAddenda) xmlCfdi.getElementAddenda());
+            comprobante.setEltOpcAddenda((cfd.ver3.DElementAddenda) xmlCfdi.getElementAddenda());
         }
 
         if (xmlCfdi.getCfdType() == SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
@@ -3718,7 +3718,7 @@ public abstract class SCfdUtils implements Serializable {
         }
 
         if (xmlCfdi.getElementAddenda() != null) {
-            comprobante.setEltOpcAddenda((cfd.ver33.DElementAddenda) xmlCfdi.getElementAddenda());
+            comprobante.setEltOpcAddenda((cfd.ver3.DElementAddenda) xmlCfdi.getElementAddenda());
         }
 
         validateCorrectnessXml(comprobante);
