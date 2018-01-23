@@ -4925,12 +4925,25 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 }
                 
                 concepto = new SCfdDataConcepto();
-                concepto.setClaveProdServ(dpsEntry.getDbmsItemClaveProdServ());
-                concepto.setNoIdentificacion(dpsEntry.getConceptKey());
+                
+                if (dpsEntry.getDbmsComplement() == null) {
+                    //use ordinary data of current document entry:
+                    concepto.setClaveProdServ(dpsEntry.getDbmsItemClaveProdServ());
+                    concepto.setNoIdentificacion(dpsEntry.getConceptKey());
+                    concepto.setClaveUnidad(dpsEntry.getDbmsOriginalUnidadClave());
+                    concepto.setUnidad(generateIntCommerceComplement() ? dpsEntry.getDbmsCustomsUnit() : dpsEntry.getDbmsOriginalUnitSymbol());
+                    concepto.setDescripcion(descripcion);
+                }
+                else {
+                    //use custom (user defined) data of current document entry:
+                    concepto.setClaveProdServ(dpsEntry.getDbmsComplement().getCfdProdServ());
+                    concepto.setNoIdentificacion(dpsEntry.getDbmsComplement().getConceptKey());
+                    concepto.setClaveUnidad(dpsEntry.getDbmsComplement().getCfdUnit());
+                    concepto.setUnidad("");
+                    concepto.setDescripcion(dpsEntry.getDbmsComplement().getConcept());
+                }
+                
                 concepto.setCantidad(dpsEntry.getOriginalQuantity());
-                concepto.setClaveUnidad(dpsEntry.getDbmsOriginalUnidadClave());
-                concepto.setUnidad(generateIntCommerceComplement() ? dpsEntry.getDbmsCustomsUnit() : dpsEntry.getDbmsOriginalUnitSymbol());
-                concepto.setDescripcion(descripcion);
                 concepto.setValorUnitario(price);
                 concepto.setImporte(dpsEntry.getSubtotalProvisionalCy_r());
                 concepto.setDescuento(dpsEntry.getDiscountDocCy());

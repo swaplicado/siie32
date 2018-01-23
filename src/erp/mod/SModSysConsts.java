@@ -188,8 +188,9 @@ public abstract class SModSysConsts {
     public static final int[] ITMS_TP_ITEM_SAL_PRO_WA = new int[] { 1, 1, 5 };
     public static final int[] ITMS_TP_ITEM_SAL_SRV_SRV = new int[] { 1, 2, 1 };
     public static final int[] ITMS_TP_ITEM_ASS_ASS_ASS = new int[] { 2, 1, 1 };
-    public static final int[] ITMS_TP_ITEM_PUR_CON_RMD = new int[] { 3, 1, 1 };
-    public static final int[] ITMS_TP_ITEM_PUR_CON_RMI = new int[] { 3, 1, 2 };
+    public static final int[] ITMS_TP_ITEM_PUR_CON_RMD = new int[] { 3, 1, 1 }; //raw materials (direct)
+    public static final int[] ITMS_TP_ITEM_PUR_CON_RMP = new int[] { 3, 1, 2 }; //raw materials packaging
+    public static final int[] ITMS_TP_ITEM_PUR_CON_RMI = new int[] { 3, 1, 3 }; //raw materials indirect
     public static final int[] ITMS_TP_ITEM_PUR_EXP_EXP = new int[] { 3, 2, 1 };
     public static final int[] ITMS_TP_ITEM_EXP_MFG_RM = new int[] { 4, 1, 1 };
     public static final int[] ITMS_TP_ITEM_EXP_MFG_LF = new int[] { 4, 1, 2 };

@@ -2388,8 +2388,9 @@ public class SDbInventoryValuationXXX extends SDbRegistryUser {
             "ig.fid_ct_item = t.id_ct_item AND ig.fid_cl_item = t.id_cl_item AND ig.fid_tp_item = t.id_tp_item " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.MFG_ORD) + " AS o ON " +
             "d.fid_mfg_year_n = o.id_year AND d.fid_mfg_ord_n = o.id_ord " +
-            "WHERE d.b_del = 0 AND de.b_del = 0 AND  s.b_del = 0 AND o.b_del = 0 AND d.id_year = " + year + " AND " +
-            "((ig.fid_ct_item = " + SModSysConsts.ITMS_TP_ITEM_PUR_CON_RMD[0] + " AND ig.fid_cl_item = " + SModSysConsts.ITMS_TP_ITEM_PUR_CON_RMD[1] + " AND ig.fid_tp_item = " + SModSysConsts.ITMS_TP_ITEM_PUR_CON_RMD[2] + ") OR " +
+            "WHERE d.b_del = 0 AND de.b_del = 0 AND  s.b_del = 0 AND o.b_del = 0 AND d.id_year = " + year + " AND (" +
+            "(ig.fid_ct_item = " + SModSysConsts.ITMS_TP_ITEM_PUR_CON_RMD[0] + " AND ig.fid_cl_item = " + SModSysConsts.ITMS_TP_ITEM_PUR_CON_RMD[1] + " AND ig.fid_tp_item = " + SModSysConsts.ITMS_TP_ITEM_PUR_CON_RMD[2] + ") OR " +
+            "(ig.fid_ct_item = " + SModSysConsts.ITMS_TP_ITEM_PUR_CON_RMP[0] + " AND ig.fid_cl_item = " + SModSysConsts.ITMS_TP_ITEM_PUR_CON_RMP[1] + " AND ig.fid_tp_item = " + SModSysConsts.ITMS_TP_ITEM_PUR_CON_RMP[2] + ") OR " +
             "(ig.fid_ct_item = " + SModSysConsts.ITMS_TP_ITEM_SAL_PRO_WP[0] + " AND ig.fid_cl_item = " + SModSysConsts.ITMS_TP_ITEM_SAL_PRO_WP[1] + " AND ig.fid_tp_item = " + SModSysConsts.ITMS_TP_ITEM_SAL_PRO_WP[2] + ")) AND " +
             "d.fid_mfg_year_n = " + pkProductionOrderId[0] + " AND d.fid_mfg_ord_n = " + pkProductionOrderId[1] + " AND " +
             "d.dt < '" + SLibUtils.DbmsDateFormatDate.format(dateStart) + "' " +

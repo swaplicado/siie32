@@ -727,6 +727,9 @@ public abstract class SDataReadComponentItems {
                                 "ig.fid_ct_item = " + SDataConstantsSys.ITMS_TP_ITEM_PUR_CON_RMD[0] + " AND " +
                                 "ig.fid_cl_item = " + SDataConstantsSys.ITMS_TP_ITEM_PUR_CON_RMD[1] + " AND " +
                                 "ig.fid_tp_item = " + SDataConstantsSys.ITMS_TP_ITEM_PUR_CON_RMD[2] + ") OR (" +
+                                "ig.fid_ct_item = " + SDataConstantsSys.ITMS_TP_ITEM_PUR_CON_RMP[0] + " AND " +
+                                "ig.fid_cl_item = " + SDataConstantsSys.ITMS_TP_ITEM_PUR_CON_RMP[1] + " AND " +
+                                "ig.fid_tp_item = " + SDataConstantsSys.ITMS_TP_ITEM_PUR_CON_RMP[2] + ") OR (" +
                                 "ig.fid_ct_item = " + SDataConstantsSys.ITMS_TP_ITEM_SAL_PRO_WP[0] + " AND " +
                                 "ig.fid_cl_item = " + SDataConstantsSys.ITMS_TP_ITEM_SAL_PRO_WP[1] + " AND " +
                                 "ig.fid_tp_item = " + SDataConstantsSys.ITMS_TP_ITEM_SAL_PRO_WP[2] + ")) ";

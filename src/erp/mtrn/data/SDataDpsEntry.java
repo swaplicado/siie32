@@ -156,6 +156,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected java.util.Vector<erp.mtrn.data.SDataDpsDpsLink> mvDbmsDpsLinksAsDestiny;
     protected java.util.Vector<erp.mtrn.data.SDataDpsDpsAdjustment> mvDbmsDpsAdjustmentsAsDps;
     protected java.util.Vector<erp.mtrn.data.SDataDpsDpsAdjustment> mvDbmsDpsAdjustmentsAsAdjustment;
+    
+    protected erp.mtrn.data.SDataDpsEntryComplement moDbmsComplement;
 
     protected int mnAuxPkDpsYearId; // DPS for adjustment DPS in record entries
     protected int mnAuxPkDpsDocId; // DPS for adjustment DPS in record entries
@@ -167,8 +169,6 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected int mnXtaPkDpsYearConId; // DPS for adjustment DPS in contract
     protected int mnXtaPkDpsDocConId; // DPS for adjustment DPS in contract
     protected int mnXtaPkDpsDocEtyConId; // DPS for adjustment DPS in contract
-
-
     
     /**
      * Overrides java.lang.Object.clone() function.
@@ -445,6 +445,10 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public java.util.Vector<erp.mtrn.data.SDataDpsDpsAdjustment> getDbmsDpsAdjustmentsAsDps() { return mvDbmsDpsAdjustmentsAsDps; }
     public java.util.Vector<erp.mtrn.data.SDataDpsDpsAdjustment> getDbmsDpsAdjustmentsAsAdjustment() { return mvDbmsDpsAdjustmentsAsAdjustment; }
 
+    public void setDbmsComplement(erp.mtrn.data.SDataDpsEntryComplement o) { moDbmsComplement = o; }
+
+    public erp.mtrn.data.SDataDpsEntryComplement getDbmsComplement() { return moDbmsComplement; }
+
     public void setAuxPkDpsYearId(int n) { mnAuxPkDpsYearId = n; }
     public void setAuxPkDpsDocId(int n) { mnAuxPkDpsDocId = n; }
     public void setAuxPkDpsEntryPrice(int[] n) { manAuxPkDpsEntryPrice = n; }
@@ -611,6 +615,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mvDbmsDpsLinksAsDestiny.clear();
         mvDbmsDpsAdjustmentsAsDps.clear();
         mvDbmsDpsAdjustmentsAsAdjustment.clear();
+        
+        moDbmsComplement = null;
 
         mnAuxPkDpsYearId = 0;
         mnAuxPkDpsDocId = 0;
@@ -983,6 +989,18 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                             mvDbmsDpsAdjustmentsAsAdjustment.add(adjustment);
                         }
                     }
+
+                    // Read aswell document entry complement, if any:
+
+                    sql = "SELECT COUNT(*) FROM trn_dps_ety_compl " +
+                            "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " AND id_ety = " + mnPkEntryId + " ";
+                    resultSet = statement.executeQuery(sql);
+                    if (resultSet.next() && resultSet.getInt(1) == 1) {
+                        moDbmsComplement = new SDataDpsEntryComplement();
+                        if (moDbmsComplement.read(new int[] { mnPkYearId, mnPkDocId, mnPkEntryId }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                        }
+                    }
                 }
 
                 mbIsRegistryNew = false;
@@ -1258,6 +1276,19 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                         if (adjustment.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                         }
+                    }
+                    
+                    // Save aswell document entry complement, if any:
+
+                    if (moDbmsComplement != null) {
+                        String sql = "DELETE FROM trn_dps_ety_compl " +
+                                "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " AND id_ety = " + mnPkEntryId + ";";
+                        statement.execute(sql);
+                        
+                        moDbmsComplement.setPkYearId(mnPkYearId);
+                        moDbmsComplement.setPkDocId(mnPkDocId);
+                        moDbmsComplement.setPkEntryId(mnPkEntryId);
+                        moDbmsComplement.save(connection);
                     }
                 }
 
@@ -1687,6 +1718,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.getDbmsDpsLinksAsDestiny().addAll(mvDbmsDpsLinksAsDestiny);
         clone.getDbmsDpsAdjustmentsAsDps().addAll(mvDbmsDpsAdjustmentsAsDps);
         clone.getDbmsDpsAdjustmentsAsAdjustment().addAll(mvDbmsDpsAdjustmentsAsAdjustment);
+
+        clone.setDbmsComplement(moDbmsComplement == null ? null : moDbmsComplement.clone());
 
         clone.setAuxPkDpsYearId(mnAuxPkDpsYearId);
         clone.setAuxPkDpsDocId(mnAuxPkDpsDocId);

@@ -367,6 +367,7 @@ public abstract class SModConsts {
     public static final int TRN_DPS_ETY_NTS = 2023019;
     public static final int TRN_DPS_ETY_PRC = 2023015;
     public static final int TRN_DPS_ETY_TAX = 2023020;
+    public static final int TRN_DPS_ETY_COMPL = 2023064;
     public static final int TRN_DPS_ETY_COMMS = 2023021;
     public static final int TRN_DPS_RISS = 2023022;
     public static final int TRN_DPS_REPL = 2023023;
@@ -965,6 +966,7 @@ public abstract class SModConsts {
         TablesMap.put(TRN_DPS_ETY_NTS, "trn_dps_ety_nts");
         TablesMap.put(TRN_DPS_ETY_PRC, "trn_dps_ety_prc");
         TablesMap.put(TRN_DPS_ETY_TAX, "trn_dps_ety_tax");
+        TablesMap.put(TRN_DPS_ETY_COMPL, "trn_dps_ety_compl");
         TablesMap.put(TRN_DPS_ETY_COMMS, "trn_dps_ety_comms");
         TablesMap.put(TRN_DPS_RISS, "trn_dps_riss");
         TablesMap.put(TRN_DPS_REPL, "trn_dps_repl");

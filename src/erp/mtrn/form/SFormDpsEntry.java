@@ -42,6 +42,7 @@ import erp.mtrn.data.SDataDpsDpsLink;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataDpsEntryCommissions;
 import erp.mtrn.data.SDataDpsEntryCommissionsRow;
+import erp.mtrn.data.SDataDpsEntryComplement;
 import erp.mtrn.data.SDataDpsEntryNotes;
 import erp.mtrn.data.SDataDpsEntryNotesRow;
 import erp.mtrn.data.SDataDpsEntryPrice;
@@ -81,6 +82,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private static final int TAB_MKT = 3;
     private static final int TAB_NOT = 4;
     private static final int TAB_CFD = 5;
+    private static final int TAB_COMPL = 6; //tab of CFD complement info
+    private static final int COMPL_VALUES = 4; //number of CFD complement values
     
     private int mnFormType;
     private int mnFormResult;
@@ -95,7 +98,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private erp.mtrn.data.SDataDpsEntry moDpsEntry;
     private erp.mitm.data.SDataItem moItem;
     private erp.lib.form.SFormField moFieldFkItemId;
-    private erp.lib.form.SFormField moFieldKey;
+    private erp.lib.form.SFormField moFieldConceptKey;
     private erp.lib.form.SFormField moFieldConcept;
     private erp.lib.form.SFormField moFieldFkOriginalUnitId;
     private erp.lib.form.SFormField moFieldIsDiscountDocApplying;
@@ -155,7 +158,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private erp.lib.form.SFormField moFieldAddendaCages;
     private erp.lib.form.SFormField moFieldAddendaCagePriceUnitary;
     private erp.lib.form.SFormField moFieldAddendaParts;
-    private erp.lib.form.SFormField moFieldAddendaPartPriceUnitary;    
+    private erp.lib.form.SFormField moFieldAddendaPartPriceUnitary;
+    private erp.lib.form.SFormField moFieldComplConceptKey;
+    private erp.lib.form.SFormField moFieldComplConcept;
+    private erp.lib.form.SFormField moFieldComplCfdProdServ;
+    private erp.lib.form.SFormField moFieldComplCfdUnit;
 
     private int mnAuxCurrentUnitTypeId;
     private int mnAuxCurrentUnitAlternativeTypeId;
@@ -227,10 +234,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jbFkItemId = new javax.swing.JButton();
         jbSetPrepayment = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
-        jlKey = new javax.swing.JLabel();
-        jtfKey = new javax.swing.JTextField();
-        jbKey = new javax.swing.JButton();
-        jLabel8 = new javax.swing.JLabel();
+        jlConceptKey = new javax.swing.JLabel();
+        jtConceptfKey = new javax.swing.JTextField();
+        jbConceptKey = new javax.swing.JButton();
         jPanel8 = new javax.swing.JPanel();
         jlConcept = new javax.swing.JLabel();
         jtfConcept = new javax.swing.JTextField();
@@ -518,6 +524,24 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel52 = new javax.swing.JPanel();
         jlAddendaPartPriceUnitary = new javax.swing.JLabel();
         jtfAddendaPartPriceUnitary = new javax.swing.JTextField();
+        jPanel66 = new javax.swing.JPanel();
+        jPanel81 = new javax.swing.JPanel();
+        jPanel86 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        jPanel82 = new javax.swing.JPanel();
+        jlComplConceptKey = new javax.swing.JLabel();
+        jtfComplConceptKey = new javax.swing.JTextField();
+        jPanel83 = new javax.swing.JPanel();
+        jlComplConcept = new javax.swing.JLabel();
+        jtfComplConcept = new javax.swing.JTextField();
+        jPanel84 = new javax.swing.JPanel();
+        jlComplCfdProdServ = new javax.swing.JLabel();
+        jtfComplCfdProdServ = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        jPanel85 = new javax.swing.JPanel();
+        jlComplCfdUnit = new javax.swing.JLabel();
+        jtfComplCfdUnit = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
         jpControls = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -569,21 +593,18 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlKey.setText("Clave: *");
-        jlKey.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel7.add(jlKey);
+        jlConceptKey.setText("Clave: *");
+        jlConceptKey.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel7.add(jlConceptKey);
 
-        jtfKey.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel7.add(jtfKey);
+        jtConceptfKey.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel7.add(jtConceptfKey);
 
-        jbKey.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif"))); // NOI18N
-        jbKey.setToolTipText("Copiar clave del ítem");
-        jbKey.setFocusable(false);
-        jbKey.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel7.add(jbKey);
-
-        jLabel8.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel7.add(jLabel8);
+        jbConceptKey.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif"))); // NOI18N
+        jbConceptKey.setToolTipText("Copiar clave del ítem");
+        jbConceptKey.setFocusable(false);
+        jbConceptKey.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel7.add(jbConceptKey);
 
         jPanel4.add(jPanel7);
 
@@ -1923,6 +1944,78 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         jTabbedPane.addTab("Datos CFD", jpAddendaData);
 
+        jPanel66.setBorder(javax.swing.BorderFactory.createTitledBorder("Información complementaria para CFD:"));
+        jPanel66.setLayout(new java.awt.BorderLayout());
+
+        jPanel81.setLayout(new java.awt.GridLayout(5, 1, 0, 2));
+
+        jPanel86.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jLabel4.setForeground(java.awt.Color.blue);
+        jLabel4.setText("IMPORTANTE: Los datos que proporciones a continuación serán incorporados en la emisión del CFDI en lugar de los datos propios de esta partida.");
+        jLabel4.setPreferredSize(new java.awt.Dimension(950, 23));
+        jPanel86.add(jLabel4);
+
+        jPanel81.add(jPanel86);
+
+        jPanel82.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlComplConceptKey.setText("Clave:");
+        jlComplConceptKey.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel82.add(jlComplConceptKey);
+
+        jtfComplConceptKey.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel82.add(jtfComplConceptKey);
+
+        jPanel81.add(jPanel82);
+
+        jPanel83.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlComplConcept.setText("Concepto:");
+        jlComplConcept.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel83.add(jlComplConcept);
+
+        jtfComplConcept.setPreferredSize(new java.awt.Dimension(750, 23));
+        jPanel83.add(jtfComplConcept);
+
+        jPanel81.add(jPanel83);
+
+        jPanel84.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlComplCfdProdServ.setText("ClaveProdServ:");
+        jlComplCfdProdServ.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel84.add(jlComplCfdProdServ);
+
+        jtfComplCfdProdServ.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel84.add(jtfComplCfdProdServ);
+
+        jLabel6.setForeground(java.awt.Color.gray);
+        jLabel6.setText("p. ej., 01010101");
+        jLabel6.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel84.add(jLabel6);
+
+        jPanel81.add(jPanel84);
+
+        jPanel85.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlComplCfdUnit.setText("ClaveUnidad:");
+        jlComplCfdUnit.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel85.add(jlComplCfdUnit);
+
+        jtfComplCfdUnit.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel85.add(jtfComplCfdUnit);
+
+        jLabel8.setForeground(java.awt.Color.gray);
+        jLabel8.setText("p. ej., XUN");
+        jLabel8.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel85.add(jLabel8);
+
+        jPanel81.add(jPanel85);
+
+        jPanel66.add(jPanel81, java.awt.BorderLayout.NORTH);
+
+        jTabbedPane.addTab("Datos CFD complementarios", jPanel66);
+
         jpRegistry.add(jTabbedPane, java.awt.BorderLayout.CENTER);
         jTabbedPane.getAccessibleContext().setAccessibleName("Precios");
 
@@ -1962,8 +2055,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         mvFields = new Vector<>();
         moFieldFkItemId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkItemId, jlFkItemId);
         moFieldFkItemId.setPickerButton(jbFkItemId);
-        moFieldKey = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfKey, jlKey);
-        moFieldKey.setLengthMax(35);
+        moFieldConceptKey = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtConceptfKey, jlConceptKey);
+        moFieldConceptKey.setLengthMax(35);
         moFieldConcept = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfConcept, jlConcept);
         moFieldConcept.setLengthMax(130);
         moFieldFkOriginalUnitId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkOriginalUnitId, jlFkOriginalUnitId);
@@ -2087,9 +2180,21 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldAddendaParts.setTabbedPaneIndex(TAB_CFD, jTabbedPane);
         moFieldAddendaPartPriceUnitary = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfAddendaPartPriceUnitary, jlAddendaPartPriceUnitary);
         moFieldAddendaPartPriceUnitary.setTabbedPaneIndex(TAB_CFD, jTabbedPane);
+        moFieldComplConceptKey = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfComplConceptKey, jlComplConceptKey);
+        moFieldComplConceptKey.setLengthMax(10);
+        moFieldComplConceptKey.setTabbedPaneIndex(TAB_COMPL, jTabbedPane);
+        moFieldComplConcept = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfComplConcept, jlComplConcept);
+        moFieldComplConcept.setLengthMax(100);
+        moFieldComplConcept.setTabbedPaneIndex(TAB_COMPL, jTabbedPane);
+        moFieldComplCfdProdServ = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfComplCfdProdServ, jlComplCfdProdServ);
+        moFieldComplCfdProdServ.setLengthMax(8);
+        moFieldComplCfdProdServ.setTabbedPaneIndex(TAB_COMPL, jTabbedPane);
+        moFieldComplCfdUnit = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfComplCfdUnit, jlComplCfdUnit);
+        moFieldComplCfdUnit.setLengthMax(3);
+        moFieldComplCfdUnit.setTabbedPaneIndex(TAB_COMPL, jTabbedPane);
 
         mvFields.add(moFieldFkItemId);
-        mvFields.add(moFieldKey);
+        mvFields.add(moFieldConceptKey);
         mvFields.add(moFieldConcept);
         mvFields.add(moFieldFkOriginalUnitId);
         mvFields.add(moFieldIsDiscountDocApplying);
@@ -2153,6 +2258,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         mvFields.add(moFieldAddendaCagePriceUnitary);
         mvFields.add(moFieldAddendaParts);
         mvFields.add(moFieldAddendaPartPriceUnitary);
+        mvFields.add(moFieldComplConceptKey);
+        mvFields.add(moFieldComplConcept);
+        mvFields.add(moFieldComplCfdProdServ);
+        mvFields.add(moFieldComplCfdUnit);
 
         // Taxes pane:
 
@@ -2274,7 +2383,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
-        jbKey.addActionListener(this);
+        jbConceptKey.addActionListener(this);
         jbConcept.addActionListener(this);
         jbFkItemId.addActionListener(this);
         jbSetPrepayment.addActionListener(this);
@@ -2405,6 +2514,13 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             }
             else {
                 jTabbedPane.setEnabledAt(TAB_CFD, false);
+            }
+            
+            if (moParamDps.isDocumentOrAdjustmentSal()) {
+                jTabbedPane.setEnabledAt(TAB_COMPL, true);
+            }
+            else {
+                jTabbedPane.setEnabledAt(TAB_COMPL, false);
             }
             
             if (moParamDps != null) {
@@ -2660,7 +2776,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
             // Clear fields:
 
-            jtfKey.setToolTipText(null);
+            jtConceptfKey.setToolTipText(null);
             jtfConcept.setToolTipText(null);
 
             jckIsBulk.setSelected(false);
@@ -2676,9 +2792,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             //jckIsPrepayment.setEnabled(false); // allways remains disabled
             //jckIsDiscountRetailChain.setEnabled(false);
             
-            jtfKey.setEditable(false);
-            jtfKey.setFocusable(false);
-            jbKey.setEnabled(false);
+            jtConceptfKey.setEditable(false);
+            jtConceptfKey.setFocusable(false);
+            jbConceptKey.setEnabled(false);
             jtfConcept.setEditable(false);
             jtfConcept.setFocusable(false);
             jbConcept.setEnabled(false);
@@ -2799,17 +2915,17 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
             jckIsBulk.setSelected(moItem.getDbmsIsBulk());
 
-            moFieldKey.setFieldValue(keyItemBp.length() == 0 ? moItem.getKey() : keyItemBp);
+            moFieldConceptKey.setFieldValue(keyItemBp.length() == 0 ? moItem.getKey() : keyItemBp);
             moFieldConcept.setFieldValue(item);
             moFieldFkOriginalUnitId.setFieldValue(new int[] { unitItemBp == 0 ? moItem.getFkUnitId() : unitItemBp });
             moFieldIsInventoriable.setFieldValue(moItem.getDbmsIsInventoriable());
             moFieldIsPrepayment.setFieldValue(moItem.getIsPrepayment());
 
-            jtfKey.setCaretPosition(0);
+            jtConceptfKey.setCaretPosition(0);
             jtfConcept.setCaretPosition(0);
 
             if (!moItem.getDbmsDataItemGeneric().getIsItemKeyEditable()) {
-                jtfKey.setToolTipText(jtfKey.getText());
+                jtConceptfKey.setToolTipText(jtConceptfKey.getText());
             }
             if (!moItem.getDbmsDataItemGeneric().getIsItemNameEditable()) {
                 jtfConcept.setToolTipText(jtfConcept.getText());
@@ -2910,7 +3026,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private void renderItemBizPartnerDescription(int[] key) {
         moDataItemBizPartnerDescription = (SDataItemBizPartnerDescription) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_CFG_ITEM_BP, key, SLibConstants.EXEC_MODE_SILENT);
 
-        moFieldKey.setFieldValue(moDataItemBizPartnerDescription.getKey());
+        moFieldConceptKey.setFieldValue(moDataItemBizPartnerDescription.getKey());
         moFieldConcept.setFieldValue(moDataItemBizPartnerDescription.getItem());
         moFieldFkOriginalUnitId.setFieldValue(new int[] { moDataItemBizPartnerDescription.getFkUnitId() });
     }
@@ -3017,9 +3133,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
             // Enable remaining fields:
 
-            jtfKey.setEditable(moItem.getDbmsDataItemGeneric().getIsItemKeyEditable());
-            jtfKey.setFocusable(moItem.getDbmsDataItemGeneric().getIsItemKeyEditable());
-            jbKey.setEnabled(moItem.getDbmsDataItemGeneric().getIsItemKeyEditable());
+            jtConceptfKey.setEditable(moItem.getDbmsDataItemGeneric().getIsItemKeyEditable());
+            jtConceptfKey.setFocusable(moItem.getDbmsDataItemGeneric().getIsItemKeyEditable());
+            jbConceptKey.setEnabled(moItem.getDbmsDataItemGeneric().getIsItemKeyEditable());
             jtfConcept.setEditable(moItem.getDbmsDataItemGeneric().getIsItemNameEditable());
             jtfConcept.setFocusable(moItem.getDbmsDataItemGeneric().getIsItemNameEditable());
             jbConcept.setEnabled(moItem.getDbmsDataItemGeneric().getIsItemNameEditable());
@@ -3210,9 +3326,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jcbFkItemId.setEnabled(false);
             jbFkItemId.setEnabled(false);
             jbSetPrepayment.setEnabled(false);
-            jtfKey.setEditable(false);
-            jtfKey.setFocusable(false);
-            jbKey.setEnabled(false);
+            jtConceptfKey.setEditable(false);
+            jtConceptfKey.setFocusable(false);
+            jbConceptKey.setEnabled(false);
             jtfConcept.setEditable(false);
             jtfConcept.setFocusable(false);
             jbConcept.setEnabled(false);
@@ -3293,6 +3409,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfAddendaCagePriceUnitary.setEnabled(false);
             jtfAddendaParts.setEnabled(false);
             jtfAddendaPartPriceUnitary.setEnabled(false);
+            
+            jtfComplConceptKey.setEnabled(false);
+            jtfComplConcept.setEnabled(false);
+            jtfComplCfdProdServ.setEnabled(false);
+            jtfComplCfdUnit.setEnabled(false);
 
             setTaxesColumnEditable(false);
         }
@@ -3324,6 +3445,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jbNotesEdit.setEnabled(true);
             jbNotesDelete.setEnabled(true);
             jbSystemNotes.setEnabled(true);
+            
+            jtfComplConceptKey.setEnabled(true);
+            jtfComplConcept.setEnabled(true);
+            jtfComplCfdProdServ.setEnabled(true);
+            jtfComplCfdUnit.setEnabled(true);
 
             jbOk.setEnabled(true);
 
@@ -3454,8 +3580,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
     private void actionKey() {
         if (moItem != null) {
-            moFieldKey.setFieldValue(moItem.getKey());
-            jtfKey.setCaretPosition(0);
+            moFieldConceptKey.setFieldValue(moItem.getKey());
+            jtConceptfKey.setCaretPosition(0);
         }
     }
 
@@ -3986,7 +4112,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
@@ -4052,6 +4180,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JPanel jPanel63;
     private javax.swing.JPanel jPanel64;
     private javax.swing.JPanel jPanel65;
+    private javax.swing.JPanel jPanel66;
     private javax.swing.JPanel jPanel67;
     private javax.swing.JPanel jPanel68;
     private javax.swing.JPanel jPanel69;
@@ -4068,6 +4197,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JPanel jPanel79;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel80;
+    private javax.swing.JPanel jPanel81;
+    private javax.swing.JPanel jPanel82;
+    private javax.swing.JPanel jPanel83;
+    private javax.swing.JPanel jPanel84;
+    private javax.swing.JPanel jPanel85;
+    private javax.swing.JPanel jPanel86;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JPanel jPricesData;
     private javax.swing.JSeparator jSeparator1;
@@ -4076,6 +4211,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbClearPriceFields;
     private javax.swing.JButton jbConcept;
+    private javax.swing.JButton jbConceptKey;
     private javax.swing.JButton jbFkItemId;
     private javax.swing.JButton jbFkItemReferenceId_n;
     private javax.swing.JButton jbFkOriginalUnitId;
@@ -4084,7 +4220,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JButton jbGridPriceEdit;
     private javax.swing.JButton jbGridPriceNew;
     private javax.swing.JButton jbItemBizPartnerDescription;
-    private javax.swing.JButton jbKey;
     private javax.swing.JButton jbNotesDelete;
     private javax.swing.JButton jbNotesEdit;
     private javax.swing.JButton jbNotesNew;
@@ -4130,7 +4265,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JLabel jlAddingMultipleMailHelp;
     private javax.swing.JLabel jlAddingMultipleMailHelp1;
     private javax.swing.JLabel jlAddingMultipleMailHelp2;
+    private javax.swing.JLabel jlComplCfdProdServ;
+    private javax.swing.JLabel jlComplCfdUnit;
+    private javax.swing.JLabel jlComplConcept;
+    private javax.swing.JLabel jlComplConceptKey;
     private javax.swing.JLabel jlConcept;
+    private javax.swing.JLabel jlConceptKey;
     private javax.swing.JLabel jlContainerTank;
     private javax.swing.JLabel jlContractBase;
     private javax.swing.JLabel jlContractFactor;
@@ -4155,7 +4295,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JLabel jlFkTaxRegionId;
     private javax.swing.JLabel jlFkVehicleTypeId_n;
     private javax.swing.JLabel jlIsPriceVariable;
-    private javax.swing.JLabel jlKey;
     private javax.swing.JLabel jlLength;
     private javax.swing.JLabel jlMass;
     private javax.swing.JLabel jlOriginalDiscountUnitaryCy;
@@ -4203,6 +4342,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JPanel jpTaxes;
     private javax.swing.JRadioButton jradAccAdvanceBilled;
     private javax.swing.JRadioButton jradAccCashAccount;
+    private javax.swing.JTextField jtConceptfKey;
     private javax.swing.JToggleButton jtbGridPriceFilter;
     private javax.swing.JToggleButton jtbNotesFilter;
     private javax.swing.JTextField jtfAddendaCagePriceUnitary;
@@ -4213,6 +4353,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JTextField jtfAddendaOrder;
     private javax.swing.JTextField jtfAddendaPartPriceUnitary;
     private javax.swing.JTextField jtfAddendaParts;
+    private javax.swing.JTextField jtfComplCfdProdServ;
+    private javax.swing.JTextField jtfComplCfdUnit;
+    private javax.swing.JTextField jtfComplConcept;
+    private javax.swing.JTextField jtfComplConceptKey;
     private javax.swing.JTextField jtfConcept;
     private javax.swing.JTextField jtfContTank;
     private javax.swing.JTextField jtfContractBase;
@@ -4237,7 +4381,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JTextField jtfDpsContractFactor;
     private javax.swing.JTextField jtfDpsContractFuture;
     private javax.swing.JTextField jtfDriver;
-    private javax.swing.JTextField jtfKey;
     private javax.swing.JTextField jtfLength;
     private javax.swing.JTextField jtfLengthUnitSymbolRo;
     private javax.swing.JTextField jtfMass;
@@ -4293,9 +4436,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jcbFkItemId.setEnabled(false);
         jbFkItemId.setEnabled(false);
         jbSetPrepayment.setEnabled(false);
-        jtfKey.setEditable(false);
-        jtfKey.setFocusable(false);
-        jbKey.setEnabled(false);
+        jtConceptfKey.setEditable(false);
+        jtConceptfKey.setFocusable(false);
+        jbConceptKey.setEnabled(false);
         jtfConcept.setEditable(false);
         jtfConcept.setFocusable(false);
         jbConcept.setEnabled(false);
@@ -4958,6 +5101,30 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             }
         }
         
+        if (!validation.getIsError()) {
+            //validate cfd complement values:
+            int values = 0;
+            
+            if (!moFieldComplConceptKey.getString().isEmpty()) {
+                values++;
+            }
+            if (!moFieldComplConcept.getString().isEmpty()) {
+                values++;
+            }
+            if (!moFieldComplCfdProdServ.getString().isEmpty()) {
+                values++;
+            }
+            if (!moFieldComplCfdUnit.getString().isEmpty()) {
+                values++;
+            }
+            
+            if (values != 0 && values != COMPL_VALUES) {
+                validation.setMessage("Se debe especificar un valor para todos los campos de información complementaria.");
+                validation.setComponent(jtfComplConceptKey);
+                validation.setTabbedPaneIndex(TAB_COMPL);
+            }
+        }
+        
         return validation;
     }
 
@@ -4992,7 +5159,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         itemChangedFkItemId(false);
 
-        moFieldKey.setFieldValue(moDpsEntry.getConceptKey());
+        moFieldConceptKey.setFieldValue(moDpsEntry.getConceptKey());
         moFieldConcept.setFieldValue(moDpsEntry.getConcept());
         moFieldFkOriginalUnitId.setFieldValue(new int[] { moDpsEntry.getFkOriginalUnitId() });
         moFieldIsDiscountDocApplying.setFieldValue(moDpsEntry.getIsDiscountDocApplying());
@@ -5081,6 +5248,13 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         moPanelFkCostCenterId_n.getFieldAccount().setFieldValue(moDpsEntry.getFkCostCenterId_n().length() == 0 ? moPanelFkCostCenterId_n.getEmptyAccountId() : moDpsEntry.getFkCostCenterId_n());
         moPanelFkCostCenterId_n.refreshPanel();
+        
+        if (moDpsEntry.getDbmsComplement() != null) {
+            moFieldComplConceptKey.setFieldValue(moDpsEntry.getDbmsComplement().getConceptKey());
+            moFieldComplConcept.setFieldValue(moDpsEntry.getDbmsComplement().getConcept());
+            moFieldComplCfdProdServ.setFieldValue(moDpsEntry.getDbmsComplement().getCfdProdServ());
+            moFieldComplCfdUnit.setFieldValue(moDpsEntry.getDbmsComplement().getCfdUnit());
+        }
 
         renderDpsEntryValue();
         renderFieldsStatus();
@@ -5113,7 +5287,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         calculateTotal();
 
-        moDpsEntry.setConceptKey(moFieldKey.getString());
+        moDpsEntry.setConceptKey(moFieldConceptKey.getString());
         moDpsEntry.setConcept(moFieldConcept.getString());
         moDpsEntry.setReference(moFieldReference.getString());
 
@@ -5189,6 +5363,18 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moDpsEntry.setDbmsDpsAddElektraCagePriceUnitary(moFieldAddendaCagePriceUnitary.getDouble());
         moDpsEntry.setDbmsDpsAddElektraParts(moFieldAddendaParts.getInteger());
         moDpsEntry.setDbmsDpsAddElektraPartPriceUnitary(moFieldAddendaPartPriceUnitary.getDouble());
+        
+        if (moFieldComplConceptKey.getString().isEmpty()) {
+            moDpsEntry.setDbmsComplement(null);
+        }
+        else {
+            SDataDpsEntryComplement complement = new SDataDpsEntryComplement();
+            complement.setConceptKey(moFieldComplConceptKey.getString());
+            complement.setConcept(moFieldComplConcept.getString());
+            complement.setCfdProdServ(moFieldComplCfdProdServ.getString());
+            complement.setCfdUnit(moFieldComplCfdUnit.getString());
+            moDpsEntry.setDbmsComplement(complement);
+        }
         
         return moDpsEntry;
     }
@@ -5304,7 +5490,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             else if (button == jbCancel) {
                 actionCancel();
             }
-            else if (button == jbKey) {
+            else if (button == jbConceptKey) {
                 actionKey();
             }
             else if (button == jbConcept) {
