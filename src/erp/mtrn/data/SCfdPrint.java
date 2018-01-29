@@ -890,7 +890,7 @@ public class SCfdPrint {
          * map.put("oCfdiQrCode", biQrCode.getScaledInstance(biQrCode.getWidth(), biQrCode.getHeight(), Image.SCALE_DEFAULT));
          */
 
-        // Addenda:
+        // Aditional info (formerly Addenda1's info):
 
         double dTotalPesoBruto = 0;
         double dTotalPesoNeto = 0;
@@ -918,6 +918,7 @@ public class SCfdPrint {
         paramsMap.put("sAddChofer", dps.getDriver());
         paramsMap.put("sAddPlacas", dps.getPlate());
         paramsMap.put("sAddBoleto", dps.getTicket());
+        paramsMap.put("sAddIncoterm", dps.getFkIncotermId() == SModSysConsts.LOGS_INC_NA ? "" : dps.getDbmsIncotermCode());
         paramsMap.put("dAddPesoBruto", dTotalPesoBruto);
         paramsMap.put("dAddPesoNeto", dTotalPesoNeto);
         paramsMap.put("sAddUnidadPesoBruto", dps.getAuxCfdParams().getUnidadPesoBruto());
@@ -949,8 +950,8 @@ public class SCfdPrint {
             unitKeys.add(clave.getAttClaveUnidad().getString());
         }
         
-        paramsMap.put("sCfdiProductKeys", productKeys);
-        paramsMap.put("sCfdiUnitKeys",  unitKeys);
+        paramsMap.put("saCfdiProdServKeys", productKeys);
+        paramsMap.put("saCfdiUnitKeys",  unitKeys);
         
         JasperPrint jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_CFDI_33, paramsMap);
         String sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));

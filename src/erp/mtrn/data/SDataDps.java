@@ -247,6 +247,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected java.util.Date mtDbmsRecordDate;
     protected java.lang.String msDbmsCurrency;
     protected java.lang.String msDbmsCurrencyKey;
+    protected java.lang.String msDbmsIncotermCode;
 
     protected boolean mbAuxIsFormerRecordAutomatic;
     protected java.lang.Object moAuxFormerRecordKey;
@@ -1794,6 +1795,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setDbmsRecordDate(java.util.Date t) { mtDbmsRecordDate = t; }
     public void setDbmsCurrency(java.lang.String s) { msDbmsCurrency = s; }
     public void setDbmsCurrencyKey(java.lang.String s) { msDbmsCurrencyKey = s; }
+    public void setDbmsIncotermCode(java.lang.String s) { msDbmsIncotermCode = s; }
 
     public void setAuxIsFormerRecordAutomatic(boolean b) { mbAuxIsFormerRecordAutomatic = b; }
     public void setAuxFormerRecordKey(java.lang.Object o) { moAuxFormerRecordKey = o; }
@@ -1812,6 +1814,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public java.util.Date getDbmsRecordDate() { return mtDbmsRecordDate; }
     public java.lang.String getDbmsCurrency() { return msDbmsCurrency; }
     public java.lang.String getDbmsCurrencyKey() { return msDbmsCurrencyKey; }
+    public java.lang.String getDbmsIncotermCode() { return msDbmsIncotermCode; }
 
     public boolean getAuxIsFormerRecordAutomatic() { return mbAuxIsFormerRecordAutomatic; }
     public java.lang.Object getAuxFormerRecordKey() { return moAuxFormerRecordKey; }
@@ -1996,6 +1999,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mtDbmsRecordDate = null;
         msDbmsCurrency = "";
         msDbmsCurrencyKey = "";
+        msDbmsIncotermCode = "";
 
         mbAuxIsFormerRecordAutomatic = false;
         moAuxFormerRecordKey = null;
@@ -2026,8 +2030,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         reset();
 
         try {
-            sSql = "SELECT d.*, c.cur, c.cur_key FROM trn_dps AS d INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
-                    "WHERE d.id_year = " + anKey[0] + " AND d.id_doc = " + anKey[1] + " ";
+            sSql = "SELECT d.*, c.cur, c.cur_key, i.code "
+                    + "FROM trn_dps AS d "
+                    + "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur "
+                    + "INNER JOIN erp.logs_inc AS i ON d.fid_inc = i.id_inc "
+                    + "WHERE d.id_year = " + anKey[0] + " AND d.id_doc = " + anKey[1] + " ";
             oResultSet = statement.executeQuery(sSql);
             if (!oResultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
@@ -2153,6 +2160,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                 msDbmsCurrency = oResultSet.getString("c.cur");
                 msDbmsCurrencyKey = oResultSet.getString("c.cur_key");
+                msDbmsIncotermCode = oResultSet.getString("i.code");
 
                 oStatementAux = statement.getConnection().createStatement();
 

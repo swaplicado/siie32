@@ -6,13 +6,41 @@
 package erp.mod;
 
 import erp.client.SClientInterface;
-import erp.mod.log.db.*;
-import erp.mod.log.form.*;
-import erp.mod.log.view.*;
+import erp.mod.log.db.SDbRate;
+import erp.mod.log.db.SDbShipment;
+import erp.mod.log.db.SDbShipmentDestiny;
+import erp.mod.log.db.SDbSpot;
+import erp.mod.log.db.SDbSpotCompanyBranch;
+import erp.mod.log.db.SDbSpotCompanyBranchEntity;
+import erp.mod.log.db.SDbVehicle;
+import erp.mod.log.db.SDbVehicleType;
+import erp.mod.log.form.SFormRate;
+import erp.mod.log.form.SFormShipment;
+import erp.mod.log.form.SFormShipmentDelivery;
+import erp.mod.log.form.SFormSpot;
+import erp.mod.log.form.SFormSpotCompanyBranch;
+import erp.mod.log.form.SFormSpotCompanyBranchEntity;
+import erp.mod.log.form.SFormVehicle;
+import erp.mod.log.form.SFormVehicleType;
+import erp.mod.log.view.SViewRate;
+import erp.mod.log.view.SViewShipment;
+import erp.mod.log.view.SViewShipmentAuthorn;
+import erp.mod.log.view.SViewShipmentBill;
+import erp.mod.log.view.SViewShipmentDelivery;
+import erp.mod.log.view.SViewShipmentDiog;
+import erp.mod.log.view.SViewShipmentDps;
+import erp.mod.log.view.SViewShipmentDpsAdjustment;
+import erp.mod.log.view.SViewShipmentDpsCost;
+import erp.mod.log.view.SViewSpot;
+import erp.mod.log.view.SViewSpotCompanyBranch;
+import erp.mod.log.view.SViewSpotCompanyBranchEntity;
+import erp.mod.log.view.SViewVehicle;
+import erp.mod.log.view.SViewVehicleType;
 import javax.swing.JMenu;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistry;
+import sa.lib.db.SDbRegistrySysFly;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiCatalogueSettings;
 import sa.lib.gui.SGuiClient;
@@ -55,6 +83,16 @@ public class SModuleLog extends SGuiModule {
         SDbRegistry registry = null;
 
         switch (type) {
+            case SModConsts.LOGS_INC:
+                registry = new SDbRegistrySysFly(type) {
+                    @Override
+                    public void initRegistry() { }
+                    @Override
+                    public String getSqlTable() { return SModConsts.TablesMap.get(type); }
+                    @Override
+                    public String getSqlWhere(int[] key) { return "WHERE id_inc = " + key[0] + " "; }
+                };
+                break;
             case SModConsts.LOGU_TP_VEH:
                 registry = new SDbVehicleType();
                 break;
