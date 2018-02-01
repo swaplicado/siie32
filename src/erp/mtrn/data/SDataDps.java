@@ -4935,11 +4935,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 concepto = new SCfdDataConcepto();
                 
                 if (dpsEntry.getDbmsComplement() == null) {
-                    //use ordinary data of current document entry:
+                    //use original data of current document entry:
                     concepto.setClaveProdServ(dpsEntry.getDbmsItemClaveProdServ());
                     concepto.setNoIdentificacion(dpsEntry.getConceptKey());
                     concepto.setClaveUnidad(dpsEntry.getDbmsOriginalUnidadClave());
-                    concepto.setUnidad(generateIntCommerceComplement() ? dpsEntry.getDbmsCustomsUnit() : dpsEntry.getDbmsOriginalUnitSymbol());
+                    concepto.setUnidad(dpsEntry.getDbmsOriginalUnitSymbol());
                     concepto.setDescripcion(descripcion);
                 }
                 else {
