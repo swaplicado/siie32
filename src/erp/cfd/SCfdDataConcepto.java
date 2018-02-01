@@ -83,7 +83,7 @@ public class SCfdDataConcepto {
                 if (!SLibUtils.belongsTo(tax.getFkTaxCalculationTypeId(), new int[] { SModSysConsts.FINS_TP_TAX_CAL_RATE, SModSysConsts.FINS_TP_TAX_CAL_EXEMPT })) {
                     throw new Exception("El tipo de cálculo '" + tax.getDbmsTaxCalculationType() + "' del impuesto '" + tax.getDbmsTax() + "' no está soportado.");
                 }
-                else {
+                else if (entry.getSubtotalCy_r() > 0) {
                     impuestoXml = new SCfdDataImpuesto();
                     
                     switch (tax.getFkTaxTypeId()) {
