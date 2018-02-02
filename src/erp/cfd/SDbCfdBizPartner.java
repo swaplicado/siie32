@@ -24,8 +24,9 @@ public class SDbCfdBizPartner {
     
     protected int mnBizPartnerId;
     protected int mnBizPartnerBranchId;
-    protected int mnBizPartnerExpeditionId;
-    protected int mnBizPartnerBranchExpeditionId;
+    protected int mnBizPartnerBranchAddressId;
+    protected int mnExpeditionBizPartnerId;
+    protected int mnExpeditionBizPartnerBranchId;
     protected boolean mbIsEmisor;
     protected boolean mbIsEmisorForIntCommerce;
     
@@ -34,54 +35,63 @@ public class SDbCfdBizPartner {
         
         mnBizPartnerId = 0;
         mnBizPartnerBranchId = 0;
-        mnBizPartnerExpeditionId = 0;
-        mnBizPartnerBranchExpeditionId = 0;
+        mnExpeditionBizPartnerId = 0;
+        mnExpeditionBizPartnerBranchId = 0;
         mbIsEmisor = false;
         mbIsEmisorForIntCommerce = false;
     }
     
-    public void setBizPartnerId(int n) { mnBizPartnerId = n; }
-    public void setBizPartnerBranchId(int n) { mnBizPartnerBranchId = n; }
-    public void setBizPartnerExpeditionId(int n) { mnBizPartnerExpeditionId = n; }
-    public void setBizPartnerBranchExpeditionId(int n) { mnBizPartnerBranchExpeditionId = n; }
-    public void setIsEmisor(boolean b) { mbIsEmisor = b; }
-    public void setIsEmisorForIntCommerce(boolean b) { mbIsEmisorForIntCommerce = b; }
+    public void setBizPartnerIds(final int idBizPartner, final int idBizPartnerBranch) {
+        setBizPartnerIds(idBizPartner, idBizPartnerBranch, 0);
+    }
     
-    public int getBizPartnerId() { return mnBizPartnerId; }
-    public int getBizPartnerBranchId() { return mnBizPartnerBranchId; }
-    public int getBizPartnerExpeditionId() { return mnBizPartnerExpeditionId; }
-    public int getBizPartnerBranchExpeditionId() { return mnBizPartnerBranchExpeditionId; }
-    public boolean isEmisor() { return mbIsEmisor; }
-    public boolean isEmisorForIntCommerce() { return mbIsEmisorForIntCommerce; }
+    public void setBizPartnerIds(final int idBizPartner, final int idBizPartnerBranch, final int idBizPartnerBranchAddress) {
+        mnBizPartnerId = idBizPartner;
+        mnBizPartnerBranchId = idBizPartnerBranch;
+        mnBizPartnerBranchAddressId = idBizPartnerBranchAddress;
+    }
+    
+    public void setExpeditionBizPartnerIds(final int idBizPartner, final int idBizPartnerBranch) {
+        mnExpeditionBizPartnerId = idBizPartner;
+        mnExpeditionBizPartnerBranchId = idBizPartnerBranch;
+    }
+    
+    public void setIsEmisor(final boolean isEmisor, final boolean isForIntCommerce) {
+        mbIsEmisor = isEmisor;
+        mbIsEmisorForIntCommerce = isForIntCommerce;
+    }
     
     public SCfdDataBizPartner getBizPartner() throws Exception {
         SCfdDataBizPartner dataBizPartner = null;
         
         try {
-            SDataBizPartner moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { mnBizPartnerId }, SLibConstants.EXEC_MODE_SILENT);
+            SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { mnBizPartnerId }, SLibConstants.EXEC_MODE_SILENT);
             
-            if (moBizPartner == null) {
+            if (bizPartner == null) {
                 throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n" + SDataBizPartner.class.getName());
             }
             else {
-                SDataBizPartnerBranch moBizPartnerBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { mnBizPartnerBranchId }, SLibConstants.EXEC_MODE_SILENT);
+                SDataBizPartnerBranch bizPartnerBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { mnBizPartnerBranchId }, SLibConstants.EXEC_MODE_SILENT);
                 
-                if (moBizPartnerBranch == null) {
+                if (bizPartnerBranch == null) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n" + SDataBizPartnerBranch.class.getName());
                 }
                 else {
-                    SDataBizPartnerBranchAddress moBizPartnerBranchAddress = null;
+                    SDataBizPartnerBranchAddress bizPartnerBranchAddress = null;
                     SCceEmisorAddressAux emisorAddress = null;
                     
-                    if (!mbIsEmisor && moBizPartnerBranch.getIsAddressPrintable()) {
-                        moBizPartnerBranchAddress = moBizPartnerBranch.getDbmsBizPartnerBranchAddressOfficial();
+                    if (mnBizPartnerBranchAddressId != 0) {
+                        bizPartnerBranchAddress = bizPartnerBranch.getDbmsBizPartnerBranchAddress(new int[] { mnBizPartnerBranchId, mnBizPartnerBranchAddressId });
+                    }
+                    else if (!mbIsEmisor && bizPartnerBranch.getIsAddressPrintable()) {
+                        bizPartnerBranchAddress = bizPartnerBranch.getDbmsBizPartnerBranchAddressOfficial();
                     }
                     else {
-                        moBizPartnerBranchAddress = moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial();
+                        bizPartnerBranchAddress = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial();
                     }
                     
                     if (mbIsEmisorForIntCommerce) {
-                        emisorAddress = miClient.getSessionXXX().getParamsCompany().getEmisorAddress(moBizPartnerBranchAddress.getZipCode());
+                        emisorAddress = miClient.getSessionXXX().getParamsCompany().getEmisorAddress(bizPartnerBranchAddress.getZipCode());
                         
                         if (emisorAddress == null) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n" + SCceEmisorAddressAux.class.getName());
@@ -91,65 +101,65 @@ public class SDbCfdBizPartner {
                     dataBizPartner = new SCfdDataBizPartner();
                     dataBizPartner.setBizPartnerId(mnBizPartnerId);
                     dataBizPartner.setBizPartnerBranchId(mnBizPartnerBranchId);
-                    dataBizPartner.setBizPartnerBranchHqId(moBizPartner.getDbmsHqBranch().getPkBizPartnerBranchId());
-                    dataBizPartner.setBizPartnerRfc(moBizPartner.getFiscalId());
-                    dataBizPartner.setBizPartnerCurp(moBizPartner.getAlternativeId());
-                    dataBizPartner.setBizPartnerFiscalForeing(moBizPartner.getFiscalFrgId());
-                    dataBizPartner.setBizPartnerName(moBizPartner.getProperName());
-                    dataBizPartner.setBizPartnerStreet(moBizPartnerBranchAddress.getStreet());
-                    dataBizPartner.setBizPartnerStreetNumberExt(moBizPartnerBranchAddress.getStreetNumberExt());
-                    dataBizPartner.setBizPartnerStreetNumberInt(moBizPartnerBranchAddress.getStreetNumberInt());
-                    dataBizPartner.setBizPartnerNeighborhood(!mbIsEmisorForIntCommerce ? moBizPartnerBranchAddress.getNeighborhood() : emisorAddress.getCfdCceEmisorColonia());
-                    dataBizPartner.setBizPartnerReference(moBizPartnerBranchAddress.getReference());
-                    dataBizPartner.setBizPartnerLocality(!mbIsEmisorForIntCommerce ? moBizPartnerBranchAddress.getLocality() : emisorAddress.getCfdCceEmisorLocalidad());
-                    dataBizPartner.setBizPartnerCounty(!mbIsEmisorForIntCommerce ? moBizPartnerBranchAddress.getCounty() : emisorAddress.getCfdCceEmisorMunicipio());
-                    dataBizPartner.setBizPartnerStateCode(moBizPartnerBranchAddress.getDbmsDataState().getStateCode());
-                    dataBizPartner.setBizPartnerStateName(moBizPartnerBranchAddress.getState());
-                    dataBizPartner.setBizPartnerZipCode(moBizPartnerBranchAddress.getZipCode());
-                    dataBizPartner.setBizPartnerPoBox(moBizPartnerBranchAddress.getPoBox());
-                    dataBizPartner.setBizPartnerCountryCode(moBizPartnerBranchAddress.getDbmsDataCountry().getCountryCode());
-                    dataBizPartner.setBizPartnerCountryName(moBizPartnerBranchAddress.getDbmsDataCountry().getCountry());
-                    dataBizPartner.setBizPartnerCountryId(moBizPartnerBranchAddress.getDbmsDataCountry().getPkCountryId());
+                    dataBizPartner.setBizPartnerBranchHqId(bizPartner.getDbmsHqBranch().getPkBizPartnerBranchId());
+                    dataBizPartner.setBizPartnerRfc(bizPartner.getFiscalId());
+                    dataBizPartner.setBizPartnerCurp(bizPartner.getAlternativeId());
+                    dataBizPartner.setBizPartnerFiscalForeing(bizPartner.getFiscalFrgId());
+                    dataBizPartner.setBizPartnerName(bizPartner.getProperName());
+                    dataBizPartner.setBizPartnerStreet(bizPartnerBranchAddress.getStreet());
+                    dataBizPartner.setBizPartnerStreetNumberExt(bizPartnerBranchAddress.getStreetNumberExt());
+                    dataBizPartner.setBizPartnerStreetNumberInt(bizPartnerBranchAddress.getStreetNumberInt());
+                    dataBizPartner.setBizPartnerNeighborhood(!mbIsEmisorForIntCommerce ? bizPartnerBranchAddress.getNeighborhood() : emisorAddress.getCfdCceEmisorColonia());
+                    dataBizPartner.setBizPartnerReference(bizPartnerBranchAddress.getReference());
+                    dataBizPartner.setBizPartnerLocality(!mbIsEmisorForIntCommerce ? bizPartnerBranchAddress.getLocality() : emisorAddress.getCfdCceEmisorLocalidad());
+                    dataBizPartner.setBizPartnerCounty(!mbIsEmisorForIntCommerce ? bizPartnerBranchAddress.getCounty() : emisorAddress.getCfdCceEmisorMunicipio());
+                    dataBizPartner.setBizPartnerStateCode(bizPartnerBranchAddress.getDbmsDataState().getStateCode());
+                    dataBizPartner.setBizPartnerStateName(bizPartnerBranchAddress.getState());
+                    dataBizPartner.setBizPartnerZipCode(bizPartnerBranchAddress.getZipCode());
+                    dataBizPartner.setBizPartnerPoBox(bizPartnerBranchAddress.getPoBox());
+                    dataBizPartner.setBizPartnerCountryCode(bizPartnerBranchAddress.getDbmsDataCountry().getCountryCode());
+                    dataBizPartner.setBizPartnerCountryName(bizPartnerBranchAddress.getDbmsDataCountry().getCountry());
+                    dataBizPartner.setBizPartnerCountryId(bizPartnerBranchAddress.getDbmsDataCountry().getPkCountryId());
                     
-                    if (mnBizPartnerExpeditionId != SLibConsts.UNDEFINED && mnBizPartnerBranchExpeditionId != SLibConsts.UNDEFINED) {
-                        moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { mnBizPartnerExpeditionId }, SLibConstants.EXEC_MODE_SILENT);
+                    if (mnExpeditionBizPartnerId != SLibConsts.UNDEFINED && mnExpeditionBizPartnerBranchId != SLibConsts.UNDEFINED) {
+                        bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { mnExpeditionBizPartnerId }, SLibConstants.EXEC_MODE_SILENT);
 
-                        if (moBizPartner == null) {
+                        if (bizPartner == null) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n" + SDataBizPartner.class.getName());
                         }
                         else {
-                            moBizPartnerBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { mnBizPartnerBranchExpeditionId }, SLibConstants.EXEC_MODE_SILENT);
+                            bizPartnerBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { mnExpeditionBizPartnerBranchId }, SLibConstants.EXEC_MODE_SILENT);
                             
-                            if (moBizPartnerBranch == null) {
+                            if (bizPartnerBranch == null) {
                                 throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n" + SDataBizPartnerBranch.class.getName());
                             }
                             else {
-                                if (moBizPartnerBranch.getIsAddressPrintable()) {
-                                    moBizPartnerBranchAddress = moBizPartnerBranch.getDbmsBizPartnerBranchAddressOfficial();
+                                if (bizPartnerBranch.getIsAddressPrintable()) {
+                                    bizPartnerBranchAddress = bizPartnerBranch.getDbmsBizPartnerBranchAddressOfficial();
                                 }
                                 else {
-                                    moBizPartnerBranchAddress = moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial();
+                                    bizPartnerBranchAddress = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial();
                                 }
                                 
                                 if (mbIsEmisorForIntCommerce) {
-                                    emisorAddress = miClient.getSessionXXX().getParamsCompany().getEmisorAddress(moBizPartnerBranchAddress.getZipCode());
+                                    emisorAddress = miClient.getSessionXXX().getParamsCompany().getEmisorAddress(bizPartnerBranchAddress.getZipCode());
                         
                                     if (emisorAddress == null) {
                                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n" + SCceEmisorAddressAux.class.getName());
                                     }
                                 }
                                 
-                                dataBizPartner.setBizPartnerExpeditionStreet(moBizPartnerBranchAddress.getStreet());
-                                dataBizPartner.setBizPartnerExpeditionStreetNumberExt(moBizPartnerBranchAddress.getStreetNumberExt());
-                                dataBizPartner.setBizPartnerExpeditionStreetNumberInt(moBizPartnerBranchAddress.getStreetNumberInt());
-                                dataBizPartner.setBizPartnerExpeditionNeighborhood(!mbIsEmisorForIntCommerce ? moBizPartnerBranchAddress.getNeighborhood() : emisorAddress.getCfdCceEmisorColonia());
-                                dataBizPartner.setBizPartnerExpeditionReference(moBizPartnerBranchAddress.getReference());
-                                dataBizPartner.setBizPartnerExpeditionLocality(!mbIsEmisorForIntCommerce ? moBizPartnerBranchAddress.getLocality() : emisorAddress.getCfdCceEmisorLocalidad());
-                                dataBizPartner.setBizPartnerExpeditionCounty(!mbIsEmisorForIntCommerce ? moBizPartnerBranchAddress.getCounty() : emisorAddress.getCfdCceEmisorMunicipio());
-                                dataBizPartner.setBizPartnerExpeditionState(!mbIsEmisorForIntCommerce ? moBizPartnerBranchAddress.getState() : moBizPartnerBranchAddress.getDbmsDataState().getStateCode());
-                                dataBizPartner.setBizPartnerExpeditionZipCode(moBizPartnerBranchAddress.getZipCode());
-                                dataBizPartner.setBizPartnerExpeditionPoBox(moBizPartnerBranchAddress.getPoBox());
-                                dataBizPartner.setBizPartnerExpeditionCountryName(!mbIsEmisorForIntCommerce ? moBizPartnerBranchAddress.getDbmsDataCountry().getCountry() : moBizPartnerBranchAddress.getDbmsDataCountry().getCountryCode());
+                                dataBizPartner.setBizPartnerExpeditionStreet(bizPartnerBranchAddress.getStreet());
+                                dataBizPartner.setBizPartnerExpeditionStreetNumberExt(bizPartnerBranchAddress.getStreetNumberExt());
+                                dataBizPartner.setBizPartnerExpeditionStreetNumberInt(bizPartnerBranchAddress.getStreetNumberInt());
+                                dataBizPartner.setBizPartnerExpeditionNeighborhood(!mbIsEmisorForIntCommerce ? bizPartnerBranchAddress.getNeighborhood() : emisorAddress.getCfdCceEmisorColonia());
+                                dataBizPartner.setBizPartnerExpeditionReference(bizPartnerBranchAddress.getReference());
+                                dataBizPartner.setBizPartnerExpeditionLocality(!mbIsEmisorForIntCommerce ? bizPartnerBranchAddress.getLocality() : emisorAddress.getCfdCceEmisorLocalidad());
+                                dataBizPartner.setBizPartnerExpeditionCounty(!mbIsEmisorForIntCommerce ? bizPartnerBranchAddress.getCounty() : emisorAddress.getCfdCceEmisorMunicipio());
+                                dataBizPartner.setBizPartnerExpeditionState(!mbIsEmisorForIntCommerce ? bizPartnerBranchAddress.getState() : bizPartnerBranchAddress.getDbmsDataState().getStateCode());
+                                dataBizPartner.setBizPartnerExpeditionZipCode(bizPartnerBranchAddress.getZipCode());
+                                dataBizPartner.setBizPartnerExpeditionPoBox(bizPartnerBranchAddress.getPoBox());
+                                dataBizPartner.setBizPartnerExpeditionCountryName(!mbIsEmisorForIntCommerce ? bizPartnerBranchAddress.getDbmsDataCountry().getCountry() : bizPartnerBranchAddress.getDbmsDataCountry().getCountryCode());
                             }
                         }
                     }

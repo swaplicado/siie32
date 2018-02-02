@@ -3497,7 +3497,7 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Motivo de traslado: *"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[150, 23]"/>
+                                  <Dimension value="[125, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -3531,7 +3531,7 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Tipo operaci&#xf3;n: *"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[150, 23]"/>
+                                  <Dimension value="[125, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -3564,7 +3564,7 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Clave de pedimento: *"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[150, 23]"/>
+                                  <Dimension value="[125, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -3597,7 +3597,7 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Certificado origen: *"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[150, 23]"/>
+                                  <Dimension value="[125, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -3627,9 +3627,9 @@
                           <SubComponents>
                             <Component class="javax.swing.JLabel" name="jlCfdCceNumberCertificateOrigin">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="N&#xfa;mero certificado origen:"/>
+                                <Property name="text" type="java.lang.String" value="N&#xfa;m. certificado origen:"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[150, 23]"/>
+                                  <Dimension value="[125, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -3661,7 +3661,7 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Subdivisi&#xf3;n: *"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[150, 23]"/>
+                                  <Dimension value="[125, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -3693,7 +3693,7 @@
 
                       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
                         <Property name="columns" type="int" value="1"/>
-                        <Property name="rows" type="int" value="2"/>
+                        <Property name="rows" type="int" value="6"/>
                         <Property name="verticalGap" type="int" value="2"/>
                       </Layout>
                       <SubComponents>
@@ -3714,7 +3714,7 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Tipo de cambio USD: *"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[150, 23]"/>
+                                  <Dimension value="[125, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -3746,7 +3746,7 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Total USD: *"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[150, 23]"/>
+                                  <Dimension value="[125, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -3756,6 +3756,85 @@
                                 <Property name="text" type="java.lang.String" value="0,000,000,000.00"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[125, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel106">
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel107">
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlFkAddresseeBizPartner">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Destinatario:"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[125, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JComboBox" name="jcbFkAddresseeBizPartner">
+                              <Properties>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[350, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel112">
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlFkAddresseeBizPartnerBranch">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Sucursal destinatario:"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[125, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JComboBox" name="jcbFkAddresseeBizPartnerBranch">
+                              <Properties>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[350, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel113">
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlFkAddresseeBizPartnerBranchAddress">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Domicilio destinatario:"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[125, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JComboBox" name="jcbFkAddresseeBizPartnerBranchAddress">
+                              <Properties>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[350, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>

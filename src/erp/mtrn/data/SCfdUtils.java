@@ -3305,9 +3305,8 @@ public abstract class SCfdUtils implements Serializable {
         comprobante.getAttMetodoDePago().setString(xmlCfd.getComprobanteMetodoDePago());
 
         emisor = new SDbCfdBizPartner(client);
-        emisor.setBizPartnerId(xmlCfd.getEmisorId());
-        emisor.setBizPartnerBranchId(xmlCfd.getEmisorSucursalId());
-        emisor.setIsEmisor(true);
+        emisor.setBizPartnerIds(xmlCfd.getEmisorId(), xmlCfd.getEmisorSucursalId());
+        emisor.setIsEmisor(true, false);
 
         asociadoNegocios = emisor.getBizPartner();
         asociadoNegocios.setVersion(fVersion);
@@ -3321,8 +3320,7 @@ public abstract class SCfdUtils implements Serializable {
         }
 
         receptor = new SDbCfdBizPartner(client);
-        receptor.setBizPartnerId(xmlCfd.getReceptorId());
-        receptor.setBizPartnerBranchId(xmlCfd.getReceptorSucursalId());
+        receptor.setBizPartnerIds(xmlCfd.getReceptorId(), xmlCfd.getReceptorSucursalId());
 
         asociadoNegocios = receptor.getBizPartner();
 
@@ -3440,12 +3438,9 @@ public abstract class SCfdUtils implements Serializable {
         }
         
         emisor = new SDbCfdBizPartner(client);
-        emisor.setBizPartnerId(xmlCfdi.getEmisorId());
-        emisor.setBizPartnerBranchId(xmlCfdi.getEmisorSucursalId());
-        emisor.setBizPartnerExpeditionId(xmlCfdi.getEmisorId());
-        emisor.setBizPartnerBranchExpeditionId(xmlCfdi.getEmisorSucursalId());
-        emisor.setIsEmisor(true);
-        emisor.setIsEmisorForIntCommerce(hasIntCommerceNode);
+        emisor.setBizPartnerIds(xmlCfdi.getEmisorId(), xmlCfdi.getEmisorSucursalId());
+        emisor.setExpeditionBizPartnerIds(xmlCfdi.getEmisorId(), xmlCfdi.getEmisorSucursalId());
+        emisor.setIsEmisor(true, hasIntCommerceNode);
 
         asociadoNegocios = emisor.getBizPartner();
         asociadoNegocios.setIsCfdiWithIntCommerce(hasIntCommerceNode);
@@ -3462,8 +3457,7 @@ public abstract class SCfdUtils implements Serializable {
         }
 
         receptor = new SDbCfdBizPartner(client);
-        receptor.setBizPartnerId(xmlCfdi.getReceptorId());
-        receptor.setBizPartnerBranchId(xmlCfdi.getReceptorSucursalId());
+        receptor.setBizPartnerIds(xmlCfdi.getReceptorId(), xmlCfdi.getReceptorSucursalId());
 
         asociadoNegocios = receptor.getBizPartner();
         asociadoNegocios.setIsCfdiWithIntCommerce(hasIntCommerceNode);
@@ -3558,12 +3552,8 @@ public abstract class SCfdUtils implements Serializable {
     }
     
     public static cfd.DElement createCfdi33RootElement(final SClientInterface client, final SCfdXmlCfdi33 xmlCfdi) throws Exception {
-        SDbCfdBizPartner emisor = null;
-        SDbCfdBizPartner receptor = null;
-        SCfdDataBizPartner asociadoNegocios = null;
+        //Comprobante:
         
-        //boolean isPayroll = xmlCfdi.getCfdType() == SDataConstantsSys.TRNS_TP_CFD_PAYROLL;
-
         cfd.ver33.DElementComprobante comprobante = new cfd.ver33.DElementComprobante();
 
         comprobante.getAttSerie().setString(xmlCfdi.getComprobanteSerie());
@@ -3606,53 +3596,67 @@ public abstract class SCfdUtils implements Serializable {
             hasIntCommerceNode = ((cfd.ver33.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior") != null;
         }
         
-        emisor = new SDbCfdBizPartner(client);
-        emisor.setBizPartnerId(xmlCfdi.getEmisorId());
-        emisor.setBizPartnerBranchId(xmlCfdi.getEmisorSucursalId());
-        emisor.setBizPartnerExpeditionId(xmlCfdi.getEmisorId());
-        emisor.setBizPartnerBranchExpeditionId(xmlCfdi.getEmisorSucursalId());
-        emisor.setIsEmisor(true);
-        emisor.setIsEmisorForIntCommerce(hasIntCommerceNode);
+        //Emisor:
+        
+        SDbCfdBizPartner emisor = new SDbCfdBizPartner(client);
+        emisor.setBizPartnerIds(xmlCfdi.getEmisorId(), xmlCfdi.getEmisorSucursalId());
+        emisor.setExpeditionBizPartnerIds(xmlCfdi.getEmisorId(), xmlCfdi.getEmisorSucursalId());
+        emisor.setIsEmisor(true, hasIntCommerceNode);
 
-        asociadoNegocios = emisor.getBizPartner();
-        asociadoNegocios.setIsCfdiWithIntCommerce(hasIntCommerceNode);
-        asociadoNegocios.setVersion(DCfdConsts.CFDI_VER_33);
-        asociadoNegocios.setCfdiType(xmlCfdi.getCfdType());
+        SCfdDataBizPartner emisorCfd = emisor.getBizPartner();
+        emisorCfd.setIsCfdiWithIntCommerce(hasIntCommerceNode);
+        emisorCfd.setVersion(DCfdConsts.CFDI_VER_33);
+        emisorCfd.setCfdiType(xmlCfdi.getCfdType());
 
-        cfd.ver33.DElementEmisor elementEmisor = (cfd.ver33.DElementEmisor) asociadoNegocios.createRootElementEmisor();
+        cfd.ver33.DElementEmisor elementEmisor = (cfd.ver33.DElementEmisor) emisorCfd.createRootElementEmisor();
         
         elementEmisor.getAttRegimenFiscal().setString(xmlCfdi.getEmisorRegimenFiscal());
         
         if (hasIntCommerceNode) {
-            ((cfd.ver3.cce11.DElementComercioExterior) ((cfd.ver33.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior")).setEltEmisor(asociadoNegocios.createRootElementEmisorIntCommerce());
+            ((cfd.ver3.cce11.DElementComercioExterior) ((cfd.ver33.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior")).setEltEmisor(emisorCfd.createRootElementEmisorIntCommerce());
         }
 
         comprobante.setEltEmisor(elementEmisor);
+        
+        //Receptor:
 
-        receptor = new SDbCfdBizPartner(client);
-        receptor.setBizPartnerId(xmlCfdi.getReceptorId());
-        receptor.setBizPartnerBranchId(xmlCfdi.getReceptorSucursalId());
+        SDbCfdBizPartner receptor = new SDbCfdBizPartner(client);
+        receptor.setBizPartnerIds(xmlCfdi.getReceptorId(), xmlCfdi.getReceptorSucursalId());
 
-        asociadoNegocios = receptor.getBizPartner();
-        asociadoNegocios.setIsCfdiWithIntCommerce(hasIntCommerceNode);
-        asociadoNegocios.setVersion(DCfdConsts.CFDI_VER_33);
-        asociadoNegocios.setCfdiType(xmlCfdi.getCfdType());
+        SCfdDataBizPartner receptorCfd = receptor.getBizPartner();
+        receptorCfd.setIsCfdiWithIntCommerce(hasIntCommerceNode);
+        receptorCfd.setVersion(DCfdConsts.CFDI_VER_33);
+        receptorCfd.setCfdiType(xmlCfdi.getCfdType());
 
-        cfd.ver33.DElementReceptor elementReceptor = (cfd.ver33.DElementReceptor) asociadoNegocios.createRootElementReceptor();
+        cfd.ver33.DElementReceptor elementReceptor = (cfd.ver33.DElementReceptor) receptorCfd.createRootElementReceptor();
         
         elementReceptor.getAttUsoCFDI().setString(xmlCfdi.getReceptorUsoCFDI());
         
         if (hasIntCommerceNode) {
-            ((cfd.ver3.cce11.DElementComercioExterior) ((cfd.ver33.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior")).setEltReceptor(asociadoNegocios.createRootElementReceptorIntCommerce());
+            ((cfd.ver3.cce11.DElementComercioExterior) ((cfd.ver33.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior")).setEltReceptor(receptorCfd.createRootElementReceptorIntCommerce());
+            
+            if (xmlCfdi.getDestinatarioId() != SLibConstants.UNDEFINED) {
+                SDbCfdBizPartner destinatario = new SDbCfdBizPartner(client);
+                destinatario.setBizPartnerIds(xmlCfdi.getDestinatarioId(), xmlCfdi.getDestinatarioSucursalId(), xmlCfdi.getDestinatarioDomicilioId());
+
+                SCfdDataBizPartner destinatarioCfd = destinatario.getBizPartner();
+                destinatarioCfd.setIsCfdiWithIntCommerce(hasIntCommerceNode);
+                destinatarioCfd.setVersion(DCfdConsts.CFDI_VER_33);
+                destinatarioCfd.setCfdiType(xmlCfdi.getCfdType());
+                
+                ((cfd.ver3.cce11.DElementComercioExterior) ((cfd.ver33.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior")).setEltDestinatario(destinatarioCfd.createRootElementDestinatarioIntCommerce());
+            }
         }
         
         comprobante.setEltReceptor(elementReceptor);
+        
+        //Conceptos:
 
         for (SCfdDataConcepto concept : xmlCfdi.getElementsConcepto()) {
             comprobante.getEltConceptos().getEltConceptos().add(concept.createRootElementConcept33());
         }
 
-        // Taxes:
+        //Impuestos:
 
         if (xmlCfdi.getCfdType() != SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
             boolean exemptTaxesAvailable = false;

@@ -424,6 +424,38 @@ public class SCfdDataBizPartner {
         return receptor;
     }
     
+     /**
+     * Creates element root for International Commerce addressee for business partner indicated.
+     * @return cfd.ver3.cce11.DElementDestinatario node for International Commerce receptor.
+     * @throws java.lang.Exception 
+     */
+    public cfd.ver3.cce11.DElementDestinatario createRootElementDestinatarioIntCommerce() throws java.lang.Exception {
+        cfd.ver3.cce11.DElementDestinatario destinatario = null;
+
+        if (mfVersion == DCfdConsts.CFDI_VER_33) {
+            destinatario = new cfd.ver3.cce11.DElementDestinatario();
+            
+            destinatario.getAttNumRegIdTrib().setString(msBizPartnerFiscalForeing);
+            destinatario.getAttNombre().setString(msBizPartnerName);
+            
+            destinatario.getEltDomicilio().getAttCalle().setString(msBizPartnerStreet);
+            destinatario.getEltDomicilio().getAttNoExterior().setString(msBizPartnerStreetNumberExt);
+            destinatario.getEltDomicilio().getAttNoInterior().setString(msBizPartnerStreetNumberInt);
+            destinatario.getEltDomicilio().getAttColonia().setString(msBizPartnerNeighborhood);
+            destinatario.getEltDomicilio().getAttLocalidad().setString(msBizPartnerLocality);
+            destinatario.getEltDomicilio().getAttReferencia().setString(msBizPartnerReference);
+            destinatario.getEltDomicilio().getAttMunicipio().setString(msBizPartnerCounty);
+            destinatario.getEltDomicilio().getAttEstado().setString(!msBizPartnerStateCode.isEmpty() ? msBizPartnerStateCode : msBizPartnerStateName);
+            destinatario.getEltDomicilio().getAttCodigoPostal().setString(msBizPartnerZipCode);
+            destinatario.getEltDomicilio().getAttPais().setString(msBizPartnerCountryCode);
+        }
+        else if (mfVersion == DCfdConsts.CFDI_VER_32) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+        
+        return destinatario;
+    }
+    
     /**
      * Gets issue place for CFD 2.0, 2.2 and CFDI 3.2.
      * @return 

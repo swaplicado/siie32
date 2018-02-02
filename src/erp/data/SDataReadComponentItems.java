@@ -326,6 +326,7 @@ public abstract class SDataReadComponentItems {
         boolean isPkOnlyInts = true;
         boolean isFkOnlyInts = true;
         boolean isComplementApplying = false;
+        boolean onlyInternational = false;
         java.lang.String sql = "";
         java.lang.String text = "";
         java.lang.String field = "";
@@ -394,7 +395,9 @@ public abstract class SDataReadComponentItems {
                 break;
             case SDataConstants.BPSX_BP_CO:
             case SDataConstants.BPSX_BP_SUP:
+            case SDataConstants.BPSX_BP_INT_SUP:
             case SDataConstants.BPSX_BP_CUS:
+            case SDataConstants.BPSX_BP_INT_CUS:
             case SDataConstants.BPSX_BP_CDR:
             case SDataConstants.BPSX_BP_DBR:
             case SDataConstants.BPSX_BP_EMP:
@@ -408,16 +411,24 @@ public abstract class SDataReadComponentItems {
                         isKeyApplying = paramsErp.getIsKeySupplierApplying();
                         break;
                     case SDataConstants.BPSX_BP_SUP:
+                    case SDataConstants.BPSX_BP_INT_SUP:
                         text = "proveedor";
                         category = SDataConstantsSys.BPSS_CT_BP_SUP;
                         sortingType = paramsErp.getFkSortingSupplierTypeId();
                         isKeyApplying = paramsErp.getIsKeySupplierApplying();
+                        if (catalogue == SDataConstants.BPSX_BP_INT_SUP) {
+                            onlyInternational = true;
+                        }
                         break;
                     case SDataConstants.BPSX_BP_CUS:
+                    case SDataConstants.BPSX_BP_INT_CUS:
                         text = "cliente";
                         category = SDataConstantsSys.BPSS_CT_BP_CUS;
                         sortingType = paramsErp.getFkSortingCustomerTypeId();
                         isKeyApplying = paramsErp.getIsKeyCustomerApplying();
+                        if (catalogue == SDataConstants.BPSX_BP_INT_CUS) {
+                            onlyInternational = true;
+                        }
                         break;
                     case SDataConstants.BPSX_BP_CDR:
                         text = "acreedor diverso";
@@ -445,6 +456,9 @@ public abstract class SDataReadComponentItems {
                         (catalogue == SDataConstants.BPSX_BP_EMP ? "WHERE bp.b_del = 0 AND bp.b_att_emp = 1 " :
                         "INNER JOIN erp.bpsu_bp_ct AS ct ON " +
                         "bp.id_bp = ct.id_bp AND ct.id_ct_bp = " + category + " AND bp.b_del = 0 AND ct.b_del = 0 ") +
+                        (!onlyInternational ? "" :
+                        "INNER JOIN erp.bpsu_bpb AS bpb ON bpb.fid_bp = bp.id_bp " +
+                        "INNER JOIN erp.bpsu_bpb_add AS bpba ON bpba.id_bpb = bpb.id_bpb AND bpba.id_add = 1 AND bpba.fid_cty_n IS NOT NULL ") +
                         "ORDER BY " +
                         (catalogue == SDataConstants.BPSX_BP_EMP ? "bp.bp, " :
                         (sortingType == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME || sortingType == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME_COMM ? "ct.bp_key, bp.bp, " : "bp.bp, ct.bp_key, ")) + "bp.id_bp ";

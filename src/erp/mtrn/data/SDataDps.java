@@ -197,6 +197,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected int mnFkBizPartnerAltId_r;
     protected int mnFkBizPartnerBranchAltId;
     protected int mnFkBizPartnerBranchAddressAltId;
+    protected int mnFkAddresseeBizPartnerId_nr;
+    protected int mnFkAddresseeBizPartnerBranchId_n;
+    protected int mnFkAddresseeBizPartnerBranchAddressId_n;
     protected int mnFkContactBizPartnerBranchId_n;
     protected int mnFkContactContactId_n;
     protected int mnFkTaxIdentityEmisorTypeId;
@@ -1627,6 +1630,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setFkBizPartnerAltId_r(int n) { mnFkBizPartnerAltId_r = n; }
     public void setFkBizPartnerBranchAltId(int n) { mnFkBizPartnerBranchAltId = n; }
     public void setFkBizPartnerBranchAddressAltId(int n) { mnFkBizPartnerBranchAddressAltId = n; }
+    public void setFkAddresseeBizPartnerId_nr(int n) { mnFkAddresseeBizPartnerId_nr = n; }
+    public void setFkAddresseeBizPartnerBranchId_n(int n) { mnFkAddresseeBizPartnerBranchId_n = n; }
+    public void setFkAddresseeBizPartnerBranchAddressId_n(int n) { mnFkAddresseeBizPartnerBranchAddressId_n = n; }
     public void setFkContactBizPartnerBranchId_n(int n) { mnFkContactBizPartnerBranchId_n = n; }
     public void setFkContactContactId_n(int n) { mnFkContactContactId_n = n; }
     public void setFkTaxIdentityEmisorTypeId(int n) { mnFkTaxIdentityEmisorTypeId = n; }
@@ -1745,6 +1751,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public int getFkBizPartnerAltId_r() { return mnFkBizPartnerAltId_r; }
     public int getFkBizPartnerBranchAltId() { return mnFkBizPartnerBranchAltId; }
     public int getFkBizPartnerBranchAddressAltId() { return mnFkBizPartnerBranchAddressAltId; }
+    public int getFkAddresseeBizPartnerId_nr() { return mnFkAddresseeBizPartnerId_nr; }
+    public int getFkAddresseeBizPartnerBranchId_n() { return mnFkAddresseeBizPartnerBranchId_n; }
+    public int getFkAddresseeBizPartnerBranchAddressId_n() { return mnFkAddresseeBizPartnerBranchAddressId_n; }
     public int getFkContactBizPartnerBranchId_n() { return mnFkContactBizPartnerBranchId_n; }
     public int getFkContactContactId_n() { return mnFkContactContactId_n; }
     public int getFkTaxIdentityEmisorTypeId() { return mnFkTaxIdentityEmisorTypeId; }
@@ -1949,6 +1958,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnFkBizPartnerAltId_r = 0;
         mnFkBizPartnerBranchAltId = 0;
         mnFkBizPartnerBranchAddressAltId = 0;
+        mnFkAddresseeBizPartnerId_nr = 0;
+        mnFkAddresseeBizPartnerBranchId_n = 0;
+        mnFkAddresseeBizPartnerBranchAddressId_n = 0;
         mnFkContactBizPartnerBranchId_n = 0;
         mnFkContactContactId_n = 0;
         mnFkTaxIdentityEmisorTypeId = 0;
@@ -2115,6 +2127,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnFkBizPartnerAltId_r = oResultSet.getInt("d.fid_bp_alt_r");
                 mnFkBizPartnerBranchAltId = oResultSet.getInt("d.fid_bpb_alt");
                 mnFkBizPartnerBranchAddressAltId = oResultSet.getInt("d.fid_add_alt");
+                mnFkAddresseeBizPartnerId_nr = oResultSet.getInt("d.fid_add_bp_nr");
+                mnFkAddresseeBizPartnerBranchId_n = oResultSet.getInt("d.fid_add_bpb_n");
+                mnFkAddresseeBizPartnerBranchAddressId_n = oResultSet.getInt("d.fid_add_add_n");
                 mnFkContactBizPartnerBranchId_n = oResultSet.getInt("d.fid_con_bpb_n");
                 mnFkContactContactId_n = oResultSet.getInt("d.fid_con_con_n");
                 mnFkTaxIdentityEmisorTypeId = oResultSet.getInt("d.fid_tp_tax_idy_emir");
@@ -2397,7 +2412,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                    "?) }");
             oCallableStatement.setInt(nParam++, mnPkYearId);
             oCallableStatement.setInt(nParam++, mnPkDocId);
             oCallableStatement.setDate(nParam++, new java.sql.Date(mtDate.getTime()));
@@ -2473,6 +2489,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             oCallableStatement.setInt(nParam++, mnFkBizPartnerAltId_r);
             oCallableStatement.setInt(nParam++, mnFkBizPartnerBranchAltId);
             oCallableStatement.setInt(nParam++, mnFkBizPartnerBranchAddressAltId);
+            if (mnFkAddresseeBizPartnerId_nr > 0) oCallableStatement.setInt(nParam++, mnFkAddresseeBizPartnerId_nr); else oCallableStatement.setNull(nParam++, java.sql.Types.INTEGER);
+            if (mnFkAddresseeBizPartnerBranchId_n > 0) oCallableStatement.setInt(nParam++, mnFkAddresseeBizPartnerBranchId_n); else oCallableStatement.setNull(nParam++, java.sql.Types.INTEGER);
+            if (mnFkAddresseeBizPartnerBranchAddressId_n > 0) oCallableStatement.setInt(nParam++, mnFkAddresseeBizPartnerBranchAddressId_n); else oCallableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
             if (mnFkContactBizPartnerBranchId_n > 0) oCallableStatement.setInt(nParam++, mnFkContactBizPartnerBranchId_n); else oCallableStatement.setNull(nParam++, java.sql.Types.INTEGER);
             if (mnFkContactContactId_n > 0) oCallableStatement.setInt(nParam++, mnFkContactContactId_n); else oCallableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
             oCallableStatement.setInt(nParam++, mnFkTaxIdentityEmisorTypeId);
@@ -4897,6 +4916,21 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         return moDbmsDataDpsCfd.getCfdiUsage();
     }
 
+    @Override
+    public int getDestinatarioId() {
+        return mnFkAddresseeBizPartnerId_nr;
+    }
+
+    @Override
+    public int getDestinatarioSucursalId() {
+        return mnFkAddresseeBizPartnerBranchId_n;
+    }
+
+    @Override
+    public int getDestinatarioDomicilioId() {
+        return mnFkAddresseeBizPartnerBranchAddressId_n;
+    }
+    
     @Override
     public ArrayList<SCfdDataConcepto> getElementsConcepto() throws Exception {
         double price = 0;
