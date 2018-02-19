@@ -3528,7 +3528,6 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                 iogCounterpart.setFkDiogCategoryId(iogTypeKey[0]);
                 iogCounterpart.setFkDiogClassId(iogTypeKey[1]);
                 iogCounterpart.setFkDiogTypeId(iogTypeKey[2]);
-                iogCounterpart.setFkDiogAdjustmentTypeId(moFieldDiogAdjustmentType.getKeyAsIntArray()[0]);
                 iogCounterpart.setFkCompanyBranchId(moWarehouseDestiny.getPkCompanyBranchId());
                 iogCounterpart.setFkWarehouseId(moWarehouseDestiny.getPkEntityId());
                 iogCounterpart.setFkDpsYearId_n(SLibConstants.UNDEFINED);
