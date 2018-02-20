@@ -84,6 +84,13 @@ public class SModuleTrn extends SGuiModule {
                     public String getSqlWhere(int[] pk) { return "WHERE id_ct_dps = " + pk[0] + " AND id_cl_dps = " + pk[1] + " AND id_tp_dps = " + pk[2] + " "; }
                 };
                 break;
+            case SModConsts.TRNS_TP_MAINT_MOV:
+                registry = new SDbRegistrySysFly(type) {
+                    public void initRegistry() { }
+                    public String getSqlTable() { return SModConsts.TablesMap.get(mnRegistryType); }
+                    public String getSqlWhere(int[] pk) { return "WHERE id_tp_maint_mov = " + pk[0] + " "; }
+                };
+                break;
             case SModConsts.TRN_DPS:
                 registry = new SDbDps();
                 break;

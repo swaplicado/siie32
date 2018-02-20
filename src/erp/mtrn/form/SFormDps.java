@@ -619,6 +619,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel94 = new javax.swing.JPanel();
         jlCfdiConfirmation = new javax.swing.JLabel();
         jtfCfdiConfirmation = new javax.swing.JTextField();
+        jPanel114 = new javax.swing.JPanel();
+        jPanel115 = new javax.swing.JPanel();
+        jlCfdiRelationType = new javax.swing.JLabel();
+        jcbCfdiRelationType = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel116 = new javax.swing.JPanel();
+        jlCfdiCfdiRelated = new javax.swing.JLabel();
+        jtfCfdiCfdiRelated = new javax.swing.JTextField();
         jpInternationalTrade = new javax.swing.JPanel();
         jPanel109 = new javax.swing.JPanel();
         jPanel97 = new javax.swing.JPanel();
@@ -2135,7 +2142,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel73.setBorder(javax.swing.BorderFactory.createTitledBorder("XML:"));
         jPanel73.setLayout(new java.awt.BorderLayout());
 
-        jPanel74.setLayout(new java.awt.GridLayout(5, 2, 0, 2));
+        jPanel74.setLayout(new java.awt.GridLayout(8, 2, 0, 2));
 
         jPanel75.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel75.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -2172,7 +2179,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel95.add(jlCfdiTaxRegime);
 
         jcbCfdiTaxRegime.setToolTipText("Régimen fiscal del emisor");
-        jcbCfdiTaxRegime.setPreferredSize(new java.awt.Dimension(245, 23));
+        jcbCfdiTaxRegime.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel95.add(jcbCfdiTaxRegime);
 
         jPanel74.add(jPanel95);
@@ -2184,7 +2191,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel93.add(jlCfdiCfdiUsage);
 
         jcbCfdiCfdiUsage.setToolTipText("Uso CFDI del receptor");
-        jcbCfdiCfdiUsage.setPreferredSize(new java.awt.Dimension(245, 23));
+        jcbCfdiCfdiUsage.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel93.add(jcbCfdiCfdiUsage);
 
         jPanel74.add(jPanel93);
@@ -2200,6 +2207,34 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel94.add(jtfCfdiConfirmation);
 
         jPanel74.add(jPanel94);
+
+        jPanel114.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel74.add(jPanel114);
+
+        jPanel115.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlCfdiRelationType.setText("Tipo relación:");
+        jlCfdiRelationType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel115.add(jlCfdiRelationType);
+
+        jcbCfdiRelationType.setToolTipText("Tipo relación de CFDI relacionados");
+        jcbCfdiRelationType.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel115.add(jcbCfdiRelationType);
+
+        jPanel74.add(jPanel115);
+
+        jPanel116.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlCfdiCfdiRelated.setText("CFDI relacionados:");
+        jlCfdiCfdiRelated.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel116.add(jlCfdiCfdiRelated);
+
+        jtfCfdiCfdiRelated.setText("TEXT");
+        jtfCfdiCfdiRelated.setToolTipText("UUID de CFDI relacionados");
+        jtfCfdiCfdiRelated.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel116.add(jtfCfdiCfdiRelated);
+
+        jPanel74.add(jPanel116);
 
         jPanel73.add(jPanel74, java.awt.BorderLayout.NORTH);
 
@@ -7174,6 +7209,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JPanel jPanel111;
     private javax.swing.JPanel jPanel112;
     private javax.swing.JPanel jPanel113;
+    private javax.swing.JPanel jPanel114;
+    private javax.swing.JPanel jPanel115;
+    private javax.swing.JPanel jPanel116;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
@@ -7316,6 +7354,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JComboBox<SFormComponentItem> jcbCfdiCfdiUsage;
     private javax.swing.JComboBox<SFormComponentItem> jcbCfdiPaymentMethod;
     private javax.swing.JComboBox<SFormComponentItem> jcbCfdiPaymentWay;
+    private javax.swing.JComboBox<SFormComponentItem> jcbCfdiRelationType;
     private javax.swing.JComboBox<SFormComponentItem> jcbCfdiTaxRegime;
     private javax.swing.JComboBox jcbDriver;
     private javax.swing.JComboBox jcbFkAddresseeBizPartner;
@@ -7384,10 +7423,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlCfdCceRequestKey;
     private javax.swing.JLabel jlCfdCceSubdivision;
     private javax.swing.JLabel jlCfdCceTotalUsd;
+    private javax.swing.JLabel jlCfdiCfdiRelated;
     private javax.swing.JLabel jlCfdiCfdiUsage;
     private javax.swing.JLabel jlCfdiConfirmation;
     private javax.swing.JLabel jlCfdiPaymentMethod;
     private javax.swing.JLabel jlCfdiPaymentWay;
+    private javax.swing.JLabel jlCfdiRelationType;
     private javax.swing.JLabel jlCfdiTaxRegime;
     private javax.swing.JLabel jlCompanyBranch;
     private javax.swing.JLabel jlCurrency;
@@ -7491,6 +7532,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JTextField jtfCfdCceNumberCertificateOrigin;
     private javax.swing.JTextField jtfCfdCceSubdivision;
     private javax.swing.JTextField jtfCfdCceTotalUsd;
+    private javax.swing.JTextField jtfCfdiCfdiRelated;
     private javax.swing.JTextField jtfCfdiConfirmation;
     private javax.swing.JTextField jtfCompanyBranchCodeRo;
     private javax.swing.JTextField jtfCompanyBranchRo;
