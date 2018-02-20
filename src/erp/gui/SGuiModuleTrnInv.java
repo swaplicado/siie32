@@ -111,6 +111,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiIogStockValueByItem;
     private javax.swing.JMenuItem jmiIogStockTheoricalCost;
     private javax.swing.JMenuItem jmiIogStockClosing;
+    private javax.swing.JMenu jmIogMaint;
+    private javax.swing.JMenuItem jmiIogMaintArea;
 
     private javax.swing.JMenu jmMenuStk;
     private javax.swing.JMenuItem jmiStkStock;
@@ -326,6 +328,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogStockValueByItem = new JMenuItem("Valor de inventarios por ítem");
         jmiIogStockTheoricalCost = new JMenuItem("Valor valuación vs. valor teórico");
         jmiIogStockClosing = new JMenuItem("Generación de inventarios iniciales...");
+        jmIogMaint = new JMenu("Mantenimiento");
+        jmiIogMaintArea = new JMenuItem("Áreas de mantenimiento");
         jmMenuIog.add(jmiIogStock);
         jmMenuIog.addSeparator();
         jmMenuIog.add(jmiIogMfgRmAssign);
@@ -351,6 +355,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuIog.add(jmiIogStockTheoricalCost);
         jmMenuIog.addSeparator();
         jmMenuIog.add(jmiIogStockClosing);
+        jmMenuIog.addSeparator();
+        jmIogMaint.add(jmiIogMaintArea);
+        jmMenuIog.add(jmIogMaint);
         jmiIogStock.addActionListener(this);
         jmiIogMfgRmAssign.addActionListener(this);
         jmiIogMfgRmReturn.addActionListener(this);
@@ -368,6 +375,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogStockValueByItem.addActionListener(this);
         jmiIogStockTheoricalCost.addActionListener(this);
         jmiIogStockClosing.addActionListener(this);
+        jmiIogMaintArea.addActionListener(this);
         
         jmMenuStk = new JMenu("Inventarios");
         jmiStkStock = new JMenuItem("Existencias");
@@ -1186,6 +1194,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiIogStockClosing) {
                 moDialogUtilStockClosing.resetForm();
                 moDialogUtilStockClosing.setVisible(true);
+            }
+            else if (item == jmiIogMaintArea) {
+                miClient.getSession().showView(SModConsts.TRN_MAINT_AREA, SLibConstants.UNDEFINED, null);
             }
             else if (item == jmiStkStock) {
                 showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_STK);

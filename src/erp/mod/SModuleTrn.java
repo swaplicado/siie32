@@ -13,10 +13,12 @@ import erp.mod.trn.db.SDbDpsEntryPrice;
 import erp.mod.trn.db.SDbInventoryMfgCost;
 import erp.mod.trn.db.SDbInventoryValuation;
 import erp.mod.trn.db.SDbItemRequiredDpsConfig;
+import erp.mod.trn.db.SDbMaintArea;
 import erp.mod.trn.db.SDbMmsConfig;
 import erp.mod.trn.form.SFormDelivery;
 import erp.mod.trn.form.SFormInventoryValuation;
 import erp.mod.trn.form.SFormItemRequiredDpsConfig;
+import erp.mod.trn.form.SFormMaintArea;
 import erp.mod.trn.form.SFormMmsConfig;
 import erp.mod.trn.view.SViewAccountsPending;
 import erp.mod.trn.view.SViewCurrencyBalance;
@@ -28,6 +30,7 @@ import erp.mod.trn.view.SViewInventoryCost;
 import erp.mod.trn.view.SViewInventoryMfgCost;
 import erp.mod.trn.view.SViewInventoryValuation;
 import erp.mod.trn.view.SViewItemRequiredDpsConfig;
+import erp.mod.trn.view.SViewMaintArea;
 import erp.mod.trn.view.SViewMmsConfig;
 import erp.mod.trn.view.SViewOrderLimitMonth;
 import erp.mod.trn.view.SViewValCost;
@@ -57,6 +60,7 @@ public class SModuleTrn extends SGuiModule {
     private SFormInventoryValuation moFormInventoryValuation;
     private SFormMmsConfig moFormMmsConfiguration;
     private SFormDelivery moFormDelivery;
+    private SFormMaintArea moFormMaintArea;
 
     public SModuleTrn(SGuiClient client, int subtype) {
         super(client, SModConsts.MOD_TRN_N, subtype);
@@ -121,6 +125,9 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRN_DVY_ETY:
                 registry = new SDbDeliveryEntry();
+                break;
+            case SModConsts.TRN_MAINT_AREA:
+                registry = new SDbMaintArea();
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -225,6 +232,9 @@ public class SModuleTrn extends SGuiModule {
                     view = new SViewDeliveryQuery(miClient, subtype, title, params);
                 }
                 break;
+            case SModConsts.TRN_MAINT_AREA:
+                view = new SViewMaintArea(miClient, "Áreas mantenimiento");
+                break;
             case SModConsts.TRNX_BP_BAL_CUR:
                 title = (subtype == SDataConstantsSys.TRNS_CT_DPS_SAL ? "CXC" : "CXP") + " x moneda";
                 if (params == null) {
@@ -270,6 +280,10 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_DVY:
                 if(moFormDelivery == null) moFormDelivery = new SFormDelivery(miClient, "Entrega");
                 form = moFormDelivery;
+                break;
+            case SModConsts.TRN_MAINT_AREA:
+                if(moFormMaintArea == null) moFormMaintArea = new SFormMaintArea(miClient, "Área de mantenimiento");
+                form = moFormMaintArea;
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
