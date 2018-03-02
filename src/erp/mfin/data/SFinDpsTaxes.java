@@ -24,7 +24,7 @@ public class SFinDpsTaxes {
     public java.util.ArrayList<erp.mfin.data.SFinDpsTaxes.STax> getTaxes() { return mvTaxes; }
 
     public void addTax(int[] keyDps, int[] keyTax, SFinAmount amount) throws java.lang.Exception {
-        STax tax = getTax(keyDps, keyTax, amount.IsPrepayment, amount.Movement);
+        STax tax = getTax(keyDps, keyTax, amount.IsPrepaymentInvoiced, amount.MovementType);
 
         if (tax == null) {
             SDataTax dataTax = new SDataTax();
@@ -37,11 +37,11 @@ public class SFinDpsTaxes {
                 tax.setPkDpsDocId(keyDps[1]);
                 tax.setPkTaxBasicId(dataTax.getPkTaxBasicId());
                 tax.setPkTaxId(dataTax.getPkTaxId());
-                tax.setPrepayment(amount.IsPrepayment);
+                tax.setPrepayment(amount.IsPrepaymentInvoiced);
                 tax.setFkTaxTypeId(dataTax.getFkTaxTypeId());
                 tax.setFkTaxCalculationTypeId(dataTax.getFkTaxCalculationTypeId());
                 tax.setFkTaxApplicationTypeId(dataTax.getFkTaxApplicationTypeId());
-                tax.setMovement(amount.Movement);
+                tax.setMovementType(amount.MovementType);
                 mvTaxes.add(tax);
             }
         }
@@ -50,11 +50,11 @@ public class SFinDpsTaxes {
         tax.addValueCy(amount.AmountCy);
     }
 
-    public erp.mfin.data.SFinDpsTaxes.STax getTax(int[] keyDps, int[] keyTax, boolean isPrepayment, SFinMovement movement) {
+    public erp.mfin.data.SFinDpsTaxes.STax getTax(int[] keyDps, int[] keyTax, boolean isPrepayment, SFinMovementType movementType) {
         STax tax = null;
 
         for (STax t : mvTaxes) {
-            if (SLibUtilities.compareKeys(t.getKeyDps(), keyDps) && SLibUtilities.compareKeys(t.getKeyTax(), keyTax) && t.isPrepayment() == isPrepayment && t.getMovement() == movement) {
+            if (SLibUtilities.compareKeys(t.getKeyDps(), keyDps) && SLibUtilities.compareKeys(t.getKeyTax(), keyTax) && t.isPrepayment() == isPrepayment && t.getMovementType() == movementType) {
                 tax = t;
                 break;
             }
@@ -75,7 +75,7 @@ public class SFinDpsTaxes {
         private int mnFkTaxTypeId;
         private int mnFkTaxCalculationTypeId;
         private int mnFkTaxApplicationTypeId;
-        private SFinMovement meMovement;
+        private SFinMovementType meMovementType;
 
         public STax() {
             mnPkDpsYearId = 0;
@@ -88,7 +88,7 @@ public class SFinDpsTaxes {
             mnFkTaxTypeId = 0;
             mnFkTaxCalculationTypeId = 0;
             mnFkTaxApplicationTypeId = 0;
-            meMovement = SFinMovement.INCREMENT;
+            meMovementType = SFinMovementType.MOVT_INCREMENT;
         }
 
         public void setPkDpsYearId(int n) { mnPkDpsYearId = n; }
@@ -101,7 +101,7 @@ public class SFinDpsTaxes {
         public void setFkTaxTypeId(int n) { mnFkTaxTypeId = n; }
         public void setFkTaxCalculationTypeId(int n) { mnFkTaxCalculationTypeId = n; }
         public void setFkTaxApplicationTypeId(int n) { mnFkTaxApplicationTypeId = n; }
-        public void setMovement(SFinMovement e) { meMovement = e; }
+        public void setMovementType(SFinMovementType e) { meMovementType = e; }
 
         public int getPkDpsYearId() { return mnPkDpsYearId; }
         public int getPkDpsDocId() { return mnPkDpsDocId; }
@@ -113,7 +113,7 @@ public class SFinDpsTaxes {
         public int getFkTaxTypeId() { return mnFkTaxTypeId; }
         public int getFkTaxCalculationTypeId() { return mnFkTaxCalculationTypeId; }
         public int getFkTaxApplicationTypeId() { return mnFkTaxApplicationTypeId; }
-        public SFinMovement getMovement() { return meMovement; }
+        public SFinMovementType getMovementType() { return meMovementType; }
 
         public int[] getKeyDps() { return new int[] { mnPkDpsYearId, mnPkDpsDocId }; }
         public int[] getKeyTax() { return new int[] { mnPkTaxBasicId, mnPkTaxId }; }

@@ -315,30 +315,71 @@ public abstract class STrnUtils {
     }
     
     /**
-     * Gets absolut balance of prepayments for provided business partner.
+     * Gets net balance of prepayments for provided business partner from invoices and credit notes.
      * @param session Current user's system session.
      * @param idBizPartner Business partner's (customer or provider) primary key.
      * @param keyDps Business partner's current document in order to descart its prepayments if any.
-     * @param idCurrency Currency for retrieving prepayments' balance amount. When undefined value is provided, currency is local currency.
+     * @param idCurrency Currency for retrieving prepayments' balance amount. When <code>undefined</code> value is provided, currency is local currency.
      */
-    public static double getPrepaymentsBalance(final SGuiSession session, final int idBizPartner, final int[] keyDps, final int idCurrency) throws Exception {
+    public static double getPrepaymentsBalance(final SGuiSession session, final int idDpsCategory, final int idBizPartner, final int[] keyDps, final int idCurrency) throws Exception {
         double balance = 0;
         String sql = "";
         ResultSet resultSet = null;
         
-        sql = "SELECT COALESCE(SUM(" + (idCurrency == SLibConsts.UNDEFINED ? "de.stot_r" : "de.stot_cur_r") + "), 0.0) "
+        sql = "SELECT "
+                + "COALESCE(SUM(IF(de.ops_type = " + SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY + ", " + (idCurrency == SLibConsts.UNDEFINED ? "de.stot_r" : "de.stot_cur_r") + ", 0.0)), 0.0) AS _ops_prepay, "
+                + "COALESCE(SUM(IF(de.ops_type = " + SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY + ", " + (idCurrency == SLibConsts.UNDEFINED ? "de.stot_r" : "de.stot_cur_r") + ", 0.0)), 0.0) AS _adj_prepay, "
+                + "COALESCE(SUM(IF(de.ops_type = " + SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY + ", " + (idCurrency == SLibConsts.UNDEFINED ? "de.disc_doc" : "de.disc_doc_cur") + ", 0.0)), 0.0) AS _ops_ops_app_prepay, "
+                + "COALESCE(SUM(IF(de.ops_type = " + SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY + ", " + (idCurrency == SLibConsts.UNDEFINED ? "de.disc_doc" : "de.disc_doc_cur") + ", 0.0)), 0.0) AS _adj_ops_app_prepay, "
+                + "COALESCE(SUM(IF(de.ops_type = " + SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY + ", " + (idCurrency == SLibConsts.UNDEFINED ? "de.stot_r" : "de.stot_cur_r") + ", 0.0)), 0.0) AS _adj_app_prepay "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc "
-                + "WHERE d.fid_bp_r = " + idBizPartner + " AND de.b_pre_pay = 1 AND "
+                + "WHERE d.fid_ct_dps = " + idDpsCategory + " AND d.fid_bp_r = " + idBizPartner + " AND "
+                + "de.ops_type NOT IN (" + SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS + ", " + SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS + ") AND "
                 + "NOT (d.id_year = " + keyDps[0] + " AND d.id_doc = " + keyDps[1] + ") AND "
                 + (idCurrency == SLibConsts.UNDEFINED ? "" : "d.fid_cur = " + idCurrency + " AND ")
                 + "NOT d.b_del AND NOT de.b_del AND d.fid_st_dps = " + SModSysConsts.TRNS_ST_DPS_EMITED + "; ";
         resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next()) {
-            balance = resultSet.getDouble(1);
+            balance = SLibUtils.round(
+                    + resultSet.getDouble("_ops_prepay")            // + prepayments in invoices
+                    - resultSet.getDouble("_adj_prepay")            // - prepayments in credit notes
+                    - resultSet.getDouble("_ops_ops_app_prepay")    // - prepayments applied as discounts in invoices
+                    + resultSet.getDouble("_adj_ops_app_prepay")    // + prepayments applied as discounts in credit notes
+                    - resultSet.getDouble("_adj_app_prepay"),       // - prepayments applied in credit notes
+                    SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
         }
         
         return balance;
+    }
+    
+    public static int mirrowOperationsType(final int operationsType) {
+        int mirrowed = SLibConsts.UNDEFINED;
+        
+        switch (operationsType) {
+            case SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS:
+                mirrowed = SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS;
+                break;
+            case SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY:
+                mirrowed = SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY;
+                break;
+            case SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY:
+                mirrowed = SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY;
+                break;
+            case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS:
+                mirrowed = SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS;
+                break;
+            case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY:
+                mirrowed = SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY;
+                break;
+            case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY:
+                mirrowed = SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY;
+                break;
+            default:
+                mirrowed = operationsType;
+        }
+        
+        return mirrowed;
     }
     
     /**

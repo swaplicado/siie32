@@ -57,6 +57,8 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected double mdUnitAlternativeBaseEquivalence;
     protected double mdSurplusPercentage;
     protected java.lang.String msTariff;
+    protected java.lang.String msCustomsUnit;
+    protected double mdCustomsEquivalence;
     protected boolean mbIsReference;
     protected boolean mbIsPrepayment;
     protected boolean mbIsFreePrice;
@@ -146,6 +148,8 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public void setUnitAlternativeBaseEquivalence(double d) { mdUnitAlternativeBaseEquivalence = d; }
     public void setSurplusPercentage(double d) { mdSurplusPercentage = d; }
     public void setTariff(java.lang.String s) { msTariff = s; }
+    public void setCustomsUnit(java.lang.String s) { msCustomsUnit = s; }
+    public void setCustomsEquivalence(double d) { mdCustomsEquivalence = d; }
     public void setIsReference(boolean b) { mbIsReference = b; }
     public void setIsPrepayment(boolean b) { mbIsPrepayment = b; }
     public void setIsFreePrice(boolean b) { mbIsFreePrice = b; }
@@ -223,6 +227,8 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public double getUnitAlternativeBaseEquivalence() { return mdUnitAlternativeBaseEquivalence; }
     public double getSurplusPercentage() { return mdSurplusPercentage; }
     public java.lang.String getTariff() { return msTariff; }
+    public java.lang.String getCustomsUnit() { return msCustomsUnit; }
+    public double getCustomsEquivalence() { return mdCustomsEquivalence; }
     public boolean getIsReference() { return mbIsReference; }
     public boolean getIsPrepayment() { return mbIsPrepayment; }
     public boolean getIsFreePrice() { return mbIsFreePrice; }
@@ -339,6 +345,8 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
         mdUnitAlternativeBaseEquivalence = 0;
         mdSurplusPercentage = 0;
         msTariff = "";
+        msCustomsUnit = "";
+        mdCustomsEquivalence = 0;
         mbIsReference = false;
         mbIsPrepayment = false;
         mbIsFreePrice = false;
@@ -439,6 +447,8 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                 mdUnitAlternativeBaseEquivalence = resultSet.getDouble("unit_alt_base_equiv");
                 mdSurplusPercentage = resultSet.getDouble("surplus_per");
                 msTariff = resultSet.getString("tariff");
+                msCustomsUnit = resultSet.getString("custs_unit");
+                mdCustomsEquivalence = resultSet.getDouble("custs_equiv");
                 mbIsReference = resultSet.getBoolean("b_ref");
                 mbIsPrepayment = resultSet.getBoolean("b_pre_pay");
                 mbIsFreePrice = resultSet.getBoolean("b_free_price");
@@ -559,7 +569,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkItemId);
             callableStatement.setString(nParam++, msKey);
             callableStatement.setString(nParam++, msItem);
@@ -597,6 +607,8 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
             callableStatement.setDouble(nParam++, mdUnitAlternativeBaseEquivalence);
             callableStatement.setDouble(nParam++, mdSurplusPercentage);
             callableStatement.setString(nParam++, msTariff);
+            callableStatement.setString(nParam++, msCustomsUnit);
+            callableStatement.setDouble(nParam++, mdCustomsEquivalence);
             callableStatement.setBoolean(nParam++, mbIsReference);
             callableStatement.setBoolean(nParam++, mbIsPrepayment);
             callableStatement.setBoolean(nParam++, mbIsFreePrice);

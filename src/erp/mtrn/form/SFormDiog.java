@@ -61,6 +61,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.table.DefaultTableCellRenderer;
+import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
 
@@ -1612,9 +1613,16 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                 iog.setFkCompanyBranchId(moWarehouseSource.getPkCompanyBranchId());
                 iog.setFkWarehouseId(moWarehouseSource.getPkEntityId());
 
+                if (moDiog == null) {
+                    iog.setFkMaintMovementTypeId(SModSysConsts.TRNS_TP_MAINT_MOV_NA);
+                    iog.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
+                    iog.setFkMaintUserId_n(SLibConsts.UNDEFINED);
+                    iog.setFkMaintUserSupervisorId(SModSysConsts.TRN_MAINT_USER_SUPV_NA);
+                }
+
                 iog.getDbmsEntries().clear();
                 iog.getDbmsEntries().addAll(getCompleteEntries());
-
+                
                 if (STrnUtilities.isIogTypeForDpsSupply(manParamIogTypeKey)) {
 
                     if (moDialogDpsStockSupply == null) {
@@ -1943,6 +1951,13 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                     iog.setDate(moFieldDate.getDate());
                     iog.setFkCompanyBranchId(moWarehouseSource.getPkCompanyBranchId());
                     iog.setFkWarehouseId(moWarehouseSource.getPkEntityId());
+                    
+                    if (moDiog == null) {
+                        iog.setFkMaintMovementTypeId(SModSysConsts.TRNS_TP_MAINT_MOV_NA);
+                        iog.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
+                        iog.setFkMaintUserId_n(SLibConsts.UNDEFINED);
+                        iog.setFkMaintUserSupervisorId(SModSysConsts.TRN_MAINT_USER_SUPV_NA);
+                    }
 
                     iog.getDbmsEntries().clear();
                     iog.getDbmsEntries().addAll(getCompleteEntries());

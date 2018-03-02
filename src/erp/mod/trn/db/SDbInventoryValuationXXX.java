@@ -83,20 +83,24 @@ public class SDbInventoryValuationXXX extends SDbRegistryUser {
         diog.setReference("");
         diog.setValue_r(SLibUtils.round(value, SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
         diog.setIsSystem(true);
-        diog.setFkCompanyBranchId(keyWarehouse[0]);
-        diog.setFkWarehouseId(keyWarehouse[1]);
-        diog.setFkDiogAdjustmentTypeId(SModSysConsts.TRNU_TP_IOG_ADJ_NA);
-        diog.setFkUserNewId(session.getUser().getPkUserId());
-        diog.setFkUserEditId(SUtilConsts.USR_NA_ID);
-        diog.setFkUserDeleteId(SUtilConsts.USR_NA_ID);
-        diog.setFkUserAuditedId(SUtilConsts.USR_NA_ID);
-        diog.setFkUserAuthorizedId(SUtilConsts.USR_NA_ID);
-        diog.setFkUserShippedId(SUtilConsts.USR_NA_ID);
         diog.setFkDiogCategoryId(keyDiogType[0]);
         diog.setFkDiogClassId(keyDiogType[1]);
         diog.setFkDiogTypeId(keyDiogType[2]);
+        diog.setFkDiogAdjustmentTypeId(SModSysConsts.TRNU_TP_IOG_ADJ_NA);
+        diog.setFkCompanyBranchId(keyWarehouse[0]);
+        diog.setFkWarehouseId(keyWarehouse[1]);
         diog.setFkMfgYearId_n(keyOrder[0]);
         diog.setFkMfgOrderId_n(keyOrder[1]);
+        diog.setFkMaintMovementTypeId(SModSysConsts.TRNS_TP_MAINT_MOV_NA);
+        diog.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
+        diog.setFkMaintUserId_n(SLibConsts.UNDEFINED);
+        diog.setFkMaintUserSupervisorId(SModSysConsts.TRN_MAINT_USER_SUPV_NA);
+        diog.setFkUserShippedId(SUtilConsts.USR_NA_ID);
+        diog.setFkUserAuditedId(SUtilConsts.USR_NA_ID);
+        diog.setFkUserAuthorizedId(SUtilConsts.USR_NA_ID);
+        diog.setFkUserNewId(session.getUser().getPkUserId());
+        diog.setFkUserEditId(SUtilConsts.USR_NA_ID);
+        diog.setFkUserDeleteId(SUtilConsts.USR_NA_ID);
 
         diogEntry = new SDataDiogEntry();
 

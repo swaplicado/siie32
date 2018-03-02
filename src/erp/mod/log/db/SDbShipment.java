@@ -536,6 +536,7 @@ public class SDbShipment extends SDbRegistryUser {
                         moDpsOrderEntry.setWeightGross(moItem.getWeightGross());
                         moDpsOrderEntry.setWeightDelivery(moItem.getWeightDelivery());
                         moDpsOrderEntry.setSurplusPercentage(0);
+                        moDpsOrderEntry.setOperationsType(SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS);
                         moDpsOrderEntry.setFkItemRefId_n(((Number) oLogEntry[0]).intValue());
                         moDpsOrderEntry.setIsInventoriable(moItem.getIsInventoriable());
                         moDpsOrderEntry.setIsDeleted(false);

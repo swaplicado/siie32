@@ -81,9 +81,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private static final int TAB_PRC = 2;
     private static final int TAB_MKT = 3;
     private static final int TAB_NOT = 4;
-    private static final int TAB_CFD = 5;
-    private static final int TAB_COMPL = 6; //tab of CFD complement info
-    private static final int COMPL_VALUES = 4; //number of CFD complement values
+    private static final int TAB_CFD_ADD = 5;   // CFD addenda
+    private static final int TAB_CFD_COMPL = 6; // CFD complement
+    private static final int CFD_COMPL_VALS = 4; //number of CFD complement values
     
     private int mnFormType;
     private int mnFormResult;
@@ -150,6 +150,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private erp.lib.form.SFormField moFieldFkTaxRegionId;
     private erp.lib.form.SFormField moFieldFkItemReferenceId_n;
     private erp.lib.form.SFormField moFieldReference;
+    private erp.lib.form.SFormField moFieldOperationsType;
     private erp.lib.form.SFormField moFieldAddendaNumberPosition;
     private erp.lib.form.SFormField moFieldAddendaCenter;
     private erp.lib.form.SFormField moFieldAddendaEntryNumber;
@@ -324,10 +325,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jlFkItemReferenceId_n = new javax.swing.JLabel();
         jcbFkItemReferenceId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkItemReferenceId_n = new javax.swing.JButton();
-        jLabel10 = new javax.swing.JLabel();
         jPanel40 = new javax.swing.JPanel();
         jlReference = new javax.swing.JLabel();
         jtfReference = new javax.swing.JTextField();
+        jlOperationsType = new javax.swing.JLabel();
+        jcbOperationsType = new javax.swing.JComboBox();
         jpCostCenter = new javax.swing.JPanel();
         jlDummyCostCenter = new javax.swing.JLabel();
         jTabbedPane = new javax.swing.JTabbedPane();
@@ -346,7 +348,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel34 = new javax.swing.JPanel();
         jckIsTaxesAutomaticApplying = new javax.swing.JCheckBox();
         jpCommissions = new javax.swing.JPanel();
-        jPricesData = new javax.swing.JPanel();
+        jpPricesData = new javax.swing.JPanel();
         jPanel46 = new javax.swing.JPanel();
         jckIsDpsReqMonthDelivery = new javax.swing.JCheckBox();
         jlDpsContractBase = new javax.swing.JLabel();
@@ -492,7 +494,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jSeparator1 = new javax.swing.JSeparator();
         jtbNotesFilter = new javax.swing.JToggleButton();
         jbSystemNotes = new javax.swing.JButton();
-        jpAddendaData = new javax.swing.JPanel();
+        jpCfdAddenda = new javax.swing.JPanel();
         jPanel37 = new javax.swing.JPanel();
         jPanel42 = new javax.swing.JPanel();
         jPanel68 = new javax.swing.JPanel();
@@ -524,7 +526,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel52 = new javax.swing.JPanel();
         jlAddendaPartPriceUnitary = new javax.swing.JLabel();
         jtfAddendaPartPriceUnitary = new javax.swing.JTextField();
-        jPanel66 = new javax.swing.JPanel();
+        jpCfdComplement = new javax.swing.JPanel();
         jPanel81 = new javax.swing.JPanel();
         jPanel86 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
@@ -1057,9 +1059,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jbFkItemReferenceId_n.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel12.add(jbFkItemReferenceId_n);
 
-        jLabel10.setPreferredSize(new java.awt.Dimension(40, 23));
-        jPanel12.add(jLabel10);
-
         jPanel35.add(jPanel12);
 
         jPanel40.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -1068,8 +1067,16 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jlReference.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel40.add(jlReference);
 
-        jtfReference.setPreferredSize(new java.awt.Dimension(200, 23));
+        jtfReference.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel40.add(jtfReference);
+
+        jlOperationsType.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlOperationsType.setText("Tipo operación:");
+        jlOperationsType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel40.add(jlOperationsType);
+
+        jcbOperationsType.setPreferredSize(new java.awt.Dimension(237, 23));
+        jPanel40.add(jcbOperationsType);
 
         jPanel35.add(jPanel40);
 
@@ -1155,7 +1162,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jpCommissions.setLayout(new java.awt.BorderLayout());
         jTabbedPane.addTab("Comisiones", jpCommissions);
 
-        jPricesData.setLayout(new java.awt.BorderLayout());
+        jpPricesData.setLayout(new java.awt.BorderLayout());
 
         jPanel46.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos generales:"));
         jPanel46.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 1));
@@ -1203,7 +1210,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jckIsPriceConfirm.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         jPanel46.add(jckIsPriceConfirm);
 
-        jPricesData.add(jPanel46, java.awt.BorderLayout.NORTH);
+        jpPricesData.add(jPanel46, java.awt.BorderLayout.NORTH);
 
         jPanel51.setBorder(javax.swing.BorderFactory.createTitledBorder("Entregas mensuales:"));
         jPanel51.setLayout(new java.awt.BorderLayout());
@@ -1427,9 +1434,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         jPanel51.add(jpPrices, java.awt.BorderLayout.CENTER);
 
-        jPricesData.add(jPanel51, java.awt.BorderLayout.CENTER);
+        jpPricesData.add(jPanel51, java.awt.BorderLayout.CENTER);
 
-        jTabbedPane.addTab("Entregas mensuales", jPricesData);
+        jTabbedPane.addTab("Entregas mensuales", jpPricesData);
 
         jpMarketing.setLayout(new java.awt.BorderLayout());
 
@@ -1812,8 +1819,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         jTabbedPane.addTab("Notas", jpNotes);
 
-        jpAddendaData.setBorder(javax.swing.BorderFactory.createTitledBorder("Información para addenda:"));
-        jpAddendaData.setLayout(new java.awt.BorderLayout());
+        jpCfdAddenda.setBorder(javax.swing.BorderFactory.createTitledBorder("Información para addenda:"));
+        jpCfdAddenda.setLayout(new java.awt.BorderLayout());
 
         jPanel37.setLayout(new java.awt.BorderLayout());
 
@@ -1883,7 +1890,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         jPanel37.add(jPanel42, java.awt.BorderLayout.NORTH);
 
-        jpAddendaData.add(jPanel37, java.awt.BorderLayout.WEST);
+        jpCfdAddenda.add(jPanel37, java.awt.BorderLayout.WEST);
 
         jPanel48.setLayout(new java.awt.BorderLayout());
 
@@ -1940,12 +1947,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         jPanel48.add(jPanel49, java.awt.BorderLayout.NORTH);
 
-        jpAddendaData.add(jPanel48, java.awt.BorderLayout.CENTER);
+        jpCfdAddenda.add(jPanel48, java.awt.BorderLayout.CENTER);
 
-        jTabbedPane.addTab("Datos CFD", jpAddendaData);
+        jTabbedPane.addTab("Datos CFD", jpCfdAddenda);
 
-        jPanel66.setBorder(javax.swing.BorderFactory.createTitledBorder("Información complementaria para CFD:"));
-        jPanel66.setLayout(new java.awt.BorderLayout());
+        jpCfdComplement.setBorder(javax.swing.BorderFactory.createTitledBorder("Información alterna para Concepto CFD:"));
+        jpCfdComplement.setLayout(new java.awt.BorderLayout());
 
         jPanel81.setLayout(new java.awt.GridLayout(5, 1, 0, 2));
 
@@ -2012,9 +2019,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         jPanel81.add(jPanel85);
 
-        jPanel66.add(jPanel81, java.awt.BorderLayout.NORTH);
+        jpCfdComplement.add(jPanel81, java.awt.BorderLayout.NORTH);
 
-        jTabbedPane.addTab("Datos CFD complementarios", jPanel66);
+        jTabbedPane.addTab("Datos Concepto CFD", jpCfdComplement);
 
         jpRegistry.add(jTabbedPane, java.awt.BorderLayout.CENTER);
         jTabbedPane.getAccessibleContext().setAccessibleName("Precios");
@@ -2157,41 +2164,42 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldFkItemReferenceId_n.setPickerButton(jbFkItemReferenceId_n);
         moFieldReference = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfReference, jlReference);
         moFieldReference.setLengthMax(25);
+        moFieldOperationsType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbOperationsType, jlOperationsType);
         moFieldAddendaNumberPosition = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, true, jtfAddendaNumberPosition, jlAddendaNumberPosition);
-        moFieldAddendaNumberPosition.setTabbedPaneIndex(TAB_CFD, jTabbedPane);
+        moFieldAddendaNumberPosition.setTabbedPaneIndex(TAB_CFD_ADD, jTabbedPane);
         moFieldAddendaNumberPosition.setLengthMax(5);
         moFieldAddendaCenter = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfAddendaCenter, jlAddendaCenter);
-        moFieldAddendaCenter.setTabbedPaneIndex(TAB_CFD, jTabbedPane);
+        moFieldAddendaCenter.setTabbedPaneIndex(TAB_CFD_ADD, jTabbedPane);
         moFieldAddendaCenter.setLengthMax(15);
         moFieldAddendaEntryNumber = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, true, jtfAddendaEntryNumber, jlAddendaEntryNumber);
-        moFieldAddendaEntryNumber.setTabbedPaneIndex(TAB_CFD, jTabbedPane);
+        moFieldAddendaEntryNumber.setTabbedPaneIndex(TAB_CFD_ADD, jTabbedPane);
         moFieldAddendaEntryNumber.setLengthMax(5);
         moFieldAddendaFkBarcode = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, (JTextField) jcbAddendaFkBarcode.getEditor().getEditorComponent(), jlAddendaFkBarcode);
         moFieldAddendaFkBarcode.setLengthMax(20);
-        moFieldAddendaFkBarcode.setTabbedPaneIndex(TAB_CFD, jTabbedPane);
+        moFieldAddendaFkBarcode.setTabbedPaneIndex(TAB_CFD_ADD, jTabbedPane);
         moFieldAddendaOrder = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfAddendaOrder, jlAddendaOrder);
         moFieldAddendaOrder.setLengthMax(20);
-        moFieldAddendaOrder.setTabbedPaneIndex(TAB_CFD, jTabbedPane);
+        moFieldAddendaOrder.setTabbedPaneIndex(TAB_CFD_ADD, jTabbedPane);
         moFieldAddendaCages = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfAddendaCages, jlAddendaCages);
-        moFieldAddendaCages.setTabbedPaneIndex(TAB_CFD, jTabbedPane);
+        moFieldAddendaCages.setTabbedPaneIndex(TAB_CFD_ADD, jTabbedPane);
         moFieldAddendaCagePriceUnitary = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfAddendaCagePriceUnitary, jlAddendaCagePriceUnitary);
-        moFieldAddendaCagePriceUnitary.setTabbedPaneIndex(TAB_CFD, jTabbedPane);
+        moFieldAddendaCagePriceUnitary.setTabbedPaneIndex(TAB_CFD_ADD, jTabbedPane);
         moFieldAddendaParts = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfAddendaParts, jlAddendaParts);
-        moFieldAddendaParts.setTabbedPaneIndex(TAB_CFD, jTabbedPane);
+        moFieldAddendaParts.setTabbedPaneIndex(TAB_CFD_ADD, jTabbedPane);
         moFieldAddendaPartPriceUnitary = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfAddendaPartPriceUnitary, jlAddendaPartPriceUnitary);
-        moFieldAddendaPartPriceUnitary.setTabbedPaneIndex(TAB_CFD, jTabbedPane);
+        moFieldAddendaPartPriceUnitary.setTabbedPaneIndex(TAB_CFD_ADD, jTabbedPane);
         moFieldComplConceptKey = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfComplConceptKey, jlComplConceptKey);
         moFieldComplConceptKey.setLengthMax(10);
-        moFieldComplConceptKey.setTabbedPaneIndex(TAB_COMPL, jTabbedPane);
+        moFieldComplConceptKey.setTabbedPaneIndex(TAB_CFD_COMPL, jTabbedPane);
         moFieldComplConcept = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfComplConcept, jlComplConcept);
         moFieldComplConcept.setLengthMax(100);
-        moFieldComplConcept.setTabbedPaneIndex(TAB_COMPL, jTabbedPane);
+        moFieldComplConcept.setTabbedPaneIndex(TAB_CFD_COMPL, jTabbedPane);
         moFieldComplCfdProdServ = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfComplCfdProdServ, jlComplCfdProdServ);
         moFieldComplCfdProdServ.setLengthMax(8);
-        moFieldComplCfdProdServ.setTabbedPaneIndex(TAB_COMPL, jTabbedPane);
+        moFieldComplCfdProdServ.setTabbedPaneIndex(TAB_CFD_COMPL, jTabbedPane);
         moFieldComplCfdUnit = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfComplCfdUnit, jlComplCfdUnit);
         moFieldComplCfdUnit.setLengthMax(3);
-        moFieldComplCfdUnit.setTabbedPaneIndex(TAB_COMPL, jTabbedPane);
+        moFieldComplCfdUnit.setTabbedPaneIndex(TAB_CFD_COMPL, jTabbedPane);
 
         mvFields.add(moFieldFkItemId);
         mvFields.add(moFieldConceptKey);
@@ -2249,6 +2257,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         mvFields.add(moFieldFkTaxRegionId);
         mvFields.add(moFieldFkItemReferenceId_n);
         mvFields.add(moFieldReference);
+        mvFields.add(moFieldOperationsType);
         mvFields.add(moFieldAddendaNumberPosition);
         mvFields.add(moFieldAddendaCenter);
         mvFields.add(moFieldAddendaEntryNumber);
@@ -2509,18 +2518,18 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             }
 
             if (moParamDps.isDocumentOrAdjustmentSal() && mbEnableDataAddenda) {
-                jTabbedPane.setEnabledAt(TAB_CFD, true);
+                jTabbedPane.setEnabledAt(TAB_CFD_ADD, true);
                 renderAddendaData();
             }
             else {
-                jTabbedPane.setEnabledAt(TAB_CFD, false);
+                jTabbedPane.setEnabledAt(TAB_CFD_ADD, false);
             }
             
             if (moParamDps.isDocumentOrAdjustmentSal()) {
-                jTabbedPane.setEnabledAt(TAB_COMPL, true);
+                jTabbedPane.setEnabledAt(TAB_CFD_COMPL, true);
             }
             else {
-                jTabbedPane.setEnabledAt(TAB_COMPL, false);
+                jTabbedPane.setEnabledAt(TAB_CFD_COMPL, false);
             }
             
             if (moParamDps != null) {
@@ -2732,6 +2741,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         boolean isDiscountRetailChain = false;
         Object keyItem = null;
         Object keyTaxRegion = null;
+        Object keyOperationsType = 0;
         String item = "";
         String keyItemBp = "";
         int unitItemBp = 0;
@@ -2742,6 +2752,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             isDiscountRetailChain = moFieldIsDiscountRetailChain.getBoolean();
             keyItem = moFieldFkItemId.getKey();
             keyTaxRegion = moFieldFkTaxRegionId.getKey();
+            keyOperationsType = moFieldOperationsType.getKey();
         }
 
         // Every time a different item is selected, form fields are cleared:
@@ -2756,6 +2767,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moFieldIsDiscountRetailChain.setFieldValue(isDiscountRetailChain);
             moFieldFkItemId.setFieldValue(keyItem);
             moFieldFkTaxRegionId.setFieldValue(keyTaxRegion);
+            moFieldOperationsType.setFieldValue(keyOperationsType);
         }
 
         // Default values:
@@ -3365,8 +3377,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfReference.setEditable(false);
             jtfReference.setFocusable(false);
 
-            moPanelFkCostCenterId_n.enableFields(false);
+            jcbOperationsType.setEnabled(false);
 
+            moPanelFkCostCenterId_n.enableFields(false);
+            
             jcbFkTaxRegionId.setEnabled(false);
             jbFkTaxRegionId.setEnabled(false);
             jckIsTaxesAutomaticApplying.setEnabled(false);
@@ -3428,6 +3442,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfReference.setEditable(true);
             jtfReference.setFocusable(true);
             
+            jcbOperationsType.setEnabled(true);
+
             jcbFkTaxRegionId.setEnabled(true);
             jbFkTaxRegionId.setEnabled(true);
             jckIsTaxesAutomaticApplying.setEnabled(true);
@@ -4105,7 +4121,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgAccOptions;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
@@ -4180,7 +4195,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JPanel jPanel63;
     private javax.swing.JPanel jPanel64;
     private javax.swing.JPanel jPanel65;
-    private javax.swing.JPanel jPanel66;
     private javax.swing.JPanel jPanel67;
     private javax.swing.JPanel jPanel68;
     private javax.swing.JPanel jPanel69;
@@ -4204,7 +4218,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JPanel jPanel85;
     private javax.swing.JPanel jPanel86;
     private javax.swing.JPanel jPanel9;
-    private javax.swing.JPanel jPricesData;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JTabbedPane jTabbedPane;
@@ -4237,6 +4250,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JComboBox<SFormComponentItem> jcbFkOriginalUnitId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkTaxRegionId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkVehicleTypeId_n;
+    private javax.swing.JComboBox jcbOperationsType;
     private javax.swing.JCheckBox jckAuxPreserveQuantity;
     private javax.swing.JCheckBox jckChangePrice;
     private javax.swing.JCheckBox jckIsBulk;
@@ -4297,6 +4311,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JLabel jlIsPriceVariable;
     private javax.swing.JLabel jlLength;
     private javax.swing.JLabel jlMass;
+    private javax.swing.JLabel jlOperationsType;
     private javax.swing.JLabel jlOriginalDiscountUnitaryCy;
     private javax.swing.JLabel jlOriginalPriceUnitaryCy;
     private javax.swing.JLabel jlOriginalQuantity;
@@ -4322,7 +4337,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JLabel jlVolume;
     private javax.swing.JLabel jlWeigthDelivery;
     private javax.swing.JLabel jlWeigthGross;
-    private javax.swing.JPanel jpAddendaData;
+    private javax.swing.JPanel jpCfdAddenda;
+    private javax.swing.JPanel jpCfdComplement;
     private javax.swing.JPanel jpCommissions;
     private javax.swing.JPanel jpControls;
     private javax.swing.JPanel jpCostCenter;
@@ -4337,6 +4353,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JPanel jpNotesControls;
     private javax.swing.JPanel jpNotesControls1;
     private javax.swing.JPanel jpPrices;
+    private javax.swing.JPanel jpPricesData;
     private javax.swing.JPanel jpRegistry;
     private javax.swing.JPanel jpTaxInfo;
     private javax.swing.JPanel jpTaxes;
@@ -4774,9 +4791,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jckIsDpsReqMonthDelivery.setEnabled(false);
         jckIsDirectPrice.setSelected(true);
         
+        jradAccAdvanceBilled.setSelected(true);
+        renderAccOptions();
+        
         jTabbedPane.setSelectedIndex(TAB_TAXES);
         jTabbedPane.setEnabledAt(TAB_PRC, false);
-        jTabbedPane.setEnabledAt(TAB_CFD, false);
+        jTabbedPane.setEnabledAt(TAB_CFD_ADD, false);
         updateFormEditStatus(true);
 
         jtfAddendaNumberPosition.setEnabled(false);
@@ -4897,6 +4917,24 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             else if (moPanelFkCostCenterId_n.isEmptyAccountId()) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + moPanelFkCostCenterId_n.getFieldAccountLabel().getText() + "'.");
                 validation.setComponent(moPanelFkCostCenterId_n.getFieldAccount().getComponent());
+            }
+            else if (moItem.getIsPrepayment() && moParamDps.isDocument() && moFieldOperationsType.getKeyAsIntArray()[0] != SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlOperationsType.getText() + "', "
+                        + "debería ser: '" + SDataConstantsSys.OperationsTypesOpsMap.get(SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY) + "'.");
+                validation.setComponent(moFieldOperationsType.getComponent());
+            }
+            else if (moItem.getIsPrepayment() && moParamDps.isAdjustment() && !SLibUtils.belongsTo(moFieldOperationsType.getKeyAsIntArray()[0], new int[] { SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY, SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY })) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlOperationsType.getText() + "', "
+                        + "debería ser: '" + SDataConstantsSys.OperationsTypesAdjMap.get(SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY) + "' o '" + SDataConstantsSys.OperationsTypesAdjMap.get(SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY) + "'.");
+                validation.setComponent(moFieldOperationsType.getComponent());
+            }
+            else if (SLibUtils.belongsTo(moFieldOperationsType.getKeyAsIntArray()[0], new int[] { SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY, SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY, SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY }) && !moItem.getIsPrepayment()) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkItemId.getText() + "' debido al valor del campo '" + jlOperationsType.getText() + "'.");
+                validation.setComponent(jcbFkItemId);
+            }
+            else if (SLibUtils.belongsTo(moFieldOperationsType.getKeyAsIntArray()[0], new int[] { SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY, SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY }) && moFieldDiscountDocCy.getDouble() == 0) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDiscountDoc.getText() + "' debido al valor del campo '" + jlOperationsType.getText() + "'.");
+                validation.setComponent(jtfDiscountDocCy);
             }
             else if (jcbFkVehicleTypeId_n.getSelectedIndex() <= 0 && SDataDpsEntry.validateShipmentDataValue(moFieldPlate.getString(), (isDataShipDomesticReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkVehicleTypeId_n.getText() + "'.");
@@ -5040,7 +5078,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 }
                 
                 if (validation.getIsError()) {
-                    jTabbedPane.setSelectedIndex(TAB_CFD); // show CFD Addenda's tab
+                    jTabbedPane.setSelectedIndex(TAB_CFD_ADD); // show CFD Addenda's tab
                 }
             }
         }
@@ -5118,10 +5156,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 values++;
             }
             
-            if (values != 0 && values != COMPL_VALUES) {
+            if (values != 0 && values != CFD_COMPL_VALS) {
                 validation.setMessage("Se debe especificar un valor para todos los campos de información complementaria.");
                 validation.setComponent(jtfComplConceptKey);
-                validation.setTabbedPaneIndex(TAB_COMPL);
+                validation.setTabbedPaneIndex(TAB_CFD_COMPL);
             }
         }
         
@@ -5214,6 +5252,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldFkTaxRegionId.setFieldValue(new int[] { moDpsEntry.getFkTaxRegionId() });
         moFieldFkItemReferenceId_n.setFieldValue(new int[] { moDpsEntry.getFkItemRefId_n() });
         moFieldReference.setFieldValue(moDpsEntry.getReference());
+        moFieldOperationsType.setFieldValue(new int[] { moDpsEntry.getOperationsType() });
 
         jckIsSurplusPercentageApplying.setSelected(moDpsEntry.getSurplusPercentage() > 0);
 
@@ -5266,7 +5305,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         }
 
         if (moParamDps.isDocumentOrAdjustmentSal()) {
-            jTabbedPane.setEnabledAt(TAB_CFD, true);
+            jTabbedPane.setEnabledAt(TAB_CFD_ADD, true);
             setAddendaData();
         }
 
@@ -5315,6 +5354,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moDpsEntry.setSealSecurity(moFieldSealSecurity.getString());
         moDpsEntry.setTicket(moFieldTicket.getString());
         moDpsEntry.setVgm(moFieldVgm.getString());
+        
+        moDpsEntry.setOperationsType(moFieldOperationsType.getKeyAsIntArray()[0]);
 
         moDpsEntry.setFkItemRefId_n(moFieldFkItemReferenceId_n.getKeyAsIntArray()[0]);
         moDpsEntry.setFkCostCenterId_n(moPanelFkCostCenterId_n.isEmptyAccountId() ? "" : moPanelFkCostCenterId_n.getFieldAccount().getString());
@@ -5395,17 +5436,18 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     manItemClassFilterKey = null;
                     
                     jcbFkCashAccountId_n.removeAllItems();
+                    jcbOperationsType.removeAllItems();
                 }
                 else {
                     moParamDps = (SDataDps) value;
-
+                    
                     jtfCurrencyKeyRo.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.CFGU_CUR, new int[] { moParamDps.getFkCurrencyId() }, SLibConstants.DESCRIPTION_CODE));
                     jtfTaxIdentityEmisorRo.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINU_TAX_IDY, new int[] { moParamDps.getFkTaxIdentityEmisorTypeId() }));
                     jtfTaxIdentityReceptorRo.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINU_TAX_IDY, new int[] { moParamDps.getFkTaxIdentityReceptorTypeId() }));
                     jtfCurrencyKeyRo.setCaretPosition(0);
                     jtfTaxIdentityEmisorRo.setCaretPosition(0);
                     jtfTaxIdentityReceptorRo.setCaretPosition(0);
-
+                    
                     if (moParamDps.isDocumentPur()) {
                         manItemClassFilterKey = SDataConstantsSys.ITMS_CL_ITEM_PUR_CON;
                     }
@@ -5414,6 +5456,20 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     }
                     
                     SFormUtilities.populateComboBox(miClient, jcbFkCashAccountId_n, SDataConstants.FIN_ACC_CASH, new int[] { moParamDps.getFkCompanyBranchId() });
+                    
+                    jcbOperationsType.removeAllItems();
+                    jcbOperationsType.addItem(new SFormComponentItem(null, "(Seleccionar tipo operación)"));
+                    if (moParamDps.isDocument()) {
+                        for (Integer key : SDataConstantsSys.OperationsTypesOpsMap.keySet()) {
+                            jcbOperationsType.addItem(new SFormComponentItem(new int[] { key }, SDataConstantsSys.OperationsTypesOpsMap.get(key)));
+                        }
+                    }
+                    else {
+                        for (Integer key : SDataConstantsSys.OperationsTypesAdjMap.keySet()) {
+                            jcbOperationsType.addItem(new SFormComponentItem(new int[] { key }, SDataConstantsSys.OperationsTypesAdjMap.get(key)));
+                        }
+                    }
+                    jcbOperationsType.setSelectedIndex(1);
                 }
 
                 jtfCurrencyKeyPriceUnitaryCyRo.setText(jtfCurrencyKeyRo.getText());

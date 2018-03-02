@@ -50,12 +50,12 @@ import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.data.SFinAccountConfig;
 import erp.mfin.data.SFinAccountConfigEntry;
+import erp.mfin.data.SFinAccountType;
 import erp.mfin.data.SFinAccountUtilities;
 import erp.mfin.data.SFinAmount;
-import erp.mfin.data.SFinAmountType;
 import erp.mfin.data.SFinAmounts;
 import erp.mfin.data.SFinDpsTaxes;
-import erp.mfin.data.SFinMovement;
+import erp.mfin.data.SFinMovementType;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SDbMmsConfig;
 import erp.mod.trn.db.STrnUtils;
@@ -94,7 +94,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public static final int FIELD_CLO_COMMS = 4;
     public static final int FIELD_CLO_COMMS_USR = 5;
     public static final int FIELD_USR = 6;
-    public static final String TXT_ADV_BILL = "facturación anticipos";
+    public static final String TXT_PREPAY_INV = "facturación anticipos";
+    public static final String TXT_OPS_TYPE = "tipo de operación";
     public static final String MSG_ERR_FIN_REC_USR = "No se ha especificado la póliza contable de usuario.";
     public static final String MSG_ERR_ACC_UNK_ = "No se encontró la configuración de cuentas contables para el ";
     public static final String MSG_ERR_ACC_EMP_ = "La configuración de cuentas contables está vacía para el ";
@@ -2360,8 +2361,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         double dCreditCy = 0;
         double dGreatestAmount = 0;
         boolean isNewRecord = false;
-        boolean appliesPrepayment = false;
-        boolean appliesAdvanceBilled = false;
         int[] anAccMvtSubclassKey = null;
         int[] anSysAccTypeKeyBpr = null;
         int[] anSysMvtTypeKeyBpr = null;
@@ -2385,19 +2384,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         SDataRecordEntry oRecordEntry = null;
         SFinDpsTaxes oDpsTaxes = null;
         SDataAccountCash oAccountCash = null;
-        SFinAccountConfig oConfigBprOp = null;
-        SFinAccountConfig oConfigBprAdvBill = null;
-        SFinAccountConfig oConfigItem = null;
-        SFinAmount oAmount = null;
-        SFinAmount oAmountBprBal = null;
-        SFinAmount oAmountBprPay = null;
-        SFinAmounts oAmounts = new SFinAmounts();
-        ArrayList<SFinAmount> aAmountEntries = null;
 
         mnLastDbActionResult = SLibConsts.UNDEFINED;
 
         try {
-            updateAuthorizationStatus(connection);  // applys only for orders and documents
+            updateAuthorizationStatus(connection); // applys only for orders and documents
 
             nParam = 1;
             oCallableStatement = connection.prepareCall(
@@ -2734,13 +2725,95 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         
                         // Add values:
                         
-                        SFinAmount finAmount = null;
+                        boolean thereArePrepayments = false;            // prepayments invoiced or prepayments to apply
+                        boolean thereArePrepaymentsToInvoice = false;   // prepayments invoiced into temporal account (a.k.a., prepayments to invoice)
+                        SFinAmount oAmountBizPartnerBalance = null;
+                        SFinAmount oAmountPrepaymentsApplications = null;
+                        SFinAmounts oAmounts = new SFinAmounts();
                         
                         for (SDataDpsEntry entry : mvDbmsDpsEntries) {
                             if (entry.isAccountable()) {
-                                if (entry.getIsPrepayment()) {
-                                    appliesPrepayment = true;
+                                if (SLibUtils.belongsTo(entry.getOperationsType(),
+                                        new int[] {
+                                            SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY,
+                                            SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY
+                                        })) {
+                                    // prepayments invoiced:
+                                    
+                                    thereArePrepayments = true;
+                                    
+                                    if (entry.getKeyCashAccount_n() != null) {
+                                        // prepayment increment (in invoice) or decrement (in credit note) into cash account:
 
+                                        SFinAmount finAmount = new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), true, SFinAccountType.ACC_CASH_ACCOUNT, isDocument() ? SFinMovementType.MOVT_INCREMENT : SFinMovementType.MOVT_DECREMENT);
+                                        if (isAdjustment()) {
+                                            finAmount.KeyRefDocument = entry.getKeyAuxDps();
+                                        }
+                                        
+                                        oAmounts.addAmountForCashAccount(entry.getKeyCashAccount_n(), finAmount); // add amounts by cash account
+                                    }
+                                    else {
+                                        // prepayment increment (in invoice) or decrement (in credit note) into prepayments to invoice:
+
+                                        thereArePrepaymentsToInvoice = true;
+
+                                        SFinAmount finAmount = new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), true, SFinAccountType.ACC_PREPAY_TO_INVOICE, isDocument() ? SFinMovementType.MOVT_INCREMENT : SFinMovementType.MOVT_DECREMENT);
+                                        if (isAdjustment()) {
+                                            finAmount.KeyRefDocument = entry.getKeyAuxDps();
+                                        }
+                                        
+                                        oAmounts.addAmountForPrepaymentsToInvoice(finAmount); // add all amounts together
+                                    }
+                                }
+                                else {
+                                    // operations and application of prepayments invoiced:
+                                    
+                                    if (isDocument()) {
+                                        // increment business partner's balance:
+
+                                        if (oAmountBizPartnerBalance == null) {
+                                            oAmountBizPartnerBalance = new SFinAmount(0, 0);
+                                            oAmounts.getAmounts().add(oAmountBizPartnerBalance);
+                                        }
+
+                                        oAmountBizPartnerBalance.addAmount(entry.getTotal_r(), entry.getTotalCy_r()); // add all amounts together
+                                    }
+                                    else {
+                                        // decrement business partner document's balance:
+
+                                        oAmounts.addAmountForDocument(entry.getKeyAuxDps(), new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), false, SFinAccountType.ACC_BIZ_PARTNER_DOC, SFinMovementType.MOVT_DECREMENT));  // add amounts by document
+                                    }
+                                    
+                                    if (SLibUtils.belongsTo(entry.getOperationsType(),
+                                            new int[] {
+                                                SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY,
+                                                SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY,
+                                                SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY
+                                            })) {
+                                        // application of prepayments invoiced:
+                                        
+                                        thereArePrepayments = true;
+
+                                        // balance of prepayments invoiced affected this way only when applied as discounts:
+                                        
+                                        if (entry.getOperationsType() != SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY) {
+                                            if (oAmountPrepaymentsApplications == null) {
+                                                oAmountPrepaymentsApplications = new SFinAmount(0, 0, true, SFinAccountType.ACC_BIZ_PARTNER, isDocument() ? SFinMovementType.MOVT_DECREMENT : SFinMovementType.MOVT_INCREMENT, true); // omit when amounts checked!
+                                                if (isAdjustment()) {
+                                                    oAmountPrepaymentsApplications.KeyRefDocument = entry.getKeyAuxDps();
+                                                }
+                                                oAmounts.getAmounts().add(oAmountPrepaymentsApplications);
+                                            }
+
+                                            oAmountPrepaymentsApplications.addAmount(entry.getDiscountDoc(), entry.getDiscountDocCy());   // only one amount per business partner
+                                        }
+                                    }
+                                }
+                                
+                                /* Deprecated due to especification of CFDI 3.3. Please remove when not needed again! (2018-03-01, Sergio Flores)
+                                if (entry.getIsPrepayment()) {
+                                    thereArePrepayments = true;
+                                    
                                     if (entry.getQuantity() >= 0) {
                                         if (entry.getKeyCashAccount_n() != null) {
                                             // Increment (invoice) or decrement (credit note) cash account's balance:
@@ -2754,7 +2827,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         else {
                                             // Increment (invoice) or decrement (credit note) advance billed's balance:
 
-                                            appliesAdvanceBilled = true;
+                                            requiredAccountingForPrepaymentsBilled = true;
                                             
                                             finAmount = new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), true, SFinAmountType.ADVANCE_BILLED, isDocument() ? SFinMovement.INCREMENT : SFinMovement.DECREMENT);
                                             if (isAdjustment()) {
@@ -2766,15 +2839,15 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     else {
                                         // Increment (credit note) or decrement (invoice) business partner's balance:
 
-                                        if (oAmountBprPay == null) {
-                                            oAmountBprPay = new SFinAmount(0, 0, true, SFinAmountType.UNDEFINED, isDocument() ? SFinMovement.DECREMENT : SFinMovement.INCREMENT);
+                                        if (oAmountBizPartnerPrepayments == null) {
+                                            oAmountBizPartnerPrepayments = new SFinAmount(0, 0, true, SFinAmountType.UNDEFINED, isDocument() ? SFinMovement.DECREMENT : SFinMovement.INCREMENT);
                                             if (isAdjustment()) {
-                                                oAmountBprPay.KeyRefDocument = entry.getKeyAuxDps();
+                                                oAmountBizPartnerPrepayments.KeyRefDocument = entry.getKeyAuxDps();
                                             }
-                                            oAmounts.getAmounts().add(oAmountBprPay);
+                                            oAmounts.getAmounts().add(oAmountBizPartnerPrepayments);
                                         }
 
-                                        oAmountBprPay.addAmount(-entry.getTotal_r(), -entry.getTotalCy_r()); // only one amount per business partner
+                                        oAmountBizPartnerPrepayments.addAmount(-entry.getTotal_r(), -entry.getTotalCy_r()); // only one amount per business partner
                                     }
                                 }
                                 else {
@@ -2782,35 +2855,48 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         // document is an ordinary invoice, so
                                         // increment business partner's balance:
 
-                                        if (oAmountBprBal == null) {
-                                            oAmountBprBal = new SFinAmount(0, 0);
-                                            oAmounts.getAmounts().add(oAmountBprBal);
+                                        if (oAmountBizPartnerBalance == null) {
+                                            oAmountBizPartnerBalance = new SFinAmount(0, 0);
+                                            oAmounts.getAmounts().add(oAmountBizPartnerBalance);
                                         }
 
-                                        oAmountBprBal.addAmount(entry.getTotal_r(), entry.getTotalCy_r()); // only one amount per business partner
+                                        oAmountBizPartnerBalance.addAmount(entry.getTotal_r(), entry.getTotalCy_r()); // only one amount per business partner
                                     }
                                     else {
                                         // document is a credit note, so
                                         // decrement business partner document's balance:
 
-                                        oAmounts.addAmountForDocument(entry.getKeyAuxDps(), new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), entry.getIsPrepayment(), SFinAmountType.UNDEFINED, SFinMovement.DECREMENT)); // add grouping by referenced invoice
+                                        oAmounts.addAmountForDocument(entry.getKeyAuxDps(), new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), false, SFinAmountType.UNDEFINED, SFinMovement.DECREMENT)); // add grouping by referenced invoice
                                     }
                                 }
+                                */
                             }
                         }
                         
                         // Validate final sum of added values, adjust difference if necessary:
                         
-                        oAmounts.checkAmount(mdTotal_r);
+                        oAmounts.checkAmounts(mdTotal_r);
                         
                         // Create journal voucher entries:
                         
-                        oConfigBprOp = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
+                        ArrayList<SFinAmount> aAmountEntries;
+                        SFinAccountConfig oAccCfgOperations = null;
+                        SFinAccountConfig oAccCfgPrepayments = null;
+                        SFinAccountConfig oAccCfgPrepaymentsToInvoice = null;
+                        SFinAccountConfig oAccCfgItem = null;
+                        
+                        oAccCfgOperations = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
                                 mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
                                 mtDate, SDataConstantsSys.FINS_TP_ACC_BP_OP, isDebitForBizPartner(), oStatement));
 
-                        if (appliesAdvanceBilled) {
-                            oConfigBprAdvBill = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
+                        if (thereArePrepayments) { // prevent from reading configuration when not needed!
+                            oAccCfgPrepayments = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
+                                    mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
+                                    mtDate, SDataConstantsSys.FINS_TP_ACC_BP_PAY, isDebitForBizPartner(), oStatement));
+                        }
+                        
+                        if (thereArePrepaymentsToInvoice) { // prevent from reading configuration when not needed!
+                            oAccCfgPrepaymentsToInvoice = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
                                     mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
                                     mtDate, SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL, isDebitForBizPartner(), oStatement));
                         }
@@ -2820,9 +2906,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         anSysMvtTypeKeyBprXXX = getSysMvtTypeKeyBizPartnerXXX();
                         
                         for (SFinAmount amount : oAmounts.getAmounts()) {
-                            if (amount.IsPrepayment && (isDocument() && amount.Movement == SFinMovement.INCREMENT || !isDocument() && amount.Movement == SFinMovement.DECREMENT)) {
-                                switch (amount.AmountType) {
-                                    case CASH_ACCOUNT: // user requested prepayment accounting into a cash account
+                            if (amount.IsPrepaymentInvoiced && (isDocument() && amount.MovementType == SFinMovementType.MOVT_INCREMENT || isAdjustment()&& amount.MovementType == SFinMovementType.MOVT_DECREMENT)) {
+                                switch (amount.AccountType) {
+                                    case ACC_CASH_ACCOUNT:
+                                        // user requested accounting of prepayments into a cash account:
+                                        
                                         oAccountCash = new SDataAccountCash();
                                         oAccountCash.read(amount.KeyRefCashAccount, oStatement);
 
@@ -2851,13 +2939,15 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         oRecord.getDbmsRecordEntries().add(oRecordEntry);
                                         break;
                                         
-                                    case ADVANCE_BILLED: // user requested prepayment accounting into business partner pending advance payments
-                                        aAmountEntries = oConfigBprAdvBill.prorateAmount(amount);
+                                    case ACC_PREPAY_TO_INVOICE:
+                                        // user requested accounting of prepayments into prepayments to invoice:
                                         
-                                        for (i = 0; i < oConfigBprAdvBill.getAccountConfigEntries().size(); i++) {
+                                        aAmountEntries = oAccCfgPrepaymentsToInvoice.prorateAmount(amount);
+                                        
+                                        for (i = 0; i < oAccCfgPrepaymentsToInvoice.getAccountConfigEntries().size(); i++) {
                                             oRecordEntry = createAccRecordEntry(
-                                                    oConfigBprAdvBill.getAccountConfigEntries().get(i).getAccountId(),
-                                                    oConfigBprAdvBill.getAccountConfigEntries().get(i).getCostCenterId(),
+                                                    oAccCfgPrepaymentsToInvoice.getAccountConfigEntries().get(i).getAccountId(),
+                                                    oAccCfgPrepaymentsToInvoice.getAccountConfigEntries().get(i).getCostCenterId(),
                                                     anAccMvtSubclassKey, SModSysConsts.FINS_TP_SYS_ACC_NA_NA, anSysMvtTypeKeyBpr, SDataConstantsSys.FINS_TP_SYS_MOV_NA,
                                                     isAdjustment() ? amount.KeyRefDocument : null, null);
                                             
@@ -2882,45 +2972,44 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         break;
                                         
                                     default:
-                                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(" + TXT_ADV_BILL + ")");
+                                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(" + TXT_PREPAY_INV + ")");
                                 }
                             }
                             else {
-                                aAmountEntries = oConfigBprOp.prorateAmount(amount);
+                                SFinAccountConfig accountConfig;
+                                
+                                if (amount.IsPrepaymentInvoiced) {
+                                    accountConfig = oAccCfgPrepayments;
+                                }
+                                else {
+                                    accountConfig = oAccCfgOperations;
+                                }
+                                
+                                aAmountEntries = accountConfig.prorateAmount(amount);
 
-                                for (i = 0; i < oConfigBprOp.getAccountConfigEntries().size(); i++) {
+                                for (i = 0; i < accountConfig.getAccountConfigEntries().size(); i++) {
                                     oRecordEntry = createAccRecordEntry(
-                                            oConfigBprOp.getAccountConfigEntries().get(i).getAccountId(),
-                                            oConfigBprOp.getAccountConfigEntries().get(i).getCostCenterId(),
+                                            accountConfig.getAccountConfigEntries().get(i).getAccountId(),
+                                            accountConfig.getAccountConfigEntries().get(i).getCostCenterId(),
                                             anAccMvtSubclassKey, anSysAccTypeKeyBpr, anSysMvtTypeKeyBpr, anSysMvtTypeKeyBprXXX,
                                             isAdjustment() ? amount.KeyRefDocument : null, null);
-                                    if (amount.IsPrepayment) { // decrementing prepayment entry:
-                                        if (isDebitForBizPartner()) {
-                                            oRecordEntry.setDebit(0);
-                                            oRecordEntry.setCredit(aAmountEntries.get(i).Amount);
-                                            oRecordEntry.setDebitCy(0);
-                                            oRecordEntry.setCreditCy(aAmountEntries.get(i).AmountCy);
-                                        }
-                                        else {
-                                            oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
-                                            oRecordEntry.setCredit(0);
-                                            oRecordEntry.setDebitCy(aAmountEntries.get(i).AmountCy);
-                                            oRecordEntry.setCreditCy(0);
-                                        }
+                                    
+                                    if (amount.IsPrepaymentInvoiced) {
+                                        oRecordEntry.setFkDpsYearId_n(SLibConsts.UNDEFINED);
+                                        oRecordEntry.setFkDpsDocId_n(SLibConsts.UNDEFINED);
                                     }
-                                    else { // ordinary entry:
-                                        if (isDebitForBizPartner()) {
-                                            oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
-                                            oRecordEntry.setCredit(0);
-                                            oRecordEntry.setDebitCy(aAmountEntries.get(i).AmountCy);
-                                            oRecordEntry.setCreditCy(0);
-                                        }
-                                        else {
-                                            oRecordEntry.setDebit(0);
-                                            oRecordEntry.setCredit(aAmountEntries.get(i).Amount);
-                                            oRecordEntry.setDebitCy(0);
-                                            oRecordEntry.setCreditCy(aAmountEntries.get(i).AmountCy);
-                                        }
+
+                                    if (isDebitForBizPartner()) {
+                                        oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
+                                        oRecordEntry.setCredit(0);
+                                        oRecordEntry.setDebitCy(aAmountEntries.get(i).AmountCy);
+                                        oRecordEntry.setCreditCy(0);
+                                    }
+                                    else {
+                                        oRecordEntry.setDebit(0);
+                                        oRecordEntry.setCredit(aAmountEntries.get(i).Amount);
+                                        oRecordEntry.setDebitCy(0);
+                                        oRecordEntry.setCreditCy(aAmountEntries.get(i).AmountCy);
                                     }
 
                                     oRecordEntry.setConcept(sConcept);
@@ -2933,14 +3022,120 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                         // 4.4 Purchases or sales:
 
-                        if (appliesPrepayment) { // prevent from reading prepayment configuration when not needed!
-                            oConfigBprOp = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
-                                    mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
-                                    mtDate, SDataConstantsSys.FINS_TP_ACC_BP_PAY, isDebitForBizPartner(), oStatement));
-                        }
-
                         for (SDataDpsEntry entry : mvDbmsDpsEntries) {
                             if (entry.isAccountable()) {
+                                switch (entry.getOperationsType()) {
+                                    case SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS:               // operations
+                                    case SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY:    // operations - application of advance invoiced as discount
+                                    case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS:               // adjustment of operations
+                                    case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY:    // adjustment of operations - application of advance invoiced as discount
+                                        
+                                        oAccCfgItem = new SFinAccountConfig(SFinAccountUtilities.obtainItemAccountConfigs(
+                                                entry.getFkItemRefId_n() != SLibConsts.UNDEFINED ? entry.getFkItemRefId_n() : entry.getFkItemId(), oRecord.getPkBookkeepingCenterId(), 
+                                                mtDate, getAccItemTypeId(entry), isDebitForOperations(), oStatement));
+
+                                        sConceptEntryAux = sConceptAux;
+                                        anSysAccTypeKeyItem = SModSysConsts.FINS_TP_SYS_ACC_NA_NA;
+                                        anSysMvtTypeKeyItem = getSysMvtTypeKeyItem(entry.getFkDpsAdjustmentTypeId());
+                                        anSysMvtTypeKeyItemXXX = getSysMvtTypeKeyItemXXX();
+
+                                        if (SLibUtils.belongsTo(entry.getOperationsType(),
+                                                new int[] {
+                                                    SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY,
+                                                    SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY
+                                                })) {
+                                            aAmountEntries = oAccCfgItem.prorateAmount(new SFinAmount(entry.getSubtotalProvisional_r(), entry.getSubtotalProvisionalCy_r()));
+                                        }
+                                        else {
+                                            aAmountEntries = oAccCfgItem.prorateAmount(new SFinAmount(entry.getSubtotal_r(), entry.getSubtotalCy_r()));
+                                        }
+
+                                        for (i = 0; i < oAccCfgItem.getAccountConfigEntries().size(); i++) {
+                                            oRecordEntry = createAccRecordEntry(
+                                                    oAccCfgItem.getAccountConfigEntries().get(i).getAccountId(),
+                                                    !entry.getFkCostCenterId_n().isEmpty() ? entry.getFkCostCenterId_n() : oAccCfgItem.getAccountConfigEntries().get(i).getCostCenterId(),
+                                                    anAccMvtSubclassKey, anSysAccTypeKeyItem, anSysMvtTypeKeyItem, anSysMvtTypeKeyItemXXX,
+                                                    isAdjustment() ? entry.getKeyAuxDps() : null, null);
+
+                                            if (isDebitForOperations()) {
+                                                oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
+                                                oRecordEntry.setCredit(0);
+                                                oRecordEntry.setDebitCy(aAmountEntries.get(i).AmountCy);
+                                                oRecordEntry.setCreditCy(0);
+                                            }
+                                            else {
+                                                oRecordEntry.setDebit(0);
+                                                oRecordEntry.setCredit(aAmountEntries.get(i).Amount);
+                                                oRecordEntry.setDebitCy(0);
+                                                oRecordEntry.setCreditCy(aAmountEntries.get(i).AmountCy);
+                                            }
+
+                                            sConceptEntryAux += (entry.getConcept().length() <= 0 ? "" : "; " + entry.getConcept());
+                                            if (sConceptEntryAux.length() > 100) {
+                                                sConceptEntryAux = sConceptEntryAux.substring(0, 100 - 3).trim() + "...";
+                                            }
+
+                                            oRecordEntry.setConcept(sConceptEntryAux);
+                                            oRecordEntry.setSortingPosition(++nSortingPosition);
+
+                                            if (entry.getFkItemRefId_n() == SLibConsts.UNDEFINED) {
+                                                oRecordEntry.setUnits(entry.getOriginalQuantity());
+                                                oRecordEntry.setFkItemId_n(entry.getFkItemId());
+                                                oRecordEntry.setFkUnitId_n(entry.getFkOriginalUnitId());
+                                                oRecordEntry.setFkItemAuxId_n(SLibConsts.UNDEFINED);
+                                            }
+                                            else {
+                                                oRecordEntry.setUnits(0);
+                                                oRecordEntry.setFkItemId_n(entry.getFkItemRefId_n());
+                                                oRecordEntry.setFkUnitId_n(SModSysConsts.ITMU_UNIT_NA);
+                                                oRecordEntry.setFkItemAuxId_n(entry.getFkItemId());
+                                            }
+
+                                            oRecord.getDbmsRecordEntries().add(oRecordEntry);
+                                        }
+                                        break;
+                                        
+                                    case SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY:        // prepayments invoiced
+                                    case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY:        // adjustment of prepayments invoiced
+                                    case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY:    // application of prepayments invoiced
+                                        
+                                        aAmountEntries = oAccCfgPrepayments.prorateAmount(new SFinAmount(entry.getSubtotal_r(), entry.getSubtotalCy_r()));
+
+                                        for (i = 0; i < oAccCfgPrepayments.getAccountConfigEntries().size(); i++) {
+                                            oRecordEntry = createAccRecordEntry(
+                                                    oAccCfgPrepayments.getAccountConfigEntries().get(i).getAccountId(),
+                                                    oAccCfgPrepayments.getAccountConfigEntries().get(i).getCostCenterId(),
+                                                    anAccMvtSubclassKey, anSysAccTypeKeyBpr, anSysMvtTypeKeyBpr, anSysMvtTypeKeyBprXXX,
+                                                    isAdjustment() ? entry.getKeyAuxDps() : null, null);
+
+                                            oRecordEntry.setFkDpsYearId_n(SLibConsts.UNDEFINED);
+                                            oRecordEntry.setFkDpsDocId_n(SLibConsts.UNDEFINED);
+
+                                            if (isDebitForOperations()) {
+                                                oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
+                                                oRecordEntry.setCredit(0);
+                                                oRecordEntry.setDebitCy(aAmountEntries.get(i).AmountCy);
+                                                oRecordEntry.setCreditCy(0);
+                                            }
+                                            else {
+                                                oRecordEntry.setDebit(0);
+                                                oRecordEntry.setCredit(aAmountEntries.get(i).Amount);
+                                                oRecordEntry.setDebitCy(0);
+                                                oRecordEntry.setCreditCy(aAmountEntries.get(i).AmountCy);
+                                            }
+
+                                            oRecordEntry.setConcept(sConcept);
+                                            oRecordEntry.setSortingPosition(++nSortingPosition);
+
+                                            oRecord.getDbmsRecordEntries().add(oRecordEntry);
+                                        }
+                                        break;
+                                        
+                                    default:
+                                        throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION + "\n(" + TXT_OPS_TYPE + ")");
+                                }
+                                
+                                /* Deprecated due to especification of CFDI 3.3. Please remove when not needed again! (2018-03-01, Sergio Flores)
                                 if (entry.getIsPrepayment()) {
                                     // Document entry for prepayment:
                                     
@@ -3056,16 +3251,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         oRecord.getDbmsRecordEntries().add(oRecordEntry);
                                     }
                                 }
+                                */
                                 
                                 for (SDataDpsEntryTax tax : entry.getDbmsEntryTaxes()) {
-                                    if (entry.getQuantity() >= 0) {
-                                        oAmount = new SFinAmount(tax.getTax(), tax.getTaxCy(), entry.getIsPrepayment(), SFinAmountType.UNDEFINED, SFinMovement.INCREMENT);
-                                    }
-                                    else {
-                                        oAmount = new SFinAmount(-tax.getTax(), -tax.getTaxCy(), entry.getIsPrepayment(), SFinAmountType.UNDEFINED, SFinMovement.DECREMENT);
-                                    }
-                                    
-                                    oDpsTaxes.addTax(isDocument() ? (int[]) getPrimaryKey() : entry.getKeyAuxDps(), tax.getKeyTax(), oAmount);
+                                    oDpsTaxes.addTax(isDocument() ? (int[]) getPrimaryKey() : entry.getKeyAuxDps(), tax.getKeyTax(), new SFinAmount(tax.getTax(), tax.getTaxCy(), entry.getIsPrepayment() && entry.getOperationsType() != SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY, SFinAccountType.ACC_BIZ_PARTNER, SFinMovementType.MOVT_INCREMENT));
                                 }
                             }
                         }
@@ -3073,7 +3262,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         // 4.5 Purchases or sales taxes:
                         
                         for (SFinDpsTaxes.STax tax : oDpsTaxes.getTaxes()) {
-                            if (tax.getMovement() == SFinMovement.DECREMENT) {
+                            if (tax.getMovementType() == SFinMovementType.MOVT_DECREMENT) {
                                 nTaxAccTypeId = SDataConstantsSys.FINX_ACC_PAY_PEND; // decrement occurs when prepayment applied into invoice
                             }
                             else {
@@ -3090,7 +3279,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             }
                             else {
                                 nTaxTypeId = oResultSet.getInt("fid_tp_tax");
-                                nTaxAppTypeId = tax.isPrepayment() && tax.getMovement() == SFinMovement.INCREMENT ? SModSysConsts.FINS_TP_TAX_APP_ACCR : oResultSet.getInt("fid_tp_tax_app");
+                                nTaxAppTypeId = tax.isPrepayment() && tax.getMovementType() == SFinMovementType.MOVT_INCREMENT ? SModSysConsts.FINS_TP_TAX_APP_ACCR : oResultSet.getInt("fid_tp_tax_app");
                             }
 
                             anSysAccTypeKeyTax = SModSysConsts.FINS_TP_SYS_ACC_NA_NA;
@@ -3101,7 +3290,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     sAccountId, "", anAccMvtSubclassKey, anSysAccTypeKeyTax, anSysMvtTypeKeyTax, anSysMvtTypeKeyTaxXXX,
                                     isAdjustment() ? tax.getKeyDps() : null, null);
 
-                            if (tax.getMovement() == SFinMovement.INCREMENT) {
+                            if (tax.getMovementType() == SFinMovementType.MOVT_INCREMENT) {
                                 if (isDebitForTaxes(tax.getFkTaxTypeId())) {
                                     oRecordEntry.setDebit(tax.getValue());
                                     oRecordEntry.setCredit(0);
@@ -3146,14 +3335,15 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         dCreditCy = 0;
                         nPositionToAdjust = 0;
                         dGreatestAmount = 0;
+                        
                         for (i = 0; i < oRecord.getDbmsRecordEntries().size(); i++) {
-
                             oRecordEntry = oRecord.getDbmsRecordEntries().get(i);
+                            
                             if (!oRecordEntry.getIsDeleted()) {
-                                dDebit += oRecordEntry.getDebit();
-                                dCredit += oRecordEntry.getCredit();
-                                dDebitCy += oRecordEntry.getDebitCy();
-                                dCreditCy += oRecordEntry.getCreditCy();
+                                dDebit = SLibUtils.round(dDebit + oRecordEntry.getDebit(), nDecimals);
+                                dCredit = SLibUtils.round(dCredit + oRecordEntry.getCredit(), nDecimals);
+                                dDebitCy = SLibUtils.round(dDebitCy + oRecordEntry.getDebitCy(), nDecimals);
+                                dCreditCy = SLibUtils.round(dCreditCy + oRecordEntry.getCreditCy(), nDecimals);
 
                                 if (SLibUtils.compareKeys(new int[] { mnFkDpsCategoryId, mnFkDpsClassId }, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC) ||
                                     SLibUtils.compareKeys(new int[] { mnFkDpsCategoryId, mnFkDpsClassId }, SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ)) {
@@ -3173,6 +3363,14 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 }
                             }
                         }
+                        
+                        if (Math.abs(dDebit - dCredit) >= 0.5) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE
+                                    + "\nLa contabilización del documento tiene una diferencia considerable entre cargos y abonos:"
+                                    + "\nCargos: " + SLibUtils.getDecimalFormatAmount().format(dDebit)
+                                    + "\nAbonos: " + SLibUtils.getDecimalFormatAmount().format(dCredit)
+                                    + "\nDiferencia: " + SLibUtils.getDecimalFormatAmount().format(dDebit - dCredit));
+                        }
 
                         if (dDebit != dCredit) {
                             oRecordEntry = oRecord.getDbmsRecordEntries().get(nPositionToAdjust);
@@ -3180,20 +3378,20 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 SLibUtils.compareKeys(new int[] { mnFkDpsCategoryId, mnFkDpsClassId }, SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ)) {
 
                                 if (dDebit > dCredit) {
-                                    oRecordEntry.setDebit(SLibUtilities.round(oRecordEntry.getDebit() - (dDebit - dCredit), nDecimals));
+                                    oRecordEntry.setDebit(SLibUtils.round(oRecordEntry.getDebit() - (dDebit - dCredit), nDecimals));
                                 }
                                 else  {
-                                    oRecordEntry.setDebit(SLibUtilities.round(oRecordEntry.getDebit() + (dCredit - dDebit), nDecimals));
+                                    oRecordEntry.setDebit(SLibUtils.round(oRecordEntry.getDebit() + (dCredit - dDebit), nDecimals));
                                 }
                             }
                             else if (SLibUtils.compareKeys(new int[] { mnFkDpsCategoryId, mnFkDpsClassId }, SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ) ||
                                 SLibUtils.compareKeys(new int[] { mnFkDpsCategoryId, mnFkDpsClassId }, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC)) {
 
                                 if (dDebit < dCredit) {
-                                    oRecordEntry.setCredit(SLibUtilities.round(oRecordEntry.getCredit() - (dCredit - dDebit), nDecimals));
+                                    oRecordEntry.setCredit(SLibUtils.round(oRecordEntry.getCredit() - (dCredit - dDebit), nDecimals));
                                 }
                                 else  {
-                                    oRecordEntry.setCredit(SLibUtilities.round(oRecordEntry.getCredit() + (dDebit - dCredit), nDecimals));
+                                    oRecordEntry.setCredit(SLibUtils.round(oRecordEntry.getCredit() + (dDebit - dCredit), nDecimals));
                                 }
                             }
 

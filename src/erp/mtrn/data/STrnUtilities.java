@@ -535,6 +535,10 @@ public abstract class STrnUtilities {
                     iog.setFkWarehouseId(curWarehouseKey[1]);
                     iog.setFkMfgYearId_n(prodOrderKey[0]);
                     iog.setFkMfgOrderId_n(prodOrderKey[1]);
+                    iog.setFkMaintMovementTypeId(SModSysConsts.TRNS_TP_MAINT_MOV_NA);
+                    iog.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
+                    iog.setFkMaintUserId_n(SLibConsts.UNDEFINED);
+                    iog.setFkMaintUserSupervisorId(SModSysConsts.TRN_MAINT_USER_SUPV_NA);
                     iog.setFkUserShippedId(SUtilConsts.USR_NA_ID);
                     iog.setFkUserAuditedId(SUtilConsts.USR_NA_ID);
                     iog.setFkUserAuthorizedId(SUtilConsts.USR_NA_ID);
@@ -3127,6 +3131,10 @@ public abstract class STrnUtilities {
         iog.setFkDiogAdjustmentTypeId(SModSysConsts.TRNU_TP_IOG_ADJ_NA);
         iog.setFkCompanyBranchId(companyBranch);
         iog.setFkWarehouseId(warehouse);
+        iog.setFkMaintMovementTypeId(SModSysConsts.TRNS_TP_MAINT_MOV_NA);
+        iog.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
+        iog.setFkMaintUserId_n(SLibConsts.UNDEFINED);
+        iog.setFkMaintUserSupervisorId(SModSysConsts.TRN_MAINT_USER_SUPV_NA);
         iog.setFkUserShippedId(SUtilConsts.USR_NA_ID);
         iog.setFkUserAuditedId(SUtilConsts.USR_NA_ID);
         iog.setFkUserAuthorizedId(SUtilConsts.USR_NA_ID);

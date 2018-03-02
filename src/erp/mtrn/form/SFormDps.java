@@ -5,6 +5,7 @@
 package erp.mtrn.form;
 
 import cfd.DCfdUtils;
+import cfd.ver3.DCfdVer3Consts;
 import cfd.ver33.DCfdi33Catalogs;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdXmlCatalogs;
@@ -109,6 +110,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private static final int TAB_NTS = 2;   // notes
     private static final int TAB_CFD_XML = 3;   // CFD & XML file
     private static final int TAB_CFD_INT = 4;   // CFD International Commerce
+    private static final int LEN_SERIES = 15;   // maximum length of number series
 
     private int mnFormType;
     private int mnFormResult;
@@ -191,6 +193,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.lib.form.SFormField moFieldCfdiTaxRegime;
     private erp.lib.form.SFormField moFieldCfdiCfdiUsage;
     private erp.lib.form.SFormField moFieldCfdiConfirmation;
+    private erp.lib.form.SFormField moFieldCfdiRelationType;
+    private erp.lib.form.SFormField moFieldCfdiCfdiRelated;
     private erp.lib.form.SFormField moFieldCfdCceApplies;
     private erp.lib.form.SFormField moFieldCfdCceMoveReason;
     private erp.lib.form.SFormField moFieldCfdCceOperationType;
@@ -239,7 +243,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private int mnSalesAgentBizPartnerId_n;
     private int mnSalesSupervisorId_n;
     private int mnSalesSupervisorBizPartnerId_n;
-    private int mnPrepaymentsItemId;
     private int mnDeliveryType;
     private int mnCfdXmlType;   // current XML type for CFD type invoice
     private double mdPrepayments;
@@ -626,6 +629,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel116 = new javax.swing.JPanel();
         jlCfdiCfdiRelated = new javax.swing.JLabel();
         jtfCfdiCfdiRelated = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
         jpInternationalTrade = new javax.swing.JPanel();
         jPanel109 = new javax.swing.JPanel();
         jPanel97 = new javax.swing.JPanel();
@@ -1472,7 +1476,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpEntriesControlsWest.add(jsEntry02);
 
         jbEntryDiscountRetailChain.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_disc_add.gif"))); // NOI18N
-        jbEntryDiscountRetailChain.setToolTipText("Crear partida descuento cadena comercial [Ctrl + R]");
+        jbEntryDiscountRetailChain.setToolTipText("Crear partida descuento independiente [Ctrl + R]");
         jbEntryDiscountRetailChain.setPreferredSize(new java.awt.Dimension(23, 23));
         jpEntriesControlsWest.add(jbEntryDiscountRetailChain);
 
@@ -2142,7 +2146,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel73.setBorder(javax.swing.BorderFactory.createTitledBorder("XML:"));
         jPanel73.setLayout(new java.awt.BorderLayout());
 
-        jPanel74.setLayout(new java.awt.GridLayout(8, 2, 0, 2));
+        jPanel74.setLayout(new java.awt.GridLayout(9, 2, 0, 2));
 
         jPanel75.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel75.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -2235,6 +2239,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel116.add(jtfCfdiCfdiRelated);
 
         jPanel74.add(jPanel116);
+
+        jLabel1.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
+        jLabel1.setForeground(java.awt.Color.gray);
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("(Si se requiere capturar más de un UUID, separarlos con coma.)");
+        jPanel74.add(jLabel1);
 
         jPanel73.add(jPanel74, java.awt.BorderLayout.NORTH);
 
@@ -2617,6 +2627,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldCfdiConfirmation.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
         moFieldCfdiConfirmation.setLengthMin(5);
         moFieldCfdiConfirmation.setLengthMax(5);
+        moFieldCfdiRelationType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdiRelationType, jlCfdiCfdiUsage);
+        moFieldCfdiRelationType.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
+        moFieldCfdiCfdiRelated = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCfdiCfdiRelated, jlCfdiCfdiRelated);
+        moFieldCfdiCfdiRelated.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
         
         // international commerce fields:
         
@@ -2710,6 +2724,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mvFields.add(moFieldCfdiTaxRegime);
         mvFields.add(moFieldCfdiCfdiUsage);
         mvFields.add(moFieldCfdiConfirmation);
+        mvFields.add(moFieldCfdiRelationType);
+        mvFields.add(moFieldCfdiCfdiRelated);
         
         mvFields.add(moFieldCfdCceMoveReason);
         mvFields.add(moFieldCfdCceOperationType);
@@ -3111,6 +3127,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbCfdiCfdiUsage.setEnabled(enableFields && isCfdiVer33);
         jtfCfdiConfirmation.setEnabled(enableFields && isCfdiVer33);
         jtfCfdiConfirmation.setFocusable(enableFields && isCfdiVer33);
+        jcbCfdiRelationType.setEnabled(enableFields && isCfdiVer33);
+        jtfCfdiCfdiRelated.setEnabled(enableFields && isCfdiVer33);
+        jtfCfdiCfdiRelated.setFocusable(enableFields && isCfdiVer33);
     }
 
     /**
@@ -3543,12 +3562,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 if (moDps.getDbmsDataDpsCfd().getPaymentWay().isEmpty()) {
                     moFieldCfdiPaymentWay.setFieldValue(moBizPartnerCategory.getCfdiPaymentWay());
                 }
+                
                 if (moDps.getDbmsDataDpsCfd().getPaymentMethod().isEmpty()) {
                     moFieldCfdiPaymentMethod.setFieldValue(moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CASH ? SDataConstantsSys.TRNS_CFD_CAT_PAY_MET_PUE : SDataConstantsSys.TRNS_CFD_CAT_PAY_MET_PPD);
                 }
+                
                 if (moDps.getDbmsDataDpsCfd().getTaxRegime().isEmpty()) {
                     moFieldCfdiTaxRegime.setFieldValue(miClient.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal());
                 }
+                
                 if (moDps.getDbmsDataDpsCfd().getCfdiUsage().isEmpty()) {
                     if (mbIsAdj) {
                         moFieldCfdiCfdiUsage.setFieldValue(SDataConstantsSys.TRNS_CFD_CAT_CFD_USE_G02);
@@ -3565,7 +3587,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         }
                     }
                 }
+                
                 moFieldCfdiConfirmation.setFieldValue("");  // confirmation is unique, cannot be copied when document is being created
+                
+                if (moDps.isAdjustment() && moDps.getDbmsDataDpsCfd().getCfdiRelacionadosTipoRelacion().isEmpty()) {
+                    moFieldCfdiRelationType.setFieldValue(SDataConstantsSys.TRNS_CFD_CAT_TP_REL_CDT);
+                }
             }
         }
     }
@@ -4102,29 +4129,21 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     }
 
     private void renderBizPartnerPrepaymentsBalance() {
-        mnPrepaymentsItemId = SLibConsts.UNDEFINED;
         mdPrepayments = 0;
         mdPrepaymentsCy = 0;
         
         if (moBizPartner != null) {
-            if (moDps.getFkDpsCategoryId() == SModSysConsts.TRNS_CT_DPS_PUR) {
-                mnPrepaymentsItemId = miClient.getSessionXXX().getParamsCompany().getFkItemPrepaymentPurId_n();
-            }
-            else {
-                mnPrepaymentsItemId = miClient.getSessionXXX().getParamsCompany().getFkItemPrepaymentSalId_n();
-            }
-            
             try {
-                mdPrepayments = STrnUtils.getPrepaymentsBalance(
-                        miClient.getSession(), moBizPartner.getPkBizPartnerId(), (int[]) moDps.getPrimaryKey(), 
+                mdPrepayments = STrnUtils.getPrepaymentsBalance(miClient.getSession(), 
+                        manDpsClassKey[0], moBizPartner.getPkBizPartnerId(), (int[]) moDps.getPrimaryKey(), 
                         SLibConsts.UNDEFINED);
                 
                 if (jcbFkCurrencyId.getSelectedIndex() <= 0) {
                     mdPrepaymentsCy = mdPrepayments;
                 }
                 else {
-                    mdPrepaymentsCy = STrnUtils.getPrepaymentsBalance(
-                            miClient.getSession(), moBizPartner.getPkBizPartnerId(), (int[]) moDps.getPrimaryKey(), 
+                    mdPrepaymentsCy = STrnUtils.getPrepaymentsBalance(miClient.getSession(), 
+                            manDpsClassKey[0], moBizPartner.getPkBizPartnerId(), (int[]) moDps.getPrimaryKey(), 
                             moFieldFkCurrencyId.getKeyAsIntArray()[0]);
                 }
             }
@@ -4135,7 +4154,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         
         jtfPrepaymentsCy.setText(SLibUtils.getDecimalFormatAmount().format(mdPrepaymentsCy));
         jtfPrepaymentsCyCurRo.setText(jtfCurrencyKeyRo.getText());
-        jlPrepaymentsWarning.setVisible(mdPrepayments > 0);
+        jlPrepaymentsWarning.setVisible(mdPrepayments != 0);
     }
     
     private void renderSalesAgentBizPartner(int[] pk) {
@@ -4262,7 +4281,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jckRecordUser.setEnabled(mbIsDoc || mbIsAdj);
 
         jbEntryNew.setEnabled(!mbIsAdj);
-        jbEntryDiscountRetailChain.setEnabled(mbIsSales && mbIsAdj);
+        jbEntryDiscountRetailChain.setEnabled(mbIsAdj);
         jbEntryImportFromDps.setEnabled(mbIsOrd || mbIsDoc || mbIsAdj);
         jbEntryWizard.setEnabled(!mbIsAdj);
 
@@ -4889,8 +4908,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         oDpsEntryComplementary.setMass(0);
         oDpsEntryComplementary.setWeightGross(0);
         oDpsEntryComplementary.setWeightDelivery(0);
-
         oDpsEntryComplementary.setSurplusPercentage(0);
+        oDpsEntryComplementary.setOperationsType(SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS);
+        oDpsEntryComplementary.setUserId(SLibConstants.UNDEFINED);
         oDpsEntryComplementary.setSortingPosition(0);
         oDpsEntryComplementary.setIsTaxesAutomaticApplying(true);
         oDpsEntryComplementary.setIsInventoriable(false);
@@ -6150,13 +6170,30 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                                 entry.setMass(dpsSourceEntry.getOriginalQuantity() == 0 ? 0 : dpsSourceEntry.getMass() * entryAdjustment.getQuantityToReturn() / dpsSourceEntry.getOriginalQuantity());
                                                 entry.setWeightGross(dpsSourceEntry.getOriginalQuantity() == 0 ? 0 : dpsSourceEntry.getWeightGross() * entryAdjustment.getQuantityToReturn() / dpsSourceEntry.getOriginalQuantity());
                                                 entry.setWeightDelivery(dpsSourceEntry.getOriginalQuantity() == 0 ? 0 : dpsSourceEntry.getWeightDelivery() * entryAdjustment.getQuantityToReturn() / dpsSourceEntry.getOriginalQuantity());
-
                                                 entry.setSurplusPercentage(0);
+                                                
+                                                //entry.setContractBase(...);         // contracts have not credit notes!
+                                                //entry.setContractFuture(...);       // contracts have not credit notes!
+                                                //entry.setContractFactor(...);       // contracts have not credit notes!
+                                                //entry.setContractPriceYear(...);    // contracts have not credit notes!
+                                                //entry.setContractPriceMonth(...);   // contracts have not credit notes!
+                                                entry.setSealQuality(dpsSourceEntry.getSealQuality());
+                                                entry.setSealSecurity(dpsSourceEntry.getSealSecurity());
+                                                entry.setDriver(dpsSourceEntry.getDriver());
+                                                entry.setPlate(dpsSourceEntry.getPlate());
+                                                entry.setTicket(dpsSourceEntry.getTicket());
+                                                entry.setContainerTank(dpsSourceEntry.getContainerTank());
+                                                entry.setVgm("");   // user must update manually verified gross mass if needed!
+
+                                                entry.setOperationsType(STrnUtils.mirrowOperationsType(dpsSourceEntry.getOperationsType()));
+                                                entry.setUserId(SLibConstants.UNDEFINED);
                                                 entry.setSortingPosition(0);
+                                                
                                                 entry.setIsPrepayment(dpsSourceEntry.getIsPrepayment());
+                                                //entry.setIsDiscountRetailChain(...);  // for discounts only, special case set by GUI
                                                 entry.setIsTaxesAutomaticApplying(true);
-                                                //entry.setIsPriceVariable(...);
-                                                //entry.setIsPriceConfirm(...);
+                                                //entry.setIsPriceVariable(...);    // contracts have not credit notes!
+                                                //entry.setIsPriceConfirm(...);     // contracts have not credit notes!
                                                 entry.setIsInventoriable(dpsSourceEntry.getIsInventoriable());
                                                 entry.setIsDeleted(false);
                                                 entry.setFkItemId(dpsSourceEntry.getFkItemId());
@@ -6274,10 +6311,30 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                                 entry.setMass(0);
                                                 entry.setWeightGross(0);
                                                 entry.setWeightDelivery(0);
-
                                                 entry.setSurplusPercentage(0);
+                                                
+                                                //entry.setContractBase(...);         // contracts have not credit notes!
+                                                //entry.setContractFuture(...);       // contracts have not credit notes!
+                                                //entry.setContractFactor(...);       // contracts have not credit notes!
+                                                //entry.setContractPriceYear(...);    // contracts have not credit notes!
+                                                //entry.setContractPriceMonth(...);   // contracts have not credit notes!
+                                                entry.setSealQuality(dpsSourceEntry.getSealQuality());
+                                                entry.setSealSecurity(dpsSourceEntry.getSealSecurity());
+                                                entry.setDriver(dpsSourceEntry.getDriver());
+                                                entry.setPlate(dpsSourceEntry.getPlate());
+                                                entry.setTicket(dpsSourceEntry.getTicket());
+                                                entry.setContainerTank(dpsSourceEntry.getContainerTank());
+                                                entry.setVgm("");   // user must update manually verified gross mass if needed!
+
+                                                entry.setOperationsType(STrnUtils.mirrowOperationsType(dpsSourceEntry.getOperationsType()));
+                                                entry.setUserId(SLibConstants.UNDEFINED);
                                                 entry.setSortingPosition(0);
+                                                
+                                                entry.setIsPrepayment(dpsSourceEntry.getIsPrepayment());
+                                                //entry.setIsDiscountRetailChain(...);  // for discounts only, special case set by GUI
                                                 entry.setIsTaxesAutomaticApplying(true);
+                                                //entry.setIsPriceVariable(...);    // contracts have not credit notes!
+                                                //entry.setIsPriceConfirm(...);     // contracts have not credit notes!
                                                 entry.setIsInventoriable(false);
                                                 entry.setIsDeleted(false);
                                                 entry.setFkItemId(dpsSourceEntry.getFkItemId());
@@ -7192,6 +7249,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel100;
@@ -7744,7 +7802,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         itemChangeFkCarrierTypeId();
         itemChangeFkVehicleTypeId_n();
 
-        jTabbedPane.setSelectedIndex(0);
+        jTabbedPane.setSelectedIndex(TAB_ETY);
         
         updateDpsFieldsStatus(true);
         jbEdit.setEnabled(false);
@@ -7827,6 +7885,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         catalogs.populateComboBox(jcbCfdiPaymentMethod, SDataConstantsSys.TRNS_CFD_CAT_PAY_MET, miClient.getSession().getSystemDate());
         catalogs.populateComboBox(jcbCfdiTaxRegime, SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, miClient.getSession().getSystemDate());
         catalogs.populateComboBox(jcbCfdiCfdiUsage, SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, miClient.getSession().getSystemDate());
+        catalogs.populateComboBox(jcbCfdiRelationType, SDataConstantsSys.TRNS_CFD_CAT_REL_TP, miClient.getSession().getSystemDate());
         catalogs.populateComboBox(jcbCfdCceMoveReason, SDataConstantsSys.TRNS_CFD_CAT_INT_MOV_REA, miClient.getSession().getSystemDate());
         catalogs.populateComboBox(jcbCfdCceOperationType, SDataConstantsSys.TRNS_CFD_CAT_INT_OPN_TP, miClient.getSession().getSystemDate());
         catalogs.populateComboBox(jcbCfdCceRequestKey, SDataConstantsSys.TRNS_CFD_CAT_INT_REQ_KEY, miClient.getSession().getSystemDate());
@@ -7841,8 +7900,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
     @Override
     public erp.lib.form.SFormValidation formValidate() {
-        int[] key = null;
-        double prepaymentsCy = 0;
         String msg = "";
         SFormValidation validation = new SFormValidation();
 
@@ -7861,7 +7918,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         if (!validation.getIsError()) {
             msg = validateDateLinks();
 
-            if (msg.length() > 0) {
+            if (!msg.isEmpty()) {
                 validation.setMessage(msg);
                 validation.setComponent(jftDate);
             }
@@ -7882,8 +7939,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_YEAR);
                 validation.setComponent(jftDate);
             }
-            else if (jcbNumberSeries.isEditable() && moFieldNumberSeries.getString().length() > 15) {
-                validation.setMessage("La longitud máxima para el campo 'Serie' es 15.");
+            else if (jcbNumberSeries.isEditable() && moFieldNumberSeries.getString().length() > LEN_SERIES) {
+                validation.setMessage("La longitud máxima para el campo 'Serie' es " + LEN_SERIES + ".");
                 validation.setComponent(jcbNumberSeries);
             }
             else if (isCfdEmissionRequired() && jcbCfdiPaymentWay.getSelectedIndex() <= 0) {
@@ -7895,12 +7952,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 validation.setComponent(jcbCfdiPaymentMethod);
             }
             else if (moDps.getTotal_r() < 0) {
-                validation.setMessage("El valor del documento no puede ser negativo.");
+                validation.setMessage("El total del documento no puede ser negativo.");
                 validation.setComponent(moPaneGridEntries);
-                jTabbedPane.setSelectedIndex(0);
+                jTabbedPane.setSelectedIndex(TAB_ETY);
             }
             else {
+                // validate document number generated by system:
                 try {
+                    int[] key = null;
+                    
                     if (mbIsSales || mbIsEst || mbIsOrd) {
                         key = SDataUtilities.obtainDpsKey(miClient, moFieldNumberSeries.getString(), moFieldNumber.getString(), moDpsType.getPrimaryKey());
                     }
@@ -7908,468 +7968,505 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         key = SDataUtilities.obtainDpsKeyForBizPartner(miClient, moFieldNumberSeries.getString(), moFieldNumber.getString(), moDpsType.getPrimaryKey(), moBizPartner.getPrimaryKey());
                     }
 
-                    if ((moDps.getIsRegistryNew() && key != null) || (!moDps.getIsRegistryNew()) && key != null && !SLibUtilities.compareKeys(key, moDps.getPrimaryKey())) {
-                        validation.setMessage("Ya existe otro documento '" + moDpsType.getDpsType() + "' " +
-                                "con el folio '" + moFieldNumberSeries.getString() + (moFieldNumberSeries.getString().length() == 0 ? "" : "-") + moFieldNumber.getString() + "'.");
+                    if (key != null && (moDps.getIsRegistryNew() || (!SLibUtilities.compareKeys(key, moDps.getPrimaryKey())))) {
+                        validation.setMessage("Ya existe otro documento '" + moDpsType.getDpsType() + "' con el folio '" + moFieldNumberSeries.getString() + (moFieldNumberSeries.getString().length() == 0 ? "" : "-") + moFieldNumber.getString() + "'.");
                         validation.setComponent(jcbNumberSeries.isEnabled() ? jcbNumberSeries : jtfNumber);
                     }
-                }
-                catch (Exception e) {
-                    validation.setMessage("" + e);
-                }
+                    else if (moFieldNumberSeries.getDataType() == SLibConstants.DATA_TYPE_KEY) {
+                        // validate document numbers according to curren number series:
+                        int num = SLibUtilities.parseInt(moFieldNumber.getString());
+                        int numMin = ((int[]) ((SFormComponentItem) jcbNumberSeries.getSelectedItem()).getComplement())[0];
+                        int numMax = ((int[]) ((SFormComponentItem) jcbNumberSeries.getSelectedItem()).getComplement())[1];
 
-                if (!validation.getIsError()) {
-                    if (jckRecordUser.isSelected() && moRecordUserKey == null) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jckRecordUser.getText() + "'.");
-                        validation.setComponent(jbRecordManualSelect);
-                    }
-                    else if (jckShipments.isSelected() && moFieldShipments.getInteger() < 0) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jckShipments.getText() + "'.");
-                        validation.setComponent(jtfShipments);
-                    }
-                    else if (mbIsSales && (mbIsDoc || mbIsAdj) && moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CASH && moFieldCfdiPaymentWay.getKey().toString().compareTo(SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY_99) == 0) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiPaymentWay.getText() + "'.");
-                        validation.setComponent(jcbCfdiPaymentWay);
-                    }
-                    else if (mbIsSales && (mbIsDoc || mbIsAdj) && moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CREDIT && moFieldCfdiPaymentWay.getKey().toString().compareTo(SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY_99) != 0) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiPaymentWay.getText() + "' (" + SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY_99 + ").");
-                        validation.setComponent(jcbCfdiPaymentWay);
-                    }
-                    else if (mbIsSales && (mbIsDoc || mbIsAdj) && moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CASH && moFieldCfdiPaymentMethod.getKey().toString().compareTo(SDataConstantsSys.TRNS_CFD_CAT_PAY_MET_PUE) != 0) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiPaymentMethod.getText() + "' (" + SDataConstantsSys.TRNS_CFD_CAT_PAY_MET_PUE + ").");
-                        validation.setComponent(jcbCfdiPaymentMethod);
-                    }
-                    else if (mbIsSales && (mbIsDoc || mbIsAdj) && moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CREDIT && moFieldCfdiPaymentMethod.getKey().toString().compareTo(SDataConstantsSys.TRNS_CFD_CAT_PAY_MET_PUE) == 0) {
-                        if (miClient.showMsgBoxConfirm(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + jlCfdiPaymentMethod.getText() + "' \"" + moFieldCfdiPaymentMethod.getFieldValue() + "\", en ventas a crédito, no está permitido según las disposiciones fiscales.\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
-                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiPaymentMethod.getText() + "'.");
-                            validation.setComponent(jcbCfdiPaymentMethod);
+                        if (num < numMin) {
+                            validation.setMessage("El valor para el campo '" + jlNumber.getText() + "' no puede ser menor a " + numMin + "'.");
+                            validation.setComponent(jtfNumber);
                         }
-                    }
-                    else if (moBizPartnerCategory.getDateStart().after(moFieldDate.getDate())) {
-                        validation.setMessage("La fecha inicial de operaciones del asociado de negocios (" + SLibUtils.DateFormatDate.format(moBizPartnerCategory.getDateStart()) + ") " +
-                                "no puede ser posterior a la fecha del campo '" + jlDate.getText() + "'.");
-                        validation.setComponent(jftDate);
-                    }
-                    else if (moBizPartnerCategory.getDateEnd_n() != null && moBizPartnerCategory.getDateEnd_n().before(moFieldDate.getDate())) {
-                        validation.setMessage("La fecha final de operaciones del asociado de negocios (" + SLibUtils.DateFormatDate.format(moBizPartnerCategory.getDateStart()) + ") " +
-                                "no puede ser anterior a la fecha del campo '" + jlDate.getText() + "'.");
-                        validation.setComponent(jftDate);
-                    }
-                    else if (moFieldDateDocDelivery_n.getDate() != null && moFieldDateDocDelivery_n.getDate().before(moFieldDate.getDate())) {
-                        validation.setMessage("La fecha del campo '" + jlDateDocDelivery_n.getText() + "' no puede ser anterior a la del campo '" + jlDate.getText() + "'.");
-                        validation.setComponent(jftDateDocDelivery_n);
-                    }
-                    else if (moFieldDateDocLapsing_n.getDate() != null && moFieldDateDocLapsing_n.getDate().before(moFieldDate.getDate())) {
-                        validation.setMessage("La fecha del campo '" + jlDateDocLapsing_n.getText() + "' no puede ser anterior a la del campo '" + jlDate.getText() + "'.");
-                        validation.setComponent(jftDateDocLapsing_n);
-                    }
-                    else if (moFieldDateDocDelivery_n.getDate() != null && moFieldDateDocLapsing_n.getDate() != null && moFieldDateDocLapsing_n.getDate().before(moFieldDateDocDelivery_n.getDate())) {
-                        validation.setMessage("La fecha del campo '" + jlDateDocLapsing_n.getText() + "' no puede ser anterior a la del campo '" + jlDateDocDelivery_n.getText() + "'.");
-                        validation.setComponent(jftDateDocLapsing_n);
-                    }
-                    else if (mbIsCon && moFieldDateDocDelivery_n.getDate() == null) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDateDocDelivery_n.getText() + "'.");
-                        validation.setComponent(jftDateDocDelivery_n);
-                    }
-                    else if (mbIsCon && moFieldDateDocLapsing_n.getDate() == null) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDateDocLapsing_n.getText() + "'.");
-                        validation.setComponent(jftDateDocLapsing_n);
-                    }
-                    else if (moFieldDateShipment_n.getDate() != null && moFieldDateShipment_n.getDate().before(moFieldDate.getDate())) {
-                        validation.setMessage("La fecha del campo '" + jlDateShipment_n.getText() + "' no puede ser anterior a la del campo '" + jlDate.getText() + "'.");
-                        validation.setComponent(jftDateShipment_nRo);
-                    }
-                    else if (moFieldDateDelivery_n.getDate() != null && moFieldDateDelivery_n.getDate().before(moFieldDate.getDate())) {
-                        validation.setMessage("La fecha del campo '" + jlDateDelivery_n.getText() + "' no puede ser anterior a la del campo '" + jlDate.getText() + "'.");
-                        validation.setComponent(jftDateDelivery_nRo);
-                    }
-                    else if (isCfdEmissionRequired() && moPaneGridEntries.getTableGuiRowCount() == 0) {
-                        validation.setMessage("El documento debe tener al menos una partida.");
-                    }
-                    else {
-                        if (moFieldNumberSeries.getDataType() == SLibConstants.DATA_TYPE_KEY) {
-                            int num = SLibUtilities.parseInt(moFieldNumber.getString());
-                            int numMin = ((int[]) ((SFormComponentItem) jcbNumberSeries.getSelectedItem()).getComplement())[0];
-                            int numMax = ((int[]) ((SFormComponentItem) jcbNumberSeries.getSelectedItem()).getComplement())[1];
-
-                            if (num < numMin) {
-                                validation.setMessage("El valor para el campo '" + jlNumber.getText() + "' no puede ser menor a " + numMin + "'.");
-                                validation.setComponent(jtfNumber);
-                            }
-                            else if (numMax != -1 && num > numMax) {
-                                validation.setMessage("El valor para el campo '" + jlNumber.getText() + "' no puede ser mayor a " + numMax + "'.");
-                                validation.setComponent(jtfNumber);
-                            }
-                        }
-
-                        if (!validation.getIsError()) {
-                            if (!isBizPartnerCreditOk(moBizPartnerCategory.getEffectiveRiskTypeId(), false)) {
-                                validation.setIsError(true);
-                                validation.setComponent(jftDate);
-                            }
-
-                            if (!validation.getIsError()) {
-                                if (mbIsDoc || mbIsAdj) {
-                                    // Check manual accounting record:
-
-                                    if (jckRecordUser.isSelected()) {
-                                        if (moRecordUser == null) {
-                                            validation.setMessage("No fue posible leer el registro '" + jckRecordUser.getText() + "'.");
-                                            validation.setComponent(jbRecordManualSelect);
-                                        }
-                                        else if (moRecordUserLock == null) {
-                                            validation.setMessage("No fue posible obtener el acceso exclusivo al registro '" + jckRecordUser.getText() + "'.");
-                                            validation.setComponent(jbRecordManualSelect);
-                                        }
-                                        else if (!SLibTimeUtilities.isBelongingToPeriod(moFieldDate.getDate(), moRecordUser.getPkYearId(), moRecordUser.getPkPeriodId())) {
-                                            if (miClient.showMsgBoxConfirm(SLibConstants.MSG_ERR_GUI_PER_DATE_REC + "\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
-                                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlDate.getText() + "'.");
-                                                validation.setComponent(jftDate);
-                                            }
-                                            else if (!SDataUtilities.isPeriodOpen(miClient, moRecordUser.getDate())) {
-                                                validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
-                                                validation.setComponent(jckRecordUser);
-                                            }
-                                        }
-                                        
-                                        if (!validation.getIsError()) {
-                                            try {
-                                                SSrvUtils.verifyLockStatus(miClient.getSession(), moRecordUserLock);
-                                            }
-                                            catch (Exception e) {
-                                                validation.setMessage("No fue posible validar el acceso exclusivo al registro '" + jckRecordUser.getText() + "'.\n" + e);
-                                                validation.setComponent(jbRecordManualSelect);
-                                            }
-                                        }
-                                    }
-
-                                    if (!validation.getIsError()) {
-                                        if (isCfdEmissionRequired()) {
-                                            if (miClient.getSessionXXX().getParamsCompany().getDbmsDataCertificate_n() == null) {
-                                                validation.setMessage("No se ha configurado un certificado de sello digital (CSD).");
-                                            }
-                                            else if (miClient.getSessionXXX().getParamsCompany().getDbmsDataCertificate_n().getDate().compareTo(moFieldDate.getDate()) > 0) {
-                                                validation.setMessage("La vigencia del certificado de sello digital (CSD) actual es inválida para la fecha del documento " +
-                                                        "(" + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + "):\n" +
-                                                        "La vigencia del certificado comienza el " + SLibUtils.DateFormatDate.format(miClient.getSessionXXX().getParamsCompany().getDbmsDataCertificate_n().getDate()) + ".");
-                                            }
-                                            else if (miClient.getSessionXXX().getParamsCompany().getDbmsDataCertificate_n().getExpirationDate().compareTo(moFieldDate.getDate()) < 0) {
-                                                validation.setMessage("La vigencia del certificado de sello digital (CSD) actual es inválida para la fecha del documento " +
-                                                        "(" + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + "):\n" +
-                                                        "El certificado expiró el " + SLibUtils.DateFormatDate.format(miClient.getSessionXXX().getParamsCompany().getDbmsDataCertificate_n().getExpirationDate()) + ".");
-                                            }
-                                        }
-                                    }
-
-                                    if (!validation.getIsError()) {
-                                        // Check if DPS can be saved:
-
-                                        SDataDps dps = (SDataDps) getRegistry();
-                                        SServerRequest request = new SServerRequest(SServerConstants.REQ_DB_CAN_SAVE);
-                                        SServerResponse response = null;
-
-                                        request.setPacket(dps);
-                                        response = miClient.getSessionXXX().request(request);
-
-                                        if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK || response.getResultType() != SLibConstants.DB_CAN_SAVE_YES) {
-                                            validation.setMessage(response.getMessage().isEmpty() ? SLibConstants.MSG_ERR_UTIL_UNKNOWN_ERR : response.getMessage());
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (!validation.getIsError()) {
-                if (isCfdEmissionRequired() && moBizPartnerCategory.getFkCfdAddendaTypeId() != SDataConstantsSys.BPSS_TP_CFD_ADD_NA) {
-                    switch (moBizPartnerCategory.getFkCfdAddendaTypeId()) {
-                        case SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA:
-                            /* XXX Code for future versions
-                             if (moFieldBulkQty.getString().length() == 0) {
-                                validation.setMessage("No se ha especificado la cantidad de " + " '" + jcbBulkType.getSelectedItem() + "'.");
-                                jtfBulkQty.requestFocus();
-                            }
-                            */
-                            if (moFieldDateRemission.getDate() == null) {
-                                validation.setMessage(SLibConstants.MSG_ERR_GUI_DATE);
-                                jTabbedPane.setSelectedIndex(3);
-                                validation.setComponent(jftRemissionDate);
-                            }
-                            if (!mbIsAdj && moFieldDateDocDelivery_n.getDate() == null) {
-                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDateDocDelivery_n.getText() + "'.");
-                                jTabbedPane.setSelectedIndex(3);
-                                validation.setComponent(jftDateDocDelivery_n);
-                            }
-                            break;
-                        case SDataConstantsSys.BPSS_TP_CFD_ADD_LOREAL:
-                            if (moFieldNumberReference.getString().length() == 0) {
-                                validation.setMessage("No se ha especificado una " + " '" + jtfNumberReference.getToolTipText() + "'.");
-                                jtfNumberReference.requestFocus();
-                            }
-                             else {
-                                for (SDataDpsEntry entry : moDps.getDbmsDpsEntries()) {
-                                    if (entry.getDbmsDpsAddLorealEntryNumber() == 0 && !entry.getIsDeleted()) {
-                                        validation.setMessage("No se han especificado datos requeridos para la addenda en una o varias partidas.");
-                                        jTabbedPane.setSelectedIndex(0);
-                                    }
-                                }
-                            }
-                            break;
-                        case SDataConstantsSys.BPSS_TP_CFD_ADD_BACHOCO:
-                            if (moFieldNumberReference.getString().length() == 0) {
-                                validation.setMessage("No se ha especificado una " + " '" + jtfNumberReference.getToolTipText() + "'.");
-                                jtfNumberReference.requestFocus();
-                            }
-                            else {
-                                for (SDataDpsEntry entry : moDps.getDbmsDpsEntries()) {
-                                    if (entry.getDbmsDpsAddBachocoCenter().length() == 0 && !entry.getIsDeleted()) {
-                                        validation.setMessage("No se han especificado datos requeridos para la addenda en una o varias partidas.");
-                                        jTabbedPane.setSelectedIndex(0);
-                                    }
-                                }
-                            }
-                            break;
-                        case SDataConstantsSys.BPSS_TP_CFD_ADD_MODELO:
-                            if (moFieldNumberReference.getString().length() == 0) {
-                                validation.setMessage("No se ha especificado una " + " '" + jtfNumberReference.getToolTipText() + "'.");
-                                jtfNumberReference.requestFocus();
-                            }
-                            break;
-                        default:
-                    }
-
-                    if (moBizPartner.getDbmsCategorySettingsCus().getCompanyKey().length() == 0) {
-                        validation.setMessage("No se han especificado la clave de la empresa\n" +
-                                "como proveedor del cliente " + moBizPartner.getBizPartner() + "\n" +
-                                "en el catálogo de clientes, categoría: 'Cliente', campo: 'Clave de la empresa (asignada por el AN):'.");
-                    }
-                }
-            }
-
-            if (!validation.getIsError()) {
-                if (isCfdIntCommerceRequired()) {
-                    if (moFieldCfdiCfdiUsage.getFieldValue().toString().compareTo(SDataConstantsSys.TRNS_CFD_CAT_CFD_USE_P01) != 0) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiCfdiUsage.getText() + "': <" + SDataConstantsSys.TRNS_CFD_CAT_CFD_USE_P01 + ">.");
-                        jTabbedPane.setSelectedIndex(TAB_CFD_XML);
-                        validation.setComponent(jcbCfdiCfdiUsage);
-                    }
-                    else if (moFieldCfdCceCertificateOrigin.getInteger() == 1 && moFieldCfdCceNumberCertificateOrigin.getString().isEmpty()) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCfdCceNumberCertificateOrigin.getText() + "'.");
-                        jTabbedPane.setSelectedIndex(TAB_CFD_INT);
-                        validation.setComponent(jtfCfdCceNumberCertificateOrigin);
-                         
-                    }
-                    else if (moFieldCfdCceCertificateOrigin.getInteger() == 0 && !moFieldCfdCceNumberCertificateOrigin.getString().isEmpty()) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_NOT_REQ + "'" + jlCfdCceNumberCertificateOrigin.getText() + "'.");
-                        jTabbedPane.setSelectedIndex(TAB_CFD_INT);
-                        validation.setComponent(jtfCfdCceNumberCertificateOrigin);
-                    }
-                    else if ((jcbFkAddresseeBizPartner.getSelectedIndex() > 0 || jcbFkAddresseeBizPartnerBranch.getSelectedIndex() > 0 || jcbFkAddresseeBizPartnerBranchAddress.getSelectedIndex() > 0) && 
-                            (jcbFkAddresseeBizPartner.getSelectedIndex() <= 0 || jcbFkAddresseeBizPartnerBranch.getSelectedIndex() <= 0 || jcbFkAddresseeBizPartnerBranchAddress.getSelectedIndex() <= 0)) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkAddresseeBizPartner.getText() + "', '" + jlFkAddresseeBizPartnerBranch.getText() + "', '" + jlFkAddresseeBizPartnerBranchAddress.getText() + "'.");
-                        jTabbedPane.setSelectedIndex(TAB_CFD_INT);
-                        validation.setComponent(jcbFkAddresseeBizPartner);
-                    }
-                    else if (jcbFkAddresseeBizPartner.getSelectedIndex() > 0 && moFieldCfdCceAddresseeBizPartner.getKeyAsIntArray()[0] == moBizPartner.getPkBizPartnerId()) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkAddresseeBizPartner.getText() + "'.");
-                        jTabbedPane.setSelectedIndex(TAB_CFD_INT);
-                        validation.setComponent(jcbFkAddresseeBizPartner);
-                    }
-                }
-            }
-            
-            if (!validation.getIsError()) {
-                if (moFieldFkIncotermId.getKeyAsIntArray()[0] == SModSysConsts.LOGS_INC_NA) {
-                    if (isCfdIntCommerceRequired()) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkIncotermId.getText() + "'.");
-                        validation.setComponent(jcbFkIncotermId);
-                        jTabbedPane.setSelectedIndex(1);
-                    }
-                }
-                else {
-                    if (jcbFkSpotSrcId_n.getSelectedIndex() <= 0) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkSpotSrcId_n.getText() + "'.");
-                        validation.setComponent(jcbFkSpotSrcId_n);
-                        jTabbedPane.setSelectedIndex(1);
-                    }
-                    else if (jcbFkSpotDesId_n.getSelectedIndex() <= 0) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkSpotDesId_n.getText() + "'.");
-                        validation.setComponent(jcbFkSpotDesId_n);
-                        jTabbedPane.setSelectedIndex(1);
-                    }
-                    else {
-                        switch (moFieldFkIncotermId.getKeyAsIntArray()[0]) {
-                            case SModSysConsts.LOGS_INC_EXW:
-                            case SModSysConsts.LOGS_INC_FCA:
-                            case SModSysConsts.LOGS_INC_CPT:
-                            case SModSysConsts.LOGS_INC_CIP:
-                            case SModSysConsts.LOGS_INC_DAT:
-                            case SModSysConsts.LOGS_INC_DAP:
-                            case SModSysConsts.LOGS_INC_DAF:
-                            case SModSysConsts.LOGS_INC_DDU:
-                            case SModSysConsts.LOGS_INC_DDP:
-                                if (moFieldFkModeOfTransportationTypeId.getKeyAsIntArray()[0] == SModSysConsts.LOGS_TP_MOT_NA) {
-                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkModeOfTransportationTypeId.getText() + "'.");
-                                    validation.setComponent(jcbFkModeOfTransportationTypeId);
-                                    jTabbedPane.setSelectedIndex(1);
-                                }
-                                break;
-                            case SModSysConsts.LOGS_INC_FAS:
-                            case SModSysConsts.LOGS_INC_FOB:
-                            case SModSysConsts.LOGS_INC_DES:
-                            case SModSysConsts.LOGS_INC_DEQ:
-                            case SModSysConsts.LOGS_INC_CFR:
-                            case SModSysConsts.LOGS_INC_CIF:
-                                if (moFieldFkModeOfTransportationTypeId.getKeyAsIntArray()[0] != SModSysConsts.LOGS_TP_MOT_SEA) {
-                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkModeOfTransportationTypeId.getText() + "'.");
-                                    validation.setComponent(jcbFkModeOfTransportationTypeId);
-                                    jTabbedPane.setSelectedIndex(1);
-                                }
-                                break;
-                            default:
-                        }
-                    }
-                }
-            }
-            
-            if (!validation.getIsError()) {
-                if (mnSalesSupervisorId_n != 0 && mnSalesAgentId_n == 0) {
-                    validation.setMessage("Se debe ingresar un valor para el campo '" + jlSalesAgent.getText() + "'.");
-                    validation.setComponent(jbSalesAgent);
-                    jTabbedPane.setSelectedIndex(1);
-                }
-                else if (mnSalesSupervisorId_n != 0 && mnSalesSupervisorId_n == mnSalesAgentId_n) {
-                    validation.setMessage("Se debe ingresar un valor diferente para el campo '" + jlSalesAgent.getText() + "'.");
-                    validation.setComponent(jbSalesAgent);
-                    jTabbedPane.setSelectedIndex(1);
-                }
-            }
-            
-            if (!validation.getIsError()) {
-                // Check if document items need to be added to document from source document:
-                
-                for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
-                    SDataDpsEntry entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
-                    
-                    try {
-                        if (!mbHasRightOmitSourceDoc) { //condition for check items
-                            STrnUtils.checkItemStandaloneDoc(miClient.getSession(), moDps.getDpsTypeKey(), entry.getFkItemId(), entry.hasDpsLinksAsDestiny());
-                        }
-                    }
-                    catch (Exception e) {
-                        SLibUtilities.printOutException(this, e);
-                        validation.setMessage(e.getMessage());
-                        validation.setComponent(moPaneGridEntries);
-                        jTabbedPane.setSelectedIndex(0);
-                    }
-                }
-            }
-            
-            if (!validation.getIsError() && mbIsSales && (mbIsOrd || mbIsDoc)) {
-                String shipmentMessageMissingData = validateRequiredShipmentData();
-                
-                if (!shipmentMessageMissingData.isEmpty()) {
-                        validation.setMessage(shipmentMessageMissingData);
-                        validation.setComponent(moPaneGridEntries);
-                        jTabbedPane.setSelectedIndex(0);
-                }
-                else{
-                    String shipmentMessage = validateProvisionalShipmentData();
-                
-                    if (!shipmentMessage.isEmpty() && miClient.showMsgBoxConfirm(shipmentMessage) != JOptionPane.YES_OPTION) {
-                        validation.setMessage("Revise la información de las partidas.");
-                        validation.setComponent(moPaneGridEntries);
-                        jTabbedPane.setSelectedIndex(0);
-                    }
-                }
-            }
-            
-            if (!validation.getIsError()) {
-                // Validate prepayments:
-                
-                if (mdPrepaymentsCy > 0) {
-                    for (STableRow row : moPaneGridEntries.getGridRows()) {
-                        if (((SDataDpsEntry) row.getData()).getFkItemId() == mnPrepaymentsItemId) {
-                            prepaymentsCy += ((SDataDpsEntry) row.getData()).getSubtotalCy_r();
-                        }
-                    }
-                    
-                    if (mbIsSales && mbIsDoc) {
-                        if (prepaymentsCy == 0) {
-                            if (miClient.showMsgBoxConfirm("'" + moBizPartner.getBizPartner() + "' tiene anticipos,\n"
-                                    + "¿está seguro que no desea aplicarlos en este documento?") != JOptionPane.YES_OPTION) {
-                                validation.setMessage("Se debe aplicar anticipos en este documento.");
-                                validation.setComponent(moPaneGridEntries);
-                                jTabbedPane.setSelectedIndex(0);
-                            }
-                        }
-                        else if (mdPrepaymentsCy + prepaymentsCy < 0) {
-                            validation.setMessage("La aplicación total de anticipos $ " + SLibUtils.getDecimalFormatAmount().format(-prepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + " "
-                                    + "no puede ser mayor al saldo actual de anticipos $ " + SLibUtils.getDecimalFormatAmount().format(mdPrepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + ".");
-                            validation.setComponent(moPaneGridEntries);
-                            jTabbedPane.setSelectedIndex(0);
-                        }
-                    }
-                }
-            }
-            
-            if (!validation.getIsError() && mbIsCon) {
-                //validate contract's calendar of monthly deliveries:
-                
-                try {
-                    int deliveryMonths;
-                    int periodMonths = SGuiUtilities.getPeriodMonths(moFieldDateDocDelivery_n.getDate(), moFieldDateDocLapsing_n.getDate());
-                    
-                    for (int row = 0; row < moPaneGridEntries.getTableGuiRowCount(); row++) {
-                        deliveryMonths = 0;
-                        
-                        //validate number of monthly deliveries on each document row, it must match the number of months of the delivery period of this document:
-                        
-                        for (SDataDpsEntryPrice price : ((SDataDpsEntry) moPaneGridEntries.getTableRow(row).getData()).getDbmsEntryPrices()) {
-                             if (!price.getIsDeleted()) {
-                                 deliveryMonths++;
-                             }
-                        }
-
-                        if (deliveryMonths != periodMonths) {
-                            validation.setMessage("El número de entregas mensuales capturadas en la partida número '" + (row + 1) + "' no coinciden con periodo de entrega del documento, en total deben ser " + periodMonths + ".");
-                            validation.setComponent(moPaneGridEntries);
-                            jTabbedPane.setSelectedIndex(0);
-                            break;
-                        }
-
-                        //validate that all monthly delivery really belongs to delivery period of this document:
-                        
-                        for (SDataDpsEntryPrice price : ((SDataDpsEntry) moPaneGridEntries.getTableRow(row).getData()).getDbmsEntryPrices()) {
-                            if (!price.getIsDeleted()) {
-                                if (!SLibTimeUtilities.isBelongingToPeriod(SLibTimeUtilities.createDate(price.getContractPriceYear(), price.getContractPriceMonth()), SLibTimeUtilities.getBeginOfMonth(moFieldDateDocDelivery_n.getDate()), SLibTimeUtilities.getEndOfMonth(moFieldDateDocLapsing_n.getDate()))) {
-                                    validation.setMessage("La entrega mensual '" + miClient.getSessionXXX().getFormatters().getDateYearMonthFormat().format(SLibTimeUtilities.createDate(price.getContractPriceYear(), price.getContractPriceMonth())) + "' de la partida '" + (row + 1) + "' no se encuentra dentro del periodo de entrega del documento.");
-                                    validation.setComponent(moPaneGridEntries);
-                                    jTabbedPane.setSelectedIndex(0);
-                                    break;
-                                }
-                            }
+                        else if (numMax != -1 && num > numMax) {
+                            validation.setMessage("El valor para el campo '" + jlNumber.getText() + "' no puede ser mayor a " + numMax + "'.");
+                            validation.setComponent(jtfNumber);
                         }
                     }
                 }
                 catch (Exception e) {
                     SLibUtilities.printOutException(this, e);
                     validation.setMessage(e.toString());
-                    validation.setComponent(moPaneGridEntries);
-                    jTabbedPane.setSelectedIndex(0);
                 }
             }
             
+            // validate other all purpose fields:
             if (!validation.getIsError()) {
-                 if (jckIsDeleted.isSelected()) {
-                     if (miClient.showMsgBoxConfirm("El documento está eliminado. Puede guardarlo de nuevo como eliminado o reactivarlo.\n¿Desea reactivar el documento?") == JOptionPane.YES_OPTION) {
-                         jckIsDeleted.setSelected(false);
-                     }
-                 }
+                if (jckRecordUser.isSelected() && moRecordUserKey == null) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jckRecordUser.getText() + "'.");
+                    validation.setComponent(jbRecordManualSelect);
+                }
+                else if (jckShipments.isSelected() && moFieldShipments.getInteger() < 0) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jckShipments.getText() + "'.");
+                    validation.setComponent(jtfShipments);
+                }
+                else if (mbIsSales && (mbIsDoc || mbIsAdj) && moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CASH && moFieldCfdiPaymentWay.getKey().toString().compareTo(SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY_99) == 0) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiPaymentWay.getText() + "'.");
+                    validation.setComponent(jcbCfdiPaymentWay);
+                }
+                else if (mbIsSales && (mbIsDoc || mbIsAdj) && moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CREDIT && moFieldCfdiPaymentWay.getKey().toString().compareTo(SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY_99) != 0) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiPaymentWay.getText() + "' (" + SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY_99 + ").");
+                    validation.setComponent(jcbCfdiPaymentWay);
+                }
+                else if (mbIsSales && (mbIsDoc || mbIsAdj) && moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CASH && moFieldCfdiPaymentMethod.getKey().toString().compareTo(SDataConstantsSys.TRNS_CFD_CAT_PAY_MET_PUE) != 0) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiPaymentMethod.getText() + "' (" + SDataConstantsSys.TRNS_CFD_CAT_PAY_MET_PUE + ").");
+                    validation.setComponent(jcbCfdiPaymentMethod);
+                }
+                else if (mbIsSales && (mbIsDoc || mbIsAdj) && moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CREDIT && moFieldCfdiPaymentMethod.getKey().toString().compareTo(SDataConstantsSys.TRNS_CFD_CAT_PAY_MET_PUE) == 0 &&
+                        miClient.showMsgBoxConfirm(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + jlCfdiPaymentMethod.getText() + "' \"" + moFieldCfdiPaymentMethod.getFieldValue() + "\", en ventas a crédito, no está permitido según las disposiciones fiscales.\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiPaymentMethod.getText() + "'.");
+                    validation.setComponent(jcbCfdiPaymentMethod);
+                }
+                else if (moBizPartnerCategory.getDateStart().after(moFieldDate.getDate())) {
+                    validation.setMessage("La fecha inicial de operaciones del asociado de negocios (" + SLibUtils.DateFormatDate.format(moBizPartnerCategory.getDateStart()) + ") " +
+                            "no puede ser posterior a la fecha del campo '" + jlDate.getText() + "'.");
+                    validation.setComponent(jftDate);
+                }
+                else if (moBizPartnerCategory.getDateEnd_n() != null && moBizPartnerCategory.getDateEnd_n().before(moFieldDate.getDate())) {
+                    validation.setMessage("La fecha final de operaciones del asociado de negocios (" + SLibUtils.DateFormatDate.format(moBizPartnerCategory.getDateStart()) + ") " +
+                            "no puede ser anterior a la fecha del campo '" + jlDate.getText() + "'.");
+                    validation.setComponent(jftDate);
+                }
+                else if (moFieldDateDocDelivery_n.getDate() != null && moFieldDateDocDelivery_n.getDate().before(moFieldDate.getDate())) {
+                    validation.setMessage("La fecha del campo '" + jlDateDocDelivery_n.getText() + "' no puede ser anterior a la del campo '" + jlDate.getText() + "'.");
+                    validation.setComponent(jftDateDocDelivery_n);
+                }
+                else if (moFieldDateDocLapsing_n.getDate() != null && moFieldDateDocLapsing_n.getDate().before(moFieldDate.getDate())) {
+                    validation.setMessage("La fecha del campo '" + jlDateDocLapsing_n.getText() + "' no puede ser anterior a la del campo '" + jlDate.getText() + "'.");
+                    validation.setComponent(jftDateDocLapsing_n);
+                }
+                else if (moFieldDateDocDelivery_n.getDate() != null && moFieldDateDocLapsing_n.getDate() != null && moFieldDateDocLapsing_n.getDate().before(moFieldDateDocDelivery_n.getDate())) {
+                    validation.setMessage("La fecha del campo '" + jlDateDocLapsing_n.getText() + "' no puede ser anterior a la del campo '" + jlDateDocDelivery_n.getText() + "'.");
+                    validation.setComponent(jftDateDocLapsing_n);
+                }
+                else if (mbIsCon && moFieldDateDocDelivery_n.getDate() == null) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDateDocDelivery_n.getText() + "'.");
+                    validation.setComponent(jftDateDocDelivery_n);
+                }
+                else if (mbIsCon && moFieldDateDocLapsing_n.getDate() == null) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDateDocLapsing_n.getText() + "'.");
+                    validation.setComponent(jftDateDocLapsing_n);
+                }
+                else if (moFieldDateShipment_n.getDate() != null && moFieldDateShipment_n.getDate().before(moFieldDate.getDate())) {
+                    validation.setMessage("La fecha del campo '" + jlDateShipment_n.getText() + "' no puede ser anterior a la del campo '" + jlDate.getText() + "'.");
+                    validation.setComponent(jftDateShipment_nRo);
+                }
+                else if (moFieldDateDelivery_n.getDate() != null && moFieldDateDelivery_n.getDate().before(moFieldDate.getDate())) {
+                    validation.setMessage("La fecha del campo '" + jlDateDelivery_n.getText() + "' no puede ser anterior a la del campo '" + jlDate.getText() + "'.");
+                    validation.setComponent(jftDateDelivery_nRo);
+                }
+                else if (isCfdEmissionRequired() && moPaneGridEntries.getTableGuiRowCount() == 0) {
+                    validation.setMessage("El documento debe tener al menos una partida.");
+                    jTabbedPane.setSelectedIndex(TAB_ETY);
+                }
+                else if (mnSalesSupervisorId_n != 0 && mnSalesAgentId_n == 0) {
+                    validation.setMessage("Se debe ingresar un valor para el campo '" + jlSalesAgent.getText() + "'.");
+                    validation.setComponent(jbSalesAgent);
+                    jTabbedPane.setSelectedIndex(TAB_MKT);
+                }
+                else if (mnSalesSupervisorId_n != 0 && mnSalesSupervisorId_n == mnSalesAgentId_n) {
+                    validation.setMessage("Se debe ingresar un valor diferente para el campo '" + jlSalesAgent.getText() + "'.");
+                    validation.setComponent(jbSalesAgent);
+                    jTabbedPane.setSelectedIndex(TAB_MKT);
+                }
+                else {
+                    // validate shipping information if Incoterm has been set:
+                    if (moFieldFkIncotermId.getKeyAsIntArray()[0] != SModSysConsts.LOGS_INC_NA) {
+                        if (jcbFkSpotSrcId_n.getSelectedIndex() <= 0) {
+                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkSpotSrcId_n.getText() + "'.");
+                            validation.setComponent(jcbFkSpotSrcId_n);
+                            jTabbedPane.setSelectedIndex(TAB_MKT);
+                        }
+                        else if (jcbFkSpotDesId_n.getSelectedIndex() <= 0) {
+                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkSpotDesId_n.getText() + "'.");
+                            validation.setComponent(jcbFkSpotDesId_n);
+                            jTabbedPane.setSelectedIndex(TAB_MKT);
+                        }
+                        else {
+                            switch (moFieldFkIncotermId.getKeyAsIntArray()[0]) {
+                                case SModSysConsts.LOGS_INC_EXW:
+                                case SModSysConsts.LOGS_INC_FCA:
+                                case SModSysConsts.LOGS_INC_CPT:
+                                case SModSysConsts.LOGS_INC_CIP:
+                                case SModSysConsts.LOGS_INC_DAT:
+                                case SModSysConsts.LOGS_INC_DAP:
+                                case SModSysConsts.LOGS_INC_DAF:
+                                case SModSysConsts.LOGS_INC_DDU:
+                                case SModSysConsts.LOGS_INC_DDP:
+                                    if (moFieldFkModeOfTransportationTypeId.getKeyAsIntArray()[0] == SModSysConsts.LOGS_TP_MOT_NA) {
+                                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkModeOfTransportationTypeId.getText() + "'.");
+                                        validation.setComponent(jcbFkModeOfTransportationTypeId);
+                                        jTabbedPane.setSelectedIndex(TAB_MKT);
+                                    }
+                                    break;
+                                case SModSysConsts.LOGS_INC_FAS:
+                                case SModSysConsts.LOGS_INC_FOB:
+                                case SModSysConsts.LOGS_INC_DES:
+                                case SModSysConsts.LOGS_INC_DEQ:
+                                case SModSysConsts.LOGS_INC_CFR:
+                                case SModSysConsts.LOGS_INC_CIF:
+                                    if (moFieldFkModeOfTransportationTypeId.getKeyAsIntArray()[0] != SModSysConsts.LOGS_TP_MOT_SEA) {
+                                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkModeOfTransportationTypeId.getText() + "'.");
+                                        validation.setComponent(jcbFkModeOfTransportationTypeId);
+                                        jTabbedPane.setSelectedIndex(TAB_MKT);
+                                    }
+                                    break;
+                                default:
+                            }
+                        }
+                    }
+
+                    // check if items of entries of this document need to be added from another source document:
+                    if (!validation.getIsError()) {
+                        for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
+                            SDataDpsEntry entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
+
+                            try {
+                                if (!mbHasRightOmitSourceDoc) { // condition for check items
+                                    STrnUtils.checkItemStandaloneDoc(miClient.getSession(), moDps.getDpsTypeKey(), entry.getFkItemId(), entry.hasDpsLinksAsDestiny());
+                                }
+                            }
+                            catch (Exception e) {
+                                SLibUtilities.printOutException(this, e);
+                                validation.setMessage(e.getMessage());
+                                validation.setComponent(moPaneGridEntries);
+                                jTabbedPane.setSelectedIndex(TAB_ETY);
+                            }
+                        }
+                    }
+                    
+                    double prepaymentsCy = mdPrepaymentsCy;
+                    double applicationsCy = 0;
+                    
+                    // check prepayments:
+                    if (!validation.getIsError() && mdPrepaymentsCy != 0) {
+                        boolean operationsAvailable = false;
+
+                        for (STableRow row : moPaneGridEntries.getGridRows()) {
+                            SDataDpsEntry dpsEntry = (SDataDpsEntry) row.getData();
+                            switch (dpsEntry.getOperationsType()) {
+                                case SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY:
+                                    prepaymentsCy = SLibUtils.round(prepaymentsCy + dpsEntry.getSubtotalCy_r(), 2);
+                                    break;
+                                case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY:
+                                    prepaymentsCy = SLibUtils.round(prepaymentsCy - dpsEntry.getSubtotalCy_r(), 2);
+                                    break;
+                                case SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY:
+                                    applicationsCy = SLibUtils.round(applicationsCy + dpsEntry.getDiscountDocCy(), 2);
+                                    break;
+                                case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY:
+                                    applicationsCy = SLibUtils.round(applicationsCy + dpsEntry.getDiscountDocCy(), 2);
+                                    break;
+                                case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY:
+                                    applicationsCy = SLibUtils.round(applicationsCy + dpsEntry.getSubtotalCy_r(), 2);
+                                    break;
+                                default:
+                                    operationsAvailable = true;
+                            }
+                        }
+                        
+                        if (applicationsCy > prepaymentsCy) {
+                            validation.setMessage("La aplicación de anticipos facturados $" + SLibUtils.getDecimalFormatAmount().format(applicationsCy) + " " + jtfCurrencyKeyRo.getText() + " "
+                                    + "no puede ser mayor a los anticipos facturados $" + SLibUtils.getDecimalFormatAmount().format(prepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + ".");
+                            validation.setComponent(moPaneGridEntries);
+                            jTabbedPane.setSelectedIndex(TAB_ETY);
+                        }
+                        else if (mbIsDoc && operationsAvailable && prepaymentsCy > 0 && applicationsCy == 0) {
+                            if (miClient.showMsgBoxConfirm("'" + moBizPartner.getBizPartner() + "' tiene anticipos facturados a su favor por $" + SLibUtils.getDecimalFormatAmount().format(prepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + ",\n"
+                                    + "¿está seguro que NO desea aplicarlos en este documento?") != JOptionPane.YES_OPTION) {
+                                validation.setMessage("Se deberían aplicar anticipos facturados en este documento.");
+                                validation.setComponent(moPaneGridEntries);
+                                jTabbedPane.setSelectedIndex(TAB_ETY);
+                            }
+                        }
+                    }
+                    
+                    // validate custom complementary shipping data:
+                    if (!validation.getIsError() && mbIsSales && (mbIsOrd || mbIsDoc)) {
+                        String shipmentMessageMissingData = validateRequiredShipmentData();
+
+                        if (!shipmentMessageMissingData.isEmpty()) {
+                                validation.setMessage(shipmentMessageMissingData);
+                                validation.setComponent(moPaneGridEntries);
+                                jTabbedPane.setSelectedIndex(TAB_ETY);
+                        }
+                        else {
+                            String shipmentMessage = validateProvisionalShipmentData();
+
+                            if (!shipmentMessage.isEmpty() && miClient.showMsgBoxConfirm(shipmentMessage) != JOptionPane.YES_OPTION) {
+                                validation.setMessage("Es necesario revisar la información de las partidas del documento.");
+                                validation.setComponent(moPaneGridEntries);
+                                jTabbedPane.setSelectedIndex(TAB_ETY);
+                            }
+                        }
+                    }
+                    
+                    // validate contract's calendar of monthly deliveries:
+                    if (!validation.getIsError() && mbIsCon) {
+                        try {
+                            int deliveryMonths;
+                            int periodMonths = SGuiUtilities.getPeriodMonths(moFieldDateDocDelivery_n.getDate(), moFieldDateDocLapsing_n.getDate());
+
+                            for (int row = 0; row < moPaneGridEntries.getTableGuiRowCount(); row++) {
+                                deliveryMonths = 0;
+
+                                // validate number of monthly deliveries on each document row, it must match the number of months of the delivery period of this document:
+
+                                for (SDataDpsEntryPrice price : ((SDataDpsEntry) moPaneGridEntries.getTableRow(row).getData()).getDbmsEntryPrices()) {
+                                     if (!price.getIsDeleted()) {
+                                         deliveryMonths++;
+                                     }
+                                }
+
+                                if (deliveryMonths != periodMonths) {
+                                    validation.setMessage("El número de entregas mensuales capturadas en la partida número '" + (row + 1) + "' no coinciden con periodo de entrega del documento, en total deben ser " + periodMonths + ".");
+                                    validation.setComponent(moPaneGridEntries);
+                                    jTabbedPane.setSelectedIndex(TAB_ETY);
+                                    break;
+                                }
+
+                                // validate that all monthly delivery really belongs to delivery period of this document:
+
+                                for (SDataDpsEntryPrice price : ((SDataDpsEntry) moPaneGridEntries.getTableRow(row).getData()).getDbmsEntryPrices()) {
+                                    if (!price.getIsDeleted()) {
+                                        if (!SLibTimeUtilities.isBelongingToPeriod(SLibTimeUtilities.createDate(price.getContractPriceYear(), price.getContractPriceMonth()), SLibTimeUtilities.getBeginOfMonth(moFieldDateDocDelivery_n.getDate()), SLibTimeUtilities.getEndOfMonth(moFieldDateDocLapsing_n.getDate()))) {
+                                            validation.setMessage("La entrega mensual '" + miClient.getSessionXXX().getFormatters().getDateYearMonthFormat().format(SLibTimeUtilities.createDate(price.getContractPriceYear(), price.getContractPriceMonth())) + "' de la partida '" + (row + 1) + "' no se encuentra dentro del periodo de entrega del documento.");
+                                            validation.setComponent(moPaneGridEntries);
+                                            jTabbedPane.setSelectedIndex(TAB_ETY);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception e) {
+                            SLibUtilities.printOutException(this, e);
+                            validation.setMessage(e.toString());
+                            validation.setComponent(moPaneGridEntries);
+                            jTabbedPane.setSelectedIndex(TAB_ETY);
+                        }
+                    }
+
+                    if (!validation.getIsError() && (mbIsDoc || mbIsAdj)) {
+                        //check manual accounting record:
+                        if (jckRecordUser.isSelected()) {
+                            if (moRecordUser == null) {
+                                validation.setMessage("No fue posible leer el registro '" + jckRecordUser.getText() + "'.");
+                                validation.setComponent(jbRecordManualSelect);
+                            }
+                            else if (moRecordUserLock == null) {
+                                validation.setMessage("No fue posible obtener el acceso exclusivo al registro '" + jckRecordUser.getText() + "'.");
+                                validation.setComponent(jbRecordManualSelect);
+                            }
+                            else if (!SLibTimeUtilities.isBelongingToPeriod(moFieldDate.getDate(), moRecordUser.getPkYearId(), moRecordUser.getPkPeriodId())) {
+                                if (miClient.showMsgBoxConfirm(SLibConstants.MSG_ERR_GUI_PER_DATE_REC + "\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlDate.getText() + "'.");
+                                    validation.setComponent(jftDate);
+                                }
+                                else if (!SDataUtilities.isPeriodOpen(miClient, moRecordUser.getDate())) {
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
+                                    validation.setComponent(jckRecordUser);
+                                }
+                            }
+
+                            if (!validation.getIsError()) {
+                                try {
+                                    SSrvUtils.verifyLockStatus(miClient.getSession(), moRecordUserLock);
+                                }
+                                catch (Exception e) {
+                                    validation.setMessage("No fue posible validar el acceso exclusivo al registro '" + jckRecordUser.getText() + "'.\n" + e);
+                                    validation.setComponent(jbRecordManualSelect);
+                                }
+                            }
+                        }
+
+                        // validate CFD emission:
+                        if (!validation.getIsError() && isCfdEmissionRequired()) {
+                            if (miClient.getSessionXXX().getParamsCompany().getDbmsDataCertificate_n() == null) {
+                                validation.setMessage("No se ha configurado un certificado de sello digital (CSD).");
+                            }
+                            else if (miClient.getSessionXXX().getParamsCompany().getDbmsDataCertificate_n().getDate().compareTo(moFieldDate.getDate()) > 0) {
+                                validation.setMessage("La vigencia del certificado de sello digital (CSD) actual es inválida para la fecha del documento " +
+                                        "(" + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + "):\n" +
+                                        "La vigencia del certificado comienza el " + SLibUtils.DateFormatDate.format(miClient.getSessionXXX().getParamsCompany().getDbmsDataCertificate_n().getDate()) + ".");
+                            }
+                            else if (miClient.getSessionXXX().getParamsCompany().getDbmsDataCertificate_n().getExpirationDate().compareTo(moFieldDate.getDate()) < 0) {
+                                validation.setMessage("La vigencia del certificado de sello digital (CSD) actual es inválida para la fecha del documento " +
+                                        "(" + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + "):\n" +
+                                        "El certificado expiró el " + SLibUtils.DateFormatDate.format(miClient.getSessionXXX().getParamsCompany().getDbmsDataCertificate_n().getExpirationDate()) + ".");
+                            }
+                            else if (moBizPartnerCategory.getFkCfdAddendaTypeId() != SDataConstantsSys.BPSS_TP_CFD_ADD_NA) {
+                                switch (moBizPartnerCategory.getFkCfdAddendaTypeId()) {
+                                    case SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA:
+                                        /* XXX Code for future versions
+                                         if (moFieldBulkQty.getString().length() == 0) {
+                                            validation.setMessage("No se ha especificado la cantidad de " + " '" + jcbBulkType.getSelectedItem() + "'.");
+                                            jtfBulkQty.requestFocus();
+                                        }
+                                        */
+                                        if (moFieldDateRemission.getDate() == null) {
+                                            validation.setMessage(SLibConstants.MSG_ERR_GUI_DATE);
+                                            validation.setComponent(jftRemissionDate);
+                                            jTabbedPane.setSelectedIndex(3);
+                                        }
+                                        if (!mbIsAdj && moFieldDateDocDelivery_n.getDate() == null) {
+                                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDateDocDelivery_n.getText() + "'.");
+                                            validation.setComponent(jftDateDocDelivery_n);
+                                            jTabbedPane.setSelectedIndex(3);
+                                        }
+                                        break;
+                                    case SDataConstantsSys.BPSS_TP_CFD_ADD_LOREAL:
+                                        if (moFieldNumberReference.getString().length() == 0) {
+                                            validation.setMessage("No se ha especificado una " + " '" + jtfNumberReference.getToolTipText() + "'.");
+                                            jtfNumberReference.requestFocus();
+                                        }
+                                         else {
+                                            for (SDataDpsEntry entry : moDps.getDbmsDpsEntries()) {
+                                                if (entry.getDbmsDpsAddLorealEntryNumber() == 0 && !entry.getIsDeleted()) {
+                                                    validation.setMessage("No se han especificado datos requeridos para la addenda en una o varias partidas.");
+                                                    jTabbedPane.setSelectedIndex(TAB_ETY);
+                                                }
+                                            }
+                                        }
+                                        break;
+                                    case SDataConstantsSys.BPSS_TP_CFD_ADD_BACHOCO:
+                                        if (moFieldNumberReference.getString().length() == 0) {
+                                            validation.setMessage("No se ha especificado una " + " '" + jtfNumberReference.getToolTipText() + "'.");
+                                            jtfNumberReference.requestFocus();
+                                        }
+                                        else {
+                                            for (SDataDpsEntry entry : moDps.getDbmsDpsEntries()) {
+                                                if (entry.getDbmsDpsAddBachocoCenter().length() == 0 && !entry.getIsDeleted()) {
+                                                    validation.setMessage("No se han especificado datos requeridos para la addenda en una o varias partidas.");
+                                                    jTabbedPane.setSelectedIndex(TAB_ETY);
+                                                }
+                                            }
+                                        }
+                                        break;
+                                    case SDataConstantsSys.BPSS_TP_CFD_ADD_MODELO:
+                                        if (moFieldNumberReference.getString().length() == 0) {
+                                            validation.setMessage("No se ha especificado una " + " '" + jtfNumberReference.getToolTipText() + "'.");
+                                            jtfNumberReference.requestFocus();
+                                        }
+                                        break;
+                                    default:
+                                }
+
+                                if (moBizPartner.getDbmsCategorySettingsCus().getCompanyKey().length() == 0) {
+                                    validation.setMessage("No se han especificado la clave de la empresa\n" +
+                                            "como proveedor del cliente " + moBizPartner.getBizPartner() + "\n" +
+                                            "en el catálogo de clientes, categoría: 'Cliente', campo: 'Clave de la empresa (asignada por el AN):'.");
+                                }
+                            }
+
+                            if (!validation.getIsError()) {
+                                 if ((isCfdCfdiRelatedRequired() || applicationsCy > 0 || !moFieldCfdiCfdiRelated.getString().isEmpty()) && jcbCfdiRelationType.getSelectedIndex() <= 0) {
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCfdiRelationType.getText() + "'.");
+                                    validation.setComponent(jcbCfdiRelationType);
+                                    jTabbedPane.setSelectedIndex(TAB_CFD_XML);
+                                 }
+                                 else if (jcbCfdiRelationType.getSelectedIndex() > 0 && !isCfdCfdiRelatedRequired() && moFieldCfdiCfdiRelated.getString().isEmpty()) { // consider that in adjustments all selected CFDI related will be added automatically
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCfdiCfdiRelated.getText() + "'.");
+                                    validation.setComponent(jtfCfdiCfdiRelated);
+                                    jTabbedPane.setSelectedIndex(TAB_CFD_XML);
+                                 }
+                                 else {
+                                     if (!moFieldCfdiCfdiRelated.getString().isEmpty()) {
+                                         String[] uuids = SLibUtils.textExplode(moFieldCfdiCfdiRelated.getString(), ",");
+                                         for (String uuid : uuids) {
+                                             if (uuid.trim().length() != DCfdVer3Consts.LEN_UUID) {
+                                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiCfdiRelated.getText() + "':\n"
+                                                        + "La longitud del UUID '" + uuid.trim() + "' debe ser de " + DCfdVer3Consts.LEN_UUID + " caracteres.");
+                                                validation.setComponent(jtfCfdiCfdiRelated);
+                                                jTabbedPane.setSelectedIndex(TAB_CFD_XML);
+                                                break;
+                                             }
+                                         }
+                                     }
+                                 }
+                            }
+                            
+                            if (!validation.getIsError() && isCfdIntCommerceRequired()) {
+                                if (moFieldFkIncotermId.getKeyAsIntArray()[0] == SModSysConsts.LOGS_INC_NA) {
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkIncotermId.getText() + "'.");
+                                    validation.setComponent(jcbFkIncotermId);
+                                    jTabbedPane.setSelectedIndex(TAB_MKT);
+                                }
+                                else if (moFieldCfdiCfdiUsage.getFieldValue().toString().compareTo(SDataConstantsSys.TRNS_CFD_CAT_CFD_USE_P01) != 0) {
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiCfdiUsage.getText() + "': <" + SDataConstantsSys.TRNS_CFD_CAT_CFD_USE_P01 + ">.");
+                                    validation.setComponent(jcbCfdiCfdiUsage);
+                                    jTabbedPane.setSelectedIndex(TAB_CFD_XML);
+                                }
+                                else if (moFieldCfdCceCertificateOrigin.getInteger() == 1 && moFieldCfdCceNumberCertificateOrigin.getString().isEmpty()) {
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCfdCceNumberCertificateOrigin.getText() + "'.");
+                                    validation.setComponent(jtfCfdCceNumberCertificateOrigin);
+                                    jTabbedPane.setSelectedIndex(TAB_CFD_INT);
+
+                                }
+                                else if (moFieldCfdCceCertificateOrigin.getInteger() == 0 && !moFieldCfdCceNumberCertificateOrigin.getString().isEmpty()) {
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_NOT_REQ + "'" + jlCfdCceNumberCertificateOrigin.getText() + "'.");
+                                    validation.setComponent(jtfCfdCceNumberCertificateOrigin);
+                                    jTabbedPane.setSelectedIndex(TAB_CFD_INT);
+                                }
+                                else if ((jcbFkAddresseeBizPartner.getSelectedIndex() > 0 || jcbFkAddresseeBizPartnerBranch.getSelectedIndex() > 0 || jcbFkAddresseeBizPartnerBranchAddress.getSelectedIndex() > 0) && 
+                                        (jcbFkAddresseeBizPartner.getSelectedIndex() <= 0 || jcbFkAddresseeBizPartnerBranch.getSelectedIndex() <= 0 || jcbFkAddresseeBizPartnerBranchAddress.getSelectedIndex() <= 0)) {
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkAddresseeBizPartner.getText() + "', '" + jlFkAddresseeBizPartnerBranch.getText() + "', '" + jlFkAddresseeBizPartnerBranchAddress.getText() + "'.");
+                                    validation.setComponent(jcbFkAddresseeBizPartner);
+                                    jTabbedPane.setSelectedIndex(TAB_CFD_INT);
+                                }
+                                else if (jcbFkAddresseeBizPartner.getSelectedIndex() > 0 && moFieldCfdCceAddresseeBizPartner.getKeyAsIntArray()[0] == moBizPartner.getPkBizPartnerId()) {
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkAddresseeBizPartner.getText() + "'.");
+                                    validation.setComponent(jcbFkAddresseeBizPartner);
+                                    jTabbedPane.setSelectedIndex(TAB_CFD_INT);
+                                }
+                            }
+                        }
+                    }
+
+                    if (!validation.getIsError()) {
+                        // credit status of business partner:
+                        if (!isBizPartnerCreditOk(moBizPartnerCategory.getEffectiveRiskTypeId(), false)) {
+                            validation.setIsError(true);
+                            validation.setComponent(jftDate);
+                        }
+                        else {
+                            // check if DPS can be saved:
+                            SDataDps dps = (SDataDps) getRegistry();
+                            SServerRequest request = new SServerRequest(SServerConstants.REQ_DB_CAN_SAVE);
+                            SServerResponse response = null;
+
+                            request.setPacket(dps);
+                            response = miClient.getSessionXXX().request(request);
+
+                            if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK || response.getResultType() != SLibConstants.DB_CAN_SAVE_YES) {
+                                validation.setMessage(response.getMessage().isEmpty() ? SLibConstants.MSG_ERR_UTIL_UNKNOWN_ERR : response.getMessage());
+                            }
+                            // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
+                        }
+                        // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
+                    }
+                    // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
+                }
+                // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
             }
+            // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
+            
+            if (!validation.getIsError()) {
+                if (jckIsDeleted.isSelected()) {
+                    if (miClient.showMsgBoxConfirm("El documento está eliminado. Puede guardarlo de nuevo como eliminado o reactivarlo.\n¿Desea reactivar el documento?") == JOptionPane.YES_OPTION) {
+                        jckIsDeleted.setSelected(false);
+                    }
+                    // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
+                }
+                // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
+            }
+            // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
         }
+        // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
 
         return validation;
     }
@@ -8559,6 +8656,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 
                 if (!moDps.getDbmsDataDpsCfd().getConfirmation().isEmpty()) {
                     moFieldCfdiConfirmation.setFieldValue(moDps.getDbmsDataDpsCfd().getConfirmation());
+                }
+                
+                if (!moDps.getDbmsDataDpsCfd().getCfdiRelacionadosTipoRelacion().isEmpty()) {
+                    moFieldCfdiRelationType.setFieldValue(moDps.getDbmsDataDpsCfd().getCfdiRelacionadosTipoRelacion());
+                }
+
+                if (!moDps.getDbmsDataDpsCfd().getCfdiRelacionados().isEmpty()) {
+                    moFieldCfdiCfdiRelated.setFieldValue(SLibUtils.textImplode(moDps.getDbmsDataDpsCfd().getCfdiRelacionados().toArray(new String[moDps.getDbmsDataDpsCfd().getCfdiRelacionados().size()]), ", "));
                 }
 
                 if (isCfdIntCommerceRequired()) {
@@ -8780,14 +8885,29 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             dpsCfd.setTaxRegime(moFieldCfdiTaxRegime.getFieldValue().toString());
             dpsCfd.setCfdiUsage(moFieldCfdiCfdiUsage.getFieldValue().toString());
             
-            if (isCfdCfdiRelatedRequired()) {
+            if (isCfdCfdiRelatedRequired() || jcbCfdiRelationType.getSelectedIndex() > 0) {
                 // include CFDI relacionados node data:
-                dpsCfd.setCfdiRelacionadosTipoRelacion(SDataConstantsSys.TRNS_CFD_CAT_TP_REL_CDT);  // by now, only credit notes supported
+                dpsCfd.setCfdiRelacionadosTipoRelacion((String) moFieldCfdiRelationType.getKey());
+                
+                for (String uuid : SLibUtils.textExplode(moFieldCfdiCfdiRelated.getString(), ",")) {
+                    try {
+                        dpsCfd.addCfdiRelacionado(uuid.trim());
+                    }
+                    catch (Exception e) {
+                        SLibUtils.printException(this, e);
+                    }
+                }
+                
                 for (SDataDpsEntry dpsEntry : moDps.getDbmsDpsEntries()) {
                     for (SDataDpsDpsAdjustment dpsAdjustment : dpsEntry.getDbmsDpsAdjustmentsAsAdjustment()) {
                         SDataDps invoice = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, dpsAdjustment.getDbmsDpsKey(), SLibConstants.EXEC_MODE_VERBOSE);
                         if (invoice.getDbmsDataCfd() != null && !invoice.getDbmsDataCfd().getUuid().isEmpty()) {
-                            dpsCfd.getCfdiRelacionados().add(invoice.getDbmsDataCfd().getUuid());
+                            try {
+                                dpsCfd.addCfdiRelacionado(invoice.getDbmsDataCfd().getUuid());
+                            }
+                            catch (Exception e) {
+                                SLibUtils.printException(this, e);
+                            }
                         }
                     }
                 }

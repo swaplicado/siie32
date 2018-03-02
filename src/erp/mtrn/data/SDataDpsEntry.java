@@ -89,6 +89,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected java.lang.String msTicket;
     protected java.lang.String msContainerTank;
     protected java.lang.String msVgm;
+    protected int mnOperationsType;
     protected int mnUserId;
     protected int mnSortingPosition;
     protected boolean mbIsPrepayment;
@@ -255,6 +256,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setTicket(java.lang.String s) { msTicket = s; }
     public void setContainerTank(java.lang.String s) { msContainerTank = s; }
     public void setVgm(java.lang.String s) { msVgm = s; }
+    public void setOperationsType(int n) { mnOperationsType = n; }
     public void setUserId(int n) { mnUserId = n; }
     public void setSortingPosition(int n) { mnSortingPosition = n; }
     public void setIsPrepayment(boolean b) { mbIsPrepayment = b; }
@@ -347,6 +349,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public java.lang.String getTicket() { return msTicket; }
     public java.lang.String getContainerTank() { return msContainerTank; }
     public java.lang.String getVgm() { return msVgm; }
+    public int getOperationsType() { return mnOperationsType; }
     public int getUserId() { return mnUserId; }
     public int getSortingPosition() { return mnSortingPosition; }
     public boolean getIsPrepayment() { return mbIsPrepayment; }
@@ -548,6 +551,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         msTicket = "";
         msContainerTank = "";
         msVgm = "";
+        mnOperationsType = SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS; // just for keeping consistence with existing source code
         mnUserId = 0;
         mnSortingPosition = 0;
         mbIsPrepayment = false;
@@ -731,6 +735,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 msTicket = resultSet.getString("de.ticket");
                 msContainerTank = resultSet.getString("de.cont_tank");
                 msVgm = resultSet.getString("de.vgm");
+                mnOperationsType = resultSet.getInt("de.ops_type");
                 mnUserId = resultSet.getInt("de.usr_id");
                 mnSortingPosition = resultSet.getInt("de.sort_pos");
                 mbIsPrepayment = resultSet.getBoolean("de.b_pre_pay");
@@ -1039,7 +1044,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " + 
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkDocId);
             callableStatement.setInt(nParam++, mnPkEntryId);
@@ -1104,6 +1109,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
             callableStatement.setString(nParam++, msTicket);
             callableStatement.setString(nParam++, msContainerTank);
             callableStatement.setString(nParam++, msVgm);
+            callableStatement.setInt(nParam++, mnOperationsType);
             callableStatement.setInt(nParam++, mnUserId);
             callableStatement.setInt(nParam++, mnSortingPosition);
             callableStatement.setBoolean(nParam++, mbIsPrepayment);
@@ -1653,6 +1659,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setTicket(msTicket);
         clone.setContainerTank(msContainerTank);
         clone.setVgm(msVgm);
+        clone.setOperationsType(mnOperationsType);
         clone.setUserId(mnUserId);
         clone.setSortingPosition(mnSortingPosition);
         clone.setIsPrepayment(mbIsPrepayment);
