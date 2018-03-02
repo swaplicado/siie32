@@ -8148,24 +8148,26 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
                         for (STableRow row : moPaneGridEntries.getGridRows()) {
                             SDataDpsEntry dpsEntry = (SDataDpsEntry) row.getData();
-                            switch (dpsEntry.getOperationsType()) {
-                                case SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY:
-                                    prepaymentsCy = SLibUtils.round(prepaymentsCy + dpsEntry.getSubtotalCy_r(), 2);
-                                    break;
-                                case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY:
-                                    prepaymentsCy = SLibUtils.round(prepaymentsCy - dpsEntry.getSubtotalCy_r(), 2);
-                                    break;
-                                case SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY:
-                                    applicationsCy = SLibUtils.round(applicationsCy + dpsEntry.getDiscountDocCy(), 2);
-                                    break;
-                                case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY:
-                                    applicationsCy = SLibUtils.round(applicationsCy + dpsEntry.getDiscountDocCy(), 2);
-                                    break;
-                                case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY:
-                                    applicationsCy = SLibUtils.round(applicationsCy + dpsEntry.getSubtotalCy_r(), 2);
-                                    break;
-                                default:
-                                    operationsAvailable = true;
+                            if (dpsEntry.isAccountable()) {
+                                switch (dpsEntry.getOperationsType()) {
+                                    case SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY:
+                                        prepaymentsCy = SLibUtils.round(prepaymentsCy + dpsEntry.getSubtotalCy_r(), 2);
+                                        break;
+                                    case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY:
+                                        prepaymentsCy = SLibUtils.round(prepaymentsCy - dpsEntry.getSubtotalCy_r(), 2);
+                                        break;
+                                    case SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY:
+                                        applicationsCy = SLibUtils.round(applicationsCy + dpsEntry.getDiscountDocCy(), 2);
+                                        break;
+                                    case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY:
+                                        applicationsCy = SLibUtils.round(applicationsCy + dpsEntry.getDiscountDocCy(), 2);
+                                        break;
+                                    case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY:
+                                        applicationsCy = SLibUtils.round(applicationsCy + dpsEntry.getSubtotalCy_r(), 2);
+                                        break;
+                                    default:
+                                        operationsAvailable = true;
+                                }
                             }
                         }
                         
