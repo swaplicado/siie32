@@ -2429,7 +2429,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jtfContractBase.addFocusListener(this);
         jtfContractFuture.addFocusListener(this);
         jtfContractFactor.addFocusListener(this);
-                
+
         // Item listeners:
 
         jckIsDiscountDocApplying.addItemListener(this);
@@ -2504,7 +2504,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 
                 if (moParamDps.getFkCurrencyId() == SModSysConsts.CFGU_CUR_USD) {
                     moFieldDpsContractFactor.setDouble(0.10d);
-                }else{
+                }
+                else{
                     moFieldDpsContractFactor.setDouble(0.0d);
                 }
                 
@@ -5459,14 +5460,14 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     
                     jcbOperationsType.removeAllItems();
                     jcbOperationsType.addItem(new SFormComponentItem(null, "(Seleccionar tipo operación)"));
-                    if (moParamDps.isDocument()) {
-                        for (Integer key : SDataConstantsSys.OperationsTypesOpsMap.keySet()) {
-                            jcbOperationsType.addItem(new SFormComponentItem(new int[] { key }, SDataConstantsSys.OperationsTypesOpsMap.get(key)));
+                    if (moParamDps.isAdjustment()) {
+                        for (Integer key : SDataConstantsSys.OperationsTypesAdjMap.keySet()) {
+                            jcbOperationsType.addItem(new SFormComponentItem(new int[] { key }, SDataConstantsSys.OperationsTypesAdjMap.get(key)));
                         }
                     }
                     else {
-                        for (Integer key : SDataConstantsSys.OperationsTypesAdjMap.keySet()) {
-                            jcbOperationsType.addItem(new SFormComponentItem(new int[] { key }, SDataConstantsSys.OperationsTypesAdjMap.get(key)));
+                        for (Integer key : SDataConstantsSys.OperationsTypesOpsMap.keySet()) {
+                            jcbOperationsType.addItem(new SFormComponentItem(new int[] { key }, SDataConstantsSys.OperationsTypesOpsMap.get(key)));
                         }
                     }
                     jcbOperationsType.setSelectedIndex(1);

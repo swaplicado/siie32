@@ -806,7 +806,8 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                    "?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkDocId);
             callableStatement.setDate(nParam++, new java.sql.Date(mtDate.getTime()));
