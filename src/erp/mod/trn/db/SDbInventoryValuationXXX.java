@@ -95,6 +95,8 @@ public class SDbInventoryValuationXXX extends SDbRegistryUser {
         diog.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
         diog.setFkMaintUserId_n(SLibConsts.UNDEFINED);
         diog.setFkMaintUserSupervisorId(SModSysConsts.TRN_MAINT_USER_SUPV_NA);
+        diog.setFkMaintReturnUserId_n(SLibConsts.UNDEFINED);
+        diog.setFkMaintReturnUserSupervisorId(SModSysConsts.TRN_MAINT_USER_SUPV_NA);
         diog.setFkUserShippedId(SUtilConsts.USR_NA_ID);
         diog.setFkUserAuditedId(SUtilConsts.USR_NA_ID);
         diog.setFkUserAuthorizedId(SUtilConsts.USR_NA_ID);

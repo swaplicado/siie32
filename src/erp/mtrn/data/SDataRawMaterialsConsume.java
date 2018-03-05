@@ -265,6 +265,8 @@ public class SDataRawMaterialsConsume extends erp.lib.data.SDataRegistry impleme
                             iog.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
                             iog.setFkMaintUserId_n(SLibConsts.UNDEFINED);
                             iog.setFkMaintUserSupervisorId(SModSysConsts.TRN_MAINT_USER_SUPV_NA);
+                            iog.setFkMaintReturnUserId_n(SLibConsts.UNDEFINED);
+                            iog.setFkMaintReturnUserSupervisorId(SModSysConsts.TRN_MAINT_USER_SUPV_NA);
                             iog.setFkUserShippedId(SUtilConsts.USR_NA_ID);
                             iog.setFkUserAuditedId(SUtilConsts.USR_NA_ID);
                             iog.setFkUserAuthorizedId(SUtilConsts.USR_NA_ID);

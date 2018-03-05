@@ -67,6 +67,8 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected int mnFkMaintAreaId;
     protected int mnFkMaintUserId_n;
     protected int mnFkMaintUserSupervisorId;
+    protected int mnFkMaintReturnUserId_n;
+    protected int mnFkMaintReturnUserSupervisorId;
     protected int mnFkUserShippedId;
     protected int mnFkUserAuditedId;
     protected int mnFkUserAuthorizedId;
@@ -406,6 +408,8 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     public void setFkMaintAreaId(int n) { mnFkMaintAreaId = n; }
     public void setFkMaintUserId_n(int n) { mnFkMaintUserId_n = n; }
     public void setFkMaintUserSupervisorId(int n) { mnFkMaintUserSupervisorId = n; }
+    public void setFkMaintReturnUserId_n(int n) { mnFkMaintReturnUserId_n = n; }
+    public void setFkMaintReturnUserSupervisorId(int n) { mnFkMaintReturnUserSupervisorId = n; }
     public void setFkUserShippedId(int n) { mnFkUserShippedId = n; }
     public void setFkUserAuditedId(int n) { mnFkUserAuditedId = n; }
     public void setFkUserAuthorizedId(int n) { mnFkUserAuthorizedId = n; }
@@ -453,6 +457,8 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     public int getFkMaintAreaId() { return mnFkMaintAreaId; }
     public int getFkMaintUserId_n() { return mnFkMaintUserId_n; }
     public int getFkMaintUserSupervisorId() { return mnFkMaintUserSupervisorId; }
+    public int getFkMaintReturnUserId_n() { return mnFkMaintReturnUserId_n; }
+    public int getFkMaintReturnUserSupervisorId() { return mnFkMaintReturnUserSupervisorId; }
     public int getFkUserShippedId() { return mnFkUserShippedId; }
     public int getFkUserAuditedId() { return mnFkUserAuditedId; }
     public int getFkUserAuthorizedId() { return mnFkUserAuthorizedId; }
@@ -553,10 +559,12 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         mnFkMfgOrderId_n = 0;
         mnFkBookkeepingYearId_n = 0;
         mnFkBookkeepingNumberId_n = 0;
-        mnFkMaintMovementTypeId = SModSysConsts.TRNS_TP_MAINT_MOV_NA;       // default value set only for preventing bugs
-        mnFkMaintAreaId = SModSysConsts.TRN_MAINT_AREA_NA;                  // default value set only for preventing bugs
+        mnFkMaintMovementTypeId = SModSysConsts.TRNS_TP_MAINT_MOV_NA;   // default value set only for preventing bugs
+        mnFkMaintAreaId = SModSysConsts.TRN_MAINT_AREA_NA;              // default value set only for preventing bugs
         mnFkMaintUserId_n = 0;
         mnFkMaintUserSupervisorId = SModSysConsts.TRN_MAINT_USER_SUPV_NA;   // default value set only for preventing bugs
+        mnFkMaintReturnUserId_n = 0;
+        mnFkMaintReturnUserSupervisorId = SModSysConsts.TRN_MAINT_USER_SUPV_NA;   // default value set only for preventing bugs
         mnFkUserShippedId = 0;
         mnFkUserAuditedId = 0;
         mnFkUserAuthorizedId = 0;
@@ -647,6 +655,8 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
                 mnFkMaintAreaId = resultSet.getInt("iog.fid_maint_area");
                 mnFkMaintUserId_n = resultSet.getInt("iog.fid_maint_user_n");
                 mnFkMaintUserSupervisorId = resultSet.getInt("iog.fid_maint_user_supv");
+                mnFkMaintReturnUserId_n = resultSet.getInt("iog.fid_maint_ret_user_n");
+                mnFkMaintReturnUserSupervisorId = resultSet.getInt("iog.fid_maint_ret_user_supv");
                 mnFkUserShippedId = resultSet.getInt("iog.fid_usr_ship");
                 mnFkUserAuditedId = resultSet.getInt("iog.fid_usr_audit");
                 mnFkUserAuthorizedId = resultSet.getInt("iog.fid_usr_authorn");
@@ -788,6 +798,8 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
                 moDbmsDataCounterpartDiog.setFkMaintAreaId(mnFkMaintAreaId);
                 moDbmsDataCounterpartDiog.setFkMaintUserId_n(mnFkMaintUserId_n);
                 moDbmsDataCounterpartDiog.setFkMaintUserSupervisorId(mnFkMaintUserSupervisorId);
+                moDbmsDataCounterpartDiog.setFkMaintReturnUserId_n(mnFkMaintReturnUserId_n);
+                moDbmsDataCounterpartDiog.setFkMaintReturnUserSupervisorId(mnFkMaintReturnUserSupervisorId);
 
                 if (moDbmsDataCounterpartDiog.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
@@ -807,7 +819,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkDocId);
             callableStatement.setDate(nParam++, new java.sql.Date(mtDate.getTime()));
@@ -842,6 +854,8 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
             callableStatement.setInt(nParam++, mnFkMaintAreaId);
             if (mnFkMaintUserId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMaintUserId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
             callableStatement.setInt(nParam++, mnFkMaintUserSupervisorId);
+            if (mnFkMaintReturnUserId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMaintReturnUserId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
+            callableStatement.setInt(nParam++, mnFkMaintReturnUserSupervisorId);
             callableStatement.setInt(nParam++, mnFkUserShippedId);
             callableStatement.setInt(nParam++, mnFkUserAuditedId);
             callableStatement.setInt(nParam++, mnFkUserAuthorizedId);
@@ -1110,6 +1124,8 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         registry.setFkMaintAreaId(this.getFkMaintAreaId());
         registry.setFkMaintUserId_n(this.getFkMaintUserId_n());
         registry.setFkMaintUserSupervisorId(this.getFkMaintUserSupervisorId());
+        registry.setFkMaintReturnUserId_n(this.getFkMaintReturnUserId_n());
+        registry.setFkMaintReturnUserSupervisorId(this.getFkMaintReturnUserSupervisorId());
         registry.setFkUserShippedId(this.getFkUserShippedId());
         registry.setFkUserAuditedId(this.getFkUserAuditedId());
         registry.setFkUserAuthorizedId(this.getFkUserAuthorizedId());

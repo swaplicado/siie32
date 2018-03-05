@@ -1618,6 +1618,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                     iog.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
                     iog.setFkMaintUserId_n(SLibConsts.UNDEFINED);
                     iog.setFkMaintUserSupervisorId(SModSysConsts.TRN_MAINT_USER_SUPV_NA);
+                    iog.setFkMaintReturnUserId_n(SLibConsts.UNDEFINED);
+                    iog.setFkMaintReturnUserSupervisorId(SModSysConsts.TRN_MAINT_USER_SUPV_NA);
                 }
 
                 iog.getDbmsEntries().clear();
@@ -1957,6 +1959,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                         iog.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
                         iog.setFkMaintUserId_n(SLibConsts.UNDEFINED);
                         iog.setFkMaintUserSupervisorId(SModSysConsts.TRN_MAINT_USER_SUPV_NA);
+                        iog.setFkMaintReturnUserId_n(SLibConsts.UNDEFINED);
+                        iog.setFkMaintReturnUserSupervisorId(SModSysConsts.TRN_MAINT_USER_SUPV_NA);
                     }
 
                     iog.getDbmsEntries().clear();
