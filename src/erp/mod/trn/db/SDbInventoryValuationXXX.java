@@ -92,7 +92,6 @@ public class SDbInventoryValuationXXX extends SDbRegistryUser {
         diog.setFkMfgYearId_n(keyOrder[0]);
         diog.setFkMfgOrderId_n(keyOrder[1]);
         diog.setFkMaintMovementTypeId(SModSysConsts.TRNS_TP_MAINT_MOV_NA);
-        diog.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
         diog.setFkMaintUserId_n(SLibConsts.UNDEFINED);
         diog.setFkMaintUserSupervisorId(SModSysConsts.TRN_MAINT_USER_SUPV_NA);
         diog.setFkMaintReturnUserId_n(SLibConsts.UNDEFINED);

@@ -1615,7 +1615,6 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 
                 if (moDiog == null) {
                     iog.setFkMaintMovementTypeId(SModSysConsts.TRNS_TP_MAINT_MOV_NA);
-                    iog.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
                     iog.setFkMaintUserId_n(SLibConsts.UNDEFINED);
                     iog.setFkMaintUserSupervisorId(SModSysConsts.TRN_MAINT_USER_SUPV_NA);
                     iog.setFkMaintReturnUserId_n(SLibConsts.UNDEFINED);
@@ -1700,6 +1699,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             iogEntry.setFkMfgYearId_n(SLibConstants.UNDEFINED);
                             iogEntry.setFkMfgOrderId_n(SLibConstants.UNDEFINED);
                             iogEntry.setFkMfgChargeId_n(SLibConstants.UNDEFINED);
+                            iogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
 
                             iogEntry.setFkUserNewId(1);
                             iogEntry.setFkUserEditId(1);
@@ -1813,6 +1813,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             iogEntry.setFkMfgYearId_n(SLibConstants.UNDEFINED);
                             iogEntry.setFkMfgOrderId_n(SLibConstants.UNDEFINED);
                             iogEntry.setFkMfgChargeId_n(SLibConstants.UNDEFINED);
+                            iogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
 
                             iogEntry.setFkUserNewId(1);
                             iogEntry.setFkUserEditId(1);
@@ -1956,7 +1957,6 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                     
                     if (moDiog == null) {
                         iog.setFkMaintMovementTypeId(SModSysConsts.TRNS_TP_MAINT_MOV_NA);
-                        iog.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
                         iog.setFkMaintUserId_n(SLibConsts.UNDEFINED);
                         iog.setFkMaintUserSupervisorId(SModSysConsts.TRN_MAINT_USER_SUPV_NA);
                         iog.setFkMaintReturnUserId_n(SLibConsts.UNDEFINED);
@@ -2078,6 +2078,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                 iogEntry.setClonedFkMfgOrderId_n(SLibConstants.UNDEFINED);
                                 iogEntry.setClonedFkMfgChargeId_n(SLibConstants.UNDEFINED);
 
+                                iogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
+                                
                                 iogEntry.setFkUserNewId(1);
                                 iogEntry.setFkUserEditId(1);
                                 iogEntry.setFkUserDeleteId(1);
@@ -2210,6 +2212,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                     iogEntry.setClonedFkMfgChargeId_n(stockFinishRow.getFkDestinyChargeId());
                                 }
 
+                                iogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
+                                
                                 iogEntry.setFkUserNewId(1);
                                 iogEntry.setFkUserEditId(1);
                                 iogEntry.setFkUserDeleteId(1);
@@ -2298,7 +2302,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                 iogEntry.setFkMfgYearId_n(SLibConstants.UNDEFINED);
                 iogEntry.setFkMfgOrderId_n(SLibConstants.UNDEFINED);
                 iogEntry.setFkMfgChargeId_n(SLibConstants.UNDEFINED);
-
+                iogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
+                            
                 iogEntry.setFkUserNewId(1);
                 iogEntry.setFkUserEditId(1);
                 iogEntry.setFkUserDeleteId(1);
@@ -2579,6 +2584,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             iogEntry.setFkMfgYearId_n(SLibConstants.UNDEFINED);
                             iogEntry.setFkMfgOrderId_n(SLibConstants.UNDEFINED);
                             iogEntry.setFkMfgChargeId_n(SLibConstants.UNDEFINED);
+                            iogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
 
                             iogEntry.setFkUserNewId(1);
                             iogEntry.setFkUserEditId(1);
@@ -3601,6 +3607,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                 entryNew.setClonedFkMfgYearId_n(entryOriginal.getClonedFkMfgYearId_n());
                                 entryNew.setClonedFkMfgOrderId_n(entryOriginal.getClonedFkMfgOrderId_n());
                                 entryNew.setClonedFkMfgChargeId_n(entryOriginal.getClonedFkMfgChargeId_n());
+                                
+                                entryNew.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
                                 break;
                             }
                         }

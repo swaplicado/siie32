@@ -64,7 +64,6 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected int mnFkBookkeepingYearId_n;
     protected int mnFkBookkeepingNumberId_n;
     protected int mnFkMaintMovementTypeId;
-    protected int mnFkMaintAreaId;
     protected int mnFkMaintUserId_n;
     protected int mnFkMaintUserSupervisorId;
     protected int mnFkMaintReturnUserId_n;
@@ -405,7 +404,6 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     public void setFkBookkeepingYearId_n(int n) { mnFkBookkeepingYearId_n = n; }
     public void setFkBookkeepingNumberId_n(int n) { mnFkBookkeepingNumberId_n = n; }
     public void setFkMaintMovementTypeId(int n) { mnFkMaintMovementTypeId = n; }
-    public void setFkMaintAreaId(int n) { mnFkMaintAreaId = n; }
     public void setFkMaintUserId_n(int n) { mnFkMaintUserId_n = n; }
     public void setFkMaintUserSupervisorId(int n) { mnFkMaintUserSupervisorId = n; }
     public void setFkMaintReturnUserId_n(int n) { mnFkMaintReturnUserId_n = n; }
@@ -454,7 +452,6 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     public int getFkBookkeepingYearId_n() { return mnFkBookkeepingYearId_n; }
     public int getFkBookkeepingNumberId_n() { return mnFkBookkeepingNumberId_n; }
     public int getFkMaintMovementTypeId() { return mnFkMaintMovementTypeId; }
-    public int getFkMaintAreaId() { return mnFkMaintAreaId; }
     public int getFkMaintUserId_n() { return mnFkMaintUserId_n; }
     public int getFkMaintUserSupervisorId() { return mnFkMaintUserSupervisorId; }
     public int getFkMaintReturnUserId_n() { return mnFkMaintReturnUserId_n; }
@@ -560,7 +557,6 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         mnFkBookkeepingYearId_n = 0;
         mnFkBookkeepingNumberId_n = 0;
         mnFkMaintMovementTypeId = SModSysConsts.TRNS_TP_MAINT_MOV_NA;   // default value set only for preventing bugs
-        mnFkMaintAreaId = SModSysConsts.TRN_MAINT_AREA_NA;              // default value set only for preventing bugs
         mnFkMaintUserId_n = 0;
         mnFkMaintUserSupervisorId = SModSysConsts.TRN_MAINT_USER_SUPV_NA;   // default value set only for preventing bugs
         mnFkMaintReturnUserId_n = 0;
@@ -652,7 +648,6 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
                 mnFkBookkeepingYearId_n = resultSet.getInt("iog.fid_bkk_year_n");
                 mnFkBookkeepingNumberId_n = resultSet.getInt("iog.fid_bkk_num_n");
                 mnFkMaintMovementTypeId = resultSet.getInt("iog.fid_maint_mov_tp");
-                mnFkMaintAreaId = resultSet.getInt("iog.fid_maint_area");
                 mnFkMaintUserId_n = resultSet.getInt("iog.fid_maint_user_n");
                 mnFkMaintUserSupervisorId = resultSet.getInt("iog.fid_maint_user_supv");
                 mnFkMaintReturnUserId_n = resultSet.getInt("iog.fid_maint_ret_user_n");
@@ -795,7 +790,6 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
                 moDbmsDataCounterpartDiog.setFkBookkeepingYearId_n(mnFkBookkeepingYearId_n);
                 moDbmsDataCounterpartDiog.setFkBookkeepingNumberId_n(mnFkBookkeepingNumberId_n);
                 moDbmsDataCounterpartDiog.setFkMaintMovementTypeId(mnFkMaintMovementTypeId);
-                moDbmsDataCounterpartDiog.setFkMaintAreaId(mnFkMaintAreaId);
                 moDbmsDataCounterpartDiog.setFkMaintUserId_n(mnFkMaintUserId_n);
                 moDbmsDataCounterpartDiog.setFkMaintUserSupervisorId(mnFkMaintUserSupervisorId);
                 moDbmsDataCounterpartDiog.setFkMaintReturnUserId_n(mnFkMaintReturnUserId_n);
@@ -819,7 +813,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkDocId);
             callableStatement.setDate(nParam++, new java.sql.Date(mtDate.getTime()));
@@ -851,7 +845,6 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
             if (mnFkBookkeepingYearId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkBookkeepingYearId_n); else callableStatement.setNull(nParam++, Types.SMALLINT);
             if (mnFkBookkeepingNumberId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkBookkeepingNumberId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
             callableStatement.setInt(nParam++, mnFkMaintMovementTypeId);
-            callableStatement.setInt(nParam++, mnFkMaintAreaId);
             if (mnFkMaintUserId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMaintUserId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
             callableStatement.setInt(nParam++, mnFkMaintUserSupervisorId);
             if (mnFkMaintReturnUserId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMaintReturnUserId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
@@ -1121,7 +1114,6 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         registry.setFkBookkeepingYearId_n(this.getFkBookkeepingYearId_n());
         registry.setFkBookkeepingNumberId_n(this.getFkBookkeepingNumberId_n());
         registry.setFkMaintMovementTypeId(this.getFkMaintMovementTypeId());
-        registry.setFkMaintAreaId(this.getFkMaintAreaId());
         registry.setFkMaintUserId_n(this.getFkMaintUserId_n());
         registry.setFkMaintUserSupervisorId(this.getFkMaintUserSupervisorId());
         registry.setFkMaintReturnUserId_n(this.getFkMaintReturnUserId_n());

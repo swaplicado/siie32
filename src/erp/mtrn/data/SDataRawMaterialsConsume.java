@@ -262,7 +262,6 @@ public class SDataRawMaterialsConsume extends erp.lib.data.SDataRegistry impleme
                             iog.setFkBookkeepingYearId_n(SLibConstants.UNDEFINED);
                             iog.setFkBookkeepingNumberId_n(SLibConstants.UNDEFINED);
                             iog.setFkMaintMovementTypeId(SModSysConsts.TRNS_TP_MAINT_MOV_NA);
-                            iog.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
                             iog.setFkMaintUserId_n(SLibConsts.UNDEFINED);
                             iog.setFkMaintUserSupervisorId(SModSysConsts.TRN_MAINT_USER_SUPV_NA);
                             iog.setFkMaintReturnUserId_n(SLibConsts.UNDEFINED);
@@ -312,6 +311,7 @@ public class SDataRawMaterialsConsume extends erp.lib.data.SDataRegistry impleme
                         diogEntry.setFkMfgYearId_n(SLibConstants.UNDEFINED);
                         diogEntry.setFkMfgOrderId_n(SLibConstants.UNDEFINED);
                         diogEntry.setFkMfgChargeId_n(SLibConstants.UNDEFINED);
+                        diogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
                         diogEntry.setFkUserNewId(mnFkUserNewId);
                         diogEntry.setFkUserEditId(1);
                         diogEntry.setFkUserDeleteId(1);

@@ -10,6 +10,7 @@ import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.mod.SModSysConsts;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.Types;
@@ -45,6 +46,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     protected int mnFkMfgYearId_n;
     protected int mnFkMfgOrderId_n;
     protected int mnFkMfgChargeId_n;
+    protected int mnFkMaintAreaId;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
     protected int mnFkUserDeleteId;
@@ -101,6 +103,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public void setFkMfgYearId_n(int n) { mnFkMfgYearId_n = n; }
     public void setFkMfgOrderId_n(int n) { mnFkMfgOrderId_n = n; }
     public void setFkMfgChargeId_n(int n) { mnFkMfgChargeId_n = n; }
+    public void setFkMaintAreaId(int n) { mnFkMaintAreaId = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
     public void setFkUserDeleteId(int n) { mnFkUserDeleteId = n; }
@@ -131,6 +134,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public int getFkMfgYearId_n() { return mnFkMfgYearId_n; }
     public int getFkMfgOrderId_n() { return mnFkMfgOrderId_n; }
     public int getFkMfgChargeId_n() { return mnFkMfgChargeId_n; }
+    public int getFkMaintAreaId() { return mnFkMaintAreaId; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
     public int getFkUserDeleteId() { return mnFkUserDeleteId; }
@@ -229,6 +233,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         mnFkMfgYearId_n = 0;
         mnFkMfgOrderId_n = 0;
         mnFkMfgChargeId_n = 0;
+        mnFkMaintAreaId = SModSysConsts.TRN_MAINT_AREA_NA;              // default value set only for preventing bugs
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
         mnFkUserDeleteId = 0;
@@ -306,6 +311,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                 mnFkMfgYearId_n = resultSet.getInt("de.fid_mfg_year_n");
                 mnFkMfgOrderId_n = resultSet.getInt("de.fid_mfg_ord_n");
                 mnFkMfgChargeId_n = resultSet.getInt("de.fid_mfg_chg_n");
+                mnFkMaintAreaId = resultSet.getInt("de.fid_maint_area");
                 mnFkUserNewId = resultSet.getInt("de.fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("de.fid_usr_edit");
                 mnFkUserDeleteId = resultSet.getInt("de.fid_usr_del");
@@ -385,7 +391,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                     "{ CALL trn_diog_ety_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkDocId);
             callableStatement.setInt(nParam++, mnPkEntryId);
@@ -409,6 +415,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
             if (mnFkMfgYearId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMfgYearId_n); else callableStatement.setNull(nParam++, Types.SMALLINT);
             if (mnFkMfgOrderId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMfgOrderId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
             if (mnFkMfgChargeId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMfgChargeId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
+            callableStatement.setInt(nParam++, mnFkMaintAreaId);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, Types.INTEGER);
             callableStatement.registerOutParameter(nParam++, Types.SMALLINT);
@@ -572,6 +579,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         registry.setFkMfgYearId_n(this.getClonedFkMfgYearId_n() != SLibConstants.UNDEFINED ? this.getClonedFkMfgYearId_n() : this.getFkMfgYearId_n());
         registry.setFkMfgOrderId_n(this.getClonedFkMfgOrderId_n() != SLibConstants.UNDEFINED ? this.getClonedFkMfgOrderId_n() : this.getFkMfgOrderId_n());
         registry.setFkMfgChargeId_n(this.getClonedFkMfgChargeId_n() != SLibConstants.UNDEFINED ? this.getClonedFkMfgChargeId_n() : this.getFkMfgChargeId_n());
+        registry.setFkMaintAreaId(this.getFkMaintAreaId());
         registry.setFkUserNewId(this.getFkUserNewId());
         registry.setFkUserEditId(this.getFkUserEditId());
         registry.setFkUserDeleteId(this.getFkUserDeleteId());

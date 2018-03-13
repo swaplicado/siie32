@@ -13,6 +13,7 @@ import erp.lib.SLibUtilities;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.mitm.data.SDataItem;
+import erp.mod.SModSysConsts;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.SDataStockClosing;
@@ -221,6 +222,7 @@ public class SDialogUtilStockClosing extends javax.swing.JDialog {
         diogEntry.setFkMfgYearId_n(SLibConstants.UNDEFINED);
         diogEntry.setFkMfgOrderId_n(SLibConstants.UNDEFINED);
         diogEntry.setFkMfgChargeId_n(SLibConstants.UNDEFINED);
+        diogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
 
         diogEntry.setFkUserNewId(mnFkUserId);
         diogEntry.setFkUserEditId(mnFkUserId);
