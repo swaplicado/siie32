@@ -288,7 +288,6 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         jlEmail.setRequestFocusEnabled(false);
         jPanel9.add(jlEmail);
 
-        jtfEmail.setToolTipText("");
         jtfEmail.setPreferredSize(new java.awt.Dimension(225, 23));
         jPanel9.add(jtfEmail);
 

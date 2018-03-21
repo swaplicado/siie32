@@ -2845,74 +2845,110 @@ public abstract class STrnUtilities {
             + "<th id=\"number\">" + SLibUtils.textToHtml("Cantidad") + "</th> "
             + "<th id=\"number\">" + SLibUtils.textToHtml("Acum. día") + "</th> "
             + "<th id=\"number\">" + SLibUtils.textToHtml("Acum. mes") + "</th> "
-            + "</tr> ";
-        
-        return mail;
-    }
-    
-    public static String computeMailItem(final SClientInterface client, final int idItem, final int idUnit, final String itemCode, final String itemName, 
-            final String contract, final String numberSeries, final String number, final String reference, final double quantity, final String unitOfMeasure, final Date date, 
-            final int[] keyDpsType, final boolean isEdited, final boolean isRebill) {
-        String mail = null;
-        double accumDay = computeAccumulatedItem(client, idItem, idUnit, keyDpsType, date, date, isRebill, numberSeries, number);
-        double accumMonth = computeAccumulatedItem(client, idItem, idUnit, keyDpsType, SLibTimeUtils.getBeginOfMonth(date), date, isRebill, numberSeries, number);
-        
-        mail = "<tr>"        
-            + "<td>" + itemCode + "</td>" 
-            + "<td colspan = \"4\">" + SLibUtils.textToHtml(itemName) + "</td>"
-            + "</tr>"
-            + "<tr>" 
-            + "<td>" + contract + "</td>"   // contract number
-            + "<td>" + reference + "</td>"  // contract reference
-            + "<td id=\"number\">" + SLibUtils.DecimalFormatValue2D.format(quantity) + " " + unitOfMeasure + "</td>"// quantity the order 
-            + "<td id=\"number\">" + (isRebill ? "N/A" : SLibUtils.DecimalFormatValue2D.format(accumDay) + " " + unitOfMeasure) + "</td>"   // accumulated quantity
-            + "<td id=\"number\">" + (isRebill ? "N/A" : SLibUtils.DecimalFormatValue2D.format(accumMonth) + " " + unitOfMeasure) + "</td>" // accumulated quantity
+            + "<th id=\"number\">" + SLibUtils.textToHtml("Entrega men.") + "<sup>*</sup></th> "
+            + "<th id=\"number\">" + SLibUtils.textToHtml("Cant. prog.") + "<sup>*</sup></th> "
+            + "<th id=\"number\">" + SLibUtils.textToHtml("Remanente mes.") + "<sup>*</sup></th> "
+            + "<th id=\"number\">" + SLibUtils.textToHtml("Cant. total") + "<sup>*</sup></th> "
+            + "<th id=\"number\">" + SLibUtils.textToHtml("Remanente total") + "<sup>*</sup></th> "        
             + "</tr>";
         
         return mail;
     }
+     
+    public static String computeMailItem(final SClientInterface client, final int idItem, final int idUnit, final String itemCode, final String itemName, 
+            final String contractNumber, final int contractYearId, final int contractDocId, final int contractMonths, final int priceYear, final int priceMonth, 
+            final String orderNumberSeries, final String orderNumber, final String orderNumberReference, 
+            final double quantity, final String unitOfMeasure, final Date date,
+            final int[] keyDpsType, final boolean isEdited, final boolean isRebill) {
+            /* XXX Former code, check if it is not longer needed (2018-03-15, Sergio Flores)
+            (client, entry.getFkItemId(), entry.getFkOriginalUnitId(), entry.getConceptKey(), entry.getConcept(),
+            dpsDestNumber, msNumberSeries, msNumber, dpsReference, entry.getOriginalQuantity(), entry.getDbmsOriginalUnitSymbol(), mtDate,
+            getDpsTypeKey(), isEdited, mbIsRebill)
+            */
+            String mail = null;
+            double accumDay = computeAccumulatedItem(client, idItem, idUnit, keyDpsType, date, date, isRebill, orderNumberSeries, orderNumber);
+            double accumMonth = computeAccumulatedItem(client, idItem, idUnit, keyDpsType, SLibTimeUtils.getBeginOfMonth(date), date, isRebill, orderNumberSeries, orderNumber);
+            double programmedQuantityMonth = computeAccumulatedDeliveryMonthly(client, contractYearId, contractDocId, priceMonth, isRebill);
+            double remainderQuantityMonth = (programmedQuantityMonth - (computeAccumulatedItem(client, idItem, idUnit, keyDpsType, SLibTimeUtils.getBeginOfMonth(date), date, isRebill, orderNumberSeries, orderNumber)));
+            double quantityTotal = computeAccumulatedTotal(client, contractYearId, contractDocId, isRebill);
+            double remainderQuantityTotal = (quantityTotal - computeAccumulatedDelivery(client, contractYearId, contractDocId, isRebill));
+                        
+            mail = "<tr>"
+            + "<td>" + itemCode + "</td>"
+            + "<td colspan = \"9\">" + SLibUtils.textToHtml(itemName) + "</td>"
+            + "<tr>"
+            + "<td>" + contractNumber + "</td>"   // contract number
+            + "<td>" + orderNumberReference + "</td>"  // contract reference
+            + "<td id=\"number\">" + SLibUtils.DecimalFormatValue2D.format(quantity) + " " + unitOfMeasure + "</td>"// quantity the order
+            + "<td id=\"number\">" + (isRebill ? "N/A" : SLibUtils.DecimalFormatValue2D.format(accumDay) + " " + unitOfMeasure) + "</td>"   // accumulated quantity
+            + "<td id=\"number\">" + (isRebill ? "N/A" : SLibUtils.DecimalFormatValue2D.format(accumMonth) + " " + unitOfMeasure) + "</td>" // accumulated quantity
+            + "<td id=\"number\">" + (isRebill ? "N/A" : (priceYear + "-" + SLibUtils.DecimalFormatCalendarMonth.format(priceMonth))) + "</td>" // date period current
+            + "<td id=\"number\">" + (isRebill ? "N/A" : SLibUtils.DecimalFormatValue2D.format(programmedQuantityMonth) + " " + unitOfMeasure) + "</td>" // programmed quantity
+            + "<td id=\"number\">" + (isRebill ? "N/A" : SLibUtils.DecimalFormatValue2D.format(remainderQuantityMonth) + " " + unitOfMeasure) + "</td>" // accumulated month quantity
+            + "<td id=\"number\">" + (isRebill ? "N/A" : SLibUtils.DecimalFormatValue2D.format(quantityTotal) + " " + unitOfMeasure) + "</td>" // total quantity
+            + "<td id=\"number\">" + (isRebill ? "N/A" : SLibUtils.DecimalFormatValue2D.format(remainderQuantityTotal) + " " + unitOfMeasure) + "</td>" // accumulated total quantity        
+            + "</tr>";
+
+        return mail;
+    }
     
     public static String computeMailFooterEndTable(final String appName, final String copyright, final String appProvider, final String vendorWebsite, final String appRelease) {
-       return "</table> " + computeMailFooter(appName, copyright, appProvider, vendorWebsite, appRelease);
+        return "</table> "
+            + " <font size = 1><p> *Entrega men: Mes del que se esta retirando </p> "
+            + " <p> *Cant. prog: Cantidad programada para el mes actual </p> "
+            + " <p> *Remanente mes: Cantidad restante del mes </p> "
+            + " <p> *Cant. total: Cantidad total del contrato </p> "
+            + " <p> *Remanente cant. total: Cantidad restante de la cantidad total del contrato </p> </font> " 
+            + computeMailFooter(appName, copyright, appProvider, vendorWebsite, appRelease);
     }
     
     public static String computeMailFooter(final String appName, final String copyright, final String appProvider, final String vendorWebsite, final String appRelease) {
-        String mail = null;
-        
-        mail = "<br> "
+        return "<br> "
             + "<br> "
             + "<hr> "
-            + "<span id =\"info\"> " 
-            + SLibUtils.textToHtml("Favor de no responder este correo-e, fue generado de forma automática.") 
-            + "<br>" 
-            + appName+ " &copy;" + copyright + " " + appProvider 
-            + "</span><span id=\"website\"><br> " 
+            + "<span id =\"info\"> "
+            + SLibUtils.textToHtml("Favor de no responder este correo-e, fue generado de forma automÃ¡tica.")
+            + "<br>"
+            + appName+ " &copy;" + copyright + " " + appProvider
+            + "</span><span id=\"website\"><br> "
             + vendorWebsite
-            + "</span><span id=\"release\"><br> " 
+            + "</span><span id=\"release\"><br> "
             + appRelease
             + "</span> "
             + "</body> "
             + "</html> ";
-        
-        return mail;
     }
-    
-    private static double computeAccumulatedItem(final SClientInterface client, final int idItem, final int idOriginalUnit, 
+        
+    /**
+     * Take out the amount collected each monthly delivery
+     * @param client ERP Client interface.
+     * @param idItem ID item the contract.
+     * @param idOriginalUnit Type unit of item.
+     * @param keyDpsType Key type Dps document contract.
+     * @param start Date start contract.
+     * @param end Date end contract.
+     * @param isRebill Flag is rebilling.
+     * @param numberSeries  Series of document. 
+     * @param number Number series of document.
+     * @return Quantity of accumulated item.
+     */
+    private static double computeAccumulatedItem(final SClientInterface client, final int idItem, final int idOriginalUnit,
             final int[] keyDpsType, final Date start, final Date end, final boolean isRebill, final String numberSeries, final String number) {
         String sql = "";
         double total = 0;
         ResultSet resultSet = null;
         Statement statement = null;
-        
+
         try {
-            if (!isRebill) {
-                sql = "SELECT COALESCE(SUM(de.orig_qty), 0) "
-                    + "FROM trn_dps AS d "
-                    + "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc "
-                    + "WHERE d.b_del = 0 AND de.b_del = 0 AND d.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(start) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(end)+ "' AND "
-                    + "de.fid_item = " + idItem + " AND de.fid_orig_unit = " + idOriginalUnit + " AND fid_ct_dps = " + keyDpsType[0] + " AND fid_cl_dps = " + keyDpsType[1] + " AND fid_tp_dps = " + keyDpsType[2] + " AND d.b_rebill = 0 "
-                    + "AND d.num_ser = '" + numberSeries + "' and d.num <= '" + number + "' ";
-                
+            if (!isRebill) {                
+                sql = "SELECT COALESCE(SUM(de.orig_qty), 0) " +
+                      "FROM trn_dps AS d " +
+                      "INNER JOIN " +
+                      "trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc " +
+                      "WHERE d.b_del = 0 AND de.b_del = 0 AND d.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(start) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(end)+ "' AND " +
+                      "de.fid_item = " + idItem + " AND de.fid_orig_unit = " + idOriginalUnit + " AND fid_ct_dps = " + keyDpsType[0] + " AND fid_cl_dps = " + keyDpsType[1] + " AND fid_tp_dps = " + keyDpsType[2] + " AND d.b_rebill = 0 " +
+                      "AND d.num_ser = '" + numberSeries + "' and d.num <= '" + number + "' ";
+
                 statement = client.getSession().getDatabase().getConnection().createStatement();
                 resultSet = statement.executeQuery(sql);
                 if (resultSet.next()) {
@@ -2923,7 +2959,122 @@ public abstract class STrnUtilities {
         catch (Exception e) {
             SLibUtilities.printOutException(STrnUtilities.class.getName(), e);
         }
-        
+
+        return total;
+    }
+    
+    /**
+     * Calculate the total amount of the order
+     * @param client ERP Client interface.
+     * @param contractYearId Year of contract work.
+     * @param contractDocId Id document contract.
+     * @param isRebill Flag is rebilling.
+     * @return Quantity of accumulated delivery.
+     */
+    private static double computeAccumulatedDelivery(final SClientInterface client,  final int contractYearId, final int contractDocId, final boolean isRebill) {
+        String sql = "";
+        double total = 0;
+        ResultSet resultSet = null;
+        Statement statement = null;
+
+        try {
+            if (!isRebill) {
+                sql = "SELECT SUM(qty) " +
+                      "FROM TRN_DPS_DPS_SUPPLY AS cu " +
+                      "WHERE cu.id_src_year = " + contractYearId + " AND cu.id_src_doc = " + contractDocId;
+
+                statement = client.getSession().getDatabase().getConnection().createStatement();
+                resultSet = statement.executeQuery(sql);
+                if (resultSet.next()) {
+                    total = resultSet.getDouble(1);
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtilities.printOutException(STrnUtilities.class.getName(), e);
+        }
+
+        return total;
+    }
+
+    /**
+     * Calculate accumulated total retired until this month
+     * @param client ERP Client interface.
+     * @param contractYearId Year of contract work.
+     * @param contractDocId Id document contract.
+     * @param isRebill Flag is rebilling.
+     * @return Quantity accumulated Total.
+     */
+    private static double computeAccumulatedTotal(final SClientInterface client, final int contractYearId, final int contractDocId, final boolean isRebill) {
+        String sql = "";
+        double total = 0;
+        ResultSet resultSet = null;
+        Statement statement = null;
+
+        try {
+            if (!isRebill) {
+                sql = "SELECT qty " +
+                      "FROM trn_dps_ety " +
+                      "WHERE id_year = " + contractYearId + " AND id_doc = " + contractDocId ;
+
+                statement = client.getSession().getDatabase().getConnection().createStatement();
+                resultSet = statement.executeQuery(sql);
+                if (resultSet.next()) {
+                    total = resultSet.getDouble(1);
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtilities.printOutException(STrnUtilities.class.getName(), e);
+        }
+
+        return total;
+    }
+
+    /**
+     * Calculate the cumulative monthly delivery until this month
+     * @param contractYearId Year of contract work.
+     * @param contractDocId Id document contract.
+     * @param isRebill Flag is rebilling.
+     * @return Quantity accumulated Ddlivery Monthly.
+     */
+    private static double computeAccumulatedDeliveryMonthly(final SClientInterface client, final int contractYearId, final int contractDocId, final int dspReferenceNumber, final boolean isRebill) {
+        String sql = "";
+        int totalId = 0;
+        double total = 0;        
+        ResultSet resultIdSet = null;
+        ResultSet resultSet = null;
+        Statement statement = null;
+
+        try {
+            if (!isRebill) {
+                sql = "SELECT id_prc " +
+                      "FROM trn_dps_ety_prc " +
+                      "WHERE id_year = " + contractYearId + " AND id_doc = " + contractDocId + " " +
+                      "AND con_prc_mon = " + dspReferenceNumber + " LIMIT 1 " ;
+
+                statement = client.getSession().getDatabase().getConnection().createStatement();
+                resultIdSet = statement.executeQuery(sql);
+                    if (resultIdSet.next()) {
+                        totalId = resultIdSet.getInt(1);
+                    }
+
+                    sql = "SELECT SUM(orig_qty) " +
+                          "FROM trn_dps_ety_prc " +
+                          "WHERE id_year = " + contractYearId + " AND id_doc = " + contractDocId  + " " +
+                          "AND id_prc = " + totalId ;
+
+                    statement = client.getSession().getDatabase().getConnection().createStatement();
+                    resultSet = statement.executeQuery(sql);
+                    if (resultSet.next()) {
+                        total = resultSet.getDouble(1);
+                    }
+                }
+            }
+            catch (Exception e) {
+                SLibUtilities.printOutException(STrnUtilities.class.getName(), e);
+        }
+
         return total;
     }
     

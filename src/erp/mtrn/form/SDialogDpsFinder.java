@@ -45,7 +45,7 @@ public class SDialogDpsFinder extends javax.swing.JDialog implements erp.lib.for
     /** Creates new form SDialogDpsFinder
      * @param client ERP Client interface.
      * @param finderType Finder type can be:
-     * a) SDataConstants.TRNX_DPS_PAY_PEND
+     * a) SDataConstants.TRNX_DPS_PAY_PEND (not really used)
      * b) SDataConstants.TRNX_DPS_PEND_LINK
      * c) SDataConstants.TRNX_DPS_PEND_ADJ
      */

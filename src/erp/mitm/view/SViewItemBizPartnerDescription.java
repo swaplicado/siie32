@@ -18,7 +18,7 @@ import sa.gui.util.SUtilConsts;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Claudio Peña
  */
 public class SViewItemBizPartnerDescription extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -34,7 +34,7 @@ public class SViewItemBizPartnerDescription extends erp.lib.table.STableTab impl
         int levelRightEdit = SDataConstantsSys.UNDEFINED;
 
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[18];
+        STableColumn[] aoTableColumns = new STableColumn[19];
 
         moTabFilterDeleted = new STabFilterDeleted(this);
 
@@ -57,6 +57,7 @@ public class SViewItemBizPartnerDescription extends erp.lib.table.STableTab impl
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.item", "Ítem asoc. neg.", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.item_short", "Ítem corto asoc. neg.", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad asoc. neg.", STableConstants.WIDTH_UNIT_SYMBOL);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.cfd_use", "Uso CFDI", 50);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "c.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_del", "Ítem eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "b.b_del", "Asoc. negocios eliminado", STableConstants.WIDTH_BOOLEAN);
@@ -93,7 +94,7 @@ public class SViewItemBizPartnerDescription extends erp.lib.table.STableTab impl
             }
         }
 
-        msSql = "SELECT c.id_bp, c.item_key, c.item, c.item_short, c.b_del, i.b_del, b.b_del, b.bp, u.symbol, i.item_key, i.item, i.item_short, uo.symbol, " +
+        msSql = "SELECT c.id_bp, c.item_key, c.item, c.item_short, c.cfd_use, c.b_del, i.b_del, b.b_del, b.bp, u.symbol, i.item_key, i.item, i.item_short, uo.symbol, " +
                 "c.ts_new, c.ts_edit, c.ts_del, un.usr, ue.usr, ud.usr " +
                 "FROM erp.itmu_cfg_item_bp AS c " +
                 "INNER JOIN erp.bpsu_bp AS b ON " +

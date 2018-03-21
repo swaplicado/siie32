@@ -41,6 +41,7 @@ import erp.mfin.data.SDataRecord;
 import erp.mfin.form.SDialogRecordPicker;
 import erp.mfin.form.SPanelRecord;
 import erp.mitm.data.SDataItem;
+import erp.mitm.data.SDataItemBizPartnerDescription;
 import erp.mitm.data.SDataUnit;
 import erp.mmkt.data.SDataCustomerBranchConfig;
 import erp.mod.SModConsts;
@@ -264,6 +265,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.mtrn.form.SDialogPickerDps moDialogPickerDps;
     private erp.mtrn.form.SDialogPickerDps moDialogPickerDpsForLink;
     private erp.mtrn.form.SDialogPickerDps moDialogPickerDpsForAdjustment;
+    private erp.mtrn.form.SDialogPickerDps moDialogPickerDpsForCfdiRelated;
     private erp.mtrn.form.SDialogDpsLink moDialogDpsLink;
     private erp.mtrn.form.SDialogDpsAdjustment moDialogDpsAdjustment;
     private erp.mfin.form.SDialogRecordPicker moDialogRecordPicker;
@@ -629,6 +631,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel116 = new javax.swing.JPanel();
         jlCfdiCfdiRelated = new javax.swing.JLabel();
         jtfCfdiCfdiRelated = new javax.swing.JTextField();
+        jbCfdiCfdiRelated = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jpInternationalTrade = new javax.swing.JPanel();
         jPanel109 = new javax.swing.JPanel();
@@ -2235,15 +2238,21 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jtfCfdiCfdiRelated.setText("TEXT");
         jtfCfdiCfdiRelated.setToolTipText("UUID de CFDI relacionados");
-        jtfCfdiCfdiRelated.setPreferredSize(new java.awt.Dimension(250, 23));
+        jtfCfdiCfdiRelated.setPreferredSize(new java.awt.Dimension(223, 23));
         jPanel116.add(jtfCfdiCfdiRelated);
+
+        jbCfdiCfdiRelated.setText("+");
+        jbCfdiCfdiRelated.setToolTipText("Agregar");
+        jbCfdiCfdiRelated.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbCfdiCfdiRelated.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel116.add(jbCfdiCfdiRelated);
 
         jPanel74.add(jPanel116);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
         jLabel1.setForeground(java.awt.Color.gray);
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("(Si se requiere capturar más de un UUID, separarlos con coma.)");
+        jLabel1.setText("(Para capturar más de un UUID, sepáralos con coma, sin espacios.)");
         jPanel74.add(jLabel1);
 
         jPanel73.add(jPanel74, java.awt.BorderLayout.NORTH);
@@ -2630,6 +2639,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldCfdiRelationType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdiRelationType, jlCfdiCfdiUsage);
         moFieldCfdiRelationType.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
         moFieldCfdiCfdiRelated = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCfdiCfdiRelated, jlCfdiCfdiRelated);
+        moFieldCfdiCfdiRelated.setPickerButton(jbCfdiCfdiRelated);
         moFieldCfdiCfdiRelated.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
         
         // international commerce fields:
@@ -2887,6 +2897,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbFkProductionOrderId_n.addActionListener(this);
         jbFileXml.addActionListener(this);
         jbDeleteFileXml.addActionListener(this);
+        jbCfdiCfdiRelated.addActionListener(this);
         jtbEntryFilter.addActionListener(this);
         jtbNotesFilter.addActionListener(this);
 
@@ -3130,6 +3141,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbCfdiRelationType.setEnabled(enableFields && isCfdiVer33);
         jtfCfdiCfdiRelated.setEnabled(enableFields && isCfdiVer33);
         jtfCfdiCfdiRelated.setFocusable(enableFields && isCfdiVer33);
+        jbCfdiCfdiRelated.setEnabled(enableFields && isCfdiVer33);
     }
 
     /**
@@ -6068,7 +6080,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             miClient.showMsgBoxWarning("La fecha del documento origen (" + SLibUtils.DateFormatDate.format(oDpsSource.getDate()) + ") " +
                                     "no puede ser posterior a la fecha de este documento (" + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + ").");
                         }
-                        else if (isCfdCfdiRelatedRequired() && (oDpsSource.getIsDeleted() || oDpsSource.getFkDpsStatusId() != SDataConstantsSys.TRNS_ST_DPS_EMITED)) {
+                        else if (oDpsSource.getIsDeleted() || oDpsSource.getFkDpsStatusId() != SDataConstantsSys.TRNS_ST_DPS_EMITED) {
                             miClient.showMsgBoxWarning("El documento origen debe estar emitido.");
                         }
                         else {
@@ -6620,8 +6632,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
                 if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains(".xml")) {
                     if (SCfdUtils.validateEmisorXmlExpenses(miClient, miClient.getFileChooser().getSelectedFile().getAbsolutePath())) {
-                    moFieldFileXml.setFieldValue(miClient.getFileChooser().getSelectedFile().getName());
-                    msFileXmlPath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
+                        moFieldFileXml.setFieldValue(miClient.getFileChooser().getSelectedFile().getName());
+                        msFileXmlPath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
                     }
                 }
                 else{
@@ -6637,6 +6649,31 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     
     private void actionDeleteFileXml() {
         moFieldFileXml.setFieldValue("");            
+    }
+    
+    private void actionCfdiCfdiRelated() {
+        if (moDialogPickerDpsForCfdiRelated == null) {
+            moDialogPickerDpsForCfdiRelated = new SDialogPickerDps(miClient, SDataConstants.TRN_DPS);
+        }
+        
+        moDialogPickerDpsForCfdiRelated.formReset();
+        moDialogPickerDpsForCfdiRelated.setFilterKey(new Object[] { mbIsDoc ? manDpsClassKey : manDpsClassPreviousKey, moBizPartner.getPrimaryKey() });
+        moDialogPickerDpsForCfdiRelated.formRefreshOptionPane();
+        moDialogPickerDpsForCfdiRelated.setFormVisible(true);
+
+        if (moDialogPickerDpsForCfdiRelated.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+            SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moDialogPickerDpsForCfdiRelated.getSelectedPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
+            if (dps.getDbmsDataCfd() == null) {
+                miClient.showMsgBoxWarning("El documento " + dps.getDpsNumber() + " no cuenta con CFD.");
+            }
+            else if (dps.getDbmsDataCfd().getUuid().isEmpty()) {
+                miClient.showMsgBoxWarning("El documento " + dps.getDpsNumber() + " no cuenta con UUID.");
+            }
+            else {
+                String cfdi = moFieldCfdiCfdiRelated.getString();
+                moFieldCfdiCfdiRelated.setString((cfdi.isEmpty() ? "" : cfdi + ",") + dps.getDbmsDataCfd().getUuid());
+            }
+        }
     }
 
     private void actionDateDocDelivery_n() {
@@ -7369,6 +7406,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JTabbedPane jTabbedPane;
     private javax.swing.JButton jbBizPartnerBalance;
     private javax.swing.JButton jbCancel;
+    private javax.swing.JButton jbCfdiCfdiRelated;
     private javax.swing.JButton jbComputeTotal;
     private javax.swing.JButton jbDate;
     private javax.swing.JButton jbDateDoc;
@@ -8392,6 +8430,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                  }
                             }
                             
+                            // validate International Commerce settings:
                             if (!validation.getIsError() && isCfdIntCommerceRequired()) {
                                 if (moFieldFkIncotermId.getKeyAsIntArray()[0] == SModSysConsts.LOGS_INC_NA) {
                                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkIncotermId.getText() + "'.");
@@ -8424,6 +8463,24 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkAddresseeBizPartner.getText() + "'.");
                                     validation.setComponent(jcbFkAddresseeBizPartner);
                                     jTabbedPane.setSelectedIndex(TAB_CFD_INT);
+                                }
+                            }
+                            
+                            // validate CFDI usage when some item requires a specific one:
+                            if (!validation.getIsError()) {
+                                for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
+                                    SDataDpsEntry entry = ((SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData());
+
+                                    for (SDataItemBizPartnerDescription description : moBizPartner.getDbmsItemBizPartnerDescription()) {
+                                        if (entry.getFkItemId() == description.getPkItemId() && !description.getCfdiUsage().isEmpty() && !description.getIsDeleted()) {
+                                            if (!moFieldCfdiCfdiUsage.getKey().toString().equals(description.getCfdiUsage())) {
+                                                validation.setMessage(SLibConstants.MSG_ERR_GUI_USE_CFDI + "'" + description.getCfdiUsage() + "'.");
+                                                validation.setComponent(jcbCfdiCfdiUsage);
+                                                jTabbedPane.setSelectedIndex(TAB_CFD_XML);
+                                                break;
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -8665,7 +8722,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
 
                 if (!moDps.getDbmsDataDpsCfd().getCfdiRelacionados().isEmpty()) {
-                    moFieldCfdiCfdiRelated.setFieldValue(SLibUtils.textImplode(moDps.getDbmsDataDpsCfd().getCfdiRelacionados().toArray(new String[moDps.getDbmsDataDpsCfd().getCfdiRelacionados().size()]), ", "));
+                    moFieldCfdiCfdiRelated.setFieldValue(SLibUtils.textImplode(moDps.getDbmsDataDpsCfd().getCfdiRelacionados().toArray(new String[moDps.getDbmsDataDpsCfd().getCfdiRelacionados().size()]), ","));
                 }
 
                 if (isCfdIntCommerceRequired()) {
@@ -9152,6 +9209,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
             else if (button == jbDeleteFileXml) {
                 actionDeleteFileXml();
+            }
+            else if (button == jbCfdiCfdiRelated) {
+                actionCfdiCfdiRelated();
             }
         }
         else if (e.getSource() instanceof javax.swing.JToggleButton) {

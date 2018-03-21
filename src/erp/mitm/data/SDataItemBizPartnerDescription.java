@@ -13,7 +13,7 @@ import java.sql.ResultSet;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Claudio Peña
  */
 public class SDataItemBizPartnerDescription extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -23,6 +23,8 @@ public class SDataItemBizPartnerDescription extends erp.lib.data.SDataRegistry i
     protected java.lang.String msKey;
     protected java.lang.String msItem;
     protected java.lang.String msItemShort;
+    protected java.lang.String mbCfdiUsage;
+    protected boolean mbIsItemDescription;
     protected boolean mbIsDeleted;
     protected int mnFkUnitId;
     protected int mnFkUserNewId;
@@ -49,6 +51,8 @@ public class SDataItemBizPartnerDescription extends erp.lib.data.SDataRegistry i
     public void setKey(java.lang.String s) { msKey = s; }
     public void setItem(java.lang.String s) { msItem = s; }
     public void setItemShort(java.lang.String s) { msItemShort = s; }
+    public void setCfdiUsage(java.lang.String s) { mbCfdiUsage = s; }
+    public void setIsItemDescription(boolean b) { mbIsItemDescription = b; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkUnitId(int n) { mnFkUnitId = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
@@ -64,6 +68,8 @@ public class SDataItemBizPartnerDescription extends erp.lib.data.SDataRegistry i
     public java.lang.String getKey() { return msKey; }
     public java.lang.String getItem() { return msItem; }
     public java.lang.String getItemShort() { return msItemShort; }
+    public java.lang.String getCfdiUsage() { return mbCfdiUsage; }
+    public boolean getIsItemDescription() { return mbIsItemDescription; }
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkUnitId() { return mnFkUnitId; }
     public int getFkUserNewId() { return mnFkUserNewId; }
@@ -104,6 +110,8 @@ public class SDataItemBizPartnerDescription extends erp.lib.data.SDataRegistry i
         msKey = "";
         msItem = "";
         msItemShort = "";
+        mbCfdiUsage = "";
+        mbIsItemDescription = false;
         mbIsDeleted = false;
         mnFkUnitId = 0;
         mnFkUserNewId = 0;
@@ -149,6 +157,8 @@ public class SDataItemBizPartnerDescription extends erp.lib.data.SDataRegistry i
                 msKey = resultSet.getString("cf.item_key");
                 msItem = resultSet.getString("cf.item");
                 msItemShort = resultSet.getString("cf.item_short");
+                mbCfdiUsage = resultSet.getString("cf.cfd_use");
+                mbIsItemDescription = resultSet.getBoolean("cf.b_item_desc");
                 mbIsDeleted = resultSet.getBoolean("cf.b_del");
                 mnFkUnitId = resultSet.getInt("cf.fid_unit");
                 mnFkUserNewId = resultSet.getInt("cf.fid_usr_new");
@@ -195,13 +205,16 @@ public class SDataItemBizPartnerDescription extends erp.lib.data.SDataRegistry i
         try {
             callableStatement = connection.prepareCall(
                     "{ CALL erp.itmu_cfg_item_bp_save(" +
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                    "?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkItemId);
             callableStatement.setInt(nParam++, mnPkBizPartnerId);
             callableStatement.setInt(nParam++, mnPkConfigId);
             callableStatement.setString(nParam++, msKey);
             callableStatement.setString(nParam++, msItem);
             callableStatement.setString(nParam++, msItemShort);
+            callableStatement.setString(nParam++, mbCfdiUsage);
+            callableStatement.setBoolean(nParam++, mbIsItemDescription);
             callableStatement.setBoolean(nParam++, mbIsDeleted);
             callableStatement.setInt(nParam++, mnFkUnitId);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);

@@ -44,7 +44,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda
+ * @author Sergio Flores, Uriel Castañeda, Claudio Peña
  */
 public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, javax.swing.event.ListSelectionListener, java.awt.event.ItemListener {
 
@@ -365,7 +365,7 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
                 if (selectedRow.getAuxSGuiDpsEntryPrice() != null) {
                     if (SLibUtilities.compareKeys(selectedRow.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getPrimaryKey(), ((SGuiDpsEntryPrice) componentItem.getComplement()).getDataDpsEntryPrice().getPrimaryKey())) {
                         jcbDpsEntryPrices.setSelectedItem(componentItem);
-                        renderEntryPriceSatus((SFormComponentItem) jcbDpsEntryPrices.getSelectedItem());
+                        renderEntryPriceStatus((SFormComponentItem) jcbDpsEntryPrices.getSelectedItem());
                         actionEntryPriceSelected((SFormComponentItem) jcbDpsEntryPrices.getSelectedItem());
                     }
                 }
@@ -373,7 +373,7 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
                     if (jcbDpsEntryPrices.getSelectedIndex() == SLibConstants.UNDEFINED) {
                         if (jcbDpsEntryPrices.getModel().getSize() > 1) {
                             jcbDpsEntryPrices.setSelectedIndex(1);
-                            renderEntryPriceSatus((SFormComponentItem) jcbDpsEntryPrices.getSelectedItem());
+                            renderEntryPriceStatus((SFormComponentItem) jcbDpsEntryPrices.getSelectedItem());
                             actionEntryPriceSelected((SFormComponentItem) jcbDpsEntryPrices.getSelectedItem());
                         }
                     }
@@ -385,11 +385,11 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
             jlEntryPrice.setEnabled(false);
             jcbDpsEntryPrices.setEnabled(false);
             jcbDpsEntryPrices.setFocusable(false);
-            renderEntryPriceSatus(null);
+            renderEntryPriceStatus(null);
         }                
     }
     
-     private void renderEntryPriceSatus(SFormComponentItem item) {
+     private void renderEntryPriceStatus(SFormComponentItem item) {
         jtfOriginalQuantity.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(0));
         jtfOriginalQuantityProcessed.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(0));
         jtfOriginalQuantityAvailable.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(0));  
@@ -832,7 +832,7 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
                 JComboBox comboBox = (JComboBox)  e.getSource();
                 if (comboBox.isEnabled() && comboBox == jcbDpsEntryPrices && e.getStateChange() == ItemEvent.SELECTED) {
                     actionEntryPriceSelected((SFormComponentItem) comboBox.getSelectedItem());
-                    renderEntryPriceSatus((SFormComponentItem) comboBox.getSelectedItem());
+                    renderEntryPriceStatus((SFormComponentItem) comboBox.getSelectedItem());
                 }
         }
     }

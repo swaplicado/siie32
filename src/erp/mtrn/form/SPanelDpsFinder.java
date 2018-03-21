@@ -55,8 +55,9 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
      * @param client ERP Client interface.
      * @param finderType Finder type can be:
      * a) SDataConstants.TRNX_DPS_PAY_PEND
-     * b) SDataConstants.TRNX_DPS_PEND_LINK
-     * c) SDataConstants.TRNX_DPS_PEND_ADJ
+     * b) SDataConstants.TRNX_DPS_SHIP_PEND_LINK
+     * c) SDataConstants.TRNX_DPS_PEND_LINK
+     * d) SDataConstants.TRNX_DPS_PEND_ADJ
      */
     public SPanelDpsFinder(erp.client.SClientInterface client, int finderType) {
         this(client, finderType, null, null);
@@ -66,8 +67,9 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
      * @param client ERP Client interface.
      * @param finderType Finder type can be:
      * a) SDataConstants.TRNX_DPS_PAY_PEND
-     * b) SDataConstants.TRNX_DPS_PEND_LINK
-     * c) SDataConstants.TRNX_DPS_PEND_ADJ
+     * b) SDataConstants.TRNX_DPS_SHIP_PEND_LINK
+     * c) SDataConstants.TRNX_DPS_PEND_LINK
+     * d) SDataConstants.TRNX_DPS_PEND_ADJ
      * @param externalObject Object that needs to be aware when a DPS is found.
      * @param externalMethod Method for external object member to take action when a DPS is found.
      */
@@ -100,7 +102,7 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         jPanel2 = new javax.swing.JPanel();
         jlSearchNumber = new javax.swing.JLabel();
         jtfSearchNumberSeries = new javax.swing.JTextField();
-        jbSearchDps = new javax.swing.JButton();
+        jbPickDps = new javax.swing.JButton();
         jbDeleteDps = new javax.swing.JButton();
         jlDummy = new javax.swing.JLabel();
         jckIsLocalCurrency = new javax.swing.JCheckBox();
@@ -155,11 +157,11 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         jtfSearchNumberSeries.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel2.add(jtfSearchNumberSeries);
 
-        jbSearchDps.setText("...");
-        jbSearchDps.setToolTipText("Buscar documento");
-        jbSearchDps.setFocusable(false);
-        jbSearchDps.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel2.add(jbSearchDps);
+        jbPickDps.setText("...");
+        jbPickDps.setToolTipText("Buscar documento");
+        jbPickDps.setFocusable(false);
+        jbPickDps.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel2.add(jbPickDps);
 
         jbDeleteDps.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif"))); // NOI18N
         jbDeleteDps.setToolTipText("Limpiar");
@@ -187,9 +189,9 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
     private void initComponentsExtra() {
         switch (mnFinderType) {
             case SDataConstants.TRNX_DPS_PAY_PEND:
+            case SDataConstants.TRNX_DPS_SHIP_PEND_LINK:
             case SDataConstants.TRNX_DPS_PEND_LINK:
             case SDataConstants.TRNX_DPS_PEND_ADJ:
-            case SDataConstants.TRNX_DPS_SHIP_PEND_LINK:    
                 break;
 
             default:
@@ -200,7 +202,7 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         moFieldSearchBizPartnerId.setPickerButton(jbSearchBizPartnerId);
         moFieldSearchNumberDps = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfSearchNumberSeries, jlSearchNumber);
         moFieldSearchNumberDps.setLengthMax(15);
-        moFieldSearchNumberDps.setPickerButton(jbSearchDps);
+        moFieldSearchNumberDps.setPickerButton(jbPickDps);
 
         mvFields = new Vector<>();
         mvFields.add(moFieldSearchBizPartnerId);
@@ -213,7 +215,7 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         add(moPanelDps, BorderLayout.CENTER);
 
         jbSearchBizPartnerId.addActionListener(this);
-        jbSearchDps.addActionListener(this);
+        jbPickDps.addActionListener(this);
         jbDeleteDps.addActionListener(this);
         jcbSearchBizPartnerId.addActionListener(this);
 
@@ -230,7 +232,7 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         moPanelDps.setDps(null, null);
 
         try {
-            if (moFieldSearchNumberDps.getString().length() > 0) {
+            if (!moFieldSearchNumberDps.getString().isEmpty()) {
                 asNumberDps = SLibUtilities.textExplode(moFieldSearchNumberDps.getString(), "-");
 
                 if (asNumberDps.length > 1) {
@@ -299,6 +301,7 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
             jcbSearchBizPartnerId.setEnabled(true);
             jbSearchBizPartnerId.setEnabled(true);
         }
+        
         SFormUtilities.populateComboBox(miClient, jcbSearchBizPartnerId, mnOptionsBizPartnerType);
     }
 
@@ -311,7 +314,7 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         }
     }
     
-    private void actionSearchDps() {
+    private void actionPickDps() {
         Object[] filterKey = null;
 
         moDps = null;
@@ -397,8 +400,8 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JButton jbDeleteDps;
+    private javax.swing.JButton jbPickDps;
     private javax.swing.JButton jbSearchBizPartnerId;
-    private javax.swing.JButton jbSearchDps;
     private javax.swing.JComboBox jcbSearchBizPartnerId;
     private javax.swing.JCheckBox jckIsLocalCurrency;
     private javax.swing.JLabel jlDummy;
@@ -514,8 +517,8 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
             if (button == jbSearchBizPartnerId) {
                 actionSearchBizPartner();
             }
-            else if (button == jbSearchDps) {
-                actionSearchDps();
+            else if (button == jbPickDps) {
+                actionPickDps();
             }
             else if (button == jbDeleteDps) {
                 actionDeleteDps();

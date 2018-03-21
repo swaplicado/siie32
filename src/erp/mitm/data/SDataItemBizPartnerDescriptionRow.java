@@ -25,6 +25,7 @@ public class SDataItemBizPartnerDescriptionRow extends erp.lib.table.STableRow {
         mvValues.add(desc.getItem());
         mvValues.add(desc.getItemShort());
         mvValues.add(desc.getDbmsUnit());
+        mvValues.add(desc.getCfdiUsage());
         mvValues.add(desc.getIsDeleted());
     }
 }

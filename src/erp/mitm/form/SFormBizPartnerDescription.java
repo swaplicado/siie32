@@ -179,11 +179,12 @@ public class SFormBizPartnerDescription extends javax.swing.JDialog implements e
         jbModifyItemDescription.addActionListener(this);
 
         i = 0;
-        tableColumnsItemBizPartnerDescription = new STableColumnForm[5];
+        tableColumnsItemBizPartnerDescription = new STableColumnForm[6];
         tableColumnsItemBizPartnerDescription[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
-        tableColumnsItemBizPartnerDescription[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 300);
+        tableColumnsItemBizPartnerDescription[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 200);
         tableColumnsItemBizPartnerDescription[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem corto", 100);
         tableColumnsItemBizPartnerDescription[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
+        tableColumnsItemBizPartnerDescription[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Uso CFDI", 100);
         tableColumnsItemBizPartnerDescription[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Eliminado", STableConstants.WIDTH_BOOLEAN);
 
         for (i = 0; i < tableColumnsItemBizPartnerDescription.length; i++) {

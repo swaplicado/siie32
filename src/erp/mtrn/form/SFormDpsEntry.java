@@ -2872,7 +2872,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
             if (moParamBizPartner.getDbmsItemBizPartnerDescription().size() > 0) {
                 for (SDataItemBizPartnerDescription description : moParamBizPartner.getDbmsItemBizPartnerDescription()) {
-                    if (moItem.getPkItemId() == description.getPkItemId() && !description.getIsDeleted()) {
+                    if (moItem.getPkItemId() == description.getPkItemId() && description.getIsItemDescription() && !description.getIsDeleted()) {
                         keyItemBp = description.getKey();
                         item = description.getItem().length() <= moFieldConcept.getLengthMax() ? description.getItem() : description.getItemShort();
                         unitItemBp = description.getFkUnitId();

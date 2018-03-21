@@ -242,6 +242,7 @@ public abstract class SLibConstants {
     public static final java.lang.String MSG_ERR_GUI_REG_ALREADY_DELETE = "El registro ya está eliminado.";
     public static final java.lang.String MSG_ERR_GUI_REG_ALREADY_ANNUL = "El registro ya está anulado.";
     public static final java.lang.String MSG_ERR_GUI_FIELD_EMPTY = "Se debe especificar un valor para el campo ";
+    public static final java.lang.String MSG_ERR_GUI_USE_CFDI = "El Uso de CFDI del documento debe ser ";
     public static final java.lang.String MSG_ERR_GUI_FIELD_VALUE_DIF = "Se debe especificar un valor diferente para el campo ";
     public static final java.lang.String MSG_ERR_GUI_FIELD_VALUE_NOT_REQ = "No se debe especificar ningún valor para el campo ";
     public static final java.lang.String MSG_ERR_GUI_FORM_READ_ONLY = "La forma es de solo lectura.";

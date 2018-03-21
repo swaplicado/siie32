@@ -11,8 +11,11 @@
 
 package erp.mitm.form;
 
+import erp.cfd.SCfdXmlCatalogs;
 import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
+import erp.gui.session.SSessionCustom;
 import erp.lib.SLibConstants;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
@@ -21,15 +24,19 @@ import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataItemBizPartnerDescription;
 import erp.mitm.data.SDataUnit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Claudio Peña
  */
-public class SFormItemDescription extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
+public class SFormItemDescription extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
     private int mnFormType;
     private int mnFormResult;
@@ -41,10 +48,12 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
 
     private erp.mitm.data.SDataItemBizPartnerDescription moItemBizPartnerDescription;
     private erp.lib.form.SFormField moFieldPkItemId;
+    private erp.lib.form.SFormField moFieldIsItemDescriptionApplying;
     private erp.lib.form.SFormField moFieldKey;
     private erp.lib.form.SFormField moFieldItem;
     private erp.lib.form.SFormField moFieldItemShort;
     private erp.lib.form.SFormField moFieldFkUnitId;
+    private erp.lib.form.SFormField moFieldCfdiUsage;
     private erp.lib.form.SFormField moFieldIsDeleted;
 
     private erp.mitm.data.SDataItem moItem;
@@ -89,6 +98,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         jPanel9 = new javax.swing.JPanel();
         jlOriginalUnit = new javax.swing.JLabel();
         jtfOriginalUnit = new javax.swing.JTextField();
+        jckIsItemDescriptionApplying = new javax.swing.JCheckBox();
         jPanel10 = new javax.swing.JPanel();
         jlKey = new javax.swing.JLabel();
         jtfKey = new javax.swing.JTextField();
@@ -102,6 +112,9 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         jlFkUnitId = new javax.swing.JLabel();
         jcbFkUnitId = new javax.swing.JComboBox();
         jbFkUnitId = new javax.swing.JButton();
+        jPanel14 = new javax.swing.JPanel();
+        jlCfdiUsage = new javax.swing.JLabel();
+        jcbCfdiUsage = new javax.swing.JComboBox();
         jckIsDeleted = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -129,7 +142,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel3.setLayout(new java.awt.GridLayout(10, 1, 0, 1));
+        jPanel3.setLayout(new java.awt.GridLayout(12, 1, 0, 5));
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -139,7 +152,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         jPanel6.add(jlPkItemId);
 
         jcbPkItemId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbPkItemId.setPreferredSize(new java.awt.Dimension(268, 23));
+        jcbPkItemId.setPreferredSize(new java.awt.Dimension(400, 23));
         jcbPkItemId.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jcbPkItemIdItemStateChanged(evt);
@@ -164,7 +177,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         jtfOriginalKey.setEditable(false);
         jtfOriginalKey.setText("ORIGINAL KEY");
         jtfOriginalKey.setFocusable(false);
-        jtfOriginalKey.setPreferredSize(new java.awt.Dimension(296, 23));
+        jtfOriginalKey.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel4.add(jtfOriginalKey);
 
         jPanel3.add(jPanel4);
@@ -178,7 +191,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         jtfOriginalItem.setEditable(false);
         jtfOriginalItem.setText("ORIGINAL ITEM");
         jtfOriginalItem.setFocusable(false);
-        jtfOriginalItem.setPreferredSize(new java.awt.Dimension(296, 23));
+        jtfOriginalItem.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel7.add(jtfOriginalItem);
 
         jPanel3.add(jPanel7);
@@ -192,7 +205,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         jtfOriginalItemShort.setEditable(false);
         jtfOriginalItemShort.setText("ORIGINAL ITEM SHORT");
         jtfOriginalItemShort.setFocusable(false);
-        jtfOriginalItemShort.setPreferredSize(new java.awt.Dimension(296, 23));
+        jtfOriginalItemShort.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel8.add(jtfOriginalItemShort);
 
         jPanel3.add(jPanel8);
@@ -211,6 +224,9 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
 
         jPanel3.add(jPanel9);
 
+        jckIsItemDescriptionApplying.setText("Aplica descripción personalizada");
+        jPanel3.add(jckIsItemDescriptionApplying);
+
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlKey.setText("Clave asoc. neg.: *");
@@ -218,7 +234,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         jPanel10.add(jlKey);
 
         jtfKey.setText("KEY");
-        jtfKey.setPreferredSize(new java.awt.Dimension(296, 23));
+        jtfKey.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel10.add(jtfKey);
 
         jPanel3.add(jPanel10);
@@ -230,7 +246,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         jPanel11.add(jlItem);
 
         jtfItem.setText("ITEM");
-        jtfItem.setPreferredSize(new java.awt.Dimension(296, 23));
+        jtfItem.setPreferredSize(new java.awt.Dimension(400, 23));
         jtfItem.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 jtfItemFocusLost(evt);
@@ -247,7 +263,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         jPanel12.add(jlItemShort);
 
         jtfItemShort.setText("ITEM SHORT");
-        jtfItemShort.setPreferredSize(new java.awt.Dimension(296, 23));
+        jtfItemShort.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel12.add(jtfItemShort);
 
         jPanel3.add(jPanel12);
@@ -259,7 +275,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         jPanel13.add(jlFkUnitId);
 
         jcbFkUnitId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkUnitId.setPreferredSize(new java.awt.Dimension(268, 23));
+        jcbFkUnitId.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel13.add(jcbFkUnitId);
 
         jbFkUnitId.setText("jButton2");
@@ -270,6 +286,18 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
 
         jPanel3.add(jPanel13);
 
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlCfdiUsage.setText("Uso del CFDI:");
+        jlCfdiUsage.setPreferredSize(new java.awt.Dimension(120, 23));
+        jPanel14.add(jlCfdiUsage);
+
+        jcbCfdiUsage.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbCfdiUsage.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel14.add(jcbCfdiUsage);
+
+        jPanel3.add(jPanel14);
+
         jckIsDeleted.setText("Registro eliminado");
         jPanel3.add(jckIsDeleted);
 
@@ -277,8 +305,8 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-460)/2, (screenSize.height-340)/2, 460, 340);
+        setSize(new java.awt.Dimension(736, 489));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -286,7 +314,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
     }//GEN-LAST:event_formWindowActivated
 
     private void jcbPkItemIdItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbPkItemIdItemStateChanged
-        itemStateChangedItem();
+        stateChangedItem();
     }//GEN-LAST:event_jcbPkItemIdItemStateChanged
 
     private void jtfItemFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jtfItemFocusLost
@@ -298,27 +326,35 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
 
         moFieldPkItemId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbPkItemId, jlPkItemId);
         moFieldPkItemId.setPickerButton(jbPkItemId);
+        moFieldIsItemDescriptionApplying = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsItemDescriptionApplying);
         moFieldKey = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfKey, jlKey);
         moFieldKey.setLengthMax(35);
         moFieldItem = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfItem, jlItem);
         moFieldItem.setLengthMax(255);
-        moFieldItemShort = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfItemShort, jlItemShort);
+        moFieldItemShort = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfItemShort, jlItemShort);
         moFieldItemShort.setLengthMax(130);
         moFieldFkUnitId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkUnitId, jlFkUnitId);
         moFieldFkUnitId.setPickerButton(jbFkUnitId);
+        moFieldCfdiUsage = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdiUsage, jlCfdiUsage);
         moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
 
         mvFields.add(moFieldPkItemId);
+        mvFields.add(moFieldIsItemDescriptionApplying);
         mvFields.add(moFieldKey);
         mvFields.add(moFieldItem);
         mvFields.add(moFieldItemShort);
         mvFields.add(moFieldFkUnitId);
+        mvFields.add(moFieldCfdiUsage);
         mvFields.add(moFieldIsDeleted);
 
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
         jbPkItemId.addActionListener(this);
         jbFkUnitId.addActionListener(this);
+        jckIsItemDescriptionApplying.addItemListener(this);
+
+        SCfdXmlCatalogs catalogs = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdXmlCatalogs();
+        catalogs.populateComboBox(jcbCfdiUsage, SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, miClient.getSession().getSystemDate());
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -347,6 +383,33 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         }
     }
 
+    private java.lang.String readUnitSymbol(final int idUnit) {
+        SDataUnit oUnit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int[] { idUnit }, SLibConstants.EXEC_MODE_SILENT);
+        
+        if (oUnit == null) {
+             return "?";
+        } 
+        else {
+            return oUnit.getSymbol();
+        }
+    }
+    
+    private void enableUnit(boolean enable) {
+        jcbFkUnitId.setEnabled(enable);
+        jbFkUnitId.setEnabled(enable);
+    }
+    
+    private void copyItem() {
+        if (moFieldItemShort.getString().isEmpty() && jtfItemShort.isEnabled()) {
+            if (moFieldItem.getString().length() <= moFieldItemShort.getLengthMax()) {
+                moFieldItemShort.setString(moFieldItem.getString());
+            }
+            else {
+                moFieldItemShort.setString(moFieldItem.getString().substring(0, moFieldItemShort.getLengthMax() - 1));
+            }
+        }
+    }
+    
     private void actionOk() {
         SFormValidation validation = formValidate();
 
@@ -377,80 +440,69 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         miClient.pickOption(SDataConstants.ITMU_UNIT, moFieldFkUnitId, new int[] { moItem.getDbmsDataItemGeneric().getFkUnitTypeId() });
     }
 
-    private void renderComboBoxItem() {
-        if (moItemBizPartnerDescription.getPkBizPartnerId() > 0) {
-            jcbPkItemId.setEnabled(false);
-            jbPkItemId.setEnabled(false);
-        }
-        else {
-            jcbPkItemId.setEnabled(true);
-            jbPkItemId.setEnabled(true);
-        }
-    }
-
-    private void readItemSettings() {
+    private void renderItemSettings() {
         String key = "";
         String item = "";
         String itemShort = "";
         String unit = "";
-        boolean isItemShortApplying = true;
+        
+        if (jcbPkItemId.getSelectedIndex() <= 0) {
+            moItem = null;
+            
+            jckIsItemDescriptionApplying.setEnabled(false);
+            jtfKey.setEnabled(false);
+            jtfItem.setEnabled(false);
+            jtfItemShort.setEnabled(false);
 
-        jcbFkUnitId.removeAllItems();
-        renderUnitSettings(false);
-
-        if (moFieldPkItemId.getKeyAsIntArray()[0] > 0) {
+            jcbFkUnitId.removeAllItems();
+            enableUnit(false); 
+        }
+        else {
             moItem = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, moFieldPkItemId.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
 
             key = moItem.getKey();
             item = moItem.getName();
             itemShort = moItem.getNameShort();
             unit = moItem.getDbmsDataUnit().getSymbol();
-            isItemShortApplying = moItem.getDbmsDataItemGeneric().getIsItemShortApplying();
+            
+            jckIsItemDescriptionApplying.setEnabled(true);
+            jtfKey.setEnabled(jckIsItemDescriptionApplying.isSelected());
+            jtfItem.setEnabled(jckIsItemDescriptionApplying.isSelected());
+            jtfItemShort.setEnabled(jckIsItemDescriptionApplying.isSelected() && moItem.getDbmsDataItemGeneric().getIsItemShortApplying());
 
             SFormUtilities.populateComboBox(miClient, jcbFkUnitId, SDataConstants.ITMU_UNIT, new int[] { moItem.getDbmsDataUnit().getFkUnitTypeId() });
-            renderUnitSettings(true);
+            enableUnit(jckIsItemDescriptionApplying.isSelected());
         }
 
         jtfOriginalKey.setText(key);
         jtfOriginalItem.setText(item);
         jtfOriginalItemShort.setText(itemShort);
         jtfOriginalUnit.setText(unit);
-
-        renderTextFieldItemShort(isItemShortApplying);
     }
 
-    private java.lang.String readUnitSymbol() {
-        SDataUnit oUnit = new SDataUnit();
-
-        oUnit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, moFieldFkUnitId.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
-
-        return oUnit.getSymbol();
-    }
-
-    private void renderTextFieldItemShort(boolean b) {
-        jtfItemShort.setEnabled(b);
-    }
-
-    private void renderUnitSettings(boolean b) {
-        jcbFkUnitId.setEnabled(b);
-        jbFkUnitId.setEnabled(b);
-    }
-
-    private void itemStateChangedItem() {
-        if (!mbResetingForm) {
-            readItemSettings();
+    private void renderIsItemDescriptionApplying() {
+        if (jckIsItemDescriptionApplying.isSelected()) {
+            jtfKey.setEnabled(true);
+            jtfItem.setEnabled(true);
+            jtfItemShort.setEnabled(moItem.getDbmsDataItemGeneric().getIsItemShortApplying());
+            jcbFkUnitId.setEnabled(true);
+            jbFkUnitId.setEnabled(true);
         }
+        else {
+             jtfKey.setEnabled(false);
+             jtfItem.setEnabled(false);
+             jtfItemShort.setEnabled(false);
+             jcbFkUnitId.setEnabled(false);
+             jbFkUnitId.setEnabled(false);
+        }             
     }
-
-    private void copyItem() {
-        if (jtfItemShort.getText().length() == 0) {
-            if (jtfItem.getText().length() > moFieldItemShort.getLengthMax()) {
-                jtfItemShort.setText(jtfItem.getText().substring(0, moFieldItemShort.getLengthMax() - 1));
-            }
-            else {
-                jtfItemShort.setText(jtfItem.getText());
-            }
-        }
+    
+    private void stateChangedItem() {
+        renderItemSettings();                
+    }
+    
+    private void stateChangedIsItemDescriptionApplying() {
+        renderIsItemDescriptionApplying();
     }
 
     private void focusLostItem() {
@@ -463,6 +515,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -474,9 +527,12 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
     private javax.swing.JButton jbFkUnitId;
     private javax.swing.JButton jbOk;
     private javax.swing.JButton jbPkItemId;
+    private javax.swing.JComboBox jcbCfdiUsage;
     private javax.swing.JComboBox jcbFkUnitId;
     private javax.swing.JComboBox jcbPkItemId;
     private javax.swing.JCheckBox jckIsDeleted;
+    private javax.swing.JCheckBox jckIsItemDescriptionApplying;
+    private javax.swing.JLabel jlCfdiUsage;
     private javax.swing.JLabel jlFkUnitId;
     private javax.swing.JLabel jlItem;
     private javax.swing.JLabel jlItemShort;
@@ -502,6 +558,8 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
 
     @Override
     public void formReset() {
+        mbResetingForm = true;
+        
         mnFormResult = SLibConstants.UNDEFINED;
         mnFormStatus = SLibConstants.UNDEFINED;
         mbFirstTime = true;
@@ -513,22 +571,23 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
         }
 
-        jtfOriginalKey.setText("");
-        jtfOriginalItem.setText("");
-        jtfOriginalItemShort.setText("");
-        jtfOriginalUnit.setText("");
-        jcbFkUnitId.removeAllItems();
+        renderItemSettings();
+        
+        jckIsItemDescriptionApplying.setSelected(true);
+        
         jcbPkItemId.setEnabled(true);
-        jbPkItemId.setEnabled(true);
         jckIsDeleted.setEnabled(false);
-        renderUnitSettings(false);
+        
         mbResetingForm = false;
     }
 
     @Override
     public void formRefreshCatalogues() {
         mbResetingForm = true;
+        
         SFormUtilities.populateComboBox(miClient, jcbPkItemId, SDataConstants.ITMU_ITEM);
+        
+        mbResetingForm = false;
     }
 
     @Override
@@ -542,11 +601,11 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
                 break;
             }
         }
-
+        
         if (!validation.getIsError()) {
-            if (jtfItemShort.isEnabled() && jtfItemShort.getText().length() == 0) {
-                validation.setMessage("La longitud del campo '" + jlItemShort.getText() + "' no puede ser menor a 1.");
-                validation.setComponent(jtfItemShort);
+            if (!jckIsItemDescriptionApplying.isSelected() && jcbCfdiUsage.getSelectedIndex() <= 0) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCfdiUsage.getText() + "'.");
+                validation.setComponent(jcbCfdiUsage);
             }
         }
 
@@ -575,39 +634,50 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
 
     @Override
     public void setRegistry(erp.lib.data.SDataRegistry registry) {
+        mbResetingForm = true;
+        
         moItemBizPartnerDescription = (SDataItemBizPartnerDescription) registry;
 
         moFieldPkItemId.setFieldValue(new int[] { moItemBizPartnerDescription.getPkItemId() });
+        renderItemSettings();   // units combobox populated aswell
+        
+        moFieldIsItemDescriptionApplying.setFieldValue(moItemBizPartnerDescription.getIsItemDescription());
+        renderIsItemDescriptionApplying();
+        
         moFieldKey.setFieldValue(moItemBizPartnerDescription.getKey());
         moFieldItem.setFieldValue(moItemBizPartnerDescription.getItem());
         moFieldItemShort.setFieldValue(moItemBizPartnerDescription.getItemShort());
+        moFieldFkUnitId.setFieldValue(new int[] { moItemBizPartnerDescription.getFkUnitId() });
+        moFieldCfdiUsage.setFieldValue(moItemBizPartnerDescription.getCfdiUsage());
         moFieldIsDeleted.setFieldValue(moItemBizPartnerDescription.getIsDeleted());
 
-        readItemSettings();
-
-        moFieldFkUnitId.setFieldValue(new int[] { moItemBizPartnerDescription.getFkUnitId() });
-
-        renderComboBoxItem();
+        jcbPkItemId.setEnabled(false);
+        jbPkItemId.setEnabled(false);
+        
         jckIsDeleted.setEnabled(true);
+        
+        mbResetingForm = false;
     }
 
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
         if (moItemBizPartnerDescription == null) {
             moItemBizPartnerDescription = new SDataItemBizPartnerDescription();
+            moItemBizPartnerDescription.setPkItemId(moFieldPkItemId.getKeyAsIntArray()[0]);
             moItemBizPartnerDescription.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
         }
         else  {
             moItemBizPartnerDescription.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
         }
-
-        moItemBizPartnerDescription.setPkItemId(moFieldPkItemId.getKeyAsIntArray()[0]);
-        moItemBizPartnerDescription.setKey(moFieldKey.getString());
-        moItemBizPartnerDescription.setItem(moFieldItem.getString());
-        moItemBizPartnerDescription.setItemShort(moFieldItemShort.getString());
-        moItemBizPartnerDescription.setFkUnitId(moFieldFkUnitId.getKeyAsIntArray()[0]);
-        moItemBizPartnerDescription.setDbmsUnit(readUnitSymbol());
+        
+        moItemBizPartnerDescription.setKey(!jckIsItemDescriptionApplying.isSelected() ? "" : moFieldKey.getString());
+        moItemBizPartnerDescription.setItem(!jckIsItemDescriptionApplying.isSelected() ? "" : moFieldItem.getString());
+        moItemBizPartnerDescription.setItemShort(!jckIsItemDescriptionApplying.isSelected() ? "" : moFieldItemShort.getString());
+        moItemBizPartnerDescription.setCfdiUsage(jcbCfdiUsage.getSelectedIndex() <= 0 ? "" : moFieldCfdiUsage.getKey().toString());
+        moItemBizPartnerDescription.setIsItemDescription(moFieldIsItemDescriptionApplying.getBoolean());
         moItemBizPartnerDescription.setIsDeleted(moFieldIsDeleted.getBoolean());
+        moItemBizPartnerDescription.setFkUnitId(!jckIsItemDescriptionApplying.isSelected() ? SDataConstantsSys.ITMU_UNIT_NA : moFieldFkUnitId.getKeyAsIntArray()[0]);
+        moItemBizPartnerDescription.setDbmsUnit(readUnitSymbol(moItemBizPartnerDescription.getFkUnitId()));
 
         return moItemBizPartnerDescription;
     }
@@ -628,9 +698,9 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
     }
 
     @Override
-    public void actionPerformed(java.awt.event.ActionEvent e) {
-        if (e.getSource() instanceof javax.swing.JButton) {
-            javax.swing.JButton button = (javax.swing.JButton) e.getSource();
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
+            JButton button = (JButton) e.getSource();
 
             if (button == jbOk) {
                 actionOk();
@@ -643,6 +713,28 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
             }
             else if (button == jbFkUnitId) {
                 actionFkUnitId();
+            }
+        }
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (!mbResetingForm) {
+            if (e.getSource() instanceof JComboBox) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    JComboBox comboBox = (JComboBox) e.getSource();
+
+                    if (comboBox == jcbPkItemId) {
+                        stateChangedItem();
+                    }
+                }
+            }
+            else if (e.getSource() instanceof JCheckBox) {
+                JCheckBox checkBox = (JCheckBox) e.getSource();
+                
+                if (checkBox == jckIsItemDescriptionApplying) {
+                    stateChangedIsItemDescriptionApplying();
+                }
             }
         }
     }

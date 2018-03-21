@@ -38,6 +38,7 @@ import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
+import erp.gui.SGuiUtilities;
 import erp.gui.session.SSessionCustom;
 import erp.gui.session.SSessionItem;
 import erp.lib.SLibConstants;
@@ -3939,13 +3940,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         String msg = "";
         String companyName = "";
         String bpName = "";
-        String dpsDestNumber = "";
-        String dpsReference = "";
         ArrayList<String> toRecipients = null;
         HashSet<String> setCfgEmail = new HashSet<>();
         SDbMmsConfig mmsConfig = null;
         SDataDpsType moDpsType = null;
-        SDataDps dpsDest = null;
         boolean isEdited = false;
         boolean send = true;
         
@@ -3956,7 +3954,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         companyName = client.getSessionXXX().getCompany().getCompany();
         bpName = SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.BPSU_BP, new int[] { mnFkBizPartnerId_r }, SLibConstants.DESCRIPTION_NAME);
         moDpsType = (SDataDpsType) SDataUtilities.readRegistry(client, SDataConstants.TRNU_TP_DPS, getDpsTypeKey(), SLibConstants.EXEC_MODE_VERBOSE);
-        dpsReference = !getNumberReference().isEmpty() ? getNumberReference() : "N/D";
         toRecipients = new ArrayList<>();
         
         for (SDataDpsEntry entry : mvDbmsDpsEntries) {
@@ -4000,16 +3997,28 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             mmsConfig.read(client.getSession(), mmsConfigKey);
 
                             if (cfgEmail.compareTo(mmsConfig.getEmail()) == 0) {
+                                SDataDps dpsSource = null;
+                                String dpsSourceDpsNumber = "";
+                                int dpsSourceYearId = 0;
+                                int dpsSourceDocId = 0;
+                                int dpsSourceMonths = 0;
+                                int dpsContractPriceYear = 0;
+                                int dpsContractPriceMonth = 0;
+                                
                                 if (entry.getDbmsDpsLinksAsDestiny()!= null && !entry.getDbmsDpsLinksAsDestiny().isEmpty()) {
-                                    dpsDest = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, entry.getDbmsDpsLinksAsDestiny().get(0).getDbmsSourceDpsKey(), SLibConstants.EXEC_MODE_STEALTH);
-                                    dpsDestNumber = dpsDest.getDpsNumber();
-                                }
-                                else {
-                                    dpsDestNumber = "N/D";
+                                    dpsSource = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, entry.getDbmsDpsLinksAsDestiny().get(0).getDbmsSourceDpsKey(), SLibConstants.EXEC_MODE_STEALTH);
+                                    dpsSourceDpsNumber = dpsSource.getDpsNumber();
+                                    dpsSourceYearId = dpsSource.getPkYearId();
+                                    dpsSourceDocId = dpsSource.getPkDocId();
+                                    dpsSourceMonths = SGuiUtilities.getPeriodMonths(mtDateDocDelivery_n, mtDateDocLapsing_n);
+                                    dpsContractPriceYear = entry.getContractPriceYear();
+                                    dpsContractPriceMonth = entry.getContractPriceMonth();
                                 }
 
                                 msg += STrnUtilities.computeMailItem(client, entry.getFkItemId(), entry.getFkOriginalUnitId(), entry.getConceptKey(), entry.getConcept(), 
-                                        dpsDestNumber, msNumberSeries, msNumber, dpsReference, entry.getOriginalQuantity(), entry.getDbmsOriginalUnitSymbol(), mtDate, 
+                                        dpsSourceDpsNumber.isEmpty() ? "N/D" : dpsSourceDpsNumber, dpsSourceYearId, dpsSourceDocId, dpsSourceMonths, dpsContractPriceYear, dpsContractPriceMonth, 
+                                        msNumberSeries, msNumber, msNumberReference.isEmpty() ? "N/D" : msNumberReference, 
+                                        entry.getOriginalQuantity(), entry.getDbmsOriginalUnitSymbol(), mtDate, 
                                         getDpsTypeKey(), isEdited, mbIsRebill);
                             }
                         }
