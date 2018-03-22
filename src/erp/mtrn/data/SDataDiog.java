@@ -511,6 +511,54 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     public int[] getLinkedDiogKey_n() { return mnFkDiogYearId_n == SLibConstants.UNDEFINED || mnFkDiogDocId_n == SLibConstants.UNDEFINED ? null : new int[] { mnFkDiogYearId_n, mnFkDiogDocId_n }; }
     public int[] getProdOrderKey_n() { return mnFkMfgYearId_n == SLibConstants.UNDEFINED || mnFkMfgOrderId_n == SLibConstants.UNDEFINED ? null : new int[] { mnFkMfgYearId_n, mnFkMfgOrderId_n }; }
 
+    public boolean isRegistryEditable() {
+        boolean editable = true;
+
+        if (this.getIsShipped()) {
+            editable = false;
+        }
+        else if (this.getIsAudited()) {
+            editable = false;
+        }
+        else if (this.getIsAuthorized()) {
+            editable = false;
+        }
+        else if (this.getIsSystem()) {
+            editable = false;
+        }
+        else if (this.getIsDeleted()) {
+            editable = false;
+        }
+
+        return editable;
+    }
+
+    public String getNonEditableHelp() {
+        String help = "";
+
+        if (this.getIsShipped()) {
+            help += "\n- El documento está embarcado.";
+        }
+        else if (this.getIsAudited()) {
+            help += "\n- El documento está auditado.";
+        }
+        else if (this.getIsAuthorized()) {
+            help += "\n- El documento está autorizado.";
+        }
+        else if (this.getIsSystem()) {
+            help += "\n- El documento es de sistema.";
+        }
+        else if (this.getIsDeleted()) {
+            help += "\n- El documento está eliminado.";
+        }
+
+        if (help.length() > 0) {
+            help = "No se puede modificar el documento porque:" + help;
+        }
+
+        return help;
+    }
+
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
         mnPkYearId = ((int[]) pk)[0];

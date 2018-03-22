@@ -1143,54 +1143,6 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         return open;
     }
 
-    private boolean isRegistryEditable() {
-        boolean editable = true;
-
-        if (moDiog.getIsShipped()) {
-            editable = false;
-        }
-        else if (moDiog.getIsAudited()) {
-            editable = false;
-        }
-        else if (moDiog.getIsAuthorized()) {
-            editable = false;
-        }
-        else if (moDiog.getIsSystem()) {
-            editable = false;
-        }
-        else if (moDiog.getIsDeleted()) {
-            editable = false;
-        }
-
-        return editable;
-    }
-
-    private String getNonEditableHelp() {
-        String help = "";
-
-        if (moDiog.getIsShipped()) {
-            help += "\n- El documento está embarcado.";
-        }
-        else if (moDiog.getIsAudited()) {
-            help += "\n- El documento está auditado.";
-        }
-        else if (moDiog.getIsAuthorized()) {
-            help += "\n- El documento está autorizado.";
-        }
-        else if (moDiog.getIsSystem()) {
-            help += "\n- El documento es de sistema.";
-        }
-        else if (moDiog.getIsDeleted()) {
-            help += "\n- El documento está eliminado.";
-        }
-
-        if (help.length() > 0) {
-            help = "No se puede modificar el documento porque:" + help;
-        }
-
-        return help;
-    }
-
     private boolean canEditEntry(erp.mtrn.data.SDataDiogEntry entry) {
         boolean can = true;
 
@@ -2532,7 +2484,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlEntryQuantity.getText() + "'.");
                 jtfEntryQuantity.requestFocus();
             }
-            else if (moFieldEntryValue.getDouble() == 0d && miClient.showMsgBoxConfirm("¿Está seguro que desea agregar al documento una partida sin valor?") != JOptionPane.YES_OPTION) {
+            else if (moFieldEntryValue.getDouble() == 0d && mnParamIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_IN && miClient.showMsgBoxConfirm("¿Está seguro que desea agregar al documento una partida sin valor?") != JOptionPane.YES_OPTION) {
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlEntryValueUnitary.getText() + "'.");
                 jtfEntryValueUnitary.requestFocus();
             }
@@ -2569,7 +2521,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             iogEntry.setOriginalQuantity(moFieldEntryQuantity.getDouble());
                             iogEntry.setOriginalValueUnitary(moFieldEntryValueUnitary.getDouble());
                             iogEntry.setSortingPosition(0);
-                            iogEntry.setIsInventoriable(moEntryItem.getIsInventoriable());
+                            iogEntry.setIsInventoriable(true);
                             iogEntry.setIsDeleted(false);
                             iogEntry.setFkItemId(moEntryItem.getPkItemId());
                             iogEntry.setFkUnitId(moEntryItem.getFkUnitId());
@@ -2942,7 +2894,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     }
 
     public void actionEditHelp() {
-        String help = getNonEditableHelp();
+        String help = moDiog.getNonEditableHelp();
 
         miClient.showMsgBoxInformation(help.length() == 0 ? "No fué posible determinar por qué el documento es de sólo lectura." : help);
     }
@@ -3355,7 +3307,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jbOk.setEnabled(false);
         jbCancel.setEnabled(true);
 
-        if (isRegistryEditable()) {
+        if (moDiog.isRegistryEditable()) {
             jbEdit.setEnabled(true);
             jbEditHelp.setEnabled(false);
         }

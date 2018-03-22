@@ -3091,7 +3091,7 @@ public abstract class SDataUtilities {
      * @param reportType Constant defined in erp.data.SDataConstantsSys.
      * @param map Report parameters.
      */
-public static net.sf.jasperreports.engine.JasperPrint fillReport(erp.client.SClientInterface client, int reportType, java.util.Map<java.lang.String, java.lang.Object> map) throws java.lang.Exception {
+    public static net.sf.jasperreports.engine.JasperPrint fillReport(erp.client.SClientInterface client, int reportType, java.util.Map<java.lang.String, java.lang.Object> map) throws java.lang.Exception {
         SServerRequest request = null;
         SServerResponse response = null;
 
