@@ -3546,7 +3546,6 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                     iogCounterpart.setNumberSeries(moDiog.getDbmsDataCounterpartDiog().getNumberSeries());
                     iogCounterpart.setNumber(moDiog.getDbmsDataCounterpartDiog().getNumber());
                     iogCounterpart.setReference(moFieldReference.getString());
-                    
 
                     for (SDataDiogEntry entry : iogCounterpart.getDbmsEntries()) {
                         entry.setPkYearId(moDiog.getDbmsDataCounterpartDiog().getPkYearId());
