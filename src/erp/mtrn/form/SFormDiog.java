@@ -694,11 +694,13 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel10.add(jtfEntryValue);
 
         jbEntryAdd.setText("Agregar");
+        jbEntryAdd.setToolTipText("Agregar partida (Ctrl + A)");
         jbEntryAdd.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jbEntryAdd.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel10.add(jbEntryAdd);
 
         jbEntryClear.setText("Limpiar");
+        jbEntryClear.setToolTipText("Limpiar partida (Ctrl + L)");
         jbEntryClear.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jbEntryClear.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel10.add(jbEntryClear);
@@ -713,6 +715,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jbEntryDelete.setText("Eliminar");
+        jbEntryDelete.setToolTipText("Eliminar partida (Ctrl + E)");
         jbEntryDelete.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jbEntryDelete.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel13.add(jbEntryDelete);
@@ -956,8 +959,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         SFormUtilities.createActionMap(rootPane, this, "actionOk", "ok", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "actionCancel", "cancel", KeyEvent.VK_ESCAPE, 0);
         SFormUtilities.createActionMap(rootPane, this, "actionRowAdd", "rowAdd", KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK);
-        SFormUtilities.createActionMap(rootPane, this, "actionRowDelete", "rowDelete", KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "actionRowClear", "rowClear", KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK);
+        SFormUtilities.createActionMap(rootPane, this, "actionRowDelete", "rowDelete", KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK);
     }
 
     private void windowActivated() {
@@ -2419,7 +2422,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         }
     }
 
-    public void actionDecimals() {
+    private void actionDecimals() {
         String toolTipText = !jtbDecimals.isSelected() ? TXT_DEC_INC : TXT_DEC_DEC;
         DefaultTableCellRenderer tcr = !jtbDecimals.isSelected() ?
             miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity() :
@@ -2439,7 +2442,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         computeDocValue();
     }
 
-    private void actionEntryAdd() {
+    public void actionEntryAdd() {
         int year = (moFieldDate.getDate() != null ? SLibTimeUtilities.digestYear(moFieldDate.getDate())[0] : 0);
         int mode = STrnUtilities.isIogTypeForProdOrder(manParamIogTypeKey) ? SLibConstants.MODE_QTY_EXT : jtbDecimals.isSelected() ? SLibConstants.MODE_QTY_EXT : SLibConstants.MODE_QTY;
         boolean add = true;
@@ -2583,7 +2586,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         }
     }
 
-    private void actionEntryClear() {
+    public void actionEntryClear() {
         moEntryItem = null;
         moStockMoveEntry = null;
         jtfEntryTextToFind.setText("");
@@ -2628,7 +2631,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         }
     }
 
-    private void actionEntryDelete() {
+    public void actionEntryDelete() {
         int index = 0;
         SDataDiogEntry iogEntry = null;
 
@@ -2880,7 +2883,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         }
     }
 
-    public void actionEdit() {
+    private void actionEdit() {
         mnFormStatus = SLibConstants.FORM_STATUS_EDIT;
 
         jbEdit.setEnabled(false);
@@ -2893,7 +2896,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jftDate.requestFocus();
     }
 
-    public void actionEditHelp() {
+    private void actionEditHelp() {
         String help = moDiog.getNonEditableHelp();
 
         miClient.showMsgBoxInformation(help.length() == 0 ? "No fué posible determinar por qué el documento es de sólo lectura." : help);

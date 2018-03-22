@@ -883,6 +883,7 @@
                     <Component class="javax.swing.JButton" name="jbEntryAdd">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Agregar"/>
+                        <Property name="toolTipText" type="java.lang.String" value="Agregar partida (Ctrl + A)"/>
                         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                           <Insets value="[2, 0, 2, 0]"/>
                         </Property>
@@ -894,6 +895,7 @@
                     <Component class="javax.swing.JButton" name="jbEntryClear">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Limpiar"/>
+                        <Property name="toolTipText" type="java.lang.String" value="Limpiar partida (Ctrl + L)"/>
                         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                           <Insets value="[2, 0, 2, 0]"/>
                         </Property>
@@ -925,6 +927,7 @@
                     <Component class="javax.swing.JButton" name="jbEntryDelete">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Eliminar"/>
+                        <Property name="toolTipText" type="java.lang.String" value="Eliminar partida (Ctrl + E)"/>
                         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                           <Insets value="[2, 0, 2, 0]"/>
                         </Property>
