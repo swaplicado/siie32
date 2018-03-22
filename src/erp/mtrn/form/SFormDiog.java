@@ -3376,7 +3376,6 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         int year = SLibTimeUtilities.digestYear(moFieldDate.getDate())[0];
         int[] iogTypeKey = null;
         SDataDiog iogCounterpart = null;
-        SDataDiogNotes iogNote = null;
         Vector<SFormComponentItem> items = null;
 
         if (moDiog == null) {
@@ -3470,33 +3469,35 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 
         // Document notes:
 
+        SDataDiogNotes diogNotes = null;
+        
         if (moDiog.getDbmsNotes().size() > 0) {
-            iogNote = moDiog.getDbmsNotes().get(0);
+            diogNotes = moDiog.getDbmsNotes().get(0);
         }
 
         if (moFieldNotes.getString().isEmpty()) {
-            if (iogNote != null) {
-                iogNote.setIsDeleted(true);
-                iogNote.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+            if (diogNotes != null) {
+                diogNotes.setIsDeleted(true);
+                diogNotes.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
             }
         }
         else {
-            if (iogNote == null) {
-                iogNote = new SDataDiogNotes();
-                iogNote.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
+            if (diogNotes == null) {
+                diogNotes = new SDataDiogNotes();
+                diogNotes.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
             }
             else {
-                iogNote.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+                diogNotes.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
             }
 
-            iogNote.setNotes(moFieldNotes.getString());
-            iogNote.setIsPrintable(true);
+            diogNotes.setNotes(moFieldNotes.getString());
+            diogNotes.setIsPrintable(true);
         }
 
         moDiog.getDbmsNotes().clear();
-        if (iogNote != null) {
-            iogNote.setIsRegistryEdited(true);
-            moDiog.getDbmsNotes().add(iogNote);
+        if (diogNotes != null) {
+            diogNotes.setIsRegistryEdited(true);
+            moDiog.getDbmsNotes().add(diogNotes);
         }
 
         if (mbWarehouseDestinyNeeded) {
