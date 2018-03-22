@@ -3366,7 +3366,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 
         // Document notes:
 
-        if (moDiog.getDbmsNotes().size() > 0) {
+        if (!moDiog.getDbmsNotes().isEmpty()) {
             moFieldNotes.setString(moDiog.getDbmsNotes().get(0).getNotes());
         }
     }
@@ -3474,8 +3474,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
             iogNote = moDiog.getDbmsNotes().get(0);
         }
 
-        moDiog.getDbmsNotes().clear();
-        if (moFieldNotes.getString().length() == 0) {
+        if (moFieldNotes.getString().isEmpty()) {
             if (iogNote != null) {
                 iogNote.setIsDeleted(true);
                 iogNote.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
@@ -3494,6 +3493,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
             iogNote.setIsPrintable(true);
         }
 
+        moDiog.getDbmsNotes().clear();
         if (iogNote != null) {
             iogNote.setIsRegistryEdited(true);
             moDiog.getDbmsNotes().add(iogNote);
