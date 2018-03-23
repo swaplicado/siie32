@@ -416,6 +416,7 @@ public abstract class SModConsts {
     public static final int TRN_MAINT_AREA = 2023301;
     public static final int TRN_MAINT_USER = 2023311;
     public static final int TRN_MAINT_USER_SUPV = 2023316;
+    public static final int TRN_MAINT_DIOG_SIG = 2023321;
 
     public static final int TRN_DNC_DPS = 2023501;
     public static final int TRN_DNC_DPS_DNS = 2023502;
@@ -1020,6 +1021,7 @@ public abstract class SModConsts {
         TablesMap.put(TRN_MAINT_AREA, "trn_maint_area");
         TablesMap.put(TRN_MAINT_USER, "trn_maint_user");
         TablesMap.put(TRN_MAINT_USER_SUPV, "trn_maint_user_supv");
+        TablesMap.put(TRN_MAINT_DIOG_SIG, "trn_maint_diog_sig");
 
         TablesMap.put(TRN_DNC_DPS, "trn_dnc_dps");
         TablesMap.put(TRN_DNC_DPS_DNS, "trn_dnc_dps_dns");
