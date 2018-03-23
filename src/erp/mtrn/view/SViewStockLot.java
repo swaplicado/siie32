@@ -5,18 +5,17 @@
 
 package erp.mtrn.view;
 
-import java.awt.Dimension;
-import javax.swing.JButton;
-
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.table.STabFilterDeleted;
-import erp.lib.table.STableField;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
+import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
 import erp.mitm.form.SPanelFilterItemGeneric;
+import java.awt.Dimension;
+import javax.swing.JButton;
 import sa.gui.util.SUtilConsts;
 
 /**
@@ -104,6 +103,7 @@ public class SViewStockLot extends erp.lib.table.STableTab implements java.awt.e
         }
 
         mvSuscriptors.add(mnTabType);
+        mvSuscriptors.add(SDataConstants.TRNX_DIOG_MAINT);
         mvSuscriptors.add(SDataConstants.ITMU_ITEM);
         mvSuscriptors.add(SDataConstants.ITMU_UNIT);
         mvSuscriptors.add(SDataConstants.ITMU_IGEN);

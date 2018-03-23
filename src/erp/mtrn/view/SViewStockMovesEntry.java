@@ -12,7 +12,6 @@ import erp.lib.table.STabFilterDatePeriodRange;
 import erp.lib.table.STabFilterDeleted;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
-import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterCompanyBranchEntity;
@@ -29,7 +28,7 @@ import sa.lib.SLibRpnOperator;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SViewStockMovesEntry extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -144,6 +143,7 @@ public class SViewStockMovesEntry extends erp.lib.table.STableTab implements jav
 
         mvSuscriptors.add(mnTabType);
         mvSuscriptors.add(SDataConstants.TRN_DIOG);
+        mvSuscriptors.add(SDataConstants.TRNX_DIOG_MAINT);
 
         populateTable();
     }

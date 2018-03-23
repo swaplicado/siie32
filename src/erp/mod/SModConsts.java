@@ -705,7 +705,7 @@ public abstract class SModConsts {
 
     public static final int QLT_LOT_APR = 2073001;
     
-    public static final HashMap<Integer, String> TablesMap = new HashMap<Integer, String>();
+    public static final HashMap<Integer, String> TablesMap = new HashMap<>();
 
     static {
         TablesMap.put(CFGS_CT_ENT, "erp.cfgs_ct_ent");

@@ -14,6 +14,7 @@ import erp.lib.SLibUtilities;
 import erp.lib.table.STableTabComponent;
 import erp.lib.table.STableTabInterface;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogAdjustmentType;
@@ -30,6 +31,7 @@ import erp.mtrn.form.SDialogRepStockTrackingLot;
 import erp.mtrn.form.SDialogUtilStockClosing;
 import erp.mtrn.form.SFormDiog;
 import erp.mtrn.form.SFormDiogAdjustmentType;
+import erp.mtrn.form.SFormDiogMaintMovement;
 import erp.mtrn.form.SFormStockConfig;
 import erp.mtrn.form.SFormStockConfigDns;
 import erp.mtrn.form.SFormStockConfigItem;
@@ -41,7 +43,7 @@ import sa.gui.util.SUtilConsts;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Cesar Orozco, Claudio Peña
+ * @author Sergio Flores, Uriel Castañeda, Cesar Orozco, Claudio Peña, Gil De Jesús
  */
 public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -112,8 +114,14 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiIogStockTheoricalCost;
     private javax.swing.JMenuItem jmiIogStockClosing;
     private javax.swing.JMenu jmIogMaint;
+    private javax.swing.JMenuItem jmiIogMaintMovementPart;
+    private javax.swing.JMenuItem jmiIogMaintMovementTool;
+    private javax.swing.JMenuItem jmiIogMaintUserEmployee;
+    private javax.swing.JMenuItem jmiIogMaintUserContractor;
+    private javax.swing.JMenuItem jmiIogMaintUserContractorSupv;
+    private javax.swing.JMenuItem jmiIogMaintUserToolMaintProv;
     private javax.swing.JMenuItem jmiIogMaintArea;
-
+    
     private javax.swing.JMenu jmMenuStk;
     private javax.swing.JMenuItem jmiStkStock;
     private javax.swing.JMenuItem jmiStkStockLot;
@@ -141,6 +149,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private erp.mtrn.form.SDialogRepStockMoves moDialogRepStockMoves;
     private erp.mtrn.form.SDialogRepStockTrackingLot moDialogRepStockTrackingLot;
     private erp.mtrn.form.SFormDiog moFormDiog;
+    private erp.mtrn.form.SFormDiogMaintMovement moFormMaintMovement;
     private erp.mtrn.form.SFormStockLot moFormStockLot;
     private erp.mtrn.form.SFormStockConfig moFormStockConfig;
     private erp.mtrn.form.SFormDiogAdjustmentType moFormDiogAdjustmentType;
@@ -329,7 +338,14 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogStockTheoricalCost = new JMenuItem("Valor valuación vs. valor teórico");
         jmiIogStockClosing = new JMenuItem("Generación de inventarios iniciales...");
         jmIogMaint = new JMenu("Mantenimiento");
+        jmiIogMaintMovementPart = new JMenuItem("Movimientos de refacciones");
+        jmiIogMaintMovementTool = new JMenuItem("Movimientos de herramientas");
+        jmiIogMaintUserEmployee = new JMenuItem("Empleados");
+        jmiIogMaintUserContractor = new JMenuItem("Contratistas");
+        jmiIogMaintUserContractorSupv = new JMenuItem("Residentes de contratistas");
+        jmiIogMaintUserToolMaintProv = new JMenuItem("Proveedores de mantto. de herramientas");
         jmiIogMaintArea = new JMenuItem("Áreas de mantenimiento");
+        
         jmMenuIog.add(jmiIogStock);
         jmMenuIog.addSeparator();
         jmMenuIog.add(jmiIogMfgRmAssign);
@@ -356,8 +372,18 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuIog.addSeparator();
         jmMenuIog.add(jmiIogStockClosing);
         jmMenuIog.addSeparator();
+        
+        jmIogMaint.add(jmiIogMaintMovementPart);
+        jmIogMaint.add(jmiIogMaintMovementTool);
+        jmIogMaint.addSeparator();
+        jmIogMaint.add(jmiIogMaintUserEmployee);
+        jmIogMaint.add(jmiIogMaintUserContractor);
+        jmIogMaint.add(jmiIogMaintUserContractorSupv);
+        jmIogMaint.add(jmiIogMaintUserToolMaintProv);
+        jmIogMaint.addSeparator();
         jmIogMaint.add(jmiIogMaintArea);
         jmMenuIog.add(jmIogMaint);
+        
         jmiIogStock.addActionListener(this);
         jmiIogMfgRmAssign.addActionListener(this);
         jmiIogMfgRmReturn.addActionListener(this);
@@ -375,6 +401,12 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogStockValueByItem.addActionListener(this);
         jmiIogStockTheoricalCost.addActionListener(this);
         jmiIogStockClosing.addActionListener(this);
+        jmiIogMaintMovementPart.addActionListener(this);
+        jmiIogMaintMovementTool.addActionListener(this);
+        jmiIogMaintUserEmployee.addActionListener(this);
+        jmiIogMaintUserContractor.addActionListener(this);
+        jmiIogMaintUserContractorSupv.addActionListener(this);
+        jmiIogMaintUserToolMaintProv.addActionListener(this);
         jmiIogMaintArea.addActionListener(this);
         
         jmMenuStk = new JMenu("Inventarios");
@@ -590,7 +622,6 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private int showForm(int formType, int auxType, java.lang.Object pk, boolean isCopy) {
         int result = SLibConstants.UNDEFINED;
         SDataDiog iog = null;
-        STrnDiogComplement iogComplement = null;
 
         try {
             clearFormMembers();
@@ -605,13 +636,27 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                         moRegistry = new SDataDiog();
                     }
                     if (moFormComplement != null) {
-                        iogComplement = (STrnDiogComplement) moFormComplement;
+                        STrnDiogComplement complement = (STrnDiogComplement) moFormComplement;
                         moFormDiog.formReset();
-                        moFormDiog.setParamIogTypeKey(iogComplement.getDiogTypeKey());
-                        moFormDiog.setParamDpsSource(iogComplement.getDpsSource());
-                        moFormDiog.setParamProdOrderSource(iogComplement.getProdOrderKey());
+                        moFormDiog.setParamIogTypeKey(complement.getDiogTypeKey());
+                        moFormDiog.setParamDpsSource(complement.getDpsSource());
+                        moFormDiog.setParamProdOrderSource(complement.getProdOrderKey());
                     }
                     miForm = moFormDiog;
+                    break;
+                case SDataConstants.TRNX_DIOG_MAINT:
+                    if (moFormMaintMovement == null) {
+                        moFormMaintMovement = new SFormDiogMaintMovement(miClient);
+                    }
+                    if (pk != null) {
+                        moRegistry = new SDataDiog();
+                    }
+                    if (moFormComplement != null) {
+                        STrnDiogComplement complement = (STrnDiogComplement) moFormComplement;
+                        moFormMaintMovement.setParamMaintMovementSettings(complement.getMaintMovementType(), complement.getMaintUserType());
+                        moFormMaintMovement.formReset();
+                    }
+                    miForm = moFormMaintMovement;
                     break;
                 case SDataConstants.TRN_LOT:
                     if (moFormStockLot == null) {
@@ -709,7 +754,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         try {
             setFrameWaitCursor();
 
-            switch (viewType) {
+            switch (viewType) {              
                 case SDataConstants.TRN_LOT:
                     viewClass = erp.mtrn.view.SViewStockLot.class;
                     title = "Lotes";
@@ -827,9 +872,31 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                             break;
                     }
                     break;
+                case SDataConstants.TRNX_DIOG_MAINT:
+                    viewClass = erp.mtrn.view.SViewDiogMaintMovement.class;
+                    title = "Movimientos ";
+                    switch (auxType01){
+                        case SModSysConsts.TRNX_MAINT_PART:
+                            title += SModSysConsts.TXT_TRNX_MAINT_PART.toLowerCase();
+                            break;
+                        case SModSysConsts.TRNX_MAINT_TOOL_AV:
+                            title += SModSysConsts.TXT_TRNX_MAINT_TOOL_AV.toLowerCase();
+                            break;
+                        case SModSysConsts.TRNX_MAINT_TOOL_LENT:
+                            title += SModSysConsts.TXT_TRNX_MAINT_TOOL_LENT.toLowerCase();
+                            break;
+                        case SModSysConsts.TRNX_MAINT_TOOL_MAINT:
+                            title += SModSysConsts.TXT_TRNX_MAINT_TOOL_MAINT.toLowerCase();
+                            break;
+                        case SModSysConsts.TRNX_MAINT_TOOL_LOST:
+                            title += SModSysConsts.TXT_TRNX_MAINT_TOOL_LOST.toLowerCase();
+                            break;
+                        default:
+                            throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
+                    }
+                    break;
                 case SDataConstants.TRNX_DIOG_MFG:
                     viewClass = erp.mtrn.view.SViewDiogProdOrder.class;
-
                     switch (auxType01) {
                         case SDataConstants.TRNX_DIOG_MFG_RM:
                         case SDataConstants.TRNX_DIOG_MFG_WP:
@@ -842,7 +909,6 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
                     }
-
                     switch (auxType01) {
                         case SDataConstants.TRNX_DIOG_MFG_RM:
                             title += " MP";
@@ -859,7 +925,6 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
                     }
-
                     break;
                 case SDataConstants.TRNX_MFG_ORD:
                     title = "Movs. prod. - ";
@@ -1194,6 +1259,24 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiIogStockClosing) {
                 moDialogUtilStockClosing.resetForm();
                 moDialogUtilStockClosing.setVisible(true);
+            }
+            else if (item == jmiIogMaintMovementPart) {
+                showView(SDataConstants.TRNX_DIOG_MAINT, SModSysConsts.TRNX_MAINT_PART);
+            }
+            else if (item == jmiIogMaintMovementTool) {
+                showView(SDataConstants.TRNX_DIOG_MAINT, SModSysConsts.TRNX_MAINT_TOOL_AV);
+            }
+            else if (item == jmiIogMaintUserEmployee) {
+                miClient.getSession().showView(SModConsts.TRN_MAINT_USER, SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE, null);
+            }
+            else if (item == jmiIogMaintUserContractor) {
+                miClient.getSession().showView(SModConsts.TRN_MAINT_USER, SModSysConsts.TRNX_TP_MAINT_USER_CONTRACTOR, null);
+            }
+            else if (item == jmiIogMaintUserContractorSupv) {
+                miClient.getSession().showView(SModConsts.TRN_MAINT_USER_SUPV, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiIogMaintUserToolMaintProv) {
+                miClient.getSession().showView(SModConsts.TRN_MAINT_USER, SModSysConsts.TRNX_TP_MAINT_USER_TOOLS_MAINT_PROV, null);
             }
             else if (item == jmiIogMaintArea) {
                 miClient.getSession().showView(SModConsts.TRN_MAINT_AREA, SLibConstants.UNDEFINED, null);

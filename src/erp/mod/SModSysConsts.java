@@ -699,23 +699,25 @@ public abstract class SModSysConsts {
     public static final int TRNX_DIOG_CST_TRAN_NO = 1;
     public static final int TRNX_DIOG_CST_TRAN_YES = 2;
     
-    public static final int TRNX_ST_MAINT_AV = 1;
-    public static final int TRNX_ST_MAINT_LENT = 2;
-    public static final int TRNX_ST_MAINT_MAINT = 3;
-    public static final int TRNX_ST_MAINT_LOST = 4;
+    public static final int TRNX_MAINT_PART = 11;
+    public static final int TRNX_MAINT_TOOL_AV = 21;
+    public static final int TRNX_MAINT_TOOL_LENT = 22;
+    public static final int TRNX_MAINT_TOOL_MAINT = 23;
+    public static final int TRNX_MAINT_TOOL_LOST = 24;
     
-    public static final String TXT_TRNX_ST_MAINT_AV = "Herramientas disponibles";
-    public static final String TXT_TRNX_ST_MAINT_LENT = "Herramientas en préstamo";
-    public static final String TXT_TRNX_ST_MAINT_MAINT = "Herramientas en mantenimiento";
-    public static final String TXT_TRNX_ST_MAINT_LOST = "Herramientas extraviadas";
+    public static final String TXT_TRNX_MAINT_PART = "Refacciones";
+    public static final String TXT_TRNX_MAINT_TOOL_AV = "Herramientas disponibles";
+    public static final String TXT_TRNX_MAINT_TOOL_LENT = "Herramientas en préstamo";
+    public static final String TXT_TRNX_MAINT_TOOL_MAINT = "Herramientas en mantto.";
+    public static final String TXT_TRNX_MAINT_TOOL_LOST = "Herramientas extraviadas";
     
     public static final int TRNX_TP_MAINT_USER_EMPLOYEE = 1;
     public static final int TRNX_TP_MAINT_USER_CONTRACTOR = 2;
-    public static final int TRNX_TP_MAINT_USER_TOOL_MAINT_PROV = 3;
+    public static final int TRNX_TP_MAINT_USER_TOOLS_MAINT_PROV = 3;
     
     public static final String TXT_TRNX_TP_MAINT_USER_EMPLOYEE = "Empleado";
     public static final String TXT_TRNX_TP_MAINT_USER_CONTRACTOR = "Contratista";
-    public static final String TXT_TRNX_TP_MAINT_USER_TOOL_MAINT_PROV = "Proveedor mantto. herramientas";
+    public static final String TXT_TRNX_TP_MAINT_USER_TOOLS_MAINT_PROV = "Proveedor mantto. herramientas";
     
     /*
      * Marketing

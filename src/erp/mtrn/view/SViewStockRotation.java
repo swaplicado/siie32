@@ -5,31 +5,29 @@
 
 package erp.mtrn.view;
 
+import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
+import erp.lib.SLibConstants;
+import erp.lib.SLibTimeUtilities;
+import erp.lib.table.STabFilterDatePeriodRange;
+import erp.lib.table.STabFilterDeleted;
+import erp.lib.table.STableColumn;
+import erp.lib.table.STableConstants;
+import erp.lib.table.STableSetting;
+import erp.table.SFilterConstants;
+import erp.table.STabFilterCompanyBranchEntity;
 import java.awt.Dimension;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JToggleButton;
 import javax.swing.table.DefaultTableCellRenderer;
-
-import erp.data.SDataConstants;
-import erp.data.SDataConstantsSys;
-import erp.lib.SLibConstants;
-import erp.lib.SLibTimeUtilities;
-import erp.lib.table.STabFilterDeleted;
-import erp.lib.table.STabFilterDatePeriodRange;
-import erp.lib.table.STableColumn;
-import erp.lib.table.STableConstants;
-import erp.lib.table.STableField;
-import erp.lib.table.STableSetting;
-import erp.table.SFilterConstants;
-import erp.table.STabFilterCompanyBranchEntity;
 import sa.lib.SLibRpnArgument;
 import sa.lib.SLibRpnArgumentType;
 import sa.lib.SLibRpnOperator;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SViewStockRotation extends erp.lib.table.STableTab {
 
@@ -125,6 +123,7 @@ public class SViewStockRotation extends erp.lib.table.STableTab {
 
         mvSuscriptors.add(mnTabType);
         mvSuscriptors.add(SDataConstants.TRN_DIOG);
+        mvSuscriptors.add(SDataConstants.TRNX_DIOG_MAINT);
 
         populateTable();
     }

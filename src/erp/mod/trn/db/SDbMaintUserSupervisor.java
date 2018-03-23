@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
@@ -17,36 +18,41 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Gil De Jesús, Sergio Flores
  */
-public class SDbMaintArea extends SDbRegistryUser {
+public class SDbMaintUserSupervisor extends SDbRegistryUser {
 
-    protected int mnPkMaintAreaId;
-    protected String msCode;
+    protected int mnPkMaintUserSupervisorId;
     protected String msName;
+    protected java.sql.Blob moFingerprint_n;
     /*
     protected boolean mbDeleted;
+    */
+    protected int mnFkMaintUserId_n;
+    /*
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
     protected Date mtTsUserInsert;
     protected Date mtTsUserUpdate;
     */
 
-    public SDbMaintArea() {
-        super(SModConsts.TRN_MAINT_AREA);
+    public SDbMaintUserSupervisor() {
+        super(SModConsts.TRN_MAINT_USER_SUPV);
     }
 
-    public void setPkMaintAreaId(int n) { mnPkMaintAreaId = n; }
-    public void setCode(String s) { msCode = s; }
+    public void setPkMaintUserSupervisorId(int n) { mnPkMaintUserSupervisorId = n; }
     public void setName(String s) { msName = s; }
+    public void setFingerprint_n(java.sql.Blob o) { moFingerprint_n = o; }
     public void setDeleted(boolean b) { mbDeleted = b; }
+    public void setFkMaintUserId_n(int n) { mnFkMaintUserId_n = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
 
-    public int getPkMaintAreaId() { return mnPkMaintAreaId; }
-    public String getCode() { return msCode; }
+    public int getPkMaintUserSupervisorId() { return mnPkMaintUserSupervisorId; }
     public String getName() { return msName; }
+    public java.sql.Blob getFingerprint_n() { return moFingerprint_n; }
     public boolean isDeleted() { return mbDeleted; }
+    public int getFkMaintUserId_n() { return mnFkMaintUserId_n; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
@@ -54,26 +60,28 @@ public class SDbMaintArea extends SDbRegistryUser {
 
     @Override
     public void setPrimaryKey(int[] pk) {
-        mnPkMaintAreaId = pk[0];
+        mnPkMaintUserSupervisorId = pk[0];
     }
 
     @Override
     public int[] getPrimaryKey() {
-        return new int[] { mnPkMaintAreaId };
+        return new int[] { mnPkMaintUserSupervisorId };
     }
 
     @Override
     public void initRegistry() {
         initBaseRegistry();
 
-        mnPkMaintAreaId = 0;
-        msCode = "";
+        mnPkMaintUserSupervisorId = 0;
         msName = "";
+        moFingerprint_n = null;
         mbDeleted = false;
+        mnFkMaintUserId_n = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
+        
     }
 
     @Override
@@ -83,24 +91,24 @@ public class SDbMaintArea extends SDbRegistryUser {
 
     @Override
     public String getSqlWhere() {
-        return "WHERE id_maint_area = " + mnPkMaintAreaId + " ";
+        return "WHERE id_maint_user_supv = " + mnPkMaintUserSupervisorId + " ";
     }
 
     @Override
     public String getSqlWhere(int[] pk) {
-        return "WHERE id_maint_area = " + pk[0] + " ";
+        return "WHERE id_maint_user_supv = " + pk[0] + " ";
     }
 
     @Override
     public void computePrimaryKey(SGuiSession session) throws SQLException, Exception {
         ResultSet resultSet = null;
 
-        mnPkMaintAreaId = 0;
+        mnPkMaintUserSupervisorId = 0;
 
-        msSql = "SELECT COALESCE(MAX(id_maint_area), 0) + 1 FROM " + getSqlTable() + " ";
+        msSql = "SELECT COALESCE(MAX(id_maint_user_supv), 0) + 1 FROM " + getSqlTable() + " ";
         resultSet = session.getStatement().executeQuery(msSql);
         if (resultSet.next()) {
-            mnPkMaintAreaId = resultSet.getInt(1);
+            mnPkMaintUserSupervisorId = resultSet.getInt(1);
         }
     }
 
@@ -118,10 +126,11 @@ public class SDbMaintArea extends SDbRegistryUser {
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
         }
         else {
-            mnPkMaintAreaId = resultSet.getInt("id_maint_area");
-            msCode = resultSet.getString("code");
+            mnPkMaintUserSupervisorId = resultSet.getInt("id_maint_user_supv");
             msName = resultSet.getString("name");
+            moFingerprint_n = resultSet.getBlob("fingerprint_n");
             mbDeleted = resultSet.getBoolean("b_del");
+            mnFkMaintUserId_n = resultSet.getInt("fk_maint_user_n");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
@@ -143,12 +152,13 @@ public class SDbMaintArea extends SDbRegistryUser {
             mbDeleted = false;
             mnFkUserInsertId = session.getUser().getPkUserId();
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
-
+            
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
-                    mnPkMaintAreaId + ", " +
-                    "'" + msCode + "', " +
-                    "'" + msName + "', " +
+                    mnPkMaintUserSupervisorId + ", " + 
+                    "'" + msName + "', " + 
+                    "NULL, " + 
                     (mbDeleted ? 1 : 0) + ", " +
+                    (mnFkMaintUserId_n == SLibConsts.UNDEFINED ? "NULL" : mnFkMaintUserId_n) + ", " + 
                     mnFkUserInsertId + ", " +
                     mnFkUserUpdateId + ", " +
                     "NOW()" + ", " +
@@ -159,10 +169,11 @@ public class SDbMaintArea extends SDbRegistryUser {
             mnFkUserUpdateId = session.getUser().getPkUserId();
 
             msSql = "UPDATE " + getSqlTable() + " SET " +
-                    //"id_maint_area = " + mnPkMaintAreaId + ", " +
-                    "code = '" + msCode + "', " +
+                    // "id_maint_user_supv = " + mnPkMaintUserSupervisorId + ", " +
                     "name = '" + msName + "', " +
+                    //"fingerprint_n = " + moFingerprint_n + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
+                    "fk_maint_user_n = " + (mnFkMaintUserId_n == SLibConsts.UNDEFINED ? "NULL" : mnFkMaintUserId_n) + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                     //"ts_usr_ins = " + "NOW()" + ", " +
@@ -176,13 +187,14 @@ public class SDbMaintArea extends SDbRegistryUser {
     }
 
     @Override
-    public SDbMaintArea clone() throws CloneNotSupportedException {
-        SDbMaintArea registry = new SDbMaintArea();
+    public SDbMaintUserSupervisor clone() throws CloneNotSupportedException {
+        SDbMaintUserSupervisor registry = new SDbMaintUserSupervisor();
 
-        registry.setPkMaintAreaId(this.getPkMaintAreaId());
-        registry.setCode(this.getCode());
+        registry.setPkMaintUserSupervisorId(this.getPkMaintUserSupervisorId());
         registry.setName(this.getName());
+        registry.setFingerprint_n(this.getFingerprint_n());
         registry.setDeleted(this.isDeleted());
+        registry.setFkMaintUserId_n(this.getFkMaintUserId_n());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());
