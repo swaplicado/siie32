@@ -27,7 +27,7 @@ public class SDbMaintDiogSignature extends SDbRegistryUser {
     protected int mnFkUserInsertId;
     protected Date mtTsUserInsert;
     */
-    
+
     public SDbMaintDiogSignature() {
         super(SModConsts.TRN_MAINT_DIOG_SIG);
     }
@@ -118,8 +118,8 @@ public class SDbMaintDiogSignature extends SDbRegistryUser {
             mnFkDiogDocId = resultSet.getInt("fk_diog_doc");
             mnFkMaintUserId = resultSet.getInt("fid_maint_user");
             mnFkMaintUserSupervisorId = resultSet.getInt("fid_maint_user_supv");
-            mnFkUserInsertId = resultSet.getInt("fk_usr");
-            mtTsUserInsert = resultSet.getTimestamp("ts_usr");
+            mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
+            mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
 
             mbRegistryNew = false;
         }
